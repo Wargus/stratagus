@@ -40,9 +40,117 @@
 
 <ul>
 <p/>
-	<li>2.2.7 Released</li>
+	<li>Unreleased 2.2.8</li>
 	<ul>
-	<li>Added CclCreateMissile function to create missiles from Lua code. from Cybermind)</li>
+	<li>Metaserver client code rewritten: now using class CMetaClient available through Lua. (from cybermind)</li>
+	<li>Added FiredSound property for MissileType. (from cybermind)</li>
+	<li>Fix bug #1245643: should fix compilation on *nix. (from Joris Dauphin)</li>
+	<li>Implement lua wrapper CheckDependency. Inspired from Mikko Merikivi's patch. (patch from Mikko Merikivi)</li>
+	<li>Changed MissileType::Damage to NumberDesc, so you can now define uour own damage formula for missile. (from cybermind)</li>
+	<li>Draw some more icons with playerColor. (from Joris Dauphin)</li>
+	<li>Increased maximum of animations to 4096. (from cybermind)</li>
+	<li>Adeed second parameter in CclFilteredListDirectory, which allows to use relative paths instead of absolute. (from cybermind)</li>
+	<li>Ability to get unittype "Name" in CclGetUnitVariable. (from cybermind)</li>
+	<li>Added new MissileStraightFly, which flies straightly, until it reaches terrain tile field flags mask specified in MissileType::MissileStopFlags. (from cybermind)</li>
+	<li>Added MissileType::KillFirstUnit flag, hich tells missile to kill first unit on it's way, rather than on destination point. (from cybermind)</li>
+	<li>Added ability to use clrl+alt+right click to attack ground. (from cybermind)</li>
+	<li>Added "attacker" property in spell autocast parameters, to control, if spell will be casted only on attacking units. (from cybermind)</li>
+	<li>Added ability to block missiles with Wall units, if missile was launched from land unit to land unit. (from cybermind)</li>
+	<li>Enhanced CclCreateMissile by addind 7th bool parameter, to make all position calculations relative to map coordinates. (from cybermind)</li>
+	<li>Added unittype variables TargetPosX and TargetPosY, to hold information about unit's current goal position. (from cybermind)</li>
+	<li>Enhanced transporters. (from cybermind)</li>
+	<li>Ability to build several units in row (useful for walls). (from cybermind)</li>
+	<li>Ability to specify setup file for map(useful for scenario maps). (from cybermind)</li>
+	<li>Added CclGetUnitsAroundUnit function to get all units around specified unit into table. (from cybermind)</li>
+	<li>Implemented spell cooldown timer ability, like in modern RTS (WC3). (from cybermind)</li>
+	<li>Added MissileType::ParabolCoefficient, to control curve coefficient in MissileParabolic. (from cybermind)</li>
+	<li>Ability to use conditions in NumberDesc using NumIf command. (from cybermind)</li>
+	<li>Ability to show player name for in StringDesc. (from cybermind)</li>
+	<li>Ability to enable OpenGL texture compression from Lua using SetUseTextureCompression function. (from cybermind)</li>
+	<li>Implemented old behavour for storing user data (logs, saves etc) to path where Stratagus is installed. (from cybermind)</li>
+	<li>Fixed map preview creating in OpenGL mode. (from cybermind)</li>
+	<li>ShieldPoints now a vital, so it may be modified through "adjust-vitals"/"area-adjust-vitals" spells. (from cybermind)</li>
+	<li>Enhanced area-adjust-vitals spell by adding Range field and addind "use-mana" boolean to control mana drain from spell usage. (from cybermind)</li>
+	<li>ShieldPiercing is now a variable instead of boolflag, so it may be modified through lua. (from cybermind)</li>
+	<li>Added ShieldPermeability unit variable, which controls damage percent absorbed by shield. (from cybermind)</li>
+	<li>allow distance rules to specify owner of units. (patch from Tim Felgentreff)</li>
+	<li>fix crash that occurs with some compilers when vector capacity isn't initialized. (patch from Tim Felgentreff)</li>
+	<li>feature: allow buildings to spawn buildings within their repair range. (patch from Tim Felgentreff)</li>
+	<li>merge lp:~timfelgentreff/stratagus/ButtonCheckUnitsNot. (patch from Tim Felgentreff)</li>
+	<li>Fix bug #1171053: Fix chopping wood. (Bug introduced by rev.8737). (from Joris Dauphin)</li>
+	<li>Add CPreference::PauseOnLeave parameter to control the game pause when the window is inactive. (from cybermind)</li>
+	<li>Fixed bug when research don't modify the stats of non-ready buildings. (from cybermind)</li>
+	<li>Fixed bug when player loses resources if he stops resource-using action. (from cybermind)</li>
+	<li>Added AND, OR, XOR and NOT operators in CAnimation_SetVar. (from cybermind)</li>
+	<li>Added CclDefineSpell parameter "force-use-animation" to use animation code for "self" targeted spells. (from cybermind)</li>
+	<li>merge lp:~timfelgentreff/stratagus/timfelgentreff-zoomeable-view. (patch from Tim Felgentreff)</li>
+	<li>Added CAnimation_LuaCallback which allows user to call lua functions from animations. (from cybermind)</li>
+	<li>Spawn-portal spell improvement. (from cybermind)</li>
+	<li>Added OnInit lua callback for CUnitType to initialize unit variables after creation. (from cybermind)</li>
+	<li>Allow user to dump unit info in log using "-i" command line parameter. (from cybermind)</li>
+	<li>Player can enable and disable asserts or debug messages. Use -a or -p command line options. (from cybermind)</li>
+	<li>Fix bug #1171053: Fix compilation under MSVC. (from Joris Dauphin)</li>
+	<li>Added teleport spell. (from cybermind)</li>
+	<li>Fixed bug with transparent 32bpp images in software mode. (from cybermind)</li>
+	<li>Added OnImpact lua callback in MissileType to make custom effects on missile impact. (from cybermind)</li>
+	<li>Added SmokePrecision in MissileType to make smoke trails much smoother. (from cybermind)</li>
+	<li>Add possibility to specify userDirectory via commandLine. (from Joris Dauphin)</li>
+	<li>UI improvements. (from Kyran Jackson)</li>
+	<li>Particle ticks bound to GameCycle (from cybermind)</li>
+	<li>Access to os table through lua (from cybermind)</li>
+	<li>Added ExactValue (to check exact value) and ExceptValue (to pass all values except this) in spell conditions (from cybermind)</li>
+	<li>Network code refactoring (from Joris Dauphin)</li>
+	<li>Some unittest code using UnitTest++ (from Joris Dauphin)</li>
+	<li>Ability to scroll through idle workers list (from cybermind)</li>
+	<li>Ability to call some ui functions from lua (from cybermind)</li>
+	<li>Added an ability to define custon user in-game UI buttons (from cybermind)</li>
+	<li>Added autocast by variable priority (heal the wounded ones, bloodlust for strong ones...) (from cybermind)</li>
+	<li>Make OpenGL support optional. (from Pali Rohár)</li>
+	<li>Fix bug #1117852: Fixed version compilation for MSVC. (from cybermind)</li>
+	<li>Correct handling for Warcraft 2 timed spells and health loss for time-to-live ability : the values change every cycle, not every second. (from cybermind)</li>
+	<li>Aility to change values in animation "set-var" by percent. (from cybermind)</li>
+	<li>Added poison damage which will slowly drain health for POISON_INDEX tics. (from cybermind)</li>
+	<li>Added fade time in "static-sprite" of DefineDecorations as third argument in table. (from cybermind)</li>
+	<li>Generate version string at compile time from CMakeLists.txt and from bzr revision. (from Pali Rohár)</li>
+	<li>Implement GetLocalPlayerNameFromEnv for Windows. (from Pali Rohár)</li>
+	<li>Fix bug #1044862: Include png.h before anything else. This fixing compilation on ubuntu. (from Joris Dauphin)</li>
+	<li>Added file HOWTO-NEW-RELEASE which describe how to release new version of stratagus. (from Pali Rohár)</li>
+	<li>Fix bug #1094352: Apply Julio patch for MAC. (patch from Julio)</li>
+	<li>PkgConfig package is needed only on Linux for determinate Maemo platform. (from Pali Rohár)</li>
+	<li>Fix bug #1093794: Fix bug where AI cannot build Lumber mill; Fix placement of storage shore building for AI. (from Joris Dauphin)</li>
+	<li>Added new order COrder_Defend, which allows to send some unit to defend another. (from cybermind)</li>
+	<li>Added new order COrder_Defend, which allows to send some unit to defend another. (from cybermind)</li>
+	<li>Ability to reset AI force manually in definition instead of adding new units (from cybermind)</li>
+	<li>Ability to use several impact missiles in one (from cybermind)</li>
+	<li>DefineUnitAllow can check now upgrade-to actions (from cybermind)</li>
+	<li>Added CUnitType::AiAdjacentRange, which prevents AI to build anything closer to that unittype (from cybermind)</li>
+	<li>Refactoring CommandKey, DrawFogOfWarTile, LoadWav, HitUnit and CButtonPanel::DoClicked functions (from Joris Dauphin)</li>
+	<li>Added destroyAnimation in CChunkParticle which creates static particle when the debris particle dies (from cybermind)</li>
+	<li>Added destroyAnimation in CChunkParticle which creates static particle when the debris particle dies (from cybermind)</li>
+	<li>Added new flag to CAnimation_SpawnMissile "setdirection", which sets the missile's direction equal to the creator's direction (from cybermind)</li>
+	<li>Added ReduceFactor in MissileType for reduce damage dealt to the next unit (from cybermind)</li>
+	<li>Refactoring popup code parsing (from Joris Dauphin)</li>
+	<li>Upgrades could now have a name (from cybermind)</li>
+	<li>Ability to view number of free workers (from cybermind)</li>
+	<li>Ability to show button in grayscale if not available (from cybermind)</li>
+	<li>Ability to view unit's dependencies in button popup (from cybermind)</li>
+	<li>Refactoring Split CMapField into CMapFieldPlayerInfo code (from Joris Dauphin)</li>
+	<li>A lot of AI enhancements (from cybermind)</li>
+	<li>Flexible upgrade-to animation (from cybermind)</li>
+	<li>Allow CAnimation_SpawnMissile to fire missile at some position instead of unit. (from cybermind)</li>
+	<li>Added ability to set text color in butrton popups. (from cybermind)</li>
+	<li>More flexible particles (from cybermind)</li>
+	<li>Added ButtonCheckUnitVariable which allow to show button only if some variables pass the condition. (from cybermind)</li>
+	<li>Allow CAnimation_SetVar to change non-CVariable variables (currently works for DamageType) (from cybermind)</li>
+	<li>Ability to set missile's damage and TTL directly in MissileType (from cybermind)</li>
+	<li>Added BoxOffsetX and BoxOffsetY in CunitType to move selection box around unit. (from cybermind)</li>
+	<li>Added NoRandomPlacing flag in CUnitType to prevent random sprite rotation. (from cybermind)</li>
+	<li>Added MissileContinious (same as MissileStay, but can show it's animation several times and damage with Sleep period). (from cybermind)</li>
+	<li>Fix a crash when loading 'recycling' units. (from Joris Dauphin)</li>
+	</ul>
+<p/><li>2.2.7 Released<p/></li>
+	<ul>
+	<li>Added CclCreateMissile function to create missiles from Lua code. (from Cybermind)</li>
 	<li>Added MissileType::SmokeParticle (same use as SmokeMissile).(from Cybermind)</li>
 	<li>Alllow same units to get upgrade-to in one click.(from Cybermind)</li>
 	<li>CclGetUnitVariable and CclSetUnitVariable now can get and set the Max, Increase and Enable fields.(from Cybermind)</li>
