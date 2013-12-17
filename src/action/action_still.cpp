@@ -119,7 +119,7 @@ public:
 	}
 private:
 	bool IsDistanceCorrect(int distance) const {
-		return attacker->Type->MinAttackRange <= distance
+		return attacker->Type->MinAttackRange < distance
 			   && distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	}
 private:
@@ -137,9 +137,8 @@ private:
 		this->ClearGoal();
 		return;
 	}
-	const Vec2i invalidPos(-1, -1);
 
-	FireMissile(unit, goal, invalidPos);
+	FireMissile(unit, goal, goal->tilePos);
 	UnHideUnit(unit);
 }
 
@@ -287,6 +286,9 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
 
 	if (autoAttackUnit == NULL) {
+		return false;
+	}
+	if (unit.MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
