@@ -2039,7 +2039,7 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitActionBuilt) {
+				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->Index == ThisPlayer->Index) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
