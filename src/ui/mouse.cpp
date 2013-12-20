@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <ctype.h>
+#include <stdexcept>
 
 #include "stratagus.h"
 
