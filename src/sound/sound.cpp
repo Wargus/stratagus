@@ -101,8 +101,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
-		if (SelectionHandler.Source.Base == source.Base
-			&& SelectionHandler.Source.Id == source.Id) {
+		if (SelectionHandler.Sound != NULL && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
 			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
@@ -135,6 +134,10 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 	} else {
 		// normal sound/sound group handling
 		result = SimpleChooseSample(*sound);
+		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
+			SelectionHandler.HowMany = 0;
+			SelectionHandler.Sound = NULL;
+		}
 		if (selection) {
 			SelectionHandler.Source = source;
 		}
