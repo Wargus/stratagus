@@ -198,12 +198,19 @@ static int CclMapSound(lua_State *l)
 */
 static int CclPlaySound(lua_State *l)
 {
-	CSound *id;
+	const int args = lua_gettop(l);
+	if (args < 1 || args > 2) {
+		LuaError(l, "incorrect argument");
+	}
 
-	LuaCheckArgs(l, 1);
-
-	id = CclGetSound(l);
-	PlayGameSound(id, MaxSampleVolume);
+	lua_pushvalue(l, 1);
+	CSound *id = CclGetSound(l);
+	lua_pop(l, 1);
+	bool always = false;
+	if (args == 2) {
+		always = LuaToBoolean(l, 2);
+	}
+	PlayGameSound(id, MaxSampleVolume, always);
 	return 0;
 }
 

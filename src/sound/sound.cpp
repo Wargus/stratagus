@@ -323,13 +323,13 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 **  @param sound   Sound to play
 **  @param volume  Volume level to play the sound
 */
-void PlayGameSound(CSound *sound, unsigned char volume)
+void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 {
 	Origin source = {NULL, 0};
 
 	CSample *sample = ChooseSample(sound, false, source);
 
-	if (SampleIsPlaying(sample)) {
+	if (!always && SampleIsPlaying(sample)) {
 		return;
 	}
 

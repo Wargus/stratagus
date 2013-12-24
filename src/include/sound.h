@@ -168,7 +168,7 @@ extern void PlayUnitSound(const CUnit &unit, CSound *sound);
 /// Play a missile sound
 extern void PlayMissileSound(const Missile &missile, CSound *sound);
 /// Play a game sound
-extern void PlayGameSound(CSound *sound, unsigned char volume);
+extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = false);
 
 /// Play a sound file
 extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL);
