@@ -173,19 +173,19 @@ bool ZoomNoResize;
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
-unsigned long NextFrameTicks;        /// Ticks of begin of the next frame
+double NextFrameTicks;               /// Ticks of begin of the next frame
 unsigned long FrameCounter;          /// Current frame number
-int SlowFrameCounter;                /// Profile, frames out of sync
+unsigned long SlowFrameCounter;      /// Profile, frames out of sync
 
-int ClipX1;                      /// current clipping top left
-int ClipY1;                      /// current clipping top left
-int ClipX2;                      /// current clipping bottom right
-int ClipY2;                      /// current clipping bottom right
+int ClipX1;                          /// current clipping top left
+int ClipY1;                          /// current clipping top left
+int ClipX2;                          /// current clipping bottom right
+int ClipY2;                          /// current clipping bottom right
 
 static std::vector<Clip> Clips;
 
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
-int SkipFrames; /// Skip this frames
+int SkipFrames;                      /// Skip this frames
 
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;

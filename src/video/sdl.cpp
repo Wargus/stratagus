@@ -127,9 +127,7 @@ bool UseGLTextureCompression;       /// Use OpenGL texture compression
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
 
-static int FrameTicks;     /// Frame length in ms
-static int FrameRemainder; /// Frame remainder 0.1 ms
-static int FrameFraction; /// Frame fractional term
+double FrameTicks;     /// Frame length in ms
 
 const EventCallback *Callbacks;
 
@@ -159,16 +157,16 @@ PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
 **  Initialise video sync.
 **  Calculate the length of video frame and any simulation skips.
 **
-**  @see VideoSyncSpeed @see SkipFrames @see FrameTicks @see FrameRemainder
+**  @see VideoSyncSpeed @see SkipFrames @see FrameTicks
 */
 void SetVideoSync()
 {
-	int ms;
+	double ms;
 
 	if (VideoSyncSpeed) {
-		ms = (1000 * 1000 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+		ms = (1000.0 * 1000.0 / CYCLES_PER_SECOND) / VideoSyncSpeed;
 	} else {
-		ms = INT_MAX;
+		ms = (double)INT_MAX;
 	}
 	SkipFrames = ms / 400;
 	while (SkipFrames && ms / SkipFrames < 200) {
@@ -177,8 +175,7 @@ void SetVideoSync()
 	ms /= SkipFrames + 1;
 
 	FrameTicks = ms / 10;
-	FrameRemainder = ms % 10;
-	DebugPrint("frames %d - %d.%dms\n" _C_ SkipFrames _C_ ms / 10 _C_ ms % 10);
+	DebugPrint("frames %d - %5.2fms\n" _C_ SkipFrames _C_ ms / 10);
 }
 
 /*----------------------------------------------------------------------------
@@ -957,13 +954,8 @@ void WaitEventsOneFrame()
 			SDL_Delay(NextFrameTicks - ticks);
 			ticks = SDL_GetTicks();
 		}
-		while (ticks >= NextFrameTicks) {
+		while (ticks >= (unsigned long)(NextFrameTicks)) {
 			++interrupts;
-			FrameFraction += FrameRemainder;
-			if (FrameFraction > 10) {
-				FrameFraction -= 10;
-				++NextFrameTicks;
-			}
 			NextFrameTicks += FrameTicks;
 		}
 

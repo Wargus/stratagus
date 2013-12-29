@@ -100,7 +100,7 @@
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	file.printf("\"state\", %d", this->State);
+	file.printf("\"state\", %d,", this->State);
 	file.printf(" \"spell\", \"%s\"", this->Spell->Ident.c_str());
 
 	file.printf("}");

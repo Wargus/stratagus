@@ -380,13 +380,13 @@ extern int SkipFrames;
 extern char VideoForceFullScreen;
 
 /// Next frame ticks
-extern unsigned long NextFrameTicks;
+extern double NextFrameTicks;
 
 /// Counts frames
 extern unsigned long FrameCounter;
 
 /// Counts quantity of slow frames
-extern int SlowFrameCounter;
+extern unsigned long SlowFrameCounter;
 
 /// Initialize Pixels[] for all players.
 /// (bring Players[] in sync with Pixels[])

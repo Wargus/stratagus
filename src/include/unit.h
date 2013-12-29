@@ -77,13 +77,13 @@ typedef COrder *COrderPtr;
 /*
 ** Configuration of the small (unit) AI.
 */
-#define PRIORITY_FACTOR   0x10000000
+#define PRIORITY_FACTOR   0x00080000
 #define HEALTH_FACTOR     0x00000001
 #define DISTANCE_FACTOR   0x00010000
-#define INRANGE_FACTOR    0x00001000
-#define INRANGE_BONUS     0x00100000
-#define CANATTACK_BONUS   0x00100000
-#define AIPRIORITY_BONUS  0x01000000
+#define INRANGE_FACTOR    0x00008000
+#define INRANGE_BONUS     0x01000000
+#define CANATTACK_BONUS   0x00080000
+#define AIPRIORITY_BONUS  0x04000000
 
 
 /// Called whenever the selected unit was updated

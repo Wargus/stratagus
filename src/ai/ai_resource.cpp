@@ -1239,14 +1239,8 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 		return false;
 	}
 
-	// Remove all workers not mining. on the way building something
-	// FIXME: It is not clever to use workers with gold
-	// Idea: Antonis: Put the rest of the workers in a table in case
-	// miners can't reach but others can. This will be useful if AI becomes
-	// more flexible (e.g.: transports workers to an island)
-	// FIXME: too hardcoded, not nice, needs improvement.
-	// FIXME: too many workers repair the same building!
-
+	// We need to send all nearby free workers to repair that building
+	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
 	std::vector<CUnit *> table;
 	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
@@ -1270,7 +1264,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 
 	terrainTraversal.PushUnitPosAndNeighboor(building);
 
-	const int maxRange = 100;
+	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 	CUnit *unit = NULL;
 	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
