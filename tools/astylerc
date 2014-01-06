@@ -1,5 +1,5 @@
 # config file for AStyle ( http://astyle.sourceforge.net/ )
-# AStyle version : 2.02
+# AStyle version : 2.0.4
 
 # style
 --style=otbs
