@@ -119,11 +119,13 @@ class CUnitType;
 class CMapInfo
 {
 public:
-	bool IsPointOnMap(int x, int y) const {
+	bool IsPointOnMap(int x, int y) const
+	{
 		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
 	}
 
-	bool IsPointOnMap(const Vec2i &pos) const {
+	bool IsPointOnMap(const Vec2i &pos) const
+	{
 		return IsPointOnMap(pos.x, pos.y);
 	}
 
@@ -150,21 +152,26 @@ public:
 	CMap();
 	~CMap();
 
-	unsigned int getIndex(int x, int y) const {
+	unsigned int getIndex(int x, int y) const
+	{
 		return x + y * this->Info.MapWidth;
 	}
-	unsigned int getIndex(const Vec2i &pos) const {
+	unsigned int getIndex(const Vec2i &pos) const
+	{
 		return getIndex(pos.x, pos.y);
 	}
 
-	CMapField *Field(unsigned int index) const {
+	CMapField *Field(unsigned int index) const
+	{
 		return &this->Fields[index];
 	}
 	/// Get the MapField at location x,y
-	CMapField *Field(int x, int y) const {
+	CMapField *Field(int x, int y) const
+	{
 		return &this->Fields[x + y * this->Info.MapWidth];
 	}
-	CMapField *Field(const Vec2i &pos) const {
+	CMapField *Field(const Vec2i &pos) const
+	{
 		return Field(pos.x, pos.y);
 	}
 
@@ -227,7 +234,8 @@ public:
 	void Clamp(Vec2i &pos) const;
 
 	//Warning: we expect typical usage as xmin = x - range
-	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos) {
+	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
+	{
 		minpos.x = std::max<short>(0, minpos.x);
 		minpos.y = std::max<short>(0, minpos.y);
 

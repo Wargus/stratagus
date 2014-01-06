@@ -100,7 +100,8 @@ public:
 		player(&_player), type(&_type)
 	{}
 
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return (unit->Player == player && unit->Type == type);
 	}
 
@@ -158,7 +159,8 @@ class CUnitTypeFinder
 {
 public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		const CUnitType &type = *unit->Type;
 		if (type.Vanishes || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;

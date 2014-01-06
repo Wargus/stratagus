@@ -38,7 +38,8 @@ class COrder_Unload : public COrder
 {
 	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitActionUnload), State(0) {
+	COrder_Unload() : COrder(UnitActionUnload), State(0)
+	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}

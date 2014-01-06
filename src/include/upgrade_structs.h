@@ -129,7 +129,8 @@ extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 class CUnitStats
 {
 public:
-	CUnitStats() : Variables(NULL) {
+	CUnitStats() : Variables(NULL)
+	{
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
 	}
@@ -179,12 +180,14 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL) {
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
+	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
 		memset(ApplyTo, 0, sizeof(ApplyTo));
 	}
-	~CUpgradeModifier() {
+	~CUpgradeModifier()
+	{
 		delete [] this->ModifyPercent;
 	}
 
@@ -222,7 +225,8 @@ class CAllow
 public:
 	CAllow() { this->Clear(); }
 
-	void Clear() {
+	void Clear()
+	{
 		memset(Units, 0, sizeof(Units));
 		memset(Upgrades, 0, sizeof(Upgrades));
 	}
@@ -240,7 +244,8 @@ class CUpgradeTimers
 public:
 	CUpgradeTimers() { this->Clear(); }
 
-	void Clear() {
+	void Clear()
+	{
 		memset(Upgrades, 0, sizeof(Upgrades));
 	}
 

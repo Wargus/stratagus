@@ -258,7 +258,8 @@ public:
 	CNetworkCommandQueue() : Time(0), Type(0) {}
 	void Clear() { this->Time = this->Type = 0; Data.clear(); }
 
-	bool operator == (const CNetworkCommandQueue &rhs) const {
+	bool operator == (const CNetworkCommandQueue &rhs) const
+	{
 		return Time == rhs.Time && Type == rhs.Type && Data == rhs.Data;
 	}
 	bool operator != (const CNetworkCommandQueue &rhs) const { return !(*this == rhs); }
@@ -309,7 +310,8 @@ public:
 		resentPacketCount(0)
 	{}
 
-	void print() const {
+	void print() const
+	{
 		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
 	}
 

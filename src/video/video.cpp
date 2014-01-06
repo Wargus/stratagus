@@ -127,7 +127,8 @@ private:
 	CColorCycling() : ColorCycleAll(false), cycleCount(0)
 	{}
 
-	static void CreateInstanceIfNeeded() {
+	static void CreateInstanceIfNeeded()
+	{
 		if (s_instance == NULL) {
 			s_instance = new CColorCycling;
 		}

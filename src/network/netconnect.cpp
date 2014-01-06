@@ -60,7 +60,8 @@
 **  Connect state information of network systems active in current game.
 */
 struct NetworkState {
-	void Clear() {
+	void Clear()
+	{
 		State = ccs_unused;
 		MsgCnt = 0;
 		LastFrame = 0;
@@ -1078,12 +1079,12 @@ void CServer::Parse_Resync(const int h)
 {
 	switch (networkStates[h].State) {
 		case ccs_mapinfo:
-			// a delayed ack - fall through..
+		// a delayed ack - fall through..
 		case ccs_async:
 			// client has recvd welcome and is waiting for info
 			networkStates[h].State = ccs_synced;
 			networkStates[h].MsgCnt = 0;
-			/* Fall through */
+		/* Fall through */
 		case ccs_synced: {
 			// this code path happens until client falls back to ICMWaiting
 			// (indicating Resync has completed)
@@ -1109,11 +1110,11 @@ void CServer::Parse_Resync(const int h)
 void CServer::Parse_Waiting(const int h)
 {
 	switch (networkStates[h].State) {
-			// client has recvd welcome and is waiting for info
+		// client has recvd welcome and is waiting for info
 		case ccs_connecting:
 			networkStates[h].State = ccs_connected;
 			networkStates[h].MsgCnt = 0;
-			/* Fall through */
+		/* Fall through */
 		case ccs_connected: {
 			// this code path happens until client acknowledges the map
 			Send_Map(Hosts[h]);
@@ -1133,7 +1134,7 @@ void CServer::Parse_Waiting(const int h)
 					networkStates[i].State = ccs_async;
 				}
 			}
-			/* Fall through */
+		/* Fall through */
 		case ccs_synced:
 			// the wanted state - do nothing.. until start...
 			networkStates[h].MsgCnt = 0;
@@ -1167,11 +1168,11 @@ void CServer::Parse_Waiting(const int h)
 void CServer::Parse_Map(const int h)
 {
 	switch (networkStates[h].State) {
-			// client has recvd map info waiting for state info
+		// client has recvd map info waiting for state info
 		case ccs_connected:
 			networkStates[h].State = ccs_mapinfo;
 			networkStates[h].MsgCnt = 0;
-			/* Fall through */
+		/* Fall through */
 		case ccs_mapinfo: {
 			// this code path happens until client acknowledges the state info
 			// by falling back to ICMWaiting with prev. State synced
@@ -1199,8 +1200,8 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 {
 	switch (networkStates[h].State) {
 		case ccs_mapinfo:
-			// User State Change right after connect - should not happen, but..
-			/* Fall through */
+		// User State Change right after connect - should not happen, but..
+		/* Fall through */
 		case ccs_synced:
 			// Default case: Client is in sync with us, but notes a local change
 			// networkStates[h].State = ccs_async;
@@ -1216,7 +1217,7 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 					networkStates[i].State = ccs_async;
 				}
 			}
-			/* Fall through */
+		/* Fall through */
 		case ccs_async: {
 			// this code path happens until client acknowledges the state change reply
 			// by sending ICMResync
@@ -1246,7 +1247,7 @@ void CServer::Parse_GoodBye(const int h)
 			// We can enter here from _ANY_ state!
 			networkStates[h].MsgCnt = 0;
 			networkStates[h].State = ccs_detaching;
-			/* Fall through */
+		/* Fall through */
 		case ccs_detaching: {
 			// this code path happens until client acknoledges the GoodBye
 			// by sending ICMSeeYou;

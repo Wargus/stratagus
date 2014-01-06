@@ -251,7 +251,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 /* virtual */ void COrder_Board::Execute(CUnit &unit)
 {
 	switch (this->State) {
-			// Wait for transporter
+		// Wait for transporter
 		case State_WaitForTransporter:
 			if (this->WaitForTransporter(unit)) {
 				this->State = State_EnterTransporter;
@@ -271,7 +271,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 				return;
 			}
 			this->State = 1;
-			// FALL THROUGH
+		// FALL THROUGH
 		default: { // Move to transporter
 			if (this->State <= State_MoveToTransporterMax) {
 				const int pathRet = MoveToTransporter(unit);

@@ -188,7 +188,8 @@ extern void CleanFonts();
 class CLabel
 {
 public:
-	CLabel(const CFont &f, const std::string &nc, const std::string &rc): font(&f) {
+	CLabel(const CFont &f, const std::string &nc, const std::string &rc): font(&f)
+	{
 		normal = CFontColor::Get(nc);
 		reverse = CFontColor::Get(rc);
 	}

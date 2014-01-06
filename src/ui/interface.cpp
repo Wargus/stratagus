@@ -431,7 +431,7 @@ void UiFindIdleWorker()
 	}
 	CUnit *unit = ThisPlayer->FreeWorkers[0];
 	if (LastIdleWorker) {
-		const std::vector<CUnit *>& freeWorkers = ThisPlayer->FreeWorkers;
+		const std::vector<CUnit *> &freeWorkers = ThisPlayer->FreeWorkers;
 		std::vector<CUnit *>::const_iterator it = std::find(freeWorkers.begin(),
 															freeWorkers.end(),
 															LastIdleWorker);
@@ -574,19 +574,19 @@ static bool CommandKey(int key)
 	}
 
 	switch (key) {
-			// Return enters chat/input mode.
+		// Return enters chat/input mode.
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: // RETURN
 			UiBeginInput();
 			return true;
 
-			// Unselect everything
+		// Unselect everything
 		case SDLK_CARET:
 		case SDLK_BACKQUOTE:
 			UiUnselectAll();
 			break;
 
-			// Group selection
+		// Group selection
 		case '0': case '1': case '2':
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
@@ -647,7 +647,7 @@ static bool CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			// FALL THROUGH
+		// FALL THROUGH
 		case SDLK_PERIOD: // ., ALT+I, CTRL+I: Find idle worker
 			UiFindIdleWorker();
 			break;
@@ -664,7 +664,7 @@ static bool CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-			// FALL THROUGH (CTRL+P, ALT+P)
+		// FALL THROUGH (CTRL+P, ALT+P)
 		case SDLK_PAUSE:
 			UiTogglePause();
 			break;
@@ -865,7 +865,7 @@ static int InputKey(int key)
 				NetworkSendChatMessage(chatMessage);
 			}
 		}
-		// FALL THROUGH
+	// FALL THROUGH
 		case SDLK_ESCAPE:
 			KeyState = KeyStateCommand;
 			UI.StatusLine.Clear();
@@ -1355,13 +1355,13 @@ void InputMouseMove(const EventCallback &callbacks,
 	const int buff = 32;
 	const PixelDiff diff = LastMousePos - mousePos;
 
-	if (abs(diff.x) > buff || abs (diff.y) > buff) {
+	if (abs(diff.x) > buff || abs(diff.y) > buff) {
 		MouseState = InitialMouseState;
 		LastMouseTicks = ticks;
 		// Reset rectangle select cursor state if we moved by a lot
 		// - rectangle select should be a drag, not a tap
 		if (CursorState == CursorStateRectangle
-			&& (abs(diff.x) > 2 * buff || abs (diff.y) > 2 * buff)) {
+			&& (abs(diff.x) > 2 * buff || abs(diff.y) > 2 * buff)) {
 			CursorState = CursorStatePoint;
 		}
 	}

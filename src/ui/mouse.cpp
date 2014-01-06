@@ -205,18 +205,18 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	if (unit.ResourcesHeld > 0
 		&& dest.Type->CanStore[unit.CurrentResource]
 		&& (dest.Player == unit.Player
-		|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
-			dest.Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandReturnGoods(unit, &dest, flush);
-			return true;
+			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandReturnGoods(unit, &dest, flush);
+		return true;
 	}
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
-	const CUnitType& type = *unit.Type;
+	const CUnitType &type = *unit.Type;
 	if (res
 		&& type.ResInfo[res]
 		&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
@@ -238,7 +238,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
 		return false;
 	}
-	const CUnitType& type = *unit.Type;
+	const CUnitType &type = *unit.Type;
 	// FIXME: support harvesting more types of terrain.
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (type.ResInfo[res]

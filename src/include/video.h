@@ -154,7 +154,8 @@ public:
 class CPlayerColorGraphic : public CGraphic
 {
 protected:
-	CPlayerColorGraphic() {
+	CPlayerColorGraphic()
+	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
 #endif
@@ -298,7 +299,8 @@ public:
 	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
-	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) {
+	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
+	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			return MapRGBA(f, r, g, b, 0xFF);
@@ -308,10 +310,12 @@ public:
 			return SDL_MapRGB(f, r, g, b);
 		}
 	}
-	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color) {
+	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
+	{
 		return MapRGB(f, color.R, color.G, color.B);
 	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
@@ -321,10 +325,12 @@ public:
 			return SDL_MapRGBA(f, r, g, b, a);
 		}
 	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color) {
+	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
+	{
 		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
-	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b) {
+	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
+	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			*r = (c >> RSHIFT) & 0xff;
@@ -336,7 +342,8 @@ public:
 			SDL_GetRGB(c, f, r, g, b);
 		}
 	}
-	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a) {
+	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
+	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			*r = (c >> RSHIFT) & 0xff;

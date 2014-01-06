@@ -223,7 +223,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	return true;
 }
 
-enum UStrIntType{
+enum UStrIntType {
 	USTRINT_STR, USTRINT_INT
 };
 struct UStrInt {
@@ -381,7 +381,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
-static void DrawUnitInfo_portrait(const CUnitType& type)
+static void DrawUnitInfo_portrait(const CUnitType &type)
 {
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
@@ -410,7 +410,7 @@ static void DrawUnitInfo_portrait(const CUnitType& type)
 	}
 }
 
-static bool DrawUnitInfo_single_selection(const CUnit& unit)
+static bool DrawUnitInfo_single_selection(const CUnit &unit)
 {
 	switch (unit.CurrentAction()) {
 		case UnitActionTrain: { //  Building training units.
@@ -591,7 +591,8 @@ static int MessagesEventIndex;                 /// FIXME: docu
 class MessagesDisplay
 {
 public:
-	MessagesDisplay() : show(true) {
+	MessagesDisplay() : show(true)
+	{
 #ifdef DEBUG
 		showBuilList = false;
 #endif
@@ -967,7 +968,7 @@ void CenterOnMessage()
 	if (MessagesEventCount == 0) {
 		return;
 	}
-	const Vec2i& pos(MessagesEventPos[MessagesEventIndex]);
+	const Vec2i &pos(MessagesEventPos[MessagesEventIndex]);
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(pos));
 	SetMessage(_("~<Event: %s~>"), MessagesEvent[MessagesEventIndex]);
 	++MessagesEventIndex;
@@ -1117,7 +1118,7 @@ static void InfoPanel_draw_no_selection()
 
 static void InfoPanel_draw_single_selection()
 {
-	CUnit& unit = *Selected[0];
+	CUnit &unit = *Selected[0];
 	int panelIndex;
 
 	// FIXME: not correct for enemy's units

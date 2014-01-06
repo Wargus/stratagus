@@ -67,9 +67,9 @@ public:
 	}
 
 	bool isTainted() const { return tainted; }
-	const std::vector<CUnit *>& getUnits() const { return units; }
+	const std::vector<CUnit *> &getUnits() const { return units; }
 
-	void add(CUnit& unit, unsigned int num)
+	void add(CUnit &unit, unsigned int num)
 	{
 		if (ThisPlayer->IsTeamed(unit)) {
 			if (!tainted) {
@@ -80,7 +80,7 @@ public:
 		}
 	}
 
-	void remove(CUnit& unit)
+	void remove(CUnit &unit)
 	{
 		std::vector<CUnit *>::iterator it = find(units.begin(), units.end(), &unit);
 
@@ -175,7 +175,7 @@ void ClearGroup(int num)
 	CUnitGroup &group = Groups[num];
 
 	for (size_t i = 0; i != group.getUnits().size(); ++i) {
-		CUnit& unit = *group.getUnits()[i];
+		CUnit &unit = *group.getUnits()[i];
 		unit.GroupId &= ~(1 << num);
 		Assert(!unit.Destroyed);
 	}

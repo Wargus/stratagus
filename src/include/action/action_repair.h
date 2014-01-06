@@ -39,7 +39,8 @@ class COrder_Repair : public COrder
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
 	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
 public:
-	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0) {
+	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)
+	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}

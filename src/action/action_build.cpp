@@ -248,11 +248,13 @@ class AlreadyBuildingFinder
 public:
 	AlreadyBuildingFinder(const CUnit &unit, const CUnitType &t) :
 		worker(&unit), type(&t) {}
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		return (!unit->Destroyed && unit->Type == type
 				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
 	}
-	CUnit *Find(const CMapField *const mf) const {
+	CUnit *Find(const CMapField *const mf) const
+	{
 		return mf->UnitCache.find(*this);
 	}
 private:

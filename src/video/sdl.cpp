@@ -835,8 +835,8 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
 			break;
 
-			// FIXME: check if this is only useful for the cursor
-			// FIXME: if this is the case we don't need this.
+		// FIXME: check if this is only useful for the cursor
+		// FIXME: if this is the case we don't need this.
 		case SDL_MOUSEMOTION:
 			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
 			// FIXME: Same bug fix from X11

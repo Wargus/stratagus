@@ -506,7 +506,7 @@ long CFile::PImpl::tell()
 **
 **  @return true if the file has been found.
 */
-static bool FindFileWithExtension(char (&file)[PATH_MAX])
+static bool FindFileWithExtension(char(&file)[PATH_MAX])
 {
 	if (!access(file, R_OK)) {
 		return true;
@@ -540,7 +540,7 @@ static bool FindFileWithExtension(char (&file)[PATH_MAX])
 **  @param file        Filename to open.
 **  @param buffer      Allocated buffer for generated filename.
 */
-static void LibraryFileName(const char *file, char (&buffer)[PATH_MAX])
+static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 {
 	// Absolute path or in current directory.
 	strcpy_s(buffer, PATH_MAX, file);
@@ -726,7 +726,8 @@ class RawFileWriter : public FileWriter
 	FILE *file;
 
 public:
-	RawFileWriter(const std::string &filename) {
+	RawFileWriter(const std::string &filename)
+	{
 		file = fopen(filename.c_str(), "wb");
 		if (!file) {
 			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
@@ -734,11 +735,13 @@ public:
 		}
 	}
 
-	virtual ~RawFileWriter() {
+	virtual ~RawFileWriter()
+	{
 		if (file) { fclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size) {
+	virtual int write(const char *data, unsigned int size)
+	{
 		return fwrite(data, size, 1, file);
 	}
 };
@@ -748,7 +751,8 @@ class GzFileWriter : public FileWriter
 	gzFile file;
 
 public:
-	GzFileWriter(const std::string &filename) {
+	GzFileWriter(const std::string &filename)
+	{
 		file = gzopen(filename.c_str(), "wb9");
 		if (!file) {
 			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
@@ -756,11 +760,13 @@ public:
 		}
 	}
 
-	virtual ~GzFileWriter() {
+	virtual ~GzFileWriter()
+	{
 		if (file) { gzclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size) {
+	virtual int write(const char *data, unsigned int size)
+	{
 		return gzwrite(file, data, size);
 	}
 };

@@ -87,7 +87,7 @@ void ShowLoadProgress(const char *fmt, ...)
 
 	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
 		// Remove non printable chars
-		for (unsigned char *s = (unsigned char*)temp; *s; ++s) {
+		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
 			if (*s < 32) {
 				*s = ' ';
 			}

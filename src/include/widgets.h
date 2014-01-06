@@ -84,7 +84,8 @@ public:
 class ButtonWidget : public gcn::Button
 {
 public:
-	explicit ButtonWidget(const std::string &caption) : Button(caption) {
+	explicit ButtonWidget(const std::string &caption) : Button(caption)
+	{
 		this->setHotKey(GetHotKey(caption));
 	}
 };

@@ -98,7 +98,7 @@ enum {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Still::Show(const CViewport & , const PixelPos &lastScreenPos) const
+/* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
 	if (this->Action == UnitActionStandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
@@ -113,12 +113,14 @@ class IsTargetInRange
 public:
 	explicit IsTargetInRange(const CUnit &_attacker) : attacker(&_attacker) {}
 
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->IsVisibleAsGoal(*attacker->Player)
 			   && IsDistanceCorrect(attacker->MapDistanceTo(*unit));
 	}
 private:
-	bool IsDistanceCorrect(int distance) const {
+	bool IsDistanceCorrect(int distance) const
+	{
 		return attacker->Type->MinAttackRange < distance
 			   && distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	}
@@ -218,7 +220,8 @@ class IsAReparableUnitBy
 {
 public:
 	explicit IsAReparableUnitBy(const CUnit &_worker) : worker(&_worker) {}
-	bool operator()(CUnit *unit) const {
+	bool operator()(CUnit *unit) const
+	{
 		return (unit->IsTeamed(*worker)
 				&& unit->Type->RepairHP
 				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max

@@ -182,7 +182,8 @@ public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
 		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
 		Variables(NULL) {}
-	~ConditionPanel() {
+	~ConditionPanel()
+	{
 		delete[] BoolFlags;
 		delete[] Variables;
 	}
@@ -227,7 +228,8 @@ class CFiller
 
 		void Init(CGraphic *g);
 
-		bool TransparentPixel(int x, int y) {
+		bool TransparentPixel(int x, int y)
+		{
 			if (bstore) {
 				const unsigned int x_index = x / 32;
 				y *= Width;
@@ -249,7 +251,8 @@ public:
 
 	void Load();
 
-	bool OnGraphic(int x, int y) {
+	bool OnGraphic(int x, int y)
+	{
 		x -= X;
 		y -= Y;
 		if (x >= 0 && y >= 0 && x < map.Width && y < map.Height) {
@@ -304,7 +307,8 @@ public:
 class CPieMenu
 {
 public:
-	CPieMenu() : G(NULL), MouseButton(NoButton) {
+	CPieMenu() : G(NULL), MouseButton(NoButton)
+	{
 		memset(this->X, 0, sizeof(this->X));
 		memset(this->Y, 0, sizeof(this->Y));
 	}
@@ -314,7 +318,8 @@ public:
 	int X[9];            /// X position of the pies
 	int Y[9];            /// Y position of the pies
 
-	void SetRadius(int radius) {
+	void SetRadius(int radius)
+	{
 		const int coeffX[] = {    0,  193, 256, 193,   0, -193, -256, -193, 0};
 		const int coeffY[] = { -256, -193,   0, 193, 256,  193,    0, -193, 0};
 		for (int i = 0; i < 9; ++i) {

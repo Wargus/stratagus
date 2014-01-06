@@ -126,7 +126,8 @@ class CConstruction
 {
 public:
 	CConstruction() : Frames(NULL), Sprite(NULL), Width(0),
-		Height(0), ShadowSprite(NULL), ShadowWidth(0), ShadowHeight(0) {
+		Height(0), ShadowSprite(NULL), ShadowWidth(0), ShadowHeight(0)
+	{
 		File.Width = 0;
 		File.Height = 0;
 		ShadowFile.Width = 0;

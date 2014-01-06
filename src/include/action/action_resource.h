@@ -42,7 +42,8 @@ class COrder_Resource : public COrder
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
-		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false) {
+		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false)
+	{
 		Resource.Pos.x = Resource.Pos.y = -1;
 		goalPos.x = goalPos.y = -1;
 	}

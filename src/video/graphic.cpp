@@ -621,7 +621,7 @@ void CGraphic::GenFramesMap()
 	}
 }
 
-static void ApplyGrayScale(SDL_Surface* Surface, int Width, int Height)
+static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 {
 	SDL_LockSurface(Surface);
 	const SDL_PixelFormat *f = Surface->format;
@@ -1293,14 +1293,14 @@ void CGraphic::Resize(int w, int h)
 
 				unsigned char *p1 = &pixels[iy * Surface->pitch + ix * bpp];
 				unsigned char *p2 = (iy != Surface->h - 1) ?
-					 &pixels[(iy + 1) * Surface->pitch + ix * bpp] :
-					 p1;
+									&pixels[(iy + 1) * Surface->pitch + ix * bpp] :
+									p1;
 				unsigned char *p3 = (ix != Surface->w - 1) ?
-					 &pixels[iy * Surface->pitch + (ix + 1) * bpp] :
-					 p1;
+									&pixels[iy * Surface->pitch + (ix + 1) * bpp] :
+									p1;
 				unsigned char *p4 = (iy != Surface->h - 1 && ix != Surface->w - 1) ?
-					 &pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
-					 p1;
+									&pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
+									p1;
 
 				data[x * bpp + 0] = static_cast<unsigned char>(
 										(p1[0] * (1 - fy) + p2[0] * fy +

@@ -38,7 +38,8 @@ class COrder_Move : public COrder
 {
 	friend COrder *COrder::NewActionMove(const Vec2i &pos);
 public:
-	COrder_Move() : COrder(UnitActionMove), Range(0) {
+	COrder_Move() : COrder(UnitActionMove), Range(0)
+	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}

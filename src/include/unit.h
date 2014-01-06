@@ -166,7 +166,8 @@ public:
 	bool CanStoreOrder(COrder *order);
 
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive() const {
+	bool IsAgressive() const
+	{
 		return (Type->CanAttack && !Type->Coward
 				&& Variable[INVISIBLE_INDEX].Value == 0);
 	}
@@ -174,7 +175,8 @@ public:
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
 
-	inline bool IsInvisibile(const CPlayer &player) const {
+	inline bool IsInvisibile(const CPlayer &player) const
+	{
 		return (&player != Player && !!Variable[INVISIBLE_INDEX].Value
 				&& !player.IsBothSharedVision(*Player));
 	}
@@ -193,7 +195,8 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
-	inline bool IsAliveOnMap() const {
+	inline bool IsAliveOnMap() const
+	{
 		return !Removed && IsAlive();
 	}
 
@@ -204,7 +207,8 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleAsGoal(const CPlayer &player) const {
+	inline bool IsVisibleAsGoal(const CPlayer &player) const
+	{
 		// Invisibility
 		if (IsInvisibile(player)) {
 			return false;
@@ -231,7 +235,8 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleOnMap(const CPlayer &player) const {
+	inline bool IsVisibleOnMap(const CPlayer &player) const
+	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
 	}
 
@@ -264,7 +269,8 @@ public:
 	 **
 	 **  @return     The distance between in tiles.
 	 */
-	int MapDistanceTo(const CUnit &dst) const {
+	int MapDistanceTo(const CUnit &dst) const
+	{
 		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
 	}
 
@@ -372,8 +378,8 @@ public:
 		signed char IY;                     /// seen Y image displacement to map position
 		unsigned    Constructed : 1;        /// Unit seen construction
 		unsigned    State : 3;              /// Unit seen build/upgrade state
-		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
+unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
 	CVariable *Variable; /// array of User Defined variables.

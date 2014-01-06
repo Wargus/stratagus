@@ -60,13 +60,15 @@ template <const int FIND_TYPE>
 class AiForceEnemyFinder
 {
 public:
-	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy) {
+	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
+	{
 		Assert(enemy != NULL);
 		*enemy = NULL;
 		AiPlayer->Force[force].Units.for_each_if(*this);
 	}
 
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy) {
+	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
+	{
 		Assert(enemy != NULL);
 		*enemy = NULL;
 		force.Units.for_each_if(*this);
@@ -74,7 +76,8 @@ public:
 
 	bool found() const { return *enemy != NULL; }
 
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		if (unit->Type->CanAttack == false) {
 			return *enemy == NULL;
 		}
@@ -99,7 +102,8 @@ class IsAnAlliedUnitOf
 {
 public:
 	explicit IsAnAlliedUnitOf(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->IsVisibleAsGoal(*player) && (unit->Player->Index == player->Index
 												  || unit->IsAllied(*player));
 	}
@@ -178,7 +182,8 @@ int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
 class UnitTypePrioritySorter_Decreasing
 {
 public:
-	bool operator()(int lhs, int rhs) const {
+	bool operator()(int lhs, int rhs) const
+	{
 		return UnitTypes[lhs]->Priority > UnitTypes[rhs]->Priority;
 	}
 };
@@ -216,11 +221,13 @@ int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
 class AiForceCounter
 {
 public:
-	AiForceCounter(CUnitCache &units, unsigned int *d, const size_t len) : data(d) {
+	AiForceCounter(CUnitCache &units, unsigned int *d, const size_t len) : data(d)
+	{
 		memset(data, 0, len);
 		units.for_each(*this);
 	}
-	inline void operator()(const CUnit *const unit) const {
+	inline void operator()(const CUnit *const unit) const
+	{
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 	}
 private:

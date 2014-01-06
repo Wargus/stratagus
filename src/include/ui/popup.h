@@ -54,7 +54,8 @@ class PopupConditionPanel
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
-	~PopupConditionPanel() {
+	~PopupConditionPanel()
+	{
 		delete[] BoolFlags;
 		delete[] Variables;
 	}
@@ -187,7 +188,8 @@ class CPopupContentTypeVariable : public CPopupContentType
 {
 public:
 	CPopupContentTypeVariable() : Text(NULL), Font(NULL), Centered(0), Index(-1) {}
-	virtual ~CPopupContentTypeVariable() {
+	virtual ~CPopupContentTypeVariable()
+	{
 		FreeStringDesc(Text);
 		delete Text;
 	}

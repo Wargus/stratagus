@@ -119,7 +119,8 @@ class CVariable
 public:
 	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
 
-	bool operator ==(const CVariable &rhs) const {
+	bool operator ==(const CVariable &rhs) const
+	{
 		return this->Max == rhs.Max
 			   && this->Value == rhs.Value
 			   && this->Increase == rhs.Increase
@@ -226,7 +227,8 @@ class CDecoVar
 public:
 
 	CDecoVar() {};
-	virtual ~CDecoVar() {
+	virtual ~CDecoVar()
+	{
 	};
 
 	/// function to draw the decorations.
@@ -335,14 +337,16 @@ public:
 class CBuildRestrictionAnd : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionAnd() {
+	virtual ~CBuildRestrictionAnd()
+	{
 		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
 			 i != _or_list.end(); ++i) {
 			delete *i;
 		}
 		_or_list.clear();
 	}
-	virtual void Init() {
+	virtual void Init()
+	{
 		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
 			 i != _or_list.end(); ++i) {
 			(*i)->Init();
@@ -619,7 +623,8 @@ public:
 
 		struct DataKey {
 			static bool key_pred(const DataKey &lhs,
-								 const DataKey &rhs) {
+								 const DataKey &rhs)
+			{
 				return ((lhs.keylen == rhs.keylen) ?
 						(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
 			}
@@ -634,11 +639,13 @@ public:
 		std::map<std::string, int> user;
 		unsigned int TotalKeys;
 
-		void Init() {
+		void Init()
+		{
 			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
 		}
 
-		const char *operator[](int index) {
+		const char *operator[](int index)
+		{
 			for (unsigned int i = 0; i < SIZE; ++i) {
 				if (buildin[i].offset == index) {
 					return buildin[i].key;
@@ -661,7 +668,8 @@ public:
 		**
 		**  @return Index of the variable, -1 if not found.
 		*/
-		int operator[](const char *const key) {
+		int operator[](const char *const key)
+		{
 			DataKey k;
 			k.key = key;
 			k.keylen = strlen(key);
@@ -680,7 +688,8 @@ public:
 			return -1;
 		}
 
-		int AddKey(const char *const key) {
+		int AddKey(const char *const key)
+		{
 			int index = this->operator[](key);
 			if (index != -1) {
 				DebugPrint("Warning, Key '%s' already defined\n" _C_ key);
@@ -712,11 +721,13 @@ public:
 	std::vector<CVariable> Variable;   /// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;   /// Array to describe how showing variable.
 
-	unsigned int GetNumberBoolFlag() const {
+	unsigned int GetNumberBoolFlag() const
+	{
 		return BoolFlagNameLookup.TotalKeys;
 	}
 
-	unsigned int GetNumberVariable() const {
+	unsigned int GetNumberVariable() const
+	{
 		return VariableNameLookup.TotalKeys;
 	}
 };

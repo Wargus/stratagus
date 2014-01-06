@@ -56,7 +56,8 @@ class TitleScreen
 {
 public:
 	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(NULL) {}
-	~TitleScreen() {
+	~TitleScreen()
+	{
 		if (this->Labels) {
 			for (int i = 0; this->Labels[i]; ++i) {
 				delete this->Labels[i];

@@ -170,7 +170,8 @@ class IsAEnemyUnitOf
 {
 public:
 	explicit IsAEnemyUnitOf(const CPlayer &_player) : player(&_player) {}
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->IsVisibleAsGoal(*player) && unit->IsEnemy(*player);
 	}
 private:
@@ -183,7 +184,8 @@ public:
 	explicit IsAEnemyUnitWhichCanCounterAttackOf(const CPlayer &_player, const CUnitType &_type) :
 		player(&_player), type(&_type)
 	{}
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->IsVisibleAsGoal(*player)
 			   && unit->IsEnemy(*player)
 			   && CanTarget(*unit->Type, *type);
@@ -430,7 +432,8 @@ class IsAWorker
 {
 public:
 	explicit IsAWorker() {}
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
 	}
 };
@@ -439,7 +442,8 @@ class CompareDepotsByDistance
 {
 public:
 	explicit CompareDepotsByDistance(const CUnit &worker) : worker(worker) {}
-	bool operator()(const CUnit *lhs, const CUnit *rhs) const {
+	bool operator()(const CUnit *lhs, const CUnit *rhs) const
+	{
 		return lhs->MapDistanceTo(worker) < rhs->MapDistanceTo(worker);
 	}
 private:

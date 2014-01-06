@@ -67,7 +67,8 @@ class CContentTypeText : public CContentType
 public:
 	CContentTypeText() : Text(NULL), Font(NULL), Centered(0), Index(-1),
 		Component(VariableValue), ShowName(0), Stat(0) {}
-	virtual ~CContentTypeText() {
+	virtual ~CContentTypeText()
+	{
 		FreeStringDesc(Text);
 		delete Text;
 	}

@@ -591,7 +591,8 @@ public:
 		unit(unit), goal_reachable(goal_reachable)
 	{}
 
-	void operator()(int offset) const {
+	void operator()(int offset) const
+	{
 		if (CostMoveTo(offset, unit) >= 0) {
 			AStarMatrix[offset].InGoal = 1;
 			*goal_reachable = true;
@@ -610,22 +611,26 @@ class MinMaxRangeVisitor
 public:
 	explicit MinMaxRangeVisitor(const T &func) : func(func), minrange(0), maxrange(0) {}
 
-	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight) {
+	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight)
+	{
 		this->goalTopLeft = goalTopLeft;
 		this->goalBottomRight = goalBottomRight;
 	}
 
-	void SetRange(int minrange, int maxrange) {
+	void SetRange(int minrange, int maxrange)
+	{
 		this->minrange = minrange;
 		this->maxrange = maxrange;
 	}
 
-	void SetUnitSize(const Vec2i &tileSize) {
+	void SetUnitSize(const Vec2i &tileSize)
+	{
 		this->unitExtraTileSize.x = tileSize.x - 1;
 		this->unitExtraTileSize.y = tileSize.y - 1;
 	}
 
-	void Visit() const {
+	void Visit() const
+	{
 		TopHemicycle();
 		TopHemicycleNoMinRange();
 		Center();
@@ -634,12 +639,14 @@ public:
 	}
 
 private:
-	int GetMaxOffsetX(int dy, int range) const {
+	int GetMaxOffsetX(int dy, int range) const
+	{
 		return isqrt(square(range + 1) - square(dy) - 1);
 	}
 
 	// Distance are computed between bottom of unit and top of goal
-	void TopHemicycle() const {
+	void TopHemicycle() const
+	{
 		const int miny = std::max(0, goalTopLeft.y - maxrange - unitExtraTileSize.y);
 		const int maxy = std::min(goalTopLeft.y - minrange - unitExtraTileSize.y, goalTopLeft.y - 1 - unitExtraTileSize.y);
 		for (int y = miny; y <= maxy; ++y) {
@@ -655,7 +662,8 @@ private:
 		}
 	}
 
-	void HemiCycleRing(int y, int offsetminx, int offsetmaxx) const {
+	void HemiCycleRing(int y, int offsetminx, int offsetmaxx) const
+	{
 		const int minx = std::max(0, goalTopLeft.x - offsetmaxx - unitExtraTileSize.x);
 		const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
 		Vec2i mpos(minx, y);
@@ -669,7 +677,8 @@ private:
 		}
 	}
 
-	void TopHemicycleNoMinRange() const {
+	void TopHemicycleNoMinRange() const
+	{
 		const int miny = std::max(0, goalTopLeft.y - (minrange - 1) - unitExtraTileSize.y);
 		const int maxy = goalTopLeft.y - 1 - unitExtraTileSize.y;
 		for (int y = miny; y <= maxy; ++y) {
@@ -680,7 +689,8 @@ private:
 		}
 	}
 
-	void Center() const {
+	void Center() const
+	{
 		const int miny = std::max(0, goalTopLeft.y - unitExtraTileSize.y);
 		const int maxy = std::min<int>(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y);
 		const int minx = std::max(0, goalTopLeft.x - maxrange - unitExtraTileSize.x);
@@ -710,7 +720,8 @@ private:
 		}
 	}
 
-	void BottomHemicycleNoMinRange() const {
+	void BottomHemicycleNoMinRange() const
+	{
 		const int miny = goalBottomRight.y + 1;
 		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
 
@@ -722,7 +733,8 @@ private:
 		}
 	}
 
-	void BottomHemicycle() const {
+	void BottomHemicycle() const
+	{
 		const int miny = std::max(goalBottomRight.y + minrange, goalBottomRight.y + 1);
 		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
 		for (int y = miny; y <= maxy; ++y) {

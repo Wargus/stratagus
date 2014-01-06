@@ -77,11 +77,13 @@ static CGraphic *AlphaFogG;
 class _filter_flags
 {
 public:
-	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask) {
+	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
+	{
 		Assert(fogmask != NULL);
 	}
 
-	void operator()(const CUnit *const unit) const {
+	void operator()(const CUnit *const unit) const
+	{
 		if (!unit->IsVisibleAsGoal(*player)) {
 			*fogmask &= ~unit->Type->FieldFlags;
 		}
@@ -124,7 +126,8 @@ public:
 	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
 	{}
 
-	void operator()(CUnit *const unit) const {
+	void operator()(CUnit *const unit) const
+	{
 		if (cloak != (int)unit->Type->PermanentCloak) {
 			return ;
 		}

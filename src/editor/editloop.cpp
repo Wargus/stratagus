@@ -133,7 +133,8 @@ static gcn::Slider *editorSlider;
 class EditorUnitSliderListener : public gcn::ActionListener
 {
 public:
-	virtual void action(const std::string &) {
+	virtual void action(const std::string &)
+	{
 		const int iconsPerStep = VisibleUnitIcons;
 		const int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		const double value = editorUnitSlider->getValue();
@@ -151,7 +152,8 @@ static EditorUnitSliderListener *editorUnitSliderListener;
 class EditorSliderListener : public gcn::ActionListener
 {
 public:
-	virtual void action(const std::string &) {
+	virtual void action(const std::string &)
+	{
 		const int iconsPerStep = VisibleTileIcons;
 		const int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
 		const double value = editorSlider->getValue();
@@ -1271,14 +1273,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 
-			// FIXME: move to lua
+		// FIXME: move to lua
 		case 'r': // CTRL+R Randomize map
 			if (KeyModifiers & ModifierControl) {
 				Editor.CreateRandomMap();
 			}
 			break;
 
-			// FIXME: move to lua
+		// FIXME: move to lua
 		case 'm': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
 				++MirrorEdit;

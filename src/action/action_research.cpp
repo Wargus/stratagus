@@ -98,7 +98,7 @@
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Research::Show(const CViewport & , const PixelPos &lastScreenPos) const
+/* virtual */ PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
 	return lastScreenPos;
 }

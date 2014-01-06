@@ -97,7 +97,8 @@ public:
 class CSound
 {
 public:
-	CSound() : Mapref(0), Range(0), Number(0) {
+	CSound() : Mapref(0), Range(0), Number(0)
+	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
 	~CSound();

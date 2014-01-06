@@ -73,7 +73,8 @@ class LogEntry
 {
 public:
 	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(NULL) {
+		Num(0), SyncRandSeed(0), Next(NULL)
+	{
 		UnitNumber = 0;
 	}
 
@@ -114,7 +115,8 @@ public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
-		MapRichness(0), GameType(0), Opponents(0), Commands(NULL) {
+		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
+	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
 	}

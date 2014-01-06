@@ -65,11 +65,13 @@ public:
 	const_iterator end() const { return Units.end(); }
 	iterator end() { return Units.end(); }
 
-	CUnit *operator[](const unsigned int index) const {
+	CUnit *operator[](const unsigned int index) const
+	{
 		//Assert(index < Units.size());
 		return Units[index];
 	}
-	CUnit *operator[](const unsigned int index) {
+	CUnit *operator[](const unsigned int index)
+	{
 		//Assert(index < Units.size());
 		return Units[index];
 	}
@@ -81,7 +83,8 @@ public:
 	 *  such that @p pred(u) is true, or NULL if no such unit exists.
 	 */
 	template<typename _T>
-	CUnit *find(const _T &pred) const {
+	CUnit *find(const _T &pred) const
+	{
 		std::vector<CUnit *>::const_iterator ret = std::find_if(Units.begin(), Units.end(), pred);
 
 		return ret != Units.end() ? (*ret) : NULL;
@@ -96,7 +99,8 @@ public:
 	 *  @p functor must not modify the order of the cache.
 	 */
 	template<typename _T>
-	void for_each(const _T functor) {
+	void for_each(const _T functor)
+	{
 		const size_t size = Units.size();
 
 		for (size_t i = 0; i != size; ++i) {
@@ -114,7 +118,8 @@ public:
 	 *  If @p functor return false then loop is exited.
 	 */
 	template<typename _T>
-	int for_each_if(const _T &functor) {
+	int for_each_if(const _T &functor)
+	{
 		const size_t size = Units.size();
 
 		for (size_t count = 0; count != size; ++count) {
@@ -132,7 +137,8 @@ public:
 	**  @param index  Unit index to remove from container.
 	**  @return pointer to removed element.
 	*/
-	CUnit *Remove(const unsigned int index) {
+	CUnit *Remove(const unsigned int index)
+	{
 		const size_t size = Units.size();
 		Assert(index < size);
 		CUnit *tmp = Units[index];
@@ -148,7 +154,8 @@ public:
 	**
 	**  @param unit  Unit pointer to remove from container.
 	*/
-	bool Remove(CUnit *const unit) {
+	bool Remove(CUnit *const unit)
+	{
 #ifndef SECURE_UNIT_REMOVING
 		const size_t size = Units.size();
 		if (size == 1 && unit == Units[0]) {
@@ -180,7 +187,8 @@ public:
 	**
 	**  @param unit  Unit pointer to remove from container.
 	*/
-	void RemoveS(CUnit *const unit) {
+	void RemoveS(CUnit *const unit)
+	{
 		for (std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end()); i != end; ++i) {
 			if ((*i) == unit) {
 				Units.erase(i);
@@ -196,7 +204,8 @@ public:
 	**  @param unit  Unit pointer to place in cache.
 	**  @return false if unit is already in cache and nothing is added.
 	*/
-	bool InsertS(CUnit *unit) {
+	bool InsertS(CUnit *unit)
+	{
 		if (!binary_search(Units.begin(), Units.end(), unit)) {
 			Units.insert(std::lower_bound(Units.begin(), Units.end(), unit), unit);
 			return true;
@@ -209,7 +218,8 @@ public:
 	**
 	**  @param unit  Unit pointer to place in cache.
 	*/
-	void Insert(CUnit *unit) {
+	void Insert(CUnit *unit)
+	{
 		Units.push_back(unit);
 	}
 

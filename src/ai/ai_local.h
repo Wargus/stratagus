@@ -121,11 +121,13 @@ public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
 		Role(AiForceRoleDefault), State(AiForceAttackingState_Free),
-		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT) {
+		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
+	{
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
 
-	void Remove(CUnit &unit) {
+	void Remove(CUnit &unit)
+	{
 		if (Units.Remove(&unit)) {
 			InternalRemoveUnit(&unit);
 		}
@@ -134,7 +136,8 @@ public:
 	/**
 	**  Reset the force. But don't change its role and its demand.
 	*/
-	void Reset(bool types = false) {
+	void Reset(bool types = false)
+	{
 		Completed = false;
 		Defending = false;
 		Attacking = false;
@@ -204,7 +207,8 @@ public:
 	const AiForce &operator[](unsigned int index) const { return forces[index]; }
 	AiForce &operator[](unsigned int index) { return forces[index]; }
 
-	int getIndex(AiForce *force) const {
+	int getIndex(AiForce *force) const
+	{
 		for (unsigned int i = 0; i < forces.size(); ++i) {
 			if (force == &forces[i]) {
 				return i;
@@ -213,7 +217,8 @@ public:
 		return -1;
 	}
 
-	unsigned int getScriptForce(unsigned int index) {
+	unsigned int getScriptForce(unsigned int index)
+	{
 		if (script[index] == -1) {
 			script[index] = FindFreeForce();
 		}
@@ -239,7 +244,8 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0) {
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
+	{
 		Pos.x = Pos.y = -1;
 	}
 
@@ -273,7 +279,8 @@ public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		ScriptDebug(false), LastExplorationGameCycle(0),
-		LastCanNotMoveGameCycle(0), LastRepairBuilding(0) {
+		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
+	{
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
 		memset(Needed, 0, sizeof(Needed));

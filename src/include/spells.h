@@ -137,7 +137,8 @@ class ConditionInfo
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
 		BoolFlag(NULL), Variable(NULL) {};
-	~ConditionInfo() {
+	~ConditionInfo()
+	{
 		delete[] BoolFlag;
 		delete[] Variable;
 	};
@@ -224,7 +225,8 @@ public:
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
 
-	bool IsCasterOnly() const {
+	bool IsCasterOnly() const
+	{
 		return !Range && Target == TargetSelf;
 	}
 	bool ForceUseAnimation;

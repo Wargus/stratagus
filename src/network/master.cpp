@@ -89,7 +89,7 @@ void CMetaClient::SetMetaServer(const std::string host, const int port)
 
 CMetaClient::~CMetaClient()
 {
-	for (std::list<CClientLog*>::iterator it = events.begin(); it != events.end(); ++it) {
+	for (std::list<CClientLog *>::iterator it = events.begin(); it != events.end(); ++it) {
 		CClientLog *log = *it;
 		delete log;
 	}

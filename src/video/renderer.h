@@ -184,15 +184,15 @@ static inline void DrawHLine(void *pixels, unsigned int index,
 		case 3:
 			PutPixel<BPP>(pixels, index, color);
 			index++;
-			//--width;
+		//--width;
 		case 2:
 			PutPixel<BPP>(pixels, index, color);
 			index++;
-			//--width;
+		//--width;
 		case 1:
 			PutPixel<BPP>(pixels, index, color);
 			index++;
-			//--width;
+		//--width;
 		default:
 			break;
 	}
@@ -210,7 +210,8 @@ class CRenderer : public CPrimitives
 {
 
 	static inline void PutTransPixel(void *pixels, unsigned int index,
-									 Uint32 color, unsigned int alpha) {
+									 Uint32 color, unsigned int alpha)
+	{
 		unsigned int dp;
 		if (BPP == 2) {
 			Uint16 *p = (((Uint16 *)pixels) + index);
@@ -259,7 +260,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void PutTransPixelDouble(void *pixels, unsigned int index,
-										   Uint32 color, unsigned int alpha) {
+										   Uint32 color, unsigned int alpha)
+	{
 
 		if (BPP == 2) {
 			/*
@@ -336,7 +338,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 
-	static inline void PutTransPixel128(void *pixels, unsigned int index, Uint32 color) {
+	static inline void PutTransPixel128(void *pixels, unsigned int index, Uint32 color)
+	{
 		if (BPP == 2) {
 			/* blend a single 16 bit pixel at 50% */
 #define BLEND16_50(d, s, mask)						\
@@ -362,7 +365,8 @@ class CRenderer : public CPrimitives
 	};
 
 	static inline void PutTransPixel128Double(void *pixels, const unsigned int index,
-											  const Uint32 color) {
+											  const Uint32 color)
+	{
 		if (BPP == 2) {
 			/* blend two 16 bit pixels at 50% */
 #define BLEND2x16_50(d, s, mask)					     \
@@ -404,7 +408,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static void DrawVLine(void *pixels, const unsigned int pitch,
-						  unsigned int index, int height, Uint32 color) {
+						  unsigned int index, int height, Uint32 color)
+	{
 		if (height < 1) { return; }
 		do {
 			DRAW::PutPixel<BPP>(pixels, index, color);
@@ -413,7 +418,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static void DrawTransVLine(void *pixels, const unsigned int pitch,
-							   unsigned int index, int height, Uint32 color, unsigned int alpha) {
+							   unsigned int index, int height, Uint32 color, unsigned int alpha)
+	{
 		if (height < 1) { return; }
 		if (alpha == 128) {
 			do {
@@ -429,7 +435,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void DrawTransHLine128(void *pixels,
-										 unsigned int index, int width, Uint32 color) {
+										 unsigned int index, int width, Uint32 color)
+	{
 #ifdef __x86_64__
 		//FIXME: this may not work on 16 bpp
 		if (((uintptr_t)pixels) & BPP) {
@@ -453,7 +460,8 @@ class CRenderer : public CPrimitives
 
 
 	static inline void DrawTransHLineNon128(void *pixels,
-											unsigned int index, int width, Uint32 color, unsigned int alpha) {
+											unsigned int index, int width, Uint32 color, unsigned int alpha)
+	{
 #ifdef __x86_64__
 		if (((uintptr_t)pixels) & BPP) {
 #else
@@ -474,7 +482,8 @@ class CRenderer : public CPrimitives
 	} // __attribute__ ((nothrow,nonnull (1)));
 
 	static inline void DrawTransHLine(void *pixels,
-									  unsigned int index, int width, Uint32 color, unsigned int alpha) {
+									  unsigned int index, int width, Uint32 color, unsigned int alpha)
+	{
 		//if(width < 1) return;
 		if (alpha == 128) {
 			DrawTransHLine128(pixels, index, width, color);
@@ -483,14 +492,16 @@ class CRenderer : public CPrimitives
 		}
 	};
 
-	void DrawPixel(Uint32 color, int x, int y) {
+	void DrawPixel(Uint32 color, int x, int y)
+	{
 		unsigned int index =  TheScreen->pitch / BPP;
 		index *= y;
 		index += x;
 		DRAW::PutPixel<BPP>(TheScreen->pixels, index, color);
 	};
 
-	void DrawTransPixel(Uint32 color, int x, int y,  unsigned char alpha) {
+	void DrawTransPixel(Uint32 color, int x, int y,  unsigned char alpha)
+	{
 		unsigned int index =  TheScreen->pitch / BPP;
 		index *= y;
 		index += x;
@@ -501,7 +512,8 @@ class CRenderer : public CPrimitives
 		}
 	};
 
-	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy) {
+	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
+	{
 		unsigned int index;
 		const unsigned int pitch = TheScreen->pitch / BPP;
 
@@ -617,12 +629,14 @@ class CRenderer : public CPrimitives
 	};
 
 	void DrawTransLine(Uint32 color, int sx, int sy,
-					   int dx, int dy, unsigned char alpha) {
+					   int dx, int dy, unsigned char alpha)
+	{
 		DrawLine(color, sx, sy, dx, dy);
 	}
 
 
-	void DrawRectangle(Uint32 color, int x, int y, int w, int h) {
+	void DrawRectangle(Uint32 color, int x, int y, int w, int h)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		unsigned int index = y * pitch;
 		unsigned int y_offset = (h - 1) * pitch;
@@ -641,7 +655,8 @@ class CRenderer : public CPrimitives
 	};
 
 	void DrawTransRectangle(Uint32 color, int x, int y,
-							int w, int h, unsigned char alpha) {
+							int w, int h, unsigned char alpha)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		unsigned int index = y * pitch;
 		unsigned int y_offset = (h - 1) * pitch;
@@ -664,7 +679,8 @@ class CRenderer : public CPrimitives
 	};
 
 	void FillTransRectangle(Uint32 color, int x, int y,
-							int w, int h, unsigned char alpha) {
+							int w, int h, unsigned char alpha)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		unsigned int index = y * pitch;
 		if (alpha == 128) {
@@ -680,7 +696,8 @@ class CRenderer : public CPrimitives
 		}
 	};
 
-	void DrawCircle(Uint32 color, int x, int y, int r) {
+	void DrawCircle(Uint32 color, int x, int y, int r)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		int p = 1 - r;
 		int px = 0;
@@ -713,7 +730,8 @@ class CRenderer : public CPrimitives
 	};
 
 	void DrawTransCircle(Uint32 color, int x, int y,
-						 int r, unsigned char alpha) {
+						 int r, unsigned char alpha)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		int p = 1 - r;
 		int px = 0;
@@ -745,7 +763,8 @@ class CRenderer : public CPrimitives
 		}
 	};
 
-	void FillCircle(Uint32 color, int x, int y, int r) {
+	void FillCircle(Uint32 color, int x, int y, int r)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		int p = 1 - r;
 		int px = 0;
@@ -799,7 +818,8 @@ class CRenderer : public CPrimitives
 	};
 
 	void FillTransCircle(Uint32 color, int x, int y,
-						 int r, unsigned char alpha) {
+						 int r, unsigned char alpha)
+	{
 		const unsigned int pitch = TheScreen->pitch / BPP;
 		int p = 1 - r;
 		int px = 0;

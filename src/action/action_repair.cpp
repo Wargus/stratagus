@@ -242,7 +242,7 @@ static void AnimateActionRepair(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			this->State = 1;
-			// FALL THROUGH
+		// FALL THROUGH
 		case 1: { // Move near to target.
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.

@@ -245,7 +245,7 @@ static void GameLogicLoop()
 		MissileActions();   // handle missiles
 		PlayersEachCycle(); // handle players
 		UpdateTimer();      // update game timer
-		
+
 
 		//
 		// Work todo each second.

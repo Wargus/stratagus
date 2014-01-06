@@ -314,7 +314,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				res |= IconAutoCast;
 			}
 			break;
-			// FIXME: must handle more actions
+		// FIXME: must handle more actions
 		default:
 			break;
 	}
@@ -905,7 +905,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
-			// FALL THROUGH
+		// FALL THROUGH
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:

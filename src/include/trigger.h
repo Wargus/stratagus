@@ -50,7 +50,8 @@ public:
 	CTimer() : Init(false), Running(false), Increasing(false), Cycles(0),
 		LastUpdate(0) {}
 
-	void Reset() {
+	void Reset()
+	{
 		Init = false;
 		Running = false;
 		Increasing = false;

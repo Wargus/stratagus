@@ -59,10 +59,12 @@ class _EnemyOnMapTile
 {
 public:
 	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
-		source(&unit) , pos(_pos), best(enemy) {
+		source(&unit) , pos(_pos), best(enemy)
+	{
 	}
 
-	void operator()(CUnit *const unit) const {
+	void operator()(CUnit *const unit) const
+	{
 		const CUnitType &type = *unit->Type;
 		// unusable unit ?
 		// if (unit->IsUnusable()) can't attack constructions
@@ -302,7 +304,8 @@ static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTrans
 class IsAFreeTransporter
 {
 public:
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->Type->CanMove() && unit->BoardCount < unit->Type->MaxOnBoard;
 	}
 };

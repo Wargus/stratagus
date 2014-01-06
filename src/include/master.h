@@ -42,8 +42,7 @@
 struct lua_State;
 
 // Log data used in metaserver client
-struct CClientLog
-{
+struct CClientLog {
 	std::string entry;     // command itself
 };
 
@@ -61,13 +60,13 @@ public:
 	int Recv();
 	int GetLastRecvState() { return lastRecvState; }
 	int GetLogSize() { return events.size(); }
-	CClientLog* GetLastMessage() { return events.back(); }
-	
+	CClientLog *GetLastMessage() { return events.back(); }
+
 private:
 	CTCPSocket metaSocket;                     /// This is a TCP socket
 	std::string metaHost;                      /// Address of metaserver
 	int metaPort;                              /// Port of metaserver
-	std::list <CClientLog*> events;            /// All commands received from metaserver
+	std::list <CClientLog *> events;           /// All commands received from metaserver
 	int lastRecvState;                         /// Now many bytes have been received in last reply
 };
 

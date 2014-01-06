@@ -86,7 +86,8 @@ public:
 	CTileInfo(unsigned char base, unsigned char mix) : BaseTerrain(base), MixTerrain(mix)
 	{}
 
-	bool operator ==(const CTileInfo &rhs) const {
+	bool operator ==(const CTileInfo &rhs) const
+	{
 		return BaseTerrain == rhs.BaseTerrain && MixTerrain == rhs.MixTerrain;
 	}
 	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }

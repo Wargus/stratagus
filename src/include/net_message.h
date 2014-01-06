@@ -432,7 +432,8 @@ public:
 class CNetworkPacketHeader
 {
 public:
-	CNetworkPacketHeader() {
+	CNetworkPacketHeader()
+	{
 		Cycle = 0;
 		memset(Type, 0, sizeof(Type));
 	}

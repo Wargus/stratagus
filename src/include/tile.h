@@ -150,7 +150,8 @@ struct lua_State;
 class CMapFieldPlayerInfo
 {
 public:
-	CMapFieldPlayerInfo() : SeenTile(0) {
+	CMapFieldPlayerInfo() : SeenTile(0)
+	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
 		memset(Radar, 0, sizeof(Radar));

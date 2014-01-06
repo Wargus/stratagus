@@ -759,7 +759,8 @@ class HasSameUnitTypeAs
 {
 public:
 	explicit HasSameUnitTypeAs(const CUnitType *_type) : type(_type) {}
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return (type == ANY_UNIT || type == unit->Type
 				|| (type == ALL_FOODUNITS && !unit->Type->Building)
 				|| (type == ALL_BUILDINGS && unit->Type->Building));
@@ -1017,8 +1018,9 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 		value = LuaToNumber(l, 3);
 		bool stats = false;
-		if (nargs == 5)
+		if (nargs == 5) {
 			stats = LuaToBoolean(l, 5);
+		}
 		if (stats) { // stat variables
 			const char *const type = LuaToString(l, 4);
 			if (!strcmp(type, "Value")) {

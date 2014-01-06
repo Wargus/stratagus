@@ -38,7 +38,8 @@ class COrder_Patrol : public COrder
 {
 	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 public:
-	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0) {
+	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
+	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}

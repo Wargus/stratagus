@@ -205,7 +205,8 @@ class AutoCastPrioritySort
 public:
 	explicit AutoCastPrioritySort(const CUnit &caster, const int var, const bool reverse) :
 		caster(caster), variable(var), reverse(reverse) {}
-	bool operator()(const CUnit *lhs, const CUnit *rhs) const {
+	bool operator()(const CUnit *lhs, const CUnit *rhs) const
+	{
 		if (variable == ACP_DISTANCE) {
 			if (reverse) {
 				return lhs->MapDistanceTo(caster) > rhs->MapDistanceTo(caster);
@@ -282,12 +283,12 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			return NULL;
 		case TargetPosition:
 			return 0;
-			//  Autocast with a position? That's hard
-			//  Possibilities: cast reveal-map on a dark region
-			//  Cast raise dead on a bunch of corpses. That would rule.
-			//  Cast summon until out of mana in the heat of battle. Trivial?
-			//  Find a tight group of units and cast area-damage spells. HARD,
-			//  but it is a must-have for AI. What about area-heal?
+		//  Autocast with a position? That's hard
+		//  Possibilities: cast reveal-map on a dark region
+		//  Cast raise dead on a bunch of corpses. That would rule.
+		//  Cast summon until out of mana in the heat of battle. Trivial?
+		//  Find a tight group of units and cast area-damage spells. HARD,
+		//  but it is a must-have for AI. What about area-heal?
 		case TargetUnit: {
 			// The units are already selected.
 			//  Check every unit if it is a possible target
@@ -298,8 +299,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				if (autocast->Attacker == CONDITION_ONLY) {
 					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
 					if ((table[i]->CurrentAction() != UnitActionAttack
-						&& table[i]->CurrentAction() != UnitActionAttackGround
-						&& table[i]->CurrentAction() != UnitActionSpellCast)
+						 && table[i]->CurrentAction() != UnitActionAttackGround
+						 && table[i]->CurrentAction() != UnitActionSpellCast)
 						|| table[i]->CurrentOrder()->HasGoal() == false
 						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
 						continue;

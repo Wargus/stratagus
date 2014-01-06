@@ -184,7 +184,8 @@ bool FindTerrainType(int movemask, int resmask, int range,
 template <const bool NEARLOCATION>
 class BestDepotFinder
 {
-	inline void operator()(CUnit *const dest) {
+	inline void operator()(CUnit *const dest)
+	{
 		/* Only resource depots */
 		if (dest->Type->CanStore[resource]
 			&& dest->IsAliveOnMap()
@@ -233,25 +234,29 @@ class BestDepotFinder
 public:
 	BestDepotFinder(const CUnit &w, int res, int ran) :
 		resource(res), range(ran),
-		best_dist(INT_MAX), best_depot(0) {
+		best_dist(INT_MAX), best_depot(0)
+	{
 		u_near.worker = &w;
 	}
 
 	BestDepotFinder(const Vec2i &pos, int res, int ran) :
 		resource(res), range(ran),
-		best_dist(INT_MAX), best_depot(0) {
+		best_dist(INT_MAX), best_depot(0)
+	{
 		u_near.loc = pos;
 	}
 
 	template <typename ITERATOR>
-	CUnit *Find(ITERATOR begin, ITERATOR end) {
+	CUnit *Find(ITERATOR begin, ITERATOR end)
+	{
 		for (ITERATOR it = begin; it != end; ++it) {
 			this->operator()(*it);
 		}
 		return best_depot;
 	}
 
-	CUnit *Find(CUnitCache &cache) {
+	CUnit *Find(CUnitCache &cache)
+	{
 		cache.for_each(*this);
 		return best_depot;
 	}
@@ -288,7 +293,8 @@ class CResourceFinder
 {
 public:
 	CResourceFinder(int r, bool on_top) : resource(r), mine_on_top(on_top) {}
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		const CUnitType &type = *unit->Type;
 		return (type.GivesResource == resource
 				&& unit->ResourcesHeld != 0
@@ -312,7 +318,8 @@ public:
 		maxRange(maxRange),
 		check_usage(check_usage),
 		res_finder(resource, 1),
-		resultMine(resultMine) {
+		resultMine(resultMine)
+	{
 		bestCost.SetToMax();
 		*resultMine = NULL;
 	}
@@ -323,7 +330,8 @@ private:
 	struct ResourceUnitFinder_Cost {
 	public:
 		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
-		bool operator < (const ResourceUnitFinder_Cost &rhs) const {
+		bool operator < (const ResourceUnitFinder_Cost &rhs) const
+		{
 			if (waiting != rhs.waiting) {
 				return waiting < rhs.waiting;
 			} else if (distance != rhs.distance) {
@@ -636,7 +644,8 @@ class IsADepositForResource
 {
 public:
 	explicit IsADepositForResource(const int r) : resource(r) {}
-	bool operator()(const CUnit *const unit) const {
+	bool operator()(const CUnit *const unit) const
+	{
 		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
 	}
 private:
@@ -667,17 +676,20 @@ public:
 		attacker(&a)
 	{}
 
-	CUnit *Find(const std::vector<CUnit *> &table) const {
+	CUnit *Find(const std::vector<CUnit *> &table) const
+	{
 		return Find(table.begin(), table.end());
 	}
 
-	CUnit *Find(CUnitCache &cache) const {
+	CUnit *Find(CUnitCache &cache) const
+	{
 		return Find(cache.begin(), cache.end());
 	}
 
 private:
 	template <typename Iterator>
-	CUnit *Find(Iterator begin, Iterator end) const {
+	CUnit *Find(Iterator begin, Iterator end) const
+	{
 		CUnit *enemy = NULL;
 		int best_cost = INT_MAX;
 
@@ -692,7 +704,8 @@ private:
 		return enemy;
 	}
 
-	int ComputeCost(CUnit *const dest) const {
+	int ComputeCost(CUnit *const dest) const
+	{
 		const CPlayer &player = *attacker->Player;
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
@@ -779,7 +792,8 @@ public:
 	**
 	*/
 	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-		best_unit(0), best_cost(INT_MIN) {
+		best_unit(0), best_cost(INT_MIN)
+	{
 		memset(good, 0 , sizeof(int) * 32 * 32);
 		memset(bad, 0 , sizeof(int) * 32 * 32);
 	};
@@ -789,15 +803,18 @@ public:
 	public:
 		FillBadGood(const CUnit &a, int r, int *g, int *b):
 			attacker(&a), range(r),
-			enemy_count(0), good(g), bad(b) {
+			enemy_count(0), good(g), bad(b)
+		{
 		}
 
-		int Fill(CUnitCache &cache) {
+		int Fill(CUnitCache &cache)
+		{
 			return Fill(cache.begin(), cache.end());
 		}
 
 		template <typename Iterator>
-		int Fill(Iterator begin, Iterator end) {
+		int Fill(Iterator begin, Iterator end)
+		{
 			for (Iterator it = begin; it != end; ++it) {
 				Compute(*it);
 			}
@@ -805,7 +822,8 @@ public:
 		}
 	private:
 
-		void Compute(CUnit *const dest) {
+		void Compute(CUnit *const dest)
+		{
 			const CPlayer &player = *attacker->Player;
 
 			if (!dest->IsVisibleAsGoal(player)) {
@@ -835,7 +853,7 @@ public:
 				hp_damage_evaluate = CalculateDamage(*attacker, *dest, Damage);
 			} else {
 				hp_damage_evaluate = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
-				+ attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 			}
 			if (!player.IsEnemy(*dest)) { // a friend or neutral
 				dest->CacheLock = 1;
@@ -942,27 +960,31 @@ public:
 		int *bad;
 	};
 
-	CUnit *Find(std::vector<CUnit *> &table) {
+	CUnit *Find(std::vector<CUnit *> &table)
+	{
 		FillBadGood(*attacker, range, good, bad).Fill(table.begin(), table.end());
 		return Find(table.begin(), table.end());
 
 	}
 
-	CUnit *Find(CUnitCache &cache) {
+	CUnit *Find(CUnitCache &cache)
+	{
 		FillBadGood(*attacker, range, good, bad).Fill(cache);
 		return Find(cache.begin(), cache.end());
 	}
 
 private:
 	template <typename Iterator>
-	CUnit *Find(Iterator begin, Iterator end) {
+	CUnit *Find(Iterator begin, Iterator end)
+	{
 		for (Iterator it = begin; it != end; ++it) {
 			Compute(*it);
 		}
 		return best_unit;
 	}
 
-	void Compute(CUnit *const dest) {
+	void Compute(CUnit *const dest)
+	{
 		if (dest->CacheLock) {
 			dest->CacheLock = 0;
 			return;
@@ -1026,7 +1048,8 @@ private:
 struct CompareUnitDistance {
 	const CUnit *referenceunit;
 	CompareUnitDistance(const CUnit &unit): referenceunit(&unit) {}
-	bool operator()(const CUnit *c1, const CUnit *c2) {
+	bool operator()(const CUnit *c1, const CUnit *c2)
+	{
 		int d1 = c1->MapDistanceTo(*referenceunit);
 		int d2 = c2->MapDistanceTo(*referenceunit);
 		if (d1 == d2) {

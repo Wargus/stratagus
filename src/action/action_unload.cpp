@@ -409,7 +409,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 			}
 
 			this->State = 1;
-			// follow on next case
+		// follow on next case
 		case 1: // Move unit to destination
 			// The Goal is the unit that we have to unload.
 			if (!this->HasGoal()) {

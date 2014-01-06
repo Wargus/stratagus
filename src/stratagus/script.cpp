@@ -1129,7 +1129,7 @@ void FreeNumberDesc(NumberDesc *number)
 	}
 	switch (number->e) {
 		case ENumber_Lua :     // a lua function.
-			// FIXME: when lua table should be freed ?
+		// FIXME: when lua table should be freed ?
 		case ENumber_Dir :     // directly a number.
 			break;
 		case ENumber_Add :     // a + b.

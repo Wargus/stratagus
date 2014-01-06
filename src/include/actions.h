@@ -93,7 +93,8 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(), Action(action), Finished(false) {
+	explicit COrder(int action) : Goal(), Action(action), Finished(false)
+	{
 	}
 	virtual ~COrder();
 

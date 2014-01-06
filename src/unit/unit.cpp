@@ -932,7 +932,8 @@ public:
 	_UnmarkUnitFieldFlags(const CUnit &unit, CMapField *mf) : main(&unit), mf(mf)
 	{}
 
-	void operator()(CUnit *const unit) const {
+	void operator()(CUnit *const unit) const
+	{
 		if (main != unit && unit->CurrentAction() != UnitActionDie) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}

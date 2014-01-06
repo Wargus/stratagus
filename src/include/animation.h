@@ -109,12 +109,14 @@ class CAnimations
 public:
 	CAnimations() : Attack(NULL), Build(NULL), Move(NULL), Repair(NULL),
 		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
-		Train(NULL), Upgrade(NULL) {
+		Train(NULL), Upgrade(NULL)
+	{
 		memset(Death, 0, sizeof(Death));
 		memset(Harvest, 0, sizeof(Harvest));
 	}
 
-	~CAnimations() {
+	~CAnimations()
+	{
 		delete Attack;
 		delete Build;
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {

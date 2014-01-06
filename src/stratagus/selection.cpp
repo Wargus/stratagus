@@ -494,7 +494,7 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 		return 0;
 	}
 	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
-		ChangeSelectedUnits(const_cast<CUnit**>(&units[0]), units.size());
+		ChangeSelectedUnits(const_cast<CUnit **>(&units[0]), units.size());
 		return Selected.size();
 	}
 	std::vector<CUnit *> table;

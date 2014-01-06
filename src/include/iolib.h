@@ -80,7 +80,8 @@ class FileList
 public:
 	FileList() : type(0) {}
 
-	bool operator < (const FileList &rhs) const {
+	bool operator < (const FileList &rhs) const
+	{
 		if (type != rhs.type) {
 			return type < rhs.type;
 		}

@@ -395,10 +395,10 @@ int GetHotKey(const std::string &text)
 
 	if (text.length() > 1) {
 		hotkey = convertKey(text.c_str());
-	} else if (text.length() == 1){
+	} else if (text.length() == 1) {
 		GetUTF8(text, pos, hotkey);
 	}
-				
+
 	return hotkey;
 }
 

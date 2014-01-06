@@ -38,7 +38,8 @@ class COrder_Defend : public COrder
 {
 	friend COrder *COrder::NewActionDefend(CUnit &dest);
 public:
-	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0) {
+	COrder_Defend() : COrder(UnitActionDefend), State(0), Range(0)
+	{
 		goalPos.x = -1;
 		goalPos.y = -1;
 	}

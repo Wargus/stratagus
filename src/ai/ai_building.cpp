@@ -148,7 +148,8 @@ public:
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		checkSurround(checkSurround),
-		resultPos(resultPos) {
+		resultPos(resultPos)
+	{
 		resultPos->x = -1;
 		resultPos->y = -1;
 	}

@@ -74,7 +74,8 @@ public:
 	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
 	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
 	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
-	int Recv(void *buf, int len, CHost *hostFrom) {
+	int Recv(void *buf, int len, CHost *hostFrom)
+	{
 		unsigned long ip;
 		int port;
 		int res = NetRecvUDP(socket, buf, len, &ip, &port);
@@ -187,7 +188,8 @@ public:
 	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
 	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }
 	int Send(const void *buf, unsigned int len) { return NetSendTCP(socket, buf, len); }
-	int Recv(void *buf, int len) {
+	int Recv(void *buf, int len)
+	{
 		int res = NetRecvTCP(socket, buf, len);
 		return res;
 	}
@@ -204,7 +206,7 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 	memset(&ip, 0, sizeof(ip));
 	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
 	this->socket = NetOpenTCP(ip, host.getPort());
-	return this->socket != INVALID_SOCKET; 
+	return this->socket != INVALID_SOCKET;
 }
 
 //

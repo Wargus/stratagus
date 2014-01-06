@@ -217,7 +217,8 @@ class AliveConstructedAndSameTypeAs
 {
 public:
 	explicit AliveConstructedAndSameTypeAs(const CUnitType &unitType) : type(&unitType) {}
-	bool operator()(const CUnit *unit) const {
+	bool operator()(const CUnit *unit) const
+	{
 		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitActionBuilt;
 	}
 private:

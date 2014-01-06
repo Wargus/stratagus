@@ -202,7 +202,8 @@ public:
 	/**
 	**  Check if the player index is an enemy
 	*/
-	bool IsEnemy(const int index) const {
+	bool IsEnemy(const int index) const
+	{
 		return (Index != index && (Enemy & (1 << index)) != 0);
 	}
 
@@ -244,7 +245,8 @@ private:
 class PlayerRace
 {
 public:
-	PlayerRace() : Count(0) {
+	PlayerRace() : Count(0)
+	{
 		memset(Visible, 0, sizeof(Visible));
 	}
 
