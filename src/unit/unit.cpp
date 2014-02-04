@@ -456,7 +456,9 @@ void CUnit::Init()
 	ReCast = 0;
 	CacheLock = 0;
 	Summoned = 0;
+	Waiting = 0;
 	memset(&Anim, 0, sizeof(Anim));
+	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	CurrentResource = 0;
 	Orders.clear();
 	delete SavedOrder;

@@ -362,6 +362,7 @@ public:
 	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
 
 	unsigned Summoned : 1;       /// Unit is summoned using spells.
+	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
@@ -397,7 +398,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 		const CAnimation *CurrAnim;  /// CurrAnim
 		int Wait;                    /// Wait
 		int Unbreakable;             /// Unbreakable
-	} Anim;
+	} Anim, WaitBackup;
 
 
 	std::vector<COrder *> Orders; /// orders to process

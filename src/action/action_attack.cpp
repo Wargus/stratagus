@@ -543,8 +543,17 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
 		return;
+	}
+	if (unit.Waiting) {
+		 unit.Anim = unit.WaitBackup;
+		 unit.Waiting = 0;
 	}
 
 	switch (this->State) {

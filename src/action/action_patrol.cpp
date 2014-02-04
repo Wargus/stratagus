@@ -37,6 +37,7 @@
 
 #include "action/action_patrol.h"
 
+#include "animation.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -133,8 +134,17 @@
 /* virtual */ void COrder_Patrol::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
-		return ;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 
 	switch (DoActionMove(unit)) {

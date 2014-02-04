@@ -153,10 +153,6 @@ int DoActionMove(CUnit &unit)
 				unit.Moving = 0;
 				return d;
 			case PF_WAIT: // No path, wait
-				// Reset frame to still frame while we wait
-				// FIXME: Unit doesn't animate.
-				unit.Frame = unit.Type->StillFrame;
-				UnitUpdateHeading(unit);
 				unit.Wait = 10;
 
 				unit.Moving = 0;
@@ -221,8 +217,17 @@ int DoActionMove(CUnit &unit)
 	Assert(unit.CanMove());
 
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
-		return ;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 

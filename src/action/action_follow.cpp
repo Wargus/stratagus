@@ -37,6 +37,7 @@
 
 #include "action/action_follow.h"
 
+#include "animation.h"
 #include "iolib.h"
 #include "missile.h"
 #include "pathfinder.h"
@@ -155,8 +156,17 @@ enum {
 /* virtual */ void COrder_Follow::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
-		return ;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 	CUnit *goal = this->GetGoal();
 
@@ -182,10 +192,6 @@ enum {
 				return ;
 			}
 
-			// Reset frame to still frame while we wait
-			// FIXME: Unit doesn't animate.
-			unit.Frame = unit.Type->StillFrame;
-			UnitUpdateHeading(unit);
 			unit.Wait = 10;
 			if (this->Range > 1) {
 				this->Range = 1;

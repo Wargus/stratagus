@@ -416,8 +416,17 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 /* virtual */ void COrder_Build::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
-		return ;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 	if (this->State <= State_MoveToLocationMax) {
 		if (this->MoveToLocation(unit)) {

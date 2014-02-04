@@ -380,6 +380,9 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "summoned")) {
 			unit->Summoned = 1;
 			--j;
+		} else if (!strcmp(value, "waiting")) {
+			unit->Summoned = 1;
+			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];
 		} else if (!strcmp(value, "seen-by-player")) {
@@ -445,6 +448,10 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "anim-data")) {
 			lua_rawgeti(l, 2, j + 1);
 			CAnimations::LoadUnitAnim(l, *unit, -1);
+			lua_pop(l, 1);
+		} else if (!strcmp(value, "wait-anim-data")) {
+			lua_rawgeti(l, 2, j + 1);
+			CAnimations::LoadWaitUnitAnim(l, *unit, -1);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "blink")) {
 			unit->Blink = LuaToNumber(l, 2, j + 1);

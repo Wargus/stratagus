@@ -1126,9 +1126,17 @@ void COrder_Resource::Execute(CUnit &unit)
 	this->worker = &unit;
 
 	if (unit.Wait) {
-		// FIXME: show idle animation while we wait?
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
 		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 
 	// Let's start mining.

@@ -137,6 +137,7 @@ public:
 
 	static void SaveUnitAnim(CFile &file, const CUnit &unit);
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
+	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
 public:
 	CAnimation *Attack;

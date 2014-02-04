@@ -37,6 +37,7 @@
 
 #include "action/action_defend.h"
 
+#include "animation.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -148,8 +149,17 @@ enum {
 /* virtual */ void COrder_Defend::Execute(CUnit &unit)
 {
 	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		unit.Wait--;
-		return ;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
 	}
 	CUnit *goal = this->GetGoal();
 
