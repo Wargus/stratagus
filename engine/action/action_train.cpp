@@ -80,6 +80,9 @@ static int CanHandleOrder(CUnit *unit, COrder *order)
 		}
 		return 1;
 	}
+	if (order->Action == UnitActionRepair) {
+		return !!unit->Type->RepairRange;
+	}
 	if (order->Action == UnitActionAttack && !unit->Type->CanAttack) {
 		return 0;
 	}
