@@ -1,0 +1,6 @@
+-- Boswars Map Presentation
+-- File licensed under the GNU GPL version 2.
+
+DefinePlayerTypes("person", "computer")
+PresentMap("Multiple fronts - total war", 1, 120, 80, 4)
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

@@ -1,0 +1,8 @@
+pre.lua {
+    margin-left: 1.5em;
+}
+
+div.nyi, div.obsolete, dt.obsolete, dd.obsolete {
+    color: #000000;
+    background: #fafafa;
+}

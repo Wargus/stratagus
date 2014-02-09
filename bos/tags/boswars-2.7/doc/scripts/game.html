@@ -1,0 +1,816 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2010 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Game</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Game</h1>
+<hr>
+<a href="../index.html">Bos Wars</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="editor.html">PREV</a> 
+<a href="magic.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#AddMessage">AddMessage</a>
+<a href="#AddObjective">AddObjective</a>
+<a href="#CenterMap">CenterMap</a>
+<a href="#ChangeUnitsOwner">ChangeUnitsOwner</a>
+<a href="#CreateUnit">CreateUnit</a>
+<a href="#DefineBurningBuilding">DefineBurningBuilding</a>
+<a href="#DefineConstruction">DefineConstruction</a>
+<a href="#DefinePlayerColorIndex">DefinePlayerColorIndex</a>
+<a href="#DefinePlayerColors">DefinePlayerColors</a>
+<a href="#Diplomacy">Diplomacy</a>
+<a href="#GetLocalPlayerName">GetLocalPlayerName</a>
+<a href="#GetUnitVariable">GetUnitVariable</a>
+<a href="#GetCurrentLuaPath">GetCurrentLuaPath</a>
+<a href="#Group">Group</a>
+<a href="#KillUnit">KillUnit</a>
+<a href="#KillUnitAt">KillUnitAt</a>
+<a href="#LibraryPath">LibraryPath</a>
+<a href="#NewColors">NewColors</a>
+<a href="#MoveUnit">MoveUnit</a>
+<a href="#SetDiplomacy">SetDiplomacy</a>
+<a href="#SetGamePaused">SetGamePaused</a>
+<a href="#SetLocalPlayerName">SetLocalPlayerName</a>
+<a href="#SetObjectives">SetObjectives</a>
+<a href="#SetResourcesHeld">SetResourcesHeld</a>
+<a href="#SetSharedVision">SetSharedVision</a>
+<a href="#SetUnitVariable">SetUnitVariable</a>
+<a href="#SharedVision">SharedVision</a>
+<a href="#SyncRand">SyncRand</a>
+<hr>
+<h2>Intro - Introduction to game functions and variables</h2>
+
+Everything around the game.
+<h2>Functions</h2>
+
+<a name="AddMessage"></a>
+<h3>AddMessage(message)</h3>
+
+Add a message to be displayed.
+
+
+<dl>
+<dt>message</dt>
+<dd>Text message to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Adds the message.
+AddMessage("This is a message")
+</pre>
+
+<a name="AddObjective"></a>
+<h3>AddObjective(objective)</h3>
+
+Add an objective to the end of the scenario objectives text list.
+
+
+<dl>
+<dt>objective</dt>
+<dd>Objective text.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Adds the objectives "-Build a barracks" and "-Destroy all enemies"
+-- to the end of the objectives list.
+AddObjective("-Build a barracks")
+AddObjective("-Destroy all enemies")
+</pre>
+
+<a name="CenterMap"></a>
+<h3>CenterMap(x, y)</h3>
+
+Center the current viewport at a certain location.
+
+
+<dl>
+<dt>x</dt>
+<dd>X tile location.
+</dd>
+<dt>y</dt>
+<dd>Y tile location.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Centers the current viewport at tile 17x40.
+CenterMap(17, 40)
+</pre>
+
+<a name="ChangeUnitsOwner"></a>
+<h3>ChangeUnitsOwner({x1, y1}, {x2, y2}, oldplayer, newplayer [,unittype])</h3>
+
+Changes the owner of a group of units from one player to another.
+
+
+<dl>
+<dt>{x1, y1}</dt>
+<dd>Upper left location for tilebox to check for units within.
+</dd>
+<dt>{x2, y2}</dt>
+<dd>Lower right location for tilebox to check for units within.
+</dd>
+<dt>oldplayer</dt>
+<dd>The player that currently owns the units.
+</dd>
+<dt>newplayer</dt>
+<dd>The player that the units should now be owned by.
+</dd>
+<dt>unittype</dt>
+<dd>Optional; change only units of this type.
+<pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type (default if omitted)
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre>
+If you want some other set of unit types, then you just need to
+call this function once for each unit type.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Changes the owner to player 2 for all units owned by player 3,
+-- that are located in the area (0,0)-(10,10).
+ChangeUnitsOwner({0, 0}, {10, 10}, 3, 2)
+
+-- As above, but affects rocket tanks only.
+ChangeUnitsOwner({0, 0}, {10, 10}, 3, 2, "unit-rtank")
+</pre>
+
+<a name="CreateUnit"></a>
+<h3>CreateUnit(type, player, {x, y})</h3>
+
+Create a unit at a location.  If the location is occupied, the unit will be
+placed in the closest available spot.
+
+
+<dl>
+<dt>type</dt>
+<dd>Type of unit to create.
+</dd>
+<dt>player</dt>
+<dd>Player number that owns the unit.
+</dd>
+<dt>x</dt>
+<dd>X map tile location.
+</dd>
+<dt>y</dt>
+<dd>Y map tile location.
+</dd>
+<dt><I>RETURNS</I></dt>
+<dd>The slot number of the created unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Creates a footman for player 2 at location 31x34.
+CreateUnit("unit-footman", 2, {31, 34})
+</pre>
+
+<a name="DefineBurningBuilding"></a>
+<h3>DefineBurningBuilding({"percent", p, "missile", m} ...)</h3>
+
+Define the burning animation for buildings. The animation will be laid over the building image.
+
+<dl>
+<dt>p</dt>
+<dd>Hit point percentage.
+</dd>
+<dt>m</dt>
+<dd>Fire missile to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+DefineBurningBuilding(
+  {"percent", 0, "missile", "missile-big-fire"},
+  {"percent", 50, "missile", "missile-small-fire"},
+  {"percent", 75}) -- no missile
+</pre>
+
+<a name="DefineConstruction"></a>
+<h3>DefineConstruction(ident, {...})</h3>
+Defines a construction, which controls how the game draws units that
+are being built.  To make use of the construction thus defined,
+you must also make one or more unit types refer to it;
+see <a href="unittype.html#DefineUnitType">DefineUnitType</a>.<br>
+<br>
+As the unit nears completion, the game shows the frames of the
+construction one at a time.  This sequence of frames does not repeat.
+The construction affects only the appearance of the unit, not how long
+it takes to build.  Constructions are not used for units that are
+being trained rather than built, because those do not appear on the
+map before they are complete.<br>
+<br>
+The game can load these frames from the graphics files of the unit
+type or from separate construction-specific files: a primary file and
+a shadow file.  If you omit the shadow file, the unit will not have a
+shadow in these frames.<br>
+<br>
+The construction frames should be ordered by increasing percentages and the
+first frame should be 0.
+
+<pre class="lua">
+DefineConstruction(ident, {
+  Files = {
+    File = filename,
+    Size = {x, y}},
+  ShadowFile = {
+    File = filename,
+    Size = {x, y}},
+  Constructions = {{
+      percent = percent,
+      file = construction-file,
+      frame = frame-number},
+    ...}
+})
+</pre>
+
+<dl>
+<dt>ident</dt>
+<dd>Unique name of the construction.
+The <a href="unittype.html#DefineUnitType.Construction">Construction parameter
+of DefineUnitType</a> refers to this.
+</dd>
+<dt>Files = {...}</dt>
+<dd>The construction-specific graphic file.
+Needed only if some construction-file is "construction".
+Although this section is tagged "Files", you cannot specify multiple files.
+</dd>
+<dt>filename</dt>
+<dd>Path of the graphic.
+</dd>
+<dt>x, y</dt>
+<dd>The size of each frame in the graphic.
+</dd>
+<dt>ShadowFile = {...}</dt>
+<dd>The construction-specific shadow graphic file.
+Needed only if some construction-file is "construction"
+and you also want shadows for those frames.
+</dd>
+<dt>percent</dt>
+<dd>Percentage of construction complete.
+</dd>
+<dt>construction-file</dt>
+<dd>Can be "construction" or "main", specifies which image should be displayed.
+</dd>
+<dt>frame-number</dt>
+<dd>Specifies which frame number to display.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Defines construction-land with a construction-specific graphics file.
+-- Buildings 0-24 percent complete use frame 0 of the construction
+-- image, 25-49 percent complete use frame 1 of the construction image, and 50-99
+-- percent complete use the frame 1 of the main building graphic.
+DefineConstruction("construction-land", {
+    Files = {
+	    File = "neutral/buildings/land_construction_site.png",
+	    Size = {64, 64}},
+    Constructions = {{
+	    Percent = 0,
+	    File = "construction",
+	    Frame = 0},{
+	    Percent = 25,
+	    File = "construction",
+	    Frame = 1},{
+	    Percent = 50,
+	    File = "main",
+	    Frame = 1}}
+})
+</pre>
+
+<a name="DefinePlayerColorIndex"></a>
+<h3>DefinePlayerColorIndex(colorstart, numcolors)</h3>
+
+Define the graphic color indexes to be replaced by the player color.
+
+<dl>
+<dt>colorstart</dt>
+<dd>Index of the first color
+</dd>
+<dt>numcolors</dt>
+<dd>Total number of colors
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+DefinePlayerColorIndex(10, 5) -- for indexes 10-14
+</pre>
+
+<a name="DefinePlayerColors"></a>
+<h3>DefinePlayerColors({"color", {{R, G, B}, {R, G, B}, {R, G, B}, {R, G, B}}, ...})</h3>
+
+Define the player colors.  There should be 16 colors defined and 4 shades of each color.
+
+<dl>
+<dt>color</dt>
+<dd>Name of the player color
+</dd>
+<dt>R, G, B</dt>
+<dd>Red, green, blue values for each color
+</dd>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+DefinePlayerColors({
+  "red", {{164, 0, 0}, {124, 0, 0}, {92, 4, 0}, {68, 4, 0}},
+  "blue", {...},
+  ...
+)
+</pre>
+
+<a name="Diplomacy"></a>
+<h3>Diplomacy(state, enemy)</h3>
+
+Does the same as SetDiplomacy(currentplayer, state, enemy).
+<p>
+
+See <a href="#SetDiplomacy">SetDiplomacy</a> for more details.
+
+
+<a name="GetCurrentLuaPath">
+<h3>GetCurrentLuaPath()</h3>
+
+Returns the path of the currenly interpreted lua script.
+
+<h4>Examples</h4>
+<pre class="lua">
+print(GetCurrentLuaPath())
+Load(GetCurrentLuaPath().."unit.lua")
+</pre>
+
+<a name="GetLocalPlayerName"></a>
+<h3>GetLocalPlayerName()</h3>
+
+Returns the name of the player playing on this computer.
+The name is used in both network games and single-player games.
+When the engine is starting up, it chooses a default name.
+Lua scripts can change the name by calling <a href="#SetLocalPlayerName">SetLocalPlayerName</a>.
+
+<dl>
+<dt><I>RETURNS</I></dt>
+<dd>The name of the local player: either set
+with <a href="#SetLocalPlayerName">SetLocalPlayerName</a>
+or chosen by the engine.
+</dd>
+</dl>
+
+<a name="GetUnitVariable"></a>
+<h3>GetUnitVariable(unit, VariableName)</h3>
+
+Get a unit's mana.
+
+<dl>
+<dt>unit</dt>
+<dd>Unit to get info for.</dd>
+<dt>VariableName</dt>
+<dd>Name of the variable to get info for.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Get mana of the unit (slot #11).
+GetUnitMana(11, "Mana");
+</pre>
+
+<a name="Group"></a>
+<h3>Group(group, quantity, {unit0, unit1, ...})</h3>
+
+Create a group of units.
+
+
+<dl>
+<dt>group</dt>
+<dd>Group number.
+</dd>
+<dt>quantity</dt>
+<dd>How much units are in the group.
+</dd>
+<dt>unitX</dt>
+<dd>unit slot number.
+</dd>
+</dl>
+
+
+<a name="KillUnit"></a>
+<h3>KillUnit(unit, player)</h3>
+
+Kill a unit.
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 8       Player number
+"any"        Matches any player
+"all"        All players (Not used)
+"this"       Player on the local computer, Human player in the campaign.
+</pre></dd>
+<dt><I>RETURNS</I></dt>
+<dd>true if it killed one unit; false if there is no matching unit.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Kills a peasant of the player on the local computer.
+KillUnit("unit-peasant", "this");
+</pre>
+
+<a name="KillUnitAt"></a>
+<h3>KillUnitAt(unit, player, quantity, location1, location2)</h3>
+
+Kills units at a specific location.
+
+
+<dl>
+<dt>unit</dt>
+<dd><pre>
+"unit-name"  Unit type of this name
+"any"        Matches any unit type
+"all"        All units (sum of units and buildings)
+"units"      All non building units
+"building"   All building units
+</pre></dd>
+<dt>player</dt>
+<dd><pre>
+0 .. 16     Player number
+"any"        Matches any player
+"all"        All players (Not used)
+"this"       Player on the local computer, Human player in the campaign.
+</pre></dd>
+<dt>quantity</dt>
+<dd><pre>
+0 ... oo    Number for the quantity
+</pre></dd>
+<dt>location1</dt>
+<dd><pre>
+{x1, y1}    Upper left corner
+</pre></dd>
+<dt>location2</dt>
+<dd><pre>
+{x2, y2}    Lower right corner
+</pre></dd>
+<dt><I>RETURNS</I></dt>
+<dd>integer: how many units it killed.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Kills any units in the rectangle (5,12) to (9,15).
+KillUnitAt("any", "any", 9, {5, 12}, {9, 15});
+</pre>
+
+<a name="LibraryPath"></a>
+<h3>LibraryPath()</h3>
+
+Returns the Bos Wars library path. The Bos Wars library path points to the game data directory.
+
+<h4>Example</h4>
+
+<pre class="lua">
+path = LibraryPath()
+</pre>
+
+<a name="ListDirectory"></a>
+<h3>ListDirectory(path)</h3>
+
+Returns a list with all files and subdirectories found in the directory pointed by path. 
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre class="lua">
+list = ListDirectory("music/")
+</pre>
+
+<a name="ListFilesInDirectory"></a>
+<h3>ListFilesInDirectory(path)</h3>
+
+Returns a list with all files found in the directory pointed by path. 
+The path is relative to the game directory. 
+If the given path starts with '~', then the path is relative to the
+stratagus' user preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre class="lua">
+list = ListFilesInDirectory("music/")
+</pre>
+
+<a name="ListDirsInDirectory"></a>
+<h3>ListDirsInDirectory(path)</h3>
+
+Returns a list with all subdirectories found in the directory pointed by path. 
+The path is relative to the game directory.
+If the given path starts with '~', then the path is relative to the
+user stratagus preferences directory.
+The path cannot include any special character.
+
+<h4>Example</h4>
+
+<pre class="lua">
+list = ListDirsInDirectory("music/")
+</pre>
+
+<a name="NewColors"></a>
+<h3>NewColors()</h3>
+
+Change players colors.
+
+<h4>Example</h4>
+
+<pre class="lua">
+NewColors()
+</pre>
+
+<a name="MoveUnit"></a>
+<h3>MoveUnit(unit-slot, {x, y})</h3>
+
+Place a unit on map. If the location is occupied, 
+the unit will be placed in the closest available spot.
+
+
+<dl>
+<dt>unit-slot</dt>
+<dd>slot number of the unit to be placed
+</dd>
+<dt>x</dt>
+<dd>X map tile position.
+</dd>
+<dt>y</dt>
+<dd>Y map tile position.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+MoveUnit(0, {10, 12})
+</pre>
+
+<a name="SetDiplomacy"></a>
+<h3>SetDiplomacy(player, state, enemy)</h3>
+
+Alters the diplomacy setting between two players. eg enemy, allied
+
+
+<dl>
+<dt>player</dt>
+<dd>Player to effect change of diplomacy on.
+</dd>
+</dl>
+<dl>
+<dt>state</dt>
+<dd>State of relationship between players ("allied", "enemy", "neutral", "crazy").
+</dd>
+</dl>
+<dl>
+<dt>enemy</dt>
+<dd>Other player involved in diplomacy.
+</dd>
+</dl>
+
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Sets player 1 to be an enemy of player 0.
+SetDiplomacy(0, "enemy", 1)
+</pre>
+
+<a name="SetGamePaused"></a>
+<h3>SetGamePaused(paused)</h3>
+
+Pause or unpause the game.
+
+
+<dl>
+<dt>paused</dt>
+<dd>true for paused, false for unpaused.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Pauses the game.
+SetGamePaused(true)
+</pre>
+
+<a name="SetLocalPlayerName"</a>
+<h3>SetLocalPlayerName("name")</h3>
+
+Sets the name of the player playing on this computer.  Does not save
+the name in <a href="config.html#preferences">preferences</a>; the
+caller can do that if desired.  Lua scripts can read the name back by
+calling <a href="#GetLocalPlayerName">GetLocalPlayerName</a>.
+
+<dl>
+<dt>"name"</dt>
+<dd>The name of the player, limited to 16 characters.</dd>
+<dt><I>RETURNS</I></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set Player Name to mr-russ
+SetLocalPlayerName("mr-russ")
+</pre>
+
+<a name="SetObjectives"></a>
+<h3>SetObjectives({ objective, ... })</h3>
+
+Set the mission objectives.  This will overwrite any previous objectives.
+
+<dl>
+<dt>objective</dt>
+<dd>Mission objective text.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Sets the mission objectives.
+SetObjectives({"Build 4 farms", "Mine 500 gold"})
+</pre>
+
+<a name="SetSharedVision"></a>
+<h3>SetSharedVision(player, state, opponent)</h3>
+
+Sets shared vision.
+
+
+<dl>
+<dt>player</dt>
+<dd>Player number to set shared vision.
+</dd>
+<dt>state</dt>
+<dd>Use true to turn on shared vision, false to turn off.
+</dd>
+<dt>opponent</dt>
+<dd>Player number to change.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Sets shared vision for player 0 to on with player 2.
+SetSharedVision(0, true, 2)
+</pre>
+
+<a name="SetResourcesHeld"></a>
+<h3>SetResourcesHeld(unit, resources)</h3>
+
+Set the amount of resources available in a unit. Mostly used for harvestable resources.
+
+
+<dl>
+<dt>unit</dt>
+<dd>unit identifier obtained via for example CreateUnit.
+</dd>
+<dt>resources</dt>
+<dd>amount of resources held by the unit.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+unit = CreateUnit("unit-crystal", {10,45})
+SetResourcesHeld(unit, 2500)
+</pre>
+
+<a name="SetUnitVariable"></a>
+<h3>SetUnitVariable(unit, VariableName, amount)</h3>
+Set the amount of VariableName of the unit.
+<dl>
+<dt>unit</dt>
+<dd>Unit to set the info for.</dd>
+<dt>VariableName</dt>
+<dd>Variable to set.</dd>
+<dt>amount</dt>
+<dd>New amount of VariableName for the unit.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+--  Set mana of the unit (slot 11)
+SetUnitVariable(12, "Mana", 255)
+</pre>
+
+<a name="SharedVision"></a>
+<h3>SharedVision(state, opponent)</h3>
+
+Sets shared vision for the player at the computer.
+
+
+<dl>
+<dt>state</dt>
+<dd>Use true to turn on shared vision, false to turn off.
+</dd>
+<dt>opponent</dt>
+<dd>Player number to change.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Sets shared vision on with player number 3.
+SharedVision(true, 3)
+</pre>
+
+<a name="SyncRand"></a>
+<h3>SyncRand(number)</h3>
+
+Get a value from the Stratagus syncronized random number generator.
+Used to allow the AI to make syncronized choices with multiplayer, and 
+during replays.
+
+<dl>
+<dt>number<dt>
+<dd>Number to create random from, eg 10</dd>
+<dt><i>RETURNS</i></dt>
+<dd>the number randomly generated, eg 0-9 for input 10.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+if(SyncRand(10) &lt; 5) then
+  -- Do this
+else
+  -- Do that
+end
+</pre>
+
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

@@ -1,0 +1,84 @@
+$#include "stratagus.h"
+$#include "ui.h"
+$#include "minimap.h"
+$#include "player.h"
+$#include "unittype.h"
+$#include "unit.h"
+$#include "video.h"
+$#include "font.h"
+$#include "widgets.h"
+$#include "sound.h"
+$#include "sound_server.h"
+$#include "netconnect.h"
+$#include "map.h"
+
+$#ifdef _MSC_VER
+$#pragma warning(disable:4800)
+$#endif
+
+$[
+mt = { __index = function(t, key) return CIcon:Get(key) end }
+Icons = {}
+setmetatable(Icons, mt)
+
+mt = { __index = function(t, key) return CFont:Get(key) end }
+Fonts = {}
+setmetatable(Fonts, mt)
+
+mt = { __index = function(t, key) return CFontColor:Get(key) end }
+FontColors = {}
+setmetatable(FontColors, mt)
+
+function GameStarting()
+end
+$]
+
+#define MaxCosts 2
+#define EnergyCost 0
+#define MagmaCost 1
+#define PlayerMax 9
+#define PlayerNumNeutral (PlayerMax - 1)
+#define UnitMax 2048
+
+#define NoButton 0
+#define LeftButton 2
+#define MiddleButton 4
+#define RightButton 8
+#define UpButton 16
+#define DownButton 32
+
+$pfile "minimap.pkg"
+$pfile "ui.pkg"
+$pfile "network.pkg"
+$pfile "video.pkg"
+$pfile "font.pkg"
+$pfile "player.pkg"
+$pfile "unittype.pkg"
+$pfile "unit.pkg"
+$pfile "sound.pkg"
+$pfile "editor.pkg"
+$pfile "game.pkg"
+$pfile "map.pkg"
+$pfile "patch.pkg"
+$pfile "pathfinder.pkg"
+$pfile "trigger.pkg"
+$pfile "particle.pkg"
+
+extern const char *Translate(const char *str);
+extern void AddTranslation(const string str1, const string str2);
+extern void LoadPO(const string file);
+extern void SetTranslationsFiles(const string stratagusfile, const string gamefile);
+extern std::string StratagusTranslation;
+extern std::string GameTranslation;
+
+extern void SaveGame(const std::string filename);
+
+extern const char *Translate @ _(const char *str);
+
+extern int SyncRand(void);
+extern int SyncRand(int max);
+
+void Exit(int err);
+
+$extern std::string CliMapName;
+extern std::string CliMapName;

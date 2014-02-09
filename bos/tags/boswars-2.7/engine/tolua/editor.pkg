@@ -1,0 +1,36 @@
+$#include "editor.h"
+
+enum EditorRunningType {
+	EditorNotRunning = 0,    /// Not Running
+	EditorStarted = 1,       /// Editor Enabled at all
+	EditorCommandLine = 2,   /// Called from Command Line
+	EditorEditing = 4,       /// Editor is fully running
+};
+
+class CEditor
+{
+	vector<string> UnitTypes;
+	const CUnitType *StartUnit;
+	bool ShowTerrainFlags;
+	EditorRunningType Running;
+
+	void TileSelectedPatch();
+};
+
+// The C++ functions may have const std::string & parameters, but
+// don't tell tolua++ about the references, because it would ignore
+// the const and generate code to copy the modified strings to
+// additional Lua return values.
+
+extern void SetEditorSelectIcon(std::string icon);
+extern void SetEditorUnitsIcon(std::string icon);
+extern void SetEditorPatchIcon(std::string icon);
+extern void SetEditorStartUnit(std::string name);
+
+extern CEditor Editor;
+
+void StartEditor(std::string filename);
+int EditorSaveMap(std::string file);
+
+void StartPatchEditor(std::string patchName);
+

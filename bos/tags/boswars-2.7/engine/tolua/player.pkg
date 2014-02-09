@@ -1,0 +1,78 @@
+$#include "player.h"
+
+enum PlayerTypes {
+	PlayerNeutral = 2,
+	PlayerNobody  = 3,
+	PlayerComputer = 4,
+	PlayerPerson = 5,
+	PlayerRescuePassive = 6,
+	PlayerRescueActive = 7,
+};
+
+class CPlayer
+{
+	int Index;
+	string Name;
+	
+	PlayerTypes Type;
+	string AiName;
+
+	int StartX;
+	int StartY;
+	void SetStartView(int x, int y);
+
+	tolua_property__s int EnergyProductionRate;
+	tolua_property__s int MagmaProductionRate;
+	tolua_property__s int EnergyStored;
+	tolua_property__s int MagmaStored;
+	tolua_property__s int EnergyStorageCapacity;
+	tolua_property__s int MagmaStorageCapacity;
+
+	const int UnitTypesCount[UnitTypeMax];
+
+	int AiEnabled;
+
+	CUnit *Units[UnitMax];
+	int TotalNumUnits;
+	int NumBuildings;
+
+	int UnitLimit;
+	int BuildingLimit;
+	int TotalUnitLimit;
+
+	int Score;
+	int TotalUnits;
+	int TotalBuildings;
+	tolua_property__s int TotalEnergy;
+	tolua_property__s int TotalMagma;
+	int TotalRazings;
+	int TotalKills;
+	
+	bool IsEnemy(const CPlayer *x) const;
+	bool IsEnemy(const CUnit *x) const;
+	bool IsAllied(const CPlayer *x) const;
+	bool IsAllied(const CUnit *x) const;
+	bool IsSharedVision(const CPlayer *x) const;
+	bool IsSharedVision(const CUnit *x) const;
+	bool IsBothSharedVision(const CPlayer *x) const;
+	bool IsBothSharedVision(const CUnit *x) const;
+	bool IsTeamed(const CPlayer *x) const;
+	bool IsTeamed(const CUnit *x) const;
+};
+
+extern CPlayer Players[PlayerMax];
+extern CPlayer *ThisPlayer;
+
+// tolua++ 1.0.93 claims to define TOLUA_NIL, but doesn't,
+// so we use 0 instead.
+//
+// tolua++ 1.0.93 generates code that copies the contents
+// of the arrays from the wrong Lua stack indexes if the
+// lua_State * parameter is the first one, so put it last.
+void CclChangeUnitsOwner @ ChangeUnitsOwner(
+	int topLeft[2],
+	int bottomRight[2],
+	int oldPlayer,
+	int newPlayer,
+	lua_Object unitType = 0 /* TOLUA_NIL */,
+	lua_State *l);

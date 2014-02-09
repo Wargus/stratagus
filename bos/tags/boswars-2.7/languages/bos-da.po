@@ -1,0 +1,1139 @@
+# BOS-Danish translation.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Bent Jakobsen <jakobsen.bent@gmail.com>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-02 12:54+0300\n"
+"PO-Revision-Date: 2006-12-25 22:11+0100\n"
+"Last-Translator: Bent Jakobsen <jakobsen.bent@gmail.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:195
+msgid "Energy"
+msgstr "Energi"
+
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:207
+msgid "Magma"
+msgstr "Magma"
+
+#: scripts/boswars.lua:247
+msgid "Eliminate your enemies."
+msgstr "Udryd dine fjender."
+
+#: scripts/guichan.lua:389
+msgid "Victory !"
+msgstr "Sejr !"
+
+#: scripts/guichan.lua:392
+msgid "Draw !"
+msgstr "Træk !"
+
+#: scripts/guichan.lua:394
+msgid "Defeat !"
+msgstr "Besejret !"
+
+#: scripts/guichan.lua:401
+msgid "Cheater"
+msgstr ""
+
+#: scripts/guichan.lua:404
+msgid "Results"
+msgstr "Resultater"
+
+#: scripts/guichan.lua:410
+msgid "Player"
+msgstr "Spiller"
+
+#: scripts/guichan.lua:411
+msgid "Units"
+msgstr "Enheder"
+
+#: scripts/guichan.lua:412
+msgid "Buildings"
+msgstr "Bygninger"
+
+#: scripts/guichan.lua:413
+msgid "Kills"
+msgstr "Drab"
+
+#: scripts/guichan.lua:414
+msgid "Razings"
+msgstr "Opførsler"
+
+#: scripts/guichan.lua:431
+msgid "~!Continue"
+msgstr "~!Forsæt"
+
+#: scripts/guichan.lua:529
+msgid "Start Game"
+msgstr "Start spil"
+
+#: scripts/guichan.lua:531 scripts/guichan.lua:753
+#: scripts/menus/network.lua:130 scripts/menus/network.lua:317
+msgid "Map"
+msgstr "Kort"
+
+#: scripts/guichan.lua:532 scripts/guichan.lua:754
+#: scripts/menus/network.lua:131 scripts/menus/network.lua:318
+#: scripts/menus/network.lua:418
+msgid "File:"
+msgstr "Fil:"
+
+#: scripts/guichan.lua:535 scripts/guichan.lua:720 scripts/guichan.lua:758
+#: scripts/menus/ingame/editor.lua:109 scripts/menus/network.lua:423
+#: scripts/menus/patch.lua:53
+msgid "Size:"
+msgstr "Størrelse:"
+
+#: scripts/guichan.lua:538 scripts/guichan.lua:756
+#: scripts/menus/network.lua:134 scripts/menus/network.lua:321
+#: scripts/menus/network.lua:421
+msgid "Players:"
+msgstr "Spillere:"
+
+#: scripts/guichan.lua:540 scripts/guichan.lua:760
+#: scripts/menus/network.lua:136 scripts/menus/network.lua:323
+#: scripts/menus/network.lua:425
+msgid "Description:"
+msgstr "Beskrivelse:"
+
+#: scripts/guichan.lua:544 scripts/menus/network.lua:140
+#: scripts/menus/network.lua:332
+msgid "Fog of war"
+msgstr "Krigs skygge"
+
+#: scripts/guichan.lua:547 scripts/guichan.lua:613
+#: scripts/menus/network.lua:144 scripts/menus/network.lua:339
+msgid "Reveal map"
+msgstr "Afslør kort"
+
+#: scripts/guichan.lua:551 scripts/menus/network.lua:147
+#: scripts/menus/network.lua:341
+msgid "Difficulty:"
+msgstr "Sværhedsgrad:"
+
+#: scripts/guichan.lua:552 scripts/menus/network.lua:148
+#: scripts/menus/network.lua:342
+msgid "easy"
+msgstr "let"
+
+#: scripts/guichan.lua:552 scripts/guichan.lua:556
+#: scripts/menus/network.lua:148 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:342 scripts/menus/network.lua:350
+msgid "normal"
+msgstr "normal"
+
+#: scripts/guichan.lua:552 scripts/menus/network.lua:148
+#: scripts/menus/network.lua:342
+msgid "hard"
+msgstr "svær"
+
+#: scripts/guichan.lua:555 scripts/menus/network.lua:151
+#: scripts/menus/network.lua:349
+msgid "Starting resources:"
+msgstr "Start resourcer:"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:350
+msgid "high"
+msgstr "høj"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:350
+msgid "low"
+msgstr "lav"
+
+#: scripts/guichan.lua:559 scripts/menus/network.lua:155
+#: scripts/menus/network.lua:357
+msgid "Game type:"
+msgstr "Spil type:"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Map Default"
+msgstr "Kort Standard"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Melee"
+msgstr "Melee"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Free For All"
+msgstr "Frit for alle"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Top vs Bottom"
+msgstr "Top imod Bund"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Left vs Right"
+msgstr "Venstre mod Højre"
+
+#: scripts/guichan.lua:560 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Man vs Machine"
+msgstr "Menneske imod Maskine"
+
+#: scripts/guichan.lua:592 scripts/guichan.lua:624 scripts/guichan.lua:668
+#: scripts/guichan.lua:736 scripts/guichan.lua:788
+#: scripts/menus/campaigns.lua:149 scripts/menus/credits.lua:141
+#: scripts/menus/options.lua:313
+msgid "Main Menu (~<Esc~>)"
+msgstr "Hovedmenu (~<Esc~>)"
+
+#: scripts/guichan.lua:594 scripts/guichan.lua:626 scripts/guichan.lua:670
+#: scripts/menus/campaigns.lua:57 scripts/menus/campaigns.lua:151
+msgid "~!Start"
+msgstr "~!Start"
+
+#: scripts/guichan.lua:603
+msgid "Show a Replay"
+msgstr "Vis et replay"
+
+#: scripts/guichan.lua:637
+msgid "Load Game"
+msgstr "Hent spil"
+
+#: scripts/guichan.lua:681 scripts/guichan.lua:704 scripts/guichan.lua:751
+msgid "Editor"
+msgstr "Editor"
+
+#: scripts/guichan.lua:683
+msgid "Create ~!New Map"
+msgstr "Opret ~!Nyt Kort"
+
+#: scripts/guichan.lua:685
+msgid "~!Load Map"
+msgstr "~!Hent Kort"
+
+#: scripts/guichan.lua:688
+#, fuzzy
+msgid "~!Patch Editor"
+msgstr "Start ~!Editor"
+
+#: scripts/guichan.lua:691 scripts/menus/campaigns.lua:62
+#: scripts/menus/ingame/editor.lua:87 scripts/menus/ingame/editor.lua:125
+#: scripts/menus/ingame/editor.lua:230 scripts/menus/ingame/game.lua:112
+#: scripts/menus/ingame/game.lua:304 scripts/menus/ingame/game.lua:352
+#: scripts/menus/ingame/game.lua:365 scripts/menus/network.lua:176
+#: scripts/menus/network.lua:242 scripts/menus/network.lua:303
+#: scripts/menus/network.lua:377 scripts/menus/network.lua:449
+#: scripts/menus/network.lua:495 scripts/menus/patch.lua:80
+#: scripts/menus/patch.lua:119 scripts/menus/patch.lua:137
+msgid "Cancel (~<Esc~>)"
+msgstr "Fortryd (~<Esc~>)"
+
+#: scripts/guichan.lua:738 scripts/guichan.lua:790 scripts/guichan.lua:820
+msgid "Start ~!Editor"
+msgstr "Start ~!Editor"
+
+#: scripts/guichan.lua:811 scripts/menus/network.lua:380
+msgid "~!Start Game"
+msgstr "~!Start spil"
+
+#: scripts/guichan.lua:812
+msgid "~!Load Game"
+msgstr "~!Hent Spil"
+
+#: scripts/guichan.lua:813
+msgid "~!Campaigns"
+msgstr "~!Kampagner"
+
+#: scripts/guichan.lua:814
+msgid "Show ~!Replay"
+msgstr "Vis ~!Replay"
+
+#: scripts/guichan.lua:816
+msgid "~!MultiPlayer"
+msgstr "~!FlereSpillere"
+
+#: scripts/guichan.lua:817
+msgid "~!Options"
+msgstr "~!Muligheder"
+
+#: scripts/guichan.lua:819
+msgid "Cre~!dits"
+msgstr "Kre~!dit"
+
+#: scripts/guichan.lua:822
+msgid "E~!xit"
+msgstr "A~!fslut"
+
+#: scripts/menus/campaigns.lua:41
+msgid "Briefing"
+msgstr "Briefing"
+
+#: scripts/menus/campaigns.lua:44
+msgid "Objectives:"
+msgstr "Mål :"
+
+#: scripts/menus/campaigns.lua:137
+msgid "List of Campaigns"
+msgstr "Kampagne liste"
+
+#: scripts/menus/credits.lua:36
+msgid "Graphics:"
+msgstr "Grafik:"
+
+#: scripts/menus/credits.lua:43
+msgid "Scripting:"
+msgstr "Scripting:"
+
+#: scripts/menus/credits.lua:47
+msgid "Maps and campaigns:"
+msgstr "Kort og kampagner:"
+
+#: scripts/menus/credits.lua:51
+msgid "Sound:"
+msgstr "Lyd:"
+
+#: scripts/menus/credits.lua:55
+msgid "Engine Programmers:"
+msgstr "Spil motor programmører:"
+
+#: scripts/menus/credits.lua:112
+msgid "Patches"
+msgstr "Patche"
+
+#: scripts/menus/credits.lua:121
+msgid "Stratagus Media Project Graphics"
+msgstr "Stratagus Media Projekt Grafik"
+
+#: scripts/menus/credits.lua:126
+msgid "The Bos Wars Team thanks"
+msgstr "Bos Wars Teamet takker"
+
+#: scripts/menus/credits.lua:127
+msgid "everybody who has contributed"
+msgstr "Alle som har hjulpet til"
+
+#: scripts/menus/credits.lua:128
+msgid "patches, bug reports, ideas."
+msgstr "patche, fejl rapporter, ideer."
+
+#: scripts/menus/credits.lua:131
+msgid "Bos Wars Credits"
+msgstr "Bos Wars Kredittere"
+
+#: scripts/menus/ingame/editor.lua:49
+msgid "Editor Menu"
+msgstr "Editor Menu"
+
+#: scripts/menus/ingame/editor.lua:50 scripts/menus/ingame/game.lua:58
+msgid "Save (~<F11~>)"
+msgstr "Gem (~<F11~>)"
+
+#: scripts/menus/ingame/editor.lua:52
+msgid "Map Properties (~<F5~>)"
+msgstr "Kort egenskaber (~<F5~>)"
+
+#: scripts/menus/ingame/editor.lua:54
+msgid "Player Properties (~<F6~>)"
+msgstr "Spiller egenskaber (~<F6~>)"
+
+#: scripts/menus/ingame/editor.lua:57
+msgid "~!Exit to menu"
+msgstr "~!Afslut til menuen"
+
+#: scripts/menus/ingame/editor.lua:59
+msgid "Return to the Editor (~<Esc~>)"
+msgstr "Returner til Editor (~<Esc~>)"
+
+#: scripts/menus/ingame/editor.lua:68
+msgid "Save Map"
+msgstr "Gem kort"
+
+#: scripts/menus/ingame/editor.lua:78 scripts/menus/ingame/game.lua:91
+msgid "~!Save"
+msgstr "~!Gem"
+
+#: scripts/menus/ingame/editor.lua:99
+msgid "Map Properties"
+msgstr "Kort egenskaber"
+
+#: scripts/menus/ingame/editor.lua:101
+msgid "Map Description:"
+msgstr "Kort beskrivelse:"
+
+#: scripts/menus/ingame/editor.lua:118 scripts/menus/ingame/editor.lua:219
+#: scripts/menus/ingame/game.lua:180 scripts/menus/ingame/game.lua:254
+#: scripts/menus/ingame/game.lua:533 scripts/menus/ingame/game.lua:559
+#: scripts/menus/network.lua:67 scripts/menus/options.lua:64
+#: scripts/menus/options.lua:141 scripts/menus/options.lua:241
+#: scripts/menus/options.lua:301
+msgid "~!OK"
+msgstr "~!OK"
+
+#: scripts/menus/ingame/editor.lua:140
+msgid "Player Properties"
+msgstr "Spiller egenskaber"
+
+#: scripts/menus/ingame/editor.lua:149
+msgid "Type"
+msgstr "Type"
+
+#: scripts/menus/ingame/editor.lua:154
+msgid "Person"
+msgstr "Person"
+
+#: scripts/menus/ingame/editor.lua:154
+msgid "Computer"
+msgstr "Computer"
+
+#: scripts/menus/ingame/editor.lua:154
+msgid "Rescue (Passive)"
+msgstr "Redning (Passive)"
+
+#: scripts/menus/ingame/editor.lua:155
+msgid "Rescue (Active)"
+msgstr "Redning (Aktiv)"
+
+#: scripts/menus/ingame/editor.lua:155
+msgid "Neutral"
+msgstr "Neutral"
+
+#: scripts/menus/ingame/editor.lua:155
+msgid "Nobody"
+msgstr "Ingen"
+
+#: scripts/menus/ingame/editor.lua:168
+msgid "AI"
+msgstr "KI"
+
+#: scripts/menus/ingame/game.lua:57
+msgid "Game Menu"
+msgstr "Spil Menu"
+
+#: scripts/menus/ingame/game.lua:63
+msgid "Options (~<F5~>)"
+msgstr "Muligheder (~<F5~>)"
+
+#: scripts/menus/ingame/game.lua:65
+msgid "Help (~<F1~>)"
+msgstr "Hjælp (~<F1~>)"
+
+#: scripts/menus/ingame/game.lua:67
+msgid "~!Objectives"
+msgstr "~!Mål"
+
+#: scripts/menus/ingame/game.lua:69
+msgid "~!End Game"
+msgstr "~!Afslut spil"
+
+#: scripts/menus/ingame/game.lua:71
+msgid "Return to Game (~<Esc~>)"
+msgstr "Returner til Spil (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:80
+msgid "Save Game"
+msgstr "Gem Spil"
+
+#: scripts/menus/ingame/game.lua:121 scripts/menus/options.lua:157
+msgid "Sound Options"
+msgstr "Lyd Muligheder"
+
+#: scripts/menus/ingame/game.lua:130 scripts/menus/ingame/game.lua:146
+msgid "Game Options"
+msgstr "Spil Muligheder"
+
+#: scripts/menus/ingame/game.lua:131
+msgid "Sound (~<F7~>)"
+msgstr "Lyd (~<F7~>)"
+
+#: scripts/menus/ingame/game.lua:133
+msgid "Game (~<F9~>)"
+msgstr "Spil (~<F9~>)"
+
+#: scripts/menus/ingame/game.lua:135
+msgid "~!Diplomacy"
+msgstr "~!Diplomatik"
+
+#: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
+#: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:459
+msgid "Previous (~<Esc~>)"
+msgstr "Forgående (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:149
+msgid "Fog of War Enabled"
+msgstr "Krigs skygge Aktiveret"
+
+#: scripts/menus/ingame/game.lua:157
+msgid "Show command key"
+msgstr "Vis kommando tast"
+
+#: scripts/menus/ingame/game.lua:161 scripts/menus/options.lua:39
+msgid "Game Speed"
+msgstr "Spil hastighed"
+
+#: scripts/menus/ingame/game.lua:171 scripts/menus/options.lua:54
+msgid "slow"
+msgstr "langsom"
+
+#: scripts/menus/ingame/game.lua:175 scripts/menus/options.lua:59
+msgid "fast"
+msgstr "hurtig"
+
+#: scripts/menus/ingame/game.lua:198
+msgid "Diplomacy"
+msgstr "Diplomatik"
+
+#: scripts/menus/ingame/game.lua:200
+msgid "Allied"
+msgstr "Allieret"
+
+#: scripts/menus/ingame/game.lua:201
+msgid "Enemy"
+msgstr "Fjende"
+
+#: scripts/menus/ingame/game.lua:202
+msgid "Shared Vision"
+msgstr "Delt syn"
+
+#: scripts/menus/ingame/game.lua:312
+msgid "Are you sure you want to restart the game?"
+msgstr "Er du sikker på at du ønsker at genstarte spillet?"
+
+#: scripts/menus/ingame/game.lua:313 scripts/menus/ingame/game.lua:326
+msgid "~!Restart Game"
+msgstr "~!Genstart spil"
+
+#: scripts/menus/ingame/game.lua:318
+msgid "Are you sure you want to quit to the main menu?"
+msgstr "Er du sikker på at du ønsker at afslutte til hovedmenu?"
+
+#: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
+msgid "~!Quit to Menu"
+msgstr "~!Afslut til menu"
+
+#: scripts/menus/ingame/game.lua:325
+msgid "End Game"
+msgstr "Afslut spil"
+
+#: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
+msgid "~!Surrender"
+msgstr "~!Overgivelse"
+
+#: scripts/menus/ingame/game.lua:333
+msgid "Are you sure you want to surrender to your enemies?"
+msgstr "Er du sikker på at du vil overgive dig til dine fjender?"
+
+#: scripts/menus/ingame/game.lua:337
+msgid "E~!xit Bos Wars"
+msgstr "A~!fslut Bos Wars"
+
+#: scripts/menus/ingame/game.lua:362
+msgid "Are you sure you want to exit Bos Wars?"
+msgstr "Er du sikker på at du vil afslutte Bos Wars?"
+
+#: scripts/menus/ingame/game.lua:363
+msgid "E~!xit Program"
+msgstr "A~!fslut Program"
+
+#: scripts/menus/ingame/game.lua:374
+msgid "Help Menu"
+msgstr "Hjælpe Menu"
+
+#: scripts/menus/ingame/game.lua:375
+msgid "Keystroke ~!Help"
+msgstr "Tasteturtryk ~!Hjælp"
+
+#: scripts/menus/ingame/game.lua:377
+msgid "Bos Wars ~!Tips"
+msgstr "Bos Wars ~!tips"
+
+#: scripts/menus/ingame/game.lua:386
+msgid "Alt-F"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:386
+#, fuzzy
+msgid "- toggle full screen"
+msgstr "Fuldskærm"
+
+#: scripts/menus/ingame/game.lua:387
+msgid "Alt-G"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:387
+msgid "- toggle grab mouse"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:388
+msgid "Ctrl-S"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:388
+msgid "- mute sound"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:389
+msgid "Ctrl-M"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:389
+msgid "- mute music"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:390
+msgid "+"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:390
+msgid "- increase game speed"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:391
+msgid "-"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:391
+msgid "- decrease game speed"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:392
+msgid "Ctrl-P"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:392 scripts/menus/ingame/game.lua:393
+msgid "- pause game"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:393
+msgid "PAUSE"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:394
+msgid "PRINT"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:394
+msgid "- make screen shot"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:395
+msgid "Alt-H"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:395
+#, fuzzy
+msgid "- help menu"
+msgstr "Hjælpe Menu"
+
+#: scripts/menus/ingame/game.lua:396
+msgid "Alt-R"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:396
+#, fuzzy
+msgid "- restart game"
+msgstr "~!Genstart spil"
+
+#: scripts/menus/ingame/game.lua:397
+msgid "Alt-Q"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:397
+#, fuzzy
+msgid "- quit to main menu"
+msgstr "~!Afslut til menuen"
+
+#: scripts/menus/ingame/game.lua:398
+msgid "Alt-X"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:398
+msgid "- quit game"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:399
+msgid "Alt-B"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:399
+msgid "- toggle expand map"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:400
+msgid "Alt-M"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:400 scripts/menus/ingame/game.lua:421
+#, fuzzy
+msgid "- game menu"
+msgstr "Spil Menu"
+
+#: scripts/menus/ingame/game.lua:401
+msgid "ENTER"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:401
+msgid "- write a message"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:402
+msgid "SPACE"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:402
+msgid "- goto last event"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:403
+msgid "TAB"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:403
+msgid "- hide/unhide terrain"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:404
+msgid "Ctrl-T"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:404
+msgid "- track unit"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:405
+msgid "Alt-I"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:405
+msgid "- find idle peon"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:406
+msgid "Alt-C"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:406
+msgid "- center on selected unit"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:407
+msgid "Alt-V"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:407
+msgid "- next view port"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:408
+msgid "Ctrl-V"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:408
+msgid "- previous view port"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:409
+msgid "^"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:409
+msgid "- select nothing"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:410
+msgid "#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:410
+msgid "- select group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:411
+msgid "##"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:411
+msgid "- center on group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:412
+msgid "Ctrl-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:412
+msgid "- define group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:413
+msgid "Shift-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:413
+msgid "- add to group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:414
+msgid "Alt-#"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:414
+msgid "- add to alternate group"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:415
+msgid "F2-F4"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:415
+msgid "- recall map position"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:416
+msgid "Shift F2-F4"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:416
+msgid "- save map position"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:417
+msgid "F5"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:417
+#, fuzzy
+msgid "- game options"
+msgstr "Spil Muligheder"
+
+#: scripts/menus/ingame/game.lua:418
+msgid "F7"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:418
+#, fuzzy
+msgid "- sound options"
+msgstr "Lyd Muligheder"
+
+#: scripts/menus/ingame/game.lua:419
+msgid "F8"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:419
+#, fuzzy
+msgid "- speed options"
+msgstr "Hastigheds Muligheder"
+
+#: scripts/menus/ingame/game.lua:420
+msgid "F9"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:420
+msgid "- preferences"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:421
+msgid "F10"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:422
+msgid "F11"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:422
+#, fuzzy
+msgid "- save game"
+msgstr "Gem Spil"
+
+#: scripts/menus/ingame/game.lua:423
+msgid "F12"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:423
+#, fuzzy
+msgid "- load game"
+msgstr "Hent spil"
+
+#: scripts/menus/ingame/game.lua:458
+msgid "Keystroke Help Menu"
+msgstr "Tastaturtryk Hjælpe Menu"
+
+#: scripts/menus/ingame/game.lua:466
+msgid ""
+"You can select all of your currently visible units of the same type by "
+"holding down the CTRL key and selecting a unit or by \"double clicking\" on "
+"a unit."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:467
+msgid ""
+"The more engineers you have collecting resources, the faster your economy "
+"will grow."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:469
+msgid "Use your engineers to repair damaged buildings."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:470
+#, fuzzy
+msgid "Explore your surroundings early in the game."
+msgstr "Er du sikker på at du ønsker at genstarte spillet?"
+
+#: scripts/menus/ingame/game.lua:473
+msgid "Keep all engineers working. Use ALT-I to find idle engineers."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:474
+msgid ""
+"You can make units automatically perform special actions by selecting a "
+"unit, holding down CTRL and clicking on the icon.  CTRL click again to turn "
+"off."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:477
+msgid ""
+"You can give an unit an order which is executed after it finishes the "
+"current work, if you hold the SHIFT key."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:478
+msgid ""
+"You can give way points, if you press the SHIFT key, while you click right "
+"for the move command."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:479
+msgid ""
+"You can order an engineer to build one building after the other, if you hold "
+"the SHIFT key, while you place the building."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:480
+msgid ""
+"You can build many of the same building, if you hold the ALT and SHIFT keys "
+"while you place the buildings."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:482
+msgid ""
+"Use CTRL-V or ALT-V to cycle through the viewport configuration, you can "
+"than monitor your base and lead an attack."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:484
+msgid "Know a useful tip?  Then add it here!"
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:496
+msgid "Bos Wars Tips"
+msgstr "Bos Wars Tips"
+
+#: scripts/menus/ingame/game.lua:527
+msgid "Show tips at startup"
+msgstr "Vis tips ved start"
+
+#: scripts/menus/ingame/game.lua:535
+msgid "~!Previous Tip"
+msgstr "~!Forrige Tip"
+
+#: scripts/menus/ingame/game.lua:537
+msgid "~!Next Tip"
+msgstr "~!Næste Tip"
+
+#: scripts/menus/ingame/game.lua:549
+msgid "Objectives"
+msgstr "Mål"
+
+#: scripts/menus/network.lua:55
+msgid "Error"
+msgstr "Fejl"
+
+#: scripts/menus/network.lua:81
+msgid "Players"
+msgstr "Spillere"
+
+#: scripts/menus/network.lua:128
+msgid "Joining game: Map"
+msgstr "Tilslutter spil: Kort"
+
+#: scripts/menus/network.lua:174
+msgid "~!Ready"
+msgstr "~!Klar"
+
+#: scripts/menus/network.lua:218 scripts/menus/network.lua:259
+msgid "Cannot reach server"
+msgstr "Kan ikke forbinde til server"
+
+#: scripts/menus/network.lua:234
+msgid "Joining game"
+msgstr "Forbinder til spil"
+
+#: scripts/menus/network.lua:256
+msgid "Map not available"
+msgstr "Kort ikke tilgængelig"
+
+#: scripts/menus/network.lua:262
+msgid "Server is full"
+msgstr "Server er fuld"
+
+#: scripts/menus/network.lua:265
+msgid "Server gone"
+msgstr "Server forsvundet"
+
+#: scripts/menus/network.lua:268
+msgid "Incompatible engine version"
+msgstr "Inkompatibel spil motor version"
+
+#: scripts/menus/network.lua:271
+#, fuzzy
+msgid "Incompatible network version"
+msgstr "Inkompatibel netværks version"
+
+#: scripts/menus/network.lua:285
+msgid "Enter Server address"
+msgstr "Indtast Server addresse"
+
+#: scripts/menus/network.lua:286
+msgid "IP or server name :"
+msgstr "IP eller server navn :"
+
+#: scripts/menus/network.lua:288 scripts/menus/network.lua:474
+msgid "~!Join Game"
+msgstr "~!Tilslut spil"
+
+#: scripts/menus/network.lua:292
+msgid "Invalid server name"
+msgstr "Forkert server navn"
+
+#: scripts/menus/network.lua:315 scripts/menus/network.lua:416
+msgid "Create MultiPlayer game"
+msgstr "Opret FlereSpillere spil"
+
+#: scripts/menus/network.lua:396
+msgid "Waiting for players"
+msgstr "Venter på spillere"
+
+#: scripts/menus/network.lua:409
+msgid "No Map"
+msgstr "Ingen Kort"
+
+#: scripts/menus/network.lua:410
+msgid "No map"
+msgstr "Ingen kort"
+
+#: scripts/menus/network.lua:451 scripts/menus/network.lua:484
+msgid "Create ~!Game"
+msgstr "Opret ~!Spil"
+
+#: scripts/menus/network.lua:467
+msgid "MultiPlayer"
+msgstr "Flere Spillere"
+
+#: scripts/menus/network.lua:469
+msgid "Nickname :"
+msgstr "Kaldenavn :"
+
+#: scripts/menus/options.lua:37
+msgid "Speed Options"
+msgstr "Hastigheds Muligheder"
+
+#: scripts/menus/options.lua:77
+msgid "Effects Volume"
+msgstr "Effekt Volume"
+
+#: scripts/menus/options.lua:93 scripts/menus/options.lua:125
+msgid "min"
+msgstr "min"
+
+#: scripts/menus/options.lua:98 scripts/menus/options.lua:130
+msgid "max"
+msgstr "maks"
+
+#: scripts/menus/options.lua:104 scripts/menus/options.lua:136
+msgid "Enabled"
+msgstr "Aktiveret"
+
+#: scripts/menus/options.lua:109
+msgid "Music Volume"
+msgstr "Musik Volume"
+
+#: scripts/menus/options.lua:218
+msgid "Fullscreen"
+msgstr "Fuldskærm"
+
+#: scripts/menus/options.lua:226
+msgid "Use OpenGL (restart required)"
+msgstr ""
+
+#: scripts/menus/options.lua:239
+msgid "Video Options"
+msgstr "Video Muligheder"
+
+#: scripts/menus/options.lua:257
+msgid "Language Selection"
+msgstr "Sprog Valg"
+
+#: scripts/menus/options.lua:308
+msgid "~!Sound"
+msgstr "~!Lyd"
+
+#: scripts/menus/options.lua:309
+msgid "~!Video"
+msgstr "~!Video"
+
+#: scripts/menus/options.lua:310
+msgid "S~!peed"
+msgstr "~!Hastighed"
+
+#: scripts/menus/options.lua:311
+msgid "~!Language"
+msgstr "~!Sprog"
+
+#: scripts/menus/options.lua:321
+msgid "Options"
+msgstr "Muligheder"
+
+#: scripts/menus/patch.lua:39 scripts/menus/patch.lua:95
+#: scripts/menus/patch.lua:130
+#, fuzzy
+msgid "Patch Editor"
+msgstr "Start ~!Editor"
+
+#: scripts/menus/patch.lua:41 scripts/menus/patch.lua:103
+#, fuzzy
+msgid "Name:"
+msgstr "Kaldenavn :"
+
+#: scripts/menus/patch.lua:47
+msgid "Image:"
+msgstr ""
+
+#: scripts/menus/patch.lua:56
+msgid "x"
+msgstr ""
+
+#: scripts/menus/patch.lua:62
+#, fuzzy
+msgid "Create ~!Patch"
+msgstr "Opret ~!Spil"
+
+#: scripts/menus/patch.lua:111
+msgid "Load ~!Patch"
+msgstr ""
+
+#: scripts/menus/patch.lua:132
+#, fuzzy
+msgid "Create ~!New Patch"
+msgstr "Opret ~!Nyt Kort"
+
+#: scripts/menus/patch.lua:134
+#, fuzzy
+msgid "~!Load Patch"
+msgstr "~!Hent Kort"
+
+#~ msgid "~!Cancel"
+#~ msgstr "~!Fortryd"

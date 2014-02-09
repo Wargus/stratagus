@@ -1,0 +1,355 @@
+# Stratagus-danish translation.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Bent Jakobsen <jakobsen.bent@gmail.com>, 2006.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-02 12:36+0300\n"
+"PO-Revision-Date: 2006-12-25 21:22-0800\n"
+"Last-Translator: Bent Jakobsen\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: action/action_build.cpp:131
+msgid "You cannot reach building place"
+msgstr "Du kan ikke nå byggepladsen"
+
+#: action/action_build.cpp:214
+#, c-format
+msgid "You cannot build %s here"
+msgstr "Du kan ikke bygge %s her"
+
+#: action/action_build.cpp:228
+#, c-format
+msgid "Can't build more units %s"
+msgstr "Kan ikke lave flere enheder %s"
+
+#: action/action_build.cpp:260
+#, c-format
+msgid "Unable to create building %s"
+msgstr "Kan ikke lave bygninger %s"
+
+#: action/action_build.cpp:379
+#, c-format
+msgid "New %s done"
+msgstr "Ny %s færdig"
+
+#: action/action_spellcast.cpp:170
+#, c-format
+msgid "%s: not enough mana for spell: %s"
+msgstr "%s: ikke nok mana for fortryllelse: %s"
+
+#: action/action_spellcast.cpp:174
+#, c-format
+msgid "%s: can't cast spell: %s"
+msgstr "%s: kan ikke kaste fortryllelse: %s"
+
+#: action/action_train.cpp:180
+#, c-format
+msgid "New %s ready"
+msgstr "Ny %s klar"
+
+#: action/action_train.cpp:230
+#, c-format
+msgid "Unable to train %s"
+msgstr "Ude af stand til at træne %s"
+
+#: action/command.cpp:1008
+#, c-format
+msgid "Player \"%s\" has left the game"
+msgstr "Spiller \"%s\" har forladt spillet"
+
+#: action/command.cpp:1010
+#, c-format
+msgid "Player \"%s\" has been killed"
+msgstr "Spiller \"%s\" er blevet dræbt"
+
+#: editor/editloop.cpp:371
+msgid "Unit deleted"
+msgstr "Enhed slettet"
+
+#: editor/editloop.cpp:694 editor/editloop.cpp:987
+msgid "Player"
+msgstr ""
+
+#: editor/editloop.cpp:699
+msgid "Neutral"
+msgstr ""
+
+#: editor/editloop.cpp:703
+msgid "Nobody"
+msgstr ""
+
+#: editor/editloop.cpp:706
+msgid "Person"
+msgstr ""
+
+#: editor/editloop.cpp:711
+msgid "Computer"
+msgstr ""
+
+#: editor/editloop.cpp:992
+msgid "Amount of"
+msgstr ""
+
+#: editor/editloop.cpp:1008
+msgid "Patch"
+msgstr ""
+
+#: editor/editloop.cpp:1290
+msgid "Unit can't be placed here."
+msgstr "Enhed kan ikke placeres her."
+
+#: editor/editloop.cpp:1371
+#, fuzzy
+msgid "Patch deleted"
+msgstr "Enhed slettet"
+
+#: editor/editloop.cpp:1402
+msgid "Unit owner modified"
+msgstr "Enheds ejer modificeret"
+
+#: editor/editloop.cpp:1603 editor/editloop.cpp:1639
+#, fuzzy
+msgid "Select player #"
+msgstr "Vælg mål"
+
+#: editor/editloop.cpp:1737
+msgid "Select mode"
+msgstr "Vælg tilstand"
+
+#: editor/editloop.cpp:1748
+msgid "Unit mode"
+msgstr "Enheds tilstand"
+
+#: editor/editloop.cpp:1759
+#, fuzzy
+msgid "Patch mode"
+msgstr "Enheds tilstand"
+
+#: editor/editloop.cpp:1770
+msgid "Set start location mode"
+msgstr "Sæt start placerings tilstand"
+
+#: editor/patch_editor.cpp:522
+msgid "Save"
+msgstr ""
+
+#: editor/patch_editor.cpp:528
+msgid "Exit"
+msgstr ""
+
+#: game/player.cpp:702
+msgid "Building Limit Reached"
+msgstr "Bygnings grænse nået"
+
+#: game/player.cpp:706
+msgid "Unit Limit Reached"
+msgstr "Enheds grænse nået"
+
+#: game/player.cpp:710
+msgid "Total Unit Limit Reached"
+msgstr "Total Enheds grænse nået"
+
+#: game/player.cpp:714
+#, c-format
+msgid "Limit of %d reached for this unit type"
+msgstr "Grænse på %d nået for denne enheds type"
+
+#: game/player.cpp:720
+msgid "Cannot create more units."
+msgstr "Kan ikke lave flere enheder."
+
+#: game/replay.cpp:766
+msgid "No sync info for this replay !"
+msgstr "Ingen synk information for dette replay !"
+
+#: game/replay.cpp:768
+#, c-format
+msgid "Replay got out of sync (%lu) !"
+msgstr "Replay gik ud af synk (%lu) !"
+
+#: game/replay.cpp:777
+msgid "Replay got out of sync !"
+msgstr "Replay gik ud af synk !"
+
+#: game/replay.cpp:875 game/replay.cpp:889
+msgid "End of replay"
+msgstr "Slut på replay"
+
+#: network/network.cpp:1069
+#, c-format
+msgid "%s sent bad command"
+msgstr "%s sendte dårlig kommando"
+
+#: network/network.cpp:1166
+msgid "Network out of sync"
+msgstr "Netværk ude af synk"
+
+#: network/network.cpp:1399
+#, c-format
+msgid "Waiting for player \"%s\": %d:%02d"
+msgstr "Venter på spiller \"%s\": %d:%02d"
+
+#: network/network.cpp:1415
+msgid "Timed out"
+msgstr "Tiden løb ud"
+
+#: stratagus/stratagus.cpp:596
+msgid "Thanks for playing Bos Wars.\n"
+msgstr "Tak for at du spillede Bos Wars.\n"
+
+#: ui/botpanel.cpp:783 ui/botpanel.cpp:848
+msgid "Select Target"
+msgstr "Vælg mål"
+
+#: ui/botpanel.cpp:896
+msgid "Select Location"
+msgstr "Vælg placering"
+
+#: ui/interface.cpp:105
+#, c-format
+msgid "MESSAGE:%s~!_"
+msgstr "BESKED:%s~!_"
+
+#: ui/interface.cpp:257
+msgid "Sound is on."
+msgstr "Lyd er aktiv."
+
+#: ui/interface.cpp:259
+msgid "Sound is off."
+msgstr "Lyd er afbrudt."
+
+#: ui/interface.cpp:274
+msgid "Music is off."
+msgstr "Musik er afbrudt."
+
+#: ui/interface.cpp:277
+msgid "Music is on."
+msgstr "Musik er aktiv."
+
+#: ui/interface.cpp:290 ui/mouse.cpp:1613
+msgid "Game Paused"
+msgstr "Spil Pauset"
+
+#: ui/interface.cpp:292
+msgid "Game Resumed"
+msgstr "Spil Genoptaget"
+
+#: ui/interface.cpp:323
+msgid "Big map enabled"
+msgstr "Stort kort aktiveret"
+
+#: ui/interface.cpp:332
+msgid "Returning to old map"
+msgstr "Returnere til gammelt kort"
+
+#: ui/interface.cpp:346
+msgid "Faster"
+msgstr "Hurtigere"
+
+#: ui/interface.cpp:365
+msgid "Slower"
+msgstr "Langsommere"
+
+#: ui/interface.cpp:398
+msgid "Terrain displayed."
+msgstr "Terræn vist."
+
+#: ui/interface.cpp:400
+msgid "Terrain hidden."
+msgstr "Terræn skjult."
+
+#: ui/interface.cpp:430
+msgid "Grab mouse toggled."
+msgstr "Tag musen valgt."
+
+#: ui/interface.cpp:911
+msgid "Screenshot made."
+msgstr "Skærmbillede lavet."
+
+#: ui/mainscr.cpp:170
+msgid "Armor: "
+msgstr ""
+
+#: ui/mainscr.cpp:176
+msgid "Radar Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:181
+msgid "Sight Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:188
+msgid "Kills: "
+msgstr ""
+
+#: ui/mainscr.cpp:193
+msgid "Attack Range: "
+msgstr ""
+
+#: ui/mainscr.cpp:200
+msgid "Damage: "
+msgstr ""
+
+#: ui/mainscr.cpp:205
+msgid "Mana: "
+msgstr ""
+
+#: ui/mainscr.cpp:600
+#, c-format
+msgid "Last message repeated ~<%d~> times"
+msgstr "Sidste besked gentaget ~<%d~> gange"
+
+#: ui/mainscr.cpp:732
+#, c-format
+msgid "~<Event: %s~>"
+msgstr "~<Handling: %s~>"
+
+#: ui/mouse.cpp:1778
+#, c-format
+msgid "You have ~<%d~> %ss"
+msgstr "Du har ~<%d~> %ser"
+
+#: ui/mouse.cpp:1782
+#, c-format
+msgid "You have ~<1~> %s"
+msgstr "Du har ~<1~> %s"
+
+#: unit/unit.cpp:2169
+#, c-format
+msgid "%s attacked"
+msgstr "%s angrebet"
+
+#: video/sdl.cpp:285
+msgid "esc"
+msgstr ""
+
+#~ msgid "Energy"
+#~ msgstr "Energi"
+
+#~ msgid "Magma"
+#~ msgstr "Magma"
+
+#~ msgid "Mirror editing enabled: 2-side"
+#~ msgstr "Spejl redigering aktiveret: 2-sides"
+
+#~ msgid "Mirror editing enabled: 4-side"
+#~ msgstr "Spejl redigering aktiveret: 4-side"
+
+#~ msgid "Mirror editing disabled"
+#~ msgstr "Spejl redigering deaktiveret"
+
+#~ msgid "Tile mode"
+#~ msgstr "Flise tilstand"
+
+#~ msgid "~!OK"
+#~ msgstr "~!OK"
+
+#~ msgid "~!Cancel"
+#~ msgstr "~!Fortryd"

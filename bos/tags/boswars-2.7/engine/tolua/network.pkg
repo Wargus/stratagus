@@ -1,0 +1,47 @@
+$#include "network.h"
+
+void InitNetwork1(void);
+void ExitNetwork1(void);
+
+bool IsNetworkGame();
+
+int NetworkSetupServerAddress(const std::string serveraddr);
+void NetworkInitClientConnect(void);
+void NetworkInitServerConnect(int openslots);
+void NetworkServerStartGame(void);
+void NetworkProcessClientRequest(void);
+$int GetNetworkState() {return (int)NetLocalState;}
+int GetNetworkState();
+void NetworkServerResyncClients(void);
+void NetworkDetachFromServer(void);
+
+class CServerSetup {
+	unsigned char ResourcesOption;
+	unsigned char UnitsOption;
+	unsigned char FogOfWar;
+	unsigned char RevealMap;
+	unsigned char GameTypeOption;
+	unsigned char Difficulty;
+	unsigned char MapRichness;
+	unsigned CompOpt[PlayerMax];
+	unsigned Ready[PlayerMax];
+	unsigned long LastFrame[PlayerMax];
+};
+extern CServerSetup LocalSetupState;
+extern CServerSetup ServerSetupState;
+extern int NetLocalHostsSlot;
+tolua_readonly int NetPlayerNameSize;
+struct CNetworkHost {
+	unsigned long  Host;         /// Host address
+	unsigned short Port;         /// Port on host
+	unsigned short PlyNr;        /// Player nummer
+	char           PlyName[NetPlayerNameSize];  /// Name of player
+};
+extern CNetworkHost Hosts[PlayerMax];
+
+$extern string NetworkMapName;
+string NetworkMapName;
+
+$void NetworkGamePrepareGameSettings(void);
+void NetworkGamePrepareGameSettings(void);
+

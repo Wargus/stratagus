@@ -1,0 +1,46 @@
+$#include "patch_type.h"
+$#include "patch.h"
+$#include "patch_manager.h"
+
+
+class CPatchType
+{
+	const CGraphic *getGraphic() const;
+	int getTileWidth() const;
+	int getTileHeight() const;
+	unsigned short getFlag(int x, int y);
+};
+
+
+class CPatch
+{
+	CPatchType *getType();
+	void setPos(int x, int y);
+	void setX(int x);
+	int getX() const;
+	void setY(int y);
+	int getY() const;
+};
+
+// The C++ functions may have const std::string & parameters, but
+// don't tell tolua++ about the references, because it would ignore
+// the const and generate code to copy the modified strings to
+// additional Lua return values.
+
+class CPatchManager
+{
+	CPatch *add(std::string typeName, int x, int y);
+
+	void moveToTop(CPatch *patch);
+	void moveToBottom(CPatch *patch);
+
+	CPatch *getPatch(int x, int y) const;
+
+	vector<string> getPatchTypeNames() const;
+	vector<string> getPatchTypeNamesUsingGraphic(std::string graphicFile) const;
+
+	CPatchType *newPatchType(std::string name, std::string file,
+		int width, int height, int flags[width*height], std::string theme);
+	bool computePatchSize(std::string graphicFile,
+		int *width = 0, int *height = 0) const;
+};

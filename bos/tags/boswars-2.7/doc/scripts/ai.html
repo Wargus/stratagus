@@ -1,0 +1,672 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2010 by Lutz Sammer, Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Artificial Intelligence (AI)</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Artificial Intelligence (AI)</h1>
+<hr>
+<a href="../index.html">Bos Wars</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="unittype.html">PREV</a> 
+<a href="config.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#AiTypes">AiTypes</a>
+<a href="#AiState">AiState</a>
+<a href="#DefineAiType">DefineAiType</a>
+<a href="#DefineAiHelper">DefineAiHelper</a>
+<a href="#AiCheckForce">AiCheckForce</a>
+<a href="#AiDebug">AiDebug</a>
+<a href="#AiDebugPlayer">AiDebugPlayer</a>
+<a href="#AiAttackWithForce">AiAttackWithForce</a>
+<a href="#AiForce">AiForce</a>
+<a href="#AiForceRole">AiForceRole</a>
+<a href="#AiNeed">AiNeed</a>
+<a href="#AiPlayer">AiPlayer</a>
+<a href="#AiSet">AiSet</a>
+<a href="#AiSleep">AiSleep</a>
+<a href="#AiWait">AiWait</a>
+<a href="#AiWaitForce">AiWaitForce</a>
+
+<hr>
+<h2>Intro - Introduction to AI functions and variables</h2>
+
+Everything around the control of the Bos Wars AI.
+
+<p>
+Warning: The AI documentation is slightly outdated. This documentation hasn't 
+been fully converted to the lua API yet.
+</p>
+
+<h2>How does it work</h2>
+
+AI in Bos Wars is script based. Each AI player keeps executing scripts.
+There are two kinds of scripts : 
+<ul>
+  <li>The main script. It starts buildings, ...</li>
+  <li>The action/reaction scripts. They are started by the AI engine, under certain condition.<br>
+  </li>
+</ul>
+Scripts can arrange and control units using forces : <br>
+A script can ask for some type of unit in a force (using <a href="#AiForce">AiForce</a>), 
+and then wait for them to be ready (using <a href="#AiWaitForce">AiWaitForce</a>).<br>
+<br>
+<br>
+The force 0 is a special case : it holds all the unassigned units, and is used to fill other forces. 
+( when needed, units are transfered from force 0 to others ). Attacker units in force 0 won't be used for attacks<br>
+Forces from 1 to 3 are also special : They are used as the attack reserve. 
+Attack forces will only be created using units available in those forces.<br>
+<br>
+The main script is responsible for setting minimums for the forces 0 and 1. This will influence the balance
+between defend and attack for an AI player.<br>
+<br>
+
+<h2>Variables</h2>
+
+<a name="AiTypes"></a>
+<h3>AiTypes</h3>
+
+<p>This table lists all the AI types defined in Lua.  It is used by
+both the engine and the Lua code.  In AiTypes, every AI type has an
+entry that is a table with these keys:</p>
+
+<dl>
+  <dt>Ident = string</dt>
+  <dd>Unique, language-independent identifier of this AI type.
+    By convention, each identifier should begin with "ai-".
+    The Ident string is also the key of the entry within AiTypes.
+    The map setup file sets e.g. <code>Players[1].AiName = "ai-blitz"</code>
+    and the engine then finds the AI type whose identifier is that string;
+    or if no such AI type exists, the engine falls back to "ai-passive".
+    In saved games, these names are used in
+    the "ai-type" parameter of <a href="savegame.html#DefineAiPlayer">DefineAiPlayer</a>
+    and the "ai-name" parameter of <a href="savegame.html#Player">Player</a>.</dd>
+  <dt>Name = string</dt>
+  <dd>Name of the AI the Player sees and which gets translated.
+    The engine does not use this; only the Lua code does.</dd>
+  <dt id="AiTypes.Init">Init = function or nil</dt>
+  <dd>Initializes
+    <a href="#AiState">AiState</a>[<a href="#AiPlayer">AiPlayer()</a>]
+    to whatever the AI type requires.
+    When starting a new game, the engine calls the Init function
+    for each player that is going to use this AI type.
+    Typically, the Init function creates a table and writes it to
+    AiState[AiPlayer()], and the <a href="#AiTypes.EachSecond">EachSecond</a>
+    function will then maintain that table.
+    Even if the AI type does not use AiState for its own purposes,
+    the Init function must regardless write a non-nil value to
+    AiState[AiPlayer()], so that the engine will know the AI state
+    has been initialized and not call the Init function again
+    if the game is later saved and loaded.
+    (Of course, if the AI type has no Init function, then there
+    is no such requirement.)</dd>
+  <dt id="AiTypes.EachSecond">EachSecond = function</dt>
+  <dd>Decides AI actions: primarily, what to build.
+    The engine calls the EachSecond function once per second
+    (at the default game speed).</dd>
+  <dt>(other)</dt>
+  <dd>Lua code can add other keys in the table.
+    The engine will ignore them.
+    (Perhaps there should be a naming convention so that
+    Lua-specific and engine-specific keys won't clash.
+    Or we can just document all keys here.)</dd>
+</dl>
+
+<p>Lua code is free to read the AiTypes table but should not
+modify it or its elements directly.  Instead, it should call
+<a href="#DefineAiType">DefineAiType</a>, so that the engine
+knows to update its data structures accordingly.</p>
+
+<a name="AiState"></a>
+<h3>AiState</h3>
+
+<p>The AI state of the map and each AI player.
+The AI scripts should write all persistent state into AiState,
+so that the engine will save and load it as part of the game,
+and so that the engine can easily clear the state when
+starting a new game.</p>
+
+<dl>
+  <dt>AiState[<a href="#AiPlayer">AiPlayer()</a>] = table</dt>
+  <dd>AI state of a single AI player.
+    The <a href="#AiTypes.Init">Init</a> function of the AI type
+    creates this table, and the other functions of the AI type
+    can then use the fields of the table as they please.
+    If AiState[AiPlayer()] is nil, that means the engine has not
+    called the Init function yet.</dd>
+
+  <dt>AiState.cache = table</dt>
+  <dd>Cached information shared by all AI players.
+    Lua scripts of individual AI types should not access this directly.
+    Instead, they should use shared functions.
+    <p><b>Not in engine:</b>
+      The engine does not know about AiState.cache.
+      Only the Lua code does.</p></dd>
+</dl>
+
+<p>The engine does not currently preserve object identity when saving
+and loading a game.  That means, if the AI script does</p>
+
+<pre class="lua">
+local x = {}
+AiState[AiPlayer()].first = x
+AiState[AiPlayer()].second = x
+</pre>
+
+<p>then a comparison like
+<code>AiState[AiPlayer()].first == AiState[AiPlayer()].second</code>
+will initially return true, but if the game is saved and loaded, the
+comparison will start returning false because <code>first</code> and
+<code>second</code> now refer to different empty tables.
+However, scripts should not depend on this behavior.</p>
+
+<h2>Functions</h2>
+<a name="DefineAiType"></a>
+<h3>DefineAiType(table)</h3>
+
+<p>Defines an AI type and adds it to <a href="#AiTypes">AiTypes</a>.</p>
+
+<dl>
+  <dt>table</dt>
+  <dd>Describes the AI type, in the same format
+    as an element of <a href="#AiTypes">AiTypes</a>.</dd>
+</dl>
+
+<p><b>Note:</b> Individual maps should not call DefineAiType.
+Call it during global initialization instead.
+The engine does not provide any way to undefine an AI type
+and reacts poorly to redefinitions.</p>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Defines the passive computer AI, which does nothing.
+DefineAiType({
+  Ident = "ai-passive",
+  Name = _("Passive"),
+  Init = nil, -- which is the default anyway
+  EachSecond = function() end })
+</pre>
+
+<a name="DefineAiHelper"></a>
+<h3>DefineAiHelper(list)</h3>
+
+The AI is complete configurable, nothing is hardcoded. The AI knows nothing
+about any units without this table. This table defines F.E. what unit can build
+and what they can build and many other things that the AI must know.
+
+
+<dl>
+<dt>list</dt>
+<dd>A list of features:
+  <dl>
+    <dt class="obsolete"><code>{"build", <var>builder-type</var>, <var>building-type-1</var>, ... <var>building-type-n</var>}</code></dt>
+    <dd class="obsolete">
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "build".</em>
+      <dl>
+	<dt>builder-type</dt>
+	<dd>Name of the unit-type that can build.
+	</dd>
+	<dt>building-type-1</dt>
+	<dt>building-type-n</dt>
+	<dd>Names of the unit-types that can be built by the builder.
+	</dd>
+      </dl>
+      <b>Note:</b> If more units can build the same buildings
+      you need the same list for all units.
+    </dd>
+    <dt class="obsolete"><code>{"train", <var>trainer-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd class="obsolete">
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "train".</em>
+      <dl>
+	  <dt>trainer-type</dt>
+	  <dd>Name of the unit-type that can train the units.
+	  </dd>
+	  <dt>unit-type-1</dt>
+	  <dt>unit-type-n</dt>
+	  <dd>Names of the unit-types that can be trained by the trainer.
+	  </dd>
+      </dl>
+      <b>Note:</b> If more units can train the same unit
+      you need the same list for all units.
+    </dd>
+    <dt class="obsolete"><code>{"repair", <var>worker-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd class="obsolete">
+      <em>Obsolete since r8101 (2006-06-21):
+	Ignored.  The AI instead gets this information from
+	<a href="ui.html#DefineButton">DefineButton</a> calls
+	that have Action = "repair".</em>
+      <dl>
+	<dt>worker-type</dt>
+	<dd>Name of the unit-type that can repair other units.
+	</dd>
+	<dt>unit-type-1</dt>
+	<dt>unit-type-n</dt>
+	<dd>Names of the unit-types that can be repaired by the worker.
+	</dd>
+      </dl>
+      <b>Note:</b> If more units can repair the same units
+      you need the same list for all units.
+    </dd>
+    <dt><code>{"unit-equiv", <var>unit-type</var>, <var>unit-type-1</var>, ... <var>unit-type-n</var>}</code></dt>
+    <dd>Declares unit types as equivalent for AI purposes.
+      When <a href="#AiForce">AiForce</a> is asked to train
+      any of them, it instead trains the best one it can;
+      "best" here is controlled by the Priority setting in
+      <a href="unittype.html#DefineUnitType">DefineUnitType</a>.
+      <dl>
+	<dt>unit-type</dt>
+	<dd>Name of the unit-type that have equivalent units.
+	</dd>
+	<dt>unit-type-1</dt>
+	<dt>unit-type-n</dt>
+	<dd>Names of the unit-types that can be used by the AI equivalent.
+	</dd>
+      </dl>
+    </dd>
+    <dt class="obsolete"><code>{"unit-limit", <var>unit-type</var>, <var>resource</var>}</code></dt>
+    <dd class="obsolete">
+      <em>Obsolete since r8101 (2006-06-21) and r8658 (2007-04-01):
+	Ignored.  The engine no longer limits the number of units
+	according to resources.</em>
+      <dl>
+	<dt>unit-type</dt>
+	<dd>Name of the unit-type that must be produced to increase the unit limit.
+	</dd>
+	<dt>resource</dt>
+	<dd>Name of the resource producing the shortage.
+	</dd>
+      </dl>
+      <i>I think we should swap the arguments: "resource", "unit-type".</i>
+    </dd>
+  </dl>
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+A minimal AI helper definition:
+
+<pre class="lua">
+DefineAiHelper(
+  {"build", "unit-peasant", "unit-farm"},
+  {"train", "unit-town-hall", "unit-peasant"},
+  {"repair", "unit-peasant", "unit-town-hall"},
+  {"unit-limit", "unit-farm", "food"},
+  {"unit-equiv", "unit-town-hall", "unit-keep"})
+</pre>
+
+<p>A peasant can build a farm.
+<p>The town hall can train a peasant.
+<p>A peasant can repair the town hall.
+<p>To fix the food shortage the AI must build farms.
+<p>For the AI is a keep equivalent to a town hall.
+
+<a name="AiAttackWithForce"></a>
+<h3>AiAttackWithForce(force)</h3>
+ 
+<p>Attack the opponent with the given force. The place is choosen by the AI. If there 	 
+are flyers, ships and land units in the force they could attack different
+goals.</p>
+
+<dl> 	 
+<dt>force</dt>
+<dd>ID of the force to which the attacking units belong. The force ids 0 to 9
+are currently supported.
+</dd>
+<dt>returns</dt>
+<dd>False.</dd>
+</dl>
+ 
+<i>The force isn't moved as a single unit: faster units attacks first, than later the
+slower units will attack.</i>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Force 0 is built with one assault unit. The script continues processing, when
+-- the assault unit is ready. When ready, the script attacks the opponent
+-- with force 0.
+{
+  function() return AiForce(0, "unit-assault", 1) end,
+  function() return AiWaitForce(0) end,
+  function() return AiAttackWithForce(0) end
+}
+</pre>
+
+<a name="AiCheckForce"></a>
+<h3>AiCheckForce(force)</h3>
+
+<p>Check if a force is complete.</p>
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>returns</dt>
+<dd>True if the force is complete, false if not yet.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Force 0 is build with one assault. 
+AiForce(0, "unit-assault", 1)
+...
+-- If the force is ready, use it to attack.
+if (AiCheckForce(0)) then AiAttackWithForce(0) end
+</pre>
+
+<div class="obsolete">
+<a name="AiDebug"></a>
+<h3>AiDebug(flag)</h3>
+
+<p><em>Obsolete since r5923 (2004-01-01):
+    The debug flag no longer affects the engine,
+    and scripts cannot read it.</em></p>
+
+Enable or disable the debug output of the AI script execution.
+
+
+<dl>
+<dt>flag</dt>
+<dd>If true enables printing of the AI commands, if false disables it.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Prints now the commands of this computer player.
+AiDebug(true)
+</pre>
+</div>
+
+<div class="obsolete">
+<a name="AiDebugPlayer"></a>
+<h3>AiDebugPlayer(1, 2, 3, ...)</h3>
+
+<p><em>Obsolete since r5923 (2004-01-01):
+    The debug flag no longer affects the engine,
+    and scripts cannot read it.</em></p>
+
+Activate dump of AI forces and strategy on stdout.<br>
+Parameters are player number, or "self", for thisplayer.<br>
+"none" will stop all AI debug output.
+
+<h4>Example</h4>
+
+<pre class="lua">
+AiDebugPlayer("self")
+</pre>
+</div>
+
+<a name="AiForce"></a>
+<h3>AiForce(force, unit-type-1, count-1, ... ,unit-type-N, count-N)</h3>
+
+<p>Define a force, what and how many units should belong to a force. Up to 10
+forces are currently supported.
+<br>
+Force 0 is currently fixed to be the defence force. Send to a building or
+unit under attack.
+<br>
+If there are any unassigned units of the requested unit-type, than they are
+assigned to the force.
+<br>
+Note: The low-level didn't support the reduce of a force.
+</p>
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>unit-type-1</dt>
+<dt>unit-type-N</dt>
+<dd>Unit-type that should be in the force. Currently only mobile (trained) units
+are allowed.
+</dd>
+<dt>count-1</dt>
+<dt>count-N</dt>
+<dd>How many of this units should be in the force.
+</dd>
+<dt>returns</dt>
+<dd>False.</dd>
+</dl>
+
+<i>The unit-types should be build in a fixed order. From left to right? or from
+each unit-type one after the other?</i>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- First the force 0 is filled up with 4 assaults and 5 bazoos, after this
+-- force 1 is filled with 3 assaults and 2 bazoos.
+AiForce(0, "unit-assault", 4, "unit-bazoo", 5)
+AiForce(1, "unit-assault", 3, "unit-bazoo", 2)
+</pre>
+
+<div class="obsolete">
+<a name="AiForceRole"></a>
+<h3>AiForceRole(force, role)</h3>
+
+<p><em>Obsolete since r5923 (2004-01-01):
+    Roles of forces no longer affect the engine,
+    and scripts cannot read them.</em></p>
+
+Define the role of a force.
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>role</dt>
+<dd>The role of the force.  Can be either "attack" or "defend".
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Sets the role of force 0 to attack.
+AiForceRole(0, "attack")
+</pre>
+</div>
+
+<a name="AiNeed"></a>
+<h3>AiNeed(unit-type)</h3>
+
+Tells the AI that it should have a unit of this unit-type. The AI builds or
+trains units in this order of the AiSet/AiNeed commands. If the unit or an
+equivalent unit already exists, the AI does nothing. If the unit is lost, it is
+automatically rebuilt. If the units are requested in wrong order, the AI could 
+hang up. Resources are collected automatic and farms are automatic build, but
+additional could be requested.
+
+
+<dl>
+<dt>unit-type</dt>
+<dd>Name of the unit-type required.
+</dd>
+<dt>returns</dt>
+<dd>False.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- The magmapump must be build before a powerplant.
+AiNeed("unit-magmapump")
+AiNeed("unit-powerplant")
+</pre>
+
+<a name="AiPlayer"></a>
+<h3>AiPlayer()</h3>
+
+Return the player number of the running AI.
+This is often used for indexing the <a href="#AiState">AiState</a> table.
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- If the player of the running AI has insufficient magma
+-- then build a magmapump:
+player = AiPlayer()
+if (Players[player].MagmaStored &lt; 300) then
+  AiNeed("unit-magmapump")
+end
+</pre>
+
+<a name="AiSet"></a>
+<h3>AiSet(unit-type, count)</h3>
+
+This AiNeed with a number. Tells the AI that it should have a specified number
+of a unit of this unit-type. The AI builds or trains units in this order of
+the AiSet/AiNeed commands. If the unit or an equivalent unit already exists,
+the AI does nothing. If the units are lost, they are automatic rebuild. If the
+units are requested in wrong order, the AI could hang up. Resources are
+collected automatic and farms are automatic build, but additional could be
+requested. In the opposite to AiNeed, which always inserts a request, AiSet
+modifies the last request to the new number.
+
+
+<dl>
+<dt>unit-type</dt>
+<dd>Name of the unit-type(s) required.
+</dd>
+<dt>count</dt>
+<dd>Number of unit-types(s) required. Zero is not allowed.
+</dd>
+<dt>returns</dt>
+<dd>False.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Request two assault units.
+AiSet("unit-assault", 2)
+</pre>
+
+<a name="AiSleep"></a>
+<h3>AiSleep(frames)</h3>
+
+<p>Wait some frames, to let the opponent (you) recover.</p>
+
+<p>The first time this function is called, 
+the frames value is stored, and "true" is returned. The next times, 
+also "true" is returned, until the timeout is over: 
+then "false" is returned.</p>
+
+<p>The frames parameter is ignored except during the first call.</p>
+
+
+<dl>
+<dt>frames</dt>
+<dd>How many frames (~1/30s) the AI shouldn't proceed with the script.
+</dd>
+<dt>returns</dt>
+<dd>True if we need to wait longer.</dd>
+<dd>False if the waiting period is over.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+{
+  -- Wait 500 frames ~16s.
+  function() return AiSleep(500) end,
+}
+</pre>
+
+<a name="AiWait"></a>
+<h3>AiWait(type)</h3>
+
+Waits until the *first* request of this unit-type is completed.
+Don't forget to request a unit-type, before you wait on it.
+
+<dl>
+<dt>type</dt>
+<dd>The unit type name string.
+</dd>
+<dt>returns</dt>
+<dd>True if this unit type is not yet available.</dd>
+<dd>False if at least one instance of this unit-type exists.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+{
+  -- Proceed only if an engineer is ready:
+  function() return AiNeed("unit-engineer") end,
+  function() return AiWait("unit-engineer") end,
+  -- Proceed only if two magmapumps are ready:
+  function() return AiSet("unit-magmapump", 2) end,
+  function() return AiWait("unit-magmapump") end,
+}
+</pre>
+
+<a name="AiWaitForce"></a>
+<h3>AiWaitForce(force)</h3>
+
+<p>Check if a force is complete.</p>
+
+<p>The forces are build in force number order. First 0, than 1, last 9.</p>
+
+
+<dl>
+<dt>force</dt>
+<dd>Number of the force to which the units should belong. 0 - 9 is currently
+supported.
+</dd>
+<dt>returns</dt>
+<dd>False if the force is complete, true if not yet.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Force 0 is build with one assault unitn. The script continues processing, if the
+-- unit is ready trained.
+AiForce(0, "unit-assault", 1)
+AiWaitForce(0)
+</pre>
+
+<h2>Notes</h2>
+
+The current AI script support is very limited, many new functions are needed.
+If you want to write this you know who to contact.
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2010 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

@@ -1,0 +1,16 @@
+class CMapInfo
+{
+	string Description;
+	int MapWidth;
+	int MapHeight;
+	int PlayerType[PlayerMax];
+};
+
+class CMap
+{
+	CMapInfo Info;
+	CPatchManager PatchManager;
+};
+
+extern CMap Map;
+

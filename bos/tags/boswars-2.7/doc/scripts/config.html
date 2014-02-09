@@ -1,0 +1,904 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2010 by Lutz Sammer, Russell Smith, Francois Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Config</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Config</h1>
+<hr>
+<a href="../index.html">Bos Wars</a>
+<a href="../faq.html">FAQ</a>
+<a href="ai.html">PREV</a>
+<a href="editor.html">NEXT</a>
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#AStarFixedUnitCrossingCost">AStarFixedUnitCrossingCost</a>
+<a href="#AStarKnowUnseenTerrain">AStarKnowUnseenTerrain</a>
+<a href="#AStarMovingUnitCrossingCost">AStarMovingUnitCrossingCost</a>
+<a href="#AStarUnknownTerrainCost">AStarUnknownTerrainCost</a>
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>
+<a href="#DefineDecorations">DefineDecorations</a>
+<a href="#DefineDefaultResourceNames">DefineDefaultResourceNames</a>
+<a href="#DefineSprites">DefineSprites</a>
+<a href="#EnemyUnitRecyclingEfficiency">EnemyUnitRecyclingEfficiency</a>
+<a href="#EnergyCost">EnergyCost</a>
+<a href="#GetVideoFullScreen">GetVideoFullScreen</a>
+<a href="#GetVideoResolution">GetVideoResolution</a>
+<a href="#MagmaCost">MagmaCost</a>
+<a href="#MaxCosts">MaxCosts</a>
+<a href="#Preference">Preference</a>
+<a href="#preferences">preferences</a>
+<a href="#RevealMap">RevealMap</a>
+<a href="#RightButtonAttacks">RightButtonAttacks</a>
+<a href="#RightButtonMoves">RightButtonMoves</a>
+<a href="#SavePreferences">SavePreferences</a>
+<a href="#SetAllPlayersBuildingLimit">SetAllPlayersBuildingLimit</a>
+<a href="#SetAllPlayersUnitLimit">SetAllPlayersUnitLimit</a>
+<a href="#SetAllPlayersTotalUnitLimit">SetAllPlayersTotalUnitLimit</a>
+<a href="#SetBuildingCapture">SetBuildingCapture</a>
+<a href="#SetClickMissile">SetClickMissile</a>
+<a href="#SetDamageMissile">SetDamageMissile</a>
+<a href="#SetDoubleClickDelay">SetDoubleClickDelay</a>
+<a href="#SetFogOfWar">SetFogOfWar</a>
+<a href="#SetFogOfWarGraphics">SetFogOfWarGraphics</a>
+<a href="#SetGrabMouse">SetGrabMouse</a>
+<a href="#SetGodMode">SetGodMode</a>
+<a href="#SetGroupKeys">SetGroupKeys</a>
+<a href="#SetHoldClickDelay">SetHoldClickDelay</a>
+<a href="#SetKeyScroll">SetKeyScroll</a>
+<a href="#SetLeaveStops">SetLeaveStops</a>
+<a href="#SetMaxOpenGLTexture">SetMaxOpenGLTexture</a>
+<a href="#SetMaxSelectable">SetMaxSelectable</a>
+<a href="#SetMinimapTerrain">SetMinimapTerrain</a>
+<a href="#SetMouseScroll">SetMouseScroll</a>
+<a href="#SetMouseScrollSpeedControl">SetMouseScrollSpeedControl</a>
+<a href="#SetMouseScrollSpeedDefault">SetMouseScrollSpeedDefault</a>
+<a href="#SetSpeedBuild">SetSpeedBuild</a>
+<a href="#SetSpeedTrain">SetSpeedTrain</a>
+<a href="#SetSpeeds">SetSpeeds</a>
+<a href="#SetTitleScreens">SetTitleScreens</a>
+<a href="#SetVideoFullScreen">SetVideoFullScreen</a>
+<a href="#SetVideoResolution">SetVideoResolution</a>
+
+<hr>
+<h2>Intro - Introduction to config functions and variables</h2>
+
+General configurations.
+
+<h2>Constants</h2>
+
+<h3 id="resource_type_identifiers">Resource type identifiers</h3>
+
+These integer constants identify types of resources.
+They are used as indices in the
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>,
+<a href="#EnemyUnitRecyclingEfficiency">EnemyUnitRecyclingEfficiency</a>,
+and <a href="ui.html#UI.Resources">UI.Resources</a> tables.
+
+<dl>
+  <dt><a name="EnergyCost">EnergyCost</a></dt>
+  <dd>The energy resource type.</dd>
+  <dt><a name="MagmaCost">MagmaCost</a></dt>
+  <dd>The magma resource type.</dd>
+  <dt><a name="MaxCosts">MaxCosts</a></dt>
+  <dd>The total number of different resource types.</dd>
+</dl>
+
+<h2>Functions</h2>
+<a name="DefineDefaultResourceNames"></a>
+<h3>DefineDefaultResourceNames("name", ...)</h3>
+
+<p>Names the resources in a given order.
+  The engine does not display these names to the user;
+  it uses them in save files only.
+  Consequently, these names should not be localized.</p>
+
+<p>(Although this function is called DefineDefaultResourceNames,
+  there is no mechanism for overriding these "default" names with
+  others.)</p>
+
+<dl>
+<dt>name</dt>
+<dd>Name to give to the resource.  There should be two names:
+  first one for <a href="#EnergyCost">EnergyCost</a>,
+  and then one for <a href="#MagmaCost">MagmaCost</a>.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Define Resource names
+DefineDefaultResourceNames(
+  "energy", "magma")
+</pre>
+
+
+<a name="DefineSprites"></a>
+<h3>DefineSprites({tag = value, ...}, ...)</h3>
+
+Define sprites to be shown for variables.
+You can define multiple sprites in the same DefineSprites call or
+each sprite in a separate call; the effect is the same either way.
+
+
+<dl>
+  Tag could be :
+  <dt>Name = "sprite-name"</dt>
+  <dd>name of the sprite.  This is how the Method parameter of
+    <a href="#DefineDecorations">DefineDecorations</a> refers to the sprite.</dd>
+  <dt>File = "filename"</dt>
+  <dd>filename containing the sprite</dd>
+  <dt>Offset = {x, y}</dt>
+  <dd>offset when drawing the sprite.
+    Positive values move the sprite to the right or down.</dd>
+  <dt>Size = {width, height}</dt>
+  <dd>Size of the sprite.
+    The graphic file may contain multiple frames of this size.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+DefineSprites(
+  {Name = "sprite-health", File = "graphics/ui/health2.png", Offset = {0, -4}, Size = {31, 4}},
+  {Name = "sprite-mana", File = "graphics/ui/mana2.png", Offset = {0, -1}, Size = {31, 4}})
+</pre>
+
+<a name="GetVideoFullScreen"></a>
+<h3>GetVideoFullScreen()</h3>
+
+Check if the game is in full screen or windowed mode.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>True if full screen, false if in windowed mode</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Get Fullscreen
+fullscreen = GetVideoFullScreen()
+</pre>
+
+<a name="GetVideoResolution"></a>
+<h3>GetVideoResolution()</h3>
+
+Get the video resolution.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Width and Height of current resolution</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Get the video resolution
+w,h = GetVideoResolution()
+</pre>
+
+<a name="DefineDecorations"></a>
+<h3>DefineDecorations({tag = value, ...}, ...)</h3>
+Define how to show variables. 
+
+<dl>
+  <dt>Index = variable</dt>
+  <dd>
+  Which variable's value this decoration will show.  It can be a
+  <a href="unittype.html#predefined-variables">predefined variable</a>,
+  or a custom variable defined with <a href="unittype.html#DefineVariables">DefineVariables</a>.</dd>
+  <dt>Offset = {x, y}, OffsetPercent = {xp, yp}</dt>
+  <dd>Decoration is placed at {x + weight(unit) * xp, y + height(unit) * yp} from the unit.</dd>
+  <dt>CenterX = boolean, CenterY = boolean</dt>
+  <dd>If set to true, use center of decoration instead of the upper-left corner.</dd>
+  <dt id="DefineDecorations.ShowIfNotEnable">ShowIfNotEnable = boolean</dt>
+  <dd>if false (default), show decoration only when variable is enable.</dd>
+  <dt>ShowWhenMax = boolean</dt>
+  <dd>if false, don't show when variable value is max.</dd>
+  <dt>ShowOnlySelected = boolean</dt>
+  <dd>if true, show only when unit is selected.</dd>
+  <dt>HideNeutral = boolean</dt>
+  <dd>if true, don't show for neutral unit.</dd>
+  <dt>HideAllied = boolean</dt>
+  <dd>if true, don't show for allied unit (but show your :) ).</dd>
+  <dt>ShowOpponent = boolean</dt>
+  <dd>if true, show also for opponent unit.</dd>
+
+  <dt>Method = {method-name, {tag = value}}</dt>
+    <dd>Which method we use to show variable.
+      The current engine supports only one method:</dd>
+    <dl>
+      <dt>"sprite", {"sprite-name"}</dt>
+      <dd>Show the p-th icon of the sprite
+		(p depands of variable percent value: from full (left) to empty (right of th image)).
+		The sprite is defined by <a href="#DefineSprites">DefineSprites()</a>.</dd>
+    </dl>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Equivalent of ShowHealthDot
+DefineDecorations({Index = "HitPoints", HideNeutral = true, CenterX = true,
+  OffsetPercent = {50, 100}, Method = {"sprite", {"sprite-health"}}})
+</pre>
+
+<a name="RevealMap"></a>
+<h3>RevealMap()</h3>
+
+Reveal the entire map.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+RevealMap()
+</pre>
+
+<a name="RightButtonAttacks"></a>
+<h3>RightButtonAttacks()</h3>
+
+If you prefer fighters are attacking by right clicking empty space.
+This cancels any previous <a href="#RightButtonMoves">RightButtonMoves</a>.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+RightButtonAttacks()
+</pre>
+
+<a name="RightButtonMoves"></a>
+<h3>RightButtonMoves()</h3>
+
+If you prefer fighters are moving by right clicking empty space.
+This cancels any previous <a href="#RightButtonAttacks">RightButtonAttacks</a>.
+
+<dl>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+RightButtonMoves()
+</pre>
+
+<a name="SavePreferences"></a>
+<h3>SavePreferences</h3>
+
+Save the user preferences, i.e. the contents of
+the <a href="#preferences">preferences</a> variable.
+
+<dl>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SavePreferences()
+</pre>
+
+<a name="SetAllPlayersBuildingLimit"></a>
+<h3>SetAllPlayersBuildingLimit(limit)</h3>
+
+Set the limit on the number of buildings a player is allowed to have at one time.
+The engine maintains a separate limit for each player,
+and this function changes them all to the same value.
+
+<dl>
+  <dt>limit</dt>
+  <dd>The maximum number of buildings a player can have.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetAllPlayersBuildingLimit(200)
+</pre>
+
+<a name="SetAllPlayersUnitLimit"></a>
+<h3>SetAllPlayersUnitLimit(limit)</h3>
+
+Sets the number of non-building type units a player can have.
+The engine maintains a separate limit for each player,
+and this function changes them all to the same value.
+
+<dl>
+  <dt>limit</dt>
+  <dd>Number of non-building unit the player can have</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetAllPlayersUnitLimit(200)
+</pre>
+
+<a name="SetAllPlayersTotalUnitLimit"></a>
+<h3>SetAllPlayersTotalUnitLimit(limit)</h3>
+
+Sets the total number of units a player may have, building or non-building.
+The engine maintains a separate limit for each player,
+and this function changes them all to the same value.
+
+<dl>
+  <dt>limit</dt>
+  <dd>The number of units to set the limit to.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetAllPlayersTotalUnitLimit(400)
+</pre>
+
+<a name="SetBuildingCapture"></a>
+<h3>SetBuildingCapture(boolean)</h3>
+
+Enable or disable building capture.
+When enabled, workers can capture low-HP enemy buildings by attacking them.
+Here, "worker" means the unit is able to repair something
+(its <a href="unittype.html#DefineUnitType.RepairRange">RepairRange</a> is not zero),
+and harvesting does not count as attacking.
+
+<p>SetBuildingCapture does not affect the other mechanisms
+with which units can be captured:
+the "capture" spell action in <a href="magic.html#DefineSpell">DefineSpell</a>,
+the <a href="game.html#ChangeUnitsOwner">ChangeUnitsOwner</a> function used in triggers,
+and the rescuable player types in <a href="mappresentation.html#DefinePlayerType">DefinePlayerType</a>.</p>
+
+<dl>
+  <dt>boolean</dt>
+  <dd>true or false, depending on if you want building capture enabled.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetBuildingCapture(true)
+</pre>
+
+<a name="SetClickMissile"></a>
+<h3>SetClickMissile("missile-type")</h3>
+
+Sets the missile to use for displaying when a player clicks on a location on the map.
+
+<dl>
+  <dt>missile-type</dt>
+  <dd>The missile to use, as defined with <a href="magic.html#DefineMissileType">DefineMissileType</a>.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetClickMissile("missile-green-cross")
+</pre>
+
+<a name="SetDamageMissile"></a>
+<h3>SetDamageMissile("missile-type")</h3>
+
+Sets the missile to use for displaying the damage done to units.
+
+<dl>
+  <dt>"missile-type"</dt>
+  <dd>missile name to use to display the damage.  It must be defined with
+  <a href="magic.html#DefineMissileType">DefineMissileType</a> and should
+  have Class = <a href="magic.html#DefineMissileType.Class.hit">"missile-class-hit"</a>.
+</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetDamageMissile("missile-hit")
+</pre>
+
+<a name="SetDoubleClickDelay"></a>
+<h3>SetDoubleClickDelay(delay)</h3>
+
+Set the delay of double clicking the mouse.
+
+<dl>
+  <dt>delay</dt>
+  <dd>The delay in ms.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetDoubleClickDelay(300)
+</pre>
+
+<a name="SetFogOfWar"></a>
+<h3>SetFogOfWar(boolean)</h3>
+
+If true, enable fog of war.
+
+<a name="SetFogOfWarGraphics"></a>
+<h3>SetFogOfWarGraphics(graphic)</h3>
+
+Set the graphics used to render the borders of the view of the units.
+
+<h4>Example</h4>
+
+<pre class="lua">
+  SetFogOfWarGraphics("general/fog.png")
+</pre>
+
+<a name="SetGrabMouse"></a>
+<h3>SetGrabMouse(boolean)</h3>
+
+Enable/disable grabbing the mouse.
+
+<a name="SetGodMode"></a>
+<h3>SetGodMode(boolean)</h3>
+
+Enable/disable god Mode, you do 255 damage, and take 0 damage. You are still vulnerable to spells.
+
+<dl>
+<dt>boolean</dt>
+<dd>true for on, false for off</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set God mode on
+SetGodMode(true)
+</pre>
+
+<a name="SetHoldClickDelay"></a>
+<h3>SetHoldClickDelay(delay)</h3>
+
+for the wanted hold-click delay (in ms)..
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetHoldClickDelay(1000)
+</pre>
+
+<a name="SetKeyScroll"></a>
+<h3>SetKeyScroll(boolean)</h3>
+
+enable/disable keyboard scrolling.
+
+<a name="SetLeaveStops"></a>
+<h3>SetLeaveStops(boolean)</h3>
+
+Enable/disable stopping scrolling on mouse leave.
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetLeaveStops(true)
+</pre>
+
+<a name="SetMaxOpenGLTexture"></a>
+<h3>SetMaxOpenGLTexture(number)</h3>
+
+<p>Limit the size of OpenGL textures.  If the game is slower with
+OpenGL than without it, try setting 1024, 512, or 256 as the limit.</p>
+
+<p>Bos Wars asks OpenGL how large textures it supports, and then
+splits all of its graphics into pieces of that size or smaller.  In
+some computers however, OpenGL reports support for e.g. 4096x4096
+textures but draws those much slower than smaller ones.  You can then
+set a smaller limit with this function.  The new limit takes effect
+on the next InitVideo call.</p>
+
+<p>If the parameter is 0, or greater than the limit reported by
+OpenGL, then Bos Wars uses the OpenGL limit instead.</p>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetMaxOpenGLTexture(512)
+</pre>
+
+<a name="SetMaxSelectable"></a>
+<h3>SetMaxSelectable(number)</h3>
+
+Set the maximum number of selectable units.
+
+<dl>
+  <dt>number</dt>
+  <dd>The number of units to set the limit to.
+    (must be positive value)</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>The limit that was set.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetMaxSelectable(18)
+</pre>
+
+<a name="SetMinimapTerrain"></a>
+<h3>SetMinimapTerrain(boolean)</h3>
+
+for minimap with/without terrain.
+
+<a name="SetMouseScroll"></a>
+<h3>SetMouseScroll(boolean)</h3>
+
+enable/disable mouse scrolling.
+
+<a name="SetMouseScrollSpeedControl"></a>
+<h3>SetMouseScrollSpeedControl(speed)</h3>
+
+Sets the speed of the mouse scrolling while control is pressed.
+
+<dl>
+<dt>speed</dt>
+<dd>Set the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set Mouse speed to 
+SetMouseScrollSpeedControl(4)
+</pre>
+
+<a name="SetMouseScrollSpeedDefault"></a>
+<h3>SetMouseScrollSpeedDefault(speed)</h3>
+
+Sets the speed of the mouse scrolling while the middle mouse button is pressed.
+
+<dl>
+<dt>speed</dt>
+<dd>Sets the number of pixels to scroll per mouse move of 1 pixel. negative = reversed</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set Speed Scroll to 5
+SetMouseScrollSpeedDefault(5)
+</pre>
+
+<a name="SetSpeedBuild"></a>
+<h3>SetSpeedBuild(number)</h3>
+
+Decrease the time to build a unit by this factor.
+
+<a name="SetSpeedTrain"></a>
+<h3>SetSpeedTrain(number)</h3>
+
+Decrease the time to train a unit by this factor.
+
+<a name="SetSpeeds"></a>
+<h3>SetSpeeds(number)</h3>
+
+Set all speeds.
+This is equivalent to
+
+<pre class="lua">
+SetSpeedBuild(number)
+SetSpeedTrain(number)
+</pre>
+
+<a name="SetTitleScreens"></a>
+<h3>SetTitleScreens({tag = value, ...}, ...)</h3>
+
+Change the default title screens.<br>
+<br>
+Possible tags:
+
+<dl>
+  <dt>Image = "filepath"</dt>
+  <dd>Image or video to be displayed as title screen, this is the first screen
+displayed. The image should be a png file with 640x480 8-bit indexed colormap.
+  </dd>
+<dt>Music = "filepath" or "none"</dt>
+  <dd>Optional music to be played with the image or video.  Use "none" to stop
+previously playing music.
+  </dd>
+  <dt>StretchImage = boolean</dt>
+  <dd>If true (default), stretch the image so it fills the screen,
+    possibly changing the aspect ratio.
+    If false, display the image in its original resolution
+    in the center of the screen.</dd>
+  <dt>Timeout = number</dt>
+  <dd>The number of seconds we should show this title-screen
+    if the user does not dismiss it first.
+    If zero (default), then the timeout is very long.</dd>
+  <dt>Label = { {Text = "text", Pos = {x, y}, Font = "font-name"}, ... }</dt>
+  <dd>Optional text to be displayed. It's a list of elements with three tags:
+  <dl>
+    <dt>Text = "text"</dt>
+    <dd>The text string to render.</dd>
+    <dt>Pos = {x, y}</dt>
+    <dd>The text coords to render.</dd>
+    <dt>Font = FIXME</dt>
+    <dd>Font to use.</dd>
+    <dt>Flags = {tag, ...}</dt>
+    <dd>The flags that tell us how should be interpretated the pos coords.
+        Possible and only value is "center".
+    </dd>
+  </dl>
+  </dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- This is the default title displayed.
+SetTitleScreens(
+  {Image = "video/int_logo_stratagus.avi", Music =  "video/int_logo_stratagus.ogg",
+   Label = {{Text = "~white~Copyright &#xa9; 1998-2003 The Stratagus Project. All rights reserved.",
+             Pos = {0, 45}, Flags = {"center"}}} },
+  {Image = "video/int_logo_bos.avi", Music =  "video/int_logo_bos.ogg"})
+</pre>
+
+<a name="SetVideoFullScreen"></a>
+<h3>SetVideoFullScreen(boolean)</h3>
+
+Sets the video to full screen or windowed mode
+
+<dl>
+<dt>boolean</dt>
+<dd>true or false for full screen</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set Fullscreen
+SetVideoFullScreen(true)
+</pre>
+
+<a name="SetVideoResolution"></a>
+<h3>SetVideoResolution(x, y)</h3>
+
+<p>Sets the resolution of the video display (in full-screen mode)
+or the size of the game window (in windowed mode).</p>
+
+<p>The engine tries to support whatever resolution you specify.
+However, at resolutions smaller than 640x480, some things might not
+fit on the screen; and at resolutions greater than 1920x1200,
+background images might not cover everything they should.</p>
+
+<dl>
+<dt>x</dt>
+<dd>Resolution in x.</dd>
+<dt>y</dt>
+<dd>Resolution in y.</dd>
+<dt><i>RETURNS</i></dt>
+<dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Set Screen res to 1024x768
+SetVideoResolution(1024, 768)
+</pre>
+
+<a name="SetGroupKeys"></a>
+<h3>SetGroupKeys("0123456789`")</h3>
+
+<p>Define the keys to use for selecting groups of units.  Those should
+normally be the digit keys; however, at least the French AZERTY layout
+requires pressing Shift to get digits, and the engine then might not
+automatically recognize those keys as digit keys.  In such cases, you
+should use this function to tell the engine what characters the keys
+generate without Shift.</p>
+
+<p>On Windows, the default setting is reported to work correctly even
+with an AZERTY keyboard.</p>
+
+<p>On X11 with GNOME 3 and SDL 1.2.15, the default setting works if
+the first keyboard layout (i.e. first XKB group) uses unshifted
+digits, even if some other keyboard layout is active.</p>
+
+<p>We hope SetGroupKeys will become unnecessary when the engine
+is changed to use SDL 1.3 or 2.0.  The engine should then be able
+to recognize the digit keys from the scancodes provided by SDL.
+This cannot be easily done with SDL 1.2, which may use different
+scancodes for the same key on different operating systems or
+different X servers.</p>
+
+<p>There is no GetGroupKeys function.  Lua scripts that call
+SetGroupKeys should also save the new value of the setting
+in <a href="#preferences">preferences</a> so that the engine
+will save it to disk.</p>
+
+<dl>
+<dt>keys</dt>
+<dd>The keys to use for selecting groups of units.
+  The string should consist of 11 characters.
+  The first ten characters are for groups 0, 1, 2, ... 9.
+  The last character is for unselecting all groups;
+  typically, this is the key on the left of the 1 key.
+</dd>
+</dl>
+
+<h4>Example</h4>
+For french azerty, use :
+
+<!-- Use &quot; rather than a plain double-quotation mark so that
+     font-lock of GNU Emacs 23 won't think that the string ends
+     there and that a new string begins at the real end.
+     To browsers, it makes no difference.  -->
+<pre class="lua">
+SetGroupKeys("&#xe0;&amp;&#xe9;\&quot;'(-&#xe8;_&#xe7;&#xb2;")
+</pre>
+
+<h2>Variables</h2>
+
+<a name="AStarFixedUnitCrossingCost"></a>
+<h3>AStarFixedUnitCrossingCost = integer</h3>
+
+<p>Cost to move over a unit that is standing still.
+(Must be greater than 3.)</p>
+
+<p>The pathfinder generally computes the total cost of each movement
+step (whether straight or diagonal) in this way: 1 + (either
+AStarUnknownTerrainCost or the cost from the map patch) + (possibly
+AStarFixedUnitCrossingCost or AStarMovingUnitCrossingCost).  However,
+there are exceptions for flying units, and for units that span
+multiple map fields.</p>
+
+<a name="AStarKnowUnseenTerrain"></a>
+<h3>AStarKnowUnseenTerrain = boolean</h3>
+
+<p>Whether the pathfinder treats unknown terrain as visible when
+calculating paths or not.  Setting AStarKnowUnseenTerrain = false will
+increase the amount the pathfinder is used at the start of a game
+while the map is being discovered.  If you need the performance, set
+it true.</p>
+
+<a name="AStarMovingUnitCrossingCost"></a>
+<h3>AStarMovingUnitCrossingCost = integer</h3>
+
+<p>Cost to move over a unit that is moving to somewhere.
+(Must be greater than 3.)</p>
+
+<a name="AStarUnknownTerrainCost"></a>
+<h3>AStarUnknownTerrainCost = integer</h3>
+
+<p>Extra cost to move on unseen terrain, makes units tend towards
+known areas when finding paths.</p>
+
+<a name="AlliedUnitRecyclingEfficiency"></a>
+<h3>AlliedUnitRecyclingEfficiency</h3>
+
+<p>What percentage of resources you get back
+when recycling your buildings or other
+<a href="unittype.html#DefineUnitType.CanHarvestFrom">harvestable</a>
+units of allied players.</p>
+
+<p>The value of this variable is a table.
+The indices of the table are resource type identifiers,
+i.e. integers between 0 and <a href="#MaxCosts">MaxCosts</a>-1
+(even though indices typically start from 1 in Lua).
+The values of the table are the percentages.</p>
+
+<h4>Example</h4>
+
+<pre class="lua">
+AlliedUnitRecyclingEfficiency[MagmaCost] = 42
+</pre>
+
+<a name="EnemyUnitRecyclingEfficiency"></a>
+<h3>EnemyUnitRecyclingEfficiency</h3>
+
+<p>What percentage of resources you get when recycling enemy
+buildings.</p>
+
+<p>The value of this variable is a table in the same format as
+<a href="#AlliedUnitRecyclingEfficiency">AlliedUnitRecyclingEfficiency</a>.</p>
+
+<a name="Preference"></a>
+<h3>Preference</h3>
+
+<p>This variable refers to an object that has the following properties:
+<a href="#Preference.ShowAttackRange">ShowAttackRange</a>
+<a href="#Preference.ShowReactionRange">ShowReactionRange</a>
+<a href="#Preference.ShowSightRange">ShowSightRange</a>
+<a href="#Preference.ShowOrders">ShowOrders</a>
+</p>
+
+<a name="Preference.ShowAttackRange"></a>
+<h4>Preference.ShowAttackRange = boolean</h4>
+
+<p>Whether to show the attack range of the selected unit as a red circle.
+See the <a href="unittype.html#variable.AttackRange">AttackRange</a> variable.</p>
+
+<p>Even if the ShowAttackRange, ShowReactionRange, and ShowSightRange
+properties are false, the player can display the ranges by holding the
+left mouse button for a moment.  In any case, the game never shows
+ranges if the player has selected more than one unit.</p>
+
+<a name="Preference.ShowReactionRange"></a>
+<h4>Preference.ShowReactionRange = boolean</h4>
+
+<p>Whether to show the reaction range of the selected unit as a blue circle.
+See the <a href="unittype.html#DefineUnitType.ComputerReactionRange">ComputerReactionRange</a>
+and <a href="unittype.html#DefineUnitType.PersonReactionRange">PersonReactionRange</a>
+parameters of DefineUnitType.</p>
+
+<a name="Preference.ShowSightRange"></a>
+<h4>Preference.ShowSightRange = boolean</h4>
+
+<p>Whether to show the sight range of the selected unit as a green circle.
+See the <a href="unittype.html#variable.SightRange">SightRange</a> variable.</p>
+
+<a name="Preference.ShowOrders"></a>
+<h4>Preference.ShowOrders = integer</h4>
+
+<p>How long to show the orders of selected units on the map,
+after the player gives an order.  Measured in seconds.
+If this is negative, or the player presses the Shift key,
+then the engine shows the orders no matter how old they are.</p>
+
+<a name="preferences"></a>
+<h3>preferences</h3>
+
+This table contains the user preferences that
+<a href="#SavePreferences">SavePreferences</a> will save.
+The engine does not otherwise interpret the contents of this table.
+Instead, when the engine is starting up, a Lua script should read
+the preferences from this table and pass each preference to the
+appropriate function so that it takes effect.
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

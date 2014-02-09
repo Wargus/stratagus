@@ -1,0 +1,1183 @@
+# Lithuanian translation
+# Copyright (C) 2010
+# This file is distributed under the same license as the PACKAGE package.
+# Vytautas Raškevičius <vytautas1987@yahoo.com>, 2010.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-03 00:29+0200\n"
+"PO-Revision-Date: 2010-09-21 18:00+0300\n"
+"Last-Translator: Vytautas Raškevičius\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: Lithuanian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: campaigns/conquest/campaign.lua:82 scripts/guichan.lua:592
+#: scripts/guichan.lua:624 scripts/guichan.lua:668
+#: scripts/menus/campaigns.lua:61 scripts/menus/campaigns.lua:155
+msgid "~!Start"
+msgstr "~!Startas"
+
+#: campaigns/conquest/campaign.lua:87 scripts/guichan.lua:756
+#: scripts/guichan.lua:812 scripts/menus/campaigns.lua:66
+#: scripts/menus/ingame/editor.lua:120 scripts/menus/ingame/editor.lua:158
+#: scripts/menus/ingame/editor.lua:277 scripts/menus/ingame/game.lua:112
+#: scripts/menus/ingame/game.lua:304 scripts/menus/ingame/game.lua:352
+#: scripts/menus/ingame/game.lua:365 scripts/menus/network.lua:176
+#: scripts/menus/network.lua:242 scripts/menus/network.lua:303
+#: scripts/menus/network.lua:377 scripts/menus/network.lua:449
+#: scripts/menus/network.lua:495 scripts/menus/patch.lua:89
+#: scripts/menus/patch.lua:171
+msgid "Cancel (~<Esc~>)"
+msgstr "Atšaukti (~<Esc~>)"
+
+#: campaigns/swindler/campaign.lua:50
+msgid "Go to boswars.org and contact us to help on the campaign."
+msgstr ""
+
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:228
+msgid "Energy"
+msgstr "Energija"
+
+#: scripts/boswars.lua:127 scripts/menus/ingame/editor.lua:240
+msgid "Magma"
+msgstr "Magma"
+
+#: scripts/boswars.lua:247
+msgid "Eliminate your enemies."
+msgstr "Sunaikink priešus"
+
+#: scripts/guichan.lua:389
+msgid "Victory !"
+msgstr "Pergalė !"
+
+#: scripts/guichan.lua:392
+msgid "Draw !"
+msgstr "Lygiosios !"
+
+#: scripts/guichan.lua:394
+msgid "Defeat !"
+msgstr "Pralaimėjimas !"
+
+#: scripts/guichan.lua:401
+msgid "Cheater"
+msgstr "Sukčius"
+
+#: scripts/guichan.lua:404
+msgid "Results"
+msgstr "Rezultatai"
+
+#: scripts/guichan.lua:410 scripts/menus/network.lua:83
+msgid "Player"
+msgstr "Žaidėjas"
+
+#: scripts/guichan.lua:411
+msgid "Units"
+msgstr "Kariai"
+
+#: scripts/guichan.lua:412
+msgid "Buildings"
+msgstr "Pastatai"
+
+#: scripts/guichan.lua:413
+msgid "Kills"
+msgstr "Nužudymai"
+
+#: scripts/guichan.lua:414
+msgid "Razings"
+msgstr "Sugriovimai"
+
+#: scripts/guichan.lua:431
+msgid "~!Continue"
+msgstr "~!Tęsti"
+
+#: scripts/guichan.lua:525
+msgid "Start Game"
+msgstr "Pradėti žaidimą"
+
+#: scripts/guichan.lua:527 scripts/guichan.lua:775
+#: scripts/menus/network.lua:130 scripts/menus/network.lua:317
+msgid "Map"
+msgstr "Žemėlapis"
+
+#: scripts/guichan.lua:528 scripts/guichan.lua:776
+#: scripts/menus/network.lua:131 scripts/menus/network.lua:318
+#: scripts/menus/network.lua:418
+msgid "File:"
+msgstr "Failas:"
+
+#: scripts/guichan.lua:531 scripts/guichan.lua:740 scripts/guichan.lua:780
+#: scripts/menus/ingame/editor.lua:142 scripts/menus/network.lua:423
+#: scripts/menus/patch.lua:77
+msgid "Size:"
+msgstr "Dydis:"
+
+#: scripts/guichan.lua:534 scripts/guichan.lua:778
+#: scripts/menus/network.lua:134 scripts/menus/network.lua:321
+#: scripts/menus/network.lua:421
+msgid "Players:"
+msgstr "Žaidėjai:"
+
+#: scripts/guichan.lua:536 scripts/guichan.lua:782
+#: scripts/menus/network.lua:136 scripts/menus/network.lua:323
+#: scripts/menus/network.lua:425
+msgid "Description:"
+msgstr "Aprašymas:"
+
+#: scripts/guichan.lua:540 scripts/menus/network.lua:140
+#: scripts/menus/network.lua:332
+msgid "Fog of war"
+msgstr "Karo uždanga"
+
+#: scripts/guichan.lua:543 scripts/guichan.lua:611
+#: scripts/menus/network.lua:144 scripts/menus/network.lua:339
+msgid "Reveal map"
+msgstr "Parodyti žemėlapį"
+
+#: scripts/guichan.lua:547 scripts/menus/network.lua:147
+#: scripts/menus/network.lua:341
+msgid "Difficulty:"
+msgstr "Sudėtingumas:"
+
+#: scripts/guichan.lua:548 scripts/menus/network.lua:148
+#: scripts/menus/network.lua:342
+msgid "easy"
+msgstr "lengvas"
+
+#: scripts/guichan.lua:548 scripts/guichan.lua:552
+#: scripts/menus/network.lua:148 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:342 scripts/menus/network.lua:350
+msgid "normal"
+msgstr "vidutinis"
+
+#: scripts/guichan.lua:548 scripts/menus/network.lua:148
+#: scripts/menus/network.lua:342
+msgid "hard"
+msgstr "sunkus"
+
+#: scripts/guichan.lua:551 scripts/menus/network.lua:151
+#: scripts/menus/network.lua:349
+msgid "Starting resources:"
+msgstr "Pradiniai resursai:"
+
+#: scripts/guichan.lua:552 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:350
+msgid "high"
+msgstr "aukšti"
+
+#: scripts/guichan.lua:552 scripts/menus/network.lua:152
+#: scripts/menus/network.lua:350
+msgid "low"
+msgstr "žemi"
+
+#: scripts/guichan.lua:555 scripts/menus/network.lua:155
+#: scripts/menus/network.lua:357
+msgid "Game type:"
+msgstr "Žaidimo tipas:"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Map Default"
+msgstr "Žemėlapio nustatymai"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Melee"
+msgstr "Melee"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Free For All"
+msgstr "Free For All"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Top vs Bottom"
+msgstr "Viršus prieš apačią"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Left vs Right"
+msgstr "Kairė prieš dešnę"
+
+#: scripts/guichan.lua:556 scripts/menus/network.lua:156
+#: scripts/menus/network.lua:358
+msgid "Man vs Machine"
+msgstr "Žmogus prieš mašiną"
+
+#: scripts/guichan.lua:590 scripts/guichan.lua:622 scripts/guichan.lua:666
+#: scripts/guichan.lua:709 scripts/menus/campaigns.lua:153
+#: scripts/menus/credits.lua:142 scripts/menus/options.lua:315
+msgid "Main Menu (~<Esc~>)"
+msgstr "Pagrindinis meniu (~<Esc~>)"
+
+#: scripts/guichan.lua:601
+msgid "Show a Replay"
+msgstr "Rodyti pakartojimą"
+
+#: scripts/guichan.lua:635
+msgid "Load Game"
+msgstr "Užkrauti žaidimą"
+
+#: scripts/guichan.lua:681
+msgid "Editor"
+msgstr "Redaktorius"
+
+#: scripts/guichan.lua:683
+msgid "Create ~!New Map"
+msgstr "Sukurti ~!Naują žemėlapį"
+
+#: scripts/guichan.lua:689
+msgid "~!Load Map"
+msgstr "~!Užkrauti žemėlapį"
+
+#: scripts/guichan.lua:696
+msgid "C~!reate New Patch"
+msgstr "S~!ukurti naują pataisą"
+
+#: scripts/guichan.lua:702 scripts/menus/patch.lua:173
+msgid "Load ~!Patch"
+msgstr "Užkrauti ~!Pataisą"
+
+#: scripts/guichan.lua:723
+msgid "Create New Map"
+msgstr "Sukurti naują žemėlapį"
+
+#: scripts/guichan.lua:758 scripts/guichan.lua:814 scripts/guichan.lua:845
+msgid "Start ~!Editor"
+msgstr "Įjungti ~!Redaktorių"
+
+#: scripts/guichan.lua:773
+msgid "Select Map to Edit"
+msgstr "Pasirinkti žemėlapį redagavimui"
+
+#: scripts/guichan.lua:836 scripts/menus/network.lua:380
+msgid "~!Start Game"
+msgstr "~!Pradėti žaidimą"
+
+#: scripts/guichan.lua:837
+msgid "~!Load Game"
+msgstr "~!Užkrauti žaidimą"
+
+#: scripts/guichan.lua:838
+msgid "~!Campaigns"
+msgstr "~!Misijos"
+
+#: scripts/guichan.lua:839
+msgid "Show ~!Replay"
+msgstr "Rodyti ~!Įrašą"
+
+#: scripts/guichan.lua:841
+msgid "~!MultiPlayer"
+msgstr "~!Žaisti internete"
+
+#: scripts/guichan.lua:842
+msgid "~!Options"
+msgstr "~!Nustatymai"
+
+#: scripts/guichan.lua:844
+msgid "Cre~!dits"
+msgstr "Kūrėj~!ai"
+
+#: scripts/guichan.lua:847
+msgid "E~!xit"
+msgstr "I~!šeiti"
+
+#: scripts/menus/campaigns.lua:45
+msgid "Briefing"
+msgstr "Užduotis"
+
+#: scripts/menus/campaigns.lua:48
+msgid "Objectives:"
+msgstr "Tikslai:"
+
+#: scripts/menus/campaigns.lua:141
+msgid "List of Campaigns"
+msgstr "Misijų sąrašas"
+
+#: scripts/menus/credits.lua:36
+msgid "Graphics:"
+msgstr "Grafika:"
+
+#: scripts/menus/credits.lua:43
+msgid "Scripting:"
+msgstr "Skriptinimas:"
+
+#: scripts/menus/credits.lua:47
+msgid "Maps and campaigns:"
+msgstr "Žemėlapiai ir misijos:"
+
+#: scripts/menus/credits.lua:51
+msgid "Sound:"
+msgstr "Garsas:"
+
+#: scripts/menus/credits.lua:55
+msgid "Engine Programmers:"
+msgstr "Varikliuko programuotojai:"
+
+#: scripts/menus/credits.lua:113
+msgid "Patches"
+msgstr "Pataisos"
+
+#: scripts/menus/credits.lua:122
+msgid "Stratagus Media Project Graphics"
+msgstr "Stratagus Media projekto grafika"
+
+#: scripts/menus/credits.lua:127
+msgid "The Bos Wars Team thanks"
+msgstr "Bos Wars komanda dėkoja"
+
+#: scripts/menus/credits.lua:128
+msgid "everybody who has contributed"
+msgstr "visiems kas prisidėjo"
+
+#: scripts/menus/credits.lua:129
+msgid "patches, bug reports, ideas."
+msgstr "pataisomis, triktų pranešimais, įdėjomis"
+
+#: scripts/menus/credits.lua:132
+msgid "Bos Wars Credits"
+msgstr "Bos Wars kūrėjai"
+
+#: scripts/menus/ingame/editor.lua:35 scripts/menus/network.lua:55
+msgid "Error"
+msgstr "Klaida"
+
+#: scripts/menus/ingame/editor.lua:47 scripts/menus/ingame/editor.lua:151
+#: scripts/menus/ingame/editor.lua:252 scripts/menus/ingame/game.lua:180
+#: scripts/menus/ingame/game.lua:254 scripts/menus/ingame/game.lua:533
+#: scripts/menus/ingame/game.lua:564 scripts/menus/network.lua:67
+#: scripts/menus/options.lua:64 scripts/menus/options.lua:141
+#: scripts/menus/options.lua:241 scripts/menus/options.lua:303
+msgid "~!OK"
+msgstr "~!OK"
+
+#: scripts/menus/ingame/editor.lua:78
+msgid "Editor Menu"
+msgstr "Redaktoriaus meniu"
+
+#: scripts/menus/ingame/editor.lua:79 scripts/menus/ingame/game.lua:58
+msgid "Save (~<F11~>)"
+msgstr "Išsaugoti (~<F11~>)"
+
+#: scripts/menus/ingame/editor.lua:81
+msgid "Map Properties (~<F5~>)"
+msgstr "Žemėlapio nustatymai (~<F5~>)"
+
+#: scripts/menus/ingame/editor.lua:83
+msgid "Player Properties (~<F6~>)"
+msgstr "Žaidėjo nustatymai (~<F6~>)"
+
+#: scripts/menus/ingame/editor.lua:85
+#, fuzzy
+msgid "Show terrain attributes"
+msgstr "Rodyti kliūtis"
+
+#: scripts/menus/ingame/editor.lua:90
+msgid "~!Exit to menu"
+msgstr "~!Išeiti į meniu"
+
+#: scripts/menus/ingame/editor.lua:92
+msgid "Return to the Editor (~<Esc~>)"
+msgstr "Grįžti į redaktorių (~<Esc~>)"
+
+#: scripts/menus/ingame/editor.lua:101
+msgid "Save Map"
+msgstr "Išsaugoti žemėlapį"
+
+#: scripts/menus/ingame/editor.lua:111 scripts/menus/ingame/game.lua:91
+msgid "~!Save"
+msgstr "~!Išsaugoti"
+
+#: scripts/menus/ingame/editor.lua:132
+msgid "Map Properties"
+msgstr "Žemėlapio nustatymai"
+
+#: scripts/menus/ingame/editor.lua:134
+msgid "Map Description:"
+msgstr "Žemėlapio aprašymas:"
+
+#: scripts/menus/ingame/editor.lua:173
+msgid "Player Properties"
+msgstr "Žaidėjo nustaymai"
+
+#: scripts/menus/ingame/editor.lua:182
+msgid "Type"
+msgstr "Tipas"
+
+#: scripts/menus/ingame/editor.lua:187
+msgid "Person"
+msgstr "Asmuo"
+
+#: scripts/menus/ingame/editor.lua:187
+msgid "Computer"
+msgstr "Kompiuteris"
+
+#: scripts/menus/ingame/editor.lua:187
+msgid "Rescue (Passive)"
+msgstr "Gelbėti (Pasyvus)"
+
+#: scripts/menus/ingame/editor.lua:188
+msgid "Rescue (Active)"
+msgstr "Gelbėti (Aktyvus)"
+
+#: scripts/menus/ingame/editor.lua:188
+msgid "Neutral"
+msgstr "Neutralus"
+
+#: scripts/menus/ingame/editor.lua:188
+msgid "Nobody"
+msgstr "Niekas"
+
+#: scripts/menus/ingame/editor.lua:201
+msgid "AI"
+msgstr "AI"
+
+#: scripts/menus/ingame/editor.lua:264
+msgid "Must have at least one Type set to Person"
+msgstr "Turi būti bent vienas žmogus"
+
+#: scripts/menus/ingame/game.lua:57
+msgid "Game Menu"
+msgstr "žaidimo meniu"
+
+#: scripts/menus/ingame/game.lua:63
+msgid "Options (~<F5~>)"
+msgstr "Nustatymai (~<F5~>)"
+
+#: scripts/menus/ingame/game.lua:65
+msgid "Help (~<F1~>)"
+msgstr "Pagalba (~<F1~>)"
+
+#: scripts/menus/ingame/game.lua:67
+msgid "~!Objectives"
+msgstr "~!Tiksliai"
+
+#: scripts/menus/ingame/game.lua:69
+msgid "~!End Game"
+msgstr "~!Baigti žaidimą"
+
+#: scripts/menus/ingame/game.lua:71
+msgid "Return to Game (~<Esc~>)"
+msgstr "Grįžti į žaidimą (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:80
+msgid "Save Game"
+msgstr "Išsaugoti žaidimą"
+
+#: scripts/menus/ingame/game.lua:121 scripts/menus/options.lua:157
+msgid "Sound Options"
+msgstr "Garso nustatymai"
+
+#: scripts/menus/ingame/game.lua:130 scripts/menus/ingame/game.lua:146
+msgid "Game Options"
+msgstr "Žaidimo nustatymai"
+
+#: scripts/menus/ingame/game.lua:131
+msgid "Sound (~<F7~>)"
+msgstr "Garsas (~<F7~>)"
+
+#: scripts/menus/ingame/game.lua:133
+msgid "Game (~<F9~>)"
+msgstr "žaidimas (~<F9~>)"
+
+#: scripts/menus/ingame/game.lua:135
+msgid "~!Diplomacy"
+msgstr "~!Diplomatija"
+
+#: scripts/menus/ingame/game.lua:137 scripts/menus/ingame/game.lua:339
+#: scripts/menus/ingame/game.lua:379 scripts/menus/ingame/game.lua:459
+msgid "Previous (~<Esc~>)"
+msgstr "Ankstesnis (~<Esc~>)"
+
+#: scripts/menus/ingame/game.lua:149
+msgid "Fog of War Enabled"
+msgstr "karo uždanga įjungta"
+
+#: scripts/menus/ingame/game.lua:157
+msgid "Show command key"
+msgstr "Rodyti komandos klavišą"
+
+#: scripts/menus/ingame/game.lua:161 scripts/menus/options.lua:39
+msgid "Game Speed"
+msgstr "Žaidimo greitis"
+
+#: scripts/menus/ingame/game.lua:171 scripts/menus/options.lua:54
+msgid "slow"
+msgstr "lėtas"
+
+#: scripts/menus/ingame/game.lua:175 scripts/menus/options.lua:59
+msgid "fast"
+msgstr "greitas"
+
+#: scripts/menus/ingame/game.lua:198
+msgid "Diplomacy"
+msgstr "Diplomatija"
+
+#: scripts/menus/ingame/game.lua:200
+msgid "Allied"
+msgstr "Sąjungininkai"
+
+#: scripts/menus/ingame/game.lua:201
+msgid "Enemy"
+msgstr "Priešai"
+
+#: scripts/menus/ingame/game.lua:202
+msgid "Shared Vision"
+msgstr "Bendras matomumas"
+
+#: scripts/menus/ingame/game.lua:312
+msgid "Are you sure you want to restart the game?"
+msgstr "Ar tu tikrai nori pradėti iš naujo?"
+
+#: scripts/menus/ingame/game.lua:313 scripts/menus/ingame/game.lua:326
+msgid "~!Restart Game"
+msgstr "~!Pradėti iš naujo"
+
+#: scripts/menus/ingame/game.lua:318
+msgid "Are you sure you want to quit to the main menu?"
+msgstr "Ar tu tikrai nori išeiti į pagrindinį meniu?"
+
+#: scripts/menus/ingame/game.lua:319 scripts/menus/ingame/game.lua:335
+msgid "~!Quit to Menu"
+msgstr "~!Išeiti į pagrindinį meniu"
+
+#: scripts/menus/ingame/game.lua:325
+msgid "End Game"
+msgstr "Baigti žaidimą"
+
+#: scripts/menus/ingame/game.lua:331 scripts/menus/ingame/game.lua:334
+msgid "~!Surrender"
+msgstr "~!Pasiduoti"
+
+#: scripts/menus/ingame/game.lua:333
+msgid "Are you sure you want to surrender to your enemies?"
+msgstr "Ar tu tikrai nori pasiduoti?"
+
+#: scripts/menus/ingame/game.lua:337
+msgid "E~!xit Bos Wars"
+msgstr "Iše~!iti iš žaidimo"
+
+#: scripts/menus/ingame/game.lua:362
+msgid "Are you sure you want to exit Bos Wars?"
+msgstr "Ar tu tikrai nori išeiti iš žaidimo"
+
+#: scripts/menus/ingame/game.lua:363
+msgid "E~!xit Program"
+msgstr "Iše~!iti"
+
+#: scripts/menus/ingame/game.lua:374
+msgid "Help Menu"
+msgstr "Pagalbos meniu"
+
+#: scripts/menus/ingame/game.lua:375
+msgid "Keystroke ~!Help"
+msgstr "Klavišų ~!pagalba"
+
+#: scripts/menus/ingame/game.lua:377
+msgid "Bos Wars ~!Tips"
+msgstr "Bos Wars Pat~!arimai"
+
+#: scripts/menus/ingame/game.lua:386
+msgid "Alt-F"
+msgstr "Alt-F"
+
+#: scripts/menus/ingame/game.lua:386
+msgid "- toggle full screen"
+msgstr "- įjungti full screen"
+
+#: scripts/menus/ingame/game.lua:387
+msgid "Alt-G"
+msgstr "Alt-G"
+
+#: scripts/menus/ingame/game.lua:387
+msgid "- toggle grab mouse"
+msgstr "- įjungti pelės sulaikymą"
+
+#: scripts/menus/ingame/game.lua:388
+msgid "Ctrl-S"
+msgstr "Ctrl-S"
+
+#: scripts/menus/ingame/game.lua:388
+msgid "- mute sound"
+msgstr "- išjungti garsą"
+
+#: scripts/menus/ingame/game.lua:389
+msgid "Ctrl-M"
+msgstr "Ctrl-M"
+
+#: scripts/menus/ingame/game.lua:389
+msgid "- mute music"
+msgstr "- išjungti muziką"
+
+#: scripts/menus/ingame/game.lua:390
+msgid "+"
+msgstr "+"
+
+#: scripts/menus/ingame/game.lua:390
+msgid "- increase game speed"
+msgstr "- padidinti žaidimo greitį"
+
+#: scripts/menus/ingame/game.lua:391
+msgid "-"
+msgstr "-"
+
+#: scripts/menus/ingame/game.lua:391
+msgid "- decrease game speed"
+msgstr "- sumažinti žaidimo greitį"
+
+#: scripts/menus/ingame/game.lua:392
+msgid "Ctrl-P"
+msgstr "Ctrl-P"
+
+#: scripts/menus/ingame/game.lua:392 scripts/menus/ingame/game.lua:393
+msgid "- pause game"
+msgstr "- pauzė"
+
+#: scripts/menus/ingame/game.lua:393
+msgid "PAUSE"
+msgstr "PAUZĖ"
+
+#: scripts/menus/ingame/game.lua:394
+msgid "PRINT"
+msgstr "SPAUZDINTI"
+
+#: scripts/menus/ingame/game.lua:394
+msgid "- make screen shot"
+msgstr "- padaryti screen shot"
+
+#: scripts/menus/ingame/game.lua:395
+msgid "Alt-H"
+msgstr "Alt-H"
+
+#: scripts/menus/ingame/game.lua:395
+msgid "- help menu"
+msgstr "- pagalbos meniu"
+
+#: scripts/menus/ingame/game.lua:396
+msgid "Alt-R"
+msgstr "Alt-R"
+
+#: scripts/menus/ingame/game.lua:396
+msgid "- restart game"
+msgstr "- restartuoti žaidimą"
+
+#: scripts/menus/ingame/game.lua:397
+msgid "Alt-Q"
+msgstr "Alt-Q"
+
+#: scripts/menus/ingame/game.lua:397
+msgid "- quit to main menu"
+msgstr "- išeiti į pagrindinį meniu"
+
+#: scripts/menus/ingame/game.lua:398
+msgid "Alt-X"
+msgstr "Alt-X"
+
+#: scripts/menus/ingame/game.lua:398
+msgid "- quit game"
+msgstr "- išjungti žaidimą"
+
+#: scripts/menus/ingame/game.lua:399
+msgid "Alt-B"
+msgstr "Alt-B"
+
+#: scripts/menus/ingame/game.lua:399
+msgid "- toggle expand map"
+msgstr "- įjungti žemėlapio didinimą"
+
+#: scripts/menus/ingame/game.lua:400
+msgid "Alt-M"
+msgstr "Alt-M"
+
+#: scripts/menus/ingame/game.lua:400 scripts/menus/ingame/game.lua:421
+msgid "- game menu"
+msgstr "- žaidimo meniu"
+
+#: scripts/menus/ingame/game.lua:401
+msgid "ENTER"
+msgstr "ENTER"
+
+#: scripts/menus/ingame/game.lua:401
+msgid "- write a message"
+msgstr "- rašyti žinutę"
+
+#: scripts/menus/ingame/game.lua:402
+msgid "SPACE"
+msgstr "SPACE"
+
+#: scripts/menus/ingame/game.lua:402
+msgid "- goto last event"
+msgstr "- eiti į paskutinio įvikio vietą"
+
+#: scripts/menus/ingame/game.lua:403
+msgid "TAB"
+msgstr "TAB"
+
+#: scripts/menus/ingame/game.lua:403
+msgid "- hide/unhide terrain"
+msgstr "- slėpti/atidengti žemę"
+
+#: scripts/menus/ingame/game.lua:404
+msgid "Ctrl-T"
+msgstr "Ctrl-T"
+
+#: scripts/menus/ingame/game.lua:404
+msgid "- track unit"
+msgstr "- sekti karį"
+
+#: scripts/menus/ingame/game.lua:405
+msgid "Alt-I"
+msgstr "Alt-I"
+
+#: scripts/menus/ingame/game.lua:405
+msgid "- find idle peon"
+msgstr "- rasti tinginiaujantį darbininką"
+
+#: scripts/menus/ingame/game.lua:406
+msgid "Alt-C"
+msgstr "Alt-C"
+
+#: scripts/menus/ingame/game.lua:406
+msgid "- center on selected unit"
+msgstr "- žiūrėti į pasirinktą karį"
+
+#: scripts/menus/ingame/game.lua:407
+msgid "Alt-V"
+msgstr "Alt-V"
+
+#: scripts/menus/ingame/game.lua:407
+msgid "- next view port"
+msgstr "- kitas žiūrėjimo taškas"
+
+#: scripts/menus/ingame/game.lua:408
+msgid "Ctrl-V"
+msgstr "Ctrl-V"
+
+#: scripts/menus/ingame/game.lua:408
+msgid "- previous view port"
+msgstr "- ankstesnis žiūrėjimo taškas"
+
+#: scripts/menus/ingame/game.lua:409
+msgid "^"
+msgstr "^"
+
+#: scripts/menus/ingame/game.lua:409
+msgid "- select nothing"
+msgstr "- nieko nesirinkti"
+
+#: scripts/menus/ingame/game.lua:410
+msgid "#"
+msgstr "#"
+
+#: scripts/menus/ingame/game.lua:410
+msgid "- select group"
+msgstr "- rinktis grupę"
+
+#: scripts/menus/ingame/game.lua:411
+msgid "##"
+msgstr "##"
+
+#: scripts/menus/ingame/game.lua:411
+msgid "- center on group"
+msgstr "- žiūrėti į grupę"
+
+#: scripts/menus/ingame/game.lua:412
+msgid "Ctrl-#"
+msgstr "Ctrl-#"
+
+#: scripts/menus/ingame/game.lua:412
+msgid "- define group"
+msgstr "- priskirti grupę"
+
+#: scripts/menus/ingame/game.lua:413
+msgid "Shift-#"
+msgstr "Shift-#"
+
+#: scripts/menus/ingame/game.lua:413
+msgid "- add to group"
+msgstr "- pridėti į grupę"
+
+#: scripts/menus/ingame/game.lua:414
+msgid "Alt-#"
+msgstr "Alt-#"
+
+#: scripts/menus/ingame/game.lua:414
+msgid "- add to alternate group"
+msgstr "- pridėti į alternatyvią grupę"
+
+#: scripts/menus/ingame/game.lua:415
+msgid "F2-F4"
+msgstr "F2-F4"
+
+#: scripts/menus/ingame/game.lua:415
+msgid "- recall map position"
+msgstr "- atkelti žemėlapio vietą"
+
+#: scripts/menus/ingame/game.lua:416
+msgid "Shift F2-F4"
+msgstr "Shift F2-F4"
+
+#: scripts/menus/ingame/game.lua:416
+msgid "- save map position"
+msgstr "- prisiminti žemėlapio vietą"
+
+#: scripts/menus/ingame/game.lua:417
+msgid "F5"
+msgstr "F5"
+
+#: scripts/menus/ingame/game.lua:417
+msgid "- game options"
+msgstr "- žaidimo nustatymai"
+
+#: scripts/menus/ingame/game.lua:418
+msgid "F7"
+msgstr "F7"
+
+#: scripts/menus/ingame/game.lua:418
+msgid "- sound options"
+msgstr "- garso nustatymai"
+
+#: scripts/menus/ingame/game.lua:419
+msgid "F8"
+msgstr "F8"
+
+#: scripts/menus/ingame/game.lua:419
+msgid "- speed options"
+msgstr "- greičio nustatymai"
+
+#: scripts/menus/ingame/game.lua:420
+msgid "F9"
+msgstr "F9"
+
+#: scripts/menus/ingame/game.lua:420
+msgid "- preferences"
+msgstr "- nustatymai"
+
+#: scripts/menus/ingame/game.lua:421
+msgid "F10"
+msgstr "F10"
+
+#: scripts/menus/ingame/game.lua:422
+msgid "F11"
+msgstr "F11"
+
+#: scripts/menus/ingame/game.lua:422
+msgid "- save game"
+msgstr "- išsaugoti žaidimą"
+
+#: scripts/menus/ingame/game.lua:423
+msgid "F12"
+msgstr "F12"
+
+#: scripts/menus/ingame/game.lua:423
+msgid "- load game"
+msgstr "- užkrauti žaidimą"
+
+#: scripts/menus/ingame/game.lua:458
+msgid "Keystroke Help Menu"
+msgstr "Klavišų pagalbos meniu"
+
+#: scripts/menus/ingame/game.lua:466
+msgid ""
+"You can select all of your currently visible units of the same type by "
+"holding down the CTRL key and selecting a unit or by \"double clicking\" on "
+"a unit."
+msgstr ""
+"Tu gali pasirinkti visus to paties tipo matomus karius laikydamas CTRL ir "
+"pasirinkdamas karį arba dvigubu paspaudimu ant kario."
+
+#: scripts/menus/ingame/game.lua:467
+msgid ""
+"The more engineers you have collecting resources, the faster your economy "
+"will grow."
+msgstr ""
+"Kuo daugiau darbininkų renka resursus tuo greičiau tavo ekonomika auga."
+
+#: scripts/menus/ingame/game.lua:469
+msgid "Use your engineers to repair damaged buildings."
+msgstr "Darbininkai gali taisyti sugadintus pastatus."
+
+#: scripts/menus/ingame/game.lua:470
+msgid "Explore your surroundings early in the game."
+msgstr "Tyrinėk aplinką žaidimo pradžioje."
+
+#: scripts/menus/ingame/game.lua:473
+msgid "Keep all engineers working. Use ALT-I to find idle engineers."
+msgstr ""
+"Žiūrėk, kad visi darbininkai dirbtų. Spausk ALT-I laisvų darbininkų radimui"
+
+#: scripts/menus/ingame/game.lua:474
+msgid ""
+"You can make units automatically perform special actions by selecting a "
+"unit, holding down CTRL and clicking on the icon.  CTRL click again to turn "
+"off."
+msgstr ""
+
+#: scripts/menus/ingame/game.lua:477
+msgid ""
+"You can give an unit an order which is executed after it finishes the "
+"current work, if you hold the SHIFT key."
+msgstr ""
+"Tu gali duoti kariui įsakymą ką daryti kai pabaigs dabartinį darbą jei "
+"laikysi SHIFT mygtuką."
+
+#: scripts/menus/ingame/game.lua:478
+msgid ""
+"You can give way points, if you press the SHIFT key, while you click right "
+"for the move command."
+msgstr ""
+"Tu gali nurodyti maršrutą jei spausi SHIFT mygtuką kol spandinėji rodydamas "
+"kur eiti."
+
+#: scripts/menus/ingame/game.lua:479
+msgid ""
+"You can order an engineer to build one building after the other, if you hold "
+"the SHIFT key, while you place the building."
+msgstr ""
+"Tu gali nurodyti darbininkui kukius pastatus statyti vieną po kito jei "
+"laikysi SHIFT mygtuką, kol statai pastatą"
+
+#: scripts/menus/ingame/game.lua:480
+msgid ""
+"You can build many of the same building, if you hold the ALT and SHIFT keys "
+"while you place the buildings."
+msgstr ""
+"Tu gali pastatyti daug vienodų pastatų jei laikai ALT ir SHIFT mygtukus kol "
+"statai pastatus."
+
+#: scripts/menus/ingame/game.lua:482
+msgid ""
+"Use CTRL-V or ALT-V to cycle through the viewport configuration, you can "
+"than monitor your base and lead an attack."
+msgstr "Naudok CTRL-V arba ALT-V tam. kad persijungtum per žiūrėjimo taškus"
+
+#: scripts/menus/ingame/game.lua:484
+msgid "Know a useful tip?  Then add it here!"
+msgstr "Žinai gerą patarimą? Pridėk jį čia!"
+
+#: scripts/menus/ingame/game.lua:496
+msgid "Bos Wars Tips"
+msgstr "Bos Wars patarimai"
+
+#: scripts/menus/ingame/game.lua:527
+msgid "Show tips at startup"
+msgstr "Rodyti patarimus pradžioje"
+
+#: scripts/menus/ingame/game.lua:535
+msgid "~!Previous Tip"
+msgstr "~!Ankstesnis patarimas"
+
+#: scripts/menus/ingame/game.lua:537
+msgid "~!Next Tip"
+msgstr "~!Kitas patarimas"
+
+#: scripts/menus/ingame/game.lua:549
+msgid "Objectives"
+msgstr "Tikslai"
+
+#: scripts/menus/network.lua:81
+msgid "Players"
+msgstr "Žaidėjai"
+
+#: scripts/menus/network.lua:85 scripts/menus/network.lua:104
+msgid "Preparing"
+msgstr "Rengiama"
+
+#: scripts/menus/network.lua:87
+msgid "Open slots: "
+msgstr "Atviros vietos: "
+
+#: scripts/menus/network.lua:92
+msgid "Creator"
+msgstr "Kūrėjas"
+
+#: scripts/menus/network.lua:102
+#, fuzzy
+msgid "Ready"
+msgstr "~!Pasiruošęs"
+
+#: scripts/menus/network.lua:109
+msgid "Open slots : "
+msgstr "Atviros vietos : "
+
+#: scripts/menus/network.lua:128
+msgid "Joining game: Map"
+msgstr "Jungiamasi prie žaidimo: Žemėlapis"
+
+#: scripts/menus/network.lua:137
+msgid "Unknown map"
+msgstr "Nežinomas žėmėlapis"
+
+#: scripts/menus/network.lua:174
+msgid "~!Ready"
+msgstr "~!Pasiruošęs"
+
+#: scripts/menus/network.lua:218 scripts/menus/network.lua:259
+msgid "Cannot reach server"
+msgstr "Nepavyksta pasiekti serverio"
+
+#: scripts/menus/network.lua:234
+msgid "Joining game"
+msgstr "Jungiamasi prie žaidimo"
+
+#: scripts/menus/network.lua:237
+msgid "Connecting ..."
+msgstr "Jungiamasi ..."
+
+#: scripts/menus/network.lua:256
+msgid "Map not available"
+msgstr "Žemėlapis neturimas"
+
+#: scripts/menus/network.lua:262
+msgid "Server is full"
+msgstr "Serveris pilnas"
+
+#: scripts/menus/network.lua:265
+msgid "Server gone"
+msgstr "Serverio nebėra"
+
+#: scripts/menus/network.lua:268
+msgid "Incompatible engine version"
+msgstr "Nesuderinama varikliuko versija"
+
+#: scripts/menus/network.lua:271
+msgid "Incompatible network version"
+msgstr "Nesuderinama tinklo versija"
+
+#: scripts/menus/network.lua:285
+msgid "Enter Server address"
+msgstr "Įvesk serverio adresą"
+
+#: scripts/menus/network.lua:286
+msgid "IP or server name :"
+msgstr "IP arba serverio vardas :"
+
+#: scripts/menus/network.lua:288 scripts/menus/network.lua:474
+msgid "~!Join Game"
+msgstr "~!Jungits prie žaidimo"
+
+#: scripts/menus/network.lua:292
+msgid "Invalid server name"
+msgstr "Klaidingas serverio vardas"
+
+#: scripts/menus/network.lua:315 scripts/menus/network.lua:416
+msgid "Create MultiPlayer game"
+msgstr "Sukurti internetinį žaidimą"
+
+#: scripts/menus/network.lua:396
+msgid "Waiting for players"
+msgstr "Laukiama žaidėjų"
+
+#: scripts/menus/network.lua:409
+msgid "No Map"
+msgstr "Nėra žemėlapio"
+
+#: scripts/menus/network.lua:410
+msgid "No map"
+msgstr "Nėra žemėlapio"
+
+#: scripts/menus/network.lua:451 scripts/menus/network.lua:484
+msgid "Create ~!Game"
+msgstr "Sukurti ~!Žaidimą"
+
+#: scripts/menus/network.lua:467
+msgid "MultiPlayer"
+msgstr "MultiPlayer"
+
+#: scripts/menus/network.lua:469
+msgid "Nickname :"
+msgstr "Vardas :"
+
+#: scripts/menus/options.lua:37
+msgid "Speed Options"
+msgstr "Greičio nustatymai"
+
+#: scripts/menus/options.lua:77
+msgid "Effects Volume"
+msgstr "Garso efektai"
+
+#: scripts/menus/options.lua:93 scripts/menus/options.lua:125
+msgid "min"
+msgstr "min"
+
+#: scripts/menus/options.lua:98 scripts/menus/options.lua:130
+msgid "max"
+msgstr "max"
+
+#: scripts/menus/options.lua:104 scripts/menus/options.lua:136
+msgid "Enabled"
+msgstr "Įjungta"
+
+#: scripts/menus/options.lua:109
+msgid "Music Volume"
+msgstr "Muzikos garsumas"
+
+#: scripts/menus/options.lua:218
+msgid "Fullscreen"
+msgstr "Fullscreen"
+
+#: scripts/menus/options.lua:226
+msgid "Use OpenGL (restart required)"
+msgstr "Naudoti OpenGL (reikia perkrauti žaidimą)"
+
+#: scripts/menus/options.lua:239
+msgid "Video Options"
+msgstr "Vaizdo nustatymai"
+
+#: scripts/menus/options.lua:256
+msgid "Language Selection"
+msgstr "Kalbos pasirinkimas"
+
+#: scripts/menus/options.lua:310
+msgid "~!Sound"
+msgstr "~!Garsas"
+
+#: scripts/menus/options.lua:311
+msgid "~!Video"
+msgstr "~!Vaizdas"
+
+#: scripts/menus/options.lua:312
+msgid "S~!peed"
+msgstr "G~!reitis"
+
+#: scripts/menus/options.lua:313
+msgid "~!Language"
+msgstr "~!Kalba"
+
+#: scripts/menus/options.lua:323
+msgid "Options"
+msgstr "Nustatymai"
+
+#: scripts/menus/patch.lua:57
+msgid "Create New Patch"
+msgstr "Sukurti naują pataisą"
+
+#: scripts/menus/patch.lua:65
+msgid "Name:"
+msgstr "Vardas:"
+
+#: scripts/menus/patch.lua:71
+msgid "Image:"
+msgstr "Paveiksliukas:"
+
+#: scripts/menus/patch.lua:80
+msgid "x"
+msgstr "x"
+
+#: scripts/menus/patch.lua:91
+msgid "Create ~!Patch"
+msgstr "Sukurti ~!Pataisą"
+
+#: scripts/menus/patch.lua:137
+msgid "The image %q is already used in the patch type %q."
+msgstr ""
+
+#: scripts/menus/patch.lua:158
+msgid "Select Patch to Edit"
+msgstr "Pasirinkti pataisą redagavimui"

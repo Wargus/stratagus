@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2002-2005 by Lutz Sammer, Russell Smith, Francois Beerten
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Editor</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Editor</h1>
+<hr>
+<a href="../index.html">Bos Wars</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="config.html">PREV</a> 
+<a href="game.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#Editor">Editor</a>
+<a href="#EditorCommandLine">EditorCommandLine</a>
+<a href="#EditorEditing">EditorEditing</a>
+<a href="#EditorNotRunning">EditorNotRunning</a>
+<a href="#EditorSaveMap">EditorSaveMap</a>
+<a href="#EditorStarted">EditorStarted</a>
+<a href="#SetEditorPatchIcon">SetEditorPatchIcon</a>
+<a href="#SetEditorSelectIcon">SetEditorSelectIcon</a>
+<a href="#SetEditorStartUnit">SetEditorStartUnit</a>
+<a href="#SetEditorUnitsIcon">SetEditorUnitsIcon</a>
+<a href="#StartEditor">StartEditor</a>
+<a href="#StartPatchEditor">StartPatchEditor</a>
+<hr>
+<h2>Intro - Introduction to editor functions and variables</h2>
+
+<p>These affect only the map editor or the patch editor, not the game
+itself.</p>
+
+<h2>Functions</h2>
+
+<a name="EditorSaveMap"></a>
+<h3>EditorSaveMap("name.map")</h3>
+
+<p>Saves the map being edited in the map editor.</p>
+
+<dl>
+  <dt>"name.map"</dt>
+  <dd>The name of the directory to which this function will save the
+    map files.  This name must end with ".map".</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>0 on success, or -1 on error.</dd>
+</dl>
+
+<a name="SetEditorPatchIcon"></a>
+<h3>SetEditorPatchIcon("icon-name")</h3>
+
+<p>Set the icon of the button that activates patch-placement mode in
+  the map editor.  In this mode, the map editor shows a list of patch
+  types, and the user can insert, move, and remove patches on the
+  map.</p>
+
+<dl>
+  <dt>"icon-name"</dt>
+  <dd>The name of the icon.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Use "icon-editor-patch" for the map editor's patches icon.
+SetEditorPatchIcon("unit-editor-patch")
+</pre>
+
+<a name="SetEditorSelectIcon"></a>
+<h3>SetEditorSelectIcon("icon-name")</h3>
+
+<p>Set the icon that is used in the editor to indicate selection.</p>
+
+<dl>
+  <dt>"icon-name"</dt>
+  <dd>The name of the icon.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Use "icon-human-patrol-land" for the editor's select icon.
+SetEditorSelectIcon("icon-human-patrol-land")
+</pre>
+
+<a name="SetEditorUnitsIcon"></a>
+<h3>SetEditorUnitsIcon("icon-name")</h3>
+
+<p>Set the icon of the button that activates unit-placement mode in
+  the map editor.  In this mode, the map editor shows a list of unit
+  types, and the user can insert, move, and remove units on the
+  map.</p>
+
+<dl>
+  <dt>"icon-name"</dt>
+  <dd>The name of the icon.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+-- Use "icon-footman" for the map editor's units icon.
+SetEditorUnitsIcon("unit-footman")
+</pre>
+
+<a name="SetEditorStartUnit"></a>
+<h3>SetEditorStartUnit("unit-start")</h3>
+
+<p>Set the unit used in the map editor to show the start location.</p>
+
+<dl>
+  <dt>unit</dt>
+  <dd>The name of the unit.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<p>See also <a href="#Editor.StartUnit">Editor.StartUnit</a>.</p>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetEditorStartUnit("unit-start-location")
+</pre>
+
+<a name="StartEditor"></a>
+<h3>StartEditor("presentation.smp")</h3>
+
+<p>Starts the map editor.</p>
+
+<dl>
+  <dt>"presentation.smp"</dt>
+  <dd>The name of the presentation file of the map that the map editor
+    will load, or an empty string to create a new map from
+    scratch.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<a name="StartPatchEditor"></a>
+<h3>StartPatchEditor("patch-name")</h3>
+
+<p>Starts the patch editor.</p>
+
+<dl>
+  <dt>"patch-name"</dt>
+  <dd>The name of patch type you want to edit.</dd>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<h2>Variables</h2>
+
+<a name="Editor"></a>
+<h3>Editor</h3>
+
+<p>This variable refers to an object that has at least the following
+  properties and methods:
+  <a href="#Editor.Running">Running</a>
+  <a href="#Editor.ShowTerrainFlags">ShowTerrainFlags</a>
+  <a href="#Editor.StartUnit">StartUnit</a>
+  <a href="#Editor.TileSelectedPatch">TileSelectedPatch</a>
+  <a href="#Editor.UnitTypes">UnitTypes</a>
+</p>
+
+<a name="Editor.Running"></a>
+<h4>Editor.Running = integer</h4>
+
+<p>Whether the map editor is running.  When the user starts the map
+  editor, the engine sets Editor.Running = EditorEditing.  When a Lua
+  script sets Editor.Running = EditorNotRunning, the map editor exits.
+  The value of this property also affects what the engine shows on the
+  screen: for example, patches may get borders around them when the
+  editor is running.</p>
+
+<p>The value of the Editor.Running property should be one of the
+  following constants defined by the engine:</p>
+
+<dl>
+  <dt><a name="EditorNotRunning">EditorNotRunning</a></dt>
+  <dd>The editor is not running.</dd>
+  <dt><a name="EditorStarted">EditorStarted</a></dt>
+  <dd>This constant is not used.</dd>
+  <dt><a name="EditorCommandLine">EditorCommandLine</a></dt>
+  <dd>This constant is not used.</dd>
+  <dt><a name="EditorEditing">EditorEditing</a></dt>
+  <dd>The editor is running; the user can edit the map.
+    A Lua script can tell the editor to exit,
+    by setting Editor.Running = EditorNotRunning.</dd>
+</dl>
+
+<a name="Editor.ShowTerrainFlags"></a>
+<h4>Editor.ShowTerrainFlags = boolean</h4>
+
+<p>If true, the editor shows the terrain flags of map tiles as colored
+  rectangles.  This makes it easier to check that the terrain flags
+  have been correctly and consistently defined in patch types, and
+  that there is enough space for large units to move between
+  obstacles.</p>
+
+<a name="Editor.StartUnit"></a>
+<h4>Editor.StartUnit = const CUnitType*</h4>
+
+<p>The value of this read-only property is the CUnitType object
+  that the editor will use to show the start location of each player.
+  Lua scripts can change it by calling
+  <a href="#SetEditorStartUnit">SetEditorStartUnit</a>.</p>
+
+<a name="Editor.UnitTypes"></a>
+<h4>Editor.UnitTypes = vector</h4>
+
+<p>A sorted list of unit-types for the editor. 
+  This is only a temporary hack for better sorted units.
+  Because this is a C++ vector rather than a Lua table,
+  the key numbers start from 0 rather than 1.</p>
+
+<h5>Example</h5>
+
+<pre class="lua">
+Editor.UnitTypes.clear()
+Editor.UnitTypes.push_back("unit-vault")
+Editor.UnitTypes.push_back("unit-apcs")
+Editor.UnitTypes.push_back("unit-medic")
+Editor.UnitTypes.push_back("unit-bazoo")
+Editor.UnitTypes.push_back("unit-assault")
+Editor.UnitTypes.push_back("unit-grenadier")
+Editor.UnitTypes.push_back("unit-camp")
+Editor.UnitTypes.push_back("unit-hosp")
+</pre>
+
+<a name="Editor.TileSelectedPatch"></a>
+<h4>Editor:TileSelectedPatch()</h4>
+
+<p>Fills the map with patches of the selected type,
+  removing all other patches.</p>
+
+<dl>
+  <dt><i>RETURNS</i></dt>
+  <dd>Nothing</dd>
+</dl>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>

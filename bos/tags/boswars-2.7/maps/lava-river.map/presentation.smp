@@ -1,0 +1,5 @@
+-- File licensed under the GNU GPL version 2 or later.
+
+DefinePlayerTypes("person", "person")
+PresentMap("Lava River", 2, 32, 32, 3)
+DefineMapSetup(GetCurrentLuaPath().."/setup.sms")

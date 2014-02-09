@@ -1,0 +1,546 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<!--
+----	(c) Copyright 2004-2007 by Russell Smith
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Bos Wars Scripting API: Save Game and Replay Files</title>
+    <meta http-equiv="Content-Type" content="text/html; CHARSET=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="scripts.css">
+</head>
+<body>
+    <h1>Bos Wars Scripting API: Save Game and Replay Files</h1>
+<hr>
+<a href="../index.html">Bos Wars</a> 
+<a href="../faq.html">FAQ</a> 
+<a href="limits.html">PREV</a> 
+<a href="sound.html">NEXT</a> 
+<a href="index.html">LUA Index</a>
+<hr>
+<a href="#DefineAiPlayer">DefineAiPlayer</a>
+<a href="#Log">Log</a>
+<a href="#Missile">Missile</a>
+<a href="#Player">Player</a>
+<a href="#ReplayLog">ReplayLog</a>
+<a href="#SaveGame">SaveGame</a>
+<a href="#Selection">Selection</a>
+<a href="#SetGroupId">SetGroupId</a>
+<a href="#SlotUsage">SlotUsage</a>
+<a href="#StratagusMap">StratagusMap</a>
+<a href="#Unit">Unit</a>
+<hr>
+<h2>Intro - Introduction to saved games and replay logs</h2>
+
+<p><b>Saved games</b> are Lua scripts that call the functions
+  described below.  The engine generates calls to these functions when
+  it saves a game.  When the saved game is loaded back, those calls
+  restore its state.</p>
+
+<p><b>Replay logs</b> are Lua scripts to which the engine writes the
+  commands of human players during a game.  You can later replay the
+  log and watch the game again.  If a bug crashes the engine, the log
+  may help you reproduce the bug under a debugger or verify that it
+  has been fixed.  The replay log does not contain any commands made
+  by AI players, because the engine assumes that the AI will behave
+  the same way each time the log is replayed.  For that reason, replay
+  logs are typically not compatible between different versions.</p>
+
+<h2>Functions</h2>
+
+<a name="DefineAiPlayer"></a>
+<h3>DefineAiPlayer(player-number, properties)</h3>
+
+<p>Define an AI player. Saved games use this function;
+map setup files should not.</p>
+
+<dl>
+  <dt>player-number</dt>
+  <dd>
+    Number of the player, counting from 0.
+  </dd>
+  <dt>properties</dt>
+  <dd>
+    Properties of the AI player.
+    This list consists of tags and associated values.
+    These tags are available:
+    <dl>
+      <dt>"ai-type", string</dt>
+      <dd>
+	Identifier of the AI type.  Matches the Ident field of the
+	table parameter of <a href="ai.html#DefineAiType">DefineAiType</a>.
+      </dd>
+      <dt class="obsolete">"script-debug", boolean</dt>
+      <dd class="obsolete">
+	<em>Obsolete since r5923 (2004-01-01):
+	  The debug flag no longer affects the engine,
+	  and scripts cannot read it.</em><br>
+
+	Whether to display the executed AI script commands.
+	The <a href="ai.html#AiDebug">AiDebug</a>
+	and <a href="ai.html#AiDebugPlayer">AiDebugPlayer</a>
+	functions also control this flag.
+      </dd>
+      <dt>"sleep-cycles", integer</dt>
+      <dd>
+	The number of the game cycle on which the AI will wake up
+	from <a href="ai.html#AiSleep">AiSleep</a>, or 0 if not sleeping.
+      </dd>
+      <dt>"force", {force, properties}</dt>
+      <dd>
+	Defines a group of units that should attack or defend together,
+	to overwhelm the enemy.
+	The value must be a list that contains two elements:
+	<dl>
+	  <dt>force</dt>
+	  <dd>
+	    Number of the force.  0 - 9 is currently supported.
+	  </dd>
+	  <dt>properties</dt>
+	  <dd>
+	    Properties of the force.
+	    This list consists of subtags and possibly values.
+	    Some subtags do not allow a value and the others require a value.
+	    These subtags are available:
+	    <dl>
+	      <dt>"complete"</dt>
+	      <dd>
+		The force does not need more units.
+		This is the opposite of "recruit".
+	      </dd>
+	      <dt>"recruit"</dt>
+	      <dd>
+		The force needs more units.
+		This is the opposite of "complete".
+	      </dd>
+	      <dt>"attack"</dt>
+	      <dd>
+		The force is attacking.
+	      </dd>
+	      <dt>"defend"</dt>
+	      <dd>
+		The force is defending a unit that was attacked.
+		After the enemies are dead, the force should return home.
+	      </dd>
+	      <dt class="obsolete">"role", string</dt>
+	      <dd class="obsolete">
+		<em>Obsolete since r5923 (2004-01-01):
+		  Roles of forces no longer affect the engine,
+		  and scripts cannot read them.</em><br>
+		The role of the force, as set with
+		<a href="ai.html#AiForceRole">AiForceRole</a>.
+	      </dd>
+	      <dt>"types", {[count, unit-type-name]...}</dt>
+	      <dd>
+		How many of each unit type should be in the force.
+		This is set with <a href="ai.html#AiForce">AiForce</a>.
+	      </dd>
+	      <dt>"units", {[unit-number, unit-type-name]...}</dt>
+	      <dd>
+		List of units currently in the force.
+		The type names are ignored on load.
+	      </dd>
+	      <dt>"state", integer</dt>
+	      <dd>
+		Attack state.
+	      </dd>
+	      <dt>"goalx", integer</dt>
+	      <dd>
+		Attack point X tile map position.
+	      </dd>
+	      <dt>"goaly", integer</dt>
+	      <dd>
+		Attack point Y tile map position.
+	      </dd>
+	    </dl>
+	  </dd>
+	</dl>
+      <dt>"needed", {[resource-type-name, amount]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"need-mask", {resource-type-name...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"last-can-not-move-cycle", integer</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"unit-type", {[unit-type-name, count]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"building", {[unit-type-name, made, want]...}</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"repair-building", integer</dt>
+      <dd>
+	FIXME
+      </dd>
+      <dt>"repair-workers", {[building-unit-number, count]...}</dt>
+      <dd>	
+	Number of workers that failed trying to repair a building.
+      </dd>
+    </dl>
+  </dd>
+</dl>
+
+<p>For an example of DefineAiPlayer, please look in any save file.
+No example is provided in this document because Lua scripts for maps
+should not call DefineAiPlayer.</p>
+
+<a name="Log"></a>
+<h3>Log()</h3>
+
+<p>Parses a log entry and appends it to an internal list.
+This function is used in both replay logs and saved games.</p>
+
+<ul>
+  <li>Replay logs mainly consist of calls to the Log function.  After
+    the engine has executed all of these calls, it starts actually
+    replaying the entries from the internal list.</li>
+  <li>Each saved game contains Log calls for all the log entries from
+    the beginning of the game to the time it was saved.  When the game
+    is loaded, the engine copies these entries to a new replay log and
+    then begins appending any new entries to that.  This way, the
+    replay log will start from the beginning of the game, even if the
+    game was saved and loaded multiple times.</li>
+</ul>
+
+<h4>Example</h4>
+
+<pre class="lua">
+Log({ GameCycle = 10420, UnitNumber = 252, UnitIdent = "unit-assault", 
+  Action = "move", Flush = 1, PosX = 113, PosY = 104, SyncRandSeed = 614148735 })
+</pre>
+
+<a name="Missile"></a>
+<h3>Missile(<var>tag</var>, <var>value</var>, <var>tag</var>, <var>value</var>, ...)</h3>
+
+<p>Adds a missile on the map.</p>
+
+<p>The function supports these tag-value pairs:</p>
+
+<dl>
+  <dt>"type", <var>missile-type-name</var></dt>
+  <dd>The type of the missile. Declared with
+    <a href="magic.html#DefineMissileType">DefineMissileType</a>.</dd>
+  <dt>"local"</dt>
+  <dd>This missile is marked as local, and it's visible only to the player.
+    This is used for instance for cursor marks on the map.
+    The "local" tag is unusual in that no value follows it.
+    Either "local" or "global" must be specified.</dd>
+  <dt>"global"</dt>
+  <dd>This missile is marked as global, and it's visible to all players.
+    The "global" tag is unusual in that no value follows it.
+    Either "local" or "global" must be specified.</dd>
+  <dt>"pos", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The current position of the missile.
+    Coordinates are in pixels, not tiles.
+    For example: "pos", {4500, 3450}</dd>
+  <dt>"origin-pos", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The starting position of the missile.
+    Coordinates are in pixels, not tiles.
+    For example: "origin-pos", {4505, 3455}</dd>
+  <dt>"goal", {<var>x</var>, <var>y</var>}</dt>
+  <dd>The position of the missile's destination.
+    Coordinates are in pixels, not tiles.
+    For example: "goal", {4510, 3460}</dd>
+  <dt>"frame", <var>integer</var></dt>
+  <dd>Current sprite frame of the missile; complicated behavior.
+    A negative <var>integer</var> generally means the actual
+    frame number is -1 - <var>integer</var> and the sprite
+    should be mirrored in the X direction; but the effect depends
+    on <a href="magic.html#DefineMissileType.Flip">the Flip parameter
+      of DefineMissileType</a>.</dd>
+  <dt>"state", <var>integer</var></dt>
+  <dd>Current state of the missile.  Used for a simple state machine,
+    dependand on the missile class.</dd>
+  <dt>"anim-wait", <var>integer</var></dt>
+  <dd>FIXME: Document this.</dd>
+  <dt>"wait", <var>integer</var></dt>
+  <dd>Wait this number of game cycles until the next state or animation
+    of this missile is handled. This counts down from
+    <a href="magic.html#DefineMissileType.Sleep">the Sleep parameter
+      of DefineMissileType</a> to 0.</dd>
+  <dt>"delay", <var>integer</var></dt>
+  <dd>Number of game cycles left until the missile is first shown on the map.
+    Please see <a href="magic.html#DefineMissileType.Delay">Delay in DefineMissileType</a>.</dd>
+  <dt>"source", <var>unit-reference-string</var></dt>
+  <dd>Number of the owner of the missile. Normally the one who fired the missile.
+    Used to check units, to prevent hitting the owner. Also used for kill and
+    experience points, and for giving the owning player score.</dd>
+  <dt>"target", <var>unit-reference-string</var></dt>
+  <dd>Number of the missile's target. Normally the unit which should be
+    hit by the missile.</dd>
+  <dt>"damage", <var>integer</var></dt>
+  <dd>Damage done by missile. Units next to it can receive some reduced splash
+    damage, this is the full damage.</dd>
+  <dt>"ttl", <var>integer</var></dt>
+  <dd>Time to live in game cycles of the missile, if it reaches zero
+    the missile is automatically removed from the map. If -1 the
+    missile lives for ever and the lifetime is handled by other means.</dd>
+  <dt>"hidden"</dt>
+  <dd>This marks the missile as hidden, until the
+    <a href="magic.html#DefineMissileType.Class">missile class</a>
+    decides to show it again.
+    The "hidden" tag is unusual in that no value follows it.</dd>
+  <dt>"step", {<var>current-step-integer</var>, <var>total-step-integer</var>}</dt>
+  <dd>The progress of the missile along its movement path.
+    Generally, <var>current-step-integer</var> starts
+    from zero when the missile is launched, and it then
+    increases until it reaches <var>total-step-integer</var>,
+    at which point the missile hits its target.
+    <a href="magic.html#DefineMissileType.Speed">The Speed parameter
+      of DefineMissileType</a> is the rate of increase,
+    and the value of <var>total-step-integer</var> is the distance
+    between the source and the target.
+    However, some missile classes may use these values differently.</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+Missile("type", "missile-small-fire", "global", "pos", {1168, 1960}, "origin-pos", {1168, 1960}, "goal", {-16, -24},
+  "frame", 0, "state", 0, "anim-wait", 0, "wait", 8, "delay", 0,
+  "source", "U003B", "damage", 0, "ttl", -1, "step", {0, 0})
+</pre>
+
+<a name="Player"></a>
+<h3>Player()</h3>
+
+Used when loading games.
+
+
+<h4>Example</h4>
+
+<pre class="lua">
+Player(0,
+  "name", "Player",
+  "type", "person", "ai-name", "ai-spacious",
+  "team", 2, "enemy", "_XXX_____", "allied", "_________", "shared-vision", "_________",
+  "start", {19, 19},
+  "production-rate", {"energy", 414, "magma", 174,},
+  "stored-resources", {"energy", 600000, "magma", 120000,},
+  "storage-capacity", {"energy", 600000, "magma", 120000,},
+  "ai-disabled",
+  "unit-limit", 200, "building-limit", 200, "total-unit-limit", 400,
+  "score", 18730,
+  "total-units", 48,
+  "total-buildings", 79,
+  "total-resources", {23339092, 9312165,},
+  "total-razings", 69,
+  "total-kills", 219,
+  "color", { 0, 0, 164 })
+</pre>
+
+<a name="ReplayLog"></a>
+<h3>ReplayLog()</h3>
+
+<p>Describes how the game was started.
+This function is used in both replay logs and saved games.</p>
+
+<ul>
+  <li>When replaying a log, the engine starts a new game in the same
+    way.</li>
+  <li>When loading a saved game, the engine copies this information
+    to a new replay log.</li>
+</ul>
+
+<h4>Example</h4>
+
+<pre class="lua">
+ReplayLog( {
+  Comment1 = "Generated by Bos Wars Version 2.6.0",
+  Comment2 = "Visit http://www.boswars.org for more information",
+  Comment3 = "&#36;Id: replay.cpp 9589 2009-05-30 18:09:56Z jim4 &#36;",
+  Date = "Sun Mar 21 21:26:57 2010",
+  Map = "Four against four on the island.",
+  MapPath = "maps/4on4.map/presentation.smp",
+  MapId = 444351,
+  Type = 1,
+  LocalPlayer = 0,
+  Players = {
+	{ Name = "Player", Team = -1, Type = -1 },
+	{ Name = "Computer", Team = -1, Type = -1 },
+	{ Name = "Computer", Team = -1, Type = -1 },
+	{ Name = "Computer", Team = -1, Type = -1 },
+	{ Name = "Neutral", Team = -1, Type = -1 },
+	{ Name = "Neutral", Team = -1, Type = -1 },
+	{ Name = "Neutral", Team = -1, Type = -1 },
+	{ Name = "Neutral", Team = -1, Type = -1 },
+	{ Name = "Neutral", Team = -1, Type = -1 }
+  },
+  Resource = 3,
+  NumUnits = -1,
+  Difficulty = 3,
+  NoFow = false,
+  RevealMap = 0,
+  GameType = -1,
+  Opponents = -1,
+  MapRichness = -1,
+  Engine = { 2, 6, 0 },
+  Network = { 2, 6, 0 }
+} )
+</pre>
+
+<a name="SaveGame"></a>
+<h3>SaveGame({SyncHash = x, SyncRandSeed = y, SaveFile = "file"})</h3>
+
+Basic outline of the savegame, include hashs for syncrand and where to load
+the rest of the game information from when loading. More information is planed
+for implementation, but currently only the above are used.
+
+<dl>
+<dt>SyncHash = x</dt>
+<dd>integer setting the Hash of the current game for Sync Purposes</dd>
+<dt>SyncRandSeed = y</dt>
+<dd>integer of the next value to be used when calling SyncRand</dd>
+<dt>SaveFile = "file"</dt>
+<dd>String containing the name of the file to load to get the rest of the gamedata</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SaveGame({
+---  "comment", "Generated by Stratagus Version 2.0",
+---  "comment", "Visit http://Stratagus.Org for more informations",
+---  "type",    "single-player",
+---  "date",    "Mon May 10 19:19:38 2004",
+---  "map",     "",
+---  "media-version", "Undefined"---  "engine",  {2, 0, 0},
+     SyncHash = 196009203,
+     SyncRandSeed = -220040269,
+     SaveFile = "data.wc2//campaigns/human/level13h.cm"
+
+---  "preview", "/home/devil/.stratagus/wc2/save/current-game.sav.pam",
+} )
+</pre>
+
+<a name="Selection"></a>
+<h3>Selection(numselected, unit0, ...)</h3>
+
+Define the current selection.
+
+
+<dl>
+<dt>numselected</dt>
+<dd>How many units are selected.
+</dd>
+<dt>unitX</dt>
+<dd>slot number of the unit to add in the selection.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+Selection(1, 0)
+</pre>
+
+<a name="SetGroupId"></a>
+<h3>SetGroupId(id)</h3>
+
+Set the current group id. (Needed for load/save).
+
+
+<dl>
+<dt>id</dt>
+<dd>new group id.
+</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SetGroupId(0)
+</pre>
+
+<a name="SlotUsage"></a>
+<h3>SlotUsage(MaxSlot, [{Slot = Slot1, FreeCycle = Freecycle1}, ..])</h3>
+
+Allows reloaded Save games to be replayed in sync by reloading the released
+units back into the queue they were in when a game was saved.
+<dl>
+<dt>MaxSlot</dt>
+<dd>The total Number of slot used.</dd>
+<dt>Slot</dt>
+<dd>The Slot Number for the unit that was in the release Queue</dd>
+<dt>FreecCycle</dt>
+<dd>The Cycle that this unit is/was released in</dd>
+</dl>
+
+<h4>Example</h4>
+
+<pre class="lua">
+SlotUsage(5, {2, 855})
+</pre>
+
+<a name="StratagusMap"></a>
+<h3>StratagusMap(...)</h3>
+
+<p>The state of the map, without units.
+Much of this information is redundant with the map setup file.
+However, the StratagusMap call also carries information on which parts of
+the map each player has explored; that is of course not in the map setup.</p>
+
+<a name="Unit"></a>
+<h3>Unit()</h3>
+
+Needed to save/load games. 
+
+<h4>Example</h4>
+
+<pre class="lua">
+Unit(0, "type", "unit-vault", "player", 0,
+  "tile", {116, 120}, "refs", 6, "stats", 0,
+  "pixel", {0, 0}, "seen-pixel", {0, 0}, "frame", 1, "not-seen", "direction", 0,
+  "attacked", 0,
+  "current-sight-range", 4, "seen-by-player", "X_______________",
+  "seen-destroyed", "________________",
+  "seen-state", 0,  "active", "mana", 0, "hp", 1800, "xp", 0, "kills", 0,
+  "ttl", 0, "bloodlust", 0, "haste", 0, "slow", 0,
+  "invisible", 0, "flame-shield", 0, "unholy-armor", 0,
+  "HitPoints", {Value = 1800, Max = 1800, Increase = 0, Enable = true},
+  "Mana", {Value = 0, Max = 0, Increase = 0, Enable = false},
+  "Transport", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "Training", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "Resource", {Value = 0, Max = 0, Increase = 0, Enable = true},
+  "group-id", 0,
+  "last-group", 0,
+  "value", 0,
+  "sub-action", 0, "wait", 2, "state", 2,
+  "blink", 0, "rs", 35, "units-boarded-count", 0,"order-count", 1,
+  "order-flush", 0,
+  "order-total", 4,
+  "orders", {
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},
+    {"action-none", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {0, 0},},},
+  "saved-order",
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},},
+  "new-order",
+    {"action-still", "flags", 0, "range", 0, "width", 0, "height", 0, "min-range", 0, "tile", {-1, -1},}
+)
+</pre>
+
+<hr>
+All trademarks and copyrights on this page are owned by their respective owners.
+<address>(c) 2002-2007 by <a href="http://boswars.org">
+The Bos Wars Project</a></address></body></html>
