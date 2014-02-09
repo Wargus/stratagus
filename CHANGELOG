@@ -1,6 +1,7 @@
 Change log for Bos Wars
 -----------------------
 
+- Added the Cornered map (Iwan Gabovitch)
 - Fixed bug #37854: Objectives screen broken: missing text and 
   freeze (Francois Beerten)
 - Fixed bug #37861: "Set new units target" makes engineers harvest 
