@@ -411,9 +411,16 @@ void DoRightButton(int sx, int sy)
 		}
 
 		// Manage new order.
-		if (!CanMove(unit)) {
+		if (!CanMove(unit) && dest) {
+			// Go and repair
+			if (dest->Type->RepairHP && 
+				  (dest->Player == unit->Player || unit->IsAllied(dest))) {
+				dest->Blink = 4;
+				SendCommandRepair(unit, x, y, dest, flush);
+				continue;
+			}
 			// Go and harvest from a unit
-			if (dest && dest->Type->CanHarvestFrom &&
+			if (dest->Type->CanHarvestFrom &&
 					(dest->Player == unit->Player || dest->Player->Index == PlayerNumNeutral)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, dest, flush);
