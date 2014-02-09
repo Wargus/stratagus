@@ -1,6 +1,8 @@
 Change log for Bos Wars
 -----------------------
 
+- Fixed bug #37854: Objectives screen broken: missing text and 
+  freeze (Francois Beerten)
 - Fixed bug #37861: "Set new units target" makes engineers harvest 
   buildings (Francois Beerten)
 - Added the Ringway map (Michiel van der Wulp)

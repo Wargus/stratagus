@@ -9,7 +9,7 @@
 --
 --  level01.sms  -  Tutorial map 1.
 --
---  (c) Copyright 2006-2010 by Francois Beerten and Jimmy Salmon
+--  (c) Copyright 2006-2014 by Francois Beerten and Jimmy Salmon
 --
 --      This program is free software; you can redistribute it and/or modify
 --      it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ AddTrigger(
     AddMessage("You'll need to gather some resources first. Use your engineer to harvest some energy from the trees or magma from the rocks.")
     AddMessage("-- End transmission --")
     Play("level01-01.wav")
-    SetObjectives("Build 2 power plants and a magma pump")
+    SetObjectives({"Build 2 power plants and a magma pump"})
 
     DefineAllow("unit-powerplant", AllowAll)
     DefineAllow("unit-magmapump", AllowAll)
@@ -95,7 +95,7 @@ AddTrigger(
       AddMessage("Your next objective is to build a training camp then some assault units.")
       AddMessage("-- End transmission --")
       Play("level01-03.wav")
-      SetObjectives("Build a training camp and 3 assault units")
+      SetObjectives({"Build a training camp and 3 assault units"})
 
       DefineAllow("unit-camp", AllowAll)
       DefineAllow("unit-assault", AllowAll)
@@ -111,7 +111,7 @@ AddTrigger(
       AddMessage("Click on the training camp then train 3 assault units.")
       AddMessage("-- End transmission --")
       Play("level01-04.wav")
-      SetObjectives("Train 3 assault units")
+      SetObjectives({"Train 3 assault units"})
       return false
     end)
 
