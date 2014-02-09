@@ -1,4 +1,0 @@
-Cornered BosWars map layout
-
-Copyright 2013 Iwan Gabovitch <qubodup@gmail.com> 
-License: GPL v2 http://www.gnu.org/licenses/gpl-2.0.html or later 
