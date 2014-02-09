@@ -87,6 +87,8 @@ static void MoveToLocation(CUnit *unit)
 	if (!unit->SubAction) {
 		unit->SubAction = 1;
 		NewResetPath(unit);
+		unit->Orders[0]->MinRange = 1;
+		unit->Orders[0]->Range = unit->Type->RepairRange;
 	}
 
 	if (unit->Wait) {
