@@ -36,6 +36,7 @@ extern void SetGameSpeed(int speed);
 extern int GetGameSpeed();
 extern tolua_property__s int GameSpeed;
 extern bool GameObserve;
+extern bool GameEstablishing;
 
 extern unsigned long GameCycle;
 

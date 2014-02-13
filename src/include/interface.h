@@ -201,6 +201,8 @@ extern bool GameRunning;
 extern bool GamePaused;
 /// Flag telling if the game is in observe mode
 extern bool GameObserve;
+/// Flag telling if the game is in establishing mode
+extern bool GameEstablishing;
 /// Flag telling not to advance to the next game cycle
 extern char SkipGameCycle;
 /// Invincibility cheat

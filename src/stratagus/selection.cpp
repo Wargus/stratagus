@@ -126,7 +126,7 @@ static void HandleSuicideClick(CUnit &unit)
 	static int NumClicks = 0;
 
 	Assert(unit.Type->ClicksToExplode);
-	if (GameObserve) {
+	if (GameObserve || GameEstablishing) {
 		return;
 	}
 	if (IsOnlySelected(unit)) {

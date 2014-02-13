@@ -81,6 +81,7 @@ std::string UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Def
 bool GameRunning;                    /// Current running state
 bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
+bool GameEstablishing;               /// Game establishing mode
 char SkipGameCycle;                  /// Skip the next game cycle
 char BigMapMode;                     /// Show only the map
 enum _iface_state_ InterfaceState;   /// Current interface state
@@ -831,14 +832,14 @@ static int InputKey(int key)
 			Replace2TildeByTilde(Input);
 #ifdef DEBUG
 			if (Input[0] == '-') {
-				if (!GameObserve && !GamePaused) {
+				if (!GameObserve && !GamePaused && !GameEstablishing) {
 					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 					CclCommand(Input + 1, false);
 				}
 			} else
 #endif
 				if (!IsNetworkGame()) {
-					if (!GameObserve && !GamePaused) {
+					if (!GameObserve && !GamePaused && !GameEstablishing) {
 						if (HandleCheats(Input)) {
 							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 						}
@@ -1089,7 +1090,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 	} else {
 		// If no modifier look if button bound
 		if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper))) {
-			if (!GameObserve && !GamePaused) {
+			if (!GameObserve && !GamePaused && !GameEstablishing) {
 				if (UI.ButtonPanel.DoKey(key)) {
 					return;
 				}

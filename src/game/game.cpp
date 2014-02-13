@@ -1058,6 +1058,7 @@ void CleanGame()
 	FreePathfinder();
 	CursorBuilding = NULL;
 	UnitUnderCursor = NULL;
+	GameEstablishing = false;
 }
 
 /**

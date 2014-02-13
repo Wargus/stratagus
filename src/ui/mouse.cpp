@@ -1445,7 +1445,7 @@ static void SendCommand(const Vec2i &tilePos)
 */
 static void DoSelectionButtons(int num, unsigned)
 {
-	if (GameObserve || GamePaused) {
+	if (GameObserve || GamePaused || GameEstablishing) {
 		return;
 	}
 
@@ -1490,7 +1490,7 @@ static void DoSelectionButtons(int num, unsigned)
 */
 static void UISelectStateButtonDown(unsigned)
 {
-	if (GameObserve || GamePaused) {
+	if (GameObserve || GamePaused || GameEstablishing) {
 		return;
 	}
 
@@ -1624,7 +1624,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 #else
 	} else if (MouseButtons & RightButton) {
 #endif
-		if (!GameObserve && !GamePaused && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 			CUnit *unit;
 			// FIXME: Rethink the complete chaos of coordinates here
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
@@ -1661,7 +1661,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 	if (MouseButtons & LeftButton) { // enter move mini-mode
 		UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorTilePos));
 	} else if (MouseButtons & RightButton) {
-		if (!GameObserve && !GamePaused) {
+		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 			if (!ClickMissile.empty()) {
 				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
@@ -1706,7 +1706,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 			//  clicked on training button
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
-			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
@@ -1717,7 +1717,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 			//  clicked on upgrading button
 		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
-			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelUpgradeTo(*Selected[0]);
@@ -1725,7 +1725,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 			//  clicked on researching button
 		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
-			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
 					SendCommandCancelResearch(*Selected[0]);
@@ -1734,7 +1734,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on button panel
 		} else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
 			//  for transporter
-			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
@@ -1748,7 +1748,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			if (!GameObserve && !GamePaused && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 			}
 		}
