@@ -334,7 +334,7 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 	// Changing animations
 	if (anim && unit.Anim.CurrAnim != anim) {
 		// Assert fails when transforming unit (upgrade-to).
-		Assert(!unit.Anim.Unbreakable && !unit.Waiting);
+		Assert(!unit.Anim.Unbreakable || unit.Waiting);
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
 	}
