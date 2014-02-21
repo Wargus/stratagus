@@ -288,7 +288,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -337,7 +337,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		}
 		return true;
 	}
-	if ((dest.Player == unit.Player || unit.IsAllied(dest)) && &dest != &unit) {
+	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -406,7 +406,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 
 static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
-	if (dest.Player == unit.Player || unit.IsAllied(dest)) {
+	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);

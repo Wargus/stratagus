@@ -11,6 +11,7 @@ class CUnit
 
 	tolua_readonly CUnitType *Type;
 	tolua_readonly CPlayer *Player;
+	CUnit *Goal;
 	bool Active;
 	int ResourcesHeld;
 };

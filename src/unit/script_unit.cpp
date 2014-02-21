@@ -691,6 +691,31 @@ static int CclSetResourcesHeld(lua_State *l)
 }
 
 /**
+**  Set teleport deastination for teleporter unit
+**
+**  @param l  Lua state.
+*/
+static int CclSetTeleportDestination(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	if (unit->Type->Teleporter == false) {
+		LuaError(l, "Unit not a teleporter");
+	}
+	lua_pushvalue(l, 2);
+	CUnit *dest = CclGetUnit(l);
+	lua_pop(l, 1);
+	if (dest->IsAliveOnMap()) {
+		unit->Goal = dest;
+	}
+
+	return 0;
+}
+
+/**
 **  Order a unit
 **
 **  @param l  Lua state.
@@ -1088,6 +1113,7 @@ void UnitCclRegister()
 	lua_register(Lua, "MoveUnit", CclMoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
 	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
+	lua_register(Lua, "SetTeleportDestination", CclSetTeleportDestination);
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);

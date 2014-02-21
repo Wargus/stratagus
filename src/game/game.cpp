@@ -509,6 +509,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 
 		f->printf("-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
+		std::vector<CUnit*> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
@@ -518,6 +519,14 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (unit.Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
+			if (unit.Type->Teleporter && unit.Goal) {
+				teleporters.push_back(*it);
+			}
+		}
+		f->printf("\n\n");
+		for (std::vector<CUnit *>::iterator it = teleporters.begin(); it != teleporters.end(); ++it) {
+			CUnit &unit = **it;
+			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
 		}
 		f->printf("\n\n");
 	} catch (const FileException &) {

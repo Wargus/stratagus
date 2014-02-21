@@ -39,6 +39,7 @@
 
 #include "animation.h"
 #include "iolib.h"
+#include "luacallback.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "script.h"
@@ -231,16 +232,26 @@ enum {
 				}
 				// Everything is OK, now teleport the unit
 				unit.Remove(NULL);
-				if (goal->Type->TeleportEffect.Missile) {
-					MakeMissile(*goal->Type->TeleportEffect.Missile, unit.GetMapPixelPosCenter(), unit.GetMapPixelPosCenter());
+				if (goal->Type->TeleportEffectIn) {
+					goal->Type->TeleportEffectIn->pushPreamble();
+					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(unit));
+					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(*goal));
+					goal->Type->TeleportEffectIn->pushInteger(unit.GetMapPixelPosCenter().x);
+					goal->Type->TeleportEffectIn->pushInteger(unit.GetMapPixelPosCenter().y);
+					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				DropOutOnSide(unit, unit.Direction, NULL);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
-				if (dest.Type->TeleportEffect.Missile) {
-					MakeMissile(*dest.Type->TeleportEffect.Missile, unit.GetMapPixelPosCenter(), unit.GetMapPixelPosCenter());
+				if (dest.Type->TeleportEffectOut) {
+					dest.Type->TeleportEffectOut->pushPreamble();
+					dest.Type->TeleportEffectOut->pushInteger(UnitNumber(unit));
+					dest.Type->TeleportEffectOut->pushInteger(UnitNumber(dest));
+					dest.Type->TeleportEffectOut->pushInteger(unit.GetMapPixelPosCenter().x);
+					dest.Type->TeleportEffectOut->pushInteger(unit.GetMapPixelPosCenter().y);
+					dest.Type->TeleportEffectOut->run();
 				}
 
 				if (dest.NewOrder == NULL

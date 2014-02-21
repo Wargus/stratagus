@@ -929,7 +929,7 @@ static void DrawEditorInfo()
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 16, buf);
 	const CMapField &mf = *Map.Field(pos);
 	//
 	// Flags info
@@ -950,7 +950,7 @@ static void DrawEditorInfo()
 			flag & MapFieldAirUnit      ? 'a' : '-',
 			flag & MapFieldSeaUnit      ? 's' : '-',
 			flag & MapFieldBuilding     ? 'b' : '-');
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);
 
 	// Tile info
 	const CTileset &tileset = *Map.Tileset;
@@ -961,7 +961,7 @@ static void DrawEditorInfo()
 	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
 #endif
 }
 

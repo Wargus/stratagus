@@ -612,7 +612,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
-	TeleportCost(0),
+	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
 	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
@@ -651,6 +651,8 @@ CUnitType::~CUnitType()
 	delete OnEachCycle;
 	delete OnEachSecond;
 	delete OnInit;
+	delete TeleportEffectIn;
+	delete TeleportEffectOut;
 
 	BoolFlag.clear();
 
@@ -1130,7 +1132,6 @@ void LoadUnitTypes()
 		// Lookup missiles.
 		type.Missile.MapMissile();
 		type.Explosion.MapMissile();
-		type.TeleportEffect.MapMissile();
 
 		// Lookup impacts
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
