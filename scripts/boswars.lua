@@ -223,7 +223,9 @@ SetMaxOpenGLTexture(preferences.MaxOpenGLTexture)
 SetFogOfWar(preferences.FogOfWar)
 UI.ButtonPanel.ShowCommandKey = preferences.ShowCommandKey
 SetGroupKeys(preferences.GroupKeys)
-SetGameSpeed(preferences.GameSpeed)
+if GetGameSpeed() < 0 then
+  SetGameSpeed(preferences.GameSpeed)
+end
 SetEffectsEnabled(preferences.EffectsEnabled)
 SetEffectsVolume(preferences.EffectsVolume)
 SetMusicEnabled(preferences.MusicEnabled)
