@@ -141,7 +141,7 @@ int ClipY2;                      /// current clipping bottom right
 
 static std::vector<Clip> Clips;
 
-int VideoSyncSpeed = 100;            /// 0 disable interrupts
+int VideoSyncSpeed = -100;            /// Default value will be set by lua. 0 disable interrupts
 int SkipFrames; /// Skip this frames
 
 Uint32 ColorBlack;
