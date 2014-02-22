@@ -1,6 +1,8 @@
 Change log for Bos Wars
 -----------------------
 
+- Patch #8319: Fast-forward Through Command Line Option 
+- Fixed command line speed option (Francois Beerten)
 - Added the Cornered map (Iwan Gabovitch)
 - Fixed bug #37854: Objectives screen broken: missing text and 
   freeze (Francois Beerten)
