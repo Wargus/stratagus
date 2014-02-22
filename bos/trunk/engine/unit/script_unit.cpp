@@ -9,7 +9,7 @@
 //
 /**@name script_unit.cpp - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2014 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1088,38 +1088,51 @@ static int CclSlotUsage(lua_State *l)
 {
 	unsigned int args;
 	unsigned int i;
-	const char *key;
 	int unit_index;
 	unsigned long cycle;
 
 	args = lua_gettop(l);
-	if (args == 0) {
-		UnitSlotFree = 0;
-		return 0;
+	if (args != 2) {
+		LuaError(l, "SlotUsage called with %d params, expected 2." _C_ args);
 	}
 	UnitSlotFree = LuaToNumber(l, 1);
 	for (i = 0; i < UnitSlotFree; i++) {
 		UnitSlots[i] = new CUnit;
 		UnitSlots[i]->Slot = i;
 	}
-	for (i = 2; i <= args; i++) {
-		unit_index = -1;
-		cycle = (unsigned long)-1;
-		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
-			key = LuaToString(l, -2);
-			if (!strcmp(key, "Slot")) {
-				unit_index = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "FreeCycle")) {
-				cycle = LuaToNumber(l, -1);
-			} else {
-				LuaError(l, "Wrong key %s" _C_ key);
-			}
+
+	// table of 'unit-slot' tables is at index 2
+
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "SlotUsage called with invalid second arg, expected table.");
+	}
+	size_t n = lua_objlen(l, 2);
+
+	if (n == 0) {
+		return 0;
+	}
+	
+	lua_pushnil(l); // push nil key to start table traversal
+	for (unsigned int i = 0; i < n; ++i) {
+		lua_next(l, 2); // get next slot table
+		if (!lua_istable(l, 4)) {
+			LuaError(l, "Corrupt SlotUsage table.");
 		}
+		lua_getfield(l, 4, "Slot");
+		unit_index = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+
+		lua_getfield(l, 4, "FreeCycle");
+		cycle = LuaToNumber(l, -1);
+		lua_pop(l, 1);
+
+		lua_pop(l, 1); // pop slot table
+
 		Assert(unit_index != -1 && cycle != (unsigned long)-1);
 		UnitManager.ReleaseUnit(UnitSlots[unit_index]);
 		UnitSlots[unit_index]->Refs = cycle;
 	}
-	return 0;
+	return lua_next(l, 2); // pops key, pushes nothing, and returns 0
 }
 
 /**
