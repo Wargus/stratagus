@@ -9,7 +9,7 @@
 //
 /**@name unit_manager.cpp - Unit manager. */
 //
-//      (c) Copyright 2007 by Jimmy Salmon
+//      (c) Copyright 2007-2014 by Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -120,13 +120,16 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 */
 void CUnitManager::Save(CFile *file)
 {
-	file->printf("SlotUsage(%d", UnitSlotFree);
+	file->printf("SlotUsage(%d, {", UnitSlotFree);
 
 	std::list<CUnit *>::iterator it = ReleasedUnits.begin();
 	for (; it != ReleasedUnits.end(); ++it) {
-		file->printf(", {Slot = %d, FreeCycle = %lu}", (*it)->Slot, (*it)->Refs);
+		if (it != ReleasedUnits.begin()) {
+			file->printf(", ");
+		}
+		file->printf("{Slot = %d, FreeCycle = %lu}", (*it)->Slot, (*it)->Refs);
 	}
-	file->printf(")\n");
+	file->printf("})\n");
 }
 
 
