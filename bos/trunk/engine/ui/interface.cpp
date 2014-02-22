@@ -760,7 +760,7 @@ static int InputKey(int key)
 #else
 			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
 #endif
-				FastForwardCycle = atoi(&Input[4]);
+				FastForwardCycle = atol(&Input[4]);
 			}
 
 			if (Input[0]) {

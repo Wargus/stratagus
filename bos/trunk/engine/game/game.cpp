@@ -643,7 +643,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	}
 
 	GameCycle = 0;
-	FastForwardCycle = 0;
 	SyncHash = 0;
 	InitSyncRand();
 

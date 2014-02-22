@@ -342,6 +342,8 @@ static int MenuLoop()
 */
 void CleanGame(void)
 {
+	FastForwardCycle = 0;
+
 	EndReplayLog();
 	CleanMessages();
 
@@ -634,6 +636,7 @@ static void Usage(void)
 		"  -D bpp        Video mode depth = bits per pixel (for Win32/TNT)\n"
 		"  -F            Full screen video mode\n"
 		"  -S speed      Video sync speed (100 = 30 frames/s)\n"
+		"  -f cycle      Fast foward until the cycle number\n"
 		"  -W            Windowed video mode\n"
 		"Specifying MAP-PRESENTATION-FILE starts a single-player game in that map.\n"
 		"Example: boswars maps/islandwar.map/presentation.smp\n");
@@ -805,7 +808,7 @@ int main(int argc, char **argv)
 	//  Parse commandline
 	//
 	for (;;) {
-		switch (getopt(argc, argv, "c:d:ehlP:v:D:E:FL:S:U:W?")) {
+		switch (getopt(argc, argv, "c:d:ehlP:v:D:E:FL:S:f:U:W?")) {
 			case 'c':
 				CclStartFile = optarg;
 				continue;
@@ -870,7 +873,9 @@ int main(int argc, char **argv)
 			case 'S':
 				VideoSyncSpeed = atoi(optarg);
 				continue;
-
+			case 'f':
+				FastForwardCycle = atol(optarg);
+				continue;
 			case -1:
 				break;
 			case '?':
