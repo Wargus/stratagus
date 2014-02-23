@@ -29,7 +29,7 @@ Version 2.7 (2013 06 16):
   as reported at http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=559615 
   (Kalle Olavi Niemitalo)
 - Added Swamp Dwellers map (Michiel van der Wulp)
-- Added hungarian translation (Ur Balazs)
+- Added Hungarian translation (Ur Balazs)
 - Added the trenches map (Michiel van der Wulp)
 - Partially fixed bug #30994: Make AI work with naval units (Kalle Olavi Niemitalo)
 - Fixed bug #30971: Units attack buildings too stubbornly (Kalle Olavi Niemitalo)
