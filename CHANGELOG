@@ -2,7 +2,7 @@ Change log for Bos Wars
 -----------------------
 
 - Fix save games with too many units. bug 35623, patch 8125 (James McCulloch)
-- Patch #8319: Fast-forward Through Command Line Option 
+- Patch #8319: Fast-forward Through Command Line Option (Douglas Krofcheck)
 - Fixed command line speed option (Francois Beerten)
 - Added the Cornered map (Iwan Gabovitch)
 - Fixed bug #37854: Objectives screen broken: missing text and 
