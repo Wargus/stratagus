@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name luacallback.h. */
 //
-//      (c) Copyright 2008 by Francois Beerten
+//      (c) Copyright 2014 by cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -25,32 +24,34 @@
 //      along with this program; if not, write to the Free Software
 //      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 //      02111-1307, USA.
+//
 
-#ifndef LUA_CALLBACK_HEADER_FILE
-#define LUA_CALLBACK_HEADER_FILE
+#ifndef SPELL_LUACALLBACK_H
+#define SPELL_LUACALLBACK_H
 
-#include <string>
+//@{
 
-typedef int lua_Object; // from tolua++.h
-struct lua_State;
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
 
-class LuaCallback
+#include "luacallback.h"
+#include "spells.h"
+
+
+class Spell_LuaCallback : public SpellActionType
 {
 public:
-	LuaCallback(lua_State *lua, lua_Object luaref);
-	~LuaCallback();
-	void pushPreamble();
-	void pushInteger(int value);
-	void pushString(const std::string &eventId);
-	void run(int results = 0);
-	bool popBoolean();
-	int popInteger();
+	Spell_LuaCallback() : Func(NULL) {};
+	~Spell_LuaCallback() { delete Func; };
+	virtual int Cast(CUnit &caster, const SpellType &spell,
+					 CUnit *target, const Vec2i &goalPos);
+	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+
 private:
-	lua_State *luastate;
-	int luaref;
-	int arguments;
-	int rescount;
-	int base;
+	LuaCallback *Func;
 };
 
-#endif
+//@}
+
+#endif // SPELL_LUACALLBACK_H

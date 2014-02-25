@@ -42,11 +42,13 @@
 #include "spell/spell_areabombardment.h"
 #include "spell/spell_capture.h"
 #include "spell/spell_demolish.h"
+#include "spell/spell_luacallback.h"
 #include "spell/spell_polymorph.h"
 #include "spell/spell_spawnmissile.h"
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
 #include "spell/spell_teleport.h"
+#include "luacallback.h"
 #include "script_sound.h"
 #include "script.h"
 #include "unittype.h"
@@ -84,6 +86,8 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		spellaction = new Spell_Capture;
 	} else if (!strcmp(value, "demolish")) {
 		spellaction = new Spell_Demolish;
+	} else if (!strcmp(value, "lua-callback")) {
+		spellaction = new Spell_LuaCallback;
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction = new Spell_Polymorph;
 	} else if (!strcmp(value, "spawn-missile")) {
@@ -167,6 +171,10 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "self")) {
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
+		} else if (!strcmp(value, "callback")) {
+			lua_rawgeti(l, -1, j + 1);
+			condition->CheckFunc = new LuaCallback(l, -1);
+			lua_pop(l, 1);
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {

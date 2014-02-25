@@ -37,6 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "luacallback.h"
 #include "unitsound.h"
 #include "vec2i.h"
 
@@ -136,11 +137,12 @@ class ConditionInfo
 {
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
-		BoolFlag(NULL), Variable(NULL) {};
+		BoolFlag(NULL), Variable(NULL), CheckFunc(NULL) {};
 	~ConditionInfo()
 	{
 		delete[] BoolFlag;
 		delete[] Variable;
+		delete CheckFunc;
 	};
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
@@ -155,6 +157,7 @@ public:
 	char *BoolFlag;         /// User defined boolean flag.
 
 	ConditionInfoVariable *Variable;
+	LuaCallback *CheckFunc;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells

@@ -100,7 +100,7 @@ static Target *NewTargetUnit(CUnit &unit)
 **  @return            true if passed, false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUnit *target,
-						  const Vec2i &/*goalPos*/, const ConditionInfo *condition)
+						  const Vec2i &goalPos, const ConditionInfo *condition)
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
@@ -173,6 +173,18 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		}
 	}
 
+	if (condition->CheckFunc) {
+		condition->CheckFunc->pushPreamble();
+		condition->CheckFunc->pushString(spell.Ident);
+		condition->CheckFunc->pushInteger(UnitNumber(caster));
+		condition->CheckFunc->pushInteger(goalPos.x);
+		condition->CheckFunc->pushInteger(goalPos.y);
+		condition->CheckFunc->pushInteger((target && target->IsAlive()) ? UnitNumber(*target) : -1);
+		condition->CheckFunc->run(1);
+		if (condition->CheckFunc->popBoolean() == false) {
+			return false;
+		}
+	}
 	if (!target) {
 		return true;
 	}
