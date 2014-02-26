@@ -47,6 +47,10 @@ enum EIfVarBinOp {
 	IF_LESS,
 	IF_EQUAL,
 	IF_NOT_EQUAL,
+	IF_AND,
+	IF_OR,
+	IF_XOR,
+	IF_NOT,
 };
 
 static bool binOpGreaterEqual(int lhs, int rhs) { return lhs >= rhs; }
@@ -55,6 +59,10 @@ static bool binOpLessEqual(int lhs, int rhs) { return lhs <= rhs; }
 static bool binOpLess(int lhs, int rhs) { return lhs < rhs; }
 static bool binOpEqual(int lhs, int rhs) { return lhs == rhs; }
 static bool binOpNotEqual(int lhs, int rhs) { return lhs != rhs; }
+static bool binOpAnd(int lhs, int rhs) { return (bool)(lhs & rhs); }
+static bool binOpOr(int lhs, int rhs) { return (bool)(lhs | rhs); }
+static bool binOpXor(int lhs, int rhs) { return (bool)(lhs ^ rhs); }
+static bool binOpNot(int lhs, int rhs = 0) { return (bool)(!lhs); }
 static bool returnFalse(int, int) { return false; }
 
 /* virtual */ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
@@ -98,6 +106,14 @@ static bool returnFalse(int, int) { return false; }
 		this->binOpFunc = binOpEqual;
 	} else if (op == "!=") {
 		this->binOpFunc = binOpNotEqual;
+	} else if (op == "&") {
+		this->binOpFunc = binOpAnd;
+	} else if (op == "|") {
+		this->binOpFunc = binOpOr;
+	} else if (op == "^") {
+		this->binOpFunc = binOpXor;
+	} else if (op == "!") {
+		this->binOpFunc = binOpNot;
 	} else {
 		EIfVarBinOp type = static_cast<EIfVarBinOp>(atoi(op.c_str()));
 
@@ -108,6 +124,10 @@ static bool returnFalse(int, int) { return false; }
 			case IF_LESS: this->binOpFunc = binOpLess; break;
 			case IF_EQUAL: this->binOpFunc = binOpEqual; break;
 			case IF_NOT_EQUAL: this->binOpFunc = binOpNotEqual; break;
+			case IF_AND: this->binOpFunc = binOpAnd; break;
+			case IF_OR: this->binOpFunc = binOpOr; break;
+			case IF_XOR: this->binOpFunc = binOpXor; break;
+			case IF_NOT: this->binOpFunc = binOpNot; break;
 			default: this->binOpFunc = returnFalse; break;
 		}
 	}
