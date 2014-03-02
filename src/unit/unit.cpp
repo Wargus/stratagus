@@ -2676,10 +2676,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// OnHit callback
 	if (type->OnHit) {
-		const int slot = UnitNumber(target);
+		const int tarSlot = UnitNumber(target);
+		const int atSlot = attacker && attacker->IsAlive() ? UnitNumber(*attacker) : -1;
 
 		type->OnHit->pushPreamble();
-		type->OnHit->pushInteger(slot);
+		type->OnHit->pushInteger(tarSlot);
+		type->OnHit->pushInteger(atSlot);
+		type->OnHit->pushInteger(damage);
 		type->OnHit->run();
 	}
 

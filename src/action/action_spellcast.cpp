@@ -350,7 +350,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			this->State = 1;
 		// FALL THROUGH
 		case 1:                         // Move to the target.
-			if (spell.Range && spell.Range != INFINITE_RANGE) {
+			if (spell.Range != INFINITE_RANGE) {
 				if (SpellMoveToTarget(unit) == true) {
 					if (!unit.RestoreOrder()) {
 						this->Finished = true;

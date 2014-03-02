@@ -154,6 +154,7 @@ void MapUnitSounds()
 		type.Sound.Acknowledgement.MapSound();
 		// type.Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.Sound.Attack.MapSound();
+		type.Sound.Build.MapSound();
 		type.Sound.Ready.MapSound();
 		type.Sound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.Sound.Repair.MapSound();

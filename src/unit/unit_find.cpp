@@ -1061,6 +1061,49 @@ struct CompareUnitDistance {
 };
 
 /**
+**  Check map for obstacles in a line between 2 tiles 
+**
+**  This function uses Bresenham's line algorithm
+**
+**  @param unit     First tile
+**  @param goal     Second tile
+**  @param flags    Terrain type to check
+**
+**  @return         true, if an obstacle was found, false otherwise  
+*/
+bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
+{
+	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
+	const Vec2i sign(unitPos.x < goalPos.x ? 1 : -1, unitPos.y < goalPos.y ? 1 : -1);
+	int error = delta.x - delta.y;
+	Vec2i pos(unitPos), oldPos(unitPos);
+
+	while(pos.x != goalPos.x || pos.y != goalPos.y) {
+		const int error2 = error * 2;
+
+		if(error2 > -delta.y) {
+			error -= delta.y;
+			pos.x += sign.x;
+		}
+		if(error2 < delta.x) {
+			error += delta.x;
+			pos.y += sign.y;
+		}
+
+		if (Map.Info.IsPointOnMap(pos) == false) {
+			DebugPrint("outside of map\n");
+		} else if (Map.Field(pos)->Flags & flags) {
+			if (distance) {
+				*distance = Distance(unitPos, pos);
+			}
+			return false;
+		}
+		oldPos = pos;
+	}
+	return true;
+}
+
+/**
 **  Attack units in distance.
 **
 **  If the unit can attack must be handled by caller.

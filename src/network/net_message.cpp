@@ -224,6 +224,7 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, this->ResourcesOption);
 	p += serialize8(p, this->UnitsOption);
 	p += serialize8(p, this->FogOfWar);
+	p += serialize8(p, this->Inside);
 	p += serialize8(p, this->RevealMap);
 	p += serialize8(p, this->TilesetSelection);
 	p += serialize8(p, this->GameTypeOption);
@@ -248,6 +249,7 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, &this->ResourcesOption);
 	p += deserialize8(p, &this->UnitsOption);
 	p += deserialize8(p, &this->FogOfWar);
+	p += deserialize8(p, &this->Inside);
 	p += deserialize8(p, &this->RevealMap);
 	p += deserialize8(p, &this->TilesetSelection);
 	p += deserialize8(p, &this->GameTypeOption);
@@ -271,6 +273,7 @@ void CServerSetup::Clear()
 	ResourcesOption = 0;
 	UnitsOption = 0;
 	FogOfWar = 0;
+	Inside = 0;
 	RevealMap = 0;
 	TilesetSelection = 0;
 	GameTypeOption = 0;
@@ -287,6 +290,7 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 	return (ResourcesOption == rhs.ResourcesOption
 			&& UnitsOption == rhs.UnitsOption
 			&& FogOfWar == rhs.FogOfWar
+			&& Inside == rhs.Inside
 			&& RevealMap == rhs.RevealMap
 			&& TilesetSelection == rhs.TilesetSelection
 			&& GameTypeOption == rhs.GameTypeOption

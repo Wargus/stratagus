@@ -75,6 +75,7 @@ struct Settings {
 	int Difficulty;  /// Terrain type (summer,winter,...)
 	int GameType;    /// Game type (melee, free for all,...)
 	bool NoFogOfWar; /// No fog of war
+	bool Inside;     /// If game uses interior tileset
 	int RevealMap;   /// Reveal map
 	int MapRichness; /// Map richness
 };

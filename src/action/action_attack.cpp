@@ -49,8 +49,10 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
 #include "spells.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -208,9 +210,6 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
-	input.SetMinRange(this->MinRange);
-	input.SetMaxRange(this->Range);
-
 	Vec2i tileSize;
 	if (this->HasGoal()) {
 		CUnit *goal = this->GetGoal();
@@ -222,6 +221,13 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		tileSize.y = 0;
 		input.SetGoal(this->goalPos, tileSize);
 	}
+
+	input.SetMinRange(this->MinRange);
+	int distance = this->Range;
+	if (GameSettings.Inside) {
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+	}
+	input.SetMaxRange(distance);
 }
 
 /* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
@@ -377,7 +383,9 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			err = PF_REACHED;
+			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+				err = PF_REACHED;
+			}
 		}
 	}
 	if (err >= 0) {
@@ -389,23 +397,26 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == PF_REACHED) {
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
-		if (goal
-			&& unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			// Reached another unit, now attacking it
-			const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-			UnitHeadingFromDeltaXY(unit, dir);
-			this->State++;
-			return;
+		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+				// Reached another unit, now attacking it
+				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
+				UnitHeadingFromDeltaXY(unit, dir);
+				this->State++;
+				return;
+			}
 		}
 		// Attacking wall or ground.
 		if (((goal && goal->Type && goal->Type->Wall)
-			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+			|| (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			// Reached wall or ground, now attacking it
-			UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
-			this->State &= WEAK_TARGET;
-			this->State |= ATTACK_TARGET;
-			return;
+				if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+					// Reached wall or ground, now attacking it
+					UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+					this->State &= WEAK_TARGET;
+					this->State |= ATTACK_TARGET;
+					return;
+				}
 		}
 	}
 	// Unreachable.
@@ -500,20 +511,21 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
-	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		// towers don't chase after goal
-		if (unit.CanMove()) {
-			if (unit.CanStoreOrder(this)) {
-				if (dead) {
-					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
-				} else {
-					unit.SavedOrder = this->Clone();
+	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max 
+		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+			// towers don't chase after goal
+			if (unit.CanMove()) {
+				if (unit.CanStoreOrder(this)) {
+					if (dead) {
+						unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
+					} else {
+						unit.SavedOrder = this->Clone();
+					}
 				}
 			}
-		}
-		unit.Frame = 0;
-		this->State &= WEAK_TARGET;
-		this->State |= MOVE_TO_TARGET;
+			unit.Frame = 0;
+			this->State &= WEAK_TARGET;
+			this->State |= MOVE_TO_TARGET;
 	}
 	if (dist < unit.Type->MinAttackRange) {
 		this->State = MOVE_TO_TARGET;
@@ -569,12 +581,14 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 				if (unit.Type->MinAttackRange < dist &&
 					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
+						if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+							const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 
-					UnitHeadingFromDeltaXY(unit, dir);
-					this->State |= ATTACK_TARGET;
-					AttackTarget(unit);
-					return;
+							UnitHeadingFromDeltaXY(unit, dir);
+							this->State |= ATTACK_TARGET;
+							AttackTarget(unit);
+							return;
+						}
 				}
 			}
 			this->State = MOVE_TO_TARGET;

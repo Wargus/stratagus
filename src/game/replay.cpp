@@ -114,7 +114,7 @@ class FullReplay
 public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), RevealMap(0),
+		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
 		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
 	{
 		memset(Engine, 0, sizeof(Engine));
@@ -137,6 +137,7 @@ public:
 	int NumUnits;
 	int Difficulty;
 	bool NoFow;
+	bool Inside;
 	int RevealMap;
 	int MapRichness;
 	int GameType;
@@ -210,6 +211,7 @@ static FullReplay *StartReplay()
 	replay->NumUnits = GameSettings.NumUnits;
 	replay->Difficulty = GameSettings.Difficulty;
 	replay->NoFow = GameSettings.NoFogOfWar;
+	replay->Inside = GameSettings.Inside;
 	replay->GameType = GameSettings.GameType;
 	replay->RevealMap = GameSettings.RevealMap;
 	replay->MapRichness = GameSettings.MapRichness;
@@ -257,6 +259,7 @@ static void ApplyReplaySettings()
 	GameSettings.NumUnits = CurrentReplay->NumUnits;
 	GameSettings.Difficulty = CurrentReplay->Difficulty;
 	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
+	GameSettings.Inside = CurrentReplay->Inside;
 	GameSettings.GameType = CurrentReplay->GameType;
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
 	GameSettings.MapRichness = CurrentReplay->MapRichness;
@@ -349,6 +352,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
 	file.printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
 	file.printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
+	file.printf("  Inside = %s,\n", CurrentReplay->Inside ? "true" : "false");
 	file.printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
 	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
 	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
@@ -640,6 +644,8 @@ static int CclReplayLog(lua_State *l)
 			replay->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
 			replay->NoFow = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Inside")) {
+			replay->Inside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {
 			replay->RevealMap = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "GameType")) {

@@ -44,7 +44,9 @@
 #include "missile.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "spells.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
@@ -292,6 +294,9 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	if (unit.MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+		return false;
+	}
+	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.

@@ -44,9 +44,12 @@
 #include "map.h"
 #include "pathfinder.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
+#include "unit_find.h"
 #include "unittype.h"
 #include "video.h"
 
@@ -109,12 +112,16 @@
 }
 
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
-{
-	input.SetMinRange(0);
-	input.SetMaxRange(this->Range);
+{	
 	const Vec2i tileSize(0, 0);
-
 	input.SetGoal(this->goalPos, tileSize);
+
+	int distance = this->Range;
+	if (GameSettings.Inside) {
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+	}
+	input.SetMaxRange(distance);
+	input.SetMinRange(0);	
 }
 
 /**

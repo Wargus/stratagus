@@ -172,6 +172,9 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			return false;
 		}
 	}
+	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+		return false;
+	}
 
 	if (condition->CheckFunc) {
 		condition->CheckFunc->pushPreamble();
@@ -188,9 +191,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	if (!target) {
 		return true;
 	}
-	if (!target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
-		return false;
-	}
+
 	if (condition->Alliance != CONDITION_TRUE) {
 		if ((condition->Alliance == CONDITION_ONLY) ^
 			// own units could be not allied ?

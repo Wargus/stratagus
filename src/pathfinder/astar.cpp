@@ -37,6 +37,7 @@
 #include "stratagus.h"
 
 #include "map.h"
+#include "settings.h"
 #include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"

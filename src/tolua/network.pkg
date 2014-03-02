@@ -18,6 +18,7 @@ class CServerSetup {
 	unsigned char ResourcesOption;
 	unsigned char UnitsOption;
 	unsigned char FogOfWar;
+	unsigned char Inside;
 	unsigned char RevealMap;
 	unsigned char GameTypeOption;
 	unsigned char Difficulty;

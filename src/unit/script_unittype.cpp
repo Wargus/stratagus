@@ -129,6 +129,7 @@ static const char MAXHARVESTERS_KEY[] = "MaxHarvesters";
 static const char POISON_KEY[] = "Poison";
 static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
 static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
+static const char ISALIVE_KEY[] = "IsAlive";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -165,7 +166,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -994,6 +995,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Acknowledgement.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "attack")) {
 					type->Sound.Attack.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "build")) {
+					type->Sound.Build.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "ready")) {
 					type->Sound.Ready.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "repair")) {
@@ -1553,7 +1556,8 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
-			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX) {
+			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
+			|| i == ISALIVE_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
@@ -1625,6 +1629,10 @@ void UpdateUnitVariables(CUnit &unit)
 	// SlotNumber
 	unit.Variable[SLOT_INDEX].Value = UnitNumber(unit);
 	unit.Variable[SLOT_INDEX].Max = UnitManager.GetUsedSlotCount();
+
+	// Is Alive
+	unit.Variable[ISALIVE_INDEX].Value = unit.IsAlive() ? 1 : 0;
+	unit.Variable[ISALIVE_INDEX].Max = 1;
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;

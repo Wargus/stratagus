@@ -68,7 +68,8 @@ enum UnitVoiceGroup {
 	VoiceDocking,           /// only for transport reaching coast
 	VoiceRepairing,         /// repairing
 	VoiceHarvesting,        /// harvesting
-	VoiceAttack             /// Attack command
+	VoiceAttack,            /// Attack command
+	VoiceBuild              /// worker goes to build a building
 };
 
 

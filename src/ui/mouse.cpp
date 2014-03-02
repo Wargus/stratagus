@@ -223,12 +223,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& dest.Type->CanHarvest
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 		dest.Blink = 4;
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
-		SendCommandResource(unit, dest, flush);
-		return true;
+			SendCommandResource(unit, dest, flush);
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceHarvesting);
+				acknowledged = 1;
+			}
+			return true;
 	}
 	return false;
 }
@@ -245,13 +245,13 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			&& type.ResInfo[res]->TerrainHarvester
 			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 			&& ((unit.CurrentResource != res)
-				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandResourceLoc(unit, pos, flush);
-			return true;
+			|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+				SendCommandResourceLoc(unit, pos, flush);
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceHarvesting);
+					acknowledged = 1;
+				}
+				return true;
 		}
 	}
 	return false;
@@ -268,7 +268,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, VoiceRepairing);
 			acknowledged = 1;
 		}
 		SendCommandRepair(unit, pos, dest, flush);
@@ -289,17 +289,17 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
-		dest->Blink = 4;
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
-		}
-		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
-			SendCommandMove(unit, pos, flush);
-		} else {
-			SendCommandFollow(unit, *dest, flush);
-		}
-		return true;
+			dest->Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
+				SendCommandMove(unit, pos, flush);
+			} else {
+				SendCommandFollow(unit, *dest, flush);
+			}
+			return true;
 	}
 	// Move
 	if (!acknowledged) {
@@ -1415,7 +1415,7 @@ static void SendCommand(const Vec2i &tilePos)
 	if (ret) {
 		// Acknowledge the command with first selected unit.
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (ret == ButtonAttack || ret == ButtonAttackGround || ret == ButtonSpellCast) {
+			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
 				if (Selected[i]->Type->Sound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
@@ -1423,8 +1423,11 @@ static void SendCommand(const Vec2i &tilePos)
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
-			} else if (ret == ButtonRepair && Selected[i]->Type->Sound.Repair.Sound) {
+			} else if (CursorAction == ButtonRepair && Selected[i]->Type->Sound.Repair.Sound) {
 				PlayUnitSound(*Selected[i], VoiceRepairing);
+				break;
+			} else if (CursorAction == ButtonBuild && Selected[i]->Type->Sound.Build.Sound) {
+				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
 			} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
 				PlayUnitSound(*Selected[i], VoiceAcknowledging);
@@ -1597,6 +1600,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
+				PlayUnitSound(*Selected[0], VoiceBuild);
 				for (size_t i = 0; i != Selected.size(); ++i) {
 					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
 				}

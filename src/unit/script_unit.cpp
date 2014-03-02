@@ -669,6 +669,31 @@ static int CclCreateUnit(lua_State *l)
 }
 
 /**
+**  Damages unit, additionally using another unit as first's attacker
+**
+**  @param l  Lua state.
+**
+**  @return   Returns the slot number of the made unit.
+*/
+static int CclDamageUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+
+	const int attacker = LuaToNumber(l, 1);
+	CUnit *attackerUnit = NULL;
+	if (attacker != -1) {
+		attackerUnit = &UnitManager.GetSlotUnit(attacker);
+	}
+	lua_pushvalue(l, 2);
+	CUnit *targetUnit = CclGetUnit(l);
+	lua_pop(l, 1);
+	const int damage = LuaToNumber(l, 3);
+	HitUnit(attackerUnit, *targetUnit, damage);
+
+	return 1;
+}
+
+/**
 **  Set resources held by a unit
 **
 **  @param l  Lua state.
@@ -936,8 +961,10 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
 	for (size_t i = 0; i < table.size(); ++i) {
-		lua_pushnumber(l, UnitNumber(*table[i]));
-		lua_rawseti(l, -2, i + 1);
+		if (table[i]->IsAliveOnMap()) {
+			lua_pushnumber(l, UnitNumber(*table[i]));
+			lua_rawseti(l, -2, i + 1);
+		}
 	}
 	return 1;
 }
@@ -1112,6 +1139,7 @@ void UnitCclRegister()
 
 	lua_register(Lua, "MoveUnit", CclMoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
+	lua_register(Lua, "DamageUnit", CclDamageUnit);
 	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
 	lua_register(Lua, "SetTeleportDestination", CclSetTeleportDestination);
 	lua_register(Lua, "OrderUnit", CclOrderUnit);

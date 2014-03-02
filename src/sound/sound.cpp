@@ -38,6 +38,7 @@
 
 #include "sound.h"
 
+#include "action/action_resource.h"
 #include "map.h"
 #include "missile.h"
 #include "sound_server.h"
@@ -160,7 +161,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceAcknowledging:
 			return unit.Type->Sound.Acknowledgement.Sound;
 		case VoiceAttack:
-			return unit.Type->Sound.Attack.Sound;
+			if (unit.Type->Sound.Attack.Sound) {
+				return unit.Type->Sound.Attack.Sound;
+			} else {
+				return unit.Type->Sound.Acknowledgement.Sound;
+			}
+		case VoiceBuild:
+			return unit.Type->Sound.Build.Sound;
 		case VoiceReady:
 			return unit.Type->Sound.Ready.Sound;
 		case VoiceSelected:
@@ -180,9 +187,22 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
-			return unit.Type->Sound.Repair.Sound;
+			if (unit.Type->Sound.Repair.Sound) {
+				return unit.Type->Sound.Repair.Sound;
+			} else {
+				return unit.Type->Sound.Acknowledgement.Sound;
+			}
 		case VoiceHarvesting:
-			return unit.Type->Sound.Harvest[unit.CurrentResource].Sound;
+			for (size_t i = 0; i != unit.Orders.size(); ++i) {
+				if (unit.Orders[i]->Action == UnitActionResource) {
+					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
+					if (unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound) {
+						return unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound;
+					} else {
+						return unit.Type->Sound.Acknowledgement.Sound;
+					}
+				}
+			}
 	}
 
 	return NO_SOUND;

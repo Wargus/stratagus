@@ -60,6 +60,7 @@ class Settings {
 	int Difficulty;
 	int GameType;
 	bool NoFogOfWar;
+	bool Inside;
 	int RevealMap;
 	int MapRichness;
 };

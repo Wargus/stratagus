@@ -123,6 +123,7 @@ void SaveGameSettings(CFile &file)
 	file.printf("GameSettings.NoFogOfWar = %s\n", GameSettings.NoFogOfWar ? "true" : "false");
 	file.printf("GameSettings.RevealMap = %d\n", GameSettings.RevealMap);
 	file.printf("GameSettings.MapRichness = %d\n", GameSettings.MapRichness);
+	file.printf("GameSettings.Inside = %d\n", GameSettings.Inside);
 	file.printf("\n");
 }
 
