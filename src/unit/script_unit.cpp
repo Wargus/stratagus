@@ -960,10 +960,11 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	lua_newtable(l);
 	std::vector<CUnit *> table;
 	SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+	size_t n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (table[i]->IsAliveOnMap()) {
 			lua_pushnumber(l, UnitNumber(*table[i]));
-			lua_rawseti(l, -2, i + 1);
+			lua_rawseti(l, -2, ++n);
 		}
 	}
 	return 1;
