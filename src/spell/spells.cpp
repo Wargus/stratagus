@@ -263,10 +263,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	Assert(autocast);
 	const Vec2i &pos = caster.tilePos;
 	int range = autocast->Range;
+	int minRange = autocast->MinRange;
 
 	// Select all units aroung the caster
 	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table);
+	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
 
 	// Check generic conditions. FIXME: a better way to do this?
 	if (autocast->Combat != CONDITION_TRUE) {

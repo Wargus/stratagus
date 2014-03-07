@@ -125,6 +125,16 @@ public:
 	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
 };
 
+class OutOfMinRange
+{
+public:
+	explicit OutOfMinRange(const int range, const Vec2i pos) : range(range), pos(pos) {}
+	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos) >= range; }
+private:
+	int range;
+	Vec2i pos;
+};
+
 
 template <typename Pred>
 class NotPredicate

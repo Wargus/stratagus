@@ -173,11 +173,12 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
+	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
 		Combat(0), Attacker(0) {};
 	~AutoCastInfo() { delete Condition; };
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
+	int MinRange;                /// Min range of the target.
 
 	int PriorytyVar;             /// Variable to sort autocast targets by priority.
 	bool ReverseSort;            /// If true, small values have the highest priority.
