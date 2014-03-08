@@ -1061,7 +1061,7 @@ struct CompareUnitDistance {
 };
 
 /**
-**  Check map for obstacles in a line between 2 tiles 
+**  Check map for obstacles in a line between 2 tiles
 **
 **  This function uses Bresenham's line algorithm
 **
@@ -1069,7 +1069,7 @@ struct CompareUnitDistance {
 **  @param goal     Second tile
 **  @param flags    Terrain type to check
 **
-**  @return         true, if an obstacle was found, false otherwise  
+**  @return         true, if an obstacle was found, false otherwise
 */
 bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
 {
@@ -1078,14 +1078,14 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 	int error = delta.x - delta.y;
 	Vec2i pos(unitPos), oldPos(unitPos);
 
-	while(pos.x != goalPos.x || pos.y != goalPos.y) {
+	while (pos.x != goalPos.x || pos.y != goalPos.y) {
 		const int error2 = error * 2;
 
-		if(error2 > -delta.y) {
+		if (error2 > -delta.y) {
 			error -= delta.y;
 			pos.x += sign.x;
 		}
-		if(error2 < delta.x) {
+		if (error2 < delta.x) {
 			error += delta.x;
 			pos.y += sign.y;
 		}

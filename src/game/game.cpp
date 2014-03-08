@@ -510,7 +510,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 
 		f->printf("-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
-		std::vector<CUnit*> teleporters;
+		std::vector<CUnit *> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			const CUnit &unit = **it;
 			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",

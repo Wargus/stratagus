@@ -112,7 +112,7 @@
 }
 
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
-{	
+{
 	const Vec2i tileSize(0, 0);
 	input.SetGoal(this->goalPos, tileSize);
 
@@ -121,7 +121,7 @@
 		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
 	}
 	input.SetMaxRange(distance);
-	input.SetMinRange(0);	
+	input.SetMinRange(0);
 }
 
 /**

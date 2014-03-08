@@ -223,12 +223,12 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& dest.Type->CanHarvest
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 		dest.Blink = 4;
-			SendCommandResource(unit, dest, flush);
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceHarvesting);
-				acknowledged = 1;
-			}
-			return true;
+		SendCommandResource(unit, dest, flush);
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceHarvesting);
+			acknowledged = 1;
+		}
+		return true;
 	}
 	return false;
 }
@@ -245,13 +245,13 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			&& type.ResInfo[res]->TerrainHarvester
 			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 			&& ((unit.CurrentResource != res)
-			|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-				SendCommandResourceLoc(unit, pos, flush);
-				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceHarvesting);
-					acknowledged = 1;
-				}
-				return true;
+				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+			SendCommandResourceLoc(unit, pos, flush);
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceHarvesting);
+				acknowledged = 1;
+			}
+			return true;
 		}
 	}
 	return false;
@@ -289,17 +289,17 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
-			dest->Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
-				SendCommandMove(unit, pos, flush);
-			} else {
-				SendCommandFollow(unit, *dest, flush);
-			}
-			return true;
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
+			SendCommandMove(unit, pos, flush);
+		} else {
+			SendCommandFollow(unit, *dest, flush);
+		}
+		return true;
 	}
 	// Move
 	if (!acknowledged) {
