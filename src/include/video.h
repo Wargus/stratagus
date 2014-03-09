@@ -470,6 +470,9 @@ extern void RealizeVideoMemory();
 /// Save a screenshot to a PNG file
 extern void SaveScreenshotPNG(const char *name);
 
+/// Save a screenshot to a PNG file
+extern void SaveMapPNG(const char *name);
+
 /// Set the current callbacks
 extern void SetCallbacks(const EventCallback *callbacks);
 /// Get the current callbacks

@@ -36,6 +36,7 @@
 #include <png.h>
 
 #include "stratagus.h"
+#include "map.h"
 #include "video.h"
 #include "iolib.h"
 #include "iocompat.h"
@@ -379,6 +380,93 @@ void SaveScreenshotPNG(const char *name)
 
 	/* clean up after the write, and free any memory allocated */
 	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	fclose(fp);
+}
+
+/**
+**  Save a whole map to a PNG file.
+**
+**  @param name  PNG filename to save.
+*/
+void SaveMapPNG(const char *name)
+{
+	FILE *fp = fopen(name, "wb");
+	if (fp == NULL) {
+		return;
+	}
+
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (png_ptr == NULL) {
+		fclose(fp);
+		return;
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL) {
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, NULL);
+		return;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		/* If we get here, we had a problem reading the file */
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		return;
+	}
+
+	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
+	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
+
+	/* set up the output control if you are using standard C streams */
+	png_init_io(png_ptr, fp);
+
+	png_set_IHDR(png_ptr, info_ptr, imageWidth, imageHeight, 8,
+		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+		PNG_FILTER_TYPE_DEFAULT);
+
+	png_write_info(png_ptr, info_ptr);	
+
+	const SDL_PixelFormat *fmt = Map.TileGraphic->Surface->format;
+	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
+		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
+
+	for (int i = 0; i < Map.Info.MapHeight; ++i) {
+		for (int j = 0; j < Map.Info.MapWidth; ++j) {
+			const CMapField &mf = *Map.Field(i, j);
+			SDL_Rect srcRect, dstRect;
+			unsigned short int tile = mf.getGraphicTile();
+
+			srcRect.x = Map.TileGraphic->frame_map[tile].x;
+			srcRect.y = Map.TileGraphic->frame_map[tile].y;
+			dstRect.x = i * PixelTileSize.x;
+			dstRect.y = j * PixelTileSize.y;
+			srcRect.w = dstRect.w = PixelTileSize.x;
+			srcRect.h = dstRect.h = PixelTileSize.y;
+			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
+		}
+	}
+
+	SDL_LockSurface(mapImage);
+	unsigned char *row = new unsigned char[imageWidth * 3];
+	for (size_t i = 0; i < imageHeight; ++i) {
+		for (size_t j = 0; j < imageWidth; ++j) {
+			Uint32 c = ((Uint32 *)mapImage->pixels)[j + i * imageWidth];
+			row[j * 3 + 0] = ((c & RMASK) >> RSHIFT);
+			row[j * 3 + 1] = ((c & GMASK) >> GSHIFT);
+			row[j * 3 + 2] = ((c & BMASK) >> BSHIFT);
+		}
+		png_write_row(png_ptr, row);
+	}
+	delete[] row;
+
+	png_write_end(png_ptr, info_ptr);
+
+	/* clean up after the write, and free any memory allocated */
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+	SDL_UnlockSurface(mapImage);
+	SDL_FreeSurface(mapImage);
 
 	fclose(fp);
 }
