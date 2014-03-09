@@ -794,15 +794,16 @@ void CButtonPanel::Draw()
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
 											   pos, buf);
 		}
-
-		//
-		//  Update status line for this button
-		//
+	}
+	//
+	//  Update status line for this button and draw popups
+	//
+	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			ButtonUnderCursor == i && KeyState != KeyStateInput) {
-			DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
-					  UI.ButtonPanel.Buttons[i].Y);
-			UpdateStatusLineForButton(buttons[i]);
+				DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
+					UI.ButtonPanel.Buttons[i].Y);
+				UpdateStatusLineForButton(buttons[i]);
 		}
 	}
 }
