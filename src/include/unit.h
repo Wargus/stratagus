@@ -427,7 +427,7 @@ class CPreference
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true),
-		BigScreen(false), PauseOnLeave(true),  ShowOrders(0), ShowNameDelay(0),
+		BigScreen(false), PauseOnLeave(true), AiExplores(true), ShowOrders(0), ShowNameDelay(0),
 		ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
@@ -436,6 +436,7 @@ public:
 	bool ShowMessages;		 /// Show messages.
 	bool BigScreen;			 /// If true, shows the big screen(without panels)
 	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
+	bool AiExplores;         /// If true, AI sends explorers to serch for resources(almost useless thing)
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

@@ -1434,6 +1434,9 @@ void AiAddUnitTypeRequest(CUnitType &type, int count)
 */
 void AiExplore(const Vec2i &pos, int mask)
 {
+	if (!Preference.AiExplores) {
+		return;
+	}
 	AiExplorationRequest req(pos, mask);
 
 	// Link into the exploration requests list
