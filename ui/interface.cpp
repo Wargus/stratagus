@@ -498,6 +498,7 @@ static bool CommandKey(int key)
 			return true;
 
 		// Unselect everything
+		case SDLK_ESCAPE:
 		case SDLK_CARET:
 		case SDLK_BACKQUOTE:
 			UiUnselectAll();
