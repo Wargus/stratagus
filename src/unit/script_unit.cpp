@@ -544,6 +544,10 @@ static int CclUnit(lua_State *l)
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {
 				LuaError(l, "incorrect argument");
 			}
+			if (!unit->SpellCoolDownTimers) {
+				unit->SpellCoolDownTimers = new int[SpellTypeTable.size()];
+				memset(unit->SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+			}
 			for (size_t k = 0; k < SpellTypeTable.size(); ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}

@@ -169,13 +169,13 @@ void CUnitManager::Add(CUnit *unit)
 */
 void CUnitManager::Save(CFile &file) const
 {
-	file.printf("SlotUsage(%lu", (long unsigned int)unitSlots.size());
+	file.printf("SlotUsage(%lu, {", (long unsigned int)unitSlots.size());
 
 	for (std::list<CUnit *>::const_iterator it = releasedUnits.begin(); it != releasedUnits.end(); ++it) {
 		const CUnit &unit = **it;
-		file.printf(", {Slot = %d, FreeCycle = %u}", UnitNumber(unit), unit.ReleaseCycle);
+		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), unit.ReleaseCycle);
 	}
-	file.printf(")\n");
+	file.printf("})\n");
 
 	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
 		const CUnit &unit = **it;
@@ -186,21 +186,25 @@ void CUnitManager::Save(CFile &file) const
 void CUnitManager::Load(lua_State *l)
 {
 	Init();
-	unsigned int args = lua_gettop(l);
-	if (args == 0) {
+	if (lua_gettop(l) != 2) {
 		return;
 	}
 	unsigned int unitCount = LuaToNumber(l, 1);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
 	for (unsigned int i = 0; i < unitCount; i++) {
 		CUnit *unit = new CUnit;
 		unitSlots.push_back(unit);
 		unit->UnitManagerData.slot = i;
 	}
-	for (unsigned int i = 2; i <= args; i++) {
+	const unsigned int args = lua_rawlen(l, 2);
+	for (unsigned int i = 0; i < args; i++) {
+		lua_rawgeti(l, 2, i + 1);
 		int unit_index = -1;
 		unsigned long cycle = static_cast<unsigned long>(-1);
 
-		for (lua_pushnil(l); lua_next(l, i); lua_pop(l, 1)) {
+		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			const char *key = LuaToString(l, -2);
 
 			if (!strcmp(key, "Slot")) {
@@ -214,6 +218,7 @@ void CUnitManager::Load(lua_State *l)
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
 		ReleaseUnit(unitSlots[unit_index]);
 		unitSlots[unit_index]->ReleaseCycle = cycle;
+		lua_pop(l, 1);
 	}
 }
 
