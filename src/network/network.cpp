@@ -280,7 +280,7 @@ CNetworkParameter::CNetworkParameter()
 	localHost = "127.0.0.1";
 	localPort = defaultPort;
 	gameCyclesPerUpdate = 5;
-	NetworkLag = 2;
+	NetworkLag = 10;
 	timeoutInS = 45;
 }
 
@@ -1048,8 +1048,7 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 			if (ncq.Type == MessageNone) {
 				break;
 			}
-			if (ncq.Time) {
-				Assert(ncq.Time == gameNetCycle);
+			if (ncq.Time && ncq.Time == gameNetCycle) {
 				NetworkExecCommand(ncq);
 			}
 		}
