@@ -1096,11 +1096,11 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				if (ThisPlayer->IsAllied(Players[i])) {
-					SetDefaultTextColors(FontGreen, rc);
+					label.SetNormalColor(FontGreen); 
 				} else if (ThisPlayer->IsEnemy(Players[i])) {
-					SetDefaultTextColors(FontRed, rc);
+					label.SetNormalColor(FontRed); 
 				} else {
-					SetDefaultTextColors(nc, rc);
+					label.SetNormalColor(nc); 
 				}
 				label.Draw(x + 15, y, i);
 
@@ -1112,7 +1112,6 @@ static void InfoPanel_draw_no_selection()
 				y += 14;
 			}
 		}
-		SetDefaultTextColors(nc, rc);
 	}
 }
 
