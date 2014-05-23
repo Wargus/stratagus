@@ -109,6 +109,7 @@ class CResourceInfo
 
 class CInfoPanel
 {
+	CGraphic *G;
 	int X;
 	int Y;
 };
