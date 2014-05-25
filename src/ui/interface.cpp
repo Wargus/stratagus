@@ -471,7 +471,7 @@ static void UiToggleGrabMouse()
 void UiTrackUnit()
 {
 	//Check if player has selected at least 1 unit
-	if (!Selected[0]) {
+	if (Selected.empty()) {
 		UI.SelectedViewport->Unit = NULL;
 		return;
 	}

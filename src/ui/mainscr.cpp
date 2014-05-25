@@ -1115,9 +1115,9 @@ static void InfoPanel_draw_no_selection()
 	}
 }
 
-static void InfoPanel_draw_single_selection()
+static void InfoPanel_draw_single_selection(CUnit *selUnit)
 {
-	CUnit &unit = *Selected[0];
+	CUnit &unit = (selUnit ? *selUnit : *Selected[0]);
 	int panelIndex;
 
 	// FIXME: not correct for enemy's units
@@ -1181,10 +1181,14 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	switch (Selected.size()) {
-		case 0: { InfoPanel_draw_no_selection(); break; }
-		case 1: { InfoPanel_draw_single_selection(); break; }
-		default: { InfoPanel_draw_multiple_selection(); break; }
+	if (UnitUnderCursor) {
+		InfoPanel_draw_single_selection(UnitUnderCursor);
+	} else {
+		switch (Selected.size()) {
+			case 0: { InfoPanel_draw_no_selection(); break; }
+			case 1: { InfoPanel_draw_single_selection(NULL); break; }
+			default: { InfoPanel_draw_multiple_selection(); break; }
+		}
 	}
 }
 
