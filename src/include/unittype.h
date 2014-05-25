@@ -167,6 +167,7 @@ enum {
 	NONSOLID_INDEX,
 	WALL_INDEX,
 	NORANDOMPLACING_INDEX,
+	ORGANIC_INDEX,
 	NBARALREADYDEFINED
 };
 
@@ -565,6 +566,7 @@ public:
 	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
+	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 
 	CUnitStats DefaultStat;
 	struct BoolFlags {

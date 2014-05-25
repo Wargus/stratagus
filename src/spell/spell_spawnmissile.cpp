@@ -38,6 +38,24 @@
 #include "missile.h"
 #include "script.h"
 #include "unit.h"
+#include "unit_find.h"
+
+
+
+struct CompareUnitDistance {
+	const CUnit *referenceunit;
+	CompareUnitDistance(const CUnit &unit): referenceunit(&unit) {}
+	bool operator()(const CUnit *c1, const CUnit *c2)
+	{
+		int d1 = c1->MapDistanceTo(*referenceunit);
+		int d2 = c2->MapDistanceTo(*referenceunit);
+		if (d1 == d2) {
+			return UnitNumber(*c1) < UnitNumber(*c2);
+		} else {
+			return d1 < d2;
+		}
+	}
+};
 
 /**
 **  Parse the missile location description for a spell action.
@@ -166,20 +184,65 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	PixelPos startPos;
 	PixelPos endPos;
 
-	EvaluateMissileLocation(this->StartPoint, caster, target, goalPos, &startPos);
-	EvaluateMissileLocation(this->EndPoint, caster, target, goalPos, &endPos);
+	/*
+		hardcoded, will be done with Lua when it's possible
+	*/
+	const Vec2i &spellPos = target ? target->tilePos : goalPos;
+	if (this->Missile->Class == MissileClassDeathCoil) {
+		const Vec2i offset(2, 2);
+		std::vector<CUnit *> table;
+		Select(goalPos - offset, goalPos + offset, table);
+		int count = 0;
+		for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end(); ++it) {
+			CUnit &unit = **it;
 
-	::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
-	missile->TTL = this->TTL;
-	missile->Delay = this->Delay;
-	missile->Damage = this->Damage;
-	if (this->UseUnitVar) {
-		missile->Damage = 0;
-		missile->SourceUnit = &caster;
-	} else if (missile->Damage != 0) {
-		missile->SourceUnit = &caster;
+			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
+				table[count++] = &unit;
+			}
+		}
+		if (count > 0) {
+			std::sort(table.begin(), table.begin() + count, CompareUnitDistance(caster));
+			int damageLeft = this->Damage;
+			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
+				CUnit &unit = **it;
+				if (unit.IsAliveOnMap()) {
+					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos, &startPos);
+					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos, &endPos);
+					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+					missile->TTL = this->TTL;
+					missile->Delay = this->Delay;
+					if (it + 1 == table.begin() + count) {
+						missile->Damage = damageLeft;
+						damageLeft = 0;
+					} else {
+						missile->Damage = std::min(damageLeft, unit.Variable[HP_INDEX].Value);
+						damageLeft -= unit.Variable[HP_INDEX].Value;
+					}
+					missile->SourceUnit = &caster;
+					missile->TargetUnit = &unit;
+				}
+			}
+			return 1;
+		}
+		return 0;
+	} else {
+		EvaluateMissileLocation(this->StartPoint, caster, target, goalPos, &startPos);
+		EvaluateMissileLocation(this->EndPoint, caster, target, goalPos, &endPos);
+
+		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+		missile->TTL = this->TTL;
+		missile->Delay = this->Delay;
+		missile->Damage = this->Damage;
+		if (this->UseUnitVar) {
+			missile->Damage = 0;
+			missile->SourceUnit = &caster;
+		} else if (missile->Damage != 0) {
+			missile->SourceUnit = &caster;
+		}
+
+		missile->TargetUnit = target;
 	}
-	missile->TargetUnit = target;
+
 	return 1;
 }
 
