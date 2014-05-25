@@ -490,6 +490,8 @@ int CLabel::DoDrawText(int x, int y,
 {
 	int widths = 0;
 	int utf8;
+	bool tab;
+	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
 	const CFontColor *backup = fc;
 	bool isReverse = false;
@@ -497,7 +499,10 @@ int CLabel::DoDrawText(int x, int y,
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
 	while (GetUTF8(text, len, pos, utf8)) {
-		if (utf8 == '~') {
+		tab = false;
+		if (utf8 == '\t') {
+			tab = true;
+		} else if (utf8 == '~') {
 			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");
@@ -553,7 +558,13 @@ int CLabel::DoDrawText(int x, int y,
 				}
 			}
 		}
-		widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, *fc);
+		if (tab) {
+			for (int tabs = 0; tabs < tabSize; ++tabs) {
+				widths += font->DrawChar<CLIP>(*g, ' ', x + widths, y, *fc);
+			}
+		} else {
+			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, *fc);
+		}
 
 		if (isReverse == false && fc != backup) {
 			fc = backup;
