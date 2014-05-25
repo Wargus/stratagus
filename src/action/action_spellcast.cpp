@@ -378,6 +378,9 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				}
 			}
 
+			if (unit.IsAlive() == false) { // unit has died when casting spell (demolish)
+				return;
+			}
 			// Target is dead ? Change order ?
 			if (CheckForDeadGoal(unit)) {
 				return;
