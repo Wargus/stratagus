@@ -25,6 +25,7 @@ class CPreference
 	bool BigScreen;
 	bool PauseOnLeave;
 	bool AiExplores;
+	bool GrayscaleIcons;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;

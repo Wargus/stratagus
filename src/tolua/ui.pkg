@@ -195,7 +195,7 @@ class CIcon
 	static CIcon *Get(const std::string ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
-	CGraphic *G;
+	CPlayerColorGraphic *G;
 	int Frame;
 };
 

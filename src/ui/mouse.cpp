@@ -2142,7 +2142,7 @@ void DrawPieMenu()
 			if (gray) {
 				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 			} else {
-				buttons[i].Icon.Icon->DrawIcon(player, pos);
+				buttons[i].Icon.Icon->DrawIcon(pos);
 			}
 
 			// Tutorial show command key in icons

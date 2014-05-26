@@ -548,9 +548,9 @@ CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
 **
 **  @param grayscale  Make grayscale texture
 */
-CGraphic *CGraphic::Clone(bool grayscale) const
+CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 {
-	CGraphic *g = CGraphic::ForceNew(this->File, this->Width, this->Height);
+	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File, this->Width, this->Height);
 
 	if (this->IsLoaded()) {
 		g->Load(grayscale);

@@ -99,7 +99,7 @@ public:
 	ButtonCheckFunc Allowed;    /// Check if this button is allowed
 	std::string AllowStr;       /// argument for allowed
 	std::string UnitMask;       /// for which units is it available
-	IconConfig Icon;            /// icon to display
+	IconConfig Icon;      /// icon to display
 	int Key;                    /// alternative on keyboard
 	std::string Hint;           /// tip texts
 	std::string Description;    /// description shown on status bar (optional)

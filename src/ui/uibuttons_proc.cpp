@@ -58,7 +58,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text)
+				  const std::string &text, int player)
 {
 	ButtonStyleProperties *p;
 
@@ -88,8 +88,8 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	if (pimage->Sprite) {
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
 
-		if (colorGraphic && ThisPlayer) {
-			colorGraphic->DrawPlayerColorFrameClip(ThisPlayer->Index, pimage->Frame, x, y);
+		if (colorGraphic && player != -1) {
+			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y);
 		}

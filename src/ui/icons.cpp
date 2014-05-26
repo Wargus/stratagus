@@ -41,6 +41,7 @@
 #include "player.h"
 #include "translate.h"
 #include "ui.h"
+#include "unit.h"
 #include "video.h"
 
 #include <map>
@@ -69,8 +70,8 @@ CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(
 */
 CIcon::~CIcon()
 {
-	CGraphic::Free(this->G);
-	CGraphic::Free(this->GScale);
+	CPlayerColorGraphic::Free(this->G);
+	CPlayerColorGraphic::Free(this->GScale);
 }
 
 /**
@@ -110,7 +111,9 @@ void CIcon::Load()
 {
 	Assert(G);
 	G->Load();
-	GScale = G->Clone(true);
+	if (Preference.GrayscaleIcons) {
+		GScale = G->Clone(true);
+	}
 	if (Frame >= G->NumFrames) {
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
 		Frame = 0;
@@ -123,11 +126,10 @@ void CIcon::Load()
 **  @param player  Player pointer used for icon colors
 **  @param pos     display pixel position
 */
-void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
+void CIcon::DrawIcon(const PixelPos &pos, const int player) const
 {
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(this->G);
-	if (g) {
-		g->DrawPlayerColorFrameClip(player.Index, this->Frame, pos.x, pos.y);
+	if (player != -1 ) {
+		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
 	} else {
 		this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
 	}
@@ -138,9 +140,15 @@ void CIcon::DrawIcon(const CPlayer &player, const PixelPos &pos) const
 **
 **  @param pos     display pixel position
 */
-void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
+void CIcon::DrawGrayscaleIcon(const PixelPos &pos, const int player) const
 {
-	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+	if (this->GScale) {
+		if (player != -1) {
+			this->GScale->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
+		} else {
+			this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+		}
+	}
 }
 
 /**
@@ -152,10 +160,15 @@ void CIcon::DrawGrayscaleIcon(const PixelPos &pos) const
 void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 {
 	// TO-DO: implement more effect types (clock-like)
-	this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
-	const int height = (G->Height * (100 - percent)) / 100;
-	this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height,
-						 G->Width, height, pos.x, pos.y + G->Height - height);
+	if (this->GScale) {
+		this->GScale->DrawFrameClip(this->Frame, pos.x, pos.y);
+		const int height = (G->Height * (100 - percent)) / 100;
+		this->G->DrawSubClip(G->frame_map[Frame].x, G->frame_map[Frame].y + G->Height - height,
+							 G->Width, height, pos.x, pos.y + G->Height - height);
+	} else {
+		DebugPrint("Enable grayscale icon drawing in your game to achieve special effects for cooldown spell icons");
+		this->DrawIcon(pos);
+	}
 }
 
 /**
@@ -167,7 +180,7 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 **  @param text    Optional text to display
 */
 void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
-						 const PixelPos &pos, const std::string &text) const
+						 const PixelPos &pos, const std::string &text, int player) const
 {
 	ButtonStyle s(style);
 
@@ -178,7 +191,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.BorderColor = 0;
 	}
 	// FIXME: player colors
-	DrawUIButton(&s, flags, pos.x, pos.y, text);
+	DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 }
 
 /**

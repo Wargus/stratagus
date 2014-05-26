@@ -573,7 +573,7 @@ static void DrawUnitIcons()
 		}
 		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		const PixelPos pos(x, y);
-		icon.DrawIcon(Players[Editor.SelectedPlayer], pos);
+		icon.DrawIcon(pos, Players[Editor.SelectedPlayer].Index);
 
 		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
 		if (i == Editor.SelectedUnitIndex) {
@@ -753,7 +753,7 @@ static void DrawEditorPanel_StartIcon()
 		int flag = (ButtonUnderCursor == StartButton ? IconActive : 0)
 				   | (Editor.State == EditorSetStartLocation ? IconSelected : 0);
 
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 	} else {
 		//  No unit specified : draw a cross.
 		//  Todo : FIXME Should we just warn user to define Start unit ?
