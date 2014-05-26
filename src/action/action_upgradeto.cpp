@@ -128,9 +128,13 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		} else {
 			unit.Variable[i].Value = newstats.Variables[i].Value;
 		}
-		unit.Variable[i].Max = newstats.Variables[i].Max;
-		unit.Variable[i].Increase = newstats.Variables[i].Increase;
-		unit.Variable[i].Enable = newstats.Variables[i].Enable;
+		if (i == KILL_INDEX || i == XP_INDEX) {
+			unit.Variable[i].Value = unit.Variable[i].Max;
+		} else {
+			unit.Variable[i].Max = newstats.Variables[i].Max;
+			unit.Variable[i].Increase = newstats.Variables[i].Increase;
+			unit.Variable[i].Enable = newstats.Variables[i].Enable;
+		}
 	}
 
 	unit.Type = const_cast<CUnitType *>(&newtype);
