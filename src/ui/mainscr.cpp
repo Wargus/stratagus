@@ -1182,7 +1182,7 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor) {
+	if (UnitUnderCursor && Selected.empty()) {
 		InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {
 		switch (Selected.size()) {
