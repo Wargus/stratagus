@@ -100,7 +100,26 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	mf.setTileIndex(*Map.Tileset, tileIndex, 0);
+	int tile = tileIndex;
+	if (TileToolRandom) {
+		int n = 0;
+		for (int i = 0; i < 16; ++i) {
+			if (!Map.Tileset->tiles[tile + i].tile) {
+				break;
+			} else {
+				++n;
+			}
+		}
+		n = MyRand() % n;
+		int i = -1;
+		do {
+			while (++i < 16 && !Map.Tileset->tiles[tile + i].tile) {
+			}
+		} while (i < 16 && n--);
+		Assert(i != 16);
+		tile += i;
+	}
+	mf.setTileIndex(*Map.Tileset, tile, 0);
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
