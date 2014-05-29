@@ -120,7 +120,9 @@ enum ENumber {
 	ENumber_UnitStat,    /// Property of Unit.
 	ENumber_TypeStat,    /// Property of UnitType.
 
-	ENumber_NumIf        /// If cond then Number1 else Number2.
+	ENumber_NumIf,       /// If cond then Number1 else Number2.
+
+	ENumber_PlayerData   /// Numeric Player Data
 };
 
 /// All possible value for a unit.
@@ -231,6 +233,11 @@ struct NumberDesc {
 			NumberDesc *BTrue;  /// Number if Cond is true.
 			NumberDesc *BFalse; /// Number if Cond is false.
 		} NumIf; /// conditional string.
+		struct {
+			NumberDesc *Player;   /// Number of player
+			StringDesc *DataType; /// Player's data
+			StringDesc *ResType;  /// Resource type
+		} PlayerData; /// conditional string.
 	} D;
 };
 

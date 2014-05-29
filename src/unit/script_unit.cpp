@@ -1022,8 +1022,6 @@ static int CclGetUnitVariable(lua_State *l)
 	const char *const value = LuaToString(l, 2);
 	if (!strcmp(value, "RegenerationRate")) {
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
-	} else if (!strcmp(value, "Player")) {
-		lua_pushnumber(l, unit->Player->Index);
 	} else if (!strcmp(value, "Ident")) {
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {

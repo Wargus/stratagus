@@ -39,6 +39,7 @@
 
 #include "script.h"
 
+#include "animation/animation_setplayervar.h"
 #include "font.h"
 #include "game.h"
 #include "iocompat.h"
@@ -736,6 +737,20 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				res->D.NumIf.BFalse = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
+		} else if (!strcmp(key, "PlayerData")) {
+			res->e = ENumber_PlayerData;
+			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
+				LuaError(l, "Bad number of args in PlayerData\n");
+			}
+			lua_rawgeti(l, -1, 1); // Player.
+			res->D.PlayerData.Player = CclParseNumberDesc(l);
+			lua_rawgeti(l, -1, 2); // DataType.
+			res->D.PlayerData.DataType = CclParseStringDesc(l);
+			if (lua_rawlen(l, -1) == 3) {
+				lua_rawgeti(l, -1, 3); // Res type.
+				res->D.PlayerData.ResType = CclParseStringDesc(l);
+			}
+			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'"_C_ key);
@@ -995,6 +1010,11 @@ int EvalNumber(const NumberDesc *number)
 			} else {
 				return 0;
 			}
+		case ENumber_PlayerData : // getplayerdata(player, data, res);
+			int player = EvalNumber(number->D.PlayerData.Player);
+			std::string data = EvalString(number->D.PlayerData.DataType);
+			std::string res = EvalString(number->D.PlayerData.ResType);
+			return GetPlayerData(player, data.c_str(), res.c_str());
 	}
 	return 0;
 }
@@ -1175,6 +1195,14 @@ void FreeNumberDesc(NumberDesc *number)
 			delete number->D.NumIf.BTrue;
 			FreeNumberDesc(number->D.NumIf.BFalse);
 			delete number->D.NumIf.BFalse;
+			break;
+		case ENumber_PlayerData : // getplayerdata(player, data, res);
+			FreeNumberDesc(number->D.PlayerData.Player);
+			delete number->D.PlayerData.Player;
+			FreeStringDesc(number->D.PlayerData.DataType);
+			delete number->D.PlayerData.DataType;
+			FreeStringDesc(number->D.PlayerData.ResType);
+			delete number->D.PlayerData.ResType;
 			break;
 	}
 }
@@ -1795,6 +1823,22 @@ static int CclNumIf(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for PlayerData.
+**  {"PlayerData", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclPlayerData(lua_State *l)
+{
+	if (lua_gettop(l) != 2 && lua_gettop(l) != 3) {
+		LuaError(l, "Bad number of arg for PlayerData()\n");
+	}
+	return Alias(l, "PlayerData");
+}
+
+/**
 **  Return equivalent lua table for PlayerName.
 **  {"PlayerName", {arg1}}
 **
@@ -1847,6 +1891,7 @@ static void AliasRegister()
 	lua_register(Lua, "Line", CclLine);
 	lua_register(Lua, "GameInfo", CclGameInfo);
 	lua_register(Lua, "PlayerName", CclPlayerName);
+	lua_register(Lua, "PlayerData", CclPlayerData);
 
 	lua_register(Lua, "If", CclIf);
 	lua_register(Lua, "NumIf", CclNumIf);

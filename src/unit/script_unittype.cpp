@@ -131,6 +131,7 @@ static const char POISON_KEY[] = "Poison";
 static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
 static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 static const char ISALIVE_KEY[] = "IsAlive";
+static const char PLAYER_KEY[] = "Player";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -167,7 +168,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -1561,7 +1562,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
-			|| i == ISALIVE_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			continue;
 		}
 		unit.Variable[i].Value = 0;
@@ -1637,6 +1638,10 @@ void UpdateUnitVariables(CUnit &unit)
 	// Is Alive
 	unit.Variable[ISALIVE_INDEX].Value = unit.IsAlive() ? 1 : 0;
 	unit.Variable[ISALIVE_INDEX].Max = 1;
+
+	// Player
+	unit.Variable[PLAYER_INDEX].Value = unit.Player->Index;
+	unit.Variable[PLAYER_INDEX].Max = PlayerMax;
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;
