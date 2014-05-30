@@ -26,6 +26,7 @@ class CPreference
 	bool PauseOnLeave;
 	bool AiExplores;
 	bool GrayscaleIcons;
+	bool IconsShift;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;

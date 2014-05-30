@@ -77,6 +77,7 @@ int KeyModifiers;                            /// Current keyboard modifiers
 CUnit *UnitUnderCursor;                      /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
+int OldButtonUnderCursor = -1;               /// Button under cursor
 bool GameMenuButtonClicked;                  /// Menu button was clicked
 bool GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
 bool LeaveStops;                             /// Mouse leaves windows stops scroll
@@ -644,6 +645,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
 
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
@@ -1550,7 +1552,7 @@ static void UISelectStateButtonDown(unsigned)
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+			OldButtonUnderCursor = ButtonUnderCursor;
 			return;
 		}
 	}
@@ -1753,7 +1755,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+				OldButtonUnderCursor = ButtonUnderCursor;
 			}
 		}
 	} else if ((MouseButtons & MiddleButton)) {
@@ -1793,6 +1795,7 @@ void UIHandleButtonDown(unsigned button)
 	static bool OldShowReactionRange;
 	static bool OldShowAttackRange;
 	static bool OldValid = false;
+	OldButtonUnderCursor = -1;
 
 	// Reset the ShowNameDelay counters
 	ShowNameDelay = ShowNameTime = GameCycle;
@@ -1931,6 +1934,20 @@ void UIHandleButtonUp(unsigned button)
 					}
 					return;
 				}
+			}
+		}
+		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
+				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+				OldButtonUnderCursor = -1;
+				return;
+			}
+		}
+		if (CursorOn == CursorOnButton) {
+			// FIXME: other buttons?
+			if (ButtonAreaUnderCursor == ButtonAreaButton && OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
+				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
+				return;
 			}
 		}
 	}

@@ -230,6 +230,8 @@ extern CUnit *UnitUnderCursor;
 extern int ButtonAreaUnderCursor;
 /// button number under the cursor
 extern int ButtonUnderCursor;
+/// oldbutton number under the cursor
+extern int OldButtonUnderCursor;
 /// menu button was clicked down
 extern bool GameMenuButtonClicked;
 /// diplomacy button was clicked down

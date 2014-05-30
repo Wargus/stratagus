@@ -428,6 +428,7 @@ public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
+		IconsShift(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
@@ -438,6 +439,7 @@ public:
 	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
 	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
 	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc 
+	bool IconsShift;         /// Shift icons slightly when you press on them
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

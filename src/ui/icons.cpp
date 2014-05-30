@@ -190,8 +190,30 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
 	}
-	// FIXME: player colors
-	DrawUIButton(&s, flags, pos.x, pos.y, text, player);
+	if (Preference.IconsShift) {
+		// Left and top edge of Icon
+		Video.DrawHLine(ColorWhite, pos.x - 1, pos.y - 1, 49);
+		Video.DrawVLine(ColorWhite, pos.x - 1, pos.y, 40);
+		Video.DrawVLine(ColorWhite, pos.x, pos.y + 38, 2);
+		Video.DrawHLine(ColorWhite, pos.x + 46, pos.y, 2);
+
+		// Bottom and Right edge of Icon
+		Video.DrawHLine(ColorGray, pos.x + 1, pos.y + 38, 47);
+		Video.DrawHLine(ColorGray, pos.x + 1, pos.y + 39, 47);
+		Video.DrawVLine(ColorGray, pos.x + 46, pos.y + 1, 37);
+		Video.DrawVLine(ColorGray, pos.x + 47, pos.y + 1, 37);
+
+		Video.DrawRectangle(ColorBlack, pos.x - 3, pos.y - 3, 52, 44);
+		Video.DrawRectangle(ColorBlack, pos.x - 4, pos.y - 4, 54, 46);
+
+		if (flags & IconClicked) {
+			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
+		} else {
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
+		}
+	} else {
+		DrawUIButton(&s, flags, pos.x, pos.y, text, player);
+	}
 }
 
 /**

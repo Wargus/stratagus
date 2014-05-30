@@ -279,6 +279,7 @@ static int MenuLoop()
 	Invalidate();
 
 	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
 

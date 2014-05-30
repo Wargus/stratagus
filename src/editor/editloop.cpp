@@ -1628,6 +1628,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	Editor.CursorUnitIndex = -1;
 	Editor.CursorTileIndex = -1;
 	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
 
 	// Minimap
 	if (UI.Minimap.Contains(screenPos)) {

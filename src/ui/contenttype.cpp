@@ -279,10 +279,10 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 
 	// Border
-	Video.FillRectangleClip(ColorBlack, this->Pos.x - 1, this->Pos.y - 1,
-							this->Width + 2, this->Height + 2);
+	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
+							this->Width + 3, this->Height + 3);
 
-	Video.FillRectangleClip(color, this->Pos.x, this->Pos.y,
+	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
 							(f * this->Width) / 100, this->Height);
 }
 
