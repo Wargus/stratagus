@@ -513,22 +513,31 @@ void AiForceManager::RemoveDeadUnit()
 **
 **  @param unit  Unit to assign to force.
 */
-bool AiForceManager::Assign(CUnit &unit)
+bool AiForceManager::Assign(CUnit &unit, int force)
 {
 	if (unit.GroupId != 0) {
 		return false;
 	}
-	// Check to which force it belongs
-	for (unsigned int i = 0; i < forces.size(); ++i) {
-		AiForce &force = forces[i];
-		// No troops for attacking force
-		if (force.IsAttacking()) {
-			continue;
-		}
-		if (force.IsBelongsTo(*unit.Type)) {
-			force.Insert(unit);
-			unit.GroupId = i + 1;
+	if (force != -1) {
+		AiForce &f = forces[AiPlayer->Force.getScriptForce(force)];
+		if (f.IsBelongsTo(*unit.Type)) {
+			f.Insert(unit);
+			unit.GroupId = force + 1;
 			return true;
+		}
+	} else {
+		// Check to which force it belongs
+		for (unsigned int i = 0; i < forces.size(); ++i) {
+			AiForce &f = forces[i];
+			// No troops for attacking force
+			if (f.IsAttacking()) {
+				continue;
+			}
+			if (f.IsBelongsTo(*unit.Type)) {
+				f.Insert(unit);
+				unit.GroupId = i + 1;
+				return true;
+			}
 		}
 	}
 	return false;
@@ -597,7 +606,7 @@ bool AiAssignToForce(CUnit &unit)
 /**
 **  Assign free units to force.
 */
-void AiAssignFreeUnitsToForce()
+void AiAssignFreeUnitsToForce(int force)
 {
 	const int n = AiPlayer->Player->GetUnitCount();
 
@@ -606,7 +615,7 @@ void AiAssignFreeUnitsToForce()
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
 		if (unit.Active && unit.GroupId == 0) {
-			AiPlayer->Force.Assign(unit);
+			AiPlayer->Force.Assign(unit, force);
 		}
 	}
 }
@@ -647,28 +656,29 @@ void AiAttackWithForce(unsigned int force)
 		return ;
 	}
 
+	unsigned int intForce = AiPlayer->Force.getScriptForce(force);
 	// The AI finds the first unassigned force, moves all data to it and cleans
 	// the first force, so we can reuse it
-	if (!AiPlayer->Force[force].Defending) {
+	if (!AiPlayer->Force[intForce].Defending) {
 		unsigned int top;
 		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
 		AiPlayer->Force[f].Reset();
+		AiPlayer->Force[f].FormerForce = force;
+		AiPlayer->Force[f].Role = AiPlayer->Force[intForce].Role;
 
-		AiPlayer->Force[f].Role = AiPlayer->Force[force].Role;
-
-		while (AiPlayer->Force[force].Size()) {
-			CUnit &aiunit = *AiPlayer->Force[force].Units[AiPlayer->Force[force].Size() - 1];
+		while (AiPlayer->Force[intForce].Size()) {
+			CUnit &aiunit = *AiPlayer->Force[intForce].Units[AiPlayer->Force[intForce].Size() - 1];
 			aiunit.GroupId = f + 1;
-			AiPlayer->Force[force].Units.Remove(&aiunit);
+			AiPlayer->Force[intForce].Units.Remove(&aiunit);
 			AiPlayer->Force[f].Units.Insert(&aiunit);
 		}
 
-		while (AiPlayer->Force[force].UnitTypes.size()) {
-			top = AiPlayer->Force[force].UnitTypes.size() - 1;
-			AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[force].UnitTypes[top]);
-			AiPlayer->Force[force].UnitTypes.pop_back();
+		while (AiPlayer->Force[intForce].UnitTypes.size()) {
+			top = AiPlayer->Force[intForce].UnitTypes.size() - 1;
+			AiPlayer->Force[f].UnitTypes.push_back(AiPlayer->Force[intForce].UnitTypes[top]);
+			AiPlayer->Force[intForce].UnitTypes.pop_back();
 		}
-		AiPlayer->Force[force].Reset();
+		AiPlayer->Force[intForce].Reset();
 		AiPlayer->Force[f].Completed = true;
 		force = f;
 	}

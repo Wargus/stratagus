@@ -43,6 +43,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
@@ -697,11 +698,11 @@ static int CclAiForce(lua_State *l)
 	}
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
 	if (resetForce) {
-		AiForceRole role = aiforce.Role;
 		aiforce.Reset(true);
-		aiforce.State = AiForceAttackingState_Waiting;
-		aiforce.Role = role;
 	}
+	AiForceRole role = aiforce.Role;
+	aiforce.State = AiForceAttackingState_Waiting;
+	aiforce.Role = role;
 
 	int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
@@ -748,7 +749,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 	}
-	AiAssignFreeUnitsToForce();
+	AiAssignFreeUnitsToForce(force);
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -776,6 +777,33 @@ static int CclAiForceRole(lua_State *l)
 	} else {
 		LuaError(l, "Unknown force role '%s'" _C_ flag);
 	}
+	lua_pushboolean(l, 0);
+	return 1;
+}
+
+/**
+**  Release force.
+**
+**  @param l  Lua state.
+*/
+static int CclAiReleaseForce(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int force = LuaToNumber(l, 1);
+	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
+		LuaError(l, "Force out of range: %d" _C_ force);
+	}
+	for (int i = AI_MAX_FORCE_INTERNAL; i < AI_MAX_FORCES; ++i) {
+		if (AiPlayer->Force[i].FormerForce != -1 && AiPlayer->Force[i].FormerForce == force) {
+			while (AiPlayer->Force[i].Size()) {
+				CUnit &aiunit = *AiPlayer->Force[i].Units[AiPlayer->Force[i].Size() - 1];
+				aiunit.GroupId = 0;
+				AiPlayer->Force[i].Units.Remove(&aiunit);
+			}
+			AiPlayer->Force[i].Reset(false);
+		}
+	}
+
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -837,7 +865,7 @@ static int CclAiAttackWithForce(lua_State *l)
 	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
 		LuaError(l, "Force out of range: %d" _C_ force);
 	}
-	AiAttackWithForce(AiPlayer->Force.getScriptForce(force));
+	AiAttackWithForce(force);
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -1394,6 +1422,7 @@ void AiCclRegister()
 
 	lua_register(Lua, "AiForce", CclAiForce);
 
+	lua_register(Lua, "AiReleaseForce", CclAiReleaseForce);
 	lua_register(Lua, "AiForceRole", CclAiForceRole);
 	lua_register(Lua, "AiCheckForce", CclAiCheckForce);
 	lua_register(Lua, "AiWaitForce", CclAiWaitForce);

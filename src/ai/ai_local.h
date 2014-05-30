@@ -120,7 +120,7 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(AiForceRoleDefault), State(AiForceAttackingState_Free),
+		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 	{
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
@@ -138,6 +138,7 @@ public:
 	*/
 	void Reset(bool types = false)
 	{
+		FormerForce = -1;
 		Completed = false;
 		Defending = false;
 		Attacking = false;
@@ -182,6 +183,7 @@ public:
 	CUnitCache Units;  /// Units in the force
 
 	// If attacking
+	int FormerForce;             /// Original force number
 	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
 	Vec2i HomePos; /// Return after attack tile map position
@@ -227,7 +229,7 @@ public:
 
 	int GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
-	bool Assign(CUnit &unit);
+	bool Assign(CUnit &unit, int force = -1);
 	void Update();
 	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
 	void CheckUnits(int *counter);
@@ -428,7 +430,7 @@ extern void AiRemoveDeadUnitInForces();
 /// Assign a new unit to a force
 extern bool AiAssignToForce(CUnit &unit);
 /// Assign a free units to a force
-extern void AiAssignFreeUnitsToForce();
+extern void AiAssignFreeUnitsToForce(int force = -1);
 /// Attack with force at position
 extern void AiAttackWithForceAt(unsigned int force, int x, int y);
 /// Attack with force
