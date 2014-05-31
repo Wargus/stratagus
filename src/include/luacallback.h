@@ -41,6 +41,7 @@ public:
 	~LuaCallback();
 	void pushPreamble();
 	void pushInteger(int value);
+	void pushIntegers(int count, int *array);
 	void pushString(const std::string &eventId);
 	void run(int results = 0);
 	bool popBoolean();

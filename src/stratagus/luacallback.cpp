@@ -76,6 +76,23 @@ void LuaCallback::pushInteger(int value)
 }
 
 /**
+**  Push a array of integers from callback to stack
+**
+**  @param value  the integer to push on the stack
+*/
+void LuaCallback::pushIntegers(int count, int *array)
+{
+	lua_newtable(luastate);
+	int c = lua_gettop(luastate);
+	for (int i = 0; i < count; ++i) {
+		lua_pushnumber(luastate, i + 1);
+		lua_pushnumber(luastate, array[i]);
+		lua_settable(luastate, -3);
+	}
+	arguments++;
+}
+
+/**
 **  Push a string argument for the callback on the stack.
 **
 **  @param s  the string to push on the stack

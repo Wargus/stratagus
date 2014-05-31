@@ -241,6 +241,10 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "min-range")) {
 			autocast->MinRange = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "position-autocast")) {
+			lua_rawgeti(l, -1, j + 1);
+			autocast->PositionAutoCast = new LuaCallback(l, -1);
+			lua_pop(l, 1);
 		} else if (!strcmp(value, "combat")) {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "attacker")) {

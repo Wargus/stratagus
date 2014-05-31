@@ -174,8 +174,12 @@ public:
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
 	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
-		Combat(0), Attacker(0) {};
-	~AutoCastInfo() { delete Condition; };
+		Combat(0), Attacker(0), PositionAutoCast(NULL) {};
+	~AutoCastInfo()
+	{
+		delete Condition;
+		delete PositionAutoCast;
+	};
 	/// @todo this below is SQUARE!!!
 	int Range;                   /// Max range of the target.
 	int MinRange;                /// Min range of the target.
@@ -190,8 +194,8 @@ public:
 	int Combat;                  /// If it should be casted in combat
 	int Attacker;                /// If it should be casted on unit which attacks
 
-	/// @todo Add stuff here for target preference.
-	/// @todo Heal units with the lowest hit points first.
+	// Position autocast callback
+	LuaCallback *PositionAutoCast;
 };
 
 /**

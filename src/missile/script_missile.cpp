@@ -139,6 +139,8 @@ void MissileType::Load(lua_State *l)
 			this->Sleep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Speed")) {
 			this->Speed = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "BlizzardSpeed")) {
+			this->BlizzardSpeed = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TTL")) {
 			this->TTL = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Damage")) {

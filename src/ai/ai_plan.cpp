@@ -86,7 +86,7 @@ public:
 			return;
 		}
 		// Choose the best target.
-		if (!*best || (*best)->Type->Priority < type.Priority) {
+		if (!*best || (*best)->Variable[PRIORITY_INDEX].Value < unit->Variable[PRIORITY_INDEX].Value) {
 			*best = unit;
 		}
 	}

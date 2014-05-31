@@ -132,6 +132,7 @@ static const char SHIELDPERMEABILITY_KEY[] = "ShieldPermeability";
 static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 static const char ISALIVE_KEY[] = "IsAlive";
 static const char PLAYER_KEY[] = "Player";
+static const char PRIORITY_KEY[] = "Priority";
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -168,7 +169,8 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
-							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY
+							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
+							   PRIORITY_KEY
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -546,7 +548,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = LuaToNumber(l, -1);
 			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Priority")) {
-			type->Priority = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[PRIORITY_INDEX].Value  = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AnnoyComputerFactor")) {
 			type->AnnoyComputerFactor = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AiAdjacentRange")) {
@@ -1609,6 +1612,10 @@ void UpdateUnitVariables(CUnit &unit)
 	// AttackRange
 	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+
+	// Priority
+	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
 	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;

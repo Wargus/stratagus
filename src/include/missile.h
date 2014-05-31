@@ -386,6 +386,7 @@ public:
 	int StartDelay;            /// missile start delay
 	int Sleep;                 /// missile sleep
 	int Speed;                 /// missile speed
+	int BlizzardSpeed;         /// speed for blizzard shards
 	int TTL;                   /// missile time-to-live
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 	int SmokePrecision;        /// How frequently the smoke missile will generate itself

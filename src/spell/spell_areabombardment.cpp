@@ -106,9 +106,9 @@
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
 			::Missile *mis = MakeMissile(*missile, start, dest);
-			//  FIXME: This is just patched up, it works, but I have no idea why.
-			//  FIXME: What is the reasoning behind all this?
-			if (mis->Type->Speed) {
+			if (mis->Type->BlizzardSpeed) {
+				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->BlizzardSpeed;
+			} else if (mis->Type->Speed) {
 				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->Speed;
 			} else {
 				mis->Delay = i * mis->Type->Sleep * mis->Type->G->NumFrames;

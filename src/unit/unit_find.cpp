@@ -615,7 +615,7 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 		}
 
 		// Choose the best target.
-		if (!best || best->Type->Priority < unit.Type->Priority) {
+		if (!best || best->Variable[PRIORITY_INDEX].Value < unit.Variable[PRIORITY_INDEX].Value) {
 			best = &unit;
 		}
 	}
@@ -737,7 +737,7 @@ private:
 		int cost = 0;
 
 		// Priority 0-255
-		cost -= dtype.Priority * PRIORITY_FACTOR;
+		cost -= dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 		// Remaining HP (Health) 0-65535
 		cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
 
@@ -871,7 +871,7 @@ public:
 				cost = -cost;
 			} else {
 				//  Priority 0-255
-				cost += dtype.Priority * PRIORITY_FACTOR;
+				cost += dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 
 				for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 					if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {

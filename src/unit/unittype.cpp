@@ -615,7 +615,7 @@ CUnitType::CUnitType() :
 	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
 	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
-	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0), Priority(0),
+	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	CanCastSpell(NULL), AutoCastActive(NULL),
 	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),

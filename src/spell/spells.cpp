@@ -295,14 +295,37 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				return NewTargetUnit(caster);
 			}
 			return NULL;
-		case TargetPosition:
+		case TargetPosition: {
+			if (autocast->PositionAutoCast && table.empty() == false) {
+				int count = 0;
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
+						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+							table[count++] = table[i];
+					}
+				}
+				if (count > 0) {
+					if (autocast->PriorytyVar != ACP_NOVALUE) {
+						std::sort(table.begin(), table.begin() + count,
+							AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+					}
+					int *array = new int[count + 1];
+					for (size_t i = 1; i != count + 1; ++i) {
+						array[i] = UnitNumber(*table[i - 1]);
+					}
+					array[0] = UnitNumber(caster);
+					autocast->PositionAutoCast->pushPreamble();
+					autocast->PositionAutoCast->pushIntegers(count + 1, array);
+					autocast->PositionAutoCast->run(2);
+					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
+					if (Map.Info.IsPointOnMap(resPos)) {
+						Target *target = new Target(TargetPosition, NULL, resPos);
+						return target;
+					}
+				}
+			}
 			return 0;
-		//  Autocast with a position? That's hard
-		//  Possibilities: cast reveal-map on a dark region
-		//  Cast raise dead on a bunch of corpses. That would rule.
-		//  Cast summon until out of mana in the heat of battle. Trivial?
-		//  Find a tight group of units and cast area-damage spells. HARD,
-		//  but it is a must-have for AI. What about area-heal?
+		}
 		case TargetUnit: {
 			// The units are already selected.
 			//  Check every unit if it is a possible target

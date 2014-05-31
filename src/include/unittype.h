@@ -212,6 +212,7 @@ enum {
 	SHIELDPIERCING_INDEX,
 	ISALIVE_INDEX,
 	PLAYER_INDEX,
+	PRIORITY_INDEX,
 	NVARALREADYDEFINED
 };
 
@@ -505,7 +506,6 @@ public:
 	int MinAttackRange;             /// Minimal attack range
 	int ReactRangeComputer;         /// Reacts on enemy for computer
 	int ReactRangePerson;           /// Reacts on enemy for person player
-	int Priority;                   /// Priority value / AI Treatment
 	int BurnPercent;                /// Burning percent.
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
