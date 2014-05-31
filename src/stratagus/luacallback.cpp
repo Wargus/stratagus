@@ -80,13 +80,12 @@ void LuaCallback::pushInteger(int value)
 **
 **  @param value  the integer to push on the stack
 */
-void LuaCallback::pushIntegers(int count, int *array)
+void LuaCallback::pushIntegers(const std::vector<int> &values)
 {
 	lua_newtable(luastate);
-	int c = lua_gettop(luastate);
-	for (int i = 0; i < count; ++i) {
+	for (size_t i = 0; i < values.size(); ++i) {
 		lua_pushnumber(luastate, i + 1);
-		lua_pushnumber(luastate, array[i]);
+		lua_pushnumber(luastate, values[i]);
 		lua_settable(luastate, -3);
 	}
 	arguments++;

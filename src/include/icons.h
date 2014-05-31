@@ -116,7 +116,7 @@ public:
 	void Load();
 
 	/// Draw icon
-	virtual void DrawIcon(const PixelPos &pos, const int player = -1) const;
+	void DrawIcon(const PixelPos &pos, const int player = -1) const;
 	/// Draw grayscale icon
 	void DrawGrayscaleIcon(const PixelPos &pos, const int player = -1) const;
 	/// Draw cooldown spell

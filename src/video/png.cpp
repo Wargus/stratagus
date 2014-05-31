@@ -426,9 +426,8 @@ void SaveMapPNG(const char *name)
 		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT);
 
-	png_write_info(png_ptr, info_ptr);	
+	png_write_info(png_ptr, info_ptr);
 
-	const SDL_PixelFormat *fmt = Map.TileGraphic->Surface->format;
 	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
 

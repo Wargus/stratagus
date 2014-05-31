@@ -2139,8 +2139,6 @@ void DrawPieMenu()
 									CursorStartScreenPos.x - UI.PieMenu.G->Width / 2,
 									CursorStartScreenPos.y - UI.PieMenu.G->Height / 2);
 	}
-	CPlayer &player = *Selected[0]->Player;
-
 	for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size() && i < 9; ++i) {
 		if (buttons[i].Pos != -1) {
 			int x = CursorStartScreenPos.x - ICON_SIZE_X / 2 + UI.PieMenu.X[i];
