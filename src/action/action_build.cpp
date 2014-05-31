@@ -142,7 +142,7 @@ enum {
 
 /* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
-	PixelPos targetPos = vp.TilePosToScreen_TopLeft(this->goalPos);
+	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
 	targetPos.y += (this->GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
 
