@@ -645,7 +645,6 @@ static void HandleMouseOn(const PixelPos screenPos)
 	MouseScrollState = ScrollNone;
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
-	OldButtonUnderCursor = -1;
 
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
