@@ -174,7 +174,7 @@ public:
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
 	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
-		Combat(0), Attacker(0), PositionAutoCast(NULL) {};
+		Combat(0), Attacker(0), Corpse(0), PositionAutoCast(NULL) {};
 	~AutoCastInfo()
 	{
 		delete Condition;
@@ -193,6 +193,7 @@ public:
 	/// Combat mode is when there are hostile non-coward units around
 	int Combat;                  /// If it should be casted in combat
 	int Attacker;                /// If it should be casted on unit which attacks
+	int Corpse;                  /// If it should be casted on corpses
 
 	// Position autocast callback
 	LuaCallback *PositionAutoCast;

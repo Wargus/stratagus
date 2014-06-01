@@ -299,6 +299,16 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			if (autocast->PositionAutoCast && table.empty() == false) {
 				size_t count = 0;
 				for (size_t i = 0; i != table.size(); ++i) {
+					// Check for corpse
+					if (autocast->Corpse == CONDITION_ONLY) {
+						if (table[i]->CurrentAction() != UnitActionDie) {
+							continue;
+						}
+					} else if (autocast->Corpse == CONDITION_FALSE) {
+						if (table[i]->CurrentAction() == UnitActionDie) {
+							continue;
+						}
+					}
 					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
 						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
 							table[count++] = table[i];
@@ -340,6 +350,16 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						 && table[i]->CurrentAction() != UnitActionSpellCast)
 						|| table[i]->CurrentOrder()->HasGoal() == false
 						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
+						continue;
+					}
+				}
+				// Check for corpse
+				if (autocast->Corpse == CONDITION_ONLY) {
+					if (table[i]->CurrentAction() != UnitActionDie) {
+						continue;
+					}
+				} else if (autocast->Corpse == CONDITION_FALSE) {
+					if (table[i]->CurrentAction() == UnitActionDie) {
 						continue;
 					}
 				}
