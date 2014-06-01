@@ -349,8 +349,10 @@ class ImageRadioButton : public RadioButton
 
 	void setUncheckedNormalImage(CGraphic *image);
 	void setUncheckedPressedImage(CGraphic *image);
+	void setUncheckedDisabledImage(CGraphic *image);
 	void setCheckedNormalImage(CGraphic *image);
 	void setCheckedPressedImage(CGraphic *image);
+	void setCheckedDisabledImage(CGraphic *image);
 };
 
 class CheckBox : public Widget
@@ -372,8 +374,10 @@ class ImageCheckBox : public CheckBox
 
 	void setUncheckedNormalImage(CGraphic *image);
 	void setUncheckedPressedImage(CGraphic *image);
+	void setUncheckedDisabledImage(CGraphic *image);
 	void setCheckedNormalImage(CGraphic *image);
 	void setCheckedPressedImage(CGraphic *image);
+	void setCheckedDisabledImage(CGraphic *image);
 };
 
 class Slider : public Widget
@@ -402,7 +406,9 @@ class ImageSlider : public Slider
 	ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 	void setMarkerImage(CGraphic *image);
+	void setDisabledMarkerImage(CGraphic *image);
 	void setBackgroundImage(CGraphic *image);
+	void setDisabledBackgroundImage(CGraphic *image);
 };
 
 class Label : public Widget

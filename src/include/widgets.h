@@ -125,13 +125,17 @@ public:
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
+	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
 	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
 	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
+	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
 
 	gcn::Image *uncheckedNormalImage;
 	gcn::Image *uncheckedPressedImage;
+	gcn::Image *uncheckedDisabledImage;
 	gcn::Image *checkedNormalImage;
 	gcn::Image *checkedPressedImage;
+	gcn::Image *checkedDisabledImage;
 	bool mMouseDown;
 };
 
@@ -151,13 +155,17 @@ public:
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
+	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
 	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
 	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
+	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
 
 	gcn::Image *uncheckedNormalImage;
 	gcn::Image *uncheckedPressedImage;
+	gcn::Image *uncheckedDisabledImage;
 	gcn::Image *checkedNormalImage;
 	gcn::Image *checkedPressedImage;
+	gcn::Image *checkedDisabledImage;
 	bool mMouseDown;
 };
 
@@ -171,10 +179,14 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 
 	void setMarkerImage(gcn::Image *image);
+	void setDisabledMarkerImage(gcn::Image *image);
 	void setBackgroundImage(gcn::Image *image);
+	void setDisabledBackgroundImage(gcn::Image *image);
 
 	gcn::Image *markerImage;
 	gcn::Image *backgroundImage;
+	gcn::Image *disabledMarkerImage;
+	gcn::Image *disabledBackgroundImage;
 };
 
 class MultiLineLabel : public gcn::Widget

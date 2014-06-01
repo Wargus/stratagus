@@ -431,8 +431,8 @@ void ImageButton::adjustSize()
 **  ImageRadioButton constructor
 */
 ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
-	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
-	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL), uncheckedDisabledImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL), checkedDisabledImage(NULL),
 	mMouseDown(false)
 {
 }
@@ -443,8 +443,8 @@ ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
 ImageRadioButton::ImageRadioButton(const std::string &caption,
 								   const std::string &group, bool marked) :
 	gcn::RadioButton(caption, group, marked),
-	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
-	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL), uncheckedDisabledImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL), checkedDisabledImage(NULL),
 	mMouseDown(false)
 {
 }
@@ -457,13 +457,17 @@ void ImageRadioButton::drawBox(gcn::Graphics *graphics)
 	gcn::Image *img = NULL;
 
 	if (isMarked()) {
-		if (mMouseDown) {
+		if (isEnabled() == false) {
+			img = checkedDisabledImage;
+		} else if (mMouseDown) {
 			img = checkedPressedImage;
 		} else {
 			img = checkedNormalImage;
 		}
 	} else {
-		if (mMouseDown) {
+		if (isEnabled() == false) {
+			img = uncheckedDisabledImage;
+		} else if (mMouseDown) {
 			img = uncheckedPressedImage;
 		} else {
 			img = uncheckedNormalImage;
@@ -566,8 +570,8 @@ void ImageRadioButton::adjustSize()
 **  Image checkbox constructor
 */
 ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
-	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
-	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL), uncheckedDisabledImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL), checkedDisabledImage(NULL),
 	mMouseDown(false)
 {
 }
@@ -577,8 +581,8 @@ ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
 */
 ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
 	gcn::CheckBox(caption, marked),
-	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL),
-	checkedNormalImage(NULL), checkedPressedImage(NULL),
+	uncheckedNormalImage(NULL), uncheckedPressedImage(NULL), uncheckedDisabledImage(NULL),
+	checkedNormalImage(NULL), checkedPressedImage(NULL), checkedDisabledImage(NULL),
 	mMouseDown(false)
 {
 }
@@ -617,13 +621,17 @@ void ImageCheckBox::drawBox(gcn::Graphics *graphics)
 	gcn::Image *img = NULL;
 
 	if (mMarked) {
-		if (mMouseDown) {
+		if (isEnabled() == false) {
+			img = checkedDisabledImage;
+		} else if (mMouseDown) {
 			img = checkedPressedImage;
 		} else {
 			img = checkedNormalImage;
 		}
 	} else {
-		if (mMouseDown) {
+		if (isEnabled() == false) {
+			img = uncheckedDisabledImage;
+		} else if (mMouseDown) {
 			img = uncheckedPressedImage;
 		} else {
 			img = uncheckedNormalImage;
@@ -699,7 +707,7 @@ void ImageCheckBox::adjustSize()
 **  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleEnd) :
-	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL)
+	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledMarkerImage(NULL), disabledBackgroundImage(NULL)
 {
 }
 
@@ -707,7 +715,7 @@ ImageSlider::ImageSlider(double scaleEnd) :
 **  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
-	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL)
+	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledMarkerImage(NULL), disabledBackgroundImage(NULL)
 {
 }
 
@@ -716,15 +724,23 @@ ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
 */
 void ImageSlider::drawMarker(gcn::Graphics *graphics)
 {
-	if (markerImage) {
+	gcn::Image *img = NULL;
+
+	if (isEnabled()) {
+		img = markerImage;
+	} else {
+		img = disabledMarkerImage;
+	}
+
+	if (img) {
 		if (getOrientation() == HORIZONTAL) {
 			int v = getMarkerPosition();
-			graphics->drawImage(markerImage, 0, 0, v, 0,
-								markerImage->getWidth(), markerImage->getHeight());
+			graphics->drawImage(img, 0, 0, v, 0,
+								img->getWidth(), img->getHeight());
 		} else {
 			int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
-			graphics->drawImage(markerImage, 0, 0, 0, v,
-								markerImage->getWidth(), markerImage->getHeight());
+			graphics->drawImage(img, 0, 0, 0, v,
+								img->getWidth(), img->getHeight());
 		}
 	} else {
 		Slider::drawMarker(graphics);
@@ -736,9 +752,16 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics)
 */
 void ImageSlider::draw(gcn::Graphics *graphics)
 {
-	if (backgroundImage) {
-		graphics->drawImage(backgroundImage, 0, 0, 0, 0,
-							backgroundImage->getWidth(), backgroundImage->getHeight());
+	gcn::Image *img = NULL;
+
+	if (isEnabled()) {
+		img = backgroundImage;
+	} else {
+		img = disabledBackgroundImage;
+	}
+
+	if (img) {
+		graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 		drawMarker(graphics);
 	} else {
 		Slider::draw(graphics);
@@ -755,11 +778,28 @@ void ImageSlider::setMarkerImage(gcn::Image *image)
 }
 
 /**
+**  Set the disabled marker image
+*/
+void ImageSlider::setDisabledMarkerImage(gcn::Image *image)
+{
+	disabledMarkerImage = image;
+	setMarkerLength(image->getWidth());
+}
+
+/**
 **  Set the background image
 */
 void ImageSlider::setBackgroundImage(gcn::Image *image)
 {
 	backgroundImage = image;
+}
+
+/**
+**  Set the disabled background image
+*/
+void ImageSlider::setDisabledBackgroundImage(gcn::Image *image)
+{
+	disabledBackgroundImage = image;
 }
 
 
