@@ -443,7 +443,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 
 static const CAnimation *Advance(const CAnimation *anim, int n)
 {
-	for (int i = 0; i != n; ++i) {
+	for (int i = 0; i < n; ++i) {
 		anim = anim->Next;
 	}
 	return anim;
