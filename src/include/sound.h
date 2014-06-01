@@ -163,6 +163,8 @@ extern int DistanceSilent;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/// Calculates volume level
+extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
 /// Play a unit sound

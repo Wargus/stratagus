@@ -529,7 +529,11 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 		//
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
-		PlayGameSound(spell.SoundWhenCast.Sound, MaxSampleVolume);
+		if (spell.Target == TargetSelf) {
+			PlayUnitSound(caster, spell.SoundWhenCast.Sound);
+		} else {
+			PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(goalPos), spell.SoundWhenCast.Sound->Range));
+		}
 		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
 			 act != spell.Action.end(); ++act) {
 			if ((*act)->ModifyManaCaster) {

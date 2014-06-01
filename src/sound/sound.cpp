@@ -217,7 +217,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 **
 **  @return       volume for given distance (0..??)
 */
-static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
+unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 {
 	// FIXME: THIS IS SLOW!!!!!!!
 	if (d <= ViewPointOffset || range == INFINITE_SOUND_RANGE) {
@@ -242,7 +242,7 @@ static unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 **  Calculate the volume associated with a request, either by clipping the
 **  range parameter of this request, or by mapping this range to a volume.
 */
-static unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
+unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
 {
 	if (isVolume) {
 		return std::min(MaxVolume, power);
