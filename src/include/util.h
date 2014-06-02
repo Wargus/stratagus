@@ -39,9 +39,13 @@
 #endif
 #endif
 
+#include <cstdlib>
+
 /*----------------------------------------------------------------------------
 --  Random
 ----------------------------------------------------------------------------*/
+
+#include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
 

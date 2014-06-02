@@ -1872,8 +1872,8 @@ void UIHandleButtonUp(unsigned button)
 	//
 	if (CursorState == CursorStatePieMenu) {
 		// Little threshold
-		if (1 < std::abs(CursorStartScreenPos.x - CursorScreenPos.x)
-			|| 1 < std::abs(CursorStartScreenPos.y - CursorScreenPos.y)) {
+		if (1 < abs(CursorStartScreenPos.x - CursorScreenPos.x)
+			|| 1 < abs(CursorStartScreenPos.y - CursorScreenPos.y)) {
 			// there was a move, handle the selected button/pie
 			HandlePieMenuMouseSelection();
 		}
