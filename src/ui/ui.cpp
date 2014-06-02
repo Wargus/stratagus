@@ -178,8 +178,8 @@ void InitUserInterface()
 	// Calculations
 	//
 	if (Map.Info.MapWidth) {
-		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, Map.Info.MapWidth * PixelTileSize.x - 1);
-		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, Map.Info.MapHeight * PixelTileSize.y - 1);
+		UI.MapArea.EndX = std::min<int>(UI.MapArea.EndX, UI.MapArea.X + Map.Info.MapWidth * PixelTileSize.x - 1);
+		UI.MapArea.EndY = std::min<int>(UI.MapArea.EndY, UI.MapArea.Y + Map.Info.MapHeight * PixelTileSize.y - 1);
 	}
 
 	UI.SelectedViewport = UI.Viewports;
