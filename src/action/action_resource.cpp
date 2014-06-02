@@ -1086,6 +1086,48 @@ void COrder_Resource::ResourceGiveUp(CUnit &unit)
 }
 
 /**
+**  Try to find another resource before give up
+**
+**  return false if failed, true otherwise.
+*/
+
+bool COrder_Resource::FindAnotherResource(CUnit &unit)
+{
+	if (this->CurrentResource) {
+		const ResourceInfo *resinfo = unit.Type->ResInfo[this->CurrentResource];
+		if (resinfo) {
+			if (!resinfo->TerrainHarvester) {
+				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
+
+				if (newGoal) {
+					CUnit *mine = this->Resource.Mine;
+					if (mine) {
+						unit.DeAssignWorkerFromMine(*mine);
+					}
+					unit.AssignWorkerToMine(*newGoal);
+					this->Resource.Mine = newGoal;
+					this->goalPos.x = -1;
+					this->goalPos.y = -1;
+					this->State = SUB_START_GATHERING;
+					this->SetGoal(newGoal);
+					return true;
+				}
+			} else {
+				Vec2i resPos;
+				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
+					this->goalPos = resPos;
+					this->State = SUB_START_GATHERING;
+					DebugPrint("Found a better place to harvest %d,%d\n" _C_ resPos.x _C_ resPos.y);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+/**
 **  Initialize
 **
 **  return false if action is canceled, true otherwise.
@@ -1172,8 +1214,10 @@ void COrder_Resource::Execute(CUnit &unit)
 
 	// Resource seems to be unreachable
 	if (this->State == SUB_UNREACHABLE_RESOURCE) {
-		ResourceGiveUp(unit);
-		return;
+		if (this->FindAnotherResource(unit) == false) {
+			ResourceGiveUp(unit);
+			return;
+		}
 	}
 
 	// Start gathering the resource

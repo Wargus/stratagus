@@ -81,6 +81,7 @@ private:
 	bool WaitInDepot(CUnit &unit);
 	void DropResource(CUnit &unit);
 	void ResourceGiveUp(CUnit &unit);
+	bool FindAnotherResource(CUnit &unit);
 	bool ActionResourceInit(CUnit &unit);
 private:
 	CUnitPtr worker; /// unit that own this order.
