@@ -2131,7 +2131,9 @@ static std::string ConcatTableString(const std::vector<std::string> &blockTableN
 	}
 	std::string res(blockTableNames[0]);
 	for (size_t i = 1; i != blockTableNames.size(); ++i) {
-		res += ".";
+		if (blockTableNames[i][0] != '[') {
+			res += ".";
+		}
 		res += blockTableNames[i];
 	}
 	return res;
@@ -2240,7 +2242,7 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 	lua_pushnil(l);
 	while (lua_next(l, -2)) {
 		const int type_key = lua_type(l, -2);
-		const std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
+		std::string key = (type_key == LUA_TSTRING) ? lua_tostring(l, -2) : "";
 		if ((key == "_G")
 			|| (is_root && ShouldGlobalTableBeSaved(key) == false)
 			|| (!is_root && ShouldLocalTableBeSaved(key) == false)) {
@@ -2267,6 +2269,11 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 		} else {
 			const int type_value = lua_type(l, -1);
 			if (type_value == LUA_TTABLE) {
+				if (key == "") {
+					lua_pushvalue(l, -2);
+					key = key + "[" + lua_tostring(l, -1) + "]";
+					lua_pop(l, 1);
+				}
 				lua_pushvalue(l, -1);
 				//res += "if (" + lhsLine + " == nil) then " + lhsLine + " = {} end\n";
 				blockTableNames.push_back(key);
