@@ -727,7 +727,7 @@ static void DrawEditorPanel_SelectIcon()
 	unsigned int flag = (ButtonUnderCursor == SelectButton ? IconActive : 0)
 						| (Editor.State == EditorSelecting ? IconSelected : 0);
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 }
 
 static void DrawEditorPanel_UnitsIcon()

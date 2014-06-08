@@ -790,9 +790,13 @@ void CButtonPanel::Draw()
 		} else if (gray) {
 			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
 		} else {
+			int player = -1;
+			if (Selected.empty() == false && Selected[0]->IsAlive()) {
+				player = Selected[0]->Player->Index;
+			}
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf);
+											   pos, buf, player);
 		}
 	}
 	//
