@@ -179,13 +179,11 @@ public:
 	virtual void draw(gcn::Graphics *graphics);
 
 	void setMarkerImage(gcn::Image *image);
-	void setDisabledMarkerImage(gcn::Image *image);
 	void setBackgroundImage(gcn::Image *image);
 	void setDisabledBackgroundImage(gcn::Image *image);
 
 	gcn::Image *markerImage;
 	gcn::Image *backgroundImage;
-	gcn::Image *disabledMarkerImage;
 	gcn::Image *disabledBackgroundImage;
 };
 

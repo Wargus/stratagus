@@ -707,7 +707,7 @@ void ImageCheckBox::adjustSize()
 **  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleEnd) :
-	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledMarkerImage(NULL), disabledBackgroundImage(NULL)
+	Slider(scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledBackgroundImage(NULL)
 {
 }
 
@@ -715,7 +715,7 @@ ImageSlider::ImageSlider(double scaleEnd) :
 **  Image slider constructor
 */
 ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
-	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledMarkerImage(NULL), disabledBackgroundImage(NULL)
+	Slider(scaleStart, scaleEnd), markerImage(NULL), backgroundImage(NULL), disabledBackgroundImage(NULL)
 {
 }
 
@@ -724,26 +724,22 @@ ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
 */
 void ImageSlider::drawMarker(gcn::Graphics *graphics)
 {
-	gcn::Image *img = NULL;
+	gcn::Image *img = markerImage;
 
 	if (isEnabled()) {
-		img = markerImage;
-	} else {
-		img = disabledMarkerImage;
-	}
-
-	if (img) {
-		if (getOrientation() == HORIZONTAL) {
-			int v = getMarkerPosition();
-			graphics->drawImage(img, 0, 0, v, 0,
-								img->getWidth(), img->getHeight());
+		if (img) {
+			if (getOrientation() == HORIZONTAL) {
+				int v = getMarkerPosition();
+				graphics->drawImage(img, 0, 0, v, 0,
+					img->getWidth(), img->getHeight());
+			} else {
+				int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
+				graphics->drawImage(img, 0, 0, 0, v,
+					img->getWidth(), img->getHeight());
+			}
 		} else {
-			int v = (getHeight() - getMarkerLength()) - getMarkerPosition();
-			graphics->drawImage(img, 0, 0, 0, v,
-								img->getWidth(), img->getHeight());
+			Slider::drawMarker(graphics);
 		}
-	} else {
-		Slider::drawMarker(graphics);
 	}
 }
 
@@ -762,7 +758,9 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 
 	if (img) {
 		graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
-		drawMarker(graphics);
+		if (isEnabled()) {
+			drawMarker(graphics);
+		}
 	} else {
 		Slider::draw(graphics);
 	}
@@ -774,15 +772,6 @@ void ImageSlider::draw(gcn::Graphics *graphics)
 void ImageSlider::setMarkerImage(gcn::Image *image)
 {
 	markerImage = image;
-	setMarkerLength(image->getWidth());
-}
-
-/**
-**  Set the disabled marker image
-*/
-void ImageSlider::setDisabledMarkerImage(gcn::Image *image)
-{
-	disabledMarkerImage = image;
 	setMarkerLength(image->getWidth());
 }
 

@@ -406,7 +406,6 @@ class ImageSlider : public Slider
 	ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 	void setMarkerImage(CGraphic *image);
-	void setDisabledMarkerImage(CGraphic *image);
 	void setBackgroundImage(CGraphic *image);
 	void setDisabledBackgroundImage(CGraphic *image);
 };
