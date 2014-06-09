@@ -1108,7 +1108,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 					this->Resource.Mine = newGoal;
 					this->goalPos.x = -1;
 					this->goalPos.y = -1;
-					this->State = SUB_START_GATHERING;
+					this->State = SUB_MOVE_TO_RESOURCE;
 					this->SetGoal(newGoal);
 					return true;
 				}
@@ -1116,7 +1116,7 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 				Vec2i resPos;
 				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
 					this->goalPos = resPos;
-					this->State = SUB_START_GATHERING;
+					this->State = SUB_MOVE_TO_RESOURCE;
 					DebugPrint("Found a better place to harvest %d,%d\n" _C_ resPos.x _C_ resPos.y);
 					return true;
 				}
