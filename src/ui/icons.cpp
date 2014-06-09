@@ -206,8 +206,20 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		Video.DrawRectangle(ColorBlack, pos.x - 3, pos.y - 3, 52, 44);
 		Video.DrawRectangle(ColorBlack, pos.x - 4, pos.y - 4, 54, 46);
 
-		if (flags & IconClicked) {
+		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
+			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
+		}
+
+		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
+			
+			Video.DrawRectangle(ColorGray, pos.x, pos.y, 48, 40);
+			Video.DrawVLine(ColorDarkGray, pos.x - 1, pos.y - 1, 40);
+			Video.DrawHLine(ColorDarkGray, pos.x - 1, pos.y - 1, 49);
+			Video.DrawHLine(ColorDarkGray, pos.x - 1, pos.y + 39, 2);
+
+			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 		} else {
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 		}
