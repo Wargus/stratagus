@@ -357,7 +357,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 									   (IconActive | (MouseButtons & LeftButton)) : 0;
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.Player->Index);
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 		}
 	} else {
 		if (!UI.TrainingText.empty()) {
@@ -374,7 +374,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.Player->Index);
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 				}
 			}
 		}
@@ -407,7 +407,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.Player->Index);
+		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 	}
 }
 
@@ -426,7 +426,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.Player->Index);
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}
 			return true;
 		}
@@ -438,7 +438,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.Player->Index);
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}
 			return true;
 		}
@@ -460,7 +460,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->Player->Index);
+		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -1156,7 +1156,7 @@ static void InfoPanel_draw_multiple_selection()
 		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  pos, "", Selected[i]->Player->Index);
+						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {

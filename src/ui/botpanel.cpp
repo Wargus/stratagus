@@ -792,7 +792,7 @@ void CButtonPanel::Draw()
 		} else {
 			int player = -1;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
-				player = Selected[0]->Player->Index;
+				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
 			}
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
