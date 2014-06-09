@@ -991,7 +991,7 @@ void ToggleShowBuilListMessages()
 --  COSTS
 ----------------------------------------------------------------------------*/
 
-static int Costs[MaxCosts + 2];          /// costs to display in status line
+static int Costs[ManaResCost + 1];          /// costs to display in status line
 
 /**
 **  Draw costs in status line.
@@ -1005,11 +1005,11 @@ void DrawCosts()
 {
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(GetGameFont());
-	if (Costs[MaxCosts + 1]) {
+	if (Costs[ManaResCost]) {
 		UI.Resources[ManaResCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
 
 		x += 20;
-		x += label.Draw(x, UI.StatusLine.TextY, Costs[MaxCosts + 1]);
+		x += label.Draw(x, UI.StatusLine.TextY, Costs[ManaResCost]);
 	}
 
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
@@ -1037,12 +1037,12 @@ void DrawCosts()
 */
 void SetCosts(int mana, int food, const int *costs)
 {
-	Costs[MaxCosts + 1] = mana;
 	if (costs) {
 		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {
 		memset(Costs, 0, sizeof(Costs));
 	}
+	Costs[ManaResCost] = mana;
 	Costs[FoodCost] = food;
 }
 
