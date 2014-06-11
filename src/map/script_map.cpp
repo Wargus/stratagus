@@ -474,6 +474,73 @@ static int CclSetTileFlags(lua_State *l)
 }
 
 /**
+**  Get the name of the terrain of the tile.
+**
+**  @param l  Lua state.
+**
+**  @return   The name of the terrain of the tile.
+*/
+static int CclGetTileTerrainName(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+
+	const CMapField &mf = *Map.Field(pos);
+	const CTileset &tileset = *Map.Tileset;
+	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	Assert(index != -1);
+	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+
+	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
+	return 1;
+}
+
+/**
+**  Check if the tile's terrain has a particular flag.
+**
+**  @param l  Lua state.
+**
+**  @return   True if has the flag, false if not.
+*/
+static int CclGetTileTerrainHasFlag(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+
+	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+
+	unsigned short flag = 0;
+	const char *flag_name = LuaToString(l, 3);
+	if (!strcmp(flag_name, "water")) {
+		flag = MapFieldWaterAllowed;
+	} else if (!strcmp(flag_name, "land")) {
+		flag = MapFieldLandAllowed;
+	} else if (!strcmp(flag_name, "coast")) {
+		flag = MapFieldCoastAllowed;
+	} else if (!strcmp(flag_name, "no-building")) {
+		flag = MapFieldNoBuilding;
+	} else if (!strcmp(flag_name, "unpassable")) {
+		flag = MapFieldUnpassable;
+	} else if (!strcmp(flag_name, "wall")) {
+		flag = MapFieldWall;
+	} else if (!strcmp(flag_name, "rock")) {
+		flag = MapFieldRocks;
+	} else if (!strcmp(flag_name, "forest")) {
+		flag = MapFieldForest;
+	}
+
+	const CMapField &mf = *Map.Field(pos);
+
+	if (mf.getFlag() & flag) {
+		lua_pushboolean(l, 1);
+	} else {
+		lua_pushboolean(l, 0);
+	}
+
+	return 1;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister()
@@ -500,6 +567,9 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
+
+	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
+	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
 }
 
 //@}
