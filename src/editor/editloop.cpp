@@ -573,7 +573,17 @@ static void DrawUnitIcons()
 		}
 		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		const PixelPos pos(x, y);
-		icon.DrawIcon(pos, Players[Editor.SelectedPlayer].Index);
+
+		unsigned int flag = 0;
+		if (i == Editor.CursorUnitIndex) {
+			flag = IconActive;
+			if (MouseButtons & LeftButton) {
+				// Overwrite IconActive.
+				flag = IconClicked;
+			}
+		}
+
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
 
 		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
 		if (i == Editor.SelectedUnitIndex) {
@@ -724,8 +734,14 @@ static void DrawEditorPanel_SelectIcon()
 	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
 	CIcon *icon = Editor.Select.Icon;
 	Assert(icon);
-	unsigned int flag = (ButtonUnderCursor == SelectButton ? IconActive : 0)
-						| (Editor.State == EditorSelecting ? IconSelected : 0);
+	unsigned int flag = 0;
+	if (ButtonUnderCursor == SelectButton) {
+		flag = IconActive;
+		if (MouseButtons & LeftButton) {
+			// Overwrite IconActive.
+			flag = IconClicked;
+		}
+	}
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 }
@@ -735,8 +751,14 @@ static void DrawEditorPanel_UnitsIcon()
 	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
 	CIcon *icon = Editor.Units.Icon;
 	Assert(icon);
-	unsigned int flag = (ButtonUnderCursor == UnitButton ? IconActive : 0)
-						| (Editor.State == EditorEditUnit ? IconSelected : 0);
+	unsigned int flag = 0;
+	if (ButtonUnderCursor == UnitButton) {
+		flag = IconActive;
+		if (MouseButtons & LeftButton) {
+			// Overwrite IconActive.
+			flag = IconClicked;
+		}
+	}
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
 }
@@ -750,8 +772,14 @@ static void DrawEditorPanel_StartIcon()
 		CIcon *icon = Editor.StartUnit->Icon.Icon;
 		Assert(icon);
 		const PixelPos pos(x + START_ICON_X, y + START_ICON_Y);
-		int flag = (ButtonUnderCursor == StartButton ? IconActive : 0)
-				   | (Editor.State == EditorSetStartLocation ? IconSelected : 0);
+		unsigned int flag = 0;
+		if (ButtonUnderCursor == StartButton) {
+			flag = IconActive;
+			if (MouseButtons & LeftButton) {
+				// Overwrite IconActive.
+				flag = IconClicked;
+			}
+		}
 
 		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 	} else {
