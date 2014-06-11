@@ -174,7 +174,7 @@ public:
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
 	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(NULL),
-		Combat(0), Attacker(0), Corpse(0), PositionAutoCast(NULL) {};
+		Combat(0), Attacker(0), Corpse(CONDITION_FALSE), PositionAutoCast(NULL) {};
 	~AutoCastInfo()
 	{
 		delete Condition;

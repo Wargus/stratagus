@@ -305,7 +305,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 							continue;
 						}
 					} else if (autocast->Corpse == CONDITION_FALSE) {
-						if (table[i]->CurrentAction() == UnitActionDie) {
+						if (table[i]->CurrentAction() == UnitActionDie || table[i]->IsAlive() == false) {
 							continue;
 						}
 					}
