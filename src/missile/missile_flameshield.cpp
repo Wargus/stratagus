@@ -55,6 +55,9 @@ void MissileFlameShield::Action()
 	};
 
 	this->Wait = this->Type->Sleep;
+	if (this->NextMissileFrame(1, 0)) {
+		this->SpriteFrame = 0;
+	}
 	const int index = this->TTL % 36;  // 36 positions on the circle
 	const int dx = fs_dc[index * 2];
 	const int dy = fs_dc[index * 2 + 1];
