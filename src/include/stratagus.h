@@ -49,6 +49,11 @@
 #define NOUSER
 #define NOMINMAX // do not use min, max as macro
 
+#if _MSC_VER >= 1800
+// From VS2013 onwards, std::min/max are only defined if algorithm is included
+#include <algorithm>
+#endif
+
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
