@@ -322,7 +322,7 @@ void CTileset::parse(lua_State *l)
 		} else if (!strcmp(value, "image")) {
 			this->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {
-			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.x, j);
+			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.y, j);
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
