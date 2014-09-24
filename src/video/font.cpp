@@ -494,7 +494,7 @@ int CLabel::DoDrawText(int x, int y,
 	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
 	const CFontColor *backup = fc;
-	bool isReverse = false;
+	bool isColor = false;
 	font->DynamicLoad();
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
@@ -520,7 +520,7 @@ int CLabel::DoDrawText(int x, int y,
 				case '<':
 					LastTextColor = fc;
 					if (fc != reverse) {
-						isReverse = true;
+						isColor = true;
 						fc = reverse;
 						g = font->GetFontColorGraphic(*fc);
 					}
@@ -529,7 +529,7 @@ int CLabel::DoDrawText(int x, int y,
 				case '>':
 					if (fc != LastTextColor) {
 						std::swap(fc, LastTextColor);
-						isReverse = false;
+						isColor = false;
 						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
@@ -551,6 +551,7 @@ int CLabel::DoDrawText(int x, int y,
 					LastTextColor = fc;
 					const CFontColor *fc_tmp = CFontColor::Get(color);
 					if (fc_tmp) {
+						isColor = true;
 						fc = fc_tmp;
 						g = font->GetFontColorGraphic(*fc);
 					}
@@ -566,7 +567,7 @@ int CLabel::DoDrawText(int x, int y,
 			widths += font->DrawChar<CLIP>(*g, utf8, x + widths, y, *fc);
 		}
 
-		if (isReverse == false && fc != backup) {
+		if (isColor == false && fc != backup) {
 			fc = backup;
 			g = font->GetFontColorGraphic(*fc);
 		}
