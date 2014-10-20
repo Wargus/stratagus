@@ -82,9 +82,10 @@ enum _play_audio_flags_ {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern CSample *LoadWav(const char *name, int flags);    /// Load a wav file
-extern CSample *LoadVorbis(const char *name, int flags); /// Load a vorbis file
-extern CSample *LoadMikMod(const char *name, int flags); /// Load a module file
+extern CSample *LoadWav(const char *name, int flags);         /// Load a wav file
+extern CSample *LoadVorbis(const char *name, int flags);      /// Load a vorbis file
+extern CSample *LoadMikMod(const char *name, int flags);      /// Load a module file
+extern CSample *LoadFluidSynth(const char *name, int flags);  /// Load a MIDI file
 
 /// Set the channel volume
 extern int SetChannelVolume(int channel, int volume);
@@ -144,6 +145,13 @@ extern bool SoundEnabled();
 extern int InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
+
+#ifdef USE_FLUIDSYNTH
+/// Init FluidSynth library
+extern int InitFluidSynth();
+// Cleans all FluidSynth data
+extern void CleanFluidSynth();
+#endif
 
 //@}
 

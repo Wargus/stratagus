@@ -9,7 +9,7 @@
 #         Stratagus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011-2013  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2011-2014  Pali Rohár <pali.rohar@gmail.com>, cybermind <cybermindid@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -253,6 +253,7 @@ set(pathfinder_SRCS
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(sound_SRCS
+	src/sound/fluidsynth.cpp
 	src/sound/mikmod.cpp
 	src/sound/music.cpp
 	src/sound/ogg.cpp
@@ -647,6 +648,7 @@ if(WIN32)
 endif()
 
 find_package(BZip2)
+find_package(FluidSynth)
 find_package(Mikmod)
 find_package(MNG)
 find_package(OggVorbis)
@@ -687,6 +689,7 @@ endif()
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
+option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
@@ -739,6 +742,12 @@ if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
 	include_directories(${BZIP2_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
+endif()
+
+if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
+	add_definitions(-DUSE_FLUIDSYNTH ${FLUIDSYNTH_DEFINITIONS})
+	include_directories(${FLUIDSYNTH_INCLUDE_DIR})
+	set(stratagus_LIBS ${stratagus_LIBS} ${FLUIDSYNTH_LIBRARY})
 endif()
 
 if(WITH_MIKMOD AND MIKMOD_FOUND)
@@ -1006,6 +1015,7 @@ else()
 endif()
 
 log_package("Bzip2" "BZIP2")
+log_package("FluidSynth" "FLUIDSYNTH")
 log_package("MikMod" "MIKMOD")
 log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")

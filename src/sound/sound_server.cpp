@@ -70,7 +70,7 @@ struct SoundChannel {
 	void (*FinishedCallback)(int channel); /// Callback for when a sample finishes playing
 };
 
-#define MaxChannels 32     /// How many channels are supported
+#define MaxChannels 64     /// How many channels are supported
 
 static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
@@ -509,6 +509,12 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 		return sampleMikMod;
 	}
 #endif
+#ifdef USE_FLUIDSYNTH
+	CSample *sampleFluidSynth = LoadFluidSynth(name, flag);
+	if (sampleFluidSynth) {
+		return sampleFluidSynth;
+	}
+#endif
 	return NULL;
 }
 
@@ -807,6 +813,9 @@ void QuitSound()
 	SoundInitialized = false;
 	delete[] MixerBuffer;
 	MixerBuffer = NULL;
+#ifdef USE_FLUIDSYNTH
+	CleanFluidSynth();
+#endif
 }
 
 //@}

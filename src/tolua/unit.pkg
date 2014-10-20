@@ -31,6 +31,8 @@ class CPreference
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;
 	unsigned int  ShowNameTime;
+
+	std::string SF2Soundfont;
 };
 
 CPreference Preference;

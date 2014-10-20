@@ -1519,6 +1519,7 @@ PREDEFINED             = USE_ZLIB \
                          USE_VORBIS \
                          USE_THEORA \
                          USE_MIKMOD \
+                         USE_FLUIDSYNTH \
                          USE_MNG \
                          USE_OPENGL \
                          USE_GLES \

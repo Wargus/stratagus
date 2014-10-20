@@ -444,6 +444,8 @@ public:
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.
 	int  ShowNameTime;       /// How many cycles need to show unit's name popup.
+
+	std::string SF2Soundfont;/// Path to SF2 soundfont
 };
 
 extern CPreference Preference;

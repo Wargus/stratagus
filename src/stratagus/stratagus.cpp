@@ -314,6 +314,9 @@ static void PrintHeader()
 #ifdef USE_THEORA
 		"THEORA "
 #endif
+#ifdef USE_FLUIDSYNTH
+		"FLUIDSYNTH "
+#endif
 #ifdef USE_MIKMOD
 		"MIKMOD "
 #endif

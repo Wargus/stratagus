@@ -1,5 +1,6 @@
 $using namespace gcn;
 
+#include "font.h"
 
 class LuaActionListener
 {
@@ -584,3 +585,5 @@ void UiFindIdleWorker();
 void CycleViewportMode(int step);
 void UiToggleTerrain();
 void UiTrackUnit();
+
+void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
