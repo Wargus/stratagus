@@ -853,7 +853,39 @@ void AiForce::Update()
 		AiGroupAttackerForTransport(*this);
 		return ;
 	}
+	if (State == AiForceAttackingState_AttackingWithTransporter) {
+		// Move transporters to goalpos
+		std::vector<CUnit *> transporters;
+		bool emptyTrans = true;
+		for (unsigned int i = 0; i != Size(); ++i) {
+			CUnit &aiunit = *Units[i];
 
+			if (aiunit.CanMove() && aiunit.Type->MaxOnBoard) {
+				transporters.push_back(&aiunit);
+				if (aiunit.BoardCount > 0) {
+					emptyTrans = false;
+				}
+			}
+		}
+		if (transporters.empty()) {
+			// Our transporters have been destroyed
+			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
+				_C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+			Reset(true);
+		} else if (emptyTrans) {
+			// We have emptied our transporters, go go go
+			State = AiForceAttackingState_GoingToRallyPoint;
+		} else {
+			for (size_t i = 0; i != transporters.size(); ++i) {
+				CUnit &trans = *transporters[i];
+				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+
+				trans.Wait = delay;
+				CommandUnload(trans, this->GoalPos, NULL, FlushCommands);
+			}
+		}
+		return;
+	}
 	CUnit *leader = NULL;
 	for (unsigned int i = 0; i != Size(); ++i) {
 		CUnit &aiunit = *Units[i];
@@ -905,14 +937,6 @@ void AiForce::Update()
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
 					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
-				} else if (aiunit.Type->CanTransport()) {
-					if (aiunit.BoardCount != 0) {
-						CommandUnload(aiunit, this->GoalPos, NULL, FlushCommands);
-					} else {
-						// FIXME : Retrieve unit blocked (transport previously full)
-						CommandMove(aiunit, aiunit.Player->StartPos, FlushCommands);
-						this->Remove(aiunit);
-					}
 				} else {
 					if (leader) {
 						CommandDefend(aiunit, *leader, FlushCommands);

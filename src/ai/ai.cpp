@@ -833,8 +833,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	AiPlayer = unit.Player->Ai;
 
-	// No more than 1 move per cycle ( avoid stressing the pathfinder )
-	if (GameCycle == AiPlayer->LastCanNotMoveGameCycle) {
+	// No more than 1 move per 3 cycle ( avoid stressing the pathfinder )
+	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 3) {
 		return;
 	}
 
@@ -869,15 +869,11 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		const Vec2i b0 = blocker.tilePos;
 		const Vec2i b1(b0.x + blockertype.TileWidth - 1, b0.y + blockertype.TileHeight - 1);
 
-		// Check for collision
-		if (!((u0.x == b1.x + 1 || u1.x == b0.x - 1)
-			  && (std::max<int>(b0.y, u0.y) <= std::min<int>(b1.y, u1.y)))
-			&& !((u0.y == b1.y + 1 || u1.y == b0.y - 1)
-				 && (std::max<int>(b0.x, u0.x) <= std::min<int>(b1.x, u1.x)))) {
+		if (&unit == &blocker) {
 			continue;
 		}
-
-		if (&unit == &blocker) {
+		// Check for collision
+		if (unit.MapDistanceTo(blocker) >= 2) {
 			continue;
 		}
 
@@ -933,8 +929,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.Player->Ai;
-	if (unit.Type->UnitType == UnitTypeFly
-		|| PlaceReachable(unit, goalPos, gw, gh, minrange, maxrange)) {
+	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 	}
