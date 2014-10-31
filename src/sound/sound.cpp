@@ -305,12 +305,16 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
+	if (volume == 0) {
+		return;
+	}
 
 	int channel = PlaySample(ChooseSample(sound, false, source));
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelVolume(channel, volume);
 	SetChannelStereo(channel, CalculateStereo(unit));
 }
 
@@ -328,12 +332,16 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {NULL, 0};
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
+	if (volume == 0) {
+		return;
+	}
 
 	int channel = PlaySample(ChooseSample(sound, false, source));
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range));
+	SetChannelVolume(channel, volume);
 	SetChannelStereo(channel, stereo);
 }
 
