@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "action/action_built.h"
 #include "font.h"
+#include "translate.h"
 #include "unit.h"
 #include "ui.h"
 #include "video.h"
@@ -147,7 +148,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
 	if (usi1.type == USTRINT_STR) {
-		snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.s);
+		snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s));
 	} else {
 		snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i);
 	}
@@ -182,13 +183,13 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	if (usi1.type == USTRINT_STR) {
 		if (usi2.type == USTRINT_STR) {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.s, usi2.s);
+			snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s), _(usi2.s));
 		} else {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.s, usi2.i);
+			snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s), usi2.i);
 		}
 	} else {
 		if (usi2.type == USTRINT_STR) {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, usi2.s);
+			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, _(usi2.s));
 		} else {
 			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, usi2.i);
 		}
