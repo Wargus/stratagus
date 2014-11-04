@@ -81,7 +81,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 	if (this->Text) {
 		text = EvalString(this->Text);
-		if (this->Centered) {
+		int pos;
+		if ((pos = text.find("~|")) != std::string::npos) {
+			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
+		} else if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
 			x += label.Draw(x, y, text);
@@ -153,7 +156,11 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 		snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i);
 	}
 
-	if (this->Centered) {
+	char *pos;
+	if ((pos = strstr(buf, "~|")) != NULL) {
+		std::string buf2(buf);
+		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
 		label.Draw(this->Pos.x, this->Pos.y, buf);
@@ -194,7 +201,11 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, usi2.i);
 		}
 	}
-	if (this->Centered) {
+	char *pos;
+	if ((pos = strstr(buf, "~|")) != NULL) {
+		std::string buf2(buf);
+		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
 		label.Draw(this->Pos.x, this->Pos.y, buf);

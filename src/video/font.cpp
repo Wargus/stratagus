@@ -359,6 +359,10 @@ int CFont::Width(const std::string &text) const
 	DynamicLoad();
 	while (GetUTF8(text, pos, utf8)) {
 		if (utf8 == '~') {
+			if (text[pos] == '|') {
+				++pos;
+				continue;
+			}
 			if (pos >= text.size()) {  // bad formatted string
 				break;
 			}
@@ -510,6 +514,9 @@ int CLabel::DoDrawText(int x, int y,
 				case '~':
 					++pos;
 					break;
+				case '|':
+					++pos;
+					continue;
 				case '!':
 					if (fc != reverse) {
 						fc = reverse;
