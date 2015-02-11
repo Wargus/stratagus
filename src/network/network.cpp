@@ -178,7 +178,7 @@
 **
 ** @section api API How should it be used.
 **
-** ::InitNetwork1()
+** ::InitNetwork()
 ** Open port. Must be called by Lua
 **
 ** ::ExitNetwork1()
@@ -197,7 +197,7 @@
 ** Network Updates : exec current command, and send commands to other players
 **
 ** ::NetworkFildes
-** UDP Socket for communication.
+** TCP Socket for communication.
 **
 ** ::NetworkInSync
 ** false when commands of the next gameNetCycle of the other player are not ready.
@@ -290,17 +290,10 @@ void CNetworkParameter::FixValues()
 	NetworkLag = std::max(NetworkLag, 2u * gameCyclesPerUpdate);
 }
 
+bool NetworkIsServer = true;               
 bool NetworkInSync = true;                 /// Network is in sync
 
-CUDPSocket NetworkFildes;                  /// Network file descriptor
-
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
-
-static int NetworkSyncSeeds[256];          /// Network sync seeds.
-static int NetworkSyncHashs[256];          /// Network sync hashs.
-static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
-static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
-static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
 
 #ifdef DEBUG
 class CNetworkStat
@@ -387,25 +380,49 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 //  API init..
 //----------------------------------------------------------------------------
 
-/**
-**  Initialize network port.
-*/
-void InitNetwork1()
+static void InitNetwork()
 {
 	CNetworkParameter::Instance.FixValues();
 
 	NetInit(); // machine dependent setup
 
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i].Clear();
+	}
+	ServerSetupState.Clear();
+	LocalSetupState.Clear();	
+}
+
+/**
+**  Initialize network port.
+*/
+void NetworkInitServer(int playerSlots)
+{
+	InitNetwork();
+
 	// Our communication port
 	const int port = CNetworkParameter::Instance.localPort;
 	const char *NetworkAddr = NULL; // FIXME : bad use
 	const CHost host(NetworkAddr, port);
-	NetworkFildes.Open(host);
-	if (NetworkFildes.IsValid() == false) {
-		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
+
+	Server.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState);
+	Server.serverSocket.SetNonBlocking();
+	if (NetworkFildes.Listen() == false) {
+		fprintf(stderr, "NETWORK: Failed to open socket for listening\n");
+		NetworkFildes.Close();
 		NetExit(); // machine dependent network exit
 		return;
 	}
+	Server.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState);
+	// preset the server (initially always slot 0)
+	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
+	for (int i = playerSlots; i < PlayerMax - 1; ++i) {
+		ServerSetupState.CompOpt[i] = 1;
+	}
+	} else {
+		Client.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState, &LocalSetupState, GetTicks());
+	}
+	
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
 	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
@@ -833,6 +850,7 @@ void NetworkEvent()
 		NetworkInSync = true;
 		return;
 	}
+	if ()
 	// Read the packet.
 	unsigned char buf[1024];
 	CHost host;

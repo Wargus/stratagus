@@ -39,49 +39,12 @@ class CHost;
 --  Defines
 ----------------------------------------------------------------------------*/
 
-/// Network protocol major version
-#define NetworkProtocolMajorVersion StratagusMajorVersion
-/// Network protocol minor version (maximal 99)
-#define NetworkProtocolMinorVersion StratagusMinorVersion
-/// Network protocol patch level (maximal 99)
-#define NetworkProtocolPatchLevel   StratagusPatchLevel
-/// Network protocol version (1,2,3) -> 10203
-#define NetworkProtocolVersion \
-	(NetworkProtocolMajorVersion * 10000 + NetworkProtocolMinorVersion * 100 + \
-	 NetworkProtocolPatchLevel)
-
-/// Network protocol printf format string
-#define NetworkProtocolFormatString "%d.%d.%d"
-/// Network protocol printf format arguments
-#define NetworkProtocolFormatArgs(v) (v) / 10000, ((v) / 100) % 100, (v) % 100
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-/**
-**  Network Client connect states
-*/
-enum _net_client_con_state_ {
-	ccs_unused = 0,           /// Unused.
-	ccs_connecting,           /// New client
-	ccs_connected,            /// Has received slot info
-	ccs_mapinfo,              /// Has received matching map-info
-	ccs_badmap,               /// Has received non-matching map-info
-	ccs_synced,               /// Client is in sync with server
-	ccs_async,                /// Server user has changed selection
-	ccs_changed,              /// Client user has made menu selection
-	ccs_detaching,            /// Client user wants to detach
-	ccs_disconnected,         /// Client has detached
-	ccs_unreachable,          /// Server is unreachable
-	ccs_usercanceled,         /// Connection canceled by user
-	ccs_nofreeslots,          /// Server has no more free slots
-	ccs_serverquits,          /// Server quits
-	ccs_goahead,              /// Server wants to start game
-	ccs_started,              /// Server has started game
-	ccs_incompatibleengine,   /// Incompatible engine version
-	ccs_incompatiblenetwork   /// Incompatible netowrk version
-};
+
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -96,8 +59,8 @@ extern int NetConnectRunning;              /// Network menu: Setup mode active
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
-extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
-extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
+extern CNetworkSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
+extern CNetworkSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -117,6 +80,52 @@ extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client reque
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
+
+/**
+** Send an InitConfig message across the Network
+**
+** @param host Host to send to (network byte order).
+** @param port Port of host to send to (network byte order).
+** @param msg The message to send
+*/
+template <typename T>
+void NetworkSendICMessage(CTCPSocket &socket, const T &msg)
+{
+	const unsigned char *buf = msg.Serialize();
+	socket.Send(buf, msg.Size());
+	delete[] buf;
+}
+
+void NetworkSendICMessage(CTCPSocket &socket, const CInitMessage_Header &msg)
+{
+	unsigned char *buf = new unsigned char [msg.Size()];
+	msg.Serialize(buf);
+	socket.Send(buf, msg.Size());
+	delete[] buf;
+}
+
+template <typename T>
+void NetworkSendICMessage_Log(CTCPSocket &socket, const T &msg)
+{
+	NetworkSendICMessage(socket, msg);
+
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
+		_C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
+#endif
+}
+
+static void NetworkSendICMessage_Log(CTCPSocket &socket, const CInitMessage_Header &msg)
+{
+	NetworkSendICMessage(socket, msg);
+
+#ifdef DEBUG
+	const std::string hostStr = host.toString();
+	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
+		_C_ icmsgsubtypenames[msg.GetSubType()]);
+#endif
+}
 
 //@}
 

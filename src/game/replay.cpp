@@ -143,7 +143,6 @@ public:
 	int GameType;
 	int Opponents;
 	int Engine[3];
-	int Network[3];
 	LogEntry *Commands;
 };
 
@@ -221,9 +220,6 @@ static FullReplay *StartReplay()
 	replay->Engine[1] = StratagusMinorVersion;
 	replay->Engine[2] = StratagusPatchLevel;
 
-	replay->Network[0] = NetworkProtocolMajorVersion;
-	replay->Network[1] = NetworkProtocolMinorVersion;
-	replay->Network[2] = NetworkProtocolPatchLevel;
 	return replay;
 }
 

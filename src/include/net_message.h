@@ -42,7 +42,7 @@
  * Number of bytes in the name of a network player,
  * including the terminating null character.
  */
-#define NetPlayerNameSize 16
+#define NetPlayerNameSize 64
 
 #define MaxNetworkCommands 9  /// Max Commands In A Packet
 
@@ -69,17 +69,17 @@ public:
 /**
 **  Multiplayer game setup menu state
 */
-class CServerSetup
+class CNetworkSetup
 {
 public:
-	CServerSetup() { Clear(); }
+	CNetworkSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
 	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
 	void Clear();
 
-	bool operator == (const CServerSetup &rhs) const;
-	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
+	bool operator == (const CNetworkSetup &rhs) const;
+	bool operator != (const CNetworkSetup &rhs) const { return !(*this == rhs); }
 public:
 	uint8_t ResourcesOption;       /// Resources option
 	uint8_t UnitsOption;           /// Unit # option
@@ -105,8 +105,6 @@ enum _ic_message_subtype_ {
 	ICMConfig,              /// Setup message configure clients
 
 	ICMEngineMismatch,      /// Stratagus engine version doesn't match
-	ICMProtocolMismatch,    /// Network protocol version doesn't match
-	ICMEngineConfMismatch,  /// UNUSED:Engine configuration isn't identical
 	ICMMapUidMismatch,      /// MAP UID doesn't match
 
 	ICMGameFull,            /// No player slots available
@@ -160,8 +158,7 @@ private:
 	CInitMessage_Header header;
 public:
 	char PlyName[NetPlayerNameSize];  /// Name of player
-	int32_t Stratagus;  /// Stratagus engine version
-	int32_t Version;    /// Network protocol version
+	int32_t StratagusVer;  /// Stratagus engine version
 };
 
 class CInitMessage_Config
@@ -192,20 +189,6 @@ private:
 	CInitMessage_Header header;
 public:
 	int32_t Stratagus;  /// Stratagus engine version
-};
-
-class CInitMessage_ProtocolMismatch
-{
-public:
-	CInitMessage_ProtocolMismatch();
-	const CInitMessage_Header &GetHeader() const { return header; }
-	const unsigned char *Serialize() const;
-	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + 4; }
-private:
-	CInitMessage_Header header;
-public:
-	int32_t Version;  /// Network protocol version
 };
 
 class CInitMessage_Welcome
@@ -244,15 +227,15 @@ class CInitMessage_State
 {
 public:
 	CInitMessage_State() {}
-	CInitMessage_State(int type, const CServerSetup &data);
+	CInitMessage_State(int type, const CNetworkSetup &data);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + CServerSetup::Size(); }
+	static size_t Size() { return CInitMessage_Header::Size() + CNetworkSetup::Size(); }
 private:
 	CInitMessage_Header header;
 public:
-	CServerSetup State;  /// Server Setup State information
+	CNetworkSetup State;  /// Server Setup State information
 };
 
 class CInitMessage_Resync

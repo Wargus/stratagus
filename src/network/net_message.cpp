@@ -214,10 +214,10 @@ void CNetworkHost::SetName(const char *name)
 }
 
 //
-// CServerSetup
+// CNetworkSetup
 //
 
-size_t CServerSetup::Serialize(unsigned char *buf) const
+size_t CNetworkSetup::Serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
 
@@ -243,7 +243,7 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	return p - buf;
 }
 
-size_t CServerSetup::Deserialize(const unsigned char *p)
+size_t CNetworkSetup::Deserialize(const unsigned char *p)
 {
 	const unsigned char *buf = p;
 	p += deserialize8(p, &this->ResourcesOption);
@@ -268,7 +268,7 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	return p - buf;
 }
 
-void CServerSetup::Clear()
+void CNetworkSetup::Clear()
 {
 	ResourcesOption = 0;
 	UnitsOption = 0;
@@ -285,7 +285,7 @@ void CServerSetup::Clear()
 	memset(Race, 0, sizeof(Race));
 }
 
-bool CServerSetup::operator == (const CServerSetup &rhs) const
+bool CNetworkSetup::operator == (const CNetworkSetup &rhs) const
 {
 	return (ResourcesOption == rhs.ResourcesOption
 			&& UnitsOption == rhs.UnitsOption
@@ -330,8 +330,7 @@ CInitMessage_Hello::CInitMessage_Hello(const char *name) :
 	header(MessageInit_FromClient, ICMHello)
 {
 	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
-	this->Stratagus = StratagusVersion;
-	this->Version = NetworkProtocolVersion;
+	this->StratagusVer = StratagusVersion;
 }
 
 const unsigned char *CInitMessage_Hello::Serialize() const
@@ -341,7 +340,7 @@ const unsigned char *CInitMessage_Hello::Serialize() const
 
 	p += header.Serialize(p);
 	p += serialize(p, this->PlyName);
-	p += serialize32(p, this->Stratagus);
+	p += serialize32(p, this->StratagusVer);
 	p += serialize32(p, this->Version);
 	return buf;
 }
@@ -350,7 +349,7 @@ void CInitMessage_Hello::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
 	p += deserialize(p, this->PlyName);
-	p += deserialize32(p, &this->Stratagus);
+	p += deserialize32(p, &this->StratagusVer);
 	p += deserialize32(p, &this->Version);
 }
 
@@ -411,32 +410,6 @@ void CInitMessage_EngineMismatch::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
 	p += deserialize32(p, &this->Stratagus);
-}
-
-//
-// CInitMessage_ProtocolMismatch
-//
-
-CInitMessage_ProtocolMismatch::CInitMessage_ProtocolMismatch() :
-	header(MessageInit_FromServer, ICMProtocolMismatch)
-{
-	this->Version = NetworkProtocolVersion;
-}
-
-const unsigned char *CInitMessage_ProtocolMismatch::Serialize() const
-{
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
-
-	p += header.Serialize(p);
-	p += serialize32(p, this->Version);
-	return buf;
-}
-
-void CInitMessage_ProtocolMismatch::Deserialize(const unsigned char *p)
-{
-	p += header.Deserialize(p);
-	p += deserialize32(p, &this->Version);
 }
 
 //
@@ -507,7 +480,7 @@ void CInitMessage_Map::Deserialize(const unsigned char *p)
 // CInitMessage_State
 //
 
-CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
+CInitMessage_State::CInitMessage_State(int type, const CNetworkSetup &data) :
 	header(type, ICMState),
 	State(data)
 {

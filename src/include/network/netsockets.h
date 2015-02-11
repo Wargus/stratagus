@@ -106,6 +106,8 @@ public:
 	bool Open(const CHost &host);
 	void Close();
 	bool Connect(const CHost &host);
+	bool Listen();
+	bool Accept(CHost *hostFrom);
 	int Send(const void *buf, unsigned int len);
 	int Recv(void *buf, int len);
 	void SetNonBlocking();

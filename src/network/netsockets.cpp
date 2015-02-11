@@ -187,6 +187,8 @@ public:
 	bool Open(const CHost &host);
 	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
 	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }
+	bool Listen() { return NetListenTCP(socket) != -1; }
+	bool Accept(CHost *hostFrom) { return (socket = NetAcceptTCP(socket, hostFrom->ip, hostFrom->port)) != (Socket)-1; }
 	int Send(const void *buf, unsigned int len) { return NetSendTCP(socket, buf, len); }
 	int Recv(void *buf, int len)
 	{
@@ -237,6 +239,16 @@ void CTCPSocket::Close()
 bool CTCPSocket::Connect(const CHost &host)
 {
 	return m_impl->Connect(host);
+}
+
+bool CTCPSocket::Listen()
+{
+	return m_impl->Listen();
+}
+
+bool CTCPSocket::Accept(CHost *hostFrom)
+{
+	return m_impl->Accept(hostFrom);
 }
 
 int CTCPSocket::Send(const void *buf, unsigned int len)
