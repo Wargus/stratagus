@@ -71,13 +71,13 @@
 
 /* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
 {
-	file.printf("{\"action-research\"");
+	file.printf("{\"action-research\",");
 
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
 	if (this->Upgrade) {
-		file.printf(", \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
+		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
 	}
 	file.printf("}");
 }
