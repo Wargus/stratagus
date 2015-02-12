@@ -1182,14 +1182,10 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor && Selected.empty()) {
-		InfoPanel_draw_single_selection(UnitUnderCursor);
-	} else {
-		switch (Selected.size()) {
-			case 0: { InfoPanel_draw_no_selection(); break; }
-			case 1: { InfoPanel_draw_single_selection(NULL); break; }
-			default: { InfoPanel_draw_multiple_selection(); break; }
-		}
+	switch (Selected.size()) {
+		case 0: { InfoPanel_draw_no_selection(); break; }
+		case 1: { InfoPanel_draw_single_selection(NULL); break; }
+		default: { InfoPanel_draw_multiple_selection(); break; }
 	}
 }
 
