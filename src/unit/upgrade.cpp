@@ -59,7 +59,6 @@
 ----------------------------------------------------------------------------*/
 
 static void AllowUnitId(CPlayer &player, int id, int units);
-static void AllowUpgradeId(CPlayer &player, int id, char af);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -314,6 +313,8 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = UnitTypeByIdent(value);
+		} else if (!strcmp(key, "research-speed")) {
+			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
@@ -622,6 +623,135 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 }
 
 /**
+**  Remove the modifiers of an upgrade.
+**
+**  This function will unmark upgrade as done and undo all required modifications
+**  to unit types and will modify allow/forbid maps back
+**
+**  @param player  Player that get all the upgrades.
+**  @param um      Upgrade modifier that do the effects
+*/
+static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	int pn = player.Index;
+
+	if (um->SpeedResearch != 0) {
+		player.SpeedResearch -= um->SpeedResearch;
+	}
+
+	for (int z = 0; z < UpgradeMax; ++z) {
+		// allow/forbid upgrades for player.  only if upgrade is not acquired
+
+		// FIXME: check if modify is allowed
+
+		if (player.Allow.Upgrades[z] != 'R') {
+			if (um->ChangeUpgrades[z] == 'A') {
+				player.Allow.Upgrades[z] = 'F';
+			}
+			if (um->ChangeUpgrades[z] == 'F') {
+				player.Allow.Upgrades[z] = 'A';
+			}
+			// we can even have upgrade acquired w/o costs
+			if (um->ChangeUpgrades[z] == 'R') {
+				player.Allow.Upgrades[z] = 'A';
+			}
+		}
+	}
+
+	for (size_t z = 0; z < UnitTypes.size(); ++z) {
+		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+		// add/remove allowed units
+
+		// FIXME: check if modify is allowed
+
+		player.Allow.Units[z] -= um->ChangeUnits[z];
+
+		Assert(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X');
+
+		// this modifier should be applied to unittype id == z
+		if (um->ApplyTo[z] == 'X') {
+
+			// If Sight range is upgraded, we need to change EVERY unit
+			// to the new range, otherwise the counters get confused.
+			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && !unit.Removed) {
+						MapUnmarkUnitSight(unit);
+						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
+							um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+						MapMarkUnitSight(unit);
+					}
+				}
+			}
+			// upgrade costs :)
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				stat.Costs[j] -= um->Modifier.Costs[j];
+				stat.Storing[j] -= um->Modifier.Storing[j];
+			}
+
+			int varModified = 0;
+			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+				varModified |= um->Modifier.Variables[j].Value
+					| um->Modifier.Variables[j].Max
+					| um->Modifier.Variables[j].Increase
+					| um->Modifier.Variables[j].Enable
+					| um->ModifyPercent[j];
+				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
+				if (um->ModifyPercent[j]) {
+					stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um->ModifyPercent[j]);
+					stat.Variables[j].Max = stat.Variables[j].Max * 100 / (100 + um->ModifyPercent[j]);
+				} else {
+					stat.Variables[j].Value -= um->Modifier.Variables[j].Value;
+					stat.Variables[j].Max -= um->Modifier.Variables[j].Max;
+					stat.Variables[j].Increase -= um->Modifier.Variables[j].Increase;
+				}
+
+				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
+				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+			}
+
+			// And now modify ingame units
+			if (varModified) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+
+					if (unit.Player->Index != player.Index) {
+						continue;
+					}
+					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+						if (um->ModifyPercent[j]) {
+							unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+							unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
+						} else {
+							unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+							unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
+						}
+
+						unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
+						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+
+						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+					}
+				}
+			}
+			if (um->ConvertTo) {
+				ConvertUnitTypeTo(player, *um->ConvertTo, *UnitTypes[z]);
+			}
+		}
+	}
+}
+
+/**
 **  Handle that an upgrade was acquired.
 **
 **  @param player   Player researching the upgrade.
@@ -647,20 +777,23 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 }
 
-#if 0 // UpgradeLost not implemented.
-/**
-**  for now it will be empty?
-**  perhaps acquired upgrade can be lost if (for example) a building is lost
-**  (lumber mill? stronghold?)
-**  this function will apply all modifiers in reverse way
-*/
-void UpgradeLost(Player &player, int id)
+void UpgradeLost(CPlayer &player, int id)
 {
 	player.UpgradeTimers.Upgrades[id] = 0;
-	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
-	// FIXME: here we should reverse apply upgrade...
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			RemoveUpgradeModifier(player, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (&player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
 }
-#endif
 
 /*----------------------------------------------------------------------------
 --  Allow(s)
@@ -687,7 +820,7 @@ static void AllowUnitId(CPlayer &player, int id, int units)
 **  @param id      upgrade id
 **  @param af      `A'llow/`F'orbid/`R'eseached
 */
-static void AllowUpgradeId(CPlayer &player, int id, char af)
+void AllowUpgradeId(CPlayer &player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player.Allow.Upgrades[id] = af;

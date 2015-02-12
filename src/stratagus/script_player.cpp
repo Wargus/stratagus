@@ -842,6 +842,23 @@ static int CclSetPlayerData(lua_State *l)
 		p->SpeedUpgrade = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedResearch")) {
 		p->SpeedResearch = LuaToNumber(l, 3);
+	} else if (!strcmp(data, "Allow")) {
+		LuaCheckArgs(l, 4);
+		const char *ident = LuaToString(l, 3);
+		const std::string acquire = LuaToString(l, 4);
+
+		if (!strncmp(ident, "upgrade-", 8)) {
+			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
+				UpgradeAcquire(*p, CUpgrade::Get(ident));
+			} else if (acquire == "F" || acquire == "A") {
+				if (UpgradeIdentAllowed(*p, ident) == 'R') {
+					UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+				}
+				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
+			}
+		} else {
+			LuaError(l, " wrong ident %s\n" _C_ ident);
+		}
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

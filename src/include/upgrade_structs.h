@@ -180,7 +180,7 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
@@ -194,7 +194,8 @@ public:
 	int UpgradeId;                      /// used to filter required modifier
 
 	CUnitStats Modifier;                /// modifier of unit stats.
-	int *ModifyPercent;                /// use for percent modifiers
+	int *ModifyPercent;                 /// use for percent modifiers
+	int SpeedResearch;                  /// speed factor for researching
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
