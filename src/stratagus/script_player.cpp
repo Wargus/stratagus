@@ -45,6 +45,7 @@
 #include "unittype.h"
 #include "unit.h"
 #include "unit_find.h"
+#include "upgrade.h"
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -741,6 +742,14 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "SpeedResearch")) {
 		lua_pushnumber(l, p->SpeedResearch);
+		return 1;
+	} else if (!strcmp(data, "Allow")) {
+		LuaCheckArgs(l, 3);
+		const std::string ident = LuaToString(l, 3);
+		char b[2];
+		b[0] = UpgradeIdentAllowed(Players[p->Index], ident.c_str());
+		b[1] = 0;
+		lua_pushstring(l, b);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
