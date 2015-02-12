@@ -179,7 +179,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 			*resultPos = pos;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (type.ShoreBuilding || CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
