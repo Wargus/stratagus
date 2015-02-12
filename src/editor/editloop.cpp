@@ -514,7 +514,7 @@ static void DrawPlayers()
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
 		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
-				 PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]].c_str());
+				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
 		// Players[SelectedPlayer].RaceName);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
