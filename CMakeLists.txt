@@ -604,6 +604,9 @@ set(stratagus_HDRS
 	version-generated.h # This line is needed for CMake when generating Doxygen documentation
 )
 
+# Configuration types
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
 # Additional platform checks
 
 if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
@@ -702,6 +705,7 @@ option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" OFF)
+option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
 
 if(NOT WITH_RENDERER)
 	if(OPENGL_FOUND)
@@ -916,6 +920,13 @@ if(ENABLE_TOUCHSCREEN)
 	add_definitions(-DUSE_TOUCHSCREEN)
 endif()
 
+if(ENABLE_MULTIBUILD)
+    if(WIN32 AND MSVC)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    endif()
+endif()
+
 # Print compile info
 
 message("==================================")
@@ -952,6 +963,12 @@ if(ENABLE_USEGAMEDIR)
 	message("Place game files in: game directory (Place in user directory with -DENABLE_USEGAMEDIR=OFF)")
 else()
 	message("Place game files in: user directory (Place in game directory with -DENABLE_USEGAMEDIR=ON)")
+endif()
+
+if(ENABLE_MULTIBUILD)
+	message("Parallel building in MSVC: Yes (Disable by param -DENABLE_MULTIBUILD=OFF)")
+else()
+	message("Parallel building in MSVC: No (Enable by param -DENABLE_MULTIBUILD=ON)")
 endif()
 
 if(WIN32 AND MSVC)
