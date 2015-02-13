@@ -78,6 +78,18 @@ enum _play_audio_flags_ {
 	PlayAudioLoadOnDemand = 8   /// Load only if needed.
 };
 
+/**
+**  Fluidsynth flags
+*/
+#ifdef USE_FLUIDSYNTH
+enum SynthState
+{
+	StateCleaned = 0,
+	StateInitialized,
+	StatePlaying
+};
+#endif
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -147,10 +159,12 @@ extern int InitSound();
 extern void QuitSound();
 
 #ifdef USE_FLUIDSYNTH
+/// Gets the state of Fluidsynth player
+SynthState GetFluidSynthState();
 /// Init FluidSynth library
 extern int InitFluidSynth();
 // Cleans all FluidSynth data
-extern void CleanFluidSynth();
+extern void CleanFluidSynth(bool reinit = false);
 #endif
 
 //@}

@@ -52,13 +52,6 @@ struct FluidSynthData {
 	CFile *MIDIFile;       /// MIDI file handle
 };
 
-enum SynthState
-{
-	StateCleaned = 0,
-	StateInitialized,
-	StatePlaying
-};
-
 class CSynthesizer {
 public:
 	CSynthesizer() : Settings(NULL), Synth(NULL), Player(NULL), State(StateCleaned) {}
@@ -158,21 +151,36 @@ CSampleFluidSynth::~CSampleFluidSynth()
 }
 
 /**
+**  Gets the state of Fluidsynth player
+**
+*/
+SynthState GetFluidSynthState()
+{
+	return FluidSynthesizer.State;
+}
+
+/**
 **  Cleans FluidSynth data
 **
 */
-void CleanFluidSynth()
+void CleanFluidSynth(bool reinit)
 {
-	if (FluidSynthesizer.Player) {
+	if (reinit) {
 		delete_fluid_player(FluidSynthesizer.Player);
+		FluidSynthesizer.Player = new_fluid_player(FluidSynthesizer.Synth);
+		FluidSynthesizer.State = StateInitialized;
+	} else {
+		if (FluidSynthesizer.Player) {
+			delete_fluid_player(FluidSynthesizer.Player);
+		}
+		if (FluidSynthesizer.Synth) {
+			delete_fluid_synth(FluidSynthesizer.Synth);
+		}
+		if (FluidSynthesizer.Settings) {
+			delete_fluid_settings(FluidSynthesizer.Settings);
+		}
+		FluidSynthesizer.State = StateCleaned;
 	}
-	if (FluidSynthesizer.Synth) {
-		delete_fluid_synth(FluidSynthesizer.Synth);
-	}
-	if (FluidSynthesizer.Settings) {
-		delete_fluid_settings(FluidSynthesizer.Settings);
-	}
-	FluidSynthesizer.State = StateCleaned;
 }
 
 /**
@@ -250,9 +258,7 @@ CSample *LoadFluidSynth(const char *name, int flags)
 		}
 	} else if (FluidSynthesizer.State == StatePlaying) {
 		// Reinit the player
-		delete_fluid_player(FluidSynthesizer.Player);
-		FluidSynthesizer.Player = new_fluid_player(FluidSynthesizer.Synth);
-		FluidSynthesizer.State = StateInitialized;
+		CleanFluidSynth(true);
 	}
 
 	strcpy_s(s, sizeof(s), name);
