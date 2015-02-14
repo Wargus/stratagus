@@ -169,7 +169,7 @@ void CleanFluidSynth(bool reinit)
 		delete_fluid_player(FluidSynthesizer.Player);
 		FluidSynthesizer.Player = new_fluid_player(FluidSynthesizer.Synth);
 		FluidSynthesizer.State = StateInitialized;
-	} else {
+	} else if (FluidSynthesizer.State != StateCleaned) {
 		if (FluidSynthesizer.Player) {
 			delete_fluid_player(FluidSynthesizer.Player);
 		}
@@ -193,6 +193,7 @@ int InitFluidSynth()
 	if (FluidSynthesizer.State > StateCleaned) {
 		return 0;
 	}
+	FluidSynthesizer.State = StateInitialized;
 	// Settings
 	FluidSynthesizer.Settings = new_fluid_settings();
 	if (FluidSynthesizer.Settings == NULL) {
@@ -231,7 +232,6 @@ int InitFluidSynth()
 		CleanFluidSynth();
 		return -1;
 	}
-	FluidSynthesizer.State = StateInitialized;
 	return 0;
 }
 
