@@ -10,7 +10,7 @@
 //
 /**@name popup.cpp - The popup globals. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2015 by cybermind and Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -363,7 +363,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			} else if (!strcmp(key, "Height")) {
 				this->Height = LuaToNumber(l, -1);
 			} else if (!strcmp(key, "Color")) {
-				this->Color = LuaToNumber(l, -1);
+				this->Color = LuaToUnsignedNumber(l, -1);
 			} else {
 				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
 			}

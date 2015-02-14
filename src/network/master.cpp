@@ -64,20 +64,6 @@ CMetaClient MetaClient;
 /**
 **  Set the metaserver to use for internet play.
 **
-**  @param l  Lua state.
-**  @warning  Deprecated function, need to be removed soon
-*/
-int CclSetMetaServer(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	MetaClient.SetMetaServer(LuaToString(l, 1), LuaToNumber(l, 2));
-
-	return 0;
-}
-
-/**
-**  Set the metaserver to use for internet play.
-**
 **  @param host  Host to connect
 **  @param port  Port to use to connect
 */

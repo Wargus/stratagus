@@ -1881,7 +1881,6 @@ static int CclNoRandomPlacementMultiplayer(lua_State *l)
 void NetworkCclRegister()
 {
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
-	lua_register(Lua, "SetMetaServer", CclSetMetaServer);
 }
 
 

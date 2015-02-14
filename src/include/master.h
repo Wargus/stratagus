@@ -77,8 +77,6 @@ private:
 ----------------------------------------------------------------------------*/
 // Metaserver itself
 extern CMetaClient MetaClient;
-// Warning: deprecated function
-extern int CclSetMetaServer(lua_State *l);
 
 //@}
 
