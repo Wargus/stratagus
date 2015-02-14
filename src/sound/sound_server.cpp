@@ -679,11 +679,6 @@ void StopMusic()
 {
 	if (MusicPlaying) {
 		MusicPlaying = false;
-#ifdef USE_FLUIDSYNTH
-		if (GetFluidSynthState() == StatePlaying) {
-			CleanFluidSynth(true);
-		}
-#endif
 		if (MusicChannel.Sample) {
 			SDL_LockAudio();
 			delete MusicChannel.Sample;
