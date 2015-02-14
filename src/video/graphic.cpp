@@ -404,11 +404,11 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		srect.y += y - oldy;
 
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = Surface->format->alpha;
+		const int oldalpha = SurfaceFlip->format->alpha;
 
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
 	}
 }
 
