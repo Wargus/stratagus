@@ -45,6 +45,7 @@
 
 #include "iocompat.h"
 #include "iolib.h"
+#include "unit.h"
 
 #include "SDL.h"
 
@@ -425,6 +426,9 @@ int SetChannelVolume(int channel, int volume)
 */
 int SetChannelStereo(int channel, int stereo)
 {
+	if (Preference.StereoSound == false) {
+		stereo = 0;
+	}
 	if (channel < 0 || channel >= MaxChannels) {
 		return -1;
 	}

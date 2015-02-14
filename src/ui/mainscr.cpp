@@ -144,9 +144,17 @@ void DrawUserDefinedButtons()
 static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
+	int hBar, hAll;
+	if (Preference.IconsShift) {
+		hBar = 6;
+		hAll = 10;
+	} else {
+		hBar = 5;
+		hAll = 7;
+	}
 	y += unit.Type->Icon.Icon->G->Height;
-	Video.FillRectangleClip(ColorBlack, x, y,
-							unit.Type->Icon.Icon->G->Width, 7);
+	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
+		unit.Type->Icon.Icon->G->Width + 8, hAll);
 
 	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
@@ -162,8 +170,9 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 			color = ColorRed;
 		}
 
-		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
-		Video.FillRectangleClip(color, x + 1, y + 1, f > 1 ? f - 2 : 0, 5);
+		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
+		Video.FillRectangleClip(color, x - 2, y + 4,
+			f > 1 ? f - 2 : 0, hBar);
 	}
 }
 

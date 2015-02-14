@@ -27,6 +27,7 @@ class CPreference
 	bool AiExplores;
 	bool GrayscaleIcons;
 	bool IconsShift;
+	bool StereoSound;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;
