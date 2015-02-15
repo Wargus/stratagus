@@ -1062,7 +1062,7 @@ void SelectionChanged()
 {
 	// We Changed out selection, anything pending buttonwise must be cleared
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
 	LastDrawnButtonPopup = NULL;
 

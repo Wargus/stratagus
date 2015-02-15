@@ -34,23 +34,31 @@
 
 #include <string>
 
+#include "upgrade_structs.h"
+
 class CFont;
 
 class CStatusLine
 {
 public:
-	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {}
+	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {
+		memset(Costs, 0, (ManaResCost + 1) * sizeof(int));
+	}
 
 	void Draw();
+	void DrawCosts();
 	void Set(const std::string &status);
+	void SetCosts(int mana, int food, const int *costs);
 	const std::string &Get() const { return this->StatusLine; }
 	void Clear();
+	void ClearCosts();
 
 public:
 	int Width;
 	int TextX;
 	int TextY;
 	CFont *Font;
+	int Costs[ManaResCost + 1];
 
 private:
 	std::string StatusLine;

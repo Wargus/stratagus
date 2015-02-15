@@ -118,7 +118,7 @@ static void UiBeginInput()
 	KeyState = KeyStateInput;
 	Input[0] = '\0';
 	InputIndex = 0;
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	ShowInput();
 }
 
@@ -447,7 +447,7 @@ void UiFindIdleWorker()
 		LastIdleWorker = unit;
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
-		ClearCosts();
+		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();

@@ -196,7 +196,7 @@ void UpdateDisplay()
 			UI.StatusLine.Draw();
 		}
 
-		DrawCosts();
+		UI.StatusLine.DrawCosts();
 		DrawTimer();
 	}
 

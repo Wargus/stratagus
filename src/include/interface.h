@@ -373,13 +373,6 @@ extern void CleanMessages();
 /// show/hide messages
 extern void ToggleShowMessages();
 
-/// Draw costs in status line
-extern void DrawCosts();
-/// Set costs to be displayed in status line
-extern void SetCosts(int mana, int food, const int *costs);
-/// Clear the costs displayed in status line (undisplay!)
-extern void ClearCosts();
-
 /// Draw the timer
 extern void DrawTimer();
 /// Update the timer

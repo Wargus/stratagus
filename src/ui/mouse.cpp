@@ -101,7 +101,7 @@ void CancelBuildingMode()
 {
 	CursorBuilding = NULL;
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 }
@@ -1478,7 +1478,7 @@ static void DoSelectionButtons(int num, unsigned)
 	}
 
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
 	SelectionChanged();
 }
@@ -1503,7 +1503,7 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		UI.StatusLine.Clear();
-		ClearCosts();
+		UI.StatusLine.ClearCosts();
 		CursorState = CursorStatePoint;
 		GameCursor = UI.Point.Cursor;
 		CustomCursor.clear();
@@ -1532,7 +1532,7 @@ static void UISelectStateButtonDown(unsigned)
 			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 
 			UI.StatusLine.Clear();
-			ClearCosts();
+			UI.StatusLine.ClearCosts();
 			CursorState = CursorStatePoint;
 			GameCursor = UI.Point.Cursor;
 			CustomCursor.clear();
@@ -1557,7 +1557,7 @@ static void UISelectStateButtonDown(unsigned)
 	}
 
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	CursorState = CursorStatePoint;
 	if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 		GameCursor = CursorByIdent(CustomCursor);
@@ -2049,7 +2049,7 @@ void UIHandleButtonUp(unsigned button)
 
 		if (num) {
 			UI.StatusLine.Clear();
-			ClearCosts();
+			UI.StatusLine.ClearCosts();
 			CurrentButtonLevel = 0;
 			SelectionChanged();
 

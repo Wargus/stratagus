@@ -826,17 +826,17 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
-			SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
+			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
 			break;
 		}
 		case ButtonResearch:
-			SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
+			UI.StatusLine.SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
 			break;
 		case ButtonSpellCast:
-			SetCosts(SpellTypeTable[button.Value]->ManaCost, 0, NULL);
+			UI.StatusLine.SetCosts(SpellTypeTable[button.Value]->ManaCost, 0, SpellTypeTable[button.Value]->Costs);
 			break;
 		default:
-			ClearCosts();
+			UI.StatusLine.ClearCosts();
 			break;
 	}
 }
@@ -1241,7 +1241,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 		}
 	}
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
@@ -1254,7 +1254,7 @@ void CButtonPanel::DoClicked_CancelTrain()
 	Assert(Selected[0]->CurrentAction() == UnitActionTrain);
 	SendCommandCancelTraining(*Selected[0], -1, NULL);
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 }
 
 void CButtonPanel::DoClicked_CancelBuild()
@@ -1265,7 +1265,7 @@ void CButtonPanel::DoClicked_CancelBuild()
 		SendCommandDismiss(*Selected[0]);
 	}
 	UI.StatusLine.Clear();
-	ClearCosts();
+	UI.StatusLine.ClearCosts();
 }
 
 void CButtonPanel::DoClicked_Build(int button)
@@ -1274,7 +1274,7 @@ void CButtonPanel::DoClicked_Build(int button)
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	if (!Selected[0]->Player->CheckUnitType(type)) {
 		UI.StatusLine.Set(_("Select Location"));
-		ClearCosts();
+		UI.StatusLine.ClearCosts();
 		CursorBuilding = &type;
 		// FIXME: check is this =9 necessary?
 		CurrentButtonLevel = 9; // level 9 is cancel-only
@@ -1296,7 +1296,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		//PlayerSubUnitType(player,type);
 		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
-		ClearCosts();
+		UI.StatusLine.ClearCosts();
 	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
 		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
 			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
@@ -1313,7 +1313,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
-				ClearCosts();
+				UI.StatusLine.ClearCosts();
 			}
 		} else {
 			break;
@@ -1328,7 +1328,7 @@ void CButtonPanel::DoClicked_Research(int button)
 		//PlayerSubCosts(player,Upgrades[i].Costs);
 		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
-		ClearCosts();
+		UI.StatusLine.ClearCosts();
 	}
 }
 
