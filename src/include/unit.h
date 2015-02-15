@@ -546,7 +546,7 @@ extern int ExtraDeathIndex(const char *death);
 extern CUnit *UnitOnScreen(int x, int y);
 
 /// Let a unit die
-extern void LetUnitDie(CUnit &unit);
+extern void LetUnitDie(CUnit &unit, bool suicide = false);
 /// Destroy all units inside another unit
 extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI

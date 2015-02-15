@@ -511,7 +511,7 @@ void CommandDismiss(CUnit &unit)
 		unit.CurrentOrder()->Cancel(unit);
 	} else {
 		DebugPrint("Suicide unit ... \n");
-		LetUnitDie(unit);
+		LetUnitDie(unit, true);
 	}
 	ClearSavedAction(unit);
 }

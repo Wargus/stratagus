@@ -2230,7 +2230,7 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 **
 **  @param unit    Unit to be destroyed.
 */
-void LetUnitDie(CUnit &unit)
+void LetUnitDie(CUnit &unit, bool suicide)
 {
 	unit.Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 	unit.Moving = 0;
@@ -2269,6 +2269,11 @@ void LetUnitDie(CUnit &unit)
 		type->DeathExplosion->pushInteger(pixelPos.x);
 		type->DeathExplosion->pushInteger(pixelPos.y);
 		type->DeathExplosion->run();
+	}
+	if (suicide) {
+		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
+
+		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
 	}
 	// Handle Teleporter Destination Removal
 	if (type->Teleporter && unit.Goal) {
