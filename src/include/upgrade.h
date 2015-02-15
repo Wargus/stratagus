@@ -74,12 +74,10 @@ extern int UpgradeIdByIdent(const std::string &sid);
 
 /// Upgrade will be acquired
 extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
-
-/// for now it will be empty?
-/// perhaps acquired upgrade can be lost if (for example) a building is lost
-/// (lumber mill? stronghold?)
-/// this function will apply all modifiers in reverse way
+/// Upgrade will be lost
 extern void UpgradeLost(CPlayer &player, int id);
+/// Apply researched upgrades when map is loading
+extern void ApplyUpgrades();
 
 /*----------------------------------------------------------------------------
 --  Allow(s)

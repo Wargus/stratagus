@@ -841,6 +841,7 @@ void CreateGame(const std::string &filename, CMap *map)
 		//
 		InitUnitTypes(1);
 		LoadMap(filename, *map);
+		ApplyUpgrades();
 	}
 	CclCommand("if (MapLoaded ~= nil) then MapLoaded() end");
 
