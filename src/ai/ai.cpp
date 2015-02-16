@@ -873,7 +873,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			continue;
 		}
 		// Check for collision
-		if (unit.MapDistanceTo(blocker) >= 2) {
+		if (unit.MapDistanceTo(blocker) >= unit.Type->TileWidth + 1) {
 			continue;
 		}
 

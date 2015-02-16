@@ -37,6 +37,7 @@
 
 #include "action/action_unload.h"
 
+#include "animation.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -68,6 +69,7 @@
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
+	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
@@ -81,6 +83,9 @@
 	if (!strcmp("state", value)) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
+	} else if (!strcmp(value, "range")) {
+		++j;
+		this->Range = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -326,7 +331,7 @@ static int MoveToDropZone(CUnit &unit)
 {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			return -1;
+			return PF_UNREACHABLE;
 		case PF_REACHED:
 			break;
 		default:
@@ -396,6 +401,25 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	if (!unit.CanMove()) {
 		this->State = 2;
 	}
+
+	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		unit.Wait--;
+		return;
+	}
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
+	}
+	if (this->State == 1 && this->Range >= 5) {
+		// failed to reach the goal
+		this->State = 2;
+	}
+
 	switch (this->State) {
 		case 0: // Choose destination
 			if (!this->HasGoal()) {
@@ -422,6 +446,10 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 							this->Finished = true;
 							return ;
 						}
+					} else if (moveResult == PF_UNREACHABLE) {
+						unit.Wait = 30;
+						this->Range++;
+						break;
 					} else {
 						this->State = 2;
 					}

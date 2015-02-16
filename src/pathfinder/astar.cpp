@@ -527,7 +527,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 		do {
 			const int flag = mf->Flags & mask;
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
-				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
+				if ((unit.Player->AiEnabled == false) && (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
 				}
