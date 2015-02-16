@@ -37,6 +37,7 @@
 
 #include "action/action_resource.h"
 
+#include "ai.h"
 #include "animation.h"
 #include "interface.h"
 #include "iolib.h"
@@ -384,6 +385,14 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			return -1;
 		case PF_REACHED:
 			return 1;
+		case PF_WAIT:
+			if (unit.Player->AiEnabled) {
+				this->Range++;
+				if (this->Range >= 5) {
+					this->Range = 0;
+					AiCanNotMove(unit);
+				}
+			}
 		default:
 			return 0;
 	}
@@ -404,6 +413,14 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 			return -1;
 		case PF_REACHED:
 			break;
+		case PF_WAIT:
+			if (unit.Player->AiEnabled) {
+				this->Range++;
+				if (this->Range >= 5) {
+					this->Range = 0;
+					AiCanNotMove(unit);
+				}
+			}
 		default:
 			// Goal gone or something.
 			if (unit.Anim.Unbreakable || goal->IsVisibleAsGoal(*unit.Player)) {
@@ -899,6 +916,14 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			return -1;
 		case PF_REACHED:
 			break;
+		case PF_WAIT:
+			if (unit.Player->AiEnabled) {
+				this->Range++;
+				if (this->Range >= 5) {
+					this->Range = 0;
+					AiCanNotMove(unit);
+				}
+			}
 		default:
 			if (unit.Anim.Unbreakable || goal.IsVisibleAsGoal(player)) {
 				return 0;
@@ -1136,6 +1161,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 {
 	Assert(this->State == SUB_START_RESOURCE);
 
+	this->Range = 0;
 	CUnit *const goal = this->GetGoal();
 	CUnit *mine = this->Resource.Mine;
 

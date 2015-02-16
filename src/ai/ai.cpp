@@ -833,8 +833,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 
 	AiPlayer = unit.Player->Ai;
 
-	// No more than 1 move per 3 cycle ( avoid stressing the pathfinder )
-	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 3) {
+	// No more than 1 move per 10 cycle ( avoid stressing the pathfinder )
+	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 10) {
 		return;
 	}
 
@@ -851,7 +851,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		if (blocker.IsUnusable()) {
 			continue;
 		}
-		if (!blocker.IsIdle()) {
+		if (!blocker.CanMove() || blocker.Moving) {
 			continue;
 		}
 		if (blocker.Player != unit.Player && blocker.Player->IsAllied(*unit.Player) == false) {
@@ -860,9 +860,6 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		const CUnitType &blockertype = *blocker.Type;
 
 		if (blockertype.UnitType != unittype.UnitType) {
-			continue;
-		}
-		if (!blocker.CanMove()) {
 			continue;
 		}
 
@@ -884,7 +881,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			r = (r + 1) & 7;
 			--trycount;
 
-			const Vec2i pos = blocker.tilePos + dirs[r];
+			const Vec2i pos = blocker.tilePos + blocker.Type->TileWidth * dirs[r];
 
 			// Out of the map => no !
 			if (!Map.Info.IsPointOnMap(pos)) {
@@ -892,6 +889,9 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			}
 			// move to blocker ? => no !
 			if (pos == u0) {
+				continue;
+			}
+			if (Map.Field(pos)->UnitCache.size() > 0) {
 				continue;
 			}
 
@@ -909,8 +909,16 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		const int index = SyncRand() % movablenb;
-
+		COrder *savedOrder = NULL;
+		if (movableunits[index]->IsIdle() == false) {
+			if (unit.CanStoreOrder(unit.CurrentOrder())) {
+				savedOrder = unit.CurrentOrder()->Clone();
+			}
+		}
 		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
+		if (savedOrder != NULL) {
+			unit.SavedOrder = savedOrder;
+		}
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}
 }

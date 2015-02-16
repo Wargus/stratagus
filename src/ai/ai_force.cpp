@@ -378,10 +378,22 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	Vec2i goalPos(pos);
 
+	bool isNaval = false;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+			isNaval = true;
+			break;
+		}
+	}
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
-		AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
+		if (isNaval) {
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
+		} else {
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
+		}
 		if (enemy) {
 			goalPos = enemy->tilePos;
 		}
@@ -571,9 +583,15 @@ void AiForceManager::CheckUnits(int *counter)
 		}
 		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
 			const AiUnitType &aiut = force.UnitTypes[j];
-			const int t = aiut.Type->Slot;
+			const unsigned int t = aiut.Type->Slot;
 			const int wantedCount = aiut.Want;
-			const int requested = wantedCount - (unit_types_count[t] + counter[t] - attacking[t]);
+			int e = unit_types_count[t];
+			if (t < AiHelpers.Equiv.size()) {
+				for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
+					e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+				}
+			}
+			const int requested = wantedCount - (e + counter[t] - attacking[t]);
 
 			if (requested > 0) {  // Request it.
 				AiAddUnitTypeRequest(*aiut.Type, requested);
@@ -778,27 +796,28 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		CUnit &unit = *aiForce.Units[i];
 		CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (transporter.IsIdle()
-			&& unit.CurrentAction() == UnitActionBoard
+		if (unit.CurrentAction() == UnitActionBoard
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
-		if (CanTransport(transporter, unit) && unit.IsIdle() && unit.Container == NULL) {
-			CommandBoard(unit, transporter, FlushCommands);
-			CommandFollow(transporter, unit, 0);
-			if (--nbToTransport == 0) { // full : next transporter.
-				for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
-					const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
+		if (CanTransport(transporter, unit) && (unit.IsIdle() 
+			|| (unit.CurrentAction() == UnitActionBoard && !unit.Moving 
+			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == NULL) {
+				CommandBoard(unit, transporter, FlushCommands);
+				CommandFollow(transporter, unit, 0);
+				if (--nbToTransport == 0) { // full : next transporter.
+					for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
+						const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
 
-					if (nextTransporter.Type->CanTransport()) {
-						nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
+						if (nextTransporter.Type->CanTransport()) {
+							nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
+							break ;
+						}
+					}
+					if (transporterIndex == aiForce.Size()) { // No more transporter.
 						break ;
 					}
 				}
-				if (transporterIndex == aiForce.Size()) { // No more transporter.
-					break ;
-				}
-			}
 		}
 	}
 }
@@ -964,7 +983,19 @@ void AiForce::Update()
 	if (State == AiForceAttackingState_Attacking && idleUnits.size() == this->Size()) {
 		const CUnit *unit = NULL;
 
-		AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+		bool isNaval = false;
+		for (size_t i = 0; i != this->Units.size(); ++i) {
+			CUnit *const unit = this->Units[i];
+			if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+				isNaval = true;
+				break;
+			}
+		}
+		if (isNaval) {
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+		} else {
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+		}
 		if (!unit) {
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
