@@ -729,6 +729,9 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 */
 void CommandTransformIntoType(CUnit &unit, CUnitType &type)
 {
+	if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
+		return;
+	}
 	Assert(unit.CriticalOrder == NULL);
 
 	unit.CriticalOrder = COrder::NewActionTransformInto(type);
