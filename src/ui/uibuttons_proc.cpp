@@ -121,7 +121,19 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Border
 	//
 	if (!p->BorderColor) {
-		p->BorderColor = Video.MapRGB(TheScreen->format, p->BorderColorRGB);
+		CColor color(p->BorderColorRGB);
+		if (p->BorderColorRGB.R > 0 || p->BorderColorRGB.G > 0 || p->BorderColorRGB.B > 0) {
+			int shift = GameCycle % 0x20;
+			color.R >>= shift / 2;
+			color.G >>= shift / 2;
+			color.B >>= shift / 2;
+			if (shift >= 0x10) {
+				color.R = (p->BorderColorRGB.R > 0) << ((shift - 0x10) / 2);
+				color.G = (p->BorderColorRGB.G > 0) << ((shift - 0x10) / 2);
+				color.B = (p->BorderColorRGB.B > 0) << ((shift - 0x10) / 2);
+			}
+		}		
+		p->BorderColor = Video.MapRGB(TheScreen->format, color);
 	}
 	if (p->BorderSize) {
 		for (int i = 0; i < p->BorderSize; ++i) {

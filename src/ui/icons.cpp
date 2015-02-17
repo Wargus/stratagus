@@ -189,6 +189,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;
 		s.Default.BorderColor = 0;
+		s.Default.BorderSize = 2;
 	}
 	if (Preference.IconsShift) {
 		// Left and top edge of Icon
