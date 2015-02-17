@@ -541,10 +541,14 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 					// moving unit are crossable
 					cost += AStarMovingUnitCrossingCost;
 				} else {
-					// for non moving unit Always Fail unless goal is unit
+					// for non moving unit Always Fail unless goal is unit, or unit can attack the target
 					if (&unit != goal) {
+						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)) {
+							cost += 2 * AStarMovingUnitCrossingCost;
+						} else {
 						// FIXME: Need support for moving a fixed unit to add cost
-						return -1;
+							return -1;
+						}
 						//cost += AStarFixedUnitCrossingCost;
 					}
 				}

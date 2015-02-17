@@ -221,8 +221,13 @@ class BestDepotFinder
 				}
 
 				// calck real travel distance
-				
-				d = UnitReachable(worker->Container ? *worker->Container : *worker, *dest, 1);
+				if (worker->Container) {
+					UnmarkUnitFieldFlags(*worker->Container);
+				}
+				d = UnitReachable(*worker, *dest, 1);
+				if (worker->Container) {
+					MarkUnitFieldFlags(*worker->Container);
+				}			
 				//
 				// Take this depot?
 				//

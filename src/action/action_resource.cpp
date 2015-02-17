@@ -374,6 +374,13 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	switch (DoActionMove(unit)) {
 		case PF_UNREACHABLE:
 			unit.Wait = 10;
+			if (unit.Player->AiEnabled) {
+				this->Range++;
+				if (this->Range >= 5) {
+					this->Range = 0;
+					AiCanNotMove(unit);
+				}
+			}
 			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
 				this->goalPos = pos;
 				DebugPrint("Found a better place to harvest %d,%d\n" _C_ pos.x _C_ pos.y);
