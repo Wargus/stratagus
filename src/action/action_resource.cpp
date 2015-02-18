@@ -545,7 +545,13 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	if (!resinfo.HarvestFromOutside) {
 		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
 			this->ClearGoal();
+			int selected = unit.Selected;
 			unit.Remove(goal);
+			if (selected) {
+				unit.Removed = 0;
+				SelectUnit(unit);
+				unit.Removed = 1;
+			}
 		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
 			//Resource is full, wait
 			unit.Wait = 10;
@@ -972,7 +978,13 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	// Place unit inside the depot
 	if (unit.Wait) {
+		int selected = unit.Selected;
 		unit.Remove(&goal);
+		if (selected) {
+			unit.Removed = 0;
+			SelectUnit(unit);
+			unit.Removed = 1;
+		}
 		unit.Anim.CurrAnim = NULL;
 	}
 

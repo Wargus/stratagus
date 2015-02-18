@@ -611,7 +611,7 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 */
 void ShowOrder(const CUnit &unit)
 {
-	if (unit.Destroyed) {
+	if (unit.Destroyed || unit.Removed) {
 		return;
 	}
 #ifndef DEBUG
