@@ -472,7 +472,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (Players[i].Type == PlayerNobody) {
+			if (Map.Info.PlayerType[i] == PlayerNobody) {
 				continue;
 			}
 			f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
