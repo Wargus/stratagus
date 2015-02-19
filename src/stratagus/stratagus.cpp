@@ -208,6 +208,12 @@ extern void beos_init(int argc, char **argv);
 #include "missile.h" //for FreeBurningBuildingFrames
 #endif
 
+#ifdef USE_STACKTRACE
+#include <stdexcept>
+#include <stacktrace/call_stack.hpp>
+#include <stacktrace/stack_exception.hpp>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -679,7 +685,9 @@ int stratagusMain(int argc, char **argv)
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
-
+#ifdef USE_STACKTRACE
+	try {
+#endif
 	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
 	parameters.SetLocalPlayerNameFromEnv();
@@ -738,6 +746,16 @@ int stratagusMain(int argc, char **argv)
 	MenuLoop();
 
 	Exit(0);
+#ifdef USE_STACKTRACE
+	} catch (const std::exception &e) {
+		fprintf(stderr, "Stratagus crashed!\n");
+		fprintf(stderr, "Please send this call stack to our bug tracker: https://bugs.launchpad.net/stratagus\n");
+		fprintf(stderr, "and what have you done to cause this bug.\n");
+		fprintf(stderr, " === exception state traceback === \n");
+		fprintf(stderr, "%s", e.what());
+		ExitFatal(1);
+	}
+#endif
 	return 0;
 }
 

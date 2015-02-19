@@ -41,6 +41,12 @@
 #include <windows.h>
 #endif
 
+#ifdef USE_STACKTRACE
+#include <stdexcept>
+#include <stacktrace/call_stack.hpp>
+#include <stacktrace/stack_exception.hpp>
+#endif
+
 #ifdef USE_X11
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -494,7 +500,13 @@ void PrintLocation(const char *file, int line, const char *funcName)
 
 void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr)
 {
-	fprintf(stderr, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+	char buf[1024];
+	snprintf(buf, 1024, "Assertion failed at %s:%d: %s: %s\n", file, line, funcName, conditionStr);
+#ifdef USE_STACKTRACE
+	throw stacktrace::stack_runtime_error((const char*)buf);
+#else
+	fprintf(stderr, "%s\n", buf);
+#endif
 	fflush(stdout);
 	fflush(stderr);
 	abort();
