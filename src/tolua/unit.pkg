@@ -36,6 +36,13 @@ class CPreference
 	std::string SF2Soundfont;
 };
 
+class CUnitManager
+{
+	CUnit &GetSlotUnit(int index) const;
+};
+
+CUnitManager UnitManager;   /// Unit manager
+
 CPreference Preference;
 
 CUnit *GetUnitUnderCursor();

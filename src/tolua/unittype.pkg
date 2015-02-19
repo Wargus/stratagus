@@ -10,6 +10,9 @@ class CUnitType
 	int GivesResource;
 	int Supply;
 	int Demand;
+
+	int TileWidth;
+	int TileHeight;
 };
 
 CUnitType *UnitTypeByIdent(const std::string ident);
