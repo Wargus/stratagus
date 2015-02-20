@@ -218,18 +218,28 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
-	if (res
-		&& type.ResInfo[res]
-		&& unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity
-		&& dest.Type->CanHarvest
+	if (res && type.ResInfo[res] && dest.Type->CanHarvest
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-		dest.Blink = 4;
-		SendCommandResource(unit, dest, flush);
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceHarvesting);
-			acknowledged = 1;
-		}
-		return true;
+			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+				dest.Blink = 4;
+				SendCommandResource(unit, dest, flush);
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceHarvesting);
+					acknowledged = 1;
+				}
+				return true;
+			} else {
+				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				if (depot) {
+					dest.Blink = 4;
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
+					SendCommandReturnGoods(unit, depot, flush);
+					return true;
+				}
+			}
 	}
 	return false;
 }
