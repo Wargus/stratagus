@@ -47,9 +47,10 @@ class CMap;
 ----------------------------------------------------------------------------*/
 
 struct SettingsPresets {
-	int Race;  /// Race of the player
-	int Team;  /// Team of player -- NOT SELECTABLE YET
-	int Type;  /// Type of player (for network games)
+	int PlayerColor;  /// Color of a player
+	int Race;         /// Race of the player
+	int Team;         /// Team of player -- NOT SELECTABLE YET
+	int Type;         /// Type of player (for network games)
 };
 
 /**

@@ -47,6 +47,7 @@
 #include "interface.h"
 #include "map.h"
 #include "player.h"
+#include "settings.h"
 #include "sound.h"
 #include "spells.h"
 #include "translate.h"
@@ -796,7 +797,7 @@ void CButtonPanel::Draw()
 			}
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf, player);
+											   pos, buf, GameSettings.Presets[player].PlayerColor);
 		}
 	}
 	//

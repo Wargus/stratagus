@@ -98,9 +98,10 @@ public:
 class MPPlayer
 {
 public:
-	MPPlayer() : Race(0), Team(0), Type(0) {}
+	MPPlayer() : PlayerColor(0), Race(0), Team(0), Type(0) {}
 
 	std::string Name;
+	int PlayerColor;
 	int Race;
 	int Team;
 	int Type;
@@ -196,6 +197,7 @@ static FullReplay *StartReplay()
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
+		replay->Players[i].PlayerColor = GameSettings.Presets[i].PlayerColor;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
@@ -245,6 +247,7 @@ static void ApplyReplaySettings()
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
+		GameSettings.Presets[i].PlayerColor = CurrentReplay->Players[i].PlayerColor;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
@@ -342,6 +345,7 @@ static void SaveFullLog(CFile &file)
 		} else {
 			file.printf("\t{");
 		}
+		file.printf(" PlayerColor = %d,", CurrentReplay->Players[i].PlayerColor);
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
@@ -623,6 +627,8 @@ static int CclReplayLog(lua_State *l)
 					value = LuaToString(l, -2);
 					if (!strcmp(value, "Name")) {
 						replay->Players[j].Name = LuaToString(l, -1);
+					} else if (!strcmp(value, "PlayerColor")) {
+						replay->Players[j].PlayerColor = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Race")) {
 						replay->Players[j].Race = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Team")) {

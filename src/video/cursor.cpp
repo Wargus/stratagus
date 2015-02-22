@@ -42,6 +42,7 @@
 #include "editor.h"
 #include "interface.h"
 #include "map.h"
+#include "settings.h"
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"
@@ -182,7 +183,7 @@ static void DrawBuildingCursor()
 	PushClipping();
 	vp.SetClipping();
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
-	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
+	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, GameSettings.Presets[ThisPlayer->Index].PlayerColor,
 				 CursorBuilding->StillFrame, screenPos);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);

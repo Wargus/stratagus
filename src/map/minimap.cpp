@@ -42,6 +42,7 @@
 #include "editor.h"
 #include "map.h"
 #include "player.h"
+#include "settings.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "ui.h"
@@ -458,7 +459,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = unit.Player->Color;
+		color = PlayerColors[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
 	}
 
 	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];

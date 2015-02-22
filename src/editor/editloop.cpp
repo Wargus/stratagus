@@ -501,7 +501,7 @@ static void DrawPlayers()
 			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
 			x + i % 8 * 20, y, 19, 19);
 		if (Map.Info.PlayerType[i] != PlayerNobody) {
-			Video.FillRectangle(Players[i].Color, x + 1 + i % 8 * 20, y + 1, 17, 17);
+			Video.FillRectangle(PlayerColors[GameSettings.Presets[i].PlayerColor][0], x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);

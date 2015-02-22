@@ -44,6 +44,7 @@ extern unsigned long GameCycle;
 $#include "settings.h"
 
 struct SettingsPresets {
+	int PlayerColor;
 	int Race;
 	int Team;
 	int Type;

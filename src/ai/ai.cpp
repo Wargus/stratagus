@@ -462,7 +462,7 @@ void AiInit(CPlayer &player)
 		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player.Race]) {
 			continue;
 		}
-		if (!player.AiName.empty() && ait->Class != player.AiName) {
+		if (!player.AiName.empty() && ait->Name != player.AiName) {
 			continue;
 		}
 		break;

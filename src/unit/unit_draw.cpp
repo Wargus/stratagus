@@ -49,6 +49,7 @@
 #include "map.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
 #include "translate.h"
 #include "unit.h"
@@ -142,11 +143,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			color = unit.Player->Color;
+			color = PlayerColors[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = Players[i].Color;
+					color = PlayerColors[GameSettings.Presets[i].PlayerColor][0];
 				}
 			}
 		}
@@ -885,15 +886,15 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1) {
 		if (constructed && cframe) {
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
-			DrawConstruction(player, cframe, *type, frame, pos);
+			DrawConstruction(GameSettings.Presets[player].PlayerColor, cframe, *type, frame, pos);
 		} else {
-			DrawUnitType(*type, sprite, player, frame, screenPos);
+			DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, player, frame, screenPos);
+		DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
