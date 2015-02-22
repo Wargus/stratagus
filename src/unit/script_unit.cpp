@@ -715,6 +715,9 @@ static int CclSetResourcesHeld(lua_State *l)
 	lua_pop(l, 1);
 	const int value = LuaToNumber(l, 2);
 	unit->ResourcesHeld = value;
+	unit->Variable[GIVERESOURCE_INDEX].Value = value;
+	unit->Variable[GIVERESOURCE_INDEX].Max = value;
+	unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 
 	return 0;
 }

@@ -1560,7 +1560,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
-			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX
+			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
@@ -1585,7 +1585,7 @@ void UpdateUnitVariables(CUnit &unit)
 	// Resources.
 	if (unit.Type->GivesResource) {
 		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[GIVERESOURCE_INDEX].Max = 0x7FFFFFFF;
+		unit.Variable[GIVERESOURCE_INDEX].Max = unit.ResourcesHeld > unit.Variable[GIVERESOURCE_INDEX].Max ? 0x7FFFFFFF : unit.Variable[GIVERESOURCE_INDEX].Max;
 	}
 	if (unit.Type->Harvester && unit.CurrentResource) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
