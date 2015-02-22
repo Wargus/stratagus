@@ -142,7 +142,7 @@ public:
 	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target);
+	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
 	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);

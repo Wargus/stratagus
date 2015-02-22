@@ -68,7 +68,7 @@ void AiCheckMagic()
 				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
 					&& SpellTypeTable[j]->AICast) {
 					if (AutoCastSpell(unit, *SpellTypeTable[j])) {
-						return; // cast only one spell per time
+						break;
 					}
 				}
 			}

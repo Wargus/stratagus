@@ -61,9 +61,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target)
+/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
 {
-	COrder_SpellCast *order = new COrder_SpellCast;
+	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
 	order->Range = spell.Range;
 	if (target) {
@@ -387,9 +387,22 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			}
 
 			// Check, if goal has moved (for ReCast)
-			if (unit.ReCast && order.GetGoal() && unit.MapDistanceTo(*order.GetGoal()) > this->Range) {
-				this->State = 0;
-				return;
+			if (unit.ReCast) {
+				if (order.GetGoal() && unit.MapDistanceTo(*order.GetGoal()) > this->Range) {
+					this->State = 0;
+					return;
+				}
+				if (this->isAutocast) {
+					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
+						order.goalPos = order.GetGoal()->tilePos;
+					}
+					if (unit.Player->AiEnabled) {
+						if (!unit.RestoreOrder()) {
+							this->Finished = true;
+						}
+						return ;
+					}
+				}
 			}
 			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
 				if (!unit.RestoreOrder()) {

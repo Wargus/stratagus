@@ -487,7 +487,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
-		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands);
+		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
 		delete target;
 		if (savedOrder != NULL) {
 			caster.SavedOrder = savedOrder;

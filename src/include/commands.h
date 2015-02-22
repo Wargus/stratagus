@@ -107,7 +107,7 @@ extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast = false);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
