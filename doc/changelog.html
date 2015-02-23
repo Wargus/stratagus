@@ -2,7 +2,7 @@
 <html>
 <head>
 <!--
-----    (c) Copyright 1998-2011 by Lutz Sammer and Pali Rohár
+----    (c) Copyright 1998-2015 by Lutz Sammer, Pali Rohár and cybermind
 
 ----    This program is free software; you can redistribute it and/or modify
 ----    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ----    02111-1307, USA.
 -->
-    <title>ChangeLog: Stratagus Version 2.2.7</title>
+    <title>ChangeLog: Stratagus Version 2.3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 
@@ -40,8 +40,71 @@
 
 <ul>
 <p/>
-	<li>Unreleased 2.2.8</li>
+	<li>Unreleased 2.3</li>
 	<ul>
+	<li>Added CPreference::MineNotifications, to show notifications when player-controlled mine is running low (as in Warcraft 3)</li>
+	<li>Fix bug #901772: Support for player color changing (from cybermind)</li>
+	<li>When right-clicking on mine, selected miners will go to depot if they are full of resources (from cybermind)</li>
+	<li>Added support for StackTrace library to log call stack into stderr in case of crash (from cybermind)</li>
+	<li>GetUnitsAroundUnit now supports 3 parameter for getting all units in range (from cybermind)</li>
+	<li>Add ability to get unit reference and CUnitType::TileWidth and CUnitType::TileHeight in Lua (from cybermind)</li>
+	<li>Fix bug #817057: Added ability to keep selected harvester when it enters mine (from cybermind)</li>
+	<li>Improved auto-cast animation (from cybermind)</li>
+	<li>Correct explosion for critters (from cybermind)</li>
+	<li>Research all upgrades which were already researched on the map beginning (from cybermind)</li>
+	<li>Added CPreference.StereoSound, to control stereo effects (from cybermind)</li>
+	<li>Fixed bug with alpha in DrawFrameClipTransX (from Andrettin)</li>
+	<li>Added option for parallel build on MSVC (from cybermind)</li>
+	<li>Fix bug #1331628: Applied Andrettin's patch for SetPlayerData, https://bugs.launchpad.net/stratagus/+bug/1331628 (from Andrettin)</li>
+	<li>Fix bug #1331788: Implemented Andrettin's patch for GetPlayerData: https://bugs.launchpad.net/stratagus/+bug/1331788 (from Andrettin)</li>
+	<li>Fix bug #1330053: Fixed bug with incorrect race name display. (from cybermind)</li>
+	<li>Fix bug #1328658: Fixed bug with IsNotSelectable flag showing info about units (from cybermind)</li>
+	<li>Fixed bug with IsNotSelectable flag showing info about units (from cybermind)</li>
+	<li>Added special "~|" formatting symbol to specify the position symbol (useful for making translations with different string length) (from cybermind)</li>
+	<li>Generic AI collision detection for blocked units (from cybermind)</li>
+	<li>SetDefaultTextColors is available from Lua (from cybermind)</li>
+	<li>Increased sound channel count to reduce sound lags (from cybermind)</li>
+	<li>Added Fluidsynth support for MIDI playback (from cybermind)</li>
+	<li>Fixed colored text (from cybermind)</li>
+	<li>Fix bug #1357737: Fix typo for tileset. thanks to Andre Novellino Gouvêa (from Andrettin)</li>
+	<li>Fix bug #1328664: Applied Andrettin's patch to map scripting: https://bugs.launchpad.net/stratagus/+bug/1328664 (from Andrettin)</li>
+	<li>Fix bug #1328326: Applied Andrettin's patch to editor: https://bugs.launchpad.net/stratagus/+bug/1328326 (from Andrettin)</li>
+	<li>Fix bug #1328040: Fixed bug with rescued units icon drawing (from cybermind)</li>
+	<li>Fix bug #1327929: Apply Dinky's icons patch (from Dinky Dye Aussie)</li>
+	<li>Fix bug #1327505: Fixed another issue with player colors (from cybermind)</li>
+	<li>Fix bug #1282580: Fixed workers resource give up, now they are trying to find another resource (from cybermind)</li>
+	<li>Fix bug #1323483: Fixed compilation on OS Mavericks (from cybermind)</li>
+	<li>Fix bug #706188: map clipping on 32x32 maps (from cybermind)</li>
+	<li>Fix bug #1325736: Added disabled graphics for ImageCheckBox, ImageRadioButton, ImageSlider (from cybermind)</li>
+	<li>Fix bug #1040967: Fixed bug with construction outline (from cybermind)</li>
+	<li>Fix bug #1293138: Fixed incorrect update for Kill and XP variables when upgrading-to (from cybermind)</li>
+	<li>Fix bug #822139: Now editor correctly uses randomized mixed tile types (from cybermind)</li>
+	<li>Added "corpse" check for autocast spells (from cybermind)</li>
+	<li>Added "position-autocast" field for "autocast" spell section, allowing to set up autocast for position spells (from cybermind)</li>
+	<li>Fix bugs #1293004, 1094527: Added CPreference::IconsShift, to shift icons slightly when you press on them (from cybermind)</li>
+	<li>Fix bug #1234987: Fixed crash when using tabs in text (from cybermind)</li>
+	<li>Fix bug #1041837: Fixed crash when blowing up dwarves/sappers (from cybermind)</li>
+	<li>Added AiReleaseForce(force) Lua function, to release "force" 's units to be able to use them in another force (from cybermind)</li>
+	<li>Added support for new NumberDesc field, PlayerData, to get player's data (from cybermind)</li>
+	<li>Added CPreference::GrayscaleIcons, to enable and disable support for grayscale icons (from cybermind)</li>
+	<li>Fix bug #1121130: Correct Death Coil spell casting (from cybermind)</li>
+	<li>Fix bug #1163591: Lua access to UI.Infopanel.G, required for correct infopanel displaying (from cybermind)</li>
+	<li>Fix bug #1297726: Fixed a bug with scoreboard (non-colored player labels) (from cybermind)</li>
+	<li>Added Preference.AiExplores, to control AI exploration requests for resources (from cybermind)</li>
+	<li>Added new function SaveMapPNG to save whole terrain as png file (from cybermind)</li>
+	<li>Added "min-range" parameter to autocast settings, to set minimal distance for autocast to work (from cybermind)</li>
+	<li>IsAlive variable, allows to check if unit is alive through Lua (from cybermind)</li>
+	<li>Support for unit's build sound (from cybermind)</li>
+	<li>DamageUnit lua function to damage unit through Lua code (from cybermind)</li>
+	<li>Correct support for interrior tilesets. Now units aren't able to shoot through "rock" and "forest" tilesets. Use GameSettings.Inside = true (from cybermind)</li>
+	<li>Support for &, |, ^, ! operations in CAnimation_IfVar (from cybermind)</li>
+	<li>Enhanced spell casting (from cybermind)</li>
+	<li>Enhanced teleporting features (from cybermind)</li>
+	<li>Added GameEstablishing flag to control player's interaction to game (from cybermind)</li>
+	<li>Ability play unit's still animation while waiting (from cybermind)</li>
+	<li>Added second parameter to PlaySound to play sound even if it's currently playing (from cybermind)</li>
+	<li>Fixed bug when selecting an enemy unit under counstrction would emit building sound (from cybermind)</li>
+	<li>Ability to automatically return goods in newly constructed depot (from cybermind)</li>
 	<li>Metaserver client code rewritten: now using class CMetaClient available through Lua. (from cybermind)</li>
 	<li>Added FiredSound property for MissileType. (from cybermind)</li>
 	<li>Fix bug #1245643: should fix compilation on *nix. (from Joris Dauphin)</li>
@@ -1544,7 +1607,7 @@
 </ul>
 
 <hr/>
-(C) Copyright 1998-2012 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br/>
+(C) Copyright 1998-2015 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br/>
 All trademarks and copyrights on this page are owned by their respective owners.<br/>
 </body>
 </html>
