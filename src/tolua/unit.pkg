@@ -28,6 +28,7 @@ class CPreference
 	bool GrayscaleIcons;
 	bool IconsShift;
 	bool StereoSound;
+	bool MineNotifications;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;

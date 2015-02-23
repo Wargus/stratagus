@@ -457,6 +457,7 @@ void CUnit::Init()
 	CacheLock = 0;
 	Summoned = 0;
 	Waiting = 0;
+	MineLow = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	CurrentResource = 0;

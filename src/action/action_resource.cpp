@@ -47,6 +47,7 @@
 #include "script.h"
 #include "sound.h"
 #include "tileset.h"
+#include "translate.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -764,6 +765,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
+					if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index) {
+						unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
+					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
 				}
@@ -832,6 +836,12 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		Assert(source->Resource.Active >= 0);
 		//Store resource position.
 		this->Resource.Mine = source;
+		
+		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
+			&& source->IsAlive() && !source->MineLow && source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10) {
+				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
+				source->MineLow = 1;
+		}
 
 		if (source->Type->MaxOnBoard) {
 			int count = 0;

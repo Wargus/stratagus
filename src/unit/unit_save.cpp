@@ -183,6 +183,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Waiting) {
 		file.printf(" \"waiting\",");
 	}
+	if (unit.MineLow) {
+		file.printf(" \"mine-low\",");
+	}
 	if (unit.RescuedFrom) {
 		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
 	}

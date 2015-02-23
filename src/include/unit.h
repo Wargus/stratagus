@@ -363,6 +363,7 @@ public:
 
 	unsigned Summoned : 1;       /// Unit is summoned using spells.
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
+	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
@@ -428,7 +429,7 @@ public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
-		IconsShift(false), StereoSound(true),
+		IconsShift(false), StereoSound(true), MineNotifications(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
@@ -441,6 +442,7 @@ public:
 	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc 
 	bool IconsShift;         /// Shift icons slightly when you press on them
 	bool StereoSound;        /// Enables/diables stereo sound effects
+	bool MineNotifications;  /// Show mine is running low/depleted messages (as in Warcraft 3)
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

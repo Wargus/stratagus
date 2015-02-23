@@ -381,7 +381,10 @@ static int CclUnit(lua_State *l)
 			unit->Summoned = 1;
 			--j;
 		} else if (!strcmp(value, "waiting")) {
-			unit->Summoned = 1;
+			unit->Waiting = 1;
+			--j;
+		} else if (!strcmp(value, "mine-low")) {
+			unit->MineLow = 1;
 			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];

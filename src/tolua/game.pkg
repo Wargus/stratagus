@@ -39,6 +39,7 @@ extern bool GameObserve;
 extern bool GameEstablishing;
 
 extern unsigned long GameCycle;
+extern unsigned long FastForwardCycle;
 
 
 $#include "settings.h"
