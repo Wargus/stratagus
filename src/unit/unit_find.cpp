@@ -1151,13 +1151,15 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		}
 		return NULL;
 	} else {
+		// If unit is removed, use containers x and y
+		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
 
 		if (onlyBuildings) {
-			SelectAroundUnit(unit, range, table,
+			SelectAroundUnit(*firstContainer, range, table,
 							 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
 		} else {
-			SelectAroundUnit(unit, range, table,
+			SelectAroundUnit(*firstContainer, range, table,
 							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
 		}
 
