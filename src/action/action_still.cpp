@@ -293,7 +293,9 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (autoAttackUnit == NULL) {
 		return false;
 	}
-	if (unit.MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+	// If unit is removed, use containers x and y
+	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		return false;
 	}
 	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {

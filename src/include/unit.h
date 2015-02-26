@@ -439,9 +439,9 @@ public:
 	bool BigScreen;			 /// If true, shows the big screen(without panels)
 	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
 	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
-	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc 
+	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
 	bool IconsShift;         /// Shift icons slightly when you press on them
-	bool StereoSound;        /// Enables/diables stereo sound effects
+	bool StereoSound;        /// Enables/disables stereo sound effects
 	bool MineNotifications;  /// Show mine is running low/depleted messages
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
