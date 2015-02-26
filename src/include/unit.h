@@ -442,7 +442,7 @@ public:
 	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc 
 	bool IconsShift;         /// Shift icons slightly when you press on them
 	bool StereoSound;        /// Enables/diables stereo sound effects
-	bool MineNotifications;  /// Show mine is running low/depleted messages (as in Warcraft 3)
+	bool MineNotifications;  /// Show mine is running low/depleted messages
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

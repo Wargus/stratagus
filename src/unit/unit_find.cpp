@@ -54,12 +54,6 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
-class NoFilter
-{
-public:
-	bool operator()(const CUnit *) const { return true; }
-};
-
 void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
 {
 	Select(ltPos, rbPos, units, NoFilter());
@@ -740,6 +734,10 @@ private:
 			return INT_MAX;
 		}
 
+		if (dtype.UnitType == UnitTypeFly && dest->IsAgressive() == false) {
+			return INT_MAX;
+		}
+
 		// Calculate the costs to attack the unit.
 		// Unit with the smallest attack costs will be taken.
 		int cost = 0;
@@ -1123,7 +1121,7 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 **
 **  @return       Unit to be attacked.
 */
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 {
 	// if necessary, take possible damage on allied units into account...
 	if (unit.Type->Missile.Missile->Range > 1
@@ -1138,13 +1136,8 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
-		if (onlyBuildings) {
-			SelectAroundUnit(*firstContainer, missile_range, table,
-							 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
-		} else {
-			SelectAroundUnit(*firstContainer, missile_range, table,
-							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
-		}
+		SelectAroundUnit(*firstContainer, missile_range, table,
+			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -1155,13 +1148,8 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
 
-		if (onlyBuildings) {
-			SelectAroundUnit(*firstContainer, range, table,
-							 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()));
-		} else {
-			SelectAroundUnit(*firstContainer, range, table,
-							 MakeNotPredicate(HasSamePlayerAs(Players[PlayerNumNeutral])));
-		}
+		SelectAroundUnit(*firstContainer, range, table,
+			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {
@@ -1173,6 +1161,11 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 	}
 }
 
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
+{
+	return AttackUnitsInDistance(unit, range, NoFilter());
+}
+
 /**
 **  Attack units in attack range.
 **
@@ -1180,10 +1173,15 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-CUnit *AttackUnitsInRange(const CUnit &unit)
+CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred)
 {
 	Assert(unit.Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max);
+	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max, pred);
+}
+
+CUnit *AttackUnitsInRange(const CUnit &unit)
+{
+	return AttackUnitsInRange(unit, NoFilter());
 }
 
 /**
@@ -1193,11 +1191,16 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 **
 **  @return      Pointer to unit which should be attacked.
 */
-CUnit *AttackUnitsInReactRange(const CUnit &unit)
+CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 {
 	Assert(unit.Type->CanAttack);
 	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
-	return AttackUnitsInDistance(unit, range);
+	return AttackUnitsInDistance(unit, range, pred);
+}
+
+CUnit *AttackUnitsInReactRange(const CUnit &unit)
+{
+	return AttackUnitsInReactRange(unit, NoFilter());
 }
 
 //@}

@@ -55,6 +55,7 @@
 #define AIATTACK_RANGE 0
 #define AIATTACK_ALLMAP 1
 #define AIATTACK_BUILDING 2
+#define AIATTACK_AGRESSIVE 3
 
 template <const int FIND_TYPE>
 class AiForceEnemyFinder
@@ -86,8 +87,14 @@ public:
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, true);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
 			Assert(!*enemy || (*enemy)->Type->Building);
+			if (*enemy == NULL) {
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+			}
+		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
+			Assert(!*enemy || (*enemy)->IsAgressive());
 			if (*enemy == NULL) {
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 			}
@@ -386,10 +393,20 @@ void AiForce::Attack(const Vec2i &pos)
 			break;
 		}
 	}
+	bool isTransporter = false;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *const unit = this->Units[i];
+		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
+			isTransporter = true;
+			break;
+		}
+	}
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
-		if (isNaval) {
+		if (isTransporter) {
+			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
+		} else if (isNaval) {
 			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
 		} else {
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
@@ -400,7 +417,7 @@ void AiForce::Attack(const Vec2i &pos)
 	} else {
 		isDefenceForce = true;
 	}
-	if (Map.Info.IsPointOnMap(goalPos) == false) {
+	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);

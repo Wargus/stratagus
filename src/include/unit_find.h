@@ -45,7 +45,19 @@
 //  Some predicates
 //
 
-class HasSameTypeAs
+class CUnitFilter
+{
+public:
+	bool operator()(const CUnit *unit) const { return true; };
+};
+
+class NoFilter : public CUnitFilter
+{
+public:
+	bool operator()(const CUnit *) const { return true; }
+};
+
+class HasSameTypeAs : public CUnitFilter
 {
 public:
 	explicit HasSameTypeAs(const CUnitType &_type) : type(&_type) {}
@@ -54,7 +66,7 @@ private:
 	const CUnitType *type;
 };
 
-class HasSamePlayerAs
+class HasSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasSamePlayerAs(const CPlayer &_player) : player(&_player) {}
@@ -63,7 +75,7 @@ private:
 	const CPlayer *player;
 };
 
-class HasNotSamePlayerAs
+class HasNotSamePlayerAs : public CUnitFilter
 {
 public:
 	explicit HasNotSamePlayerAs(const CPlayer &_player) : player(&_player) {}
@@ -72,7 +84,7 @@ private:
 	const CPlayer *player;
 };
 
-class IsAlliedWith
+class IsAlliedWith : public CUnitFilter
 {
 public:
 	explicit IsAlliedWith(const CPlayer &_player) : player(&_player) {}
@@ -81,7 +93,7 @@ private:
 	const CPlayer *player;
 };
 
-class IsEnemyWith
+class IsEnemyWith : public CUnitFilter
 {
 public:
 	explicit IsEnemyWith(const CPlayer &_player) : player(&_player) {}
@@ -90,7 +102,7 @@ private:
 	const CPlayer *player;
 };
 
-class HasSamePlayerAndTypeAs
+class HasSamePlayerAndTypeAs : public CUnitFilter
 {
 public:
 	explicit HasSamePlayerAndTypeAs(const CUnit &unit) :
@@ -110,7 +122,7 @@ private:
 	const CUnitType *type;
 };
 
-class IsNotTheSameUnitAs
+class IsNotTheSameUnitAs : public CUnitFilter
 {
 public:
 	explicit IsNotTheSameUnitAs(const CUnit &unit) : forbidden(&unit) {}
@@ -119,13 +131,19 @@ private:
 	const CUnit *forbidden;
 };
 
-class IsBuildingType
+class IsBuildingType : public CUnitFilter
 {
 public:
 	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
 };
 
-class OutOfMinRange
+class IsAggresiveUnit : public CUnitFilter
+{
+public:
+	bool operator()(const CUnit *unit) const { return unit->IsAgressive(); }
+};
+
+class OutOfMinRange : public CUnitFilter
 {
 public:
 	explicit OutOfMinRange(const int range, const Vec2i pos) : range(range), pos(pos) {}
@@ -137,7 +155,7 @@ private:
 
 
 template <typename Pred>
-class NotPredicate
+class NotPredicate : public CUnitFilter
 {
 public:
 	explicit NotPredicate(Pred _pred) : pred(_pred) {}
@@ -150,7 +168,7 @@ template <typename Pred>
 NotPredicate<Pred> MakeNotPredicate(Pred pred) { return NotPredicate<Pred>(pred); }
 
 template <typename Pred1, typename Pred2>
-class AndPredicate
+class AndPredicate : public CUnitFilter
 {
 public:
 	AndPredicate(Pred1 _pred1, Pred2 _pred2) : pred1(_pred1), pred2(_pred2) {}
@@ -310,11 +328,16 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 /// Check map for obstacles in a line between 2 tiles
 extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
 /// Find best enemy in numeric range to attack
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings = false);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
 /// Find best enemy in attack range to attack
+extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
 extern CUnit *AttackUnitsInRange(const CUnit &unit);
 /// Find best enemy in reaction range to attack
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
 extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
+
+
 
 //@}
 
