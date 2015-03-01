@@ -2193,7 +2193,15 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 		}
 		case LUA_TSTRING: {
 			const std::string s = lua_tostring(l, -1);
-			value = ((s.find('\n') != std::string::npos) ? (std::string("[[") + s + "]]") : (std::string("\"") + s + "\""));
+			value = "";
+
+			for (std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
+				if (*it == '\"') {
+					value.push_back('\\');
+				}
+				value.push_back(*it);
+			}
+			value = ((value.find('\n') != std::string::npos) ? (std::string("[[") + value + "]]") : (std::string("\"") + value + "\""));
 			return true;
 		}
 		case LUA_TTABLE:
