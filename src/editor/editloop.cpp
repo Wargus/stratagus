@@ -289,6 +289,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 		if (it != unitCache.end()) {
 			CUnit &replacedUnit = **it;
 			unit->ResourcesHeld = replacedUnit.ResourcesHeld; // We capture the value of what is beneath.
+			unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
+			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
+			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
 			replacedUnit.Remove(NULL); // Destroy building beneath
 			UnitLost(replacedUnit);
 			UnitClearOrders(replacedUnit);
@@ -298,6 +301,9 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	if (unit != NULL) {
 		if (type.GivesResource) {
 			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
+			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 	} else {
 		DebugPrint("Unable to allocate Unit");

@@ -336,6 +336,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		Assert(b);
 		if (b->ReplaceOnBuild) {
 			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
+			build->Variable[GIVERESOURCE_INDEX].Value = ontop.Variable[GIVERESOURCE_INDEX].Value;
+			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
+			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;
 			ontop.Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
