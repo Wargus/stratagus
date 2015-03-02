@@ -93,6 +93,7 @@ extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
 
 extern int NetConnectRunning;              /// Network menu: Setup mode active
+extern int NetConnectType;              /// Network menu: Setup mode active
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 

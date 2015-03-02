@@ -437,14 +437,16 @@ public:
 	{
 		Cycle = 0;
 		memset(Type, 0, sizeof(Type));
+		OrigPlayer = 255;
 	}
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
-	static size_t Size() { return 1 + 1 * MaxNetworkCommands; }
+	static size_t Size() { return 1 + 1 + 1 * MaxNetworkCommands; }
 
 	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
 	uint8_t Cycle;                     /// Destination game cycle
+	uint8_t OrigPlayer;                /// Host address
 };
 
 /**

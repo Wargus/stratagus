@@ -279,7 +279,7 @@ CNetworkParameter::CNetworkParameter()
 {
 	localHost = "127.0.0.1";
 	localPort = defaultPort;
-	gameCyclesPerUpdate = 5;
+	gameCyclesPerUpdate = 1;
 	NetworkLag = 10;
 	timeoutInS = 45;
 }
@@ -295,12 +295,14 @@ bool NetworkInSync = true;                 /// Network is in sync
 CUDPSocket NetworkFildes;                  /// Network file descriptor
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
+static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
 static int NetworkSyncSeeds[256];          /// Network sync seeds.
 static int NetworkSyncHashs[256];          /// Network sync hashs.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
+
 
 #ifdef DEBUG
 class CNetworkStat
@@ -345,15 +347,23 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 **  @param packet       Packet to send.
 **  @param numcommands  Number of commands.
 */
-static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands)
+static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
 {
 	const unsigned int size = packet.Size(numcommands);
 	unsigned char *buf = new unsigned char[size];
 	packet.Serialize(buf, numcommands);
 
 	// Send to all clients.
-	for (int i = 0; i < HostsCount; ++i) {
-		const CHost host(Hosts[i].Host, Hosts[i].Port);
+	if (NetConnectType == 1) { // server
+		for (int i = 0; i < HostsCount; ++i) {
+			const CHost host(Hosts[i].Host, Hosts[i].Port);
+			if (Hosts[i].PlyNr == player) {
+				continue;
+			}
+			NetworkFildes.Send(host, buf, size);
+		}
+	} else { // client		
+		const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
 		NetworkFildes.Send(host, buf, size);
 	}
 	delete[] buf;
@@ -371,6 +381,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 	// Build packet of up to MaxNetworkCommands messages.
 	int numcommands = 0;
 	packet.Header.Cycle = ncq[0].Time & 0xFF;
+	packet.Header.OrigPlayer = ThisPlayer->Index;
 	int i;
 	for (i = 0; i < MaxNetworkCommands && ncq[i].Type != MessageNone; ++i) {
 		packet.Header.Type[i] = ncq[i].Type;
@@ -494,6 +505,7 @@ void NetworkOnStartGame()
 	memset(NetworkSyncHashs, 0, sizeof(NetworkSyncHashs));
 	memset(PlayerQuit, 0, sizeof(PlayerQuit));
 	memset(NetworkLastFrame, 0, sizeof(NetworkLastFrame));
+	memset(NetworkLastCycle, 0, sizeof(NetworkLastCycle));
 }
 
 //----------------------------------------------------------------------------
@@ -673,6 +685,7 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 			return false;
 		}
 	}
+	
 	return true;
 }
 
@@ -757,23 +770,36 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 
 static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHost &host)
 {
-	const int index = FindHostIndexBy(host);
-	if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
-#ifdef DEBUG
-		const std::string hostStr = host.toString();
-		DebugPrint("Not a host in play: %s\n" _C_ hostStr.c_str());
-#endif
-		return;
-	}
-	const int player = Hosts[index].PlyNr;
-
 	CNetworkPacket packet;
 	int commands;
 	packet.Deserialize(buf, len, &commands);
+
+	int player = packet.Header.OrigPlayer;
+	if (player == 255) {
+		const int index = FindHostIndexBy(host);
+		if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
+#ifdef DEBUG
+			const std::string hostStr = host.toString();
+			DebugPrint("Not a host in play: %s\n" _C_ hostStr.c_str());
+#endif
+			return;
+		}
+		player = Hosts[index].PlyNr;
+	}
+	if (NetConnectType == 1) {
+		if (player != 255) {
+			NetworkBroadcast(packet, commands, player);
+		}
+		if (NetworkLastCycle[player] > 10 && (int)(packet.Header.Cycle - NetworkLastCycle[player]) > (int)CNetworkParameter::Instance.NetworkLag) {
+			NetworkInSync = false;
+			return;
+		}
+	}
 	if (commands < 0) {
 		DebugPrint("Bad packet read\n");
 		return;
 	}
+	NetworkLastCycle[player] = packet.Header.Cycle;
 	// Parse the packet commands.
 	for (int i = 0; i != commands; ++i) {
 		// Handle some messages.

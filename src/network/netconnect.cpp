@@ -81,6 +81,7 @@ int HostsCount;                        /// Number of hosts.
 CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
 
 int NetConnectRunning = 0;             /// Network menu: Setup mode active
+int NetConnectType = 0;             /// Network menu: Setup mode active
 int NetLocalHostsSlot;                 /// Network menu: Slot # in Hosts array of local client
 int NetLocalPlayerNumber;              /// Player number of local client
 
@@ -1458,6 +1459,7 @@ void NetworkProcessServerRequest()
 void NetworkInitClientConnect()
 {
 	NetConnectRunning = 2;
+	NetConnectType = 2;
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
@@ -1755,6 +1757,7 @@ void NetworkDetachFromServer()
 void NetworkInitServerConnect(int openslots)
 {
 	NetConnectRunning = 1;
+	NetConnectType = 1;
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i].Clear();
