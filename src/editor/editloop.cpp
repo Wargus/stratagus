@@ -65,7 +65,7 @@
 #include "widgets.h"
 
 
-extern void DoScrollArea(int state, bool fast);
+extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
 extern void CleanGame();
 
@@ -1985,10 +1985,10 @@ void EditorMainLoop()
 			// Map scrolling
 			//
 			if (UI.MouseScroll) {
-				DoScrollArea(MouseScrollState, 0);
+				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
 			}
 			if (UI.KeyScroll) {
-				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0);
+				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
 					(Editor.State == EditorEditTile ||
 					 Editor.State == EditorEditUnit)) {

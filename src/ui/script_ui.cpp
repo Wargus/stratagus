@@ -68,6 +68,29 @@ CPreference Preference;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**  Set speed of key scroll
+**
+**  @param l  Lua state.
+*/
+static int CclSetKeyScrollSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	UI.KeyScrollSpeed = LuaToNumber(l, 1);
+	return 0;
+}
+
+/**
+**  Get speed of key scroll
+**
+**  @param l  Lua state.
+*/
+static int CclGetKeyScrollSpeed(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushnumber(l, UI.KeyScrollSpeed);
+	return 1;
+}
 
 /**
 **  Set speed of mouse scroll
@@ -1170,6 +1193,8 @@ void UserInterfaceCclRegister()
 	CursorCclRegister();
 	lua_register(Lua, "AddMessage", CclAddMessage);
 
+	lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
+	lua_register(Lua, "GetKeyScrollSpeed", CclGetKeyScrollSpeed);
 	lua_register(Lua, "SetMouseScrollSpeed", CclSetMouseScrollSpeed);
 	lua_register(Lua, "GetMouseScrollSpeed", CclGetMouseScrollSpeed);
 	lua_register(Lua, "SetMouseScrollSpeedDefault", CclSetMouseScrollSpeedDefault);

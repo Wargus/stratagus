@@ -380,6 +380,8 @@ public:
 
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
+	/// Key Scroll Speed
+	int KeyScrollSpeed;
 	/// Mouse Scroll Speed (screenpixels per mousepixel)
 	int MouseScrollSpeed;
 	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)

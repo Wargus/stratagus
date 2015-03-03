@@ -79,13 +79,15 @@ EventCallback EditorCallbacks; /// Editor callbacks
 **  @todo  Support dynamic acceleration of scroll speed.
 **  @todo  If the scroll key is longer pressed the area is scrolled faster.
 */
-void DoScrollArea(int state, bool fast)
+void DoScrollArea(int state, bool fast, bool isKeyboard)
 {
 	CViewport *vp;
 	int stepx;
 	int stepy;
 	static int remx = 0; // FIXME: docu
 	static int remy = 0; // FIXME: docu
+
+	int speed = isKeyboard ? UI.KeyScrollSpeed : UI.MouseScrollSpeed;
 
 	if (state == ScrollNone) {
 		return;
@@ -94,12 +96,12 @@ void DoScrollArea(int state, bool fast)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = (int)(UI.MouseScrollSpeed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(UI.MouseScrollSpeed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(UI.MouseScrollSpeed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(UI.MouseScrollSpeed * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
+		stepy = (int)(speed * PixelTileSize.y * FRAMES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
 		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
@@ -341,7 +343,7 @@ static void DisplayLoop()
 	//
 	// Map scrolling
 	//
-	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0);
+	DoScrollArea(MouseScrollState | KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 
 	ColorCycle();
 
