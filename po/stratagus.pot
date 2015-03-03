@@ -52,7 +52,17 @@ msgstr ""
 
 #: src/action/action_research.cpp:103
 #, c-format
-msgid "%s: complete"
+msgid "%s: research complete"
+msgstr ""
+
+#: src/action/action_resource.cpp:769
+#, c-format
+msgid "%s has collapsed!"
+msgstr ""
+
+#: src/action/action_resource.cpp:842
+#, c-format
+msgid "%s is running low!"
 msgstr ""
 
 #: src/action/action_returngoods.cpp:68
