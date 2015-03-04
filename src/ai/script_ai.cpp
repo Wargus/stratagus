@@ -1040,6 +1040,21 @@ static int CclAiSetCollect(lua_State *l)
 }
 
 /**
+**  Set AI player build.
+**
+**  @param l  Lua state.
+*/
+static int CclAiSetBuildDepots(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_isboolean(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+	AiPlayer->BuildDepots = LuaToBoolean(l, 1);
+	return 0;
+}
+
+/**
 **  Dump some AI debug informations.
 **
 **  @param l  Lua state.
@@ -1435,6 +1450,8 @@ void AiCclRegister()
 	lua_register(Lua, "AiPlayer", CclAiPlayer);
 	lua_register(Lua, "AiSetReserve", CclAiSetReserve);
 	lua_register(Lua, "AiSetCollect", CclAiSetCollect);
+
+	lua_register(Lua, "AiSetBuildDepots", CclAiSetBuildDepots);
 
 	lua_register(Lua, "AiDump", CclAiDump);
 
