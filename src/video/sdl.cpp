@@ -859,7 +859,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				}
 				InMainWindow = (event.active.gain != 0);
 			}
-			if (Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
+			if (!IsNetworkGame() && Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
 				static bool DoTogglePause = false;
 
 				if (IsSDLWindowVisible && !event.active.gain) {

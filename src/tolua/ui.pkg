@@ -2,6 +2,14 @@ $using namespace gcn;
 
 #include "font.h"
 
+enum ViewportModeType {
+	VIEWPORT_SINGLE = 0,
+	VIEWPORT_SPLIT_HORIZ,
+	VIEWPORT_SPLIT_HORIZ3,
+	VIEWPORT_SPLIT_VERT,
+	VIEWPORT_QUAD
+};
+
 class LuaActionListener
 {
 	LuaActionListener(lua_State *lua, lua_Object luaref);
@@ -585,5 +593,6 @@ void UiFindIdleWorker();
 void CycleViewportMode(int step);
 void UiToggleTerrain();
 void UiTrackUnit();
+void SetNewViewportMode(ViewportModeType new_mode);
 
 void SetDefaultTextColors(const std::string &normal, const std::string &reverse);

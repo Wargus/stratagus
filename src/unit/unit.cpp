@@ -1544,12 +1544,12 @@ void UnitCountSeen(CUnit &unit)
 		if (Players[p].Type != PlayerNobody) {
 			int newv = unit.IsVisible(Players[p]);
 			if (!oldv[p] && newv) {
-				UnitGoesOutOfFog(unit, Players[p]);
 				// Might have revealed a destroyed unit which caused it to
 				// be released
 				if (!unit.Type) {
 					break;
 				}
+				UnitGoesOutOfFog(unit, Players[p]);
 			}
 			if (oldv[p] && !newv) {
 				UnitGoesUnderFog(unit, Players[p]);

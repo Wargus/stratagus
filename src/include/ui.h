@@ -565,6 +565,7 @@ extern CViewport *GetViewport(const PixelPos &screenPos);
 extern void CycleViewportMode(int);
 /// Select viewport mode
 extern void SetViewportMode(ViewportModeType mode);
+extern void SetNewViewportMode(ViewportModeType mode);
 extern void CheckViewportMode();
 
 /// Check if mouse scrolling is enabled

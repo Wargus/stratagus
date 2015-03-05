@@ -37,12 +37,17 @@
 
 #include "animation/animation_frame.h"
 
+#include "ui.h"
 #include "unit.h"
 
 /* virtual */ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	unit.Frame = ParseAnimInt(&unit);
+	if (unit.Type->Building && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->NoRandomPlacing == false && unit.Frame < 0) {
+	} else {
+		unit.Frame = ParseAnimInt(&unit);
+	}
+	
 	UnitUpdateHeading(unit);
 }
 

@@ -650,6 +650,22 @@ void SetViewportMode(ViewportModeType new_mode)
 }
 
 /**
+**  Sets up a new viewport mode.
+**
+**  @param new_mode  New mode's number.
+*/
+void SetNewViewportMode(ViewportModeType new_mode)
+{
+	NewViewportMode = new_mode;
+	if (NewViewportMode >= NUM_VIEWPORT_MODES) {
+		NewViewportMode = VIEWPORT_SINGLE;
+	}
+	if (NewViewportMode < 0) {
+		NewViewportMode = (ViewportModeType)(NUM_VIEWPORT_MODES - 1);
+	}
+}
+
+/**
 **  Cycles through predefined viewport modes (geometry configurations)
 **  in order defined by the ViewportMode enumerated type.
 **

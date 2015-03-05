@@ -60,6 +60,7 @@
 
 #include "animation/animation_die.h"
 #include "commands.h"
+#include "interface.h"
 #include "luacallback.h"
 #include "map.h"
 #include "missile.h"
@@ -461,6 +462,11 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		if (unit.Destroyed) {
 			continue;
+		}
+
+		if (unit.Selected && !unit.IsVisible(*ThisPlayer)) {
+			UnSelectUnit(unit);
+			SelectionChanged();
 		}
 
 		// OnEachCycle callback
