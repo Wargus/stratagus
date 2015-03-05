@@ -548,9 +548,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 			this->ClearGoal();
 			int selected = unit.Selected;
 			unit.Remove(goal);
-			if (selected) {
+			if (selected && !Preference.DeselectInMine) {
 				unit.Removed = 0;
 				SelectUnit(unit);
+				SelectionChanged();
 				unit.Removed = 1;
 			}
 		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
@@ -990,9 +991,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	if (unit.Wait) {
 		int selected = unit.Selected;
 		unit.Remove(&goal);
-		if (selected) {
+		if (selected && !Preference.DeselectInMine) {
 			unit.Removed = 0;
 			SelectUnit(unit);
+			SelectionChanged();
 			unit.Removed = 1;
 		}
 		unit.Anim.CurrAnim = NULL;

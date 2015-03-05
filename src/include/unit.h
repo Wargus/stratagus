@@ -430,6 +430,7 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
+		DeselectInMine(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 
 	bool ShowSightRange;     /// Show sight range.
@@ -443,6 +444,7 @@ public:
 	bool IconsShift;         /// Shift icons slightly when you press on them
 	bool StereoSound;        /// Enables/disables stereo sound effects
 	bool MineNotifications;  /// Show mine is running low/depleted messages
+	bool DeselectInMine;     /// Deselect peasants in mines
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.
