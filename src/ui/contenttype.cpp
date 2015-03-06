@@ -257,7 +257,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-		unitToDraw->Type->Icon.Icon->DrawIcon(this->Pos, unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
+		unitToDraw->Type->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
+			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
 	}
 }
 
