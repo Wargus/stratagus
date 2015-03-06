@@ -46,6 +46,7 @@ $#include "settings.h"
 
 struct SettingsPresets {
 	int PlayerColor;
+	string AIScript;
 	int Race;
 	int Team;
 	int Type;

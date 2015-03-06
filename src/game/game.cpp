@@ -112,6 +112,7 @@ void SaveGameSettings(CFile &file)
 	file.printf("\nGameSettings.NetGameType = %d\n", GameSettings.NetGameType);
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		file.printf("GameSettings.Presets[%d].PlayerColor = %d\n", i, GameSettings.Presets[i].PlayerColor);
+		file.printf("GameSettings.Presets[%d].AIScript = \"%s\"\n", i, GameSettings.Presets[i].AIScript);
 		file.printf("GameSettings.Presets[%d].Race = %d\n", i, GameSettings.Presets[i].Race);
 		file.printf("GameSettings.Presets[%d].Team = %d\n", i, GameSettings.Presets[i].Team);
 		file.printf("GameSettings.Presets[%d].Type = %d\n", i, GameSettings.Presets[i].Type);
@@ -1022,6 +1023,7 @@ void InitSettings()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].PlayerColor = i;
+		GameSettings.Presets[i].AIScript = "ai-passive";
 		GameSettings.Presets[i].Race = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Type = SettingsPresetMapDefault;

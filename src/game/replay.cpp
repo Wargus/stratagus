@@ -101,6 +101,7 @@ public:
 	MPPlayer() : PlayerColor(0), Race(0), Team(0), Type(0) {}
 
 	std::string Name;
+	std::string AIScript;
 	int PlayerColor;
 	int Race;
 	int Team;
@@ -198,6 +199,7 @@ static FullReplay *StartReplay()
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
 		replay->Players[i].PlayerColor = GameSettings.Presets[i].PlayerColor;
+		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
@@ -248,6 +250,7 @@ static void ApplyReplaySettings()
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].PlayerColor = CurrentReplay->Players[i].PlayerColor;
+		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
