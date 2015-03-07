@@ -496,7 +496,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			unit.WaitBackup.CurrAnim = AnimationsArray[animIndex];
 		} else if (!strcmp(value, "anim")) {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.Anim = Advance(unit.Anim.CurrAnim, animIndex);
+			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
 		} else if (!strcmp(value, "unbreakable")) {
 			unit.WaitBackup.Unbreakable = 1;
 			--j;
