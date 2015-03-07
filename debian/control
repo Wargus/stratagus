@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
  imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
  zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
  libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev,
- libsdl1.2-dev (>> 1.2.2), libosso-dev, libx11-dev, libsqlite3-dev,
+ libsdl1.2-dev (>> 1.2.2), libx11-dev, libsqlite3-dev,
  libgles1-sgx-img-dev | libglu1-mesa-dev | libglu-dev | libgles1-mesa-dev,
  libsdl-gles1.2-dev | libglu1-mesa-dev | libglu-dev,
 Standards-Version: 3.9.2
