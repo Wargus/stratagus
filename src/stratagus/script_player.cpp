@@ -745,11 +745,25 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Allow")) {
 		LuaCheckArgs(l, 3);
-		const std::string ident = LuaToString(l, 3);
-		char b[2];
-		b[0] = UpgradeIdentAllowed(Players[p->Index], ident.c_str());
-		b[1] = 0;
-		lua_pushstring(l, b);
+		const char *ident = LuaToString(l, 3);
+		if (!strncmp(ident, "unit-", 5)) {
+			int id = UnitTypeIdByIdent(ident);
+			if (UnitIdAllowed(Players[p->Index], id) > 0) {
+				lua_pushstring(l, "A");
+			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
+				lua_pushstring(l, "F");
+			}
+		} else if (!strncmp(ident, "upgrade-", 8)) {
+			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
+				lua_pushstring(l, "A");
+			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'R') {
+				lua_pushstring(l, "R");
+			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'F') {
+				lua_pushstring(l, "F");
+			}
+		} else {
+			DebugPrint(" wrong ident %s\n" _C_ ident);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
