@@ -312,13 +312,28 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	return val;
 }
 
-UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e)
+UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 {
 	UStrInt val;
-	CVariable *var = &type.Stats[ThisPlayer->Index].Variables[index];
+	CVariable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
+	switch (t) {
+		case 0: // Unit:
+			var = &type.Stats[ThisPlayer->Index].Variables[index];;
+			break;
+		case 1: // Type:
+			var = &type.DefaultStat.Variables[index];
+			break;
+		case 2: // Stats:
+			var = &type.Stats[ThisPlayer->Index].Variables[index];
+			break;
+		default:
+			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
+			var = &type.Stats[ThisPlayer->Index].Variables[index];
+			break;
+	}
 	switch (e) {
 		case VariableValue:
 			val.type = USTRINT_INT;

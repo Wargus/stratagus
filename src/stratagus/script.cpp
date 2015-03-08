@@ -76,7 +76,7 @@ struct UStrInt {
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 /// Get component for unit type variable.
-extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
+extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -685,6 +685,11 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					if (res->D.TypeStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
+				} else if (!strcmp(key, "Loc")) {
+					res->D.TypeStat.Loc = LuaToNumber(l, -1);
+					if (res->D.TypeStat.Loc < 0 || 2 < res->D.TypeStat.Loc) {
+						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
+					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key);
 				}
@@ -983,7 +988,7 @@ int EvalNumber(const NumberDesc *number)
 			type = number->D.TypeStat.Type;
 			if (type != NULL) {
 				return GetComponent(**type, number->D.TypeStat.Index,
-									number->D.TypeStat.Component).i;
+									number->D.TypeStat.Component, number->D.TypeStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
@@ -1292,8 +1297,8 @@ void FreeStringDesc(StringDesc *s)
 */
 static int AliasTypeVar(lua_State *l, const char *s)
 {
-	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 2);
-
+	Assert(0 < lua_gettop(l) && lua_gettop(l) <= 3);
+	int nargs = lua_gettop(l); // number of args in lua.
 	lua_newtable(l);
 	lua_pushnumber(l, 1);
 	lua_pushstring(l, "TypeVar");
@@ -1308,7 +1313,33 @@ static int AliasTypeVar(lua_State *l, const char *s)
 	lua_pushvalue(l, 1);
 	lua_rawset(l, -3);
 	lua_pushstring(l, "Component");
-	lua_pushvalue(l, 2);
+	if (nargs >= 2) {
+		lua_pushvalue(l, 2);
+	} else {
+		lua_pushstring(l, "Value");
+	}
+	lua_rawset(l, -3);
+	lua_pushstring(l, "Loc");
+	if (nargs >= 3) {
+		//  Warning: type is for unit->Stats->Var...
+		//           and Initial is for unit->Type->Var... (no upgrade modification)
+		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		int i;
+		const char *key;
+
+		key = LuaToString(l, 3);
+		for (i = 0; sloc[i] != NULL; i++) {
+			if (!strcmp(key, sloc[i])) {
+				lua_pushnumber(l, i);
+				break ;
+			}
+		}
+		if (sloc[i] == NULL) {
+			LuaError(l, "Bad loc :'%s'" _C_ key);
+		}
+	} else {
+		lua_pushnumber(l, 0);
+	}
 	lua_rawset(l, -3);
 
 	lua_rawset(l, -3);

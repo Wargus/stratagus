@@ -366,7 +366,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->Variables && type) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->DefaultStat.Variables[i].Enable) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[ThisPlayer->Index].Variables[i].Enable) {
 					return false;
 				}
 			}

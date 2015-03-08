@@ -219,6 +219,7 @@ struct NumberDesc {
 			CUnitType **Type;           /// Which unit type.
 			int Index;                 /// Which index variable.
 			EnumVariable Component;    /// Which component.
+			int Loc;                   /// Location of Variables[].
 		} TypeStat;
 		struct {
 			StringDesc *String; /// String.

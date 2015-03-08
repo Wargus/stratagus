@@ -544,6 +544,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "MaxAttackRange")) {
 			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = LuaToNumber(l, -1);
 			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = 1;
 		} else if (!strcmp(value, "MaxHarvesters")) {
 			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = LuaToNumber(l, -1);
 			type->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = LuaToNumber(l, -1);

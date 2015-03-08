@@ -122,17 +122,17 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		if (unit.Variable[i].Max && unit.Variable[i].Value) {
-			unit.Variable[i].Value = newstats.Variables[i].Max *
-									 unit.Variable[i].Value / unit.Variable[i].Max;
-		} else {
-			unit.Variable[i].Value = newstats.Variables[i].Value;
-		}
 		if (i == KILL_INDEX || i == XP_INDEX) {
 			unit.Variable[i].Value = unit.Variable[i].Max;
-		} else {
-			unit.Variable[i].Max = newstats.Variables[i].Max;
+		} else if (unit.Variable[i].Max && unit.Variable[i].Value) {
+			unit.Variable[i].Value = newstats.Variables[i].Max *
+									 unit.Variable[i].Value / unit.Variable[i].Max;
+			unit.Variable[i].Max = std::max(newstats.Variables[i].Max, unit.Variable[i].Max);
 			unit.Variable[i].Increase = newstats.Variables[i].Increase;
+			unit.Variable[i].Enable = newstats.Variables[i].Enable;
+		} else {
+			unit.Variable[i].Value = newstats.Variables[i].Value;
+			unit.Variable[i].Max = unit.Variable[i].Value;
 			unit.Variable[i].Enable = newstats.Variables[i].Enable;
 		}
 	}
