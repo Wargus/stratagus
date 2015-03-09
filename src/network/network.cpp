@@ -790,10 +790,6 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 		if (player != 255) {
 			NetworkBroadcast(packet, commands, player);
 		}
-		if (NetworkLastCycle[player] > 10 && (int)(packet.Header.Cycle - NetworkLastCycle[player]) > (int)CNetworkParameter::Instance.NetworkLag) {
-			NetworkInSync = false;
-			return;
-		}
 	}
 	if (commands < 0) {
 		DebugPrint("Bad packet read\n");
