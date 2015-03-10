@@ -72,7 +72,7 @@
 /* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
 {
 	const Vec2i range(this->Range, this->Range);
-	const Vec2i typeSize(caster.Type->Width, caster.Type->Height);
+	const Vec2i typeSize(caster.Type->TileWidth, caster.Type->TileHeight);
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit
