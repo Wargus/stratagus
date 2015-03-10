@@ -766,8 +766,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
-					if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index) {
-						unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
+					if (Preference.MineNotifications 
+						&& unit.Player->Index == ThisPlayer->Index 
+						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
 					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
@@ -839,7 +841,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		this->Resource.Mine = source;
 		
 		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
-			&& source->IsAlive() && !source->MineLow && source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10) {
+			&& source->IsAlive() 
+			&& !source->MineLow 
+			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10 
+			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
 				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				source->MineLow = 1;
 		}
