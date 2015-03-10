@@ -170,18 +170,8 @@ static bool MoveRandomly(CUnit &unit)
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
-	switch ((SyncRand() >> 12) & 15) {
-		case 0: pos.x++; break;
-		case 1: pos.y++; break;
-		case 2: pos.x--; break;
-		case 3: pos.y--; break;
-		case 4: pos.x++; pos.y++; break;
-		case 5: pos.x--; pos.y++; break;
-		case 6: pos.y--; pos.x++; break;
-		case 7: pos.x--; pos.y--; break;
-		default:
-			break;
-	}
+	pos.x += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
+	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 
 	// restrict to map
 	Map.Clamp(pos);

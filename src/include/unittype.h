@@ -513,6 +513,7 @@ public:
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
 	int RandomMovementProbability;  /// Probability to move randomly.
+	int RandomMovementDistance;     /// Quantity of tiles to move randomly.
 	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int BoardSize;                  /// How much "cells" unit occupies inside transporter
