@@ -114,6 +114,7 @@ public:
 	void Flip();
 	void UseDisplayFormat();
 	void Resize(int w, int h);
+	void SetOriginalSize();
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 

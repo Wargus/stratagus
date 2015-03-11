@@ -471,12 +471,32 @@ class ListBox : public Widget
 {
 };
 
+class ImageListBox : public ListBox
+{
+};
+
 class ListBoxWidget : public ScrollArea
 {
 	ListBoxWidget(unsigned int width, unsigned int height);
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected (int selected);
 	int getSelected();
+};
+
+class ImageListBoxWidget : public ListBoxWidget
+{
+	ImageListBoxWidget(unsigned int width, unsigned int height);
+	void setList(lua_State *lua, lua_Object *lo);
+	void setSelected (int selected);
+	int getSelected();
+	void setItemImage(CGraphic *image);
+	void setUpButtonImage(CGraphic *image);
+	void setDownButtonImage(CGraphic *image);
+	void setLeftButtonImage(CGraphic *image);
+	void setRightButtonImage(CGraphic *image);
+	void setHBarImage(CGraphic *image);
+	void setVBarImage(CGraphic *image);
+	void setMarkerImage(CGraphic *image);
 };
 
 class Window : public BasicContainer

@@ -1206,37 +1206,7 @@ void CGraphic::Resize(int w, int h)
 	// Resizing the same image multiple times looks horrible
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
-		if (Surface) {
-			FreeSurface(&Surface);
-			Surface = NULL;
-		}
-		delete[] frame_map;
-		frame_map = NULL;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (!UseOpenGL)
-#endif
-		{
-			if (SurfaceFlip) {
-				FreeSurface(&SurfaceFlip);
-				SurfaceFlip = NULL;
-			}
-			delete[] frameFlip_map;
-			frameFlip_map = NULL;
-		}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL && Textures) {
-			glDeleteTextures(NumTextures, Textures);
-			delete[] Textures;
-			Textures = NULL;
-		}
-#endif
-
-		this->Width = this->Height = 0;
-		this->Surface = NULL;
-		this->Load();
-
-		Resized = false;
+		this->SetOriginalSize();
 		if (GraphicWidth == w && GraphicHeight == h) {
 			return;
 		}
@@ -1351,6 +1321,52 @@ void CGraphic::Resize(int w, int h)
 	}
 #endif
 	GenFramesMap();
+}
+
+/**
+**  Sets the original size for a graphic
+**
+*/
+void CGraphic::SetOriginalSize()
+{
+	Assert(Surface); // can't resize before it's been loaded
+
+	if (!Resized) {
+		return;
+	}
+
+	
+	if (Surface) {
+		FreeSurface(&Surface);
+		Surface = NULL;
+	}
+	delete[] frame_map;
+	frame_map = NULL;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
+		if (SurfaceFlip) {
+			FreeSurface(&SurfaceFlip);
+			SurfaceFlip = NULL;
+		}
+		delete[] frameFlip_map;
+		frameFlip_map = NULL;
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL && Textures) {
+		glDeleteTextures(NumTextures, Textures);
+		delete[] Textures;
+		Textures = NULL;
+	}
+#endif
+
+	this->Width = this->Height = 0;
+	this->Surface = NULL;
+	this->Load();
+
+	Resized = false;
 }
 
 /**

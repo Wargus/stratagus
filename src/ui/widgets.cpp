@@ -1277,6 +1277,129 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	}
 }
 
+/*----------------------------------------------------------------------------
+--  ImageListBox
+----------------------------------------------------------------------------*/
+
+ImageListBox::ImageListBox() : gcn::ListBox(), itemImage(NULL)
+{
+}
+
+ImageListBox::ImageListBox(gcn::ListModel *listModel) : gcn::ListBox(listModel), itemImage(NULL)
+{
+}
+
+void ImageListBox::draw(gcn::Graphics *graphics)
+{
+	if (mListModel == NULL) {
+		return;
+	}
+
+	graphics->setColor(getForegroundColor());
+	graphics->setFont(getFont());
+
+	int i, fontHeight;
+	int y = 0;
+	CGraphic *img = itemImage;
+	img->Resize(getWidth(), img->getHeight());
+
+	fontHeight = std::max<int>(getFont()->getHeight(), img->getHeight());
+
+    /**
+        * @todo Check cliprects so we do not have to iterate over elements in the list model
+        */
+	for (i = 0; i < mListModel->getNumberOfElements(); ++i) {
+		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight());
+		if (i == mSelected) {
+			graphics->drawText("~<" + mListModel->getElementAt(i) + "~>", 1, y + (fontHeight - getFont()->getHeight()) / 2);
+		} else {
+			graphics->drawText(mListModel->getElementAt(i), 1, y + (fontHeight - getFont()->getHeight()) / 2);
+		}
+
+		y += fontHeight;
+	}
+	img->SetOriginalSize();
+}
+
+void ImageListBox::drawBorder(gcn::Graphics *graphics)
+{
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
+	int alpha = getBaseColor().a;
+	int width = getWidth() + getBorderSize() * 2 - 1;
+	int height = getHeight() + getBorderSize() * 2 - 1;
+	highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+	unsigned int i;
+	for (i = 0; i < getBorderSize(); ++i)
+	{
+		graphics->setColor(shadowColor);
+		graphics->drawLine(i,i, width - i, i);
+		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->setColor(highlightColor);
+		graphics->drawLine(width - i,i + 1, width - i, height - i);
+		graphics->drawLine(i,height - i, width - i - 1, height - i);
+	}
+}
+
+void ImageListBox::adjustSize()
+{
+	if (mListModel != NULL)
+	{
+		setHeight((itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight()) * mListModel->getNumberOfElements());
+	}
+}
+
+void ImageListBox::mousePress(int, int y, int button)
+{
+	if (button == gcn::MouseInput::LEFT && hasMouse())
+	{
+		setSelected(y / (itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight()));
+		generateAction();
+	}
+}
+
+void ImageListBox::setSelected(int selected)
+{
+	if (mListModel == NULL)
+	{
+		mSelected = -1;
+	}
+	else
+	{
+		if (selected < 0)
+		{
+			mSelected = -1;
+		}
+		else if (selected >= mListModel->getNumberOfElements())
+		{
+			mSelected = mListModel->getNumberOfElements() - 1;
+		}
+		else
+		{
+			mSelected = selected;
+		}
+
+		Widget *par = getParent();
+		if (par == NULL)
+		{
+			return;
+		}
+
+		gcn::ScrollArea* scrollArea = dynamic_cast<gcn::ScrollArea *>(par);
+		if (scrollArea != NULL)
+		{
+			gcn::Rectangle scroll;
+			scroll.y = (itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight()) * mSelected;
+			scroll.height = (itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight());
+			scrollArea->scrollToRectangle(scroll);
+		}
+	}
+}
+
 
 /*----------------------------------------------------------------------------
 --  ListBoxWidget
@@ -1295,11 +1418,34 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 	setBackgroundColor(gcn::Color(128, 128, 128));
 }
 
+/**
+**  ImageListBoxWidget constructor.
+**
+**  @todo  Size should be parametrable, maybe remove default constructor?
+*/
+ImageListBoxWidget::ImageListBoxWidget(unsigned int width, unsigned int height) : ListBoxWidget(width, height),
+	upButtonImage(NULL), downButtonImage(NULL), leftButtonImage(NULL), rightButtonImage(NULL), hBarButtonImage(NULL), 
+	vBarButtonImage(NULL),	markerImage(NULL)
+{
+	setDimension(gcn::Rectangle(0, 0, width, height));
+	setContent(&listbox);
+}
+
 
 /**
 **  Set the list
 */
 void ListBoxWidget::setList(lua_State *lua, lua_Object *lo)
+{
+	lualistmodel.setList(lua, lo);
+	listbox.setListModel(&lualistmodel);
+	adjustSize();
+}
+
+/**
+**  Set the list
+*/
+void ImageListBoxWidget::setList(lua_State *lua, lua_Object *lo)
 {
 	lualistmodel.setList(lua, lo);
 	listbox.setListModel(&lualistmodel);
@@ -1319,6 +1465,18 @@ void ListBoxWidget::setSelected(int selected)
 }
 
 /**
+**  Sets the ListModel index of the selected element.
+**
+**  @param selected  The ListModel index of the selected element.
+**
+**  @see gcn::ListBox
+*/
+void ImageListBoxWidget::setSelected(int selected)
+{
+	listbox.setSelected(selected);
+}
+
+/**
 **  Gets the ListModel index of the selected element.
 **
 **  @return  The ListModel index of the selected element.
@@ -1328,6 +1486,18 @@ void ListBoxWidget::setSelected(int selected)
 int ListBoxWidget::getSelected() const
 {
 	return const_cast<gcn::ListBox &>(listbox).getSelected();
+}
+
+/**
+**  Gets the ListModel index of the selected element.
+**
+**  @return  The ListModel index of the selected element.
+**
+**  @see gcn::ListBox
+*/
+int ImageListBoxWidget::getSelected() const
+{
+	return const_cast<ImageListBox &>(listbox).getSelected();
 }
 
 /**
@@ -1343,11 +1513,35 @@ void ListBoxWidget::setBackgroundColor(const gcn::Color &color)
 }
 
 /**
+**  Set background color of the ListBoxWidget.
+**
+**  @param color  Color to set.
+*/
+void ImageListBoxWidget::setBackgroundColor(const gcn::Color &color)
+{
+	ScrollArea::setBackgroundColor(color);
+	ScrollArea::setBaseColor(color);
+	listbox.setBackgroundColor(color);
+}
+
+/**
 **  Set font of the ListBox.
 **
 **  @param font  Font to set.
 */
 void ListBoxWidget::setFont(gcn::Font *font)
+{
+	listbox.setFont(font);
+	listbox.setWidth(getWidth());
+	adjustSize();
+}
+
+/**
+**  Set font of the ListBox.
+**
+**  @param font  Font to set.
+*/
+void ImageListBoxWidget::setFont(gcn::Font *font)
 {
 	listbox.setFont(font);
 	listbox.setWidth(getWidth());
@@ -1379,11 +1573,317 @@ void ListBoxWidget::adjustSize()
 }
 
 /**
+**  Adjust size of the listBox.
+**
+**  @todo Fix width of the scroll area (depend of v-scroll or not).
+*/
+void ImageListBoxWidget::adjustSize()
+{
+	int i;
+	int width;
+	gcn::ListModel *listmodel;
+
+	width = listbox.getWidth();
+	Assert(listbox.getListModel());
+	listmodel = listbox.getListModel();
+	for (i = 0; i < listmodel->getNumberOfElements(); ++i) {
+		if (width < listbox.getFont()->getWidth(listmodel->getElementAt(i))) {
+			width = listbox.getFont()->getWidth(listmodel->getElementAt(i));
+		}
+	}
+	if (width != listbox.getWidth()) {
+		listbox.setWidth(width);
+	}
+}
+
+/**
 **  Add an action listener
 */
 void ListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 {
 	listbox.addActionListener(actionListener);
+}
+
+/**
+**  Add an action listener
+*/
+void ImageListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
+{
+	listbox.addActionListener(actionListener);
+}
+
+
+
+/**
+**  Draw the list box  
+**
+**  @param  graphics Graphics to use
+*/
+void ImageListBoxWidget::draw(gcn::Graphics *graphics)
+{
+	CGraphic *img = NULL;
+
+	// Check if we have all required graphics
+	if (!this->upButtonImage || !this->downButtonImage || !this->leftButtonImage || !this->rightButtonImage
+		|| !this->markerImage || !this->hBarButtonImage || !this->vBarButtonImage) {
+			fprintf(stderr, "Not all graphics for ImageListBoxWidget were set\n");
+			ExitFatal(1);
+	}
+
+	if (mVBarVisible)
+	{
+		this->drawUpButton(graphics);
+		this->drawDownButton(graphics);
+		this->drawVBar(graphics);
+		this->drawVMarker(graphics);
+	}
+	if (mHBarVisible)
+	{
+		this->drawLeftButton(graphics);
+		this->drawRightButton(graphics);
+		this->drawHBar(graphics);
+		this->drawHMarker(graphics);
+	}
+	if (mContent)
+	{
+		gcn::Rectangle contdim = mContent->getDimension();
+		graphics->pushClipArea(getContentDimension());
+
+		if (mContent->getBorderSize() > 0)
+		{
+			img = this->itemImage;
+			gcn::Rectangle rec = mContent->getDimension();
+			rec.x -= mContent->getBorderSize();
+			rec.y -= mContent->getBorderSize();
+			rec.width += 2 * mContent->getBorderSize();
+			rec.height += 2 * mContent->getBorderSize();
+			graphics->pushClipArea(rec);
+			mContent->drawBorder(graphics);
+			graphics->popClipArea();
+		}
+
+		graphics->pushClipArea(contdim);
+		mContent->draw(graphics);
+		graphics->popClipArea();
+		graphics->popClipArea();
+	}
+}
+
+/**
+**  Draw the list box border 
+**
+**  @param  graphics Graphics to use
+*/
+void ImageListBoxWidget::drawBorder(gcn::Graphics *graphics)
+{
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
+	int alpha = getBaseColor().a;
+	int width = getWidth() + getBorderSize() * 2 - 1;
+	int height = getHeight() + getBorderSize() * 2 - 1;
+	highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+	unsigned int i;
+	for (i = 0; i < getBorderSize(); ++i)
+	{
+		graphics->setColor(shadowColor);
+		graphics->drawLine(i,i, width - i, i);
+		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->setColor(highlightColor);
+		graphics->drawLine(width - i,i + 1, width - i, height - i);
+		graphics->drawLine(i,height - i, width - i - 1, height - i);
+	}
+}
+
+void ImageListBoxWidget::drawUpButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getUpButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = upButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawDownButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getDownButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = downButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawLeftButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getLeftButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = leftButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getRightButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = rightButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawHBar(gcn::Graphics *graphics)
+{
+	gcn::Rectangle dim = getHorizontalBarDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = hBarButtonImage;
+	img->Resize(dim.width, dim.height);
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	img->SetOriginalSize();
+
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawVBar(gcn::Graphics *graphics)
+{
+	gcn::Rectangle dim = getVerticalBarDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = vBarButtonImage;
+	img->Resize(dim.width, dim.height);
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	img->SetOriginalSize();
+
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawHMarker(gcn::Graphics *graphics)
+{
+	gcn::Rectangle dim = getHorizontalMarkerDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = markerImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawVMarker(gcn::Graphics *graphics)
+{
+	gcn::Rectangle dim = getVerticalMarkerDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = markerImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+
+	graphics->popClipArea();
+}
+
+gcn::Rectangle ImageListBoxWidget::getVerticalMarkerDimension()
+{
+	if (!mVBarVisible)
+	{
+		return gcn::Rectangle(0, 0, 0, 0);
+	}
+
+	int length, pos;
+	gcn::Rectangle barDim = getVerticalBarDimension();
+
+	if (mContent && mContent->getHeight() != 0)
+	{
+		length = this->markerImage->getHeight();
+	}
+	else
+	{
+		length = barDim.height;
+	}
+
+	if (length < mScrollbarWidth)
+	{
+		length = mScrollbarWidth;
+	}
+
+	if (length > barDim.height)
+	{
+		length = barDim.height;
+	}
+
+	if (getVerticalMaxScroll() != 0)
+	{
+		pos = ((barDim.height - length) * getVerticalScrollAmount())
+			/ getVerticalMaxScroll();
+	}
+	else
+	{
+		pos = 0;
+	}
+
+	return gcn::Rectangle(barDim.x, barDim.y + pos, mScrollbarWidth, length);
+}
+
+gcn::Rectangle ImageListBoxWidget::getHorizontalMarkerDimension()
+{
+	if (!mHBarVisible)
+	{
+		return gcn::Rectangle(0, 0, 0, 0);
+	}
+
+	int length, pos;
+	gcn::Rectangle barDim = getHorizontalBarDimension();
+
+	if (mContent && mContent->getWidth() != 0)
+	{
+		length = this->markerImage->getHeight();
+	}
+	else
+	{
+		length = barDim.width;
+	}
+
+	if (length < mScrollbarWidth)
+	{
+		length = mScrollbarWidth;
+	}
+
+	if (length > barDim.width)
+	{
+		length = barDim.width;
+	}
+
+	if (getHorizontalMaxScroll() != 0)
+	{
+		pos = ((barDim.width - length) * getHorizontalScrollAmount())
+			/ getHorizontalMaxScroll();
+	}
+	else
+	{
+		pos = 0;
+	}
+
+	return gcn::Rectangle(barDim.x + pos, barDim.y, length, mScrollbarWidth);
 }
 
 
