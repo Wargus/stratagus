@@ -226,7 +226,7 @@ private:
 };
 
 
-bool CBuildRestrictionOnTop::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
+bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -236,6 +236,21 @@ bool CBuildRestrictionOnTop::Check(const CUnit *, const CUnitType &, const Vec2i
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
 
 	if (it != cache.end() && (*it)->tilePos == pos) {
+		CUnit &found = **it;
+		std::vector<CUnit *> table;
+		Vec2i endPos(found.tilePos.x + found.Type->TileWidth, found.tilePos.y + found.Type->TileHeight);
+		Select(found.tilePos, endPos, table);
+		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
+			if (*it == *it2) {
+				continue;
+			}
+			if (builder == *it2) {
+				continue;
+			}
+			if (found.Type->UnitType == (*it2)->Type->UnitType) {
+				return false;
+			}
+		}
 		ontoptarget = *it;
 		return true;
 	}
@@ -317,7 +332,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			CBuildRestriction *rule = type.BuildingRules[i];
 			CUnit *ontoptarget = NULL;
 			// All checks processed, did we really have success
-			if (rule->Check(NoUnitP, type, pos, ontoptarget)) {
+			if (rule->Check(unit, type, pos, ontoptarget)) {
 				// We passed a full ruleset return
 				if (unit == NULL) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;
