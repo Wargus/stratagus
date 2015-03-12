@@ -40,6 +40,7 @@
 #include "animation.h"
 #include "commands.h"
 #include "construct.h"
+#include "interface.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -125,7 +126,16 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
-	return &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	int num = LuaToNumber(l, -1);
+	if (num == -1) {
+		if (!Selected.empty()) {
+			return Selected[0];
+		} else if (UnitUnderCursor) {
+			return UnitUnderCursor;
+		}
+		return NULL;
+	}
+	return &UnitManager.GetSlotUnit(num);
 }
 
 /**
@@ -1043,6 +1053,10 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
+	} else if (!strcmp(value, "GiveResourceType")) {
+		lua_pushnumber(l, unit->Type->GivesResource);
+	} else if (!strcmp(value, "CurrentResource")) {
+		lua_pushnumber(l, unit->CurrentResource);
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else {

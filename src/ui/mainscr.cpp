@@ -299,12 +299,15 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
+				val.i = unit.Type->GivesResource;
 				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
 			} else if (index == CARRYRESOURCE_INDEX) {
 				val.type = USTRINT_STR;
+				val.i = unit.CurrentResource;
 				val.s = DefaultResourceNames[unit.CurrentResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
+				val.i = index;
 				val.s = UnitTypeVar.VariableNameLookup[index];
 			}
 			break;
@@ -359,9 +362,11 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
 				val.type = USTRINT_STR;
+				val.i = type.GivesResource;
 				val.s = DefaultResourceNames[type.GivesResource].c_str();
 			} else {
 				val.type = USTRINT_STR;
+				val.i = index;
 				val.s = UnitTypeVar.VariableNameLookup[index];
 			}
 			break;
