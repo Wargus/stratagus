@@ -291,6 +291,11 @@ public:
 	void adjustSize();
 	void mousePress(int, int y, int button);
 	void setSelected(int selected);
+	void setListModel(gcn::ListModel *listModel);
+	void logic()
+	{
+		adjustSize();
+	}
 private:
 	CGraphic *itemImage;
 };
@@ -328,9 +333,13 @@ public:
 		listbox.setItemImage(image);
 	}
 	void setUpButtonImage(CGraphic *image) { upButtonImage = image; }
+	void setUpPressedButtonImage(CGraphic *image) { upPressedButtonImage = image; }
 	void setDownButtonImage(CGraphic *image) { downButtonImage = image; }
+	void setDownPressedButtonImage(CGraphic *image) { downPressedButtonImage = image; }
 	void setLeftButtonImage(CGraphic *image) { leftButtonImage = image; }
+	void setLeftPressedButtonImage(CGraphic *image) { leftPressedButtonImage = image; }
 	void setRightButtonImage(CGraphic *image) { rightButtonImage = image; }
+	void setRightPressedButtonImage(CGraphic *image) { rightPressedButtonImage = image; }
 	void setHBarImage(CGraphic *image) {
 		hBarButtonImage = image;
 		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
@@ -352,6 +361,10 @@ private:
 	void drawDownButton(gcn::Graphics *graphics);
 	void drawLeftButton(gcn::Graphics *graphics);
 	void drawRightButton(gcn::Graphics *graphics);
+	void drawUpPressedButton(gcn::Graphics *graphics);
+	void drawDownPressedButton(gcn::Graphics *graphics);
+	void drawLeftPressedButton(gcn::Graphics *graphics);
+	void drawRightPressedButton(gcn::Graphics *graphics);
 	void drawHMarker(gcn::Graphics *graphics);
 	void drawVMarker(gcn::Graphics *graphics);
 	void drawHBar(gcn::Graphics *graphics);
@@ -359,9 +372,13 @@ private:
 private:
 	CGraphic *itemImage;
 	CGraphic *upButtonImage;
+	CGraphic *upPressedButtonImage;
 	CGraphic *downButtonImage;
+	CGraphic *downPressedButtonImage;
 	CGraphic *leftButtonImage;
+	CGraphic *leftPressedButtonImage;
 	CGraphic *rightButtonImage;
+	CGraphic *rightPressedButtonImage;
 	CGraphic *hBarButtonImage;
 	CGraphic *vBarButtonImage;
 	CGraphic *markerImage;
@@ -377,6 +394,42 @@ public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
 	virtual void setSize(int width, int height);
+};
+
+class ImageDropDownWidget : public DropDownWidget
+{
+public:
+	ImageDropDownWidget() : itemImage(NULL) {
+		mListBox.addActionListener(this);
+		setListModel(&listmodel);
+		mScrollArea->setContent(&mListBox);
+	}
+	void setItemImage(CGraphic *image) {
+		itemImage = image;
+		mListBox.setItemImage(image);
+	}
+	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
+	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
+
+	virtual ImageListBox *getListBox() { return &mListBox; }
+	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawBorder(gcn::Graphics *graphics);
+	void drawButton(gcn::Graphics *graphics);
+	void setList(lua_State *lua, lua_Object *lo);
+	virtual void setSize(int width, int height);
+	void setListModel(LuaListModel *listModel);
+	int getSelected();
+	void setSelected(int selected);
+	void adjustHeight();
+	void setListBox(ImageListBox *listBox);
+	void setFont(gcn::Font *font);
+	void _mouseInputMessage(const gcn::MouseInput &mouseInput);
+private:
+	CGraphic *itemImage;
+	CGraphic *DownNormalImage;
+	CGraphic *DownPressedImage;
+	ImageListBox mListBox;
+	LuaListModel listmodel;
 };
 
 class StatBoxWidget : public gcn::Widget

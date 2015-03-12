@@ -499,9 +499,13 @@ class ImageListBoxWidget : public ListBoxWidget
 	int getSelected();
 	void setItemImage(CGraphic *image);
 	void setUpButtonImage(CGraphic *image);
+	void setUpPressedButtonImage(CGraphic *image);
 	void setDownButtonImage(CGraphic *image);
+	void setDownPressedButtonImage(CGraphic *image);
 	void setLeftButtonImage(CGraphic *image);
+	void setLeftPressedButtonImage(CGraphic *image);
 	void setRightButtonImage(CGraphic *image);
+	void setRightPressedButtonImage(CGraphic *image);
 	void setHBarImage(CGraphic *image);
 	void setVBarImage(CGraphic *image);
 	void setMarkerImage(CGraphic *image);
@@ -561,6 +565,17 @@ class DropDownWidget : public DropDown
 	void setList(lua_State *lua, lua_Object *lo);
 	virtual ListBox *getListBox();
 	virtual void setSize(int width, int height);
+};
+
+class ImageDropDownWidget : public DropDown
+{
+	ImageDropDownWidget();
+	void setList(lua_State *lua, lua_Object *lo);
+	virtual ListBox *getListBox();
+	virtual void setSize(int width, int height);
+	void setItemImage(CGraphic *image);
+	void setDownNormalImage(CGraphic *image);
+	void setDownPressedImage(CGraphic *image);
 };
 
 class StatBoxWidget : public Widget

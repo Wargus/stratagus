@@ -1475,6 +1475,13 @@ void ImageListBox::setSelected(int selected)
 	}
 }
 
+void ImageListBox::setListModel(gcn::ListModel *listModel)
+{
+	mSelected = -1;
+	mListModel = listModel;
+	adjustSize();
+}
+
 
 /*----------------------------------------------------------------------------
 --  ListBoxWidget
@@ -1700,22 +1707,49 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 
 	// Check if we have all required graphics
 	if (!this->upButtonImage || !this->downButtonImage || !this->leftButtonImage || !this->rightButtonImage
+		|| !this->upPressedButtonImage || !this->downPressedButtonImage || !this->leftPressedButtonImage || !this->rightPressedButtonImage
 		|| !this->markerImage || !this->hBarButtonImage || !this->vBarButtonImage) {
 			fprintf(stderr, "Not all graphics for ImageListBoxWidget were set\n");
 			ExitFatal(1);
 	}
 
+	gcn::Rectangle rect = getContentDimension();
+	img = itemImage;
+	img->Resize(rect.width, img->getHeight());
+	int y = 0;
+	while (y + img->getHeight() <= rect.height) {
+		graphics->drawImage(img, 0, 0, 0, y, getWidth(), img->getHeight());
+		y += img->getHeight();
+	}
+	img->SetOriginalSize();
+
 	if (mVBarVisible)
 	{
-		this->drawUpButton(graphics);
-		this->drawDownButton(graphics);
+		if (mUpButtonPressed) {
+			this->drawUpPressedButton(graphics);
+		} else {
+			this->drawUpButton(graphics);
+		}
+		if (mDownButtonPressed) {
+			this->drawDownPressedButton(graphics);
+		} else {
+			this->drawDownButton(graphics);
+		}
 		this->drawVBar(graphics);
 		this->drawVMarker(graphics);
 	}
 	if (mHBarVisible)
 	{
-		this->drawLeftButton(graphics);
-		this->drawRightButton(graphics);
+		if (mLeftButtonPressed) {
+			this->drawLeftPressedButton(graphics);
+		} else {
+			this->drawLeftButton(graphics);
+		}
+		if (mRightButtonPressed) {
+			this->drawRightPressedButton(graphics);
+		} else {
+			this->drawRightButton(graphics);
+		}
 		this->drawHBar(graphics);
 		this->drawHMarker(graphics);
 	}
@@ -1817,6 +1851,54 @@ void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics)
 	CGraphic *img = NULL;
 
 	img = rightButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawUpPressedButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getUpButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = upPressedButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawDownPressedButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getDownButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = downPressedButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawLeftPressedButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getLeftButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = leftPressedButtonImage;
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
+	graphics->popClipArea();
+}
+
+void ImageListBoxWidget::drawRightPressedButton(gcn::Graphics* graphics)
+{
+	gcn::Rectangle dim = getRightButtonDimension();
+	graphics->pushClipArea(dim);
+
+	CGraphic *img = NULL;
+
+	img = rightPressedButtonImage;
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -1986,7 +2068,255 @@ void DropDownWidget::setSize(int width, int height)
 }
 
 /*----------------------------------------------------------------------------
---  DropDownWidget
+--  ImageDropDownWidget
+----------------------------------------------------------------------------*/
+
+/**
+**  Set the list
+*/
+
+void ImageDropDownWidget::setListModel(LuaListModel *listModel)
+{
+	Assert(mScrollArea && mScrollArea->getContent() != NULL);
+
+	mListBox.setListModel(listModel);
+
+	if (mListBox.getSelected() < 0)
+	{
+		mListBox.setSelected(0);
+	}
+
+	adjustHeight();
+}
+
+void ImageDropDownWidget::setList(lua_State *lua, lua_Object *lo)
+{
+	listmodel.setList(lua, lo);
+	setListModel(&listmodel);
+}
+
+/**
+**  Set the drop down size
+*/
+void ImageDropDownWidget::setSize(int width, int height)
+{
+	DropDown::setSize(width, height);
+	this->getListBox()->setSize(width, height);
+}
+
+void ImageDropDownWidget::draw(gcn::Graphics *graphics)
+{
+	Assert(mScrollArea && mScrollArea->getContent() != NULL);
+	int h;
+
+	if (mDroppedDown)
+	{
+		h = mOldH;
+	}
+	else
+	{
+		h = getHeight();
+	}
+
+	CGraphic *img = this->itemImage;
+	if (!this->itemImage || !this->DownNormalImage || !this->DownPressedImage) {
+		fprintf(stderr, "Not all graphics for ImageDropDownWidget were set\n");
+		ExitFatal(1);
+	}
+
+	int alpha = getBaseColor().a;
+	gcn::Color faceColor = getBaseColor();
+	faceColor.a = alpha;
+	gcn::Color highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	gcn::Color shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+
+	img->Resize(getWidth(), h);
+	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
+	img->SetOriginalSize();
+	
+	graphics->setFont(getFont());
+
+	if (mListBox.getListModel() && mListBox.getSelected() >= 0)
+	{
+		graphics->drawText(mListBox.getListModel()->getElementAt(mListBox.getSelected()),
+			1, (h - getFont()->getHeight()) / 2);
+	}
+
+	if (hasFocus())
+	{
+		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth() - h, h));
+	}
+
+	drawButton(graphics);
+
+	if (mDroppedDown)
+	{
+		graphics->pushClipArea(mScrollArea->getDimension());
+		mScrollArea->draw(graphics);
+		graphics->popClipArea();
+
+		// Draw two lines separating the ListBox with se selected
+		// element view.
+		graphics->setColor(highlightColor);
+		graphics->drawLine(0, h, getWidth(), h);
+		graphics->setColor(shadowColor);
+		graphics->drawLine(0, h + 1,getWidth(),h + 1);
+	}
+}
+
+void ImageDropDownWidget::drawBorder(gcn::Graphics *graphics)
+{
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
+	int alpha = getBaseColor().a;
+	int width = getWidth() + getBorderSize() * 2 - 1;
+	int height = getHeight() + getBorderSize() * 2 - 1;
+	highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+	unsigned int i;
+	for (i = 0; i < getBorderSize(); ++i)
+	{
+		graphics->setColor(shadowColor);
+		graphics->drawLine(i,i, width - i, i);
+		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->setColor(highlightColor);
+		graphics->drawLine(width - i,i + 1, width - i, height - i);
+		graphics->drawLine(i,height - i, width - i - 1, height - i);
+	}
+}
+
+void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
+{
+	int h;
+	if (mDroppedDown)
+	{
+		h = mOldH;
+	}
+	else
+	{
+		h = getHeight();
+	}
+	int x = getWidth() - h;
+	int y = 0;
+
+	CGraphic *img = NULL;
+	if (mDroppedDown) {
+		img = this->DownPressedImage;
+	} else {
+		img = this->DownNormalImage;
+	}
+	img->Resize(h, h);
+	graphics->drawImage(img, 0, 0, x, y, h, h);
+	img->SetOriginalSize();
+}
+
+int ImageDropDownWidget::getSelected()
+{
+	Assert(mScrollArea && mScrollArea->getContent() != NULL);
+
+	return mListBox.getSelected();
+}
+
+void ImageDropDownWidget::setSelected(int selected)
+{
+	Assert(mScrollArea && mScrollArea->getContent() != NULL);
+
+	if (selected >= 0)
+	{
+		mListBox.setSelected(selected);
+	}
+}
+
+void ImageDropDownWidget::adjustHeight()
+{
+	Assert(mScrollArea && mScrollArea->getContent() != NULL);
+
+	int listBoxHeight = mListBox.getHeight();
+	int h2 = mOldH ? mOldH : getFont()->getHeight();
+
+	setHeight(h2);
+
+	// The addition/subtraction of 2 compensates for the seperation lines
+	// seperating the selected element view and the scroll area.
+
+	if (mDroppedDown && getParent())
+	{
+		int h = getParent()->getHeight() - getY();
+
+		if (listBoxHeight > h - h2 - 2)
+		{
+			mScrollArea->setHeight(h - h2 - 2);
+			setHeight(h);
+		}
+		else
+		{
+			setHeight(listBoxHeight + h2 + 2);
+			mScrollArea->setHeight(listBoxHeight);
+		}
+	}
+
+	mScrollArea->setWidth(getWidth());
+	mScrollArea->setPosition(0, h2 + 2);
+}
+
+void ImageDropDownWidget::setListBox(ImageListBox *listBox)
+{
+	listBox->setSelected(mListBox.getSelected());
+	listBox->setListModel(mListBox.getListModel());
+	listBox->addActionListener(this);
+
+	if (mScrollArea->getContent() != NULL)
+	{
+		mListBox.removeActionListener(this);
+	}
+
+	mListBox = *listBox;
+
+	mScrollArea->setContent(&mListBox);
+
+	if (mListBox.getSelected() < 0)
+	{
+		mListBox.setSelected(0);
+	}
+}
+
+void ImageDropDownWidget::setFont(gcn::Font *font)
+{
+	gcn::Widget::setFont(font);
+	mListBox.setFont(font);
+}
+
+void ImageDropDownWidget::_mouseInputMessage(const gcn::MouseInput &mouseInput)
+{
+	gcn::BasicContainer::_mouseInputMessage(mouseInput);
+
+	if (mDroppedDown)
+	{
+		Assert(mScrollArea && mScrollArea->getContent() != NULL);
+
+		if (mouseInput.y >= mOldH)
+		{
+			gcn::MouseInput mi = mouseInput;
+			mi.y -= mScrollArea->getY();
+			mScrollArea->_mouseInputMessage(mi);
+
+			if (mListBox.hasFocus())
+			{
+				mi.y -= mListBox.getY();
+				mListBox._mouseInputMessage(mi);
+			}
+		}
+	}
+}
+
+/*----------------------------------------------------------------------------
+--  StatBoxWidget
 ----------------------------------------------------------------------------*/
 
 /**
