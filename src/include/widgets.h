@@ -256,6 +256,19 @@ private:
 	/// @todo Method to set this variable. Maybe set the variable static.
 };
 
+class ImageTextField : public gcn::TextField
+{
+
+public:
+	ImageTextField() : TextField(), itemImage(NULL) {}
+	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(NULL) {}
+	virtual void draw(gcn::Graphics *graphics);
+	virtual void drawBorder(gcn::Graphics *graphics);
+	void setItemImage(CGraphic *image) { itemImage = image; }
+private:
+	CGraphic *itemImage;
+};
+
 class LuaListModel : public gcn::ListModel
 {
 	std::vector<std::string> list;

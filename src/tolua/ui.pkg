@@ -467,6 +467,14 @@ class TextField : public Widget
 	virtual std::string &getText();
 };
 
+class ImageTextField : public Widget
+{
+	ImageTextField(const std::string text);
+	virtual void setText(const std::string text);
+	virtual std::string &getText();
+	void setItemImage(CGraphic *image);
+};
+
 class ListBox : public Widget
 {
 };

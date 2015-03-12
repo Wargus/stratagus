@@ -1258,6 +1258,81 @@ void Windows::setBaseColor(const gcn::Color &color)
 	container.setBaseColor(color);
 }
 
+/*----------------------------------------------------------------------------
+--  ImageTextField
+----------------------------------------------------------------------------*/
+
+void ImageTextField::draw(gcn::Graphics *graphics)
+{
+	gcn::Font *font;
+	int x, y;
+	CGraphic *img = this->itemImage;
+	if (!img) {
+		fprintf(stderr, "Not all graphics for ImageTextField were set\n");
+		ExitFatal(1);
+	}
+	img->Resize(getWidth(), img->getHeight());
+	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), img->getHeight());
+
+	if (hasFocus())
+	{
+		drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
+	}
+
+	graphics->setColor(getForegroundColor());
+	font = getFont();
+	graphics->setFont(font);
+
+	x = 1 - mXScroll;
+	y = 1;
+
+	if (mSelectEndOffset != 0)
+	{
+		unsigned int first;
+		unsigned int len;
+		int selX;
+		int selW;
+		std::string tmpStr;
+
+		getTextSelectionPositions(&first, &len);
+
+		tmpStr = std::string(mText.substr(0, first));
+		selX = font->getWidth(tmpStr);
+
+		tmpStr = std::string(mText.substr(first, len));
+		selW = font->getWidth(tmpStr);
+
+		graphics->setColor(gcn::Color(127, 127, 127));
+		graphics->fillRectangle(gcn::Rectangle(x + selX, y, selW, font->getHeight()));
+	}
+
+	graphics->drawText(mText, x, y);
+}
+
+void ImageTextField::drawBorder(gcn::Graphics *graphics)
+{
+	gcn::Color faceColor = getBaseColor();
+	gcn::Color highlightColor, shadowColor;
+	int alpha = getBaseColor().a;
+	int width = getWidth() + getBorderSize() * 2 - 1;
+	int height = getHeight() + getBorderSize() * 2 - 1;
+	height = itemImage ? std::max<int>(height, itemImage->getHeight()) : height;
+	highlightColor = faceColor + 0x303030;
+	highlightColor.a = alpha;
+	shadowColor = faceColor - 0x303030;
+	shadowColor.a = alpha;
+
+	unsigned int i;
+	for (i = 0; i < getBorderSize(); ++i)
+	{
+		graphics->setColor(shadowColor);
+		graphics->drawLine(i,i, width - i, i);
+		graphics->drawLine(i,i + 1, i, height - i - 1);
+		graphics->setColor(highlightColor);
+		graphics->drawLine(width - i,i + 1, width - i, height - i);
+		graphics->drawLine(i,height - i, width - i - 1, height - i);
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  LuaListModel
