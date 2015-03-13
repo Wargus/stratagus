@@ -132,6 +132,7 @@ extern void EditorCclRegister();
 /// Update surroundings for tile changes
 extern void EditorTileChanged(const Vec2i &pos);
 
+extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
 
 //@}
 

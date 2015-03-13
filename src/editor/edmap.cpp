@@ -94,7 +94,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
+void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 

@@ -495,6 +495,9 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if (dest == &unit) {
 		return;
 	}
+	if (unit.Removed) {
+		return;
+	}
 	const CUnitType &type = *unit.Type;
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.

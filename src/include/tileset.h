@@ -135,6 +135,7 @@ public:
 	unsigned getRemovedTreeTile() const { return removedTreeTile; }
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
+	unsigned getMidOneTreeTile() const { return midOneTreeTile; }
 
 	unsigned getHumanWallTileIndex(int dirFlag) const;
 	unsigned getOrcWallTileIndex(int dirFlag) const;

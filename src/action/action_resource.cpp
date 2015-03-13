@@ -940,6 +940,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	CPlayer &player = *unit.Player;
 	Assert(&goal);
 
+	if (this->Finished) {
+		return 0; // Could happen when mining near to depot
+	}
+
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			return -1;
