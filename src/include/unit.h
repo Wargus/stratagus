@@ -430,21 +430,22 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false),
+		DeselectInMine(false), NoStatusLineTooltips(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 
-	bool ShowSightRange;     /// Show sight range.
-	bool ShowReactionRange;  /// Show reaction range.
-	bool ShowAttackRange;    /// Show attack range.
-	bool ShowMessages;		 /// Show messages.
-	bool BigScreen;			 /// If true, shows the big screen(without panels)
-	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
-	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
-	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
-	bool IconsShift;         /// Shift icons slightly when you press on them
-	bool StereoSound;        /// Enables/disables stereo sound effects
-	bool MineNotifications;  /// Show mine is running low/depleted messages
-	bool DeselectInMine;     /// Deselect peasants in mines
+	bool ShowSightRange;       /// Show sight range.
+	bool ShowReactionRange;    /// Show reaction range.
+	bool ShowAttackRange;      /// Show attack range.
+	bool ShowMessages;		   /// Show messages.
+	bool BigScreen;			   /// If true, shows the big screen(without panels)
+	bool PauseOnLeave;         /// If true, game pauses when cursor is gone
+	bool AiExplores;           /// If true, AI sends explorers to search for resources (almost useless thing)
+	bool GrayscaleIcons;       /// Use grayscaled icons for unavailable units, upgrades, etc
+	bool IconsShift;           /// Shift icons slightly when you press on them
+	bool StereoSound;          /// Enables/disables stereo sound effects
+	bool MineNotifications;    /// Show mine is running low/depleted messages
+	bool DeselectInMine;       /// Deselect peasants in mines
+	bool NoStatusLineTooltips; /// Don't show messages on status line
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.

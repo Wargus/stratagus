@@ -30,6 +30,7 @@ class CPreference
 	bool StereoSound;
 	bool MineNotifications;
 	bool DeselectInMine;
+	bool NoStatusLineTooltips;
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;

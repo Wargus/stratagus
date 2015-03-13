@@ -2191,7 +2191,9 @@ void DrawPieMenu()
 
 	int i = GetPieUnderCursor();
 	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
-		UpdateStatusLineForButton(buttons[i]);
+		if (!Preference.NoStatusLineTooltips) {
+			UpdateStatusLineForButton(buttons[i]);
+		}
 		DrawPopup(buttons[i], UI.ButtonPanel.Buttons[i],
 				  CursorStartScreenPos.x + UI.PieMenu.X[i], CursorStartScreenPos.y + UI.PieMenu.Y[i]);
 	}
