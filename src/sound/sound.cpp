@@ -304,6 +304,9 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 */
 void PlayUnitSound(const CUnit &unit, CSound *sound)
 {
+	if (!sound) {
+		return;
+	}
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
 	if (volume == 0) {
@@ -326,6 +329,9 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 */
 void PlayMissileSound(const Missile &missile, CSound *sound)
 {
+	if (!sound) {
+		return;
+	}
 	int stereo = ((missile.position.x + (missile.Type->G ? missile.Type->G->Width / 2 : 0) +
 				   UI.SelectedViewport->MapPos.x * PixelTileSize.x) * 256 /
 				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
@@ -353,6 +359,9 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 */
 void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 {
+	if (!sound) {
+		return;
+	}
 	Origin source = {NULL, 0};
 
 	CSample *sample = ChooseSample(sound, false, source);

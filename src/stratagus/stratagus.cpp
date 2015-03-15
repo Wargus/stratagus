@@ -217,6 +217,10 @@ extern void beos_init(int argc, char **argv);
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef USE_WIN32
+#include <windows.h>
+#include <dbghelp.h>
+#endif
 
 #if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
 #include "windows.h"
@@ -431,6 +435,9 @@ void Exit(int err)
 */
 void ExitFatal(int err)
 {
+#ifdef USE_STACKTRACE
+	throw stacktrace::stack_runtime_error((const char*)err);
+#endif
 	exit(err);
 }
 
@@ -654,6 +661,24 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	}
 }
 
+#ifdef USE_WIN32
+static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
+{
+	HANDLE hFile = CreateFile("crash.dmp", GENERIC_READ | GENERIC_WRITE,	FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,	NULL);
+	MINIDUMP_EXCEPTION_INFORMATION mei;
+	mei.ThreadId = GetCurrentThreadId();
+	mei.ClientPointers = TRUE;
+	mei.ExceptionPointers = ExceptionInfo;
+	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
+	fprintf(stderr, "Stratagus crashed!\n");
+	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
+	fprintf(stderr, "Please send it to our bug tracker: https://bugs.launchpad.net/stratagus\n");
+	fprintf(stderr, "and tell us what have you done to cause this bug.\n");
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
+
 /**
 **  The main program: initialise, parse options and arguments.
 **
@@ -669,7 +694,9 @@ int stratagusMain(int argc, char **argv)
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
 #endif
-
+#ifdef USE_WIN32
+	SetUnhandledExceptionFilter(CreateDumpFile);
+#endif
 	//  Setup some defaults.
 #ifndef MAC_BUNDLE
 	StratagusLibPath = ".";
@@ -750,10 +777,10 @@ int stratagusMain(int argc, char **argv)
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
 		fprintf(stderr, "Please send this call stack to our bug tracker: https://bugs.launchpad.net/stratagus\n");
-		fprintf(stderr, "and what have you done to cause this bug.\n");
+		fprintf(stderr, "and tell us what have you done to cause this bug.\n");
 		fprintf(stderr, " === exception state traceback === \n");
 		fprintf(stderr, "%s", e.what());
-		ExitFatal(1);
+		exit(1);
 	}
 #endif
 	return 0;
