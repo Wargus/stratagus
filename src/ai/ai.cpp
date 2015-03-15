@@ -931,8 +931,6 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 void AiCanNotMove(CUnit &unit)
 {
 	const Vec2i &goalPos = unit.pathFinderData->input.GetGoalPos();
-	const int minrange = unit.pathFinderData->input.GetMinRange();
-	const int maxrange = unit.pathFinderData->input.GetMaxRange();
 	const int gw = unit.pathFinderData->input.GetGoalSize().x;
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 

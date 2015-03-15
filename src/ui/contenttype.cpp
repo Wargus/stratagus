@@ -81,7 +81,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 	if (this->Text) {
 		text = EvalString(this->Text);
-		int pos;
+		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
 			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
 		} else if (this->Centered) {
