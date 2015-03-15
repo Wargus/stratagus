@@ -735,7 +735,7 @@ private:
 		}
 
 		if (dtype.UnitType == UnitTypeFly && dest->IsAgressive() == false) {
-			return INT_MAX;
+			return INT_MAX / 2;
 		}
 
 		// Calculate the costs to attack the unit.
