@@ -2746,7 +2746,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill) {
+	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
 		HitUnit_RunAway(target, *attacker);
 	}
 
