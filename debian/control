@@ -1,7 +1,7 @@
 Source: stratagus
 Section: games
 Priority: optional
-Maintainer: Pali Rohár <pali.rohar@gmail.com>
+Maintainer: cybermind <iddqd_mail@mail.ru>
 Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
  imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
  zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
@@ -33,6 +33,9 @@ Description: Strategy Gaming Engine
  .
  Games which use Stratagus:
   * Wargus - Warcraft II - https://launchpad.net/wargus
+  * Doom Wars - http://stratagus.com/games/doom-wars
+  * Wyrmsun - https://github.com/andrettin/wyrmsun
+    (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
   * Stargus - Starcraft I - https://launchpad.net/stargus
   * War1gus - Warcraft I - https://launchpad.net/war1gus
  .
@@ -66,6 +69,9 @@ Description: Strategy Gaming Engine (debugging symbols)
  .
  Games which use Stratagus:
   * Wargus - Warcraft II - https://launchpad.net/wargus
+  * Doom Wars - http://stratagus.com/games/doom-wars
+  * Wyrmsun - https://github.com/andrettin/wyrmsun
+    (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
   * Stargus - Starcraft I - https://launchpad.net/stargus
   * War1gus - Warcraft I - https://launchpad.net/war1gus
  .
@@ -101,6 +107,9 @@ Description: Strategy Gaming Engine (documentation)
  .
  Games which use Stratagus:
   * Wargus - Warcraft II - https://launchpad.net/wargus
+  * Doom Wars - http://stratagus.com/games/doom-wars
+  * Wyrmsun - https://github.com/andrettin/wyrmsun
+    (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
   * Stargus - Starcraft I - https://launchpad.net/stargus
   * War1gus - Warcraft I - https://launchpad.net/war1gus
  .
@@ -134,6 +143,9 @@ Description: Strategy Gaming Engine (development files)
  .
  Games which use Stratagus:
   * Wargus - Warcraft II - https://launchpad.net/wargus
+  * Doom Wars - http://stratagus.com/games/doom-wars
+  * Wyrmsun - https://github.com/andrettin/wyrmsun
+    (uses modified engine version : https://github.com/Andrettin/Wyrmgus)
   * Stargus - Starcraft I - https://launchpad.net/stargus
   * War1gus - Warcraft I - https://launchpad.net/war1gus
  .
