@@ -10,8 +10,8 @@
 //
 /**@name stratagus.cpp - The main file. */
 //
-//      (c) Copyright 1998-2011 by Lutz Sammer, Francois Beerten,
-//                                 Jimmy Salmon and Pali Rohár
+//      (c) Copyright 1998-2015 by Lutz Sammer, Francois Beerten,
+//                                 Jimmy Salmon, Pali Rohár and cybermind
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

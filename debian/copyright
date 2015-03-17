@@ -2,6 +2,7 @@ This work was packaged for Debian by:
 
     David Martínez Moreno <ender@debian.org> on Thu, 14 Feb 2004 21:43:26 +0100.
     Pali Rohár <pali.rohar@gmail.com> on Mon, 08 Aug 2011 20:56:26 +0200
+    cybermind <iddqd_mail@mail.ru>  on Tue, 17 Mar 2015 11:11:01 +0500
 
 It was downloaded from:
 
@@ -13,10 +14,11 @@ Upstream Author(s):
     Russel Smith <mr-russ@users.sourceforge.net>
     Nehal Mistry <nehalmistry@users.sourceforge.net>
     Pali Rohár <pali.rohar@gmail.com>
+    cybermind <iddqd_mail@mail.ru>
 
 Copyright:
 
-    (C) 1998-2012 by The Stratagus Project and Pali Rohár
+    (C) 1998-2015 by The Stratagus Project
 
 License:
 
@@ -38,6 +40,7 @@ The Debian packaging is:
 
     Copyright (C) 2004 David Martínez Moreno <ender@debian.org>
     Copyright (C) 2010-2012 Pali Rohár <pali.rohar@gmail.com>
+    Copyright (C) 2015 cybermind <iddqd_mail@mail.ru>
 
 and is licensed under the GPL version 2,
 see "/usr/share/common-licenses/GPL-2".
