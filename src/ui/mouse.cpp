@@ -1755,14 +1755,22 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
-					for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
-						if (uins->Boarded) {
-							--i;
+					size_t j = 0;
+
+					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+							continue;
 						}
+					if (ButtonAreaUnderCursor == ButtonAreaTransporting
+						&& static_cast<size_t>(ButtonUnderCursor) == j) {
+							Assert(uins->Boarded);
+							const int flush = !(KeyModifiers & ModifierShift);
+							if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+								SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+							}
+						}
+						++j;
 					}
-					Assert(uins->Boarded);
-					const int flush = !(KeyModifiers & ModifierShift);
-					SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
