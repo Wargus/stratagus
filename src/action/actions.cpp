@@ -464,7 +464,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 			continue;
 		}
 
-		if (unit.Selected && !unit.IsVisible(*ThisPlayer)) {
+		if (!ReplayRevealMap && unit.Selected && !unit.IsVisible(*ThisPlayer)) {
 			UnSelectUnit(unit);
 			SelectionChanged();
 		}

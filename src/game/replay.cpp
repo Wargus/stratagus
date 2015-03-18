@@ -348,6 +348,7 @@ static void SaveFullLog(CFile &file)
 		} else {
 			file.printf("\t{");
 		}
+		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" PlayerColor = %d,", CurrentReplay->Players[i].PlayerColor);
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
@@ -630,6 +631,8 @@ static int CclReplayLog(lua_State *l)
 					value = LuaToString(l, -2);
 					if (!strcmp(value, "Name")) {
 						replay->Players[j].Name = LuaToString(l, -1);
+					} else if (!strcmp(value, "AIScript")) {
+						replay->Players[j].AIScript = LuaToString(l, -1);
 					} else if (!strcmp(value, "PlayerColor")) {
 						replay->Players[j].PlayerColor = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Race")) {
