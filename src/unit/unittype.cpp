@@ -630,7 +630,7 @@ CUnitType::CUnitType() :
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
-	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0), SideAttack(0),
+	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {

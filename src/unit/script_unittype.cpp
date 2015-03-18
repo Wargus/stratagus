@@ -344,7 +344,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
 	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
 	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
-	type.BoolFlag[SIDEATTACK_INDEX].value            = type.SideAttack;
 }
 
 /**
