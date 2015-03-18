@@ -993,8 +993,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->NoRandomPlacing = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "organic")) {
 			type->Organic = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SideAttack")) {
-			type->SideAttack = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
