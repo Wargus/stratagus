@@ -400,8 +400,19 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
 				// Reached another unit, now attacking it
+				unsigned char oldDir = unit.Direction;
 				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
 				UnitHeadingFromDeltaXY(unit, dir);
+				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+					unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+					unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+					if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+						unit.Direction = leftTurn;
+					} else {
+						unit.Direction = rightTurn;
+					}
+					UnitUpdateHeading(unit);
+				}
 				this->State++;
 				return;
 			}
@@ -412,7 +423,18 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
 				// Reached wall or ground, now attacking it
+				unsigned char oldDir = unit.Direction;
 				UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+					unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+					unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+					if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+						unit.Direction = leftTurn;
+					} else {
+						unit.Direction = rightTurn;
+					}
+					UnitUpdateHeading(unit);
+				}
 				this->State &= WEAK_TARGET;
 				this->State |= ATTACK_TARGET;
 				return;
@@ -534,7 +556,18 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Turn always to target
 	if (goal) {
 		const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
+		unsigned char oldDir = unit.Direction;
 		UnitHeadingFromDeltaXY(unit, dir);
+		if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+			unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+			unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+			if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+				unit.Direction = leftTurn;
+			} else {
+				unit.Direction = rightTurn;
+			}
+			UnitUpdateHeading(unit);
+		}
 	}
 }
 
@@ -583,8 +616,18 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
 						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
-
+						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);
+						if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+							unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+							unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+							if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+								unit.Direction = leftTurn;
+							} else {
+								unit.Direction = rightTurn;
+							}
+							UnitUpdateHeading(unit);
+						}
 						this->State |= ATTACK_TARGET;
 						AttackTarget(unit);
 						return;

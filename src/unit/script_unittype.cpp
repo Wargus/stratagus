@@ -91,6 +91,7 @@ static const char NONSOLID_KEY[] = "NonSolid";
 static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
+static const char SIDEATTACK_KEY[] = "SideAttack";
 
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
@@ -148,7 +149,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY
 							  };
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
@@ -343,6 +344,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
 	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
 	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
+	type.BoolFlag[SIDEATTACK_INDEX].value            = type.SideAttack;
 }
 
 /**
@@ -991,6 +993,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->NoRandomPlacing = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "organic")) {
 			type->Organic = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SideAttack")) {
+			type->SideAttack = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

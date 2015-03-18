@@ -168,6 +168,7 @@ enum {
 	WALL_INDEX,
 	NORANDOMPLACING_INDEX,
 	ORGANIC_INDEX,
+	SIDEATTACK_INDEX,
 	NBARALREADYDEFINED
 };
 
@@ -569,6 +570,7 @@ public:
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
+	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
 
 	CUnitStats DefaultStat;
 	struct BoolFlags {
