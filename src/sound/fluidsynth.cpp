@@ -219,11 +219,14 @@ int InitFluidSynth()
 		CleanFluidSynth();
 		return -1;
     }
-    // Load the soundfont 
-    if (fluid_synth_sfload(FluidSynthesizer.Synth, Preference.SF2Soundfont.c_str(), 1) == -1) {
-		fprintf(stderr, "Failed to load the SoundFont: %s\n", Preference.SF2Soundfont.c_str());
-		CleanFluidSynth();
-		return -1;
+    // Load the soundfont
+	std::string sf2Path = LibraryFileName(Preference.SF2Soundfont.c_str());
+    if (fluid_synth_sfload(FluidSynthesizer.Synth, sf2Path.c_str(), 1) == -1) {
+		if (fluid_synth_sfload(FluidSynthesizer.Synth, Preference.SF2Soundfont.c_str(), 1) == -1) {
+			fprintf(stderr, "Failed to load the SoundFont: %s\n", Preference.SF2Soundfont.c_str());
+			CleanFluidSynth();
+			return -1;
+		}
     }
 	// Create player
 	FluidSynthesizer.Player = new_fluid_player(FluidSynthesizer.Synth);
