@@ -194,11 +194,11 @@ void UpdateDisplay()
 
 			UI.InfoPanel.Draw();
 			DrawResources();
-			UI.ButtonPanel.Draw();
 			UI.StatusLine.Draw();
+			UI.StatusLine.DrawCosts();
+			UI.ButtonPanel.Draw();
 		}
 
-		UI.StatusLine.DrawCosts();
 		DrawTimer();
 	}
 
