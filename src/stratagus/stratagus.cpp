@@ -227,6 +227,10 @@ extern void beos_init(int argc, char **argv);
 #define REDIRECT_OUTPUT
 #endif
 
+#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
+#include "SetupConsole_win32.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -696,6 +700,9 @@ int stratagusMain(int argc, char **argv)
 #endif
 #ifdef USE_WIN32
 	SetUnhandledExceptionFilter(CreateDumpFile);
+#endif
+#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
+	SetupConsole();
 #endif
 	//  Setup some defaults.
 #ifndef MAC_BUNDLE

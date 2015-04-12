@@ -354,7 +354,7 @@ set(video_SRCS
 source_group(video FILES ${video_SRCS})
 
 set(win32_SRCS
-	src/win32/attachconsole.cpp
+	src/win32/SetupConsole_win32.cpp
 	src/win32/stratagus.rc
 )
 source_group(win32 FILES ${win32_SRCS})
@@ -584,6 +584,7 @@ set(stratagus_generic_HDRS
 	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
+	src/include/SetupConsole_win32.h
 )
 
 
