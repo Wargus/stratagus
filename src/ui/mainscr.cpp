@@ -1143,7 +1143,7 @@ static void InfoPanel_draw_multiple_selection()
 	if (Selected.size() > UI.SelectedButtons.size()) {
 		char buf[5];
 
-		sprintf(buf, "+%u", Selected.size() - UI.SelectedButtons.size());
+		sprintf(buf, "+%lu", (long unsigned int)(Selected.size() - UI.SelectedButtons.size()));
 		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);
 	}
 }

@@ -982,7 +982,7 @@ void SaveSelections(CFile &file)
 	file.printf("--- MODULE: selection\n\n");
 
 	file.printf("SetGroupId(%d)\n", GroupId);
-	file.printf("Selection(%d, {", Selected.size()); // TODO: remove
+	file.printf("Selection(%lu, {", (long unsigned int)Selected.size()); // TODO: remove
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		file.printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
 	}
