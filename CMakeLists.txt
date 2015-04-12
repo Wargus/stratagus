@@ -1140,6 +1140,14 @@ if(SQLITE_FOUND)
 	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
 
+	if(WIN32)
+		target_link_libraries(metaserver winmm ws2_32)
+	endif()
+
+	if(WIN32 AND MINGW)
+		target_link_libraries(metaserver dxguid)
+	endif()
+
 	if(WIN32 AND MINGW AND ENABLE_STATIC)
 		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
 	endif()
