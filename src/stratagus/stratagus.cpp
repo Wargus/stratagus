@@ -337,12 +337,6 @@ static void PrintHeader()
 #ifdef USE_MNG
 		"MNG "
 #endif
-#ifdef USE_OPENGL
-		"OPENGL "
-#endif
-#ifdef USE_GLES
-		"GLES "
-#endif
 #ifdef USE_WIN32
 		"WIN32 "
 #endif
@@ -465,10 +459,6 @@ static void Usage()
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
-		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
-#endif
 		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
@@ -476,9 +466,6 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
-#endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -569,21 +556,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'N':
 				parameters.LocalPlayerName = optarg;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'o':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 0;
-				if (ZoomNoResize) {
-					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
-					Usage();
-					ExitFatal(-1);
-				}
-				continue;
-			case 'O':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				continue;
-#endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
 				continue;
@@ -614,31 +586,12 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					ExitFatal(-1);
 				}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (ZoomNoResize) {
-					Video.ViewportHeight = Video.Height;
-					Video.ViewportWidth = Video.Width;
-					Video.Height = 0;
-					Video.Width = 0;
-				}
-#endif
 				continue;
 			}
 			case 'W':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'Z':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				ZoomNoResize = 1;
-				Video.ViewportHeight = Video.Height;
-				Video.ViewportWidth = Video.Width;
-				Video.Height = 0;
-				Video.Width = 0;
-				continue;
-#endif
 			case -1:
 				break;
 			case '?':

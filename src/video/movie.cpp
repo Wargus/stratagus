@@ -174,13 +174,8 @@ static int TheoraProcessData(OggData *data)
 int PlayMovie(const std::string &name)
 {
 	int videoWidth, videoHeight;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	videoWidth  = Video.ViewportWidth;
-	videoHeight = Video.ViewportHeight;
-#else
 	videoWidth  = Video.Width;
 	videoHeight = Video.Height;
-#endif
 
 	const std::string filename = LibraryFileName(name.c_str());
 
@@ -212,14 +207,6 @@ int PlayMovie(const std::string &name)
 		rect.x = (videoWidth - rect.w) / 2;
 		rect.y = 0;
 	}
-
-#ifdef USE_OPENGL
-	// When SDL_OPENGL is used, it is not possible to call SDL_CreateYUVOverlay, so turn temporary OpenGL off
-	// With GLES is all ok
-	if (UseOpenGL) {
-		SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, SDL_GetVideoSurface()->flags & ~SDL_OPENGL);
-	}
-#endif
 
 	SDL_FillRect(SDL_GetVideoSurface(), NULL, 0);
 	Video.ClearScreen();
@@ -295,13 +282,6 @@ int PlayMovie(const std::string &name)
 
 	OggFree(&data);
 	f.close();
-
-#ifdef USE_OPENGL
-	if (UseOpenGL) {
-		SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, SDL_GetVideoSurface()->flags | SDL_OPENGL);
-		ReloadOpenGL();
-	}
-#endif
 
 	SetCallbacks(old_callbacks);
 

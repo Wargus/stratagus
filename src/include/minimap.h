@@ -63,10 +63,6 @@ public:
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
 	void Create();
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	void FreeOpenGL();
-	void Reload();
-#endif
 	void Destroy();
 	void Draw() const;
 	void DrawViewportArea(const CViewport &viewport) const;
@@ -88,13 +84,6 @@ public:
 	bool Transparent;
 	bool UpdateCache;
 };
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-// Minimap surface with units (for OpenGL)
-extern unsigned char *MinimapSurfaceGL;
-// Minimap surface with terrain only (for OpenGL)
-extern unsigned char *MinimapTerrainSurfaceGL;
-#endif
 
 // Minimap surface with units (for software)
 extern SDL_Surface *MinimapSurface;

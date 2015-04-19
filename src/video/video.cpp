@@ -73,7 +73,6 @@
 ** drawing directly to screen in conflict with the video update.
 **
 **   @see linedraw.cpp
-**   @see sprite.cpp
 */
 
 /*----------------------------------------------------------------------------
@@ -165,12 +164,6 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = NULL;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-char ForceUseOpenGL;
-bool UseOpenGL;                      /// Use OpenGL
-bool ZoomNoResize;
-#endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
@@ -284,32 +277,10 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			FreeOpenGLGraphics();
-			FreeOpenGLFonts();
-			UI.Minimap.FreeOpenGL();
-		}
-#endif
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		ViewportWidth = w;
-		ViewportHeight = h;
-		if (ZoomNoResize) {
-			ReloadOpenGL();
-		} else {
-			Width = w;
-			Height = h;
-			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-			if (UseOpenGL) {
-				ReloadOpenGL();
-			}
-		}
-#else
 		Width = w;
 		Height = h;
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#endif
 		return true;
 	}
 	return false;

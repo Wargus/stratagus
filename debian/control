@@ -7,8 +7,7 @@ Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
  zlib1g-dev, libbz2-dev, libpng12-dev (>= 1.2.5), libmng-dev,
  libmikmod2-dev, libogg-dev, libvorbis-dev, libtheora-dev,
  libsdl1.2-dev (>> 1.2.2), libx11-dev, libsqlite3-dev,
- libgles1-sgx-img-dev | libglu1-mesa-dev | libglu-dev | libgles1-mesa-dev,
- libsdl-gles1.2-dev | libglu1-mesa-dev | libglu-dev, libfluidsynth-dev
+ libsdl-gles1.2-dev, libfluidsynth-dev
 Standards-Version: 3.9.6
 Homepage: https://launchpad.net/stratagus
 Vcs-Browser: https://code.launchpad.net/stratagus
@@ -46,7 +45,7 @@ Description: Strategy Gaming Engine
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+ gzip, bunzip2, SDL, vorbis, and theora support.
  The sound options will depend on your personal election on SDL packages.
 
 Package: stratagus-dbg
@@ -82,7 +81,7 @@ Description: Strategy Gaming Engine (debugging symbols)
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+ gzip, bunzip2, SDL, vorbis, and theora support.
  The sound options will depend on your personal election on SDL packages.
  .
  This package contains Stratagus binary with debugging symbols.
@@ -120,7 +119,7 @@ Description: Strategy Gaming Engine (documentation)
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+ gzip, bunzip2, SDL, vorbis, and theora support.
  The sound options will depend on your personal election on SDL packages.
  .
  This package contains Stratagus documentation.
@@ -156,7 +155,7 @@ Description: Strategy Gaming Engine (development files)
  fairly bug-free. It also has network connectivity for up to 8 players.
  .
  This version is compiled with some of the possible options, and thus has
- gzip, bunzip2, SDL, vorbis, theora and OpenGL (or OpenGL ES 1.1) support.
+ gzip, bunzip2, SDL, vorbis, and theora support.
  The sound options will depend on your personal election on SDL packages.
  .
  This package contains Stratagus game development headers files needed for

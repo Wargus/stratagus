@@ -155,9 +155,6 @@ set(guichan_SRCS
 	src/guichan/key.cpp
 	src/guichan/keyinput.cpp
 	src/guichan/mouseinput.cpp
-#	src/guichan/opengl/opengl.cpp
-#	src/guichan/opengl/openglgraphics.cpp
-#	src/guichan/opengl/openglimageloader.cpp
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlgraphics.cpp
@@ -348,7 +345,6 @@ set(video_SRCS
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
-	src/video/sprite.cpp
 	src/video/video.cpp
 )
 source_group(video FILES ${video_SRCS})
@@ -660,8 +656,6 @@ find_package(OggVorbis)
 find_package(Theora)
 
 find_package(X11)
-find_package(OpenGL)
-find_package(OpenGLES)
 find_package(SDL_gles)
 
 find_package(Sqlite)
@@ -709,16 +703,6 @@ option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" OFF)
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
-
-if(NOT WITH_RENDERER)
-	if(OPENGL_FOUND)
-		set(WITH_RENDERER "OpenGL")
-	elseif(OPENGLES_FOUND AND SDLGLES_FOUND)
-		set(WITH_RENDERER "OpenGLES")
-	else()
-		set(WITH_RENDERER "NativeSDL")
-	endif()
-endif()
 
 # Install paths
 set(BINDIR "bin" CACHE PATH "Where to install user binaries")
@@ -792,31 +776,6 @@ if(WITH_X11 AND X11_FOUND)
 	add_definitions(-DUSE_X11)
 	include_directories(${X11_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${X11_X11_LIB})
-endif()
-
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
-	add_definitions(-DUSE_OPENGL)
-	include_directories(${OPENGL_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGL_LIBRARIES})
-	message(STATUS "Using OpenGL")
-elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
-	if(SDLGLES_TYPE STREQUAL "Native")
-		add_definitions(-DUSE_GLES_NATIVE)
-		message(STATUS "Using OpenGLES (SDL Native)")
-	elseif(SDLGLES_TYPE STREQUAL "Maemo")
-		add_definitions(-DUSE_GLES_MAEMO)
-		message(STATUS "Using OpenGLES (SDL Maemo)")
-	elseif(SDLGLES_TYPE STREQUAL "EGL")
-		add_definitions(-DUSE_GLES_EGL)
-		message(STATUS "Using OpenGLES (SDL EGL)")
-	else()
-		message(FATAL_ERROR "Unknown SDL gles type")
-	endif()
-	add_definitions(-DUSE_GLES)
-	include_directories(${OPENGLES_INCLUDE_DIR} ${SDLGLES_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGLES_LIBRARIES} ${SDLGLES_LIBRARY})
-elseif(NOT WITH_RENDERER STREQUAL "NativeSDL")
-	message(FATAL_ERROR "Specified rendering support was not found in system.\nChoose: NativeSDL OpenGL OpenGLES")
 endif()
 
 # Platform definitions
@@ -1050,13 +1009,7 @@ log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
 log_package("X11" "X11")
 
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
-	message("Renderer: OpenGL (Disable by param -DWITH_RENDERER=NativeSDL)")
-elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
-	message("Renderer: OpenGLES (Disable by param -DWITH_RENDERER=NativeSDL)")
-else()
-	message("Renderer: NativeSDL (Enable OpenGL by param -DWITH_RENDERER=OpenGL)")
-endif()
+message("Renderer: NativeSDL")
 
 message("==================================")
 

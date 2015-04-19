@@ -69,8 +69,8 @@ namespace gcn
 
     /**
      * Used for drawing graphics. It contains all vital functions for drawing.
-     * We include implemented Graphics classes for some common platforms like the
-     * Allegro library, the OpenGL library and the SDL library. To make Guichan
+     * We include implemented Graphics classes for some the
+     * Allegro library and the SDL library. To make Guichan
      * usable under another platform, a Graphics class must be implemented.
      *
      * In Graphics you can set clip areas to limit drawing to certain
@@ -92,7 +92,7 @@ namespace gcn
      * If you implement a Graphics class not present in Guichan we would be very
      * happy to add it to Guichan.
      *
-     * @see AllegroGraphics, OpenGLGraphics, SDLGraphics, Image
+     * @see AllegroGraphics, SDLGraphics, Image
      */
     class GCN_CORE_DECLSPEC Graphics
     {
@@ -104,8 +104,7 @@ namespace gcn
         /**
          * Initializes drawing. Called by the Gui when Gui::draw() is called.
          * It is needed by some implementations of Graphics to perform
-         * preparations before drawing. An example of such an implementation
-         * would be OpenGLGraphics.
+         * preparations before drawing.
          *
          * NOTE: You will never need to call this function yourself.
          *       Gui will do it for you.

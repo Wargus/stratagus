@@ -2,7 +2,7 @@
 # Once done this will define
 #
 #  SDLGLES_FOUND - system has gles support in SDL
-#  SDLGLES_TYPE - Native, Maemo or EGL
+#  SDLGLES_TYPE - Native or Maemo
 #  SDLGLES_INCLUDE_DIR - include directory for SDL gles (can be empty)
 #  SDLGLES_LIBRARY - library for SDL gles (can be empty)
 
@@ -11,8 +11,6 @@
 #  Maemo - support using SDL_gles library which was created for Maemo but should work with other systems too
 #          program needs to call SDL_GLES_Init, SDL_GLES_CreateContext and SDL_GLES_MakeCurrent
 #          More info on https://garage.maemo.org/projects/sdlhildon and https://wiki.maemo.org/User:Javispedro/SDL-GLES
-#  EGL - support using directly EGL library, see http://pandorawiki.org/Combining_OpenGL_ES_1.1_and_SDL_to_create_a_window_on_the_Pandora
-#        program needs to initialize EGL and GLES manually
 
 # Copyright (c) 2011-2013, Pali Rohár <pali.rohar@gmail.com>
 #
@@ -56,20 +54,6 @@ else()
 			unset(SDLGLES_INCLUDE_DIR)
 			unset(SDLGLES_LIBRARY)
 			message(STATUS "Could not find Maemo SDL gles")
-		endif()
-	endif()
-
-	if (NOT SDLGLES_FOUND)
-		# Check for EGL support
-		find_package(OpenGLES)
-		if(OPENGLES_FOUND)
-			set(SDLGLES_FOUND true)
-			set(SDLGLES_TYPE "EGL")
-			set(SDLGLES_INCLUDE_DIR "")
-			set(SDLGLES_LIBRARY "")
-			message(STATUS "Found EGL SDL gles")
-		else()
-			message(STATUS "Could not find EGL SDL gles")
 		endif()
 	endif()
 

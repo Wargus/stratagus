@@ -1521,8 +1521,6 @@ PREDEFINED             = USE_ZLIB \
                          USE_MIKMOD \
                          USE_FLUIDSYNTH \
                          USE_MNG \
-                         USE_OPENGL \
-                         USE_GLES \
                          USE_WIN32 \
                          USE_MAC \
                          USE_BSD \
