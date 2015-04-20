@@ -164,9 +164,9 @@ namespace gcn
               break;
 
           case SDL_MOUSEWHEEL:
-	      // XXX: Hack.
+	      // FIXME:sdl2 Hack.
 	      if (mMouseInputQueue.empty()) {
-		      break; // TODO: does this happen? and what do we do?
+		      break; // FIXME:sdl2 does this happen? and what do we do?
 	      }
 	      lastMouseInput = mMouseInputQueue.front();
               mouseInput.x = syntheticMouseInput.x = lastMouseInput.x;
@@ -252,7 +252,7 @@ namespace gcn
 			}
 			else
 			{
-			    // TODO: XXX: Hack that only works for ASCII7
+			    // FIXME:sdl2 Hack that only works for ASCII7
 			    value = (int)SDL_GetKeyName(keysym.sym)[0];
 			}
         }

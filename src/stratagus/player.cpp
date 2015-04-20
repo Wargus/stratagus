@@ -1200,7 +1200,7 @@ void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
 
 	SDL_LockSurface(sprite.Surface);
 	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
-	// XXX TODO FIXME
+	// FIXME:sdl2
 	// SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	// if (sprite.SurfaceFlip) {
 	// 	SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);

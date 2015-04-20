@@ -255,7 +255,7 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAUSE] = "break";
 	Key2Str[SDLK_MENU] = "menu";
 	Key2Str[SDLK_POWER] = "power";
-	// FIXME Key2Str[SDLK_EURO] = "euro";
+	// FIXME:sdl2 Key2Str[SDLK_EURO] = "euro";
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
@@ -269,7 +269,7 @@ void InitVideoSdl()
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 #ifndef USE_WIN32
 		// Fix tablet input in full-screen mode
-		// FIXME SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+		// FIXME:sdl2 SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
 #endif
 		int res = SDL_Init(
 #ifdef DEBUG
@@ -337,7 +337,7 @@ void InitVideoSdl()
 		}
 
 		if (icon) {
-			// FIXME SDL_WM_SetIcon(icon, 0);
+			// FIXME:sdl2 SDL_WM_SetIcon(icon, 0);
 		}
 
 		if (g) {
@@ -474,7 +474,7 @@ int VideoValidResolution(int w, int h)
 		return 0;
 	}
 #endif
-	// FIXME return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+	// FIXME:sdl2 return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
         return 1;
 }
 
@@ -537,12 +537,12 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				int yw = UI.MouseWarpPos.y;
 				UI.MouseWarpPos.x = -1;
 				UI.MouseWarpPos.y = -1;
-				// FIXME SDL_WarpMouse(xw, yw);
+				// FIXME:sdl2 SDL_WarpMouse(xw, yw);
 			}
 			break;
 
 		case SDL_WINDOWEVENT:
-			// FIXME if (event.active.state & SDL_APPMOUSEFOCUS) {
+			// FIXME:sdl2 if (event.active.state & SDL_APPMOUSEFOCUS) {
 			// 	static bool InMainWindow = true;
 
 			// 	if (InMainWindow && !event.active.gain) {
@@ -651,7 +651,7 @@ void WaitEventsOneFrame()
 			SdlDoEvent(*GetCallbacks(), *event);
 		}
 
-		// Flush to screen // FIXME
+		// Flush to screen // FIXME:sdl2 check if this is correct
 		SDL_UpdateTexture(TheScreenTexture, NULL, TheScreen->pixels, TheScreen->pitch);
 		SDL_RenderClear(TheRenderer);
 		SDL_RenderCopy(TheRenderer, TheScreenTexture, NULL, NULL);
@@ -683,7 +683,8 @@ void WaitEventsOneFrame()
 void RealizeVideoMemory()
 {
 	if (NumRects) {
-	        // FIXME SDL_UpdateRects(TheScreen, NumRects, Rects);
+	        // FIXME:sdl2 do we still need this?
+	        // SDL_UpdateRects(TheScreen, NumRects, Rects);
 		NumRects = 0;
 	}
 	HideCursor();
@@ -744,7 +745,7 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
-	// FIXME return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
+	// FIXME:sdl2 return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
         return 0;
 }
 
@@ -762,7 +763,7 @@ void ToggleGrabMouse(int mode)
 	// } else if (mode >= 0 && !grabbed) {
 	// 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	// }
-        // FIXME
+        // FIXME:sdl2
 }
 
 /**
@@ -794,7 +795,7 @@ void ToggleFullScreen()
 	h = TheScreen->h;
 	bpp = TheScreen->format->BitsPerPixel;
 
-	// FIXME if (!SDL_VideoModeOK(w, h, bpp,	flags)) {
+	// FIXME:sdl2 if (!SDL_VideoModeOK(w, h, bpp,	flags)) {
 	// 	return;
 	// }
 
@@ -820,7 +821,7 @@ void ToggleFullScreen()
 	}
 	SDL_UnlockSurface(TheScreen);
 
-	// FIXME TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
+	// FIXME:sdl2 TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 	// if (!TheScreen) {
 	// 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 	// 	if (!TheScreen) { // completely screwed.
@@ -856,7 +857,7 @@ void ToggleFullScreen()
 
 	Invalidate(); // Update display
 #else // !USE_WIN32
-	// FIXME SDL_WM_ToggleFullScreen(TheScreen);
+	// FIXME:sdl2 SDL_WM_ToggleFullScreen(TheScreen);
 #endif
 
 	Video.FullScreen = (TheScreen->flags) ? 1 : 0;

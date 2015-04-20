@@ -124,7 +124,7 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 							unsigned char alpha) const
 {
-	// FIXME int oldalpha = Surface->format->alpha;
+	// FIXME:sdl2 int oldalpha = Surface->format->alpha;
         int oldalpha = 100;
 	SDL_SetSurfaceAlphaMod(Surface, alpha);
 	DrawSub(gx, gy, w, h, x, y);
@@ -245,7 +245,7 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	const int oldalpha = 100; // FIXME Surface->format->alpha;
+	const int oldalpha = 100; // FIXME:sdl2 Surface->format->alpha;
 
 	SDL_SetSurfaceAlphaMod(Surface, alpha);
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
@@ -263,7 +263,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	srect.y += y - oldy;
 
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	const int oldalpha = 100; // FIXME SurfaceFlip->format->alpha;
+	const int oldalpha = 100; // FIXME:sdl2 SurfaceFlip->format->alpha;
 
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
