@@ -277,7 +277,7 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+		// FIXME TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 		Width = w;
 		Height = h;
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
@@ -394,7 +394,7 @@ static void ColorCycleSurface(SDL_Surface &surface)
 		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
 		colors[range.end] = palcolors[range.begin];
 	}
-	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 }
 
 /**
@@ -415,7 +415,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 			memcpy(colors + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
 			colors[range.begin] = palcolors[range.end];
 		}
-		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 	}
 }
 

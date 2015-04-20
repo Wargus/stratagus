@@ -92,6 +92,9 @@
 ----------------------------------------------------------------------------*/
 
 SDL_Surface *TheScreen; /// Internal screen
+SDL_Texture *TheScreenTexture;
+SDL_Renderer *TheRenderer;
+SDL_Window *TheWindow;
 
 static SDL_Rect Rects[100];
 static int NumRects;
@@ -217,8 +220,8 @@ static void InitKey2Str()
 
 	Key2Str[SDLK_DELETE] = "delete";
 
-	for (i = SDLK_KP0; i <= SDLK_KP9; ++i) {
-		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP0);
+	for (i = SDLK_KP_0; i <= SDLK_KP_9; ++i) {
+		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP_0);
 		Key2Str[i] = str;
 	}
 
@@ -247,12 +250,12 @@ static void InitKey2Str()
 	}
 
 	Key2Str[SDLK_HELP] = "help";
-	Key2Str[SDLK_PRINT] = "print";
+	Key2Str[SDLK_PRINTSCREEN] = "print";
 	Key2Str[SDLK_SYSREQ] = "sysreq";
-	Key2Str[SDLK_BREAK] = "break";
+	Key2Str[SDLK_PAUSE] = "break";
 	Key2Str[SDLK_MENU] = "menu";
 	Key2Str[SDLK_POWER] = "power";
-	Key2Str[SDLK_EURO] = "euro";
+	// FIXME Key2Str[SDLK_EURO] = "euro";
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
@@ -266,7 +269,7 @@ void InitVideoSdl()
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 #ifndef USE_WIN32
 		// Fix tablet input in full-screen mode
-		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
+		// FIXME SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
 #endif
 		int res = SDL_Init(
 #ifdef DEBUG
@@ -292,14 +295,6 @@ void InitVideoSdl()
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
-		// Set WindowManager Title
-		if (!FullGameName.empty()) {
-			SDL_WM_SetCaption(FullGameName.c_str(), FullGameName.c_str());
-		} else if (!Parameters::Instance.applicationName.empty()) {
-			SDL_WM_SetCaption(Parameters::Instance.applicationName.c_str(), Parameters::Instance.applicationName.c_str());
-		} else {
-			SDL_WM_SetCaption("Stratagus", "Stratagus");
-		}
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 		SDL_Surface *icon = NULL;
@@ -342,7 +337,7 @@ void InitVideoSdl()
 		}
 
 		if (icon) {
-			SDL_WM_SetIcon(icon, 0);
+			// FIXME SDL_WM_SetIcon(icon, 0);
 		}
 
 		if (g) {
@@ -380,12 +375,6 @@ void InitVideoSdl()
 	Video.Height = 480;
 #endif
 
-	// Sam said: better for windows.
-	/* SDL_HWSURFACE|SDL_HWPALETTE | */
-	if (Video.FullScreen) {
-		flags |= SDL_FULLSCREEN;
-	}
-
 	if (!Video.Width || !Video.Height) {
 		Video.Width = 640;
 		Video.Height = 480;
@@ -395,18 +384,51 @@ void InitVideoSdl()
 		Video.Depth = 32;
 	}
 
-	if (TheScreen && (TheScreen->format->BitsPerPixel != 16
-					  && TheScreen->format->BitsPerPixel != 32)) {
-		// Only support 16 and 32 bpp, default to 16
-		TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, 16, flags);
+	SDL_CreateWindowAndRenderer(Video.Width, Video.Height,
+				    SDL_WINDOW_ALLOW_HIGHDPI |
+				    (Video.FullScreen ?
+				     SDL_WINDOW_FULLSCREEN_DESKTOP :
+				     SDL_WINDOW_RESIZABLE),
+				    &TheWindow, &TheRenderer);
+	if (TheWindow == NULL || TheRenderer == NULL) {
+	    fprintf(stderr, "Couldn't create window at %dx%d: %s\n",
+		    Video.Width, Video.Height, SDL_GetError());
+	    exit(1);
 	}
-	if (TheScreen == NULL) {
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
+	SDL_RenderSetLogicalSize(TheRenderer, Video.Width, Video.Height);
+	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(TheRenderer);
+	SDL_RenderPresent(TheRenderer);
+
+	if (!FullGameName.empty()) {
+	    SDL_SetWindowTitle(TheWindow, FullGameName.c_str());
+	} else if (!Parameters::Instance.applicationName.empty()) {
+	    SDL_SetWindowTitle(TheWindow, Parameters::Instance.applicationName.c_str());
+	} else {
+	    SDL_SetWindowTitle(TheWindow, "Stratagus");
+	}
+
+	// if (TheScreen && (TheScreen->format->BitsPerPixel != 16
+	// 				  && TheScreen->format->BitsPerPixel != 32)) {
+	    // Only support 16 and 32 bpp, default to 32
+	    TheScreen = SDL_CreateRGBSurface(0, 640, 480, 32,
+					     0x00FF0000,
+					     0x0000FF00,
+					     0x000000FF,
+					     0xFF000000);
+	    TheScreenTexture = SDL_CreateTexture(TheRenderer,
+						 SDL_PIXELFORMAT_ARGB8888,
+						 SDL_TEXTUREACCESS_STREAMING,
+						 640, 480);
+	// }
+	if (TheScreen == NULL || TheScreenTexture == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
 	}
 
-	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	Video.FullScreen = (TheScreen->flags) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
 #if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
@@ -420,9 +442,6 @@ void InitVideoSdl()
 	// Turn cursor off, we use our own.
 	SDL_ShowCursor(SDL_DISABLE);
 #endif
-
-	// Make default character translation easier
-	SDL_EnableUNICODE(1);
 
 	InitKey2Str();
 
@@ -455,7 +474,8 @@ int VideoValidResolution(int w, int h)
 		return 0;
 	}
 #endif
-	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+	// FIXME return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+        return 1;
 }
 
 /**
@@ -517,46 +537,49 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				int yw = UI.MouseWarpPos.y;
 				UI.MouseWarpPos.x = -1;
 				UI.MouseWarpPos.y = -1;
-				SDL_WarpMouse(xw, yw);
+				// FIXME SDL_WarpMouse(xw, yw);
 			}
 			break;
 
-		case SDL_ACTIVEEVENT:
-			if (event.active.state & SDL_APPMOUSEFOCUS) {
-				static bool InMainWindow = true;
+		case SDL_WINDOWEVENT:
+			// FIXME if (event.active.state & SDL_APPMOUSEFOCUS) {
+			// 	static bool InMainWindow = true;
 
-				if (InMainWindow && !event.active.gain) {
-					InputMouseExit(callbacks, SDL_GetTicks());
-				}
-				InMainWindow = (event.active.gain != 0);
-			}
-			if (!IsNetworkGame() && Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
-				static bool DoTogglePause = false;
+			// 	if (InMainWindow && !event.active.gain) {
+			// 		InputMouseExit(callbacks, SDL_GetTicks());
+			// 	}
+			// 	InMainWindow = (event.active.gain != 0);
+			// }
+			// if (!IsNetworkGame() && Preference.PauseOnLeave && (event.active.state & SDL_APPACTIVE || SDL_GetAppState() & SDL_APPACTIVE)) {
+			// 	static bool DoTogglePause = false;
 
-				if (IsSDLWindowVisible && !event.active.gain) {
-					IsSDLWindowVisible = false;
-					if (!GamePaused) {
-						DoTogglePause = true;
-						UiTogglePause();
-					}
-				} else if (!IsSDLWindowVisible && event.active.gain) {
-					IsSDLWindowVisible = true;
-					if (GamePaused && DoTogglePause) {
-						DoTogglePause = false;
-						UiTogglePause();
-					}
-				}
-			}
+			// 	if (IsSDLWindowVisible && !event.active.gain) {
+			// 		IsSDLWindowVisible = false;
+			// 		if (!GamePaused) {
+			// 			DoTogglePause = true;
+			// 			UiTogglePause();
+			// 		}
+			// 	} else if (!IsSDLWindowVisible && event.active.gain) {
+			// 		IsSDLWindowVisible = true;
+			// 		if (GamePaused && DoTogglePause) {
+			// 			DoTogglePause = false;
+			// 			UiTogglePause();
+			// 		}
+			// 	}
+			// }
 			break;
 
 		case SDL_KEYDOWN:
+		        
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-								event.key.keysym.sym, event.key.keysym.unicode);
+					    event.key.keysym.sym,
+					    SDL_GetKeyName(event.key.keysym.sym)[0]);
 			break;
 
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-								  event.key.keysym.sym, event.key.keysym.unicode);
+					      event.key.keysym.sym,
+					      SDL_GetKeyName(event.key.keysym.sym)[0]);
 			break;
 
 		case SDL_QUIT:
@@ -628,6 +651,12 @@ void WaitEventsOneFrame()
 			SdlDoEvent(*GetCallbacks(), *event);
 		}
 
+		// Flush to screen // FIXME
+		SDL_UpdateTexture(TheScreenTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+		SDL_RenderClear(TheRenderer);
+		SDL_RenderCopy(TheRenderer, TheScreenTexture, NULL, NULL);
+		SDL_RenderPresent(TheRenderer);
+
 		// Network
 		int s = 0;
 		if (IsNetworkGame()) {
@@ -654,7 +683,7 @@ void WaitEventsOneFrame()
 void RealizeVideoMemory()
 {
 	if (NumRects) {
-		SDL_UpdateRects(TheScreen, NumRects, Rects);
+	        // FIXME SDL_UpdateRects(TheScreen, NumRects, Rects);
 		NumRects = 0;
 	}
 	HideCursor();
@@ -715,7 +744,8 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
-	return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
+	// FIXME return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
+        return 0;
 }
 
 /**
@@ -725,13 +755,14 @@ bool SdlGetGrabMouse()
 */
 void ToggleGrabMouse(int mode)
 {
-	bool grabbed = SdlGetGrabMouse();
+	// bool grabbed = SdlGetGrabMouse();
 
-	if (mode <= 0 && grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_OFF);
-	} else if (mode >= 0 && !grabbed) {
-		SDL_WM_GrabInput(SDL_GRAB_ON);
-	}
+	// if (mode <= 0 && grabbed) {
+	// 	SDL_WM_GrabInput(SDL_GRAB_OFF);
+	// } else if (mode >= 0 && !grabbed) {
+	// 	SDL_WM_GrabInput(SDL_GRAB_ON);
+	// }
+        // FIXME
 }
 
 /**
@@ -763,9 +794,9 @@ void ToggleFullScreen()
 	h = TheScreen->h;
 	bpp = TheScreen->format->BitsPerPixel;
 
-	if (!SDL_VideoModeOK(w, h, bpp,	flags ^ SDL_FULLSCREEN)) {
-		return;
-	}
+	// FIXME if (!SDL_VideoModeOK(w, h, bpp,	flags)) {
+	// 	return;
+	// }
 
 	SDL_GetClipRect(TheScreen, &clip);
 
@@ -789,16 +820,16 @@ void ToggleFullScreen()
 	}
 	SDL_UnlockSurface(TheScreen);
 
-	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
-	if (!TheScreen) {
-		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
-		if (!TheScreen) { // completely screwed.
-			delete[] pixels;
-			delete[] palette;
-			fprintf(stderr, "Toggle to fullscreen, crashed all\n");
-			Exit(-1);
-		}
-	}
+	// FIXME TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
+	// if (!TheScreen) {
+	// 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
+	// 	if (!TheScreen) { // completely screwed.
+	// 		delete[] pixels;
+	// 		delete[] palette;
+	// 		fprintf(stderr, "Toggle to fullscreen, crashed all\n");
+	// 		Exit(-1);
+	// 	}
+	// }
 
 #ifndef USE_TOUCHSCREEN
 	// Cannot hide cursor on Windows with touchscreen, as it switches
@@ -817,7 +848,7 @@ void ToggleFullScreen()
 
 	if (TheScreen->format->palette) {
 		// !!! FIXME : No idea if that flags param is right.
-		SDL_SetPalette(TheScreen, SDL_LOGPAL, palette, 0, ncolors);
+		SDL_SetPaletteColors(TheScreen->format->palette, palette, 0, ncolors);
 		delete[] palette;
 	}
 	SDL_UnlockSurface(TheScreen);
@@ -825,10 +856,10 @@ void ToggleFullScreen()
 
 	Invalidate(); // Update display
 #else // !USE_WIN32
-	SDL_WM_ToggleFullScreen(TheScreen);
+	// FIXME SDL_WM_ToggleFullScreen(TheScreen);
 #endif
 
-	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
+	Video.FullScreen = (TheScreen->flags) ? 1 : 0;
 }
 
 //@}

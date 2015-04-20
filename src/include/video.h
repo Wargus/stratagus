@@ -329,6 +329,15 @@ extern void SetPlayersPalette();
 /// The SDL screen
 extern SDL_Surface *TheScreen;
 
+/// The screen texture
+extern SDL_Texture *TheScreenTexture;
+
+/// The SDL window
+extern SDL_Window *TheWindow;
+
+/// The SDL renderer
+extern SDL_Renderer *TheRenderer;
+
 /// register lua function
 extern void VideoCclRegister();
 

@@ -635,7 +635,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
-find_package(SDL REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -656,7 +656,6 @@ find_package(OggVorbis)
 find_package(Theora)
 
 find_package(X11)
-find_package(SDL_gles)
 
 find_package(Sqlite)
 find_package(Doxygen)

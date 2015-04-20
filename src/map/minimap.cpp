@@ -174,7 +174,7 @@ void CMinimap::UpdateTerrain()
 	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	if (bpp == 1) {
-		SDL_SetPalette(MinimapTerrainSurface, SDL_LOGPAL,
+		SDL_SetPaletteColors(MinimapTerrainSurface->format->palette,
 				   Map.TileGraphic->Surface->format->palette->colors, 0, 256);
 	}
 

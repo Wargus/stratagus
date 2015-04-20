@@ -220,8 +220,7 @@ int LoadGraphicPNG(CGraphic *g)
 			Amask = 0x000000FF >> s;
 		}
 	}
-	SDL_Surface *surface =
-		SDL_AllocSurface(SDL_SWSURFACE, width, height,
+	SDL_Surface *surface = SDL_CreateRGBSurface(0, width, height,
 						 bit_depth * png_get_channels(png_ptr, info_ptr), Rmask, Gmask, Bmask, Amask);
 	if (surface == NULL) {
 		fprintf(stderr, "Out of memory");
@@ -233,7 +232,7 @@ int LoadGraphicPNG(CGraphic *g)
 			/* FIXME: Should these be truncated or shifted down? */
 			ckey = SDL_MapRGB(surface->format, (Uint8)transv->red, (Uint8)transv->green, (Uint8)transv->blue);
 		}
-		SDL_SetColorKey(surface, SDL_SRCCOLORKEY, ckey);
+		SDL_SetColorKey(surface, SDL_TRUE, ckey);
 	}
 
 	/* Create the array of pointers to image data */

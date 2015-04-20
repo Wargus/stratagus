@@ -58,6 +58,7 @@
 #include <queue>
 
 #include "SDL.h"
+#include "SDL_keyboard.h"
 
 #include "guichan/input.h"
 #include "guichan/key.h"
@@ -113,7 +114,7 @@ namespace gcn
          * @param key an SDL keysym
          * @return a Key object.
          */
-        static Key convertKeyCharacter(SDL_keysym key);
+        static Key convertKeyCharacter(SDL_Keysym key);
 
     protected:
         /**

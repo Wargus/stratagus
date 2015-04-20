@@ -671,8 +671,8 @@ void CMap::InitFogOfWar()
 	Uint32 color = Video.MapRGB(s->format, r, g, b);
 
 	SDL_FillRect(s, NULL, color);
-	OnlyFogSurface = SDL_DisplayFormat(s);
-	SDL_SetAlpha(OnlyFogSurface, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+	OnlyFogSurface = s;
+	SDL_SetSurfaceAlphaMod(OnlyFogSurface, FogOfWarOpacity);
 	VideoPaletteListRemove(s);
 	SDL_FreeSurface(s);
 
@@ -680,8 +680,8 @@ void CMap::InitFogOfWar()
 	// Generate Alpha Fog surface.
 	//
 	if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_DisplayFormat(FogGraphic->Surface);
-		SDL_SetAlpha(s, SDL_SRCALPHA | SDL_RLEACCEL, FogOfWarOpacity);
+		s = FogGraphic->Surface;
+		SDL_SetSurfaceAlphaMod(s, FogOfWarOpacity);
 	} else {
 		// Copy the top row to a new surface
 		SDL_PixelFormat *f = FogGraphic->Surface->format;

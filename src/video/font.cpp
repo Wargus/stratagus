@@ -141,7 +141,7 @@ static void VideoDrawChar(const CGraphic &g,
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 	std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
-	SDL_SetColors(g.Surface, &sdlColors[0], 0, MaxFontColors);
+	SDL_SetPaletteColors(g.Surface->format->palette, &sdlColors[0], 0, MaxFontColors);
 	SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 }
 
@@ -774,9 +774,9 @@ void CFont::MeasureWidths()
 	CharWidth = new char[maxy];
 	memset(CharWidth, 0, maxy);
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
-	const Uint32 ckey = G->Surface->format->colorkey;
 	const int ipr = G->Surface->w / G->Width; // images per row
-
+	Uint32 ckey;
+	SDL_GetColorKey(G->Surface, &ckey);
 	SDL_LockSurface(G->Surface);
 	for (int y = 1; y < maxy; ++y) {
 		const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
