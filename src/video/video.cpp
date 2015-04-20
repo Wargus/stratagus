@@ -275,9 +275,21 @@ void CVideo::ClearScreen()
 **  @return  True if the resolution changed, false otherwise
 */
 bool CVideo::ResizeScreen(int w, int h)
-{
+{ // FIXME:sdl2 does not work quite right
 	if (VideoValidResolution(w, h)) {
-		// FIXME:sdl2 TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+		SDL_FreeSurface(TheScreen);
+                TheScreen = SDL_CreateRGBSurface(0, w, h, TheScreen->format->BitsPerPixel,
+						 TheScreen->format->Rmask,
+						 TheScreen->format->Gmask,
+						 TheScreen->format->Bmask,
+						 TheScreen->format->Amask);
+		SDL_DestroyTexture(TheScreenTexture);
+		TheScreenTexture = SDL_CreateTexture(TheRenderer,
+						     SDL_PIXELFORMAT_ARGB8888,
+						     SDL_TEXTUREACCESS_STREAMING,
+						     TheScreen->w, TheScreen->h);
+		SDL_RenderSetLogicalSize(TheRenderer, w, h);
+		SDL_SetWindowSize(TheWindow, w, h);
 		Width = w;
 		Height = h;
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);

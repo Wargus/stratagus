@@ -146,6 +146,11 @@ void SetVideoSync()
 --  Video
 ----------------------------------------------------------------------------*/
 
+int IsFullScreen()
+{
+	return (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 1 : 0;
+}
+
 #if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int)
 {
@@ -295,75 +300,6 @@ void InitVideoSdl()
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
-
-#if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
-		SDL_Surface *icon = NULL;
-		CGraphic *g = NULL;
-		struct stat st;
-
-		std::string FullGameNameL = FullGameName;
-		for (size_t i = 0; i < FullGameNameL.size(); ++i) {
-			FullGameNameL[i] = tolower(FullGameNameL[i]);
-		}
-
-		std::string ApplicationName = Parameters::Instance.applicationName;
-		std::string ApplicationNameL = ApplicationName;
-		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
-			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
-		}
-
-		std::vector <std::string> pixmaps;
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
-		pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
-
-		for (size_t i = 0; i < pixmaps.size(); ++i) {
-			if (stat(pixmaps[i].c_str(), &st) == 0) {
-				if (g) { CGraphic::Free(g); }
-				g = CGraphic::New(pixmaps[i].c_str());
-				g->Load();
-				icon = g->Surface;
-				if (icon) { break; }
-			}
-		}
-
-		if (icon) {
-			// FIXME:sdl2 SDL_WM_SetIcon(icon, 0);
-		}
-
-		if (g) {
-			CGraphic::Free(g);
-		}
-
-#endif
-#ifdef USE_WIN32
-		HWND hwnd = NULL;
-		HICON hicon = NULL;
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-
-		if (SDL_GetWMInfo(&info)) {
-			hwnd = info.window;
-		}
-
-		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
-		}
-
-		if (hicon) {
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-		}
-#endif
 	}
 
 	// Initialize the display
@@ -409,26 +345,93 @@ void InitVideoSdl()
 	    SDL_SetWindowTitle(TheWindow, "Stratagus");
 	}
 
-	// if (TheScreen && (TheScreen->format->BitsPerPixel != 16
-	// 				  && TheScreen->format->BitsPerPixel != 32)) {
-	    // Only support 16 and 32 bpp, default to 32
-	    TheScreen = SDL_CreateRGBSurface(0, 640, 480, 32,
-					     0x00FF0000,
-					     0x0000FF00,
-					     0x000000FF,
-					     0xFF000000);
-	    TheScreenTexture = SDL_CreateTexture(TheRenderer,
-						 SDL_PIXELFORMAT_ARGB8888,
-						 SDL_TEXTUREACCESS_STREAMING,
-						 640, 480);
-	// }
-	if (TheScreen == NULL || TheScreenTexture == NULL) {
-		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
+#if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
+	SDL_Surface *icon = NULL;
+	CGraphic *g = NULL;
+	struct stat st;
+
+	std::string FullGameNameL = FullGameName;
+	for (size_t i = 0; i < FullGameNameL.size(); ++i) {
+		FullGameNameL[i] = tolower(FullGameNameL[i]);
+	}
+
+	std::string ApplicationName = Parameters::Instance.applicationName;
+	std::string ApplicationNameL = ApplicationName;
+	for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
+		ApplicationNameL[i] = tolower(ApplicationNameL[i]);
+	}
+
+	std::vector <std::string> pixmaps;
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameName + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + FullGameNameL + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameName + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + FullGameNameL + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationName + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + ApplicationNameL + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationName + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + ApplicationNameL + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + "Stratagus" + ".png");
+	pixmaps.push_back(std::string() + PIXMAPS + "/" + "stratagus" + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "Stratagus" + ".png");
+	pixmaps.push_back(std::string() + "/usr/share/pixmaps" + "/" + "stratagus" + ".png");
+
+	for (size_t i = 0; i < pixmaps.size(); ++i) {
+		if (stat(pixmaps[i].c_str(), &st) == 0) {
+			if (g) { CGraphic::Free(g); }
+			g = CGraphic::New(pixmaps[i].c_str());
+			g->Load();
+			icon = g->Surface;
+			if (icon) { break; }
+		}
+	}
+
+	if (icon) {
+		SDL_SetWindowIcon(TheWindow, icon);
+	}
+
+	if (g) {
+		CGraphic::Free(g);
+	}
+#endif
+#ifdef USE_WIN32
+	HWND hwnd = NULL;
+	HICON hicon = NULL;
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+
+	if (SDL_GetWindowWMInfo(TheWindow, &info)) {
+		hwnd = info.window;
+	}
+
+	if (hwnd) {
+		hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
+	}
+
+	if (hicon) {
+		SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
+		SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+	}
+#endif
+
+	// Only support 16 and 32 bpp, default to 32
+	TheScreen = SDL_CreateRGBSurface(0, Video.Width, Video.Height, Video.Depth,
+					 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	if (TheScreen == NULL) {
+		fprintf(stderr, "Couldn't create RGB surface for %dx%dx%d video mode: %s\n",
+				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+		exit(1);
+	}
+	TheScreenTexture = SDL_CreateTexture(TheRenderer,
+					     SDL_PIXELFORMAT_ARGB8888,
+					     SDL_TEXTUREACCESS_STREAMING,
+					     TheScreen->w, TheScreen->h);
+	if (TheScreenTexture == NULL) {
+		fprintf(stderr, "Couldn't create texture for %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
 	}
 
-	Video.FullScreen = (TheScreen->flags) ? 1 : 0;
+	Video.FullScreen = IsFullScreen();
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
 #if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
@@ -474,7 +477,9 @@ int VideoValidResolution(int w, int h)
 		return 0;
 	}
 #endif
-	// FIXME:sdl2 return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+	// FIXME:sdl2 Check if this thinking is ok: any resolution is
+	// valid, because we're using the SDL renderers scaling to fit
+	// whatever we're doing into fullscreen
         return 1;
 }
 
@@ -683,8 +688,7 @@ void WaitEventsOneFrame()
 void RealizeVideoMemory()
 {
 	if (NumRects) {
-	        // FIXME:sdl2 do we still need this?
-	        // SDL_UpdateRects(TheScreen, NumRects, Rects);
+		SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
 		NumRects = 0;
 	}
 	HideCursor();
@@ -745,8 +749,7 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
-	// FIXME:sdl2 return SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON;
-        return 0;
+	return SDL_GetWindowGrab(TheWindow) == SDL_TRUE;
 }
 
 /**
@@ -756,14 +759,13 @@ bool SdlGetGrabMouse()
 */
 void ToggleGrabMouse(int mode)
 {
-	// bool grabbed = SdlGetGrabMouse();
+	bool grabbed = SdlGetGrabMouse();
 
-	// if (mode <= 0 && grabbed) {
-	// 	SDL_WM_GrabInput(SDL_GRAB_OFF);
-	// } else if (mode >= 0 && !grabbed) {
-	// 	SDL_WM_GrabInput(SDL_GRAB_ON);
-	// }
-        // FIXME:sdl2
+	if (mode <= 0 && grabbed) {
+		SDL_SetWindowGrab(TheWindow, SDL_FALSE);
+	} else if (mode >= 0 && !grabbed) {
+		SDL_SetWindowGrab(TheWindow, SDL_TRUE);
+	}
 }
 
 /**
@@ -775,92 +777,14 @@ void ToggleFullScreen()
 	// On Maemo is only supported fullscreen mode
 	return;
 #endif
-#ifdef USE_WIN32
-	long framesize;
-	SDL_Rect clip;
-	Uint32 flags;
-	int w;
-	int h;
-	int bpp;
-	unsigned char *pixels = NULL;
-	SDL_Color *palette = NULL;
-	int ncolors = 0;
-
-	if (!TheScreen) { // don't bother if there's no surface.
-		return;
+	Uint32 flags = SDL_GetWindowFlags(TheWindow);
+	if (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) {
+		SDL_SetWindowFullscreen(TheWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	} else {
+		SDL_SetWindowFullscreen(TheWindow, 0);
 	}
 
-	flags = TheScreen->flags;
-	w = TheScreen->w;
-	h = TheScreen->h;
-	bpp = TheScreen->format->BitsPerPixel;
-
-	// FIXME:sdl2 if (!SDL_VideoModeOK(w, h, bpp,	flags)) {
-	// 	return;
-	// }
-
-	SDL_GetClipRect(TheScreen, &clip);
-
-	// save the contents of the screen.
-	framesize = w * h * TheScreen->format->BytesPerPixel;
-
-	if (!(pixels = new unsigned char[framesize])) { // out of memory
-		return;
-	}
-	SDL_LockSurface(TheScreen);
-	memcpy(pixels, TheScreen->pixels, framesize);
-
-	if (TheScreen->format->palette) {
-		ncolors = TheScreen->format->palette->ncolors;
-		if (!(palette = new SDL_Color[ncolors])) {
-			delete[] pixels;
-			return;
-		}
-		memcpy(palette, TheScreen->format->palette->colors,
-			   ncolors * sizeof(SDL_Color));
-	}
-	SDL_UnlockSurface(TheScreen);
-
-	// FIXME:sdl2 TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
-	// if (!TheScreen) {
-	// 	TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
-	// 	if (!TheScreen) { // completely screwed.
-	// 		delete[] pixels;
-	// 		delete[] palette;
-	// 		fprintf(stderr, "Toggle to fullscreen, crashed all\n");
-	// 		Exit(-1);
-	// 	}
-	// }
-
-#ifndef USE_TOUCHSCREEN
-	// Cannot hide cursor on Windows with touchscreen, as it switches
-	// to relative mouse coordinates in fullscreen. See above initial
-	// call to ShowCursor
-	//
-	// Windows shows the SDL cursor when starting in fullscreen mode
-	// then switching to window mode.  This hides the cursor again.
-	SDL_ShowCursor(SDL_ENABLE);
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
-
-	SDL_LockSurface(TheScreen);
-	memcpy(TheScreen->pixels, pixels, framesize);
-	delete[] pixels;
-
-	if (TheScreen->format->palette) {
-		// !!! FIXME : No idea if that flags param is right.
-		SDL_SetPaletteColors(TheScreen->format->palette, palette, 0, ncolors);
-		delete[] palette;
-	}
-	SDL_UnlockSurface(TheScreen);
-	SDL_SetClipRect(TheScreen, &clip);
-
-	Invalidate(); // Update display
-#else // !USE_WIN32
-	// FIXME:sdl2 SDL_WM_ToggleFullScreen(TheScreen);
-#endif
-
-	Video.FullScreen = (TheScreen->flags) ? 1 : 0;
+	Video.FullScreen = IsFullScreen();
 }
 
 //@}
