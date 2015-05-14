@@ -298,7 +298,7 @@ void Mng::Draw(int x, int y)
 	} else
 #endif
 	{
-		SDL_Rect rect = {x, y, surface->w, surface->h};
+		SDL_Rect rect = {(Sint16)x, (Sint16)y, (Uint16)surface->w, (Uint16)surface->h};
 		SDL_BlitSurface(surface, NULL, TheScreen, &rect);
 	}
 }
