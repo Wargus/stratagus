@@ -490,6 +490,8 @@ void UpdateUnitSightRange(CUnit &unit);
 extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
 /// Create a new unit and place on map
 extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
+/// Find the nearest position at which unit can be placed.
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 /// Remove the Orders of a Unit

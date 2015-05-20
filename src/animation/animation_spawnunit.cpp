@@ -43,66 +43,6 @@
 #include "map.h"
 #include "unit.h"
 
-/**
-**  Find the nearest position at which unit can be placed.
-**
-**  @param type     Type of the dropped unit.
-**  @param goalPos  Goal map tile position.
-**  @param resPos   Holds the nearest point.
-**  @param heading  preferense side to drop out of.
-*/
-static void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
-{
-	int addx = 0;
-	int addy = 0;
-	Vec2i pos = goalPos;
-
-	if (heading < LookingNE || heading > LookingNW) {
-		goto starts;
-	} else if (heading < LookingSE) {
-		goto startw;
-	} else if (heading < LookingSW) {
-		goto startn;
-	} else {
-		goto starte;
-	}
-
-	// FIXME: don't search outside of the map
-	for (;;) {
-startw:
-		for (int i = addy; i--; ++pos.y) {
-			if (UnitTypeCanBeAt(type, pos)) {
-				goto found;
-			}
-		}
-		++addx;
-starts:
-		for (int i = addx; i--; ++pos.x) {
-			if (UnitTypeCanBeAt(type, pos)) {
-				goto found;
-			}
-		}
-		++addy;
-starte:
-		for (int i = addy; i--; --pos.y) {
-			if (UnitTypeCanBeAt(type, pos)) {
-				goto found;
-			}
-		}
-		++addx;
-startn:
-		for (int i = addx; i--; --pos.x) {
-			if (UnitTypeCanBeAt(type, pos)) {
-				goto found;
-			}
-		}
-		++addy;
-	}
-
-found:
-	resPos = pos;
-}
-
 /* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);

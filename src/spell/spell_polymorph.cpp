@@ -107,21 +107,15 @@
 	// as said somewhere else -- no corpses :)
 	target->Remove(NULL);
 	Vec2i offset;
-	for (offset.x = 0; offset.x < type.TileWidth; ++offset.x) {
-		for (offset.y = 0; offset.y < type.TileHeight; ++offset.y) {
-			if (!UnitTypeCanBeAt(type, pos + offset)) {
-				target->Place(target->tilePos);
-				return 0;
-			}
-		}
-	}
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
+	Vec2i resPos;
+	FindNearestDrop(type, pos, resPos, LookingW);
 	if (this->PlayerNeutral == 1) {
-		MakeUnitAndPlace(pos, type, Players + PlayerNumNeutral);
+		MakeUnitAndPlace(resPos, type, Players + PlayerNumNeutral);
 	} else if (this->PlayerNeutral == 2) {
-		MakeUnitAndPlace(pos, type, caster.Player);
+		MakeUnitAndPlace(resPos, type, caster.Player);
 	} else {
-		MakeUnitAndPlace(pos, type, target->Player);
+		MakeUnitAndPlace(resPos, type, target->Player);
 	}
 	UnitLost(*target);
 	UnitClearOrders(*target);

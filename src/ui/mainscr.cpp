@@ -500,9 +500,9 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom 
-			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
-			: GameSettings.Presets[unit.Player->Index].PlayerColor);
+		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom 
+			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor 
+			: GameSettings.Presets[uins->Player->Index].PlayerColor);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);

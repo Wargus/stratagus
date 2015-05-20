@@ -1059,7 +1059,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		CUnit *goal = NULL;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
-		if (unit.Player->AiEnabled && AiPlayer->BuildDepots) {
+		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
