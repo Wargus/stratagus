@@ -812,6 +812,12 @@ void CPlayer::RemoveUnit(CUnit &unit)
 void CPlayer::UpdateFreeWorkers()
 {
 	FreeWorkers.clear();
+	if (FreeWorkers.capacity() != 0) {
+		// Just calling FreeWorkers.clear() is not always appropriate.
+		// Certain paths may leave FreeWorkers in an invalid state, so
+		// it's safer to re-initialize.
+		std::vector<CUnit*>().swap(FreeWorkers);
+	}
 	const int nunits = this->GetUnitCount();
 
 	for (int i = 0; i < nunits; ++i) {
