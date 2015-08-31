@@ -303,6 +303,41 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				}
 			}
 			andlist->push_back(b);
+		} else if (!strcmp(value, "has-unit")) {
+			CBuildRestrictionHasUnit *b = new CBuildRestrictionHasUnit;
+
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				value = LuaToString(l, -2);
+				if (!strcmp(value, "Type")) {
+					b->RestrictTypeName = LuaToString(l, -1);
+				} else if (!strcmp(value, "Count")) {
+					b->Count = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "CountType")) {
+					value = LuaToString(l, -1);
+					if (value[0] == '=') {
+						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
+							b->CountType = Equal;
+						}
+					} else if (value[0] == '>') {
+						if (value[1] == '=' && value[2] == '\0') {
+							b->CountType = GreaterThanEqual;
+						} else if (value[1] == '\0') {
+							b->CountType = GreaterThan;
+						}
+					} else if (value[0] == '<') {
+						if (value[1] == '=' && value[2] == '\0') {
+							b->CountType = LessThanEqual;
+						} else if (value[1] == '\0') {
+							b->CountType = LessThan;
+						}
+					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
+						b->CountType = NotEqual;
+					}
+				} else {
+					LuaError(l, "Unsupported BuildingRules has-unit tag: %s" _C_ value);
+				}
+			}
+			andlist->push_back(b);
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value);
 		}

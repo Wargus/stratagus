@@ -425,6 +425,20 @@ public:
 	CUnitType *RestrictType;
 };
 
+class CBuildRestrictionHasUnit : public CBuildRestriction
+{
+public:
+	CBuildRestrictionHasUnit() : Count(0), RestrictType(NULL) {};
+	virtual ~CBuildRestrictionHasUnit() {};
+	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+
+	int Count;
+	DistanceTypeType CountType;
+	std::string RestrictTypeName;
+	CUnitType *RestrictType;
+};
+
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType

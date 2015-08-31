@@ -175,6 +175,26 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			this->DistanceType == NotEqual);
 }
 
+/**
+**  Check HasUnit Restriction
+*/
+bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+{
+	Vec2i pos1(0, 0);
+	Vec2i pos2(0, 0);
+	int count = ThisPlayer->GetUnitTotalCount(*this->RestrictType);
+	switch (this->CountType)
+	{
+	case LessThan: return count < this->Count;
+	case LessThanEqual: return count <= this->Count;
+	case Equal: return count == this->Count;
+	case NotEqual: return count != this->Count;
+	case GreaterThanEqual: return count >= this->Count;
+	case GreaterThan: return count > this->Count;
+	default: return false;
+	}
+}
+
 inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit) const
 {
 	return (unit->Type == Parent && unit->tilePos == this->pos);
