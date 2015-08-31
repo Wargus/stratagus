@@ -413,7 +413,7 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), RestrictType(NULL) {};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -423,6 +423,7 @@ public:
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType;
+	bool CheckBuilder;
 };
 
 class CBuildRestrictionHasUnit : public CBuildRestriction

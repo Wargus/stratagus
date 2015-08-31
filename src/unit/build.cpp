@@ -135,7 +135,8 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Select(pos1, pos2, table);
 
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (builder != table[i] &&
+		bool isorctownhall = table[i]->Type->Ident.compare("unit-orc-town-hall");
+		if ((builder != table[i] || this->CheckBuilder) &&
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
 			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
