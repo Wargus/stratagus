@@ -1800,7 +1800,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 void UIHandleButtonDown(unsigned button)
 {
 	// Detect long left selection click
-	const bool longLeftButton = MouseButtons & ((LeftButton << MouseHoldShift));
+	const bool longLeftButton = (MouseButtons & ((LeftButton << MouseHoldShift))) != 0;
 
 #ifdef USE_TOUCHSCREEN
 	// If we are moving with stylus/finger,
