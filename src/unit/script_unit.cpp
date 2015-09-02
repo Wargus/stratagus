@@ -632,6 +632,24 @@ static int CclMoveUnit(lua_State *l)
 }
 
 /**
+**  Remove unit from the map.
+**
+**  @param l  Lua state.
+**
+**  @return   Returns 1.
+*/
+static int CclRemoveUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	unit->Remove(NULL);
+	lua_pushvalue(l, 1);
+	return 1;
+}
+
+/**
 **  Create a unit and place it on the map
 **
 **  @param l  Lua state.
@@ -1172,6 +1190,7 @@ void UnitCclRegister()
 	lua_register(Lua, "Unit", CclUnit);
 
 	lua_register(Lua, "MoveUnit", CclMoveUnit);
+	lua_register(Lua, "RemoveUnit", CclRemoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
 	lua_register(Lua, "DamageUnit", CclDamageUnit);
 	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
