@@ -55,6 +55,7 @@ $]
 #define MaxResourceInfo MaxCosts + 4
 #define PlayerMax 16
 #define PlayerNumNeutral (PlayerMax - 1)
+#define InfiniteRepairRange 0x7FFFFFFF
 
 #define NoButton 0
 #define LeftButton 2

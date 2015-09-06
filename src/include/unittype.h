@@ -525,6 +525,7 @@ public:
 	int BurnPercent;                /// Burning percent.
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
+#define InfiniteRepairRange INT_MAX
 	char *CanCastSpell;             /// Unit is able to use spells.
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
