@@ -52,6 +52,7 @@
 #include "missileconfig.h"
 #include "vec2i.h"
 
+#include <climits>
 #include <vector>
 #include <algorithm>
 #include <map>
