@@ -114,6 +114,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
+	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -140,9 +141,9 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			(this->RestrictType == table[i]->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.size() == 0 ||
-			 (!this->RestrictTypeOwner.compare("self") && builder->Player == table[i]->Player) ||
-			 (!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->IsAllied(*table[i]->Player))) ||
-			 (!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i]->Player)))) {
+			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||
+			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->IsAllied(*table[i]->Player))) ||
+			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->Player)))) {
 
 			switch (this->DistanceType) {
 				case GreaterThan :
@@ -182,7 +183,8 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
-	int count = builder->Player->GetUnitTotalCount(*this->RestrictType);
+	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	int count = player->GetUnitTotalCount(*this->RestrictType);
 	switch (this->CountType)
 	{
 	case LessThan: return count < this->Count;
