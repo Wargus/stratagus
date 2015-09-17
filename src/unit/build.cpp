@@ -184,7 +184,27 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
-	int count = player->GetUnitTotalCount(*this->RestrictType);
+	int count = 0;
+	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
+		count = player->GetUnitTotalCount(*this->RestrictType);
+	} else if (!this->RestrictTypeOwner.compare("allied")) {
+		count = player->GetUnitTotalCount(*this->RestrictType);
+		for (int i = 0; i < NumPlayers; i++) {
+			if (player->IsAllied(Players[i])) {
+				count += Players[i].GetUnitTotalCount(*this->RestrictType);
+			}
+		}
+	} else if (!this->RestrictTypeOwner.compare("enemy")) {
+		for (int i = 0; i < NumPlayers; i++) {
+			if (player->IsEnemy(Players[i])) {
+				count += Players[i].GetUnitTotalCount(*this->RestrictType);
+			}
+		}
+	} else if (!this->RestrictTypeOwner.compare("any")) {
+		for (int i = 0; i < NumPlayers; i++) {
+			count += Players[i].GetUnitTotalCount(*this->RestrictType);
+		}
+	}
 	switch (this->CountType)
 	{
 	case LessThan: return count < this->Count;
