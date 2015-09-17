@@ -1097,6 +1097,8 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushnumber(l, unit->CurrentResource);
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Type->Name.c_str());
+	} else if (!strcmp(value, "PlayerType")) {
+		lua_pushinteger(l, unit->Player->Type);
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
