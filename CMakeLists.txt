@@ -348,6 +348,7 @@ set(video_SRCS
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
+	src/video/shaders.cpp
 	src/video/sprite.cpp
 	src/video/video.cpp
 )
@@ -554,6 +555,7 @@ set(stratagus_generic_HDRS
 	src/include/script.h
 	src/include/script_sound.h
 	src/include/settings.h
+	src/include/shaders.h
 	src/include/sound.h
 	src/include/sound_server.h
 	src/include/spells.h
@@ -932,6 +934,13 @@ endif()
 
 if(ENABLE_MULTIBUILD)
     if(WIN32 AND MSVC)
+      if(MSVC_VERSION GREATER 1800)       # if > VC13 
+        message("The project must be compiled with VS2013 or older. VS2015 has deprecated many functions that we still use.") 
+        set(CMAKE_GENERATOR_TOOLSET "v120" CACHE STRING "Platform Toolset" FORCE) 
+      endif()
+	  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:MSVCRT")
+	  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:MSVCRT")
+	  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO /NODEFAULTLIB:MSVCRT")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
       message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
     endif()

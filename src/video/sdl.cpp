@@ -70,6 +70,7 @@
 
 #ifdef USE_OPENGL
 #include "SDL_opengl.h"
+#include "shaders.h"
 #endif
 
 #ifdef USE_BEOS
@@ -122,6 +123,7 @@ GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
 GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
 bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression
+bool GLShaderPipelineSupported;
 #endif
 
 static std::map<int, std::string> Key2Str;
@@ -256,8 +258,11 @@ static void InitOpenGLExtensions()
 	} else {
 		GLTextureCompressionSupported = false;
 	}
+
+	GLShaderPipelineSupported = LoadShaderExtensions();
 #else
 	GLTextureCompressionSupported = false;
+	GLShaderPipelineSupported = false;
 #endif
 }
 
@@ -281,7 +286,11 @@ static void InitOpenGL()
 #endif
 
 #ifdef USE_OPENGL
-	glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
+	if (!GLShaderPipelineSupported) {
+		glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
+	} else {
+		glOrtho(0, Video.ViewportWidth, Video.ViewportHeight, 0, -1, 1);
+	}
 #endif
 
 	glMatrixMode(GL_MODELVIEW);
@@ -299,6 +308,10 @@ static void InitOpenGL()
 
 #ifdef USE_OPENGL
 	glClearDepth(1.0f);
+
+	if (GLShaderPipelineSupported) {
+		SetupFramebuffer();
+	}
 #endif
 
 	glShadeModel(GL_FLAT);
@@ -879,6 +892,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_BACKSLASH) {
+				LoadShaders();
+				break;
+			}
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 								event.key.keysym.sym, event.key.keysym.unicode);
 			break;
@@ -999,7 +1016,11 @@ void RealizeVideoMemory()
 		eglSwapBuffers(eglDisplay, eglSurface);
 #endif
 #if defined(USE_OPENGL) || defined(USE_GLES_NATIVE)
-		SDL_GL_SwapBuffers();
+		if (GLShaderPipelineSupported) {
+			RenderFramebufferToScreen();
+		} else {
+			SDL_GL_SwapBuffers();
+		}
 #endif
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	} else
