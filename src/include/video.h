@@ -41,6 +41,7 @@
 
 #ifdef USE_OPENGL
 #include "SDL_opengl.h"
+#include "shaders.h"
 #endif
 
 #include "guichan.h"

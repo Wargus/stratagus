@@ -1,9 +1,6 @@
 #include "stratagus.h"
 #include "video.h"
-#include "SDL.h"
-#include "SDL_syswm.h"
-#include "SDL_opengl.h"
-
+#ifdef USE_OPENGL
 const char* vertex_shader = "#version 130\n\
 \n\
 uniform sampler2D u_texture;\n\
@@ -13,8 +10,8 @@ void main()\n\
     gl_TexCoord[0] = gl_MultiTexCoord0;\n\
 	gl_Position = ftransform();\n\
 }";
-#define MAX_SHADER 5
-const char* fragment_shaders[5] = {
+
+const char* fragment_shaders[MAX_SHADERS] = {
 	// Nearest-neighbour
 	"#version 130\n\
 	\n\
@@ -388,19 +385,19 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 	}
 }
 
-unsigned shader_index = 0;
+extern unsigned ShaderIndex = 0;
 
 extern void LoadShaders() {
 	GLuint vs, fs;
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, (const char**)&(fragment_shaders[shader_index]), NULL);
+	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), NULL);
 	glCompileShader(fs);
-	printShaderInfoLog(fs, "Fragment Shader");
-	shader_index = (shader_index + 1) % MAX_SHADER;
+	//printShaderInfoLog(fs, "Fragment Shader");
+	ShaderIndex = (ShaderIndex + 1) % MAX_SHADERS;
 	vs = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vs, 1, (const char**)&vertex_shader, NULL);
 	glCompileShader(vs);
-	printShaderInfoLog(vs, "Vertex Shader");
+	//printShaderInfoLog(vs, "Vertex Shader");
 	if (glIsProgram(fullscreenShader)) {
 		glDeleteProgram(fullscreenShader);
 	}
@@ -410,7 +407,7 @@ extern void LoadShaders() {
 	glLinkProgram(fullscreenShader);
 	glDeleteShader(fs);
 	glDeleteShader(vs);
-	printProgramInfoLog(fullscreenShader, "Shader Program");
+	//printProgramInfoLog(fullscreenShader, "Shader Program");
 }
 
 extern bool LoadShaderExtensions() {
@@ -502,3 +499,4 @@ extern void RenderFramebufferToScreen() {
 	glUseProgram(0); // Disable shaders again, and render to framebuffer again
 	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
 }
+#endif

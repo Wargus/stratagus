@@ -892,7 +892,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
-			if (UseOpenGL && event.key.keysym.sym == SDLK_BACKSLASH) {
+			if (GLShaderPipelineSupported
+				&& event.key.keysym.sym == SDLK_SLASH
+				&& event.key.keysym.mod & KMOD_ALT
+				&& event.key.keysym.mod & KMOD_CTRL) {
 				LoadShaders();
 				break;
 			}
