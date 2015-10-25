@@ -463,7 +463,14 @@ CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		return FontColorGraphics[this][&fontColor];
+		CGraphic* fontColorG = FontColorGraphics[this][&fontColor];
+		if (!fontColorG) {
+#ifdef DEBUG
+			fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident, this->Ident);
+#endif
+			return this->G;
+		}
+		return fontColorG;
 	} else
 #endif
 	{
