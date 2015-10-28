@@ -103,7 +103,7 @@ void InitButtons()
 **  FIXME: docu
 */
 int AddButton(int pos, int level, const std::string &icon_ident,
-			  ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+			  ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
 			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
 			  const std::string &sound, const std::string &cursor, const std::string &umask,
 			  const std::string &popup, bool alwaysShow)
@@ -116,6 +116,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ba->Level = level;
 	ba->AlwaysShow = alwaysShow;
 	ba->Icon.Name = icon_ident;
+	ba->Payload = actionCb;
 	// FIXME: check if already initited
 	//ba->Icon.Load();
 	ba->Action = action;
@@ -876,6 +877,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonStandGround:
 		case ButtonButton:
 		case ButtonMove:
+		case ButtonCallbackAction:
 			res = true;
 			break;
 		case ButtonRepair:
@@ -1335,6 +1337,14 @@ void CButtonPanel::DoClicked_Research(int button)
 	}
 }
 
+void CButtonPanel::DoClicked_CallbackAction(int button)
+{
+	LuaCallback* callback = (LuaCallback*)(CurrentButtons[button].Payload);
+	callback->pushPreamble();
+	callback->pushInteger(UnitNumber(*Selected[0]));
+	callback->run();
+}
+
 /**
 **  Handle bottom button clicked.
 **
@@ -1384,6 +1394,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonTrain: { DoClicked_Train(button); break; }
 		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
 		case ButtonResearch: { DoClicked_Research(button); break; }
+		case ButtonCallbackAction: { DoClicked_CallbackAction(button); break; }
 	}
 }
 

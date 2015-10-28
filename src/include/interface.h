@@ -76,7 +76,8 @@ enum ButtonCmd {
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild     /// cancel building
+	ButtonCancelBuild,    /// cancel building
+	ButtonCallbackAction
 };
 
 class ButtonAction;
@@ -86,7 +87,7 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0),
+	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(NULL),
 		Allowed(NULL), Key(0) {}
 
 	int Pos;          /// button position in the grid
@@ -94,6 +95,7 @@ public:
 	bool AlwaysShow;  /// button is always shown but drawn grayscale if not available
 	ButtonCmd Action; /// command on button press
 	int Value;        /// extra value for command
+	void* Payload;
 	std::string ValueStr;    /// keep original value string
 
 	ButtonCheckFunc Allowed;    /// Check if this button is allowed
@@ -266,7 +268,7 @@ extern void InitButtons();
 extern void CleanButtons();
 /// Make a new button
 extern int AddButton(int pos, int level, const std::string &IconIdent,
-					 ButtonCmd action, const std::string &value, const ButtonCheckFunc func,
+					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
 					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
 					 const std::string &sound, const std::string &cursor, const std::string &umask,
 					 const std::string &popup, bool alwaysShow);

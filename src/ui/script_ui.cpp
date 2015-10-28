@@ -971,23 +971,30 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonCancelTrain;
 			} else if (!strcmp(value, "cancel-build")) {
 				ba.Action = ButtonCancelBuild;
+			} else if (!strcmp(value, "callback")) {
+				ba.Action = ButtonCallbackAction;
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
 		} else if (!strcmp(value, "Value")) {
-			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1)) {
+			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1) && !lua_isfunction(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			char buf[64];
-			const char *s2;
 
-			if (lua_isnumber(l, -1)) {
-				snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
-				s2 = buf;
+			if (lua_isfunction(l, -1)) {
+				ba.Payload = new LuaCallback(l, -1);
 			} else {
-				s2 = lua_tostring(l, -1);
+				char buf[64];
+				const char *s2;
+
+				if (lua_isnumber(l, -1)) {
+					snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
+					s2 = buf;
+				} else {
+					s2 = lua_tostring(l, -1);
+				}
+				ba.ValueStr = s2;
 			}
-			ba.ValueStr = s2;
 		} else if (!strcmp(value, "Allowed")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "check-true")) {
@@ -1072,7 +1079,7 @@ static int CclDefineButton(lua_State *l)
 		}
 		lua_pop(l, 1);
 	}
-	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr,
+	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
 			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
 			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
 	return 0;
