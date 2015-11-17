@@ -55,6 +55,7 @@ class CFont;
 extern char ForceUseOpenGL;
 extern bool UseOpenGL;
 extern bool ZoomNoResize;
+extern bool GLShaderPipelineSupported;
 #endif
 
 class CGraphic : public gcn::Image

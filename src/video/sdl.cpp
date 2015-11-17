@@ -123,7 +123,6 @@ GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
 GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
 bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
 bool UseGLTextureCompression;       /// Use OpenGL texture compression
-bool GLShaderPipelineSupported;
 #endif
 
 static std::map<int, std::string> Key2Str;
@@ -259,7 +258,7 @@ static void InitOpenGLExtensions()
 		GLTextureCompressionSupported = false;
 	}
 
-	GLShaderPipelineSupported = LoadShaderExtensions();
+	GLShaderPipelineSupported = GLShaderPipelineSupported && LoadShaderExtensions();
 #else
 	GLTextureCompressionSupported = false;
 	GLShaderPipelineSupported = false;

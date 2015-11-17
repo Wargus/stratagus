@@ -335,7 +335,7 @@ PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLACTIVETEXTUREPROC glActiveTextureProc;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM1IPROC glUniform1i;
 
@@ -385,7 +385,7 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 	}
 }
 
-extern unsigned ShaderIndex = 0;
+unsigned ShaderIndex = 0;
 
 extern void LoadShaders() {
 	GLuint vs, fs;
@@ -427,7 +427,7 @@ extern bool LoadShaderExtensions() {
 	glDeleteShader = (PFNGLDELETESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glDeleteShader");
 
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetUniformLocation");
-	glActiveTexture = (PFNGLACTIVETEXTUREPROC)(uintptr_t)SDL_GL_GetProcAddress("glActiveTexture");
+	glActiveTextureProc = (PFNGLACTIVETEXTUREPROC)(uintptr_t)SDL_GL_GetProcAddress("glActiveTexture");
 	glUniform1f = (PFNGLUNIFORM1FPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1f");
 	glUniform1i = (PFNGLUNIFORM1IPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1i");
 
@@ -441,7 +441,7 @@ extern bool LoadShaderExtensions() {
 	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
 
-	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTexture) {
+	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
 		LoadShaders();
 		return true;
 	} else {
@@ -482,7 +482,7 @@ extern void RenderFramebufferToScreen() {
 	glUniform1f(widthrelloc, (float)Video.Width / (float)Video.ViewportWidth);
 	glUniform1f(heightrelloc, (float)Video.Height / (float)Video.ViewportHeight);
 	glUniform1i(textureloc, 0);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTextureProc(GL_TEXTURE0);
 	// render the framebuffer texture to a fullscreen quad on the real display
 	glBindTexture(GL_TEXTURE_2D, fullscreenTexture);
 	glBegin(GL_QUADS);

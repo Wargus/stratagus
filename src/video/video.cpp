@@ -170,6 +170,7 @@ CVideo Video;
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
 bool ZoomNoResize;
+bool GLShaderPipelineSupported = true;
 #endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
