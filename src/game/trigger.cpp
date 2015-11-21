@@ -186,7 +186,9 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 			// Check the player
 			if (plynr == -1 || plynr == unit.Player->Index) {
-				++s;
+				if (unit.IsAlive()) {
+					++s;
+				}
 			}
 		}
 	}
