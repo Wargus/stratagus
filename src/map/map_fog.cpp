@@ -372,7 +372,7 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	// bottom hemi-cycle
 	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
 	for (int offsety = 0; offsety < maxy; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(offsety) - 1);
+		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
 		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
 		Vec2i mpos(minx, pos.y + h + offsety);

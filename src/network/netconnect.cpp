@@ -1829,17 +1829,7 @@ void NetworkGamePrepareGameSettings()
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
 				int v = ServerSetupState.Race[num[i]];
 				if (v != 0) {
-					int x = 0;
-
-					for (unsigned int n = 0; n < PlayerRaces.Count; ++n) {
-						if (PlayerRaces.Visible[n]) {
-							if (x + 1 == v) {
-								break;
-							}
-							++x;
-						}
-					}
-					GameSettings.Presets[num[i]].Race = x;
+					GameSettings.Presets[num[i]].Race = v - 1;
 				} else {
 					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}

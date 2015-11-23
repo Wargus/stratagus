@@ -356,7 +356,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	if (it != cache.end() && (*it)->tilePos == pos) {
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
-		Vec2i endPos(found.tilePos.x + found.Type->TileWidth, found.tilePos.y + found.Type->TileHeight);
+		Vec2i endPos(found.tilePos.x + found.Type->TileWidth - 1, found.tilePos.y + found.Type->TileHeight - 1);
 		Select(found.tilePos, endPos, table);
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
