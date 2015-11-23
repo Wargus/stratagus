@@ -1,0 +1,21 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+os:
+  - linux
+addons:
+  apt:
+    packages:
+      - cmake
+      - libsdl1.2-dev
+      - liblua5.1-0-dev
+      - libtolua++5.1-dev
+      - libtolua-dev
+      - zlib1g-dev
+      - libpng12-dev
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+script: cd build && make
