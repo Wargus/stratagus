@@ -466,7 +466,7 @@ CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 		CGraphic* fontColorG = FontColorGraphics[this][&fontColor];
 		if (!fontColorG) {
 #ifdef DEBUG
-			fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident, this->Ident);
+			fprintf(stderr, "Could not load font color %s for font %s\n", fontColor.Ident.c_str(), this->Ident.c_str());
 #endif
 			return this->G;
 		}
