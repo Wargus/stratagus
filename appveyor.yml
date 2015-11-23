@@ -1,0 +1,10 @@
+environment:
+  VisualStudioVersion: 12.0
+shallow_clone: true
+before_build:
+  - mkdir build
+  - cd build
+  - appveyor DownloadFile http://stratagus.sourceforge.net/msvc-libs.zip
+  - 7z x msvc-libs.zip
+  - cmake -G "Visual Studio 12 2013" -DCMAKE_PREFIX_PATH="%cd%\\3rd" ..
+  - cd ..
