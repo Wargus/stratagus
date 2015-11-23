@@ -1828,8 +1828,8 @@ void NetworkGamePrepareGameSettings()
 			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
 				int v = ServerSetupState.Race[num[i]];
-				if (v != -1) {
-					GameSettings.Presets[num[i]].Race = v;
+				if (v != 0) {
+					GameSettings.Presets[num[i]].Race = v - 1;
 				} else {
 					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}
