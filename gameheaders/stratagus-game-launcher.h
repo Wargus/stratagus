@@ -103,6 +103,14 @@
  * Path to stratagus executable binary
  **/
 
+/**
+ * \def TITLE_PNG
+ * OPTIONAL: Path to title screen (for testing if data was extracted)
+ **/
+#ifndef TITLE_PNG
+#define TITLE_PNG "%s\\graphics\\ui\\title.png"
+#endif
+
 /* Fake definitions for Doxygen */
 #ifdef DOXYGEN
 #define GAME_NAME
@@ -313,7 +321,7 @@ int main(int argc, char * argv[]) {
 		error(TITLE, DATA_NOT_EXTRACTED);
 	}
 #ifdef WIN32
-	sprintf(title_path, "%s\\graphics\\ui\\title.png", data_path);
+	sprintf(title_path, TITLE_PNG, data_path);
 
 	int data_path_len = strlen(data_path);
 
