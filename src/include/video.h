@@ -112,6 +112,7 @@ public:
 
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
 
@@ -171,6 +172,7 @@ public:
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *Get(const std::string &file);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 
