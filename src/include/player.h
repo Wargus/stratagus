@@ -109,6 +109,7 @@ public:
 
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
+	int UnitTypesAiActiveCount[UnitTypeMax];  /// total units of unit-type that have their AI set to active
 
 	bool AiEnabled;        /// handle AI on local computer
 	PlayerAi *Ai;          /// Ai structure pointer

@@ -712,6 +712,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			}
 		}
 		player.UnitTypesCount[type.Slot]++;
+		if (Active) {
+			player.UnitTypesAiActiveCount[type.Slot]++;
+		}
 		player.Demand += type.Demand; // food needed
 	}
 
@@ -1279,6 +1282,9 @@ void UnitLost(CUnit &unit)
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
 			player.UnitTypesCount[type.Slot]--;
+			if (unit.Active) {
+				player.UnitTypesAiActiveCount[type.Slot]--;
+			}
 		}
 	}
 
@@ -1779,6 +1785,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.NumBuildings++;
 	}
 	newplayer.UnitTypesCount[Type->Slot]++;
+	if (Active) {
+		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
+	}
 
 	//apply the upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {

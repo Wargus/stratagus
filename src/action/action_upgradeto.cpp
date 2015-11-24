@@ -106,6 +106,10 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	CPlayer &player = *unit.Player;
 	player.UnitTypesCount[oldtype.Slot]--;
 	player.UnitTypesCount[newtype.Slot]++;
+	if (unit.Active) {
+		player.UnitTypesAiActiveCount[oldtype.Slot]--;
+		player.UnitTypesAiActiveCount[newtype.Slot]++;
+	}
 
 	player.Demand += newtype.Demand - oldtype.Demand;
 	player.Supply += newtype.Supply - oldtype.Supply;

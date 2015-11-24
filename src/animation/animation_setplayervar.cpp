@@ -88,6 +88,11 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 		CUnitType *type = UnitTypeByIdent(unit);
 		Assert(type);
 		return Players[player].UnitTypesCount[type->Slot];
+	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
+		const std::string unit(arg);
+		CUnitType *type = UnitTypeByIdent(unit);
+		Assert(type);
+		return Players[player].UnitTypesAiActiveCount[type->Slot];
 	} else if (!strcmp(prop, "AiEnabled")) {
 		return Players[player].AiEnabled;
 	} else if (!strcmp(prop, "TotalNumUnits")) {

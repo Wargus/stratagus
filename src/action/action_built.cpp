@@ -155,6 +155,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// HACK: the building is ready now
 	player.UnitTypesCount[type.Slot]++;
+	if (unit.Active) {
+		player.UnitTypesAiActiveCount[type.Slot]++;
+	}
 	unit.Constructed = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;

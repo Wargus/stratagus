@@ -702,6 +702,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	}
 
 	memset(this->UnitTypesCount, 0, sizeof(this->UnitTypesCount));
+	memset(this->UnitTypesAiActiveCount, 0, sizeof(this->UnitTypesAiActiveCount));
 
 	this->Supply = 0;
 	this->Demand = 0;
@@ -754,6 +755,7 @@ void CPlayer::Clear()
 	memset(Incomes, 0, sizeof(Incomes));
 	memset(Revenue, 0, sizeof(Revenue));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
+	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
 	AiEnabled = false;
 	Ai = 0;
 	this->Units.resize(0);

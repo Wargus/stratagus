@@ -26,6 +26,7 @@ class CPlayer
 	const int Revenue[MaxCosts];
 
 	const int UnitTypesCount[UnitTypeMax];
+	const int UnitTypesAiActiveCount[UnitTypeMax];
 	bool AiEnabled;
 
 	int NumBuildings;

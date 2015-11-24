@@ -526,6 +526,9 @@ static int CclUnit(lua_State *l)
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
+				if (unit->Active) {
+					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
+				}
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -1108,6 +1111,9 @@ static int CclGetUnitVariable(lua_State *l)
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
 		return 1;
+	} else if (!strcmp(value, "Active")) {
+		lua_pushboolean(l, unit->Active);
+		return 1;
 	} else if (!strcmp(value, "Idle")) {
 		lua_pushboolean(l, unit->IsIdle());
 		return 1;
@@ -1171,6 +1177,19 @@ static int CclSetUnitVariable(lua_State *l)
 		} else {
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
+	} else if (!strcmp(name, "Active")) {
+		bool ai_active = LuaToBoolean(l, 3);
+		if (ai_active != unit->Active) {
+			if (ai_active) {
+				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]++;
+			} else {
+				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
+				if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
+				}
+			}
+		}
+		unit->Active = ai_active;
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {

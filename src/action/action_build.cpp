@@ -356,6 +356,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;
+	if (build->Active) {
+		build->Player->UnitTypesAiActiveCount[type.Slot]--;
+	}
 
 	// We need somebody to work on it.
 	if (!type.BuilderOutside) {

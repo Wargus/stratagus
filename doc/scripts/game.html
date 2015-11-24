@@ -651,8 +651,8 @@ Possible values for <i>property</i>:
 <dt>RaceName</dt>
 <dd>Name of race.
 </dd>
-<dt>Ressources</dt>
-<dd>The amount of ressources available for the ressource whose name is given as third argument.
+<dt>Resources</dt>
+<dd>The amount of resources available for the resource whose name is given as third argument.
 </dd>
 <dt>UnitTypesCount</dt>
 <dd>The amount of units whose type is given as third argument.
@@ -691,7 +691,7 @@ Possible values for <i>property</i>:
 <dd>Total number of buildings.
 </dd>
 <dt>TotalResources</dt>
-<dd>Total ressources of the <i>resource</i> type collected by the player.
+<dd>Total resources of the <i>resource</i> type collected by the player.
 </dd>
 <dt>TotalRazings</dt>
 <dd>Total buildings destroyed.
@@ -728,10 +728,23 @@ Get a unit's variable.
 <dt>unit</dt>
 <dd>Unit to get info for.</dd>
 <dt>VariableName</dt>
-<dd>Name of the variable to get info for. Also takes "IndividualUpgrade" instead of a variable name, to get whether the unit has acquired a particular individual upgrade. Alternatively, takes "Idle" to check whether the unit is idle or not.</dd>
+<dd>Name of the variable to get info for.</dd>
 <dt>third_element</dt>
-<dd>Used if getting whether the unit has an individual upgrade, taking the upgrade's ident.</dd>
+<dd>Used for certain alternate uses of the function, described below.</dd>
 </dl>
+<p>
+
+Besides variable names, the <i>VariableName</i> field takes the following alternate values:
+<dl>
+<dt>IndividualUpgrade</dt>
+<dd>Use this to get whether the unit has a certain individual upgrade. Use the upgrade's ident in the <i>third_element</i> field.
+</dd>
+<dt>Active</dt>
+<dd>Use this to get whether the unit's AI is active.
+</dd>
+<dt>Idle</dt>
+<dd>Use this to get whether the unit is idle.
+</dd>
 
 <h4>Example</h4>
 
@@ -1324,7 +1337,7 @@ Possible values for <i>property</i>:
 <dt>RaceName</dt>
 <dd>Name of the race of the player. Don't change this value during the game.
 </dd>
-<dt>Ressources</dt>
+<dt>Resources</dt>
 <dd>The amount of resources available of the <i>resource</i> kind.
 </dd>
 <dt>UnitLimit</dt>
@@ -1346,7 +1359,7 @@ Possible values for <i>property</i>:
 <dd>Total number of buildings.
 </dd>
 <dt>TotalResources</dt>
-<dd>Total ressources of the <i>resource</i> type collected by the player.
+<dd>Total resources of the <i>resource</i> type collected by the player.
 </dd>
 <dt>TotalRazings</dt>
 <dd>Total buildings destroyed.
@@ -1409,12 +1422,22 @@ Set the amount of VariableName of the unit.
 <dt>unit</dt>
 <dd>Unit to set the info for.</dd>
 <dt>VariableName</dt>
-<dd>Variable to set. Also takes "IndividualUpgrade" instead of a variable name, to make the unit acquire or lose an individual upgrade.</dd>
+<dd>Variable to set.</dd>
 <dt>amount</dt>
-<dd>New amount of VariableName for the unit. Alternatively, if setting an individual upgrade for the unit, this field takes the ident of the upgrade.</dd>
+<dd>New amount of VariableName for the unit.</dd>
 <dt>fourth_element</dt>
-<dd>Used if setting an individual upgrade for the unit. Use a boolean value for whether the unit will acquire or lose the individual upgrade.</dd>
+<dd>Used for certain alternative uses of the function, described below.</dd>
 </dl>
+<p>
+
+Besides variable names, the <i>VariableName</i> field takes the following alternate string values:
+<dl>
+<dt>IndividualUpgrade</dt>
+<dd>Use this to make the unit acquire or lose an individual upgrade. Use the upgrade's ident in the <i>amount</i> field, and whether the upgrade should be acquired or lost in the <i>fourth_element</i> field (set it to true or false).
+</dd>
+<dt>Active</dt>
+<dd>Use this to set the unit's AI to active. Use true or false for the <i>amount</i> field.
+</dd>
 
 <h4>Example</h4>
 
