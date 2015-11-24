@@ -155,10 +155,16 @@
 #define stat _stat
 #endif
 
+#ifdef _MSC_VER
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#endif
+
 #ifndef WIN32
 #include <unistd.h>
 #include <X11/Xlib.h>
+#ifndef NOGTK
 #include <gtk/gtk.h>
+#endif
 #endif
 
 #ifdef MAEMO
@@ -188,6 +194,9 @@ static void error(char * title, char * text) {
 #ifdef WIN32
 	MessageBox(NULL, text, title, MB_OK | MB_ICONERROR);
 #else
+#ifdef NOGTK
+	{
+#else
 	if ( ! ConsoleMode ) {
 		GtkWidget * window = NULL;
 		GtkWidget * dialog = NULL;
@@ -210,6 +219,7 @@ static void error(char * title, char * text) {
 		gtk_widget_destroy(window);
 #endif
 	} else {
+#endif
 		fprintf(stderr, "%s -- Error: %s\n", title, text);
 	}
 #endif
@@ -231,9 +241,11 @@ int main(int argc, char * argv[]) {
 		}
 #endif
 	} else {
+#ifndef NOGTK
 		gtk_init(&argc, &argv);
 #ifdef MAEMO
 		hildon_init();
+#endif
 #endif
 	}
 #endif
