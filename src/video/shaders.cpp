@@ -319,7 +319,7 @@ const char* fragment_shaders[MAX_SHADERS] = {
 	}"
 };
 
-
+#ifndef __APPLE__
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLCOMPILESHADERPROC glCompileShader;
@@ -338,10 +338,6 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLACTIVETEXTUREPROC glActiveTextureProc;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM1IPROC glUniform1i;
-
-GLuint fullscreenShader;
-GLuint fullscreenFramebuffer = 0;
-GLuint fullscreenTexture;
 PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture;
@@ -351,6 +347,17 @@ PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorage;
 PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbuffer;
 PFNGLDRAWBUFFERSPROC glDrawBuffers;
 PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatus;
+#else
+#define glGenFramebuffers glGenFramebuffersEXT
+#define glBindFramebuffer glBindFramebufferEXT
+#define glCheckFramebufferStatus glCheckFramebufferStatusEXT
+#define glActiveTextureProc glActiveTexture
+#define glFramebufferTexture glFramebufferTexture2DEXT
+#endif
+
+GLuint fullscreenShader;
+GLuint fullscreenFramebuffer = 0;
+GLuint fullscreenTexture;
 
 void printShaderInfoLog(GLuint obj, const char* prefix)
 {
@@ -411,6 +418,7 @@ extern void LoadShaders() {
 }
 
 extern bool LoadShaderExtensions() {
+#ifndef __APPLE__
 	glCreateShader = (PFNGLCREATESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glCreateShader");
 	glShaderSource = (PFNGLSHADERSOURCEPROC)(uintptr_t)SDL_GL_GetProcAddress("glShaderSource");
 	glCompileShader = (PFNGLCOMPILESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompileShader");
@@ -440,7 +448,7 @@ extern bool LoadShaderExtensions() {
 	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glFramebufferRenderbuffer");
 	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
-
+#endif
 	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
 		LoadShaders();
 		return true;

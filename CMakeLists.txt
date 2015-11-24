@@ -1122,7 +1122,7 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(APPLE)
-	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -framework libpng -lSDLmain")
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDLmain")
 endif()
 
 ########### next target ###############
