@@ -1,10 +1,11 @@
 language: cpp
 sudo: required
-compiler:
-  - gcc
-  - clang
+# compiler:
+#   - gcc
+#   - clang
 os:
   - linux
+  - osx
 addons:
   apt:
     packages:
@@ -21,4 +22,4 @@ before_script:
   - mkdir build
   - cd build
   - cmake ..
-script: cd build && make
+script: make
