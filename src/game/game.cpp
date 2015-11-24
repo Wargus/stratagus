@@ -522,6 +522,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (unit.Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
+			if (!unit.Active) { //Active is true by default
+				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
+			}
 			if (unit.Type->Teleporter && unit.Goal) {
 				teleporters.push_back(*it);
 			}
