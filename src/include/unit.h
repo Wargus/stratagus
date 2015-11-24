@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -337,6 +337,7 @@ public:
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
+	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position

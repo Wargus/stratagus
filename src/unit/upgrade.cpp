@@ -10,7 +10,8 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
