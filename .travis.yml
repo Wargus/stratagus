@@ -18,7 +18,12 @@ addons:
       - libpng12-dev
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libtolua++5.1-dev; fi
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; fi
+  - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
+         git clone https://github.com/LuaDist/toluapp.git; \
+         cd toluapp; \
+         cmake; \
+         make && sudo make install; \
+    fi"
   - mkdir build
   - cd build
   - cmake ..
