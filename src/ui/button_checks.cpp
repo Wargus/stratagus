@@ -10,7 +10,8 @@
 //
 /**@name button_checks.cpp - The button checks. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -88,6 +89,19 @@ bool ButtonCheckFalse(const CUnit &, const ButtonAction &)
 bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 {
 	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
+}
+
+/**
+**  Check for button enabled, if unit has an individual upgrade.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
+{
+	return unit.IndividualUpgrades[UpgradeIdByIdent(button.AllowStr)];
 }
 
 /**

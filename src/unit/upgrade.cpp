@@ -753,6 +753,78 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 }
 
 /**
+**  Apply the modifiers of an individual upgrade.
+**
+**  @param unit    Unit that will get the modifier applied
+**  @param um      Upgrade modifier that does the effects
+*/
+void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+		if (!unit.Removed) {
+			MapUnmarkUnitSight(unit);
+			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
+									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			UpdateUnitSightRange(unit);
+			MapMarkUnitSight(unit);
+		}
+	}
+
+	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+		if (um->ModifyPercent[j]) {
+			unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+			unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
+		} else {
+			unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
+		}
+		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
+		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+		if (unit.Variable[j].Max > 0) {
+			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+		}
+	}
+	
+	if (um->ConvertTo) {
+		CommandTransformIntoType(unit, *um->ConvertTo);
+	}
+}
+
+static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+		if (!unit.Removed) {
+			MapUnmarkUnitSight(unit);
+			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
+									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			UpdateUnitSightRange(unit);
+			MapMarkUnitSight(unit);
+		}
+	}
+
+	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+		if (um->ModifyPercent[j]) {
+			unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+			unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
+		} else {
+			unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+			unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
+		}
+		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
+		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+		if (unit.Variable[j].Max > 0) {
+			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+		}
+	}
+}
+
+/**
 **  Handle that an upgrade was acquired.
 **
 **  @param player   Player researching the upgrade.
@@ -827,6 +899,46 @@ void ApplyUpgrades()
 				}
 			}
 		}
+	}
+}
+
+void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+	unit.IndividualUpgrades[id] = true;
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
+
+void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = 0;
+	unit.IndividualUpgrades[id] = false;
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
 	}
 }
 

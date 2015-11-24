@@ -10,7 +10,8 @@
 //
 /**@name script_ui.cpp - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2007 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2015 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1003,6 +1004,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckFalse;
 			} else if (!strcmp(value, "check-upgrade")) {
 				ba.Allowed = ButtonCheckUpgrade;
+			} else if (!strcmp(value, "check-individual-upgrade")) {
+				ba.Allowed = ButtonCheckIndividualUpgrade;
 			} else if (!strcmp(value, "check-unit-variable")) {
 				ba.Allowed = ButtonCheckUnitVariable;
 			} else if (!strcmp(value, "check-units-or")) {

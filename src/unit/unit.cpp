@@ -10,7 +10,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -472,6 +472,7 @@ void CUnit::Init()
 	SpellCoolDownTimers = NULL;
 	AutoRepair = 0;
 	Goal = NULL;
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 }
 
 
@@ -598,6 +599,8 @@ void CUnit::Init(const CUnitType &type)
 		Variable = NULL;
 	}
 
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
+	
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
@@ -1776,6 +1779,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 	newplayer.UnitTypesCount[Type->Slot]++;
 
+	//apply the upgrades of the new player, if the old one doesn't have that upgrade
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
+			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]); //apply the upgrade to this unit only
+		}
+	}
+	
 	UpdateForNewUnit(*this, 1);
 }
 

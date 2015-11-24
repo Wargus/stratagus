@@ -1099,6 +1099,18 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
+	} else if (!strcmp(value, "IndividualUpgrade")) {
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (CUpgrade::Get(upgrade_ident)) {
+			lua_pushboolean(l, unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]);
+		} else {
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
+		return 1;
+	} else if (!strcmp(value, "Idle")) {
+		lua_pushboolean(l, unit->IsIdle());
+		return 1;
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
@@ -1143,10 +1155,22 @@ static int CclSetUnitVariable(lua_State *l)
 	int value;
 	if (!strcmp(name, "Player")) {
 		unit->AssignToPlayer(Players[LuaToNumber(l, 3)]);
-	}
-	if (!strcmp(name, "RegenerationRate")) {
+	} else if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
+	} else if (!strcmp(name, "IndividualUpgrade")) {
+		LuaCheckArgs(l, 4);
+		std::string upgrade_ident = LuaToString(l, 3);
+		bool has_upgrade = LuaToBoolean(l, 4);
+		if (CUpgrade::Get(upgrade_ident)) {
+			if (has_upgrade && unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID] == false) {
+				IndividualUpgradeAcquire(*unit, CUpgrade::Get(upgrade_ident));
+			} else if (!has_upgrade && unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]) {
+				IndividualUpgradeLost(*unit, CUpgrade::Get(upgrade_ident));
+			}
+		} else {
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {

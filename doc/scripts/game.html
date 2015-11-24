@@ -720,22 +720,24 @@ Returns the current player. Usefull mostly in for AI scripts.
 </pre>
 
 <a name="GetUnitVariable"></a>
-<h3>GetUnitVariable(unit, VariableName)</h3>
+<h3>GetUnitVariable(unit, VariableName, third_element)</h3>
 
-Get a unit's mana.
+Get a unit's variable.
 
 <dl>
 <dt>unit</dt>
 <dd>Unit to get info for.</dd>
 <dt>VariableName</dt>
-<dd>Name of the variable to get info for.</dd>
+<dd>Name of the variable to get info for. Also takes "IndividualUpgrade" instead of a variable name, to get whether the unit has acquired a particular individual upgrade. Alternatively, takes "Idle" to check whether the unit is idle or not.</dd>
+<dt>third_element</dt>
+<dd>Used if getting whether the unit has an individual upgrade, taking the upgrade's ident.</dd>
 </dl>
 
 <h4>Example</h4>
 
 <pre>
 -- Get mana of the unit (slot #11).
-GetUnitMana(11, "Mana");
+GetUnitVariable(11, "Mana");
 </pre>
 
 <a name="Group"></a>
@@ -1401,15 +1403,17 @@ Set ThisPlayer.
 </pre>
 
 <a name="SetUnitVariable"></a>
-<h3>SetUnitVariable(unit, VariableName, amount)</h3>
+<h3>SetUnitVariable(unit, VariableName, amount, fourth_element)</h3>
 Set the amount of VariableName of the unit.
 <dl>
 <dt>unit</dt>
 <dd>Unit to set the info for.</dd>
 <dt>VariableName</dt>
-<dd>Variable to set.</dd>
+<dd>Variable to set. Also takes "IndividualUpgrade" instead of a variable name, to make the unit acquire or lose an individual upgrade.</dd>
 <dt>amount</dt>
-<dd>New amount of VariableName for the unit.</dd>
+<dd>New amount of VariableName for the unit. Alternatively, if setting an individual upgrade for the unit, this field takes the ident of the upgrade.</dd>
+<dt>fourth_element</dt>
+<dd>Used if setting an individual upgrade for the unit. Use a boolean value for whether the unit will acquire or lose the individual upgrade.</dd>
 </dl>
 
 <h4>Example</h4>

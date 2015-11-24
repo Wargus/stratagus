@@ -10,7 +10,7 @@
 //
 /**@name interface.h - The user interface header file. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -398,6 +398,8 @@ extern bool ButtonCheckTrue(const CUnit &unit, const ButtonAction &button);
 extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button);
+/// Check if unit has an individual upgrade
+extern bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button);
 /// Check if unit's variables pass the condition check
 extern bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed units exists
