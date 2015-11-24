@@ -23,6 +23,7 @@ before_script:
          cd toluapp; \
          cmake; \
          make && sudo make install; \
+         cd ..;
     fi"
   - mkdir build
   - cd build
