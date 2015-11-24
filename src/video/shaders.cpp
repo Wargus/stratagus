@@ -1,6 +1,6 @@
 #include "stratagus.h"
 #include "video.h"
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !defined(__APPLE__)
 const char* vertex_shader = "#version 130\n\
 \n\
 uniform sampler2D u_texture;\n\
@@ -318,7 +318,6 @@ const char* fragment_shaders[MAX_SHADERS] = {
 		gl_FragColor = vec4(p10, 1);\n\
 	}"
 };
-
 
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
