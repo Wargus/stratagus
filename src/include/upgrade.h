@@ -40,10 +40,19 @@
 class CFile;
 class CPlayer;
 class CUpgrade;
+class CUnit;
+class CUpgradeModifier;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+/// How many upgrades modifiers supported
+#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
+
+extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+
+extern int NumUpgradeModifiers;
 
 /*----------------------------------------------------------------------------
 --  Functions

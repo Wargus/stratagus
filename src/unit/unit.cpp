@@ -63,6 +63,7 @@
 #include "unit_manager.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "upgrade.h"
 #include "video.h"
 
 #include <math.h>
