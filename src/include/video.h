@@ -40,14 +40,7 @@
 #endif
 
 #ifdef USE_OPENGL
-#ifdef __APPLE__
-#define NO_SDL_GLEXT
 #include "SDL_opengl.h"
-#include "OpenGL/glu.h"
-#include "OpenGL/glext.h"
-#else
-#include "SDL_opengl.h"
-#endif
 #include "shaders.h"
 #endif
 
