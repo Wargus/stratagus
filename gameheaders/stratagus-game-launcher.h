@@ -320,9 +320,8 @@ int main(int argc, char * argv[]) {
 	if ( stat(data_path, &st) != 0 ) {
 		error(TITLE, DATA_NOT_EXTRACTED);
 	}
-#ifdef WIN32
 	sprintf(title_path, TITLE_PNG, data_path);
-
+#ifdef WIN32
 	int data_path_len = strlen(data_path);
 
 	for (int i = data_path_len - 1; i >= 0; --i) {
@@ -331,8 +330,6 @@ int main(int argc, char * argv[]) {
 	data_path[0] = '"';
 	data_path[data_path_len + 1] = '"';
 	data_path[data_path_len + 2] = 0;
-#else
-	sprintf(title_path, "%s/graphics/ui/title.png", data_path);
 #endif
 
 	if ( stat(title_path, &st) != 0 ) {
