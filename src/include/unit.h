@@ -286,6 +286,8 @@ public:
 
 	int GetDrawLevel() const;
 
+	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
+	
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
 

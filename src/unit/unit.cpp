@@ -3121,6 +3121,37 @@ bool CUnit::IsUnusable(bool ignore_built_state) const
 	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitActionBuilt));
 }
 
+/**
+**  Check if the unit attacking its goal will result in a ranged attack
+*/
+bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
+{
+	if (this->Variable[ATTACKRANGE_INDEX].Value <= 1) { //always return false if the units attack range is 1 or lower
+		return false;
+	}
+	
+	if (this->Container) { //if the unit is inside a container, the attack will always be ranged
+		return true;
+	}
+	
+	if (
+		goal
+		&& goal->IsAliveOnMap()
+		&& (
+			this->MapDistanceTo(*goal) > 1
+			|| (this->Type->UnitType != UnitTypeFly && goal->Type->UnitType == UnitTypeFly)
+			|| (this->Type->UnitType == UnitTypeFly && goal->Type->UnitType != UnitTypeFly)
+		)
+	) {
+		return true;
+	}
+	
+	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
+		return true;
+	}
+	
+	return false;
+}
 
 /*----------------------------------------------------------------------------
 --  Initialize/Cleanup

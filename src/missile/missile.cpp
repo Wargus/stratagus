@@ -367,7 +367,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	}
 
 	// No missile hits immediately!
-	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
+	if (
+		unit.Type->Missile.Missile->Class == MissileClassNone
+		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
+	) {
 		// No goal, take target coordinates
 		if (!goal) {
 			if (Map.WallOnMap(goalPos)) {
