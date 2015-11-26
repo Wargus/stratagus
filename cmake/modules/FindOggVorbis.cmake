@@ -19,8 +19,8 @@ include (CheckLibraryExists)
 find_path(VORBIS_INCLUDE_DIR vorbis/vorbisfile.h)
 find_path(OGG_INCLUDE_DIR ogg/ogg.h)
 
-find_library(OGG_LIBRARY NAMES ogg ogg_static)
-find_library(VORBIS_LIBRARY NAMES vorbis vorbis_static)
+find_library(OGG_LIBRARY NAMES libogg libogg_static ogg ogg_static)
+find_library(VORBIS_LIBRARY NAMES libvorbis libvorbis_static vorbis vorbis_static)
 
 mark_as_advanced(VORBIS_INCLUDE_DIR OGG_INCLUDE_DIR
                  OGG_LIBRARY VORBIS_LIBRARY)
