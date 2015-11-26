@@ -10,8 +10,7 @@
 //
 /**@name action_build.cpp - The build building action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer, Jimmy Salmon, and
-//                                 Russell Smith
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -80,7 +79,7 @@ enum {
 		order->Range = builder.Type->RepairRange;
 	} else {
 		// If building inside, but be next to stop
-		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
+		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->UnitType == UnitTypeLand) {
 			// Peon won't dive :-)
 			order->Range = 1;
 		}

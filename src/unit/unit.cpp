@@ -10,7 +10,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -2956,7 +2956,7 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 		}
 	}
 	if (dest.UnitType == UnitTypeLand) {
-		if (dest.ShoreBuilding) {
+		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
 			return source.CanTarget & (CanTargetLand | CanTargetSea);
 		}
 		return source.CanTarget & CanTargetLand;

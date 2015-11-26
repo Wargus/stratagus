@@ -10,7 +10,7 @@
 //
 /**@name build.cpp - The units. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer, Jimmy Salmon and Rafal Bursig
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -398,7 +398,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	}
 
 	// Must be checked before oil!
-	if (type.ShoreBuilding) {
+	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
 		const int width = type.TileWidth;
 		int h = type.TileHeight;
 		bool success = false;

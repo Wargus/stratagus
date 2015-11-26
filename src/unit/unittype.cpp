@@ -10,7 +10,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -361,10 +361,6 @@
 **
 **    Can do command ground attack
 **
-**  CUnitType::ShoreBuilding
-**
-**    Building must be build on coast
-**
 **  CUnitType::CanCastSpell
 **
 **    Unit is able to use spells
@@ -626,7 +622,7 @@ CUnitType::CUnitType() :
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	PermanentCloak(0), DetectCloak(0),
 	Coward(0), AttackFromTransporter(0),
-	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
+	Vanishes(0), GroundAttack(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
@@ -796,9 +792,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask = 0;
 			break;
 	}
-	if (type.Building || type.ShoreBuilding) {
+	if (type.Building || type.BoolFlag[SHOREBUILDING_INDEX].value) {
 		// Shore building is something special.
-		if (type.ShoreBuilding) {
+		if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
