@@ -2287,7 +2287,7 @@ CUnit *UnitOnScreen(int x, int y)
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
 			// Check if there are other units on this place
 			candidate = &unit;
-			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
+			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 				continue;
 			} else {
 				break;

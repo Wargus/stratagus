@@ -593,7 +593,6 @@ public:
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
-	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.

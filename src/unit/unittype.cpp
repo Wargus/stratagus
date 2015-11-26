@@ -602,7 +602,7 @@ CUnitType::CUnitType() :
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), CanAttack(0),
 	BuilderLost(0),
-	Neutral(0), IsNotSelectable(0), Decoration(0),
+	Neutral(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
@@ -694,7 +694,7 @@ bool CUnitType::CanMove() const
 
 bool CUnitType::CanSelect(GroupSelectionMode mode) const
 {
-	if (!IsNotSelectable) {
+	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		switch (mode) {
 			case SELECTABLE_BY_RECTANGLE_ONLY:
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;

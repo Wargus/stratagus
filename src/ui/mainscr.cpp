@@ -10,8 +10,7 @@
 //
 /**@name mainscr.cpp - The main screen. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Valery Shchedrin, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1159,7 +1158,7 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->IsNotSelectable
+	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value
 		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*ThisPlayer))) {
 			InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {

@@ -434,7 +434,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
-	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
 	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
 	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
 	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
@@ -1069,8 +1068,6 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				LuaError(l, "Unsupported flag tag for ai-priority-target: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "IsNotSelectable")) {
-			type->IsNotSelectable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Teleporter")) {
 			type->Teleporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SaveCargo")) {
