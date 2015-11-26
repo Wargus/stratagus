@@ -41,6 +41,7 @@
 
 #include "action/action_spellcast.h"
 #include "actions.h"
+#include "animation.h"
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
