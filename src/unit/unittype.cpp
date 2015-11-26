@@ -373,10 +373,6 @@
 **    Only valid for buildings without the BuilderOutside flag.
 **    The worker is lost when the building is completed.
 **
-**  CUnitType::SelectableByRectangle
-**
-**    Selectable with mouse rectangle
-**
 **    CUnitType::Teleporter
 **
 **    Can teleport other units.
@@ -606,7 +602,7 @@ CUnitType::CUnitType() :
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), CanAttack(0),
 	BuilderLost(0),
-	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+	Neutral(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
@@ -701,9 +697,9 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	if (!IsNotSelectable) {
 		switch (mode) {
 			case SELECTABLE_BY_RECTANGLE_ONLY:
-				return SelectableByRectangle;
+				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
 			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
-				return !SelectableByRectangle;
+				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
 			default:
 				return true;
 		}

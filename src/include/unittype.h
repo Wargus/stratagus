@@ -158,7 +158,7 @@ enum {
 	BUILDERLOST_INDEX,
 	CANHARVEST_INDEX,				/// Resource can be harvested.
 	HARVESTER_INDEX,				/// Unit is a resource harvester.
-	SELECTABLEBYRECTANGLE_INDEX,
+	SELECTABLEBYRECTANGLE_INDEX,	/// Selectable with mouse rectangle.
 	ISNOTSELECTABLE_INDEX,
 	DECORATION_INDEX,
 	INDESTRUCTIBLE_INDEX,
@@ -593,7 +593,6 @@ public:
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
-	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).

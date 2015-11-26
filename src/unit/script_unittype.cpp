@@ -434,7 +434,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
-	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
 	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
 	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
 	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
@@ -1072,8 +1071,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "IsNotSelectable")) {
 			type->IsNotSelectable = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SelectableByRectangle")) {
-			type->SelectableByRectangle = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Teleporter")) {
 			type->Teleporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SaveCargo")) {

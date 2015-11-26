@@ -10,8 +10,7 @@
 //
 /**@name groups.cpp - The units' groups handling. */
 //
-//      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -73,7 +72,7 @@ public:
 	{
 		if (ThisPlayer->IsTeamed(unit)) {
 			if (!tainted) {
-				tainted = unit.Type->SelectableByRectangle != true;
+				tainted = unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value != true;
 			}
 			units.push_back(&unit);
 			unit.GroupId |= (1 << num);
@@ -89,7 +88,7 @@ public:
 		units.pop_back();
 
 		// Update tainted flag.
-		if (tainted && !unit.Type->SelectableByRectangle) {
+		if (tainted && !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 			updateTainted();
 		}
 	}
@@ -99,7 +98,7 @@ private:
 	{
 		tainted = false;
 		for (size_t i = 0; i != units.size(); ++i) {
-			if (units[i]->Type && !units[i]->Type->SelectableByRectangle) {
+			if (units[i]->Type && !units[i]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
 				tainted = true;
 			}
 		}
