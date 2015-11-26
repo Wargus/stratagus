@@ -14,7 +14,7 @@
 if(MAKENSIS)
 	set(MAKENSIS_FOUND true)
 else()
-	find_program(MAKENSIS NAMES makensis)
+	find_program(MAKENSIS NAMES makensis HINTS "C:/Program Files/NSIS" "C:/Program Files (x86)/NSIS")
 	find_package(SelfPackers)
 
 	set(MAKENSIS_ADDITIONAL_FLAGS "" CACHE STRING "Additional flags for makensis")
