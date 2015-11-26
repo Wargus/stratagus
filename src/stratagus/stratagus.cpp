@@ -238,7 +238,7 @@ extern void beos_init(int argc, char **argv);
 std::string StratagusLibPath;        /// Path for data directory
 
 /// Name, Version, Copyright
-const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
+const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string MenuRace;
@@ -687,8 +687,8 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
 	fprintf(stderr, "Stratagus crashed!\n");
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
-	fprintf(stderr, "Please send it to our bug tracker: https://bugs.launchpad.net/stratagus\n");
-	fprintf(stderr, "and tell us what have you done to cause this bug.\n");
+	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
+	fprintf(stderr, "and tell us what caused this bug to occur.\n");
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 #endif
@@ -793,8 +793,8 @@ int stratagusMain(int argc, char **argv)
 #ifdef USE_STACKTRACE
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
-		fprintf(stderr, "Please send this call stack to our bug tracker: https://bugs.launchpad.net/stratagus\n");
-		fprintf(stderr, "and tell us what have you done to cause this bug.\n");
+		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
+		fprintf(stderr, "and tell us what caused this bug to occur.\n");
 		fprintf(stderr, " === exception state traceback === \n");
 		fprintf(stderr, "%s", e.what());
 		exit(1);
