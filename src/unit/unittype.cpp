@@ -329,16 +329,6 @@
 **    This equals to the resource Id of the resource given
 **    or 0 (TimeCost) for other buildings.
 **
-**  CUnitType::CanHarvest
-**
-**    Resource can be harvested. It's false for things like
-**    oil patches.
-**  @todo crappy name.
-**
-**  CUnitType::Harvester
-**
-**    Unit is a resource worker. Faster than examining ResInfo
-**
 **  CUnitType::ResInfo[::MaxCosts]
 **
 **    Information about resource harvesting. If NULL, it can't
@@ -377,14 +367,6 @@
 **  @todo The above should be more configurable.
 **    If units have a repair range, they can repair, and this is the
 **    distance.
-**
-**  CUnitType::BuilderOutside
-**
-**    Only valid for buildings. When building the worker will
-**    remain outside inside the building.
-**
-**  @warning Workers that can build buildings with the
-**  @warning BuilderOutside flag must have the CanRepair flag.
 **
 **  CUnitType::BuilderLost
 **
@@ -623,7 +605,7 @@ CUnitType::CUnitType() :
 	PermanentCloak(0), DetectCloak(0),
 	Coward(0), AttackFromTransporter(0),
 	Vanishes(0), GroundAttack(0), CanAttack(0),
-	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+	BuilderLost(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
@@ -1069,7 +1051,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		type.ShadowSprite->MakeShadow();
 	}
 
-	if (type.Harvester) {
+	if (type.BoolFlag[HARVESTER_INDEX].value) {
 		for (int i = 0; i < MaxCosts; ++i) {
 			ResourceInfo *resinfo = type.ResInfo[i];
 			if (!resinfo) {

@@ -10,7 +10,7 @@
 //
 /**@name action_train.cpp - The building train action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	}
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
-		if (!unit.Type->Harvester) {
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 			return false;
 		}
 		//  Also check if new unit can harvest this specific resource.

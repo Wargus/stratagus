@@ -10,7 +10,7 @@
 //
 /**@name mouse.cpp - The mouse handling. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -131,10 +131,10 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 	const int res = unit.Type->GivesResource;
 
 	if (res
-		&& dest->Type->Harvester
+		&& dest->Type->BoolFlag[HARVESTER_INDEX].value
 		&& dest->Type->ResInfo[res]
 		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
-		&& unit.Type->CanHarvest) {
+		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
 		unit.Blink = 4;
 		//  Right mouse with SHIFT appends command to old commands.
 		const int flush = !(KeyModifiers & ModifierShift);
@@ -218,7 +218,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
-	if (res && type.ResInfo[res] && dest.Type->CanHarvest
+	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				dest.Blink = 4;
@@ -286,7 +286,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		return true;
 	}
 	// Harvest
-	if (type.Harvester) {
+	if (type.BoolFlag[HARVESTER_INDEX].value) {
 		if (dest != NULL) {
 			if (DoRightButton_Harvest_Unit(unit, *dest, flush, acknowledged)) {
 				return true;
@@ -454,7 +454,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	if (res
 		&& dest.Type->ResInfo[res]
 		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
-		&& type.CanHarvest
+		&& type.BoolFlag[CANHARVEST_INDEX].value
 		&& dest.Player == unit.Player) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
@@ -466,7 +466,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	// Go and harvest from a unit
-	if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest
+	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -560,7 +560,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	// Manage harvester from the destination side.
-	if (dest != NULL && dest->Type->Harvester) {
+	if (dest != NULL && dest->Type->BoolFlag[HARVESTER_INDEX].value) {
 		if (DoRightButton_Harvest_Reverse(unit, *dest, flush, acknowledged)) {
 			return;
 		}
@@ -1274,12 +1274,12 @@ static int SendResource(const Vec2i &pos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
-		if (unit.Type->Harvester) {
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 			if (dest
 				&& (res = dest->Type->GivesResource) != 0
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-				&& dest->Type->CanHarvest
+				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
 				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
@@ -1304,7 +1304,7 @@ static int SendResource(const Vec2i &pos)
 			}
 		}
 		if (!unit.CanMove()) {
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
+			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
 				ret = 1;

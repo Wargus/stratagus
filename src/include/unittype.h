@@ -154,10 +154,10 @@ enum {
 	GROUNDATTACK_INDEX,
 	SHOREBUILDING_INDEX,			/// Building must be built on coast.
 	CANATTACK_INDEX,
-	BUILDEROUTSIDE_INDEX,
+	BUILDEROUTSIDE_INDEX,			/// The builder stays outside during the construction.
 	BUILDERLOST_INDEX,
-	CANHARVEST_INDEX,
-	HARVESTER_INDEX,
+	CANHARVEST_INDEX,				/// Resource can be harvested.
+	HARVESTER_INDEX,				/// Unit is a resource harvester.
 	SELECTABLEBYRECTANGLE_INDEX,
 	ISNOTSELECTABLE_INDEX,
 	DECORATION_INDEX,
@@ -590,10 +590,7 @@ public:
 	unsigned Vanishes : 1;          /// Corpes & destroyed places.
 	unsigned GroundAttack : 1;      /// Can do command ground attack.
 	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
-	unsigned CanHarvest : 1;        /// Resource can be harvested.
-	unsigned Harvester : 1;         /// unit is a resource harvester.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.

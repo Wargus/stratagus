@@ -10,7 +10,7 @@
 //
 /**@name unit_find.cpp - The find/select for units. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -300,7 +300,7 @@ public:
 		const CUnitType &type = *unit->Type;
 		return (type.GivesResource == resource
 				&& unit->ResourcesHeld != 0
-				&& (mine_on_top ? type.CanHarvest : !type.CanHarvest)
+				&& (mine_on_top ? type.BoolFlag[CANHARVEST_INDEX].value : !type.BoolFlag[CANHARVEST_INDEX].value)
 				&& !unit->IsUnusable(true) //allow mines under construction
 			   );
 	}
@@ -365,7 +365,7 @@ private:
 
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
-	return mine.Type->CanHarvest && mine.ResourcesHeld
+	return mine.Type->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
 		   && (resinfo.HarvestFromOutside
 			   || mine.Player->Index == PlayerMax - 1
 			   || mine.Player == worker.Player
@@ -495,7 +495,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
-		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo && !unit.Removed) {
 			if (unit.CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;

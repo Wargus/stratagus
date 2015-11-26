@@ -10,7 +10,7 @@
 //
 /**@name action_follow.cpp - The follow action. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ enum {
 				}
 
 				if (dest.NewOrder == NULL
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->Harvester)
+					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
