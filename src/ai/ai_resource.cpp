@@ -434,7 +434,7 @@ public:
 	explicit IsAWorker() {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
+		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && unit->Type->ResInfo && !unit->Removed);
 	}
 };
 
@@ -1031,7 +1031,7 @@ static void AiCollectResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->Harvester) {
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
 			continue;
 		}
 

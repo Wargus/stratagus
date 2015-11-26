@@ -132,7 +132,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		++obstacleCount;
 	}
 
-	if (!type.ShoreBuilding) {
+	if (!type.BoolFlag[SHOREBUILDING_INDEX].value) {
 		backupok = obstacleCount < 5;
 	} else {
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
@@ -147,7 +147,7 @@ public:
 	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
-			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		checkSurround(checkSurround),
 		resultPos(resultPos)
@@ -182,7 +182,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		}
 	}
 	if (CanMoveToMask(pos, movemask)
-		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BuilderOutside)) { // reachable, or unit can build from outside and anywhere
+		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -226,7 +226,7 @@ public:
 	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask 
-			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		resource(resource),
 		resultPos(resultPos)
