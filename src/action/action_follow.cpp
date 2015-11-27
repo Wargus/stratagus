@@ -218,7 +218,7 @@ enum {
 			// Handle Teleporter Units
 			// FIXME: BAD HACK
 			// goal shouldn't be busy and portal should be alive
-			if (goal->Type->Teleporter && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
+			if (goal->Type->BoolFlag[TELEPORTER_INDEX].value && goal->Goal && goal->Goal->IsAlive() && unit.MapDistanceTo(*goal) <= 1) {
 				if (!goal->IsIdle()) { // wait
 					unit.Wait = 10;
 					return;

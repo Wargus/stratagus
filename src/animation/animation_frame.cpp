@@ -10,7 +10,7 @@
 //
 /**@name animation_frame.cpp - The animation Frame. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2012-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 /* virtual */ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	if (unit.Type->Building && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->NoRandomPlacing == false && unit.Frame < 0) {
+	if (unit.Type->Building && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.Frame < 0) {
 	} else {
 		unit.Frame = ParseAnimInt(&unit);
 	}

@@ -422,7 +422,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			}
 		}
 		// Attacking wall or ground.
-		if (((goal && goal->Type && goal->Type->Wall)
+		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
 			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {

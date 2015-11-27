@@ -10,8 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -525,7 +524,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (!unit.Active) { //Active is true by default
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
-			if (unit.Type->Teleporter && unit.Goal) {
+			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
 				teleporters.push_back(*it);
 			}
 		}

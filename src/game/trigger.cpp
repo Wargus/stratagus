@@ -10,7 +10,7 @@
 //
 /**@name trigger.cpp - The trigger handling. */
 //
-//      (c) Copyright 2002-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -335,7 +335,7 @@ int GetNumOpponents(int player)
 		if ((Players[player].IsEnemy(Players[i])) || (Players[i].IsEnemy(Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
-				if (Players[i].GetUnit(j).Type->Wall == false) {
+				if (Players[i].GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
 					++n;
 					break;
 				}

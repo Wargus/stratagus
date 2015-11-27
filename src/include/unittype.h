@@ -155,19 +155,19 @@ enum {
 	SHOREBUILDING_INDEX,			/// Building must be built on coast.
 	CANATTACK_INDEX,
 	BUILDEROUTSIDE_INDEX,			/// The builder stays outside during the construction.
-	BUILDERLOST_INDEX,
+	BUILDERLOST_INDEX,				/// The builder is lost after the construction.
 	CANHARVEST_INDEX,				/// Resource can be harvested.
 	HARVESTER_INDEX,				/// Unit is a resource harvester.
 	SELECTABLEBYRECTANGLE_INDEX,	/// Selectable with mouse rectangle.
 	ISNOTSELECTABLE_INDEX,
-	DECORATION_INDEX,
-	INDESTRUCTIBLE_INDEX,
-	TELEPORTER_INDEX,
+	DECORATION_INDEX,				/// Unit is a decoration (act as tile).
+	INDESTRUCTIBLE_INDEX,			/// Unit is indestructible (take no damage).
+	TELEPORTER_INDEX,				/// Can teleport other units.
 	SHIELDPIERCE_INDEX,
-	SAVECARGO_INDEX,
-	NONSOLID_INDEX,
-	WALL_INDEX,
-	NORANDOMPLACING_INDEX,
+	SAVECARGO_INDEX,				/// Unit unloads his passengers after death.
+	NONSOLID_INDEX,					/// Unit can be entered by other units.
+	WALL_INDEX,						/// Use special logic for Direction field.
+	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
 	SIDEATTACK_INDEX,
 	NBARALREADYDEFINED
@@ -582,16 +582,8 @@ public:
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
 	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned BuilderLost : 1;       /// The builder is lost after the build.
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
-	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
-	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
-	unsigned Teleporter : 1;            /// Can teleport other units.
-	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
-	unsigned NonSolid : 1;              /// Unit can be entered by other units.
-	unsigned Wall : 1;                  /// Use special logic for Direction field.
-	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
 
 	CUnitStats DefaultStat;
