@@ -1421,9 +1421,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		} else if (type->UnitType == UnitTypeFly) {
 			lua_pushstring(l, "fly");
 			return 1;
-		} else if (type->UnitType == UnitTypeFlyLow) {
-			lua_pushstring(l, "fly-low");
-			return 1;
 		} else if (type->UnitType == UnitTypeNaval) {
 			lua_pushstring(l, "naval");
 			return 1;
