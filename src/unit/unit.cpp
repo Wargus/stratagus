@@ -1307,11 +1307,11 @@ void UnitLost(CUnit &unit)
 		//  which have given him a better income, find the next best
 		//  income.
 		for (int i = 1; i < MaxCosts; ++i) {
-			if (player.Incomes[i] && type.ImproveIncomes[i] == player.Incomes[i]) {
+			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
 				int m = DefaultIncomes[i];
 
 				for (int j = 0; j < player.GetUnitCount(); ++j) {
-					m = std::max(m, player.GetUnit(j).Type->ImproveIncomes[i]);
+					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);
 				}
 				player.Incomes[i] = m;
 			}
@@ -1378,7 +1378,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 
 	// Update resources
 	for (int u = 1; u < MaxCosts; ++u) {
-		player.Incomes[u] = std::max(player.Incomes[u], type.ImproveIncomes[u]);
+		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].ImproveIncomes[u]);
 	}
 }
 

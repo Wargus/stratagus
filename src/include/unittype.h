@@ -610,8 +610,6 @@ public:
 
 	// --- FILLED UP ---
 
-	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
-
 	unsigned FieldFlags;            /// Unit map field flags
 	unsigned MovementMask;          /// Unit check this map flags for move
 

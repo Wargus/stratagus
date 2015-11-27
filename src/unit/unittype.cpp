@@ -347,10 +347,6 @@
 **
 **  @todo temporary solution
 **
-**  CUnitType::ImproveIncomes[::MaxCosts]
-**
-**    Gives the player an improved income.
-**
 **  CUnitType::FieldFlags
 **
 **    Flags that are set, if a unit enters a map field or cleared, if
@@ -553,7 +549,6 @@ CUnitType::CUnitType() :
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	memset(ResInfo, 0, sizeof(ResInfo));
-	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 }
 
@@ -799,6 +794,13 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 			file.printf(" ");
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
+	}
+	file.printf("},\n\"improve-production\", {");
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (i) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
 	}
 	file.printf("}})\n");
 	return true;

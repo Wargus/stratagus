@@ -568,7 +568,7 @@ static int CclDefineUnitType(lua_State *l)
 				const int res = CclGetResourceByName(l);
 				lua_pop(l, 1);
 				++k;
-				type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
@@ -1178,6 +1178,21 @@ static int CclDefineUnitStats(lua_State *l)
 				++k;
 				const int resId = GetResourceIdByName(l, value);
 				stats->Storing[resId] = LuaToNumber(l, -1, k + 1);
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "improve-production")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				value = LuaToString(l, -1, k + 1);
+				++k;
+				const int resId = GetResourceIdByName(l, value);
+				stats->ImproveIncomes[resId] = LuaToNumber(l, -1, k + 1);
 				lua_pop(l, 1);
 			}
 		} else {
