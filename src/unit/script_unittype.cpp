@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "animation.h"
 #include "construct.h"
+#include "editor.h"
 #include "font.h"
 #include "luacallback.h"
 #include "map.h"
