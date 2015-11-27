@@ -1430,20 +1430,20 @@ static void SendCommand(const Vec2i &tilePos)
 		// Acknowledge the command with first selected unit.
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
-				if (Selected[i]->Type->Sound.Attack.Sound) {
+				if (Selected[i]->Type->MapSound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
-				} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
+				} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
-			} else if (CursorAction == ButtonRepair && Selected[i]->Type->Sound.Repair.Sound) {
+			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
 				PlayUnitSound(*Selected[i], VoiceRepairing);
 				break;
-			} else if (CursorAction == ButtonBuild && Selected[i]->Type->Sound.Build.Sound) {
+			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
 				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
-			} else if (Selected[i]->Type->Sound.Acknowledgement.Sound) {
+			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
 				PlayUnitSound(*Selected[i], VoiceAcknowledging);
 				break;
 			}

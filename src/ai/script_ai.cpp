@@ -136,7 +136,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 			unsigned int cost = 0;
 
 			for (unsigned j = 0; j < MaxCosts; ++j) {
-				cost += type.DefaultStat.Costs[j];
+				cost += type.DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
 			}
 			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
 			if (score > bestscore) {

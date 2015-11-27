@@ -10,7 +10,7 @@
 //
 /**@name unitsound.cpp - The unit sounds. */
 //
-//      (c) Copyright 1999-2007 by Fabrice Rossi and Jimmy Salmon
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -151,22 +151,22 @@ void MapUnitSounds()
 
 		MapAnimSounds(type);
 
-		type.Sound.Selected.MapSound();
-		type.Sound.Acknowledgement.MapSound();
+		type.MapSound.Selected.MapSound();
+		type.MapSound.Acknowledgement.MapSound();
 		// type.Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
-		type.Sound.Attack.MapSound();
-		type.Sound.Build.MapSound();
-		type.Sound.Ready.MapSound();
-		type.Sound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
-		type.Sound.Repair.MapSound();
+		type.MapSound.Attack.MapSound();
+		type.MapSound.Build.MapSound();
+		type.MapSound.Ready.MapSound();
+		type.MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
+		type.MapSound.Repair.MapSound();
 		for (int i = 0; i < MaxCosts; ++i) {
-			type.Sound.Harvest[i].MapSound();
+			type.MapSound.Harvest[i].MapSound();
 		}
-		type.Sound.Help.MapSound();
-		type.Sound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
+		type.MapSound.Help.MapSound();
+		type.MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
 
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			type.Sound.Dead[i].MapSound();
+			type.MapSound.Dead[i].MapSound();
 		}
 	}
 }

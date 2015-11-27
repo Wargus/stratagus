@@ -509,7 +509,66 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			}
 		}
 
-		f->printf("-- place units\n");
+		f->printf("\n-- set map default stat and map sound for unit types\n");
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+			const CUnitType &type = *UnitTypes[i];
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.MapDefaultStat.Costs[j] != type.DefaultStat.Costs[j]) {
+					f->printf("SetMapStat(\"%s\", \"Costs\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.Costs[j], DefaultResourceNames[j].c_str());
+				}
+			}
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.MapDefaultStat.ImproveIncomes[j] != type.DefaultStat.ImproveIncomes[j]) {
+					f->printf("SetMapStat(\"%s\", \"ImproveProduction\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.ImproveIncomes[j], DefaultResourceNames[j].c_str());
+				}
+			}
+			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Max\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Max);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Enable\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Enable);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Increase);
+				}
+			}
+			
+			if (type.MapSound.Selected.Name != type.Sound.Selected.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"selected\")\n", type.Ident.c_str(), type.MapSound.Selected.Name.c_str());
+			}
+			if (type.MapSound.Acknowledgement.Name != type.Sound.Acknowledgement.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"acknowledge\")\n", type.Ident.c_str(), type.MapSound.Acknowledgement.Name.c_str());
+			}
+			if (type.MapSound.Attack.Name != type.Sound.Attack.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"attack\")\n", type.Ident.c_str(), type.MapSound.Attack.Name.c_str());
+			}
+			if (type.MapSound.Build.Name != type.Sound.Build.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"build\")\n", type.Ident.c_str(), type.MapSound.Build.Name.c_str());
+			}
+			if (type.MapSound.Ready.Name != type.Sound.Ready.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"ready\")\n", type.Ident.c_str(), type.MapSound.Ready.Name.c_str());
+			}
+			if (type.MapSound.Repair.Name != type.Sound.Repair.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"repair\")\n", type.Ident.c_str(), type.MapSound.Repair.Name.c_str());
+			}
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.MapSound.Harvest[j].Name != type.Sound.Harvest[j].Name) {
+					f->printf("SetMapSound(\"%s\", \"%s\", \"harvest\", \"%s\")\n", type.Ident.c_str(), type.MapSound.Harvest[j].Name.c_str(), DefaultResourceNames[j].c_str());
+				}
+			}
+			if (type.MapSound.Help.Name != type.Sound.Help.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"help\")\n", type.Ident.c_str(), type.MapSound.Help.Name.c_str());
+			}
+			if (type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name != type.Sound.Dead[ANIMATIONS_DEATHTYPES].Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"dead\")\n", type.Ident.c_str(), type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+			}
+			int death;
+			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+				if (type.MapSound.Dead[death].Name != type.Sound.Dead[death].Name) {
+					f->printf("SetMapSound(\"%s\", \"%s\", \"dead\", \"%s\")\n", type.Ident.c_str(), type.MapSound.Dead[death].Name.c_str(), ExtraDeathTypes[death].c_str());
+				}
+			}
+		}
+		
+		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {

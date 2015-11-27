@@ -193,7 +193,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	if (&player == ThisPlayer) {
-		if (type.Sound.Ready.Sound) {
+		if (type.MapSound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
 		} else if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);

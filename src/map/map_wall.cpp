@@ -10,7 +10,7 @@
 //
 /**@name map_wall.cpp - The map wall handling. */
 //
-//      (c) Copyright 1999-2005 by Vladi Shabanski
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 	if (humanWall) {
 		if (value == 0) {
 			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
 			tileIndex = tileset.getHumanWallTileIndex_broken(dirFlag);
 		} else {
 			tileIndex = tileset.getHumanWallTileIndex(dirFlag);
@@ -74,7 +74,7 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 	} else { // orcWall
 		if (value == 0) {
 			tileIndex = tileset.getOrcWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
 			tileIndex = tileset.getOrcWallTileIndex_broken(dirFlag);
 		} else {
 			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
@@ -236,10 +236,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	CMapField &mf = *Field(pos);
 
 	if (humanwall) {
-		const int value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
 		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
 	} else {
-		const int value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
 		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
 	}
 

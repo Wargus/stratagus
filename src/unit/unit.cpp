@@ -595,7 +595,7 @@ void CUnit::Init(const CUnitType &type)
 		Assert(!Variable);
 		const unsigned int size = UnitTypeVar.GetNumberVariable();
 		Variable = new CVariable[size];
-		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
+		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
 	} else {
 		Variable = NULL;
 	}
@@ -2458,7 +2458,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	}
 
 	// Priority 0-255
-	cost -= dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+	cost -= dest.Variable[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 	// Remaining HP (Health) 0-65535
 	cost += dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max * HEALTH_FACTOR;
 

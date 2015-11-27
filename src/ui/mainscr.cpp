@@ -262,7 +262,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			var = &unit.Variable[index];
 			break;
 		case 1: // Type:
-			var = &unit.Type->DefaultStat.Variables[index];
+			var = &unit.Type->MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &unit.Stats->Variables[index];
@@ -326,7 +326,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			var = &type.Stats[ThisPlayer->Index].Variables[index];;
 			break;
 		case 1: // Type:
-			var = &type.DefaultStat.Variables[index];
+			var = &type.MapDefaultStat.Variables[index];
 			break;
 		case 2: // Stats:
 			var = &type.Stats[ThisPlayer->Index].Variables[index];

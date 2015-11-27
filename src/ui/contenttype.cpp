@@ -10,7 +10,7 @@
 //
 /**@name contenttype.cpp - . */
 //
-//      (c) Copyright 1999-2012 by Joris Dauphin
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 					Assert(0);
 			}
 		} else {
-			int value = unit.Type->DefaultStat.Variables[this->Index].Value;
+			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {

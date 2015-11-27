@@ -10,7 +10,7 @@
 //
 /**@name ai_force.cpp - AI force functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return UnitTypes[lhs]->DefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->DefaultStat.Variables[PRIORITY_INDEX].Value;
+		return UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	}
 };
 

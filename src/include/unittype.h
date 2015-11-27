@@ -587,6 +587,7 @@ public:
 	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
 
 	CUnitStats DefaultStat;
+	CUnitStats MapDefaultStat;
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
 		char CanTransport;      /// Can transport units with this flag.
@@ -603,6 +604,7 @@ public:
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;               /// Sounds for events
+	CUnitSound MapSound;			/// Sounds for events, map-specific
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
 
@@ -782,6 +784,8 @@ extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
 
+extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
+extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
 //@}
 
 #endif // !__UNITTYPE_H__

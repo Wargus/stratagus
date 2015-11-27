@@ -10,8 +10,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -159,26 +158,26 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	switch (voice) {
 		case VoiceAcknowledging:
-			return unit.Type->Sound.Acknowledgement.Sound;
+			return unit.Type->MapSound.Acknowledgement.Sound;
 		case VoiceAttack:
-			if (unit.Type->Sound.Attack.Sound) {
-				return unit.Type->Sound.Attack.Sound;
+			if (unit.Type->MapSound.Attack.Sound) {
+				return unit.Type->MapSound.Attack.Sound;
 			} else {
-				return unit.Type->Sound.Acknowledgement.Sound;
+				return unit.Type->MapSound.Acknowledgement.Sound;
 			}
 		case VoiceBuild:
-			return unit.Type->Sound.Build.Sound;
+			return unit.Type->MapSound.Build.Sound;
 		case VoiceReady:
-			return unit.Type->Sound.Ready.Sound;
+			return unit.Type->MapSound.Ready.Sound;
 		case VoiceSelected:
-			return unit.Type->Sound.Selected.Sound;
+			return unit.Type->MapSound.Selected.Sound;
 		case VoiceHelpMe:
-			return unit.Type->Sound.Help.Sound;
+			return unit.Type->MapSound.Help.Sound;
 		case VoiceDying:
-			if (unit.Type->Sound.Dead[unit.DamagedType].Sound) {
-				return unit.Type->Sound.Dead[unit.DamagedType].Sound;
+			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
+				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
 			} else {
-				return unit.Type->Sound.Dead[ANIMATIONS_DEATHTYPES].Sound;
+				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
@@ -187,19 +186,19 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
-			if (unit.Type->Sound.Repair.Sound) {
-				return unit.Type->Sound.Repair.Sound;
+			if (unit.Type->MapSound.Repair.Sound) {
+				return unit.Type->MapSound.Repair.Sound;
 			} else {
-				return unit.Type->Sound.Acknowledgement.Sound;
+				return unit.Type->MapSound.Acknowledgement.Sound;
 			}
 		case VoiceHarvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionResource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
-					if (unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound) {
-						return unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound;
+					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
+						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
 					} else {
-						return unit.Type->Sound.Acknowledgement.Sound;
+						return unit.Type->MapSound.Acknowledgement.Sound;
 					}
 				}
 			}

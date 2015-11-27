@@ -1322,6 +1322,225 @@ static int CclSetUnitTypeName(lua_State *l)
 	return 1;
 }
 
+/**
+**  Get unit type data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetUnitTypeData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushvalue(l, 1);
+	const CUnitType *type = CclGetUnitType(l);
+	lua_pop(l, 1);
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, type->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, type->Icon.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Costs")) {
+		LuaCheckArgs(l, 3);
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.Costs[resId]);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Costs[resId]);
+		}
+		return 1;
+	} else if (!strcmp(data, "ImproveProduction")) {
+		LuaCheckArgs(l, 3);
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.ImproveIncomes[resId]);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.ImproveIncomes[resId]);
+		}
+		return 1;
+	} else if (!strcmp(data, "DrawLevel")) {
+		lua_pushnumber(l, type->DrawLevel);
+		return 1;
+	} else if (!strcmp(data, "TileWidth")) {
+		lua_pushnumber(l, type->TileWidth);
+		return 1;
+	} else if (!strcmp(data, "TileHeight")) {
+		lua_pushnumber(l, type->TileHeight);
+		return 1;
+	} else if (!strcmp(data, "ComputerReactionRange")) {
+		lua_pushnumber(l, type->ReactRangeComputer);
+		return 1;
+	} else if (!strcmp(data, "PersonReactionRange")) {
+		lua_pushnumber(l, type->ReactRangePerson);
+		return 1;
+	} else if (!strcmp(data, "Missile")) {
+		lua_pushstring(l, type->Missile.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "MinAttackRange")) {
+		lua_pushnumber(l, type->MinAttackRange);
+		return 1;
+	} else if (!strcmp(data, "MaxAttackRange")) {
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		}
+		return 1;
+	} else if (!strcmp(data, "Priority")) {
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
+		}
+		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (type->UnitType == UnitTypeLand) {
+			lua_pushstring(l, "land");
+			return 1;
+		} else if (type->UnitType == UnitTypeFly) {
+			lua_pushstring(l, "fly");
+			return 1;
+		} else if (type->UnitType == UnitTypeFlyLow) {
+			lua_pushstring(l, "fly-low");
+			return 1;
+		} else if (type->UnitType == UnitTypeNaval) {
+			lua_pushstring(l, "naval");
+			return 1;
+		}
+	} else if (!strcmp(data, "Corpse")) {
+		lua_pushstring(l, type->CorpseName.c_str());
+		return 1;
+	} else if (!strcmp(data, "CanAttack")) {
+		lua_pushboolean(l, type->CanAttack);
+		return 1;
+	} else if (!strcmp(data, "Building")) {
+		lua_pushboolean(l, type->Building);
+		return 1;
+	} else if (!strcmp(data, "LandUnit")) {
+		lua_pushboolean(l, type->LandUnit);
+		return 1;
+	} else if (!strcmp(data, "GivesResource")) {
+		if (type->GivesResource > 0) {
+			lua_pushstring(l, DefaultResourceNames[type->GivesResource].c_str());
+			return 1;
+		} else {
+			lua_pushstring(l, "");
+			return 1;
+		}
+	} else if (!strcmp(data, "Sounds")) {
+		LuaCheckArgs(l, 3);
+		const std::string sound_type = LuaToString(l, 3);
+		if (sound_type == "selected") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Selected.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Selected.Name.c_str());
+			}
+		} else if (sound_type == "acknowledge") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Acknowledgement.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Acknowledgement.Name.c_str());
+			}
+		} else if (sound_type == "attack") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Attack.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Attack.Name.c_str());
+			}
+		} else if (sound_type == "build") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Build.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Build.Name.c_str());
+			}
+		} else if (sound_type == "ready") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Ready.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Ready.Name.c_str());
+			}
+		} else if (sound_type == "repair") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Repair.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Repair.Name.c_str());
+			}
+		} else if (sound_type == "harvest") {
+			LuaCheckArgs(l, 4);
+			const std::string sound_subtype = LuaToString(l, 4);
+			const int resId = GetResourceIdByName(sound_subtype.c_str());
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Harvest[resId].Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Harvest[resId].Name.c_str());
+			}
+		} else if (sound_type == "help") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Help.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Help.Name.c_str());
+			}
+		} else if (sound_type == "dead") {
+			if (lua_gettop(l) < 4) {
+				if (!GameRunning && Editor.Running != EditorEditing) {
+					lua_pushstring(l, type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+				} else {
+					lua_pushstring(l, type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+				}
+			} else {
+				int death;
+				const std::string sound_subtype = LuaToString(l, 4);
+
+				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+					if (sound_subtype == ExtraDeathTypes[death]) {
+						break;
+					}
+				}
+				if (death == ANIMATIONS_DEATHTYPES) {
+					if (!GameRunning && Editor.Running != EditorEditing) {
+						lua_pushstring(l, type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+					} else {
+						lua_pushstring(l, type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+					}
+				} else {
+					if (!GameRunning && Editor.Running != EditorEditing) {
+						lua_pushstring(l, type->Sound.Dead[death].Name.c_str());
+					} else {
+						lua_pushstring(l, type->MapSound.Dead[death].Name.c_str());
+					}
+				}
+			}
+		}
+		return 1;
+	} else {
+		int index = UnitTypeVar.VariableNameLookup[data];
+		if (index != -1) { // valid index
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
+			} else {
+				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
+			}
+			return 1;
+		}
+
+		index = UnitTypeVar.BoolFlagNameLookup[data];
+		if (index != -1) {
+			lua_pushboolean(l, type->BoolFlag[index].value);
+			return 1;
+		} else {
+			LuaError(l, "Invalid field: %s" _C_ data);
+		}
+	}
+
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1635,15 +1854,15 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 
 	// SightRange
-	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;
+	unit.Variable[SIGHTRANGE_INDEX].Value = type->MapDefaultStat.Variables[SIGHTRANGE_INDEX].Value;
 	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 
 	// AttackRange
-	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	unit.Variable[ATTACKRANGE_INDEX].Value = type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	// Priority
-	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	unit.Variable[PRIORITY_INDEX].Value = type->MapDefaultStat.Variables[PRIORITY_INDEX].Max;
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
@@ -1692,6 +1911,111 @@ void UpdateUnitVariables(CUnit &unit)
 }
 
 /**
+**  Set the map default stat for a unit type
+**
+**  @param ident			Unit type ident
+**  @param variable_key		Key of the desired variable
+**  @param value			Value to set to
+**  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.); alternatively, resource type if variable_key equals "Costs"
+*/
+void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
+{
+	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	
+	if (variable_key == "Costs") {
+		const int resId = GetResourceIdByName(variable_type.c_str());
+		type->MapDefaultStat.Costs[resId] = value;
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player].Costs[resId] = type->MapDefaultStat.Costs[resId];
+		}
+	} else if (variable_key == "ImproveProduction") {
+		const int resId = GetResourceIdByName(variable_type.c_str());
+		type->MapDefaultStat.ImproveIncomes[resId] = value;
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
+		}
+	} else {
+		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
+		if (variable_index != -1) { // valid index
+			if (variable_type == "Value") {
+				type->MapDefaultStat.Variables[variable_index].Value = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
+				}
+			} else if (variable_type == "Max") {
+				type->MapDefaultStat.Variables[variable_index].Max = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
+				}
+			} else if (variable_type == "Increase") {
+				type->MapDefaultStat.Variables[variable_index].Increase = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+				}
+			} else if (variable_type == "Enable") {
+				type->MapDefaultStat.Variables[variable_index].Enable = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
+				}
+			} else {
+				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
+				return;
+			}
+		} else {
+			fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
+			return;
+		}
+	}
+}
+
+/**
+**  Set the map sound for a unit type
+**
+**  @param ident			Unit type ident
+**  @param sound_type		Type of the sound
+**  @param sound			The sound to be set for that type
+*/
+void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype)
+{
+	if (sound.empty()) {
+		return;
+	}
+	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	
+	if (sound_type == "selected") {
+		type->MapSound.Selected.Name = sound;
+	} else if (sound_type == "acknowledge") {
+		type->MapSound.Acknowledgement.Name = sound;
+	} else if (sound_type == "attack") {
+		type->MapSound.Attack.Name = sound;
+	} else if (sound_type == "build") {
+		type->MapSound.Build.Name = sound;
+	} else if (sound_type == "ready") {
+		type->MapSound.Ready.Name = sound;
+	} else if (sound_type == "repair") {
+		type->MapSound.Repair.Name = sound;
+	} else if (sound_type == "harvest") {
+		const int resId = GetResourceIdByName(sound_subtype.c_str());
+		type->MapSound.Harvest[resId].Name = sound;
+	} else if (sound_type == "help") {
+		type->MapSound.Help.Name = sound;
+	} else if (sound_type == "dead") {
+		int death;
+
+		for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+			if (sound_subtype == ExtraDeathTypes[death]) {
+				break;
+			}
+		}
+		if (death == ANIMATIONS_DEATHTYPES) {
+			type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
+		} else {
+			type->MapSound.Dead[death].Name = sound;
+		}
+	}
+}
+
+/**
 **  Register CCL features for unit-type.
 */
 void UnitTypeCclRegister()
@@ -1712,6 +2036,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
+	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
 }
 
 //@}
