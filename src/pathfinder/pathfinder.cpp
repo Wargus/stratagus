@@ -12,7 +12,7 @@
 //
 //      I use breadth-first.
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Russell Smith
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -266,6 +266,9 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 
 void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
 {
+	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(unit);
+	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
 	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
