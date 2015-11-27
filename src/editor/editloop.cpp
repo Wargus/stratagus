@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -300,9 +300,15 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 	if (unit != NULL) {
 		if (type.GivesResource) {
-			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
-			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
-			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			if (type.StartingResources != 0) {
+				unit->ResourcesHeld = type.StartingResources;
+				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
+				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
+			} else {
+				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
+				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			}
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 	} else {
@@ -939,7 +945,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, PixelTileSize, PlayerColors[i][0]);
+					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
 				}
 			}
 		}
@@ -1205,9 +1211,17 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (Editor.State == EditorEditUnit) {
 		// Cursor on unit icons
 		if (Editor.CursorUnitIndex != -1) {
-			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-			return;
+			if (MouseButtons & LeftButton) {
+				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
+				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+				return;
+			} else if (MouseButtons & RightButton) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
+				Editor.CursorUnitIndex = -1;
+				CclCommand(buf);
+				return;
+			}
 		}
 	}
 
@@ -1254,7 +1268,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
-						UI.StatusLine.Set(_("Unit can't be placed here."));
+						UI.StatusLine.Set(_("Unit cannot be placed here."));
 						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
 					}
@@ -1691,7 +1705,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Select mode"));
+		UI.StatusLine.Set(_("Select Mode"));
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
@@ -1701,7 +1715,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Unit mode"));
+		UI.StatusLine.Set(_("Unit Mode"));
 		return;
 	}
 	if (Editor.TerrainEditable) {
@@ -1712,7 +1726,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
-			UI.StatusLine.Set(_("Tile mode"));
+			UI.StatusLine.Set(_("Tile Mode"));
 			return;
 		}
 	}
@@ -1728,7 +1742,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Set start location mode"));
+		UI.StatusLine.Set(_("Set Start Location"));
 		return;
 	}
 	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {
