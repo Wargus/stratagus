@@ -10,7 +10,7 @@
 //
 /**@name action_attack.cpp - The attack action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -361,7 +361,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		}
 	}
 
-	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	return false;
 }
 
@@ -372,7 +372,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 */
 void COrder_Attack::MoveToTarget(CUnit &unit)
 {
-	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));

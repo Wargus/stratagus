@@ -505,7 +505,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
-		if (unit.Type->GroundAttack) {
+		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;

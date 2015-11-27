@@ -10,9 +10,7 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2011 by Lutz Sammer, Vladi Shabanski,
-//                                 Russell Smith, Jimmy Salmon and
-//                                 Pali Rohár
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -128,7 +126,7 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
-		if (cloak != (int)unit->Type->PermanentCloak) {
+		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
 			return ;
 		}
 		const int p = player->Index;
@@ -151,7 +149,7 @@ public:
 			/*
 			 * HACK: UGLY !!!
 			 * There is bug in Seen code conneded with
-			 * UnitActionDie and Cloacked units.
+			 * UnitActionDie and Cloaked units.
 			 */
 			if (!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie) {
 				return;

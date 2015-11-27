@@ -208,7 +208,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 */
 int SelectUnit(CUnit &unit)
 {
-	if (unit.Type->Revealer) { // Revealers cannot be selected
+	if (unit.Type->BoolFlag[REVEALER_INDEX].value) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
 		return 0;
 	}

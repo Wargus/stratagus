@@ -69,7 +69,7 @@ static const char AIRUNIT_KEY[] = "AirUnit";
 static const char SEAUNIT_KEY[] = "SeaUnit";
 static const char EXPLODEWHENKILLED_KEY[] = "ExplodeWhenKilled";
 static const char VISIBLEUNDERFOG_KEY[] = "VisibleUnderFog";
-static const char PERMANENTCLOACK_KEY[] = "PermanentCloack";
+static const char PERMANENTCLOAK_KEY[] = "PermanentCloak";
 static const char DETECTCLOAK_KEY[] = "DetectCloak";
 static const char ATTACKFROMTRANSPORTER_KEY[] = "AttackFromTransporter";
 static const char VANISHES_KEY[] = "Vanishes";
@@ -144,7 +144,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 
 	const char *const tmp[] = {COWARD_KEY, BUILDING_KEY, FLIP_KEY, REVEALER_KEY,
 							   LANDUNIT_KEY, AIRUNIT_KEY, SEAUNIT_KEY, EXPLODEWHENKILLED_KEY,
-							   VISIBLEUNDERFOG_KEY, PERMANENTCLOACK_KEY, DETECTCLOAK_KEY,
+							   VISIBLEUNDERFOG_KEY, PERMANENTCLOAK_KEY, DETECTCLOAK_KEY,
 							   ATTACKFROMTRANSPORTER_KEY, VANISHES_KEY, GROUNDATTACK_KEY,
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
@@ -418,20 +418,12 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 static void UpdateDefaultBoolFlags(CUnitType &type)
 {
 	// BoolFlag
-	type.BoolFlag[COWARD_INDEX].value                = type.Coward;
 	type.BoolFlag[BUILDING_INDEX].value              = type.Building;
 	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
-	type.BoolFlag[REVEALER_INDEX].value              = type.Revealer;
 	type.BoolFlag[LANDUNIT_INDEX].value              = type.LandUnit;
 	type.BoolFlag[AIRUNIT_INDEX].value               = type.AirUnit;
 	type.BoolFlag[SEAUNIT_INDEX].value               = type.SeaUnit;
 	type.BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type.ExplodeWhenKilled;
-	type.BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type.VisibleUnderFog;
-	type.BoolFlag[PERMANENTCLOAK_INDEX].value        = type.PermanentCloak;
-	type.BoolFlag[DETECTCLOAK_INDEX].value           = type.DetectCloak;
-	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
-	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
-	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
 	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
@@ -441,7 +433,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
 	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
-	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 }
 
 /**
@@ -629,8 +620,6 @@ static int CclDefineUnitType(lua_State *l)
 			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Revealer")) {
-			type->Revealer = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "ComputerReactionRange")) {
 			type->ReactRangeComputer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PersonReactionRange")) {
@@ -758,8 +747,6 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "CanGroundAttack")) {
-			type->GroundAttack = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanAttack")) {
 			type->CanAttack = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RepairRange")) {
@@ -798,8 +785,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Building")) {
 			type->Building = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "VisibleUnderFog")) {
-			type->VisibleUnderFog = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuildingRules")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -856,10 +841,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->ClicksToExplode = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PermanentCloak")) {
-			type->PermanentCloak = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "DetectCloak")) {
-			type->DetectCloak = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanTransport")) {
 			//  Warning: CanTransport should only be used AFTER all bool flags
 			//  have been defined.
@@ -887,10 +868,6 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "AttackFromTransporter")) {
-			type->AttackFromTransporter = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Coward")) {
-			type->Coward = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanGatherResources")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -962,8 +939,6 @@ static int CclDefineUnitType(lua_State *l)
 				type->CanStore[CclGetResourceByName(l)] = 1;
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "Vanishes")) {
-			type->Vanishes = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CanCastSpell")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1074,8 +1049,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->Wall = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NoRandomPlacing")) {
 			type->NoRandomPlacing = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "organic")) {
-			type->Organic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

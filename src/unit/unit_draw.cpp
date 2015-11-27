@@ -792,14 +792,14 @@ void CUnit::Draw(const CViewport &vp) const
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
 
-	if (this->Destroyed || this->Container || this->Type->Revealer) { // Revealers are not drawn
+	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;
 	}
 
 	bool IsVisible = this->IsVisible(*ThisPlayer);
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || IsVisible);
+	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int action = this->CurrentAction();

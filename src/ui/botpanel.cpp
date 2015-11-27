@@ -905,7 +905,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
 		case ButtonAttackGround:
-			if (unit.Type->GroundAttack) {
+			if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 				res = true;
 			}
 			break;

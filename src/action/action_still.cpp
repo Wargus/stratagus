@@ -10,7 +10,7 @@
 //
 /**@name action_still.cpp - The stand still action. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -347,7 +347,7 @@ bool AutoAttack(CUnit &unit)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
-		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
+		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		return ;
 	}
 	this->Finished = false;

@@ -697,7 +697,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	const CUnitType &type = *Type;
 
 	// Build player unit table
-	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
+	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
@@ -789,7 +789,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	MapSight(*unit.Player, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
-	if (unit.Type && unit.Type->DetectCloak && f2) {
+	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
 		MapSight(*unit.Player, pos, width, height,
 				 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
@@ -923,7 +923,7 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	const int width = unit.Type->TileWidth; // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->Vanishes) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
 		return ;
 	}
 	do {
@@ -967,7 +967,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 	int h = unit.Type->TileHeight;
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->Vanishes) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
 		return ;
 	}
 	do {
@@ -1271,7 +1271,7 @@ void UnitLost(CUnit &unit)
 	//  Remove the unit from the player's units table.
 
 	const CUnitType &type = *unit.Type;
-	if (!type.Vanishes) {
+	if (!type.BoolFlag[VANISHES_INDEX].value) {
 		player.RemoveUnit(unit);
 
 		if (type.Building) {
@@ -1501,7 +1501,7 @@ void CorrectWallNeighBours(CUnit &unit)
 */
 void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
-	if (unit.Type->VisibleUnderFog) {
+	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		if (player.Type == PlayerPerson && !unit.Destroyed) {
 			unit.RefsIncrease();
 		}
@@ -1542,7 +1542,7 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 */
 void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 {
-	if (!unit.Type->VisibleUnderFog) {
+	if (!unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
 		return;
 	}
 	if (unit.Seen.ByPlayer & (1 << (player.Index))) {
@@ -1590,7 +1590,7 @@ void UnitCountSeen(CUnit &unit)
 				CMapField *mf = Map.Field(index);
 				int x = width;
 				do {
-					if (unit.Type->PermanentCloak && unit.Player != &Players[p]) {
+					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
 						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
@@ -1669,7 +1669,7 @@ bool CUnit::IsVisibleOnMinimap() const
 	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)) {
 		return IsAliveOnMap();
 	} else {
-		return Type->VisibleUnderFog && Seen.State != 3
+		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
 			   && (Seen.ByPlayer & (1 << ThisPlayer->Index))
 			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
 	}
@@ -1717,7 +1717,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
 		if (!Destroyed || !(Seen.Destroyed & (1 << ThisPlayer->Index))) {
-			return (Type->VisibleUnderFog && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
+			return (Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
 		} else {
 			return false;
 		}
@@ -2744,7 +2744,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->Vanishes);
+	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {

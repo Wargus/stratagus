@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ public:
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const
 	{
-		return (Type->CanAttack && !Type->Coward
+		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
 				&& Variable[INVISIBLE_INDEX].Value == 0);
 	}
 
@@ -214,14 +214,14 @@ public:
 			return false;
 		}
 		// Don't attack revealers
-		if (this->Type->Revealer) {
+		if (this->Type->BoolFlag[REVEALER_INDEX].value) {
 			return false;
 		}
-		if ((player.Type == PlayerComputer && !this->Type->PermanentCloak)
+		if ((player.Type == PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
 			|| IsVisible(player) || IsVisibleOnRadar(player)) {
 			return IsAliveOnMap();
 		} else {
-			return Type->VisibleUnderFog
+			return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value
 				   && (Seen.ByPlayer & (1 << player.Index))
 				   && !(Seen.Destroyed & (1 << player.Index));
 		}
