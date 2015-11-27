@@ -10,7 +10,8 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2015 by the Stratagus Team
+//      (c) Copyright 2000-2015 by Lutz Sammer, Antonis Chaniotis
+//		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

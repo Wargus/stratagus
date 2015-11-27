@@ -10,7 +10,7 @@
 //
 /**@name action_upgradeto.cpp - The unit upgrading to new action. */
 //
-//      (c) Copyright 1998-2015 by the Stratagus Team
+//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

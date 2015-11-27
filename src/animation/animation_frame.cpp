@@ -10,7 +10,7 @@
 //
 /**@name animation_frame.cpp - The animation Frame. */
 //
-//      (c) Copyright 2012-2015 by the Stratagus Team
+//      (c) Copyright 2012-2015 by Joris Dauphin and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

@@ -10,7 +10,7 @@
 //
 /**@name action_follow.cpp - The follow action. */
 //
-//      (c) Copyright 2001-2015 by the Stratagus Team
+//      (c) Copyright 2001-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

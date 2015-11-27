@@ -10,7 +10,8 @@
 //
 /**@name actions.cpp - The actions. */
 //
-//      (c) Copyright 1998-2015 by the Stratagus Team
+//      (c) Copyright 1998-2015 by Lutz Sammer, Russell Smith, Jimmy Salmon
+//		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -168,8 +169,6 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return goal->Resource.Active;
 			} else if (!strcmp(cur, "_Distance")) {
 				return unit.MapDistanceTo(*goal);
-			} else if (!strcmp(cur, "Direction")) {
-				return goal->Direction;
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			ExitFatal(1);

@@ -10,7 +10,8 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2015 by the Stratagus Team
+//      (c) Copyright 2000-2015 by Lutz Sammer, Ludovic Pollet,
+//      Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

@@ -10,7 +10,8 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2015 by the Stratagus Team
+//      (c) Copyright 1998-2015 by Lutz Sammer, Fabrice Rossi,
+//		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

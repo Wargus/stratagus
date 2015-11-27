@@ -10,7 +10,8 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2015 by the Stratagus Team
+//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Shabanski,
+//		Russell Smith, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

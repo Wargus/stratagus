@@ -10,7 +10,8 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2015 by the Stratagus Team
+//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Belperchinov-Shabanski,
+//		Jimmy Salmon, cybermind and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
