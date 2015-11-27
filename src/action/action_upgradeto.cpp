@@ -10,7 +10,7 @@
 //
 /**@name action_upgradeto.cpp - The unit upgrading to new action. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -111,8 +111,8 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		player.UnitTypesAiActiveCount[newtype.Slot]++;
 	}
 
-	player.Demand += newtype.Demand - oldtype.Demand;
-	player.Supply += newtype.Supply - oldtype.Supply;
+	player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
+	player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 
 	// Change resource limit
 	for (int i = 0; i < MaxCosts; ++i) {

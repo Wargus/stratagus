@@ -10,8 +10,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski, Jimmy Salmon
-//      and Andrettin
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -563,6 +562,33 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
+			
+			// if a unit type's supply is changed, we need to update the player's supply accordingly
+			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+					}
+				}
+			}
+			
+			// if a unit type's demand is changed, we need to update the player's demand accordingly
+			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
+					}
+				}
+			}
+			
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] += um->Modifier.Costs[j];
@@ -693,6 +719,33 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
+			
+			// if a unit type's supply is changed, we need to update the player's supply accordingly
+			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+					}
+				}
+			}
+			
+			// if a unit type's demand is changed, we need to update the player's demand accordingly
+			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
+					}
+				}
+			}
+			
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] -= um->Modifier.Costs[j];

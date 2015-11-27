@@ -8,8 +8,6 @@ class CUnitType
 	int ClicksToExplode;
 
 	int GivesResource;
-	int Supply;
-	int Demand;
 
 	int TileWidth;
 	int TileHeight;

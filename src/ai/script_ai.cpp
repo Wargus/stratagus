@@ -10,8 +10,7 @@
 //
 /**@name script_ai.cpp - The AI ccl functions. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer, Ludovic Pollet,
-//                                 and Jimmy Salmon
+//      (c) Copyright 2000-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -123,7 +122,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
-		if (type.Supply > 0) {
+		if (type.DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
 			res.push_back(&type);
 		}
 	}
@@ -139,7 +138,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 			for (unsigned j = 0; j < MaxCosts; ++j) {
 				cost += type.DefaultStat.Costs[j];
 			}
-			const float score = ((float) type.Supply) / cost;
+			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
 			if (score > bestscore) {
 				bestscore = score;
 				besttype = &type;

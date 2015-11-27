@@ -395,14 +395,6 @@
 **
 **  @todo temporary solution
 **
-**  CUnitType::Supply
-**
-**    How much food does this unit supply.
-**
-**  CUnitType::Demand
-**
-**    Food demand
-**
 **  CUnitType::ImproveIncomes[::MaxCosts]
 **
 **    Gives the player an improved income.
@@ -605,7 +597,7 @@ CUnitType::CUnitType() :
 	Neutral(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
-	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
+	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
 {
 #ifdef USE_MNG

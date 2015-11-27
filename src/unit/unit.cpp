@@ -715,7 +715,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		if (Active) {
 			player.UnitTypesAiActiveCount[type.Slot]++;
 		}
-		player.Demand += type.Demand; // food needed
+		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -1289,11 +1289,11 @@ void UnitLost(CUnit &unit)
 	}
 
 	//  Handle unit demand. (Currently only food supported.)
-	player.Demand -= type.Demand;
+	player.Demand -= type.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitActionBuilt) {
-		player.Supply -= type.Supply;
+		player.Supply -= type.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
@@ -1368,7 +1368,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
-		player.Supply += type.Supply;
+		player.Supply += type.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
 				player.MaxResources[i] += type.Stats[player.Index].Storing[i];
@@ -1773,8 +1773,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	if (Type->GivesResource) {
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer.Demand += Type->Demand;
-	newplayer.Supply += Type->Supply;
+	newplayer.Demand += Type->Stats[newplayer.Index].Variables[DEMAND_INDEX].Value;
+	newplayer.Supply += Type->Stats[newplayer.Index].Variables[SUPPLY_INDEX].Value;
 	// Increase resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].Storing[i]) {

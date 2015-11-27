@@ -991,7 +991,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		Notify("%s", _("Unit Limit Reached"));
 		return -2;
 	}
-	if (this->Demand + type.Demand > this->Supply && type.Demand) {
+	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 		Notify("%s", _("Insufficient Supply, increase Supply."));
 		return -3;
 	}

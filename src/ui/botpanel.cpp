@@ -10,8 +10,7 @@
 //
 /**@name botpanel.cpp - The bottom panel. */
 //
-//      (c) Copyright 1999-2012 by Lutz Sammer, Vladi Belperchinov-Shabanski,
-//                                 Jimmy Salmon and cybermind
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -431,7 +430,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 
 	//detect max Width
 	int popupWidth = GetPopupCostsWidth(font, stats->Costs);
-	if (type->Demand) {
+	if (stats->Variables[DEMAND_INDEX].Value) {
 		if (UI.Resources[FoodCost].IconWidth != -1) {
 			popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
 		} else {
@@ -440,7 +439,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 				popupWidth += (G->Width + 5);
 			}
 		}
-		popupWidth += (font->Width(type->Demand) + 5);
+		popupWidth += (font->Width(stats->Variables[DEMAND_INDEX].Value) + 5);
 	}
 	popupWidth += 10;
 	popupWidth = std::max<int>(popupWidth, font->Width(type->Name) + 10);
@@ -468,7 +467,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	// Costs
 	x = DrawPopupCosts(x + 5, y, label,  stats->Costs);
 
-	if (type->Demand) {
+	if (stats->Variables[DEMAND_INDEX].Value) {
 		int y_offset = 0;
 		G = UI.Resources[FoodCost].G;
 		if (G) {
@@ -479,7 +478,7 @@ void DrawPopupUnitInfo(const CUnitType *type,
 			y_offset -= font->Height();
 			y_offset /= 2;
 		}
-		label.Draw(x, y + y_offset, type->Demand);
+		label.Draw(x, y + y_offset, stats->Variables[DEMAND_INDEX].Value);
 		//x += 5;
 	}
 
@@ -572,7 +571,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonUpgradeTo:
 			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
-			Costs[FoodCost] = UnitTypes[button.Value]->Demand;
+			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
 			break;
 		default:
 			break;
@@ -830,7 +829,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
-			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
+			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			break;
 		}
 		case ButtonResearch:

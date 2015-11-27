@@ -656,10 +656,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->AiAdjacentRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Demand")) {
-			type->Demand = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Supply")) {
-			type->Supply = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
@@ -1652,6 +1648,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
+			|| i == SUPPLY_INDEX || i == DEMAND_INDEX
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
@@ -1683,19 +1680,6 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}
-
-	// Supply
-	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;
-	unit.Variable[SUPPLY_INDEX].Max = unit.Player->Supply;
-	if (unit.Player->Supply < unit.Type->Supply) { // Come with 1st supply building.
-		unit.Variable[SUPPLY_INDEX].Value = unit.Variable[SUPPLY_INDEX].Max;
-	}
-	unit.Variable[SUPPLY_INDEX].Enable = unit.Type->Supply > 0;
-
-	// Demand
-	unit.Variable[DEMAND_INDEX].Value = unit.Type->Demand;
-	unit.Variable[DEMAND_INDEX].Max = unit.Player->Demand;
-	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
 
 	// SightRange
 	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;

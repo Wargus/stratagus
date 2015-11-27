@@ -186,8 +186,8 @@ enum {
 	CARRYRESOURCE_INDEX,
 	XP_INDEX,
 	KILL_INDEX,
-	SUPPLY_INDEX,
-	DEMAND_INDEX,
+	SUPPLY_INDEX,					/// Food supply
+	DEMAND_INDEX,					/// Food demand
 	ARMOR_INDEX,
 	SIGHTRANGE_INDEX,
 	ATTACKRANGE_INDEX,
@@ -620,9 +620,6 @@ public:
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;               /// Sounds for events
-
-	int Supply;                     /// Food supply
-	int Demand;                     /// Food demand
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
 
