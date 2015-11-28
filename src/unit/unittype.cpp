@@ -987,7 +987,9 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (type.Flip) {
 			type.ShadowSprite->Flip();
 		}
-		type.ShadowSprite->MakeShadow();
+		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
+			type.ShadowSprite->MakeShadow();
+		}
 	}
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
