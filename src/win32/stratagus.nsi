@@ -58,7 +58,7 @@
 
 !define SDL "SDL.dll"
 !ifndef NO_DOWNLOAD
-!system 'powershell -Command "& {wget https://www.libsdl.org/release/SDL-1.2.15-win32.zip -O SDL.zip}"'
+!system 'powershell -Command "& {wget https://www.libsdl.org/release/SDL-1.2.15-win32.zip -OutFile SDL.zip}"'
 !system 'powershell -Command "& {unzip -o SDL.zip SDL.dll}"'
 !endif
 
