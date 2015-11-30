@@ -10,9 +10,9 @@ Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
  libgles1-sgx-img-dev | libglu1-mesa-dev | libglu-dev | libgles1-mesa-dev,
  libsdl-gles1.2-dev | libglu1-mesa-dev | libglu-dev, libfluidsynth-dev
 Standards-Version: 3.9.6
-Homepage: https://launchpad.net/stratagus
-Vcs-Browser: https://code.launchpad.net/stratagus
-Vcs-Bzr: lp:stratagus
+Homepage: https://github.com/Wargus/stratagus
+Vcs-Browser: https://github.com/Wargus/stratagus
+Vcs-Git: https://github.com/Wargus/stratagus.git
 
 Package: stratagus
 Architecture: any
