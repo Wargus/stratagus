@@ -7,5 +7,5 @@ before_build:
   - appveyor DownloadFile https://github.com/Wargus/stratagus/releases/download/2015-30-11/dependencies.zip
   - 7z x dependencies.zip
   - choco install nsis -pre
-  - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="%cd%\\dependencies" ..
+  - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON ..
   - cd ..
