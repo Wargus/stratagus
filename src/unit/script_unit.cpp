@@ -1160,7 +1160,8 @@ static int CclSetUnitVariable(lua_State *l)
 	const char *const name = LuaToString(l, 2);
 	int value;
 	if (!strcmp(name, "Player")) {
-		unit->AssignToPlayer(Players[LuaToNumber(l, 3)]);
+		value = LuaToNumber(l, 3);
+		unit->AssignToPlayer(Players[value]);
 	} else if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
