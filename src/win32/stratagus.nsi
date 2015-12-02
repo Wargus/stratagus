@@ -58,7 +58,7 @@
 
 !define SDL "SDL.dll"
 !ifndef NO_DOWNLOAD
-!system 'powershell -Command "& {wget https://www.libsdl.org/release/SDL-1.2.15-win32.zip -O SDL.zip}"'
+!system 'powershell -Command "& {wget https://www.libsdl.org/release/SDL-1.2.15-win32.zip -OutFile SDL.zip}"'
 !system 'powershell -Command "& {unzip -o SDL.zip SDL.dll}"'
 !endif
 
@@ -92,9 +92,6 @@ ${redefine} NAME "Stratagus (64 bit)"
 
 !endif
 
-!ifdef FLUID
-!define FLUIDDLL "libfluidsynth.dll"
-!endif
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${NAME}"
 
 ;--------------------------------
@@ -228,6 +225,8 @@ Section "${NAME}"
 	File "${SDL}"
 	!ifdef FLUID
 		File "${FLUIDDLL}"
+		File "${GLIBDLL}"
+		File "${GTHREADDLL}"
 	!endif
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
