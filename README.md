@@ -13,6 +13,10 @@ Windows: <a href="https://ci.appveyor.com/project/timfel/stratagus"><img width="
 
 Linux & OSX: [![Build Status](https://travis-ci.org/Wargus/stratagus.svg?branch=master)](https://travis-ci.org/Wargus/stratagus)
 
+Nightly builds are available:
+  - Windows Installer: https://github.com/Wargus/stratagus/releases/tag/master-builds
+  - Ubuntu/Debian Packages: https://launchpad.net/~stratagus/+archive/ubuntu/ppa
+
 Read 'doc/index.html' for general information and license information.
 Read 'doc/install.html' for Stratagus installation instructions.
 Read 'doc/changelog.html' for the Stratagus changelog.
