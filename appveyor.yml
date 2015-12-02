@@ -21,4 +21,4 @@ deploy:
   draft: false
   prerelease: true
   on:
-    branch: tim/vs2015
+    branch: master
