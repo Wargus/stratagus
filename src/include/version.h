@@ -32,7 +32,7 @@
 #define StratagusVersion (StratagusMajorVersion * 10000 + StratagusMinorVersion * 100 + StratagusPatchLevel)
 
 /// Homepage
-#define HOMEPAGE "https://launchpad.net/stratagus"
+#define HOMEPAGE "https://github.com/Wargus/stratagus"
 
 /// License
 #define LICENSE "GPL v2"

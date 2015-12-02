@@ -1,3 +1,16 @@
+stratagus (2.3.9-1) unstable; urgency=low
+
+  * Introduced OpenGL shaders for pixel scaling
+  * Add support for semi-transparent unit shadows
+  * Many cleanups ported from Wyrmgus
+  * Support individual unit upgrades
+  * Fix multiplayer out-of-sync issue
+  * Fix multiplayer race selection
+  * Fix unit sight not being symmetrical
+  * Fix build restriction on top not being symmetrical
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Wed, 2 Dec 2015 12:41:01 +0100
+
 stratagus (2.3.0-1) unstable; urgency=low
 
   * Introduced crash dump writing for win32 (from cybermind)

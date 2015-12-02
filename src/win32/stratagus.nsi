@@ -45,7 +45,7 @@
 
 !define NAME "Stratagus"
 !define DESCRIPTION "Strategy Gaming Engine"
-!define HOMEPAGE "https://launchpad.net/stratagus"
+!define HOMEPAGE "https://github.com/Wargus/stratagus"
 !define LICENSE "GPL v2"
 !define COPYRIGHT "Copyright (c) 1998-2012 by The Stratagus Project"
 

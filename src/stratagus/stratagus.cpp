@@ -44,7 +44,7 @@
 **
 ** @section Informations Informations
 **
-** Visit the https://launchpad.net/stratagus web page for the latest news and
+** Visit the https://github.com/Wargus/stratagus web page for the latest news and
 ** <A HREF="../index.html">Stratagus Info</A> for other documentations.
 **
 ** @section Modules Modules
