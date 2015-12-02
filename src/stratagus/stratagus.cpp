@@ -42,10 +42,10 @@
 ** understand something or you found an error or a wrong spelling
 ** or wrong grammar please write an email (including a patch :).
 **
-** @section Informations Informations
+** @section Information Information
 **
 ** Visit the https://github.com/Wargus/stratagus web page for the latest news and
-** <A HREF="../index.html">Stratagus Info</A> for other documentations.
+** <A HREF="../index.html">Stratagus Info</A> for other documentation.
 **
 ** @section Modules Modules
 **

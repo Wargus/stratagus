@@ -41,9 +41,9 @@ class CHost;
 
 /// Network protocol major version
 #define NetworkProtocolMajorVersion StratagusMajorVersion
-/// Network protocol minor version (maximal 99)
+/// Network protocol minor version (maximum 99)
 #define NetworkProtocolMinorVersion StratagusMinorVersion
-/// Network protocol patch level (maximal 99)
+/// Network protocol patch level (maximum 99)
 #define NetworkProtocolPatchLevel   StratagusPatchLevel
 /// Network protocol version (1,2,3) -> 10203
 #define NetworkProtocolVersion \

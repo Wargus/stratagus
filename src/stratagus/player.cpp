@@ -64,7 +64,7 @@
 **
 **  \#include "player.h"
 **
-**  This structure contains all informations about a player in game.
+**  This structure contains all information about a player in game.
 **
 **  The player structure members:
 **
@@ -195,7 +195,7 @@
 **  CPlayer::Ai
 **
 **    AI structure pointer. Please look at #PlayerAi for more
-**    informations.
+**    information.
 **
 **  CPlayer::Units
 **
@@ -1229,7 +1229,7 @@ void SetPlayersPalette()
 }
 
 /**
-**  Output debug informations for players.
+**  Output debug information for players.
 */
 void DebugPlayers()
 {

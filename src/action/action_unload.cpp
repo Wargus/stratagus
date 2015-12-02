@@ -129,7 +129,7 @@
 **  @param transporter
 **  @param unit         Unit to unload.
 **  @param startPos     Original search position
-**  @param maxrange     maximal range to unload.
+**  @param maxrange     maximum range to unload.
 **  @param res          Unload position.
 **
 **  @return      True if a position was found, False otherwise.

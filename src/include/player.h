@@ -370,7 +370,7 @@ extern void PlayersEachSecond(int player);
 /// Change current color set to new player of the sprite
 extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
 
-/// Output debug informations for players
+/// Output debug information for players
 extern void DebugPlayers();
 
 #ifdef DEBUG

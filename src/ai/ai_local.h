@@ -321,7 +321,7 @@ public:
 /**
 **  AI Helper.
 **
-**  Contains informations needed for the AI. If the AI needs an unit or
+**  Contains information needed for the AI. If the AI needs an unit or
 **  building or upgrade or spell, it could lookup in this tables to find
 **  where it could be trained, built or researched.
 */

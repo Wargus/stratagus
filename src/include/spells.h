@@ -165,7 +165,7 @@ public:
 };
 
 /**
-**  Informations about the autocasting mode.
+**  information about the autocasting mode.
 */
 class AutoCastInfo
 {
@@ -227,7 +227,7 @@ public:
 	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
 	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
 
-	// Autocast informations. No AICast means the AI use AutoCast.
+	// Autocast information. No AICast means the AI use AutoCast.
 	AutoCastInfo *AutoCast;     /// AutoCast information for your own units
 	AutoCastInfo *AICast;       /// AutoCast information for ai. More detalied.
 

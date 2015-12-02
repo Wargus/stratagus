@@ -102,7 +102,7 @@
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
-**    informations (::MissileClassNone, ...).
+**    information (::MissileClassNone, ...).
 **
 **  MissileType::NumBounces
 **
@@ -209,7 +209,7 @@
 **  Missile::Type
 **
 **    ::MissileType pointer of the missile, contains the shared
-**    informations of all missiles of the same type.
+**    information of all missiles of the same type.
 **
 **  Missile::SpriteFrame
 **

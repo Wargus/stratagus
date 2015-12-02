@@ -151,7 +151,7 @@
 **  CUnit::Type
 **
 **  Pointer to the unit-type (::UnitType). The unit-type contains
-**  all informations that all units of the same type shares.
+**  all information that all units of the same type shares.
 **  (Animations, Name, Stats, ...)
 **
 **  CUnit::SeenType
@@ -239,7 +239,7 @@
 **  CUnit::Destroyed
 **
 ** @todo docu.
-**  If you need more informations, please send me an email or write it self.
+**  If you need more information, please send me an email or write it self.
 **
 **  CUnit::Removed
 **

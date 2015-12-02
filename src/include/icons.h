@@ -44,7 +44,7 @@
 **
 **  \#include "icons.h"
 **
-**  This structure contains all informations about an icon.
+**  This structure contains all information about an icon.
 **
 **  The icon structure members:
 **
@@ -70,7 +70,7 @@
 **
 **  \#include "icons.h"
 **
-**  This structure contains all configuration informations about an icon.
+**  This structure contains all configuration information about an icon.
 **
 **  IconConfig::Name
 **

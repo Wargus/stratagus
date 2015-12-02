@@ -41,7 +41,7 @@
 **
 **  \#include "cursor.h"
 **
-**  This structure contains all informations about a cursor.
+**  This structure contains all information about a cursor.
 **  The cursor changes depending of the current user input state.
 **  A cursor can have transparent areas and color cycle animated.
 **
