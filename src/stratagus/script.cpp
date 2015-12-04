@@ -205,10 +205,11 @@ static bool GetFileContent(const std::string &file, std::string &content)
 **  Load a file and execute it
 **
 **  @param file  File to load and execute
+**  @param nargs Number of arguments that caller has put on the stack
 **
 **  @return      0 for success, else exit.
 */
-int LuaLoadFile(const std::string &file)
+int LuaLoadFile(const std::string &file, const std::string &strArg)
 {
 	DebugPrint("Loading '%s'\n" _C_ file.c_str());
 
@@ -219,7 +220,12 @@ int LuaLoadFile(const std::string &file)
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
-		LuaCall(0, 1);
+		if (!strArg.empty()) {
+			lua_pushstring(Lua, strArg.c_str());
+			LuaCall(1, 1);
+		} else {
+			LuaCall(0, 1);
+		}
 	} else {
 		report(status, true);
 	}
@@ -2385,7 +2391,7 @@ void SavePreferences()
 /**
 **  Load stratagus config file.
 */
-void LoadCcl(const std::string &filename)
+void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 {
 	//  Load and evaluate configuration file
 	CclInConfigFile = 1;
@@ -2396,11 +2402,10 @@ void LoadCcl(const std::string &filename)
 	}
 
 	ShowLoadProgress(_("Script %s\n"), name.c_str());
-	LuaLoadFile(name);
+	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();
 }
-
 
 void ScriptRegister()
 {

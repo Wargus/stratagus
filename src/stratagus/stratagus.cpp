@@ -457,6 +457,7 @@ static void Usage()
 		"\t-e\t\tStart editor (instead of game)\n"
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
+		"\t-G \"[options]\"\tGame options (passed to game scripts)\n"
 		"\t-h\t\tHelp shows this page\n"
 		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
 		"\t-I addr\t\tNetwork address to use\n"
@@ -530,12 +531,16 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:Wx:Z?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;
+				if (strlen(optarg) > 4 &&
+				    !(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
+					parameters.luaStartFilename += ".lua";
+				}
 				continue;
 			case 'd': {
 				StratagusLibPath = optarg;
@@ -557,6 +562,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
+				continue;
+			case 'G':
+				parameters.luaScriptArguments = optarg;
 				continue;
 			case 'i':
 				EnableUnitDebug = true;
@@ -658,7 +666,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	}
 
 	if (argc - optind > 1) {
-		fprintf(stderr, "too many files\n");
+		fprintf(stderr, "too many map files. if you meant to pass game arguments, these go after '--'\n");
 		Usage();
 		ExitFatal(-1);
 	}
@@ -751,7 +759,7 @@ int stratagusMain(int argc, char **argv)
 	// Initialise AI module
 	InitAiModule();
 
-	LoadCcl(parameters.luaStartFilename);
+	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
 	PrintHeader();
 	PrintLicense();

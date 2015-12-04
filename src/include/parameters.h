@@ -46,6 +46,7 @@ public:
 	std::string applicationName;
 	std::string luaStartFilename;
 	std::string luaEditorStartFilename;
+	std::string luaScriptArguments;
 	std::string LocalPlayerName;        /// Name of local player
 private:
 	std::string userDirectory;          /// Directory containing user settings and data
