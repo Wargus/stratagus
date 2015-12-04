@@ -45,6 +45,7 @@
 #include "replay.h"
 #include "results.h"
 #include "sound.h"
+#include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
