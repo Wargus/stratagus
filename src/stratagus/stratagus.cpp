@@ -540,6 +540,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;
+				if (strlen(optarg) > 4 &&
+				    !(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
+					parameters.luaStartFilename += ".lua";
+				}
 				continue;
 			case 'd': {
 				StratagusLibPath = optarg;
