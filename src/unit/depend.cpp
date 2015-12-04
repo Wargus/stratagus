@@ -81,7 +81,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
-		DebugPrint("dependency target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return;
 	}
 
@@ -134,7 +134,7 @@ static void AddDependency(const std::string &target, const std::string &required
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
-		DebugPrint("dependency required `%s' should be unit-type or upgrade\n" _C_ required.c_str());
+		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.c_str());
 		delete temp;
 		return;
 	}
@@ -261,7 +261,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		}
 		return rules;
 	} else {
-		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());
+		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());
 		return rules;
 	}
 
@@ -345,7 +345,7 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target)
 		}
 		rule.Type = DependRuleUpgrade;
 	} else {
-		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
 	}
 	return CheckDependByRule(player, rule);

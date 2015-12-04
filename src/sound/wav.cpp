@@ -232,7 +232,7 @@ CSample *LoadWav(const char *name, int flags)
 	CFile *f = new CFile;
 
 	if (f->open(name, CL_OPEN_READ) == -1) {
-		printf("Can't open file `%s'\n", name);
+		printf("Can't open file '%s'\n", name);
 		delete f;
 		return NULL;
 	}

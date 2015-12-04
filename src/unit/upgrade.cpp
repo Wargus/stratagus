@@ -1106,7 +1106,7 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 	if (id != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong identifier `%s'\n" _C_ ident.c_str());
+	DebugPrint("Fix your code, wrong identifier '%s'\n" _C_ ident.c_str());
 	return '-';
 }
 

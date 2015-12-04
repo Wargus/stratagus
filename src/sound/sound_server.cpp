@@ -542,7 +542,7 @@ CSample *LoadSample(const std::string &name)
 	CSample *sample = LoadSample(filename.c_str(), PlayAudioLoadInMemory);
 
 	if (sample == NULL) {
-		fprintf(stderr, "Can't load the sound `%s'\n", name.c_str());
+		fprintf(stderr, "Can't load the sound '%s'\n", name.c_str());
 	}
 	return sample;
 }

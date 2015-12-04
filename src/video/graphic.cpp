@@ -710,7 +710,7 @@ void CGraphic::Load(bool grayscale)
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this) == -1) {
-		fprintf(stderr, "Can't load the graphic `%s'\n", File.c_str());
+		fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
 		ExitFatal(-1);
 	}
 

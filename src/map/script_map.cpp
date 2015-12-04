@@ -431,7 +431,7 @@ static int CclDefineTileset(lua_State *l)
 	//  Load and prepare the tileset
 	PixelTileSize = Map.Tileset->getPixelTileSize();
 
-	ShowLoadProgress(_("Tileset `%s'"), Map.Tileset->ImageFile.c_str());
+	ShowLoadProgress(_("Tileset '%s'"), Map.Tileset->ImageFile.c_str());
 	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
 	return 0;

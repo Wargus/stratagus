@@ -671,13 +671,13 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			tablep = &AiHelpers.Train;
 		}
 		if (type.Slot > n) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit I: Nothing known about `%s'\n"
+			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
 		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
 		if (table.empty()) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit II: Nothing known about `%s'\n"
+			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n"
 					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 			continue;
 		}
@@ -750,13 +750,13 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
 	if (upgrade->ID > n) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest I: Nothing known about `%s'\n"
+		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
 	}
 	std::vector<CUnitType *> &table = tablep[upgrade->ID];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest II: Nothing known about `%s'\n"
+		DebugPrint("%d: AiAddResearchRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 		return;
 	}
@@ -821,13 +821,13 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
 
 	if (type.Slot > n) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about `%s'\n"
+		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about `%s'\n"
+		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return;
 	}
@@ -1295,13 +1295,13 @@ static int AiRepairUnit(CUnit &unit)
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
 	const CUnitType &type = *unit.Type;
 	if (type.Slot > n) { // Oops not known.
-		DebugPrint("%d: AiRepairUnit I: Nothing known about `%s'\n"
+		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiRepairUnit II: Nothing known about `%s'\n"
+		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
 				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
 		return 0;
 	}

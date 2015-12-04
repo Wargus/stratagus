@@ -116,7 +116,7 @@ int SaveGame(const std::string &filename)
 	fullpath += "/";
 	fullpath += filename;
 	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
-		fprintf(stderr, "Can't save to `%s'\n", filename.c_str());
+		fprintf(stderr, "Can't save to '%s'\n", filename.c_str());
 		return -1;
 	}
 

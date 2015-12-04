@@ -396,7 +396,7 @@ CSample *LoadVorbis(const char *name, int flags)
 
 	f = new CFile;
 	if (f->open(name, CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file `%s'\n", name);
+		fprintf(stderr, "Can't open file '%s'\n", name);
 		delete f;
 		return NULL;
 	}

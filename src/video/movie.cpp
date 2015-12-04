@@ -186,7 +186,7 @@ int PlayMovie(const std::string &name)
 
 	CFile f;
 	if (f.open(filename.c_str(), CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file `%s'\n", name.c_str());
+		fprintf(stderr, "Can't open file '%s'\n", name.c_str());
 		return 0;
 	}
 

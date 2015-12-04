@@ -595,7 +595,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		}
 		f->printf("\n\n");
 	} catch (const FileException &) {
-		fprintf(stderr, "Can't save map setup : `%s' \n", mapSetup);
+		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
 		delete f;
 		return -1;
 	}

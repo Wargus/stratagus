@@ -625,7 +625,7 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 		return;
 	}
 
-	DebugPrint("File `%s' not found\n" _C_ file);
+	DebugPrint("File '%s' not found\n" _C_ file);
 	strcpy_s(buffer, PATH_MAX, file);
 }
 

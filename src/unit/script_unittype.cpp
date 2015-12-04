@@ -516,7 +516,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Animations")) {
 			type->Animations = AnimationsByIdent(LuaToString(l, -1));
 			if (!type->Animations) {
-				DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1));
+				DebugPrint("Warning animation '%s' not found\n" _C_ LuaToString(l, -1));
 			}
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
@@ -1118,7 +1118,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type `%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
+		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
 	UpdateDefaultBoolFlags(*type);
 	if (!CclInConfigFile) {

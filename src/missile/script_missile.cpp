@@ -226,7 +226,7 @@ static int CclDefineMissileType(lua_State *l)
 	MissileType *mtype = MissileTypeByIdent(str);
 
 	if (mtype) {
-		DebugPrint("Redefining missile-type `%s'\n" _C_ str);
+		DebugPrint("Redefining missile-type '%s'\n" _C_ str);
 	} else {
 		mtype = NewMissileTypeSlot(str);
 	}
