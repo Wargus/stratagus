@@ -38,11 +38,6 @@ Create ubuntu dsc packages:
  sed "0,/(\(.*\)ubuntu.*) $release;/s//(\1) unstable;/" -i debian/changelog; \
  done
 
-Create maemo dsc package:
- sed "0,/(\(.*\)) unstable;/s//(\1maemo1~fremantle) fremantle;/" -i debian/changelog
- bzr builddeb -S --builder="debuild -sa"
- sed "0,/(\(.*\)maemo.*) fremantle;/s//(\1) unstable;/" -i debian/changelog
-
 Create win32 installer + sign:
  rm -rf build && mkdir build && cd build
  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/path/to/win32/toolchain/file -DENABLE_STATIC=ON -DENABLE_NSIS=ON -DENABLE_UPX=ON -DENABLE_STRIP=ON ..
@@ -63,9 +58,6 @@ Upload orig tarball and windows installers with signatures:
 
 Upload ubuntu dsc packages to stratagus PPA:
  dput ppa:stratagus/ppa ../stratagus_*ubuntu*_source.changes
-
-Upload maemo dsc package to Maemo Extras-devel:
- scp ../stratagus_*.orig.tar.gz ../stratagus_*maemo*.debian.tar.gz ../stratagus_*maemo*_source.changes ../stratagus_*maemo*.dsc drop.maemo.org:/var/www/extras-devel/incoming-builder/fremantle/
 
 Example of cmake win32 toolchain file for windows:
  SET(CMAKE_SYSTEM_NAME Windows)

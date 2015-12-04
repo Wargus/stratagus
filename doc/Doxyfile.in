@@ -1528,7 +1528,6 @@ PREDEFINED             = USE_ZLIB \
                          USE_BSD \
                          USE_BEOS \
                          USE_MAC \
-                         USE_MAEMO \
                          WIN32 \
                          DOXYGEN
 

@@ -361,9 +361,6 @@ static void PrintHeader()
 #ifdef USE_X11
 		"X11 "
 #endif
-#ifdef USE_MAEMO
-		"MAEMO "
-#endif
 #ifdef USE_TOUCHSCREEN
 		"TOUCHSCREEN "
 #endif

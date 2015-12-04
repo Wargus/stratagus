@@ -27,8 +27,6 @@
 #
 #
 
-MAEMO := $(shell if pkg-config maemo-version 1>/dev/null 2>&1 || test -f "/etc/maemo_version" || osso-product-info -q OSSO_PRODUCT_INFO_RELEASE_NAME 2>/dev/null | grep -q -i maemo; then echo YES; fi)
-
 %:
 	dh $@ --parallel
 
@@ -55,30 +53,3 @@ override_dh_shlibdeps:
 
 override_dh_strip:
 	dh_strip --dbg-package=stratagus-dbg
-
-ifdef MAEMO
-
-override_dh_fixperms:
-	mkdir -p debian/stratagus/opt/stratagus/bin
-	mkdir -p debian/stratagus/opt/man/man6
-	mv debian/stratagus/usr/games/stratagus debian/stratagus/opt/stratagus/bin/
-	mv debian/stratagus/usr/share/man/man6/stratagus.6.gz debian/stratagus/opt/man/man6/
-	ln -s /opt/stratagus/bin/stratagus debian/stratagus/usr/games/stratagus
-	ln -s /opt/man/man6/stratagus.6.gz debian/stratagus/usr/share/man/man6/stratagus.6.gz
-	dh_fixperms
-
-override_dh_gencontrol:
-	dh_gencontrol
-	cp debian/stratagus/DEBIAN/control debian/stratagus/DEBIAN/control.orig
-	sed -n -e "1,/^Depends:.*$$/p" -i debian/stratagus/DEBIAN/control
-	echo "Bugtracker: https://bugs.launchpad.net/stratagus" >> debian/stratagus/DEBIAN/control
-	echo "Maemo-Display-Name: Stratagus" >> debian/stratagus/DEBIAN/control
-	echo "Maemo-Icon-26:" >> debian/stratagus/DEBIAN/control
-	for line in $(shell convert src/win32/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
-		echo " $$line" >> debian/stratagus/DEBIAN/control; \
-	done
-	sed -n -e "/^Depends:.*$$/,\$$p" debian/stratagus/DEBIAN/control.orig | tail -n +2 >> debian/stratagus/DEBIAN/control
-	sed "s/Section: .*/Section: user\/games/" -i debian/stratagus/DEBIAN/control
-	rm -f debian/stratagus/DEBIAN/control.orig
-
-endif
