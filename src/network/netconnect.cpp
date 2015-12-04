@@ -1507,7 +1507,7 @@ void NetworkServerStartGame()
 		}
 	}
 
-#if 0
+#ifdef DEBUG
 	printf("INITIAL ServerSetupState:\n");
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);

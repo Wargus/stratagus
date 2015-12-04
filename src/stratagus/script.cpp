@@ -233,18 +233,6 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 }
 
 /**
-**  Load a file and execute it
-**
-**  @param file  File to load and execute
-**
-**  @return      0 for success, else exit.
-*/
-int LuaLoadFile(const std::string &file)
-{
-	return LuaLoadFile(file, std::string());
-}
-
-/**
 **  Save preferences
 **
 **  @param l  Lua state.
@@ -2417,11 +2405,6 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();
-}
-
-void LoadCcl(const std::string &filename)
-{
-	LoadCcl(filename, std::string());
 }
 
 void ScriptRegister()
