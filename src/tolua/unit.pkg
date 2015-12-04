@@ -33,8 +33,9 @@ class CPreference
 	bool NoStatusLineTooltips;
 
 	unsigned int ShowOrders;
-	unsigned int  ShowNameDelay;
-	unsigned int  ShowNameTime;
+	unsigned int ShowNameDelay;
+	unsigned int ShowNameTime;
+	unsigned int AutosaveMinutes;
 
 	std::string SF2Soundfont;
 };

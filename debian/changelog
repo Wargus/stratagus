@@ -1,14 +1,15 @@
-stratagus (2.3.9-1) unstable; urgency=low
+stratagus (2.4.0-1) unstable; urgency=low
 
   * Introduced OpenGL shaders for pixel scaling
-  * Add support for semi-transparent building shadows
+  * Added support for semi-transparent building shadows
   * Many cleanups ported from Wyrmgus
-  * Support individual unit upgrades
-  * Fix multiplayer out-of-sync issue
-  * Fix multiplayer race selection
-  * Fix unit sight not being symmetrical
-  * Fix build restriction on top not being symmetrical
+  * Added support individual unit upgrades
+  * Fixed multiplayer out-of-sync issue
+  * Fixed multiplayer race selection
+  * Fixed unit sight not being symmetrical
+  * Fixed build restriction on top not being symmetrical
   * Added support for map-specific unit stats and changing them through the map editor
+  * Added support for autosaves
 
  -- Tim Felgentreff <timfelgentreff@gmail.com>  Wed, 2 Dec 2015 12:41:01 +0100
 
@@ -25,7 +26,7 @@ stratagus (2.3.0-1) unstable; urgency=low
   * Added function for key scroll speed (from cybermind)
   * Improved network stability (from cybermind)
   * Added CPreference::MineNotifications, to show notifications when
-    player-controlled mine is running low (as in Warcraft 3)
+    player-controlled mine is running low
   * Fix bug #901772: Support for player color changing (from cybermind)
   * When right-clicking on mine, selected miners will go to depot
     if they are full of resources (from cybermind)
@@ -237,7 +238,7 @@ stratagus (2.3.0-1) unstable; urgency=low
     bloodlust for strong ones...) (from cybermind)
   * Make OpenGL support optional. (from Pali Rohár)
   * Fix bug #1117852: Fixed version compilation for MSVC. (from cybermind)
-  * Correct handling for Warcraft 2 timed spells and health loss for
+  * Correct handling for timed spells and health loss for
     time-to-live ability : the values change every cycle, not every second.
     (from cybermind)
   * Aility to change values in animation "set-var" by percent.

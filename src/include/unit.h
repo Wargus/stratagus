@@ -434,7 +434,7 @@ public:
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
+		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
 	bool ShowSightRange;       /// Show sight range.
 	bool ShowReactionRange;    /// Show reaction range.
@@ -450,9 +450,10 @@ public:
 	bool DeselectInMine;       /// Deselect peasants in mines
 	bool NoStatusLineTooltips; /// Don't show messages on status line
 
-	int  ShowOrders;         /// How many second show orders of unit on map.
-	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.
-	int  ShowNameTime;       /// How many cycles need to show unit's name popup.
+	int ShowOrders;			/// How many second show orders of unit on map.
+	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
+	int ShowNameTime;		/// How many cycles need to show unit's name popup.
+	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 
 	std::string SF2Soundfont;/// Path to SF2 soundfont
 };
