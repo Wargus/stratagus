@@ -457,7 +457,7 @@ static void Usage()
 		"\t-e\t\tStart editor (instead of game)\n"
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
-		"\t-G \"[options]\"\tGame options (passed to game scripts)\n"
+		"\t-G \"options\"\tGame options (passed to game scripts)\n"
 		"\t-h\t\tHelp shows this page\n"
 		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
 		"\t-I addr\t\tNetwork address to use\n"
@@ -475,7 +475,7 @@ static void Usage()
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-x\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
+		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
 		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
 		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
 		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\

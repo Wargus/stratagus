@@ -3,8 +3,8 @@
 stratagus \- Strategy Gaming Engine
 .SH SYNOPSIS
 .B stratagus
-.I [-c file.lua] [-d datapath] [-D depth] [-e] [-E file.lua] [-F|-W] [-h] [-I addr] [-l] [-L lag] [-n server]
-.I [-N name] [-o|-O] [-P port] [-s sleep] [-S speed] [-U update] [-v mode] [map.smp|map.smp.gz]
+.I [-a] [-c file.lua] [-d datapath] [-D depth] [-e] [-E file.lua] [-F|-W] [-G options] [-h] [-I addr] [-l]
+.I [-N name] [-o|-O] [-p] [-P port] [-s sleep] [-S speed] [-v mode] [-x scaler-idx] [-Z] [map.smp|map.smp.gz]
 .SH "DESCRIPTION"
 This manual page documents briefly the flags that you can give to
 .BR stratagus
@@ -14,6 +14,9 @@ This manual page documents briefly the flags that you can give to
 is a powerful game engine for building realtime strategy games, a la AoE or Warcraft.
 .SH OPTIONS
 A summary of options is included below.
+.TP
+.B \-a
+Enables asserts check in engine code (for debugging)
 .TP
 .B \-c file.lua
 Choose a different stratagus start config file.
@@ -34,8 +37,16 @@ Choose a different editor config file.
 .B \-F
 With this option you can start Stratagus in full screen video mode.
 .TP
+.B \-G "lua options"
+The argument is passed as argument string to the lua game script. Take care to
+quote if spaces are used. This can be used in conjunction with -c to have custom
+startup routines with arguments.
+.TP
 .B \-h
 Show summary of all options.
+.TP
+.B \-i
+Enables unit info dumping into log (for debugging).
 .TP
 .B \-I addr
 With this option you can specify the network address for network play.
@@ -43,41 +54,58 @@ With this option you can specify the network address for network play.
 .B \-l
 Disable command log messages.
 .TP
-.B \-L lag
-This sets the network lag in number of frames (default 10 = 333 ms).
-.TP
-.B \-n server
-With this option you can specify the network server host for network play.
-.TP
 .B \-N name
 The name of the player (will appear in network games).
+.TP
+.B \-o
+Do not use OpenGL or OpenGL ES 1.1.
 .TP
 .B \-O
 Use OpenGL or OpenGL ES 1.1.
 .TP
-.B \-o
-Do not use OpenGL or OpenGL ES 1.1.
+.B \-p
+Enables debug messages.
 .TP
 .B \-P port
 With this option you can set the network port to use in network games.
 The default value is port udp/6660.
 .TP
 .B \-s number
-Number of frames before AI awakes. This is useful if the AI is beating
-you hard, and you want to make it sweet like a cat. The higher, the easier
-will be the game against the AI. Default is to sleep 0 time frames.
+Number of frames before AI awakes. This is useful if the AI is too strong and
+you want it to react slower. The higher, the easier will be the game against the
+AI. Default is to sleep 0 time frames.
 .TP
 .B \-S number
 Sync speed (100 = 30 frames/s).
-.TP
-.B \-U update
-With this option you can specify the network update rate in # frames (default 5=6x per s).
 .TP
 .B \-v mode
 With this option you can specify video mode resolution in format \fB<xres>\fRx\fB<yres>\fR
 .TP
 .B \-W
 With this option you can start Stratagus in windowed video mode.
+.TP
+.B \-x filter-idx
+In OpenGL mode, this controls the pixel scaling algorithm that is run on the
+entire display. This runs on the GPU Fragment shader, so your card and driver
+need to support at least OpenGL 1.3.
+  -1 - OpenGL native texture scaling (disables scaling in the shader)
+  1  - nearest neighbour
+  2  - EPX/AdvMame
+  3  - HQx
+  4  - SAL
+  5  - SuperEagle
+
+This is especially useful in combination with -Z, since that will keep the
+original size of all elements on the screen at the ratio they have at 640x480,
+but scales everything to the chosen video resolution using the nice pixel
+scaler. To try which scaler looks best at run-time, you can use Ctrl+Alt+/ to
+cycle between scalers.
+.TP
+.B \-Z
+Use OpenGL to scale the screen to the viewport. This is nice for games with
+assets only in one resolution, where higher screen resolutions shouldn't make
+everything smaller, but instead everything should be scaled up. Implies -O. Use
+with -x to get nicer pixel scaling.
 .SH "FILES"
 .TP
 .B ./
@@ -109,9 +137,10 @@ in the Warcraft II CD, thanks to the Wargus dataset.
 .PP
 Warcraft II is a registered trademark of Blizzard Entertainment.
 .SH AUTHOR
-Stratagus is written by Nehal Mistry, Russell Smith, Pali Rohár and others.
+Stratagus is written and developed by the Stratagus Team and Contributors.
 .PP
 This manual page was written by Anthony Towns <ajt@debian.org>,
-David Martínez Moreno <ender@debian.org> and
-Pali Rohár <pali.rohar@gmail.com> for the Debian GNU/Linux
+David Martínez Moreno <ender@debian.org>,
+Pali Rohár <pali.rohar@gmail.com>, and
+Tim Felgentreff <timfelgentreff@gmail.com> for the Debian GNU/Linux
 system (but may be used by others).
