@@ -64,8 +64,9 @@ int main(int argc, char * argv[]) {
 	char *git_rev, *gitrevfile;
 	if ( file ) {
 		new_ver[4] = 1;
-		if (fscanf(file, "ref: %ms", &git_rev) != 1 ) {
-			if (fscanf(file, "%ms", &git_rev) != 1 ) {
+		git_rev = (char*)calloc(sizeof(char), 1024);
+		if (fscanf(file, "ref: %s", &git_rev) != 1 ) {
+			if (fscanf(file, "%s", &git_rev) != 1 ) {
 				new_ver[4] = -1;
 			}
 			fclose(file);
@@ -77,7 +78,7 @@ int main(int argc, char * argv[]) {
 			file = fopen(gitrevfile, "r");
 			free(gitrevfile);
 			if (file) {
-				if (fscanf(file, "%ms", &git_rev) != 1) {
+				if (fscanf(file, "%s", &git_rev) != 1) {
 					new_ver[4] = -1;
 				}
 				fclose(file);
