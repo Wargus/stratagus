@@ -1,5 +1,5 @@
 language: cpp
-sudo: required
+# sudo: required
 # compiler:
 #   - gcc
 #   - clang
@@ -17,7 +17,6 @@ addons:
       - zlib1g-dev
       - libpng12-dev
 before_script:
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libtolua++5.1-dev; fi
   - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
