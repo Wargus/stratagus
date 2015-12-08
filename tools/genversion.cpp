@@ -87,9 +87,6 @@ int main(int argc, char * argv[]) {
 		}
 	}
 
-	if ( memcmp(old_ver, new_ver, sizeof(old_ver)) == 0 )
-		return 0;
-
 	file = fopen(argv[1], "w");
 	if ( ! file )
 		return 1;
@@ -101,7 +98,7 @@ int main(int argc, char * argv[]) {
 	fprintf(file, "#define StratagusPatchLevel %d\n", new_ver[2]);
 	fprintf(file, "#define StratagusPatchLevel2 %d\n", new_ver[3]);
 
-	if ( new_ver[4] )
+	if ( new_ver[4] != -1 )
 		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
 
 	fclose(file);
