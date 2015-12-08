@@ -1,7 +1,7 @@
 Here is small HOWTO release new version of Stratagus
 
 You need some linux machine (ideally ubuntu) with:
- bzr, debhelper, devscripts, cmake, make, nsis, upx, gnupg
+ git, debhelper, devscripts, cmake, make, nsis, upx, gnupg
 
 For windows installers you need:
  cmake toolchain file (see example)
@@ -11,7 +11,7 @@ For windows installers you need:
   libtheora-mingw-w64-cross, libvorbis-mingw-w64-cross, lua5.1-mingw-w64-cross, tolua++-mingw-w64-cross, zlib-mingw-w64-cross
 
 Download source code:
- bzr branch lp:stratagus && cd stratagus
+ git clone https://github.com/Wargus/stratagus && cd stratagus
 
 Increase version in file:
  CMakeLists.txt
@@ -22,21 +22,18 @@ Update changelog in file:
 Increase version and update changelog for debian:
  dch -i
 
-Commit changes to bzr and create tag:
- bzr ci -m "Release version <version>"
- bzr tag <version>
- bzr push lp:stratagus
+Commit changes to git and create tag:
+ git commit -a -m "Release version <version>"
+ git tag <version>
+ git push --tags origin master
 
 Create orig tarball + sign:
- bzr export ../stratagus_*.orig.tar.gz
+ git clean -idx
+ tar czvf ../stratagus_<version>.orig.tar.gz
  gpg --armor --sign --detach-sig ../stratagus_*.orig.tar.gz
 
-Create ubuntu dsc packages:
- for release in karmic lucid maverick natty oneiric precise quantal; do \
- sed "0,/(\(.*\)) unstable;/s//(\1ubuntu1~$release) $release;/" -i debian/changelog; \
- bzr builddeb -S --builder="debuild -sa"; \
- sed "0,/(\(.*\)ubuntu.*) $release;/s//(\1) unstable;/" -i debian/changelog; \
- done
+Create ubuntu release packages:
+ (happens automatically on commit in launchpad)
 
 Create win32 installer + sign:
  rm -rf build && mkdir build && cd build
@@ -50,11 +47,8 @@ Create win64 installer + sign:
  make && mv Stratagus-*-x86_64.exe ../../ && cd ..
  gpg --armor --sign --detach-sig ../Stratagus-*-x86_64.exe
 
-Create new version on launchpad:
- via web interface on https://launchpad.net/stratagus/trunk/+addrelease
-
-Upload orig tarball and windows installers with signatures:
- via web interface on https://launchpad.net/stratagus/+download
+Create new release on github, upload windows installers with signatures:
+ via web interface on https://github.com/Wargus/stratagus/releases
 
 Upload ubuntu dsc packages to stratagus PPA:
  dput ppa:stratagus/ppa ../stratagus_*ubuntu*_source.changes

@@ -1040,7 +1040,7 @@ message("==================================")
 # Compile Stratagus
 
 if(NOT CMAKE_CROSSCOMPILING)
-	# Generate header file version-generated.h with bzr revision
+	# Generate header file version-generated.h with git revision
 	# Run tool genversion at compile time which (re)generate file version-generated.h when needed
 	set(genversion_SRCS tools/genversion.cpp)
 	source_group(genversion FILES ${genversion_SRCS})
@@ -1055,7 +1055,7 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set_source_files_properties(src/include/version.h PROPERTIES OBJECT_DEPENDS version-generated.h) # This is needed for old CMake which does not generate correct dependences
 	list(APPEND CLEAN_FILES version-generated.h)
 else()
-	# Generate header file version-generated.h without bzr revision
+	# Generate header file version-generated.h without git revision
 	# When cross compiling we cannot build host binary, so create file at cmake time
 	if(NOT "${STRATAGUS_VERSION}" STREQUAL "${STRATAGUS_VERSION_CACHED}" OR NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h)
 		file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
