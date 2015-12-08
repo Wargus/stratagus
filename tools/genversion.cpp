@@ -60,11 +60,29 @@ int main(int argc, char * argv[]) {
 		fclose(file);
 	}
 
-	file = fopen(".bzr/branch/last-revision", "r");
+	file = fopen(".git/HEAD", "r");
+	char *git_rev, *gitrevfile;
 	if ( file ) {
-		if ( fscanf(file, "%d", &new_ver[4]) != 1 )
-			new_ver[4] = -1;
-		fclose(file);
+		new_ver[4] = 1;
+		if (fscanf(file, "ref: %ms", &git_rev) != 1 ) {
+			if (fscanf(file, "%ms", &git_rev) != 1 ) {
+				new_ver[4] = -1;
+			}
+			fclose(file);
+		} else {
+			fclose(file);
+			gitrevfile = (char*)calloc(sizeof(char), strlen(git_rev) + 6);
+			sprintf(gitrevfile, ".git/%s", git_rev);
+			free(git_rev);
+			file = fopen(gitrevfile, "r");
+			free(gitrevfile);
+			if (file) {
+				if (fscanf(file, "%ms", &git_rev) != 1) {
+					new_ver[4] = -1;
+				}
+				fclose(file);
+			}
+		}
 	}
 
 	if ( memcmp(old_ver, new_ver, sizeof(old_ver)) == 0 )
@@ -81,8 +99,8 @@ int main(int argc, char * argv[]) {
 	fprintf(file, "#define StratagusPatchLevel %d\n", new_ver[2]);
 	fprintf(file, "#define StratagusPatchLevel2 %d\n", new_ver[3]);
 
-	if ( new_ver[4] >= 0 )
-		fprintf(file, "#define StratagusBzrRev %d\n", new_ver[4]);
+	if ( new_ver[4] )
+		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
 
 	fclose(file);
 	return 0;

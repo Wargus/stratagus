@@ -22,8 +22,8 @@
 #endif
 
 /// Engine version string
-#ifdef StratagusBzrRev
-#define VERSION _version_str2 "-bzr" _version_stringify(StratagusBzrRev)
+#ifdef StratagusGitRev
+#define VERSION _version_str2 "-git" _version_stringify(StratagusGitRev)
 #else
 #define VERSION _version_str2
 #endif
