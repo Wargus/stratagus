@@ -644,6 +644,16 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 	}
 }
 
+unsigned CTileset::getWallDirection(int tileIndex, bool human) const
+{
+	int i;
+	tileIndex &= 0xff0; // only the base indices are in the tables
+	for (i = 0; i < 16; i++) {
+		if ((human && humanWallTable[i] == tileIndex) || orcWallTable[i] == tileIndex) {
+			return i;
+		}
+	}
+}
 unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
 {
 	return humanWallTable[dirFlag];
@@ -667,18 +677,21 @@ static unsigned int NextSection(const CTileset &tileset, unsigned int tileIndex)
 unsigned CTileset::getHumanWallTileIndex_broken(int dirFlag) const
 {
 	unsigned tileIndex = humanWallTable[dirFlag];
+	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
 unsigned CTileset::getOrcWallTileIndex_broken(int dirFlag) const
 {
 	unsigned tileIndex = orcWallTable[dirFlag];
+	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
 unsigned CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
 {
 	unsigned tileIndex = humanWallTable[dirFlag];
+	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
@@ -686,6 +699,7 @@ unsigned CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
 unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 {
 	unsigned tileIndex = orcWallTable[dirFlag];
+	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
