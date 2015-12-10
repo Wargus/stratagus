@@ -60,9 +60,9 @@
   For the connecting new walls -- all's fine.
 */
 
-static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value)
+static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value, unsigned int oldTile = 0)
 {
-	unsigned int tileIndex;
+	unsigned int tileIndex, newTile;
 	if (humanWall) {
 		if (value == 0) {
 			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
@@ -80,7 +80,13 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
 		}
 	}
-	return tileset.tiles[tileIndex].tile;
+	newTile = tileset.tiles[tileIndex].tile;
+	if (!newTile && oldTile) {
+		unsigned int oldTileIndex = tileset.findTileIndexByTile(oldTile);
+		return getWallTile(tileset, humanWall, tileset.getWallDirection(oldTileIndex, humanWall), value);
+	} else {
+		return newTile;
+	}
 }
 
 
@@ -128,7 +134,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 	}
 	const bool human = tileset.isARaceWallTile(tile, true);
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, true);
-	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
+	const int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
 
 	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
 		mf.playerInfo.SeenTile = wallTile;
@@ -172,7 +178,7 @@ void MapFixWallTile(const Vec2i &pos)
 	}
 	const bool human = tileset.isARaceWallTile(tile, true);
 	const int dirFlag = GetDirectionFromSurrounding(pos, human, false);
-	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.Value);
+	const unsigned int wallTile = getWallTile(tileset, human, dirFlag, mf.Value, tile);
 
 	if (mf.getGraphicTile() != wallTile) {
 		mf.setGraphicTile(wallTile);
