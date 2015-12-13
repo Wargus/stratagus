@@ -862,6 +862,7 @@ static void AiCheckingWork()
 	for (int i = 0; i < sz; ++i) {
 		AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		CUnitType &type = *queue.Type;
+		bool new_supply = false;
 
 		// FIXME: must check if requirements are fulfilled.
 		// Buildings can be destroyed.
@@ -869,7 +870,7 @@ static void AiCheckingWork()
 		// Check if we have enough food.
 		if (type.Stats[AiPlayer->Player->Index].Variables[DEMAND_INDEX].Value && !AiCheckSupply(*AiPlayer, type)) {
 			AiPlayer->NeedSupply = true;
-			AiRequestSupply();
+			new_supply = true;
 		}
 		// Check limits, AI should be broken if reached.
 		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) < 0) {
@@ -896,6 +897,10 @@ static void AiCheckingWork()
 					queue.Wait = GameCycle + 450;
 				}
 			}
+		}
+		if (new_supply) {
+			// trigger this last, because it may re-arrange the queue and invalidate our queue item
+			AiRequestSupply();
 		}
 	}
 }
