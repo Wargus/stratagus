@@ -90,6 +90,7 @@ namespace gcn
          * @param target the target to draw to.
          */
         virtual void setTarget(SDL_Surface* target);
+        //virtual void setTarget(SDL_Renderer* renderer);
 
         /**
          * Gets the target SDL_Surface.
@@ -155,6 +156,8 @@ namespace gcn
         virtual void drawVLine(int x, int y1, int y2);
 
         SDL_Surface* mTarget;
+        SDL_Renderer* mRenderer;
+        SDL_Texture* mTargetTexture;
         Color mColor;
         bool mAlpha;
     };

@@ -408,6 +408,8 @@ extern unsigned long SlowFrameCounter;
 extern void SetPlayersPalette();
 
 /// The SDL screen
+extern SDL_Window *TheWindow;
+extern SDL_Renderer *TheRenderer;
 extern SDL_Surface *TheScreen;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)

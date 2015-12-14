@@ -168,12 +168,12 @@ namespace gcn
 
         if (hasPink)
         {
-            SDL_SetColorKey(temp, SDL_SRCCOLORKEY,
+            SDL_SetColorKey(temp, SDL_TRUE,
                             SDL_MapRGB(temp->format,255,0,255));
         }
         if (hasAlpha)
         {
-            SDL_SetAlpha(temp, SDL_SRCALPHA, 255);
+            SDL_SetSurfaceAlphaMod(temp, 255);
         }
 
         return temp;

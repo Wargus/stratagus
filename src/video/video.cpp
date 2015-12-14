@@ -292,7 +292,7 @@ bool CVideo::ResizeScreen(int w, int h)
 			UI.Minimap.FreeOpenGL();
 		}
 #endif
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
+		SDL_SetWindowSize(TheWindow, w, h);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		ViewportWidth = w;
 		ViewportHeight = h;
@@ -424,7 +424,7 @@ static void ColorCycleSurface(SDL_Surface &surface)
 		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
 		colors[range.end] = palcolors[range.begin];
 	}
-	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 }
 
 /**
@@ -445,7 +445,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 			memcpy(colors + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
 			colors[range.begin] = palcolors[range.end];
 		}
-		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 	}
 }
 

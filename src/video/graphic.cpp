@@ -140,10 +140,11 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 	} else
 #endif
 	{
-		int oldalpha = Surface->format->alpha;
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+		Uint8 oldalpha;
+		SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
+		SDL_SetSurfaceAlphaMod(Surface, alpha);
 		DrawSub(gx, gy, w, h, x, y);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 	}
 }
 
@@ -376,11 +377,12 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	{
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = Surface->format->alpha;
+		Uint8 oldalpha;
+		SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
 
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
+		SDL_SetSurfaceAlphaMod(Surface, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 	}
 }
 
@@ -404,11 +406,12 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		srect.y += y - oldy;
 
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = SurfaceFlip->format->alpha;
+		Uint8 oldalpha;
+		SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
-		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 	}
 }
 
@@ -676,7 +679,7 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 				const int gray = redGray * pal.colors[i].r + greenGray * pal.colors[i].g + blueGray * pal.colors[i].b;
 				colors[i].r = colors[i].g = colors[i].b = gray;
 			}
-			SDL_SetColors(Surface, &colors[0], 0, 256);
+			SDL_SetPaletteColors(&pal, &colors[0], 0, 256);
 			break;
 		}
 		case 4: {
@@ -893,14 +896,16 @@ void CGraphic::Flip()
 	}
 
 	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
-	if (Surface->flags & SDL_SRCCOLORKEY) {
-		SDL_SetColorKey(SurfaceFlip, SDL_SRCCOLORKEY | SDL_RLEACCEL, Surface->format->colorkey);
+	Uint32 ckey;
+	if (!SDL_GetColorKey(Surface, &ckey)) {
+		SDL_SetColorKey(SurfaceFlip, SDL_TRUE, ckey);
 	}
 	if (SurfaceFlip->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(SurfaceFlip);
 	}
 	SDL_LockSurface(Surface);
 	SDL_LockSurface(s);
+	//fprintf(stderr, "flipping sprite %s (%dbpp)\n", File.c_str(), 8*s->format->BytesPerPixel);
 	switch (s->format->BytesPerPixel) {
 		case 1:
 			for (int i = 0; i < s->h; ++i) {
@@ -919,6 +924,13 @@ void CGraphic::Flip()
 			}
 			break;
 		case 4: {
+			for (int i = 0; i < s->h; ++i) {
+				for (int j = 0; j < s->w; ++j) {
+					memcpy(&((char *)s->pixels)[j + i * s->pitch],
+						   &((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch], 4);
+				}
+			}
+#if 0
 			unsigned int p0 = s->pitch;
 			unsigned int p1 = Surface->pitch;
 			const int width = s->w;
@@ -970,6 +982,7 @@ void CGraphic::Flip()
 				p0 += s->pitch;
 				p1 += Surface->pitch;
 			}
+#endif
 		}
 		break;
 	}
@@ -996,6 +1009,7 @@ void CGraphic::UseDisplayFormat()
 	if (UseOpenGL) { return; }
 #endif
 
+#if 0
 	SDL_Surface *s = Surface;
 
 	if (s->format->Amask != 0) {
@@ -1016,6 +1030,12 @@ void CGraphic::UseDisplayFormat()
 		VideoPaletteListRemove(s);
 		SDL_FreeSurface(s);
 	}
+	VideoPaletteListRemove(Surface);
+	if (SurfaceFlip) {
+		VideoPaletteListRemove(SurfaceFlip);
+	}
+#endif
+
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1042,10 +1062,10 @@ static int PowerOf2(int x)
 static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 						  int ow, int oh)
 {
-	int useckey = g->Surface->flags & SDL_SRCCOLORKEY;
+	Uint32 ckey;
+	int useckey = !SDL_GetColorKey(g->Surface, &ckey);
 	SDL_PixelFormat *f = g->Surface->format;
 	int bpp = f->BytesPerPixel;
-	Uint32 ckey = f->colorkey;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	int maxw = std::min<int>(g->GraphicWidth - ow, GLMaxTextureSize);
@@ -1055,9 +1075,7 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	unsigned char *tex = new unsigned char[w * h * 4];
 	memset(tex, 0, w * h * 4);
 	unsigned char alpha;
-	if (g->Surface->flags & SDL_SRCALPHA) {
-		alpha = f->alpha;
-	} else {
+	if (!!SDL_GetSurfaceAlphaMod(g->Surface, &alpha) {
 		alpha = 0xff;
 	}
 
@@ -1251,8 +1269,8 @@ void CGraphic::Resize(int w, int h)
 	}
 
 	Resized = true;
-	Uint32 ckey = Surface->format->colorkey;
-	int useckey = Surface->flags & SDL_SRCCOLORKEY;
+	Uint32 ckey;
+	bool useckey = !SDL_GetColorKey(Surface, &ckey);
 
 	int bpp = Surface->format->BytesPerPixel;
 	if (bpp == 1) {
@@ -1281,7 +1299,7 @@ void CGraphic::Resize(int w, int h)
 		if (Surface->format->BytesPerPixel == 1) {
 			VideoPaletteListAdd(Surface);
 		}
-		SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, pal, 0, 256);
+		SDL_SetPaletteColors(Surface->format->palette, pal, 0, 256);
 	} else {
 		SDL_LockSurface(Surface);
 
@@ -1345,7 +1363,7 @@ void CGraphic::Resize(int w, int h)
 										   Rmask, Gmask, Bmask, Amask);
 	}
 	if (useckey) {
-		SDL_SetColorKey(Surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ckey);
+		SDL_SetColorKey(Surface, SDL_TRUE, ckey);
 	}
 	Width = GraphicWidth = w;
 	Height = GraphicHeight = h;
@@ -1418,7 +1436,9 @@ void CGraphic::SetOriginalSize()
 bool CGraphic::TransparentPixel(int x, int y)
 {
 	int bpp = Surface->format->BytesPerPixel;
-	if ((bpp == 1 && !(Surface->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
+	Uint32 colorkey;
+	bool has_colorkey = !SDL_GetColorKey(Surface, &colorkey);
+	if ((bpp == 1 && !has_colorkey) || bpp == 3) {
 		return false;
 	}
 
@@ -1426,12 +1446,12 @@ bool CGraphic::TransparentPixel(int x, int y)
 	SDL_LockSurface(Surface);
 	unsigned char *p = (unsigned char *)Surface->pixels + y * Surface->pitch + x * bpp;
 	if (bpp == 1) {
-		if (*p == Surface->format->colorkey) {
+		if (*p == colorkey) {
 			ret = true;
 		}
 	} else {
-		bool ckey = (Surface->flags & SDL_SRCCOLORKEY) > 0;
-		if (ckey && *p == Surface->format->colorkey) {
+		bool ckey = has_colorkey;
+		if (ckey && *p == colorkey) {
 			ret = true;
 		} else if (p[Surface->format->Ashift >> 3] == 255) {
 			ret = true;
@@ -1454,8 +1474,8 @@ void CGraphic::MakeShadow()
 	// Set all colors in the palette to black and use 50% alpha
 	memset(colors, 0, sizeof(colors));
 
-	SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	SDL_SetPaletteColors(Surface->format->palette, colors, 0, 256);
+	SDL_SetSurfaceAlphaMod(Surface, 128);
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -1469,8 +1489,8 @@ void CGraphic::MakeShadow()
 #endif
 	{
 		if (SurfaceFlip) {
-			SDL_SetPalette(SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+			SDL_SetPaletteColors(SurfaceFlip->format->palette, colors, 0, 256);
+			SDL_SetSurfaceAlphaMod(SurfaceFlip, 128);
 		}
 	}
 }
@@ -1500,6 +1520,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 {
 	SDL_Surface *s = g->Surface;
 	int bpp = s->format->BytesPerPixel;
+	unsigned int ckey;
 
 	if (bstore) {
 		free(bstore);
@@ -1508,7 +1529,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 		Height = 0;
 	}
 
-	if ((bpp == 1 && !(s->flags & SDL_SRCCOLORKEY)) || bpp == 3) {
+	if ((bpp == 1 && SDL_GetColorKey(s, &ckey) != 0) || bpp == 3) {
 		return;
 	}
 
@@ -1524,7 +1545,6 @@ void CFiller::bits_map::Init(CGraphic *g)
 
 	switch (s->format->BytesPerPixel) {
 		case 1: {
-			int ckey = s->format->colorkey;
 			unsigned char *ptr = (unsigned char *)s->pixels;
 
 			for (int i = 0; i < Height; ++i) {
@@ -1546,8 +1566,8 @@ void CFiller::bits_map::Init(CGraphic *g)
 		case 3:
 			break;
 		case 4:
-			if ((s->flags & SDL_SRCCOLORKEY) == SDL_SRCCOLORKEY) {
-				unsigned int ckey = s->format->colorkey;
+		{
+			if (!SDL_GetColorKey(s, &ckey)) {
 				unsigned int *ptr = (unsigned int *)s->pixels;
 
 				for (int i = 0; i < Height; ++i) {
@@ -1581,6 +1601,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 				}
 			}
 			break;
+		}
 		default:
 			break;
 	}

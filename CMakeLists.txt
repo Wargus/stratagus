@@ -161,7 +161,7 @@ set(guichan_SRCS
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlgraphics.cpp
-	src/guichan/sdl/sdlimageloader.cpp
+#	src/guichan/sdl/sdlimageloader.cpp
 	src/guichan/sdl/sdlinput.cpp
 	src/guichan/widget.cpp
 	src/guichan/widgets/button.cpp
@@ -631,7 +631,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
-find_package(SDL REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -699,7 +699,7 @@ option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) 
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
 
 if(NOT WITH_RENDERER)
-	if(OPENGL_FOUND)
+	if(OPENGL_FOUND AND FALSE)
 		set(WITH_RENDERER "OpenGL")
 	elseif(OPENGLES_FOUND AND SDLGLES_FOUND)
 		set(WITH_RENDERER "OpenGLES")
@@ -726,8 +726,8 @@ endif()
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL2_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -825,7 +825,7 @@ endif()
 
 if(APPLE)
 	add_definitions(-DUSE_MAC)
-	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)	
+	set(SDL_LIBRARY ${SDL_LIBRARY} SDLmain)
 endif()
 
 if(BSD)
@@ -1115,7 +1115,7 @@ source_group(metaserver FILES ${metaserver_SRCS} ${metaserver_HDRS})
 
 if(SQLITE_FOUND)
 	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
-	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
+	target_link_libraries(metaserver ${SDL2_LIBRARY} ${SQLITE_LIBRARIES})
 
 	if(WIN32)
 		target_link_libraries(metaserver winmm ws2_32)
