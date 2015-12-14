@@ -531,7 +531,9 @@ void InitVideoSdl()
 	}
 #endif
 
-	if (!Video.Width || !Video.Height) {
+	if (true || !Video.Width || !Video.Height) {
+		Video.ViewportWidth = Video.Width;
+		Video.ViewportHeight = Video.Height;
 		Video.Width = 640;
 		Video.Height = 480;
 	}
@@ -557,7 +559,7 @@ void InitVideoSdl()
 	                             Video.ViewportWidth, Video.ViewportHeight, flags);
 #else
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	                             Video.Width, Video.Height, flags);
+	                             Video.ViewportWidth, Video.ViewportHeight, flags);
 #endif
 	if (TheWindow == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
@@ -565,13 +567,13 @@ void InitVideoSdl()
 		exit(1);
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
-	SDL_RenderSetLogicalSize(TheRenderer, 640, 480);
+	SDL_RenderSetLogicalSize(TheRenderer, Video.Width, Video.Height);
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	TheScreen = SDL_CreateRGBSurface(0, Video.Width, Video.Height, 32,
 	                                 0x00FF0000,
 	                                 0x0000FF00,
 	                                 0x000000FF,
-	                                 0xFF000000);
+	                                 0); //0xFF000000);
 	TheTexture = SDL_CreateTexture(TheRenderer,
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
@@ -993,10 +995,10 @@ void RealizeVideoMemory()
 	{
 		if (NumRects) {
 			//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-			//SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+			SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
 			//SDL_RenderClear(TheRenderer);
-			for (int i = 0; i < NumRects; i++)
-			    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
+			//for (int i = 0; i < NumRects; i++)
+			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
 			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
 			SDL_RenderPresent(TheRenderer);
 			NumRects = 0;
@@ -1096,8 +1098,10 @@ void ToggleFullScreen()
 {
 	Uint32 flags;
 	flags = SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+	SDL_GetWindowSize(TheWindow, &Video.ViewportWidth, &Video.ViewportHeight);
+
 #ifdef USE_WIN32
-	
+
 	if (!TheWindow) { // don't bother if there's no surface.
 		return;
 	}

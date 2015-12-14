@@ -95,7 +95,9 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 	{
 		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 
@@ -304,7 +306,9 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 
@@ -360,7 +364,9 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 
@@ -381,7 +387,9 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 		SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
 
 		SDL_SetSurfaceAlphaMod(Surface, alpha);
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 		SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 	}
 }
@@ -410,7 +418,9 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
 		SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 		SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 	}
 }
@@ -895,17 +905,18 @@ void CGraphic::Flip()
 		return;
 	}
 
-	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, SDL_SWSURFACE);
+	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, 0);
 	Uint32 ckey;
 	if (!SDL_GetColorKey(Surface, &ckey)) {
 		SDL_SetColorKey(SurfaceFlip, SDL_TRUE, ckey);
 	}
 	if (SurfaceFlip->format->BytesPerPixel == 1) {
+		//SDL_SetPaletteColors(SurfaceFlip->format->palette, Surface->format->palette->colors, 0, Surface->format->palette->ncolors);
 		VideoPaletteListAdd(SurfaceFlip);
 	}
 	SDL_LockSurface(Surface);
 	SDL_LockSurface(s);
-	//fprintf(stderr, "flipping sprite %s (%dbpp)\n", File.c_str(), 8*s->format->BytesPerPixel);
+	fprintf(stderr, "flipping sprite %s (%dbpp)\n", File.c_str(), 8*s->format->BytesPerPixel);
 	switch (s->format->BytesPerPixel) {
 		case 1:
 			for (int i = 0; i < s->h; ++i) {
@@ -986,6 +997,18 @@ void CGraphic::Flip()
 		}
 		break;
 	}
+	#if 0
+	if (File=="graphics/human/units/elven_archer.png" && s->format->BytesPerPixel == 1)
+	{
+	  //FILE *file = fopen("archer-test.data", "w+");
+	  FILE *file = fopen("archer-palete.data", "w+");
+	  if (file) {
+	    //fwrite(s->pixels, 1, s->pitch*s->h, file);
+	    fwrite(s->format->palette->colors, 1, 3 * s->format->palette->ncolors, file);
+	    fclose(file);
+	  }
+	}
+	#endif
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 

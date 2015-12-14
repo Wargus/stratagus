@@ -165,17 +165,13 @@ namespace gcn
 
           case SDL_MOUSEWHEEL:
               if (event.wheel.y != 0) {
-                  mouseInput.x = event.wheel.x;
-                  mouseInput.y = event.wheel.y;
-                  mouseInput.setButton(event.wheel.y > 0 ? MouseInput::WHEEL_UP : MouseInput::WHEEL_DOWN);
-                  mouseInput.setType(MouseInput::PRESS);
-                  mouseInput.setTimeStamp(SDL_GetTicks());
-                  mMouseInputQueue.push(mouseInput);
-                  mouseInput.x = event.wheel.x;
-                  mouseInput.y = event.wheel.y;
-                  mouseInput.setButton(event.wheel.y > 0 ? MouseInput::WHEEL_UP : MouseInput::WHEEL_DOWN);
-                  mouseInput.setType(MouseInput::RELEASE);
-                  mouseInput.setTimeStamp(SDL_GetTicks()+1);
+                  SDL_GetMouseState(&mouseInput.x, &mouseInput.y);
+                  if (event.wheel.y > 0)
+                    mouseInput.setType(MouseInput::WHEEL_UP);
+                  else
+                    mouseInput.setType(MouseInput::WHEEL_DOWN);
+                  mouseInput.setButton(MouseInput::EMPTY);
+                  mouseInput.setTimeStamp(event.wheel.timestamp);
                   mMouseInputQueue.push(mouseInput);
               }
               break;
@@ -441,7 +437,7 @@ namespace gcn
         key.setShiftPressed((keysym.mod & KMOD_SHIFT) != 0);
         key.setControlPressed((keysym.mod & KMOD_CTRL) != 0);
         key.setAltPressed((keysym.mod & KMOD_ALT) != 0);
-        //key.setMetaPressed((keysym.mod & KMOD_META) != 0);
+        key.setMetaPressed((keysym.mod & KMOD_GUI) != 0);
 
         if (keysym.sym >= SDLK_KP_0 && keysym.sym <= SDLK_KP_EQUALS)
         {

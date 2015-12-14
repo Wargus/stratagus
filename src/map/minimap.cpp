@@ -246,13 +246,12 @@ void CMinimap::UpdateTerrain()
 	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		SDL_LockSurface(Map.TileGraphic->Surface);
-	} else
+	if (!UseOpenGL)
 #endif
 	{
-		SDL_LockSurface(MinimapTerrainSurface);
+		//SDL_LockSurface(MinimapTerrainSurface);
 	}
+	//SDL_LockSurface(Map.TileGraphic->Surface);
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -304,9 +303,9 @@ void CMinimap::UpdateTerrain()
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_UnlockSurface(MinimapTerrainSurface);
+		//SDL_UnlockSurface(MinimapTerrainSurface);
 	}
-	SDL_UnlockSurface(Map.TileGraphic->Surface);
+	//SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -348,9 +347,9 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_LockSurface(MinimapTerrainSurface);
+		//SDL_LockSurface(MinimapTerrainSurface);
 	}
-	SDL_LockSurface(Map.TileGraphic->Surface);
+	//SDL_LockSurface(Map.TileGraphic->Surface);
 
 	const int ty = pos.y * Map.Info.MapWidth;
 	const int tx = pos.x;
@@ -423,9 +422,9 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_UnlockSurface(MinimapTerrainSurface);
+		//SDL_UnlockSurface(MinimapTerrainSurface);
 	}
-	SDL_UnlockSurface(Map.TileGraphic->Surface);
+	//SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -553,8 +552,8 @@ void CMinimap::Update()
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_LockSurface(MinimapSurface);
-		SDL_LockSurface(MinimapTerrainSurface);
+		//SDL_LockSurface(MinimapSurface);
+		//SDL_LockSurface(MinimapTerrainSurface);
 	}
 
 	for (int my = 0; my < H; ++my) {
@@ -590,7 +589,7 @@ void CMinimap::Update()
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_UnlockSurface(MinimapTerrainSurface);
+		//SDL_UnlockSurface(MinimapTerrainSurface);
 	}
 
 	//
@@ -606,7 +605,7 @@ void CMinimap::Update()
 	if (!UseOpenGL)
 #endif
 	{
-		SDL_UnlockSurface(MinimapSurface);
+		//SDL_UnlockSurface(MinimapSurface);
 	}
 }
 
@@ -681,7 +680,9 @@ void CMinimap::Draw() const
 #endif
 	{
 		SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 
 	DrawEvents();

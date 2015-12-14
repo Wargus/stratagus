@@ -148,7 +148,9 @@ static void VideoDrawChar(const CGraphic &g,
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 		std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
 		SDL_SetPaletteColors(g.Surface->format->palette, &sdlColors[0], 0, MaxFontColors);
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 

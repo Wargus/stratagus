@@ -450,7 +450,9 @@ void VideoDrawOnlyFog(int x, int y)
 		drect.x = x;
 		drect.y = y;
 
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 

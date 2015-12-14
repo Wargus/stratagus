@@ -441,20 +441,6 @@ namespace gcn
                       mClickButton = 0;
                   }
               }
-              else if (b == MouseInput::WHEEL_UP)
-              {
-                  for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
-                  {
-                      (*iter)->mouseWheelUp(x, y);
-                  }
-              }
-              else
-              {
-                  for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
-                  {
-                      (*iter)->mouseWheelDown(x, y);
-                  }
-              }
               setDirty(true);
               break;
 
@@ -491,6 +477,22 @@ namespace gcn
               {
                   mClickCount = 0;
                   mClickTimeStamp = 0;
+              }
+              setDirty(true);
+              break;
+
+          case MouseInput::WHEEL_UP:
+              for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
+              {
+                  (*iter)->mouseWheelUp(x, y);
+              }
+              setDirty(true);
+              break;
+
+          case MouseInput::WHEEL_DOWN:
+              for (iter = mMouseListeners.begin(); iter != mMouseListeners.end(); ++iter)
+              {
+                  (*iter)->mouseWheelDown(x, y);
               }
               setDirty(true);
               break;

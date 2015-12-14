@@ -367,7 +367,7 @@ public:
 
 	int Width;
 	int Height;
-#if defined(USE_OPENGL) || defined(USE_GLES)
+#if 1 || defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
 #endif

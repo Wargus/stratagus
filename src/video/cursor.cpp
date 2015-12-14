@@ -286,7 +286,9 @@ void DrawCursor()
 		}
 
 		SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+		//SDL_UnlockSurface(TheScreen);
 	}
 
 	//  Last, Normal cursor.
@@ -309,7 +311,9 @@ void HideCursor()
 		!GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
+		//SDL_LockSurface(TheScreen);
 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
+		//SDL_UnlockSurface(TheScreen);
 	}
 }
 
