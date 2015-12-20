@@ -89,6 +89,7 @@ namespace gcn
          *
          * @param target the target to draw to.
          */
+        //virtual void setTarget(SDL_Renderer* renderer);
         virtual void setTarget(SDL_Surface* target);
         //virtual void setTarget(SDL_Renderer* renderer);
 

@@ -826,26 +826,26 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				{
 					static bool InMainWindow = true;
 
-					if (InMainWindow && (event.window.event & SDL_WINDOWEVENT_LEAVE)) {
+					if (InMainWindow && (event.window.event == SDL_WINDOWEVENT_LEAVE)) {
 						InputMouseExit(callbacks, SDL_GetTicks());
 					}
-					InMainWindow = !!(event.window.event & SDL_WINDOWEVENT_ENTER);
+					InMainWindow = (event.window.event == SDL_WINDOWEVENT_ENTER);
 				}
 				break;
 
 				case SDL_WINDOWEVENT_FOCUS_GAINED:
 				case SDL_WINDOWEVENT_FOCUS_LOST:
 				{
-				if (!IsNetworkGame() && Preference.PauseOnLeave /*SDL_GetAppState() & SDL_APPACTIVE*/) {
+				if (!IsNetworkGame() && Preference.PauseOnLeave /*(SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_INPUT_FOCUS)*/) {
 					static bool DoTogglePause = false;
 
-					if (IsSDLWindowVisible && (event.window.event & SDL_WINDOWEVENT_FOCUS_LOST)) {
+					if (IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)) {
 						IsSDLWindowVisible = false;
 						if (!GamePaused) {
 							DoTogglePause = true;
 							UiTogglePause();
 						}
-					} else if (!IsSDLWindowVisible && (event.window.event & SDL_WINDOWEVENT_FOCUS_GAINED)) {
+					} else if (!IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)) {
 						IsSDLWindowVisible = true;
 						if (GamePaused && DoTogglePause) {
 							DoTogglePause = false;
@@ -1072,7 +1072,7 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
-	return SDL_GetRelativeMouseMode();
+	return SDL_GetWindowGrab(TheWindow);
 }
 
 /**
@@ -1085,9 +1085,9 @@ void ToggleGrabMouse(int mode)
 	bool grabbed = SdlGetGrabMouse();
 
 	if (mode <= 0 && grabbed) {
-		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetWindowGrab(TheWindow, SDL_FALSE);
 	} else if (mode >= 0 && !grabbed) {
-		SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetWindowGrab(TheWindow, SDL_TRUE);
 	}
 }
 
