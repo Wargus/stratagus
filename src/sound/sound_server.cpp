@@ -86,8 +86,17 @@ static struct {
 } MusicChannel;
 
 static void ChannelFinished(int channel);
-static int *MixerBuffer;
-static int MixerBufferSize;
+
+static struct {
+	SDL_AudioSpec Format;
+	SDL_mutex *Lock;
+	SDL_cond *Cond;
+	SDL_Thread *Thread;
+
+	int *MixerBuffer;
+	Uint8 *Buffer;
+	bool Running;
+} Audio;
 
 
 /*----------------------------------------------------------------------------
@@ -282,24 +291,18 @@ static void ClipMixToStereo16(const int *mix, int size, short *output)
 */
 static void MixIntoBuffer(void *buffer, int samples)
 {
-	if (samples > MixerBufferSize) {
-		delete[] MixerBuffer;
-		MixerBuffer = new int[samples];
-		MixerBufferSize = samples;
-	}
-
 	// FIXME: can save the memset here, if first channel sets the values
-	memset(MixerBuffer, 0, samples * sizeof(*MixerBuffer));
+	memset(Audio.MixerBuffer, 0, samples * sizeof(*Audio.MixerBuffer));
 
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
-		MixChannelsToStereo32(MixerBuffer, samples);
+		MixChannelsToStereo32(Audio.MixerBuffer, samples);
 	}
 	if (MusicEnabled) {
 		// Add music to mixer buffer
-		MixMusicToStereo32(MixerBuffer, samples);
+		MixMusicToStereo32(Audio.MixerBuffer, samples);
 	}
-	ClipMixToStereo16(MixerBuffer, samples, (short *)buffer);
+	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
 }
 
 /**
@@ -313,8 +316,34 @@ static void MixIntoBuffer(void *buffer, int samples)
 */
 static void FillAudio(void *, Uint8 *stream, int len)
 {
-	len >>= 1;
-	MixIntoBuffer(stream, len);
+	Assert(len != Audio.Format.size);
+	SDL_memset(stream, 0, len);
+
+	SDL_LockMutex(Audio.Lock);
+	SDL_MixAudio(stream, Audio.Buffer, len, SDL_MIX_MAXVOLUME);
+
+	// Signal our FillThread, we can fill the Audio.Buffer again
+	SDL_CondSignal(Audio.Cond);
+	SDL_UnlockMutex(Audio.Lock);
+}
+
+/**
+**  Fill audio thread.
+*/
+static int FillThread(void *)
+{
+	while (Audio.Running == true) {
+		SDL_LockMutex(Audio.Lock);
+		int ret = SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100);
+		if (ret == 0) {
+			SDL_LockAudio();
+			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
+			SDL_UnlockAudio();
+		}
+		SDL_UnlockMutex(Audio.Lock);
+	}
+
+	return 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -406,12 +435,12 @@ int SetChannelVolume(int channel, int volume)
 	if (volume < 0) {
 		volume = Channels[channel].Volume;
 	} else {
-		SDL_LockAudio();
+		SDL_LockMutex(Audio.Lock);
 
 		volume = std::min(MaxVolume, volume);
 		Channels[channel].Volume = volume;
 
-		SDL_UnlockAudio();
+		SDL_UnlockMutex(Audio.Lock);
 	}
 	return volume;
 }
@@ -436,9 +465,9 @@ int SetChannelStereo(int channel, int stereo)
 	if (stereo < -128 || stereo > 127) {
 		stereo = Channels[channel].Stereo;
 	} else {
-		SDL_LockAudio();
+		SDL_LockMutex(Audio.Lock);
 		Channels[channel].Stereo = stereo;
-		SDL_UnlockAudio();
+		SDL_UnlockMutex(Audio.Lock);
 	}
 	return stereo;
 }
@@ -475,13 +504,13 @@ CSample *GetChannelSample(int channel)
 */
 void StopChannel(int channel)
 {
-	SDL_LockAudio();
+	SDL_LockMutex(Audio.Lock);
 	if (channel >= 0 && channel < MaxChannels) {
 		if (Channels[channel].Playing) {
 			ChannelFinished(channel);
 		}
 	}
-	SDL_UnlockAudio();
+	SDL_UnlockMutex(Audio.Lock);
 }
 
 /**
@@ -489,13 +518,13 @@ void StopChannel(int channel)
 */
 void StopAllChannels()
 {
-	SDL_LockAudio();
+	SDL_LockMutex(Audio.Lock);
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (Channels[i].Playing) {
 			ChannelFinished(i);
 		}
 	}
-	SDL_UnlockAudio();
+	SDL_UnlockMutex(Audio.Lock);
 }
 
 static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
@@ -558,11 +587,11 @@ int PlaySample(CSample *sample, Origin *origin)
 {
 	int channel = -1;
 
-	SDL_LockAudio();
+	SDL_LockMutex(Audio.Lock);
 	if (SoundEnabled() && EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
 		channel = FillChannel(sample, EffectsVolume, 0, origin);
 	}
-	SDL_UnlockAudio();
+	SDL_UnlockMutex(Audio.Lock);
 	return channel;
 }
 
@@ -684,10 +713,10 @@ void StopMusic()
 	if (MusicPlaying) {
 		MusicPlaying = false;
 		if (MusicChannel.Sample) {
-			SDL_LockAudio();
+			SDL_LockMutex(Audio.Lock);
 			delete MusicChannel.Sample;
 			MusicChannel.Sample = NULL;
-			SDL_UnlockAudio();
+			SDL_UnlockMutex(Audio.Lock);
 		}
 	}
 }
@@ -779,7 +808,7 @@ static int InitSdlSound(int freq, int size)
 	wanted.userdata = NULL;
 
 	//  Open the audio device, forcing the desired format
-	if (SDL_OpenAudio(&wanted, NULL) < 0) {
+	if (SDL_OpenAudio(&wanted, &Audio.Format) < 0) {
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 		return -1;
 	}
@@ -809,6 +838,18 @@ int InitSound()
 	for (int i = 0; i < MaxChannels; ++i) {
 		Channels[i].Point = i + 1;
 	}
+
+	// Create mutex and cond for FillThread
+	Audio.MixerBuffer = new int[Audio.Format.samples * Audio.Format.channels];
+	memset(Audio.MixerBuffer, 0, Audio.Format.samples * Audio.Format.channels * sizeof(int));
+	Audio.Buffer = new Uint8[Audio.Format.size];
+	memset(Audio.Buffer, 0, Audio.Format.size);
+	Audio.Lock = SDL_CreateMutex();
+	Audio.Cond = SDL_CreateCond();
+	Audio.Running = true;
+
+	// Create thread to fill sdl audio buffer
+	Audio.Thread = SDL_CreateThread(FillThread, NULL);
 	return 0;
 }
 
@@ -817,10 +858,18 @@ int InitSound()
 */
 void QuitSound()
 {
+	Audio.Running = false;
+	SDL_KillThread(Audio.Thread);
+
+	SDL_DestroyCond(Audio.Cond);
+	SDL_DestroyMutex(Audio.Lock);
+
 	SDL_CloseAudio();
 	SoundInitialized = false;
-	delete[] MixerBuffer;
-	MixerBuffer = NULL;
+	delete[] Audio.MixerBuffer;
+	Audio.MixerBuffer = NULL;
+	delete[] Audio.Buffer;
+	Audio.Buffer = NULL;
 #ifdef USE_FLUIDSYNTH
 	CleanFluidSynth();
 #endif
