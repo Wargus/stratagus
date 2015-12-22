@@ -530,9 +530,7 @@ void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
 #endif
 
-#ifdef DEBUG
 extern void FreeGraphics();
-#endif
 
 
 // ARB_texture_compression

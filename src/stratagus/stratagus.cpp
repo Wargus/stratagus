@@ -204,9 +204,7 @@ extern void beos_init(int argc, char **argv);
 #include "widgets.h"
 #include "util.h"
 
-#ifdef DEBUG
 #include "missile.h" //for FreeBurningBuildingFrames
-#endif
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>
@@ -407,7 +405,6 @@ void Exit(int err)
 	NetworkQuitGame();
 
 	ExitNetwork1();
-#ifdef DEBUG
 	CleanModules();
 	FreeBurningBuildingFrames();
 	FreeSounds();
@@ -422,7 +419,6 @@ void Exit(int err)
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
-#endif
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);

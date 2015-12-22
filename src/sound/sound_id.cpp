@@ -153,7 +153,6 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	return sound;
 }
 
-#ifdef DEBUG
 void FreeSounds()
 {
 	std::map<std::string, CSound *>::iterator i;
@@ -165,6 +164,5 @@ void FreeSounds()
 		}
 	}
 }
-#endif
 
 //@}

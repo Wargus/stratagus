@@ -1475,7 +1475,6 @@ void CGraphic::MakeShadow()
 	}
 }
 
-#ifdef DEBUG
 void FreeGraphics()
 {
 	std::map<std::string, CGraphic *>::iterator i;
@@ -1484,7 +1483,6 @@ void FreeGraphics()
 		CGraphic::Free((*i).second);
 	}
 }
-#endif
 
 CFiller::bits_map::~bits_map()
 {

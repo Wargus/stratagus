@@ -627,9 +627,7 @@ extern void InitMissiles();
 /// Clean missiles
 extern void CleanMissiles();
 
-#ifdef DEBUG
 extern void FreeBurningBuildingFrames();
-#endif
 
 //@}
 

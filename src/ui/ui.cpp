@@ -358,7 +358,6 @@ void CleanUserInterface()
 	}
 }
 
-#ifdef DEBUG
 void FreeButtonStyles()
 {
 	std::map<std::string, ButtonStyle *>::iterator i;
@@ -367,7 +366,6 @@ void FreeButtonStyles()
 	}
 	ButtonStyleHash.clear();
 }
-#endif
 
 /**
 **  Takes coordinates of a pixel in stratagus's window and computes

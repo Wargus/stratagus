@@ -536,9 +536,9 @@ extern void InitUserInterface();
 extern void SaveUserInterface(CFile &file);
 /// Clean up the ui module
 extern void CleanUserInterface();
-#ifdef DEBUG
+
 extern void FreeButtonStyles();
-#endif
+
 /// Register ccl features
 extern void UserInterfaceCclRegister();
 
