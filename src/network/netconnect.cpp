@@ -1824,15 +1824,15 @@ void NetworkGamePrepareGameSettings()
 		}
 	}
 	for (int i = 0; i < h; i++) {
+		int v = ServerSetupState.Race[num[i]];
+		if (v != 0) {
+			GameSettings.Presets[num[i]].Race = v;
+		} else {
+			GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
+		}
 		switch (ServerSetupState.CompOpt[num[i]]) {
 			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				int v = ServerSetupState.Race[num[i]];
-				if (v != 0) {
-					GameSettings.Presets[num[i]].Race = v;
-				} else {
-					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
-				}
 				break;
 			}
 			case 1:
