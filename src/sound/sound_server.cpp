@@ -316,6 +316,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 */
 static void FillAudio(void *, Uint8 *stream, int len)
 {
+	if (!Audio.Running) return;
 	Assert(len != Audio.Format.size);
 	SDL_memset(stream, 0, len);
 
@@ -343,6 +344,10 @@ static int FillThread(void *)
 		SDL_UnlockMutex(Audio.Lock);
 	}
 
+	SDL_LockMutex(Audio.Lock);
+	SDL_CloseAudio();
+	SDL_DestroyCond(Audio.Cond);
+	SDL_DestroyMutex(Audio.Lock);
 	return 0;
 }
 
@@ -858,13 +863,8 @@ int InitSound()
 */
 void QuitSound()
 {
-	Audio.Running = false;
-	SDL_KillThread(Audio.Thread);
+	Audio.Running = false;	
 
-	SDL_DestroyCond(Audio.Cond);
-	SDL_DestroyMutex(Audio.Lock);
-
-	SDL_CloseAudio();
 	SoundInitialized = false;
 	delete[] Audio.MixerBuffer;
 	Audio.MixerBuffer = NULL;
