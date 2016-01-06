@@ -20,7 +20,7 @@ before_script:
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
            cd build; cmake ..; make; \
-	     export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp\";
+             export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp\";
            cd ..;
          cd ..;
     fi"
@@ -40,6 +40,6 @@ after_success:
          git config --global user.name \"Travis CI\";
          git add $TRAVIS_OS_NAME/stratagus;
          git commit --amend -C HEAD;
-         git push -fq;
+         git push -fq origin master;
          cd ..;
     fi"
