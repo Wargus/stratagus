@@ -19,13 +19,14 @@ before_script:
   - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
-           cd build; cmake ..; make && sudo make install; \
+           cd build; cmake ..; make; \
+	     export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp\";
            cd ..;
          cd ..;
     fi"
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake $CMAKEARGS ..
 script: make
 after_success:
   - "if [ $TRAVIS_REPO_SLUG == Wargus/stratagus -a \
