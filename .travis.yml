@@ -42,7 +42,7 @@ after_success:
          git config --global user.email \"travis-ci@travis.org\";
          git config --global user.name \"Travis CI\";
          git add $TRAVIS_OS_NAME/stratagus;
-         git add $TRAVIS_OS_NAME/libs;
+         git add libs;
          git commit --amend -C HEAD;
          git push -fq origin master;
          cd ..;
