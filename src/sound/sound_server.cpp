@@ -345,7 +345,7 @@ static int FillThread(void *)
 	}
 
 	SDL_LockMutex(Audio.Lock);
-	SDL_CloseAudio();
+	// Mustn't call SDL_CloseAudio here, it'll be called again from SDL_Quit
 	SDL_DestroyCond(Audio.Cond);
 	SDL_DestroyMutex(Audio.Lock);
 	return 0;
