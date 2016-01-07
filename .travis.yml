@@ -35,10 +35,14 @@ after_success:
          git clone https://${GH_TOKEN}@github.com/Wargus/stratagus.wiki.git;
          mkdir -p stratagus.wiki/$TRAVIS_OS_NAME;
          cp $TRAVIS_BUILD_DIR/build/stratagus stratagus.wiki/$TRAVIS_OS_NAME/;
+         rm -rf macdylibbundler; git clone https://github.com/auriamg/macdylibbundler;
+         cd macdylibbundler; make; cd ..;
+         macdylibbundler/dylibbundler -cd -of -b -x stratagus.wiki/$TRAVIS_OS_NAME/stratagus -d stratagus.wiki/libs/;
          cd stratagus.wiki/;
          git config --global user.email \"travis-ci@travis.org\";
          git config --global user.name \"Travis CI\";
          git add $TRAVIS_OS_NAME/stratagus;
+         git add $TRAVIS_OS_NAME/libs;
          git commit --amend -C HEAD;
          git push -fq origin master;
          cd ..;
