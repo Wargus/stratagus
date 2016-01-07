@@ -17,6 +17,11 @@ Nightly builds are available:
   - Windows Installer: https://github.com/Wargus/stratagus/releases/tag/master-builds
   - Ubuntu/Debian Packages: https://launchpad.net/~stratagus/+archive/ubuntu/ppa
 
+For Mac OS X, Stratagus comes bundled in the app bundles for Wargus, Stargus, and War1gus:
+  - Wargus: https://github.com/Wargus/stratagus/wiki/osx/Wargus.app.tar.gz
+  - War1gus: https://github.com/Wargus/stratagus/wiki/osx/War1gus.app.tar.gz
+  - Stargus: https://github.com/Wargus/stratagus/wiki/osx/Stargus.app.tar.gz
+
 Read 'doc/index.html' for general information and license information.
 Read 'doc/install.html' for Stratagus installation instructions.
 Read 'doc/changelog.html' for the Stratagus changelog.
