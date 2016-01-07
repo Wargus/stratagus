@@ -20,7 +20,7 @@ before_script:
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
            cd build; cmake ..; make; \
-             export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp\";
+             export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp -DWITH_X11=OFF\";
            cd ..;
          cd ..;
     fi"
