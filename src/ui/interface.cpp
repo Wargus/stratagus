@@ -568,7 +568,7 @@ static bool CommandKey(int key)
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
 	if (ptr) {
-		key = '0' + ptr - UiGroupKeys.c_str();
+		key = ((int)'0') + ptr - UiGroupKeys.c_str();
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}
