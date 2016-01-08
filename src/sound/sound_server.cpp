@@ -335,11 +335,13 @@ static int FillThread(void *)
 {
 	while (Audio.Running == true) {
 		SDL_LockMutex(Audio.Lock);
-		int ret = SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100);
-		if (ret == 0) {
-			SDL_LockAudio();
+#ifdef USE_WIN32
+		// This is kind of a hackfix, without this on windows audio can get sluggish
+		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 1000) == 0) {
+#else
+		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100) == 0) {
+#endif
 			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
-			SDL_UnlockAudio();
 		}
 		SDL_UnlockMutex(Audio.Lock);
 	}
@@ -863,7 +865,9 @@ int InitSound()
 */
 void QuitSound()
 {
-	Audio.Running = false;	
+	Audio.Running = false;
+	// Join with the FillThread
+	SDL_WaitThread(Audio.Thread, NULL);
 
 	SoundInitialized = false;
 	delete[] Audio.MixerBuffer;
