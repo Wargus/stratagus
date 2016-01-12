@@ -170,6 +170,7 @@ enum {
 	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
 	SIDEATTACK_INDEX,
+	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	NBARALREADYDEFINED
 };
 
