@@ -93,6 +93,7 @@ static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
+static const char NOFRIENDLYFIRE_KEY[] = "NoFriendlyFire";
 
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
@@ -150,7 +151,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, NOFRIENDLYFIRE_KEY
 							  };
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
