@@ -812,6 +812,12 @@ public:
 		bad = (int*)calloc(sizeof(int), size * size);
 	};
 
+	~BestRangeTargetFinder()
+	{
+		free(good);
+		free(bad);
+	};
+
 	class FillBadGood
 	{
 	public:
