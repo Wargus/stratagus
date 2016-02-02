@@ -103,14 +103,6 @@
  * Path to stratagus executable binary
  **/
 
-/**
- * \def TITLE_PNG
- * OPTIONAL: Path to title screen (for testing if data was extracted)
- **/
-#ifndef TITLE_PNG
-#define TITLE_PNG "%s\\graphics\\ui\\title.png"
-#endif
-
 /* Fake definitions for Doxygen */
 #ifdef DOXYGEN
 #define GAME_NAME
@@ -127,6 +119,18 @@
 
 #if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
 #define WIN32
+#endif
+
+/**
+ * \def TITLE_PNG
+ * OPTIONAL: Path to title screen (for testing if data was extracted)
+ **/
+#ifndef TITLE_PNG
+#ifdef WIN32
+#define TITLE_PNG "%s\\graphics\\ui\\title.png"
+#else
+#define TITLE_PNG "%s/graphics/ui/title.png"
+#endif
 #endif
 
 #ifndef WIN32
