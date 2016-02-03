@@ -1200,6 +1200,7 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 **  Make an OpenGL texture or textures out of a graphic object.
 **
 **  @param g  The graphic object.
+**  @note The force-flag is used in color cycling, should be optimized to instead cache the cycled textures
 */
 void MakeTexture(CGraphic *g, bool force)
 {
