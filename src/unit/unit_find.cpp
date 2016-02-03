@@ -808,20 +808,20 @@ public:
 		best_unit(0), best_cost(INT_MIN), size(0)
 	{
 		size = (a.Type->Missile.Missile->Range + range) * 2;
-		good = (int*)calloc(sizeof(int), size * size);
-		bad = (int*)calloc(sizeof(int), size * size);
+		good = new std::vector<int>(size * size, 0);
+		bad = new std::vector<int>(size * size, 0);
 	};
 
 	~BestRangeTargetFinder()
 	{
-		free(good);
-		free(bad);
+		delete good;
+		delete bad;
 	};
 
 	class FillBadGood
 	{
 	public:
-		FillBadGood(const CUnit &a, int r, int *g, int *b, int s):
+		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s):
 			attacker(&a), range(r), size(s),
 			enemy_count(0), good(g), bad(b)
 		{
@@ -959,9 +959,9 @@ public:
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (cost < 0) {
-						good[pos] -= cost;
+						good->at(pos) -= cost;
 					} else {
-						bad[pos] += cost;
+						bad->at(pos) += cost;
 					}
 				}
 			}
@@ -972,8 +972,8 @@ public:
 		const CUnit *attacker;
 		const int range;
 		int enemy_count;
-		int *good;
-		int *bad;
+		std::vector<int> *good;
+		std::vector<int> *bad;
 		int size;
 	};
 
@@ -1033,8 +1033,8 @@ private:
 			for (int xx = -1; xx <= 1; ++xx) {
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
-				sbad += bad[pos] / localFactor;
-				sgood += good[pos] / localFactor;
+				sbad += bad->at(pos) / localFactor;
+				sgood += good->at(pos) / localFactor;
 			}
 		}
 
@@ -1056,8 +1056,8 @@ private:
 	const int range;
 	CUnit *best_unit;
 	int best_cost;
-	int *good;
-	int *bad;
+	std::vector<int> *good;
+	std::vector<int> *bad;
 	int size;
 };
 
