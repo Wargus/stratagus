@@ -488,6 +488,9 @@ void RestoreColorCyclingSurface()
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		MakeTexture(Map.TileGraphic, true);
+#endif
 	}
 	colorCycling.cycleCount = 0;
 }
