@@ -471,6 +471,9 @@ void ColorCycle()
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
 		ColorCycleSurface(*Map.TileGraphic->Surface);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		MakeTexture(Map.TileGraphic, true);
+#endif
 	}
 }
 

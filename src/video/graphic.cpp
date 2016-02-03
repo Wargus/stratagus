@@ -1201,10 +1201,14 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 **
 **  @param g  The graphic object.
 */
-void MakeTexture(CGraphic *g)
+void MakeTexture(CGraphic *g, bool force)
 {
 	if (g->Textures) {
-		return;
+		if (force) {
+			glDeleteTextures(g->NumTextures, g->Textures);
+		} else {
+			return;
+		}
 	}
 
 	MakeTextures(g, 0, NULL);

@@ -439,7 +439,7 @@ extern int LoadGraphicPNG(CGraphic *g);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic);
+extern void MakeTexture(CGraphic *graphic, bool force = false);
 /// Make an OpenGL texture of the player color pixels only.
 extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
 
