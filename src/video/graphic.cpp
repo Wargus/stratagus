@@ -794,6 +794,7 @@ void CGraphic::Free(CGraphic *g)
 			if (g->Textures) {
 				glDeleteTextures(g->NumTextures, g->Textures);
 				delete[] g->Textures;
+				g->DeleteColorCyclingTextures();
 			}
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
@@ -862,6 +863,9 @@ void ReloadGraphics()
 			delete[](*i)->Textures;
 			(*i)->Textures = NULL;
 			MakeTexture(*i);
+			if ((*i)->DeleteColorCyclingTextures()) {
+				MakeColorCyclingTextures((*i), (*i)->NumColorCycles);
+			}
 		}
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
@@ -1200,19 +1204,58 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors)
 **  Make an OpenGL texture or textures out of a graphic object.
 **
 **  @param g  The graphic object.
-**  @note The force-flag is used in color cycling, should be optimized to instead cache the cycled textures
 */
-void MakeTexture(CGraphic *g, bool force)
+void MakeTexture(CGraphic *g)
 {
 	if (g->Textures) {
-		if (force) {
-			glDeleteTextures(g->NumTextures, g->Textures);
-		} else {
-			return;
-		}
+		return;
 	}
 
 	MakeTextures(g, 0, NULL);
+}
+
+void LazilyMakeColorCyclingTextures(CGraphic *g, std::vector<ColorIndexRange> ranges)
+{
+	if (g->ColorCyclingTextures) {
+		return;
+	}
+	// Note: below we just use the longest range for cycling.
+	// Absolutely correct would be the lowest common multiple,
+	// but it's harder to calculate and we run this lazily and don't
+	// want the load.
+	unsigned int count = 0;
+	for (std::vector<ColorIndexRange>::const_iterator it = ranges.begin(); it != ranges.end(); ++it) {
+		const ColorIndexRange &range = *it;
+		count = std::max(range.end - range.begin, count);
+	}
+	count++; // make room for the default texture at the end of the cycle
+	MakeColorCyclingTextures(g, count);
+}
+
+void MakeColorCyclingTextures(CGraphic *g, int count)
+{
+	if (g->ColorCyclingTextures) {
+		return;
+	}
+	MakeTexture(g); // ensure that we are initialized
+
+	int tw = (g->GraphicWidth - 1) / GLMaxTextureSize + 1;
+	const int th = (g->GraphicHeight - 1) / GLMaxTextureSize + 1;
+
+	GLuint **textures;
+	g->NumColorCycles = count;
+	textures = g->ColorCyclingTextures = new GLuint*[count];
+
+	for (int c = 0; c < count; c++) {
+		for (int j = 0; j < th; ++j) {
+			for (int i = 0; i < tw; ++i) {
+				textures[c] = new GLuint[g->NumTextures];
+				glGenTextures(g->NumTextures, textures[c]);
+				MakeTextures2(g, textures[c][j * tw + i], NULL, GLMaxTextureSize * i, GLMaxTextureSize * j);
+				ColorCycleSurface(*g->Surface);
+			}
+		}
+	}
 }
 
 /**
@@ -1361,6 +1404,9 @@ void CGraphic::Resize(int w, int h)
 		delete[] Textures;
 		Textures = NULL;
 		MakeTexture(this);
+		if (DeleteColorCyclingTextures()) {
+			MakeColorCyclingTextures(this, NumColorCycles);
+		}
 	}
 #endif
 	GenFramesMap();
@@ -1402,6 +1448,7 @@ void CGraphic::SetOriginalSize()
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
 		Textures = NULL;
+		DeleteColorCyclingTextures();
 	}
 #endif
 
@@ -1468,6 +1515,7 @@ void CGraphic::MakeShadow()
 			glDeleteTextures(NumTextures, Textures);
 			delete[] Textures;
 			Textures = NULL;
+			DeleteColorCyclingTextures();
 		}
 		MakeTexture(this);
 	} else
@@ -1598,6 +1646,17 @@ void CFiller::Load()
 		map.Init(G);
 		G->UseDisplayFormat();
 	}
+}
+
+bool CGraphic::DeleteColorCyclingTextures() {
+	if (!ColorCyclingTextures) return false;
+	for (int i = 0; i < NumColorCycles; i++) {
+		glDeleteTextures(NumTextures, ColorCyclingTextures[i]);
+		delete[] ColorCyclingTextures[i];
+	}
+	delete[] ColorCyclingTextures;
+	ColorCyclingTextures = NULL;
+	return true;
 }
 
 //@}
