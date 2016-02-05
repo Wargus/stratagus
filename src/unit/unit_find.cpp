@@ -805,9 +805,8 @@ public:
 	**
 	*/
 	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-		best_unit(0), best_cost(INT_MIN), size(0)
+		best_unit(0), best_cost(INT_MIN), size((a.Type->Missile.Missile->Range + r) * 2)
 	{
-		size = (a.Type->Missile.Missile->Range + range) * 2;
 		good = new std::vector<int>(size * size, 0);
 		bad = new std::vector<int>(size * size, 0);
 	};
@@ -958,6 +957,13 @@ public:
 			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
+					if (pos >= good->size()) {
+						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
+						       "size: %d, pos: %d, " \
+						       "x: %d, xx: %d, y: %d, yy: %d",
+						       size, pos, x, xx, y, yy);
+						break;
+					}
 					if (cost < 0) {
 						good->at(pos) -= cost;
 					} else {
@@ -974,7 +980,7 @@ public:
 		int enemy_count;
 		std::vector<int> *good;
 		std::vector<int> *bad;
-		int size;
+		const int size;
 	};
 
 	CUnit *Find(std::vector<CUnit *> &table)
@@ -1033,6 +1039,13 @@ private:
 			for (int xx = -1; xx <= 1; ++xx) {
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
+				if (pos >= good->size()) {
+					printf("BUG: RangeTargetFinder.Compute out of range. " \
+					       "size: %d, pos: %d, "	\
+					       "x: %d, xx: %d, y: %d, yy: %d",
+					       size, pos, x, xx, y, yy);
+					break;
+				}
 				sbad += bad->at(pos) / localFactor;
 				sgood += good->at(pos) / localFactor;
 			}
@@ -1058,7 +1071,7 @@ private:
 	int best_cost;
 	std::vector<int> *good;
 	std::vector<int> *bad;
-	int size;
+	const int size;
 };
 
 struct CompareUnitDistance {

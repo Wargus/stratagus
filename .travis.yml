@@ -31,6 +31,7 @@ script: make
 after_success:
   - "if [ $TRAVIS_REPO_SLUG == Wargus/stratagus -a \
           $TRAVIS_BRANCH == master -a \
+          $TRAVIS_OS_NAME == osx -a \
           $TRAVIS_PULL_REQUEST == 'false' ]; then \
          git clone https://${GH_TOKEN}@github.com/Wargus/stratagus.wiki.git;
          mkdir -p stratagus.wiki/$TRAVIS_OS_NAME;
