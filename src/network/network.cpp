@@ -916,11 +916,14 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 
 	if (syncSeed != NetworkSyncSeeds[gameNetCycle & 0xFF]
 		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
-		SetMessage("%s", _("Network out of sync"));
-		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
-				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
-				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
-		NetworkInSync = false;
+		if (NetworkInSync) {
+			NetworkInSync = false;
+		} else {
+			SetMessage("%s", _("Network out of sync"));
+			DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
+					   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
+					   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
+		}
 	}
 }
 
