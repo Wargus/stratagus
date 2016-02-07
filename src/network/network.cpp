@@ -920,6 +920,7 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
 				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
+		NetworkInSync = false;
 	}
 }
 
