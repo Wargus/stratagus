@@ -653,6 +653,7 @@ unsigned CTileset::getWallDirection(int tileIndex, bool human) const
 			return i;
 		}
 	}
+	return 0;
 }
 unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
 {

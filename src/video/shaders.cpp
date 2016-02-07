@@ -448,13 +448,15 @@ extern bool LoadShaderExtensions() {
 	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glFramebufferRenderbuffer");
 	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
-#endif
 	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
 		LoadShaders();
 		return true;
 	} else {
 		return false;
 	}
+#else
+	return false; // FIXME: Does not currently work on OSX
+#endif
 }
 
 extern void SetupFramebuffer() {

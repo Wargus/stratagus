@@ -1419,14 +1419,14 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 	glVertex2i(x, y);
 	glVertex2i(x + w, y);
 
-	glVertex2i(x + w - 1, y + 1);
-	glVertex2i(x + w - 1, y + h);
+	glVertex2i(x + w, y);
+	glVertex2i(x + w, y + h);
 
-	glVertex2i(x + w - 1, y + h - 1);
-	glVertex2i(x, y + h - 1);
+	glVertex2i(x + w, y + h);
+	glVertex2i(x, y + h);
 
-	glVertex2i(x, y + h - 1);
-	glVertex2i(x, y + 1);
+	glVertex2i(x, y + h);
+	glVertex2i(x, y);
 	glEnd();
 #endif
 	glEnable(GL_TEXTURE_2D);
@@ -1519,7 +1519,7 @@ void DrawRectangleClip(Uint32 color, int x, int y,
 		++y;
 	}
 	if (bottom) {
-		DrawHLine(color, x, y + h - 1, w);
+		DrawHLine(color, x, y + h, w);
 		--h;
 	}
 	if (left) {
@@ -1530,7 +1530,7 @@ void DrawRectangleClip(Uint32 color, int x, int y,
 		++x;
 	}
 	if (right) {
-		DrawVLine(color, x + w - 1, y, h);
+		DrawVLine(color, x + w, y, h);
 	}
 }
 

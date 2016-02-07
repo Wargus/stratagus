@@ -268,7 +268,7 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 		}
 		// Town hall may not be near but we may be using it, check
 		// for 2 buildings near it and assume it's been used
-		if (unit.Type->Building && !unit.Type->GivesResource == resource) {
+		if (unit.Type->Building && !(unit.Type->GivesResource == resource)) {
 			++buildings;
 			if (buildings == 2) {
 				return false;

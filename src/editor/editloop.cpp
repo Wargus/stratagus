@@ -1301,7 +1301,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 	const char *ptr = strchr(UiGroupKeys.c_str(), key);
 
 	if (ptr) {
-		key = '0' + ptr - UiGroupKeys.c_str();
+		key = ((int)'0') + ptr - UiGroupKeys.c_str();
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}
