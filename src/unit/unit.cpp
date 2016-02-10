@@ -606,7 +606,7 @@ void CUnit::Init(const CUnitType &type)
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
 	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.Building) {
-		Direction = (MyRand() >> 8) & 0xFF; // random heading
+		Direction = (SyncRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
 
@@ -765,7 +765,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.Building && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (MyRand() & 1) != 0) {
+		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
 	return unit;
