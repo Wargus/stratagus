@@ -64,7 +64,7 @@ struct Open {
 };
 
 //for 32 bit signed int
-inline int MyAbs(int x) { return (x ^ (x >> 31)) - (x >> 31); }
+inline int32_t MyAbs(int32_t x) { return (x ^ (x >> 31)) - (x >> 31); }
 
 /// heuristic cost function for a*
 static inline int AStarCosts(const Vec2i &pos, const Vec2i &goalPos)
@@ -463,8 +463,7 @@ static void AStarReplaceNode(int pos)
 	// Remove the outdated node
 	node = OpenSet[pos];
 	OpenSetSize--;
-	//memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
-	memcpy(&OpenSet[pos], &OpenSet[pos + 1], sizeof(Open) * (OpenSetSize - pos));
+	memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.pos, node.O, node.Costs);

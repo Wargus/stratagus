@@ -878,6 +878,14 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	InitPlayers();
 
+	if (IsNetworkGame()) {
+		// if is a network game, it is necessary to reinitialize the syncrand
+		// variables before beginning to load the map, due to random map
+		// generation
+		SyncHash = 0;
+		InitSyncRand();
+	}
+
 	if (Map.Info.Filename.empty() && !filename.empty()) {
 		const std::string path = LibraryFileName(filename.c_str());
 
