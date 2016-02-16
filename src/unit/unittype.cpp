@@ -661,7 +661,12 @@ void UpdateUnitStats(CUnitType &type, int reset)
 								MapFieldWaterAllowed |
 								MapFieldNoBuilding |
 								MapFieldUnpassable;
-			type.FieldFlags = MapFieldNoBuilding;
+			if (type.BoolFlag[DECORATION_INDEX].value && type.MapDefaultStat.Variables[HP_INDEX].Max == 0) {
+				// special case, a decoration with no HP can always be built over
+				type.FieldFlags = 0;
+			} else {
+				type.FieldFlags = MapFieldNoBuilding;
+			}
 		} else {
 			type.MovementMask = 0;
 			type.FieldFlags = 0;
