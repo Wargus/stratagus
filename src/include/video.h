@@ -74,7 +74,8 @@ protected:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
+		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0),
+		ColorCyclingTextures(NULL), NumColorCycles(0)
 #endif
 	{
 		frameFlip_map = NULL;
@@ -115,6 +116,9 @@ public:
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	bool DeleteColorCyclingTextures();
+#endif
 
 	void Load(bool grayscale = false);
 	void Flip();
@@ -151,6 +155,8 @@ public:
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
 	int NumTextures;           /// Number of textures
+	GLuint **ColorCyclingTextures; /// Texture names
+	int NumColorCycles; /// Number of color cycled texture groups
 #endif
 
 	friend class CFont;

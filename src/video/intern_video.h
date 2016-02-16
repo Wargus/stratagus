@@ -54,11 +54,29 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL.h"
+#include <vector>
 
 /*----------------------------------------------------------------------------
 -- Declarations
 ----------------------------------------------------------------------------*/
 
+class ColorIndexRange
+{
+public:
+	ColorIndexRange(unsigned int begin, unsigned int end) :
+		begin(begin), end(end)
+	{}
+public:
+	unsigned int begin;
+	unsigned int end;
+};
+
+// Do one cycle
+extern void ColorCycleSurface(SDL_Surface &surface);
+/// Make OpenGL textures for color cycling
+extern void LazilyMakeColorCyclingTextures(CGraphic *g, std::vector<ColorIndexRange> ranges);
+extern void MakeColorCyclingTextures(CGraphic *g, int count);
 
 /*----------------------------------------------------------------------------
 -- Variables
