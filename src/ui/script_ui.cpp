@@ -238,6 +238,17 @@ static int CclSetUseOpenGL(lua_State *l)
 	return 0;
 }
 
+static int CclGetUseOpenGL(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	lua_pushboolean(l, UseOpenGL);
+#else
+	lua_pushboolean(l, 0);
+#endif
+	return 0;
+}
+
 static int CclSetZoomNoResize(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
@@ -1218,6 +1229,7 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetMaxOpenGLTexture", CclSetMaxOpenGLTexture);
 	lua_register(Lua, "SetUseTextureCompression", CclSetUseTextureCompression);
 	lua_register(Lua, "SetUseOpenGL", CclSetUseOpenGL);
+	lua_register(Lua, "GetUseOpenGL", CclGetUseOpenGL);
 	lua_register(Lua, "SetZoomNoResize", CclSetZoomNoResize);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
