@@ -394,6 +394,10 @@ void AddColorCyclingRange(unsigned int begin, unsigned int end)
 
 void SetColorCycleAll(bool value)
 {
+	if (UseOpenGL) {
+		// FIXME: In OpenGL-mode, we can only cycle the tileset graphic
+		return;
+	}
 	CColorCycling::GetInstance().ColorCycleAll = value;
 }
 
