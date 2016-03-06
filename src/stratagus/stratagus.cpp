@@ -502,17 +502,10 @@ static void CleanupOutput()
 
 static void RedirectOutput()
 {
-	char path[MAX_PATH];
-	int pathlen;
+	std::string path = Parameters::Instance.GetUserDirectory();
 
-	pathlen = GetModuleFileName(NULL, path, sizeof(path));
-	while (pathlen > 0 && path[pathlen] != '\\') {
-		--pathlen;
-	}
-	path[pathlen] = '\0';
-
-	stdoutFile = std::string(path) + "\\stdout.txt";
-	stderrFile = std::string(path) + "\\stderr.txt";
+	stdoutFile = path + "\\stdout.txt";
+	stderrFile = path + "\\stderr.txt";
 
 	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
 		printf("freopen stdout failed");
@@ -702,9 +695,6 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 */
 int stratagusMain(int argc, char **argv)
 {
-#ifdef REDIRECT_OUTPUT
-	RedirectOutput();
-#endif
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
@@ -736,6 +726,10 @@ int stratagusMain(int argc, char **argv)
 	Parameters &parameters = Parameters::Instance;
 	parameters.SetDefaultValues();
 	parameters.SetLocalPlayerNameFromEnv();
+
+#ifdef REDIRECT_OUTPUT
+	RedirectOutput();
+#endif
 
 	if (argc > 0) {
 		parameters.applicationName = argv[0];
