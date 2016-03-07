@@ -268,26 +268,32 @@ int main(int argc, char * argv[]) {
 	if (data_path_length != 0 && data_path[data_path_length - 1] == '\\') {
 		data_path[data_path_length - 1] = '\0';
 	}
+	sprintf(scripts_path, "\"%s\"", data_path);
 
 	char stratagus_path[BUFF_SIZE];
-	DWORD stratagus_path_size = sizeof(stratagus_path);
-	memset(stratagus_path, 0, stratagus_path_size);
-	HKEY key;
 
-	if ( RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS ) {
-		if ( RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE) stratagus_path, &stratagus_path_size) == ERROR_SUCCESS ) {
-			if ( stratagus_path_size == 0 || strlen(stratagus_path) == 0 ) {
-				error(TITLE, STRATAGUS_NOT_FOUND);
+	// Try to use stratagus.exe from data (install) directory first
+	sprintf(stratagus_bin, "%s\\stratagus.exe", data_path);
+	if (stat(stratagus_bin, &st) != 0) {
+		// If no local stratagus.exe is present, look for a globally installed version
+		DWORD stratagus_path_size = sizeof(stratagus_path);
+		memset(stratagus_path, 0, stratagus_path_size);
+		HKEY key;
+
+		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
+			if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
+				if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
+					error(TITLE, STRATAGUS_NOT_FOUND);
+				}
 			}
+			RegCloseKey(key);
 		}
-		RegCloseKey(key);
-	}
 
-	if ( chdir(stratagus_path) != 0 ) {
-		error(TITLE, STRATAGUS_NOT_FOUND);
+		if (chdir(stratagus_path) != 0) {
+			error(TITLE, STRATAGUS_NOT_FOUND);
+		}
+		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
-	sprintf(scripts_path, "\"%s\"", data_path);
-	sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 #else
 	strcpy(data_path, DATA_PATH);
 	strcpy(scripts_path, SCRIPTS_PATH);
