@@ -223,6 +223,7 @@ Section "${NAME}"
 	SetOutPath $INSTDIR
 	File "${EXE}"
 	File "${SDL}"
+	File "${LUADLL}"
 	!ifdef FLUID
 		File "${FLUIDDLL}"
 		File "${GLIBDLL}"
