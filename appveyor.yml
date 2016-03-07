@@ -11,15 +11,18 @@ before_build:
   - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
   - cmake -G "Visual Studio 14 2015" -T v140_xp -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON ..
   - cd ..
+after_build:
+  - 7z a compiled-binaries.zip build\stratagus.exe dependencies\bin\*.dll
 artifacts:
   - path: build\Stratagus-*.exe
+  - path: compiled-binaries.zip
 deploy:
   - provider: GitHub
     release: master-builds
     description: 'Automatic builds from the master branch'
     auth_token:
       secure: NMy2KE3EpZTjverxNzEAoBnlV+7VLGvwy3e1WEIrliFy3R1oxuT+AgGUDcRwv9y/
-    artifact: /.*exe/
+    artifact: /.*(exe|zip)/
     draft: false
     prerelease: true
     on:
@@ -29,7 +32,7 @@ deploy:
     description: 'Release'
     auth_token:
       secure: NMy2KE3EpZTjverxNzEAoBnlV+7VLGvwy3e1WEIrliFy3R1oxuT+AgGUDcRwv9y/
-    artifact: /.*exe/
+    artifact: /.*(exe|zip)/
     draft: false
     prerelease: false
     on:
