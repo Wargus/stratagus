@@ -993,6 +993,7 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 			return 1;
 		case SDLK_SYSREQ:
 		case SDLK_PRINT:
+		case SDLK_F11:
 			Screenshot();
 			if (GameRunning) {
 				SetMessage("%s", _("Screenshot made."));
