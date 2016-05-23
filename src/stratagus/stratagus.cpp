@@ -504,6 +504,8 @@ static void RedirectOutput()
 {
 	std::string path = Parameters::Instance.GetUserDirectory();
 
+	makedir(path.c_str(), 0777);
+
 	stdoutFile = path + "\\stdout.txt";
 	stderrFile = path + "\\stderr.txt";
 
