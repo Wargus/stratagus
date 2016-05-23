@@ -353,7 +353,7 @@ void SaveScreenshotPNG(const char *name)
 			// switch back to framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
 		}
-		for (int i = 0; i < Video.Height; ++i) {
+		for (int i = 0; i < Video.ViewportHeight; ++i) {
 			png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
 		}
 		delete []pixels;
