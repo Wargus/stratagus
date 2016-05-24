@@ -9,16 +9,14 @@ Update changelog in file:
 Increase version and update changelog for debian:
  dch -i
 
-Commit changes to git and create tag:
- git commit -a -m "Release version <version>"
- git tag <version>
- git push --tags origin master
-
 Tag the new release in https://github.com/Wargus/win32-stratagus-dependencies and wait for it to run through on the Appveyor CI.
   This will automatically cause a release with the tag name to be created, and the windows dependencies will be uploaded there
 
 Tag the new release here and wait for it to run through the CIs. Appveyor and Travis will upload new versions for Windows and OSX,
-  and Launchpad will automatically build new debian packages
+and Launchpad will automatically build new debian packages:
+ git commit -a -m "Release version <version>"
+ git tag <version>
+ git push --tags origin master
 
 Tag the new release in Wargus/War1gus/Stargus/... these repositories should be set up to also use the appropriate release source
   from the Stratagus releases
