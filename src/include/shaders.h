@@ -10,7 +10,7 @@ extern PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
 #endif
 extern GLuint fullscreenFramebuffer;
 extern unsigned ShaderIndex;
-extern bool LoadShaders(char* shadernameOut);
+extern bool LoadShaders(int direction, char* shadernameOut);
 extern bool LoadShaderExtensions();
 extern void SetupFramebuffer();
 extern void RenderFramebufferToScreen();

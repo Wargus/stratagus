@@ -81,9 +81,18 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 	}
 }
 
-unsigned ShaderIndex = 0;
+unsigned ShaderIndex = -1;
 
-extern bool LoadShaders(char* shadernameOut) {
+/* This does not have to be very efficient, it is only called when the shader
+   is changed by the user.
+ */
+extern bool LoadShaders(int direction, char* shadernameOut) {
+	ShaderIndex += direction;
+	if (direction == 0 && ShaderIndex == -1) {
+		// TODO: load from preferences
+		ShaderIndex = 0;
+	}
+
 	GLuint vs, fs;
 	GLint params;
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -92,7 +101,13 @@ extern bool LoadShaders(char* shadernameOut) {
 	}
 
 	std::vector<FileList> flp;
-	int n = ReadDataDirectory(".", flp);
+	std::string shaderPath(StratagusLibPath);
+#ifdef _WIN32
+	shaderPath.append("\\shaders\\");
+#else
+	shaderPath.append("/shaders/");
+#endif
+	int n = ReadDataDirectory(shaderPath.c_str(), flp);
 	int numShaderFiles = 0;
 	int shaderFileToIdx[1024];
 	for (int i = 0; i < n; ++i) {
@@ -103,18 +118,18 @@ extern bool LoadShaders(char* shadernameOut) {
 		}
 	}
 	if (numShaderFiles <= 0) return false;
-	if (numShaderFiles <= ShaderIndex) {
+	if (numShaderFiles <= ShaderIndex || ShaderIndex < 0) {
 		ShaderIndex = ShaderIndex % numShaderFiles;
 	}
 
 	if (shadernameOut) {
 		strncpy(shadernameOut, flp[shaderFileToIdx[ShaderIndex]].name.c_str(), 1023);
 	}
-	std::ifstream myfile(flp[shaderFileToIdx[ShaderIndex]].name);
+	shaderPath.append(flp[shaderFileToIdx[ShaderIndex]].name);
+	std::ifstream myfile(shaderPath);
 	std::string contents((std::istreambuf_iterator<char>(myfile)),
 						  std::istreambuf_iterator<char>());
 	myfile.close();
-	ShaderIndex++;
 
 	const char *fragmentSrc[2] = { "#define FRAGMENT\n", contents.c_str() };
 	const char *vertexSrc[2] = { "#define VERTEX\n", contents.c_str() };
@@ -200,7 +215,7 @@ extern bool LoadShaderExtensions() {
 	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
 	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
-		return LoadShaders(NULL);
+		return LoadShaders(0, NULL);
 	} else {
 		return false;
 	}
