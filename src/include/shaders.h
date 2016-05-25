@@ -2,6 +2,7 @@
 #define __SHADERS_H__
 #ifdef USE_OPENGL
 #define MAX_SHADERS 5
+// #define SHADERDEBUG // Uncomment for loading shaders from file
 #ifndef __APPLE__
 extern PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
 #else

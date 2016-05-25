@@ -359,6 +359,11 @@ GLuint fullscreenShader;
 GLuint fullscreenFramebuffer = 0;
 GLuint fullscreenTexture;
 
+#ifdef SHADERDEBUG
+#include <iostream>
+#include <fstream>
+#endif
+
 void printShaderInfoLog(GLuint obj, const char* prefix)
 {
 	int infologLength = 0;
@@ -401,29 +406,45 @@ extern bool LoadShaders() {
 	if (fs == 0) {
 	    return false;
 	}
+#ifdef SHADERDEBUG
+	std::ifstream myfile("fragment.txt");
+	std::string contents((std::istreambuf_iterator<char>(myfile)),
+						  std::istreambuf_iterator<char>());
+	const char* f = contents.c_str();
+	glShaderSource(fs, 1, &f, NULL);
+	myfile.close();
+#else
 	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), NULL);
+#endif
 	glCompileShader(fs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {
+#ifdef SHADERDEBUG
+		printShaderInfoLog(fs, "Fragment Shader");
+#endif
 		glDeleteShader(fs);
 		return false;
 	}
-	//printShaderInfoLog(fs, "Fragment Shader");
 	ShaderIndex = (ShaderIndex + 1) % MAX_SHADERS;
 	vs = glCreateShader(GL_VERTEX_SHADER);
 	if (fs == 0) {
-	    glDeleteShader(fs);
-	    return false;
+#ifdef SHADERDEBUG
+		printShaderInfoLog(fs, "Fragment Shader");
+#endif
+		glDeleteShader(fs);
+		return false;
 	}
 	glShaderSource(vs, 1, (const char**)&vertex_shader, NULL);
 	glCompileShader(vs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {
+#ifdef SHADERDEBUG
+		printShaderInfoLog(vs, "Vertex Shader");
+#endif
 		glDeleteShader(fs);
 		glDeleteShader(vs);
 		return false;
 	}
-	//printShaderInfoLog(vs, "Vertex Shader");
 	if (glIsProgram(fullscreenShader)) {
 		glDeleteProgram(fullscreenShader);
 	}
@@ -438,6 +459,9 @@ extern bool LoadShaders() {
 	glLinkProgram(fullscreenShader);
 	glGetProgramiv(fullscreenShader, GL_LINK_STATUS, &params);
 	if (params == GL_FALSE) {
+#ifdef SHADERDEBUG
+		printProgramInfoLog(fullscreenShader, "Shader Program");
+#endif
 		glDeleteShader(fs);
 		glDeleteShader(vs);
 		glDeleteProgram(fullscreenShader);
@@ -445,7 +469,6 @@ extern bool LoadShaders() {
 	}
 	glDeleteShader(fs);
 	glDeleteShader(vs);
-	//printProgramInfoLog(fullscreenShader, "Shader Program");
 	return true;
 }
 
