@@ -1,0 +1,1 @@
+for i in $(grep -l -PR "shaders = .?1" common-shaders/ | xargs grep shader0 | ruby -e "STDIN.read.split(\"\n\").each {|i| print i.split(':')[0].split('/')[0...-1].join('/'); print '/' + i.split('=')[-1].strip; puts }"); do ./cg2glsl.py "$i" "$i".glsl; done
