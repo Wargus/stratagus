@@ -1,323 +1,10 @@
 #include "stratagus.h"
 #include "video.h"
-#ifdef USE_OPENGL
-const char* vertex_shader = "#version 130\n\
-\n\
-uniform sampler2D u_texture;\n\
-\n\
-void main()\n\
-{\n\
-    gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-	gl_Position = ftransform();\n\
-}";
+#include "iolib.h"
+#include <iostream>
+#include <fstream>
 
-const char* fragment_shaders[MAX_SHADERS] = {
-	// Nearest-neighbour
-	"#version 130\n\
-	\n\
-	uniform sampler2D u_texture;\n\
-	uniform float u_width;\n\
-	uniform float u_height;\n\
-	uniform float u_widthrel;\n\
-	uniform float u_heightrel;\n\
-	void main()\n\
-	{\n\
-		vec4 myColor = texture2D(u_texture, gl_TexCoord[0].xy * vec2(u_widthrel, -u_heightrel));\n\
-		gl_FragColor = myColor;\n\
-	}",
-	// Scale2x
-	"#version 110\n\
-	\n\
-	uniform sampler2D u_texture;\n\
-	uniform float u_width;\n\
-	uniform float u_height;\n\
-	uniform float u_widthrel;\n\
-	uniform float u_heightrel;\n\
-	\n\
-	void main() {\n\
-		// o = offset, the width of a pixel\n\
-        vec2 texCoord = gl_TexCoord[0].xy * vec2(u_widthrel, -u_heightrel);\n\
-        vec2 textureDimensions = vec2(u_width, u_height);\n\
-		vec2 o = 1.0 / textureDimensions;\n\
-		// texel arrangement\n\
-		// A B C\n\
-		// D E F\n\
-		// G H I\n\
-		vec4 A = texture2D(u_texture, texCoord + vec2( -o.x,  o.y));\n\
-		vec4 B = texture2D(u_texture, texCoord + vec2(    0,  o.y));\n\
-		vec4 C = texture2D(u_texture, texCoord + vec2(  o.x,  o.y));\n\
-		vec4 D = texture2D(u_texture, texCoord + vec2( -o.x,    0));\n\
-		vec4 E = texture2D(u_texture, texCoord + vec2(    0,    0));\n\
-		vec4 F = texture2D(u_texture, texCoord + vec2(  o.x,    0));\n\
-		vec4 G = texture2D(u_texture, texCoord + vec2( -o.x, -o.y));\n\
-		vec4 H = texture2D(u_texture, texCoord + vec2(    0, -o.y));\n\
-		vec4 I = texture2D(u_texture, texCoord + vec2(  o.x, -o.y));\n\
-		vec2 p = texCoord * textureDimensions;\n\
-		// p = the position within a pixel [0...1]\n\
-		p = p - floor(p);\n\
-		if (p.x > .5) {\n\
-			if (p.y > .5) {\n\
-				// Top Right\n\
-				gl_FragColor = B == F && B != D && F != H ? F : E;\n\
-			} else {\n\
-				// Bottom Right\n\
-				gl_FragColor = H == F && D != H && B != F ? F : E;\n\
-			}\n\
-		} else {\n\
-			if (p.y > .5) {\n\
-				// Top Left\n\
-				gl_FragColor = D == B && B != F && D != H ? D : E;\n\
-			} else {\n\
-				// Bottom Left\n\
-				gl_FragColor = D == H && D != B && H != F ? D : E;\n\
-			}\n\
-		}\n\
-	}",
-	// HQX
-	"#version 130\n\
-	\n\
-	uniform sampler2D u_texture;\n\
-	uniform float u_width;\n\
-	uniform float u_height;\n\
-	uniform float u_widthrel;\n\
-	uniform float u_heightrel;\n\
-	\n\
-	const float mx = 0.325;      // start smoothing wt.\n\
-	const float k = -0.250;      // wt. decrease factor\n\
-	const float max_w = 0.25;    // max filter weigth\n\
-	const float min_w =-0.05;    // min filter weigth\n\
-	const float lum_add = 0.25;  // effects smoothing \n\
-	\n\
-	void main()\n\
-	{\n\
-	   vec2 v_texCoord = gl_TexCoord[0].xy * vec2(u_widthrel, -u_heightrel);\n\
-	\n\
-	   // hq2x\n\
-	   float x = 0.5 * (1.0 / u_width);\n\
-	   float y = 0.5 * (1.0 / u_height);\n\
-	   vec2 dg1 = vec2( x, y);\n\
-	   vec2 dg2 = vec2(-x, y);\n\
-	   vec2 dx = vec2(x, 0.0);\n\
-	   vec2 dy = vec2(0.0, y);\n\
-	\n\
-	   vec4 TexCoord[5];\n\
-	   TexCoord[0] = vec4(v_texCoord, 0.0, 0.0);\n\
-	   TexCoord[1].xy = TexCoord[0].xy - dg1;\n\
-	   TexCoord[1].zw = TexCoord[0].xy - dy;\n\
-	   TexCoord[2].xy = TexCoord[0].xy - dg2;\n\
-	   TexCoord[2].zw = TexCoord[0].xy + dx;\n\
-	   TexCoord[3].xy = TexCoord[0].xy + dg1;\n\
-	   TexCoord[3].zw = TexCoord[0].xy + dy;\n\
-	   TexCoord[4].xy = TexCoord[0].xy + dg2;\n\
-	   TexCoord[4].zw = TexCoord[0].xy - dx;\n\
-	\n\
-	   vec3 c00 = texture2D(u_texture, TexCoord[1].xy).xyz; \n\
-	   vec3 c10 = texture2D(u_texture, TexCoord[1].zw).xyz; \n\
-	   vec3 c20 = texture2D(u_texture, TexCoord[2].xy).xyz; \n\
-	   vec3 c01 = texture2D(u_texture, TexCoord[4].zw).xyz; \n\
-	   vec3 c11 = texture2D(u_texture, TexCoord[0].xy).xyz; \n\
-	   vec3 c21 = texture2D(u_texture, TexCoord[2].zw).xyz; \n\
-	   vec3 c02 = texture2D(u_texture, TexCoord[4].xy).xyz; \n\
-	   vec3 c12 = texture2D(u_texture, TexCoord[3].zw).xyz; \n\
-	   vec3 c22 = texture2D(u_texture, TexCoord[3].xy).xyz; \n\
-	   vec3 dt = vec3(1.0, 1.0, 1.0);\n\
-	\n\
-	   float md1 = dot(abs(c00 - c22), dt);\n\
-	   float md2 = dot(abs(c02 - c20), dt);\n\
-	\n\
-	   float w1 = dot(abs(c22 - c11), dt) * md2;\n\
-	   float w2 = dot(abs(c02 - c11), dt) * md1;\n\
-	   float w3 = dot(abs(c00 - c11), dt) * md2;\n\
-	   float w4 = dot(abs(c20 - c11), dt) * md1;\n\
-	\n\
-	   float t1 = w1 + w3;\n\
-	   float t2 = w2 + w4;\n\
-	   float ww = max(t1, t2) + 0.0001;\n\
-	\n\
-	   c11 = (w1 * c00 + w2 * c20 + w3 * c22 + w4 * c02 + ww * c11) / (t1 + t2 + ww);\n\
-	\n\
-	   float lc1 = k / (0.12 * dot(c10 + c12 + c11, dt) + lum_add);\n\
-	   float lc2 = k / (0.12 * dot(c01 + c21 + c11, dt) + lum_add);\n\
-	\n\
-	   w1 = clamp(lc1 * dot(abs(c11 - c10), dt) + mx, min_w, max_w);\n\
-	   w2 = clamp(lc2 * dot(abs(c11 - c21), dt) + mx, min_w, max_w);\n\
-	   w3 = clamp(lc1 * dot(abs(c11 - c12), dt) + mx, min_w, max_w);\n\
-	   w4 = clamp(lc2 * dot(abs(c11 - c01), dt) + mx, min_w, max_w);\n\
-	   \n\
-	   gl_FragColor = vec4(w1 * c10 + w2 * c21 + w3 * c12 + w4 * c01 + (1.0 - w1 - w2 - w3 - w4) * c11, 1);\n\
-	}",
-	// 2xSAL
-	"#version 130\n\
-	\n\
-	uniform sampler2D u_texture;\n\
-	uniform float u_width;\n\
-	uniform float u_height;\n\
-	uniform float u_widthrel;\n\
-	uniform float u_heightrel;\n\
-	\n\
-	void main()\n\
-	{\n\
-	   vec2 texCoord = gl_TexCoord[0].xy * vec2(u_widthrel, -u_heightrel);\n\
-	   vec2 UL, UR, DL, DR;\n\
-	   float dx = pow(u_width, -1.0) * 0.25;\n\
-	   float dy = pow(u_height, -1.0) * 0.25;\n\
-	   vec3 dt = vec3(1.0, 1.0, 1.0);\n\
-	   UL = texCoord + vec2(-dx, -dy);\n\
-	   UR = texCoord + vec2(dx, -dy);\n\
-	   DL = texCoord + vec2(-dx, dy);\n\
-	   DR = texCoord + vec2(dx, dy);\n\
-	   vec3 c00 = texture2D(u_texture, UL).xyz;\n\
-	   vec3 c20 = texture2D(u_texture, UR).xyz;\n\
-	   vec3 c02 = texture2D(u_texture, DL).xyz;\n\
-	   vec3 c22 = texture2D(u_texture, DR).xyz;\n\
-	   float m1=dot(abs(c00-c22),dt)+0.001;\n\
-	   float m2=dot(abs(c02-c20),dt)+0.001;\n\
-	   gl_FragColor = vec4((m1*(c02+c20)+m2*(c22+c00))/(2.0*(m1+m2)),1.0); \n\
-	}",
-	// SuperEagle
-	"#version 130\n\
-	\n\
-	uniform sampler2D u_texture;\n\
-	uniform float u_width;\n\
-	uniform float u_height;\n\
-	uniform float u_widthrel;\n\
-	uniform float u_heightrel;\n\
-	\n\
-	int GET_RESULT(float A, float B, float C, float D)\n\
-	{\n\
-		int x = 0; int y = 0; int r = 0;\n\
-		if (A == C) x+=1; else if (B == C) y+=1;\n\
-		if (A == D) x+=1; else if (B == D) y+=1;\n\
-		if (x <= 1) r+=1; \n\
-		if (y <= 1) r-=1;\n\
-		return r;\n\
-	} \n\
-	\n\
-	const vec3 dtt = vec3(65536.0,255.0,1.0);\n\
-	\n\
-	float reduce(vec3 color)\n\
-	{ \n\
-		return dot(color, dtt);\n\
-	}\n\
-	\n\
-	void main()\n\
-	{\n\
-	   // get texel size   	\n\
-		vec2 ps = vec2(0.999/u_width, 0.999/u_height);\n\
-	\n\
-		vec2 v_texCoord = gl_TexCoord[0].xy * vec2(u_widthrel, -u_heightrel);\n\
-	\n\
-		// calculating offsets, coordinates\n\
-		vec2 dx = vec2( ps.x, 0.0); \n\
-		vec2 dy = vec2( 0.0, ps.y);\n\
-		vec2 g1 = vec2( ps.x,ps.y);\n\
-		vec2 g2 = vec2(-ps.x,ps.y);	\n\
-		\n\
-		vec2 pixcoord  = v_texCoord/ps;	//VAR.CT\n\
-		vec2 fp        = fract(pixcoord);\n\
-		vec2 pC4       = v_texCoord-fp*ps;\n\
-		vec2 pC8       = pC4+g1;		//VAR.CT\n\
-	\n\
-		// Reading the texels\n\
-		vec3 C0 = texture2D(u_texture,pC4-g1).xyz; \n\
-		vec3 C1 = texture2D(u_texture,pC4-dy).xyz;\n\
-		vec3 C2 = texture2D(u_texture,pC4-g2).xyz;\n\
-		vec3 D3 = texture2D(u_texture,pC4-g2+dx).xyz;\n\
-		vec3 C3 = texture2D(u_texture,pC4-dx).xyz;\n\
-		vec3 C4 = texture2D(u_texture,pC4   ).xyz;\n\
-		vec3 C5 = texture2D(u_texture,pC4+dx).xyz;\n\
-		vec3 D4 = texture2D(u_texture,pC8-g2).xyz;\n\
-		vec3 C6 = texture2D(u_texture,pC4+g2).xyz;\n\
-		vec3 C7 = texture2D(u_texture,pC4+dy).xyz;\n\
-		vec3 C8 = texture2D(u_texture,pC4+g1).xyz;\n\
-		vec3 D5 = texture2D(u_texture,pC8+dx).xyz;\n\
-		vec3 D0 = texture2D(u_texture,pC4+g2+dy).xyz;\n\
-		vec3 D1 = texture2D(u_texture,pC8+g2).xyz;\n\
-		vec3 D2 = texture2D(u_texture,pC8+dy).xyz;\n\
-		vec3 D6 = texture2D(u_texture,pC8+g1).xyz;\n\
-	\n\
-		vec3 p00,p10,p01,p11;\n\
-	\n\
-		// reducing vec3 to float	\n\
-		float c0 = reduce(C0);float c1 = reduce(C1);\n\
-		float c2 = reduce(C2);float c3 = reduce(C3);\n\
-		float c4 = reduce(C4);float c5 = reduce(C5);\n\
-		float c6 = reduce(C6);float c7 = reduce(C7);\n\
-		float c8 = reduce(C8);float d0 = reduce(D0);\n\
-		float d1 = reduce(D1);float d2 = reduce(D2);\n\
-		float d3 = reduce(D3);float d4 = reduce(D4);\n\
-		float d5 = reduce(D5);float d6 = reduce(D6);\n\
-	\n\
-		/*              SuperEagle code               */\n\
-		/*  Copied from the Dosbox source code        */\n\
-		/*  Copyright (C) 2002-2007  The DOSBox Team  */\n\
-		/*  License: GNU-GPL                          */\n\
-		/*  Adapted by guest(r) on 16.4.2007          */       \n\
-		if (c4 != c8) {\n\
-			if (c7 == c5) {\n\
-				p01 = p10 = C7;\n\
-				if ((c6 == c7) || (c5 == c2)) {\n\
-						p00 = 0.25*(3.0*C7+C4);\n\
-				} else {\n\
-						p00 = 0.5*(C4+C5);\n\
-				}\n\
-	\n\
-				if ((c5 == d4) || (c7 == d1)) {\n\
-						p11 = 0.25*(3.0*C7+C8);\n\
-				} else {\n\
-						p11 = 0.5*(C7+C8);\n\
-				}\n\
-			} else {\n\
-				p11 = 0.125*(6.0*C8+C7+C5);\n\
-				p00 = 0.125*(6.0*C4+C7+C5);\n\
-	\n\
-				p10 = 0.125*(6.0*C7+C4+C8);\n\
-				p01 = 0.125*(6.0*C5+C4+C8);\n\
-			}\n\
-		} else {\n\
-			if (c7 != c5) {\n\
-				p11 = p00 = C4;\n\
-	\n\
-				if ((c1 == c4) || (c8 == d5)) {\n\
-						p01 = 0.25*(3.0*C4+C5);\n\
-				} else {\n\
-						p01 = 0.5*(C4+C5);\n\
-				}\n\
-	\n\
-				if ((c8 == d2) || (c3 == c4)) {\n\
-						p10 = 0.25*(3.0*C4+C7);\n\
-				} else {\n\
-						p10 = 0.5*(C7+C8);\n\
-				}\n\
-			} else {\n\
-				int r = 0;\n\
-				r += GET_RESULT(c5,c4,c6,d1);\n\
-				r += GET_RESULT(c5,c4,c3,c1);\n\
-				r += GET_RESULT(c5,c4,d2,d5);\n\
-				r += GET_RESULT(c5,c4,c2,d4);\n\
-	\n\
-				if (r > 0) {\n\
-						p01 = p10 = C7;\n\
-						p00 = p11 = 0.5*(C4+C5);\n\
-				} else if (r < 0) {\n\
-						p11 = p00 = C4;\n\
-						p01 = p10 = 0.5*(C4+C5);\n\
-				} else {\n\
-						p11 = p00 = C4;\n\
-						p01 = p10 = C7;\n\
-				}\n\
-			}\n\
-		}\n\
-	\n\
-		// Distributing the four products	\n\
-		if (fp.x < 0.50)\n\
-			{ if (fp.y < 0.50) p10 = p00;}\n\
-		else\n\
-			{ if (fp.y < 0.50) p10 = p01; else p10 = p11;}\n\
-	\n\
-		gl_FragColor = vec4(p10, 1);\n\
-	}"
-};
+#ifdef USE_OPENGL
 
 #ifndef __APPLE__
 PFNGLCREATESHADERPROC glCreateShader;
@@ -337,7 +24,9 @@ PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLACTIVETEXTUREPROC glActiveTextureProc;
 PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM2FPROC glUniform2f;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture;
@@ -358,11 +47,6 @@ PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatus;
 GLuint fullscreenShader;
 GLuint fullscreenFramebuffer = 0;
 GLuint fullscreenTexture;
-
-#ifdef SHADERDEBUG
-#include <iostream>
-#include <fstream>
-#endif
 
 void printShaderInfoLog(GLuint obj, const char* prefix)
 {
@@ -399,48 +83,60 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 
 unsigned ShaderIndex = 0;
 
-extern bool LoadShaders() {
+extern bool LoadShaders(char* shadernameOut) {
 	GLuint vs, fs;
 	GLint params;
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
 	if (fs == 0) {
 	    return false;
 	}
-#ifdef SHADERDEBUG
-	std::ifstream myfile("fragment.txt");
+
+	std::vector<FileList> flp;
+	int n = ReadDataDirectory(".", flp);
+	int numShaderFiles = 0;
+	int shaderFileToIdx[1024];
+	for (int i = 0; i < n; ++i) {
+		int pos = flp[i].name.find(".glsl");
+		if (pos > 0) {
+			shaderFileToIdx[numShaderFiles] = i;
+			numShaderFiles++;
+		}
+	}
+	if (numShaderFiles <= 0) return false;
+	if (numShaderFiles <= ShaderIndex) {
+		ShaderIndex = ShaderIndex % numShaderFiles;
+	}
+
+	if (shadernameOut) {
+		strncpy(shadernameOut, flp[shaderFileToIdx[ShaderIndex]].name.c_str(), 1023);
+	}
+	std::ifstream myfile(flp[shaderFileToIdx[ShaderIndex]].name);
 	std::string contents((std::istreambuf_iterator<char>(myfile)),
 						  std::istreambuf_iterator<char>());
-	const char* f = contents.c_str();
-	glShaderSource(fs, 1, &f, NULL);
 	myfile.close();
-#else
-	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), NULL);
-#endif
+	ShaderIndex++;
+
+	const char *fragmentSrc[2] = { "#define FRAGMENT\n", contents.c_str() };
+	const char *vertexSrc[2] = { "#define VERTEX\n", contents.c_str() };
+
+	glShaderSource(fs, 2, fragmentSrc, NULL);
 	glCompileShader(fs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {
-#ifdef SHADERDEBUG
 		printShaderInfoLog(fs, "Fragment Shader");
-#endif
 		glDeleteShader(fs);
 		return false;
 	}
-	ShaderIndex = (ShaderIndex + 1) % MAX_SHADERS;
 	vs = glCreateShader(GL_VERTEX_SHADER);
 	if (fs == 0) {
-#ifdef SHADERDEBUG
-		printShaderInfoLog(fs, "Fragment Shader");
-#endif
 		glDeleteShader(fs);
 		return false;
 	}
-	glShaderSource(vs, 1, (const char**)&vertex_shader, NULL);
+	glShaderSource(vs, 2, vertexSrc, NULL);
 	glCompileShader(vs);
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
 	if (params == GL_FALSE) {
-#ifdef SHADERDEBUG
 		printShaderInfoLog(vs, "Vertex Shader");
-#endif
 		glDeleteShader(fs);
 		glDeleteShader(vs);
 		return false;
@@ -459,9 +155,7 @@ extern bool LoadShaders() {
 	glLinkProgram(fullscreenShader);
 	glGetProgramiv(fullscreenShader, GL_LINK_STATUS, &params);
 	if (params == GL_FALSE) {
-#ifdef SHADERDEBUG
 		printProgramInfoLog(fullscreenShader, "Shader Program");
-#endif
 		glDeleteShader(fs);
 		glDeleteShader(vs);
 		glDeleteProgram(fullscreenShader);
@@ -492,7 +186,9 @@ extern bool LoadShaderExtensions() {
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetUniformLocation");
 	glActiveTextureProc = (PFNGLACTIVETEXTUREPROC)(uintptr_t)SDL_GL_GetProcAddress("glActiveTexture");
 	glUniform1f = (PFNGLUNIFORM1FPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1f");
+	glUniform2f = (PFNGLUNIFORM2FPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform2f");
 	glUniform1i = (PFNGLUNIFORM1IPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1i");
+	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniformMatrix4fv");
 
 	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glGenFramebuffers");
 	glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glBindFramebuffer");
@@ -504,7 +200,7 @@ extern bool LoadShaderExtensions() {
 	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
 	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
-		return LoadShaders();
+		return LoadShaders(NULL);
 	} else {
 		return false;
 	}
@@ -536,27 +232,40 @@ extern void RenderFramebufferToScreen() {
 	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	// setup our shader program
 	glUseProgram(fullscreenShader);
-	GLint textureloc = glGetUniformLocation(fullscreenShader, "u_texture");
-	GLint widthloc = glGetUniformLocation(fullscreenShader, "u_width");
-	GLint heightloc = glGetUniformLocation(fullscreenShader, "u_height");
-	GLint widthrelloc = glGetUniformLocation(fullscreenShader, "u_widthrel");
-	GLint heightrelloc = glGetUniformLocation(fullscreenShader, "u_heightrel");
-	glUniform1f(widthloc, Video.ViewportWidth);
-	glUniform1f(heightloc, Video.ViewportHeight);
-	glUniform1f(widthrelloc, (float)Video.Width / (float)Video.ViewportWidth);
-	glUniform1f(heightrelloc, (float)Video.Height / (float)Video.ViewportHeight);
-	glUniform1i(textureloc, 0);
+
+	// These are the default uniforms for glsl converted libretro shaders
+	GLint Texture = glGetUniformLocation(fullscreenShader, "Texture");
+	GLint MVPMatrix = glGetUniformLocation(fullscreenShader, "MVPMatrix");
+	GLint FrameDirection = glGetUniformLocation(fullscreenShader, "FrameDirection");
+	GLint FrameCount = glGetUniformLocation(fullscreenShader, "FrameCount");
+	GLint OutputSize = glGetUniformLocation(fullscreenShader, "OutputSize");
+	GLint TextureSize = glGetUniformLocation(fullscreenShader, "TextureSize");
+	GLint InputSize = glGetUniformLocation(fullscreenShader, "InputSize");
+
+	glUniform1i(Texture, 0);
+	GLfloat matrix[4 * 4];
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, matrix);
+	glUniform1f(FrameDirection, 1);
+	glUniform1f(FrameCount, 1);
+	glUniform2f(OutputSize, (float)Video.ViewportWidth, (float)Video.ViewportHeight);
+	glUniform2f(TextureSize, (float)Video.ViewportWidth, (float)Video.ViewportHeight);
+	glUniform2f(InputSize, (float)Video.Width, (float)Video.Height);
+
+	float widthRel = (float)Video.Width / Video.ViewportWidth;
+	float heightRel = (float)Video.Height / Video.ViewportHeight;
+
 	glActiveTextureProc(GL_TEXTURE0);
 	// render the framebuffer texture to a fullscreen quad on the real display
 	glBindTexture(GL_TEXTURE_2D, fullscreenTexture);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0);
-	glVertex2i(0, 0);
-	glTexCoord2f(1, 0);
-	glVertex2i(Video.ViewportWidth, 0);
-	glTexCoord2f(1, 1);
-	glVertex2i(Video.ViewportWidth, Video.ViewportHeight);
 	glTexCoord2f(0, 1);
+	glVertex2i(0, 0);
+	glTexCoord2f(widthRel, 1);
+	glVertex2i(Video.ViewportWidth, 0);
+	glTexCoord2f(widthRel, 1 - heightRel);
+	glVertex2i(Video.ViewportWidth, Video.ViewportHeight);
+	glTexCoord2f(0, 1 - heightRel);
 	glVertex2i(0, Video.ViewportHeight);
 	glEnd();
 	SDL_GL_SwapBuffers();
