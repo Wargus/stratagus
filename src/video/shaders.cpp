@@ -126,7 +126,7 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 		strncpy(shadernameOut, flp[shaderFileToIdx[ShaderIndex]].name.c_str(), 1023);
 	}
 	shaderPath.append(flp[shaderFileToIdx[ShaderIndex]].name);
-	std::ifstream myfile(shaderPath);
+	std::ifstream myfile(shaderPath.c_str());
 	std::string contents((std::istreambuf_iterator<char>(myfile)),
 						  std::istreambuf_iterator<char>());
 	myfile.close();
