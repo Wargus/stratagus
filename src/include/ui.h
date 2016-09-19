@@ -124,7 +124,9 @@ public:
 class CUIButton
 {
 public:
-	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
+	// CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {} //OLD BUTTON STYLE CODE
+	// NEW CODE BELOW, THANKS TO ANDRETTIN - MODIFIED BY DINKY
+	CUIButton() : X(0), Y(0), Clicked(false), HotKeyPressed(false), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
 
 	bool Contains(const PixelPos &screenPos) const;
@@ -132,6 +134,10 @@ public:
 public:
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
+	//NEW CODE START
+	bool Clicked;			/// whether the button is currently clicked or not
+	bool HotKeyPressed;		/// whether the buttons hotkey is currently pressed or not
+	// NEW CODE END
 	std::string Text;               /// button text
 	ButtonStyle *Style;             /// button style
 	LuaActionListener *Callback;    /// callback function
