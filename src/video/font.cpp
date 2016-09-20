@@ -103,7 +103,7 @@ CFont &GetGameFont()
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
-/* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y)
+/* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal)
 {
 	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
@@ -116,7 +116,7 @@ CFont &GetGameFont()
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt);
+	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt, bool is_normal);
 	PopClipping();
 }
 
@@ -621,9 +621,16 @@ int CLabel::DrawClip(int x, int y, const char *const text) const
 	return DoDrawText<true>(x, y, text, strlen(text), normal);
 }
 
-int CLabel::DrawClip(int x, int y, const std::string &text) const
+int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal) const
 {
-	return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+	// return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+	if (is_normal) {
+	    return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+	}
+	else
+	{
+	    return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+	}
 }
 
 int CLabel::DrawClip(int x, int y, int number) const
