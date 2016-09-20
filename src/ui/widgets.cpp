@@ -398,10 +398,17 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
 
 	graphics->setFont(getFont());
+	
+	bool is_normal = true;
+	
+	if (hasMouse()) {
+		is_normal = false;
+	}
+
 	if (isPressed()) {
-		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment());
+		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment(), is_normal);
 	} else {
-		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
+		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal);
 	}
 
 	if (hasFocus()) {
