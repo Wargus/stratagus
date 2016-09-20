@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof NaessÃ©n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -247,8 +247,7 @@ namespace gcn
          * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
          * @throws Exception when no Font is set.
          */
-        virtual void drawText(const std::string& text, int x, int y,
-                              unsigned int alignment = LEFT);
+        virtual void drawText(const std::string& text, int x, int y, unsigned int alignment = LEFT, bool is_normal = true);
         /**
          * Alignments for text drawing.
          */
