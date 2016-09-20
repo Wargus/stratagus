@@ -140,13 +140,13 @@ namespace gcn
         switch (alignment)
         {
           case LEFT:
-              mFont->drawString(this, text, x, y, bool is_normal);
+              mFont->drawString(this, text, x, y, is_normal);
               break;
           case CENTER:
-              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, bool is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, is_normal);
               break;
           case RIGHT:
-              mFont->drawString(this, text, x - mFont->getWidth(text), y, bool is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text), y, is_normal);
               break;
           default:
           	assert(!"Unknown alignment.");
