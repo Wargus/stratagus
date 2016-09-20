@@ -116,7 +116,7 @@ CFont &GetGameFont()
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt, bool is_normal);
+	CLabel(*this).DrawClip(x + r.xOffset, y + r.yOffset, txt, is_normal);
 	PopClipping();
 }
 
