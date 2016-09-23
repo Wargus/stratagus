@@ -1313,7 +1313,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
 	}
 	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
-		SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index);
+		SendCommandTrainUnit(*Selected[best_training_place], type, !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 	}
