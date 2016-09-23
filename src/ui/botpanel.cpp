@@ -1288,7 +1288,48 @@ void CButtonPanel::DoClicked_Build(int button)
 }
 
 void CButtonPanel::DoClicked_Train(int button)
+{	
+	// NEW CODE FOR CButtonPanel::DoClicked_Train(int button)
+	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	int best_training_place = 0;
+	int lowest_queue = Selected[0]->Orders.size();
+
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		if (Selected[i]->Type == Selected[0]->Type) {
+			int selected_queue = 0;
+			for (size_t j = 0; j < Selected[i]->Orders.size(); ++j) {
+				if (Selected[i]->Orders[j]->Action == UnitActionTrain) {
+					selected_queue += 1;
+				}
+			}
+			if (selected_queue < lowest_queue) {
+				lowest_queue = selected_queue;
+				best_training_place = i;
+			}
+		}
+	}
+
+	if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
+	}
+	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
+		SendCommandTrainUnit(*Selected[best_training_place], type, ThisPlayer->Index);
+		UI.StatusLine.Clear();
+		UI.StatusLine.ClearCosts();
+	}
+	else if (ThisPlayer->CheckLimits(type) == -3) {
+		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
+		}
+	}
+}
+
+/*
+void CButtonPanel::DoClicked_Train(int button)
 {
+	OLD CODE FOR CButtonPanel::DoClicked_Train(int button)
+	To use this code, uncomment it but make sure to comment the code above!
+	
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	// FIXME: Johns: I want to place commands in queue, even if not
@@ -1307,7 +1348,9 @@ void CButtonPanel::DoClicked_Train(int button)
 			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
 		}
 	}
-}
+} 
+*/
+
 
 void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
