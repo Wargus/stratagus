@@ -747,6 +747,7 @@ void MessagesDisplay::DrawMessages()
 		} else {
 #endif
 			// background so the text is easier to read
+			/*
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
 				Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
@@ -758,6 +759,7 @@ void MessagesDisplay::DrawMessages()
 									UI.MapArea.EndX - UI.MapArea.X - 15,
 									textHeight - MessagesScrollY + 2);
 			}
+			*/
 
 			// Draw message line(s)
 			for (int z = 0; z < MessagesCount; ++z) {
