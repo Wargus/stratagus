@@ -648,6 +648,7 @@ static int CclRemoveUnit(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	unit->Remove(NULL);
+	LetUnitDie(*unit);
 	lua_pushvalue(l, 1);
 	return 1;
 }
