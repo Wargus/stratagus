@@ -54,6 +54,7 @@
 <a href="#DefineUI">DefineUI</a>
 <a href="#DefineViewports">DefineViewports</a>
 <a href="#SetGameCursor">SetGameCursor</a>
+<a href="#Icon Frame">Icon Frame</a>
 <hr>
 <h2>Intro - Introduction to UI functions and variables</h2>
 
@@ -231,7 +232,11 @@ Selected, Clicked, Disabled, or the Default setting. Possible tags:
   <dd>Display the text at this position (overrides the main position).
   </dd>
   <dt>Border = { Color = color, Size = size}</dt>
-  <dd>Draw a border with the specified color and size.
+  <dd>Draw a border with the specified color and size, with the border flashing
+  </dd>
+  </dl>
+  <dt>Border = { SolidColor = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size, without any flashing of the border
   </dd>
   </dl>
 </dd>
@@ -1259,6 +1264,16 @@ Set the game cursor.
 <pre>
 -- Set the game cursor to 'cursor-point'.
 SetGameCursor("cursor-point")
+</pre>
+
+<a name="Icon Frame"></a>
+<h3>Icon Frame</h3>
+Set a custom frame to be drawn around icons. Note that "IconsShift" has to be true.
+<h4>Example</h4>
+<pre>
+Preference.IconsShift = true
+Preference.IconFrameG = CGraphic:New("ui/" .. race .. "/icon_border.png", 62, 48)
+Preference.PressedIconFrameG = CGraphic:New("ui/" .. race .. "/icon_border.png", 62, 48)
 </pre>
 
 <hr>

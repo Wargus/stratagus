@@ -114,7 +114,7 @@ CUnitInfoPanel::~CUnitInfoPanel()
 CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
 	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-	NormalFontColor("yellow"), ReverseFontColor("white"), 
+	NormalFontColor("yellow"), ReverseFontColor("white"),
 	SingleSelectedButton(NULL),
 	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
 	SingleTrainingButton(NULL),
@@ -235,6 +235,15 @@ void CUserInterface::Load()
 		PieMenu.G->UseDisplayFormat();
 	}
 
+	if (Preference.IconFrameG) {
+		Preference.IconFrameG->Load();
+		Preference.IconFrameG->UseDisplayFormat();
+	}
+	if (Preference.PressedIconFrameG) {
+		Preference.PressedIconFrameG->Load();
+		Preference.PressedIconFrameG->UseDisplayFormat();
+	}
+
 	//  Resolve cursors
 	Point.Load();
 	Glass.Load();
@@ -319,6 +328,13 @@ void CleanUserInterface()
 		delete *panel;
 	}
 	UI.InfoPanelContents.clear();
+
+	if (Preference.IconFrameG) {
+		CGraphic::Free(Preference.IconFrameG);
+	}
+	if (Preference.PressedIconFrameG) {
+		CGraphic::Free(Preference.PressedIconFrameG);
+	}
 
 	// Button Popups
 	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();

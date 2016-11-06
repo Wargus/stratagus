@@ -287,7 +287,7 @@ public:
 	int GetDrawLevel() const;
 
 	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
-	
+
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
 
@@ -430,10 +430,11 @@ class CPreference
 {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
+		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
+		IconFrameG(NULL), PressedIconFrameG(NULL),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
 	bool ShowSightRange;       /// Show sight range.
@@ -456,6 +457,9 @@ public:
 	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 
 	std::string SF2Soundfont;/// Path to SF2 soundfont
+
+	CGraphic *IconFrameG;
+	CGraphic *PressedIconFrameG;
 };
 
 extern CPreference Preference;

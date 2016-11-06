@@ -768,6 +768,9 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 					p->BorderColorRGB.Parse(l);
 				} else if (!strcmp(value, "Size")) {
 					p->BorderSize = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "SolidColor")) {
+					p->BorderColorRGB.Parse(l);
+					p->BorderColor = 1; // XXX: see uibuttons_proc.cpp#DrawUIButton
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
