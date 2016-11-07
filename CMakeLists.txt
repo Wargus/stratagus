@@ -351,6 +351,7 @@ source_group(video FILES ${video_SRCS})
 
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
+	src/win32/DeclareDPIAware.manifest
 	src/win32/stratagus.rc
 )
 source_group(win32 FILES ${win32_SRCS})
