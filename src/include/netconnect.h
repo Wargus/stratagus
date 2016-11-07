@@ -80,7 +80,7 @@ enum _net_client_con_state_ {
 	ccs_goahead,              /// Server wants to start game
 	ccs_started,              /// Server has started game
 	ccs_incompatibleengine,   /// Incompatible engine version
-	ccs_incompatiblenetwork   /// Incompatible netowrk version
+	ccs_incompatibleluafiles  /// Incompatible lua files
 };
 
 /*----------------------------------------------------------------------------

@@ -217,6 +217,9 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 	if (GetFileContent(file, content) == false) {
 		return -1;
 	}
+	if (file.rfind(".lua") != -1) {
+		FileChecksums ^= fletcher32(content);
+	}
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {

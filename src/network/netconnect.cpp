@@ -167,7 +167,7 @@ private:
 	void SetConfig(const CInitMessage_Config &msg);
 
 	void Parse_GameFull();
-	void Parse_ProtocolMismatch(const unsigned char *buf);
+	void Parse_LuaMismatch(const unsigned char *buf);
 	void Parse_EngineMismatch(const unsigned char *buf);
 	void Parse_Resync(const unsigned char *buf);
 	void Parse_Config(const unsigned char *buf);
@@ -234,7 +234,7 @@ static const char *ncconstatenames[] = {
 	"ccs_goahead",             // server wants to start game
 	"ccs_started",             // server has started game
 	"ccs_incompatibleengine",  // incompatible engine version
-	"ccs_incompatiblenetwork", // incompatible network version
+	"ccs_incompatibleluafiles", // incompatible network version
 };
 
 static const char *icmsgsubtypenames[] = {
@@ -668,8 +668,8 @@ bool CClient::Parse(const unsigned char *buf, const CHost &host)
 			Parse_EngineMismatch(buf);
 			return false;
 		}
-		case ICMProtocolMismatch: { // Network protocol version doesn't match
-			Parse_ProtocolMismatch(buf);
+		case ICMLuaFilesMismatch: { // Network protocol version doesn't match
+			Parse_LuaMismatch(buf);
 			return false;
 		}
 		case ICMGameFull: { // Game is full - server rejected connnection
@@ -860,21 +860,19 @@ void CClient::Parse_GameFull()
 	networkState.State = ccs_nofreeslots;
 }
 
-void CClient::Parse_ProtocolMismatch(const unsigned char *buf)
+void CClient::Parse_LuaMismatch(const unsigned char *buf)
 {
 	if (networkState.State != ccs_connecting) {
 		return;
 	}
-	CInitMessage_ProtocolMismatch msg;
+	CInitMessage_LuaFilesMismatch msg;
 
 	msg.Deserialize(buf);
 	const std::string serverHostStr = serverHost.toString();
-	fprintf(stderr, "Incompatible network protocol version "
-			NetworkProtocolFormatString " <-> " NetworkProtocolFormatString "\n"
-			"from %s\n",
-			NetworkProtocolFormatArgs(NetworkProtocolVersion), NetworkProtocolFormatArgs(msg.Version),
+	fprintf(stderr, "Incompatible Lua files version %d <-> %d \nfrom %s\n",
+			FileChecksums, msg.Version,
 			serverHostStr.c_str());
-	networkState.State = ccs_incompatiblenetwork;
+	networkState.State = ccs_incompatibleluafiles;
 }
 
 void CClient::Parse_EngineMismatch(const unsigned char *buf)
@@ -1302,17 +1300,14 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 		return -1;
 	}
 
-	if (msg.Version != NetworkProtocolVersion) {
+	if (msg.Version != FileChecksums) {
 		const std::string hostStr = host.toString();
-		fprintf(stderr, "Incompatible network protocol version "
-				NetworkProtocolFormatString " <-> "
-				NetworkProtocolFormatString "\n"
-				"from %s\n",
-				NetworkProtocolFormatArgs(NetworkProtocolVersion),
-				NetworkProtocolFormatArgs(msg.Version),
+		fprintf(stderr, "Incompatible lua files %d <-> %d\nfrom %s\n",
+				FileChecksums,
+				msg.Version,
 				hostStr.c_str());
 
-		const CInitMessage_ProtocolMismatch message;
+		const CInitMessage_LuaFilesMismatch message;
 		NetworkSendICMessage_Log(socket, host, message);
 		return -1;
 	}

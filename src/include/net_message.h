@@ -105,7 +105,7 @@ enum _ic_message_subtype_ {
 	ICMConfig,              /// Setup message configure clients
 
 	ICMEngineMismatch,      /// Stratagus engine version doesn't match
-	ICMProtocolMismatch,    /// Network protocol version doesn't match
+	ICMLuaFilesMismatch,    /// Network protocol version doesn't match
 	ICMEngineConfMismatch,  /// UNUSED:Engine configuration isn't identical
 	ICMMapUidMismatch,      /// MAP UID doesn't match
 
@@ -161,7 +161,7 @@ private:
 public:
 	char PlyName[NetPlayerNameSize];  /// Name of player
 	int32_t Stratagus;  /// Stratagus engine version
-	int32_t Version;    /// Network protocol version
+	uint32_t Version;   /// Lua files version
 };
 
 class CInitMessage_Config
@@ -194,10 +194,10 @@ public:
 	int32_t Stratagus;  /// Stratagus engine version
 };
 
-class CInitMessage_ProtocolMismatch
+class CInitMessage_LuaFilesMismatch
 {
 public:
-	CInitMessage_ProtocolMismatch();
+	CInitMessage_LuaFilesMismatch();
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
@@ -205,7 +205,7 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	int32_t Version;  /// Network protocol version
+	uint32_t Version;  /// Lua files version
 };
 
 class CInitMessage_Welcome

@@ -40,6 +40,7 @@
 #endif
 
 #include <cstdlib>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -48,6 +49,7 @@
 #include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
+extern uint32_t FileChecksums;          /// checksums of all loaded lua files
 
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
@@ -80,6 +82,7 @@ void clamp(T *value, T minValue, T maxValue)
 	}
 }
 
+extern uint32_t fletcher32(const std::string &content);
 
 /*----------------------------------------------------------------------------
 --  Strings
