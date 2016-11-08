@@ -767,7 +767,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'"_C_ key);
+			LuaError(l, "unknow condition '%s'" _C_ key);
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseNumber");
@@ -881,7 +881,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.PlayerName = CclParseNumberDesc(l);
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'"_C_ key);
+			LuaError(l, "unknow condition '%s'" _C_ key);
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseString");

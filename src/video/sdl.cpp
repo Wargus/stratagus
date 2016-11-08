@@ -853,7 +853,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				&& event.key.keysym.mod & KMOD_CTRL) {
 				char shadername[1024] = { '\0' };
 				LoadShaders(event.key.keysym.sym == SDLK_SLASH ? 1 : -1, shadername);
-				SetMessage(shadername);
+				SetMessage("%s", shadername);
 				break;
 			}
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
