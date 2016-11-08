@@ -1,3 +1,12 @@
+stratagus (2.4.1-0) unstable; urgency=low
+
+  * Add support for icon frames in engine
+  * Add support for selecting and giving orders to multiple buildings
+  * Add checksumming for loaded lua files, to avoid incompatible multiplayer clients
+  * Update shader support to use pre-compiled shaders from libretro
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Wed, 2 Dec 2015 12:41:01 +0100
+
 stratagus (2.4.0-1) unstable; urgency=low
 
   * Introduced OpenGL shaders for pixel scaling
