@@ -152,6 +152,9 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	if (Preference.IconsShift) {
 		hBar = 6;
 		hAll = 10;
+		if (Preference.IconFrameG && Preference.PressedIconFrameG) {
+			y -= hBar;
+		}
 	} else {
 		hBar = 5;
 		hAll = 7;
@@ -390,8 +393,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 									   (IconActive | (MouseButtons & LeftButton)) : 0;
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom 
-				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom
+				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 				: GameSettings.Presets[unit.Player->Index].PlayerColor);
 		}
 	} else {
@@ -409,8 +412,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom 
-						? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom
+						? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 						: GameSettings.Presets[unit.Player->Index].PlayerColor);
 				}
 			}
@@ -444,8 +447,8 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom 
-			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom
+			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 			: GameSettings.Presets[unit.Player->Index].PlayerColor);
 	}
 }
@@ -465,8 +468,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom 
-					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom
+					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 					: GameSettings.Presets[unit.Player->Index].PlayerColor);
 			}
 			return true;
@@ -479,8 +482,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom 
-					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom
+					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 					: GameSettings.Presets[unit.Player->Index].PlayerColor);
 			}
 			return true;
@@ -503,8 +506,8 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom 
-			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor 
+		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom
+			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor
 			: GameSettings.Presets[uins->Player->Index].PlayerColor);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
@@ -1077,11 +1080,11 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				if (ThisPlayer->IsAllied(Players[i])) {
-					label.SetNormalColor(FontGreen); 
+					label.SetNormalColor(FontGreen);
 				} else if (ThisPlayer->IsEnemy(Players[i])) {
-					label.SetNormalColor(FontRed); 
+					label.SetNormalColor(FontRed);
 				} else {
-					label.SetNormalColor(nc); 
+					label.SetNormalColor(nc);
 				}
 				label.Draw(x + 15, y, i);
 
@@ -1136,8 +1139,8 @@ static void InfoPanel_draw_multiple_selection()
 		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  pos, "", Selected[i]->RescuedFrom 
-						  ? GameSettings.Presets[Selected[i]->RescuedFrom->Index].PlayerColor 
+						  pos, "", Selected[i]->RescuedFrom
+						  ? GameSettings.Presets[Selected[i]->RescuedFrom->Index].PlayerColor
 						  : GameSettings.Presets[Selected[i]->Player->Index].PlayerColor);
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
