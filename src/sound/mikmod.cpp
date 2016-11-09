@@ -118,7 +118,6 @@ int CSampleMikModStream::Read(void *buf, int len)
 	int read;
 
 	// fill up the buffer
-	read = 0;
 	while (this->Len < SOUND_BUFFER_SIZE / 2 && Player_Active()) {
 		memcpy(this->Buffer, this->Buffer + this->Pos, this->Len);
 		this->Pos = 0;

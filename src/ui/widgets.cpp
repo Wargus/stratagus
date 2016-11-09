@@ -1767,7 +1767,6 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 
 		if (mContent->getBorderSize() > 0)
 		{
-			img = this->itemImage;
 			gcn::Rectangle rec = mContent->getDimension();
 			rec.x -= mContent->getBorderSize();
 			rec.y -= mContent->getBorderSize();

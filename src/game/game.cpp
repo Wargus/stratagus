@@ -625,6 +625,7 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 	char *setupExtension = strstr(mapSetup, ".smp");
 	if (!setupExtension) {
 		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
+		return -1;
 	}
 
 	char previewName[PATH_MAX];

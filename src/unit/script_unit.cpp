@@ -1159,7 +1159,7 @@ static int CclSetUnitVariable(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
-	int value;
+	int value = 0;
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
 		unit->AssignToPlayer(Players[value]);

@@ -705,7 +705,6 @@ static void DrawTileIcons()
 	} else {
 		label.DrawCentered(x, y, "Filler");
 	}
-	y += 20;
 
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
@@ -1502,7 +1501,6 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	}
 
 	int i = Editor.UnitIndex;
-	by = UI.ButtonPanel.Y + 24;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;

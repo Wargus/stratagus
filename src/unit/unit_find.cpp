@@ -1014,7 +1014,6 @@ private:
 		}
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
-		const int missile_range = type.Missile.Missile->Range + range - 1;
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;
 
