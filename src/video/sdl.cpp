@@ -812,6 +812,13 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
 				int xw = UI.MouseWarpPos.x;
 				int yw = UI.MouseWarpPos.y;
+#if (defined(USE_OPENGL) || defined(USE_GLES))
+				// Scale mouse-coordinates to viewport
+				if (ZoomNoResize) {
+				    xw = (Uint16)floorf(xw * float(Video.ViewportWidth) / Video.Width);
+				    yw = (Uint16)floorf(yw * float(Video.ViewportHeight) / Video.Height);
+				}
+#endif
 				UI.MouseWarpPos.x = -1;
 				UI.MouseWarpPos.y = -1;
 				SDL_WarpMouse(xw, yw);
