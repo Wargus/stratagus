@@ -472,10 +472,10 @@ static void Usage()
 		"\t-W\t\tWindowed video mode\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
-		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
+		"\t  \t\tPass a number to select a shader in your shaders directory by index (starting at 0).\n"\
 		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
 		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
+		"\t-Z mode\t\tGame resolution <xres>x<yres> (scaled to -v output resolution with OpenGL).\n"
 #endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
@@ -521,8 +521,9 @@ static void RedirectOutput()
 
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
+	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z:?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -600,26 +601,29 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Parameters::Instance.SetUserDirectory(optarg);
 				continue;
 			case 'v': {
-				char *sep = strchr(optarg, 'x');
+				sep = strchr(optarg, 'x');
 				if (!sep || !*(sep + 1)) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
 					ExitFatal(-1);
 				}
-				Video.Height = atoi(sep + 1);
+				Video.ViewportHeight = atoi(sep + 1);
 				*sep = 0;
-				Video.Width = atoi(optarg);
-				if (!Video.Height || !Video.Width) {
+				Video.ViewportWidth = atoi(optarg);
+				if (!Video.ViewportHeight || !Video.ViewportWidth) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
 					ExitFatal(-1);
 				}
 #if defined(USE_OPENGL) || defined(USE_GLES)
-				if (ZoomNoResize) {
-					Video.ViewportHeight = Video.Height;
-					Video.ViewportWidth = Video.Width;
-					Video.Height = 0;
-					Video.Width = 0;
+				if (!ZoomNoResize) {
+					Video.Height = Video.ViewportHeight;
+					Video.Width = Video.ViewportWidth;
+				}
+#else
+				{
+					Video.Height = Video.ViewportHeight;
+					Video.Width = Video.ViewportWidth;
 				}
 #endif
 				continue;
@@ -639,10 +643,15 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;
 				ZoomNoResize = 1;
-				Video.ViewportHeight = Video.Height;
-				Video.ViewportWidth = Video.Width;
-				Video.Height = 0;
-				Video.Width = 0;
+				sep = strchr(optarg, 'x');
+				if (!sep || !*(sep + 1)) {
+					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
+					Usage();
+					ExitFatal(-1);
+				}
+				Video.Height = atoi(sep + 1);
+				*sep = 0;
+				Video.Width = atoi(optarg);
 				continue;
 #endif
 			case -1:
