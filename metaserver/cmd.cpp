@@ -498,19 +498,19 @@ static void ParseBuffer(Session *session)
 	buf = session->Buffer;
 	if (!strncmp(buf, "PING", 4)) {
 		ParsePing(session);
-	} else if (!session->UserData.LoggedIn) {
-		if (!strncmp(buf, "USER ", 5)) {
-			ParseUser(session, buf + 5);
-		} else if (!strncmp(buf, "REGISTER ", 9)) {
-			ParseRegister(session, buf + 9);
-		} else {
-			fprintf(stderr, "Unknown command: %s\n", session->Buffer);
-			Send(session, "ERR_BADCOMMAND\n");
-		}
 	} else {
-		if (!strncmp(buf, "USER ", 5) || !strncmp(buf, "REGISTER ", 9)) {
-			Send(session, "ERR_ALREADYLOGGEDIN\n");
-		} else if (!strncmp(buf, "CREATEGAME ", 11)) {
+		if (!session->UserData.LoggedIn) {
+			if (!strncmp(buf, "USER ", 5)) {
+				ParseUser(session, buf + 5);
+			} else if (!strncmp(buf, "REGISTER ", 9)) {
+				ParseRegister(session, buf + 9);
+			}
+		} else {
+			if (!strncmp(buf, "USER ", 5) || !strncmp(buf, "REGISTER ", 9)) {
+				Send(session, "ERR_ALREADYLOGGEDIN\n");
+			}
+		}
+		if (!strncmp(buf, "CREATEGAME ", 11)) {
 			ParseCreateGame(session, buf + 11);
 		} else if (!strcmp(buf, "CANCELGAME") || !strncmp(buf, "CANCELGAME ", 11)) {
 			ParseCancelGame(session, buf + 10);
