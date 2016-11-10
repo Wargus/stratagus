@@ -187,3 +187,42 @@ int CMetaClient::Recv()
 }
 
 //@}
+
+int CMetaClient::CreateGame(std::string desc, std::string map, std::string players) {
+	if (metaSocket.IsValid() == false) {
+		return -1;
+	}
+	if (NetworkFildes.IsValid() == false) {
+		return -1;
+	}
+	CHost metaServerHost(metaHost.c_str(), metaPort);
+
+	std::string ipport(CNetworkParameter::Instance.localHost.c_str());
+	ipport += " ";
+	ipport += std::to_string(CNetworkParameter::Instance.localPort);
+
+	std::string cmd("CREATEGAME \"");
+	cmd += desc;
+	cmd += "\" \"";
+	cmd += map;
+	cmd += "\" ";
+	cmd += players;
+	cmd += " ";
+	cmd += ipport;
+
+	if (this->Send(cmd.c_str()) == -1) { // not sent
+		return -1;
+	}
+	if (this->Recv() == -1) { // not received
+		return -1;
+	}
+	CClientLog &log = *GetLastMessage();
+	if (log.entry.find("CREATEGAME_OK") != std::string::npos) {
+		// Everything is OK, let's inform metaserver of our UDP info
+		NetworkFildes.Send(metaServerHost, ipport.c_str(), ipport.size());
+		return 0;
+	} else {
+		fprintf(stderr, "METACLIENT: failed to create game: %s\n", log.entry.c_str());
+		return -1;
+	}
+}
