@@ -371,7 +371,7 @@ Socket NetOpenUDP(unsigned long ip, int port)
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
 		sock_addr.sin_addr.s_addr = ip;
-		sock_addr.sin_port = port;
+		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
@@ -407,7 +407,7 @@ Socket NetOpenTCP(const char *addr, int port)
 		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		}
-		sock_addr.sin_port = port;
+		sock_addr.sin_port = htons(port);
 
 		int opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
@@ -577,7 +577,7 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 	// sending us packets at this level
 
 	*hostFrom = sock_addr.sin_addr.s_addr;
-	*portFrom = sock_addr.sin_port;
+	*portFrom = ntohs(sock_addr.sin_port);
 
 	return l;
 }
@@ -628,7 +628,7 @@ int NetSendUDP(Socket sockfd, unsigned long host, int port,
 
 	const int n = sizeof(struct sockaddr_in);
 	sock_addr.sin_addr.s_addr = host;
-	sock_addr.sin_port = port;
+	sock_addr.sin_port = htons(port);
 	sock_addr.sin_family = AF_INET;
 
 	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
@@ -676,7 +676,7 @@ Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 
 	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
 	*clientHost = sa.sin_addr.s_addr;
-	*clientPort = sa.sin_port;
+	*clientPort = ntohs(sa.sin_port);
 	return socket;
 }
 

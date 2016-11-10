@@ -47,13 +47,13 @@
 CHost::CHost(const char *name, int port)
 {
 	this->ip = name ? NetResolveHost(name) : INADDR_ANY;
-	this->port = htons(port);
+	this->port = port;
 }
 
 std::string CHost::toString() const
 {
 	char buf[24]; // 127.255.255.255:65555
-	sprintf(buf, "%d.%d.%d.%d:%d", NIPQUAD(ntohl(ip)), ntohs(port));
+	sprintf(buf, "%d.%d.%d.%d:%d", NIPQUAD(ntohl(ip)), port);
 	return buf;
 }
 

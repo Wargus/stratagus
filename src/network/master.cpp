@@ -195,7 +195,7 @@ int CMetaClient::CreateGame(std::string desc, std::string map, std::string playe
 	if (NetworkFildes.IsValid() == false) {
 		return -1;
 	}
-	CHost metaServerHost(metaHost.c_str(), ntohs(metaPort));
+	CHost metaServerHost(metaHost.c_str(), metaPort);
 
 	std::string ipport(CNetworkParameter::Instance.localHost.c_str());
 	ipport += " ";
