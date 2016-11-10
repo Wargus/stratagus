@@ -399,13 +399,15 @@ static void ParseJoinGame(Session *session, char *buf)
 	char *id;
 	char *password;
 	int ret;
+	unsigned long udphost;
+	int udpport;
 
 	if (Parse1or2Args(buf, &id, &password)) {
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	}
 
-	ret = JoinGame(session, atoi(id), password);
+	ret = JoinGame(session, atoi(id), password, &udphost, &udpport);
 	if (ret == -1) {
 		Send(session, "ERR_ALREADYINGAME\n");
 		return;
@@ -422,10 +424,16 @@ static void ParseJoinGame(Session *session, char *buf)
 	} else if (ret == -4) {
 		Send(session, "ERR_GAMEFULL\n");
 		return;
+	} else if (ret == -5) {
+		Send(session, "ERR_SERVERNOTREADY\n");
+		return;
 	}
 
-	DebugPrint("%s joined game %d\n" _C_ session->UserData.Name _C_ atoi(id));
-	Send(session, "JOINGAME_OK\n");
+	char* reply = (char*)calloc(sizeof(char), strlen("JOINGAME_OK 255.255.255.255 66535\n") + 1);
+	sprintf(reply, "JOINGAME_OK %d.%d.%d.%d %d\n", NIPQUAD(ntohl(UDPHost)), udpport);
+	DebugPrint("%s joined game %d with %s\n" _C_ session->UserData.Name _C_ atoi(id) _C_ reply);
+	Send(session, reply);
+	free(reply);
 }
 
 /**
@@ -556,6 +564,24 @@ int UpdateParser(void)
 		}
 
 	}
+
+	if (strlen(UDPBuffer)) {
+		// If this is a server, we'll note its external data. When clients join,
+		// they'll receive this as part of the TCP response that they
+		// successfully joined.  This is a simplification of the full UDP hole
+		// punching algorithm, which unneccessarily might go through the NAT
+		// even for clients inside the same NAT. This will also not work if in
+		// that case the NAT does not support hairpin translation. But we'll see
+		// how common that is...
+		char *ip = NULL;
+		char *port = NULL;
+		Parse1or2Args(UDPBuffer, &ip, &port);
+		if (FillinUDPInfo(UDPHost, UDPPort, ip, port)) {
+			fprintf(stderr, "Error filling in UDP info for %s:%s with %d.%d.%d.%d:%d",
+					ip, port, NIPQUAD(ntohl(UDPHost)), UDPPort);
+		}
+	}
+
 	return 0;
 }
 

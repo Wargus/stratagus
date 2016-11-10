@@ -140,7 +140,7 @@ int StartGame(Session *session)
 /**
 **  Join a game
 */
-int JoinGame(Session *session, int id, char *password)
+int JoinGame(Session *session, int id, char *password, unsigned long *host, int *port)
 {
 	GameData *game;
 
@@ -167,6 +167,12 @@ int JoinGame(Session *session, int id, char *password)
 	if (!game->OpenSlots) {
 		return -4; // Game full
 	}
+	if (!(game->UDPHost && game->UDPPort)) {
+		return -5; // Server not ready
+	}
+
+	*host = game->UDPHost;
+	*port = game->UDPPort;
 	game->Sessions[game->NumSessions++] = session;
 	session->Game = game;
 
@@ -213,8 +219,9 @@ int PartGame(Session *session)
 
 static int MatchGameType(Session *session, GameData *game)
 {
-	return (!*game->GameName || !strcmp(session->UserData.GameName, game->GameName)) &&
-		(!*game->Version || !strcmp(session->UserData.Version, game->Version));
+	return (!session->UserData.LoggedIn) ||
+		((!*game->GameName ||!strcmp(session->UserData.GameName, game->GameName)) &&
+		 (!*game->Version || !strcmp(session->UserData.Version, game->Version)));
 }
 
 /**
@@ -235,4 +242,18 @@ void ListGames(Session *session)
 		}
 		game = game->Next;
 	}
+}
+
+int FillinUDPInfo(unsigned long udphost, int udpport, char* ip, char* port) {
+	GameData *game;
+	for (game = Games; game; game = Games->Next) {
+		if (!strcmp(game->IP, ip) && !strcmp(game->Port, port)) {
+			if (!game->UDPHost && !game->UDPPort) {
+				game->UDPHost = udphost;
+				game->UDPPort = udpport;
+				return 0;
+			}
+		}
+	}
+	return -1;
 }
