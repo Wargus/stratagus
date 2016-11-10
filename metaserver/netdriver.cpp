@@ -268,10 +268,8 @@ static void AcceptConnections()
 	}
 	if (NetSocketReady(HolePunchSocket, 0)) {
 		NetRecvUDP(HolePunchSocket, UDPBuffer, sizeof(UDPBuffer), &UDPHost, &UDPPort);
-	} else {
-		UDPBuffer[0] = '\0';
-		UDPHost = 0;
-		UDPPort = 0;
+		UDPPort = ntohs(UDPPort);
+		DebugPrint("New UDP %s (%d %d)\n" _C_ UDPBuffer);
 	}
 }
 

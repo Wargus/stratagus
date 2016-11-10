@@ -196,7 +196,6 @@ int CMetaClient::CreateGame(std::string desc, std::string map, std::string playe
 		return -1;
 	}
 	CHost metaServerHost(metaHost.c_str(), ntohs(metaPort));
-	printf("PORTIN: %d PORTOUT: %d\n", metaPort, metaServerHost.getPort());
 
 	std::string ipport(CNetworkParameter::Instance.localHost.c_str());
 	ipport += " ";
