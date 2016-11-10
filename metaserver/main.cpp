@@ -223,7 +223,7 @@ int main(int argc, char **argv)
 	//
 	// Parse the command line.
 	//
-	while ((i = getopt(argc, argv, "aP:pm:i:d:")) != -1) {
+	while ((i = getopt(argc, argv, "aP:pm:i:d:h")) != -1) {
 		switch (i) {
 			case 'a':
 				EnableAssert = true;
@@ -248,6 +248,16 @@ int main(int argc, char **argv)
 				break;
 			case ':':
 				printf("Missing argument for %c\n", optopt);
+				exit(0);
+				break;
+			case 'h':
+				printf("Arguments:\n"
+					   "-a\tEnable asserts\n"
+					   "-P\tSet port\n"
+					   "-p\tEnable debug print\n"
+					   "-m\tMax connections\n"
+					   "-i\tIdle timeout\n"
+					   "-d\tPolling delay\n");
 				exit(0);
 				break;
 			case '?':
