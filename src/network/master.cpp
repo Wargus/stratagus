@@ -97,7 +97,13 @@ int CMetaClient::Init()
 	// Server socket
 	CHost metaServerHost(metaHost.c_str(), metaPort);
 	// Client socket
-	CHost metaClientHost(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
+
+	// open on all interfaces, not the loopback, unless we have an override from the commandline
+	std::string localHost = CNetworkParameter::Instance.localHost;
+	if (!localHost.compare("127.0.0.1")) {
+		localHost = "0.0.0.0";
+	}
+	CHost metaClientHost(localHost.c_str(), CNetworkParameter::Instance.localPort);
 	metaSocket.Open(metaClientHost);
 	if (metaSocket.IsValid() == false) {
 		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
