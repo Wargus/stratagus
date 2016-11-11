@@ -264,83 +264,30 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 	delete [] localAddr;
 	return nif;
 }
-#elif USE_LINUX // } {
-// ARI: I knew how to write this for a unix environment,
-// but am quite certain that porting this can cause you
-// trouble..
+#elif defined(USE_LINUX) || defined(USE_MAC)
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	if (sock == static_cast<Socket>(-1)) {
-		return 0;
+	struct ifaddrs *ifAddrStruct = NULL;
+	struct ifaddrs *ifa = NULL;
+	void *tmpAddrPtr = NULL;
+	int idx = 0;
+	getifaddrs(&ifAddrStruct);
+	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+		if (idx == maxAddr) break;
+		if (!ifa->ifa_addr) continue;
+		if (ifa->ifa_addr->sa_family != AF_INET) continue;
+		if (ifa->ifa_flags & IFF_LOOPBACK) continue;
+		if (ifa->ifa_flags & IFF_POINTOPOINT) continue;
+		if (ifa->ifa_flags & IFF_UP == 0) continue;
+		ips[idx++] = ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
 	}
-	char buf[4096];
-	struct ifconf ifc;
-	ifc.ifc_len = sizeof(buf);
-	ifc.ifc_buf = buf;
-	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
-		DebugPrint("SIOCGIFCONF - errno %d\n" _C_ errno);
-		return 0;
+	if (ifAddrStruct != NULL) {
+		freeifaddrs(ifAddrStruct);
 	}
-	// with some inspiration from routed..
-	int nif = 0;
-	struct ifreq *ifr = ifc.ifc_req;
-	char *cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
-
-	for (char *cp = buf; cp < cplim;
-		 cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
-		ifr = (struct ifreq *)cp;
-		struct ifreq ifreq = *ifr;
-		if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
-			DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
-					   ifr->ifr_name _C_ errno);
-			continue;
-		}
-		if ((ifreq.ifr_flags & IFF_UP) == 0 || ifr->ifr_addr.sa_family == AF_UNSPEC) {
-			continue;
-		}
-		// argh, this'll have to change sometime
-		if (ifr->ifr_addr.sa_family != AF_INET) {
-			continue;
-		}
-		if (ifreq.ifr_flags & IFF_LOOPBACK) {
-			continue;
-		}
-		struct sockaddr_in *sap = (struct sockaddr_in *)&ifr->ifr_addr;
-		struct sockaddr_in sa = *sap;
-		ips[nif] = sap->sin_addr.s_addr;
-		if (ifreq.ifr_flags & IFF_POINTOPOINT) {
-			if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
-				DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
-						   ifr->ifr_name _C_ errno);
-				// failed to obtain dst addr - ignore
-				continue;
-			}
-			if (ifr->ifr_addr.sa_family == AF_UNSPEC) {
-				continue;
-			}
-		}
-		// avoid p-t-p links with common src
-		if (nif) {
-			int i;
-			for (i = 0; i < nif; ++i) {
-				if (sa.sin_addr.s_addr == ips[i]) {
-					i = -1;
-					break;
-				}
-			}
-			if (i == -1) {
-				continue;
-			}
-		}
-		++nif;
-		if (nif == maxAddr) {
-			break;
-		}
-	}
-	return nif;
+	return idx;
 }
 #else // } {
-// Beos?? Mac??
+// more??
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
 	ips[0] = htonl(0x7f000001);

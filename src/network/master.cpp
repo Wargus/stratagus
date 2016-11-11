@@ -197,7 +197,15 @@ int CMetaClient::CreateGame(std::string desc, std::string map, std::string playe
 	}
 	CHost metaServerHost(metaHost.c_str(), metaPort);
 
-	std::string ipport(CNetworkParameter::Instance.localHost.c_str());
+	// Advertise an external IP address if we can
+	unsigned long ips[1];
+	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 1);
+	std::string ipport = "";
+	if (!networkNumInterfaces || CNetworkParameter::Instance.localHost.compare("127.0.0.1")) {
+	    ipport += CNetworkParameter::Instance.localHost.c_str();
+	} else {
+	    ipport += ips[0];
+	}
 	ipport += " ";
 	ipport += std::to_string(CNetworkParameter::Instance.localPort);
 
