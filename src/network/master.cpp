@@ -204,7 +204,7 @@ int CMetaClient::CreateGame(std::string desc, std::string map, std::string playe
 	if (!networkNumInterfaces || CNetworkParameter::Instance.localHost.compare("127.0.0.1")) {
 	    ipport += CNetworkParameter::Instance.localHost.c_str();
 	} else {
-	    ipport += ips[0];
+		ipport += inet_ntoa(((struct in_addr *)ips)[0]);
 	}
 	ipport += " ";
 	ipport += std::to_string(CNetworkParameter::Instance.localPort);

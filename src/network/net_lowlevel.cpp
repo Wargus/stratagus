@@ -49,19 +49,9 @@
 
 #include <windows.h>
 #include <winsock.h>
-//#include <ws2tcpip.h>
-
-// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
-#define SIO_GET_INTERFACE_LIST 0x4004747F
-#define IFF_UP 1
-#define IFF_LOOPBACK 4
-struct OLD_INTERFACE_INFO {
-	unsigned long iiFlags; /* Interface flags */
-	SOCKADDR   iiAddress;  /* Interface address */
-	SOCKADDR   iiBroadcastAddress; /* Broadcast address */
-	SOCKADDR   iiNetmask;  /* Network mask */
-};
-#define INTERFACE_INFO OLD_INTERFACE_INFO
+#include <ws2tcpip.h>
+#include <Iphlpapi.h>
+#pragma comment(lib, "Iphlpapi.lib")
 
 typedef const char *setsockopttype;
 typedef char *recvfrombuftype;
@@ -226,43 +216,33 @@ unsigned long NetResolveHost(const std::string &host)
 **  @return number of IP-addrs found.
 */
 #ifdef USE_WINSOCK // {
-// ARI: MS documented this for winsock2, so I finally found it..
-// I also found a way for winsock1.1 (= win95), but
-// that one was too complex to start with.. -> trouble
-// Lookout for INTRFC.EXE on the MS web site...
+#ifndef MIB_IF_TYPE_IEEE80211
+#define MIB_IF_TYPE_IEEE80211 71
+#endif
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	INTERFACE_INFO *localAddr = new INTERFACE_INFO[maxAddr];  // Assume there will be no more than maxAddr interfaces
-	int nif = 0;
-
-	if (sock != static_cast<Socket>(-1)) {
-		DWORD bytesReturned;
-		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-							   sizeof(INTERFACE_INFO) * maxAddr, &bytesReturned, NULL, NULL);
-		if (wsError == SOCKET_ERROR) {
-			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
-		}
-
-		// parse interface information
-		const int numLocalAddr = (bytesReturned / sizeof(INTERFACE_INFO));
-		for (int i = 0; i < numLocalAddr; ++i) {
-			u_long SetFlags = localAddr[i].iiFlags;
-			if ((SetFlags & IFF_UP) == 0) {
-				continue;
-			}
-			if ((SetFlags & IFF_LOOPBACK)) {
-				continue;
-			}
-			SOCKADDR_IN *pAddrInet = (SOCKADDR_IN *)&localAddr[i].iiAddress;
-			ips[nif] = pAddrInet->sin_addr.s_addr;
-			++nif;
-			if (nif == maxAddr) {
-				break;
-			}
+	int idx = 0;
+	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+	ULONG outBufLen = 0;
+	GetAdaptersAddresses(AF_INET,
+						 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
+						 NULL, pAddresses, &outBufLen);
+	pAddresses = (PIP_ADAPTER_ADDRESSES)malloc(outBufLen);
+	if (GetAdaptersAddresses(AF_INET,
+							 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
+							 NULL, pAddresses, &outBufLen) == NO_ERROR) {
+		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
+			if (idx == maxAddr) break;
+			if (pAddresses->Flags & IP_ADAPTER_RECEIVE_ONLY) continue;
+			if (pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED == 0) continue;
+			if (pAddresses->IfType != IF_TYPE_ETHERNET_CSMACD && pAddresses->IfType != IF_TYPE_IEEE80211) continue;
+			if (pAddresses->OperStatus != IfOperStatusUp) continue;
+			if (strlen((char*)pAddresses->PhysicalAddress) == 0) continue;
+			ips[idx++] = ((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr;
 		}
 	}
-	delete [] localAddr;
-	return nif;
+
+	return idx;
 }
 #elif defined(USE_LINUX) || defined(USE_MAC)
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
