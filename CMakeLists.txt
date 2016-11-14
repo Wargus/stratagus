@@ -1240,7 +1240,7 @@ install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
 if(SQLITE_FOUND)
-	install(TARGETS metaserver DESTINATION ${SBINDIR})
+	install(TARGETS metaserver DESTINATION ${BINDIR} RENAME stratagus-metaserver)
 endif()
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
