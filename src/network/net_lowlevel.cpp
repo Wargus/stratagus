@@ -50,6 +50,14 @@
 #include <windows.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+// that's fine
+#elif (NTDDI_VERSION >= NTDDI_WIN2K)
+// that's fine, too
+#else
+// oh no, we're at least NTDDI_WIN2K, otherwise Iphlpapi doesn't work
+#define NTDDI_VERSION NTDDI_WIN2K
+#endif
 #include <Iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
 
@@ -234,7 +242,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
 			if (idx == maxAddr) break;
 			if (pAddresses->Flags & IP_ADAPTER_RECEIVE_ONLY) continue;
-			if (pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED == 0) continue;
+			if ((pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == 0) continue;
 			if (pAddresses->IfType != IF_TYPE_ETHERNET_CSMACD && pAddresses->IfType != IF_TYPE_IEEE80211) continue;
 			if (pAddresses->OperStatus != IfOperStatusUp) continue;
 			if (strlen((char*)pAddresses->PhysicalAddress) == 0) continue;
