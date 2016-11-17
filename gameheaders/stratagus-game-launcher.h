@@ -1,29 +1,29 @@
 /*
-       _________ __                 __
-      /   _____//  |_____________ _/  |______     ____  __ __  ______
-      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-             \/                  \/          \//_____/            \/
+	   _________ __                 __
+	  /   _____//  |_____________ _/  |______     ____  __ __  ______
+	  \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+	  /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+	 /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+			 \/                  \/          \//_____/            \/
   ______________________                           ______________________
-                        T H E   W A R   B E G I N S
-         Stratagus - A free fantasy real time strategy game engine
+						T H E   W A R   B E G I N S
+		 Stratagus - A free fantasy real time strategy game engine
 
-    stratagus-game-launcher.h - Stratagus Game Launcher
-    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
+	stratagus-game-launcher.h - Stratagus Game Launcher
+	Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -41,7 +41,13 @@
  *
  * ::GAME_CD
  *
+ * ::GAME_CD_FILE_PATTERNS
+ *
  * ::GAME
+ *
+ * ::EXTRACTOR_TOOL
+ *
+ * ::EXTRACTOR_ARGS
  *
  * On Non Windows system you need to specify also paths:
  *
@@ -61,6 +67,9 @@
  * #define GAME_NAME "My Game Name"
  * #define GAME_CD "Original Game CD Name"
  * #define GAME "my_game"
+ * #define GAME_CD_FILE_PATTERNS "*.WAR", "*.war"
+ * #define EXTRACTOR_TOOL "gametool"
+ * #define EXTRACTOR_ARGS "-v"
  *
  * #ifndef WIN32
  * #define DATA_PATH "/usr/share/games/stratagus/my_game"
@@ -84,8 +93,25 @@
  **/
 
 /**
+ * \def GAME_CD_FILE_PATTERNS
+ * Comma-separated file patterns for the extraction wizard to help users select
+ * the right folder.
+ **/
+
+/**
  * \def GAME
  * Short name of game (lower ascii chars without space)
+ **/
+
+/**
+ * \def EXTRACTOR_TOOL
+ * The name of the game data extractor tool. This code will append the
+ * arguments, src, and destionation directories.
+ **/
+
+/**
+ * \def EXTRACTOR_ARGS
+ * The default arguments of the game data extractor tool.
  **/
 
 /**
@@ -113,12 +139,14 @@
 #define STRATAGUS_BIN
 #endif
 
-#if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME)
+#if ! defined (GAME_NAME) || ! defined (GAME_CD) || ! defined (GAME) || ! defined(EXTRACTOR_TOOL)
 #error You need to define all Game macros, see stratagus-game-launcher.h
 #endif
 
 #if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
 #define WIN32
+#pragma comment(lib, "comdlg32.lib")
+#pragma comment(lib, "ole32.lib")
 #endif
 
 /**
@@ -137,6 +165,7 @@
 #if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
 #error You need to define paths, see stratagus-game-launcher.h
 #endif
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
 #ifdef WIN32
@@ -144,12 +173,13 @@
 #include <windows.h>
 #include <wincon.h>
 #include <process.h>
-#include <errno.h>
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ftw.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -170,6 +200,7 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <X11/Xlib.h>
+#include <libgen.h>
 #ifndef NOGTK
 #include <gtk/gtk.h>
 #endif
@@ -183,55 +214,226 @@
 
 #define TITLE GAME_NAME
 #define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\nFirst install Stratagus from https://launchpad.net/stratagus"
-#define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted yet.\nYou need extract data from original " GAME_CD " first!"
-#define NO_X_DISPLAY "Cannot open X Display"
-#define CONSOLE_MODE_NOT_ROOT "You must be root to run " GAME_NAME " in console framebuffer mode"
+#define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted, is corrupted, or outdated.\nYou need to extract it from original " GAME_CD "."
 
-#define BUFF_SIZE 1024
+#define BUFF_SIZE 4096
 
 #ifndef WIN32
 int ConsoleMode = 0;
 #endif
 
-static void error(char * title, char * text) {
+#include "tinyfiledialogs.h"
+#include "tinyfiledialogs.c"
+
+static void SetUserDataPath(char* data_path) {
+#if USE_WIN32
+	strcpy(data_path, getenv("APPDATA"));
+#else
+	strcpy(data_path, getenv("HOME"));
+#endif
+	int datalen = strlen(data_path);
+	if (datalen == 0) {
+		return;
+	}
+	data_path[datalen] = '/';
+	data_path[datalen + 1] = '\0';
+
+#if USE_WIN32
+	strcat(data_path, "Stratagus\\");
+#elif defined(USE_MAC)
+	strcat(data_path, "Library/Stratagus/");
+#else
+	strcat(data_path, ".stratagus/");
+#endif
+	strcat(data_path, "data." GAME_NAME);
+}
+
+#ifdef USE_WIN32
+#define QUOTE "\""
+#else
+#define QUOTE "'"
+#endif
+
+static void error(char* title, char* text) {
+	tinyfd_messageBox(title, text, "ok", "error", 1);
+	exit(-1);
+}
+
+char dst_root[BUFF_SIZE];
+char src_root[BUFF_SIZE];
+
+void mkdir_p(const char* path)
+{
+	char* cp;
+	char* s;
+
+	if (*path && path[0] == '.') {  // relative don't work
+		return;
+	}
+	cp = strdup(path);
+	s = strrchr(cp, '/');
+	if (s) {
+		*s = '\0';  // remove file
+		s = cp;
+		for (;;) {  // make each path element
+			s = strchr(s, '/');
+			if (s) {
+				*s = '\0';
+			}
+			mkdir(cp, 0777);
+			if (s) {
+				*s++ = '/';
+			} else {
+				break;
+			}
+		}
+	} else {
+		mkdir(cp, 0777);
+	}
+	free(cp);
+}
+
+static int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
+	char dst_path[BUFF_SIZE];
+	strcpy(dst_path, dst_root);
+	strcat(dst_path, src_path + strlen(src_root));
+	switch(typeflag) {
+	case FTW_D:
+		mkdir(dst_path, sb->st_mode);
+		break;
+	case FTW_F:
+		FILE* in = fopen(src_path, "rb");
+		FILE* out = fopen(dst_path, "wb");
+		char buf[4096];
+		int c = 0;
+		while (c = fread(buf, sizeof(char), 4096, in)) {
+			fwrite(buf, sizeof(char), c, out);
+		}
+		fclose(in);
+		fclose(out);
+		break;
+	}
+	return 0;
+}
+
+static void copy_dir(const char* src_path, const char* dst_path) {
+	printf("Copying %s to %s\n", src_path, dst_path);
+	mkdir_p(dst_path);
+	strcpy(dst_root, dst_path);
+	strcpy(src_root, src_path);
+	ftw(src_path, copy_file, 20);
+}
+
+
+int check_version(char* tool_path, char* data_path) {
+    char buf[4096] = {'\0'};
+    sprintf(buf, "%s/extracted" , data_path);
+    FILE *f = fopen(buf, "r");
+    char dataversion[20] = {'\0'};
+    char toolversion[20] = {'\0'};
+    if (f) {
+		fgets(dataversion, 20, f);
+		fclose(f);
+    } else {
+		return 1; // No file means we don't care
+	}
+    sprintf(buf, "%s -V", tool_path);
+    FILE *pipe = popen(buf, "r");
+    if (f) {
+		fgets(toolversion, 20, pipe);
+		pclose(pipe);
+    }
+    // strip whitespace
+    for (size_t i=0, j=0; toolversion[j]=toolversion[i]; j+=!isspace(toolversion[i++]));
+    for (size_t i=0, j=0; dataversion[j]=dataversion[i]; j+=!isspace(dataversion[i++]));
+	if (strcmp(dataversion, toolversion) == 0) {
+		return 1;
+	}
+    return 0;
+}
+
+static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
+	if (!force) {
+		tinyfd_messageBox("Missing data",
+						  DATA_NOT_EXTRACTED "Please select the " GAME_CD, "ok", "error", 1);
+	} else {
+		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
+	}
+	char* filepatterns[] = { GAME_CD_FILE_PATTERNS, NULL };
+	int patterncount = 0;
+	while (filepatterns[patterncount++] != NULL);
+	const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
+												  patterncount - 1, filepatterns, NULL, 0);
+	if (datafile == NULL) {
+		exit(-1);
+	}
+	char srcfolder[1024] = {'\0'};
+	strcpy(srcfolder, datafile);
 
 #ifdef WIN32
-	MessageBox(NULL, text, title, MB_OK | MB_ICONERROR);
+	PathRemoveFileSpec(srcfolder);
 #else
-#ifdef NOGTK
-	{
-#else
-	if ( ! ConsoleMode ) {
-		GtkWidget * window = NULL;
-		GtkWidget * dialog = NULL;
-
-		dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", text);
-		gtk_window_set_title(GTK_WINDOW(dialog), title);
-		gtk_window_set_skip_pager_hint(GTK_WINDOW(dialog), 0);
-		gtk_window_set_skip_taskbar_hint(GTK_WINDOW(dialog), 0);
-		gtk_label_set_selectable(GTK_LABEL(GTK_MESSAGE_DIALOG(dialog)->label), 0);
-		gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
-
-	} else {
+	dirname(srcfolder);
 #endif
-		fprintf(stderr, "%s -- Error: %s\n", title, text);
+
+	struct stat st;
+	if (stat(scripts_path, &st) != 0) {
+		// deployment time path not found, try compile time path
+		strcpy(scripts_path, SRC_PATH());
+#ifdef WIN32
+		PathRemoveFileSpec(scripts_path);
+#else
+		dirname(scripts_path);
+#endif
+	}
+
+	char contrib_src_path[BUFF_SIZE];
+	char contrib_dest_path[BUFF_SIZE];
+	int i = 0;
+	char* contrib_directories[] = CONTRIB_DIRECTORIES;
+	while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
+		strcpy(contrib_src_path, scripts_path);
+		strcat(contrib_src_path, "/");
+		strcat(contrib_src_path, contrib_directories[i]);
+		strcpy(contrib_dest_path, destination);
+		strcat(contrib_dest_path, "/");
+		strcat(contrib_dest_path, contrib_directories[i + 1]);
+		copy_dir(contrib_src_path, contrib_dest_path);
+		i += 2;
+	}
+
+	char cmdbuf[4096] = {'\0'};
+#ifdef USE_MAC
+	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\" to do script \\\"'");
+#elseif !defined(WIN32)
+	if (!ConsoleMode) {
+		strcat(cmdbuf, "x-terminal-emulator -e \"");
 	}
 #endif
-	exit(1);
+	strcat(cmdbuf, extractor_tool);
+	strcat(cmdbuf, " " QUOTE);
+	strcat(cmdbuf, srcfolder);
+	strcat(cmdbuf, QUOTE " " QUOTE);
+	strcat(cmdbuf, destination);
+	strcat(cmdbuf, QUOTE);
+#ifdef USE_MAC
+	strcat(cmdbuf, "\\\"\"");
+#elseif !defined(WIN32)
+	if (!ConsoleMode) {
+	strcat(cmdbuf, "\"");
+}
+#endif
+	printf("Running %s\n", cmdbuf);
+	system(cmdbuf);
 }
 
 int main(int argc, char * argv[]) {
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(USE_MAC)
 	if ( ! XOpenDisplay(NULL) ) {
 		ConsoleMode = 1;
 	}
-	if ( ConsoleMode ) {
-		if ( getuid() != 0 ) {
-			error(TITLE, CONSOLE_MODE_NOT_ROOT);
-		}
-	} else {
+	if (!ConsoleMode) {
 #ifndef NOGTK
 		gtk_init(&argc, &argv);
 #endif
@@ -243,6 +445,26 @@ int main(int argc, char * argv[]) {
 	char scripts_path[BUFF_SIZE];
 	char stratagus_bin[BUFF_SIZE];
 	char title_path[BUFF_SIZE];
+	char extractor_path[BUFF_SIZE];
+
+	// The extractor is in the same dir as we are
+	strcpy(extractor_path, argv[0]);
+#ifdef WIN32
+	PathRemoveFileSpec(extractor_path);
+	strcat(extractor_path, "\\" EXTRACTOR_TOOL);
+#else
+	dirname(extractor_path);
+	strcat(extractor_path, "/" EXTRACTOR_TOOL);
+#endif
+	// Once we have the path, we quote it by moving the memory one byte to the
+	// right, and surrounding it with the quote character and finishing null
+	// bytes. Then we add the arguments.
+	extractor_path[strlen(extractor_path) + 1] = '\0';
+	memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
+	extractor_path[0] = QUOTE[0];
+	extractor_path[strlen(extractor_path) + 1] = '\0';
+	extractor_path[strlen(extractor_path)] = QUOTE[0];
+	strcat(extractor_path, " " EXTRACTOR_ARGS);
 
 #ifdef WIN32
 	char executable_path[BUFF_SIZE];
@@ -301,12 +523,57 @@ int main(int argc, char * argv[]) {
 #endif
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
-		error(TITLE, STRATAGUS_NOT_FOUND);
+#ifdef WIN32
+		stratagus_bin = _fullpath(argv[0], NULL);
+		PathRemoveFileSpec(stratagus_bin);
+		strcat(extractor_path, "\\stratagus.exe");
+#else
+		realpath(argv[0], stratagus_bin);
+		dirname(stratagus_bin);
+		if (strlen(stratagus_bin) > 0) {
+			strcat(stratagus_bin, "/stratagus");
+		} else {
+			strcat(stratagus_bin, "./stratagus");
+		}
+#endif
+		if ( stat(stratagus_bin, &st) != 0 ) {
+			error(TITLE, STRATAGUS_NOT_FOUND);
+		}
 	}
-	if ( stat(data_path, &st) != 0 ) {
-		error(TITLE, DATA_NOT_EXTRACTED);
+
+	if (argc > 1) {
+		if (!strcmp(argv[1], "--extract")) {
+			// Force extraction and exit
+			SetUserDataPath(data_path);
+			ExtractData(extractor_path, data_path, scripts_path, 1);
+			return 0;
+		}
+
+		if (!strcmp(argv[1], "--extract-no-gui")) {
+			// Force extraction without ui and exit
+			tinyfd_forceConsole = 1;
+			SetUserDataPath(data_path);
+			ExtractData(extractor_path, data_path, scripts_path, 1);
+			return 0;
+		}
 	}
+
 	sprintf(title_path, TITLE_PNG, data_path);
+	if ( stat(title_path, &st) != 0 ) {
+		SetUserDataPath(data_path);
+		sprintf(title_path, TITLE_PNG, data_path);
+		if ( stat(title_path, &st) != 0 ) {
+			ExtractData(extractor_path, data_path, scripts_path);
+		}
+		if ( stat(title_path, &st) != 0 ) {
+			error(TITLE, DATA_NOT_EXTRACTED);
+		}
+	}
+
+	if (!check_version(extractor_path, data_path)) {
+		ExtractData(extractor_path, data_path, scripts_path);
+	}
+
 #ifdef WIN32
 	int data_path_len = strlen(data_path);
 
@@ -316,17 +583,6 @@ int main(int argc, char * argv[]) {
 	data_path[0] = '"';
 	data_path[data_path_len + 1] = '"';
 	data_path[data_path_len + 2] = 0;
-#endif
-
-	if ( stat(title_path, &st) != 0 ) {
-		error(TITLE, DATA_NOT_EXTRACTED);
-	}
-#ifndef WIN32
-	if ( strcmp(data_path, scripts_path) != 0 ) {
-		if ( chdir(data_path) != 0 ) {
-			error(TITLE, DATA_NOT_EXTRACTED);
-		}
-	}
 #endif
 
 #ifdef _MSC_VER
@@ -349,7 +605,7 @@ int main(int argc, char * argv[]) {
 #endif
 
 	stratagus_argv[1] = "-d";
-	stratagus_argv[2] = scripts_path;
+	stratagus_argv[2] = data_path;
 
 	for (int i = 3; i < argc + 2; ++i ) {
 		stratagus_argv[i] = argv[i - 2];
@@ -371,6 +627,14 @@ int main(int argc, char * argv[]) {
 	execvp(stratagus_bin, stratagus_argv);
 #endif
 
+#ifndef WIN32
+	if (strcmp(stratagus_bin, "stratagus") == 0) {
+		realpath(argv[0], stratagus_bin);
+		dirname(stratagus_bin);
+		strcat(stratagus_bin, "/stratagus");
+	}
+	execvp(stratagus_bin, stratagus_argv);
+#endif
 	error(TITLE, STRATAGUS_NOT_FOUND);
 	return 1;
 }
