@@ -223,7 +223,7 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 		content.erase(std::remove(content.begin(), content.end(), '\r'), content.end());
 		// FileChecksums ^= fletcher32(content);
 		// https://github.com/Wargus/stratagus/issues/196, disable for now.
-		FileChecksums ^= 0;
+		FileChecksums = 0;
 	}
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
