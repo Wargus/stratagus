@@ -1,30 +1,29 @@
 /*
-	   _________ __                 __
-	  /   _____//  |_____________ _/  |______     ____  __ __  ______
-	  \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
-	  /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
-	 /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
-			 \/                  \/          \//_____/            \/
+       _________ __                 __
+      /   _____//  |_____________ _/  |______     ____  __ __  ______
+      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
+     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+             \/                  \/          \//_____/            \/
   ______________________                           ______________________
-						T H E   W A R   B E G I N S
-		 Stratagus - A free fantasy real time strategy game engine
+                        T H E   W A R   B E G I N S
+         Stratagus - A free fantasy real time strategy game engine
 
-	stratagus-game-launcher.h - Stratagus Game Launcher
-	Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
+stratagus-game-launcher.h - Stratagus Game Launcher
+    Copyright (C) 2010-2011  Pali Rohár <pali.rohar@gmail.com>
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 2 of the License, or
-	(at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
@@ -202,6 +201,8 @@
 #define strdup _strdup
 #define mkdir(f, m) _mkdir(f)
 #define dirname(x) PathRemoveFileSpec(x)
+#define execvp _execvp
+#define unlink _unlink
 #endif
 
 #ifdef _MSC_VER
@@ -212,9 +213,6 @@
 #include <unistd.h>
 #include <X11/Xlib.h>
 #include <libgen.h>
-#ifndef NOGTK
-#include <gtk/gtk.h>
-#endif
 #endif
 
 #ifdef _WIN64
@@ -505,7 +503,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	if (exitcode != 0) {
 		tinyfd_messageBox("Missing data", "Data extraction failed", "ok", "error", 1);
-		_unlink(destination);
+		unlink(destination);
 	};
 }
 
@@ -516,9 +514,6 @@ int main(int argc, char * argv[]) {
 		ConsoleMode = 1;
 	}
 	if (!ConsoleMode) {
-#ifndef NOGTK
-		gtk_init(&argc, &argv);
-#endif
 	}
 #endif
 
@@ -689,7 +684,7 @@ int main(int argc, char * argv[]) {
 	}
 	stratagus_argv[argc + 2] = NULL;
 
-	_execvp(stratagus_bin, stratagus_argv);
+	execvp(stratagus_bin, stratagus_argv);
 
 #ifndef WIN32
 	if (strcmp(stratagus_bin, "stratagus") == 0) {
