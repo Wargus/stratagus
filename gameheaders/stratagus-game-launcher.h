@@ -145,8 +145,13 @@
 
 #if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
 #define WIN32
+#endif
+
+#ifdef WIN32
+#include <Shlwapi.h>
 #pragma comment(lib, "comdlg32.lib")
 #pragma comment(lib, "ole32.lib")
+#pragma comment(lib, "Shlwapi.lib")
 #endif
 
 /**
@@ -169,28 +174,34 @@
 #endif
 
 #ifdef WIN32
+#ifndef WINVER
 #define WINVER 0x0501
+#endif
 #include <windows.h>
 #include <wincon.h>
 #include <process.h>
+#else
+#include <ftw.h>
 #endif
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ftw.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <direct.h>
-#define inline __inline
+//#define inline __inline
 #define chdir _chdir
 #define getcwd _getcwd
 #define spawnvp _spawnvp
 #define stat _stat
+#define strdup _strdup
+#define mkdir(f, m) _mkdir(f)
+#define dirname(x) PathRemoveFileSpec(x)
 #endif
 
 #ifdef _MSC_VER
@@ -226,32 +237,28 @@ int ConsoleMode = 0;
 #include "tinyfiledialogs.c"
 
 static void SetUserDataPath(char* data_path) {
-#if USE_WIN32
+#if WIN32
 	strcpy(data_path, getenv("APPDATA"));
 #else
 	strcpy(data_path, getenv("HOME"));
 #endif
 	int datalen = strlen(data_path);
-	if (datalen == 0) {
-		return;
-	}
-	data_path[datalen] = '/';
-	data_path[datalen + 1] = '\0';
-
-#if USE_WIN32
-	strcat(data_path, "Stratagus\\");
+#if WIN32
+	strcat(data_path, "\\Stratagus\\");
 #elif defined(USE_MAC)
-	strcat(data_path, "Library/Stratagus/");
+	strcat(data_path, "/Library/Stratagus/");
 #else
-	strcat(data_path, ".stratagus/");
+	strcat(data_path, "/.stratagus/");
 #endif
 	strcat(data_path, "data." GAME_NAME);
 }
 
-#ifdef USE_WIN32
+#ifdef WIN32
 #define QUOTE "\""
+#define SLASH "\\"
 #else
 #define QUOTE "'"
+#define SLASH "/"
 #endif
 
 static void error(char* title, char* text) {
@@ -264,25 +271,27 @@ char src_root[BUFF_SIZE];
 
 void mkdir_p(const char* path)
 {
-	char* cp;
-	char* s;
+	char *cp, *s, *s2;
 
 	if (*path && path[0] == '.') {  // relative don't work
 		return;
 	}
 	cp = strdup(path);
 	s = strrchr(cp, '/');
+	if (!s) s = strrchr(cp, SLASH[0]);
 	if (s) {
 		*s = '\0';  // remove file
 		s = cp;
 		for (;;) {  // make each path element
-			s = strchr(s, '/');
+			s2 = strchr(s, '/');
+			if (!s2) s = strchr(s, SLASH[0]);
+			s = s2;
 			if (s) {
 				*s = '\0';
 			}
 			mkdir(cp, 0777);
 			if (s) {
-				*s++ = '/';
+				*s++ = SLASH[0];
 			} else {
 				break;
 			}
@@ -293,6 +302,31 @@ void mkdir_p(const char* path)
 	free(cp);
 }
 
+#ifdef WIN32
+#include <wchar.h>
+#include <string>
+static void copy_dir(const char* source_folder, const char* target_folder)
+{
+	wchar_t *wsource_folder = new wchar_t[strlen(source_folder) + 1];
+	size_t convertedChars = 0;
+	mbstowcs_s(&convertedChars, wsource_folder, strlen(source_folder) + 1, source_folder, _TRUNCATE);
+	wchar_t *wtarget_folder = new wchar_t[strlen(target_folder) + 1];
+	mbstowcs_s(&convertedChars, wtarget_folder, strlen(target_folder) + 1, target_folder, _TRUNCATE);
+	WCHAR sf[MAX_PATH + 1];
+	WCHAR tf[MAX_PATH + 1];
+	wcscpy_s(sf, MAX_PATH, wsource_folder);
+	mkdir_p(target_folder);
+	wcscpy_s(tf, MAX_PATH, wtarget_folder);
+	sf[lstrlenW(sf) + 1] = 0;
+	tf[lstrlenW(tf) + 1] = 0;
+	SHFILEOPSTRUCTW s = { 0 };
+	s.wFunc = FO_COPY;
+	s.pTo = tf;
+	s.pFrom = sf;
+	s.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
+	SHFileOperationW(&s);
+}
+#else
 static int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 	char dst_path[BUFF_SIZE];
 	strcpy(dst_path, dst_root);
@@ -323,7 +357,7 @@ static void copy_dir(const char* src_path, const char* dst_path) {
 	strcpy(src_root, src_path);
 	ftw(src_path, copy_file, 20);
 }
-
+#endif
 
 int check_version(char* tool_path, char* data_path) {
     char buf[4096] = {'\0'};
@@ -338,11 +372,37 @@ int check_version(char* tool_path, char* data_path) {
 		return 1; // No file means we don't care
 	}
     sprintf(buf, "%s -V", tool_path);
+#ifndef WIN32
     FILE *pipe = popen(buf, "r");
     if (f) {
 		fgets(toolversion, 20, pipe);
 		pclose(pipe);
     }
+#else
+	HANDLE g_hChildStd_OUT_Rd = NULL;
+	HANDLE g_hChildStd_OUT_Wr = NULL;
+	SECURITY_ATTRIBUTES saAttr;
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+	if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0))
+		return 1;
+	if (!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0))
+		return 1;
+	PROCESS_INFORMATION piProcInfo;
+	STARTUPINFO siStartInfo;
+	ZeroMemory(&piProcInfo, sizeof(PROCESS_INFORMATION));
+	ZeroMemory(&siStartInfo, sizeof(STARTUPINFO));
+	siStartInfo.cb = sizeof(STARTUPINFO);
+	siStartInfo.hStdError = g_hChildStd_OUT_Wr;
+	siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
+	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+	if (!CreateProcess(NULL, buf, NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &piProcInfo))
+		return 1;
+	CloseHandle(piProcInfo.hProcess);
+	CloseHandle(piProcInfo.hThread);
+	ReadFile(g_hChildStd_OUT_Rd, toolversion, 20, NULL, NULL);
+#endif
     // strip whitespace
     for (size_t i=0, j=0; toolversion[j]=toolversion[i]; j+=!isspace(toolversion[i++]));
     for (size_t i=0, j=0; dataversion[j]=dataversion[i]; j+=!isspace(dataversion[i++]));
@@ -355,7 +415,7 @@ int check_version(char* tool_path, char* data_path) {
 static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
 	if (!force) {
 		tinyfd_messageBox("Missing data",
-						  DATA_NOT_EXTRACTED "Please select the " GAME_CD, "ok", "error", 1);
+						  DATA_NOT_EXTRACTED " Please select the " GAME_CD, "ok", "error", 1);
 	} else {
 		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
 	}
@@ -370,21 +430,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	char srcfolder[1024] = {'\0'};
 	strcpy(srcfolder, datafile);
 
-#ifdef WIN32
-	PathRemoveFileSpec(srcfolder);
-#else
 	dirname(srcfolder);
-#endif
 
 	struct stat st;
 	if (stat(scripts_path, &st) != 0) {
 		// deployment time path not found, try compile time path
 		strcpy(scripts_path, SRC_PATH());
-#ifdef WIN32
-		PathRemoveFileSpec(scripts_path);
-#else
 		dirname(scripts_path);
-#endif
 	}
 
 	char contrib_src_path[BUFF_SIZE];
@@ -393,10 +445,10 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	char* contrib_directories[] = CONTRIB_DIRECTORIES;
 	while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
 		strcpy(contrib_src_path, scripts_path);
-		strcat(contrib_src_path, "/");
+		strcat(contrib_src_path, SLASH);
 		strcat(contrib_src_path, contrib_directories[i]);
 		strcpy(contrib_dest_path, destination);
-		strcat(contrib_dest_path, "/");
+		strcat(contrib_dest_path, SLASH);
 		strcat(contrib_dest_path, contrib_directories[i + 1]);
 		copy_dir(contrib_src_path, contrib_dest_path);
 		i += 2;
@@ -409,6 +461,8 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	if (!ConsoleMode) {
 		strcat(cmdbuf, "x-terminal-emulator -e \"");
 	}
+#else
+	strcat(cmdbuf, "/C \"");
 #endif
 	strcat(cmdbuf, extractor_tool);
 	strcat(cmdbuf, " " QUOTE);
@@ -422,9 +476,37 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	if (!ConsoleMode) {
 	strcat(cmdbuf, "\"");
 }
+#else
+	strcat(cmdbuf, "\"");
 #endif
-	printf("Running %s\n", cmdbuf);
-	system(cmdbuf);
+#ifdef WIN32
+	DWORD exitcode = 0;
+	SHELLEXECUTEINFO ShExecInfo = { 0 };
+	char* toolpath = strdup(extractor_tool);
+	PathRemoveFileSpec(toolpath);
+	// remove the leading quote
+	if (toolpath[0] == '"') memmove(toolpath, toolpath + 1, strlen(toolpath) + 1);
+	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+	ShExecInfo.hwnd = NULL;
+	ShExecInfo.lpVerb = NULL;
+	ShExecInfo.lpFile = "cmd";
+	ShExecInfo.lpParameters = cmdbuf;
+	ShExecInfo.lpDirectory = toolpath;
+	ShExecInfo.nShow = SW_SHOW;
+	ShExecInfo.hInstApp = NULL;
+	ShellExecuteEx(&ShExecInfo);
+	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+	GetExitCodeProcess(ShExecInfo.hProcess, &exitcode);
+#else
+	int exitcode = 0;
+    printf("Running %s\n", cmdbuf);
+	exitcode = system(cmdbuf);
+#endif
+	if (exitcode != 0) {
+		tinyfd_messageBox("Missing data", "Data extraction failed", "ok", "error", 1);
+		_unlink(destination);
+	};
 }
 
 int main(int argc, char * argv[]) {
@@ -449,13 +531,8 @@ int main(int argc, char * argv[]) {
 
 	// The extractor is in the same dir as we are
 	strcpy(extractor_path, argv[0]);
-#ifdef WIN32
-	PathRemoveFileSpec(extractor_path);
-	strcat(extractor_path, "\\" EXTRACTOR_TOOL);
-#else
 	dirname(extractor_path);
-	strcat(extractor_path, "/" EXTRACTOR_TOOL);
-#endif
+	strcat(extractor_path, SLASH EXTRACTOR_TOOL);
 	// Once we have the path, we quote it by moving the memory one byte to the
 	// right, and surrounding it with the quote character and finishing null
 	// bytes. Then we add the arguments.
@@ -524,7 +601,7 @@ int main(int argc, char * argv[]) {
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
 #ifdef WIN32
-		stratagus_bin = _fullpath(argv[0], NULL);
+		_fullpath(stratagus_bin, argv[0], BUFF_SIZE);
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 #else
@@ -612,20 +689,7 @@ int main(int argc, char * argv[]) {
 	}
 	stratagus_argv[argc + 2] = NULL;
 
-#ifdef WIN32
-	AttachConsole(ATTACH_PARENT_PROCESS);
-
-	errno = 0;
-	int ret = spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
-#ifdef _MSC_VER
-	free (stratagus_argv);
-#endif
-	if ( errno == 0 ) {
-		return ret;
-	}
-#else
-	execvp(stratagus_bin, stratagus_argv);
-#endif
+	_execvp(stratagus_bin, stratagus_argv);
 
 #ifndef WIN32
 	if (strcmp(stratagus_bin, "stratagus") == 0) {
