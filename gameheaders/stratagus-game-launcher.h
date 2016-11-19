@@ -458,7 +458,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, "/C \"");
 #else
 	if (!ConsoleMode) {
-		strcat(cmdbuf, "x-terminal-emulator -e \"");
+		strcat(cmdbuf, "xterm -e \"");
 	}
 #endif
 	strcat(cmdbuf, extractor_tool);
@@ -524,6 +524,7 @@ int main(int argc, char * argv[]) {
 	char extractor_path[BUFF_SIZE];
 
 	// The extractor is in the same dir as we are
+        if (strchr(argv[0], SLASH[0]))  {
 	strcpy(extractor_path, argv[0]);
 	dirname(extractor_path);
 	strcat(extractor_path, SLASH EXTRACTOR_TOOL);
@@ -535,6 +536,9 @@ int main(int argc, char * argv[]) {
 	extractor_path[0] = QUOTE[0];
 	extractor_path[strlen(extractor_path) + 1] = '\0';
 	extractor_path[strlen(extractor_path)] = QUOTE[0];
+       } else {
+           strcat(extractor_path, EXTRACTOR_TOOL);
+       } 
 	strcat(extractor_path, " " EXTRACTOR_ARGS);
 
 #ifdef WIN32
