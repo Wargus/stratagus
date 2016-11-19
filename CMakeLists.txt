@@ -1155,6 +1155,7 @@ endif()
 set(gameheaders_HDRS
 	gameheaders/stratagus-game-installer.nsi
 	gameheaders/stratagus-game-launcher.h
+	gameheaders/stratagus-tinyfiledialogs.h
 )
 source_group(gameheaders FILES ${gameheaders_HDRS})
 

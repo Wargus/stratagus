@@ -231,8 +231,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 int ConsoleMode = 0;
 #endif
 
-#include "tinyfiledialogs.h"
-#include "tinyfiledialogs.c"
+#include "stratagus-tinyfiledialogs.h"
 
 static void SetUserDataPath(char* data_path) {
 #if WIN32
