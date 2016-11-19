@@ -455,12 +455,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	char cmdbuf[4096] = {'\0'};
 #ifdef USE_MAC
 	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\" to do script \\\"'");
-#elseif !defined(WIN32)
+#elseif WIN32
+	strcat(cmdbuf, "/C \"");
+#else
 	if (!ConsoleMode) {
 		strcat(cmdbuf, "x-terminal-emulator -e \"");
 	}
-#else
-	strcat(cmdbuf, "/C \"");
 #endif
 	strcat(cmdbuf, extractor_tool);
 	strcat(cmdbuf, " " QUOTE);
@@ -470,12 +470,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, QUOTE);
 #ifdef USE_MAC
 	strcat(cmdbuf, "\\\"\"");
-#elseif !defined(WIN32)
-	if (!ConsoleMode) {
+#elseif WIN32
 	strcat(cmdbuf, "\"");
-}
 #else
-	strcat(cmdbuf, "\"");
+	if (!ConsoleMode) {
+	    strcat(cmdbuf, "\"");
+	}
 #endif
 #ifdef WIN32
 	DWORD exitcode = 0;
