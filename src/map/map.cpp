@@ -589,7 +589,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
@@ -598,7 +598,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		UI.Minimap.UpdateXY(pos + offset);
 
 
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 0;
