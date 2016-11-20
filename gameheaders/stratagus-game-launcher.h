@@ -211,7 +211,6 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #ifndef WIN32
 #include <unistd.h>
-#include <X11/Xlib.h>
 #include <libgen.h>
 #endif
 
@@ -226,10 +225,6 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted, is corrupted, or outdated.\nYou need to extract it from original " GAME_CD "."
 
 #define BUFF_SIZE 4096
-
-#ifndef WIN32
-int ConsoleMode = 0;
-#endif
 
 #include "stratagus-tinyfiledialogs.h"
 
@@ -457,8 +452,9 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #elseif WIN32
 	strcat(cmdbuf, "/C \"");
 #else
-	if (!ConsoleMode) {
-		strcat(cmdbuf, "xterm -e \"");
+	if (!isatty(1)) {
+		strcat(cmdbuf, terminalName());
+		strcat(cmdbuf, " \"");
 	}
 #endif
 	strcat(cmdbuf, extractor_tool);
@@ -472,7 +468,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #elseif WIN32
 	strcat(cmdbuf, "\"");
 #else
-	if (!ConsoleMode) {
+	if (!isatty(1)) {
 	    strcat(cmdbuf, "\"");
 	}
 #endif
@@ -499,6 +495,14 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	int exitcode = 0;
     printf("Running %s\n", cmdbuf);
 	exitcode = system(cmdbuf);
+#ifdef USE_MAC
+#else
+	if (!isatty(1)) {
+		tinyfd_messageBox("Extraction in progress",
+						  "Data extraction is in progress in a new terminal window. "
+						  "Press ok after it finished.", "ok", "info", 1);
+	}
+#endif
 #endif
 	if (exitcode != 0) {
 		tinyfd_messageBox("Missing data", "Data extraction failed", "ok", "error", 1);
@@ -507,15 +511,6 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 }
 
 int main(int argc, char * argv[]) {
-
-#if !defined(WIN32) && !defined(USE_MAC)
-	if ( ! XOpenDisplay(NULL) ) {
-		ConsoleMode = 1;
-	}
-	if (!ConsoleMode) {
-	}
-#endif
-
 	struct stat st;
 	char data_path[BUFF_SIZE];
 	char scripts_path[BUFF_SIZE];
@@ -524,21 +519,21 @@ int main(int argc, char * argv[]) {
 	char extractor_path[BUFF_SIZE];
 
 	// The extractor is in the same dir as we are
-        if (strchr(argv[0], SLASH[0]))  {
-	strcpy(extractor_path, argv[0]);
-	dirname(extractor_path);
-	strcat(extractor_path, SLASH EXTRACTOR_TOOL);
-	// Once we have the path, we quote it by moving the memory one byte to the
-	// right, and surrounding it with the quote character and finishing null
-	// bytes. Then we add the arguments.
-	extractor_path[strlen(extractor_path) + 1] = '\0';
-	memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
-	extractor_path[0] = QUOTE[0];
-	extractor_path[strlen(extractor_path) + 1] = '\0';
-	extractor_path[strlen(extractor_path)] = QUOTE[0];
-       } else {
-           strcat(extractor_path, EXTRACTOR_TOOL);
-       } 
+	if (strchr(argv[0], SLASH[0]))  {
+		strcpy(extractor_path, argv[0]);
+		dirname(extractor_path);
+		strcat(extractor_path, SLASH EXTRACTOR_TOOL);
+		// Once we have the path, we quote it by moving the memory one byte to the
+		// right, and surrounding it with the quote character and finishing null
+		// bytes. Then we add the arguments.
+		extractor_path[strlen(extractor_path) + 1] = '\0';
+		memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
+		extractor_path[0] = QUOTE[0];
+		extractor_path[strlen(extractor_path) + 1] = '\0';
+		extractor_path[strlen(extractor_path)] = QUOTE[0];
+	} else {
+		strcat(extractor_path, EXTRACTOR_TOOL);
+	} 
 	strcat(extractor_path, " " EXTRACTOR_ARGS);
 
 #ifdef WIN32
