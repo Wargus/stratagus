@@ -685,6 +685,11 @@ static int dirExists ( char const * const aDirPath )
 		return 0 ;
 }
 
+static int detectPresence ( char const * const aExecutable )
+{
+    return 0;
+}
+
 #ifndef TINYFD_WIN_CONSOLE_ONLY
 
 static int messageBoxWinGui (

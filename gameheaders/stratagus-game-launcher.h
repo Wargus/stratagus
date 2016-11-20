@@ -469,7 +469,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, "\"");
 #else
 	if (!isatty(1)) {
-	    strcat(cmdbuf, "\"");
+	    strcat(cmdbuf, "; echo 'Press RETURN to continue...'; read\"");
 	}
 #endif
 #ifdef WIN32
