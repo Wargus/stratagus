@@ -143,7 +143,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #endif
 
 #if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
-#define WIN32
+#define WIN32 1
 #endif
 
 #ifdef WIN32
