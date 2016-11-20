@@ -509,6 +509,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 
 int main(int argc, char * argv[]) {
 	struct stat st;
+	int argccpy = argc;
 	char data_path[BUFF_SIZE];
 	char scripts_path[BUFF_SIZE];
 	char stratagus_bin[BUFF_SIZE];
@@ -584,11 +585,32 @@ int main(int argc, char * argv[]) {
 		}
 		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
+#ifdef DATA_PATH
+	// usually this isn't defined for windows builds. if it is, use it
+	strcpy(data_path, DATA_PATH);
+#endif
 #else
 	strcpy(data_path, DATA_PATH);
 	strcpy(scripts_path, SCRIPTS_PATH);
 	strcpy(stratagus_bin, STRATAGUS_BIN);
 #endif
+
+	if (argc > 1) {
+		if (!strcmp(argv[1], "--extract")) {
+			// Force extraction and exit
+			SetUserDataPath(data_path);
+			ExtractData(extractor_path, data_path, scripts_path, 1);
+			return 0;
+		}
+
+		if (!strcmp(argv[1], "--extract-no-gui")) {
+			// Force extraction without ui and exit
+			tinyfd_forceConsole = 1;
+			SetUserDataPath(data_path);
+			ExtractData(extractor_path, data_path, scripts_path, 1);
+			return 0;
+		}
+	}
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
 #ifdef WIN32
@@ -612,23 +634,6 @@ int main(int argc, char * argv[]) {
 			}
 		}
 #endif
-	}
-
-	if (argc > 1) {
-		if (!strcmp(argv[1], "--extract")) {
-			// Force extraction and exit
-			SetUserDataPath(data_path);
-			ExtractData(extractor_path, data_path, scripts_path, 1);
-			return 0;
-		}
-
-		if (!strcmp(argv[1], "--extract-no-gui")) {
-			// Force extraction without ui and exit
-			tinyfd_forceConsole = 1;
-			SetUserDataPath(data_path);
-			ExtractData(extractor_path, data_path, scripts_path, 1);
-			return 0;
-		}
 	}
 
 	sprintf(title_path, TITLE_PNG, data_path);
