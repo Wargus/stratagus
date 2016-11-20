@@ -229,13 +229,13 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #include "stratagus-tinyfiledialogs.h"
 
 static void SetUserDataPath(char* data_path) {
-#if WIN32
+#if defined(WIN32)
 	strcpy(data_path, getenv("APPDATA"));
 #else
 	strcpy(data_path, getenv("HOME"));
 #endif
 	int datalen = strlen(data_path);
-#if WIN32
+#if defined(WIN32)
 	strcat(data_path, "\\Stratagus\\");
 #elif defined(USE_MAC)
 	strcat(data_path, "/Library/Stratagus/");
@@ -449,7 +449,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	char cmdbuf[4096] = {'\0'};
 #ifdef USE_MAC
 	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\" to do script \\\"'");
-#elseif WIN32
+#elif defined(WIN32)
 	strcat(cmdbuf, "/C \"");
 #else
 	if (!isatty(1)) {
@@ -465,7 +465,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, QUOTE);
 #ifdef USE_MAC
 	strcat(cmdbuf, "\\\"\"");
-#elseif WIN32
+#elif defined(WIN32)
 	strcat(cmdbuf, "\"");
 #else
 	if (!isatty(1)) {
@@ -497,11 +497,11 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	GetExitCodeProcess(ShExecInfo.hProcess, &exitcode);
 #else
 	int exitcode = 0;
-	char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
-	sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 	exitcode = system(cmdbuf);
 #endif
 	if (exitcode != 0) {
+		char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
+		sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 		unlink(destination);
 	};
@@ -595,6 +595,9 @@ int main(int argc, char * argv[]) {
 		_fullpath(stratagus_bin, argv[0], BUFF_SIZE);
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
+		if (stat(stratagus_bin, &st) != 0) {
+			error(TITLE, STRATAGUS_NOT_FOUND);
+		}
 #else
 		if (!detectPresence(stratagus_bin)) {
 			realpath(argv[0], stratagus_bin);
@@ -604,11 +607,11 @@ int main(int argc, char * argv[]) {
 			} else {
 				strcat(stratagus_bin, "./stratagus");
 			}
-#endif
 			if ( stat(stratagus_bin, &st) != 0 ) {
 				error(TITLE, STRATAGUS_NOT_FOUND);
 			}
 		}
+#endif
 	}
 
 	if (argc > 1) {
