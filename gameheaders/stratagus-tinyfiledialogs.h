@@ -2059,7 +2059,7 @@ static char const * terminalName ( )
 		else if ( strcpy(lTerminalName,"gnome-terminal")
 			  && detectPresence(lTerminalName) )
 		{
-			strcat(lTerminalName , " -x bash -c " ) ;
+			strcat(lTerminalName , " --disable-factory -x bash -c " ) ;
 		}
 		else if ( strcpy(lTerminalName,"konsole")
 			  && detectPresence(lTerminalName) )

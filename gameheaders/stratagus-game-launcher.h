@@ -453,7 +453,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, "/C \"");
 #else
 	if (!isatty(1)) {
-		strcat(cmdbuf, terminalName());
+		strcat(cmdbuf, "xterm -e bash -c ");
 		strcat(cmdbuf, " \"");
 	}
 #endif
@@ -476,9 +476,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	DWORD exitcode = 0;
 	SHELLEXECUTEINFO ShExecInfo = { 0 };
 	char* toolpath = strdup(extractor_tool);
-	PathRemoveFileSpec(toolpath);
-	// remove the leading quote
-	if (toolpath[0] == '"') memmove(toolpath, toolpath + 1, strlen(toolpath) + 1);
+	if (PathRemoveFileSpec(toolpath)) {
+		// remove the leading quote
+		if (toolpath[0] == '"') memmove(toolpath, toolpath + 1, strlen(toolpath) + 1);
+	} else {
+		// nothing was removed, use current dir
+		toolpath = NULL;
+	}
 	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
 	ShExecInfo.hwnd = NULL;
@@ -493,19 +497,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	GetExitCodeProcess(ShExecInfo.hProcess, &exitcode);
 #else
 	int exitcode = 0;
-    printf("Running %s\n", cmdbuf);
+	char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
+	sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 	exitcode = system(cmdbuf);
-#ifdef USE_MAC
-#else
-	if (!isatty(1)) {
-		tinyfd_messageBox("Extraction in progress",
-						  "Data extraction is in progress in a new terminal window. "
-						  "Press ok after it finished.", "ok", "info", 1);
-	}
-#endif
 #endif
 	if (exitcode != 0) {
-		tinyfd_messageBox("Missing data", "Data extraction failed", "ok", "error", 1);
+		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 		unlink(destination);
 	};
 }
@@ -518,22 +515,23 @@ int main(int argc, char * argv[]) {
 	char title_path[BUFF_SIZE];
 	char extractor_path[BUFF_SIZE];
 
-	// The extractor is in the same dir as we are
-	if (strchr(argv[0], SLASH[0]))  {
-		strcpy(extractor_path, argv[0]);
-		dirname(extractor_path);
-		strcat(extractor_path, SLASH EXTRACTOR_TOOL);
-		// Once we have the path, we quote it by moving the memory one byte to the
-		// right, and surrounding it with the quote character and finishing null
-		// bytes. Then we add the arguments.
-		extractor_path[strlen(extractor_path) + 1] = '\0';
-		memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
-		extractor_path[0] = QUOTE[0];
-		extractor_path[strlen(extractor_path) + 1] = '\0';
-		extractor_path[strlen(extractor_path)] = QUOTE[0];
-	} else {
-		strcat(extractor_path, EXTRACTOR_TOOL);
-	} 
+	strcat(extractor_path, EXTRACTOR_TOOL);
+	if (!detectPresence(extractor_path)) {
+		// The extractor is in the same dir as we are
+		if (strchr(argv[0], SLASH[0])) {
+			strcpy(extractor_path, argv[0]);
+			dirname(extractor_path);
+			strcat(extractor_path, SLASH EXTRACTOR_TOOL);
+			// Once we have the path, we quote it by moving the memory one byte to the
+			// right, and surrounding it with the quote character and finishing null
+			// bytes. Then we add the arguments.
+			extractor_path[strlen(extractor_path) + 1] = '\0';
+			memmove(extractor_path + 1, extractor_path, strlen(extractor_path));
+			extractor_path[0] = QUOTE[0];
+			extractor_path[strlen(extractor_path) + 1] = '\0';
+			extractor_path[strlen(extractor_path)] = QUOTE[0];
+		}
+	}
 	strcat(extractor_path, " " EXTRACTOR_ARGS);
 
 #ifdef WIN32
@@ -598,16 +596,18 @@ int main(int argc, char * argv[]) {
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 #else
-		realpath(argv[0], stratagus_bin);
-		dirname(stratagus_bin);
-		if (strlen(stratagus_bin) > 0) {
-			strcat(stratagus_bin, "/stratagus");
-		} else {
-			strcat(stratagus_bin, "./stratagus");
-		}
+		if (!detectPresence(stratagus_bin)) {
+			realpath(argv[0], stratagus_bin);
+			dirname(stratagus_bin);
+			if (strlen(stratagus_bin) > 0) {
+				strcat(stratagus_bin, "/stratagus");
+			} else {
+				strcat(stratagus_bin, "./stratagus");
+			}
 #endif
-		if ( stat(stratagus_bin, &st) != 0 ) {
-			error(TITLE, STRATAGUS_NOT_FOUND);
+			if ( stat(stratagus_bin, &st) != 0 ) {
+				error(TITLE, STRATAGUS_NOT_FOUND);
+			}
 		}
 	}
 
