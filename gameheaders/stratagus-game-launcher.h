@@ -363,14 +363,15 @@ int check_version(char* tool_path, char* data_path) {
     } else {
 		return 1; // No file means we don't care
 	}
-    sprintf(buf, "%s -V", tool_path);
 #ifndef WIN32
+	sprintf(buf, "%s -V", tool_path);
     FILE *pipe = popen(buf, "r");
     if (f) {
 		fgets(toolversion, 20, pipe);
 		pclose(pipe);
     }
 #else
+	sprintf(buf, "\"%s -V\"", tool_path);
 	HANDLE g_hChildStd_OUT_Rd = NULL;
 	HANDLE g_hChildStd_OUT_Wr = NULL;
 	SECURITY_ATTRIBUTES saAttr;
@@ -654,6 +655,7 @@ int main(int argc, char * argv[]) {
 
 #ifdef WIN32
 	int data_path_len = strlen(data_path);
+	_chdir(data_path);
 
 	for (int i = data_path_len - 1; i >= 0; --i) {
 		data_path[i + 1] = data_path[i];
