@@ -422,9 +422,15 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	} else {
 		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
 	}
+#ifdef USE_MAC
+	int patterncount = 0;
+	char* filepatterns[] = { NULL };
+	// file types as names not working at least on macOS sierra
+#else
 	char* filepatterns[] = { GAME_CD_FILE_PATTERNS, NULL };
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
+#endif
 	const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
 												  patterncount - 1, filepatterns, NULL, 0);
 	if (datafile == NULL) {
@@ -459,7 +465,8 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 
 	char cmdbuf[4096] = {'\0'};
 #ifdef USE_MAC
-	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\" to do script \\\"'");
+	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\"\n"
+                       "    set w to do script \\\"");
 #elif defined(WIN32)
 	strcat(cmdbuf, "/C \"");
 #else
@@ -475,7 +482,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, destination);
 	strcat(cmdbuf, QUOTE);
 #ifdef USE_MAC
-	strcat(cmdbuf, "\\\"\"");
+	strcat(cmdbuf, "; exit\\\"\n"
+                       "    repeat\n"
+                       "        delay 1\n"
+                       "        if not busy of w then exit repeat\n"
+                       "    end repeat\n"
+                       "end tell\"");
 #elif defined(WIN32)
 	strcat(cmdbuf, "\"");
 #else
