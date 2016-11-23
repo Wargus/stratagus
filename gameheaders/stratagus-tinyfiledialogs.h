@@ -3726,12 +3726,12 @@ char const * tinyfd_openFileDialog (
 		if ( aNumOfFilterPatterns > 0 )
 		{
 			strcat(lDialogString , "of type {\"" );
-			strcat ( lDialogString , aFilterPatterns [ 0 ] + 2 ) ;
+			strcat ( lDialogString , aFilterPatterns [ 0 ] ) ;
 			strcat ( lDialogString , "\"" ) ;
 			for ( i = 1 ; i < aNumOfFilterPatterns ; i ++ )
 			{
 				strcat ( lDialogString , ",\"" ) ;
-				strcat ( lDialogString , aFilterPatterns [ i ] + 2) ;
+				strcat ( lDialogString , aFilterPatterns [ i ]) ;
 				strcat ( lDialogString , "\"" ) ;
 			}
 			strcat ( lDialogString , "} " ) ;

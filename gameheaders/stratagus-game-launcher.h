@@ -165,6 +165,10 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #endif
 #endif
 
+#if __APPLE__
+#define USE_MAC
+#endif
+
 #ifndef WIN32
 #if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
 #error You need to define paths, see stratagus-game-launcher.h
@@ -200,9 +204,15 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define stat _stat
 #define strdup _strdup
 #define mkdir(f, m) _mkdir(f)
-#define dirname(x) PathRemoveFileSpec(x)
+#define parentdir(x) PathRemoveFileSpec(x)
 #define execvp _execvp
 #define unlink _unlink
+#else
+#if defined(USE_MAC)
+#define parentdir(x) strcpy(x, dirname(x))
+#else
+#define parentdir(x) dirname(x)
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -423,13 +433,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	char srcfolder[1024] = {'\0'};
 	strcpy(srcfolder, datafile);
 
-	dirname(srcfolder);
+	parentdir(srcfolder);
 
 	struct stat st;
 	if (stat(scripts_path, &st) != 0) {
 		// deployment time path not found, try compile time path
 		strcpy(scripts_path, SRC_PATH());
-		dirname(scripts_path);
+		parentdir(scripts_path);
 	}
 
 	char contrib_src_path[BUFF_SIZE];
@@ -522,7 +532,7 @@ int main(int argc, char * argv[]) {
 		// The extractor is in the same dir as we are
 		if (strchr(argv[0], SLASH[0])) {
 			strcpy(extractor_path, argv[0]);
-			dirname(extractor_path);
+			parentdir(extractor_path);
 			strcat(extractor_path, SLASH EXTRACTOR_TOOL);
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
@@ -624,7 +634,7 @@ int main(int argc, char * argv[]) {
 #else
 		if (!detectPresence(stratagus_bin)) {
 			realpath(argv[0], stratagus_bin);
-			dirname(stratagus_bin);
+			parentdir(stratagus_bin);
 			if (strlen(stratagus_bin) > 0) {
 				strcat(stratagus_bin, "/stratagus");
 			} else {
@@ -697,7 +707,7 @@ int main(int argc, char * argv[]) {
 #ifndef WIN32
 	if (strcmp(stratagus_bin, "stratagus") == 0) {
 		realpath(argv[0], stratagus_bin);
-		dirname(stratagus_bin);
+		parentdir(stratagus_bin);
 		strcat(stratagus_bin, "/stratagus");
 	}
 	execvp(stratagus_bin, stratagus_argv);
