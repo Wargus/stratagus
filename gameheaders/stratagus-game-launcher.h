@@ -371,7 +371,11 @@ int check_version(char* tool_path, char* data_path) {
 		fgets(dataversion, 20, f);
 		fclose(f);
     } else {
+#ifdef CHECK_EXTRACTED_VERSION
+		return 0; // No file means we have a problem
+#else
 		return 1; // No file means we don't care
+#endif
 	}
 #ifndef WIN32
 	sprintf(buf, "%s -V", tool_path);
