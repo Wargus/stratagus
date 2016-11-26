@@ -422,14 +422,32 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	}
 	char srcfolder[1024] = {'\0'};
 	strcpy(srcfolder, datafile);
+	char* sourcepath = strdup(scripts_path);
+#ifdef WIN32
+	if (sourcepath[0] == '"') {
+		// if scripts_path is quoted, remove the quotes, i.e.,
+		// copy all but the first until all but the last char.
+		// sourcepath is already large enough because it used to contain the
+		// entire scripts_path
+		strncpy(sourcepath, scripts_path + 1, strlen(scripts_path) - 2);
+		sourcepath[strlen(scripts_path) - 2] = '\0';
+	}
+#endif
+	mkdir_p(destination);
 
 	dirname(srcfolder);
 
 	struct stat st;
-	if (stat(scripts_path, &st) != 0) {
+	if (stat(sourcepath, &st) != 0) {
 		// deployment time path not found, try compile time path
-		strcpy(scripts_path, SRC_PATH());
-		dirname(scripts_path);
+		strcpy(sourcepath, SRC_PATH());
+		dirname(sourcepath);
+	}
+
+	if (stat(sourcepath, &st) != 0) {
+		// scripts not found, abort!
+		tinyfd_messageBox("Error", "There was an unrecoverable error copying the data", "ok", "error", 1);
+		return;
 	}
 
 	char contrib_src_path[BUFF_SIZE];
@@ -437,7 +455,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	int i = 0;
 	char* contrib_directories[] = CONTRIB_DIRECTORIES;
 	while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
-		strcpy(contrib_src_path, scripts_path);
+		strcpy(contrib_src_path, sourcepath);
 		strcat(contrib_src_path, SLASH);
 		strcat(contrib_src_path, contrib_directories[i]);
 		strcpy(contrib_dest_path, destination);
