@@ -165,6 +165,10 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #endif
 #endif
 
+#if __APPLE__
+#define USE_MAC
+#endif
+
 #ifndef WIN32
 #if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
 #error You need to define paths, see stratagus-game-launcher.h
@@ -200,9 +204,15 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define stat _stat
 #define strdup _strdup
 #define mkdir(f, m) _mkdir(f)
-#define dirname(x) PathRemoveFileSpec(x)
+#define parentdir(x) PathRemoveFileSpec(x)
 #define execvp _execvp
 #define unlink _unlink
+#else
+#if defined(USE_MAC)
+#define parentdir(x) strcpy(x, dirname(x))
+#else
+#define parentdir(x) dirname(x)
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -361,7 +371,11 @@ int check_version(char* tool_path, char* data_path) {
 		fgets(dataversion, 20, f);
 		fclose(f);
     } else {
+#ifdef CHECK_EXTRACTED_VERSION
+		return 0; // No file means we have a problem
+#else
 		return 1; // No file means we don't care
+#endif
 	}
 #ifndef WIN32
 	sprintf(buf, "%s -V", tool_path);
@@ -412,9 +426,15 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	} else {
 		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
 	}
+#ifdef USE_MAC
+	int patterncount = 0;
+	char* filepatterns[] = { NULL };
+	// file types as names not working at least on macOS sierra
+#else
 	char* filepatterns[] = { GAME_CD_FILE_PATTERNS, NULL };
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
+#endif
 	const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
 												  patterncount - 1, filepatterns, NULL, 0);
 	if (datafile == NULL) {
@@ -435,13 +455,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	mkdir_p(destination);
 
-	dirname(srcfolder);
+	parentdir(srcfolder);
 
 	struct stat st;
 	if (stat(sourcepath, &st) != 0) {
 		// deployment time path not found, try compile time path
 		strcpy(sourcepath, SRC_PATH());
-		dirname(sourcepath);
+		parentdir(sourcepath);
 	}
 
 	if (stat(sourcepath, &st) != 0) {
@@ -467,7 +487,8 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 
 	char cmdbuf[4096] = {'\0'};
 #ifdef USE_MAC
-	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\" to do script \\\"'");
+	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\"\n"
+                       "    set w to do script \\\"");
 #elif defined(WIN32)
 	strcat(cmdbuf, "/C \"");
 #else
@@ -483,7 +504,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	strcat(cmdbuf, destination);
 	strcat(cmdbuf, QUOTE);
 #ifdef USE_MAC
-	strcat(cmdbuf, "\\\"\"");
+	strcat(cmdbuf, "; exit\\\"\n"
+                       "    repeat\n"
+                       "        delay 1\n"
+                       "        if not busy of w then exit repeat\n"
+                       "    end repeat\n"
+                       "end tell\"");
 #elif defined(WIN32)
 	strcat(cmdbuf, "\"");
 #else
@@ -540,7 +566,7 @@ int main(int argc, char * argv[]) {
 		// The extractor is in the same dir as we are
 		if (strchr(argv[0], SLASH[0])) {
 			strcpy(extractor_path, argv[0]);
-			dirname(extractor_path);
+			parentdir(extractor_path);
 			strcat(extractor_path, SLASH EXTRACTOR_TOOL);
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
@@ -642,7 +668,7 @@ int main(int argc, char * argv[]) {
 #else
 		if (!detectPresence(stratagus_bin)) {
 			realpath(argv[0], stratagus_bin);
-			dirname(stratagus_bin);
+			parentdir(stratagus_bin);
 			if (strlen(stratagus_bin) > 0) {
 				strcat(stratagus_bin, "/stratagus");
 			} else {
@@ -715,7 +741,7 @@ int main(int argc, char * argv[]) {
 #ifndef WIN32
 	if (strcmp(stratagus_bin, "stratagus") == 0) {
 		realpath(argv[0], stratagus_bin);
-		dirname(stratagus_bin);
+		parentdir(stratagus_bin);
 		strcat(stratagus_bin, "/stratagus");
 	}
 	execvp(stratagus_bin, stratagus_argv);
