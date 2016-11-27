@@ -206,7 +206,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define mkdir(f, m) _mkdir(f)
 #define parentdir(x) PathRemoveFileSpec(x)
 #define execvp _execvp
-#define unlink _unlink
+#define unlink(x) _unlink(x)
 #else
 #if defined(USE_MAC)
 #define parentdir(x) strcpy(x, dirname(x))
@@ -222,6 +222,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #ifndef WIN32
 #include <unistd.h>
 #include <libgen.h>
+#include <sys/wait.h>
 #endif
 
 #ifdef _WIN64
@@ -736,16 +737,36 @@ int main(int argc, char * argv[]) {
 	}
 	stratagus_argv[argc + 2] = NULL;
 
-	execvp(stratagus_bin, stratagus_argv);
-
-#ifndef WIN32
-	if (strcmp(stratagus_bin, "stratagus") == 0) {
-		realpath(argv[0], stratagus_bin);
-		parentdir(stratagus_bin);
-		strcat(stratagus_bin, "/stratagus");
+#ifdef WIN32
+	int ret = spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
+#else
+	int ret = 0;
+	int childpid = fork();
+	if (childpid == 0) {
+		execvp(stratagus_bin, stratagus_argv);
+		if (strcmp(stratagus_bin, "stratagus") == 0) {
+			realpath(argv[0], stratagus_bin);
+			parentdir(stratagus_bin);
+			strcat(stratagus_bin, "/stratagus");
+		}
+		execvp(stratagus_bin, stratagus_argv);
+		exit(ENOENT);
+	} else if (childpid > 0) {
+		waitpid(childpid, &ret, 0);
+	} else {
+		ret = ENOENT;
 	}
-	execvp(stratagus_bin, stratagus_argv);
 #endif
-	error(TITLE, STRATAGUS_NOT_FOUND);
-	return 1;
+	if (ret == ENOENT) {
+		error(TITLE, STRATAGUS_NOT_FOUND);
+	} else if (ret != 0) {
+		error(TITLE,
+			  "Stratagus failed to load game data. "
+			  "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
+			  "Please report this on https://github.com/Wargus/stratagus/issues/new, "
+			  "and please give details, including: operating system, installation path, username.");
+		unlink(title_path);
+		unlink(data_path);
+	}
+	exit(ret);
 }
