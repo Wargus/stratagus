@@ -204,7 +204,8 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define stat _stat
 #define strdup _strdup
 #define mkdir(f, m) _mkdir(f)
-#define parentdir(x) PathRemoveFileSpec(x)
+// PathRemoveFileSpec on a drive (e.g. when extracting from CD) will leave the trailing \... remove that
+#define parentdir(x) PathRemoveFileSpec(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
 #define execvp _execvp
 #define unlink(x) _unlink(x)
 #else
