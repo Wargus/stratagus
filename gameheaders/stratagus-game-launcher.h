@@ -761,12 +761,14 @@ int main(int argc, char * argv[]) {
 	if (ret == ENOENT) {
 		error(TITLE, STRATAGUS_NOT_FOUND);
 	} else if (ret != 0) {
-		error(TITLE,
-			  "Stratagus failed to load game data. "
-			  "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
-			  "Please report this on https://github.com/Wargus/stratagus/issues/new, "
-			  "and please give details, including: operating system, installation path, username. "
-			  "A possible solution is to remove the hidden folder c:\Users\You\Appdata\Roaming\Stratagus).");
+		char message[8096] = {'\0'};
+		snprintf(message, 8096,
+				 "Stratagus failed to load game data. "
+				 "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
+				 "Please report this on https://github.com/Wargus/stratagus/issues/new, "
+				 "and please give details, including: operating system, installation path, username, kind of source CD. "
+				 "A possible solution is to remove the hidden folder %s).", data_path);
+		error(TITLE, message);
 		unlink(title_path);
 		unlink(data_path);
 	}
