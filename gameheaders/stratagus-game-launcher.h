@@ -142,17 +142,6 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #error You need to define all Game macros, see stratagus-game-launcher.h
 #endif
 
-#if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
-#define WIN32 1
-#endif
-
-#ifdef WIN32
-#include <Shlwapi.h>
-#pragma comment(lib, "comdlg32.lib")
-#pragma comment(lib, "ole32.lib")
-#pragma comment(lib, "Shlwapi.lib")
-#endif
-
 /**
  * \def TITLE_PNG
  * OPTIONAL: Path to title screen (for testing if data was extracted)
@@ -165,10 +154,6 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #endif
 #endif
 
-#if __APPLE__
-#define USE_MAC
-#endif
-
 #ifndef WIN32
 #if ! defined (DATA_PATH) || ! defined (SCRIPTS_PATH) || ! defined (STRATAGUS_BIN)
 #error You need to define paths, see stratagus-game-launcher.h
@@ -176,54 +161,8 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #endif
 
-#ifdef WIN32
-#ifndef WINVER
-#define WINVER 0x0501
-#endif
-#include <windows.h>
-#include <wincon.h>
-#include <process.h>
-#else
-#include <ftw.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#include <direct.h>
-//#define inline __inline
-#define chdir _chdir
-#define getcwd _getcwd
-#define spawnvp _spawnvp
-#define stat _stat
-#define strdup _strdup
-#define mkdir(f, m) _mkdir(f)
-// PathRemoveFileSpec on a drive (e.g. when extracting from CD) will leave the trailing \... remove that
-#define parentdir(x) PathRemoveFileSpec(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
-#define execvp _execvp
-#define unlink(x) _unlink(x)
-#else
-#if defined(USE_MAC)
-#define parentdir(x) strcpy(x, dirname(x))
-#else
-#define parentdir(x) dirname(x)
-#endif
-#endif
-
 #ifdef _MSC_VER
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-#endif
-
-#ifndef WIN32
-#include <unistd.h>
-#include <libgen.h>
-#include <sys/wait.h>
 #endif
 
 #ifdef _WIN64
@@ -236,9 +175,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\nFirst install Stratagus from https://launchpad.net/stratagus"
 #define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted, is corrupted, or outdated.\nYou need to extract it from original " GAME_CD "."
 
-#define BUFF_SIZE 4096
-
-#include "stratagus-tinyfiledialogs.h"
+#include "stratagus-gameutils.h"
 
 static void SetUserDataPath(char* data_path) {
 #if defined(WIN32)
@@ -256,112 +193,6 @@ static void SetUserDataPath(char* data_path) {
 #endif
 	strcat(data_path, "data." GAME_NAME);
 }
-
-#ifdef WIN32
-#define QUOTE "\""
-#define SLASH "\\"
-#else
-#define QUOTE "'"
-#define SLASH "/"
-#endif
-
-static void error(char* title, char* text) {
-	tinyfd_messageBox(title, text, "ok", "error", 1);
-	exit(-1);
-}
-
-char dst_root[BUFF_SIZE];
-char src_root[BUFF_SIZE];
-
-void mkdir_p(const char* path)
-{
-	char *cp, *s, *s2;
-
-	if (*path && path[0] == '.') {  // relative don't work
-		return;
-	}
-	cp = strdup(path);
-	s = strrchr(cp, '/');
-	if (!s) s = strrchr(cp, SLASH[0]);
-	if (s) {
-		*s = '\0';  // remove file
-		s = cp;
-		for (;;) {  // make each path element
-			s2 = strchr(s, '/');
-			if (!s2) s = strchr(s, SLASH[0]);
-			s = s2;
-			if (s) {
-				*s = '\0';
-			}
-			mkdir(cp, 0777);
-			if (s) {
-				*s++ = SLASH[0];
-			} else {
-				break;
-			}
-		}
-	} else {
-		mkdir(cp, 0777);
-	}
-	free(cp);
-}
-
-#ifdef WIN32
-#include <wchar.h>
-#include <string>
-static void copy_dir(const char* source_folder, const char* target_folder)
-{
-	wchar_t *wsource_folder = new wchar_t[strlen(source_folder) + 1];
-	size_t convertedChars = 0;
-	mbstowcs_s(&convertedChars, wsource_folder, strlen(source_folder) + 1, source_folder, _TRUNCATE);
-	wchar_t *wtarget_folder = new wchar_t[strlen(target_folder) + 1];
-	mbstowcs_s(&convertedChars, wtarget_folder, strlen(target_folder) + 1, target_folder, _TRUNCATE);
-	WCHAR sf[MAX_PATH + 1];
-	WCHAR tf[MAX_PATH + 1];
-	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	mkdir_p(target_folder);
-	wcscpy_s(tf, MAX_PATH, wtarget_folder);
-	sf[lstrlenW(sf) + 1] = 0;
-	tf[lstrlenW(tf) + 1] = 0;
-	SHFILEOPSTRUCTW s = { 0 };
-	s.wFunc = FO_COPY;
-	s.pTo = tf;
-	s.pFrom = sf;
-	s.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
-	SHFileOperationW(&s);
-}
-#else
-static int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
-	char dst_path[BUFF_SIZE];
-	strcpy(dst_path, dst_root);
-	strcat(dst_path, src_path + strlen(src_root));
-	switch(typeflag) {
-	case FTW_D:
-		mkdir(dst_path, sb->st_mode);
-		break;
-	case FTW_F:
-		FILE* in = fopen(src_path, "rb");
-		FILE* out = fopen(dst_path, "wb");
-		char buf[4096];
-		int c = 0;
-		while (c = fread(buf, sizeof(char), 4096, in)) {
-			fwrite(buf, sizeof(char), c, out);
-		}
-		fclose(in);
-		fclose(out);
-		break;
-	}
-	return 0;
-}
-
-static void copy_dir(const char* src_path, const char* dst_path) {
-	printf("Copying %s to %s\n", src_path, dst_path);
-	mkdir_p(dst_path);
-	strcpy(dst_root, dst_path);
-	strcpy(src_root, src_path);
-	ftw(src_path, copy_file, 20);
-}
-#endif
 
 int check_version(char* tool_path, char* data_path) {
     char buf[4096] = {'\0'};
