@@ -730,6 +730,17 @@ static bool CommandKey(int key)
 			KeyScrollState |= ScrollRight;
 			break;
 
+		case SDLK_SLASH:
+		case SDLK_BACKSLASH:
+			if (KeyModifiers & ModifierAlt) {
+				if (GLShaderPipelineSupported) {
+					char shadername[1024] = { '\0' };
+					LoadShaders(key == SDLK_SLASH ? 1 : -1, shadername);
+					SetMessage("%s", shadername);
+				}
+			}
+			break;
+
 		default:
 			if (HandleCommandKey(key)) {
 				break;

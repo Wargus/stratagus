@@ -863,15 +863,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
-			if (GLShaderPipelineSupported
-				&& (event.key.keysym.sym == SDLK_SLASH || event.key.keysym.sym == SDLK_BACKSLASH)
-				&& event.key.keysym.mod & KMOD_ALT
-				&& event.key.keysym.mod & KMOD_CTRL) {
-				char shadername[1024] = { '\0' };
-				LoadShaders(event.key.keysym.sym == SDLK_SLASH ? 1 : -1, shadername);
-				SetMessage("%s", shadername);
-				break;
-			}
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 								event.key.keysym.sym, event.key.keysym.unicode);
 			break;
