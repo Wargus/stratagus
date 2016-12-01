@@ -1,6 +1,7 @@
 #include "stratagus.h"
 #include "parameters.h"
 #include "video.h"
+#include "game.h"
 #include "iolib.h"
 #include <iostream>
 #include <fstream>
@@ -101,9 +102,9 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 	std::vector<FileList> flp;
 	std::string shaderPath(Parameters::Instance.GetUserDirectory());
 #ifdef _WIN32
-	shaderPath.append("\\shaders\\");
+	shaderPath.append("\\shaders\\" + GameName + "\\");
 #else
-	shaderPath.append("/shaders/");
+	shaderPath.append("/shaders/" + GameName + "/");
 #endif
 	int n = ReadDataDirectory(shaderPath.c_str(), flp);
 	int numShaderFiles = 0;
