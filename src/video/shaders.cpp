@@ -1,4 +1,5 @@
 #include "stratagus.h"
+#include "parameters.h"
 #include "video.h"
 #include "iolib.h"
 #include <iostream>
@@ -81,16 +82,13 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 	}
 }
 
-unsigned ShaderIndex = -1;
-
 /* This does not have to be very efficient, it is only called when the shader
    is changed by the user.
  */
 extern bool LoadShaders(int direction, char* shadernameOut) {
-	ShaderIndex += direction;
-	if (direction == 0 && ShaderIndex == -1) {
-		// TODO: load from preferences
-		ShaderIndex = 0;
+	Video.ShaderIndex += direction;
+	if (direction == 0 && Video.ShaderIndex == -1) {
+		Video.ShaderIndex = 0;
 	}
 
 	GLuint vs, fs;
@@ -101,7 +99,7 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 	}
 
 	std::vector<FileList> flp;
-	std::string shaderPath(StratagusLibPath);
+	std::string shaderPath(Parameters::Instance.GetUserDirectory());
 #ifdef _WIN32
 	shaderPath.append("\\shaders\\");
 #else
@@ -118,14 +116,14 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 		}
 	}
 	if (numShaderFiles <= 0) return false;
-	if (numShaderFiles <= ShaderIndex || ShaderIndex < 0) {
-		ShaderIndex = ShaderIndex % numShaderFiles;
+	if (numShaderFiles <= Video.ShaderIndex || Video.ShaderIndex < 0) {
+		Video.ShaderIndex = Video.ShaderIndex % numShaderFiles;
 	}
 
 	if (shadernameOut) {
-		strncpy(shadernameOut, flp[shaderFileToIdx[ShaderIndex]].name.c_str(), 1023);
+		strncpy(shadernameOut, flp[shaderFileToIdx[Video.ShaderIndex]].name.c_str(), 1023);
 	}
-	shaderPath.append(flp[shaderFileToIdx[ShaderIndex]].name);
+	shaderPath.append(flp[shaderFileToIdx[Video.ShaderIndex]].name);
 	std::ifstream myfile(shaderPath.c_str());
 	std::string contents((std::istreambuf_iterator<char>(myfile)),
 						  std::istreambuf_iterator<char>());

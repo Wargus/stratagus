@@ -779,6 +779,15 @@ void Invalidate()
 	}
 }
 
+// Switch to the shader currently stored in Video.ShaderIndex without changing it
+void SwitchToShader() {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		LoadShaders(0, NULL);
+	}
+#endif
+}
+
 /**
 **  Handle interactive input event.
 **

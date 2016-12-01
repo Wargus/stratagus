@@ -267,7 +267,7 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), Depth(0), ShaderIndex(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -381,6 +381,7 @@ public:
 	SDL_Cursor *blankCursor;
 #endif
 	int Depth;
+	int ShaderIndex;
 	bool FullScreen;
 };
 
@@ -497,6 +498,9 @@ extern void WaitEventsOneFrame();
 
 /// Toggle full screen mode
 extern void ToggleFullScreen();
+
+/// Switch to the shader currently stored in Video.ShaderIndex
+extern void SwitchToShader();
 
 /// Push current clipping.
 extern void PushClipping();

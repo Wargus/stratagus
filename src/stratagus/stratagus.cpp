@@ -634,7 +634,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 			case 'x':
-				ShaderIndex = atoi(optarg);
+				Video.ShaderIndex = atoi(optarg);
 				if (atoi(optarg) == -1) {
 					GLShaderPipelineSupported = false;
 				}
