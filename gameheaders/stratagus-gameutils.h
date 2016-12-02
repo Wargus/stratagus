@@ -165,10 +165,17 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 		mkdir_p(dst_path);
 		break;
 	case FTW_F:
+		mkdir_p(dst_path);
 		FILE* in = fopen(src_path, "rb");
 		FILE* out = fopen(dst_path, "wb");
 		char buf[4096];
 		int c = 0;
+		if (!in) {
+			error("Extraction error", "Could not open source folder for reading.");
+		}
+		if (!out) {
+			error("Extraction error", "Could not open data folder for writing.");
+		}
 		while (c = fread(buf, sizeof(char), 4096, in)) {
 			fwrite(buf, sizeof(char), c, out);
 		}
