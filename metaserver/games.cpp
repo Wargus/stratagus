@@ -89,6 +89,9 @@ void CreateGame(Session *session, char *description, char *map,
 	game->Prev = NULL;
 	Games = game;
 
+	if (session->Game) {
+		PartGame(session);
+	}
 	session->Game = game;
 }
 
@@ -120,6 +123,7 @@ int CancelGame(Session *session)
 		game->Sessions[i]->Game = NULL;
 	}
 
+	session->Game = NULL;
 	delete game;
 	return 0;
 }
@@ -145,7 +149,7 @@ int JoinGame(Session *session, int id, char *password, unsigned long *host, int 
 	GameData *game;
 
 	if (session->Game) {
-		return -1; // Already in a game
+		PartGame(session);
 	}
 
 	game = Games;

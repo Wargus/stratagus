@@ -42,6 +42,7 @@
 #endif
 
 #include "stratagus.h"
+#include "games.h"
 #include "netdriver.h"
 #include "net_lowlevel.h"
 
@@ -228,6 +229,7 @@ static int KillSession(Session *session)
 	NetCloseTCP(session->Sock);
 	Pool->Sockets->DelSocket(session->Sock);
 	UNLINK(Pool->First, session, Pool->Last, Pool->Count);
+	PartGame(session);
 	delete session;
 	return 0;
 }

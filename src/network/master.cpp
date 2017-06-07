@@ -157,9 +157,11 @@ void CMetaClient::Close()
 int CMetaClient::Send(const std::string cmd)
 {
 	int ret = -1;
-	std::string mes(cmd);
-	mes.append("\n");
-	ret = metaSocket.Send(mes.c_str(), mes.size());
+	if (metaSocket.IsValid()) {
+		std::string mes(cmd);
+		mes.append("\n");
+		ret = metaSocket.Send(mes.c_str(), mes.size());
+	}
 	return ret;
 }
 
