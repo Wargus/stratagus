@@ -329,6 +329,7 @@ static void ParseCreateGame(Session *session, char *buf)
 	CreateGame(session, description, map, players, ip, port, password);
 
 	DebugPrint("%s created a game\n" _C_ session->UserData.Name);
+	DBAddGame(description, map, players_int);
 	Send(session, "CREATEGAME_OK\n");
 }
 

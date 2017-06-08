@@ -41,6 +41,7 @@ extern void DBQuit(void);
 extern int DBFindUser(char *username, char *password);
 extern int DBAddUser(char *username, char *password);
 extern int DBUpdateLoginDate(char *username);
+extern int DBAddGame(char *description, char *mapname, int numplayers);
 
 //@}
 
