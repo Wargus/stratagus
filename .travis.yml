@@ -12,9 +12,6 @@ addons:
       - libtolua-dev
       - zlib1g-dev
       - libpng12-dev
-env:
-  global:
-    secure: h/wMVlWxfXeIC35xML0omciLC92zEVxwubWphmmF0dti90CwfEESV/Xo3cC6BH5rNUkxWctELGlBlkUEaP5Tyy/yjfkYv+dvR0Vh7H+M2ZZttDyIOv1016iz/3tNC7elMKyt2e3VHzVajGiHXMKNf+l0DO2/3T3YiKDlZIydb5IDbgaKIY4vPBkc05khAEpWEeNc2dpYxNTh6zgTCuBdc4INbKzDhgivimrXoYRTZ6tBcpvjy/iVy9gFJShwR0neM/F7b80wgyp02Cc5Z7Cwx0APc/UZ9uEd0aWzunO2wjFc9KPppOmlydnfXrzD8SUXg33X9sMLH7hpUXuom1lFlzpofXyH6nZ3wHZX+9jX6liiHRpBlSG+T3V4ddVjWZo1HHKmTMlu0x9S4uw1xSwWmX4dWPQaIGO0/BRKZwV00UdXlnUm+s5e7k6NPu1iI6Amuc4CCUC54PGPBRY8OA6A04krq2RB2Rx+xMuWmECJ3mFPVjW48XUkZvcQxexoocRxCWWRMGX5qKF4/TSbzMRMrLsUqcOCc9zW+uJoMQ404sKnjwUZp9fOfoZuVHSrHJ4SNW8tPYu4XCrTbURVgeePB3QqrwYiLZBDQ8F9eFMU/Gwdc2uJRp3+fLhyGu+x896jryJnpEmbs1P2sUvKjZnlmE3XxDv5xCvLNFhbRrl0Pfo=
 before_script:
   - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
          git clone https://github.com/LuaDist/toluapp.git; \
