@@ -329,7 +329,7 @@ static void ParseCreateGame(Session *session, char *buf)
 	CreateGame(session, description, map, players, ip, port, password);
 
 	DebugPrint("%s created a game\n" _C_ session->UserData.Name);
-	DBAddGame(description, map, players_int);
+	DBAddGame(session->Game->ID, description, map, players_int);
 	Send(session, "CREATEGAME_OK\n");
 }
 
@@ -476,6 +476,30 @@ static void ParseEndGame(Session *session, char *buf)
 	Send(session, "ENDGAME_OK\n");
 }
 
+
+/**
+**  Parse STATS
+*/
+static void ParseStats(Session *session, char *buf)
+{
+	char *result;
+	int start_time = 0;
+	char resultbuf[20] = {'\0'};
+
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Parse1Arg(buf, &result);
+		start_time = atoi(result);
+	}
+
+	DebugPrint("%s requested stats\n" _C_ session->UserData.Name);
+	char* reply = (char*)calloc(sizeof(char), strlen("GAMES SINCE 12345678901234567890: 12345678901234567890\n") + 1);
+	DBStats(resultbuf, start_time);
+	sprintf(reply, "GAMES SINCE %d: %s\n", start_time, resultbuf);
+	Send(session, reply);
+	Send(session, "STATS_OK\n");
+}
+
 /**
 **  Parse MSG
 */
@@ -525,6 +549,8 @@ static void ParseBuffer(Session *session)
 			ParsePartGame(session, buf + 8);
 		} else if (!strncmp(buf, "ENDGAME ", 8)) {
 			ParseEndGame(session, buf + 8);
+		} else if (!strncmp(buf, "STATS ", 6)) {
+			ParseStats(session, buf + 6);
 		} else if (!strncmp(buf, "MSG ", 4)) {
 			ParseMsg(session, buf + 4);
 		} else {
