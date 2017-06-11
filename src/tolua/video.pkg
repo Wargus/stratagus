@@ -11,6 +11,8 @@ class CVideo
 public:
 	int Width;
 	int Height;
+	int ViewportWidth;
+	int ViewportHeight;
 	int Depth;
 	int ShaderIndex;
 	bool FullScreen;
