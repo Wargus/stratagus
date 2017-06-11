@@ -266,6 +266,17 @@ static int CclSetZoomNoResize(lua_State *l)
 	return 0;
 }
 
+static int CclGetZoomNoResize(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	lua_pushboolean(l, ZoomNoResize);
+#else
+	lua_pushboolean(l, 0);
+#endif
+	return 0;
+}
+
 /**
 **  Set the video resolution.
 **
@@ -1234,6 +1245,7 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetUseOpenGL", CclSetUseOpenGL);
 	lua_register(Lua, "GetUseOpenGL", CclGetUseOpenGL);
 	lua_register(Lua, "SetZoomNoResize", CclSetZoomNoResize);
+	lua_register(Lua, "GetZoomNoResize", CclGetZoomNoResize);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
