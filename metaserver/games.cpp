@@ -252,12 +252,10 @@ int FillinUDPInfo(unsigned long udphost, int udpport, char* ip, char* port) {
 	GameData *game;
 	for (game = Games; game; game = Games->Next) {
 		if (!strcmp(game->IP, ip) && !strcmp(game->Port, port)) {
-			if (!game->UDPHost && !game->UDPPort) {
 				game->UDPHost = udphost;
 				game->UDPPort = udpport;
 				return 0;
 			}
-		}
 	}
 	return -1;
 }
