@@ -28,6 +28,10 @@ automatically build new debian packages:
  git tag <version>
  git push --tags origin master
 
+For Wargus/War1gus/Stargus we have a release.rb script. Run it without any
+arguments, and it will tell you how to call it to start the release process
+for this particular project.
+
 Tag the new release in Wargus/War1gus/Stargus/... these repositories should be
-set up to also use the appropriate release source from the Stratagus releases
+set up to also use the appropriate release source from the Stratagus releases.
 
