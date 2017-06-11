@@ -142,6 +142,10 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #error You need to define all Game macros, see stratagus-game-launcher.h
 #endif
 
+#ifndef GAME_SHOULD_EXTRACT_AGAIN
+#define GAME_SHOULD_EXTRACT_AGAIN false
+#endif
+
 /**
  * \def TITLE_PNG
  * OPTIONAL: Path to title screen (for testing if data was extracted)
@@ -253,11 +257,13 @@ int check_version(char* tool_path, char* data_path) {
 }
 
 static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
-	if (!force) {
+	if (force == 0) {
 		tinyfd_messageBox("Missing data",
 						  DATA_NOT_EXTRACTED " Please select the " GAME_CD, "ok", "error", 1);
-	} else {
+	} else if (force == 1) {
 		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
+	} else if (force == 2) {
+		// pass
 	}
 #ifdef USE_MAC
 	int patterncount = 0;
@@ -303,19 +309,21 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		return;
 	}
 
-	char contrib_src_path[BUFF_SIZE];
-	char contrib_dest_path[BUFF_SIZE];
-	int i = 0;
-	char* contrib_directories[] = CONTRIB_DIRECTORIES;
-	while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
-		strcpy(contrib_src_path, sourcepath);
-		strcat(contrib_src_path, SLASH);
-		strcat(contrib_src_path, contrib_directories[i]);
-		strcpy(contrib_dest_path, destination);
-		strcat(contrib_dest_path, SLASH);
-		strcat(contrib_dest_path, contrib_directories[i + 1]);
-		copy_dir(contrib_src_path, contrib_dest_path);
-		i += 2;
+	if (force != 2) {
+		char contrib_src_path[BUFF_SIZE];
+		char contrib_dest_path[BUFF_SIZE];
+		int i = 0;
+		char* contrib_directories[] = CONTRIB_DIRECTORIES;
+		while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
+			strcpy(contrib_src_path, sourcepath);
+			strcat(contrib_src_path, SLASH);
+			strcat(contrib_src_path, contrib_directories[i]);
+			strcpy(contrib_dest_path, destination);
+			strcat(contrib_dest_path, SLASH);
+			strcat(contrib_dest_path, contrib_directories[i + 1]);
+			copy_dir(contrib_src_path, contrib_dest_path);
+			i += 2;
+		}
 	}
 
 	char cmdbuf[4096] = {'\0'};
@@ -382,7 +390,9 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 		unlink(destination);
-	};
+	} else if (GAME_SHOULD_EXTRACT_AGAIN) {
+		ExtractData(extractor_tool, destination, scripts_path, 2);
+	}
 }
 
 int main(int argc, char * argv[]) {
