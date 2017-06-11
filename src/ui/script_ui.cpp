@@ -251,13 +251,25 @@ static int CclGetUseOpenGL(lua_State *l)
 
 static int CclSetZoomNoResize(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!ForceUseOpenGL) {
-			ZoomNoResize = LuaToBoolean(l, 1);
+		if (!(ForceUseOpenGL && ZoomNoResize)) {
+			const int args = lua_gettop(l);
+			int originalWidth = 640;
+			int originalHeight = 480;
+			if (args == 1) {
+				ZoomNoResize = LuaToBoolean(l, 1);
+			} else if (args == 2) {
+				originalWidth = LuaToNumber(l, 1);
+				originalHeight = LuaToNumber(l, 2);
+				ZoomNoResize = true;
+			} else {
+				LuaError(l, "Valid calls for SetZoSetZoomNoResize are SetZoomNoResize(isEnabled) or SetZoomNoResize(width, height)");
+			}
 			if (ZoomNoResize) {
+				Video.ViewportWidth = originalWidth;
+				Video.ViewportHeight = originalHeight;
 				UseOpenGL = true;
 			}
 		}
