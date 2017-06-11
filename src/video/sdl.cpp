@@ -633,6 +633,19 @@ void InitVideoSdl()
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+		if (UseOpenGL) {
+			fprintf(stderr, "Re-trying video without OpenGL\n");
+			UseOpenGL = false;
+			InitVideoSdl();
+			return;
+		}
+		if (Video.FullScreen) {
+			fprintf(stderr, "Re-trying video without fullscreen mode\n");
+			Video.FullScreen = false;
+			InitVideoSdl();
+			return;
+		}
+		fprintf(stderr, "Could not initialize video, even without fullscreen or OpenGL. Giving up.\n");
 		exit(1);
 	}
 

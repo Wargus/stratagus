@@ -1031,7 +1031,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
-			// occupy first available slot
+			// occupy first available slot, excepting the first slot (the host)
 			if (serverSetup->CompOpt[i] == 0) {
 				if (Hosts[i].PlyNr == 0) {
 					h = i;
@@ -1469,7 +1469,7 @@ void NetworkInitClientConnect()
 */
 void NetworkServerStartGame()
 {
-	Assert(ServerSetupState.CompOpt[0] == 0);
+	Assert(ServerSetupState.CompOpt[0] == 0); // the host should be slot 0
 
 	// save it first..
 	LocalSetupState = ServerSetupState;
