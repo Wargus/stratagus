@@ -268,8 +268,10 @@ static int CclSetZoomNoResize(lua_State *l)
 				LuaError(l, "Valid calls for SetZoSetZoomNoResize are SetZoomNoResize(isEnabled) or SetZoomNoResize(width, height)");
 			}
 			if (ZoomNoResize) {
-				Video.ViewportWidth = originalWidth;
-				Video.ViewportHeight = originalHeight;
+				Video.ViewportWidth = Video.Width;
+				Video.ViewportHeight = Video.Height;
+				Video.Width = originalWidth;
+				Video.Height = originalHeight;
 				UseOpenGL = true;
 			}
 		}
