@@ -100,13 +100,18 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 	}
 
 	std::vector<FileList> flp;
-	std::string shaderPath(Parameters::Instance.GetUserDirectory());
+	std::string shaderPath(StratagusLibPath);
+	char *cShaderPath;
 #ifdef _WIN32
-	shaderPath.append("\\shaders\\" + GameName + "\\");
+	shaderPath.append("\\shaders\\");
+	int fullpathsize = ExpandEnvironmentStrings(shaderPath.c_str(), NULL, 0);
+	cShaderPath = (char*)calloc(fullpathsize + 1, sizeof(char));
+	ExpandEnvironmentStrings(shaderPath.c_str(), cShaderPath, fullpathsize);
 #else
-	shaderPath.append("/shaders/" + GameName + "/");
+	shaderPath.append("/shaders/");
+	cShaderPath = shaderPath.c_str();
 #endif
-	int n = ReadDataDirectory(shaderPath.c_str(), flp);
+	int n = ReadDataDirectory(cShaderPath, flp);
 	int numShaderFiles = 0;
 	int shaderFileToIdx[1024];
 	for (int i = 0; i < n; ++i) {
@@ -117,9 +122,10 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 		}
 	}
 	if (numShaderFiles <= 0) return false;
-	if (numShaderFiles <= Video.ShaderIndex || Video.ShaderIndex < 0) {
-		Video.ShaderIndex = Video.ShaderIndex % numShaderFiles;
+	while (Video.ShaderIndex < 0) {
+		Video.ShaderIndex = numShaderFiles + Video.ShaderIndex;
 	}
+	Video.ShaderIndex = Video.ShaderIndex % numShaderFiles;
 
 	if (shadernameOut) {
 		strncpy(shadernameOut, flp[shaderFileToIdx[Video.ShaderIndex]].name.c_str(), 1023);
