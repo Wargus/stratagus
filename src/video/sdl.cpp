@@ -612,11 +612,11 @@ void InitVideoSdl()
 		Video.Depth = 32;
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!Video.ViewportWidth || !Video.ViewportHeight) {
 		Video.ViewportWidth = Video.Width;
 		Video.ViewportHeight = Video.Height;
 	}
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	TheScreen = SDL_SetVideoMode(Video.ViewportWidth, Video.ViewportHeight, Video.Depth, flags);
 #else
 	TheScreen = SDL_SetVideoMode(Video.Width, Video.Height, Video.Depth, flags);

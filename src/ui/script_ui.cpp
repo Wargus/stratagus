@@ -301,9 +301,18 @@ static int CclSetVideoResolution(lua_State *l)
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!Video.Width || !Video.Height) {
-			Video.Width = LuaToNumber(l, 1);
-			Video.Height = LuaToNumber(l, 2);
+		if (!Video.ViewportWidth || !Video.ViewportHeight) {
+			Video.ViewportWidth = LuaToNumber(l, 1);
+			Video.ViewportHeight = LuaToNumber(l, 2);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (!ZoomNoResize) {
+				Video.Height = Video.ViewportHeight;
+				Video.Width = Video.ViewportWidth;
+			}
+#else
+			Video.Height = Video.ViewportHeight;
+			Video.Width = Video.ViewportWidth;
+#endif
 		}
 	}
 	return 0;

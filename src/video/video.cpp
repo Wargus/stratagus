@@ -282,9 +282,9 @@ bool CVideo::ResizeScreen(int w, int h)
 		}
 #endif
 		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		ViewportWidth = w;
 		ViewportHeight = h;
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (ZoomNoResize) {
 			ReloadOpenGL();
 		} else {
