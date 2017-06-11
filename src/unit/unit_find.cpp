@@ -958,10 +958,10 @@ public:
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= good->size()) {
-						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
-						       "size: %d, pos: %d, " \
-						       "x: %d, xx: %d, y: %d, yy: %d",
-						       size, pos, x, xx, y, yy);
+						DebugPrint("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
+								   "size: %d, pos: %d, "				\
+								   "x: %d, xx: %d, y: %d, yy: %d" _C_
+								   size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
 						break;
 					}
 					if (cost < 0) {
