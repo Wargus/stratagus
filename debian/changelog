@@ -1,3 +1,27 @@
+stratagus (2.4.2) xenial; urgency=medium
+
+  * Reliability: Fall back to software and windowed rendering before
+    giving up on startup. This fixes the trouble some people have when
+    they enable OpenGL or an unsupported fullscreen resolution and now the
+    game won't start. Otherwise, they have to know where the
+    preferences.lua file is stored and either delete or edit it.
+  * Commandline: -Z now takes a WIDTHxHEIGHT argument, too, to define the
+    base resolution to scale up from.
+  * Bugfix: Warping mouse coordinates in zoomed mode was not scaled correctly.
+  * Metaserver: Implement simple UDP hole punching to allow connections through some NATs
+  * Metaserver: Add CREATEGAME command
+  * Metaserver: Allow access for non-registered users
+  * Bugfix: Remove checksumming of lua files for now due to issues
+  * Installation: Include tinyfiledialogs and make extraction of game
+    data more consistent for games that want it by offering the
+    functionality on first launch based on header defines in the game
+    launchers.
+  * Bugfix: Regenerating forest tiles should no longer set the wrong tile index
+  * Graphics: Allow each game to ship its own shaders by searching in the game data path
+  * Keybindings: Use Alt+/ and Alt+\ do change shaders globally
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sun, 11 Jun 2017 12:10:55 +0200
+
 stratagus (2.4.1-0) unstable; urgency=low
 
   * Add support for icon frames in engine

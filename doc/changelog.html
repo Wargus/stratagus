@@ -40,6 +40,57 @@
 
 <ul>
 <p/>
+<p/><li>2.4.1 Released<p/></li>
+	<ul>
+	  <li>
+	    Reliability: Fall back to software and windowed rendering before
+	    giving up on startup. This fixes the trouble some people have when
+	    they enable OpenGL or an unsupported fullscreen resolution and now the
+	    game won't start. Otherwise, they have to know where the
+	    preferences.lua file is stored and either delete or edit it.
+	  </li>
+	  <li>
+	    Commandline: -Z now takes a WIDTHxHEIGHT argument, too, to define the
+	    base resolution to scale up from.
+	  </li>
+	  <li>
+	    Bugfix: Warping mouse coordinates in zoomed mode was not scaled correctly.
+	  </li>
+	  <li>
+	    Metaserver: Implement simple UDP hole punching to allow connections through some NATs
+	  </li>
+	  <li>
+	    Metaserver: Add CREATEGAME command
+	  </li>
+	  <li>
+	    Metaserver: Allow access for non-registered users
+	  </li>
+	  <li>
+	    Bugfix: Remove checksumming of lua files for now due to issues
+	  </li>
+	  <li>
+	    Installation: Include tinyfiledialogs and make extraction of game
+	    data more consistent for games that want it by offering the
+	    functionality on first launch based on header defines in the game
+	    launchers.
+	  </li>
+	  <li>
+	    Bugfix: Regenerating forest tiles should no longer set the wrong tile index
+	  </li>
+	  <li>
+	    Graphics: Allow each game to ship its own shaders by searching in the game data path
+	  </li>
+	  <li>
+	    Keybindings: Use Alt+/ and Alt+\ do change shaders globally
+	  </li>
+	</ul>
+<p/><li>2.4.1 Released<p/></li>
+	<ul>
+	  <li>Add support for icon frames in engine</li>
+	  <li>Add support for selecting and giving orders to multiple buildings</li>
+	  <li>Add checksumming for loaded lua files, to avoid incompatible multiplayer clients</li>
+	  <li>Update shader support to use pre-compiled shaders from libretro</li>
+	</ul>
 <p/><li>2.4.0 Released<p/></li>
 	<ul>
 	<li>Introduced OpenGL shaders for pixel scaling</li>
