@@ -109,7 +109,7 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 	ExpandEnvironmentStrings(shaderPath.c_str(), cShaderPath, fullpathsize);
 #else
 	shaderPath.append("/shaders/");
-	cShaderPath = shaderPath.c_str();
+	cShaderPath = (char*)shaderPath.c_str();
 #endif
 	int n = ReadDataDirectory(cShaderPath, flp);
 	int numShaderFiles = 0;

@@ -246,7 +246,7 @@ static int CclGetUseOpenGL(lua_State *l)
 #else
 	lua_pushboolean(l, 0);
 #endif
-	return 0;
+	return 1;
 }
 
 static int CclSetZoomNoResize(lua_State *l)
@@ -274,7 +274,7 @@ static int CclGetZoomNoResize(lua_State *l)
 #else
 	lua_pushboolean(l, 0);
 #endif
-	return 0;
+	return 1;
 }
 
 /**
