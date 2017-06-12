@@ -64,6 +64,8 @@ void CreateGame(Session *session, char *description, char *map,
 
 	strcpy(game->IP, ip);
 	strcpy(game->Port, port);
+	game->UDPHost = 0;
+	game->UDPPort = 0;
 	strcpy(game->Description, description);
 	strcpy(game->Map, map);
 	game->MaxSlots = atoi(players);
@@ -252,10 +254,12 @@ int FillinUDPInfo(unsigned long udphost, int udpport, char* ip, char* port) {
 	GameData *game;
 	for (game = Games; game; game = Games->Next) {
 		if (!strcmp(game->IP, ip) && !strcmp(game->Port, port)) {
+			if (!game->UDPHost && !game->UDPPort) {
 				game->UDPHost = udphost;
 				game->UDPPort = udpport;
 				return 0;
 			}
+	}
 	}
 	return -1;
 }

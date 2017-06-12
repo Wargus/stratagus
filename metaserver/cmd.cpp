@@ -600,8 +600,8 @@ int UpdateParser(void)
 		// even for clients inside the same NAT. This will also not work if in
 		// that case the NAT does not support hairpin translation. But we'll see
 		// how common that is...
-		char ip[16] = {'\0'};
-		char port[6] = {'\0'};
+		char ip[128] = {'\0'};
+		char port[128] = {'\0'};
 		sscanf(UDPBuffer, "%s %s", (char*)&ip, (char*)&port);
 		DebugPrint("Filling in UDP info for %s:%s\n" _C_ ip _C_ port);
 		if (FillinUDPInfo(UDPHost, UDPPort, ip, port)) {

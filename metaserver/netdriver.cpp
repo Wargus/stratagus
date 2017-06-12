@@ -270,7 +270,7 @@ static void AcceptConnections()
 	}
 	if (NetSocketReady(HolePunchSocket, 0)) {
 		NetRecvUDP(HolePunchSocket, UDPBuffer, sizeof(UDPBuffer), &UDPHost, &UDPPort);
-		DebugPrint("New UDP %s (%d %d)\n" _C_ UDPBuffer);
+		DebugPrint("New UDP %s (%d %d)\n" _C_ UDPBuffer _C_ UDPHost _C_ UDPPort);
 	}
 }
 

@@ -113,8 +113,10 @@ static sqlite3 *DB;
 static int DBMaxIDCallback(void *password, int argc, char **argv, char **colname)
 {
 	Assert(argc == 1);
-	if (argv[0])
-		GameID = atoi(argv[0]);
+	if (argv[0]) {
+		GameID = atoi(argv[0]) + 1;
+	}
+	fprintf(stderr, "Current max game id is %d\n", GameID);
 	return 0;
 }
 
@@ -142,19 +144,19 @@ int DBInit(void)
 		return -1;
 	}
 
+	errmsg = NULL;
+	if (sqlite3_exec(DB, "SELECT MAX(id) FROM games;", DBMaxIDCallback, NULL, &errmsg) != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", errmsg);
+		sqlite3_free(errmsg);
+		return -1;
+	}
+
 	if (!doinit) {
 		return 0;
 	}
 
 	errmsg = NULL;
 	if (sqlite3_exec(DB, SQLCreateTables, NULL, NULL, &errmsg) != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", errmsg);
-		sqlite3_free(errmsg);
-		return -1;
-	}
-
-	errmsg = NULL;
-	if (sqlite3_exec(DB, "SELECT MAX(id) FROM games;", DBMaxIDCallback, NULL, &errmsg) != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", errmsg);
 		sqlite3_free(errmsg);
 		return -1;
