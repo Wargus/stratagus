@@ -222,7 +222,7 @@ int check_version(char* tool_path, char* data_path) {
 		pclose(pipe);
     }
 #else
-	sprintf(buf, "\"%s -V\"", tool_path);
+	sprintf(buf, "%s -V", tool_path); // tool_path is already quoted
 	HANDLE g_hChildStd_OUT_Rd = NULL;
 	HANDLE g_hChildStd_OUT_Wr = NULL;
 	SECURITY_ATTRIBUTES saAttr;
@@ -411,6 +411,11 @@ int main(int argc, char * argv[]) {
 			strcpy(extractor_path, argv[0]);
 			parentdir(extractor_path);
 			strcat(extractor_path, SLASH EXTRACTOR_TOOL);
+#ifdef WIN32
+			if (!strstr(extractor_path, ".exe")) {
+				strcat(extractor_path, ".exe");
+			}
+#endif
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
 			// bytes. Then we add the arguments.
