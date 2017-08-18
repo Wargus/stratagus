@@ -1039,10 +1039,10 @@ private:
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
 				if (pos >= good->size()) {
-					printf("BUG: RangeTargetFinder.Compute out of range. " \
+					DebugPrint("BUG: RangeTargetFinder.Compute out of range. " \
 					       "size: %d, pos: %d, "	\
-					       "x: %d, xx: %d, y: %d, yy: %d",
-					       size, pos, x, xx, y, yy);
+					       "x: %d, xx: %d, y: %d, yy: %d" _C_
+					       size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
 					break;
 				}
 				sbad += bad->at(pos) / localFactor;
