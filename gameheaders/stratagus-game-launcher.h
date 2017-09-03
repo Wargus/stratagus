@@ -297,6 +297,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	parentdir(srcfolder);
 
 	struct stat st;
+	if (stat(sourcepath, &st) != 0) {
+		// deployment time path not found, try compile time path
+		strcpy(sourcepath, SRC_PATH());
+		parentdir(sourcepath);
+	}
+
 #ifndef WIN32
 	if (stat(sourcepath, &st) != 0) {
 		// deployment time path might be same as extractor 
@@ -304,11 +310,6 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		parentdir(sourcepath);
 	}
 #endif
-	if (stat(sourcepath, &st) != 0) {
-		// deployment time path not found, try compile time path
-		strcpy(sourcepath, SRC_PATH());
-		parentdir(sourcepath);
-	}
 
 	if (stat(sourcepath, &st) != 0) {
 		// scripts not found, abort!
@@ -325,6 +326,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 			strcpy(contrib_src_path, sourcepath);
 			strcat(contrib_src_path, SLASH);
 			strcat(contrib_src_path, contrib_directories[i]);
+			
+			if (stat(contrib_src_path, &st) != 0) {
+				// contrib dir not found, abort!
+				tinyfd_messageBox(contrib_directories[i], "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
+				return;
+			}
+
 			strcpy(contrib_dest_path, destination);
 			strcat(contrib_dest_path, SLASH);
 			strcat(contrib_dest_path, contrib_directories[i + 1]);
