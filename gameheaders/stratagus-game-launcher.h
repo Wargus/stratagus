@@ -297,6 +297,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	parentdir(srcfolder);
 
 	struct stat st;
+#ifndef WIN32
+	if (stat(sourcepath, &st) != 0) {
+		// deployment time path might be same as extractor 
+		strcpy(sourcepath, extractor_tool);
+		parentdir(sourcepath);
+	}
+#endif
 	if (stat(sourcepath, &st) != 0) {
 		// deployment time path not found, try compile time path
 		strcpy(sourcepath, SRC_PATH());
@@ -305,7 +312,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 
 	if (stat(sourcepath, &st) != 0) {
 		// scripts not found, abort!
-		tinyfd_messageBox("Error", "There was an unrecoverable error copying the data", "ok", "error", 1);
+		tinyfd_messageBox("Error", "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
 		return;
 	}
 
