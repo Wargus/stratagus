@@ -1082,7 +1082,10 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+if (ENABLE_STDIO_REDIRECT)
+   add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+else
+   add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
