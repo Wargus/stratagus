@@ -127,7 +127,7 @@ CUserInterface::CUserInterface() :
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
-	MouseWarpPos.x = MouseWarpPos.y = 0;
+	MouseWarpPos.x = MouseWarpPos.y = -1;
 
 	Point.Name = "cursor-point";
 	Glass.Name = "cursor-glass";
