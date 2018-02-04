@@ -375,9 +375,7 @@ public:
 	int Height;
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
-#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
 	SDL_Cursor *blankCursor;
-#endif
 	int Depth;
 	int ShaderIndex;
 	bool FullScreen;

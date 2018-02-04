@@ -466,10 +466,14 @@ void InitVideoSdl()
 	Uint32 flags = 0;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
-#ifndef USE_WIN32
+//Wyrmgus start
+//#ifndef USE_WIN32
+//Wyrmgus end
 		// Fix tablet input in full-screen mode
 		SDL_putenv(strdup("SDL_MOUSE_RELATIVE=0"));
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 		int res = SDL_Init(
 #ifdef DEBUG
 					  SDL_INIT_NOPARACHUTE |
@@ -590,6 +594,8 @@ void InitVideoSdl()
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
+	} else {
+		flags |= SDL_RESIZABLE;
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -652,17 +658,25 @@ void InitVideoSdl()
 	Video.FullScreen = (TheScreen->flags & SDL_FULLSCREEN) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
-#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus start
+//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus end
 	// Must not allow SDL to switch to relative mouse coordinates
 	// with touchscreen when going fullscreen. So we don't hide the
 	// cursor, but instead set a transparent 1px cursor
 	Uint8 emptyCursor[] = {'\0'};
 	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
 	SDL_SetCursor(Video.blankCursor);
-#else
+//Wyrmgus start
+//#else
+//Wyrmgus end
 	// Turn cursor off, we use our own.
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
+	//Wyrmgus start
+//	SDL_ShowCursor(SDL_DISABLE);
+	//Wyrmgus end
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 	// Make default character translation easier
 	SDL_EnableUNICODE(1);
@@ -883,6 +897,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
 								  event.key.keysym.sym, event.key.keysym.unicode);
+			break;
+
+		case SDL_VIDEORESIZE:
+			Video.ResizeScreen(event.resize.w, event.resize.h);
 			break;
 
 		case SDL_QUIT:
@@ -1151,7 +1169,7 @@ void ToggleFullScreen()
 		SDL_UnlockSurface(TheScreen);
 	}
 
-	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
+	TheScreen = SDL_SetVideoMode(w, h, bpp, (flags ^ SDL_FULLSCREEN) ^ SDL_RESIZABLE);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
@@ -1174,8 +1192,10 @@ void ToggleFullScreen()
 	//
 	// Windows shows the SDL cursor when starting in fullscreen mode
 	// then switching to window mode.  This hides the cursor again.
-	SDL_ShowCursor(SDL_ENABLE);
-	SDL_ShowCursor(SDL_DISABLE);
+	//Wyrmgus start
+//	SDL_ShowCursor(SDL_ENABLE);
+//	SDL_ShowCursor(SDL_DISABLE);
+	//Wyrmgus end
 #endif
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
