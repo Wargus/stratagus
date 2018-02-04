@@ -594,6 +594,8 @@ void InitVideoSdl()
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
 		flags |= SDL_FULLSCREEN;
+	} else {
+		flags |= SDL_RESIZABLE;
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -897,6 +899,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 								  event.key.keysym.sym, event.key.keysym.unicode);
 			break;
 
+		case SDL_VIDEORESIZE:
+			Video.ResizeScreen(event.resize.w, event.resize.h);
+			break;
+
 		case SDL_QUIT:
 			Exit(0);
 			break;
@@ -1163,7 +1169,7 @@ void ToggleFullScreen()
 		SDL_UnlockSurface(TheScreen);
 	}
 
-	TheScreen = SDL_SetVideoMode(w, h, bpp, flags ^ SDL_FULLSCREEN);
+	TheScreen = SDL_SetVideoMode(w, h, bpp, (flags ^ SDL_FULLSCREEN) ^ SDL_RESIZABLE);
 	if (!TheScreen) {
 		TheScreen = SDL_SetVideoMode(w, h, bpp, flags);
 		if (!TheScreen) { // completely screwed.
