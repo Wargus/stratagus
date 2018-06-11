@@ -1083,6 +1083,12 @@ void AiForceManager::Update()
 						}
 					}
 				}
+
+				if (force.Defending == false) {
+					// force is no longer defending
+					return;
+				}
+
 				// Find idle units and order them to defend
 				// Don't attack if there aren't our units near goal point
 				std::vector<CUnit *> nearGoal;
