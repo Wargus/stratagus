@@ -18,6 +18,7 @@
 if ( SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES )
    # in cache already
    SET(Sqlite_FIND_QUIETLY TRUE)
+   SET(SQLITE_FOUND)
 endif ( SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES )
 
 # use pkg-config to get the directories and then use these values

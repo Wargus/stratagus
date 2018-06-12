@@ -144,19 +144,17 @@ int DBInit(void)
 		return -1;
 	}
 
+	if (doinit) {
+		errmsg = NULL;
+		if (sqlite3_exec(DB, SQLCreateTables, NULL, NULL, &errmsg) != SQLITE_OK) {
+			fprintf(stderr, "SQL error: %s\n", errmsg);
+			sqlite3_free(errmsg);
+			return -1;
+		}
+	}
+
 	errmsg = NULL;
 	if (sqlite3_exec(DB, "SELECT MAX(id) FROM games;", DBMaxIDCallback, NULL, &errmsg) != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", errmsg);
-		sqlite3_free(errmsg);
-		return -1;
-	}
-
-	if (!doinit) {
-		return 0;
-	}
-
-	errmsg = NULL;
-	if (sqlite3_exec(DB, SQLCreateTables, NULL, NULL, &errmsg) != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", errmsg);
 		sqlite3_free(errmsg);
 		return -1;
