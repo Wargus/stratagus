@@ -56,23 +56,6 @@
 #define CLIENT_LIVE_BEAT 60
 #define CLIENT_IS_DEAD 300
 
-/**
-**  Connect state information of network systems active in current game.
-*/
-struct NetworkState {
-	void Clear()
-	{
-		State = ccs_unused;
-		MsgCnt = 0;
-		LastFrame = 0;
-	}
-
-	unsigned char State;     /// Menu: ConnectState
-	unsigned short MsgCnt;   /// Menu: Counter for state msg of same type (detect unreachable)
-	unsigned long LastFrame; /// Last message received
-	// Fill in here...
-};
-
 //----------------------------------------------------------------------------
 // Variables
 //----------------------------------------------------------------------------
@@ -92,7 +75,7 @@ static int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 
-class CServer
+/*class CServer
 {
 public:
 	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup);
@@ -184,7 +167,7 @@ private:
 	CUDPSocket *socket;
 	CServerSetup *serverSetup;
 	CServerSetup *localSetup;
-};
+};*/
 
 static CServer Server;
 static CClient Client;
@@ -200,21 +183,21 @@ static CClient Client;
 ** @param port Port of host to send to (network byte order).
 ** @param msg The message to send
 */
-template <typename T>
-static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
-{
-	const unsigned char *buf = msg.Serialize();
-	socket.Send(host, buf, msg.Size());
-	delete[] buf;
-}
-
-void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
-{
-	unsigned char *buf = new unsigned char [msg.Size()];
-	msg.Serialize(buf);
-	socket.Send(host, buf, msg.Size());
-	delete[] buf;
-}
+//template <typename T>
+//static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
+//{
+//	const unsigned char *buf = msg.Serialize();
+//	socket.Send(host, buf, msg.Size());
+//	delete[] buf;
+//}
+//
+//void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
+//{
+//	unsigned char *buf = new unsigned char [msg.Size()];
+//	msg.Serialize(buf);
+//	socket.Send(host, buf, msg.Size());
+//	delete[] buf;
+//}
 
 static const char *ncconstatenames[] = {
 	"ccs_unused",
@@ -263,28 +246,28 @@ static const char *icmsgsubtypenames[] = {
 	"IAmHere",                 // Client answers I am here
 };
 
-template <typename T>
-static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
-{
-	NetworkSendICMessage(socket, host, msg);
-
-#ifdef DEBUG
-	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-			   _C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
-#endif
-}
-
-static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
-{
-	NetworkSendICMessage(socket, host, msg);
-
-#ifdef DEBUG
-	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-			   _C_ icmsgsubtypenames[msg.GetSubType()]);
-#endif
-}
+//template <typename T>
+//static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
+//{
+//	NetworkSendICMessage(socket, host, msg);
+//
+//#ifdef DEBUG
+//	const std::string hostStr = host.toString();
+//	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
+//			   _C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
+//#endif
+//}
+//
+//static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
+//{
+//	NetworkSendICMessage(socket, host, msg);
+//
+//#ifdef DEBUG
+//	const std::string hostStr = host.toString();
+//	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
+//			   _C_ icmsgsubtypenames[msg.GetSubType()]);
+//#endif
+//}
 
 /**
 ** Send a message to the server, but only if the last packet was a while ago
@@ -308,7 +291,8 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(*socket, serverHost, msg);
+	SendToServer(msg);
+	//NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
@@ -329,13 +313,14 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		networkState.MsgCnt = 0;
 		lastMsgTypeSent = subtype;
 	}
-	NetworkSendICMessage(*socket, serverHost, msg);
+	SendToServer(msg);
+	//NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
 }
 
-void CClient::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
+void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
 {
 	networkState.LastFrame = tick;
 	networkState.State = ccs_connecting;
@@ -344,7 +329,6 @@ void CClient::Init(const std::string &name, CUDPSocket *socket, CServerSetup *se
 	this->serverSetup = serverSetup;
 	this->localSetup = localSetup;
 	this->name = name;
-	this->socket = socket;
 }
 
 void CClient::DetachFromServer()
@@ -360,7 +344,8 @@ bool CClient::Update_disconnected()
 
 	// Spew out 5 and trust in God that they arrive
 	for (int i = 0; i < 5; ++i) {
-		NetworkSendICMessage(*socket, serverHost, message);
+		SendToServer(message);
+		//NetworkSendICMessage(*socket, serverHost, message);
 	}
 	networkState.State = ccs_usercanceled;
 	return false;
@@ -897,8 +882,24 @@ void CClient::Parse_EngineMismatch(const unsigned char *buf)
 void CClient::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
+	SendToServer(message);
+	//NetworkSendICMessage(*socket, serverHost, message);
+}
 
-	NetworkSendICMessage(*socket, serverHost, message);
+template <typename T>
+void CClient::SendToServer(const T &msg)
+{
+	const unsigned char *buf = msg.Serialize();
+	//socket.Send(host, buf, msg.Size());
+	delete[] buf;
+}
+
+void CClient::SendToServer(const CInitMessage_Header &msg)
+{
+	unsigned char *buf = new unsigned char [msg.Size()];
+	msg.Serialize(buf);
+	//socket.Send(host, buf, msg.Size());
+	delete[] buf;
 }
 
 //
@@ -920,7 +921,7 @@ void CServer::KickClient(int c)
 	}
 }
 
-void CServer::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup)
+void CServer::Init(const std::string &name, CServerSetup *serverSetup)
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
@@ -928,21 +929,20 @@ void CServer::Init(const std::string &name, CUDPSocket *socket, CServerSetup *se
 	}
 	this->serverSetup = serverSetup;
 	this->name = name;
-	this->socket = socket;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
-
-	NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
-
-	NetworkSendICMessage_Log(*socket, host, message);
+	SendToSpecificClient(host, message);
+	//NetworkSendICMessage_Log(*socket, host, message);
 }
 
 void CServer::Send_Welcome(const CNetworkHost &host, int index)
@@ -956,7 +956,8 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
@@ -968,28 +969,29 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 			message.hosts[i] = Hosts[i];
 		}
 	}
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
-
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
-
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GoodBye(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
-
-	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+	SendToSpecificClient(CHost(host.Host, host.Port), message);
+	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Update(unsigned long frameCounter)
@@ -1288,15 +1290,16 @@ void CServer::Parse_SeeYou(const int h)
 **
 **  @return 0 if the versions match, -1 otherwise
 */
-static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
+static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
 		fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
 				StratagusVersion, msg.Stratagus, hostStr.c_str());
 
-		const CInitMessage_EngineMismatch message;
-		NetworkSendICMessage_Log(socket, host, message);
+		//const CInitMessage_EngineMismatch message;
+		//Server.SendToSpecificHost(host, message);
+		//NetworkSendICMessage_Log(socket, host, message);
 		return -1;
 	}
 
@@ -1307,9 +1310,10 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 				msg.Version,
 				hostStr.c_str());
 
-		const CInitMessage_LuaFilesMismatch message;
-		NetworkSendICMessage_Log(socket, host, message);
-		return -1;
+		//const CInitMessage_LuaFilesMismatch message;
+		//Server.SendToSpecificHost(host, message);
+		//NetworkSendICMessage_Log(socket, host, message);
+		return -2;
 	}
 	return 0;
 }
@@ -1323,8 +1327,43 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 		if (msgsubtype == ICMHello) {
 			CInitMessage_Hello msg;
 
+
+			//if (msg.Stratagus != StratagusVersion) {
+			//	const std::string hostStr = host.toString();
+			//	fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
+			//		StratagusVersion, msg.Stratagus, hostStr.c_str());
+
+			//	//const CInitMessage_EngineMismatch message;
+			//	//Server.SendToSpecificHost(host, message);
+			//	//NetworkSendICMessage_Log(socket, host, message);
+			//	return -1;
+			//}
+
+			//if (msg.Version != FileChecksums) {
+			//	const std::string hostStr = host.toString();
+			//	fprintf(stderr, "Incompatible lua files %d <-> %d\nfrom %s\n",
+			//		FileChecksums,
+			//		msg.Version,
+			//		hostStr.c_str());
+
+			//	//const CInitMessage_LuaFilesMismatch message;
+			//	//Server.SendToSpecificHost(host, message);
+			//	//NetworkSendICMessage_Log(socket, host, message);
+			//	return -2;
+			//}
+			//return 0;
+
+
 			msg.Deserialize(buf);
-			if (CheckVersions(msg, *socket, host)) {
+			int versionCheck = CheckVersions(msg, host);
+			if (versionCheck == -1) {
+				const CInitMessage_EngineMismatch message;
+				Server.SendToSpecificClient(host, message);
+				return;
+			}
+			if (versionCheck == -2) {
+				const CInitMessage_LuaFilesMismatch message;
+				Server.SendToSpecificClient(host, message);
 				return;
 			}
 			// Special case: a new client has arrived
@@ -1461,7 +1500,7 @@ void NetworkInitClientConnect()
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear();
-	Client.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState, &LocalSetupState, GetTicks());
+	Client.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState, &LocalSetupState, GetTicks());
 }
 
 /**
@@ -1641,17 +1680,19 @@ breakout:
 
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
-				NetworkSendICMessage_Log(NetworkFildes, host, message);
+				Server.SendToSpecificClient(host, message);
+				//NetworkSendICMessage_Log(NetworkFildes, host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
-				NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
+				Server.SendToSpecificClient(host, statemsg);
+				//NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 			}
 		}
 
 		// Wait for acknowledge
 		unsigned char buf[1024];
-		while (j && NetworkFildes.HasDataToRead(1000)) {
+		while (j && Server.HasDataToRead(1000)) {
 			CHost host;
-			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
+			const int len = Server.Recv(buf, sizeof(buf), &host);
 			if (len < 0) {
 #ifdef DEBUG
 				const std::string hostStr = host.toString();
@@ -1710,7 +1751,8 @@ breakout:
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		NetworkSendICMessage_Log(NetworkFildes, host, message_go);
+		Server.SendToSpecificClient(host, message_go);
+		//NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}
 }
 
@@ -1759,7 +1801,7 @@ void NetworkInitServerConnect(int openslots)
 	}
 	ServerSetupState.Clear();
 	LocalSetupState.Clear(); // Unused when we are server
-	Server.Init(Parameters::Instance.LocalPlayerName, &NetworkFildes, &ServerSetupState);
+	Server.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState);
 
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());

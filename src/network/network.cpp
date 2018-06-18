@@ -292,7 +292,7 @@ void CNetworkParameter::FixValues()
 
 bool NetworkInSync = true;                 /// Network is in sync
 
-CUDPSocket NetworkFildes;                  /// Network file descriptor
+//CUDPSocket NetworkFildes;                  /// Network file descriptor
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
@@ -303,6 +303,10 @@ static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// P
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
 
+extern CServer Server;
+extern CClient Client;
+
+extern inline bool IsNetworkGame() { return Server.IsValid() || Client.IsValid(); }
 
 #ifdef DEBUG
 class CNetworkStat
@@ -324,11 +328,11 @@ public:
 static void printStatistic(const CUDPSocket::CStatistic &statistic)
 {
 	DebugPrint("Sent: %d packets %d bytes (max %d bytes).\n"
-			   _C_ statistic.sentPacketsCount _C_ statistic.sentBytesCount
-			   _C_ statistic.biggestSentPacketSize);
+		_C_ statistic.sentPacketsCount _C_ statistic.sentBytesCount
+		_C_ statistic.biggestSentPacketSize);
 	DebugPrint("Received: %d packets %d bytes (max %d bytes).\n" _C_
-			   statistic.receivedPacketsCount _C_ statistic.receivedBytesCount
-			   _C_ statistic.biggestReceivedPacketSize);
+		statistic.receivedPacketsCount _C_ statistic.receivedBytesCount
+		_C_ statistic.biggestReceivedPacketSize);
 	DebugPrint("Received: %d error(s).\n" _C_ statistic.receivedErrorCount);
 }
 
@@ -355,16 +359,19 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 
 	// Send to all clients.
 	if (NetConnectType == 1) { // server
-		for (int i = 0; i < HostsCount; ++i) {
+		Server.SendToAllClients(buf, size);
+		/*for (int i = 0; i < HostsCount; ++i) {
 			const CHost host(Hosts[i].Host, Hosts[i].Port);
 			if (Hosts[i].PlyNr == player) {
 				continue;
 			}
 			NetworkFildes.Send(host, buf, size);
-		}
-	} else { // client		
-		const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
-		NetworkFildes.Send(host, buf, size);
+		}*/
+	}
+	else { // client		
+		Client.SendToServer(buf, size);
+		//const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
+		//NetworkFildes.Send(host, buf, size);
 	}
 	delete[] buf;
 }
@@ -407,22 +414,33 @@ void InitNetwork1()
 
 	NetInit(); // machine dependent setup
 
-	// Our communication port
-	const int port = CNetworkParameter::Instance.localPort;
-	const char *NetworkAddr = NULL; // FIXME : bad use
-	const CHost host(NetworkAddr, port);
-	NetworkFildes.Open(host);
-	if (NetworkFildes.IsValid() == false) {
-		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
-		NetExit(); // machine dependent network exit
-		return;
-	}
-#ifdef DEBUG
-	const std::string hostStr = host.toString();
-	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
-#endif
+	if (NetConnectType == 1) { // server
+		// Our communication port
+		const int port = CNetworkParameter::Instance.localPort;
+		const char *NetworkAddr = NULL; // FIXME : bad use
+		const CHost host(NetworkAddr, port);
+		Server.Open(host);
 
-	unsigned long ips[10];
+		if (Server.IsValid() == false) {
+			fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
+			NetExit(); // machine dependent network exit
+			return;
+		}
+#ifdef DEBUG
+		const std::string hostStr = host.toString();
+		DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
+#endif
+	}
+	else { // client
+		Client.Open();
+		if (Client.IsValid() == false) {
+			fprintf(stderr, "Unable to open socket for client\n");
+			NetExit(); // machine dependent network exit
+			return;
+		}
+	}
+
+	/*unsigned long ips[10];
 	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 10);
 	if (networkNumInterfaces) {
 		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
@@ -432,7 +450,7 @@ void InitNetwork1()
 	} else {
 		fprintf(stderr, "WARNING: Not connected to any external IPV4-network!\n");
 		return;
-	}
+	}*/
 }
 
 /**
@@ -450,7 +468,13 @@ void ExitNetwork1()
 	NetworkStat.print();
 #endif
 
-	NetworkFildes.Close();
+	if (NetConnectType == 1) { // server
+		Server.Close();
+	}
+	else { // client
+		Client.Close();
+	}
+
 	NetExit(); // machine dependent setup
 
 	NetworkInSync = true;
@@ -468,8 +492,8 @@ void NetworkOnStartGame()
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
 	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
-			   CNetworkParameter::Instance.gameCyclesPerUpdate _C_
-			   CNetworkParameter::Instance.NetworkLag _C_ HostsCount);
+		CNetworkParameter::Instance.gameCyclesPerUpdate _C_
+		CNetworkParameter::Instance.NetworkLag _C_ HostsCount);
 
 	NetworkInSync = true;
 	CommandsIn.clear();
@@ -525,7 +549,7 @@ void NetworkOnStartGame()
 **  @warning  Destination and unit-type shares the same network slot.
 */
 void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const CUnitType *type, int status)
+	const CUnit *dest, const CUnitType *type, int status)
 {
 	CNetworkCommandQueue ncq;
 
@@ -568,7 +592,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 **  @param status   Append command or flush old commands.
 */
 void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
-								int arg4, int status)
+	int arg4, int status)
 {
 	CNetworkCommandQueue ncq;
 
@@ -682,7 +706,7 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -729,7 +753,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 
 	if (unit && (unit->Player->Index == player
-				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
+		|| Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
 		return true;
 	} else {
 		return false;
@@ -752,15 +776,15 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, con
 static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int player)
 {
 	switch (packet.Header.Type[index] & 0x7F) {
-		case MessageExtendedCommand: // FIXME: ensure the sender is part of the command
-		case MessageSync: // Sync does not matter
-		case MessageSelection: // FIXME: ensure it's from the right player
-		case MessageQuit:      // FIXME: ensure it's from the right player
-		case MessageResend:    // FIXME: ensure it's from the right player
-		case MessageChat:      // FIXME: ensure it's from the right player
-			return true;
-		case MessageCommandDismiss: return IsAValidCommand_Dismiss(packet, index, player);
-		default: return IsAValidCommand_Command(packet, index, player);
+	case MessageExtendedCommand: // FIXME: ensure the sender is part of the command
+	case MessageSync: // Sync does not matter
+	case MessageSelection: // FIXME: ensure it's from the right player
+	case MessageQuit:      // FIXME: ensure it's from the right player
+	case MessageResend:    // FIXME: ensure it's from the right player
+	case MessageChat:      // FIXME: ensure it's from the right player
+		return true;
+	case MessageCommandDismiss: return IsAValidCommand_Dismiss(packet, index, player);
+	default: return IsAValidCommand_Command(packet, index, player);
 	}
 	// FIXME: not all values in nc have been validated
 }
@@ -826,7 +850,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
 			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
-					   _C_ packet.Header.Type[i] & 0x7F);
+				_C_ packet.Header.Type[i] & 0x7F);
 		}
 	}
 	for (int i = commands; i != MaxNetworkCommands; ++i) {
@@ -855,7 +879,15 @@ void NetworkEvent()
 	// Read the packet.
 	unsigned char buf[1024];
 	CHost host;
-	int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
+	int len;
+
+	if (NetConnectType == 1) { // server
+		Server.Recv(&buf, sizeof(buf), &host);
+	} else { // client
+		Client.Recv(&buf, sizeof(buf), &host);
+	}
+
+	//int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
@@ -915,8 +947,8 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
 		SetMessage("%s", _("Network out of sync"));
 		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
-				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
-				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
+			syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
+			syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
 	}
 }
 
@@ -968,7 +1000,7 @@ static void NetworkExecCommand_ExtendedCommand(const CNetworkCommandQueue &ncq)
 
 	nec.Deserialize(&ncq.Data[0]);
 	ExecExtendedCommand(nec.ExtendedType, (ncq.Type & 0x80) >> 7,
-						nec.Arg1, nec.Arg2, nec.Arg3, nec.Arg4);
+		nec.Arg1, nec.Arg2, nec.Arg3, nec.Arg4);
 }
 
 static void NetworkExecCommand_Command(const CNetworkCommandQueue &ncq)
@@ -987,16 +1019,16 @@ static void NetworkExecCommand_Command(const CNetworkCommandQueue &ncq)
 static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
 {
 	switch (ncq.Type & 0x7F) {
-		case MessageSync: NetworkExecCommand_Sync(ncq); break;
-		case MessageSelection: NetworkExecCommand_Selection(ncq); break;
-		case MessageChat: NetworkExecCommand_Chat(ncq); break;
-		case MessageQuit: NetworkExecCommand_Quit(ncq); break;
-		case MessageExtendedCommand: NetworkExecCommand_ExtendedCommand(ncq); break;
-		case MessageNone:
-			// Nothing to Do, This Message Should Never be Executed
-			Assert(0);
-			break;
-		default: NetworkExecCommand_Command(ncq); break;
+	case MessageSync: NetworkExecCommand_Sync(ncq); break;
+	case MessageSelection: NetworkExecCommand_Selection(ncq); break;
+	case MessageChat: NetworkExecCommand_Chat(ncq); break;
+	case MessageQuit: NetworkExecCommand_Quit(ncq); break;
+	case MessageExtendedCommand: NetworkExecCommand_ExtendedCommand(ncq); break;
+	case MessageNone:
+		// Nothing to Do, This Message Should Never be Executed
+		Assert(0);
+		break;
+	default: NetworkExecCommand_Command(ncq); break;
 	}
 }
 
@@ -1030,8 +1062,8 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 				// FIXME: we can send destoyed units over network :(
 				if (unit.Destroyed) {
 					DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_ nc.Unit);
-				}
-			}
+	}
+}
 #endif
 			ncq[numcommands] = incommand;
 			ncq[numcommands].Time = gameNetCycle;
@@ -1105,7 +1137,7 @@ static void CheckPlayerThatTimeOut(int hostIndex)
 	const int timeoutInS = CNetworkParameter::Instance.timeoutInS;
 	if (3 <= secs && secs < timeoutInS && FrameCounter % framesPerSecond == 0) {
 		SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[hostIndex].PlyName,
-				   (timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
+			(timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
 	}
 	if (secs >= timeoutInS) {
 		const unsigned int nextGameNetCycle = GameCycle / CNetworkParameter::Instance.gameCyclesPerUpdate + 1;
