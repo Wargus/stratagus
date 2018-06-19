@@ -844,9 +844,9 @@ void NetworkEvent()
 	int len;
 
 	if (NetConnectType == 1) { // server
-		Server.Recv(&buf, sizeof(buf), &host);
+		len = Server.Recv(&buf, sizeof(buf), &host);
 	} else { // client
-		Client.Recv(&buf, sizeof(buf), &host);
+		len = Client.Recv(&buf, sizeof(buf), &host);
 	}
 
 	//int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);

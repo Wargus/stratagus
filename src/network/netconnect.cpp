@@ -340,7 +340,7 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 
 void CClient::Open() {
 #ifdef UDP
-	socket->Open(CHost("localhost", 6661));
+	socket->Open(CHost("localhost", 6662));
 #else
 	x
 #endif
@@ -950,7 +950,7 @@ template <typename T>
 void CClient::SendToServer(const T &msg)
 {
 	const unsigned char *buf = msg.Serialize();
-	//socket.Send(host, buf, msg.Size());
+	SendToServer(buf, msg.Size());
 	delete[] buf;
 }
 
@@ -958,7 +958,7 @@ void CClient::SendToServer(const CInitMessage_Header &msg)
 {
 	unsigned char *buf = new unsigned char [msg.Size()];
 	msg.Serialize(buf);
-	//socket.Send(host, buf, msg.Size());
+	SendToServer(buf, msg.Size());
 	delete[] buf;
 }
 
