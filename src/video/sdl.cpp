@@ -75,6 +75,7 @@
 
 #ifdef USE_WIN32
 #include <shellapi.h>
+#include <winuser.h>
 #endif
 
 #include "editor.h"
@@ -91,6 +92,7 @@
 #include "unit.h"
 #include "video.h"
 #include "widgets.h"
+#include <winuser.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -578,8 +580,10 @@ void InitVideoSdl()
 		}
 
 		if (hicon) {
+#ifndef NO_ICON
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+#endif
 		}
 #endif
 	}
@@ -983,7 +987,7 @@ void WaitEventsOneFrame()
 		// Network
 		int s = 0;
 		if (IsNetworkGame()) {
-			s = NetworkFildes.HasDataToRead(0);
+			s = NetworkHasDataToRead();
 			if (s > 0) {
 				GetCallbacks()->NetworkEvent();
 			}
