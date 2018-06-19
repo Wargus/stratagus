@@ -144,18 +144,28 @@ class CServer
 public:
 	void Init(const std::string &name, CServerSetup *serverSetup);
 
+	void Open(const CHost &host);
+
+	bool IsValid();
+
+	int HasDataToRead(int timeout);
+
+	void SendToAllClients(const void *buf, unsigned int len);
+
+	template <typename T>
+	void SendMessageToSpecificClient(const CHost &host, const T &msg);
+
+	void SendMessageToSpecificClient(const CHost &host, const CInitMessage_Header &msg);
+
+	int Recv(void *buf, int len, CHost *hostFrom);
+
+	void Close();
+
 	void Update(unsigned long frameCounter);
 	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void MarkClientsAsResync();
 	void KickClient(int c);
-
-	template <typename T>
-	void SendToSpecificClient(const CHost &host, const T &msg);
-
-	bool HasDataToRead(int count);
-
-	int Recv();
 
 private:
 	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
@@ -177,6 +187,11 @@ private:
 private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
+#if UDP
+	CUDPSocket *socket = nullptr;
+#else
+	CTCPSocket *socket = nullptr;
+#endif
 	CServerSetup *serverSetup;
 };
 
@@ -185,6 +200,18 @@ class CClient
 public:
 	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	void SetServerHost(const CHost &host) { serverHost = host; }
+
+	void Open();
+
+	bool IsValid();
+
+	int HasDataToRead(int timeout);
+
+	void SendToServer(const void *buf, unsigned int len);
+
+	int Recv(void *buf, int len, CHost *hostFrom);
+
+	void Close();
 
 	bool Parse(const unsigned char *buf, const CHost &host);
 	bool Update(unsigned long tick);
@@ -240,7 +267,13 @@ private:
 	CHost serverHost;  /// IP:port of server to join
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
-	//CUDPSocket *socket;
+	
+#if UDP
+	CUDPSocket *socket = nullptr;
+#else
+	CTCPSocket *socket = nullptr;
+#endif
+
 	CServerSetup *serverSetup;
 	CServerSetup *localSetup;
 };

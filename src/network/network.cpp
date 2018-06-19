@@ -307,6 +307,7 @@ extern CServer Server;
 extern CClient Client;
 
 extern inline bool IsNetworkGame() { return Server.IsValid() || Client.IsValid(); }
+extern inline int NetworkHasDataToRead() { return NetConnectType == 1 ? Server.HasDataToRead(0) : Client.HasDataToRead(0); }
 
 #ifdef DEBUG
 class CNetworkStat
@@ -411,46 +412,7 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 void InitNetwork1()
 {
 	CNetworkParameter::Instance.FixValues();
-
 	NetInit(); // machine dependent setup
-
-	if (NetConnectType == 1) { // server
-		// Our communication port
-		const int port = CNetworkParameter::Instance.localPort;
-		const char *NetworkAddr = NULL; // FIXME : bad use
-		const CHost host(NetworkAddr, port);
-		Server.Open(host);
-
-		if (Server.IsValid() == false) {
-			fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
-			NetExit(); // machine dependent network exit
-			return;
-		}
-#ifdef DEBUG
-		const std::string hostStr = host.toString();
-		DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
-#endif
-	}
-	else { // client
-		Client.Open();
-		if (Client.IsValid() == false) {
-			fprintf(stderr, "Unable to open socket for client\n");
-			NetExit(); // machine dependent network exit
-			return;
-		}
-	}
-
-	/*unsigned long ips[10];
-	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 10);
-	if (networkNumInterfaces) {
-		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
-		for (int i = 0; i < networkNumInterfaces; ++i) {
-			DebugPrint("IP: %d.%d.%d.%d\n" _C_ NIPQUAD(ntohl(ips[i])));
-		}
-	} else {
-		fprintf(stderr, "WARNING: Not connected to any external IPV4-network!\n");
-		return;
-	}*/
 }
 
 /**
@@ -462,11 +424,11 @@ void ExitNetwork1()
 		return;
 	}
 
-#ifdef DEBUG
+/*#ifdef DEBUG
 	printStatistic(NetworkFildes.getStatistic());
 	NetworkFildes.clearStatistic();
 	NetworkStat.print();
-#endif
+#endif*/
 
 	if (NetConnectType == 1) { // server
 		Server.Close();
