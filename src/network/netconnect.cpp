@@ -340,7 +340,7 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 
 void CClient::Open() {
 #ifdef UDP
-	socket->Open(CHost("localhost", 6662));
+	socket->Open(CHost("localhost", 0));
 #else
 	x
 #endif
