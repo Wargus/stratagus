@@ -150,14 +150,14 @@ public:
 
 	int HasDataToRead(int timeout);
 
-	void SendToAllClients(const void *buf, unsigned int len);
+	void SendToAllClients(const unsigned char *buf, unsigned int len);
 
 	template <typename T>
 	void SendMessageToSpecificClient(const CHost &host, const T &msg);
 
 	void SendMessageToSpecificClient(const CHost &host, const CInitMessage_Header &msg);
 
-	int Recv(void *buf, int len, CHost *hostFrom);
+	int Recv(unsigned char *buf, int len, CHost *hostFrom);
 
 	void Close();
 
@@ -207,13 +207,13 @@ public:
 
 	int HasDataToRead(int timeout);
 
-	void SendToServer(const void *buf, unsigned int len);
+	void SendToServer(const unsigned char *buf, unsigned int len);
 
-	int Recv(void *buf, int len, CHost *hostFrom);
+	int Recv(unsigned char *buf, int len, CHost *hostFrom);
 
 	void Close();
 
-	bool Parse(const unsigned char *buf, const CHost &host);
+	bool Parse(const unsigned char *buf);
 	bool Update(unsigned long tick);
 
 	void DetachFromServer();

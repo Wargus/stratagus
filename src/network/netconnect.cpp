@@ -334,7 +334,7 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 #ifdef UDP
 	socket = new CUDPSocket();
 #else
-	x
+	socket = new CTCPSocket();
 #endif
 }
 
@@ -342,7 +342,9 @@ void CClient::Open() {
 #ifdef UDP
 	socket->Open(CHost("localhost", 0));
 #else
-	x
+	socket->Open(CHost("localhost", 0));
+	socket->SetBlocking();
+	socket->Connect(this->serverHost);
 #endif
 }
 
@@ -354,7 +356,7 @@ bool CClient::IsValid() {
 #ifdef UDP
 	return socket->IsValid();
 #else
-	x
+	return socket->IsValid();
 #endif
 }
 
@@ -362,32 +364,34 @@ int CClient::HasDataToRead(int timeout) {
 #ifdef UDP
 	return socket->HasDataToRead(timeout);
 #else
-	x
+	return socket->HasDataToRead(timeout);
 #endif
 }
 
-void CClient::SendToServer(const void *buf, unsigned int len) {
+void CClient::SendToServer(const unsigned char *buf, unsigned int len) {
 #ifdef UDP
 	socket->Send(serverHost, buf, len);
 #else
-	x
+	socket->Send(buf, len);
 #endif
 }
 
-int CClient::Recv(void *buf, int len, CHost *hostFrom) {
+int CClient::Recv(unsigned char *buf, int len, CHost *hostFrom) {
 #ifdef UDP
 	return socket->Recv(buf, len, hostFrom);
 #else
-	x
+	*hostFrom = serverHost;
+	return socket->Recv(buf, len);
 #endif
 }
 
 void CClient::Close() {
 #ifdef UDP
-	return socket->Close();
+	socket->Close();
 	socket = nullptr;
 #else
-	x
+	socket->Close();
+	socket = nullptr;
 #endif
 }
 
@@ -678,7 +682,7 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 #endif
 }
 
-bool CClient::Parse(const unsigned char *buf, const CHost &host)
+bool CClient::Parse(const unsigned char *buf)
 {
 	CInitMessage_Header header;
 	header.Deserialize(buf);
@@ -1001,7 +1005,9 @@ void CServer::Open(const CHost &host) {
 #ifdef UDP
 	socket->Open(host);
 #else
-	x
+	socket->Open(host);
+	socket->SetNonBlocking();
+	socket->Listen();
 #endif
 }
 
@@ -1013,26 +1019,50 @@ bool CServer::IsValid() {
 #ifdef UDP
 	return socket->IsValid();
 #else
-	x
+	return socket->IsValid();
 #endif
 }
+
+#ifndef UDP
+	std::map<CHost, CTCPSocket*> clientSockets;
+#endif
 
 int CServer::HasDataToRead(int timeout) {
 #ifdef UDP
 	return socket->HasDataToRead(timeout);
 #else
-	x
+	const auto newClientSocket = socket->Accept();
+	if (newClientSocket)
+	{
+		newClientSocket->SetBlocking();
+		clientSockets[newClientSocket->GetHost()] = newClientSocket;
+	}
+
+	for (auto& it : clientSockets)
+	{
+		const int read = it.second->HasDataToRead(timeout);
+		if(read > 0)
+		{
+			return read;
+		}
+	}
+
+	return 0;
 #endif
 }
 
-void CServer::SendToAllClients(const void *buf, unsigned int len) {
+void CServer::SendToAllClients(const unsigned char *buf, unsigned int len) {
 #ifdef UDP
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
 		socket->Send(host, buf, len);
 	}	
 #else
-	x
+	for (int i = 0; i < HostsCount; ++i) {
+		const CHost host(Hosts[i].Host, Hosts[i].Port);
+		//TODO CHECK IF FAILED
+		clientSockets[host]->Send(buf, len);
+	}
 #endif
 }
 
@@ -1052,7 +1082,7 @@ void CServer::SendMessageToSpecificClient(const CHost &host, const T &msg) {
 #ifdef UDP
 	socket->Send(host, buf, msg.Size());
 #else
-	x
+	clientSockets[host]->Send(buf, msg.Size());
 #endif
 
 	delete[] buf;
@@ -1066,17 +1096,28 @@ void CServer::SendMessageToSpecificClient(const CHost &host, const CInitMessage_
 #ifdef UDP
 	socket->Send(host, buf, msg.Size());
 #else
-	x
+	auto clientSocket = clientSockets[host];
+	clientSocket->Send(buf, msg.Size());
 #endif
 
 	delete[] buf;
 }
 
-int CServer::Recv(void *buf, int len, CHost *hostFrom) {
+int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) {
 #ifdef UDP
 	return socket->Recv(buf, len, hostFrom);
 #else
-	x
+	for (auto& it : clientSockets)
+	{
+		const int read = it.second->HasDataToRead(0);
+		if (read > 0)
+		{
+			*hostFrom = it.first;
+			return it.second->Recv(buf, len);
+		}
+	}
+
+	return 0;
 #endif
 }
 
@@ -1084,7 +1125,13 @@ void CServer::Close() {
 #ifdef UDP
 	socket->Close();
 #else
-	x
+	for (auto& it : clientSockets)
+	{
+		it.second->Close();
+	}
+
+	clientSockets.clear();
+	socket->Close();
 #endif
 
 	socket = nullptr;
@@ -1600,7 +1647,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 			   hostStr.c_str());
 #endif
 	if (NetConnectRunning == 2) { // client
-		if (Client.Parse(buf, host) == false) {
+		if (Client.Parse(buf) == false) {
 			NetConnectRunning = 0;
 		}
 	} else if (NetConnectRunning == 1) { // server

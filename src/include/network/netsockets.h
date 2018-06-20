@@ -46,6 +46,7 @@ public:
 
 	bool operator == (const CHost &rhs) const { return ip == rhs.ip && port == rhs.port; }
 	bool operator != (const CHost &rhs) const { return !(*this == rhs); }
+	bool operator < (const CHost &rhs) const { return ip < rhs.ip || ip == rhs.ip && port < rhs.port; }
 private:
 	unsigned long ip;
 	int port;
@@ -61,8 +62,8 @@ public:
 	~CUDPSocket();
 	bool Open(const CHost &host);
 	void Close();
-	void Send(const CHost &host, const void *buf, unsigned int len);
-	int Recv(void *buf, int len, CHost *hostFrom);
+	void Send(const CHost &host, const unsigned char *buf, unsigned int len);
+	int Recv(unsigned char *buf, int len, CHost *hostFrom);
 	void SetNonBlocking();
 	//
 	int HasDataToRead(int timeout);
@@ -105,15 +106,19 @@ public:
 	CTCPSocket();
 	~CTCPSocket();
 	bool Open(const CHost &host);
+	int Listen();
+	CTCPSocket* Accept();
 	void Close();
 	bool Connect(const CHost &host);
-	int Send(const void *buf, unsigned int len);
-	int Recv(void *buf, int len);
+	int Send(const unsigned char *buf, unsigned int len);
+	int Recv(unsigned char *buf, int len);
 	void SetNonBlocking();
 	//
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
+	CHost GetHost() const;
 private:
+	CTCPSocket(CTCPSocket_Impl *impl);
 	CTCPSocket_Impl *m_impl;
 };
 
