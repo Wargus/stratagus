@@ -112,6 +112,7 @@ public:
 	bool Connect(const CHost &host);
 	int Send(const unsigned char *buf, unsigned int len);
 	int Recv(unsigned char *buf, int len);
+	void SetBlocking();
 	void SetNonBlocking();
 	//
 	int HasDataToRead(int timeout);

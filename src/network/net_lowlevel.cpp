@@ -172,6 +172,27 @@ void NetCloseTCP(Socket sockfd)
 #endif // } !USE_WINSOCK
 
 /**
+**  Set socket to blocking.
+**
+**  @param sockfd  Socket
+**
+**  @return 0 for success, -1 for error
+*/
+#ifdef USE_WINSOCK
+int NetSetBlocking(Socket sockfd)
+{
+	unsigned long opt = 0;
+	return ioctlsocket(sockfd, FIONBIO, &opt);
+}
+#else
+int NetSetNonBlocking(Socket sockfd)
+{
+	int flags = fcntl(sockfd, F_GETFL, 0);
+	return fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK);
+}
+#endif
+
+/**
 **  Set socket to non-blocking.
 **
 **  @param sockfd  Socket
