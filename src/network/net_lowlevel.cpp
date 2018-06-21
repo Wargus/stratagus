@@ -185,7 +185,7 @@ int NetSetBlocking(Socket sockfd)
 	return ioctlsocket(sockfd, FIONBIO, &opt);
 }
 #else
-int NetSetNonBlocking(Socket sockfd)
+int NetSetBlocking(Socket sockfd)
 {
 	int flags = fcntl(sockfd, F_GETFL, 0);
 	return fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK);
