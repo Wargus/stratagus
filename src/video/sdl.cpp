@@ -985,15 +985,14 @@ void WaitEventsOneFrame()
 		}
 
 		// Network
-		int s = 0;
+		bool networkHasDataToRead = false;
 		if (IsNetworkGame()) {
-			s = NetworkHasDataToRead();
-			if (s > 0) {
+			if (networkHasDataToRead = NetworkHasDataToRead()) {
 				GetCallbacks()->NetworkEvent();
 			}
 		}
 		// No more input and time for frame over: return
-		if (!i && s <= 0 && interrupts) {
+		if (!i && !networkHasDataToRead && interrupts) {
 			break;
 		}
 	}

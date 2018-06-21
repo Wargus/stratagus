@@ -74,7 +74,7 @@ extern bool NetworkInSync;        /// Network is in sync
 ----------------------------------------------------------------------------*/
 
 extern inline bool IsNetworkGame();
-extern inline int NetworkHasDataToRead();
+extern inline bool NetworkHasDataToRead();
 
 extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)

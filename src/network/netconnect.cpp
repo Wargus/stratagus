@@ -1041,7 +1041,7 @@ int CServer::HasDataToRead(int timeout) {
 	for (auto& it : clientSockets)
 	{
 		const int read = it.second->HasDataToRead(timeout);
-		if(read > 0)
+		if (read > 0)
 		{
 			return read;
 		}

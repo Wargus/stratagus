@@ -307,7 +307,7 @@ extern CServer Server;
 extern CClient Client;
 
 extern inline bool IsNetworkGame() { return Server.IsValid() || Client.IsValid(); }
-extern inline int NetworkHasDataToRead() { return NetConnectType == 1 ? Server.HasDataToRead(0) : Client.HasDataToRead(0); }
+extern inline bool NetworkHasDataToRead() { return NetConnectType == 1 ? Server.HasDataToRead(0) > 0 : Client.HasDataToRead(0) > 0; }
 
 #ifdef DEBUG
 class CNetworkStat
