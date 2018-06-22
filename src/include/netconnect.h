@@ -31,8 +31,12 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "net_message.h"
-#include "network\netsockets.h"
+#include "network/netsockets.h"
 
 class CHost;
 
