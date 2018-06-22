@@ -314,14 +314,7 @@ int CTCPSocket::Recv(unsigned char *buf, int len)
 	actualLen <<= 8;
 	actualLen |= bufLength[1];
 
-	const int r1 = m_impl->Recv(buf, actualLen);
-
-	if(r1 != actualLen)
-	{
-		DebugBreak();
-	}
-
-	return r1;
+	return m_impl->Recv(buf, actualLen);
 }
 
 void CTCPSocket::SetBlocking()
