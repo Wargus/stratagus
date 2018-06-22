@@ -1116,32 +1116,22 @@ int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) {
 
 	skipClient = (skipClient + 1) % clientSockets.size();
 
-	for (auto& it : clientSockets)
-	{
-		if (skip-- > 0)
-		{
-			continue;
-		}
+	for (auto& it : clientSockets) {
+		if (skip-- > 0) continue;
 		take--;
 
 		const int read = it.second->HasDataToRead(0);
-		if (read > 0)
-		{
+		if (read > 0) {
 			*hostFrom = it.first;
 			return it.second->Recv(buf, len);
 		}
 	}
 
-	for (auto& it : clientSockets)
-	{
-		if (take-- == 0)
-		{
-			break;
-		}
+	for (auto& it : clientSockets) {
+		if (take-- == 0) break;
 
 		const int read = it.second->HasDataToRead(0);
-		if (read > 0)
-		{
+		if (read > 0) {
 			*hostFrom = it.first;
 			return it.second->Recv(buf, len);
 		}
