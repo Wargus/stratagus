@@ -92,7 +92,6 @@
 #include "unit.h"
 #include "video.h"
 #include "widgets.h"
-#include <winuser.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
