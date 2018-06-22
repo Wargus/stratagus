@@ -291,6 +291,7 @@ void CNetworkParameter::FixValues()
 }
 
 bool NetworkInSync = true;                 /// Network is in sync
+bool NetworkGame = false;
 
 //CUDPSocket NetworkFildes;                  /// Network file descriptor
 
@@ -305,9 +306,6 @@ static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input
 
 extern CServer Server;
 extern CClient Client;
-
-extern inline bool IsNetworkGame() { return Server.IsValid() || Client.IsValid(); }
-extern inline bool NetworkHasDataToRead() { return NetConnectType == 1 ? Server.HasDataToRead(0) > 0 : Client.HasDataToRead(0) > 0; }
 
 #ifdef DEBUG
 class CNetworkStat
@@ -415,6 +413,11 @@ void InitNetwork1()
 	NetInit(); // machine dependent setup
 }
 
+bool NetworkHasDataToRead()
+{
+	return NetConnectType == 1 ? Server.HasDataToRead(0) > 0 : Client.HasDataToRead(0) > 0;
+}
+
 /**
 **  Cleanup network.
 */
@@ -440,6 +443,7 @@ void ExitNetwork1()
 	NetExit(); // machine dependent setup
 
 	NetworkInSync = true;
+	NetworkGame = false;
 	NetPlayers = 0;
 	HostsCount = 0;
 }

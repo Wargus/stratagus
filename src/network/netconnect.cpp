@@ -1732,7 +1732,10 @@ void NetworkInitClientConnect()
 	if (Client.IsValid() == false) {
 		fprintf(stderr, "Unable to open socket for client\n");
 		NetExit(); // machine dependent network exit
+		return;
 	}
+
+	NetworkGame = true;
 }
 
 /**
@@ -2057,6 +2060,8 @@ void NetworkInitServerConnect(int openslots)
 	const std::string hostStr = host.toString();
 	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
 #endif
+
+	NetworkGame = true;
 }
 
 /**
