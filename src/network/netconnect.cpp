@@ -1103,12 +1103,42 @@ void CServer::SendMessageToSpecificClient(const CHost &host, const CInitMessage_
 	delete[] buf;
 }
 
+#ifndef UDP
+int skipClient = 0;
+#endif
+
 int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) {
 #ifdef UDP
 	return socket->Recv(buf, len, hostFrom);
 #else
+	int skip = skipClient;
+	int take = clientSockets.size();
+
+	skipClient = (skipClient + 1) % clientSockets.size();
+
 	for (auto& it : clientSockets)
 	{
+		if (skip-- > 0)
+		{
+			continue;
+		}
+		take--;
+
+		const int read = it.second->HasDataToRead(0);
+		if (read > 0)
+		{
+			*hostFrom = it.first;
+			return it.second->Recv(buf, len);
+		}
+	}
+
+	for (auto& it : clientSockets)
+	{
+		if (take-- == 0)
+		{
+			break;
+		}
+
 		const int read = it.second->HasDataToRead(0);
 		if (read > 0)
 		{
