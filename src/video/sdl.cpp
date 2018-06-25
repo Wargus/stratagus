@@ -579,10 +579,8 @@ void InitVideoSdl()
 		}
 
 		if (hicon) {
-#ifndef NO_ICON
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
 			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-#endif
 		}
 #endif
 	}
@@ -989,6 +987,7 @@ void WaitEventsOneFrame()
 			networkHasDataToRead = NetworkHasDataToRead();
 			if (networkHasDataToRead) {
 				GetCallbacks()->NetworkEvent();
+				if (ClientDisconnected) break;
 			}
 		}
 		// No more input and time for frame over: return
