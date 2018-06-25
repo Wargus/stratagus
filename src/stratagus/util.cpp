@@ -398,7 +398,7 @@ int GetClipboard(std::string &str)
 #endif
 
 #ifdef USE_WIN32
-	if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
+	/*if (!IsClipboardFormatAvailable(CF_TEXT) || !OpenClipboard(NULL)) {
 		return -1;
 	}
 	handle = GetClipboardData(CF_TEXT);
@@ -410,7 +410,7 @@ int GetClipboard(std::string &str)
 	if (!clipboard) {
 		CloseClipboard();
 		return -1;
-	}
+	}*/
 #elif defined(USE_X11)
 	if (!(display = XOpenDisplay(NULL))) {
 		return -1;
@@ -450,15 +450,15 @@ int GetClipboard(std::string &str)
 	}
 #endif
 	// Only allow ascii characters
-	for (i = 0; clipboard[i] != '\0'; ++i) {
+	/*for (i = 0; clipboard[i] != '\0'; ++i) {
 		if (clipboard[i] < 32 || clipboard[i] > 126) {
 			return -1;
 		}
-	}
-	str = (char *)clipboard;
+	}*/
+	str = '\0';
 #ifdef USE_WIN32
-	GlobalUnlock(handle);
-	CloseClipboard();
+	//GlobalUnlock(handle);
+	//CloseClipboard();
 #elif defined(USE_X11)
 	if (clipboard != NULL) {
 		XFree(clipboard);
