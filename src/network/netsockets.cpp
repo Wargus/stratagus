@@ -241,23 +241,16 @@ CTCPSocket_Impl* CTCPSocket_Impl::Accept()
 // CTCPSocket
 //
 
-CTCPSocket::CTCPSocket()
+CTCPSocket::CTCPSocket() : m_impl(nullptr)
 {
-	m_impl = new CTCPSocket_Impl();
-}
-
-CTCPSocket::CTCPSocket(CTCPSocket_Impl *impl)
-{
-	m_impl = impl;
-}
-
-CTCPSocket::~CTCPSocket()
-{
-	delete m_impl;
 }
 
 bool CTCPSocket::Open(const CHost &host)
 {
+	if(!m_impl) {
+		m_impl = new CTCPSocket_Impl();
+	}
+
 	return m_impl->Open(host);
 }
 
@@ -269,8 +262,9 @@ int CTCPSocket::Listen()
 void CTCPSocket::Close()
 {
 	m_impl->Close();
+	delete m_impl;
+	m_impl = nullptr;
 }
-
 
 bool CTCPSocket::Connect(const CHost &host)
 {
@@ -290,31 +284,12 @@ CTCPSocket* CTCPSocket::Accept()
 
 int CTCPSocket::Send(const unsigned char *buf, unsigned int len)
 {
-	unsigned char *bufLength = new unsigned char[2];
-	
-	bufLength[0] = len >> 8 & 0xFF;
-	bufLength[1] = len & 0xFF;
-
-	m_impl->Send(bufLength, 2);
 	return m_impl->Send(buf, len);
 }
 
 int CTCPSocket::Recv(unsigned char *buf, int len)
 {
-	int actualLen;
-	unsigned char *bufLength = new unsigned char[2];
-	
-	const int resLen = m_impl->Recv(bufLength, 2);
-	if(resLen < 2)
-	{
-		return resLen;
-	}
-
-	actualLen = bufLength[0];
-	actualLen <<= 8;
-	actualLen |= bufLength[1];
-
-	return m_impl->Recv(buf, actualLen);
+	return m_impl->Recv(buf, len);
 }
 
 void CTCPSocket::SetBlocking()

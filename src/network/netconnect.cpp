@@ -49,6 +49,8 @@
 #include "video.h"
 #include "net_lowlevel.h"
 
+#include <vector>
+
 //----------------------------------------------------------------------------
 // Declaration
 //----------------------------------------------------------------------------
@@ -329,70 +331,84 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 	lastMsgTypeSent = ICMServerQuit;
 	this->serverSetup = serverSetup;
 	this->localSetup = localSetup;
-	this->name = name;
-
-#ifdef UDP
-	socket = new CUDPSocket();
-#else
-	socket = new CTCPSocket();
-#endif
+	this->name = name;	
 }
 
-void CClient::Open() {
-#ifdef UDP
-	socket->Open(CHost("localhost", 0));
-#else
-	socket->Open(CHost("localhost", 0));
-	socket->SetBlocking();
-	socket->Connect(this->serverHost);
-#endif
+void CClient::Open(bool udp) {
+	if(udp) {
+		_clientConnectionHandler = new CUDPClientConnectionHandler(this->serverHost);
+	}
+	else {
+		_clientConnectionHandler = new CTCPClientConnectionHandler(this->serverHost);
+	}
+
+	_clientConnectionHandler->Open(CHost("localhost", 0));
+
+//xxxxx
+//	socket->Open(CHost("localhost", 0));
+//#else
+//	socket->Open(CHost("localhost", 0));
+//	socket->SetBlocking();
+//	socket->Connect(this->serverHost);
+//#endif
 }
 
-bool CClient::IsValid() {
-	if (socket == nullptr) {
+bool CClient::IsValid() const {
+	if (_clientConnectionHandler == nullptr) {
 		return false;
 	}
 
-#ifdef UDP
-	return socket->IsValid();
-#else
-	return socket->IsValid();
-#endif
+	return _clientConnectionHandler->IsValid();
+
+//xxxxx
+//	return socket->IsValid();
+//#else
+//	return socket->IsValid();
+//#endif
 }
 
 int CClient::HasDataToRead(int timeout) {
-#ifdef UDP
-	return socket->HasDataToRead(timeout);
-#else
-	return socket->HasDataToRead(timeout);
-#endif
+	return _clientConnectionHandler->HasDataToRead(timeout);
+
+//xxxxx
+//	return socket->HasDataToRead(timeout);
+//#else
+//	return socket->HasDataToRead(timeout);
+//#endif
 }
 
 void CClient::SendToServer(const unsigned char *buf, unsigned int len) {
-#ifdef UDP
-	socket->Send(serverHost, buf, len);
-#else
-	socket->Send(buf, len);
-#endif
+	_clientConnectionHandler->SendToServer(buf, len);
+//xxxxx
+//	socket->Send(serverHost, buf, len);
+//#else
+//	socket->Send(buf, len);
+//#endif
 }
 
 int CClient::Recv(unsigned char *buf, int len, CHost *hostFrom) {
-#ifdef UDP
-	return socket->Recv(buf, len, hostFrom);
-#else
-	*hostFrom = serverHost;
-	return socket->Recv(buf, len);
-#endif
+	return _clientConnectionHandler->Recv(buf, len, hostFrom);
+
+//xxxxx
+//	return socket->Recv(buf, len, hostFrom);
+//#else
+//	*hostFrom = serverHost;
+//	return socket->Recv(buf, len);
+//#endif
 }
 
 void CClient::Close() {
-#ifdef UDP
-	socket->Close();
-	socket = nullptr;
-#else
-	socket->Close();
-	socket = nullptr;
-#endif
+	_clientConnectionHandler->Close();
+	delete _clientConnectionHandler;
+	_clientConnectionHandler = nullptr;
+
+//xxxxx
+//	socket->Close();
+//	socket = nullptr;
+//#else
+//	socket->Close();
+//	socket = nullptr;
+//#endif
 }
 
 void CClient::DetachFromServer()
@@ -994,76 +1010,97 @@ void CServer::Init(const std::string &name, CServerSetup *serverSetup)
 	this->serverSetup = serverSetup;
 	this->name = name;
 	
-#ifdef UDP
-	this->socket = new CUDPSocket();
-#else
-	this->socket = new CTCPSocket();
-#endif
+//xxxxx
+//	this->socket = new CUDPSocket();
+//#else
+//	this->socket = new CTCPSocket();
+//#endif
 }
 
-void CServer::Open(const CHost &host) {
-#ifdef UDP
-	socket->Open(host);
-#else
-	socket->Open(host);
-	socket->SetNonBlocking();
-	socket->Listen();
-#endif
+void CServer::Open(const CHost &host, bool udp) {
+	if (udp) {
+		_serverConnectionHandler = new CUDPServerConnectionHandler();
+	}
+	else {
+		_serverConnectionHandler = new CTCPServerConnectionHandler();
+	}
+
+	_serverConnectionHandler->Open(host);
+
+//xxxxx
+//	socket->Open(host);
+//#else
+//	socket->Open(host);
+//	socket->SetNonBlocking();
+//	socket->Listen();
+//#endif
 }
 
-bool CServer::IsValid() {
-	if (socket == nullptr) {
+bool CServer::IsValid() const {
+	if (_serverConnectionHandler == nullptr) {
 		return false;
 	}
 
-#ifdef UDP
-	return socket->IsValid();
-#else
-	return socket->IsValid();
-#endif
+	return _serverConnectionHandler->IsValid();
+
+//xxxxx
+//	return socket->IsValid();
+//#else
+//	return socket->IsValid();
+//#endif
 }
 
 #ifndef UDP
 	std::map<CHost, CTCPSocket*> clientSockets;
 #endif
 
-int CServer::HasDataToRead(int timeout) {
-#ifdef UDP
-	return socket->HasDataToRead(timeout);
-#else
-	const auto newClientSocket = socket->Accept();
-	if (newClientSocket)
-	{
-		newClientSocket->SetBlocking();
-		clientSockets[newClientSocket->GetHost()] = newClientSocket;
-	}
+int CServer::HasDataToRead(int timeout) const {
+	return _serverConnectionHandler->HasDataToRead(timeout);
 
-	for (auto& it : clientSockets)
-	{
-		const int read = it.second->HasDataToRead(timeout);
-		if (read > 0)
-		{
-			return read;
-		}
-	}
-
-	return 0;
-#endif
+//xxxxx
+//	return socket->HasDataToRead(timeout);
+//#else
+//	const auto newClientSocket = socket->Accept();
+//	if (newClientSocket)
+//	{
+//		newClientSocket->SetBlocking();
+//		clientSockets[newClientSocket->GetHost()] = newClientSocket;
+//	}
+//
+//	for (auto& it : clientSockets)
+//	{
+//		const int read = it.second->HasDataToRead(timeout);
+//		if (read > 0)
+//		{
+//			return read;
+//		}
+//	}
+//
+//	return 0;
+//#endif
 }
 
-void CServer::SendToAllClients(const unsigned char *buf, unsigned int len) {
-#ifdef UDP
+void CServer::SendToAllClients(CNetworkHost hosts[], int hostCount, const unsigned char *buf, unsigned int len) {
+	std::vector<CHost> hostVector;
+	
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		socket->Send(host, buf, len);
-	}	
-#else
-	for (int i = 0; i < HostsCount; ++i) {
-		const CHost host(Hosts[i].Host, Hosts[i].Port);
-		//TODO CHECK IF FAILED
-		clientSockets[host]->Send(buf, len);
+		hostVector.emplace_back(host);
 	}
-#endif
+	_serverConnectionHandler->SendToAllClients(hostVector, buf, len);
+
+//xxxxx
+//	for (int i = 0; i < HostsCount; ++i) {
+//		const CHost host(Hosts[i].Host, Hosts[i].Port);
+//		socket->Send(host, buf, len);
+//	}	
+//#else
+//	for (int i = 0; i < HostsCount; ++i) {
+//		const CHost host(Hosts[i].Host, Hosts[i].Port);
+//		//TODO CHECK IF FAILED
+//		clientSockets[host]->Send(buf, len);
+//	}
+//#endif
 }
 
 
@@ -1078,83 +1115,92 @@ void CServer::SendToAllClients(const unsigned char *buf, unsigned int len) {
 template <typename T>
 void CServer::SendMessageToSpecificClient(const CHost &host, const T &msg) {
 	const unsigned char *buf = msg.Serialize();
+	_serverConnectionHandler->SendToClient(host, buf, msg.Size());
 
-#ifdef UDP
-	socket->Send(host, buf, msg.Size());
-#else
-	clientSockets[host]->Send(buf, msg.Size());
-#endif
+//xxxxx
+//	socket->Send(host, buf, msg.Size());
+//#else
+//	clientSockets[host]->Send(buf, msg.Size());
+//#endif
 
 	delete[] buf;
 }
 
 void CServer::SendMessageToSpecificClient(const CHost &host, const CInitMessage_Header &msg)
 {
-	unsigned char *buf = new unsigned char [msg.Size()];
+	auto buf = new unsigned char [msg.Size()];
 	msg.Serialize(buf);
 
-#ifdef UDP
-	socket->Send(host, buf, msg.Size());
-#else
-	auto clientSocket = clientSockets[host];
-	clientSocket->Send(buf, msg.Size());
-#endif
+	_serverConnectionHandler->SendToClient(host, buf, msg.Size());
+
+//xxxxx
+//	socket->Send(host, buf, msg.Size());
+//#else
+//	auto clientSocket = clientSockets[host];
+//	clientSocket->Send(buf, msg.Size());
+//#endif
 
 	delete[] buf;
 }
 
-#ifndef UDP
-int skipClient = 0;
-#endif
+//#ifndef UDP
+//int skipClient = 0;
+//#endif
 
-int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) {
-#ifdef UDP
-	return socket->Recv(buf, len, hostFrom);
-#else
-	int skip = skipClient;
-	int take = clientSockets.size();
+int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) const {
+	return _serverConnectionHandler->Recv(buf, len, hostFrom);
 
-	skipClient = (skipClient + 1) % clientSockets.size();
-
-	for (auto& it : clientSockets) {
-		if (skip-- > 0) continue;
-		take--;
-
-		const int read = it.second->HasDataToRead(0);
-		if (read > 0) {
-			*hostFrom = it.first;
-			return it.second->Recv(buf, len);
-		}
-	}
-
-	for (auto& it : clientSockets) {
-		if (take-- == 0) break;
-
-		const int read = it.second->HasDataToRead(0);
-		if (read > 0) {
-			*hostFrom = it.first;
-			return it.second->Recv(buf, len);
-		}
-	}
-
-	return 0;
-#endif
+//xxxxx
+//	return socket->Recv(buf, len, hostFrom);
+//#else
+//	int skip = skipClient;
+//	int take = clientSockets.size();
+//
+//	skipClient = (skipClient + 1) % clientSockets.size();
+//
+//	for (auto& it : clientSockets) {
+//		if (skip-- > 0) continue;
+//		take--;
+//
+//		const int read = it.second->HasDataToRead(0);
+//		if (read > 0) {
+//			*hostFrom = it.first;
+//			return it.second->Recv(buf, len);
+//		}
+//	}
+//
+//	for (auto& it : clientSockets) {
+//		if (take-- == 0) break;
+//
+//		const int read = it.second->HasDataToRead(0);
+//		if (read > 0) {
+//			*hostFrom = it.first;
+//			return it.second->Recv(buf, len);
+//		}
+//	}
+//
+//	return 0;
+//#endif
 }
 
 void CServer::Close() {
-#ifdef UDP
-	socket->Close();
-#else
-	for (auto& it : clientSockets)
-	{
-		it.second->Close();
-	}
+	_serverConnectionHandler->Close();
+	_serverConnectionHandler = nullptr;
 
-	clientSockets.clear();
-	socket->Close();
-#endif
 
-	socket = nullptr;
+//xxxxx
+//	socket->Close();
+//#else
+//	for (auto& it : clientSockets)
+//	{
+//		it.second->Close();
+//	}
+//
+//	clientSockets.clear();
+//	socket->Close();
+//#endif
+//
+//	socket = nullptr;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
@@ -1728,7 +1774,7 @@ void NetworkInitClientConnect()
 	LocalSetupState.Clear();
 	Client.Init(Parameters::Instance.LocalPlayerName, &ServerSetupState, &LocalSetupState, GetTicks());
 
-	Client.Open();
+	Client.Open(Parameters::Instance.UseUDP);
 	if (Client.IsValid() == false) {
 		fprintf(stderr, "Unable to open socket for client\n");
 		NetExit(); // machine dependent network exit
@@ -2049,7 +2095,7 @@ void NetworkInitServerConnect(int openslots)
 	const int port = CNetworkParameter::Instance.localPort;
 	const char *NetworkAddr = NULL; // FIXME : bad use
 	const CHost host(NetworkAddr, port);
-	Server.Open(host);
+	Server.Open(host, Parameters::Instance.UseUDP);
 
 	if (Server.IsValid() == false) {
 		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);

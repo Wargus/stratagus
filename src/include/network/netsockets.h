@@ -104,7 +104,6 @@ class CTCPSocket
 {
 public:
 	CTCPSocket();
-	~CTCPSocket();
 	bool Open(const CHost &host);
 	int Listen();
 	CTCPSocket* Accept();
@@ -119,8 +118,8 @@ public:
 	bool IsValid() const;
 	CHost GetHost() const;
 private:
-	CTCPSocket(CTCPSocket_Impl *impl);
-	CTCPSocket_Impl *m_impl;
+	CTCPSocket(CTCPSocket_Impl* impl) : m_impl(impl) {};
+	CTCPSocket_Impl* m_impl;
 };
 
 //@}

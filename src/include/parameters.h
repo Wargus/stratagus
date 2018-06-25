@@ -48,6 +48,8 @@ public:
 	std::string luaEditorStartFilename;
 	std::string luaScriptArguments;
 	std::string LocalPlayerName;        /// Name of local player
+	bool UseUDP;
+
 private:
 	std::string userDirectory;          /// Directory containing user settings and data
 public:

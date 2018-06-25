@@ -986,7 +986,8 @@ void WaitEventsOneFrame()
 		// Network
 		bool networkHasDataToRead = false;
 		if (IsNetworkGame()) {
-			if (networkHasDataToRead = NetworkHasDataToRead()) {
+			networkHasDataToRead = NetworkHasDataToRead();
+			if (networkHasDataToRead) {
 				GetCallbacks()->NetworkEvent();
 			}
 		}

@@ -358,7 +358,7 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 
 	// Send to all clients.
 	if (NetConnectType == 1) { // server
-		Server.SendToAllClients(buf, size);
+		Server.SendToAllClients(Hosts, HostsCount, buf, size);
 		/*for (int i = 0; i < HostsCount; ++i) {
 			const CHost host(Hosts[i].Host, Hosts[i].Port);
 			if (Hosts[i].PlyNr == player) {

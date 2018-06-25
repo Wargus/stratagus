@@ -36,7 +36,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "net_message.h"
-#include "network/netsockets.h"
+#include "net_connection_handler.h"
 
 class CHost;
 
@@ -148,20 +148,20 @@ class CServer
 public:
 	void Init(const std::string &name, CServerSetup *serverSetup);
 
-	void Open(const CHost &host);
+	void Open(const CHost &host, bool udp);
 
-	bool IsValid();
+	bool IsValid() const;
 
-	int HasDataToRead(int timeout);
+	int HasDataToRead(int timeout) const;
 
-	void SendToAllClients(const unsigned char *buf, unsigned int len);
+	void SendToAllClients(CNetworkHost hosts[], int hostCount, const unsigned char *buf, unsigned int len);
 
 	template <typename T>
 	void SendMessageToSpecificClient(const CHost &host, const T &msg);
 
 	void SendMessageToSpecificClient(const CHost &host, const CInitMessage_Header &msg);
 
-	int Recv(unsigned char *buf, int len, CHost *hostFrom);
+	int Recv(unsigned char *buf, int len, CHost *hostFrom) const;
 
 	void Close();
 
@@ -191,11 +191,9 @@ private:
 private:
 	std::string name;
 	NetworkState networkStates[PlayerMax]; /// Client Host states
-#if UDP
-	CUDPSocket *socket = nullptr;
-#else
-	CTCPSocket *socket = nullptr;
-#endif
+
+	IServerConnectionHandler* _serverConnectionHandler = nullptr;
+
 	CServerSetup *serverSetup;
 };
 
@@ -205,9 +203,9 @@ public:
 	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
 	void SetServerHost(const CHost &host) { serverHost = host; }
 
-	void Open();
+	void Open(bool udp);
 
-	bool IsValid();
+	bool IsValid() const;
 
 	int HasDataToRead(int timeout);
 
@@ -271,12 +269,14 @@ private:
 	CHost serverHost;  /// IP:port of server to join
 	NetworkState networkState;
 	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
-	
-#if UDP
-	CUDPSocket *socket = nullptr;
-#else
-	CTCPSocket *socket = nullptr;
-#endif
+
+	IClientConnectionHandler* _clientConnectionHandler = nullptr;
+
+//#if UDP
+//	CUDPSocket *socket = nullptr;
+//#else
+//	CTCPSocket *socket = nullptr;
+//#endif
 
 	CServerSetup *serverSetup;
 	CServerSetup *localSetup;
