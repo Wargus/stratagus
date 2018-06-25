@@ -31,7 +31,7 @@ bool CTCPConnectionHandler::Connect(const CHost& host) {
 	return _socket.Connect(host);
 }
 
-int CTCPConnectionHandler::Send(const unsigned char* buf, unsigned len) {
+int CTCPConnectionHandler::Send(const unsigned char* buf, unsigned int len) {
 	const auto bufLength = new unsigned char[2];
 
 	bufLength[0] = len >> 8 & 0xFF;
@@ -85,7 +85,7 @@ void CUDPConnectionHandler::Close() {
 	_socket.Close();
 }
 
-void CUDPConnectionHandler::Send(const CHost& host, const unsigned char* buf, unsigned len) {
+void CUDPConnectionHandler::Send(const CHost& host, const unsigned char* buf, unsigned int len) {
 	_socket.Send(host, buf, len);
 }
 
@@ -131,13 +131,13 @@ int CTCPServerConnectionHandler::HasDataToRead(int timeout) {
 	return 0;
 }
 
-void CTCPServerConnectionHandler::SendToAllClients(vector<CHost> hosts, const unsigned char* buf, unsigned len) {
+void CTCPServerConnectionHandler::SendToAllClients(vector<CHost> hosts, const unsigned char* buf, unsigned int len) {
 	for (auto& host : hosts) {
 		_clientConnections[host]->Send(buf, len);
 	}
 }
 
-void CTCPServerConnectionHandler::SendToClient(CHost host, const unsigned char* buf, unsigned len) {
+void CTCPServerConnectionHandler::SendToClient(CHost host, const unsigned char* buf, unsigned int len) {
 	_clientConnections[host]->Send(buf, len);
 }
 
@@ -188,13 +188,13 @@ void CUDPServerConnectionHandler::Open(const CHost& host) {
 	_connectionHandler.Open(host);
 }
 
-void CUDPServerConnectionHandler::SendToAllClients(std::vector<CHost> hosts, const unsigned char* buf, unsigned len) {
+void CUDPServerConnectionHandler::SendToAllClients(std::vector<CHost> hosts, const unsigned char* buf, unsigned int len) {
 	for (auto& host : hosts) {
 		_connectionHandler.Send(host, buf, len);
 	}
 }
 
-void CUDPServerConnectionHandler::SendToClient(CHost host, const unsigned char* buf, unsigned len) {
+void CUDPServerConnectionHandler::SendToClient(CHost host, const unsigned char* buf, unsigned int len) {
 	_connectionHandler.Send(host, buf, len);
 }
 
@@ -208,7 +208,7 @@ void CTCPClientConnectionHandler::Open(const CHost& host) {
 	_connectionHandler.Connect(_serverHost);
 }
 
-void CTCPClientConnectionHandler::SendToServer(const unsigned char* buf, unsigned len) {
+void CTCPClientConnectionHandler::SendToServer(const unsigned char* buf, unsigned int len) {
 	_connectionHandler.Send(buf, len);
 }
 
@@ -221,7 +221,7 @@ void CUDPClientConnectionHandler::Open(const CHost& host) {
 	_connectionHandler.Open(CHost("localhost", 0));
 }
 
-void CUDPClientConnectionHandler::SendToServer(const unsigned char* buf, unsigned len) {
+void CUDPClientConnectionHandler::SendToServer(const unsigned char* buf, unsigned int len) {
 	_connectionHandler.Send(_serverHost, buf, len);
 }
 
