@@ -2,6 +2,8 @@
 #define __NET_CONNECTION_HANDLER_H__
 
 #include "network/netsockets.h"
+
+#include <memory>
 #include <map>
 #include <vector>
 
