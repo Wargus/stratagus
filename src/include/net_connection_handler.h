@@ -21,6 +21,7 @@ public:
 class IServerConnectionHandler : public IConnectionHandler
 {
 public:
+	virtual ~IServerConnectionHandler() = default;
 	virtual void SendToAllClients(std::vector<CHost> hosts, const unsigned char *buf, unsigned int len) = 0;
 	virtual void SendToClient(CHost host, const unsigned char *buf, unsigned int len) = 0;
 };
@@ -28,6 +29,7 @@ public:
 class IClientConnectionHandler : public IConnectionHandler
 {
 public:
+	virtual ~IClientConnectionHandler() = default;
 	virtual void SendToServer(const unsigned char *buf, unsigned int len) = 0;
 };
 
@@ -73,6 +75,7 @@ private:
 class CTCPServerConnectionHandler : public IServerConnectionHandler
 {
 public:
+	virtual ~CTCPServerConnectionHandler() = default;
 	void Open(const CHost& host) override;
 	bool IsValid() override { return _connectionHandler.IsValid(); }
 	int HasDataToRead(int timeout) override;
@@ -90,6 +93,7 @@ private:
 class CUDPServerConnectionHandler : public IServerConnectionHandler
 {
 public:
+	virtual ~CUDPServerConnectionHandler() = default;
 	void Open(const CHost& host) override;
 	int HasDataToRead(int timeout) override { return _connectionHandler.HasDataToRead(timeout); }
 	void SendToAllClients(std::vector<CHost> hosts, const unsigned char* buf, unsigned int len) override;
@@ -108,6 +112,7 @@ public:
 	CTCPClientConnectionHandler(CHost serverHost)
 		: _serverHost(serverHost) {}
 
+	virtual ~CTCPClientConnectionHandler() = default;
 	void Open(const CHost &host) override;
 	int HasDataToRead(int timeout) override { return _connectionHandler.HasDataToRead(timeout); }
 	void SendToServer(const unsigned char *buf, unsigned int len) override;
@@ -126,6 +131,7 @@ public:
 	CUDPClientConnectionHandler(CHost serverHost)
 		: _serverHost(serverHost) {}
 
+	virtual ~CUDPClientConnectionHandler() = default;
 	void Open(const CHost &host) override;
 	int HasDataToRead(int timeout) override { return _connectionHandler.HasDataToRead(timeout); }
 	void SendToServer(const unsigned char *buf, unsigned int len) override;
