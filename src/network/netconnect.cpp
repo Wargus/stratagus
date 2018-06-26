@@ -846,10 +846,6 @@ bool CServer::IsValid() const {
 	return _serverConnectionHandler->IsValid();
 }
 
-#ifndef UDP
-	std::map<CHost, CTCPSocket*> clientSockets;
-#endif
-
 int CServer::HasDataToRead(int timeout) const {
 	return _serverConnectionHandler->HasDataToRead(timeout);
 }
@@ -886,6 +882,7 @@ int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) const {
 
 void CServer::Close() {
 	_serverConnectionHandler->Close();
+	delete _serverConnectionHandler;
 	_serverConnectionHandler = nullptr;
 }
 
