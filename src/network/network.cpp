@@ -292,6 +292,7 @@ void CNetworkParameter::FixValues()
 
 bool NetworkInSync = true;                 /// Network is in sync
 bool NetworkGame = false;
+bool ClientDisconnected = false;
 
 //CUDPSocket NetworkFildes;                  /// Network file descriptor
 
@@ -851,6 +852,7 @@ void NetworkEvent()
 		len = Server.Recv(buf, sizeof(buf), &host);
 	} else { // client
 		len = Client.Recv(buf, sizeof(buf), &host);
+		ClientDisconnected = len < 0;
 	}
 
 	if (len == 0)
