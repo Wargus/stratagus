@@ -44,7 +44,7 @@ void Parameters::SetDefaultValues()
 	luaStartFilename = "scripts/stratagus.lua";
 	luaEditorStartFilename = "scripts/editor.lua";
 	SetDefaultUserDirectory();
-	UseUDP = false;
+	UseUDP = true;
 }
 
 void Parameters::SetDefaultUserDirectory()

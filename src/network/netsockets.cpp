@@ -309,7 +309,7 @@ int CTCPSocket::HasDataToRead(int timeout)
 
 bool CTCPSocket::IsValid() const
 {
-	return m_impl->IsValid();
+	return m_impl && m_impl->IsValid();
 }
 
 CHost CTCPSocket::GetHost() const
