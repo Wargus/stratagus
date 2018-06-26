@@ -69,18 +69,18 @@ CMetaClient MetaClient;
 */
 void CMetaClient::SetMetaServer(const std::string host, const int port)
 {
-	/*metaHost = host;
-	metaPort = port;*/
+	metaHost = host;
+	metaPort = port;
 }
 
 CMetaClient::~CMetaClient()
 {
-	/*for (std::list<CClientLog *>::iterator it = events.begin(); it != events.end(); ++it) {
+	for (std::list<CClientLog *>::iterator it = events.begin(); it != events.end(); ++it) {
 		CClientLog *log = *it;
 		delete log;
 	}
 	events.clear();
-	this->Close();*/
+	this->Close();
 }
 
 /**
@@ -90,50 +90,48 @@ CMetaClient::~CMetaClient()
 */
 int CMetaClient::Init()
 {
-	return -1;
+	if (metaPort == -1) {
+		return -1;
+	}
 
-	//if (metaPort == -1) {
-	//	return -1;
-	//}
+	// Server socket
+	CHost metaServerHost(metaHost.c_str(), metaPort);
+	// Client socket
 
-	//// Server socket
-	//CHost metaServerHost(metaHost.c_str(), metaPort);
-	//// Client socket
+	// open on all interfaces, not the loopback, unless we have an override from the commandline
+	std::string localHost = CNetworkParameter::Instance.localHost;
+	if (!localHost.compare("127.0.0.1")) {
+		localHost = "0.0.0.0";
+	}
+	CHost metaClientHost(localHost.c_str(), CNetworkParameter::Instance.localPort);
+	metaSocket.Open(metaClientHost);
+	if (metaSocket.IsValid() == false) {
+		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
+		return -1;
+	}
+	if (metaSocket.Connect(metaServerHost) == false) {
+		fprintf(stderr, "METACLIENT: Unable to connect to host %s\n", metaServerHost.toString().c_str());
+		MetaClient.Close();
+		return -1;
+	}
 
-	//// open on all interfaces, not the loopback, unless we have an override from the commandline
-	//std::string localHost = CNetworkParameter::Instance.localHost;
-	//if (!localHost.compare("127.0.0.1")) {
-	//	localHost = "0.0.0.0";
-	//}
-	//CHost metaClientHost(localHost.c_str(), CNetworkParameter::Instance.localPort);
-	//metaSocket.Open(metaClientHost);
-	//if (metaSocket.IsValid() == false) {
-	//	fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
-	//	return -1;
-	//}
-	//if (metaSocket.Connect(metaServerHost) == false) {
-	//	fprintf(stderr, "METACLIENT: Unable to connect to host %s\n", metaServerHost.toString().c_str());
-	//	MetaClient.Close();
-	//	return -1;
-	//}
-
-	//if (this->Send("PING") == -1) { // not sent
-	//	MetaClient.Close();
-	//	return -1;
-	//}
-	//if (this->Recv() == -1) { // not received
-	//	MetaClient.Close();
-	//	return -1;
-	//}
-	//CClientLog &log = *GetLastMessage();
-	//if (log.entry.find("PING_OK") != std::string::npos) {
-	//	// Everything is OK
-	//	return 0;
-	//} else {
-	//	fprintf(stderr, "METACLIENT: inappropriate message received from %s\n", metaServerHost.toString().c_str());
-	//	MetaClient.Close();
-	//	return -1;
-	//}
+	if (this->Send("PING") == -1) { // not sent
+		MetaClient.Close();
+		return -1;
+	}
+	if (this->Recv() == -1) { // not received
+		MetaClient.Close();
+		return -1;
+	}
+	CClientLog &log = *GetLastMessage();
+	if (log.entry.find("PING_OK") != std::string::npos) {
+		// Everything is OK
+		return 0;
+	} else {
+		fprintf(stderr, "METACLIENT: inappropriate message received from %s\n", metaServerHost.toString().c_str());
+		MetaClient.Close();
+		return -1;
+	}
 }
 
 /**
@@ -143,9 +141,9 @@ int CMetaClient::Init()
 */
 void CMetaClient::Close()
 {
-	/*if (metaSocket.IsValid()) {
+	if (metaSocket.IsValid()) {
 		metaSocket.Close();
-	}*/
+	}
 }
 
 
@@ -158,15 +156,13 @@ void CMetaClient::Close()
 */
 int CMetaClient::Send(const std::string cmd)
 {
-	return -1;
-
-	/*int ret = -1;
+	int ret = -1;
 	if (metaSocket.IsValid()) {
 		std::string mes(cmd);
 		mes.append("\n");
-		ret = metaSocket.Send(mes.c_str(), mes.size());
+		ret = metaSocket.Send((unsigned char*)mes.c_str(), mes.size());
 	}
-	return ret;*/
+	return ret;
 }
 
 /**
@@ -176,33 +172,33 @@ int CMetaClient::Send(const std::string cmd)
 */
 int CMetaClient::Recv()
 {
-	return -1;
+	if (metaSocket.HasDataToRead(5000) == -1) {
+		return -1;
+	}
 
-	//if (metaSocket.HasDataToRead(5000) == -1) {
-	//	return -1;
-	//}
-
-	//char buf[1024];
-	//memset(&buf, 0, sizeof(buf));
-	//int n = metaSocket.Recv(&buf, sizeof(buf));
-	//if (n == -1) {
-	//	return n;
-	//}
-	//// We know we now have the whole command.
-	//// Convert to standard notation
-	//std::string cmd(buf, strlen(buf));
-	//cmd += '\n';
-	//cmd += '\0';
-	//CClientLog *log = new CClientLog;
-	//log->entry = cmd;
-	//events.push_back(log);
-	//lastRecvState = n;
-	//return n;
+	char buf[1024];
+	memset(&buf, 0, sizeof(buf));
+	int n = metaSocket.Recv((unsigned char*)buf, sizeof(buf));
+	if (n == -1) {
+		return n;
+	}
+	// We know we now have the whole command.
+	// Convert to standard notation
+	std::string cmd(buf, strlen(buf));
+	cmd += '\n';
+	cmd += '\0';
+	CClientLog *log = new CClientLog;
+	log->entry = cmd;
+	events.push_back(log);
+	lastRecvState = n;
+	return n;
 }
 
 //@}
 
 int CMetaClient::CreateGame(std::string desc, std::string map, std::string players) {
+	//TODO: decide where to publish newly created games from
+	
 	return -1;
 
 	//if (metaSocket.IsValid() == false) {

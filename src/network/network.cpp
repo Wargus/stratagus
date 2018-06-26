@@ -196,9 +196,6 @@
 ** ::NetworkCommands()
 ** Network Updates : exec current command, and send commands to other players
 **
-** ::NetworkFildes
-** UDP Socket for communication.
-**
 ** ::NetworkInSync
 ** false when commands of the next gameNetCycle of the other player are not ready.
 **
@@ -292,9 +289,7 @@ void CNetworkParameter::FixValues()
 
 bool NetworkInSync = true;                 /// Network is in sync
 bool NetworkGame = false;
-bool ClientDisconnected = false;
-
-//CUDPSocket NetworkFildes;                  /// Network file descriptor
+bool ClientDisconnected = false;           /// Client has issues connecting to server
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
@@ -360,18 +355,9 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 	// Send to all clients.
 	if (NetConnectType == 1) { // server
 		Server.SendToAllClients(Hosts, HostsCount, buf, size);
-		/*for (int i = 0; i < HostsCount; ++i) {
-			const CHost host(Hosts[i].Host, Hosts[i].Port);
-			if (Hosts[i].PlyNr == player) {
-				continue;
-			}
-			NetworkFildes.Send(host, buf, size);
-		}*/
 	}
 	else { // client		
 		Client.SendToServer(buf, size);
-		//const CHost host(Hosts[HostsCount - 1].Host, Hosts[HostsCount - 1].Port);
-		//NetworkFildes.Send(host, buf, size);
 	}
 	delete[] buf;
 }
@@ -428,14 +414,8 @@ void ExitNetwork1()
 		return;
 	}
 
-/*#ifdef DEBUG
-	printStatistic(NetworkFildes.getStatistic());
-	NetworkFildes.clearStatistic();
-	NetworkStat.print();
-#endif*/
-
 	if (NetConnectType == 1) { // server
-		Server.Close();
+	   Server.Close();
 	}
 	else { // client
 		Client.Close();
