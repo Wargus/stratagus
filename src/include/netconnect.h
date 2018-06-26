@@ -272,12 +272,6 @@ private:
 
 	IClientConnectionHandler* _clientConnectionHandler = nullptr;
 
-//#if UDP
-//	CUDPSocket *socket = nullptr;
-//#else
-//	CTCPSocket *socket = nullptr;
-//#endif
-
 	CServerSetup *serverSetup;
 	CServerSetup *localSetup;
 };

@@ -81,126 +81,9 @@ CClient Client;
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 
-/*class CServer
-{
-public:
-	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup);
-
-	void Update(unsigned long frameCounter);
-	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
-
-	void MarkClientsAsResync();
-	void KickClient(int c);
-private:
-	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
-	void Parse_Resync(const int h);
-	void Parse_Waiting(const int h);
-	void Parse_Map(const int h);
-	void Parse_State(const int h, const CInitMessage_State &msg);
-	void Parse_GoodBye(const int h);
-	void Parse_SeeYou(const int h);
-
-	void Send_AreYouThere(const CNetworkHost &host);
-	void Send_GameFull(const CHost &host);
-	void Send_Welcome(const CNetworkHost &host, int hostIndex);
-	void Send_Resync(const CNetworkHost &host, int hostIndex);
-	void Send_Map(const CNetworkHost &host);
-	void Send_State(const CNetworkHost &host);
-	void Send_GoodBye(const CNetworkHost &host);
-private:
-	std::string name;
-	NetworkState networkStates[PlayerMax]; /// Client Host states
-	CUDPSocket *socket;
-	CServerSetup *serverSetup;
-};
-
-class CClient
-{
-public:
-	void Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
-	void SetServerHost(const CHost &host) { serverHost = host; }
-
-	bool Parse(const unsigned char *buf, const CHost &host);
-	bool Update(unsigned long tick);
-
-	void DetachFromServer();
-
-	int GetNetworkState() const { return networkState.State; }
-
-private:
-	bool Update_disconnected();
-	bool Update_detaching(unsigned long tick);
-	bool Update_connecting(unsigned long tick);
-	bool Update_connected(unsigned long tick);
-	bool Update_synced(unsigned long tick);
-	bool Update_changed(unsigned long tick);
-	bool Update_async(unsigned long tick);
-	bool Update_mapinfo(unsigned long tick);
-	bool Update_badmap(unsigned long tick);
-	bool Update_goahead(unsigned long tick);
-	bool Update_started(unsigned long tick);
-
-	void Send_Go(unsigned long tick);
-	void Send_Config(unsigned long tick);
-	void Send_MapUidMismatch(unsigned long tick);
-	void Send_Map(unsigned long tick);
-	void Send_Resync(unsigned long tick);
-	void Send_State(unsigned long tick);
-	void Send_Waiting(unsigned long tick, unsigned long msec);
-	void Send_Hello(unsigned long tick);
-	void Send_GoodBye(unsigned long tick);
-
-	template <typename T>
-	void SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
-
-	void SetConfig(const CInitMessage_Config &msg);
-
-	void Parse_GameFull();
-	void Parse_LuaMismatch(const unsigned char *buf);
-	void Parse_EngineMismatch(const unsigned char *buf);
-	void Parse_Resync(const unsigned char *buf);
-	void Parse_Config(const unsigned char *buf);
-	void Parse_State(const unsigned char *buf);
-	void Parse_Welcome(const unsigned char *buf);
-	void Parse_Map(const unsigned char *buf);
-	void Parse_AreYouThere();
-
-private:
-	std::string name;
-	CHost serverHost;  /// IP:port of server to join
-	NetworkState networkState;
-	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
-	CUDPSocket *socket;
-	CServerSetup *serverSetup;
-	CServerSetup *localSetup;
-};*/
-
 //
 // CClient
 //
-
-/**
-** Send an InitConfig message across the Network
-**
-** @param host Host to send to (network byte order).
-** @param port Port of host to send to (network byte order).
-** @param msg The message to send
-*/
-//template <typename T>
-//static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
-//{
-//	const unsigned char *buf = msg.Serialize();
-//	socket.Send(host, buf, msg.Size());
-//	delete[] buf;
-//}
-//
-//void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
-//{
-//	unsigned char *buf = new unsigned char [msg.Size()];
-//	msg.Serialize(buf);
-//	socket.Send(host, buf, msg.Size());
-//	delete[] buf;
-//}
 
 static const char *ncconstatenames[] = {
 	"ccs_unused",
@@ -249,29 +132,6 @@ static const char *icmsgsubtypenames[] = {
 	"IAmHere",                 // Client answers I am here
 };
 
-//template <typename T>
-//static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const T &msg)
-//{
-//	NetworkSendICMessage(socket, host, msg);
-//
-//#ifdef DEBUG
-//	const std::string hostStr = host.toString();
-//	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-//			   _C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
-//#endif
-//}
-//
-//static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
-//{
-//	NetworkSendICMessage(socket, host, msg);
-//
-//#ifdef DEBUG
-//	const std::string hostStr = host.toString();
-//	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-//			   _C_ icmsgsubtypenames[msg.GetSubType()]);
-//#endif
-//}
-
 /**
 ** Send a message to the server, but only if the last packet was a while ago
 **
@@ -295,7 +155,6 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 		lastMsgTypeSent = subtype;
 	}
 	SendToServer(msg);
-	//NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
@@ -317,7 +176,6 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		lastMsgTypeSent = subtype;
 	}
 	SendToServer(msg);
-	//NetworkSendICMessage(*socket, serverHost, msg);
 	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
 			   ncconstatenames[networkState.State] _C_
 			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
@@ -343,14 +201,6 @@ void CClient::Open(bool udp) {
 	}
 
 	_clientConnectionHandler->Open(CHost("localhost", 0));
-
-//xxxxx
-//	socket->Open(CHost("localhost", 0));
-//#else
-//	socket->Open(CHost("localhost", 0));
-//	socket->SetBlocking();
-//	socket->Connect(this->serverHost);
-//#endif
 }
 
 bool CClient::IsValid() const {
@@ -359,56 +209,24 @@ bool CClient::IsValid() const {
 	}
 
 	return _clientConnectionHandler->IsValid();
-
-//xxxxx
-//	return socket->IsValid();
-//#else
-//	return socket->IsValid();
-//#endif
 }
 
 int CClient::HasDataToRead(int timeout) {
 	return _clientConnectionHandler->HasDataToRead(timeout);
-
-//xxxxx
-//	return socket->HasDataToRead(timeout);
-//#else
-//	return socket->HasDataToRead(timeout);
-//#endif
 }
 
 void CClient::SendToServer(const unsigned char *buf, unsigned int len) {
 	_clientConnectionHandler->SendToServer(buf, len);
-//xxxxx
-//	socket->Send(serverHost, buf, len);
-//#else
-//	socket->Send(buf, len);
-//#endif
 }
 
 int CClient::Recv(unsigned char *buf, int len, CHost *hostFrom) {
 	return _clientConnectionHandler->Recv(buf, len, hostFrom);
-
-//xxxxx
-//	return socket->Recv(buf, len, hostFrom);
-//#else
-//	*hostFrom = serverHost;
-//	return socket->Recv(buf, len);
-//#endif
 }
 
 void CClient::Close() {
 	_clientConnectionHandler->Close();
 	delete _clientConnectionHandler;
 	_clientConnectionHandler = nullptr;
-
-//xxxxx
-//	socket->Close();
-//	socket = nullptr;
-//#else
-//	socket->Close();
-//	socket = nullptr;
-//#endif
 }
 
 void CClient::DetachFromServer()
@@ -425,7 +243,6 @@ bool CClient::Update_disconnected()
 	// Spew out 5 and trust in God that they arrive
 	for (int i = 0; i < 5; ++i) {
 		SendToServer(message);
-		//NetworkSendICMessage(*socket, serverHost, message);
 	}
 	networkState.State = ccs_usercanceled;
 	return false;
@@ -963,7 +780,6 @@ void CClient::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
 	SendToServer(message);
-	//NetworkSendICMessage(*socket, serverHost, message);
 }
 
 template <typename T>
@@ -1009,12 +825,6 @@ void CServer::Init(const std::string &name, CServerSetup *serverSetup)
 	}
 	this->serverSetup = serverSetup;
 	this->name = name;
-	
-//xxxxx
-//	this->socket = new CUDPSocket();
-//#else
-//	this->socket = new CTCPSocket();
-//#endif
 }
 
 void CServer::Open(const CHost &host, bool udp) {
@@ -1026,14 +836,6 @@ void CServer::Open(const CHost &host, bool udp) {
 	}
 
 	_serverConnectionHandler->Open(host);
-
-//xxxxx
-//	socket->Open(host);
-//#else
-//	socket->Open(host);
-//	socket->SetNonBlocking();
-//	socket->Listen();
-//#endif
 }
 
 bool CServer::IsValid() const {
@@ -1042,12 +844,6 @@ bool CServer::IsValid() const {
 	}
 
 	return _serverConnectionHandler->IsValid();
-
-//xxxxx
-//	return socket->IsValid();
-//#else
-//	return socket->IsValid();
-//#endif
 }
 
 #ifndef UDP
@@ -1056,28 +852,6 @@ bool CServer::IsValid() const {
 
 int CServer::HasDataToRead(int timeout) const {
 	return _serverConnectionHandler->HasDataToRead(timeout);
-
-//xxxxx
-//	return socket->HasDataToRead(timeout);
-//#else
-//	const auto newClientSocket = socket->Accept();
-//	if (newClientSocket)
-//	{
-//		newClientSocket->SetBlocking();
-//		clientSockets[newClientSocket->GetHost()] = newClientSocket;
-//	}
-//
-//	for (auto& it : clientSockets)
-//	{
-//		const int read = it.second->HasDataToRead(timeout);
-//		if (read > 0)
-//		{
-//			return read;
-//		}
-//	}
-//
-//	return 0;
-//#endif
 }
 
 void CServer::SendToAllClients(CNetworkHost hosts[], int hostCount, const unsigned char *buf, unsigned int len) {
@@ -1088,41 +862,12 @@ void CServer::SendToAllClients(CNetworkHost hosts[], int hostCount, const unsign
 		hostVector.emplace_back(host);
 	}
 	_serverConnectionHandler->SendToAllClients(hostVector, buf, len);
-
-//xxxxx
-//	for (int i = 0; i < HostsCount; ++i) {
-//		const CHost host(Hosts[i].Host, Hosts[i].Port);
-//		socket->Send(host, buf, len);
-//	}	
-//#else
-//	for (int i = 0; i < HostsCount; ++i) {
-//		const CHost host(Hosts[i].Host, Hosts[i].Port);
-//		//TODO CHECK IF FAILED
-//		clientSockets[host]->Send(buf, len);
-//	}
-//#endif
 }
-
-
-//template <typename T>
-//static void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
-//{
-//	const unsigned char *buf = msg.Serialize();
-//	socket.Send(host, buf, msg.Size());
-//	delete[] buf;
-//}
 
 template <typename T>
 void CServer::SendMessageToSpecificClient(const CHost &host, const T &msg) {
 	const unsigned char *buf = msg.Serialize();
 	_serverConnectionHandler->SendToClient(host, buf, msg.Size());
-
-//xxxxx
-//	socket->Send(host, buf, msg.Size());
-//#else
-//	clientSockets[host]->Send(buf, msg.Size());
-//#endif
-
 	delete[] buf;
 }
 
@@ -1132,89 +877,28 @@ void CServer::SendMessageToSpecificClient(const CHost &host, const CInitMessage_
 	msg.Serialize(buf);
 
 	_serverConnectionHandler->SendToClient(host, buf, msg.Size());
-
-//xxxxx
-//	socket->Send(host, buf, msg.Size());
-//#else
-//	auto clientSocket = clientSockets[host];
-//	clientSocket->Send(buf, msg.Size());
-//#endif
-
 	delete[] buf;
 }
 
-//#ifndef UDP
-//int skipClient = 0;
-//#endif
-
 int CServer::Recv(unsigned char *buf, int len, CHost *hostFrom) const {
 	return _serverConnectionHandler->Recv(buf, len, hostFrom);
-
-//xxxxx
-//	return socket->Recv(buf, len, hostFrom);
-//#else
-//	int skip = skipClient;
-//	int take = clientSockets.size();
-//
-//	skipClient = (skipClient + 1) % clientSockets.size();
-//
-//	for (auto& it : clientSockets) {
-//		if (skip-- > 0) continue;
-//		take--;
-//
-//		const int read = it.second->HasDataToRead(0);
-//		if (read > 0) {
-//			*hostFrom = it.first;
-//			return it.second->Recv(buf, len);
-//		}
-//	}
-//
-//	for (auto& it : clientSockets) {
-//		if (take-- == 0) break;
-//
-//		const int read = it.second->HasDataToRead(0);
-//		if (read > 0) {
-//			*hostFrom = it.first;
-//			return it.second->Recv(buf, len);
-//		}
-//	}
-//
-//	return 0;
-//#endif
 }
 
 void CServer::Close() {
 	_serverConnectionHandler->Close();
 	_serverConnectionHandler = nullptr;
-
-
-//xxxxx
-//	socket->Close();
-//#else
-//	for (auto& it : clientSockets)
-//	{
-//		it.second->Close();
-//	}
-//
-//	clientSockets.clear();
-//	socket->Close();
-//#endif
-//
-//	socket = nullptr;
 }
 
 void CServer::Send_AreYouThere(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 	SendMessageToSpecificClient(host, message);
-	//NetworkSendICMessage_Log(*socket, host, message);
 }
 
 void CServer::Send_Welcome(const CNetworkHost &host, int index)
@@ -1229,7 +913,6 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 		}
 	}
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
@@ -1242,28 +925,24 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 		}
 	}
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_Map(const CNetworkHost &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), Map.Info.MapUID);
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Send_GoodBye(const CNetworkHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 	SendMessageToSpecificClient(CHost(host.Host, host.Port), message);
-	//NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
 void CServer::Update(unsigned long frameCounter)
@@ -1569,9 +1248,6 @@ static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 		fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
 				StratagusVersion, msg.Stratagus, hostStr.c_str());
 
-		//const CInitMessage_EngineMismatch message;
-		//Server.SendToSpecificHost(host, message);
-		//NetworkSendICMessage_Log(socket, host, message);
 		return -1;
 	}
 
@@ -1582,9 +1258,6 @@ static int CheckVersions(const CInitMessage_Hello &msg, const CHost &host)
 				msg.Version,
 				hostStr.c_str());
 
-		//const CInitMessage_LuaFilesMismatch message;
-		//Server.SendToSpecificHost(host, message);
-		//NetworkSendICMessage_Log(socket, host, message);
 		return -2;
 	}
 	return 0;
@@ -1598,33 +1271,6 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 	if (index == -1) {
 		if (msgsubtype == ICMHello) {
 			CInitMessage_Hello msg;
-
-
-			//if (msg.Stratagus != StratagusVersion) {
-			//	const std::string hostStr = host.toString();
-			//	fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
-			//		StratagusVersion, msg.Stratagus, hostStr.c_str());
-
-			//	//const CInitMessage_EngineMismatch message;
-			//	//Server.SendToSpecificHost(host, message);
-			//	//NetworkSendICMessage_Log(socket, host, message);
-			//	return -1;
-			//}
-
-			//if (msg.Version != FileChecksums) {
-			//	const std::string hostStr = host.toString();
-			//	fprintf(stderr, "Incompatible lua files %d <-> %d\nfrom %s\n",
-			//		FileChecksums,
-			//		msg.Version,
-			//		hostStr.c_str());
-
-			//	//const CInitMessage_LuaFilesMismatch message;
-			//	//Server.SendToSpecificHost(host, message);
-			//	//NetworkSendICMessage_Log(socket, host, message);
-			//	return -2;
-			//}
-			//return 0;
-
 
 			msg.Deserialize(buf);
 			int versionCheck = CheckVersions(msg, host);
@@ -1962,10 +1608,8 @@ breakout:
 			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
 				Server.SendMessageToSpecificClient(host, message);
-				//NetworkSendICMessage_Log(NetworkFildes, host, message);
 			} else if (num[Hosts[i].PlyNr] == 2) {
 				Server.SendMessageToSpecificClient(host, statemsg);
-				//NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 			}
 		}
 
@@ -2033,7 +1677,6 @@ breakout:
 	for (int i = 0; i < HostsCount; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
 		Server.SendMessageToSpecificClient(host, message_go);
-		//NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}
 }
 

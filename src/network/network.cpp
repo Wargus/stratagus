@@ -858,7 +858,6 @@ void NetworkEvent()
 		return;
 	}
 
-	//int len = NetworkFildes.Recv(&buf, sizeof(buf), &host);
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
