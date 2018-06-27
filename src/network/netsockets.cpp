@@ -256,11 +256,14 @@ bool CTCPSocket::Open(const CHost &host)
 
 int CTCPSocket::Listen()
 {
+	if (!IsValid()) return -1;
 	return m_impl->Listen();
 }
 
 void CTCPSocket::Close()
 {
+	if (!IsValid()) return;
+
 	m_impl->Close();
 	delete m_impl;
 	m_impl = nullptr;
@@ -268,11 +271,14 @@ void CTCPSocket::Close()
 
 bool CTCPSocket::Connect(const CHost &host)
 {
+	if (!IsValid()) return false;
 	return m_impl->Connect(host);
 }
 
 CTCPSocket* CTCPSocket::Accept()
 {
+	if (!IsValid()) return nullptr;
+
 	auto impl = m_impl->Accept();
 	if(impl == nullptr)
 	{
@@ -284,26 +290,31 @@ CTCPSocket* CTCPSocket::Accept()
 
 int CTCPSocket::Send(const unsigned char *buf, unsigned int len)
 {
+	if (!IsValid()) return -1;
 	return m_impl->Send(buf, len);
 }
 
 int CTCPSocket::Recv(unsigned char *buf, int len)
 {
+	if (!IsValid()) return -1;
 	return m_impl->Recv(buf, len);
 }
 
 void CTCPSocket::SetBlocking()
 {
+	if (!IsValid()) return;
 	m_impl->SetBlocking();
 }
 
 void CTCPSocket::SetNonBlocking()
 {
+	if (!IsValid()) return;
 	m_impl->SetNonBlocking();
 }
 
 int CTCPSocket::HasDataToRead(int timeout)
 {
+	if (!IsValid()) return -1;
 	return m_impl->HasDataToRead(timeout);
 }
 

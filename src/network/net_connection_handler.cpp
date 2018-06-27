@@ -73,9 +73,14 @@ int CTCPConnectionHandler::Send(const unsigned char* buf, unsigned int len) {
 int CTCPConnectionHandler::Recv(unsigned char* buf, int len) {
 	auto* bufLength = new unsigned char[2];
 
+	if(_socket.HasDataToRead(0) <= 0) {
+		return 0;
+	}
+
 	const int resLen = _socket.Recv(bufLength, 2);
 	if (resLen < 2)
 	{
+		_socket.Close();
 		return resLen;
 	}
 

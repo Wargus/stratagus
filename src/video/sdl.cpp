@@ -987,8 +987,6 @@ void WaitEventsOneFrame()
 			networkHasDataToRead = NetworkHasDataToRead();
 			if (networkHasDataToRead) {
 				GetCallbacks()->NetworkEvent();
-				if (NetworkDisconnected)
-					break;
 			}
 		}
 		// No more input and time for frame over: return
