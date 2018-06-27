@@ -68,7 +68,7 @@ public:
 
 extern bool NetworkInSync;        /// Network is in sync
 extern bool NetworkGame;
-extern bool ClientDisconnected;
+extern bool NetworkDisconnected;
 
 /*----------------------------------------------------------------------------
 --  Functions

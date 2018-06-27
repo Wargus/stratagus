@@ -289,7 +289,7 @@ void CNetworkParameter::FixValues()
 
 bool NetworkInSync = true;                 /// Network is in sync
 bool NetworkGame = false;
-bool ClientDisconnected = false;           /// Client has issues connecting to server
+bool NetworkDisconnected = false;           /// Client has issues connecting to server
 
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
@@ -769,11 +769,13 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 		// Handle some messages.
 		if (packet.Header.Type[i] == MessageQuit) {
 			CNetworkCommandQuit nc;
-			nc.Deserialize(&packet.Command[i][0]);
-			const int playerNum = nc.player;
+			if (!packet.Command[i].empty()) {
+				nc.Deserialize(&packet.Command[i][0]);
+				const int playerNum = nc.player;
 
-			if (playerNum >= 0 && playerNum < NumPlayers) {
-				PlayerQuit[playerNum] = 1;
+				if (playerNum >= 0 && playerNum < NumPlayers) {
+					PlayerQuit[playerNum] = 1;
+				}
 			}
 		}
 		if (packet.Header.Type[i] == MessageResend) {
@@ -832,13 +834,14 @@ void NetworkEvent()
 		len = Server.Recv(buf, sizeof(buf), &host);
 	} else { // client
 		len = Client.Recv(buf, sizeof(buf), &host);
-		ClientDisconnected = len < 0;
 	}
 
 	if (len == 0)
 	{
 		return;
 	}
+
+	NetworkDisconnected = len < 0;
 
 	if (len < 0) {
 		DebugPrint("Server/Client gone?\n");
