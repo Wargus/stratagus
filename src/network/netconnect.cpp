@@ -193,7 +193,11 @@ void CClient::Init(const std::string &name, CServerSetup *serverSetup, CServerSe
 }
 
 void CClient::Open(bool udp) {
-	if(udp) {
+	if (_clientConnectionHandler) {
+		Close();
+	}
+
+	if (udp) {
 		_clientConnectionHandler = new CUDPClientConnectionHandler(this->serverHost);
 	}
 	else {
@@ -212,18 +216,22 @@ bool CClient::IsValid() const {
 }
 
 int CClient::HasDataToRead(int timeout) {
+	if (!IsValid()) return -1;
 	return _clientConnectionHandler->HasDataToRead(timeout);
 }
 
 void CClient::SendToServer(const unsigned char *buf, unsigned int len) {
+	if (!IsValid()) return;
 	_clientConnectionHandler->SendToServer(buf, len);
 }
 
 int CClient::Recv(unsigned char *buf, int len, CHost *hostFrom) {
+	if (!IsValid()) return -1;
 	return _clientConnectionHandler->Recv(buf, len, hostFrom);
 }
 
 void CClient::Close() {
+	if (_clientConnectionHandler == nullptr) return;
 	_clientConnectionHandler->Close();
 	delete _clientConnectionHandler;
 	_clientConnectionHandler = nullptr;
