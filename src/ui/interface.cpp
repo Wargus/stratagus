@@ -584,7 +584,7 @@ static bool CommandKey(int key)
 		// Unselect everything
 		case SDLK_CARET:
 		case SDLK_BACKQUOTE:
-			UiUnselectAll();
+			// UiUnselectAll();
 			break;
 
 		// Group selection
