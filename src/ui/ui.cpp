@@ -79,6 +79,12 @@ void ShowLoadProgress(const char *fmt, ...)
 {
 	va_list va;
 	char temp[4096];
+	static unsigned int lastProgressUpdate = SDL_GetTicks();
+	if (SDL_GetTicks() < lastProgressUpdate + 500) {
+		// Only show progress updates every half second, otherwise we're waiting for the screen too much
+		return;
+	}
+	lastProgressUpdate = SDL_GetTicks();
 
 	va_start(va, fmt);
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
