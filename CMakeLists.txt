@@ -675,7 +675,7 @@ endif()
 # Options for compiling
 
 if(WIN32)
-	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" OFF)
+	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" ON)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
