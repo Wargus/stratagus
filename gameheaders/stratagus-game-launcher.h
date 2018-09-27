@@ -321,23 +321,36 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		char contrib_src_path[BUFF_SIZE];
 		char contrib_dest_path[BUFF_SIZE];
 		int i = 0;
+		int optional = 0;
 		char* contrib_directories[] = CONTRIB_DIRECTORIES;
 		while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
-			strcpy(contrib_src_path, sourcepath);
-			strcat(contrib_src_path, SLASH);
-			strcat(contrib_src_path, contrib_directories[i]);
-			
-			if (stat(contrib_src_path, &st) != 0) {
-				// contrib dir not found, abort!
-				tinyfd_messageBox(contrib_directories[i], "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
-				return;
-			}
+			if (!strcmp(contrib_directories[i], ":optional:")) {
+				i += 1;
+				optional = 1;
+			} else {
+				if (contrib_directories[i][0] != '/') {
+					// absolute Unix paths are not appended to the source path
+					strcpy(contrib_src_path, sourcepath);
+					strcat(contrib_src_path, SLASH);
+					strcat(contrib_src_path, contrib_directories[i]);
+				} else {
+					strcpy(contrib_src_path, contrib_directories[i]);
+				}
 
-			strcpy(contrib_dest_path, destination);
-			strcat(contrib_dest_path, SLASH);
-			strcat(contrib_dest_path, contrib_directories[i + 1]);
-			copy_dir(contrib_src_path, contrib_dest_path);
-			i += 2;
+				if (stat(contrib_src_path, &st) != 0) {
+					// contrib dir not found, abort!
+					if (!optional) {
+						tinyfd_messageBox(contrib_directories[i], "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
+						return;
+					}
+				} else {
+					strcpy(contrib_dest_path, destination);
+					strcat(contrib_dest_path, SLASH);
+					strcat(contrib_dest_path, contrib_directories[i + 1]);
+					copy_dir(contrib_src_path, contrib_dest_path);
+				}
+				i += 2;
+			}
 		}
 	}
 
