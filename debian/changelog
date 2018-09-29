@@ -1,5 +1,9 @@
 stratagus (2.4.2) xenial; urgency=medium
-
+  * Force load progress to screen only every 500ms. On modern machines,
+    loading was so fast that almost all time was spent in screen redraw
+    rather than loading.
+	 * Add support for game launchers to have optional contrib files that are
+    just ignored if they are not present
   * Reliability: Fall back to software and windowed rendering before
     giving up on startup. This fixes the trouble some people have when
     they enable OpenGL or an unsupported fullscreen resolution and now the
