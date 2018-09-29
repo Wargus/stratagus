@@ -40,8 +40,18 @@
 
 <ul>
 <p/>
-<p/><li>2.4.1 Released<p/></li>
+<p/><li>2.4.2 Released<p/></li>
 	<ul>
+	  <li>
+	    Force load progress to screen only every 500ms. On modern machines, loading
+	    was so fast that almost all time was spent in screen redraw rather than loading.
+	  </li>
+	  <li>
+	    Add support for game launchers to have optional contrib files that are just ignored if they are not present
+	  </li>
+	  <li>
+	    Add "make uninstall" target
+	  </li>
 	  <li>
 	    Reliability: Fall back to software and windowed rendering before
 	    giving up on startup. This fixes the trouble some people have when
