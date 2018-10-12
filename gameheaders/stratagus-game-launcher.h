@@ -259,9 +259,9 @@ int check_version(char* tool_path, char* data_path) {
 static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
 	if (force == 0) {
 		tinyfd_messageBox("Missing data",
-						  DATA_NOT_EXTRACTED " Please select the " GAME_CD, "ok", "error", 1);
+						  DATA_NOT_EXTRACTED " Please select the " GAME_CD, "ok", "question", 1);
 	} else if (force == 1) {
-		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "error", 1);
+		tinyfd_messageBox("", "Please select the " GAME_CD, "ok", "question", 1);
 	} else if (force == 2) {
 		// pass
 	}
