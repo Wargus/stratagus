@@ -918,6 +918,15 @@ Define panel content when an unit is selected.
         <dd>Height of the bar.</dd>
         <dt>Width = value</dt>
         <dd>width of the bar.</dd>
+        <dt>Border = boolean</dt>
+        <dd>if true then add a border to the bar. Default is true.</dd>
+        <dt>Colors = list</dt>
+        <dd>A list of {percentage, color-name} pairs. The default is equivalent
+          to {{75, "dark-green"}, {50, "yellow"}, {25, "orange"}, {0,
+          "red"}}. The last element must start with "0". The meaning of the
+          number is the percentage above which the associated color takes
+          effect.
+        </dd>
       </dl></dd>
       <dt>"CompleteBar", {flag = value, ...}</dt>
       <dd>Draw a bar which represent the variable.
