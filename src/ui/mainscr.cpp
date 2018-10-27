@@ -160,22 +160,22 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		hAll = 7;
 	}
 	y += unit.Type->Icon.Icon->G->Height;
-	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-		unit.Type->Icon.Icon->G->Width + 8, hAll);
+	y += UI.LifeBarYOffset;
+	if (UI.LifeBarBorder) {
+		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
+								unit.Type->Icon.Icon->G->Width + 8, hAll);
+	}
 
 	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
 		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 
-		if (f > 75) {
-			color = ColorDarkGreen;
-		} else if (f > 50) {
-			color = ColorYellow;
-		} else if (f > 25) {
-			color = ColorOrange;
-		} else {
-			color = ColorRed;
+		// get to right color
+		int i = 0;
+		while (f < UI.LifeBarPercents[i]) {
+			i++;
 		}
+		color = UI.LifeBarColorsInt[i];
 
 		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
 		Video.FillRectangleClip(color, x - 2, y + 4,

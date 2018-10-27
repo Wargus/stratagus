@@ -262,30 +262,6 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 }
 
-static inline Uint32 IndexToColor(unsigned int index) {
-	// FIXME: this only works after video was initialized, so we do it dynamically
-	static const Uint32 ColorValues[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
-										 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
-										 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack};
-	return ColorValues[index];
-}
-
-static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
-								   "gray", "dark-gray", "white", "orange",
-								   "light-blue", "blue", "dark-green", "black", NULL};
-
-static int GetColorIndexByName(const char *colorName)
-{
-	int i = 0;
-	while (ColorNames[i] != NULL) {
-		if (!strcmp(colorName, ColorNames[i])) {
-			return i;
-		}
-		i++;
-	}
-	return -1;
-}
-
 /**
 **  Draw life bar of a unit using selected variable.
 **  Placed under icons on top-panel.

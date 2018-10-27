@@ -172,6 +172,11 @@ class CUserInterface
 	CUIButton *ResearchingButton;
 	vector<CUIButton> TransportingButtons;
 
+        vector<string> LifeBarColorNames;
+        vector<int> LifeBarPercents;
+        int LifeBarYOffset;
+        bool LifeBarBorder;
+
 	CColor CompletedBarColorRGB;
 	bool CompletedBarShadow;
 

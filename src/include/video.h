@@ -531,6 +531,29 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
+inline Uint32 IndexToColor(unsigned int index) {
+    // FIXME: this only works after video was initialized, so we do it dynamically
+    static const Uint32 ColorValues[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
+                                         ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
+                                         ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack};
+    return ColorValues[index];
+}
+
+static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
+                                   "gray", "dark-gray", "white", "orange",
+                                   "light-blue", "blue", "dark-green", "black", NULL};
+
+inline int GetColorIndexByName(const char *colorName) {
+    int i = 0;
+    while (ColorNames[i] != NULL) {
+        if (!strcmp(colorName, ColorNames[i])) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
 #if defined(USE_OPENGL) || defined(USE_GLES)
 void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
