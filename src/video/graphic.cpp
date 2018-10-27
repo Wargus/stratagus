@@ -1650,9 +1650,13 @@ void CFiller::Load()
 
 bool CGraphic::DeleteColorCyclingTextures() {
 	if (!ColorCyclingTextures) return false;
-	for (int i = 0; i < NumColorCycles; i++) {
-		glDeleteTextures(NumTextures, ColorCyclingTextures[i]);
-		delete[] ColorCyclingTextures[i];
+	for (int i = 1; i < NumColorCycles; i++) {
+		// first one is the default and already free'd
+		if (ColorCyclingTextures[i] != NULL) {
+			glDeleteTextures(NumTextures, ColorCyclingTextures[i]);
+			delete[] ColorCyclingTextures[i];
+			ColorCyclingTextures[i] = NULL;
+		}
 	}
 	delete[] ColorCyclingTextures;
 	ColorCyclingTextures = NULL;
