@@ -1648,6 +1648,7 @@ void CFiller::Load()
 	}
 }
 
+#ifdef USE_OPENGL
 bool CGraphic::DeleteColorCyclingTextures() {
 	if (!ColorCyclingTextures) return false;
 	for (int i = 0; i < NumColorCycles; i++) {
@@ -1658,5 +1659,5 @@ bool CGraphic::DeleteColorCyclingTextures() {
 	ColorCyclingTextures = NULL;
 	return true;
 }
-
+#endif
 //@}
