@@ -67,7 +67,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &/*goalPos*/)
+/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &/*goalPos*/)
 {
 	if (!target) {
 		return 0;

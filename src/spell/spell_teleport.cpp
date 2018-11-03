@@ -56,7 +56,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit * /*target*/, const Vec2i &goalPos)
+/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit *&, const Vec2i &goalPos)
 {
 	if (Map.Info.IsPointOnMap(goalPos)) {
 		unsigned int selected = caster.Selected;

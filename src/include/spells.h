@@ -67,7 +67,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos) = 0;
+					 CUnit* &target, const Vec2i &goalPos) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;

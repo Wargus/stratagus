@@ -43,7 +43,7 @@ class Spell_Polymorph : public SpellActionType
 public:
 	Spell_Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *&target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:
