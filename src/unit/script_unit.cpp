@@ -1110,7 +1110,7 @@ static int CclGetUnitVariable(lua_State *l)
 			int pcnt = W * 100.0 / G;
 			lua_pushinteger(l, pcnt);
 		} else {
-			lua_pushinteger(l, 100);
+			lua_pushinteger(l, -1);
 		}
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);

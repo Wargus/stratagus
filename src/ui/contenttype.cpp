@@ -284,6 +284,9 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	} else {
 		f = (100 * EvalNumber(this->ValueFunc)) / this->ValueMax;
 		f = f > 100 ? 100 : f;
+		if (f < 0) {
+			return;
+		}
 	}
 	int i = 0;
 
