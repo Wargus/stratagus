@@ -1114,7 +1114,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 			|| unit.Orders[0]->Action == UnitActionUpgradeTo
 			|| unit.Orders[0]->Action == UnitActionTrain) {
 			panelIndex = 3;
-		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
+		} else if (unit.Variable[MANA_INDEX].Max) {
 			panelIndex = 2;
 		} else {
 			panelIndex = 1;
