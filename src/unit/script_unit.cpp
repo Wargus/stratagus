@@ -1104,10 +1104,10 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
 	} else if (!strcmp(value, "TTLPercent")) {
-		if (unit->Summoned) {
+		if (unit->Summoned || unit->TTL) {
 			int G = unit->TTL - unit->Summoned;
 			int W = unit->TTL - GameCycle;
-			int pcnt = W * 100.0 / G;
+			int pcnt = W * 100 / G;
 			lua_pushinteger(l, pcnt);
 		} else {
 			lua_pushinteger(l, -1);

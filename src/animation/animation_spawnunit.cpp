@@ -66,7 +66,7 @@
 			target->tilePos = resPos;
 			target->Place(resPos);
 			if (flags & SU_Summoned) {
-				target->Summoned = 1;
+				target->Summoned = GameCycle + 1;
 			}
 			if ((flags & SU_JoinToAIForce) && unit.Player->AiEnabled) {
 				int force = unit.Player->Ai->Force.GetForce(unit);
