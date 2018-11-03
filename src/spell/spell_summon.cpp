@@ -133,7 +133,7 @@ public:
 			// To avoid defending summoned unit for AI
 			// we also use this value to store when this
 			// unit was summoned
-			target->Summoned = GameCycle;
+			target->Summoned = GameCycle + 1;
 			//
 			//  set life span. ttl=0 results in a permanent unit.
 			//

@@ -1750,6 +1750,23 @@ static int CclDefineDecorations(lua_State *l)
 						lua_pop(l, 1); // Pop value
 					}
 					decovar = decovarbar;
+				} else if (!strcmp(key, "frame")) {
+					CDecoVarFrame *frame = new CDecoVarFrame;
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument, need table with Thickness= and Color=");
+					}
+					for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+						const char* innerkey = LuaToString(l, -2);
+						if (!strcmp(innerkey, "Thickness")) {
+							frame->Thickness = LuaToNumber(l, -1);
+						} else if (!strcmp(innerkey, "ColorName")) {
+							const char *const colorName = LuaToString(l, -1);
+							frame->ColorIndex = GetColorIndexByName(colorName);
+						} else {
+							LuaError(l, "'%s' invalid for Method frame" _C_ innerkey);
+						}
+					}
+					decovar = frame;
 				} else if (!strcmp(key, "text")) {
 					CDecoVarText *decovartext = new CDecoVarText;
 
