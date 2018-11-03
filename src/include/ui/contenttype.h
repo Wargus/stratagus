@@ -149,9 +149,10 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), Width(0), Height(0), hasBorder(true), colors(NULL), values(NULL) {}
+	CContentTypeLifeBar() : Index(-1), ValueFunc(NULL), ValueMax(-1), Width(0), Height(0), hasBorder(true), colors(NULL), values(NULL) {}
 	virtual ~CContentTypeLifeBar()
 	{
+		FreeNumberDesc(ValueFunc);
 		delete[] colors;
 		delete[] values;
 	}
@@ -161,6 +162,8 @@ public:
 
 private:
 	int Index;            /// Index of the variable to show, -1 if not.
+	NumberDesc *ValueFunc;/// Handler of the value function
+	int ValueMax;         /// Max, when used with a value function
 	int Width;            /// Width of the bar.
 	int Height;           /// Height of the bar.
 	bool hasBorder;       /// True for additional border.

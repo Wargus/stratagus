@@ -273,13 +273,18 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 */
 /* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 {
-	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit.Variable[this->Index].Max) {
-		return;
-	}
-
 	Uint32 color;
-	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
+	int f;
+	if (this->Index != -1) {
+		Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
+		if (!unit.Variable[this->Index].Max) {
+			return;
+		}
+		f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
+	} else {
+		f = (100 * EvalNumber(this->ValueFunc)) / this->ValueMax;
+		f = f > 100 ? 100 : f;
+	}
 	int i = 0;
 
 	// get to right color
@@ -494,10 +499,34 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Variable")) {
-			const char *const name = LuaToString(l, -1);
-			this->Index = UnitTypeVar.VariableNameLookup[name];
-			if (this->Index == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+			if (lua_isstring(l, -1)) {
+				const char *const name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name];
+				if (this->Index == -1) {
+					LuaError(l, "unknown variable '%s'" _C_ name);
+				}
+			} else {
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument, need list of size 2 with {function, max} or a string with the name of a unit variable");
+				}
+				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+					const char *key = LuaToString(l, -2);
+					if (!strcmp(key, "Max")) {
+						this->ValueMax = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "Value")) {
+						this->ValueFunc = CclParseNumberDesc(l);
+						lua_pushnil(l); // ParseStringDesc eat token
+					} else {
+						lua_pop(l, 1);
+						LuaError(l, "unknow value '%s'" _C_ key);
+					}
+				}
+				if (this->ValueMax == -1) {
+					this->ValueMax = 100;
+				}
+				if (this->ValueFunc == NULL) {
+					LuaError(l, "didn't set a value function");
+				}
 			}
 		} else if (!strcmp(key, "Height")) {
 			this->Height = LuaToNumber(l, -1);
@@ -542,7 +571,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	if (this->Width <= 0) {
 		this->Width = 50; // Default value.
 	}
-	if (this->Index == -1) {
+	if (this->Index == -1 && this->ValueFunc == NULL) {
 		LuaError(l, "variable undefined for LifeBar");
 	}
 	if (this->colors == NULL || this->values == NULL) {
