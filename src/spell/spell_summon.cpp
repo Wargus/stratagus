@@ -131,7 +131,9 @@ public:
 			target->tilePos = pos;
 			DropOutOnSide(*target, LookingW, NULL);
 			// To avoid defending summoned unit for AI
-			target->Summoned = 1;
+			// we also use this value to store when this
+			// unit was summoned
+			target->Summoned = GameCycle;
 			//
 			//  set life span. ttl=0 results in a permanent unit.
 			//
