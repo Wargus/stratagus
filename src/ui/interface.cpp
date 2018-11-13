@@ -732,6 +732,7 @@ static bool CommandKey(int key)
 
 		case SDLK_SLASH:
 		case SDLK_BACKSLASH:
+#ifdef USE_OPENGL
 			if (KeyModifiers & ModifierAlt) {
 				if (GLShaderPipelineSupported) {
 					char shadername[1024] = { '\0' };
@@ -739,6 +740,7 @@ static bool CommandKey(int key)
 					SetMessage("%s", shadername);
 				}
 			}
+#endif
 			break;
 
 		default:
