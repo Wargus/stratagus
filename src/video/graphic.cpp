@@ -1652,7 +1652,7 @@ bool CGraphic::DeleteColorCyclingTextures() {
 	if (!ColorCyclingTextures) return false;
 	for (int i = 0; i < NumColorCycles; i++) {
 		glDeleteTextures(NumTextures, ColorCyclingTextures[i]);
-		delete[] ColorCyclingTextures[i];
+		//delete[] ColorCyclingTextures[i]; //glDeleteTextures already deletes the array
 	}
 	delete[] ColorCyclingTextures;
 	ColorCyclingTextures = NULL;

@@ -2124,9 +2124,14 @@ void InitLua()
 	Lua = luaL_newstate();
 
 	for (const luaL_Reg *lib = lualibs; lib->func; ++lib) {
+#if LUA_VERSION_NUM == 503 || LUA_VERSION_NUM == 502
+		luaL_requiref(Lua, lib->name, lib->func, 1);
+		lua_pop(Lua, 1);
+#else
 		lua_pushcfunction(Lua, lib->func);
 		lua_pushstring(Lua, lib->name);
 		lua_call(Lua, 1, 0);
+#endif
 	}
 	tolua_stratagus_open(Lua);
 	lua_settop(Lua, 0);  // discard any results
@@ -2306,9 +2311,16 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
+
+
 		std::string lhsLine;
 		if (tablesName.empty() == false) {
 			if (type_key == LUA_TSTRING) {
+				/*if(key.empty())	{
+					lua_pop(l, 1);
+					lua_pop(l, 1);
+					return res;		
+				}*/	
 				lhsLine = tablesName + "." + key;
 			} else if (type_key == LUA_TNUMBER) {
 				lua_pushvalue(l, -2);
@@ -2331,11 +2343,15 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 					key = key + "[" + lua_tostring(l, -1) + "]";
 					lua_pop(l, 1);
 				}
-				lua_pushvalue(l, -1);
 				//res += "if (" + lhsLine + " == nil) then " + lhsLine + " = {} end\n";
-				blockTableNames.push_back(key);
-				res += SaveGlobal(l, false, blockTableNames);
-				blockTableNames.pop_back();
+				if(std::find(blockTableNames.begin(), blockTableNames.end(), key) == blockTableNames.end()
+				 && key != "[]")
+				{
+					lua_pushvalue(l, -1);
+					blockTableNames.push_back(key);
+					res += SaveGlobal(l, false, blockTableNames);
+					blockTableNames.pop_back();
+				}
 			}
 		}
 		lua_pop(l, 1); /* pop the value */
