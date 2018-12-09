@@ -2311,8 +2311,6 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 			lua_pop(l, 1); // pop the value
 			continue;
 		}
-
-
 		std::string lhsLine;
 		if (tablesName.empty() == false) {
 			if (type_key == LUA_TSTRING) {
