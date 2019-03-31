@@ -290,17 +290,6 @@ static int CclLoadBuffer(lua_State *l)
 }
 
 /**
- ** Check if a file is accessible.
- ** @param l Lua state
- ** @return true or false
- **/
-static int CclCanAccessFile(lua_State *l) {
-	LuaCheckArgs(l, 1);
-	lua_pushboolean(l, CanAccessFile(LuaToString(l, 1)));
-	return 0;
-}
-
-/**
 **  Convert lua string in char*.
 **  It checks also type and exit in case of error.
 **
@@ -2449,8 +2438,6 @@ void ScriptRegister()
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
-
-	lua_register(Lua, "CanAccessFile", CclCanAccessFile);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
 }
