@@ -71,7 +71,7 @@ public:
 	Spell_SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *&target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
 
 private:

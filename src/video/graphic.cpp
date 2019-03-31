@@ -1648,15 +1648,17 @@ void CFiller::Load()
 	}
 }
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 bool CGraphic::DeleteColorCyclingTextures() {
 	if (!ColorCyclingTextures) return false;
-	for (int i = 0; i < NumColorCycles; i++) {
+	for (int i = 1; i < NumColorCycles; i++) {
+		// first one is the default and already free'd
 		glDeleteTextures(NumTextures, ColorCyclingTextures[i]);
-		//delete[] ColorCyclingTextures[i]; //glDeleteTextures already deletes the array
+		// glDeleteTextures already deletes the array
 	}
 	delete[] ColorCyclingTextures;
 	ColorCyclingTextures = NULL;
 	return true;
 }
-
+#endif
 //@}

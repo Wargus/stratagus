@@ -845,6 +845,10 @@ if(BEOS)
 	set(stratagus_SRCS ${stratagus_SRCS} ${beos_SRCS})
 endif()
 
+if(HAIKU)
+	set(stratagus_LIBS ${stratagus_LIBS} -lnetwork)
+endif()
+
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -976,6 +980,8 @@ elseif(BSD)
 	message("Platform: BSD")
 elseif(BEOS)
 	message("Platform: BEOS")
+elseif(HAIKU)
+	message("Platform: Haiku")
 elseif(LINUX)
 	message("Platform: Linux")
 else()

@@ -273,27 +273,34 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 */
 /* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 {
-	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit.Variable[this->Index].Max) {
-		return;
-	}
-
 	Uint32 color;
-	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
-
-	if (f > 75) {
-		color = ColorDarkGreen;
-	} else if (f > 50) {
-		color = ColorYellow;
-	} else if (f > 25) {
-		color = ColorOrange;
+	int f;
+	if (this->Index != -1) {
+		Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
+		if (!unit.Variable[this->Index].Max) {
+			return;
+		}
+		f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	} else {
-		color = ColorRed;
+		f = (100 * EvalNumber(this->ValueFunc)) / this->ValueMax;
+		f = f > 100 ? 100 : f;
+		if (f < 0) {
+			return;
+		}
 	}
+	int i = 0;
 
-	// Border
-	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
-							this->Width + 3, this->Height + 3);
+	// get to right color
+	while (f < this->values[i]) {
+		i++;
+	}
+	color = IndexToColor(this->colors[i]);
+
+	if (this->hasBorder) {
+		// Border
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
+								this->Width + 3, this->Height + 3);
+	}
 
 	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
 							(f * this->Width) / 100, this->Height);
@@ -320,11 +327,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	int h = this->height;
 	Assert(w > 0);
 	Assert(h > 4);
-	const Uint32 colors[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
-							 ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
-							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
-							};
-	const Uint32 color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
+	const Uint32 color = (colorIndex != -1) ? IndexToColor(colorIndex) : UI.CompletedBarColor;
 	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
 
 	if (!this->hasBorder) {
@@ -499,15 +502,67 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Variable")) {
-			const char *const name = LuaToString(l, -1);
-			this->Index = UnitTypeVar.VariableNameLookup[name];
-			if (this->Index == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+			if (lua_isstring(l, -1)) {
+				const char *const name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name];
+				if (this->Index == -1) {
+					LuaError(l, "unknown variable '%s'" _C_ name);
+				}
+			} else {
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument, need list of size 2 with {function, max} or a string with the name of a unit variable");
+				}
+				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+					const char *key = LuaToString(l, -2);
+					if (!strcmp(key, "Max")) {
+						this->ValueMax = LuaToNumber(l, -1);
+					} else if (!strcmp(key, "Value")) {
+						this->ValueFunc = CclParseNumberDesc(l);
+						lua_pushnil(l); // ParseStringDesc eat token
+					} else {
+						lua_pop(l, 1);
+						LuaError(l, "unknow value '%s'" _C_ key);
+					}
+				}
+				if (this->ValueMax == -1) {
+					this->ValueMax = 100;
+				}
+				if (this->ValueFunc == NULL) {
+					LuaError(l, "didn't set a value function");
+				}
 			}
 		} else if (!strcmp(key, "Height")) {
 			this->Height = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Width")) {
 			this->Width = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "Colors")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument, need list");
+			}
+		    const int color_len = lua_rawlen(l, -1);
+			if (color_len == 0) {
+				LuaError(l, "need at least one {percentage, color} pair, got 0");
+			}
+			this->colors = new unsigned int[color_len];
+			this->values = new unsigned int[color_len];
+			int i = 0;
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+					LuaError(l, "incorrect argument, need list of size 2 with {percentage, color}");
+				}
+				this->values[i] = LuaToNumber(l, -1, 1);
+				const char *const colorName = LuaToString(l, -1, 2);
+				this->colors[i] = GetColorIndexByName(colorName);
+				if (this->colors[i] == -1) {
+					LuaError(l, "incorrect color: '%s' " _C_ colorName);
+				}
+				i++;
+			}
+			if (this->values[color_len - 1] != 0) {
+				LuaError(l, "the last {percentage, color} pair must be for 0%%");
+			}
+		} else if (!strcmp(key, "Border")) {
+			this->hasBorder = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key);
 		}
@@ -519,25 +574,23 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	if (this->Width <= 0) {
 		this->Width = 50; // Default value.
 	}
-	if (this->Index == -1) {
+	if (this->Index == -1 && this->ValueFunc == NULL) {
 		LuaError(l, "variable undefined for LifeBar");
 	}
-}
+	if (this->colors == NULL || this->values == NULL) {
+		this->colors = new unsigned int[4];
+		this->values = new unsigned int[4];
 
-static int GetColorIndexByName(const char *colorName)
-{
-	//FIXME: need more general way
-	const char *names[] = {
-		"red", "yellow", "green", "light-gray", "gray", "dark-gray",
-		"white", "orange", "light-blue", "blue", "dark-green", "black"
-	};
+		this->values[0] = 75;
+		this->values[1] = 50;
+		this->values[2] = 25;
+		this->values[3] = 0;
 
-	for (unsigned int i = 0; i != sizeof(names) / sizeof(names[0]); ++i) {
-		if (!strcmp(colorName, names[i])) {
-			return i;
-		}
+		this->colors[0] = GetColorIndexByName("dark-green");
+		this->colors[1] = GetColorIndexByName("yellow");
+		this->colors[2] = GetColorIndexByName("orange");;
+		this->colors[3] = GetColorIndexByName("red");
 	}
-	return -1;
 }
 
 /* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)

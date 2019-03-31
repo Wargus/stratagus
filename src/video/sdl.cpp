@@ -639,12 +639,14 @@ void InitVideoSdl()
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			fprintf(stderr, "Re-trying video without OpenGL\n");
 			UseOpenGL = false;
 			InitVideoSdl();
 			return;
 		}
+#endif
 		if (Video.FullScreen) {
 			fprintf(stderr, "Re-trying video without fullscreen mode\n");
 			Video.FullScreen = false;
@@ -750,6 +752,10 @@ void InitVideoSdl()
 	ColorRed = Video.MapRGB(TheScreen->format, 252, 0, 0);
 	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);
+
+	for(std::vector<std::string>::iterator it = UI.LifeBarColorNames.begin(); it != UI.LifeBarColorNames.end(); ++it) {
+		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName((*it).c_str())));
+	}
 
 	UI.MouseWarpPos.x = UI.MouseWarpPos.y = -1;
 }

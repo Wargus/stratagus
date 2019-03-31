@@ -730,6 +730,7 @@ static bool CommandKey(int key)
 			KeyScrollState |= ScrollRight;
 			break;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		case SDLK_SLASH:
 		case SDLK_BACKSLASH:
 			if (KeyModifiers & ModifierAlt) {
@@ -740,7 +741,7 @@ static bool CommandKey(int key)
 				}
 			}
 			break;
-
+#endif
 		default:
 			if (HandleCommandKey(key)) {
 				break;

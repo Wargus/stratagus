@@ -69,7 +69,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
 {
 	const Vec2i range(this->Range, this->Range);
 	const Vec2i typeSize(caster.Type->TileWidth, caster.Type->TileHeight);
@@ -80,22 +80,23 @@
 	int hp = this->HP;
 	int mana = this->Mana;
 	int shield = this->Shield;
+	CUnit* currentTarget;
 	for (size_t j = 0; j != units.size(); ++j) {
-		target = units[j];
+		currentTarget = units[j];
 		// if (!PassCondition(caster, spell, target, goalPos) {
-		if (!CanCastSpell(caster, spell, target, goalPos)) {
+		if (!CanCastSpell(caster, spell, currentTarget, goalPos)) {
 			continue;
 		}
 		if (hp < 0) {
-			HitUnit(&caster, *target, -hp);
+			HitUnit(&caster, *currentTarget, -hp);
 		} else {
-			target->Variable[HP_INDEX].Value += hp;
-			target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
+			currentTarget->Variable[HP_INDEX].Value += hp;
+			currentTarget->Variable[HP_INDEX].Value = std::min(currentTarget->Variable[HP_INDEX].Max, currentTarget->Variable[HP_INDEX].Value);
 		}
-		target->Variable[MANA_INDEX].Value += mana;
-		clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
-		target->Variable[SHIELD_INDEX].Value += shield;
-		clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
+		currentTarget->Variable[MANA_INDEX].Value += mana;
+		clamp(&currentTarget->Variable[MANA_INDEX].Value, 0, currentTarget->Variable[MANA_INDEX].Max);
+		currentTarget->Variable[SHIELD_INDEX].Value += shield;
+		clamp(&currentTarget->Variable[SHIELD_INDEX].Value, 0, currentTarget->Variable[SHIELD_INDEX].Max);
 	}
 	if (UseMana) {
 		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
