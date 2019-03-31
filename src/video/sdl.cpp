@@ -639,12 +639,14 @@ void InitVideoSdl()
 	if (TheScreen == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
 			fprintf(stderr, "Re-trying video without OpenGL\n");
 			UseOpenGL = false;
 			InitVideoSdl();
 			return;
 		}
+#endif
 		if (Video.FullScreen) {
 			fprintf(stderr, "Re-trying video without fullscreen mode\n");
 			Video.FullScreen = false;
