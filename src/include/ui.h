@@ -435,6 +435,12 @@ public:
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
+        std::vector<std::string> LifeBarColorNames;
+        std::vector<int> LifeBarPercents;
+        std::vector<IntColor> LifeBarColorsInt;
+        int LifeBarYOffset;
+        bool LifeBarBorder;
+
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
 	IntColor CompletedBarColor;      /// color for completed bar

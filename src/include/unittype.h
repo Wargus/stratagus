@@ -280,6 +280,16 @@ public:
 	IntColor BColor;            /// Color of background.
 };
 
+class CDecoVarFrame : public CDecoVar
+{
+public:
+	CDecoVarFrame() : Thickness(0), ColorIndex(-1) {};
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+
+	int Thickness;
+	int ColorIndex;
+};
+
 class CDecoVarText : public CDecoVar
 {
 public:

@@ -730,9 +730,9 @@ static bool CommandKey(int key)
 			KeyScrollState |= ScrollRight;
 			break;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
 		case SDLK_SLASH:
 		case SDLK_BACKSLASH:
-#ifdef USE_OPENGL
 			if (KeyModifiers & ModifierAlt) {
 				if (GLShaderPipelineSupported) {
 					char shadername[1024] = { '\0' };
@@ -740,9 +740,8 @@ static bool CommandKey(int key)
 					SetMessage("%s", shadername);
 				}
 			}
-#endif
 			break;
-
+#endif
 		default:
 			if (HandleCommandKey(key)) {
 				break;

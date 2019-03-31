@@ -1103,6 +1103,18 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
+	} else if (!strcmp(value, "TTLPercent")) {
+		if (unit->Summoned && unit->TTL) {
+			unsigned long time_lived = GameCycle - unit->Summoned;
+			Assert(time_lived >= 0);
+			unsigned long time_to_live = unit->TTL;
+			Assert(time_to_live > 0);
+			double pcnt = time_lived * 100.0 / time_to_live;
+			int pcnt_i = (int)round(pcnt);
+			lua_pushinteger(l, pcnt_i);
+		} else {
+			lua_pushinteger(l, -1);
+		}
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);

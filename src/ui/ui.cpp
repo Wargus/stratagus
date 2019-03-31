@@ -154,6 +154,19 @@ CUserInterface::CUserInterface() :
 
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
+
+	LifeBarColorNames.push_back("dark-green");
+	LifeBarColorNames.push_back("yellow");
+	LifeBarColorNames.push_back("orange");
+	LifeBarColorNames.push_back("red");
+
+    LifeBarPercents.push_back(75);
+	LifeBarPercents.push_back(50);
+	LifeBarPercents.push_back(25);
+	LifeBarPercents.push_back(0);
+
+	LifeBarBorder = true;
+	LifeBarYOffset = 0;
 }
 
 /**
