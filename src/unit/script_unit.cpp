@@ -1104,11 +1104,14 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
 	} else if (!strcmp(value, "TTLPercent")) {
-		if (unit->Summoned || unit->TTL) {
-			int G = unit->TTL - unit->Summoned;
-			int W = unit->TTL - GameCycle;
-			int pcnt = W * 100 / G;
-			lua_pushinteger(l, pcnt);
+		if (unit->Summoned && unit->TTL) {
+			unsigned long time_lived = GameCycle - unit->Summoned;
+			Assert(time_lived >= 0);
+			unsigned long time_to_live = unit->TTL;
+			Assert(time_to_live > 0);
+			double pcnt = time_lived * 100.0 / time_to_live;
+			int pcnt_i = (int)round(pcnt);
+			lua_pushinteger(l, pcnt_i);
 		} else {
 			lua_pushinteger(l, -1);
 		}
