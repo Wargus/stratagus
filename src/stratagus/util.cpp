@@ -45,6 +45,8 @@
 #include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
 #endif
 
 #ifdef USE_X11
@@ -530,6 +532,7 @@ void AbortAt(const char *file, int line, const char *funcName, const char *condi
 	throw stacktrace::stack_runtime_error((const char*)buf);
 #else
 	fprintf(stderr, "%s\n", buf);
+	print_backtrace();
 #endif
 	fflush(stdout);
 	fflush(stderr);
