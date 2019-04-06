@@ -16,7 +16,9 @@ inline void print_backtrace(void) {
 
 #elif defined(USE_WIN32)
 
+#if 0 // the below would mean we give up XP support
 #include "windows.h"
+#include "winbase.h"
 #include "dbghelp.h"
 #include "process.h"
 
@@ -49,13 +51,17 @@ inline void print_backtrace(void) {
             name = "<unknown frame>";
         }
         if (SymGetLineFromAddr64(process, (DWORD64)(stack[i]), &displacement, line)) {
-            fprintf("%d: %s in %s:%d 0x%x\n", frames - i - 1, name, line->FileName, line->LineNumber, symbol->Address);
+            fprintf(stderr, srder, "%d: %s in %s:%d 0x%x\n", frames - i - 1, name, line->FileName, line->LineNumber, symbol->Address);
         } else {
-            fprintf("%d: %s 0x%x\n", frames - i - 1, name, symbol->Address);
+            fprintf(stderr, "%d: %s 0x%x\n", frames - i - 1, name, symbol->Address);
         }
     }
     free(symbol);
 }
+#else
+inline void print_backtrace(void) {
+}
+#endif
 
 #else
 
