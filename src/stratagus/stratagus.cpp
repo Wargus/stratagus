@@ -210,6 +210,8 @@ extern void beos_init(int argc, char **argv);
 #include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
 #endif
 
 #include <stdlib.h>
@@ -434,6 +436,8 @@ void ExitFatal(int err)
 {
 #ifdef USE_STACKTRACE
 	throw stacktrace::stack_runtime_error((const char*)err);
+#else
+	print_backtrace();
 #endif
 	exit(err);
 }
@@ -577,7 +581,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (ZoomNoResize) {
 					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 				continue;
 			case 'O':
@@ -605,7 +609,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (!sep || !*(sep + 1)) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 				Video.ViewportHeight = atoi(sep + 1);
 				*sep = 0;
@@ -613,7 +617,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (!Video.ViewportHeight || !Video.ViewportWidth) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 #if defined(USE_OPENGL) || defined(USE_GLES)
 				if (!ZoomNoResize) {
@@ -647,7 +651,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (!sep || !*(sep + 1)) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 				Video.Height = atoi(sep + 1);
 				*sep = 0;
@@ -660,7 +664,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'h':
 			default:
 				Usage();
-				ExitFatal(-1);
+				exit(-1);
 		}
 		break;
 	}
@@ -731,72 +735,69 @@ int stratagusMain(int argc, char **argv)
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
-#ifdef USE_STACKTRACE
 	try {
-#endif
-	Parameters &parameters = Parameters::Instance;
-	parameters.SetDefaultValues();
-	parameters.SetLocalPlayerNameFromEnv();
+		Parameters &parameters = Parameters::Instance;
+		parameters.SetDefaultValues();
+		parameters.SetLocalPlayerNameFromEnv();
 
 #ifdef REDIRECT_OUTPUT
-	RedirectOutput();
+		RedirectOutput();
 #endif
 
-	if (argc > 0) {
-		parameters.applicationName = argv[0];
-	}
+		if (argc > 0) {
+			parameters.applicationName = argv[0];
+		}
 
-	// FIXME: Parse options before or after scripts?
-	ParseCommandLine(argc, argv, parameters);
-	// Init the random number generator.
-	InitSyncRand();
+		// FIXME: Parse options before or after scripts?
+		ParseCommandLine(argc, argv, parameters);
+		// Init the random number generator.
+		InitSyncRand();
 
-	makedir(parameters.GetUserDirectory().c_str(), 0777);
+		makedir(parameters.GetUserDirectory().c_str(), 0777);
 
-	// Init Lua and register lua functions!
-	InitLua();
-	LuaRegisterModules();
+		// Init Lua and register lua functions!
+		InitLua();
+		LuaRegisterModules();
 
-	// Initialise AI module
-	InitAiModule();
+		// Initialise AI module
+		InitAiModule();
 
-	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
-	PrintHeader();
-	PrintLicense();
+		PrintHeader();
+		PrintLicense();
 
-	// Setup video display
-	InitVideo();
+		// Setup video display
+		InitVideo();
 
-	// Setup sound card
-	if (!InitSound()) {
-		InitMusic();
-	}
+		// Setup sound card
+		if (!InitSound()) {
+			InitMusic();
+		}
 
 #ifndef DEBUG           // For debug it's better not to have:
-	srand(time(NULL));  // Random counter = random each start
+		srand(time(NULL));  // Random counter = random each start
 #endif
 
-	//  Show title screens.
-	SetDefaultTextColors(FontYellow, FontWhite);
-	LoadFonts();
-	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-	Video.ClearScreen();
-	ShowTitleScreens();
+		//  Show title screens.
+		SetDefaultTextColors(FontYellow, FontWhite);
+		LoadFonts();
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+		Video.ClearScreen();
+		ShowTitleScreens();
 
-	// Init player data
-	ThisPlayer = NULL;
-	//Don't clear the Players structure as it would erase the allowed units.
-	// memset(Players, 0, sizeof(Players));
-	NumPlayers = 0;
+		// Init player data
+		ThisPlayer = NULL;
+		//Don't clear the Players structure as it would erase the allowed units.
+		// memset(Players, 0, sizeof(Players));
+		NumPlayers = 0;
 
-	UnitManager.Init(); // Units memory management
-	PreMenuSetup();     // Load everything needed for menus
+		UnitManager.Init(); // Units memory management
+		PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop();
+		MenuLoop();
 
-	Exit(0);
-#ifdef USE_STACKTRACE
+		Exit(0);
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
 		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
@@ -805,7 +806,6 @@ int stratagusMain(int argc, char **argv)
 		fprintf(stderr, "%s", e.what());
 		exit(1);
 	}
-#endif
 	return 0;
 }
 

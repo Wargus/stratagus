@@ -65,6 +65,7 @@
 #endif
 
 #ifdef USE_OPENGL
+#define __gl_glext_h_
 #include "SDL_opengl.h"
 #include "shaders.h"
 #endif

@@ -43,6 +43,7 @@
 #ifdef __APPLE__
 #define GL_GLEXT_PROTOTYPES 1
 #endif
+#define __gl_glext_h_
 #include "SDL_opengl.h"
 #include "shaders.h"
 #endif
