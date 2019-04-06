@@ -4,6 +4,7 @@
 #define MAX_SHADERS 5
 // #define SHADERDEBUG // Uncomment for loading shaders from file
 #ifndef __APPLE__
+#include <GL/glext.h>
 extern PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
 #else
 #define glBindFramebuffer glBindFramebufferEXT
