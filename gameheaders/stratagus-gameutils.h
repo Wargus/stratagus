@@ -97,37 +97,44 @@ void error(const char* title, const char* text) {
 	exit(-1);
 }
 
-void mkdir_p(const char* path)
-{
-	char *cp, *s, *s2;
-
-	if (*path && path[0] == '.') {  // relative don't work
-		return;
+const char* dirnam(const char* path) {
+	char* dir = strdup(path);
+	char *sep = strrchr((char*)dir, '/');
+	if (sep == NULL) {
+		sep = strrchr((char*)dir, SLASH[0]);
 	}
-	cp = strdup(path);
-	s = strrchr(cp, '/');
-	if (!s) s = strrchr(cp, SLASH[0]);
-	if (s) {
-		*s = '\0';  // remove file
-		s = cp;
-		for (;;) {  // make each path element
-			s2 = strchr(s, '/');
-			if (!s2) s = strchr(s, SLASH[0]);
-			s = s2;
-			if (s) {
-				*s = '\0';
+	if (sep != NULL && strlen(sep) > 0) {
+		// there's a slash, and it's not the last letter, cut off the final
+		// component
+		*sep = '\0';
+	}
+	return dir;
+}
+
+void mkdir_p(const char* path) {
+	int error = 0;	
+	printf("mkdir %s\n", path);
+	if (mkdir(path, 0777)) {
+		error = errno;
+		if (error == ENOENT) {	
+			char *sep = strrchr((char*)path, '/');
+			if (sep == NULL) {
+				sep = strrchr((char*)path, SLASH[0]);
 			}
-			mkdir(cp, 0777);
-			if (s) {
-				*s++ = SLASH[0];
-			} else {
-				break;
+			if (sep != NULL) {
+				*sep = '\0';
+				if (strlen(path) > 0) {
+					// will be null if the we reach the first /
+					mkdir_p(path);
+				}
+				*sep = '/';
+			}
+		} else if (error != EEXIST) {
+			if (mkdir(path, 0777)) {
+				printf("Error while trying to create '%s'\n", path);
 			}
 		}
-	} else {
-		mkdir(cp, 0777);
 	}
-	free(cp);
 }
 
 #ifdef WIN32
@@ -165,7 +172,7 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 		mkdir_p(dst_path);
 		break;
 	case FTW_F:
-		mkdir_p(dst_path);
+		mkdir_p(dirnam(dst_path));
 		FILE* in = fopen(src_path, "rb");
 		FILE* out = fopen(dst_path, "wb");
 		char buf[4096];
