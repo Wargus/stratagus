@@ -136,7 +136,9 @@ void copy_dir(const char* source_folder, const char* target_folder)
 	WCHAR sf[MAX_PATH + 1];
 	WCHAR tf[MAX_PATH + 1];
 	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	mkdir_p(parentdir(strdup(target_folder)));
+	char* ptarget = strdup(target_folder);
+	parentdir(ptarget);
+	mkdir_p(ptarget);
 	wcscpy_s(tf, MAX_PATH, wtarget_folder);
 	sf[lstrlenW(sf) + 1] = 0;
 	tf[lstrlenW(tf) + 1] = 0;
