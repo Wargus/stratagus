@@ -97,20 +97,6 @@ void error(const char* title, const char* text) {
 	exit(-1);
 }
 
-const char* dirnam(const char* path) {
-	char* dir = strdup(path);
-	char *sep = strrchr((char*)dir, '/');
-	if (sep == NULL) {
-		sep = strrchr((char*)dir, SLASH[0]);
-	}
-	if (sep != NULL && strlen(sep) > 0) {
-		// there's a slash, and it's not the last letter, cut off the final
-		// component
-		*sep = '\0';
-	}
-	return dir;
-}
-
 void mkdir_p(const char* path) {
 	int error = 0;	
 	printf("mkdir %s\n", path);
@@ -150,7 +136,7 @@ void copy_dir(const char* source_folder, const char* target_folder)
 	WCHAR sf[MAX_PATH + 1];
 	WCHAR tf[MAX_PATH + 1];
 	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	mkdir_p(target_folder);
+	mkdir_p(parentdir(strdup(target_folder)));
 	wcscpy_s(tf, MAX_PATH, wtarget_folder);
 	sf[lstrlenW(sf) + 1] = 0;
 	tf[lstrlenW(tf) + 1] = 0;
@@ -172,7 +158,7 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 		mkdir_p(dst_path);
 		break;
 	case FTW_F:
-		mkdir_p(dirnam(dst_path));
+		mkdir_p(parentdir(strdup(dst_path)));
 		FILE* in = fopen(src_path, "rb");
 		FILE* out = fopen(dst_path, "wb");
 		char buf[4096];
@@ -195,7 +181,7 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 
 void copy_dir(const char* src_path, const char* dst_path) {
 	printf("Copying %s to %s\n", src_path, dst_path);
-	mkdir_p(dst_path);
+	mkdir_p(parentdir(strdup(dst_path)));
 	strcpy(dst_root, dst_path);
 	strcpy(src_root, src_path);
 	ftw(src_path, copy_file, 20);
