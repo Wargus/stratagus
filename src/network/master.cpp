@@ -116,11 +116,14 @@ int CMetaClient::Init()
 		this->Close();
 		return -1;
 	}
-	CClientLog &log = *GetLastMessage();
+	CClientLog &log = *GetNextMessage();
 	if (log.entry.find("PING_OK") != std::string::npos) {
+		PopNextMessage();
 		return 0;
 	} else {
 		fprintf(stderr, "METACLIENT: inappropriate message received from %s\n", metaHost->toString().c_str());
+		fprintf(stderr, "METACLIENT: inappropriate message %s\n", log.entry.c_str());
+		PopNextMessage();
 		this->Close();
 		return -1;
 	}

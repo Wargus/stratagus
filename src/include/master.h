@@ -51,7 +51,7 @@ struct CClientLog {
 class CMetaClient
 {
 public:
-	CMetaClient() : metaHost(NULL), metaPort(-1), lastRecvState(-1) {}
+	CMetaClient() : metaHost(NULL), metaPort(-1) {}
 	~CMetaClient();
 	void SetMetaServer(const std::string host, const int port);
 	int Init();
@@ -59,8 +59,8 @@ public:
 	int Send(const std::string cmd);
 	void RecordEvent(unsigned char *buf);
 	int GetLogSize() { return events.size(); }
-	CClientLog *GetLastMessage() { return events.back(); }
-	CClientLog *PopNextMessage() { return events.pop_front(); }
+	CClientLog *GetNextMessage() { return events.front(); }
+	void PopNextMessage() { events.pop_front(); }
 	std::string GetInternalIP();
 	int GetInternalPort();
 

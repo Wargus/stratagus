@@ -14,8 +14,8 @@ public:
 	void Close();
 	int Send(const std::string cmd);
 	int GetLogSize() { return events.size(); }
-	CClientLog* GetLastMessage() { return events.back(); }
-        CClientLog* PopNextMessage() { return events.pop_front(); }
+	CClientLog *GetNextMessage() { return events.front(); }
+	void PopNextMessage() { events.pop_front(); }
 	std::string GetInternalIP();
 	int GetInternalPort();
 };
