@@ -101,6 +101,7 @@ public:
 **  Network init config message subtypes (menu state machine).
 */
 enum _ic_message_subtype_ {
+	ICMPunchUDPHole,        /// Request a UDP hole punch
 	ICMHello,               /// Client Request
 	ICMConfig,              /// Setup message configure clients
 
@@ -145,6 +146,16 @@ public:
 private:
 	unsigned char type;
 	unsigned char subtype;
+};
+
+class CInitMessage_UDPPunch
+{
+public:
+	CInitMessage_UDPPunch() {}
+	void Deserialize(const unsigned char *p);
+public:
+	CNetworkHost *publicHost;
+        CNetworkHost *privateHost;
 };
 
 class CInitMessage_Hello

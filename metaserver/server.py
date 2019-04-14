@@ -1,6 +1,7 @@
 import collections
 import re
 import socket
+import struct
 import time
 
 
@@ -137,14 +138,21 @@ class Server(object):
                 if game.id == game_id:
                     session.local_host = m.group("local_host")
                     session.local_port = m.group("local_port")
-                    self.socket.sendto(
+                    self.send(
                         "JOIN_OK %s:%s %s:%s" % (game.session.host, game.session.port, game.session.local_host, game.session.local_port),
                         session
                     )
-                    self.send(
-                        "JOIN_FROM %s:%s %s:%s" % (session.host, session.port, session.local_host, session.local_port),
-                        game.session
-                    )
+                    # server message is packed so it looks like a
+                    # CInitMessage_UDPPunch message. See net_message.cpp.  This
+                    # is because it fits better with the NetworkParseSetupEvent
+                    # processing that happens while the server is open
+                    msg = (b"\x00" + # MessageNone
+                           b"\x00" + # ICMPunchUDPHole
+                           socket.inet_aton(session.host), # uint32 ip
+                           struct.pack('>H', session.port), # uint16 port
+                           socket.inet_aton(session.local_host),
+                           struct.pack('>H', session.local_port))
+                    self.socket.sendto(msg, (game.session.host, game.session.port))
                     break
             else:
                 self.send("JOIN_FAILED", session)

@@ -1330,6 +1330,13 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 			// Special case: a new client has arrived
 			index = Parse_Hello(-1, msg, host);
 			networkStates[index].LastFrame = frameCounter;
+		} else if (msgsubtype == ICMPunchUDPHole) {
+			CInitMessage_UDPPunch msg;
+			msg.Deserialize(buf);
+			for (int i = 0; i < 3; i++) {
+				this->Send_AreYouThere(*(msg.publicHost));
+				this->Send_AreYouThere(*(msg.privateHost));
+			}
 		}
 		return;
 	}

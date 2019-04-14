@@ -342,6 +342,28 @@ size_t CInitMessage_Header::Deserialize(const unsigned char *p)
 }
 
 //
+// CInitMessage_UDPPunch
+//
+void CInitMessage_UDPPunch::Deserialize(const unsigned char *p)
+{
+	Assert(p[0] == MessageNone);
+	Assert(p[1] == ICMPunchUDPHole);
+	p += 2;
+	uint32_t ip;
+	uint16_t port;
+	p += deserialize32(p, &ip);
+	p += deserialize16(p, &port);
+	this->publicHost = new CNetworkHost();
+	this->publicHost->Host = ip;
+	this->publicHost->Port = port;
+	p += deserialize32(p, &ip);
+	p += deserialize16(p, &port);
+	this->privateHost = new CNetworkHost();
+	this->privateHost->Host = ip;
+	this->privateHost->Port = port;
+}
+
+//
 // CInitMessage_Hello
 //
 
