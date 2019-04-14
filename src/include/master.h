@@ -51,7 +51,7 @@ struct CClientLog {
 class CMetaClient
 {
 public:
-	CMetaClient() : metaSocket(), metaPort(-1), lastRecvState(-1) {}
+	CMetaClient() : metaHost(NULL), metaPort(-1), lastRecvState(-1) {}
 	~CMetaClient();
 	void SetMetaServer(const std::string host, const int port);
 	int Init();
@@ -61,14 +61,15 @@ public:
 	int GetLastRecvState() { return lastRecvState; }
 	int GetLogSize() { return events.size(); }
 	CClientLog *GetLastMessage() { return events.back(); }
-	int CreateGame(std::string desc, std::string map, std::string players);
+	std::string GetInternalIP();
+	int GetInternalPort();
 
 private:
-	CTCPSocket metaSocket;                     /// This is a TCP socket
-	std::string metaHost;                      /// Address of metaserver
+	CHost *metaHost;                           /// The metaserver
+	std::string metaHostName;                  /// Address of metaserver
 	int metaPort;                              /// Port of metaserver
 	std::list <CClientLog *> events;           /// All commands received from metaserver
-	int lastRecvState;                         /// Now many bytes have been received in last reply
+	int lastRecvState;                         /// How many bytes have been received in last reply
 };
 
 
