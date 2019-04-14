@@ -225,6 +225,7 @@
 #include <list>
 
 #include "network.h"
+#include "master.h"
 
 #include "actions.h"
 #include "commands.h"
@@ -860,6 +861,14 @@ void NetworkEvent()
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = false;
+		return;
+	}
+
+	if (MetaClient.metaHost != NULL &&
+		host.getIp() == MetaClient.metaHost->getIp() &&
+		host.getPort() == MetaClient.metaHost->getPort()) {
+		// Message from the MetaServer
+		MetaClient.RecordEvent(buf);
 		return;
 	}
 

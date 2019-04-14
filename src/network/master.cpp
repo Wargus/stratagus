@@ -168,22 +168,25 @@ int CMetaClient::Recv()
 		return -1;
 	}
 
-	char buf[1024];
+	unsigned char buf[1024];
 	memset(&buf, 0, sizeof(buf));
 	int n = NetworkFildes.Recv(&buf, sizeof(buf), metaHost);
 	if (n == -1) {
 		return n;
 	}
+	this->RecordEvent(buf);
+	return n;
+}
+
+void CMetaClient::RecordEvent(unsigned char *buf) {
 	// We know we now have the whole command.
 	// Convert to standard notation
-	std::string cmd(buf, strlen(buf));
+	std::string cmd((char*)buf, strlen((char*)buf));
 	cmd += '\n';
 	cmd += '\0';
 	CClientLog *log = new CClientLog;
 	log->entry = cmd;
 	events.push_back(log);
-	lastRecvState = n;
-	return n;
 }
 
 //@}

@@ -13,10 +13,9 @@ public:
 	int Init();
 	void Close();
 	int Send(const std::string cmd);
-	int Recv();
-	int GetLastRecvState() { return lastRecvState; }
 	int GetLogSize() { return events.size(); }
 	CClientLog* GetLastMessage() { return events.back(); }
+        CClientLog* PopNextMessage() { return events.pop_front(); }
 	std::string GetInternalIP();
 	int GetInternalPort();
 };

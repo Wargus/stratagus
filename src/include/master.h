@@ -57,19 +57,23 @@ public:
 	int Init();
 	void Close();
 	int Send(const std::string cmd);
-	int Recv();
-	int GetLastRecvState() { return lastRecvState; }
+	void RecordEvent(unsigned char *buf);
 	int GetLogSize() { return events.size(); }
 	CClientLog *GetLastMessage() { return events.back(); }
+	CClientLog *PopNextMessage() { return events.pop_front(); }
 	std::string GetInternalIP();
 	int GetInternalPort();
 
 private:
+	int Recv();
+
+public:
 	CHost *metaHost;                           /// The metaserver
+
+private:
 	std::string metaHostName;                  /// Address of metaserver
 	int metaPort;                              /// Port of metaserver
 	std::list <CClientLog *> events;           /// All commands received from metaserver
-	int lastRecvState;                         /// How many bytes have been received in last reply
 };
 
 
