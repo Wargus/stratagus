@@ -863,6 +863,8 @@ void NetworkEvent()
 		NetworkInSync = false;
 		return;
 	}
+	Assert(len < 1024);
+	buf[len] = '\0';
 
 	if (MetaClient.metaHost != NULL &&
 		host.getIp() == MetaClient.metaHost->getIp() &&

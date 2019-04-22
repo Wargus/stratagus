@@ -172,11 +172,12 @@ int CMetaClient::Recv()
 	}
 
 	unsigned char buf[1024];
-	memset(&buf, 0, sizeof(buf));
 	int n = NetworkFildes.Recv(&buf, sizeof(buf), metaHost);
 	if (n == -1) {
 		return n;
 	}
+	Assert(n < 1024);
+	buf[n] = '\0';
 	this->RecordEvent(buf);
 	return n;
 }
