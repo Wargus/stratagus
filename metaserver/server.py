@@ -30,6 +30,10 @@ class Session(object):
         self.local_host = host
         self.local_port = port
 
+    def clear(self):
+        self.__init__(self.host, self.port)
+        self.time = 0
+
     def should_timeout(self):
         return self.time + Session.TIMEOUT < time.time()
 
@@ -105,11 +109,23 @@ class Server(object):
                     return
         session.name = name
         self.send("LOGIN_OK", session)
+        for s in self.sessions:
+            self.send("USERNAME %s" % name, s)
 
+    def LEAVE(self, session, args):
+        name = args.strip()
+        if session.name == name:
+            self.send("LEAVE_OK", session)
+            session.clear()
+        else:
+            self.send("LEAVE_FAILED", session)
 
     def MESSAGE(self, session, args):
         self.ensure_logged_in(session)
-        self.messages.append("[%d] %s: %s" % (time.time(), session.name, args))
+        msg = "[%d] %s: %s" % (time.time(), session.name, args)
+        self.messages.append(msg)
+        for s in self.sessions:
+            self.send("MESSAGE %s" % msg, s)
 
     GAME_RE = re.compile('''
     "(?P<gameversion>[^"]+)"\s+
@@ -130,6 +146,8 @@ class Server(object):
             session.local_host = m.group("local_host")
             session.local_port = m.group("local_port")
             self.send("CREATE_OK " + str(session.game.id), session)
+        for s in self.sessions:
+            self.send("GAME %s" % session.game, s)
 
     def CANCEL(self, session, args):
         self.ensure_logged_in(session)
