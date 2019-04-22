@@ -313,6 +313,8 @@ class ScrollArea : public BasicContainer
 	virtual Widget *getContent();
 	virtual void setScrollbarWidth(int width);
 	virtual int getScrollbarWidth();
+        virtual int getVerticalMaxScroll();
+        virtual void setVerticalScrollAmount(int vScroll);
 };
 
 class ImageWidget : public Widget
