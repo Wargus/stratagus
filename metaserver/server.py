@@ -12,10 +12,10 @@ class Game(object):
         self.description = description
         self.map = map
         self.player_count = int(player_count)
-        self.id = time.monotonic()
+        self.id = "%f" % time.monotonic()
 
     def __str__(self):
-        return '%f "%s" "%s" "%s" %d' % (self.id, self.gameversion, self.description, self.map, self.player_count)
+        return '%s "%s" "%s" "%s" %d' % (self.id, self.gameversion, self.description, self.map, self.player_count)
 
 
 class Session(object):
@@ -90,11 +90,11 @@ class Server(object):
         self.ensure_logged_in(session)
         for msg in self.messages:
             self.send(("MESSAGE %s" % msg), session)
-        for session in self.sessions:
-            if session.name:
-                self.send(("USERNAME %s" % session.name), session)
-            if session.game:
-                self.send(("GAME %s" % session.game), session)
+        for s in self.sessions:
+            if s.name:
+                self.send(("USERNAME %s" % s.name), session)
+            if s.game:
+                self.send(("GAME %s" % s.game), session)
         self.send("LIST_OK", session)
 
     def LOGIN(self, session, args):
@@ -144,15 +144,15 @@ class Server(object):
         else:
             session.game = Game(session, **m.groupdict())
             session.local_host = m.group("local_host")
-            session.local_port = m.group("local_port")
-            self.send("CREATE_OK " + str(session.game.id), session)
+            session.local_port = int(m.group("local_port"))
+            self.send("CREATE_OK " + session.game.id, session)
         for s in self.sessions:
             self.send("GAME %s" % session.game, s)
 
     def CANCEL(self, session, args):
         self.ensure_logged_in(session)
         try:
-            gameid = float(args.strip())
+            gameid = args.strip()
         except:
             pass
         else:
@@ -174,11 +174,11 @@ class Server(object):
         if not m:
             self.send("JOIN_MALFORMED", session)
         else:
-            game_id = float(m.group("id"))
-            for game in games:
+            game_id = m.group("id")
+            for game in self.games:
                 if game.id == game_id:
                     session.local_host = m.group("local_host")
-                    session.local_port = m.group("local_port")
+                    session.local_port = int(m.group("local_port"))
                     self.send(
                         "JOIN_OK %s:%s %s:%s" % (game.session.host, game.session.port, game.session.local_host, game.session.local_port),
                         session
@@ -189,14 +189,14 @@ class Server(object):
                     # processing that happens while the server is open
                     msg = (b"\x00" + # MessageNone
                            b"\x00" + # ICMPunchUDPHole
-                           socket.inet_aton(session.host), # uint32 ip
-                           struct.pack('>H', session.port), # uint16 port
-                           socket.inet_aton(session.local_host),
+                           socket.inet_aton(session.host) + # uint32 ip
+                           struct.pack('>H', session.port) + # uint16 port
+                           socket.inet_aton(session.local_host) +
                            struct.pack('>H', session.local_port))
                     self.socket.sendto(msg, (game.session.host, game.session.port))
                     break
             else:
-                self.send("JOIN_FAILED", session)
+                self.send("JOIN_FAILED %s" % game_id, session)
 
     def UNKNOWN_COMMAND(self, session, msg):
         self.send(("UNKNOWN MSG %s" % msg), session)
