@@ -11,11 +11,11 @@ class Game(object):
         self.gameversion = gameversion
         self.description = description
         self.map = map
-        self.player_count = player_count
+        self.player_count = int(player_count)
         self.id = time.monotonic()
 
     def __str__(self):
-        return '%d "%s" "%s" "%s" %d' % (self.id, self.gameversion, self.description, self.map, self.player_count)
+        return '%f "%s" "%s" "%s" %d' % (self.id, self.gameversion, self.description, self.map, self.player_count)
 
 
 class Session(object):
@@ -43,11 +43,11 @@ class Session(object):
 class Server(object):
     def __init__(self):
         localIP = "0.0.0.0"
-        localPort = 20001
+        localPort = 7775
         self.buffersize = 1024
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.socket.bind((localIP, localPort))
-        print("UDP server up and listening")
+        print("UDP server up and listening on", localIP, localPort)
         self.host_port_session = {}
         self.messages = collections.deque([], 100)
 
@@ -95,11 +95,21 @@ class Server(object):
 
     def LOGIN(self, session, args):
         name = args.strip()
-        if name and name not in self.usernames:
-            session.name = name
-            self.send("LOGIN_OK", session)
-        else:
-            self.send("LOGIN_FAILED", session)
+        for s in self.sessions:
+            if s.name == name:
+                if session != s:
+                    self.send("LOGIN_FAILED", session)
+                    return
+                else:
+                    self.send("LOGIN_OK", session)
+                    return
+        session.name = name
+        self.send("LOGIN_OK", session)
+
+
+    def MESSAGE(self, session, args):
+        self.ensure_logged_in(session)
+        self.messages.append("[%d] %s: %s" % (time.time(), session.name, args))
 
     GAME_RE = re.compile('''
     "(?P<gameversion>[^"]+)"\s+
@@ -119,7 +129,20 @@ class Server(object):
             session.game = Game(session, **m.groupdict())
             session.local_host = m.group("local_host")
             session.local_port = m.group("local_port")
-            self.send("CREATE_OK", session)
+            self.send("CREATE_OK " + str(session.game.id), session)
+
+    def CANCEL(self, session, args):
+        self.ensure_logged_in(session)
+        try:
+            gameid = float(args.strip())
+        except:
+            pass
+        else:
+            if session.game and session.game.id == gameid:
+                session.game = None
+                self.send("CANCEL_OK", session)
+                return
+        self.send("CANCEL_FAILED", session)
 
     JOIN_RE = re.compile('''
     (?P<id>\d+\.\d+)\s+
@@ -194,7 +217,7 @@ class Server(object):
             command, *args = message.split(maxsplit=1)
             if args:
                 args = args[0]
-            print(args)
+            print(command, args)
             method = getattr(self, command, None)
             if method:
                 method(session, args)
