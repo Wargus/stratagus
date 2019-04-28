@@ -148,7 +148,7 @@ public:
 		} else {
 			// Terrain traversal by Andrettin
 			TerrainTraversal terrainTraversal;
-			terrainTraversal.SetSize(MaxMapWidth, MaxMapHeight);
+			terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 			terrainTraversal.Init();
 			terrainTraversal.PushUnitPosAndNeighboor(*unit);
 			CUnit *result_unit = NULL;
