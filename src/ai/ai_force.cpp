@@ -94,10 +94,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		const CUnitType &dtype = *dest->Type;
 
 		if (
-			(
-				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index)
-			)
+			!unit.IsEnemy(*dest) // a friend or neutral
 			|| !CanTarget(*unit.Type, dtype)
 		) {
 			continue;
