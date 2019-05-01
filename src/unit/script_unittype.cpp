@@ -1055,6 +1055,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Harvest[resId].Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "help")) {
 					type->Sound.Help.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "work-complete")) {
+					type->Sound.WorkComplete.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "dead")) {
 					int death;
 

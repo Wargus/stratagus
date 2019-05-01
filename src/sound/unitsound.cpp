@@ -164,6 +164,7 @@ void MapUnitSounds()
 		}
 		type.MapSound.Help.MapSound();
 		type.MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
+		type.MapSound.WorkComplete.MapSound();
 
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 			type.MapSound.Dead[i].MapSound();

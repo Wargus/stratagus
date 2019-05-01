@@ -181,7 +181,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
 		case VoiceWorkCompleted:
-			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+			{
+				CSound *workCompleteSound = unit.Type->MapSound.WorkComplete.Sound;
+				if (workCompleteSound == NULL) {
+					workCompleteSound = GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+				}
+				return workCompleteSound;
+			}
 		case VoiceBuilding:
 			return GameSounds.BuildingConstruction[ThisPlayer->Race].Sound;
 		case VoiceDocking:
