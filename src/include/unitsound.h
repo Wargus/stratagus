@@ -81,6 +81,7 @@ public:
 	SoundConfig Repair;             /// unit repairing
 	SoundConfig Harvest[MaxCosts];  /// unit harvesting
 	SoundConfig Help;               /// unit is attacked
+	SoundConfig WorkComplete;       /// unit has completed work
 	SoundConfig Dead[ANIMATIONS_DEATHTYPES + 1];             /// unit is killed
 };
 
