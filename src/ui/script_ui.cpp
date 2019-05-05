@@ -360,6 +360,14 @@ static int CclGetVideoFullScreen(lua_State *l)
 	return 1;
 }
 
+static int CclShowTitleScreens(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	ShowTitleScreens();
+	lua_pushboolean(l, 1);
+	return 1;
+}
+
 /**
 **  Default title screens.
 **
@@ -1275,6 +1283,7 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
+	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);
 
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 	lua_register(Lua, "DefinePopup", CclDefinePopup);
