@@ -1107,7 +1107,7 @@ static int CclGetUnitVariable(lua_State *l)
 		if (unit->Summoned && unit->TTL) {
 			unsigned long time_lived = GameCycle - unit->Summoned;
 			Assert(time_lived >= 0);
-			unsigned long time_to_live = unit->TTL;
+			unsigned long time_to_live = unit->TTL - unit->Summoned;
 			Assert(time_to_live > 0);
 			double pcnt = time_lived * 100.0 / time_to_live;
 			int pcnt_i = (int)round(pcnt);
