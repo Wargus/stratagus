@@ -178,7 +178,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"selected\",");
 	}
 	if (unit.Summoned) {
-		file.printf(" \"summoned\",");
+		file.printf("\"summoned\", %lu,\n ", unit.Summoned);
 	}
 	if (unit.Waiting) {
 		file.printf(" \"waiting\",");

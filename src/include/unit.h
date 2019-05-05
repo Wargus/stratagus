@@ -349,6 +349,7 @@ public:
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked
+	unsigned long Summoned;      /// GameCycle unit was summoned using spells
 	unsigned Blink : 3;          /// Let selection rectangle blink
 	unsigned Moving : 1;         /// The unit is moving
 	unsigned ReCast : 1;         /// Recast again next cycle
@@ -364,7 +365,6 @@ public:
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
 
-	unsigned long Summoned : 1;  /// Unit is summoned using spells.
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 

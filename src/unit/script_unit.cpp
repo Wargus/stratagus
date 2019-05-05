@@ -388,8 +388,8 @@ static int CclUnit(lua_State *l)
 			unit->Selected = 1;
 			--j;
 		} else if (!strcmp(value, "summoned")) {
-			unit->Summoned = 1;
-			--j;
+			// FIXME : unsigned long should be better handled
+			unit->Summoned = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "waiting")) {
 			unit->Waiting = 1;
 			--j;
