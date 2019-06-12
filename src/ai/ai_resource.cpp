@@ -778,12 +778,14 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 **  @param what  To what should be upgraded.
 **
 **  @return      True if made, false if can't be made.
-**
-**  @note        We must check if the dependencies are fulfilled.
 */
 static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table;
+
+	if (!CheckDependByType(*AiPlayer->Player, what)) {
+		return false;
+	}
 
 	// Remove all units already doing something.
 	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
