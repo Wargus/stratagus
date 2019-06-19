@@ -605,6 +605,11 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		unit.Waiting = 0;
 	}
 
+	if (this->State != ATTACK_TARGET && unit.CanStoreOrder(this) && AutoCast(unit)) {
+		this->Finished = true;
+		return;
+	}
+
 	switch (this->State) {
 		case 0: { // First entry
 			// did Order change ?
