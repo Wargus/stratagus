@@ -136,7 +136,7 @@ public:
 class ConditionInfo
 {
 public:
-	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
+	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(1),
 		BoolFlag(NULL), Variable(NULL), CheckFunc(NULL) {};
 	~ConditionInfo()
 	{

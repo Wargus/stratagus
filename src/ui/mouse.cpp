@@ -1381,16 +1381,15 @@ static int SendSpellCast(const Vec2i &tilePos)
 			// this unit cannot cast spell
 			continue;
 		}
-		if (dest && &unit == dest) {
-			// no unit can cast spell on himself
-			// n0b0dy: why not?
-			continue;
-		}
 		// CursorValue here holds the spell type id
 		const SpellType *spell = SpellTypeTable[CursorValue];
 		if (!spell) {
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
+		}
+		if (dest && dest == &unit && (!spell->Condition || spell->Condition->TargetSelf == CONDITION_FALSE)) {
+			// Only spells with explicit 'self: true' allows self targetting
+			continue;
 		}
 		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
 		ret = 1;
