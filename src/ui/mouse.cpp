@@ -1563,6 +1563,25 @@ static void UISelectStateButtonDown(unsigned)
 
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
+		// 74145: Spell-cast on unit portrait
+		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected
+			&& CursorAction == ButtonSpellCast) {
+			if (GameObserve || GamePaused || GameEstablishing) {
+				return;
+			}
+			int num = ButtonUnderCursor;
+
+			if (static_cast<size_t>(num) >= Selected.size() || !(MouseButtons & LeftButton)) {
+				return;
+			}
+
+			CUnit &unit = *Selected[num];
+
+			const Vec2i tilePos = unit.tilePos;
+			UnitUnderCursor = &unit;
+			SendSpellCast(tilePos);
+			UnitUnderCursor = NULL;
+		}
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			OldButtonUnderCursor = ButtonUnderCursor;
 			return;
