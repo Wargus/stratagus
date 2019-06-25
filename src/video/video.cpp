@@ -451,7 +451,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 void ColorCycle()
 {
 	/// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
+#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND * 2)
 	if ((FrameCounter % COLOR_CYCLE_SPEED) != 0) {
 		return;
 	}
