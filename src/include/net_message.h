@@ -299,6 +299,7 @@ enum _message_type_ {
 	MessageCommandBoard,           /// Unit command board
 	MessageCommandUnload,          /// Unit command unload
 	MessageCommandBuild,           /// Unit command build building
+	MessageCommandExplore,         /// Unit command explore
 	MessageCommandDismiss,         /// Unit command dismiss unit
 	MessageCommandResourceLoc,     /// Unit command resource location
 	MessageCommandResource,        /// Unit command resource

@@ -492,6 +492,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->ButtonAction = ButtonTrain;
 			} else if (!strcmp(value, "patrol")) {
 				condition->ButtonAction = ButtonPatrol;
+			} else if (!strcmp(value, "explore")) {
+				condition->ButtonAction = ButtonExplore;
 			} else if (!strcmp(value, "stand-ground")) {
 				condition->ButtonAction = ButtonStandGround;
 			} else if (!strcmp(value, "attack-ground")) {

@@ -288,6 +288,7 @@ private:
 	void DoClicked_Unload(int button);
 	void DoClicked_SpellCast(int button);
 	void DoClicked_Repair(int button);
+	void DoClicked_Explore();
 	void DoClicked_Return();
 	void DoClicked_Stop();
 	void DoClicked_StandGround();

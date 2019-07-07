@@ -70,6 +70,7 @@ enum UnitAction {
 	UnitActionUnload,       /// unit leaving transporter
 	UnitActionPatrol,       /// unit paroling area
 	UnitActionBuild,        /// unit builds building
+	UnitActionExplore,      /// unit explores map
 
 	UnitActionRepair,       /// unit repairing
 	UnitActionResource,     /// unit harvesting resources
@@ -133,6 +134,7 @@ public:
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
+	static COrder *NewActionExplore(const CUnit &unit);
 	static COrder *NewActionFollow(CUnit &dest);
 	static COrder *NewActionMove(const Vec2i &pos);
 	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
