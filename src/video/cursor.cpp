@@ -256,7 +256,7 @@ void DrawCursor()
 
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
-	if (GameCursor == NULL || (GameRunning && ThisPlayer->Type == PlayerNobody)) {
+	if (GameCursor == NULL || IsDemoMode()) {
 		return;
 	}
 	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;

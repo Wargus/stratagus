@@ -1089,7 +1089,7 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 */
 void HandleKeyDown(unsigned key, unsigned keychar)
 {
-	if (GameRunning && ThisPlayer->Type == PlayerNobody) {
+	if (IsDemoMode()) {
 		// If we are in "demo mode", exit no matter which key we hit.
 		void ActionDraw();
 		ActionDraw();
