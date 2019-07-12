@@ -1572,7 +1572,7 @@ void UnitCountSeen(CUnit &unit)
 	//  unit before this calc.
 	int oldv[PlayerMax];
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			oldv[p] = unit.IsVisible(Players[p]);
 		}
 	}
@@ -1582,7 +1582,7 @@ void UnitCountSeen(CUnit &unit)
 	const int width = unit.Type->TileWidth;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			int newv = 0;
 			int y = height;
 			unsigned int index = unit.Offset;
@@ -1591,7 +1591,7 @@ void UnitCountSeen(CUnit &unit)
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
-						if (mf->playerInfo.VisCloak[p]) {
+						if (mf->playerInfo.VisCloak[p] || Players[p].Type == PlayerNobody) {
 							newv++;
 						}
 					} else {
@@ -1612,7 +1612,7 @@ void UnitCountSeen(CUnit &unit)
 	// for players. Hopefully this works with shared vision just great.
 	//
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			int newv = unit.IsVisible(Players[p]);
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to

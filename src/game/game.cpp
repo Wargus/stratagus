@@ -903,6 +903,15 @@ void CreateGame(const std::string &filename, CMap *map)
 		}
 		CreatePlayer(playertype);
 	}
+	if (!ThisPlayer && !IsNetworkGame()) {
+		// In demo or kiosk mode, pick first empty slot
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (Players[i].Type == PlayerNobody) {
+				ThisPlayer = &Players[i];
+				break;
+			}
+		}
+	}
 
 	if (!filename.empty()) {
 		if (CurrentMapPath != filename) {

@@ -659,6 +659,11 @@ static void HandleMouseOn(const PixelPos screenPos)
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
 
+	if (IsDemoMode()) {
+		// If we are in "demo mode", do nothing.
+		return;
+	}
+
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
 		CursorOn = CursorOnMap;
@@ -900,6 +905,13 @@ static void MouseScrollMap(const PixelPos &pos)
 void UIHandleMouseMove(const PixelPos &cursorPos)
 {
 	enum _cursor_on_ OldCursorOn;
+
+	if (IsDemoMode()) {
+		// If we are in "demo mode", exit now.
+		void ActionDraw();
+		ActionDraw();
+		return;
+	}
 
 	OldCursorOn = CursorOn;
 	//  Selecting units.
@@ -1820,6 +1832,13 @@ void UIHandleButtonDown(unsigned button)
 {
 	// Detect long left selection click
 	const bool longLeftButton = (MouseButtons & ((LeftButton << MouseHoldShift))) != 0;
+
+	if (IsDemoMode()) {
+		// If we are in "demo mode", exit no matter what we click on.
+		void ActionDraw();
+		ActionDraw();
+		return;
+	}
 
 #ifdef USE_TOUCHSCREEN
 	// If we are moving with stylus/finger,

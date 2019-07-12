@@ -107,6 +107,16 @@ void ShowLoadProgress(const char *fmt, ...)
 	}
 }
 
+/**
+**  Check if the game is running in Demo mode.
+**
+**  @return  True if the game is in demo mode, false otherwise
+*/
+bool IsDemoMode()
+{
+	return GameRunning && ThisPlayer->Type == PlayerNobody;
+}
+
 CUnitInfoPanel::~CUnitInfoPanel()
 {
 	for (std::vector<CContentType *>::iterator content = Contents.begin();
