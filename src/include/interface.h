@@ -63,6 +63,7 @@ enum ButtonCmd {
 	ButtonHarvest,        /// order harvest
 	ButtonBuild,          /// order build
 	ButtonPatrol,         /// order patrol
+	ButtonExplore,        /// order explore
 	ButtonAttackGround,   /// order attack ground
 	ButtonSpellCast,      /// order cast spell
 	ButtonUnload,         /// order unload unit

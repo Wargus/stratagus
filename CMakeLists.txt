@@ -65,6 +65,7 @@ set(action_SRCS
 	src/action/action_built.cpp
 	src/action/action_defend.cpp
 	src/action/action_die.cpp
+	src/action/action_explore.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
 	src/action/action_patrol.cpp

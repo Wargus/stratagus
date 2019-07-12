@@ -249,6 +249,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		case ButtonPatrol:
 			action = UnitActionPatrol;
 			break;
+		case ButtonExplore:
+			action = UnitActionExplore;
+			break;
 		case ButtonHarvest:
 		case ButtonReturn:
 			action = UnitActionResource;
@@ -884,6 +887,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = unit.Type->RepairRange > 0;
 			break;
 		case ButtonPatrol:
+		case ButtonExplore:
 			res = unit.CanMove();
 			break;
 		case ButtonHarvest:
@@ -1203,6 +1207,13 @@ void CButtonPanel::DoClicked_Repair(int button)
 	DoClicked_SelectTarget(button);
 }
 
+void CButtonPanel::DoClicked_Explore()
+{
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		SendCommandExplore(*Selected[i], !(KeyModifiers & ModifierShift));
+	}
+}
+
 void CButtonPanel::DoClicked_Return()
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1420,6 +1431,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonUnload: { DoClicked_Unload(button); break; }
 		case ButtonSpellCast: { DoClicked_SpellCast(button); break; }
 		case ButtonRepair: { DoClicked_Repair(button); break; }
+		case ButtonExplore: { DoClicked_Explore(); break; }
 		case ButtonMove:    // Follow Next
 		case ButtonPatrol:  // Follow Next
 		case ButtonHarvest: // Follow Next

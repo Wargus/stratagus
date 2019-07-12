@@ -850,6 +850,8 @@ static void DoNextReplay()
 		SendCommandUnload(*unit, pos, dunit, flags);
 	} else if (!strcmp(action, "build")) {
 		SendCommandBuildBuilding(*unit, pos, *UnitTypeByIdent(val), flags);
+	} else if (!strcmp(action, "explore")) {
+		SendCommandExplore(*unit, flags);
 	} else if (!strcmp(action, "dismiss")) {
 		SendCommandDismiss(*unit);
 	} else if (!strcmp(action, "resource-loc")) {

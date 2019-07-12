@@ -500,6 +500,33 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 }
 
 /**
+**  Send a unit exploring
+**
+**  @param unit   pointer to unit.
+**  @param flush  if true, flush command queue.
+*/
+void CommandExplore(CUnit &unit, int flush)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionExplore(unit);
+
+	ClearSavedAction(unit);
+}
+
+/**
 **  Cancel the building construction, or kill a unit.
 **
 **  @param unit  pointer to unit.

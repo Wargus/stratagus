@@ -1006,6 +1006,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonTrain;
 			} else if (!strcmp(value, "patrol")) {
 				ba.Action = ButtonPatrol;
+			} else if (!strcmp(value, "explore")) {
+				ba.Action = ButtonExplore;
 			} else if (!strcmp(value, "stand-ground")) {
 				ba.Action = ButtonStandGround;
 			} else if (!strcmp(value, "attack-ground")) {
