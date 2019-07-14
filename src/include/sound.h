@@ -166,7 +166,7 @@ extern int DistanceSilent;
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group);
+extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group, bool sampleUnique = false);
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, CSound *sound);
 /// Play a missile sound

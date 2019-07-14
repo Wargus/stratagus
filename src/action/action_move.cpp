@@ -170,13 +170,22 @@ int DoActionMove(CUnit &unit)
 		}
 
 		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
-			const CMapField &mf_cur = *Map.Field(unit.Offset);
-			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
+			bool foundCoast = false;
 
-			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
-				PlayUnitSound(unit, VoiceDocking);
-			} else if (mf_cur.CoastOnMap() && mf_next.WaterOnMap()) {
-				PlayUnitSound(unit, VoiceDocking); // undocking
+			for (int i = 0; i < unit.Type->TileWidth && !foundCoast; i++) {
+				for (int j = 0; j < unit.Type->TileHeight && !foundCoast; j++) {
+					const Vec2i offset(i, j);
+					const CMapField &mf_next = *Map.Field(unit.tilePos + posd + offset);
+					const CMapField &mf_cur = *Map.Field(unit.tilePos + offset);
+
+					if (mf_cur.CoastOnMap() || mf_next.CoastOnMap()) {
+						foundCoast = true;
+					}
+				}
+			}
+			if (foundCoast) {
+				// Should play, even if unit already speaking
+				PlayUnitSound(unit, VoiceDocking, true);
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;

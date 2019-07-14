@@ -884,13 +884,13 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 					IsSDLWindowVisible = false;
 					if (!GamePaused) {
 						DoTogglePause = true;
-						UiTogglePause();
+						GamePaused = true;
 					}
 				} else if (!IsSDLWindowVisible && event.active.gain) {
 					IsSDLWindowVisible = true;
 					if (GamePaused && DoTogglePause) {
 						DoTogglePause = false;
-						UiTogglePause();
+						GamePaused = false;
 					}
 				}
 			}

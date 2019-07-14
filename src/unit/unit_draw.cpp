@@ -730,7 +730,10 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// FIXME: johns: ugly check here, should be removed!
 	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
-		DrawDecoration(unit, type, screenPos);
+		PixelPos offsetPos(screenPos);
+		if (unit.tilePos.y == Map.Info.MapHeight-1)
+			offsetPos.y -= 2;
+		DrawDecoration(unit, type, offsetPos);
 	}
 }
 

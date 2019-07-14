@@ -267,6 +267,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
+	// Check if we should make some random noise
+	if (unit.Frame == 0 && unit.Player == ThisPlayer && GameCycle % 150 == 0 && SyncRand(3) == 0) {
+		PlayUnitSound(unit, VoiceBuilding, true);
+	}
+
 	// Check if building ready. Note we can both build and repair.
 	if (!unit.Anim.Unbreakable && this->ProgressCounter >= maxProgress) {
 		Finish(*this, unit);
