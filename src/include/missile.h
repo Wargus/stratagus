@@ -462,7 +462,7 @@ public:
 	static unsigned int Count; /// slot number generator.
 };
 
-extern bool MissileInitMove(Missile &missile);
+extern bool MissileInitMove(Missile &missile, bool pointToPoint = false);
 extern bool PointToPointMissile(Missile &missile);
 extern void MissileHandlePierce(Missile &missile, const Vec2i &pos);
 extern bool MissileHandleBlocking(Missile &missile, const PixelPos &position);
