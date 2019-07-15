@@ -170,6 +170,7 @@ enum {
 	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
 	SIDEATTACK_INDEX,
+	SKIRMISHER_INDEX,
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	NBARALREADYDEFINED
 };
@@ -596,6 +597,7 @@ public:
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
+	unsigned Skirmisher : 1;            /// Unit will try to shoot from max range
 
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
