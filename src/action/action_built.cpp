@@ -37,6 +37,7 @@
 #include "commands.h"
 #include "construct.h"
 #include "iolib.h"
+#include "luacallback.h"
 #include "map.h"
 #include "player.h"
 #include "script.h"
@@ -206,6 +207,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (player.AiEnabled) {
 		/* Worker can be NULL */
 		AiWorkComplete(worker, unit);
+	}
+
+	if (unit.Type->OnReady) {
+		unit.Type->OnReady->pushPreamble();
+		unit.Type->OnReady->pushInteger(UnitNumber(unit));
+		unit.Type->OnReady->run();
 	}
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,

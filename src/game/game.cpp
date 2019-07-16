@@ -1086,6 +1086,11 @@ void CreateGame(const std::string &filename, CMap *map)
 		} else {
 			unit.Colors = &unit.Player->UnitColors;
 		}
+		if (unit.Type->OnReady) {
+			unit.Type->OnReady->pushPreamble();
+			unit.Type->OnReady->pushInteger(UnitNumber(unit));
+			unit.Type->OnReady->run();
+		}
 	}
 
 	GameResult = GameNoResult;

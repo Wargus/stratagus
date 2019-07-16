@@ -861,8 +861,9 @@ static int CclOrderUnit(lua_State *l)
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
-
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+				} else if (!strcmp(order, "explore")) {
+					CommandExplore(unit, 1);
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 				} else {
@@ -1175,6 +1176,12 @@ static int CclSetUnitVariable(lua_State *l)
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
 		unit->AssignToPlayer(Players[value]);
+	} else if (!strcmp(name, "TTL")) {
+		value = LuaToNumber(l, 3);
+		unit->TTL = GameCycle + value;
+	} else if (!strcmp(name, "Summoned")) {
+		value = LuaToNumber(l, 3);
+		unit->Summoned = value;
 	} else if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
