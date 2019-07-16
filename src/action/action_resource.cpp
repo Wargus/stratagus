@@ -167,6 +167,15 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
+	if (harvester.CurrentResource) {
+		const ResourceInfo &resinfo = *harvester.Type->ResInfo[harvester.CurrentResource];
+		if (resinfo.TerrainHarvester && harvester.ResourcesHeld < resinfo.ResourceCapacity) {
+			// Need to finish harvesting first!
+			delete order;
+			return NewActionResource(harvester, harvester.tilePos);
+		}
+	}
+
 	if (depot == NULL) {
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
@@ -345,6 +354,11 @@ COrder_Resource::~COrder_Resource()
 	}
 	if (this->IsGatheringStarted()  && unit.ResourcesHeld > 0) {
 		// escape to Depot with what you have
+		const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+		if (resinfo.TerrainHarvester && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+			// We don't have anything yet.
+			return false;
+		}
 		this->DoneHarvesting = true;
 		return true;
 	}

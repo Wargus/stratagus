@@ -400,6 +400,14 @@ static void HandleUnitAction(CUnit &unit)
 				SelectedUnitChanged();
 			}
 		}
+		if (unit.CurrentResource) {
+			const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
+			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitActionResource
+				&& (!resinfo.TerrainHarvester || unit.ResourcesHeld < resinfo.ResourceCapacity)) {
+				unit.CurrentResource = 0;
+				unit.ResourcesHeld = 0;
+			}
+		}
 	}
 	unit.Orders[0]->Execute(unit);
 }
