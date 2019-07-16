@@ -40,6 +40,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "iolib.h"
+#include "luacallback.h"
 #include "player.h"
 #include "sound.h"
 #include "translate.h"
@@ -238,6 +239,11 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	if (unit.Player->AiEnabled) {
 		AiTrainingComplete(unit, *newUnit);
+	}
+	if (newUnit->Type->OnReady) {
+		newUnit->Type->OnReady->pushPreamble();
+		newUnit->Type->OnReady->pushInteger(UnitNumber(*newUnit));
+		newUnit->Type->OnReady->run();
 	}
 
 	if (unit.NewOrder && unit.NewOrder->HasGoal()

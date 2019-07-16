@@ -529,6 +529,7 @@ public:
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second
 	LuaCallback *OnInit;            /// lua function called on unit init
+	LuaCallback *OnReady;           /// lua function called when unit ready/built
 
 	int TeleportCost;               /// mana used for teleportation
 	LuaCallback *TeleportEffectIn;   /// lua function to create effects before teleportation
