@@ -103,6 +103,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->SetGoal(&target);
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->MinRange = attacker.Type->MinAttackRange;
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+		order->SkirmishRange = order->Range;
 
 	return order;
 }
@@ -121,6 +123,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	} else {
 		order->goalPos = dest;
 	}
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+		order->SkirmishRange = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+
 	return order;
 }
 
@@ -131,6 +136,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->goalPos = dest;
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->MinRange = attacker.Type->MinAttackRange;
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+		order->SkirmishRange = order->Range;
 
 	return order;
 }
@@ -172,6 +179,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
+		if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value)
+			this->SkirmishRange = this->Range;
 	} else if (!strcmp(value, "tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -226,12 +235,15 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		input.SetGoal(this->goalPos, tileSize);
 	}
 
-	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
 	if (GameSettings.Inside) {
 		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
 	}
 	input.SetMaxRange(distance);
+	if (!this->SkirmishRange || Distance(input.GetUnitPos(), input.GetGoalPos()) < this->SkirmishRange)
+		input.SetMinRange(this->MinRange);
+	else
+		input.SetMinRange(std::max<int>(this->SkirmishRange, this->MinRange));
 }
 
 /* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
