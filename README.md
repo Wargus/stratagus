@@ -1,4 +1,4 @@
-    ________________________________README_________________________________
+    _______________________________________________________________________
          _________ __                 __                               
         /   _____//  |_____________ _/  |______     ____  __ __  ______
         \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
@@ -8,6 +8,8 @@
     ______________________                           ______________________
                           T H E   W A R   B E G I N S
            Stratagus - A free fantasy real time strategy game engine
+
+[![Join the chat at https://gitter.im/Wargus](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Wargus?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Windows: <a href="https://ci.appveyor.com/project/timfel/stratagus"><img width="100" src="https://ci.appveyor.com/api/projects/status/github/Wargus/stratagus?branch=master&svg=true"></a>
 
