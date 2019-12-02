@@ -197,6 +197,11 @@ static bool IsExtensionSupported(const char *extension)
 	len = strlen(extension);
 	start = extensions;
 	while (true) {
+		if (!start)
+		{
+			fprintf(stderr, "error in function " __FUNCTION__ ", start is NULL, extension=%s, extensions=%X, ptr=%X, len=%d, glGetError=%d\n", extension, extensions, ptr, len, glGetError());
+			return false;
+		}
 		ptr = (GLubyte *)strstr((const char *)start, extension);
 		if (!ptr) {
 			break;
