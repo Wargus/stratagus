@@ -198,6 +198,7 @@ static bool IsExtensionSupported(const char *extension)
 	start = extensions;
 	while (true) {
 		if (!start)
+		{
 			return false;
 		}
 		ptr = (GLubyte *)strstr((const char *)start, extension);
