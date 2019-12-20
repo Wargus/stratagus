@@ -216,7 +216,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
-	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+	Video.DrawLineClip(IsWeakTargetSelected() ? ColorOrange : ColorRed, lastScreenPos, targetPos);
 	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
 	return targetPos;
 }
@@ -542,7 +542,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->SetGoal(newTarget);
 				this->goalPos = newTarget->tilePos;
 				this->MinRange = unit.Type->MinAttackRange;
-				this->State = MOVE_TO_TARGET;
+				this->State &= WEAK_TARGET;
+				this->State |= MOVE_TO_TARGET;
 			}
 		}
 	}
@@ -566,7 +567,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->State |= MOVE_TO_TARGET;
 	}
 	if (dist < unit.Type->MinAttackRange) {
-		this->State = MOVE_TO_TARGET;
+		this->State &= WEAK_TARGET;
+		this->State |= MOVE_TO_TARGET;
 	}
 
 	// Turn always to target
@@ -655,7 +657,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					}
 				}
 			}
-			this->State = MOVE_TO_TARGET;
+			this->State = MOVE_TO_TARGET | (IsWeakTargetSelected() ? WEAK_TARGET : 0);
 			// FIXME: should use a reachable place to reduce pathfinder time.
 		}
 		// FALL THROUGH
