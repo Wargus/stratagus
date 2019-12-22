@@ -216,7 +216,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
-	Video.DrawLineClip(IsWeakTargetSelected() ? ColorOrange : ColorRed, lastScreenPos, targetPos);
+	if (Preference.SimplifiedAutoTargeting){
+		Video.DrawLineClip(IsWeakTargetSelected() ? ColorOrange : ColorRed, lastScreenPos, targetPos);
+	} else {
+		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+	}	
 	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
 	return targetPos;
 }
