@@ -63,9 +63,10 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define WEAK_TARGET      2  /// Weak target, could be changed
+#define AUTO_TARGETING   2  /// Targets will be selected by small (unit's) AI
 #define MOVE_TO_TARGET   4  /// Move to target state
 #define ATTACK_TARGET    5  /// Attack target state
+
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -215,9 +216,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	} else {
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
-	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
-	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+	Video.FillCircleClip(this->State & AUTO_TARGETING ? ColorOrange : ColorRed, lastScreenPos, 2);
+	Video.DrawLineClip(this->State & AUTO_TARGETING ? ColorOrange : ColorRed, lastScreenPos, targetPos);
+	Video.FillCircleClip(this->State & AUTO_TARGETING ? ColorOrange : ColorRed, targetPos, 3);
 	return targetPos;
 }
 
@@ -280,9 +281,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 
 
-bool COrder_Attack::IsWeakTargetSelected() const
+bool COrder_Attack::IsAutoTargeting() const
 {
-	return (this->State & WEAK_TARGET) != 0;
+	return (this->State & AUTO_TARGETING) != 0;
 }
 
 /**
@@ -334,10 +335,19 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		return true;
 	}
 
+	if (this->State && !(this->State & AUTO_TARGETING)) {
+		if (!this->HasGoal() || !this->GetGoal()->IsAlive()){
+			this->Finished = true;
+			return true;
+		}
+	}	
 	// No goal: if meeting enemy attack it.
 	if (!this->HasGoal()
 		&& this->Action != UnitActionAttackGround
 		&& !Map.WallOnMap(this->goalPos)) {
+
+		this->State |= AUTO_TARGETING;
+
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
@@ -353,10 +363,9 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->MinRange = unit.Type->MinAttackRange;
 			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 			this->goalPos = goal->tilePos;
-			this->State |= WEAK_TARGET; // weak target
 		}
 		// Have a weak target, try a better target.
-	} else if (this->HasGoal() && (this->State & WEAK_TARGET || unit.Player->AiEnabled)) {
+	} else if (this->HasGoal() && (this->State & AUTO_TARGETING || unit.Player->AiEnabled)) {
 		CUnit *goal = this->GetGoal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 
@@ -429,7 +438,8 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 					}
 					UnitUpdateHeading(unit);
 				}
-				this->State++;
+				this->State &= AUTO_TARGETING;
+				this->State |= ATTACK_TARGET;
 				return;
 			}
 		}
@@ -451,7 +461,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 					}
 					UnitUpdateHeading(unit);
 				}
-				this->State &= WEAK_TARGET;
+				this->State &= AUTO_TARGETING;
 				this->State |= ATTACK_TARGET;
 				return;
 			}
@@ -500,39 +510,46 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 	CUnit *goal = this->GetGoal();
 	bool dead = !goal || goal->IsAlive() == false;
+	if (dead && !(this->State & AUTO_TARGETING)){
+		this->Finished = true;
+		return;
+	}
 
-	// No target choose one.
-	if (!goal) {
-		goal = AttackUnitsInReactRange(unit);
-
-		// No new goal, continue way to destination.
+	if (this->State & AUTO_TARGETING){
+		// No target choose one.
 		if (!goal) {
-			// Return to old task ?
-			if (unit.RestoreOrder()) {
+			goal = AttackUnitsInReactRange(unit);
+
+			// No new goal, continue way to destination.
+			if (!goal) {
+				// Return to old task ?
+				if (unit.RestoreOrder()) {
+					return;
+				}
+				this->State = MOVE_TO_TARGET | AUTO_TARGETING;	
 				return;
 			}
-			this->State = MOVE_TO_TARGET;
-			return;
-		}
-		// Save current command to come back.
-		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
 
-		if (unit.CanStoreOrder(savedOrder) == false) {
-			delete savedOrder;
-			savedOrder = NULL;
+/*
+			// Save current command to come back.
+			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
+
+			if (unit.CanStoreOrder(savedOrder) == false) {
+				delete savedOrder;
+				savedOrder = NULL;
+			} else {
+				unit.SavedOrder = savedOrder;
+			}
+*/
+			this->SetGoal(goal);
+			this->goalPos = goal->tilePos;
+			this->MinRange = unit.Type->MinAttackRange;
+			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+			this->State = MOVE_TO_TARGET | AUTO_TARGETING;
+
+			// Have a weak target, try a better target.
+			// FIXME: if out of range also try another target quick
 		} else {
-			unit.SavedOrder = savedOrder;
-		}
-		this->SetGoal(goal);
-		this->goalPos = goal->tilePos;
-		this->MinRange = unit.Type->MinAttackRange;
-		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		this->State |= WEAK_TARGET;
-
-		// Have a weak target, try a better target.
-		// FIXME: if out of range also try another target quick
-	} else {
-		if ((this->State & WEAK_TARGET)) {
 			CUnit *newTarget = AttackUnitsInReactRange(unit);
 			if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 				if (unit.CanStoreOrder(this)) {
@@ -542,11 +559,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->SetGoal(newTarget);
 				this->goalPos = newTarget->tilePos;
 				this->MinRange = unit.Type->MinAttackRange;
-				this->State = MOVE_TO_TARGET;
+				this->State = MOVE_TO_TARGET | AUTO_TARGETING;
 			}
 		}
 	}
-
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max
@@ -556,17 +572,18 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			if (unit.CanStoreOrder(this)) {
 				if (dead) {
 					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
-				} else {
+				}else {
 					unit.SavedOrder = this->Clone();
 				}
 			}
 		}
 		unit.Frame = 0;
-		this->State &= WEAK_TARGET;
+		this->State &= AUTO_TARGETING;
 		this->State |= MOVE_TO_TARGET;
 	}
 	if (dist < unit.Type->MinAttackRange) {
-		this->State = MOVE_TO_TARGET;
+		this->State &= AUTO_TARGETING;
+		this->State |= MOVE_TO_TARGET;		
 	}
 
 	// Turn always to target
@@ -590,7 +607,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 /**
 **  Unit attacks!
 **
-**  if (SubAction & WEAK_TARGET) is true the goal is a weak goal.
+**  if (SubAction & AUTO_TARGETING) is true the goal is a weak goal.
 **  This means the unit AI (little AI) could choose a new better goal.
 **
 **  @todo  Lets do some tries to reach the target.
@@ -654,13 +671,15 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 						return;
 					}
 				}
+			} else {
+				this->State |= AUTO_TARGETING;
 			}
-			this->State = MOVE_TO_TARGET;
+			this->State |= MOVE_TO_TARGET;
 			// FIXME: should use a reachable place to reduce pathfinder time.
 		}
 		// FALL THROUGH
 		case MOVE_TO_TARGET:
-		case MOVE_TO_TARGET + WEAK_TARGET:
+		case MOVE_TO_TARGET + AUTO_TARGETING:
 			if (!unit.CanMove()) {
 				this->Finished = true;
 				return;
@@ -669,11 +688,11 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			break;
 
 		case ATTACK_TARGET:
-		case ATTACK_TARGET + WEAK_TARGET:
+		case ATTACK_TARGET + AUTO_TARGETING:
 			AttackTarget(unit);
 			break;
 
-		case WEAK_TARGET:
+		case AUTO_TARGETING:
 			DebugPrint("FIXME: wrong entry.\n");
 			break;
 	}
