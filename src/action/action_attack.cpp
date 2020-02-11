@@ -280,7 +280,10 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 
-
+bool COrder_Attack::IsWeakTargetSelected() const
+{
+	return (this->State & AUTO_TARGETING) != 0;
+}
 bool COrder_Attack::IsAutoTargeting() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
