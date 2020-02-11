@@ -57,6 +57,7 @@ public:
 
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
 	bool IsWeakTargetSelected() const;
+	bool IsAutoTargeting() const;
 
 private:
 	bool CheckForDeadGoal(CUnit &unit);
