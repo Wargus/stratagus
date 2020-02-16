@@ -214,23 +214,23 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	PixelPos targetPos;
 	PixelPos orderedPos;
 
-	if (this->HasGoal()) {
-		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
-	} else {
-		targetPos = vp.TilePosToScreen_Center(this->goalPos);
+	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
+								: vp.TilePosToScreen_Center(this->goalPos);
+
+	orderedPos = this->isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
+									: targetPos;
+	
+	Uint32 color = this->isAttackMove ? ColorOrange : ColorRed;
+	Video.FillCircleClip(color, lastScreenPos, 2);
+	Video.DrawLineClip(ColorRed, lastScreenPos, orderedPos);
+	Video.FillCircleClip(color, orderedPos, 3);
+
+	if (this->isAttackMove && this->HasGoal()){
+		Video.DrawLineClip(ColorOrange, lastScreenPos, targetPos);
+		Video.FillCircleClip(ColorOrange, targetPos, 3);
 	}
 
-	Video.FillCircleClip(this->isAttackMove  ? ColorOrange : ColorRed, lastScreenPos, 2);
-	Video.DrawLineClip(this->isAttackMove ? ColorOrange : ColorRed, lastScreenPos, targetPos);
-	Video.FillCircleClip(this->isAttackMove && this->HasGoal() ? ColorOrange : ColorRed, targetPos, 3);
-
-	if (this->isAttackMove && this->goalPos != this->attackMovePos){
-		orderedPos = vp.TilePosToScreen_Center(this->attackMovePos);
-		Video.DrawLineClip(ColorOrange, targetPos, orderedPos);
-		Video.FillCircleClip(ColorRed, orderedPos, 3);
-	}
-
-	return (this->isAttackMove && this->HasGoal()) ? orderedPos : targetPos;
+	return this->isAttackMove ? orderedPos : targetPos;
 }
 
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
