@@ -56,6 +56,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	const Vec2i &GetWayPoint() const { return WayPoint; }
+	virtual const Vec2i GetGoalPos() const;
 private:
 	Vec2i WayPoint; /// position for patroling.
 	unsigned int WaitingCycle; /// number of cycle pathfinder wait.

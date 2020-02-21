@@ -403,6 +403,19 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+
+	const Vec2i invalidPos(-1, -1);
+
+	Vec2i startPos = unit.tilePos;
+	COrderPtr *prevOrder = &unit.Orders.back();
+
+	if(*prevOrder != NULL) {
+		Vec2i prevGoalPos = (*prevOrder)->GetGoalPos();
+		if(prevGoalPos != invalidPos) {
+			startPos = prevGoalPos;
+		}
+	}
+
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
@@ -414,7 +427,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionPatrol(unit.tilePos, pos);
+	*order = COrder::NewActionPatrol(startPos, pos);
 
 	ClearSavedAction(unit);
 }
