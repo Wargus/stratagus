@@ -68,6 +68,7 @@ public:
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
+	virtual const Vec2i GetGoalPos() const;
 private:
 	int MoveToResource_Terrain(CUnit &unit);
 	int MoveToResource_Unit(CUnit &unit);

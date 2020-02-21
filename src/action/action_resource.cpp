@@ -1369,4 +1369,19 @@ void COrder_Resource::Execute(CUnit &unit)
 	}
 }
 
+/**
+**  Get goal position
+*/
+/* virtual */ const Vec2i COrder_Resource::GetGoalPos() const
+{
+	const Vec2i invalidPos(-1, -1);
+	if (goalPos != invalidPos) {
+		return goalPos;
+	}
+	if (this->HasGoal()) {
+		return this->GetGoal()->tilePos;
+	}
+	return invalidPos;
+}
+
 //@}
