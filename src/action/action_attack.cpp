@@ -125,6 +125,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		order->goalPos = dest;
 		order->isAttackMove = true;
 		order->attackMovePos = dest;
+		order->State = AUTO_TARGETING;
 	}
 	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
 		order->SkirmishRange = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -165,7 +166,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-
+//	file.printf(" \"is-amove\", %d,", this->isAttackMove);
+//	file.printf(" \"amove-tile\", {%d, %d},", this->attackMovePos.x, this->attackMovePos.y);
 	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
@@ -189,6 +191,16 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+/*		
+	} else if (!strcmp(value, "is-amove")) {
+		++j;
+		this->isAttackMove = LuaToNumber(l, -1, j + 1);
+	} else if (!strcmp(value, "amove-tile")) {
+		++j;
+		lua_rawgeti(l, -1, j + 1);
+		CclGetPos(l, &this->attackMovePos.x , &this->attackMovePos.y);
+		lua_pop(l, 1);
+*/
 	} else {
 		return false;
 	}
@@ -317,7 +329,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 
 	// Position or valid target, it is ok.
-	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
+	if (!goal || (goal->IsAliveOnMap() && goal->IsVisibleAsGoal(*unit.Player))) {
 		return false;
 	}
 
@@ -336,6 +348,58 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 }
 
 /**
+**  Turn unit to Target or position on map for attack.
+**
+**  @param unit    Unit to turn.
+**  @param target  Turn to this Target. If NULL then turn to goalPos.
+**
+*/
+void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
+{
+	const Vec2i dir = target ? (target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos)
+							 : (this->goalPos - unit.tilePos);
+	const unsigned char oldDir = unit.Direction;
+
+	UnitHeadingFromDeltaXY(unit, dir);
+	if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+		unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+		unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+		if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+			unit.Direction = leftTurn;
+		} else {
+			unit.Direction = rightTurn;
+		}
+		UnitUpdateHeading(unit);
+	}
+}
+
+/**
+**  Set target for attack in auto-attack mode. 
+**  Also if there is no active target Attack-Move action will be saved.
+**
+**  @param unit    Attacker.
+**  @param target  Turn to this Target. If NULL then turn to goalPos.
+**
+*/
+void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
+{
+	// Save current command to come back.
+	if (!this->HasGoal())
+	{
+		COrder *savedOrder = COrder::NewActionAttack(unit, this->attackMovePos);
+		if (unit.CanStoreOrder(savedOrder) == false) {
+			delete savedOrder;
+			savedOrder = NULL;
+		} else {
+			unit.SavedOrder = savedOrder;
+		}
+	}
+	this->SetGoal(target);
+	this->goalPos = target->tilePos;
+	this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+}
+
+/**
 **  Change invalid target for new target in range.
 **
 **  @param unit  Unit to check if goal is in range
@@ -344,6 +408,11 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 */
 bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 {
+
+	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
+		return false;
+	}
+
 	// Target is dead?
 	if (CheckForDeadGoal(unit)) {
 		return true;
@@ -354,48 +423,19 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->Finished = true;
 			return true;
 		}
-	}	
-	// No goal: if meeting enemy attack it.
-	if (!this->HasGoal()
-		&& this->Action != UnitActionAttackGround
-		&& !Map.WallOnMap(this->goalPos)) {
-
-		this->State |= AUTO_TARGETING;
-
-		CUnit *goal = AttackUnitsInReactRange(unit);
-
-		if (goal) {
-			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
-
-			if (unit.CanStoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			} else {
-				unit.SavedOrder = savedOrder;
-			}
-			this->SetGoal(goal);
-			this->MinRange = unit.Type->MinAttackRange;
-			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			this->goalPos = goal->tilePos;
-		}
-		// Have a weak target, try a better target.
-	} else if (this->HasGoal() && (this->State & AUTO_TARGETING || unit.Player->AiEnabled)) {
-		CUnit *goal = this->GetGoal();
-		CUnit *newTarget = AttackUnitsInReactRange(unit);
-
-		if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-			COrder *savedOrder = NULL;
-			if (unit.CanStoreOrder(this)) {
-				savedOrder = this->Clone();
-			}
-			if (savedOrder != NULL) {
-				unit.SavedOrder = savedOrder;
-			}
-			this->SetGoal(newTarget);
-			this->goalPos = newTarget->tilePos;
-		}
 	}
 
+	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
+		CUnit *goal = this->GetGoal();
+		CUnit *newTarget = AttackUnitsInReactRange(unit);
+		if (newTarget) {
+			if (!goal
+				|| (goal && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal))) {
+
+				SetAutoTarget(unit, newTarget);					
+			}
+		}
+	}
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	return false;
 }
@@ -422,36 +462,26 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (!GameSettings.Inside 
+				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+
 				err = PF_REACHED;
 			}
 		}
 	}
 	if (err >= 0) {
-		if (CheckForTargetInRange(unit)) {
-			return;
-		}
+		CheckForTargetInRange(unit);
 		return;
 	}
 	if (err == PF_REACHED) {
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (!GameSettings.Inside 
+				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+
 				// Reached another unit, now attacking it
-				unsigned char oldDir = unit.Direction;
-				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-				UnitHeadingFromDeltaXY(unit, dir);
-				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
-					unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
-					unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
-					if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
-						unit.Direction = leftTurn;
-					} else {
-						unit.Direction = rightTurn;
-					}
-					UnitUpdateHeading(unit);
-				}
+				TurnToTarget(unit, goal);
 				this->State &= AUTO_TARGETING;
 				this->State |= ATTACK_TARGET;
 				return;
@@ -459,22 +489,13 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 		// Attacking wall or ground.
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
-			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+			|| (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (!GameSettings.Inside 
+				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+
 				// Reached wall or ground, now attacking it
-				unsigned char oldDir = unit.Direction;
-				UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
-				if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
-					unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
-					unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
-					if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
-						unit.Direction = leftTurn;
-					} else {
-						unit.Direction = rightTurn;
-					}
-					UnitUpdateHeading(unit);
-				}
+				TurnToTarget(unit, NULL);
 				this->State &= AUTO_TARGETING;
 				this->State |= ATTACK_TARGET;
 				return;
@@ -482,7 +503,6 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 	}
 	// Unreachable.
-
 	if (err == PF_UNREACHABLE) {
 		if (!this->HasGoal()) {
 			// When attack-moving we have to allow a bigger range
@@ -513,84 +533,42 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return;
 	}
-
 	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
 		return;
 	}
-
 	// Target is dead ? Change order ?
 	if (CheckForDeadGoal(unit)) {
 		return;
 	}
 	CUnit *goal = this->GetGoal();
+	
 	bool dead = !goal || goal->IsAlive() == false;
 	if (dead && !(this->State & AUTO_TARGETING)){
 		this->Finished = true;
 		return;
 	}
 
-	if (this->State & AUTO_TARGETING){
-		// No target choose one.
-		if (!goal) {
-			goal = AttackUnitsInReactRange(unit);
+	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
+		CUnit *newTarget = AttackUnitsInReactRange(unit);
+		if (newTarget) {
+			if (!goal
+				|| (goal && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal))) {
 
-			// No new goal, continue way to destination.
-			if (!goal) {
-				// Return to old task ?
-				if (unit.RestoreOrder()) {
-					return;
-				}
-				this->State = MOVE_TO_TARGET | AUTO_TARGETING;	
-				return;
-			}
-
-/*
-			// Save current command to come back.
-			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
-
-			if (unit.CanStoreOrder(savedOrder) == false) {
-				delete savedOrder;
-				savedOrder = NULL;
-			} else {
-				unit.SavedOrder = savedOrder;
-			}
-*/
-			this->SetGoal(goal);
-			this->goalPos = goal->tilePos;
-			this->MinRange = unit.Type->MinAttackRange;
-			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			this->State = MOVE_TO_TARGET | AUTO_TARGETING;
-
-			// Have a weak target, try a better target.
-			// FIXME: if out of range also try another target quick
-		} else {
-			CUnit *newTarget = AttackUnitsInReactRange(unit);
-			if (newTarget && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-				if (unit.CanStoreOrder(this)) {
-					unit.SavedOrder = this->Clone();
-				}
+				SetAutoTarget(unit, newTarget);
 				goal = newTarget;
-				this->SetGoal(newTarget);
-				this->goalPos = newTarget->tilePos;
-				this->MinRange = unit.Type->MinAttackRange;
-				this->State = MOVE_TO_TARGET | AUTO_TARGETING;
-			}
+				this->State = MOVE_TO_TARGET | AUTO_TARGETING;			
+				}
 		}
+		if (!goal && unit.RestoreOrder()) {
+			return;
+		}		
 	}
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max
-		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
-		// towers don't chase after goal
-		if (unit.CanMove()) {
-			if (unit.CanStoreOrder(this)) {
-				if (dead) {
-					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
-				}else {
-					unit.SavedOrder = this->Clone();
-				}
-			}
-		}
+		|| (GameSettings.Inside 
+			&& CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+
 		unit.Frame = 0;
 		this->State &= AUTO_TARGETING;
 		this->State |= MOVE_TO_TARGET;
@@ -602,19 +580,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 	// Turn always to target
 	if (goal) {
-		const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
-		unsigned char oldDir = unit.Direction;
-		UnitHeadingFromDeltaXY(unit, dir);
-		if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
-			unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
-			unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
-			if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
-				unit.Direction = leftTurn;
-			} else {
-				unit.Direction = rightTurn;
-			}
-			UnitUpdateHeading(unit);
-		}
+		TurnToTarget(unit, goal);
 	}
 }
 
@@ -654,43 +620,32 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	switch (this->State) {
-		case 0: { // First entry
+		case 0:  
+		case AUTO_TARGETING:// First entry
 			// did Order change ?
 			if (CheckForTargetInRange(unit)) {
 				return;
 			}
 			// Can we already attack ?
 			if (this->HasGoal()) {
-				CUnit &goal = *this->GetGoal();
-				const int dist = goal.MapDistanceTo(unit);
+				CUnit *goal = this->GetGoal();
+				const int dist = goal->MapDistanceTo(unit);
 
-				if (unit.Type->MinAttackRange < dist &&
-					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
-						unsigned char oldDir = unit.Direction;
-						UnitHeadingFromDeltaXY(unit, dir);
-						if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
-							unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
-							unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
-							if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
-								unit.Direction = leftTurn;
-							} else {
-								unit.Direction = rightTurn;
-							}
-							UnitUpdateHeading(unit);
-						}
+				if (unit.Type->MinAttackRange < dist 
+					&& dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+					if (!GameSettings.Inside 
+						|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+						
+						TurnToTarget(unit, goal);
 						this->State |= ATTACK_TARGET;
 						AttackTarget(unit);
 						return;
 					}
 				}
-			} else {
-				this->State |= AUTO_TARGETING;
 			}
 			this->State |= MOVE_TO_TARGET;
 			// FIXME: should use a reachable place to reduce pathfinder time.
-		}
+		
 		// FALL THROUGH
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + AUTO_TARGETING:
@@ -704,10 +659,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		case ATTACK_TARGET:
 		case ATTACK_TARGET + AUTO_TARGETING:
 			AttackTarget(unit);
-			break;
-
-		case AUTO_TARGETING:
-			DebugPrint("FIXME: wrong entry.\n");
 			break;
 	}
 }

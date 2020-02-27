@@ -61,6 +61,8 @@ public:
 
 private:
 	bool CheckForDeadGoal(CUnit &unit);
+	void TurnToTarget(CUnit &unit, const CUnit *target);
+	void SetAutoTarget(CUnit &unit, CUnit *target);
 	bool CheckForTargetInRange(CUnit &unit);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);
