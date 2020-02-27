@@ -2671,6 +2671,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	COrder *savedOrder = NULL;
 
 	if (target.Player->AiEnabled == false) {
+		return;
+/*		
 		if (target.CurrentAction() == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsWeakTargetSelected() == false) {
@@ -2679,6 +2681,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		} else {
 			return;
 		}
+*/
 	}
 	if (target.CanStoreOrder(target.CurrentOrder())) {
 		savedOrder = target.CurrentOrder()->Clone();
