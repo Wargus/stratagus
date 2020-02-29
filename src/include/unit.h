@@ -76,14 +76,29 @@ typedef COrder *COrderPtr;
 
 /*
 ** Configuration of the small (unit) AI.
+** sPPP PPdd dddd dddd 0000 0000 0hhh hhhh 
+** s... .ppp pppp p... .... .... .... ....
+** s... ...I .... .... iiii i... .... ....                             
+** s... .... .... c... .... .... .... ....
 */
-#define PRIORITY_FACTOR   0x00080000
-#define HEALTH_FACTOR     0x00000001
-#define DISTANCE_FACTOR   0x00010000
-#define INRANGE_FACTOR    0x00008000
-#define INRANGE_BONUS     0x01000000
-#define CANATTACK_BONUS   0x00080000
-#define AIPRIORITY_BONUS  0x04000000
+#define PRIORITY_FACTOR   0x00080000   /// p
+#define HEALTH_FACTOR     0x00000001   /// h (0..100)%
+#define DISTANCE_FACTOR   0x00010000   /// d (0..1023)
+#define INRANGE_FACTOR    0x00008000   /// i (0..31)
+#define INRANGE_BONUS     0x01000000   /// I
+#define CANATTACK_BONUS   0x00080000   /// c
+#define AIPRIORITY_BONUS  0x04000000   /// P (0..31)
+
+/*
+** Same for alternate (simplified) implementation of the small (unit) AI.
+** sA00 PPPP  Pppp pppp  pddd dddd  dhhh hhhh
+*/
+#define ALTERNATE_AT		  /* Activate alternative auto targeting algorithm */
+#define AT_THREAT_FACTOR      0x40000000 /// A
+#define AT_PRIORITY_OFFSET    15         /// p (0..255)
+#define AT_AIPRIORITY_OFFSET  23         /// P (0..31) 
+#define AT_DISTANCE_OFFSET    7          /// d (0..255) TODO: may be to make range smaller
+#define AT_PRIORITY_MASK_HI   0xFFFF8000 /// Mask for checking only priority (without distance part)
 
 
 /// Called whenever the selected unit was updated
@@ -433,7 +448,7 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false),
+		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(true),
 		IconFrameG(NULL), PressedIconFrameG(NULL),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -450,6 +465,9 @@ public:
 	bool MineNotifications;    /// Show mine is running low/depleted messages
 	bool DeselectInMine;       /// Deselect peasants in mines
 	bool NoStatusLineTooltips; /// Don't show messages on status line
+
+/// FIXME: 	Doesn't change in menu
+	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
 
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
@@ -566,6 +584,14 @@ extern void LetUnitDie(CUnit &unit, bool suicide = false);
 extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI
 extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
+extern int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest);
+
+/// Is target within reaction range of this unit?
+extern bool InReactRange(const CUnit &unit, const CUnit &target);
+/// Is target within attack range of this unit?
+extern bool InAttackRange(const CUnit &unit, const CUnit &target);
+
+
 /// Hit unit with damage, if destroyed give attacker the points
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
 

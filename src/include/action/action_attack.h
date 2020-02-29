@@ -64,6 +64,7 @@ private:
 	void TurnToTarget(CUnit &unit, const CUnit *target);
 	void SetAutoTarget(CUnit &unit, CUnit *target);
 	bool EndActionAttack(CUnit &unit, const bool canBeFinished);
+	bool AutoSelectTarget(CUnit &unit);	
 	bool CheckForTargetInRange(CUnit &unit);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);

@@ -54,9 +54,11 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+#include "tileset.h"
 #include "translate.h"
 #include "ui.h"
 #include "unit_find.h"
@@ -2447,8 +2449,8 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	const CUnitType &dtype = *dest.Type;
 	int cost = 0;
 
-	// Buildings, non-aggressive and invincible units have the lowest priority
-	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
+	// Buildings, non-aggressive (except workers) and invincible units have the lowest priority
+	if ((dest.IsAgressive() == false && !dest.Type->BoolFlag[HARVESTER_INDEX].value) || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
 		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
@@ -2487,6 +2489,124 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 		cost -= CANATTACK_BONUS;
 	}
 	return cost;
+}
+
+int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest) /*(const CUnit &attacker, const CUnit &dest)*/
+{
+	const CPlayer &player 	= *attacker->Player;
+	const CUnitType &type 	= *attacker->Type;
+	const CUnitType &dtype 	= *dest->Type;
+
+	if (!player.IsEnemy(*dest) // a friend or neutral
+		|| !dest->IsVisibleAsGoal(player)
+		|| !CanTarget(type, dtype)) {
+		return INT_MIN;
+	}
+	// Don't attack invulnerable units
+	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+		return INT_MIN;
+	}
+	
+	const int attackrange 	= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int pathLength 	= UnitReachable(*attacker, *dest, attackrange);
+	int distance 			= attacker->MapDistanceTo(*dest);	
+
+DebugPrint("Target: %s[%d], Distance: %d, PathLength: %d \n" _C_ dest->Type->Ident.c_str() _C_ InAttackRange(*attacker, *dest) _C_ distance _C_ pathLength);
+
+	if (distance > attackrange && pathLength == 0) {
+		return INT_MIN;
+	}	
+
+	const int reactionRange = (player.Type == PlayerPerson) ? type.ReactRangePerson 
+															: type.ReactRangeComputer;
+	// FIXME: may be not to throw away this target, just to make priority lower? 
+	if (pathLength + 1 > reactionRange + reactionRange >> 1) {
+		return INT_MIN;
+	}
+
+	// Attack walls only if we are stuck in them
+	if (dtype.BoolFlag[WALL_INDEX].value && distance > 1) {
+		return INT_MIN;
+	}
+
+	// Calculate the costs to attack the unit.
+	// Unit with the smallest attack costs will be taken.
+	int priority = 0;
+
+	// is Threat?
+	// Unit can attack back.
+	if (CanTarget(dtype, type)) {
+		priority |= AT_THREAT_FACTOR;
+	}
+
+	// Check Priority
+	// Priority 0-255
+	priority |= (dtype.DefaultStat.Variables[PRIORITY_INDEX].Value << AT_PRIORITY_OFFSET);
+
+	// AI Priority
+	int ai_priority = 0;
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
+				(dtype.BoolFlag[i].value)) {
+				ai_priority++;
+			}
+			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
+				(dtype.BoolFlag[i].value)) {
+				ai_priority--;
+			}
+		}
+	}
+	// AI Priority (0-31)
+	priority |= (ai_priority > 31 ? 31 : (ai_priority < 0 ? 0 : ai_priority)) << AT_AIPRIORITY_OFFSET;
+
+	// Calc distance factor (0-255)
+	// FIXME: count MinAttackRange
+	distance = (distance == 1) ? distance : pathLength + 1;
+	priority |= (255 - (distance > 255 ? 255 : distance)) << AT_DISTANCE_OFFSET;
+
+	// Remaining HP (Health) (0..100)%
+	priority |= 100 - dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max;
+
+	return priority;
+}
+
+/**
+**  Returns true, if target is in reaction range of the unit
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**
+**  @param unit    Unit to check for.
+**	@param target  Checked target.
+**
+**  @return       True if within react range, false otherwise.
+*/
+bool InReactRange(const CUnit &unit, const CUnit &target)
+{
+	const int distance 	= unit.MapDistanceTo(target);
+	const int range 	= (unit.Player->Type == PlayerPerson)
+												? unit.Type->ReactRangePerson 
+												: unit.Type->ReactRangeComputer;
+	return distance <= range;
+}
+
+/**
+**  Returns true, if target is in attack range of the unit and there is no obstacles between them (when inside caves)
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**   
+**  @param unit    Unit to check for.
+**	@param target  Checked target.
+**
+**  @return       True if in attack range, false otherwise.
+*/
+bool InAttackRange(const CUnit &unit, const CUnit &target)
+{
+	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minRange 	= unit.Type->MinAttackRange;
+	const int distance 	= unit.MapDistanceTo(target);	
+	
+	return (minRange <= distance && distance <= range)
+			&& (!GameSettings.Inside 
+				|| CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
 }
 
 static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)

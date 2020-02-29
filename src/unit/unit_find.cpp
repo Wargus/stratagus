@@ -701,14 +701,22 @@ private:
 	CUnit *Find(Iterator begin, Iterator end) const
 	{
 		CUnit *enemy = NULL;
-		int best_cost = INT_MAX;
+		int best_cost = Preference.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
 
 		for (Iterator it = begin; it != end; ++it) {
-			const int cost = ComputeCost(*it);
-
-			if (cost < best_cost) {
-				enemy = *it;
-				best_cost = cost;
+			int cost = Preference.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
+			
+			if (Preference.SimplifiedAutoTargeting)
+			{
+				if (cost > best_cost) {
+					enemy = *it;
+					best_cost = cost;
+				}			
+			} else {
+				if (cost < best_cost) {
+					enemy = *it;
+					best_cost = cost;
+				}
 			}
 		}
 		return enemy;
@@ -1001,8 +1009,17 @@ private:
 	CUnit *Find(Iterator begin, Iterator end)
 	{
 		for (Iterator it = begin; it != end; ++it) {
-			Compute(*it);
-		}
+            if (Preference.SimplifiedAutoTargeting) {
+				int cost = TargetPriorityCalculate(attacker, *it); 
+				
+				if (cost > best_cost) {
+					best_unit = *it;
+					best_cost = cost;
+				}
+			} else { 
+				Compute(*it);
+			}
+		} 
 		return best_unit;
 	}
 
@@ -1097,7 +1114,7 @@ struct CompareUnitDistance {
 **  @param goal     Second tile
 **  @param flags    Terrain type to check
 **
-**  @return         true, if an obstacle was found, false otherwise
+**  @return         false, if an obstacle was found, true otherwise
 */
 bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
 {
