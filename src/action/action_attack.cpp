@@ -123,7 +123,6 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		order->MinRange = attacker.Type->MinAttackRange;
 	} else {
 		order->goalPos = dest;
-		order->isAttackMove = true;
 		order->attackMovePos = dest;
 		order->State = AUTO_TARGETING;
 	}
@@ -166,7 +165,6 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-//	file.printf(" \"is-amove\", %d,", this->isAttackMove);
 //	file.printf(" \"amove-tile\", {%d, %d},", this->attackMovePos.x, this->attackMovePos.y);
 	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
@@ -192,9 +190,6 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
 /*		
-	} else if (!strcmp(value, "is-amove")) {
-		++j;
-		this->isAttackMove = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "amove-tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -225,24 +220,25 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	PixelPos targetPos;
 	PixelPos orderedPos;
+	bool isAttackMove = this->State & AUTO_TARGETING ? true : false;
 
 	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
 								: vp.TilePosToScreen_Center(this->goalPos);
 
-	orderedPos = this->isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
-									: targetPos;
+	orderedPos = isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
+							  : targetPos;
 	
-	Uint32 color = this->isAttackMove ? ColorOrange : ColorRed;
+	Uint32 color = isAttackMove ? ColorOrange : ColorRed;
 	Video.FillCircleClip(color, lastScreenPos, 2);
 	Video.DrawLineClip(ColorRed, lastScreenPos, orderedPos);
 	Video.FillCircleClip(color, orderedPos, 3);
 
-	if (this->isAttackMove && this->HasGoal()){
+	if (isAttackMove && this->HasGoal()) {
 		Video.DrawLineClip(ColorOrange, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorOrange, targetPos, 3);
 	}
 
-	return this->isAttackMove ? orderedPos : targetPos;
+	return isAttackMove ? orderedPos : targetPos;
 }
 
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
@@ -329,7 +325,7 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 
 	// Position or valid target, it is ok.
-	if (!goal || (goal->IsAliveOnMap() && goal->IsVisibleAsGoal(*unit.Player))) {
+	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
 		return false;
 	}
 
