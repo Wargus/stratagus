@@ -165,7 +165,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
-//	file.printf(" \"amove-tile\", {%d, %d},", this->attackMovePos.x, this->attackMovePos.y);
+	file.printf(" \"amove-tile\", {%d, %d},", this->attackMovePos.x, this->attackMovePos.y);
 	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
 }
@@ -189,13 +189,13 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-/*		
+		
 	} else if (!strcmp(value, "amove-tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->attackMovePos.x , &this->attackMovePos.y);
 		lua_pop(l, 1);
-*/
+
 	} else {
 		return false;
 	}
