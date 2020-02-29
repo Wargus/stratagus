@@ -418,19 +418,17 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		return true;
 	}
 
-	if (this->State && !(this->State & AUTO_TARGETING)) {
-		if (!this->HasGoal() || !this->GetGoal()->IsAlive()){
-			this->Finished = true;
-			return true;
-		}
+	if (!this->HasGoal() && !(this->State & AUTO_TARGETING)){
+		this->Finished = true;
+		return true;
 	}
-
+	
 	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
 		CUnit *goal = this->GetGoal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 		if (newTarget) {
 			if (!goal
-				|| (goal && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal))) {
+				|| ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 
 				SetAutoTarget(unit, newTarget);					
 			}
@@ -540,26 +538,25 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (CheckForDeadGoal(unit)) {
 		return;
 	}
-	CUnit *goal = this->GetGoal();
-	
-	bool dead = !goal || goal->IsAlive() == false;
-	if (dead && !(this->State & AUTO_TARGETING)){
+	if (!this->HasGoal() && !(this->State & AUTO_TARGETING)){
 		this->Finished = true;
 		return;
 	}
-
+	
+	CUnit *goal = this->GetGoal();
 	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 		if (newTarget) {
 			if (!goal
-				|| (goal && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal))) {
+				|| ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 
 				SetAutoTarget(unit, newTarget);
 				goal = newTarget;
 				this->State = MOVE_TO_TARGET | AUTO_TARGETING;			
 				}
 		}
-		if (!goal && unit.RestoreOrder()) {
+		if (!goal) {
+		 	unit.RestoreOrder();
 			return;
 		}		
 	}
