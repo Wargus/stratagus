@@ -191,7 +191,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-		
+
 	} else if (!strcmp(value, "amove-tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -375,10 +375,75 @@ void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 */
 void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 {
+	if (this->HasGoal()) {
+		this->ClearGoal();
+	}
 	this->SetGoal(target);
-	this->goalPos = target->tilePos;
-	this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-	this->MinRange = unit.Type->MinAttackRange;
+	this->goalPos 			= target->tilePos;
+	this->Range 			= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	this->MinRange 			= unit.Type->MinAttackRange;
+	if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value)
+		this->SkirmishRange = this->Range;
+}
+
+ /**
+ ** Select target in auto attack mode
+ **
+ ** return true if we have a target, false if can't find any 
+ **/
+bool COrder_Attack::AutoSelectTarget(CUnit &unit)
+{
+	// if unit can't attack, or if unit is not bunkered and removed - exit, no targets
+	if (unit.Type->CanAttack == false
+		|| (unit.Removed
+			&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false))) {
+		return false;
+	}
+	CUnit *goal = this->GetGoal();
+	CUnit *newTarget = NULL;
+
+	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
+	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	
+	if (immobile) {
+		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range 
+	} else {
+		newTarget = AttackUnitsInReactRange(unit); // search for enemies in reaction range
+	}
+
+    if (goal /// if goal is Valid
+		&& goal->IsVisibleAsGoal(*unit.Player) 
+		&& CanTarget(*unit.Type, *goal->Type)
+		&& (immobile ? InAttackRange(unit, *goal) : InReactRange(unit, *goal))) {
+				
+		if (newTarget && newTarget != goal) {
+			if (Preference.SimplifiedAutoTargeting) {
+				const int goal_priority			= TargetPriorityCalculate(&unit, goal);
+				const int newTarget_priority 	= TargetPriorityCalculate(&unit, newTarget);
+
+				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
+					SetAutoTarget(unit, newTarget);
+				} else if (!immobile
+							&& (!InAttackRange(unit, *goal) && newTarget_priority > goal_priority)) {
+							SetAutoTarget(unit, newTarget);
+				}
+			} else {
+				if (ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
+					SetAutoTarget(unit, newTarget);
+				}
+			}
+		}	
+	} else {
+		if (goal) {
+			this->ClearGoal();
+		} 
+		if (newTarget) {
+			SetAutoTarget(unit, newTarget);
+		} else {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
@@ -393,13 +458,13 @@ bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true
 {
 	if (!unit.RestoreOrder()) {
 		if (IsAutoTargeting() && this->goalPos != this->attackMovePos) {
-			this->goalPos = this->attackMovePos;
-			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			this->MinRange = unit.Type->MinAttackRange;				 
-			this->State = AUTO_TARGETING;
+			this->goalPos 	= this->attackMovePos;
+			this->Range 	= 0;
+			this->MinRange 	= 0;				 
+			this->State 	= AUTO_TARGETING;
 			return false;
 		}
-		this->Finished = canBeFinished ? true : false;
+		this->Finished 		= canBeFinished ? true : false;
 		return true;
 	}
 	return false;
@@ -422,18 +487,15 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		EndActionAttack(unit);
 		return true;
 	}
-
+	
 	if (IsAutoTargeting() || unit.Player->AiEnabled) {
-		CUnit *goal = this->GetGoal();
-		CUnit *newTarget = AttackUnitsInReactRange(unit);
-		if (newTarget) {
-			if (!goal
-				|| ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-
-				SetAutoTarget(unit, newTarget);					
-			}
+		static bool hadGoal = this->HasGoal();
+		if (!AutoSelectTarget(unit) && hadGoal) {
+			EndActionAttack(unit, RESTORE_ONLY);
+			return true;
 		}
 	}
+
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	return false;
 }
@@ -501,6 +563,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 	}
 	// Unreachable.
+	// FIXME: look at this
 	if (err == PF_UNREACHABLE) {
 		if (!this->HasGoal()) {
 			// When attack-moving we have to allow a bigger range
@@ -537,42 +600,20 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		return;
 	}
 
-	CUnit *goal = this->GetGoal();
 	if (IsAutoTargeting() || unit.Player->AiEnabled) {
-		CUnit *newTarget = AttackUnitsInReactRange(unit);
-		if (newTarget) {
-			if (!goal
-				|| ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
-
-				SetAutoTarget(unit, newTarget);
-				goal = newTarget;
-				this->State = MOVE_TO_TARGET | AUTO_TARGETING;			
-				}
-		}
-		if (!goal) { 
+		if (!AutoSelectTarget(unit)) {
 			EndActionAttack(unit, RESTORE_ONLY);
 			return;
-		}		
+		}
 	}
-	// Still near to target, if not goto target.
-	const int dist = unit.MapDistanceTo(*goal);
-	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max
-		|| (GameSettings.Inside 
-			&& CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
-
-		unit.Frame = 0;
+	// FIXME: What to when Distance < MinAttackRange?
+	CUnit *goal = this->GetGoal();
+	if (!InAttackRange(unit, *goal)) {
+		unit.Frame 	= 0;
 		this->State &= AUTO_TARGETING;
 		this->State |= MOVE_TO_TARGET;
 	}
-	if (dist < unit.Type->MinAttackRange) {
-		this->State &= AUTO_TARGETING;
-		this->State |= MOVE_TO_TARGET;		
-	}
-
-	// Turn always to target
-	if (goal) {
-		TurnToTarget(unit, goal);
-	}
+	TurnToTarget(unit, goal);
 }
 
 /**
@@ -618,20 +659,12 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				return;
 			}
 			// Can we already attack ?
-			if (this->HasGoal()) {
+			if (this->GetGoal()) {
 				CUnit *goal = this->GetGoal();
-				const int dist = goal->MapDistanceTo(unit);
-
-				if (unit.Type->MinAttackRange < dist 
-					&& dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					if (!GameSettings.Inside 
-						|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-						
-						TurnToTarget(unit, goal);
-						this->State |= ATTACK_TARGET;
-						AttackTarget(unit);
-						return;
-					}
+				if (InAttackRange(unit, *goal)) {
+					TurnToTarget(unit, goal);
+					this->State |= ATTACK_TARGET;
+					AttackTarget(unit);
 				}
 			}
 			this->State |= MOVE_TO_TARGET;
