@@ -63,11 +63,12 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
+#define FIRST_ENTRY		 0
 #define AUTO_TARGETING   2  /// Targets will be selected by small (unit's) AI
 #define MOVE_TO_TARGET   4  /// Move to target state
 #define ATTACK_TARGET    5  /// Attack target state
 
-#define RESTORE_ONLY false
+#define RESTORE_ONLY false  /// Do not finish this order, only restore saved
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -610,9 +611,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	switch (this->State) {
-		case 0:  
-		case AUTO_TARGETING:// First entry
-			// did Order change ?
+		case FIRST_ENTRY:  
+		case AUTO_TARGETING:
+			
 			if (CheckForTargetInRange(unit)) {
 				return;
 			}
