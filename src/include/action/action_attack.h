@@ -60,9 +60,10 @@ public:
 	bool IsAutoTargeting() const;
 
 private:
-	bool CheckForDeadGoal(CUnit &unit);
+	bool CheckIfGoalValid(CUnit &unit);
 	void TurnToTarget(CUnit &unit, const CUnit *target);
 	void SetAutoTarget(CUnit &unit, CUnit *target);
+	bool EndActionAttack(CUnit &unit, const bool canBeFinished);
 	bool CheckForTargetInRange(CUnit &unit);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);

@@ -67,6 +67,7 @@
 #define MOVE_TO_TARGET   4  /// Move to target state
 #define ATTACK_TARGET    5  /// Attack target state
 
+#define RESTORE_ONLY false
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -220,7 +221,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	PixelPos targetPos;
 	PixelPos orderedPos;
-	bool isAttackMove = this->State & AUTO_TARGETING ? true : false;
+	bool isAttackMove = IsAutoTargeting() ? true : false;
 
 	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
 								: vp.TilePosToScreen_Center(this->goalPos);
@@ -299,34 +300,33 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 
-bool COrder_Attack::IsWeakTargetSelected() const
+inline bool COrder_Attack::IsWeakTargetSelected() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
 }
-bool COrder_Attack::IsAutoTargeting() const
+inline bool COrder_Attack::IsAutoTargeting() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
 }
 
 /**
-**  Check for dead goal.
+**  Check for dead/valid goal.
 **
-**  @warning  The caller must check, if he likes the restored SavedOrder!
 **
 **  @todo     If a unit enters an building, than the attack choose an
 **            other goal, perhaps it is better to wait for the goal?
 **
 **  @param unit  Unit using the goal.
 **
-**  @return      true if order have changed, false else.
+**  @return      true if target is valid, false else.
 */
-bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
+bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 {
 	CUnit *goal = this->GetGoal();
 
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
-		return false;
+		return true;
 	}
 
 	// Goal could be destroyed or unseen
@@ -335,11 +335,6 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	this->MinRange = 0;
 	this->Range = 0;
 	this->ClearGoal();
-
-	// If we have a saved order continue this saved order.
-	if (unit.RestoreOrder()) {
-		return true;
-	}
 	return false;
 }
 
@@ -379,22 +374,35 @@ void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 */
 void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 {
-	// Save current command to come back.
-	if (!this->HasGoal())
-	{
-		COrder *savedOrder = COrder::NewActionAttack(unit, this->attackMovePos);
-		if (unit.CanStoreOrder(savedOrder) == false) {
-			delete savedOrder;
-			savedOrder = NULL;
-		} else {
-			unit.SavedOrder = savedOrder;
-		}
-	}
 	this->SetGoal(target);
 	this->goalPos = target->tilePos;
 	this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	this->MinRange = unit.Type->MinAttackRange;
 }
 
+/**
+**  Restore action/order when current action is finished
+**
+**  @param unit  
+**  @param canBeFinished    False if ony restore order/action needed 
+**
+**  @return      			false if order/action restored, true else (if order finished).
+*/
+bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true)
+{
+	if (!unit.RestoreOrder()) {
+		if (IsAutoTargeting() && this->goalPos != this->attackMovePos) {
+			this->goalPos = this->attackMovePos;
+			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+			this->MinRange = unit.Type->MinAttackRange;				 
+			this->State = AUTO_TARGETING;
+			return false;
+		}
+		this->Finished = canBeFinished ? true : false;
+		return true;
+	}
+	return false;
+}
 /**
 **  Change invalid target for new target in range.
 **
@@ -409,17 +417,12 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		return false;
 	}
 
-	// Target is dead?
-	if (CheckForDeadGoal(unit)) {
+	if (!CheckIfGoalValid(unit)) {
+		EndActionAttack(unit);
 		return true;
 	}
 
-	if (!this->HasGoal() && !(this->State & AUTO_TARGETING)){
-		this->Finished = true;
-		return true;
-	}
-	
-	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
+	if (IsAutoTargeting() || unit.Player->AiEnabled) {
 		CUnit *goal = this->GetGoal();
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 		if (newTarget) {
@@ -507,11 +510,8 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			this->ClearGoal();
 		}
 	}
-
-	// Return to old task?
-	if (!unit.RestoreOrder()) {
-		this->Finished = true;
-	}
+	EndActionAttack(unit);
+	return;
 }
 
 /**
@@ -530,17 +530,14 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
 		return;
 	}
-	// Target is dead ? Change order ?
-	if (CheckForDeadGoal(unit)) {
+
+	if (!CheckIfGoalValid(unit)) {
+		EndActionAttack(unit);
 		return;
 	}
-	if (!this->HasGoal() && !(this->State & AUTO_TARGETING)){
-		this->Finished = true;
-		return;
-	}
-	
+
 	CUnit *goal = this->GetGoal();
-	if (this->State & AUTO_TARGETING || unit.Player->AiEnabled) {
+	if (IsAutoTargeting() || unit.Player->AiEnabled) {
 		CUnit *newTarget = AttackUnitsInReactRange(unit);
 		if (newTarget) {
 			if (!goal
@@ -551,8 +548,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				this->State = MOVE_TO_TARGET | AUTO_TARGETING;			
 				}
 		}
-		if (!goal) {
-		 	unit.RestoreOrder();
+		if (!goal) { 
+			EndActionAttack(unit, RESTORE_ONLY);
 			return;
 		}		
 	}
