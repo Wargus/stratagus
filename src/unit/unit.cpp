@@ -2534,6 +2534,7 @@ DebugPrint("Target: %s[%d], Distance: %d, PathLength: %d \n" _C_ dest->Type->Ide
 	int priority = 0;
 
 	// is Threat?
+	// FIXME: Add alwaysThreat property to CUnitType
 	// Unit can attack back.
 	if (CanTarget(dtype, type)) {
 		priority |= AT_THREAT_FACTOR;
@@ -2607,6 +2608,26 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 	return (minRange <= distance && distance <= range)
 			&& (!GameSettings.Inside 
 				|| CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
+}
+
+/**
+**  Returns true, if tile is in attack range of the unit and there is no obstacles between them (when inside caves)
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**   
+**  @param unit    Unit to check for.
+**	@param pos     Checked position.
+**
+**  @return       True if in attack range, false otherwise.
+*/
+bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
+{
+	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minRange 	= unit.Type->MinAttackRange;
+	const int distance 	= unit.MapDistanceTo(tilePos);	
+	
+	return (minRange <= distance && distance <= range)
+			&& (!GameSettings.Inside 
+				|| CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
 }
 
 static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
