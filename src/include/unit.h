@@ -590,6 +590,8 @@ extern int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *con
 extern bool InReactRange(const CUnit &unit, const CUnit &target);
 /// Is target within attack range of this unit?
 extern bool InAttackRange(const CUnit &unit, const CUnit &target);
+/// Is tile within attack range of this unit?
+extern bool InAttackRange(const CUnit &unit, const Vec2i &tilePos);
 
 
 /// Hit unit with damage, if destroyed give attacker the points

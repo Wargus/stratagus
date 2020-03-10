@@ -521,45 +521,35 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	// Look if we have reached the target.
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
-		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside 
-				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-
-				err = PF_REACHED;
-			}
+		if (InAttackRange(unit, this->goalPos)) {
+			err = PF_REACHED;
 		}
 	}
 	if (err >= 0) {
+		// FIXME: add change of State here in case of target changed
 		CheckForTargetInRange(unit);
 		return;
 	}
 	if (err == PF_REACHED) {
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
-		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside 
-				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-
-				// Reached another unit, now attacking it
-				TurnToTarget(unit, goal);
-				this->State &= AUTO_TARGETING;
-				this->State |= ATTACK_TARGET;
-				return;
-			}
+		if (goal && InAttackRange(unit, *goal)) {
+			// Reached another unit, now attacking it
+			TurnToTarget(unit, goal);
+			this->State &= AUTO_TARGETING;
+			this->State |= ATTACK_TARGET;
+			return;
 		}
 		// Attacking wall or ground.
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
 			|| (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
-			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside 
-				|| CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			&& InAttackRange(unit, this->goalPos)) {
 
-				// Reached wall or ground, now attacking it
-				TurnToTarget(unit, NULL);
-				this->State &= AUTO_TARGETING;
-				this->State |= ATTACK_TARGET;
-				return;
-			}
+			// Reached wall or ground, now attacking it
+			TurnToTarget(unit, NULL);
+			this->State &= AUTO_TARGETING;
+			this->State |= ATTACK_TARGET;
+			return;
 		}
 	}
 	// Unreachable.
@@ -606,7 +596,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			return;
 		}
 	}
-	// FIXME: What to when Distance < MinAttackRange?
+	// FIXME: What to do when Distance < MinAttackRange?
 	CUnit *goal = this->GetGoal();
 	if (!InAttackRange(unit, *goal)) {
 		unit.Frame 	= 0;
