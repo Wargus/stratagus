@@ -2509,28 +2509,21 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	
 	const int attackrange 	= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int pathLength 	= UnitReachable(*attacker, *dest, attackrange);
+	const int reactionRange = (player.Type == PlayerPerson) ? type.ReactRangePerson 
+															: type.ReactRangeComputer;
 	int distance 			= attacker->MapDistanceTo(*dest);	
-
-DebugPrint("Target: %s[%d], Distance: %d, PathLength: %d \n" _C_ dest->Type->Ident.c_str() _C_ InAttackRange(*attacker, *dest) _C_ distance _C_ pathLength);
 
 	if (distance > attackrange && pathLength == 0) {
 		return INT_MIN;
 	}	
-
-	const int reactionRange = (player.Type == PlayerPerson) ? type.ReactRangePerson 
-															: type.ReactRangeComputer;
-	// FIXME: may be not to throw away this target, just to make priority lower? 
-	if (pathLength + 1 > reactionRange + reactionRange >> 1) {
-		return INT_MIN;
-	}
 
 	// Attack walls only if we are stuck in them
 	if (dtype.BoolFlag[WALL_INDEX].value && distance > 1) {
 		return INT_MIN;
 	}
 
-	// Calculate the costs to attack the unit.
-	// Unit with the smallest attack costs will be taken.
+	// Calculate the priority to attack the unit.
+	// Unit with the highest attack priority will be taken.
 	int priority = 0;
 
 	// is Threat?
@@ -2540,26 +2533,35 @@ DebugPrint("Target: %s[%d], Distance: %d, PathLength: %d \n" _C_ dest->Type->Ide
 		priority |= AT_THREAT_FACTOR;
 	}
 
-	// Check Priority
-	// Priority 0-255
-	priority |= (dtype.DefaultStat.Variables[PRIORITY_INDEX].Value << AT_PRIORITY_OFFSET);
+	// To reduce units roaming when a lot of them fight in small areas
+	// we do full priority calculations only for easy reachable units.
+	// For other targets we dramaticaly reduce priority and calc only threat factor, distance and health
+	const bool isFarAwayTarget = (pathLength + 1 > reactionRange + reactionRange >> 1) ? true : false;
 
-	// AI Priority
-	int ai_priority = 0;
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
-				(dtype.BoolFlag[i].value)) {
-				ai_priority++;
-			}
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-				(dtype.BoolFlag[i].value)) {
-				ai_priority--;
+	if (isFarAwayTarget) {
+		priority >>= 15; // save AT_THREAT_FACTOR if present
+	} else {
+		// Check Priority
+		// Priority 0-255
+		priority |= (dtype.DefaultStat.Variables[PRIORITY_INDEX].Value << AT_PRIORITY_OFFSET);
+
+		// AI Priority
+		int ai_priority = 0;
+		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
+					(dtype.BoolFlag[i].value)) {
+					ai_priority++;
+				}
+				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
+					(dtype.BoolFlag[i].value)) {
+					ai_priority--;
+				}
 			}
 		}
-	}
-	// AI Priority (0-31)
-	priority |= (ai_priority > 31 ? 31 : (ai_priority < 0 ? 0 : ai_priority)) << AT_AIPRIORITY_OFFSET;
+		// AI Priority (0-31)
+		priority |= (ai_priority > 31 ? 31 : (ai_priority < 0 ? 0 : ai_priority)) << AT_AIPRIORITY_OFFSET;
+	} 
 
 	// Calc distance factor (0-255)
 	// FIXME: count MinAttackRange
