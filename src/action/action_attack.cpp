@@ -525,13 +525,24 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			err = PF_REACHED;
 		}
 	}
+	CUnit *goal = this->GetGoal();
 	if (err >= 0) {
-		// FIXME: add change of State here in case of target changed
-		CheckForTargetInRange(unit);
+		if (!CheckForTargetInRange(unit) && IsAutoTargeting()) {
+			// If target changed
+			CUnit *currGoal = this->GetGoal();
+			if (goal && this->HasGoal() && goal != currGoal) {
+				if (InAttackRange(unit, *currGoal)) {
+					TurnToTarget(unit, currGoal);
+					this->State = ATTACK_TARGET | AUTO_TARGETING;
+				} else {
+					unit.Frame 	= 0;
+					this->State = MOVE_TO_TARGET | AUTO_TARGETING;
+				}
+			}
+		}
 		return;
 	}
 	if (err == PF_REACHED) {
-		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && InAttackRange(unit, *goal)) {
 			// Reached another unit, now attacking it
@@ -556,7 +567,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	// FIXME: look at this
 	if (err == PF_UNREACHABLE) {
 		if (!this->HasGoal()) {
-			// When attack-moving we have to allow a bigger range
+			// When attack-moving we have to allow a bigger range (PF)
 			this->Range++;
 			unit.Wait = 5;
 			return;
