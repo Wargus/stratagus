@@ -448,7 +448,7 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(true),
+		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(false),
 		IconFrameG(NULL), PressedIconFrameG(NULL),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -465,10 +465,8 @@ public:
 	bool MineNotifications;    /// Show mine is running low/depleted messages
 	bool DeselectInMine;       /// Deselect peasants in mines
 	bool NoStatusLineTooltips; /// Don't show messages on status line
-
-/// FIXME: 	Doesn't change in menu
 	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
-
+		 
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.
