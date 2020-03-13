@@ -2445,6 +2445,12 @@ void DestroyAllInside(CUnit &source)
 
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
+
+	if (Preference.SimplifiedAutoTargeting) {
+		// Original algorithm return smaler values for better targets
+		return -TargetPriorityCalculate(&unit, &dest);
+	}
+
 	const CUnitType &type = *unit.Type;
 	const CUnitType &dtype = *dest.Type;
 	int cost = 0;
