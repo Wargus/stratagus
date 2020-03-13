@@ -706,17 +706,9 @@ private:
 		for (Iterator it = begin; it != end; ++it) {
 			int cost = Preference.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
 			
-			if (Preference.SimplifiedAutoTargeting)
-			{
-				if (cost > best_cost) {
-					enemy = *it;
-					best_cost = cost;
-				}			
-			} else {
-				if (cost < best_cost) {
-					enemy = *it;
-					best_cost = cost;
-				}
+			if (Preference.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
+				enemy = *it;
+				best_cost = cost;
 			}
 		}
 		return enemy;
