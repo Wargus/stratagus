@@ -1001,16 +1001,7 @@ private:
 	CUnit *Find(Iterator begin, Iterator end)
 	{
 		for (Iterator it = begin; it != end; ++it) {
-            if (Preference.SimplifiedAutoTargeting) {
-				int cost = TargetPriorityCalculate(attacker, *it); 
-				
-				if (cost > best_cost) {
-					best_unit = *it;
-					best_cost = cost;
-				}
-			} else { 
-				Compute(*it);
-			}
+			Compute(*it);
 		} 
 		return best_unit;
 	}
@@ -1021,6 +1012,16 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
+		if (Preference.SimplifiedAutoTargeting) {
+			int cost = TargetPriorityCalculate(attacker, dest); 
+			
+			if (cost > best_cost) {
+				best_unit = dest;
+				best_cost = cost;
+			}
+			return;
+		}
+
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
 		int x = attacker->tilePos.x;
