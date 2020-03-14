@@ -960,7 +960,7 @@ public:
 					if (pos >= good->size()) {
 						DebugPrint("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
 								   "size: %d, pos: %d, "				\
-								   "x: %d, xx: %d, y: %d, yy: %d" _C_
+								   "x: %d, xx: %d, y: %d, yy: %d\n" _C_
 								   size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
 						break;
 					}
@@ -985,7 +985,9 @@ public:
 
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
-		FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
+		if (!Preference.SimplifiedAutoTargeting) {
+			FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
+		}
 		return Find(table.begin(), table.end());
 
 	}
@@ -1012,9 +1014,9 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
+		
 		if (Preference.SimplifiedAutoTargeting) {
-			int cost = TargetPriorityCalculate(attacker, dest); 
-			
+			const int cost = TargetPriorityCalculate(attacker, dest); 
 			if (cost > best_cost) {
 				best_unit = dest;
 				best_cost = cost;
@@ -1051,7 +1053,7 @@ private:
 				if (pos >= good->size()) {
 					DebugPrint("BUG: RangeTargetFinder.Compute out of range. " \
 					       "size: %d, pos: %d, "	\
-					       "x: %d, xx: %d, y: %d, yy: %d" _C_
+					       "x: %d, xx: %d, y: %d, yy: %d \n" _C_
 					       size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
 					break;
 				}

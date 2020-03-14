@@ -1331,7 +1331,7 @@ void UnitLost(CUnit &unit)
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NULL) {
-				DebugPrint("Unable to allocate Unit");
+				DebugPrint("Unable to allocate Unit\n");
 			} else {
 				temp->ResourcesHeld = unit.ResourcesHeld;
 				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
@@ -2513,15 +2513,21 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 		return INT_MIN;
 	}
 	
-	const int attackrange 	= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
-	const int pathLength 	= UnitReachable(*attacker, *dest, attackrange);
-	const int reactionRange = (player.Type == PlayerPerson) ? type.ReactRangePerson 
-															: type.ReactRangeComputer;
-	int distance 			= attacker->MapDistanceTo(*dest);	
+	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minAttackRange = attacker->Type->MinAttackRange;
+	const int pathLength 	 = CalcPathToUnit(*attacker, *dest, minAttackRange, attackRange);
+		  int distance		 = attacker->MapDistanceTo(*dest);	
 
-	if (distance > attackrange && pathLength == 0) {
-		return INT_MIN;
+	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson 
+															 : type.ReactRangeComputer;
+
+
+	if (!InAttackRange(*attacker, *dest)
+		&& ((distance > minAttackRange && pathLength < 0) 
+			|| attacker->CanMove() == false)) {
+			return INT_MIN;
 	}	
+	
 
 	// Attack walls only if we are stuck in them
 	if (dtype.BoolFlag[WALL_INDEX].value && distance > 1) {
@@ -2542,9 +2548,9 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	// To reduce units roaming when a lot of them fight in small areas
 	// we do full priority calculations only for easy reachable units.
 	// For other targets we dramaticaly reduce priority and calc only threat factor, distance and health
-	const bool isFarAwayTarget = (pathLength + 1 > reactionRange + reactionRange >> 1) ? true : false;
+	const bool isFarAwayTarget = (pathLength + 1 > 1.5 * reactionRange) ? true : false;
 
-	if (isFarAwayTarget) {
+	if (isFarAwayTarget || distance < minAttackRange) {
 		priority >>= 15; // save AT_THREAT_FACTOR if present
 	} else {
 		// Check Priority
@@ -2570,9 +2576,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	} 
 
 	// Calc distance factor (0-255)
-	// FIXME: count MinAttackRange
-	distance = (distance == 1) ? distance : pathLength + 1;
-	priority |= (255 - (distance > 255 ? 255 : distance)) << AT_DISTANCE_OFFSET;
+	priority |= (255 - (pathLength > 255 || pathLength < 0 ? 255 : pathLength)) << AT_DISTANCE_OFFSET;
 
 	// Remaining HP (Health) (0..100)%
 	priority |= 100 - dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max;
