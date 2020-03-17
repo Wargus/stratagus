@@ -2642,6 +2642,21 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 				|| CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
 }
 
+
+Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
+{
+	Vec2i pos = unit.tilePos - src.tilePos;
+	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
+
+	if (!d) {
+		d = 1;
+	}
+	pos.x = unit.tilePos.x + (pos.x * minRange * (SyncRand() & 2) + 1) / d + (SyncRand() & 2);
+	pos.y = unit.tilePos.y + (pos.y * minRange * (SyncRand() & 2) + 1) / d + (SyncRand() & 2);
+	Map.Clamp(pos);
+	return pos;
+}
+
 static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 {
 	const unsigned long lastattack = target.Attacked;

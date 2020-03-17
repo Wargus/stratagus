@@ -63,10 +63,11 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define FIRST_ENTRY		 0
-#define AUTO_TARGETING   2  /// Targets will be selected by small (unit's) AI
-#define MOVE_TO_TARGET   4  /// Move to target state
-#define ATTACK_TARGET    5  /// Attack target state
+#define FIRST_ENTRY		 	0
+#define AUTO_TARGETING   	2  /// Targets will be selected by small (unit's) AI
+#define MOVE_TO_TARGET   	4  /// Move to target state
+#define ATTACK_TARGET    	5  /// Attack target state
+#define MOVE_TO_ATTACKPOS	8  /// Move to position for attack when target is too close
 
 #define RESTORE_ONLY false  /// Do not finish this order, only restore saved
 
@@ -246,7 +247,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
 	Vec2i tileSize;
-	if (this->HasGoal()) {
+	if (this->HasGoal() && !(this->State & MOVE_TO_ATTACKPOS)) {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
@@ -469,6 +470,20 @@ bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true
 	}
 	return false;
 }
+
+void COrder_Attack::MoveToBetterPos(CUnit &unit)
+{
+	Assert(this->HasGoal());
+
+	CUnit *goal = this->GetGoal();
+	this->goalPos 	= PosToRetreat(unit, *goal, unit.Type->MinAttackRange + 1);
+	this->Range		= 0;
+	this->MinRange 	= 0;
+	unit.Frame 	  	= 0;
+	this->State  	&= AUTO_TARGETING;
+	this->State  	|= MOVE_TO_ATTACKPOS;
+}
+
 /**
 **  Change invalid target for new target in range.
 **
@@ -525,16 +540,29 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			err = PF_REACHED;
 		}
 	}
+
 	CUnit *goal = this->GetGoal();
-	if (err >= 0) {
-		if (!CheckForTargetInRange(unit) && IsAutoTargeting()) {
-			// If target changed
+	const int distance 	= this->HasGoal() ? unit.MapDistanceTo(*goal) : 0;
+	const bool tooClose = (distance && (distance < unit.Type->MinAttackRange)) ? true : false;
+
+	// Waiting or on the way
+	if (err >= 0 ) {
+		bool targetChanged = false;
+		if (!CheckForTargetInRange(unit)) {
+
 			CUnit *currGoal = this->GetGoal();
-			if (goal && this->HasGoal() && goal != currGoal) {
+		  	if (currGoal && goal != currGoal) {
+				targetChanged = true;
+			}
+	
+			if((IsAutoTargeting() && targetChanged) || (this->State & MOVE_TO_ATTACKPOS)) {
+	
 				if (InAttackRange(unit, *currGoal)) {
+					this->goalPos = currGoal->tilePos; // We have to restore in case of MOVE_TO_ATTACKPOS
 					TurnToTarget(unit, currGoal);
 					this->State = ATTACK_TARGET | AUTO_TARGETING;
-				} else {
+	
+				} else if (targetChanged) {
 					unit.Frame 	= 0;
 					this->State = MOVE_TO_TARGET | AUTO_TARGETING;
 				}
@@ -549,6 +577,9 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			TurnToTarget(unit, goal);
 			this->State &= AUTO_TARGETING;
 			this->State |= ATTACK_TARGET;
+			return;
+		} else if (tooClose) {
+			MoveToBetterPos(unit);
 			return;
 		}
 		// Attacking wall or ground.
@@ -571,9 +602,11 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			this->Range++;
 			unit.Wait = 5;
 			return;
-		} else {
-			this->ClearGoal();
+		} else if (tooClose) {
+			MoveToBetterPos(unit);
+			return;
 		}
+		this->ClearGoal();
 	}
 	EndActionAttack(unit);
 	return;
@@ -674,6 +707,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		// FALL THROUGH
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + AUTO_TARGETING:
+		case MOVE_TO_ATTACKPOS:
+		case MOVE_TO_ATTACKPOS + AUTO_TARGETING:
 			if (!unit.CanMove()) {
 				this->Finished = true;
 				return;
