@@ -471,11 +471,16 @@ bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true
 	return false;
 }
 
+/**
+**  Move unit to randomly selected position in MinAttackRange away from current goal.
+**
+**  @param unit  Unit ot move
+*/
 void COrder_Attack::MoveToBetterPos(CUnit &unit)
 {
 	Assert(this->HasGoal());
 
-	CUnit *goal = this->GetGoal();
+	CUnit *goal 	= this->GetGoal();
 	this->goalPos 	= PosToRetreat(unit, *goal, unit.Type->MinAttackRange + 1);
 	this->Range		= 0;
 	this->MinRange 	= 0;
@@ -504,7 +509,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	}
 	
 	if (IsAutoTargeting() || unit.Player->AiEnabled) {
-		static bool hadGoal = this->HasGoal();
+		const bool hadGoal = this->HasGoal();
 		if (!AutoSelectTarget(unit) && hadGoal) {
 			EndActionAttack(unit, RESTORE_ONLY);
 			return true;
@@ -517,6 +522,8 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 
 /**
 **  Controls moving a unit to its target when attacking
+**
+**	@todo FIXME: add move to better pos for Attack_Ground when target tile is too close
 **
 **  @param unit  Unit that is attacking and moving
 */
@@ -640,7 +647,6 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			return;
 		}
 	}
-	// FIXME: What to do when Distance < MinAttackRange?
 	CUnit *goal = this->GetGoal();
 	if (!InAttackRange(unit, *goal)) {
 		unit.Frame 	= 0;
