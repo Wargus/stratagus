@@ -567,11 +567,12 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 				if (InAttackRange(unit, *currGoal)) {
 					this->goalPos = currGoal->tilePos; // We have to restore in case of MOVE_TO_ATTACKPOS
 					TurnToTarget(unit, currGoal);
-					this->State = ATTACK_TARGET | AUTO_TARGETING;
-	
+					this->State &= AUTO_TARGETING;
+					this->State |= ATTACK_TARGET;
 				} else if (targetChanged) {
-					unit.Frame 	= 0;
-					this->State = MOVE_TO_TARGET | AUTO_TARGETING;
+					unit.Frame	= 0;
+					this->State &= AUTO_TARGETING;
+					this->State |= MOVE_TO_TARGET;
 				}
 			}
 		}
@@ -629,7 +630,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
 	AnimateActionAttack(unit, *this);
-	if (unit.Anim.Unbreakable) {
+	/// Order may be set as finished by outside code while playing attack animation. 
+	/// In this case we must not execute code of AttackTarget
+	if (unit.Anim.Unbreakable || this->Finished) { 
 		return;
 	}
 	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
@@ -705,6 +708,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					TurnToTarget(unit, goal);
 					this->State |= ATTACK_TARGET;
 					AttackTarget(unit);
+					return;
 				}
 			}
 			this->State |= MOVE_TO_TARGET;
