@@ -2645,6 +2645,8 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 
 Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
 {
+	/// FIXME: rewrite to use opposite direction as vector, with random deviations
+
 	Vec2i pos = unit.tilePos - src.tilePos;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
