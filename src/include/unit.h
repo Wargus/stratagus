@@ -76,9 +76,9 @@ typedef COrder *COrderPtr;
 
 /*
 ** Configuration of the small (unit) AI.
-** sPPP PPdd dddd dddd 0000 0000 0hhh hhhh 
+** sPPP PPdd dddd dddd 0000 0000 0hhh hhhh
 ** s... .ppp pppp p... .... .... .... ....
-** s... ...I .... .... iiii i... .... ....                             
+** s... ...I .... .... iiii i... .... ....
 ** s... .... .... c... .... .... .... ....
 */
 #define PRIORITY_FACTOR   0x00080000   /// p
@@ -466,7 +466,7 @@ public:
 	bool DeselectInMine;       /// Deselect peasants in mines
 	bool NoStatusLineTooltips; /// Don't show messages on status line
 	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
-		 
+
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.

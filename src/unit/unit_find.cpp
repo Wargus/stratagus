@@ -221,7 +221,7 @@ class BestDepotFinder
 				d = UnitReachable(*worker, *dest, 1);
 				if (worker->Container) {
 					MarkUnitFieldFlags(*worker->Container);
-				}			
+				}
 				//
 				// Take this depot?
 				//
@@ -548,11 +548,11 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 	if (ai_active) {
 		typecount = player.UnitTypesAiActiveCount[type.Slot];
 	}
-	
+
 	if (typecount < 0) { // if unit type count is negative, something wrong happened
 		fprintf(stderr, "Player %d has a negative %s unit type count of %d.\n", player.Index, type.Ident.c_str(), typecount);
 	}
-	
+
 	if (typecount == 0) {
 		return;
 	}
@@ -705,7 +705,7 @@ private:
 
 		for (Iterator it = begin; it != end; ++it) {
 			int cost = Preference.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
-			
+
 			if (Preference.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
 				enemy = *it;
 				best_cost = cost;
@@ -1004,7 +1004,7 @@ private:
 	{
 		for (Iterator it = begin; it != end; ++it) {
 			Compute(*it);
-		} 
+		}
 		return best_unit;
 	}
 
@@ -1014,9 +1014,9 @@ private:
 			dest->CacheLock = 0;
 			return;
 		}
-		
+
 		if (Preference.SimplifiedAutoTargeting) {
-			const int cost = TargetPriorityCalculate(attacker, dest); 
+			const int cost = TargetPriorityCalculate(attacker, dest);
 			if (cost > best_cost) {
 				best_unit = dest;
 				best_cost = cost;
@@ -1035,7 +1035,7 @@ private:
 		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
 
 		int sbad = 0;
-		int sgood = 0;		
+		int sgood = 0;
 
 		// cost map is relative to attacker position
 		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
@@ -1052,9 +1052,9 @@ private:
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
 				if (pos >= good->size()) {
 					DebugPrint("BUG: RangeTargetFinder.Compute out of range. " \
-					       "size: %d, pos: %d, "	\
-					       "x: %d, xx: %d, y: %d, yy: %d \n" _C_
-					       size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
+							   "size: %d, pos: %d, "	\
+							   "x: %d, xx: %d, y: %d, yy: %d \n" _C_
+							   size _C_ pos _C_ x _C_ xx _C_ y _C_ yy);
 					break;
 				}
 				sbad += bad->at(pos) / localFactor;
@@ -1171,7 +1171,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
 		SelectAroundUnit(*firstContainer, missile_range, table,
-			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+						 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -1183,7 +1183,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		std::vector<CUnit *> table;
 
 		SelectAroundUnit(*firstContainer, range, table,
-			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+						 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {

@@ -569,8 +569,8 @@ bool CUnit::IsAlive() const
 int CUnit::GetDrawLevel() const
 {
 	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-		Type->CorpseType->DrawLevel :
-	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));;
+			Type->CorpseType->DrawLevel :
+			((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));;
 }
 
 /**
@@ -603,7 +603,7 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
-	
+
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
@@ -1797,7 +1797,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]); //apply the upgrade to this unit only
 		}
 	}
-	
+
 	UpdateForNewUnit(*this, 1);
 }
 
@@ -2512,22 +2512,21 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
 		return INT_MIN;
 	}
-	
+
 	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minAttackRange = attacker->Type->MinAttackRange;
 	const int pathLength 	 = CalcPathToUnit(*attacker, *dest, minAttackRange, attackRange);
-		  int distance		 = attacker->MapDistanceTo(*dest);	
+	int distance		 	 = attacker->MapDistanceTo(*dest);
 
-	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson 
-															 : type.ReactRangeComputer;
+	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 
 
 	if (!InAttackRange(*attacker, *dest)
-		&& ((distance > minAttackRange && pathLength < 0) 
+		&& ((distance > minAttackRange && pathLength < 0)
 			|| attacker->CanMove() == false)) {
-			return INT_MIN;
-	}	
-	
+		return INT_MIN;
+	}
+
 
 	// Attack walls only if we are stuck in them
 	if (dtype.BoolFlag[WALL_INDEX].value && distance > 1) {
@@ -2573,7 +2572,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 		}
 		// AI Priority (0-31)
 		priority |= (ai_priority > 31 ? 31 : (ai_priority < 0 ? 0 : ai_priority)) << AT_AIPRIORITY_OFFSET;
-	} 
+	}
 
 	// Calc distance factor (0-255)
 	priority |= (255 - (pathLength > 255 || pathLength < 0 ? 255 : pathLength)) << AT_DISTANCE_OFFSET;
@@ -2597,15 +2596,15 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 {
 	const int distance 	= unit.MapDistanceTo(target);
 	const int range 	= (unit.Player->Type == PlayerPerson)
-												? unit.Type->ReactRangePerson 
-												: unit.Type->ReactRangeComputer;
+						  ? unit.Type->ReactRangePerson
+						  : unit.Type->ReactRangeComputer;
 	return distance <= range;
 }
 
 /**
 **  Returns true, if target is in attack range of the unit and there is no obstacles between them (when inside caves)
 **  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
-**   
+**
 **  @param unit    Unit to check for.
 **  @param target  Checked target.
 **
@@ -2615,17 +2614,17 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 {
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
-	const int distance 	= unit.MapDistanceTo(target);	
-	
+	const int distance 	= unit.MapDistanceTo(target);
+
 	return (minRange <= distance && distance <= range)
-			&& (!GameSettings.Inside 
-				|| CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
+		   && (!GameSettings.Inside
+			   || CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
 }
 
 /**
 **  Returns true, if tile is in attack range of the unit and there is no obstacles between them (when inside caves)
 **  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
-**   
+**
 **  @param unit    Unit to check for.
 **  @param pos     Checked position.
 **
@@ -2635,11 +2634,11 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 {
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
-	const int distance 	= unit.MapDistanceTo(tilePos);	
-	
+	const int distance 	= unit.MapDistanceTo(tilePos);
+
 	return (minRange <= distance && distance <= range)
-			&& (!GameSettings.Inside 
-				|| CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
+		   && (!GameSettings.Inside
+			   || CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
 }
 
 
@@ -2849,16 +2848,16 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 
 	if (target.Player->AiEnabled == false) {
 		return;
-/*		
-		if (target.CurrentAction() == UnitActionAttack) {
-			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
-			if (order.IsWeakTargetSelected() == false) {
-				return;
-			}
-		} else {
-			return;
-		}
-*/
+		/*
+				if (target.CurrentAction() == UnitActionAttack) {
+					COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
+					if (order.IsWeakTargetSelected() == false) {
+						return;
+					}
+				} else {
+					return;
+				}
+		*/
 	}
 	if (target.CanStoreOrder(target.CurrentOrder())) {
 		savedOrder = target.CurrentOrder()->Clone();
@@ -3309,11 +3308,11 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 	if (this->Variable[ATTACKRANGE_INDEX].Value <= 1) { //always return false if the units attack range is 1 or lower
 		return false;
 	}
-	
+
 	if (this->Container) { //if the unit is inside a container, the attack will always be ranged
 		return true;
 	}
-	
+
 	if (
 		goal
 		&& goal->IsAliveOnMap()
@@ -3325,11 +3324,11 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 	) {
 		return true;
 	}
-	
+
 	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
 		return true;
 	}
-	
+
 	return false;
 }
 

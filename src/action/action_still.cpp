@@ -278,16 +278,16 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	//  FIXME: if bunkers can increase attack range - count it in the distance calculations and target selection.
-	
+
 	// Removed units can only attack in AttackRange, from bunker
 	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
 
 	if (autoAttackUnit == NULL) {
 		return false;
 	}
-	
-	/*	
-		FIXME: To Calc and Set GoalPos (if target is closer than MinAttackRange)	
+
+	/*
+		FIXME: To Calc and Set GoalPos (if target is closer than MinAttackRange)
 		Only for units which can attack-ground && has a splash attack && can hit current target with splash
 		Else do not attack at all
 	*/
