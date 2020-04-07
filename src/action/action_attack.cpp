@@ -107,8 +107,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->SetGoal(&target);
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->MinRange = attacker.Type->MinAttackRange;
-	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 		order->SkirmishRange = order->Range;
+	}
 
 	return order;
 }
@@ -129,8 +130,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		order->attackMovePos = dest;
 		order->State = AUTO_TARGETING;
 	}
-	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 		order->SkirmishRange = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	}
 
 	return order;
 }
@@ -142,8 +144,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->goalPos = dest;
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->MinRange = attacker.Type->MinAttackRange;
-	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value)
+	if (attacker.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 		order->SkirmishRange = order->Range;
+	}
 
 	return order;
 }
@@ -185,18 +188,19 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	} else if (!strcmp(value, "range")) {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-		if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value)
+		if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 			this->SkirmishRange = this->Range;
+		}
 	} else if (!strcmp(value, "tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		CclGetPos(l, &this->goalPos.x, &this->goalPos.y);
 		lua_pop(l, 1);
 
 	} else if (!strcmp(value, "amove-tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->attackMovePos.x , &this->attackMovePos.y);
+		CclGetPos(l, &this->attackMovePos.x, &this->attackMovePos.y);
 		lua_pop(l, 1);
 
 	} else {
@@ -229,8 +233,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 								: vp.TilePosToScreen_Center(this->goalPos);
 
 	orderedPos = isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
-							  : targetPos;
-	
+				 			  : targetPos;
+
 	Uint32 color = isAttackMove ? ColorOrange : ColorRed;
 	Video.FillCircleClip(color, lastScreenPos, 2);
 	Video.DrawLineClip(ColorRed, lastScreenPos, orderedPos);
@@ -263,10 +267,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
 	}
 	input.SetMaxRange(distance);
-	if (!this->SkirmishRange || Distance(input.GetUnitPos(), input.GetGoalPos()) < this->SkirmishRange)
+	if (!this->SkirmishRange || Distance(input.GetUnitPos(), input.GetGoalPos()) < this->SkirmishRange) {
 		input.SetMinRange(this->MinRange);
-	else
+	} else {
 		input.SetMinRange(std::max<int>(this->SkirmishRange, this->MinRange));
+	}
 }
 
 /* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
@@ -350,7 +355,7 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 {
 	const Vec2i dir = target ? (target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos)
-							 : (this->goalPos - unit.tilePos);
+					  		 : (this->goalPos - unit.tilePos);
 	const unsigned char oldDir = unit.Direction;
 
 	UnitHeadingFromDeltaXY(unit, dir);
@@ -367,7 +372,7 @@ void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 }
 
 /**
-**  Set target for attack in auto-attack mode. 
+**  Set target for attack in auto-attack mode.
 **  Also if there is no active target Attack-Move action will be saved.
 **
 **  @param unit    Attacker.
@@ -383,15 +388,16 @@ void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 	this->goalPos 			= target->tilePos;
 	this->Range 			= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	this->MinRange 			= unit.Type->MinAttackRange;
-	if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value)
+	if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 		this->SkirmishRange = this->Range;
+	}
 }
 
- /**
- ** Select target in auto attack mode
- **
- ** return true if we have a target, false if can't find any 
- **/
+/**
+** Select target in auto attack mode
+**
+** return true if we have a target, false if can't find any
+**/
 bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 {
 	// if unit can't attack, or if unit is not bunkered and removed - exit, no targets
@@ -405,18 +411,18 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
-	
+
 	if (immobile) {
-		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range 
+		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range
 	} else {
 		newTarget = AttackUnitsInReactRange(unit); // search for enemies in reaction range
 	}
 
-    if (goal /// if goal is Valid
-		&& goal->IsVisibleAsGoal(*unit.Player) 
+	if (goal /// if goal is Valid
+		&& goal->IsVisibleAsGoal(*unit.Player)
 		&& CanTarget(*unit.Type, *goal->Type)
 		&& (immobile ? InAttackRange(unit, *goal) : InReactRange(unit, *goal))) {
-				
+
 		if (newTarget && newTarget != goal) {
 			if (Preference.SimplifiedAutoTargeting) {
 				const int goal_priority			= TargetPriorityCalculate(&unit, goal);
@@ -425,19 +431,19 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
 					SetAutoTarget(unit, newTarget);
 				} else if (!immobile
-							&& (!InAttackRange(unit, *goal) && newTarget_priority > goal_priority)) {
-							SetAutoTarget(unit, newTarget);
+						   && (!InAttackRange(unit, *goal) && newTarget_priority > goal_priority)) {
+					SetAutoTarget(unit, newTarget);
 				}
 			} else {
 				if (ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 					SetAutoTarget(unit, newTarget);
 				}
 			}
-		}	
+		}
 	} else {
 		if (goal) {
 			this->ClearGoal();
-		} 
+		}
 		if (newTarget) {
 			SetAutoTarget(unit, newTarget);
 		} else {
@@ -450,8 +456,8 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 /**
 **  Restore action/order when current action is finished
 **
-**  @param unit  
-**  @param canBeFinished    False if ony restore order/action needed 
+**  @param unit
+**  @param canBeFinished    False if ony restore order/action needed
 **
 **  @return      			false if order/action restored, true else (if order finished).
 */
@@ -461,7 +467,7 @@ bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true
 		if (IsAutoTargeting() && this->goalPos != this->attackMovePos) {
 			this->goalPos 	= this->attackMovePos;
 			this->Range 	= 0;
-			this->MinRange 	= 0;				 
+			this->MinRange 	= 0;
 			this->State 	= AUTO_TARGETING;
 			return false;
 		}
@@ -507,7 +513,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		EndActionAttack(unit);
 		return true;
 	}
-	
+
 	if (IsAutoTargeting() || unit.Player->AiEnabled) {
 		const bool hadGoal = this->HasGoal();
 		if (!AutoSelectTarget(unit) && hadGoal) {
@@ -553,17 +559,17 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	const bool tooClose = (distance && (distance < unit.Type->MinAttackRange)) ? true : false;
 
 	// Waiting or on the way
-	if (err >= 0 ) {
+	if (err >= 0) {
 		bool targetChanged = false;
 		if (!CheckForTargetInRange(unit)) {
 
 			CUnit *currGoal = this->GetGoal();
-		  	if (currGoal && goal != currGoal) {
+			if (currGoal && goal != currGoal) {
 				targetChanged = true;
 			}
-	
-			if((IsAutoTargeting() && targetChanged) || (this->State & MOVE_TO_ATTACKPOS)) {
-	
+
+			if ((IsAutoTargeting() && targetChanged) || (this->State & MOVE_TO_ATTACKPOS)) {
+
 				if (InAttackRange(unit, *currGoal)) {
 					this->goalPos = currGoal->tilePos; // We have to restore in case of MOVE_TO_ATTACKPOS
 					TurnToTarget(unit, currGoal);
@@ -592,7 +598,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		}
 		// Attacking wall or ground.
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
-			|| (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& InAttackRange(unit, this->goalPos)) {
 
 			// Reached wall or ground, now attacking it
@@ -630,9 +636,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
 	AnimateActionAttack(unit, *this);
-	/// Order may be set as finished by outside code while playing attack animation. 
+	/// Order may be set as finished by outside code while playing attack animation.
 	/// In this case we must not execute code of AttackTarget
-	if (unit.Anim.Unbreakable || this->Finished) { 
+	if (unit.Anim.Unbreakable || this->Finished) {
 		return;
 	}
 	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
@@ -695,9 +701,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	}
 
 	switch (this->State) {
-		case FIRST_ENTRY:  
+		case FIRST_ENTRY:
 		case AUTO_TARGETING:
-			
+
 			if (CheckForTargetInRange(unit)) {
 				return;
 			}
@@ -712,8 +718,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				}
 			}
 			this->State |= MOVE_TO_TARGET;
-			// FIXME: should use a reachable place to reduce pathfinder time.
-		
+		// FIXME: should use a reachable place to reduce pathfinder time.
+
 		// FALL THROUGH
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + AUTO_TARGETING:

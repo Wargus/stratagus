@@ -247,13 +247,12 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 
 int CalcPathToUnit(const CUnit &src, const CUnit &dst, const int minrange, const int range)
 {
-	int length = AStarFindPath(src.tilePos, dst.tilePos, 
+	int length = AStarFindPath(src.tilePos, dst.tilePos,
 							   dst.Type->TileWidth, dst.Type->TileHeight,
 							   src.Type->TileWidth, src.Type->TileHeight,
-							   minrange, range, 
+							   minrange, range,
 							   NULL, 0, src);
-	switch (length)
-	{
+	switch (length) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
 		case PF_WAIT:

@@ -221,7 +221,7 @@ extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return path length to unit 'dst'.
 extern int UnitReachable(const CUnit &src, const CUnit &dst, int range);
 /// Return path length to unit 'dst' or error code.
-extern int CalcPathToUnit(const CUnit &src, const CUnit &dst, 
+extern int CalcPathToUnit(const CUnit &src, const CUnit &dst,
 						  const int minrange, const int range);
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
