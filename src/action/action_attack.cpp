@@ -67,7 +67,7 @@
 #define AUTO_TARGETING   	2  /// Targets will be selected by small (unit's) AI
 #define MOVE_TO_TARGET   	4  /// Move to target state
 #define ATTACK_TARGET    	5  /// Attack target state
-#define MOVE_TO_ATTACKPOS	8  /// Move to position for attack when target is too close
+#define MOVE_TO_ATTACKPOS	8  /// Move to position for attack if target is too close
 
 #define RESTORE_ONLY false  /// Do not finish this order, only restore saved
 

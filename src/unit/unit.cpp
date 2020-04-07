@@ -2589,7 +2589,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 **  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
 **
 **  @param unit    Unit to check for.
-**	@param target  Checked target.
+**  @param target  Checked target.
 **
 **  @return       True if within react range, false otherwise.
 */
@@ -2607,7 +2607,7 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 **  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
 **   
 **  @param unit    Unit to check for.
-**	@param target  Checked target.
+**  @param target  Checked target.
 **
 **  @return       True if in attack range, false otherwise.
 */
@@ -2627,7 +2627,7 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 **  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
 **   
 **  @param unit    Unit to check for.
-**	@param pos     Checked position.
+**  @param pos     Checked position.
 **
 **  @return       True if in attack range, false otherwise.
 */
@@ -2643,18 +2643,25 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 }
 
 
+/**
+**  Return randomly found position for unit in opposite derection to src
+**
+**  @param unit     Unit to move.
+**  @param src      Unit to retreat from.
+**  @param minRange Minimal distance to retreat
+**
+**  @return       	True if in attack range, false otherwise.
+*/
 Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
 {
-	/// FIXME: rewrite to use opposite direction as vector, with random deviations
-
 	Vec2i pos = unit.tilePos - src.tilePos;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
 		d = 1;
 	}
-	pos.x = unit.tilePos.x + (pos.x * minRange * (SyncRand() & 2) + 1) / d + (SyncRand() & 2);
-	pos.y = unit.tilePos.y + (pos.y * minRange * (SyncRand() & 2) + 1) / d + (SyncRand() & 2);
+	pos.x = unit.tilePos.x + (pos.x * (minRange + (SyncRand() & 2))) / d + (2 - (SyncRand() & 4));
+	pos.y = unit.tilePos.y + (pos.y * (minRange + (SyncRand() & 2))) / d + (2 - (SyncRand() & 4));
 	Map.Clamp(pos);
 	return pos;
 }
