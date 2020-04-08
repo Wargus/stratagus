@@ -2653,14 +2653,14 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 */
 Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
 {
-	Vec2i pos = unit.tilePos - src.tilePos;
+	Vec2i pos = unit.tilePos - (src.tilePos + src.Type->GetHalfTileSize());
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
 		d = 1;
 	}
-	pos.x = unit.tilePos.x + (pos.x * (minRange + (SyncRand() & 2))) / d + (2 - (SyncRand() & 4));
-	pos.y = unit.tilePos.y + (pos.y * (minRange + (SyncRand() & 2))) / d + (2 - (SyncRand() & 4));
+	pos.x = unit.tilePos.x + (pos.x * (minRange + (SyncRand() % 3))) / d + (2 - (SyncRand() % 5));
+	pos.y = unit.tilePos.y + (pos.y * (minRange + (SyncRand() % 3))) / d + (2 - (SyncRand() % 5));
 	Map.Clamp(pos);
 	return pos;
 }
