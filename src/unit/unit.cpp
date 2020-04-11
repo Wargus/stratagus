@@ -2649,11 +2649,26 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 **  @param src      Unit to retreat from.
 **  @param minRange Minimal distance to retreat
 **
-**  @return       	True if in attack range, false otherwise.
+**  @return       	Position to retreat
 */
 Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
 {
-	Vec2i pos = unit.tilePos - (src.tilePos + src.Type->GetHalfTileSize());
+	const Vec2i tilePos = src.tilePos + src.Type->GetHalfTileSize();
+	return PosToRetreat(unit, tilePos, minRange);
+}
+
+/**
+**  Return randomly found position for unit in opposite derection to src
+**
+**  @param unit     Unit to move.
+**  @param srcPos   Pos to retreat from.
+**  @param minRange Minimal distance to retreat
+**
+**  @return       	Position to retreat
+*/
+Vec2i PosToRetreat(const CUnit &unit, const Vec2i &srcPos, const int minRange)
+{
+	Vec2i pos = unit.tilePos - srcPos;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
