@@ -253,7 +253,11 @@ static int CclSetZoomNoResize(lua_State *l)
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
-		// May have been set from the command line
+		// Did the commandline force OpenGL off?
+		if (ForceUseOpenGL && UseOpenGL == 0) {
+			return 0;
+		}
+		// Did the commandline already force ZoomNoResize on?
 		if (!(ForceUseOpenGL && ZoomNoResize)) {
 			const int args = lua_gettop(l);
 			int originalWidth = 640;
