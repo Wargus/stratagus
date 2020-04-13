@@ -238,21 +238,61 @@ static int CclSetUseOpenGL(lua_State *l)
 	return 0;
 }
 
+static int CclGetUseOpenGL(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	lua_pushboolean(l, UseOpenGL);
+#else
+	lua_pushboolean(l, 0);
+#endif
+	return 1;
+}
+
 static int CclSetZoomNoResize(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (CclInConfigFile) {
-		// May have been set from the command line
-		if (!ForceUseOpenGL) {
-			ZoomNoResize = LuaToBoolean(l, 1);
+		// Did the commandline force OpenGL off?
+		if (ForceUseOpenGL && UseOpenGL == 0) {
+			return 0;
+		}
+		// Did the commandline already force ZoomNoResize on?
+		if (!(ForceUseOpenGL && ZoomNoResize)) {
+			const int args = lua_gettop(l);
+			int originalWidth = 640;
+			int originalHeight = 480;
+			if (args == 1) {
+				ZoomNoResize = LuaToBoolean(l, 1);
+			} else if (args == 2) {
+				originalWidth = LuaToNumber(l, 1);
+				originalHeight = LuaToNumber(l, 2);
+				ZoomNoResize = true;
+			} else {
+				LuaError(l, "Valid calls for SetZoSetZoomNoResize are SetZoomNoResize(isEnabled) or SetZoomNoResize(width, height)");
+			}
 			if (ZoomNoResize) {
+				Video.ViewportWidth = Video.Width;
+				Video.ViewportHeight = Video.Height;
+				Video.Width = originalWidth;
+				Video.Height = originalHeight;
 				UseOpenGL = true;
 			}
 		}
 	}
 #endif
 	return 0;
+}
+
+static int CclGetZoomNoResize(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	lua_pushboolean(l, ZoomNoResize);
+#else
+	lua_pushboolean(l, 0);
+#endif
+	return 1;
 }
 
 /**
@@ -265,9 +305,18 @@ static int CclSetVideoResolution(lua_State *l)
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!Video.Width || !Video.Height) {
-			Video.Width = LuaToNumber(l, 1);
-			Video.Height = LuaToNumber(l, 2);
+		if (!Video.ViewportWidth || !Video.ViewportHeight) {
+			Video.ViewportWidth = LuaToNumber(l, 1);
+			Video.ViewportHeight = LuaToNumber(l, 2);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (!ZoomNoResize) {
+				Video.Height = Video.ViewportHeight;
+				Video.Width = Video.ViewportWidth;
+			}
+#else
+			Video.Height = Video.ViewportHeight;
+			Video.Width = Video.ViewportWidth;
+#endif
 		}
 	}
 	return 0;
@@ -312,6 +361,14 @@ static int CclGetVideoFullScreen(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushboolean(l, Video.FullScreen);
+	return 1;
+}
+
+static int CclShowTitleScreens(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	ShowTitleScreens();
+	lua_pushboolean(l, 1);
 	return 1;
 }
 
@@ -757,6 +814,9 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 					p->BorderColorRGB.Parse(l);
 				} else if (!strcmp(value, "Size")) {
 					p->BorderSize = LuaToNumber(l, -1);
+				} else if (!strcmp(value, "SolidColor")) {
+					p->BorderColorRGB.Parse(l);
+					p->BorderColor = 1; // XXX: see uibuttons_proc.cpp#DrawUIButton
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -950,6 +1010,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonTrain;
 			} else if (!strcmp(value, "patrol")) {
 				ba.Action = ButtonPatrol;
+			} else if (!strcmp(value, "explore")) {
+				ba.Action = ButtonExplore;
 			} else if (!strcmp(value, "stand-ground")) {
 				ba.Action = ButtonStandGround;
 			} else if (!strcmp(value, "attack-ground")) {
@@ -1218,13 +1280,16 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetMaxOpenGLTexture", CclSetMaxOpenGLTexture);
 	lua_register(Lua, "SetUseTextureCompression", CclSetUseTextureCompression);
 	lua_register(Lua, "SetUseOpenGL", CclSetUseOpenGL);
+	lua_register(Lua, "GetUseOpenGL", CclGetUseOpenGL);
 	lua_register(Lua, "SetZoomNoResize", CclSetZoomNoResize);
+	lua_register(Lua, "GetZoomNoResize", CclGetZoomNoResize);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
+	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);
 
 	lua_register(Lua, "DefinePanelContents", CclDefinePanelContents);
 	lua_register(Lua, "DefinePopup", CclDefinePopup);

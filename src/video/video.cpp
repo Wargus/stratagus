@@ -110,17 +110,6 @@ struct Clip {
 	int Y2;                             /// pushed clipping bottom right
 };
 
-class ColorIndexRange
-{
-public:
-	ColorIndexRange(unsigned int begin, unsigned int end) :
-		begin(begin), end(end)
-	{}
-public:
-	unsigned int begin;
-	unsigned int end;
-};
-
 class CColorCycling
 {
 private:
@@ -405,13 +394,19 @@ void AddColorCyclingRange(unsigned int begin, unsigned int end)
 
 void SetColorCycleAll(bool value)
 {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		// FIXME: In OpenGL-mode, we can only cycle the tileset graphic
+		return;
+	}
+#endif
 	CColorCycling::GetInstance().ColorCycleAll = value;
 }
 
 /**
 **  Color Cycle for particular surface
 */
-static void ColorCycleSurface(SDL_Surface &surface)
+void ColorCycleSurface(SDL_Surface &surface)
 {
 	SDL_Color *palcolors = surface.format->palette->colors;
 	SDL_Color colors[256];
@@ -456,7 +451,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 void ColorCycle()
 {
 	/// MACRO defines speed of colorcycling FIXME: should be made configurable
-#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND / 4)
+#define COLOR_CYCLE_SPEED  (CYCLES_PER_SECOND * 2)
 	if ((FrameCounter % COLOR_CYCLE_SPEED) != 0) {
 		return;
 	}
@@ -465,12 +460,19 @@ void ColorCycle()
 		++colorCycling.cycleCount;
 		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
 			SDL_Surface *surface = (*it);
-
 			ColorCycleSurface(*surface);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
-		ColorCycleSurface(*Map.TileGraphic->Surface);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL && colorCycling.ColorIndexRanges.size() > 0) {
+			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
+			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[colorCycling.cycleCount % Map.TileGraphic->NumColorCycles];
+		} else
+#endif
+		{
+			ColorCycleSurface(*Map.TileGraphic->Surface);
+		}
 	}
 }
 
@@ -484,7 +486,16 @@ void RestoreColorCyclingSurface()
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL) {
+			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
+			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[0];
+		}
+		else
+#endif
+		{
+			ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
+		}
 	}
 	colorCycling.cycleCount = 0;
 }

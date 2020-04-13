@@ -44,8 +44,8 @@
 #include "unittype.h"
 
 
-/// Callback for changed tile (with direction mask)
-static void EditorChangeSurrounding(const Vec2i &pos, int d);
+/// Callback for changed tile (with locked position)
+static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -92,9 +92,9 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **
 **  @param pos   map tile coordinate.
 **  @param tileIndex  Tile type to edit.
-**  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**  @param lock_pos   map tile coordinate, that should not be changed in callback.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
+void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -125,16 +125,16 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorChangeSurrounding(pos, d);
+	EditorChangeSurrounding(pos, lock_pos);
 }
 
 /**
 **  Update surroundings for tile changes.
 **
 **  @param pos  Map tile position of change.
-**  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
+**  @param lock_pos  Original change position, that should not be altered.
 */
-static void EditorChangeSurrounding(const Vec2i &pos, int d)
+static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 {
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
@@ -148,54 +148,60 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 	const unsigned int BH_QUAD_M = 0x0000FFFF; // Bottom half quad mask
 	const unsigned int LH_QUAD_M = 0xFF00FF00; // Left half quad mask
 	const unsigned int RH_QUAD_M = 0x00FF00FF; // Right half quad mask
-	const unsigned int DIR_UP =    8; // Go up allowed
-	const unsigned int DIR_DOWN =  4; // Go down allowed
-	const unsigned int DIR_LEFT =  2; // Go left allowed
-	const unsigned int DIR_RIGHT = 1; // Go right allowed
+
+	bool did_change = false; // if we changed any tiles
 
 	// How this works:
 	//  first get the quad of the neighbouring tile,
 	//  then check if the margin matches.
 	//  Otherwise, call EditorChangeTile again.
-	if ((d & DIR_UP) && pos.y) {
+	if (pos.y) {
 		const Vec2i offset(0, -1);
 		// Insert into the bottom the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
-		if (u != q2) {
+		if (u != q2 && (pos + offset) != lock_pos) {
+			did_change = true;
 			int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_DOWN);
+			EditorChangeTile(pos + offset, tile, lock_pos);
 		}
 	}
-	if ((d & DIR_DOWN) && pos.y < Map.Info.MapHeight - 1) {
+	if (pos.y < Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
 		// Insert into the top the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
-		if (u != q2) {
+		if (u != q2 && (pos + offset) != lock_pos) {
+			did_change = true;
 			int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_UP);
+			EditorChangeTile(pos + offset, tile, lock_pos);
 		}
 	}
-	if ((d & DIR_LEFT) && pos.x) {
+	if (pos.x) {
 		const Vec2i offset(-1, 0);
 		// Insert into the left the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
-		if (u != q2) {
+		if (u != q2 && (pos + offset) != lock_pos) {
+			did_change = true;
 			int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_RIGHT);
+			EditorChangeTile(pos + offset, tile, lock_pos);
 		}
 	}
-	if ((d & DIR_RIGHT) && pos.x < Map.Info.MapWidth - 1) {
+	if (pos.x < Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
 		// Insert into the right the new tile.
 		unsigned q2 = QuadFromTile(pos + offset);
 		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
-		if (u != q2) {
+		if (u != q2 && (pos + offset) != lock_pos) {
+			did_change = true;
 			int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
+			EditorChangeTile(pos + offset, tile, lock_pos);
 		}
+	}
+
+	if (did_change) {
+		EditorChangeSurrounding(pos, lock_pos);
 	}
 }
 
@@ -206,7 +212,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 */
 void EditorTileChanged(const Vec2i &pos)
 {
-	EditorChangeSurrounding(pos, 0x0F);
+	EditorChangeSurrounding(pos, pos);
 }
 
 /**
@@ -235,7 +241,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
-			EditorChangeTile(itPos, tile, 15);
+			EditorChangeTile(itPos, tile, itPos);
 		}
 	}
 }

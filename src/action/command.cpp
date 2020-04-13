@@ -403,6 +403,19 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+
+	const Vec2i invalidPos(-1, -1);
+
+	Vec2i startPos = unit.tilePos;
+	COrderPtr *prevOrder = &unit.Orders.back();
+
+	if(*prevOrder != NULL) {
+		Vec2i prevGoalPos = (*prevOrder)->GetGoalPos();
+		if(prevGoalPos != invalidPos) {
+			startPos = prevGoalPos;
+		}
+	}
+
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
@@ -414,7 +427,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionPatrol(unit.tilePos, pos);
+	*order = COrder::NewActionPatrol(startPos, pos);
 
 	ClearSavedAction(unit);
 }
@@ -496,6 +509,33 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 		}
 	}
 	*order = COrder::NewActionBuild(unit, pos, what);
+	ClearSavedAction(unit);
+}
+
+/**
+**  Send a unit exploring
+**
+**  @param unit   pointer to unit.
+**  @param flush  if true, flush command queue.
+*/
+void CommandExplore(CUnit &unit, int flush)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionExplore(unit);
+
 	ClearSavedAction(unit);
 }
 

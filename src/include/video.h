@@ -43,6 +43,7 @@
 #ifdef __APPLE__
 #define GL_GLEXT_PROTOTYPES 1
 #endif
+#define __gl_glext_h_
 #include "SDL_opengl.h"
 #include "shaders.h"
 #endif
@@ -74,7 +75,8 @@ protected:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
+		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0),
+		ColorCyclingTextures(NULL), NumColorCycles(0)
 #endif
 	{
 		frameFlip_map = NULL;
@@ -115,6 +117,9 @@ public:
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	bool DeleteColorCyclingTextures();
+#endif
 
 	void Load(bool grayscale = false);
 	void Flip();
@@ -151,6 +156,8 @@ public:
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
 	int NumTextures;           /// Number of textures
+	GLuint **ColorCyclingTextures; /// Texture names
+	int NumColorCycles; /// Number of color cycled texture groups
 #endif
 
 	friend class CFont;
@@ -261,7 +268,7 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), Depth(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), ViewportWidth(0), ViewportHeight(0), Depth(0), ShaderIndex(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -367,14 +374,11 @@ public:
 
 	int Width;
 	int Height;
-#if 1 || defined(USE_OPENGL) || defined(USE_GLES)
 	int ViewportWidth;         /// Actual width of the window
 	int ViewportHeight;        /// Actual height of the window
-#endif
-#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
 	SDL_Cursor *blankCursor;
-#endif
 	int Depth;
+	int ShaderIndex;
 	bool FullScreen;
 };
 
@@ -494,6 +498,9 @@ extern void WaitEventsOneFrame();
 /// Toggle full screen mode
 extern void ToggleFullScreen();
 
+/// Switch to the shader currently stored in Video.ShaderIndex
+extern void SwitchToShader();
+
 /// Push current clipping.
 extern void PushClipping();
 
@@ -527,14 +534,35 @@ extern Uint32 ColorRed;
 extern Uint32 ColorGreen;
 extern Uint32 ColorYellow;
 
+inline Uint32 IndexToColor(unsigned int index) {
+    // FIXME: this only works after video was initialized, so we do it dynamically
+    static const Uint32 ColorValues[] = {ColorRed, ColorYellow, ColorGreen, ColorLightGray,
+                                         ColorGray, ColorDarkGray, ColorWhite, ColorOrange,
+                                         ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack};
+    return ColorValues[index];
+}
+
+static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
+                                   "gray", "dark-gray", "white", "orange",
+                                   "light-blue", "blue", "dark-green", "black", NULL};
+
+inline int GetColorIndexByName(const char *colorName) {
+    int i = 0;
+    while (ColorNames[i] != NULL) {
+        if (!strcmp(colorName, ColorNames[i])) {
+            return i;
+        }
+        i++;
+    }
+    return -1;
+}
+
 #if defined(USE_OPENGL) || defined(USE_GLES)
 void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
 				 int ex, int ey, int x, int y, int flip);
 #endif
 
-#ifdef DEBUG
 extern void FreeGraphics();
-#endif
 
 
 // ARB_texture_compression

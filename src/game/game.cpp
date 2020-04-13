@@ -625,6 +625,7 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 	char *setupExtension = strstr(mapSetup, ".smp");
 	if (!setupExtension) {
 		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
+		return -1;
 	}
 
 	char previewName[PATH_MAX];
@@ -878,6 +879,14 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	InitPlayers();
 
+	if (IsNetworkGame()) {
+		// if is a network game, it is necessary to reinitialize the syncrand
+		// variables before beginning to load the map, due to random map
+		// generation
+		SyncHash = 0;
+		InitSyncRand();
+	}
+
 	if (Map.Info.Filename.empty() && !filename.empty()) {
 		const std::string path = LibraryFileName(filename.c_str());
 
@@ -893,6 +902,15 @@ void CreateGame(const std::string &filename, CMap *map)
 			playertype = GameSettings.Presets[i].Type;
 		}
 		CreatePlayer(playertype);
+	}
+	if (!ThisPlayer && !IsNetworkGame()) {
+		// In demo or kiosk mode, pick first empty slot
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (Players[i].Type == PlayerNobody) {
+				ThisPlayer = &Players[i];
+				break;
+			}
+		}
 	}
 
 	if (!filename.empty()) {
@@ -1067,6 +1085,11 @@ void CreateGame(const std::string &filename, CMap *map)
 			unit.Colors = &unit.RescuedFrom->UnitColors;
 		} else {
 			unit.Colors = &unit.Player->UnitColors;
+		}
+		if (unit.Type->OnReady) {
+			unit.Type->OnReady->pushPreamble();
+			unit.Type->OnReady->pushInteger(UnitNumber(unit));
+			unit.Type->OnReady->run();
 		}
 	}
 

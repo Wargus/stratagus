@@ -97,7 +97,13 @@ int CMetaClient::Init()
 	// Server socket
 	CHost metaServerHost(metaHost.c_str(), metaPort);
 	// Client socket
-	CHost metaClientHost(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
+
+	// open on all interfaces, not the loopback, unless we have an override from the commandline
+	std::string localHost = CNetworkParameter::Instance.localHost;
+	if (!localHost.compare("127.0.0.1")) {
+		localHost = "0.0.0.0";
+	}
+	CHost metaClientHost(localHost.c_str(), CNetworkParameter::Instance.localPort);
 	metaSocket.Open(metaClientHost);
 	if (metaSocket.IsValid() == false) {
 		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
@@ -151,9 +157,11 @@ void CMetaClient::Close()
 int CMetaClient::Send(const std::string cmd)
 {
 	int ret = -1;
-	std::string mes(cmd);
-	mes.append("\n");
-	ret = metaSocket.Send(mes.c_str(), mes.size());
+	if (metaSocket.IsValid()) {
+		std::string mes(cmd);
+		mes.append("\n");
+		ret = metaSocket.Send(mes.c_str(), mes.size());
+	}
 	return ret;
 }
 
@@ -187,3 +195,50 @@ int CMetaClient::Recv()
 }
 
 //@}
+
+int CMetaClient::CreateGame(std::string desc, std::string map, std::string players) {
+	if (metaSocket.IsValid() == false) {
+		return -1;
+	}
+	if (NetworkFildes.IsValid() == false) {
+		return -1;
+	}
+	CHost metaServerHost(metaHost.c_str(), metaPort);
+
+	// Advertise an external IP address if we can
+	unsigned long ips[1];
+	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 1);
+	std::string ipport = "";
+	if (!networkNumInterfaces || CNetworkParameter::Instance.localHost.compare("127.0.0.1")) {
+	    ipport += CNetworkParameter::Instance.localHost.c_str();
+	} else {
+		ipport += inet_ntoa(((struct in_addr *)ips)[0]);
+	}
+	ipport += " ";
+	ipport += std::to_string(CNetworkParameter::Instance.localPort);
+
+	std::string cmd("CREATEGAME \"");
+	cmd += desc;
+	cmd += "\" \"";
+	cmd += map;
+	cmd += "\" ";
+	cmd += players;
+	cmd += " ";
+	cmd += ipport;
+
+	if (this->Send(cmd.c_str()) == -1) { // not sent
+		return -1;
+	}
+	if (this->Recv() == -1) { // not received
+		return -1;
+	}
+	CClientLog &log = *GetLastMessage();
+	if (log.entry.find("CREATEGAME_OK") != std::string::npos) {
+		// Everything is OK, let's inform metaserver of our UDP info
+		NetworkFildes.Send(metaServerHost, ipport.c_str(), ipport.size());
+		return 0;
+	} else {
+		fprintf(stderr, "METACLIENT: failed to create game: %s\n", log.entry.c_str());
+		return -1;
+	}
+}

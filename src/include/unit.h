@@ -287,7 +287,7 @@ public:
 	int GetDrawLevel() const;
 
 	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
-	
+
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
 
@@ -349,6 +349,7 @@ public:
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked
+	unsigned long Summoned;      /// GameCycle unit was summoned using spells
 	unsigned Blink : 3;          /// Let selection rectangle blink
 	unsigned Moving : 1;         /// The unit is moving
 	unsigned ReCast : 1;         /// Recast again next cycle
@@ -364,7 +365,6 @@ public:
 	unsigned Boarded : 1;        /// Unit is on board a transporter.
 	unsigned CacheLock : 1;      /// Unit is on lock by unitcache operations.
 
-	unsigned Summoned : 1;       /// Unit is summoned using spells.
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 
@@ -430,10 +430,11 @@ class CPreference
 {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
+		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
+		IconFrameG(NULL), PressedIconFrameG(NULL),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
 	bool ShowSightRange;       /// Show sight range.
@@ -456,6 +457,9 @@ public:
 	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 
 	std::string SF2Soundfont;/// Path to SF2 soundfont
+
+	CGraphic *IconFrameG;
+	CGraphic *PressedIconFrameG;
 };
 
 extern CPreference Preference;

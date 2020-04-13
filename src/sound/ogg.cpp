@@ -103,10 +103,7 @@ int VorbisProcessData(OggData *data, char *buffer)
 	int i, j;
 	int val;
 	ogg_packet packet;
-	int len;
-
-	len = 0;
-	num_samples = 0;
+	int len = 0;
 
 	while (!len) {
 		if (ogg_stream_packetout(&data->astream, &packet) != 1) {
@@ -155,7 +152,6 @@ int OggInit(CFile *f, OggData *data)
 #ifdef USE_THEORA
 	int num_theora;
 #endif
-	int stream_start;
 	int ret;
 
 	unsigned magic;
@@ -179,8 +175,7 @@ int OggInit(CFile *f, OggData *data)
 	num_theora = 0;
 #endif
 	num_vorbis = 0;
-	stream_start = 0;
-	while (!stream_start) {
+	while (1) {
 		ogg_stream_state test;
 
 		if (OggGetNextPage(&data->page, &data->sync, f)) {
@@ -196,7 +191,6 @@ int OggInit(CFile *f, OggData *data)
 				ogg_stream_pagein(&data->vstream, &data->page);
 			}
 #endif
-			stream_start = 1;
 			break;
 		}
 

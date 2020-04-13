@@ -45,6 +45,8 @@
 #include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
 #endif
 
 #ifdef USE_X11
@@ -57,6 +59,7 @@
 ----------------------------------------------------------------------------*/
 
 unsigned SyncRandSeed;               /// sync random seed value.
+uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
 
 /**
 **  Inititalize sync rand seed.
@@ -152,6 +155,29 @@ long isqrt(long num)
 	return root;
 }
 
+// from wikipedia, simple checksumming of our lua files
+uint32_t fletcher32(const std::string &content)
+{
+	const uint16_t *data = (const uint16_t*)content.c_str();
+	size_t shorts = content.size() / 2;
+	uint32_t sum1 = 0xffff, sum2 = 0xffff;
+	size_t tlen;
+
+	while (shorts) {
+		tlen = ((shorts >= 359) ? 359 : shorts);
+		shorts -= tlen;
+		do {
+			sum2 += sum1 += *data++;
+			tlen--;
+		} while (tlen);
+		sum1 = (sum1 & 0xffff) + (sum1 >> 16);
+		sum2 = (sum2 & 0xffff) + (sum2 >> 16);
+	}
+	/* Second reduction step to reduce sums to 16 bits */
+	sum1 = (sum1 & 0xffff) + (sum1 >> 16);
+	sum2 = (sum2 & 0xffff) + (sum2 >> 16);
+	return (sum2 << 16) | sum1;
+}
 
 /*----------------------------------------------------------------------------
 --  Strings
@@ -506,6 +532,7 @@ void AbortAt(const char *file, int line, const char *funcName, const char *condi
 	throw stacktrace::stack_runtime_error((const char*)buf);
 #else
 	fprintf(stderr, "%s\n", buf);
+	print_backtrace();
 #endif
 	fflush(stdout);
 	fflush(stderr);

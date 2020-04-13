@@ -65,6 +65,7 @@
 #endif
 
 #ifdef USE_OPENGL
+#define __gl_glext_h_
 #include "SDL_opengl.h"
 #include "shaders.h"
 #endif
@@ -199,6 +200,10 @@ static bool IsExtensionSupported(const char *extension)
 	len = strlen(extension);
 	start = extensions;
 	while (true) {
+		if (!start)
+		{
+			return false;
+		}
 		ptr = (GLubyte *)strstr((const char *)start, extension);
 		if (!ptr) {
 			break;
@@ -287,6 +292,9 @@ static void InitOpenGL()
 	}
 #endif
 
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -466,10 +474,14 @@ void InitVideoSdl()
 	Uint32 flags = 0;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
-#ifndef USE_WIN32
+//Wyrmgus start
+//#ifndef USE_WIN32
+//Wyrmgus end
 		// Fix tablet input in full-screen mode
 		SDL_setenv("SDL_MOUSE_RELATIVE", "0", 1);
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 		int res = SDL_Init(
 					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
 					  SDL_INIT_TIMER);
@@ -518,6 +530,8 @@ void InitVideoSdl()
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
 		flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+	} else {
+		flags |= SDL_WINDOW_RESIZABLE;
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -550,20 +564,31 @@ void InitVideoSdl()
 		win_title = Parameters::Instance.applicationName.c_str();
 	}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!Video.ViewportWidth || !Video.ViewportHeight) {
 		Video.ViewportWidth = Video.Width;
 		Video.ViewportHeight = Video.Height;
 	}
+
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                             Video.ViewportWidth, Video.ViewportHeight, flags);
-#else
-	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	                             Video.ViewportWidth, Video.ViewportHeight, flags);
-#endif
 	if (TheWindow == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL) {
+			fprintf(stderr, "Re-trying video without OpenGL\n");
+			UseOpenGL = false;
+			InitVideoSdl();
+			return;
+		}
+#endif
+		if (Video.FullScreen) {
+			fprintf(stderr, "Re-trying video without fullscreen mode\n");
+			Video.FullScreen = false;
+			InitVideoSdl();
+			return;
+		}
+		fprintf(stderr, "Could not initialize video, even without fullscreen or OpenGL. Giving up.\n");
 		exit(1);
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
@@ -642,17 +667,25 @@ void InitVideoSdl()
 	Video.FullScreen = (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
-#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus start
+//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
+//Wyrmgus end
 	// Must not allow SDL to switch to relative mouse coordinates
 	// with touchscreen when going fullscreen. So we don't hide the
 	// cursor, but instead set a transparent 1px cursor
 	Uint8 emptyCursor[] = {'\0'};
 	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
 	SDL_SetCursor(Video.blankCursor);
-#else
+//Wyrmgus start
+//#else
+//Wyrmgus end
 	// Turn cursor off, we use our own.
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
+	//Wyrmgus start
+//	SDL_ShowCursor(SDL_DISABLE);
+	//Wyrmgus end
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -724,6 +757,10 @@ void InitVideoSdl()
 	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);
 
+	for(std::vector<std::string>::iterator it = UI.LifeBarColorNames.begin(); it != UI.LifeBarColorNames.end(); ++it) {
+		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName((*it).c_str())));
+	}
+
 	UI.MouseWarpPos.x = UI.MouseWarpPos.y = -1;
 }
 
@@ -780,6 +817,15 @@ void Invalidate()
 	}
 }
 
+// Switch to the shader currently stored in Video.ShaderIndex without changing it
+void SwitchToShader() {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (TheScreen && UseOpenGL && GLShaderPipelineSupported) {
+		LoadShaders(0, NULL);
+	}
+#endif
+}
+
 /**
 **  Handle interactive input event.
 **
@@ -813,6 +859,13 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
 				int xw = UI.MouseWarpPos.x;
 				int yw = UI.MouseWarpPos.y;
+#if (defined(USE_OPENGL) || defined(USE_GLES))
+				// Scale mouse-coordinates to viewport
+				if (ZoomNoResize) {
+				    xw = (Uint16)floorf(xw * float(Video.ViewportWidth) / Video.Width);
+				    yw = (Uint16)floorf(yw * float(Video.ViewportHeight) / Video.Height);
+				}
+#endif
 				UI.MouseWarpPos.x = -1;
 				UI.MouseWarpPos.y = -1;
 				SDL_WarpMouseInWindow(TheWindow, xw, yw);
@@ -843,13 +896,13 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 						IsSDLWindowVisible = false;
 						if (!GamePaused) {
 							DoTogglePause = true;
-							UiTogglePause();
+							GamePaused = true;
 						}
 					} else if (!IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)) {
 						IsSDLWindowVisible = true;
 						if (GamePaused && DoTogglePause) {
 							DoTogglePause = false;
-							UiTogglePause();
+							GamePaused = true;
 						}
 					}
 				}
@@ -859,15 +912,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
-#ifdef OPENGL
-		    if (GLShaderPipelineSupported
-			&& event.key.keysym.sym == SDLK_SLASH
-			&& event.key.keysym.mod & KMOD_ALT
-			&& event.key.keysym.mod & KMOD_CTRL) {
-			LoadShaders();
-			break;
-		    }
-#endif
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 								event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
 			break;
@@ -875,6 +919,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 		case SDL_KEYUP:
 			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
 								  event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
+			break;
+
+		case SDL_VIDEORESIZE:
+			Video.ResizeScreen(event.resize.w, event.resize.h);
 			break;
 
 		case SDL_QUIT:
@@ -1116,6 +1164,7 @@ void ToggleFullScreen()
 	//
 	// Windows shows the SDL cursor when starting in fullscreen mode
 	// then switching to window mode.  This hides the cursor again.
+	// tfel: this was for SDL1...
 	//SDL_ShowCursor(SDL_ENABLE);
 	//SDL_ShowCursor(SDL_DISABLE);
 #endif

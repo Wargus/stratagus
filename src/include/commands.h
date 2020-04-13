@@ -84,6 +84,8 @@ extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
 /// Prepare command build
 extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
+/// Prepare command explore
+extern void CommandExplore(CUnit &unit, int flush);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
 /// Prepare command resource location
@@ -152,6 +154,8 @@ extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
 /// Send build building command
 extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);
+/// Send explore command
+extern void SendCommandExplore(CUnit &unit, int flush);
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit);
 /// Send harvest location command

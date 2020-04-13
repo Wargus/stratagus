@@ -46,6 +46,7 @@
 #include "action/action_built.h"
 #include "action/action_defend.h"
 #include "action/action_die.h"
+#include "action/action_explore.h"
 #include "action/action_follow.h"
 #include "action/action_move.h"
 #include "action/action_patrol.h"
@@ -200,6 +201,8 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 		*orderPtr = new COrder_Defend;
 	} else if (!strcmp(actiontype, "action-die")) {
 		*orderPtr = new COrder_Die;
+	} else if (!strcmp(actiontype, "action-explore")) {
+		*orderPtr = new COrder_Explore;
 	} else if (!strcmp(actiontype, "action-follow")) {
 		*orderPtr = new COrder_Follow;
 	} else if (!strcmp(actiontype, "action-move")) {
@@ -395,6 +398,14 @@ static void HandleUnitAction(CUnit &unit)
 			unit.Wait = 0;
 			if (IsOnlySelected(unit)) { // update display for new action
 				SelectedUnitChanged();
+			}
+		}
+		if (unit.CurrentResource) {
+			const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
+			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitActionResource
+				&& (!resinfo.TerrainHarvester || unit.ResourcesHeld < resinfo.ResourceCapacity)) {
+				unit.CurrentResource = 0;
+				unit.ResourcesHeld = 0;
 			}
 		}
 	}

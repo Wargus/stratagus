@@ -34,7 +34,7 @@ set(STRATAGUS_MAJOR_VERSION 2)
 # Stratagus minor version (maximum 99)
 set(STRATAGUS_MINOR_VERSION 4)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 0)
+set(STRATAGUS_PATCH_LEVEL 2)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -65,6 +65,7 @@ set(action_SRCS
 	src/action/action_built.cpp
 	src/action/action_defend.cpp
 	src/action/action_die.cpp
+	src/action/action_explore.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
 	src/action/action_patrol.cpp
@@ -675,7 +676,7 @@ endif()
 # Options for compiling
 
 if(WIN32)
-	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" OFF)
+	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" ON)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
@@ -759,6 +760,10 @@ if(WITH_MNG AND MNG_FOUND)
 	add_definitions(-DUSE_MNG)
 	include_directories(${MNG_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
+	if (MSVC)
+		include_directories(${JPEG_INCLUDE_DIR})
+		set(stratagus_LIBS ${stratagus_LIBS} ${JPEG_LIBRARY})
+	endif()
 endif()
 
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
@@ -841,10 +846,14 @@ if(BEOS)
 	set(stratagus_SRCS ${stratagus_SRCS} ${beos_SRCS})
 endif()
 
+if(HAIKU)
+	set(stratagus_LIBS ${stratagus_LIBS} -lnetwork)
+endif()
+
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char -std=gnu++0x -Werror")
 endif()
 if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
@@ -972,6 +981,8 @@ elseif(BSD)
 	message("Platform: BSD")
 elseif(BEOS)
 	message("Platform: BEOS")
+elseif(HAIKU)
+	message("Platform: Haiku")
 elseif(LINUX)
 	message("Platform: Linux")
 else()
@@ -1078,7 +1089,11 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+if (ENABLE_STDIO_REDIRECT)
+   add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+else ()
+   add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
+endif ()
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -1149,7 +1164,9 @@ endif()
 
 set(gameheaders_HDRS
 	gameheaders/stratagus-game-installer.nsi
+	gameheaders/stratagus-gameutils.h
 	gameheaders/stratagus-game-launcher.h
+	gameheaders/stratagus-tinyfiledialogs.h
 )
 source_group(gameheaders FILES ${gameheaders_HDRS})
 
@@ -1212,6 +1229,14 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 		file(COPY ${GLIB_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 		file(COPY ${GTHREAD_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	endif()
+	# also ship lua51.dll
+	find_file(LUA_DLL lua51.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
+	file(COPY ${LUA_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DLUADLL=lua51.dll)
+	# ship SDL.dll
+	find_file(SDL_DLL SDL.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
+	file(COPY ${SDL_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DSDL=SDL.dll)
 	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
 		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
 		DEPENDS src/win32/stratagus.nsi stratagus COPYING
@@ -1227,7 +1252,7 @@ install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
 if(SQLITE_FOUND)
-	install(TARGETS metaserver DESTINATION ${SBINDIR})
+	install(TARGETS metaserver DESTINATION ${BINDIR} RENAME stratagus-metaserver)
 endif()
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
@@ -1255,3 +1280,14 @@ endif()
 ########### clean files ###############
 
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CLEAN_FILES}")
+
+# uninstall target
+if(NOT TARGET uninstall)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+        IMMEDIATE @ONLY)
+
+    add_custom_target(uninstall
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()

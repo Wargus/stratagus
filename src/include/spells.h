@@ -67,7 +67,7 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos) = 0;
+					 CUnit* &target, const Vec2i &goalPos) = 0;
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;
@@ -136,7 +136,7 @@ public:
 class ConditionInfo
 {
 public:
-	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
+	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(1),
 		BoolFlag(NULL), Variable(NULL), CheckFunc(NULL) {};
 	~ConditionInfo()
 	{

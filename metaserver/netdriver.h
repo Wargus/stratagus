@@ -133,8 +133,11 @@ public:
 	SocketSet *Sockets;
 };
 
-	/// external reference to session tracking.
+/// external reference to session tracking.
 extern SessionPool *Pool;
+extern char UDPBuffer[16 /* GameData->IP */ + 6 /* GameData->Port */ + 1];
+extern unsigned long UDPHost;
+extern int UDPPort;
 
 /*----------------------------------------------------------------------------
 --  Functions

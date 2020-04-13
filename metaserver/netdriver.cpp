@@ -42,6 +42,7 @@
 #endif
 
 #include "stratagus.h"
+#include "games.h"
 #include "netdriver.h"
 #include "net_lowlevel.h"
 
@@ -92,9 +93,13 @@
 ----------------------------------------------------------------------------*/
 
 static Socket MasterSocket;
+static Socket HolePunchSocket;
 
 SessionPool *Pool;
 ServerStruct Server;
+char UDPBuffer[16 /* GameData->IP */ + 6 /* GameData->Port */ + 1] = {'\0'};
+unsigned long UDPHost = 0;
+int UDPPort = 0;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -120,6 +125,7 @@ void Send(Session *session, const char *msg)
 */
 int ServerInit(int port)
 {
+	int code = 0;
 	Pool = NULL;
 
 	if (NetInit() == -1) {
@@ -127,35 +133,42 @@ int ServerInit(int port)
 	}
 
 	if ((MasterSocket = NetOpenTCP(NULL, port)) == (Socket)-1) {
-   		fprintf(stderr, "NetOpenTCP failed\n");
-   		return -2;
+		fprintf(stderr, "NetOpenTCP failed\n");
+		return -2;
+	}
+
+	if ((HolePunchSocket = NetOpenUDP(INADDR_ANY, port)) == (Socket)-1) {
+		fprintf(stderr, "NetOpenUDP failed\n");
+		return -2;
 	}
 
 	if (NetSetNonBlocking(MasterSocket) == -1) {
-		fprintf(stderr, "NetSetNonBlocking failed\n");
-		NetCloseTCP(MasterSocket);
-		NetExit();
-		return -3;
+		fprintf(stderr, "NetSetNonBlocking TCP failed\n");
+		code = -3;
+		goto error;
+	}
+
+	if (NetSetNonBlocking(HolePunchSocket) == -1) {
+		fprintf(stderr, "NetSetNonBlocking UDP failed\n");
+		code = -3;
+		goto error;
 	}
 
 	if (NetListenTCP(MasterSocket) == -1) {
-   		fprintf(stderr, "NetListenTCP failed\n");
-		NetCloseTCP(MasterSocket);
-		NetExit();
-   		return -4;
+		fprintf(stderr, "NetListenTCP failed\n");
+		code = -4;
+		goto error;
 	}
 
 	if (!(Pool = new SessionPool)) {
 		fprintf(stderr, "Out of memory\n");
-		NetCloseTCP(MasterSocket);
-		NetExit();
-		return -5;
+		code = -5;
+		goto error;
 	}
 
 	if (!(Pool->Sockets = new SocketSet)) {
-		NetCloseTCP(MasterSocket);
-		NetExit();
-		return -6;
+		code = -6;
+		goto error;
 	}
 
 	Pool->First = NULL;
@@ -163,6 +176,12 @@ int ServerInit(int port)
 	Pool->Count = 0;
 
 	return 0;
+
+ error:
+	NetCloseTCP(MasterSocket);
+	NetCloseUDP(HolePunchSocket);
+	NetExit();
+	return code;
 }
 
 /**
@@ -210,6 +229,7 @@ static int KillSession(Session *session)
 	NetCloseTCP(session->Sock);
 	Pool->Sockets->DelSocket(session->Sock);
 	UNLINK(Pool->First, session, Pool->Last, Pool->Count);
+	PartGame(session);
 	delete session;
 	return 0;
 }
@@ -247,6 +267,10 @@ static void AcceptConnections()
 
 		LINK(Pool->First, new_session, Pool->Last, Pool->Count);
 		Pool->Sockets->AddSocket(new_socket);
+	}
+	if (NetSocketReady(HolePunchSocket, 0)) {
+		NetRecvUDP(HolePunchSocket, UDPBuffer, sizeof(UDPBuffer), &UDPHost, &UDPPort);
+		DebugPrint("New UDP %s (%d %d)\n" _C_ UDPBuffer _C_ UDPHost _C_ UDPPort);
 	}
 }
 

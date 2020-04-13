@@ -136,7 +136,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.Variable[i].Enable = newstats.Variables[i].Enable;
 		} else {
 			unit.Variable[i].Value = newstats.Variables[i].Value;
-			unit.Variable[i].Max = unit.Variable[i].Value;
+			unit.Variable[i].Max = unit.Variable[i].Max;
 			unit.Variable[i].Enable = newstats.Variables[i].Enable;
 		}
 	}

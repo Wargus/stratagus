@@ -1,24 +1,39 @@
+os: Visual Studio 2015
 shallow_clone: true
 configuration:
   - Release
 before_build:
   - mkdir build
   - cd build
-  - appveyor DownloadFile https://github.com/Wargus/stratagus/releases/download/2015-30-11/dependencies.zip
+  - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/master-builds/dependencies.zip
   - 7z x dependencies.zip
-  - choco install nsis -pre
-  - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON ..
+  - appveyor DownloadFile https://github.com/jimpark/unsis/releases/download/2.50.0/nsis-2.50.0-Unicode-setup.exe
+  - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
+  - cmake -G "Visual Studio 14 2015" -T v140_xp -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON ..
   - cd ..
+after_build:
+  - 7z a compiled-binaries.zip %cd%\build\stratagus.exe %cd%\build\dependencies\bin\*.dll
 artifacts:
   - path: build\Stratagus-*.exe
+  - path: compiled-binaries.zip
 deploy:
-  release: master-builds
-  description: 'Automatic builds from the master branch'
-  provider: GitHub
-  auth_token:
-    secure: NMy2KE3EpZTjverxNzEAoBnlV+7VLGvwy3e1WEIrliFy3R1oxuT+AgGUDcRwv9y/
-  artifact: /.*exe/
-  draft: false
-  prerelease: true
-  on:
-    branch: master
+  - provider: GitHub
+    release: master-builds
+    description: 'Automatic builds from the master branch'
+    auth_token:
+      secure: NMy2KE3EpZTjverxNzEAoBnlV+7VLGvwy3e1WEIrliFy3R1oxuT+AgGUDcRwv9y/
+    artifact: /.*(exe|zip)/
+    draft: false
+    prerelease: true
+    on:
+      branch: master
+  - provider: GitHub
+    release: $(APPVEYOR_REPO_TAG_NAME)
+    description: 'Release'
+    auth_token:
+      secure: NMy2KE3EpZTjverxNzEAoBnlV+7VLGvwy3e1WEIrliFy3R1oxuT+AgGUDcRwv9y/
+    artifact: /.*(exe|zip)/
+    draft: false
+    prerelease: false
+    on:
+      appveyor_repo_tag: true

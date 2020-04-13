@@ -26,3 +26,5 @@ obj-*
 ./stratagus.suo
 ./tolua.cpp
 ./tolua.cpp.rule
+build
+.vscode

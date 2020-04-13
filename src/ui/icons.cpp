@@ -191,7 +191,23 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		s.Default.BorderColor = 0;
 		s.Default.BorderSize = 2;
 	}
-	if (Preference.IconsShift) {
+	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
+		int shift = 0;
+		if (!(flags & IconClicked)) {
+			int xoffset = (s.Width - Preference.IconFrameG->Width) / 2;
+			int yoffset = (s.Height - Preference.IconFrameG->Height) / 2;
+			Preference.IconFrameG->DrawClip(pos.x + xoffset, pos.y + yoffset);
+		} else { // Shift the icon a bit to make it look like it's been pressed.
+			shift = 1;
+			int xoffset = (s.Width - Preference.PressedIconFrameG->Width) / 2 + shift;
+			int yoffset = (s.Height - Preference.PressedIconFrameG->Height) / 2 + shift;
+			Preference.PressedIconFrameG->DrawClip(pos.x + xoffset, pos.y + yoffset);
+		}
+		DrawUIButton(&s, flags, pos.x + shift, pos.y + shift, text, player);
+		if (flags & IconSelected) {
+			Video.DrawRectangle(ColorGreen, pos.x + shift, pos.y + shift, s.Width, s.Height);
+		}
+	} else if (Preference.IconsShift) {
 		// Left and top edge of Icon
 		Video.DrawHLine(ColorWhite, pos.x - 1, pos.y - 1, 49);
 		Video.DrawVLine(ColorWhite, pos.x - 1, pos.y, 40);
@@ -216,7 +232,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1, pos.y + 1, 46, 38);
-			}			
+			}
 			Video.DrawRectangle(ColorGray, pos.x, pos.y, 48, 40);
 			Video.DrawVLine(ColorDarkGray, pos.x - 1, pos.y - 1, 40);
 			Video.DrawHLine(ColorDarkGray, pos.x - 1, pos.y - 1, 49);

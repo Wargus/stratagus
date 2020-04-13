@@ -93,6 +93,8 @@ static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
+static const char SKIRMISHER_KEY[] = "Skirmisher";
+static const char NOFRIENDLYFIRE_KEY[] = "NoFriendlyFire";
 
 // names of the variable.
 static const char HITPOINTS_KEY[] = "HitPoints";
@@ -150,7 +152,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, SKIRMISHER_KEY,
+							   NOFRIENDLYFIRE_KEY
 							  };
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
@@ -663,6 +666,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->OnEachSecond = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnInit")) {
 			type->OnInit = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnReady")) {
+			type->OnReady = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {
@@ -1054,6 +1059,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Harvest[resId].Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "help")) {
 					type->Sound.Help.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "work-complete")) {
+					type->Sound.WorkComplete.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "dead")) {
 					int death;
 
@@ -1749,6 +1756,23 @@ static int CclDefineDecorations(lua_State *l)
 						lua_pop(l, 1); // Pop value
 					}
 					decovar = decovarbar;
+				} else if (!strcmp(key, "frame")) {
+					CDecoVarFrame *frame = new CDecoVarFrame;
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument, need table with Thickness= and Color=");
+					}
+					for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+						const char* innerkey = LuaToString(l, -2);
+						if (!strcmp(innerkey, "Thickness")) {
+							frame->Thickness = LuaToNumber(l, -1);
+						} else if (!strcmp(innerkey, "ColorName")) {
+							const char *const colorName = LuaToString(l, -1);
+							frame->ColorIndex = GetColorIndexByName(colorName);
+						} else {
+							LuaError(l, "'%s' invalid for Method frame" _C_ innerkey);
+						}
+					}
+					decovar = frame;
 				} else if (!strcmp(key, "text")) {
 					CDecoVarText *decovartext = new CDecoVarText;
 

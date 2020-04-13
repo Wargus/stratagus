@@ -317,4 +317,19 @@ enum {
 	}
 }
 
+/**
+**  Get goal position
+*/
+/* virtual */ const Vec2i COrder_Follow::GetGoalPos() const
+{
+	const Vec2i invalidPos(-1, -1);
+	if (goalPos != invalidPos) {
+		return goalPos;
+	}
+	if (this->HasGoal()) {
+		return this->GetGoal()->tilePos;
+	}
+	return invalidPos;
+}
+
 //@}

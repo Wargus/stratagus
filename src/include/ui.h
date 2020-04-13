@@ -124,7 +124,9 @@ public:
 class CUIButton
 {
 public:
-	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
+	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {} //OLD BUTTON STYLE CODE
+	// NEW CODE BELOW, THANKS TO ANDRETTIN - MODIFIED BY DINKY
+	// CUIButton() : X(0), Y(0), Clicked(false), HotKeyPressed(false), Style(NULL), Callback(NULL) {}
 	~CUIButton() {}
 
 	bool Contains(const PixelPos &screenPos) const;
@@ -132,6 +134,10 @@ public:
 public:
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
+	//NEW CODE START
+	//bool Clicked;			/// whether the button is currently clicked or not
+	//bool HotKeyPressed;		/// whether the buttons hotkey is currently pressed or not
+	// NEW CODE END
 	std::string Text;               /// button text
 	ButtonStyle *Style;             /// button style
 	LuaActionListener *Callback;    /// callback function
@@ -282,6 +288,7 @@ private:
 	void DoClicked_Unload(int button);
 	void DoClicked_SpellCast(int button);
 	void DoClicked_Repair(int button);
+	void DoClicked_Explore();
 	void DoClicked_Return();
 	void DoClicked_Stop();
 	void DoClicked_StandGround();
@@ -429,6 +436,12 @@ public:
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
+        std::vector<std::string> LifeBarColorNames;
+        std::vector<int> LifeBarPercents;
+        std::vector<IntColor> LifeBarColorsInt;
+        int LifeBarYOffset;
+        bool LifeBarBorder;
+
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
 	IntColor CompletedBarColor;      /// color for completed bar
@@ -536,9 +549,9 @@ extern void InitUserInterface();
 extern void SaveUserInterface(CFile &file);
 /// Clean up the ui module
 extern void CleanUserInterface();
-#ifdef DEBUG
+
 extern void FreeButtonStyles();
-#endif
+
 /// Register ccl features
 extern void UserInterfaceCclRegister();
 
@@ -591,6 +604,8 @@ extern void CallHandler(unsigned int handle, int value);
 
 /// Show load progress
 extern void ShowLoadProgress(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
+/// Check if Demo/Attract mode is in progress
+extern bool IsDemoMode();
 
 //@}
 

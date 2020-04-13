@@ -74,7 +74,7 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *&, const Vec2i &goalPos)
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;
@@ -85,7 +85,7 @@
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
 								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
-		portal->Summoned = 1;
+		portal->Summoned = GameCycle + 1;
 	}
 	portal->TTL = GameCycle + this->TTL;
 	//  Goal is used to link to destination circle of power

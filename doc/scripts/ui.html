@@ -14,8 +14,8 @@
 ----
 ----    You should have received a copy of the GNU General Public License
 ----    along with this program; if not, write to the Free Software
-----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-----    02111-1307, USA.
+----    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+----    02110-1301, USA.
 -->
     <title>Stratagus Configuration Language Description: User Interface (UI)</title>
     <meta name="Author" content="johns98@gmx.net">
@@ -54,6 +54,7 @@
 <a href="#DefineUI">DefineUI</a>
 <a href="#DefineViewports">DefineViewports</a>
 <a href="#SetGameCursor">SetGameCursor</a>
+<a href="#Icon Frame">Icon Frame</a>
 <hr>
 <h2>Intro - Introduction to UI functions and variables</h2>
 
@@ -231,7 +232,11 @@ Selected, Clicked, Disabled, or the Default setting. Possible tags:
   <dd>Display the text at this position (overrides the main position).
   </dd>
   <dt>Border = { Color = color, Size = size}</dt>
-  <dd>Draw a border with the specified color and size.
+  <dd>Draw a border with the specified color and size, with the border flashing
+  </dd>
+  </dl>
+  <dt>Border = { SolidColor = color, Size = size}</dt>
+  <dd>Draw a border with the specified color and size, without any flashing of the border
   </dd>
   </dl>
 </dd>
@@ -913,6 +918,15 @@ Define panel content when an unit is selected.
         <dd>Height of the bar.</dd>
         <dt>Width = value</dt>
         <dd>width of the bar.</dd>
+        <dt>Border = boolean</dt>
+        <dd>if true then add a border to the bar. Default is true.</dd>
+        <dt>Colors = list</dt>
+        <dd>A list of {percentage, color-name} pairs. The default is equivalent
+          to {{75, "dark-green"}, {50, "yellow"}, {25, "orange"}, {0,
+          "red"}}. The last element must start with "0". The meaning of the
+          number is the percentage above which the associated color takes
+          effect.
+        </dd>
       </dl></dd>
       <dt>"CompleteBar", {flag = value, ...}</dt>
       <dd>Draw a bar which represent the variable.
@@ -1259,6 +1273,16 @@ Set the game cursor.
 <pre>
 -- Set the game cursor to 'cursor-point'.
 SetGameCursor("cursor-point")
+</pre>
+
+<a name="Icon Frame"></a>
+<h3>Icon Frame</h3>
+Set a custom frame to be drawn around icons. Note that "IconsShift" has to be true.
+<h4>Example</h4>
+<pre>
+Preference.IconsShift = true
+Preference.IconFrameG = CGraphic:New("ui/" .. race .. "/icon_border.png", 62, 48)
+Preference.PressedIconFrameG = CGraphic:New("ui/" .. race .. "/icon_border.png", 62, 48)
 </pre>
 
 <hr>

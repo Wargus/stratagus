@@ -57,6 +57,64 @@
 #define AIATTACK_BUILDING 2
 #define AIATTACK_AGRESSIVE 3
 
+class EnemyUnitFinder
+{
+public:
+	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type) :
+	//Wyrmgus end
+		unit(unit),
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		attackrange(unit.Stats->Variables[ATTACKRANGE_INDEX].Max),
+		find_type(find_type),
+		result_unit(result_unit)
+	{
+		*result_unit = NULL;
+	}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CUnit &unit;
+	unsigned int movemask;
+	const int attackrange;
+	const int find_type;
+	CUnit **result_unit;
+};
+
+VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!CanMoveToMask(pos, movemask)) { // unreachable
+		return VisitResult_DeadEnd;
+	}
+
+	std::vector<CUnit *> table;
+	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
+	Vec2i maxpos = pos + Vec2i(unit.Type->TileWidth - 1 + attackrange, unit.Type->TileHeight - 1 + attackrange);
+	Select(minpos, maxpos, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit *dest = table[i];
+		const CUnitType &dtype = *dest->Type;
+
+		if (
+			!unit.IsEnemy(*dest) // a friend or neutral
+			|| !CanTarget(*unit.Type, dtype)
+		) {
+			continue;
+		}
+
+		// Don't attack invulnerable units
+		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+			continue;
+		}
+
+		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
+			*result_unit = dest;
+			return VisitResult_Finished;
+		} else if (*result_unit == NULL) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
+			*result_unit = dest;
+		}
+	}
+	return VisitResult_Ok;
+}
+
 template <const int FIND_TYPE>
 class AiForceEnemyFinder
 {
@@ -84,21 +142,35 @@ public:
 		}
 		if (FIND_TYPE == AIATTACK_RANGE) {
 			*enemy = AttackUnitsInReactRange(*unit);
-		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-		} else if (FIND_TYPE == AIATTACK_BUILDING) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			Assert(!*enemy);
-			if (*enemy == NULL || !(*enemy)->Type->Building) {
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			}
-		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			Assert(!*enemy || (*enemy)->IsAgressive());
-			if (*enemy == NULL) {
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-			}
+		} else {
+			// Terrain traversal by Andrettin
+			TerrainTraversal terrainTraversal;
+			terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+			terrainTraversal.Init();
+			terrainTraversal.PushUnitPosAndNeighboor(*unit);
+			CUnit *result_unit = NULL;
+			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE);
+			terrainTraversal.Run(enemyUnitFinder);
+			*enemy = result_unit;
 		}
+		// Previous attack finding code before we added TerrainTraversal for all
+		// of these. Here for prosperity
+
+		// } else if (FIND_TYPE == AIATTACK_ALLMAP) {
+		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+		// } else if (FIND_TYPE == AIATTACK_BUILDING) {
+		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
+		// 	Assert(!*enemy);
+		// 	if (*enemy == NULL || !(*enemy)->Type->Building) {
+		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+		// 	}
+		// } else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
+		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
+		// 	Assert(!*enemy || (*enemy)->IsAgressive());
+		// 	if (*enemy == NULL) {
+		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+		// 	}
+		// }
 		return *enemy == NULL;
 	}
 private:
@@ -1083,6 +1155,12 @@ void AiForceManager::Update()
 						}
 					}
 				}
+
+				if (force.Defending == false) {
+					// force is no longer defending
+					return;
+				}
+
 				// Find idle units and order them to defend
 				// Don't attack if there aren't our units near goal point
 				std::vector<CUnit *> nearGoal;

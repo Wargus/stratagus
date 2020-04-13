@@ -320,7 +320,19 @@ void SaveScreenshotPNG(const char *name)
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
 
-	png_set_IHDR(png_ptr, info_ptr, Video.Width, Video.Height, 8,
+	int pngw, pngh;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		pngw = Video.ViewportWidth;
+		pngh = Video.ViewportHeight;
+	}
+	else
+#endif
+	{
+		pngw = Video.Width;
+		pngh = Video.Height;
+	}
+	png_set_IHDR(png_ptr, info_ptr, pngw, pngh, 8,
 				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 				 PNG_FILTER_TYPE_DEFAULT);
 
@@ -330,15 +342,23 @@ void SaveScreenshotPNG(const char *name)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		std::vector<unsigned char> pixels;
-		pixels.resize(Video.Width * Video.Height * 3);
+		unsigned char* pixels = new unsigned char[Video.ViewportWidth * Video.ViewportHeight * 3];
+		if (GLShaderPipelineSupported) {
+			// switch to real display
+			glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		}
 #ifdef USE_OPENGL
 		glReadBuffer(GL_FRONT);
 #endif
-		glReadPixels(0, 0, Video.Width, Video.Height, GL_RGB, GL_UNSIGNED_BYTE, &pixels[0]);
-		for (int i = 0; i < Video.Height; ++i) {
-			png_write_row(png_ptr, &pixels[(Video.Height - 1 - i) * Video.Width * 3]);
+		glReadPixels(0, 0, Video.ViewportWidth, Video.ViewportHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+		if (GLShaderPipelineSupported) {
+			// switch back to framebuffer
+			glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
 		}
+		for (int i = 0; i < Video.ViewportHeight; ++i) {
+			png_write_row(png_ptr, &pixels[(Video.ViewportHeight - 1 - i) * Video.ViewportWidth * 3]);
+		}
+		delete []pixels;
 	} else
 #endif
 	{

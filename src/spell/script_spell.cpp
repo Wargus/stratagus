@@ -67,7 +67,7 @@
 static SpellActionType *CclSpellAction(lua_State *l)
 {
 	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
+		LuaError(l, "expected a table of tables as spell action");
 	}
 	const int args = lua_rawlen(l, -1);
 

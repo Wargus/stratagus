@@ -123,6 +123,7 @@ public:
 	unsigned int getTileCount() const { return tiles.size(); }
 
 	unsigned int getDefaultTileIndex() const;
+	unsigned int getDefaultWoodTileIndex() const;
 
 	bool isAWallTile(unsigned tile) const;
 	bool isARaceWallTile(unsigned tile, bool human) const;

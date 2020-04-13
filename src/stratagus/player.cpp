@@ -386,7 +386,6 @@ void CleanPlayers()
 	NoRescueCheck = false;
 }
 
-#ifdef DEBUG
 void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -395,7 +394,6 @@ void FreePlayerColors()
 		PlayerColors[i].clear();
 	}
 }
-#endif
 
 /**
 **  Save state of players to file.

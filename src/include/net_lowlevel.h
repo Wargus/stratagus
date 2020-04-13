@@ -51,6 +51,7 @@
 # include <netdb.h>
 # include <sys/socket.h>
 # include <sys/ioctl.h>
+# include <ifaddrs.h>
 # ifndef __BEOS__
 #  include <net/if.h>
 #  include <arpa/inet.h>

@@ -40,6 +40,7 @@
 #include "ai.h"
 #include "animation.h"
 #include "iolib.h"
+#include "luacallback.h"
 #include "player.h"
 #include "sound.h"
 #include "translate.h"
@@ -217,14 +218,19 @@ static void AnimateActionTrain(CUnit &unit)
 		newUnit->TTL = GameCycle + unit.Type->DecayRate * 6 * CYCLES_PER_SECOND;
 	}
 
+
 	/* Auto Group Add */
+	/* Remove this code from active status to allow buildings to be a group member
+	   without trained units becoming part of the group. Reactivate to enable units
+	   to be added to the group by uncommenting this code block
+
 	if (!unit.Player->AiEnabled && unit.GroupId) {
 		int num = 0;
 		while (!(unit.GroupId & (1 << num))) {
 			++num;
 		}
 		AddToGroup(&newUnit, 1, num);
-	}
+	} */
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
 	player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
@@ -233,6 +239,11 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	if (unit.Player->AiEnabled) {
 		AiTrainingComplete(unit, *newUnit);
+	}
+	if (newUnit->Type->OnReady) {
+		newUnit->Type->OnReady->pushPreamble();
+		newUnit->Type->OnReady->pushInteger(UnitNumber(*newUnit));
+		newUnit->Type->OnReady->run();
 	}
 
 	if (unit.NewOrder && unit.NewOrder->HasGoal()

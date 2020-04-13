@@ -272,6 +272,22 @@ void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, in
 }
 
 /**
+** Send command: Unit explores the map.
+**
+** @param unit     pointer to unit.
+** @param flush    Flag flush all pending commands.
+*/
+void SendCommandExplore(CUnit &unit, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("explore", &unit, flush, -1, -1, NoUnitP, NULL, -1);
+		CommandExplore(unit, flush);
+	} else {
+		NetworkSendCommand(MessageCommandExplore, unit, 0, 0, NoUnitP, 0, flush);
+	}
+}
+
+/**
 **  Send command: Cancel this building construction.
 **
 **  @param unit  pointer to unit.
@@ -667,6 +683,10 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandBuild:
 			CommandLog("build", &unit, status, pos.x, pos.y, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
+			break;
+		case MessageCommandExplore:
+			CommandLog("explore", &unit, status, -1, -1, NoUnitP, NULL, -1);
+			CommandExplore(unit, status);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);

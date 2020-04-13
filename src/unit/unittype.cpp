@@ -526,7 +526,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
-	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
+	OnReady(NULL), TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
 	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
@@ -559,6 +559,7 @@ CUnitType::~CUnitType()
 	delete OnEachCycle;
 	delete OnEachSecond;
 	delete OnInit;
+	delete OnReady;
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
 
@@ -661,7 +662,12 @@ void UpdateUnitStats(CUnitType &type, int reset)
 								MapFieldWaterAllowed |
 								MapFieldNoBuilding |
 								MapFieldUnpassable;
-			type.FieldFlags = MapFieldNoBuilding;
+			if (type.BoolFlag[DECORATION_INDEX].value && type.MapDefaultStat.Variables[HP_INDEX].Max == 0) {
+				// special case, a decoration with no HP can always be built over
+				type.FieldFlags = 0;
+			} else {
+				type.FieldFlags = MapFieldNoBuilding;
+			}
 		} else {
 			type.MovementMask = 0;
 			type.FieldFlags = 0;

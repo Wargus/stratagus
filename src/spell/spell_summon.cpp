@@ -94,7 +94,7 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
@@ -131,7 +131,9 @@ public:
 			target->tilePos = pos;
 			DropOutOnSide(*target, LookingW, NULL);
 			// To avoid defending summoned unit for AI
-			target->Summoned = 1;
+			// we also use this value to store when this
+			// unit was summoned
+			target->Summoned = GameCycle + 1;
 			//
 			//  set life span. ttl=0 results in a permanent unit.
 			//

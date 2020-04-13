@@ -388,8 +388,8 @@ static int CclUnit(lua_State *l)
 			unit->Selected = 1;
 			--j;
 		} else if (!strcmp(value, "summoned")) {
-			unit->Summoned = 1;
-			--j;
+			// FIXME : unsigned long should be better handled
+			unit->Summoned = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "waiting")) {
 			unit->Waiting = 1;
 			--j;
@@ -648,6 +648,7 @@ static int CclRemoveUnit(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	unit->Remove(NULL);
+	LetUnitDie(*unit);
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -860,8 +861,9 @@ static int CclOrderUnit(lua_State *l)
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
-
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+				} else if (!strcmp(order, "explore")) {
+					CommandExplore(unit, 1);
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 				} else {
@@ -1102,6 +1104,18 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
+	} else if (!strcmp(value, "TTLPercent")) {
+		if (unit->Summoned && unit->TTL) {
+			unsigned long time_lived = GameCycle - unit->Summoned;
+			Assert(time_lived >= 0);
+			unsigned long time_to_live = unit->TTL - unit->Summoned;
+			Assert(time_to_live > 0);
+			double pcnt = time_lived * 100.0 / time_to_live;
+			int pcnt_i = (int)round(pcnt);
+			lua_pushinteger(l, pcnt_i);
+		} else {
+			lua_pushinteger(l, -1);
+		}
 	} else if (!strcmp(value, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
@@ -1158,10 +1172,16 @@ static int CclSetUnitVariable(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
-	int value;
+	int value = 0;
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
 		unit->AssignToPlayer(Players[value]);
+	} else if (!strcmp(name, "TTL")) {
+		value = LuaToNumber(l, 3);
+		unit->TTL = GameCycle + value;
+	} else if (!strcmp(name, "Summoned")) {
+		value = LuaToNumber(l, 3);
+		unit->Summoned = value;
 	} else if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);

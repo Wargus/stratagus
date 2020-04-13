@@ -59,10 +59,11 @@ static sqlite3 *DB;
 
 #define SQLCreateGamesTable \
 	"CREATE TABLE games (" \
-	"date INTEGER," \
 	"id INTEGER PRIMARY KEY," \
+	"date INTEGER," \
 	"gamename TEXT," \
-	"map_id INTEGER" \
+	"mapname TEXT,"	 \
+	"slots INTEGER" \
 	");"
 
 #define SQLCreateGameDataTable \
@@ -112,8 +113,10 @@ static sqlite3 *DB;
 static int DBMaxIDCallback(void *password, int argc, char **argv, char **colname)
 {
 	Assert(argc == 1);
-	if (argv[0])
-		GameID = atoi(argv[0]);
+	if (argv[0]) {
+		GameID = atoi(argv[0]) + 1;
+	}
+	fprintf(stderr, "Current max game id is %d\n", GameID);
 	return 0;
 }
 
@@ -141,15 +144,13 @@ int DBInit(void)
 		return -1;
 	}
 
-	if (!doinit) {
-		return 0;
-	}
-
-	errmsg = NULL;
-	if (sqlite3_exec(DB, SQLCreateTables, NULL, NULL, &errmsg) != SQLITE_OK) {
-		fprintf(stderr, "SQL error: %s\n", errmsg);
-		sqlite3_free(errmsg);
-		return -1;
+	if (doinit) {
+		errmsg = NULL;
+		if (sqlite3_exec(DB, SQLCreateTables, NULL, NULL, &errmsg) != SQLITE_OK) {
+			fprintf(stderr, "SQL error: %s\n", errmsg);
+			sqlite3_free(errmsg);
+			return -1;
+		}
 	}
 
 	errmsg = NULL;
@@ -253,6 +254,47 @@ int DBUpdateLoginDate(char *username)
 	sprintf(buf, "UPDATE players SET last_login_date = %d WHERE username = '%s'",
 		t, username);
 	if (sqlite3_exec(DB, buf, NULL, NULL, &errmsg) != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", errmsg);
+		sqlite3_free(errmsg);
+		return -1;
+	}
+	return 0;
+}
+
+int DBAddGame(int id, char *description, char *mapname, int numplayers)
+{
+	char buf[1024];
+	int t;
+	char *errmsg;
+
+	t = (int)time(0);
+	sprintf(buf, "INSERT INTO games VALUES(%d, %d, '%s', '%s', %d);",
+			id, t, description, mapname, numplayers);
+	if (sqlite3_exec(DB, buf, NULL, NULL, &errmsg) != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", errmsg);
+		sqlite3_free(errmsg);
+		return -1;
+	}
+	return 0;
+}
+
+static int DBStatsCallback(void *resultbuf, int argc, char **argv, char **colname)
+{
+	Assert(argc == 1);
+	strcpy((char *)resultbuf, argv[0]);
+	return 0;
+}
+
+
+int DBStats(char* resultbuf, int start_time)
+{
+	char buf[1024];
+	int t;
+	char *errmsg;
+
+	t = (int)time(0);
+	sprintf(buf, "SELECT COUNT(id) FROM games WHERE date > %d;", start_time);
+	if (sqlite3_exec(DB, buf, DBStatsCallback, resultbuf, &errmsg) != SQLITE_OK) {
 		fprintf(stderr, "SQL error: %s\n", errmsg);
 		sqlite3_free(errmsg);
 		return -1;

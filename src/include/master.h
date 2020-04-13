@@ -61,6 +61,7 @@ public:
 	int GetLastRecvState() { return lastRecvState; }
 	int GetLogSize() { return events.size(); }
 	CClientLog *GetLastMessage() { return events.back(); }
+	int CreateGame(std::string desc, std::string map, std::string players);
 
 private:
 	CTCPSocket metaSocket;                     /// This is a TCP socket

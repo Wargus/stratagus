@@ -330,6 +330,7 @@ void CViewport::Draw() const
 	/* this may take while */
 	this->DrawMapBackgroundInViewport();
 
+	Missile *clickMissile = NULL;
 	CurrentViewport = this;
 	{
 		// Now we need to sort units, missiles, particles by draw level and draw them
@@ -354,6 +355,9 @@ void CViewport::Draw() const
 			if (i == nunits) {
 				if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
 					missiletable[j]->DrawMissile(*this);
+					if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+						clickMissile = missiletable[j];
+					}
 					++j;
 				} else {
 					particletable[k]->draw();
@@ -373,6 +377,9 @@ void CViewport::Draw() const
 					++i;
 				} else {
 					missiletable[j]->DrawMissile(*this);
+					if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+						clickMissile = missiletable[j];
+					}
 					++j;
 				}
 			} else {
@@ -387,6 +394,9 @@ void CViewport::Draw() const
 				} else {
 					if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
 						missiletable[j]->DrawMissile(*this);
+						if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+							clickMissile = missiletable[j];
+						}
 						++j;
 					} else {
 						particletable[k]->draw();
@@ -400,6 +410,9 @@ void CViewport::Draw() const
 		}
 		for (; j < nmissiles; ++j) {
 			missiletable[j]->DrawMissile(*this);
+			if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+				clickMissile = missiletable[j];
+			}
 		}
 		for (; k < nparticles; ++k) {
 			particletable[k]->draw();
@@ -408,6 +421,17 @@ void CViewport::Draw() const
 	}
 
 	this->DrawMapFogOfWar();
+
+	// If there was a click missile, draw it again here above the fog
+	if (clickMissile != NULL) {
+		Vec2i pos = Map.MapPixelPosToTilePos(clickMissile->position);
+		if (Map.Field(pos.x, pos.y)->playerInfo.TeamVisibilityState(*ThisPlayer) != 2) {
+			// if this tile is not visible, we want to draw the click on top of
+			// the fog again
+			clickMissile->DrawMissile(*this);
+		}
+	}
+
 
 	//
 	// Draw orders of selected units.

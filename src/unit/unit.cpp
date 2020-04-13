@@ -606,7 +606,7 @@ void CUnit::Init(const CUnitType &type)
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
 	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.Building) {
-		Direction = (MyRand() >> 8) & 0xFF; // random heading
+		Direction = (SyncRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
 
@@ -765,7 +765,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.Building && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (MyRand() & 1) != 0) {
+		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
 	return unit;
@@ -1572,7 +1572,7 @@ void UnitCountSeen(CUnit &unit)
 	//  unit before this calc.
 	int oldv[PlayerMax];
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			oldv[p] = unit.IsVisible(Players[p]);
 		}
 	}
@@ -1582,7 +1582,7 @@ void UnitCountSeen(CUnit &unit)
 	const int width = unit.Type->TileWidth;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			int newv = 0;
 			int y = height;
 			unsigned int index = unit.Offset;
@@ -1591,7 +1591,7 @@ void UnitCountSeen(CUnit &unit)
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
-						if (mf->playerInfo.VisCloak[p]) {
+						if (mf->playerInfo.VisCloak[p] || Players[p].Type == PlayerNobody) {
 							newv++;
 						}
 					} else {
@@ -1612,7 +1612,7 @@ void UnitCountSeen(CUnit &unit)
 	// for players. Hopefully this works with shared vision just great.
 	//
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody) {
+		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
 			int newv = unit.IsVisible(Players[p]);
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
@@ -1791,7 +1791,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 
 	//apply the upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
+		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && newplayer.Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
 			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]); //apply the upgrade to this unit only
 		}
 	}
@@ -1927,7 +1927,7 @@ void RescueUnits()
 				SelectAroundUnit(unit, 1, around);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
-					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {
+					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!

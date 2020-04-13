@@ -207,20 +207,23 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& dest.Type->CanStore[unit.CurrentResource]
 		&& (dest.Player == unit.Player
 			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
-		dest.Blink = 4;
-		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
-			acknowledged = 1;
+		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
+		if (!resinfo.TerrainHarvester || unit.ResourcesHeld >= resinfo.ResourceCapacity) {
+			dest.Blink = 4;
+			if (!acknowledged) {
+				PlayUnitSound(unit, VoiceAcknowledging);
+				acknowledged = 1;
+			}
+			SendCommandReturnGoods(unit, &dest, flush);
+			return true;
 		}
-		SendCommandReturnGoods(unit, &dest, flush);
-		return true;
 	}
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				if (!acknowledged) {
@@ -254,15 +257,25 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (type.ResInfo[res]
 			&& type.ResInfo[res]->TerrainHarvester
-			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
-			&& ((unit.CurrentResource != res)
-				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
-			SendCommandResourceLoc(unit, pos, flush);
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceHarvesting);
-				acknowledged = 1;
+			&& Map.Field(pos)->IsTerrainResourceOnMap(res)) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+				SendCommandResourceLoc(unit, pos, flush);
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceHarvesting);
+					acknowledged = 1;
+				}
+				return true;
+			} else {
+				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				if (depot) {
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
+					SendCommandReturnGoods(unit, depot, flush);
+					return true;
+				}
 			}
-			return true;
 		}
 	}
 	return false;
@@ -659,6 +672,11 @@ static void HandleMouseOn(const PixelPos screenPos)
 	ButtonAreaUnderCursor = -1;
 	ButtonUnderCursor = -1;
 
+	if (IsDemoMode()) {
+		// If we are in "demo mode", do nothing.
+		return;
+	}
+
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
 		CursorOn = CursorOnMap;
@@ -900,6 +918,13 @@ static void MouseScrollMap(const PixelPos &pos)
 void UIHandleMouseMove(const PixelPos &cursorPos)
 {
 	enum _cursor_on_ OldCursorOn;
+
+	if (IsDemoMode()) {
+		// If we are in "demo mode", exit now.
+		void ActionDraw();
+		ActionDraw();
+		return;
+	}
 
 	OldCursorOn = CursorOn;
 	//  Selecting units.
@@ -1369,16 +1394,15 @@ static int SendSpellCast(const Vec2i &tilePos)
 			// this unit cannot cast spell
 			continue;
 		}
-		if (dest && &unit == dest) {
-			// no unit can cast spell on himself
-			// n0b0dy: why not?
-			continue;
-		}
 		// CursorValue here holds the spell type id
 		const SpellType *spell = SpellTypeTable[CursorValue];
 		if (!spell) {
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
+		}
+		if (dest && dest == &unit && (!spell->Condition || spell->Condition->TargetSelf == CONDITION_FALSE)) {
+			// Only spells with explicit 'self: true' allows self targetting
+			continue;
 		}
 		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
 		ret = 1;
@@ -1563,6 +1587,25 @@ static void UISelectStateButtonDown(unsigned)
 
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
+		// 74145: Spell-cast on unit portrait
+		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected
+			&& CursorAction == ButtonSpellCast) {
+			if (GameObserve || GamePaused || GameEstablishing) {
+				return;
+			}
+			int num = ButtonUnderCursor;
+
+			if (static_cast<size_t>(num) >= Selected.size() || !(MouseButtons & LeftButton)) {
+				return;
+			}
+
+			CUnit &unit = *Selected[num];
+
+			const Vec2i tilePos = unit.tilePos;
+			UnitUnderCursor = &unit;
+			SendSpellCast(tilePos);
+			UnitUnderCursor = NULL;
+		}
 		if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			OldButtonUnderCursor = ButtonUnderCursor;
 			return;
@@ -1801,6 +1844,13 @@ void UIHandleButtonDown(unsigned button)
 {
 	// Detect long left selection click
 	const bool longLeftButton = (MouseButtons & ((LeftButton << MouseHoldShift))) != 0;
+
+	if (IsDemoMode()) {
+		// If we are in "demo mode", exit no matter what we click on.
+		void ActionDraw();
+		ActionDraw();
+		return;
+	}
 
 #ifdef USE_TOUCHSCREEN
 	// If we are moving with stylus/finger,

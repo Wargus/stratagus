@@ -301,14 +301,25 @@ void UnSelectUnit(CUnit &unit)
 **  @param unit  Pointer to unit to be toggled.
 **  @return      0 if unselected, 1 otherwise
 */
+/**
+**  Toggle the selection of a unit in a group of selected units
+**
+**  @param unit  Pointer to unit to be toggled.
+**  @return      0 if unselected, 1 otherwise
+*/
 int ToggleSelectUnit(CUnit &unit)
 {
-	if (unit.Selected) {
-		UnSelectUnit(unit);
-		return 0;
-	}
-	SelectUnit(unit);
-	return 1;
+    if (unit.Selected) {
+        UnSelectUnit(unit);
+        return 0;
+    }
+    //Wyrmgus start
+    if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+        return 0;
+    }
+    //Wyrmgus end
+    SelectUnit(unit);
+    return 1;
 }
 
 /**
@@ -419,63 +430,78 @@ int SelectUnitsByType(CUnit &base)
 */
 int ToggleUnitsByType(CUnit &base)
 {
-	const CUnitType &type = *base.Type;
+    const CUnitType &type = *base.Type;
 
-	// if unit is a cadaver or hidden (not on map)
-	// no unit can be selected.
-	if (base.Removed || base.IsAlive() == false) {
-		return 0;
-	}
-	// if unit isn't belonging to the player, or is a static unit
-	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-		return 0;
-	}
+    // if unit is a cadaver or hidden (not on map)
+    // no unit can be selected.
+    if (base.Removed || base.IsAlive() == false) {
+        return 0;
+    }
+    // if unit isn't belonging to the player, or is a static unit
+    // (like a building), only 1 unit can be selected at the same time.
+    if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+        return 0;
+    }
 
-	if (!SelectUnit(base)) { // Add base to selection
-		return 0;
-	}
-	//
-	//  Search for other visible units of the same type
-	//
+    //Wyrmgus start
+    if (Selected.size() && ((Selected[0]->Type->Building && (!base.Type->Building || base.Type != Selected[0]->Type)) || Selected[0]->Type->Building != base.Type->Building)) {
+        return 0;
+    }
+    //Wyrmgus end
 
-	// select all visible units.
-	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
-	// FIXME: this should probably be cleaner implemented if SelectUnitsByType()
-	// took parameters of the selection rectangle as arguments */
-	const CViewport *vp = UI.MouseViewport;
-	const Vec2i offset(1, 1);
-	const Vec2i minPos = vp->MapPos - offset;
-	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
-	const Vec2i maxPos = vp->MapPos + vpSize + offset;
-	std::vector<CUnit *> table;
+    if (!SelectUnit(base)) { // Add base to selection
+        return 0;
+    }
+    //
+    //  Search for other visible units of the same type
+    //
 
-	Select(minPos, maxPos, table, HasSameTypeAs(type));
+    // select all visible units.
+    // StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
+    // FIXME: this should probably be cleaner implemented if SelectUnitsByType()
+    // took parameters of the selection rectangle as arguments */
+    const CViewport *vp = UI.MouseViewport;
+    const Vec2i offset(1, 1);
+    const Vec2i minPos = vp->MapPos - offset;
+    const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
+    const Vec2i maxPos = vp->MapPos + vpSize + offset;
+    std::vector<CUnit *> table;
 
-	// FIXME: peon/peasant with gold/wood & co are considered from
-	// different type... idem for tankers
-	for (size_t i = 0; i < table.size(); ++i) {
-		CUnit &unit = *table[i];
+    Select(minPos, maxPos, table, HasSameTypeAs(type));
 
-		if (!CanSelectMultipleUnits(*unit.Player)) {
-			continue;
-		}
-		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (&unit == &base) { // no need to have the same unit twice
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		if (!SelectUnit(unit)) { // add unit to selection
-			return Selected.size();
-		}
-	}
+    // FIXME: peon/peasant with gold/wood & co are considered from
+    // different type... idem for tankers
+    for (size_t i = 0; i < table.size(); ++i) {
+        CUnit &unit = *table[i];
 
-	NetworkSendSelection(&Selected[0], Selected.size());
-	return Selected.size();
+        if (!CanSelectMultipleUnits(*unit.Player)) {
+            continue;
+        }
+        if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (&unit == &base) { // no need to have the same unit twice
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        if (unit.Type->Building && Selected.size() && (!Selected[0]->Type->Building || unit.Type != Selected[0]->Type)) {
+            continue;
+        }
+        //don't select units if a building is selected
+        if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
+            continue;
+        }
+        //Wyrmgus end
+        if (!SelectUnit(unit)) { // add unit to selection
+            return Selected.size();
+        }
+    }
+
+    NetworkSendSelection(&Selected[0], Selected.size());
+    return Selected.size();
 }
 
 /**
@@ -522,22 +548,28 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 */
 int AddGroupFromUnitToSelection(CUnit &unit)
 {
-	unsigned int group = unit.LastGroup;
+    unsigned int group = unit.LastGroup;
 
-	if (!group) { // belongs to no group
-		return 0;
-	}
+    if (!group) { // belongs to no group
+        return 0;
+    }
 
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.LastGroup == group && !unit.Removed) {
-			SelectUnit(unit);
-			if (Selected.size() == MaxSelectable) {
-				return Selected.size();
-			}
-		}
-	}
-	return Selected.size();
+    //Wyrmgus start
+    if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+        return 0;
+    }
+    //Wyrmgus end
+
+    for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+        CUnit &unit = **it;
+        if (unit.LastGroup == group && !unit.Removed) {
+            SelectUnit(unit);
+            if (Selected.size() == MaxSelectable) {
+                return Selected.size();
+            }
+        }
+    }
+    return Selected.size();
 }
 
 /**
@@ -569,32 +601,56 @@ int SelectGroupFromUnit(CUnit &unit)
 **
 **  return true if at least a unit is found;
 */
-static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
+//Wyrmgus start
+//static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
+static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_table)
+//Wyrmgus end
 {
-	unsigned int n = 0;
+    unsigned int n = 0;
 
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
+    //Wyrmgus start
+    //check if has non-building
+    bool hasNonBuilding = false;
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-			continue;
-		}
-		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = &unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
-	if (n != 0) {
-		table.resize(n);
-		return true;
-	}
-	return false;
+    if (added_table == false) {
+        for (size_t i = 0; i != table.size(); ++i) {
+            CUnit &unit = *table[i];
+
+            if (!unit.Type->Building) {
+                hasNonBuilding = true;
+            }
+        }
+    }
+    //Wyrmgus end
+
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
+
+        if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+            continue;
+        }
+        if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        //only select buildings if another building of the same type is already selected
+        if (added_table == false && unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
+            continue;
+        }
+        //Wyrmgus end
+        table[n++] = &unit;
+        if (n == MaxSelectable) {
+            break;
+        }
+    }
+    if (n != 0) {
+        table.resize(n);
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -647,70 +703,73 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 */
 int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    Select(t0 - range, t1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
-	// 1) search for the player units selectable with rectangle
-	if (SelectOrganicUnitsInTable(table)) {
-		const int size = static_cast<int>(table.size());
-		ChangeSelectedUnits(&table[0], size);
-		return size;
-	}
+    // 1) search for the player units selectable with rectangle
+    //Wyrmgus start
+//  if (SelectOrganicUnitsInTable(table)) {
+    if (SelectOrganicUnitsInTable(table, false)) {
+    //Wyrmgus end
+        const int size = static_cast<int>(table.size());
+        ChangeSelectedUnits(&table[0], size);
+        return size;
+    }
 
-	// 2) If no unit found, try a player's unit not selectable by rectangle
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
+    // 2) If no unit found, try a player's unit not selectable by rectangle
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player)) {
-			continue;
-		}
-		// FIXME: Can we get this?
-		if (!unit.Removed && unit.IsAlive()) {
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
+        if (!CanSelectMultipleUnits(*unit.Player)) {
+            continue;
+        }
+        // FIXME: Can we get this?
+        if (!unit.Removed && unit.IsAlive()) {
+            SelectSingleUnit(unit);
+            return 1;
+        }
+    }
 
-	// 3) If no unit found, try a resource or a neutral critter
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-		// Unit visible FIXME: write function UnitSelectable
-		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
-			continue;
-		}
-		const CUnitType &type = *unit.Type;
-		// Buildings are visible but not selectable
-		if (type.Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
-			continue;
-		}
-		if ((type.GivesResource && !unit.Removed)) { // no built resources.
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
+    // 3) If no unit found, try a resource or a neutral critter
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
+        // Unit visible FIXME: write function UnitSelectable
+        if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
+            continue;
+        }
+        const CUnitType &type = *unit.Type;
+        // Buildings are visible but not selectable
+        if (type.Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+            continue;
+        }
+        if ((type.GivesResource && !unit.Removed)) { // no built resources.
+            SelectSingleUnit(unit);
+            return 1;
+        }
+    }
 
-	// 4) If no unit found, select an enemy unit (first found)
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-		// Unit visible FIXME: write function UnitSelectable
-		if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
-			continue;
-		}
-		// Buildings are visible but not selectable
-		if (unit.Type->Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
-			continue;
-		}
-		if (unit.IsAliveOnMap()) {
-			SelectSingleUnit(unit);
-			return 1;
-		}
-	}
-	return 0;
+    // 4) If no unit found, select an enemy unit (first found)
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
+        // Unit visible FIXME: write function UnitSelectable
+        if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
+            continue;
+        }
+        // Buildings are visible but not selectable
+        if (unit.Type->Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+            continue;
+        }
+        if (unit.IsAliveOnMap()) {
+            SelectSingleUnit(unit);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /**
@@ -723,40 +782,52 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 */
 int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	// Check if the original selected unit (if it's alone) is ours,
-	// and can be selectable by rectangle.
-	// In this case, do nothing.
-	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
-		return Selected.empty();
-	}
-	// If there is no selected unit yet, do a simple selection.
-	if (Selected.empty()) {
-		return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
-	}
-	const Vec2i tilePos0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i tilePos1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    // Check if the original selected unit (if it's alone) is ours,
+    // and can be selectable by rectangle.
+    // In this case, do nothing.
+    if (Selected.size() == 1
+        && (!CanSelectMultipleUnits(*Selected[0]->Player)
+            || !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+        return Selected.empty();
+    }
+    // If there is no selected unit yet, do a simple selection.
+    if (Selected.empty()) {
+        return SelectUnitsInRectangle(corner_topleft, corner_bottomright);
+    }
+    const Vec2i tilePos0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i tilePos1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(tilePos0 - range, tilePos1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
-	// If no unit in rectangle area... do nothing
-	if (table.empty()) {
-		return Selected.size();
-	}
+    Select(tilePos0 - range, tilePos1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    // If no unit in rectangle area... do nothing
+    if (table.empty()) {
+        return Selected.size();
+    }
 
-	// Now we should only have mobile (organic) units belonging to us,
-	// so if there's no such units in the rectangle, do nothing.
-	if (SelectOrganicUnitsInTable(table) == false) {
-		return Selected.size();
-	}
+    // Now we should only have mobile (organic) units belonging to us,
+    // so if there's no such units in the rectangle, do nothing.
+    //Wyrmgus start
+//  if (SelectOrganicUnitsInTable(table) == false) {
+    if (SelectOrganicUnitsInTable(table, true) == false) {
+    //Wyrmgus end
+        return Selected.size();
+    }
 
-	for (size_t i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
-		SelectUnit(*table[i]);
-	}
-	return Selected.size();
+    for (size_t i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
+        //Wyrmgus start
+        if (table[i]->Type->Building && Selected.size() && (!Selected[0]->Type->Building || table[i]->Type != Selected[0]->Type)) {
+            continue;
+        }
+        //don't select units if a building is selected
+        if (!table[i]->Type->Building && Selected.size() && Selected[0]->Type->Building) {
+            continue;
+        }
+        //Wyrmgus end
+        SelectUnit(*table[i]);
+    }
+    return Selected.size();
 }
 
 /**
@@ -769,39 +840,44 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 */
 int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    Select(t0 - range, t1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
-	unsigned int n = 0;
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
+    unsigned int n = 0;
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-			continue;
-		}
-		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit.Type->UnitType == UnitTypeFly) {
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = &unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
-	if (n) {
-		ChangeSelectedUnits(&table[0], n);
-	}
-	return n;
+        if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+            continue;
+        }
+        if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (unit.Type->UnitType == UnitTypeFly) {
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        if (unit.Type->Building) { //this selection mode is not for buildings
+            continue;
+        }
+        //Wyrmgus end
+        table[n++] = &unit;
+        if (n == MaxSelectable) {
+            break;
+        }
+    }
+    if (n) {
+        ChangeSelectedUnits(&table[0], n);
+    }
+    return n;
 }
 
 /**
@@ -814,37 +890,42 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 */
 int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
-	unsigned int n = 0;
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-			continue;
-		}
-		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit.Type->UnitType != UnitTypeFly) {
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = &unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
-	if (n) {
-		ChangeSelectedUnits(&table[0], n);
-	}
-	return n;
+    Select(t0 - range, t1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    unsigned int n = 0;
+    for (size_t i = 0; i != table.size(); ++i) {
+        CUnit &unit = *table[i];
+        if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+            continue;
+        }
+        if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (unit.Type->UnitType != UnitTypeFly) {
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        if (unit.Type->Building) { //this selection mode is not for buildings
+            continue;
+        }
+        //Wyrmgus end
+        table[n++] = &unit;
+        if (n == MaxSelectable) {
+            break;
+        }
+    }
+    if (n) {
+        ChangeSelectedUnits(&table[0], n);
+    }
+    return n;
 }
 
 
@@ -858,56 +939,64 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 */
 int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	// Check if the original selected unit (if it's alone) is ours,
-	// and can be selectable by rectangle.
-	// In this case, do nothing.
-	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
-		return Selected.size();
-	}
+    // Check if the original selected unit (if it's alone) is ours,
+    // and can be selectable by rectangle.
+    // In this case, do nothing.
+    if (Selected.size() == 1
+        && (!CanSelectMultipleUnits(*Selected[0]->Player)
+            || !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+        return Selected.size();
+    }
 
-	// If there is no selected unit yet, do a simple selection.
-	if (Selected.empty()) {
-		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
-	}
+    // If there is no selected unit yet, do a simple selection.
+    //Wyrmgus start
+//  if (Selected.empty()) {
+    if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+    //Wyrmgus end
+        return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
+    }
 
-	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    Select(t0 - range, t1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
-	unsigned int n = 0;
-	for (size_t i = 0; i < table.size(); ++i) {
-		CUnit &unit = *table[i];
+    unsigned int n = 0;
+    for (size_t i = 0; i < table.size(); ++i) {
+        CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-			continue;
-		}
-		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit.Type->UnitType == UnitTypeFly) {
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = &unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
+        if (!CanSelectMultipleUnits(*unit.Player) ||
+            !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+            continue;
+        }
+        if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (unit.Type->UnitType == UnitTypeFly) {
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        if (unit.Type->Building) { //this selection mode is not for buildings
+            continue;
+        }
+        //Wyrmgus end
+        table[n++] = &unit;
+        if (n == MaxSelectable) {
+            break;
+        }
+    }
 
-	// Add the units to selected.
-	for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
-		SelectUnit(*table[i]);
-	}
-	return Selected.size();
+    // Add the units to selected.
+    for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
+        SelectUnit(*table[i]);
+    }
+    return Selected.size();
 }
 
 /**
@@ -920,54 +1009,62 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 */
 int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright)
 {
-	// Check if the original selected unit (if it's alone) is ours,
-	// and can be selectable by rectangle.
-	// In this case, do nothing.
-	if (Selected.size() == 1
-		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
-		return Selected.size();
-	}
+    // Check if the original selected unit (if it's alone) is ours,
+    // and can be selectable by rectangle.
+    // In this case, do nothing.
+    if (Selected.size() == 1
+        && (!CanSelectMultipleUnits(*Selected[0]->Player)
+            || !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+        return Selected.size();
+    }
 
-	// If there is no selected unit yet, do a simple selection.
-	if (Selected.empty()) {
-		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
-	}
+    // If there is no selected unit yet, do a simple selection.
+    //Wyrmgus start
+//  if (Selected.empty()) {
+    if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+    //Wyrmgus end
+        return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
+    }
 
-	const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
-	const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
-	const Vec2i range(2, 2);
-	std::vector<CUnit *> table;
+    const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
+    const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
+    const Vec2i range(2, 2);
+    std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
-	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
-	unsigned int n = 0;
-	for (size_t i = 0; i < table.size(); ++i) {
-		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-			continue;
-		}
-		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
-			continue;
-		}
-		if (unit.Type->UnitType != UnitTypeFly) {
-			continue;
-		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
-			continue;
-		}
-		table[n++] = &unit;
-		if (n == MaxSelectable) {
-			break;
-		}
-	}
+    Select(t0 - range, t1 + range, table);
+    SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
+    unsigned int n = 0;
+    for (size_t i = 0; i < table.size(); ++i) {
+        CUnit &unit = *table[i];
+        if (!CanSelectMultipleUnits(*unit.Player) ||
+            !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+            continue;
+        }
+        if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+            continue;
+        }
+        if (unit.Type->UnitType != UnitTypeFly) {
+            continue;
+        }
+        if (unit.TeamSelected) { // Somebody else onteam has this unit
+            continue;
+        }
+        //Wyrmgus start
+        if (unit.Type->Building) { //this selection mode is not for buildings
+            continue;
+        }
+        //Wyrmgus end
+        table[n++] = &unit;
+        if (n == MaxSelectable) {
+            break;
+        }
+    }
 
-	// Add the units to selected.
-	for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
-		SelectUnit(*table[i]);
-	}
-	return Selected.size();
+    // Add the units to selected.
+    for (unsigned int i = 0; i < n && Selected.size() < MaxSelectable; ++i) {
+        SelectUnit(*table[i]);
+    }
+    return Selected.size();
 }
 
 

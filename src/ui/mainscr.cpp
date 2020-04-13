@@ -77,6 +77,7 @@ static void DrawMenuButtonArea_noNetwork()
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
 					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 // (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.MenuButton.X, UI.MenuButton.Y,
 					 UI.MenuButton.Text);
 	}
@@ -89,6 +90,7 @@ static void DrawMenuButtonArea_Network()
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
 					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 // (UI.NetworkMenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
 					 UI.NetworkMenuButton.Text);
 	}
@@ -97,6 +99,7 @@ static void DrawMenuButtonArea_Network()
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
 					 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 // (UI.NetworkDiplomacyButton.Clicked ? MI_FLAGS_CLICKED : 0),
 					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
 					 UI.NetworkDiplomacyButton.Text);
 	}
@@ -149,27 +152,30 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 	if (Preference.IconsShift) {
 		hBar = 6;
 		hAll = 10;
+		if (Preference.IconFrameG && Preference.PressedIconFrameG) {
+			y -= hBar;
+		}
 	} else {
 		hBar = 5;
 		hAll = 7;
 	}
 	y += unit.Type->Icon.Icon->G->Height;
-	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
-		unit.Type->Icon.Icon->G->Width + 8, hAll);
+	y += UI.LifeBarYOffset;
+	if (UI.LifeBarBorder) {
+		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
+								unit.Type->Icon.Icon->G->Width + 8, hAll);
+	}
 
 	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
 		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 
-		if (f > 75) {
-			color = ColorDarkGreen;
-		} else if (f > 50) {
-			color = ColorYellow;
-		} else if (f > 25) {
-			color = ColorOrange;
-		} else {
-			color = ColorRed;
+		// get to right color
+		int i = 0;
+		while (f < UI.LifeBarPercents[i]) {
+			i++;
 		}
+		color = UI.LifeBarColorsInt[i];
 
 		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
 		Video.FillRectangleClip(color, x - 2, y + 4,
@@ -387,8 +393,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
 									   (IconActive | (MouseButtons & LeftButton)) : 0;
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom 
-				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom
+				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 				: GameSettings.Presets[unit.Player->Index].PlayerColor);
 		}
 	} else {
@@ -406,8 +412,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom 
-						? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom
+						? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 						: GameSettings.Presets[unit.Player->Index].PlayerColor);
 				}
 			}
@@ -441,8 +447,8 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom 
-			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom
+			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 			: GameSettings.Presets[unit.Player->Index].PlayerColor);
 	}
 }
@@ -462,8 +468,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom 
-					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom
+					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 					: GameSettings.Presets[unit.Player->Index].PlayerColor);
 			}
 			return true;
@@ -476,8 +482,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom 
-					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor 
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom
+					? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 					: GameSettings.Presets[unit.Player->Index].PlayerColor);
 			}
 			return true;
@@ -500,8 +506,8 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom 
-			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor 
+		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom
+			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor
 			: GameSettings.Presets[uins->Player->Index].PlayerColor);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
@@ -744,6 +750,7 @@ void MessagesDisplay::DrawMessages()
 		} else {
 #endif
 			// background so the text is easier to read
+			/*
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
 				Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
@@ -755,6 +762,7 @@ void MessagesDisplay::DrawMessages()
 									UI.MapArea.EndX - UI.MapArea.X - 15,
 									textHeight - MessagesScrollY + 2);
 			}
+			*/
 
 			// Draw message line(s)
 			for (int z = 0; z < MessagesCount; ++z) {
@@ -1072,11 +1080,11 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				if (ThisPlayer->IsAllied(Players[i])) {
-					label.SetNormalColor(FontGreen); 
+					label.SetNormalColor(FontGreen);
 				} else if (ThisPlayer->IsEnemy(Players[i])) {
-					label.SetNormalColor(FontRed); 
+					label.SetNormalColor(FontRed);
 				} else {
-					label.SetNormalColor(nc); 
+					label.SetNormalColor(nc);
 				}
 				label.Draw(x + 15, y, i);
 
@@ -1106,7 +1114,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 			|| unit.Orders[0]->Action == UnitActionUpgradeTo
 			|| unit.Orders[0]->Action == UnitActionTrain) {
 			panelIndex = 3;
-		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
+		} else if (unit.Variable[MANA_INDEX].Max) {
 			panelIndex = 2;
 		} else {
 			panelIndex = 1;
@@ -1131,8 +1139,8 @@ static void InfoPanel_draw_multiple_selection()
 		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  pos, "", Selected[i]->RescuedFrom 
-						  ? GameSettings.Presets[Selected[i]->RescuedFrom->Index].PlayerColor 
+						  pos, "", Selected[i]->RescuedFrom
+						  ? GameSettings.Presets[Selected[i]->RescuedFrom->Index].PlayerColor
 						  : GameSettings.Presets[Selected[i]->Player->Index].PlayerColor);
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
@@ -1141,7 +1149,7 @@ static void InfoPanel_draw_multiple_selection()
 		}
 	}
 	if (Selected.size() > UI.SelectedButtons.size()) {
-		char buf[5];
+		char buf[22];
 
 		sprintf(buf, "+%lu", (long unsigned int)(Selected.size() - UI.SelectedButtons.size()));
 		CLabel(*UI.MaxSelectedFont).Draw(UI.MaxSelectedTextX, UI.MaxSelectedTextY, buf);

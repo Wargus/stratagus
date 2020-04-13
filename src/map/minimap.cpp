@@ -597,7 +597,7 @@ void CMinimap::Update()
 	//
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
-		if (unit.IsVisibleOnMinimap()) {
+		if (unit.IsVisibleOnMinimap() && !unit.Removed && !unit.Type->BoolFlag[REVEALER_INDEX].value) {
 			DrawUnitOn(unit, red_phase);
 		}
 	}

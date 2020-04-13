@@ -67,6 +67,7 @@ public:
 	//
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
+	int GetSocketAddresses(unsigned long *ips, int maxAddr);
 
 #ifdef DEBUG
 

@@ -57,6 +57,7 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
 	const CUnitPtr &GetReparableTarget() const { return ReparableTarget; }
+	virtual const Vec2i GetGoalPos() const;
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:

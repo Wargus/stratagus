@@ -568,7 +568,7 @@ static bool CommandKey(int key)
 
 	// FIXME: don't handle unicode well. Should work on all latin keyboard.
 	if (ptr) {
-		key = '0' + ptr - UiGroupKeys.c_str();
+		key = ((int)'0') + ptr - UiGroupKeys.c_str();
 		if (key > '9') {
 			key = SDLK_BACKQUOTE;
 		}
@@ -584,7 +584,7 @@ static bool CommandKey(int key)
 		// Unselect everything
 		case SDLK_CARET:
 		case SDLK_BACKQUOTE:
-			UiUnselectAll();
+			// UiUnselectAll();
 			break;
 
 		// Group selection
@@ -730,6 +730,18 @@ static bool CommandKey(int key)
 			KeyScrollState |= ScrollRight;
 			break;
 
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		case SDLK_SLASH:
+		case SDLK_BACKSLASH:
+			if (KeyModifiers & ModifierAlt) {
+				if (GLShaderPipelineSupported) {
+					char shadername[1024] = { '\0' };
+					LoadShaders(key == SDLK_SLASH ? 1 : -1, shadername);
+					SetMessage("%s", shadername);
+				}
+			}
+			break;
+#endif
 		default:
 			if (HandleCommandKey(key)) {
 				break;
@@ -1077,6 +1089,13 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 */
 void HandleKeyDown(unsigned key, unsigned keychar)
 {
+	if (IsDemoMode()) {
+		// If we are in "demo mode", exit no matter which key we hit.
+		void ActionDraw();
+		ActionDraw();
+		return;
+	}
+
 	if (HandleKeyModifiersDown(key, keychar)) {
 		return;
 	}

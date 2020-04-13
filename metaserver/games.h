@@ -65,6 +65,9 @@ public:
 	int ID;
 	int Started;
 
+	unsigned long UDPHost;
+	int UDPPort;
+
 	GameData *Next;
 	GameData *Prev;
 };
@@ -79,9 +82,10 @@ extern void CreateGame(Session *session, char *description, char *map,
 	char *players, char *ip, char *port, char *password);
 extern int CancelGame(Session *session);
 extern int StartGame(Session *session);
-extern int JoinGame(Session *session, int id, char *password);
+extern int JoinGame(Session *session, int id, char *password, unsigned long *host, int *port);
 extern int PartGame(Session *session);
 extern void ListGames(Session *session);
+extern int FillinUDPInfo(unsigned long udphost, int udpport, char* ip, char* port);
 
 //@}
 

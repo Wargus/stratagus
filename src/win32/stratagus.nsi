@@ -47,7 +47,7 @@
 !define DESCRIPTION "Strategy Gaming Engine"
 !define HOMEPAGE "https://github.com/Wargus/stratagus"
 !define LICENSE "GPL v2"
-!define COPYRIGHT "Copyright (c) 1998-2012 by The Stratagus Project"
+!define COPYRIGHT "Copyright (c) 1998-2018 by The Stratagus Project"
 
 ;--------------------------------
 
@@ -55,13 +55,6 @@
 !define EXE "stratagus.exe"
 ; copy, in case VS put the exe under Release or Debug
 !system "powershell -Command $\"& {cp **\${EXE} ${EXE}}$\""
-
-!define SDL "SDL.dll"
-!ifndef NO_DOWNLOAD
-!system 'powershell -Command "& {wget https://www.libsdl.org/release/SDL-1.2.15-win32.zip -OutFile SDL.zip}"'
-!system 'powershell -Command "& {unzip -o SDL.zip SDL.dll}"'
-!endif
-
 
 
 !define UNINSTALL "uninstall.exe"
@@ -223,6 +216,7 @@ Section "${NAME}"
 	SetOutPath $INSTDIR
 	File "${EXE}"
 	File "${SDL}"
+	File "${LUADLL}"
 	!ifdef FLUID
 		File "${FLUIDDLL}"
 		File "${GLIBDLL}"

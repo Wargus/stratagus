@@ -79,6 +79,12 @@ void ShowLoadProgress(const char *fmt, ...)
 {
 	va_list va;
 	char temp[4096];
+	static unsigned int lastProgressUpdate = SDL_GetTicks();
+	if (SDL_GetTicks() < lastProgressUpdate + 500) {
+		// Only show progress updates every half second, otherwise we're waiting for the screen too much
+		return;
+	}
+	lastProgressUpdate = SDL_GetTicks();
 
 	va_start(va, fmt);
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
@@ -101,6 +107,16 @@ void ShowLoadProgress(const char *fmt, ...)
 	}
 }
 
+/**
+**  Check if the game is running in Demo mode.
+**
+**  @return  True if the game is in demo mode, false otherwise
+*/
+bool IsDemoMode()
+{
+	return GameRunning && ThisPlayer->Type == PlayerNobody;
+}
+
 CUnitInfoPanel::~CUnitInfoPanel()
 {
 	for (std::vector<CContentType *>::iterator content = Contents.begin();
@@ -114,7 +130,7 @@ CUnitInfoPanel::~CUnitInfoPanel()
 CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
 	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-	NormalFontColor("yellow"), ReverseFontColor("white"), 
+	NormalFontColor("yellow"), ReverseFontColor("white"),
 	SingleSelectedButton(NULL),
 	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
 	SingleTrainingButton(NULL),
@@ -127,7 +143,7 @@ CUserInterface::CUserInterface() :
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
 	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
 {
-	MouseWarpPos.x = MouseWarpPos.y = 0;
+	MouseWarpPos.x = MouseWarpPos.y = -1;
 
 	Point.Name = "cursor-point";
 	Glass.Name = "cursor-glass";
@@ -148,6 +164,19 @@ CUserInterface::CUserInterface() :
 
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
+
+	LifeBarColorNames.push_back("dark-green");
+	LifeBarColorNames.push_back("yellow");
+	LifeBarColorNames.push_back("orange");
+	LifeBarColorNames.push_back("red");
+
+    LifeBarPercents.push_back(75);
+	LifeBarPercents.push_back(50);
+	LifeBarPercents.push_back(25);
+	LifeBarPercents.push_back(0);
+
+	LifeBarBorder = true;
+	LifeBarYOffset = 0;
 }
 
 /**
@@ -235,6 +264,15 @@ void CUserInterface::Load()
 		PieMenu.G->UseDisplayFormat();
 	}
 
+	if (Preference.IconFrameG) {
+		Preference.IconFrameG->Load();
+		Preference.IconFrameG->UseDisplayFormat();
+	}
+	if (Preference.PressedIconFrameG) {
+		Preference.PressedIconFrameG->Load();
+		Preference.PressedIconFrameG->UseDisplayFormat();
+	}
+
 	//  Resolve cursors
 	Point.Load();
 	Glass.Load();
@@ -320,6 +358,13 @@ void CleanUserInterface()
 	}
 	UI.InfoPanelContents.clear();
 
+	if (Preference.IconFrameG) {
+		CGraphic::Free(Preference.IconFrameG);
+	}
+	if (Preference.PressedIconFrameG) {
+		CGraphic::Free(Preference.PressedIconFrameG);
+	}
+
 	// Button Popups
 	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
 		 popup != UI.ButtonPopups.end(); ++popup) {
@@ -358,7 +403,6 @@ void CleanUserInterface()
 	}
 }
 
-#ifdef DEBUG
 void FreeButtonStyles()
 {
 	std::map<std::string, ButtonStyle *>::iterator i;
@@ -367,7 +411,6 @@ void FreeButtonStyles()
 	}
 	ButtonStyleHash.clear();
 }
-#endif
 
 /**
 **  Takes coordinates of a pixel in stratagus's window and computes

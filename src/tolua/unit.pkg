@@ -38,6 +38,9 @@ class CPreference
 	unsigned int AutosaveMinutes;
 
 	std::string SF2Soundfont;
+
+	CGraphic *IconFrameG;
+	CGraphic *PressedIconFrameG;
 };
 
 class CUnitManager

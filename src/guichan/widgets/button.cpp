@@ -171,7 +171,7 @@ namespace gcn
               textX = getWidth() - 4;
               break;
           default:
-              textX = 0;
+              //textX = 0;
               //throw GCN_EXCEPTION("Unknown alignment.");
               assert(!"Unknown alignment.");
         }

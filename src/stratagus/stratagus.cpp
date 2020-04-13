@@ -204,14 +204,14 @@ extern void beos_init(int argc, char **argv);
 #include "widgets.h"
 #include "util.h"
 
-#ifdef DEBUG
 #include "missile.h" //for FreeBurningBuildingFrames
-#endif
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>
 #include <stacktrace/call_stack.hpp>
 #include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
 #endif
 
 #include <stdlib.h>
@@ -407,7 +407,6 @@ void Exit(int err)
 	NetworkQuitGame();
 
 	ExitNetwork1();
-#ifdef DEBUG
 	CleanModules();
 	FreeBurningBuildingFrames();
 	FreeSounds();
@@ -422,7 +421,6 @@ void Exit(int err)
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
-#endif
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
@@ -438,6 +436,8 @@ void ExitFatal(int err)
 {
 #ifdef USE_STACKTRACE
 	throw stacktrace::stack_runtime_error((const char*)err);
+#else
+	print_backtrace();
 #endif
 	exit(err);
 }
@@ -476,10 +476,10 @@ static void Usage()
 		"\t-W\t\tWindowed video mode\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
-		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
+		"\t  \t\tPass a number to select a shader in your shaders directory by index (starting at 0).\n"\
 		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
 		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
+		"\t-Z mode\t\tGame resolution <xres>x<yres> (scaled to -v output resolution with OpenGL).\n"
 #endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
@@ -506,17 +506,12 @@ static void CleanupOutput()
 
 static void RedirectOutput()
 {
-	char path[MAX_PATH];
-	int pathlen;
+	std::string path = Parameters::Instance.GetUserDirectory();
 
-	pathlen = GetModuleFileName(NULL, path, sizeof(path));
-	while (pathlen > 0 && path[pathlen] != '\\') {
-		--pathlen;
-	}
-	path[pathlen] = '\0';
+	makedir(path.c_str(), 0777);
 
-	stdoutFile = std::string(path) + "\\stdout.txt";
-	stderrFile = std::string(path) + "\\stderr.txt";
+	stdoutFile = path + "\\stdout.txt";
+	stderrFile = path + "\\stderr.txt";
 
 	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
 		printf("freopen stdout failed");
@@ -530,8 +525,9 @@ static void RedirectOutput()
 
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
+	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z:?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -585,7 +581,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (ZoomNoResize) {
 					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 				continue;
 			case 'O':
@@ -609,26 +605,29 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Parameters::Instance.SetUserDirectory(optarg);
 				continue;
 			case 'v': {
-				char *sep = strchr(optarg, 'x');
+				sep = strchr(optarg, 'x');
 				if (!sep || !*(sep + 1)) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
-				Video.Height = atoi(sep + 1);
+				Video.ViewportHeight = atoi(sep + 1);
 				*sep = 0;
-				Video.Width = atoi(optarg);
-				if (!Video.Height || !Video.Width) {
+				Video.ViewportWidth = atoi(optarg);
+				if (!Video.ViewportHeight || !Video.ViewportWidth) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
-					ExitFatal(-1);
+					exit(-1);
 				}
 #if defined(USE_OPENGL) || defined(USE_GLES)
-				if (ZoomNoResize) {
-					Video.ViewportHeight = Video.Height;
-					Video.ViewportWidth = Video.Width;
-					Video.Height = 0;
-					Video.Width = 0;
+				if (!ZoomNoResize) {
+					Video.Height = Video.ViewportHeight;
+					Video.Width = Video.ViewportWidth;
+				}
+#else
+				{
+					Video.Height = Video.ViewportHeight;
+					Video.Width = Video.ViewportWidth;
 				}
 #endif
 				continue;
@@ -639,7 +638,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 			case 'x':
-				ShaderIndex = atoi(optarg) % MAX_SHADERS;
+				Video.ShaderIndex = atoi(optarg);
 				if (atoi(optarg) == -1) {
 					GLShaderPipelineSupported = false;
 				}
@@ -648,10 +647,15 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;
 				ZoomNoResize = 1;
-				Video.ViewportHeight = Video.Height;
-				Video.ViewportWidth = Video.Width;
-				Video.Height = 0;
-				Video.Width = 0;
+				sep = strchr(optarg, 'x');
+				if (!sep || !*(sep + 1)) {
+					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
+					Usage();
+					exit(-1);
+				}
+				Video.Height = atoi(sep + 1);
+				*sep = 0;
+				Video.Width = atoi(optarg);
 				continue;
 #endif
 			case -1:
@@ -660,7 +664,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'h':
 			default:
 				Usage();
-				ExitFatal(-1);
+				exit(-1);
 		}
 		break;
 	}
@@ -706,9 +710,6 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 */
 int stratagusMain(int argc, char **argv)
 {
-#ifdef REDIRECT_OUTPUT
-	RedirectOutput();
-#endif
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
@@ -734,68 +735,69 @@ int stratagusMain(int argc, char **argv)
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
-#ifdef USE_STACKTRACE
 	try {
+		Parameters &parameters = Parameters::Instance;
+		parameters.SetDefaultValues();
+		parameters.SetLocalPlayerNameFromEnv();
+
+#ifdef REDIRECT_OUTPUT
+		RedirectOutput();
 #endif
-	Parameters &parameters = Parameters::Instance;
-	parameters.SetDefaultValues();
-	parameters.SetLocalPlayerNameFromEnv();
 
-	if (argc > 0) {
-		parameters.applicationName = argv[0];
-	}
+		if (argc > 0) {
+			parameters.applicationName = argv[0];
+		}
 
-	// FIXME: Parse options before or after scripts?
-	ParseCommandLine(argc, argv, parameters);
-	// Init the random number generator.
-	InitSyncRand();
+		// FIXME: Parse options before or after scripts?
+		ParseCommandLine(argc, argv, parameters);
+		// Init the random number generator.
+		InitSyncRand();
 
-	makedir(parameters.GetUserDirectory().c_str(), 0777);
+		makedir(parameters.GetUserDirectory().c_str(), 0777);
 
-	// Init Lua and register lua functions!
-	InitLua();
-	LuaRegisterModules();
+		// Init Lua and register lua functions!
+		InitLua();
+		LuaRegisterModules();
 
-	// Initialise AI module
-	InitAiModule();
+		// Initialise AI module
+		InitAiModule();
 
-	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
-	PrintHeader();
-	PrintLicense();
+		PrintHeader();
+		PrintLicense();
 
-	// Setup video display
-	InitVideo();
+		// Setup video display
+		InitVideo();
 
-	// Setup sound card
-	if (!InitSound()) {
-		InitMusic();
-	}
+		// Setup sound card
+		if (!InitSound()) {
+			InitMusic();
+		}
 
 #ifndef DEBUG           // For debug it's better not to have:
-	srand(time(NULL));  // Random counter = random each start
+		srand(time(NULL));  // Random counter = random each start
 #endif
 
-	//  Show title screens.
-	SetDefaultTextColors(FontYellow, FontWhite);
-	LoadFonts();
-	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-	Video.ClearScreen();
-	ShowTitleScreens();
+		//  Show title screens.
+		SetDefaultTextColors(FontYellow, FontWhite);
+		LoadFonts();
+		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+		Video.ClearScreen();
+		ShowTitleScreens();
 
-	// Init player data
-	ThisPlayer = NULL;
-	//Don't clear the Players structure as it would erase the allowed units.
-	// memset(Players, 0, sizeof(Players));
-	NumPlayers = 0;
+		// Init player data
+		ThisPlayer = NULL;
+		//Don't clear the Players structure as it would erase the allowed units.
+		// memset(Players, 0, sizeof(Players));
+		NumPlayers = 0;
 
-	UnitManager.Init(); // Units memory management
-	PreMenuSetup();     // Load everything needed for menus
+		UnitManager.Init(); // Units memory management
+		PreMenuSetup();     // Load everything needed for menus
 
-	MenuLoop();
+		MenuLoop();
 
-	Exit(0);
-#ifdef USE_STACKTRACE
+		Exit(0);
 	} catch (const std::exception &e) {
 		fprintf(stderr, "Stratagus crashed!\n");
 		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
@@ -804,7 +806,6 @@ int stratagusMain(int argc, char **argv)
 		fprintf(stderr, "%s", e.what());
 		exit(1);
 	}
-#endif
 	return 0;
 }
 

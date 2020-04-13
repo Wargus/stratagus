@@ -116,7 +116,7 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &/*goalPos*/)
+/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *&target, const Vec2i &/*goalPos*/)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;

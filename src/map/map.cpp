@@ -490,7 +490,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(mf);
@@ -529,7 +529,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	FixNeighbors(MapFieldForest, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
@@ -547,7 +547,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	FixNeighbors(MapFieldRocks, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
@@ -589,7 +589,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
@@ -598,7 +598,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		UI.Minimap.UpdateXY(pos + offset);
 
 
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 0;

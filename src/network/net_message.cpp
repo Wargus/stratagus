@@ -350,7 +350,7 @@ CInitMessage_Hello::CInitMessage_Hello(const char *name) :
 {
 	strncpy_s(this->PlyName, sizeof(this->PlyName), name, _TRUNCATE);
 	this->Stratagus = StratagusVersion;
-	this->Version = NetworkProtocolVersion;
+	this->Version = FileChecksums;
 }
 
 const unsigned char *CInitMessage_Hello::Serialize() const
@@ -433,16 +433,16 @@ void CInitMessage_EngineMismatch::Deserialize(const unsigned char *p)
 }
 
 //
-// CInitMessage_ProtocolMismatch
+// CInitMessage_LuaFilesMismatch
 //
 
-CInitMessage_ProtocolMismatch::CInitMessage_ProtocolMismatch() :
-	header(MessageInit_FromServer, ICMProtocolMismatch)
+CInitMessage_LuaFilesMismatch::CInitMessage_LuaFilesMismatch() :
+	header(MessageInit_FromServer, ICMLuaFilesMismatch)
 {
-	this->Version = NetworkProtocolVersion;
+	this->Version = FileChecksums;
 }
 
-const unsigned char *CInitMessage_ProtocolMismatch::Serialize() const
+const unsigned char *CInitMessage_LuaFilesMismatch::Serialize() const
 {
 	unsigned char *buf = new unsigned char[Size()];
 	unsigned char *p = buf;
@@ -452,7 +452,7 @@ const unsigned char *CInitMessage_ProtocolMismatch::Serialize() const
 	return buf;
 }
 
-void CInitMessage_ProtocolMismatch::Deserialize(const unsigned char *p)
+void CInitMessage_LuaFilesMismatch::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
 	p += deserialize32(p, &this->Version);

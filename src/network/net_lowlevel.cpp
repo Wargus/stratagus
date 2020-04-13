@@ -49,19 +49,17 @@
 
 #include <windows.h>
 #include <winsock.h>
-//#include <ws2tcpip.h>
-
-// MS Knowledge base fix for SIO_GET_INTERFACE_LIST with NT4.0 ++
-#define SIO_GET_INTERFACE_LIST 0x4004747F
-#define IFF_UP 1
-#define IFF_LOOPBACK 4
-struct OLD_INTERFACE_INFO {
-	unsigned long iiFlags; /* Interface flags */
-	SOCKADDR   iiAddress;  /* Interface address */
-	SOCKADDR   iiBroadcastAddress; /* Broadcast address */
-	SOCKADDR   iiNetmask;  /* Network mask */
-};
-#define INTERFACE_INFO OLD_INTERFACE_INFO
+#include <ws2tcpip.h>
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+// that's fine
+#elif (NTDDI_VERSION >= NTDDI_WIN2K)
+// that's fine, too
+#else
+// oh no, we're at least NTDDI_WIN2K, otherwise Iphlpapi doesn't work
+#define NTDDI_VERSION NTDDI_WIN2K
+#endif
+#include <Iphlpapi.h>
+#pragma comment(lib, "Iphlpapi.lib")
 
 typedef const char *setsockopttype;
 typedef char *recvfrombuftype;
@@ -226,121 +224,58 @@ unsigned long NetResolveHost(const std::string &host)
 **  @return number of IP-addrs found.
 */
 #ifdef USE_WINSOCK // {
-// ARI: MS documented this for winsock2, so I finally found it..
-// I also found a way for winsock1.1 (= win95), but
-// that one was too complex to start with.. -> trouble
-// Lookout for INTRFC.EXE on the MS web site...
+#ifndef MIB_IF_TYPE_IEEE80211
+#define MIB_IF_TYPE_IEEE80211 71
+#endif
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	INTERFACE_INFO *localAddr = new INTERFACE_INFO[maxAddr];  // Assume there will be no more than maxAddr interfaces
-	int nif = 0;
-
-	if (sock != static_cast<Socket>(-1)) {
-		DWORD bytesReturned;
-		int wsError = WSAIoctl(sock, SIO_GET_INTERFACE_LIST, NULL, 0, &localAddr,
-							   sizeof(INTERFACE_INFO) * maxAddr, &bytesReturned, NULL, NULL);
-		if (wsError == SOCKET_ERROR) {
-			DebugPrint("SIOCGIFCONF:WSAIoctl(SIO_GET_INTERFACE_LIST) - errno %d\n" _C_ WSAGetLastError());
-		}
-
-		// parse interface information
-		const int numLocalAddr = (bytesReturned / sizeof(INTERFACE_INFO));
-		for (int i = 0; i < numLocalAddr; ++i) {
-			u_long SetFlags = localAddr[i].iiFlags;
-			if ((SetFlags & IFF_UP) == 0) {
-				continue;
-			}
-			if ((SetFlags & IFF_LOOPBACK)) {
-				continue;
-			}
-			SOCKADDR_IN *pAddrInet = (SOCKADDR_IN *)&localAddr[i].iiAddress;
-			ips[nif] = pAddrInet->sin_addr.s_addr;
-			++nif;
-			if (nif == maxAddr) {
-				break;
-			}
+	int idx = 0;
+	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+	ULONG outBufLen = 0;
+	GetAdaptersAddresses(AF_INET,
+						 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
+						 NULL, pAddresses, &outBufLen);
+	pAddresses = (PIP_ADAPTER_ADDRESSES)malloc(outBufLen);
+	if (GetAdaptersAddresses(AF_INET,
+							 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
+							 NULL, pAddresses, &outBufLen) == NO_ERROR) {
+		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
+			if (idx == maxAddr) break;
+			if (pAddresses->Flags & IP_ADAPTER_RECEIVE_ONLY) continue;
+			if ((pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == 0) continue;
+			if (pAddresses->IfType != IF_TYPE_ETHERNET_CSMACD && pAddresses->IfType != IF_TYPE_IEEE80211) continue;
+			if (pAddresses->OperStatus != IfOperStatusUp) continue;
+			if (strlen((char*)pAddresses->PhysicalAddress) == 0) continue;
+			ips[idx++] = ((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr;
 		}
 	}
-	delete [] localAddr;
-	return nif;
+
+	return idx;
 }
-#elif USE_LINUX // } {
-// ARI: I knew how to write this for a unix environment,
-// but am quite certain that porting this can cause you
-// trouble..
+#elif defined(USE_LINUX) || defined(USE_MAC)
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
-	if (sock == static_cast<Socket>(-1)) {
-		return 0;
+	struct ifaddrs *ifAddrStruct = NULL;
+	struct ifaddrs *ifa = NULL;
+	void *tmpAddrPtr = NULL;
+	int idx = 0;
+	getifaddrs(&ifAddrStruct);
+	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+		if (idx == maxAddr) break;
+		if (!ifa->ifa_addr) continue;
+		if (ifa->ifa_addr->sa_family != AF_INET) continue;
+		if (ifa->ifa_flags & IFF_LOOPBACK) continue;
+		if (ifa->ifa_flags & IFF_POINTOPOINT) continue;
+		if (ifa->ifa_flags & IFF_UP == 0) continue;
+		ips[idx++] = ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
 	}
-	char buf[4096];
-	struct ifconf ifc;
-	ifc.ifc_len = sizeof(buf);
-	ifc.ifc_buf = buf;
-	if (ioctl(sock, SIOCGIFCONF, (char *)&ifc) < 0) {
-		DebugPrint("SIOCGIFCONF - errno %d\n" _C_ errno);
-		return 0;
+	if (ifAddrStruct != NULL) {
+		freeifaddrs(ifAddrStruct);
 	}
-	// with some inspiration from routed..
-	int nif = 0;
-	struct ifreq *ifr = ifc.ifc_req;
-	char *cplim = buf + ifc.ifc_len; // skip over if's with big ifr_addr's
-
-	for (char *cp = buf; cp < cplim;
-		 cp += sizeof(ifr->ifr_name) + sizeof(ifr->ifr_ifru)) {
-		ifr = (struct ifreq *)cp;
-		struct ifreq ifreq = *ifr;
-		if (ioctl(sock, SIOCGIFFLAGS, (char *)&ifreq) < 0) {
-			DebugPrint("%s: SIOCGIFFLAGS - errno %d\n" _C_
-					   ifr->ifr_name _C_ errno);
-			continue;
-		}
-		if ((ifreq.ifr_flags & IFF_UP) == 0 || ifr->ifr_addr.sa_family == AF_UNSPEC) {
-			continue;
-		}
-		// argh, this'll have to change sometime
-		if (ifr->ifr_addr.sa_family != AF_INET) {
-			continue;
-		}
-		if (ifreq.ifr_flags & IFF_LOOPBACK) {
-			continue;
-		}
-		struct sockaddr_in *sap = (struct sockaddr_in *)&ifr->ifr_addr;
-		struct sockaddr_in sa = *sap;
-		ips[nif] = sap->sin_addr.s_addr;
-		if (ifreq.ifr_flags & IFF_POINTOPOINT) {
-			if (ioctl(sock, SIOCGIFDSTADDR, (char *)&ifreq) < 0) {
-				DebugPrint("%s: SIOCGIFDSTADDR - errno %d\n" _C_
-						   ifr->ifr_name _C_ errno);
-				// failed to obtain dst addr - ignore
-				continue;
-			}
-			if (ifr->ifr_addr.sa_family == AF_UNSPEC) {
-				continue;
-			}
-		}
-		// avoid p-t-p links with common src
-		if (nif) {
-			int i;
-			for (i = 0; i < nif; ++i) {
-				if (sa.sin_addr.s_addr == ips[i]) {
-					i = -1;
-					break;
-				}
-			}
-			if (i == -1) {
-				continue;
-			}
-		}
-		++nif;
-		if (nif == maxAddr) {
-			break;
-		}
-	}
-	return nif;
+	return idx;
 }
 #else // } {
-// Beos?? Mac??
+// more??
 int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 {
 	ips[0] = htonl(0x7f000001);
@@ -371,7 +306,7 @@ Socket NetOpenUDP(unsigned long ip, int port)
 		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
 		sock_addr.sin_addr.s_addr = ip;
-		sock_addr.sin_port = port;
+		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
@@ -407,7 +342,7 @@ Socket NetOpenTCP(const char *addr, int port)
 		} else {
 			sock_addr.sin_addr.s_addr = INADDR_ANY;
 		}
-		sock_addr.sin_port = port;
+		sock_addr.sin_port = htons(port);
 
 		int opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
@@ -577,7 +512,7 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 	// sending us packets at this level
 
 	*hostFrom = sock_addr.sin_addr.s_addr;
-	*portFrom = sock_addr.sin_port;
+	*portFrom = ntohs(sock_addr.sin_port);
 
 	return l;
 }
@@ -628,7 +563,7 @@ int NetSendUDP(Socket sockfd, unsigned long host, int port,
 
 	const int n = sizeof(struct sockaddr_in);
 	sock_addr.sin_addr.s_addr = host;
-	sock_addr.sin_port = port;
+	sock_addr.sin_port = htons(port);
 	sock_addr.sin_family = AF_INET;
 
 	return sendto(sockfd, (sendtobuftype)buf, len, 0, (struct sockaddr *)&sock_addr, n);
@@ -676,7 +611,7 @@ Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 
 	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
 	*clientHost = sa.sin_addr.s_addr;
-	*clientPort = sa.sin_port;
+	*clientPort = ntohs(sa.sin_port);
 	return socket;
 }
 

@@ -149,19 +149,26 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), Width(0), Height(0) {}
+	CContentTypeLifeBar() : Index(-1), ValueFunc(NULL), ValueMax(-1), Width(0), Height(0), hasBorder(true), colors(NULL), values(NULL) {}
+	virtual ~CContentTypeLifeBar()
+	{
+		FreeNumberDesc(ValueFunc);
+		delete[] colors;
+		delete[] values;
+	}
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	int Index;           /// Index of the variable to show, -1 if not.
-	int Width;           /// Width of the bar.
-	int Height;          /// Height of the bar.
-#if 0 // FIXME : something for color and value parametrisation (not implemented)
-	Color *colors;       /// array of color to show (depend of value)
-	int *values;         /// list of percentage to change color.
-#endif
+	int Index;            /// Index of the variable to show, -1 if not.
+	NumberDesc *ValueFunc;/// Handler of the value function
+	int ValueMax;         /// Max, when used with a value function
+	int Width;            /// Width of the bar.
+	int Height;           /// Height of the bar.
+	bool hasBorder;       /// True for additional border.
+	unsigned int *colors; /// array of color to show (depend of value)
+	unsigned int *values; /// list of percentage to change color.
 };
 
 /**

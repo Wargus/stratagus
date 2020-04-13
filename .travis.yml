@@ -1,8 +1,4 @@
 language: cpp
-# sudo: required
-# compiler:
-#   - gcc
-#   - clang
 os:
   - linux
   - osx
@@ -20,11 +16,32 @@ before_script:
   - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
-           cd build; cmake ..; make && sudo make install; \
+           cd build; cmake ..; make; \
+             export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp -DWITH_X11=OFF\";
            cd ..;
          cd ..;
     fi"
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake $CMAKEARGS ..
 script: make
+after_success:
+  - "if [ $TRAVIS_REPO_SLUG == Wargus/stratagus -a \
+          $TRAVIS_BRANCH == master -a \
+          $TRAVIS_OS_NAME == osx -a \
+          $TRAVIS_PULL_REQUEST == 'false' ]; then \
+         git clone https://${GH_TOKEN}@github.com/Wargus/stratagus.wiki.git;
+         mkdir -p stratagus.wiki/$TRAVIS_OS_NAME;
+         cp $TRAVIS_BUILD_DIR/build/stratagus stratagus.wiki/$TRAVIS_OS_NAME/;
+         rm -rf macdylibbundler; git clone https://github.com/auriamg/macdylibbundler;
+         cd macdylibbundler; make; cd ..;
+         macdylibbundler/dylibbundler -cd -of -b -x stratagus.wiki/$TRAVIS_OS_NAME/stratagus -d stratagus.wiki/libs/;
+         cd stratagus.wiki/;
+         git config --global user.email \"travis-ci@travis.org\";
+         git config --global user.name \"Travis CI\";
+         git add $TRAVIS_OS_NAME/stratagus;
+         git add libs;
+         git commit --amend -C HEAD;
+         git push -fq origin master;
+         cd ..;
+    fi"

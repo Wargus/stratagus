@@ -33,13 +33,14 @@
 //@{
 
 #ifdef USE_WIN32
-#undef NOUSER
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
 #endif
 #endif
 
 #include <cstdlib>
+#include <cstdint>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -48,6 +49,7 @@
 #include <cmath>
 
 extern unsigned SyncRandSeed;           /// Sync random seed value
+extern uint32_t FileChecksums;          /// checksums of all loaded lua files
 
 extern void InitSyncRand();             /// Initialize the syncron rand
 extern int SyncRand();                  /// Syncron rand
@@ -80,6 +82,7 @@ void clamp(T *value, T minValue, T maxValue)
 	}
 }
 
+extern uint32_t fletcher32(const std::string &content);
 
 /*----------------------------------------------------------------------------
 --  Strings

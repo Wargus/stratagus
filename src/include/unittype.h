@@ -170,6 +170,8 @@ enum {
 	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
 	SIDEATTACK_INDEX,
+	SKIRMISHER_INDEX,
+	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	NBARALREADYDEFINED
 };
 
@@ -277,6 +279,16 @@ public:
 	// FIXME color depend of percent (red, Orange, Yellow, Green...)
 	IntColor Color;             /// Color of bar.
 	IntColor BColor;            /// Color of background.
+};
+
+class CDecoVarFrame : public CDecoVar
+{
+public:
+	CDecoVarFrame() : Thickness(0), ColorIndex(-1) {};
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+
+	int Thickness;
+	int ColorIndex;
 };
 
 class CDecoVarText : public CDecoVar
@@ -518,6 +530,7 @@ public:
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second
 	LuaCallback *OnInit;            /// lua function called on unit init
+	LuaCallback *OnReady;           /// lua function called when unit ready/built
 
 	int TeleportCost;               /// mana used for teleportation
 	LuaCallback *TeleportEffectIn;   /// lua function to create effects before teleportation
@@ -585,6 +598,7 @@ public:
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
+	unsigned Skirmisher : 1;            /// Unit will try to shoot from max range
 
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;

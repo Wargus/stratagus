@@ -373,9 +373,7 @@ extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
 /// Output debug information for players
 extern void DebugPlayers();
 
-#ifdef DEBUG
 void FreePlayerColors();
-#endif
 
 /// register ccl features
 extern void PlayerCclRegister();

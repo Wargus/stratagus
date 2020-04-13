@@ -329,6 +329,7 @@ static void ParseCreateGame(Session *session, char *buf)
 	CreateGame(session, description, map, players, ip, port, password);
 
 	DebugPrint("%s created a game\n" _C_ session->UserData.Name);
+	DBAddGame(session->Game->ID, description, map, players_int);
 	Send(session, "CREATEGAME_OK\n");
 }
 
@@ -399,13 +400,15 @@ static void ParseJoinGame(Session *session, char *buf)
 	char *id;
 	char *password;
 	int ret;
+	unsigned long udphost;
+	int udpport;
 
 	if (Parse1or2Args(buf, &id, &password)) {
 		Send(session, "ERR_BADPARAMETER\n");
 		return;
 	}
 
-	ret = JoinGame(session, atoi(id), password);
+	ret = JoinGame(session, atoi(id), password, &udphost, &udpport);
 	if (ret == -1) {
 		Send(session, "ERR_ALREADYINGAME\n");
 		return;
@@ -422,10 +425,16 @@ static void ParseJoinGame(Session *session, char *buf)
 	} else if (ret == -4) {
 		Send(session, "ERR_GAMEFULL\n");
 		return;
+	} else if (ret == -5) {
+		Send(session, "ERR_SERVERNOTREADY\n");
+		return;
 	}
 
-	DebugPrint("%s joined game %d\n" _C_ session->UserData.Name _C_ atoi(id));
-	Send(session, "JOINGAME_OK\n");
+	char* reply = (char*)calloc(sizeof(char), strlen("JOINGAME_OK 255.255.255.255 66535\n") + 1);
+	sprintf(reply, "JOINGAME_OK %d.%d.%d.%d %d\n", NIPQUAD(ntohl(UDPHost)), udpport);
+	DebugPrint("%s joined game %d with %s\n" _C_ session->UserData.Name _C_ atoi(id) _C_ reply);
+	Send(session, reply);
+	free(reply);
 }
 
 /**
@@ -467,6 +476,30 @@ static void ParseEndGame(Session *session, char *buf)
 	Send(session, "ENDGAME_OK\n");
 }
 
+
+/**
+**  Parse STATS
+*/
+static void ParseStats(Session *session, char *buf)
+{
+	char *result;
+	int start_time = 0;
+	char resultbuf[20] = {'\0'};
+
+	while (*buf == ' ') ++buf;
+	if (*buf) {
+		Parse1Arg(buf, &result);
+		start_time = atoi(result);
+	}
+
+	DebugPrint("%s requested stats\n" _C_ session->UserData.Name);
+	char* reply = (char*)calloc(sizeof(char), strlen("GAMES SINCE 12345678901234567890: 12345678901234567890\n") + 1);
+	DBStats(resultbuf, start_time);
+	sprintf(reply, "GAMES SINCE %d: %s\n", start_time, resultbuf);
+	Send(session, reply);
+	Send(session, "STATS_OK\n");
+}
+
 /**
 **  Parse MSG
 */
@@ -490,19 +523,19 @@ static void ParseBuffer(Session *session)
 	buf = session->Buffer;
 	if (!strncmp(buf, "PING", 4)) {
 		ParsePing(session);
-	} else if (!session->UserData.LoggedIn) {
-		if (!strncmp(buf, "USER ", 5)) {
-			ParseUser(session, buf + 5);
-		} else if (!strncmp(buf, "REGISTER ", 9)) {
-			ParseRegister(session, buf + 9);
-		} else {
-			fprintf(stderr, "Unknown command: %s\n", session->Buffer);
-			Send(session, "ERR_BADCOMMAND\n");
-		}
 	} else {
-		if (!strncmp(buf, "USER ", 5) || !strncmp(buf, "REGISTER ", 9)) {
-			Send(session, "ERR_ALREADYLOGGEDIN\n");
-		} else if (!strncmp(buf, "CREATEGAME ", 11)) {
+		if (!session->UserData.LoggedIn) {
+			if (!strncmp(buf, "USER ", 5)) {
+				ParseUser(session, buf + 5);
+			} else if (!strncmp(buf, "REGISTER ", 9)) {
+				ParseRegister(session, buf + 9);
+			}
+		} else {
+			if (!strncmp(buf, "USER ", 5) || !strncmp(buf, "REGISTER ", 9)) {
+				Send(session, "ERR_ALREADYLOGGEDIN\n");
+			}
+		}
+		if (!strncmp(buf, "CREATEGAME ", 11)) {
 			ParseCreateGame(session, buf + 11);
 		} else if (!strcmp(buf, "CANCELGAME") || !strncmp(buf, "CANCELGAME ", 11)) {
 			ParseCancelGame(session, buf + 10);
@@ -516,6 +549,8 @@ static void ParseBuffer(Session *session)
 			ParsePartGame(session, buf + 8);
 		} else if (!strncmp(buf, "ENDGAME ", 8)) {
 			ParseEndGame(session, buf + 8);
+		} else if (!strncmp(buf, "STATS ", 6)) {
+			ParseStats(session, buf + 6);
 		} else if (!strncmp(buf, "MSG ", 4)) {
 			ParseMsg(session, buf + 4);
 		} else {
@@ -556,6 +591,26 @@ int UpdateParser(void)
 		}
 
 	}
+
+	if (strlen(UDPBuffer)) {
+		// If this is a server, we'll note its external data. When clients join,
+		// they'll receive this as part of the TCP response that they
+		// successfully joined.  This is a simplification of the full UDP hole
+		// punching algorithm, which unneccessarily might go through the NAT
+		// even for clients inside the same NAT. This will also not work if in
+		// that case the NAT does not support hairpin translation. But we'll see
+		// how common that is...
+		char ip[128] = {'\0'};
+		char port[128] = {'\0'};
+		sscanf(UDPBuffer, "%s %s", (char*)&ip, (char*)&port);
+		DebugPrint("Filling in UDP info for %s:%s\n" _C_ ip _C_ port);
+		if (FillinUDPInfo(UDPHost, UDPPort, ip, port)) {
+			fprintf(stderr, "Error filling in UDP info for %s:%s with %d.%d.%d.%d:%d",
+					ip, port, NIPQUAD(ntohl(UDPHost)), UDPPort);
+		}
+		UDPBuffer[0] = '\0';
+	}
+
 	return 0;
 }
 

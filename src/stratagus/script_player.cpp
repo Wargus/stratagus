@@ -515,13 +515,12 @@ static int CclSharedVision(lua_State *l)
 }
 
 /**
-**  Define race names
+**  Define race names in addition to those already there.
 **
 **  @param l  Lua state.
 */
-static int CclDefineRaceNames(lua_State *l)
+static int CclDefineNewRaceNames(lua_State *l)
 {
-	PlayerRaces.Clean();
 	int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, j + 1);
@@ -550,8 +549,18 @@ static int CclDefineRaceNames(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-
 	return 0;
+}
+
+/**
+** Define race names
+**
+** @param l Lua state.
+*/
+static int CclDefineRaceNames(lua_State *l)
+{
+	PlayerRaces.Clean();
+	return CclDefineNewRaceNames(l);
 }
 
 /**
@@ -931,6 +940,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "SharedVision", CclSharedVision);
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
+	lua_register(Lua, "DefineNewRaceNames", CclDefineRaceNames);
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
 

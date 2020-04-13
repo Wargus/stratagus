@@ -427,6 +427,33 @@ void CDecoVarBar::Draw(int x, int y,
 }
 
 /**
+**  Draw bar for variables.
+**
+**  @param x       X screen pixel position
+**  @param y       Y screen pixel position
+**  @param unit    Unit pointer
+**  @todo fix color configuration.
+*/
+void CDecoVarFrame::Draw(int x, int y,
+					   const CUnitType &type, const CVariable &var) const
+{
+	Assert(var.Max);
+
+	int height = type.BoxHeight - 2;
+	int width = type.BoxWidth - 2;
+	int thickness = this->Thickness;
+
+	Uint32 color = IndexToColor(this->ColorIndex);
+	// always keep it between a 2/5 and 4/5 visible
+	unsigned char alpha = (var.Value * 51 / var.Max + 51) * 2;
+
+	Video.FillTransRectangleClip(color, x + 1, y + 1, width, thickness, alpha);
+	Video.FillTransRectangleClip(color, x + 1, y + 1 + thickness, thickness, height - thickness, alpha);
+	Video.FillTransRectangleClip(color, x + 1 + width - thickness, y + 1 + thickness, thickness, height - thickness, alpha);
+	Video.FillTransRectangleClip(color, x + 1 + thickness, y + 1 + height - thickness, width - 2 * thickness, thickness, alpha);
+}
+
+/**
 **  Print variable values (and max....).
 **
 **  @param x       X screen pixel position
@@ -703,7 +730,10 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 
 	// FIXME: johns: ugly check here, should be removed!
 	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
-		DrawDecoration(unit, type, screenPos);
+		PixelPos offsetPos(screenPos);
+		if (unit.tilePos.y == Map.Info.MapHeight-1)
+			offsetPos.y -= 2;
+		DrawDecoration(unit, type, offsetPos);
 	}
 }
 
