@@ -856,7 +856,7 @@ int InitSound()
 	Audio.Running = true;
 
 	// Create thread to fill sdl audio buffer
-	Audio.Thread = SDL_CreateThread(FillThread, NULL);
+	Audio.Thread = SDL_CreateThread(FillThread, "stratagus-snd", NULL);
 	return 0;
 }
 

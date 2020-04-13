@@ -921,8 +921,8 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 								  event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
 			break;
 
-		case SDL_VIDEORESIZE:
-			Video.ResizeScreen(event.resize.w, event.resize.h);
+		case SDL_WINDOWEVENT_RESIZED:
+			Video.ResizeScreen(event.window.data1, event.window.data2);
 			break;
 
 		case SDL_QUIT:
