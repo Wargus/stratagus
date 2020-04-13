@@ -537,10 +537,65 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 }
 
 /**
+**  Check if current target is closer to unit more than MinAttackRange
+**	
+**  @param unit  Unit that is attacking and moving
+*/
+bool COrder_Attack::IsTargetTooClose(CUnit &unit)
+{
+	CUnit *goal 		= this->GetGoal();
+	/// Calculate distance to goal or map tile if attack ground/wall
+	const int distance 	= IsAttackGroundOrWall() ? unit.MapDistanceTo(this->goalPos) 
+												 : goal ? unit.MapDistanceTo(*goal) : 0;
+	const bool tooClose = (distance && (distance < unit.Type->MinAttackRange)) ? true : false;
+	return tooClose;
+}
+
+/**
+**  Controls moving a unit to position if its target is closer than MinAttackRange when attacking
+**	
+**  @param unit  Unit that is attacking and moving
+*/
+void COrder_Attack::MoveToAttackPos(CUnit &unit, int pfReturn)
+{
+	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
+	Assert(unit.CurrentOrder() == this);
+	Assert(unit.CanMove());
+	Assert(this->State & MOVE_TO_ATTACKPOS);
+	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+
+	if (unit.Anim.Unbreakable) {
+		return;
+	}
+	if (CheckForTargetInRange(unit)) {
+		return;
+	}
+	CUnit *goal 			 = this->GetGoal();
+	/// When attack ground and moving to attack position, the target tile pos is stored in attackMovePos
+	const bool inAttackRange = goal ? InAttackRange(unit, *goal) 
+									: InAttackRange(unit, this->attackMovePos); 
+	if (!IsTargetTooClose(unit)) {
+		/// We have to restore original goalPos value
+		if (goal) {
+			this->goalPos = goal->tilePos;
+		} else {
+			this->goalPos = this->attackMovePos;
+			this->attackMovePos = Vec2i(-1,-1);
+		}
+		TurnToTarget(unit, goal);
+		this->State &= AUTO_TARGETING;
+		this->State |= inAttackRange ? ATTACK_TARGET : MOVE_TO_TARGET;
+		if (this->State & MOVE_TO_TARGET) {
+			unit.Frame	= 0;
+		}
+	} else if (pfReturn < 0) {
+		MoveToBetterPos(unit);
+	}
+}
+
+/**
 **  Controls moving a unit to its target when attacking
-**
-**	@todo FIXME: add move to better pos for Attack_Ground when target tile is too close
-**
+**	
 **  @param unit  Unit that is attacking and moving
 */
 void COrder_Attack::MoveToTarget(CUnit &unit)
@@ -550,19 +605,17 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 	
-	CUnit *goal 		= this->GetGoal();
-	/// Calculate distance to goal or map tile if attack ground/wall
-	const int distance 	= IsAttackGroundOrWall() ? unit.MapDistanceTo(this->goalPos) 
-												 : goal ? unit.MapDistanceTo(*goal) : 0;
-	const bool tooClose = (distance && (distance < unit.Type->MinAttackRange)) ? true : false;
-	
-	if (tooClose && !(this->State & MOVE_TO_ATTACKPOS)) {
+	if (IsTargetTooClose(unit) && !(this->State & MOVE_TO_ATTACKPOS)) {
 		MoveToBetterPos(unit);
 	}
 
 	int err = DoActionMove(unit);
-
+	
 	if (unit.Anim.Unbreakable) {
+		return;
+	}
+	if (this->State & MOVE_TO_ATTACKPOS) {
+		MoveToAttackPos(unit, err);
 		return;
 	}
 
@@ -573,35 +626,18 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			err = PF_REACHED;
 		}
 	}
-
+	CUnit *goal = this->GetGoal();
 	// Waiting or on the way
 	if (err >= 0) {
-		bool targetChanged = false;
-		if (!CheckForTargetInRange(unit)) {
-
+		if (!CheckForTargetInRange(unit) && IsAutoTargeting()) {
 			CUnit *currGoal = this->GetGoal();
 			if (currGoal && goal != currGoal) {
-				targetChanged = true;
-			}
-
-			if ((IsAutoTargeting() && targetChanged) || (this->State & MOVE_TO_ATTACKPOS)) {
-
-				const bool inAttackRange = currGoal ? InAttackRange(unit, *currGoal) 
-													: InAttackRange(unit, this->attackMovePos);
-				if (inAttackRange) {
-					if (currGoal) {
-						this->goalPos = currGoal->tilePos; // We have to restore in case of MOVE_TO_ATTACKPOS
-					} else {
-						this->goalPos = this->attackMovePos;
-						this->attackMovePos = Vec2i(-1,-1);
-					}
+				if (InAttackRange(unit, *currGoal)) {
 					TurnToTarget(unit, currGoal);
-					this->State &= AUTO_TARGETING;
-					this->State |= ATTACK_TARGET;
-				} else if (targetChanged) {
+					this->State = ATTACK_TARGET | AUTO_TARGETING;
+				} else {
 					unit.Frame	= 0;
-					this->State &= AUTO_TARGETING;
-					this->State |= MOVE_TO_TARGET;
+					this->State = MOVE_TO_TARGET | AUTO_TARGETING;
 				}
 			}
 		}
@@ -614,9 +650,6 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			TurnToTarget(unit, goal);
 			this->State &= AUTO_TARGETING;
 			this->State |= ATTACK_TARGET;
-			return;
-		} else if (tooClose) {
-			MoveToBetterPos(unit);
 			return;
 		}
 		// Attacking wall or ground.
@@ -638,9 +671,6 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			// When attack-moving we have to allow a bigger range (PF)
 			this->Range++;
 			unit.Wait = 5;
-			return;
-		} else if (tooClose) {
-			MoveToBetterPos(unit);
 			return;
 		}
 		this->ClearGoal();
