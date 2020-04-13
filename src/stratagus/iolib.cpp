@@ -512,7 +512,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 		return true;
 	}
 #if defined(USE_ZLIB) || defined(USE_BZ2LIB)
-	char buf[PATH_MAX];
+	char buf[PATH_MAX + 4];
 #endif
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
