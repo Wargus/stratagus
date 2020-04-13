@@ -452,7 +452,6 @@ int UnitTypeIdByIdent(const std::string &ident)
 		return type->Slot;
 	}
 	DebugPrint(" fix this %s\n" _C_ ident.c_str());
-	Assert(0);
 	return -1;
 }
 

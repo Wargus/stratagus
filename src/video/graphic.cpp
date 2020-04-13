@@ -539,6 +539,7 @@ CGraphic *CGraphic::New(const std::string &filename, int w, int h)
 		g->Height = h;
 	} else {
 		++g->Refs;
+		DebugPrint("f:%s,w%d,W%d,H%d,h%d\n" _C_ filename.c_str() _C_ w _C_ g->Width _C_ g->Height _C_ h);
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
 
@@ -795,20 +796,6 @@ void CGraphic::Load(bool grayscale)
 
 	Assert(Width <= GraphicWidth && Height <= GraphicHeight);
 
-	#if 1
-	if (File=="graphics/human/units/elven_archer.png" && Surface->format->BytesPerPixel == 1)
-	{
-	  //FILE *file = fopen("archer-test.data", "w+");
-	  FILE *file = fopen("archer-palete-orig.data", "w+");
-	  if (file) {
-	    //fwrite(s->pixels, 1, s->pitch*s->h, file);
-	    //fwrite(s->format->palette->colors, 1, 3 * s->format->palette->ncolors, file);
-	    for (int i = 0; i < Surface->format->palette->ncolors; i++)
-	      fwrite(&Surface->format->palette->colors[i], 1, 3, file);
-	    fclose(file);
-	  }
-	}
-	#endif
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
 		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
@@ -1072,34 +1059,6 @@ void CGraphic::Flip()
 		}
 		break;
 	}
-	#if 1
-	if (File=="graphics/human/units/elven_archer.png" && Surface->format->BytesPerPixel == 1)
-	{
-	  //FILE *file = fopen("archer-test.data", "w+");
-	  FILE *file = fopen("archer-palete.data", "w+");
-	  if (file) {
-	    //fwrite(s->pixels, 1, s->pitch*s->h, file);
-	    //fwrite(s->format->palette->colors, 1, 3 * s->format->palette->ncolors, file);
-	    for (int i = 0; i < Surface->format->palette->ncolors; i++)
-	      fwrite(&Surface->format->palette->colors[i], 1, 3, file);
-	    fclose(file);
-	  }
-	}
-	#endif
-	#if 1
-	if (File=="graphics/human/units/elven_archer.png" && s->format->BytesPerPixel == 1)
-	{
-	  //FILE *file = fopen("archer-test.data", "w+");
-	  FILE *file = fopen("archer-palete-flip.data", "w+");
-	  if (file) {
-	    //fwrite(s->pixels, 1, s->pitch*s->h, file);
-	    //fwrite(s->format->palette->colors, 1, 3 * s->format->palette->ncolors, file);
-	    for (int i = 0; i < s->format->palette->ncolors; i++)
-	      fwrite(&s->format->palette->colors[i], 1, 3, file);
-	    fclose(file);
-	  }
-	}
-	#endif
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 
