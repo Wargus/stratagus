@@ -343,7 +343,7 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 int AiForce::PlanAttack()
 {
 	CPlayer &player = *AiPlayer->Player;
-	DebugPrint("%d: Planning for force #%lu of player #%d\n"_C_ player.Index
+	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.Index
 			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ player.Index);
 
 	TerrainTraversal transporterTerrainTraversal;
