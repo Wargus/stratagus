@@ -296,11 +296,11 @@ static void MixIntoBuffer(void *buffer, int samples)
 
 	if (EffectsEnabled) {
 		// Add channels to mixer buffer
-		MixChannelsToStereo32(Audio.MixerBuffer, samples);
+		// MixChannelsToStereo32(Audio.MixerBuffer, samples);
 	}
 	if (MusicEnabled) {
 		// Add music to mixer buffer
-		MixMusicToStereo32(Audio.MixerBuffer, samples);
+		// MixMusicToStereo32(Audio.MixerBuffer, samples);
 	}
 	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
 }
@@ -317,7 +317,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 static void FillAudio(void *, Uint8 *stream, int len)
 {
 	if (!Audio.Running) return;
-	Assert(len != Audio.Format.size);
+	Assert(len == Audio.Format.size);
 	SDL_memset(stream, 0, len);
 
 	SDL_LockMutex(Audio.Lock);
