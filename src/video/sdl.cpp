@@ -56,20 +56,6 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-#ifdef USE_GLES_EGL
-#include "EGL/egl.h"
-#endif
-
-#ifdef USE_GLES
-#include "GLES/gl.h"
-#endif
-
-#ifdef USE_OPENGL
-#define __gl_glext_h_
-#include "SDL_opengl.h"
-#include "shaders.h"
-#endif
-
 #ifdef USE_BEOS
 #include <sys/socket.h>
 #endif
@@ -101,11 +87,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-#ifdef USE_GLES_EGL
-static EGLDisplay eglDisplay;
-static EGLSurface eglSurface;
-#endif
-
 SDL_Window *TheWindow; /// Internal screen
 SDL_Renderer *TheRenderer = NULL; /// Internal screen
 SDL_Texture *TheTexture; /// Internal screen
@@ -113,13 +94,6 @@ SDL_Surface *TheScreen; /// Internal screen
 
 static SDL_Rect Rects[100];
 static int NumRects;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-GLint GLMaxTextureSize = 256;   /// Max texture size supported on the video card
-GLint GLMaxTextureSizeOverride;     /// User-specified limit for ::GLMaxTextureSize
-bool GLTextureCompressionSupported; /// Is OpenGL texture compression supported
-bool UseGLTextureCompression;       /// Use OpenGL texture compression
-#endif
 
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
@@ -130,21 +104,6 @@ const EventCallback *Callbacks;
 
 static bool RegenerateScreen = false;
 bool IsSDLWindowVisible = true;
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-// ARB_texture_compression
-#ifdef USE_OPENGL
-PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
-PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
-PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
-PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
-PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
-#endif
 
 /*----------------------------------------------------------------------------
 --  Sync
@@ -178,180 +137,6 @@ void SetVideoSync()
 /*----------------------------------------------------------------------------
 --  Video
 ----------------------------------------------------------------------------*/
-
-#ifdef USE_OPENGL
-/**
-**  Check if an extension is supported
-*/
-static bool IsExtensionSupported(const char *extension)
-{
-	const GLubyte *extensions = NULL;
-	const GLubyte *start;
-	GLubyte *ptr, *terminator;
-	int len;
-
-	// Extension names should not have spaces.
-	ptr = (GLubyte *)strchr(extension, ' ');
-	if (ptr || *extension == '\0') {
-		return false;
-	}
-
-	extensions = glGetString(GL_EXTENSIONS);
-	len = strlen(extension);
-	start = extensions;
-	while (true) {
-		if (!start)
-		{
-			return false;
-		}
-		ptr = (GLubyte *)strstr((const char *)start, extension);
-		if (!ptr) {
-			break;
-		}
-
-		terminator = ptr + len;
-		if (ptr == start || *(ptr - 1) == ' ') {
-			if (*terminator == ' ' || *terminator == '\0') {
-				return true;
-			}
-		}
-		start = terminator;
-	}
-	return false;
-}
-#endif
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-/**
-**  Initialize OpenGL extensions
-*/
-static void InitOpenGLExtensions()
-{
-	// ARB_texture_compression
-#ifdef USE_OPENGL
-	if (IsExtensionSupported("GL_ARB_texture_compression")) {
-		glCompressedTexImage3DARB =
-			(PFNGLCOMPRESSEDTEXIMAGE3DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage3DARB");
-		glCompressedTexImage2DARB =
-			(PFNGLCOMPRESSEDTEXIMAGE2DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage2DARB");
-		glCompressedTexImage1DARB =
-			(PFNGLCOMPRESSEDTEXIMAGE1DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexImage1DARB");
-		glCompressedTexSubImage3DARB =
-			(PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexSubImage3DARB");
-		glCompressedTexSubImage2DARB =
-			(PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexSubImage2DARB");
-		glCompressedTexSubImage1DARB =
-			(PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompressedTexSubImage1DARB");
-		glGetCompressedTexImageARB =
-			(PFNGLGETCOMPRESSEDTEXIMAGEARBPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetCompressedTexImageARB");
-
-		if (glCompressedTexImage3DARB && glCompressedTexImage2DARB &&
-			glCompressedTexImage1DARB && glCompressedTexSubImage3DARB &&
-			glCompressedTexSubImage2DARB && glCompressedTexSubImage1DARB &&
-			glGetCompressedTexImageARB) {
-			GLTextureCompressionSupported = true;
-		} else {
-			GLTextureCompressionSupported = false;
-		}
-	} else {
-		GLTextureCompressionSupported = false;
-	}
-
-	GLShaderPipelineSupported = GLShaderPipelineSupported && LoadShaderExtensions();
-#else
-	GLTextureCompressionSupported = false;
-	GLShaderPipelineSupported = false;
-#endif
-}
-
-/**
-**  Initialize OpenGL
-*/
-static void InitOpenGL()
-{
-
-	InitOpenGLExtensions();
-
-	glViewport(0, 0, (GLsizei)Video.ViewportWidth, (GLsizei)Video.ViewportHeight);
-
-#ifdef USE_OPENGL
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-#endif
-
-#ifdef USE_GLES
-	glOrthof(0.0f, (GLfloat)Video.Width, (GLfloat)Video.Height, 0.0f, -1.0f, 1.0f);
-#endif
-
-#ifdef USE_OPENGL
-	if (!GLShaderPipelineSupported) {
-		glOrtho(0, Video.Width, Video.Height, 0, -1, 1);
-	} else {
-		glOrtho(0, Video.ViewportWidth, Video.ViewportHeight, 0, -1, 1);
-	}
-#endif
-
-
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-#ifdef USE_OPENGL
-	glTranslatef(0.375, 0.375, 0.);
-#endif
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-#ifdef USE_GLES
-	glClearDepthf(1.0f);
-#endif
-
-#ifdef USE_OPENGL
-	glClearDepth(1.0f);
-
-	if (GLShaderPipelineSupported) {
-		SetupFramebuffer();
-	}
-#endif
-
-	glShadeModel(GL_FLAT);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &GLMaxTextureSize);
-	if (GLMaxTextureSize == 0) {
-		// FIXME: try to use GL_PROXY_TEXTURE_2D to get a valid size
-#if 0
-		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, size, size, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glGetTexLevelParameterfv(GL_PROXY_TEXTURE_2D, 0,
-								 GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
-#endif
-		fprintf(stderr, "GL_MAX_TEXTURE_SIZE is 0, using 256 by default\n");
-		GLMaxTextureSize = 256;
-	}
-	if (GLMaxTextureSize > GLMaxTextureSizeOverride
-		&& GLMaxTextureSizeOverride > 0) {
-		GLMaxTextureSize = GLMaxTextureSizeOverride;
-	}
-}
-
-void ReloadOpenGL()
-{
-	InitOpenGL();
-	ReloadGraphics();
-	ReloadFonts();
-	UI.Minimap.Reload();
-}
-
-#endif
 
 #if defined(DEBUG) && !defined(USE_WIN32)
 static void CleanExit(int)
@@ -522,10 +307,6 @@ void InitVideoSdl()
 
 	// Initialize the display
 
-#if !defined(USE_OPENGL) && !defined(USE_GLES)
-	flags = 0;
-#endif
-
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
@@ -533,17 +314,6 @@ void InitVideoSdl()
 	} else {
 		flags |= SDL_WINDOW_RESIZABLE;
 	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-#ifdef USE_GLES_NATIVE
-		flags |= SDL_OPENGLES;
-#endif
-#ifdef USE_OPENGL
-		flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
-#endif
-	}
-#endif
 
 	if (true || !Video.Width || !Video.Height) {
 		Video.ViewportWidth = Video.Width;
@@ -574,14 +344,6 @@ void InitVideoSdl()
 	if (TheWindow == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			fprintf(stderr, "Re-trying video without OpenGL\n");
-			UseOpenGL = false;
-			InitVideoSdl();
-			return;
-		}
-#endif
 		if (Video.FullScreen) {
 			fprintf(stderr, "Re-trying video without fullscreen mode\n");
 			Video.FullScreen = false;
@@ -603,14 +365,9 @@ void InitVideoSdl()
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
 	                               Video.Width, Video.Height);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
-		bool UseOpenGL_orig = UseOpenGL;
-		UseOpenGL = false;
-#endif
 
 		SDL_Surface *icon = NULL;
 		CGraphic *g = NULL;
@@ -659,88 +416,16 @@ void InitVideoSdl()
 			CGraphic::Free(g);
 		}
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		UseOpenGL = UseOpenGL_orig;
-#endif
-
 #endif
 	Video.FullScreen = (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 1 : 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
-//Wyrmgus start
-//#if defined(USE_TOUCHSCREEN) && defined(USE_WIN32)
-//Wyrmgus end
-	// Must not allow SDL to switch to relative mouse coordinates
-	// with touchscreen when going fullscreen. So we don't hide the
-	// cursor, but instead set a transparent 1px cursor
+	// Must not allow SDL to switch to relative mouse coordinates when going
+	// fullscreen. So we don't hide the cursor, but instead set a transparent
+	// 1px cursor
 	Uint8 emptyCursor[] = {'\0'};
 	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
 	SDL_SetCursor(Video.blankCursor);
-//Wyrmgus start
-//#else
-//Wyrmgus end
-	// Turn cursor off, we use our own.
-	//Wyrmgus start
-//	SDL_ShowCursor(SDL_DISABLE);
-	//Wyrmgus end
-//Wyrmgus start
-//#endif
-//Wyrmgus end
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-#ifdef USE_GLES_EGL
-		// Get the SDL window handle
-		SDL_SysWMinfo sysInfo; //Will hold our Window information
-		SDL_VERSION(&sysInfo.version); //Set SDL version
-		if (SDL_GetWMInfo(&sysInfo) <= 0) {
-			fprintf(stderr, "Unable to get window handle\n");
-			exit(1);
-		}
-
-		eglDisplay = eglGetDisplay((EGLNativeDisplayType)sysInfo.info.x11.display);
-		if (!eglDisplay) {
-			fprintf(stderr, "Couldn't open EGL Display\n");
-			exit(1);
-		}
-
-		if (!eglInitialize(eglDisplay, NULL, NULL)) {
-			fprintf(stderr, "Couldn't initialize EGL Display\n");
-			exit(1);
-		}
-
-		// Find a matching config
-		EGLint configAttribs[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_NONE};
-		EGLint numConfigsOut = 0;
-		EGLConfig eglConfig;
-		if (eglChooseConfig(eglDisplay, configAttribs, &eglConfig, 1, &numConfigsOut) != EGL_TRUE || numConfigsOut == 0) {
-			fprintf(stderr, "Unable to find appropriate EGL config\n");
-			exit(1);
-		}
-
-		eglSurface = eglCreateWindowSurface(eglDisplay, eglConfig, (EGLNativeWindowType)sysInfo.info.x11.window, 0);
-		if (eglSurface == EGL_NO_SURFACE) {
-			fprintf(stderr, "Unable to create EGL surface\n");
-			exit(1);
-		}
-
-		// Bind GLES and create the context
-		eglBindAPI(EGL_OPENGL_ES_API);
-		EGLint contextParams[] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
-		EGLContext eglContext = eglCreateContext(eglDisplay, eglConfig, NULL, NULL);
-		if (eglContext == EGL_NO_CONTEXT) {
-			fprintf(stderr, "Unable to create GLES context\n");
-			exit(1);
-		}
-
-		if (eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext) == EGL_FALSE) {
-			fprintf(stderr, "Unable to make GLES context current\n");
-			exit(1);
-		}
-#endif
-		InitOpenGL();
-	}
-#endif
 
 	InitKey2Str();
 
@@ -786,18 +471,13 @@ int VideoValidResolution(int w, int h)
 */
 void InvalidateArea(int x, int y, int w, int h)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
-		Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
-		Rects[NumRects].x = x;
-		Rects[NumRects].y = y;
-		Rects[NumRects].w = w;
-		Rects[NumRects].h = h;
-		++NumRects;
-	}
+	Assert(NumRects != sizeof(Rects) / sizeof(*Rects));
+	Assert(x >= 0 && y >= 0 && x + w <= Video.Width && y + h <= Video.Height);
+	Rects[NumRects].x = x;
+	Rects[NumRects].y = y;
+	Rects[NumRects].w = w;
+	Rects[NumRects].h = h;
+	++NumRects;
 }
 
 /**
@@ -805,25 +485,15 @@ void InvalidateArea(int x, int y, int w, int h)
 */
 void Invalidate()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		Rects[0].x = 0;
-		Rects[0].y = 0;
-		Rects[0].w = Video.Width;
-		Rects[0].h = Video.Height;
-		NumRects = 1;
-	}
+	Rects[0].x = 0;
+	Rects[0].y = 0;
+	Rects[0].w = Video.Width;
+	Rects[0].h = Video.Height;
+	NumRects = 1;
 }
 
 // Switch to the shader currently stored in Video.ShaderIndex without changing it
 void SwitchToShader() {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (TheScreen && UseOpenGL && GLShaderPipelineSupported) {
-		LoadShaders(0, NULL);
-	}
-#endif
 }
 
 /**
@@ -834,13 +504,6 @@ void SwitchToShader() {
 */
 static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 {
-#if (defined(USE_OPENGL) || defined(USE_GLES))
-	// Scale mouse-coordinates to viewport
-	if (ZoomNoResize && (event.type & (SDL_MOUSEBUTTONUP | SDL_MOUSEBUTTONDOWN | SDL_MOUSEMOTION))) {
-		event.button.x = (Uint16)floorf(event.button.x * float(Video.Width) / Video.ViewportWidth);
-		event.button.y = (Uint16)floorf(event.button.y * float(Video.Height) / Video.ViewportHeight);
-	}
-#endif
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
@@ -1023,32 +686,15 @@ void WaitEventsOneFrame()
 */
 void RealizeVideoMemory()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-#ifdef USE_GLES_EGL
-		eglSwapBuffers(eglDisplay, eglSurface);
-#endif
-#if defined(USE_OPENGL) || defined(USE_GLES_NATIVE)
-		if (GLShaderPipelineSupported) {
-			RenderFramebufferToScreen();
-		} else {
-			SDL_GL_SwapWindow(TheWindow);
-		}
-#endif
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	} else
-#endif
-	{
-		if (NumRects) {
-			//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-			SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
-			//SDL_RenderClear(TheRenderer);
-			//for (int i = 0; i < NumRects; i++)
-			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
-			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
-			SDL_RenderPresent(TheRenderer);
-			NumRects = 0;
-		}
+	if (NumRects) {
+		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
+		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+		SDL_RenderClear(TheRenderer);
+		//for (int i = 0; i < NumRects; i++)
+		//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
+		SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
+		SDL_RenderPresent(TheRenderer);
+		NumRects = 0;
 	}
 	HideCursor();
 }
@@ -1058,13 +704,8 @@ void RealizeVideoMemory()
 */
 void SdlLockScreen()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SDL_MUSTLOCK(TheScreen)) {
-			SDL_LockSurface(TheScreen);
-		}
+	if (SDL_MUSTLOCK(TheScreen)) {
+		SDL_LockSurface(TheScreen);
 	}
 }
 
@@ -1073,13 +714,8 @@ void SdlLockScreen()
 */
 void SdlUnlockScreen()
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (!UseOpenGL)
-#endif
-	{
-		if (SDL_MUSTLOCK(TheScreen)) {
-			SDL_UnlockSurface(TheScreen);
-		}
+	if (SDL_MUSTLOCK(TheScreen)) {
+		SDL_UnlockSurface(TheScreen);
 	}
 }
 
@@ -1152,24 +788,6 @@ void ToggleFullScreen()
 		return;
 	}
 	SDL_SetWindowFullscreen(TheWindow, flags ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-#ifndef USE_TOUCHSCREEN
-	// Cannot hide cursor on Windows with touchscreen, as it switches
-	// to relative mouse coordinates in fullscreen. See above initial
-	// call to ShowCursor
-	//
-	// Windows shows the SDL cursor when starting in fullscreen mode
-	// then switching to window mode.  This hides the cursor again.
-	// tfel: this was for SDL1...
-	//SDL_ShowCursor(SDL_ENABLE);
-	//SDL_ShowCursor(SDL_DISABLE);
-#endif
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		ReloadOpenGL();
-	}
-#endif
 
 	Invalidate(); // Update display
 #else // !USE_WIN32

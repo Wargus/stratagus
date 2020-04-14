@@ -156,9 +156,6 @@ set(guichan_SRCS
 	src/guichan/key.cpp
 	src/guichan/keyinput.cpp
 	src/guichan/mouseinput.cpp
-#	src/guichan/opengl/opengl.cpp
-#	src/guichan/opengl/openglgraphics.cpp
-#	src/guichan/opengl/openglimageloader.cpp
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlgraphics.cpp
@@ -336,12 +333,9 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/mng.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
-	src/video/shaders.cpp
-	src/video/sprite.cpp
 	src/video/video.cpp
 )
 source_group(video FILES ${video_SRCS})
@@ -546,7 +540,6 @@ set(stratagus_generic_HDRS
 	src/include/script.h
 	src/include/script_sound.h
 	src/include/settings.h
-	src/include/shaders.h
 	src/include/sound.h
 	src/include/sound_server.h
 	src/include/spells.h
@@ -638,17 +631,11 @@ if(WIN32)
 endif()
 
 find_package(BZip2)
-find_package(FluidSynth)
 find_package(StackTrace)
-find_package(Mikmod)
-find_package(MNG)
 find_package(OggVorbis)
 find_package(Theora)
 
 find_package(X11)
-find_package(OpenGL)
-find_package(OpenGLES)
-find_package(SDL_gles)
 
 find_package(Sqlite)
 find_package(Doxygen)
@@ -680,9 +667,6 @@ endif()
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
-option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
-option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
-option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
@@ -697,13 +681,7 @@ option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) 
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
 
 if(NOT WITH_RENDERER)
-	if(OPENGL_FOUND AND FALSE)
-		set(WITH_RENDERER "OpenGL")
-	elseif(OPENGLES_FOUND AND SDLGLES_FOUND)
-		set(WITH_RENDERER "OpenGLES")
-	else()
-		set(WITH_RENDERER "NativeSDL")
-	endif()
+	set(WITH_RENDERER "NativeSDL")
 endif()
 
 # Install paths
@@ -737,32 +715,6 @@ if(WITH_BZIP2 AND BZIP2_FOUND)
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
 endif()
 
-if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
-	add_definitions(-DUSE_FLUIDSYNTH ${FLUIDSYNTH_DEFINITIONS})
-	include_directories(${FLUIDSYNTH_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${FLUIDSYNTH_LIBRARY})
-	find_file(FLUIDSYNTH_DLL libfluidsynth.dll HINTS ${CMAKE_PREFIX_PATH}/bin)
-	find_file(GLIB_DLL libglib-2.0-0.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	find_file(GTHREAD_DLL libgthread-2.0-0.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
-	set(MAKENSIS_FLAGS ${MAKENSIS_FLAGS} -DFLUID -DFLUIDDLL=libfluidsynth.dll -DGTHREADDLL=libglib-2.0-0.dll -DGLIBDLL=libgthread-2.0-0.dll)
-endif()
-
-if(WITH_MIKMOD AND MIKMOD_FOUND)
-	add_definitions(-DUSE_MIKMOD ${MIKMOD_DEFINITIONS})
-	include_directories(${MIKMOD_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MIKMOD_LIBRARY})
-endif()
-
-if(WITH_MNG AND MNG_FOUND)
-	add_definitions(-DUSE_MNG)
-	include_directories(${MNG_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
-	if (MSVC)
-		include_directories(${JPEG_INCLUDE_DIR})
-		set(stratagus_LIBS ${stratagus_LIBS} ${JPEG_LIBRARY})
-	endif()
-endif()
-
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
 	add_definitions(-DUSE_VORBIS)
 	include_directories(${OGGVORBIS_INCLUDE_DIR})
@@ -785,28 +737,6 @@ if(WITH_X11 AND X11_FOUND)
 	add_definitions(-DUSE_X11)
 	include_directories(${X11_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${X11_X11_LIB})
-endif()
-
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
-	add_definitions(-DUSE_OPENGL)
-	include_directories(${OPENGL_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGL_LIBRARIES})
-	message(STATUS "Using OpenGL")
-elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
-	if(SDLGLES_TYPE STREQUAL "Native")
-		add_definitions(-DUSE_GLES_NATIVE)
-		message(STATUS "Using OpenGLES (SDL Native)")
-	elseif(SDLGLES_TYPE STREQUAL "EGL")
-		add_definitions(-DUSE_GLES_EGL)
-		message(STATUS "Using OpenGLES (SDL EGL)")
-	else()
-		message(FATAL_ERROR "Unknown SDL gles type")
-	endif()
-	add_definitions(-DUSE_GLES)
-	include_directories(${OPENGLES_INCLUDE_DIR} ${SDLGLES_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${OPENGLES_LIBRARIES} ${SDLGLES_LIBRARY})
-elseif(NOT WITH_RENDERER STREQUAL "NativeSDL")
-	message(FATAL_ERROR "Specified rendering support was not found in system.\nChoose: NativeSDL OpenGL OpenGLES")
 endif()
 
 # Platform definitions
@@ -1027,21 +957,10 @@ else()
 endif()
 
 log_package("Bzip2" "BZIP2")
-log_package("FluidSynth" "FLUIDSYNTH")
-log_package("MikMod" "MIKMOD")
-log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
 log_package("X11" "X11")
-
-if(WITH_RENDERER STREQUAL "OpenGL" AND OPENGL_FOUND)
-	message("Renderer: OpenGL (Disable by param -DWITH_RENDERER=NativeSDL)")
-elseif(WITH_RENDERER STREQUAL "OpenGLES" AND OPENGLES_FOUND AND SDLGLES_FOUND)
-	message("Renderer: OpenGLES (Disable by param -DWITH_RENDERER=NativeSDL)")
-else()
-	message("Renderer: NativeSDL (Enable OpenGL by param -DWITH_RENDERER=OpenGL)")
-endif()
 
 message("==================================")
 
@@ -1221,11 +1140,6 @@ endif()
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
-		file(COPY ${FLUIDSYNTH_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-		file(COPY ${GLIB_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-		file(COPY ${GTHREAD_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	endif()
 	# also ship lua51.dll
 	find_file(LUA_DLL lua51.dll HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES bin lib)
 	file(COPY ${LUA_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

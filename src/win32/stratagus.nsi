@@ -217,11 +217,6 @@ Section "${NAME}"
 	File "${EXE}"
 	File "${SDL}"
 	File "${LUADLL}"
-	!ifdef FLUID
-		File "${FLUIDDLL}"
-		File "${GLIBDLL}"
-		File "${GTHREADDLL}"
-	!endif
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
 	WriteRegStr HKLM "${REGKEY}" "QuietUninstallString" "$\"$INSTDIR\${UNINSTALL}$\" /S"

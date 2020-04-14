@@ -375,11 +375,6 @@
 **
 **    Shadow sprite images
 **
-**  CUnitType::PlayerColorSprite
-**
-**    Sprite images of the player colors.  This image is drawn
-**    over CUnitType::Sprite.  Used with OpenGL only.
-**
 **
 */
 /**

@@ -1628,10 +1628,6 @@ static void UISelectStateButtonDown(unsigned)
 static void UIHandleButtonDown_OnMap(unsigned button)
 {
 	Assert(UI.MouseViewport);
-#ifdef USE_TOUCHSCREEN
-	// Detect double left click
-	const bool doubleLeftButton = MouseButtons & (LeftButton << MouseDoubleShift);
-#endif
 	if ((MouseButtons & LeftButton) && UI.SelectedViewport != UI.MouseViewport) {
 		UI.SelectedViewport = UI.MouseViewport;
 		DebugPrint("selected viewport changed to %ld.\n" _C_
@@ -1640,12 +1636,6 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 	// to redraw the cursor immediately (and avoid up to 1 sec delay
 	if (CursorBuilding) {
-#ifdef USE_TOUCHSCREEN
-		// On touch screen is building started with double left click
-		if (!doubleLeftButton) {
-			return;
-		}
-#endif
 		// Possible Selected[0] was removed from map
 		// need to make sure there is a unit to build
 		if (Selected[0] && (MouseButtons & LeftButton)
@@ -1680,11 +1670,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
 			CursorState = CursorStatePieMenu;
 		}
-#ifdef USE_TOUCHSCREEN
-	} else if (doubleLeftButton) {
-#else
 	} else if (MouseButtons & RightButton) {
-#endif
 		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 			CUnit *unit;
 			// FIXME: Rethink the complete chaos of coordinates here
@@ -1851,15 +1837,6 @@ void UIHandleButtonDown(unsigned button)
 		ActionDraw();
 		return;
 	}
-
-#ifdef USE_TOUCHSCREEN
-	// If we are moving with stylus/finger,
-	// left button on touch screen devices is still clicked
-	// Ignore handle if left button is long cliked
-	if (longLeftButton) {
-		return;
-	}
-#endif
 
 	static bool OldShowSightRange;
 	static bool OldShowReactionRange;
@@ -2063,13 +2040,7 @@ void UIHandleButtonUp(unsigned button)
 					num = SelectUnitsInRectangle(pos0, pos1);
 				}
 			}
-#ifdef USE_TOUCHSCREEN
-			// On touch screen select single unit only when long click is detected
-			// This fix problem with emulating right mouse button as long left click on touch screens
-		} else if (button == 0x1000001) {
-#else
 		} else {
-#endif
 			//
 			// Select single unit
 			//

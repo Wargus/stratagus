@@ -155,13 +155,6 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = NULL;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-char ForceUseOpenGL;
-bool UseOpenGL;                      /// Use OpenGL
-bool ZoomNoResize;
-bool GLShaderPipelineSupported = true;
-#endif
-
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
 double NextFrameTicks;               /// Ticks of begin of the next frame
@@ -274,32 +267,9 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			FreeOpenGLGraphics();
-			FreeOpenGLFonts();
-			UI.Minimap.FreeOpenGL();
-		}
-#endif
 		SDL_SetWindowSize(TheWindow, w, h);
-#if defined(USE_OPENGL) || defined(USE_GLES)
 		ViewportWidth = w;
 		ViewportHeight = h;
-		if (ZoomNoResize) {
-			ReloadOpenGL();
-		} else {
-			Width = w;
-			Height = h;
-			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-			if (UseOpenGL) {
-				ReloadOpenGL();
-			}
-		}
-#else
-		Width = w;
-		Height = h;
-		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#endif
 		return true;
 	}
 	return false;
@@ -394,12 +364,6 @@ void AddColorCyclingRange(unsigned int begin, unsigned int end)
 
 void SetColorCycleAll(bool value)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		// FIXME: In OpenGL-mode, we can only cycle the tileset graphic
-		return;
-	}
-#endif
 	CColorCycling::GetInstance().ColorCycleAll = value;
 }
 
@@ -464,15 +428,7 @@ void ColorCycle()
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL && colorCycling.ColorIndexRanges.size() > 0) {
-			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
-			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[colorCycling.cycleCount % Map.TileGraphic->NumColorCycles];
-		} else
-#endif
-		{
-			ColorCycleSurface(*Map.TileGraphic->Surface);
-		}
+		ColorCycleSurface(*Map.TileGraphic->Surface);
 	}
 }
 
@@ -486,16 +442,7 @@ void RestoreColorCyclingSurface()
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
-			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[0];
-		}
-		else
-#endif
-		{
-			ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
-		}
+		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
 	}
 	colorCycling.cycleCount = 0;
 }

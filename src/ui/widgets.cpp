@@ -94,19 +94,12 @@ void initGuichan()
 {
 	gcn::Graphics *graphics;
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		graphics = new MyOpenGLGraphics();
-	} else
-#endif
-	{
-		graphics = new gcn::SDLGraphics();
+	graphics = new gcn::SDLGraphics();
 
-		// Set the target for the graphics object to be the screen.
-		// In other words, we will draw to the screen.
-		// Note, any surface will do, it doesn't have to be the screen.
-		((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
-	}
+	// Set the target for the graphics object to be the screen.
+	// In other words, we will draw to the screen.
+	// Note, any surface will do, it doesn't have to be the screen.
+	((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
 
 	Input = new gcn::SDLInput();
 
@@ -115,11 +108,7 @@ void initGuichan()
 	Gui->setInput(Input);
 	Gui->setTop(NULL);
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	Gui->setUseDirtyDrawing(!UseOpenGL);
-#else
 	Gui->setUseDirtyDrawing(1);
-#endif
 
 	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
 	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
@@ -171,11 +160,7 @@ void handleInput(const SDL_Event *event)
 void DrawGuichanWidgets()
 {
 	if (Gui) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-#else
 		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-#endif
 		Gui->draw();
 	}
 }
@@ -217,110 +202,6 @@ void LuaActionListener::action(const std::string &eventId)
 LuaActionListener::~LuaActionListener()
 {
 }
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-/*----------------------------------------------------------------------------
---  MyOpenGLGraphics
-----------------------------------------------------------------------------*/
-
-void MyOpenGLGraphics::_beginDraw()
-{
-	gcn::Rectangle area(0, 0, Video.Width, Video.Height);
-	pushClipArea(area);
-}
-
-void MyOpenGLGraphics::_endDraw()
-{
-	popClipArea();
-}
-
-void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height)
-{
-	const gcn::ClipRectangle &r = this->getCurrentClipArea();
-	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
-	int bottom = std::min<int>(r.y + r.height - 1, Video.Height - 1);
-
-	if (r.x > right || r.y > bottom) {
-		return;
-	}
-
-	PushClipping();
-	SetClipping(r.x, r.y, right, bottom);
-	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
-									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
-	PopClipping();
-}
-
-void MyOpenGLGraphics::drawPoint(int x, int y)
-{
-	gcn::Color c = this->getColor();
-	Video.DrawPixelClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a),
-						x + mClipStack.top().xOffset, y + mClipStack.top().yOffset);
-}
-
-void MyOpenGLGraphics::drawLine(int x1, int y1, int x2, int y2)
-{
-	gcn::Color c = this->getColor();
-	const PixelPos pos1(x1 + mClipStack.top().xOffset, y1 + mClipStack.top().yOffset);
-	const PixelPos pos2(x2 + mClipStack.top().xOffset, y2 + mClipStack.top().yOffset);
-
-	Video.DrawLineClip(Video.MapRGBA(0, c.r, c.g, c.b, c.a), pos1, pos2);
-}
-
-void MyOpenGLGraphics::drawRectangle(const gcn::Rectangle &rectangle)
-{
-	gcn::Color c = this->getColor();
-	if (c.a == 0) {
-		return;
-	}
-
-	const gcn::ClipRectangle top = mClipStack.top();
-	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
-										 rectangle.y + top.yOffset,
-										 rectangle.width, rectangle.height);
-
-	if (!area.intersect(top)) {
-		return;
-	}
-
-	int x1 = std::max<int>(area.x, top.x);
-	int y1 = std::max<int>(area.y, top.y);
-	int x2 = std::min<int>(area.x + area.width, top.x + top.width);
-	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
-
-	Video.DrawTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
-							 x1, y1, x2 - x1, y2 - y1, mColor.a);
-}
-
-void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
-{
-	const gcn::Color c = this->getColor();
-
-	if (c.a == 0) {
-		return;
-	}
-
-	const gcn::ClipRectangle top = mClipStack.top();
-	gcn::Rectangle area = gcn::Rectangle(rectangle.x + top.xOffset,
-										 rectangle.y + top.yOffset,
-										 rectangle.width, rectangle.height);
-
-	if (!area.intersect(top)) {
-		return;
-	}
-
-	int x1 = std::max<int>(area.x, top.x);
-	int y1 = std::max<int>(area.y, top.y);
-	int x2 = std::min<int>(area.x + area.width, top.x + top.width);
-	int y2 = std::min<int>(area.y + area.height, top.y + top.height);
-
-	Video.FillTransRectangle(Video.MapRGB(0, c.r, c.g, c.b),
-							 x1, y1, x2 - x1, y2 - y1, c.a);
-}
-
-#endif
 
 /*----------------------------------------------------------------------------
 --  ImageButton
