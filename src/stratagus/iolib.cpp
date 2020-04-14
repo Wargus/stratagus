@@ -217,7 +217,6 @@ static int sdl_close(SDL_RWops * context) {
 
 SDL_RWops * CFile::as_SDL_RWops()
 {
-	
 	SDL_RWops *ops = (SDL_RWops *) calloc(1, sizeof(SDL_RWops));
 	ops->type = SDL_RWOPS_UNKNOWN;
 	ops->hidden.unknown.data1 = this;
@@ -554,7 +553,7 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
 	sprintf(buf, "%s.gz", file);
 	if (!access(buf, R_OK)) {
-		strcpy_s(file, PATH_MAX, buf);
+		strcpy_s(file, PATH_MAX + 4, buf);
 		return true;
 	}
 #endif
