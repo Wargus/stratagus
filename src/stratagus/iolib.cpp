@@ -44,6 +44,8 @@
 #include "parameters.h"
 #include "util.h"
 
+#include "SDL.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -189,6 +191,41 @@ int CFile::printf(const char *format, ...)
 	int ret = pimpl->write(p, size);
 	delete[] p;
 	return ret;
+}
+
+static Sint64 sdl_size(SDL_RWops * context) {
+	return -1;
+}
+
+static Sint64 sdl_seek(SDL_RWops * context, Sint64 offset, int whence) {
+	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
+	return self->seek(offset, whence);
+}
+
+static size_t sdl_read(SDL_RWops * context, void *ptr, size_t size, size_t maxnum) {
+	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
+	return self->read(ptr, size * maxnum) / size;
+}
+
+static size_t sdl_write(SDL_RWops * context, const void *ptr, size_t size, size_t num) {
+	return 0;
+}
+
+static int sdl_close(SDL_RWops * context) {
+	return -1;
+}
+
+SDL_RWops * CFile::as_SDL_RWops()
+{
+	
+	SDL_RWops *ops = (SDL_RWops *) calloc(1, sizeof(SDL_RWops));
+	ops->type = SDL_RWOPS_UNKNOWN;
+	ops->hidden.unknown.data1 = this;
+	ops->size = sdl_size;
+	ops->seek = sdl_seek;
+	ops->read = sdl_read;
+	ops->write = sdl_write;
+	return ops;
 }
 
 //

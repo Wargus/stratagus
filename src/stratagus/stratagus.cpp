@@ -762,11 +762,6 @@ int stratagusMain(int argc, char **argv)
 		// Initialise AI module
 		InitAiModule();
 
-		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
-
-		PrintHeader();
-		PrintLicense();
-
 		// Setup video display
 		InitVideo();
 
@@ -774,6 +769,11 @@ int stratagusMain(int argc, char **argv)
 		if (!InitSound()) {
 			InitMusic();
 		}
+
+		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+
+		PrintHeader();
+		PrintLicense();
 
 #ifndef DEBUG           // For debug it's better not to have:
 		srand(time(NULL));  // Random counter = random each start

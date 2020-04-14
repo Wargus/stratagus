@@ -249,16 +249,12 @@ set(pathfinder_SRCS
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(sound_SRCS
-	src/sound/fluidsynth.cpp
-	src/sound/mikmod.cpp
 	src/sound/music.cpp
-	src/sound/ogg.cpp
 	src/sound/script_sound.cpp
 	src/sound/sound.cpp
 	src/sound/sound_id.cpp
 	src/sound/sound_server.cpp
 	src/sound/unitsound.cpp
-	src/sound/wav.cpp
 )
 source_group(sound FILES ${sound_SRCS})
 
@@ -633,6 +629,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -727,8 +724,8 @@ endif()
 # Stratagus definitions
 
 add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL2_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)

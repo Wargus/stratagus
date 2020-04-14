@@ -87,7 +87,6 @@ void CheckMusicFinished(bool force)
 		lua_getglobal(Lua, "MusicStopped");
 		if (!lua_isfunction(Lua, -1)) {
 			fprintf(stderr, "No MusicStopped function in Lua\n");
-			StopMusic();
 		} else {
 			LuaCall(0, 1);
 		}

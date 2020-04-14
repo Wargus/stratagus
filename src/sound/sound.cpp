@@ -78,7 +78,7 @@ int DistanceSilent;              /// silent distance
 /**
 **  "Randomly" choose a sample from a sound group.
 */
-static CSample *SimpleChooseSample(const CSound &sound)
+static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 {
 	if (sound.Number == ONE_SOUND) {
 		return sound.Sound.OneSound;
@@ -92,9 +92,9 @@ static CSample *SimpleChooseSample(const CSound &sound)
 /**
 **  Choose the sample to play
 */
-static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
+static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 {
-	CSample *result = NULL;
+	Mix_Chunk *result = NULL;
 
 	if (!sound || !SoundEnabled()) {
 		return NULL;
@@ -292,7 +292,7 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice, bool sampleUnique)
 		return;
 	}
 
-	CSample *sample = ChooseSample(sound, selection, source);
+	Mix_Chunk *sample = ChooseSample(sound, selection, source);
 
 	if (sampleUnique && SampleIsPlaying(sample)) {
 		return;
@@ -376,7 +376,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	}
 	Origin source = {NULL, 0};
 
-	CSample *sample = ChooseSample(sound, false, source);
+	Mix_Chunk *sample = ChooseSample(sound, false, source);
 
 	if (!always && SampleIsPlaying(sample)) {
 		return;
@@ -415,10 +415,10 @@ static void PlaySoundFileCallback(int channel)
 int PlayFile(const std::string &name, LuaActionListener *listener)
 {
 	int channel = -1;
-	CSample *sample = LoadSample(name);
+	Mix_Chunk *sample = LoadSample(name);
 
 	if (sample) {
-		channel = PlaySample(sample);
+		channel = PlaySample(sample, NULL);
 		if (channel != -1) {
 			SetChannelVolume(channel, MaxVolume);
 			SetChannelFinishedCallback(channel, PlaySoundFileCallback);
@@ -459,8 +459,8 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 	size_t number = files.size();
 
 	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new CSample *[number];
-		memset(id->Sound.OneGroup, 0, sizeof(CSample *) * number);
+		id->Sound.OneGroup = new Mix_Chunk *[number];
+		memset(id->Sound.OneGroup, 0, sizeof(Mix_Chunk *) * number);
 		id->Number = number;
 		for (unsigned int i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);

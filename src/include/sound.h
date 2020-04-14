@@ -37,6 +37,8 @@
 ----------------------------------------------------------------------------*/
 
 #include "unitsound.h"
+#include "SDL.h"
+#include "SDL_mixer.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -44,7 +46,6 @@
 
 class CUnit;
 class Missile;
-class CSample;
 class LuaActionListener;
 
 /*----------------------------------------------------------------------------
@@ -111,8 +112,8 @@ public:
 	unsigned char Range;        /// Range is a multiplier for DistanceSilent
 	unsigned char Number;       /// single, group, or table of sounds.
 	union {
-		CSample *OneSound;       /// if it's only a simple sound
-		CSample **OneGroup;      /// when it's a simple group
+		Mix_Chunk *OneSound;       /// if it's only a simple sound
+		Mix_Chunk **OneGroup;      /// when it's a simple group
 		struct {
 			CSound *First;       /// first group: selected sound
 			CSound *Second;      /// second group: annoyed sound

@@ -242,16 +242,8 @@ int PlayMovie(const std::string &name)
 	}
 
 	StopMusic();
-	CSample *sample = LoadVorbis(filename.c_str(), PlayAudioStream);
+	Mix_Music *sample = LoadMusic(filename);
 	if (sample) {
-		if ((sample->Channels != 1 && sample->Channels != 2) || sample->SampleSize != 16) {
-			fprintf(stderr, "Unsupported sound format in movie\n");
-			delete sample;
-			SDL_DestroyTexture(yuv_overlay);
-			OggFree(&data);
-			f.close();
-			return 0;
-		}
 		PlayMusic(sample);
 	}
 

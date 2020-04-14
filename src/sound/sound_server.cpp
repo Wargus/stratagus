@@ -48,322 +48,35 @@
 #include "unit.h"
 
 #include "SDL.h"
+#include "SDL_mixer.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 static bool SoundInitialized;    /// is sound initialized
-static bool MusicPlaying;        /// flag true if playing music
-
-static int EffectsVolume = 128;  /// effects sound volume
-static int MusicVolume = 128;    /// music volume
-
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	CSample *Sample;       /// sample to play
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any
-	unsigned char Volume;  /// Volume of this channel
-	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
-
-	bool Playing;          /// channel is currently playing
-	int Point;             /// point in sample if playing or next free channel
-
 	void (*FinishedCallback)(int channel); /// Callback for when a sample finishes playing
 };
 
 #define MaxChannels 64     /// How many channels are supported
 
 static SoundChannel Channels[MaxChannels];
-static int NextFreeChannel;
-
-static struct {
-	CSample *Sample;       /// Music sample
-	void (*FinishedCallback)(); /// Callback for when music finishes playing
-} MusicChannel;
 
 static void ChannelFinished(int channel);
-
-static struct {
-	SDL_AudioSpec Format;
-	SDL_mutex *Lock;
-	SDL_cond *Cond;
-	SDL_Thread *Thread;
-
-	int *MixerBuffer;
-	Uint8 *Buffer;
-	bool Running;
-} Audio;
-
-
-/*----------------------------------------------------------------------------
---  Mixers
-----------------------------------------------------------------------------*/
-
-/**
-**  Convert RAW sound data to 44100 hz, Stereo, 16 bits per channel
-**
-**  @param src        Source buffer
-**  @param dest       Destination buffer
-**  @param frequency  Frequency of source
-**  @param chansize   Bitrate in bytes per channel of source
-**  @param channels   Number of channels of source
-**  @param bytes      Number of compressed bytes to read
-**
-**  @return           Number of bytes written in 'dest'
-*/
-static int ConvertToStereo32(const char *src, char *dest, int frequency,
-							 int chansize, int channels, int bytes)
-{
-	SDL_AudioCVT acvt;
-	Uint16 format;
-
-	if (chansize == 1) {
-		format = AUDIO_U8;
-	} else {
-		format = AUDIO_S16SYS;
-	}
-	SDL_BuildAudioCVT(&acvt, format, channels, frequency, AUDIO_S16SYS, 2, 44100);
-
-	acvt.buf = (Uint8 *)dest;
-	memcpy(dest, src, bytes);
-	acvt.len = bytes;
-
-	SDL_ConvertAudio(&acvt);
-
-	return acvt.len_mult * bytes;
-}
-
-/**
-**  Mix music to stereo 32 bit.
-**
-**  @param buffer  Buffer for mixed samples.
-**  @param size    Number of samples that fits into buffer.
-**
-**  @todo this functions can be called from inside the SDL audio callback,
-**  which is bad, the buffer should be precalculated.
-*/
-static void MixMusicToStereo32(int *buffer, int size)
-{
-	if (MusicPlaying) {
-		Assert(MusicChannel.Sample);
-
-		short *buf = new short[size];
-		int len = size * sizeof(short);
-		char *tmp = new char[len];
-
-		int div = 176400 / (MusicChannel.Sample->Frequency * (MusicChannel.Sample->SampleSize / 8) * MusicChannel.Sample->Channels);
-
-		size = MusicChannel.Sample->Read(tmp, len / div);
-
-		int n = ConvertToStereo32(tmp, (char *)buf, MusicChannel.Sample->Frequency,
-								  MusicChannel.Sample->SampleSize / 8, MusicChannel.Sample->Channels, size);
-
-		for (int i = 0; i < n / (int)sizeof(*buf); ++i) {
-			// Add to our samples
-			// FIXME: why taking out '/ 2' leads to distortion
-			buffer[i] += buf[i] * MusicVolume / MaxVolume / 2;
-		}
-
-		delete[] tmp;
-		delete[] buf;
-
-		if (n < len) { // End reached
-			MusicPlaying = false;
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = NULL;
-
-			if (MusicChannel.FinishedCallback) {
-				MusicChannel.FinishedCallback();
-			}
-		}
-	}
-}
-
-/**
-**  Mix sample to buffer.
-**
-**  The input samples are adjusted by the local volume and resampled
-**  to the output frequence.
-**
-**  @param sample  Input sample
-**  @param index   Position into input sample
-**  @param volume  Volume of the input sample
-**  @param stereo  Stereo (left/right) position of sample
-**  @param buffer  Output buffer
-**  @param size    Size of output buffer (in samples per channel)
-**
-**  @return        The number of bytes used to fill buffer
-**
-**  @todo          Can mix faster if signed 8 bit buffers are used.
-*/
-static int MixSampleToStereo32(CSample *sample, int index, unsigned char volume,
-							   char stereo, int *buffer, int size)
-{
-	static int buf[SOUND_BUFFER_SIZE / 2];
-	unsigned char left;
-	unsigned char right;
-
-	int div = 176400 / (sample->Frequency * (sample->SampleSize / 8) * sample->Channels);
-	int local_volume = (int)volume * EffectsVolume / MaxVolume;
-
-	if (stereo < 0) {
-		left = 128;
-		right = 128 + stereo;
-	} else {
-		left = 128 - stereo;
-		right = 128;
-	}
-
-	Assert(!(index & 1));
-
-	size = std::min((sample->Len - index) * div / 2, size);
-
-	size = ConvertToStereo32((char *)(sample->Buffer + index), (char *)buf, sample->Frequency,
-							 sample->SampleSize / 8, sample->Channels,
-							 size * 2 / div);
-
-	size /= 2;
-	for (int i = 0; i < size; i += 2) {
-		// FIXME: why taking out '/ 2' leads to distortion
-		buffer[i] += ((short *)buf)[i] * local_volume * left / 128 / MaxVolume / 2;
-		buffer[i + 1] += ((short *)buf)[i + 1] * local_volume * right / 128 / MaxVolume / 2;
-	}
-
-	return 2 * size / div;
-}
-
-/**
-**  Mix channels to stereo 32 bit.
-**
-**  @param buffer  Buffer for mixed samples.
-**  @param size    Number of samples that fits into buffer.
-**
-**  @return        How many channels become free after mixing them.
-*/
-static int MixChannelsToStereo32(int *buffer, int size)
-{
-	int new_free_channels = 0;
-
-	for (int channel = 0; channel < MaxChannels; ++channel) {
-		if (Channels[channel].Playing && Channels[channel].Sample) {
-			int i = MixSampleToStereo32(Channels[channel].Sample,
-										Channels[channel].Point, Channels[channel].Volume,
-										Channels[channel].Stereo, buffer, size);
-			Channels[channel].Point += i;
-			Assert(Channels[channel].Point <= Channels[channel].Sample->Len);
-
-			if (Channels[channel].Point == Channels[channel].Sample->Len) {
-				ChannelFinished(channel);
-				++new_free_channels;
-			}
-		}
-	}
-	return new_free_channels;
-}
-
-/**
-**  Clip mix to output stereo 16 signed bit.
-**
-**  @param mix     signed 32 bit input.
-**  @param size    number of samples in input.
-**  @param output  clipped 16 signed bit output buffer.
-*/
-static void ClipMixToStereo16(const int *mix, int size, short *output)
-{
-	const int *end = mix + size;
-
-	while (mix < end) {
-		int s = (*mix++);
-		clamp(&s, SHRT_MIN, SHRT_MAX);
-		*output++ = s;
-	}
-}
-
-/**
-**  Mix into buffer.
-**
-**  @param buffer   Buffer to be filled with samples. Buffer must be big enough.
-**  @param samples  Number of samples.
-*/
-static void MixIntoBuffer(void *buffer, int samples)
-{
-	// FIXME: can save the memset here, if first channel sets the values
-	memset(Audio.MixerBuffer, 0, samples * sizeof(*Audio.MixerBuffer));
-
-	if (EffectsEnabled) {
-		// Add channels to mixer buffer
-		// MixChannelsToStereo32(Audio.MixerBuffer, samples);
-	}
-	if (MusicEnabled) {
-		// Add music to mixer buffer
-		// MixMusicToStereo32(Audio.MixerBuffer, samples);
-	}
-	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
-}
-
-/**
-**  Fill buffer for the sound card.
-**
-**  @see SDL_OpenAudio
-**
-**  @param udata   the pointer stored in userdata field of SDL_AudioSpec.
-**  @param stream  pointer to buffer you want to fill with information.
-**  @param len     is length of audio buffer in bytes.
-*/
-static void FillAudio(void *, Uint8 *stream, int len)
-{
-	if (!Audio.Running) return;
-	Assert(len == Audio.Format.size);
-	SDL_memset(stream, 0, len);
-
-	SDL_LockMutex(Audio.Lock);
-	SDL_MixAudio(stream, Audio.Buffer, len, SDL_MIX_MAXVOLUME);
-
-	// Signal our FillThread, we can fill the Audio.Buffer again
-	SDL_CondSignal(Audio.Cond);
-	SDL_UnlockMutex(Audio.Lock);
-}
-
-/**
-**  Fill audio thread.
-*/
-static int FillThread(void *)
-{
-	while (Audio.Running == true) {
-		SDL_LockMutex(Audio.Lock);
-#ifdef USE_WIN32
-		// This is kind of a hackfix, without this on windows audio can get sluggish
-		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 1000) == 0) {
-#else
-		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100) == 0) {
-#endif
-			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
-		}
-		SDL_UnlockMutex(Audio.Lock);
-	}
-
-	SDL_LockMutex(Audio.Lock);
-	// Mustn't call SDL_CloseAudio here, it'll be called again from SDL_Quit
-	SDL_DestroyCond(Audio.Cond);
-	SDL_DestroyMutex(Audio.Lock);
-	return 0;
-}
-
-/*----------------------------------------------------------------------------
---  Effects
-----------------------------------------------------------------------------*/
 
 /**
 **  Check if this sound is already playing
 */
-bool SampleIsPlaying(CSample *sample)
+bool SampleIsPlaying(Mix_Chunk *sample)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
-		if (Channels[i].Sample == sample && Channels[i].Playing) {
+		if (Mix_GetChunk(i) == sample && Mix_Playing(i)) {
 			return true;
 		}
 	}
@@ -374,7 +87,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
-			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
+			&& origin->Id == Channels[i].Unit->Id && Mix_Playing(i)) {
 			return true;
 		}
 	}
@@ -389,40 +102,8 @@ static void ChannelFinished(int channel)
 	if (Channels[channel].FinishedCallback) {
 		Channels[channel].FinishedCallback(channel);
 	}
-
 	delete Channels[channel].Unit;
 	Channels[channel].Unit = NULL;
-
-	Channels[channel].Playing = false;
-	Channels[channel].Point = NextFreeChannel;
-	NextFreeChannel = channel;
-}
-
-/**
-**  Put a sound request in the next free channel.
-*/
-static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origin *origin)
-{
-	Assert(NextFreeChannel < MaxChannels);
-
-	int old_free = NextFreeChannel;
-	int next_free = Channels[NextFreeChannel].Point;
-
-	Channels[NextFreeChannel].Volume = volume;
-	Channels[NextFreeChannel].Point = 0;
-	Channels[NextFreeChannel].Playing = true;
-	Channels[NextFreeChannel].Sample = sample;
-	Channels[NextFreeChannel].Stereo = stereo;
-	Channels[NextFreeChannel].FinishedCallback = NULL;
-	if (origin && origin->Base) {
-		Origin *source = new Origin;
-		source->Base = origin->Base;
-		source->Id = origin->Id;
-		Channels[NextFreeChannel].Unit = source;
-	}
-	NextFreeChannel = next_free;
-
-	return old_free;
 }
 
 /**
@@ -435,21 +116,7 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origi
 */
 int SetChannelVolume(int channel, int volume)
 {
-	if (channel < 0 || channel >= MaxChannels) {
-		return -1;
-	}
-
-	if (volume < 0) {
-		volume = Channels[channel].Volume;
-	} else {
-		SDL_LockMutex(Audio.Lock);
-
-		volume = std::min(MaxVolume, volume);
-		Channels[channel].Volume = volume;
-
-		SDL_UnlockMutex(Audio.Lock);
-	}
-	return volume;
+	return Mix_Volume(channel, volume);
 }
 
 /**
@@ -460,23 +127,15 @@ int SetChannelVolume(int channel, int volume)
 **
 **  @return         Current stereo of the channel, -1 for error
 */
-int SetChannelStereo(int channel, int stereo)
+void SetChannelStereo(int channel, int stereo)
 {
 	if (Preference.StereoSound == false) {
-		stereo = 0;
-	}
-	if (channel < 0 || channel >= MaxChannels) {
-		return -1;
-	}
-
-	if (stereo < -128 || stereo > 127) {
-		stereo = Channels[channel].Stereo;
+		Mix_SetPanning(channel, 255, 255);
 	} else {
-		SDL_LockMutex(Audio.Lock);
-		Channels[channel].Stereo = stereo;
-		SDL_UnlockMutex(Audio.Lock);
+		Assert(stereo >= -128 && stereo <= 127);
+		int left_volume = (127 - stereo) * 2; // 127 would play only on the right
+		Mix_SetPanning(channel, left_volume, 254 - left_volume);
 	}
-	return stereo;
 }
 
 /**
@@ -496,12 +155,12 @@ void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
 /**
 **  Get the sample playing on a channel
 */
-CSample *GetChannelSample(int channel)
+Mix_Chunk *GetChannelSample(int channel)
 {
-	if (channel < 0 || channel >= MaxChannels) {
-		return NULL;
+	if (Mix_Playing(channel)) {
+		return Mix_GetChunk(channel);
 	}
-	return Channels[channel].Sample;
+	return NULL;
 }
 
 /**
@@ -511,13 +170,7 @@ CSample *GetChannelSample(int channel)
 */
 void StopChannel(int channel)
 {
-	SDL_LockMutex(Audio.Lock);
-	if (channel >= 0 && channel < MaxChannels) {
-		if (Channels[channel].Playing) {
-			ChannelFinished(channel);
-		}
-	}
-	SDL_UnlockMutex(Audio.Lock);
+	Mix_HaltChannel(channel);
 }
 
 /**
@@ -525,43 +178,57 @@ void StopChannel(int channel)
 */
 void StopAllChannels()
 {
-	SDL_LockMutex(Audio.Lock);
-	for (int i = 0; i < MaxChannels; ++i) {
-		if (Channels[i].Playing) {
-			ChannelFinished(i);
-		}
-	}
-	SDL_UnlockMutex(Audio.Lock);
+	Mix_HaltChannel(-1);
 }
 
-static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
+static Mix_Music *LoadMusic(const char *name)
 {
-	CSample *sampleWav = LoadWav(name, flag);
+	Mix_Music *r = Mix_LoadMUS(name);
+	if (r) {
+		return r;
+	}
 
-	if (sampleWav) {
-		return sampleWav;
+	CFile *f = new CFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
+		printf("Can't open file '%s'\n", name);
+		delete f;
+		return NULL;
 	}
-#ifdef USE_VORBIS
-	CSample *sampleVorbis = LoadVorbis(name, flag);
-	if (sampleVorbis) {
-		return sampleVorbis;
-	}
-#endif
-#ifdef USE_MIKMOD
-	CSample *sampleMikMod = LoadMikMod(name, flag);
-	if (sampleMikMod) {
-		return sampleMikMod;
-	}
-#endif
-#ifdef USE_FLUIDSYNTH
-	CSample *sampleFluidSynth = LoadFluidSynth(name, flag);
-	if (sampleFluidSynth) {
-		return sampleFluidSynth;
-	}
-#endif
-	return NULL;
+	return Mix_LoadMUS_RW(f->as_SDL_RWops(), 0);
 }
 
+static Mix_Chunk *LoadSample(const char *name)
+{
+	Mix_Chunk *r = Mix_LoadWAV(name);
+	if (r) {
+		return r;
+	}
+	CFile *f = new CFile;
+	if (f->open(name, CL_OPEN_READ) == -1) {
+		printf("Can't open file '%s'\n", name);
+		delete f;
+		return NULL;
+	}
+	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 0);
+}
+
+/**
+**  Load a music file
+**
+**  @param name  File name
+**
+**  @return      Mix_Music pointer
+*/
+Mix_Music *LoadMusic(const std::string &name)
+{
+	const std::string filename = LibraryFileName(name.c_str());
+	Mix_Music *music = LoadMusic(filename.c_str());
+
+	if (music == NULL) {
+		fprintf(stderr, "Can't load the music '%s'\n", name.c_str());
+	}
+	return music;
+}
 
 /**
 **  Load a sample
@@ -572,13 +239,13 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 **
 **  @todo  Add streaming, caching support.
 */
-CSample *LoadSample(const std::string &name)
+Mix_Chunk *LoadSample(const std::string &name)
 {
 	const std::string filename = LibraryFileName(name.c_str());
-	CSample *sample = LoadSample(filename.c_str(), PlayAudioLoadInMemory);
+	Mix_Chunk *sample = LoadSample(filename.c_str());
 
 	if (sample == NULL) {
-		fprintf(stderr, "Can't load the sound '%s'\n", name.c_str());
+		fprintf(stderr, "Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());
 	}
 	return sample;
 }
@@ -590,32 +257,21 @@ CSample *LoadSample(const std::string &name)
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(CSample *sample, Origin *origin)
+int PlaySample(Mix_Chunk *sample, Origin *origin)
 {
 	int channel = -1;
-
-	SDL_LockMutex(Audio.Lock);
-	if (SoundEnabled() && EffectsEnabled && sample && NextFreeChannel != MaxChannels) {
-		channel = FillChannel(sample, EffectsVolume, 0, origin);
+	DebugPrint("play sample %d\n" _C_ sample->volume);
+	if (SoundEnabled() && EffectsEnabled && sample) {
+		channel = Mix_PlayChannel(-1, sample, 0);
+		Channels[channel].FinishedCallback = NULL;
+		if (origin && origin->Base) {
+			Origin *source = new Origin;
+			source->Base = origin->Base;
+			source->Id = origin->Id;
+			Channels[channel].Unit = source;
+		}
 	}
-	SDL_UnlockMutex(Audio.Lock);
 	return channel;
-}
-
-/**
-**  Play a sound file
-**
-**  @param name  Filename of a sound to play
-**
-**  @return      Channel number the sound is playing on, -1 for error
-*/
-int PlaySoundFile(const std::string &name)
-{
-	CSample *sample = LoadSample(name);
-	if (sample) {
-		return PlaySample(sample);
-	}
-	return -1;
 }
 
 /**
@@ -625,8 +281,7 @@ int PlaySoundFile(const std::string &name)
 */
 void SetEffectsVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
-	EffectsVolume = volume;
+	Mix_Volume(-1, volume);
 }
 
 /**
@@ -634,7 +289,7 @@ void SetEffectsVolume(int volume)
 */
 int GetEffectsVolume()
 {
-	return EffectsVolume;
+	return Mix_Volume(-1, -1);
 }
 
 /**
@@ -662,7 +317,7 @@ bool IsEffectsEnabled()
 */
 void SetMusicFinishedCallback(void (*callback)())
 {
-	MusicChannel.FinishedCallback = callback;
+	Mix_HookMusicFinished(callback);
 }
 
 /**
@@ -672,12 +327,10 @@ void SetMusicFinishedCallback(void (*callback)())
 **
 **  @return        0 if music is playing, -1 if not.
 */
-int PlayMusic(CSample *sample)
+int PlayMusic(Mix_Music *sample)
 {
 	if (sample) {
-		StopMusic();
-		MusicChannel.Sample = sample;
-		MusicPlaying = true;
+		Mix_PlayMusic(sample, 0);
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -697,14 +350,11 @@ int PlayMusic(const std::string &file)
 	if (!SoundEnabled() || !IsMusicEnabled()) {
 		return -1;
 	}
-	const std::string name = LibraryFileName(file.c_str());
-	DebugPrint("play music %s\n" _C_ name.c_str());
-	CSample *sample = LoadSample(name.c_str(), PlayAudioStream);
+	DebugPrint("play music %s\n" _C_ file.c_str());
+	Mix_Music *music = LoadMusic(file);
 
-	if (sample) {
-		StopMusic();
-		MusicChannel.Sample = sample;
-		MusicPlaying = true;
+	if (music) {
+		Mix_FadeInMusic(music, 0, 200);
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
@@ -717,15 +367,7 @@ int PlayMusic(const std::string &file)
 */
 void StopMusic()
 {
-	if (MusicPlaying) {
-		MusicPlaying = false;
-		if (MusicChannel.Sample) {
-			SDL_LockMutex(Audio.Lock);
-			delete MusicChannel.Sample;
-			MusicChannel.Sample = NULL;
-			SDL_UnlockMutex(Audio.Lock);
-		}
-	}
+	Mix_FadeOutMusic(200);
 }
 
 /**
@@ -735,8 +377,9 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	clamp(&volume, 0, MaxVolume);
-	MusicVolume = volume;
+	// due to left-right separation, sound effect volume is effectively halfed,
+	// so we adjust the music
+	Mix_VolumeMusic(volume / 2);
 }
 
 /**
@@ -744,7 +387,7 @@ void SetMusicVolume(int volume)
 */
 int GetMusicVolume()
 {
-	return MusicVolume;
+	return Mix_VolumeMusic(-1);
 }
 
 /**
@@ -773,7 +416,7 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	return MusicPlaying;
+	return Mix_PlayingMusic();
 }
 
 /*----------------------------------------------------------------------------
@@ -796,30 +439,13 @@ bool SoundEnabled()
 **
 **  @return      True if failure, false if everything ok.
 */
-static int InitSdlSound(int freq, int size)
+static int InitSdlSound()
 {
-	SDL_AudioSpec wanted;
-
-	wanted.freq = freq;
-	if (size == 8) {
-		wanted.format = AUDIO_U8;
-	} else if (size == 16) {
-		wanted.format = AUDIO_S16SYS;
-	} else {
-		DebugPrint("Unexpected sample size %d\n" _C_ size);
-		wanted.format = AUDIO_S16SYS;
-	}
-	wanted.channels = 2;
-	wanted.samples = 4096;
-	wanted.callback = FillAudio;
-	wanted.userdata = NULL;
-
-	//  Open the audio device, forcing the desired format
-	if (SDL_OpenAudio(&wanted, &Audio.Format) < 0) {
+	Mix_Init(MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC | MIX_INIT_OPUS);
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096)) {
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 		return -1;
 	}
-	SDL_PauseAudio(0);
 	return 0;
 }
 
@@ -833,30 +459,17 @@ int InitSound()
 	//
 	// Open sound device, 8bit samples, stereo.
 	//
-	if (InitSdlSound(44100, 16)) {
+	if (InitSdlSound()) {
 		SoundInitialized = false;
 		return 1;
 	}
 	SoundInitialized = true;
+	Mix_AllocateChannels(MaxChannels);
+	Mix_ChannelFinished(ChannelFinished);
 
-	// ARI: The following must be done here to allow sound to work in
-	// pre-start menus!
-	// initialize channels
-	for (int i = 0; i < MaxChannels; ++i) {
-		Channels[i].Point = i + 1;
-	}
-
-	// Create mutex and cond for FillThread
-	Audio.MixerBuffer = new int[Audio.Format.samples * Audio.Format.channels];
-	memset(Audio.MixerBuffer, 0, Audio.Format.samples * Audio.Format.channels * sizeof(int));
-	Audio.Buffer = new Uint8[Audio.Format.size];
-	memset(Audio.Buffer, 0, Audio.Format.size);
-	Audio.Lock = SDL_CreateMutex();
-	Audio.Cond = SDL_CreateCond();
-	Audio.Running = true;
-
-	// Create thread to fill sdl audio buffer
-	Audio.Thread = SDL_CreateThread(FillThread, "stratagus-snd", NULL);
+	// Now we're ready for the callback to run
+	Mix_ResumeMusic();
+	Mix_Resume(-1);
 	return 0;
 }
 
@@ -865,18 +478,9 @@ int InitSound()
 */
 void QuitSound()
 {
-	Audio.Running = false;
-	// Join with the FillThread
-	SDL_WaitThread(Audio.Thread, NULL);
-
+	Mix_CloseAudio();
+	Mix_Quit();
 	SoundInitialized = false;
-	delete[] Audio.MixerBuffer;
-	Audio.MixerBuffer = NULL;
-	delete[] Audio.Buffer;
-	Audio.Buffer = NULL;
-#ifdef USE_FLUIDSYNTH
-	CleanFluidSynth();
-#endif
 }
 
 //@}
