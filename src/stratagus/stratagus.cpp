@@ -687,15 +687,15 @@ int stratagusMain(int argc, char **argv)
 		// Initialise AI module
 		InitAiModule();
 
-		// Setup video display
-		InitVideo();
-
 		// Setup sound card
 		if (!InitSound()) {
 			InitMusic();
 		}
 
 		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+
+		// Setup video display
+		InitVideo();
 
 		PrintHeader();
 		PrintLicense();
