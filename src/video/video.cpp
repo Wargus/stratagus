@@ -267,8 +267,6 @@ void CVideo::ClearScreen()
 bool CVideo::ResizeScreen(int w, int h)
 {
 	if (VideoValidResolution(w, h)) {
-		ViewportWidth = w;
-		ViewportHeight = h;
 		Width = w;
 		Height = h;
 

@@ -567,16 +567,14 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					exit(-1);
 				}
-				Video.ViewportHeight = atoi(sep + 1);
+				Video.Height = atoi(sep + 1);
 				*sep = 0;
-				Video.ViewportWidth = atoi(optarg);
-				if (!Video.ViewportHeight || !Video.ViewportWidth) {
+				Video.Width = atoi(optarg);
+				if (!Video.Height || !Video.Width) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
 					exit(-1);
 				}
-				Video.Height = Video.ViewportHeight;
-				Video.Width = Video.ViewportWidth;
 				continue;
 			}
 			case 'W':

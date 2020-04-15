@@ -214,7 +214,7 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), ViewportWidth(0), ViewportHeight(0), Depth(0), ShaderIndex(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), Depth(0), ShaderIndex(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -287,8 +287,6 @@ public:
 
 	int Width;
 	int Height;
-	int ViewportWidth;         /// Actual width of the window
-	int ViewportHeight;        /// Actual height of the window
 	SDL_Cursor *blankCursor;
 	int Depth;
 	int ShaderIndex;

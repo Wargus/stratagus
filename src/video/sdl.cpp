@@ -315,8 +315,6 @@ void InitVideoSdl()
 	}
 
 	if (!Video.Width || !Video.Height) {
-		Video.ViewportWidth = Video.Width;
-		Video.ViewportHeight = Video.Height;
 		Video.Width = 640;
 		Video.Height = 480;
 	}
@@ -333,13 +331,8 @@ void InitVideoSdl()
 		win_title = Parameters::Instance.applicationName.c_str();
 	}
 
-	if (!Video.ViewportWidth || !Video.ViewportHeight) {
-		Video.ViewportWidth = Video.Width;
-		Video.ViewportHeight = Video.Height;
-	}
-
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	                             Video.ViewportWidth, Video.ViewportHeight, flags);
+	                             Video.Width, Video.Height, flags);
 	if (TheWindow == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
@@ -514,9 +507,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				&& (event.motion.x != UI.MouseWarpPos.x || event.motion.y != UI.MouseWarpPos.y)) {
 				int xw = UI.MouseWarpPos.x;
 				int yw = UI.MouseWarpPos.y;
-				// Scale mouse-coordinates to viewport
-				xw = (Uint16)floorf(xw * float(Video.ViewportWidth) / Video.Width);
-				yw = (Uint16)floorf(yw * float(Video.ViewportHeight) / Video.Height);
 				UI.MouseWarpPos.x = -1;
 				UI.MouseWarpPos.y = -1;
 				SDL_WarpMouseInWindow(TheWindow, xw, yw);
@@ -764,7 +754,6 @@ void ToggleFullScreen()
 {
 	Uint32 flags;
 	flags = SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
-	SDL_GetWindowSize(TheWindow, &Video.ViewportWidth, &Video.ViewportHeight);
 
 #ifdef USE_WIN32
 

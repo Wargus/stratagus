@@ -321,8 +321,8 @@ void SaveScreenshotPNG(const char *name)
 	png_init_io(png_ptr, fp);
 
 	int pngw, pngh;
-	pngw = Video.ViewportWidth;
-	pngh = Video.ViewportHeight;
+	pngw = Video.Width;
+	pngh = Video.Height;
 	png_set_IHDR(png_ptr, info_ptr, pngw, pngh, 8,
 				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 				 PNG_FILTER_TYPE_DEFAULT);

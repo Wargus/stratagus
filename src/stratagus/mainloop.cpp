@@ -170,7 +170,7 @@ void UpdateDisplay()
 {
 	if (GameRunning || Editor.Running == EditorEditing) {
 		// to prevent empty spaces in the UI
-		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight);
+		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height);
 		DrawMapArea();
 		DrawMessages();
 

@@ -212,11 +212,9 @@ static int CclSetVideoResolution(lua_State *l)
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!Video.ViewportWidth || !Video.ViewportHeight) {
-			Video.ViewportWidth = LuaToNumber(l, 1);
-			Video.ViewportHeight = LuaToNumber(l, 2);
-			Video.Height = Video.ViewportHeight;
-			Video.Width = Video.ViewportWidth;
+		if (!Video.Width || !Video.Height) {
+			Video.Width = LuaToNumber(l, 1);
+			Video.Height = LuaToNumber(l, 2);
 		}
 	}
 	return 0;

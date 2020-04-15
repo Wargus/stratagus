@@ -305,8 +305,8 @@ void UiToggleBigMap()
 
 		UI.MapArea.X = 0;
 		UI.MapArea.Y = 0;
-		UI.MapArea.EndX = Video.ViewportWidth - 1;
-		UI.MapArea.EndY = Video.ViewportHeight - 1;
+		UI.MapArea.EndX = Video.Width - 1;
+		UI.MapArea.EndY = Video.Height - 1;
 
 		SetViewportMode(UI.ViewportMode);
 
