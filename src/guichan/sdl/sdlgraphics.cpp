@@ -84,44 +84,19 @@ namespace gcn
         Rectangle area;
         area.x = 0;
         area.y = 0;
-        area.width = mTarget->w;
-        area.height = mTarget->h;
+        area.width = (*mTarget)->w;
+        area.height = (*mTarget)->h;
         pushClipArea(area);
-
-        //SDL_FillRect(mTarget, NULL, SDL_MapRGBA(mTarget->format, 0, 0, 0, 0));
     }
 
     void SDLGraphics::_endDraw()
     {
-        //SDL_UpdateTexture(mTargetTexture, NULL, mTarget->pixels, mTarget->w * sizeof(Uint32));
-        //SDL_RenderCopy(mRenderer, mTargetTexture, NULL, NULL);
-        //SDL_RenderPresent(mRenderer);
-
         popClipArea();
     }
 
-#if 0
-    void SDLGraphics::setTarget(SDL_Renderer* renderer)
+    void SDLGraphics::setTarget(SDL_Surface** targetPtr)
     {
-        if(mTarget)
-        {
-            SDL_FreeSurface(mTarget);
-            SDL_DestroyTexture(mTargetTexture);
-        }
-
-        #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-            mTarget = SDL_CreateRGBSurface(0, 640, 480, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-        #else
-            mTarget = SDL_CreateRGBSurface(0, 640, 480, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
-        #endif
-        SDL_FillRect(mTarget, NULL, SDL_MapRGBA(mTarget->format, 0, 0, 0, 0));
-        mTargetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 640, 480);
-        mRenderer = renderer;
-    }
-#endif
-    void SDLGraphics::setTarget(SDL_Surface* target)
-    {
-        mTarget = target;
+        mTarget = targetPtr;
     }
     bool SDLGraphics::pushClipArea(Rectangle area)
     {
@@ -134,7 +109,7 @@ namespace gcn
         rect.w = carea.width;
         rect.h = carea.height;
 
-        SDL_SetClipRect(mTarget, &rect);
+        SDL_SetClipRect(*mTarget, &rect);
 
         return result;
     }
@@ -155,12 +130,7 @@ namespace gcn
         rect.w = carea.width;
         rect.h = carea.height;
 
-        SDL_SetClipRect(mTarget, &rect);
-    }
-
-    SDL_Surface* SDLGraphics::getTarget() const
-    {
-        return mTarget;
+        SDL_SetClipRect(*mTarget, &rect);
     }
 
     void SDLGraphics::drawImage(const Image* image, int srcX,
@@ -179,9 +149,9 @@ namespace gcn
 
         SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
 
-        //SDL_LockSurface(mTarget);
-        SDL_BlitSurface(srcImage, &src, mTarget, &dst);
-        //SDL_UnlockSurface(mTarget);
+        //SDL_LockSurface(*mTarget);
+        SDL_BlitSurface(srcImage, &src, *mTarget, &dst);
+        //SDL_UnlockSurface(*mTarget);
     }
 
     void SDLGraphics::fillRectangle(const Rectangle& rectangle)
@@ -204,18 +174,17 @@ namespace gcn
 			int x2 = std::min<int>(area.x + area.width, top.x + top.width);
 			int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 			int x, y;
-
-			//Video.FillTransRectangle(SDL_MapRGB(mTarget->format, mColor.r, mColor.g, mColor.b),
+			//Video.FillTransRectangle(SDL_MapRGB((*mTarget)->format, mColor.r, mColor.g, mColor.b),
 			//	x1, y1, x2 - x1, y2 - y1, mColor.a);
-			//SDL_LockSurface(mTarget);
+			//SDL_LockSurface(*mTarget);
 			for (y = y1; y < y2; y++)
 			{
 			    for (x = x1; x < x2; x++)
 			    {
-			        SDLputPixelAlpha(mTarget, x, y, mColor);
+			        SDLputPixelAlpha(*mTarget, x, y, mColor);
 			    }
 			}
-			//SDL_UnlockSurface(mTarget);
+			//SDL_UnlockSurface(*mTarget);
 	}
         else
         {
@@ -225,8 +194,8 @@ namespace gcn
             rect.w = area.width;
             rect.h = area.height;
 
-            Uint32 color = SDL_MapRGBA(mTarget->format, mColor.r, mColor.g, mColor.b, mColor.a);
-            SDL_FillRect(mTarget, &rect, color);
+            Uint32 color = SDL_MapRGBA((*mTarget)->format, mColor.r, mColor.g, mColor.b, mColor.a);
+            SDL_FillRect(*mTarget, &rect, color);
         }
     }
 
@@ -241,11 +210,11 @@ namespace gcn
 
         if (mAlpha)
         {
-            SDLputPixelAlpha(mTarget, x, y, mColor);
+            SDLputPixelAlpha(*mTarget, x, y, mColor);
         }
         else
         {
-            SDLputPixel(mTarget, x, y, mColor);
+            SDLputPixel(*mTarget, x, y, mColor);
         }
     }
 
@@ -284,7 +253,7 @@ namespace gcn
             x2 = top.x + top.width -1;
         }
 		Uint32 color =
-			SDL_MapRGB(mTarget->format, mColor.r, mColor.g, mColor.b);
+			SDL_MapRGB((*mTarget)->format, mColor.r, mColor.g, mColor.b);
 		if (mAlpha)	{
 			Video.DrawTransHLine(color, x1, y, x2 - x1, mColor.a);
 		} else {
@@ -327,7 +296,7 @@ namespace gcn
             y2 = top.y + top.height - 1;
         }
 		Uint32 color =
-			SDL_MapRGB(mTarget->format, mColor.r, mColor.g, mColor.b);
+			SDL_MapRGB((*mTarget)->format, mColor.r, mColor.g, mColor.b);
 		if (mAlpha)	{
 			Video.DrawTransVLine(color, x, y1,y2 - y1, mColor.a);
 		} else {
@@ -399,11 +368,11 @@ namespace gcn
                     {
                         if (mAlpha)
                         {
-                            SDLputPixelAlpha(mTarget, x, y, mColor);
+                            SDLputPixelAlpha(*mTarget, x, y, mColor);
                         }
                         else
                         {
-                            SDLputPixel(mTarget, x, y, mColor);
+                            SDLputPixel(*mTarget, x, y, mColor);
                         }
                     }
 
@@ -427,11 +396,11 @@ namespace gcn
                     {
                         if (mAlpha)
                         {
-                            SDLputPixelAlpha(mTarget, x, y, mColor);
+                            SDLputPixelAlpha(*mTarget, x, y, mColor);
                         }
                         else
                         {
-                            SDLputPixel(mTarget, x, y, mColor);
+                            SDLputPixel(*mTarget, x, y, mColor);
                         }
                     }
 
@@ -471,11 +440,11 @@ namespace gcn
                     {
                         if (mAlpha)
                         {
-                            SDLputPixelAlpha(mTarget, x, y, mColor);
+                            SDLputPixelAlpha(*mTarget, x, y, mColor);
                         }
                         else
                         {
-                            SDLputPixel(mTarget, x, y, mColor);
+                            SDLputPixel(*mTarget, x, y, mColor);
                         }
                     }
 
@@ -499,11 +468,11 @@ namespace gcn
                     {
                         if (mAlpha)
                         {
-                            SDLputPixelAlpha(mTarget, x, y, mColor);
+                            SDLputPixelAlpha(*mTarget, x, y, mColor);
                         }
                         else
                         {
-                            SDLputPixel(mTarget, x, y, mColor);
+                            SDLputPixel(*mTarget, x, y, mColor);
                         }
                     }
 
@@ -538,6 +507,6 @@ namespace gcn
         destination.x += top.xOffset;
         destination.y += top.yOffset;
 
-        SDL_BlitSurface(surface, &source, mTarget, &destination);
+        SDL_BlitSurface(surface, &source, *mTarget, &destination);
     }
 }

@@ -99,7 +99,7 @@ void initGuichan()
 	// Set the target for the graphics object to be the screen.
 	// In other words, we will draw to the screen.
 	// Note, any surface will do, it doesn't have to be the screen.
-	((gcn::SDLGraphics *)graphics)->setTarget(TheScreen);
+	((gcn::SDLGraphics *)graphics)->setTarget(&TheScreen);
 
 	Input = new gcn::SDLInput();
 
