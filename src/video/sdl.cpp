@@ -102,7 +102,6 @@ double FrameTicks;     /// Frame length in ms
 
 const EventCallback *Callbacks;
 
-static bool RegenerateScreen = false;
 bool IsSDLWindowVisible = true;
 
 /*----------------------------------------------------------------------------
@@ -315,7 +314,7 @@ void InitVideoSdl()
 		flags |= SDL_WINDOW_RESIZABLE;
 	}
 
-	if (true || !Video.Width || !Video.Height) {
+	if (!Video.Width || !Video.Height) {
 		Video.ViewportWidth = Video.Width;
 		Video.ViewportHeight = Video.Height;
 		Video.Width = 640;
@@ -591,14 +590,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 	if (&callbacks == GetCallbacks()) {
 		handleInput(&event);
-	}
-}
-
-void ValidateOpenGLScreen()
-{
-	if (RegenerateScreen) {
-		Video.ResizeScreen(Video.Width, Video.Height);
-		RegenerateScreen = false;
 	}
 }
 
