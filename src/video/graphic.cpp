@@ -112,35 +112,12 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 	gx += x - oldx;
 	gy += y - oldy;
 
-	#if 1
-	if (File=="graphics/human/units/elven_archer.png" && Surface->format->BytesPerPixel == 1)
-	{
-	  //FILE *file = fopen("archer-test.data", "w+");
-	  FILE *file = fopen("archer-palete-draw.data", "w+");
-	  if (file) {
-	    //fwrite(s->pixels, 1, s->pitch*s->h, file);
-	    //fwrite(s->format->palette->colors, 1, 3 * s->format->palette->ncolors, file);
-	    for (int i = 0; i < Surface->format->palette->ncolors; i++)
-	      fwrite(&Surface->format->palette->colors[i], 1, 4, file);
-	    fclose(file);
-	  }
-	}
-	#endif
 	//DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 	//SDL_LockSurface(TheScreen);
-	int ret;
-	ret = SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 	//SDL_UnlockSurface(TheScreen);
-	#if 1
-	if (File=="graphics/human/units/elven_archer.png" && Surface->format->BytesPerPixel == 1)
-	{
-		fprintf(stderr, "drawing non-flipped archer, srect %d, %d, %dx%d on %d, %d\n", srect.x, srect.y, w, h, drect.x, drect.y);
-		fprintf(stderr, "format %x\n", Surface->format->format);
-		if (ret) fprintf(stderr, "%s\n", SDL_GetError());
-	}
-	#endif
 }
 
 /**
