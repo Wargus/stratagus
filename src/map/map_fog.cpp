@@ -679,7 +679,7 @@ void CMap::InitFogOfWar()
 	// Generate Alpha Fog surface.
 	//
 	if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_ConvertSurfaceFormat(FogGraphic->Surface, SDL_PIXELFORMAT_RGB888, 0);
+		s = SDL_ConvertSurfaceFormat(FogGraphic->Surface, SDL_PIXELFORMAT_RGBA8888, 0);
 		SDL_SetSurfaceAlphaMod(s, FogOfWarOpacity);
 	} else {
 		// Copy the top row to a new surface
