@@ -40,6 +40,8 @@
 #include <map>
 #include <list>
 
+#include "SDL_image.h"
+
 #include "video.h"
 #include "player.h"
 #include "intern_video.h"
@@ -564,11 +566,25 @@ void CGraphic::Load(bool grayscale)
 		return;
 	}
 
-	// TODO: More formats?
-	if (LoadGraphicPNG(this) == -1) {
-		fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
-		ExitFatal(-1);
+	CFile fp;
+	const std::string name = LibraryFileName(File.c_str());
+	if (name.empty()) {
+		perror("Cannot find file");
+		goto error;
 	}
+	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {
+		perror("Can't open file");
+		goto error;
+	}
+	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
+	if (Surface == NULL) {
+		fprintf(stderr, "Couldn't load file %s: %s", name.c_str(), IMG_GetError());
+		goto error;
+	}
+
+	GraphicWidth = Surface->w;
+	GraphicHeight = Surface->h;
+	fp.close();
 
 	if (Surface->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(Surface);
@@ -598,6 +614,11 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	GenFramesMap();
+	return;
+
+ error:
+	fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
+	ExitFatal(-1);
 }
 
 /**

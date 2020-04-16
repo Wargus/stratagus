@@ -340,9 +340,6 @@ void DeInitVideo();
 /// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
 
-/// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g);
-
 /// Initializes video synchronization.
 extern void SetVideoSync();
 

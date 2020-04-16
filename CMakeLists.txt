@@ -623,6 +623,7 @@ find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
+find_package(SDL2_image REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -701,9 +702,9 @@ endif()
 
 # Stratagus definitions
 
-add_definitions(${PNG_DEFINITIONS} -DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${PNG_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${PNG_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARY} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
+include_directories(${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -1021,7 +1022,7 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(APPLE)
-	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -framework libpng -lSDL2main")
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
 endif()
 
 ########### next target ###############
@@ -1067,6 +1068,9 @@ set(png2stratagus_SRCS
 	tools/png2stratagus.cpp
 )
 source_group(png2stratagus FILES ${png2stratagus_SRCS})
+
+set_source_files_properties(png2stratagus_SRCS PROPERTIES INCLUDE_DIRECTORIES "${PNG_INCLUDE_DIR}")
+set_source_files_properties(png2stratagus_SRCS PROPERTIES COMPILE_DEFINITIONS "${PNG_DEFINITIONS}")
 
 add_executable(png2stratagus ${png2stratagus_SRCS})
 target_link_libraries(png2stratagus ${PNG_LIBRARY} ${ZLIB_LIBRARIES})

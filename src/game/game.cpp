@@ -34,7 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <png.h>
+#include "SDL_image.h"
 
 #include "stratagus.h"
 
@@ -263,42 +263,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 // Write a small image of map preview
 static void WriteMapPreview(const char *mapname, CMap &map)
 {
-	FILE *fp = fopen(mapname, "wb");
-	if (fp == NULL) {
-		return;
-	}
-
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png_ptr == NULL) {
-		fclose(fp);
-		return;
-	}
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL) {
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, NULL);
-		return;
-	}
-
-	if (setjmp(png_jmpbuf(png_ptr))) {
-		/* If we get here, we had a problem reading the file */
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return;
-	}
-
-	/* set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
-
-	png_set_IHDR(png_ptr, info_ptr, UI.Minimap.W, UI.Minimap.H, 8,
-				 PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-				 PNG_FILTER_TYPE_DEFAULT);
-
-	png_write_info(png_ptr, info_ptr);
-
 	const int rectSize = 5; // size of rectange used for player start spots
-	unsigned char *row = new unsigned char[UI.Minimap.W * 3];
 	const SDL_PixelFormat *fmt = MinimapSurface->format;
 	SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
 												UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
@@ -316,41 +281,9 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		}
 	}
 
-	for (int i = 0; i < UI.Minimap.H; ++i) {
-		switch (preview->format->BytesPerPixel) {
-		case 1:
-			for (int j = 0; j < UI.Minimap.W; ++j) {
-				Uint8 c = ((Uint8 *)preview->pixels)[j + i * UI.Minimap.W];
-				row[j * 3 + 0] = fmt->palette->colors[c].r;
-				row[j * 3 + 1] = fmt->palette->colors[c].g;
-				row[j * 3 + 2] = fmt->palette->colors[c].b;
-			}
-			break;
-		case 3:
-			memcpy(row, (char *)preview->pixels + i * UI.Minimap.W, UI.Minimap.W * 3);
-			break;
-		case 4:
-			for (int j = 0; j < UI.Minimap.W; ++j) {
-				Uint32 c = ((Uint32 *)preview->pixels)[j + i * UI.Minimap.W];
-				row[j * 3 + 0] = ((c & fmt->Rmask) >> fmt->Rshift);
-				row[j * 3 + 1] = ((c & fmt->Gmask) >> fmt->Gshift);
-				row[j * 3 + 2] = ((c & fmt->Bmask) >> fmt->Bshift);
-			}
-			break;
-		}
-		png_write_row(png_ptr, row);
-	}
-	delete[] row;
-
 	SDL_UnlockSurface(preview);
+	IMG_SavePNG(preview, mapname);
 	SDL_FreeSurface(preview);
-
-	png_write_end(png_ptr, info_ptr);
-
-	/* clean up after the write, and free any memory allocated */
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	fclose(fp);
 }
 
 
