@@ -333,6 +333,7 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
+	src/video/mng.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
@@ -633,6 +634,7 @@ endif()
 
 find_package(BZip2)
 find_package(StackTrace)
+find_package(MNG)
 find_package(OggVorbis)
 find_package(Theora)
 
@@ -668,6 +670,7 @@ endif()
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
+option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
@@ -714,6 +717,16 @@ if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
 	include_directories(${BZIP2_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
+endif()
+
+if(WITH_MNG AND MNG_FOUND)
+	add_definitions(-DUSE_MNG)
+	include_directories(${MNG_INCLUDE_DIR})
+	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
+	if (MSVC)
+		include_directories(${JPEG_INCLUDE_DIR})
+		set(stratagus_LIBS ${stratagus_LIBS} ${JPEG_LIBRARY})
+	endif()
 endif()
 
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
@@ -958,6 +971,7 @@ else()
 endif()
 
 log_package("Bzip2" "BZIP2")
+log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
