@@ -29,11 +29,15 @@
 
 //@{
 
-#ifdef USE_THEORA
+#if defined(USE_THEORA) && defined(USE_VORBIS)
 
 /*----------------------------------------------------------------------------
 -- Includes
 ----------------------------------------------------------------------------*/
+
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
+#include <theora/theora.h>
 
 #include "stratagus.h"
 
@@ -47,6 +51,7 @@
 #include "video.h"
 
 #include "SDL.h"
+#include "SDL_endian.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -62,6 +67,162 @@ static bool MovieStop;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f)
+{
+	char *buf;
+	int bytes;
+
+	while (ogg_sync_pageout(sync, page) != 1) {
+		// need more bytes
+		buf = ogg_sync_buffer(sync, 4096);
+		bytes = f->read(buf, 4096);
+		if (!bytes || ogg_sync_wrote(sync, bytes)) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int OggInit(CFile *f, OggData *data)
+{
+	ogg_packet packet;
+	int num_vorbis;
+	int num_theora;
+	int ret;
+
+	unsigned magic;
+	f->read(&magic, sizeof(magic));
+	if (SDL_SwapLE32(magic) != 0x5367674F) { // "OggS" in ASCII
+		return -1;
+	}
+	f->seek(0, SEEK_SET);
+
+	ogg_sync_init(&data->sync);
+
+	vorbis_info_init(&data->vinfo);
+	vorbis_comment_init(&data->vcomment);
+
+	theora_info_init(&data->tinfo);
+	theora_comment_init(&data->tcomment);
+
+	num_theora = 0;
+	num_vorbis = 0;
+	while (1) {
+		ogg_stream_state test;
+
+		if (OggGetNextPage(&data->page, &data->sync, f)) {
+			return -1;
+		}
+
+		if (!ogg_page_bos(&data->page)) {
+			if (num_vorbis) {
+				ogg_stream_pagein(&data->astream, &data->page);
+			}
+			if (num_theora) {
+				ogg_stream_pagein(&data->vstream, &data->page);
+			}
+			break;
+		}
+
+		ogg_stream_init(&test, ogg_page_serialno(&data->page));
+		ogg_stream_pagein(&test, &data->page);
+
+		// initial codec headers
+		while (ogg_stream_packetout(&test, &packet) == 1) {
+			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet) >= 0) {
+				memcpy(&data->vstream, &test, sizeof(test));
+				++num_theora;
+			} else
+				if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
+					memcpy(&data->astream, &test, sizeof(test));
+					++num_vorbis;
+				} else {
+					ogg_stream_clear(&test);
+				}
+		}
+	}
+
+	data->audio = num_vorbis;
+	data->video = num_theora;
+
+	// remainint codec headers
+	while ((num_vorbis && num_vorbis < 3)
+		   || (num_theora && num_theora < 3)) {
+		// are we in the theora page ?
+		while (num_theora && num_theora < 3 &&
+			   (ret = ogg_stream_packetout(&data->vstream, &packet))) {
+			if (ret < 0) {
+				return -1;
+			}
+			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet)) {
+				return -1;
+			}
+			++num_theora;
+		}
+
+		// are we in the vorbis page ?
+		while (num_vorbis && num_vorbis < 3 &&
+			   (ret = ogg_stream_packetout(&data->astream, &packet))) {
+			if (ret < 0) {
+				return -1;
+			}
+			if (vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
+				return -1;
+
+			}
+			++num_vorbis;
+		}
+
+		if (OggGetNextPage(&data->page, &data->sync, f)) {
+			break;
+		}
+
+		if (num_vorbis) {
+			ogg_stream_pagein(&data->astream, &data->page);
+		}
+		if (num_theora) {
+			ogg_stream_pagein(&data->vstream, &data->page);
+		}
+	}
+
+	if (num_vorbis) {
+		vorbis_synthesis_init(&data->vdsp, &data->vinfo);
+		vorbis_block_init(&data->vdsp, &data->vblock);
+	} else {
+		vorbis_info_clear(&data->vinfo);
+		vorbis_comment_clear(&data->vcomment);
+	}
+
+	if (num_theora) {
+		theora_decode_init(&data->tstate, &data->tinfo);
+		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
+	} else {
+		theora_info_clear(&data->tinfo);
+		theora_comment_clear(&data->tcomment);
+	}
+
+	return !(num_vorbis || num_theora);
+}
+
+void OggFree(OggData *data)
+{
+	if (data->audio) {
+		ogg_stream_clear(&data->astream);
+		vorbis_block_clear(&data->vblock);
+		vorbis_dsp_clear(&data->vdsp);
+		vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data->vinfo);
+	}
+	if (data->video) {
+		ogg_stream_clear(&data->vstream);
+		theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data->tinfo);
+		theora_clear(&data->tstate);
+	}
+	ogg_sync_clear(&data->sync);
+}
 
 /**
 **  Callbacks for movie input.
