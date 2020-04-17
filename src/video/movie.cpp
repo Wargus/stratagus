@@ -107,38 +107,6 @@ static int OutputTheora(OggData *data, SDL_Texture *yuv_overlay, SDL_Rect *rect)
 
 	theora_decode_YUVout(&data->tstate, &yuv);
 
-#if 0
-	if (SDL_MUSTLOCK(TheScreen)) {
-		if (SDL_LockSurface(TheScreen) < 0) {
-			return - 1;
-		}
-	}
-
-	if (SDL_LockYUVOverlay(yuv_overlay) < 0) {
-		return -1;
-	}
-
-	int crop_offset = data->tinfo.offset_x + yuv.y_stride * data->tinfo.offset_y;
-	for (int i = 0; i < yuv_overlay->h; ++i) {
-		memcpy(yuv_overlay->pixels[0] + yuv_overlay->pitches[0] * i,
-			   yuv.y + crop_offset + yuv.y_stride * i, yuv_overlay->w);
-	}
-
-	crop_offset = (data->tinfo.offset_x / 2) + (yuv.uv_stride) *
-				  (data->tinfo.offset_y / 2);
-	for (int i = 0; i < yuv_overlay->h / 2; ++i) {
-		memcpy(yuv_overlay->pixels[1] + yuv_overlay->pitches[1] * i,
-			   yuv.v + yuv.uv_stride * i, yuv_overlay->w / 2);
-		memcpy(yuv_overlay->pixels[2] + yuv_overlay->pitches[2] * i,
-			   yuv.u + crop_offset + yuv.uv_stride * i, yuv_overlay->w / 2);
-	}
-
-	if (SDL_MUSTLOCK(TheScreen)) {
-		SDL_UnlockSurface(TheScreen);
-	}
-	SDL_UnlockYUVOverlay(yuv_overlay);
-#endif
-
 	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
 	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, NULL);
 	SDL_RenderPresent(TheRenderer);

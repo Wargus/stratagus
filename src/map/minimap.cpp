@@ -180,8 +180,8 @@ void CMinimap::UpdateTerrain()
 
 	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
 
-	//SDL_LockSurface(MinimapTerrainSurface);
-	//SDL_LockSurface(Map.TileGraphic->Surface);
+	Assert(SDL_MUSTLOCK(MinimapTerrainSurface) == 0);
+	Assert(SDL_MUSTLOCK(Map.TileGraphic->Surface) == 0);
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -208,8 +208,6 @@ void CMinimap::UpdateTerrain()
 
 		}
 	}
-	//SDL_UnlockSurface(MinimapTerrainSurface);
-	//SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -238,8 +236,6 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
 	//
-	//SDL_LockSurface(MinimapTerrainSurface);
-	//SDL_LockSurface(Map.TileGraphic->Surface);
 
 	const int ty = pos.y * Map.Info.MapWidth;
 	const int tx = pos.x;
@@ -285,8 +281,6 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 			}
 		}
 	}
-	//SDL_UnlockSurface(MinimapTerrainSurface);
-	//SDL_UnlockSurface(Map.TileGraphic->Surface);
 }
 
 /**
@@ -377,8 +371,8 @@ void CMinimap::Update()
 		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
 	}
 
-	//SDL_LockSurface(MinimapSurface);
-	//SDL_LockSurface(MinimapTerrainSurface);
+	Assert(SDL_MUSTLOCK(MinimapSurface) == 0);
+	Assert(SDL_MUSTLOCK(MinimapTerrainSurface) == 0);
 
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
@@ -402,8 +396,6 @@ void CMinimap::Update()
 		}
 	}
 
-	//SDL_UnlockSurface(MinimapTerrainSurface);
-
 	//
 	// Draw units on map
 	//
@@ -413,7 +405,6 @@ void CMinimap::Update()
 			DrawUnitOn(unit, red_phase);
 		}
 	}
-	//SDL_UnlockSurface(MinimapSurface);
 }
 
 /**
@@ -441,9 +432,7 @@ static void DrawEvents()
 void CMinimap::Draw() const
 {
 	SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 
 	DrawEvents();
 }

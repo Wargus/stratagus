@@ -97,6 +97,7 @@ namespace gcn
     void SDLGraphics::setTarget(SDL_Surface** targetPtr)
     {
         mTarget = targetPtr;
+        Assert(SDL_MUSTLOCK(*mTarget) == 0);
     }
     bool SDLGraphics::pushClipArea(Rectangle area)
     {
@@ -149,9 +150,7 @@ namespace gcn
 
         SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
 
-        //SDL_LockSurface(*mTarget);
         SDL_BlitSurface(srcImage, &src, *mTarget, &dst);
-        //SDL_UnlockSurface(*mTarget);
     }
 
     void SDLGraphics::fillRectangle(const Rectangle& rectangle)
@@ -174,9 +173,6 @@ namespace gcn
 			int x2 = std::min<int>(area.x + area.width, top.x + top.width);
 			int y2 = std::min<int>(area.y + area.height, top.y + top.height);
 			int x, y;
-			//Video.FillTransRectangle(SDL_MapRGB((*mTarget)->format, mColor.r, mColor.g, mColor.b),
-			//	x1, y1, x2 - x1, y2 - y1, mColor.a);
-			//SDL_LockSurface(*mTarget);
 			for (y = y1; y < y2; y++)
 			{
 			    for (x = x1; x < x2; x++)
@@ -184,7 +180,6 @@ namespace gcn
 			        SDLputPixelAlpha(*mTarget, x, y, mColor);
 			    }
 			}
-			//SDL_UnlockSurface(*mTarget);
 	}
         else
         {

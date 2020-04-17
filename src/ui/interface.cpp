@@ -978,8 +978,6 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 			return 1;
 		case SDLK_LALT:
 		case SDLK_RALT:
-		//case SDLK_LMETA:
-		//case SDLK_RMETA:
 			KeyModifiers |= ModifierAlt;
 			// maxy: disabled
 			if (InterfaceState == IfaceStateNormal) {
@@ -1024,8 +1022,6 @@ int HandleKeyModifiersUp(unsigned key, unsigned)
 			return 1;
 		case SDLK_LALT:
 		case SDLK_RALT:
-		//case SDLK_LMETA:
-		//case SDLK_RMETA:
 			KeyModifiers &= ~ModifierAlt;
 			// maxy: disabled
 			if (InterfaceState == IfaceStateNormal) {

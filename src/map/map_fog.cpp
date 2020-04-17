@@ -443,9 +443,7 @@ void VideoDrawOnlyFog(int x, int y)
 	drect.x = x;
 	drect.y = y;
 
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(OnlyFogSurface, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 }
 
 /*----------------------------------------------------------------------------
@@ -672,8 +670,6 @@ void CMap::InitFogOfWar()
 	Uint32 color = Video.MapRGBA(OnlyFogSurface->format, r, g, b, FogOfWarOpacity);
 
 	SDL_FillRect(OnlyFogSurface, NULL, color);
-	//SDL_SetSurfaceAlphaMod(OnlyFogSurface, FogOfWarOpacity);
-	//VideoPaletteListRemove(OnlyFogSurface);
 
 	//
 	// Generate Alpha Fog surface.
@@ -720,7 +716,6 @@ void CMap::InitFogOfWar()
 	AlphaFogG->GraphicHeight = s->h;
 	AlphaFogG->NumFrames = 16;//1;
 	AlphaFogG->GenFramesMap();
-	AlphaFogG->UseDisplayFormat();
 
 	VisibleTable.clear();
 	VisibleTable.resize(Info.MapWidth * Info.MapHeight);

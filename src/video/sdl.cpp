@@ -346,6 +346,7 @@ void InitVideoSdl()
 	                                 0x0000FF00,
 	                                 0x000000FF,
 	                                 0); //0xFF000000);
+	Assert(SDL_MUSTLOCK(TheScreen) == 0);
 	TheTexture = SDL_CreateTexture(TheRenderer,
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
@@ -442,7 +443,6 @@ void InitVideoSdl()
 */
 int VideoValidResolution(int w, int h)
 {
-	//return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 	return 1;
 }
 

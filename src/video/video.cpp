@@ -284,6 +284,7 @@ bool CVideo::ResizeScreen(int w, int h)
 		Uint8 bpp = TheScreen->format->BitsPerPixel;
 		SDL_FreeSurface(TheScreen);
 		TheScreen = SDL_CreateRGBSurface(flags, w, h, bpp, rmask, gmask, bmask, amask);
+		Assert(SDL_MUSTLOCK(TheScreen) == 0);
 
 		// new texture
 		Uint32 format;

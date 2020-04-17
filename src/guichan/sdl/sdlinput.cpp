@@ -353,14 +353,6 @@ namespace gcn
           case SDLK_SCROLLLOCK:
               value = Key::K_SCROLL_LOCK;
               break;
-          #if 0
-          case SDLK_RMETA:
-              value = Key::K_RIGHT_META;
-              break;
-          case SDLK_LMETA:
-              value = Key::K_LEFT_META;
-              break;
-          #endif
           case SDLK_LGUI:
               value = Key::K_LEFT_SUPER;
               break;

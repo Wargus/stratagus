@@ -114,12 +114,9 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 	gx += x - oldx;
 	gy += y - oldy;
 
-	//DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 }
 
 /**
@@ -228,9 +225,7 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 }
 
 /**
@@ -253,10 +248,8 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
 	int ret;
-	//SDL_LockSurface(TheScreen);
 	//SDL_SetSurfaceAlphaMod(SurfaceFlip, 0xFF);
 	ret = SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
@@ -267,9 +260,7 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
@@ -288,9 +279,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	//SDL_LockSurface(TheScreen);
 	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
@@ -688,15 +677,12 @@ void CGraphic::Flip()
 	if (!SDL_GetColorKey(Surface, &ckey)) {
 		SDL_SetColorKey(SurfaceFlip, SDL_TRUE, ckey);
 	}
-	//SDL_SetSurfaceAlphaMod(SurfaceFlip, 0xFF);
 	SDL_SetSurfaceBlendMode(SurfaceFlip, SDL_BLENDMODE_NONE);
 	if (SurfaceFlip->format->BytesPerPixel == 1) {
-		//SDL_SetPaletteColors(SurfaceFlip->format->palette, Surface->format->palette->colors, 0, Surface->format->palette->ncolors);
 		VideoPaletteListAdd(SurfaceFlip);
 	}
 	SDL_LockSurface(Surface);
 	SDL_LockSurface(s);
-	//fprintf(stderr, "flipping sprite %s (%dbpp)\n", File.c_str(), 8*s->format->BytesPerPixel);
 	switch (s->format->BytesPerPixel) {
 		case 1:
 			for (int i = 0; i < s->h; ++i) {
@@ -721,59 +707,6 @@ void CGraphic::Flip()
 						   &((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch], 4);
 				}
 			}
-#if 0
-			unsigned int p0 = s->pitch;
-			unsigned int p1 = Surface->pitch;
-			const int width = s->w;
-			int j = 0;
-			for (int i = 0; i < s->h; ++i) {
-#ifdef _MSC_VER
-				for (j = 0; j < width; ++j) {
-					*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-						*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-				}
-#else
-				int n = (width + 7) / 8;
-				switch (width & 7) {
-					case 0: do {
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 7:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 6:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 5:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 4:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 3:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 2:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						case 1:
-							*(Uint32 *)&((char *)s->pixels)[j * 4 + p0] =
-								*(Uint32 *) & ((char *)Surface->pixels)[(width - j - 1) * 4 + p1];
-							j++;
-						} while (--n > 0);
-				}
-#endif
-				p0 += s->pitch;
-				p1 += Surface->pitch;
-			}
-#endif
 		}
 		break;
 	}
@@ -788,36 +721,6 @@ void CGraphic::Flip()
 		frameFlip_map[frame].x = ((NumFrames - frame - 1) % (SurfaceFlip->w / Width)) * Width;
 		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
 	}
-}
-
-/**
-**  Convert the SDL surface to the display format
-*/
-void CGraphic::UseDisplayFormat()
-{
-#if 0
-	SDL_Surface *s = Surface;
-
-	if (s->format->Amask != 0) {
-		Surface = SDL_DisplayFormatAlpha(s);
-	} else {
-		Surface = SDL_DisplayFormat(s);
-	}
-	VideoPaletteListRemove(s);
-	SDL_FreeSurface(s);
-
-	if (SurfaceFlip) {
-		s = SurfaceFlip;
-		if (s->format->Amask != 0) {
-			SurfaceFlip = SDL_DisplayFormatAlpha(s);
-		} else {
-			SurfaceFlip = SDL_DisplayFormat(s);
-		}
-		VideoPaletteListRemove(s);
-		SDL_FreeSurface(s);
-	}
-#endif
-
 }
 
 /**
@@ -1154,7 +1057,6 @@ void CFiller::Load()
 	if (G) {
 		G->Load();
 		map.Init(G);
-		G->UseDisplayFormat();
 	}
 }
 

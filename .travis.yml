@@ -7,11 +7,12 @@ addons:
     packages:
       - cmake
       - libsdl2-dev
+      - libsdl2-mixer-dev
+      - libsdl2-image-dev
       - liblua5.1-0-dev
       - libtolua++5.1-dev
       - libtolua-dev
       - zlib1g-dev
-      - libpng12-dev
 before_script:
   - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
          git clone https://github.com/LuaDist/toluapp.git; \

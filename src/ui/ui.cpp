@@ -247,30 +247,24 @@ void CUserInterface::Load()
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
 		if (Resources[i].G) {
 			Resources[i].G->Load();
-			Resources[i].G->UseDisplayFormat();
 		}
 	}
 
 	if (InfoPanel.G) {
 		InfoPanel.G->Load();
-		InfoPanel.G->UseDisplayFormat();
 	}
 	if (ButtonPanel.G) {
 		ButtonPanel.G->Load();
-		ButtonPanel.G->UseDisplayFormat();
 	}
 	if (PieMenu.G) {
 		PieMenu.G->Load();
-		PieMenu.G->UseDisplayFormat();
 	}
 
 	if (Preference.IconFrameG) {
 		Preference.IconFrameG->Load();
-		Preference.IconFrameG->UseDisplayFormat();
 	}
 	if (Preference.PressedIconFrameG) {
 		Preference.PressedIconFrameG->Load();
-		Preference.PressedIconFrameG->UseDisplayFormat();
 	}
 
 	//  Resolve cursors

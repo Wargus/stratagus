@@ -159,7 +159,6 @@ set(guichan_SRCS
 	src/guichan/rectangle.cpp
 	src/guichan/sdl/gsdl.cpp
 	src/guichan/sdl/sdlgraphics.cpp
-#	src/guichan/sdl/sdlimageloader.cpp
 	src/guichan/sdl/sdlinput.cpp
 	src/guichan/widget.cpp
 	src/guichan/widgets/button.cpp
@@ -333,7 +332,7 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-	src/video/mng.cpp
+        src/video/mng.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
@@ -683,10 +682,6 @@ option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
 option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" OFF)
 option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
-
-if(NOT WITH_RENDERER)
-	set(WITH_RENDERER "NativeSDL")
-endif()
 
 # Install paths
 set(BINDIR "bin" CACHE PATH "Where to install user binaries")

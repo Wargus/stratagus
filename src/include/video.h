@@ -90,7 +90,6 @@ public:
 
 	void Load(bool grayscale = false);
 	void Flip();
-	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
 	bool TransparentPixel(int x, int y);
