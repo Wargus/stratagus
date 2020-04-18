@@ -171,7 +171,6 @@ static std::vector<Clip> Clips;
 int VideoSyncSpeed = 100;            /// 0 disable interrupts
 int SkipFrames;                      /// Skip this frames
 
-Uint32 ColorTransparent;
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
 Uint32 ColorLightBlue;
@@ -257,7 +256,7 @@ void CVideo::UnlockScreen()
 */
 void CVideo::ClearScreen()
 {
-	FillRectangle(ColorTransparent, 0, 0, Video.Width, Video.Height);
+	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
 }
 
 /**
@@ -290,12 +289,9 @@ bool CVideo::ResizeScreen(int w, int h)
 		// new texture
 		Uint32 format;
 		int access, oldW, oldH;
-		SDL_BlendMode blend;
 		SDL_QueryTexture(TheTexture, &format, &access, &oldW, &oldH);
-		SDL_GetTextureBlendMode(TheTexture, &blend);
 		SDL_DestroyTexture(TheTexture);
 		TheTexture = SDL_CreateTexture(TheRenderer, format, access, w, h);
-		SDL_SetTextureBlendMode(TheTexture, blend);
 
 		SetClipping(0, 0, w - 1, h - 1);
 

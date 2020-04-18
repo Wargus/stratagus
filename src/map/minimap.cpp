@@ -431,7 +431,7 @@ static void DrawEvents()
 */
 void CMinimap::Draw() const
 {
-	SDL_Rect drect = {Sint16(X), Sint16(Y), MinimapSurface->w, MinimapSurface->h};
+	SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
 	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
 
 	DrawEvents();
