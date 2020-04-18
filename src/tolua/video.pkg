@@ -12,7 +12,6 @@ public:
 	int Width;
 	int Height;
 	int Depth;
-	int ShaderIndex;
 	bool FullScreen;
 	bool ResizeScreen(int width, int height);
 };

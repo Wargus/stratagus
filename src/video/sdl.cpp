@@ -319,6 +319,11 @@ void InitVideoSdl()
 		Video.Height = 480;
 	}
 
+	if (!Video.WindowWidth || !Video.WindowHeight) {
+		Video.WindowWidth = Video.Width;
+		Video.WindowHeight = Video.Height;
+	}
+
 	if (!Video.Depth) {
 		Video.Depth = 32;
 	}
@@ -332,7 +337,7 @@ void InitVideoSdl()
 	}
 
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	                             Video.Width, Video.Height, flags);
+	                             Video.WindowWidth, Video.WindowHeight, flags);
 	if (TheWindow == NULL) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());

@@ -578,6 +578,25 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			}
 			case 'W':
+				if (optind < argc && argv[optind] && argv[optind][0] != '-') {
+					// allow -W to take an optional argument in a POSIX compliant way
+					optarg = argv[optind];
+					sep = strchr(optarg, 'x');
+					if (!sep || !*(sep + 1)) {
+						fprintf(stderr, "%s: incorrect window size -- '%s'\n", argv[0], optarg);
+						Usage();
+						exit(-1);
+					}
+					Video.WindowHeight = atoi(sep + 1);
+					*sep = 0;
+					Video.WindowWidth = atoi(optarg);
+					if (!Video.WindowHeight || !Video.WindowWidth) {
+						fprintf(stderr, "%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
+						Usage();
+						exit(-1);
+					}
+					optind += 1; // skip the optional window size argument
+				}
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
