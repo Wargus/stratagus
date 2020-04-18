@@ -51,7 +51,7 @@ class CGraphic : public gcn::Image
 	};
 
 protected:
-	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
+	CGraphic() : Surface(NULL), SurfaceFlip(NULL), Texture(NULL), TextureFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 	{
@@ -106,6 +106,8 @@ public:
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	SDL_Texture *Texture;
+	SDL_Texture *TextureFlip;
 	frame_pos_t *frame_map;
 	frame_pos_t *frameFlip_map;
 	void GenFramesMap();
@@ -399,6 +401,7 @@ extern void ToggleGrabMouse(int mode);
 extern EventCallback GameCallbacks;   /// Game callbacks
 extern EventCallback EditorCallbacks; /// Editor callbacks
 
+extern Uint32 ColorTransparent;
 extern Uint32 ColorBlack;
 extern Uint32 ColorDarkGreen;
 extern Uint32 ColorLightBlue;

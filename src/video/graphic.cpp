@@ -90,10 +90,9 @@ void CGraphic::DrawClip(int x, int y) const
 void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 {
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	//SDL_LockSurface(TheScreen);
-	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
+	SDL_RenderCopy(TheRenderer, Texture, &srect, &drect);
+	// SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
 }
 
 /**
@@ -113,10 +112,7 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 	CLIP_RECTANGLE(x, y, w, h);
 	gx += x - oldx;
 	gy += y - oldy;
-
-	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+	DrawSub(gx, gy, w, h, x, y);
 }
 
 /**
@@ -134,10 +130,13 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 							unsigned char alpha) const
 {
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
-	SDL_SetSurfaceAlphaMod(Surface, alpha);
+	// SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
+	// SDL_SetSurfaceAlphaMod(Surface, alpha);
+	SDL_GetTextureAlphaMod(Texture, &oldalpha);
+	SDL_SetTextureAlphaMod(Texture, alpha);
 	DrawSub(gx, gy, w, h, x, y);
-	SDL_SetSurfaceAlphaMod(Surface, oldalpha);
+	SDL_SetTextureAlphaMod(Texture, oldalpha);
+	// SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 }
 
 /**
@@ -223,9 +222,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
 
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	// SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 }
 
 /**
@@ -245,23 +245,25 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 	srect.x += x - oldx;
 	srect.y += y - oldy;
 
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
 
-	int ret;
-	//SDL_SetSurfaceAlphaMod(SurfaceFlip, 0xFF);
-	ret = SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	// SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
-
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+	// SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
+	SDL_SetTextureAlphaMod(TextureFlip, alpha);
+	// SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
+	SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	// SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
+	// SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
 void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
@@ -274,13 +276,16 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	srect.x += x - oldx;
 	srect.y += y - oldy;
 
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
-
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+	// SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
+	SDL_SetTextureAlphaMod(TextureFlip, alpha);
+	// SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
+	SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	// SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
+	// SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
 /**
@@ -603,6 +608,9 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	GenFramesMap();
+
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
 	return;
 
  error:
@@ -651,10 +659,12 @@ void CGraphic::Free(CGraphic *g)
 		FreeSurface(&g->Surface);
 		delete[] g->frame_map;
 		g->frame_map = NULL;
+		SDL_DestroyTexture(g->Texture);
 
 		FreeSurface(&g->SurfaceFlip);
 		delete[] g->frameFlip_map;
 		g->frameFlip_map = NULL;
+		SDL_DestroyTexture(g->TextureFlip);
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
@@ -721,6 +731,9 @@ void CGraphic::Flip()
 		frameFlip_map[frame].x = ((NumFrames - frame - 1) % (SurfaceFlip->w / Width)) * Width;
 		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
 	}
+
+	TextureFlip = SDL_CreateTextureFromSurface(TheRenderer, SurfaceFlip);
+	SDL_SetTextureBlendMode(TextureFlip, SDL_BLENDMODE_BLEND);
 }
 
 /**
@@ -847,6 +860,9 @@ void CGraphic::Resize(int w, int h)
 	Height = GraphicHeight = h;
 
 	GenFramesMap();
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
 }
 
 /**
@@ -861,15 +877,14 @@ void CGraphic::SetOriginalSize()
 		return;
 	}
 
-	
-	if (Surface) {
-		FreeSurface(&Surface);
-		Surface = NULL;
-	}
+	FreeSurface(&Surface);
+	SDL_DestroyTexture(Texture);
+	Surface = NULL;
 	delete[] frame_map;
 	frame_map = NULL;
 	if (SurfaceFlip) {
 		FreeSurface(&SurfaceFlip);
+		SDL_DestroyTexture(TextureFlip);
 		SurfaceFlip = NULL;
 	}
 	delete[] frameFlip_map;
@@ -933,10 +948,18 @@ void CGraphic::MakeShadow()
 
 	SDL_SetPaletteColors(Surface->format->palette, colors, 0, 256);
 	SDL_SetSurfaceAlphaMod(Surface, 128);
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+	SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(Texture, 128);
 
 	if (SurfaceFlip) {
 		SDL_SetPaletteColors(SurfaceFlip->format->palette, colors, 0, 256);
 		SDL_SetSurfaceAlphaMod(SurfaceFlip, 128);
+		SDL_DestroyTexture(TextureFlip);
+		TextureFlip = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+		SDL_SetTextureBlendMode(TextureFlip, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(TextureFlip, 128);
 	}
 }
 
