@@ -344,7 +344,7 @@ void InitVideoSdl()
 		exit(1);
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
-	SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	Video.ResizeScreen(Video.Width, Video.Height);
 
@@ -656,9 +656,11 @@ void RealizeVideoMemory()
 		SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
 		if (EnableDebugPrint) {
 			// show a bar representing fps scaled by 10
+			SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
 			Uint32 nextTick = SDL_GetTicks();
 			double fps = 10000.0 / (nextTick - LastTick);
 			SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
+			SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 			LastTick = nextTick;
 		}
 		SDL_RenderPresent(TheRenderer);
