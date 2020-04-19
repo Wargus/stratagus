@@ -266,38 +266,44 @@ void CVideo::ClearScreen()
 */
 bool CVideo::ResizeScreen(int w, int h)
 {
-	if (VideoValidResolution(w, h)) {
-		Width = w;
-		Height = h;
-
-		if (!(SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP)) {
-			SDL_SetWindowSize(TheWindow, w, h);
-		}
-		SDL_RenderSetLogicalSize(TheRenderer, w, h);
-
-		// new surface
-		Uint32 flags = TheScreen->flags;
-		Uint32 rmask = TheScreen->format->Rmask;
-		Uint32 gmask = TheScreen->format->Gmask;
-		Uint32 bmask = TheScreen->format->Bmask;
-		Uint32 amask = TheScreen->format->Amask;
-		Uint8 bpp = TheScreen->format->BitsPerPixel;
-		SDL_FreeSurface(TheScreen);
-		TheScreen = SDL_CreateRGBSurface(flags, w, h, bpp, rmask, gmask, bmask, amask);
-		Assert(SDL_MUSTLOCK(TheScreen) == 0);
-
-		// new texture
-		Uint32 format;
-		int access, oldW, oldH;
-		SDL_QueryTexture(TheTexture, &format, &access, &oldW, &oldH);
-		SDL_DestroyTexture(TheTexture);
-		TheTexture = SDL_CreateTexture(TheRenderer, format, access, w, h);
-
-		SetClipping(0, 0, w - 1, h - 1);
-
-		return true;
+	if (!(SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP)
+		&& Video.Width == Video.WindowWidth
+		&& Video.Height == Video.WindowHeight) {
+		// if initially window was the same size as res, keep it that way
+		SDL_SetWindowSize(TheWindow, w, h);
 	}
-	return false;
+	Width = w;
+	Height = h;
+
+	SDL_RenderSetLogicalSize(TheRenderer, w, h);
+
+	// new surface
+	if (TheScreen) {
+		if (TheScreen->userdata) {
+			free(TheScreen->userdata);
+		}
+		SDL_FreeSurface(TheScreen);
+	}
+	TheScreen = SDL_CreateRGBSurface(0, w, h, 32,
+									 0x00ff0000,
+									 0x0000ff00,
+									 0x000000ff,
+									 0); // 0xff000000);
+	Assert(SDL_MUSTLOCK(TheScreen) == 0);
+	TheScreen->userdata = calloc(w * Video.Scale * h * Video.Scale, sizeof(Uint32));
+
+	// new texture
+	if (TheTexture) {
+		SDL_DestroyTexture(TheTexture);
+	}
+	TheTexture = SDL_CreateTexture(TheRenderer,
+	                               SDL_PIXELFORMAT_ARGB8888,
+	                               SDL_TEXTUREACCESS_STREAMING,
+	                               w * Video.Scale, h * Video.Scale);
+
+	SetClipping(0, 0, w - 1, h - 1);
+
+	return true;
 }
 
 /**
@@ -474,5 +480,66 @@ void RestoreColorCyclingSurface()
 
 
 #endif
+
+void* NullScaler(SDL_Surface *s) {
+	return s->pixels;
+}
+
+void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *s) {
+	Assert(Video.Scale == 2);
+	Assert(s->format->BitsPerPixel == 32);
+	Assert(Video.Height * Video.Width == s->h * 2 * s->w * 2);
+
+	Uint32 *in = (Uint32*) s->pixels;
+	Uint32 *out = (Uint32*) s->userdata;
+	int inputW = s->w;
+	int outputW = s->w * 2;
+
+	// Just the algo from wikipedia.
+	//
+	// Input  +-----+-----+-----+
+	//        |     |  A  |     |
+	//        +-----+-----+-----+
+	//        |  C  |  P  |  B  |
+	//        +-----+-----+-----+
+	//        |     |  D  |     |
+	//        +-----+-----+-----+
+	//                ||
+	// Output    +-----+-----+
+	// for P     |  o1 |  o2 |
+	//           +-----+-----+
+	//           |  o3 |  o4 |
+	//           +-----+-----+
+	Uint32 a, b, c, d, p, o1, o2, o3, o4;
+	for (int y = 1, y2 = 1; y < Video.Height - 1; y++, y2 += 2) {
+		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 2) {
+			o1 = o2 = o3 = o4 = p = in[x + y * inputW];
+			a = in[x + (y - 1) * inputW];
+			b = in[x + 1 + y * inputW];
+			c = in[x - 1 + y * inputW];
+			d = in[x + (y + 1) * inputW];
+			if ((c == a) && (c != d) && (a != b)) {
+				o1 = a;
+			}
+			if ((a == b) && (a != c) && (b != d)) {
+				o2 = b;
+			}
+			if ((d == c) && (d != b) && (c != a)) {
+				o3 = c;
+			}
+			if ((b == d) && (b != a) && (d != c)) {
+				o4 = d;
+			}
+			out[x2 + y2 * outputW] = o1;
+			out[x2 + 1 + y2 * outputW] = o2;
+			out[x2 + (y2 + 1) * outputW] = o3;
+			out[x2 + 1 + (y2 + 1) * outputW] = o4;
+		}
+	}
+
+	return out;
+}
+
+
 
 //@}

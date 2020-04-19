@@ -344,18 +344,8 @@ void InitVideoSdl()
 		exit(1);
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
-	SDL_RenderSetLogicalSize(TheRenderer, Video.Width, Video.Height);
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-	TheScreen = SDL_CreateRGBSurface(0, Video.Width, Video.Height, 32,
-	                                 0x00FF0000,
-	                                 0x0000FF00,
-	                                 0x000000FF,
-	                                 0); //0xFF000000);
-	Assert(SDL_MUSTLOCK(TheScreen) == 0);
-	TheTexture = SDL_CreateTexture(TheRenderer,
-	                               SDL_PIXELFORMAT_ARGB8888,
-	                               SDL_TEXTUREACCESS_STREAMING,
-	                               Video.Width, Video.Height);
+	Video.ResizeScreen(Video.Width, Video.Height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
@@ -667,7 +657,7 @@ void RealizeVideoMemory()
 {
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+		SDL_UpdateTexture(TheTexture, NULL, Video.Scaler(TheScreen), TheScreen->pitch * Video.Scale);
 		SDL_RenderClear(TheRenderer);
 		//for (int i = 0; i < NumRects; i++)
 		//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
