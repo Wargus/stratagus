@@ -345,8 +345,8 @@ void InitVideoSdl()
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
 	SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	Video.ResizeScreen(Video.Width, Video.Height);
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 
