@@ -275,7 +275,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const int maxProgress = type.Stats[unit.Player->Index].Costs[TimeCost] * 600;
 
 	// Check if we should make some random noise
-	if (unit.Frame == 0 && unit.Player == ThisPlayer && GameCycle % 150 == 0 && SyncRand(3) == 0) {
+	// IMPORTANT: this is local randomization, do not use the SyncRand function!
+	if (unit.Frame == 0 && unit.Player == ThisPlayer && GameCycle % 150 == 0 && (MyRand() % 3) == 0) {
 		PlayUnitSound(unit, VoiceBuilding, true);
 	}
 

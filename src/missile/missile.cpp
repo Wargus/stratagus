@@ -397,7 +397,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	// If Firing from inside a Bunker
 	CUnit *from = GetFirstContainer(unit);
 	const int dir = ((unit.Direction + NextDirection / 2) & 0xFF) / NextDirection;
-	const PixelPos startPixelPos = Map.TilePosToMapPixelPos_Center(from->tilePos)
+	const PixelPos startPixelPos = from->GetMapPixelPosCenter()
 								   + unit.Type->MissileOffsets[dir][0];
 
 	Vec2i dpos;

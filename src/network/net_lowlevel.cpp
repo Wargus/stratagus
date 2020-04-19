@@ -266,7 +266,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 		if (ifa->ifa_addr->sa_family != AF_INET) continue;
 		if (ifa->ifa_flags & IFF_LOOPBACK) continue;
 		if (ifa->ifa_flags & IFF_POINTOPOINT) continue;
-		if (ifa->ifa_flags & IFF_UP == 0) continue;
+		if ((ifa->ifa_flags & IFF_UP) == 0) continue;
 		ips[idx++] = ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
 	}
 	if (ifAddrStruct != NULL) {
