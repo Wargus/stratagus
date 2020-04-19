@@ -344,7 +344,7 @@ void InitVideoSdl()
 		exit(1);
 	}
 	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
-	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
 	Video.ResizeScreen(Video.Width, Video.Height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
@@ -642,6 +642,9 @@ void WaitEventsOneFrame()
 /**
 **  Realize video memory.
 */
+
+static Uint32 LastTick = 0;
+
 void RealizeVideoMemory()
 {
 	if (NumRects) {
@@ -651,6 +654,13 @@ void RealizeVideoMemory()
 		//for (int i = 0; i < NumRects; i++)
 		//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
 		SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
+		if (EnableDebugPrint) {
+			// show a bar representing fps scaled by 10
+			Uint32 nextTick = SDL_GetTicks();
+			double fps = 10000.0 / (nextTick - LastTick);
+			SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
+			LastTick = nextTick;
+		}
 		SDL_RenderPresent(TheRenderer);
 		NumRects = 0;
 	}
