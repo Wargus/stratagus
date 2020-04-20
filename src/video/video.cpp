@@ -93,6 +93,8 @@
 #include "map.h"
 #include "ui.h"
 
+#include "hqx/HQ2x.hh"
+#include "hqx/HQ3x.hh"
 
 #include "SDL.h"
 
@@ -290,7 +292,7 @@ bool CVideo::ResizeScreen(int w, int h)
 									 0x000000ff,
 									 0); // 0xff000000);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
-	TheScreen->userdata = calloc(w * Video.Scale * h * Video.Scale, sizeof(Uint32));
+	TheScreen->userdata = calloc(w * Scale * h * Scale, sizeof(Uint32));
 
 	// new texture
 	if (TheTexture) {
@@ -299,7 +301,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	TheTexture = SDL_CreateTexture(TheRenderer,
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
-	                               w * Video.Scale, h * Video.Scale);
+	                               w * Scale, h * Scale);
 
 	SetClipping(0, 0, w - 1, h - 1);
 
@@ -488,7 +490,6 @@ void* NullScaler(SDL_Surface *s) {
 void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *s) {
 	Assert(Video.Scale == 2);
 	Assert(s->format->BitsPerPixel == 32);
-	Assert(Video.Height * Video.Width == s->h * 2 * s->w * 2);
 
 	Uint32 *in = (Uint32*) s->pixels;
 	Uint32 *out = (Uint32*) s->userdata;
@@ -540,6 +541,129 @@ void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *s) {
 	return out;
 }
 
+void* Scale3x_AdvMame3x_Scaler(SDL_Surface *s) {
+	Assert(Video.Scale == 3);
+	Assert(s->format->BitsPerPixel == 32);
 
+	Uint32 *in = (Uint32*) s->pixels;
+	Uint32 *out = (Uint32*) s->userdata;
+	int inputW = s->w;
+	int outputW = s->w * 3;
+
+	// Just the algo from wikipedia.
+	//
+	// Input  +-----+-----+-----+
+	//        |  A  |  B  |  C  |
+	//        +-----+-----+-----+
+	//        |  D  |  E  |  F  |
+	//        +-----+-----+-----+
+	//        |  G  |  H  |  I  |
+	//        +-----+-----+-----+
+	//                ||
+	// Output +-----+-----+-----+
+	//        |  1  |  2  |  3  |
+	//        +-----+-----+-----+
+	//        |  4  |  5  |  6  |
+	//        +-----+-----+-----+
+	//        |  7  |  8  |  9  |
+	//        +-----+-----+-----+
+	Uint32 a, b, c, d, e, f, g, h, i, o1, o2, o3, o4, o5, o6, o7, o8, o9;
+	for (int y = 1, y2 = 1; y < Video.Height - 1; y++, y2 += 3) {
+		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 3) {
+			o1 = o2 = o3 = o4 = o5 = o6 = o7 = o8 = o9 = e = in[x + y * inputW];
+			a = in[x - 1 + (y - 1) * inputW];
+			b = in[x     + (y - 1) * inputW];
+			c = in[x + 1 + (y - 1) * inputW];
+			d = in[x - 1 +  y      * inputW];
+			f = in[x + 1 +  y      * inputW];
+			g = in[x - 1 + (y + 1) * inputW];
+			h = in[x     + (y + 1) * inputW];
+			i = in[x + 1 + (y + 1) * inputW];
+
+			if (d == b && d != h && b != f) {
+				o1 = d;
+				if (e != c) {
+					o2 = b;
+				}
+				if (e != g) {
+					o4 = d;
+				}
+			}
+			if (b == f && b != d && f != h) {
+				o3 = f;
+				if (e != a) {
+					o2 = b;
+				}
+				if (e != i) {
+					o6 = f;
+				}
+			}
+			if (h == d && h != f && d != b) {
+				o7 = d;
+				if (e != a) {
+					o4 = d;
+				}
+				if (e != i) {
+					o8 = h;
+				}
+			}
+			if (f == h && f != b && h != d) {
+				o9 = f;
+				if (e != c) {
+					o6 = f;
+				}
+				if (e != g) {
+					o8 = h;
+				}
+			}
+
+			out[x2 - 1 + (y2 - 1) * outputW] = o1;
+			out[x2     + (y2 - 1) * outputW] = o2;
+			out[x2 + 1 + (y2 - 1) * outputW] = o3;
+			out[x2 - 1 +  y2      * outputW] = o4;
+			out[x2     +  y2      * outputW] = o5;
+			out[x2 + 1 +  y2      * outputW] = o6;
+			out[x2 - 1 + (y2 + 1) * outputW] = o7;
+			out[x2     + (y2 + 1) * outputW] = o8;
+			out[x2 + 1 + (y2 + 1) * outputW] = o9;
+		}
+	}
+
+	return out;
+}
+
+void *Hq2x_Scaler(SDL_Surface *s) {
+	// these shifts are the hqx ARGBtoAYUV hardcoded values
+	Assert(s->format->Ashift == 24);
+	Assert(s->format->Rshift == 16);
+	Assert(s->format->Gshift == 8);
+	Assert(s->format->Bshift == 0);
+	Assert(Video.Scale == 2);
+	Assert(s->format->BitsPerPixel == 32);
+
+	Uint32 *in = (Uint32 *)s->pixels;
+	Uint32 *out = (Uint32 *)s->userdata;
+	HQ2x *hq2x = new HQ2x();
+	hq2x->resize(in, Video.Width, Video.Height, out);
+	delete hq2x;
+	return out;
+}
+
+void *Hq3x_Scaler(SDL_Surface *s) {
+	// these shifts are the hqx ARGBtoAYUV hardcoded values
+	Assert(s->format->Ashift == 24);
+	Assert(s->format->Rshift == 16);
+	Assert(s->format->Gshift == 8);
+	Assert(s->format->Bshift == 0);
+	Assert(Video.Scale == 3);
+	Assert(s->format->BitsPerPixel == 32);
+
+	Uint32 *in = (Uint32 *)s->pixels;
+	Uint32 *out = (Uint32 *)s->userdata;
+	HQ3x *hq3x = new HQ3x();
+	hq3x->resize(in, Video.Width, Video.Height, out);
+	delete hq3x;
+	return out;
+}
 
 //@}

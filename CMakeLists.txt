@@ -55,6 +55,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
+        src/third_party/hqx/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -338,7 +339,12 @@ set(video_SRCS
 	src/video/sdl.cpp
 	src/video/video.cpp
 )
-source_group(video FILES ${video_SRCS})
+set(hqx_SRCS
+	src/third_party/hqx/source/HQx.cc
+	src/third_party/hqx/source/HQ2x.cc
+	src/third_party/hqx/source/HQ3x.cc
+)
+source_group(video FILES ${video_SRCS} ${hqx_SRCS})
 
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
@@ -389,6 +395,7 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
+        ${hqx_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 

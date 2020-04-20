@@ -606,6 +606,15 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				if (!strcmp(optarg, "scale2x")) {
 					Video.Scale = 2;
 					Video.Scaler = Epx_Scale2x_AdvMame2x_Scaler;
+				} else if (!strcmp(optarg, "scale3x")) {
+					Video.Scale = 3;
+					Video.Scaler = Scale3x_AdvMame3x_Scaler;
+				} else if (!strcmp(optarg, "hq2x")) {
+					Video.Scale = 2;
+					Video.Scaler = Hq2x_Scaler;
+				} else if (!strcmp(optarg, "hq3x")) {
+					Video.Scale = 3;
+					Video.Scaler = Hq3x_Scaler;
 				}
 				continue;
 			case -1:
