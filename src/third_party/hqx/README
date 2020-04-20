@@ -1,32 +1,29 @@
 hqx Library README
 ==================
 
-# Introduction
-hqx ("hq" stands for "high quality" and "x" stands for magnification) is one of the pixel art scaling algorithms developed by Maxim Stepin, used in emulators such as Nestopia, bsnes, ZSNES, Snes9x, FCE Ultra and many more. There are 3 hqx filters: hq2x, hq3x and hq4x which magnify by factor of 2, 3 and 4 respectively.
+Introduction
+------------
+hqx is a fast, high-quality magnification filter designed for pixel art.
 
-# Build
-
-    autoreconf -vi
-
-# Install
-NOTE: [DevIL](http://openil.sf.net/) library and development headers are required.
+Install
+-------
+NOTE: DevIL library and development headers are required.
 
     ./configure
     make && make install
 
 For more information refer to INSTALL.
 
-# Usage
+Usage
+-----
 hqx -s scaleBy input output
 Where scaleBy is either 2, 3 or 4
 
 For example:
-```
-hqx -s 4 test.png out.png
-```
+    hqx -s 4 test.png out.png
 
-# Example
-```c
+Example
+-------
 #include <stdint.h>
 #include <hqx.h>
 
@@ -40,9 +37,9 @@ size_t width, height; // Size of source bitmap
 uint32_t *dest = (uint32_t *) malloc(width * 4 * height * 4 * sizeof(uint32_t));
 hqxInit();
 hq4x_32(src, dest, width, height);
-```
 
-# Implementation
+Implementation
+--------------
 The first step is an analysis of the 3x3 area of the source pixel. At first, we
 calculate the color difference between the central pixel and its 8 nearest
 neighbors. Then that difference is compared to a predefined threshold, and these

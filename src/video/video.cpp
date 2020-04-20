@@ -93,8 +93,9 @@
 #include "map.h"
 #include "ui.h"
 
-#include "hqx/HQ2x.hh"
-#include "hqx/HQ3x.hh"
+extern "C" {
+#include "hqx/src/hqx.h"
+}
 
 #include "SDL.h"
 
@@ -637,7 +638,13 @@ void* Scale3x_AdvMame3x_Scaler(SDL_Surface *s) {
 	return out;
 }
 
+static bool hqxInitialized = false;
+
 void *Hq2x_Scaler(SDL_Surface *s) {
+	if (!hqxInitialized) {
+		hqxInitialized = true;
+		hqxInit();
+	}
 	// these shifts are the hqx ARGBtoAYUV hardcoded values
 	Assert(s->format->Ashift == 24);
 	Assert(s->format->Rshift == 16);
@@ -648,13 +655,15 @@ void *Hq2x_Scaler(SDL_Surface *s) {
 
 	Uint32 *in = (Uint32 *)s->pixels;
 	Uint32 *out = (Uint32 *)s->userdata;
-	HQ2x *hq2x = new HQ2x();
-	hq2x->resize(in, Video.Width, Video.Height, out);
-	delete hq2x;
+	hq2x_32(in, out, Video.Width, Video.Height);
 	return out;
 }
 
 void *Hq3x_Scaler(SDL_Surface *s) {
+	if (!hqxInitialized) {
+		hqxInitialized = true;
+		hqxInit();
+	}
 	// these shifts are the hqx ARGBtoAYUV hardcoded values
 	Assert(s->format->Ashift == 24);
 	Assert(s->format->Rshift == 16);
@@ -665,9 +674,26 @@ void *Hq3x_Scaler(SDL_Surface *s) {
 
 	Uint32 *in = (Uint32 *)s->pixels;
 	Uint32 *out = (Uint32 *)s->userdata;
-	HQ3x *hq3x = new HQ3x();
-	hq3x->resize(in, Video.Width, Video.Height, out);
-	delete hq3x;
+	hq3x_32(in, out, Video.Width, Video.Height);
+	return out;
+}
+
+void *Hq4x_Scaler(SDL_Surface *s) {
+	if (!hqxInitialized) {
+		hqxInitialized = true;
+		hqxInit();
+	}
+	// these shifts are the hqx ARGBtoAYUV hardcoded values
+	Assert(s->format->Ashift == 24);
+	Assert(s->format->Rshift == 16);
+	Assert(s->format->Gshift == 8);
+	Assert(s->format->Bshift == 0);
+	Assert(Video.Scale == 4);
+	Assert(s->format->BitsPerPixel == 32);
+
+	Uint32 *in = (Uint32 *)s->pixels;
+	Uint32 *out = (Uint32 *)s->userdata;
+	hq4x_32(in, out, Video.Width, Video.Height);
 	return out;
 }
 

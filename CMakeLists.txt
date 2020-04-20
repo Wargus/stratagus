@@ -55,7 +55,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
-        src/third_party/hqx/include
+        src/third_party/
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -340,9 +340,10 @@ set(video_SRCS
 	src/video/video.cpp
 )
 set(hqx_SRCS
-	src/third_party/hqx/source/HQx.cc
-	src/third_party/hqx/source/HQ2x.cc
-	src/third_party/hqx/source/HQ3x.cc
+	src/third_party/hqx/src/init.c
+	src/third_party/hqx/src/hq2x.c
+	src/third_party/hqx/src/hq3x.c
+	src/third_party/hqx/src/hq4x.c
 )
 source_group(video FILES ${video_SRCS} ${hqx_SRCS})
 

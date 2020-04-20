@@ -1,0 +1,48 @@
+Source: libhqx
+Priority: optional
+Maintainer: James E. Flemer <jflemer@alum.rpi.edu>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, libdevil-dev
+Standards-Version: 3.9.2
+Section: graphics
+Homepage: http://code.google.com/p/hqx/
+Vcs-Svn: http://hqx.googlecode.com/svn/trunk/
+Vcs-Browser: http://code.google.com/p/hqx/source/browse/#svn%2Ftrunk
+
+Package: libhqx
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: fast, high-quality magnification filter for pixel art
+ hqx ("hq" stands for "high quality" and "x" stands for magnification)
+ is one of the pixel art scaling algorithms developed by Maxim Stepin,
+ used in emulators such as Nestopia, bsnes, ZSNES, Snes9x, FCE Ultra
+ and many more. There are 3 hqx filters: hq2x, hq3x and hq4x which
+ magnify by factor of 2, 3 and 4 respectively. 
+ .
+ libhqx shared library
+
+Package: libhqx-dev
+Section: libdevel
+Architecture: any
+Depends: libhqx (= ${binary:Version})
+Description: fast, high-quality magnification filter for pixel art
+ hqx ("hq" stands for "high quality" and "x" stands for magnification)
+ is one of the pixel art scaling algorithms developed by Maxim Stepin,
+ used in emulators such as Nestopia, bsnes, ZSNES, Snes9x, FCE Ultra
+ and many more. There are 3 hqx filters: hq2x, hq3x and hq4x which
+ magnify by factor of 2, 3 and 4 respectively. 
+ .
+ libhqx headers and static library
+
+Package: libhqx-bin
+Section: graphics
+Architecture: any
+Depends: libhqx (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: fast, high-quality magnification filter for pixel art
+ hqx ("hq" stands for "high quality" and "x" stands for magnification)
+ is one of the pixel art scaling algorithms developed by Maxim Stepin,
+ used in emulators such as Nestopia, bsnes, ZSNES, Snes9x, FCE Ultra
+ and many more. There are 3 hqx filters: hq2x, hq3x and hq4x which
+ magnify by factor of 2, 3 and 4 respectively. 
+ .
+ hqx command line tool
