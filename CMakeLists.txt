@@ -600,7 +600,7 @@ set(stratagus_HDRS
 )
 
 # Configuration types
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Profile" CACHE STRING "" FORCE)
 
 # Additional platform checks
 
@@ -803,6 +803,11 @@ endif()
 if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
 endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Profile")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+endif()
 # TODO: Add support for other compilers
 
 check_type_size(errno_t ERRNOT)
@@ -888,6 +893,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message("Debug mode: Yes (Disable by param -DCMAKE_BUILD_TYPE=Release)")
 else()
 	message("Debug mode: No (Enable by param -DCMAKE_BUILD_TYPE=Debug)")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Profile")
+	message("Profiling mode: Yes (Disable by param -DCMAKE_BUILD_TYPE=Release)")
+else()
+	message("Profiling mode: No (Enable by param -DCMAKE_BUILD_TYPE=Profile)")
 endif()
 
 if(ENABLE_STRIP)
@@ -1038,6 +1049,10 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Profile")
+	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-prof)
 endif()
 
 if(WIN32 AND MINGW AND ENABLE_STATIC)
