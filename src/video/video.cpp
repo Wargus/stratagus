@@ -511,8 +511,10 @@ void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *s) {
 	//           +-----+-----+
 	//           |  o3 |  o4 |
 	//           +-----+-----+
-	Uint32 a, b, c, d, p, o1, o2, o3, o4;
-	for (int y = 1, y2 = 1; y < Video.Height - 1; y++, y2 += 2) {
+#pragma omp parallel for
+	for (int y = 1; y < Video.Height - 1; y++) {
+		int y2 = y * 2;
+		Uint32 a, b, c, d, p, o1, o2, o3, o4;
 		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 2) {
 			o1 = o2 = o3 = o4 = p = in[x + y * inputW];
 			a = in[x + (y - 1) * inputW];
@@ -567,8 +569,11 @@ void* Scale3x_AdvMame3x_Scaler(SDL_Surface *s) {
 	//        +-----+-----+-----+
 	//        |  7  |  8  |  9  |
 	//        +-----+-----+-----+
-	Uint32 a, b, c, d, e, f, g, h, i, o1, o2, o3, o4, o5, o6, o7, o8, o9;
-	for (int y = 1, y2 = 1; y < Video.Height - 1; y++, y2 += 3) {
+
+#pragma omp parallel for num_threads(4)
+	for (int y = 1; y < Video.Height - 1; y++) {
+		int y2 = y * 3;
+		Uint32 a, b, c, d, e, f, g, h, i, o1, o2, o3, o4, o5, o6, o7, o8, o9;
 		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 3) {
 			o1 = o2 = o3 = o4 = o5 = o6 = o7 = o8 = o9 = e = in[x + y * inputW];
 			a = in[x - 1 + (y - 1) * inputW];
