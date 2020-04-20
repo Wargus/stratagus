@@ -215,6 +215,8 @@ extern void* Scale3x_AdvMame3x_Scaler(SDL_Surface *pixels);
 extern void* Hq2x_Scaler(SDL_Surface *pixels);
 extern void* Hq3x_Scaler(SDL_Surface *pixels);
 extern void* Hq4x_Scaler(SDL_Surface *pixels);
+extern void* XBRZ2x_Scaler(SDL_Surface *pixels);
+extern void* XBRZ3x_Scaler(SDL_Surface *pixels);
 
 class CVideo
 {

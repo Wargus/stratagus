@@ -345,7 +345,10 @@ set(hqx_SRCS
 	src/third_party/hqx/src/hq3x.c
 	src/third_party/hqx/src/hq4x.c
 )
-source_group(video FILES ${video_SRCS} ${hqx_SRCS})
+set(xbrz_SRCS
+	src/third_party/xbrz/xbrz.cpp
+)
+source_group(video FILES ${video_SRCS} ${hqx_SRCS} ${xbrz_SRCS})
 
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp
@@ -397,6 +400,7 @@ set(stratagus_SRCS
 	${unit_SRCS}
 	${video_SRCS}
         ${hqx_SRCS}
+        ${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -798,7 +802,7 @@ endif()
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
 if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char -std=gnu++0x -Werror")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char -std=gnu++17 -Werror")
 endif()
 if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")

@@ -96,6 +96,7 @@
 extern "C" {
 #include "hqx/src/hqx.h"
 }
+#include "xbrz/xbrz.h"
 
 #include "SDL.h"
 
@@ -694,6 +695,54 @@ void *Hq4x_Scaler(SDL_Surface *s) {
 	Uint32 *in = (Uint32 *)s->pixels;
 	Uint32 *out = (Uint32 *)s->userdata;
 	hq4x_32(in, out, Video.Width, Video.Height);
+	return out;
+}
+
+void *XBRZ2x_Scaler(SDL_Surface *s) {
+	Assert(s->format->Ashift == 24);
+	Assert(s->format->Rshift == 16);
+	Assert(s->format->Gshift == 8);
+	Assert(s->format->Bshift == 0);
+	Assert(Video.Scale == 2);
+	Assert(s->format->BitsPerPixel == 32);
+
+	Uint32 *in = (Uint32 *)s->pixels;
+	Uint32 *out = (Uint32 *)s->userdata;
+
+	int sliceHeight = 40;
+	int stepEnd = Video.Height - sliceHeight - 2;
+	int maxHeight = Video.Height;
+	int stepSize = sliceHeight;
+#pragma omp parallel for
+	for (int y = 0; y <= maxHeight; y += stepSize) {
+		xbrz::scale(2, in, out, Video.Width, Video.Height, xbrz::ColorFormat::RGB,
+					xbrz::ScalerCfg(), y, std::min(y + sliceHeight, maxHeight)); // we ignore the alpha channel
+	}
+
+	return out;
+}
+
+void *XBRZ3x_Scaler(SDL_Surface *s) {
+	Assert(s->format->Ashift == 24);
+	Assert(s->format->Rshift == 16);
+	Assert(s->format->Gshift == 8);
+	Assert(s->format->Bshift == 0);
+	Assert(Video.Scale == 3);
+	Assert(s->format->BitsPerPixel == 32);
+
+	Uint32 *in = (Uint32 *)s->pixels;
+	Uint32 *out = (Uint32 *)s->userdata;
+
+	int sliceHeight = 40;
+	int stepEnd = Video.Height - sliceHeight - 2;
+	int maxHeight = Video.Height;
+	int stepSize = sliceHeight;
+#pragma omp parallel for
+	for (int y = 0; y <= maxHeight; y += stepSize) {
+		xbrz::scale(3, in, out, Video.Width, Video.Height, xbrz::ColorFormat::RGB,
+					xbrz::ScalerCfg(), y, std::min(y + sliceHeight, maxHeight)); // we ignore the alpha channel
+	}
+
 	return out;
 }
 
