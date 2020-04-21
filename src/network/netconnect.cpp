@@ -734,7 +734,7 @@ static bool IsSafeMapName(const char *mapname)
 
 	for (const char *ch = buf; *ch != '\0'; ++ch) {
 		if (!isalnum(*ch) && *ch != '/' && *ch != '.' && *ch != '-'
-			&& *ch != '(' && *ch != ')' && *ch != '_') {
+			&& *ch != '(' && *ch != ')' && *ch != '_' && *ch != ' ') {
 			return false;
 		}
 	}
