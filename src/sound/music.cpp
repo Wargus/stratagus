@@ -51,8 +51,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
-static bool MusicFinished;                /// Music ended and we need a new file
+static volatile bool MusicFinished;       /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
@@ -66,9 +65,7 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 */
 static void MusicFinishedCallback()
 {
-	SDL_LockMutex(MusicFinishedMutex);
 	MusicFinished = true;
-	SDL_UnlockMutex(MusicFinishedMutex);
 }
 
 /**
@@ -76,21 +73,18 @@ static void MusicFinishedCallback()
 */
 void CheckMusicFinished(bool force)
 {
-	bool proceed;
-
-	SDL_LockMutex(MusicFinishedMutex);
-	proceed = MusicFinished;
-	MusicFinished = false;
-	SDL_UnlockMutex(MusicFinishedMutex);
-
-	if ((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic) {
-		lua_getglobal(Lua, "MusicStopped");
-		if (!lua_isfunction(Lua, -1)) {
-			fprintf(stderr, "No MusicStopped function in Lua\n");
-		} else {
-			LuaCall(0, 1);
-		}
+	// this races, but that's just fine, since we'll just miss a frame of we're unlucky
+	bool proceed = MusicFinished;
+	if (!(((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic))) {
+		return;
 	}
+	lua_getglobal(Lua, "MusicStopped");
+	if (!lua_isfunction(Lua, -1)) {
+		fprintf(stderr, "No MusicStopped function in Lua\n");
+	} else {
+		LuaCall(0, 1);
+	}
+	MusicFinished = false;
 }
 
 /**
@@ -99,7 +93,6 @@ void CheckMusicFinished(bool force)
 void InitMusic()
 {
 	MusicFinished = false;
-	MusicFinishedMutex = SDL_CreateMutex();
 	SetMusicFinishedCallback(MusicFinishedCallback);
 #ifdef USE_FLUIDSYNTH
 	InitFluidSynth();
