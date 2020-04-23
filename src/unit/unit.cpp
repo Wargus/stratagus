@@ -2849,17 +2849,13 @@ static void HitUnit_Burning(CUnit &target)
 
 static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 {
-	Vec2i pos = target.tilePos - attacker.tilePos;
-	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
-
-	if (!d) {
-		d = 1;
+	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
+	
+	if (target.IsAgressive()) { 
+		CommandAttack(target, pos, NULL, 0); /// Attack-move to pos
+	} else {
+		CommandMove(target, pos, 0); /// Run away to pos
 	}
-	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
-	Map.Clamp(pos);
-	CommandStopUnit(target);
-	CommandMove(target, pos, 0);
 }
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
@@ -3026,7 +3022,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
+	if (target.CanMove() && target.CurrentAction() == UnitActionStill
+		&& (!CanTarget(*target.Type, *attacker->Type) || !target.IsAgressive()) 
+		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
+
 		HitUnit_RunAway(target, *attacker);
 	}
 
