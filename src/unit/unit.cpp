@@ -2675,13 +2675,12 @@ Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool 
 	Vec2i pos = dirPos - srcPos;
 	pos *= dirFrom ? -1 : 1;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
-
 	if (!d) {
 		d = 1;
 	}
-	const int range = minRange + (SyncRand() % (rangeDev + 1));
-	pos.x = srcPos.x + (pos.x * range) / d + (devRadius - (SyncRand() % (devRadius * 2 + 1)));
-	pos.y = srcPos.y + (pos.y * range) / d + (devRadius - (SyncRand() % (devRadius * 2 + 1)));
+	const int range = minRange + SyncRand(rangeDev + 1);
+	pos.x = srcPos.x + (pos.x * range) / d + (devRadius - SyncRand(devRadius * 2 + 1));
+	pos.y = srcPos.y + (pos.y * range) / d + (devRadius - SyncRand(devRadius * 2 + 1));
 	Map.Clamp(pos);
 	return pos;
 }
