@@ -3027,6 +3027,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
 
 		HitUnit_RunAway(target, *attacker);
+		return;
 	}
 
 	const int threshold = 30;
