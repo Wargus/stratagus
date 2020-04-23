@@ -495,9 +495,8 @@ void COrder_Attack::MoveToBetterPos(CUnit &unit)
 	if (!goal && IsAttackGroundOrWall()) {
 		this->attackMovePos = this->goalPos;
 	}
-	this->goalPos 	= goal ? PosToRetreat(unit, *goal, unit.Type->MinAttackRange + 1) 
-							: PosToRetreat(unit, this->goalPos, unit.Type->MinAttackRange + 1);
-	
+	this->goalPos 	= goal	? GetRndPosInDirection(unit.tilePos, goal, true, unit.Type->MinAttackRange + 1, 3)
+							: GetRndPosInDirection(unit.tilePos, this->goalPos, true, unit.Type->MinAttackRange + 1, 3);
 	this->Range		= 0;
 	this->MinRange 	= 0;
 	unit.Frame 	  	= 0;

@@ -590,10 +590,10 @@ extern bool InReactRange(const CUnit &unit, const CUnit &target);
 extern bool InAttackRange(const CUnit &unit, const CUnit &target);
 /// Is tile within attack range of this unit?
 extern bool InAttackRange(const CUnit &unit, const Vec2i &tilePos);
-/// Return new position for 'unit' to retreat from 'src'
-extern Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange);
-/// Return new position for 'unit' to retreat from 'srcPos'
-extern Vec2i PosToRetreat(const CUnit &unit, const Vec2i &srcPos, const int minRange);
+/// Return randomly selected position in direction (to/from) dirUnit from srcPos 
+extern Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3);
+/// Return randomly selected position in direction (to/from) dirPos from srcPos 
+extern Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3);
 
 
 /// Hit unit with damage, if destroyed give attacker the points

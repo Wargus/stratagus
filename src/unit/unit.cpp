@@ -2643,39 +2643,46 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 
 
 /**
-**  Return randomly found position for unit in opposite derection to src
+**  Returns end position of randomly generated vector form srcPos in direction to/from dirUnit
+**	
+**  @param srcPos   Vector origin
+**  @param dirUnit   Position to determine vector direction
+**	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
+**  @param minRange Minimal range to new position
+**	@param devRadius Diviation radius
+**	@param rangeDev Range deviation
 **
-**  @param unit     Unit to move.
-**  @param src      Unit to retreat from.
-**  @param minRange Minimal distance to retreat
-**
-**  @return       	Position to retreat
+**  @return       	Position
 */
-Vec2i PosToRetreat(const CUnit &unit, const CUnit &src, const int minRange)
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3) {
 {
-	const Vec2i tilePos = src.tilePos + src.Type->GetHalfTileSize();
-	return PosToRetreat(unit, tilePos, minRange);
+	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
+	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
 }
 
 /**
-**  Return randomly found position for unit in opposite derection to src
+**  Returns end position of randomly generated vector form srcPos in direction to/from dirPos
+**	
+**  @param srcPos   Vector origin
+**  @param dirPos   Position to determine vector direction
+**	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
+**  @param minRange Minimal range to new position
+**	@param devRadius Diviation radius
+**	@param rangeDev Range deviation
 **
-**  @param unit     Unit to move.
-**  @param srcPos   Pos to retreat from.
-**  @param minRange Minimal distance to retreat
-**
-**  @return       	Position to retreat
+**  @return       	Position
 */
-Vec2i PosToRetreat(const CUnit &unit, const Vec2i &srcPos, const int minRange)
-{
-	Vec2i pos = unit.tilePos - srcPos;
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3) {
+	Vec2i pos = dirPos - srcPos;
+	pos *= dirFrom ? -1 : 1;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
 
 	if (!d) {
 		d = 1;
 	}
-	pos.x = unit.tilePos.x + (pos.x * (minRange + (SyncRand() % 3))) / d + (2 - (SyncRand() % 5));
-	pos.y = unit.tilePos.y + (pos.y * (minRange + (SyncRand() % 3))) / d + (2 - (SyncRand() % 5));
+	const int range = minRange + (SyncRand() % (rangeDev + 1));
+	pos.x = srcPos.x + (pos.x * range) / d + (devRadius - (SyncRand() % (devRadius * 2 + 1)));
+	pos.y = srcPos.y + (pos.y * range) / d + (devRadius - (SyncRand() % (devRadius * 2 + 1)));
 	Map.Clamp(pos);
 	return pos;
 }
