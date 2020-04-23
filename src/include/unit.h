@@ -91,15 +91,15 @@ typedef COrder *COrderPtr;
 
 /*
 ** Same for alternate (simplified) implementation of the small (unit) AI.
-** FIXME: may be we have to swap P & p?
-** sA00 PPPP  Pppp pppp  pddd dddd  dhhh hhhh
+** sAT0 0000  0ppp pppp  pddd dddd  dhhh hhhh
 */
-#define AT_THREAT_FACTOR      0x40000000 /// A
-#define AT_AIPRIORITY_OFFSET  23         /// P (0..31) 
+#define AT_ATTACKED_BY_FACTOR 0x40000000 /// A (attacker is under attack by target)
+#define AT_THREAT_FACTOR      0x20000000 /// T
 #define AT_PRIORITY_OFFSET    15         /// p (0..255)
-#define AT_DISTANCE_OFFSET    7          /// d (0..255) TODO: may be to make range smaller
+#define AT_DISTANCE_OFFSET    7          /// d (0..255) 
 #define AT_PRIORITY_MASK_HI   0xFFFF8000 /// Mask for checking only priority (without distance part)
 
+#define AT_FARAWAY_REDUCE_OFFSET 14      /// Priority reduce offset for far away targets (AT_THREAT_FACTOR must be preserved if present)
 
 /// Called whenever the selected unit was updated
 extern void SelectedUnitChanged();

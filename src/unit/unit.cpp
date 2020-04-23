@@ -2538,6 +2538,12 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	int priority = 0;
 
 	// is Threat?
+	/// Check if target attacks us
+	if (dest->CurrentAction() == (UnitActionAttack || UnitActionStandGround || UnitActionSpellCast)
+		&& dest->CurrentOrder()->GetGoal() == attacker) {
+		priority |= AT_ATTACKED_BY_FACTOR;
+	}
+
 	// FIXME: Add alwaysThreat property to CUnitType
 	// Unit can attack back.
 	if (CanTarget(dtype, type)) {
@@ -2545,33 +2551,26 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	}
 
 	// To reduce units roaming when a lot of them fight in small areas
-	// we do full priority calculations only for easy reachable units.
+	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
 	// For other targets we dramaticaly reduce priority and calc only threat factor, distance and health
-	const bool isFarAwayTarget = (pathLength + 1 > 1.5 * reactionRange) ? true : false;
+	const bool isFarAwayTarget = (!(priority &= AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > 1.5 * reactionRange) ? true : false;
 
 	if (isFarAwayTarget || distance < minAttackRange) {
-		priority >>= 15; // save AT_THREAT_FACTOR if present
+		priority >>= AT_FARAWAY_REDUCE_OFFSET; // save AT_THREAT_FACTOR if present
 	} else {
 		// Check Priority
 		// Priority 0-255
 		priority |= (dtype.DefaultStat.Variables[PRIORITY_INDEX].Value << AT_PRIORITY_OFFSET);
 
 		// AI Priority
-		int ai_priority = 0;
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
-					(dtype.BoolFlag[i].value)) {
-					ai_priority++;
-				}
-				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-					(dtype.BoolFlag[i].value)) {
-					ai_priority--;
-				}
+				if (((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) & !dtype.BoolFlag[i].value)
+					|| ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) & dtype.BoolFlag[i].value)) {
+						return INT_MIN;
+					}
 			}
 		}
-		// AI Priority (0-31)
-		priority |= (ai_priority > 31 ? 31 : (ai_priority < 0 ? 0 : ai_priority)) << AT_AIPRIORITY_OFFSET;
 	}
 
 	// Calc distance factor (0-255)

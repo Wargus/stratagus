@@ -434,13 +434,19 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 				const int newTarget_priority 	= TargetPriorityCalculate(&unit, newTarget);
 
 				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
-					SetAutoTarget(unit, newTarget);
+					if (goal_priority & AT_ATTACKED_BY_FACTOR) { /// if unit under attack by current goal
+						if (InAttackRange(unit, *newTarget)) {
+							SetAutoTarget(unit, newTarget);
+						}
+					} else {
+						SetAutoTarget(unit, newTarget);
+					}
 				} else if (!immobile
 						   && (!InAttackRange(unit, *goal) && newTarget_priority > goal_priority)) {
 					SetAutoTarget(unit, newTarget);
 				}
 			} else {
-				if (ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
+				if (unit.Threshold == 0 && ThreatCalculate(unit, *newTarget) < ThreatCalculate(unit, *goal)) {
 					SetAutoTarget(unit, newTarget);
 				}
 			}
