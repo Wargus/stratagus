@@ -2553,7 +2553,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	// To reduce units roaming when a lot of them fight in small areas
 	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
 	// For other targets we dramaticaly reduce priority and calc only threat factor, distance and health
-	const bool isFarAwayTarget = (!(priority &= AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > 1.5 * reactionRange) ? true : false;
+	const bool isFarAwayTarget = (!(priority &= AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > 1.5 * reactionRange)) ? true : false;
 
 	if (isFarAwayTarget || distance < minAttackRange) {
 		priority >>= AT_FARAWAY_REDUCE_OFFSET; // save AT_THREAT_FACTOR if present
@@ -2653,7 +2653,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 **
 **  @return       	Position
 */
-Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3) {
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
 	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
 	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
@@ -2671,7 +2671,8 @@ Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool
 **
 **  @return       	Position
 */
-Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3) {
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev) 
+{
 	Vec2i pos = dirPos - srcPos;
 	pos *= dirFrom ? -1 : 1;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
