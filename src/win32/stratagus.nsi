@@ -47,7 +47,7 @@
 !define DESCRIPTION "Strategy Gaming Engine"
 !define HOMEPAGE "https://github.com/Wargus/stratagus"
 !define LICENSE "GPL v2"
-!define COPYRIGHT "Copyright (c) 1998-2018 by The Stratagus Project"
+!define COPYRIGHT "Copyright (c) 1998-2020 by The Stratagus Project"
 
 ;--------------------------------
 
