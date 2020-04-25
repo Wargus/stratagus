@@ -560,8 +560,9 @@ bool COrder_Attack::IsTargetTooClose(CUnit &unit)
 **  Controls moving a unit to position if its target is closer than MinAttackRange when attacking
 **	
 **  @param unit  Unit that is attacking and moving
+**  @param pfReturn Current path finder status. Using to find new attack pos if current is unreachable.
 */
-void COrder_Attack::MoveToAttackPos(CUnit &unit, int pfReturn)
+void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 {
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
@@ -569,9 +570,6 @@ void COrder_Attack::MoveToAttackPos(CUnit &unit, int pfReturn)
 	Assert(this->State & MOVE_TO_ATTACKPOS);
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	if (unit.Anim.Unbreakable) {
-		return;
-	}
 	if (CheckForTargetInRange(unit)) {
 		return;
 	}
@@ -609,13 +607,19 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
-	
-	if (IsTargetTooClose(unit) && !(this->State & MOVE_TO_ATTACKPOS)) {
+
+	bool needToSearchBetterPos = (IsTargetTooClose(unit) && !(this->State & MOVE_TO_ATTACKPOS)) ? true : false;
+	if (needToSearchBetterPos && !unit.Anim.Unbreakable) {
 		MoveToBetterPos(unit);
+		needToSearchBetterPos = false;
 	}
 
 	int err = DoActionMove(unit);
-	
+
+	if (needToSearchBetterPos) {
+		MoveToBetterPos(unit);
+		return;	
+	}
 	if (unit.Anim.Unbreakable) {
 		return;
 	}

@@ -69,7 +69,7 @@ private:
 	bool AutoSelectTarget(CUnit &unit);
 	bool CheckForTargetInRange(CUnit &unit);
 	bool IsTargetTooClose(CUnit &unit);
-	void MoveToAttackPos(CUnit &unit, int pfReturn);
+	void MoveToAttackPos(CUnit &unit, const int pfReturn);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);
 
