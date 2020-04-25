@@ -1,3 +1,53 @@
+stratagus (2.4.3) eoan; urgency=medium
+
+  * Allow specifying colors, percentages, and border for the LifeBar.
+  * Allow spaces in map names.
+  * Fix spawning missile positions.
+  * Let AI players attack each other if the presets have been
+    adjusted to move them to different teams.
+  * Fix multiplayer desync, use local random function for building
+    sound randomness.
+  * Use goal position of previous command as starting point for
+    chained commands. This fixes sending a unit somewhere and then
+    chaining the command to guard.
+  * Fix an OpenGL crash on video playback.
+  * Allow self-casting.
+  * Add a flag for units that should snipe from a distance, so those
+    units will try to stay out of range of others as much as
+    possible. This fixes an issue whereby Alleria or a ballista would
+    enter tower range needlessly.
+  * Add a fix to make sure terrain resources are lost when
+    harvesting actions are cancelled.
+  * Randomly play building sounds when constructing.
+  * Play shore sounds when units reach the shore.
+  * Add an action to let units auto-explore. This is also used so
+    that AI players now send out exploration units across the
+    map. (The latter is for effect.)
+  * Add a DemoMode to allow auto-playing AI demos from the main menu
+    when idle.
+  * Fix editor changing of surroundings to recurse until all
+    transitions are done.
+  * Enable auto-cast during attack move.
+  * Allow casting on unit portraits.
+  * Fix an issue where the minimap was not updated after a building
+    was destroyed.
+  * Add TTL percent calculation that can be used from Lua scripts to
+    show the time to live for a summoned unit.
+  * Draw the click missile (the cross that is placed when ordering a
+    unit) over the fog of war. It was invisible otherwise, and with
+    order-lines disabled it was not clear if the order had been
+    received.
+  * Improve the performance of the AI enemy finder. Ported from
+    Wyrmgus.
+  * Print stack information on errors to get better bug reports.
+  * Support compilation on Haiku.
+  * Show panel index 2, even if only this unit has mana and not the
+    entire unit type.
+  * Make code work with Lua 5.3. However, the build will still use
+    5.1 because 5.2 and 5.3 are noticeably slower.
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 25 Apr 2020 09:53:28 +0200
+
 stratagus (2.4.2) xenial; urgency=medium
   * Force load progress to screen only every 500ms. On modern machines,
     loading was so fast that almost all time was spent in screen redraw

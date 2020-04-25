@@ -45,6 +45,94 @@
 	  <li>
 	    Allow specifying colors, percentages, and border for the LifeBar.
 	  </li>
+	  <li>
+	    Allow spaces in map names.
+	  </li>
+          <li>
+            Fix spawning missile positions.
+          </li>
+          <li>
+            Let AI players attack each other if the presets have been adjusted
+            to move them to different teams.
+          </li>
+          <li>
+            Fix multiplayer desync, use local random function for building sound
+            randomness.
+          </li>
+          <li>
+            Use goal position of previous command as starting point for chained
+            commands. This fixes sending a unit somewhere and then chaining the
+            command to guard.
+          </li>
+          <li>
+            Fix an OpenGL crash on video playback.
+          </li>
+          <li>
+            Allow self-casting.
+          </li>
+          <li>
+            Add a flag for units that should snipe from a distance, so those
+            units will try to stay out of range of others as much as
+            possible. This fixes an issue whereby Alleria or a ballista would
+            enter tower range needlessly.
+          </li>
+          <li>
+            Add a fix to make sure terrain resources are lost when harvesting
+            actions are cancelled.
+          </li>
+          <li>
+            Randomly play building sounds when constructing.
+          </li>
+          <li>
+            Play shore sounds when units reach the shore.
+          </li>
+          <li>
+            Add an action to let units auto-explore. This is also used so that
+            AI players now send out exploration units across the map. (The
+            latter is for effect.)
+          </li>
+          <li>
+            Add a DemoMode to allow auto-playing AI demos from the main menu when idle.
+          </li>
+          <li>
+            Fix editor changing of surroundings to recurse until all transitions
+            are done.
+          </li>
+          <li>
+            Enable auto-cast during attack move.
+          </li>
+          <li>
+            Allow casting on unit portraits.
+          </li>
+          <li>
+            Fix an issue where the minimap was not updated after a building was destroyed.
+          </li>
+          <li>
+            Add TTL percent calculation that can be used from Lua scripts to
+            show the time to live for a summoned unit.
+          </li>
+          <li>
+            Draw the click missile (the cross that is placed when ordering a
+            unit) over the fog of war. It was invisible otherwise, and with
+            order-lines disabled it was not clear if the order had been received.
+          </li>
+          <li>
+            Improve the performance of the AI enemy finder. Ported from Wyrmgus.
+          </li>
+          <li>
+            Print stack information on errors to get better bug reports.
+          </li>
+          <li>
+            Support compilation on Haiku.
+          </li>
+          <li>
+            Show panel index 2, even if only this unit has mana and not the
+            entire unit type.
+          </li>
+          <li>
+            Make code work with Lua 5.3. However, the build will still use 5.1
+            because 5.2 and 5.3 are noticeably slower.
+          </li>
 	</ul>
 </li><p/><li>2.4.2 Released<p/></li>
 	<ul>
