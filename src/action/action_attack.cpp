@@ -230,8 +230,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	bool isAttackMove = IsAutoTargeting() ? true : false;
 
 	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
-								: (this->State & MOVE_TO_ATTACKPOS) ? vp.TilePosToScreen_Center(this->attackMovePos) 
-																	: vp.TilePosToScreen_Center(this->goalPos);
+								: IsMovingToAttackPos() ? vp.TilePosToScreen_Center(this->attackMovePos) 
+														: vp.TilePosToScreen_Center(this->goalPos);
 
 	orderedPos = isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
 				 			  : targetPos;
@@ -246,7 +246,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		Video.FillCircleClip(ColorOrange, targetPos, 3);
 	}
 #ifdef DEBUG	
-	if (this->State & MOVE_TO_ATTACKPOS) {
+	if (IsMovingToAttackPos()) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, vp.TilePosToScreen_Center(this->goalPos));
 		Video.FillCircleClip(ColorRed, vp.TilePosToScreen_Center(this->goalPos), 3);
 	}
@@ -258,7 +258,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 /* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
 {
 	Vec2i tileSize;
-	if (this->HasGoal() && !(this->State & MOVE_TO_ATTACKPOS)) {
+	if (this->HasGoal() && !IsMovingToAttackPos()) {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
@@ -321,6 +321,10 @@ inline bool COrder_Attack::IsWeakTargetSelected() const
 inline bool COrder_Attack::IsAutoTargeting() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
+}
+inline bool COrder_Attack::IsMovingToAttackPos() const
+{
+	return (this->State & MOVE_TO_ATTACKPOS) != 0;
 }
 inline bool COrder_Attack::IsAttackGroundOrWall() const
 {
@@ -537,7 +541,7 @@ void COrder_Attack::MoveToBetterPos(CUnit &unit)
 
 	/// Save current goalPos if target is ground or wall
 	if (!goal && IsAttackGroundOrWall()) {
-		if (this->State & MOVE_TO_ATTACKPOS) {
+		if (IsMovingToAttackPos()) {
 			this->goalPos = this->attackMovePos;
 		} else {
 			this->attackMovePos = this->goalPos;
@@ -595,8 +599,8 @@ bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
 		return false;
 	}
 	const int distance = this->HasGoal() ? unit.MapDistanceTo(*this->GetGoal())
-										: (this->State & MOVE_TO_ATTACKPOS) ? unit.MapDistanceTo(this->attackMovePos)
-																			: unit.MapDistanceTo(this->goalPos);
+										: IsMovingToAttackPos() ? unit.MapDistanceTo(this->attackMovePos)
+																: unit.MapDistanceTo(this->goalPos);
 	const bool tooClose = (distance < unit.Type->MinAttackRange) ? true : false;
 	return tooClose;
 }
@@ -612,7 +616,7 @@ void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
-	Assert(this->State & MOVE_TO_ATTACKPOS);
+	Assert(IsMovingToAttackPos());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
 	if (CheckForTargetInRange(unit)) {
@@ -653,7 +657,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	bool needToSearchBetterPos = (IsTargetTooClose(unit) && !(this->State & MOVE_TO_ATTACKPOS)) ? true : false;
+	bool needToSearchBetterPos = (IsTargetTooClose(unit) && !IsMovingToAttackPos()) ? true : false;
 	if (needToSearchBetterPos && !unit.Anim.Unbreakable) {
 		MoveToBetterPos(unit);
 		needToSearchBetterPos = false;
@@ -668,7 +672,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (unit.Anim.Unbreakable) {
 		return;
 	}
-	if (this->State & MOVE_TO_ATTACKPOS) {
+	if (IsMovingToAttackPos()) {
 		MoveToAttackPos(unit, err);
 		return;
 	}

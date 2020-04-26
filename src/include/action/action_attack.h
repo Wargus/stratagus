@@ -58,6 +58,7 @@ public:
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
 	bool IsWeakTargetSelected() const;
 	bool IsAutoTargeting() const;
+	bool IsMovingToAttackPos() const;
 	bool IsAttackGroundOrWall() const;
 	bool IsTargetTooClose(const CUnit &unit) const;
 	void OfferNewTarget(const CUnit &unit, CUnit *const target);
