@@ -59,6 +59,7 @@ public:
 	bool IsWeakTargetSelected() const;
 	bool IsAutoTargeting() const;
 	bool IsAttackGroundOrWall() const;
+	bool IsTargetTooClose(const CUnit &unit) const;
 	void OfferNewTarget(const CUnit &unit, CUnit *const target);
 
 private:
@@ -69,7 +70,6 @@ private:
 	void MoveToBetterPos(CUnit &unit);
 	bool AutoSelectTarget(CUnit &unit);
 	bool CheckForTargetInRange(CUnit &unit);
-	bool IsTargetTooClose(CUnit &unit);
 	void MoveToAttackPos(CUnit &unit, const int pfReturn);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);

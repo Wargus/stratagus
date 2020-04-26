@@ -245,6 +245,12 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		Video.DrawLineClip(ColorOrange, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorOrange, targetPos, 3);
 	}
+#ifdef DEBUG	
+	if (this->State & MOVE_TO_ATTACKPOS) {
+		Video.DrawLineClip(ColorGreen, lastScreenPos, vp.TilePosToScreen_Center(this->goalPos));
+		Video.FillCircleClip(ColorRed, vp.TilePosToScreen_Center(this->goalPos), 3);
+	}
+#endif
 
 	return isAttackMove ? orderedPos : targetPos;
 }
@@ -531,7 +537,11 @@ void COrder_Attack::MoveToBetterPos(CUnit &unit)
 
 	/// Save current goalPos if target is ground or wall
 	if (!goal && IsAttackGroundOrWall()) {
-		this->attackMovePos = this->goalPos;
+		if (this->State & MOVE_TO_ATTACKPOS) {
+			this->goalPos = this->attackMovePos;
+		} else {
+			this->attackMovePos = this->goalPos;
+		}
 	}
 	this->goalPos 	= goal	? GetRndPosInDirection(unit.tilePos, *goal, true, unit.Type->MinAttackRange, 3)
 							: GetRndPosInDirection(unit.tilePos, this->goalPos, true, unit.Type->MinAttackRange, 3);
@@ -578,13 +588,16 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 **	
 **  @param unit  Unit that is attacking and moving
 */
-bool COrder_Attack::IsTargetTooClose(CUnit &unit)
+bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
 {
-	CUnit *goal 		= this->GetGoal();
 	/// Calculate distance to goal or map tile if attack ground/wall
-	const int distance 	= IsAttackGroundOrWall() ? unit.MapDistanceTo(this->goalPos) 
-												 : goal ? unit.MapDistanceTo(*goal) : 0;
-	const bool tooClose = (distance && (distance < unit.Type->MinAttackRange)) ? true : false;
+	if (!this->HasGoal() && !IsAttackGroundOrWall()) {
+		return false;
+	}
+	const int distance = this->HasGoal() ? unit.MapDistanceTo(*this->GetGoal())
+										: (this->State & MOVE_TO_ATTACKPOS) ? unit.MapDistanceTo(this->attackMovePos)
+																			: unit.MapDistanceTo(this->goalPos);
+	const bool tooClose = (distance < unit.Type->MinAttackRange) ? true : false;
 	return tooClose;
 }
 
