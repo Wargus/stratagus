@@ -321,6 +321,38 @@ inline bool COrder_Attack::IsAttackGroundOrWall() const
 	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)	
 	return (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos) ? true : false);
 }
+
+/**
+**  Try to change goal from outside, when in the auto attack mode
+**
+**	@param unit
+**  @param target	Target that offered as the new current goal
+**
+*/
+void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
+{
+	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
+	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	if (immobile && !InAttackRange(unit, *target)) {
+		return;
+	}
+	bool isBetter = offeredTarget ? false : true;
+	if (!isBetter) {
+		if (Preference.SimplifiedAutoTargeting) {
+			isBetter = (TargetPriorityCalculate(&unit, offeredTarget) < TargetPriorityCalculate(&unit, target)) ? true : false;
+		} else {
+			isBetter = (ThreatCalculate(unit, *offeredTarget) > ThreatCalculate(unit, *target)) ? true : false;
+		}
+	}
+	if (isBetter) {
+		if (offeredTarget) {
+			offeredTarget.Reset();
+		}
+		offeredTarget = target;
+	}
+
+}
+
 /**
 **  Check for dead/valid goal.
 **

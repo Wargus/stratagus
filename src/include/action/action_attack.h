@@ -41,7 +41,7 @@ class COrder_Attack : public COrder
 	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		State(0), MinRange(0), Range(0), SkirmishRange(0), goalPos(-1, -1), attackMovePos(-1, -1) {}
+		State(0), MinRange(0), Range(0), SkirmishRange(0), offeredTarget(NULL), goalPos(-1, -1), attackMovePos(-1, -1) {}
 
 	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
 
@@ -59,6 +59,7 @@ public:
 	bool IsWeakTargetSelected() const;
 	bool IsAutoTargeting() const;
 	bool IsAttackGroundOrWall() const;
+	void OfferNewTarget(const CUnit &unit, CUnit *const target);
 
 private:
 	bool CheckIfGoalValid(CUnit &unit);
@@ -78,6 +79,7 @@ private:
 	int MinRange;
 	int Range;
 	int SkirmishRange;
+	CUnitPtr offeredTarget; // Stores pointer to target offered from outside (f.e. by HitUnit_AttackBack() event). 
 	Vec2i goalPos;		 // Current goal position
 	Vec2i attackMovePos; // If attack-move was ordered
 };
