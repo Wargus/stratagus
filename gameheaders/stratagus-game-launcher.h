@@ -176,6 +176,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #endif
 
 #define TITLE GAME_NAME
+#define EXTRACTOR_NOT_FOUND GAME_NAME " could not find its extraction tool.\n" EXTRACTOR_TOOL "!\n"
 #define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\nFirst install Stratagus from https://launchpad.net/stratagus"
 #define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted, is corrupted, or outdated.\nYou need to extract it from original " GAME_CD "."
 
@@ -257,7 +258,33 @@ int check_version(char* tool_path, char* data_path) {
 }
 
 static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
+	struct stat st;
+	int canJustReextract;
+#ifdef EXTRACTION_FILES
 	if (force == 0) {
+		canJustReextract = 1;
+		char* extraction_files[] = { EXTRACTION_FILES, NULL };
+		char* efile = extraction_files[0];
+		char efile_path[PATH_MAX] = {'\0'};
+		for (int i = 0; efile != NULL; i++) {
+			strcpy(efile_path, destination);
+			strcat(efile_path, SLASH);
+			strcat(efile_path, efile);
+			if (stat(efile_path, &st) != 0) {
+				// file to extract not found
+				canJustReextract = 0;
+			}
+			efile = extraction_files[i + 1];
+		}
+	} else {
+		canJustReextract = 0;
+	}
+#else
+	canJustReextract = 0;
+#endif
+	if (canJustReextract) {
+		tinyfd_messageBox("", GAME " game data format changed, we can migrate in-place. Please be patient.", "ok", "info", 1);
+	} else if (force == 0) {
 		tinyfd_messageBox("Missing data",
 						  DATA_NOT_EXTRACTED " Please select the " GAME_CD, "ok", "question", 1);
 	} else if (force == 1) {
@@ -274,13 +301,19 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
 #endif
-	const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
-												  patterncount - 1, filepatterns, NULL, 0);
-	if (datafile == NULL) {
-		exit(-1);
-	}
 	char srcfolder[1024] = {'\0'};
-	strcpy(srcfolder, datafile);
+	if (!canJustReextract) {
+		const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
+													 patterncount - 1, filepatterns, NULL, 0);
+		if (datafile == NULL) {
+			exit(-1);
+		}
+		strcpy(srcfolder, datafile);
+		parentdir(srcfolder);
+	} else {
+		strcpy(srcfolder, destination);
+	}
+
 	char* sourcepath = strdup(scripts_path);
 #ifdef WIN32
 	if (sourcepath[0] == '"') {
@@ -294,9 +327,6 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	mkdir_p(destination);
 
-	parentdir(srcfolder);
-
-	struct stat st;
 	if (stat(sourcepath, &st) != 0) {
 		// deployment time path not found, try compile time path
 		strcpy(sourcepath, SRC_PATH());
@@ -410,6 +440,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 	GetExitCodeProcess(ShExecInfo.hProcess, &exitcode);
 #else
+	printf("Running extractor as %s\n", cmdbuf);
 	int exitcode = 0;
 	exitcode = system(cmdbuf);
 #endif
@@ -418,7 +449,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 		unlink(destination);
-	} else if (GAME_SHOULD_EXTRACT_AGAIN) {
+	} else if (!canJustReextract && GAME_SHOULD_EXTRACT_AGAIN) {
 		ExtractData(extractor_tool, destination, scripts_path, 2);
 	}
 }
@@ -430,20 +461,19 @@ int main(int argc, char * argv[]) {
 	char scripts_path[BUFF_SIZE];
 	char stratagus_bin[BUFF_SIZE];
 	char title_path[BUFF_SIZE];
-	char extractor_path[BUFF_SIZE];
+	char extractor_path[BUFF_SIZE] = {'\0'};
 
-	strcat(extractor_path, EXTRACTOR_TOOL);
-	if (!detectPresence(extractor_path)) {
-		// The extractor is in the same dir as we are
-		if (strchr(argv[0], SLASH[0])) {
-			strcpy(extractor_path, argv[0]);
-			parentdir(extractor_path);
-			strcat(extractor_path, SLASH EXTRACTOR_TOOL);
+	// Try the extractor from the same dir as we are
+	if (strchr(argv[0], SLASH[0])) {
+		strcpy(extractor_path, argv[0]);
+		parentdir(extractor_path);
+		strcat(extractor_path, SLASH EXTRACTOR_TOOL);
 #ifdef WIN32
-			if (!strstr(extractor_path, ".exe")) {
-				strcat(extractor_path, ".exe");
-			}
+		if (!strstr(extractor_path, ".exe")) {
+			strcat(extractor_path, ".exe");
+		}
 #endif
+		if (stat(extractor_path, &st) == 0) {
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
 			// bytes. Then we add the arguments.
@@ -452,6 +482,15 @@ int main(int argc, char * argv[]) {
 			extractor_path[0] = QUOTE[0];
 			extractor_path[strlen(extractor_path) + 1] = '\0';
 			extractor_path[strlen(extractor_path)] = QUOTE[0];
+		} else {
+			extractor_path[0] = '\0';
+		}
+	}
+	if (extractor_path[0] == '\0') {
+		// Use extractor from PATH
+		strcpy(extractor_path, EXTRACTOR_TOOL);
+		if (!detectPresence(extractor_path)) {
+			error(TITLE, EXTRACTOR_NOT_FOUND);
 		}
 	}
 	strcat(extractor_path, " " EXTRACTOR_ARGS);

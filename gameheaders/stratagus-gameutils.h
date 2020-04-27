@@ -114,6 +114,7 @@ void mkdir_p(const char* path) {
 					mkdir_p(path);
 				}
 				*sep = '/';
+				mkdir(path, 0777);
 			}
 		} else if (error != EEXIST) {
 			if (mkdir(path, 0777)) {
