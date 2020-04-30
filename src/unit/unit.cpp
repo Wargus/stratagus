@@ -3030,8 +3030,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (target.CanMove() && target.CurrentAction() == UnitActionStill
-		&& (!CanTarget(*target.Type, *attacker->Type) || !target.IsAgressive()) 
+	if (target.CanMove() 
+		&& target.CurrentAction() == UnitActionStill
+		&& (!CanTarget(*target.Type, *attacker->Type) 
+			|| !target.IsAgressive() 
+			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value 
+				&& !(attacker->IsVisible(*target.Player) || attacker->IsVisibleOnRadar(*target.Player))))
 		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
 
 		HitUnit_RunAway(target, *attacker);
