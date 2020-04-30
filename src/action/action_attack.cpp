@@ -686,7 +686,9 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		MoveToBetterPos(unit);
 		return;	
 	}
-	if (unit.Anim.Unbreakable) {
+	/// Order may be set as finished by outside code while playing animation.
+	/// In this case we must not execute code of MoveToTarget
+	if (unit.Anim.Unbreakable || this->State == Finished) {
 		return;
 	}
 	if (IsMovingToAttackPos()) {
@@ -785,7 +787,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 	}
 	CUnit *goal = this->GetGoal();
-	if (!InAttackRange(unit, *goal)) {
+	if (goal && !InAttackRange(unit, *goal)) {
 		unit.Frame 	= 0;
 		this->State &= AUTO_TARGETING;
 		this->State |= MOVE_TO_TARGET;
