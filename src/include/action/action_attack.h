@@ -61,6 +61,7 @@ public:
 	bool IsMovingToAttackPos() const;
 	bool IsAttackGroundOrWall() const;
 	bool IsTargetTooClose(const CUnit &unit) const;
+	CUnit *const BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const;
 	void OfferNewTarget(const CUnit &unit, CUnit *const target);
 
 private:
