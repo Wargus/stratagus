@@ -630,11 +630,7 @@ bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
 */
 void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 {
-	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
-	Assert(unit.CurrentOrder() == this);
-	Assert(unit.CanMove());
 	Assert(IsMovingToAttackPos());
-	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
 	if (CheckForTargetInRange(unit)) {
 		return;

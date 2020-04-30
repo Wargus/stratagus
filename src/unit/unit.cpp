@@ -2498,8 +2498,11 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	return cost;
 }
 
-int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest) /*(const CUnit &attacker, const CUnit &dest)*/
+int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest)
 {
+	Assert(attacker != NULL);
+	Assert(dest != NULL);
+
 	const CPlayer &player 	= *attacker->Player;
 	const CUnitType &type 	= *attacker->Type;
 	const CUnitType &dtype 	= *dest->Type;
@@ -2594,6 +2597,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 */
 bool InReactRange(const CUnit &unit, const CUnit &target)
 {
+	Assert(&target != NULL);
 	const int distance 	= unit.MapDistanceTo(target);
 	const int range 	= (unit.Player->Type == PlayerPerson)
 						  ? unit.Type->ReactRangePerson
@@ -2612,6 +2616,7 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 */
 bool InAttackRange(const CUnit &unit, const CUnit &target)
 {
+	Assert(&target != NULL);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
 	const int distance 	= unit.MapDistanceTo(target);
@@ -2632,6 +2637,7 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 */
 bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 {
+	Assert(Map.Info.IsPointOnMap(tilePos));
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
 	const int distance 	= unit.MapDistanceTo(tilePos);
@@ -2656,6 +2662,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 */
 Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
+	Assert(&dirUnit != NULL);
 	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
 	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
 }
