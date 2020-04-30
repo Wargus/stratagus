@@ -332,6 +332,13 @@ inline bool COrder_Attack::IsAttackGroundOrWall() const
 	return (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos) ? true : false);
 }
 
+CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
+{
+	return (Preference.SimplifiedAutoTargeting 
+				? ((TargetPriorityCalculate(&unit, target1) > TargetPriorityCalculate(&unit, target2)) ? target1 : target2)
+				: ((ThreatCalculate(unit, *target1) < ThreatCalculate(unit, *target2)) ?  target1 : target2));
+}
+
 /**
 **  Try to change goal from outside, when in the auto attack mode
 **
@@ -341,26 +348,21 @@ inline bool COrder_Attack::IsAttackGroundOrWall() const
 */
 void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 {
+	Assert(target != NULL);
+	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
+	
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
 	if (immobile && !InAttackRange(unit, *target)) {
 		return;
 	}
-	bool isBetter = offeredTarget ? false : true;
-	if (!isBetter) {
-		if (Preference.SimplifiedAutoTargeting) {
-			isBetter = (TargetPriorityCalculate(&unit, offeredTarget) < TargetPriorityCalculate(&unit, target)) ? true : false;
-		} else {
-			isBetter = (ThreatCalculate(unit, *offeredTarget) > ThreatCalculate(unit, *target)) ? true : false;
-		}
+	CUnit *best = (this->offeredTarget != NULL && this->offeredTarget->IsVisibleAsGoal(*unit.Player))
+				? BestTarget(unit, this->offeredTarget, target)
+				: target;
+	if (this->offeredTarget != NULL) {
+		this->offeredTarget.Reset();
 	}
-	if (isBetter) {
-		if (offeredTarget) {
-			offeredTarget.Reset();
-		}
-		offeredTarget = target;
-	}
-
+	this->offeredTarget = best;
 }
 
 /**
@@ -451,6 +453,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	if (unit.Type->CanAttack == false
 		|| (unit.Removed
 			&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false))) {
+		this->offeredTarget.Reset();
 		return false;
 	}
 	CUnit *goal = this->GetGoal();
@@ -458,17 +461,26 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
-
 	if (immobile) {
 		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range
 	} else {
 		newTarget = AttackUnitsInReactRange(unit); // search for enemies in reaction range
 	}
+	/// If we have target offered from outside - try it
+	if (this->offeredTarget != NULL) {
+		if (this->offeredTarget->IsVisibleAsGoal(*unit.Player)
+			&& (!immobile || InAttackRange(unit, *this->offeredTarget))) {
 
+			newTarget = BestTarget(unit, this->offeredTarget, newTarget);
+		}
+		this->offeredTarget.Reset();
+	}
+	const bool attackedByGoal = (goal && goal->CurrentOrder()->GetGoal() == &unit) ? true : false;
 	if (goal /// if goal is Valid
 		&& goal->IsVisibleAsGoal(*unit.Player)
 		&& CanTarget(*unit.Type, *goal->Type)
-		&& (immobile ? InAttackRange(unit, *goal) : InReactRange(unit, *goal))) {
+		&& (immobile ? InAttackRange(unit, *goal) : (attackedByGoal ? true : InReactRange(unit, *goal)))
+		&& !(unit.UnderAttack && !goal->IsAgressive())) {
 
 		if (newTarget && newTarget != goal) {
 			/// Do not switch to non aggresive targets while UnderAttack counter is active
