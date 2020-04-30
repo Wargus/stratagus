@@ -450,6 +450,7 @@ void CUnit::Init()
 	Variable = NULL;
 	TTL = 0;
 	Threshold = 0;
+	UnderAttack = 0;
 	GroupId = 0;
 	LastGroup = 0;
 	ResourcesHeld = 0;
@@ -2860,58 +2861,65 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
-	const int threshold = 30;
-	COrder *savedOrder = NULL;
-
-	if (target.Player->AiEnabled == false) {
-		return;
-		/*
-				if (target.CurrentAction() == UnitActionAttack) {
-					COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
-					if (order.IsWeakTargetSelected() == false) {
-						return;
-					}
-				} else {
+	const int underAttack = 240;
+	DebugPrint("UnderAttack counter: %d\n" _C_ target.UnderAttack);
+	if (&attacker != target.CurrentOrder()->GetGoal()
+		&& attacker.Player != target.Player && target.IsEnemy(attacker)
+		&& CanTarget(*target.Type, *attacker.Type))	{
+		
+		Vec2i posToAttack = Vec2i(-1, -1);
+		const unsigned char targetCurrAction = target.CurrentAction();
+		
+		if (targetCurrAction == UnitActionAttack) {
+			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
+			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
+				if (attacker.IsVisibleAsGoal(*target.Player)) {
+					target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
+					order.OfferNewTarget(target, &attacker);
 					return;
-				}
-		*/
-	}
-	if (target.CanStoreOrder(target.CurrentOrder())) {
-		savedOrder = target.CurrentOrder()->Clone();
-	}
-	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
-	CUnit *goal, *best = oldgoal;
-
-	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
-		// Reveal Unit that is attacking
-		goal = &attacker;
-	} else {
-		if (target.CurrentAction() == UnitActionStandGround) {
-			goal = AttackUnitsInRange(target);
+				} 
+				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
+					return;
+				} 
+			} else {
+				return;
+			}
+		}
+		/// Wait for timer expires for preventing frequent switching of attack-move positions
+		if (target.UnderAttack) {
+			return;
+		}
+		if (attacker.IsVisibleAsGoal(*target.Player)) {
+			posToAttack = attacker.tilePos;
 		} else {
-			// Check for any other units in range
-			goal = AttackUnitsInReactRange(target);
+			posToAttack = GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
 		}
-	}
-
-	// Calculate the best target we could attack
-	if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
-		best = goal;
-	}
-	if (CanTarget(*target.Type, *attacker.Type)
-		&& (!best || (goal != &attacker
-					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
-		best = &attacker;
-	}
-	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-		CommandAttack(target, best->tilePos, best, FlushCommands);
-		// Set threshold value only for aggressive units
-		if (best->IsAgressive()) {
-			target.Threshold = threshold;
-		}
-		if (savedOrder != NULL) {
-			target.SavedOrder = savedOrder;
-		}
+		switch (targetCurrAction)
+		{
+		case UnitActionStandGround:
+		case UnitActionFollow:
+		case UnitActionAttackGround:
+		case UnitActionExplore:
+			if (target.Player->AiEnabled == false) {
+				return;
+			}
+		case UnitActionAttack:
+		case UnitActionStill:
+		case UnitActionDefend:
+		case UnitActionPatrol:
+			COrder *savedOrder = NULL;
+			if (targetCurrAction == UnitActionStill || targetCurrAction == UnitActionStandGround) {
+				savedOrder = COrder::NewActionAttack(target, target.tilePos);
+			} else if (target.CanStoreOrder(target.CurrentOrder())) {
+				savedOrder = target.CurrentOrder()->Clone();
+			}
+			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
+			CommandAttack(target, posToAttack, NULL, FlushCommands);
+			if (savedOrder != NULL) {
+				target.SavedOrder = savedOrder;
+			}
+			break;
+		}			
 	}
 }
 
