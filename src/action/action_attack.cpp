@@ -471,10 +471,14 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		&& (immobile ? InAttackRange(unit, *goal) : InReactRange(unit, *goal))) {
 
 		if (newTarget && newTarget != goal) {
+			/// Do not switch to non aggresive targets while UnderAttack counter is active
+			if (unit.UnderAttack && !newTarget->IsAgressive()) {
+				return true;
+			}
 			if (Preference.SimplifiedAutoTargeting) {
 				const int goal_priority			= TargetPriorityCalculate(&unit, goal);
 				const int newTarget_priority 	= TargetPriorityCalculate(&unit, newTarget);
-
+				
 				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
 					if (goal_priority & AT_ATTACKED_BY_FACTOR) { /// if unit under attack by current goal
 						if (InAttackRange(unit, *newTarget)) {
@@ -497,7 +501,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		if (goal) {
 			this->ClearGoal();
 		}
-		if (newTarget) {
+		if (newTarget && !(unit.UnderAttack && !newTarget->IsAgressive())) {
 			SetAutoTarget(unit, newTarget);
 		} else {
 			return false;
@@ -516,7 +520,8 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 */
 bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true)
 {
-	if (!unit.RestoreOrder()) {
+	/// Restore saved order only when UnderAttack counter is expired
+	if (unit.UnderAttack || !unit.RestoreOrder()) {
 		if (IsAutoTargeting() && this->goalPos != this->attackMovePos) {
 			this->goalPos 	= this->attackMovePos;
 			this->Range 	= 0;

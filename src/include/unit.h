@@ -411,6 +411,7 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 
 	unsigned int Wait;          /// action counter
 	int Threshold;              /// The counter while ai unit couldn't change target.
+	int UnderAttack;			/// The counter while small ai can ignore non aggressive targets if searching attacker.
 
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim
