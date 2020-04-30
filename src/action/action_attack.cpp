@@ -704,7 +704,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 	// Waiting or on the way
 	if (err >= 0) {
-		if (!CheckForTargetInRange(unit) && IsAutoTargeting()) {
+		if (!CheckForTargetInRange(unit) && (IsAutoTargeting() || unit.Player->AiEnabled)) {
 			CUnit *currGoal = this->GetGoal();
 			if (currGoal && goal != currGoal) {
 				if (InAttackRange(unit, *currGoal)) {
