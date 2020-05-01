@@ -26,6 +26,9 @@ stratagus-game-launcher.h - Stratagus Game Launcher
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef STRATAGUS_GAMEUTILS_H
+#define STRATAGUS_GAMEUTILS_H
+
 void error(const char* title, const char* text);
 void mkdir_p(const char* path);
 void copy_dir(const char* source_folder, const char* target_folder);
@@ -39,6 +42,9 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #endif
 
 #ifdef WIN32
+#ifndef PATH_MAX
+#define PATH_MAX MAX_PATH
+#endif
 #include <Shlwapi.h>
 #pragma comment(lib, "comdlg32.lib")
 #pragma comment(lib, "ole32.lib")
@@ -189,4 +195,6 @@ void copy_dir(const char* src_path, const char* dst_path) {
 	strcpy(src_root, src_path);
 	ftw(src_path, copy_file, 20);
 }
+#endif
+
 #endif

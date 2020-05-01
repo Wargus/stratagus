@@ -128,6 +128,9 @@ stratagus-game-launcher.h - Stratagus Game Launcher
  * Path to stratagus executable binary
  **/
 
+#ifndef STRATAGUS_GAME_LAUNCHER_H
+#define STRATAGUS_GAME_LAUNCHER_H
+
 /* Fake definitions for Doxygen */
 #ifdef DOXYGEN
 #define GAME_NAME
@@ -687,3 +690,5 @@ int main(int argc, char * argv[]) {
 	}
 	exit(ret);
 }
+
+#endif
