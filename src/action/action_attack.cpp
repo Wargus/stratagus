@@ -440,6 +440,11 @@ void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 	if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 		this->SkirmishRange = this->Range;
 	}
+	// Set threshold value only for aggressive units (Prevent to change target)
+	if (!Preference.SimplifiedAutoTargeting && target->IsAgressive())
+	{
+		unit.Threshold = 30;
+	}
 }
 
 /**

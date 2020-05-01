@@ -3049,11 +3049,14 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	const int threshold = 30;
-
-	if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
-		target.Threshold = threshold;
-		return;
+	if (Preference.SimplifiedAutoTargeting) {
+		target.Threshold = 0;
+	} else {		
+		const int threshold = 30;
+		if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
+			target.Threshold = threshold;
+			return;
+		}
 	}
 
 	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
@@ -3157,7 +3160,7 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 }
 
 /**
-**  Can the source unit attack the destination unit.
+**  Can the source unit attack the destination unit?
 **
 **  @param source  Unit type pointer of the attacker.
 **  @param dest    Unit type pointer of the target.
