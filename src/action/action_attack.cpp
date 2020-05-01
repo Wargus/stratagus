@@ -334,6 +334,9 @@ inline bool COrder_Attack::IsAttackGroundOrWall() const
 
 CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
 {
+	Assert(target1 != NULL);
+	Assert(target2 != NULL);
+
 	return (Preference.SimplifiedAutoTargeting 
 				? ((TargetPriorityCalculate(&unit, target1) > TargetPriorityCalculate(&unit, target2)) ? target1 : target2)
 				: ((ThreatCalculate(unit, *target1) < ThreatCalculate(unit, *target2)) ?  target1 : target2));
@@ -476,7 +479,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		if (this->offeredTarget->IsVisibleAsGoal(*unit.Player)
 			&& (!immobile || InAttackRange(unit, *this->offeredTarget))) {
 
-			newTarget = newTarget ? BestTarget(unit, this->offeredTarget, newTarget) : NULL;
+			newTarget = newTarget ? BestTarget(unit, this->offeredTarget, newTarget) : this->offeredTarget;
 		}
 		this->offeredTarget.Reset();
 	}
