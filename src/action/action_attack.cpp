@@ -479,7 +479,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		if (this->offeredTarget->IsVisibleAsGoal(*unit.Player)
 			&& (!immobile || InAttackRange(unit, *this->offeredTarget))) {
 
-			newTarget = newTarget ? BestTarget(unit, this->offeredTarget, newTarget) : this->offeredTarget;
+			newTarget = newTarget ? BestTarget(unit, this->offeredTarget, newTarget) : &(*this->offeredTarget);
 		}
 		this->offeredTarget.Reset();
 	}
@@ -541,7 +541,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true)
 {
 	/// Restore saved order only when UnderAttack counter is expired
-	if (unit.UnderAttack || !unit.RestoreOrder()) {
+	if ((unit.UnderAttack && IsAutoTargeting()) || !unit.RestoreOrder()) {
 		if (IsAutoTargeting() && this->goalPos != this->attackMovePos) {
 			this->goalPos 	= this->attackMovePos;
 			this->Range 	= 0;
@@ -715,10 +715,12 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			if (currGoal && goal != currGoal) {
 				if (InAttackRange(unit, *currGoal)) {
 					TurnToTarget(unit, currGoal);
-					this->State = ATTACK_TARGET | AUTO_TARGETING;
+					this->State &= AUTO_TARGETING;
+					this->State |= ATTACK_TARGET ;
 				} else {
 					unit.Frame	= 0;
-					this->State = MOVE_TO_TARGET | AUTO_TARGETING;
+					this->State &= AUTO_TARGETING;
+					this->State |= MOVE_TO_TARGET;
 				}
 			}
 		}
