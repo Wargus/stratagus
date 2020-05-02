@@ -34,12 +34,14 @@
 #endif
 
 #if defined(_WIN32)
-    #ifdef DLL_EXPORT
-        #define HQX_API __declspec(dllexport)
-    #else
-        #define HQX_API __declspec(dllimport)
-    #endif
-#else
+/* 
+ *     #ifdef DLL_EXPORT
+ *         #define HQX_API __declspec(dllexport)
+ *     #else
+ *         #define HQX_API __declspec(dllimport)
+ *     #endif
+ * #else
+ */
     #define HQX_API
 #endif
 
