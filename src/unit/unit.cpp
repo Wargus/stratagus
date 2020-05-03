@@ -2866,8 +2866,7 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
-	const int underAttack = 240;
-	DebugPrint("UnderAttack counter: %d\n" _C_ target.UnderAttack);
+	const int underAttack = 128;
 	if (&attacker != target.CurrentOrder()->GetGoal()
 		&& attacker.Player != target.Player && target.IsEnemy(attacker)
 		&& CanTarget(*target.Type, *attacker.Type))	{
@@ -2883,7 +2882,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				} 
 				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
 					return;
-				} 
+				}
 			} else {
 				return;
 			}

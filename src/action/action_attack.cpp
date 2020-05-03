@@ -466,6 +466,10 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	}
 	CUnit *goal = this->GetGoal();
 	CUnit *newTarget = NULL;
+	if (unit.Selected)
+	{
+		DebugPrint("UnderAttack counter: %d \n" _C_ unit.UnderAttack);
+	}
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
@@ -498,7 +502,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 			if (Preference.SimplifiedAutoTargeting) {
 				const int goal_priority			= TargetPriorityCalculate(&unit, goal);
 				const int newTarget_priority 	= TargetPriorityCalculate(&unit, newTarget);
-				
+
 				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
 					if (goal_priority & AT_ATTACKED_BY_FACTOR) { /// if unit under attack by current goal
 						if (InAttackRange(unit, *newTarget)) {
