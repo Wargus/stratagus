@@ -2542,12 +2542,10 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	int priority = 0;
 
 	// is Threat?
-	/// Check if target attacks us
-	if (dest->CurrentAction() == (UnitActionAttack || UnitActionStandGround || UnitActionSpellCast)
-		&& dest->CurrentOrder()->GetGoal() == attacker) {
+	/// Check if target attacks us 
+	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
-
 	// FIXME: Add alwaysThreat property to CUnitType
 	// Unit can attack back.
 	if (CanTarget(dtype, type)) {
@@ -2557,7 +2555,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	// To reduce units roaming when a lot of them fight in small areas
 	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
 	// For other targets we dramaticaly reduce priority and calc only threat factor, distance and health
-	const bool isFarAwayTarget = (!(priority &= AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > 1.5 * reactionRange)) ? true : false;
+	const bool isFarAwayTarget = (!(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > 1.5 * reactionRange)) ? true : false;
 
 	if (isFarAwayTarget || distance < minAttackRange) {
 		priority >>= AT_FARAWAY_REDUCE_OFFSET; // save AT_THREAT_FACTOR if present
