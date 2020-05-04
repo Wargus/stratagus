@@ -199,6 +199,8 @@ extern int AStarMovingUnitCrossingCost;
 extern bool AStarKnowUnseenTerrain;
 /// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
+/// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
+extern bool AStarFixedEnemyUnitsUnpassable;
 
 //
 //  Convert heading into direction.
@@ -221,7 +223,7 @@ extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return path length to unit 'dst'.
 extern int UnitReachable(const CUnit &src, const CUnit &dst, int range);
 /// Return path length to unit 'dst' or error code.
-extern int CalcPathToUnit(const CUnit &src, const CUnit &dst,
+extern int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst,
 						  const int minrange, const int range);
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
@@ -239,6 +241,9 @@ extern int GetAStarMovingUnitCrossingCost();
 
 extern void SetAStarUnknownTerrainCost(int cost);
 extern int GetAStarUnknownTerrainCost();
+
+extern void SetAStarFixedEnemyUnitsUnpassable(const bool value);
+extern bool GetAStarFixedEnemyUnitsUnpassable();
 
 extern void PathfinderCclRegister();
 

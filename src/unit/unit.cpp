@@ -2519,7 +2519,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 
 	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minAttackRange = attacker->Type->MinAttackRange;
-	const int pathLength 	 = CalcPathToUnit(*attacker, *dest, minAttackRange, attackRange);
+	const int pathLength 	 = CalcPathLengthToUnit(*attacker, *dest, minAttackRange, attackRange);
 	int distance		 	 = attacker->MapDistanceTo(*dest);
 
 	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;

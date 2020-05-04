@@ -101,6 +101,7 @@ int AStarFixedUnitCrossingCost;// = MaxMapWidth * MaxMapHeight;
 int AStarMovingUnitCrossingCost = 5;
 bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
+bool AStarFixedEnemyUnitsUnpassable = false;
 
 static int AStarMapWidth;
 static int AStarMapHeight;
@@ -542,6 +543,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				} else {
 					// for non moving unit Always Fail unless goal is unit, or unit can attack the target
 					if (&unit != goal) {
+						if (GetAStarFixedEnemyUnitsUnpassable() == true) {
+							return -1;
+						}
 						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
 							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
 								cost += 2 * AStarMovingUnitCrossingCost;
@@ -1164,4 +1168,13 @@ int GetAStarUnknownTerrainCost()
 	return AStarUnknownTerrainCost;
 }
 
+void SetAStarFixedEnemyUnitsUnpassable(const bool value)
+{
+	AStarFixedEnemyUnitsUnpassable = value;
+}
+
+bool GetAStarFixedEnemyUnitsUnpassable()
+{
+	return AStarFixedEnemyUnitsUnpassable;
+}
 //@}

@@ -245,13 +245,15 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 **  @return       path length to dst or error code
 */
 
-int CalcPathToUnit(const CUnit &src, const CUnit &dst, const int minrange, const int range)
+int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange, const int range)
 {
+	SetAStarFixedEnemyUnitsUnpassable(true); /// change Path Finder setting to don't count tiles with enemy units as passable
 	int length = AStarFindPath(src.tilePos, dst.tilePos,
 							   dst.Type->TileWidth, dst.Type->TileHeight,
 							   src.Type->TileWidth, src.Type->TileHeight,
 							   minrange, range,
 							   NULL, 0, src);
+   SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (length) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
