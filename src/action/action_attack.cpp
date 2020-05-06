@@ -313,20 +313,19 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return false;
 }
 
-
-inline bool COrder_Attack::IsWeakTargetSelected() const
+bool COrder_Attack::IsWeakTargetSelected() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
 }
-inline bool COrder_Attack::IsAutoTargeting() const
+bool COrder_Attack::IsAutoTargeting() const
 {
 	return (this->State & AUTO_TARGETING) != 0;
 }
-inline bool COrder_Attack::IsMovingToAttackPos() const
+bool COrder_Attack::IsMovingToAttackPos() const
 {
 	return (this->State & MOVE_TO_ATTACKPOS) != 0;
 }
-inline bool COrder_Attack::IsAttackGroundOrWall() const
+bool COrder_Attack::IsAttackGroundOrWall() const
 {
 	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)	
 	return (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos) ? true : false);
