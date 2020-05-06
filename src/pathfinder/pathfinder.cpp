@@ -185,10 +185,11 @@ void FreePathfinder()
 */
 int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
 {
+	SetAStarFixedEnemyUnitsUnpassable(true); /// change Path Finder setting to don't count tiles with enemy units as passable
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
 						  minrange, range, NULL, 0, src);
-
+	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
@@ -253,7 +254,7 @@ int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange,
 							   src.Type->TileWidth, src.Type->TileHeight,
 							   minrange, range,
 							   NULL, 0, src);
-   SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
+	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (length) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:

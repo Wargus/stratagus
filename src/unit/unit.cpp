@@ -2876,8 +2876,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
-					target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-					order.OfferNewTarget(target, &attacker);
+					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
+						order.OfferNewTarget(target, &attacker);
+					}
 					return;
 				} 
 				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
@@ -2905,18 +2907,19 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		case UnitActionStill:
 		case UnitActionDefend:
 		case UnitActionPatrol:
-		
+			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
+									? attacker.tilePos 
+									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
+			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+				return;
+			}
 			COrder *savedOrder = NULL;
 			if (targetCurrAction == UnitActionStill || targetCurrAction == UnitActionStandGround) {
 				savedOrder = COrder::NewActionAttack(target, target.tilePos);
 			} else if (target.CanStoreOrder(target.CurrentOrder())) {
 				savedOrder = target.CurrentOrder()->Clone();
 			}
-
 			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
-									? attacker.tilePos 
-									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
 			CommandAttack(target, posToAttack, NULL, FlushCommands);
 
 			if (savedOrder != NULL) {
