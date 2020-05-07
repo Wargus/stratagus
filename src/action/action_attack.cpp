@@ -656,7 +656,7 @@ void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 			this->goalPos = goal->tilePos;
 		} else {
 			this->goalPos = this->attackMovePos;
-			this->attackMovePos = Vec2i(-1,-1);
+			this->attackMovePos = {-1, -1};
 		}
 		TurnToTarget(unit, goal);
 		this->State &= AUTO_TARGETING;
