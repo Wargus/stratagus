@@ -171,6 +171,7 @@ enum {
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
 	SIDEATTACK_INDEX,
 	SKIRMISHER_INDEX,
+	ALWAYSTHREAT_INDEX,				/// Unit always considered as threat for auto targeting algorihm, useful for unit without main attack ability, but which can cast spells (f.e. defiler in SC:BW)
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	NBARALREADYDEFINED
 };

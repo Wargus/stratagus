@@ -2542,13 +2542,13 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	int priority = 0;
 
 	// is Threat?
-	/// Check if target attacks us 
+	/// Check if target attacks us (or has us as goal for any action)
 	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
 	// FIXME: Add alwaysThreat property to CUnitType
 	// Unit can attack back.
-	if (CanTarget(dtype, type)) {
+	if (CanTarget(dtype, type) || dtype.BoolFlag[ALWAYSTHREAT_INDEX].value) {
 		priority |= AT_THREAT_FACTOR;
 	}
 
