@@ -2555,7 +2555,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	// To reduce melee units roaming when a lot of them fight in small areas
 	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
 	// For other targets we dramaticaly reduce priority and calc only attacked by/threat factor, distance and health
-	const int maxDistance = attackRange > 1 ? reactionRange : 1.5 * reactionRange;
+	const int maxDistance = attackRange > 1 ? reactionRange : (reactionRange * 3) >> 1 /* x1.5 */;
 	const bool isFarAwayTarget = (!(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > maxDistance)) ? true : false;
 
 	if (isFarAwayTarget || distance < minAttackRange) {
