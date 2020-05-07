@@ -101,7 +101,8 @@ int AStarFixedUnitCrossingCost;// = MaxMapWidth * MaxMapHeight;
 int AStarMovingUnitCrossingCost = 5;
 bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
-bool AStarFixedEnemyUnitsUnpassable = false;
+/// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
+static bool AStarFixedEnemyUnitsUnpassable = false;
 
 static int AStarMapWidth;
 static int AStarMapHeight;

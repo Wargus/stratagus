@@ -199,8 +199,6 @@ extern int AStarMovingUnitCrossingCost;
 extern bool AStarKnowUnseenTerrain;
 /// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
-/// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
-extern bool AStarFixedEnemyUnitsUnpassable;
 
 //
 //  Convert heading into direction.
