@@ -287,6 +287,9 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	if (--unit.Threshold < 0) {
 		unit.Threshold = 0;
 	}
+	if (--unit.UnderAttack < 0) {
+		unit.UnderAttack = 0;
+	}
 
 	if (unit.Type->CanCastSpell) {
 		// decrease spell countdown timers

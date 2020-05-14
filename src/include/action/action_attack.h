@@ -41,7 +41,7 @@ class COrder_Attack : public COrder
 	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		State(0), MinRange(0), Range(0), SkirmishRange(0), goalPos(-1, -1) {}
+		State(0), MinRange(0), Range(0), SkirmishRange(0), offeredTarget(NULL), goalPos(-1, -1), attackMovePos(-1, -1) {}
 
 	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
 
@@ -57,10 +57,22 @@ public:
 
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
 	bool IsWeakTargetSelected() const;
+	bool IsAutoTargeting() const;
+	bool IsMovingToAttackPos() const;
+	bool IsAttackGroundOrWall() const;
+	bool IsTargetTooClose(const CUnit &unit) const;
+	CUnit *const BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const;
+	void OfferNewTarget(const CUnit &unit, CUnit *const target);
 
 private:
-	bool CheckForDeadGoal(CUnit &unit);
+	bool CheckIfGoalValid(CUnit &unit);
+	void TurnToTarget(CUnit &unit, const CUnit *target);
+	void SetAutoTarget(CUnit &unit, CUnit *target);
+	bool EndActionAttack(CUnit &unit, const bool canBeFinished);
+	void MoveToBetterPos(CUnit &unit);
+	bool AutoSelectTarget(CUnit &unit);
 	bool CheckForTargetInRange(CUnit &unit);
+	void MoveToAttackPos(CUnit &unit, const int pfReturn);
 	void MoveToTarget(CUnit &unit);
 	void AttackTarget(CUnit &unit);
 
@@ -69,7 +81,9 @@ private:
 	int MinRange;
 	int Range;
 	int SkirmishRange;
-	Vec2i goalPos;
+	CUnitPtr offeredTarget; // Stores pointer to target offered from outside (f.e. by HitUnit_AttackBack() event). 
+	Vec2i goalPos;		 // Current goal position
+	Vec2i attackMovePos; // If attack-move was ordered
 };
 //@}
 
