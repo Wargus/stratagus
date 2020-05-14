@@ -683,7 +683,7 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 			Uint32 *p;
 			for (int i = 0; i < Height; ++i) {
 				for (int j = 0; j < Width; ++j) {
-					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
+					p = static_cast<Uint32 *>(Surface->pixels) + (i * Surface->w + j);
 					const Uint32 gray = ((Uint8)((*p) * redGray) >> f->Rshift) +
 										((Uint8)(*(p + 1) * greenGray) >> f->Gshift) +
 										((Uint8)(*(p + 2) * blueGray) >> f->Bshift) +
