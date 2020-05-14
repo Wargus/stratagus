@@ -54,9 +54,11 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+#include "tileset.h"
 #include "translate.h"
 #include "ui.h"
 #include "unit_find.h"
@@ -448,6 +450,7 @@ void CUnit::Init()
 	Variable = NULL;
 	TTL = 0;
 	Threshold = 0;
+	UnderAttack = 0;
 	GroupId = 0;
 	LastGroup = 0;
 	ResourcesHeld = 0;
@@ -567,8 +570,8 @@ bool CUnit::IsAlive() const
 int CUnit::GetDrawLevel() const
 {
 	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-		Type->CorpseType->DrawLevel :
-	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));;
+			Type->CorpseType->DrawLevel :
+			((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));;
 }
 
 /**
@@ -601,7 +604,7 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
-	
+
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
@@ -1329,7 +1332,7 @@ void UnitLost(CUnit &unit)
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
 			if (temp == NULL) {
-				DebugPrint("Unable to allocate Unit");
+				DebugPrint("Unable to allocate Unit\n");
 			} else {
 				temp->ResourcesHeld = unit.ResourcesHeld;
 				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
@@ -1795,7 +1798,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]); //apply the upgrade to this unit only
 		}
 	}
-	
+
 	UpdateForNewUnit(*this, 1);
 }
 
@@ -2443,12 +2446,18 @@ void DestroyAllInside(CUnit &source)
 
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
+
+	if (Preference.SimplifiedAutoTargeting) {
+		// Original algorithm return smaler values for better targets
+		return -TargetPriorityCalculate(&unit, &dest);
+	}
+
 	const CUnitType &type = *unit.Type;
 	const CUnitType &dtype = *dest.Type;
 	int cost = 0;
 
-	// Buildings, non-aggressive and invincible units have the lowest priority
-	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
+	// Buildings, non-aggressive (except workers) and invincible units have the lowest priority
+	if ((dest.IsAgressive() == false && !dest.Type->BoolFlag[HARVESTER_INDEX].value) || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
 		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
@@ -2487,6 +2496,201 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 		cost -= CANATTACK_BONUS;
 	}
 	return cost;
+}
+
+int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest)
+{
+	Assert(attacker != NULL);
+	Assert(dest != NULL);
+
+	const CPlayer &player 	= *attacker->Player;
+	const CUnitType &type 	= *attacker->Type;
+	const CUnitType &dtype 	= *dest->Type;
+
+	if (!player.IsEnemy(*dest) // a friend or neutral
+		|| !dest->IsVisibleAsGoal(player)
+		|| !CanTarget(type, dtype)) {
+		return INT_MIN;
+	}
+	// Don't attack invulnerable units
+	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+		return INT_MIN;
+	}
+
+	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minAttackRange = attacker->Type->MinAttackRange;
+	const int pathLength 	 = CalcPathLengthToUnit(*attacker, *dest, minAttackRange, attackRange);
+	int distance		 	 = attacker->MapDistanceTo(*dest);
+
+	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+
+
+	if (!InAttackRange(*attacker, *dest)
+		&& ((distance > minAttackRange && pathLength < 0)
+			|| attacker->CanMove() == false)) {
+		return INT_MIN;
+	}
+
+
+	// Attack walls only if we are stuck in them
+	if (dtype.BoolFlag[WALL_INDEX].value && distance > 1) {
+		return INT_MIN;
+	}
+
+	// Calculate the priority to attack the unit.
+	// Unit with the highest attack priority will be taken.
+	int priority = 0;
+
+	// is Threat?
+	/// Check if target attacks us (or has us as goal for any action)
+	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker) {
+		priority |= AT_ATTACKED_BY_FACTOR;
+	}
+	// FIXME: Add alwaysThreat property to CUnitType
+	// Unit can attack back.
+	if (CanTarget(dtype, type) || dtype.BoolFlag[ALWAYSTHREAT_INDEX].value) {
+		priority |= AT_THREAT_FACTOR;
+	}
+
+	// To reduce melee units roaming when a lot of them fight in small areas
+	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
+	// For other targets we dramaticaly reduce priority and calc only attacked by/threat factor, distance and health
+	const int maxDistance = attackRange > 1 ? reactionRange : (reactionRange * 3) >> 1 /* x1.5 */;
+	const bool isFarAwayTarget = (!(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > maxDistance)) ? true : false;
+
+	if (isFarAwayTarget || distance < minAttackRange) {
+		priority >>= AT_FARAWAY_REDUCE_OFFSET; // save AT_THREAT_FACTOR if present
+	} else {
+		// Check Priority
+		// Priority 0-255
+		priority |= (dtype.DefaultStat.Variables[PRIORITY_INDEX].Value << AT_PRIORITY_OFFSET);
+
+		// AI Priority
+		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
+			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
+				if (((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) & !dtype.BoolFlag[i].value)
+					|| ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) & dtype.BoolFlag[i].value)) {
+						return INT_MIN;
+					}
+			}
+		}
+	}
+
+	// Calc distance factor (0-255)
+	priority |= (255 - (pathLength > 255 || pathLength < 0 ? 255 : pathLength)) << AT_DISTANCE_OFFSET;
+
+	// Remaining HP (Health) (0..100)%
+	priority |= 100 - dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max;
+
+	return priority;
+}
+
+/**
+**  Returns true, if target is in reaction range of the unit
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**
+**  @param unit    Unit to check for.
+**  @param target  Checked target.
+**
+**  @return       True if within react range, false otherwise.
+*/
+bool InReactRange(const CUnit &unit, const CUnit &target)
+{
+	Assert(&target != NULL);
+	const int distance 	= unit.MapDistanceTo(target);
+	const int range 	= (unit.Player->Type == PlayerPerson)
+						  ? unit.Type->ReactRangePerson
+						  : unit.Type->ReactRangeComputer;
+	return distance <= range;
+}
+
+/**
+**  Returns true, if target is in attack range of the unit and there is no obstacles between them (when inside caves)
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**
+**  @param unit    Unit to check for.
+**  @param target  Checked target.
+**
+**  @return       True if in attack range, false otherwise.
+*/
+bool InAttackRange(const CUnit &unit, const CUnit &target)
+{
+	Assert(&target != NULL);
+	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minRange 	= unit.Type->MinAttackRange;
+	const int distance 	= unit.MapDistanceTo(target);
+
+	return (minRange <= distance && distance <= range)
+		   && (!GameSettings.Inside
+			   || CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
+}
+
+/**
+**  Returns true, if tile is in attack range of the unit and there is no obstacles between them (when inside caves)
+**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**
+**  @param unit    Unit to check for.
+**  @param pos     Checked position.
+**
+**  @return       True if in attack range, false otherwise.
+*/
+bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
+{
+	Assert(Map.Info.IsPointOnMap(tilePos));
+	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minRange 	= unit.Type->MinAttackRange;
+	const int distance 	= unit.MapDistanceTo(tilePos);
+
+	return (minRange <= distance && distance <= range)
+		   && (!GameSettings.Inside
+			   || CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
+}
+
+
+/**
+**  Returns end position of randomly generated vector form srcPos in direction to/from dirUnit
+**	
+**  @param srcPos   Vector origin
+**  @param dirUnit   Position to determine vector direction
+**	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
+**  @param minRange Minimal range to new position
+**	@param devRadius Diviation radius
+**	@param rangeDev Range deviation
+**
+**  @return       	Position
+*/
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
+{
+	Assert(&dirUnit != NULL);
+	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
+	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
+}
+
+/**
+**  Returns end position of randomly generated vector form srcPos in direction to/from dirPos
+**	
+**  @param srcPos   Vector origin
+**  @param dirPos   Position to determine vector direction
+**	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
+**  @param minRange Minimal range to new position
+**	@param devRadius Diviation radius
+**	@param rangeDev Range deviation
+**
+**  @return       	Position
+*/
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev) 
+{
+	Vec2i pos = dirPos - srcPos;
+	pos *= dirFrom ? -1 : 1;
+	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
+	if (!d) {
+		d = 1;
+	}
+	const int range = minRange + SyncRand(rangeDev + 1);
+	pos.x = srcPos.x + (pos.x * range) / d + (devRadius - SyncRand(devRadius * 2 + 1));
+	pos.y = srcPos.y + (pos.y * range) / d + (devRadius - SyncRand(devRadius * 2 + 1));
+	Map.Clamp(pos);
+	return pos;
 }
 
 static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
@@ -2652,70 +2856,78 @@ static void HitUnit_Burning(CUnit &target)
 
 static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 {
-	Vec2i pos = target.tilePos - attacker.tilePos;
-	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
-
-	if (!d) {
-		d = 1;
+	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
+	
+	if (target.IsAgressive()) { 
+		CommandAttack(target, pos, NULL, 0); /// Attack-move to pos
+	} else {
+		CommandMove(target, pos, 0); /// Run away to pos
 	}
-	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
-	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
-	Map.Clamp(pos);
-	CommandStopUnit(target);
-	CommandMove(target, pos, 0);
 }
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 {
-	const int threshold = 30;
-	COrder *savedOrder = NULL;
-
-	if (target.Player->AiEnabled == false) {
-		if (target.CurrentAction() == UnitActionAttack) {
+	const int underAttack = 128;
+	if (&attacker != target.CurrentOrder()->GetGoal()
+		&& attacker.Player != target.Player && target.IsEnemy(attacker)
+		&& CanTarget(*target.Type, *attacker.Type))	{
+		
+		const unsigned char targetCurrAction = target.CurrentAction();
+		if (targetCurrAction == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
-			if (order.IsWeakTargetSelected() == false) {
+			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
+				if (attacker.IsVisibleAsGoal(*target.Player)) {
+					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
+						order.OfferNewTarget(target, &attacker);
+					}
+					return;
+				} 
+				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
+					return;
+				}
+			} else {
 				return;
 			}
-		} else {
+		}
+		/// Wait for timer expires for preventing frequent switching of attack-move positions
+		if (target.UnderAttack) {
 			return;
 		}
-	}
-	if (target.CanStoreOrder(target.CurrentOrder())) {
-		savedOrder = target.CurrentOrder()->Clone();
-	}
-	CUnit *oldgoal = target.CurrentOrder()->GetGoal();
-	CUnit *goal, *best = oldgoal;
+	
+		switch (targetCurrAction)
+		{
+		case UnitActionStandGround:
+		case UnitActionFollow:
+		case UnitActionAttackGround:
+		case UnitActionExplore:
+			if (target.Player->AiEnabled == false) {
+				return;
+			}
+		case UnitActionAttack:
+		case UnitActionStill:
+		case UnitActionDefend:
+		case UnitActionPatrol:
+			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
+									? attacker.tilePos 
+									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
+			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+				return;
+			}
+			COrder *savedOrder = NULL;
+			if (targetCurrAction == UnitActionStill || targetCurrAction == UnitActionStandGround) {
+				savedOrder = COrder::NewActionAttack(target, target.tilePos);
+			} else if (target.CanStoreOrder(target.CurrentOrder())) {
+				savedOrder = target.CurrentOrder()->Clone();
+			}
+			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
+			CommandAttack(target, posToAttack, NULL, FlushCommands);
 
-	if (RevealAttacker && CanTarget(*target.Type, *attacker.Type)) {
-		// Reveal Unit that is attacking
-		goal = &attacker;
-	} else {
-		if (target.CurrentAction() == UnitActionStandGround) {
-			goal = AttackUnitsInRange(target);
-		} else {
-			// Check for any other units in range
-			goal = AttackUnitsInReactRange(target);
-		}
-	}
-
-	// Calculate the best target we could attack
-	if (!best || (goal && (ThreatCalculate(target, *goal) < ThreatCalculate(target, *best)))) {
-		best = goal;
-	}
-	if (CanTarget(*target.Type, *attacker.Type)
-		&& (!best || (goal != &attacker
-					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
-		best = &attacker;
-	}
-	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
-		CommandAttack(target, best->tilePos, best, FlushCommands);
-		// Set threshold value only for aggressive units
-		if (best->IsAgressive()) {
-			target.Threshold = threshold;
-		}
-		if (savedOrder != NULL) {
-			target.SavedOrder = savedOrder;
-		}
+			if (savedOrder != NULL) {
+				target.SavedOrder = savedOrder;
+			}
+			break;
+		}			
 	}
 }
 
@@ -2826,15 +3038,26 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
+	if (target.CanMove() 
+		&& target.CurrentAction() == UnitActionStill
+		&& (!CanTarget(*target.Type, *attacker->Type) 
+			|| !target.IsAgressive() 
+			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value 
+				&& !(attacker->IsVisible(*target.Player) || attacker->IsVisibleOnRadar(*target.Player))))
+		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
+
 		HitUnit_RunAway(target, *attacker);
+		return;
 	}
 
-	const int threshold = 30;
-
-	if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
-		target.Threshold = threshold;
-		return;
+	if (Preference.SimplifiedAutoTargeting) {
+		target.Threshold = 0;
+	} else {		
+		const int threshold = 30;
+		if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
+			target.Threshold = threshold;
+			return;
+		}
 	}
 
 	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
@@ -2938,7 +3161,7 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 }
 
 /**
-**  Can the source unit attack the destination unit.
+**  Can the source unit attack the destination unit?
 **
 **  @param source  Unit type pointer of the attacker.
 **  @param dest    Unit type pointer of the target.
@@ -3129,11 +3352,11 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 	if (this->Variable[ATTACKRANGE_INDEX].Value <= 1) { //always return false if the units attack range is 1 or lower
 		return false;
 	}
-	
+
 	if (this->Container) { //if the unit is inside a container, the attack will always be ranged
 		return true;
 	}
-	
+
 	if (
 		goal
 		&& goal->IsAliveOnMap()
@@ -3145,11 +3368,11 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 	) {
 		return true;
 	}
-	
+
 	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
 		return true;
 	}
-	
+
 	return false;
 }
 

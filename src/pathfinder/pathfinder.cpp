@@ -185,10 +185,11 @@ void FreePathfinder()
 */
 int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
 {
+	SetAStarFixedEnemyUnitsUnpassable(true); /// change Path Finder setting to don't count tiles with enemy units as passable
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
 						  minrange, range, NULL, 0, src);
-
+	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
@@ -232,6 +233,38 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 		return 0;
 	}
 	return depth;
+}
+
+/**
+**  Calc path length for the unit 'src' to reach the unit 'dst'.
+**
+**  @param src     	 Unit for the path.
+**  @param dst    	 Unit to be reached.
+**  @param minrange  min range to the tile
+**  @param range     Range to the tile.
+**
+**  @return       path length to dst or error code
+*/
+
+int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange, const int range)
+{
+	SetAStarFixedEnemyUnitsUnpassable(true); /// change Path Finder setting to don't count tiles with enemy units as passable
+	int length = AStarFindPath(src.tilePos, dst.tilePos,
+							   dst.Type->TileWidth, dst.Type->TileHeight,
+							   src.Type->TileWidth, src.Type->TileHeight,
+							   minrange, range,
+							   NULL, 0, src);
+	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
+	switch (length) {
+		case PF_FAILED:
+		case PF_UNREACHABLE:
+		case PF_WAIT:
+			return -1;
+			break;
+		case PF_REACHED:
+			return 0;
+	}
+	return length;
 }
 
 /*----------------------------------------------------------------------------

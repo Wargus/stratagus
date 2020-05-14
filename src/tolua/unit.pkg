@@ -31,6 +31,7 @@ class CPreference
 	bool MineNotifications;
 	bool DeselectInMine;
 	bool NoStatusLineTooltips;
+	bool SimplifiedAutoTargeting;
 
 	unsigned int ShowOrders;
 	unsigned int ShowNameDelay;
