@@ -79,38 +79,243 @@ typedef void SetFoVFunc(const short x, const short y);
 class CShadowCaster
 {
 public:
-    CShadowCaster(IsTileOpaqueFunc *isTileOpaque, SetFoVFunc *setFoV) 
-        : map_isTileOpaque(isTileOpaque), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
-    
-    void CalcFoV(const Vec2i &center, const short width, const short height, const short range);
-    
+	CShadowCaster(IsTileOpaqueFunc *isTileOpaque, SetFoVFunc *setFoV) 
+		: map_isTileOpaque(isTileOpaque), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
+	
+	void CalcFoV(const Vec2i &center, const short width, const short height, const short range);
+	
 protected:
 private:
-    struct SColumnPiece
-    {
-        SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : x(xValue), TopVector(top), BottomVector(bottom){}
-        short x;
-        Vec2i TopVector;
-        Vec2i BottomVector;
-    };
-    void CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
-    void CalcFoVInOctant(const char octant, const Vec2i &origin, const short range);
-    void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
-                                const short range, std::queue<SColumnPiece> &wrkQueue);
-    short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector);
+	struct SColumnPiece
+	{
+		SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : x(xValue), TopVector(top), BottomVector(bottom){}
+		short x;
+		Vec2i TopVector;
+		Vec2i BottomVector;
+	};
+	void CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
+	void CalcFoVInOctant(const char octant, const Vec2i &origin, const short range);
+	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
+								const short range, std::queue<SColumnPiece> &wrkQueue);
+	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector);
 	bool IsTileOpaque(const short x, const short y);
-    void SetFoV(const short x, const short y);
-    void SetEnvironment(const char octant, const Vec2i &origin);
-    void ResetEnvironment();
-    /// Convert coordinates to global coordinate system
-    Vec2i ToGlobalCS(const short x, const short y);
+	void SetFoV(const short x, const short y);
+	void SetEnvironment(const char octant, const Vec2i &origin);
+	void ResetEnvironment();
+	/// Convert coordinates to global coordinate system
+	Vec2i ToGlobalCS(const short x, const short y);
 
 private:
-   char 			currOctant;         /// Current octant
-   Vec2i 			Origin;             /// Position of the spectator in the global (Map) coordinate system
-   IsTileOpaqueFunc *map_isTileOpaque;  /// Pointer to external function for opacity checks
-   SetFoVFunc 		*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+char 			currOctant;         /// Current octant
+Vec2i 			Origin;             /// Position of the spectator in the global (Map) coordinate system
+IsTileOpaqueFunc *map_isTileOpaque;  /// Pointer to external function for opacity checks
+SetFoVFunc 		*map_setFoV;        /// Pointer to external function for setting tiles visibilty
 };
+
+/**
+**  @param spectratorPos    tile position of the spectrator unit - upper left corner for unit larger than 1x1
+**  @param width            spectrator's width in tiles
+**  @param height           spectrator's height in tiles
+**  @param radius           Spectrator's sight ranger in tiles
+*/
+void CShadowCaster::CalcFoV(const Vec2i &spectatorPos, const short width, const short height, const short range)
+{
+	enum SpectatorGeometry {cOneTiled, cEven, cOdd, cTall, cWide} ;
+	const int geometry = [width, height]{   if (width == height) {
+												if (width == 1) return cOneTiled;
+												if (width % 2)  return cOdd;
+												else            return cEven;
+											} 
+											if (width > height) return cWide;
+											else                return cTall;
+										}();
+	
+	Vec2i center = {0, 0};
+	int sightRange = range;
+
+	const bool isGeometrySymmetric = (geometry == cTall || geometry == cWide) ? false : true;
+
+	if (isGeometrySymmetric) {
+		const short half = width >> 1;
+		center.x = spectatorPos.x + half;
+		center.y = spectatorPos.y + half;
+		sightRange += half - (geometry == cEven ? 1 : 0);
+	} else {
+		/// Fill spectator's tiles which not affected by CalcFoVInOctant and CalcFoVRaysCast
+		ResetEnvironment();
+		for (short x = spectatorPos.x + 1; x < spectatorPos.x + width - 1; x++) {
+			for (short y = spectatorPos.y + 1; y < spectatorPos.y + height - 1; y++) {
+				SetFoV(x, y);
+			}
+		}
+	}
+
+	short rayWidth = 0;
+	for (char quadrant = 0; quadrant < 4; ++quadrant) {
+		if (geometry == cEven) {
+			/// recalculate center
+			switch (quadrant) {
+				case 1: center.x--; break;
+				case 2: center.y--; break;
+				case 3: center.x++; break;
+				default: break;  /// For quadrant 0 center is altready calculated
+			}
+		} else if(!isGeometrySymmetric) {
+			switch (quadrant) {
+				case 0:
+					center.x = spectatorPos.x + width - 1;
+					center.y = spectatorPos.y + height - 1;
+					rayWidth = width - 2;
+					break;  
+				case 1: 
+					center.x = spectatorPos.x; 
+					rayWidth = height - 2;
+					break;
+				case 2: 
+					center.y = spectatorPos.y; 
+					rayWidth = width - 2;
+					break;
+				case 3: 
+					center.x = spectatorPos.x + width - 1;
+					rayWidth = height - 2;
+					break;
+			}
+		}
+		const char octant = quadrant << 1;
+		/// First half-quadrant
+		CalcFoVInOctant(octant, center, sightRange);
+		/// Second half-quadrant
+		CalcFoVInOctant(octant + 1, center, sightRange);
+
+		/// calv FoV for asymmetric spectrator
+		if (rayWidth) 
+		{
+			CalcFoVRaysCast(octant, center, rayWidth, sightRange);
+		}
+	}
+}
+
+void CShadowCaster::CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
+{   
+	SetEnvironment(octant, origin);
+	for (short x = -1; x >= -width; x--) {
+		for (short y = 0; y < range; y++) {
+			SetFoV(x, y);
+			if(IsTileOpaque(x ,y)) break;
+		}
+	}
+	ResetEnvironment();
+}
+
+void CShadowCaster::CalcFoVInOctant(const char octant, const Vec2i &origin, const short range)
+{
+	SetEnvironment(octant, origin);
+	std::queue<SColumnPiece> wrkQueue;
+	wrkQueue.push(SColumnPiece(0, Vec2i(1, 1), Vec2i(1, 0)));
+	while (!wrkQueue.empty()) {
+		SColumnPiece current = wrkQueue.front();
+		wrkQueue.pop();
+		if (current.x >= range) {
+			continue;
+		}
+		CalcFoVForColumnPiece(current.x, current.TopVector, current.BottomVector, range, wrkQueue);
+	}
+	ResetEnvironment();
+}
+
+void  CShadowCaster::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
+											const short range, std::queue<SColumnPiece> &wrkQueue)
+{
+	enum { cTop = true, cBottom = false };
+	short topY    = CalcY_ByVector(cTop, x, topVector);
+	short bottomY = CalcY_ByVector(cBottom, x, bottomVector);
+
+	enum { cInit, cYes, cNo } wasLastTileOpaque = cInit;
+	for (short y = topY; y >= bottomY; --y) {
+		const bool inRange = square(2 * x - 1) + square(2 * y - 1) <= square(2 * range);
+		if (inRange) {
+			SetFoV(x, y);
+		}
+
+		bool isCurrentTileOpaque = !inRange || IsTileOpaque(x, y);
+		if (wasLastTileOpaque != cInit) {
+			if (isCurrentTileOpaque) {
+				if (wasLastTileOpaque == cNo) {
+					wrkQueue.push(SColumnPiece(x + 1, topVector, Vec2i(x * 2 - 1, y * 2 + 1)));
+				}
+			}
+			else if (wasLastTileOpaque == cYes) {
+				topVector = {short (x * 2 + 1), short (y * 2 + 1)};
+			}
+		}
+		wasLastTileOpaque = isCurrentTileOpaque ? cYes : cNo;
+	}
+	if (wasLastTileOpaque == cNo) {
+		wrkQueue.push(SColumnPiece(x + 1, topVector, bottomVector));
+	}
+}
+
+short CShadowCaster::CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector)
+{
+	short y;
+	if (x == 0) {
+			y = 0;
+	} else {
+		// (x +|- 0.5) * (top|bot)_vector.y/(top|bot)_vector.x in integers
+		const short devidend  = (isTop ? (2 * x + 1) : (2 * x - 1)) * vector.y;
+		const short devisor   = 2 * vector.x;
+		const short quotient  = devidend / devisor;
+		const short remainder = devidend % devisor;
+		// Round the result
+		if (isTop ? remainder > vector.x 
+				: remainder >= vector.x) {
+			y = quotient + 1;
+		} else {
+			y = quotient;
+		}
+	}
+	return y;
+}
+
+bool CShadowCaster::IsTileOpaque(const short x, const short y)
+{
+	Vec2i tilePos = ToGlobalCS(x, y);
+	return map_isTileOpaque(tilePos.x, tilePos.y);
+}
+
+void SetFoV(const short x, const short y)
+{
+	Vec2i tilePos = ToGlobalCS(x, y);
+	map_setFoV(tilePos.x, tilePos.y);
+}
+
+void CShadowCaster::SetEnvironment(const char octant, const Vec2i &origin)
+{
+	Origin  = origin;
+	currOctant = octant;
+}
+void CShadowCaster::ResetEnvironment()
+{
+	Origin = {0, 0};
+	currOctant = 0;
+}
+
+Vec2i CShadowCaster::ToGlobalCS(const short x, const short y)
+{
+	Vec2i pos;
+	switch(currOctant) {
+		case 1:  pos.x =  y; pos.y =  x; break;
+		case 2:  pos.x = -y; pos.y =  x; break;
+		case 3:  pos.x = -x; pos.y =  y; break;
+		case 4:  pos.x = -x; pos.y = -y; break;
+		case 5:  pos.x = -y; pos.y = -x; break;
+		case 6:  pos.x =  y; pos.y = -x; break;
+		case 7:  pos.x =  x; pos.y = -y; break;
+		default: pos.x =  x; pos.y =  y; break;
+	}
+	pos += Origin;
+	return pos;
+}
 
 /*----------------------------------------------------------------------------
 --  Functions
