@@ -283,7 +283,7 @@ bool CShadowCaster::IsTileOpaque(const short x, const short y)
 	return map_isTileOpaque(tilePos.x, tilePos.y);
 }
 
-void SetFoV(const short x, const short y)
+void CShadowCaster::SetFoV(const short x, const short y)
 {
 	Vec2i tilePos = ToGlobalCS(x, y);
 	map_setFoV(tilePos.x, tilePos.y);
