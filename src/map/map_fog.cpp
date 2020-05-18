@@ -33,7 +33,7 @@
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
+#include <queue>
 #include "stratagus.h"
 
 #include "map.h"
@@ -46,6 +46,7 @@
 #include "unit_manager.h"
 #include "video.h"
 #include "../video/intern_video.h"
+
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -68,6 +69,48 @@ static std::vector<unsigned short> VisibleTable;
 
 static SDL_Surface *OnlyFogSurface;
 static CGraphic *AlphaFogG;
+
+/*----------------------------------------------------------------------------
+--  Shadowcaster
+----------------------------------------------------------------------------*/
+typedef bool IsTileOpaqueFunc(const short x, const short y);
+typedef void SetFoVFunc(const short x, const short y);
+
+class CShadowCaster
+{
+public:
+    CShadowCaster(IsTileOpaqueFunc *isTileOpaque, SetFoVFunc *setFoV) 
+        : map_isTileOpaque(isTileOpaque), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
+    
+    void CalcFoV(const Vec2i &center, const short width, const short height, const short range);
+    
+protected:
+private:
+    struct SColumnPiece
+    {
+        SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : x(xValue), TopVector(top), BottomVector(bottom){}
+        short x;
+        Vec2i TopVector;
+        Vec2i BottomVector;
+    };
+    void CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
+    void CalcFoVInOctant(const char octant, const Vec2i &origin, const short range);
+    void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
+                                const short range, std::queue<SColumnPiece> &wrkQueue);
+    short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector);
+	bool IsTileOpaque(const short x, const short y);
+    void SetFoV(const short x, const short y);
+    void SetEnvironment(const char octant, const Vec2i &origin);
+    void ResetEnvironment();
+    /// Convert coordinates to global coordinate system
+    Vec2i ToGlobalCS(const short x, const short y);
+
+private:
+   char 			currOctant;         /// Current octant
+   Vec2i 			Origin;             /// Position of the spectator in the global (Map) coordinate system
+   IsTileOpaqueFunc *map_isTileOpaque;  /// Pointer to external function for opacity checks
+   SetFoVFunc 		*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+};
 
 /*----------------------------------------------------------------------------
 --  Functions
