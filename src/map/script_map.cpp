@@ -242,6 +242,20 @@ static int CclSetMinimapTerrain(lua_State *l)
 }
 
 /**
+**  Unit's field of view algorithm - 'true' for shadow casting, 'false' for simple radial 
+**
+**  @param l  Lua state.
+**
+**  @return   The old state of the flag
+*/
+static int CclSetFoVShadowCasting(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	FoVShadowCasting = LuaToBoolean(l, 1);
+	return 0;
+}
+
+/**
 **  Fog of war opacity.
 **
 **  @param l  Lua state.
@@ -572,6 +586,8 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
+
+	lua_register(Lua, "SetFoVShadowCasting", CclSetFoVShadowCasting);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);

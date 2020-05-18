@@ -275,6 +275,8 @@ public:
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
+/// Flag to enable shadow casting FoV
+extern bool FoVShadowCasting;
 /// Contrast of fog of war
 extern int FogOfWarOpacity;
 /// fog of war color

@@ -52,7 +52,9 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int FogOfWarOpacity;                 /// Fog of war Opacity.
+bool FoVShadowCasting {false};		/// Unit's field of view algorithm - 'true' for shadow casting, 'false' for simple radial 
+
+int FogOfWarOpacity;				/// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;
 
@@ -581,6 +583,8 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	if (!range) {
 		return;
 	}
+
+
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
 	for (int offsety = miny; offsety != 0; ++offsety) {
