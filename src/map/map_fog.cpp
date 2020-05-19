@@ -84,7 +84,7 @@ public:
 	CShadowCaster(CPlayer *player, CUnit *unit, SetFoVFunc *setFoV) 
 		: Player(player), Unit(unit), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
 	
-	void CalcFoV(const Vec2i &center, const short width, const short height, const short range);
+	void CalcFoV(const Vec2i &spectatorPos, const short width, const short height, const short range);
 	
 protected:
 private:
@@ -240,7 +240,7 @@ void  CShadowCaster::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2
 			SetFoV(x, y);
 		}
 
-		bool isCurrentTileOpaque = !inRange || IsTileOpaque(x, y);
+		bool isCurrentTileOpaque = !inRange || isTileOpaque(x, y);
 		if (wasLastTileOpaque != cInit) {
 			if (isCurrentTileOpaque) {
 				if (wasLastTileOpaque == cNo) {
@@ -271,7 +271,7 @@ short CShadowCaster::CalcY_ByVector(const bool isTop, const short x, const Vec2i
 		const short remainder = devidend % devisor;
 		// Round the result
 		if (isTop ? remainder > vector.x 
-				: remainder >= vector.x) {
+				  : remainder >= vector.x) {
 			y = quotient + 1;
 		} else {
 			y = quotient;
