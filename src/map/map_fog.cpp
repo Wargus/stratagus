@@ -81,8 +81,8 @@ typedef void SetFoVFunc(const short x, const short y);
 class CShadowCaster
 {
 public:
-	CShadowCaster(IsTileOpaqueFunc *isTileOpaque, SetFoVFunc *setFoV) 
-		: map_isTileOpaque(isTileOpaque), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
+	CShadowCaster(CPlayer *player, CUnit *unit, SetFoVFunc *setFoV) 
+		: Player(player), Unit(unit), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
 	
 	void CalcFoV(const Vec2i &center, const short width, const short height, const short range);
 	
@@ -100,7 +100,7 @@ private:
 	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
 								const short range, std::queue<SColumnPiece> &wrkQueue);
 	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector);
-	bool IsTileOpaque(const short x, const short y);
+	bool isTileOpaque(const short x, const short y);
 	void SetFoV(const short x, const short y);
 	void SetEnvironment(const char octant, const Vec2i &origin);
 	void ResetEnvironment();
@@ -108,10 +108,11 @@ private:
 	Vec2i ToGlobalCS(const short x, const short y);
 
 private:
-char 			currOctant;         /// Current octant
-Vec2i 			Origin;             /// Position of the spectator in the global (Map) coordinate system
-IsTileOpaqueFunc *map_isTileOpaque;  /// Pointer to external function for opacity checks
-SetFoVFunc 		*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+	char		 	 currOctant;        /// Current octant
+	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
+	CUnit			*Unit;				/// Pointer to unit to calculate FoV for 
+	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+	CPlayer			*Player;			/// Pointer to player to set FoV for
 };
 
 /**
@@ -203,7 +204,7 @@ void CShadowCaster::CalcFoVRaysCast(const char octant, const Vec2i &origin, cons
 	for (short x = -1; x >= -width; x--) {
 		for (short y = 0; y < range; y++) {
 			SetFoV(x, y);
-			if(IsTileOpaque(x ,y)) break;
+			if(isTileOpaque(x ,y)) break;
 		}
 	}
 	ResetEnvironment();
@@ -279,16 +280,15 @@ short CShadowCaster::CalcY_ByVector(const bool isTop, const short x, const Vec2i
 	return y;
 }
 
-bool CShadowCaster::IsTileOpaque(const short x, const short y)
+bool CShadowCaster::isTileOpaque(const short x, const short y)
 {
-	Vec2i tilePos = ToGlobalCS(x, y);
-	return map_isTileOpaque(tilePos.x, tilePos.y);
+	const Vec2i tilePos = ToGlobalCS(x, y);
+	return IsTileOpaque(*Unit, tilePos.x, tilePos.y);
 }
 
 void CShadowCaster::SetFoV(const short x, const short y)
 {
-	Vec2i tilePos = ToGlobalCS(x, y);
-	map_setFoV(tilePos.x, tilePos.y);
+	map_setFoV(*Player, Map.getIndex(ToGlobalCS(x, y)));
 }
 
 void CShadowCaster::SetEnvironment(const char octant, const Vec2i &origin)
@@ -565,6 +565,25 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 {
 	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
+}
+
+/**
+**  Checks if tile in pos is opaque or transparent for unit.
+**
+**  @param	unit for which we check opacity (some units may have abilities/parameters to see above obstacles)
+**  @param	x	position on the map field to check for opacity	
+**  @param	y  	position on the map field to check for opacity
+*/
+bool IsTileOpaque(const CUnit &unit, const int x, const int y)
+{
+	if(Map.Info.IsPointOnMap(x, y) == false) {
+		return true;
+	}
+	/// FIXME: add MapFieldOpaque flsg, high-/lowground, units with 'elevation' flag (for watchtowers f.ex.)
+	if (Map.Field(x, y)->Flags & (MapFieldRocks | MapFieldForest)) {
+		return true;
+	}
+	return false;
 }
 
 /**
