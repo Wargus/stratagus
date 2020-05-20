@@ -862,7 +862,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	int fogTile = 0;
 	int blackFogTile = 0;
 
-	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
+//	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
 
 	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 		if (fogTile && fogTile != blackFogTile) {
