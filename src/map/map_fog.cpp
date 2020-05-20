@@ -41,6 +41,7 @@
 #include "actions.h"
 #include "minimap.h"
 #include "player.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -75,13 +76,12 @@ static CGraphic *AlphaFogG;
 /*----------------------------------------------------------------------------
 --  Shadowcaster
 ----------------------------------------------------------------------------*/
-typedef bool IsTileOpaqueFunc(const short x, const short y);
-typedef void SetFoVFunc(const short x, const short y);
+extern bool IsTileOpaque(const CUnit &unit, const int x, const int y);
 
 class CShadowCaster
 {
 public:
-	CShadowCaster(CPlayer *player, CUnit *unit, SetFoVFunc *setFoV) 
+	CShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV) 
 		: Player(player), Unit(unit), map_setFoV(setFoV), Origin(0, 0), currOctant(0) {}
 	
 	void CalcFoV(const Vec2i &spectatorPos, const short width, const short height, const short range);
@@ -110,9 +110,9 @@ private:
 private:
 	char		 	 currOctant;        /// Current octant
 	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
-	CUnit			*Unit;				/// Pointer to unit to calculate FoV for 
+	const CUnit		*Unit;				/// Pointer to unit to calculate FoV for 
 	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
-	CPlayer			*Player;			/// Pointer to player to set FoV for
+	const CPlayer	*Player;			/// Pointer to player to set FoV for
 };
 
 /**
