@@ -283,12 +283,18 @@ short CShadowCaster::CalcY_ByVector(const bool isTop, const short x, const Vec2i
 bool CShadowCaster::isTileOpaque(const short x, const short y)
 {
 	const Vec2i tilePos = ToGlobalCS(x, y);
-	return IsTileOpaque(*Unit, tilePos.x, tilePos.y);
+	if(Map.Info.IsPointOnMap(tilePos.x, tilePos.y)) {
+		return IsTileOpaque(*Unit, tilePos.x, tilePos.y);
+	}
+	return false;
 }
 
 void CShadowCaster::SetFoV(const short x, const short y)
 {
-	map_setFoV(*Player, Map.getIndex(ToGlobalCS(x, y)));
+	const Vec2i tilePos = ToGlobalCS(x, y);
+	if(Map.Info.IsPointOnMap(tilePos.x, tilePos.y)) {
+		map_setFoV(*Player, Map.getIndex(tilePos.x, tilePos.y));
+	}
 }
 
 void CShadowCaster::SetEnvironment(const char octant, const Vec2i &origin)
@@ -571,14 +577,13 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 **  Checks if tile in pos is opaque or transparent for unit.
 **
 **  @param	unit for which we check opacity (some units may have abilities/parameters to see above obstacles)
-**  @param	x	position on the map field to check for opacity	
-**  @param	y  	position on the map field to check for opacity
+**  @param	x	position on the map field to check for opacity(must be checked by caller for IsPointOnMap(x, y))
+**  @param	y  	position on the map field to check for opacity (must be checked by caller for IsPointOnMap(x, y))
 */
 bool IsTileOpaque(const CUnit &unit, const int x, const int y)
 {
-	if(Map.Info.IsPointOnMap(x, y) == false) {
-		return true;
-	}
+	Assert(Map.Info.IsPointOnMap(x, y));
+
 	/// FIXME: add MapFieldOpaque flsg, high-/lowground, units with 'elevation' flag (for watchtowers f.ex.)
 	if (Map.Field(x, y)->Flags & (MapFieldRocks | MapFieldForest)) {
 		return true;
