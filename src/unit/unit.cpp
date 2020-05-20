@@ -802,11 +802,11 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 								MapMarkerFunc *f, MapMarkerFunc *f2)
 {
 	Assert(f);
-	MapSight(*unit.Player, pos, width, height,
+	MapSight(*unit.Player, unit, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
 	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
+		MapSight(*unit.Player, unit, pos, width, height,
 				 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
 
@@ -851,11 +851,11 @@ void MapMarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapMarkRadar(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 						 unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapMarkRadarJammer(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -881,11 +881,11 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapUnmarkRadar(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 						   unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapUnmarkRadarJammer(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}

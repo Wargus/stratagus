@@ -315,7 +315,7 @@ extern MapMarkerFunc MapMarkTileDetectCloak;
 extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 /// Mark sight changes
-extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
+extern void MapSight(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w,
 					 int h, int range, MapMarkerFunc *marker);
 /// Update fog of war
 extern void UpdateFogOfWarChange();
@@ -400,22 +400,22 @@ inline bool CanMoveToMask(const Vec2i &pos, int mask)
 }
 
 /// Handle Marking and Unmarking of radar vision
-inline void MapMarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
+inline void MapMarkRadar(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range)
 {
-	MapSight(player, pos, w, h, range, MapMarkTileRadar);
+	MapSight(player, unit, pos, w, h, range, MapMarkTileRadar);
 }
-inline void MapUnmarkRadar(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
+inline void MapUnmarkRadar(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range)
 {
-	MapSight(player, pos, w, h, range, MapUnmarkTileRadar);
+	MapSight(player, unit, pos, w, h, range, MapUnmarkTileRadar);
 }
 /// Handle Marking and Unmarking of radar vision
-inline void MapMarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
+inline void MapMarkRadarJammer(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range)
 {
-	MapSight(player, pos, w, h, range, MapMarkTileRadarJammer);
+	MapSight(player, unit, pos, w, h, range, MapMarkTileRadarJammer);
 }
-inline void MapUnmarkRadarJammer(const CPlayer &player, const Vec2i &pos, int w, int h, int range)
+inline void MapUnmarkRadarJammer(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range)
 {
-	MapSight(player, pos, w, h, range, MapUnmarkTileRadarJammer);
+	MapSight(player, unit, pos, w, h, range, MapUnmarkTileRadarJammer);
 }
 
 //@}

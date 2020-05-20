@@ -601,13 +601,17 @@ bool IsTileOpaque(const CUnit &unit, const int x, const int y)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
 	// Units under construction have no sight range.
 	if (!range) {
 		return;
 	}
-
+	if (FoVShadowCasting && unit.Type->AirUnit == false) {
+		CShadowCaster shadowCaster(&player, &unit, marker);
+		shadowCaster.CalcFoV(pos, w, h, range + 1);
+		return;
+	}
 
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
