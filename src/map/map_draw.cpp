@@ -236,6 +236,20 @@ void CViewport::Center(const PixelPos &mapPixelPos)
 ** (in pixels)
 ** </PRE>
 */
+/// Draw the map grid for dubug purposes
+void CViewport::DrawMapGridInViewport() const
+{
+	int x0 = this->TopLeftPos.x - this->Offset.x;
+	int y0 = this->TopLeftPos.y - this->Offset.y;
+
+	for (int x = ((x0 % PixelTileSize.x != 0) ? x0 + PixelTileSize.x : x0) ; x <= this->BottomRightPos.x ; x += PixelTileSize.x) {
+		Video.DrawLineClip(ColorDarkGray, {x, this->TopLeftPos.y - this->Offset.y}, {x, this->BottomRightPos.y});
+	}
+	for(int y = ((y0 % PixelTileSize.y != 0) ? y0 + PixelTileSize.y : y0) ; y <= this->BottomRightPos.y ; y += PixelTileSize.y) {
+		Video.DrawLineClip(ColorDarkGray, {this->TopLeftPos.x - this->Offset.x, y}, {this->BottomRightPos.x, y});
+	}
+}
+
 void CViewport::DrawMapBackgroundInViewport() const
 {
 	int ex = this->BottomRightPos.x;
@@ -273,6 +287,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
+#ifdef DEBUG	
+	DrawMapGridInViewport();
+#endif
 }
 
 /**

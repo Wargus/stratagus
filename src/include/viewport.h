@@ -104,6 +104,8 @@ public:
 private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);
+	/// Draw the map grid for dubug purposes
+	void DrawMapGridInViewport() const;
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
