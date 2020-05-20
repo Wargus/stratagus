@@ -235,7 +235,7 @@ void  CShadowCaster::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2
 
 	enum { cInit, cYes, cNo } wasLastTileOpaque = cInit;
 	for (short y = topY; y >= bottomY; --y) {
-		const bool inRange = square(2 * x - 1) + square(2 * y - 1) <= square(2 * range);
+		const bool inRange = square(x) + square(y) < square(range);
 		if (inRange) {
 			SetFoV(x, y);
 		}
