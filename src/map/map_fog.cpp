@@ -585,7 +585,7 @@ bool IsTileOpaque(const CUnit &unit, const int x, const int y)
 	Assert(Map.Info.IsPointOnMap(x, y));
 
 	/// FIXME: add MapFieldOpaque flsg, high-/lowground, units with 'elevation' flag (for watchtowers f.ex.)
-	if (Map.Field(x, y)->Flags & (MapFieldRocks | MapFieldForest)) {
+	if (Map.Field(x, y)->Flags & (/*MapFieldRocks | MapFieldForest | */MapFieldOpaque)) {
 		return true;
 	}
 	return false;
