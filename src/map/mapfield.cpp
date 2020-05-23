@@ -83,7 +83,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 #if 0
 	this->Flags = tile.flag;
 #else
-	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+	this->Flags &= ~(MapFieldOpaque | MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
 	this->Flags |= tile.flag;
@@ -101,6 +101,9 @@ void CMapField::Save(CFile &file) const
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
 		}
+	}
+	if (Flags & MapFieldOpaque) {
+		file.printf(", \"opaque\"");
 	}
 	if (Flags & MapFieldHuman) {
 		file.printf(", \"human\"");
@@ -171,6 +174,8 @@ void CMapField::parse(lua_State *l)
 		if (!strcmp(value, "explored")) {
 			++j;
 			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
+		} else if (!strcmp(value, "opaque")) {
+			this->Flags |= MapFieldOpaque;
 		} else if (!strcmp(value, "human")) {
 			this->Flags |= MapFieldHuman;
 		} else if (!strcmp(value, "land")) {

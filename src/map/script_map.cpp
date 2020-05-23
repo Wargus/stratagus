@@ -541,7 +541,9 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 
 	unsigned short flag = 0;
 	const char *flag_name = LuaToString(l, 3);
-	if (!strcmp(flag_name, "water")) {
+	if (!strcmp(flag_name, "opaque")) {
+		flag = MapFieldOpaque;
+	} else if (!strcmp(flag_name, "water")) {
 		flag = MapFieldWaterAllowed;
 	} else if (!strcmp(flag_name, "land")) {
 		flag = MapFieldLandAllowed;
