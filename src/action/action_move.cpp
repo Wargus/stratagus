@@ -256,6 +256,18 @@ int DoActionMove(CUnit &unit)
 		case PF_REACHED:
 			this->Finished = true;
 			break;
+			
+		case PF_WAIT: 
+		{
+			const CUnit *blocker = UnitOnMapTile(this->goalPos, unit.Type->UnitType);
+			if (blocker) { 
+				const int distToBlocker = MapDistanceBetweenTypes(*(unit.Type), unit.tilePos, *(blocker->Type), blocker->tilePos);
+				if (distToBlocker == 1 && (unit.IsEnemy(*blocker) || blocker->Moving == false)) {
+					unit.Wait = 0;
+					this->Finished = true;
+				}
+			}
+		}	break;
 		default:
 			break;
 	}
