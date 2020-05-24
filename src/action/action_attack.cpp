@@ -382,6 +382,10 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 {
 	CUnit *goal = this->GetGoal();
 
+	// Wall was destroyed
+	if (!goal && this->State & ATTACK_TARGET && this->Action != UnitActionAttackGround && !Map.WallOnMap(this->goalPos)) {
+		return false;
+	}
 	// Position or valid target, it is ok.
 	if (!goal || goal->IsVisibleAsGoal(*unit.Player)) {
 		return true;
