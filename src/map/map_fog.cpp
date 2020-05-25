@@ -607,7 +607,8 @@ void MapSight(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w,
 	if (!range) {
 		return;
 	}
-	if (FoVShadowCasting && unit.Type->AirUnit == false) {
+	const bool simpleFoV = (!FoVShadowCasting || !unit || unit.Type->AirUnit || unit.Type->BoolFlag[RAISED_INDEX].value);
+	if (!simpleFoV) {
 		CShadowCaster shadowCaster(&player, &unit, marker);
 		shadowCaster.CalcFoV(pos, w, h, range + 1);
 		return;
