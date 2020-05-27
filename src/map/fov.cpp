@@ -50,7 +50,7 @@ bool CFieldOfView::SetType(const unsigned short fov_type)
 		return false;
 	}
 }
-unsigned short CFieldOfView::GetType()
+unsigned short CFieldOfView::GetType() const
 {
 	return this->Settings.FoV_Type;
 }
@@ -102,7 +102,7 @@ void CFieldOfView::Calculate(const CPlayer &player, const CUnit &unit, const Vec
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void CFieldOfView::CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const
 {
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
@@ -310,7 +310,7 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i
 	}
 }
 
-short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector)
+short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector) const
 {
 	short y;
 	if (x == 0) {

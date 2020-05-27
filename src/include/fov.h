@@ -57,7 +57,7 @@ public:
     
     enum { cSimpleRadial = 0, cShadowCasting };
     void SetType(const unsigned short);
-    unsigned short GetType();
+    unsigned short GetType() const;
 
     void AddOpaqueFieldFlag(const unsigned short flag);
     void RemoveOpaqueFieldFlag(const unsigned short flag);
@@ -74,17 +74,17 @@ private:
 		Vec2i BottomVector;
 	};
 
-    void CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker);
+    void CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const;
     void CalcShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
 
     void CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
 	void CalcFoVInOctant(const char octant, const Vec2i &origin, const short range);
 	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
 								const short range, std::queue<SColumnPiece> &wrkQueue);
-	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector);
+	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
     bool SwitchCurrentTileTo(const short x, const short y);
-	bool IsTileOpaque();
-	void SetFoV();
+	bool IsTileOpaque() const;
+	void SetFoV() const;
 	void InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV);
     void ResetShadowCaster();
 	void SetEnvironment(const char octant, const Vec2i &origin);
@@ -118,13 +118,13 @@ inline bool CFieldOfView::SwitchCurrentTileTo(const short x, const short y)
     }
 }
 
-inline bool CFieldOfView::IsTileOpaque()
+inline bool CFieldOfView::IsTileOpaque() const
 {
     /// FIXME: add high-/lowground
     return (Map.Field(currTilePos_GCS.x, currTilePos_GCS.y)->Flags & OpaqueFieldsFlags);
 }
 
-inline void CFieldOfView::SetFoV()
+inline void CFieldOfView::SetFoV() const
 {
     map_setFoV(*Player, Map.getIndex(currTilePos_GCS.x, currTilePos_GCS.y));
 }
