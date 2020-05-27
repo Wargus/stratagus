@@ -38,9 +38,7 @@
 #include "map.h"
 #include "tileset.h"
 
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
+
 
 class CFieldOfView
 {
@@ -55,8 +53,9 @@ public:
 	
 	void Calculate(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker);
     
-    enum { cSimpleRadial = 0, cShadowCasting };
-    void SetType(const unsigned short);
+    enum { cShadowCasting = 0,  cSimpleRadial }; /// cSimpeRadial must be last. Add new types before it.
+
+    bool SetType(const unsigned short);
     unsigned short GetType() const;
 
     void AddOpaqueFieldFlag(const unsigned short flag);
@@ -102,10 +101,20 @@ private:
 	char		 	 currOctant;        /// Current octant
 	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
     unsigned short   OpaqueFieldsFlags; /// 
-	CPlayer	        *Player;			/// Pointer to player to set FoV for	
-    CUnit		    *Unit;				/// Pointer to unit to calculate FoV for 
+	const CPlayer   *Player;			/// Pointer to player to set FoV for	
+    const CUnit     *Unit;				/// Pointer to unit to calculate FoV for 
 	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
 };
+
+/*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+extern CFieldOfView FieldOfView;
+
+
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 
 inline bool CFieldOfView::SwitchCurrentTileTo(const short x, const short y)
 {

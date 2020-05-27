@@ -54,8 +54,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CFieldOfView FieldOfView;
-
 int FogOfWarOpacity;				/// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;

@@ -30,8 +30,13 @@
 //
 
 #include <queue>
+#include "stratagus.h"
+
 #include "fov.h"
 #include "settings.h"
+#include "unit.h"
+#include "unittype.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -256,7 +261,7 @@ void CFieldOfView::CalcFoVRaysCast(const char octant, const Vec2i &origin, const
 			if (isOnMap) {
 				SetFoV();
 			}
-			if (!isOnMap || IsTileOpaque(x ,y)) break;
+			if (!isOnMap || IsTileOpaque()) break;
 		}
 	}
 	ResetEnvironment();
@@ -335,14 +340,14 @@ short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i 
 void CFieldOfView::InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV)
 {
 	Player 		= player;
-	unit 		= unit;
+	Unit 		= unit;
 	map_setFoV 	= setFoV;
 }
 
 void CFieldOfView::ResetShadowCaster()
 {
 	Player 			= NULL;
-	unit 			= NULL;
+	Unit 			= NULL;
 	map_setFoV 		= NULL;
 	currTilePos_GCS = {0, 0};
 
