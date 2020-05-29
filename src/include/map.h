@@ -289,16 +289,11 @@ extern int ReplayRevealMap;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-#define MARKER_ON_INDEX
 //
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
-#ifndef MARKER_ON_INDEX
-typedef void MapMarkerFunc(const CPlayer &player, const Vec2i &pos);
-#else
 typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index);
-#endif
 
 /// Filter map flags through fog
 extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
