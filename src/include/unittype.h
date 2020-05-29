@@ -172,7 +172,7 @@ enum {
 	SIDEATTACK_INDEX,
 	SKIRMISHER_INDEX,
 	ALWAYSTHREAT_INDEX,				/// Unit always considered as threat for auto targeting algorihm, useful for unit without main attack ability, but which can cast spells (f.e. defiler in SC:BW)
-	RAISED_INDEX,					/// Unit is elevated and can see over opaque tiles placed in the same ground level with the unit.
+	ELEVATED_INDEX,					/// Unit is elevated and can see over opaque tiles placed in the same ground level with the unit.
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	MAINFACILITY_INDEX,				/// Unit is a main building (Town Hall f. ex.)
 	NBARALREADYDEFINED

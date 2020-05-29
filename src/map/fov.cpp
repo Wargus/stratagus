@@ -83,7 +83,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 	}
 	if (this->Settings.FoV_Type == cShadowCasting && !unit.Type->AirUnit) {
 
-		OpaqueFields = unit.Type->BoolFlag[RAISED_INDEX].value ? 0 : this->Settings.OpaqueFields;
+		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
 			OpaqueFields &= ~(MapFieldRocks); /// because rocks-flag used as obstacle for ranged attackers
 		}
