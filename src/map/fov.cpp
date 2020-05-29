@@ -74,7 +74,8 @@ void CFieldOfView::ResetAdditionalOpaqueFields()
 	this->Settings.OpaqueFields = MapFieldOpaque;
 }
 
-void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const int w, 
+							const int h, const int range, MapMarkerFunc *marker)
 {
 	// Units under construction have no sight range.
 	if (!range) {
@@ -164,15 +165,15 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
                                             else                { return cTall; 	}
                                         }();										  
 
-	Vec2i center = {0, 0};
+	Vec2i origin = {0, 0};
 	int sightRange = range;
 
 	const bool isGeometrySymmetric = (geometry == cTall || geometry == cWide) ? false : true;
 
 	if (isGeometrySymmetric) {
 		const short half = width >> 1;
-		center.x = spectatorPos.x + half;
-		center.y = spectatorPos.y + half;
+		origin.x = spectatorPos.x + half;
+		origin.y = spectatorPos.y + half;
 		sightRange += half - (geometry == cEven ? 1 : 0);
 	} else {
 		/// Fill spectator's tiles which not affected by RefreshOctant and ProceedRaysCast
@@ -191,41 +192,41 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 		if (geometry == cEven) {
 			/// recalculate center
 			switch (quadrant) {
-				case 1: center.x--; break;
-				case 2: center.y--; break;
-				case 3: center.x++; break;
+				case 1: origin.x--; break;
+				case 2: origin.y--; break;
+				case 3: origin.x++; break;
 				default: break;  /// For quadrant 0 center is altready calculated
 			}
 		} else if (!isGeometrySymmetric) {
 			switch (quadrant) {
 				case 0:
-					center.x = spectatorPos.x + width - 1;
-					center.y = spectatorPos.y + height - 1;
+					origin.x = spectatorPos.x + width - 1;
+					origin.y = spectatorPos.y + height - 1;
 					rayWidth = width - 2;
 					break;
 				case 1:
-					center.x = spectatorPos.x;
+					origin.x = spectatorPos.x;
 					rayWidth = height - 2;
 					break;
 				case 2:
-					center.y = spectatorPos.y;
+					origin.y = spectatorPos.y;
 					rayWidth = width - 2;
 					break;
 				case 3:
-					center.x = spectatorPos.x + width - 1;
+					origin.x = spectatorPos.x + width - 1;
 					rayWidth = height - 2;
 					break;
 			}
 		}
 		const char octant = quadrant << 1;
 		/// First half-quadrant
-		RefreshOctant(octant, center, sightRange);
+		RefreshOctant(octant, origin, sightRange);
 		/// Second half-quadrant
-		RefreshOctant(octant + 1, center, sightRange);
+		RefreshOctant(octant + 1, origin, sightRange);
 
 		/// calv FoV for asymmetric spectrator
 		if (rayWidth) {
-			ProceedRaysCast(octant, center, rayWidth, sightRange);
+			ProceedRaysCast(octant, origin, rayWidth, sightRange);
 		}
 	}
 }
@@ -233,12 +234,12 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
 {
 	SetEnvironment(octant, origin);
-	for (short x = -1; x >= -width; x--) {
-		for (short y = 0; y < range; y++) {
-			const bool isOnMap = SetCurrentTile(x, y);
+	for (short col = -1; col >= -width; col--) {
+		for (short row = 0; row < range; row++) {
+			const bool isOnMap = SetCurrentTile(col, row);
 			if (isOnMap) {
 				SetVisible();
-			}
+			} 
 			if (!isOnMap || IsTileOpaque()) { break; }
 		}
 	}
@@ -253,65 +254,66 @@ void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const s
 	while (!wrkQueue.empty()) {
 		SColumnPiece current = wrkQueue.front();
 		wrkQueue.pop();
-		if (current.x >= range) {
+		if (current.col >= range) {
 			continue;
 		}
-		CalcFoVForColumnPiece(current.x, current.TopVector, current.BottomVector, range, wrkQueue);
+		CalcFoVForColumnPiece(current.col, current.TopVector, current.BottomVector, range, wrkQueue);
 	}
 	ResetEnvironment();
 }
 
-void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector,
+void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec2i &bottomVector,
 										  const short range, std::queue<SColumnPiece> &wrkQueue)
 {
 	enum { cTop = true, cBottom = false };
-	short topY    = CalcY_ByVector(cTop, x, topVector);
-	short bottomY = CalcY_ByVector(cBottom, x, bottomVector);
+
+	short topRow    = CalcRow_ByVector(cTop, col, topVector);
+	short bottomRow = CalcRow_ByVector(cBottom, col, bottomVector);
 
 	enum { cInit, cYes, cNo } wasLastTileOpaque = cInit;
-	for (short y = topY; y >= bottomY; --y) {
-		const bool inRange = square(x) + square(y) < square(range);
-		const bool isOnMap = SetCurrentTile(x, y);
+	for (short row = topRow; row >= bottomRow; --row) {
+		const bool inRange = square(col) + square(row) < square(range);
+		const bool isOnMap = SetCurrentTile(col, row);
 		if (inRange && isOnMap) {
 			SetVisible();
 		}
-		bool isCurrentTileOpaque = !inRange || (isOnMap && IsTileOpaque());
+		const bool isTileOpaque = !inRange || (isOnMap && IsTileOpaque());
 		if (wasLastTileOpaque != cInit) {
-			if (isCurrentTileOpaque) {
+			if (isTileOpaque) {
 				if (wasLastTileOpaque == cNo) {
-					wrkQueue.push(SColumnPiece(x + 1, topVector, Vec2i(x * 2 - 1, y * 2 + 1)));
+					wrkQueue.push(SColumnPiece(col + 1, topVector, Vec2i(col * 2 - 1, row * 2 + 1)));
 				}
 			} else if (wasLastTileOpaque == cYes) {
-				topVector = {short (x * 2 + 1), short (y * 2 + 1)};
+				topVector = {short (col * 2 + 1), short (row * 2 + 1)};
 			}
 		}
-		wasLastTileOpaque = isCurrentTileOpaque ? cYes : cNo;
+		wasLastTileOpaque = isTileOpaque ? cYes : cNo;
 	}
 	if (wasLastTileOpaque == cNo) {
-		wrkQueue.push(SColumnPiece(x + 1, topVector, bottomVector));
+		wrkQueue.push(SColumnPiece(col + 1, topVector, bottomVector));
 	}
 }
 
-short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector) const
+short CFieldOfView::CalcRow_ByVector(const bool isTop, const short col, const Vec2i &vector) const
 {
-	short y;
-	if (x == 0) {
-		y = 0;
+	short row;
+	if (col == 0) {
+		row = 0;
 	} else {
-		// (x +|- 0.5) * (top|bot)_vector.y/(top|bot)_vector.x in integers
-		const short devidend  = (isTop ? (2 * x + 1) : (2 * x - 1)) * vector.y;
+		// (col +|- 0.5) * (top|bot)_vector.y/(top|bot)_vector.x in integers
+		const short devidend  = (isTop ? (2 * col + 1) : (2 * col - 1)) * vector.y;
 		const short devisor   = 2 * vector.x;
 		const short quotient  = devidend / devisor;
 		const short remainder = devidend % devisor;
 		// Round the result
 		if (isTop ? remainder > vector.x
 				  : remainder >= vector.x) {
-			y = quotient + 1;
+			row = quotient + 1;
 		} else {
-			y = quotient;
+			row = quotient;
 		}
 	}
-	return y;
+	return row;
 }
 
 void CFieldOfView::InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV)

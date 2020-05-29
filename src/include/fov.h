@@ -50,7 +50,11 @@ public:
 		Settings.OpaqueFields  = MapFieldOpaque;
 	}
 
-	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker);
+	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const int w, 
+				const int h, const int range, MapMarkerFunc *marker);
+	/** FIXME: change to this call:
+	** void Refresh(const CPlayer &player, const CUnit &unit, MapMarkerFunc *marker);
+	*/
 
 	enum { cShadowCasting = 0,  cSimpleRadial }; /// cSimpeRadial must be last. Add new types before it.
 
@@ -65,8 +69,8 @@ public:
 protected:
 private:
 	struct SColumnPiece {
-		SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : x(xValue), TopVector(top), BottomVector(bottom) {}
-		short x;
+		SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : col(xValue), TopVector(top), BottomVector(bottom) {}
+		short col;
 		Vec2i TopVector;
 		Vec2i BottomVector;
 	};
@@ -78,7 +82,7 @@ private:
 	void RefreshOctant(const char octant, const Vec2i &origin, const short range);
 	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector,
 							   const short range, std::queue<SColumnPiece> &wrkQueue);
-	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
+	short CalcRow_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
 
 	bool SetCurrentTile(const short x, const short y);
 	bool IsTileOpaque() const;
@@ -97,7 +101,7 @@ private:
 		unsigned short OpaqueFields;    /// Flags for opaque MapFields
 	} Settings;
 
-	Vec2i            currTilePos;       /// Current work tile pos in global system coordinates
+	Vec2i            currTilePos;       /// Current work tile pos in global (Map) system coordinates
 	char		 	 currOctant;        /// Current octant
 	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
 	unsigned short   OpaqueFields;      /// Flags for opaque MapTiles for current calculation
