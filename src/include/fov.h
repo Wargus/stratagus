@@ -43,25 +43,24 @@
 class CFieldOfView
 {
 public:
-
-	CFieldOfView() : currTilePos_GCS(0, 0), currOctant(0), Origin(0, 0), OpaqueFieldsFlags(0),
+	CFieldOfView() : currTilePos(0, 0), currOctant(0), Origin(0, 0), OpaqueFields(0),
                      Player(NULL), Unit(NULL), map_setFoV(NULL)  
     {
-        Settings.FoV_Type           = cSimpleRadial;
-        Settings.OpaqueFieldsFlags  = MapFieldOpaque;
+        Settings.FoV_Type      = cSimpleRadial;
+        Settings.OpaqueFields  = MapFieldOpaque;
     }
 	
-	void Calculate(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker);
+	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker);
     
     enum { cShadowCasting = 0,  cSimpleRadial }; /// cSimpeRadial must be last. Add new types before it.
 
     bool SetType(const unsigned short);
     unsigned short GetType() const;
 
-    void AddOpaqueFieldFlag(const unsigned short flag);
-    void RemoveOpaqueFieldFlag(const unsigned short flag);
-    void SetOpaqueFieldFlags(const unsigned short flags);
-    void ResetOpaqueFieldFlags();
+    void SetOpaqueFields(const unsigned short flags);
+    unsigned short GetOpaqueFields() const;
+
+    void ResetAdditionalOpaqueFields();
 	
 protected:
 private:
@@ -73,34 +72,36 @@ private:
 		Vec2i BottomVector;
 	};
 
-    void CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const;
-    void CalcShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
+    void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const;
+    void ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
 
-    void CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
-	void CalcFoVInOctant(const char octant, const Vec2i &origin, const short range);
+    void ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
+	void RefreshOctant(const char octant, const Vec2i &origin, const short range);
 	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
 								const short range, std::queue<SColumnPiece> &wrkQueue);
 	short CalcY_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
-    bool SwitchCurrentTileTo(const short x, const short y);
+    
+    bool SetCurrentTile(const short x, const short y);
 	bool IsTileOpaque() const;
-	void SetFoV() const;
+	void SetVisible() const;
+    
 	void InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV);
     void ResetShadowCaster();
 	void SetEnvironment(const char octant, const Vec2i &origin);
 	void ResetEnvironment();
 	/// Convert coordinates to global coordinate system
-	void Update_currTilePos_GCS(const short x, const short y);
+	void ProjectCurrentTile(const short x, const short y);
 
 private:
     struct {
-        unsigned short FoV_Type;
-        unsigned short OpaqueFieldsFlags;
+        unsigned short FoV_Type;        /// Type of field of view - Shadowcasting or simple radial
+        unsigned short OpaqueFields;    /// Flags for opaque MapFields 
     } Settings;
     
-    Vec2i            currTilePos_GCS;   /// Current work tile pos in global system coordinates
+    Vec2i            currTilePos;       /// Current work tile pos in global system coordinates
 	char		 	 currOctant;        /// Current octant
 	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
-    unsigned short   OpaqueFieldsFlags; /// 
+    unsigned short   OpaqueFields;      /// Flags for opaque MapTiles for current calculation
 	const CPlayer   *Player;			/// Pointer to player to set FoV for	
     const CUnit     *Unit;				/// Pointer to unit to calculate FoV for 
 	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
@@ -109,20 +110,18 @@ private:
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-extern CFieldOfView FieldOfView;
-
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-inline bool CFieldOfView::SwitchCurrentTileTo(const short x, const short y)
+inline bool CFieldOfView::SetCurrentTile(const short x, const short y)
 {
-    Update_currTilePos_GCS(x, y);
-    if (Map.Info.IsPointOnMap(currTilePos_GCS.x, currTilePos_GCS.y)) {
+    ProjectCurrentTile(x, y);
+    if (Map.Info.IsPointOnMap(currTilePos.x, currTilePos.y)) {
         return true;
     } else {
-        currTilePos_GCS = {0, 0};
+        currTilePos = {0, 0};
         return false;
     }
 }
@@ -130,27 +129,27 @@ inline bool CFieldOfView::SwitchCurrentTileTo(const short x, const short y)
 inline bool CFieldOfView::IsTileOpaque() const
 {
     /// FIXME: add high-/lowground
-    return (Map.Field(currTilePos_GCS.x, currTilePos_GCS.y)->Flags & OpaqueFieldsFlags);
+    return (Map.Field(currTilePos.x, currTilePos.y)->Flags & OpaqueFields);
 }
 
-inline void CFieldOfView::SetFoV() const
+inline void CFieldOfView::SetVisible() const
 {
-    map_setFoV(*Player, Map.getIndex(currTilePos_GCS.x, currTilePos_GCS.y));
+    map_setFoV(*Player, Map.getIndex(currTilePos.x, currTilePos.y));
 }
 
-inline void CFieldOfView::Update_currTilePos_GCS(const short x, const short y)
+inline void CFieldOfView::ProjectCurrentTile(const short x, const short y)
 {
     switch(currOctant) {
-        case 1:  currTilePos_GCS.x =  y; currTilePos_GCS.y =  x;
-        case 2:  currTilePos_GCS.x = -y; currTilePos_GCS.y =  x;
-        case 3:  currTilePos_GCS.x = -x; currTilePos_GCS.y =  y;
-        case 4:  currTilePos_GCS.x = -x; currTilePos_GCS.y = -y;
-        case 5:  currTilePos_GCS.x = -y; currTilePos_GCS.y = -x;
-        case 6:  currTilePos_GCS.x =  y; currTilePos_GCS.y = -x;
-        case 7:  currTilePos_GCS.x =  x; currTilePos_GCS.y = -y;
-        default: currTilePos_GCS.x =  x; currTilePos_GCS.y =  y;
+        case 1:  currTilePos.x =  y; currTilePos.y =  x;
+        case 2:  currTilePos.x = -y; currTilePos.y =  x;
+        case 3:  currTilePos.x = -x; currTilePos.y =  y;
+        case 4:  currTilePos.x = -x; currTilePos.y = -y;
+        case 5:  currTilePos.x = -y; currTilePos.y = -x;
+        case 6:  currTilePos.x =  y; currTilePos.y = -x;
+        case 7:  currTilePos.x =  x; currTilePos.y = -y;
+        default: currTilePos.x =  x; currTilePos.y =  y;
     }
-    currTilePos_GCS += Origin;
+    currTilePos += Origin;
 }    
 //@}
 

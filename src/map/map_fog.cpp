@@ -53,6 +53,7 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+CFieldOfView FieldOfView;
 
 int FogOfWarOpacity;				/// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
@@ -332,7 +333,7 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 */
 void MapSight(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
-	FieldOfView.Calculate(player, unit, pos, w, h, range, marker);
+	FieldOfView.Refresh(player, unit, pos, w, h, range, marker);
 }
 
 /**

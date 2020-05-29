@@ -41,11 +41,10 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-CFieldOfView FieldOfView;
 
-
-
-
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
 bool CFieldOfView::SetType(const unsigned short fov_type)
 {
 	if (fov_type == cSimpleRadial || fov_type == cShadowCasting) {
@@ -60,24 +59,22 @@ unsigned short CFieldOfView::GetType() const
 	return this->Settings.FoV_Type;
 }
 
-void CFieldOfView::AddOpaqueFieldFlag(const unsigned short flag)
+void CFieldOfView::SetOpaqueFields(const unsigned short flags)
 {
-	this->Settings.OpaqueFieldsFlags |= flag;
-}
-void CFieldOfView::RemoveOpaqueFieldFlag(const unsigned short flag)
-{
-	this->Settings.OpaqueFieldsFlags &= ~flag;
-}
-void CFieldOfView::SetOpaqueFieldFlags(const unsigned short flags)
-{
-	this->Settings.OpaqueFieldsFlags = flags;
-}
-void CFieldOfView::ResetOpaqueFieldFlags()
-{
-	this->Settings.OpaqueFieldsFlags = MapFieldOpaque;
+	this->Settings.OpaqueFields = flags;
 }
 
-void CFieldOfView::Calculate(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+unsigned short CFieldOfView::GetOpaqueFields() const
+{
+	return this->Settings.OpaqueFields;
+}
+
+void CFieldOfView::ResetAdditionalOpaqueFields()
+{
+	this->Settings.OpaqueFields = MapFieldOpaque;
+}
+
+void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
 	// Units under construction have no sight range.
 	if (!range) {
@@ -85,15 +82,15 @@ void CFieldOfView::Calculate(const CPlayer &player, const CUnit &unit, const Vec
 	}
 	if (this->Settings.FoV_Type == cShadowCasting && !unit.Type->AirUnit) {
 
-		OpaqueFieldsFlags = unit.Type->BoolFlag[RAISED_INDEX].value ? 0 : this->Settings.OpaqueFieldsFlags;
+		OpaqueFields = unit.Type->BoolFlag[RAISED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
-			OpaqueFieldsFlags &= ~(MapFieldRocks); /// because rocks-flag used as obstacle for ranged attackers
+			OpaqueFields &= ~(MapFieldRocks); /// because rocks-flag used as obstacle for ranged attackers
 		}
 		InitShadowCaster(&player, &unit, marker);
-		CalcShadowCasting(pos, w, h, range + 1);
+		ProceedShadowCasting(pos, w, h, range + 1);
 		ResetShadowCaster();
 	} else {
-		CalcSimpleRadial(player, pos, w, h, range, marker);
+		ProceedSimpleRadial(player, pos, w, h, range, marker);
 	}
 }
 
@@ -107,7 +104,7 @@ void CFieldOfView::Calculate(const CPlayer &player, const CUnit &unit, const Vec
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const
+void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const
 {
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
@@ -173,7 +170,7 @@ void CFieldOfView::CalcSimpleRadial(const CPlayer &player, const Vec2i &pos, int
 **  @param height           spectrator's height in tiles
 **  @param radius           Spectrator's sight ranger in tiles
 */
-void CFieldOfView::CalcShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range)
+void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range)
 {
 	enum SpectatorGeometry {cOneTiled, cEven, cOdd, cTall, cWide} ;
 	const int geometry = [width, height]{   if (width == height) {
@@ -196,12 +193,12 @@ void CFieldOfView::CalcShadowCasting(const Vec2i &spectatorPos, const short widt
 		center.y = spectatorPos.y + half;
 		sightRange += half - (geometry == cEven ? 1 : 0);
 	} else {
-		/// Fill spectator's tiles which not affected by CalcFoVInOctant and CalcFoVRaysCast
+		/// Fill spectator's tiles which not affected by RefreshOctant and ProceedRaysCast
 		ResetEnvironment();
 		for (short x = spectatorPos.x + 1; x < spectatorPos.x + width - 1; x++) {
 			for (short y = spectatorPos.y + 1; y < spectatorPos.y + height - 1; y++) {
-				if (SwitchCurrentTileTo(x, y)) {
-					SetFoV();
+				if (SetCurrentTile(x, y)) {
+					SetVisible();
 				}
 			}
 		}
@@ -240,26 +237,26 @@ void CFieldOfView::CalcShadowCasting(const Vec2i &spectatorPos, const short widt
 		}
 		const char octant = quadrant << 1;
 		/// First half-quadrant
-		CalcFoVInOctant(octant, center, sightRange);
+		RefreshOctant(octant, center, sightRange);
 		/// Second half-quadrant
-		CalcFoVInOctant(octant + 1, center, sightRange);
+		RefreshOctant(octant + 1, center, sightRange);
 
 		/// calv FoV for asymmetric spectrator
 		if (rayWidth) 
 		{
-			CalcFoVRaysCast(octant, center, rayWidth, sightRange);
+			ProceedRaysCast(octant, center, rayWidth, sightRange);
 		}
 	}
 }
 
-void CFieldOfView::CalcFoVRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
+void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
 {   
 	SetEnvironment(octant, origin);
 	for (short x = -1; x >= -width; x--) {
 		for (short y = 0; y < range; y++) {
-			const bool isOnMap = SwitchCurrentTileTo(x, y);
+			const bool isOnMap = SetCurrentTile(x, y);
 			if (isOnMap) {
-				SetFoV();
+				SetVisible();
 			}
 			if (!isOnMap || IsTileOpaque()) break;
 		}
@@ -267,7 +264,7 @@ void CFieldOfView::CalcFoVRaysCast(const char octant, const Vec2i &origin, const
 	ResetEnvironment();
 }
 
-void CFieldOfView::CalcFoVInOctant(const char octant, const Vec2i &origin, const short range)
+void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const short range)
 {
 	SetEnvironment(octant, origin);
 	std::queue<SColumnPiece> wrkQueue;
@@ -293,9 +290,9 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i
 	enum { cInit, cYes, cNo } wasLastTileOpaque = cInit;
 	for (short y = topY; y >= bottomY; --y) {
 		const bool inRange = square(x) + square(y) < square(range);
-		const bool isOnMap = SwitchCurrentTileTo(x, y);
+		const bool isOnMap = SetCurrentTile(x, y);
 		if (inRange && isOnMap) {
-			SetFoV();
+			SetVisible();
 		}
 		bool isCurrentTileOpaque = !inRange || (isOnMap && IsTileOpaque());
 		if (wasLastTileOpaque != cInit) {
@@ -349,7 +346,7 @@ void CFieldOfView::ResetShadowCaster()
 	Player 			= NULL;
 	Unit 			= NULL;
 	map_setFoV 		= NULL;
-	currTilePos_GCS = {0, 0};
+	currTilePos 	= {0, 0};
 
 	ResetEnvironment();
 }
