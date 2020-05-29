@@ -36,7 +36,7 @@
 #include "stratagus.h"
 
 #include "map.h"
-
+#include "fov.h"
 #include "iolib.h"
 #include "script.h"
 #include "tileset.h"
@@ -45,6 +45,11 @@
 #include "unit.h"
 #include "version.h"
 #include "video.h"
+
+/*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+extern CFieldOfView FieldOfView;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -242,16 +247,94 @@ static int CclSetMinimapTerrain(lua_State *l)
 }
 
 /**
-**  Unit's field of view algorithm - 'true' for shadow casting, 'false' for simple radial 
+**  Select unit's field of view algorithm -  ShadowCasting or SimpleRadial
 **
 **  @param l  Lua state.
 **
-**  @return   The old state of the flag
+**  @return   0 for success, 1 for wrong type;
 */
-static int CclSetFoVShadowCasting(lua_State *l)
+static int CclSetFieldOfViewType(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	FoVShadowCasting = LuaToBoolean(l, 1);
+	
+	unsigned short new_type = 0;
+	const char *type_name = LuaToString(l, 1);
+	if (!strcmp(type_name, "shadow-casting")) {
+		new_type |= CFieldOfView::cShadowCasting;
+	} else if (!strcmp(type_name, "simple-radial")) {
+		new_type |= CFieldOfView::cSimpleRadial;
+	} else {
+		PrintFunction();
+		fprintf(stdout, "Accessible Field of View types are \"shadow-casting\", \"simple-radial\".\n");
+		return 1;
+	}
+	FieldOfView.SetType(new_type);
+	return 0;
+}
+
+/**
+**  Set opaque for the tile's terrain.
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong tile's terrain;
+*/
+static int CclSetOpaqueFor(lua_State *l)
+{
+	unsigned short new_flag = 0;
+	const int args = lua_gettop(l);
+	if (args < 1) {
+		LuaError(l, "argument missed");
+		return 1;
+	}
+	for (int arg = 0; arg < args; ++arg) {
+		const char *flag_name = LuaToString(l, arg + 1);
+		if (!strcmp(flag_name, "wall")) {
+			new_flag |= MapFieldWall;
+		} else if (!strcmp(flag_name, "rock")) {
+			new_flag |= MapFieldRocks;
+		} else if (!strcmp(flag_name, "forest")) {
+			new_flag |= MapFieldForest;
+		} else {
+			PrintFunction();
+			fprintf(stdout, "Opaque may be set only for \"wall\", \"rock\" or \"forest\". \n");
+			return 1;
+		}
+	}
+	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() | new_flag);
+	return 0;
+}
+
+/**
+**  Remove opaque for the tile's terrain.
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong tile's terrain;
+*/
+static int CclRemoveOpaqueFor(lua_State *l)
+{
+	unsigned short new_flag = 0;
+	const int args = lua_gettop(l);
+	if (args < 1) {
+		LuaError(l, "argument missed");
+		return 1;
+	}
+	for (int arg = 0; arg < args; ++arg) {
+		const char *flag_name = LuaToString(l, arg + 1);
+		if (!strcmp(flag_name, "wall")) {
+			new_flag |= MapFieldWall;
+		} else if (!strcmp(flag_name, "rock")) {
+			new_flag |= MapFieldRocks;
+		} else if (!strcmp(flag_name, "forest")) {
+			new_flag |= MapFieldForest;
+		} else {
+			PrintFunction();
+			fprintf(stdout, "Opaque may be set only for \"wall\", \"rock\" or \"forest\". \n");
+			return 1;
+		}
+	}
+	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() & ~new_flag);
 	return 0;
 }
 
@@ -589,7 +672,9 @@ void MapCclRegister()
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
 
-	lua_register(Lua, "SetFoVShadowCasting", CclSetFoVShadowCasting);
+	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
+	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);
+	lua_register(Lua, "RemoveOpaqueFor", CclRemoveOpaqueFor);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
