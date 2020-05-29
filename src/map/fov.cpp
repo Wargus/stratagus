@@ -277,7 +277,7 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec
 		if (inRange && isOnMap) {
 			SetVisible();
 		}
-		const bool isTileOpaque = !inRange || (isOnMap && IsTileOpaque());
+		const bool isTileOpaque = !inRange || !isOnMap || IsTileOpaque();
 		if (wasLastTileOpaque != cInit) {
 			if (isTileOpaque) {
 				if (wasLastTileOpaque == cNo) {
