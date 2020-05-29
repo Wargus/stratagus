@@ -11,7 +11,7 @@
 /**@name fov.cpp - The field of view handling. */
 //
 //      (c) Copyright 2001-2020 by Joris Dauphin, JLutz Sammer,
-//		Vladi Shabanski, Russell Smith, Jimmy Salmon, Pali Rohár, Andrettin 
+//		Vladi Shabanski, Russell Smith, Jimmy Salmon, Pali Rohár, Andrettin
 //      and Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -159,12 +159,12 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, 
 			marker(player, mpos);
 #endif
 		}
-	}	
+	}
 }
 
 /**
 ** Mark the sight of unit by ShadowCaster algorithm. (Explore and make visible.)
-** 
+**
 **  @param spectratorPos    tile position of the spectrator unit - upper left corner for unit larger than 1x1
 **  @param width            spectrator's width in tiles
 **  @param height           spectrator's height in tiles
@@ -174,14 +174,14 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 {
 	enum SpectatorGeometry {cOneTiled, cEven, cOdd, cTall, cWide} ;
 	const int geometry = [width, height]{   if (width == height) {
-												if (width == 1) return cOneTiled;
-												if (width % 2)  return cOdd;
-												else            return cEven;
-											} 
-											if (width > height) return cWide;
-											else                return cTall;
-										}();
-	
+                                                if (width == 1) { return cOneTiled; }
+                                                if (width % 2)  { return cOdd; 		}
+                                                else            { return cEven; 	}
+                                            } 
+                                            if (width > height) { return cWide; 	}
+                                            else                { return cTall; 	}
+                                        }();										  
+
 	Vec2i center = {0, 0};
 	int sightRange = range;
 
@@ -214,22 +214,22 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 				case 3: center.x++; break;
 				default: break;  /// For quadrant 0 center is altready calculated
 			}
-		} else if(!isGeometrySymmetric) {
+		} else if (!isGeometrySymmetric) {
 			switch (quadrant) {
 				case 0:
 					center.x = spectatorPos.x + width - 1;
 					center.y = spectatorPos.y + height - 1;
 					rayWidth = width - 2;
-					break;  
-				case 1: 
-					center.x = spectatorPos.x; 
+					break;
+				case 1:
+					center.x = spectatorPos.x;
 					rayWidth = height - 2;
 					break;
-				case 2: 
-					center.y = spectatorPos.y; 
+				case 2:
+					center.y = spectatorPos.y;
 					rayWidth = width - 2;
 					break;
-				case 3: 
+				case 3:
 					center.x = spectatorPos.x + width - 1;
 					rayWidth = height - 2;
 					break;
@@ -242,15 +242,14 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 		RefreshOctant(octant + 1, center, sightRange);
 
 		/// calv FoV for asymmetric spectrator
-		if (rayWidth) 
-		{
+		if (rayWidth) {
 			ProceedRaysCast(octant, center, rayWidth, sightRange);
 		}
 	}
 }
 
 void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
-{   
+{
 	SetEnvironment(octant, origin);
 	for (short x = -1; x >= -width; x--) {
 		for (short y = 0; y < range; y++) {
@@ -258,7 +257,7 @@ void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const
 			if (isOnMap) {
 				SetVisible();
 			}
-			if (!isOnMap || IsTileOpaque()) break;
+			if (!isOnMap || IsTileOpaque()) { break; }
 		}
 	}
 	ResetEnvironment();
@@ -280,8 +279,8 @@ void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const s
 	ResetEnvironment();
 }
 
-void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector, 
-											const short range, std::queue<SColumnPiece> &wrkQueue)
+void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector,
+										  const short range, std::queue<SColumnPiece> &wrkQueue)
 {
 	enum { cTop = true, cBottom = false };
 	short topY    = CalcY_ByVector(cTop, x, topVector);
@@ -300,8 +299,7 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i
 				if (wasLastTileOpaque == cNo) {
 					wrkQueue.push(SColumnPiece(x + 1, topVector, Vec2i(x * 2 - 1, y * 2 + 1)));
 				}
-			}
-			else if (wasLastTileOpaque == cYes) {
+			} else if (wasLastTileOpaque == cYes) {
 				topVector = {short (x * 2 + 1), short (y * 2 + 1)};
 			}
 		}
@@ -316,7 +314,7 @@ short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i 
 {
 	short y;
 	if (x == 0) {
-			y = 0;
+		y = 0;
 	} else {
 		// (x +|- 0.5) * (top|bot)_vector.y/(top|bot)_vector.x in integers
 		const short devidend  = (isTop ? (2 * x + 1) : (2 * x - 1)) * vector.y;
@@ -324,7 +322,7 @@ short CFieldOfView::CalcY_ByVector(const bool isTop, const short x, const Vec2i 
 		const short quotient  = devidend / devisor;
 		const short remainder = devidend % devisor;
 		// Round the result
-		if (isTop ? remainder > vector.x 
+		if (isTop ? remainder > vector.x
 				  : remainder >= vector.x) {
 			y = quotient + 1;
 		} else {
@@ -361,7 +359,6 @@ void CFieldOfView::ResetEnvironment()
 {
 	Origin 		= {0, 0};
 	currOctant 	= 0;
-	
 }
 
 //@}
