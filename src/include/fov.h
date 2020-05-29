@@ -139,13 +139,13 @@ inline void CFieldOfView::SetVisible() const
 inline void CFieldOfView::ProjectCurrentTile(const short x, const short y)
 {
 	switch (currOctant) {
-		case 1:  currTilePos.x =  y; currTilePos.y =  x;
-		case 2:  currTilePos.x = -y; currTilePos.y =  x;
-		case 3:  currTilePos.x = -x; currTilePos.y =  y;
-		case 4:  currTilePos.x = -x; currTilePos.y = -y;
-		case 5:  currTilePos.x = -y; currTilePos.y = -x;
-		case 6:  currTilePos.x =  y; currTilePos.y = -x;
-		case 7:  currTilePos.x =  x; currTilePos.y = -y;
+		case 1:  currTilePos.x =  y; currTilePos.y =  x; break;
+		case 2:  currTilePos.x = -y; currTilePos.y =  x; break;
+		case 3:  currTilePos.x = -x; currTilePos.y =  y; break;
+		case 4:  currTilePos.x = -x; currTilePos.y = -y; break;
+		case 5:  currTilePos.x = -y; currTilePos.y = -x; break;
+		case 6:  currTilePos.x =  y; currTilePos.y = -x; break;
+		case 7:  currTilePos.x =  x; currTilePos.y = -y; break;
 		default: currTilePos.x =  x; currTilePos.y =  y;
 	}
 	currTilePos += Origin;
