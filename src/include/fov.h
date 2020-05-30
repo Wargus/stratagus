@@ -57,7 +57,7 @@ public:
 	*/
 
 	/// Select algorithm for field of view
-	enum { cShadowCasting = 0,  cSimpleRadial }; /// cSimpeRadial must be last. Add new types before it.
+	enum { cShadowCasting = 0,  cSimpleRadial, cFoVTypesCount }; 
 	bool SetType(const unsigned short);
 	unsigned short GetType() const;
 
@@ -81,7 +81,7 @@ private:
 	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, int range, MapMarkerFunc *marker) const;
 	/// Calc whole chadow casting field of view
 	void ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
-	/// Calc field of view for set of set of lines along x or y. 
+	/// Calc field of view for set of lines along x or y. 
 	/// Used for calc part of FoV for assymetric (widht != height) spectators.
 	void ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
 	/// Calc shadow casting field of view for single octant

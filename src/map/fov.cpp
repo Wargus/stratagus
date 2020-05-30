@@ -45,35 +45,73 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+/** 
+** Select which type of Field of View to use
+** 
+** @param fov_type	type to set
+** @return true if success, false for wrong fov_type 
+*/
 bool CFieldOfView::SetType(const unsigned short fov_type)
 {
-	if (fov_type == cSimpleRadial || fov_type == cShadowCasting) {
+	if (fov_type < cFoVTypesCount) {
 		this->Settings.FoV_Type = fov_type;
 		return true;
 	} else {
 		return false;
 	}
 }
+
+/** 
+** Returns used type of Field of View 
+** 
+** @return current Field of View type
+*/
 unsigned short CFieldOfView::GetType() const
 {
 	return this->Settings.FoV_Type;
 }
 
+/** 
+** Set additional opaque map field flags (which terrains will be opaque)
+** 
+** @param flags	Terrain flags to set as opaque (MapField*)
+*/
 void CFieldOfView::SetOpaqueFields(const unsigned short flags)
 {
 	this->Settings.OpaqueFields = flags;
 }
 
+/** 
+** Returns current set of opaque map field flags
+** 
+** @return Set of terrain flags
+*/
 unsigned short CFieldOfView::GetOpaqueFields() const
 {
 	return this->Settings.OpaqueFields;
 }
 
+/** 
+** Reset opaque map field flags to default (MapfieldOpaque)
+** 
+*/
 void CFieldOfView::ResetAdditionalOpaqueFields()
 {
 	this->Settings.OpaqueFields = MapFieldOpaque;
 }
 
+/**
+**  Refresh the whole field of view for unit (Explore and make visible.)
+**
+**  @param player  player to mark the sight for
+**	@param unit    unit to mark the sight for
+**  @param pos     location to mark
+**  @param width   width to mark, in square
+**  @param height  height to mark, in square
+**  @param range   Radius to mark.
+**  @param marker  Function to mark or unmark sight
+*/
 void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
 							const short height, const short range, MapMarkerFunc *marker)
 {
@@ -96,13 +134,13 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 }
 
 /**
-**  Mark the sight of unit by SimleRadial algorithm. (Explore and make visible.)
+**  Refresh the whole sight of unit by SimleRadial algorithm. (Explore and make visible.)
 **
 **  @param player  player to mark the sight for (not unit owner)
 **  @param pos     location to mark
 **  @param w       width to mark, in square
 **  @param h       height to mark, in square
-**  @param range   Radius to mark.
+**  @param range   Radius to mark (sight range)
 **  @param marker  Function to mark or unmark sight
 */
 void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, MapMarkerFunc *marker) const
@@ -148,10 +186,10 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, 
 /**
 ** Mark the sight of unit by ShadowCaster algorithm. (Explore and make visible.)
 **
-**  @param spectratorPos    tile position of the spectrator unit - upper left corner for unit larger than 1x1
-**  @param width            spectrator's width in tiles
-**  @param height           spectrator's height in tiles
-**  @param radius           Spectrator's sight ranger in tiles
+**  @param spectratorPos	Tile position of the spectrator unit - upper left corner for unit larger than 1x1
+**  @param width			Spectrator's width in tiles
+**  @param height			Spectrator's height in tiles
+**  @param range			Spectrator's sight range in tiles
 */
 void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range)
 {
@@ -231,6 +269,16 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 	}
 }
 
+/**
+**  Calc field of view for set of lines along x or y. 
+**	Used for calc part of FoV for assymetric (widht != height) spectators.
+**
+**  @param octant	Current work octant
+**	@param origin	Tile position of the spectrator
+**  @param width	Spectrator's width in tiles
+**  @param height	Spectrator's height in tiles
+**  @param range	Spectrator's sight range in tiles
+*/
 void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
 {
 	SetEnvironment(octant, origin);
@@ -246,6 +294,13 @@ void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const
 	ResetEnvironment();
 }
 
+/**
+**  Calc shadow casting field of view for single octant
+**
+**  @param octant	Octant to calc for
+**	@param origin	Tile position of the spectrator
+**  @param range	Spectrator's sight range in tiles
+*/
 void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const short range)
 {
 	SetEnvironment(octant, origin);
@@ -262,6 +317,15 @@ void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const s
 	ResetEnvironment();
 }
 
+/**
+**  Calc shadow casting for portion of column
+**
+**  @param col  		Column in current octant
+**	@param topVector  	Top direction vector
+**	@param bottomVector Top direction vector
+**  @param range		Spectrator's sight range in tiles
+**	@param wrkQueue		Queue with all column pieces
+*/
 void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec2i &bottomVector,
 										  const short range, std::queue<SColumnPiece> &wrkQueue)
 {
@@ -294,6 +358,14 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec
 	}
 }
 
+/**
+**  Recalculate top or bottom direction vector
+**
+**  @param isTop	Flag to determine Top or Bottom direction vector is proceed
+**	@param col		Current column
+**	@param vector	Current direction vector
+**	@return 		Row (Y-value) for new direction vector
+*/
 short CFieldOfView::CalcRow_ByVector(const bool isTop, const short col, const Vec2i &vector) const
 {
 	short row;
@@ -316,6 +388,13 @@ short CFieldOfView::CalcRow_ByVector(const bool isTop, const short col, const Ve
 	return row;
 }
 
+/**
+**  Init ShadowCaster for current refreshing of FoV
+**
+**  @param player	Player to mark the sight for
+**	@param unit		Unit to mark the sight for
+**	@param setFoV	Function to mark or unmark sight
+*/
 void CFieldOfView::InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV)
 {
 	Player 		= player;
@@ -333,6 +412,12 @@ void CFieldOfView::ResetShadowCaster()
 	ResetEnvironment();
 }
 
+/**
+**  Update values of Octant and Origin for current working set
+**
+**  @param octant	Octant to calc for
+**	@param origin	Tile position of the spectrator
+*/
 void CFieldOfView::SetEnvironment(const char octant, const Vec2i &origin)
 {
 	Origin  	= origin;
