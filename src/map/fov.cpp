@@ -74,8 +74,8 @@ void CFieldOfView::ResetAdditionalOpaqueFields()
 	this->Settings.OpaqueFields = MapFieldOpaque;
 }
 
-void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const int w, 
-							const int h, const int range, MapMarkerFunc *marker)
+void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
+							const short height, const short range, MapMarkerFunc *marker)
 {
 	// Units under construction have no sight range.
 	if (!range) {
@@ -88,10 +88,10 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 			OpaqueFields &= ~(MapFieldRocks); /// because rocks-flag used as obstacle for ranged attackers
 		}
 		InitShadowCaster(&player, &unit, marker);
-		ProceedShadowCasting(pos, w, h, range + 1);
+		ProceedShadowCasting(pos, width, height, range + 1);
 		ResetShadowCaster();
 	} else {
-		ProceedSimpleRadial(player, pos, w, h, range, marker);
+		ProceedSimpleRadial(player, pos, width, height, range, marker);
 	}
 }
 
@@ -105,7 +105,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const
+void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, MapMarkerFunc *marker) const
 {
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);

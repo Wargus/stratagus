@@ -49,25 +49,27 @@ public:
 		Settings.FoV_Type      = cSimpleRadial;
 		Settings.OpaqueFields  = MapFieldOpaque;
 	}
-
-	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const int w, 
-				const int h, const int range, MapMarkerFunc *marker);
+	/// Refresh field of view
+	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
+				const short height, const short range, MapMarkerFunc *marker);
 	/** FIXME: change to this call:
 	** void Refresh(const CPlayer &player, const CUnit &unit, MapMarkerFunc *marker);
 	*/
 
+	/// Select algorithm for field of view
 	enum { cShadowCasting = 0,  cSimpleRadial }; /// cSimpeRadial must be last. Add new types before it.
-
 	bool SetType(const unsigned short);
 	unsigned short GetType() const;
 
+	/// Set opaque map field flags (which fields will be opaque)
 	void SetOpaqueFields(const unsigned short flags);
 	unsigned short GetOpaqueFields() const;
-
+	/// Reset opaque flags to default (MapFieldOpaque)
 	void ResetAdditionalOpaqueFields();
 
 protected:
 private:
+	/// Struct for portion of column. Used in FoV calculations
 	struct SColumnPiece {
 		SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : col(xValue), TopVector(top), BottomVector(bottom) {}
 		short col;
@@ -75,29 +77,40 @@ private:
 		Vec2i BottomVector;
 	};
 
-	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker) const;
+	/// Calc whole simple radial field of view
+	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, int range, MapMarkerFunc *marker) const;
+	/// Calc whole chadow casting field of view
 	void ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
-
+	/// Calc field of view for set of set of lines along x or y. 
+	/// Used for calc part of FoV for assymetric (widht != height) spectators.
 	void ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
+	/// Calc shadow casting field of view for single octant
 	void RefreshOctant(const char octant, const Vec2i &origin, const short range);
-	void CalcFoVForColumnPiece(const short x, Vec2i &topVector, Vec2i &bottomVector,
+	/// Calc shadow casting for portion of column 
+	void CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec2i &bottomVector,
 							   const short range, std::queue<SColumnPiece> &wrkQueue);
+	/// Recalculate top or bottom direction vectors
 	short CalcRow_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
 
-	bool SetCurrentTile(const short x, const short y);
+	/// Recalculate coordinates and set current MapTile for [col, row]
+	bool SetCurrentTile(const short col, const short row);
+	/// Check if current MapTile opaque
 	bool IsTileOpaque() const;
+	/// Mark current MapTile visible
 	void SetVisible() const;
 
+	/// Init ShadowCaster for current refreshing of FoV
 	void InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV);
 	void ResetShadowCaster();
+	/// Update values of Octant and Origin for current working set
 	void SetEnvironment(const char octant, const Vec2i &origin);
 	void ResetEnvironment();
-	/// Convert coordinates to global coordinate system
-	void ProjectCurrentTile(const short x, const short y);
+	/// Project [col,row] coordinates from current octant to global (Map) coordinate system and accordingly update position of current MapTile
+	void ProjectCurrentTile(const short col, const short row);
 
 private:
 	struct {
-		unsigned short FoV_Type;        /// Type of field of view - Shadowcasting or simple radial
+		unsigned short FoV_Type;        /// Type of field of view - Shadowcasting or Simple Radial
 		unsigned short OpaqueFields;    /// Flags for opaque MapFields
 	} Settings;
 
@@ -118,9 +131,9 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-inline bool CFieldOfView::SetCurrentTile(const short x, const short y)
+inline bool CFieldOfView::SetCurrentTile(const short col, const short row)
 {
-	ProjectCurrentTile(x, y);
+	ProjectCurrentTile(col, row);
 	if (Map.Info.IsPointOnMap(currTilePos.x, currTilePos.y)) {
 		return true;
 	} else {
@@ -140,17 +153,17 @@ inline void CFieldOfView::SetVisible() const
 	map_setFoV(*Player, Map.getIndex(currTilePos.x, currTilePos.y));
 }
 
-inline void CFieldOfView::ProjectCurrentTile(const short x, const short y)
+inline void CFieldOfView::ProjectCurrentTile(const short col, const short row)
 {
 	switch (currOctant) {
-		case 1:  currTilePos.x =  y; currTilePos.y =  x; break;
-		case 2:  currTilePos.x = -y; currTilePos.y =  x; break;
-		case 3:  currTilePos.x = -x; currTilePos.y =  y; break;
-		case 4:  currTilePos.x = -x; currTilePos.y = -y; break;
-		case 5:  currTilePos.x = -y; currTilePos.y = -x; break;
-		case 6:  currTilePos.x =  y; currTilePos.y = -x; break;
-		case 7:  currTilePos.x =  x; currTilePos.y = -y; break;
-		default: currTilePos.x =  x; currTilePos.y =  y;
+		case 1:  currTilePos.x =  row; currTilePos.y =  col; break;
+		case 2:  currTilePos.x = -row; currTilePos.y =  col; break;
+		case 3:  currTilePos.x = -col; currTilePos.y =  row; break;
+		case 4:  currTilePos.x = -col; currTilePos.y = -row; break;
+		case 5:  currTilePos.x = -row; currTilePos.y = -col; break;
+		case 6:  currTilePos.x =  row; currTilePos.y = -col; break;
+		case 7:  currTilePos.x =  col; currTilePos.y = -row; break;
+		default: currTilePos.x =  col; currTilePos.y =  row;
 	}
 	currTilePos += Origin;
 }
