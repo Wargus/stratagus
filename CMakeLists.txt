@@ -714,6 +714,11 @@ else()
 	set(PIXMAPSDIRABS "${PIXMAPSDIR}")
 endif()
 
+if (WIN32)
+  	set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SDL2main_LIBRARY})
+  	message(${SDL2_LIBRARY})
+endif()
+
 # Stratagus definitions
 
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
@@ -809,6 +814,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
+endif()
+if(WIN32 AND MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Profile")
@@ -1066,7 +1074,7 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++ -Wl,--stack,10485760")
 endif()
 
-if(APPLE)
+if(APPLE OR WIN32)
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
 endif()
 

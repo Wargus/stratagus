@@ -13,6 +13,13 @@ find_library(SDL2_LIBRARY_TEMP
   PATH_SUFFIXES lib
 )
 
+find_library(SDL2main_LIBRARY
+  NAMES SDL2main
+  HINTS
+    ENV SDLDIR
+  PATH_SUFFIXES lib
+)
+
 # SDL may require threads on your system.
 # The Apple build may not need an explicit flag because one of the
 # frameworks may already provide it.
@@ -84,4 +91,4 @@ else (THEORA_FOUND)
   endif (SDL2_FIND_REQUIRED)
 endif (SDL2_FOUND)
 
-MARK_AS_ADVANCED(SDL2_INCLUDE_DIR SDL2_LIBRARY)
+MARK_AS_ADVANCED(SDL2_INCLUDE_DIR SDL2_LIBRARY SDL2main_LIBRARY)

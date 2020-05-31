@@ -283,25 +283,6 @@ void InitVideoSdl()
 		signal(SIGSEGV, CleanExit);
 		signal(SIGABRT, CleanExit);
 #endif
-#ifdef USE_WIN32
-		HWND hwnd = NULL;
-		HICON hicon = NULL;
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-
-		if (SDL_GetWMInfo(&info)) {
-			hwnd = info.window;
-		}
-
-		if (hwnd) {
-			hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
-		}
-
-		if (hicon) {
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
-			SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
-		}
-#endif
 	}
 
 	// Initialize the display
@@ -351,6 +332,26 @@ void InitVideoSdl()
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 	}
 	Video.ResizeScreen(Video.Width, Video.Height);
+
+// #ifdef USE_WIN32
+// 	HWND hwnd = NULL;
+// 	HICON hicon = NULL;
+// 	SDL_SysWMinfo info;
+// 	SDL_VERSION(&info.version);
+
+// 	if (SDL_GetWindowWMInfo(TheWindow, &info)) {
+// 		hwnd = info.win.window;
+// 	}
+
+// 	if (hwnd) {
+// 		hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
+// 	}
+
+// 	if (hicon) {
+// 		SendMessage(hwnd, (UINT)WM_SETICON, ICON_SMALL, (LPARAM)hicon);
+// 		SendMessage(hwnd, (UINT)WM_SETICON, ICON_BIG, (LPARAM)hicon);
+// 	}
+// #endif
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 
