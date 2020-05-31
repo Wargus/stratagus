@@ -51,6 +51,7 @@
 #include "unit_find.h"
 #include "unittype.h"
 #include "upgrade.h"
+#include "network.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -783,8 +784,10 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table;
 
-	if (!CheckDependByType(*AiPlayer->Player, what)) {
-		return false;
+	if (Preference.AiChecksDependencies || IsNetworkGame()) {
+		if (!CheckDependByType(*AiPlayer->Player, what)) {
+			return false;
+		}
 	}
 
 	// Remove all units already doing something.

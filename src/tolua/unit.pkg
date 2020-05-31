@@ -32,6 +32,7 @@ class CPreference
 	bool DeselectInMine;
 	bool NoStatusLineTooltips;
 	bool SimplifiedAutoTargeting;
+	bool AiChecksDependencies;
 
 	unsigned int ShowOrders;
 	unsigned int ShowNameDelay;
