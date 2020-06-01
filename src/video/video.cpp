@@ -93,11 +93,6 @@
 #include "map.h"
 #include "ui.h"
 
-extern "C" {
-#include "hqx/src/hqx.h"
-}
-#include "xbrz/xbrz.h"
-
 #include "SDL.h"
 
 /*----------------------------------------------------------------------------
@@ -283,9 +278,6 @@ bool CVideo::ResizeScreen(int w, int h)
 
 	// new surface
 	if (TheScreen) {
-		if (TheScreen->userdata) {
-			free(TheScreen->userdata);
-		}
 		SDL_FreeSurface(TheScreen);
 	}
 	TheScreen = SDL_CreateRGBSurface(0, w, h, 32,
@@ -294,7 +286,6 @@ bool CVideo::ResizeScreen(int w, int h)
 									 0x000000ff,
 									 0); // 0xff000000);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
-	TheScreen->userdata = calloc(w * Scale * h * Scale, sizeof(Uint32));
 
 	// new texture
 	if (TheTexture) {
@@ -303,7 +294,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	TheTexture = SDL_CreateTexture(TheRenderer,
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
-	                               w * Scale, h * Scale);
+	                               w, h);
 
 	SetClipping(0, 0, w - 1, h - 1);
 
@@ -484,266 +475,5 @@ void RestoreColorCyclingSurface()
 
 
 #endif
-
-void* NullScaler(SDL_Surface *s) {
-	return s->pixels;
-}
-
-void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *s) {
-	Assert(Video.Scale == 2);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32*) s->pixels;
-	Uint32 *out = (Uint32*) s->userdata;
-	int inputW = s->w;
-	int outputW = s->w * 2;
-
-	// Just the algo from wikipedia.
-	//
-	// Input  +-----+-----+-----+
-	//        |     |  A  |     |
-	//        +-----+-----+-----+
-	//        |  C  |  P  |  B  |
-	//        +-----+-----+-----+
-	//        |     |  D  |     |
-	//        +-----+-----+-----+
-	//                ||
-	// Output    +-----+-----+
-	// for P     |  o1 |  o2 |
-	//           +-----+-----+
-	//           |  o3 |  o4 |
-	//           +-----+-----+
-#pragma omp parallel for
-	for (int y = 1; y < Video.Height - 1; y++) {
-		int y2 = y * 2;
-		Uint32 a, b, c, d, p, o1, o2, o3, o4;
-		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 2) {
-			o1 = o2 = o3 = o4 = p = in[x + y * inputW];
-			a = in[x + (y - 1) * inputW];
-			b = in[x + 1 + y * inputW];
-			c = in[x - 1 + y * inputW];
-			d = in[x + (y + 1) * inputW];
-			if ((c == a) && (c != d) && (a != b)) {
-				o1 = a;
-			}
-			if ((a == b) && (a != c) && (b != d)) {
-				o2 = b;
-			}
-			if ((d == c) && (d != b) && (c != a)) {
-				o3 = c;
-			}
-			if ((b == d) && (b != a) && (d != c)) {
-				o4 = d;
-			}
-			out[x2 + y2 * outputW] = o1;
-			out[x2 + 1 + y2 * outputW] = o2;
-			out[x2 + (y2 + 1) * outputW] = o3;
-			out[x2 + 1 + (y2 + 1) * outputW] = o4;
-		}
-	}
-
-	return out;
-}
-
-void* Scale3x_AdvMame3x_Scaler(SDL_Surface *s) {
-	Assert(Video.Scale == 3);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32*) s->pixels;
-	Uint32 *out = (Uint32*) s->userdata;
-	int inputW = s->w;
-	int outputW = s->w * 3;
-
-	// Just the algo from wikipedia.
-	//
-	// Input  +-----+-----+-----+
-	//        |  A  |  B  |  C  |
-	//        +-----+-----+-----+
-	//        |  D  |  E  |  F  |
-	//        +-----+-----+-----+
-	//        |  G  |  H  |  I  |
-	//        +-----+-----+-----+
-	//                ||
-	// Output +-----+-----+-----+
-	//        |  1  |  2  |  3  |
-	//        +-----+-----+-----+
-	//        |  4  |  5  |  6  |
-	//        +-----+-----+-----+
-	//        |  7  |  8  |  9  |
-	//        +-----+-----+-----+
-
-#pragma omp parallel for num_threads(4)
-	for (int y = 1; y < Video.Height - 1; y++) {
-		int y2 = y * 3;
-		Uint32 a, b, c, d, e, f, g, h, i, o1, o2, o3, o4, o5, o6, o7, o8, o9;
-		for (int x = 1, x2 = 1; x < Video.Width - 1; x++, x2 += 3) {
-			o1 = o2 = o3 = o4 = o5 = o6 = o7 = o8 = o9 = e = in[x + y * inputW];
-			a = in[x - 1 + (y - 1) * inputW];
-			b = in[x     + (y - 1) * inputW];
-			c = in[x + 1 + (y - 1) * inputW];
-			d = in[x - 1 +  y      * inputW];
-			f = in[x + 1 +  y      * inputW];
-			g = in[x - 1 + (y + 1) * inputW];
-			h = in[x     + (y + 1) * inputW];
-			i = in[x + 1 + (y + 1) * inputW];
-
-			if (d == b && d != h && b != f) {
-				o1 = d;
-				if (e != c) {
-					o2 = b;
-				}
-				if (e != g) {
-					o4 = d;
-				}
-			}
-			if (b == f && b != d && f != h) {
-				o3 = f;
-				if (e != a) {
-					o2 = b;
-				}
-				if (e != i) {
-					o6 = f;
-				}
-			}
-			if (h == d && h != f && d != b) {
-				o7 = d;
-				if (e != a) {
-					o4 = d;
-				}
-				if (e != i) {
-					o8 = h;
-				}
-			}
-			if (f == h && f != b && h != d) {
-				o9 = f;
-				if (e != c) {
-					o6 = f;
-				}
-				if (e != g) {
-					o8 = h;
-				}
-			}
-
-			out[x2 - 1 + (y2 - 1) * outputW] = o1;
-			out[x2     + (y2 - 1) * outputW] = o2;
-			out[x2 + 1 + (y2 - 1) * outputW] = o3;
-			out[x2 - 1 +  y2      * outputW] = o4;
-			out[x2     +  y2      * outputW] = o5;
-			out[x2 + 1 +  y2      * outputW] = o6;
-			out[x2 - 1 + (y2 + 1) * outputW] = o7;
-			out[x2     + (y2 + 1) * outputW] = o8;
-			out[x2 + 1 + (y2 + 1) * outputW] = o9;
-		}
-	}
-
-	return out;
-}
-
-static bool hqxInitialized = false;
-
-void *Hq2x_Scaler(SDL_Surface *s) {
-	if (!hqxInitialized) {
-		hqxInitialized = true;
-		hqxInit();
-	}
-	// these shifts are the hqx ARGBtoAYUV hardcoded values
-	Assert(s->format->Ashift == 24);
-	Assert(s->format->Rshift == 16);
-	Assert(s->format->Gshift == 8);
-	Assert(s->format->Bshift == 0);
-	Assert(Video.Scale == 2);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32 *)s->pixels;
-	Uint32 *out = (Uint32 *)s->userdata;
-	hq2x_32(in, out, Video.Width, Video.Height);
-	return out;
-}
-
-void *Hq3x_Scaler(SDL_Surface *s) {
-	if (!hqxInitialized) {
-		hqxInitialized = true;
-		hqxInit();
-	}
-	// these shifts are the hqx ARGBtoAYUV hardcoded values
-	Assert(s->format->Ashift == 24);
-	Assert(s->format->Rshift == 16);
-	Assert(s->format->Gshift == 8);
-	Assert(s->format->Bshift == 0);
-	Assert(Video.Scale == 3);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32 *)s->pixels;
-	Uint32 *out = (Uint32 *)s->userdata;
-	hq3x_32(in, out, Video.Width, Video.Height);
-	return out;
-}
-
-void *Hq4x_Scaler(SDL_Surface *s) {
-	if (!hqxInitialized) {
-		hqxInitialized = true;
-		hqxInit();
-	}
-	// these shifts are the hqx ARGBtoAYUV hardcoded values
-	Assert(s->format->Ashift == 24);
-	Assert(s->format->Rshift == 16);
-	Assert(s->format->Gshift == 8);
-	Assert(s->format->Bshift == 0);
-	Assert(Video.Scale == 4);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32 *)s->pixels;
-	Uint32 *out = (Uint32 *)s->userdata;
-	hq4x_32(in, out, Video.Width, Video.Height);
-	return out;
-}
-
-void *XBRZ2x_Scaler(SDL_Surface *s) {
-	Assert(s->format->Ashift == 24);
-	Assert(s->format->Rshift == 16);
-	Assert(s->format->Gshift == 8);
-	Assert(s->format->Bshift == 0);
-	Assert(Video.Scale == 2);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32 *)s->pixels;
-	Uint32 *out = (Uint32 *)s->userdata;
-
-	int sliceHeight = 40;
-	int stepEnd = Video.Height - sliceHeight - 2;
-	int maxHeight = Video.Height;
-	int stepSize = sliceHeight;
-#pragma omp parallel for
-	for (int y = 0; y <= maxHeight; y += stepSize) {
-		xbrz::scale(2, in, out, Video.Width, Video.Height, xbrz::ColorFormat::RGB,
-					xbrz::ScalerCfg(), y, std::min(y + sliceHeight, maxHeight)); // we ignore the alpha channel
-	}
-
-	return out;
-}
-
-void *XBRZ3x_Scaler(SDL_Surface *s) {
-	Assert(s->format->Ashift == 24);
-	Assert(s->format->Rshift == 16);
-	Assert(s->format->Gshift == 8);
-	Assert(s->format->Bshift == 0);
-	Assert(Video.Scale == 3);
-	Assert(s->format->BitsPerPixel == 32);
-
-	Uint32 *in = (Uint32 *)s->pixels;
-	Uint32 *out = (Uint32 *)s->userdata;
-
-	int sliceHeight = 40;
-	int stepEnd = Video.Height - sliceHeight - 2;
-	int maxHeight = Video.Height;
-	int stepSize = sliceHeight;
-#pragma omp parallel for
-	for (int y = 0; y <= maxHeight; y += stepSize) {
-		xbrz::scale(3, in, out, Video.Width, Video.Height, xbrz::ColorFormat::RGB,
-					xbrz::ScalerCfg(), y, std::min(y + sliceHeight, maxHeight)); // we ignore the alpha channel
-	}
-
-	return out;
-}
 
 //@}

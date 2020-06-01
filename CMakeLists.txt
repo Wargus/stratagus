@@ -342,16 +342,7 @@ set(video_SRCS
 	src/video/sdl.cpp
 	src/video/video.cpp
 )
-set(hqx_SRCS
-	src/third_party/hqx/src/init.c
-	src/third_party/hqx/src/hq2x.c
-	src/third_party/hqx/src/hq3x.c
-	src/third_party/hqx/src/hq4x.c
-)
-set(xbrz_SRCS
-	src/third_party/xbrz/xbrz.cpp
-)
-source_group(video FILES ${video_SRCS} ${hqx_SRCS} ${xbrz_SRCS})
+source_group(video FILES ${video_SRCS})
 
 set(win32_SRCS
 	src/win32/SetupConsole_win32.cpp

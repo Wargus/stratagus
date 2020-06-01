@@ -452,8 +452,6 @@ static void Usage()
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode. Optionally takes a window size in <xres>x<yres>\n"
-		"\t-x\tPostprocessing. Currently available\n"
-		"\t\tscale2x - Double thei nternal pixel the output using the AdvMAME2x scaler.\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -500,7 +498,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:W?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -601,30 +599,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				}
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
-				continue;
-		    case 'x':
-				if (!strcmp(optarg, "scale2x")) {
-					Video.Scale = 2;
-					Video.Scaler = Epx_Scale2x_AdvMame2x_Scaler;
-				} else if (!strcmp(optarg, "scale3x")) {
-					Video.Scale = 3;
-					Video.Scaler = Scale3x_AdvMame3x_Scaler;
-				} else if (!strcmp(optarg, "hq2x")) {
-					Video.Scale = 2;
-					Video.Scaler = Hq2x_Scaler;
-				} else if (!strcmp(optarg, "hq3x")) {
-					Video.Scale = 3;
-					Video.Scaler = Hq3x_Scaler;
-				} else if (!strcmp(optarg, "hq4x")) {
-					Video.Scale = 4;
-					Video.Scaler = Hq4x_Scaler;
-				} else if (!strcmp(optarg, "xbrz2x")) {
-					Video.Scale = 2;
-					Video.Scaler = XBRZ2x_Scaler;
-				} else if (!strcmp(optarg, "xbrz3x")) {
-					Video.Scale = 3;
-					Video.Scaler = XBRZ3x_Scaler;
-				}
 				continue;
 			case -1:
 				break;

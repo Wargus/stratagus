@@ -324,13 +324,17 @@ void InitVideoSdl()
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
 	}
-	if (!TheRenderer) TheRenderer = SDL_CreateRenderer(TheWindow, -1, 0);
-	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-	if (Video.Scaler != NullScaler) {
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
-	} else {
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	if (!TheRenderer) {
+		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	}
+	SDL_RendererInfo rendererInfo;
+	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
+	if(!strncmp(rendererInfo.name, "opengl", 6)) {
+		puts("[Renderer] Got OpenGL");
+	}
+	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	Video.ResizeScreen(Video.Width, Video.Height);
 
 // #ifdef USE_WIN32
@@ -654,7 +658,7 @@ void RealizeVideoMemory()
 {
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-		SDL_UpdateTexture(TheTexture, NULL, Video.Scaler(TheScreen), TheScreen->pitch * Video.Scale);
+		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
 		SDL_RenderClear(TheRenderer);
 		//for (int i = 0; i < NumRects; i++)
 		//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);

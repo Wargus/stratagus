@@ -209,19 +209,10 @@ struct EventCallback {
 #define AMASK   0x000000ff
 #endif
 
-extern void* NullScaler(SDL_Surface *pixels);
-extern void* Epx_Scale2x_AdvMame2x_Scaler(SDL_Surface *pixels);
-extern void* Scale3x_AdvMame3x_Scaler(SDL_Surface *pixels);
-extern void* Hq2x_Scaler(SDL_Surface *pixels);
-extern void* Hq3x_Scaler(SDL_Surface *pixels);
-extern void* Hq4x_Scaler(SDL_Surface *pixels);
-extern void* XBRZ2x_Scaler(SDL_Surface *pixels);
-extern void* XBRZ3x_Scaler(SDL_Surface *pixels);
-
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), Depth(0), Scale(1), Scaler(NullScaler), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), Depth(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -298,8 +289,6 @@ public:
 	int WindowHeight;
 	SDL_Cursor *blankCursor;
 	int Depth;
-	int Scale;
-	void* (*Scaler)(SDL_Surface* pixels);
 	bool FullScreen;
 };
 
