@@ -34,7 +34,7 @@
 //@{
 
 #include "SDL.h"
-
+#include "shaders.h"
 #include "guichan.h"
 
 #include "color.h"

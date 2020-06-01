@@ -102,6 +102,8 @@ double FrameTicks;     /// Frame length in ms
 
 const EventCallback *Callbacks;
 
+static bool CanUseShaders = false;
+
 bool IsSDLWindowVisible = true;
 
 /*----------------------------------------------------------------------------
@@ -255,17 +257,11 @@ static void InitKey2Str()
 */
 void InitVideoSdl()
 {
-	Uint32 flags = 0;
+	Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI;
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
-//Wyrmgus start
-//#ifndef USE_WIN32
-//Wyrmgus end
 		// Fix tablet input in full-screen mode
 		SDL_setenv("SDL_MOUSE_RELATIVE", "0", 1);
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 		int res = SDL_Init(
 					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
 					  SDL_INIT_TIMER);
@@ -333,6 +329,7 @@ void InitVideoSdl()
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
 	if(!strncmp(rendererInfo.name, "opengl", 6)) {
 		puts("[Renderer] Got OpenGL");
+		CanUseShaders = LoadShaderExtensions();
 	}
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	Video.ResizeScreen(Video.Width, Video.Height);
@@ -555,10 +552,6 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 								  event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
 			break;
 
-		case SDL_WINDOWEVENT_RESIZED:
-			Video.ResizeScreen(event.window.data1, event.window.data2);
-			break;
-
 		case SDL_QUIT:
 			Exit(0);
 			break;
@@ -659,20 +652,24 @@ void RealizeVideoMemory()
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
 		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
-		SDL_RenderClear(TheRenderer);
-		//for (int i = 0; i < NumRects; i++)
-		//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
-		SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
-		if (EnableDebugPrint) {
-			// show a bar representing fps scaled by 10
-			SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
-			Uint32 nextTick = SDL_GetTicks();
-			double fps = 10000.0 / (nextTick - LastTick);
-			SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
-			SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-			LastTick = nextTick;
+		if (CanUseShaders) {
+			RenderWithShader(TheRenderer, TheWindow, TheTexture);
+		} else {
+			SDL_RenderClear(TheRenderer);
+			//for (int i = 0; i < NumRects; i++)
+			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
+			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
+			if (EnableDebugPrint) {
+				// show a bar representing fps scaled by 10
+				SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+				Uint32 nextTick = SDL_GetTicks();
+				double fps = 10000.0 / (nextTick - LastTick);
+				SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
+				SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+				LastTick = nextTick;
+			}
+			SDL_RenderPresent(TheRenderer);
 		}
-		SDL_RenderPresent(TheRenderer);
 		NumRects = 0;
 	}
 	HideCursor();

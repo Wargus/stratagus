@@ -18,7 +18,6 @@ public:
 
 CVideo Video;
 void ToggleFullScreen(void);
-void SwitchToShader(void);
 
 class CGraphic
 {

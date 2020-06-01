@@ -341,6 +341,7 @@ set(video_SRCS
 	src/video/png.cpp
 	src/video/sdl.cpp
 	src/video/video.cpp
+        src/video/shaders.cpp
 )
 source_group(video FILES ${video_SRCS})
 
@@ -573,6 +574,7 @@ set(stratagus_generic_HDRS
 	src/include/vec2i.h
 	src/include/version.h
 	src/include/video.h
+	src/include/shaders.h
 	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
