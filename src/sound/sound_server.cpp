@@ -181,11 +181,17 @@ void StopAllChannels()
 	Mix_HaltChannel(-1);
 }
 
+static Mix_Music *currentMusic = NULL;
+
 static Mix_Music *LoadMusic(const char *name)
 {
-	Mix_Music *r = Mix_LoadMUS(name);
-	if (r) {
-		return r;
+	if (currentMusic) {
+		Mix_HaltMusic();
+		Mix_FreeMusic(currentMusic);
+	}
+	currentMusic = Mix_LoadMUS(name);
+	if (currentMusic) {
+		return currentMusic;
 	}
 
 	CFile *f = new CFile;
@@ -194,7 +200,8 @@ static Mix_Music *LoadMusic(const char *name)
 		delete f;
 		return NULL;
 	}
-	return Mix_LoadMUS_RW(f->as_SDL_RWops(), 0);
+	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 0);
+	return currentMusic;
 }
 
 static Mix_Chunk *LoadSample(const char *name)

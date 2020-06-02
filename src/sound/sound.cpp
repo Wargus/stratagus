@@ -401,7 +401,10 @@ static void PlaySoundFileCallback(int channel)
 		listener->action("");
 		ChannelMap[channel] = NULL;
 	}
-	delete GetChannelSample(channel);
+	Mix_Chunk *sample = GetChannelSample(channel);
+	if (sample) {
+		Mix_FreeChunk(sample);
+	}
 }
 
 /**
@@ -578,11 +581,15 @@ void InitSoundClient()
 CSound::~CSound()
 {
 	if (this->Number == ONE_SOUND) {
-		delete Sound.OneSound;
+		if (Sound.OneSound) {
+			Mix_FreeChunk(Sound.OneSound);
+		}
 	} else if (this->Number == TWO_GROUPS) {
 	} else {
 		for (int i = 0; i < this->Number; ++i) {
-			delete this->Sound.OneGroup[i];
+			if (this->Sound.OneGroup[i]) {
+				Mix_FreeChunk(this->Sound.OneGroup[i]);
+			}
 			this->Sound.OneGroup[i] = NULL;
 		}
 		delete[] this->Sound.OneGroup;
