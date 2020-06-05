@@ -139,7 +139,7 @@
 **
 **  CPlayer::SharedVision
 **
-**    A bit field which contains shared vision for this player.
+**    Contains shared vision for this player.
 **    Shared vision only works when it's activated both ways. Really.
 **
 **  CPlayer::StartX CPlayer::StartY
@@ -445,7 +445,7 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("\", \"shared-vision\", \"");
 	for (int j = 0; j < PlayerMax; ++j) {
-		file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
+		file.printf("%c", (p.SharedVision.find(j) != p.SharedVision.end()) ? 'X' : '_');
 	}
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 
@@ -744,7 +744,7 @@ void CPlayer::Clear()
 	Team = 0;
 	Enemy = 0;
 	Allied = 0;
-	SharedVision = 0;
+	SharedVision.clear();
 	StartPos.x = 0;
 	StartPos.y = 0;
 	memset(Resources, 0, sizeof(Resources));
@@ -1363,12 +1363,12 @@ void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 
 void CPlayer::ShareVisionWith(const CPlayer &player)
 {
-	this->SharedVision |= (1 << player.Index);
+	this->SharedVision.insert(player.Index);
 }
 
 void CPlayer::UnshareVisionWith(const CPlayer &player)
 {
-	this->SharedVision &= ~(1 << player.Index);
+	this->SharedVision.erase(player.Index);
 }
 
 
@@ -1407,40 +1407,40 @@ bool CPlayer::IsAllied(const CUnit &unit) const
 
 bool CPlayer::IsVisionSharing() const
 {
-	return SharedVision != 0;
+	return !this->SharedVision.empty();
 }
 
 /**
 **  Check if the player shares vision with the player
 */
-bool CPlayer::IsSharedVision(const CPlayer &player) const
+bool CPlayer::HasSharedVisionWith(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0;
+	return this->SharedVision.find(player.Index) != this->SharedVision.end();
 }
 
 /**
 **  Check if the player shares vision with the unit
 */
-bool CPlayer::IsSharedVision(const CUnit &unit) const
+bool CPlayer::HasSharedVisionWith(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return this->HasSharedVisionWith(*unit.Player);
 }
 
 /**
 **  Check if the both players share vision
 */
-bool CPlayer::IsBothSharedVision(const CPlayer &player) const
+bool CPlayer::HasMutualSharedVisionWith(const CPlayer &player) const
 {
-	return (SharedVision & (1 << player.Index)) != 0
-		   && (player.SharedVision & (1 << Index)) != 0;
+	return this->SharedVision.find(player.Index) != this->SharedVision.end()
+	 		&& player.SharedVision.find(this->Index) != player.SharedVision.end();
 }
 
 /**
 **  Check if the player and the unit share vision
 */
-bool CPlayer::IsBothSharedVision(const CUnit &unit) const
+bool CPlayer::HasMutualSharedVisionWith(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return this->HasMutualSharedVisionWith(*unit.Player);
 }
 
 /**

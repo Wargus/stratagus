@@ -924,13 +924,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 	}
 
 	// Compute Before and after.
-	const int before = Players[player].IsBothSharedVision(Players[opponent]);
+	const int before = Players[player].HasMutualSharedVisionWith(Players[opponent]);
 	if (state == false) {
 		Players[player].UnshareVisionWith(Players[opponent]);
 	} else {
 		Players[player].ShareVisionWith(Players[opponent]);
 	}
-	const int after = Players[player].IsBothSharedVision(Players[opponent]);
+	const int after = Players[player].HasMutualSharedVisionWith(Players[opponent]);
 
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.

@@ -61,11 +61,11 @@ IsTileRadarVisible(const CPlayer &pradar, const CPlayer &punit, const CMapFieldP
 		// Check jamming first, if we are jammed, exit
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i != p) {
-				if (jamming[i] > 0 && punit.IsBothSharedVision(Players[i])) {
+				if (jamming[i] > 0 && punit.HasMutualSharedVisionWith(Players[i])) {
 					// We are jammed, return nothing
 					return 0;
 				}
-				if (radar[i] > 0 && pradar.IsBothSharedVision(Players[i])) {
+				if (radar[i] > 0 && pradar.HasMutualSharedVisionWith(Players[i])) {
 					radarvision |= radar[i];
 				}
 			}

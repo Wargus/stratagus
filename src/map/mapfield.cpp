@@ -266,8 +266,8 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	if (IsExplored(player)) {
 		maxVision = 1;
 	}
-	for (int i = 0; i != PlayerMax ; ++i) {
-		if (player.IsBothSharedVision(Players[i])) {
+	for (const int i : player.GetSharedVision()) {
+		if (player.HasMutualSharedVisionWith(Players[i])) {
 			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
 			if (maxVision >= 2) {
 				return 2;

@@ -153,9 +153,9 @@ void CPlayer::Load(lua_State *l)
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					this->SharedVision &= ~(1 << i);
+					this->SharedVision.erase(i);
 				} else {
-					this->SharedVision |= (1 << i);
+					this->SharedVision.insert(i);
 				}
 			}
 		} else if (!strcmp(value, "start")) {
