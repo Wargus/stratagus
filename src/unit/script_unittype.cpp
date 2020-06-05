@@ -436,6 +436,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 **
 **  @param l  Lua state.
 */
+static const std::string shadowMarker = std::string("MARKER");
 static int CclDefineUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -485,7 +486,22 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->Sprite);
 				type->Sprite = NULL;
 			}
+			if (type->ShadowFile == shadowMarker) {
+				type->ShadowFile = type->File;
+				if (type->ShadowWidth == 0 && type->ShadowHeight == 0) {
+					type->ShadowWidth = type->Width;
+					type->ShadowHeight = type->Height;
+				}
+			}
 		} else if (!strcmp(value, "Shadow")) {
+			// default to same spritemap as unit
+			if (type->File.length() > 0) {
+				type->ShadowFile = type->File;
+				type->ShadowWidth = type->Width;
+				type->ShadowHeight = type->Height;
+			} else {
+				type->ShadowFile = shadowMarker;
+			}
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -504,6 +520,10 @@ static int CclDefineUnitType(lua_State *l)
 					lua_rawgeti(l, -1, k + 1);
 					CclGetPos(l, &type->ShadowOffsetX, &type->ShadowOffsetY);
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "sprite-frame")) {
+					type->ShadowSpriteFrame = LuaToNumber(l, -1, k + 1);
+				} else if (!strcmp(value, "scale")) {
+					type->ShadowScale = LuaToNumber(l, -1, k + 1);
 				} else {
 					LuaError(l, "Unsupported shadow tag: %s" _C_ value);
 				}

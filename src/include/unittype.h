@@ -506,6 +506,9 @@ public:
 	int ShadowHeight;                                     /// Shadow sprite height
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
 	int ShadowOffsetY;                                    /// Shadow vertical offset
+	char ShadowScale;                                     /// Shadow scale-down factor
+	char ShadowSpriteFrame;                               /// If > 0, the shadow is a simple sprite without
+	                                                      /// directions and this selects which frame to use
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
 	CAnimations *Animations;        /// Animation scripts
