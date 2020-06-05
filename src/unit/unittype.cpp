@@ -1032,7 +1032,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 		// FIXME: should be configurable
 		type.Portrait.CurrMng = 0;
-		type.Portrait.NumIterations = SyncRand() % 16 + 1;
+		type.Portrait.NumIterations = MyRand() % 16 + 1;
 	}
 #endif
 }
