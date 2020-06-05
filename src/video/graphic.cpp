@@ -919,6 +919,17 @@ bool CGraphic::TransparentPixel(int x, int y)
 	return ret;
 }
 
+static inline void dither(SDL_Surface *Surface) {
+	for (int x = 0; x < Surface->w; x++) {
+		for (int y = 0; y < Surface->h; y++) {
+			Uint8* pixel = ((Uint8*)(Surface->pixels)) + x + y * Surface->pitch;
+			if (*pixel != 255) {
+				*pixel = (y % 2 == x % 2) ? 255 : 0;
+			}
+		}
+	}
+}
+
 /**
 **  Make shadow sprite
 **
@@ -929,15 +940,14 @@ void CGraphic::MakeShadow()
 	if (Surface->format->BytesPerPixel == 1) {
 		SDL_Color colors[256];
 
-		// Set all colors in the palette to black and use 50% alpha
+		// Set all colors in the palette to black and use dithering for alpha
 		memset(colors, 0, sizeof(colors));
-
 		SDL_SetPaletteColors(Surface->format->palette, colors, 0, 256);
-		SDL_SetSurfaceAlphaMod(Surface, 128);
+		dither(Surface);
 
 		if (SurfaceFlip) {
 			SDL_SetPaletteColors(SurfaceFlip->format->palette, colors, 0, 256);
-			SDL_SetSurfaceAlphaMod(SurfaceFlip, 128);
+			dither(Surface);
 		}
 	}
 }
