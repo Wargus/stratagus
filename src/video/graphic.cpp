@@ -762,7 +762,7 @@ void CGraphic::Resize(int w, int h)
 
 		for (int i = 0; i < h; ++i) {
 			for (int j = 0; j < w; ++j) {
-				data[x] = pixels[(i * Height / h) * Surface->pitch + j * Width / w];
+				data[x] = pixels[(i * GraphicHeight / h) * Surface->pitch + j * GraphicWidth / w];
 				++x;
 			}
 		}
@@ -786,11 +786,11 @@ void CGraphic::Resize(int w, int h)
 		int x = 0;
 
 		for (int i = 0; i < h; ++i) {
-			float fy = (float)i * Height / h;
+			float fy = (float)i * GraphicHeight / h;
 			int iy = (int)fy;
 			fy -= iy;
 			for (int j = 0; j < w; ++j) {
-				float fx = (float)j * Width / w;
+				float fx = (float)j * GraphicWidth / w;
 				int ix = (int)fx;
 				fx -= ix;
 				float fz = (fx + fy) / 2;
@@ -843,8 +843,12 @@ void CGraphic::Resize(int w, int h)
 	if (useckey) {
 		SDL_SetColorKey(Surface, SDL_TRUE, ckey);
 	}
-	Width = GraphicWidth = w;
-	Height = GraphicHeight = h;
+
+	Height = h / (GraphicHeight / Height);
+	Width = w / (GraphicWidth / Width);
+	GraphicWidth = w;
+	GraphicHeight = h;
+	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
 
 	GenFramesMap();
 }
