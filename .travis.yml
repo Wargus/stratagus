@@ -14,7 +14,7 @@ addons:
       - libtolua-dev
       - zlib1g-dev
 before_script:
-  - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl; \
+  - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl2 sdl2_mixer sdl2_image; \
          git clone https://github.com/LuaDist/toluapp.git; \
          cd toluapp; mkdir build;
            cd build; cmake ..; make; \
