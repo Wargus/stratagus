@@ -403,6 +403,7 @@ void Exit(int err)
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
+	DeInitImageLoaders();
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);

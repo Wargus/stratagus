@@ -330,6 +330,12 @@ extern SDL_Texture *TheTexture;
 /// register lua function
 extern void VideoCclRegister();
 
+/// initialize the image loaders part
+extern void InitImageLoaders();
+
+/// deinitialize the image loaders
+extern void DeInitImageLoaders();
+
 /// initialize the video part
 extern void InitVideo();
 

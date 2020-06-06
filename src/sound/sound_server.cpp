@@ -453,6 +453,16 @@ static int InitSdlSound()
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096)) {
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 		return -1;
+	} else {
+		printf("Supported sound decoders:");
+		for (int i = 0; i < Mix_GetNumChunkDecoders(); i++) {
+			printf(" %s", Mix_GetChunkDecoder(i));
+		}
+		printf("\nSupported music decoders:");
+		for (int i = 0; i < Mix_GetNumMusicDecoders(); i++) {
+			printf(" %s", Mix_GetMusicDecoder(i));
+		}
+		printf("\n");
 	}
 	return 0;
 }

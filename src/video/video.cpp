@@ -94,6 +94,7 @@
 #include "ui.h"
 
 #include "SDL.h"
+#include "SDL_image.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -307,6 +308,17 @@ bool CVideo::ResizeScreen(int w, int h)
 unsigned long GetTicks()
 {
 	return SDL_GetTicks();
+}
+
+void InitImageLoaders()
+{
+	// just activate everything we can by setting all bits
+	IMG_Init(std::numeric_limits<unsigned int>::max());
+}
+
+void DeInitImageLoaders()
+{
+	IMG_Quit();
 }
 
 /**
