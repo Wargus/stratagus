@@ -448,7 +448,8 @@ bool SoundEnabled()
 */
 static int InitSdlSound()
 {
-	Mix_Init(MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC | MIX_INIT_OPUS);
+	// just activate everything we can by setting all bits
+	Mix_Init(std::numeric_limits<unsigned int>::max());
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096)) {
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
 		return -1;
