@@ -225,6 +225,7 @@ set(network_SRCS
 	src/network/net_lowlevel.cpp
 	src/network/net_message.cpp
 	src/network/master.cpp
+	src/network/net_connection_handler.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
 	src/network/netsockets.cpp
@@ -540,6 +541,7 @@ set(stratagus_generic_HDRS
 	src/include/net_message.h
 	src/include/netconnect.h
 	src/include/network.h
+	src/include/net_connection_handler.h
 	src/include/network/netsockets.h
 	src/include/parameters.h
 	src/include/particle.h

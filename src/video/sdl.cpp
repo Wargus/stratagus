@@ -76,6 +76,7 @@
 
 #ifdef USE_WIN32
 #include <shellapi.h>
+#include <winuser.h>
 #endif
 
 #include "editor.h"
@@ -992,15 +993,15 @@ void WaitEventsOneFrame()
 		}
 
 		// Network
-		int s = 0;
+		bool networkHasDataToRead = false;
 		if (IsNetworkGame()) {
-			s = NetworkFildes.HasDataToRead(0);
-			if (s > 0) {
+			networkHasDataToRead = NetworkHasDataToRead();
+			if (networkHasDataToRead) {
 				GetCallbacks()->NetworkEvent();
 			}
 		}
 		// No more input and time for frame over: return
-		if (!i && s <= 0 && interrupts) {
+		if (!i && !networkHasDataToRead && interrupts) {
 			break;
 		}
 	}

@@ -31,7 +31,12 @@
 
 //@{
 
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
 #include "net_message.h"
+#include "net_connection_handler.h"
 
 class CHost;
 
@@ -120,5 +125,155 @@ extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients 
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
 
 //@}
+
+/**
+**  Connect state information of network systems active in current game.
+*/
+struct NetworkState {
+	void Clear()
+	{
+		State = ccs_unused;
+		MsgCnt = 0;
+		LastFrame = 0;
+	}
+
+	unsigned char State;     /// Menu: ConnectState
+	unsigned short MsgCnt;   /// Menu: Counter for state msg of same type (detect unreachable)
+	unsigned long LastFrame; /// Last message received
+							 // Fill in here...
+};
+
+class CServer
+{
+public:
+	void Init(const std::string &name, CServerSetup *serverSetup);
+
+	void Open(const CHost &host, bool udp);
+
+	bool IsValid() const;
+
+	int HasDataToRead(int timeout) const;
+
+	void SendToAllClients(CNetworkHost hosts[], int hostCount, const unsigned char *buf, unsigned int len);
+
+	template <typename T>
+	void SendMessageToSpecificClient(const CHost &host, const T &msg);
+
+	void SendMessageToSpecificClient(const CHost &host, const CInitMessage_Header &msg);
+
+	int Recv(unsigned char *buf, int len, CHost *hostFrom) const;
+
+	void Close();
+
+	void Update(unsigned long frameCounter);
+	void Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
+
+	void MarkClientsAsResync();
+	void KickClient(int c);
+
+private:
+	int Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
+	void Parse_Resync(const int h);
+	void Parse_Waiting(const int h);
+	void Parse_Map(const int h);
+	void Parse_State(const int h, const CInitMessage_State &msg);
+	void Parse_GoodBye(const int h);
+	void Parse_SeeYou(const int h);
+
+	void Send_AreYouThere(const CNetworkHost &host);
+	void Send_GameFull(const CHost &host);
+	void Send_Welcome(const CNetworkHost &host, int hostIndex);
+	void Send_Resync(const CNetworkHost &host, int hostIndex);
+	void Send_Map(const CNetworkHost &host);
+	void Send_State(const CNetworkHost &host);
+	void Send_GoodBye(const CNetworkHost &host);
+
+private:
+	std::string name;
+	NetworkState networkStates[PlayerMax]; /// Client Host states
+
+	IServerConnectionHandler* _serverConnectionHandler = nullptr;
+
+	CServerSetup *serverSetup;
+};
+
+class CClient
+{
+public:
+	void Init(const std::string &name, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick);
+	void SetServerHost(const CHost &host) { serverHost = host; }
+
+	void Open(bool udp);
+
+	bool IsValid() const;
+
+	int HasDataToRead(int timeout);
+
+	void SendToServer(const unsigned char *buf, unsigned int len);
+
+	int Recv(unsigned char *buf, int len, CHost *hostFrom);
+
+	void Close();
+
+	bool Parse(const unsigned char *buf);
+	bool Update(unsigned long tick);
+
+	void DetachFromServer();
+
+	int GetNetworkState() const { return networkState.State; }
+
+private:
+	bool Update_disconnected();
+	bool Update_detaching(unsigned long tick);
+	bool Update_connecting(unsigned long tick);
+	bool Update_connected(unsigned long tick);
+	bool Update_synced(unsigned long tick);
+	bool Update_changed(unsigned long tick);
+	bool Update_async(unsigned long tick);
+	bool Update_mapinfo(unsigned long tick);
+	bool Update_badmap(unsigned long tick);
+	bool Update_goahead(unsigned long tick);
+	bool Update_started(unsigned long tick);
+
+	void Send_Go(unsigned long tick);
+	void Send_Config(unsigned long tick);
+	void Send_MapUidMismatch(unsigned long tick);
+	void Send_Map(unsigned long tick);
+	void Send_Resync(unsigned long tick);
+	void Send_State(unsigned long tick);
+	void Send_Waiting(unsigned long tick, unsigned long msec);
+	void Send_Hello(unsigned long tick);
+	void Send_GoodBye(unsigned long tick);
+
+	template <typename T>
+	void SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
+
+	void SetConfig(const CInitMessage_Config &msg);
+
+	void Parse_GameFull();
+	void Parse_LuaMismatch(const unsigned char *buf);
+	void Parse_EngineMismatch(const unsigned char *buf);
+	void Parse_Resync(const unsigned char *buf);
+	void Parse_Config(const unsigned char *buf);
+	void Parse_State(const unsigned char *buf);
+	void Parse_Welcome(const unsigned char *buf);
+	void Parse_Map(const unsigned char *buf);
+	void Parse_AreYouThere();
+	
+	template <typename T>
+	void SendToServer(const T & msg);
+	void SendToServer(const CInitMessage_Header &msg);
+
+private:
+	std::string name;
+	CHost serverHost;  /// IP:port of server to join
+	NetworkState networkState;
+	unsigned char lastMsgTypeSent;  /// Subtype of last InitConfig message sent
+
+	IClientConnectionHandler* _clientConnectionHandler = nullptr;
+
+	CServerSetup *serverSetup;
+	CServerSetup *localSetup;
+};
 
 #endif // !__NETCONNECT_H__

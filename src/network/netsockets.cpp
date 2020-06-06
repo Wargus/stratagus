@@ -135,7 +135,7 @@ void CUDPSocket::Close()
 	m_impl->Close();
 }
 
-void CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
+void CUDPSocket::Send(const CHost &host, const unsigned char *buf, unsigned int len)
 {
 #ifdef DEBUG
 	++m_statistic.sentPacketsCount;
@@ -145,7 +145,7 @@ void CUDPSocket::Send(const CHost &host, const void *buf, unsigned int len)
 	m_impl->Send(host, buf, len);
 }
 
-int CUDPSocket::Recv(void *buf, int len, CHost *hostFrom)
+int CUDPSocket::Recv(unsigned char *buf, int len, CHost *hostFrom)
 {
 	const int res = m_impl->Recv(buf, len, hostFrom);
 #ifdef DEBUG
@@ -192,21 +192,31 @@ public:
 	bool Open(const CHost &host);
 	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
 	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }
+	int Listen() { return NetListenTCP(socket); }
+	CTCPSocket_Impl* Accept();
 	int Send(const void *buf, unsigned int len) { return NetSendTCP(socket, buf, len); }
 	int Recv(void *buf, int len)
 	{
 		int res = NetRecvTCP(socket, buf, len);
 		return res;
 	}
+	void SetBlocking() { NetSetBlocking(socket); }
 	void SetNonBlocking() { NetSetNonBlocking(socket); }
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
 	bool IsValid() const { return socket != Socket(-1); }
+	unsigned long ip;
+	int port;
+private:
+	CTCPSocket_Impl(Socket socket, unsigned long ip, int port) : socket(socket), ip(ip), port(port) {}
 private:
 	Socket socket;
 };
 
 bool CTCPSocket_Impl::Open(const CHost &host)
 {
+	this->ip = host.getIp();
+	this->port = host.getPort();
+
 	char ip[24]; // 127.255.255.255:65555
 	memset(&ip, 0, sizeof(ip));
 	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
@@ -214,60 +224,109 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 	return this->socket != INVALID_SOCKET;
 }
 
+CTCPSocket_Impl* CTCPSocket_Impl::Accept()
+{
+	unsigned long clientIp;
+	int clientPort;
+	auto clientSocket = NetAcceptTCP(socket, &clientIp, &clientPort);
+	if(clientSocket == INVALID_SOCKET)
+	{
+		return nullptr;
+	}
+
+	return new CTCPSocket_Impl(clientSocket, clientIp, clientPort);
+}
+
 //
 // CTCPSocket
 //
 
-CTCPSocket::CTCPSocket()
+CTCPSocket::CTCPSocket() : m_impl(nullptr)
 {
-	m_impl = new CTCPSocket_Impl();
-}
-
-CTCPSocket::~CTCPSocket()
-{
-	delete m_impl;
 }
 
 bool CTCPSocket::Open(const CHost &host)
 {
+	if(!m_impl) {
+		m_impl = new CTCPSocket_Impl();
+	}
+
 	return m_impl->Open(host);
+}
+
+int CTCPSocket::Listen()
+{
+	if (!IsValid()) return -1;
+	return m_impl->Listen();
 }
 
 void CTCPSocket::Close()
 {
-	m_impl->Close();
-}
+	if (!IsValid()) return;
 
+	m_impl->Close();
+	delete m_impl;
+	m_impl = nullptr;
+}
 
 bool CTCPSocket::Connect(const CHost &host)
 {
+	if (!IsValid()) return false;
 	return m_impl->Connect(host);
 }
 
-int CTCPSocket::Send(const void *buf, unsigned int len)
+CTCPSocket* CTCPSocket::Accept()
 {
+	if (!IsValid()) return nullptr;
+
+	auto impl = m_impl->Accept();
+	if(impl == nullptr)
+	{
+		return nullptr;
+	}
+
+	return new CTCPSocket(impl);
+}
+
+int CTCPSocket::Send(const unsigned char *buf, unsigned int len)
+{
+	if (!IsValid()) return -1;
 	return m_impl->Send(buf, len);
 }
 
-int CTCPSocket::Recv(void *buf, int len)
+int CTCPSocket::Recv(unsigned char *buf, int len)
 {
-	const int res = m_impl->Recv(buf, len);
-	return res;
+	if (!IsValid()) return -1;
+	return m_impl->Recv(buf, len);
+}
+
+void CTCPSocket::SetBlocking()
+{
+	if (!IsValid()) return;
+	m_impl->SetBlocking();
 }
 
 void CTCPSocket::SetNonBlocking()
 {
+	if (!IsValid()) return;
 	m_impl->SetNonBlocking();
 }
 
 int CTCPSocket::HasDataToRead(int timeout)
 {
+	if (!IsValid()) return -1;
 	return m_impl->HasDataToRead(timeout);
 }
 
 bool CTCPSocket::IsValid() const
 {
-	return m_impl->IsValid();
+	return m_impl && m_impl->IsValid();
 }
+
+CHost CTCPSocket::GetHost() const
+{
+	return CHost(m_impl->ip, m_impl->port);
+}
+
 
 //@}

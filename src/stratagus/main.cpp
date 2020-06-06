@@ -32,6 +32,16 @@
 #include "stratagus.h"
 #include "SDL.h"
 
+#ifdef WIN32
+#include <windows.h>
+#include <shellapi.h>
+
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
+{
+	return main(__argc, __argv);
+}
+#endif
+
 int main(int argc, char **argv)
 {
 	return stratagusMain(argc, argv);

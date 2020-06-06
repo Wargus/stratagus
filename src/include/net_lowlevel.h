@@ -141,6 +141,8 @@ extern int NetListenTCP(Socket sockfd);
 extern Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort);
 
 
+/// Set socket to blocking
+extern int NetSetBlocking(Socket sockfd);
 /// Set socket to non-blocking
 extern int NetSetNonBlocking(Socket sockfd);
 /// Wait for socket ready.

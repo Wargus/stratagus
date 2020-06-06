@@ -66,16 +66,18 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CUDPSocket NetworkFildes;  /// Network file descriptor
 extern bool NetworkInSync;        /// Network is in sync
+extern bool NetworkGame;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern inline bool IsNetworkGame() { return NetworkFildes.IsValid(); }
+extern inline bool IsNetworkGame() { return NetworkGame; }
+
 extern void InitNetwork1();  /// Initialise network
 extern void ExitNetwork1();  /// Cleanup network (port)
+extern bool NetworkHasDataToRead();
 extern void NetworkOnStartGame();  /// Initialise network data for ingame communication
 extern void NetworkEvent();  /// Handle network events
 extern void NetworkSync();   /// Hold in sync
