@@ -266,6 +266,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	if (IsExplored(player)) {
 		maxVision = 1;
 	}
+	
 	for (const int i : player.GetSharedVision()) {
 		if (player.HasMutualSharedVisionWith(Players[i])) {
 			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
@@ -274,6 +275,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 			}
 		}
 	}
+
 	if (maxVision == 1 && Map.NoFogOfWar) {
 		return 2;
 	}

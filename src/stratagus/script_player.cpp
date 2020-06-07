@@ -235,6 +235,9 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "ai-disabled")) {
 			this->AiEnabled = false;
 			--j;
+		} else if (!strcmp(value, "revealed")) {
+			this->SetRevealed(true); 
+			--j;	
 		} else if (!strcmp(value, "supply")) {
 			this->Supply = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "demand")) {
@@ -255,6 +258,8 @@ void CPlayer::Load(lua_State *l)
 			this->TotalRazings = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-kills")) {
 			this->TotalKills = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "lost-main-facility-timer")) {
+			this->LostMainFacilityTimer = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -512,6 +517,30 @@ static int CclSharedVision(lua_State *l)
 	lua_pushnumber(l, ThisPlayer->Index);
 	lua_insert(l, 1);
 	return CclSetSharedVision(l);
+}
+
+/**
+**  Change the players revelation type - reveal all units, only buidings or don't reveal anything
+**
+**  @param l  Lua state.
+*/
+static int CclSetRevelationType(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	const char *revel_type = LuaToString(l, 1);
+	if (!strcmp(revel_type, "no-revelation")) {
+		CPlayer::SetRevelationType(CPlayer::cNoRrevelation);
+	} else if (!strcmp(revel_type, "all-units")) {
+		CPlayer::SetRevelationType(CPlayer::cAllUnits);
+	} else if (!strcmp(revel_type, "buildings-only")) {
+		CPlayer::SetRevelationType(CPlayer::cBuildingsOnly);
+	} else {
+		PrintFunction();
+		fprintf(stdout, "Accessible types of revelation \"no-revelation\", \"all-units\" and \"buildings-only\".\n");
+		return 1;
+	}
+	return 0;
 }
 
 /**
@@ -938,6 +967,8 @@ void PlayerCclRegister()
 	lua_register(Lua, "Diplomacy", CclDiplomacy);
 	lua_register(Lua, "SetSharedVision", CclSetSharedVision);
 	lua_register(Lua, "SharedVision", CclSharedVision);
+	
+	lua_register(Lua, "SetRevelationType", CclSetRevelationType);
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	lua_register(Lua, "DefineNewRaceNames", CclDefineRaceNames);
