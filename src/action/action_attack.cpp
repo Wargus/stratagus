@@ -64,12 +64,12 @@
 ----------------------------------------------------------------------------*/
 
 #define FIRST_ENTRY		 	0
-#define AUTO_TARGETING   	2  /// Targets will be selected by small (unit's) AI
-#define MOVE_TO_TARGET   	4  /// Move to target state
-#define ATTACK_TARGET    	5  /// Attack target state
+#define AUTO_TARGETING   	1  /// Targets will be selected by small (unit's) AI
+#define MOVE_TO_TARGET   	2  /// Move to target state
+#define ATTACK_TARGET    	4  /// Attack target state
 #define MOVE_TO_ATTACKPOS	8  /// Move to position for attack if target is too close
 
-#define RESTORE_ONLY false  /// Do not finish this order, only restore saved
+#define RESTORE_ONLY 		false  /// Do not finish this order, only restore saved
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -699,7 +699,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	}
 	/// Order may be set as finished by outside code while playing animation.
 	/// In this case we must not execute code of MoveToTarget
-	if (unit.Anim.Unbreakable || this->State == Finished) {
+	if (unit.Anim.Unbreakable || this->Finished) {
 		return;
 	}
 	if (IsMovingToAttackPos()) {
