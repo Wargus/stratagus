@@ -5,7 +5,7 @@ configuration:
 before_build:
   - mkdir build
   - cd build
-  - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/master-builds/dependencies.zip
+  - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/sdl2-migration-builds/dependencies.zip
   - 7z x dependencies.zip
   - appveyor DownloadFile https://github.com/jimpark/unsis/releases/download/2.50.0/nsis-2.50.0-Unicode-setup.exe
   - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
