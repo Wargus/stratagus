@@ -25,6 +25,7 @@
 
 #include "shaders.h"
 
+#ifndef __APPLE__
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
@@ -41,7 +42,6 @@
 #include "iolib.h"
 #include "script.h"
 
-#ifndef __APPLE__
 // Avoiding the use of GLEW or some extensions handler
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
@@ -419,6 +419,7 @@ bool LoadShaderExtensions() {
 		loadShaders();
 	} else {
 		shadersLoaded = 0;
+		return false;
 	}
 
 	lua_register(Lua, "GetShaderNames", CclGetShaderNames);
