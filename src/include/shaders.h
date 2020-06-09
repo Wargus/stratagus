@@ -1,17 +1,27 @@
 #ifndef __SHADERS_H__
 #define __SHADERS_H__
-#ifdef USE_OPENGL
-#define MAX_SHADERS 5
-// #define SHADERDEBUG // Uncomment for loading shaders from file
+
+#include <SDL.h>
+
 #ifndef __APPLE__
-extern PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
-#else
-#define glBindFramebuffer glBindFramebufferEXT
-#endif
-extern GLuint fullscreenFramebuffer;
-extern bool LoadShaders(int direction, char* shadernameOut);
 extern bool LoadShaderExtensions();
-extern void SetupFramebuffer();
-extern void RenderFramebufferToScreen();
+extern void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer);
+extern const char* NextShader();
+#else
+#include "stratagus.h"
+
+inline bool LoadShaderExtensions() {
+    return false;
+}
+
+inline void RenderWithShader(SDL_Renderer*, SDL_Window*, SDL_Texture*) {
+    fprintf(stderr, "shaders not supported on macOS\n");
+    ExitFatal(-1);
+}
+
+inline const char* NextShader() {
+    return "shaders not supported on macOS";
+}
 #endif
+
 #endif

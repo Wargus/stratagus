@@ -328,21 +328,6 @@ static void PrintHeader()
 #ifdef USE_THEORA
 		"THEORA "
 #endif
-#ifdef USE_FLUIDSYNTH
-		"FLUIDSYNTH "
-#endif
-#ifdef USE_MIKMOD
-		"MIKMOD "
-#endif
-#ifdef USE_MNG
-		"MNG "
-#endif
-#ifdef USE_OPENGL
-		"OPENGL "
-#endif
-#ifdef USE_GLES
-		"GLES "
-#endif
 #ifdef USE_WIN32
 		"WIN32 "
 #endif
@@ -360,9 +345,6 @@ static void PrintHeader()
 #endif
 #ifdef USE_X11
 		"X11 "
-#endif
-#ifdef USE_TOUCHSCREEN
-		"TOUCHSCREEN "
 #endif
 		"";
 
@@ -421,6 +403,7 @@ void Exit(int err)
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
+	DeInitImageLoaders();
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
@@ -463,24 +446,13 @@ static void Usage()
 		"\t-I addr\t\tNetwork address to use\n"
 		"\t-l\t\tDisable command log\n"
 		"\t-N name\t\tName of the player\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-o\t\tDo not use OpenGL or OpenGL ES 1.1\n"
-		"\t-O\t\tUse OpenGL or OpenGL ES 1.1\n"
-#endif
 		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
-		"\t-W\t\tWindowed video mode\n"
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		"\t-x idx\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
-		"\t  \t\tPass a number to select a shader in your shaders directory by index (starting at 0).\n"\
-		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
-		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
-		"\t-Z mode\t\tGame resolution <xres>x<yres> (scaled to -v output resolution with OpenGL).\n"
-#endif
+		"\t-W\t\tWindowed video mode. Optionally takes a window size in <xres>x<yres>\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
 		Parameters::Instance.applicationName.c_str());
 }
@@ -527,7 +499,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:Wx:Z:?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:W?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -574,21 +546,6 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'N':
 				parameters.LocalPlayerName = optarg;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'o':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 0;
-				if (ZoomNoResize) {
-					fprintf(stderr, "Error: -Z only works with OpenGL enabled\n");
-					Usage();
-					exit(-1);
-				}
-				continue;
-			case 'O':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				continue;
-#endif
 			case 'P':
 				CNetworkParameter::Instance.localPort = atoi(optarg);
 				continue;
@@ -611,53 +568,39 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					exit(-1);
 				}
-				Video.ViewportHeight = atoi(sep + 1);
+				Video.Height = atoi(sep + 1);
 				*sep = 0;
-				Video.ViewportWidth = atoi(optarg);
-				if (!Video.ViewportHeight || !Video.ViewportWidth) {
+				Video.Width = atoi(optarg);
+				if (!Video.Height || !Video.Width) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
 					exit(-1);
 				}
-#if defined(USE_OPENGL) || defined(USE_GLES)
-				if (!ZoomNoResize) {
-					Video.Height = Video.ViewportHeight;
-					Video.Width = Video.ViewportWidth;
-				}
-#else
-				{
-					Video.Height = Video.ViewportHeight;
-					Video.Width = Video.ViewportWidth;
-				}
-#endif
 				continue;
 			}
 			case 'W':
+				if (optind < argc && argv[optind] && argv[optind][0] != '-') {
+					// allow -W to take an optional argument in a POSIX compliant way
+					optarg = argv[optind];
+					sep = strchr(optarg, 'x');
+					if (!sep || !*(sep + 1)) {
+						fprintf(stderr, "%s: incorrect window size -- '%s'\n", argv[0], optarg);
+						Usage();
+						exit(-1);
+					}
+					Video.WindowHeight = atoi(sep + 1);
+					*sep = 0;
+					Video.WindowWidth = atoi(optarg);
+					if (!Video.WindowHeight || !Video.WindowWidth) {
+						fprintf(stderr, "%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
+						Usage();
+						exit(-1);
+					}
+					optind += 1; // skip the optional window size argument
+				}
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 0;
 				continue;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			case 'x':
-				Video.ShaderIndex = atoi(optarg);
-				if (atoi(optarg) == -1) {
-					GLShaderPipelineSupported = false;
-				}
-				continue;
-			case 'Z':
-				ForceUseOpenGL = 1;
-				UseOpenGL = 1;
-				ZoomNoResize = 1;
-				sep = strchr(optarg, 'x');
-				if (!sep || !*(sep + 1)) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
-					Usage();
-					exit(-1);
-				}
-				Video.Height = atoi(sep + 1);
-				*sep = 0;
-				Video.Width = atoi(optarg);
-				continue;
-#endif
 			case -1:
 				break;
 			case '?':
@@ -762,18 +705,19 @@ int stratagusMain(int argc, char **argv)
 		// Initialise AI module
 		InitAiModule();
 
-		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+		// Setup sound card, must be done before loading sounds, so that
+		// SDL_mixer can auto-convert to the target format
+		if (!InitSound()) {
+			InitMusic();
+		}
 
-		PrintHeader();
-		PrintLicense();
+		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
 		// Setup video display
 		InitVideo();
 
-		// Setup sound card
-		if (!InitSound()) {
-			InitMusic();
-		}
+		PrintHeader();
+		PrintLicense();
 
 #ifndef DEBUG           // For debug it's better not to have:
 		srand(time(NULL));  // Random counter = random each start

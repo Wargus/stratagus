@@ -375,11 +375,6 @@
 **
 **    Shadow sprite images
 **
-**  CUnitType::PlayerColorSprite
-**
-**    Sprite images of the player colors.  This image is drawn
-**    over CUnitType::Sprite.  Used with OpenGL only.
-**
 **
 */
 /**
@@ -541,7 +536,7 @@ CUnitType::CUnitType() :
 	CanAttack(0),
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	Sprite(NULL), ShadowSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), ShadowSpriteFrame(0), ShadowScale(1)
 {
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
@@ -990,10 +985,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 	if (!type.ShadowFile.empty()) {
 		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
 		type.ShadowSprite->Load();
-		if (type.Flip) {
-			type.ShadowSprite->Flip();
+		if (type.ShadowScale != 1) {
+			type.ShadowSprite->Resize(type.ShadowSprite->GraphicWidth / type.ShadowScale, type.ShadowSprite->GraphicHeight / type.ShadowScale);
 		}
-		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
+		if (!type.ShadowSpriteFrame) {
+			if (type.Flip) {
+				type.ShadowSprite->Flip();
+			}
 			type.ShadowSprite->MakeShadow();
 		}
 	}
@@ -1039,7 +1037,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 		// FIXME: should be configurable
 		type.Portrait.CurrMng = 0;
-		type.Portrait.NumIterations = SyncRand() % 16 + 1;
+		type.Portrait.NumIterations = MyRand() % 16 + 1;
 	}
 #endif
 }

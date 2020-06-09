@@ -475,8 +475,6 @@ public:
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.
 	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
 
-	std::string SF2Soundfont;/// Path to SF2 soundfont
-
 	CGraphic *IconFrameG;
 	CGraphic *PressedIconFrameG;
 };

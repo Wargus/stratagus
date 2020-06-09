@@ -60,7 +60,7 @@ void CColor::Parse(lua_State *l, const int offset)
 	this->R = r;
 	this->G = g;
 	this->B = b;
-	this->A = 0;
+	this->A = 255;
 }
 
 //@}

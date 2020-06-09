@@ -170,11 +170,7 @@ void UpdateDisplay()
 {
 	if (GameRunning || Editor.Running == EditorEditing) {
 		// to prevent empty spaces in the UI
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		Video.FillRectangleClip(ColorBlack, 0, 0, Video.ViewportWidth, Video.ViewportHeight);
-#else
 		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height);
-#endif
 		DrawMapArea();
 		DrawMessages();
 
@@ -326,14 +322,6 @@ static	int RealVideoSyncSpeed;
 
 static void DisplayLoop()
 {
-	
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		/* update only if screen changed */
-		ValidateOpenGLScreen();
-	}
-#endif
-
 	/* update only if viewmode changed */
 	CheckViewportMode();
 

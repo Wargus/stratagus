@@ -202,99 +202,6 @@ static int CclSetDamageMissile(lua_State *l)
 	return 0;
 }
 
-static int CclSetMaxOpenGLTexture(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (CclInConfigFile) {
-		GLMaxTextureSizeOverride = LuaToNumber(l, 1);
-	}
-#endif
-	return 0;
-}
-
-static int CclSetUseTextureCompression(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (CclInConfigFile) {
-		UseGLTextureCompression = LuaToBoolean(l, 1);
-	}
-#endif
-	return 0;
-}
-
-static int CclSetUseOpenGL(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (CclInConfigFile) {
-		// May have been set from the command line
-		if (!ForceUseOpenGL) {
-			UseOpenGL = LuaToBoolean(l, 1);
-		}
-	}
-#endif
-	return 0;
-}
-
-static int CclGetUseOpenGL(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	lua_pushboolean(l, UseOpenGL);
-#else
-	lua_pushboolean(l, 0);
-#endif
-	return 1;
-}
-
-static int CclSetZoomNoResize(lua_State *l)
-{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (CclInConfigFile) {
-		// Did the commandline force OpenGL off?
-		if (ForceUseOpenGL && UseOpenGL == 0) {
-			return 0;
-		}
-		// Did the commandline already force ZoomNoResize on?
-		if (!(ForceUseOpenGL && ZoomNoResize)) {
-			const int args = lua_gettop(l);
-			int originalWidth = 640;
-			int originalHeight = 480;
-			if (args == 1) {
-				ZoomNoResize = LuaToBoolean(l, 1);
-			} else if (args == 2) {
-				originalWidth = LuaToNumber(l, 1);
-				originalHeight = LuaToNumber(l, 2);
-				ZoomNoResize = true;
-			} else {
-				LuaError(l, "Valid calls for SetZoSetZoomNoResize are SetZoomNoResize(isEnabled) or SetZoomNoResize(width, height)");
-			}
-			if (ZoomNoResize) {
-				Video.ViewportWidth = Video.Width;
-				Video.ViewportHeight = Video.Height;
-				Video.Width = originalWidth;
-				Video.Height = originalHeight;
-				UseOpenGL = true;
-			}
-		}
-	}
-#endif
-	return 0;
-}
-
-static int CclGetZoomNoResize(lua_State *l)
-{
-	LuaCheckArgs(l, 0);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	lua_pushboolean(l, ZoomNoResize);
-#else
-	lua_pushboolean(l, 0);
-#endif
-	return 1;
-}
-
 /**
 **  Set the video resolution.
 **
@@ -305,18 +212,9 @@ static int CclSetVideoResolution(lua_State *l)
 	LuaCheckArgs(l, 2);
 	if (CclInConfigFile) {
 		// May have been set from the command line
-		if (!Video.ViewportWidth || !Video.ViewportHeight) {
-			Video.ViewportWidth = LuaToNumber(l, 1);
-			Video.ViewportHeight = LuaToNumber(l, 2);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-			if (!ZoomNoResize) {
-				Video.Height = Video.ViewportHeight;
-				Video.Width = Video.ViewportWidth;
-			}
-#else
-			Video.Height = Video.ViewportHeight;
-			Video.Width = Video.ViewportWidth;
-#endif
+		if (!Video.Width || !Video.Height) {
+			Video.Width = LuaToNumber(l, 1);
+			Video.Height = LuaToNumber(l, 2);
 		}
 	}
 	return 0;
@@ -1277,12 +1175,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetClickMissile", CclSetClickMissile);
 	lua_register(Lua, "SetDamageMissile", CclSetDamageMissile);
 
-	lua_register(Lua, "SetMaxOpenGLTexture", CclSetMaxOpenGLTexture);
-	lua_register(Lua, "SetUseTextureCompression", CclSetUseTextureCompression);
-	lua_register(Lua, "SetUseOpenGL", CclSetUseOpenGL);
-	lua_register(Lua, "GetUseOpenGL", CclGetUseOpenGL);
-	lua_register(Lua, "SetZoomNoResize", CclSetZoomNoResize);
-	lua_register(Lua, "GetZoomNoResize", CclGetZoomNoResize);
 	lua_register(Lua, "SetVideoResolution", CclSetVideoResolution);
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);

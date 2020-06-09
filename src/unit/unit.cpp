@@ -768,7 +768,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.Building && FancyBuildings
-		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (SyncRand() & 1) != 0) {
+		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (MyRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
 	return unit;

@@ -93,8 +93,8 @@
 #include "map.h"
 #include "ui.h"
 
-
 #include "SDL.h"
+#include "SDL_image.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -154,13 +154,6 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 
 CVideo Video;
 /*static*/ CColorCycling *CColorCycling::s_instance = NULL;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-char ForceUseOpenGL;
-bool UseOpenGL;                      /// Use OpenGL
-bool ZoomNoResize;
-bool GLShaderPipelineSupported = true;
-#endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
@@ -273,36 +266,40 @@ void CVideo::ClearScreen()
 */
 bool CVideo::ResizeScreen(int w, int h)
 {
-	if (VideoValidResolution(w, h)) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			FreeOpenGLGraphics();
-			FreeOpenGLFonts();
-			UI.Minimap.FreeOpenGL();
-		}
-#endif
-		TheScreen = SDL_SetVideoMode(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
-		ViewportWidth = w;
-		ViewportHeight = h;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (ZoomNoResize) {
-			ReloadOpenGL();
-		} else {
-			Width = w;
-			Height = h;
-			SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-			if (UseOpenGL) {
-				ReloadOpenGL();
-			}
-		}
-#else
-		Width = w;
-		Height = h;
-		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-#endif
-		return true;
+	if (!(SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP)
+		&& Video.Width == Video.WindowWidth
+		&& Video.Height == Video.WindowHeight) {
+		// if initially window was the same size as res, keep it that way
+		SDL_SetWindowSize(TheWindow, w, h);
 	}
-	return false;
+	Width = w;
+	Height = h;
+
+	SDL_RenderSetLogicalSize(TheRenderer, w, h);
+
+	// new surface
+	if (TheScreen) {
+		SDL_FreeSurface(TheScreen);
+	}
+	TheScreen = SDL_CreateRGBSurface(0, w, h, 32,
+									 0x00ff0000,
+									 0x0000ff00,
+									 0x000000ff,
+									 0); // 0xff000000);
+	Assert(SDL_MUSTLOCK(TheScreen) == 0);
+
+	// new texture
+	if (TheTexture) {
+		SDL_DestroyTexture(TheTexture);
+	}
+	TheTexture = SDL_CreateTexture(TheRenderer,
+	                               SDL_PIXELFORMAT_ARGB8888,
+	                               SDL_TEXTUREACCESS_STREAMING,
+	                               w, h);
+
+	SetClipping(0, 0, w - 1, h - 1);
+
+	return true;
 }
 
 /**
@@ -311,6 +308,17 @@ bool CVideo::ResizeScreen(int w, int h)
 unsigned long GetTicks()
 {
 	return SDL_GetTicks();
+}
+
+void InitImageLoaders()
+{
+	// just activate everything we can by setting all bits
+	IMG_Init(std::numeric_limits<unsigned int>::max());
+}
+
+void DeInitImageLoaders()
+{
+	IMG_Quit();
 }
 
 /**
@@ -394,12 +402,6 @@ void AddColorCyclingRange(unsigned int begin, unsigned int end)
 
 void SetColorCycleAll(bool value)
 {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL) {
-		// FIXME: In OpenGL-mode, we can only cycle the tileset graphic
-		return;
-	}
-#endif
 	CColorCycling::GetInstance().ColorCycleAll = value;
 }
 
@@ -419,7 +421,7 @@ void ColorCycleSurface(SDL_Surface &surface)
 		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
 		colors[range.end] = palcolors[range.begin];
 	}
-	SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+	SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 }
 
 /**
@@ -440,7 +442,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 			memcpy(colors + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
 			colors[range.begin] = palcolors[range.end];
 		}
-		SDL_SetPalette(&surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
+		SDL_SetPaletteColors(surface.format->palette, colors, 0, 256);
 	}
 }
 
@@ -464,15 +466,7 @@ void ColorCycle()
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL && colorCycling.ColorIndexRanges.size() > 0) {
-			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
-			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[colorCycling.cycleCount % Map.TileGraphic->NumColorCycles];
-		} else
-#endif
-		{
-			ColorCycleSurface(*Map.TileGraphic->Surface);
-		}
+		ColorCycleSurface(*Map.TileGraphic->Surface);
 	}
 }
 
@@ -486,16 +480,7 @@ void RestoreColorCyclingSurface()
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			LazilyMakeColorCyclingTextures(Map.TileGraphic, colorCycling.ColorIndexRanges);
-			Map.TileGraphic->Textures = Map.TileGraphic->ColorCyclingTextures[0];
-		}
-		else
-#endif
-		{
-			ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
-		}
+		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
 	}
 	colorCycling.cycleCount = 0;
 }

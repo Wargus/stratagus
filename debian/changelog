@@ -1,3 +1,20 @@
+stratagus (3.0.0) UNRELEASED; urgency=medium
+
+  * Migrate to SDL2, remove old direct OpenGL backend
+  * Migrate most custom code to handle image and audio formats, use SDL2_mixer and SDL2_image instead
+  * Force the AI to observe dependencies when upgrading in network games
+  * Fixed an issue with units continuing to attack destroyed walls
+  * Fixed an issue with units never finishing their move action if another unit appears at the goal position
+  * Fixed an issue when units would cease attacking non-threatening units of they came under attack, but their attacker is not reachable
+  * Fixed a potential segfault in the AI pathfinder
+  * Fixed a number of potential desyncs in network games, because the network random numbers where used for local sounds
+  * Fixed an issue with grayscale application for 4 bpp images
+  * Add an AlwaysThreat boolean flag for units that cannot attack but can cast spells and are thus still a danger for the AI
+  * Improve the displayed number of additional selected units
+  * Improve the pathfinding algorithm and related functions like retreating and roaming behavior
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 06 Jun 2020 11:10:12 +0200
+
 stratagus (2.4.3) eoan; urgency=medium
 
   * Allow specifying colors, percentages, and border for the LifeBar.

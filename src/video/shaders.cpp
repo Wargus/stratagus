@@ -1,103 +1,192 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2020 Tim Felgentreff
+ * Copyright (c) 2017 Augusto Ruiz
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#include "shaders.h"
+
+#ifndef __APPLE__
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
+
+#include <stdlib.h>
+
+#include <iostream>
+#include <fstream>
+
 #include "stratagus.h"
 #include "parameters.h"
 #include "video.h"
 #include "game.h"
 #include "iolib.h"
-#include <iostream>
-#include <fstream>
+#include "script.h"
 
-#ifdef USE_OPENGL
-
-#ifndef __APPLE__
+// Avoiding the use of GLEW or some extensions handler
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLATTACHSHADERPROC glAttachShader;
-PFNGLLINKPROGRAMPROC glLinkProgram;
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLISPROGRAMPROC glIsProgram;
-PFNGLDELETEPROGRAMPROC glDeleteProgram;
-PFNGLDELETESHADERPROC glDeleteShader;
 PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+PFNGLDELETESHADERPROC glDeleteShader;
+PFNGLATTACHSHADERPROC glAttachShader;
+PFNGLCREATEPROGRAMPROC glCreateProgram;
+PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLVALIDATEPROGRAMPROC glValidateProgram;
+PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+PFNGLUSEPROGRAMPROC glUseProgram;
+
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLACTIVETEXTUREPROC glActiveTextureProc;
+PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffers;
-PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebuffer;
-PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture;
-PFNGLGENRENDERBUFFERSEXTPROC glGenRenderbuffers;
-PFNGLBINDRENDERBUFFEREXTPROC glBindRenderbuffer;
-PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorage;
-PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbuffer;
-PFNGLDRAWBUFFERSPROC glDrawBuffers;
-PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatus;
+
+PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+PFNGLVERTEXATTRIB4FPROC glVertexAttrib4f;
+
+#ifdef WIN32
+#define CCONV __stdcall
 #else
-#define glGenFramebuffers glGenFramebuffersEXT
-#define glBindFramebuffer glBindFramebufferEXT
-#define glCheckFramebufferStatus glCheckFramebufferStatusEXT
-#define glActiveTextureProc glActiveTexture
-#define glFramebufferTexture glFramebufferTexture2DEXT
+#define CCONV
 #endif
 
-GLuint fullscreenShader;
-GLuint fullscreenFramebuffer = 0;
-GLuint fullscreenTexture;
+void (CCONV *lazyGlBegin)(GLenum);
+void (CCONV *lazyGlEnd)(void);
+void (CCONV *lazyGlTexCoord2f)(GLfloat, GLfloat);
+void (CCONV *lazyGlVertex2f)(GLfloat, GLfloat);
+void (CCONV *lazyGlGetIntegerv)(GLenum, GLint*);
+void (CCONV *lazyGlGetFloatv)(GLenum, GLfloat*);
+void (CCONV *lazyGlViewport)(GLint, GLint, GLsizei, GLsizei);
+void (CCONV *lazyGlMatrixMode)(GLenum);
+void (CCONV *lazyGlLoadIdentity)(void);
+void (CCONV *lazyGlOrtho)(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble);
 
-void printShaderInfoLog(GLuint obj, const char* prefix)
-{
-	int infologLength = 0;
-	int charsWritten = 0;
-	char *infoLog;
+static const int MAX_SHADERS = 128;
+static GLuint shaderPrograms[MAX_SHADERS + 1] = { (GLuint) 0 };
+static const char* shaderNames[MAX_SHADERS + 1] = { NULL };
+static char shadersLoaded = -1;
+static int currentShaderIdx = 0;
 
-	glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+const char* none =
+#include "./shaders/noshader.glsl"
+;
+const char* CRT =
+#include "./shaders/crt.glsl"
+;
+const char* VHS =
+#include "./shaders/vhs.glsl"
+;
+const char* xBRZ =
+#include "./shaders/xbrz.glsl"
+;
 
-	if (infologLength > 0)
-	{
-		infoLog = (char *)malloc(infologLength);
-		glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-		fprintf(stdout, "%s: %s\n", prefix, infoLog);
-		free(infoLog);
+static GLuint compileShader(const char* source, GLuint shaderType) {
+	// Create ID for shader
+	GLuint result = glCreateShader(shaderType);
+	// Define shader text
+	glShaderSource(result, 1, &source, NULL);
+	// Compile shader
+	glCompileShader(result);
+
+	// Check vertex shader for errors
+	GLint shaderCompiled = GL_FALSE;
+	glGetShaderiv( result, GL_COMPILE_STATUS, &shaderCompiled );
+	if( shaderCompiled != GL_TRUE ) {
+		std::cout << "Error during compilation: " << result << "!" << std::endl;
+		GLint logLength;
+		glGetShaderiv(result, GL_INFO_LOG_LENGTH, &logLength);
+		if (logLength > 0) {
+			GLchar *log = (GLchar*)malloc(logLength);
+			glGetShaderInfoLog(result, logLength, &logLength, log);
+			std::cout << "Shader compile log: " << log << std::endl;
+			free(log);
+		}
+		glDeleteShader(result);
+		result = 0;
+	} else {
+		std::cout << "Shader compiled correctly. Id = " << result << std::endl;
 	}
+	return result;
 }
-void printProgramInfoLog(GLuint obj, const char* prefix)
-{
-	int infologLength = 0;
-	int charsWritten = 0;
-	char *infoLog;
 
-	glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+static GLuint compileProgramSource(std::string source) {
+	GLuint programId = 0;
+	GLuint vtxShaderId, fragShaderId;
 
-	if (infologLength > 0)
-	{
-		infoLog = (char *)malloc(infologLength);
-		glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
-		fprintf(stdout, "%s: %s\n", prefix, infoLog);
-		free(infoLog);
+	vtxShaderId = compileShader((std::string("#define VERTEX\n") + source).c_str(), GL_VERTEX_SHADER);
+	fragShaderId = compileShader((std::string("#define FRAGMENT\n") + source).c_str(), GL_FRAGMENT_SHADER);
+
+	if(vtxShaderId && fragShaderId) {
+		programId = glCreateProgram();
+		// Associate shader with program
+		glAttachShader(programId, vtxShaderId);
+		glAttachShader(programId, fragShaderId);
+		glLinkProgram(programId);
+		glValidateProgram(programId);
+
+		// Check the status of the compile/link
+		GLint logLen;
+		glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &logLen);
+		if(logLen > 0) {
+			char* log = (char*) malloc(logLen * sizeof(char));
+			// Show any errors as appropriate
+			glGetProgramInfoLog(programId, logLen, &logLen, log);
+			std::cout << "Prog Info Log: " << std::endl << log << std::endl;
+			free(log);
+		}
 	}
+	if(vtxShaderId) {
+		glDeleteShader(vtxShaderId);
+	}
+	if(fragShaderId) {
+		glDeleteShader(fragShaderId);
+	}
+	return programId;
 }
 
-/* This does not have to be very efficient, it is only called when the shader
-   is changed by the user.
- */
-extern bool LoadShaders(int direction, char* shadernameOut) {
-	Video.ShaderIndex += direction;
-	if (direction == 0 && Video.ShaderIndex == -1) {
-		Video.ShaderIndex = 0;
-	}
+static GLuint compileProgram(std::string shaderFile) {
+	std::ifstream f(shaderFile);
+	std::string source((std::istreambuf_iterator<char>(f)),
+						std::istreambuf_iterator<char>());
+	std::cout << "[Shaders] Compiling shader: " << shaderFile << std::endl;
+	return compileProgramSource(source);
+}
 
-	GLuint vs, fs;
-	GLint params;
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	if (fs == 0) {
-	    return false;
-	}
+static void loadShaders() {
+	int numShdr = 0;
+
+#define COMPILE_BUILTIN_SHADER(name)									\
+	std::cout << "[Shaders] Compiling shader: " #name << std::endl;		\
+	shaderPrograms[numShdr] = compileProgramSource(std::string(name));	\
+	shaderNames[numShdr] = #name ;										\
+	numShdr++;
+	COMPILE_BUILTIN_SHADER(none);
+	COMPILE_BUILTIN_SHADER(xBRZ);
+	COMPILE_BUILTIN_SHADER(CRT);
+	COMPILE_BUILTIN_SHADER(VHS);
+#undef COMPILE_BUILTIN_SHADER
 
 	std::vector<FileList> flp;
 	std::string shaderPath(StratagusLibPath);
@@ -112,184 +201,232 @@ extern bool LoadShaders(int direction, char* shadernameOut) {
 	cShaderPath = (char*)shaderPath.c_str();
 #endif
 	int n = ReadDataDirectory(cShaderPath, flp);
-	int numShaderFiles = 0;
 	int shaderFileToIdx[1024];
 	for (int i = 0; i < n; ++i) {
 		int pos = flp[i].name.find(".glsl");
 		if (pos > 0) {
-			shaderFileToIdx[numShaderFiles] = i;
-			numShaderFiles++;
+			GLuint program = compileProgram(shaderPath + flp[i].name);
+			if (program) {
+				shaderPrograms[numShdr] = program;
+				shaderNames[numShdr] = strdup(flp[i].name.c_str());
+				numShdr += 1;
+				if (numShdr >= MAX_SHADERS) {
+					break;
+				}
+			}
 		}
 	}
-	if (numShaderFiles <= 0) return false;
-	while (Video.ShaderIndex < 0) {
-		Video.ShaderIndex = numShaderFiles + Video.ShaderIndex;
-	}
-	Video.ShaderIndex = Video.ShaderIndex % numShaderFiles;
-
-	if (shadernameOut) {
-		strncpy(shadernameOut, flp[shaderFileToIdx[Video.ShaderIndex]].name.c_str(), 1023);
-	}
-	shaderPath.append(flp[shaderFileToIdx[Video.ShaderIndex]].name);
-	std::ifstream myfile(shaderPath.c_str());
-	std::string contents((std::istreambuf_iterator<char>(myfile)),
-						  std::istreambuf_iterator<char>());
-	myfile.close();
-
-	const char *fragmentSrc[2] = { "#define FRAGMENT\n", contents.c_str() };
-	const char *vertexSrc[2] = { "#define VERTEX\n", contents.c_str() };
-
-	glShaderSource(fs, 2, fragmentSrc, NULL);
-	glCompileShader(fs);
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
-	if (params == GL_FALSE) {
-		printShaderInfoLog(fs, "Fragment Shader");
-		glDeleteShader(fs);
-		return false;
-	}
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	if (fs == 0) {
-		glDeleteShader(fs);
-		return false;
-	}
-	glShaderSource(vs, 2, vertexSrc, NULL);
-	glCompileShader(vs);
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
-	if (params == GL_FALSE) {
-		printShaderInfoLog(vs, "Vertex Shader");
-		glDeleteShader(fs);
-		glDeleteShader(vs);
-		return false;
-	}
-	if (glIsProgram(fullscreenShader)) {
-		glDeleteProgram(fullscreenShader);
-	}
-	fullscreenShader = glCreateProgram();
-	if (fullscreenShader == 0) {
-		glDeleteShader(fs);
-		glDeleteShader(vs);
-		return false;
-	}
-	glAttachShader(fullscreenShader, vs);
-	glAttachShader(fullscreenShader, fs);
-	glLinkProgram(fullscreenShader);
-	glGetProgramiv(fullscreenShader, GL_LINK_STATUS, &params);
-	if (params == GL_FALSE) {
-		printProgramInfoLog(fullscreenShader, "Shader Program");
-		glDeleteShader(fs);
-		glDeleteShader(vs);
-		glDeleteProgram(fullscreenShader);
-		return false;
-	}
-	glDeleteShader(fs);
-	glDeleteShader(vs);
-	return true;
 }
 
-extern bool LoadShaderExtensions() {
-#ifndef __APPLE__
-	glCreateShader = (PFNGLCREATESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glCreateShader");
-	glShaderSource = (PFNGLSHADERSOURCEPROC)(uintptr_t)SDL_GL_GetProcAddress("glShaderSource");
-	glCompileShader = (PFNGLCOMPILESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glCompileShader");
-	glCreateProgram = (PFNGLCREATEPROGRAMPROC)(uintptr_t)SDL_GL_GetProcAddress("glCreateProgram");
-	glAttachShader = (PFNGLATTACHSHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glAttachShader");
-	glLinkProgram = (PFNGLLINKPROGRAMPROC)(uintptr_t)SDL_GL_GetProcAddress("glLinkProgram");
-	glUseProgram = (PFNGLUSEPROGRAMPROC)(uintptr_t)SDL_GL_GetProcAddress("glUseProgram");
-	glGetShaderiv = (PFNGLGETSHADERIVPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetShaderiv");
-	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetProgramiv");
-	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetShaderInfoLog");
-	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetProgramInfoLog");
-	glIsProgram = (PFNGLISPROGRAMPROC)(uintptr_t)SDL_GL_GetProcAddress("glIsProgram");
-	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)(uintptr_t)SDL_GL_GetProcAddress("glDeleteProgram");
-	glDeleteShader = (PFNGLDELETESHADERPROC)(uintptr_t)SDL_GL_GetProcAddress("glDeleteShader");
+void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
+	GLint oldProgramId;
+	// Detach the texture
+	SDL_SetRenderTarget(renderer, NULL);
+	SDL_RenderClear(renderer);
 
-	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)(uintptr_t)SDL_GL_GetProcAddress("glGetUniformLocation");
-	glActiveTextureProc = (PFNGLACTIVETEXTUREPROC)(uintptr_t)SDL_GL_GetProcAddress("glActiveTexture");
-	glUniform1f = (PFNGLUNIFORM1FPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1f");
-	glUniform2f = (PFNGLUNIFORM2FPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform2f");
-	glUniform1i = (PFNGLUNIFORM1IPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniform1i");
-	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)(uintptr_t)SDL_GL_GetProcAddress("glUniformMatrix4fv");
+	SDL_GL_BindTexture(backBuffer, NULL, NULL);
+	GLuint shaderProgram = shaderPrograms[currentShaderIdx];
+	if (shaderProgram != 0) {
+		lazyGlGetIntegerv(GL_CURRENT_PROGRAM, &oldProgramId);
+		glUseProgram(shaderProgram);
+	}
 
-	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glGenFramebuffers");
-	glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glBindFramebuffer");
-	glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glFramebufferTexture2D");
-	glGenRenderbuffers = (PFNGLGENRENDERBUFFERSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glGenRenderbuffers");
-	glBindRenderbuffer = (PFNGLBINDRENDERBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glBindRenderbuffer");
-	glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glRenderbufferStorage");
-	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glFramebufferRenderbuffer");
-	glDrawBuffers = (PFNGLDRAWBUFFERSPROC)(uintptr_t)SDL_GL_GetProcAddress("glDrawBuffers");
-	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
-	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
-		return LoadShaders(0, NULL);
+	// These are the default uniforms and attrs for glsl converted libretro shaders
+	GLint Texture = glGetUniformLocation(shaderProgram, "Texture");
+	GLint MVPMatrix = glGetUniformLocation(shaderProgram, "MVPMatrix");
+	GLint FrameDirection = glGetUniformLocation(shaderProgram, "FrameDirection");
+	GLint FrameCount = glGetUniformLocation(shaderProgram, "FrameCount");
+	GLint OutputSize = glGetUniformLocation(shaderProgram, "OutputSize");
+	GLint TextureSize = glGetUniformLocation(shaderProgram, "TextureSize");
+	GLint InputSize = glGetUniformLocation(shaderProgram, "InputSize");
+	// (timfel): If I manually set the VertexCoord, it's wrong? But I have to set TexCoord? no idea...
+	// GLint VertexCoord = glGetAttribLocation(shaderProgram, "VertexCoord");
+	GLint TexCoord = glGetAttribLocation(shaderProgram, "TexCoord");
+
+	// Window coordinates
+	int w, h, xBorder = 0, yBorder = 0;
+	SDL_GL_GetDrawableSize(win, &w, &h);
+
+	// letterboxing
+	double xScale = (double)w / Video.Width;
+	double yScale = (double)h  / Video.Height;
+	if (xScale > yScale) {
+		xScale = yScale;
+		xBorder = std::floor((w - (Video.Width * yScale)) / 2.0);
+		w = Video.Width * yScale;
 	} else {
-		return false;
+		yScale = xScale;
+		yBorder = std::floor((h - (Video.Height * xScale)) / 2.0);
+		h = Video.Height * xScale;
 	}
-#else
-	return false; // FIXME: Does not currently work on OSX
-#endif
-}
-
-extern void SetupFramebuffer() {
-	glGenTextures(1, &fullscreenTexture); // generate a texture to render to off-screen
-	glBindTexture(GL_TEXTURE_2D, fullscreenTexture); // bind it, so all texture functions go to it
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Video.ViewportWidth, Video.ViewportHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0); // give an empty image to opengl
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // make sure we use nearest filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glGenFramebuffers(1, &fullscreenFramebuffer); // generate a framebuffer to render to
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer); // bind it
-	glFramebufferTexture(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, fullscreenTexture, 0); // set our texture as the "screen" of the framebuffer
-	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
-	glDrawBuffers(1, DrawBuffers);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT) != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "FATAL: Error Creating Framebuffer! Try running without OpenGL.");
-		exit(-1);
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
-}
-
-extern void RenderFramebufferToScreen() {
-	// switch the rendering target back to the real display
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-	// setup our shader program
-	glUseProgram(fullscreenShader);
-
-	// These are the default uniforms for glsl converted libretro shaders
-	GLint Texture = glGetUniformLocation(fullscreenShader, "Texture");
-	GLint MVPMatrix = glGetUniformLocation(fullscreenShader, "MVPMatrix");
-	GLint FrameDirection = glGetUniformLocation(fullscreenShader, "FrameDirection");
-	GLint FrameCount = glGetUniformLocation(fullscreenShader, "FrameCount");
-	GLint OutputSize = glGetUniformLocation(fullscreenShader, "OutputSize");
-	GLint TextureSize = glGetUniformLocation(fullscreenShader, "TextureSize");
-	GLint InputSize = glGetUniformLocation(fullscreenShader, "InputSize");
 
 	glUniform1i(Texture, 0);
-	GLfloat matrix[4 * 4];
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	GLfloat modelview[4 * 4];
+	GLfloat projection[4 * 4];
+	lazyGlGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+	lazyGlGetFloatv(GL_PROJECTION_MATRIX, projection);
+	GLfloat matrix[4 * 4] = {0.0f};
+	for (int i = 0; i < 4; i++) {
+		for(int j = 0; j < 4; j++) {
+			for (int k = 0; k < 4; k++) {
+				matrix[i * 4 + j] += modelview[i * 4 + k] * projection[k * 4 + j];
+			}
+		}
+	}
 	glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, matrix);
 	glUniform1f(FrameDirection, 1);
 	glUniform1f(FrameCount, 1);
-	glUniform2f(OutputSize, (float)Video.ViewportWidth, (float)Video.ViewportHeight);
-	glUniform2f(TextureSize, (float)Video.ViewportWidth, (float)Video.ViewportHeight);
+	glUniform2f(OutputSize, (float)w, (float)h);
+	glUniform2f(TextureSize, (float)Video.Width, (float)Video.Height);
 	glUniform2f(InputSize, (float)Video.Width, (float)Video.Height);
 
-	float widthRel = (float)Video.Width / Video.ViewportWidth;
-	float heightRel = (float)Video.Height / Video.ViewportHeight;
+	GLfloat minx, miny, maxx, maxy;
+	GLfloat minu, maxu, minv, maxv;
 
-	glActiveTextureProc(GL_TEXTURE0);
-	// render the framebuffer texture to a fullscreen quad on the real display
-	glBindTexture(GL_TEXTURE_2D, fullscreenTexture);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 1);
-	glVertex2i(0, 0);
-	glTexCoord2f(widthRel, 1);
-	glVertex2i(Video.ViewportWidth, 0);
-	glTexCoord2f(widthRel, 1 - heightRel);
-	glVertex2i(Video.ViewportWidth, Video.ViewportHeight);
-	glTexCoord2f(0, 1 - heightRel);
-	glVertex2i(0, Video.ViewportHeight);
-	glEnd();
-	SDL_GL_SwapBuffers();
-	glUseProgram(0); // Disable shaders again, and render to framebuffer again
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, fullscreenFramebuffer);
+	minx = 0.0f;
+	miny = 0.0f;
+	maxx = w;
+	maxy = h;
+
+	minu = 0.0f;
+	maxu = 1.0f;
+	minv = 0.0f;
+	maxv = 1.0f;
+
+
+	lazyGlMatrixMode(GL_PROJECTION);
+	lazyGlLoadIdentity();
+	lazyGlOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
+	lazyGlViewport(xBorder, yBorder, w, h);
+
+	lazyGlBegin(GL_TRIANGLE_STRIP);
+		glVertexAttrib4f(TexCoord, minu, minv, 0, 0);
+		lazyGlTexCoord2f(minu, minv);
+		lazyGlVertex2f(minx, miny);
+
+		glVertexAttrib4f(TexCoord, maxu, minv, 0, 0);
+		lazyGlTexCoord2f(maxu, minv);
+		lazyGlVertex2f(maxx, miny);
+
+		glVertexAttrib4f(TexCoord, minu, maxv, 0, 0);
+		lazyGlTexCoord2f(minu, maxv);
+		lazyGlVertex2f(minx, maxy);
+
+		glVertexAttrib4f(TexCoord, maxu, maxv, 0, 0);
+		lazyGlTexCoord2f(maxu, maxv);
+		lazyGlVertex2f(maxx, maxy);
+	lazyGlEnd();
+	SDL_GL_SwapWindow(win);
+
+	if (shaderProgram != 0) {
+		glUseProgram(oldProgramId);
+	}
 }
+
+const char* NextShader() {
+	if (shaderPrograms[++currentShaderIdx] == 0) {
+		currentShaderIdx = 0;
+	}
+	std::cout << "NextShader: " << shaderNames[currentShaderIdx] << std::endl;
+	return shaderNames[currentShaderIdx];
+}
+
+static int CclGetShader(lua_State *l) {
+	LuaCheckArgs(l, 0);
+	const char* shaderName = shaderNames[currentShaderIdx];
+	if (shaderName) {
+		lua_pushstring(l, shaderName);
+	} else {
+		lua_pushnil(l);
+	}
+	return 1;
+}
+
+static int CclSetShader(lua_State *l) {
+	LuaCheckArgs(l, 1);
+	const char* shaderName = LuaToString(l, 1);
+	for (int i = 0; i < MAX_SHADERS; i++) {
+		const char* n = shaderNames[i];
+		if (n) {
+			if (!strcmp(n, shaderName)) {
+				currentShaderIdx = i;
+				std::cout << "SetShader: " << shaderNames[currentShaderIdx] << std::endl;
+				lua_pushboolean(l, 1);
+				return 1;
+			}
+		} else {
+			break;
+		}
+	}
+	lua_pushboolean(l, 0);
+	return 1;
+}
+
+static int CclGetShaderNames(lua_State *l) {
+	LuaCheckArgs(l, 0);
+	lua_newtable(l);
+	for (int i = 0; shaderNames[i] != NULL; i++) {
+		lua_pushstring(l, shaderNames[i]);
+		lua_rawseti(l, -2, i + 1);
+	}
+	return 1;
+}
+
+bool LoadShaderExtensions() {
+	if (shadersLoaded != -1) {
+		return shadersLoaded == 1;
+	}
+
+	*(void **) (&lazyGlBegin) = SDL_GL_GetProcAddress("glBegin");
+	*(void **) (&lazyGlEnd) = SDL_GL_GetProcAddress("glEnd");
+	*(void **) (&lazyGlTexCoord2f) = SDL_GL_GetProcAddress("glTexCoord2f");
+	*(void **) (&lazyGlVertex2f) = SDL_GL_GetProcAddress("glVertex2f");
+	*(void **) (&lazyGlGetIntegerv) = SDL_GL_GetProcAddress("glGetIntegerv");
+	*(void **) (&lazyGlGetFloatv) = SDL_GL_GetProcAddress("glGetFloatv");
+	*(void **) (&lazyGlViewport) = SDL_GL_GetProcAddress("glViewport");
+	*(void **) (&lazyGlMatrixMode) = SDL_GL_GetProcAddress("glMatrixMode");
+	*(void **) (&lazyGlOrtho) = SDL_GL_GetProcAddress("glOrtho");
+	*(void **) (&lazyGlLoadIdentity) = SDL_GL_GetProcAddress("glLoadIdentity");
+
+	glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
+	glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
+	glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
+	glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
+	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
+	glDeleteShader = (PFNGLDELETESHADERPROC)SDL_GL_GetProcAddress("glDeleteShader");
+	glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
+	glCreateProgram = (PFNGLCREATEPROGRAMPROC)SDL_GL_GetProcAddress("glCreateProgram");
+	glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
+	glValidateProgram = (PFNGLVALIDATEPROGRAMPROC)SDL_GL_GetProcAddress("glValidateProgram");
+	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
+	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
+	glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
+	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)SDL_GL_GetProcAddress("glGetUniformLocation");
+	glUniform1i = (PFNGLUNIFORM1IPROC)SDL_GL_GetProcAddress("glUniform1i");
+	glUniform1f = (PFNGLUNIFORM1FPROC)SDL_GL_GetProcAddress("glUniform1f");
+	glUniform2f = (PFNGLUNIFORM2FPROC)SDL_GL_GetProcAddress("glUniform2f");
+	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)SDL_GL_GetProcAddress("glUniformMatrix4fv");
+	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)SDL_GL_GetProcAddress("glGetAttribLocation");
+	glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)SDL_GL_GetProcAddress("glVertexAttrib4f");
+
+	if (lazyGlBegin && lazyGlEnd && lazyGlTexCoord2f && lazyGlVertex2f && lazyGlGetIntegerv &&
+		glCreateShader && glShaderSource && glCompileShader && glGetShaderiv &&
+		glGetShaderInfoLog && glDeleteShader && glAttachShader && glCreateProgram &&
+		glLinkProgram && glValidateProgram && glGetProgramiv && glGetProgramInfoLog &&
+		glUseProgram && glGetUniformLocation && glUniform1i && glUniform1f && glUniform2f &&
+		glUniformMatrix4fv && glGetAttribLocation && glVertexAttrib4f) {
+		shadersLoaded = 1;
+		loadShaders();
+	} else {
+		shadersLoaded = 0;
+		return false;
+	}
+
+	lua_register(Lua, "GetShaderNames", CclGetShaderNames);
+	lua_register(Lua, "GetShader", CclGetShader);
+	lua_register(Lua, "SetShader", CclSetShader);
+
+	return shadersLoaded == 1;
+}
+
 #endif

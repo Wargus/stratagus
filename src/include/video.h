@@ -34,33 +34,13 @@
 //@{
 
 #include "SDL.h"
-
-#ifdef USE_GLES
-#include "GLES/gl.h"
-#endif
-
-#ifdef USE_OPENGL
-#ifdef __APPLE__
-#define GL_GLEXT_PROTOTYPES 1
-#endif
-#define __gl_glext_h_
-#include "SDL_opengl.h"
 #include "shaders.h"
-#endif
-
 #include "guichan.h"
 
 #include "color.h"
 #include "vec2i.h"
 
 class CFont;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-extern char ForceUseOpenGL;
-extern bool UseOpenGL;
-extern bool ZoomNoResize;
-extern bool GLShaderPipelineSupported;
-#endif
 
 class CGraphic : public gcn::Image
 {
@@ -74,10 +54,6 @@ protected:
 	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0),
-		ColorCyclingTextures(NULL), NumColorCycles(0)
-#endif
 	{
 		frameFlip_map = NULL;
 	}
@@ -95,18 +71,12 @@ public:
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	void DrawFrameClip(unsigned frame, int x, int y) const;
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
-#endif
 	void DrawFrameClipX(unsigned frame, int x, int y) const;
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
@@ -117,13 +87,9 @@ public:
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	bool DeleteColorCyclingTextures();
-#endif
 
 	void Load(bool grayscale = false);
 	void Flip();
-	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
 	bool TransparentPixel(int x, int y);
@@ -151,15 +117,6 @@ public:
 	int Refs;                  /// Uses of this graphic
 	bool Resized;              /// Image has been resized
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat TextureWidth;      /// Width of the texture
-	GLfloat TextureHeight;     /// Height of the texture
-	GLuint *Textures;          /// Texture names
-	int NumTextures;           /// Number of textures
-	GLuint **ColorCyclingTextures; /// Texture names
-	int NumColorCycles; /// Number of color cycled texture groups
-#endif
-
 	friend class CFont;
 };
 
@@ -168,9 +125,6 @@ class CPlayerColorGraphic : public CGraphic
 protected:
 	CPlayerColorGraphic()
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
-#endif
 	}
 
 public:
@@ -182,10 +136,6 @@ public:
 	static CPlayerColorGraphic *Get(const std::string &file);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
-#endif
 };
 
 #ifdef USE_MNG
@@ -207,11 +157,6 @@ public:
 	unsigned char *buffer;
 	unsigned long ticks;
 	int iteration;
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	GLfloat texture_width;   /// Width of the texture
-	GLfloat texture_height;  /// Height of the texture
-	GLuint texture_name;     /// Texture name
-#endif
 };
 #endif
 
@@ -264,11 +209,10 @@ struct EventCallback {
 #define AMASK   0x000000ff
 #endif
 
-
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), ViewportWidth(0), ViewportHeight(0), Depth(0), ShaderIndex(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), Depth(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -316,14 +260,7 @@ public:
 
 	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return MapRGBA(f, r, g, b, 0xFF);
-		} else
-#endif
-		{
-			return SDL_MapRGB(f, r, g, b);
-		}
+		return SDL_MapRGB(f, r, g, b);
 	}
 	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
 	{
@@ -331,14 +268,7 @@ public:
 	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			return ((r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (a << ASHIFT));
-		} else
-#endif
-		{
-			return SDL_MapRGBA(f, r, g, b, a);
-		}
+		return SDL_MapRGBA(f, r, g, b, a);
 	}
 	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
 	{
@@ -346,39 +276,19 @@ public:
 	}
 	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGB(c, f, r, g, b);
-		}
+		SDL_GetRGB(c, f, r, g, b);
 	}
 	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
-#if defined(USE_OPENGL) || defined(USE_GLES)
-		if (UseOpenGL) {
-			*r = (c >> RSHIFT) & 0xff;
-			*g = (c >> GSHIFT) & 0xff;
-			*b = (c >> BSHIFT) & 0xff;
-			*a = (c >> ASHIFT) & 0xff;
-		} else
-#endif
-		{
-			SDL_GetRGBA(c, f, r, g, b, a);
-		}
+		SDL_GetRGBA(c, f, r, g, b, a);
 	}
 
 	int Width;
 	int Height;
-	int ViewportWidth;         /// Actual width of the window
-	int ViewportHeight;        /// Actual height of the window
+	int WindowWidth;
+	int WindowHeight;
 	SDL_Cursor *blankCursor;
 	int Depth;
-	int ShaderIndex;
 	bool FullScreen;
 };
 
@@ -412,21 +322,19 @@ extern unsigned long SlowFrameCounter;
 extern void SetPlayersPalette();
 
 /// The SDL screen
+extern SDL_Window *TheWindow;
+extern SDL_Renderer *TheRenderer;
 extern SDL_Surface *TheScreen;
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-/// Max texture size supported on the video card
-extern GLint GLMaxTextureSize;
-/// User-specified limit for ::GLMaxTextureSize
-extern GLint GLMaxTextureSizeOverride;
-/// Is OpenGL texture compression supported
-extern bool GLTextureCompressionSupported;
-/// Use OpenGL texture compression
-extern bool UseGLTextureCompression;
-#endif
+extern SDL_Texture *TheTexture;
 
 /// register lua function
 extern void VideoCclRegister();
+
+/// initialize the image loaders part
+extern void InitImageLoaders();
+
+/// deinitialize the image loaders
+extern void DeInitImageLoaders();
 
 /// initialize the video part
 extern void InitVideo();
@@ -436,28 +344,6 @@ void DeInitVideo();
 
 /// Check if a resolution is valid
 extern int VideoValidResolution(int w, int h);
-
-/// Load graphic from PNG file
-extern int LoadGraphicPNG(CGraphic *g);
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-
-/// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic);
-/// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
-
-/// Regenerate Window screen if needed
-extern void ValidateOpenGLScreen();
-
-/// Free OpenGL graphics
-extern void FreeOpenGLGraphics();
-/// Reload OpenGL graphics
-extern void ReloadGraphics();
-/// Reload OpenGL
-extern void ReloadOpenGL();
-
-#endif
 
 /// Initializes video synchronization.
 extern void SetVideoSync();
@@ -555,24 +441,7 @@ inline int GetColorIndexByName(const char *colorName) {
     return -1;
 }
 
-#if defined(USE_OPENGL) || defined(USE_GLES)
-void DrawTexture(const CGraphic *g, GLuint *textures, int sx, int sy,
-				 int ex, int ey, int x, int y, int flip);
-#endif
-
 extern void FreeGraphics();
-
-
-// ARB_texture_compression
-#if defined(USE_OPENGL) && !defined(__APPLE__)
-extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
-extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
-extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE3DARBPROC glCompressedTexSubImage3DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE2DARBPROC glCompressedTexSubImage2DARB;
-extern PFNGLCOMPRESSEDTEXSUBIMAGE1DARBPROC glCompressedTexSubImage1DARB;
-extern PFNGLGETCOMPRESSEDTEXIMAGEARBPROC   glGetCompressedTexImageARB;
-#endif
 
 //
 //  Color Cycling stuff

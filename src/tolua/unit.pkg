@@ -39,8 +39,6 @@ class CPreference
 	unsigned int ShowNameTime;
 	unsigned int AutosaveMinutes;
 
-	std::string SF2Soundfont;
-
 	CGraphic *IconFrameG;
 	CGraphic *PressedIconFrameG;
 };

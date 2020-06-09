@@ -615,20 +615,26 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 	pos.x += type.OffsetX + type.ShadowOffsetX;
 	pos.y += type.OffsetY + type.ShadowOffsetY;
 
-	if (type.Flip) {
-		if (frame < 0) {
-			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+	if (!type.ShadowSpriteFrame) {
+		// the shadow is a full unit shadow
+		if (type.Flip) {
+			if (frame < 0) {
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			} else {
+				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+			}
 		} else {
+			int row = type.NumDirections / 2 + 1;
+			if (frame < 0) {
+				frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+			} else {
+				frame = (frame / row) * type.NumDirections + frame % row;
+			}
 			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 		}
 	} else {
-		int row = type.NumDirections / 2 + 1;
-		if (frame < 0) {
-			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
-		} else {
-			frame = (frame / row) * type.NumDirections + frame % row;
-		}
-		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+		// the shadow is a simple sprite without directions, like in WC2
+		type.ShadowSprite->DrawFrameClip(type.ShadowSpriteFrame - 1, pos.x, pos.y);
 	}
 }
 

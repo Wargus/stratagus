@@ -20,6 +20,6 @@ extern void StopMusic(void);
 extern bool IsMusicPlaying();
 
 extern int SetChannelVolume(int channel, int volume);
-extern int SetChannelStereo(int channel, int stereo);
+extern void SetChannelStereo(int channel, int stereo);
 extern void StopChannel(int channel);
 extern void StopAllChannels();

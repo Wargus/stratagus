@@ -90,6 +90,7 @@ void MissileType::LoadMissileSprite()
 		}
 
 		// Correct the number of frames in graphic
+		DebugPrint("%s - %d>=%d\n" _C_ this->G->File.c_str() _C_ this->G->NumFrames _C_ this->SpriteFrames);
 		Assert(this->G->NumFrames >= this->SpriteFrames);
 		this->G->NumFrames = this->SpriteFrames;
 		// FIXME: Don't use NumFrames as number of frames.
