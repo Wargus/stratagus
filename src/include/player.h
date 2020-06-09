@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <set>
 #include <string>
 
 #include "color.h"
@@ -213,10 +214,14 @@ public:
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
-	bool IsSharedVision(const CPlayer &player) const;
-	bool IsSharedVision(const CUnit &unit) const;
-	bool IsBothSharedVision(const CPlayer &player) const;
-	bool IsBothSharedVision(const CUnit &unit) const;
+	const std::set<int> &GetSharedVision() const
+	{
+		return this->SharedVision;
+	}
+	bool HasSharedVisionWith(const CPlayer &player) const;
+	bool HasSharedVisionWith(const CUnit &unit) const;
+	bool HasMutualSharedVisionWith(const CPlayer &player) const;
+	bool HasMutualSharedVisionWith(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 
@@ -236,7 +241,7 @@ private:
 	std::vector<CUnit *> Units; /// units of this player
 	unsigned int Enemy;         /// enemy bit field for this player
 	unsigned int Allied;        /// allied bit field for this player
-	unsigned int SharedVision;  /// shared vision bit field
+	std::set<int> SharedVision; /// set of player indexes that this player has shared vision with
 };
 
 /**

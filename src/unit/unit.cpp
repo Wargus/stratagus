@@ -1645,8 +1645,8 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	if (VisCount[player.Index]) {
 		return true;
 	}
-	for (int p = 0; p < PlayerMax; ++p) {
-		if (p != player.Index && player.IsBothSharedVision(Players[p])) {
+	for (const int p : player.GetSharedVision()) {
+		if (player.HasMutualSharedVisionWith(Players[p])) {
 			if (VisCount[p]) {
 				return true;
 			}
@@ -3280,9 +3280,9 @@ bool CUnit::IsAllied(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::IsSharedVision(const CPlayer &player) const
+bool CUnit::HasSharedVisionWith(const CPlayer &player) const
 {
-	return this->Player->IsSharedVision(player);
+	return this->Player->HasSharedVisionWith(player);
 }
 
 /**
@@ -3290,9 +3290,9 @@ bool CUnit::IsSharedVision(const CPlayer &player) const
 **
 **  @param x  Unit to check
 */
-bool CUnit::IsSharedVision(const CUnit &unit) const
+bool CUnit::HasSharedVisionWith(const CUnit &unit) const
 {
-	return IsSharedVision(*unit.Player);
+	return this->HasSharedVisionWith(*unit.Player);
 }
 
 /**
@@ -3300,9 +3300,9 @@ bool CUnit::IsSharedVision(const CUnit &unit) const
 **
 **  @param x  Player to check
 */
-bool CUnit::IsBothSharedVision(const CPlayer &player) const
+bool CUnit::HasMutualSharedVisionWith(const CPlayer &player) const
 {
-	return this->Player->IsBothSharedVision(player);
+	return this->Player->HasMutualSharedVisionWith(player);
 }
 
 /**
@@ -3310,9 +3310,9 @@ bool CUnit::IsBothSharedVision(const CPlayer &player) const
 **
 **  @param x  Unit to check
 */
-bool CUnit::IsBothSharedVision(const CUnit &unit) const
+bool CUnit::HasMutualSharedVisionWith(const CUnit &unit) const
 {
-	return IsBothSharedVision(*unit.Player);
+	return this->HasMutualSharedVisionWith(*unit.Player);
 }
 
 /**
