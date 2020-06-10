@@ -82,7 +82,7 @@ class CPlayer
 {
 public:
 	static inline enum ERevelations { cNoRrevelation, cAllUnits, cBuildingsOnly } 
-		RevelationFor; /// type of revelation (when player lost their last main facility)
+		RevelationFor {cNoRrevelation}; /// type of revelation (when player lost their last main facility)
 
 public:
 	/// Check if relevation enabled
