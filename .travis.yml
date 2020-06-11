@@ -1,7 +1,9 @@
 language: cpp
-os:
-  - linux
-  - osx
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+    - os: osx
 addons:
   apt:
     packages:
