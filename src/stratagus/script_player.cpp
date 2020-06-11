@@ -530,11 +530,11 @@ static int CclSetRevelationType(lua_State *l)
 
 	const char *revel_type = LuaToString(l, 1);
 	if (!strcmp(revel_type, "no-revelation")) {
-		CPlayer::SetRevelationType(CPlayer::cNoRrevelation);
+		CPlayer::SetRevelationType(RevealTypes::cNoRrevelation);
 	} else if (!strcmp(revel_type, "all-units")) {
-		CPlayer::SetRevelationType(CPlayer::cAllUnits);
+		CPlayer::SetRevelationType(RevealTypes::cAllUnits);
 	} else if (!strcmp(revel_type, "buildings-only")) {
-		CPlayer::SetRevelationType(CPlayer::cBuildingsOnly);
+		CPlayer::SetRevelationType(RevealTypes::cBuildingsOnly);
 	} else {
 		PrintFunction();
 		fprintf(stdout, "Accessible types of revelation \"no-revelation\", \"all-units\" and \"buildings-only\".\n");

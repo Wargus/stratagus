@@ -1692,7 +1692,7 @@ bool CUnit::IsVisibleOnMinimap() const
 	}
 	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer) 
 		|| (CPlayer::IsRevelationEnabled() && Player->IsRevealed() 
-			&& (CPlayer::RevelationFor == CPlayer::cAllUnits || this->Type->BoolFlag[BUILDING_INDEX].value))) {
+			&& (CPlayer::RevelationFor == RevealTypes::cAllUnits || this->Type->BoolFlag[BUILDING_INDEX].value))) {
 		return IsAliveOnMap();
 	} else {
 		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3

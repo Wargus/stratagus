@@ -77,22 +77,28 @@ enum _diplomacy_ {
 	DiplomacyCrazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
+enum class RevealTypes 
+{ 
+	cNoRrevelation, 
+	cAllUnits, 
+	cBuildingsOnly 
+}; /// Revelation types
+
 ///  Player structure
 class CPlayer
 {
 public:
-	static inline enum ERevelations { cNoRrevelation, cAllUnits, cBuildingsOnly } 
-		RevelationFor {cNoRrevelation}; /// type of revelation (when player lost their last main facility)
+	static inline RevealTypes RevelationFor { RevealTypes::cNoRrevelation }; /// type of revelation (when player lost their last main facility)
 
 public:
 	/// Check if relevation enabled
 	static const bool IsRevelationEnabled()
 	{
 		// By default there is no revelation. Can be changed in lua-script
-		return CPlayer::RevelationFor != cNoRrevelation; 
+		return CPlayer::RevelationFor != RevealTypes::cNoRrevelation; 
 	}
 	/// Change revelation type
-	static void SetRevelationType(const ERevelations type);
+	static void SetRevelationType(const RevealTypes type);
 	/// Get revealed players list
 	static const std::vector<const CPlayer *> &GetRevealedPlayers()
 	{
