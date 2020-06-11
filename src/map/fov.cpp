@@ -52,9 +52,9 @@
 ** @param fov_type	type to set
 ** @return true if success, false for wrong fov_type 
 */
-bool CFieldOfView::SetType(const unsigned short fov_type)
+bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 {
-	if (fov_type < cFoVTypesCount) {
+	if (fov_type < FieldOfViewTypes::NumOfTypes) {
 		this->Settings.FoV_Type = fov_type;
 		return true;
 	} else {
@@ -67,7 +67,7 @@ bool CFieldOfView::SetType(const unsigned short fov_type)
 ** 
 ** @return current Field of View type
 */
-unsigned short CFieldOfView::GetType() const
+FieldOfViewTypes CFieldOfView::GetType() const
 {
 	return this->Settings.FoV_Type;
 }
@@ -77,7 +77,7 @@ unsigned short CFieldOfView::GetType() const
 ** 
 ** @param flags	Terrain flags to set as opaque (MapField*)
 */
-void CFieldOfView::SetOpaqueFields(const unsigned short flags)
+void CFieldOfView::SetOpaqueFields(const uint16_t flags)
 {
 	this->Settings.OpaqueFields = flags;
 }
@@ -87,7 +87,7 @@ void CFieldOfView::SetOpaqueFields(const unsigned short flags)
 ** 
 ** @return Set of terrain flags
 */
-unsigned short CFieldOfView::GetOpaqueFields() const
+uint16_t CFieldOfView::GetOpaqueFields() const
 {
 	return this->Settings.OpaqueFields;
 }
@@ -119,7 +119,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 	if (!range) {
 		return;
 	}
-	if (this->Settings.FoV_Type == cShadowCasting && !unit.Type->AirUnit) {
+	if (this->Settings.FoV_Type == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
 
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
@@ -404,9 +404,9 @@ void CFieldOfView::InitShadowCaster(const CPlayer *player, const CUnit *unit, Ma
 
 void CFieldOfView::ResetShadowCaster()
 {
-	Player 			= NULL;
-	Unit 			= NULL;
-	map_setFoV 		= NULL;
+	Player 			= nullptr;
+	Unit 			= nullptr;
+	map_setFoV 		= nullptr;
 	currTilePos 	= {0, 0};
 
 	ResetEnvironment();

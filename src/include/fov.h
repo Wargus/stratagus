@@ -39,14 +39,16 @@
 #include "tileset.h"
 
 
+/// Select algorithm for field of view
+enum class FieldOfViewTypes { cShadowCasting,  cSimpleRadial, NumOfTypes }; 
 
 class CFieldOfView
 {
 public:
 	CFieldOfView() : currTilePos(0, 0), currOctant(0), Origin(0, 0), OpaqueFields(0),
-		Player(NULL), Unit(NULL), map_setFoV(NULL)
+		Player(nullptr), Unit(nullptr), map_setFoV(nullptr)
 	{
-		Settings.FoV_Type      = cSimpleRadial;
+		Settings.FoV_Type      = FieldOfViewTypes::cSimpleRadial;
 		Settings.OpaqueFields  = MapFieldOpaque;
 	}
 	/// Refresh field of view
@@ -56,14 +58,12 @@ public:
 	** void Refresh(const CPlayer &player, const CUnit &unit, MapMarkerFunc *marker);
 	*/
 
-	/// Select algorithm for field of view
-	enum { cShadowCasting = 0,  cSimpleRadial, cFoVTypesCount }; 
-	bool SetType(const unsigned short);
-	unsigned short GetType() const;
+	bool SetType(const FieldOfViewTypes fov_type);
+	FieldOfViewTypes GetType() const;
 
 	/// Set opaque map field flags (which fields will be opaque)
-	void SetOpaqueFields(const unsigned short flags);
-	unsigned short GetOpaqueFields() const;
+	void SetOpaqueFields(const uint16_t flags);
+	uint16_t GetOpaqueFields() const;
 	/// Reset opaque flags to default (MapFieldOpaque)
 	void ResetAdditionalOpaqueFields();
 
@@ -109,9 +109,10 @@ private:
 	void ProjectCurrentTile(const short col, const short row);
 
 private:
-	struct {
-		unsigned short FoV_Type;        /// Type of field of view - Shadowcasting or Simple Radial
-		unsigned short OpaqueFields;    /// Flags for opaque MapFields
+	struct FieldOfViewSettings 
+	{
+		FieldOfViewTypes FoV_Type;        /// Type of field of view - Shadowcasting or Simple Radial
+		uint16_t 		 OpaqueFields;    /// Flags for opaque MapFields
 	} Settings;
 
 	Vec2i            currTilePos;       /// Current work tile pos in global (Map) system coordinates

@@ -257,15 +257,15 @@ static int CclSetFieldOfViewType(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	
-	unsigned short new_type = 0;
+	FieldOfViewTypes new_type;
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "shadow-casting")) {
-		new_type |= CFieldOfView::cShadowCasting;
+		new_type = FieldOfViewTypes::cShadowCasting;
 	} else if (!strcmp(type_name, "simple-radial")) {
-		new_type |= CFieldOfView::cSimpleRadial;
+		new_type = FieldOfViewTypes::cSimpleRadial;
 	} else {
 		PrintFunction();
-		fprintf(stdout, "Accessible Field of View types are \"shadow-casting\", \"simple-radial\".\n");
+		fprintf(stdout, "Accessible Field of View types: \"shadow-casting\", \"simple-radial\".\n");
 		return 1;
 	}
 	FieldOfView.SetType(new_type);
@@ -281,7 +281,7 @@ static int CclSetFieldOfViewType(lua_State *l)
 */
 static int CclSetOpaqueFor(lua_State *l)
 {
-	unsigned short new_flag = 0;
+	uint16_t new_flag = 0;
 	const int args = lua_gettop(l);
 	if (args < 1) {
 		LuaError(l, "argument missed");
