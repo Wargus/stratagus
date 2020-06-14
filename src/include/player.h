@@ -79,7 +79,7 @@ enum _diplomacy_ {
 
 enum class RevealTypes 
 { 
-	cNoRrevelation, 
+	cNoRevelation, 
 	cAllUnits, 
 	cBuildingsOnly 
 }; /// Revelation types
@@ -88,14 +88,14 @@ enum class RevealTypes
 class CPlayer
 {
 public:
-	static inline RevealTypes RevelationFor { RevealTypes::cNoRrevelation }; /// type of revelation (when player lost their last main facility)
+	static inline RevealTypes RevelationFor { RevealTypes::cNoRevelation }; /// type of revelation (when player lost their last main facility)
 
 public:
 	/// Check if relevation enabled
 	static const bool IsRevelationEnabled()
 	{
 		// By default there is no revelation. Can be changed in lua-script
-		return CPlayer::RevelationFor != RevealTypes::cNoRrevelation; 
+		return CPlayer::RevelationFor != RevealTypes::cNoRevelation; 
 	}
 	/// Change revelation type
 	static void SetRevelationType(const RevealTypes type);

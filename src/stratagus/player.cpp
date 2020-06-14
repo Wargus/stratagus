@@ -338,7 +338,7 @@ int PlayerColorIndexCount;
 */
 void CPlayer::SetRevelationType(const RevealTypes type)
 {
-	if (type >= RevealTypes::cNoRrevelation && type <= RevealTypes::cBuildingsOnly) {
+	if (type >= RevealTypes::cNoRevelation && type <= RevealTypes::cBuildingsOnly) {
 		CPlayer::RevelationFor = type;
 	}
 }
