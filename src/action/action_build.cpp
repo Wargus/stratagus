@@ -345,6 +345,20 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			ontop.Release();
 		}
 	}
+	
+	if (type.BoolFlag[MAINFACILITY_INDEX].value 
+	&& CPlayer::IsRevelationEnabled() && unit.Player->LostMainFacilityTimer != 0 ) {
+		
+		unit.Player->LostMainFacilityTimer = 0;
+		unit.Player->SetRevealed(false);
+		for (int j = 0; j < NumPlayers; ++j) {
+			if (unit.Player->Index != j && Players[j].Type != PlayerNobody) {
+				Players[j].Notify(_("%s has rebuilt a base, and will no longer be revealed!"), unit.Player->Name.c_str());
+			} else {
+				Players[j].Notify("%s", _("You have rebuilt a base, and will no longer be revealed!"));
+			}
+		}
+	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
 	delete build->CurrentOrder();

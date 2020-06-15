@@ -290,7 +290,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 {
 	const CUnitType *type;
 
-	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer)) {
+	if (Editor.Running || ReplayRevealMap || unit.IsVisible(*ThisPlayer) || unit.Player->IsRevealed()) {
 		type = unit.Type;
 	} else {
 		type = unit.Seen.Type;

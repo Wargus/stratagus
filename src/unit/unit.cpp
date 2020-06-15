@@ -1321,6 +1321,26 @@ void UnitLost(CUnit &unit)
 		}
 	}
 
+	if (type.BoolFlag[MAINFACILITY_INDEX].value && CPlayer::IsRevelationEnabled()) {
+		bool lost_town_hall = true;
+		for (int j = 0; j < player.GetUnitCount(); ++j) {
+			if (player.GetUnit(j).Type->BoolFlag[MAINFACILITY_INDEX].value) {
+				lost_town_hall = false;
+				break;
+			}
+		}
+		if (lost_town_hall) {
+			player.LostMainFacilityTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
+			for (int j = 0; j < NumPlayers; ++j) {
+				if (player.Index != j && Players[j].Type != PlayerNobody) {
+					Players[j].Notify(_("%s has lost their last base, and will be revealed in thirty seconds!"), player.Name.c_str());
+				} else {
+					Players[j].Notify("%s", _("You have lost your last base, and will be revealed in thirty seconds!"));
+				}
+			}
+		}
+	}
+
 	//  Handle order cancels.
 	unit.CurrentOrder()->Cancel(unit);
 
@@ -1652,6 +1672,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -1669,7 +1690,9 @@ bool CUnit::IsVisibleOnMinimap() const
 	if (IsInvisibile(*ThisPlayer)) {
 		return false;
 	}
-	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)) {
+	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer) 
+		|| (CPlayer::IsRevelationEnabled() && Player->IsRevealed() 
+			&& (CPlayer::RevelationFor == RevealTypes::cAllUnits || this->Type->BoolFlag[BUILDING_INDEX].value))) {
 		return IsAliveOnMap();
 	} else {
 		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
