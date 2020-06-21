@@ -34,7 +34,9 @@
 #include <guichan/gsdl.h>
 #include "font.h"
 
+#include "keylistener.h"
 #include "luacallback.h"
+#include "mouselistener.h"
 
 
 extern bool GuichanActive;
@@ -43,12 +45,24 @@ void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
 
-class LuaActionListener : public gcn::ActionListener
+class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, public gcn::MouseListener
 {
 	LuaCallback callback;
 public:
 	LuaActionListener(lua_State *lua, lua_Object function);
 	virtual void action(const std::string &eventId);
+	virtual bool keyPress(const gcn::Key&);
+	virtual bool keyRelease(const gcn::Key&);
+	virtual void hotKeyPress(const gcn::Key&);
+	virtual void hotKeyRelease(const gcn::Key&);
+	virtual void mouseIn();
+	virtual void mouseOut();
+	virtual void mousePress(int, int, int);
+	virtual void mouseRelease(int, int, int);
+	virtual void mouseClick(int, int, int, int);
+	virtual void mouseWheelUp(int, int);
+	virtual void mouseWheelDown(int, int);
+	virtual void mouseMotion(int, int);
 	virtual ~LuaActionListener();
 };
 

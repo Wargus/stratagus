@@ -293,12 +293,24 @@ class Widget
 	virtual void setHotKey(const char *key);
 
 	virtual void addActionListener(LuaActionListener *actionListener);
+        virtual void addMouseListener(LuaActionListener *actionListener);
+        virtual void addKeyListener(LuaActionListener *actionListener);
 };
 
 $[
 Widget.setActionCallback = function(w, f)
   w._actioncb = LuaActionListener(f)
   w:addActionListener(w._actioncb)
+end
+
+Widget.setMouseCallback = function(w, f)
+  w._mousecb = LuaActionListener(f)
+  w:addMouseListener(w._mousecb)
+end
+
+Widget.setKeyCallback = function(w, f)
+  w._keycb = LuaActionListener(f)
+  w:addKeyListener(w._keycb)
 end
 $]
 

@@ -196,6 +196,85 @@ void LuaActionListener::action(const std::string &eventId)
 	callback.run();
 }
 
+bool LuaActionListener::keyPress(const gcn::Key& key) {
+	callback.pushPreamble();
+	callback.pushString("keyPress");
+	callback.pushString(key.toString());
+	callback.run(1);
+	return callback.popBoolean();
+}
+
+bool LuaActionListener::keyRelease(const gcn::Key& key) {
+	callback.pushPreamble();
+	callback.pushString("keyRelease");
+	callback.pushString(key.toString());
+	callback.run(1);
+	return callback.popBoolean();
+}
+
+void LuaActionListener::hotKeyPress(const gcn::Key& key) {
+	callback.pushPreamble();
+	callback.pushString("hotKeyPress");
+	callback.pushString(key.toString());
+	callback.run();
+}
+
+void LuaActionListener::hotKeyRelease(const gcn::Key& key) {
+	callback.pushPreamble();
+	callback.pushString("hotKeyRelease");
+	callback.pushString(key.toString());
+	callback.run();
+}
+
+void LuaActionListener::mouseIn() {
+	callback.pushPreamble();
+	callback.pushString("mouseIn");
+	callback.run();
+}
+
+void LuaActionListener::mouseOut() {
+	callback.pushPreamble();
+	callback.pushString("mouseOut");
+	callback.run();
+}
+
+void LuaActionListener::mousePress(int x, int y, int btn) {
+	callback.pushPreamble();
+	callback.pushString("mousePress");
+	callback.pushInteger(btn);
+	callback.run();
+}
+
+void LuaActionListener::mouseRelease(int x, int y, int btn) {
+	callback.pushPreamble();
+	callback.pushString("mouseRelease");
+	callback.pushInteger(btn);
+	callback.run();
+}
+
+void LuaActionListener::mouseClick(int x, int y, int btn, int cnt) {
+	callback.pushPreamble();
+	callback.pushString("mouseClick");
+	callback.pushInteger(btn);
+	callback.pushInteger(cnt);
+	callback.run();
+}
+
+void LuaActionListener::mouseWheelUp(int x, int y) {
+	callback.pushPreamble();
+	callback.pushString("mouseWheelUp");
+	callback.run();
+}
+
+void LuaActionListener::mouseWheelDown(int x, int y) {
+	callback.pushPreamble();
+	callback.pushString("mouseWheelDown");
+	callback.run();
+}
+
+void LuaActionListener::mouseMotion(int x, int y) {}
+
+
 /**
 **  LuaActionListener destructor
 */
