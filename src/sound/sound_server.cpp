@@ -57,6 +57,7 @@
 static bool SoundInitialized;    /// is sound initialized
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
+static double VolumeScale = 1.0;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
@@ -110,13 +111,13 @@ static void ChannelFinished(int channel)
 **  Set the channel volume
 **
 **  @param channel  Channel to set
-**  @param volume   New volume, <0 will not set the volume
+**  @param volume   New volume 0-255, <0 will not set the volume
 **
 **  @return         Current volume of the channel, -1 for error
 */
 int SetChannelVolume(int channel, int volume)
 {
-	return Mix_Volume(channel, volume);
+	return Mix_Volume(channel, volume / 2 * VolumeScale);
 }
 
 /**
@@ -288,7 +289,7 @@ int PlaySample(Mix_Chunk *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	Mix_Volume(-1, volume);
+	VolumeScale = (double)volume / 255;
 }
 
 /**
@@ -296,7 +297,7 @@ void SetEffectsVolume(int volume)
 */
 int GetEffectsVolume()
 {
-	return Mix_Volume(-1, -1);
+	return VolumeScale * 255;
 }
 
 /**
@@ -394,7 +395,7 @@ void SetMusicVolume(int volume)
 */
 int GetMusicVolume()
 {
-	return Mix_VolumeMusic(-1);
+	return std::min(MaxVolume, Mix_VolumeMusic(-1) * 2);
 }
 
 /**
