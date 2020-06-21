@@ -1722,6 +1722,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 {
 	// clicked on info panel - selection shown
 	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
+		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 		DoSelectionButtons(ButtonUnderCursor, button);
 	} else if ((MouseButtons & LeftButton)) {
 		//  clicked on menu button
@@ -1759,6 +1760,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
 
 					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelTraining(*Selected[0], ButtonUnderCursor, &order.GetUnitType());
 				}
 			}
@@ -1767,6 +1769,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
 			}
@@ -1775,6 +1778,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelResearch(*Selected[0]);
 				}
 			}
@@ -1795,6 +1799,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 							Assert(uins->Boarded);
 							const int flush = !(KeyModifiers & ModifierShift);
 							if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+								PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 								SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 							}
 						}
@@ -1804,6 +1809,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
 		}
