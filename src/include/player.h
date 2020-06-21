@@ -38,6 +38,7 @@
 
 #include <set>
 #include <string>
+#include <vector>
 
 #include "color.h"
 #include "upgrade_structs.h"
@@ -76,9 +77,38 @@ enum _diplomacy_ {
 	DiplomacyCrazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
+enum class RevealTypes 
+{ 
+	cNoRevelation, 
+	cAllUnits, 
+	cBuildingsOnly 
+}; /// Revelation types
+
 ///  Player structure
 class CPlayer
 {
+public:
+	static inline RevealTypes RevelationFor { RevealTypes::cNoRevelation }; /// type of revelation (when player lost their last main facility)
+
+public:
+	/// Check if relevation enabled
+	static const bool IsRevelationEnabled()
+	{
+		// By default there is no revelation. Can be changed in lua-script
+		return CPlayer::RevelationFor != RevealTypes::cNoRevelation; 
+	}
+	/// Change revelation type
+	static void SetRevelationType(const RevealTypes type);
+	/// Get revealed players list
+	static const std::vector<const CPlayer *> &GetRevealedPlayers()
+	{
+		return CPlayer::RevealedPlayers;
+	}
+
+private:
+	/// List of players revealed after losing their last Town Hall
+	static inline std::vector<const CPlayer *> RevealedPlayers;	
+	
 public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
@@ -129,7 +159,10 @@ public:
 	int    TotalResources[MaxCosts];
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
-
+	
+	int 	LostMainFacilityTimer { 0 };/// The timer for when the player lost the last town hall 
+									/// (to make the player's units be revealed)
+	
 	IntColor Color;           /// color of units on minimap
 
 	CUnitColors UnitColors; /// Unit colors for new units
@@ -236,12 +269,21 @@ public:
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
+	
+	bool IsRevealed() const
+	{
+		return this->isRevealed;
+	}
+	void SetRevealed(const bool revealed);
 
 private:
 	std::vector<CUnit *> Units; /// units of this player
 	unsigned int Enemy;         /// enemy bit field for this player
 	unsigned int Allied;        /// allied bit field for this player
 	std::set<int> SharedVision; /// set of player indexes that this player has shared vision with
+	bool isRevealed { false }; 	/// whether the player has been revealed (i.e. after losing the last Town Hall)
+
+	friend void CleanPlayers();
 };
 
 /**

@@ -138,7 +138,7 @@ public:
 			if (!unit->VisCount[p]) {
 				for (int pi = 0; pi < PlayerMax; ++pi) {
 					if ((pi == p /*player->Index*/)
-						|| player->HasMutualSharedVisionWith(Players[pi])) {
+						|| player->HasMutualSharedVisionWith(Players[pi])) { 
 						if (!unit->IsVisible(Players[pi])) {
 							UnitGoesOutOfFog(*unit, Players[pi]);
 						}
