@@ -923,6 +923,20 @@ bool CGraphic::TransparentPixel(int x, int y)
 	return ret;
 }
 
+/**
+** Change a palette color.
+*/
+void CGraphic::SetPaletteColor(int idx, int r, int g, int b) {
+	if (!Surface) {
+		return;
+	}
+	SDL_Color color;
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	SDL_SetPaletteColors(Surface->format->palette, &color, idx, 1);
+}
+
 static inline void dither(SDL_Surface *Surface) {
 	for (int x = 0; x < Surface->w; x++) {
 		for (int y = 0; y < Surface->h; y++) {

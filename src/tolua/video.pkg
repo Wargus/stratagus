@@ -27,6 +27,7 @@ public:
 	static void Free(CGraphic *);
 	void Load();
 	void Resize(int w, int h);
+        void SetPaletteColor(int idx, int r, int g, int b);
 };
 
 class CPlayerColorGraphic : public CGraphic

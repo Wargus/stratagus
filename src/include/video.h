@@ -93,6 +93,7 @@ public:
 	void Resize(int w, int h);
 	void SetOriginalSize();
 	bool TransparentPixel(int x, int y);
+	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow();
 
 	inline bool IsLoaded() const { return Surface != NULL; }
