@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "unit.h"
 #include "unit_manager.h"
+#include "map.h"
 
 #include <stdio.h>
 
@@ -153,6 +154,12 @@
 		goal->Variable[index].Value = value;
 	} else if (!strcmp(next + 1, "Max")) {
 		goal->Variable[index].Max = value;
+		// Special case: when adjusting the sight range, we need to update the visibility
+		if (index == SIGHTRANGE_INDEX) {
+			MapUnmarkUnitSight(unit);
+			unit.CurrentSightRange = value;
+			MapMarkUnitSight(unit);
+		}
 	} else if (!strcmp(next + 1, "Increase")) {
 		goal->Variable[index].Increase = value;
 	} else if (!strcmp(next + 1, "Enable")) {
