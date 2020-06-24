@@ -2428,7 +2428,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	// If we have a corpse, or a death animation, we are put back on the map
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
-	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
+	if (type->CorpseType || (type->Animations && type->Animations->hasDeathAnimation)) {
 		unit.Removed = 0;
 		Map.Insert(unit);
 

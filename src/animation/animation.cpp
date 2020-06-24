@@ -692,6 +692,7 @@ static int CclDefineAnimations(lua_State *l)
 		} else if (!strncmp(value, "Still", 5)) {
 			anims->Still = ParseAnimation(l, -1);
 		} else if (!strncmp(value, "Death", 5)) {
+			anims->hasDeathAnimation = true;
 			if (strlen(value) > 5) {
 				const int death = ExtraDeathIndex(value + 6);
 				if (death == ANIMATIONS_DEATHTYPES) {

@@ -109,7 +109,7 @@ class CAnimations
 public:
 	CAnimations() : Attack(NULL), RangedAttack(NULL), Build(NULL), Move(NULL), Repair(NULL),
 		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
-		Train(NULL), Upgrade(NULL)
+		Train(NULL), Upgrade(NULL), hasDeathAnimation(false)
 	{
 		memset(Death, 0, sizeof(Death));
 		memset(Harvest, 0, sizeof(Harvest));
@@ -144,6 +144,7 @@ public:
 	CAnimation *Attack;
 	CAnimation *RangedAttack;
 	CAnimation *Build;
+	bool hasDeathAnimation;
 	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
 	CAnimation *Harvest[MaxCosts];
 	CAnimation *Move;
