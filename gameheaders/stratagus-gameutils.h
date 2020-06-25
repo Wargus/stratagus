@@ -189,7 +189,7 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 		if (!out) {
 			error("Extraction error", "Could not open data folder for writing.");
 		}
-		while (c = fread(buf, sizeof(char), 4096, in)) {
+		while ((c = fread(buf, sizeof(char), 4096, in))) {
 			fwrite(buf, sizeof(char), c, out);
 		}
 		fclose(in);
