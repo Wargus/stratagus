@@ -135,6 +135,11 @@ void mkdir_p(const char* path) {
 #include <string>
 void copy_dir(const char* source_folder, const char* target_folder)
 {
+	// make the parentdir of the target folder
+	char* ptarget = strdup(target_folder);
+	parentdir(ptarget);
+	mkdir_p(ptarget);
+	// convert source and target folder strings to windows wide strings
 	wchar_t *wsource_folder = new wchar_t[strlen(source_folder) + 1];
 	size_t convertedChars = 0;
 	mbstowcs_s(&convertedChars, wsource_folder, strlen(source_folder) + 1, source_folder, _TRUNCATE);
@@ -143,12 +148,18 @@ void copy_dir(const char* source_folder, const char* target_folder)
 	WCHAR sf[MAX_PATH + 1];
 	WCHAR tf[MAX_PATH + 1];
 	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	char* ptarget = strdup(target_folder);
-	parentdir(ptarget);
-	mkdir_p(ptarget);
 	wcscpy_s(tf, MAX_PATH, wtarget_folder);
+	// ensure we have double-null terminated strings like Windows docs demand
 	sf[lstrlenW(sf) + 1] = 0;
 	tf[lstrlenW(tf) + 1] = 0;
+	// first delete the target_folder, if it exists
+	SHFILEOPSTRUCTW deleteS = { 0 };
+	deleteS.wFunc = FO_DELETE;
+	deleteS.pTo = tf;
+	deleteS.pFrom = tf;
+	deleteS.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
+	SHFileOperationW(&deleteS);
+	// now copy the new folder in its place
 	SHFILEOPSTRUCTW s = { 0 };
 	s.wFunc = FO_COPY;
 	s.pTo = tf;
