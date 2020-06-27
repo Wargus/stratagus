@@ -26,6 +26,9 @@ stratagus-game-launcher.h - Stratagus Game Launcher
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef STRATAGUS_GAMEUTILS_H
+#define STRATAGUS_GAMEUTILS_H
+
 void error(const char* title, const char* text);
 void mkdir_p(const char* path);
 void copy_dir(const char* source_folder, const char* target_folder);
@@ -39,6 +42,9 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #endif
 
 #ifdef WIN32
+#ifndef PATH_MAX
+#define PATH_MAX MAX_PATH
+#endif
 #include <Shlwapi.h>
 #pragma comment(lib, "comdlg32.lib")
 #pragma comment(lib, "ole32.lib")
@@ -114,6 +120,7 @@ void mkdir_p(const char* path) {
 					mkdir_p(path);
 				}
 				*sep = '/';
+				mkdir(path, 0777);
 			}
 		} else if (error != EEXIST) {
 			if (mkdir(path, 0777)) {
@@ -128,6 +135,11 @@ void mkdir_p(const char* path) {
 #include <string>
 void copy_dir(const char* source_folder, const char* target_folder)
 {
+	// make the parentdir of the target folder
+	char* ptarget = strdup(target_folder);
+	parentdir(ptarget);
+	mkdir_p(ptarget);
+	// convert source and target folder strings to windows wide strings
 	wchar_t *wsource_folder = new wchar_t[strlen(source_folder) + 1];
 	size_t convertedChars = 0;
 	mbstowcs_s(&convertedChars, wsource_folder, strlen(source_folder) + 1, source_folder, _TRUNCATE);
@@ -136,12 +148,18 @@ void copy_dir(const char* source_folder, const char* target_folder)
 	WCHAR sf[MAX_PATH + 1];
 	WCHAR tf[MAX_PATH + 1];
 	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	char* ptarget = strdup(target_folder);
-	parentdir(ptarget);
-	mkdir_p(ptarget);
 	wcscpy_s(tf, MAX_PATH, wtarget_folder);
+	// ensure we have double-null terminated strings like Windows docs demand
 	sf[lstrlenW(sf) + 1] = 0;
 	tf[lstrlenW(tf) + 1] = 0;
+	// first delete the target_folder, if it exists
+	SHFILEOPSTRUCTW deleteS = { 0 };
+	deleteS.wFunc = FO_DELETE;
+	deleteS.pTo = tf;
+	deleteS.pFrom = tf;
+	deleteS.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
+	SHFileOperationW(&deleteS);
+	// now copy the new folder in its place
 	SHFILEOPSTRUCTW s = { 0 };
 	s.wFunc = FO_COPY;
 	s.pTo = tf;
@@ -171,7 +189,7 @@ int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
 		if (!out) {
 			error("Extraction error", "Could not open data folder for writing.");
 		}
-		while (c = fread(buf, sizeof(char), 4096, in)) {
+		while ((c = fread(buf, sizeof(char), 4096, in))) {
 			fwrite(buf, sizeof(char), c, out);
 		}
 		fclose(in);
@@ -188,4 +206,6 @@ void copy_dir(const char* src_path, const char* dst_path) {
 	strcpy(src_root, src_path);
 	ftw(src_path, copy_file, 20);
 }
+#endif
+
 #endif
