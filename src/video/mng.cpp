@@ -262,6 +262,14 @@ void Mng::Reset()
 	mng_display(handle);
 }
 
+void* Mng::_getData() const
+{
+	if (ticks <= GetTicks()) {
+		mng_display_resume(handle);
+	}
+	return surface;
+}
+
 #endif // USE_MNG
 
 //@}

@@ -142,7 +142,7 @@ public:
 #ifdef USE_MNG
 #include <libmng.h>
 
-class Mng
+class Mng : public gcn::Image
 {
 public:
 	Mng();
@@ -150,6 +150,11 @@ public:
 	int Load(const std::string &name);
 	void Reset();
 	void Draw(int x, int y);
+
+	//guichan
+	virtual void *_getData() const;
+	virtual int getWidth() const { return surface->h; }
+	virtual int getHeight() const { return surface->w; }
 
 	std::string name;
 	FILE *fd;

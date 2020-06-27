@@ -330,6 +330,9 @@ class ScrollArea : public BasicContainer
 class ImageWidget : public Widget
 {
 	ImageWidget(CGraphic *image);
+#ifdef USE_MNG
+        ImageWidget(Mng *image);
+#endif
 };
 
 class Button : public Widget

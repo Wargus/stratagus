@@ -50,3 +50,14 @@ class CColor {
 void SetColorCycleAll(bool value);
 void ClearAllColorCyclingRange();
 void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);
+
+#ifdef USE_MNG
+class Mng
+{
+public:
+        Mng();
+        int Load(const std::string name);
+        void Draw(int x, int y);
+        void Reset();
+}
+#endif
