@@ -35,6 +35,8 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
+#include <cstdlib>
+
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include <theora/theora.h>
@@ -419,6 +421,120 @@ int PlayMovie(const std::string &name)
 	SetCallbacks(old_callbacks);
 
 	return 0;
+}
+
+Movie::~Movie()
+{
+	if (rect != NULL) {
+		// free(rect);
+	}
+	if (surface != NULL) {
+		// SDL_FreeSurface(surface);
+	}
+	if (yuv_overlay != NULL) {
+		// SDL_DestroyTexture(yuv_overlay);
+	}
+	if (data != NULL) {
+		// data.File->close();
+		// OggFree(&data);
+	}
+}
+
+static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_Rect *rect, OggData *data) {
+	yuv_buffer *yuv = (yuv_buffer*)calloc(sizeof(yuv_buffer), 1);
+	theora_decode_YUVout(&data->tstate, yuv);
+	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv->y, yuv->y_stride, yuv->u, yuv->uv_stride, yuv->v, yuv->uv_stride);
+	SDL_RenderClear(TheRenderer);
+	int w, h;
+	SDL_RenderGetLogicalSize(TheRenderer, &w, &h);
+	SDL_RenderSetLogicalSize(TheRenderer, 0, 0);
+	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
+	SDL_RenderReadPixels(TheRenderer, rect, surface->format->format, surface->pixels, surface->pitch);
+	SDL_RenderSetLogicalSize(TheRenderer, w, h);
+	free(yuv);
+}
+
+int Movie::Load(const std::string &name, int w, int h)
+{
+	Width = w;
+	Height = h;
+	const std::string filename = LibraryFileName(name.c_str());
+
+	f = new CFile();
+	if (f->open(filename.c_str(), CL_OPEN_READ) == -1) {
+		fprintf(stderr, "Can't open file '%s'\n", name.c_str());
+		return -1;
+	}
+
+	rect = (SDL_Rect*)calloc(sizeof(SDL_Rect), 1);
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = w;
+	rect->h = h;
+
+	surface = SDL_CreateRGBSurface(0, w, h, TheScreen->format->BitsPerPixel,
+									 TheScreen->format->Rmask,
+									 TheScreen->format->Gmask,
+									 TheScreen->format->Bmask,
+									 0);
+
+	if (surface == NULL) {
+		fprintf(stderr, "SDL_CreateRGBSurface: %s\n", SDL_GetError());
+		f->close();
+		return -1;
+	}
+
+	return 0;
+}
+
+void *Movie::_getData() const
+{
+	if (data == NULL) {
+		data = (OggData*)calloc(sizeof(OggData), 1);
+		if (OggInit(f, data) || !data->video) {
+			OggFree(data);
+			f->close();
+			fprintf(stderr, "Could not init OggData or not a video\n");
+			return surface;
+		}
+
+		data->File = f;
+		yuv_overlay = SDL_CreateTexture(TheRenderer,
+										SDL_PIXELFORMAT_YV12,
+										SDL_TEXTUREACCESS_STREAMING,
+										data->tinfo.frame_width,
+										data->tinfo.frame_height);
+
+		if (yuv_overlay == NULL) {
+			fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
+			fprintf(stderr, "SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
+			OggFree(data);
+			f->close();
+			return surface;
+		}
+
+		start_time = SDL_GetTicks();
+		need_data = true;
+		TheoraProcessData(data);
+		RenderToSurface(surface, yuv_overlay, rect, data);
+	}
+	if (need_data) {
+		if (TheoraProcessData(data)) {
+			is_dirty = false;
+			return surface;
+		}
+		need_data = false;
+	}
+
+	const int diff = SDL_GetTicks() - start_time
+		- static_cast<int>(theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000);
+
+	if (diff > 0) {
+		RenderToSurface(surface, yuv_overlay, rect, data);
+		need_data = true;
+	}
+
+	return surface;
 }
 
 #else

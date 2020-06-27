@@ -67,12 +67,17 @@ namespace gcn
         mImage = image;
         setHeight(image->getHeight());
         setWidth(image->getWidth());
+        Widget::setDirty(true);
     }
 
     void Icon::draw(Graphics* graphics)
     {
         graphics->drawImage(mImage, 0, 0);
+    }
 
+    bool Icon::getDirty() const
+    {
+        return Widget::getDirty() || mImage->isDirty();
     }
 
     void Icon::drawBorder(Graphics* graphics)

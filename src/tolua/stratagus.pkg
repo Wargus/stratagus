@@ -16,6 +16,7 @@ $#include "unit.h"
 $#include "unit_manager.h"
 $#include "unittype.h"
 $#include "video.h"
+$#include "movie.h"
 $#include "widgets.h"
 
 $#ifdef _MSC_VER

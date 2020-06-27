@@ -124,6 +124,8 @@ namespace gcn
          */
         virtual void* _getData() const;
 
+        virtual bool isDirty() const { return false; };
+
         /**
          * Gets the ImageLoader used for loading Images.
          *

@@ -61,3 +61,13 @@ public:
         void Reset();
 }
 #endif
+
+#if defined(USE_THEORA) && defined(USE_VORBIS)
+class Movie
+{
+public:
+        Movie();
+        int Load(const std::string name, int w, int h);
+        bool IsPlaying();
+}
+#endif

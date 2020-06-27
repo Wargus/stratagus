@@ -333,6 +333,9 @@ class ImageWidget : public Widget
 #ifdef USE_MNG
         ImageWidget(Mng *image);
 #endif
+#if defined(USE_THEORA) && defined(USE_VORBIS)
+        ImageWidget(Movie *image);
+#endif
 };
 
 class Button : public Widget

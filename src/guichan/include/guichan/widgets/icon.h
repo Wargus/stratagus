@@ -81,6 +81,8 @@ namespace gcn
 
         virtual void drawBorder(Graphics* graphics);
 
+        virtual bool getDirty() const;
+
     private:
         Image* mImage;
     };
