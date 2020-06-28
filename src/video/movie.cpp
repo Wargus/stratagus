@@ -459,7 +459,7 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	free(yuv);
 }
 
-int Movie::Load(const std::string &name, int w, int h)
+bool Movie::Load(const std::string &name, int w, int h)
 {
 	Width = w;
 	Height = h;
@@ -468,7 +468,7 @@ int Movie::Load(const std::string &name, int w, int h)
 	f = new CFile();
 	if (f->open(filename.c_str(), CL_OPEN_READ) == -1) {
 		fprintf(stderr, "Can't open file '%s'\n", name.c_str());
-		return -1;
+		return false;
 	}
 
 	rect = (SDL_Rect*)calloc(sizeof(SDL_Rect), 1);
@@ -486,10 +486,10 @@ int Movie::Load(const std::string &name, int w, int h)
 	if (surface == NULL) {
 		fprintf(stderr, "SDL_CreateRGBSurface: %s\n", SDL_GetError());
 		f->close();
-		return -1;
+		return false;
 	}
 
-	return 0;
+	return true;
 }
 
 void *Movie::_getData() const

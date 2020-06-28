@@ -28,3 +28,5 @@ obj-*
 ./tolua.cpp.rule
 build
 .vscode
+.clangd
+compile_commands.json

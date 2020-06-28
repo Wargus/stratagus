@@ -147,7 +147,7 @@ class Mng : public gcn::Image
 public:
 	Mng();
 	~Mng();
-	int Load(const std::string &name);
+	bool Load(const std::string &name);
 	void Reset();
 	void Draw(int x, int y);
 
@@ -165,6 +165,23 @@ public:
 	unsigned char *buffer;
 	unsigned long ticks;
 	int iteration;
+};
+#else
+/// empty class for lua scripts
+class Mng : public gcn::Image
+{
+public:
+	Mng();
+	~Mng();
+	bool Load(const std::string &name) { return false; }
+	void Reset() {};
+	void Draw(int x, int y) {};
+
+	//guichan
+	virtual void *_getData() const { return NULL; };
+	virtual int getWidth() const { return 0; }
+	virtual int getHeight() const { return 0; }
+	virtual bool isDirty() const { return false; }
 };
 #endif
 

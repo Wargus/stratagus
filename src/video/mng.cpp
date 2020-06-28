@@ -223,12 +223,12 @@ void Mng::Draw(int x, int y)
 **
 **  @param name  Name of the MNG file
 */
-int Mng::Load(const std::string &name)
+bool Mng::Load(const std::string &name)
 {
 	this->name = LibraryFileName(name.c_str());
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
-		return -1;
+		return false;
 	}
 	mng_setcb_openstream(handle, my_openstream);
 	mng_setcb_closestream(handle, my_closestream);
@@ -247,9 +247,9 @@ int Mng::Load(const std::string &name)
 	}
 
 	if (!surface || iteration == 0x7fffffff) {
-		return -1;
+		return false;
 	}
-	return 0;
+	return true;
 }
 
 /**

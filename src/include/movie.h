@@ -89,7 +89,7 @@ public:
     Movie() : rect(NULL), yuv_overlay(NULL), surface(NULL), need_data(true), start_time(0),
               is_dirty(true), Width(0), Height(0), data(NULL), f(NULL) {};
     ~Movie();
-    int Load(const std::string &filename, int w, int h);
+    bool Load(const std::string &filename, int w, int h);
     bool IsPlaying() const { return is_dirty; }
 
     //guichan
@@ -123,6 +123,23 @@ extern void OggFree(OggData *data);
 extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
 
 extern int VorbisProcessData(OggData *data, char *buffer);
+
+#else
+
+/// empty class for lua scripts
+class Movie : public gcn::Image
+{
+public:
+    Movie() : {};
+    ~Movie();
+    bool Load(const std::string &filename, int w, int h) { return false; }
+    bool IsPlaying() const { return false; }
+    //guichan
+    virtual void *_getData() const { return NULL; };
+    virtual int getWidth() const { return 0; }
+    virtual int getHeight() const { return 0; }
+    virtual bool isDirty() const { return false; }
+};
 
 #endif // USE_VORBIS
 
