@@ -451,7 +451,9 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	SDL_RenderGetLogicalSize(TheRenderer, &w, &h);
 	SDL_RenderSetLogicalSize(TheRenderer, 0, 0);
 	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
-	SDL_RenderReadPixels(TheRenderer, rect, surface->format->format, surface->pixels, surface->pitch);
+	if (SDL_RenderReadPixels(TheRenderer, rect, surface->format->format, surface->pixels, surface->pitch)) {
+		fprintf(stderr, "Reading from renderer not supported\n");
+	}
 	SDL_RenderSetLogicalSize(TheRenderer, w, h);
 	free(yuv);
 }
