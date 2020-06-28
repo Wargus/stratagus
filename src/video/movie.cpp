@@ -453,6 +453,7 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
 	if (SDL_RenderReadPixels(TheRenderer, rect, surface->format->format, surface->pixels, surface->pitch)) {
 		fprintf(stderr, "Reading from renderer not supported\n");
+		SDL_FillRect(surface, NULL, 0); // completely transparent
 	}
 	SDL_RenderSetLogicalSize(TheRenderer, w, h);
 	free(yuv);
@@ -477,10 +478,10 @@ int Movie::Load(const std::string &name, int w, int h)
 	rect->h = h;
 
 	surface = SDL_CreateRGBSurface(0, w, h, TheScreen->format->BitsPerPixel,
-									 TheScreen->format->Rmask,
-									 TheScreen->format->Gmask,
-									 TheScreen->format->Bmask,
-									 0);
+								   0x00ff0000,
+								   0x0000ff00,
+								   0x000000ff,
+								   0xff000000);
 
 	if (surface == NULL) {
 		fprintf(stderr, "SDL_CreateRGBSurface: %s\n", SDL_GetError());
