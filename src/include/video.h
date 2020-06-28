@@ -171,17 +171,17 @@ public:
 class Mng : public gcn::Image
 {
 public:
-	Mng();
-	~Mng();
-	bool Load(const std::string &name) { return false; }
+	Mng() {};
+	~Mng() {};
+	bool Load(const std::string &name) { return false; };
 	void Reset() {};
 	void Draw(int x, int y) {};
 
 	//guichan
 	virtual void *_getData() const { return NULL; };
-	virtual int getWidth() const { return 0; }
-	virtual int getHeight() const { return 0; }
-	virtual bool isDirty() const { return false; }
+	virtual int getWidth() const { return 0; };
+	virtual int getHeight() const { return 0; };
+	virtual bool isDirty() const { return false; };
 };
 #endif
 
