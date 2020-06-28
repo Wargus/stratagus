@@ -87,7 +87,7 @@ class Movie : public gcn::Image
 {
 public:
     Movie() : rect(NULL), yuv_overlay(NULL), surface(NULL), need_data(true), start_time(0),
-              is_dirty(true), Width(0), Height(0), data(NULL) {};
+              is_dirty(true), Width(0), Height(0), data(NULL), f(NULL) {};
     ~Movie();
     int Load(const std::string &filename, int w, int h);
     bool IsPlaying() const { return is_dirty; }

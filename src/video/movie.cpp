@@ -426,17 +426,19 @@ int PlayMovie(const std::string &name)
 Movie::~Movie()
 {
 	if (rect != NULL) {
-		// free(rect);
+		free(rect);
 	}
 	if (surface != NULL) {
-		// SDL_FreeSurface(surface);
+		SDL_FreeSurface(surface);
 	}
 	if (yuv_overlay != NULL) {
-		// SDL_DestroyTexture(yuv_overlay);
+		SDL_DestroyTexture(yuv_overlay);
 	}
 	if (data != NULL) {
-		// data.File->close();
-		// OggFree(&data);
+		OggFree(data);
+	}
+	if (f != NULL) {
+		delete f;
 	}
 }
 

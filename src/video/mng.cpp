@@ -184,7 +184,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 
 Mng::Mng() :
 	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
-	ticks(0), iteration(0)
+	ticks(0), iteration(0), is_dirty(false)
 {
 }
 
@@ -265,7 +265,10 @@ void Mng::Reset()
 void* Mng::_getData() const
 {
 	if (ticks <= GetTicks()) {
+		is_dirty = true;
 		mng_display_resume(handle);
+	} else {
+		is_dirty = false;
 	}
 	return surface;
 }
