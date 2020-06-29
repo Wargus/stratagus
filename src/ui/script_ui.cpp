@@ -862,6 +862,18 @@ void CallHandler(unsigned int handle, int value)
 }
 
 /**
+**  Clear all buttons
+**
+**  @param l  Lua state.
+*/
+static int CclClearButtons(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	CleanButtons();
+	return 0;
+}
+
+/**
 **  Define a button.
 **
 **  @param l  Lua state.
@@ -1192,6 +1204,7 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetFancyBuildings", CclSetFancyBuildings);
 
 	lua_register(Lua, "DefineButton", CclDefineButton);
+	lua_register(Lua, "ClearButtons", CclClearButtons);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
 
