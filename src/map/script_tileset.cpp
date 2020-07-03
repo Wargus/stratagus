@@ -38,6 +38,7 @@
 #include "tileset.h"
 
 #include "script.h"
+#include <cstring>
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -61,7 +62,8 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"air-unit", MapFieldAirUnit},
 		{"sea-unit", MapFieldSeaUnit},
 		{"building", MapFieldBuilding},
-		{"human", MapFieldHuman}
+		{"human", MapFieldHuman},
+		{"decorative", MapFieldDecorative}
 	};
 
 	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
@@ -98,8 +100,10 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 **  @param back  pointer for the flags (return).
 **  @param j     pointer for the location in the array. in and out
 **
+**  @return      index for basename, if the name this tile should be available as a different basename, or 0
+**
 */
-void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
+int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
 	unsigned int flags = 3;
 
@@ -114,12 +118,18 @@ void ParseTilesetTileFlags(lua_State *l, int *back, int *j)
 		const char *value = LuaToString(l, -1);
 		lua_pop(l, 1);
 
-		//  Flags are only needed for the editor
+		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags) == false) {
 			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}
 	}
 	*back = flags;
+
+	if (flags & MapFieldDecorative) {
+		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
+	} else {
+		return 0;
+	}
 }
 
 /**
@@ -190,7 +200,10 @@ void CTileset::parseSolid(lua_State *l)
 	++j;
 
 	int f = 0;
-	ParseTilesetTileFlags(l, &f, &j);
+	if (parseTilesetTileFlags(l, &f, &j)) {
+		LuaError(l, "cannot set a custom basename in the main set of flags");
+	}
+
 	//  Vector: the tiles.
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {
@@ -204,10 +217,13 @@ void CTileset::parseSolid(lua_State *l)
 		if (lua_istable(l, -1)) {
 			int k = 0;
 			int tile_flag = 0;
-			ParseTilesetTileFlags(l, &tile_flag, &k);
+			unsigned char new_basename = parseTilesetTileFlags(l, &tile_flag, &k);
 			--j;
 			lua_pop(l, 1);
 			tiles[index + j].flag = tile_flag;
+			if (new_basename) {
+				tiles[index + j].tileinfo.BaseTerrain = new_basename;
+			}
 			continue;
 		}
 		const int pud = LuaToNumber(l, -1);
@@ -248,7 +264,9 @@ void CTileset::parseMixed(lua_State *l)
 	++j;
 
 	int f = 0;
-	ParseTilesetTileFlags(l, &f, &j);
+	if (parseTilesetTileFlags(l, &f, &j)) {
+		LuaError(l, "cannot set a custom basename in the main set of flags");
+	}
 
 	for (; j < args; ++j) {
 		lua_rawgeti(l, -1, j + 1);

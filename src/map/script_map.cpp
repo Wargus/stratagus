@@ -468,8 +468,11 @@ static int CclSetTileFlags(lua_State *l)
 	int j = 0;
 	int flags = 0;
 
-	ParseTilesetTileFlags(l, &flags, &j);
+	unsigned char newBase = Map.Tileset->parseTilesetTileFlags(l, &flags, &j);
 	Map.Tileset->tiles[tilenumber].flag = flags;
+	if (newBase) {
+		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = newBase;
+	}
 	return 0;
 }
 

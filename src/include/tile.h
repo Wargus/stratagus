@@ -210,6 +210,9 @@ public:
 	/// Returns true, if coast on the map tile field
 	bool RockOnMap() const;
 
+	/// Returns true if the field should not need mixing with the surroundings
+	bool isDecorative() const;
+
 	bool isAWall() const;
 	bool isHuman() const;
 	bool isAHumanWall() const;
@@ -227,7 +230,7 @@ private:
 #endif
 	unsigned short tile;       /// graphic tile number
 public:
-	unsigned short Flags;      /// field flags
+	unsigned int Flags;        /// field flags
 private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:

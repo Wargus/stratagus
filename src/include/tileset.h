@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "vec2i.h"
+#include <string>
 #include <vector>
 
 struct lua_State;
@@ -60,6 +61,8 @@ struct lua_State;
 #define MapFieldAirUnit  0x2000  /// Air unit on field
 #define MapFieldSeaUnit  0x4000  /// Water unit on field
 #define MapFieldBuilding 0x8000  /// Building on field
+
+#define MapFieldDecorative 0x10000  /// A field that needs no mixing with the surroundings, for the editor
 
 /**
 **  These are used for lookup tiles types
@@ -110,7 +113,7 @@ public:
 
 public:
 	unsigned short tile;  /// graphical pos
-	unsigned short flag;  /// Flag
+	unsigned int flag;    /// Flag
 	CTileInfo tileinfo;   /// Tile descriptions
 };
 
@@ -164,6 +167,7 @@ public:
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
+	int parseTilesetTileFlags(lua_State *l, int *back, int *j);
 
 private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);

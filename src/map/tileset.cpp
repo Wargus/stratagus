@@ -656,11 +656,16 @@ unsigned CTileset::getQuadFromTile(unsigned int tile) const
 
 void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 {
-	for (size_t i = 16; i < tiles.size(); i += 16) {
-		const CTileInfo &info = tiles[i].tileinfo;
+	std::vector<int> seen_types;
+	seen_types.resize(solidTerrainTypes.size(), 0);
 
+	for (size_t i = 16; i < tiles.size(); i++) {
+		const CTileInfo &info = tiles[i].tileinfo;
 		if (info.BaseTerrain && info.MixTerrain == 0) {
-			solidTiles->push_back(tiles[i].tile);
+			if (seen_types[info.BaseTerrain] == 0) {
+				seen_types[info.BaseTerrain] = 1;
+				solidTiles->push_back(tiles[i].tile);
+			}
 		}
 	}
 }

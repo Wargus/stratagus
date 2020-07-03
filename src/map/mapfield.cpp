@@ -233,6 +233,12 @@ bool CMapField::RockOnMap() const
 	return CheckMask(MapFieldRocks);
 }
 
+/// Returns true if the field should not need mixing with the surroundings
+bool CMapField::isDecorative() const
+{
+	return CheckMask(MapFieldDecorative);
+}
+
 bool CMapField::isAWall() const
 {
 	return Flags & MapFieldWall;

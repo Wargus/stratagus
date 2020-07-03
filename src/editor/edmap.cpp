@@ -100,6 +100,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
+	if (mf.isDecorative()) {
+		return;
+	}
 	int tile = tileIndex;
 	if (TileToolRandom) {
 		int n = 0;
@@ -143,6 +146,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 		return;
 	}
 
+	if (mf.isDecorative()) {
+		return;
+	}
+
 	const unsigned int quad = QuadFromTile(pos);
 	const unsigned int TH_QUAD_M = 0xFFFF0000; // Top half quad mask
 	const unsigned int BH_QUAD_M = 0x0000FFFF; // Bottom half quad mask
@@ -158,45 +165,53 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (pos.y) {
 		const Vec2i offset(0, -1);
 		// Insert into the bottom the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
-		if (u != q2 && (pos + offset) != lock_pos) {
-			did_change = true;
-			int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, lock_pos);
+		if (!(Map.Field(pos + offset)->isDecorative())) {
+			unsigned q2 = QuadFromTile(pos + offset);
+			unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
+			if (u != q2 && (pos + offset) != lock_pos) {
+				did_change = true;
+				int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
+				EditorChangeTile(pos + offset, tile, lock_pos);
+			}
 		}
 	}
 	if (pos.y < Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
 		// Insert into the top the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
-		if (u != q2 && (pos + offset) != lock_pos) {
-			did_change = true;
-			int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, lock_pos);
+		if (!(Map.Field(pos + offset)->isDecorative())) {
+			unsigned q2 = QuadFromTile(pos + offset);
+			unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
+			if (u != q2 && (pos + offset) != lock_pos) {
+				did_change = true;
+				int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
+				EditorChangeTile(pos + offset, tile, lock_pos);
+			}
 		}
 	}
 	if (pos.x) {
 		const Vec2i offset(-1, 0);
 		// Insert into the left the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
-		if (u != q2 && (pos + offset) != lock_pos) {
-			did_change = true;
-			int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, lock_pos);
+		if (!(Map.Field(pos + offset)->isDecorative())) {
+			unsigned q2 = QuadFromTile(pos + offset);
+			unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
+			if (u != q2 && (pos + offset) != lock_pos) {
+				did_change = true;
+				int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
+				EditorChangeTile(pos + offset, tile, lock_pos);
+			}
 		}
 	}
 	if (pos.x < Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
 		// Insert into the right the new tile.
-		unsigned q2 = QuadFromTile(pos + offset);
-		unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
-		if (u != q2 && (pos + offset) != lock_pos) {
-			did_change = true;
-			int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
-			EditorChangeTile(pos + offset, tile, lock_pos);
+		if (!(Map.Field(pos + offset)->isDecorative())) {
+			unsigned q2 = QuadFromTile(pos + offset);
+			unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
+			if (u != q2 && (pos + offset) != lock_pos) {
+				did_change = true;
+				int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
+				EditorChangeTile(pos + offset, tile, lock_pos);
+			}
 		}
 	}
 
