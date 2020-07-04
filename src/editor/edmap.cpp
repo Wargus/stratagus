@@ -100,9 +100,6 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	if (mf.isDecorative()) {
-		return;
-	}
 	int tile = tileIndex;
 	if (TileToolRandom) {
 		int n = 0;
@@ -128,7 +125,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorChangeSurrounding(pos, lock_pos);
+	if (!mf.isDecorative()) {
+		EditorChangeSurrounding(pos, lock_pos);
+	}
 }
 
 /**
