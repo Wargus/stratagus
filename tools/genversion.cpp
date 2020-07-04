@@ -93,6 +93,10 @@ int main(int argc, char * argv[]) {
 			break;
 		}
 	}
+	if (git_rev == NULL) {
+		needs_update = true;
+	}
+
 	if (!needs_update) {
 		needs_update = strcmp(old_rev, git_rev);
 	}
@@ -101,6 +105,7 @@ int main(int argc, char * argv[]) {
 		puts("[genversion] no update needed");
 		return 0;
 	}
+	puts("[genversion] update needed");
 
 	file = fopen(argv[1], "w");
 	if ( ! file )
