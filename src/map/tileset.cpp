@@ -196,6 +196,7 @@
 */
 PixelSize PixelTileSize(32, 32);
 
+static const int TILE_PATH_MAX  = 6;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -372,8 +373,11 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 		*tileIndex = tileres;
 		return length;
 	}
+	if (length >= TILE_PATH_MAX) {
+		return TILE_PATH_MAX;
+	}
 	// Find any mixed tile
-	int l = INT_MAX;
+	int l = TILE_PATH_MAX;
 	for (size_t i = 0; i != tiles.size();) {
 		int j = 0;
 		if (base == tiles[i].tileinfo.BaseTerrain) {
@@ -417,7 +421,8 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
-			ExitFatal(-1);
+			DebugPrint("WARNING: No fixed tile found for %x" _C_ fixed);
+			return 0;
 		}
 	}
 	fixed >>= 8;
@@ -467,7 +472,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	std::vector<char> marks;
 	marks.resize(getSolidTerrainCount(), 0);
 	marks[type1] = type1;
-	if (findTilePath(type1, type2, 0, marks, &tileIndex) == INT_MAX) {
+	if (findTilePath(type1, type2, 0, marks, &tileIndex) == TILE_PATH_MAX) {
 		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
 		const int res = findTileIndex(type1);
 		Assert(res != -1);

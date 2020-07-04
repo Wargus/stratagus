@@ -168,9 +168,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				did_change = true;
 				int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
-				EditorChangeTile(pos + offset, tile, lock_pos);
+				if (tile) {
+					did_change = true;
+					EditorChangeTile(pos + offset, tile, lock_pos);
+				}
 			}
 		}
 	}
@@ -181,9 +183,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				did_change = true;
 				int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
-				EditorChangeTile(pos + offset, tile, lock_pos);
+				if (tile) {
+					did_change = true;
+					EditorChangeTile(pos + offset, tile, lock_pos);
+				}
 			}
 		}
 	}
@@ -194,9 +198,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				did_change = true;
 				int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
-				EditorChangeTile(pos + offset, tile, lock_pos);
+				if (tile) {
+					did_change = true;
+					EditorChangeTile(pos + offset, tile, lock_pos);
+				}
 			}
 		}
 	}
@@ -207,9 +213,11 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				did_change = true;
 				int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
-				EditorChangeTile(pos + offset, tile, lock_pos);
+				if (tile) {
+					did_change = true;
+					EditorChangeTile(pos + offset, tile, lock_pos);
+				}
 			}
 		}
 	}
