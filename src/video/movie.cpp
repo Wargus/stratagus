@@ -271,6 +271,7 @@ static int OutputTheora(OggData *data, SDL_Texture *yuv_overlay, SDL_Rect *rect)
 	theora_decode_YUVout(&data->tstate, &yuv);
 
 	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
+	SDL_RenderClear(TheRenderer);
 	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
 	SDL_RenderPresent(TheRenderer);
 
