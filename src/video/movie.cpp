@@ -384,7 +384,7 @@ int PlayMovie(const std::string &name)
 	SDL_RenderClear(TheRenderer);
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(TheRenderer, NULL);
-	SDL_RenderPresent(TheRenderer);
+	// SDL_RenderPresent(TheRenderer);
 
 	MovieStop = false;
 	const unsigned int start_ticks = SDL_GetTicks();
