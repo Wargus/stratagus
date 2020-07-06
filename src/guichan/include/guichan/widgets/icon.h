@@ -83,8 +83,12 @@ namespace gcn
 
         virtual bool getDirty() const;
 
+        // only affects the alpha value
+        virtual void setBaseColor(const Color& color);
+
     private:
         Image* mImage;
+        Color mColor;
     };
 }
 

@@ -65,6 +65,7 @@ namespace gcn
     Icon::Icon(Image* image)
     {
         mImage = image;
+        mColor = Color(255, 255, 255, 255);
         setHeight(image->getHeight());
         setWidth(image->getWidth());
         Widget::setDirty(true);
@@ -72,6 +73,7 @@ namespace gcn
 
     void Icon::draw(Graphics* graphics)
     {
+        graphics->setColor(mColor);
         graphics->drawImage(mImage, 0, 0);
     }
 
@@ -102,5 +104,11 @@ namespace gcn
             graphics->drawLine(width - i,i + 1, width - i, height - i);
             graphics->drawLine(i,height - i, width - i - 1, height - i);
         }
+    }
+
+    void Icon::setBaseColor(const Color& color)
+    {
+        Widget::setDirty(true);
+        mColor = color;
     }
 }
