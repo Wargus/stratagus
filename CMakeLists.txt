@@ -236,6 +236,7 @@ set(network_SRCS
 	src/network/netconnect.cpp
 	src/network/network.cpp
 	src/network/netsockets.cpp
+        src/network/online_service.cpp
 )
 source_group(network FILES ${network_SRCS})
 
