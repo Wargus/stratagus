@@ -579,6 +579,66 @@ public:
         delete host;
     }
 
+    // User and UI actions
+    void sendText(std::string txt) {
+        // C>S 0x0E SID_CHATCOMMAND
+        int pos = 0;
+        for (int pos = 0; pos < txt.size(); pos += 220) {
+            std::string text = txt.substr(pos, pos + 220);
+            if (pos + 220 < txt.size()) {
+                text += "...";
+            }
+            BNCSOutputStream msg(0x0e);
+            msg.serialize(text.c_str());
+            msg.flush(getTCPSocket());
+        }
+    }
+
+    void requestExtraUserInfo(std::string username) {
+        BNCSOutputStream msg(0x26);
+        msg.serialize32(1); // num accounts
+        msg.serialize32(5); // num keys
+        msg.serialize32((uint32_t) extendedInfoIdx.size());
+        msg.serialize(username.c_str());
+        msg.serialize("record\\GAME\\0\\wins");
+        msg.serialize("record\\GAME\\0\\losses");
+        msg.serialize("record\\GAME\\0\\disconnects");
+        msg.serialize("record\\GAME\\0\\last game");
+        msg.serialize("record\\GAME\\0\\last game result");
+        msg.flush(getTCPSocket());
+    }
+
+    void refreshGames() {
+        // C>S 0x09 SID_GETADVLISTEX
+        BNCSOutputStream getadvlistex(0x09);
+        getadvlistex.serialize16((uint16_t) 0x00); // all games
+        getadvlistex.serialize16((uint16_t) 0x01); // no sub game type
+        getadvlistex.serialize32(0xff80); // show all games
+        getadvlistex.serialize32(0x00); // reserved field
+        getadvlistex.serialize32(0xff); // return all games
+        getadvlistex.serialize(""); // no game name
+        getadvlistex.serialize(""); // no game pw
+        getadvlistex.serialize(""); // no game statstring
+        getadvlistex.flush(getTCPSocket());
+    }
+
+    void refreshFriends() {
+        // C>S 0x65 SID_FRIENDSLIST
+        BNCSOutputStream msg(0x65);
+        msg.flush(getTCPSocket());
+    }
+
+    void joinGame(std::string name, std::string pw) {
+        // C>S 0x22 SID_NOTIFYJOIN
+        BNCSOutputStream msg(0x09);
+        msg.serialize("W2BN", 4);
+        msg.serialize32(0x4f);
+        msg.serialize(name.c_str());
+        msg.serialize(pw.c_str());
+        msg.flush(getTCPSocket());
+    }
+
+    // UI information
     void setGamelist(std::vector<Game*> games) {
         for (const auto value : this->games) {
             delete value;
@@ -617,6 +677,7 @@ public:
         this->channelList = channels;
     }
 
+    // State
     std::string getUsername() { return username; }
 
     void setUsername(std::string arg) { username = arg; }
@@ -646,6 +707,7 @@ public:
         xsha1_calcHashDat(password, password2);
     }
 
+    // Protocol
     CHost *getHost() { return host; }
 
     void setHost(CHost *arg) {
@@ -691,7 +753,7 @@ private:
     std::queue<std::string> info;
     std::vector<Game*> games;
     std::vector<Friend*> friends;
-    std::map<uint32_t, std::vector<std::string>> extendedInfoKeys;
+    std::map<std::string, uint32_t> extendedInfoIdx;
     std::map<uint32_t, std::vector<std::string>> extendedInfoValues;
 };
 
@@ -718,16 +780,6 @@ private:
     bool hasPrinted;
     std::string message;
 };
-
-/* needed
-
-C>S 0x09 SID_GETADVLISTEX
-C>S 0x0E SID_CHATCOMMAND
-C>S 0x22 SID_NOTIFYJOIN
-C>S 0x65 SID_FRIENDSLIST
-C>S 0x26 SID_READUSERDATA
-
-*/
 
 class C2S_GAMERESULT_OR_STOPADV : public NetworkState {
     virtual void doOneStep(Context *ctx) {
@@ -916,16 +968,9 @@ class S2C_GETCHANNELLIST : public NetworkState {
             std::vector<std::string> channels = ctx->getMsgIStream()->readStringlist();
             ctx->setChannels(channels);
 
-            BNCSOutputStream getadvlistex(0x09);
-            getadvlistex.serialize16((uint16_t) 0x00); // all games
-            getadvlistex.serialize16((uint16_t) 0x01); // no sub game type
-            getadvlistex.serialize32(0xff80); // show all games
-            getadvlistex.serialize32(0x00); // reserved field
-            getadvlistex.serialize32(0xff); // return all games
-            getadvlistex.serialize(""); // no game name
-            getadvlistex.serialize(""); // no game pw
-            getadvlistex.serialize(""); // no game statstring
-            getadvlistex.flush(ctx->getTCPSocket());
+            // request our user info and refresh the active games list
+            ctx->requestExtraUserInfo(ctx->getUsername());
+            ctx->refreshGames();
 
             ctx->setState(new S2C_CHATEVENT());
         }
@@ -1021,6 +1066,83 @@ class C2S_LOGONRESPONSE2 : public NetworkState {
     virtual void doOneStep(Context *ctx);
 };
 
+class S2C_CREATEACCOUNT2 : public NetworkState {
+    virtual void doOneStep(Context *ctx) {
+        if (ctx->getTCPSocket()->HasDataToRead(0)) {
+            uint8_t msg = ctx->getMsgIStream()->readMessageId();
+            if (msg == 0xff) {
+                // try again next time
+                return;
+            }
+            if (msg != 0x3d) {
+                std::string error = std::string("Expected SID_CREATEACCOUNT2, got msg id ");
+                error += std::to_string(msg);
+                ctx->setState(new DisconnectedState(error));
+            }
+
+            uint32_t status = ctx->getMsgIStream()->read32();
+            std::string nameSugg = ctx->getMsgIStream()->readString();
+
+            if (!nameSugg.empty()) {
+                nameSugg = " (try username: " + nameSugg + ")";
+            }
+
+            switch (status) {
+            case 0x00:
+                // login into created account
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x01:
+                ctx->showError("Name too short" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x02:
+                ctx->showError("Name contains invalid character(s)" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x03:
+                ctx->showError("Name contains banned word(s)" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x04:
+                ctx->showError("Account already exists" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x05:
+                ctx->showError("Account is still being created" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x06:
+                ctx->showError("Name does not contain enough alphanumeric characters" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x07:
+                ctx->showError("Name contained adjacent punctuation characters" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            case 0x08:
+                ctx->showError("Name contained too many punctuation characters" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            default:
+                ctx->showError("Unknown error creating account" + nameSugg);
+                ctx->setUsername("");
+                ctx->setState(new C2S_LOGONRESPONSE2());
+                return;
+            }
+
+        }
+    }
+};
+
 class S2C_LOGONRESPONSE2 : public NetworkState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
@@ -1043,21 +1165,35 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 ctx->setState(new S2C_PKT_SERVERPING());
                 return;
             case 0x01:
+                ctx->showInfo("Account does not exist, creating it...");
+                createAccount(ctx);
+                return;
             case 0x02:
-                ctx->showInfo("Account does not exist or incorrect password");
+                ctx->showInfo("Incorrect password");
                 ctx->setPassword("");
-                // C>S 0x3D SID_CREATEACCOUNT2
-                // S>C 0x3D SID_CREATEACCOUNT2
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             case 0x06:
                 ctx->showInfo("Account closed: " + ctx->getMsgIStream()->readString());
+                ctx->setPassword("");
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             default:
                 ctx->setState(new DisconnectedState("unknown logon response"));
             }
         }
+    }
+
+private:
+    void createAccount(Context *ctx) {
+        BNCSOutputStream msg(0x3d);
+        uint32_t *pw = ctx->getPassword1();
+        for (int i = 0; i < 20; i++) {
+            msg.serialize8(reinterpret_cast<uint8_t*>(pw)[i]);
+        }
+        msg.serialize(ctx->getUsername().c_str());
+        msg.flush(ctx->getTCPSocket());
+        ctx->setState(new S2C_CREATEACCOUNT2());
     }
 };
 
