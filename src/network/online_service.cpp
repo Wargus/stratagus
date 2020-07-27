@@ -1,11 +1,16 @@
+#include <arpa/inet.h>
 #include <clocale>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <iostream>
+#include <map>
 #include <ostream>
+#include <queue>
+#include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <unistd.h>
@@ -242,6 +247,307 @@ private:
     int length_pos;
 };
 
+class Friend {
+public:
+    Friend(std::string name, uint8_t status, uint8_t location, uint32_t product, std::string locationName) {
+        this->name = name;
+        this->status = status;
+        this->location = location;
+        this->product = product;
+        this->locationName = locationName;
+    }
+
+    std::string getStatus() {
+        switch (location) {
+        case 0:
+            return "offline";
+        case 1:
+            return "not in chat";
+        case 2:
+            return "in chat";
+        case 3:
+            return "in public game " + locationName;
+        case 4:
+            return "in a private game";
+        case 5:
+            return "in private game " + locationName;
+        default:
+            return "unknown";
+        }
+    }
+
+    std::string getName() { return name; }
+
+    std::string getProduct() {
+        switch (product) {
+        case 0x1:
+        case 0x2:
+        case 0x6:
+        case 0xb:
+            return "Starcraft";
+        case 0x3:
+            return "Warcraft II";
+        case 0x4:
+        case 0x5:
+            return "Diablo II";
+        case 0x7:
+        case 0x8:
+        case 0xc:
+            return "Warcraft III";
+        case 0x9:
+        case 0xa:
+            return "Diablo";
+        default:
+            return "Unknown Game";
+        }
+    }
+
+private:
+    std::string name;
+    uint8_t status;
+    uint8_t location;
+    uint32_t product;
+    std::string locationName;
+};
+
+class Game {
+public:
+    Game(uint32_t settings, uint16_t port, uint32_t host, uint32_t status, uint32_t time, std::string name, std::string pw, std::string stats) {
+        this->gameSettings = settings;
+        this->host = CHost(host, port);
+        this->gameStatus = status;
+        this->elapsedTime = time;
+        this->gameName = name;
+        this->gamePassword = pw;
+        this->gameStatstring = stats;
+        splitStatstring();
+    }
+
+    CHost getHost() { return host; }
+
+    bool isSavedGame() {
+        return !gameStats[0].empty();
+    };
+
+    std::tuple<int, int> mapSize() {
+        if (gameStats[1].empty()) {
+            return {128, 128};
+        }
+        char w = gameStats[1].at(0);
+        char h = gameStats[1].at(1);
+        return {w * 32, h * 32};
+    };
+
+    int maxPlayers() {
+        if (gameStats[2].empty()) {
+            return 8;
+        } else {
+            return std::stoi(gameStats[2]) - 10;
+        }
+    };
+
+    std::string getApproval() {
+        return "Not approved";
+    }
+
+    std::string getGameSettings() {
+        if (gameStats[9].empty()) {
+            return "Map default";
+        }
+        long settings = std::stol(gameStats[9]);
+        std::string result;
+        if (settings & 0x200) {
+            result += " 1 worker";
+        }
+        if (settings & 0x400) {
+            result += " fixed placement";
+        }
+        switch (settings & 0x23000) {
+        case 0x01000:
+            result += " low resources";
+            break;
+        case 0x02000:
+            result += " medium resources";
+            break;
+        case 0x03000:
+            result += " high resources";
+            break;
+        case 0x20000:
+            result += " random resources";
+            break;
+        }
+        switch (settings & 0x1C000) {
+        case 0x04000:
+            result += " forest";
+            break;
+        case 0x08000:
+            result += " winter";
+            break;
+        case 0x0c000:
+            result += " wasteland";
+            break;
+        case 0x14000:
+            result += " random";
+            break;
+        case 0x1c000:
+            result += " orc swamp";
+            break;
+        }
+        return result;
+    };
+
+    std::string getCreator() {
+        int end = gameStats[10].find("\r");
+        return gameStats[10].substr(0, end);
+    };
+
+    std::string getMap() {
+        int begin = gameStats[10].find("\r") + 1;
+        return gameStats[10].substr(begin);
+    };
+
+    std::string getGameStatus() {
+        switch (gameStatus) {
+        case 0x0:
+            return "OK";
+        case 0x1:
+            return "No such game";
+        case 0x2:
+            return "Wrong password";
+        case 0x3:
+            return "Game full";
+        case 0x4:
+            return "Game already started";
+        case 0x5:
+            return "Spawned CD-Key not allowed";
+        case 0x6:
+            return "Too many server requests";
+        }
+        return "Unknown status";
+    }
+
+    std::string getGameType() {
+        std::string sub("");
+        switch (gameSettings & 0xff) {
+        case 0x02:
+            return "Melee";
+        case 0x03:
+            return "Free 4 All";
+        case 0x04:
+            return "One vs One";
+        case 0x05:
+            return "CTF";
+        case 0x06:
+            switch (gameSettings & 0xffff0000) {
+            case 0x00010000:
+                return "Greed 2500 resources";
+            case 0x00020000:
+                return "Greed 5000 resources";
+            case 0x00030000:
+                return "Greed 7500 resources";
+            case 0x00040000:
+                return "Greed 10000 resources";
+            }
+            return "Greed";
+        case 0x07:
+            switch (gameSettings & 0xffff0000) {
+            case 0x00010000:
+                return "Slaughter 15 minutes";
+            case 0x00020000:
+                return "Slaughter 30 minutes";
+            case 0x00030000:
+                return "Slaughter 45 minutes";
+            case 0x00040000:
+                return "Slaughter 60 minutes";
+            }
+            return "Slaughter";
+        case 0x08:
+            return "Sudden Death";
+        case 0x09:
+            switch (gameSettings & 0xffff0000) {
+            case 0x00000000:
+                return "Ladder (Disconnect is not loss)";
+            case 0x00010000:
+                return "Ladder (Loss on Disconnect)";
+            }
+            return "Ladder";
+        case 0x0A:
+            return "Use Map Settings";
+        case 0x0B:
+        case 0x0C:
+        case 0x0D:
+            switch (gameSettings & 0xffff0000) {
+            case 0x00010000:
+                sub += " (2 teams)";
+                break;
+            case 0x00020000:
+                sub += " (3 teams)";
+                break;
+            case 0x00030000:
+                sub += " (4 teams)";
+                break;
+            }
+            switch (gameSettings & 0xff) {
+            case 0x0B:
+                return "Team Melee" + sub;
+            case 0x0C:
+                return "Team Free 4 All" + sub;
+            case 0x0D:
+                return "Team CTF" + sub;
+            }
+        case 0x0F:
+            switch (gameSettings & 0xffff0000) {
+            case 0x00010000:
+                return "Top vs Bottom (1v7)";
+            case 0x00020000:
+                return "Top vs Bottom (2v6)";
+            case 0x00030000:
+                return "Top vs Bottom (3v5)";
+            case 0x00040000:
+                return "Top vs Bottom (4v4)";
+            case 0x00050000:
+                return "Top vs Bottom (5v3)";
+            case 0x00060000:
+                return "Top vs Bottom (6v2)";
+            case 0x00070000:
+                return "Top vs Bottom (7v1)";
+            }
+            return "Top vs Bottom";
+        case 0x10:
+            return "Iron Man Ladder";
+        default:
+            return "Unknown";
+        }
+    }
+
+private:
+    void splitStatstring() {
+        // statstring is a comma-delimited list of values
+        int pos = 0;
+        while (true) {
+            int newpos = gameStatstring.find(",", pos);
+            gameStats.push_back(gameStatstring.substr(pos, newpos));
+            pos = newpos + 1;
+            if (pos == 0) {
+                break;
+            }
+        }
+        while (gameStats.size() < 10) {
+            gameStats.push_back("");
+        }
+    }
+
+    uint32_t gameSettings;
+    uint32_t languageId;
+    CHost host;
+    uint32_t gameStatus;
+    uint32_t elapsedTime;
+    std::string gameName;
+    std::string gamePassword;
+    std::string gameStatstring;
+    std::vector<std::string> gameStats;
+};
+
 class Context;
 class NetworkState {
 public:
@@ -262,7 +568,6 @@ public:
         this->host = new CHost("127.0.0.1", 6112); // TODO: parameterize
         this->clientToken = MyRand();
         this->username = "";
-        this->info = "";
     }
 
     ~Context() {
@@ -274,9 +579,43 @@ public:
         delete host;
     }
 
-    std::string getInfo() { return info; }
+    void setGamelist(std::vector<Game*> games) {
+        for (const auto value : this->games) {
+            delete value;
+        }
+        this->games = games;
+    }
 
-    void setInfo(std::string arg) { info = arg; }
+    void setFriendslist(std::vector<Friend*> friends) {
+        for (const auto value : this->friends) {
+            delete value;
+        }
+        this->friends = friends;
+    }
+
+    void reportUserdata(uint32_t id, std::vector<std::string> values) {
+        this->extendedInfoValues[id] = values;
+    }
+
+    std::queue<std::string> getInfo() { return info; }
+
+    void showInfo(std::string arg) { info.push("*** " + arg + " ***"); }
+
+    void showError(std::string arg) { info.push("!!! " + arg + " !!!"); }
+
+    void showChat(std::string arg) { info.push(arg); }
+
+    void addUser(std::string name) {
+        userList.insert(name);
+    }
+
+    void removeUser(std::string name) {
+        userList.erase(name);
+    }
+
+    void setChannels(std::vector<std::string> channels) {
+        this->channelList = channels;
+    }
 
     std::string getUsername() { return username; }
 
@@ -342,10 +681,18 @@ private:
     CTCPSocket *tcpSocket;
     BNCSInputStream *istream;
 
-    std::string info;
     std::string username;
     uint32_t password[5]; // xsha1 hash of password
     uint32_t password2[5]; // xsha1 hash of password hash
+
+    std::string currentChannel;
+    std::set<std::string> userList;
+    std::vector<std::string> channelList;
+    std::queue<std::string> info;
+    std::vector<Game*> games;
+    std::vector<Friend*> friends;
+    std::map<uint32_t, std::vector<std::string>> extendedInfoKeys;
+    std::map<uint32_t, std::vector<std::string>> extendedInfoValues;
 };
 
 int NetworkState::send(Context *ctx, BNCSOutputStream *buf) {
@@ -373,181 +720,22 @@ private:
 };
 
 /* needed
-C>S 0x02 SID_STOPADV
 
 C>S 0x09 SID_GETADVLISTEX
-S>C 0x09 SID_GETADVLISTEX
-
 C>S 0x0E SID_CHATCOMMAND
-
-S>C 0x0F SID_CHATEVENT
-
-C>S 0x1C SID_STARTADVEX3
-S>C 0x1C SID_STARTADVEX3
-
 C>S 0x22 SID_NOTIFYJOIN
-
-C>S 0x3D SID_CREATEACCOUNT2
-S>C 0x3D SID_CREATEACCOUNT2
-
-C>S 0x2C SID_GAMERESULT
-
-C>S 0x2F SID_FINDLADDERUSER
-S>C 0x2F SID_FINDLADDERUSER
-
-C>S 0x26 SID_READUSERDATA
-S>C 0x26 SID_READUSERDATA
-
-C>S 0x31 SID_CHANGEPASSWORD
-S>C 0x31 SID_CHANGEPASSWORD
-
-C>S 0x5A SID_RESETPASSWORD
-
 C>S 0x65 SID_FRIENDSLIST
-S>C 0x65 SID_FRIENDSLIST
+C>S 0x26 SID_READUSERDATA
 
 */
 
-class Game {
-public:
-    Game(uint32_t settings, uint16_t port, uint32_t host, uint32_t status, uint32_t time, std::string name, std::string pw, std::string stats) {
-        this->gameSettings = settings;
-        this->host = CHost(host, port);
-        this->gameStatus = status;
-        this->elapsedTime = time;
-        this->gameName = name;
-        this->gamePassword = pw;
-        this->gameStatstring = stats;
+class C2S_GAMERESULT_OR_STOPADV : public NetworkState {
+    virtual void doOneStep(Context *ctx) {
+        // TODO - wait until the game lobby is left or the game is over and then send the result
+        // C>S 0x02 SID_STOPADV
+        // C>S 0x2C SID_GAMERESULT
     }
-
-    CHost getHost() { return host; }
-
-    
-
-    std::string getGameStatus() {
-        switch (gameStatus) {
-        case 0x0:
-            return "OK";
-        case 0x1:
-            return "No such game";
-        case 0x2:
-            return "Wrong password";
-        case 0x3:
-            return "Game full";
-        case 0x4:
-            return "Game already started";
-        case 0x5:
-            return "Spawned CD-Key not allowed";
-        case 0x6:
-            return "Too many server requests";
-        }
-        return "Unknown status";
-    }
-
-    std::string getGameType() {
-        switch (gameSettings & 0xff) {
-        case 0x02:
-            return "Melee";
-        case 0x03:
-            return "Free 4 All";
-        case 0x04:
-            return "One vs One";
-        case 0x05:
-            return "CTF";
-        case 0x06:
-            switch (gameSettings & 0xffff0000) {
-            case 0x00010000:
-                return "Greed 2500 resources";
-            case 0x00020000:
-                return "Greed 5000 resources";
-            case 0x00030000:
-                return "Greed 7500 resources";
-            case 0x00040000:
-                return "Greed 10000 resources";
-            }
-            return "Greed";
-        case 0x07:
-            switch (gameSettings & 0xffff0000) {
-            case 0x00010000:
-                return "Slaughter 15 minutes";
-            case 0x00020000:
-                return "Slaughter 30 minutes";
-            case 0x00030000:
-                return "Slaughter 45 minutes";
-            case 0x00040000:
-                return "Slaughter 60 minutes";
-            }
-            return "Slaughter";
-        case 0x08:
-            return "Sudden Death";
-        case 0x09:
-            switch (gameSettings & 0xffff0000) {
-            case 0x00000000:
-                return "Ladder (Disconnect is not loss)";
-            case 0x00010000:
-                return "Ladder (Loss on Disconnect)";
-            }
-            return "Ladder";
-        case 0x0A:
-            return "Use Map Settings";
-        case 0x0B:
-        case 0x0C:
-        case 0x0D:
-            std::string sub("");
-            switch (gameSettings & 0xffff0000) {
-            case 0x00010000:
-                sub += " (2 teams)";
-                break;
-            case 0x00020000:
-                sub += " (3 teams)";
-                break;
-            case 0x00030000:
-                sub += " (4 teams)";
-                break;                
-            }
-            switch (gameSettings & 0xff) {
-            case 0x0B:
-                return "Team Melee" + sub;
-            case 0x0C:
-                return "Team Free 4 All" + sub;
-            case 0x0D:
-                return "Team CTF" + sub;
-            }
-        case 0x0F:
-            switch (gameSettings & 0xffff0000) {
-            case 0x00010000:
-                return "Top vs Bottom (1v7)";
-            case 0x00020000:
-                return "Top vs Bottom (2v6)";
-            case 0x00030000:
-                return "Top vs Bottom (3v5)";
-            case 0x00040000:
-                return "Top vs Bottom (4v4)";
-            case 0x00050000:
-                return "Top vs Bottom (5v3)";
-            case 0x00060000:
-                return "Top vs Bottom (6v2)";
-            case 0x00070000:
-                return "Top vs Bottom (7v1)";
-            }
-            return "Top vs Bottom";
-        case 0x10:
-            return "Iron Man Ladder";
-        default:
-            return "Unknown";
-        }
-    }
-
-private:
-    uint32_t gameSettings;
-    uint32_t languageId;
-    CHost host;
-    uint32_t gameStatus;
-    uint32_t elapsedTime;
-    std::string gameName;
-    std::string gamePassword;
-    std::string gameStatstring;
-}
+};
 
 class S2C_CHATEVENT : public NetworkState {
 public:
@@ -581,7 +769,25 @@ public:
             case 0x09:
                 // S>C 0x09 SID_GETADVLISTEX
                 handleGamelist(ctx);
+                break;
+            case 0x1c:
+                // S>C 0x1C SID_STARTADVEX3
+                if (ctx->getMsgIStream()->read32()) {
+                    ctx->showError("Game creation failed");
+                } else {
+                    ctx->setState(new C2S_GAMERESULT_OR_STOPADV());
+                }
+                break;
+            case 0x65:
+                // S>C 0x65 SID_FRIENDSLIST
+                handleFriendlist(ctx);
+                break;
+            case 0x26:
+                // S>C 0x26 SID_READUSERDATA
+                handleUserdata(ctx);
+                break;
             default:
+                // TODO:
                 // S>C 0x68 SID_FRIENDSREMOVE
                 // S>C 0x67 SID_FRIENDSADD
                 std::cout << "Unhandled message ID: " << std::hex << msg << std::endl;
@@ -592,11 +798,47 @@ public:
 private:
     void handleGamelist(Context *ctx) {
         uint32_t cnt = ctx->getMsgIStream()->read32();
-        std::vector<std::tuple<CHost, std::string, uint32_t, std::string, std::string, std::string>> games();
-        if (cnt == 0) {
-            ctx->setGamelist(games);
-            return;
+        std::vector<Game*> games;
+        while (cnt--) {
+            uint32_t settings = ctx->getMsgIStream()->read32();
+            uint32_t lang = ctx->getMsgIStream()->read32();
+            uint16_t addr_fam = ctx->getMsgIStream()->read16();
+            uint16_t port = ctx->getMsgIStream()->read16();
+            uint32_t ip = ctx->getMsgIStream()->read32();
+            uint32_t sinzero1 = ctx->getMsgIStream()->read32();
+            uint32_t sinzero2 = ctx->getMsgIStream()->read32();
+            uint32_t status = ctx->getMsgIStream()->read32();
+            uint32_t time = ctx->getMsgIStream()->read32();
+            std::string name = ctx->getMsgIStream()->readString();
+            std::string pw = ctx->getMsgIStream()->readString();
+            std::string stat = ctx->getMsgIStream()->readString();
+            games.push_back(new Game(settings, port, ip, status, time, name, pw, stat));
         }
+        ctx->setGamelist(games);
+    }
+
+
+    void handleFriendlist(Context *ctx) {
+        uint32_t cnt = ctx->getMsgIStream()->read32();
+        std::vector<Friend*> friends;
+        while (cnt--) {
+            std::string user = ctx->getMsgIStream()->readString();
+            uint8_t status = ctx->getMsgIStream()->read8();
+            uint8_t location = ctx->getMsgIStream()->read8();
+            uint32_t product = ctx->getMsgIStream()->read32();
+            std::string locname = ctx->getMsgIStream()->readString();
+            friends.push_back(new Friend(user, status, location, product, locname));
+        }
+        ctx->setFriendslist(friends);
+    }
+
+    void handleUserdata(Context *ctx) {
+        uint32_t cnt = ctx->getMsgIStream()->read32();
+        assert(cnt == 1);
+        uint32_t keys = ctx->getMsgIStream()->read32();
+        uint32_t reqId = ctx->getMsgIStream()->read32();
+        std::vector<std::string> values = ctx->getMsgIStream()->readStringlist();
+        ctx->reportUserdata(reqId, values);
     }
 
     void handleChatevent(Context *ctx) {
@@ -614,11 +856,11 @@ private:
             break;
         case 0x02: // user joined channel
             ctx->addUser(username);
-            ctx->showInfo(username " joined");
+            ctx->showInfo(username + " joined");
             break;
         case 0x03: // user left channel
-            ctx->rmUser(username);
-            ctx->showInfo(username " left");
+            ctx->removeUser(username);
+            ctx->showInfo(username + " left");
         case 0x04: // recv whisper
             ctx->showChat(username + " whispers: " + text);
             break;
@@ -670,13 +912,13 @@ class S2C_GETCHANNELLIST : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
-            
+
             std::vector<std::string> channels = ctx->getMsgIStream()->readStringlist();
             ctx->setChannels(channels);
 
             BNCSOutputStream getadvlistex(0x09);
-            getadvlistex.serialize16(0x00); // all games
-            getadvlistex.serialize16(0x01); // no sub game type
+            getadvlistex.serialize16((uint16_t) 0x00); // all games
+            getadvlistex.serialize16((uint16_t) 0x01); // no sub game type
             getadvlistex.serialize32(0xff80); // show all games
             getadvlistex.serialize32(0x00); // reserved field
             getadvlistex.serialize32(0xff); // return all games
@@ -710,7 +952,7 @@ class S2C_ENTERCHAT : public NetworkState {
 
             ctx->setUsername(uniqueName);
             if (!statString.empty()) {
-                ctx->setInfo("Statstring after logon: " + statString);
+                ctx->showInfo("Statstring after logon: " + statString);
             }
 
             ctx->setState(new S2C_GETCHANNELLIST());
@@ -802,12 +1044,14 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 return;
             case 0x01:
             case 0x02:
-                ctx->setInfo("Account does not exist or incorrect password");
+                ctx->showInfo("Account does not exist or incorrect password");
                 ctx->setPassword("");
+                // C>S 0x3D SID_CREATEACCOUNT2
+                // S>C 0x3D SID_CREATEACCOUNT2
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             case 0x06:
-                ctx->setInfo("Account closed: " + ctx->getMsgIStream()->readString());
+                ctx->showInfo("Account closed: " + ctx->getMsgIStream()->readString());
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             default:
