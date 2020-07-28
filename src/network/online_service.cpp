@@ -1421,6 +1421,12 @@ class ConnectState : public NetworkState {
             ctx->setState(new DisconnectedState("TCP connect failed"));
             return;
         }
+
+        if (!ctx->getUDPSocket()->Open(*ctx->getHost())) {
+            ctx->setState(new DisconnectedState("UDP open failed"));
+            return;
+        }
+
         // Send proto byte
         ctx->getTCPSocket()->Send("\x1", 1);
 
