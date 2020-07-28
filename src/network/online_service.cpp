@@ -22,6 +22,13 @@
 #include <netinet/in.h>
 #endif
 
+#include "cursor.h"
+#include "font.h"
+#include "input.h"
+#include "stratagus.h"
+#include "ui.h"
+#include "video.h"
+#include "widgets.h"
 #include "game.h"
 #include "parameters.h"
 #include "assert.h"
@@ -639,6 +646,12 @@ public:
     }
 
     // UI information
+    void setCurrentChannel(std::string name) {
+        this->currentChannel = name;
+    }
+
+    std::string getCurrentChannel() { return currentChannel; }
+
     void setGamelist(std::vector<Game*> games) {
         for (const auto value : this->games) {
             delete value;
@@ -646,12 +659,16 @@ public:
         this->games = games;
     }
 
+    std::vector<Game*> getGames() { return games; }
+
     void setFriendslist(std::vector<Friend*> friends) {
         for (const auto value : this->friends) {
             delete value;
         }
         this->friends = friends;
     }
+
+    std::vector<Friend*> getFriends() { return friends; }
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
         this->extendedInfoValues[id] = values;
@@ -673,9 +690,13 @@ public:
         userList.erase(name);
     }
 
+    std::set<std::string> getUsers() { return userList; }
+
     void setChannels(std::vector<std::string> channels) {
         this->channelList = channels;
     }
+
+    std::vector<std::string> getChannels() { return channelList; }
 
     // State
     std::string getUsername() { return username; }
@@ -923,6 +944,8 @@ private:
             ctx->showChat("[BROADCAST]: " + text);
             break;
         case 0x07: // channel info
+            ctx->setCurrentChannel(username);
+            ctx->showInfo("Joined channel " + username);
             break;
         case 0x09: // user flags update
             break;
@@ -1469,11 +1492,200 @@ class ConnectState : public NetworkState {
     }
 };
 
-static void goOnline() {
-    Context *ctx = new Context();
-    ctx->setState(new ConnectState());
-    while (true) {
-        ctx->doOneStep();
-        sleep(1);
+extern gcn::Gui *Gui;
+static gcn::Container *onlineServiceContainer;
+static gcn::ScrollArea *messageArea;
+static gcn::ScrollArea *usersArea;
+static gcn::ScrollArea *friendsArea;
+static gcn::ScrollArea *channelsArea;
+static gcn::ScrollArea *gamelistArea;
+static gcn::TextField *chatInput;
+static gcn::Window *loginWindow;
+static gcn::Container *loginWindowContainer;
+static gcn::TextField *username;
+static gcn::TextField *password;
+
+static Context *ctx;
+
+class ChatInputListener : public gcn::ActionListener {
+    virtual void action(const std::string &) {
+        ctx->sendText(chatInput->getText());
+        chatInput->setText("");
     }
+};
+
+class UsernameInputListener : public gcn::ActionListener {
+    virtual void action(const std::string &) {
+        ctx->setUsername(username->getText());
+    }
+};
+
+class PasswordInputListener : public gcn::ActionListener {
+    virtual void action(const std::string &) {
+        ctx->setPassword(password->getText());
+    }
+};
+
+static void GoOnline() {
+    std::string nc, rc;
+    GetDefaultTextColors(nc, rc);
+
+    gcn::Widget *oldTop = Gui->getTop();
+    Gui->setUseDirtyDrawing(false);
+
+    ctx = new Context();
+    ctx->setState(new ConnectState());
+
+    onlineServiceContainer = new gcn::Container();
+    onlineServiceContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
+    onlineServiceContainer->setOpaque(false);
+    Gui->setTop(onlineServiceContainer);
+
+    static int chatInputHeight = 24;
+    messageArea = new gcn::ScrollArea(new gcn::TextBox());
+    messageArea->setBackgroundColor(gcn::Color(200, 200, 120));
+    messageArea->setSize(Video.Width * 0.7, Video.Height * 0.7 - chatInputHeight);
+    static_cast<gcn::TextBox*>(messageArea->getContent())->setEditable(false);
+    onlineServiceContainer->add(messageArea, Video.Width * 0.3, Video.Height * 0.3);
+
+    chatInput = new gcn::TextField();
+    chatInput->setSize(Video.Width * 0.7, chatInputHeight);
+    onlineServiceContainer->add(chatInput, Video.Width * 0.3, Video.Height * 0.7 - chatInputHeight);
+    chatInput->addActionListener(new ChatInputListener());
+
+    usersArea = new gcn::ScrollArea(new gcn::TextBox());
+    usersArea->setBackgroundColor(gcn::Color(120, 200, 200));
+    usersArea->setSize(Video.Width * 0.1, Video.Height * 0.7);
+    static_cast<gcn::TextBox*>(usersArea->getContent())->setEditable(false);
+    onlineServiceContainer->add(usersArea, Video.Width * 0.2, Video.Height * 0.3);
+
+    friendsArea = new gcn::ScrollArea(new gcn::TextBox());
+    friendsArea->setBackgroundColor(gcn::Color(200, 120, 200));
+    friendsArea->setSize(Video.Width * 0.1, Video.Height * 0.5);
+    static_cast<gcn::TextBox*>(friendsArea->getContent())->setEditable(false);
+    onlineServiceContainer->add(friendsArea, 0, 0);
+
+    channelsArea = new gcn::ScrollArea(new gcn::TextBox());
+    channelsArea->setBackgroundColor(gcn::Color(255, 255, 255));
+    channelsArea->setSize(Video.Width * 0.1, Video.Height * 0.5);
+    static_cast<gcn::TextBox*>(channelsArea->getContent())->setEditable(false);
+    onlineServiceContainer->add(channelsArea, 0, Video.Height * 0.5);
+
+    gamelistArea = new gcn::ScrollArea(new gcn::TextBox());
+    gamelistArea->setBackgroundColor(gcn::Color(120, 120, 120));
+    gamelistArea->setSize(Video.Width * 0.8, Video.Height * 0.3);
+    static_cast<gcn::TextBox*>(gamelistArea->getContent())->setEditable(false);
+    onlineServiceContainer->add(gamelistArea, Video.Width * 0.2, 0);
+
+    loginWindow = new gcn::Window();
+    loginWindow->setBaseColor(gcn::Color(120, 120, 120, 120));
+    loginWindow->setCaption("Username / Password");
+    loginWindow->setWidth(Video.Width / 2);
+    loginWindow->setHeight(chatInputHeight * 8);
+
+    loginWindowContainer = new gcn::Container();
+    loginWindowContainer->setWidth(loginWindow->getWidth());
+    loginWindowContainer->setHeight(loginWindow->getHeight());
+    loginWindowContainer->setOpaque(false);
+    loginWindow->setContent(loginWindowContainer);
+
+    username = new gcn::TextField();
+    username->setSize(Video.Width * 0.3, chatInputHeight);
+    username->addActionListener(new UsernameInputListener());
+    loginWindowContainer->add(username, Video.Width * 0.1, chatInputHeight);
+
+    password = new gcn::TextField();
+    password->setSize(Video.Width * 0.3, chatInputHeight);
+    password->addActionListener(new PasswordInputListener());
+    loginWindowContainer->add(password, Video.Width * 0.1, chatInputHeight * 4);
+
+    onlineServiceContainer->add(loginWindow, Video.Width / 4, Video.Height / 2 - chatInputHeight * 4);
+
+    SetVideoSync();
+    GameCursor = UI.Point.Cursor;
+    InterfaceState = IfaceStateNormal;
+    UI.SelectedViewport = UI.Viewports;
+    while (1) {
+        ctx->doOneStep();
+
+        if (!ctx->getCurrentChannel().empty()) {
+            loginWindow->setVisible(false);
+
+            if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
+                ctx->refreshGames();
+                ctx->refreshFriends();
+            }
+
+            if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
+                static_cast<gcn::TextBox*>(gamelistArea->getContent())->setText("");
+                for (auto g : ctx->getGames()) {
+                    static_cast<gcn::TextBox*>(gamelistArea->getContent())->addRow(g->getMap() + " " +
+                                                                                   g->getCreator() + " " +
+                                                                                   g->getGameType() + " " +
+                                                                                   g->getGameSettings() + " " +
+                                                                                   std::to_string(g->maxPlayers()));
+                }
+
+                static_cast<gcn::TextBox*>(usersArea->getContent())->setText("");
+                for (auto u : ctx->getUsers()) {
+                    static_cast<gcn::TextBox*>(usersArea->getContent())->addRow(u);
+                }
+
+                static_cast<gcn::TextBox*>(channelsArea->getContent())->setText("");
+                for (auto u : ctx->getChannels()) {
+                    static_cast<gcn::TextBox*>(channelsArea->getContent())->addRow(u);
+                }
+
+                static_cast<gcn::TextBox*>(friendsArea->getContent())->setText("");
+                for (auto u : ctx->getFriends()) {
+                    static_cast<gcn::TextBox*>(friendsArea->getContent())->addRow(u->getName() + ", " + u->getStatus() + ", " + u->getProduct());
+                }
+            }
+        }
+
+        if (!ctx->getInfo().empty()) {
+            std::string info = ctx->getInfo().front();
+            ctx->getInfo().pop();
+            while (!info.empty()) {
+                static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(info);
+            }
+        }
+
+        Gui->draw();
+        DrawCursor();
+        Invalidate();
+        RealizeVideoMemory();
+
+        WaitEventsOneFrame();
+    }
+
+    CleanModules();
+    LoadCcl(Parameters::Instance.luaStartFilename); // Reload the main config file
+    // PreMenuSetup();
+
+    InterfaceState = IfaceStateMenu;
+    GameCursor = UI.Point.Cursor;
+
+    Gui->setTop(oldTop);
+    SetDefaultTextColors(nc, rc);
+
+    Video.ClearScreen();
+    Invalidate();
+
+    delete onlineServiceContainer;
+    delete messageArea->getContent();
+    delete messageArea;
+    delete usersArea->getContent();
+    delete usersArea;
+    delete friendsArea->getContent();
+    delete friendsArea;
+    delete channelsArea->getContent();
+    delete channelsArea;
+    delete gamelistArea->getContent();
+    delete gamelistArea;
+    delete chatInput;
+    delete loginWindow;
+    delete loginWindowContainer;
+    delete username;
+    delete password;
 }
