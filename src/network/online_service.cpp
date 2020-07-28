@@ -1,3 +1,5 @@
+#include "online_service.h"
+
 #include <arpa/inet.h>
 #include <clocale>
 #include <cstdio>
@@ -1526,7 +1528,7 @@ class PasswordInputListener : public gcn::ActionListener {
     }
 };
 
-static void GoOnline() {
+void GoOnline() {
     std::string nc, rc;
     GetDefaultTextColors(nc, rc);
 

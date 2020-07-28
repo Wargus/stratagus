@@ -363,6 +363,7 @@ source_group(win32 FILES ${win32_SRCS})
 set(tolua_FILES
 	src/tolua/ai.pkg
 	src/tolua/editor.pkg
+	src/tolua/online_service.pkg
 	src/tolua/font.pkg
 	src/tolua/game.pkg
 	src/tolua/map.pkg
@@ -527,6 +528,7 @@ set(stratagus_generic_HDRS
 	src/include/cursor.h
 	src/include/depend.h
 	src/include/editor.h
+	src/include/online_service.h
 	src/include/font.h
 	src/include/game.h
 	src/include/icons.h

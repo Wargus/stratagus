@@ -1,0 +1,3 @@
+$#include "online_service.h"
+
+void GoOnline();
