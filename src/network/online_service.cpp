@@ -214,13 +214,14 @@ public:
         *(buf + pos) = data;
         pos++;
     };
-    void serialize(const char* str, int len) {
-        ensureSpace(len);
-        memcpy(buf + pos, str, len);
-        pos += len;
+    void serialize32(const char* str) {
+        assert(strlen(str) == 4);
+        uint32_t value;
+        memcpy(&value, str, 4);
+        serialize32(value);
     };
     void serialize(const char* str) {
-        int len = strlen(str);
+        int len = strlen(str) + 1; // include NULL byte
         ensureSpace(len);
         memcpy(buf + pos, str, len);
         pos += len;
@@ -238,12 +239,12 @@ private:
     uint8_t *getBuffer() {
         // insert length to make it a valid buffer
         uint16_t *view = reinterpret_cast<uint16_t *>(buf + length_pos);
-        *view = htons(pos);
+        *view = pos;
         return buf;
     };
 
     void ensureSpace(size_t required) {
-        if (pos + required < sz) {
+        if (pos + required >= sz) {
             sz = sz * 2;
             buf = (uint8_t*) realloc(buf, sz);
             assert(buf != NULL);
@@ -640,7 +641,7 @@ public:
     void joinGame(std::string name, std::string pw) {
         // C>S 0x22 SID_NOTIFYJOIN
         BNCSOutputStream msg(0x09);
-        msg.serialize("W2BN", 4);
+        msg.serialize32("W2BN");
         msg.serialize32(0x4f);
         msg.serialize(name.c_str());
         msg.serialize(pw.c_str());
@@ -1412,19 +1413,23 @@ class S2C_SID_PING : public NetworkState {
 class ConnectState : public NetworkState {
     virtual void doOneStep(Context *ctx) {
         // Connect
-        ctx->getTCPSocket()->Open(*ctx->getHost());
-        if (ctx->getTCPSocket()->IsValid() == false) {
+        
+        if (!ctx->getTCPSocket()->Open(CHost("0.0.0.0", 6113))) { // TODO...
             ctx->setState(new DisconnectedState("TCP open failed"));
             return;
         }
-        if (ctx->getTCPSocket()->Connect(*ctx->getHost()) == false) {
+        if (!ctx->getTCPSocket()->IsValid()) {
+            ctx->setState(new DisconnectedState("TCP not valid"));
+            return;
+        }
+        if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
             ctx->setState(new DisconnectedState("TCP connect failed"));
             return;
         }
-
         if (!ctx->getUDPSocket()->Open(*ctx->getHost())) {
-            ctx->setState(new DisconnectedState("UDP open failed"));
-            return;
+            std::cerr << "UDP open failed" << std::endl;
+            // ctx->setState(new DisconnectedState("UDP open failed"));
+            // return;
         }
 
         // Send proto byte
@@ -1435,10 +1440,10 @@ class ConnectState : public NetworkState {
         // (UINT32) Protocol ID
         buffer.serialize32(0x00);
         // (UINT32) Platform code
-        buffer.serialize("IX86", 4);
+        buffer.serialize32("IX86");
         // (UINT32) Product code - we'll just use W2BN and encode what we are in
         // the version
-        buffer.serialize("W2BN", 4);
+        buffer.serialize32("W2BN");
         // (UINT32) Version byte - just use the last from W2BN
         buffer.serialize32(0x4f);
         // (UINT32) Language code
@@ -1480,7 +1485,7 @@ class ConnectState : public NetworkState {
                 if (localtime != 0) {
                     std::time_t localtime_since_epoch = std::mktime(localtime);
                     if (localtime_since_epoch != -1) {
-                        bias = std::difftime(utctime_since_epoch, localtime_since_epoch) / 60;
+                        bias = (localtime_since_epoch - utctime_since_epoch) / 60;
                     }
                 }
             }
@@ -1537,6 +1542,8 @@ class PasswordInputListener : public gcn::ActionListener {
 void GoOnline() {
     std::string nc, rc;
     GetDefaultTextColors(nc, rc);
+
+    const EventCallback *old_callbacks = GetCallbacks();
 
     gcn::Widget *oldTop = Gui->getTop();
     Gui->setUseDirtyDrawing(false);
@@ -1674,6 +1681,7 @@ void GoOnline() {
     InterfaceState = IfaceStateMenu;
     GameCursor = UI.Point.Cursor;
 
+    SetCallbacks(old_callbacks);
     Gui->setTop(oldTop);
     SetDefaultTextColors(nc, rc);
 
