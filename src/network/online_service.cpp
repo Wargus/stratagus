@@ -90,19 +90,19 @@ public:
     uint16_t read16() {
         uint16_t byte = ntohs(reinterpret_cast<uint16_t *>(buffer + pos)[0]);
         consumeData(2);
-        return byte;
+        return ntohs(byte);
     }
 
     uint32_t read32() {
         uint32_t byte = ntohs(reinterpret_cast<uint32_t *>(buffer + pos)[0]);
         consumeData(4);
-        return byte;
+        return ntohl(byte);
     }
 
     uint64_t read64() {
         uint64_t byte = ntohs(reinterpret_cast<uint64_t *>(buffer + pos)[0]);
         consumeData(8);
-        return byte;
+        return ntohl(byte & (uint32_t)-1) | ntohl(byte >> 32);
     }
 
     bool readBool8() {
@@ -142,15 +142,21 @@ public:
         assert(read8() == 0xff);
         uint8_t msgId = read8();
         uint16_t len = read16();
-        avail += this->sock->Recv(buffer + avail, len - 4);
-        if (avail < len) {
-            // Didn't receive full message on the socket, yet. Reset position so
-            // this method can be used to try again
-            pos = 0;
-            return -1;
-        } else {
-            return 0;
+        // we still need to have len in total for this message, so if we have
+        // more available than len minus the current position and minus the
+        // first 4 bytes that we already consumed, we'll have enough
+        long needed = len - avail + pos - 4;
+        if (needed > 0) {
+            long got = this->sock->Recv(buffer + avail, needed);
+            avail += got;
+            if (got < needed) {
+                // Didn't receive full message on the socket, yet. Reset position so
+                // this method can be used to try again
+                pos = 0;
+                return -1;
+            }
         }
+        return msgId;
     };
 
 private:
@@ -1369,6 +1375,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
                     exeInfo += Parameters::Instance.applicationName;
                 }
             }
+            exeInfo += " ";
             exeInfo += StratagusLastModifiedDate;
             exeInfo += " ";
             exeInfo += StratagusLastModifiedTime;
