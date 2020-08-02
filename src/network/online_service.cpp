@@ -94,13 +94,13 @@ public:
     }
 
     uint32_t read32() {
-        uint32_t byte = ntohs(reinterpret_cast<uint32_t *>(buffer + pos)[0]);
+        uint32_t byte = ntohl(reinterpret_cast<uint32_t *>(buffer + pos)[0]);
         consumeData(4);
         return ntohl(byte);
     }
 
     uint64_t read64() {
-        uint64_t byte = ntohs(reinterpret_cast<uint64_t *>(buffer + pos)[0]);
+        uint64_t byte = reinterpret_cast<uint64_t *>(buffer + pos)[0];
         consumeData(8);
         return ntohl(byte & (uint32_t)-1) | ntohl(byte >> 32);
     }
@@ -208,19 +208,7 @@ public:
         *view = htonl(data);
         pos += sizeof(data);
     };
-    void serialize32(int32_t data) {
-        ensureSpace(sizeof(data));
-        int32_t *view = reinterpret_cast<int32_t *>(buf + pos);
-        *view = htonl(data);
-        pos += sizeof(data);
-    };
     void serialize16(uint16_t data) {
-        ensureSpace(sizeof(data));
-        uint16_t *view = reinterpret_cast<uint16_t *>(buf + pos);
-        *view = htons(data);
-        pos += sizeof(data);
-    };
-    void serialize16(int16_t data) {
         ensureSpace(sizeof(data));
         uint16_t *view = reinterpret_cast<uint16_t *>(buf + pos);
         *view = htons(data);
@@ -231,7 +219,7 @@ public:
         *(buf + pos) = data;
         pos++;
     };
-    void serialize32(const char* str) {
+    void serializeC32(const char* str) {
         assert(strlen(str) == 4);
         uint32_t value;
         memcpy(&value, str, 4);
@@ -639,8 +627,8 @@ public:
     void refreshGames() {
         // C>S 0x09 SID_GETADVLISTEX
         BNCSOutputStream getadvlistex(0x09);
-        getadvlistex.serialize16((uint16_t) 0x00); // all games
-        getadvlistex.serialize16((uint16_t) 0x01); // no sub game type
+        getadvlistex.serialize16(0x00); // all games
+        getadvlistex.serialize16(0x01); // no sub game type
         getadvlistex.serialize32(0xff80); // show all games
         getadvlistex.serialize32(0x00); // reserved field
         getadvlistex.serialize32(0xff); // return all games
@@ -659,7 +647,7 @@ public:
     void joinGame(std::string name, std::string pw) {
         // C>S 0x22 SID_NOTIFYJOIN
         BNCSOutputStream msg(0x09);
-        msg.serialize32("W2BN");
+        msg.serializeC32("W2BN");
         msg.serialize32(0x4f);
         msg.serialize(name.c_str());
         msg.serialize(pw.c_str());
@@ -1477,10 +1465,10 @@ class ConnectState : public NetworkState {
         // (UINT32) Protocol ID
         buffer.serialize32(0x00);
         // (UINT32) Platform code
-        buffer.serialize32("IX86");
+        buffer.serializeC32("IX86");
         // (UINT32) Product code - we'll just use W2BN and encode what we are in
         // the version
-        buffer.serialize32("W2BN");
+        buffer.serializeC32("W2BN");
         // (UINT32) Version byte - just use the last from W2BN
         buffer.serialize32(0x4f);
         // (UINT32) Language code
