@@ -774,7 +774,6 @@ public:
     void doOneStep() { this->state->doOneStep(this); }
 
     void setState(NetworkState* newState) {
-        std::cout << "new state" << std::endl;
         assert (newState != this->state);
         if (this->state != NULL) {
             delete this->state;
@@ -1560,19 +1559,23 @@ static Context *ctx;
 
 class ChatInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        ctx->sendText(chatInput->getText());
-        chatInput->setText("");
+        if (!ctx->getCurrentChannel().empty()) {
+            ctx->sendText(chatInput->getText());
+            chatInput->setText("");
+        }
     }
 };
 
 class UsernameInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
         ctx->setUsername(username->getText());
+        ctx->setPassword(password->getText());
     }
 };
 
 class PasswordInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
+        ctx->setUsername(username->getText());
         ctx->setPassword(password->getText());
     }
 };
