@@ -712,16 +712,6 @@ public:
 
     void setUsername(std::string arg) { username = arg; }
 
-    uint32_t* getPassword2() {
-        // we assume that any valid password has at least 1 non-null word hash
-        for (int i = 0; i < 5; i++) {
-            if (password[i] != 0) {
-                return password2;
-            }
-        }
-        return NULL;
-    }
-
     uint32_t* getPassword1() {
         // we assume that any valid password has at least 1 non-null word hash
         for (int i = 0; i < 5; i++) {
@@ -738,8 +728,7 @@ public:
                 this->password[i] = 0;
             }
         } else {
-            xsha1_calcHashBuf(pw.c_str(), pw.length(), password);
-            xsha1_calcHashDat(password, 5, password2);
+            pvpgn::sha1_hash(&password, pw.length(), pw.c_str());
         }
     }
 
@@ -781,7 +770,6 @@ private:
 
     std::string username;
     uint32_t password[5]; // xsha1 hash of password
-    uint32_t password2[5]; // xsha1 hash of password hash
 
     std::string currentChannel;
     std::set<std::string> userList;
@@ -878,7 +866,7 @@ public:
                 // TODO:
                 // S>C 0x68 SID_FRIENDSREMOVE
                 // S>C 0x67 SID_FRIENDSADD
-                std::cout << "Unhandled message ID: " << std::hex << msg << std::endl;
+                std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
             }
 
             ctx->getMsgIStream()->finishMessage();
@@ -1026,6 +1014,13 @@ class S2C_ENTERCHAT : public NetworkState {
                 // try again next time
                 return;
             }
+            if (msg == 0x3a) {
+                // pvpgn seems to send a successful logonresponse again
+                uint32_t status = ctx->getMsgIStream()->read32();
+                assert(status == 0);
+                ctx->getMsgIStream()->finishMessage();
+                return;
+            }
             if (msg != 0x0a) {
                 std::string error = std::string("Expected SID_ENTERCHAT, got msg id ");
                 error += std::to_string(msg);
@@ -1091,7 +1086,7 @@ public:
             }
         } else {
             retries++;
-            if (retries < 5000) {
+            if (retries < 50) {
                 return;
             }
             // we're using a timeout of 1ms, so now we've been waiting at
@@ -1258,18 +1253,33 @@ void C2S_LOGONRESPONSE2::doOneStep(Context *ctx) {
         // (UINT32) Client Token
         // (UINT32) Server Token
         // (UINT32)[5] First password hash
-        uint32_t data[7];
-        data[0] = ctx->clientToken;
-        data[1] = ctx->serverToken;
-        data[2] = pw[0];
-        data[3] = pw[1];
-        data[4] = pw[2];
-        data[5] = pw[3];
-        data[6] = pw[4];
-        uint32_t sendHash[5];
-        xsha1_calcHashDat(data, 7, sendHash);
+        // The logic below is taken straight from pvpgn
+        struct {
+            pvpgn::bn_int ticks;
+            pvpgn::bn_int sessionkey;
+            pvpgn::bn_int passhash1[5];
+        } temp;
+        uint32_t passhash2[5];
+
+        pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
+        pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
+        pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
+        pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp);	/* do the double hash */
+
+        // std::cout << std::endl << "Password 1 hash: ";
+        // for (int i = 0; i < 5; i++) {
+        //     std::cout << std::hex << pw[i] << " ";
+        // }
+        // std::cout << std::endl << "Password 2 hash: ";
+        // for (int i = 0; i < 5; i++) {
+        //     std::cout << std::hex << passhash2[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // std::cout << "client token: " << *((uint32_t*)temp.ticks) << std::endl;
+        // std::cout << "server token: " << *((uint32_t*)temp.sessionkey) << std::endl;
+
         for (int i = 0; i < 20; i++) {
-            logon.serialize8(reinterpret_cast<uint8_t*>(sendHash)[i]);
+            logon.serialize8(reinterpret_cast<uint8_t*>(passhash2)[i]);
         }
         logon.serialize(user.c_str());
         logon.flush(ctx->getTCPSocket());
@@ -1644,6 +1654,8 @@ void GoOnline() {
     loginWindowContainer->add(password, Video.Width * 0.1, chatInputHeight * 4);
 
     onlineServiceContainer->add(loginWindow, Video.Width / 4, Video.Height / 2 - chatInputHeight * 4);
+
+    username->requestFocus();
 
     SetVideoSync();
     GameCursor = UI.Point.Cursor;
