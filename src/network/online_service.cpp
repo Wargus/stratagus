@@ -48,23 +48,23 @@ public:
         this->sock = socket;
         this->bufsize = 1024;
         this->buffer = (char*)calloc(sizeof(char), bufsize);
-        this->avail = 0;
+        this->received_bytes = 0;
         this->pos = 0;
     };
     ~BNCSInputStream() {};
 
     std::string readString() {
-        if (avail == 0) {
+        if (received_bytes == 0) {
             return NULL;
         }
         std::stringstream strstr;
         int i = pos;
         char c;
-        while ((c = buffer[i]) != '\0' && i < avail) {
+        while ((c = buffer[i]) != '\0' && i < received_bytes) {
             strstr.put(c);
             i += 1;
         }
-        consumeData(i);
+        consumeData(i + 1 - pos);
         return strstr.str();
     };
 
@@ -135,21 +135,27 @@ public:
         //  (UINT8) Message ID
         // (UINT16) Message length, including this header
         //   (VOID) Message data
-        avail += this->sock->Recv(buffer + avail, 4 - avail);
-        if (avail < 4) {
+        received_bytes += this->sock->Recv(buffer + received_bytes, 4 - received_bytes);
+        if (received_bytes != 4) {
             return -1;
         }
+        assert(received_bytes == 4);
         assert(read8() == 0xff);
         uint8_t msgId = read8();
         uint16_t len = read16();
         // we still need to have len in total for this message, so if we have
         // more available than len minus the current position and minus the
         // first 4 bytes that we already consumed, we'll have enough
-        long needed = len - avail + pos - 4;
-        if (needed > 0) {
-            long got = this->sock->Recv(buffer + avail, needed);
-            avail += got;
-            if (got < needed) {
+        assert(pos == 4);
+        long needed = len - received_bytes;
+        if (needed != 0) {
+            assert(needed > 0);
+            if (len >= bufsize) {
+                buffer = (char*)realloc(buffer, sizeof(char) * len + 1);
+                bufsize = len + 1;
+            }
+            received_bytes += this->sock->Recv(buffer + received_bytes, needed);
+            if (received_bytes < len) {
                 // Didn't receive full message on the socket, yet. Reset position so
                 // this method can be used to try again
                 pos = 0;
@@ -159,6 +165,11 @@ public:
         return msgId;
     };
 
+    void finishMessage() {
+        received_bytes = 0;
+        pos = 0;
+    }
+
 private:
     void consumeData(int bytes) {
         pos += bytes;
@@ -166,7 +177,7 @@ private:
 
     CTCPSocket *sock;
     char *buffer;
-    int avail;
+    int received_bytes;
     int pos;
     int bufsize;
 };
@@ -584,6 +595,7 @@ public:
         this->host = new CHost("127.0.0.1", 6112); // TODO: parameterize
         this->clientToken = MyRand();
         this->username = "";
+        setPassword("");
     }
 
     ~Context() {
@@ -683,7 +695,7 @@ public:
         this->extendedInfoValues[id] = values;
     }
 
-    std::queue<std::string> getInfo() { return info; }
+    std::queue<std::string> *getInfo() { return &info; }
 
     void showInfo(std::string arg) { info.push("*** " + arg + " ***"); }
 
@@ -733,8 +745,14 @@ public:
     }
 
     void setPassword(std::string pw) {
-        xsha1_calcHashBuf(pw.c_str(), pw.length(), password);
-        xsha1_calcHashDat(password, password2);
+        if (pw.empty()) {
+            for (int i = 0; i < sizeof(password); i++) {
+                this->password[i] = 0;
+            }
+        } else {
+            xsha1_calcHashBuf(pw.c_str(), pw.length(), password);
+            xsha1_calcHashDat(password, 5, password2);
+        }
     }
 
     // Protocol
@@ -756,6 +774,7 @@ public:
     void doOneStep() { this->state->doOneStep(this); }
 
     void setState(NetworkState* newState) {
+        std::cout << "new state" << std::endl;
         assert (newState != this->state);
         if (this->state != NULL) {
             delete this->state;
@@ -874,6 +893,8 @@ public:
                 // S>C 0x67 SID_FRIENDSADD
                 std::cout << "Unhandled message ID: " << std::hex << msg << std::endl;
             }
+
+            ctx->getMsgIStream()->finishMessage();
         }
     }
 
@@ -998,6 +1019,7 @@ class S2C_GETCHANNELLIST : public NetworkState {
             }
 
             std::vector<std::string> channels = ctx->getMsgIStream()->readStringlist();
+            ctx->getMsgIStream()->finishMessage();
             ctx->setChannels(channels);
 
             // request our user info and refresh the active games list
@@ -1026,6 +1048,7 @@ class S2C_ENTERCHAT : public NetworkState {
             std::string uniqueName = ctx->getMsgIStream()->readString();
             std::string statString = ctx->getMsgIStream()->readString();
             std::string accountName = ctx->getMsgIStream()->readString();
+            ctx->getMsgIStream()->finishMessage();
 
             ctx->setUsername(uniqueName);
             if (!statString.empty()) {
@@ -1114,6 +1137,7 @@ class S2C_CREATEACCOUNT2 : public NetworkState {
 
             uint32_t status = ctx->getMsgIStream()->read32();
             std::string nameSugg = ctx->getMsgIStream()->readString();
+            ctx->getMsgIStream()->finishMessage();
 
             if (!nameSugg.empty()) {
                 nameSugg = " (try username: " + nameSugg + ")";
@@ -1190,6 +1214,7 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
             }
 
             uint32_t status = ctx->getMsgIStream()->read32();
+            ctx->getMsgIStream()->finishMessage();
 
             switch (status) {
             case 0x00:
@@ -1197,15 +1222,18 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 ctx->setState(new S2C_PKT_SERVERPING());
                 return;
             case 0x01:
+            case 0x010000:
                 ctx->showInfo("Account does not exist, creating it...");
                 createAccount(ctx);
                 return;
             case 0x02:
+            case 0x020000:
                 ctx->showInfo("Incorrect password");
                 ctx->setPassword("");
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             case 0x06:
+            case 0x060000:
                 ctx->showInfo("Account closed: " + ctx->getMsgIStream()->readString());
                 ctx->setPassword("");
                 ctx->setState(new C2S_LOGONRESPONSE2());
@@ -1252,7 +1280,7 @@ void C2S_LOGONRESPONSE2::doOneStep(Context *ctx) {
         data[5] = pw[3];
         data[6] = pw[4];
         uint32_t sendHash[5];
-        xsha1_calcHashDat(data, sendHash);
+        xsha1_calcHashDat(data, 7, sendHash);
         for (int i = 0; i < 20; i++) {
             logon.serialize8(reinterpret_cast<uint8_t*>(sendHash)[i]);
         }
@@ -1279,6 +1307,7 @@ class S2C_SID_AUTH_CHECK : public NetworkState {
 
             uint32_t result = ctx->getMsgIStream()->read32();
             std::string info = ctx->getMsgIStream()->readString();
+            ctx->getMsgIStream()->finishMessage();
 
             switch (result) {
             case 0x000:
@@ -1344,6 +1373,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             uint64_t mpqFiletime = ctx->getMsgIStream()->readFiletime();
             std::string mpqFilename = ctx->getMsgIStream()->readString();
             std::string formula = ctx->getMsgIStream()->readString();
+            ctx->getMsgIStream()->finishMessage();
 
             // immediately respond with pkt_conntest2 udp msg
             BNCSOutputStream conntest(0x09);
@@ -1406,6 +1436,7 @@ class S2C_SID_PING : public NetworkState {
                 ctx->setState(new DisconnectedState(error));
             }
             uint32_t pingValue = ctx->getMsgIStream()->read32();
+            ctx->getMsgIStream()->finishMessage();
 
             // immediately respond with C2S_SID_PING
             BNCSOutputStream buffer(0x25);
@@ -1611,12 +1642,12 @@ void GoOnline() {
     loginWindowContainer->setOpaque(false);
     loginWindow->setContent(loginWindowContainer);
 
-    username = new gcn::TextField();
+    username = new gcn::TextField("");
     username->setSize(Video.Width * 0.3, chatInputHeight);
     username->addActionListener(new UsernameInputListener());
     loginWindowContainer->add(username, Video.Width * 0.1, chatInputHeight);
 
-    password = new gcn::TextField();
+    password = new gcn::TextField("");
     password->setSize(Video.Width * 0.3, chatInputHeight);
     password->addActionListener(new PasswordInputListener());
     loginWindowContainer->add(password, Video.Width * 0.1, chatInputHeight * 4);
@@ -1665,12 +1696,9 @@ void GoOnline() {
             }
         }
 
-        if (!ctx->getInfo().empty()) {
-            std::string info = ctx->getInfo().front();
-            ctx->getInfo().pop();
-            while (!info.empty()) {
-                static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(info);
-            }
+        while (!ctx->getInfo()->empty()) {
+            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(ctx->getInfo()->front());
+            ctx->getInfo()->pop();
         }
 
         Gui->draw();

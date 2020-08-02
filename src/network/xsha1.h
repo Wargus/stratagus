@@ -18,17 +18,18 @@ See LICENSE.TXT that should have accompanied this software for full terms and
 conditions.
 */
 
+#include <cassert>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
-uint32_t ROL(uint32_t val, uint32_t shift) {
+static uint32_t ROL(uint32_t val, uint32_t shift) {
     shift &= 0x1f;
     val = (val >> (0x20 - shift)) | (val << shift);
     return val;
 }
 
-void xsha1_calcHashDat(uint32_t* data, uint32_t* result) {
+static void calcHash(uint32_t data[1024], uint32_t result[5]) {
     for (int i = 16; i < 80; i++) {
         data[i] = ROL(1, (int) (data[i-16] ^ data[i-8] ^ data[i-14] ^ data[i-3]) % 32);
     }
@@ -67,11 +68,16 @@ void xsha1_calcHashDat(uint32_t* data, uint32_t* result) {
     result[4] = E + 0xc3d2e1f0;
 }
 
-void xsha1_calcHashBuf(const char* input, size_t length, uint32_t* result) {
+void xsha1_calcHashBuf(const char* input, size_t length, uint32_t *result) {
+    assert(length < 1024);
     void *dataptr = malloc(1024);
     memset(dataptr, 0, 1024);
     uint32_t *data = (uint32_t *) dataptr;
     memcpy(data, input, length);
-    xsha1_calcHashDat(data, result);
+    calcHash(data, result);
     free(dataptr);
+}
+
+void xsha1_calcHashDat(uint32_t* data, size_t length, uint32_t *result) {
+    xsha1_calcHashBuf((const char*)data, length * 4, result);
 }
