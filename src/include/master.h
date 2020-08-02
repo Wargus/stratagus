@@ -63,6 +63,8 @@ public:
 	CClientLog *GetLastMessage() { return events.back(); }
 	int CreateGame(std::string desc, std::string map, std::string players);
 
+	CHost *GetMetaServer() { return new CHost(metaHost.c_str(), metaPort); }
+
 private:
 	CTCPSocket metaSocket;                     /// This is a TCP socket
 	std::string metaHost;                      /// Address of metaserver

@@ -1,4 +1,5 @@
 #include "online_service.h"
+#include "master.h"
 
 #include <arpa/inet.h>
 #include <clocale>
@@ -580,7 +581,7 @@ public:
         this->tcpSocket = new CTCPSocket();
         this->istream = new BNCSInputStream(tcpSocket);
         this->state = NULL;
-        this->host = new CHost("127.0.0.1", 6112); // TODO: parameterize
+        this->host = new CHost("127.0.0.1", 6112);
         this->clientToken = MyRand();
         this->username = "";
         setPassword("");
@@ -795,6 +796,7 @@ public:
     virtual void doOneStep(Context *ctx) {
         if (!hasPrinted) {
             std::cout << message << std::endl;
+            ctx->showInfo(message);
             hasPrinted = true;
         }
         // the end
@@ -1448,8 +1450,12 @@ class S2C_SID_PING : public NetworkState {
 class ConnectState : public NetworkState {
     virtual void doOneStep(Context *ctx) {
         // Connect
-        
-        if (!ctx->getTCPSocket()->Open(CHost("0.0.0.0", 6113))) { // TODO...
+
+        std::string localHost = CNetworkParameter::Instance.localHost;
+	if (!localHost.compare("127.0.0.1")) {
+            localHost = "0.0.0.0";
+	}
+        if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
             ctx->setState(new DisconnectedState("TCP open failed"));
             return;
         }
@@ -1458,7 +1464,7 @@ class ConnectState : public NetworkState {
             return;
         }
         if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
-            ctx->setState(new DisconnectedState("TCP connect failed"));
+            ctx->setState(new DisconnectedState("TCP connect failed for server " + ctx->getHost()->toString()));
             return;
         }
         if (!ctx->getUDPSocket()->Open(*ctx->getHost())) {
@@ -1588,6 +1594,7 @@ void GoOnline() {
     Gui->setUseDirtyDrawing(false);
 
     ctx = new Context();
+    ctx->setHost(MetaClient.GetMetaServer());
     ctx->setState(new ConnectState());
 
     onlineServiceContainer = new gcn::Container();
