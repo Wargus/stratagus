@@ -1355,7 +1355,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             uint32_t logonType = ctx->getMsgIStream()->read32();
             assert(logonType == 0x00); // only support Broken SHA-1 logon for now
             uint32_t serverToken = ctx->getMsgIStream()->read32();
-            ctx->serverToken = serverToken;
+            ctx->serverToken = htonl(serverToken); // keep in network order
             uint32_t udpValue = ctx->getMsgIStream()->read32();
             uint64_t mpqFiletime = ctx->getMsgIStream()->readFiletime();
             std::string mpqFilename = ctx->getMsgIStream()->readString();
