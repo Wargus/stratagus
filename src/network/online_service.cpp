@@ -851,6 +851,9 @@ public:
             switch (msg) {
             case 0x00: // SID_NULL
                 break;
+            case 0x25: // SID_PING
+                handlePing(ctx);
+                break;
             case 0x0f: // CHATEVENT
                 handleChatevent(ctx);
                 break;
@@ -891,6 +894,14 @@ public:
     }
 
 private:
+    void handlePing(Context *ctx) {
+        uint32_t pingValue = ctx->getMsgIStream()->read32();
+        ctx->getMsgIStream()->finishMessage();
+        BNCSOutputStream buffer(0x25);
+        buffer.serialize32(pingValue);
+        send(ctx, &buffer);
+    }
+
     void handleGamelist(Context *ctx) {
         uint32_t cnt = ctx->getMsgIStream()->read32();
         std::vector<Game*> games;
