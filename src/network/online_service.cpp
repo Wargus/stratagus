@@ -118,6 +118,16 @@ public:
         return read64();
     }
 
+    /**
+     * For debugging and development: read the entire thing as a char
+     * array. Caller must "free" the out-char
+     */
+    int readAll(char** out) {
+        *out = (char*)calloc(received_bytes, sizeof(char));
+        strncpy(*out, buffer, received_bytes);
+        return received_bytes;
+    }
+
     std::string string32() {
         // uint32 encoded (4-byte) string
         uint32_t data = read32();
@@ -869,6 +879,11 @@ public:
                 // S>C 0x68 SID_FRIENDSREMOVE
                 // S>C 0x67 SID_FRIENDSADD
                 std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
+                std::cout << "Raw contents >>>" << std::endl;
+                char* out;
+                int len = ctx->getMsgIStream()->readAll(&out);
+                std::cout.write(out, len);
+                std::cout << "<<<" << std::endl;
             }
 
             ctx->getMsgIStream()->finishMessage();
