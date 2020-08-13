@@ -5,23 +5,25 @@
 
 class OnlineContext {
 public:
+    virtual ~OnlineContext() { };
+
     // called in the sdl event loop
-    virtual void doOneStep();
+    virtual void doOneStep() = 0;
 
     // called when joining a network game
-    virtual void joinGame(std::string hostPlayerName, std::string pw);
+    virtual void joinGame(std::string hostPlayerName, std::string pw) = 0;
 
     // called when leaving a network game
-    virtual void leaveGame();
+    virtual void leaveGame() = 0;
 
     // called when advertised game is starting (just reports the game as in-progress)
-    virtual void startAdvertising(bool isStarted = false);
+    virtual void startAdvertising(bool isStarted = false) = 0;
 
     // called when advertised game is left by the server
-    virtual void stopAdvertising();
+    virtual void stopAdvertising() = 0;
 
     // called when network game ends
-    virtual void reportGameResult();
+    virtual void reportGameResult() = 0;
 };
 
 extern OnlineContext *OnlineContextHandler;

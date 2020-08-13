@@ -1761,12 +1761,12 @@ static gcn::TextField *username;
 static gcn::TextField *password;
 
 static Context _ctx;
-Context *OnlineContext = &_ctx;
+OnlineContext *OnlineContextHandler = &_ctx;
 
 class ChatInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        if (!OnlineContext->getCurrentChannel().empty()) {
-            OnlineContext->sendText(chatInput->getText());
+        if (!_ctx.getCurrentChannel().empty()) {
+            _ctx.sendText(chatInput->getText());
             chatInput->setText("");
         }
     }
@@ -1774,15 +1774,15 @@ class ChatInputListener : public gcn::ActionListener {
 
 class UsernameInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        OnlineContext->setUsername(username->getText());
-        OnlineContext->setPassword(password->getText());
+        _ctx.setUsername(username->getText());
+        _ctx.setPassword(password->getText());
     }
 };
 
 class PasswordInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        OnlineContext->setUsername(username->getText());
-        OnlineContext->setPassword(password->getText());
+        _ctx.setUsername(username->getText());
+        _ctx.setPassword(password->getText());
     }
 };
 
@@ -1795,7 +1795,7 @@ static int CclGoOnline(lua_State* l) {
     gcn::Widget *oldTop = Gui->getTop();
     Gui->setUseDirtyDrawing(false);
 
-    OnlineContext->setState(new ConnectState());
+    _ctx.setState(new ConnectState());
 
     onlineServiceContainer = new gcn::Container();
     onlineServiceContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
@@ -1869,17 +1869,17 @@ static int CclGoOnline(lua_State* l) {
     InterfaceState = IfaceStateNormal;
     UI.SelectedViewport = UI.Viewports;
     while (1) {
-        if (OnlineContext->isConnected()) {
+        if (_ctx.isConnected()) {
             loginWindow->setVisible(false);
 
             if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
-                OnlineContext->refreshGames();
-                OnlineContext->refreshFriends();
+                _ctx.refreshGames();
+                _ctx.refreshFriends();
             }
 
             if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
                 static_cast<gcn::TextBox*>(gamelistArea->getContent())->setText("");
-                for (auto g : OnlineContext->getGames()) {
+                for (auto g : _ctx.getGames()) {
                     static_cast<gcn::TextBox*>(gamelistArea->getContent())->addRow(g->getMap() + " " +
                                                                                    g->getCreator() + " " +
                                                                                    g->getGameType() + " " +
@@ -1888,25 +1888,25 @@ static int CclGoOnline(lua_State* l) {
                 }
 
                 static_cast<gcn::TextBox*>(usersArea->getContent())->setText("");
-                for (auto u : OnlineContext->getUsers()) {
+                for (auto u : _ctx.getUsers()) {
                     static_cast<gcn::TextBox*>(usersArea->getContent())->addRow(u);
                 }
 
                 static_cast<gcn::TextBox*>(channelsArea->getContent())->setText("");
-                for (auto u : OnlineContext->getChannels()) {
+                for (auto u : _ctx.getChannels()) {
                     static_cast<gcn::TextBox*>(channelsArea->getContent())->addRow(u);
                 }
 
                 static_cast<gcn::TextBox*>(friendsArea->getContent())->setText("");
-                for (auto u : OnlineContext->getFriends()) {
+                for (auto u : _ctx.getFriends()) {
                     static_cast<gcn::TextBox*>(friendsArea->getContent())->addRow(u->getName() + ", " + u->getStatus() + ", " + u->getProduct());
                 }
             }
         }
 
-        while (!OnlineContext->getInfo()->empty()) {
-            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(OnlineContext->getInfo()->front());
-            OnlineContext->getInfo()->pop();
+        while (!_ctx.getInfo()->empty()) {
+            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(_ctx.getInfo()->front());
+            _ctx.getInfo()->pop();
         }
 
         Gui->draw();
