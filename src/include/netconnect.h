@@ -97,6 +97,8 @@ extern int NetConnectType;              /// Network menu: Setup mode active
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
+extern std::string NetworkMapName;         /// Name of the map received with ICMMap
+
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 

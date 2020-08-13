@@ -809,7 +809,35 @@ public:
     }
 
     virtual void reportGameResult() {
-        GameResult
+        BNCSOutputStream msg(0x2c);
+        msg.serialize32(8); // number of results
+        for (int i = 0; i < 8; i++) {
+            if (NetLocalPlayerNumber == i) {
+                switch (GameResult) {
+                case GameVictory:
+                    msg.serialize32(0x01);
+                    break;
+                case GameDefeat:
+                    msg.serialize32(0x02);
+                    break;
+                case GameDraw:
+                    msg.serialize32(0x03);
+                    break;
+                default:
+                    msg.serialize32(0x04);
+                    break;
+                }
+            } else {
+                // it's annoying to tease out the other results, we ignore it and let the server merge
+                msg.serialize32(0x00);
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            msg.serialize(Hosts[i].PlyName);
+        }
+        msg.serialize(NetworkMapName.c_str());
+        msg.serialize(""); // TODO: transmit player scores
+        msg.flush(getTCPSocket());
     }
 
     // UI information
@@ -969,15 +997,6 @@ private:
     std::string message;
 };
 
-class C2S_GAMERESULT_OR_STOPADV : public NetworkState {
-    virtual void doOneStep(Context *ctx) {
-        // TODO - wait until the game lobby is left or the game is over and then send the result
-        // C>S 0x02 SID_STOPADV
-        // C>S 0x2C SID_GAMERESULT
-        // C>S 0x22 SID_NOTIFYJOIN
-    }
-};
-
 class S2C_CHATEVENT : public NetworkState {
 public:
     S2C_CHATEVENT() {
@@ -1019,8 +1038,6 @@ public:
                 // S>C 0x1C SID_STARTADVEX3
                 if (ctx->getMsgIStream()->read32()) {
                     ctx->showError("Game creation failed");
-                } else {
-                    ctx->setState(new C2S_GAMERESULT_OR_STOPADV());
                 }
                 break;
             case 0x65:
