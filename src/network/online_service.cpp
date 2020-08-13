@@ -584,7 +584,7 @@ protected:
     int send(Context *ctx, BNCSOutputStream *buf);
 };
 
-class Context {
+class Context : public OnlineContext {
 public:
     Context() {
         this->udpSocket = new CUDPSocket();
@@ -606,7 +606,29 @@ public:
         delete host;
     }
 
+    boolean isConnected() {
+        return !getCurrentChannel().empty();
+    }
+
     // User and UI actions
+    void disconnect() {
+        if (isConnected()) {
+            // SID_STOPADV: according to bnetdocs.org, this is always sent when
+            // clients disconnect, regardless of state
+            BNCSOutputStream stop(0x02);
+            stop.flush(tcpSocket);
+            // SID_LEAVECHAT
+            BNCSOutputStream leave(0x10);
+            leave.flush(tcpSocket);
+        }
+        udpSocket->Close();
+        tcpSocket->Close();
+        state = NULL;
+        clientToken = MyRand();
+        username = "";
+        setPassword("");
+    }
+
     void sendText(std::string txt) {
         // C>S 0x0E SID_CHATCOMMAND
         int pos = 0;
@@ -759,7 +781,7 @@ public:
 
     BNCSInputStream *getMsgIStream() { return istream; }
 
-    void doOneStep() { this->state->doOneStep(this); }
+    virtual void doOneStep() { if (this->state != NULL) this->state->doOneStep(this); }
 
     void setState(NetworkState* newState) {
         assert (newState != this->state);
@@ -808,6 +830,7 @@ public:
             std::cout << message << std::endl;
             ctx->showInfo(message);
             hasPrinted = true;
+            ctx->disconnect();
         }
         // the end
     }
@@ -822,6 +845,7 @@ class C2S_GAMERESULT_OR_STOPADV : public NetworkState {
         // TODO - wait until the game lobby is left or the game is over and then send the result
         // C>S 0x02 SID_STOPADV
         // C>S 0x2C SID_GAMERESULT
+        // C>S 0x22 SID_NOTIFYJOIN
     }
 };
 
@@ -850,6 +874,7 @@ public:
 
             switch (msg) {
             case 0x00: // SID_NULL
+                handleNull(ctx);
                 break;
             case 0x25: // SID_PING
                 handlePing(ctx);
@@ -894,9 +919,13 @@ public:
     }
 
 private:
+    void handleNull(Context *ctx) {
+        BNCSOutputStream buffer(0x00);
+        send(ctx, &buffer);
+    }
+
     void handlePing(Context *ctx) {
         uint32_t pingValue = ctx->getMsgIStream()->read32();
-        ctx->getMsgIStream()->finishMessage();
         BNCSOutputStream buffer(0x25);
         buffer.serialize32(pingValue);
         send(ctx, &buffer);
@@ -1585,12 +1614,13 @@ static gcn::Container *loginWindowContainer;
 static gcn::TextField *username;
 static gcn::TextField *password;
 
-static Context *ctx;
+static Context _ctx;
+Context *OnlineContext = &_ctx;
 
 class ChatInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        if (!ctx->getCurrentChannel().empty()) {
-            ctx->sendText(chatInput->getText());
+        if (!OnlineContext->getCurrentChannel().empty()) {
+            OnlineContext->sendText(chatInput->getText());
             chatInput->setText("");
         }
     }
@@ -1598,15 +1628,15 @@ class ChatInputListener : public gcn::ActionListener {
 
 class UsernameInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        ctx->setUsername(username->getText());
-        ctx->setPassword(password->getText());
+        OnlineContext->setUsername(username->getText());
+        OnlineContext->setPassword(password->getText());
     }
 };
 
 class PasswordInputListener : public gcn::ActionListener {
     virtual void action(const std::string &) {
-        ctx->setUsername(username->getText());
-        ctx->setPassword(password->getText());
+        OnlineContext->setUsername(username->getText());
+        OnlineContext->setPassword(password->getText());
     }
 };
 
@@ -1619,9 +1649,7 @@ void GoOnline() {
     gcn::Widget *oldTop = Gui->getTop();
     Gui->setUseDirtyDrawing(false);
 
-    ctx = new Context();
-    ctx->setHost(MetaClient.GetMetaServer());
-    ctx->setState(new ConnectState());
+    OnlineContext->setState(new ConnectState());
 
     onlineServiceContainer = new gcn::Container();
     onlineServiceContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
@@ -1695,19 +1723,17 @@ void GoOnline() {
     InterfaceState = IfaceStateNormal;
     UI.SelectedViewport = UI.Viewports;
     while (1) {
-        ctx->doOneStep();
-
-        if (!ctx->getCurrentChannel().empty()) {
+        if (OnlineContext->isConnected()) {
             loginWindow->setVisible(false);
 
             if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
-                ctx->refreshGames();
-                ctx->refreshFriends();
+                OnlineContext->refreshGames();
+                OnlineContext->refreshFriends();
             }
 
             if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
                 static_cast<gcn::TextBox*>(gamelistArea->getContent())->setText("");
-                for (auto g : ctx->getGames()) {
+                for (auto g : OnlineContext->getGames()) {
                     static_cast<gcn::TextBox*>(gamelistArea->getContent())->addRow(g->getMap() + " " +
                                                                                    g->getCreator() + " " +
                                                                                    g->getGameType() + " " +
@@ -1716,25 +1742,25 @@ void GoOnline() {
                 }
 
                 static_cast<gcn::TextBox*>(usersArea->getContent())->setText("");
-                for (auto u : ctx->getUsers()) {
+                for (auto u : OnlineContext->getUsers()) {
                     static_cast<gcn::TextBox*>(usersArea->getContent())->addRow(u);
                 }
 
                 static_cast<gcn::TextBox*>(channelsArea->getContent())->setText("");
-                for (auto u : ctx->getChannels()) {
+                for (auto u : OnlineContext->getChannels()) {
                     static_cast<gcn::TextBox*>(channelsArea->getContent())->addRow(u);
                 }
 
                 static_cast<gcn::TextBox*>(friendsArea->getContent())->setText("");
-                for (auto u : ctx->getFriends()) {
+                for (auto u : OnlineContext->getFriends()) {
                     static_cast<gcn::TextBox*>(friendsArea->getContent())->addRow(u->getName() + ", " + u->getStatus() + ", " + u->getProduct());
                 }
             }
         }
 
-        while (!ctx->getInfo()->empty()) {
-            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(ctx->getInfo()->front());
-            ctx->getInfo()->pop();
+        while (!OnlineContext->getInfo()->empty()) {
+            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(OnlineContext->getInfo()->front());
+            OnlineContext->getInfo()->pop();
         }
 
         Gui->draw();

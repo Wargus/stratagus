@@ -35,6 +35,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+#include "online_service.h"
 
 #ifdef DEBUG
 #include <signal.h>
@@ -676,6 +677,10 @@ void WaitEventsOneFrame()
 				GetCallbacks()->NetworkEvent();
 			}
 		}
+
+		// Online session
+		OnlineContextHandler->doOneStep();
+
 		// No more input and time for frame over: return
 		if (!i && s <= 0 && interrupts) {
 			break;

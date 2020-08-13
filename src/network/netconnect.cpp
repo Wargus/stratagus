@@ -39,7 +39,6 @@
 
 #include "interface.h"
 #include "map.h"
-#include "master.h"
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
