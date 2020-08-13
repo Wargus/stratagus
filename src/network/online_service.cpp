@@ -1,5 +1,5 @@
 #include "online_service.h"
-#include "master.h"
+#include "results.h"
 
 #include <arpa/inet.h>
 #include <clocale>
@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <ios>
 #include <iostream>
 #include <map>
 #include <ostream>
@@ -25,6 +26,13 @@
 #include <netinet/in.h>
 #endif
 
+#include "stratagus.h"
+#include "lua.h"
+#include "map.h"
+#include "netconnect.h"
+#include "script.h"
+#include "settings.h"
+#include "tileset.h"
 #include "cursor.h"
 #include "font.h"
 #include "input.h"
@@ -41,7 +49,6 @@
 #include "version.h"
 
 #include "./xsha1.h"
-
 
 class BNCSInputStream {
 public:
@@ -677,14 +684,132 @@ public:
         msg.flush(getTCPSocket());
     }
 
-    void joinGame(std::string name, std::string pw) {
+    virtual void joinGame(std::string username, std::string pw) {
+        if (!isConnected()) {
+            return;
+        }
         // C>S 0x22 SID_NOTIFYJOIN
         BNCSOutputStream msg(0x09);
         msg.serializeC32("W2BN");
         msg.serialize32(0x4f);
-        msg.serialize(name.c_str());
+        msg.serialize(gameNameFromUsername(getUsername()).c_str());
         msg.serialize(pw.c_str());
         msg.flush(getTCPSocket());
+    }
+
+    virtual void leaveGame() {
+        // TODO: ?
+    }
+
+    virtual void startAdvertising(bool isStarted = false) {
+        if (!isConnected()) {
+            return;
+        }
+        BNCSOutputStream msg(0x1c);
+        int maxSlots = 0;
+        for (int i = 0; i < PlayerMax; i++) {
+            if (ServerSetupState.CompOpt[i] == 0) { // available
+                maxSlots++;
+            }
+        }
+        int joinedPlayers = 0;
+        for (int i = 1; i < PlayerMax; i++) { // skip server host
+            if (Hosts[i].PlyNr) {
+                joinedPlayers++;
+            }
+        }
+        uint32_t state = 0x10; // disconnect always counts as loss
+        if (joinedPlayers) {
+            state |= 0x04; // has players other than creator
+        }
+        if (joinedPlayers + 1 == maxSlots) {
+            state |= 0x02; // game is full
+        }
+        if (isStarted) {
+            state |= 0x08; // game in progress
+        }
+        msg.serialize32(state);
+        msg.serialize32(0x00); // uptime
+        msg.serialize16(0x0a); // game type - map settings
+        msg.serialize16(0x01); // sub game type
+        msg.serialize32(0xff); // provider version constant
+        msg.serialize32(0x00); // not ladder
+        msg.serialize((gameNameFromUsername(getUsername())).c_str()); // game name
+        msg.serialize(""); // password. TODO: add support
+
+        std::stringstream statstring;
+        statstring << ","; // this game is not saved. TODO: add support
+        int w = Map.Info.MapWidth;
+        int h = Map.Info.MapWidth;
+        if (w == 128 && h == 128) {
+            statstring << ",";
+        } else {
+            statstring << std::dec << w / 32 << h / 32 << ",";
+        }
+        if (maxSlots == 8) {
+            statstring << ",";
+        } else {
+            statstring << std::dec << maxSlots + 10 << ",";
+        }
+        statstring << "0x04,"; // speed - normal (can be changed in-game anyway)
+        statstring << "0x00,"; // not an approved game
+        statstring << "0x0a,"; // game type uses map settings
+        statstring << "0x01,"; // game settings parameter - none
+        statstring << std::hex << FileChecksums << ","; // cd key checksum - we use lua files checksum
+
+        uint32_t game_settings = 0;
+        if (GameSettings.NumUnits == 1) {
+            game_settings |= 0x200;
+        }
+        if (NoRandomPlacementMultiplayer == 1) {
+            game_settings |= 0x400;
+        }
+        switch (GameSettings.Resources) {
+        case -1:
+            break;
+        case 1:
+            game_settings |= 0x1000;
+            break;
+        case 2:
+            game_settings |= 0x2000;
+            break;
+        case 3:
+            game_settings |= 0x3000;
+            break;
+        default:
+            game_settings |= 0x20000;
+            break;
+        }
+        if (Map.Tileset->Name == "Forest") {
+            game_settings |= 0x4000;
+        } else if (Map.Tileset->Name == "Winter") {
+            game_settings |= 0x8000;
+        } else if (Map.Tileset->Name == "Wasteland") {
+            game_settings |= 0xC000;
+        } else if (Map.Tileset->Name == "Orc Swamp") {
+            game_settings |= 0x1C000;
+        }
+        statstring << std::hex << game_settings << ",";
+
+        statstring << getUsername();
+        statstring.put(0x0d);
+        statstring << Map.Info.Filename;
+        statstring.put(0x0d);
+
+        msg.serialize(statstring.str().c_str());
+        msg.flush(getTCPSocket());
+    }
+
+    virtual void stopAdvertising() {
+        if (!isConnected()) {
+            return;
+        }
+        BNCSOutputStream msg(0x02);
+        msg.flush(getTCPSocket());
+    }
+
+    virtual void reportGameResult() {
+        GameResult
     }
 
     // UI information
@@ -795,6 +920,10 @@ public:
     uint32_t serverToken;
 
 private:
+    std::string gameNameFromUsername(std::string username) {
+        return username + "'s game";
+    }
+
     NetworkState *state;
     CHost *host;
     CUDPSocket *udpSocket;
@@ -1507,9 +1636,9 @@ class ConnectState : public NetworkState {
         // Connect
 
         std::string localHost = CNetworkParameter::Instance.localHost;
-	if (!localHost.compare("127.0.0.1")) {
+        if (!localHost.compare("127.0.0.1")) {
             localHost = "0.0.0.0";
-	}
+        }
         if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
             ctx->setState(new DisconnectedState("TCP open failed"));
             return;
@@ -1640,7 +1769,7 @@ class PasswordInputListener : public gcn::ActionListener {
     }
 };
 
-void GoOnline() {
+static int CclGoOnline(lua_State* l) {
     std::string nc, rc;
     GetDefaultTextColors(nc, rc);
 
@@ -1801,4 +1930,20 @@ void GoOnline() {
     delete loginWindowContainer;
     delete username;
     delete password;
+
+    return 0;
+}
+
+static int CclStopAdvertisingOnlineGame(lua_State* l) {
+    return 0;
+}
+
+static int CclStartAdvertisingOnlineGame(lua_State* l) {
+    return 0;
+}
+
+void OnlineServiceCclRegister() {
+    lua_register(Lua, "StartAdvertisingOnlineGame", CclStartAdvertisingOnlineGame);
+    lua_register(Lua, "StopAdvertisingOnlineGame", CclStopAdvertisingOnlineGame);
+    lua_register(Lua, "GoOnline", CclGoOnline);
 }

@@ -33,6 +33,7 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include "online_service.h"
 #include "stratagus.h"
 
 #include "netconnect.h"
@@ -86,7 +87,7 @@ int NetLocalPlayerNumber;              /// Player number of local client
 
 int NetPlayers;                         /// How many network players
 std::string NetworkMapName;             /// Name of the map received with ICMMap
-static int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
+int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
@@ -780,6 +781,8 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
 	CNetworkParameter::Instance.gameCyclesPerUpdate = msg.gameCyclesPerUpdate;
+
+	OnlineContextHandler->joinGame(msg.hosts[0].PlyName, "");
 
 	Hosts[0].Host = serverHost.getIp();
 	Hosts[0].Port = serverHost.getPort();
@@ -1705,6 +1708,10 @@ breakout:
 	}
 
 	DebugPrint("DONE: All configs acked - Now starting..\n");
+
+	// advertise online that we're in progress
+	OnlineContextHandler->startAdvertising(true);
+
 	// Give clients a quick-start kick..
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
 	for (int i = 0; i < HostsCount; ++i) {

@@ -1,23 +1,31 @@
 #ifndef __ONLINE_SERVICE_H__
 #define __ONLINE_SERVICE_H__
 
+#include <string>
+
 class OnlineContext {
 public:
+    // called in the sdl event loop
     virtual void doOneStep();
 
-    virtual void goOnline();
+    // called when joining a network game
+    virtual void joinGame(std::string hostPlayerName, std::string pw);
 
-    virtual void joinGame(std:string name, std::string pw);
+    // called when leaving a network game
+    virtual void leaveGame();
 
-    // TODO: allow passing all the other options, like 1 peon only, resource amount, game type, ...
-    virtual void advertiseGame(std::string name, std::string pw, std::string creatorName, std::string mapName,
-                               int mapX, int mapY, int maxPlayers, int playersInGame);
+    // called when advertised game is starting (just reports the game as in-progress)
+    virtual void startAdvertising(bool isStarted = false);
 
-    virtual void stopAdvertisingGame();
+    // called when advertised game is left by the server
+    virtual void stopAdvertising();
 
+    // called when network game ends
     virtual void reportGameResult();
 };
 
 extern OnlineContext *OnlineContextHandler;
+
+extern void OnlineServiceCclRegister();
 
 #endif

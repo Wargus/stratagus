@@ -33,6 +33,7 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "online_service.h"
 #include "stratagus.h"
 
 #include "actions.h"
@@ -418,6 +419,10 @@ void GameMainLoop()
 	//
 	// Game over
 	//
+	if (ThisPlayer && IsNetworkGame()) {
+		OnlineContextHandler->reportGameResult();
+	}
+
 	if (GameResult == GameExit) {
 		Exit(0);
 		return;

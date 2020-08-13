@@ -100,6 +100,8 @@ extern int NetLocalPlayerNumber;           /// Player number of local client
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 
+extern int NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

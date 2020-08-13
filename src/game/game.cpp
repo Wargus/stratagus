@@ -56,6 +56,7 @@
 #include "missile.h"
 #include "netconnect.h"
 #include "network.h"
+#include "online_service.h"
 #include "parameters.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -1507,6 +1508,7 @@ void LuaRegisterModules()
 	UpgradesCclRegister();
 	UserInterfaceCclRegister();
 	VideoCclRegister();
+	OnlineServiceCclRegister();
 }
 
 
