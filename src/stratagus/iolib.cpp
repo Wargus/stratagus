@@ -715,8 +715,8 @@ int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 #else
 	strcat_s(buffer, sizeof(buffer), "*.*");
 	struct _finddata_t fileinfo;
-	long hFile = _findfirst(buffer, &fileinfo);
-	if (hFile != -1L) {
+	intptr_t hFile = _findfirst(buffer, &fileinfo);
+	if (hFile != -1) {
 		do {
 			filename = fileinfo.name;
 #endif
