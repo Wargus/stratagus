@@ -27,6 +27,11 @@ obj-*
 ./tolua.cpp
 ./tolua.cpp.rule
 build
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/scripts
 .clangd
 compile_commands.json
