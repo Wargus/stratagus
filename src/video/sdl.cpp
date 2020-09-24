@@ -106,6 +106,8 @@ static bool CanUseShaders = false;
 
 bool IsSDLWindowVisible = true;
 
+static uint32_t SDL_CUSTOM_KEY_UP;
+
 /*----------------------------------------------------------------------------
 --  Sync
 ----------------------------------------------------------------------------*/
@@ -264,11 +266,14 @@ void InitVideoSdl()
 		SDL_setenv("SDL_MOUSE_RELATIVE", "0", 1);
 		int res = SDL_Init(
 					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
-					  SDL_INIT_TIMER);
+					  SDL_INIT_EVENTS | SDL_INIT_TIMER);
 		if (res < 0) {
 			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 			exit(1);
 		}
+
+		SDL_CUSTOM_KEY_UP = SDL_RegisterEvents(1);
+		SDL_StartTextInput();
 
 		// Clean up on exit
 		atexit(SDL_Quit);
@@ -498,6 +503,8 @@ void SwitchToShader() {
 */
 static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 {
+	unsigned int keysym = 0;
+
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
@@ -550,14 +557,46 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			}
 			break;
 
+		case SDL_TEXTINPUT:
+			{
+				char* text = event.text.text;
+				if (text[0] < 128) {
+					// we only accept US-ascii chars for now
+					char lastKey = text[0];
+					InputKeyButtonPress(callbacks, SDL_GetTicks(), lastKey, lastKey);
+					// fabricate a keyup event for later
+					SDL_Event event;
+					SDL_zero(event);
+					event.type = SDL_USEREVENT;
+					event.user.code = lastKey;
+					event.user.data1 = reinterpret_cast<void*>(SDL_CUSTOM_KEY_UP);
+					SDL_PushEvent(&event);
+				}
+			}
+			break;
+
+		case SDL_USEREVENT:
+			{
+				Assert(reinterpret_cast<uint32_t>(event.user.data1) == SDL_CUSTOM_KEY_UP);
+				char key = static_cast<char>(event.user.code);
+				InputKeyButtonRelease(callbacks, SDL_GetTicks(), key, key);
+			}
+			break;
+
 		case SDL_KEYDOWN:
-			InputKeyButtonPress(callbacks, SDL_GetTicks(),
-								event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
+			keysym = event.key.keysym.sym;
+			if (keysym < 32 || keysym > 128) {
+				// only report non-printing keys here, the characters will be reported with the textinput event
+				InputKeyButtonPress(callbacks, SDL_GetTicks(), keysym, keysym < 128 ? keysym : 0);
+			}
 			break;
 
 		case SDL_KEYUP:
-			InputKeyButtonRelease(callbacks, SDL_GetTicks(),
-								  event.key.keysym.sym, event.key.keysym.sym < 128 ? event.key.keysym.sym : 0);
+			keysym = event.key.keysym.sym;
+			if (keysym < 32 || keysym > 128) {
+				// only report non-printing keys here, the characters will be reported with the textinput event
+				InputKeyButtonRelease(callbacks, SDL_GetTicks(), keysym, keysym < 128 ? keysym : 0);
+			}
 			break;
 
 		case SDL_QUIT:
@@ -565,9 +604,8 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 	}
 
-	if (&callbacks == GetCallbacks()) {
-		handleInput(&event);
-	}
+	Assert(&callbacks == GetCallbacks());
+	handleInput(&event);
 }
 
 /**
