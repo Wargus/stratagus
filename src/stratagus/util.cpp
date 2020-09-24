@@ -497,7 +497,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 
 int UTF8GetNext(const std::string &text, int curpos)
 {
-	if (curpos == (int)text.size()) {
+	if (curpos >= (int)text.size()) {
 		return curpos + 1;
 	}
 	char c = text[curpos];

@@ -72,10 +72,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+const char Cursor[] = "~!_";         /// Input cursor
 static Vec2i SavedMapPosition[3];    /// Saved map position
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
+const int MaxInputHistorySize = 16;  /// Max history of inputs
+static char InputHistory[MaxInputHistorySize * sizeof(Input)] = { '\0' }; /// History of inputs
+static int InputHistoryIdx = 0;      /// Next history idx
+static int InputHistoryPos = 0;      /// Current position in history
+static int InputHistorySize = 0;     /// History fill size
 const char DefaultGroupKeys[] = "0123456789`";/// Default group keys
 std::string UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
 bool GameRunning;                    /// Current running state
@@ -93,12 +99,27 @@ CUnit *LastIdleWorker;               /// Last called idle worker
 --  Functions
 ----------------------------------------------------------------------------*/
 
+static void moveInputContent(int targetPos, int srcPos) {
+	memmove(Input + targetPos, Input + srcPos, sizeof(Input) - std::max(targetPos, srcPos));
+}
+
+static void removeCursorFromInput() {
+	// remove cursor, which is at InputIndex. there might be other chars behind it, if we're in the middle
+	moveInputContent(InputIndex, InputIndex + strlen(Cursor));
+}
+
+static void addCursorToInput() {
+	// insert cursor at pos
+	moveInputContent(InputIndex + strlen(Cursor), InputIndex);
+	strncpy(Input + InputIndex, Cursor, strlen(Cursor));
+}
+
 /**
 **  Show input.
 */
 static void ShowInput()
 {
-	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
+	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s"), Input);
 	char *input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
@@ -116,8 +137,9 @@ static void ShowInput()
 static void UiBeginInput()
 {
 	KeyState = KeyStateInput;
-	Input[0] = '\0';
+	memset(Input, 0, sizeof(Input));
 	InputIndex = 0;
+	addCursorToInput();
 	UI.StatusLine.ClearCosts();
 	ShowInput();
 }
@@ -820,13 +842,23 @@ static void ReplaceTildeBy2Tilde(char *s)
 **  Handle keys in input mode.
 **
 **  @param key  Key scancode.
-**  @return     True input finished.
 */
-static int InputKey(int key)
+static void InputKey(int key)
 {
 	switch (key) {
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: { // RETURN
+			removeCursorFromInput();		
+			// save to history
+			strncpy(InputHistory + (InputHistoryIdx * sizeof(Input)), Input, sizeof(Input));
+			if (InputHistorySize < MaxInputHistorySize) {
+				InputHistorySize++;
+				InputHistoryIdx = InputHistorySize;
+			} else {
+				InputHistoryIdx = ((InputHistoryIdx + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
+			}
+			InputHistoryPos = InputHistoryIdx;
+
 			// Replace ~~ with ~
 			Replace2TildeByTilde(Input);
 #ifdef DEBUG
@@ -869,73 +901,116 @@ static int InputKey(int key)
 		case SDLK_ESCAPE:
 			KeyState = KeyStateCommand;
 			UI.StatusLine.Clear();
-			return 1;
+			break;
 
 #ifdef USE_MAC
 		case SDLK_DELETE:
 #endif
-		case SDLK_BACKSPACE:
+		case SDLK_BACKSPACE: {
 			if (InputIndex) {
+				InputHistoryPos = InputHistoryIdx;
+				removeCursorFromInput();
 				if (Input[InputIndex - 1] == '~') {
-					Input[--InputIndex] = '\0';
+					moveInputContent(InputIndex - 1, InputIndex);
+					InputIndex--;
 				}
-				InputIndex = UTF8GetPrev(Input, InputIndex);
-				if (InputIndex >= 0) {
-					Input[InputIndex] = '\0';
-					ShowInput();
+				int prevIndex = UTF8GetPrev(Input, InputIndex);
+				if (prevIndex >= 0) {
+					moveInputContent(prevIndex, InputIndex);
+					InputIndex = prevIndex;
 				}
+				addCursorToInput();
+				ShowInput();
 			}
-			return 1;
+			break;
+		}
+		case SDLK_UP:
+			removeCursorFromInput();
+			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			InputHistoryPos = ((InputHistoryPos - 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
+			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
+			InputIndex = strlen(Input);
+			addCursorToInput();
+			ShowInput();
+			break;
+
+		case SDLK_DOWN:
+			removeCursorFromInput();
+			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			InputHistoryPos = ((InputHistoryPos + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
+			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
+			InputIndex = strlen(Input);
+			addCursorToInput();
+			ShowInput();
+			break;
+
+		case SDLK_LEFT:
+			if (InputIndex) {
+				removeCursorFromInput();
+				InputIndex = UTF8GetPrev(Input, InputIndex);
+				addCursorToInput();
+				ShowInput();
+			}
+			break;
+
+		case SDLK_RIGHT:
+			removeCursorFromInput();
+			InputIndex = UTF8GetNext(Input, InputIndex);
+			addCursorToInput();
+			ShowInput();
+			break;
 
 		case SDLK_TAB: {
+			InputHistoryPos = InputHistoryIdx;
+			removeCursorFromInput();
 			char *namestart = strrchr(Input, ' ');
 			if (namestart) {
 				++namestart;
 			} else {
 				namestart = Input;
 			}
-			if (!strlen(namestart)) {
-				return 1;
-			}
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (Players[i].Type != PlayerPerson) {
-					continue;
-				}
-				if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
-					InputIndex += strlen(Players[i].Name.c_str()) - strlen(namestart);
-					strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
-					if (namestart == Input) {
-						InputIndex += 2;
-						strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");
+			if (strlen(namestart)) {
+				for (int i = 0; i < PlayerMax; ++i) {
+					if (Players[i].Type != PlayerPerson) {
+						continue;
 					}
-					ShowInput();
+					if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
+						InputIndex += strlen(Players[i].Name.c_str()) - strlen(namestart);
+						strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
+						if (namestart == Input) {
+							InputIndex += 2;
+							strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");
+						}
+					}
 				}
 			}
-			return 1;
+			addCursorToInput();
+			ShowInput();
+			break;
 		}
 		default:
 			if (key >= ' ') {
+				InputHistoryPos = InputHistoryIdx;
+				removeCursorFromInput();
 				gcn::Key k(key);
 				std::string kstr = k.toString();
 				if (key == '~') {
 					if (InputIndex < (int)sizeof(Input) - 2) {
+						moveInputContent(InputIndex + 2, InputIndex);
 						Input[InputIndex++] = key;
 						Input[InputIndex++] = key;
-						Input[InputIndex] = '\0';
-						ShowInput();
 					}
 				} else if (InputIndex < (int)(sizeof(Input) - kstr.size())) {
+					moveInputContent(InputIndex + kstr.size(), InputIndex);
 					for (size_t i = 0; i < kstr.size(); ++i) {
 						Input[InputIndex++] = kstr[i];
 					}
-					Input[InputIndex] = '\0';
-					ShowInput();
 				}
-				return 1;
+				addCursorToInput();
+				ShowInput();
 			}
 			break;
 	}
-	return 0;
 }
 
 /**
@@ -1057,6 +1132,8 @@ static bool IsKeyPad(unsigned key, unsigned *kp)
 		*kp = SDLK_RETURN;
 	} else if (key == SDLK_KP_EQUALS) {
 		*kp = SDLK_EQUALS;
+	} else if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT) {
+		*kp = key;
 	} else  {
 		*kp = SDLK_UNKNOWN;
 		return false;
