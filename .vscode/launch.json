@@ -5,7 +5,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/Debug/stratagus.exe",
-            "args": ["-d", "${env:APPDATA}/Stratagus/data.${input:game}"],
+            "args": ["-a", "-d", "${env:APPDATA}/Stratagus/data.${input:game}"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../${input:game}",
             "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
