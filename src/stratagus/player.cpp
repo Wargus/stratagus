@@ -825,7 +825,13 @@ void CPlayer::Clear()
 
 void CPlayer::AddUnit(CUnit &unit)
 {
-	Assert(unit.Player != this);
+	if (unit.Player == this) {
+		return;
+	}
+	if (unit.PlayerSlot != static_cast<size_t>(-1)) {
+		// unit is registered with another player
+		unit.Player->RemoveUnit(unit);
+	}
 	Assert(unit.PlayerSlot == static_cast<size_t>(-1));
 	unit.PlayerSlot = this->Units.size();
 	this->Units.push_back(&unit);
