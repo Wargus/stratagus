@@ -2432,8 +2432,11 @@ void MenuScreen::stop(int result, bool stopAll)
 {
 	if (!this->runLoop) {
 		Gui->setTop(this->oldtop);
-		Assert(MenuStack.top() == this);
-		MenuStack.pop();
+		if (MenuStack.top() == this) {
+			MenuStack.pop();
+		} else {
+			DebugPrint("ALARM! A menu we're trying to stop is NOT at the top of the menu stack!!");
+		}
 		if (stopAll) {
 			while (!MenuStack.empty()) {
 				MenuStack.pop();
