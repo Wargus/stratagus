@@ -560,7 +560,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 		case SDL_TEXTINPUT:
 			{
 				char* text = event.text.text;
-				if (text[0] < 128) {
+				if ((uint8_t)text[0] < 128) {
 					// we only accept US-ascii chars for now
 					char lastKey = text[0];
 					InputKeyButtonPress(callbacks, SDL_GetTicks(), lastKey, lastKey);
@@ -577,7 +577,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_USEREVENT:
 			{
-				Assert(reinterpret_cast<uint32_t>(event.user.data1) == SDL_CUSTOM_KEY_UP);
+				Assert(reinterpret_cast<uintptr_t>(event.user.data1) == SDL_CUSTOM_KEY_UP);
 				char key = static_cast<char>(event.user.code);
 				InputKeyButtonRelease(callbacks, SDL_GetTicks(), key, key);
 			}
