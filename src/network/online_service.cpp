@@ -627,6 +627,10 @@ public:
         return state == NULL;
     }
 
+    std::string getLastError() {
+        return lastError;
+    }
+
     // User and UI actions
     void disconnect() {
         if (isConnected()) {
@@ -883,7 +887,10 @@ public:
 
     void showInfo(std::string arg) { info.push("*** " + arg + " ***"); }
 
-    void showError(std::string arg) { info.push("!!! " + arg + " !!!"); }
+    void showError(std::string arg) {
+        info.push("!!! " + arg + " !!!");
+        lastError = arg;
+    }
 
     void showChat(std::string arg) { info.push(arg); }
 
@@ -971,6 +978,8 @@ private:
     std::string username;
     uint32_t password[5]; // xsha1 hash of password
 
+    std::string lastError;
+
     std::string currentChannel;
     std::set<std::string> userList;
     std::vector<std::string> channelList;
@@ -995,7 +1004,7 @@ public:
     virtual void doOneStep(Context *ctx) {
         if (!hasPrinted) {
             std::cout << message << std::endl;
-            ctx->showInfo(message);
+            ctx->showError(message);
             hasPrinted = true;
             ctx->disconnect();
         }
@@ -1825,7 +1834,16 @@ static int CclGoOnline(lua_State* l) {
         }
     }
 
-    if (_ctx.isConnected()) {
+    _ctx.doOneStep();
+
+    if (!_ctx.getLastError().empty()) {
+        lua_pushstring(l, lastError);
+    } else if (!username.empty() && !password.empty()) {
+        lua_pushstring(l, "pending");
+        _ctx.setUsername(username);
+        _ctx.setPassword(password);
+    } else if (_ctx.isConnected()) {
+        lua_pushstring(l, "online");
         if (!message.empty() && !_ctx.getCurrentChannel().empty()) {
             _ctx.sendText(message);
         }
@@ -1883,12 +1901,11 @@ static int CclGoOnline(lua_State* l) {
                 }
             }
         }
-    } else if (!username.empty() && !password.empty()) {
-        _ctx.setUsername(username);
-        _ctx.setPassword(password);
+    } else {
+        lua_pushstring("unknown");
     }
 
-    return 0;
+    return 1;
 }
 
 static int CclStopAdvertisingOnlineGame(lua_State* l) {
