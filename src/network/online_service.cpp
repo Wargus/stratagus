@@ -623,6 +623,10 @@ public:
         return !getCurrentChannel().empty();
     }
 
+    boolean isDisconnected() {
+        return state == NULL;
+    }
+
     // User and UI actions
     void disconnect() {
         if (isConnected()) {
@@ -1758,206 +1762,131 @@ class ConnectState : public NetworkState {
     }
 };
 
-extern gcn::Gui *Gui;
-static gcn::Container *onlineServiceContainer;
-static gcn::ScrollArea *messageArea;
-static gcn::ScrollArea *usersArea;
-static gcn::ScrollArea *friendsArea;
-static gcn::ScrollArea *channelsArea;
-static gcn::ScrollArea *gamelistArea;
-static gcn::TextField *chatInput;
-static gcn::Window *loginWindow;
-static gcn::Container *loginWindowContainer;
-static gcn::TextField *username;
-static gcn::TextField *password;
-
 static Context _ctx;
 OnlineContext *OnlineContextHandler = &_ctx;
 
-class ChatInputListener : public gcn::ActionListener {
-    virtual void action(const std::string &) {
-        if (!_ctx.getCurrentChannel().empty()) {
-            _ctx.sendText(chatInput->getText());
-            chatInput->setText("");
-        }
-    }
-};
-
-class UsernameInputListener : public gcn::ActionListener {
-    virtual void action(const std::string &) {
-        _ctx.setUsername(username->getText());
-        _ctx.setPassword(password->getText());
-    }
-};
-
-class PasswordInputListener : public gcn::ActionListener {
-    virtual void action(const std::string &) {
-        _ctx.setUsername(username->getText());
-        _ctx.setPassword(password->getText());
-    }
-};
-
+/**
+ ** The assumption is that the lists of users, friends, and games are cleared by
+ ** the caller before calling this.
+ **
+ ** Lua arguments and return values:
+ **
+ ** @param username: login username, only used if not logged in
+ ** @param password: login password, only used if not logged in
+ ** @param message: a message to send, only used if logged in
+ ** @param AddMessage: a callback to add new messages. (str) -> nil
+ ** @param AddUser: a callback to add an online username. (str) -> nil
+ ** @param AddFriend: a callback to add an online friend. (name, product, status) -> nil
+ ** @param AddChannel: a callback to add a channel. (str) -> nil
+ ** @param ActiveChannel: a callback to report the currently active channel. (str) -> nil
+ ** @param AddGame: a callback to add an advertised game. (map, creator, gametype, settings, max-players) -> nil
+ **
+ ** @return status - "online" if successfully logged in, "pending" if waiting for connection, or error string
+ */
 static int CclGoOnline(lua_State* l) {
-    std::string nc, rc;
-    GetDefaultTextColors(nc, rc);
+    std::string username = "";
+    std::string password = "";
+    std::string message = "";
 
-    const EventCallback *old_callbacks = GetCallbacks();
+    LuaCallback *AddMessage = NULL;
+    LuaCallback *AddUser = NULL;
+    LuaCallback *AddFriend = NULL;
+    LuaCallback *AddGame = NULL;
+    LuaCallback *AddChannel = NULL;
+    LuaCallback *ActiveChannel = NULL;
 
-    gcn::Widget *oldTop = Gui->getTop();
-    Gui->setUseDirtyDrawing(false);
-
-    _ctx.setState(new ConnectState());
-
-    onlineServiceContainer = new gcn::Container();
-    onlineServiceContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
-    onlineServiceContainer->setOpaque(false);
-    Gui->setTop(onlineServiceContainer);
-
-    static int chatInputHeight = 24;
-    messageArea = new gcn::ScrollArea(new gcn::TextBox());
-    messageArea->setBackgroundColor(gcn::Color(200, 200, 120));
-    messageArea->setSize(Video.Width * 0.7, Video.Height * 0.7 - chatInputHeight);
-    static_cast<gcn::TextBox*>(messageArea->getContent())->setEditable(false);
-    onlineServiceContainer->add(messageArea, Video.Width * 0.3, Video.Height * 0.3);
-
-    chatInput = new gcn::TextField();
-    chatInput->setSize(Video.Width * 0.7, chatInputHeight);
-    onlineServiceContainer->add(chatInput, Video.Width * 0.3, Video.Height * 0.7 - chatInputHeight);
-    chatInput->addActionListener(new ChatInputListener());
-
-    usersArea = new gcn::ScrollArea(new gcn::TextBox());
-    usersArea->setBackgroundColor(gcn::Color(120, 200, 200));
-    usersArea->setSize(Video.Width * 0.1, Video.Height * 0.7);
-    static_cast<gcn::TextBox*>(usersArea->getContent())->setEditable(false);
-    onlineServiceContainer->add(usersArea, Video.Width * 0.2, Video.Height * 0.3);
-
-    friendsArea = new gcn::ScrollArea(new gcn::TextBox());
-    friendsArea->setBackgroundColor(gcn::Color(200, 120, 200));
-    friendsArea->setSize(Video.Width * 0.1, Video.Height * 0.5);
-    static_cast<gcn::TextBox*>(friendsArea->getContent())->setEditable(false);
-    onlineServiceContainer->add(friendsArea, 0, 0);
-
-    channelsArea = new gcn::ScrollArea(new gcn::TextBox());
-    channelsArea->setBackgroundColor(gcn::Color(255, 255, 255));
-    channelsArea->setSize(Video.Width * 0.1, Video.Height * 0.5);
-    static_cast<gcn::TextBox*>(channelsArea->getContent())->setEditable(false);
-    onlineServiceContainer->add(channelsArea, 0, Video.Height * 0.5);
-
-    gamelistArea = new gcn::ScrollArea(new gcn::TextBox());
-    gamelistArea->setBackgroundColor(gcn::Color(120, 120, 120));
-    gamelistArea->setSize(Video.Width * 0.8, Video.Height * 0.3);
-    static_cast<gcn::TextBox*>(gamelistArea->getContent())->setEditable(false);
-    onlineServiceContainer->add(gamelistArea, Video.Width * 0.2, 0);
-
-    loginWindow = new gcn::Window();
-    loginWindow->setBaseColor(gcn::Color(120, 120, 120, 120));
-    loginWindow->setCaption("Username / Password");
-    loginWindow->setWidth(Video.Width / 2);
-    loginWindow->setHeight(chatInputHeight * 8);
-
-    loginWindowContainer = new gcn::Container();
-    loginWindowContainer->setWidth(loginWindow->getWidth());
-    loginWindowContainer->setHeight(loginWindow->getHeight());
-    loginWindowContainer->setOpaque(false);
-    loginWindow->setContent(loginWindowContainer);
-
-    username = new gcn::TextField("");
-    username->setSize(Video.Width * 0.3, chatInputHeight);
-    username->addActionListener(new UsernameInputListener());
-    loginWindowContainer->add(username, Video.Width * 0.1, chatInputHeight);
-
-    password = new gcn::TextField("");
-    password->setSize(Video.Width * 0.3, chatInputHeight);
-    password->addActionListener(new PasswordInputListener());
-    loginWindowContainer->add(password, Video.Width * 0.1, chatInputHeight * 4);
-
-    onlineServiceContainer->add(loginWindow, Video.Width / 4, Video.Height / 2 - chatInputHeight * 4);
-
-    username->requestFocus();
-
-    SetVideoSync();
-    GameCursor = UI.Point.Cursor;
-    InterfaceState = IfaceStateNormal;
-    UI.SelectedViewport = UI.Viewports;
-    while (1) {
-        if (_ctx.isConnected()) {
-            loginWindow->setVisible(false);
-
-            if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
-                _ctx.refreshGames();
-                _ctx.refreshFriends();
-            }
-
-            if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
-                static_cast<gcn::TextBox*>(gamelistArea->getContent())->setText("");
-                for (auto g : _ctx.getGames()) {
-                    static_cast<gcn::TextBox*>(gamelistArea->getContent())->addRow(g->getMap() + " " +
-                                                                                   g->getCreator() + " " +
-                                                                                   g->getGameType() + " " +
-                                                                                   g->getGameSettings() + " " +
-                                                                                   std::to_string(g->maxPlayers()));
-                }
-
-                static_cast<gcn::TextBox*>(usersArea->getContent())->setText("");
-                for (auto u : _ctx.getUsers()) {
-                    static_cast<gcn::TextBox*>(usersArea->getContent())->addRow(u);
-                }
-
-                static_cast<gcn::TextBox*>(channelsArea->getContent())->setText("");
-                for (auto u : _ctx.getChannels()) {
-                    static_cast<gcn::TextBox*>(channelsArea->getContent())->addRow(u);
-                }
-
-                static_cast<gcn::TextBox*>(friendsArea->getContent())->setText("");
-                for (auto u : _ctx.getFriends()) {
-                    static_cast<gcn::TextBox*>(friendsArea->getContent())->addRow(u->getName() + ", " + u->getStatus() + ", " + u->getProduct());
-                }
-            }
-        }
-
-        while (!_ctx.getInfo()->empty()) {
-            static_cast<gcn::TextBox*>(messageArea->getContent())->addRow(_ctx.getInfo()->front());
-            _ctx.getInfo()->pop();
-        }
-
-        Gui->draw();
-        DrawCursor();
-        Invalidate();
-        RealizeVideoMemory();
-
-        WaitEventsOneFrame();
+    if (_ctx.isDisconnected()) {
+        _ctx.setState(new ConnectState());
     }
 
-    CleanModules();
-    LoadCcl(Parameters::Instance.luaStartFilename); // Reload the main config file
-    // PreMenuSetup();
+    for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+        const char *value = LuaToString(l, -2);
 
-    InterfaceState = IfaceStateMenu;
-    GameCursor = UI.Point.Cursor;
+        if (!strcmp(value, "username")) {
+            username = std::string(LuaToString(l, -1));
+        } else if (!strcmp(value, "password")) {
+            password = std::string(LuaToString(l, -1));
+        } else if (!strcmp(value, "message")) {
+            message = std::string(LuaToString(l, -1));
+        } else if (!strcmp(value, "AddMessage")) {
+            AddMessage = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "AddUser")) {
+            AddUser = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "AddFriend")) {
+            AddFriend = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "AddGame")) {
+            AddGame = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "AddChannel")) {
+            AddChannel = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "ActiveChannel")) {
+            ActiveChannel = new LuaCallback(l, -1);
+        } else {
+            LuaError(l, "Unsupported tag: %s" _C_ value);
+        }
+    }
 
-    SetCallbacks(old_callbacks);
-    Gui->setTop(oldTop);
-    SetDefaultTextColors(nc, rc);
+    if (_ctx.isConnected()) {
+        if (!message.empty() && !_ctx.getCurrentChannel().empty()) {
+            _ctx.sendText(message);
+        }
 
-    Video.ClearScreen();
-    Invalidate();
+        if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
+            _ctx.refreshGames();
+            _ctx.refreshFriends();
+        }
 
-    delete onlineServiceContainer;
-    delete messageArea->getContent();
-    delete messageArea;
-    delete usersArea->getContent();
-    delete usersArea;
-    delete friendsArea->getContent();
-    delete friendsArea;
-    delete channelsArea->getContent();
-    delete channelsArea;
-    delete gamelistArea->getContent();
-    delete gamelistArea;
-    delete chatInput;
-    delete loginWindow;
-    delete loginWindowContainer;
-    delete username;
-    delete password;
+        if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
+            if (AddGame) {
+                for (auto g : _ctx.getGames()) {
+                    AddGame->pushPreamble();
+                    AddGame->pushString(g->getMap());
+                    AddGame->pushString(g->getCreator());
+                    AddGame->pushString(g->getGameType());
+                    AddGame->pushString(g->getGameSettings());
+                    AddGame->pushInteger(g->maxPlayers());
+                    AddGame->run(0);
+                }
+            }
+            if (AddUser) {
+                for (auto u : _ctx.getUsers()) {
+                    AddUser->pushPreamble();
+                    AddUser->pushString(u);
+                    AddUser->run(0);
+                }
+            }
+            if (AddChannel) {
+                for (auto u : _ctx.getChannels()) {
+                    AddChannel->pushPreamble();
+                    AddChannel->pushString(u);
+                    AddChannel->run(0);
+                }
+            }
+            if (ActiveChannel) {
+                ActiveChannel->pushPreamble();
+                ActiveChannel->pushString(_ctx.getCurrentChannel());
+                ActiveChannel->run(0);
+            }
+            if (AddFriend) {
+                for (auto u : _ctx.getFriends()) {
+                    AddFriend->pushPreamble();
+                    AddFriend->pushString(u->getName());
+                    AddFriend->pushString(u->getProduct());
+                    AddFriend->pushString(u->getStatus());
+                    AddFriend->run(0);
+                }
+            }
+            while (!_ctx.getInfo()->empty()) {
+                if (AddMessage) {
+                    AddMessage->pushPreamble();
+                    AddMessage->pushString(_ctx.getInfo()->front());
+                    _ctx.getInfo()->pop();
+                }
+            }
+        }
+    } else if (!username.empty() && !password.empty()) {
+        _ctx.setUsername(username);
+        _ctx.setPassword(password);
+    }
 
     return 0;
 }
