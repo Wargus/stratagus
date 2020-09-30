@@ -619,11 +619,15 @@ public:
         delete host;
     }
 
-    boolean isConnected() {
+    bool isConnected() {
         return !getCurrentChannel().empty();
     }
 
-    boolean isDisconnected() {
+    bool isConnecting() {
+        return !isDisconnected() && !isConnected() && !username.empty() && hasPassword;
+    }
+
+    bool isDisconnected() {
         return state == NULL;
     }
 
@@ -930,8 +934,10 @@ public:
             for (int i = 0; i < sizeof(password); i++) {
                 this->password[i] = 0;
             }
+            hasPassword = false;
         } else {
             pvpgn::sha1_hash(&password, pw.length(), pw.c_str());
+            hasPassword = true;
         }
     }
 
@@ -977,6 +983,7 @@ private:
 
     std::string username;
     uint32_t password[5]; // xsha1 hash of password
+    bool hasPassword;
 
     std::string lastError;
 
@@ -1778,6 +1785,12 @@ OnlineContext *OnlineContextHandler = &_ctx;
  ** The assumption is that the lists of users, friends, and games are cleared by
  ** the caller before calling this.
  **
+ ** The call order should be this:
+ **  1) call once with username + password
+ **  2) call without args until you get a result that is not "pending"
+ **  2a) if result is "online", call repeatedly with callbacks or messages
+ **  2b) if result is an error, you may go to 1 after fixing the error
+ **
  ** Lua arguments and return values:
  **
  ** @param username: login username, only used if not logged in
@@ -1803,10 +1816,6 @@ static int CclGoOnline(lua_State* l) {
     LuaCallback *AddGame = NULL;
     LuaCallback *AddChannel = NULL;
     LuaCallback *ActiveChannel = NULL;
-
-    if (_ctx.isDisconnected()) {
-        _ctx.setState(new ConnectState());
-    }
 
     for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
         const char *value = LuaToString(l, -2);
@@ -1836,8 +1845,16 @@ static int CclGoOnline(lua_State* l) {
 
     _ctx.doOneStep();
 
+    if (!username.empty() && !password.empty()) {
+        if (_ctx.isDisconnected()) {
+            _ctx.setState(new ConnectState());
+        }
+    }
+
     if (!_ctx.getLastError().empty()) {
-        lua_pushstring(l, lastError);
+        lua_pushstring(l, _ctx.getLastError().c_str());
+    } else if (_ctx.isConnecting()) {
+        lua_pushstring(l, "pending");
     } else if (!username.empty() && !password.empty()) {
         lua_pushstring(l, "pending");
         _ctx.setUsername(username);
@@ -1902,7 +1919,7 @@ static int CclGoOnline(lua_State* l) {
             }
         }
     } else {
-        lua_pushstring("unknown");
+        lua_pushstring(l, "unknown");
     }
 
     return 1;
