@@ -1793,6 +1793,8 @@ OnlineContext *OnlineContextHandler = &_ctx;
  **
  ** Lua arguments and return values:
  **
+ ** @param host: hostname of the online service. Inititates a new connection.
+ ** @param post: port of the online service. Inititates a new connection.
  ** @param username: login username, only used if not logged in
  ** @param password: login password, only used if not logged in
  ** @param message: a message to send, only used if logged in
@@ -1809,6 +1811,8 @@ static int CclGoOnline(lua_State* l) {
     std::string username = "";
     std::string password = "";
     std::string message = "";
+    std::string host = "";
+    int port = 0;
 
     LuaCallback *AddMessage = NULL;
     LuaCallback *AddUser = NULL;
@@ -1816,14 +1820,24 @@ static int CclGoOnline(lua_State* l) {
     LuaCallback *AddGame = NULL;
     LuaCallback *AddChannel = NULL;
     LuaCallback *ActiveChannel = NULL;
+    std::string newActiveChannel = "";
 
-    for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+    LuaCheckArgs(l, 1);
+    if (!lua_istable(l, 1)) {
+        LuaError(l, "incorrect argument");
+    }
+
+    for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
         const char *value = LuaToString(l, -2);
 
         if (!strcmp(value, "username")) {
             username = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "password")) {
             password = std::string(LuaToString(l, -1));
+        } else if (!strcmp(value, "host")) {
+            host = std::string(LuaToString(l, -1));
+        } else if (!strcmp(value, "port")) {
+            port = LuaToNumber(l, -1);
         } else if (!strcmp(value, "message")) {
             message = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "AddMessage")) {
@@ -1837,22 +1851,29 @@ static int CclGoOnline(lua_State* l) {
         } else if (!strcmp(value, "AddChannel")) {
             AddChannel = new LuaCallback(l, -1);
         } else if (!strcmp(value, "ActiveChannel")) {
-            ActiveChannel = new LuaCallback(l, -1);
+            if (lua_isstring(l, -1)) {
+                newActiveChannel = LuaToString(l, -1);
+            } else {
+                ActiveChannel = new LuaCallback(l, -1);
+            }
         } else {
             LuaError(l, "Unsupported tag: %s" _C_ value);
         }
     }
 
-    _ctx.doOneStep();
-
-    if (!username.empty() && !password.empty()) {
+    if (!host.empty() && port) {
         if (_ctx.isDisconnected()) {
+            _ctx.setHost(new CHost(host.c_str(), port));
             _ctx.setState(new ConnectState());
         }
     }
 
-    if (!_ctx.getLastError().empty()) {
-        lua_pushstring(l, _ctx.getLastError().c_str());
+    _ctx.doOneStep();
+
+    std::string error = _ctx.getLastError();
+
+    if (!error.empty()) {
+        lua_pushstring(l, error.c_str());
     } else if (_ctx.isConnecting()) {
         lua_pushstring(l, "pending");
     } else if (!username.empty() && !password.empty()) {
@@ -1865,7 +1886,7 @@ static int CclGoOnline(lua_State* l) {
             _ctx.sendText(message);
         }
 
-        if ((FrameCounter % (FRAMES_PER_SECOND * 5)) == 0) {
+        if ((FrameCounter % (FRAMES_PER_SECOND * 20)) == 0) {
             _ctx.refreshGames();
             _ctx.refreshFriends();
         }
@@ -1900,6 +1921,8 @@ static int CclGoOnline(lua_State* l) {
                 ActiveChannel->pushPreamble();
                 ActiveChannel->pushString(_ctx.getCurrentChannel());
                 ActiveChannel->run(0);
+            } else if (!newActiveChannel.empty()) {
+                _ctx.setCurrentChannel(newActiveChannel);
             }
             if (AddFriend) {
                 for (auto u : _ctx.getFriends()) {
