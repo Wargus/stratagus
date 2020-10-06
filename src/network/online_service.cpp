@@ -1886,59 +1886,63 @@ static int CclGoOnline(lua_State* l) {
             _ctx.sendText(message);
         }
 
-        if ((FrameCounter % (FRAMES_PER_SECOND * 20)) == 0) {
-            _ctx.refreshGames();
+        // refresh friends every 5 minutes
+        if ((FrameCounter % (FRAMES_PER_SECOND * 300)) == 0) {
             _ctx.refreshFriends();
         }
 
-        if ((FrameCounter % (FRAMES_PER_SECOND * 1)) == 0) {
-            if (AddGame) {
-                for (auto g : _ctx.getGames()) {
-                    AddGame->pushPreamble();
-                    AddGame->pushString(g->getMap());
-                    AddGame->pushString(g->getCreator());
-                    AddGame->pushString(g->getGameType());
-                    AddGame->pushString(g->getGameSettings());
-                    AddGame->pushInteger(g->maxPlayers());
-                    AddGame->run(0);
-                }
+        // refresh games every 30 seconds
+        if ((FrameCounter % (FRAMES_PER_SECOND * 30)) == 0) {
+            _ctx.refreshGames();
+        }
+
+        if (AddGame) {
+            for (auto g : _ctx.getGames()) {
+                AddGame->pushPreamble();
+                AddGame->pushString(g->getMap());
+                AddGame->pushString(g->getCreator());
+                AddGame->pushString(g->getGameType());
+                AddGame->pushString(g->getGameSettings());
+                AddGame->pushInteger(g->maxPlayers());
+                AddGame->run(0);
             }
-            if (AddUser) {
-                for (auto u : _ctx.getUsers()) {
-                    AddUser->pushPreamble();
-                    AddUser->pushString(u);
-                    AddUser->run(0);
-                }
+        }
+        if (AddUser) {
+            for (auto u : _ctx.getUsers()) {
+                AddUser->pushPreamble();
+                AddUser->pushString(u);
+                AddUser->run(0);
             }
-            if (AddChannel) {
-                for (auto u : _ctx.getChannels()) {
-                    AddChannel->pushPreamble();
-                    AddChannel->pushString(u);
-                    AddChannel->run(0);
-                }
+        }
+        if (AddChannel) {
+            for (auto u : _ctx.getChannels()) {
+                AddChannel->pushPreamble();
+                AddChannel->pushString(u);
+                AddChannel->run(0);
             }
-            if (ActiveChannel) {
-                ActiveChannel->pushPreamble();
-                ActiveChannel->pushString(_ctx.getCurrentChannel());
-                ActiveChannel->run(0);
-            } else if (!newActiveChannel.empty()) {
-                _ctx.setCurrentChannel(newActiveChannel);
+        }
+        if (ActiveChannel) {
+            ActiveChannel->pushPreamble();
+            ActiveChannel->pushString(_ctx.getCurrentChannel());
+            ActiveChannel->run(0);
+        } else if (!newActiveChannel.empty()) {
+            _ctx.setCurrentChannel(newActiveChannel);
+        }
+        if (AddFriend) {
+            for (auto u : _ctx.getFriends()) {
+                AddFriend->pushPreamble();
+                AddFriend->pushString(u->getName());
+                AddFriend->pushString(u->getProduct());
+                AddFriend->pushString(u->getStatus());
+                AddFriend->run(0);
             }
-            if (AddFriend) {
-                for (auto u : _ctx.getFriends()) {
-                    AddFriend->pushPreamble();
-                    AddFriend->pushString(u->getName());
-                    AddFriend->pushString(u->getProduct());
-                    AddFriend->pushString(u->getStatus());
-                    AddFriend->run(0);
-                }
-            }
+        }
+        if (AddMessage) {
             while (!_ctx.getInfo()->empty()) {
-                if (AddMessage) {
-                    AddMessage->pushPreamble();
-                    AddMessage->pushString(_ctx.getInfo()->front());
-                    _ctx.getInfo()->pop();
-                }
+                AddMessage->pushPreamble();
+                AddMessage->pushString(_ctx.getInfo()->front());
+                AddMessage->run(0);
+                _ctx.getInfo()->pop();
             }
         }
     } else {
