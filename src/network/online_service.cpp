@@ -678,6 +678,7 @@ public:
             msg.serialize(text.c_str());
             msg.flush(getTCPSocket());
         }
+        showChat(username + ": " + txt);
     }
 
     void requestExtraUserInfo(std::string username) {
