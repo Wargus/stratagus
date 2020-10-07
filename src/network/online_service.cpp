@@ -833,7 +833,6 @@ public:
             statstring << "unknown map";
         }
         statstring << "\r";
-        std::cout << statstring.str() << std::endl;
 
         msg.serialize(statstring.str().c_str());
         msg.flush(getTCPSocket());
@@ -1529,18 +1528,6 @@ void C2S_LOGONRESPONSE2::doOneStep(Context *ctx) {
         pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
         pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
         pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp);	/* do the double hash */
-
-        // std::cout << std::endl << "Password 1 hash: ";
-        // for (int i = 0; i < 5; i++) {
-        //     std::cout << std::hex << pw[i] << " ";
-        // }
-        // std::cout << std::endl << "Password 2 hash: ";
-        // for (int i = 0; i < 5; i++) {
-        //     std::cout << std::hex << passhash2[i] << " ";
-        // }
-        // std::cout << std::endl;
-        // std::cout << "client token: " << *((uint32_t*)temp.ticks) << std::endl;
-        // std::cout << "server token: " << *((uint32_t*)temp.sessionkey) << std::endl;
 
         for (int i = 0; i < 20; i++) {
             logon.serialize8(reinterpret_cast<uint8_t*>(passhash2)[i]);
