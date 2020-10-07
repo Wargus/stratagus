@@ -869,6 +869,15 @@ public:
         msg.flush(getTCPSocket());
     }
 
+    void joinChannel(std::string name) {
+        if (isConnected()) {
+            BNCSOutputStream join(0x0c);
+            join.serialize32(0x02); // forced join
+            join.serialize(name.c_str());
+            join.flush(getTCPSocket());
+        }
+    }
+
     // UI information
     void setCurrentChannel(std::string name) {
         this->currentChannel = name;
@@ -1194,8 +1203,8 @@ private:
             ctx->showChat("[BROADCAST]: " + text);
             break;
         case 0x07: // channel info
-            ctx->setCurrentChannel(username);
-            ctx->showInfo("Joined channel " + username);
+            ctx->setCurrentChannel(text);
+            ctx->showInfo("Joined channel " + text);
             break;
         case 0x09: // user flags update
             break;
@@ -1214,7 +1223,7 @@ private:
             ctx->showInfo("[INFO]: " + text);
             break;
         case 0x13: // error message
-            ctx->showError("[ERROR]: " + text);
+            ctx->showError("[SEVERE]: " + text);
             break;
         case 0x17: // emote
             break;
@@ -1946,7 +1955,7 @@ static int CclGoOnline(lua_State* l) {
             ActiveChannel->pushString(_ctx.getCurrentChannel());
             ActiveChannel->run(0);
         } else if (!newActiveChannel.empty()) {
-            _ctx.setCurrentChannel(newActiveChannel);
+            _ctx.joinChannel(newActiveChannel);
         }
         if (AddFriend) {
             for (auto u : _ctx.getFriends()) {
