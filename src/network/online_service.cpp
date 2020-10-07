@@ -1986,11 +1986,23 @@ static int CclGoOnline(lua_State* l) {
 }
 
 static int CclStopAdvertisingOnlineGame(lua_State* l) {
-    return 0;
+    if (_ctx.isConnected()) {
+        _ctx.stopAdvertising();
+        lua_pushboolean(l, true);
+    } else {
+        lua_pushboolean(l, false);
+    }
+    return 1;
 }
 
 static int CclStartAdvertisingOnlineGame(lua_State* l) {
-    return 0;
+    if (_ctx.isConnected()) {
+        _ctx.startAdvertising();
+        lua_pushboolean(l, true);
+    } else {
+        lua_pushboolean(l, false);
+    }
+    return 1;
 }
 
 void OnlineServiceCclRegister() {
