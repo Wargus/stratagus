@@ -232,6 +232,12 @@ public:
         *view = htonl(data);
         pos += sizeof(data);
     };
+    void serialize32NativeByteOrder(uint32_t data) {
+        ensureSpace(sizeof(data));
+        uint32_t *view = reinterpret_cast<uint32_t *>(buf + pos);
+        *view = data;
+        pos += sizeof(data);
+    };
     void serialize16(uint16_t data) {
         ensureSpace(sizeof(data));
         uint16_t *view = reinterpret_cast<uint16_t *>(buf + pos);
@@ -608,6 +614,12 @@ public:
         this->clientToken = MyRand();
         this->username = "";
         setPassword("");
+        defaultUserKeys.push_back("record\\GAME\\0\\wins");
+        defaultUserKeys.push_back("record\\GAME\\0\\losses");
+        defaultUserKeys.push_back("record\\GAME\\0\\disconnects");
+        defaultUserKeys.push_back("record\\GAME\\0\\last game");
+        defaultUserKeys.push_back("record\\GAME\\0\\last game result");
+
     }
 
     ~Context() {
@@ -670,15 +682,14 @@ public:
 
     void requestExtraUserInfo(std::string username) {
         BNCSOutputStream msg(0x26);
-        msg.serialize32(1); // num accounts
-        msg.serialize32(5); // num keys
-        msg.serialize32((uint32_t) extendedInfoIdx.size());
+        msg.serialize32NativeByteOrder(1); // num accounts
+        msg.serialize32NativeByteOrder(defaultUserKeys.size()); // num keys
+        msg.serialize32NativeByteOrder((uint32_t) extendedInfoNames.size());
+        extendedInfoNames.push_back(username);
         msg.serialize(username.c_str());
-        msg.serialize("record\\GAME\\0\\wins");
-        msg.serialize("record\\GAME\\0\\losses");
-        msg.serialize("record\\GAME\\0\\disconnects");
-        msg.serialize("record\\GAME\\0\\last game");
-        msg.serialize("record\\GAME\\0\\last game result");
+        for (const auto key : defaultUserKeys) {
+            msg.serialize(key.c_str());
+        }
         msg.flush(getTCPSocket());
     }
 
@@ -885,6 +896,10 @@ public:
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
         this->extendedInfoValues[id] = values;
+        showInfo("User Info for " + extendedInfoNames.at(id));
+        for (int i = 0; i < values.size(); i++) {
+            showInfo(defaultUserKeys.at(i) + ": " + values.at(i));
+        }
     }
 
     std::queue<std::string> *getInfo() { return &info; }
@@ -993,8 +1008,9 @@ private:
     std::queue<std::string> info;
     std::vector<Game*> games;
     std::vector<Friend*> friends;
-    std::map<std::string, uint32_t> extendedInfoIdx;
+    std::vector<std::string> extendedInfoNames;
     std::map<uint32_t, std::vector<std::string>> extendedInfoValues;
+    std::vector<std::string> defaultUserKeys;
 };
 
 int NetworkState::send(Context *ctx, BNCSOutputStream *buf) {
@@ -1798,6 +1814,7 @@ OnlineContext *OnlineContextHandler = &_ctx;
  ** @param username: login username, only used if not logged in
  ** @param password: login password, only used if not logged in
  ** @param message: a message to send, only used if logged in
+ ** @param userInfo: a username to request info for
  ** @param AddMessage: a callback to add new messages. (str) -> nil
  ** @param AddUser: a callback to add an online username. (str) -> nil
  ** @param AddFriend: a callback to add an online friend. (name, product, status) -> nil
@@ -1821,6 +1838,7 @@ static int CclGoOnline(lua_State* l) {
     LuaCallback *AddChannel = NULL;
     LuaCallback *ActiveChannel = NULL;
     std::string newActiveChannel = "";
+    std::string userInfo = "";
 
     LuaCheckArgs(l, 1);
     if (!lua_istable(l, 1)) {
@@ -1838,6 +1856,8 @@ static int CclGoOnline(lua_State* l) {
             host = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "port")) {
             port = LuaToNumber(l, -1);
+        } else if (!strcmp(value, "userInfo")) {
+            userInfo = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "message")) {
             message = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "AddMessage")) {
@@ -1944,6 +1964,9 @@ static int CclGoOnline(lua_State* l) {
                 AddMessage->run(0);
                 _ctx.getInfo()->pop();
             }
+        }
+        if (!userInfo.empty()) {
+            _ctx.requestExtraUserInfo(userInfo);
         }
     } else {
         lua_pushstring(l, "unknown");
