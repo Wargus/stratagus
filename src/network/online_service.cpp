@@ -748,20 +748,20 @@ public:
                 joinedPlayers++;
             }
         }
-        uint32_t state = 0x10; // disconnect always counts as loss
+        uint32_t state = 0x10000000; // disconnect always counts as loss
         if (joinedPlayers) {
-            state |= 0x04; // has players other than creator
+            state |= 0x04000000; // has players other than creator
         }
         if (joinedPlayers + 1 == maxSlots) {
-            state |= 0x02; // game is full
+            state |= 0x02000000; // game is full
         }
         if (isStarted) {
-            state |= 0x08; // game in progress
+            state |= 0x08000000; // game in progress
         }
         msg.serialize32(state);
         msg.serialize32(0x00); // uptime
-        msg.serialize16(0x0a); // game type - map settings
-        msg.serialize16(0x01); // sub game type
+        msg.serialize16(0x0300); // game type - map settings not supported on W2BN, so use FFA
+        msg.serialize16(0x0100); // sub game type
         msg.serialize32(0xff); // provider version constant
         msg.serialize32(0x00); // not ladder
         msg.serialize((gameNameFromUsername(getUsername())).c_str()); // game name
@@ -818,13 +818,22 @@ public:
             game_settings |= 0xC000;
         } else if (Map.Tileset->Name == "Orc Swamp") {
             game_settings |= 0x1C000;
+        } else {
+            game_settings |= 0x4000; // default to forest
         }
         statstring << std::hex << game_settings << ",";
 
         statstring << getUsername();
-        statstring.put(0x0d);
-        statstring << Map.Info.Filename;
-        statstring.put(0x0d);
+        statstring << "\r";
+        if (!Map.Info.Filename.empty()) {
+            statstring << Map.Info.Filename;
+        } else if (!Map.Info.Description.empty()) {
+            statstring << Map.Info.Description;
+        } else {
+            statstring << "unknown map";
+        }
+        statstring << "\r";
+        std::cout << statstring.str() << std::endl;
 
         msg.serialize(statstring.str().c_str());
         msg.flush(getTCPSocket());
