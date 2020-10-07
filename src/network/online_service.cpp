@@ -917,7 +917,7 @@ public:
 
     void showError(std::string arg) {
         info.push("!!! " + arg + " !!!");
-        lastError = arg;
+        // lastError = arg;
     }
 
     void showChat(std::string arg) { info.push(arg); }
