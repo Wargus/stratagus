@@ -391,15 +391,23 @@ public:
         }
     };
 
+    int getSpeed() {
+        return std::stol(gameStats[3]);
+    }
+
     std::string getApproval() {
-        return "Not approved";
+        if (std::stol(gameStats[4]) == 0) {
+            return "Not approved";
+        } else {
+            return "Approved";
+        }
     }
 
     std::string getGameSettings() {
-        if (gameStats[9].empty()) {
+        if (gameStats[8].empty()) {
             return "Map default";
         }
-        long settings = std::stol(gameStats[9]);
+        long settings = std::stol(gameStats[8]);
         std::string result;
         if (settings & 0x200) {
             result += " 1 worker";
@@ -442,13 +450,11 @@ public:
     };
 
     std::string getCreator() {
-        int end = gameStats[10].find("\r");
-        return gameStats[10].substr(0, end);
+        return gameStats[9];
     };
 
     std::string getMap() {
-        int begin = gameStats[10].find("\r") + 1;
-        return gameStats[10].substr(begin);
+        return gameStats[10];
     };
 
     std::string getGameStatus() {
@@ -561,7 +567,7 @@ public:
         case 0x10:
             return "Iron Man Ladder";
         default:
-            return "Unknown";
+            return gameStats[5]; // just the code
         }
     }
 
@@ -569,13 +575,19 @@ private:
     void splitStatstring() {
         // statstring is a comma-delimited list of values
         int pos = 0;
+        int newpos = 0;
+        char sep[2] = {',', '\0'};
         while (true) {
-            int newpos = gameStatstring.find(",", pos);
-            gameStats.push_back(gameStatstring.substr(pos, newpos));
-            pos = newpos + 1;
-            if (pos == 0) {
+            newpos = gameStatstring.find(sep, pos);
+            if (newpos < pos && sep[0] == ',') {
+                sep[0] = '\r';
+                continue;
+            } else if (newpos < pos) {
                 break;
+            } else {
+                gameStats.push_back(gameStatstring.substr(pos, newpos - pos));
             }
+            pos = newpos + 1;
         }
         while (gameStats.size() < 10) {
             gameStats.push_back("");
@@ -1067,10 +1079,18 @@ public:
         ticks++;
         if ((ticks % 5000) == 0) {
             // C>S 0x07 PKT_KEEPALIVE
-            // ~5000 frames @ ~50fps == 100 seconds
+            // ~5000 frames @ ~50fps ~= 100 seconds
             BNCSOutputStream keepalive(0x07);
             keepalive.serialize32(ticks);
             keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
+        }
+
+        if ((ticks % 5000) == 0) {
+            ctx->refreshFriends();
+        }
+
+        if ((ticks % 100) == 0) {
+            ctx->refreshGames();
         }
 
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
@@ -1910,16 +1930,6 @@ static int CclGoOnline(lua_State* l) {
         lua_pushstring(l, "online");
         if (!message.empty() && !_ctx.getCurrentChannel().empty()) {
             _ctx.sendText(message);
-        }
-
-        // refresh friends every 5 minutes
-        if ((FrameCounter % (FRAMES_PER_SECOND * 300)) == 0) {
-            _ctx.refreshFriends();
-        }
-
-        // refresh games every 30 seconds
-        if ((FrameCounter % (FRAMES_PER_SECOND * 30)) == 0) {
-            _ctx.refreshGames();
         }
 
         if (AddGame) {
