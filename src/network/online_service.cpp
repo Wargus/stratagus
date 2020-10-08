@@ -1194,7 +1194,9 @@ private:
             uint32_t settings = ctx->getMsgIStream()->read32();
             uint32_t lang = ctx->getMsgIStream()->read32();
             uint16_t addr_fam = ctx->getMsgIStream()->read16();
-            uint16_t port = ctx->getMsgIStream()->read16();
+            // the port is not in network byte order, since it's sent to
+            // directly go into a sockaddr_in struct
+            uint16_t port = (ctx->getMsgIStream()->read8() << 8) | ctx->getMsgIStream()->read8();
             uint32_t ip = ctx->getMsgIStream()->read32();
             uint32_t sinzero1 = ctx->getMsgIStream()->read32();
             uint32_t sinzero2 = ctx->getMsgIStream()->read32();
