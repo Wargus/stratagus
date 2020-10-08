@@ -141,6 +141,35 @@ public:
         return received_bytes;
     }
 
+    void dump() {
+        std::cout << "Raw contents >>>" << std::endl;
+        for (int i = 0; i < received_bytes; i += 8) {
+            std::cout << std::hex;
+            int j = i;
+            for (; j < received_bytes && j < (i + 8); j++) {
+                uint8_t byte = buffer[j];
+                if (byte < 0x10) {
+                    std::cout << "0";
+                }
+                std::cout << (unsigned short)byte << " ";
+            }
+            for (; j < (i + 9); j++) {
+                std::cout << "   "; // room for 2 hex digits and one space
+            }
+            j = i;
+            for (; j < received_bytes && j < (i + 8); j++) {
+                char c = buffer[j];
+                if (c >= 32) {
+                    std::cout.write(&c, 1);
+                } else {
+                    std::cout.write(".", 1);
+                }
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "<<<" << std::endl;
+    }
+
     std::string string32() {
         // uint32 encoded (4-byte) string
         uint32_t data = read32();
@@ -734,7 +763,7 @@ public:
         BNCSOutputStream msg(0x09);
         msg.serializeC32("W2BN");
         msg.serialize32(0x4f);
-        msg.serialize(gameNameFromUsername(getUsername()).c_str());
+        msg.serialize(gameNameFromUsername(username).c_str());
         msg.serialize(pw.c_str());
         msg.flush(getTCPSocket());
     }
@@ -1138,6 +1167,7 @@ public:
                 int len = ctx->getMsgIStream()->readAll(&out);
                 std::cout.write(out, len);
                 std::cout << "<<<" << std::endl;
+                free(out);
             }
 
             ctx->getMsgIStream()->finishMessage();
@@ -1846,7 +1876,7 @@ OnlineContext *OnlineContextHandler = &_ctx;
  ** @param AddFriend: a callback to add an online friend. (name, product, status) -> nil
  ** @param AddChannel: a callback to add a channel. (str) -> nil
  ** @param ActiveChannel: a callback to report the currently active channel. (str) -> nil
- ** @param AddGame: a callback to add an advertised game. (map, creator, gametype, settings, max-players) -> nil
+ ** @param AddGame: a callback to add an advertised game. (map, creator, gametype, settings, max-players, ip:port) -> nil
  **
  ** @return status - "online" if successfully logged in, "pending" if waiting for connection, or error string
  */
@@ -1940,6 +1970,7 @@ static int CclGoOnline(lua_State* l) {
                 AddGame->pushString(g->getGameType());
                 AddGame->pushString(g->getGameSettings());
                 AddGame->pushInteger(g->maxPlayers());
+                AddGame->pushString(g->getHost().toString());
                 AddGame->run(0);
             }
         }
