@@ -1867,7 +1867,7 @@ OnlineContext *OnlineContextHandler = &_ctx;
  **
  ** Lua arguments and return values:
  **
- ** @param host: hostname of the online service. Inititates a new connection.
+ ** @param host: hostname of the online service. Inititates a new connection if given, or disconnects if empty.
  ** @param post: port of the online service. Inititates a new connection.
  ** @param username: login username, only used if not logged in
  ** @param password: login password, only used if not logged in
@@ -1886,7 +1886,7 @@ static int CclGoOnline(lua_State* l) {
     std::string username = "";
     std::string password = "";
     std::string message = "";
-    std::string host = "";
+    const char* host = NULL;
     int port = 0;
 
     LuaCallback *AddMessage = NULL;
@@ -1911,7 +1911,7 @@ static int CclGoOnline(lua_State* l) {
         } else if (!strcmp(value, "password")) {
             password = std::string(LuaToString(l, -1));
         } else if (!strcmp(value, "host")) {
-            host = std::string(LuaToString(l, -1));
+            host = LuaToString(l, -1);
         } else if (!strcmp(value, "port")) {
             port = LuaToNumber(l, -1);
         } else if (!strcmp(value, "userInfo")) {
@@ -1939,10 +1939,14 @@ static int CclGoOnline(lua_State* l) {
         }
     }
 
-    if (!host.empty() && port) {
-        if (_ctx.isDisconnected()) {
-            _ctx.setHost(new CHost(host.c_str(), port));
-            _ctx.setState(new ConnectState());
+    if (host && port) {
+        if (strlen(host) == 0) {
+            _ctx.disconnect();
+        } else {
+            if (_ctx.isDisconnected()) {
+                _ctx.setHost(new CHost(host, port));
+                _ctx.setState(new ConnectState());
+            }
         }
     }
 
