@@ -688,6 +688,10 @@ public:
         return lastError;
     }
 
+    void clearError() {
+        lastError = "";
+    }
+
     // User and UI actions
     void disconnect() {
         if (isConnected()) {
@@ -1284,7 +1288,7 @@ private:
             ctx->showInfo("[INFO]: " + text);
             break;
         case 0x13: // error message
-            ctx->showError("[SEVERE]: " + text);
+            ctx->showError(text);
             break;
         case 0x17: // emote
             break;
@@ -1941,7 +1945,9 @@ static int CclGoOnline(lua_State* l) {
 
     if (host && port) {
         if (strlen(host) == 0) {
+            lua_pushstring(l, "disconnected");
             _ctx.disconnect();
+            return 1;
         } else {
             if (_ctx.isDisconnected()) {
                 _ctx.setHost(new CHost(host, port));
@@ -1956,6 +1962,7 @@ static int CclGoOnline(lua_State* l) {
 
     if (!error.empty()) {
         lua_pushstring(l, error.c_str());
+        _ctx.clearError();
     } else if (_ctx.isConnecting()) {
         lua_pushstring(l, "pending");
     } else if (!username.empty() && !password.empty()) {
@@ -2022,7 +2029,7 @@ static int CclGoOnline(lua_State* l) {
             _ctx.requestExtraUserInfo(userInfo);
         }
     } else {
-        lua_pushstring(l, "unknown");
+        lua_pushnil(l);
     }
 
     return 1;
