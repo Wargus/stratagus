@@ -178,7 +178,7 @@ bool FindTerrainType(int movemask, int resmask, int range,
 template <const bool NEARLOCATION>
 class BestDepotFinder
 {
-	inline void operator()(CUnit *const dest)
+	void operator()(CUnit *const dest)
 	{
 		/* Only resource depots */
 		if (dest->Type->CanStore[resource]
@@ -186,64 +186,65 @@ class BestDepotFinder
 			&& dest->CurrentAction() != UnitActionBuilt) {
 			// Unit in range?
 
-			if (NEARLOCATION) {
-				int d = dest->MapDistanceTo(u_near.loc);
+			if constexpr (NEARLOCATION) {
+				const int d = dest->MapDistanceTo(u_near.loc);
 
 				//
 				// Take this depot?
 				//
-				if (d <= range && d < best_dist) {
-					best_depot = dest;
-					best_dist = d;
+				if (d <= this->range && d < this->best_dist) {
+					this->best_depot = dest;
+					this->best_dist = d;
 				}
 			} else {
-				int d;
-				const CUnit *worker = u_near.worker;
-				if (!worker->Container) {
-					d = worker->MapDistanceTo(*dest);
-				} else {
-					d = worker->Container->MapDistanceTo(*dest);
-				}
+				const CUnit *worker = this->u_near.worker;
+				const CUnit *first_container = GetFirstContainer(*worker);
+
+				//simple distance
+				const int distance = first_container->MapDistanceTo(*dest);
 
 				// Use Circle, not square :)
-				if (d > range) {
+				if (distance > this->range) {
 					return;
 				}
 
-				if (best_dist == INT_MAX) {
-					best_depot = dest;
+				if (this->best_dist == INT_MAX) {
+					this->best_depot = dest;
+				}
+
+				if (distance >= this->best_dist) {
+					//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance 
+					return;
 				}
 
 				// calck real travel distance
-				if (worker->Container) {
-					UnmarkUnitFieldFlags(*worker->Container);
+				if (worker->Container != nullptr) {
+					UnmarkUnitFieldFlags(*first_container);
 				}
-				d = UnitReachable(*worker, *dest, 1);
-				if (worker->Container) {
-					MarkUnitFieldFlags(*worker->Container);
+				const int travel_distance = UnitReachable(*worker, *dest, 1);
+				if (worker->Container != nullptr) {
+					MarkUnitFieldFlags(*first_container);
 				}
 				//
 				// Take this depot?
 				//
-				if (d && d < best_dist) {
-					best_depot = dest;
-					best_dist = d;
+				if (travel_distance && travel_distance < this->best_dist) {
+					this->best_depot = dest;
+					this->best_dist = travel_distance;
 				}
 			}
 		}
 	}
 
 public:
-	BestDepotFinder(const CUnit &w, int res, int ran) :
-		resource(res), range(ran),
-		best_dist(INT_MAX), best_depot(0)
+	explicit BestDepotFinder(const CUnit &w, const int res, const int ran)
+		: resource(res), range(ran)
 	{
 		u_near.worker = &w;
 	}
 
-	BestDepotFinder(const Vec2i &pos, int res, int ran) :
-		resource(res), range(ran),
-		best_dist(INT_MAX), best_depot(0)
+	explicit BestDepotFinder(const Vec2i &pos, const int res, const int ran) :
+		resource(res), range(ran)
 	{
 		u_near.loc = pos;
 	}
@@ -269,9 +270,9 @@ private:
 	} u_near;
 	const int resource;
 	const int range;
-	int best_dist;
+	int best_dist = INT_MAX;
 public:
-	CUnit *best_depot;
+	CUnit *best_depot = nullptr;
 };
 
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
