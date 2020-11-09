@@ -3422,18 +3422,18 @@ void CleanUnits()
 	std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
 
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
-		CUnit &unit = **it;
+		CUnit *unit = *it;
 
-		if (&unit == NULL) {
+		if (unit == NULL) {
 			continue;
 		}
-		if (!unit.Destroyed) {
-			if (!unit.Removed) {
-				unit.Remove(NULL);
+		if (!unit->Destroyed) {
+			if (!unit->Removed) {
+				unit->Remove(NULL);
 			}
-			UnitClearOrders(unit);
+			UnitClearOrders(*unit);
 		}
-		unit.Release(true);
+		unit->Release(true);
 	}
 
 	UnitManager.Init();
