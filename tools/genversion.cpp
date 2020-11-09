@@ -74,9 +74,7 @@ int main(int argc, char * argv[]) {
 		free(gitrevfile);
 		if (file) {
 			git_rev = (char*)calloc(sizeof(char), 1024);
-			if (fscanf(file, "%s", git_rev) != 1) {
-				new_ver[4] = -1;
-			}
+			fscanf(file, "%s", git_rev);
 			fclose(file);
 		}
 	} else {
