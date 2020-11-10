@@ -538,6 +538,19 @@ void CUnit::Release(bool final)
 	}
 	Orders.clear();
 
+	if (SavedOrder != NULL) {
+		delete SavedOrder;
+		SavedOrder = NULL;
+	}
+	if (NewOrder != NULL) {
+		delete NewOrder;
+		NewOrder = NULL;
+	}
+	if (CriticalOrder != NULL) {
+		delete CriticalOrder;
+		CriticalOrder = NULL;
+	}
+
 	// Remove the unit from the global units table.
 	UnitManager.ReleaseUnit(this);
 }
