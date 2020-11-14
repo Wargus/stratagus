@@ -684,14 +684,6 @@ public:
         return state == NULL;
     }
 
-    std::string getLastError() {
-        return lastError;
-    }
-
-    void clearError() {
-        lastError = "";
-    }
-
     // User and UI actions
     void disconnect() {
         if (isConnected()) {
@@ -935,6 +927,11 @@ public:
     // UI information
     void setCurrentChannel(std::string name) {
         this->currentChannel = name;
+        if (SetActiveChannel != NULL) {
+          SetActiveChannel->pushPreamble();
+          SetActiveChannel->pushString(name);
+          SetActiveChannel->run();
+        }
     }
 
     std::string getCurrentChannel() { return currentChannel; }
@@ -944,6 +941,22 @@ public:
             delete value;
         }
         this->games = games;
+        if (SetGames != NULL) {
+          SetGames->pushPreamble();
+          for (const auto value : games) {
+            SetGames->pushTable({{"Creator", value->getCreator()},
+                                 {"Host", value->getHost().toString()},
+                                 {"IsSavedGame", value->isSavedGame()},
+                                 {"Map", value->getMap()},
+                                 {"MaxPlayers", value->maxPlayers()},
+                                 {"Speed", value->getSpeed()},
+                                 {"Approval", value->getApproval()},
+                                 {"Settings", value->getGameSettings()},
+                                 {"Status", value->getGameStatus()},
+                                 {"Type", value->getGameType()}});
+          }
+          SetGames->run();
+        }
     }
 
     std::vector<Game*> getGames() { return games; }
@@ -953,41 +966,91 @@ public:
             delete value;
         }
         this->friends = friends;
+        if (SetFriends != NULL) {            
+            SetFriends->pushPreamble();
+            for (const auto value : friends) {
+                SetFriends->pushTable({ { "Name", value->getName() },
+                                        { "Status", value->getStatus() },
+                                        { "Product", value->getProduct() } });
+            }
+            SetFriends->run();
+        }
     }
 
     std::vector<Friend*> getFriends() { return friends; }
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
-        this->extendedInfoValues[id] = values;
-        showInfo("User Info for " + extendedInfoNames.at(id));
-        for (int i = 0; i < values.size(); i++) {
-            showInfo(defaultUserKeys.at(i) + ": " + values.at(i));
+        if (ShowUserInfo != NULL) {
+            ShowUserInfo->pushPreamble();
+            std::map<std::string, std::variant<std::string, int>> m;
+            m["User"] = extendedInfoNames.at(id);            
+            for (int i = 0; i < values.size(); i++) {
+                m[defaultUserKeys.at(i)] = values.at(i);
+            }
+            ShowUserInfo->pushTable(m);
+            ShowUserInfo->run();
         }
     }
 
     std::queue<std::string> *getInfo() { return &info; }
 
-    void showInfo(std::string arg) { info.push("*** " + arg + " ***"); }
+    void showInfo(std::string arg) {
+        std::string infoStr = "*** " + arg + " ***";
+        info.push(infoStr);
+        if (ShowInfo != NULL) {
+            ShowInfo->pushPreamble();
+            ShowInfo->pushString(infoStr);
+            ShowInfo->run();
+        }
+    }
 
     void showError(std::string arg) {
         info.push("!!! " + arg + " !!!");
-        // lastError = arg;
+        if (ShowError != NULL) {
+            ShowError->pushPreamble();
+            ShowError->pushString(arg);
+            ShowError->run();
+        }
     }
 
-    void showChat(std::string arg) { info.push(arg); }
+    void showChat(std::string arg) {
+        info.push(arg);
+        if (ShowChat != NULL) {
+            ShowChat->pushPreamble();
+            ShowChat->pushString(arg);
+            ShowChat->run();
+        }
+    }
 
     void addUser(std::string name) {
         userList.insert(name);
+        if (AddUser != NULL) {
+            AddUser->pushPreamble();
+            AddUser->pushString(name);
+            AddUser->run();
+        }
     }
 
     void removeUser(std::string name) {
         userList.erase(name);
+        if (RemoveUser != NULL) {
+            RemoveUser->pushPreamble();
+            RemoveUser->pushString(name);
+            RemoveUser->run();
+        }
     }
 
     std::set<std::string> getUsers() { return userList; }
 
     void setChannels(std::vector<std::string> channels) {
         this->channelList = channels;
+        if (SetChannels != NULL) {            
+            SetChannels->pushPreamble();
+            for (const auto value : channels) {
+                SetChannels->pushString(value);
+            }
+            SetChannels->run();
+        }
     }
 
     std::vector<std::string> getChannels() { return channelList; }
@@ -1048,6 +1111,17 @@ public:
     uint32_t clientToken;
     uint32_t serverToken;
 
+    LuaCallback *AddUser = NULL;
+    LuaCallback *RemoveUser = NULL;
+    LuaCallback *SetFriends = NULL;
+    LuaCallback *SetGames = NULL;
+    LuaCallback *SetChannels = NULL;
+    LuaCallback *SetActiveChannel = NULL;
+    LuaCallback *ShowError = NULL;
+    LuaCallback *ShowInfo = NULL;
+    LuaCallback *ShowChat = NULL;
+    LuaCallback *ShowUserInfo = NULL;
+
 private:
     std::string gameNameFromUsername(std::string username) {
         return username + "'s game";
@@ -1072,7 +1146,6 @@ private:
     std::vector<Game*> games;
     std::vector<Friend*> friends;
     std::vector<std::string> extendedInfoNames;
-    std::map<uint32_t, std::vector<std::string>> extendedInfoValues;
     std::vector<std::string> defaultUserKeys;
 };
 
@@ -1859,182 +1932,6 @@ class ConnectState : public NetworkState {
 static Context _ctx;
 OnlineContext *OnlineContextHandler = &_ctx;
 
-/**
- ** The assumption is that the lists of users, friends, and games are cleared by
- ** the caller before calling this.
- **
- ** The call order should be this:
- **  1) call once with username + password
- **  2) call without args until you get a result that is not "pending"
- **  2a) if result is "online", call repeatedly with callbacks or messages
- **  2b) if result is an error, you may go to 1 after fixing the error
- **
- ** Lua arguments and return values:
- **
- ** @param host: hostname of the online service. Inititates a new connection if given, or disconnects if empty.
- ** @param post: port of the online service. Inititates a new connection.
- ** @param username: login username, only used if not logged in
- ** @param password: login password, only used if not logged in
- ** @param message: a message to send, only used if logged in
- ** @param userInfo: a username to request info for
- ** @param AddMessage: a callback to add new messages. (str) -> nil
- ** @param AddUser: a callback to add an online username. (str) -> nil
- ** @param AddFriend: a callback to add an online friend. (name, product, status) -> nil
- ** @param AddChannel: a callback to add a channel. (str) -> nil
- ** @param ActiveChannel: a callback to report the currently active channel. (str) -> nil
- ** @param AddGame: a callback to add an advertised game. (map, creator, gametype, settings, max-players, ip:port) -> nil
- **
- ** @return status - "online" if successfully logged in, "pending" if waiting for connection, or error string
- */
-static int CclGoOnline(lua_State* l) {
-    std::string username = "";
-    std::string password = "";
-    std::string message = "";
-    const char* host = NULL;
-    int port = 0;
-
-    LuaCallback *AddMessage = NULL;
-    LuaCallback *AddUser = NULL;
-    LuaCallback *AddFriend = NULL;
-    LuaCallback *AddGame = NULL;
-    LuaCallback *AddChannel = NULL;
-    LuaCallback *ActiveChannel = NULL;
-    std::string newActiveChannel = "";
-    std::string userInfo = "";
-
-    LuaCheckArgs(l, 1);
-    if (!lua_istable(l, 1)) {
-        LuaError(l, "incorrect argument");
-    }
-
-    for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
-        const char *value = LuaToString(l, -2);
-
-        if (!strcmp(value, "username")) {
-            username = std::string(LuaToString(l, -1));
-        } else if (!strcmp(value, "password")) {
-            password = std::string(LuaToString(l, -1));
-        } else if (!strcmp(value, "host")) {
-            host = LuaToString(l, -1);
-        } else if (!strcmp(value, "port")) {
-            port = LuaToNumber(l, -1);
-        } else if (!strcmp(value, "userInfo")) {
-            userInfo = std::string(LuaToString(l, -1));
-        } else if (!strcmp(value, "message")) {
-            message = std::string(LuaToString(l, -1));
-        } else if (!strcmp(value, "AddMessage")) {
-            AddMessage = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "AddUser")) {
-            AddUser = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "AddFriend")) {
-            AddFriend = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "AddGame")) {
-            AddGame = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "AddChannel")) {
-            AddChannel = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "ActiveChannel")) {
-            if (lua_isstring(l, -1)) {
-                newActiveChannel = LuaToString(l, -1);
-            } else {
-                ActiveChannel = new LuaCallback(l, -1);
-            }
-        } else {
-            LuaError(l, "Unsupported tag: %s" _C_ value);
-        }
-    }
-
-    if (host && port) {
-        if (strlen(host) == 0) {
-            lua_pushstring(l, "disconnected");
-            _ctx.disconnect();
-            return 1;
-        } else {
-            if (_ctx.isDisconnected()) {
-                _ctx.setHost(new CHost(host, port));
-                _ctx.setState(new ConnectState());
-            }
-        }
-    }
-
-    _ctx.doOneStep();
-
-    std::string error = _ctx.getLastError();
-
-    if (!error.empty()) {
-        lua_pushstring(l, error.c_str());
-        _ctx.clearError();
-    } else if (_ctx.isConnecting()) {
-        lua_pushstring(l, "pending");
-    } else if (!username.empty() && !password.empty()) {
-        lua_pushstring(l, "pending");
-        _ctx.setUsername(username);
-        _ctx.setPassword(password);
-    } else if (_ctx.isConnected()) {
-        lua_pushstring(l, "online");
-        if (!message.empty() && !_ctx.getCurrentChannel().empty()) {
-            _ctx.sendText(message);
-        }
-
-        if (AddGame) {
-            for (auto g : _ctx.getGames()) {
-                AddGame->pushPreamble();
-                AddGame->pushString(g->getMap());
-                AddGame->pushString(g->getCreator());
-                AddGame->pushString(g->getGameType());
-                AddGame->pushString(g->getGameSettings());
-                AddGame->pushInteger(g->maxPlayers());
-                AddGame->pushString(g->getHost().toString());
-                AddGame->run(0);
-            }
-        }
-        if (AddUser) {
-            for (auto u : _ctx.getUsers()) {
-                AddUser->pushPreamble();
-                AddUser->pushString(u);
-                AddUser->run(0);
-            }
-        }
-        if (AddChannel) {
-            for (auto u : _ctx.getChannels()) {
-                AddChannel->pushPreamble();
-                AddChannel->pushString(u);
-                AddChannel->run(0);
-            }
-        }
-        if (ActiveChannel) {
-            ActiveChannel->pushPreamble();
-            ActiveChannel->pushString(_ctx.getCurrentChannel());
-            ActiveChannel->run(0);
-        } else if (!newActiveChannel.empty()) {
-            _ctx.joinChannel(newActiveChannel);
-        }
-        if (AddFriend) {
-            for (auto u : _ctx.getFriends()) {
-                AddFriend->pushPreamble();
-                AddFriend->pushString(u->getName());
-                AddFriend->pushString(u->getProduct());
-                AddFriend->pushString(u->getStatus());
-                AddFriend->run(0);
-            }
-        }
-        if (AddMessage) {
-            while (!_ctx.getInfo()->empty()) {
-                AddMessage->pushPreamble();
-                AddMessage->pushString(_ctx.getInfo()->front());
-                AddMessage->run(0);
-                _ctx.getInfo()->pop();
-            }
-        }
-        if (!userInfo.empty()) {
-            _ctx.requestExtraUserInfo(userInfo);
-        }
-    } else {
-        lua_pushnil(l);
-    }
-
-    return 1;
-}
-
 static int CclStopAdvertisingOnlineGame(lua_State* l) {
     if (_ctx.isConnected()) {
         _ctx.stopAdvertising();
@@ -2055,8 +1952,190 @@ static int CclStartAdvertisingOnlineGame(lua_State* l) {
     return 1;
 }
 
+static int CclSetup(lua_State *l) {
+    LuaCheckArgs(l, 1);
+    if (!lua_istable(l, 1)) {
+        LuaError(l, "incorrect argument");
+    }
+
+    for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+        const char *value = LuaToString(l, -2);
+        if (!strcmp(value, "AddUser")) {
+            if (_ctx.AddUser) {
+                delete _ctx.AddUser;
+            }
+            _ctx.AddUser = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "RemoveUser")) {
+            if (_ctx.RemoveUser) {
+                delete _ctx.RemoveUser;
+            }
+            _ctx.RemoveUser = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "SetFriends")) {
+            if (_ctx.SetFriends) {
+                delete _ctx.SetFriends;
+            }
+            _ctx.SetFriends = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "SetGames")) {
+          if (_ctx.SetGames) {
+            delete _ctx.SetGames;
+          }
+          _ctx.SetGames = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "SetChannels")) {
+            if (_ctx.SetChannels) {
+                delete _ctx.SetChannels;
+            }
+            _ctx.SetChannels = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "SetActiveChannel")) {
+            if (_ctx.SetActiveChannel) {
+                delete _ctx.SetActiveChannel;
+            }
+            _ctx.SetActiveChannel = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "ShowChat")) {
+            if (_ctx.ShowChat) {
+                delete _ctx.ShowChat;
+            }
+            _ctx.ShowChat = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "ShowInfo")) {
+            if (_ctx.ShowInfo) {
+                delete _ctx.ShowInfo;
+            }
+            _ctx.ShowInfo = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "ShowError")) {
+            if (_ctx.ShowError) {
+                delete _ctx.ShowError;
+            }
+            _ctx.ShowError = new LuaCallback(l, -1);
+        } else if (!strcmp(value, "ShowUserInfo")) {
+            if (_ctx.ShowUserInfo) {
+                delete _ctx.ShowUserInfo;
+            }
+            _ctx.ShowUserInfo = new LuaCallback(l, -1);
+        } else {
+            LuaError(l, "Unsupported callback: %s" _C_ value);
+        }
+    }
+    return 0;
+}
+
+static int CclDisconnect(lua_State *l) {
+    LuaCheckArgs(l, 0);
+    _ctx.disconnect();
+    return 0;
+}
+
+static int CclConnect(lua_State *l) {
+    _ctx.disconnect();
+    LuaCheckArgs(l, 2);
+    const char *host = LuaToString(l, 1);
+    int port = LuaToNumber(l, 2);
+
+    _ctx.setHost(new CHost(host, port));
+    _ctx.setState(new ConnectState());
+    return 0;
+}
+
+static int CclLogin(lua_State *l) {
+    LuaCheckArgs(l, 2);
+    _ctx.setUsername(LuaToString(l, 1));
+    _ctx.setPassword(LuaToString(l, 2));
+    return 0;
+}
+
+static int CclStep(lua_State *l) {
+    LuaCheckArgs(l, 0);
+    if (_ctx.isDisconnected()) {
+        LuaError(l, "disconnected service cannot step");
+    } else {
+        _ctx.doOneStep();
+        if (_ctx.isConnecting()) {
+            lua_pushstring(l, "connecting");
+        } else if (_ctx.isConnected()) {
+            lua_pushstring(l, "online");
+        } else {
+            LuaError(l, "unknown online state");
+        }
+    }
+    return 1;
+}
+
+static int CclSendMessage(lua_State *l) {
+    LuaCheckArgs(l, 1);
+    if (!_ctx.isConnected()) {
+        LuaError(l, "connect first");
+    }
+    _ctx.sendText(LuaToString(l, 1));
+    return 0;
+}
+
+static int CclJoinChannel(lua_State *l) {
+    LuaCheckArgs(l, 1);
+    if (!_ctx.isConnected()) {
+        LuaError(l, "connect first");
+    }
+    _ctx.joinChannel(LuaToString(l, 1));
+    return 0;
+}
+
+static int CclJoinGame(lua_State *l) {
+    LuaCheckArgs(l, 2);
+    if (!_ctx.isConnected()) {
+        LuaError(l, "connect first");
+    }
+    _ctx.joinGame(LuaToString(l, 1), LuaToString(l, 2));
+    return 0;
+}
+
+static int CclStatus(lua_State *l) {
+    LuaCheckArgs(l, 0);
+    if (_ctx.isConnected()) {
+        lua_pushstring(l, "connected");
+    } else if (_ctx.isConnecting()) {
+        lua_pushstring(l, "connecting");
+    } else if (_ctx.isDisconnected()) {
+        lua_pushstring(l, "disconnected");
+    }
+    return 1;
+}
+
+static int CclRequestUserInfo(lua_State *l) {
+    LuaCheckArgs(l, 1);
+    if (!_ctx.isConnected()) {
+        LuaError(l, "not connected");
+    }
+    _ctx.requestExtraUserInfo(LuaToString(l, 1));
+    return 0;
+}
+
 void OnlineServiceCclRegister() {
-    lua_register(Lua, "StartAdvertisingOnlineGame", CclStartAdvertisingOnlineGame);
-    lua_register(Lua, "StopAdvertisingOnlineGame", CclStopAdvertisingOnlineGame);
-    lua_register(Lua, "GoOnline", CclGoOnline);
+    lua_createtable(Lua, 0, 3);
+
+    lua_pushcfunction(Lua, CclSetup);
+    lua_setfield(Lua, -2, "setupcallbacks");
+
+    lua_pushcfunction(Lua, CclConnect);
+    lua_setfield(Lua, -2, "connect");
+    lua_pushcfunction(Lua, CclDisconnect);
+    lua_setfield(Lua, -2, "disconnect");
+
+    lua_pushcfunction(Lua, CclStatus);
+    lua_setfield(Lua, -2, "status");
+
+    // step is called in the SDL event loop, I don't think we need to expose it
+    // lua_pushcfunction(Lua, CclStep);
+    // lua_setfield(Lua, -2, "step");
+    lua_pushcfunction(Lua, CclSendMessage);
+    lua_setfield(Lua, -2, "sendmessage");
+    lua_pushcfunction(Lua, CclJoinChannel);
+    lua_setfield(Lua, -2, "joinchannel");
+    lua_pushcfunction(Lua, CclRequestUserInfo);
+    lua_setfield(Lua, -2, "requestuserinfo");
+    // join game is called from the netconnect code, I don't think we need to expose it
+    // lua_pushcfunction(Lua, CclJoinGame);
+    // lua_setfield(Lua, -2, "joingame");
+    lua_pushcfunction(Lua, CclStartAdvertisingOnlineGame);
+    lua_setfield(Lua, -2, "startadvertising");
+    lua_pushcfunction(Lua, CclStopAdvertisingOnlineGame);
+    lua_setfield(Lua, -2, "stopadvertising");
+
+    lua_setglobal(Lua, "OnlineService");
 }
