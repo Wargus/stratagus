@@ -327,9 +327,17 @@ void InitVideoSdl()
 	}
 	SDL_RendererInfo rendererInfo;
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
+	printf("[Renderer] %s\n", rendererInfo.name);
 	if(!strncmp(rendererInfo.name, "opengl", 6)) {
-		puts("[Renderer] Got OpenGL");
 		CanUseShaders = LoadShaderExtensions();
+	}
+	if (!CanUseShaders) {
+		puts("[Renderer] Cannot use shaders");
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+		SDL_DestroyRenderer(TheRenderer);
+		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_SOFTWARE);
+		SDL_GetRendererInfo(TheRenderer, &rendererInfo);
+		printf("[Renderer] %s\n", rendererInfo.name);
 	}
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	Video.ResizeScreen(Video.Width, Video.Height);

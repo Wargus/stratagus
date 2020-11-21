@@ -174,14 +174,16 @@ static GLuint compileProgram(std::string shaderFile) {
 	return compileProgramSource(source);
 }
 
-static void loadShaders() {
+static int loadShaders() {
 	int numShdr = 0;
 
 #define COMPILE_BUILTIN_SHADER(name)									\
 	std::cout << "[Shaders] Compiling shader: " #name << std::endl;		\
 	shaderPrograms[numShdr] = compileProgramSource(std::string(name));	\
 	shaderNames[numShdr] = #name ;										\
-	numShdr++;
+	if (shaderPrograms[numShdr] != 0) {									\
+		numShdr++;														\
+	}
 	COMPILE_BUILTIN_SHADER(none);
 	COMPILE_BUILTIN_SHADER(xBRZ);
 	COMPILE_BUILTIN_SHADER(CRT);
@@ -216,6 +218,8 @@ static void loadShaders() {
 			}
 		}
 	}
+
+	return numShdr;
 }
 
 void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
@@ -415,11 +419,9 @@ bool LoadShaderExtensions() {
 		glLinkProgram && glValidateProgram && glGetProgramiv && glGetProgramInfoLog &&
 		glUseProgram && glGetUniformLocation && glUniform1i && glUniform1f && glUniform2f &&
 		glUniformMatrix4fv && glGetAttribLocation && glVertexAttrib4f) {
-		shadersLoaded = 1;
-		loadShaders();
+		shadersLoaded = loadShaders() > 0 ? 1 : 0;
 	} else {
 		shadersLoaded = 0;
-		return false;
 	}
 
 	lua_register(Lua, "GetShaderNames", CclGetShaderNames);
