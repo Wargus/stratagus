@@ -33,7 +33,7 @@
 #endif
 
 #include "stratagus.h"
-#include "lua.h"
+#include "script.h"
 #include "map.h"
 #include "netconnect.h"
 #include "script.h"
