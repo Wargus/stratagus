@@ -317,8 +317,8 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		strcpy(srcfolder, destination);
 	}
 
-	char* sourcepath = strdup(scripts_path);
 #ifdef WIN32
+	char* sourcepath = _strdup(scripts_path);
 	if (sourcepath[0] == '"') {
 		// if scripts_path is quoted, remove the quotes, i.e.,
 		// copy all but the first until all but the last char.
@@ -327,6 +327,8 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		strncpy(sourcepath, scripts_path + 1, strlen(scripts_path) - 2);
 		sourcepath[strlen(scripts_path) - 2] = '\0';
 	}
+#else
+	char* sourcepath = strdup(scripts_path);
 #endif
 	mkdir_p(destination);
 
@@ -422,7 +424,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #ifdef WIN32
 	DWORD exitcode = 0;
 	SHELLEXECUTEINFO ShExecInfo = { 0 };
-	char* toolpath = strdup(extractor_tool);
+	char* toolpath = _strdup(extractor_tool);
 	if (PathRemoveFileSpec(toolpath)) {
 		// remove the leading quote
 		if (toolpath[0] == '"') memmove(toolpath, toolpath + 1, strlen(toolpath) + 1);
@@ -451,7 +453,11 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
 		sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
+#ifdef WIN32
+		_unlink(destination);
+#else
 		unlink(destination);
+#endif
 	} else if (!canJustReextract && GAME_SHOULD_EXTRACT_AGAIN) {
 		ExtractData(extractor_tool, destination, scripts_path, 2);
 	}
@@ -516,7 +522,7 @@ int main(int argc, char * argv[]) {
 		strcpy(data_path, executable_drive);
 		strcpy(data_path+strlen(executable_drive), executable_dir);
 	} else {
-		getcwd(data_path, data_path_size);
+		_getcwd(data_path, data_path_size);
 	}
 	const size_t data_path_length = strlen(data_path);
 	if (data_path_length != 0 && data_path[data_path_length - 1] == '\\') {
@@ -543,7 +549,7 @@ int main(int argc, char * argv[]) {
 			RegCloseKey(key);
 		}
 
-		if (chdir(stratagus_path) != 0) {
+		if (_chdir(stratagus_path) != 0) {
 			error(TITLE, STRATAGUS_NOT_FOUND);
 		}
 		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
@@ -655,7 +661,7 @@ int main(int argc, char * argv[]) {
 	stratagus_argv[argc + 2] = NULL;
 
 #ifdef WIN32
-	int ret = spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
+	int ret = _spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
 #else
 	int ret = 0;
 	int childpid = fork();
@@ -685,8 +691,13 @@ int main(int argc, char * argv[]) {
 				 "and please give details, including: operating system, installation path, username, kind of source CD. "
 				 "A possible solution is to remove the hidden folder %s).", data_path);
 		error(TITLE, message);
+#ifdef WIN32
+		_unlink(title_path);
+		_unlink(data_path);
+#else
 		unlink(title_path);
 		unlink(data_path);
+#endif
 	}
 	exit(ret);
 }

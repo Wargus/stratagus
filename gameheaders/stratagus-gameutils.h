@@ -41,6 +41,13 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #define WIN32 1
 #endif
 
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #ifdef WIN32
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
@@ -50,17 +57,9 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "Shlwapi.lib")
 #include <direct.h>
-//#define inline __inline
-#define chdir _chdir
-#define getcwd _getcwd
-#define spawnvp _spawnvp
-#define stat _stat
-#define strdup _strdup
 #define mkdir(f, m) _mkdir(f)
 // PathRemoveFileSpec on a drive (e.g. when extracting from CD) will leave the trailing \... remove that
 #define parentdir(x) PathRemoveFileSpec(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
-#define execvp _execvp
-#define unlink(x) _unlink(x)
 #else
 #if defined(USE_MAC)
 #define parentdir(x) strcpy(x, dirname(x))
@@ -136,7 +135,7 @@ void mkdir_p(const char* path) {
 void copy_dir(const char* source_folder, const char* target_folder)
 {
 	// make the parentdir of the target folder
-	char* ptarget = strdup(target_folder);
+	char* ptarget = _strdup(target_folder);
 	parentdir(ptarget);
 	mkdir_p(ptarget);
 	// convert source and target folder strings to windows wide strings
