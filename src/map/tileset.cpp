@@ -590,7 +590,7 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 				++n;
 			}
 		}
-		n = SyncRand() % n;
+		n = MyRand() % n;
 		int i = -1;
 		do {
 			while (++i < 16 && !tiles[tile + i].tile) {
