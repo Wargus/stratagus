@@ -30,6 +30,10 @@
 #ifndef __STRATAGUS_H__
 #define __STRATAGUS_H__
 
+#ifdef HAVE_COZ_PROFILER
+#include <coz.h>
+#endif
+
 //@{
 
 /*============================================================================

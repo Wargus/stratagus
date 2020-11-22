@@ -313,6 +313,10 @@ static void GameLogicLoop()
 	if (!NetworkInSync) {
 		NetworkRecover(); // recover network
 	}
+
+#ifdef HAVE_COZ_PROFILER
+	COZ_PROGRESS_NAMED("GameLogicLoop")
+#endif
 }
 
 //#define REALVIDEO
