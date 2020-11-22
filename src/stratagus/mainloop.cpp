@@ -400,6 +400,7 @@ void GameMainLoop()
 
 	SetVideoSync();
 	GameCursor = UI.Point.Cursor;
+	GameCycle = 0;
 	GameRunning = true;
 
 	CParticleManager::init();
@@ -430,7 +431,7 @@ void GameMainLoop()
 	NetworkQuitGame();
 	EndReplayLog();
 
-	GameCycle = 0;//????
+	GameCycle = 0;
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;
