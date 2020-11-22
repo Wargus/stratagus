@@ -6,12 +6,12 @@
 #ifdef __GLIBC__
 
 #include "execinfo.h"
-inline void print_backtrace(void) {
+inline void print_backtrace(int sz = 100) {
     int j, nptrs;
-    void *buffer[100];
-    nptrs = backtrace(buffer, 100);
+    void *buffer[sz];
+    nptrs = backtrace(buffer, sz);
     fprintf(stderr, "backtrace() returned %d addresses\n", nptrs);
-    backtrace_symbols_fd(buffer, 100, 2);
+    backtrace_symbols_fd(buffer, sz, 2);
 }
 
 #elif defined(USE_WIN32)
