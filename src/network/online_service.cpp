@@ -2102,6 +2102,12 @@ static int CclStatus(lua_State *l) {
         lua_pushstring(l, "connecting");
     } else if (_ctx.isDisconnected()) {
         lua_pushstring(l, "disconnected");
+    } else {
+        if (!_ctx.getInfo()->empty()) {
+            lua_pushstring(l, _ctx.getInfo()->back().c_str());
+        } else {
+            lua_pushstring(l, "unknown error");
+        }
     }
     return 1;
 }
