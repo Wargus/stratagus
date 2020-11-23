@@ -995,7 +995,7 @@ public:
     std::queue<std::string> *getInfo() { return &info; }
 
     void showInfo(std::string arg) {
-        std::string infoStr = "*** " + arg + " ***";
+        std::string infoStr = arg;
         info.push(infoStr);
         if (ShowInfo != NULL) {
             ShowInfo->pushPreamble();
