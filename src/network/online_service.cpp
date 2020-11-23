@@ -1082,6 +1082,14 @@ public:
         }
     }
 
+    void setCreateAccount(bool flag) {
+        createAccount = flag;
+    }
+
+    bool shouldCreateAccount() {
+        return createAccount;
+    }
+
     // Protocol
     CHost *getHost() { return host; }
 
@@ -1136,6 +1144,7 @@ private:
     std::string username;
     uint32_t password[5]; // xsha1 hash of password
     bool hasPassword;
+    bool createAccount;
 
     std::string lastError;
 
@@ -1597,18 +1606,25 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 return;
             case 0x01:
             case 0x010000:
-                ctx->showInfo("Account does not exist, creating it...");
-                createAccount(ctx);
+                if (ctx->shouldCreateAccount()) {
+                    ctx->showInfo("Account does not exist, creating it...");
+                    createAccount(ctx);
+                } else {
+                    ctx->showError("Account does not exist");
+                    ctx->setUsername("");
+                    ctx->setPassword("");
+                    ctx->setState(new C2S_LOGONRESPONSE2());
+                }
                 return;
             case 0x02:
             case 0x020000:
-                ctx->showInfo("Incorrect password");
+                ctx->showError("Incorrect password");
                 ctx->setPassword("");
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
             case 0x06:
             case 0x060000:
-                ctx->showInfo("Account closed: " + ctx->getMsgIStream()->readString());
+                ctx->showError("Account closed: " + ctx->getMsgIStream()->readString());
                 ctx->setPassword("");
                 ctx->setState(new C2S_LOGONRESPONSE2());
                 return;
@@ -2045,6 +2061,15 @@ static int CclConnect(lua_State *l) {
 
 static int CclLogin(lua_State *l) {
     LuaCheckArgs(l, 2);
+    _ctx.setCreateAccount(false);
+    _ctx.setUsername(LuaToString(l, 1));
+    _ctx.setPassword(LuaToString(l, 2));
+    return 0;
+}
+
+static int CclSignUp(lua_State *l) {
+    LuaCheckArgs(l, 2);
+    _ctx.setCreateAccount(true);
     _ctx.setUsername(LuaToString(l, 1));
     _ctx.setPassword(LuaToString(l, 2));
     return 0;
@@ -2131,6 +2156,8 @@ void OnlineServiceCclRegister() {
     lua_setfield(Lua, -2, "connect");
     lua_pushcfunction(Lua, CclLogin);
     lua_setfield(Lua, -2, "login");
+    lua_pushcfunction(Lua, CclSignUp);
+    lua_setfield(Lua, -2, "signup");
     lua_pushcfunction(Lua, CclDisconnect);
     lua_setfield(Lua, -2, "disconnect");
 
