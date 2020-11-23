@@ -151,8 +151,12 @@ namespace gcn
         SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
 
         Color c = getColor();
-        SDL_SetSurfaceColorMod(srcImage, c.r, c.g, c.b);
-        SDL_SetSurfaceAlphaMod(srcImage, c.a);
+        if (!SDL_SetSurfaceColorMod(srcImage, c.r, c.g, c.b)) {
+            SDL_SetSurfaceColorMod(srcImage, 255, 255, 255);
+        }
+        if (!SDL_SetSurfaceAlphaMod(srcImage, c.a)) {
+            SDL_SetSurfaceAlphaMod(srcImage, 255);
+        }
         SDL_BlitSurface(srcImage, &src, *mTarget, &dst);
     }
 
