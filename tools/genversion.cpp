@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 
 /* usage: genversion "/path/to/version-generated.h" "major.minor.path.patch2" */
 
@@ -120,8 +121,14 @@ int main(int argc, char * argv[]) {
 	fprintf(file, "#define StratagusPatchLevel %d\n", new_ver[2]);
 	fprintf(file, "#define StratagusPatchLevel2 %d\n", new_ver[3]);
 
+
 	if ( git_rev != NULL )
 		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
+
+	time_t tt = time(NULL);
+	struct tm *tm = gmtime(&tt);
+	fprintf(file, "#define StratagusLastModifiedDate \"%02d/%02d/%02d\"\n", tm->tm_mon + 1, tm->tm_mday, tm->tm_year + 1900);
+	fprintf(file, "#define StratagusLastModifiedTime \"%02d:%02d:%02d\"\n", tm->tm_hour, tm->tm_min, tm->tm_sec);
 
 	fclose(file);
 	return 0;

@@ -38,4 +38,4 @@
 #define LICENSE "GPL v2"
 
 /// Copyright
-#define COPYRIGHT "Copyright (c) 1998-2015 by The Stratagus Project"
+#define COPYRIGHT "Copyright (c) 1998-2020 by The Stratagus Project"
