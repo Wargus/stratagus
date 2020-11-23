@@ -1975,6 +1975,9 @@ static int CclSetup(lua_State *l) {
                 delete _ctx.SetFriends;
             }
             _ctx.SetFriends = new LuaCallback(l, -1);
+            if (_ctx.isConnected()) {
+                _ctx.setFriendslist(_ctx.getFriends());
+            }
         } else if (!strcmp(value, "SetGames")) {
           if (_ctx.SetGames) {
             delete _ctx.SetGames;
@@ -1984,12 +1987,18 @@ static int CclSetup(lua_State *l) {
             if (_ctx.SetChannels) {
                 delete _ctx.SetChannels;
             }
+            if (_ctx.isConnected()) {
+                _ctx.setChannels(_ctx.getChannels());
+            }
             _ctx.SetChannels = new LuaCallback(l, -1);
         } else if (!strcmp(value, "SetActiveChannel")) {
             if (_ctx.SetActiveChannel) {
                 delete _ctx.SetActiveChannel;
             }
             _ctx.SetActiveChannel = new LuaCallback(l, -1);
+            if (_ctx.isConnected()) {
+                _ctx.setCurrentChannel(_ctx.getCurrentChannel());
+            }
         } else if (!strcmp(value, "ShowChat")) {
             if (_ctx.ShowChat) {
                 delete _ctx.ShowChat;
@@ -2110,10 +2119,12 @@ void OnlineServiceCclRegister() {
     lua_createtable(Lua, 0, 3);
 
     lua_pushcfunction(Lua, CclSetup);
-    lua_setfield(Lua, -2, "setupcallbacks");
+    lua_setfield(Lua, -2, "setup");
 
     lua_pushcfunction(Lua, CclConnect);
     lua_setfield(Lua, -2, "connect");
+    lua_pushcfunction(Lua, CclLogin);
+    lua_setfield(Lua, -2, "login");
     lua_pushcfunction(Lua, CclDisconnect);
     lua_setfield(Lua, -2, "disconnect");
 
