@@ -403,6 +403,9 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 */
 void InitNetwork1()
 {
+	if (NetworkFildes.IsValid()) {
+		return;
+	}
 	CNetworkParameter::Instance.FixValues();
 
 	NetInit(); // machine dependent setup

@@ -296,7 +296,9 @@ public:
     };
 
     void flush(CUDPSocket *sock, CHost *host) {
-        sock->Send(*host, getBuffer(), pos);
+        if (sock->IsValid()) {
+            sock->Send(*host, getBuffer(), pos);
+        }
     };
 
 private:
@@ -647,7 +649,6 @@ protected:
 class Context : public OnlineContext {
 public:
     Context() {
-        this->udpSocket = new CUDPSocket();
         this->tcpSocket = new CTCPSocket();
         this->istream = new BNCSInputStream(tcpSocket);
         this->state = NULL;
@@ -669,7 +670,6 @@ public:
         if (state != NULL) {
             delete state;
         }
-        delete udpSocket;
         delete tcpSocket;
         delete host;
     }
@@ -697,7 +697,6 @@ public:
             BNCSOutputStream leave(0x10);
             leave.flush(tcpSocket);
         }
-        udpSocket->Close();
         tcpSocket->Close();
         state = NULL;
         clientToken = MyRand();
@@ -1108,7 +1107,18 @@ public:
         host = arg;
     }
 
-    CUDPSocket *getUDPSocket() { return udpSocket; }
+    CUDPSocket *getUDPSocket() {
+        if (!NetworkFildes.IsValid()) {
+            if (canDoUdp) {
+                InitNetwork1();
+                if (!NetworkFildes.IsValid()) {
+                    // do not try again
+                    canDoUdp = false;
+                }
+            }
+        }
+        return &NetworkFildes;
+    }
 
     CTCPSocket *getTCPSocket() { return tcpSocket; }
 
@@ -1145,7 +1155,7 @@ private:
 
     NetworkState *state;
     CHost *host;
-    CUDPSocket *udpSocket;
+    bool canDoUdp;
     CTCPSocket *tcpSocket;
     BNCSInputStream *istream;
 
@@ -1473,27 +1483,29 @@ public:
     };
 
     virtual void doOneStep(Context *ctx) {
-        if (ctx->getUDPSocket()->HasDataToRead(1)) {
-            // PKT_SERVERPING
-            //  (UINT8) 0xFF
-            //  (UINT8) 0x05
-            // (UINT16) 8
-            // (UINT32) UDP Code
-            char buf[8];
-            int received = ctx->getUDPSocket()->Recv(buf, 8, ctx->getHost());
-            if (received == 8) {
-                uint32_t udpCode = reinterpret_cast<uint32_t*>(buf)[1];
-                BNCSOutputStream udppingresponse(0x14);
-                udppingresponse.serialize32(udpCode);
-                udppingresponse.flush(ctx->getTCPSocket());
+        if (ctx->getUDPSocket()->IsValid()) {
+            if (ctx->getUDPSocket()->HasDataToRead(1)) {
+                // PKT_SERVERPING
+                //  (UINT8) 0xFF
+                //  (UINT8) 0x05
+                // (UINT16) 8
+                // (UINT32) UDP Code
+                char buf[8];
+                int received = ctx->getUDPSocket()->Recv(buf, 8, ctx->getHost());
+                if (received == 8) {
+                    uint32_t udpCode = reinterpret_cast<uint32_t*>(buf)[1];
+                    BNCSOutputStream udppingresponse(0x14);
+                    udppingresponse.serialize32(udpCode);
+                    udppingresponse.flush(ctx->getTCPSocket());
+                }
+            } else {
+                retries++;
+                if (retries < 50) {
+                    return;
+                }
+                // we're using a timeout of 1ms, so now we've been waiting at
+                // the very least for 5 seconds... let's skip UDP then
             }
-        } else {
-            retries++;
-            if (retries < 50) {
-                return;
-            }
-            // we're using a timeout of 1ms, so now we've been waiting at
-            // the very least for 5 seconds... let's skip UDP then
         }
         ctx->setState(new C2S_ENTERCHAT());
     }
@@ -1869,11 +1881,6 @@ class ConnectState : public NetworkState {
         if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
             ctx->setState(new DisconnectedState("TCP connect failed for server " + ctx->getHost()->toString()));
             return;
-        }
-        if (!ctx->getUDPSocket()->Open(*ctx->getHost())) {
-            std::cerr << "UDP open failed" << std::endl;
-            // ctx->setState(new DisconnectedState("UDP open failed"));
-            // return;
         }
 
         // Send proto byte
