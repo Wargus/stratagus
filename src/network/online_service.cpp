@@ -323,6 +323,18 @@ private:
     int length_pos;
 };
 
+static std::string gameName() {
+    if (!FullGameName.empty()) {
+        return FullGameName;
+    } else {
+        if (!GameName.empty()) {
+            return GameName;
+        } else {
+            return Parameters::Instance.applicationName;
+        }
+    }
+}
+
 class Friend {
 public:
     Friend(std::string name, uint8_t status, uint8_t location, uint32_t product, std::string locationName) {
@@ -734,7 +746,8 @@ public:
 
     void refreshChannels() {
         BNCSOutputStream getlist(0x0b);
-        getlist.serialize32(0x00);
+        // identify as W2BN
+        getlist.serialize32(0x4f);
         getlist.flush(getTCPSocket());
     }
 
@@ -1204,7 +1217,6 @@ public:
     }
 
     virtual void doOneStep(Context *ctx) {
-        ticks++;
         if ((ticks % 5000) == 0) {
             // C>S 0x07 PKT_KEEPALIVE
             // ~5000 frames @ ~50fps ~= 100 seconds
@@ -1222,6 +1234,8 @@ public:
             ctx->refreshGames();
         }
 
+        ticks++;
+
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
             if (msg == 0xff) {
@@ -1236,6 +1250,9 @@ public:
             case 0x25: // SID_PING
                 handlePing(ctx);
                 break;
+            case 0x0b: // SID_CHANNELLIST
+                ctx->setChannels(ctx->getMsgIStream()->readStringlist());
+                break;
             case 0x0f: // CHATEVENT
                 handleChatevent(ctx);
                 break;
@@ -1246,7 +1263,7 @@ public:
             case 0x1c:
                 // S>C 0x1C SID_STARTADVEX3
                 if (ctx->getMsgIStream()->read32()) {
-                    ctx->showError("Game creation failed");
+                    ctx->showError("Online game creation failed");
                 }
                 break;
             case 0x65:
@@ -1391,34 +1408,7 @@ private:
         }
     }
 
-    uint32_t ticks;
-};
-
-class S2C_GETCHANNELLIST : public NetworkState {
-    virtual void doOneStep(Context *ctx) {
-        if (ctx->getTCPSocket()->HasDataToRead(0)) {
-            uint8_t msg = ctx->getMsgIStream()->readMessageId();
-            if (msg == 0xff) {
-                // try again next time
-                return;
-            }
-            if (msg != 0x0b) {
-                std::string error = std::string("Expected SID_GETCHANNELLIST, got msg id ");
-                error += std::to_string(msg);
-                ctx->setState(new DisconnectedState(error));
-            }
-
-            std::vector<std::string> channels = ctx->getMsgIStream()->readStringlist();
-            ctx->getMsgIStream()->finishMessage();
-            ctx->setChannels(channels);
-
-            // request our user info and refresh the active games list
-            ctx->requestExtraUserInfo(ctx->getUsername());
-            ctx->refreshGames();
-
-            ctx->setState(new S2C_CHATEVENT());
-        }
-    }
+    uint64_t ticks;
 };
 
 class S2C_ENTERCHAT : public NetworkState {
@@ -1452,7 +1442,9 @@ class S2C_ENTERCHAT : public NetworkState {
                 ctx->showInfo("Statstring after logon: " + statString);
             }
 
-            ctx->setState(new S2C_GETCHANNELLIST());
+            ctx->requestExtraUserInfo(ctx->getUsername());
+
+            ctx->setState(new S2C_CHATEVENT());
         }
     }
 };
@@ -1469,8 +1461,10 @@ class C2S_ENTERCHAT : public NetworkState {
 
         BNCSOutputStream join(0x0c);
         join.serialize32(0x01); // first-join
-        join.serialize("ignored");
+        join.serialize(gameName().c_str());
         join.flush(ctx->getTCPSocket());
+
+        ctx->refreshChannels();
 
         ctx->setState(new S2C_ENTERCHAT());
     }
@@ -1810,15 +1804,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             check.serialize32(0);
             // EXE information
             std::string exeInfo("");
-            if (!FullGameName.empty()) {
-                exeInfo += FullGameName;
-            } else {
-                if (!GameName.empty()) {
-                    exeInfo += GameName;
-                } else {
-                    exeInfo += Parameters::Instance.applicationName;
-                }
-            }
+            exeInfo += gameName();
             exeInfo += " ";
             exeInfo += StratagusLastModifiedDate;
             exeInfo += " ";
