@@ -947,6 +947,17 @@ public:
     // UI information
     void setCurrentChannel(std::string name) {
         this->currentChannel = name;
+        bool unlisted = true;
+        for (const auto c : channelList) {
+            if (c == name) {
+                unlisted = false;
+                break;
+            }
+        }
+        if (unlisted) {
+            channelList.push_back(name);
+            setChannels(channelList);
+        }
         if (SetActiveChannel != NULL) {
           SetActiveChannel->pushPreamble();
           SetActiveChannel->pushString(name);
