@@ -655,6 +655,8 @@ public:
         this->clientToken = MyRand();
         this->username = "";
         setPassword("");
+        defaultUserKeys.push_back("profile\\location");
+        defaultUserKeys.push_back("profile\\description");
         defaultUserKeys.push_back("record\\GAME\\0\\wins");
         defaultUserKeys.push_back("record\\GAME\\0\\losses");
         defaultUserKeys.push_back("record\\GAME\\0\\disconnects");
@@ -729,6 +731,12 @@ public:
             msg.serialize(key.c_str());
         }
         msg.flush(getTCPSocket());
+    }
+
+    void refreshChannels() {
+        BNCSOutputStream getlist(0x0b);
+        getlist.serialize32(0x00);
+        getlist.flush(getTCPSocket());
     }
 
     void refreshGames() {
@@ -983,7 +991,7 @@ public:
         if (ShowUserInfo != NULL) {
             ShowUserInfo->pushPreamble();
             std::map<std::string, std::variant<std::string, int>> m;
-            m["User"] = extendedInfoNames.at(id);            
+            m["User"] = extendedInfoNames.at(id);
             for (int i = 0; i < values.size(); i++) {
                 m[defaultUserKeys.at(i)] = values.at(i);
             }
@@ -1166,17 +1174,12 @@ class DisconnectedState : public NetworkState {
 public:
     DisconnectedState(std::string message) {
         this->message = message;
-        this->hasPrinted = false;
     };
 
     virtual void doOneStep(Context *ctx) {
-        if (!hasPrinted) {
-            std::cout << message << std::endl;
-            ctx->showError(message);
-            hasPrinted = true;
-            ctx->disconnect();
-        }
-        // the end
+        std::cout << message << std::endl;
+        ctx->disconnect();
+        ctx->showError(message);
     }
 
 private:
@@ -1202,9 +1205,10 @@ public:
 
         if ((ticks % 5000) == 0) {
             ctx->refreshFriends();
+            ctx->refreshChannels();
         }
 
-        if ((ticks % 100) == 0) {
+        if ((ticks % 300) == 0) {
             ctx->refreshGames();
         }
 
@@ -1367,7 +1371,7 @@ private:
             ctx->showInfo("Channel restricted");
             break;
         case 0x12: // general info text
-            ctx->showInfo("[INFO]: " + text);
+            ctx->showInfo("~<" + text + "~>");
             break;
         case 0x13: // error message
             ctx->showError(text);
@@ -1451,9 +1455,7 @@ class C2S_ENTERCHAT : public NetworkState {
         enterchat.serialize("");
         enterchat.flush(ctx->getTCPSocket());
 
-        BNCSOutputStream getlist(0x0b);
-        getlist.serialize32(0x00);
-        getlist.flush(ctx->getTCPSocket());
+        ctx->refreshChannels();
 
         BNCSOutputStream join(0x0c);
         join.serialize32(0x01); // first-join
@@ -1500,8 +1502,8 @@ private:
     int retries;
 };
 
-class C2S_LOGONRESPONSE2 : public NetworkState {
-    virtual void doOneStep(Context *ctx);
+class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public NetworkState {
+  virtual void doOneStep(Context *ctx);
 };
 
 class S2C_CREATEACCOUNT2 : public NetworkState {
@@ -1529,52 +1531,52 @@ class S2C_CREATEACCOUNT2 : public NetworkState {
             switch (status) {
             case 0x00:
                 // login into created account
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x01:
                 ctx->showError("Name too short" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x02:
                 ctx->showError("Name contains invalid character(s)" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x03:
                 ctx->showError("Name contains banned word(s)" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x04:
                 ctx->showError("Account already exists" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x05:
                 ctx->showError("Account is still being created" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x06:
                 ctx->showError("Name does not contain enough alphanumeric characters" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x07:
                 ctx->showError("Name contained adjacent punctuation characters" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x08:
                 ctx->showError("Name contained too many punctuation characters" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             default:
                 ctx->showError("Unknown error creating account" + nameSugg);
                 ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             }
 
@@ -1606,27 +1608,22 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 return;
             case 0x01:
             case 0x010000:
-                if (ctx->shouldCreateAccount()) {
-                    ctx->showInfo("Account does not exist, creating it...");
-                    createAccount(ctx);
-                } else {
-                    ctx->showError("Account does not exist");
-                    ctx->setUsername("");
-                    ctx->setPassword("");
-                    ctx->setState(new C2S_LOGONRESPONSE2());
-                }
+                ctx->showError("Account does not exist");
+                ctx->setUsername("");
+                ctx->setPassword("");
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x02:
             case 0x020000:
                 ctx->showError("Incorrect password");
                 ctx->setPassword("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x06:
             case 0x060000:
                 ctx->showError("Account closed: " + ctx->getMsgIStream()->readString());
                 ctx->setPassword("");
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             default:
                 ctx->setState(new DisconnectedState("unknown logon response"));
@@ -1647,41 +1644,53 @@ private:
     }
 };
 
-void C2S_LOGONRESPONSE2::doOneStep(Context *ctx) {
-    std::string user = ctx->getUsername();
-    uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
-    if (!user.empty() && pw) {
-        BNCSOutputStream logon(0x3a);
-        logon.serialize32(ctx->clientToken);
-        logon.serialize32(ctx->serverToken);
-
-        // Battle.net password hashes are hashed twice using XSHA-1. First, the
-        // password is hashed by itself, then the following data is hashed again
-        // and sent to Battle.net:
-        // (UINT32) Client Token
-        // (UINT32) Server Token
-        // (UINT32)[5] First password hash
-        // The logic below is taken straight from pvpgn
-        struct {
-            pvpgn::bn_int ticks;
-            pvpgn::bn_int sessionkey;
-            pvpgn::bn_int passhash1[5];
-        } temp;
-        uint32_t passhash2[5];
-
-        pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
-        pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
-        pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
-        pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp);	/* do the double hash */
-
-        for (int i = 0; i < 20; i++) {
-            logon.serialize8(reinterpret_cast<uint8_t*>(passhash2)[i]);
-        }
-        logon.serialize(user.c_str());
-        logon.flush(ctx->getTCPSocket());
-
-        ctx->setState(new S2C_LOGONRESPONSE2());
+void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
+  std::string user = ctx->getUsername();
+  uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
+  if (!user.empty() && pw) {
+    if (ctx->shouldCreateAccount()) {
+      BNCSOutputStream msg(0x3d);
+      uint32_t *pw = ctx->getPassword1();
+      for (int i = 0; i < 20; i++) {
+        msg.serialize8(reinterpret_cast<uint8_t *>(pw)[i]);
+      }
+      msg.serialize(ctx->getUsername().c_str());
+      msg.flush(ctx->getTCPSocket());
+      ctx->setState(new S2C_CREATEACCOUNT2());
+      return;
     }
+
+    BNCSOutputStream logon(0x3a);
+    logon.serialize32(ctx->clientToken);
+    logon.serialize32(ctx->serverToken);
+
+    // Battle.net password hashes are hashed twice using XSHA-1. First, the
+    // password is hashed by itself, then the following data is hashed again
+    // and sent to Battle.net:
+    // (UINT32) Client Token
+    // (UINT32) Server Token
+    // (UINT32)[5] First password hash
+    // The logic below is taken straight from pvpgn
+    struct {
+      pvpgn::bn_int ticks;
+      pvpgn::bn_int sessionkey;
+      pvpgn::bn_int passhash1[5];
+    } temp;
+    uint32_t passhash2[5];
+
+    pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
+    pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
+    pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
+    pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp); /* do the double hash */
+
+    for (int i = 0; i < 20; i++) {
+      logon.serialize8(reinterpret_cast<uint8_t *>(passhash2)[i]);
+    }
+    logon.serialize(user.c_str());
+    logon.flush(ctx->getTCPSocket());
+
+    ctx->setState(new S2C_LOGONRESPONSE2());
+  }
 };
 
 class S2C_SID_AUTH_CHECK : public NetworkState {
@@ -1705,7 +1714,7 @@ class S2C_SID_AUTH_CHECK : public NetworkState {
             switch (result) {
             case 0x000:
                 // Passed challenge
-                ctx->setState(new C2S_LOGONRESPONSE2());
+                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x100:
                 // Old game version
