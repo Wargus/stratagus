@@ -1383,13 +1383,13 @@ private:
             ctx->removeUser(username);
             ctx->showInfo(username + " left");
         case 0x04: // recv whisper
-            ctx->showChat(username + " whispers: " + text);
+            ctx->showChat(username + " whispers " + text);
             break;
         case 0x05: // recv chat
             ctx->showChat(username + ": " + text);
             break;
         case 0x06: // recv broadcast
-            ctx->showChat("[BROADCAST]: " + text);
+            ctx->showInfo("[BROADCAST]: " + text);
             break;
         case 0x07: // channel info
             ctx->setCurrentChannel(text);
@@ -1476,6 +1476,9 @@ class C2S_ENTERCHAT : public NetworkState {
         join.flush(ctx->getTCPSocket());
 
         ctx->refreshChannels();
+
+        // TODO: maybe send 0x45 SID_NETGAMEPORT to report our gameport on pvpgn
+        // to whatever the user specified on the cmdline?
 
         ctx->setState(new S2C_ENTERCHAT());
     }
