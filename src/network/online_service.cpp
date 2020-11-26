@@ -1176,6 +1176,34 @@ public:
 
     virtual void doOneStep() { if (this->state != NULL) this->state->doOneStep(this); }
 
+    virtual bool handleUDP(const unsigned char *buffer, int len, CHost host) {
+        if (host.getIp() != getHost()->getIp() || host.getPort() != getHost()->getPort()) {
+            return false;
+        }
+
+        uint8_t id = 0;
+        if (len >= 4) {
+            uint8_t id = buffer[0];
+        }
+        switch (id) {
+        case 0x05:
+            // PKT_SERVERPING
+            // (UINT32) 0x05 0x00 0x00 0x00
+            // (UINT32) UDP Code
+            {
+                const uint32_t udpCode = reinterpret_cast<const uint32_t*>(buffer)[1];
+                BNCSOutputStream udppingresponse(0x14);
+                udppingresponse.serialize32(udpCode);
+                udppingresponse.flush(getTCPSocket());
+            }
+            break;
+        default:
+            // unknown package, ignore
+            break;
+        }
+        return true;
+    }
+
     void setState(NetworkState* newState) {
         assert (newState != this->state);
         if (this->state != NULL) {
@@ -1535,44 +1563,6 @@ class C2S_ENTERCHAT : public NetworkState {
     }
 };
 
-class S2C_PKT_SERVERPING : public NetworkState {
-public:
-    S2C_PKT_SERVERPING() {
-        this->retries = 0;
-    };
-
-    virtual void doOneStep(Context *ctx) {
-        if (ctx->getUDPSocket()->IsValid()) {
-            if (ctx->getUDPSocket()->HasDataToRead(1)) {
-                // PKT_SERVERPING
-                //  (UINT8) 0xFF
-                //  (UINT8) 0x05
-                // (UINT16) 8
-                // (UINT32) UDP Code
-                char buf[8];
-                int received = ctx->getUDPSocket()->Recv(buf, 8, ctx->getHost());
-                if (received == 8) {
-                    uint32_t udpCode = reinterpret_cast<uint32_t*>(buf)[1];
-                    BNCSOutputStream udppingresponse(0x14);
-                    udppingresponse.serialize32(udpCode);
-                    udppingresponse.flush(ctx->getTCPSocket());
-                }
-            } else {
-                retries++;
-                if (retries < 50) {
-                    return;
-                }
-                // we're using a timeout of 1ms, so now we've been waiting at
-                // the very least for 5 seconds... let's skip UDP then
-            }
-        }
-        ctx->setState(new C2S_ENTERCHAT());
-    }
-
-private:
-    int retries;
-};
-
 class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public NetworkState {
   virtual void doOneStep(Context *ctx);
 };
@@ -1674,8 +1664,8 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
 
             switch (status) {
             case 0x00:
-                // success. we need to send SID_UDPPINGRESPONSE before entering chat
-                ctx->setState(new S2C_PKT_SERVERPING());
+                // success. we will send SID_UDPPINGRESPONSE before entering chat
+                ctx->setState(new C2S_ENTERCHAT());
                 return;
             case 0x01:
             case 0x010000:

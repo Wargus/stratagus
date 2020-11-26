@@ -219,6 +219,7 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "online_service.h"
 #include "stratagus.h"
 
 #include <stddef.h>
@@ -863,6 +864,10 @@ void NetworkEvent()
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = false;
+		return;
+	}
+
+	if (OnlineContextHandler->handleUDP(buf, len, host)) {
 		return;
 	}
 

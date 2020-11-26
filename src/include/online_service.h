@@ -3,9 +3,14 @@
 
 #include <string>
 
+#include "network/netsockets.h"
+
 class OnlineContext {
 public:
     virtual ~OnlineContext() { };
+
+    // called in the sdl event loop
+    virtual bool handleUDP(const unsigned char *buffer, int len, CHost host) = 0;
 
     // called in the sdl event loop
     virtual void doOneStep() = 0;
