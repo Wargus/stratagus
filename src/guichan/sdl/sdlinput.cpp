@@ -59,6 +59,8 @@
 #include "guichan/sdl/sdlinput.h"
 #include "guichan/exception.h"
 
+extern uint32_t SDL_CUSTOM_KEY_UP;
+
 namespace gcn
 {
     SDLInput::SDLInput()
@@ -128,19 +130,44 @@ namespace gcn
 
         switch (event.type)
         {
+          case SDL_TEXTINPUT:
+              {
+                  char* text = event.text.text;
+                  if ((uint8_t)text[0] < 128) {
+                      mLastKey = text[0];
+                      mIsRepeating = true;
+                      keyInput.setKey(mLastKey);
+                      keyInput.setType(KeyInput::PRESS);
+                      mKeyInputQueue.push(keyInput);
+                  }
+              }
+              break;
+
+          case SDL_USEREVENT:
+              if (reinterpret_cast<uintptr_t>(event.user.data1) == SDL_CUSTOM_KEY_UP) {
+                  mIsRepeating = false;
+                  keyInput.setKey(static_cast<char>(event.user.code));
+                  keyInput.setType(KeyInput::RELEASE);
+                  mKeyInputQueue.push(keyInput);
+              }
+
           case SDL_KEYDOWN:
-              mLastKey = convertKeyCharacter(event.key.keysym);
-              mIsRepeating = true;
-              keyInput.setKey(mLastKey);
-              keyInput.setType(KeyInput::PRESS);
-              mKeyInputQueue.push(keyInput);
+              if (event.key.keysym.sym < 32 || event.key.keysym.sym > 128) {
+                  mLastKey = convertKeyCharacter(event.key.keysym);
+                  mIsRepeating = true;
+                  keyInput.setKey(mLastKey);
+                  keyInput.setType(KeyInput::PRESS);
+                  mKeyInputQueue.push(keyInput);
+              }
               break;
 
           case SDL_KEYUP:
-              mIsRepeating = false;
-              keyInput.setKey(convertKeyCharacter(event.key.keysym));
-              keyInput.setType(KeyInput::RELEASE);
-              mKeyInputQueue.push(keyInput);
+              if (event.key.keysym.sym < 32 || event.key.keysym.sym > 128) {
+                  mIsRepeating = false;
+                  keyInput.setKey(convertKeyCharacter(event.key.keysym));
+                  keyInput.setType(KeyInput::RELEASE);
+                  mKeyInputQueue.push(keyInput);
+              }
               break;
 
           case SDL_MOUSEBUTTONDOWN:

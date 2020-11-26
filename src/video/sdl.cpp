@@ -106,7 +106,7 @@ static bool CanUseShaders = false;
 
 bool IsSDLWindowVisible = true;
 
-static uint32_t SDL_CUSTOM_KEY_UP;
+uint32_t SDL_CUSTOM_KEY_UP;
 
 /*----------------------------------------------------------------------------
 --  Sync
