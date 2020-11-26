@@ -32,6 +32,7 @@
 //@{
 
 #include "net_message.h"
+#include "network/netsockets.h"
 
 class CHost;
 
@@ -122,6 +123,8 @@ extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client reque
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
+
+extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 //@}
 

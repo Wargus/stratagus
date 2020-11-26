@@ -747,6 +747,10 @@ public:
         msg.flush(getTCPSocket());
     }
 
+    void punchNAT(std::string username) {
+        sendText("/udppunch " + username);
+    }
+
     void refreshChannels() {
         BNCSOutputStream getlist(0x0b);
         // identify as W2BN
@@ -1389,6 +1393,26 @@ private:
             ctx->removeUser(username);
             ctx->showInfo(username + " left");
         case 0x04: // recv whisper
+            if (!text.empty()) {
+                const char *prefix = "/udppunch ";
+                unsigned int a, b, c, d, ip, port;
+                if (text.rfind(prefix, 0)) {
+                    int res = sscanf(text.substr(strlen(prefix)).c_str(), "%uhh.%uhh.%uhh.%uhh:%d", &d, &c, &b, &a, &port);
+                    if (res == 5) {
+                         ip = a | b << 8 | c << 16 | d << 24;
+                         if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
+                             const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
+                             NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
+                         } else {
+                             // the client will connect now and send packages, anyway.
+                             // any other state shouldn't try to udp hole punch at this stage
+                         }
+                         return;
+                    } else {
+                        // incorrect format, fall through and treat as normal whisper;
+                    }
+                }
+            }
             ctx->showChat(username + " whispers " + text);
             break;
         case 0x05: // recv chat
@@ -2168,6 +2192,12 @@ static int CclRequestUserInfo(lua_State *l) {
     return 0;
 }
 
+static int CclPunchNAT(lua_State *l) {
+    LuaCheckArgs(l, 1);
+    _ctx.punchNAT(LuaToString(l, 1));
+    return 0;
+}
+
 void OnlineServiceCclRegister() {
     lua_createtable(Lua, 0, 3);
 
@@ -2202,6 +2232,8 @@ void OnlineServiceCclRegister() {
     lua_setfield(Lua, -2, "startadvertising");
     lua_pushcfunction(Lua, CclStopAdvertisingOnlineGame);
     lua_setfield(Lua, -2, "stopadvertising");
+    lua_pushcfunction(Lua, CclPunchNAT);
+    lua_setfield(Lua, -2, "punchNAT");
 
     lua_setglobal(Lua, "OnlineService");
 }
