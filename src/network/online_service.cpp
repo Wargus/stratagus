@@ -739,6 +739,7 @@ public:
             BNCSOutputStream msg(0x0e);
             msg.serialize(text.c_str());
             msg.flush(getTCPSocket());
+            DebugPrint("TCP Sent: 0x0e CHATCOMMAND\n");
         }
         if (!silent) {
             showChat(username + ": " + txt);
@@ -762,6 +763,7 @@ public:
             msg.serialize(key.c_str());
         }
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x26 USERINFO\n");
     }
 
     void punchNAT(std::string username) {
@@ -775,6 +777,7 @@ public:
         // identify as W2BN
         getlist.serialize32(0x4f);
         getlist.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x0b CHANNELLIST\n");
     }
 
     void refreshGames() {
@@ -789,12 +792,14 @@ public:
         getadvlistex.serialize(""); // no game pw
         getadvlistex.serialize(""); // no game statstring
         getadvlistex.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x09 GAMELIST\n");
     }
 
     void refreshFriends() {
         // C>S 0x65 SID_FRIENDSLIST
         BNCSOutputStream msg(0x65);
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x65 FRIENDSLIST\n");
     }
 
     virtual void joinGame(std::string username, std::string pw) {
@@ -808,6 +813,7 @@ public:
         msg.serialize(gameNameFromUsername(username).c_str());
         msg.serialize(pw.c_str());
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x09 NOTIFYJOIN\n");
     }
 
     virtual void leaveGame() {
@@ -919,6 +925,7 @@ public:
 
         msg.serialize(statstring.str().c_str());
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x1c STARTADVEX\n");
     }
 
     virtual void stopAdvertising() {
@@ -927,6 +934,7 @@ public:
         }
         BNCSOutputStream msg(0x02);
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x02 STOPADVEX\n");
     }
 
     virtual void reportGameResult() {
@@ -959,6 +967,7 @@ public:
         msg.serialize(NetworkMapName.c_str());
         msg.serialize(""); // TODO: transmit player scores
         msg.flush(getTCPSocket());
+        DebugPrint("TCP Sent: 0x2c REPORTRESULT\n");
     }
 
     void joinChannel(std::string name) {
@@ -967,6 +976,7 @@ public:
             join.serialize32(0x02); // forced join
             join.serialize(name.c_str());
             join.flush(getTCPSocket());
+            DebugPrint("TCP Sent: 0x0c JOINCHANNEL\n");
         }
     }
 
@@ -975,6 +985,7 @@ public:
         conntest.serialize32(serverToken);
         conntest.serialize32(udpToken);
         conntest.flush(getUDPSocket(), getHost());
+        DebugPrint("UDP Sent: 0x09 connection info\n");
     }
 
     // UI information
@@ -1217,8 +1228,9 @@ public:
 
         uint8_t id = 0;
         if (len >= 4) {
-            uint8_t id = buffer[0];
+            id = buffer[0];
         }
+        DebugPrint("UDP Recv: 0x%x\n" _C_ id);
         switch (id) {
         case 0x05:
             // PKT_SERVERPING
@@ -1229,6 +1241,7 @@ public:
                 BNCSOutputStream udppingresponse(0x14);
                 udppingresponse.serialize32(udpCode);
                 udppingresponse.flush(getTCPSocket());
+                DebugPrint("TCP Sent: 0x14 UDPPINGRESPONSE\n");
             }
             break;
         default:
@@ -1326,6 +1339,7 @@ public:
             BNCSOutputStream keepalive(0x07, true);
             keepalive.serialize32(ticks);
             keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
+            DebugPrint("UDP Sent: 0x07 PKT_KEEPALIVE\n");
         }
 
         if ((ticks % 2000) == 0) {
@@ -1351,6 +1365,7 @@ public:
                 // try again next time
                 return;
             }
+            DebugPrint("TCP Recv: 0x%x\n" _C_ msg);
 
             switch (msg) {
             case 0x00: // SID_NULL
@@ -1404,6 +1419,7 @@ private:
     void handleNull(Context *ctx) {
         BNCSOutputStream buffer(0x00);
         send(ctx, &buffer);
+        DebugPrint("TCP Sent: 0x00 NULL\n");
     }
 
     void handlePing(Context *ctx) {
@@ -1411,6 +1427,7 @@ private:
         BNCSOutputStream buffer(0x25);
         buffer.serialize32(htonl(pingValue));
         send(ctx, &buffer);
+        DebugPrint("TCP Sent: 0x25 PING\n");
     }
 
     void handleGamelist(Context *ctx) {
@@ -1491,6 +1508,7 @@ private:
                          if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
                              const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
                              NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
+                             DebugPrint("UDP Sent: UDP punch\n");
                          } else {
                              // the client will connect now and send packages, anyway.
                              // any other state shouldn't try to udp hole punch at this stage
@@ -1549,6 +1567,7 @@ class S2C_ENTERCHAT : public NetworkState {
                 return;
             }
             if (msg == 0x3a) {
+                DebugPrint("TCP Recv: 0x3a LOGONRESPONSE\n");
                 // pvpgn seems to send a successful logonresponse again
                 uint32_t status = ctx->getMsgIStream()->read32();
                 assert(status == 0);
@@ -1560,6 +1579,7 @@ class S2C_ENTERCHAT : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Recv: 0x0a ENTERCHAT\n");
 
             std::string uniqueName = ctx->getMsgIStream()->readString();
             std::string statString = ctx->getMsgIStream()->readString();
@@ -1585,6 +1605,7 @@ class C2S_ENTERCHAT : public NetworkState {
         enterchat.serialize(ctx->getUsername().c_str());
         enterchat.serialize("");
         enterchat.flush(ctx->getTCPSocket());
+        DebugPrint("TCP Sent: 0x0a ENTERCHAT\n");
 
         ctx->refreshChannels();
 
@@ -1592,6 +1613,7 @@ class C2S_ENTERCHAT : public NetworkState {
         join.serialize32(0x01); // first-join
         join.serialize(gameName().c_str());
         join.flush(ctx->getTCPSocket());
+        DebugPrint("TCP Sent: 0x0c JOINCHANNEL\n");
 
         ctx->refreshChannels();
 
@@ -1619,6 +1641,7 @@ class S2C_CREATEACCOUNT2 : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Recv: 0x3d CREATEACCOUNT\n");
 
             uint32_t status = ctx->getMsgIStream()->read32();
             std::string nameSugg = ctx->getMsgIStream()->readString();
@@ -1697,6 +1720,7 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Sent: 0x3a LOGONRESPONSE\n");
 
             uint32_t status = ctx->getMsgIStream()->read32();
             ctx->getMsgIStream()->finishMessage();
@@ -1744,6 +1768,7 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
       }
       msg.serialize(ctx->getUsername().c_str());
       msg.flush(ctx->getTCPSocket());
+      DebugPrint("TCP Sent: 0x3d CREATEACOUNT\n");
       ctx->setState(new S2C_CREATEACCOUNT2());
       return;
     }
@@ -1776,6 +1801,7 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
     }
     logon.serialize(user.c_str());
     logon.flush(ctx->getTCPSocket());
+    DebugPrint("TCP Sent: 0x3a LOGIN\n");
 
     ctx->setState(new S2C_LOGONRESPONSE2());
   }
@@ -1794,6 +1820,7 @@ class S2C_SID_AUTH_CHECK : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Recv: 0x51 AUTH_CHECK\n");
 
             uint32_t result = ctx->getMsgIStream()->read32();
             std::string info = ctx->getMsgIStream()->readString();
@@ -1854,6 +1881,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Recv: 0x50 AUTH_INFO\n");
 
             uint32_t logonType = ctx->getMsgIStream()->read32();
             assert(logonType == 0x00); // only support Broken SHA-1 logon for now
@@ -1895,6 +1923,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             // Key owner name
             check.serialize(DESCRIPTION);
             check.flush(ctx->getTCPSocket());
+            DebugPrint("TCP Sent: 0x51 AUTH_CHECK\n");
 
             ctx->setState(new S2C_SID_AUTH_CHECK());
         }
@@ -1915,6 +1944,7 @@ class S2C_SID_PING : public NetworkState {
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
             }
+            DebugPrint("TCP Recv: 0x25 PING\n");
             uint32_t pingValue = ctx->getMsgIStream()->read32();
             ctx->getMsgIStream()->finishMessage();
 
@@ -1922,6 +1952,7 @@ class S2C_SID_PING : public NetworkState {
             BNCSOutputStream buffer(0x25);
             buffer.serialize32(htonl(pingValue));
             send(ctx, &buffer);
+            DebugPrint("TCP Sent: 0x25 PING\n");
 
             ctx->setState(new S2C_SID_AUTH_INFO());
         }
@@ -2023,6 +2054,7 @@ class ConnectState : public NetworkState {
         buffer.serialize("United States");
 
         send(ctx, &buffer);
+        DebugPrint("TCP Sent: 0x50 AUTH_INFO\n");
         ctx->setState(new S2C_SID_PING());
     }
 };
