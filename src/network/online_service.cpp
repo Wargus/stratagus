@@ -56,6 +56,35 @@
 
 #include "./xsha1.h"
 
+static void dump(uint8_t* buffer, int received_bytes) {
+    std::cout << "Raw contents >>>" << std::endl;
+    for (int i = 0; i < received_bytes; i += 8) {
+        std::cout << std::hex;
+        int j = i;
+        for (; j < received_bytes && j < (i + 8); j++) {
+            uint8_t byte = buffer[j];
+            if (byte < 0x10) {
+                std::cout << "0";
+            }
+            std::cout << (unsigned short)byte << " ";
+        }
+        for (; j < (i + 9); j++) {
+            std::cout << "   "; // room for 2 hex digits and one space
+        }
+        j = i;
+        for (; j < received_bytes && j < (i + 8); j++) {
+            char c = buffer[j];
+            if (c >= 32) {
+                std::cout.write(&c, 1);
+            } else {
+                std::cout.write(".", 1);
+            }
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "<<<" << std::endl;
+}
+
 class BNCSInputStream {
 public:
     BNCSInputStream(CTCPSocket *socket) {
@@ -139,35 +168,6 @@ public:
         *out = (char*)calloc(received_bytes, sizeof(char));
         strncpy(*out, buffer, received_bytes);
         return received_bytes;
-    }
-
-    void dump() {
-        std::cout << "Raw contents >>>" << std::endl;
-        for (int i = 0; i < received_bytes; i += 8) {
-            std::cout << std::hex;
-            int j = i;
-            for (; j < received_bytes && j < (i + 8); j++) {
-                uint8_t byte = buffer[j];
-                if (byte < 0x10) {
-                    std::cout << "0";
-                }
-                std::cout << (unsigned short)byte << " ";
-            }
-            for (; j < (i + 9); j++) {
-                std::cout << "   "; // room for 2 hex digits and one space
-            }
-            j = i;
-            for (; j < received_bytes && j < (i + 8); j++) {
-                char c = buffer[j];
-                if (c >= 32) {
-                    std::cout.write(&c, 1);
-                } else {
-                    std::cout.write(".", 1);
-                }
-            }
-            std::cout << std::endl;
-        }
-        std::cout << "<<<" << std::endl;
     }
 
     std::string string32() {
