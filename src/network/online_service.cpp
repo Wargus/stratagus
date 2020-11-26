@@ -1238,20 +1238,22 @@ public:
     }
 
     virtual void doOneStep(Context *ctx) {
-        if ((ticks % 5000) == 0) {
+        if ((ticks % 500) == 0) {
             // C>S 0x07 PKT_KEEPALIVE
-            // ~5000 frames @ ~50fps ~= 100 seconds
+            // ~500 frames @ ~50fps ~= 10 seconds
             BNCSOutputStream keepalive(0x07);
             keepalive.serialize32(ticks);
             keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
         }
 
-        if ((ticks % 5000) == 0) {
+        if ((ticks % 2000) == 0) {
+            // ~2000 frames @ ~50fps ~= 40 seconds
             ctx->refreshFriends();
             ctx->refreshChannels();
         }
 
-        if ((ticks % 300) == 0) {
+        if ((ticks % 500) == 0) {
+            // ~300 frames @ ~50fps ~= 10 seconds
             ctx->refreshGames();
         }
 
