@@ -1340,7 +1340,7 @@ private:
     void handlePing(Context *ctx) {
         uint32_t pingValue = ctx->getMsgIStream()->read32();
         BNCSOutputStream buffer(0x25);
-        buffer.serialize32(pingValue);
+        buffer.serialize32(htonl(pingValue));
         send(ctx, &buffer);
     }
 
@@ -1903,7 +1903,7 @@ class S2C_SID_PING : public NetworkState {
 
             // immediately respond with C2S_SID_PING
             BNCSOutputStream buffer(0x25);
-            buffer.serialize32(pingValue);
+            buffer.serialize32(htonl(pingValue));
             send(ctx, &buffer);
 
             ctx->setState(new S2C_SID_AUTH_INFO());
