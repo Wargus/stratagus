@@ -1441,10 +1441,10 @@ private:
             ctx->showInfo(username + " left");
         case 0x04: // recv whisper
             if (!text.empty()) {
-                const char *prefix = "/udppunch ";
+                std::string prefix = "/udppunch ";
                 unsigned int a, b, c, d, ip, port;
-                if (text.rfind(prefix, 0)) {
-                    int res = sscanf(text.substr(strlen(prefix)).c_str(), "%uhh.%uhh.%uhh.%uhh:%d", &d, &c, &b, &a, &port);
+                if (text.size() > prefix.size() && text.rfind(prefix, 0)) {
+                    int res = sscanf(text.substr(prefix.size()).c_str(), "%uhh.%uhh.%uhh.%uhh:%d", &d, &c, &b, &a, &port);
                     if (res == 5) {
                          ip = a | b << 8 | c << 16 | d << 24;
                          if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
