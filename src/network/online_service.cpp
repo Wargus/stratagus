@@ -728,7 +728,7 @@ public:
         setPassword("");
     }
 
-    void sendText(std::string txt) {
+    void sendText(std::string txt, bool silent = false) {
         // C>S 0x0E SID_CHATCOMMAND
         int pos = 0;
         for (unsigned int pos = 0; pos < txt.size(); pos += 220) {
@@ -740,7 +740,15 @@ public:
             msg.serialize(text.c_str());
             msg.flush(getTCPSocket());
         }
-        showChat(username + ": " + txt);
+        if (!silent) {
+            showChat(username + ": " + txt);
+        }
+    }
+
+    void requestExternalAddress() {
+        // uses the /netinfo command to get which ip:port the server sees from us
+        sendText("/netinfo", true);
+        requestedAddress = true;
     }
 
     void requestExtraUserInfo(std::string username) {
@@ -757,7 +765,9 @@ public:
     }
 
     void punchNAT(std::string username) {
-        sendText("/udppunch " + username);
+        if (externalAddress.isValid()) {
+            sendText("/whisper " + username + " /udppunch " + externalAddress.toString());
+        }
     }
 
     void refreshChannels() {
@@ -1049,6 +1059,30 @@ public:
     std::queue<std::string> *getInfo() { return &info; }
 
     void showInfo(std::string arg) {
+        if (requestedAddress) {
+            // we have requested our external address from the server
+            DebugPrint("Requested Address Info: %s\n" _C_ arg.c_str());
+            if (arg.find("Server TCP: ") != std::string::npos || arg.find("Client TCP: ") != std::string::npos) {
+                // ignore
+                return;
+            }
+            if (arg.find("Client UDP: ") != std::string::npos) {
+                unsigned int a, b, c, d, ip, port;
+                unsigned char prefix[256]; // longer than any BNet message can be
+                int res = sscanf(arg.c_str(), "%s %s %d.%d.%d.%d:%d", prefix, prefix, &a, &b, &c, &d, &port);
+                if (res == 7 && a < 255 && b < 255 && c < 255 && d < 255 && port > 1024) {
+                    ip = a | b << 8 | c << 16 | d << 24;
+                    externalAddress = CHost(ip, port);
+                    DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
+                }
+                return;
+            }
+            if (arg.find("Game UDP: ") != std::string::npos) {
+                // this is the last line in the /netinfo response
+                requestedAddress = false;
+                return;
+            }
+        }
         std::string infoStr = arg;
         info.push(infoStr);
         if (ShowInfo != NULL) {
@@ -1243,6 +1277,9 @@ private:
     bool hasPassword;
     bool createAccount;
 
+    bool requestedAddress = false;
+    CHost externalAddress;
+
     std::string lastError;
 
     std::string currentChannel;
@@ -1300,6 +1337,10 @@ public:
         if ((ticks % 500) == 0) {
             // ~300 frames @ ~50fps ~= 10 seconds
             ctx->refreshGames();
+        }
+
+        if (ticks == 50) {
+            ctx->requestExternalAddress();
         }
 
         ticks++;
@@ -1531,8 +1572,6 @@ class S2C_ENTERCHAT : public NetworkState {
             }
 
             ctx->requestExtraUserInfo(ctx->getUsername());
-            // send again
-            ctx->sendUdpConnectionInfo();
 
             ctx->setState(new S2C_CHATEVENT());
         }
@@ -1690,18 +1729,6 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 ctx->setState(new DisconnectedState("unknown logon response"));
             }
         }
-    }
-
-private:
-    void createAccount(Context *ctx) {
-        BNCSOutputStream msg(0x3d);
-        uint32_t *pw = ctx->getPassword1();
-        for (int i = 0; i < 20; i++) {
-            msg.serialize8(reinterpret_cast<uint8_t*>(pw)[i]);
-        }
-        msg.serialize(ctx->getUsername().c_str());
-        msg.flush(ctx->getTCPSocket());
-        ctx->setState(new S2C_CREATEACCOUNT2());
     }
 };
 
