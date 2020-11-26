@@ -960,6 +960,13 @@ public:
         }
     }
 
+    void sendUdpConnectionInfo() {
+        BNCSOutputStream conntest(0x09, true);
+        conntest.serialize32(serverToken);
+        conntest.serialize32(udpToken);
+        conntest.flush(getUDPSocket(), getHost());
+    }
+
     // UI information
     void setCurrentChannel(std::string name) {
         this->currentChannel = name;
@@ -1179,6 +1186,7 @@ public:
 
     uint32_t clientToken;
     uint32_t serverToken;
+    uint32_t udpToken;
 
     LuaCallback *AddUser = NULL;
     LuaCallback *RemoveUser = NULL;
@@ -1250,7 +1258,7 @@ public:
         if ((ticks % 500) == 0) {
             // C>S 0x07 PKT_KEEPALIVE
             // ~500 frames @ ~50fps ~= 10 seconds
-            BNCSOutputStream keepalive(0x07);
+            BNCSOutputStream keepalive(0x07, true);
             keepalive.serialize32(ticks);
             keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
         }
@@ -1495,6 +1503,8 @@ class S2C_ENTERCHAT : public NetworkState {
             }
 
             ctx->requestExtraUserInfo(ctx->getUsername());
+            // send again
+            ctx->sendUdpConnectionInfo();
 
             ctx->setState(new S2C_CHATEVENT());
         }
@@ -1832,17 +1842,15 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             assert(logonType == 0x00); // only support Broken SHA-1 logon for now
             uint32_t serverToken = ctx->getMsgIStream()->read32();
             ctx->serverToken = htonl(serverToken); // keep in network order
-            uint32_t udpValue = ctx->getMsgIStream()->read32();
+            uint32_t udpToken = ctx->getMsgIStream()->read32();
+            ctx->udpToken = htonl(udpToken);
             uint64_t mpqFiletime = ctx->getMsgIStream()->readFiletime();
             std::string mpqFilename = ctx->getMsgIStream()->readString();
             std::string formula = ctx->getMsgIStream()->readString();
             ctx->getMsgIStream()->finishMessage();
 
             // immediately respond with pkt_conntest2 udp msg
-            BNCSOutputStream conntest(0x09);
-            conntest.serialize32(serverToken);
-            conntest.serialize32(udpValue);
-            conntest.flush(ctx->getUDPSocket(), ctx->getHost());
+            ctx->sendUdpConnectionInfo();
 
             // immediately respond with SID_AUTH_CHECK
             BNCSOutputStream check(0x51);
