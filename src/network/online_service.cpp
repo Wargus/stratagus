@@ -237,18 +237,25 @@ private:
 
 class BNCSOutputStream {
 public:
-    BNCSOutputStream(uint8_t id) {
+    BNCSOutputStream(uint8_t id, bool udp = false) {
         // Every BNCS message has the same header:
         //  (UINT8) Always 0xFF
         //  (UINT8) Message ID
         // (UINT16) Message length, including this header
         //   (VOID) Message data
+        // The UDP messages are instead 4 bytes for the id, then the content
         this->sz = 16;
         this->buf = (uint8_t*) calloc(sizeof(uint8_t), this->sz);
         this->pos = 0;
-        serialize8(0xff);
-        serialize8(id);
-        this->length_pos = pos;
+        if (udp) {
+            serialize8(id);
+            serialize8(0);
+            this->length_pos = -1;
+        } else {
+            serialize8(0xff);
+            serialize8(id);
+            this->length_pos = pos;
+        }
         serialize16((uint16_t)0);
     };
     ~BNCSOutputStream() {
@@ -303,9 +310,11 @@ public:
 
 private:
     uint8_t *getBuffer() {
-        // insert length to make it a valid buffer
-        uint16_t *view = reinterpret_cast<uint16_t *>(buf + length_pos);
-        *view = pos;
+        // if needed, insert length to make it a valid buffer
+        if (length_pos >= 0) {
+            uint16_t *view = reinterpret_cast<uint16_t *>(buf + length_pos);
+            *view = pos;
+        }
         return buf;
     };
 
