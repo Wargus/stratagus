@@ -709,6 +709,9 @@ public:
             BNCSOutputStream leave(0x10);
             leave.flush(tcpSocket);
         }
+        if (canDoUdp == 1) {
+            ExitNetwork1();
+        }
         tcpSocket->Close();
         state = NULL;
         clientToken = MyRand();
@@ -1133,11 +1136,14 @@ public:
 
     CUDPSocket *getUDPSocket() {
         if (!NetworkFildes.IsValid()) {
-            if (canDoUdp) {
+            if (canDoUdp == -1) {
                 InitNetwork1();
-                if (!NetworkFildes.IsValid()) {
+                if (NetworkFildes.IsValid()) {
+                    // I started it, so I'll shut it down
+                    canDoUdp = 1;
+                } else {
                     // do not try again
-                    canDoUdp = false;
+                    canDoUdp = 0;
                 }
             }
         }
@@ -1179,7 +1185,7 @@ private:
 
     NetworkState *state;
     CHost *host;
-    bool canDoUdp;
+    int8_t canDoUdp = -1; // -1,0,1 --- not tried, doesn't work, I created it
     CTCPSocket *tcpSocket;
     BNCSInputStream *istream;
 
