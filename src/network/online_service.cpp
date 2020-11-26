@@ -748,8 +748,10 @@ public:
 
     void requestExternalAddress() {
         // uses the /netinfo command to get which ip:port the server sees from us
-        sendText("/netinfo", true);
-        requestedAddress = true;
+        if (!externalAddress.isValid()) {
+            sendText("/netinfo", true);
+            requestedAddress = true;
+        }
     }
 
     void requestExtraUserInfo(std::string username) {
@@ -1012,6 +1014,9 @@ public:
     std::string getCurrentChannel() { return currentChannel; }
 
     void setGamelist(std::vector<Game*> games) {
+        // before we are able to join any game, we should try to get our own
+        // external address to help NAT traversal
+        requestExternalAddress();
         for (const auto value : this->games) {
             delete value;
         }
@@ -1073,10 +1078,6 @@ public:
         if (requestedAddress) {
             // we have requested our external address from the server
             DebugPrint("Requested Address Info: %s\n" _C_ arg.c_str());
-            if (arg.find("Server TCP: ") != std::string::npos || arg.find("Client TCP: ") != std::string::npos) {
-                // ignore
-                return;
-            }
             if (arg.find("Client UDP: ") != std::string::npos) {
                 unsigned int a, b, c, d, ip, port;
                 unsigned char prefix[256]; // longer than any BNet message can be
@@ -1086,12 +1087,10 @@ public:
                     externalAddress = CHost(ip, port);
                     DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
                 }
-                return;
             }
             if (arg.find("Game UDP: ") != std::string::npos) {
                 // this is the last line in the /netinfo response
                 requestedAddress = false;
-                return;
             }
         }
         std::string infoStr = arg;
@@ -1333,28 +1332,24 @@ public:
     }
 
     virtual void doOneStep(Context *ctx) {
-        if ((ticks % 500) == 0) {
+        if ((ticks % 1000) == 0) {
             // C>S 0x07 PKT_KEEPALIVE
-            // ~500 frames @ ~50fps ~= 10 seconds
+            // ~1000 frames @ ~50fps ~= 20 seconds
             BNCSOutputStream keepalive(0x07, true);
             keepalive.serialize32(ticks);
             keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
             DebugPrint("UDP Sent: 0x07 PKT_KEEPALIVE\n");
         }
 
-        if ((ticks % 2000) == 0) {
-            // ~2000 frames @ ~50fps ~= 40 seconds
+        if ((ticks % 10000) == 0) {
+            // ~10000 frames @ ~50fps ~= 200 seconds
             ctx->refreshFriends();
             ctx->refreshChannels();
         }
 
-        if ((ticks % 500) == 0) {
-            // ~300 frames @ ~50fps ~= 10 seconds
+        if ((ticks % 1000) == 0) {
+            // ~1000 frames @ ~50fps ~= 20 seconds
             ctx->refreshGames();
-        }
-
-        if (ticks == 50) {
-            ctx->requestExternalAddress();
         }
 
         ticks++;
