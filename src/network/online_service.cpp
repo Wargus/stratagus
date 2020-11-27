@@ -1879,7 +1879,8 @@ class S2C_SID_AUTH_INFO : public NetworkState {
             DebugPrint("TCP Recv: 0x50 AUTH_INFO\n");
 
             uint32_t logonType = ctx->getMsgIStream()->read32();
-            assert(logonType == 0x00); // only support Broken SHA-1 logon for now
+            // assert(logonType == 0x00); // only support Broken SHA-1 logon for now
+            DebugPrint("logonType: 0x%x\n" _C_ logonType);
             uint32_t serverToken = ctx->getMsgIStream()->read32();
             ctx->serverToken = htonl(serverToken); // keep in network order
             uint32_t udpToken = ctx->getMsgIStream()->read32();
