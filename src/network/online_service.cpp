@@ -244,8 +244,6 @@ public:
         // (UINT16) Message length, including this header
         //   (VOID) Message data
         // The UDP messages are instead 4 bytes for the id, then the content
-        this->sz = 16;
-        this->buf = (uint8_t*) calloc(sizeof(uint8_t), this->sz);
         this->pos = 0;
         if (udp) {
             serialize8(id);
@@ -258,8 +256,8 @@ public:
         }
         serialize16((uint16_t)0);
     };
+
     ~BNCSOutputStream() {
-        free(buf);
     };
 
     void serialize32(uint32_t data) {
@@ -319,16 +317,12 @@ private:
     };
 
     void ensureSpace(size_t required) {
-        if (pos + required >= sz) {
-            sz = sz * 2;
-            buf = (uint8_t*) realloc(buf, sz);
-            assert(buf != NULL);
-        }
+        assert(pos + required < MAX_MSG_SIZE);
     }
 
-    uint8_t *buf;
-    unsigned int sz;
-    unsigned int pos;
+    static const uint32_t MAX_MSG_SIZE = 1024; // 1kb for an outgoing message should be plenty
+    uint8_t buf[MAX_MSG_SIZE];
+    unsigned int pos = 0;
     int length_pos;
 };
 
@@ -1033,13 +1027,14 @@ public:
             delete value;
         }
         if (requestedAddress && !externalAddress.isValid()) {
-            for (int i = 0; i < games.size(); i++) {
+            for (unsigned int i = 0; i < games.size(); i++) {
                 const auto game = games[i];
                 if (game->getCreator() == getUsername() && game->getMap() == "udp") {
                     // our fake game, remove and break;
                     games.erase(games.begin() + i);
                     externalAddress = game->getHost();
                     DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
+                    showInfo("Your external route is " + externalAddress.toString());
                     stopAdvertising();
                     break;
                 }
@@ -1089,7 +1084,7 @@ public:
             ShowUserInfo->pushPreamble();
             std::map<std::string, std::variant<std::string, int>> m;
             m["User"] = extendedInfoNames.at(id);
-            for (int i = 0; i < values.size(); i++) {
+            for (unsigned int i = 0; i < values.size(); i++) {
                 m[defaultUserKeys.at(i)] = values.at(i);
             }
             ShowUserInfo->pushTable(m);
