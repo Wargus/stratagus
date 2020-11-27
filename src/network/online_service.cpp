@@ -747,10 +747,23 @@ public:
     }
 
     void requestExternalAddress() {
-        // uses the /netinfo command to get which ip:port the server sees from us
-        if (!externalAddress.isValid()) {
-            sendText("/netinfo", true);
+        // start advertising a fake game so we can see our external address in the gamelist
+        if (!requestedAddress) {
             requestedAddress = true;
+            BNCSOutputStream msg(0x1c);
+            msg.serialize32(0x10000000);
+            msg.serialize32(0x00); // uptime
+            msg.serialize16(0x0300); // game type
+            msg.serialize16(0x0100); // sub game type
+            msg.serialize32(0xff); // provider version constant
+            msg.serialize32(0x00); // not ladder
+            msg.serialize(""); // game name
+            msg.serialize(""); // password
+            std::string statstring = ",,,0x04,0x00,0x0a,0x01,0x1234,0x4000,";
+            statstring += getUsername() + "\rudp\r";
+            msg.serialize(statstring.c_str());
+            msg.flush(getTCPSocket());
+            DebugPrint("TCP Sent: 0x1c STARTADVEX\n");
         }
     }
 
@@ -1016,9 +1029,21 @@ public:
     void setGamelist(std::vector<Game*> games) {
         // before we are able to join any game, we should try to get our own
         // external address to help NAT traversal
-        requestExternalAddress();
         for (const auto value : this->games) {
             delete value;
+        }
+        if (requestedAddress && !externalAddress.isValid()) {
+            for (int i = 0; i < games.size(); i++) {
+                const auto game = games[i];
+                if (game->getCreator() == getUsername() && game->getMap() == "udp") {
+                    // our fake game, remove and break;
+                    games.erase(games.begin() + i);
+                    externalAddress = game->getHost();
+                    DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
+                    stopAdvertising();
+                    break;
+                }
+            }
         }
         this->games = games;
         if (SetGames != NULL) {
@@ -1075,24 +1100,6 @@ public:
     std::queue<std::string> *getInfo() { return &info; }
 
     void showInfo(std::string arg) {
-        if (requestedAddress) {
-            // we have requested our external address from the server
-            DebugPrint("Requested Address Info: %s\n" _C_ arg.c_str());
-            if (arg.find("Client UDP: ") != std::string::npos) {
-                unsigned int a, b, c, d, ip, port;
-                unsigned char prefix[256]; // longer than any BNet message can be
-                int res = sscanf(arg.c_str(), "%s %s %d.%d.%d.%d:%d", prefix, prefix, &a, &b, &c, &d, &port);
-                if (res == 7 && a < 255 && b < 255 && c < 255 && d < 255 && port > 1024) {
-                    ip = a | b << 8 | c << 16 | d << 24;
-                    externalAddress = CHost(ip, port);
-                    DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
-                }
-            }
-            if (arg.find("Game UDP: ") != std::string::npos) {
-                // this is the last line in the /netinfo response
-                requestedAddress = false;
-            }
-        }
         std::string infoStr = arg;
         info.push(infoStr);
         if (ShowInfo != NULL) {
@@ -1347,8 +1354,8 @@ public:
             ctx->refreshChannels();
         }
 
-        if ((ticks % 1000) == 0) {
-            // ~1000 frames @ ~50fps ~= 20 seconds
+        if ((ticks % 500) == 0) {
+            // ~1000 frames @ ~50fps ~= 10 seconds
             ctx->refreshGames();
         }
 
@@ -1450,7 +1457,7 @@ private:
 
 
     void handleFriendlist(Context *ctx) {
-        uint32_t cnt = ctx->getMsgIStream()->read32();
+        uint8_t cnt = ctx->getMsgIStream()->read8();
         std::vector<Friend*> friends;
         while (cnt--) {
             std::string user = ctx->getMsgIStream()->readString();
@@ -1540,7 +1547,7 @@ private:
             ctx->showInfo("Channel restricted");
             break;
         case 0x12: // general info text
-            ctx->showInfo("~<" + text + "~>");
+            ctx->showInfo(text);
             break;
         case 0x13: // error message
             ctx->showError(text);
@@ -1587,6 +1594,7 @@ class S2C_ENTERCHAT : public NetworkState {
             }
 
             ctx->requestExtraUserInfo(ctx->getUsername());
+            ctx->requestExternalAddress();
 
             ctx->setState(new S2C_CHATEVENT());
         }
@@ -1609,8 +1617,6 @@ class C2S_ENTERCHAT : public NetworkState {
         join.serialize(gameName().c_str());
         join.flush(ctx->getTCPSocket());
         DebugPrint("TCP Sent: 0x0c JOINCHANNEL\n");
-
-        ctx->refreshChannels();
 
         // TODO: maybe send 0x45 SID_NETGAMEPORT to report our gameport on pvpgn
         // to whatever the user specified on the cmdline?
