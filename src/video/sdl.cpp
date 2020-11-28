@@ -604,8 +604,9 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 	}
 
-	Assert(&callbacks == GetCallbacks());
-	handleInput(&event);
+	if (&callbacks == GetCallbacks()) {
+		handleInput(&event);
+	}
 }
 
 /**
