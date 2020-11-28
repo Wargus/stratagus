@@ -1757,6 +1757,7 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
   uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
   if (!user.empty() && pw) {
     if (ctx->shouldCreateAccount()) {
+      ctx->setCreateAccount(false);
       BNCSOutputStream msg(0x3d);
       uint32_t *pw = ctx->getPassword1();
       for (int i = 0; i < 20; i++) {
