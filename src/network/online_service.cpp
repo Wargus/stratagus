@@ -1012,9 +1012,9 @@ public:
             setChannels(channelList);
         }
         if (SetActiveChannel != NULL) {
-          SetActiveChannel->pushPreamble();
-          SetActiveChannel->pushString(name);
-          SetActiveChannel->run();
+            SetActiveChannel->pushPreamble();
+            SetActiveChannel->pushString(name);
+            SetActiveChannel->run();
         }
     }
 
@@ -1042,20 +1042,20 @@ public:
         }
         this->games = games;
         if (SetGames != NULL) {
-          SetGames->pushPreamble();
-          for (const auto value : games) {
-            SetGames->pushTable({{"Creator", value->getCreator()},
-                                 {"Host", value->getHost().toString()},
-                                 {"IsSavedGame", value->isSavedGame()},
-                                 {"Map", value->getMap()},
-                                 {"MaxPlayers", value->maxPlayers()},
-                                 {"Speed", value->getSpeed()},
-                                 {"Approval", value->getApproval()},
-                                 {"Settings", value->getGameSettings()},
-                                 {"Status", value->getGameStatus()},
-                                 {"Type", value->getGameType()}});
-          }
-          SetGames->run();
+            SetGames->pushPreamble();
+            for (const auto value : games) {
+                SetGames->pushTable({{"Creator", value->getCreator()},
+                                     {"Host", value->getHost().toString()},
+                                     {"IsSavedGame", value->isSavedGame()},
+                                     {"Map", value->getMap()},
+                                     {"MaxPlayers", value->maxPlayers()},
+                                     {"Speed", value->getSpeed()},
+                                     {"Approval", value->getApproval()},
+                                     {"Settings", value->getGameSettings()},
+                                     {"Status", value->getGameStatus()},
+                                     {"Type", value->getGameType()}});
+            }
+            SetGames->run();
         }
     }
 
@@ -1066,7 +1066,7 @@ public:
             delete value;
         }
         this->friends = friends;
-        if (SetFriends != NULL) {            
+        if (SetFriends != NULL) {
             SetFriends->pushPreamble();
             for (const auto value : friends) {
                 SetFriends->pushTable({ { "Name", value->getName() },
@@ -1144,7 +1144,7 @@ public:
 
     void setChannels(std::vector<std::string> channels) {
         this->channelList = channels;
-        if (SetChannels != NULL) {            
+        if (SetChannels != NULL) {
             SetChannels->pushPreamble();
             for (const auto value : channels) {
                 SetChannels->pushString(value);
@@ -1501,16 +1501,16 @@ private:
                 if (text.size() > prefix.size() && text.rfind(prefix, 0) != std::string::npos) {
                     int res = sscanf(text.substr(prefix.size()).c_str(), "%d.%d.%d.%d:%d", &a, &b, &c, &d, &port);
                     if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port > 1024) {
-                         ip = a | b << 8 | c << 16 | d << 24;
-                         if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
-                             const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
-                             NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
-                             DebugPrint("UDP Sent: UDP punch\n");
-                         } else {
-                             // the client will connect now and send packages, anyway.
-                             // any other state shouldn't try to udp hole punch at this stage
-                         }
-                         return;
+                        ip = a | b << 8 | c << 16 | d << 24;
+                        if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
+                            const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
+                            NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
+                            DebugPrint("UDP Sent: UDP punch\n");
+                        } else {
+                            // the client will connect now and send packages, anyway.
+                            // any other state shouldn't try to udp hole punch at this stage
+                        }
+                        return;
                     } else {
                         // incorrect format, fall through and treat as normal whisper;
                     }
@@ -1621,7 +1621,7 @@ class C2S_ENTERCHAT : public NetworkState {
 };
 
 class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public NetworkState {
-  virtual void doOneStep(Context *ctx);
+    virtual void doOneStep(Context *ctx);
 };
 
 class S2C_CREATEACCOUNT2 : public NetworkState {
@@ -1753,55 +1753,55 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
 };
 
 void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
-  std::string user = ctx->getUsername();
-  uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
-  if (!user.empty() && pw) {
-    if (ctx->shouldCreateAccount()) {
-      ctx->setCreateAccount(false);
-      BNCSOutputStream msg(0x3d);
-      uint32_t *pw = ctx->getPassword1();
-      for (int i = 0; i < 20; i++) {
-        msg.serialize8(reinterpret_cast<uint8_t *>(pw)[i]);
-      }
-      msg.serialize(ctx->getUsername().c_str());
-      msg.flush(ctx->getTCPSocket());
-      DebugPrint("TCP Sent: 0x3d CREATEACOUNT\n");
-      ctx->setState(new S2C_CREATEACCOUNT2());
-      return;
+    std::string user = ctx->getUsername();
+    uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
+    if (!user.empty() && pw) {
+        if (ctx->shouldCreateAccount()) {
+            ctx->setCreateAccount(false);
+            BNCSOutputStream msg(0x3d);
+            uint32_t *pw = ctx->getPassword1();
+            for (int i = 0; i < 20; i++) {
+                msg.serialize8(reinterpret_cast<uint8_t *>(pw)[i]);
+            }
+            msg.serialize(ctx->getUsername().c_str());
+            msg.flush(ctx->getTCPSocket());
+            DebugPrint("TCP Sent: 0x3d CREATEACOUNT\n");
+            ctx->setState(new S2C_CREATEACCOUNT2());
+            return;
+        }
+
+        BNCSOutputStream logon(0x3a);
+        logon.serialize32(ctx->clientToken);
+        logon.serialize32(ctx->serverToken);
+
+        // Battle.net password hashes are hashed twice using XSHA-1. First, the
+        // password is hashed by itself, then the following data is hashed again
+        // and sent to Battle.net:
+        // (UINT32) Client Token
+        // (UINT32) Server Token
+        // (UINT32)[5] First password hash
+        // The logic below is taken straight from pvpgn
+        struct {
+            pvpgn::bn_int ticks;
+            pvpgn::bn_int sessionkey;
+            pvpgn::bn_int passhash1[5];
+        } temp;
+        uint32_t passhash2[5];
+
+        pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
+        pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
+        pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
+        pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp); /* do the double hash */
+
+        for (int i = 0; i < 20; i++) {
+            logon.serialize8(reinterpret_cast<uint8_t *>(passhash2)[i]);
+        }
+        logon.serialize(user.c_str());
+        logon.flush(ctx->getTCPSocket());
+        DebugPrint("TCP Sent: 0x3a LOGIN\n");
+
+        ctx->setState(new S2C_LOGONRESPONSE2());
     }
-
-    BNCSOutputStream logon(0x3a);
-    logon.serialize32(ctx->clientToken);
-    logon.serialize32(ctx->serverToken);
-
-    // Battle.net password hashes are hashed twice using XSHA-1. First, the
-    // password is hashed by itself, then the following data is hashed again
-    // and sent to Battle.net:
-    // (UINT32) Client Token
-    // (UINT32) Server Token
-    // (UINT32)[5] First password hash
-    // The logic below is taken straight from pvpgn
-    struct {
-      pvpgn::bn_int ticks;
-      pvpgn::bn_int sessionkey;
-      pvpgn::bn_int passhash1[5];
-    } temp;
-    uint32_t passhash2[5];
-
-    pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
-    pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
-    pvpgn::hash_to_bnhash((pvpgn::t_hash const *)pw, temp.passhash1);
-    pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp); /* do the double hash */
-
-    for (int i = 0; i < 20; i++) {
-      logon.serialize8(reinterpret_cast<uint8_t *>(passhash2)[i]);
-    }
-    logon.serialize(user.c_str());
-    logon.flush(ctx->getTCPSocket());
-    DebugPrint("TCP Sent: 0x3a LOGIN\n");
-
-    ctx->setState(new S2C_LOGONRESPONSE2());
-  }
 };
 
 class S2C_SID_AUTH_CHECK : public NetworkState {
@@ -2107,10 +2107,10 @@ static int CclSetup(lua_State *l) {
                 _ctx.setFriendslist(_ctx.getFriends());
             }
         } else if (!strcmp(value, "SetGames")) {
-          if (_ctx.SetGames) {
-            delete _ctx.SetGames;
-          }
-          _ctx.SetGames = new LuaCallback(l, -1);
+            if (_ctx.SetGames) {
+                delete _ctx.SetGames;
+            }
+            _ctx.SetGames = new LuaCallback(l, -1);
         } else if (!strcmp(value, "SetChannels")) {
             if (_ctx.SetChannels) {
                 delete _ctx.SetChannels;
