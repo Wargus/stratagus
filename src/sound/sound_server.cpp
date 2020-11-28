@@ -117,7 +117,7 @@ static void ChannelFinished(int channel)
 */
 int SetChannelVolume(int channel, int volume)
 {
-	return Mix_Volume(channel, volume / 2 * VolumeScale);
+	return Mix_Volume(channel, volume * VolumeScale);
 }
 
 /**
@@ -133,9 +133,15 @@ void SetChannelStereo(int channel, int stereo)
 	if (Preference.StereoSound == false) {
 		Mix_SetPanning(channel, 255, 255);
 	} else {
-		Assert(stereo >= -128 && stereo <= 127);
-		int left_volume = (127 - stereo) * 2; // 127 would play only on the right
-		Mix_SetPanning(channel, left_volume, 254 - left_volume);
+		int left, right;
+		if (stereo > 0) {
+			left = 255 - stereo;
+			right = 255;
+		} else {
+			left = 255;
+			right = 255 + stereo;
+		}
+		Mix_SetPanning(channel, left, right);
 	}
 }
 
@@ -289,7 +295,7 @@ int PlaySample(Mix_Chunk *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	VolumeScale = (double)volume / 255;
+	VolumeScale = (volume * 1.0) / 255.0;
 }
 
 /**
