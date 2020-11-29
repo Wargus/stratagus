@@ -1431,7 +1431,7 @@ void ImageListBox::setSelected(int selected)
 			par = par->getParent();
 		}
 
-		gcn::ScrollArea* scrollArea = dynamic_cast<gcn::ScrollArea *>(par);
+		gcn::ScrollArea* scrollArea = dynamic_cast<gcn::ScrollArea *>(getParent());
 		if (scrollArea != NULL)
 		{
 			gcn::Rectangle scroll;
