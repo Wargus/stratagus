@@ -35,6 +35,10 @@
 
 #include <stdlib.h>
 
+#ifdef USE_WIN32
+#include <Shlobj.h>
+#endif
+
 /* static */ Parameters Parameters::Instance;
 
 
@@ -51,7 +55,7 @@ void Parameters::SetDefaultUserDirectory()
 #ifdef USE_GAME_DIR
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
-	char data_path[MAX_PATH] = {'\0'};
+	char data_path[4096] = {'\0'};
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path)))
 	userDirectory = data_path;
 	// userDirectory = getenv("APPDATA");

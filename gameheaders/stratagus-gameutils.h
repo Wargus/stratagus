@@ -53,6 +53,7 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #define PATH_MAX MAX_PATH
 #endif
 #include <Shlwapi.h>
+#include <Shlobj.h>
 #pragma comment(lib, "comdlg32.lib")
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "Shlwapi.lib")
