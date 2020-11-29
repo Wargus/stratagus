@@ -1425,10 +1425,10 @@ void ImageListBox::setSelected(int selected)
 			mSelected = selected;
 		}
 
-		Widget *par = getParent();
-		if (par == NULL)
-		{
-			return;
+		Widget *par = this;
+		while (par != NULL) {
+			par->setDirty(true);
+			par = par->getParent();
 		}
 
 		gcn::ScrollArea* scrollArea = dynamic_cast<gcn::ScrollArea *>(par);
