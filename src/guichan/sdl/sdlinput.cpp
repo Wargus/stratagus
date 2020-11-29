@@ -133,7 +133,7 @@ namespace gcn
           case SDL_TEXTINPUT:
               {
                   char* text = event.text.text;
-                  if ((uint8_t)text[0] < 128) {
+                  if ((uint8_t)text[0] >= 32 || (uint8_t)text[0] < 128) {
                       mLastKey = text[0];
                       mIsRepeating = true;
                       keyInput.setKey(mLastKey);
@@ -152,7 +152,7 @@ namespace gcn
               }
 
           case SDL_KEYDOWN:
-              if (event.key.keysym.sym < 32 || event.key.keysym.sym > 128) {
+              if (event.key.keysym.sym < 32 || event.key.keysym.sym >= 128) {
                   mLastKey = convertKeyCharacter(event.key.keysym);
                   mIsRepeating = true;
                   keyInput.setKey(mLastKey);
@@ -162,7 +162,7 @@ namespace gcn
               break;
 
           case SDL_KEYUP:
-              if (event.key.keysym.sym < 32 || event.key.keysym.sym > 128) {
+              if (event.key.keysym.sym < 32 || event.key.keysym.sym >= 128) {
                   mIsRepeating = false;
                   keyInput.setKey(convertKeyCharacter(event.key.keysym));
                   keyInput.setType(KeyInput::RELEASE);

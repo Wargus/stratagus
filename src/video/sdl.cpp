@@ -492,7 +492,10 @@ void Invalidate()
 }
 
 // Switch to the shader currently stored in Video.ShaderIndex without changing it
-void SwitchToShader() {
+void SwitchToShader() {}
+
+static bool isTextInput(int key) {
+	return key >= 32 && key <= 128 && !(KeyModifiers & (ModifierAlt | ModifierControl | ModifierSuper));
 }
 
 /**
@@ -560,7 +563,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 		case SDL_TEXTINPUT:
 			{
 				char* text = event.text.text;
-				if ((uint8_t)text[0] < 128) {
+				if (isTextInput((uint8_t)text[0])) {
 					// we only accept US-ascii chars for now
 					char lastKey = text[0];
 					InputKeyButtonPress(callbacks, SDL_GetTicks(), lastKey, lastKey);
@@ -585,7 +588,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_KEYDOWN:
 			keysym = event.key.keysym.sym;
-			if (keysym < 32 || keysym > 128) {
+			if (!isTextInput(keysym)) {
 				// only report non-printing keys here, the characters will be reported with the textinput event
 				InputKeyButtonPress(callbacks, SDL_GetTicks(), keysym, keysym < 128 ? keysym : 0);
 			}
@@ -593,7 +596,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_KEYUP:
 			keysym = event.key.keysym.sym;
-			if (keysym < 32 || keysym > 128) {
+			if (!isTextInput(keysym)) {
 				// only report non-printing keys here, the characters will be reported with the textinput event
 				InputKeyButtonRelease(callbacks, SDL_GetTicks(), keysym, keysym < 128 ? keysym : 0);
 			}
