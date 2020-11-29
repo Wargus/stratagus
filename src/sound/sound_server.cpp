@@ -393,7 +393,7 @@ void SetMusicVolume(int volume)
 {
 	// due to left-right separation, sound effect volume is effectively halfed,
 	// so we adjust the music
-	Mix_VolumeMusic(volume / 2);
+	Mix_VolumeMusic(volume / 4.0);
 }
 
 /**
