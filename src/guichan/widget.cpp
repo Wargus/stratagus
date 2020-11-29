@@ -382,7 +382,8 @@ namespace gcn
         if (mFocusHandler == NULL)
         {
             //throw GCN_EXCEPTION("No focushandler set (did you add the widget to the gui?).");
-            assert(!"No focushandler set (did you add the widget to the gui?).");
+            // assert(!"No focushandler set (did you add the widget to the gui?).");
+            return;
         }
 
         if (!mEnabled || (mFocusHandler->getModalFocused() != NULL &&
