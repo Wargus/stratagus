@@ -952,7 +952,6 @@ public:
 			// cost map is relative to attacker position
 			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
 			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
-			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
 			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
@@ -1041,7 +1040,6 @@ private:
 		// cost map is relative to attacker position
 		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
 		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
-		Assert(x >= 0 && y >= 0);
 
 		// calculate the costs:
 		// costs are the full costs at the target and the splash-factor
