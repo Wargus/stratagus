@@ -187,7 +187,8 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 static void SetUserDataPath(char* data_path) {
 #if defined(WIN32)
-	strcpy(data_path, getenv("APPDATA"));
+	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path)))
+	// strcpy(data_path, getenv("APPDATA"));
 #else
 	strcpy(data_path, getenv("HOME"));
 #endif

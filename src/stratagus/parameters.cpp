@@ -51,7 +51,10 @@ void Parameters::SetDefaultUserDirectory()
 #ifdef USE_GAME_DIR
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
-	userDirectory = getenv("APPDATA");
+	char data_path[MAX_PATH] = {'\0'};
+	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path)))
+	userDirectory = data_path;
+	// userDirectory = getenv("APPDATA");
 #else
 	userDirectory = getenv("HOME");
 #endif
