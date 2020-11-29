@@ -292,6 +292,8 @@ class Widget
 	virtual void setHotKey(const int key);
 	virtual void setHotKey(const char *key);
 
+        virtual void requestFocus();
+
 	virtual void addActionListener(LuaActionListener *actionListener);
         virtual void addMouseListener(LuaActionListener *actionListener);
         virtual void addKeyListener(LuaActionListener *actionListener);
