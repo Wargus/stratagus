@@ -407,9 +407,6 @@ extern void WaitEventsOneFrame();
 /// Toggle full screen mode
 extern void ToggleFullScreen();
 
-/// Switch to the shader currently stored in Video.ShaderIndex
-extern void SwitchToShader();
-
 /// Push current clipping.
 extern void PushClipping();
 

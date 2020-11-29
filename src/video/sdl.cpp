@@ -491,9 +491,6 @@ void Invalidate()
 	NumRects = 1;
 }
 
-// Switch to the shader currently stored in Video.ShaderIndex without changing it
-void SwitchToShader() {}
-
 static bool isTextInput(int key) {
 	return key >= 32 && key <= 128 && !(KeyModifiers & (ModifierAlt | ModifierControl | ModifierSuper));
 }
