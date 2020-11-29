@@ -191,7 +191,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 **
 **  @param group  Group number to select.
 */
-static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
+static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECT_ALL)
 {
 	SelectGroup(group, mode);
 	SelectionChanged();
