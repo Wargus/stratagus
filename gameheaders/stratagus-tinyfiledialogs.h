@@ -374,7 +374,7 @@ misrepresented as being the original software.
 
 #ifdef _WIN32
  #ifndef _WIN32_WINNT
- #define _WIN32_WINNT 0x0500
+ #define _WIN32_WINNT 0x0502
  #endif
  #ifndef TINYFD_WIN_CONSOLE_ONLY
   #include <Windows.h>

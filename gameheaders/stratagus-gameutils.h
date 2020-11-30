@@ -51,7 +51,7 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #ifdef WIN32
 
 // set everything to winxp sp2 compatiblity
-#define NTDDI_VERSION 0x05010300
+#define NTDDI_VERSION 0x05010200
 #define _WIN32_WINNT 0x0502
 #define WINVER 0x0502
 
