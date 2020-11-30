@@ -56,7 +56,7 @@ void Parameters::SetDefaultUserDirectory()
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
 	char data_path[4096] = {'\0'};
-	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path)))
+	SHGetFolderPath(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
 	userDirectory = data_path;
 	// userDirectory = getenv("APPDATA");
 #else
