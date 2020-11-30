@@ -36,6 +36,10 @@
 #include <stdlib.h>
 
 #ifdef USE_WIN32
+// set everything to winxp sp2 compatiblity
+#define NTDDI_VERSION 0x05010300
+#define _WIN32_WINNT 0x0502
+#define WINVER 0x0502
 #include <Shlobj.h>
 #endif
 
@@ -56,7 +60,7 @@ void Parameters::SetDefaultUserDirectory()
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
 	char data_path[4096] = {'\0'};
-	SHGetFolderPath(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
+	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
 	userDirectory = data_path;
 	// userDirectory = getenv("APPDATA");
 #else

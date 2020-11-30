@@ -49,6 +49,12 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #endif
 
 #ifdef WIN32
+
+// set everything to winxp sp2 compatiblity
+#define NTDDI_VERSION 0x05010300
+#define _WIN32_WINNT 0x0502
+#define WINVER 0x0502
+
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
 #endif
