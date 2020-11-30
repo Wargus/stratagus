@@ -52,8 +52,8 @@ void copy_dir(const char* source_folder, const char* target_folder);
 
 // set everything to winxp sp2 compatiblity
 #define NTDDI_VERSION 0x05010200
-#define _WIN32_WINNT 0x0502
-#define WINVER 0x0502
+#define _WIN32_WINNT 0x0501
+#define WINVER 0x0501
 
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH
@@ -76,9 +76,6 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #endif
 
 #ifdef WIN32
-#ifndef WINVER
-#define WINVER 0x0501
-#endif
 #include <windows.h>
 #include <wincon.h>
 #include <process.h>

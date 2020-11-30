@@ -770,7 +770,7 @@ endif()
 
 if(WIN32)
 	# define winXP SP2 as minimum for everything
-	add_definitions(-DUSE_WIN32 -DNTDDI_VERSION=0x05010200 -D_WIN32_WINNT=0x0502 -DWINVER=0x0502)
+	add_definitions(-DUSE_WIN32 -DNTDDI_VERSION=0x05010200 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501)
 	set(stratagus_SRCS ${stratagus_SRCS} ${win32_SRCS})
 	set(stratagus_LIBS ${stratagus_LIBS} dsound winmm ws2_32 dbghelp)
 endif()
