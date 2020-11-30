@@ -16,16 +16,6 @@
 
 */
 
-/* _WIN32_WINNT must be set to at least 0x0501 */
-#ifdef _WIN32_WINNT
-#if _WIN32_WINNT < 0x0501
-#undef _WIN32_WINNT
-#endif
-#endif
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
-#endif
-
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>

@@ -50,14 +50,6 @@
 #include <windows.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-// that's fine
-#elif (NTDDI_VERSION >= NTDDI_WIN2K)
-// that's fine, too
-#else
-// oh no, we're at least NTDDI_WIN2K, otherwise Iphlpapi doesn't work
-#define NTDDI_VERSION NTDDI_WIN2K
-#endif
 #include <Iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
 
