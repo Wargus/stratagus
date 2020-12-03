@@ -679,6 +679,11 @@ if(WIN32)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
+if(EXISTS WIN32_CMAKE_PREFIX_PATH)
+	list(APPEND CMAKE_PREFIX_PATH "${WIN32_CMAKE_PREFIX_PATH}")
+	message("Using prefix path ${CMAKE_PREFIX_PATH}")
+endif()
+
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)

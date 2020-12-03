@@ -13,5 +13,5 @@ if (-not (Test-Path "$stratagus_folder\\..\\wargus")) {
     git clone https://github.com/Wargus/wargus "$stratagus_folder\\..\\wargus"
 }
 if (-not (Test-Path "$stratagus_folder\\..\\war1gus")) {
-    git clone https://github.com/Wargus/wargus "$stratagus_folder\\..\\war1gus"
+    git clone https://github.com/Wargus/war1gus "$stratagus_folder\\..\\war1gus"
 }

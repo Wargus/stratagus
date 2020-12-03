@@ -2,14 +2,22 @@
     "configurations": [
         {
             "name": "Stratagus",
-            "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Debug/stratagus.exe",
-            "args": ["-a", "-d", "${env:APPDATA}/Stratagus/data.${input:game}"],
+            "type": "cppdbg",
+            "linux": {
+              "program": "${workspaceFolder}/build/stratagus-dbg",
+              "args": ["-W", "-a", "-d", "${env:HOME}/.stratagus/data.${input:game}"],
+              "preLaunchTask": "Download games and dependencies",
+            },
+            "windows": {
+              "type": "cppvsdbg",
+              "program": "${workspaceFolder}/build/Debug/stratagus.exe",
+              "args": ["-W", "-a", "-d", "${env:APPDATA}/Stratagus/data.${input:game}"],
+              "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
+              "externalConsole": true,
+            },
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../${input:game}",
-            "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
-            "externalConsole": true
         }
     ],
     "inputs": [
@@ -18,11 +26,11 @@
           "id": "game",
           "description": "Which game to launch?",
           "options": [
-            "wargus",
-            "war1gus",
-            "stargus",
+            "Wargus",
+            "War1gus",
+            "Stargus",
           ],
-          "default": "wargus"
+          "default": "Wargus"
         },
     ]
 }
