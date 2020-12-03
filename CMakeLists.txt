@@ -45,6 +45,11 @@ cmake_minimum_required(VERSION 2.6)
 # useful for clangd LSP server
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(EXISTS ${WIN32_CMAKE_PREFIX_PATH})
+	list(APPEND CMAKE_PREFIX_PATH "${WIN32_CMAKE_PREFIX_PATH}")
+	message("Using prefix path ${CMAKE_PREFIX_PATH}")
+endif()
+
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
@@ -677,11 +682,6 @@ endif()
 if(WIN32)
 	option(ENABLE_STDIO_REDIRECT "Redirect Stratagus console output to files on Windows" ON)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
-endif()
-
-if(EXISTS WIN32_CMAKE_PREFIX_PATH)
-	list(APPEND CMAKE_PREFIX_PATH "${WIN32_CMAKE_PREFIX_PATH}")
-	message("Using prefix path ${CMAKE_PREFIX_PATH}")
 endif()
 
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
