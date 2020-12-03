@@ -6,13 +6,12 @@
             "type": "cppdbg",
             "linux": {
               "program": "${workspaceFolder}/build/stratagus-dbg",
-              "args": ["-W", "-a", "-d", "${env:HOME}/.stratagus/data.${input:game}"],
-              "preLaunchTask": "Download games and dependencies",
+              "args": ["-W", "-a", "-d", "${workspaceFolder}/../data.${input:game}"],
             },
             "windows": {
               "type": "cppvsdbg",
               "program": "${workspaceFolder}/build/Debug/stratagus.exe",
-              "args": ["-W", "-a", "-d", "${env:APPDATA}/Stratagus/data.${input:game}"],
+              "args": ["-W", "-a", "-d", "${workspaceFolder}\\..\\data.${input:game}"],
               "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
               "externalConsole": true,
             },
@@ -26,11 +25,11 @@
           "id": "game",
           "description": "Which game to launch?",
           "options": [
-            "Wargus",
-            "War1gus",
-            "Stargus",
+            "wargus",
+            "war1gus",
+            "stargus",
           ],
-          "default": "Wargus"
+          "default": "wargus"
         },
     ]
 }
