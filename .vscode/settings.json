@@ -1,16 +1,11 @@
 {
-    "cmake.configureEnvironment": {
-        "CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies",
-    },
-    "cmake.configureArgs": [
-        "-DENABLE_STDIO_REDIRECT=ON",
-        //"-G", "Visual Studio 16 2019",
-        //"-T", "v141_xp",
-        //"-A", "win32",
-    ],
-    "cmake.generator":  "Visual Studio 16 2019",
+    "cmake.preferredGenerators":  ["Visual Studio 16 2019", "Unix Makefiles"],
     "cmake.toolset": "v141_xp",
     "cmake.platform": "win32",
-    "cmake.copyCompileCommands": "${workspaceFolder}",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "WIN32_CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies",
+    },
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
 }
