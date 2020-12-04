@@ -1,0 +1,12 @@
+{
+    "cmake.generator": "Visual Studio 16 2019",
+    "cmake.toolset": "v141_xp",
+    "cmake.platform": "win32",
+    "cmake.configureSettings": {
+        "STRATAGUS_INCLUDE_DIR": "${workspaceFolder}/../stratagus/gameheaders",
+        "STRATAGUS": "stratagus",
+        "WIN32_CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies"
+    },
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}

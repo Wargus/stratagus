@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Wartool",
+            "request": "launch",
+            "type": "cppdbg",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/Debug/wartool.exe",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
+                "externalConsole": true
+            },
+            "linux": {
+                "program": "${workspaceRoot}/build/wartool"
+            },
+            "args": ["-v", "${input:datadir}", "${workspaceFolder}/../data.wargus"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+        }
+    ],
+    "inputs": [
+        {
+          "type": "promptString",
+          "id": "datadir",
+          "description": "Enter path to DATA folder"
+        },
+    ]
+}
