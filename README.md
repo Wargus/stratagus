@@ -34,6 +34,10 @@ For Windows, you likely want the game installers:
 If you do indeed need the Stratagus engine itself, nightly builds are available:
   - Windows Installer: https://github.com/Wargus/stratagus/releases/tag/master-builds
   - Ubuntu/Debian Packages: https://launchpad.net/~stratagus/+archive/ubuntu/ppa
+  
+### Contributing
+
+If you want to contribute, there is a video that details how to set up a development environment on Windows using VSCode here: https://youtu.be/c1Zm7tt_QtQ 
 
 Read 'doc/index.html' for general information and license information.
 Read 'doc/install.html' for Stratagus installation instructions.
