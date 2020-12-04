@@ -10,7 +10,7 @@
             },
             "windows": {
               "type": "cppvsdbg",
-              "program": "${workspaceFolder}/build/Debug/stratagus.exe",
+              "program": "${workspaceFolder}/build/Debug/stratagus-dbg.exe",
               "args": ["-W", "-a", "-d", "${workspaceFolder}\\..\\data.${input:game}"],
               "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
               "externalConsole": true,

@@ -159,12 +159,28 @@ static int luatraceback(lua_State *L)
 int LuaCall(int narg, int clear, bool exitOnError)
 {
 	const int base = lua_gettop(Lua) - narg;  // function index
-	lua_pushcfunction(Lua, luatraceback);  // push traceback function
-	lua_insert(Lua, base);  // put it under chunk and args
+	return LuaCall(Lua, narg, clear ? 0 : LUA_MULTRET, base, exitOnError);
+}
+
+/**
+**  Call a lua function
+**
+**  @param L            Pointer to Lua state
+**  @param narg         Number of arguments
+**  @param nresults     Number of return values
+**  @param base         Stack index of the function to call
+**  @param exitOnError  Exit the program when an error occurs
+**
+**  @return             0 in success, else exit.
+*/
+int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
+{
+	lua_pushcfunction(L, luatraceback);  // push traceback function
+	lua_insert(L, base);  // put it under chunk and args
 	signal(SIGINT, laction);
-	const int status = lua_pcall(Lua, narg, (clear ? 0 : LUA_MULTRET), base);
+	const int status = lua_pcall(L, narg, nresults, base);
 	signal(SIGINT, SIG_DFL);
-	lua_remove(Lua, base);  // remove traceback function
+	lua_remove(L, base);  // remove traceback function
 
 	return report(status, exitOnError);
 }

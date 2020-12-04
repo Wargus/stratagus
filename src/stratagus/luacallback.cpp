@@ -177,18 +177,7 @@ int LuaCallback::popInteger()
 */
 void LuaCallback::run(int results)
 {
-	//FIXME call error reporting function
-	int status = lua_pcall(luastate, arguments, results, base);
-
-	if (status) {
-		const char *msg = lua_tostring(luastate, -1);
-
-		if (msg == NULL) {
-			msg = "(error with no message)";
-		}
-		fprintf(stderr, "%s\n", msg);
-		lua_pop(luastate, 1);
-	}
+	LuaCall(luastate, arguments, results, base, false);
 	rescount = results;
 }
 
