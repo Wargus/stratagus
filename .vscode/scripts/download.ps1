@@ -17,6 +17,9 @@ if (-not (Test-Path "$stratagus_folder\\.vscode\\settings.json")) {
 if (-not (Test-Path "$stratagus_folder\\..\\wargus")) {
     git clone https://github.com/Wargus/wargus "$stratagus_folder\\..\\wargus"
 }
+if (-not (Test-Path "$stratagus_folder\\..\\wargus\\.vscode")) {
+    mkdir "$stratagus_folder\\..\\wargus\\.vscode"
+}
 if (-not (Test-Path "$stratagus_folder\\..\\wargus\\.vscode\\settings.json")) {
     Copy-Item "$stratagus_folder\\.vscode\\settings.windows.wargus.json" "$stratagus_folder\\..\\wargus\\.vscode\\settings.json"
 }
@@ -24,6 +27,9 @@ if (-not (Test-Path "$stratagus_folder\\..\\wargus\\.vscode\\launch.json")) {
     Copy-Item "$stratagus_folder\\.vscode\\launch.wargus.json" "$stratagus_folder\\..\\wargus\\.vscode\\launch.json"
 }
 
+if (-not (Test-Path "$stratagus_folder\\..\\war1gus\\.vscode")) {
+    mkdir "$stratagus_folder\\..\\war1gus\\.vscode"
+}
 if (-not (Test-Path "$stratagus_folder\\..\\war1gus")) {
     git clone https://github.com/Wargus/war1gus "$stratagus_folder\\..\\war1gus"
 }
