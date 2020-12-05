@@ -330,6 +330,19 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 }
 
 /**
+**  Define size in pixels (x,y) of a tile in this game
+**
+**  @param l  Lua state.
+*/
+static int CclSetTileSize(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	PixelTileSize.x = LuaToNumber(l, 1);
+	PixelTileSize.y = LuaToNumber(l, 2);
+	return 0;
+}
+
+/**
 **  Set a tile
 **
 **  @param tileIndex   Tile number
@@ -553,6 +566,8 @@ void MapCclRegister()
 	lua_register(Lua, "CenterMap", CclCenterMap);
 	lua_register(Lua, "SetStartView", CclSetStartView);
 	lua_register(Lua, "ShowMapLocation", CclShowMapLocation);
+
+	lua_register(Lua, "SetTileSize", CclSetTileSize);
 
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
