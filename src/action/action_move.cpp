@@ -137,8 +137,6 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd; // movement in tile.
 	int d;
 
-	Assert(unit.CanMove());
-
 	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		Assert(!unit.Anim.Unbreakable);
 
@@ -165,6 +163,7 @@ int DoActionMove(CUnit &unit)
 				unit.Moving = 0;
 				return d;
 			default: // On the way moving
+				Assert(unit.CanMove());
 				unit.Moving = 1;
 				break;
 		}
