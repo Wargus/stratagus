@@ -175,6 +175,15 @@ int LuaCall(int narg, int clear, bool exitOnError)
 */
 int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 {
+#if 0
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "traceback");
+	lua_call(L, 0, 1); 
+	const char *str = lua_tostring(L, -1);
+	lua_pop(L, 2);
+	fprintf(stderr, "\n===============\n%s\n\n", str);
+#endif
+
 	lua_pushcfunction(L, luatraceback);  // push traceback function
 	lua_insert(L, base);  // put it under chunk and args
 	signal(SIGINT, laction);
