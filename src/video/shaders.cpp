@@ -253,13 +253,14 @@ void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 
 	// letterboxing
 	double xScale = (double)w / Video.Width;
-	double yScale = (double)h  / Video.Height;
+	double yScale = (double)h  / (Video.Height * Video.VerticalPixelSize);
 	if (xScale > yScale) {
 		xScale = yScale;
 		xBorder = std::floor((w - (Video.Width * yScale)) / 2.0);
 		w = Video.Width * yScale;
 	} else {
 		yScale = xScale;
+		xScale = xScale * Video.VerticalPixelSize;
 		yBorder = std::floor((h - (Video.Height * xScale)) / 2.0);
 		h = Video.Height * xScale;
 	}

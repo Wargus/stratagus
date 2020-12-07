@@ -262,6 +262,36 @@ static int CclGetVideoFullScreen(lua_State *l)
 	return 1;
 }
 
+/**
+** Request a specific initial window size
+*/
+static int CclSetWindowSize(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (CclInConfigFile) {
+		// May have been set from the command line
+		if (!Video.WindowWidth || !Video.WindowHeight) {
+			Video.WindowWidth = LuaToNumber(l, 1);
+			Video.WindowHeight = LuaToNumber(l, 2);
+		}
+	}
+	return 0;
+}
+
+/**
+** For games with non-square pixels, this sets the scale of vertical pixels versus horizontal pixels.
+** e.g., if your assets are 320x200, but you render at 320x240, this is 1.2.
+*/
+static int CclSetVerticalPixelSize(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (CclInConfigFile) {
+		luaL_checktype(l, 1, LUA_TNUMBER);
+		Video.VerticalPixelSize = static_cast<double>(lua_tonumber(l, 1));
+	}
+	return 0;
+}
+
 static int CclShowTitleScreens(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
@@ -1191,6 +1221,8 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "GetVideoResolution", CclGetVideoResolution);
 	lua_register(Lua, "SetVideoFullScreen", CclSetVideoFullScreen);
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
+	lua_register(Lua, "SetWindowSize", CclSetWindowSize);
+	lua_register(Lua, "SetVerticalPixelSize", CclSetVerticalPixelSize);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);

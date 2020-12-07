@@ -275,7 +275,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	Width = w;
 	Height = h;
 
-	SDL_RenderSetLogicalSize(TheRenderer, w, h);
+	SDL_RenderSetLogicalSize(TheRenderer, w, h * VerticalPixelSize);
 
 	// new surface
 	if (TheScreen) {
