@@ -177,6 +177,7 @@ CUserInterface::CUserInterface() :
 
 	LifeBarBorder = true;
 	LifeBarYOffset = 0;
+	LifeBarPadding = 0;
 }
 
 /**

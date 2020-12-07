@@ -175,6 +175,7 @@ class CUserInterface
         vector<string> LifeBarColorNames;
         vector<int> LifeBarPercents;
         int LifeBarYOffset;
+		int LifeBarPadding;
         bool LifeBarBorder;
 
 	CColor CompletedBarColorRGB;

@@ -439,7 +439,8 @@ public:
         std::vector<std::string> LifeBarColorNames;
         std::vector<int> LifeBarPercents;
         std::vector<IntColor> LifeBarColorsInt;
-        int LifeBarYOffset;
+        int8_t LifeBarYOffset;
+		int8_t LifeBarPadding;
         bool LifeBarBorder;
 
 	// Completed bar

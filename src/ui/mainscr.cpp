@@ -178,8 +178,8 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		color = UI.LifeBarColorsInt[i];
 
 		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
-		Video.FillRectangleClip(color, x - 2, y + 4,
-			f > 1 ? f - 2 : 0, hBar);
+		Video.FillRectangleClip(color, x - 2 + UI.LifeBarPadding, y + 4 + UI.LifeBarPadding,
+			std::max(f - 2 - UI.LifeBarPadding * 2, 0), hBar - UI.LifeBarPadding);
 	}
 }
 
