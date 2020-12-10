@@ -126,7 +126,11 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 	UI.Minimap.UpdateXY(pos);
 
 	if (!mf.isDecorative()) {
-		EditorChangeSurrounding(pos, lock_pos);
+		if (TileToolNoFixup) {
+			mf.Flags |= MapFieldDecorative;
+		} else {
+			EditorChangeSurrounding(pos, lock_pos);
+		}
 	}
 }
 
@@ -138,6 +142,12 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 */
 static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 {
+	if (TileToolNoFixup) {
+		CMapField &mf = *Map.Field(pos);
+		mf.Flags |= MapFieldDecorative;
+		return;
+	}
+
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
 	if (mf.isAWall()) {

@@ -91,6 +91,7 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
+bool TileToolNoFixup = false;     /// Allow setting every tile, no fixups
 char TileToolRandom;      /// Tile tool draws random
 static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
@@ -705,6 +706,12 @@ static void DrawTileIcons()
 	} else {
 		label.DrawCentered(x, y, "Filler");
 	}
+	y += 20;
+	if (TileToolNoFixup) {
+		label.DrawReverseCentered(x, y, "Manual");
+	} else {
+		label.DrawCentered(x, y, "Manual");
+	}
 
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
@@ -1187,8 +1194,26 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 303: TileCursorSize = 4; return;
 				case 304: TileToolRandom ^= 1; return;
 				case 305: TileToolDecoration ^= 1; return;
+			    case 306: {
+					TileToolNoFixup = !TileToolNoFixup;
+					// switch the selected tiles
+					if (TileToolNoFixup) {
+						Editor.ShownTileTypes.clear();
+						for (size_t i = 0; i < Map.Tileset->getTileCount(); i++) {
+							const CTileInfo &info = Map.Tileset->tiles[i].tileinfo;
+							if (info.BaseTerrain || info.MixTerrain) {
+								Editor.ShownTileTypes.push_back(Map.Tileset->tiles[i].tile);
+							}
+						}
+					} else {
+						Editor.ShownTileTypes.clear();
+						Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
+					}
+					return;
+				}
 			}
 		}
+		
 		if (Editor.CursorTileIndex != -1) {
 			Editor.SelectedTileIndex = Editor.CursorTileIndex;
 			return;
@@ -1527,7 +1552,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	int bx = UI.InfoPanel.X + 4;
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < 7; ++i) {
 		if (bx < screenPos.x && screenPos.x < bx + 100 && by < screenPos.y && screenPos.y < by + 18) {
 			ButtonUnderCursor = i + 300;
 			CursorOn = CursorOnButton;
