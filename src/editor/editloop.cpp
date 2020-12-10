@@ -1201,13 +1201,17 @@ static void EditorCallbackButtonDown(unsigned button)
 						Editor.ShownTileTypes.clear();
 						for (size_t i = 0; i < Map.Tileset->getTileCount(); i++) {
 							const CTileInfo &info = Map.Tileset->tiles[i].tileinfo;
-							if (info.BaseTerrain || info.MixTerrain) {
+							if (Map.Tileset->tiles[i].tile) {
 								Editor.ShownTileTypes.push_back(Map.Tileset->tiles[i].tile);
 							}
 						}
 					} else {
 						Editor.ShownTileTypes.clear();
 						Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
+					}
+					VisibleTileIcons = CalculateVisibleIcons(true);
+					if (VisibleTileIcons < (int)Editor.ShownTileTypes.size()) {
+						editorSlider->setVisible(true);
 					}
 					return;
 				}
