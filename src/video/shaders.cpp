@@ -24,6 +24,7 @@
  */
 
 #include "shaders.h"
+#include <stdint.h>
 
 #ifndef __APPLE__
 #include <SDL.h>
@@ -31,7 +32,7 @@
 #include <SDL_opengl_glext.h>
 
 #include <stdlib.h>
-
+#include <regex>
 #include <iostream>
 #include <fstream>
 
@@ -89,6 +90,8 @@ static const char* shaderNames[MAX_SHADERS + 1] = { NULL };
 static char shadersLoaded = -1;
 static int currentShaderIdx = 0;
 
+static std::regex invalidQuoteReplaceRegex("\"([a-zA-Z0-9 -\\.]+)\"");
+
 const char* none =
 #include "./shaders/noshader.glsl"
 ;
@@ -134,6 +137,20 @@ static GLuint compileShader(const char* source, GLuint shaderType) {
 static GLuint compileProgramSource(std::string source) {
 	GLuint programId = 0;
 	GLuint vtxShaderId, fragShaderId;
+
+	uint32_t offset = 0;
+	std::smatch m;
+	while (std::regex_search(source.cbegin() + offset, source.cend(), m, invalidQuoteReplaceRegex)) {
+		uint32_t next_offset = offset + m.position() + m.length();
+		for (std::string::iterator it = source.begin() + offset + m.position(); it < source.begin() + next_offset; it++) {
+			if (*it == '"') {
+				source.replace(it, it + 1, " ");
+			} else if (*it == ' ') {
+				source.replace(it, it + 1, "_");
+			}
+		}
+		offset = next_offset;
+	}
 
 	vtxShaderId = compileShader((std::string("#define VERTEX\n") + source).c_str(), GL_VERTEX_SHADER);
 	fragShaderId = compileShader((std::string("#define FRAGMENT\n") + source).c_str(), GL_FRAGMENT_SHADER);
