@@ -1993,8 +1993,8 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (args < 1 || args > 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const char *userdir = lua_tostring(l, 1);
-	const int rel = args > 1 ? lua_toboolean(l, 2) : 0;
+	const char *userdir = LuaToString(l, 1);
+	const bool rel = args > 1 ? lua_toboolean(l, 2) : false;
 	int n = strlen(userdir);
 
 	int pathtype = 0; // path relative to stratagus dir
@@ -2020,11 +2020,9 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	} else if (rel) {
 		std::string dir = LibraryFileName(userdir);
 		snprintf(directory, sizeof(directory), "%s", dir.c_str());
-		lua_pop(l, 1);
 	} else {
 		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
 	}
-	lua_pop(l, 1);
 	lua_newtable(l);
 	std::vector<FileList> flp;
 	n = ReadDataDirectory(directory, flp);
@@ -2033,7 +2031,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 		if ((flp[i].type & mask) == type) {
 			lua_pushnumber(l, j + 1);
 			lua_pushstring(l, flp[i].name.c_str());
-			lua_settable(l, 1);
+			lua_settable(l, -3);
 			++j;
 		}
 	}
