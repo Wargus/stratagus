@@ -30,6 +30,8 @@
 #ifndef __WIDGETS_H__
 #define __WIDGETS_H__
 
+#include <functional>
+
 #include <guichan.h>
 #include <guichan/gsdl.h>
 #include "font.h"
@@ -64,6 +66,21 @@ public:
 	virtual void mouseWheelDown(int, int);
 	virtual void mouseMotion(int, int);
 	virtual ~LuaActionListener();
+};
+
+class LambdaActionListener : public gcn::ActionListener
+{
+	std::function<void(const std::string &)> lambda;
+public:
+	LambdaActionListener(std::function<void(const std::string &)> l)
+	{
+		lambda = l;
+	}
+
+	virtual void action(const std::string &eventId)
+	{
+		lambda(eventId);
+	}
 };
 
 class ImageWidget : public gcn::Icon
@@ -258,6 +275,18 @@ public:
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
 	CGraphic *itemImage;
+};
+
+class StringListModel : public gcn::ListModel
+{
+	std::vector<std::string> list;
+public:
+	StringListModel(std::vector<std::string> l) {
+		list = l;
+	}
+
+	virtual int getNumberOfElements() { return list.size(); }
+	virtual std::string getElementAt(int i) { return list[i]; }
 };
 
 class LuaListModel : public gcn::ListModel
