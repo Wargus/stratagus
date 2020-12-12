@@ -718,6 +718,7 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 	if (VisibleTileIcons == 0) {
 		VisibleTileIcons = i - Editor.TileIndex;
 	}
+	return true;
 }
 
 /**
