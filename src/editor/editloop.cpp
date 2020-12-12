@@ -429,7 +429,7 @@ static void RecalculateShownUnits()
 ----------------------------------------------------------------------------*/
 
 static int getPlayerButtonSize() {
-	static int sz = GetGameFont().getHeight() + 3;
+	static int sz = GetGameFont().getHeight() + 2;
 	return sz;
 }
 
@@ -531,9 +531,9 @@ static void DrawPlayers()
 		}
 
 		char buf[256];
-		sprintf(buf, "%d", i);
+		sprintf(buf, "%d", i + 1);
 		CLabel label(GetGameFont());
-		label.DrawCentered(x + getPlayerButtonSize() / 2, y + getPlayerButtonSize() / 2, buf);
+		label.DrawCentered(x + getPlayerButtonSize() / 2, y + 3, buf);
 
 		return true;
 	});
@@ -1390,7 +1390,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 			if (Map.Info.PlayerType[i] != PlayerNobody) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
+				snprintf(buf, sizeof(buf), _("Select player #%d"), i + 1);
 				UI.StatusLine.Set(buf);
 			} else {
 				UI.StatusLine.Clear();
