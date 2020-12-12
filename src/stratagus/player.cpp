@@ -1004,7 +1004,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		CUnit &unit = **it;
 
-		if (unit.CurrentAction() == UnitActionUpgradeTo) {
+		if (GameRunning && unit.CurrentAction() == UnitActionUpgradeTo) {
 			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
 			if (order.GetUnitType().Slot == type.Slot) {
 				++count;

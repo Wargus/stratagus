@@ -114,7 +114,7 @@ static bool AnimateActionDie(CUnit &unit)
 	}
 
 	const CUnitType &corpseType = *type.CorpseType;
-	Assert(type.TileWidth >= corpseType.TileWidth && type.TileHeight >= corpseType.TileHeight);
+	// Assert(type.TileWidth >= corpseType.TileWidth && type.TileHeight >= corpseType.TileHeight);
 
 	// Update sight for new corpse
 	// We have to unmark BEFORE changing the type.
