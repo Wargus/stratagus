@@ -219,6 +219,7 @@
 //  Includes
 //----------------------------------------------------------------------------
 
+#include "online_service.h"
 #include "stratagus.h"
 
 #include <stddef.h>
@@ -403,6 +404,9 @@ static void NetworkSendPacket(const CNetworkCommandQueue(&ncq)[MaxNetworkCommand
 */
 void InitNetwork1()
 {
+	if (NetworkFildes.IsValid()) {
+		return;
+	}
 	CNetworkParameter::Instance.FixValues();
 
 	NetInit(); // machine dependent setup
@@ -860,6 +864,10 @@ void NetworkEvent()
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = false;
+		return;
+	}
+
+	if (OnlineContextHandler->handleUDP(buf, len, host)) {
 		return;
 	}
 

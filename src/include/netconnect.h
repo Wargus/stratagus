@@ -32,6 +32,7 @@
 //@{
 
 #include "net_message.h"
+#include "network/netsockets.h"
 
 class CHost;
 
@@ -97,8 +98,12 @@ extern int NetConnectType;              /// Network menu: Setup mode active
 extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts array of local client
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
+extern std::string NetworkMapName;         /// Name of the map received with ICMMap
+
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
+
+extern int NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -118,6 +123,8 @@ extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client reque
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
 extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
+
+extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 //@}
 

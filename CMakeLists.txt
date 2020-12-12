@@ -232,10 +232,10 @@ set(network_SRCS
 	src/network/commands.cpp
 	src/network/net_lowlevel.cpp
 	src/network/net_message.cpp
-	src/network/master.cpp
 	src/network/netconnect.cpp
 	src/network/network.cpp
 	src/network/netsockets.cpp
+        src/network/online_service.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -365,7 +365,6 @@ set(tolua_FILES
 	src/tolua/font.pkg
 	src/tolua/game.pkg
 	src/tolua/map.pkg
-	src/tolua/master.pkg
 	src/tolua/minimap.pkg
 	src/tolua/network.pkg
 	src/tolua/particle.pkg
@@ -526,6 +525,7 @@ set(stratagus_generic_HDRS
 	src/include/cursor.h
 	src/include/depend.h
 	src/include/editor.h
+	src/include/online_service.h
 	src/include/font.h
 	src/include/game.h
 	src/include/icons.h
@@ -534,7 +534,6 @@ set(stratagus_generic_HDRS
 	src/include/iolib.h
 	src/include/luacallback.h
 	src/include/map.h
-	src/include/master.h
 	src/include/menus.h
 	src/include/minimap.h
 	src/include/missile.h
@@ -1101,43 +1100,6 @@ endif()
 
 ########### next target ###############
 
-set(metaserver_SRCS
-	metaserver/cmd.cpp
-	metaserver/db.cpp
-	metaserver/games.cpp
-	metaserver/main.cpp
-	metaserver/netdriver.cpp
-	src/network/net_lowlevel.cpp
-)
-
-set(metaserver_HDRS
-	metaserver/cmd.h
-	metaserver/db.h
-	metaserver/games.h
-	metaserver/netdriver.h
-)
-
-source_group(metaserver FILES ${metaserver_SRCS} ${metaserver_HDRS})
-
-if(SQLITE_FOUND)
-	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
-	target_link_libraries(metaserver ${SDL2_LIBRARY} ${SQLITE_LIBRARIES})
-
-	if(WIN32)
-		target_link_libraries(metaserver winmm ws2_32)
-	endif()
-
-	if(WIN32 AND MINGW)
-		target_link_libraries(metaserver dxguid)
-	endif()
-
-	if(WIN32 AND MINGW AND ENABLE_STATIC)
-		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
-	endif()
-endif()
-
-########### next target ###############
-
 set(png2stratagus_SRCS
 	tools/png2stratagus.cpp
 )
@@ -1172,8 +1134,6 @@ set(doxygen_FILES
 	doc/Doxyfile-header.html
 	${stratagus_SRCS}
 	${stratagus_HDRS}
-	${metaserver_SRCS}
-	${metaserver_HDRS}
 	${gameheaders_HDRS}
 	${png2stratagus_SRCS}
 )
@@ -1208,9 +1168,6 @@ endmacro()
 if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	self_packer(stratagus)
 	self_packer(png2stratagus)
-	if(SQLITE_FOUND)
-		self_packer(metaserver)
-	endif()
 endif()
 
 ########### next target ###############
@@ -1235,10 +1192,6 @@ endif()
 install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
-if(SQLITE_FOUND)
-	install(TARGETS metaserver DESTINATION ${BINDIR} RENAME stratagus-metaserver)
-endif()
-
 if(ENABLE_DOC AND DOXYGEN_FOUND)
 	install(FILES doc/stratagus.6 DESTINATION ${MANDIR})
 	install(FILES
@@ -1250,7 +1203,6 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		doc/index.html
 		doc/install.html
 		doc/media.html
-		doc/metaserver_protocol.txt
 		doc/README-SDL.txt
 		DESTINATION share/doc/stratagus
 	)
