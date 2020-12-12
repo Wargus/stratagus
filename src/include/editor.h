@@ -109,6 +109,7 @@ public:
 
 extern CEditor Editor;
 
+extern bool TileToolNoFixup;
 extern char TileToolRandom;
 
 /*----------------------------------------------------------------------------
