@@ -255,6 +255,47 @@ static void InitKey2Str()
 	Key2Str[SDLK_UNDO] = "undo";
 }
 
+#ifdef USE_WIN32
+typedef enum PROCESS_DPI_AWARENESS {
+    PROCESS_DPI_UNAWARE = 0,
+    PROCESS_SYSTEM_DPI_AWARE = 1,
+    PROCESS_PER_MONITOR_DPI_AWARE = 2
+} PROCESS_DPI_AWARENESS;
+
+static void setDpiAware() {
+	void* userDLL;
+	BOOL(WINAPI *SetProcessDPIAware)(void); // Vista and later
+	void* shcoreDLL;
+	HRESULT(WINAPI *SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS dpiAwareness); // Windows 8.1 and later
+
+	userDLL = SDL_LoadObject("USER32.DLL");
+	if (userDLL) {
+		SetProcessDPIAware = (BOOL(WINAPI *)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
+	}
+
+	shcoreDLL = SDL_LoadObject("SHCORE.DLL");
+	if (shcoreDLL) {
+		SetProcessDpiAwareness = (HRESULT(WINAPI *)(PROCESS_DPI_AWARENESS)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
+	}
+
+	if (SetProcessDpiAwareness) {
+		/* Try Windows 8.1+ version */
+		HRESULT result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+		DebugPrint("called SetProcessDpiAwareness: %d", (result == S_OK) ? 1 : 0);
+	}
+	else if (SetProcessDPIAware) {
+		/* Try Vista - Windows 8 version.
+		This has a constant scale factor for all monitors.
+		*/
+		BOOL success = SetProcessDPIAware();
+		DebugPrint("called SetProcessDPIAware: %d", (int)success);
+	}
+}
+#else
+static void setDpiAware() {
+}
+#endif
+
 /**
 **  Initialize the video part for SDL.
 */
@@ -318,6 +359,8 @@ void InitVideoSdl()
 	} else if (!Parameters::Instance.applicationName.empty()) {
 		win_title = Parameters::Instance.applicationName.c_str();
 	}
+
+	setDpiAware();
 
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                             Video.WindowWidth, Video.WindowHeight, flags);
