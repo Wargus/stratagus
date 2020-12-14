@@ -448,15 +448,31 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	theora_decode_YUVout(&data->tstate, yuv);
 	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv->y, yuv->y_stride, yuv->u, yuv->uv_stride, yuv->v, yuv->uv_stride);
 	SDL_RenderClear(TheRenderer);
-	int w, h;
-	SDL_RenderGetLogicalSize(TheRenderer, &w, &h);
-	SDL_RenderSetLogicalSize(TheRenderer, 0, 0);
-	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
-	if (SDL_RenderReadPixels(TheRenderer, rect, surface->format->format, surface->pixels, surface->pitch)) {
+
+	// since SDL will render us at logical size, and SDL_RenderReadPixels will read the at
+	// output size, we need to adapt the rectangles to read and write from dynamically
+	int rw, rh, ww, wh;
+	SDL_GetWindowSize(TheWindow, &ww, &wh);
+	SDL_RenderGetLogicalSize(TheRenderer, &rw, &rh);
+	SDL_Rect render_rect;
+	render_rect.x = 0;
+	render_rect.y = 0;
+	double scaleX = (double)ww / rw;
+	double scaleY = (double)wh / rh;
+	double scale = std::min(scaleX, scaleY);
+	render_rect.w = rect->w / scale;
+	render_rect.h = rect->h / scale;
+
+	SDL_Rect read_rect;
+	read_rect.w = rect->w;
+	read_rect.h = rect->h;
+	read_rect.x = (ww - (rw * scale)) / 2;
+	read_rect.y = (wh - (rh * scale)) / 2;
+	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, &render_rect);
+	if (SDL_RenderReadPixels(TheRenderer, &read_rect, surface->format->format, surface->pixels, surface->pitch)) {
 		fprintf(stderr, "Reading from renderer not supported\n");
 		SDL_FillRect(surface, NULL, 0); // completely transparent
 	}
-	SDL_RenderSetLogicalSize(TheRenderer, w, h);
 	free(yuv);
 }
 
