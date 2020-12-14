@@ -281,14 +281,14 @@ static void setDpiAware() {
 	if (SetProcessDpiAwareness) {
 		/* Try Windows 8.1+ version */
 		HRESULT result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
-		DebugPrint("called SetProcessDpiAwareness: %d", (result == S_OK) ? 1 : 0);
+		DebugPrint("called SetProcessDpiAwareness: %d" _C_ (result == S_OK) ? 1 : 0);
 	}
 	else if (SetProcessDPIAware) {
 		/* Try Vista - Windows 8 version.
 		This has a constant scale factor for all monitors.
 		*/
 		BOOL success = SetProcessDPIAware();
-		DebugPrint("called SetProcessDPIAware: %d", (int)success);
+		DebugPrint("called SetProcessDPIAware: %d" _C_ (int)success);
 	}
 }
 #else
