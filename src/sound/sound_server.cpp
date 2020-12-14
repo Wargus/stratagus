@@ -58,6 +58,7 @@ static bool SoundInitialized;    /// is sound initialized
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
 static double VolumeScale = 1.0;
+static int MusicVolume = 0;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
@@ -344,7 +345,9 @@ void SetMusicFinishedCallback(void (*callback)())
 int PlayMusic(Mix_Music *sample)
 {
 	if (sample) {
+		Mix_VolumeMusic(MusicVolume);
 		Mix_PlayMusic(sample, 0);
+		Mix_VolumeMusic(MusicVolume / 4.0);
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -393,6 +396,7 @@ void SetMusicVolume(int volume)
 {
 	// due to left-right separation, sound effect volume is effectively halfed,
 	// so we adjust the music
+	MusicVolume = volume;
 	Mix_VolumeMusic(volume / 4.0);
 }
 
@@ -401,7 +405,7 @@ void SetMusicVolume(int volume)
 */
 int GetMusicVolume()
 {
-	return std::min(MaxVolume, Mix_VolumeMusic(-1) * 2);
+	return MusicVolume;
 }
 
 /**
