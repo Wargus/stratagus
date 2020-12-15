@@ -85,7 +85,7 @@ public:
 	void SetNonBlocking() { NetSetNonBlocking(socket); }
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
 	bool IsValid() const { return socket != Socket(-1); }
-	int GetSocketAddresses(unsigned long *ips, int maxAddr) { return NetSocketAddr(socket, ips, maxAddr); }
+	int GetSocketAddresses(unsigned long *ips, int maxAddr) { return NetSocketAddr(ips, maxAddr); }
 private:
 	Socket socket;
 };
