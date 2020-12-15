@@ -1539,7 +1539,7 @@ private:
                 unsigned int a, b, c, d, ip, port;
                 if (text.size() > prefix.size() && text.rfind(prefix, 0) != std::string::npos) {
                     int res = sscanf(text.substr(prefix.size()).c_str(), "%d.%d.%d.%d:%d", &a, &b, &c, &d, &port);
-                    if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port > 1024) {
+                    if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port >= 1024) {
                         ip = a | b << 8 | c << 16 | d << 24;
                         if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
                             const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
