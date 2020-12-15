@@ -33,6 +33,7 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include "game.h"
 #include "online_service.h"
 #include "stratagus.h"
 
@@ -47,6 +48,9 @@
 #include "settings.h"
 #include "version.h"
 #include "video.h"
+
+#include "net_lowlevel.h"
+#include "network/mdns.h"
 
 //----------------------------------------------------------------------------
 // Declaration
@@ -1438,14 +1442,62 @@ int FindHostIndexBy(const CHost &host)
 	return -1;
 }
 
+static int service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
+							uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
+							size_t size, size_t name_offset, size_t name_length, size_t record_offset,
+							size_t record_length, void* user_data) {
+	if (rtype == MDNS_RECORDTYPE_A && entry == MDNS_ENTRYTYPE_QUESTION) {
+		size_t cap = 2048;
+		void *buffer = malloc(cap);
+		unsigned long ips[cap];
+		int numIps = NetSocketAddr(ips, cap);
+		for (int i = 0; i < numIps; i++) {
+			mdns_query_answer(sock, from, addrlen, buffer, cap, query_id,
+							  GameName.c_str(), GameName.size(),
+							  CNetworkParameter::Instance.localHost.c_str(),
+							  CNetworkParameter::Instance.localHost.size(),
+							  ips[i], NULL, CNetworkParameter::Instance.localPort,
+							  NULL, 0);
+		}
+	}
+	return 0;
+}
+
 /**
 ** Server Menu Loop: Send out server request messages
 */
 void NetworkProcessServerRequest()
 {
+	static int mDNS_socket = -1;
+
 	if (GameRunning) {
+		if (mDNS_socket != -1) {
+			mdns_socket_close(mDNS_socket);
+			mDNS_socket = -1;
+		}
 		return;
 		// Game already started...
+	}
+
+	if (mDNS_socket == -1) {
+		struct sockaddr_in sock_addr;
+		memset(&sock_addr, 0, sizeof(struct sockaddr_in));
+		sock_addr.sin_family = AF_INET;
+#ifdef _WIN32
+		sock_addr.sin_addr = in4addr_any;
+#else
+		sock_addr.sin_addr.s_addr = INADDR_ANY;
+#endif
+		sock_addr.sin_port = htons(MDNS_PORT);
+#ifdef __APPLE__
+		sock_addr.sin_len = sizeof(struct sockaddr_in);
+#endif
+		mDNS_socket = mdns_socket_open_ipv4(&sock_addr);
+	} else {
+		size_t cap = 2048;
+		void *buffer = malloc(cap);
+		mdns_socket_listen(mDNS_socket, buffer, cap, service_callback, NULL);
+		free(buffer);
 	}
 	Server.Update(FrameCounter);
 }
@@ -1867,9 +1919,58 @@ static int CclNoRandomPlacementMultiplayer(lua_State *l)
 	return 0;
 }
 
+static int query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
+						  uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
+						  size_t size, size_t name_offset, size_t name_length, size_t record_offset,
+						  size_t record_length, void* user_data) {
+	lua_State *l = (lua_State *)user_data;
+	if (rtype == MDNS_RECORDTYPE_A && entry == MDNS_ENTRYTYPE_ADDITIONAL) {
+		struct sockaddr_in addr;
+		mdns_record_parse_a(data, size, record_offset, record_length, &addr);
+		char buf[24] = {'\0'};
+		sprintf(buf, "%d.%d.%d.%d", NIPQUAD(ntohl(addr.sin_addr.s_addr)));
+		int i = lua_objlen(l, -1) + 1;
+		lua_pushnumber(l, i);
+		lua_pushstring(l, buf);
+		lua_settable(l, -3);
+	}
+	return 0;
+}
+
+static int CclNetworkDiscoverServers(lua_State *l)
+{
+	static int mDNS_queryId = -1;
+	static int mDNS_querySocket = -1;
+
+	LuaCheckArgs(l, 1);
+	bool start = LuaToBoolean(l, 1);
+
+	lua_newtable(l);
+	if (start) {
+		size_t cap = 2048;
+		void *buffer = malloc(cap);
+		if (mDNS_querySocket == -1) {
+			mDNS_querySocket = mdns_socket_open_ipv4(NULL);
+		}
+		mDNS_queryId = mdns_query_send(mDNS_querySocket, MDNS_RECORDTYPE_A,
+									   GameName.c_str(), GameName.size(),
+									   buffer, cap, 0);
+		int responses = mdns_query_recv(mDNS_querySocket, buffer, cap, query_callback, l, mDNS_queryId);
+		free(buffer);
+	} else {
+		mdns_socket_close(mDNS_querySocket);
+		mDNS_querySocket = -1;
+		mDNS_queryId = -1;
+	}
+
+	return 1;
+}
+
+
 void NetworkCclRegister()
 {
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
+	lua_register(Lua, "NetworkDiscoverServers", CclNetworkDiscoverServers);
 }
 
 
