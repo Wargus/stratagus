@@ -339,7 +339,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 /**
 **  Draw a map viewport.
 */
-void CViewport::Draw() const
+void CViewport::Draw()
 {
 	PushClipping();
 	this->SetClipping();

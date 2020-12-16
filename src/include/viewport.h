@@ -89,7 +89,7 @@ public:
 	void SetClipping() const;
 
 	/// Draw the full Viewport.
-	void Draw() const;
+	void Draw();
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
