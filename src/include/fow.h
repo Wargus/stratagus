@@ -45,6 +45,7 @@ class CViewport;
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+enum class FogOfWarTypes { cLegacy, cEnhanced, NumOfTypes };
 
 class CFogOfWar
 {
@@ -61,6 +62,8 @@ public:
     static void InitCache();
     static void CleanCache();
     static void ResetCache();
+    static bool SetType(const FogOfWarTypes fow_type);
+	static FogOfWarTypes GetType();
 
 private:
     void Clean();
@@ -75,6 +78,12 @@ private:
 public:
 
 private:
+    static struct FogOfWarSettings 
+	{
+		FogOfWarTypes FOW_Type;      /// Type of fog of war - legacy or enhanced(smooth)
+        
+	} Settings;
+
     /// cached vision table. Tiles filled only once even if it present in the several viewports
     static std::vector<uint8_t> VisTableCache; 
     static intptr_t VisCache_Index0; /// index in the cached vision table for [0:0] tile

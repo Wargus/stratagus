@@ -52,6 +52,7 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+CFogOfWar::FogOfWarSettings CFogOfWar::Settings;
 
 std::vector<uint8_t> CFogOfWar::VisTableCache;
 
@@ -86,6 +87,32 @@ void CFogOfWar::CleanCache()
 void CFogOfWar::ResetCache()
 {
     std::fill(VisTableCache.begin(), VisTableCache.end(), 0);
+}
+
+/** 
+** Select which type of Fog of War to use
+** 
+** @param fow_type	type to set
+** @return true if success, false for wrong fow_type 
+*/
+bool CFogOfWar::SetType(const FogOfWarTypes fow_type)
+{
+	if (fow_type < FogOfWarTypes::NumOfTypes) {
+		CFogOfWar::Settings.FOW_Type = fow_type;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/** 
+** Returns used type of Fog of War 
+** 
+** @return current Fog of War type
+*/
+FogOfWarTypes CFogOfWar::GetType()
+{
+	return CFogOfWar::Settings.FOW_Type;
 }
 
 /**

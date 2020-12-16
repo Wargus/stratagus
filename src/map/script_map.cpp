@@ -37,6 +37,7 @@
 
 #include "map.h"
 #include "fov.h"
+#include "fow.h"
 #include "iolib.h"
 #include "script.h"
 #include "tileset.h"
@@ -336,6 +337,34 @@ static int CclRemoveOpaqueFor(lua_State *l)
 	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() & ~new_flag);
 	return 0;
 }
+
+
+/**
+**  Select which type of Fog of War to use
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetFogOfWarType(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	
+	FogOfWarTypes new_type;
+	const char *type_name = LuaToString(l, 1);
+	if (!strcmp(type_name, "legacy")) {
+		new_type = FogOfWarTypes::cLegacy;
+	} else if (!strcmp(type_name, "enhanced")) {
+		new_type = FogOfWarTypes::cEnhanced;
+	} else {
+		PrintFunction();
+		fprintf(stdout, "Accessible Fog of War types: \"legacy\", \"enhanced\".\n");
+		return 1;
+	}
+	CFogOfWar::SetType(new_type);
+	return 0;
+}
+
 
 /**
 **  Fog of war opacity.
@@ -674,6 +703,8 @@ void MapCclRegister()
 	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
 	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);
 	lua_register(Lua, "RemoveOpaqueFor", CclRemoveOpaqueFor);
+
+	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
 
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
