@@ -1211,9 +1211,7 @@ public:
 
     void setPassword(std::string pw) {
         if (pw.empty()) {
-            for (int i = 0; i < sizeof(password); i++) {
-                this->password[i] = 0;
-            }
+            memset(password, 0, sizeof(password));
             hasPassword = false;
         } else {
             pvpgn::sha1_hash(&password, pw.length(), pw.c_str());
