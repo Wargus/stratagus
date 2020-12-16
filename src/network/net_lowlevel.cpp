@@ -219,7 +219,7 @@ unsigned long NetResolveHost(const std::string &host)
 #ifndef MIB_IF_TYPE_IEEE80211
 #define MIB_IF_TYPE_IEEE80211 71
 #endif
-int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
+int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	int idx = 0;
 	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
@@ -245,7 +245,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 	return idx;
 }
 #elif defined(USE_LINUX) || defined(USE_MAC)
-int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
+int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	struct ifaddrs *ifAddrStruct = NULL;
 	struct ifaddrs *ifa = NULL;
@@ -268,7 +268,7 @@ int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
 }
 #else // } {
 // more??
-int NetSocketAddr(const Socket sock, unsigned long *ips, int maxAddr)
+int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	ips[0] = htonl(0x7f000001);
 	return 1;
