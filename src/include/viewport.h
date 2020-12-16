@@ -31,7 +31,7 @@
 #define VIEWPORT_H
 
 //@{
-
+#include "fow.h"
 #include "vec2i.h"
 class CUnit;
 
@@ -123,6 +123,9 @@ public:
 	int MapHeight;            /// Height in map tiles
 
 	CUnit *Unit;              /// Bound to this unit
+private:
+	CFogOfWar FogOfWar;
+
 };
 
 //@}
