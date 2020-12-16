@@ -1449,8 +1449,8 @@ static int service_callback(int sock, const struct sockaddr* from, size_t addrle
 	if (rtype == MDNS_RECORDTYPE_A && entry == MDNS_ENTRYTYPE_QUESTION) {
 		size_t cap = 2048;
 		void *buffer = malloc(cap);
-		unsigned long ips[cap];
-		int numIps = NetSocketAddr(ips, cap);
+		unsigned long ips[20];
+		int numIps = NetSocketAddr(ips, 20);
 		for (int i = 0; i < numIps; i++) {
 			mdns_query_answer(sock, from, addrlen, buffer, cap, query_id,
 							  GameName.c_str(), GameName.size(),
