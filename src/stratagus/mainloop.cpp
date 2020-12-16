@@ -38,6 +38,7 @@
 
 #include "actions.h"
 #include "editor.h"
+#include "fow.h"
 #include "game.h"
 #include "map.h"
 #include "missile.h"
@@ -147,6 +148,11 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 */
 void DrawMapArea()
 {
+	/// Reset VisionCache
+	if (CFogOfWar::GetType() == FogOfWarTypes::cEnhanced) {
+		CFogOfWar::ResetCache();
+	}
+
 	// Draw all of the viewports
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		// Center viewport on tracked unit

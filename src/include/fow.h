@@ -80,7 +80,7 @@ public:
 private:
     static struct FogOfWarSettings 
 	{
-		FogOfWarTypes FOW_Type;      /// Type of fog of war - legacy or enhanced(smooth)
+		FogOfWarTypes FOW_Type {FogOfWarTypes::cEnhanced};      /// Type of fog of war - legacy or enhanced(smooth)
         
 	} Settings;
 

@@ -670,6 +670,9 @@ void CMap::InitFogOfWar()
 
 /**
 **  Cleanup the fog of war.
+**  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
+**  It's safe to call this for both types of FOW. 
+**	CFogOfWar::CleanCache() is called from CMap::Clean()
 */
 void CMap::CleanFogOfWar()
 {

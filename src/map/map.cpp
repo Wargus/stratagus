@@ -335,7 +335,11 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	InitFogOfWar();
+	switch (CFogOfWar::GetType()) {
+		case FogOfWarTypes::cLegacy:   InitFogOfWar(); break;
+		case FogOfWarTypes::cEnhanced: CFogOfWar::InitCache(); break;
+		default: break;
+	}
 }
 
 /**
@@ -361,6 +365,10 @@ void CMap::Clean()
 	UI.Minimap.Destroy();
 
 	FieldOfView.Clean();
+	
+	if (CFogOfWar::GetType() == FogOfWarTypes::cEnhanced) {
+		CFogOfWar::CleanCache();
+	}
 }
 
 /**

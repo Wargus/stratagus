@@ -34,6 +34,7 @@
 #include "viewport.h"
 
 #include "font.h"
+#include "fow.h"
 #include "map.h"
 #include "missile.h"
 #include "particle.h"
@@ -436,8 +437,13 @@ void CViewport::Draw()
 		}
 		ParticleManager.endDraw();
 	}
-
-	this->DrawMapFogOfWar();
+	
+	/// Draw Fog of War
+	switch (CFogOfWar::GetType()) {
+		case FogOfWarTypes::cLegacy:   this->DrawMapFogOfWar(); break;
+		case FogOfWarTypes::cEnhanced: this->FogOfWar.Refresh(*this, *ThisPlayer); break;
+		default: break;
+	}
 
 	// If there was a click missile, draw it again here above the fog
 	if (clickMissile != NULL) {
