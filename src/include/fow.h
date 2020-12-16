@@ -34,7 +34,6 @@
 #include <vector>
 #include "player.h"
 #include "video.h"
-//#include "viewport.h"
 
 //@{
 
