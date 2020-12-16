@@ -50,7 +50,6 @@ class CViewport;
 class CFogOfWar
 {
 public:
-    enum MapEdges   { cNone    = 0, cBottom   = 0b001, cRight   = 0b010, cBottomRight = 0b011, cUpper = 0b0100, cLeft = 0b1000};
     enum VisionType { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010, cCached      = 0b100};
 
     ~CFogOfWar()
