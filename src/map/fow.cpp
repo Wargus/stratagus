@@ -52,6 +52,12 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+float   CBlurer::Radius {1.5};
+uint8_t CBlurer::NumOfIteratons {2};
+
+std::vector<uint8_t> CBlurer::BoxRadius; 
+
+
 CFogOfWar::FogOfWarSettings CFogOfWar::Settings;
 
 std::vector<uint8_t> CFogOfWar::VisTableCache;
@@ -350,4 +356,156 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
         index += textureWidth;
     }
 }
+
+/**
+**  Determine radiuses (box sizes) for box blur iterations
+**
+**  @param radius Radius or standard deviation
+**  @param numOfIterations Number of boxes
+*/
+void CBlurer::Init(const float radius/* = 1.5*/, const uint8_t numOfIterations/* = 2*/)
+{
+  
+    float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
+    int dL = floor(D);  
+    if (dL % 2 == 0) dL--;
+    int dU = dL + 2;
+				
+    float M = (12 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
+    int m = round(M);
+
+    CBlurer::BoxRadius.clear();
+    CBlurer::BoxRadius.resize(numOfIterations);
+    for(uint8_t i = 0; i < numOfIterations; i++) {
+        float val = ((float)(i < m ? dL : dU) - 1) / 2;
+        CBlurer::BoxRadius[i] = val;
+    }
+
+    CBlurer::Radius         = radius;
+    CBlurer::NumOfIteratons = numOfIterations;
+}
+
+/**
+**  Setup blurer
+**
+**  @param textureWidth width of the working texture (input/output texture also)
+**  @param textureHeight height of the working texture (input/output texture also)
+**  @param radius Radius or standard deviation
+**  @param numOfIterations Number of boxes
+*/
+void CBlurer::Setup(const uint16_t textureWidth, const uint16_t textureHeight)
+{
+    TextureWidth = textureWidth;
+    TextureHeight = textureHeight;
+    WorkingTexture.clear();
+    WorkingTexture.resize(TextureWidth * TextureHeight);
+
+    Init(CBlurer::Radius, CBlurer::NumOfIteratons);
+}
+
+
+
+void CBlurer::Blur(uint8_t *texture)
+{
+    uint8_t *source = texture;
+    uint8_t *target = WorkingTexture.data();
+
+    for (int i = 0; i < BoxRadius.size(); i++){
+        if (i > 0) {
+            uint8_t *swap = source;
+            source = target;
+            target = swap;
+        }
+        ProceedIteration(source, target, BoxRadius[i]); 
+    }
+    if (target != texture) {
+        memcpy(texture, WorkingTexture.data(), WorkingTexture.size() * sizeof(uint8_t));    
+    }
+ }
+
+void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
+{
+    memcpy(target, source, WorkingTexture.size() * sizeof(uint8_t));
+    
+    uint8_t *swap = source;
+    source = target;
+    target = swap; 
+
+    float iarr = 1.0 / (radius + radius + 1);
+    size_t ti, li, ri;
+    uint8_t leftBorder, rightBorder;
+    int16_t sum;
+
+    /// Horizontal blur pass
+    for (size_t i = 0; i < TextureHeight; i++) {
+
+        ti = i * TextureWidth; 
+        li = ti;
+        ri = ti + radius;
+        leftBorder  = source[ti];
+        rightBorder = source[ti + TextureWidth - 1];
+        sum         = (radius + 1) * leftBorder;
+
+        for (size_t j = 0; j < radius; j++) { 
+            sum += source[ti + j]; 
+        }
+        for (size_t j = 0; j <= radius; j++) {
+            sum += source[ri++] - leftBorder; 
+            target[ti++] = round(iarr * sum);
+        }
+        for (size_t j = radius + 1; j < TextureWidth - radius; j++) 
+        {
+            sum += source[ri++] - source[li++];
+            target[ti++] = round(sum * iarr);
+        }
+        for (size_t j = TextureWidth - radius; j < TextureWidth; j++)
+        {
+            sum += rightBorder - source[li++];   
+            target[ti++] = round(iarr * sum);
+        }
+    }
+
+    swap = source;
+    source = target;
+    target = swap;  
+
+    /// Vertical blur pass
+    for (size_t i = 0; i < TextureWidth; i++) {
+
+        ti = i;
+        li = ti;
+        ri = ti + radius * TextureWidth;
+        leftBorder  = source[ti];
+        rightBorder = source[ti + TextureWidth * (TextureHeight - 1)];
+        sum         = (radius + 1) * leftBorder;
+
+        for (size_t j = 0; j < radius; j++) {
+            sum += source[ti + j * TextureWidth];
+        }
+        for (size_t j = 0; j <= radius ; j++)
+        { 
+            sum += source[ri] - leftBorder;
+            target[ti] = round(iarr * sum);
+            ri += TextureWidth;
+            ti += TextureWidth;
+        }
+        for (size_t j = radius + 1; j < TextureHeight - radius; j++)
+        { 
+            sum += source[ri] - source[li];
+            target[ti] = round(iarr * sum);
+            li += TextureWidth;
+            ri += TextureWidth;
+            ti += TextureWidth;
+        }
+        for (size_t j = TextureHeight - radius; j < TextureHeight; j++)
+        { 
+            sum += rightBorder - source[li];
+            target[ti] = round(iarr * sum);
+            li += TextureWidth;
+            ti += TextureWidth;
+        }
+    }
+
+}
+
 //@}
