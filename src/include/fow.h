@@ -59,7 +59,7 @@ public:
 
     void Refresh(const CViewport &viewport, const CPlayer &thisPlayer);
     
-    static void InitCache();
+    static void Init();
     static void CleanCache();
     static void ResetCache();
     static bool SetType(const FogOfWarTypes fow_type);

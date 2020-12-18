@@ -337,7 +337,7 @@ void CMap::Init()
 {
 	switch (CFogOfWar::GetType()) {
 		case FogOfWarTypes::cLegacy:   InitFogOfWar(); break;
-		case FogOfWarTypes::cEnhanced: CFogOfWar::InitCache(); break;
+		case FogOfWarTypes::cEnhanced: CFogOfWar::Init(); break;
 		default: break;
 	}
 }

@@ -62,7 +62,7 @@ size_t   CFogOfWar::VisCacheWidth   = 0;
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-void CFogOfWar::InitCache()
+void CFogOfWar::Init()
 {
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
     /// +1 to the bottom & right because of UI.MapArea.ScrollPadding
