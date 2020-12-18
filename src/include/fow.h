@@ -115,6 +115,8 @@ private:
     std::vector<uint8_t> FogTexture; // Upscaled fog texture
     SDL_Surface         *WorkSurface {nullptr};
     SDL_Surface         *FogSurface {nullptr};
+    
+    CBlurer Blurer;
 
     uint16_t RenderWidth      {0}; // In pixels
     uint16_t RenderHeight     {0}; // In pixels

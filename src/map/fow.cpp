@@ -80,6 +80,8 @@ void CFogOfWar::Init()
     VisTableCache.clear();
     VisTableCache.resize(tableSize);
     ResetCache();
+
+    CBlurer::Init();
 }
 
 void CFogOfWar::CleanCache()
@@ -144,6 +146,8 @@ void CFogOfWar::AdjustToViewport(const CViewport &viewport)
 
     FogTexture.resize(FogTextureWidth * FogTextureHeight);
     std::fill(FogTexture.begin(), FogTexture.end(), 0xFF);
+
+    Blurer.Setup(FogTextureWidth, FogTextureHeight);
 
     RenderWidth  = viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1;
     RenderHeight = viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1;
@@ -262,6 +266,7 @@ void CFogOfWar::GenerateFog(const CViewport &viewport, const CPlayer &thisPlayer
 
     UpscaleFog(FogTexture.data(), viewport);
     /// TODO: Blur fog texture
+    Blurer.Blur(FogTexture.data());
 }
 
 
