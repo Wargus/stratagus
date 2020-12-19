@@ -42,6 +42,11 @@
 
 class CViewport;
 
+
+/*----------------------------------------------------------------------------
+--  Declarations
+----------------------------------------------------------------------------*/
+/// Class for box blur algorithm. Used to blur upscaled FOW texture.
 class CBlurer
 {
 public:
@@ -57,25 +62,19 @@ private:
     static float Radius;
     static uint8_t NumOfIterations;
 
-    static std::vector<uint8_t> BoxRadius; /// Radiuses (box sizes) for box blur iterations
+    static std::vector<uint8_t> HalfBoxes; /// Radiuses (box sizes) for box blur iterations
     
     std::vector<uint8_t> WorkingTexture;
     uint16_t TextureWidth {0};
     uint16_t TextureHeight {0};
-    
-    ///int NumOfPasses {3};
-
 };
 
-/*----------------------------------------------------------------------------
---  Declarations
-----------------------------------------------------------------------------*/
 enum class FogOfWarTypes { cLegacy, cEnhanced, NumOfTypes };
 
 class CFogOfWar
 {
 public:
-    enum VisionType { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010, cCached      = 0b100};
+    enum VisionType { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010, cCached = 0b100};
 
     ~CFogOfWar()
     {
@@ -109,7 +108,7 @@ private:
         
 	} Settings;
 
-    /// cached vision table. Tiles filled only once even if it present in the several viewports
+    /// cached vision table. Tiles filled only once per cycle even if they present in the several viewports
     static std::vector<uint8_t> VisTableCache; 
     static intptr_t VisCache_Index0; /// index in the cached vision table for [0:0] tile
     static size_t   VisCacheWidth;   /// width of the cached vision table

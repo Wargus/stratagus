@@ -52,18 +52,22 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-float   CBlurer::Radius {1.5};
-uint8_t CBlurer::NumOfIterations {2};
+/// Blurer parameters
+/// From 1 to 3 is optimal. With 3 result is very smooth, 
+/// but it opens about 1/2 extra tiles around SightRange circle
+float   CBlurer::Radius {2};
+/// 2-3 is optimal, with higher values result enhancing not so radicaly
+uint8_t CBlurer::NumOfIterations {3};
 
-std::vector<uint8_t> CBlurer::BoxRadius; 
+std::vector<uint8_t> CBlurer::HalfBoxes; /// Calculated radiuses for box blur iterations
 
 
 CFogOfWar::FogOfWarSettings CFogOfWar::Settings;
 
 std::vector<uint8_t> CFogOfWar::VisTableCache;
 
-intptr_t CFogOfWar::VisCache_Index0 = 0;
-size_t   CFogOfWar::VisCacheWidth   = 0;
+intptr_t CFogOfWar::VisCache_Index0 {0};
+size_t   CFogOfWar::VisCacheWidth   {0};
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -89,7 +93,6 @@ void CFogOfWar::CleanCache()
     VisTableCache.clear();
     CFogOfWar::VisCacheWidth = 0;
     CFogOfWar::VisCache_Index0 = 0;
-    
 }
 
 void CFogOfWar::ResetCache()
@@ -162,6 +165,11 @@ void CFogOfWar::AdjustToViewport(const CViewport &viewport)
     SDL_SetSurfaceBlendMode(FogSurface, SDL_BLENDMODE_BLEND);
     SDL_FillRect(FogSurface, NULL, SDL_MapRGBA(FogSurface->format, 0, 0, 0, 0));
 }
+
+/**
+ ** Clean Fog of War (free reserved memory and SDL surfaces)
+ **
+ */
 
 void CFogOfWar::Clean()
 {
@@ -276,10 +284,10 @@ void CFogOfWar::GenerateFog(const CViewport &viewport, const CPlayer &thisPlayer
 
 
 /**
-**  4x4 upscale for generated fog of war texture
+**  4x4 upscale generated fog of war texture
 **
-**  @param 
-**  @param 
+**  @param alphaTexture FOW texture upscale to
+**  @param viewport     viewport which has this FOW texture
 */
 void CFogOfWar::UpscaleFog(uint8_t *alphaTexture, const CViewport &viewport)
 {
@@ -368,32 +376,35 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 }
 
 /**
-**  Determine radiuses (box sizes) for box blur iterations
-**
-**  @param radius Radius or standard deviation
-**  @param numOfIterations Number of boxes
+**  Init box blurer parameters (determine radiuses (box sizes) for box blur iterations)
+**  Uses already stored parameters
 */
 void CBlurer::Init()
 {
     CBlurer::Init(CBlurer::Radius, CBlurer::NumOfIterations);
 }
 
+/**
+**  Init box blurer parameters (determine radiuses (box sizes) for box blur iterations)
+**  This used to set new parameters for blur algorithm
+**
+**  @param radius Radius or standard deviation
+**  @param numOfIterations Number of boxes
+*/
 void CBlurer::Init(const float radius, const uint8_t numOfIterations)
 {
-  
     float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
     int dL = floor(D);  
-    if (dL % 2 == 0) dL--;
+    if (dL % 2 == 0) { dL--; }
     int dU = dL + 2;
 				
     float M = (12 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
     int m = round(M);
 
-    CBlurer::BoxRadius.clear();
-    CBlurer::BoxRadius.resize(numOfIterations);
+    CBlurer::HalfBoxes.clear();
+    CBlurer::HalfBoxes.resize(numOfIterations);
     for(uint8_t i = 0; i < numOfIterations; i++) {
-        float val = ((float)(i < m ? dL : dU) - 1) / 2;
-        CBlurer::BoxRadius[i] = val;
+        CBlurer::HalfBoxes[i] = ((float)(i < m ? dL : dU) - 1) / 2;
     }
 
     CBlurer::Radius         = radius;
@@ -405,8 +416,6 @@ void CBlurer::Init(const float radius, const uint8_t numOfIterations)
 **
 **  @param textureWidth width of the working texture (input/output texture also)
 **  @param textureHeight height of the working texture (input/output texture also)
-**  @param radius Radius or standard deviation
-**  @param numOfIterations Number of boxes
 */
 void CBlurer::Setup(const uint16_t textureWidth, const uint16_t textureHeight)
 {
@@ -428,24 +437,38 @@ void CBlurer::Clean()
 }
 
 
+/**
+ ** Blur a texture (optimized for 1 chanel (alpha) textures)
+ **
+ ** @param  texture texture to blur (uint8_t)
+ **
+ */
 void CBlurer::Blur(uint8_t *texture)
 {
     uint8_t *source = texture;
     uint8_t *target = WorkingTexture.data();
 
-    for (int i = 0; i < BoxRadius.size(); i++){
+    for (int i = 0; i < HalfBoxes.size(); i++){
         if (i > 0) {
             uint8_t *swap = source;
             source = target;
             target = swap;
         }
-        ProceedIteration(source, target, BoxRadius[i]); 
+        ProceedIteration(source, target, HalfBoxes[i]); 
     }
     if (target != texture) {
         memcpy(texture, WorkingTexture.data(), WorkingTexture.size() * sizeof(uint8_t));    
     }
- }
+}
 
+/**
+**  Proceed one iteration of box bluring
+**
+**  @param  source  source texture (which has to be blured)
+**  @param  target  target texture (where result will be)
+**  @param  radius  blur radius (box size) for current iteration
+**
+*/
 void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
 {
     memcpy(target, source, WorkingTexture.size() * sizeof(uint8_t));
