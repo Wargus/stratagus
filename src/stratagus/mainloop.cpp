@@ -357,12 +357,6 @@ static void DisplayLoop()
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
 		UpdateDisplay();
-
-		//
-		// If double-buffered mode, we will display the contains of
-		// VideoMemory. If direct mode this does nothing. In X11 it does
-		// XFlush
-		//
 		RealizeVideoMemory();
 	}
 #ifdef REALVIDEO

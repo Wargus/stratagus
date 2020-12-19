@@ -13,6 +13,9 @@ Increase version and update changelog for debian:
 Update copyright information for Debian:
  debian/copyright
 
+It's a good idea to ensure the debian build works before taggging:
+ gbp buildpackage
+
 Tag the new release in https://github.com/Wargus/win32-stratagus-dependencies
 and wait for it to run through on the Appveyor CI. This will automatically
 cause a release with the tag name to be created, and the windows dependencies

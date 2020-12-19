@@ -642,7 +642,6 @@ find_package(SDL2_mixer REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(OpenMP)
 
 if(WIN32)
 	find_package(MakeNSIS)
@@ -654,9 +653,6 @@ find_package(MNG)
 find_package(OggVorbis)
 find_package(Theora)
 
-find_package(X11)
-
-find_package(Sqlite)
 find_package(Doxygen)
 find_package(SelfPackers)
 
@@ -690,8 +686,6 @@ option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
-
-option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
 option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
@@ -762,12 +756,6 @@ if(WITH_STACKTRACE AND STACKTRACE_FOUND)
 	add_definitions(-DUSE_STACKTRACE ${STACKTRACE_DEFINITIONS})
 	include_directories(${STACKTRACE_PROJECT_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${STACKTRACE_LIBRARY})
-endif()
-
-if(WITH_X11 AND X11_FOUND)
-	add_definitions(-DUSE_X11)
-	include_directories(${X11_INCLUDE_DIR})
-	set(stratagus_LIBS ${stratagus_LIBS} ${X11_X11_LIB})
 endif()
 
 # Platform definitions
@@ -1024,7 +1012,6 @@ log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
-log_package("X11" "X11")
 
 message("==================================")
 
@@ -1075,11 +1062,6 @@ else ()
    add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
 endif ()
 target_link_libraries(stratagus ${stratagus_LIBS})
-
-if(OpenMP_CXX_FOUND)
-	target_compile_options(stratagus PRIVATE ${OpenMP_CXX_FLAGS})
-	target_link_libraries(stratagus OpenMP::OpenMP_CXX)
-endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
