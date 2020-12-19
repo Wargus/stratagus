@@ -53,7 +53,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 float   CBlurer::Radius {1.5};
-uint8_t CBlurer::NumOfIteratons {2};
+uint8_t CBlurer::NumOfIterations {2};
 
 std::vector<uint8_t> CBlurer::BoxRadius; 
 
@@ -368,7 +368,12 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 **  @param radius Radius or standard deviation
 **  @param numOfIterations Number of boxes
 */
-void CBlurer::Init(const float radius/* = 1.5*/, const uint8_t numOfIterations/* = 2*/)
+void CBlurer::Init()
+{
+    CBlurer::Init(CBlurer::Radius, CBlurer::NumOfIterations);
+}
+
+void CBlurer::Init(const float radius, const uint8_t numOfIterations)
 {
   
     float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
@@ -387,7 +392,7 @@ void CBlurer::Init(const float radius/* = 1.5*/, const uint8_t numOfIterations/*
     }
 
     CBlurer::Radius         = radius;
-    CBlurer::NumOfIteratons = numOfIterations;
+    CBlurer::NumOfIterations = numOfIterations;
 }
 
 /**
@@ -404,8 +409,6 @@ void CBlurer::Setup(const uint16_t textureWidth, const uint16_t textureHeight)
     TextureHeight = textureHeight;
     WorkingTexture.clear();
     WorkingTexture.resize(TextureWidth * TextureHeight);
-
-    Init(CBlurer::Radius, CBlurer::NumOfIteratons);
 }
 
 

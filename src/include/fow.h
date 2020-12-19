@@ -45,7 +45,8 @@ class CViewport;
 class CBlurer
 {
 public:
-    static void Init(const float radius = 1.5, const uint8_t numOfIterations = 2);
+    static void Init();
+    static void Init(const float radius, const uint8_t numOfIterations);
     void Setup(const uint16_t textureWidth, const uint16_t textureHeight);
     void Blur(uint8_t *texture);
 private:
@@ -53,7 +54,7 @@ private:
 
 private:
     static float Radius;
-    static uint8_t NumOfIteratons;
+    static uint8_t NumOfIterations;
 
     static std::vector<uint8_t> BoxRadius; /// Radiuses (box sizes) for box blur iterations
     
