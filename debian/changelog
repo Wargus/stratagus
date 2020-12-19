@@ -1,4 +1,4 @@
-stratagus (3.0.0) UNRELEASED; urgency=medium
+stratagus (3.0.0) focal; urgency=medium
 
   * Migrate to SDL2, remove old direct OpenGL backend
   * Migrate most custom code to handle image and audio formats, use SDL2_mixer and SDL2_image instead
@@ -12,8 +12,13 @@ stratagus (3.0.0) UNRELEASED; urgency=medium
   * Add an AlwaysThreat boolean flag for units that cannot attack but can cast spells and are thus still a danger for the AI
   * Improve the displayed number of additional selected units
   * Improve the pathfinding algorithm and related functions like retreating and roaming behavior
+  * Improve the target selection when attack ground is used
+  * Add support for online gaming via PVPGN
+  * Add discovery of open games in the LAN using DNS-SD queries
+  * Allow non-square pixel scaling to be set by games
+  * Fix flickering when rendering movies into widget surfaces
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 06 Jun 2020 11:10:12 +0200
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Fri, 18 Dec 2020 23:15:21 +0100
 
 stratagus (2.4.3) eoan; urgency=medium
 

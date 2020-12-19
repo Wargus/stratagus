@@ -40,7 +40,28 @@
 
 <ul>
 <p/>
-<p/><li>2.4.3 Released<p/></li>
+<p/>
+<li>3.0.0 Released<p/></li>
+  <ul>
+    <li>Migrate to SDL2, remove old direct OpenGL backend</li>
+    <li>Migrate most custom code to handle image and audio formats, use SDL2_mixer and SDL2_image instead</li>
+    <li>Force the AI to observe dependencies when upgrading in network games</li>
+    <li>Fixed an issue with units continuing to attack destroyed walls</li>
+    <li>Fixed an issue with units never finishing their move action if another unit appears at the goal position</li>
+    <li>Fixed an issue when units would cease attacking non-threatening units of they came under attack, but their attacker is not reachable</li>
+    <li>Fixed a potential segfault in the AI pathfinder</li>
+    <li>Fixed a number of potential desyncs in network games, because the network random numbers where used for local sounds</li>
+    <li>Fixed an issue with grayscale application for 4 bpp images</li>
+    <li>Add an AlwaysThreat boolean flag for units that cannot attack but can cast spells and are thus still a danger for the AI</li>
+    <li>Improve the displayed number of additional selected units</li>
+    <li>Improve the pathfinding algorithm and related functions like retreating and roaming behavior</li>
+    <li>Improve the target selection when attack ground is used</li>
+    <li>Add support for online gaming via PVPGN</li>
+    <li>Add discovery of open games in the LAN using DNS-SD queries</li>
+    <li>Allow non-square pixel scaling to be set by games</li>
+    <li>Fix flickering when rendering movies into widget surfaces</li>
+  </ul>
+<li>2.4.3 Released<p/></li>
 	<ul>
 	  <li>
 	    Allow specifying colors, percentages, and border for the LifeBar.
