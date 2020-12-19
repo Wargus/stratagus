@@ -51,7 +51,7 @@ class CBlurer
 {
 public:
     static void Init();
-    static void Init(const float radius, const uint8_t numOfIterations);
+    static void Init(const float radius, const int numOfIterations);
     void Setup(const uint16_t textureWidth, const uint16_t textureHeight);
     void Clean();
     void Blur(uint8_t *texture);

@@ -391,8 +391,10 @@ void CBlurer::Init()
 **  @param radius Radius or standard deviation
 **  @param numOfIterations Number of boxes
 */
-void CBlurer::Init(const float radius, const uint8_t numOfIterations)
+void CBlurer::Init(const float radius, const int numOfIterations)
 {
+    Assert (radius >= 0 && numOfIterations > 0);
+
     float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
     int dL = floor(D);  
     if (dL % 2 == 0) { dL--; }
