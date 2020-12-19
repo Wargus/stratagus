@@ -166,10 +166,15 @@ void CFogOfWar::AdjustToViewport(const CViewport &viewport)
 void CFogOfWar::Clean()
 {
     FogTexture.clear();
+    FogTextureWidth = 0;
+    FogTextureHeight = 0;
+   
     SDL_FreeSurface(WorkSurface); /// It is safe to pass NULL to this function.
     WorkSurface = nullptr;
     SDL_FreeSurface(FogSurface); /// It is safe to pass NULL to this function.
     FogSurface = nullptr;
+   
+    Blurer.Clean();
 }
 
 /**
@@ -411,6 +416,16 @@ void CBlurer::Setup(const uint16_t textureWidth, const uint16_t textureHeight)
     WorkingTexture.resize(TextureWidth * TextureHeight);
 }
 
+/**
+**  Clean blurer
+**
+*/
+void CBlurer::Clean()
+{
+    WorkingTexture.clear();
+    TextureWidth = 0;
+    TextureHeight = 0;
+}
 
 
 void CBlurer::Blur(uint8_t *texture)

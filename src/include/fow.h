@@ -48,6 +48,7 @@ public:
     static void Init();
     static void Init(const float radius, const uint8_t numOfIterations);
     void Setup(const uint16_t textureWidth, const uint16_t textureHeight);
+    void Clean();
     void Blur(uint8_t *texture);
 private:
     void ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius);
