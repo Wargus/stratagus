@@ -261,6 +261,10 @@ static int CclSetFieldOfViewType(lua_State *l)
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "shadow-casting")) {
 		new_type = FieldOfViewTypes::cShadowCasting;
+		/// Legacy type of FOW doesn't work with shadow casting
+		if (CFogOfWar::GetType() == FogOfWarTypes::cLegacy) {
+			CFogOfWar::SetType(FogOfWarTypes::cEnhanced);
+		}	
 	} else if (!strcmp(type_name, "simple-radial")) {
 		new_type = FieldOfViewTypes::cSimpleRadial;
 	} else {
@@ -354,6 +358,10 @@ static int CclSetFogOfWarType(lua_State *l)
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "legacy")) {
 		new_type = FogOfWarTypes::cLegacy;
+		/// Legacy type of FOW doesn't work with shadow casting
+		if (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting) {
+			FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
+		}
 	} else if (!strcmp(type_name, "enhanced")) {
 		new_type = FogOfWarTypes::cEnhanced;
 	} else {
