@@ -365,6 +365,13 @@ static int CclSetFogOfWarType(lua_State *l)
 	return 0;
 }
 
+/**
+**  Set parameters for FOW blurer (radius and number of iterations)
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
 static int CclSetFogOfWarBlur(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
