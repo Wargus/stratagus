@@ -110,7 +110,8 @@ public:
 extern CEditor Editor;
 
 extern bool TileToolNoFixup;
-extern char TileToolRandom;
+extern bool TileToolRandom;
+extern bool TileToolDecoration;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -130,10 +131,7 @@ extern int EditorSaveMap(const std::string &file);
 /// Register ccl features
 extern void EditorCclRegister();
 
-/// Update surroundings for tile changes
-extern void EditorTileChanged(const Vec2i &pos);
-
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
+extern void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos);
 
 //@}
 

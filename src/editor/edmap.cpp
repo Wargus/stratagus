@@ -100,25 +100,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	int tile = tileIndex;
-	if (TileToolRandom) {
-		int n = 0;
-		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset->tiles[tile + i].tile) {
-				break;
-			} else {
-				++n;
-			}
-		}
-		n = MyRand() % n;
-		int i = -1;
-		do {
-			while (++i < 16 && !Map.Tileset->tiles[tile + i].tile) {
-			}
-		} while (i < 16 && n--);
-		Assert(i != 16);
-		tile += i;
-	}
+	const CTileset &tileset = *Map.Tileset;
+	const int baseTileIndex = tileset.findTileIndexByTile(tileIndex);
+	const int tile = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	mf.setTileIndex(*Map.Tileset, tile, 0);
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
@@ -235,16 +219,6 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (did_change) {
 		EditorChangeSurrounding(pos, lock_pos);
 	}
-}
-
-/**
-**  Update surroundings for tile changes.
-**
-**  @param pos  Map tile position of change.
-*/
-void EditorTileChanged(const Vec2i &pos)
-{
-	EditorChangeSurrounding(pos, pos);
 }
 
 /**

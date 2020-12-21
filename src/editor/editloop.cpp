@@ -93,8 +93,8 @@ static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
 bool TileToolNoFixup = false;     /// Allow setting every tile, no fixups
-char TileToolRandom;      /// Tile tool draws random
-static char TileToolDecoration;  /// Tile tool draws with decorations
+bool TileToolRandom;      /// Tile tool draws random
+bool TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static bool UpdateMinimap = false;        /// Update units on the minimap
@@ -140,30 +140,6 @@ static gcn::Container *editorContainer;
 ----------------------------------------------------------------------------*/
 
 /**
-**  Edit tile.
-**
-**  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit.
-*/
-static void EditTile(const Vec2i &pos, int tile)
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-
-	const CTileset &tileset = *Map.Tileset;
-	const int baseTileIndex = tileset.findTileIndexByTile(tile);
-	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
-	CMapField &mf = *Map.Field(pos);
-	mf.setTileIndex(tileset, tileIndex, 0);
-	mf.playerInfo.SeenTile = mf.getGraphicTile();
-
-	UI.Minimap.UpdateSeenXY(pos);
-	UI.Minimap.UpdateXY(pos);
-
-	EditorTileChanged(pos);
-	UpdateMinimap = true;
-}
-
-/**
 **  Edit tiles (internal, used by EditTiles()).
 **
 **  @param pos   map tile coordinate.
@@ -182,7 +158,7 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 	Vec2i itPos;
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
-			EditTile(itPos, tile);
+			EditorChangeTile(itPos, tile, itPos);
 		}
 	}
 }
@@ -1083,8 +1059,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 301: TileCursorSize = 2; return;
 				case 302: TileCursorSize = 3; return;
 				case 303: TileCursorSize = 4; return;
-				case 304: TileToolRandom ^= 1; return;
-				case 305: TileToolDecoration ^= 1; return;
+				case 304: TileToolRandom = !TileToolRandom; return;
+				case 305: TileToolDecoration = !TileToolDecoration; return;
 			    case 306: {
 					TileToolNoFixup = !TileToolNoFixup;
 					// switch the selected tiles
