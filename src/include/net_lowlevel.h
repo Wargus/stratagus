@@ -114,6 +114,8 @@ extern void NetExit();
 extern unsigned long NetResolveHost(const std::string &host);
 /// Get local IPs
 extern int NetSocketAddr(unsigned long *ips, int maxAddr);
+/// Get local hostname
+extern std::string NetGetHostname();
 
 /// Open a UDP Socket port. (param in network format)
 extern Socket NetOpenUDP(unsigned long ip, int port);

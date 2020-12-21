@@ -207,6 +207,26 @@ unsigned long NetResolveHost(const std::string &host)
 }
 
 /**
+ * Return the system hostname.
+ */
+std::string NetGetHostname()
+{
+	char hostname_buffer[256];
+#ifdef _WIN32
+	DWORD hostname_size = (DWORD)sizeof(hostname_buffer);
+	if (GetComputerNameA(hostname_buffer, &hostname_size)) {
+		return std::string(hostname_buffer);
+	}
+#else
+	size_t hostname_size = sizeof(hostname_buffer);
+	if (gethostname(hostname_buffer, hostname_size) == 0) {
+		return std::string(hostname_buffer);
+	}
+#endif
+	return "localhost";
+}
+
+/**
 **  Get IP-addrs of local interfaces from Network file descriptor
 **
 **  @param sock     local socket.
