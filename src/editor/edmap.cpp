@@ -46,6 +46,7 @@
 
 /// Callback for changed tile (with locked position)
 static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos);
+static void EditorFloodfill(const Vec2i &pos, int tileIndex, int prevGraphicTile);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -103,17 +104,58 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 	const CTileset &tileset = *Map.Tileset;
 	const int baseTileIndex = tileset.findTileIndexByTile(tileIndex);
 	const int tile = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
+	const int prevTile = mf.getGraphicTile();
+
 	mf.setTileIndex(*Map.Tileset, tile, 0);
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	if (!mf.isDecorative()) {
-		if (TileToolNoFixup) {
-			mf.Flags |= MapFieldDecorative;
-		} else {
-			EditorChangeSurrounding(pos, lock_pos);
+	if (TileToolNoFixup) {
+		mf.Flags |= MapFieldDecorative;
+		if (TileToolDecoration) {
+			EditorFloodfill(pos, tileIndex, prevTile);
+		}
+	} else if (!mf.isDecorative()) {
+		EditorChangeSurrounding(pos, lock_pos);
+	}
+}
+
+ static void EditorFloodfill(const Vec2i &pos, int tileIndex, int prevGraphicTile) {
+	CMapField &mf = *Map.Field(pos);
+	mf.Flags |= MapFieldDecorative;
+
+	if (mf.getGraphicTile() == prevGraphicTile) {
+		return;
+	}
+
+	// we don't need to take care of recursion, because we keep track of what
+	// the tile was previously. So when we get to a tile we already were at, it
+	// will have changed.
+
+	if (pos.y) {
+		const Vec2i offset(0, -1);
+		if (Map.Field(pos + offset)->getGraphicTile() == prevGraphicTile) {
+			EditorChangeTile(pos + offset, tileIndex, pos + offset);
+		}
+	}
+	if (pos.y < Map.Info.MapHeight - 1) {
+		const Vec2i offset(0, 1);
+		if (Map.Field(pos + offset)->getGraphicTile() == prevGraphicTile) {
+			EditorChangeTile(pos + offset, tileIndex, pos + offset);
+		}
+	}
+	if (pos.x) {
+		const Vec2i offset(-1, 0);
+		if (Map.Field(pos + offset)->getGraphicTile() == prevGraphicTile) {
+			EditorChangeTile(pos + offset, tileIndex, pos + offset);
+		}
+	}
+	if (pos.x < Map.Info.MapWidth - 1) {
+		const Vec2i offset(1, 0);
+		if (Map.Field(pos + offset)->getGraphicTile() == prevGraphicTile) {
+			EditorChangeTile(pos + offset, tileIndex, pos + offset);
 		}
 	}
 }
@@ -126,12 +168,6 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 */
 static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 {
-	if (TileToolNoFixup) {
-		CMapField &mf = *Map.Field(pos);
-		mf.Flags |= MapFieldDecorative;
-		return;
-	}
-
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
 	if (mf.isAWall()) {
