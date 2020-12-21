@@ -32,6 +32,7 @@
 
 //@{
 
+#include <variant>
 #include <vector>
 #include <string>
 #include "icons.h"
@@ -87,6 +88,7 @@ public:
 	int TileIndex;              /// tile icon draw index.
 	int CursorTileIndex;		/// tile icon under cursor.
 	int SelectedTileIndex;       /// tile type to draw.
+	std::vector<int> ExtraSelectedTiles; /// extra tiles for random drawing
 
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
@@ -112,6 +114,7 @@ extern CEditor Editor;
 extern bool TileToolNoFixup;
 extern bool TileToolRandom;
 extern bool TileToolDecoration;
+extern bool TileToolFloodfill;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -131,7 +134,7 @@ extern int EditorSaveMap(const std::string &file);
 /// Register ccl features
 extern void EditorCclRegister();
 
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos);
+extern void EditorChangeTile(const Vec2i &pos, std::variant<std::vector<int>, int> tileIndex, const Vec2i &lock_pos);
 
 //@}
 

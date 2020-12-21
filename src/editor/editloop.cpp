@@ -95,6 +95,7 @@ static int ButtonPanelHeight;
 bool TileToolNoFixup = false;     /// Allow setting every tile, no fixups
 bool TileToolRandom;      /// Tile tool draws random
 bool TileToolDecoration;  /// Tile tool draws with decorations
+bool TileToolFloodfill;   /// Tile tool floodfills
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static bool UpdateMinimap = false;        /// Update units on the minimap
@@ -148,19 +149,46 @@ static gcn::Container *editorContainer;
 **
 **  @bug  This function does not support mirror editing!
 */
-static void EditTilesInternal(const Vec2i &pos, int tile, int size)
+static void EditTilesInternal(const Vec2i &pos, int size)
 {
+	int tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
 	Vec2i minPos = pos;
 	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
+
+	bool prevRandom = TileToolRandom;
+	bool prevFiller = TileToolDecoration;
+	std::vector<int> variants;
+	if (TileToolNoFixup) {
+		// have to disable randomness/fillers from within tileset in manual mode
+		TileToolRandom = false;
+		TileToolDecoration = false;
+		TileToolFloodfill = prevFiller;
+		if (prevRandom) {
+			variants.push_back(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
+			for (auto i : Editor.ExtraSelectedTiles) {
+				variants.push_back(Editor.ShownTileTypes[i]);
+			}
+		}
+	} else {
+		// floodfill only applies in manual mode
+		TileToolFloodfill = false;
+	}
 
 	Map.FixSelectionArea(minPos, maxPos);
 
 	Vec2i itPos;
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
-			EditorChangeTile(itPos, tile, itPos);
+			if (TileToolNoFixup && prevRandom) {
+				EditorChangeTile(itPos, variants, itPos);
+			} else {
+				EditorChangeTile(itPos, tile, itPos);
+			}
 		}
 	}
+
+	TileToolRandom = prevRandom;
+	TileToolDecoration = prevFiller;
 }
 
 /**
@@ -170,9 +198,9 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 **  @param tile  Tile type to edit.
 **  @param size  Size of rectangle
 */
-static void EditTiles(const Vec2i &pos, int tile, int size)
+static void EditTiles(const Vec2i &pos, int size)
 {
-	EditTilesInternal(pos, tile, size);
+	EditTilesInternal(pos, size);
 
 	if (!MirrorEdit) {
 		return;
@@ -181,14 +209,14 @@ static void EditTiles(const Vec2i &pos, int tile, int size)
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
-	EditTilesInternal(mirrorv, tile, size);
+	EditTilesInternal(mirrorv, size);
 	if (MirrorEdit == 1) {
 		return;
 	}
 	const Vec2i mirrorh(pos.x, mirror.y);
 
-	EditTilesInternal(mirrorh, tile, size);
-	EditTilesInternal(mirror, tile, size);
+	EditTilesInternal(mirrorh, size);
+	EditTilesInternal(mirror, size);
 }
 
 /*----------------------------------------------------------------------------
@@ -603,9 +631,9 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string,int,int,in
 	};
 
 	std::vector<std::pair<bool, std::string>> options = {
-		{ TileToolRandom != 0, "Random" },
-		{ TileToolDecoration != 0, "Filler" },
-		{ TileToolNoFixup != 0, "Manual" }
+		{ TileToolRandom, "Random" },
+		{ TileToolDecoration, TileToolNoFixup ? "Floodfill" : "Decoration" },
+		{ TileToolNoFixup, "Manual" }
 	};
 
 	int i = 0;
@@ -710,6 +738,11 @@ static void DrawTileIcons()
 
 		if (i == Editor.SelectedTileIndex) {
 			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
+									Map.Tileset->getPixelTileSize().x - 2, Map.Tileset->getPixelTileSize().y - 2);
+		}
+		auto vec = Editor.ExtraSelectedTiles;
+		if (std::find(vec.begin(), vec.end(), i) != vec.end()) {
+			Video.DrawRectangleClip(ColorDarkGreen, x + 1, y + 1,
 									Map.Tileset->getPixelTileSize().x - 2, Map.Tileset->getPixelTileSize().y - 2);
 		}
 		if (i == Editor.CursorTileIndex) {
@@ -1063,10 +1096,13 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 305: TileToolDecoration = !TileToolDecoration; return;
 			    case 306: {
 					TileToolNoFixup = !TileToolNoFixup;
+					TileToolDecoration = false;
+					TileToolRandom = false;
 					// switch the selected tiles
 					if (TileToolNoFixup) {
 						Editor.ShownTileTypes.clear();
 						Editor.SelectedTileIndex = -1;
+						Editor.ExtraSelectedTiles.clear();
 						for (size_t i = 0; i < Map.Tileset->getTileCount(); i++) {
 							const CTileInfo &info = Map.Tileset->tiles[i].tileinfo;
 							if (Map.Tileset->tiles[i].tile) {
@@ -1076,6 +1112,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					} else {
 						Editor.ShownTileTypes.clear();
 						Editor.SelectedTileIndex = -1;
+						Editor.ExtraSelectedTiles.clear();
 						Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
 					}
 					return;
@@ -1084,7 +1121,13 @@ static void EditorCallbackButtonDown(unsigned button)
 		}
 		
 		if (Editor.CursorTileIndex != -1) {
-			Editor.SelectedTileIndex = Editor.CursorTileIndex;
+			if (Editor.SelectedTileIndex >= 0 && (KeyModifiers & ModifierShift) != 0 && TileToolNoFixup) {
+				// extra selection is only available in fully manual mode
+				Editor.ExtraSelectedTiles.push_back(Editor.CursorTileIndex);
+			} else {
+				Editor.SelectedTileIndex = Editor.CursorTileIndex;
+				Editor.ExtraSelectedTiles.clear();
+			}
 			return;
 		}
 	}
@@ -1136,6 +1179,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				return;
 			} else if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 				Editor.SelectedTileIndex = -1;
+				Editor.ExtraSelectedTiles.clear();
 				CursorBuilding = NULL;
 				return;
 			}
@@ -1152,7 +1196,7 @@ static void EditorCallbackButtonDown(unsigned button)
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
-				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+				EditTiles(tilePos, TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
@@ -1505,7 +1549,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			EditTiles(tilePos, TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {

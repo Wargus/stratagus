@@ -46,7 +46,7 @@
 
 /// Callback for changed tile (with locked position)
 static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos);
-static void EditorFloodfill(const Vec2i &pos, int tileIndex, int prevGraphicTile);
+static void EditorFloodfill(const Vec2i &pos, std::variant<std::vector<int>, int> tileIndex, int prevGraphicTile);
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -95,14 +95,21 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param lock_pos   map tile coordinate, that should not be changed in callback.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
+void EditorChangeTile(const Vec2i &pos, std::variant<std::vector<int>, int> tileIndex, const Vec2i &lock_pos)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int baseTileIndex = tileset.findTileIndexByTile(tileIndex);
+	int baseIndex;
+	if (std::holds_alternative<int>(tileIndex)) {
+		baseIndex = std::get<int>(tileIndex);
+	} else {
+		auto vec = std::get<std::vector<int>>(tileIndex);
+		baseIndex = vec[MyRand() % vec.size()];
+	}
+	const int baseTileIndex = tileset.findTileIndexByTile(baseIndex);
 	const int tile = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	const int prevTile = mf.getGraphicTile();
 
@@ -114,7 +121,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 
 	if (TileToolNoFixup) {
 		mf.Flags |= MapFieldDecorative;
-		if (TileToolDecoration) {
+		if (TileToolFloodfill) {
 			EditorFloodfill(pos, tileIndex, prevTile);
 		}
 	} else if (!mf.isDecorative()) {
@@ -122,7 +129,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 	}
 }
 
- static void EditorFloodfill(const Vec2i &pos, int tileIndex, int prevGraphicTile) {
+static void EditorFloodfill(const Vec2i &pos, std::variant<std::vector<int>, int> tileIndex, int prevGraphicTile) {
 	CMapField &mf = *Map.Field(pos);
 	mf.Flags |= MapFieldDecorative;
 
