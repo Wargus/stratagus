@@ -103,8 +103,6 @@ double FrameTicks;     /// Frame length in ms
 
 const EventCallback *Callbacks;
 
-static bool CanUseShaders = false;
-
 bool IsSDLWindowVisible = true;
 
 uint32_t SDL_CUSTOM_KEY_UP;
@@ -378,15 +376,7 @@ void InitVideoSdl()
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
 	printf("[Renderer] %s\n", rendererInfo.name);
 	if(!strncmp(rendererInfo.name, "opengl", 6)) {
-		CanUseShaders = LoadShaderExtensions();
-	}
-	if (!CanUseShaders) {
-		puts("[Renderer] Cannot use shaders");
-		SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-		SDL_DestroyRenderer(TheRenderer);
-		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_SOFTWARE);
-		SDL_GetRendererInfo(TheRenderer, &rendererInfo);
-		printf("[Renderer] %s\n", rendererInfo.name);
+		LoadShaderExtensions();
 	}
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 	Video.ResizeScreen(Video.Width, Video.Height);
@@ -747,9 +737,7 @@ void RealizeVideoMemory()
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
 		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
-		if (CanUseShaders) {
-			RenderWithShader(TheRenderer, TheWindow, TheTexture);
-		} else {
+		if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
 			SDL_RenderClear(TheRenderer);
 			//for (int i = 0; i < NumRects; i++)
 			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);

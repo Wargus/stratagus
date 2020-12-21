@@ -88,6 +88,9 @@ static const int MAX_SHADERS = 128;
 static GLuint shaderPrograms[MAX_SHADERS + 1] = { (GLuint) 0 };
 static const char* shaderNames[MAX_SHADERS + 1] = { NULL };
 static char shadersLoaded = -1;
+#define canUseShaders (shadersLoaded == 1)
+#define shadersAreInitialized (shadersLoaded != -1)
+#define setCanUseShaders(x) (shadersLoaded = (x ? 1 : 0))
 static int currentShaderIdx = 0;
 
 static std::regex invalidQuoteReplaceRegex("\"([a-zA-Z0-9 -\\.]+)\"");
@@ -239,7 +242,11 @@ static int loadShaders() {
 	return numShdr;
 }
 
-void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
+bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
+	if (!canUseShaders || currentShaderIdx == 0) {
+		return false;
+	}
+
 	GLint oldProgramId;
 	// Detach the texture
 	SDL_SetRenderTarget(renderer, NULL);
@@ -343,14 +350,8 @@ void RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	if (shaderProgram != 0) {
 		glUseProgram(oldProgramId);
 	}
-}
 
-const char* NextShader() {
-	if (shaderPrograms[++currentShaderIdx] == 0) {
-		currentShaderIdx = 0;
-	}
-	std::cout << "NextShader: " << shaderNames[currentShaderIdx] << std::endl;
-	return shaderNames[currentShaderIdx];
+	return true;
 }
 
 static int CclGetShader(lua_State *l) {
@@ -380,6 +381,7 @@ static int CclSetShader(lua_State *l) {
 			break;
 		}
 	}
+	currentShaderIdx = 0;
 	lua_pushboolean(l, 0);
 	return 1;
 }
@@ -395,8 +397,8 @@ static int CclGetShaderNames(lua_State *l) {
 }
 
 bool LoadShaderExtensions() {
-	if (shadersLoaded != -1) {
-		return shadersLoaded == 1;
+	if (shadersAreInitialized) {
+		return canUseShaders;
 	}
 
 	*(void **) (&lazyGlBegin) = SDL_GL_GetProcAddress("glBegin");
@@ -437,16 +439,16 @@ bool LoadShaderExtensions() {
 		glLinkProgram && glValidateProgram && glGetProgramiv && glGetProgramInfoLog &&
 		glUseProgram && glGetUniformLocation && glUniform1i && glUniform1f && glUniform2f &&
 		glUniformMatrix4fv && glGetAttribLocation && glVertexAttrib4f) {
-		shadersLoaded = loadShaders() > 0 ? 1 : 0;
+		setCanUseShaders(loadShaders() > 0);
 	} else {
-		shadersLoaded = 0;
+		setCanUseShaders(false);
 	}
 
 	lua_register(Lua, "GetShaderNames", CclGetShaderNames);
 	lua_register(Lua, "GetShader", CclGetShader);
 	lua_register(Lua, "SetShader", CclSetShader);
 
-	return shadersLoaded == 1;
+	return canUseShaders;
 }
 
 #endif
