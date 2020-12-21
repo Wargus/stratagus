@@ -1488,6 +1488,7 @@ void NetworkProcessServerRequest()
 	}
 
 	if (mDNS_socket == -1) {
+		// When recieving, a socket can recieve data from all network interfaces
 		struct sockaddr_in sock_addr;
 		memset(&sock_addr, 0, sizeof(struct sockaddr_in));
 		sock_addr.sin_family = AF_INET;
@@ -1948,27 +1949,43 @@ static int query_callback(int sock, const struct sockaddr* from, size_t addrlen,
 static int CclNetworkDiscoverServers(lua_State *l)
 {
 	static int mDNS_queryId = -1;
-	static int mDNS_querySocket = -1;
+	static int mDNS_querySocket[20] = {-1};
+	static int numSockets = -1;
 
 	LuaCheckArgs(l, 1);
 	bool start = LuaToBoolean(l, 1);
 
 	lua_newtable(l);
 	if (start) {
-		size_t cap = 2048;
-		void *buffer = malloc(cap);
-		if (mDNS_querySocket == -1) {
-			mDNS_querySocket = mdns_socket_open_ipv4(NULL);
+		char buffer[1024];
+		if (numSockets == -1) {
+			// When sending, each socket can only send to one network interface
+			// Thus we need to open one socket for each interface
+			unsigned long ips[20];
+			numSockets = NetSocketAddr(ips, 20);
+			struct sockaddr_in sock_addr;
+			for (int i = 0; i < numSockets; i++) {
+				memset(&sock_addr, 0, sizeof(struct sockaddr_in));
+				sock_addr.sin_family = AF_INET;
+				sock_addr.sin_addr.s_addr = ips[i];
+#ifdef __APPLE__
+				sock_addr.sin_len = sizeof(struct sockaddr_in);
+#endif
+				mDNS_querySocket[i] = mdns_socket_open_ipv4(&sock_addr);
+			}
 		}
-		mDNS_queryId = mdns_query_send(mDNS_querySocket, MDNS_RECORDTYPE_PTR,
-									   GameName.c_str(), GameName.size(),
-									   buffer, cap, 0);
-		int responses = mdns_query_recv(mDNS_querySocket, buffer, cap, query_callback, l, mDNS_queryId);
-		free(buffer);
+		for (int i = 0; i < numSockets; i++) {
+			mDNS_queryId = mdns_query_send(mDNS_querySocket[i], MDNS_RECORDTYPE_PTR,
+										GameName.c_str(), GameName.size(),
+										buffer, sizeof(buffer), 0);
+			int responses = mdns_query_recv(mDNS_querySocket[i], buffer, sizeof(buffer), query_callback, l, mDNS_queryId);
+		}
 	} else {
-		mdns_socket_close(mDNS_querySocket);
-		mDNS_querySocket = -1;
-		mDNS_queryId = -1;
+		for (int i = 0; i < numSockets; i++) {
+			mdns_socket_close(mDNS_querySocket[i]);
+			numSockets = -1;
+			mDNS_queryId = -1;
+		}
 	}
 
 	return 1;
