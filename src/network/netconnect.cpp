@@ -1446,18 +1446,26 @@ static int service_callback(int sock, const struct sockaddr* from, size_t addrle
 							uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
 							size_t size, size_t name_offset, size_t name_length, size_t record_offset,
 							size_t record_length, void* user_data) {
-	if (rtype == MDNS_RECORDTYPE_A && entry == MDNS_ENTRYTYPE_QUESTION) {
-		size_t cap = 2048;
-		void *buffer = malloc(cap);
-		unsigned long ips[20];
-		int numIps = NetSocketAddr(ips, 20);
-		for (int i = 0; i < numIps; i++) {
-			mdns_query_answer(sock, from, addrlen, buffer, cap, query_id,
-							  GameName.c_str(), GameName.size(),
-							  CNetworkParameter::Instance.localHost.c_str(),
-							  CNetworkParameter::Instance.localHost.size(),
-							  ips[i], NULL, CNetworkParameter::Instance.localPort,
-							  NULL, 0);
+	if (rtype == MDNS_RECORDTYPE_PTR && entry == MDNS_ENTRYTYPE_QUESTION) {
+		char namebuffer[256];
+		mdns_string_t service = mdns_record_parse_ptr(data, size, record_offset, record_length, namebuffer, sizeof(namebuffer));
+		std::string offeredService = GameName;
+		if (strncmp(offeredService.c_str(), service.str, offeredService.size()) == 0) {
+			uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
+			std::string hostname = NetGetHostname();
+			if (!unicast) {
+				addrlen = 0;
+			}
+			char buffer[256];
+			unsigned long ips[20];
+			int numIps = NetSocketAddr(ips, 20);
+			for (int i = 0; i < numIps; i++) {
+				mdns_query_answer(sock, from, addrlen, buffer, sizeof(buffer), query_id,
+								  offeredService.c_str(), offeredService.size(),
+								  hostname.c_str(), hostname.size(),
+								  ips[i], NULL, CNetworkParameter::Instance.localPort,
+								  NULL, 0);
+			}
 		}
 	}
 	return 0;
@@ -1952,7 +1960,7 @@ static int CclNetworkDiscoverServers(lua_State *l)
 		if (mDNS_querySocket == -1) {
 			mDNS_querySocket = mdns_socket_open_ipv4(NULL);
 		}
-		mDNS_queryId = mdns_query_send(mDNS_querySocket, MDNS_RECORDTYPE_A,
+		mDNS_queryId = mdns_query_send(mDNS_querySocket, MDNS_RECORDTYPE_PTR,
 									   GameName.c_str(), GameName.size(),
 									   buffer, cap, 0);
 		int responses = mdns_query_recv(mDNS_querySocket, buffer, cap, query_callback, l, mDNS_queryId);
