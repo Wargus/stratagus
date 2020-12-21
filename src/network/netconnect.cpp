@@ -48,9 +48,7 @@
 #include "settings.h"
 #include "version.h"
 #include "video.h"
-
-#include "net_lowlevel.h"
-#include "network/mdns.h"
+#include "mdns.h"
 
 //----------------------------------------------------------------------------
 // Declaration
@@ -95,6 +93,8 @@ int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of player
 
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
+
+MDNS MdnsService;
 
 class CServer
 {
@@ -1442,72 +1442,17 @@ int FindHostIndexBy(const CHost &host)
 	return -1;
 }
 
-static int service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
-							uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
-							size_t size, size_t name_offset, size_t name_length, size_t record_offset,
-							size_t record_length, void* user_data) {
-	if (rtype == MDNS_RECORDTYPE_PTR && entry == MDNS_ENTRYTYPE_QUESTION) {
-		char namebuffer[256];
-		mdns_string_t service = mdns_record_parse_ptr(data, size, record_offset, record_length, namebuffer, sizeof(namebuffer));
-		std::string offeredService = GameName;
-		if (strncmp(offeredService.c_str(), service.str, offeredService.size()) == 0) {
-			uint16_t unicast = (rclass & MDNS_UNICAST_RESPONSE);
-			std::string hostname = NetGetHostname();
-			if (!unicast) {
-				addrlen = 0;
-			}
-			char buffer[256];
-			unsigned long ips[20];
-			int numIps = NetSocketAddr(ips, 20);
-			for (int i = 0; i < numIps; i++) {
-				mdns_query_answer(sock, from, addrlen, buffer, sizeof(buffer), query_id,
-								  offeredService.c_str(), offeredService.size(),
-								  hostname.c_str(), hostname.size(),
-								  ips[i], NULL, CNetworkParameter::Instance.localPort,
-								  NULL, 0);
-			}
-		}
-	}
-	return 0;
-}
-
 /**
 ** Server Menu Loop: Send out server request messages
 */
 void NetworkProcessServerRequest()
 {
-	static int mDNS_socket = -1;
-
 	if (GameRunning) {
-		if (mDNS_socket != -1) {
-			mdns_socket_close(mDNS_socket);
-			mDNS_socket = -1;
-		}
 		return;
 		// Game already started...
 	}
 
-	if (mDNS_socket == -1) {
-		// When recieving, a socket can recieve data from all network interfaces
-		struct sockaddr_in sock_addr;
-		memset(&sock_addr, 0, sizeof(struct sockaddr_in));
-		sock_addr.sin_family = AF_INET;
-#ifdef _WIN32
-		sock_addr.sin_addr = in4addr_any;
-#else
-		sock_addr.sin_addr.s_addr = INADDR_ANY;
-#endif
-		sock_addr.sin_port = htons(MDNS_PORT);
-#ifdef __APPLE__
-		sock_addr.sin_len = sizeof(struct sockaddr_in);
-#endif
-		mDNS_socket = mdns_socket_open_ipv4(&sock_addr);
-	} else {
-		size_t cap = 2048;
-		void *buffer = malloc(cap);
-		mdns_socket_listen(mDNS_socket, buffer, cap, service_callback, NULL);
-		free(buffer);
-	}
+	MdnsService.AnswerServerQueries();
 	Server.Update(FrameCounter);
 }
 
@@ -1928,64 +1873,21 @@ static int CclNoRandomPlacementMultiplayer(lua_State *l)
 	return 0;
 }
 
-static int query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
-						  uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
-						  size_t size, size_t name_offset, size_t name_length, size_t record_offset,
-						  size_t record_length, void* user_data) {
-	lua_State *l = (lua_State *)user_data;
-	if (rtype == MDNS_RECORDTYPE_A && entry == MDNS_ENTRYTYPE_ADDITIONAL) {
-		struct sockaddr_in addr;
-		mdns_record_parse_a(data, size, record_offset, record_length, &addr);
-		char buf[24] = {'\0'};
-		sprintf(buf, "%d.%d.%d.%d", NIPQUAD(ntohl(addr.sin_addr.s_addr)));
-		int i = lua_objlen(l, -1) + 1;
-		lua_pushnumber(l, i);
-		lua_pushstring(l, buf);
-		lua_settable(l, -3);
-	}
-	return 0;
-}
-
 static int CclNetworkDiscoverServers(lua_State *l)
 {
-	static int mDNS_queryId = -1;
-	static int mDNS_querySocket[20] = {-1};
-	static int numSockets = -1;
-
 	LuaCheckArgs(l, 1);
 	bool start = LuaToBoolean(l, 1);
 
+	auto callback= [l](char* ip) {
+		auto i = lua_objlen(l, -1) + 1;
+		lua_pushnumber(l, i);
+		lua_pushstring(l, ip);
+		lua_settable(l, -3);
+	};
+
 	lua_newtable(l);
 	if (start) {
-		char buffer[1024];
-		if (numSockets == -1) {
-			// When sending, each socket can only send to one network interface
-			// Thus we need to open one socket for each interface
-			unsigned long ips[20];
-			numSockets = NetSocketAddr(ips, 20);
-			struct sockaddr_in sock_addr;
-			for (int i = 0; i < numSockets; i++) {
-				memset(&sock_addr, 0, sizeof(struct sockaddr_in));
-				sock_addr.sin_family = AF_INET;
-				sock_addr.sin_addr.s_addr = ips[i];
-#ifdef __APPLE__
-				sock_addr.sin_len = sizeof(struct sockaddr_in);
-#endif
-				mDNS_querySocket[i] = mdns_socket_open_ipv4(&sock_addr);
-			}
-		}
-		for (int i = 0; i < numSockets; i++) {
-			mDNS_queryId = mdns_query_send(mDNS_querySocket[i], MDNS_RECORDTYPE_PTR,
-										GameName.c_str(), GameName.size(),
-										buffer, sizeof(buffer), 0);
-			int responses = mdns_query_recv(mDNS_querySocket[i], buffer, sizeof(buffer), query_callback, l, mDNS_queryId);
-		}
-	} else {
-		for (int i = 0; i < numSockets; i++) {
-			mdns_socket_close(mDNS_querySocket[i]);
-			numSockets = -1;
-			mDNS_queryId = -1;
-		}
+		MdnsService.QueryServers(callback);
 	}
 
 	return 1;
