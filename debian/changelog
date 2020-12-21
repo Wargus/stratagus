@@ -1,3 +1,10 @@
+stratagus (3.0.1) UNRELEASED; urgency=medium
+
+  * Be more compliant with server discovery and announcement to better support introspecting firewalls
+  * Be more conservative and use pure SDL when shader 0 ("none") is selected
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Mon, 21 Dec 2020 15:48:15 +0100
+
 stratagus (3.0.0) focal; urgency=medium
 
   * Migrate to SDL2, remove old direct OpenGL backend
