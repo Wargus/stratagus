@@ -22,16 +22,16 @@ cause a release with the tag name to be created, and the windows dependencies
 will be uploaded there.
 
 Tag the new release here and wait for it to run through the CIs. Appveyor and
-Travis will upload new versions for Windows and OSX. Go to Launchpad to
-trigger building new debian packages:
+Travis will upload new versions for Windows and OSX.
  git commit -a -m "Release version <version>"
  git tag <version>
  git push --tags origin master
+
+Go to Launchpad to trigger building new debian packages.
 
 For Wargus/War1gus/Stargus we have a release.rb script. Run it without any
 arguments, and it will tell you how to call it to start the release process
 for this particular project.
 
-Tag the new release in Wargus/War1gus/Stargus/... these repositories should be
-set up to also use the appropriate release source from the Stratagus releases.
-
+Finally, update the download links for the stable versions in the
+wargus.github.io repository.
