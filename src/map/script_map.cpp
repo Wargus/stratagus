@@ -262,8 +262,8 @@ static int CclSetFieldOfViewType(lua_State *l)
 	if (!strcmp(type_name, "shadow-casting")) {
 		new_type = FieldOfViewTypes::cShadowCasting;
 		/// Legacy type of FOW doesn't work with shadow casting
-		if (CFogOfWar::GetType() == FogOfWarTypes::cLegacy) {
-			CFogOfWar::SetType(FogOfWarTypes::cEnhanced);
+		if (FogOfWar.GetType() == FogOfWarTypes::cLegacy) {
+			FogOfWar.SetType(FogOfWarTypes::cEnhanced);
 		}	
 	} else if (!strcmp(type_name, "simple-radial")) {
 		new_type = FieldOfViewTypes::cSimpleRadial;
@@ -369,7 +369,7 @@ static int CclSetFogOfWarType(lua_State *l)
 		fprintf(stdout, "Accessible Fog of War types: \"legacy\", \"enhanced\".\n");
 		return 1;
 	}
-	CFogOfWar::SetType(new_type);
+	FogOfWar.SetType(new_type);
 	return 0;
 }
 
@@ -385,18 +385,16 @@ static int CclSetFogOfWarBlur(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	float radius = LuaToFloat(l, 1);
-	if (radius < 0 ) {
-		PrintFunction();
-		fprintf(stdout, "Radius should be a positive float number, or 0.\n");
-		return 1;
-	}
-	int iterations = LuaToNumber(l, 2);	
 	if (radius <= 0 ) {
 		PrintFunction();
-		fprintf(stdout, "Number of box blur iterations should be greater than 0.\n");
-		return 1;
+		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
 	}
-	CBlurer::Init(radius, iterations);
+	int iterations = LuaToNumber(l, 2);	
+	if (iterations <= 0 ) {
+		PrintFunction();
+		fprintf(stdout, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
+	}
+	FogOfWar.InitBlurer(radius, iterations);
 	return 0;
 }
 

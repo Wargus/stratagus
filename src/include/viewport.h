@@ -97,6 +97,8 @@ public:
 	bool Contains(const PixelPos &screenPos) const;
 
 	void Restrict(int &screenPosX, int &screenPosY) const;
+	void Clean();
+
 
 	PixelSize GetPixelSize() const;
 	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}
@@ -109,7 +111,11 @@ private:
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
-	void DrawMapFogOfWar() const;
+	void DrawMapFogOfWar();
+	void DrawLegacyFogOfWar() const;
+	void DrawEnhancedFogOfWar();
+	/// Adjust fog of war surface to viewport
+	void AdjustFogSurface();
 
 public:
 	//private:
@@ -124,7 +130,7 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	CFogOfWar FogOfWar;
+	SDL_Surface *FogSurface {nullptr};
 
 };
 

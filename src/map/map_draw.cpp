@@ -56,6 +56,7 @@ CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
 
 CViewport::~CViewport()
 {
+	this->Clean();
 }
 
 bool CViewport::Contains(const PixelPos &screenPos) const
@@ -439,11 +440,7 @@ void CViewport::Draw()
 	}
 	
 	/// Draw Fog of War
-	switch (CFogOfWar::GetType()) {
-		case FogOfWarTypes::cLegacy:   this->DrawMapFogOfWar(); break;
-		case FogOfWarTypes::cEnhanced: this->FogOfWar.Refresh(*this, *ThisPlayer); break;
-		default: break;
-	}
+	this->DrawMapFogOfWar();
 
 	// If there was a click missile, draw it again here above the fog
 	if (clickMissile != NULL) {

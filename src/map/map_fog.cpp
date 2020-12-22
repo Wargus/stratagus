@@ -529,7 +529,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	int fogTile = 0;
 	int blackFogTile = 0;
 
-//	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
+	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
 
 	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 		if (fogTile && fogTile != blackFogTile) {
@@ -549,13 +549,43 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 /**
 **  Draw the map fog of war.
 */
-void CViewport::DrawMapFogOfWar() const
+void CViewport::DrawMapFogOfWar()
 {
 	// flags must redraw or not
 	if (ReplayRevealMap) {
 		return;
 	}
 
+	switch (FogOfWar.GetType()) {
+		case FogOfWarTypes::cLegacy:
+		
+			this->DrawLegacyFogOfWar();
+			break;
+		
+		case FogOfWarTypes::cEnhanced: 
+
+			if (!FogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
+								  / PixelTileSize.x + 2) 
+								  * PixelTileSize.x != FogSurface->w 
+								|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
+									/ PixelTileSize.y + 2) 
+									* PixelTileSize.y != FogSurface->h) ) {
+          		this->AdjustFogSurface();
+    		}
+			this->DrawEnhancedFogOfWar(); 
+			break;
+		default: 
+		break;
+	}
+}
+
+
+/**
+**  Draw the map fog of war (legacy type).
+*/
+void CViewport::DrawLegacyFogOfWar() const
+{
+	
 	int sx = std::max<int>(MapPos.x - 1, 0);
 	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
 	int my = std::max<int>(MapPos.y - 1, 0);
@@ -591,6 +621,63 @@ void CViewport::DrawMapFogOfWar() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
+}
+
+
+
+
+/**
+**  Draw the map fog of war (enhanced type).
+*/
+void CViewport::DrawEnhancedFogOfWar()
+{
+   /// TODO: Redraw to surface only if viewport state was changed
+	FogOfWar.RenderToViewPort(*this, this->FogSurface);
+
+    SDL_Rect screenRect;
+    screenRect.x = this->TopLeftPos.x;
+    screenRect.y = this->TopLeftPos.y;
+    screenRect.w = this->BottomRightPos.x - this->TopLeftPos.x + 1;
+    screenRect.h = this->BottomRightPos.y - this->TopLeftPos.y + 1;
+
+	SDL_Rect fogRect;
+    fogRect.x = this->Offset.x;
+    fogRect.y = this->Offset.y;
+    fogRect.w = screenRect.w;
+    fogRect.h = screenRect.h;
+
+    SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
+}
+
+
+/**
+**  Adjust fog of war surface to viewport
+**
+*/
+void CViewport::AdjustFogSurface()
+{
+ 	SDL_FreeSurface(FogSurface); /// It is safe to pass NULL to this function.
+	FogSurface = nullptr;
+	
+    const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x) 
+									/ PixelTileSize.x + 2) 
+									* PixelTileSize.x;  /// +2 because of Offset.x
+    const uint16_t surfaceHeight = ((this->BottomRightPos.y - this->TopLeftPos.y) 
+									/ PixelTileSize.y + 2) 
+									* PixelTileSize.y; /// +2 because of Offset.y
+    
+    FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
+                                                     surfaceHeight,
+                                                     32, RMASK, GMASK, BMASK, AMASK);
+    SDL_SetSurfaceBlendMode(FogSurface, SDL_BLENDMODE_BLEND);
+	SDL_FillRect(FogSurface, NULL, SDL_MapRGBA(FogSurface->format, 0, 0, 0, 0xFF));
+}
+
+
+void CViewport::Clean()
+{
+	SDL_FreeSurface(this->FogSurface);
+	this->FogSurface = nullptr;
 }
 
 /**
@@ -672,7 +759,6 @@ void CMap::InitFogOfWar()
 **  Cleanup the fog of war.
 **  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
 **  It's safe to call this for both types of FOW. 
-**	CFogOfWar::CleanCache() is called from CMap::Clean()
 */
 void CMap::CleanFogOfWar()
 {

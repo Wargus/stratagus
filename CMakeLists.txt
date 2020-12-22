@@ -192,6 +192,7 @@ source_group(guichan FILES ${guichan_SRCS})
 set(map_SRCS
 	src/map/fov.cpp
 	src/map/fow.cpp
+	src/map/fow_utils.cpp
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
@@ -532,6 +533,7 @@ set(stratagus_generic_HDRS
 	src/include/font.h
 	src/include/fov.h
 	src/include/fow.h
+	src/include/fow_utils.h
 	src/include/game.h
 	src/include/icons.h
 	src/include/interface.h

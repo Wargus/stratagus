@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "fow_utils.h"
 #include "player.h"
 #include "video.h"
 
@@ -40,89 +41,74 @@
 
 
 
-class CViewport;
-
+//class CViewport;
+//class CEasedTexture;
+//class CBlurer;
 
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-/// Class for box blur algorithm. Used to blur upscaled FOW texture.
-class CBlurer
-{
-public:
-    static void Init();
-    static void Init(const float radius, const int numOfIterations);
-    void Setup(const uint16_t textureWidth, const uint16_t textureHeight);
-    void Clean();
-    void Blur(uint8_t *texture);
-private:
-    void ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius);
-
-private:
-    static float Radius;
-    static uint8_t NumOfIterations;
-
-    static std::vector<uint8_t> HalfBoxes; /// Radiuses (box sizes) for box blur iterations
-    
-    std::vector<uint8_t> WorkingTexture;
-    uint16_t TextureWidth {0};
-    uint16_t TextureHeight {0};
-};
-
-enum class FogOfWarTypes { cLegacy, cEnhanced, NumOfTypes };
+enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };
 
 class CFogOfWar
 {
 public:
-    enum VisionType { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010, cCached = 0b100};
+    enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
+    enum States       { cFirstEntry = 0, cGenerateFog, cUpscaleFog, cBlurFog, cReady };
+    enum UpscaleTypes { cSimple, cBilinear };
 
-    ~CFogOfWar()
+    void Update(bool doAtOnce = false);
+    
+    void Init();
+    void Clean();
+    void VisTableReset();
+    bool SetType(const FogOfWarTypes fow_type);
+	FogOfWarTypes GetType() { return Settings.FOW_Type; }
+    void InitBlurer(const float radius, const uint16_t numOfIterations)
     {
-        Clean();
+        Settings.BlurRadius = radius;
+        Settings.BlurIterations = numOfIterations;
+        Blurer.PrecalcParameters(radius, numOfIterations);
     }
 
-    void Refresh(const CViewport &viewport, const CPlayer &thisPlayer);
-    
-    static void Init();
-    static void CleanCache();
-    static void ResetCache();
-    static bool SetType(const FogOfWarTypes fow_type);
-	static FogOfWarTypes GetType();
+    void RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface);
 
 private:
-    void Clean();
-    void AdjustToViewport(const CViewport &viewport);
-    void Render(const uint8_t *alphaTexture, const CViewport &viewport);
-    void GenerateFog(const CViewport &viewport, const CPlayer &thisPlayer);
-    void UpscaleFog(uint8_t *alphaTexture, const CViewport &viewport);
+    void GenerateFog(const CPlayer &thisPlayer);
+    void UpscaleFog();
+
     uint8_t DeterminePattern(intptr_t index, const uint8_t visFlag);
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
+    void RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+    void UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+    void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                       SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+
     
 public:
 
 private:
-    static struct FogOfWarSettings 
+    struct FogOfWarSettings 
 	{
-		FogOfWarTypes FOW_Type {FogOfWarTypes::cEnhanced};      /// Type of fog of war - legacy or enhanced(smooth)
-        
+		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced};      /// Type of fog of war - legacy or enhanced(smooth)
+        uint8_t       NumOfEasingSteps {8};
+        float         BlurRadius       {2};
+        uint8_t       BlurIterations   {3};
+        uint8_t       UpscaleType      {UpscaleTypes::cSimple};
 	} Settings;
 
-    /// cached vision table. Tiles filled only once per cycle even if they present in the several viewports
-    static std::vector<uint8_t> VisTableCache; 
-    static intptr_t VisCache_Index0; /// index in the cached vision table for [0:0] tile
-    static size_t   VisCacheWidth;   /// width of the cached vision table
+    uint8_t State { States::cFirstEntry };
     
-    std::vector<uint8_t> FogTexture; // Upscaled fog texture
-    SDL_Surface         *WorkSurface {nullptr};
-    SDL_Surface         *FogSurface {nullptr};
-    
-    CBlurer Blurer;
-
-    uint16_t RenderWidth      {0}; // In pixels
-    uint16_t RenderHeight     {0}; // In pixels
-    uint16_t FogTextureWidth  {0};
-    uint16_t FogTextureHeight {0};
+    std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
+    intptr_t             VisTable_Index0 {0}; /// index in the vision table for [0:0] tile
+    size_t               VisTableWidth   {0}; /// width of the vision table
+    CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map 
+                                              /// + 1 tile around (for simplification of upscale algorithm purposes).
+    std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
+    CBlurer              Blurer;
 
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
@@ -163,5 +149,7 @@ private:
                                                     {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
 #endif
 };
+
+extern CFogOfWar FogOfWar;
 
 #endif // !__FOW_H__

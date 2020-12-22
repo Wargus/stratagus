@@ -56,6 +56,8 @@ bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 {
 	if (fov_type < FieldOfViewTypes::NumOfTypes) {
 		this->Settings.FoV_Type = fov_type;
+
+		
 		return true;
 	} else {
 		return false;
@@ -115,6 +117,8 @@ void CFieldOfView::ResetAdditionalOpaqueFields()
 void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
 							const short height, const short range, MapMarkerFunc *marker)
 {
+	/// FIXME: sometimes when quit from game this assert is triggered
+	Assert(unit.Type != NULL);
 	// Units under construction have no sight range.
 	if (!range) {
 		return;

@@ -56,6 +56,16 @@
 #include <guichan.h>
 void DrawGuichanWidgets();
 
+
+enum CallPeriod { cEvery2nd   = 0b1, 
+				  cEvery4th   = 0b11, 
+				  cEvery8th   = 0b111, 
+				  cEvery16th  = 0b1111, 
+				  cEvery32nd  = 0b11111, 
+				  cEvery64th  = 0b111111, 
+				  cEvery128th = 0b1111111,
+				  cEvery256th = 0b11111111 };
+
 //----------------------------------------------------------------------------
 // Variables
 //----------------------------------------------------------------------------
@@ -148,11 +158,6 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 */
 void DrawMapArea()
 {
-	/// Reset VisionCache
-	if (CFogOfWar::GetType() == FogOfWarTypes::cEnhanced) {
-		CFogOfWar::ResetCache();
-	}
-
 	// Draw all of the viewports
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		// Center viewport on tracked unit
@@ -313,7 +318,7 @@ static void GameLogicLoop()
 	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song
 
-	if (FastForwardCycle <= GameCycle || !(GameCycle & 0xff)) {
+	if (FastForwardCycle <= GameCycle || !(GameCycle & CallPeriod::cEvery256th)) {
 		WaitEventsOneFrame();
 	}
 
@@ -358,10 +363,15 @@ static void DisplayLoop()
 		VideoSyncSpeed = 3000;
 	}
 #endif
-	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0xff)) {
+	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & CallPeriod::cEvery256th)) {
 		//FIXME: this might be better placed somewhere at front of the
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
+
+		/// TODO: if FastForwardCycle then do full update cycle at once, and disable texture easing 
+		///  FogOfWar.Update(true);
+		FogOfWar.Update(FastForwardCycle > GameCycle ? true : false);
+
 		UpdateDisplay();
 		RealizeVideoMemory();
 	}

@@ -42,32 +42,17 @@
 #include "map.h"
 #include "player.h"
 #include "tile.h"
+#include "ui.h"
 #include "viewport.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
 
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-/// Blurer parameters
-/// From 1 to 3 is optimal. With 3 result is very smooth, 
-/// but it opens about 1/2 extra tiles around SightRange circle
-float   CBlurer::Radius {2};
-/// 2-3 is optimal, with higher values result enhancing not so radicaly
-uint8_t CBlurer::NumOfIterations {3};
-
-std::vector<uint8_t> CBlurer::HalfBoxes; /// Calculated radiuses for box blur iterations
-
-
-CFogOfWar::FogOfWarSettings CFogOfWar::Settings;
-
-std::vector<uint8_t> CFogOfWar::VisTableCache;
-
-intptr_t CFogOfWar::VisCache_Index0 {0};
-size_t   CFogOfWar::VisCacheWidth   {0};
+CFogOfWar FogOfWar;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -75,29 +60,46 @@ size_t   CFogOfWar::VisCacheWidth   {0};
 void CFogOfWar::Init()
 {
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    /// +1 to the bottom & right because of UI.MapArea.ScrollPadding
     /// Extra tiles will always be VisionType::cNone. 
-    CFogOfWar::VisCacheWidth = Map.Info.MapHeight + 3;    
-    CFogOfWar::VisCache_Index0 = CFogOfWar::VisCacheWidth + 1;
+    VisTableWidth   = Map.Info.MapWidth + 2;    
+    VisTable_Index0 = VisTableWidth + 1;
 
-    size_t tableSize = CFogOfWar::VisCacheWidth * (Map.Info.MapHeight + 3);
-    VisTableCache.clear();
-    VisTableCache.resize(tableSize);
-    ResetCache();
+    const size_t tableSize = VisTableWidth * (Map.Info.MapHeight + 2);
+    VisTable.clear();
+    VisTable.resize(tableSize);
 
-    CBlurer::Init();
+    VisTableReset();
+    
+    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
+    const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 2) * 4;
+    const uint16_t fogTextureHeight = (Map.Info.MapHeight + 2) * 4;
+
+    FogTexture.Init(fogTextureWidth, fogTextureHeight, Settings.NumOfEasingSteps);
+    
+    RenderedFog.clear();
+    RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
+    std::fill(RenderedFog.begin(), RenderedFog.end(), 0xFF);
+
+    Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius, Settings.BlurIterations);
+
+    this->State = 0;
 }
 
-void CFogOfWar::CleanCache()
+void CFogOfWar::Clean()
 {
-    VisTableCache.clear();
-    CFogOfWar::VisCacheWidth = 0;
-    CFogOfWar::VisCache_Index0 = 0;
+    VisTable.clear();
+    VisTableWidth   = 0;
+    VisTable_Index0 = 0;
+
+    FogTexture.Clean();
+    RenderedFog.clear();
+
+    Blurer.Clean();
 }
 
-void CFogOfWar::ResetCache()
+void CFogOfWar::VisTableReset()
 {
-    std::fill(VisTableCache.begin(), VisTableCache.end(), 0);
+    std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
 }
 
 /** 
@@ -108,81 +110,30 @@ void CFogOfWar::ResetCache()
 */
 bool CFogOfWar::SetType(const FogOfWarTypes fow_type)
 {
-	if (fow_type < FogOfWarTypes::NumOfTypes) {
-		CFogOfWar::Settings.FOW_Type = fow_type;
+	if (fow_type < FogOfWarTypes::cNumOfTypes) {
+		Settings.FOW_Type = fow_type;
 		return true;
 	} else {
 		return false;
 	}
 }
 
-/** 
-** Returns used type of Fog of War 
-** 
-** @return current Fog of War type
-*/
-FogOfWarTypes CFogOfWar::GetType()
+void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 {
-	return CFogOfWar::Settings.FOW_Type;
-}
+    intptr_t visIndex = VisTable_Index0;
+    intptr_t mapIndex = 0;
+    for (uint16_t row = 0 ; row < Map.Info.MapHeight; row++) {
+		for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
+            /// FIXME: to speedup this part, maybe we have to use Map.Field(mapIndex + col)->playerInfo.Visible[thisPlayer.index] instead
+            /// this must be much faster
+            VisTable[visIndex + col] = Map.Field(mapIndex + col)->playerInfo.TeamVisibilityState(thisPlayer);
+		}
+		visIndex += VisTableWidth;
+        mapIndex += Map.Info.MapWidth;
+	}
 
-/**
-**  Adjust viewport
-**
-**  @param viewport     viewport to adjust fog of war for
-**  
-*/
-void CFogOfWar::AdjustToViewport(const CViewport &viewport)
-{
-    /// TODO: Add support for maps which smaller than viewport
-    Assert(viewport.MapWidth <= Map.Info.MapWidth && viewport.MapHeight <= Map.Info.MapHeight);
-
-    Clean();
-    
-    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    /// +1 to the bottom & right because of UI.MapArea.ScrollPadding
-    uint16_t mapAreaWidth  = viewport.MapWidth + 3;
-    uint16_t mapAreaHeight = viewport.MapHeight + 3;
-    
-    FogTextureWidth  = mapAreaWidth  * 4;
-    FogTextureHeight = mapAreaHeight * 4;
-
-    FogTexture.resize(FogTextureWidth * FogTextureHeight);
-    std::fill(FogTexture.begin(), FogTexture.end(), 0xFF);
-
-    Blurer.Setup(FogTextureWidth, FogTextureHeight);
-
-    RenderWidth  = viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1;
-    RenderHeight = viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1;
-    
-    WorkSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, FogTextureWidth, FogTextureHeight, 
-                                                      32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(WorkSurface, SDL_BLENDMODE_NONE);
-
-    FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, mapAreaWidth * PixelTileSize.x, 
-                                                     mapAreaHeight * PixelTileSize.y, 
-                                                     32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(FogSurface, SDL_BLENDMODE_BLEND);
-    SDL_FillRect(FogSurface, NULL, SDL_MapRGBA(FogSurface->format, 0, 0, 0, 0));
-}
-
-/**
- ** Clean Fog of War (free reserved memory and SDL surfaces)
- **
- */
-
-void CFogOfWar::Clean()
-{
-    FogTexture.clear();
-    FogTextureWidth = 0;
-    FogTextureHeight = 0;
-   
-    SDL_FreeSurface(WorkSurface); /// It is safe to pass NULL to this function.
-    WorkSurface = nullptr;
-    SDL_FreeSurface(FogSurface); /// It is safe to pass NULL to this function.
-    FogSurface = nullptr;
-   
-    Blurer.Clean();
+    /// Set the fog texture fully opaque
+ //   std::fill(CFogOfWar::FogTexture.begin(), CFogOfWar::FogTexture.end(), 0xFF);
 }
 
 /**
@@ -191,20 +142,49 @@ void CFogOfWar::Clean()
 **  @param viewport     viewport to refresh fog of war for
 **  @param thisPlayer   player to refresh fog of war for
 */
-void CFogOfWar::Refresh(const CViewport &viewport, const CPlayer &thisPlayer)
+void CFogOfWar::Update(bool doAtOnce)
 {
-    // flags must redraw or not
-	if (ReplayRevealMap) {
-		return;
-	}
-    if ((viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1) != RenderWidth
-        || (viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1) != RenderHeight ) {
-  
-        AdjustToViewport(viewport);
-    }
+    
+    FogTexture.Ease();
 
-    GenerateFog(viewport, thisPlayer);
-    Render(FogTexture.data(), viewport);
+    if (doAtOnce || this->State == cFirstEntry) {
+        /// TODO: Add posibility to generate fog for different players (for replays purposes)
+        GenerateFog(*ThisPlayer);
+        UpscaleFog();
+        Blurer.Blur(FogTexture.GetNext());
+        FogTexture.PushNext();
+        FogTexture.PrepareTransition();
+        this->State = cGenerateFog;
+    } else {
+
+        switch (this->State) {
+            case cGenerateFog:
+                /// TODO: Add posibility to generate fog for different players (for replays purposes)
+                GenerateFog(*ThisPlayer);
+                this->State++;
+                break;
+
+            case cUpscaleFog:
+                UpscaleFog();
+                this->State++;
+                break;
+
+            case cBlurFog:
+                Blurer.Blur(FogTexture.GetNext());
+                FogTexture.PushNext();
+                this->State++;
+                break;
+                
+            case cReady:
+                if (FogTexture.isFullyEased()) {
+                    FogTexture.PrepareTransition();
+                    this->State = cGenerateFog;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 /**
@@ -213,83 +193,37 @@ void CFogOfWar::Refresh(const CViewport &viewport, const CPlayer &thisPlayer)
 **  @param alphaTexture texture with alpha mask to render 
 **  @param viewport     viewport to render fog of war texture in
 */
- void CFogOfWar::Render(const uint8_t *alphaTexture, const CViewport &viewport)
+void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface)
 {
-    
-    /// Clear fog surface
-    SDL_FillRect(FogSurface, NULL, SDL_MapRGBA(FogSurface->format, 0, 0, 0, 0));
-    
-    /// convert fog texture into surface to be able to scale it with SDL_BlitScaled
-    intptr_t renderIndex = 0;
-    for (uint16_t y = 0; y < WorkSurface->h; y++) {
-        for (uint16_t x = 0; x < WorkSurface->w; x++) {
-            reinterpret_cast<uint32_t*>(WorkSurface->pixels)[renderIndex] = SDL_MapRGBA(WorkSurface->format, 0, 0, 0, (alphaTexture[renderIndex])); 
-            renderIndex++;
-        }
-    }
-    SDL_BlitScaled(WorkSurface, NULL, FogSurface, NULL);
 
-    SDL_Rect screenRect;
-    screenRect.x = viewport.TopLeftPos.x;
-    screenRect.y = viewport.TopLeftPos.y;
-    screenRect.w = RenderWidth;
-    screenRect.h = RenderHeight;
+    SDL_Rect srcRect;
+    srcRect.x = (viewport.MapPos.x + 1) * 4 - 2;  /// '+1' because of 1 tile frame around the texture 
+    srcRect.y = (viewport.MapPos.y + 1) * 4 - 2;  /// '-2' is a half-tile compensation
+    srcRect.w = viewport.MapWidth  * 4;
+    srcRect.h = viewport.MapHeight * 4;
     
-    SDL_Rect fogRect;
-    fogRect.x = viewport.Offset.x + PixelTileSize.x / 2;
-    fogRect.y = viewport.Offset.y + PixelTileSize.y / 2;
-    fogRect.w = screenRect.w;
-    fogRect.h = screenRect.h;
-	SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
+    const uint16_t x0 = viewport.MapPos.x * 4;
+    const uint16_t y0 = viewport.MapPos.y * 4;
+
+    FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
+
+    srcRect.x = viewport.MapPos.x  * 4;
+    srcRect.y = viewport.MapPos.y  * 4;
+    
+    SDL_Rect trgRect;
+    trgRect.x = 0;
+    trgRect.y = 0;
+    trgRect.w = viewport.MapWidth  * PixelTileSize.x;
+    trgRect.h = viewport.MapHeight * PixelTileSize.y;
+    
+    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpSurface, trgRect);
 }
-
-/**
-**  Generate fog of war texture for certain viewport.
-**
-**  @param viewport     viewport to generate fog of war for
-**  @param thisPlayer   player to generate fog of war for
-*/
-void CFogOfWar::GenerateFog(const CViewport &viewport, const CPlayer &thisPlayer)
-{
-    // Update for visibility all tile in viewport 
-    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    /// +1 to the bottom & right because of UI.MapArea.ScrollPadding
-    int beginCol    = std::max(viewport.MapPos.x - 1, 0);
-    int beginRow    = std::max(viewport.MapPos.y - 1, 0);
-    int rightEdge   = std::min<int>(viewport.MapPos.x + viewport.MapWidth + 2, Map.Info.MapWidth);
-    int bottomEdge  = std::min<int>(viewport.MapPos.y + viewport.MapHeight + 2, Map.Info.MapHeight);
-
-    intptr_t cacheIndex = CFogOfWar::VisCache_Index0 + beginRow * CFogOfWar::VisCacheWidth;
-    intptr_t mapIndex = beginRow * Map.Info.MapWidth;
-    for (int row = beginRow ; row < bottomEdge; row++) {
-		for (int col = beginCol; col < rightEdge; col++) {
-            /// FIXME: to speedup this part, maybe we have to use Map.Field(mapIndex + col)->playerInfo.Visible[thisPlayer.index] instead
-            /// this must be much faster
-            if (!(VisTableCache[cacheIndex + col] & VisionType::cCached)) {
-                VisTableCache[cacheIndex + col] = Map.Field(mapIndex + col)->playerInfo.TeamVisibilityState(thisPlayer);
-                VisTableCache[cacheIndex + col] |= VisionType::cCached;
-            }
-		}
-		cacheIndex += CFogOfWar::VisCacheWidth;
-        mapIndex += Map.Info.MapWidth;
-	}
-
-    /// Set the fog texture fully opaque
-    std::fill(FogTexture.begin(), FogTexture.end(), 0xFF);
-
-    UpscaleFog(FogTexture.data(), viewport);
-    /// TODO: Blur fog texture
-    Blurer.Blur(FogTexture.data());
-}
-
 
 /**
 **  4x4 upscale generated fog of war texture
 **
-**  @param alphaTexture FOW texture upscale to
-**  @param viewport     viewport which has this FOW texture
 */
-void CFogOfWar::UpscaleFog(uint8_t *alphaTexture, const CViewport &viewport)
+void CFogOfWar::UpscaleFog()
 {
     /*
     **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Exlored.
@@ -309,13 +243,13 @@ void CFogOfWar::UpscaleFog(uint8_t *alphaTexture, const CViewport &viewport)
     */
 
     /// Because we work with 4x4 scaled map tiles here, the textureIndex is in 32bits chunks (byte * 4)
-    uint32_t    *fogTexture    = reinterpret_cast<uint32_t*>(alphaTexture);
-    const size_t textureHeight = FogTextureHeight / 4;
-    const size_t textureWidth  = FogTextureWidth / 4;
+    uint32_t    *fogTexture    = reinterpret_cast<uint32_t*>(FogTexture.GetNext());
+    const size_t textureHeight = FogTexture.GetHeight() / 4;
+    const size_t textureWidth  = FogTexture.GetWidth()  / 4;
     intptr_t     textureIndex  = 0;
   
-    /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTableCache starts from [-1:-1]
-    intptr_t  visIndex = viewport.MapPos.y * VisCacheWidth + viewport.MapPos.x;
+    /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTable starts from [-1:-1]
+    intptr_t  visIndex = 0;
         
     for (int row = 0; row < textureHeight; row++) {
         for (int col = 0; col < textureWidth; col++) {
@@ -324,7 +258,7 @@ void CFogOfWar::UpscaleFog(uint8_t *alphaTexture, const CViewport &viewport)
                             DeterminePattern(visIndex + col, VisionType::cVisible), 
                             DeterminePattern(visIndex + col, VisionType::cVisible | VisionType::cExplored));
         }
-        visIndex     += CFogOfWar::VisCacheWidth;
+        visIndex     += VisTableWidth;
         textureIndex += textureWidth * 4;
     }
 }
@@ -341,11 +275,11 @@ uint8_t CFogOfWar::DeterminePattern(intptr_t index, uint8_t visFlag)
     Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
 
     uint8_t n1, n2, n3, n4;
-    n1 = (visFlag & VisTableCache[index]);
-    n2 = (visFlag & VisTableCache[index + 1]);
-    index += CFogOfWar::VisCacheWidth;
-    n3 = (visFlag & VisTableCache[index]);
-    n4 = (visFlag & VisTableCache[index + 1]);
+    n1 = (visFlag & VisTable[index]);
+    n2 = (visFlag & VisTable[index + 1]);
+    index += VisTableWidth;
+    n3 = (visFlag & VisTable[index]);
+    n4 = (visFlag & VisTable[index + 1]);
     
     n1 >>= n1 - VisionType::cExplored;
     n2 >>= n2 - VisionType::cExplored;
@@ -376,184 +310,102 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 }
 
 /**
-**  Init box blurer parameters (determine radiuses (box sizes) for box blur iterations)
-**  Uses already stored parameters
-*/
-void CBlurer::Init()
-{
-    CBlurer::Init(CBlurer::Radius, CBlurer::NumOfIterations);
-}
-
-/**
-**  Init box blurer parameters (determine radiuses (box sizes) for box blur iterations)
-**  This used to set new parameters for blur algorithm
-**
-**  @param radius Radius or standard deviation
-**  @param numOfIterations Number of boxes
-*/
-void CBlurer::Init(const float radius, const int numOfIterations)
-{
-    Assert (radius >= 0 && numOfIterations > 0);
-
-    float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
-    int dL = floor(D);  
-    if (dL % 2 == 0) { dL--; }
-    int dU = dL + 2;
-				
-    float M = (12 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
-    int m = round(M);
-
-    CBlurer::HalfBoxes.clear();
-    CBlurer::HalfBoxes.resize(numOfIterations);
-    for(uint8_t i = 0; i < numOfIterations; i++) {
-        CBlurer::HalfBoxes[i] = ((float)(i < m ? dL : dU) - 1) / 2;
-    }
-
-    CBlurer::Radius         = radius;
-    CBlurer::NumOfIterations = numOfIterations;
-}
-
-/**
-**  Setup blurer
-**
-**  @param textureWidth width of the working texture (input/output texture also)
-**  @param textureHeight height of the working texture (input/output texture also)
-*/
-void CBlurer::Setup(const uint16_t textureWidth, const uint16_t textureHeight)
-{
-    TextureWidth = textureWidth;
-    TextureHeight = textureHeight;
-    WorkingTexture.clear();
-    WorkingTexture.resize(TextureWidth * TextureHeight);
-}
-
-/**
-**  Clean blurer
+** Bilinear resize alpha texture
+** 
+**  @param src          Image src.
+**  @param srcRect      Rectangle in the src image to render
+**  @param srcWidth     Image width
+**  @param target       Where to render
+**  @param trgRect      Scale src rectangle to this rectangle
+**  @param trgWidth     Dest. width
+**  @param format       Target's pixel format
 **
 */
-void CBlurer::Clean()
+void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
-    WorkingTexture.clear();
-    TextureWidth = 0;
-    TextureHeight = 0;
-}
+    Assert(trgRect.w != 0 && trgRect.h != 0);
+    Assert(trgSurface->format->BitsPerPixel == 32);
 
-
-/**
- ** Blur a texture (optimized for 1 chanel (alpha) textures)
- **
- ** @param  texture texture to blur (uint8_t)
- **
- */
-void CBlurer::Blur(uint8_t *texture)
-{
-    uint8_t *source = texture;
-    uint8_t *target = WorkingTexture.data();
-
-    for (int i = 0; i < HalfBoxes.size(); i++){
-        if (i > 0) {
-            uint8_t *swap = source;
-            source = target;
-            target = swap;
-        }
-        ProceedIteration(source, target, HalfBoxes[i]); 
-    }
-    if (target != texture) {
-        memcpy(texture, WorkingTexture.data(), WorkingTexture.size() * sizeof(uint8_t));    
+    switch (this->Settings.UpscaleType) {
+        case cBilinear:
+            UpscaleBilinear(src, srcRect, srcWidth, trgSurface, trgRect);
+            break;
+        case cSimple:
+        default:
+            UpscaleSimple(src, srcRect, srcWidth, trgSurface, trgRect);
+            break;
     }
 }
 
-/**
-**  Proceed one iteration of box bluring
-**
-**  @param  source  source texture (which has to be blured)
-**  @param  target  target texture (where result will be)
-**  @param  radius  blur radius (box size) for current iteration
-**
-*/
-void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
+void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
-    memcpy(target, source, WorkingTexture.size() * sizeof(uint8_t));
+    uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
     
-    uint8_t *swap = source;
-    source = target;
-    target = swap; 
+    const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
+    const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
+    
+    intptr_t trgIndex = trgRect.y * trgSurface->w + trgRect.x;
+    int64_t  y        = srcRect.y << 16;
 
-    float iarr = 1.0 / (radius + radius + 1);
-    size_t ti, li, ri;
-    uint8_t leftBorder, rightBorder;
-    int16_t sum;
+    for (size_t i = 0 ; i < trgRect.h; i++) {
 
-    /// Horizontal blur pass
-    for (size_t i = 0; i < TextureHeight; i++) {
+        const int32_t ySrc          = static_cast<int32_t> (y >> 16);
+        const int64_t yDiff         = y - (ySrc << 16);
+        const int64_t one_min_yDiff = 65536 - yDiff;
+        const size_t  yIndex        = ySrc * srcWidth;
+              int64_t x             = 0;
+        
+        for (size_t j = 0 ; j < trgRect.w; j++) {
 
-        ti = i * TextureWidth; 
-        li = ti;
-        ri = ti + radius;
-        leftBorder  = source[ti];
-        rightBorder = source[ti + TextureWidth - 1];
-        sum         = (radius + 1) * leftBorder;
+            const int32_t xSrc          = static_cast<int32_t> (x >> 16);
+            const int64_t xDiff         = x - (xSrc << 16);
+            const int64_t one_min_xDiff = 65536 - xDiff;
+            const size_t  srcIndex      = yIndex + xSrc;
 
-        for (size_t j = 0; j < radius; j++) { 
-            sum += source[ti + j]; 
+            const uint8_t A = src[srcIndex];
+            const uint8_t B = src[srcIndex + 1];
+            const uint8_t C = src[srcIndex + srcWidth];
+            const uint8_t D = src[srcIndex + srcWidth + 1];
+
+            // alpha = A(1-w)(1-h) + B(w)(1-h) + C(h)(1-w) + D(w)(h)
+            const uint8_t alpha = static_cast<uint8_t> ((  A * one_min_xDiff * one_min_yDiff
+                                                         + B * xDiff * one_min_yDiff
+                                                         + C * yDiff * one_min_xDiff
+                                                         + D * xDiff * yDiff ) >> 32);
+
+            target[trgIndex + j] = SDL_MapRGBA(trgSurface->format, 0, 0, 0, alpha);
+          
+            x += xRatio;
         }
-        for (size_t j = 0; j <= radius; j++) {
-            sum += source[ri++] - leftBorder; 
-            target[ti++] = round(iarr * sum);
-        }
-        for (size_t j = radius + 1; j < TextureWidth - radius; j++) 
-        {
-            sum += source[ri++] - source[li++];
-            target[ti++] = round(sum * iarr);
-        }
-        for (size_t j = TextureWidth - radius; j < TextureWidth; j++)
-        {
-            sum += rightBorder - source[li++];   
-            target[ti++] = round(iarr * sum);
-        }
+        y += yRatio;
+        trgIndex += trgSurface->w;
     }
+}
 
-    swap = source;
-    source = target;
-    target = swap;  
+void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                              SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+{
+    const uint8_t texelWidth  = PixelTileSize.x / 4;
+    const uint8_t texelHeight = PixelTileSize.y / 4;
+    
+    uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
+    intptr_t srcIndex = srcRect.x + srcRect.y * srcWidth;
+    intptr_t trgIndex = trgRect.x + trgRect.y * trgSurface->w;
 
-    /// Vertical blur pass
-    for (size_t i = 0; i < TextureWidth; i++) {
-
-        ti = i;
-        li = ti;
-        ri = ti + radius * TextureWidth;
-        leftBorder  = source[ti];
-        rightBorder = source[ti + TextureWidth * (TextureHeight - 1)];
-        sum         = (radius + 1) * leftBorder;
-
-        for (size_t j = 0; j < radius; j++) {
-            sum += source[ti + j * TextureWidth];
+    for (uint16_t ySrc = 0; ySrc < srcRect.h; ySrc++) {
+        for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
+ 
+            const uint32_t texelValue = SDL_MapRGBA(trgSurface->format, 0, 0, 0, src[srcIndex + xSrc]);
+            std::fill_n(&target[trgIndex + xSrc * texelWidth], texelWidth, texelValue);
         }
-        for (size_t j = 0; j <= radius ; j++)
-        { 
-            sum += source[ri] - leftBorder;
-            target[ti] = round(iarr * sum);
-            ri += TextureWidth;
-            ti += TextureWidth;
+        for (uint8_t texelRow = 1; texelRow < texelHeight; texelRow++) {
+            std::copy_n(&target[trgIndex], trgRect.w, &target[trgIndex + texelRow * trgSurface->w]);
         }
-        for (size_t j = radius + 1; j < TextureHeight - radius; j++)
-        { 
-            sum += source[ri] - source[li];
-            target[ti] = round(iarr * sum);
-            li += TextureWidth;
-            ri += TextureWidth;
-            ti += TextureWidth;
-        }
-        for (size_t j = TextureHeight - radius; j < TextureHeight; j++)
-        { 
-            sum += rightBorder - source[li];
-            target[ti] = round(iarr * sum);
-            li += TextureWidth;
-            ti += TextureWidth;
-        }
+        srcIndex += srcWidth;
+        trgIndex += trgSurface->w * texelHeight;
     }
-
 }
 
 //@}
