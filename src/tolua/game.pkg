@@ -80,5 +80,7 @@ enum GameTypes {
 	SettingsGameTypeLeftVsRight,
 	SettingsGameTypeManVsMachine,
 	SettingsGameTypeManTeamVsMachine,
+	SettingsGameTypeMachineVsMachine,
+        SettingsGameTypeMachineVsMachineTraining,
 };
 

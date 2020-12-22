@@ -101,7 +101,9 @@ enum GameTypes {
 	SettingsGameTypeTopVsBottom,
 	SettingsGameTypeLeftVsRight,
 	SettingsGameTypeManVsMachine,
-	SettingsGameTypeManTeamVsMachine
+	SettingsGameTypeManTeamVsMachine,
+	SettingsGameTypeMachineVsMachine,
+	SettingsGameTypeMachineVsMachineTraining
 
 	// Future game type ideas
 #if 0
