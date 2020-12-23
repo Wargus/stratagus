@@ -33,3 +33,4 @@ build
 !.vscode/scripts
 .clangd
 compile_commands.json
+pytorchenv

@@ -770,6 +770,8 @@ static void GameTypeMachineVsMachineTraining()
 	FastForwardCycle = LONG_MAX;
 	SyncHash = 0;
 	InitSyncRand();
+	SetEffectsEnabled(false);
+	SetMusicEnabled(false);
 	for (int i = 0; i < MyRand() % 100; i++) {
 		SyncRand();
 	}

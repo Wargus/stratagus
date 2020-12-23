@@ -105,6 +105,8 @@ const EventCallback *Callbacks;
 
 bool IsSDLWindowVisible = true;
 
+static bool dummyRenderer = false;
+
 uint32_t SDL_CUSTOM_KEY_UP;
 
 /*----------------------------------------------------------------------------
@@ -375,6 +377,9 @@ void InitVideoSdl()
 	SDL_RendererInfo rendererInfo;
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
 	printf("[Renderer] %s\n", rendererInfo.name);
+	if (strlen(rendererInfo.name) == 0) {
+		dummyRenderer = true;
+	}
 	if(!strncmp(rendererInfo.name, "opengl", 6)) {
 		LoadShaderExtensions();
 	}
@@ -673,6 +678,10 @@ void WaitEventsOneFrame()
 {
 	++FrameCounter;
 
+	if (dummyRenderer) {
+		return;
+	}
+
 	Uint32 ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
 		++SlowFrameCounter;
@@ -734,6 +743,9 @@ static Uint32 LastTick = 0;
 
 void RealizeVideoMemory()
 {
+	if (dummyRenderer) {
+		return;
+	}
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
 		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
