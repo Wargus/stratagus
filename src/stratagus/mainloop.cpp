@@ -307,7 +307,7 @@ static void GameLogicLoop()
 	ParticleManager.update(); // handle particles
 	CheckMusicFinished(); // Check for next song
 
-	if (FastForwardCycle <= GameCycle || !(GameCycle & 0x3f)) {
+	if (FastForwardCycle <= GameCycle || !(GameCycle & 0xff)) {
 		WaitEventsOneFrame();
 	}
 
@@ -352,7 +352,7 @@ static void DisplayLoop()
 		VideoSyncSpeed = 3000;
 	}
 #endif
-	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0x3f)) {
+	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & 0xff)) {
 		//FIXME: this might be better placed somewhere at front of the
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
