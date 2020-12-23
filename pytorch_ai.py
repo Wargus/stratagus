@@ -1,3 +1,4 @@
+import atexit
 import socket
 import struct
 import random
@@ -26,11 +27,12 @@ class AI:
             self.net = self.net.to(device="cuda")
 
         self.exploration_rate = 1
-        self.exploration_rate_decay = 0.99999975
+        # self.exploration_rate_decay = 0.99999975
+        self.exploration_rate_decay = 0.95
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
-        self.save_every = 50  # no. of experiences between saving the net
+        self.save_every = 1000  # no. of experiences between saving the net
 
         self.memory = deque(maxlen=100000)
         self.batch_size = 32
@@ -59,9 +61,9 @@ class AI:
         else:
             state = state.__array__()
             if self.use_cuda:
-                state = torch.tensor(state).cuda()
+                state = torch.tensor(state, dtype=torch.float).cuda()
             else:
-                state = torch.tensor(state)
+                state = torch.tensor(state, dtype=torch.float)
             state = state.unsqueeze(0)
             action_values = self.net(state, model="online")
             action_idx = torch.argmax(action_values, axis=1).item()
@@ -74,7 +76,7 @@ class AI:
         self.curr_step += 1
         return action_idx
 
-    def cache(self, experience):
+    def cache(self, state, next_state, action, reward, done):
         """
         Store the experience to self.memory (replay buffer)
 
@@ -176,29 +178,19 @@ class AI:
 
 
 class StratagusNet(nn.Module):
-    """mini cnn structure
-  input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
-  """
     def __init__(self, input_dim, output_dim):
         super().__init__()
-        c, h, w = input_dim
+        c = input_dim
 
-        if h != 84:
-            raise ValueError(f"Expecting input height: 84, got: {h}")
-        if w != 84:
-            raise ValueError(f"Expecting input width: 84, got: {w}")
+        self.l1 = nn.Linear(input_dim, 512, bias=True)
+        self.l2 = nn.Linear(512, output_dim, bias=True)
 
-        self.online = nn.Sequential(
-            nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
+        self.online = torch.nn.Sequential(
+            self.l1,
+            nn.Dropout(p=0.6),
             nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-            nn.ReLU(),
-            nn.Flatten(),
-            nn.Linear(3136, 512),
-            nn.ReLU(),
-            nn.Linear(512, output_dim),
+            self.l2,
+            nn.Softmax(dim=-1)
         )
 
         self.target = copy.deepcopy(self.online)
@@ -320,10 +312,11 @@ class MetricLogger:
 if __name__ == "__main__":
     # Listen for incoming datagrams
     localIP = "127.0.0.1"
-    localPort = 9292
+    localPort = 9293
     buffersize = 1024
     sock = socket.socket(family=socket.AF_INET)
     sock.bind((localIP, localPort))
+    atexit.register(lambda: sock.close())
     sock.listen(5)
 
     use_cuda = torch.cuda.is_available()
@@ -332,15 +325,16 @@ if __name__ == "__main__":
 
     save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     save_dir.mkdir(parents=True)
-
+    stratagus = None
     logger = MetricLogger(save_dir)
+    num_state = 0
+    num_actions = 0
+    e = 0
 
     while True:
         print("TCP server up and listening on", localIP, localPort)
         (clientsocket, address) = sock.accept()
         print("connection", address)
-        num_state = 0
-        num_actions = 0
         long_size = struct.calcsize('!l')
         last_state = None
         last_action = 0
@@ -354,31 +348,32 @@ if __name__ == "__main__":
                 states = ord(clientsocket.recv(1))
                 actions = ord(clientsocket.recv(1))
                 if stratagus is not None:
-                    assert states == num_state
-                    assert actions == num_actions
+                    assert states == num_state, ("%d:%d" % (states, num_state))
+                    assert actions == num_actions, ("%d:%d" % (actions, num_actions))
                 else:
                     num_state, num_actions = states, actions
                     state_unpack_fmt = "!" + "l" * num_state
-                    stratagus = AI(state_dim=(num_state,), action_dim=num_actions, save_dir=save_dir)
+                    stratagus = AI(state_dim=num_state, action_dim=num_actions, save_dir=save_dir)
                 print("setup", num_state, num_actions)
             elif command == b"S" or command == b"E":
                 r = b""
                 while len(r) < long_size:
                     r += clientsocket.recv(long_size - len(r))
                 reward = struct.unpack("!l", r)[0]
+                print("reward", reward)
                 r = b""
                 expected = long_size * num_state
                 while len(r) < expected:
                     r += clientsocket.recv(expected - len(r))
                 args = struct.unpack(state_unpack_fmt, r)
                 print("step", args)
-                state = numpy.array(args, dtype=numpy.long)
+                state = np.array(args, dtype=np.float)
 
-                if last_state:
+                if last_state is not None:
                     # Remember
                     stratagus.cache(last_state, state, last_action, reward, False)
                     # Learn
-                    q, loss = mario.learn()
+                    q, loss = stratagus.learn()
                     # Logging
                     logger.log_step(reward, loss, q)
 
@@ -393,3 +388,4 @@ if __name__ == "__main__":
                     assert command == b"E"
                     logger.log_episode()
                     logger.record(episode=e, epsilon=stratagus.exploration_rate, step=stratagus.curr_step)
+                    e += 1
