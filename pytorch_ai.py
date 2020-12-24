@@ -28,7 +28,7 @@ class AI:
 
         self.exploration_rate = 1
         # self.exploration_rate_decay = 0.99999975
-        self.exploration_rate_decay = 0.95
+        self.exploration_rate_decay = 0.999
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
@@ -41,9 +41,9 @@ class AI:
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        self.burnin = 1e4  # min. experiences before training
+        self.burnin = 100  # min. experiences before training
         self.learn_every = 3  # no. of experiences between updates to Q_online
-        self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
+        self.sync_every = 50  # no. of experiences between Q_target & Q_online sync
 
     def act(self, state):
         """
@@ -55,10 +55,12 @@ class AI:
         """
         # EXPLORE
         if np.random.rand() < self.exploration_rate:
+            print("EXPLORE")
             action_idx = np.random.randint(self.action_dim)
 
         # EXPLOIT
         else:
+            print("EXPLOIT")
             state = state.__array__()
             if self.use_cuda:
                 state = torch.tensor(state, dtype=torch.float).cuda()
@@ -91,14 +93,14 @@ class AI:
         next_state = next_state.__array__()
 
         if self.use_cuda:
-            state = torch.tensor(state).cuda()
-            next_state = torch.tensor(next_state).cuda()
+            state = torch.tensor(state, dtype=torch.float).cuda()
+            next_state = torch.tensor(next_state, dtype=torch.float).cuda()
             action = torch.tensor([action]).cuda()
             reward = torch.tensor([reward]).cuda()
             done = torch.tensor([done]).cuda()
         else:
-            state = torch.tensor(state)
-            next_state = torch.tensor(next_state)
+            state = torch.tensor(state, dtype=torch.float)
+            next_state = torch.tensor(next_state, dtype=torch.float)
             action = torch.tensor([action])
             reward = torch.tensor([reward])
             done = torch.tensor([done])
@@ -183,13 +185,21 @@ class StratagusNet(nn.Module):
         c = input_dim
 
         self.l1 = nn.Linear(input_dim, 512, bias=True)
-        self.l2 = nn.Linear(512, output_dim, bias=True)
+        self.l2 = nn.Linear(512, 1024, bias=True)
+        self.l3 = nn.Linear(1024, 256, bias=True)
+        self.l4 = nn.Linear(256, output_dim, bias=True)
 
         self.online = torch.nn.Sequential(
             self.l1,
             nn.Dropout(p=0.6),
             nn.ReLU(),
             self.l2,
+            nn.Dropout(p=0.8),
+            nn.ReLU(),
+            self.l3,
+            nn.Dropout(p=0.9),
+            nn.ReLU(),
+            self.l4,
             nn.Softmax(dim=-1)
         )
 
@@ -343,7 +353,6 @@ if __name__ == "__main__":
             command = clientsocket.recv(1)
             if not command:
                 break
-            print(command)
             if command == b"I":
                 states = ord(clientsocket.recv(1))
                 actions = ord(clientsocket.recv(1))
@@ -354,19 +363,17 @@ if __name__ == "__main__":
                     num_state, num_actions = states, actions
                     state_unpack_fmt = "!" + "l" * num_state
                     stratagus = AI(state_dim=num_state, action_dim=num_actions, save_dir=save_dir)
-                print("setup", num_state, num_actions)
             elif command == b"S" or command == b"E":
                 r = b""
                 while len(r) < long_size:
                     r += clientsocket.recv(long_size - len(r))
                 reward = struct.unpack("!l", r)[0]
-                print("reward", reward)
                 r = b""
                 expected = long_size * num_state
                 while len(r) < expected:
                     r += clientsocket.recv(expected - len(r))
                 args = struct.unpack(state_unpack_fmt, r)
-                print("step", args)
+                print(args)
                 state = np.array(args, dtype=np.float)
 
                 if last_state is not None:
