@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "lua.h"
 #include "network.h"
 #include "network/netsockets.h"
 #include "net_lowlevel.h"
@@ -677,6 +678,30 @@ static int CclAiWait(lua_State *l)
 		return 1;
 	}
 	lua_pushboolean(l, 1);
+	return 1;
+}
+
+/**
+**  Get number of active build requests for a unit type.
+**
+**  @param l  Lua State.
+**
+**  @return   Number of return values
+*/
+static int CclAiPendingBuildCount(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const CUnitType *type = CclGetUnitType(l);
+
+	// The assumption of this function is that UnitTypeBuilt will be always be
+	// fairly small so we iterate each time instead of doing any caching
+	for (auto b : AiPlayer->UnitTypeBuilt) {
+		if (b.Type == type) {
+			lua_pushinteger(l, b.Want);
+			return 1;
+		}
+	}
+	lua_pushinteger(l, 0);
 	return 1;
 }
 
@@ -1534,6 +1559,7 @@ void AiCclRegister()
 	lua_register(Lua, "AiNeed", CclAiNeed);
 	lua_register(Lua, "AiSet", CclAiSet);
 	lua_register(Lua, "AiWait", CclAiWait);
+	lua_register(Lua, "AiGetPendingBuilds", CclAiPendingBuildCount);
 
 	lua_register(Lua, "AiForce", CclAiForce);
 
