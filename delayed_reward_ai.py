@@ -24,11 +24,7 @@ class AI:
 
         # Stratagus's DNN to predict the most optimal action - we implement this in the Learn section
         self.net = StratagusNet(self.state_dim, self.action_dim).float()
-        if load_file:
-            with open(load_file, "rb") as f:
-                d = torch.load(f)
-            self.net.load_state_dict(d["model"])
-            self.exploration_rate = d["exploration_rate"]
+
         if self.use_cuda:
             self.net = self.net.to(device="cuda")
 
@@ -37,19 +33,25 @@ class AI:
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
-        self.save_every = 10000  # no. of experiences between saving the net
+        self.save_every = 5e5  # no. of experiences between saving the net
 
         self.memory = deque(maxlen=100000)
         self.batch_size = 32
 
-        self.gamma = 0.99
-        # self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
-        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.1) # faster learning rate
+        self.gamma = 0.9
+        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
+        # self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.1) # faster learning rate
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        self.burnin = 1000  # min. experiences before training
-        self.learn_every = 30  # no. of experiences between updates to Q_online
-        self.sync_every = 500  # no. of experiences between Q_target & Q_online sync
+        self.burnin = 1e4  # min. experiences before training
+        self.learn_every = 3  # no. of experiences between updates to Q_online
+        self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
+
+        if load_file:
+            checkpoint = torch.load(load_file)
+            self.net.load_state_dict(checkpoint['net_state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.exploration_rate = checkpoint['exploration_rate']
 
     def act(self, state):
         """
@@ -176,10 +178,11 @@ class AI:
         save_path = (
             self.save_dir / f"stratagus_net_{int(self.curr_step // self.save_every)}.chkpt"
         )
-        torch.save(
-            dict(model=self.net.state_dict(), exploration_rate=self.exploration_rate),
-            save_path,
-        )
+        torch.save({
+            "net_state_dict": self.net.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "exploration_rate": self.exploration_rate,
+        }, save_path)
         print(f"StratagusNet saved to {save_path} at step {self.curr_step}")
 
 
@@ -189,16 +192,16 @@ class StratagusNet(nn.Module):
         c = input_dim
 
         self.l1 = nn.Linear(input_dim, 512)
-        self.l2 = nn.Linear(512, 2048)
-        self.l3 = nn.Linear(2048, output_dim)
+        self.l2 = nn.Linear(512, 1024)
+        self.l3 = nn.Linear(1024, 256)
+        self.l3 = nn.Linear(256, output_dim)
 
         self.online = torch.nn.Sequential(
             self.l1,
             nn.ReLU(),
-            nn.Dropout(p=0.6),
             self.l2,
+            nn.Dropout(p=0.6),
             nn.ReLU(),
-            nn.Dropout(p=0.8),
             self.l3,
             nn.Softmax(dim=-1)
         )
