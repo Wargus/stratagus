@@ -33,18 +33,18 @@ class AI:
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
-        self.save_every = 5e5  # no. of experiences between saving the net
+        self.save_every = 5e4  # no. of experiences between saving the net
 
         self.memory = deque(maxlen=100000)
-        self.batch_size = 32
+        self.batch_size = 64
 
         self.gamma = 0.9
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
         # self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.1) # faster learning rate
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        self.burnin = 1e4  # min. experiences before training
-        self.learn_every = 3  # no. of experiences between updates to Q_online
+        self.burnin = 5e4  # min. experiences before training
+        self.learn_every = 32  # no. of experiences between updates to Q_online
         self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
 
         if load_file:
@@ -194,15 +194,17 @@ class StratagusNet(nn.Module):
         self.l1 = nn.Linear(input_dim, 512)
         self.l2 = nn.Linear(512, 1024)
         self.l3 = nn.Linear(1024, 256)
-        self.l3 = nn.Linear(256, output_dim)
+        self.l4 = nn.Linear(256, output_dim)
 
         self.online = torch.nn.Sequential(
             self.l1,
             nn.ReLU(),
             self.l2,
-            nn.Dropout(p=0.6),
             nn.ReLU(),
             self.l3,
+            nn.Dropout(p=0.6),
+            nn.ReLU(),
+            self.l4,
             nn.Softmax(dim=-1)
         )
 
@@ -325,15 +327,15 @@ class MetricLogger:
 if __name__ == "__main__":
     # Listen for incoming datagrams
     localIP = "127.0.0.1"
-    localPort = 9293
+    localPort = int(sys.argv[1])
     buffersize = 1024
     sock = socket.socket(family=socket.AF_INET)
     sock.bind((localIP, localPort))
     atexit.register(lambda: sock.close())
     sock.listen(5)
 
-    if len(sys.argv) > 1:
-        load_file = sys.argv[1]
+    if len(sys.argv) > 2:
+        load_file = sys.argv[2]
     else:
         load_file = None
 
