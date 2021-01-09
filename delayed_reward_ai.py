@@ -36,15 +36,15 @@ class AI:
         self.save_every = 5e4  # no. of experiences between saving the net
 
         self.memory = deque(maxlen=100000)
-        self.batch_size = 64
+        self.batch_size = 256
 
-        self.gamma = 0.9
+        self.gamma = 0.99
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
         # self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.1) # faster learning rate
         self.loss_fn = torch.nn.SmoothL1Loss()
 
         self.burnin = 5e4  # min. experiences before training
-        self.learn_every = 32  # no. of experiences between updates to Q_online
+        self.learn_every = 512  # no. of experiences between updates to Q_online
         self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
 
         if load_file:
@@ -52,6 +52,10 @@ class AI:
             self.net.load_state_dict(checkpoint['net_state_dict'])
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.exploration_rate = checkpoint['exploration_rate']
+            self.burnin = 1e4
+        # if True: # no learning
+        #     self.exploration_rate = 0.0
+        #     self.exploration_rate_min = 0.0
 
     def act(self, state):
         """
@@ -202,7 +206,7 @@ class StratagusNet(nn.Module):
             self.l2,
             nn.ReLU(),
             self.l3,
-            nn.Dropout(p=0.6),
+            # nn.Dropout(p=0.6),
             nn.ReLU(),
             self.l4,
             nn.Softmax(dim=-1)
