@@ -30,6 +30,7 @@ class AI:
 
         self.exploration_rate = 1
         self.exploration_rate_decay = 0.99999975
+        # self.exploration_rate_decay = 0.99
         self.exploration_rate_min = 0.1
         self.curr_step = 0
 
@@ -43,7 +44,7 @@ class AI:
         # self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.1) # faster learning rate
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        self.burnin = 5e4  # min. experiences before training
+        self.burnin = 1e4  # min. experiences before training
         self.learn_every = 512  # no. of experiences between updates to Q_online
         self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
 
@@ -201,12 +202,17 @@ class StratagusNet(nn.Module):
         self.l4 = nn.Linear(256, output_dim)
 
         self.online = torch.nn.Sequential(
-            self.l1,
+            nn.Conv1d(in_channels=input_dim, out_channels=256, kernel_size=8, stride=4),
             nn.ReLU(),
-            self.l2,
+            # nn.Conv1d(in_channels=32, out_channels=64, kernel_size=1, stride=2),
+            # nn.ReLU(),
+            # nn.Conv1d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
+            # nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(256, 1024),
+            # self.l2,
             nn.ReLU(),
             self.l3,
-            # nn.Dropout(p=0.6),
             nn.ReLU(),
             self.l4,
             nn.Softmax(dim=-1)
@@ -387,7 +393,17 @@ if __name__ == "__main__":
                 while len(r) < expected:
                     r += clientsocket.recv(expected - len(r))
                 args = struct.unpack(state_unpack_fmt, r)
-                state = np.array(args, dtype=np.float)
+                if last_state is not None:
+                    tlast = last_state.transpose()
+                    state = np.array([
+                        args, tlast[0], tlast[1], tlast[2],
+                        tlast[3], tlast[4], tlast[5], tlast[6]
+                    ], dtype=np.float)
+                else:
+                    # initial state is just repeated 8 times
+                    state = np.array([args] * 8, dtype=np.float)
+                state = state.transpose()
+                # print(len(state), state)
 
                 if last_state is not None:
                     # Remember
