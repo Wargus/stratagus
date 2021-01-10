@@ -1528,7 +1528,7 @@ static int CclAiProcessorStep(lua_State *l)
 	CTCPSocket *s = AiProcessorSendState(l, 'S');
 	int action = 0;
 	s->Recv(&action, 1);
-	lua_pushnumber(l, action);
+	lua_pushnumber(l, action + 1); // +1 since lua tables are 1-indexed
 	return 1;
 }
 
