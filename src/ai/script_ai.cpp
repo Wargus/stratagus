@@ -34,11 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "lua.h"
 #include "network.h"
-#include "network/netsockets.h"
 #include "net_lowlevel.h"
-#include "results.h"
 #include "stratagus.h"
 
 #include "ai.h"
