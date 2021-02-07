@@ -690,7 +690,6 @@ static void GameTypeLeftVsRight()
 */
 static void GameTypeManVsMachine()
 {
-	Map.NoFogOfWar = true;
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer) {
 			continue;
