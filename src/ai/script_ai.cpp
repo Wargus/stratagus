@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "network.h"
+#include "net_lowlevel.h"
 #include "stratagus.h"
 
 #include "ai.h"
@@ -673,6 +675,30 @@ static int CclAiWait(lua_State *l)
 		return 1;
 	}
 	lua_pushboolean(l, 1);
+	return 1;
+}
+
+/**
+**  Get number of active build requests for a unit type.
+**
+**  @param l  Lua State.
+**
+**  @return   Number of return values
+*/
+static int CclAiPendingBuildCount(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const CUnitType *type = CclGetUnitType(l);
+
+	// The assumption of this function is that UnitTypeBuilt will be always be
+	// fairly small so we iterate each time instead of doing any caching
+	for (auto b : AiPlayer->UnitTypeBuilt) {
+		if (b.Type == type) {
+			lua_pushinteger(l, b.Want);
+			return 1;
+		}
+	}
+	lua_pushinteger(l, 0);
 	return 1;
 }
 
@@ -1416,6 +1442,102 @@ static int CclDefineAiPlayer(lua_State *l)
 }
 
 /**
+ * AiProcessorSetup(host, port, number_of_state_variables, number_of_actions)
+ *
+ * Connect to an AI agent running at host:port, that will consume
+ * number_of_state_variables every step and select one of number_of_actions.
+ */
+static int CclAiProcessorSetup(lua_State *l)
+{
+	InitNetwork1();
+	LuaCheckArgs(l, 4);
+	std::string host = LuaToString(l, 1);
+	int port = LuaToNumber(l, 2);
+	int stateDim = LuaToNumber(l, 3);
+	int actionDim = LuaToNumber(l, 4);
+
+	CHost h(host.c_str(), port);
+	CTCPSocket *s = new CTCPSocket();
+	s->Open(CHost());
+	if (s->Connect(h)) {
+		char buf[3];
+		buf[0] = 'I';
+		buf[1] = (uint8_t)stateDim;
+		buf[2] = (uint8_t)actionDim;
+		s->Send(buf, 3);
+		lua_pushlightuserdata(l, s);
+		return 1;
+	}
+
+	delete s;
+	lua_pushnil(l);
+	return 1;
+}
+
+static CTCPSocket * AiProcessorSendState(lua_State *l, char prefix)
+{
+	LuaCheckArgs(l, 3);
+	CTCPSocket *s = (CTCPSocket *)lua_touserdata(l, 1);
+	if (s == NULL) {
+		LuaError(l, "first argument must be valid handle returned from a previous AiProcessorSetup call");
+	}
+
+	uint32_t reward = htonl(LuaToNumber(l, 2));
+	if (!lua_istable(l, 3)) {
+		LuaError(l, "3rd argument to AiProcessorStep must be table");
+	}
+
+	char stepBuf[1029] = {'\0'}; // room for prefix + uint32 reward + 256 uint32 variables
+	stepBuf[0] = prefix;
+	int i = 1;
+
+	memcpy(stepBuf + i, &reward, sizeof(uint32_t));
+	i += sizeof(uint32_t);
+
+	for (lua_pushnil(l); lua_next(l, 3); lua_pop(l, 1)) {
+		// idx is ignored
+		uint32_t var = htonl(LuaToNumber(l, -1));
+		memcpy(stepBuf + i, &var, sizeof(uint32_t));
+		i += sizeof(uint32_t);
+		if (i + sizeof(uint32_t) > 1025) {
+			LuaError(l, "too many state variables");
+		}
+	}
+	s->Send(stepBuf, i);
+
+	return s;
+}
+
+/**
+ * AiProcessorStep(handle, reward_since_last_call, table_of_state_variables)
+ */
+static int CclAiProcessorStep(lua_State *l)
+{
+	// A single step in a reinforcement learning network
+
+	// We receive the current env and current reward in the arguments
+
+	// We need to return the next action.
+
+	// The next call to this function will be the updated state, reward for the
+	// last action
+
+	CTCPSocket *s = AiProcessorSendState(l, 'S');
+	int action = 0;
+	s->Recv(&action, 1);
+	lua_pushnumber(l, action + 1); // +1 since lua tables are 1-indexed
+	return 1;
+}
+
+static int CclAiProcessorEnd(lua_State *l)
+{
+	CTCPSocket *s = AiProcessorSendState(l, 'E');
+	s->Close();
+	delete s;
+	return 0;
+}
+
+/**
 **  Register CCL features for unit-type.
 */
 void AiCclRegister()
@@ -1434,6 +1556,7 @@ void AiCclRegister()
 	lua_register(Lua, "AiNeed", CclAiNeed);
 	lua_register(Lua, "AiSet", CclAiSet);
 	lua_register(Lua, "AiWait", CclAiWait);
+	lua_register(Lua, "AiGetPendingBuilds", CclAiPendingBuildCount);
 
 	lua_register(Lua, "AiForce", CclAiForce);
 
@@ -1458,6 +1581,11 @@ void AiCclRegister()
 	lua_register(Lua, "DefineAiPlayer", CclDefineAiPlayer);
 	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
 	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
+
+	// for external AI processors
+	lua_register(Lua, "AiProcessorSetup", CclAiProcessorSetup);
+	lua_register(Lua, "AiProcessorStep", CclAiProcessorStep);
+	lua_register(Lua, "AiProcessorEnd", CclAiProcessorEnd);
 }
 
 //@}

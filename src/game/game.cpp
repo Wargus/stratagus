@@ -738,6 +738,44 @@ static void GameTypeManTeamVsMachine()
 	}
 }
 
+/**
+**  Machine vs Machine
+*/
+static void GameTypeMachineVsMachine()
+{
+	Map.Reveal();
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		if (Players[i].Type == PlayerComputer) {
+			for (int j = i + 1; j < PlayerMax - 1; ++j) {
+				if (Players[j].Type == PlayerComputer) {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+					CommandDiplomacy(j, DiplomacyEnemy, i);
+				} else {
+					CommandDiplomacy(i, DiplomacyNeutral, j);
+					CommandDiplomacy(j, DiplomacyNeutral, i);
+				}
+			}
+		}
+	}
+}
+
+/**
+ ** Machine vs Machine Training
+ */
+static void GameTypeMachineVsMachineTraining()
+{
+	Assert(!IsNetworkGame());
+	GameTypeMachineVsMachine();
+	FastForwardCycle = LONG_MAX;
+	SyncHash = 0;
+	InitSyncRand();
+	SetEffectsEnabled(false);
+	SetMusicEnabled(false);
+	for (int i = 0; i < MyRand() % 100; i++) {
+		SyncRand();
+	}
+}
+
 /*----------------------------------------------------------------------------
 --  Game creation
 ----------------------------------------------------------------------------*/
@@ -871,6 +909,13 @@ void CreateGame(const std::string &filename, CMap *map)
 				break;
 			case SettingsGameTypeManTeamVsMachine:
 				GameTypeManTeamVsMachine();
+				break;
+			case SettingsGameTypeMachineVsMachine:
+				GameTypeMachineVsMachine();
+				break;
+			case SettingsGameTypeMachineVsMachineTraining:
+				GameTypeMachineVsMachineTraining();
+				break;
 
 				// Future game type ideas
 #if 0
