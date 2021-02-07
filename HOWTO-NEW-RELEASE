@@ -16,6 +16,10 @@ Update copyright information for Debian:
 It's a good idea to ensure the debian build works before taggging:
  gbp buildpackage
 
+Create the doxygen documentation by building with -DENABLE_DOC=ON
+Create the lua function bindings overview by running the Python script doc/lua/generate_index.py
+Copy the generated doxygen and the generated lua bindings html to the website storage.
+
 Tag the new release in https://github.com/Wargus/win32-stratagus-dependencies
 and wait for it to run through on the Appveyor CI. This will automatically
 cause a release with the tag name to be created, and the windows dependencies
