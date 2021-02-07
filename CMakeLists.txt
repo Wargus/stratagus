@@ -648,6 +648,12 @@ if(WIN32)
 	find_package(MakeNSIS)
 endif()
 
+if(ENABLE_DOC)
+find_package(Doxygen
+             REQUIRED dot
+             OPTIONAL_COMPONENTS mscgen dia)
+endif()
+
 find_package(BZip2)
 find_package(StackTrace)
 find_package(MNG)
