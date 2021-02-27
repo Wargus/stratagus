@@ -859,6 +859,10 @@ static int CclOrderUnit(lua_State *l)
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order, "move")) {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
+				} else if (!strcmp(order, "stop")) {
+					CommandStopUnit(unit); //Stop the unit
+				} else if (!strcmp(order, "stand-ground")) {
+					CommandStandGround(unit,0); //Stand and flush every order
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
