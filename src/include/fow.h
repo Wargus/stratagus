@@ -97,7 +97,7 @@ private:
         uint8_t       NumOfEasingSteps {8};
         float         BlurRadius       {2};
         uint8_t       BlurIterations   {3};
-        uint8_t       UpscaleType      {UpscaleTypes::cSimple};
+        uint8_t       UpscaleType      {UpscaleTypes::cBilinear};
 	} Settings;
 
     uint8_t State { States::cFirstEntry };

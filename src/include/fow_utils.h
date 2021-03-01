@@ -65,6 +65,7 @@ public:
     {
         if (CurrentStep < EasingStepsNum) CurrentStep++;
     }
+    
     void PrepareTransition(bool forcedShowNext = false)
     {
         CalcDeltas();

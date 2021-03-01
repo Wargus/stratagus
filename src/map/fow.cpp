@@ -356,7 +356,7 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, con
         const int64_t yDiff         = y - (ySrc << 16);
         const int64_t one_min_yDiff = 65536 - yDiff;
         const size_t  yIndex        = ySrc * srcWidth;
-              int64_t x             = 0;
+              int64_t x             = srcRect.x << 16;
         
         for (size_t j = 0 ; j < trgRect.w; j++) {
 
