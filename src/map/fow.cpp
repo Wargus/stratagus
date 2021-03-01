@@ -142,10 +142,12 @@ void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 **  @param viewport     viewport to refresh fog of war for
 **  @param thisPlayer   player to refresh fog of war for
 */
-void CFogOfWar::Update(bool doAtOnce)
+void CFogOfWar::Update(bool doAtOnce /*= false*/)
 {
     
     FogTexture.Ease();
+
+    if (Settings.NumOfEasingSteps < States::cReady) doAtOnce = true;
 
     if (doAtOnce || this->State == cFirstEntry) {
         /// TODO: Add posibility to generate fog for different players (for replays purposes)
@@ -153,10 +155,9 @@ void CFogOfWar::Update(bool doAtOnce)
         UpscaleFog();
         Blurer.Blur(FogTexture.GetNext());
         FogTexture.PushNext();
-        FogTexture.PrepareTransition();
+        FogTexture.PrepareTransition(doAtOnce);
         this->State = cGenerateFog;
     } else {
-
         switch (this->State) {
             case cGenerateFog:
                 /// TODO: Add posibility to generate fog for different players (for replays purposes)

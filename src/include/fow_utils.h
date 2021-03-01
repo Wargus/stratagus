@@ -61,15 +61,15 @@ public:
         isWatingForNext = true;
     }
 
-    void Ease(bool forcedLastStep = false)
+    void Ease()
     {
         if (CurrentStep < EasingStepsNum) CurrentStep++;
     }
-    void PrepareTransition()
+    void PrepareTransition(bool forcedShowNext = false)
     {
         CalcDeltas();
         SwapFrames();
-        CurrentStep = 0;
+        CurrentStep = forcedShowNext ? EasingStepsNum: 0;
         isWatingForNext = true;
     }
 
