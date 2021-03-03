@@ -55,7 +55,7 @@ class CFogOfWar
 public:
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
     enum States       { cFirstEntry = 0, cGenerateFog, cUpscaleFog, cBlurFog, cReady };
-    enum UpscaleTypes { cSimple, cBilinear };
+    enum UpscaleTypes { cSimple = 0, cBilinear };
 
     void Update(bool doAtOnce = false);
     
@@ -64,11 +64,22 @@ public:
     void VisTableReset();
     bool SetType(const FogOfWarTypes fow_type);
 	FogOfWarTypes GetType() { return Settings.FOW_Type; }
-    void InitBlurer(const float radius, const uint16_t numOfIterations)
+    
+    void SetBilinearUpscale(bool isBilinear) 
     {
-        Settings.BlurRadius = radius;
-        Settings.BlurIterations = numOfIterations;
-        Blurer.PrecalcParameters(radius, numOfIterations);
+        uint8_t prev = Settings.UpscaleType;
+        Settings.UpscaleType = isBilinear ? cBilinear : cSimple;
+        if (prev != Settings.UpscaleType) {
+            Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
+        }
+    }
+
+    void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations)
+    {
+        Settings.BlurRadius[cSimple]   = radius1;
+        Settings.BlurRadius[cBilinear] = radius2;
+        Settings.BlurIterations        = numOfIterations;
+        Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
     }
 
     void RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface);
@@ -95,7 +106,7 @@ private:
 	{
 		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced};      /// Type of fog of war - legacy or enhanced(smooth)
         uint8_t       NumOfEasingSteps {8};
-        float         BlurRadius       {2};
+        float         BlurRadius[2]    {2.0, 1.5};
         uint8_t       BlurIterations   {3};
         uint8_t       UpscaleType      {UpscaleTypes::cBilinear};
 	} Settings;

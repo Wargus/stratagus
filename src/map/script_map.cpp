@@ -382,19 +382,40 @@ static int CclSetFogOfWarType(lua_State *l)
 */
 static int CclSetFogOfWarBlur(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 3);
 
-	float radius = LuaToFloat(l, 1);
-	if (radius <= 0 ) {
+	float radiusSimple = LuaToFloat(l, 1);
+	if (radiusSimple <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
 	}
-	int iterations = LuaToNumber(l, 2);	
+
+	float radiusBilinear = LuaToFloat(l, 2);
+	if (radiusBilinear <= 0 ) {
+		PrintFunction();
+		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
+	}
+
+	int iterations = LuaToNumber(l, 3);	
 	if (iterations <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
 	}
-	FogOfWar.InitBlurer(radius, iterations);
+	FogOfWar.InitBlurer(radiusSimple, radiusBilinear, iterations);
+	return 0;
+}
+
+/**
+**  Activate FOW bilinear upscaling type  (true|false)
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetFogOfWarBilinear(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	FogOfWar.SetBilinearUpscale(LuaToBoolean(l, 1));
 	return 0;
 }
 
@@ -738,7 +759,8 @@ void MapCclRegister()
 
 	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
 	lua_register(Lua, "SetFogOfWarBlur", CclSetFogOfWarBlur);
-
+	lua_register(Lua, "SetFogOfWarBilinear", CclSetFogOfWarBilinear);
+	
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);

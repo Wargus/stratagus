@@ -80,7 +80,7 @@ void CFogOfWar::Init()
     RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
     std::fill(RenderedFog.begin(), RenderedFog.end(), 0xFF);
 
-    Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius, Settings.BlurIterations);
+    Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
     this->State = 0;
 }
