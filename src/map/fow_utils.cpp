@@ -10,7 +10,7 @@
 //
 /**@name fow_utils.cpp - The utilities for fog of war . */
 //
-//      (c) Copyright 2020 by Alyokhin
+//      (c) Copyright 2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -53,7 +53,14 @@
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-
+/**
+**  Init eased texture
+**
+**  @param width width of the texture
+**  @param height height of the texture
+**  @param numOfSteps number easing steps
+**
+*/
 void CEasedTexture::Init(const uint16_t width, const uint16_t height, const uint8_t numOfSteps)
 {
     Width       = width;
@@ -76,9 +83,12 @@ void CEasedTexture::Init(const uint16_t width, const uint16_t height, const uint
 
     EasingStepsNum  = numOfSteps;
     CurrentStep     = numOfSteps;
-    isWatingForNext = true;
 }
 
+/**
+**  Clean the texture
+**
+*/
 void CEasedTexture::Clean()
 {
     for (auto &frame : Frames) {
@@ -90,9 +100,45 @@ void CEasedTexture::Clean()
     Height          = 0;
     EasingStepsNum  = 0;
     CurrentStep     = 0;
-    isWatingForNext = false;
 }
 
+/**
+**  Change number of easing steps
+**
+**  @param width width of the texture
+**  @param height height of the texture
+**  @param numOfSteps number of the texture easing steps
+**
+*/
+void CEasedTexture::SetNumOfSteps (const uint8_t num)
+{
+    EasingStepsNum  = num;
+    CurrentStep     = EasingStepsNum;
+}
+
+/**
+**  Switch easing to new frame of the texture
+**
+**  @param forcedShowNext cmd to immediately show next frame without easing
+**
+*/
+void CEasedTexture::PushNext(bool forcedShowNext /*= false*/)
+{
+    CalcDeltas();
+    SwapFrames();
+    CurrentStep = forcedShowNext ? EasingStepsNum: 0;
+}
+
+/**
+**  Draw a rectangle of the texture into the target
+**
+**  @param target   target where draw texture to
+**  @param trgWidth target width in pixels
+**  @param x0       left coordinate in the target (where to draw)
+**  @param y0       upper coordinate in the target (where to draw)
+**  @param srcRect  rectangle of the texture to draw
+**
+*/
 void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect)
 {
     const uint16_t xEnd   = srcRect.x + srcRect.w;
@@ -122,6 +168,10 @@ void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const u
     }
 }
 
+/**
+**  Calculate deltas between next and current frames
+**
+*/
 void CEasedTexture::CalcDeltas() 
 { 
     const uint8_t *curr   = Frames[Curr].data();
@@ -135,13 +185,13 @@ void CEasedTexture::CalcDeltas()
     }
 }
 
-
-
 /**
 **  Init box blurer
 **
 **  @param textureWidth width of the working texture (input/output texture also)
 **  @param textureHeight height of the working texture (input/output texture also)
+**  @param radius Radius or standard deviation
+**  @param numOfIterations c
 **
 */
 void CBlurer::Init(const uint16_t textureWidth, const uint16_t textureHeight, const float radius, const int numOfIterations)
@@ -163,8 +213,6 @@ void CBlurer::Init(const uint16_t textureWidth, const uint16_t textureHeight, co
 */
 void CBlurer::PrecalcParameters(const float radius, const int numOfIterations)
 {
-    //Assert (radius >= 0 && numOfIterations > 0);
-
     Radius          = radius;
     NumOfIterations = numOfIterations;
 
@@ -199,12 +247,12 @@ void CBlurer::Clean()
 
 
 /**
- ** Blur a texture (optimized for 1 chanel (alpha) textures)
- **
- ** @param  texture texture to blur (uint8_t)
- **
- */
-void CBlurer::Blur(uint8_t *texture)
+** Blur a texture (optimized for 1 chanel (alpha) textures)
+**
+** @param  texture texture to blur (uint8_t)
+**
+*/
+void CBlurer::Blur(uint8_t *const texture)
 {
     if (Radius * NumOfIterations == 0) { return; }
     
@@ -220,7 +268,6 @@ void CBlurer::Blur(uint8_t *texture)
         ProceedIteration(source, target, HalfBoxes[i]); 
     }
     if (target != texture) {
-        // memcpy(texture, WorkingTexture.data(), WorkingTexture.size() * sizeof(uint8_t));
         std::copy(WorkingTexture.begin(), WorkingTexture.end(), texture);
     }
 }
@@ -234,9 +281,8 @@ void CBlurer::Blur(uint8_t *texture)
 ** /// TODO: sitch to fixed point math
 **
 */
-void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
+void CBlurer::ProceedIteration( uint8_t *source, uint8_t *target, const uint8_t radius)
 {
-    //memcpy(target, source, WorkingTexture.size() * sizeof(uint8_t));
     std::copy_n(&source[0], WorkingTexture.size(), target);
 
     uint8_t *swap = source;
@@ -312,7 +358,6 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
             ti += TextureWidth;
         }
     }
-
 }
 
 

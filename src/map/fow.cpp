@@ -10,7 +10,7 @@
 //
 /**@name fow.cpp - The fog of war. */
 //
-//      (c) Copyright 2020 by Alyokhin
+//      (c) Copyright 2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-CFogOfWar FogOfWar;
+CFogOfWar FogOfWar; /// Fog of war itself
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -67,9 +67,8 @@ void CFogOfWar::Init()
     const size_t tableSize = VisTableWidth * (Map.Info.MapHeight + 2);
     VisTable.clear();
     VisTable.resize(tableSize);
+    std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
 
-    VisTableReset();
-    
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
     const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 2) * 4;
     const uint16_t fogTextureHeight = (Map.Info.MapHeight + 2) * 4;
@@ -82,7 +81,7 @@ void CFogOfWar::Init()
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
-    this->State = 0;
+    this->State = cFirstEntry;
 }
 
 void CFogOfWar::Clean()
@@ -95,11 +94,6 @@ void CFogOfWar::Clean()
     RenderedFog.clear();
 
     Blurer.Clean();
-}
-
-void CFogOfWar::VisTableReset()
-{
-    std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
 }
 
 /** 
@@ -118,6 +112,29 @@ bool CFogOfWar::SetType(const FogOfWarTypes fow_type)
 	}
 }
 
+/** 
+** Enable or disable bilinear upscale for the final fog texture rendering
+** 
+** @param enable  cmd to enable/disable
+** 
+*/
+void CFogOfWar::EnableBilinearUpscale(const bool enable) 
+{
+    const uint8_t prev = Settings.UpscaleType;
+    Settings.UpscaleType = enable ? cBilinear : cSimple;
+    if (prev != Settings.UpscaleType) {
+        Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
+    }
+}
+
+void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations)
+{
+    Settings.BlurRadius[cSimple]   = radius1;
+    Settings.BlurRadius[cBilinear] = radius2;
+    Settings.BlurIterations        = numOfIterations;
+    Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
+}
+
 void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 {
     intptr_t visIndex = VisTable_Index0;
@@ -131,16 +148,13 @@ void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 		visIndex += VisTableWidth;
         mapIndex += Map.Info.MapWidth;
 	}
-
-    /// Set the fog texture fully opaque
- //   std::fill(CFogOfWar::FogTexture.begin(), CFogOfWar::FogTexture.end(), 0xFF);
 }
 
 /**
-**  Generate and render fog of war for certain viewport.
+**  Proceed fog of war state update
 **
-**  @param viewport     viewport to refresh fog of war for
-**  @param thisPlayer   player to refresh fog of war for
+**  @param doAtOnce     command to calculate fog of war in single sycle
+**
 */
 void CFogOfWar::Update(bool doAtOnce /*= false*/)
 {
@@ -152,10 +166,9 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
     if (doAtOnce || this->State == cFirstEntry) {
         /// TODO: Add posibility to generate fog for different players (for replays purposes)
         GenerateFog(*ThisPlayer);
-        UpscaleFog();
+        GenerateFogTexture();
         Blurer.Blur(FogTexture.GetNext());
-        FogTexture.PushNext();
-        FogTexture.PrepareTransition(doAtOnce);
+        FogTexture.PushNext(doAtOnce);
         this->State = cGenerateFog;
     } else {
         switch (this->State) {
@@ -165,20 +178,19 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
                 this->State++;
                 break;
 
-            case cUpscaleFog:
-                UpscaleFog();
+            case cGenerateTexture:
+                GenerateFogTexture();
                 this->State++;
                 break;
 
-            case cBlurFog:
+            case cBlurTexture:
                 Blurer.Blur(FogTexture.GetNext());
-                FogTexture.PushNext();
                 this->State++;
                 break;
                 
             case cReady:
                 if (FogTexture.isFullyEased()) {
-                    FogTexture.PrepareTransition();
+                    FogTexture.PushNext();
                     this->State = cGenerateFog;
                 }
                 break;
@@ -224,7 +236,7 @@ void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const v
 **  4x4 upscale generated fog of war texture
 **
 */
-void CFogOfWar::UpscaleFog()
+void CFogOfWar::GenerateFogTexture()
 {
     /*
     **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Exlored.
@@ -271,16 +283,18 @@ void CFogOfWar::UpscaleFog()
 **  @param  visFlag     layer to determine pattern for
 **
 */
-uint8_t CFogOfWar::DeterminePattern(intptr_t index, uint8_t visFlag)
+uint8_t CFogOfWar::DeterminePattern(const intptr_t index, const uint8_t visFlag)
 {
     Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
 
     uint8_t n1, n2, n3, n4;
-    n1 = (visFlag & VisTable[index]);
-    n2 = (visFlag & VisTable[index + 1]);
-    index += VisTableWidth;
-    n3 = (visFlag & VisTable[index]);
-    n4 = (visFlag & VisTable[index + 1]);
+    intptr_t offset = index;
+
+    n1 = (visFlag & VisTable[offset]);
+    n2 = (visFlag & VisTable[offset + 1]);
+    offset += VisTableWidth;
+    n3 = (visFlag & VisTable[offset]);
+    n4 = (visFlag & VisTable[offset + 1]);
     
     n1 >>= n1 - VisionType::cExplored;
     n2 >>= n2 - VisionType::cExplored;
@@ -311,15 +325,13 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 }
 
 /**
-** Bilinear resize alpha texture
+** Zoom and render Fog Of War texture into SDL surface
 ** 
 **  @param src          Image src.
 **  @param srcRect      Rectangle in the src image to render
 **  @param srcWidth     Image width
-**  @param target       Where to render
+**  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
-**  @param trgWidth     Dest. width
-**  @param format       Target's pixel format
 **
 */
 void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
@@ -339,6 +351,17 @@ void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, con
     }
 }
 
+
+/**
+** Bilinear zoom and render Fog Of War texture into SDL surface
+** 
+**  @param src          Image src.
+**  @param srcRect      Rectangle in the src image to render
+**  @param srcWidth     Image width
+**  @param trgSurface   Where to render
+**  @param trgRect      Scale src rectangle to this rectangle
+**
+*/
 void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                                 SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
@@ -385,6 +408,16 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, con
     }
 }
 
+/**
+** Simple zoom and render Fog Of War texture into SDL surface
+** 
+**  @param src          Image src.
+**  @param srcRect      Rectangle in the src image to render
+**  @param srcWidth     Image width
+**  @param trgSurface   Where to render
+**  @param trgRect      Scale src rectangle to this rectangle
+**
+*/
 void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                               SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {

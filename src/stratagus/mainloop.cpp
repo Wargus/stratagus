@@ -368,8 +368,6 @@ static void DisplayLoop()
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
 
-		/// TODO: if FastForwardCycle then do full update cycle at once, and disable texture easing 
-		///  FogOfWar.Update(true);
 		FogOfWar.Update(FastForwardCycle > GameCycle ? true : false);
 
 		UpdateDisplay();

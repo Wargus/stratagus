@@ -374,7 +374,7 @@ static int CclSetFogOfWarType(lua_State *l)
 }
 
 /**
-**  Set parameters for FOW blurer (radius and number of iterations)
+**  Set parameters for FOW blurer (radiuses and number of iterations)
 **
 **  @param l  Lua state.
 **
@@ -415,7 +415,7 @@ static int CclSetFogOfWarBlur(lua_State *l)
 static int CclSetFogOfWarBilinear(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	FogOfWar.SetBilinearUpscale(LuaToBoolean(l, 1));
+	FogOfWar.EnableBilinearUpscale(LuaToBoolean(l, 1));
 	return 0;
 }
 

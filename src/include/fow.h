@@ -10,7 +10,7 @@
 //
 /**@name fow.h - The fog of war headerfile. */
 //
-//      (c) Copyright 2020 Alyokhin
+//      (c) Copyright 2021 Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,56 +39,36 @@
 //@{
 
 
-
-
-//class CViewport;
-//class CEasedTexture;
-//class CBlurer;
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };
+enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };  /// Types of the fog of war
 
 class CFogOfWar
 {
 public:
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
-    enum States       { cFirstEntry = 0, cGenerateFog, cUpscaleFog, cBlurFog, cReady };
+    enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
 
-    void Update(bool doAtOnce = false);
+
     
     void Init();
     void Clean();
-    void VisTableReset();
     bool SetType(const FogOfWarTypes fow_type);
 	FogOfWarTypes GetType() { return Settings.FOW_Type; }
     
-    void SetBilinearUpscale(bool isBilinear) 
-    {
-        uint8_t prev = Settings.UpscaleType;
-        Settings.UpscaleType = isBilinear ? cBilinear : cSimple;
-        if (prev != Settings.UpscaleType) {
-            Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
-        }
-    }
+    void EnableBilinearUpscale(const bool enable);
+    void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
-    void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations)
-    {
-        Settings.BlurRadius[cSimple]   = radius1;
-        Settings.BlurRadius[cBilinear] = radius2;
-        Settings.BlurIterations        = numOfIterations;
-        Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
-    }
-
+    void Update(bool doAtOnce = false);
     void RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface);
 
 private:
     void GenerateFog(const CPlayer &thisPlayer);
-    void UpscaleFog();
+    void GenerateFogTexture();
 
-    uint8_t DeterminePattern(intptr_t index, const uint8_t visFlag);
+    uint8_t DeterminePattern(const intptr_t index, const uint8_t visFlag);
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
     void RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
@@ -104,14 +84,14 @@ public:
 private:
     struct FogOfWarSettings 
 	{
-		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced};      /// Type of fog of war - legacy or enhanced(smooth)
-        uint8_t       NumOfEasingSteps {8};
-        float         BlurRadius[2]    {2.0, 1.5};
-        uint8_t       BlurIterations   {3};
-        uint8_t       UpscaleType      {UpscaleTypes::cBilinear};
-	} Settings;
+		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced}; /// Type of fog of war - legacy or enhanced(smooth)
+        uint8_t       NumOfEasingSteps {8};                        /// Number of the texture easing steps
+        float         BlurRadius[2]    {2.0, 1.5};                 /// Radiuses or standard deviation
+        uint8_t       BlurIterations   {3};                        /// Radius or standard deviation
+        uint8_t       UpscaleType      {UpscaleTypes::cBilinear};  /// Rendering zoom type
+	} Settings;  /// Fog of war settings
 
-    uint8_t State { States::cFirstEntry };
+    uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
     
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
     intptr_t             VisTable_Index0 {0}; /// index in the vision table for [0:0] tile
@@ -119,11 +99,11 @@ private:
     CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map 
                                               /// + 1 tile around (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
-    CBlurer              Blurer;
+    CBlurer              Blurer;              /// Blurer for fog of war texture
 
 
+    /// Table with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-
     static constexpr uint32_t UpscaleTable[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
                                                     {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 1 00:01
                                                     {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 2 00:10

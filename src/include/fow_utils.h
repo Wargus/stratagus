@@ -10,7 +10,7 @@
 //
 /**@name fow_utils.h - The utilities for fog of war headerfile. */
 //
-//      (c) Copyright 2020 Alyokhin
+//      (c) Copyright 2021 Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,8 +38,6 @@
 //@{
 
 
-
-
 class CViewport;
 
 
@@ -52,31 +50,12 @@ public:
     void Init(const uint16_t width, const uint16_t height, const uint8_t numOfSteps);
     void Clean();
 
-    bool isFullyEased() { return CurrentStep == EasingStepsNum ? true : false; }
-
-    void SetNumOfSteps (const uint8_t num)
-    {
-        EasingStepsNum  = num;
-        CurrentStep     = EasingStepsNum;
-        isWatingForNext = true;
-    }
-
-    void Ease()
-    {
-        if (CurrentStep < EasingStepsNum) CurrentStep++;
-    }
-    
-    void PrepareTransition(bool forcedShowNext = false)
-    {
-        CalcDeltas();
-        SwapFrames();
-        CurrentStep = forcedShowNext ? EasingStepsNum: 0;
-        isWatingForNext = true;
-    }
-
-    void PushNext() { isWatingForNext = false; }
-    
+    void SetNumOfSteps (const uint8_t num);
+    void PushNext(bool forcedShowNext = false);
     void DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect);
+
+    bool isFullyEased() { return CurrentStep == EasingStepsNum ? true : false; }
+    void Ease()         { if (CurrentStep < EasingStepsNum) CurrentStep++; }
 
     uint8_t *GetCurrent() { return Frames[Prev].data(); }
     uint8_t *GetNext()    { return Frames[Next].data(); }
@@ -98,7 +77,6 @@ private:
     uint8_t              Prev  {0};
     uint8_t              Curr  {1};
     uint8_t              Next  {2};
-    bool                 isWatingForNext {false};
 
     std::vector<int16_t> Deltas;
 };
@@ -111,7 +89,7 @@ public:
     void PrecalcParameters(const float radius, const int numOfIterations);
     
     void Clean();
-    void Blur(uint8_t *texture);
+    void Blur(uint8_t *const texture);
 private:
     void ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius);
 
