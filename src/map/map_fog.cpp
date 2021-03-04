@@ -631,8 +631,7 @@ void CViewport::DrawLegacyFogOfWar() const
 */
 void CViewport::DrawEnhancedFogOfWar()
 {
-   /// TODO: Redraw to surface only if viewport state was changed
-	FogOfWar.RenderToViewPort(*this, this->FogSurface);
+    FogOfWar.RenderToViewPort(*this, this->FogSurface);
 
     SDL_Rect screenRect;
     screenRect.x = this->TopLeftPos.x;
