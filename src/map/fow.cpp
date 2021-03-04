@@ -44,7 +44,7 @@
 #include "tile.h"
 #include "ui.h"
 #include "viewport.h"
-
+#include <omp.h>
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -362,25 +362,35 @@ void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, con
 **  @param trgRect      Scale src rectangle to this rectangle
 **
 */
-void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
                                 SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
+    const uint16_t surfaceAShift = trgSurface->format->Ashift;
     uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
     
     const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
     const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
     
-    intptr_t trgIndex = trgRect.y * trgSurface->w + trgRect.x;
-    int64_t  y        = srcRect.y << 16;
+#pragma omp parallel
+{    
 
-    for (size_t i = 0 ; i < trgRect.h; i++) {
+    const int thisThread = omp_get_thread_num();
+    const int numOfThreads = omp_get_num_threads();
+    
+    const int this_iBegin = (thisThread    ) * trgRect.h / numOfThreads;
+    const int this_iEnd   = (thisThread + 1) * trgRect.h / numOfThreads;
+
+    intptr_t trgIndex     = (trgRect.y + this_iBegin) * trgSurface->w + trgRect.x;
+    int64_t y             = (srcRect.y << 16) + this_iBegin * yRatio;
+
+    for (size_t i = this_iBegin ; i < this_iEnd; i++) {
 
         const int32_t ySrc          = static_cast<int32_t> (y >> 16);
         const int64_t yDiff         = y - (ySrc << 16);
         const int64_t one_min_yDiff = 65536 - yDiff;
         const size_t  yIndex        = ySrc * srcWidth;
               int64_t x             = srcRect.x << 16;
-        
+
         for (size_t j = 0 ; j < trgRect.w; j++) {
 
             const int32_t xSrc          = static_cast<int32_t> (x >> 16);
@@ -393,19 +403,19 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, con
             const uint8_t C = src[srcIndex + srcWidth];
             const uint8_t D = src[srcIndex + srcWidth + 1];
 
-            // alpha = A(1-w)(1-h) + B(w)(1-h) + C(h)(1-w) + D(w)(h)
-            const uint8_t alpha = static_cast<uint8_t> ((  A * one_min_xDiff * one_min_yDiff
-                                                         + B * xDiff * one_min_yDiff
-                                                         + C * yDiff * one_min_xDiff
-                                                         + D * xDiff * yDiff ) >> 32);
+            const uint32_t alpha = ((  A * one_min_xDiff * one_min_yDiff
+                                     + B * xDiff * one_min_yDiff
+                                     + C * yDiff * one_min_xDiff
+                                     + D * xDiff * yDiff ) >> 32 );
 
-            target[trgIndex + j] = SDL_MapRGBA(trgSurface->format, 0, 0, 0, alpha);
+            target[trgIndex + j] = alpha << surfaceAShift; //SDL_MapRGBA(trgSurface->format, 0, 0, 0, alpha);
           
             x += xRatio;
         }
-        y += yRatio;
-        trgIndex += trgSurface->w;
+       y += yRatio;
+       trgIndex += trgSurface->w;
     }
+} /// pragma omp parallel
 }
 
 /**
@@ -421,6 +431,8 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, con
 void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                               SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
+    const uint16_t surfaceAShift = trgSurface->format->Ashift;
+
     const uint8_t texelWidth  = PixelTileSize.x / 4;
     const uint8_t texelHeight = PixelTileSize.y / 4;
     
@@ -431,7 +443,7 @@ void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const
     for (uint16_t ySrc = 0; ySrc < srcRect.h; ySrc++) {
         for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
  
-            const uint32_t texelValue = SDL_MapRGBA(trgSurface->format, 0, 0, 0, src[srcIndex + xSrc]);
+            const uint32_t texelValue = static_cast<uint32_t>(src[srcIndex + xSrc]) << surfaceAShift;
             std::fill_n(&target[trgIndex + xSrc * texelWidth], texelWidth, texelValue);
         }
         for (uint8_t texelRow = 1; texelRow < texelHeight; texelRow++) {
