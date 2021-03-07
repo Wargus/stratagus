@@ -631,8 +631,8 @@ void CViewport::DrawLegacyFogOfWar() const
 */
 void CViewport::DrawEnhancedFogOfWar()
 {
-    FogOfWar.RenderToViewPort(*this, this->FogSurface);
-
+    FogOfWar.RenderToViewPort(*this, TheScreen);
+/*
     SDL_Rect screenRect;
     screenRect.x = this->TopLeftPos.x;
     screenRect.y = this->TopLeftPos.y;
@@ -646,6 +646,7 @@ void CViewport::DrawEnhancedFogOfWar()
     fogRect.h = screenRect.h;
 
     SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
+*/
 }
 
 

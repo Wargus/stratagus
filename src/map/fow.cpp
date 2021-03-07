@@ -228,8 +228,14 @@ void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const v
     trgRect.y = 0;
     trgRect.w = viewport.MapWidth  * PixelTileSize.x;
     trgRect.h = viewport.MapHeight * PixelTileSize.y;
+
+    SDL_Rect renderRect;
+    renderRect.x = viewport.TopLeftPos.x;
+    renderRect.y = viewport.TopLeftPos.y;
+    renderRect.w = viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1;
+    renderRect.h = viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1;
     
-    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpSurface, trgRect);
+    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpSurface, trgRect, viewport.Offset, renderRect);
 }
 
 /**
@@ -335,14 +341,14 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 **
 */
 void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect) 
 {
     Assert(trgRect.w != 0 && trgRect.h != 0);
     Assert(trgSurface->format->BitsPerPixel == 32);
 
     switch (this->Settings.UpscaleType) {
         case cBilinear:
-            UpscaleBilinear(src, srcRect, srcWidth, trgSurface, trgRect);
+            UpscaleBilinear(src, srcRect, srcWidth, trgSurface, trgRect, offset, renderRect);
             break;
         case cSimple:
         default:
@@ -363,59 +369,79 @@ void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, con
 **
 */
 void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect) 
 {
-    const uint16_t surfaceAShift = trgSurface->format->Ashift;
+    const uint8_t surfaceAShift = trgSurface->format->Ashift;
+    const uint8_t RShift = trgSurface->format->Rshift;
+    const uint8_t GShift = trgSurface->format->Gshift;
+    const uint8_t BShift = trgSurface->format->Bshift;
+
     uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
     
     const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
     const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
     
-#pragma omp parallel
-{    
+    const int64_t xOffset = offset.x * xRatio;
+    const int64_t yOffset = offset.y * yRatio;
 
-    const int thisThread = omp_get_thread_num();
-    const int numOfThreads = omp_get_num_threads();
-    
-    const int this_iBegin = (thisThread    ) * trgRect.h / numOfThreads;
-    const int this_iEnd   = (thisThread + 1) * trgRect.h / numOfThreads;
+    #pragma omp parallel
+    {    
+        const int thisThread = omp_get_thread_num();
+        const int numOfThreads = omp_get_num_threads();
+        
+        const int lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
+                                            : 0;
+        const int uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
+                                            : renderRect.h;
 
-    intptr_t trgIndex     = (trgRect.y + this_iBegin) * trgSurface->w + trgRect.x;
-    int64_t y             = (srcRect.y << 16) + this_iBegin * yRatio;
+        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * trgSurface->w + trgRect.x + renderRect.x;
+        int64_t y         = (srcRect.y << 16) + (lBound + offset.y) * yRatio;
 
-    for (size_t i = this_iBegin ; i < this_iEnd; i++) {
+        for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
 
-        const int32_t ySrc          = static_cast<int32_t> (y >> 16);
-        const int64_t yDiff         = y - (ySrc << 16);
-        const int64_t one_min_yDiff = 65536 - yDiff;
-        const size_t  yIndex        = ySrc * srcWidth;
-              int64_t x             = srcRect.x << 16;
+            const int32_t ySrc          = static_cast<int32_t> (y >> 16);
+            const int64_t yDiff         = y - (ySrc << 16);
+            const int64_t one_min_yDiff = 65536 - yDiff;
+            const size_t  yIndex        = ySrc * srcWidth;
+                  int64_t x             = (srcRect.x << 16) + offset.x * xRatio;
 
-        for (size_t j = 0 ; j < trgRect.w; j++) {
+            for (size_t xTrg = 0 ; xTrg < renderRect.w; xTrg++) {
 
-            const int32_t xSrc          = static_cast<int32_t> (x >> 16);
-            const int64_t xDiff         = x - (xSrc << 16);
-            const int64_t one_min_xDiff = 65536 - xDiff;
-            const size_t  srcIndex      = yIndex + xSrc;
+                const int32_t xSrc          = static_cast<int32_t> (x >> 16);
+                const int64_t xDiff         = x - (xSrc << 16);
+                const int64_t one_min_xDiff = 65536 - xDiff;
+                const size_t  srcIndex      = yIndex + xSrc;
 
-            const uint8_t A = src[srcIndex];
-            const uint8_t B = src[srcIndex + 1];
-            const uint8_t C = src[srcIndex + srcWidth];
-            const uint8_t D = src[srcIndex + srcWidth + 1];
+                const uint8_t A = src[srcIndex];
+                const uint8_t B = src[srcIndex + 1];
+                const uint8_t C = src[srcIndex + srcWidth];
+                const uint8_t D = src[srcIndex + srcWidth + 1];
 
-            const uint32_t alpha = ((  A * one_min_xDiff * one_min_yDiff
-                                     + B * xDiff * one_min_yDiff
-                                     + C * yDiff * one_min_xDiff
-                                     + D * xDiff * yDiff ) >> 32 );
+                const uint8_t alpha = ((  A * one_min_xDiff * one_min_yDiff
+                                        + B * xDiff * one_min_yDiff
+                                        + C * yDiff * one_min_xDiff
+                                        + D * xDiff * yDiff ) >> 32 );
 
-            target[trgIndex + j] = alpha << surfaceAShift; //SDL_MapRGBA(trgSurface->format, 0, 0, 0, alpha);
-          
-            x += xRatio;
+                const uint32_t pixel = target[trgIndex + xTrg];
+                
+                const uint8_t r = 0xFF & (pixel >> RShift);
+                const uint8_t g = 0xFF & (pixel >> GShift);
+                const uint8_t b = 0xFF & (pixel >> BShift);
+
+                /// FIXME: this works only for black fog of war color (fog[R|G|B] == 0)
+                const uint32_t resR = /*(fogR * alpha) + */(r * (0xFF - alpha)) >> 8;
+                const uint32_t resG = /*(fogG * alpha) + */(g * (0xFF - alpha)) >> 8;
+                const uint32_t resB = /*(fogB * alpha) + */(b * (0xFF - alpha)) >> 8;
+
+                const uint32_t resPixel =  (resR << RShift) | (resG << GShift) | (resB << BShift);
+                target[trgIndex + xTrg] = resPixel;
+
+                x += xRatio;
+            }
+            y += yRatio;
+            trgIndex += trgSurface->w;
         }
-       y += yRatio;
-       trgIndex += trgSurface->w;
-    }
-} /// pragma omp parallel
+    } /// pragma omp parallel
 }
 
 /**

@@ -72,9 +72,9 @@ private:
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
     void RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect);
     void UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect);
     void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                        SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
 
