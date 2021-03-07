@@ -184,7 +184,7 @@ static int CclShowMapLocation(lua_State *l)
 	// Put a unit on map, use its properties, except for
 	// what is listed below
 
-	LuaCheckArgs(l, 4);
+	LuaCheckArgs(l, 5);
 	const char *unitname = LuaToString(l, 5);
 	CUnitType *unitType = UnitTypeByIdent(unitname);
 	if (!unitType) {
