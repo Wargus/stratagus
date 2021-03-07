@@ -71,13 +71,13 @@ private:
     uint8_t DeterminePattern(const intptr_t index, const uint8_t visFlag);
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
-    void RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect);
-    void UpscaleBilinear(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect);
-    void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                       SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
-
+    void RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
+    void UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
+    void UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
+    void ApplyFogTo(uint32_t &pixel, const uint8_t alpha);
     
 public:
 
@@ -89,6 +89,7 @@ private:
         float         BlurRadius[2]    {2.0, 1.5};                 /// Radiuses or standard deviation
         uint8_t       BlurIterations   {3};                        /// Radius or standard deviation
         uint8_t       UpscaleType      {UpscaleTypes::cBilinear};  /// Rendering zoom type
+        uint32_t      FogColor         {0};
 	} Settings;  /// Fog of war settings
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
@@ -101,6 +102,9 @@ private:
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
     CBlurer              Blurer;              /// Blurer for fog of war texture
 
+    uint8_t              FogColorR       {0};
+    uint8_t              FogColorG       {0};
+    uint8_t              FogColorB       {0};
 
     /// Table with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN

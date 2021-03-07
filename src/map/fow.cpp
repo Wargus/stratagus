@@ -81,6 +81,10 @@ void CFogOfWar::Init()
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
+    FogColorR = 0xFF & (Settings.FogColor >> RSHIFT);
+    FogColorG = 0xFF & (Settings.FogColor >> GSHIFT);
+    FogColorB = 0xFF & (Settings.FogColor >> BSHIFT);
+
     this->State = cFirstEntry;
 }
 
@@ -235,7 +239,7 @@ void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const v
     renderRect.w = viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1;
     renderRect.h = viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1;
     
-    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpSurface, trgRect, viewport.Offset, renderRect);
+    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, trgRect, vpSurface, renderRect, viewport.Offset);
 }
 
 /**
@@ -338,21 +342,23 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 **  @param srcWidth     Image width
 **  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
+**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
+**  @param renderRect   Viewport rectangle where to render upscaled image
 **
 */
-void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect) 
+void CFogOfWar::RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
 {
     Assert(trgRect.w != 0 && trgRect.h != 0);
-    Assert(trgSurface->format->BitsPerPixel == 32);
+    Assert(renderSurface->format->BitsPerPixel == 32);
 
     switch (this->Settings.UpscaleType) {
         case cBilinear:
-            UpscaleBilinear(src, srcRect, srcWidth, trgSurface, trgRect, offset, renderRect);
+            UpscaleBilinear(src, srcRect, srcWidth, trgRect, renderSurface, renderRect, offset);
             break;
         case cSimple:
         default:
-            UpscaleSimple(src, srcRect, srcWidth, trgSurface, trgRect);
+            UpscaleSimple(src, srcRect, srcWidth, trgRect, renderSurface, renderRect, offset);
             break;
     }
 }
@@ -366,17 +372,14 @@ void CFogOfWar::RenderToSurface(const uint8_t *src, const SDL_Rect &srcRect, con
 **  @param srcWidth     Image width
 **  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
+**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
+**  @param renderRect   Viewport rectangle where to render upscaled image
 **
 */
 void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect, const PixelDiff &offset, const SDL_Rect &renderRect) 
+                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
 {
-    const uint8_t surfaceAShift = trgSurface->format->Ashift;
-    const uint8_t RShift = trgSurface->format->Rshift;
-    const uint8_t GShift = trgSurface->format->Gshift;
-    const uint8_t BShift = trgSurface->format->Bshift;
-
-    uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
+    uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
     const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
     const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
@@ -394,8 +397,8 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
         const int uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
                                             : renderRect.h;
 
-        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * trgSurface->w + trgRect.x + renderRect.x;
-        int64_t y         = (srcRect.y << 16) + (lBound + offset.y) * yRatio;
+        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        int64_t  y        = (srcRect.y << 16) + lBound * yRatio + yOffset;
 
         for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
 
@@ -403,9 +406,9 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
             const int64_t yDiff         = y - (ySrc << 16);
             const int64_t one_min_yDiff = 65536 - yDiff;
             const size_t  yIndex        = ySrc * srcWidth;
-                  int64_t x             = (srcRect.x << 16) + offset.x * xRatio;
+                  int64_t x             = (srcRect.x << 16) + xOffset;
 
-            for (size_t xTrg = 0 ; xTrg < renderRect.w; xTrg++) {
+            for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
 
                 const int32_t xSrc          = static_cast<int32_t> (x >> 16);
                 const int64_t xDiff         = x - (xSrc << 16);
@@ -422,24 +425,12 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
                                         + C * yDiff * one_min_xDiff
                                         + D * xDiff * yDiff ) >> 32 );
 
-                const uint32_t pixel = target[trgIndex + xTrg];
+                ApplyFogTo(target[trgIndex + xTrg], alpha);
                 
-                const uint8_t r = 0xFF & (pixel >> RShift);
-                const uint8_t g = 0xFF & (pixel >> GShift);
-                const uint8_t b = 0xFF & (pixel >> BShift);
-
-                /// FIXME: this works only for black fog of war color (fog[R|G|B] == 0)
-                const uint32_t resR = /*(fogR * alpha) + */(r * (0xFF - alpha)) >> 8;
-                const uint32_t resG = /*(fogG * alpha) + */(g * (0xFF - alpha)) >> 8;
-                const uint32_t resB = /*(fogB * alpha) + */(b * (0xFF - alpha)) >> 8;
-
-                const uint32_t resPixel =  (resR << RShift) | (resG << GShift) | (resB << BShift);
-                target[trgIndex + xTrg] = resPixel;
-
                 x += xRatio;
             }
             y += yRatio;
-            trgIndex += trgSurface->w;
+            trgIndex += renderSurface->w;
         }
     } /// pragma omp parallel
 }
@@ -452,32 +443,70 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 **  @param srcWidth     Image width
 **  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
+**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
+**  @param renderRect   Viewport rectangle where to render upscaled image
 **
 */
-void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                              SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
 {
-    const uint16_t surfaceAShift = trgSurface->format->Ashift;
-
-    const uint8_t texelWidth  = PixelTileSize.x / 4;
-    const uint8_t texelHeight = PixelTileSize.y / 4;
+    uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
-    uint32_t *const target = static_cast<uint32_t *>(trgSurface->pixels);
-    intptr_t srcIndex = srcRect.x + srcRect.y * srcWidth;
-    intptr_t trgIndex = trgRect.x + trgRect.y * trgSurface->w;
+    const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
+    const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
+    
+    const int64_t xOffset = offset.x * xRatio;
+    const int64_t yOffset = offset.y * yRatio;
 
-    for (uint16_t ySrc = 0; ySrc < srcRect.h; ySrc++) {
-        for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
- 
-            const uint32_t texelValue = static_cast<uint32_t>(src[srcIndex + xSrc]) << surfaceAShift;
-            std::fill_n(&target[trgIndex + xSrc * texelWidth], texelWidth, texelValue);
+    #pragma omp parallel
+    {    
+        const int thisThread = omp_get_thread_num();
+        const int numOfThreads = omp_get_num_threads();
+        
+        const int lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
+                                            : 0;
+        const int uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
+                                            : renderRect.h;
+
+        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        int64_t  y        = (srcRect.y << 16) + lBound * yRatio + yOffset;
+
+        for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
+
+            const int32_t ySrc          = static_cast<int32_t> (y >> 16);
+            const size_t  yIndex        = ySrc * srcWidth;
+                  int64_t x             = (srcRect.x << 16) + xOffset;
+
+            for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
+
+                const int32_t xSrc          = static_cast<int32_t> (x >> 16);
+                const size_t  srcIndex      = yIndex + xSrc;
+
+                const uint8_t alpha = src[srcIndex];
+
+                ApplyFogTo(target[trgIndex + xTrg], alpha);
+
+                x += xRatio;
+            }
+            y += yRatio;
+            trgIndex += renderSurface->w;
         }
-        for (uint8_t texelRow = 1; texelRow < texelHeight; texelRow++) {
-            std::copy_n(&target[trgIndex], trgRect.w, &target[trgIndex + texelRow * trgSurface->w]);
-        }
-        srcIndex += srcWidth;
-        trgIndex += trgSurface->w * texelHeight;
-    }
+    } /// pragma omp parallel
 }
 
+void CFogOfWar::ApplyFogTo(uint32_t &pixel, const uint8_t alpha) 
+{
+    if (alpha == 0xFE) { pixel = this->Settings.FogColor; }
+    else  {
+        const uint8_t r = 0xFF & (pixel >> RSHIFT);
+        const uint8_t g = 0xFF & (pixel >> GSHIFT);
+        const uint8_t b = 0xFF & (pixel >> BSHIFT);
+
+        const uint32_t resR = ((this->FogColorR * alpha) + (r * (0xFF - alpha))) >> 8;
+        const uint32_t resG = ((this->FogColorG * alpha) + (g * (0xFF - alpha))) >> 8;
+        const uint32_t resB = ((this->FogColorB * alpha) + (b * (0xFF - alpha))) >> 8;
+
+        pixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
+    }
+}
 //@}
