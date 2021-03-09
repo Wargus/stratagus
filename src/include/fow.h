@@ -68,7 +68,7 @@ private:
     void GenerateFog(const CPlayer &thisPlayer);
     void GenerateFogTexture();
 
-    uint8_t DeterminePattern(const intptr_t index, const uint8_t visFlag);
+    uint8_t DeterminePattern(const size_t index, const uint8_t visFlag);
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
     void RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,

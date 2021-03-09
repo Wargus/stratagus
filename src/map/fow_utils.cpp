@@ -117,12 +117,12 @@ void CEasedTexture::SetNumOfSteps (const uint8_t num)
 }
 
 /**
-**  Switch easing to new frame of the texture
+**  Switch easing to the new frame of the texture
 **
 **  @param forcedShowNext cmd to immediately show next frame without easing
 **
 */
-void CEasedTexture::PushNext(bool forcedShowNext /*= false*/)
+void CEasedTexture::PushNext(const bool forcedShowNext /*= false*/)
 {
     CalcDeltas();
     SwapFrames();
@@ -143,8 +143,8 @@ void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const u
 {
     const uint16_t xEnd   = srcRect.x + srcRect.w;
     
-    intptr_t trgIndex     = y0 * trgWidth + x0;
-    intptr_t textureIndex = srcRect.y * Width + srcRect.x;
+    size_t trgIndex     = y0 * trgWidth + x0;
+    size_t textureIndex = srcRect.y * Width + srcRect.x;
    
     if (CurrentStep == 0 || CurrentStep == EasingStepsNum) {
         const uint8_t currFrame = CurrentStep ? Curr : Prev;
@@ -278,7 +278,6 @@ void CBlurer::Blur(uint8_t *const texture)
 **  @param  source  source texture (which has to be blured)
 **  @param  target  target texture (where result will be)
 **  @param  radius  blur radius (box size) for current iteration
-** /// TODO: sitch to fixed point math
 **
 */
 void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
@@ -300,9 +299,10 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
         size_t ti = i * TextureWidth; 
         size_t li = ti;
         size_t ri = ti + radius;
+
         const uint8_t leftBorder  = source[ti];
         const uint8_t rightBorder = source[ti + TextureWidth - 1];
-        int16_t sum               = (radius + 1) * leftBorder;
+              int16_t sum         = (radius + 1) * leftBorder;
 
         for (size_t j = 0; j < radius; j++) { 
             sum += source[ti + j]; 
@@ -332,9 +332,10 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
         size_t ti = i;
         size_t li = ti;
         size_t ri = ti + radius * TextureWidth;
+
         const uint8_t leftBorder  = source[ti];
         const uint8_t rightBorder = source[ti + TextureWidth * (TextureHeight - 1)];
-        int16_t       sum         = (radius + 1) * leftBorder;
+              int16_t sum         = (radius + 1) * leftBorder;
 
         for (size_t j = 0; j < radius; j++) {
             sum += source[ti + j * TextureWidth];

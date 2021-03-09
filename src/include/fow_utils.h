@@ -50,8 +50,8 @@ public:
     void Init(const uint16_t width, const uint16_t height, const uint8_t numOfSteps);
     void Clean();
 
-    void SetNumOfSteps (const uint8_t num);
-    void PushNext(bool forcedShowNext = false);
+    void SetNumOfSteps(const uint8_t num);
+    void PushNext(const bool forcedShowNext = false);
     void DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect);
 
     bool isFullyEased() { return CurrentStep == EasingStepsNum ? true : false; }

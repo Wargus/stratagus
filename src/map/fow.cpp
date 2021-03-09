@@ -141,8 +141,8 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 
 void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 {
-    intptr_t visIndex = VisTable_Index0;
-    intptr_t mapIndex = 0;
+    size_t visIndex = VisTable_Index0;
+    size_t mapIndex = 0;
     for (uint16_t row = 0 ; row < Map.Info.MapHeight; row++) {
 		for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
             /// FIXME: to speedup this part, maybe we have to use Map.Field(mapIndex + col)->playerInfo.Visible[thisPlayer.index] instead
@@ -293,12 +293,12 @@ void CFogOfWar::GenerateFogTexture()
 **  @param  visFlag     layer to determine pattern for
 **
 */
-uint8_t CFogOfWar::DeterminePattern(const intptr_t index, const uint8_t visFlag)
+uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag)
 {
     Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
 
     uint8_t n1, n2, n3, n4;
-    intptr_t offset = index;
+    size_t offset = index;
 
     n1 = (visFlag & VisTable[offset]);
     n2 = (visFlag & VisTable[offset + 1]);
@@ -328,7 +328,7 @@ uint8_t CFogOfWar::DeterminePattern(const intptr_t index, const uint8_t visFlag)
 void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, 
                                 const uint8_t patternVisible, const uint8_t patternExplored)
 {
-    for (int scan_line = 0; scan_line < 4; scan_line++) {
+    for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
         texture[index] = UpscaleTable[patternVisible][scan_line] + UpscaleTable[patternExplored][scan_line];
         index += textureWidth;
     }
@@ -379,40 +379,42 @@ void CFogOfWar::RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRec
 void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
                                 const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
 {
+    constexpr int32_t fixedOne = 65536;
+
     uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
-    const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
-    const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
+    const int32_t xRatio = (((int32_t)srcRect.w - 1) << 16) / trgRect.w;
+    const int32_t yRatio = (((int32_t)srcRect.h - 1) << 16) / trgRect.h;
     
     const int64_t xOffset = offset.x * xRatio;
     const int64_t yOffset = offset.y * yRatio;
 
     #pragma omp parallel
     {    
-        const int thisThread = omp_get_thread_num();
-        const int numOfThreads = omp_get_num_threads();
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
         
-        const int lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
-                                            : 0;
-        const int uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
-                                            : renderRect.h;
+        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
+                                                 : 0;
+        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
+                                                 : renderRect.h;
 
-        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
-        int64_t  y        = (srcRect.y << 16) + lBound * yRatio + yOffset;
+        size_t  trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
 
         for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
 
             const int32_t ySrc          = static_cast<int32_t> (y >> 16);
             const int64_t yDiff         = y - (ySrc << 16);
-            const int64_t one_min_yDiff = 65536 - yDiff;
+            const int64_t one_min_yDiff = fixedOne - yDiff;
             const size_t  yIndex        = ySrc * srcWidth;
-                  int64_t x             = (srcRect.x << 16) + xOffset;
+                  int64_t x             = ((int32_t)srcRect.x << 16) + xOffset;
 
             for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
 
                 const int32_t xSrc          = static_cast<int32_t> (x >> 16);
                 const int64_t xDiff         = x - (xSrc << 16);
-                const int64_t one_min_xDiff = 65536 - xDiff;
+                const int64_t one_min_xDiff = fixedOne - xDiff;
                 const size_t  srcIndex      = yIndex + xSrc;
 
                 const uint8_t A = src[srcIndex];
@@ -448,39 +450,39 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 **
 */
 void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
+                              const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
 {
     uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
-    const int32_t xRatio = static_cast<int32_t>(((srcRect.w - 1) << 16) / trgRect.w);
-    const int32_t yRatio = static_cast<int32_t>(((srcRect.h - 1) << 16) / trgRect.h);
+    const int32_t xRatio = (((int32_t)srcRect.w - 1) << 16) / trgRect.w;
+    const int32_t yRatio = (((int32_t)srcRect.h - 1) << 16) / trgRect.h;
     
     const int64_t xOffset = offset.x * xRatio;
     const int64_t yOffset = offset.y * yRatio;
 
     #pragma omp parallel
     {    
-        const int thisThread = omp_get_thread_num();
-        const int numOfThreads = omp_get_num_threads();
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
         
-        const int lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
-                                            : 0;
-        const int uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
-                                            : renderRect.h;
+        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
+                                                 : 0;
+        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
+                                                 : renderRect.h;
 
-        intptr_t trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
-        int64_t  y        = (srcRect.y << 16) + lBound * yRatio + yOffset;
+        size_t  trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
 
         for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
 
-            const int32_t ySrc          = static_cast<int32_t> (y >> 16);
-            const size_t  yIndex        = ySrc * srcWidth;
-                  int64_t x             = (srcRect.x << 16) + xOffset;
+            const int32_t ySrc   = static_cast<int32_t> (y >> 16);
+            const size_t  yIndex = ySrc * srcWidth;
+                  int64_t x      = ((int32_t)srcRect.x << 16) + xOffset;
 
             for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
 
-                const int32_t xSrc          = static_cast<int32_t> (x >> 16);
-                const size_t  srcIndex      = yIndex + xSrc;
+                const int32_t xSrc     = static_cast<int32_t> (x >> 16);
+                const size_t  srcIndex = yIndex + xSrc;
 
                 const uint8_t alpha = src[srcIndex];
 
