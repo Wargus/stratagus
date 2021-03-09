@@ -266,24 +266,39 @@ void CFogOfWar::GenerateFogTexture()
     */
 
     /// Because we work with 4x4 scaled map tiles here, the textureIndex is in 32bits chunks (byte * 4)
-    uint32_t    *fogTexture    = reinterpret_cast<uint32_t*>(FogTexture.GetNext());
-    const size_t textureHeight = FogTexture.GetHeight() / 4;
+    uint32_t *const fogTexture = reinterpret_cast<uint32_t*>(FogTexture.GetNext());
+    
+    /// Fog texture width and height in 32bit chunks
     const size_t textureWidth  = FogTexture.GetWidth()  / 4;
-    intptr_t     textureIndex  = 0;
-  
-    /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTable starts from [-1:-1]
-    intptr_t  visIndex = 0;
+    const size_t textureHeight = FogTexture.GetHeight() / 4;
+    const size_t nextRowOffset = textureWidth * 4;
+
+    #pragma omp parallel
+    {
+
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
         
-    for (int row = 0; row < textureHeight; row++) {
-        for (int col = 0; col < textureWidth; col++) {
-            /// Fill the 4x4 scaled tile
-            FillUpscaledRec(fogTexture, textureWidth, textureIndex + col, 
-                            DeterminePattern(visIndex + col, VisionType::cVisible), 
-                            DeterminePattern(visIndex + col, VisionType::cVisible | VisionType::cExplored));
+        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * textureHeight / numOfThreads 
+                                                 : 0;
+        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * textureHeight / numOfThreads 
+                                                 : textureHeight;
+        /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTable starts from [-1:-1]
+        size_t visIndex      = lBound * VisTableWidth;
+        size_t textureIndex  = lBound * nextRowOffset;
+        
+
+        for (uint16_t row = lBound; row < uBound; row++) {
+            for (uint16_t col = 0; col < textureWidth; col++) {
+                /// Fill the 4x4 scaled tile
+                FillUpscaledRec(fogTexture, textureWidth, textureIndex + col, 
+                                DeterminePattern(visIndex + col, VisionType::cVisible), 
+                                DeterminePattern(visIndex + col, VisionType::cVisible | VisionType::cExplored));
+            }
+            visIndex     += VisTableWidth;
+            textureIndex += nextRowOffset;
         }
-        visIndex     += VisTableWidth;
-        textureIndex += textureWidth * 4;
-    }
+    } // pragma omp parallel
 }
 
 /**
