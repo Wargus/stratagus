@@ -178,10 +178,10 @@ void CEasedTexture::CalcDeltas()
     const uint8_t *next   = Frames[Next].data();
 
     size_t index = 0;
-    for (int16_t &delta : Deltas)
+    #pragma omp parallel for
+    for (size_t index = 0; index < TextureSize; index++)
     {
-        delta = (static_cast <int16_t>(next[index]) - curr[index]) / EasingStepsNum;
-        index++;
+        Deltas[index] = (static_cast <int16_t>(next[index]) - curr[index]) / EasingStepsNum;
     }
 }
 
