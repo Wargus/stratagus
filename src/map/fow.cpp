@@ -162,7 +162,10 @@ void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 */
 void CFogOfWar::Update(bool doAtOnce /*= false*/)
 {
-    
+    if (Settings.FOW_Type == FogOfWarTypes::cLegacy) {
+        return;
+    }
+
     FogTexture.Ease();
 
     if (Settings.NumOfEasingSteps < States::cReady) doAtOnce = true;
