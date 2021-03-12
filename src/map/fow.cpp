@@ -401,11 +401,11 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 
     uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
-    const int32_t xRatio = (((int32_t)srcRect.w - 1) << 16) / trgRect.w;
-    const int32_t yRatio = (((int32_t)srcRect.h - 1) << 16) / trgRect.h;
+    const int32_t xRatio = ((int32_t)srcRect.w << 16) / trgRect.w;
+    const int32_t yRatio = ((int32_t)srcRect.h << 16) / trgRect.h;
     
-    const int64_t xOffset = offset.x * xRatio;
-    const int64_t yOffset = offset.y * yRatio;
+    const int32_t xOffset = offset.x * xRatio;
+    const int32_t yOffset = offset.y * yRatio;
 
     #pragma omp parallel
     {    
@@ -417,7 +417,7 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
         const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
                                                  : renderRect.h;
 
-        size_t  trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        size_t  trgIndex = (renderRect.y + lBound) * renderSurface->w + renderRect.x;
         int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
 
         for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
@@ -472,11 +472,11 @@ void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect,
 {
     uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
     
-    const int32_t xRatio = (((int32_t)srcRect.w - 1) << 16) / trgRect.w;
-    const int32_t yRatio = (((int32_t)srcRect.h - 1) << 16) / trgRect.h;
+    const int32_t xRatio = ((int32_t)srcRect.w << 16) / trgRect.w;
+    const int32_t yRatio = ((int32_t)srcRect.h << 16) / trgRect.h;
     
-    const int64_t xOffset = offset.x * xRatio;
-    const int64_t yOffset = offset.y * yRatio;
+    const int32_t xOffset = offset.x * xRatio;
+    const int32_t yOffset = offset.y * yRatio;
 
     #pragma omp parallel
     {    
@@ -488,7 +488,7 @@ void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect,
         const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
                                                  : renderRect.h;
 
-        size_t  trgIndex = (trgRect.y + renderRect.y + lBound) * renderSurface->w + trgRect.x + renderRect.x;
+        size_t  trgIndex = (renderRect.y + lBound) * renderSurface->w + renderRect.x;
         int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
 
         for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
@@ -501,8 +501,7 @@ void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect,
 
                 const int32_t xSrc     = static_cast<int32_t> (x >> 16);
                 const size_t  srcIndex = yIndex + xSrc;
-
-                const uint8_t alpha = src[srcIndex];
+                const uint8_t alpha    = src[srcIndex];
 
                 ApplyFogTo(target[trgIndex + xTrg], alpha);
 
