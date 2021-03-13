@@ -56,8 +56,12 @@ public:
     void Init();
     void Clean();
     bool SetType(const FogOfWarTypes fow_type);
-	FogOfWarTypes GetType() { return Settings.FOW_Type; }
-    
+    FogOfWarTypes GetType()   { return Settings.FOW_Type;    }
+    CColor GetFogColor()      { return Settings.FogColor;    }
+    uint32_t GetFogColorSDL() { return Settings.FogColorSDL; }
+    void SetFogColor(uint8_t r, uint8_t g, uint8_t b);
+    void SetFogColor(CColor color);
+
     void EnableBilinearUpscale(const bool enable);
     void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
@@ -89,7 +93,8 @@ private:
         float         BlurRadius[2]    {2.0, 1.5};                 /// Radiuses or standard deviation
         uint8_t       BlurIterations   {3};                        /// Radius or standard deviation
         uint8_t       UpscaleType      {UpscaleTypes::cBilinear};  /// Rendering zoom type
-        uint32_t      FogColor         {0};
+        CColor        FogColor         {0, 0, 0, 0};               /// Fog of war color
+        uint32_t      FogColorSDL      {0};                        /// Fog of war color in the SDL format
 	} Settings;  /// Fog of war settings
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
@@ -101,10 +106,6 @@ private:
                                               /// + 1 tile around (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
     CBlurer              Blurer;              /// Blurer for fog of war texture
-
-    uint8_t              FogColorR       {0};
-    uint8_t              FogColorG       {0};
-    uint8_t              FogColorB       {0};
 
     /// Table with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN

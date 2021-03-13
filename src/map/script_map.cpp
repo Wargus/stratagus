@@ -485,6 +485,8 @@ static int CclSetFogOfWarColor(lua_State *l)
 	FogOfWarColor.G = g;
 	FogOfWarColor.B = b;
 
+	FogOfWar.SetFogColor(r, g, b);
+
 	return 0;
 }
 

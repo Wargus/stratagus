@@ -81,11 +81,20 @@ void CFogOfWar::Init()
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
-    FogColorR = 0xFF & (Settings.FogColor >> RSHIFT);
-    FogColorG = 0xFF & (Settings.FogColor >> GSHIFT);
-    FogColorB = 0xFF & (Settings.FogColor >> BSHIFT);
+   SetFogColor(Settings.FogColor);
 
     this->State = cFirstEntry;
+}
+
+void CFogOfWar::SetFogColor(uint8_t r, uint8_t g, uint8_t b)
+{
+    SetFogColor(CColor(r, g, b));
+}
+
+void CFogOfWar::SetFogColor(CColor color)
+{
+    Settings.FogColor = color;
+    Settings.FogColorSDL = (color.R << RSHIFT) | (color.G << GSHIFT) | (color.B << BSHIFT);
 }
 
 void CFogOfWar::Clean()
@@ -515,15 +524,15 @@ void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect,
 
 void CFogOfWar::ApplyFogTo(uint32_t &pixel, const uint8_t alpha) 
 {
-    if (alpha == 0xFE) { pixel = this->Settings.FogColor; }
+    if (alpha == 0xFE) { pixel = this->Settings.FogColorSDL; }
     else  {
         const uint8_t r = 0xFF & (pixel >> RSHIFT);
         const uint8_t g = 0xFF & (pixel >> GSHIFT);
         const uint8_t b = 0xFF & (pixel >> BSHIFT);
 
-        const uint32_t resR = ((this->FogColorR * alpha) + (r * (0xFF - alpha))) >> 8;
-        const uint32_t resG = ((this->FogColorG * alpha) + (g * (0xFF - alpha))) >> 8;
-        const uint32_t resB = ((this->FogColorB * alpha) + (b * (0xFF - alpha))) >> 8;
+        const uint32_t resR = ((Settings.FogColor.R * alpha) + (r * (0xFF - alpha))) >> 8;
+        const uint32_t resG = ((Settings.FogColor.G * alpha) + (g * (0xFF - alpha))) >> 8;
+        const uint32_t resB = ((Settings.FogColor.B * alpha) + (b * (0xFF - alpha))) >> 8;
 
         pixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
     }
