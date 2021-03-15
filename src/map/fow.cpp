@@ -10,7 +10,7 @@
 //
 /**@name fow.cpp - The fog of war. */
 //
-//      (c) Copyright 2021 by Alyokhin
+//      (c) Copyright 2020-2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <algorithm>
+#include <omp.h>
 
 #include "stratagus.h"
 
@@ -44,7 +45,7 @@
 #include "tile.h"
 #include "ui.h"
 #include "viewport.h"
-#include <omp.h>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -112,13 +113,13 @@ void CFogOfWar::Clean()
 /** 
 ** Select which type of Fog of War to use
 ** 
-** @param fow_type	type to set
+** @param fowType	type to set
 ** @return true if success, false for wrong fow_type 
 */
-bool CFogOfWar::SetType(const FogOfWarTypes fow_type)
+bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 {
-	if (fow_type < FogOfWarTypes::cNumOfTypes) {
-		Settings.FOW_Type = fow_type;
+	if (fowType < FogOfWarTypes::cNumOfTypes) {
+		Settings.FOW_Type = fowType;
 		return true;
 	} else {
 		return false;
@@ -148,6 +149,14 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
     Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
 }
 
+/** 
+** Generate fog of war:
+** fill map-sized table with values of visiblty for current player/players 
+** TODO: Add posibility to select players (actual for replays or observers)
+**
+** @param thisPlayer  Player to check for
+** 
+*/
 void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 {
     size_t visIndex = VisTable_Index0;
@@ -182,7 +191,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
     if (doAtOnce || this->State == cFirstEntry) {
         /// TODO: Add posibility to generate fog for different players (for replays purposes)
         GenerateFog(*ThisPlayer);
-        GenerateFogTexture();
+        FogUpscale4x4();
         Blurer.Blur(FogTexture.GetNext());
         FogTexture.PushNext(doAtOnce);
         this->State = cGenerateFog;
@@ -195,7 +204,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
                 break;
 
             case cGenerateTexture:
-                GenerateFogTexture();
+                FogUpscale4x4();
                 this->State++;
                 break;
 
@@ -217,12 +226,12 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
 }
 
 /**
-**  Render fog of war texture in certain viewport.
+**  Generate fog of war texture for certain viewport.
 **
-**  @param alphaTexture texture with alpha mask to render 
-**  @param viewport     viewport to render fog of war texture in
+**  @param viewport     viewport to generate fog of war texture for
+**  @param vpFogSurface surface where to put the generated texture
 */
-void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface)
+void CFogOfWar::GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpFogSurface)
 {
 
     SDL_Rect srcRect;
@@ -236,29 +245,34 @@ void CFogOfWar::RenderToViewPort(const CViewport &viewport, SDL_Surface *const v
 
     FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
 
-    srcRect.x = viewport.MapPos.x  * 4;
-    srcRect.y = viewport.MapPos.y  * 4;
+    /// TOTO: This part may be replaced by GPU shaders. 
+    /// In that case vpFogSurface shall be filled up with FogTexture.DrawRegion()
+
+    srcRect.x = x0;
+    srcRect.y = y0;
     
     SDL_Rect trgRect;
     trgRect.x = 0;
     trgRect.y = 0;
     trgRect.w = viewport.MapWidth  * PixelTileSize.x;
     trgRect.h = viewport.MapHeight * PixelTileSize.y;
-
-    SDL_Rect renderRect;
-    renderRect.x = viewport.TopLeftPos.x;
-    renderRect.y = viewport.TopLeftPos.y;
-    renderRect.w = viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1;
-    renderRect.h = viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1;
-    
-    RenderToSurface(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, trgRect, vpSurface, renderRect, viewport.Offset);
+   
+    switch (this->Settings.UpscaleType) {
+        case cBilinear:
+            UpscaleBilinear(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpFogSurface, trgRect);
+            break;
+        case cSimple:
+        default:
+            UpscaleSimple(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpFogSurface, trgRect);
+            break;
+    }
 }
 
 /**
 **  4x4 upscale generated fog of war texture
 **
 */
-void CFogOfWar::GenerateFogTexture()
+void CFogOfWar::FogUpscale4x4()
 {
     /*
     **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Exlored.
@@ -278,7 +292,7 @@ void CFogOfWar::GenerateFogTexture()
     */
 
     /// Because we work with 4x4 scaled map tiles here, the textureIndex is in 32bits chunks (byte * 4)
-    uint32_t *const fogTexture = reinterpret_cast<uint32_t*>(FogTexture.GetNext());
+    uint32_t *const fogTexture = (uint32_t*)FogTexture.GetNext();
     
     /// Fog texture width and height in 32bit chunks
     const size_t textureWidth  = FogTexture.GetWidth()  / 4;
@@ -291,15 +305,13 @@ void CFogOfWar::GenerateFogTexture()
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
         
-        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * textureHeight / numOfThreads 
-                                                 : 0;
-        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * textureHeight / numOfThreads 
-                                                 : textureHeight;
+        const uint16_t lBound = (thisThread    ) * textureHeight / numOfThreads;
+        const uint16_t uBound = (thisThread + 1) * textureHeight / numOfThreads;
+
         /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTable starts from [-1:-1]
         size_t visIndex      = lBound * VisTableWidth;
         size_t textureIndex  = lBound * nextRowOffset;
         
-
         for (uint16_t row = lBound; row < uBound; row++) {
             for (uint16_t col = 0; col < textureWidth; col++) {
                 /// Fill the 4x4 scaled tile
@@ -361,85 +373,52 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
     }
 }
 
+
 /**
-** Zoom and render Fog Of War texture into SDL surface
+** Bilinear zoom Fog Of War texture into SDL surface
 ** 
 **  @param src          Image src.
 **  @param srcRect      Rectangle in the src image to render
 **  @param srcWidth     Image width
 **  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
-**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
-**  @param renderRect   Viewport rectangle where to render upscaled image
-**
-*/
-void CFogOfWar::RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
-{
-    Assert(trgRect.w != 0 && trgRect.h != 0);
-    Assert(renderSurface->format->BitsPerPixel == 32);
-
-    switch (this->Settings.UpscaleType) {
-        case cBilinear:
-            UpscaleBilinear(src, srcRect, srcWidth, trgRect, renderSurface, renderRect, offset);
-            break;
-        case cSimple:
-        default:
-            UpscaleSimple(src, srcRect, srcWidth, trgRect, renderSurface, renderRect, offset);
-            break;
-    }
-}
-
-
-/**
-** Bilinear zoom and render Fog Of War texture into SDL surface
-** 
-**  @param src          Image src.
-**  @param srcRect      Rectangle in the src image to render
-**  @param srcWidth     Image width
-**  @param trgSurface   Where to render
-**  @param trgRect      Scale src rectangle to this rectangle
-**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
-**  @param renderRect   Viewport rectangle where to render upscaled image
 **
 */
 void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
     constexpr int32_t fixedOne = 65536;
 
-    uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
+    uint32_t *const target = (uint32_t*)trgSurface->pixels;
+    const uint16_t AShift = trgSurface->format->Ashift;
     
-    const int32_t xRatio = ((int32_t)srcRect.w << 16) / trgRect.w;
-    const int32_t yRatio = ((int32_t)srcRect.h << 16) / trgRect.h;
+    /// FIXME: '-1' shouldn't be here, but without it the resulting fog has a shift to the left and upward
+    const int32_t xRatio = (int32_t(srcRect.w - 1) << 16) / trgRect.w;
+    const int32_t yRatio = (int32_t(srcRect.h - 1) << 16) / trgRect.h;
     
-    const int32_t xOffset = offset.x * xRatio;
-    const int32_t yOffset = offset.y * yRatio;
-
     #pragma omp parallel
     {    
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
         
-        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
-                                                 : 0;
-        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
-                                                 : renderRect.h;
+        const uint16_t lBound = (thisThread    ) * trgRect.h / numOfThreads; 
+        const uint16_t uBound = (thisThread + 1) * trgRect.h / numOfThreads; 
 
-        size_t  trgIndex = (renderRect.y + lBound) * renderSurface->w + renderRect.x;
-        int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
 
-        for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
+        size_t  trgIndex = (trgRect.y + lBound) * trgSurface->w + trgRect.x;
+        int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio;
 
-            const int32_t ySrc          = static_cast<int32_t> (y >> 16);
+        for (size_t yTrg = lBound; yTrg < uBound; yTrg++) {
+
+            const int32_t ySrc          = int32_t(y >> 16);
             const int64_t yDiff         = y - (ySrc << 16);
             const int64_t one_min_yDiff = fixedOne - yDiff;
             const size_t  yIndex        = ySrc * srcWidth;
-                  int64_t x             = ((int32_t)srcRect.x << 16) + xOffset;
+                  int64_t x             = int32_t(srcRect.x) << 16;
 
-            for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
+            for (size_t xTrg = 0; xTrg < trgRect.w; xTrg++) {
 
-                const int32_t xSrc          = static_cast<int32_t> (x >> 16);
+                const int32_t xSrc          = int32_t(x >> 16);
                 const int64_t xDiff         = x - (xSrc << 16);
                 const int64_t one_min_xDiff = fixedOne - xDiff;
                 const size_t  srcIndex      = yIndex + xSrc;
@@ -449,92 +428,64 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
                 const uint8_t C = src[srcIndex + srcWidth];
                 const uint8_t D = src[srcIndex + srcWidth + 1];
 
-                const uint8_t alpha = ((  A * one_min_xDiff * one_min_yDiff
-                                        + B * xDiff * one_min_yDiff
-                                        + C * yDiff * one_min_xDiff
-                                        + D * xDiff * yDiff ) >> 32 );
+                const uint32_t alpha = ((  A * one_min_xDiff * one_min_yDiff
+                                         + B * xDiff * one_min_yDiff
+                                         + C * yDiff * one_min_xDiff
+                                         + D * xDiff * yDiff ) >> 32 );
 
-                ApplyFogTo(target[trgIndex + xTrg], alpha);
-                
+                target[trgIndex + xTrg] = (alpha << AShift) | Settings.FogColorSDL;
                 x += xRatio;
             }
             y += yRatio;
-            trgIndex += renderSurface->w;
+            trgIndex += trgSurface->w;
         }
     } /// pragma omp parallel
 }
 
 /**
-** Simple zoom and render Fog Of War texture into SDL surface
+** Simple zoom Fog Of War texture into SDL surface
 ** 
 **  @param src          Image src.
 **  @param srcRect      Rectangle in the src image to render
 **  @param srcWidth     Image width
 **  @param trgSurface   Where to render
 **  @param trgRect      Scale src rectangle to this rectangle
-**  @param offset       Alignment of viewport (on the surface where ro render) in relation to trgRect
-**  @param renderRect   Viewport rectangle where to render upscaled image
 **
 */
-void CFogOfWar::UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                              const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset) 
+void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                              SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
 {
-    uint32_t *const target = static_cast<uint32_t *>(renderSurface->pixels);
+    const uint16_t surfaceAShift = trgSurface->format->Ashift;
+
+    const uint8_t texelWidth  = PixelTileSize.x / 4;
+    const uint8_t texelHeight = PixelTileSize.y / 4;
     
-    const int32_t xRatio = ((int32_t)srcRect.w << 16) / trgRect.w;
-    const int32_t yRatio = ((int32_t)srcRect.h << 16) / trgRect.h;
-    
-    const int32_t xOffset = offset.x * xRatio;
-    const int32_t yOffset = offset.y * yRatio;
+    uint32_t *const target =(uint32_t*)trgSurface->pixels;
 
     #pragma omp parallel
     {    
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
         
-        const uint16_t lBound = numOfThreads > 1 ? (thisThread    ) * renderRect.h / numOfThreads 
-                                                 : 0;
-        const uint16_t uBound = numOfThreads > 1 ? (thisThread + 1) * renderRect.h / numOfThreads 
-                                                 : renderRect.h;
+        const uint16_t lBound = (thisThread    ) * srcRect.h / numOfThreads; 
+        const uint16_t uBound = (thisThread + 1) * srcRect.h / numOfThreads; 
 
-        size_t  trgIndex = (renderRect.y + lBound) * renderSurface->w + renderRect.x;
-        int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio + yOffset;
+        intptr_t srcIndex = srcRect.x + (srcRect.y + lBound) * srcWidth;
+        intptr_t trgIndex = trgRect.x + (trgRect.y + lBound * texelHeight) * trgSurface->w;
 
-        for (size_t yTrg = lBound ; yTrg < uBound; yTrg++) {
-
-            const int32_t ySrc   = static_cast<int32_t> (y >> 16);
-            const size_t  yIndex = ySrc * srcWidth;
-                  int64_t x      = ((int32_t)srcRect.x << 16) + xOffset;
-
-            for (size_t xTrg = 0; xTrg < renderRect.w; xTrg++) {
-
-                const int32_t xSrc     = static_cast<int32_t> (x >> 16);
-                const size_t  srcIndex = yIndex + xSrc;
-                const uint8_t alpha    = src[srcIndex];
-
-                ApplyFogTo(target[trgIndex + xTrg], alpha);
-
-                x += xRatio;
+        for (uint16_t ySrc = lBound; ySrc < uBound; ySrc++) {
+            for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
+    
+                const uint32_t texelValue = (uint32_t(src[srcIndex + xSrc]) << surfaceAShift) 
+                                            | Settings.FogColorSDL;
+                std::fill_n(&target[trgIndex + xSrc * texelWidth], texelWidth, texelValue);
             }
-            y += yRatio;
-            trgIndex += renderSurface->w;
+            for (uint8_t texelRow = 1; texelRow < texelHeight; texelRow++) {
+                std::copy_n(&target[trgIndex], trgRect.w, &target[trgIndex + texelRow * trgSurface->w]);
+            }
+            srcIndex += srcWidth;
+            trgIndex += trgSurface->w * texelHeight;
         }
     } /// pragma omp parallel
-}
-
-void CFogOfWar::ApplyFogTo(uint32_t &pixel, const uint8_t alpha) 
-{
-    if (alpha == 0xFE) { pixel = this->Settings.FogColorSDL; }
-    else  {
-        const uint8_t r = 0xFF & (pixel >> RSHIFT);
-        const uint8_t g = 0xFF & (pixel >> GSHIFT);
-        const uint8_t b = 0xFF & (pixel >> BSHIFT);
-
-        const uint32_t resR = ((Settings.FogColor.R * alpha) + (r * (0xFF - alpha))) >> 8;
-        const uint32_t resG = ((Settings.FogColor.G * alpha) + (g * (0xFF - alpha))) >> 8;
-        const uint32_t resB = ((Settings.FogColor.B * alpha) + (b * (0xFF - alpha))) >> 8;
-
-        pixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
-    }
 }
 //@}

@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 #include <queue>
+#include <omp.h>
+
 #include "stratagus.h"
 
 #include "map.h"
@@ -624,29 +626,77 @@ void CViewport::DrawLegacyFogOfWar() const
 }
 
 
-
-
 /**
 **  Draw the map fog of war (enhanced type).
 */
-void CViewport::DrawEnhancedFogOfWar()
+void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 {
-    FogOfWar.RenderToViewPort(*this, TheScreen);
-/*
-    SDL_Rect screenRect;
-    screenRect.x = this->TopLeftPos.x;
-    screenRect.y = this->TopLeftPos.y;
-    screenRect.w = this->BottomRightPos.x - this->TopLeftPos.x + 1;
-    screenRect.h = this->BottomRightPos.y - this->TopLeftPos.y + 1;
 
-	SDL_Rect fogRect;
-    fogRect.x = this->Offset.x;
-    fogRect.y = this->Offset.y;
-    fogRect.w = screenRect.w;
-    fogRect.h = screenRect.h;
+ 	FogOfWar.GetFogForViewport(*this, FogSurface);
 
-    SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
-*/
+	if (isSoftwareRender) {
+		SDL_Rect screenRect;
+		screenRect.x = this->TopLeftPos.x;
+		screenRect.y = this->TopLeftPos.y;
+		screenRect.w = this->BottomRightPos.x - this->TopLeftPos.x + 1;
+		screenRect.h = this->BottomRightPos.y - this->TopLeftPos.y + 1;
+
+		SDL_Rect fogRect;
+		fogRect.x = this->Offset.x;
+		fogRect.y = this->Offset.y;
+		fogRect.w = screenRect.w;
+		fogRect.h = screenRect.h;
+
+		/// As a single-threaded alternative:
+		// SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
+
+		/// Alpha blending of the fog texture into the screen
+		uint32_t *const fog    = static_cast<uint32_t *>(FogSurface->pixels);
+		uint32_t *const screen = static_cast<uint32_t *>(TheScreen->pixels);
+		const CColor fogColor = FogOfWar.GetFogColor();
+		const uint8_t fogR = fogColor.R;
+		const uint8_t fogG = fogColor.G;
+		const uint8_t fogB = fogColor.B;
+		
+		#pragma omp parallel
+		{    
+			const uint16_t thisThread   = omp_get_thread_num();
+			const uint16_t numOfThreads = omp_get_num_threads();
+			
+			const uint16_t lBound = (thisThread    ) * screenRect.h / numOfThreads; 
+			const uint16_t uBound = (thisThread + 1) * screenRect.h / numOfThreads; 
+
+			size_t fogIndex = (fogRect.y    + lBound) * FogSurface->w + fogRect.x;
+			size_t scrIndex = (screenRect.y + lBound) * TheScreen->w + screenRect.x;
+			
+			for (uint16_t y = lBound; y < uBound; y++) {
+				for (uint16_t x = 0; x < screenRect.w; x++) {
+
+					const uint32_t fogPixel = fog[fogIndex + x];
+					const uint8_t  alpha    = 0xFF & (fogPixel >> ASHIFT);
+
+					uint32_t &scrPixel = screen[scrIndex + x];
+
+					if (alpha == 0xFE) { scrPixel = fogPixel; }
+					else  {
+						const uint8_t scrR = 0xFF & (scrPixel >> RSHIFT);
+						const uint8_t scrG = 0xFF & (scrPixel >> GSHIFT);
+						const uint8_t scrB = 0xFF & (scrPixel >> BSHIFT);
+
+						const uint32_t resR = ((fogR * alpha) + (scrR * (0xFF - alpha))) >> 8;
+						const uint32_t resG = ((fogG * alpha) + (scrG * (0xFF - alpha))) >> 8;
+						const uint32_t resB = ((fogB * alpha) + (scrB * (0xFF - alpha))) >> 8;
+
+						scrPixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
+					}
+				}
+				fogIndex += FogSurface->w;
+				scrIndex += TheScreen->w;
+			}
+		} /// pragma omp parallel
+
+	}
+
 }
 
 
@@ -670,7 +720,10 @@ void CViewport::AdjustFogSurface()
                                                      surfaceHeight,
                                                      32, RMASK, GMASK, BMASK, AMASK);
     SDL_SetSurfaceBlendMode(FogSurface, SDL_BLENDMODE_BLEND);
-	SDL_FillRect(FogSurface, NULL, SDL_MapRGBA(FogSurface->format, 0, 0, 0, 0xFF));
+	
+	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | ((uint32_t)0xFF << ASHIFT);
+
+	SDL_FillRect(FogSurface, NULL, fogColorSolid);
 }
 
 

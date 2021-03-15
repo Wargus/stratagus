@@ -10,7 +10,7 @@
 //
 /**@name fow_utils.cpp - The utilities for fog of war . */
 //
-//      (c) Copyright 2021 by Alyokhin
+//      (c) Copyright 2020-2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ void CEasedTexture::CalcDeltas()
     #pragma omp parallel for
     for (size_t index = 0; index < TextureSize; index++)
     {
-        Deltas[index] = (static_cast <int16_t>(next[index]) - curr[index]) / EasingStepsNum;
+        Deltas[index] = (int16_t(next[index]) - curr[index]) / EasingStepsNum;
     }
 }
 

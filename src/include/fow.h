@@ -10,7 +10,7 @@
 //
 /**@name fow.h - The fog of war headerfile. */
 //
-//      (c) Copyright 2021 Alyokhin
+//      (c) Copyright 2020-2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -50,14 +50,13 @@ public:
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
     enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
-
-
     
     void Init();
     void Clean();
-    bool SetType(const FogOfWarTypes fow_type);
+    bool SetType(const FogOfWarTypes fowType);
     FogOfWarTypes GetType()   { return Settings.FOW_Type;    }
-    CColor GetFogColor()      { return Settings.FogColor;    }
+    
+    CColor   GetFogColor()    { return Settings.FogColor;    }
     uint32_t GetFogColorSDL() { return Settings.FogColorSDL; }
     void SetFogColor(uint8_t r, uint8_t g, uint8_t b);
     void SetFogColor(CColor color);
@@ -66,22 +65,19 @@ public:
     void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
     void Update(bool doAtOnce = false);
-    void RenderToViewPort(const CViewport &viewport, SDL_Surface *const vpSurface);
+    void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpSurface);
 
 private:
     void GenerateFog(const CPlayer &thisPlayer);
-    void GenerateFogTexture();
+    void FogUpscale4x4();
 
     uint8_t DeterminePattern(const size_t index, const uint8_t visFlag);
     void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
                                                                                     const uint8_t patternExplored);
-    void RenderToSurface(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
     void UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
-    void UpscaleSimple(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         const SDL_Rect &trgRect, SDL_Surface *const renderSurface, const SDL_Rect &renderRect, const PixelDiff &offset);
-    void ApplyFogTo(uint32_t &pixel, const uint8_t alpha);
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+    void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
+                       SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
     
 public:
 
@@ -91,8 +87,8 @@ private:
 		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced}; /// Type of fog of war - legacy or enhanced(smooth)
         uint8_t       NumOfEasingSteps {8};                        /// Number of the texture easing steps
         float         BlurRadius[2]    {2.0, 1.5};                 /// Radiuses or standard deviation
-        uint8_t       BlurIterations   {3};                        /// Radius or standard deviation
-        uint8_t       UpscaleType      {UpscaleTypes::cBilinear};  /// Rendering zoom type
+        uint8_t       BlurIterations   {3};                        /// Number of blur iterations
+        uint8_t       UpscaleType      {UpscaleTypes::cSimple};    /// Rendering zoom type
         CColor        FogColor         {0, 0, 0, 0};               /// Fog of war color
         uint32_t      FogColorSDL      {0};                        /// Fog of war color in the SDL format
 	} Settings;  /// Fog of war settings

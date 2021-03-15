@@ -10,7 +10,7 @@
 //
 /**@name fow_utils.h - The utilities for fog of war headerfile. */
 //
-//      (c) Copyright 2021 Alyokhin
+//      (c) Copyright 2020-2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ private:
     std::vector<int16_t> Deltas;
 };
 
-/// Class for box blur algorithm. Used to blur upscaled FOW texture.
+/// Class for box blur algorithm. Used to blur 4x4 upscaled FOW texture.
 class CBlurer
 {
 public:
@@ -99,7 +99,7 @@ private:
     uint8_t NumOfIterations {3}; /// 2-3 is optimal, with higher values result enhancing not so radicaly
 
     std::vector<uint8_t> HalfBoxes; /// Radiuses (box sizes) for box blur iterations
-    std::vector<uint8_t> WorkingTexture;
+    std::vector<uint8_t> WorkingTexture;  /// Back buffer
     uint16_t TextureWidth  {0};
     uint16_t TextureHeight {0};
 };
