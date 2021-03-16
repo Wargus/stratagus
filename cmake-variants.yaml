@@ -1,0 +1,15 @@
+buildType:
+  default: debug
+  choices:
+    debug:
+      short: Debug
+      long: Emit debug information
+      buildType: Debug
+    profile:
+      short: Profiler
+      long: Add extra code to use profilers
+      buildType: Profile
+    release:
+      short: Release
+      long: Optimize generated code
+      buildType: Release
