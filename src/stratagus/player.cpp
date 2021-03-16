@@ -1469,7 +1469,7 @@ bool CPlayer::IsVisionSharing() const
 */
 bool CPlayer::HasSharedVisionWith(const CPlayer &player) const
 {
-	return this->SharedVision.find(player.Index) != this->SharedVision.end();
+	return this->HasSharedVisionWith(player.Index);
 }
 
 /**
@@ -1502,7 +1502,7 @@ bool CPlayer::HasMutualSharedVisionWith(const CUnit &unit) const
 */
 bool CPlayer::IsTeamed(const CPlayer &player) const
 {
-	return Team == player.Team;
+	return this->Team == player.Team;
 }
 
 /**
@@ -1510,7 +1510,7 @@ bool CPlayer::IsTeamed(const CPlayer &player) const
 */
 bool CPlayer::IsTeamed(const CUnit &unit) const
 {
-	return IsTeamed(*unit.Player);
+	return this->IsTeamed(*unit.Player);
 }
 
 //@}
