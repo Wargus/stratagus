@@ -265,17 +265,17 @@ bool CMapField::isAOrcWall() const
 
 unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) const
 {
-	if (IsVisible(player)) {
+	if (this->IsVisible(player)) {
 		return 2;
 	}
 	unsigned char maxVision = 0;
-	if (IsExplored(player)) {
+	if (this->IsExplored(player)) {
 		maxVision = 1;
 	}
 	
 	for (const int i : player.GetSharedVision()) {
-		if (player.HasMutualSharedVisionWith(Players[i])) {
-			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
+		if (Players[i].HasSharedVisionWith(player.Index)) { //if the shared vision is mutual
+			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
 			if (maxVision >= 2) {
 				return 2;
 			}
@@ -290,18 +290,18 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 
 bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
 {
-	return Visible[player.Index] != 0;
+	return this->Visible[player.Index] != 0;
 }
 
 bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
 {
 	const bool fogOfWar = !Map.NoFogOfWar;
-	return Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
+	return this->Visible[player.Index] >= 2 || (!fogOfWar && IsExplored(player));
 }
 
 bool CMapFieldPlayerInfo::IsTeamVisible(const CPlayer &player) const
 {
-	return TeamVisibilityState(player) == 2;
+	return this->TeamVisibilityState(player) == 2;
 }
 
 //@}

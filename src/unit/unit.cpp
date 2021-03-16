@@ -1675,12 +1675,12 @@ void UnitCountSeen(CUnit &unit)
 */
 bool CUnit::IsVisible(const CPlayer &player) const
 {
-	if (VisCount[player.Index]) {
+	if (this->VisCount[player.Index]) {
 		return true;
 	}
 	for (const int p : player.GetSharedVision()) {
-		if (player.HasMutualSharedVisionWith(Players[p])) {
-			if (VisCount[p]) {
+		if (this->VisCount[p]) {
+			if (Players[p].HasSharedVisionWith(player.Index)) {	//if the shared vision is mutual	
 				return true;
 			}
 		}

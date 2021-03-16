@@ -251,6 +251,10 @@ public:
 	{
 		return this->SharedVision;
 	}
+	bool HasSharedVisionWith(const int playerIndex) const
+	{
+		return (this->SharedVision.find(playerIndex) != this->SharedVision.end());
+	}
 	bool HasSharedVisionWith(const CPlayer &player) const;
 	bool HasSharedVisionWith(const CUnit &unit) const;
 	bool HasMutualSharedVisionWith(const CPlayer &player) const;
