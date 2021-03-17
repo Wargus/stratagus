@@ -126,7 +126,7 @@ void CEasedTexture::PushNext(const bool forcedShowNext /*= false*/)
 {
     CalcDeltas();
     SwapFrames();
-    CurrentStep = forcedShowNext ? EasingStepsNum: 0;
+    CurrentStep = forcedShowNext ? EasingStepsNum : 0;
 }
 
 /**
@@ -179,8 +179,7 @@ void CEasedTexture::CalcDeltas()
 
     size_t index = 0;
     #pragma omp parallel for
-    for (size_t index = 0; index < TextureSize; index++)
-    {
+    for (size_t index = 0; index < TextureSize; index++) {
         Deltas[index] = (int16_t(next[index]) - curr[index]) / EasingStepsNum;
     }
 }
@@ -216,20 +215,22 @@ void CBlurer::PrecalcParameters(const float radius, const int numOfIterations)
     Radius          = radius;
     NumOfIterations = numOfIterations;
 
-    if (Radius * NumOfIterations == 0) { return; }
+    if (Radius * NumOfIterations == 0) { 
+        return; 
+    }
 
-    float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
+    const float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
     uint8_t dL = floor(D);  
     if (dL % 2 == 0) { dL--; }
-    uint8_t dU = dL + 2;
+    const uint8_t dU = dL + 2;
 				
-    float M = (12 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
-    uint8_t m = round(M);
+    const float M = (12.0 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
+    const uint8_t m = round(M);
 
     HalfBoxes.clear();
     HalfBoxes.resize(numOfIterations);
     for (uint8_t i = 0; i < numOfIterations; i++) {
-        HalfBoxes[i] = ((float)(i < m ? dL : dU) - 1) / 2;
+        HalfBoxes[i] = ((i < m ? dL : dU) - 1) / 2;
     }
 }
 
@@ -259,7 +260,7 @@ void CBlurer::Blur(uint8_t *const texture)
     uint8_t *source = texture;
     uint8_t *target = WorkingTexture.data();
 
-    for (uint8_t i = 0; i < HalfBoxes.size(); i++){
+    for (uint8_t i = 0; i < HalfBoxes.size(); i++) {
         if (i > 0) {
             uint8_t *const swap = source;
             source = target;

@@ -135,7 +135,7 @@ bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 void CFogOfWar::EnableBilinearUpscale(const bool enable) 
 {
     const uint8_t prev = Settings.UpscaleType;
-    Settings.UpscaleType = enable ? cBilinear : cSimple;
+    Settings.UpscaleType = enable ? UpscaleTypes::cBilinear : UpscaleTypes::cSimple;
     if (prev != Settings.UpscaleType) {
         Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
     }
@@ -188,32 +188,32 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
 
     if (Settings.NumOfEasingSteps < States::cReady) doAtOnce = true;
 
-    if (doAtOnce || this->State == cFirstEntry) {
+    if (doAtOnce || this->State == States::cFirstEntry) {
         /// TODO: Add posibility to generate fog for different players (for replays purposes)
         GenerateFog(*ThisPlayer);
         FogUpscale4x4();
         Blurer.Blur(FogTexture.GetNext());
         FogTexture.PushNext(doAtOnce);
-        this->State = cGenerateFog;
+        this->State = States::cGenerateFog;
     } else {
         switch (this->State) {
-            case cGenerateFog:
+            case States::cGenerateFog:
                 /// TODO: Add posibility to generate fog for different players (for replays purposes)
                 GenerateFog(*ThisPlayer);
                 this->State++;
                 break;
 
-            case cGenerateTexture:
+            case States::cGenerateTexture:
                 FogUpscale4x4();
                 this->State++;
                 break;
 
-            case cBlurTexture:
+            case States::cBlurTexture:
                 Blurer.Blur(FogTexture.GetNext());
                 this->State++;
                 break;
                 
-            case cReady:
+            case States::cReady:
                 if (FogTexture.isFullyEased()) {
                     FogTexture.PushNext();
                     this->State = cGenerateFog;
@@ -332,7 +332,7 @@ void CFogOfWar::FogUpscale4x4()
 **  @param  visFlag     layer to determine pattern for
 **
 */
-uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag)
+uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag) const
 {
     Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
 
@@ -364,8 +364,8 @@ uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag)
 **  @param  patternExplored index int the upscale table for Explored layer
 **
 */
-void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, 
-                                const uint8_t patternVisible, const uint8_t patternExplored)
+void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
+                                const uint8_t patternVisible, const uint8_t patternExplored) const
 {
     for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
         texture[index] = UpscaleTable[patternVisible][scan_line] + UpscaleTable[patternExplored][scan_line];
@@ -385,7 +385,7 @@ void CFogOfWar::FillUpscaledRec(uint32_t *texture, const int textureWidth, intpt
 **
 */
 void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+                                SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const
 {
     constexpr int32_t fixedOne = 65536;
 
@@ -453,7 +453,7 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 **
 */
 void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                              SDL_Surface *const trgSurface, const SDL_Rect &trgRect) 
+                              SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const
 {
     const uint16_t surfaceAShift = trgSurface->format->Ashift;
 

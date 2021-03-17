@@ -54,10 +54,11 @@ public:
     void Init();
     void Clean();
     bool SetType(const FogOfWarTypes fowType);
-    FogOfWarTypes GetType()   { return Settings.FOW_Type;    }
-    
-    CColor   GetFogColor()    { return Settings.FogColor;    }
-    uint32_t GetFogColorSDL() { return Settings.FogColorSDL; }
+
+    FogOfWarTypes GetType()   const { return Settings.FOW_Type; }
+    CColor   GetFogColor()    const { return Settings.FogColor; }
+    uint32_t GetFogColorSDL() const { return Settings.FogColorSDL; }
+
     void SetFogColor(uint8_t r, uint8_t g, uint8_t b);
     void SetFogColor(CColor color);
 
@@ -71,13 +72,15 @@ private:
     void GenerateFog(const CPlayer &thisPlayer);
     void FogUpscale4x4();
 
-    uint8_t DeterminePattern(const size_t index, const uint8_t visFlag);
-    void FillUpscaledRec(uint32_t *texture, const int textureWidth, intptr_t index, const uint8_t patternVisible, 
-                                                                                    const uint8_t patternExplored);
+    uint8_t DeterminePattern(const size_t index, const uint8_t visFlag) const;
+    void FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
+                         const uint8_t patternVisible, const uint8_t patternExplored) const;
+
     void UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+                         SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const;
+
     void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
-                       SDL_Surface *const trgSurface, const SDL_Rect &trgRect);
+                       SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const;
     
 public:
 

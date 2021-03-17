@@ -54,13 +54,13 @@ public:
     void PushNext(const bool forcedShowNext = false);
     void DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect);
 
-    bool isFullyEased() { return CurrentStep == EasingStepsNum ? true : false; }
-    void Ease()         { if (CurrentStep < EasingStepsNum) CurrentStep++; }
+    bool isFullyEased() const { return CurrentStep == EasingStepsNum ? true : false; }
+    void Ease()               { if (CurrentStep < EasingStepsNum) CurrentStep++; }
 
-    uint8_t *GetCurrent() { return Frames[Prev].data(); }
-    uint8_t *GetNext()    { return Frames[Next].data(); }
-    uint16_t GetWidth()   { return Width;               }
-    uint16_t GetHeight()  { return Height;              }
+    uint8_t *GetCurrent()      { return Frames[Prev].data(); }
+    uint8_t *GetNext()         { return Frames[Next].data(); }
+    uint16_t GetWidth()  const { return Width;  }
+    uint16_t GetHeight() const { return Height; }
 
 private:
     void CalcDeltas();
