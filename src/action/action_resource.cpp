@@ -119,7 +119,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.Init();
 
-	Assert(Map.Field(startPos)->CheckMask(resmask));
 	terrainTraversal.PushPos(startPos);
 
 	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);
