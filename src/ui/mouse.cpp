@@ -1315,7 +1315,8 @@ static int SendResource(const Vec2i &pos)
 					if (unit.Type->ResInfo[res]
 						&& unit.Type->ResInfo[res]->TerrainHarvester
 						&& mf.playerInfo.IsExplored(*unit.Player)
-						&& mf.IsTerrainResourceOnMap(res)
+						/// By disabling this, we allow the harvester to find the nearest tile with a resource by itself, in case mf is empty.
+						/*&& mf.IsTerrainResourceOnMap(res)*/ 
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						SendCommandResourceLoc(unit, pos, flush);
