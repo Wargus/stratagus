@@ -169,10 +169,10 @@ public:
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// Screen pixel left corner x coordinate
-	int Y;                          /// Screen pixel upper corner y coordinate
-	int EndX;                       /// Screen pixel right x coordinate
-	int EndY;                       /// Screen pixel bottom y coordinate
+	int X;                          /// Screen pixel left corner x coordinate adjusted for current map size
+	int Y;                          /// Screen pixel upper corner y coordinate adjusted for current map size 
+	int EndX;                       /// Screen pixel right x coordinate adjusted for current map size
+	int EndY;                       /// Screen pixel bottom y coordinate adjusted for current map size
 	int ScrollPaddingLeft;          /// Scrollable area past the left of map
 	int ScrollPaddingRight;         /// Scrollable area past the right of map
 	int ScrollPaddingTop;           /// Scrollable area past the top of map
