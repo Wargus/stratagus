@@ -119,7 +119,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.Init();
 
-	Assert(Map.Field(startPos)->CheckMask(resmask));
 	terrainTraversal.PushPos(startPos);
 
 	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);
@@ -1066,11 +1065,13 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			return false;
 		}
 	} else {
+		/// FIXME: Make it customizable
 		const unsigned int tooManyWorkers = 15;
+
 		CUnit *mine = this->Resource.Mine;
 		const int range = 15;
-		CUnit *newdepot = NULL;
-		CUnit *goal = NULL;
+		CUnit *newdepot = nullptr;
+		CUnit *goal = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
 		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
@@ -1087,8 +1088,20 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		// If goal is not NULL, then we got it in AiGetSuitableDepot
 		if (!goal) {
-			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
-									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
+			if (mine != nullptr && mine->IsAlive()) {
+			goal = mine;
+			} else {
+				const CUnit *start_unit = nullptr;
+				if (newdepot != nullptr) {
+					start_unit = newdepot;
+				} else if (depot != nullptr) {
+					start_unit = depot;
+				}
+				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource, 
+										unit.Player->AiEnabled, (newdepot ? newdepot : depot));
+			}
+
+									
 		}
 
 		if (goal) {
