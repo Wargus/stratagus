@@ -159,17 +159,18 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 */
 void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
 {
-    size_t visIndex = VisTable_Index0;
-    size_t mapIndex = 0;
-    for (uint16_t row = 0 ; row < Map.Info.MapHeight; row++) {
-		for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
+    #pragma omp parallel for 
+    for (uint16_t row = 0; row < Map.Info.MapHeight; row++) {
+
+        const size_t visIndex = VisTable_Index0 + row * VisTableWidth;
+        const size_t mapIndex = row * Map.Info.MapHeight;
+
+        for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
             /// FIXME: to speedup this part, maybe we have to use Map.Field(mapIndex + col)->playerInfo.Visible[thisPlayer.index] instead
             /// this must be much faster
             VisTable[visIndex + col] = Map.Field(mapIndex + col)->playerInfo.TeamVisibilityState(thisPlayer);
-		}
-		visIndex += VisTableWidth;
-        mapIndex += Map.Info.MapWidth;
-	}
+        }
+    }
 }
 
 /**
