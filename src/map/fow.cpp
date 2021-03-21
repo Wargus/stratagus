@@ -332,7 +332,7 @@ void CFogOfWar::FogUpscale4x4()
 **  @param  visFlag     layer to determine pattern for
 **
 */
-uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag) const
+inline uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag) const
 {
     Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
 
@@ -364,7 +364,7 @@ uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag) c
 **  @param  patternExplored index int the upscale table for Explored layer
 **
 */
-void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
+inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
                                 const uint8_t patternVisible, const uint8_t patternExplored) const
 {
     for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
