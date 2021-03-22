@@ -247,6 +247,12 @@ bool EnableDebugPrint;           /// if enabled, print the debug messages
 bool EnableAssert;               /// if enabled, halt on assertion failures
 bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
 
+#ifdef DEBUG
+bool IsDebugEnabled {true};      /// Is debug enaled? Flag to pass into lua code. 
+#else
+bool IsDebugEnabled {false};     /// Is debug enaled? Flag to pass into lua code.
+#endif
+
 /*============================================================================
 ==  MAIN
 ============================================================================*/
