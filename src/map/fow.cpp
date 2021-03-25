@@ -82,7 +82,10 @@ void CFogOfWar::Init()
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
-   SetFogColor(Settings.FogColor);
+    SetFogColor(Settings.FogColor);
+    
+    /// TODO: Add fog initialization for replays and observer players
+    ShowVisionFor(*ThisPlayer);
 
     this->State = cFirstEntry;
 }
@@ -157,7 +160,7 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 ** @param thisPlayer  Player to check for
 ** 
 */
-void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
+void CFogOfWar::GenerateFog()
 {
     #pragma omp parallel for 
     for (uint16_t row = 0; row < Map.Info.MapHeight; row++) {
@@ -166,9 +169,18 @@ void CFogOfWar::GenerateFog(const CPlayer &thisPlayer)
         const size_t mapIndex = row * Map.Info.MapHeight;
 
         for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
-            /// FIXME: to speedup this part, maybe we have to use Map.Field(mapIndex + col)->playerInfo.Visible[thisPlayer.index] instead
-            /// this must be much faster
-            VisTable[visIndex + col] = Map.Field(mapIndex + col)->playerInfo.TeamVisibilityState(thisPlayer);
+
+            uint8_t &visCell = VisTable[visIndex + col];
+            visCell = 0; /// Clear it before check for players
+            const CMapField *mapField = Map.Field(mapIndex + col);
+
+            for (const uint8_t player : VisionFor) {
+                visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]);
+                if (visCell >= 2) {
+                    visCell = 2;
+                    break;
+                }
+            }
         }
     }
 }
@@ -191,7 +203,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
 
     if (doAtOnce || this->State == States::cFirstEntry) {
         /// TODO: Add posibility to generate fog for different players (for replays purposes)
-        GenerateFog(*ThisPlayer);
+        GenerateFog();
         FogUpscale4x4();
         Blurer.Blur(FogTexture.GetNext());
         FogTexture.PushNext(doAtOnce);
@@ -200,7 +212,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
         switch (this->State) {
             case States::cGenerateFog:
                 /// TODO: Add posibility to generate fog for different players (for replays purposes)
-                GenerateFog(*ThisPlayer);
+                GenerateFog();
                 this->State++;
                 break;
 

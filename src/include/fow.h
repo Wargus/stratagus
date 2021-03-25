@@ -59,6 +59,9 @@ public:
     CColor   GetFogColor()    const { return Settings.FogColor; }
     uint32_t GetFogColorSDL() const { return Settings.FogColorSDL; }
 
+    void ShowVisionFor(const CPlayer &player) { VisionFor.insert(player.Index); }
+    void HideVisionFor(const CPlayer &player) { VisionFor.erase(player.Index); }
+
     void SetFogColor(uint8_t r, uint8_t g, uint8_t b);
     void SetFogColor(CColor color);
 
@@ -69,7 +72,7 @@ public:
     void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpSurface);
 
 private:
-    void GenerateFog(const CPlayer &thisPlayer);
+    void GenerateFog();
     void FogUpscale4x4();
 
     uint8_t DeterminePattern(const size_t index, const uint8_t visFlag) const;
@@ -98,6 +101,9 @@ private:
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
     
+    std::set<uint8_t>    VisionFor;           /// Visibilty through the fog is generated for this players
+                                              /// ThisPlayer and his allies in normal games
+                                              /// Any set of players for observers and in the replays
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
     intptr_t             VisTable_Index0 {0}; /// index in the vision table for [0:0] tile
     size_t               VisTableWidth   {0}; /// width of the vision table
