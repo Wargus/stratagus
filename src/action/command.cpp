@@ -909,27 +909,32 @@ void CommandDiplomacy(int player, int state, int opponent)
 /**
 **  Shared vision changed.
 **
-**  @param player    Player which changes his state.
-**  @param state     New shared vision state.
-**  @param opponent  Opponent.
+**  @param playerIndex   Player which changes his state.
+**  @param state         New shared vision state.
+**  @param opponentIndex Opponent.
 */
-void CommandSharedVision(int player, bool state, int opponent)
+void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 {
-	
-	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapUnmarkUnitSight(unit);
-		}
-	}
+	CPlayer *player = &Players[playerIndex];
+	CPlayer *opponent = &Players[opponentIndex];
 
 	// Compute Before.
-	const bool before = Players[player].HasSharedVisionWith(Players[opponent]);
+	const bool before = player->HasSharedVisionWith(*opponent);
+	if (state == before || opponent->Type == PlayerNobody 
+						|| player->Type == PlayerNobody) {
+		return;
+	}
+	
 	if (state == false) {
-		Players[player].UnshareVisionWith(Players[opponent]);
+		// Do a real hardcore seen recount. First we unmark sight for all units of the player.
+		for (CUnit *const unit : player->GetUnits()) {
+			if (!unit->Destroyed) {
+				MapUnmarkUnitSight(*unit);
+			}
+		}
+		player->UnshareVisionWith(*opponent);
 	} else {
-		Players[player].ShareVisionWith(Players[opponent]);
+		player->ShareVisionWith(*opponent);
 	}
 
 	if (before && !state) {
@@ -939,23 +944,20 @@ void CommandSharedVision(int player, bool state, int opponent)
 			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
-			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->Index) {
+			if (mfp.Visible[playerIndex] && !mfp.Visible[opponentIndex]) {
+				mfp.Visible[opponentIndex] = 1;
+				if (opponent == ThisPlayer) {
 					Map.MarkSeenTile(mf);
 				}
 			}
 		}
 	}
-
-	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapMarkUnitSight(unit);
+	// Do a real hardcore seen recount. Now we remark sight for all units of the player
+	for (CUnit *const unit : player->GetUnits()) {
+		if (!unit->Destroyed) {
+			MapMarkUnitSight(*unit);
 		}
 	}
-
 }
 
 /**
