@@ -915,6 +915,7 @@ void CommandDiplomacy(int player, int state, int opponent)
 */
 void CommandSharedVision(int player, bool state, int opponent)
 {
+	
 	// Do a real hardcore seen recount. First we unmark EVERYTHING.
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
@@ -923,31 +924,24 @@ void CommandSharedVision(int player, bool state, int opponent)
 		}
 	}
 
-	// Compute Before and after.
-	const int before = Players[player].HasMutualSharedVisionWith(Players[opponent]);
+	// Compute Before.
+	const bool before = Players[player].HasSharedVisionWith(Players[opponent]);
 	if (state == false) {
 		Players[player].UnshareVisionWith(Players[opponent]);
 	} else {
 		Players[player].ShareVisionWith(Players[opponent]);
 	}
-	const int after = Players[player].HasMutualSharedVisionWith(Players[opponent]);
 
-	if (before && !after) {
-		// Don't share vision anymore. Give each other explored terrain for good-bye.
-
-		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+	if (before && !state) {
+		// Don't share vision anymore. Give explored terrain for good-bye.
+		const size_t fieldsNum = Map.Info.MapWidth * Map.Info.MapHeight;
+		for (size_t i = 0; i != fieldsNum; ++i) {
 			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
 			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
 				mfp.Visible[opponent] = 1;
 				if (opponent == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->Index) {
 					Map.MarkSeenTile(mf);
 				}
 			}
@@ -961,6 +955,7 @@ void CommandSharedVision(int player, bool state, int opponent)
 			MapMarkUnitSight(unit);
 		}
 	}
+
 }
 
 /**

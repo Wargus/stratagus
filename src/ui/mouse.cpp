@@ -1028,7 +1028,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			CMapField &mf = *Map.Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (mf.playerInfo.IsExplored(Players[i])
-					&& (i == ThisPlayer->Index || Players[i].HasMutualSharedVisionWith(*ThisPlayer))) {
+					&& (i == ThisPlayer->Index || Players[i].HasSharedVisionWith(*ThisPlayer))) {
 					show = true;
 					break;
 				}

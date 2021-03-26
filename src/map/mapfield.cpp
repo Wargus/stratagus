@@ -290,12 +290,10 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 		maxVision = 1;
 	}
 	
-	for (const int i : player.GetSharedVision()) {
-		if (Players[i].HasSharedVisionWith(player.Index)) { //if the shared vision is mutual
-			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
-			if (maxVision >= 2) {
-				return 2;
-			}
+	for (const uint8_t p : player.GetSharedVision()) {
+		maxVision = std::max<uint8_t>(maxVision, this->Visible[p]);
+		if (maxVision >= 2) {
+			return 2;
 		}
 	}
 

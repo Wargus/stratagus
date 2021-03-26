@@ -1711,11 +1711,9 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	if (this->VisCount[player.Index]) {
 		return true;
 	}
-	for (const int p : player.GetSharedVision()) {
+	for (const uint8_t p : player.GetSharedVision()) {
 		if (this->VisCount[p]) {
-			if (Players[p].HasSharedVisionWith(player.Index)) {	//if the shared vision is mutual	
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -3342,46 +3340,6 @@ bool CUnit::IsAllied(const CPlayer &player) const
 bool CUnit::IsAllied(const CUnit &unit) const
 {
 	return IsAllied(*unit.Player);
-}
-
-/**
-**  Check if unit shares vision with the player
-**
-**  @param x  Player to check
-*/
-bool CUnit::HasSharedVisionWith(const CPlayer &player) const
-{
-	return this->Player->HasSharedVisionWith(player);
-}
-
-/**
-**  Check if the unit shares vision with the unit
-**
-**  @param x  Unit to check
-*/
-bool CUnit::HasSharedVisionWith(const CUnit &unit) const
-{
-	return this->HasSharedVisionWith(*unit.Player);
-}
-
-/**
-**  Check if both players share vision
-**
-**  @param x  Player to check
-*/
-bool CUnit::HasMutualSharedVisionWith(const CPlayer &player) const
-{
-	return this->Player->HasMutualSharedVisionWith(player);
-}
-
-/**
-**  Check if both units share vision
-**
-**  @param x  Unit to check
-*/
-bool CUnit::HasMutualSharedVisionWith(const CUnit &unit) const
-{
-	return this->HasMutualSharedVisionWith(*unit.Player);
 }
 
 /**

@@ -193,7 +193,7 @@ public:
 	inline bool IsInvisibile(const CPlayer &player) const
 	{
 		return (&player != Player && Variable[INVISIBLE_INDEX].Value > 0
-				&& !player.HasMutualSharedVisionWith(*Player));
+				&& !Player->HasSharedVisionWith(player));
 	}
 
 	/**
@@ -268,10 +268,6 @@ public:
 	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
-	bool HasSharedVisionWith(const CPlayer &player) const;
-	bool HasSharedVisionWith(const CUnit &unit) const;
-	bool HasMutualSharedVisionWith(const CPlayer &player) const;
-	bool HasMutualSharedVisionWith(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 

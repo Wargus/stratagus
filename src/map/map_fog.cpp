@@ -144,7 +144,7 @@ public:
 			if (!unit->VisCount[p]) {
 				for (int pi = 0; pi < PlayerMax; ++pi) {
 					if ((pi == p /*player->Index*/)
-						|| player->HasMutualSharedVisionWith(Players[pi])) { 
+						|| player->HasSharedVisionWith(Players[pi])) { 
 						if (!unit->IsVisible(Players[pi])) {
 							UnitGoesOutOfFog(*unit, Players[pi]);
 						}
@@ -171,7 +171,7 @@ public:
 			if (!unit->VisCount[p]) {
 				for (int pi = 0; pi < PlayerMax; ++pi) {
 					if (pi == p/*player->Index*/ ||
-						player->HasMutualSharedVisionWith(Players[pi])) {
+						player->HasSharedVisionWith(Players[pi])) {
 						if (!unit->IsVisible(Players[pi])) {
 							UnitGoesUnderFog(*unit, Players[pi]);
 						}
