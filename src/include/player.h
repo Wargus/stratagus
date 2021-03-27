@@ -254,6 +254,10 @@ public:
 	{
 		return this->HasVisionFrom;
 	}
+	const std::set<uint8_t> &GetGaveVisionTo() const
+	{
+		return this->GaveVisionTo;
+	}
 	bool HasSharedVisionWith(const CPlayer &player) const
 	{
 		return (this->GaveVisionTo.find(player.Index) != this->GaveVisionTo.end());

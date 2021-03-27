@@ -136,19 +136,17 @@ public:
 		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
 			return ;
 		}
-		const int p = player->Index;
+		const uint8_t p = this->player->Index;
 		if (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that
 			//  this player shares vision with, and can't YET see the unit.
 			//  It will be able to see the unit after the Unit->VisCount ++
 			if (!unit->VisCount[p]) {
-				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if ((pi == p /*player->Index*/)
-						|| player->HasSharedVisionWith(Players[pi])) { 
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesOutOfFog(*unit, Players[pi]);
-						}
-					}
+				UnitGoesOutOfFog(*unit, *this->player);
+				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
+					if (!unit->IsVisible(Players[pi])) {
+						UnitGoesOutOfFog(*unit, Players[pi]);
+					} 
 				}
 			}
 			unit->VisCount[p/*player->Index*/]++;
@@ -174,13 +172,11 @@ public:
 			//  every player that this player shares vision to can see the unit.
 			//  Now we have to check who can't see the unit anymore.
 			if (!unit->VisCount[p]) {
-				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if (pi == p/*player->Index*/ ||
-						player->HasSharedVisionWith(Players[pi])) {
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesUnderFog(*unit, Players[pi]);
-						}
-					}
+				UnitGoesUnderFog(*unit, *this->player);
+				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
+					if (!unit->IsVisible(Players[pi])) {
+						UnitGoesUnderFog(*unit, Players[pi]);
+					} 
 				}
 			}
 		}
