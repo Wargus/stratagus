@@ -162,7 +162,12 @@ public:
 				return;
 			}
 
-			Assert(unit->VisCount[p]);
+			/// This could happen if shadow caster type of field of view is enabled, 
+			/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
+			if(!unit->VisCount[p]) {
+				return;
+			}
+
 			unit->VisCount[p]--;
 			//  If the unit goes under of fog, this can happen for any player that
 			//  this player shares vision to. First of all, before unmarking,
