@@ -10,7 +10,7 @@
 //
 /**@name fov.cpp - The field of view handling. */
 //
-//      (c) Copyright 2001-2020 by Joris Dauphin, JLutz Sammer,
+//      (c) Copyright 2001-2021 by Joris Dauphin, JLutz Sammer,
 //		Vladi Shabanski, Russell Smith, Jimmy Salmon, Pali Rohár, Andrettin
 //      and Alyokhin
 //
@@ -123,10 +123,11 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
-			OpaqueFields &= ~(MapFieldRocks); /// because rocks-flag used as obstacle for ranged attackers
+			OpaqueFields &= ~(MapFieldRocks); /// because of rocks-flag is used as an obstacle for ranged attackers
 		}
-		InitShadowCaster(&player, &unit, marker);
+		PrepareShadowCaster(player, unit, pos, marker);
 		ProceedShadowCasting(pos, width, height, range + 1);
+		MarkMapTiles();
 		ResetShadowCaster();
 	} else {
 		ProceedSimpleRadial(player, pos, width, height, range, marker);
@@ -219,7 +220,7 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 		for (short x = spectatorPos.x + 1; x < spectatorPos.x + width - 1; x++) {
 			for (short y = spectatorPos.y + 1; y < spectatorPos.y + height - 1; y++) {
 				if (SetCurrentTile(x, y)) {
-					SetVisible();
+					MarkTile();
 				}
 			}
 		}
@@ -286,7 +287,7 @@ void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const
 		for (short row = 0; row < range; row++) {
 			const bool isOnMap = SetCurrentTile(col, row);
 			if (isOnMap) {
-				SetVisible();
+				MarkTile();
 			} 
 			if (!isOnMap || IsTileOpaque()) { break; }
 		}
@@ -339,7 +340,7 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec
 		const bool inRange = square(col) + square(row) < square(range);
 		const bool isOnMap = SetCurrentTile(col, row);
 		if (inRange && isOnMap) {
-			SetVisible();
+			MarkTile();
 		}
 		const bool isTileOpaque = !inRange || !isOnMap || IsTileOpaque();
 		if (wasLastTileOpaque != cInit) {
@@ -388,26 +389,25 @@ short CFieldOfView::CalcRow_ByVector(const bool isTop, const short col, const Ve
 	return row;
 }
 
-/**
-**  Init ShadowCaster for current refreshing of FoV
-**
-**  @param player	Player to mark the sight for
-**	@param unit		Unit to mark the sight for
-**	@param setFoV	Function to mark or unmark sight
-*/
-void CFieldOfView::InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV)
+void CFieldOfView::PrepareShadowCaster(const CPlayer &player, const CUnit &unit, const Vec2i &pos, MapMarkerFunc *marker)
 {
-	Player 		= player;
-	Unit 		= unit;
-	map_setFoV 	= setFoV;
+	Player 		= &player;
+	Unit 		= &unit;
+	map_setFoV 	= marker;
+	 
+	if (!TilesToMark.empty()) {
+		TilesToMark.clear();
+	}
 }
 
 void CFieldOfView::ResetShadowCaster()
 {
-	Player 			= nullptr;
-	Unit 			= nullptr;
-	map_setFoV 		= nullptr;
-	currTilePos 	= {0, 0};
+	Player 		= nullptr;
+	Unit 		= nullptr;
+	map_setFoV 	= nullptr;
+	currTilePos = { 0, 0 };
+	
+	TilesToMark.clear();
 
 	ResetEnvironment();
 }
@@ -426,7 +426,7 @@ void CFieldOfView::SetEnvironment(const char octant, const Vec2i &origin)
 
 void CFieldOfView::ResetEnvironment()
 {
-	Origin 		= {0, 0};
+	Origin 		= { 0, 0 };
 	currOctant 	= 0;
 }
 

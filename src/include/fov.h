@@ -10,7 +10,7 @@
 //
 /**@name fov.h - The field of view header file. */
 //
-//      (c) Copyright 2020 by Alyokhin
+//      (c) Copyright 2020-2021 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 
 #include <functional>
 #include <queue>
+#include <set>
 #include "vec2i.h"
 #include "map.h"
 #include "tileset.h"
@@ -51,12 +52,10 @@ public:
 		Settings.FoV_Type      = FieldOfViewTypes::cSimpleRadial;
 		Settings.OpaqueFields  = MapFieldOpaque;
 	}
+	
 	/// Refresh field of view
 	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
 				const short height, const short range, MapMarkerFunc *marker);
-	/** FIXME: change to this call:
-	** void Refresh(const CPlayer &player, const CUnit &unit, MapMarkerFunc *marker);
-	*/
 
 	bool SetType(const FieldOfViewTypes fov_type);
 	FieldOfViewTypes GetType() const;
@@ -96,11 +95,12 @@ private:
 	bool SetCurrentTile(const short col, const short row);
 	/// Check if current MapTile opaque
 	bool IsTileOpaque() const;
-	/// Mark current MapTile visible
-	void SetVisible() const;
+	/// Mark current MapTile
+	void MarkTile();
+	void MarkMapTiles() const;
 
-	/// Init ShadowCaster for current refreshing of FoV
-	void InitShadowCaster(const CPlayer *player, const CUnit *unit, MapMarkerFunc *setFoV);
+	/// Setup ShadowCaster for current refreshing of FoV
+	void PrepareShadowCaster(const CPlayer &player, const CUnit &unit, const Vec2i &pos, MapMarkerFunc *marker);
 	void ResetShadowCaster();
 	/// Update values of Octant and Origin for current working set
 	void SetEnvironment(const char octant, const Vec2i &origin);
@@ -122,11 +122,18 @@ private:
 	const CPlayer   *Player;			/// Pointer to player to set FoV for
 	const CUnit     *Unit;				/// Pointer to unit to calculate FoV for
 	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+
+	std::set<size_t> TilesToMark;		/// To prevent multiple calls of map_setFoV for single tile (for tiles on the vertical,
+										/// horizontal and diagonal lines it calls twise) we store indexes of tiles to mark in the this set.
+										/// Then call map_setFoV once for all tiles from set.
+
 };
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+extern CFieldOfView FieldOfView;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -149,9 +156,16 @@ inline bool CFieldOfView::IsTileOpaque() const
 	return (Map.Field(currTilePos.x, currTilePos.y)->Flags & OpaqueFields);
 }
 
-inline void CFieldOfView::SetVisible() const
+inline void CFieldOfView::MarkTile()
 {
-	map_setFoV(*Player, Map.getIndex(currTilePos.x, currTilePos.y));
+	TilesToMark.insert(Map.getIndex(currTilePos.x, currTilePos.y));
+}
+
+inline void CFieldOfView::MarkMapTiles() const
+{
+	for (const size_t index : TilesToMark) {
+		map_setFoV(*Player, index);		
+	}
 }
 
 inline void CFieldOfView::ProjectCurrentTile(const short col, const short row)
