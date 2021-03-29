@@ -918,26 +918,21 @@ void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 	CPlayer *player = &Players[playerIndex];
 	CPlayer *opponent = &Players[opponentIndex];
 
-	// Compute Before.
-	const bool before = player->HasSharedVisionWith(*opponent);
-	if (state == before || opponent->Type == PlayerNobody 
-						|| player->Type == PlayerNobody) {
+	if (state == player->HasSharedVisionWith(*opponent) || opponent->Type == PlayerNobody 
+														|| player->Type == PlayerNobody) {
 		return;
+	}
+
+	// Do a real hardcore seen recount. First we unmark sight for all units of the player.
+	for (CUnit *const unit : player->GetUnits()) {
+		if (!unit->Destroyed) {
+			MapUnmarkUnitSight(*unit);
+		}
 	}
 	
 	if (state == false) {
-		// Do a real hardcore seen recount. First we unmark sight for all units of the player.
-		for (CUnit *const unit : player->GetUnits()) {
-			if (!unit->Destroyed) {
-				MapUnmarkUnitSight(*unit);
-			}
-		}
 		player->UnshareVisionWith(*opponent);
-	} else {
-		player->ShareVisionWith(*opponent);
-	}
 
-	if (before && !state) {
 		// Don't share vision anymore. Give explored terrain for good-bye.
 		const size_t fieldsNum = Map.Info.MapWidth * Map.Info.MapHeight;
 		for (size_t i = 0; i != fieldsNum; ++i) {
@@ -946,12 +941,16 @@ void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 
 			if (mfp.Visible[playerIndex] && !mfp.Visible[opponentIndex]) {
 				mfp.Visible[opponentIndex] = 1;
+				/// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
 				if (opponent == ThisPlayer) {
 					Map.MarkSeenTile(mf);
 				}
 			}
 		}
+	} else {
+		player->ShareVisionWith(*opponent);
 	}
+
 	// Do a real hardcore seen recount. Now we remark sight for all units of the player
 	for (CUnit *const unit : player->GetUnits()) {
 		if (!unit->Destroyed) {
