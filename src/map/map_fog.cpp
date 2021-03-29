@@ -265,6 +265,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 				UnitsOnTileUnmarkSeen(player, mf, 0);
 			}
 			// Check visible Tile, then deduct...
+			/// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
 			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 				Map.MarkSeenTile(mf);
 			}

@@ -796,7 +796,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param width   Width of the first container of unit.
 **  @param height  Height of the first container of unit.
 **  @param f       Function to (un)mark for normal vision.
-**  @param f2        Function to (un)mark for cloaking vision.
+**  @param f2      Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
 								MapMarkerFunc *f, MapMarkerFunc *f2)

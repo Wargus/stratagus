@@ -173,9 +173,9 @@ void CFogOfWar::GenerateFog()
             uint8_t &visCell = VisTable[visIndex + col];
             visCell = 0; /// Clear it before check for players
             const CMapField *mapField = Map.Field(mapIndex + col);
-
+            /// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
             for (const uint8_t player : VisionFor) {
-                visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]);
+                visCell = std::max<uint8_t>(visCell, mapField->playerInfo.TeamVisibilityState(Players[player])); // Visible[player]);
                 if (visCell >= 2) {
                     visCell = 2;
                     break;

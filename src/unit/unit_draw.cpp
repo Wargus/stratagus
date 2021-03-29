@@ -832,7 +832,7 @@ void CUnit::Draw(const CViewport &vp) const
 	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;
 	}
-
+	/// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
 	bool IsVisible = this->IsVisible(*ThisPlayer);
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
