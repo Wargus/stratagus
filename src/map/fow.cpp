@@ -339,55 +339,6 @@ void CFogOfWar::FogUpscale4x4()
 }
 
 /**
-**  Determine upscale patterns (index in the upscale table) for Visible and Explored layers
-**
-**  @param  index       tile in the vision table 
-**  @param  visFlag     layer to determine pattern for
-**
-*/
-inline uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t visFlag) const
-{
-    Assert(visFlag == VisionType::cVisible || visFlag == (VisionType::cExplored | VisionType::cVisible));
-
-    uint8_t n1, n2, n3, n4;
-    size_t offset = index;
-
-    n1 = (visFlag & VisTable[offset]);
-    n2 = (visFlag & VisTable[offset + 1]);
-    offset += VisTableWidth;
-    n3 = (visFlag & VisTable[offset]);
-    n4 = (visFlag & VisTable[offset + 1]);
-    
-    n1 >>= n1 - VisionType::cExplored;
-    n2 >>= n2 - VisionType::cExplored;
-    n3 >>= n3 - VisionType::cExplored;
-    n4 >>= n4 - VisionType::cExplored;
-    
-    return ( (n1 << 3) | (n2 << 2) | (n3 << 1) | n4 );
-}
-
-
-/**
-**  Fill 4x4 sized tile in the fog texture according to the patterns
-**
-**  @param  texture         pointer to the texture to fill
-**  @param  textureWidth    width of the texture
-**  @param  index           index of the tile to fill
-**  @param  patternVisible  index int the upscale table for Visible layer
-**  @param  patternExplored index int the upscale table for Explored layer
-**
-*/
-inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
-                                const uint8_t patternVisible, const uint8_t patternExplored) const
-{
-    for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
-        texture[index] = UpscaleTable[patternVisible][scan_line] + UpscaleTable[patternExplored][scan_line];
-        index += textureWidth;
-    }
-}
-
-
-/**
 ** Bilinear zoom Fog Of War texture into SDL surface
 ** 
 **  @param src          Image src.
