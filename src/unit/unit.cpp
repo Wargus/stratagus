@@ -2582,8 +2582,8 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
-	// FIXME: Add alwaysThreat property to CUnitType
-	// Unit can attack back.
+	/// FIXME: Add alwaysThreat property to CUnitType
+	/// Unit can attack back.
 	if (CanTarget(dtype, type) || dtype.BoolFlag[ALWAYSTHREAT_INDEX].value) {
 		priority |= AT_THREAT_FACTOR;
 	}
@@ -2641,8 +2641,7 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 }
 
 /**
-**  Returns true, if target is in attack range of the unit and there is no obstacles between them (when inside caves)
-**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**  Returns true, if target is in attack range of the unit and there are no obstacles between them (when inside caves)
 **
 **  @param unit    Unit to check for.
 **  @param target  Checked target.
@@ -2654,7 +2653,8 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 	Assert(&target != NULL);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
-	const int distance 	= unit.MapDistanceTo(target);
+	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target) 
+										 : unit.MapDistanceTo(target);
 
 	return (minRange <= distance && distance <= range)
 		   && (!GameSettings.Inside
@@ -2662,8 +2662,7 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 }
 
 /**
-**  Returns true, if tile is in attack range of the unit and there is no obstacles between them (when inside caves)
-**  @todo: Do we have to check range from unit.Container pos if unit is bunkered or in transport?
+**  Returns true, if tile is in attack range of the unit and there are no obstacles between them (when inside caves)
 **
 **  @param unit    Unit to check for.
 **  @param pos     Checked position.
@@ -2675,7 +2674,8 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 	Assert(Map.Info.IsPointOnMap(tilePos));
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
-	const int distance 	= unit.MapDistanceTo(tilePos);
+	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(tilePos)
+										 : unit.MapDistanceTo(tilePos);
 
 	return (minRange <= distance && distance <= range)
 		   && (!GameSettings.Inside
@@ -2687,7 +2687,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 **  Returns end position of randomly generated vector form srcPos in direction to/from dirUnit
 **	
 **  @param srcPos   Vector origin
-**  @param dirUnit   Position to determine vector direction
+**  @param dirUnit  Position to determine vector direction
 **	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
 **  @param minRange Minimal range to new position
 **	@param devRadius Diviation radius
