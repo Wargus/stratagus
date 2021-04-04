@@ -183,7 +183,10 @@ public:
 	std::vector<CUnit *>::iterator UnitBegin();
 	std::vector<CUnit *>::const_iterator UnitEnd() const;
 	std::vector<CUnit *>::iterator UnitEnd();
-
+	
+	const std::vector<CUnit *> &GetUnits() const {
+		return this->Units;
+	}
 	CUnit &GetUnit(int index) const;
 	int GetUnitCount() const;
 
