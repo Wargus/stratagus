@@ -82,12 +82,8 @@
 			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
-			} else if (mf.isAWall()) {
-				Map.RemoveWall(ipos);
-			} else if (mf.RockOnMap()) {
-				Map.ClearRockTile(ipos);
-			} else if (mf.ForestOnMap()) {
-				Map.ClearWoodTile(ipos);
+			} else if (mf.isAWall() || mf.RockOnMap() || mf.ForestOnMap()) {
+				Map.ClearTile(ipos);
 			}
 		}
 	}

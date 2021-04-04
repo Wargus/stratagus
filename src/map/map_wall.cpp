@@ -37,6 +37,7 @@
 
 #include "stratagus.h"
 #include "map.h"
+#include "fov.h"
 #include "tileset.h"
 #include "ui.h"
 #include "player.h"
@@ -241,6 +242,12 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 {
 	CMapField &mf = *Field(pos);
 
+	/// Refresh vision of nearby units in case is walls are set as opaque field
+	const bool isOpaque = FieldOfView.GetOpaqueFields() & MapFieldWall;
+	if (isOpaque) {
+		MapRefreshUnitsSightAroundTile(pos, true);
+	}
+
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
 		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
@@ -252,6 +259,11 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	UI.Minimap.UpdateXY(pos);
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
+	
+	/// Refresh vision of nearby units in case is walls are set as opaque field
+	if (isOpaque) {
+		MapRefreshUnitsSightAroundTile(pos);
+	}
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
@@ -270,7 +282,8 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage)
 	const unsigned v = this->Field(pos)->Value;
 
 	if (v <= damage) {
-		RemoveWall(pos);
+		//RemoveWall(pos);
+		ClearTile(pos);
 	} else {
 		this->Field(pos)->Value = v - damage;
 		MapFixWallTile(pos);

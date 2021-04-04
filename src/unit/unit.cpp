@@ -892,6 +892,39 @@ void MapUnmarkUnitSight(CUnit &unit)
 }
 
 /**
+**  Mark/Unmark on vision table the Sight for the units 
+**  around the tilePos
+**  (and units inside for transporter)
+**
+**  @param tilePos    Position of the tile around which to update units vision for
+**  @param resetSight Unmark sight if True, Mark otherwise
+**
+**  @see MapUnmarkUnitSight/MapMarkUnitSight
+*/
+void MapRefreshUnitsSightAroundTile(const Vec2i &tilePos, const bool resetSight /*= false*/)
+{
+	const CMapField *mapField = Map.Field(tilePos);
+	for (const CPlayer &player : Players) {
+		if(!mapField->playerInfo.Visible[player.Index]) {
+			continue;
+		}
+		for (CUnit *const unit : player.GetUnits()) {
+			if (!unit->Destroyed) {
+				const auto dist = unit->Container ? unit->Container->MapDistanceTo(tilePos) 
+												  : unit->MapDistanceTo(tilePos);
+				if (dist <= unit->CurrentSightRange) {
+					if (resetSight) {
+						MapUnmarkUnitSight(*unit);
+					} else {
+						MapMarkUnitSight(*unit);
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
 **  Update the Unit Current sight range to good value and transported units inside.
 **
 **  @param unit  unit to update SightRange

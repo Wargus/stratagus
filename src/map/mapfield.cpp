@@ -37,6 +37,7 @@
 
 #include "tile.h"
 
+#include "fov.h"
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
@@ -206,6 +207,17 @@ void CMapField::parse(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+}
+
+/**
+** Check if a field is opaque
+** We check not only MapFieldOpaque flag because some field types (f.e. forest/rock/wall) 
+** may be set in the FieldOfView as opaque as well.
+*/
+bool CMapField::isOpaque() const
+{
+	return (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting 
+			&& FieldOfView.GetOpaqueFields() & this->Flags);
 }
 
 /// Check if a field flags.

@@ -516,6 +516,35 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 	}
 }
 
+
+/**
+**  Remove Wood, Rock or Wall tile from the map
+**  It checks if field is opaque and recalc vision for nearby units
+**
+**  @param tilePos   Map tile-position.
+*/
+void CMap::ClearTile(const Vec2i &tilePos)
+{
+	Assert(Map.Info.IsPointOnMap(tilePos));
+	
+	CMapField &mapField = *this->Field(tilePos);
+
+	const bool isOpaque = Map.Field(tilePos)->isOpaque();
+	if (isOpaque) {
+		MapRefreshUnitsSightAroundTile(tilePos, true);
+		mapField.Flags &= ~MapFieldOpaque;
+	}
+	if (mapField.ForestOnMap()) {
+		ClearWoodTile(tilePos);
+	} else if (mapField.RockOnMap()) {
+		ClearRockTile(tilePos);
+	} else if (mapField.isAWall()) {
+		RemoveWall(tilePos);
+	}
+	if (isOpaque) {
+		MapRefreshUnitsSightAroundTile(tilePos);
+	} 	
+}
 /// Remove wood from the map.
 void CMap::ClearWoodTile(const Vec2i &pos)
 {

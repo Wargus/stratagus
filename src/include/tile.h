@@ -195,6 +195,9 @@ public:
 
 	unsigned int getGraphicTile() const { return tile; }
 
+	/// Check if a field is opaque for field of view
+	bool isOpaque() const;
+
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 

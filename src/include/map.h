@@ -184,10 +184,8 @@ public:
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar();
 
-	/// Remove wood from the map.
-	void ClearWoodTile(const Vec2i &pos);
-	/// Remove rock from the map.
-	void ClearRockTile(const Vec2i &pos);
+	/// Remove wood, rock or wall from the map and update nearby unit's vision if needed
+	void ClearTile(const Vec2i &tilePos);
 
 	/// convert map pixelpos coordonates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
@@ -246,6 +244,11 @@ public:
 private:
 	/// Build tables for fog of war
 	void InitFogOfWar();
+
+	/// Remove wood from the map.
+	void ClearWoodTile(const Vec2i &pos);
+	/// Remove rock from the map.
+	void ClearRockTile(const Vec2i &pos);
 
 	/// Correct the surrounding seen wood fields
 	void FixNeighbors(unsigned short type, int seen, const Vec2i &pos);
@@ -376,12 +379,14 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 extern void PreprocessMap();
 
 // in unit.c
+//typedef void MapClearField(const Vec2i &tilePos);
 
 /// Mark on vision table the Sight of the unit.
 void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
 void MapUnmarkUnitSight(CUnit &unit);
-
+///Mark/Unmark on vision table the Sight for the units around the tilePos
+void MapRefreshUnitsSightAroundTile(const Vec2i &tilePos, const bool resetSight = false);
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
