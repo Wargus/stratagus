@@ -61,7 +61,7 @@ int FogOfWarOpacity;				/// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;
 
-CGraphic *CMap::FogGraphic;
+CGraphic *CMap::LegacyFogGraphic { nullptr };
 
 /**
 **  Mapping for fog of war tiles.
@@ -543,7 +543,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (blackFogTile) {
-		Map.FogGraphic->DrawFrameClip(blackFogTile, dx, dy);
+		Map.LegacyFogGraphic->DrawFrameClip(blackFogTile, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
@@ -562,18 +562,21 @@ void CViewport::DrawMapFogOfWar()
 
 	switch (FogOfWar.GetType()) {
 		case FogOfWarTypes::cLegacy:
-		
+			/// Auto clean texture for enhanced fog. For cases when fog type was changed "on the fly"
+			if (this->EnhFogSurface) {
+				CleanEnhFog();
+			}
 			this->DrawLegacyFogOfWar();
 			break;
 		
 		case FogOfWarTypes::cEnhanced: 
 
-			if (!FogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
-								  / PixelTileSize.x + 2) 
-								  * PixelTileSize.x != FogSurface->w 
-								|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
-									/ PixelTileSize.y + 2) 
-									* PixelTileSize.y != FogSurface->h) ) {
+			if (!this->EnhFogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
+											/ PixelTileSize.x + 2) 
+											* PixelTileSize.x != this->EnhFogSurface->w 
+										|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
+											/ PixelTileSize.y + 2) 
+											* PixelTileSize.y != this->EnhFogSurface->h) ) {
           		this->AdjustFogSurface();
     		}
 			this->DrawEnhancedFogOfWar(); 
@@ -634,7 +637,7 @@ void CViewport::DrawLegacyFogOfWar() const
 void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 {
 
- 	FogOfWar.GetFogForViewport(*this, FogSurface);
+ 	FogOfWar.GetFogForViewport(*this, this->EnhFogSurface);
 
 	if (isSoftwareRender) {
 		SDL_Rect screenRect;
@@ -650,10 +653,10 @@ void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 		fogRect.h = screenRect.h;
 
 		/// As a single-threaded alternative:
-		// SDL_BlitSurface(FogSurface, &fogRect, TheScreen, &screenRect);
+		// SDL_BlitSurface(this->EnhFogSurface, &fogRect, TheScreen, &screenRect);
 
 		/// Alpha blending of the fog texture into the screen
-		uint32_t *const fog    = static_cast<uint32_t *>(FogSurface->pixels);
+		uint32_t *const fog    = static_cast<uint32_t *>(this->EnhFogSurface->pixels);
 		uint32_t *const screen = static_cast<uint32_t *>(TheScreen->pixels);
 		const CColor fogColor = FogOfWar.GetFogColor();
 		const uint8_t fogR = fogColor.R;
@@ -668,7 +671,7 @@ void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 			const uint16_t lBound = (thisThread    ) * screenRect.h / numOfThreads; 
 			const uint16_t uBound = (thisThread + 1) * screenRect.h / numOfThreads; 
 
-			size_t fogIndex = (fogRect.y    + lBound) * FogSurface->w + fogRect.x;
+			size_t fogIndex = (fogRect.y    + lBound) * this->EnhFogSurface->w + fogRect.x;
 			size_t scrIndex = (screenRect.y + lBound) * TheScreen->w + screenRect.x;
 			
 			for (uint16_t y = lBound; y < uBound; y++) {
@@ -692,7 +695,7 @@ void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 						scrPixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
 					}
 				}
-				fogIndex += FogSurface->w;
+				fogIndex += this->EnhFogSurface->w;
 				scrIndex += TheScreen->w;
 			}
 		} /// pragma omp parallel
@@ -708,9 +711,8 @@ void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 */
 void CViewport::AdjustFogSurface()
 {
- 	SDL_FreeSurface(FogSurface); /// It is safe to pass NULL to this function.
-	FogSurface = nullptr;
-	
+	this->CleanEnhFog();
+
     const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x) 
 									/ PixelTileSize.x + 2) 
 									* PixelTileSize.x;  /// +2 because of Offset.x
@@ -718,28 +720,34 @@ void CViewport::AdjustFogSurface()
 									/ PixelTileSize.y + 2) 
 									* PixelTileSize.y; /// +2 because of Offset.y
     
-    FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
+    this->EnhFogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
                                                      surfaceHeight,
                                                      32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(FogSurface, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceBlendMode(this->EnhFogSurface, SDL_BLENDMODE_BLEND);
 	
-	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | ((uint32_t)0xFF << ASHIFT);
+	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 
-	SDL_FillRect(FogSurface, NULL, fogColorSolid);
+	SDL_FillRect(this->EnhFogSurface, NULL, fogColorSolid);
 }
-
 
 void CViewport::Clean()
 {
-	SDL_FreeSurface(this->FogSurface);
-	this->FogSurface = nullptr;
+	if (this->EnhFogSurface) {
+		CleanEnhFog();
+	}
+}
+
+void CViewport::CleanEnhFog()
+{
+	SDL_FreeSurface(this->EnhFogSurface);
+	this->EnhFogSurface = nullptr;
 }
 
 /**
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void CMap::InitFogOfWar()
+void CMap::InitLegacyFogOfWar()
 {
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
@@ -747,7 +755,7 @@ void CMap::InitFogOfWar()
 	Uint8 r, g, b;
 	SDL_Surface *s;
 
-	FogGraphic->Load();
+	LegacyFogGraphic->Load();
 
 	//
 	// Generate Only Fog surface.
@@ -763,23 +771,23 @@ void CMap::InitFogOfWar()
 	//
 	// Generate Alpha Fog surface.
 	//
-	if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_ConvertSurfaceFormat(FogGraphic->Surface, SDL_PIXELFORMAT_RGBA8888, 0);
+	if (LegacyFogGraphic->Surface->format->BytesPerPixel == 1) {
+		s = SDL_ConvertSurfaceFormat(LegacyFogGraphic->Surface, SDL_PIXELFORMAT_RGBA8888, 0);
 		SDL_SetSurfaceAlphaMod(s, FogOfWarOpacity);
 	} else {
 		// Copy the top row to a new surface
-		SDL_PixelFormat *f = FogGraphic->Surface->format;
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
+		SDL_PixelFormat *f = LegacyFogGraphic->Surface->format;
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, LegacyFogGraphic->Surface->w, PixelTileSize.y,
 								 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 		SDL_LockSurface(s);
-		SDL_LockSurface(FogGraphic->Surface);
+		SDL_LockSurface(LegacyFogGraphic->Surface);
 		for (int i = 0; i < s->h; ++i) {
 			memcpy(reinterpret_cast<Uint8 *>(s->pixels) + i * s->pitch,
-				   reinterpret_cast<Uint8 *>(FogGraphic->Surface->pixels) + i * FogGraphic->Surface->pitch,
-				   FogGraphic->Surface->w * f->BytesPerPixel);
+				   reinterpret_cast<Uint8 *>(LegacyFogGraphic->Surface->pixels) + i * LegacyFogGraphic->Surface->pitch,
+				   LegacyFogGraphic->Surface->w * f->BytesPerPixel);
 		}
 		SDL_UnlockSurface(s);
-		SDL_UnlockSurface(FogGraphic->Surface);
+		SDL_UnlockSurface(LegacyFogGraphic->Surface);
 
 		// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 		SDL_LockSurface(s);
@@ -815,20 +823,20 @@ void CMap::InitFogOfWar()
 **  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
 **  It's safe to call this for both types of FOW. 
 */
-void CMap::CleanFogOfWar()
+void CMap::CleanLegacyFogOfWar()
 {
 	VisibleTable.clear();
 
-	CGraphic::Free(Map.FogGraphic);
-	FogGraphic = NULL;
+	CGraphic::Free(Map.LegacyFogGraphic);
+	LegacyFogGraphic = nullptr;
 
 	if (OnlyFogSurface) {
 		VideoPaletteListRemove(OnlyFogSurface);
 		SDL_FreeSurface(OnlyFogSurface);
-		OnlyFogSurface = NULL;
+		OnlyFogSurface = nullptr;
 	}
 	CGraphic::Free(AlphaFogG);
-	AlphaFogG = NULL;
+	AlphaFogG = nullptr;
 }
 
 //@}

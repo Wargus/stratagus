@@ -121,8 +121,22 @@ void CFogOfWar::Clean()
 */
 bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 {
-	if (fowType < FogOfWarTypes::cNumOfTypes) {
-		Settings.FOW_Type = fowType;
+	if (fowType < FogOfWarTypes::cNumOfTypes && fowType != Settings.FOW_Type) {
+        if (Map.isInitialized()) {
+            switch (fowType) {
+                case FogOfWarTypes::cLegacy:
+                    this->Clean();
+                    Map.InitLegacyFogOfWar();
+                    break;
+                case FogOfWarTypes::cEnhanced:
+                    Map.CleanLegacyFogOfWar();
+                    this->Init();
+                    break;
+                default:
+                    break;
+            }
+        }
+    	Settings.FOW_Type = fowType;
 		return true;
 	} else {
 		return false;

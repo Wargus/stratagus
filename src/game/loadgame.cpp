@@ -100,7 +100,6 @@ void CleanModules()
 	CleanButtons();
 	CleanMissileTypes();
 	Map.Clean();
-	Map.CleanFogOfWar();
 	CParticleManager::exit();
 	CleanReplayLog();
 	CleanSpells();

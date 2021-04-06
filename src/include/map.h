@@ -175,14 +175,21 @@ public:
 		return Field(pos.x, pos.y);
 	}
 
+	bool isInitialized() const
+	{
+		return this->isMapInitialized;
+	}
+
 	/// Alocate and initialise map table.
 	void Create();
 	/// Build tables for map
 	void Init();
+	/// Build tables for fog of war
+	void InitLegacyFogOfWar();
 	/// Clean the map
 	void Clean();
 	/// Cleanup memory for fog of war tables
-	void CleanFogOfWar();
+	void CleanLegacyFogOfWar();
 
 	/// Remove wood, rock or wall from the map and update nearby unit's vision if needed
 	void ClearTile(const Vec2i &tilePos);
@@ -242,9 +249,6 @@ public:
 	}
 
 private:
-	/// Build tables for fog of war
-	void InitFogOfWar();
-
 	/// Remove wood from the map.
 	void ClearWoodTile(const Vec2i &pos);
 	/// Remove rock from the map.
@@ -259,15 +263,16 @@ private:
 	void RegenerateForestTile(const Vec2i &pos);
 
 public:
-	CMapField *Fields;              /// fields on map
-	bool NoFogOfWar;           /// fog of war disabled
+	CMapField *Fields;              	/// fields on map
+	bool NoFogOfWar;           			/// fog of war disabled
 
-	CTileset *Tileset;          /// tileset data
-	std::string TileModelsFileName; /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;     /// graphic for all the tiles
-	static CGraphic *FogGraphic;      /// graphic for fog of war
+	CTileset *Tileset;          		/// tileset data
+	std::string TileModelsFileName; 	/// lua filename that loads all tilemodels
+	CGraphic *TileGraphic;     			/// graphic for all the tiles
+	static CGraphic *LegacyFogGraphic;  /// graphic for legacy fog of war
+	bool isMapInitialized { false };
 
-	CMapInfo Info;             /// descriptive information
+	CMapInfo Info;             			/// descriptive information
 };
 
 

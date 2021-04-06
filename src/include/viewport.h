@@ -116,6 +116,8 @@ private:
 	void DrawEnhancedFogOfWar(const bool isSoftwareRender = true);
 	/// Adjust fog of war surface to viewport
 	void AdjustFogSurface();
+	/// Clean enhanced fog of war texture
+	void CleanEnhFog();
 
 public:
 	//private:
@@ -130,7 +132,7 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	SDL_Surface *FogSurface {nullptr}; /// Fog of war texture. Viewport sized.
+	SDL_Surface *EnhFogSurface { nullptr }; /// Texture for enhanced fog of war. Viewport sized.
 
 };
 

@@ -336,10 +336,11 @@ void CMap::Create()
 void CMap::Init()
 {
 	switch (FogOfWar.GetType()) {
-		case FogOfWarTypes::cLegacy:   InitFogOfWar(); break;
+		case FogOfWarTypes::cLegacy:   InitLegacyFogOfWar(); break;
 		case FogOfWarTypes::cEnhanced: FogOfWar.Init(); break;
 		default: break;
 	}
+	this->isMapInitialized = true;
 }
 
 /**
@@ -366,13 +367,23 @@ void CMap::Clean()
 
 	FieldOfView.Clean();
 	
-	if (FogOfWar.GetType() == FogOfWarTypes::cEnhanced) {
-		FogOfWar.Clean();
-		
-		for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-			vp->Clean();
-		}
+	switch (FogOfWar.GetType()) {
+		case FogOfWarTypes::cLegacy:   
+			CleanLegacyFogOfWar(); 
+			break;
+		case FogOfWarTypes::cEnhanced: 
+			if (FogOfWar.GetType() == FogOfWarTypes::cEnhanced) {
+				FogOfWar.Clean();
+				for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+					vp->Clean();
+				}
+			}
+			break;
+		default: 
+			break;
 	}
+
+	this->isMapInitialized = false;
 }
 
 /**
