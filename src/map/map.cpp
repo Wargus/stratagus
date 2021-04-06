@@ -38,6 +38,7 @@
 
 #include "map.h"
 
+#include "fov.h"
 #include "iolib.h"
 #include "player.h"
 #include "tileset.h"
@@ -358,6 +359,8 @@ void CMap::Clean()
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
+
+	FieldOfView.Clean();
 }
 
 /**

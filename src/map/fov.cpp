@@ -126,8 +126,8 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 			OpaqueFields &= ~(MapFieldRocks); /// because of rocks-flag is used as an obstacle for ranged attackers
 		}
 		PrepareShadowCaster(player, unit, pos, marker);
+		PrepareCache(pos, width, height, range);
 		ProceedShadowCasting(pos, width, height, range + 1);
-		MarkMapTiles();
 		ResetShadowCaster();
 	} else {
 		ProceedSimpleRadial(player, pos, width, height, range, marker);
@@ -394,10 +394,6 @@ void CFieldOfView::PrepareShadowCaster(const CPlayer &player, const CUnit &unit,
 	Player 		= &player;
 	Unit 		= &unit;
 	map_setFoV 	= marker;
-	 
-	if (!TilesToMark.empty()) {
-		TilesToMark.clear();
-	}
 }
 
 void CFieldOfView::ResetShadowCaster()
@@ -406,10 +402,36 @@ void CFieldOfView::ResetShadowCaster()
 	Unit 		= nullptr;
 	map_setFoV 	= nullptr;
 	currTilePos = { 0, 0 };
-	
-	TilesToMark.clear();
 
 	ResetEnvironment();
+}
+
+void CFieldOfView::PrepareCache(const Vec2i pos, const short width, const short height, const short range)
+{
+	/// Init cache table if it's uninitialized yet
+	if (!MarkedTilesCache.size()) {
+		MarkedTilesCache.resize(Map.Info.MapWidth * Map.Info.MapWidth);
+		std::fill_n(MarkedTilesCache.begin(), MarkedTilesCache.size(), 0);
+	}
+	/// Clean cache for sight-sized frame
+	Vec2i upperLeft;
+	upperLeft.x = pos.x - range;
+	upperLeft.y = pos.y - range;
+	Map.Clamp(upperLeft);
+
+	Vec2i bottomRight;
+	bottomRight.x =  pos.x + width + range;
+	bottomRight.y =  pos.y + height + range;
+	Map.Clamp(bottomRight);
+
+	const uint16_t sightRecWidth = bottomRight.x - upperLeft.x;
+
+	size_t index = upperLeft.x + upperLeft.y * Map.Info.MapWidth;
+
+	for (uint16_t y = upperLeft.y; y < bottomRight.y; y++ ) {
+		std::fill_n(&MarkedTilesCache[index], sightRecWidth, 0);
+		index += Map.Info.MapWidth;
+	}
 }
 
 /**
