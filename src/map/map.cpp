@@ -346,7 +346,7 @@ void CMap::Init()
 /**
 **  Cleanup the map module.
 */
-void CMap::Clean()
+void CMap::Clean(const bool isHardClean /* = false*/)
 {
 	delete[] this->Fields;
 
@@ -369,7 +369,7 @@ void CMap::Clean()
 	
 	switch (FogOfWar.GetType()) {
 		case FogOfWarTypes::cLegacy:   
-			CleanLegacyFogOfWar(); 
+			CleanLegacyFogOfWar(isHardClean); 
 			break;
 		case FogOfWarTypes::cEnhanced: 
 			if (FogOfWar.GetType() == FogOfWarTypes::cEnhanced) {

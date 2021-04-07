@@ -823,20 +823,23 @@ void CMap::InitLegacyFogOfWar()
 **  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
 **  It's safe to call this for both types of FOW. 
 */
-void CMap::CleanLegacyFogOfWar()
+void CMap::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 {
 	VisibleTable.clear();
 
-	CGraphic::Free(Map.LegacyFogGraphic);
-	LegacyFogGraphic = nullptr;
-
+	if (isHardClean) {
+		CGraphic::Free(Map.LegacyFogGraphic);
+		LegacyFogGraphic = nullptr;
+	}
 	if (OnlyFogSurface) {
 		VideoPaletteListRemove(OnlyFogSurface);
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = nullptr;
 	}
-	CGraphic::Free(AlphaFogG);
-	AlphaFogG = nullptr;
+	if (AlphaFogG) {
+		CGraphic::Free(AlphaFogG);
+		AlphaFogG = nullptr;
+	}
 }
 
 //@}

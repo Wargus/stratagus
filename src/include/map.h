@@ -187,9 +187,9 @@ public:
 	/// Build tables for fog of war
 	void InitLegacyFogOfWar();
 	/// Clean the map
-	void Clean();
+	void Clean(const bool isHardClean = false);
 	/// Cleanup memory for fog of war tables
-	void CleanLegacyFogOfWar();
+	void CleanLegacyFogOfWar(const bool isHardClean = false);
 
 	/// Remove wood, rock or wall from the map and update nearby unit's vision if needed
 	void ClearTile(const Vec2i &tilePos);
