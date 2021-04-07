@@ -313,7 +313,12 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
 	CMapField &mf = *Map.Field(index);
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
-	Assert(*v != 0);
+	///Assert(*v != 0);
+	/// This could happen if shadow caster type of field of view is enabled, 
+	/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
+	if(*v == 0) {
+		return;
+	}	
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, mf, 1);
 	}
