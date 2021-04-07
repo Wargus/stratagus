@@ -391,7 +391,10 @@ void MapMarkUnitSight(CUnit &unit);
 /// Unmark on vision table the Sight of the unit.
 void MapUnmarkUnitSight(CUnit &unit);
 ///Mark/Unmark on vision table the Sight for the units around the tilePos
-void MapRefreshUnitsSightAroundTile(const Vec2i &tilePos, const bool resetSight = false);
+void MapRefreshUnitsSight(const Vec2i &tilePos, const bool resetSight = false);
+///Mark/Unmark on vision table the Sight for all units on the map
+void MapRefreshUnitsSight(const bool resetSight = false);
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/

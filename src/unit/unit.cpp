@@ -901,7 +901,7 @@ void MapUnmarkUnitSight(CUnit &unit)
 **
 **  @see MapUnmarkUnitSight/MapMarkUnitSight
 */
-void MapRefreshUnitsSightAroundTile(const Vec2i &tilePos, const bool resetSight /*= false*/)
+void MapRefreshUnitsSight(const Vec2i &tilePos, const bool resetSight /*= false*/)
 {
 	const CMapField *mapField = Map.Field(tilePos);
 	for (const CPlayer &player : Players) {
@@ -919,6 +919,26 @@ void MapRefreshUnitsSightAroundTile(const Vec2i &tilePos, const bool resetSight 
 						MapMarkUnitSight(*unit);
 					}
 				}
+			}
+		}
+	}
+}
+
+/**
+**  Mark/Unmark on vision table the Sight for all units on the map
+**
+**  @param resetSight Unmark sight if True, Mark otherwise
+**
+**  @see MapUnmarkUnitSight/MapMarkUnitSight
+*/
+void MapRefreshUnitsSight(const bool resetSight /*= false*/)
+{
+	for (CUnit *const unit : UnitManager.GetUnits()) {
+		if (!unit->Destroyed) {
+			if (resetSight) {
+				MapUnmarkUnitSight(*unit);
+			} else {
+				MapMarkUnitSight(*unit);
 			}
 		}
 	}

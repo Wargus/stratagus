@@ -557,7 +557,7 @@ void CMap::ClearTile(const Vec2i &tilePos)
 
 	const bool isOpaque = Map.Field(tilePos)->isOpaque();
 	if (isOpaque) {
-		MapRefreshUnitsSightAroundTile(tilePos, true);
+		MapRefreshUnitsSight(tilePos, true);
 		mapField.Flags &= ~MapFieldOpaque;
 	}
 	if (mapField.ForestOnMap()) {
@@ -568,7 +568,7 @@ void CMap::ClearTile(const Vec2i &tilePos)
 		RemoveWall(tilePos);
 	}
 	if (isOpaque) {
-		MapRefreshUnitsSightAroundTile(tilePos);
+		MapRefreshUnitsSight(tilePos);
 	} 	
 }
 /// Remove wood from the map.

@@ -245,7 +245,7 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	/// Refresh vision of nearby units in case is walls are set as opaque field
 	const bool isOpaque = FieldOfView.GetOpaqueFields() & MapFieldWall;
 	if (isOpaque) {
-		MapRefreshUnitsSightAroundTile(pos, true);
+		MapRefreshUnitsSight(pos, true);
 	}
 
 	if (humanwall) {
@@ -262,7 +262,7 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	
 	/// Refresh vision of nearby units in case is walls are set as opaque field
 	if (isOpaque) {
-		MapRefreshUnitsSightAroundTile(pos);
+		MapRefreshUnitsSight(pos);
 	}
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {

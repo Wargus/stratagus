@@ -46,12 +46,6 @@ enum class FieldOfViewTypes { cShadowCasting,  cSimpleRadial, NumOfTypes };
 class CFieldOfView
 {
 public:
-	CFieldOfView() : currTilePos(0, 0), currOctant(0), Origin(0, 0), OpaqueFields(0),
-		Player(nullptr), Unit(nullptr), map_setFoV(nullptr)
-	{
-		Settings.FoV_Type      = FieldOfViewTypes::cSimpleRadial;
-		Settings.OpaqueFields  = MapFieldOpaque;
-	}
 	void Clean()
 	{
 		MarkedTilesCache.clear();
@@ -116,17 +110,18 @@ private:
 private:
 	struct FieldOfViewSettings 
 	{
-		FieldOfViewTypes FoV_Type;        /// Type of field of view - Shadowcasting or Simple Radial
-		uint16_t 		 OpaqueFields;    /// Flags for opaque MapFields
+		FieldOfViewTypes Type	  	  {FieldOfViewTypes::cSimpleRadial}; 	/// Type of field of view - Shadowcasting or Simple Radial
+		uint16_t 		 OpaqueFields {MapFieldOpaque};    				/// Flags for opaque MapFields
 	} Settings;
 
-	Vec2i            currTilePos;       /// Current work tile pos in global (Map) system coordinates
-	char		 	 currOctant;        /// Current octant
-	Vec2i		 	 Origin;            /// Position of the spectator in the global (Map) coordinate system
-	unsigned short   OpaqueFields;      /// Flags for opaque MapTiles for current calculation
-	const CPlayer   *Player;			/// Pointer to player to set FoV for
-	const CUnit     *Unit;				/// Pointer to unit to calculate FoV for
-	MapMarkerFunc	*map_setFoV;        /// Pointer to external function for setting tiles visibilty
+	Vec2i            currTilePos  {0, 0};	/// Current work tile pos in global (Map) system coordinates
+	char		 	 currOctant   {0};		/// Current octant
+	Vec2i		 	 Origin 	  {0, 0};	/// Position of the spectator in the global (Map) coordinate system
+	unsigned short   OpaqueFields {0};		/// Flags for opaque MapTiles for current calculation
+	
+	const CPlayer   *Player 	  {nullptr};	/// Pointer to player to set FoV for
+	const CUnit     *Unit 		  {nullptr};	/// Pointer to unit to calculate FoV for
+	MapMarkerFunc	*map_setFoV   {nullptr};	/// Pointer to external function for setting tiles visibilty
 
 	std::vector<uint8_t> MarkedTilesCache;	/// To prevent multiple calls of map_setFoV for single tile (for tiles on the vertical,
 											/// horizontal and diagonal lines it calls twise) we use cache table to 

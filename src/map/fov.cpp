@@ -35,6 +35,7 @@
 #include "fov.h"
 #include "settings.h"
 #include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 #include "util.h"
 
@@ -54,10 +55,14 @@
 */
 bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 {
-	if (fov_type < FieldOfViewTypes::NumOfTypes) {
-		this->Settings.FoV_Type = fov_type;
+	if (fov_type != Settings.Type && fov_type < FieldOfViewTypes::NumOfTypes) {
+		/// Unmark sight for all units
+		MapRefreshUnitsSight(true);
 
+		this->Settings.Type = fov_type;
 		
+		/// Mark sight with new fov type for all units 
+		MapRefreshUnitsSight();
 		return true;
 	} else {
 		return false;
@@ -71,7 +76,7 @@ bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 */
 FieldOfViewTypes CFieldOfView::GetType() const
 {
-	return this->Settings.FoV_Type;
+	return this->Settings.Type;
 }
 
 /** 
@@ -81,7 +86,15 @@ FieldOfViewTypes CFieldOfView::GetType() const
 */
 void CFieldOfView::SetOpaqueFields(const uint16_t flags)
 {
-	this->Settings.OpaqueFields = flags;
+	if (this->Settings.OpaqueFields != flags) {
+		/// Unmark sight for all units
+		MapRefreshUnitsSight(true);
+
+		this->Settings.OpaqueFields = flags;
+
+		/// Mark sight with new fov type for all units 
+		MapRefreshUnitsSight();
+	}
 }
 
 /** 
@@ -124,7 +137,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 	if (!range) {
 		return;
 	}
-	if (this->Settings.FoV_Type == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
+	if (this->Settings.Type == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
 
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
