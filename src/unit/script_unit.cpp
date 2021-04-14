@@ -280,7 +280,7 @@ static int CclUnit(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CUnit *unit = NULL;
+	CUnit *unit = &UnitManager.GetSlotUnit(slot);
 	CUnitType *type = NULL;
 	CUnitType *seentype = NULL;
 	CPlayer *player = NULL;
@@ -309,7 +309,6 @@ static int CclUnit(lua_State *l)
 			// unit->CurrentAction()==UnitActionDie so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
-			unit = &UnitManager.GetSlotUnit(slot);
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
