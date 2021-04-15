@@ -247,6 +247,30 @@ static int CclSetMinimapTerrain(lua_State *l)
 }
 
 /**
+**  Activate map grid  (true|false)
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetEnableMapGrid(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	CViewport::EnableGrid(LuaToBoolean(l, 1));
+	return 0;
+}
+
+/**
+**  Check if map grid is enabled
+*/
+static int CclGetIsMapGridEnabled(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, CViewport::isGridEnabled());
+	return 1;
+}
+
+/**
 **  Select unit's field of view algorithm -  ShadowCasting or SimpleRadial
 **
 **  @param l  Lua state.
@@ -754,6 +778,9 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWar", CclSetFogOfWar);
 	lua_register(Lua, "GetFogOfWar", CclGetFogOfWar);
 	lua_register(Lua, "SetMinimapTerrain", CclSetMinimapTerrain);
+
+	lua_register(Lua, "SetEnableMapGrid", CclSetEnableMapGrid);
+	lua_register(Lua, "GetIsMapGridEnabled", CclGetIsMapGridEnabled);
 
 	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
 	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);

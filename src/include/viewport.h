@@ -99,6 +99,16 @@ public:
 	void Restrict(int &screenPosX, int &screenPosY) const;
 	void Clean();
 
+	static bool isGridEnabled()
+	{
+		return CViewport::ShowGrid;
+	}
+
+	static void EnableGrid(const bool value)
+	{
+		CViewport::ShowGrid = value;
+	}
+
 
 	PixelSize GetPixelSize() const;
 	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}
@@ -133,8 +143,10 @@ public:
 	CUnit *Unit;              /// Bound to this unit
 private:
 	SDL_Surface *EnhFogSurface { nullptr }; /// Texture for enhanced fog of war. Viewport sized.
+	static bool ShowGrid;
 
 };
+
 
 //@}
 

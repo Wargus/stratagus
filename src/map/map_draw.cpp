@@ -46,6 +46,9 @@
 #include "video.h"
 
 
+bool CViewport::ShowGrid = false;
+
+
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
 {
 	this->TopLeftPos.x = this->TopLeftPos.y = 0;
@@ -289,9 +292,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
-#ifdef DEBUG	
-	DrawMapGridInViewport();
-#endif
+	if (CViewport::isGridEnabled()) {
+		DrawMapGridInViewport();
+	}
 }
 
 /**
