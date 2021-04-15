@@ -66,6 +66,10 @@ public:
     void SetFogColor(CColor color);
 
     void EnableBilinearUpscale(const bool enable);
+    bool IsBilinearUpscaleEnabled() const 
+    {
+        return Settings.UpscaleType == UpscaleTypes::cBilinear;
+    }
     void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
     void Update(bool doAtOnce = false);

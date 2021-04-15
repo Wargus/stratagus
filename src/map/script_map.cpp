@@ -301,6 +301,16 @@ static int CclSetFieldOfViewType(lua_State *l)
 }
 
 /**
+**  Get unit's field of view type -  ShadowCasting or SimpleRadial
+*/
+static int CclGetFieldOfViewType(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushinteger(l, int(FieldOfView.GetType()));
+	return 1;
+}
+
+/**
 **  Set opaque for the tile's terrain.
 **
 **  @param l  Lua state.
@@ -325,21 +335,40 @@ static int CclSetOpaqueFor(lua_State *l)
 			new_flag |= MapFieldForest;
 		} else {
 			PrintFunction();
-			fprintf(stdout, "Opaque may be set only for \"wall\", \"rock\" or \"forest\". \n");
+			fprintf(stdout, "Opaque can only be set for \"wall\", \"rock\" or \"forest\". \n");
 			return 1;
 		}
 	}
 	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() | new_flag);
 	return 0;
 }
-
 /**
-**  Remove opaque for the tile's terrain.
+**  Check opacity for the tile's terrain.
 **
 **  @param l  Lua state.
 **
-**  @return   0 for success, 1 for wrong tile's terrain;
 */
+static int CclGetIsOpaqueFor(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	uint16_t flagToCheck = 0;
+	const char *flag_name = LuaToString(l, 1);
+	if (!strcmp(flag_name, "wall")) {
+		flagToCheck = MapFieldWall;
+	} else if (!strcmp(flag_name, "rock")) {
+		flagToCheck = MapFieldRocks;
+	} else if (!strcmp(flag_name, "forest")) {
+		flagToCheck = MapFieldForest;
+	} else {
+		PrintFunction();
+		fprintf(stdout, "Opaque can only be checked for \"wall\", \"rock\" or \"forest\". \n");
+	}
+
+	lua_pushboolean(l, FieldOfView.GetOpaqueFields() & flagToCheck);
+	return 1;
+}
+
 static int CclRemoveOpaqueFor(lua_State *l)
 {
 	unsigned short new_flag = 0;
@@ -358,7 +387,7 @@ static int CclRemoveOpaqueFor(lua_State *l)
 			new_flag |= MapFieldForest;
 		} else {
 			PrintFunction();
-			fprintf(stdout, "Opaque may be set only for \"wall\", \"rock\" or \"forest\". \n");
+			fprintf(stdout, "Opaque can only be removed for \"wall\", \"rock\" or \"forest\". \n");
 			return 1;
 		}
 	}
@@ -396,6 +425,17 @@ static int CclSetFogOfWarType(lua_State *l)
 	FogOfWar.SetType(new_type);
 	return 0;
 }
+
+/**
+**  Get Fog of War type - legacy or enhanced
+*/
+static int CclGetFogOfWarType(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushinteger (l, int(FogOfWar.GetType()));
+	return 1;
+}
+
 
 /**
 **  Set parameters for FOW blurer (radiuses and number of iterations)
@@ -441,6 +481,16 @@ static int CclSetFogOfWarBilinear(lua_State *l)
 	LuaCheckArgs(l, 1);
 	FogOfWar.EnableBilinearUpscale(LuaToBoolean(l, 1));
 	return 0;
+}
+
+/**
+**  Check if FOW bilinear upscaling enabled
+*/
+static int CclGetIsFogOfWarBilinear(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, FogOfWar.IsBilinearUpscaleEnabled());
+	return 1;
 }
 
 /**
@@ -783,12 +833,17 @@ void MapCclRegister()
 	lua_register(Lua, "GetIsMapGridEnabled", CclGetIsMapGridEnabled);
 
 	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
+	lua_register(Lua, "GetFieldOfViewType", CclGetFieldOfViewType);
 	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);
 	lua_register(Lua, "RemoveOpaqueFor", CclRemoveOpaqueFor);
-
+	lua_register(Lua, "GetIsOpaqueFor", CclGetIsOpaqueFor);
+	
 	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
+	lua_register(Lua, "GetFogOfWarType", CclGetFogOfWarType);
+
 	lua_register(Lua, "SetFogOfWarBlur", CclSetFogOfWarBlur);
 	lua_register(Lua, "SetFogOfWarBilinear", CclSetFogOfWarBilinear);
+	lua_register(Lua, "GetIsFogOfWarBilinear", CclGetIsFogOfWarBilinear);
 	
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
