@@ -248,17 +248,18 @@ struct Settings {
 			unsigned AiExplores:1;        /// If true, AI sends explorers to search for resources (almost useless thing)
 			unsigned SimplifiedAutoTargeting:1; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
 			unsigned AiChecksDependencies:1; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
-			unsigned UserGameSettings:27; /// A bitfield for use by games and their settings
+			unsigned AllyDepositsAllowed:1; /// If false, the AI does not consider allied player's townhalls as deposits, so it will prefer harvesting gold closer to their own base
+			unsigned UserGameSettings:26; /// A bitfield for use by games and their settings
 		};
 		uint32_t _Bitfield;
 	};
 
 	bool GetUserGameSetting(int i) {
-		return std::bitset<27>(UserGameSettings).test(i);
+		return std::bitset<26>(UserGameSettings).test(i);
 	}
 
 	void SetUserGameSetting(int i, bool v) {
-		std::bitset<27> bs(UserGameSettings);
+		std::bitset<26> bs(UserGameSettings);
 		bs.set(i, v);
 		UserGameSettings = bs.to_ulong();
 	}
@@ -348,6 +349,7 @@ struct Settings {
 		Inside = 0;
 		AiExplores = 1;
 		AiChecksDependencies = 0;
+		AllyDepositsAllowed = 0;
 		SimplifiedAutoTargeting = 0;
 		UserGameSettings = 0;
 	}

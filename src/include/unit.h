@@ -489,11 +489,13 @@ public:
 		s.AiExplores = AiExplores;
 		s.SimplifiedAutoTargeting = SimplifiedAutoTargeting;
 		s.AiChecksDependencies = AiChecksDependencies;
+		s.AllyDepositsAllowed = AllyDepositsAllowed;
 	}
 private:
 	bool AiExplores = true;
 	bool SimplifiedAutoTargeting = false;
 	bool AiChecksDependencies = false;
+	bool AllyDepositsAllowed = false;
 
 #if USING_TOLUAPP
 public:
@@ -503,6 +505,8 @@ public:
 	void set_SimplifiedAutoTargeting(bool v) { SimplifiedAutoTargeting = GameSettings.SimplifiedAutoTargeting = v; }
 	bool get_AiChecksDependencies() { return AiChecksDependencies; }
 	void set_AiChecksDependencies(bool v) { AiChecksDependencies = GameSettings.AiChecksDependencies = v; }
+	bool get_AllyDepositsAllowed() { return AllyDepositsAllowed; }
+	void set_AllyDepositsAllowed(bool v) { AllyDepositsAllowed = GameSettings.AllyDepositsAllowed = v; }
 #endif
 };
 

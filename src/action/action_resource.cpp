@@ -178,6 +178,10 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	if (depot && depot->Destroyed) {
 		depot = NULL;
 	}
+	// clicking on an allied depot still doesn't allow you to deposit there depending on preference
+	if (!GameSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
+		depot = NULL;
+	}
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
