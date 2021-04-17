@@ -470,10 +470,12 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
 		table.push_back(*it);
 	}
-	for (int i = 0; i < PlayerMax - 1; ++i) {
-		if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
-			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
-				table.push_back(*it);
+	if (Preference.AllyDepositsAllowed) {
+		for (int i = 0; i < PlayerMax - 1; ++i) {
+			if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
+				for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
+					table.push_back(*it);
+				}
 			}
 		}
 	}

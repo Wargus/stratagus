@@ -33,6 +33,7 @@ class CPreference
 	bool NoStatusLineTooltips;
 	bool SimplifiedAutoTargeting;
 	bool AiChecksDependencies;
+	bool AllyDepositsAllowed;
 
 	unsigned int ShowOrders;
 	unsigned int ShowNameDelay;
