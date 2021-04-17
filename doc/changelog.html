@@ -45,11 +45,19 @@
   <ul>
     <li></li>
     <li>Optimized shared vison code.</li>
-    <li>Now field of view parameters and auto targeting algorithm can be changed simultaneously for all computers of already started network game. It prevents desync causes. Mostly useful for debug.</li>
-    <li>Map grid is optional now and can be disabled. Actual only for debug builds.</li>
+    <li>Now field of view parameters and auto targeting algorithm can be changed simultaneously for all computers of already started network game to prevent desyncs. Mostly useful for debugging.</li>
+    <li>Added an optional map grid for debug builds.</li>
     <li>Added enhanced type of fog of war, as long as original sprite-based fog can't be used when shadow caster is enabled. Also added few parameters to tune it (blur radius, number of blur iterations, number fog easing steps, bilinear interpolation).</li>
     <li>Added "elevated" flag for units/buildings which can look over opaque fields (f.eg. towers).</li>
     <li>Implemented shadow caster field of view type, which blocks vision through opaque obstacles (f.eg. cave walls in war1gus) or certain map tiles with enabled "opaque" flag. In additional there is a possibility to enable opacity for all rocks- OR forest- OR wall-tiles. This feature makes it possible to implement sight blocking for high/low ground .</li>
+    <li>Add preference AllyDepositsAllowed to change if resources can be brought to allied depots. Defaults to false, like original Warcraft II</li>
+    <li>Support cave walls and other obstacles blocking ranged attacks</li>
+    <li>Center small maps in large resolutions, instead of having them in the top left</li>
+    <li>When returning from a depot to gather resources, use the same mine as before if it is still alive; otherwise, search for a resource unit as close to the depot as possible.</li>
+    <li>Enabled the posibility to give an order to harves wood just by H+left-click anywhere on the explored map. If there is no resources on the ordered tile, then the unit will find nearest tile with a resource. Also now we can set "harvest" rally-point from a Town Hall to forest.</li>
+    <li>Performance improvements to shared vision checking</li>
+    <li>Fixed the LuaCheckArgs in ShowMapLocation to match the declared number of arguments</li>
+    <li>Adding "stop" and "stand-ground" commands to Lua binding OrderUnit</li>
   </ul>
 <li>3.0.0 Released<p/></li>
   <ul>
