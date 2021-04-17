@@ -289,7 +289,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 
 // Write the map presentation file
-static int WriteMapPresentation(const std::string &mapname, CMap &map)
+static int WriteMapPresentation(const std::string &mapname, CMap &map, Vec2i newSize)
 {
 	FileWriter *f = NULL;
 
@@ -319,8 +319,13 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 		}
 		f->printf(")\n");
 
+		if (newSize.x == 0 || newSize.y == 0) {
+			newSize.x = map.Info.MapWidth;
+			newSize.y = map.Info.MapHeight;
+		}
+
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
-				  map.Info.Description.c_str(), numplayers, map.Info.MapWidth, map.Info.MapHeight,
+				  map.Info.Description.c_str(), numplayers, newSize.x, newSize.y,
 				  map.Info.MapUID + 1);
 
 		if (map.Info.Filename.find(".sms") == std::string::npos && !map.Info.Filename.empty()) {
@@ -344,7 +349,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map)
 **  @param map           map to save
 **  @param writeTerrain  write the tiles map in the .sms
 */
-int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
+int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
 	FileWriter *f = NULL;
 
@@ -382,6 +387,17 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		f->printf("LoadTileModels(\"%s\")\n\n", map.TileModelsFileName.c_str());
 
 		if (writeTerrain) {
+		   	if (newSize.x != 0 && newSize.y != 0) {
+				f->printf("for x=0,%d,1 do\n", newSize.x - 1);
+				f->printf("    for y=0,%d,1 do\n", newSize.y - 1);
+				f->printf("        SetTile(%d, x, y, 0)\n", Map.Tileset->getDefaultTileIndex());
+				f->printf("    end\n");
+				f->printf("end\n");
+			} else {
+				newSize.x = map.Info.MapHeight;
+				newSize.y = map.Info.MapWidth;
+			}
+
 			f->printf("-- Tiles Map\n");
 			for (int i = 0; i < map.Info.MapHeight; ++i) {
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
@@ -389,9 +405,18 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 					const int tile = mf.getGraphicTile();
 					const int n = map.Tileset->findTileIndexByTile(tile);
 					const int value = mf.Value;
-					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
+					const int x = j + offset.x;
+					const int y = i + offset.y;
+					if (x < newSize.x && y < newSize.y) {
+						f->printf("SetTile(%3d, %d, %d, %d)\n", n, x, y, value);
+					}
 				}
 			}
+		}
+
+		if (newSize.x == 0 || newSize.y == 0) {
+			newSize.x = map.Info.MapHeight;
+			newSize.y = map.Info.MapWidth;
 		}
 
 		f->printf("\n-- set map default stat and map sound for unit types\n");
@@ -458,18 +483,22 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		std::vector<CUnit *> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 			const CUnit &unit = **it;
-			f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
-					  unit.Type->Ident.c_str(),
-					  unit.Player->Index,
-					  unit.tilePos.x, unit.tilePos.y);
-			if (unit.Type->GivesResource) {
-				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
-			}
-			if (!unit.Active) { //Active is true by default
-				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
-			}
-			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-				teleporters.push_back(*it);
+			const int x = unit.tilePos.x + offset.x;
+			const int y = unit.tilePos.y + offset.y;
+			if (x < newSize.x && y < newSize.y) {
+				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",
+						  unit.Type->Ident.c_str(),
+						  unit.Player->Index,
+						  x, y);
+				if (unit.Type->GivesResource) {
+					f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
+				}
+				if (!unit.Active) { //Active is true by default
+					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
+				}
+				if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
+					teleporters.push_back(*it);
+				}
 			}
 		}
 		f->printf("\n\n");
@@ -497,7 +526,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
+int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.c_str());
@@ -519,13 +548,12 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 	WriteMapPreview(previewName, map);
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
-	if (WriteMapPresentation(mapName, map) == -1) {
+	if (WriteMapPresentation(mapName, map, newSize) == -1) {
 		return -1;
 	}
 
-	return WriteMapSetup(mapSetup, map, writeTerrain);
+	return WriteMapSetup(mapSetup, map, writeTerrain, newSize, offset);
 }
-
 
 /**
 **  Load any map.

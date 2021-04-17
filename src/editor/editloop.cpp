@@ -1754,6 +1754,17 @@ int EditorSaveMap(const std::string &file)
 	return 0;
 }
 
+int EditorSaveMapWithResize(const std::string &file, Vec2i newSize, Vec2i offset)
+{
+	std::string fullName;
+	fullName = StratagusLibPath + "/" + file;
+	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable, newSize, offset) == -1) {
+		fprintf(stderr, "Cannot save map\n");
+		return -1;
+	}
+	return 0;
+}
+
 /*----------------------------------------------------------------------------
 --  Editor main loop
 ----------------------------------------------------------------------------*/
