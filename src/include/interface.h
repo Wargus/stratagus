@@ -425,6 +425,8 @@ extern bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button);
 extern bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button);
 /// Check if all requirements for a single research are meet
 extern bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button);
+/// Check for button enabled, if requested condition passes check. Used for debug purposes
+extern bool ButtonCheckDebug(const CUnit &unit, const ButtonAction &button);
 
 //
 // in ccl_ui.c

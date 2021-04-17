@@ -248,10 +248,12 @@ bool EnableAssert;               /// if enabled, halt on assertion failures
 bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
 
 #ifdef DEBUG
-bool IsDebugEnabled {true};      /// Is debug enaled? Flag to pass into lua code. 
+bool IsDebugEnabled {true};      /// Is debug enabled? Flag to pass into lua code. 
 #else
-bool IsDebugEnabled {false};     /// Is debug enaled? Flag to pass into lua code.
+bool IsDebugEnabled {false};     /// Is debug enabled? Flag to pass into lua code.
 #endif
+bool EnableWallsInSinglePlayer {false}; /// Enables ability to build walls in the single player games
+										/// used for debug purposes
 
 /*============================================================================
 ==  MAIN

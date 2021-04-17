@@ -813,6 +813,30 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 }
 
 /**
+**  Enable walls enabled for single player games (for debug purposes)
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetEnableWallsForSP(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	EnableWallsInSinglePlayer = LuaToBoolean(l, 1);
+	return 0;
+}
+
+/**
+**  Check if walls enabled for single player games (for debug purposes)
+*/
+static int CclIsWallsEnabledForSP(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, EnableWallsInSinglePlayer);
+	return 1;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister()
@@ -860,6 +884,9 @@ void MapCclRegister()
 
 	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
 	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
+
+	lua_register(Lua, "SetEnableWallsForSP", CclSetEnableWallsForSP);
+	lua_register(Lua, "GetIsWallsEnabledForSP", CclIsWallsEnabledForSP);
 }
 
 //@}
