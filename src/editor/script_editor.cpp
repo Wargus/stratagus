@@ -83,6 +83,16 @@ static int CclSetEditorStartUnit(lua_State *l)
 	return 0;
 }
 
+static int CclEditorResizeMap(lua_State *l)
+{
+	LuaCheckArgs(l, 5);
+	int res = EditorSaveMapWithResize(LuaToString(l, 1),
+							{(short)LuaToNumber(l, 2), (short)LuaToNumber(l, 3)},
+							{(short)LuaToNumber(l, 4), (short)LuaToNumber(l, 5)});
+	lua_pushnumber(l, res);
+	return 1;
+}
+
 /**
 **  Register CCL features for the editor.
 */
@@ -91,6 +101,7 @@ void EditorCclRegister()
 	lua_register(Lua, "SetEditorSelectIcon", CclSetEditorSelectIcon);
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
+	lua_register(Lua, "EditorResizeMap", CclEditorResizeMap);
 }
 
 //@}
