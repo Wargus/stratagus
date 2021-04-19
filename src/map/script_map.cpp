@@ -39,6 +39,8 @@
 #include "fov.h"
 #include "fow.h"
 #include "iolib.h"
+#include "netconnect.h"
+#include "network.h"
 #include "script.h"
 #include "tileset.h"
 #include "translate.h"
@@ -280,7 +282,7 @@ static int CclGetIsMapGridEnabled(lua_State *l)
 static int CclSetFieldOfViewType(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	
+
 	FieldOfViewTypes new_type;
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "shadow-casting")) {
@@ -296,7 +298,11 @@ static int CclSetFieldOfViewType(lua_State *l)
 		fprintf(stdout, "Accessible Field of View types: \"shadow-casting\", \"simple-radial\".\n");
 		return 1;
 	}
-	FieldOfView.SetType(new_type);
+	if (!IsNetworkGame()) {
+		FieldOfView.SetType(new_type);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageFieldOfViewDB, int(new_type), 0, 0, 0, 0);
+	}
 	return 0;
 }
 
@@ -339,7 +345,12 @@ static int CclSetOpaqueFor(lua_State *l)
 			return 1;
 		}
 	}
-	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() | new_flag);
+	if (!IsNetworkGame()) {
+		FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() | new_flag);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageMapFieldsOpacityDB, 0,
+								   FieldOfView.GetOpaqueFields() | new_flag, 0, 0, 0);
+	}
 	return 0;
 }
 /**
@@ -391,7 +402,12 @@ static int CclRemoveOpaqueFor(lua_State *l)
 			return 1;
 		}
 	}
-	FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() & ~new_flag);
+	if (!IsNetworkGame()) {
+		FieldOfView.SetOpaqueFields(FieldOfView.GetOpaqueFields() & ~new_flag);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageMapFieldsOpacityDB, 0,
+								   FieldOfView.GetOpaqueFields() & ~new_flag, 0, 0, 0);
+	}
 	return 0;
 }
 
@@ -413,7 +429,12 @@ static int CclSetFogOfWarType(lua_State *l)
 		new_type = FogOfWarTypes::cLegacy;
 		/// Legacy type of FOW doesn't work with shadow casting
 		if (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting) {
-			FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
+			if (!IsNetworkGame()) {
+				FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
+			} else {
+				NetworkSendExtendedCommand(ExtendedMessageFieldOfViewDB, 
+										   int(FieldOfViewTypes::cSimpleRadial), 0, 0, 0, 0);
+			}
 		}
 	} else if (!strcmp(type_name, "enhanced")) {
 		new_type = FogOfWarTypes::cEnhanced;
@@ -432,7 +453,7 @@ static int CclSetFogOfWarType(lua_State *l)
 static int CclGetFogOfWarType(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushinteger (l, int(FogOfWar.GetType()));
+	lua_pushinteger(l, int(FogOfWar.GetType()));
 	return 1;
 }
 
@@ -837,6 +858,16 @@ static int CclIsWallsEnabledForSP(lua_State *l)
 }
 
 /**
+**  Check if network game was created on this PC
+*/
+static int CclGetIsGameHoster(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, (ThisPlayer->Index == Hosts[0].PlyNr) ? true : false);
+	return 1;
+}
+
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister()
@@ -887,6 +918,9 @@ void MapCclRegister()
 
 	lua_register(Lua, "SetEnableWallsForSP", CclSetEnableWallsForSP);
 	lua_register(Lua, "GetIsWallsEnabledForSP", CclIsWallsEnabledForSP);
+
+	lua_register(Lua, "GetIsGameHoster", CclGetIsGameHoster);
+
 }
 
 //@}
