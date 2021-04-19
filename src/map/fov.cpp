@@ -38,7 +38,7 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "util.h"
-
+ 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -127,8 +127,8 @@ void CFieldOfView::ResetAdditionalOpaqueFields()
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
-							const short height, const short range, MapMarkerFunc *marker)
+void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width, 
+							const uint16_t height, const uint16_t range, MapMarkerFunc *marker)
 {
 	/// FIXME: sometimes when quit from game this assert is triggered
 	if (!unit.Type) return;
@@ -137,8 +137,8 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 	if (!range) {
 		return;
 	}
-	if (this->Settings.Type == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
-
+	if (this->Settings.Type == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) { 
+		/// FIXME: add high-/lowground
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
 			OpaqueFields &= ~(MapFieldRocks); /// because of rocks-flag is used as an obstacle for ranged attackers
@@ -162,41 +162,43 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 **  @param range   Radius to mark (sight range)
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, const int range, MapMarkerFunc *marker) const
+void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, 
+									   const int16_t w, const int16_t h, const int16_t range, 
+									   MapMarkerFunc *marker) const
 {
 	// Up hemi-cyle
-	const int miny = std::max(-range, 0 - pos.y);
-	for (int offsety = miny; offsety != 0; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
-		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+	const int16_t miny = std::max(-range, 0 - pos.y);
+	for (int16_t offsety = miny; offsety != 0; offsety++) {
+		const int16_t offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
+		const int16_t minx = std::max(0, pos.x - offsetx);
+		const int16_t maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
 		Vec2i mpos(minx, pos.y + offsety);
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const size_t index = mpos.y * Map.Info.MapWidth;
 
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+		for (mpos.x = minx; mpos.x < maxx; mpos.x++) {
 			marker(player, mpos.x + index);
 		}
 	}
-	for (int offsety = 0; offsety < h; ++offsety) {
-		const int minx = std::max(0, pos.x - range);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
+	for (int16_t offsety = 0; offsety < h; offsety++) {
+		const int16_t minx = std::max(0, pos.x - range);
+		const int16_t maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
 		Vec2i mpos(minx, pos.y + offsety);
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const size_t index = mpos.y * Map.Info.MapWidth;
 
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+		for (mpos.x = minx; mpos.x < maxx; mpos.x++) {
 			marker(player, mpos.x + index);
 		}
 	}
 	// bottom hemi-cycle
-	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
-	for (int offsety = 0; offsety < maxy; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
-		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+	const int16_t maxy = std::min(range, int16_t(Map.Info.MapHeight - pos.y - h));
+	for (int16_t offsety = 0; offsety < maxy; offsety++) {
+		const int16_t offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
+		const int16_t minx = std::max(0, pos.x - offsetx);
+		const int16_t maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
 		Vec2i mpos(minx, pos.y + h + offsety);
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const size_t index = mpos.y * Map.Info.MapWidth;
 
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+		for (mpos.x = minx; mpos.x < maxx; mpos.x++) {
 			marker(player, mpos.x + index);
 		}
 	}
@@ -210,33 +212,33 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, 
 **  @param height			Spectrator's height in tiles
 **  @param range			Spectrator's sight range in tiles
 */
-void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range)
+void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range)
 {
 	enum SpectatorGeometry {cOneTiled, cEven, cOdd, cTall, cWide} ;
-	const int geometry = [width, height]{   if (width == height) {
-                                                if (width == 1) { return cOneTiled; }
-                                                if (width % 2)  { return cOdd; 		}
-                                                else            { return cEven; 	}
-                                            } 
-                                            if (width > height) { return cWide; 	}
-                                            else                { return cTall; 	}
-                                        }();										  
+	const uint8_t geometry = [width, height]{   if (width == height) {
+													if (width == 1) { return cOneTiled; }
+													if (width % 2)  { return cOdd; 		}
+													else            { return cEven; 	}
+												} 
+												if (width > height) { return cWide; 	}
+												else                { return cTall; 	}
+											}();										  
 
 	Vec2i origin = {0, 0};
-	int sightRange = range;
+	uint16_t sightRange = range;
 
 	const bool isGeometrySymmetric = (geometry == cTall || geometry == cWide) ? false : true;
 
 	if (isGeometrySymmetric) {
-		const short half = width >> 1;
+		const int16_t half = width >> 1;
 		origin.x = spectatorPos.x + half;
 		origin.y = spectatorPos.y + half;
 		sightRange += half - (geometry == cEven ? 1 : 0);
 	} else {
 		/// Fill spectator's tiles which not affected by RefreshOctant and ProceedRaysCast
 		ResetEnvironment();
-		for (short x = spectatorPos.x + 1; x < spectatorPos.x + width - 1; x++) {
-			for (short y = spectatorPos.y + 1; y < spectatorPos.y + height - 1; y++) {
+		for (int16_t x = spectatorPos.x + 1; x < spectatorPos.x + width - 1; x++) {
+			for (int16_t y = spectatorPos.y + 1; y < spectatorPos.y + height - 1; y++) {
 				if (SetCurrentTile(x, y)) {
 					MarkTile();
 				}
@@ -244,8 +246,8 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 		}
 	}
 
-	short rayWidth = 0;
-	for (char quadrant = 0; quadrant < 4; ++quadrant) {
+	int16_t rayWidth = 0;
+	for (uint8_t quadrant = 0; quadrant < 4; quadrant++) {
 		if (geometry == cEven) {
 			/// recalculate center
 			switch (quadrant) {
@@ -275,7 +277,7 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 					break;
 			}
 		}
-		const char octant = quadrant << 1;
+		const uint8_t octant = quadrant << 1;
 		/// First half-quadrant
 		RefreshOctant(octant, origin, sightRange);
 		/// Second half-quadrant
@@ -298,11 +300,11 @@ void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const short w
 **  @param height	Spectrator's height in tiles
 **  @param range	Spectrator's sight range in tiles
 */
-void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range)
+void CFieldOfView::ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range)
 {
 	SetEnvironment(octant, origin);
-	for (short col = -1; col >= -width; col--) {
-		for (short row = 0; row < range; row++) {
+	for (int16_t col = -1; col >= -width; col--) {
+		for (int16_t row = 0; row < range; row++) {
 			const bool isOnMap = SetCurrentTile(col, row);
 			if (isOnMap) {
 				MarkTile();
@@ -320,7 +322,7 @@ void CFieldOfView::ProceedRaysCast(const char octant, const Vec2i &origin, const
 **	@param origin	Tile position of the spectrator
 **  @param range	Spectrator's sight range in tiles
 */
-void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const short range)
+void CFieldOfView::RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range)
 {
 	SetEnvironment(octant, origin);
 	std::queue<SColumnPiece> wrkQueue;
@@ -345,16 +347,16 @@ void CFieldOfView::RefreshOctant(const char octant, const Vec2i &origin, const s
 **  @param range		Spectrator's sight range in tiles
 **	@param wrkQueue		Queue with all column pieces
 */
-void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec2i &bottomVector,
-										  const short range, std::queue<SColumnPiece> &wrkQueue)
+void  CFieldOfView::CalcFoVForColumnPiece(const int16_t col, Vec2i &topVector, Vec2i &bottomVector,
+										  const uint16_t range, std::queue<SColumnPiece> &wrkQueue)
 {
 	enum { cTop = true, cBottom = false };
 
-	short topRow    = CalcRow_ByVector(cTop, col, topVector);
-	short bottomRow = CalcRow_ByVector(cBottom, col, bottomVector);
+	int16_t topRow    = CalcRow_ByVector(cTop, col, topVector);
+	int16_t bottomRow = CalcRow_ByVector(cBottom, col, bottomVector);
 
 	enum { cInit, cYes, cNo } wasLastTileOpaque = cInit;
-	for (short row = topRow; row >= bottomRow; --row) {
+	for (int16_t row = topRow; row >= bottomRow; --row) {
 		const bool inRange = square(col) + square(row) < square(range);
 		const bool isOnMap = SetCurrentTile(col, row);
 		if (inRange && isOnMap) {
@@ -367,7 +369,7 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec
 					wrkQueue.push(SColumnPiece(col + 1, topVector, Vec2i(col * 2 - 1, row * 2 + 1)));
 				}
 			} else if (wasLastTileOpaque == cYes) {
-				topVector = {short (col * 2 + 1), short (row * 2 + 1)};
+				topVector = {int16_t(col * 2 + 1), int16_t(row * 2 + 1)};
 			}
 		}
 		wasLastTileOpaque = isTileOpaque ? cYes : cNo;
@@ -385,17 +387,17 @@ void  CFieldOfView::CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec
 **	@param vector	Current direction vector
 **	@return 		Row (Y-value) for new direction vector
 */
-short CFieldOfView::CalcRow_ByVector(const bool isTop, const short col, const Vec2i &vector) const
+int16_t CFieldOfView::CalcRow_ByVector(const bool isTop, const int16_t col, const Vec2i &vector) const
 {
-	short row;
+	int16_t row;
 	if (col == 0) {
 		row = 0;
 	} else {
 		// (col +|- 0.5) * (top|bot)_vector.y/(top|bot)_vector.x in integers
-		const short devidend  = (isTop ? (2 * col + 1) : (2 * col - 1)) * vector.y;
-		const short devisor   = 2 * vector.x;
-		const short quotient  = devidend / devisor;
-		const short remainder = devidend % devisor;
+		const int16_t devidend  = (isTop ? (2 * col + 1) : (2 * col - 1)) * vector.y;
+		const int16_t devisor   = 2 * vector.x;
+		const int16_t quotient  = devidend / devisor;
+		const int16_t remainder = devidend % devisor;
 		// Round the result
 		if (isTop ? remainder > vector.x
 				  : remainder >= vector.x) {
@@ -424,7 +426,7 @@ void CFieldOfView::ResetShadowCaster()
 	ResetEnvironment();
 }
 
-void CFieldOfView::PrepareCache(const Vec2i pos, const short width, const short height, const short range)
+void CFieldOfView::PrepareCache(const Vec2i pos, const uint16_t width, const uint16_t height, const uint16_t range)
 {
 	/// Init cache table if it's uninitialized yet
 	if (!MarkedTilesCache.size()) {
@@ -458,7 +460,7 @@ void CFieldOfView::PrepareCache(const Vec2i pos, const short width, const short 
 **  @param octant	Octant to calc for
 **	@param origin	Tile position of the spectrator
 */
-void CFieldOfView::SetEnvironment(const char octant, const Vec2i &origin)
+void CFieldOfView::SetEnvironment(const uint8_t octant, const Vec2i &origin)
 {
 	Origin  	= origin;
 	currOctant 	= octant;

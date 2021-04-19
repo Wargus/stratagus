@@ -52,8 +52,8 @@ public:
 	}
 
 	/// Refresh field of view
-	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const short width, 
-				const short height, const short range, MapMarkerFunc *marker);
+	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width, 
+				 const uint16_t height, const uint16_t range, MapMarkerFunc *marker);
 
 	bool SetType(const FieldOfViewTypes fov_type);
 	FieldOfViewTypes GetType() const;
@@ -68,29 +68,30 @@ protected:
 private:
 	/// Struct for portion of column. Used in FoV calculations
 	struct SColumnPiece {
-		SColumnPiece(short xValue, Vec2i top, Vec2i bottom) : col(xValue), TopVector(top), BottomVector(bottom) {}
-		short col;
+		SColumnPiece(int16_t xValue, Vec2i top, Vec2i bottom) : col(xValue), TopVector(top), BottomVector(bottom) {}
+		int16_t col;
 		Vec2i TopVector;
 		Vec2i BottomVector;
 	};
 
 	/// Calc whole simple radial field of view
-	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int w, const int h, int range, MapMarkerFunc *marker) const;
+	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int16_t w, const int16_t h, 
+							 int16_t range, MapMarkerFunc *marker) const;
 	/// Calc whole chadow casting field of view
-	void ProceedShadowCasting(const Vec2i &spectatorPos, const short width, const short height, const short range);
+	void ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range);
 	/// Calc field of view for set of lines along x or y. 
 	/// Used for calc part of FoV for assymetric (widht != height) spectators.
-	void ProceedRaysCast(const char octant, const Vec2i &origin, const short width, const short range);
+	void ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range);
 	/// Calc shadow casting field of view for single octant
-	void RefreshOctant(const char octant, const Vec2i &origin, const short range);
+	void RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range);
 	/// Calc shadow casting for portion of column 
-	void CalcFoVForColumnPiece(const short col, Vec2i &topVector, Vec2i &bottomVector,
-							   const short range, std::queue<SColumnPiece> &wrkQueue);
+	void CalcFoVForColumnPiece(const int16_t col, Vec2i &topVector, Vec2i &bottomVector,
+							   const uint16_t range, std::queue<SColumnPiece> &wrkQueue);
 	/// Recalculate top or bottom direction vectors
-	short CalcRow_ByVector(const bool isTop, const short x, const Vec2i &vector) const;
+	int16_t CalcRow_ByVector(const bool isTop, const int16_t x, const Vec2i &vector) const;
 
 	/// Recalculate coordinates and set current MapTile for [col, row]
-	bool SetCurrentTile(const short col, const short row);
+	bool SetCurrentTile(const int16_t col, const int16_t row);
 	/// Check if current MapTile opaque
 	bool IsTileOpaque() const;
 	/// Mark current MapTile
@@ -99,13 +100,13 @@ private:
 	/// Setup ShadowCaster for current refreshing of FoV
 	void PrepareShadowCaster(const CPlayer &player, const CUnit &unit, const Vec2i &pos, MapMarkerFunc *marker);
 	void ResetShadowCaster();
-	void PrepareCache(const Vec2i pos, const short width, const short height, const short range);
+	void PrepareCache(const Vec2i pos, const uint16_t width, const uint16_t height, const uint16_t range);
 
 	/// Update values of Octant and Origin for current working set
-	void SetEnvironment(const char octant, const Vec2i &origin);
+	void SetEnvironment(const uint8_t octant, const Vec2i &origin);
 	void ResetEnvironment();
 	/// Project [col,row] coordinates from current octant to global (Map) coordinate system and accordingly update position of current MapTile
-	void ProjectCurrentTile(const short col, const short row);
+	void ProjectCurrentTile(const int16_t col, const int16_t row);
 
 private:
 	struct FieldOfViewSettings 
@@ -115,9 +116,9 @@ private:
 	} Settings;
 
 	Vec2i            currTilePos  {0, 0};	/// Current work tile pos in global (Map) system coordinates
-	char		 	 currOctant   {0};		/// Current octant
+	uint8_t		 	 currOctant   {0};		/// Current octant
 	Vec2i		 	 Origin 	  {0, 0};	/// Position of the spectator in the global (Map) coordinate system
-	unsigned short   OpaqueFields {0};		/// Flags for opaque MapTiles for current calculation
+	uint16_t		 OpaqueFields {0};		/// Flags for opaque MapTiles for current calculation
 	
 	const CPlayer   *Player 	  {nullptr};	/// Pointer to player to set FoV for
 	const CUnit     *Unit 		  {nullptr};	/// Pointer to unit to calculate FoV for
@@ -138,7 +139,7 @@ extern CFieldOfView FieldOfView;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-inline bool CFieldOfView::SetCurrentTile(const short col, const short row)
+inline bool CFieldOfView::SetCurrentTile(const int16_t col, const int16_t row)
 {
 	ProjectCurrentTile(col, row);
 	if (Map.Info.IsPointOnMap(currTilePos.x, currTilePos.y)) {
@@ -164,7 +165,7 @@ inline void CFieldOfView::MarkTile()
 	} 
 }
 
-inline void CFieldOfView::ProjectCurrentTile(const short col, const short row)
+inline void CFieldOfView::ProjectCurrentTile(const int16_t col, const int16_t row)
 {
 	switch (currOctant) {
 		case 1:  currTilePos.x =  row; currTilePos.y =  col; break;
