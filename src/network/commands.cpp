@@ -38,6 +38,7 @@
 #include "commands.h"
 
 #include "actions.h"
+#include "fov.h"
 #include "net_message.h"
 #include "network.h"
 #include "replay.h"
@@ -801,6 +802,34 @@ void ExecExtendedCommand(unsigned char type, int status,
 				CommandLog("shared-vision", NoUnitP, 0, arg2, arg4, NoUnitP, "1", -1);
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
+			break;
+		case ExtendedMessageAutoTargetingDB:
+			/// arg1: 0:true / 1:false
+			if (arg1 == 0 || arg1 == 1) {
+				Preference.SimplifiedAutoTargeting = arg1 ? true : false;
+				/// CommandLog(...);
+			} else {
+				/// CommandLog(...);
+			}
+			break;
+		case ExtendedMessageFieldOfViewDB:
+			{
+				/// arg1: 0:cShadowCasting / 1:cSimpleRadial
+				FieldOfViewTypes fovType = arg1 == 0 ? FieldOfViewTypes::cShadowCasting
+										 : arg1 == 1 ? FieldOfViewTypes::cSimpleRadial
+													 : FieldOfViewTypes::NumOfTypes;
+				if (fovType < FieldOfViewTypes::NumOfTypes) {
+					FieldOfView.SetType(fovType);
+					/// CommandLog(...);
+				} else {
+					/// CommandLog(...);
+				}
+			}
+			break;
+		case ExtendedMessageMapFieldsOpacityDB:
+			/// Arg2: Opaque fields flags
+			FieldOfView.SetOpaqueFields(arg2);
+			/// CommandLog(...);
 			break;
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
