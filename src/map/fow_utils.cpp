@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <algorithm>
+#include <omp.h>
 
 #include "stratagus.h"
 #include "fow_utils.h"
@@ -177,10 +178,17 @@ void CEasedTexture::CalcDeltas()
     const uint8_t *curr   = Frames[Curr].data();
     const uint8_t *next   = Frames[Next].data();
 
-    size_t index = 0;
-    #pragma omp parallel for
-    for (size_t index = 0; index < TextureSize; index++) {
-        Deltas[index] = (int16_t(next[index]) - curr[index]) / EasingStepsNum;
+    #pragma omp parallel
+    {
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
+        
+        const size_t lBound = TextureSize * (thisThread    ) / numOfThreads;
+        const size_t uBound = TextureSize * (thisThread + 1) / numOfThreads;
+
+        for (size_t index = lBound; index < uBound; index++) {
+            Deltas[index] = (int16_t(next[index]) - curr[index]) / EasingStepsNum;
+        }
     }
 }
 
@@ -291,76 +299,93 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
     source = target;
     target = swap; 
 
+    /// *fixed point math
     const uint32_t iarr = (1 << 16) / (2 * radius + 1);
     
     /// Horizontal blur pass
-    #pragma omp parallel for
-    for (size_t i = 0; i < TextureHeight; i++) {
+    #pragma omp parallel
+    {
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
+        
+        const uint16_t lBound = TextureHeight * (thisThread    ) / numOfThreads;
+        const uint16_t uBound = TextureHeight * (thisThread + 1) / numOfThreads;
 
-        size_t ti = i * TextureWidth; 
-        size_t li = ti;
-        size_t ri = ti + radius;
+        for (uint16_t i = lBound; i < uBound; i++) {
 
-        const uint8_t leftBorder  = source[ti];
-        const uint8_t rightBorder = source[ti + TextureWidth - 1];
-              int16_t sum         = (radius + 1) * leftBorder;
+            size_t ti = size_t(i) * TextureWidth; 
+            size_t li = ti;
+            size_t ri = ti + radius;
 
-        for (size_t j = 0; j < radius; j++) { 
-            sum += source[ti + j]; 
+            const uint8_t leftBorder  = source[ti];
+            const uint8_t rightBorder = source[ti + TextureWidth - 1];
+                  int16_t sum         = int16_t(radius + 1) * leftBorder;
+
+            for (uint16_t j = 0; j < radius; j++) { 
+                sum += source[ti + j]; 
+            }
+            for (uint16_t j = 0; j <= radius; j++) {
+                sum += source[ri++] - leftBorder; 
+                target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
+            }
+            for (uint16_t j = radius + 1; j < TextureWidth - radius; j++) {
+                sum += source[ri++] - source[li++];
+                target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
+            }
+            for (uint16_t j = TextureWidth - radius; j < TextureWidth; j++) {
+                sum += rightBorder - source[li++];   
+                target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
+            }
         }
-        for (size_t j = 0; j <= radius; j++) {
-            sum += source[ri++] - leftBorder; 
-            target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
-        }
-        for (size_t j = radius + 1; j < TextureWidth - radius; j++) {
-            sum += source[ri++] - source[li++];
-            target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
-        }
-        for (size_t j = TextureWidth - radius; j < TextureWidth; j++) {
-            sum += rightBorder - source[li++];   
-            target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
-        }
-    }
+    } // pragma omp parallel
 
     swap = source;
     source = target;
     target = swap;  
 
     /// Vertical blur pass
-    #pragma omp parallel for
-    for (size_t i = 0; i < TextureWidth; i++) {
+    #pragma omp parallel
+    {
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
+        
+        const uint16_t lBound = TextureWidth * (thisThread    ) / numOfThreads;
+        const uint16_t uBound = TextureWidth * (thisThread + 1) / numOfThreads;
 
-        size_t ti = i;
-        size_t li = ti;
-        size_t ri = ti + radius * TextureWidth;
+        for (uint16_t i = lBound; i < uBound; i++) {
 
-        const uint8_t leftBorder  = source[ti];
-        const uint8_t rightBorder = source[ti + TextureWidth * (TextureHeight - 1)];
-              int16_t sum         = (radius + 1) * leftBorder;
+            size_t ti = i;
+            size_t li = ti;
+            size_t ri = ti + radius * TextureWidth;
 
-        for (size_t j = 0; j < radius; j++) {
-            sum += source[ti + j * TextureWidth];
+            const uint8_t leftBorder  = source[ti];
+            const uint8_t rightBorder = source[ti + TextureWidth * (TextureHeight - 1)];
+                  int16_t sum         = int16_t(radius + 1) * leftBorder;
+
+            for (uint16_t j = 0; j < radius; j++) {
+                sum += source[ti + j * TextureWidth];
+            }
+            for (uint16_t j = 0; j <= radius ; j++) { 
+                sum += source[ri] - leftBorder;
+                target[ti] = (iarr * sum + fixedOneHalf) >> 16;
+                ri += TextureWidth;
+                ti += TextureWidth;
+            }
+            for (uint16_t j = radius + 1; j < TextureHeight - radius; j++) { 
+                sum += source[ri] - source[li];
+                target[ti] = (iarr * sum + fixedOneHalf) >> 16;
+                li += TextureWidth;
+                ri += TextureWidth;
+                ti += TextureWidth;
+            }
+            for (uint16_t j = TextureHeight - radius; j < TextureHeight; j++) { 
+                sum += rightBorder - source[li];
+                target[ti] = (iarr * sum + fixedOneHalf) >> 16;
+                li += TextureWidth;
+                ti += TextureWidth;
+            }
         }
-        for (size_t j = 0; j <= radius ; j++) { 
-            sum += source[ri] - leftBorder;
-            target[ti] = (iarr * sum + fixedOneHalf) >> 16;
-            ri += TextureWidth;
-            ti += TextureWidth;
-        }
-        for (size_t j = radius + 1; j < TextureHeight - radius; j++) { 
-            sum += source[ri] - source[li];
-            target[ti] = (iarr * sum + fixedOneHalf) >> 16;
-            li += TextureWidth;
-            ri += TextureWidth;
-            ti += TextureWidth;
-        }
-        for (size_t j = TextureHeight - radius; j < TextureHeight; j++) { 
-            sum += rightBorder - source[li];
-            target[ti] = (iarr * sum + fixedOneHalf) >> 16;
-            li += TextureWidth;
-            ti += TextureWidth;
-        }
-    }
+    } // pragma omp parallel
 }
 
 

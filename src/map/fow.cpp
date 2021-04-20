@@ -171,28 +171,35 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 ** fill map-sized table with values of visiblty for current player/players 
 ** TODO: Add posibility to select players (actual for replays or observers)
 **
-** @param thisPlayer  Player to check for
 ** 
 */
 void CFogOfWar::GenerateFog()
 {
-    #pragma omp parallel for 
-    for (uint16_t row = 0; row < Map.Info.MapHeight; row++) {
+    #pragma omp parallel
+    {
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
+        
+        const uint16_t lBound = (thisThread    ) * Map.Info.MapHeight / numOfThreads;
+        const uint16_t uBound = (thisThread + 1) * Map.Info.MapHeight / numOfThreads;
 
-        const size_t visIndex = VisTable_Index0 + row * VisTableWidth;
-        const size_t mapIndex = row * Map.Info.MapHeight;
+        for (uint16_t row = lBound; row < uBound; row++) {
 
-        for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
+            const size_t visIndex = VisTable_Index0 + row * VisTableWidth;
+            const size_t mapIndex = size_t(row) * Map.Info.MapHeight;
 
-            uint8_t &visCell = VisTable[visIndex + col];
-            visCell = 0; /// Clear it before check for players
-            const CMapField *mapField = Map.Field(mapIndex + col);
-            /// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
-            for (const uint8_t player : VisionFor) {
-                visCell = std::max<uint8_t>(visCell, mapField->playerInfo.TeamVisibilityState(Players[player])); // Visible[player]);
-                if (visCell >= 2) {
-                    visCell = 2;
-                    break;
+            for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
+
+                uint8_t &visCell = VisTable[visIndex + col];
+                visCell = 0; /// Clear it before check for players
+                const CMapField *mapField = Map.Field(mapIndex + col);
+                /// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
+                for (const uint8_t player : VisionFor) {
+                    visCell = std::max<uint8_t>(visCell, mapField->playerInfo.TeamVisibilityState(Players[player])); // Visible[player]);
+                    if (visCell >= 2) {
+                        visCell = 2;
+                        break;
+                    }
                 }
             }
         }
@@ -383,10 +390,10 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
         const uint16_t uBound = (thisThread + 1) * trgRect.h / numOfThreads; 
 
 
-        size_t  trgIndex = (trgRect.y + lBound) * trgSurface->w + trgRect.x;
+        size_t  trgIndex = size_t(trgRect.y + lBound) * trgSurface->w + trgRect.x;
         int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio;
 
-        for (size_t yTrg = lBound; yTrg < uBound; yTrg++) {
+        for (uint16_t yTrg = lBound; yTrg < uBound; yTrg++) {
 
             const int32_t ySrc          = int32_t(y >> 16);
             const int64_t yDiff         = y - (ySrc << 16);
@@ -394,7 +401,7 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
             const size_t  yIndex        = ySrc * srcWidth;
                   int64_t x             = int32_t(srcRect.x) << 16;
 
-            for (size_t xTrg = 0; xTrg < trgRect.w; xTrg++) {
+            for (uint16_t xTrg = 0; xTrg < trgRect.w; xTrg++) {
 
                 const int32_t xSrc          = int32_t(x >> 16);
                 const int64_t xDiff         = x - (xSrc << 16);
@@ -448,8 +455,8 @@ void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const
         const uint16_t lBound = (thisThread    ) * srcRect.h / numOfThreads; 
         const uint16_t uBound = (thisThread + 1) * srcRect.h / numOfThreads; 
 
-        intptr_t srcIndex = srcRect.x + (srcRect.y + lBound) * srcWidth;
-        intptr_t trgIndex = trgRect.x + (trgRect.y + lBound * texelHeight) * trgSurface->w;
+        size_t srcIndex = size_t(srcRect.y + lBound) * srcWidth + srcRect.x;
+        size_t trgIndex = size_t(trgRect.y + lBound * texelHeight) * trgSurface->w + trgRect.x;
 
         for (uint16_t ySrc = lBound; ySrc < uBound; ySrc++) {
             for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
