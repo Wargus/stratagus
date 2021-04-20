@@ -329,9 +329,9 @@ void CFogOfWar::FogUpscale4x4()
     uint32_t *const fogTexture = (uint32_t*)FogTexture.GetNext();
     
     /// Fog texture width and height in 32bit chunks
-    const size_t textureWidth  = FogTexture.GetWidth()  / 4;
-    const size_t textureHeight = FogTexture.GetHeight() / 4;
-    const size_t nextRowOffset = textureWidth * 4;
+    const uint16_t textureWidth  = FogTexture.GetWidth()  / 4;
+    const uint16_t textureHeight = FogTexture.GetHeight() / 4;
+    const uint16_t nextRowOffset = textureWidth * 4;
 
     #pragma omp parallel
     {
