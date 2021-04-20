@@ -10,7 +10,7 @@
 //
 /**@name script_ui.cpp - The ui ccl functions. */
 //
-//      (c) Copyright 1999-2015 by Lutz Sammer, Jimmy Salmon, Martin Renold
+//      (c) Copyright 1999-2021 by Lutz Sammer, Jimmy Salmon, Martin Renold
 //      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

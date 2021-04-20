@@ -10,7 +10,7 @@
 //
 /**@name script_tileset.cpp - The tileset ccl functions. */
 //
-//      (c) Copyright 2000-2007 by Lutz Sammer, Francois Beerten and Jimmy Salmon
+//      (c) Copyright 2000-2021 by Lutz Sammer, Francois Beerten and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

@@ -10,7 +10,7 @@
 //
 /**@name viewport.h - The Viewport header file. */
 //
-//      (c) Copyright 2012 by Joris Dauphin
+//      (c) Copyright 2021 by Joris Dauphin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

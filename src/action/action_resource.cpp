@@ -10,7 +10,7 @@
 //
 /**@name action_resource.cpp - The generic resource action. */
 //
-//      (c) Copyright 2001-2005 by Crestez Leonard and Jimmy Salmon
+//      (c) Copyright 2001-2021 by Crestez Leonard and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

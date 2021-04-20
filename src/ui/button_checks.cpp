@@ -10,7 +10,7 @@
 //
 /**@name button_checks.cpp - The button checks. */
 //
-//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      (c) Copyright 1999-2021 by Lutz Sammer, Vladi Belperchinov-Shabanski
 //      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

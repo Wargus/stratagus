@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2021 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
