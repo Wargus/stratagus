@@ -1677,7 +1677,7 @@ void CEditor::Init()
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 		}
-		GameSettings.Resources = SettingsPresetMapDefault;
+		GameSettings.SharedSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
 	} else {
 		CreateGame(CurrentMapPath, &Map);

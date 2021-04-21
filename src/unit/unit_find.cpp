@@ -35,6 +35,7 @@
 
 #include <limits.h>
 
+#include "settings.h"
 #include "stratagus.h"
 
 #include "unit_find.h"
@@ -470,7 +471,7 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
 		table.push_back(*it);
 	}
-	if (Preference.AllyDepositsAllowed) {
+	if (GameSettings.SharedSettings.AllyDepositsAllowed) {
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
 				for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
@@ -704,12 +705,12 @@ private:
 	CUnit *Find(Iterator begin, Iterator end) const
 	{
 		CUnit *enemy = NULL;
-		int best_cost = Preference.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
+		int best_cost = GameSettings.SharedSettings.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
 
 		for (Iterator it = begin; it != end; ++it) {
-			int cost = Preference.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
+			int cost = GameSettings.SharedSettings.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
 
-			if (Preference.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
+			if (GameSettings.SharedSettings.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
 				enemy = *it;
 				best_cost = cost;
 			}
@@ -987,7 +988,7 @@ public:
 
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
-		if (!Preference.SimplifiedAutoTargeting) {
+		if (!GameSettings.SharedSettings.SimplifiedAutoTargeting) {
 			FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
 		}
 		return Find(table.begin(), table.end());
@@ -1017,7 +1018,7 @@ private:
 			return;
 		}
 
-		if (Preference.SimplifiedAutoTargeting) {
+		if (GameSettings.SharedSettings.SimplifiedAutoTargeting) {
 			const int cost = TargetPriorityCalculate(attacker, dest);
 			if (cost > best_cost) {
 				best_unit = dest;

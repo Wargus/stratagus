@@ -2534,7 +2534,7 @@ void DestroyAllInside(CUnit &source)
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SharedSettings.SimplifiedAutoTargeting) {
 		// Original algorithm return smaler values for better targets
 		return -TargetPriorityCalculate(&unit, &dest);
 	}
@@ -2708,7 +2708,7 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 										 : unit.MapDistanceTo(target);
 
 	return (minRange <= distance && distance <= range)
-		   && (!GameSettings.Inside
+		   && (!GameSettings.SharedSettings.Inside
 			   || CheckObstaclesBetweenTiles(unit.tilePos, target.tilePos, MapFieldRocks | MapFieldForest));
 }
 
@@ -2729,7 +2729,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 										 : unit.MapDistanceTo(tilePos);
 
 	return (minRange <= distance && distance <= range)
-		   && (!GameSettings.Inside
+		   && (!GameSettings.SharedSettings.Inside
 			   || CheckObstaclesBetweenTiles(unit.tilePos, tilePos, MapFieldRocks | MapFieldForest));
 }
 
@@ -3137,7 +3137,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SharedSettings.SimplifiedAutoTargeting) {
 		target.Threshold = 0;
 	} else {		
 		const int threshold = 30;

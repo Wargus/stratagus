@@ -31,6 +31,8 @@
 
 //@{
 
+#include "settings.h"
+#include "stratagus.h"
 #include <stdint.h>
 #include <vector>
 
@@ -81,20 +83,11 @@ public:
 	bool operator == (const CServerSetup &rhs) const;
 	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
 public:
-	uint8_t ResourcesOption;       /// Resources option
-	uint8_t UnitsOption;           /// Unit # option
-	uint8_t FogOfWar;              /// Fog of war option
-	uint8_t Inside;                /// Inside option
-	uint8_t RevealMap;             /// Reveal all the map
-	uint8_t TilesetSelection;      /// Tileset select option
-	uint8_t GameTypeOption;        /// Game type option
-	uint8_t Difficulty;            /// Difficulty option
-	uint8_t MapRichness;           /// Map richness option
-	uint8_t Opponents;             /// Number of AI opponents
 	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint8_t Ready[PlayerMax];      /// Client ready state
 	uint8_t Race[PlayerMax];       /// Client race selection
-	// Fill in here...
+
+	SharedGameSettings SharedSettings;
 };
 
 /**

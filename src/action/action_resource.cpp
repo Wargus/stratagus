@@ -45,6 +45,7 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+#include "settings.h"
 #include "sound.h"
 #include "tileset.h"
 #include "translate.h"
@@ -164,7 +165,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 		depot = NULL;
 	}
 	// clicking on an allied depot still doesn't allow you to deposit there depending on preference
-	if (!Preference.AllyDepositsAllowed && depot->Player != harvester.Player) {
+	if (!GameSettings.SharedSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
 		depot = NULL;
 	}
 	order->CurrentResource = harvester.CurrentResource;

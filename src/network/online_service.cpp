@@ -941,14 +941,14 @@ public:
         statstring << std::hex << FileChecksums << ","; // cd key checksum - we use lua files checksum
 
         uint32_t game_settings = 0;
-        if (GameSettings.NumUnits == 1) {
+        if (GameSettings.SharedSettings.NumUnits == 1) {
             game_settings |= 0x200;
         }
         if (NoRandomPlacementMultiplayer == 1) {
             game_settings |= 0x400;
         }
-        switch (GameSettings.Resources) {
-        case -1:
+        switch (GameSettings.SharedSettings.Resources) {
+        case SettingsPresetMapDefault:
             break;
         case 1:
             game_settings |= 0x1000;

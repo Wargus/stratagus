@@ -116,11 +116,11 @@ class FullReplay
 public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
-		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
+		Commands(NULL)
 	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
+		memset(&SharedSettings, 0, sizeof(SharedGameSettings));
 	}
 	std::string Comment1;
 	std::string Comment2;
@@ -135,15 +135,7 @@ public:
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
 
-	int Resource;
-	int NumUnits;
-	int Difficulty;
-	bool NoFow;
-	bool Inside;
-	int RevealMap;
-	int MapRichness;
-	int GameType;
-	int Opponents;
+	SharedGameSettings SharedSettings;
 	int Engine[3];
 	int Network[3];
 	LogEntry *Commands;
@@ -211,15 +203,7 @@ static FullReplay *StartReplay()
 	replay->Map = Map.Info.Description;
 	replay->MapId = (signed int)Map.Info.MapUID;
 	replay->MapPath = CurrentMapPath;
-	replay->Resource = GameSettings.Resources;
-	replay->NumUnits = GameSettings.NumUnits;
-	replay->Difficulty = GameSettings.Difficulty;
-	replay->NoFow = GameSettings.NoFogOfWar;
-	replay->Inside = GameSettings.Inside;
-	replay->GameType = GameSettings.GameType;
-	replay->RevealMap = GameSettings.RevealMap;
-	replay->MapRichness = GameSettings.MapRichness;
-	replay->Opponents = GameSettings.Opponents;
+	replay->SharedSettings = GameSettings.SharedSettings;
 
 	replay->Engine[0] = StratagusMajorVersion;
 	replay->Engine[1] = StratagusMinorVersion;
@@ -261,15 +245,9 @@ static void ApplyReplaySettings()
 		// FIXME: need to handle errors better
 		Exit(1);
 	}
-	GameSettings.Resources = CurrentReplay->Resource;
-	GameSettings.NumUnits = CurrentReplay->NumUnits;
-	GameSettings.Difficulty = CurrentReplay->Difficulty;
-	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
-	GameSettings.Inside = CurrentReplay->Inside;
-	GameSettings.GameType = CurrentReplay->GameType;
-	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
-	GameSettings.MapRichness = CurrentReplay->MapRichness;
-	GameSettings.Opponents = CurrentReplay->Opponents;
+	GameSettings.SharedSettings = CurrentReplay->SharedSettings;
+	Map.NoFogOfWar = GameSettings.SharedSettings.NoFogOfWar;
+	FlagRevealMap = GameSettings.SharedSettings.RevealMap;
 
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
@@ -356,20 +334,42 @@ static void SaveFullLog(CFile &file)
 					i != PlayerMax - 1 ? ",\n" : "\n");
 	}
 	file.printf("  },\n");
-	file.printf("  Resource = %d,\n", CurrentReplay->Resource);
-	file.printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
-	file.printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
-	file.printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
-	file.printf("  Inside = %s,\n", CurrentReplay->Inside ? "true" : "false");
-	file.printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
-	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
-	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
-	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
+	file.printf("  Resources = %d\n", CurrentReplay->SharedSettings.Resources);
+	file.printf("  NumUnits = %d\n", CurrentReplay->SharedSettings.NumUnits);
+	file.printf("  Opponents = %d\n", CurrentReplay->SharedSettings.Opponents);
+	file.printf("  Difficulty = %d\n", CurrentReplay->SharedSettings.Difficulty);
+	file.printf("  GameType = %d\n", CurrentReplay->SharedSettings.GameType);
+	file.printf("  NoFogOfWar = %d\n", CurrentReplay->SharedSettings.NoFogOfWar);
+	file.printf("  Inside = %d\n", CurrentReplay->SharedSettings.Inside);
+	file.printf("  RevealMap = %d\n", CurrentReplay->SharedSettings.RevealMap);
+	file.printf("  MapRichness = %d\n", CurrentReplay->SharedSettings.MapRichness);
+	file.printf("  TilesetSelection = %d\n", CurrentReplay->SharedSettings.TilesetSelection);
+	file.printf("  AiExplores = %d\n", CurrentReplay->SharedSettings.AiExplores);
+	file.printf("  SimplifiedAutoTargeting = %d\n", CurrentReplay->SharedSettings.SimplifiedAutoTargeting);
+	file.printf("  AiChecksDependencies = %d\n", CurrentReplay->SharedSettings.AiChecksDependencies);
+	file.printf("  AllyDepositsAllowed = %d\n", CurrentReplay->SharedSettings.AllyDepositsAllowed);
+	file.printf("  GameSetting01 = %d\n", CurrentReplay->SharedSettings.GameSetting01);
+	file.printf("  GameSetting02 = %d\n", CurrentReplay->SharedSettings.GameSetting02);
+	file.printf("  GameSetting03 = %d\n", CurrentReplay->SharedSettings.GameSetting03);
+	file.printf("  GameSetting04 = %d\n", CurrentReplay->SharedSettings.GameSetting04);
+	file.printf("  GameSetting05 = %d\n", CurrentReplay->SharedSettings.GameSetting05);
+	file.printf("  GameSetting06 = %d\n", CurrentReplay->SharedSettings.GameSetting06);
 	file.printf("  Engine = { %d, %d, %d },\n",
 				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
 	file.printf("  Network = { %d, %d, %d }\n",
 				CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
 	file.printf("} )\n");
+
+	// and now, for easier debugging, we log a few things that aren't part of the replay, but might help...
+	file.printf("\n-- Preferences\n");
+	uint8_t * preferenceMemory = new uint8_t[sizeof(CPreference)];
+	memcpy(preferenceMemory, &Preference, sizeof(CPreference));
+	for (int i = 0; i < sizeof(CPreference); i++) {
+		file.printf("-- Preference byte %d : %08x\n", i, preferenceMemory[i]);
+	}
+	file.printf("\n\n");
+	delete[] preferenceMemory;
+
 	const LogEntry *log = CurrentReplay->Commands;
 	while (log) {
 		PrintLogCommand(*log, file);
@@ -648,24 +648,46 @@ static int CclReplayLog(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "Resource")) {
-			replay->Resource = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Resources")) {
+			replay->SharedSettings.Resources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NumUnits")) {
-			replay->NumUnits = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Difficulty")) {
-			replay->Difficulty = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "NoFow")) {
-			replay->NoFow = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Inside")) {
-			replay->Inside = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "RevealMap")) {
-			replay->RevealMap = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "GameType")) {
-			replay->GameType = LuaToNumber(l, -1);
+			replay->SharedSettings.NumUnits = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Opponents")) {
-			replay->Opponents = LuaToNumber(l, -1);
+			replay->SharedSettings.Opponents = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Difficulty")) {
+			replay->SharedSettings.Difficulty = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameType")) {
+			replay->SharedSettings.GameType = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "NoFogOfWar")) {
+			replay->SharedSettings.NoFogOfWar = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Inside")) {
+			replay->SharedSettings.Inside = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "RevealMap")) {
+			replay->SharedSettings.RevealMap = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MapRichness")) {
-			replay->MapRichness = LuaToNumber(l, -1);
+			replay->SharedSettings.MapRichness = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TilesetSelection")) {
+			replay->SharedSettings.TilesetSelection = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AiExplores")) {
+			replay->SharedSettings.AiExplores = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "SimplifiedAutoTargeting")) {
+			replay->SharedSettings.SimplifiedAutoTargeting = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AiChecksDependencies")) {
+			replay->SharedSettings.AiChecksDependencies = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AllyDepositsAllowed")) {
+			replay->SharedSettings.AllyDepositsAllowed = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting01")) {
+			replay->SharedSettings.GameSetting01 = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting02")) {
+			replay->SharedSettings.GameSetting02 = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting03")) {
+			replay->SharedSettings.GameSetting03 = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting04")) {
+			replay->SharedSettings.GameSetting04 = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting05")) {
+			replay->SharedSettings.GameSetting05 = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GameSetting06")) {
+			replay->SharedSettings.GameSetting06 = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");

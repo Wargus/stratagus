@@ -297,7 +297,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max	|| dist < unit.Type->MinAttackRange) {
 		return false;
 	}
-	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
+	if (GameSettings.SharedSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
 		return false;
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.

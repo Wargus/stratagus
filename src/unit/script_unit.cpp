@@ -33,6 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "settings.h"
 #include "stratagus.h"
 #include "unit.h"
 
@@ -1315,7 +1316,7 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const bool isSimplified = LuaToBoolean(l, 1);
 	if (!IsNetworkGame()) {
-		Preference.SimplifiedAutoTargeting = isSimplified;
+		GameSettings.SharedSettings.SimplifiedAutoTargeting = isSimplified;
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB, 
 								   int(isSimplified), 0, 0, 0, 0);
