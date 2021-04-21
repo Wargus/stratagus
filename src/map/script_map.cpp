@@ -10,7 +10,7 @@
 //
 /**@name script_map.cpp - The map ccl functions. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Jimmy Salmon and Alyokhin
+//      (c) Copyright 1999-2005 by Lutz Sammer and Jimmy Salmon
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

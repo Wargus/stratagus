@@ -10,7 +10,7 @@
 //
 /**@name map_radar.cpp - The map radar handling. */
 //
-//      (c) Copyright 2004-2021 by Russell Smith and Jimmy Salmon.
+//      (c) Copyright 2004-2006 by Russell Smith and Jimmy Salmon.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

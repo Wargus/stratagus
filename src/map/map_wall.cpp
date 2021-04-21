@@ -10,7 +10,7 @@
 //
 /**@name map_wall.cpp - The map wall handling. */
 //
-//      (c) Copyright 1999-2021 by Vladi Shabanski and Andrettin
+//      (c) Copyright 1999-2015 by Vladi Shabanski and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by

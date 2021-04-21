@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2021 by Lutz Sammer, Jimmy Salmon and
+//      (c) Copyright 2002-2015 by Lutz Sammer, Jimmy Salmon and
 //		Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

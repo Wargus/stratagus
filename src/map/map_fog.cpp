@@ -10,7 +10,7 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2021 by Lutz Sammer, Vladi Shabanski,
+//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Shabanski,
 //		Russell Smith, Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

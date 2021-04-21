@@ -10,7 +10,7 @@
 //
 /**@name spell_demolish.cpp - The spell demolish. */
 //
-//      (c) Copyright 1998-2021 by Vladi Belperchinov-Shabanski, Lutz Sammer,
+//      (c) Copyright 1998-2012 by Vladi Belperchinov-Shabanski, Lutz Sammer,
 //                                 Jimmy Salmon, and Joris DAUPHIN
 //
 //      This program is free software; you can redistribute it and/or modify
