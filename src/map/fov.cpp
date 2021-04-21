@@ -212,7 +212,7 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos,
 **  @param height			Spectrator's height in tiles
 **  @param range			Spectrator's sight range in tiles
 */
-void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range)
+inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range)
 {
 	enum SpectatorGeometry {cOneTiled, cEven, cOdd, cTall, cWide} ;
 	const uint8_t geometry = [width, height]{   if (width == height) {
