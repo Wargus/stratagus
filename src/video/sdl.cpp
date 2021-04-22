@@ -105,6 +105,9 @@ const EventCallback *Callbacks;
 
 bool IsSDLWindowVisible = true;
 
+/// Just a counter to cache window data on in other places when the size changes
+uint8_t SizeChangeCounter = 0;
+
 static bool dummyRenderer = false;
 
 uint32_t SDL_CUSTOM_KEY_UP;
@@ -559,6 +562,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_WINDOWEVENT:
 			switch (event.window.event) {
+				case SDL_WINDOWEVENT_SIZE_CHANGED:
+				SizeChangeCounter++;
+				break;
+
 				case SDL_WINDOWEVENT_ENTER:
 				case SDL_WINDOWEVENT_LEAVE:
 				{
