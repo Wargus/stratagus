@@ -175,6 +175,15 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 */
 void CFogOfWar::GenerateFog()
 {
+    /// FIXME: Maybe to move this set into the CFogOfWar and recalt with every change of shared vision
+    std::set<uint8_t> playersToRenderView;
+    for (const uint8_t player : VisionFor) {
+        playersToRenderView.insert(player);
+        for (const uint8_t playersSharedVision : Players[player].GetSharedVision()) {
+            playersToRenderView.insert(playersSharedVision);
+        }
+    }
+
     #pragma omp parallel
     {
         const uint16_t thisThread   = omp_get_thread_num();
@@ -193,9 +202,8 @@ void CFogOfWar::GenerateFog()
                 uint8_t &visCell = VisTable[visIndex + col];
                 visCell = 0; /// Clear it before check for players
                 const CMapField *mapField = Map.Field(mapIndex + col);
-                /// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
-                for (const uint8_t player : VisionFor) {
-                    visCell = std::max<uint8_t>(visCell, mapField->playerInfo.TeamVisibilityState(Players[player])); // Visible[player]);
+                for (const uint8_t player : playersToRenderView) {
+                    visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]); // mapField->playerInfo.TeamVisibilityState(Players[player]));
                     if (visCell >= 2) {
                         visCell = 2;
                         break;
