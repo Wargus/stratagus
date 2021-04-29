@@ -668,7 +668,7 @@ int main(int argc, char * argv[]) {
     environ[i] = (char*)"OMP_WAIT_POLICY=passive";
     environ[i + 1] = NULL;
 #ifdef WIN32
-	int ret = _spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
+	int ret = _spawnvpe(_P_WAIT, stratagus_bin, stratagus_argv, environ);
 #else
 	int ret = 0;
 	int childpid = fork();
