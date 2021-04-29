@@ -662,15 +662,18 @@ int main(int argc, char * argv[]) {
 	stratagus_argv[argc + 2] = NULL;
 
 	// Needed to reduce CPU load while idle threads are wating for havn't finished yet ones
-	char *const env[] = { (char*)"OMP_WAIT_POLICY=passive", NULL }; 
-
+	extern char** environ;
+    int i = 0;
+    while(environ[i]) { i++; }
+    environ[i] = (char*)"OMP_WAIT_POLICY=passive";
+    environ[i + 1] = NULL;
 #ifdef WIN32
-	int ret = _spawnvpe(_P_WAIT, stratagus_bin, stratagus_argv, env);
+	int ret = _spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
 #else
 	int ret = 0;
 	int childpid = fork();
 	if (childpid == 0) {
-		execvpe(stratagus_bin, stratagus_argv, env);
+		execvp(stratagus_bin, stratagus_argv);
 		if (strcmp(stratagus_bin, "stratagus") == 0) {
 			realpath(argv[0], stratagus_bin);
 			parentdir(stratagus_bin);
