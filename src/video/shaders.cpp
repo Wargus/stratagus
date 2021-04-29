@@ -242,6 +242,32 @@ static int loadShaders() {
 	return numShdr;
 }
 
+// caches that don't change for a shader program
+static int LastShaderIndex = -1;
+static GLuint ShaderProgram;
+static GLint Texture;
+static GLint MVPMatrix;
+static GLint FrameDirection;
+static GLint FrameCount;
+static GLint OutputSize;
+static GLint TextureSize;
+static GLint InputSize;
+static GLint VertexCoord;
+static GLint TexCoord;
+// caches that don't change for a window size
+extern uint8_t SizeChangeCounter; // from sdl.cpp
+static uint16_t LastSizeVersion = -1;
+static int LastVideoWidth = -1;
+static int LastVideoHeight = -1;
+static double LastVideoVerticalPixelSize = -1.0;
+static int DrawableWidth;
+static int DrawableHeight;
+static int XBorder;
+static int YBorder;
+static GLfloat modelview[4 * 4];
+static GLfloat projection[4 * 4];
+static GLfloat matrix[4 * 4] = {0.0f};
+
 bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
 	if (!canUseShaders || currentShaderIdx == 0) {
 		return false;
@@ -253,82 +279,96 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	SDL_RenderClear(renderer);
 
 	SDL_GL_BindTexture(backBuffer, NULL, NULL);
-	GLuint shaderProgram = shaderPrograms[currentShaderIdx];
-	if (shaderProgram != 0) {
+	if (LastShaderIndex != currentShaderIdx) {
+		LastShaderIndex = currentShaderIdx;
+		// force to recalculate everything based on size, too
+		LastSizeVersion = -1;
+
+		ShaderProgram = shaderPrograms[currentShaderIdx];
+		if (ShaderProgram != 0) {
+			// These are the default uniforms and attrs for glsl converted libretro shaders
+			Texture = glGetUniformLocation(ShaderProgram, "Texture");
+			MVPMatrix = glGetUniformLocation(ShaderProgram, "MVPMatrix");
+			FrameDirection = glGetUniformLocation(ShaderProgram, "FrameDirection");
+			FrameCount = glGetUniformLocation(ShaderProgram, "FrameCount");
+			OutputSize = glGetUniformLocation(ShaderProgram, "OutputSize");
+			TextureSize = glGetUniformLocation(ShaderProgram, "TextureSize");
+			InputSize = glGetUniformLocation(ShaderProgram, "InputSize");
+			// (timfel): If I manually set the VertexCoord, it's wrong? But I have to set TexCoord? no idea...
+			// VertexCoord = glGetAttribLocation(ShaderProgram, "VertexCoord");
+			TexCoord = glGetAttribLocation(ShaderProgram, "TexCoord");
+		}
+
+		// the texture is always 0, never changes
+		glUniform1i(Texture, 0);
+		glUniform1f(FrameDirection, 1);
+		glUniform1f(FrameCount, 1);
+	}
+
+	if (ShaderProgram != 0) {
 		lazyGlGetIntegerv(GL_CURRENT_PROGRAM, &oldProgramId);
-		glUseProgram(shaderProgram);
+		glUseProgram(ShaderProgram);
 	}
 
-	// These are the default uniforms and attrs for glsl converted libretro shaders
-	GLint Texture = glGetUniformLocation(shaderProgram, "Texture");
-	GLint MVPMatrix = glGetUniformLocation(shaderProgram, "MVPMatrix");
-	GLint FrameDirection = glGetUniformLocation(shaderProgram, "FrameDirection");
-	GLint FrameCount = glGetUniformLocation(shaderProgram, "FrameCount");
-	GLint OutputSize = glGetUniformLocation(shaderProgram, "OutputSize");
-	GLint TextureSize = glGetUniformLocation(shaderProgram, "TextureSize");
-	GLint InputSize = glGetUniformLocation(shaderProgram, "InputSize");
-	// (timfel): If I manually set the VertexCoord, it's wrong? But I have to set TexCoord? no idea...
-	// GLint VertexCoord = glGetAttribLocation(shaderProgram, "VertexCoord");
-	GLint TexCoord = glGetAttribLocation(shaderProgram, "TexCoord");
+	if (LastSizeVersion != SizeChangeCounter || LastVideoWidth != Video.Width || LastVideoHeight != Video.Height || LastVideoVerticalPixelSize != Video.VerticalPixelSize) {
+		LastSizeVersion = SizeChangeCounter;
+		LastVideoWidth = Video.Width;
+		LastVideoHeight = Video.Height;
+		LastVideoVerticalPixelSize = Video.VerticalPixelSize;
 
-	// Window coordinates
-	int w, h, xBorder = 0, yBorder = 0;
-	SDL_GL_GetDrawableSize(win, &w, &h);
+		// Window coordinates
+		SDL_GL_GetDrawableSize(win, &DrawableWidth, &DrawableHeight);
 
-	// letterboxing
-	double xScale = (double)w / Video.Width;
-	double yScale = (double)h  / (Video.Height * Video.VerticalPixelSize);
-	if (xScale > yScale) {
-		xScale = yScale;
-		xBorder = std::floor((w - (Video.Width * yScale)) / 2.0);
-		w = Video.Width * yScale;
-	} else {
-		yScale = xScale;
-		xScale = xScale * Video.VerticalPixelSize;
-		yBorder = std::floor((h - (Video.Height * xScale)) / 2.0);
-		h = Video.Height * xScale;
-	}
+		// letterboxing
+		double xScale = (double)DrawableWidth / LastVideoWidth;
+		double yScale = (double)DrawableHeight / (LastVideoHeight * LastVideoVerticalPixelSize);
+		if (xScale > yScale) {
+			xScale = yScale;
+			XBorder = std::floor((DrawableWidth - (LastVideoWidth * yScale)) / 2.0);
+			YBorder = 0;
+			DrawableWidth = LastVideoWidth * yScale;
+		} else {
+			yScale = xScale;
+			xScale = xScale * LastVideoVerticalPixelSize;
+			XBorder = 0;
+			YBorder = std::floor((DrawableHeight - (LastVideoHeight * xScale)) / 2.0);
+			DrawableHeight = LastVideoHeight * xScale;
+		}
 
-	glUniform1i(Texture, 0);
-	GLfloat modelview[4 * 4];
-	GLfloat projection[4 * 4];
-	lazyGlGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-	lazyGlGetFloatv(GL_PROJECTION_MATRIX, projection);
-	GLfloat matrix[4 * 4] = {0.0f};
-	for (int i = 0; i < 4; i++) {
-		for(int j = 0; j < 4; j++) {
-			for (int k = 0; k < 4; k++) {
-				matrix[i * 4 + j] += modelview[i * 4 + k] * projection[k * 4 + j];
+		// these uniforms only change with the video size
+		glUniform2f(OutputSize, (float)DrawableWidth, (float)DrawableHeight);
+		glUniform2f(TextureSize, (float)LastVideoWidth, (float)LastVideoHeight);
+		glUniform2f(InputSize, (float)LastVideoWidth, (float)LastVideoHeight);
+
+		lazyGlGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+		lazyGlGetFloatv(GL_PROJECTION_MATRIX, projection);
+		memset(matrix, 0, sizeof(matrix));
+		for (int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++) {
+				for (int k = 0; k < 4; k++) {
+					matrix[i * 4 + j] += modelview[i * 4 + k] * projection[k * 4 + j];
+				}
 			}
 		}
+		glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, matrix);
 	}
-	glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, matrix);
-	glUniform1f(FrameDirection, 1);
-	glUniform1f(FrameCount, 1);
-	glUniform2f(OutputSize, (float)w, (float)h);
-	glUniform2f(TextureSize, (float)Video.Width, (float)Video.Height);
-	glUniform2f(InputSize, (float)Video.Width, (float)Video.Height);
 
-	GLfloat minx, miny, maxx, maxy;
-	GLfloat minu, maxu, minv, maxv;
+	const GLfloat minx = 0.0f;
+	const GLfloat miny = 0.0f;
+	const GLfloat maxx = DrawableWidth;
+	const GLfloat maxy = DrawableHeight;
 
-	minx = 0.0f;
-	miny = 0.0f;
-	maxx = w;
-	maxy = h;
-
-	minu = 0.0f;
-	maxu = 1.0f;
-	minv = 0.0f;
-	maxv = 1.0f;
-
+	const GLfloat minu = 0.0f;
+	const GLfloat maxu = 1.0f;
+	const GLfloat minv = 0.0f;
+	const GLfloat maxv = 1.0f;
 
 	lazyGlMatrixMode(GL_PROJECTION);
 	lazyGlLoadIdentity();
-	lazyGlOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
-	lazyGlViewport(xBorder, yBorder, w, h);
+	lazyGlOrtho(0.0f, DrawableWidth, DrawableHeight, 0.0f, 0.0f, 1.0f);
+	lazyGlViewport(XBorder, YBorder, DrawableWidth, DrawableHeight);
 
-	lazyGlBegin(GL_TRIANGLE_STRIP);
+	lazyGlBegin(GL_TRIANGLE_STRIP); {
 		glVertexAttrib4f(TexCoord, minu, minv, 0, 0);
 		lazyGlTexCoord2f(minu, minv);
 		lazyGlVertex2f(minx, miny);
@@ -344,10 +384,10 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 		glVertexAttrib4f(TexCoord, maxu, maxv, 0, 0);
 		lazyGlTexCoord2f(maxu, maxv);
 		lazyGlVertex2f(maxx, maxy);
-	lazyGlEnd();
+	} lazyGlEnd();
 	SDL_GL_SwapWindow(win);
 
-	if (shaderProgram != 0) {
+	if (ShaderProgram != 0) {
 		glUseProgram(oldProgramId);
 	}
 
