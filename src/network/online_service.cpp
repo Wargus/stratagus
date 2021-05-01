@@ -138,24 +138,36 @@ public:
     };
 
     uint8_t read8() {
+        if (pos > received_bytes) {
+            return 0;
+        }
         uint8_t byte = buffer[pos];
         consumeData(1);
         return byte;
     }
 
     uint16_t read16() {
+        if (pos + 1 > received_bytes) {
+            return 0;
+        }
         uint16_t byte = ntohs(reinterpret_cast<uint16_t *>(buffer + pos)[0]);
         consumeData(2);
         return ntohs(byte);
     }
 
     uint32_t read32() {
+        if (pos + 3 > received_bytes) {
+            return 0;
+        }
         uint32_t byte = ntohl(reinterpret_cast<uint32_t *>(buffer + pos)[0]);
         consumeData(4);
         return ntohl(byte);
     }
 
     uint64_t read64() {
+        if (pos + 7 > received_bytes) {
+            return 0;
+        }
         uint64_t byte = reinterpret_cast<uint64_t *>(buffer + pos)[0];
         consumeData(8);
         return ntohl(byte & (uint32_t)-1) | ntohl(byte >> 32);
@@ -263,7 +275,11 @@ public:
 
 private:
     void consumeData(int bytes) {
-        assert(pos + bytes <= received_bytes);
+        if (pos + bytes > received_bytes) {
+            // XXX: This is probably a symptom of missing error handling
+            // somewhere else, but we'll try just not to crash here
+            return;
+        }
         pos += bytes;
     }
 
@@ -1466,6 +1482,9 @@ private:
 
     void handleGamelist(Context *ctx) {
         uint32_t cnt = ctx->getMsgIStream()->read32();
+        if (cnt > 100) {
+            cnt = 100;
+        }
         std::vector<Game*> games;
         while (cnt--) {
             uint32_t settings = ctx->getMsgIStream()->read32();
@@ -1490,6 +1509,9 @@ private:
 
     void handleFriendlist(Context *ctx) {
         uint8_t cnt = ctx->getMsgIStream()->read8();
+        if (cnt > 100) {
+            cnt = 100;
+        }
         std::vector<Friend*> friends;
         while (cnt--) {
             std::string user = ctx->getMsgIStream()->readString();
@@ -1686,58 +1708,42 @@ class S2C_CREATEACCOUNT2 : public NetworkState {
                 nameSugg = " (try username: " + nameSugg + ")";
             }
 
+            std::string errMsg;
+
             switch (status) {
             case 0x00:
                 // login into created account
                 ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
                 return;
             case 0x01:
-                ctx->showError("Name too short" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name too short";
+                break;
             case 0x02:
-                ctx->showError("Name contains invalid character(s)" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name contains invalid character(s)";
+                break;
             case 0x03:
-                ctx->showError("Name contains banned word(s)" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name contains banned word(s)";
+                break;
             case 0x04:
-                ctx->showError("Account already exists" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Account already exists";
+                break;
             case 0x05:
-                ctx->showError("Account is still being created" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Account is still being created";
+                break;
             case 0x06:
-                ctx->showError("Name does not contain enough alphanumeric characters" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name does not contain enough alphanumeric characters";
+                break;
             case 0x07:
-                ctx->showError("Name contained adjacent punctuation characters" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name contained adjacent punctuation characters";
+                break;
             case 0x08:
-                ctx->showError("Name contained too many punctuation characters" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Name contained too many punctuation characters";
+                break;
             default:
-                ctx->showError("Unknown error creating account" + nameSugg);
-                ctx->setUsername("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Unknown error creating account";
             }
-
+            ctx->setState(new DisconnectedState(errMsg + nameSugg));
+            return;
         }
     }
 };
@@ -1762,6 +1768,7 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
 
             uint32_t status = ctx->getMsgIStream()->read32();
             ctx->getMsgIStream()->finishMessage();
+            std::string errMsg;
 
             switch (status) {
             case 0x00:
@@ -1770,27 +1777,21 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 return;
             case 0x01:
             case 0x010000:
-                ctx->showError("Account does not exist");
-                ctx->setUsername("");
-                ctx->setPassword("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Account does not exist";
+                break;
             case 0x02:
             case 0x020000:
-                ctx->showError("Incorrect password");
-                ctx->setPassword("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Incorrect password";
+                break;
             case 0x06:
             case 0x060000:
-                ctx->showError("Account closed: " + ctx->getMsgIStream()->readString());
-                ctx->setPassword("");
-                ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
-                return;
+                errMsg = "Account closed: " + ctx->getMsgIStream()->readString();
+                break;
             default:
-                ctx->setState(new DisconnectedState("unknown logon response"));
-                return;
+                errMsg = "unknown logon response";
+                break;
             }
+            ctx->setState(new DisconnectedState(errMsg));
         }
     }
 };
@@ -2011,16 +2012,20 @@ class ConnectState : public NetworkState {
         if (!localHost.compare("127.0.0.1")) {
             localHost = "0.0.0.0";
         }
-        if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
-            ctx->setState(new DisconnectedState("TCP open failed"));
-            return;
-        }
         if (!ctx->getTCPSocket()->IsValid()) {
-            ctx->setState(new DisconnectedState("TCP not valid"));
-            return;
+            if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
+                ctx->setState(new DisconnectedState("TCP open failed"));
+                return;
+            }
+            if (!ctx->getTCPSocket()->IsValid()) {
+                ctx->setState(new DisconnectedState("TCP not valid"));
+                return;
+            }
         }
         if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
-            ctx->setState(new DisconnectedState("TCP connect failed for server " + ctx->getHost()->toString()));
+            if (--retries < 0) {
+                ctx->setState(new DisconnectedState("TCP connect failed for server " + ctx->getHost()->toString()));
+            }
             return;
         }
 
@@ -2101,6 +2106,9 @@ class ConnectState : public NetworkState {
         DebugPrint("TCP Sent: 0x50 AUTH_INFO\n");
         ctx->setState(new S2C_SID_PING());
     }
+
+private:
+    int retries = 15;
 };
 
 static Context _ctx;
