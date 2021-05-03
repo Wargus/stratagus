@@ -444,11 +444,11 @@ void CFieldOfView::PrepareCache(const Vec2i pos, const uint16_t width, const uin
 	bottomRight.y =  pos.y + height + range;
 	Map.Clamp(bottomRight);
 
-	const uint16_t sightRecWidth = bottomRight.x - upperLeft.x;
+	const uint16_t sightRecWidth = bottomRight.x - upperLeft.x + 1;
 
 	size_t index = upperLeft.x + upperLeft.y * Map.Info.MapWidth;
 
-	for (uint16_t y = upperLeft.y; y < bottomRight.y; y++ ) {
+	for (uint16_t y = upperLeft.y; y <= bottomRight.y; y++ ) {
 		std::fill_n(&MarkedTilesCache[index], sightRecWidth, 0);
 		index += Map.Info.MapWidth;
 	}
