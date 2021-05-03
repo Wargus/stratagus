@@ -109,10 +109,10 @@ private:
                                               /// ThisPlayer and his allies in normal games
                                               /// Any set of players for observers and in the replays
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
-    size_t               VisTable_Index0 {0}; /// index in the vision table for [0:0] tile
+    size_t               VisTable_Index0 {0}; /// index in the vision table for [0:0] map tile
     size_t               VisTableWidth   {0}; /// width of the vision table
     CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map 
-                                              /// + 1 tile around (for simplification of upscale algorithm purposes).
+                                              /// + 1 tile to the left and up (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
     CBlurer              Blurer;              /// Blurer for fog of war texture
 

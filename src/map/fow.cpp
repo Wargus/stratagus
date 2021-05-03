@@ -61,18 +61,19 @@ CFogOfWar FogOfWar; /// Fog of war itself
 void CFogOfWar::Init()
 {
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    /// Extra tiles will always be VisionType::cNone. 
-    VisTableWidth   = Map.Info.MapWidth + 2;    
-    VisTable_Index0 = VisTableWidth + 1;
-
-    const size_t tableSize = VisTableWidth * (Map.Info.MapHeight + 2);
+    /// Extra tiles will always be VisionType::cUnseen. 
+                   VisTableWidth  = Map.Info.MapWidth  + 2;
+    const uint16_t visTableHeight = Map.Info.MapHeight + 2;
+    const size_t   tableSize      = VisTableWidth * visTableHeight;
     VisTable.clear();
     VisTable.resize(tableSize);
     std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
+    
+    VisTable_Index0 = VisTableWidth + 1;
 
-    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 2) * 4;
-    const uint16_t fogTextureHeight = (Map.Info.MapHeight + 2) * 4;
+    /// +1 to the top & left for 4x scale algorithm purposes, 
+    const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 1) * 4;
+    const uint16_t fogTextureHeight = (Map.Info.MapHeight + 1) * 4;
 
     FogTexture.Init(fogTextureWidth, fogTextureHeight, Settings.NumOfEasingSteps);
     
