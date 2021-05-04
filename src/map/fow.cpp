@@ -185,6 +185,8 @@ void CFogOfWar::GenerateFog()
         }
     }
 
+    const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
+    
     #pragma omp parallel
     {
         const uint16_t thisThread   = omp_get_thread_num();
@@ -205,7 +207,7 @@ void CFogOfWar::GenerateFog()
                 const CMapField *mapField = Map.Field(mapIndex + col);
                 for (const uint8_t player : playersToRenderView) {
                     visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]); // mapField->playerInfo.TeamVisibilityState(Players[player]));
-                    if (visCell >= 2) {
+                    if (visCell >= visibleThreshold) {
                         visCell = 2;
                         break;
                     }
