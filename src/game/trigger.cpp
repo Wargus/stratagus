@@ -259,7 +259,17 @@ static int CclIfNearUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Player has the quantity of rescued unit-type near to unit-type.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		IfRescuedNearUnit("this", ">=", 1, "unit-archer", "unit-circle-of-power")
+** 	</code>
+** </div>
 */
 static int CclIfRescuedNearUnit(lua_State *l)
 {
@@ -423,7 +433,20 @@ void ActionStopTimer()
 }
 
 /**
+** <b>Description</b>
+**
 **  Add a trigger.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+** 		AddTrigger(<br>
+**			function() return (GetPlayerData(1,"UnitTypesCount","unit-farm") >= 4) end,<br>
+**			function() return ActionVictory() end<br>
+**		)
+** 	</code>
+** </div>
 */
 static int CclAddTrigger(lua_State *l)
 {

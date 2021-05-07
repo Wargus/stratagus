@@ -655,11 +655,21 @@ static int CclRemoveUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Create a unit and place it on the map
 **
 **  @param l  Lua state.
 **
 **  @return   Returns the slot number of the made unit.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		CreateUnit("unit-human-transport", 1, {94, 0})
+** 	</code>
+** </div>
 */
 static int CclCreateUnit(lua_State *l)
 {
@@ -804,11 +814,21 @@ static int CclSetTeleportDestination(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Order a unit
 **
 **  @param l  Lua state.
 **
 **  OrderUnit(player, unit-type, sloc, dloc, order)
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		OrderUnit(1,"unit-human-transport",{94,0},{80,9},"move")
+** 	</code>
+** </div>
 */
 static int CclOrderUnit(lua_State *l)
 {

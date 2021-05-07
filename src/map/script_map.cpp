@@ -213,7 +213,17 @@ static int CclShowMapLocation(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set fog of war on/off.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		SetFogOfWar(true)
+** 	</code>
+** </div>
 **
 **  @param l  Lua state.
 */
