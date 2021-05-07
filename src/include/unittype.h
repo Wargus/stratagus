@@ -531,7 +531,7 @@ public:
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *DeathExplosion;
+	LuaCallback *OnDeath;           /// lua function called when unit is about to die, receives x,y,unit
 	LuaCallback *OnHit;             /// lua function called when unit is hit
 	LuaCallback *OnEachCycle;       /// lua function called every cycle
 	LuaCallback *OnEachSecond;      /// lua function called every second

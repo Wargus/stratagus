@@ -2437,13 +2437,14 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos);
 	}
-	if (type->DeathExplosion) {
+	if (type->OnDeath) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 
-		type->DeathExplosion->pushPreamble();
-		type->DeathExplosion->pushInteger(pixelPos.x);
-		type->DeathExplosion->pushInteger(pixelPos.y);
-		type->DeathExplosion->run();
+		type->OnDeath->pushPreamble();
+		type->OnDeath->pushInteger(UnitNumber(unit));
+		type->OnDeath->pushInteger(pixelPos.x);
+		type->OnDeath->pushInteger(pixelPos.y);
+		type->OnDeath->run();
 	}
 	if (suicide) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
