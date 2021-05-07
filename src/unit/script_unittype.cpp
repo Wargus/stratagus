@@ -453,6 +453,7 @@ static int CclDefineUnitType(lua_State *l)
 	int redefine;
 	if (type) {
 		redefine = 1;
+		DebugPrint("Redefining unit-type '%s'\n" _C_ str);
 	} else {
 		type = NewUnitTypeSlot(str);
 		redefine = 0;
