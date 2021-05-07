@@ -1003,26 +1003,28 @@ public:
 
     virtual void reportGameResult() {
         BNCSOutputStream msg(0x2c);
-        msg.serialize32(8); // number of results
+        msg.serialize32(0); // Normal game
+        msg.serialize32NativeByteOrder(8); // number of results
         for (int i = 0; i < 8; i++) {
             if (NetLocalPlayerNumber == i) {
                 switch (GameResult) {
                 case GameVictory:
-                    msg.serialize32(0x01);
+                    msg.serialize32NativeByteOrder(0x01);
                     break;
                 case GameDefeat:
-                    msg.serialize32(0x02);
+                    msg.serialize32NativeByteOrder(0x02);
                     break;
                 case GameDraw:
-                    msg.serialize32(0x03);
+                    msg.serialize32NativeByteOrder(0x03);
                     break;
-                default:
-                    msg.serialize32(0x04);
+                default: // disconnect
+                    msg.serialize32NativeByteOrder(0x04);
                     break;
                 }
             } else {
                 // it's annoying to tease out the other results, we ignore it and let the server merge
-                msg.serialize32(0x00);
+                // by sending that the result is unknown/still playing
+                msg.serialize32NativeByteOrder(0x00);
             }
         }
         for (int i = 0; i < 8; i++) {
