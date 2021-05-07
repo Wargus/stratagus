@@ -94,7 +94,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(), Action(action), Finished(false)
+	explicit COrder(int action) : Goal(), Action(action), Finished(false), Instant(false)
 	{
 	}
 	virtual ~COrder();
@@ -150,7 +150,7 @@ public:
 	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
 	static COrder *NewActionTransformInto(CUnitType &type);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
-	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant = false);
 
 protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
@@ -160,6 +160,7 @@ private:
 public:
 	const unsigned char Action;   /// global action
 	bool Finished; /// true when order is finish
+	bool Instant; /// true to ignore TimeCost
 };
 
 typedef COrder *COrderPtr;

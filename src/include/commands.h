@@ -99,7 +99,7 @@ extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush, bool instant = false);
 /// immediate transforming into type.
 extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
 /// Prepare command cancel upgrade to

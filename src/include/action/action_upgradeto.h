@@ -58,7 +58,7 @@ private:
 
 class COrder_UpgradeTo : public COrder
 {
-	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant);
 public:
 	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(NULL), Ticks(0) {}
 

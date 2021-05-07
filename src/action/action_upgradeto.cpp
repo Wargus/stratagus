@@ -64,13 +64,14 @@
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type)
+/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant)
 {
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubUnitType(type);
 	order->Type = &type;
+	order->Instant = instant;
 	return order;
 }
 
@@ -271,13 +272,13 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	const CUnitStats &newstats = newtype.Stats[player.Index];
 
 	this->Ticks += std::max(1, player.SpeedUpgrade / SPEEDUP_FACTOR);
-	if (this->Ticks < newstats.Costs[TimeCost]) {
+	if (!this->Instant && this->Ticks < newstats.Costs[TimeCost]) {
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
 
 	if (unit.Anim.Unbreakable) {
-		this->Ticks = newstats.Costs[TimeCost];
+		this->Ticks = this->Instant ? 0 : newstats.Costs[TimeCost];
 		return ;
 	}
 

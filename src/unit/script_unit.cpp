@@ -733,7 +733,7 @@ static int CclTransformUnit(lua_State *l)
 	lua_pushvalue(l, 2);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1);
+	CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1, true);
 	lua_pushvalue(l, 1);
 	return 1;
 }
