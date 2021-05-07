@@ -34,6 +34,7 @@
 #include "viewport.h"
 
 #include "font.h"
+#include "fow.h"
 #include "map.h"
 #include "missile.h"
 #include "particle.h"
@@ -43,6 +44,9 @@
 #include "unittype.h"
 #include "ui.h"
 #include "video.h"
+
+
+bool CViewport::ShowGrid = false;
 
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
@@ -55,6 +59,7 @@ CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
 
 CViewport::~CViewport()
 {
+	this->Clean();
 }
 
 bool CViewport::Contains(const PixelPos &screenPos) const
@@ -287,9 +292,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
-#ifdef DEBUG	
-	DrawMapGridInViewport();
-#endif
+	if (CViewport::isGridEnabled()) {
+		DrawMapGridInViewport();
+	}
 }
 
 /**
@@ -339,7 +344,7 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 /**
 **  Draw a map viewport.
 */
-void CViewport::Draw() const
+void CViewport::Draw()
 {
 	PushClipping();
 	this->SetClipping();
@@ -436,7 +441,8 @@ void CViewport::Draw() const
 		}
 		ParticleManager.endDraw();
 	}
-
+	
+	/// Draw Fog of War
 	this->DrawMapFogOfWar();
 
 	// If there was a click missile, draw it again here above the fog

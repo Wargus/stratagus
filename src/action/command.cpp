@@ -909,56 +909,52 @@ void CommandDiplomacy(int player, int state, int opponent)
 /**
 **  Shared vision changed.
 **
-**  @param player    Player which changes his state.
-**  @param state     New shared vision state.
-**  @param opponent  Opponent.
+**  @param playerIndex   Player which changes his state.
+**  @param state         New shared vision state.
+**  @param opponentIndex Opponent.
 */
-void CommandSharedVision(int player, bool state, int opponent)
+void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 {
-	// Do a real hardcore seen recount. First we unmark EVERYTHING.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapUnmarkUnitSight(unit);
+	CPlayer *player = &Players[playerIndex];
+	CPlayer *opponent = &Players[opponentIndex];
+
+	if (state == player->HasSharedVisionWith(*opponent) || opponent->Type == PlayerNobody 
+														|| player->Type == PlayerNobody) {
+		return;
+	}
+
+	// Do a real hardcore seen recount. First we unmark sight for all units of the player.
+	for (CUnit *const unit : player->GetUnits()) {
+		if (!unit->Destroyed) {
+			MapUnmarkUnitSight(*unit);
 		}
 	}
-
-	// Compute Before and after.
-	const int before = Players[player].HasMutualSharedVisionWith(Players[opponent]);
+	
 	if (state == false) {
-		Players[player].UnshareVisionWith(Players[opponent]);
-	} else {
-		Players[player].ShareVisionWith(Players[opponent]);
-	}
-	const int after = Players[player].HasMutualSharedVisionWith(Players[opponent]);
+		player->UnshareVisionWith(*opponent);
 
-	if (before && !after) {
-		// Don't share vision anymore. Give each other explored terrain for good-bye.
-
-		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+		// Don't share vision anymore. Give explored terrain for good-bye.
+		const size_t fieldsNum = Map.Info.MapWidth * Map.Info.MapHeight;
+		for (size_t i = 0; i != fieldsNum; ++i) {
 			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
-			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
-				mfp.Visible[opponent] = 1;
-				if (opponent == ThisPlayer->Index) {
-					Map.MarkSeenTile(mf);
-				}
-			}
-			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
-				mfp.Visible[player] = 1;
-				if (player == ThisPlayer->Index) {
+			if (mfp.Visible[playerIndex] && !mfp.Visible[opponentIndex]) {
+				mfp.Visible[opponentIndex] = 1;
+				/// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
+				if (opponent == ThisPlayer) {
 					Map.MarkSeenTile(mf);
 				}
 			}
 		}
+	} else {
+		player->ShareVisionWith(*opponent);
 	}
 
-	// Do a real hardcore seen recount. Now we remark EVERYTHING
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapMarkUnitSight(unit);
+	// Do a real hardcore seen recount. Now we remark sight for all units of the player
+	for (CUnit *const unit : player->GetUnits()) {
+		if (!unit->Destroyed) {
+			MapMarkUnitSight(*unit);
 		}
 	}
 }

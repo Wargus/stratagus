@@ -152,10 +152,13 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "shared-vision")) {
 			value = LuaToString(l, j + 1);
 			for (int i = 0; i < PlayerMax && *value; ++i, ++value) {
+				if (i == this->Index) {
+					continue;
+				}
 				if (*value == '-' || *value == '_' || *value == ' ') {
-					this->SharedVision.erase(i);
+					this->UnshareVisionWith(Players[i]);
 				} else {
-					this->SharedVision.insert(i);
+					this->ShareVisionWith(Players[i]);
 				}
 			}
 		} else if (!strcmp(value, "start")) {

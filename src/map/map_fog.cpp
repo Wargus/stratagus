@@ -33,29 +33,35 @@
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
+#include <queue>
+#include <omp.h>
 
 #include "stratagus.h"
 
 #include "map.h"
 
 #include "actions.h"
+#include "fov.h"
 #include "minimap.h"
 #include "player.h"
+#include "tileset.h"
 #include "ui.h"
 #include "unit.h"
 #include "unit_manager.h"
 #include "video.h"
 #include "../video/intern_video.h"
 
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+CFieldOfView FieldOfView;
 
-int FogOfWarOpacity;                 /// Fog of war Opacity.
+int FogOfWarOpacity;				/// Fog of war Opacity.
 Uint32 FogOfWarColorSDL;
 CColor FogOfWarColor;
 
-CGraphic *CMap::FogGraphic;
+CGraphic *CMap::LegacyFogGraphic { nullptr };
 
 /**
 **  Mapping for fog of war tiles.
@@ -130,19 +136,17 @@ public:
 		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
 			return ;
 		}
-		const int p = player->Index;
+		const uint8_t p = this->player->Index;
 		if (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that
 			//  this player shares vision with, and can't YET see the unit.
 			//  It will be able to see the unit after the Unit->VisCount ++
 			if (!unit->VisCount[p]) {
-				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if ((pi == p /*player->Index*/)
-						|| player->HasMutualSharedVisionWith(Players[pi])) { 
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesOutOfFog(*unit, Players[pi]);
-						}
-					}
+				UnitGoesOutOfFog(*unit, *this->player);
+				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
+					if (!unit->IsVisible(Players[pi])) {
+						UnitGoesOutOfFog(*unit, Players[pi]);
+					} 
 				}
 			}
 			unit->VisCount[p/*player->Index*/]++;
@@ -156,20 +160,23 @@ public:
 				return;
 			}
 
-			Assert(unit->VisCount[p]);
+			/// This could happen if shadow caster type of field of view is enabled, 
+			/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
+			if(!unit->VisCount[p]) {
+				return;
+			}
+
 			unit->VisCount[p]--;
 			//  If the unit goes under of fog, this can happen for any player that
 			//  this player shares vision to. First of all, before unmarking,
 			//  every player that this player shares vision to can see the unit.
 			//  Now we have to check who can't see the unit anymore.
 			if (!unit->VisCount[p]) {
-				for (int pi = 0; pi < PlayerMax; ++pi) {
-					if (pi == p/*player->Index*/ ||
-						player->HasMutualSharedVisionWith(Players[pi])) {
-						if (!unit->IsVisible(Players[pi])) {
-							UnitGoesUnderFog(*unit, Players[pi]);
-						}
-					}
+				UnitGoesUnderFog(*unit, *this->player);
+				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
+					if (!unit->IsVisible(Players[pi])) {
+						UnitGoesUnderFog(*unit, Players[pi]);
+					} 
 				}
 			}
 		}
@@ -258,6 +265,7 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 				UnitsOnTileUnmarkSeen(player, mf, 0);
 			}
 			// Check visible Tile, then deduct...
+			/// TODO: change ThisPlayer to currently rendered player/players #RenderTargets
 			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 				Map.MarkSeenTile(mf);
 			}
@@ -305,7 +313,12 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 {
 	CMapField &mf = *Map.Field(index);
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
-	Assert(*v != 0);
+	///Assert(*v != 0);
+	/// This could happen if shadow caster type of field of view is enabled, 
+	/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
+	if(*v == 0) {
+		return;
+	}	
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, mf, 1);
 	}
@@ -327,66 +340,9 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer &player, const CUnit &unit, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
 {
-	// Units under construction have no sight range.
-	if (!range) {
-		return;
-	}
-	// Up hemi-cyle
-	const int miny = std::max(-range, 0 - pos.y);
-	for (int offsety = miny; offsety != 0; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
-		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		Vec2i mpos(minx, pos.y + offsety);
-#ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
-#endif
-
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-#ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
-#else
-			marker(player, mpos);
-#endif
-		}
-	}
-	for (int offsety = 0; offsety < h; ++offsety) {
-		const int minx = std::max(0, pos.x - range);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
-		Vec2i mpos(minx, pos.y + offsety);
-#ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
-#endif
-
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-#ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
-#else
-			marker(player, mpos);
-#endif
-		}
-	}
-	// bottom hemi-cycle
-	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
-	for (int offsety = 0; offsety < maxy; ++offsety) {
-		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
-		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
-		Vec2i mpos(minx, pos.y + h + offsety);
-#ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
-#endif
-
-		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
-#ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
-#else
-			marker(player, mpos);
-#endif
-		}
-	}
+	FieldOfView.Refresh(player, unit, pos, w, h, range, marker);
 }
 
 /**
@@ -592,7 +548,7 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		VideoDrawOnlyFog(dx, dy);
 	}
 	if (blackFogTile) {
-		Map.FogGraphic->DrawFrameClip(blackFogTile, dx, dy);
+		Map.LegacyFogGraphic->DrawFrameClip(blackFogTile, dx, dy);
 	}
 
 #undef IsMapFieldExploredTable
@@ -602,13 +558,46 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 /**
 **  Draw the map fog of war.
 */
-void CViewport::DrawMapFogOfWar() const
+void CViewport::DrawMapFogOfWar()
 {
 	// flags must redraw or not
 	if (ReplayRevealMap) {
 		return;
 	}
 
+	switch (FogOfWar.GetType()) {
+		case FogOfWarTypes::cLegacy:
+			/// Auto clean texture for enhanced fog. For cases when fog type was changed "on the fly"
+			if (this->EnhFogSurface) {
+				CleanEnhFog();
+			}
+			this->DrawLegacyFogOfWar();
+			break;
+		
+		case FogOfWarTypes::cEnhanced: 
+
+			if (!this->EnhFogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
+											/ PixelTileSize.x + 2) 
+											* PixelTileSize.x != this->EnhFogSurface->w 
+										|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
+											/ PixelTileSize.y + 2) 
+											* PixelTileSize.y != this->EnhFogSurface->h) ) {
+          		this->AdjustFogSurface();
+    		}
+			this->DrawEnhancedFogOfWar(); 
+			break;
+		default: 
+		break;
+	}
+}
+
+
+/**
+**  Draw the map fog of war (legacy type).
+*/
+void CViewport::DrawLegacyFogOfWar() const
+{
+	
 	int sx = std::max<int>(MapPos.x - 1, 0);
 	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
 	int my = std::max<int>(MapPos.y - 1, 0);
@@ -646,11 +635,124 @@ void CViewport::DrawMapFogOfWar() const
 	}
 }
 
+
+/**
+**  Draw the map fog of war (enhanced type).
+*/
+void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
+{
+
+ 	FogOfWar.GetFogForViewport(*this, this->EnhFogSurface);
+
+	if (isSoftwareRender) {
+		SDL_Rect screenRect;
+		screenRect.x = this->TopLeftPos.x;
+		screenRect.y = this->TopLeftPos.y;
+		screenRect.w = this->BottomRightPos.x - this->TopLeftPos.x + 1;
+		screenRect.h = this->BottomRightPos.y - this->TopLeftPos.y + 1;
+
+		SDL_Rect fogRect;
+		fogRect.x = this->Offset.x;
+		fogRect.y = this->Offset.y;
+		fogRect.w = screenRect.w;
+		fogRect.h = screenRect.h;
+
+		/// As a single-threaded alternative:
+		// SDL_BlitSurface(this->EnhFogSurface, &fogRect, TheScreen, &screenRect);
+
+		/// Alpha blending of the fog texture into the screen
+		uint32_t *const fog    = static_cast<uint32_t *>(this->EnhFogSurface->pixels);
+		uint32_t *const screen = static_cast<uint32_t *>(TheScreen->pixels);
+		const CColor fogColor = FogOfWar.GetFogColor();
+		const uint8_t fogR = fogColor.R;
+		const uint8_t fogG = fogColor.G;
+		const uint8_t fogB = fogColor.B;
+		
+		#pragma omp parallel
+		{    
+			const uint16_t thisThread   = omp_get_thread_num();
+			const uint16_t numOfThreads = omp_get_num_threads();
+			
+			const uint16_t lBound = (thisThread    ) * screenRect.h / numOfThreads; 
+			const uint16_t uBound = (thisThread + 1) * screenRect.h / numOfThreads; 
+
+			size_t fogIndex = (fogRect.y    + lBound) * this->EnhFogSurface->w + fogRect.x;
+			size_t scrIndex = (screenRect.y + lBound) * TheScreen->w + screenRect.x;
+			
+			for (uint16_t y = lBound; y < uBound; y++) {
+				for (uint16_t x = 0; x < screenRect.w; x++) {
+
+					const uint32_t fogPixel = fog[fogIndex + x];
+					const uint8_t  alpha    = 0xFF & (fogPixel >> ASHIFT);
+
+					uint32_t &scrPixel = screen[scrIndex + x];
+
+					if (alpha == 0xFE) { scrPixel = fogPixel; }
+					else  {
+						const uint8_t scrR = 0xFF & (scrPixel >> RSHIFT);
+						const uint8_t scrG = 0xFF & (scrPixel >> GSHIFT);
+						const uint8_t scrB = 0xFF & (scrPixel >> BSHIFT);
+
+						const uint32_t resR = ((fogR * alpha) + (scrR * (0xFF - alpha))) >> 8;
+						const uint32_t resG = ((fogG * alpha) + (scrG * (0xFF - alpha))) >> 8;
+						const uint32_t resB = ((fogB * alpha) + (scrB * (0xFF - alpha))) >> 8;
+
+						scrPixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
+					}
+				}
+				fogIndex += this->EnhFogSurface->w;
+				scrIndex += TheScreen->w;
+			}
+		} /// pragma omp parallel
+
+	}
+
+}
+
+
+/**
+**  Adjust fog of war surface to viewport
+**
+*/
+void CViewport::AdjustFogSurface()
+{
+	this->CleanEnhFog();
+
+    const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x) 
+									/ PixelTileSize.x + 2) 
+									* PixelTileSize.x;  /// +2 because of Offset.x
+    const uint16_t surfaceHeight = ((this->BottomRightPos.y - this->TopLeftPos.y) 
+									/ PixelTileSize.y + 2) 
+									* PixelTileSize.y; /// +2 because of Offset.y
+    
+    this->EnhFogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
+                                                     surfaceHeight,
+                                                     32, RMASK, GMASK, BMASK, AMASK);
+    SDL_SetSurfaceBlendMode(this->EnhFogSurface, SDL_BLENDMODE_BLEND);
+	
+	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
+
+	SDL_FillRect(this->EnhFogSurface, NULL, fogColorSolid);
+}
+
+void CViewport::Clean()
+{
+	if (this->EnhFogSurface) {
+		CleanEnhFog();
+	}
+}
+
+void CViewport::CleanEnhFog()
+{
+	SDL_FreeSurface(this->EnhFogSurface);
+	this->EnhFogSurface = nullptr;
+}
+
 /**
 **  Initialize the fog of war.
 **  Build tables, setup functions.
 */
-void CMap::InitFogOfWar()
+void CMap::InitLegacyFogOfWar()
 {
 	//calculate this once from the settings and store it
 	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
@@ -658,7 +760,7 @@ void CMap::InitFogOfWar()
 	Uint8 r, g, b;
 	SDL_Surface *s;
 
-	FogGraphic->Load();
+	LegacyFogGraphic->Load();
 
 	//
 	// Generate Only Fog surface.
@@ -674,23 +776,23 @@ void CMap::InitFogOfWar()
 	//
 	// Generate Alpha Fog surface.
 	//
-	if (FogGraphic->Surface->format->BytesPerPixel == 1) {
-		s = SDL_ConvertSurfaceFormat(FogGraphic->Surface, SDL_PIXELFORMAT_RGBA8888, 0);
+	if (LegacyFogGraphic->Surface->format->BytesPerPixel == 1) {
+		s = SDL_ConvertSurfaceFormat(LegacyFogGraphic->Surface, SDL_PIXELFORMAT_RGBA8888, 0);
 		SDL_SetSurfaceAlphaMod(s, FogOfWarOpacity);
 	} else {
 		// Copy the top row to a new surface
-		SDL_PixelFormat *f = FogGraphic->Surface->format;
-		s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
+		SDL_PixelFormat *f = LegacyFogGraphic->Surface->format;
+		s = SDL_CreateRGBSurface(SDL_SWSURFACE, LegacyFogGraphic->Surface->w, PixelTileSize.y,
 								 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 		SDL_LockSurface(s);
-		SDL_LockSurface(FogGraphic->Surface);
+		SDL_LockSurface(LegacyFogGraphic->Surface);
 		for (int i = 0; i < s->h; ++i) {
 			memcpy(reinterpret_cast<Uint8 *>(s->pixels) + i * s->pitch,
-				   reinterpret_cast<Uint8 *>(FogGraphic->Surface->pixels) + i * FogGraphic->Surface->pitch,
-				   FogGraphic->Surface->w * f->BytesPerPixel);
+				   reinterpret_cast<Uint8 *>(LegacyFogGraphic->Surface->pixels) + i * LegacyFogGraphic->Surface->pitch,
+				   LegacyFogGraphic->Surface->w * f->BytesPerPixel);
 		}
 		SDL_UnlockSurface(s);
-		SDL_UnlockSurface(FogGraphic->Surface);
+		SDL_UnlockSurface(LegacyFogGraphic->Surface);
 
 		// Convert any non-transparent pixels to use FogOfWarOpacity as alpha
 		SDL_LockSurface(s);
@@ -723,21 +825,26 @@ void CMap::InitFogOfWar()
 
 /**
 **  Cleanup the fog of war.
+**  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
+**  It's safe to call this for both types of FOW. 
 */
-void CMap::CleanFogOfWar()
+void CMap::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 {
 	VisibleTable.clear();
 
-	CGraphic::Free(Map.FogGraphic);
-	FogGraphic = NULL;
-
+	if (isHardClean) {
+		CGraphic::Free(Map.LegacyFogGraphic);
+		LegacyFogGraphic = nullptr;
+	}
 	if (OnlyFogSurface) {
 		VideoPaletteListRemove(OnlyFogSurface);
 		SDL_FreeSurface(OnlyFogSurface);
-		OnlyFogSurface = NULL;
+		OnlyFogSurface = nullptr;
 	}
-	CGraphic::Free(AlphaFogG);
-	AlphaFogG = NULL;
+	if (AlphaFogG) {
+		CGraphic::Free(AlphaFogG);
+		AlphaFogG = nullptr;
+	}
 }
 
 //@}

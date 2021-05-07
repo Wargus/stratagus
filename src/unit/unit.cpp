@@ -796,17 +796,17 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param width   Width of the first container of unit.
 **  @param height  Height of the first container of unit.
 **  @param f       Function to (un)mark for normal vision.
-**  @param f2        Function to (un)mark for cloaking vision.
+**  @param f2      Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
 								MapMarkerFunc *f, MapMarkerFunc *f2)
 {
 	Assert(f);
-	MapSight(*unit.Player, pos, width, height,
+	MapSight(*unit.Player, unit, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
 	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
-		MapSight(*unit.Player, pos, width, height,
+		MapSight(*unit.Player, unit, pos, width, height,
 				 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
 
@@ -851,11 +851,11 @@ void MapMarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapMarkRadar(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 						 unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapMarkRadarJammer(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
 		}
 	}
@@ -881,12 +881,65 @@ void MapUnmarkUnitSight(CUnit &unit)
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
-			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapUnmarkRadar(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 						   unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
-			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
+			MapUnmarkRadarJammer(*unit.Player, unit, unit.tilePos, unit.Type->TileWidth,
 								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
+		}
+	}
+}
+
+/**
+**  Mark/Unmark on vision table the Sight for the units 
+**  around the tilePos
+**  (and units inside for transporter)
+**
+**  @param tilePos    Position of the tile around which to update units vision for
+**  @param resetSight Unmark sight if True, Mark otherwise
+**
+**  @see MapUnmarkUnitSight/MapMarkUnitSight
+*/
+void MapRefreshUnitsSight(const Vec2i &tilePos, const bool resetSight /*= false*/)
+{
+	const CMapField *mapField = Map.Field(tilePos);
+	for (const CPlayer &player : Players) {
+		if(!mapField->playerInfo.Visible[player.Index]) {
+			continue;
+		}
+		for (CUnit *const unit : player.GetUnits()) {
+			if (!unit->Destroyed) {
+				const auto dist = unit->Container ? unit->Container->MapDistanceTo(tilePos) 
+												  : unit->MapDistanceTo(tilePos);
+				if (dist <= unit->CurrentSightRange) {
+					if (resetSight) {
+						MapUnmarkUnitSight(*unit);
+					} else {
+						MapMarkUnitSight(*unit);
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
+**  Mark/Unmark on vision table the Sight for all units on the map
+**
+**  @param resetSight Unmark sight if True, Mark otherwise
+**
+**  @see MapUnmarkUnitSight/MapMarkUnitSight
+*/
+void MapRefreshUnitsSight(const bool resetSight /*= false*/)
+{
+	for (CUnit *const unit : UnitManager.GetUnits()) {
+		if (!unit->Destroyed) {
+			if (resetSight) {
+				MapUnmarkUnitSight(*unit);
+			} else {
+				MapMarkUnitSight(*unit);
+			}
 		}
 	}
 }
@@ -1678,11 +1731,9 @@ bool CUnit::IsVisible(const CPlayer &player) const
 	if (this->VisCount[player.Index]) {
 		return true;
 	}
-	for (const int p : player.GetSharedVision()) {
+	for (const uint8_t p : player.GetSharedVision()) {
 		if (this->VisCount[p]) {
-			if (Players[p].HasSharedVisionWith(player.Index)) {	//if the shared vision is mutual	
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -3309,46 +3360,6 @@ bool CUnit::IsAllied(const CPlayer &player) const
 bool CUnit::IsAllied(const CUnit &unit) const
 {
 	return IsAllied(*unit.Player);
-}
-
-/**
-**  Check if unit shares vision with the player
-**
-**  @param x  Player to check
-*/
-bool CUnit::HasSharedVisionWith(const CPlayer &player) const
-{
-	return this->Player->HasSharedVisionWith(player);
-}
-
-/**
-**  Check if the unit shares vision with the unit
-**
-**  @param x  Unit to check
-*/
-bool CUnit::HasSharedVisionWith(const CUnit &unit) const
-{
-	return this->HasSharedVisionWith(*unit.Player);
-}
-
-/**
-**  Check if both players share vision
-**
-**  @param x  Player to check
-*/
-bool CUnit::HasMutualSharedVisionWith(const CPlayer &player) const
-{
-	return this->Player->HasMutualSharedVisionWith(player);
-}
-
-/**
-**  Check if both units share vision
-**
-**  @param x  Unit to check
-*/
-bool CUnit::HasMutualSharedVisionWith(const CUnit &unit) const
-{
-	return this->HasMutualSharedVisionWith(*unit.Player);
 }
 
 /**

@@ -183,7 +183,10 @@ public:
 	std::vector<CUnit *>::iterator UnitBegin();
 	std::vector<CUnit *>::const_iterator UnitEnd() const;
 	std::vector<CUnit *>::iterator UnitEnd();
-
+	
+	const std::vector<CUnit *> &GetUnits() const {
+		return this->Units;
+	}
 	CUnit &GetUnit(int index) const;
 	int GetUnitCount() const;
 
@@ -247,18 +250,18 @@ public:
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
-	const std::set<int> &GetSharedVision() const
+	const std::set<uint8_t> &GetSharedVision() const
 	{
-		return this->SharedVision;
+		return this->HasVisionFrom;
 	}
-	bool HasSharedVisionWith(const int playerIndex) const
+	const std::set<uint8_t> &GetGaveVisionTo() const
 	{
-		return (this->SharedVision.find(playerIndex) != this->SharedVision.end());
+		return this->GaveVisionTo;
 	}
-	bool HasSharedVisionWith(const CPlayer &player) const;
-	bool HasSharedVisionWith(const CUnit &unit) const;
-	bool HasMutualSharedVisionWith(const CPlayer &player) const;
-	bool HasMutualSharedVisionWith(const CUnit &unit) const;
+	bool HasSharedVisionWith(const CPlayer &player) const
+	{
+		return (this->GaveVisionTo.find(player.Index) != this->GaveVisionTo.end());
+	}
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 
@@ -267,8 +270,10 @@ public:
 	void SetDiplomacyEnemyWith(const CPlayer &player);
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
-	void ShareVisionWith(const CPlayer &player);
-	void UnshareVisionWith(const CPlayer &player);
+	void ShareVisionWith(CPlayer &player);
+	void EnableSharedVisionFrom(const CPlayer &player);
+	void UnshareVisionWith(CPlayer &player);
+	void DisableSharedVisionFrom(const CPlayer &player);
 
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;
@@ -281,10 +286,12 @@ public:
 	void SetRevealed(const bool revealed);
 
 private:
-	std::vector<CUnit *> Units; /// units of this player
-	unsigned int Enemy;         /// enemy bit field for this player
-	unsigned int Allied;        /// allied bit field for this player
-	std::set<int> SharedVision; /// set of player indexes that this player has shared vision with
+	std::vector<CUnit *> Units;        /// units of this player
+	unsigned int Enemy;                /// enemy bit field for this player
+	unsigned int Allied;               /// allied bit field for this player
+	std::set<uint8_t> HasVisionFrom;   /// set of player indexes that have shared their vision with this player
+	std::set<uint8_t> GaveVisionTo;    /// set of player indexes that this player has shared vision with
+
 	bool isRevealed { false }; 	/// whether the player has been revealed (i.e. after losing the last Town Hall)
 
 	friend void CleanPlayers();

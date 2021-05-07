@@ -42,6 +42,8 @@
 #include "construct.h"
 #include "interface.h"
 #include "map.h"
+#include "netconnect.h"
+#include "network.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
@@ -331,10 +333,10 @@ static int CclUnit(lua_State *l)
 			pos.y = LuaToNumber(l, -1, 2);
 			w = LuaToNumber(l, -1, 3);
 			h = LuaToNumber(l, -1, 4);
-			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			MapSight(*player, *unit, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
 			// Detectcloak works in container
 			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
-				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+				MapSight(*player, *unit, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 			}
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
@@ -1282,6 +1284,26 @@ static int CclSelectSingleUnit(lua_State *l)
 }
 
 /**
+**  Enable/disable simplified auto targeting 
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclEnableSimplifiedAutoTargeting(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const bool isSimplified = LuaToBoolean(l, 1);
+	if (!IsNetworkGame()) {
+		Preference.SimplifiedAutoTargeting = isSimplified;
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB, 
+								   int(isSimplified), 0, 0, 0, 0);
+	}
+	return 0;
+}
+
+/**
 **  Register CCL features for unit.
 */
 void UnitCclRegister()
@@ -1315,6 +1337,7 @@ void UnitCclRegister()
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 
 	lua_register(Lua, "SelectSingleUnit", CclSelectSingleUnit);
+	lua_register(Lua, "EnableSimplifiedAutoTargeting", CclEnableSimplifiedAutoTargeting);
 }
 
 //@}

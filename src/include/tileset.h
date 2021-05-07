@@ -43,7 +43,9 @@
 struct lua_State;
 
 // Not used until now:
-#define MapFieldSpeedMask 0x0007  /// Move faster on this tile
+#define MapFieldSpeedMask 0x0003  /// Move faster on this tile
+
+#define MapFieldOpaque 0x0004  /// Units can't see through this field (FoW)
 
 #define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
 

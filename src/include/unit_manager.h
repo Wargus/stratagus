@@ -64,6 +64,11 @@ public:
 	void Add(CUnit *unit);
 	Iterator begin();
 	Iterator end();
+	const std::vector<CUnit *> &GetUnits() const
+	{
+		return units;
+	}
+
 	bool empty() const;
 
 	CUnit *lastCreatedUnit();

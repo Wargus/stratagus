@@ -736,7 +736,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			unit.ResourcesHeld += addload;
 
 			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
-				Map.ClearWoodTile(this->goalPos);
+				Map.ClearTile(this->goalPos);
 			}
 		} else {
 			if (resinfo.HarvestFromOutside) {

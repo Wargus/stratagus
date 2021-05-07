@@ -364,4 +364,22 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 	return false;
 }
 
+/**
+**  Check for button enabled, if requested condition passes check
+**  Used for debug purposes
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if check passed.
+**
+*/
+bool ButtonCheckDebug(const CUnit &, const ButtonAction &button)
+{
+	if(!button.AllowStr.compare("single-player-walls")) { /// Check if enabled walls for singleplayer games
+		return !IsNetworkGame() && EnableWallsInSinglePlayer;
+	}
+	return false;
+}
+
 //@}

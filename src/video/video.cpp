@@ -288,10 +288,10 @@ bool CVideo::ResizeScreen(int w, int h)
 		SDL_FreeSurface(TheScreen);
 	}
 	TheScreen = SDL_CreateRGBSurface(0, w, h, 32,
-									 0x00ff0000,
-									 0x0000ff00,
-									 0x000000ff,
-									 0); // 0xff000000);
+									 RMASK,
+									 GMASK,
+									 BMASK,
+									 0); // AMASK);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
 
 	// new texture

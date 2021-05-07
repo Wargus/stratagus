@@ -661,8 +661,14 @@ int main(int argc, char * argv[]) {
 	}
 	stratagus_argv[argc + 2] = NULL;
 
+	// Needed to reduce CPU load while idle threads are wating for havn't finished yet ones
+	extern char** environ;
+    int i = 0;
+    while(environ[i]) { i++; }
+    environ[i] = (char*)"OMP_WAIT_POLICY=passive";
+    environ[i + 1] = NULL;
 #ifdef WIN32
-	int ret = _spawnvp(_P_WAIT, stratagus_bin, stratagus_argv);
+	int ret = _spawnvpe(_P_WAIT, stratagus_bin, stratagus_argv, environ);
 #else
 	int ret = 0;
 	int childpid = fork();

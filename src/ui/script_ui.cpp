@@ -1032,6 +1032,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckResearch;
 			} else if (!strcmp(value, "check-single-research")) {
 				ba.Allowed = ButtonCheckSingleResearch;
+			} else if (!strcmp(value, "check-debug")) {
+				ba.Allowed = ButtonCheckDebug;
 			} else {
 				LuaError(l, "Unsupported action: %s" _C_ value);
 			}

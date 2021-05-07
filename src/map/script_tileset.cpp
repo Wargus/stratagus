@@ -50,6 +50,7 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		const char *name;
 		unsigned int flag;
 	} flags[] = {
+		{"opaque", MapFieldOpaque},
 		{"water", MapFieldWaterAllowed},
 		{"land", MapFieldLandAllowed},
 		{"coast", MapFieldCoastAllowed},
@@ -79,11 +80,9 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 	} speeds[] = {
 		{"fastest", 0},
 		{"fast", 1},
-		{"slow", 4},
-		{"slower", 5},
-		{"slowest", 7},
+		{"slow", 2},
+		{"slower", 3}
 	};
-
 	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
 		if (!strcmp(flagName, speeds[i].name)) {
 			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;

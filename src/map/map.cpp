@@ -38,6 +38,7 @@
 
 #include "map.h"
 
+#include "fov.h"
 #include "iolib.h"
 #include "player.h"
 #include "tileset.h"
@@ -334,13 +335,18 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	InitFogOfWar();
+	switch (FogOfWar.GetType()) {
+		case FogOfWarTypes::cLegacy:   InitLegacyFogOfWar(); break;
+		case FogOfWarTypes::cEnhanced: FogOfWar.Init(); break;
+		default: break;
+	}
+	this->isMapInitialized = true;
 }
 
 /**
 **  Cleanup the map module.
 */
-void CMap::Clean()
+void CMap::Clean(const bool isHardClean /* = false*/)
 {
 	delete[] this->Fields;
 
@@ -358,6 +364,26 @@ void CMap::Clean()
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
+
+	FieldOfView.Clean();
+	
+	switch (FogOfWar.GetType()) {
+		case FogOfWarTypes::cLegacy:   
+			CleanLegacyFogOfWar(isHardClean); 
+			break;
+		case FogOfWarTypes::cEnhanced: 
+			if (FogOfWar.GetType() == FogOfWarTypes::cEnhanced) {
+				FogOfWar.Clean();
+				for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+					vp->Clean();
+				}
+			}
+			break;
+		default: 
+			break;
+	}
+
+	this->isMapInitialized = false;
 }
 
 /**
@@ -516,6 +542,35 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 	}
 }
 
+
+/**
+**  Remove Wood, Rock or Wall tile from the map
+**  It checks if field is opaque and recalc vision for nearby units
+**
+**  @param tilePos   Map tile-position.
+*/
+void CMap::ClearTile(const Vec2i &tilePos)
+{
+	Assert(Map.Info.IsPointOnMap(tilePos));
+	
+	CMapField &mapField = *this->Field(tilePos);
+
+	const bool isOpaque = Map.Field(tilePos)->isOpaque();
+	if (isOpaque) {
+		MapRefreshUnitsSight(tilePos, true);
+		mapField.Flags &= ~MapFieldOpaque;
+	}
+	if (mapField.ForestOnMap()) {
+		ClearWoodTile(tilePos);
+	} else if (mapField.RockOnMap()) {
+		ClearRockTile(tilePos);
+	} else if (mapField.isAWall()) {
+		RemoveWall(tilePos);
+	}
+	if (isOpaque) {
+		MapRefreshUnitsSight(tilePos);
+	} 	
+}
 /// Remove wood from the map.
 void CMap::ClearWoodTile(const Vec2i &pos)
 {

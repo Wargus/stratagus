@@ -37,6 +37,7 @@
 
 #include "tile.h"
 
+#include "fov.h"
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
@@ -83,7 +84,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 #if 0
 	this->Flags = tile.flag;
 #else
-	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
+	this->Flags &= ~(MapFieldOpaque | MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
 	this->Flags |= tile.flag;
@@ -101,6 +102,9 @@ void CMapField::Save(CFile &file) const
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
 		}
+	}
+	if (Flags & MapFieldOpaque) {
+		file.printf(", \"opaque\"");
 	}
 	if (Flags & MapFieldHuman) {
 		file.printf(", \"human\"");
@@ -171,6 +175,8 @@ void CMapField::parse(lua_State *l)
 		if (!strcmp(value, "explored")) {
 			++j;
 			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
+		} else if (!strcmp(value, "opaque")) {
+			this->Flags |= MapFieldOpaque;
 		} else if (!strcmp(value, "human")) {
 			this->Flags |= MapFieldHuman;
 		} else if (!strcmp(value, "land")) {
@@ -201,6 +207,17 @@ void CMapField::parse(lua_State *l)
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
+}
+
+/**
+** Check if a field is opaque
+** We check not only MapFieldOpaque flag because some field types (f.e. forest/rock/wall) 
+** may be set in the FieldOfView as opaque as well.
+*/
+bool CMapField::isOpaque() const
+{
+	return (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting 
+			&& FieldOfView.GetOpaqueFields() & this->Flags);
 }
 
 /// Check if a field flags.
@@ -273,12 +290,10 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 		maxVision = 1;
 	}
 	
-	for (const int i : player.GetSharedVision()) {
-		if (Players[i].HasSharedVisionWith(player.Index)) { //if the shared vision is mutual
-			maxVision = std::max<unsigned char>(maxVision, this->Visible[i]);
-			if (maxVision >= 2) {
-				return 2;
-			}
+	for (const uint8_t p : player.GetSharedVision()) {
+		maxVision = std::max<uint8_t>(maxVision, this->Visible[p]);
+		if (maxVision >= 2) {
+			return 2;
 		}
 	}
 

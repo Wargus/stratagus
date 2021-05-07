@@ -190,6 +190,9 @@ set(guichan_SRCS
 source_group(guichan FILES ${guichan_SRCS})
 
 set(map_SRCS
+	src/map/fov.cpp
+	src/map/fow.cpp
+	src/map/fow_utils.cpp
 	src/map/map.cpp
 	src/map/map_draw.cpp
 	src/map/map_fog.cpp
@@ -528,6 +531,9 @@ set(stratagus_generic_HDRS
 	src/include/editor.h
 	src/include/online_service.h
 	src/include/font.h
+	src/include/fov.h
+	src/include/fow.h
+	src/include/fow_utils.h
 	src/include/game.h
 	src/include/icons.h
 	src/include/interface.h
@@ -643,6 +649,7 @@ find_package(SDL2_mixer REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(OpenMP)
 
 if(WIN32)
 	find_package(MakeNSIS)
@@ -1069,6 +1076,12 @@ else ()
    add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
 endif ()
 target_link_libraries(stratagus ${stratagus_LIBS})
+
+if(OpenMP_CXX_FOUND)
+	target_compile_options(stratagus PRIVATE ${OpenMP_CXX_FLAGS})
+	target_link_libraries(stratagus OpenMP::OpenMP_CXX)
+endif()
+
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
