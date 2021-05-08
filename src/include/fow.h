@@ -47,6 +47,21 @@ enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };  /// Types of the 
 class CFogOfWar
 {
 public:
+    CFogOfWar()
+    {
+        /// Calculate values of upscale table for explored/unexplored tiles
+        for (auto i = 0; i < 16; i++) {
+            for (auto j = 0; j < 4; j++) {
+                UpscaleTableExplored[i][j] = 0;
+                for (auto pos = 0; pos < 4; pos ++) {
+                    uint32_t initValue = (UpscaleTableVisible[i][j] >> (8 * pos)) & 0xFF;
+                    initValue -= initValue / 2; 
+                    UpscaleTableExplored[i][j] |= initValue << (pos * 8);
+                }
+            }
+        }
+    }
+
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
     enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
@@ -116,43 +131,46 @@ private:
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
     CBlurer              Blurer;              /// Blurer for fog of war texture
 
-    /// Table with patterns to generate fog of war texture from vision table
+    /// Tables with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-    static constexpr uint32_t UpscaleTable[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 1 00:01
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 2 00:10
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x3F3F3F3F, 0x00000000},   // 3 00:11
-                                                    {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
-                                                    {0x003F7F7F, 0x003F7F7F, 0x003F7F7F, 0x003F7F7F},   // 5 01:01
-                                                    {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 6 01:10
-                                                    {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // 7 01:11
-                                                    {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
-                                                    {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 9 10:01
-                                                    {0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00},   // A 10:10
-                                                    {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // B 10:11
-                                                    {0x00000000, 0x3F3F3F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
-                                                    {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // D 11:01
-                                                    {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // E 11:10
-                                                    {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
+    const uint32_t UpscaleTableVisible[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 1 00:01
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 2 00:10
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F3F3F3F, 0x00000000},   // 3 00:11
+                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
+                                                {0x003F7F7F, 0x003F7F7F, 0x003F7F7F, 0x003F7F7F},   // 5 01:01
+                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 6 01:10
+                                                {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // 7 01:11
+                                                {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
+                                                {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 9 10:01
+                                                {0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00},   // A 10:10
+                                                {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // B 10:11
+                                                {0x00000000, 0x3F3F3F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
+                                                {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // D 11:01
+                                                {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // E 11:10
+                                                {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
 
 #else // big endian
-    static constexpr uint32_t UpscaleTable[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 1 00:01
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 2 00:10
-                                                    {0x7F7F7F7F, 0x7F7F7F7F, 0x00000000, 0x00000000},   // 3 00:11
-                                                    {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
-                                                    {0x7F7F0000, 0x7F7F0000, 0x7F7F0000, 0x7F7F0000},   // 5 01:01
-                                                    {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 6 01:10
-                                                    {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // 7 01:11
-                                                    {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
-                                                    {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 9 10:01
-                                                    {0x00007F7F, 0x00007F7F, 0x00007F7F, 0x00007F7F},   // A 10:10
-                                                    {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // B 10:11
-                                                    {0x00000000, 0x00000000, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
-                                                    {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // D 11:01
-                                                    {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // E 11:10
-                                                    {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
+    const uint32_t UpscaleTableVisible[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 1 00:01
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 2 00:10
+                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x00000000, 0x00000000},   // 3 00:11
+                                                {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
+                                                {0x7F7F0000, 0x7F7F0000, 0x7F7F0000, 0x7F7F0000},   // 5 01:01
+                                                {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 6 01:10
+                                                {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // 7 01:11
+                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
+                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 9 10:01
+                                                {0x00007F7F, 0x00007F7F, 0x00007F7F, 0x00007F7F},   // A 10:10
+                                                {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // B 10:11
+                                                {0x00000000, 0x00000000, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
+                                                {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // D 11:01
+                                                {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // E 11:10
+                                                {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
 #endif
+
+    uint32_t UpscaleTableExplored[16][4] = {}; /// It will be generated from UpscaleTableVisible
+    const uint32_t (*CurrUpscaleTableExplored)[4] = UpscaleTableVisible;
 };
 
 extern CFogOfWar FogOfWar;
@@ -200,7 +218,7 @@ inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t texture
                                 const uint8_t patternVisible, const uint8_t patternExplored) const
 {
     for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
-        texture[index] = UpscaleTable[patternVisible][scan_line] + UpscaleTable[patternExplored][scan_line];
+        texture[index] = UpscaleTableVisible[patternVisible][scan_line] + CurrUpscaleTableExplored[patternExplored][scan_line];
         index += textureWidth;
     }
 }
