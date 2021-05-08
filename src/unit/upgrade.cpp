@@ -382,7 +382,20 @@ static int CclDefineUnitAllow(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define which units/upgrades are allowed.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		DefineAllow("unit-town-hall","AAAAAAAAAAAAAAAA") -- Available for everybody<br>
+**		DefineAllow("unit-stables","FFFFFFFFFFFFFFFF") -- Not available<br>
+**		DefineAllow("upgrade-sword1","RRRRRRRRRRRRRRRR") -- Upgrade already researched.
+** 	</code>
+** </div>
+**
 */
 static int CclDefineAllow(lua_State *l)
 {

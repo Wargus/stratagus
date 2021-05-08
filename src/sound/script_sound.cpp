@@ -192,7 +192,17 @@ static int CclMapSound(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Ask the sound system to play the specified sound.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		PlaySound("rescue (orc)")
+** 	</code>
+** </div>
 **
 **  @param l  Lua state.
 */

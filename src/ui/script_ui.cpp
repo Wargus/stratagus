@@ -1145,7 +1145,17 @@ static int CclSetSelectionStyle(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Add a new message.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		AddMessage("Hello World!")
+** 	</code>
+** </div>
 **
 **  @param l  Lua state.
 */
