@@ -453,6 +453,7 @@ static int CclDefineUnitType(lua_State *l)
 	int redefine;
 	if (type) {
 		redefine = 1;
+		DebugPrint("Redefining unit-type '%s'\n" _C_ str);
 	} else {
 		type = NewUnitTypeSlot(str);
 		redefine = 0;
@@ -679,8 +680,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->TeleportEffectIn = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "TeleportEffectOut")) {
 			type->TeleportEffectOut = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "DeathExplosion")) {
-			type->DeathExplosion = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "OnDeath")) {
+			type->OnDeath = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnHit")) {
 			type->OnHit = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "OnEachCycle")) {

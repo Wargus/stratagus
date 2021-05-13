@@ -741,7 +741,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 **  @param type   upgrade to type
 **  @param flush  if true, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
+void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush, bool instant)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -757,7 +757,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush)
 	if (order == NULL) {
 		return;
 	}
-	*order = COrder::NewActionUpgradeTo(unit, type);
+	*order = COrder::NewActionUpgradeTo(unit, type, instant);
 	ClearSavedAction(unit);
 }
 
