@@ -1,6 +1,6 @@
 # Stratagus italian translation.
 # Copyright (C) 2021 Simone Starace
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the stratagus package.
 # Simone Starace <simone.starace93@gmail.com>, 2021.
 #
 msgid ""
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-12-12 21:22-0800\n"
-"PO-Revision-Date: 2021-05-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2021-05-14 23:56+0200\n"
 "Last-Translator: Simone Starace <simone.starace93@gmail.com>\n"
 "Language-Team: ITALIAN\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/action/action_build.cpp:119
 msgid "You cannot reach building place"
-msgstr ""
+msgstr "Non puoi raggiungere il luogo di costruzione"
 
 #: src/action/action_build.cpp:177
 #, c-format
@@ -34,7 +34,7 @@ msgstr "Non hai abbastanza risorse per costruire %s"
 #: src/action/action_build.cpp:215
 #, c-format
 msgid "Can't build more units %s"
-msgstr ""
+msgstr "Non puoi realizzare piu' unita' di %s"
 
 #: src/action/action_build.cpp:255
 #, c-format
@@ -44,7 +44,7 @@ msgstr "Impossibile realizzare la struttura %s"
 #: src/action/action_build.cpp:515
 #, c-format
 msgid "New %s done"
-msgstr ""
+msgstr "Nuovo %s fatto"
 
 #: src/action/action_repair.cpp:84
 #, c-format
@@ -73,22 +73,22 @@ msgstr "Nessuna risorsa da ritornare"
 #: src/action/action_spellcast.cpp:181
 #, c-format
 msgid "%s: not enough mana for spell: %s"
-msgstr ""
+msgstr "%s: non ha abbastanza mana per l'incantesimo: %s"
 
 #: src/action/action_spellcast.cpp:185
 #, c-format
 msgid "%s: can't cast spell: %s"
-msgstr ""
+msgstr "%s: non puo' lanciare l'incantesimo: %s"
 
 #: src/action/action_train.cpp:170
 #, c-format
 msgid "New %s ready"
-msgstr ""
+msgstr "Nuovo %s pronto"
 
 #: src/action/action_train.cpp:217
 #, c-format
 msgid "Unable to train %s"
-msgstr "Impposibile addestrare %s"
+msgstr "Impossibile addestrare %s"
 
 #: src/action/action_upgradeto.cpp:199
 #, c-format
@@ -144,7 +144,7 @@ msgstr "Unita' cancellata"
 
 #: src/editor/editloop.cpp:1497 src/editor/editloop.cpp:1506
 msgid "Unit owner modified"
-msgstr ""
+msgstr "Possessore unita' modificato"
 
 #: src/editor/editloop.cpp:1831
 msgid "Select mode"
@@ -156,7 +156,7 @@ msgstr "Modalita' Unita'"
 
 #: src/editor/editloop.cpp:1852
 msgid "Tile mode"
-msgstr ""
+msgstr "Modalita' Tassello"
 
 #: src/editor/editloop.cpp:1863
 msgid "Set start location mode"
@@ -164,34 +164,34 @@ msgstr "Imposta luogo di partenza"
 
 #: src/network/commands.cpp:824
 msgid "No sync info for this replay !"
-msgstr ""
+msgstr "Nessuna informazione di sincronizzazione per questo replay!"
 
 #: src/network/commands.cpp:826
 #, c-format
 msgid "Replay got out of sync (%lu) !"
-msgstr ""
+msgstr "Il replay e' andato fuori sincronizzazione (%lu)!"
 
 #: src/network/commands.cpp:835
 msgid "Replay got out of sync !"
-msgstr ""
+msgstr "Il replay e' andato fuori sincronizzazione!"
 
 #: src/network/commands.cpp:946 src/network/commands.cpp:961
 msgid "End of replay"
-msgstr ""
+msgstr "Fine del replay"
 
 #: src/network/network.cpp:928
 #, c-format
 msgid "%s sent bad command"
-msgstr ""
+msgstr "%s ha inviato un commando errato"
 
 #: src/network/network.cpp:1022
 msgid "Network out of sync"
-msgstr ""
+msgstr "Rete fuori sincronizzazione"
 
 #: src/network/network.cpp:1256
 #, c-format
 msgid "Waiting for player \"%s\": %d:%02d"
-msgstr ""
+msgstr "Aspettando il giocatore \"%s\": %d:%02d"
 
 #: src/network/network.cpp:1272
 msgid "Timed out"
@@ -199,132 +199,132 @@ msgstr "Tempo scaduto"
 
 #: src/stratagus/player.cpp:553
 msgid "Building Limit Reached"
-msgstr ""
+msgstr "Limite di costruzioni raggiunto"
 
 #: src/stratagus/player.cpp:557
 msgid "Unit Limit Reached"
-msgstr ""
+msgstr "Limite di unita' raggiunto"
 
 #: src/stratagus/player.cpp:561
 msgid "Insufficient Supply, increase Supply."
-msgstr ""
+msgstr "Fornitura insufficiente, incrementare la fornitura"
 
 #: src/stratagus/player.cpp:565
 msgid "Total Unit Limit Reached"
-msgstr ""
+msgstr "Limite di unita' totali raggiunto"
 
 #: src/stratagus/player.cpp:569
 #, c-format
 msgid "Limit of %d reached for this unit type"
-msgstr ""
+msgstr "Limite di %d raggiunto per questo tipo di unita'"
 
 #: src/stratagus/player.cpp:575
 msgid "Cannot create more units."
-msgstr ""
+msgstr "Impossibile creare piu' unita'"
 
 #: src/stratagus/stratagus.cpp:548 src/stratagus/stratagus.cpp:681
 msgid "Do it! Do it now!"
-msgstr ""
+msgstr "Buon divertimento"
 
 #: src/stratagus/stratagus.cpp:812
 #, c-format
 msgid "Thanks for playing Stratagus.\n"
-msgstr ""
+msgstr "Grazie per aver giocato a Stratagus.\n"
 
 #: src/ui/botpanel.cpp:724 src/ui/botpanel.cpp:789
 msgid "Select Target"
-msgstr ""
+msgstr "Seleziona Bersaglio"
 
 #: src/ui/botpanel.cpp:852
 msgid "Select Location"
-msgstr ""
+msgstr "Seleziona Locazione"
 
 #: src/ui/botpanel.cpp:871
 msgid "Unit training queue is full"
-msgstr ""
+msgstr "La coda di addestramento delle unita' e' piena"
 
 #: src/ui/interface.cpp:95
 #, c-format
 msgid "MESSAGE:%s~!_"
-msgstr ""
+msgstr "MESSAGGIO:%s~!_"
 
 #: src/ui/interface.cpp:247
 msgid "Sound is on."
-msgstr ""
+msgstr "Il suono e' acceso"
 
 #: src/ui/interface.cpp:249
 msgid "Sound is off."
-msgstr ""
+msgstr "Il suono e' spento"
 
 #: src/ui/interface.cpp:264
 msgid "Music is off."
-msgstr ""
+msgstr "La musica e' spenta"
 
 #: src/ui/interface.cpp:267
 msgid "Music is on."
-msgstr ""
+msgstr "La musica e' accesa"
 
 #: src/ui/interface.cpp:280 src/ui/mouse.cpp:1736
 msgid "Game Paused"
-msgstr ""
+msgstr "Gioco in Pausa"
 
 #: src/ui/interface.cpp:282
 msgid "Game Resumed"
-msgstr ""
+msgstr "Gioco Ripreso"
 
 #: src/ui/interface.cpp:313
 msgid "Big map enabled"
-msgstr ""
+msgstr "Grande mappa abilitata"
 
 #: src/ui/interface.cpp:322
 msgid "Returning to old map"
-msgstr ""
+msgstr "Ritornando alla vecchia mappa"
 
 #: src/ui/interface.cpp:333
 msgid "Faster"
-msgstr ""
+msgstr "Piu' veloce"
 
 #: src/ui/interface.cpp:349
 msgid "Slower"
-msgstr ""
+msgstr "Piu' lento"
 
 #: src/ui/interface.cpp:404
 msgid "Terrain displayed."
-msgstr ""
+msgstr "Terreno mostrato."
 
 #: src/ui/interface.cpp:406
 msgid "Terrain hidden."
-msgstr ""
+msgstr "Terreno nascosto."
 
 #: src/ui/interface.cpp:439
 msgid "Grab mouse toggled."
-msgstr ""
+msgstr "Afferra mouse azionato"
 
 #: src/ui/interface.cpp:914
 msgid "Screenshot made."
-msgstr ""
+msgstr "Schermata salvata"
 
 #: src/ui/mainscr.cpp:971
 #, c-format
 msgid "Last message repeated ~<%d~> times"
-msgstr ""
+msgstr "Ultimo messaggio ripetuto ~<%d~> volte"
 
 #: src/ui/mainscr.cpp:1047
 #, c-format
 msgid "~<Event: %s~>"
-msgstr ""
+msgstr "~<Evento: %s~>"
 
 #: src/ui/mouse.cpp:1904
 #, c-format
 msgid "You have ~<%d~> %ss"
-msgstr ""
+msgstr "Tu hai ~<%d~> %ss"
 
 #: src/ui/mouse.cpp:1908
 #, c-format
 msgid "You have ~<%d~> %s(s)"
-msgstr ""
+msgstr "Tu hai ~<%d~> %s(s)"
 
 #: src/unit/unit.cpp:2990
 #, c-format
 msgid "%s attacked"
-msgstr ""
+msgstr "%s ha attaccato"
