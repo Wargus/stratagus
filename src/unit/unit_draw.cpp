@@ -875,7 +875,7 @@ void CUnit::Draw(const CViewport &vp) const
 
 #ifdef DYNAMIC_LOAD
 	if (!type->Sprite) {
-		LoadUnitTypeSprite(type);
+		LoadUnitTypeSprite(*(CUnitType*)type);
 	}
 #endif
 

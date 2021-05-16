@@ -496,7 +496,7 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 {
 #ifdef DYNAMIC_LOAD
 	if (!this->G->IsLoaded()) {
-		LoadMissileSprite(this);
+		((MissileType*)this)->LoadMissileSprite();
 	}
 #endif
 
@@ -540,8 +540,8 @@ void Missile::DrawMissile(const CViewport &vp) const
 	// FIXME: I should copy SourcePlayer for second level missiles.
 	if (sunit && sunit->Player) {
 #ifdef DYNAMIC_LOAD
-		if (!this->Type->Sprite) {
-			LoadMissileSprite(this->Type);
+		if (!this->Type->G->IsLoaded()) {
+			((MissileType*)this->Type)->LoadMissileSprite();
 		}
 #endif
 	}

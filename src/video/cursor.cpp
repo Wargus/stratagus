@@ -175,8 +175,8 @@ static void DrawBuildingCursor()
 	//  Draw building
 	//
 #ifdef DYNAMIC_LOAD
-	if (!CursorBuilding->G->IsLoaded()) {
-		LoadUnitTypeSprite(CursorBuilding);
+	if (!CursorBuilding->Sprite) {
+		LoadUnitTypeSprite(*CursorBuilding);
 	}
 #endif
 	PushClipping();
