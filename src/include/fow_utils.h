@@ -53,6 +53,7 @@ public:
     void SetNumOfSteps(const uint8_t num);
     void PushNext(const bool forcedShowNext = false);
     void DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect);
+    uint8_t GetPixel(const uint16_t x, const uint16_t y);
 
     bool isFullyEased() const { return CurrentStep == EasingStepsNum ? true : false; }
     void Ease()               { if (CurrentStep < EasingStepsNum) CurrentStep++; }
@@ -104,6 +105,24 @@ private:
     uint16_t TextureHeight {0};
 };
 
+/// returns pixel value for current frame
+inline uint8_t CEasedTexture::GetPixel(const uint16_t x, const uint16_t y)
+{
+    const size_t textureIndex = y * Width + x;
+    
+    if (CurrentStep == 0 || CurrentStep == EasingStepsNum) {
+        const uint8_t currFrame = CurrentStep ? Curr : Prev;
+        const uint8_t *curr     = Frames[currFrame].data();
+       
+        return curr[textureIndex];
+    
+    } else {
+        const uint8_t *prev   = Frames[Prev].data();
+        const int16_t *deltas = Deltas.data();
 
+        return prev[textureIndex] + deltas[textureIndex] * CurrentStep;
+    
+    }
+}
 
 #endif // !__FOW_UTILS_H__
