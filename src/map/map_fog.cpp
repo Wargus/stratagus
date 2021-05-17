@@ -644,6 +644,7 @@ void CViewport::DrawEnhancedFogOfWar(const bool isSoftwareRender /* = true */ )
 
  	FogOfWar.GetFogForViewport(*this, this->EnhFogSurface);
 
+	/// TODO: switch to hardware rendering
 	if (isSoftwareRender) {
 		SDL_Rect screenRect;
 		screenRect.x = this->TopLeftPos.x;
