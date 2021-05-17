@@ -83,6 +83,7 @@
 #include "stratagus.h"
 
 #include <vector>
+#include <omp.h>
 
 #include "video.h"
 #include "intern_video.h"
@@ -356,6 +357,78 @@ static int CclSetVideoSyncSpeed(lua_State *l)
 void VideoCclRegister()
 {
 	lua_register(Lua, "SetVideoSyncSpeed", CclSetVideoSyncSpeed);
+}
+
+/*
+**
+**  Blit a surface into another with alpha blending
+**  
+*/
+void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect, 
+										  SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT/* = true*/)
+{
+	/// This implementation of blittind doesn't scale
+	Assert(srcRect->w == dstRect->w);
+	Assert(srcRect->h == dstRect->h);
+	Assert(srcRect->x >= 0 && srcRect->y >= 0 && dstRect->x >= 0 && dstRect->y >= 0);
+
+	/// Crop rectangles if necessary
+	SDL_Rect dstWrkRect = { dstRect->x, dstRect->y, dstRect->w, dstRect->h };
+	SDL_Rect srcWrkRect = { srcRect->x, srcRect->y, srcRect->w, srcRect->h };
+	const int16_t xDiff = dstRect->w - (dstSurface->w - dstRect->x);
+	if (xDiff > 0) {
+		dstWrkRect.w -= xDiff;
+		srcWrkRect.w -= xDiff;
+	}
+	const int16_t yDiff = dstRect->h - (dstSurface->h - dstRect->y);
+	if (yDiff > 0) {
+		dstWrkRect.h -= yDiff;
+		srcWrkRect.h -= yDiff;
+	}
+
+
+	/// Alpha blending of the src texture into the dst
+	const uint32_t *const src = static_cast<uint32_t *>(srcSurface->pixels);
+	uint32_t *const dst = static_cast<uint32_t *>(dstSurface->pixels);
+
+	#pragma omp parallel if(enableMT)
+	{    
+		/// TODO: change numOfThreads for small rectangles to prevent False Sharing
+		const uint16_t thisThread   = omp_get_thread_num();
+		const uint16_t numOfThreads = omp_get_num_threads();
+		
+		const uint16_t lBound = (thisThread    ) * dstWrkRect.h / numOfThreads; 
+		const uint16_t uBound = (thisThread + 1) * dstWrkRect.h / numOfThreads; 
+
+		size_t srcIndex = (srcWrkRect.y + lBound) * srcSurface->w + srcWrkRect.x;
+		size_t dstIndex = (dstWrkRect.y + lBound) * dstSurface->w + dstWrkRect.x;
+		
+		for (uint16_t y = lBound; y < uBound; y++) {
+			for (uint16_t x = 0; x < dstWrkRect.w; x++) {
+
+				uint32_t &dstPixel = dst[dstIndex + x];
+
+				const uint8_t dstR = 0xFF & (dstPixel >> RSHIFT);
+				const uint8_t dstG = 0xFF & (dstPixel >> GSHIFT);
+				const uint8_t dstB = 0xFF & (dstPixel >> BSHIFT);
+
+				const uint32_t srcPixel = src[srcIndex + x];
+
+				const uint8_t alpha = 0xFF & (srcPixel >> ASHIFT);
+				const uint8_t srcR  = 0xFF & (srcPixel >> RSHIFT);
+				const uint8_t srcG  = 0xFF & (srcPixel >> GSHIFT);
+				const uint8_t srcB  = 0xFF & (srcPixel >> BSHIFT);
+
+				const uint32_t resR = ((srcR * alpha) + (dstR * (0xFF - alpha))) >> 8;
+				const uint32_t resG = ((srcG * alpha) + (dstG * (0xFF - alpha))) >> 8;
+				const uint32_t resB = ((srcB * alpha) + (dstB * (0xFF - alpha))) >> 8;
+
+				dstPixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
+			}
+			srcIndex += srcSurface->w;
+			dstIndex += dstSurface->w;
+		}
+	} /// pragma omp parallel
 }
 
 #if 1 // color cycling

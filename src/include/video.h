@@ -490,6 +490,10 @@ extern void RestoreColorCyclingSurface();
 /// Does ColorCycling..
 extern void ColorCycle();
 
+/// Blit a surface into another with alpha blending
+extern void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect, 
+												 SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT = true);
+
 //@}
 
 #endif // !__VIDEO_H__
