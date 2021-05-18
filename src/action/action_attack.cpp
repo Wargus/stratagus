@@ -490,7 +490,8 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		}
 		this->offeredTarget.Reset();
 	}
-	const bool attackedByGoal = (goal && goal->CurrentOrder()->GetGoal() == &unit) ? true : false;
+	const bool attackedByGoal = (goal && goal->CurrentOrder()->GetGoal() == &unit) 
+								&& InAttackRange(*goal, unit) ? true : false;
 	if (goal /// if goal is Valid
 		&& goal->IsVisibleAsGoal(*unit.Player)
 		&& CanTarget(*unit.Type, *goal->Type)
