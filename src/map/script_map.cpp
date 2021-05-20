@@ -524,19 +524,19 @@ static int CclSetFogOfWarBlur(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 
-	float radiusSimple = LuaToFloat(l, 1);
+	const float radiusSimple = LuaToFloat(l, 1);
 	if (radiusSimple <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
 	}
 
-	float radiusBilinear = LuaToFloat(l, 2);
+	const float radiusBilinear = LuaToFloat(l, 2);
 	if (radiusBilinear <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
 	}
 
-	int iterations = LuaToNumber(l, 3);	
+	const int iterations = LuaToNumber(l, 3);	
 	if (iterations <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
