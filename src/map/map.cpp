@@ -133,6 +133,7 @@ void CMap::MarkSeenTile(CMapField &mf)
 void CMap::Reveal()
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
+	/*
 	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
 		CMapField &mf = *this->Field(i);
 		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
@@ -141,19 +142,22 @@ void CMap::Reveal()
 		}
 		MarkSeenTile(mf);
 	}
+	*/
 	//  Global seen recount. Simple and effective.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
+	for (CUnit *unit : UnitManager.GetUnits()) {
 		//  Reveal neutral buildings. Gold mines:)
-		if (unit.Player->Type == PlayerNeutral) {
-			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(unit, Players[p]);
-					UnitGoesUnderFog(unit, Players[p]);
+		if (unit->Player->Type == PlayerNeutral) {
+			for (const CPlayer &player : Players) {
+				if (player.Type != PlayerNobody && (!(unit->Seen.ByPlayer & (1 << player.Index )))) {
+					UnitGoesOutOfFog(*unit, player);
+					UnitGoesUnderFog(*unit, player);
 				}
 			}
 		}
-		UnitCountSeen(unit);
+		UnitCountSeen(*unit);
+	}
+	if (!GameSettings.RevealMap) { 
+		GameSettings.RevealMap = 1; 
 	}
 }
 
