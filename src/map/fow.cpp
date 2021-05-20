@@ -172,7 +172,7 @@ bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 ** Set fog of war opacity (alpha chanel values) for different levels of visibility
 ** 
 ** @param explored  alpha channel value for explored tiles
-** @param revealed  alpha channel value for revelaed tiles (when map revealed)
+** @param revealed  alpha channel value for revealed tiles (when the map revealed)
 ** @param unseen    alpha channel value for unseen tiles
 ** 
 */

@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <vector>
 #include "fow_utils.h"
+#include "map.h"
 #include "player.h"
 #include "settings.h"
 #include "video.h"
@@ -79,7 +80,9 @@ public:
     void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
     void Update(bool doAtOnce = false);
-    void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpSurface);
+    void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpFogSurface);
+    
+    uint8_t GetVisibilityForTile(const Vec2i tilePos) const;
 
 private:
     void GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo);
@@ -221,4 +224,9 @@ inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t texture
     }
 }
 
+inline uint8_t CFogOfWar::GetVisibilityForTile(const Vec2i tilePos) const
+{
+    return (this->Settings.FOW_Type == FogOfWarTypes::cEnhanced) ? VisTable[VisTable_Index0 + tilePos.x + VisTableWidth * tilePos.y]
+                                                                 : Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
+}
 #endif // !__FOW_H__
