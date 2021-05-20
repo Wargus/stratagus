@@ -59,6 +59,8 @@ public:
 		WithTerrain(false), ShowSelected(false),
 		Transparent(false), UpdateCache(false) {}
 
+	void SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
+
 	void UpdateXY(const Vec2i &pos);
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
@@ -83,12 +85,21 @@ public:
 	bool ShowSelected;
 	bool Transparent;
 	bool UpdateCache;
+private:
+	struct MinimapSettings
+	{
+		/// used to draw fog in on the minimap
+		uint8_t FogVisibleOpacity	{0x00};
+		uint8_t FogExploredOpacity  {0x55};
+		uint8_t FogRevealedOpacity  {0xAA};
+		uint8_t FogUnseenOpacity 	{0xFF};		
+	} Settings;
 };
 
 // Minimap surface with units (for software)
 extern SDL_Surface *MinimapSurface;
 // Minimap surface with terrain only (for software)
-extern SDL_Surface *MinimapTerrainSurface;
+//extern SDL_Surface *MinimapTerrainSurface;
 
 //@}
 

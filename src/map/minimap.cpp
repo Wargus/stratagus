@@ -210,6 +210,22 @@ void CMinimap::UpdateTerrain()
 	}
 }
 
+
+/** 
+** Set fog of war opacity (alpha chanel values) for different levels of visibility
+** 
+** @param explored  alpha channel value for explored tiles
+** @param revealed  alpha channel value for revealed tiles (when the map revealed)
+** @param unseen    alpha channel value for unseen tiles
+** 
+*/
+void CMinimap::SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen)
+{
+    this->Settings.FogExploredOpacity = explored;
+    this->Settings.FogRevealedOpacity = revealed;
+    this->Settings.FogUnseenOpacity   = unseen;
+}
+
 /**
 **  Update a single minimap tile after a change
 **

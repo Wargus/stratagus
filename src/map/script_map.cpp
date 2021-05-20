@@ -674,6 +674,41 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 	return 0;
 }
 
+
+/**
+**  Set opacity (alpha) for different levels of fog of war - explored, revealed, unexplored for mini map
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	const int explored = LuaToNumber(l, 1);
+	if (explored <= 0 || explored > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's Explored tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", explored);
+		return 1;
+	}
+	const int revealed = LuaToNumber(l, 2);
+	if (revealed <= explored || revealed > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's  Revealed tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", revealed);
+		return 1;
+	}
+	const int unseen = LuaToNumber(l, 3);
+	if (unseen < revealed || unseen > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's Unseen tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", unseen);
+		return 1;
+	}
+
+	UI.Minimap.SetFogOpacityLevels(explored, revealed, unseen);
+
+	return 0;	
+}
+
 /**
 **  Define size in pixels (x,y) of a tile in this game
 **
@@ -974,6 +1009,8 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
+
+	lua_register(Lua, "SetMMFogOfWarOpacityLevels", CclSetMMFogOfWarOpacityLevels);
 
 	lua_register(Lua, "SetForestRegeneration", CclSetForestRegeneration);
 
