@@ -58,6 +58,30 @@ CFogOfWar FogOfWar; /// Fog of war itself
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
+/// Calculate values of upscale table for explored/unexplored tiles
+void CFogOfWar::GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo)
+{
+    for (auto i = 0; i < 16; i++) {
+        for (auto j = 0; j < 4; j++) {
+            table[i][j] = 0;
+            for (auto pos = 0; pos < 4; pos ++) {
+                uint32_t initValue {0};
+                switch ((UpscaleTable_4x4[i][j] >> (8 * pos)) & 0xFF) {
+                    case 0xFF: // full
+                        initValue = alphaTo - alphaFrom;
+                    break;
+                    case 0x7F: // half
+                        initValue = (alphaTo - alphaFrom) / 2;
+                    break;
+                    default:   // zero
+                        initValue = 0;
+                }
+                table[i][j] |= initValue << (pos * 8);
+            }
+        }
+    }
+
+}
 void CFogOfWar::Init()
 {
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
@@ -145,6 +169,24 @@ bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 }
 
 /** 
+** Set fog of war opacity (alpha chanel values) for different levels of visibility
+** 
+** @param explored  alpha channel value for explored tiles
+** @param revealed  alpha channel value for revelaed tiles (when map revealed)
+** @param unseen    alpha channel value for unseen tiles
+** 
+*/
+void CFogOfWar::SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen)
+{
+    this->Settings.ExploredOpacity = explored;
+    this->Settings.RevealedOpacity = revealed;
+    this->Settings.UnseenOpacity   = unseen;
+    GenerateUpscaleTables(UpscaleTableVisible, 0, explored);
+    GenerateUpscaleTables(UpscaleTableExplored, explored, unseen);
+    GenerateUpscaleTables(UpscaleTableRevealed, explored, revealed);
+}
+
+/** 
 ** Enable or disable bilinear upscale for the final fog texture rendering
 ** 
 ** @param enable  cmd to enable/disable
@@ -184,6 +226,8 @@ void CFogOfWar::GenerateFog()
             playersToRenderView.insert(playersSharedVision);
         }
     }
+    CurrUpscaleTableExplored = GameSettings.RevealMap ? UpscaleTableRevealed
+                                                      : UpscaleTableExplored;
 
     const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
     

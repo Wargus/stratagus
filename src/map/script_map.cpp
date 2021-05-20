@@ -479,6 +479,39 @@ static int CclGetFogOfWarType(lua_State *l)
 	return 1;
 }
 
+/**
+**  Set opacity (alpha) for different levels of fog of war - explored, revealed, unexplored
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success, 1 for wrong type;
+*/
+static int CclSetFogOfWarOpacityLevels(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	const int explored = LuaToNumber(l, 1);
+	if (explored <= 0 || explored > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Explored tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", explored);
+		return 1;
+	}
+	const int revealed = LuaToNumber(l, 2);
+	if (revealed <= explored || revealed > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Revealed tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", revealed);
+		return 1;
+	}
+	const int unseen = LuaToNumber(l, 3);
+	if (unseen < revealed || unseen > 255) {
+		PrintFunction();
+		fprintf(stderr, "Invalid value (%d) of alpha channel for Unseen tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", unseen);
+		return 1;
+	}
+
+	FogOfWar.SetOpacityLevels(explored, revealed, unseen);
+
+	return 0;	
+}
 
 /**
 **  Set parameters for FOW blurer (radiuses and number of iterations)
@@ -933,6 +966,7 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
 	lua_register(Lua, "GetFogOfWarType", CclGetFogOfWarType);
 
+	lua_register(Lua, "SetFogOfWarOpacityLevels", CclSetFogOfWarOpacityLevels);
 	lua_register(Lua, "SetFogOfWarBlur", CclSetFogOfWarBlur);
 	lua_register(Lua, "SetFogOfWarBilinear", CclSetFogOfWarBilinear);
 	lua_register(Lua, "GetIsFogOfWarBilinear", CclGetIsFogOfWarBilinear);

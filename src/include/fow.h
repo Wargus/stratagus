@@ -34,6 +34,7 @@
 #include <vector>
 #include "fow_utils.h"
 #include "player.h"
+#include "settings.h"
 #include "video.h"
 
 //@{
@@ -43,23 +44,12 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };  /// Types of the fog of war
-
 class CFogOfWar
 {
 public:
     CFogOfWar()
     {
-        /// Calculate values of upscale table for explored/unexplored tiles
-        for (auto i = 0; i < 16; i++) {
-            for (auto j = 0; j < 4; j++) {
-                UpscaleTableExplored[i][j] = 0;
-                for (auto pos = 0; pos < 4; pos ++) {
-                    uint32_t initValue = (UpscaleTableVisible[i][j] >> (8 * pos)) & 0xFF;
-                    initValue -= initValue / 2; 
-                    UpscaleTableExplored[i][j] |= initValue << (pos * 8);
-                }
-            }
-        }
+        SetOpacityLevels(this->Settings.ExploredOpacity, this->Settings.RevealedOpacity, this->Settings.UnseenOpacity);
     }
 
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
@@ -69,6 +59,7 @@ public:
     void Init();
     void Clean();
     bool SetType(const FogOfWarTypes fowType);
+    void SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
     FogOfWarTypes GetType()   const { return Settings.FOW_Type; }
     CColor   GetFogColor()    const { return Settings.FogColor; }
@@ -91,6 +82,8 @@ public:
     void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpSurface);
 
 private:
+    void GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo);
+
     void GenerateFog();
     void FogUpscale4x4();
 
@@ -116,6 +109,9 @@ private:
         uint8_t       UpscaleType      {UpscaleTypes::cSimple};    /// Rendering zoom type
         CColor        FogColor         {0, 0, 0, 0};               /// Fog of war color
         uint32_t      FogColorSDL      {0};                        /// Fog of war color in the SDL format
+        uint8_t       ExploredOpacity  {0x7F};
+        uint8_t       RevealedOpacity  {0xBE};
+        uint8_t       UnseenOpacity    {0xFE};
 	} Settings;  /// Fog of war settings
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
@@ -133,43 +129,45 @@ private:
 
     /// Tables with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-    const uint32_t UpscaleTableVisible[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 1 00:01
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 2 00:10
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F3F3F3F, 0x00000000},   // 3 00:11
-                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
-                                                {0x003F7F7F, 0x003F7F7F, 0x003F7F7F, 0x003F7F7F},   // 5 01:01
-                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 6 01:10
-                                                {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // 7 01:11
-                                                {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
-                                                {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 9 10:01
-                                                {0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00, 0x7F7F3F00},   // A 10:10
-                                                {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // B 10:11
-                                                {0x00000000, 0x3F3F3F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
-                                                {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // D 11:01
-                                                {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // E 11:10
-                                                {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
+    const uint32_t UpscaleTable_4x4[16][4] { {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},   // 0 00:00
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x007FFFFF},   // 1 00:01
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFF7F, 0xFFFF7F00},   // 2 00:10
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0x7F7F7F7F, 0x00000000},   // 3 00:11
+                                             {0x007FFFFF, 0x7FFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},   // 4 01:00
+                                             {0x007FFFFF, 0x007FFFFF, 0x007FFFFF, 0x007FFFFF},   // 5 01:01
+                                             {0x007FFFFF, 0x7FFFFFFF, 0xFFFFFF7F, 0xFFFF7F00},   // 6 01:10
+                                             {0x00007FFF, 0x0000007F, 0x00000000, 0x00000000},   // 7 01:11
+                                             {0xFFFF7F00, 0xFFFFFF7F, 0xFFFFFFFF, 0xFFFFFFFF},   // 8 10:00
+                                             {0xFFFF7F00, 0xFFFFFF7F, 0x7FFFFFFF, 0x007FFFFF},   // 9 10:01
+                                             {0xFFFF7F00, 0xFFFF7F00, 0xFFFF7F00, 0xFFFF7F00},   // A 10:10
+                                             {0xFF7F0000, 0x7F000000, 0x00000000, 0x00000000},   // B 10:11
+                                             {0x00000000, 0x7F7F7F7F, 0xFFFFFFFF, 0xFFFFFFFF},   // C 11:00
+                                             {0x00000000, 0x00000000, 0x0000007F, 0x00007FFF},   // D 11:01
+                                             {0x00000000, 0x00000000, 0x7F000000, 0xFF7F0000},   // E 11:10
+                                             {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
 
 #else // big endian
-    const uint32_t UpscaleTableVisible[16][4] { {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 0 00:00
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 1 00:01
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x3F7F7F7F, 0x003F7F7F},   // 2 00:10
-                                                {0x7F7F7F7F, 0x7F7F7F7F, 0x00000000, 0x00000000},   // 3 00:11
-                                                {0x7F7F3F00, 0x7F7F7F3F, 0x7F7F7F7F, 0x7F7F7F7F},   // 4 01:00
-                                                {0x7F7F0000, 0x7F7F0000, 0x7F7F0000, 0x7F7F0000},   // 5 01:01
-                                                {0x7F7F3F00, 0x7F7F7F3F, 0x3F7F7F7F, 0x003F7F7F},   // 6 01:10
-                                                {0x7F3F0000, 0x3F000000, 0x00000000, 0x00000000},   // 7 01:11
-                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F7F, 0x7F7F7F7F},   // 8 10:00
-                                                {0x003F7F7F, 0x3F7F7F7F, 0x7F7F7F3F, 0x7F7F3F00},   // 9 10:01
-                                                {0x00007F7F, 0x00007F7F, 0x00007F7F, 0x00007F7F},   // A 10:10
-                                                {0x00003F7F, 0x0000003F, 0x00000000, 0x00000000},   // B 10:11
-                                                {0x00000000, 0x00000000, 0x7F7F7F7F, 0x7F7F7F7F},   // C 11:00
-                                                {0x00000000, 0x00000000, 0x3F000000, 0x7F3F0000},   // D 11:01
-                                                {0x00000000, 0x00000000, 0x0000003F, 0x00003F7F},   // E 11:10
-                                                {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
+    const uint32_t UpscaleTable_4x4[16][4] { {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},   // 0 00:00
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFF7F, 0xFFFF7F00},   // 1 00:01
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF, 0x007FFFFF},   // 2 00:10
+                                             {0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000},   // 3 00:11
+                                             {0xFFFF7F00, 0xFFFFFF7F, 0xFFFFFFFF, 0xFFFFFFFF},   // 4 01:00
+                                             {0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000},   // 5 01:01
+                                             {0xFFFF7F00, 0xFFFFFF7F, 0x7FFFFFFF, 0x007FFFFF},   // 6 01:10
+                                             {0xFF7F0000, 0x7F000000, 0x00000000, 0x00000000},   // 7 01:11
+                                             {0x007FFFFF, 0x7FFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},   // 8 10:00
+                                             {0x007FFFFF, 0x7FFFFFFF, 0xFFFFFF7F, 0xFFFF7F00},   // 9 10:01
+                                             {0x0000FFFF, 0x0000FFFF, 0x0000FFFF, 0x0000FFFF},   // A 10:10
+                                             {0x00007FFF, 0x0000007F, 0x00000000, 0x00000000},   // B 10:11
+                                             {0x00000000, 0x00000000, 0xFFFFFFFF, 0xFFFFFFFF},   // C 11:00
+                                             {0x00000000, 0x00000000, 0x7F000000, 0xFF7F0000},   // D 11:01
+                                             {0x00000000, 0x00000000, 0x0000007F, 0x00007FFF},   // E 11:10
+                                             {0x00000000, 0x00000000, 0x00000000, 0x00000000} }; // F 11:11
 #endif
 
-    uint32_t UpscaleTableExplored[16][4] = {}; /// It will be generated from UpscaleTableVisible
+    uint32_t UpscaleTableVisible[16][4]  = {}; /// It will be generated from UpscaleTable_4x4
+    uint32_t UpscaleTableExplored[16][4] = {}; /// It will be generated from UpscaleTable_4x4
+    uint32_t UpscaleTableRevealed[16][4] = {}; /// It will be generated from UpscaleTable_4x4
     const uint32_t (*CurrUpscaleTableExplored)[4] = UpscaleTableVisible;
 };
 
@@ -215,7 +213,7 @@ inline uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t vis
 **
 */
 inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
-                                const uint8_t patternVisible, const uint8_t patternExplored) const
+                                        const uint8_t patternVisible, const uint8_t patternExplored) const
 {
     for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {
         texture[index] = UpscaleTableVisible[patternVisible][scan_line] + CurrUpscaleTableExplored[patternExplored][scan_line];
