@@ -498,10 +498,15 @@ void AiForce::Attack(const Vec2i &pos)
 		return;
 	}
 	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
-		Vec2i resultPos;
+		Vec2i resultPos {-1, -1};
 		NewRallyPoint(goalPos, &resultPos);
-		this->GoalPos = resultPos;
-		this->State = AiForceAttackingState_GoingToRallyPoint;
+		if (resultPos.x != -1 && resultPos.y != -1) {
+			this->GoalPos = resultPos;
+			this->State = AiForceAttackingState_GoingToRallyPoint;
+		} else {
+			this->GoalPos = goalPos;
+			this->State = AiForceAttackingState_Attacking;
+		}
 	} else {
 		this->GoalPos = goalPos;
 		this->State = AiForceAttackingState_Attacking;
@@ -1094,10 +1099,15 @@ void AiForce::Update()
 			State = AiForceAttackingState_Waiting;
 			return;
 		} else {
-			Vec2i resultPos;
+			Vec2i resultPos {-1, -1};
 			NewRallyPoint(unit->tilePos, &resultPos);
-			this->GoalPos = resultPos;
-			this->State = AiForceAttackingState_GoingToRallyPoint;
+			if (resultPos.x != -1 && resultPos.y != -1) {
+				this->GoalPos = resultPos;
+				this->State = AiForceAttackingState_GoingToRallyPoint;
+			} else {
+				this->GoalPos = unit->tilePos;
+				this->State = AiForceAttackingState_Attacking;
+			}
 		}
 	}
 	for (size_t i = 0; i != idleUnits.size(); ++i) {
