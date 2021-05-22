@@ -8,7 +8,7 @@
                 "command": "bash ${workspaceFolder}/.vscode/scripts/download.sh '${workspaceFolder}'",
             },
             "windows": {
-                "command": "PowerShell.exe -ExecutionPolicy Bypass -File ${workspaceFolder}/.vscode/scripts/download.ps1 '${workspaceFolder}'",
+                "command": "PowerShell.exe -ExecutionPolicy Bypass -File '${workspaceFolder}/.vscode/scripts/download.ps1' '${workspaceFolder}'",
             },
             "problemMatcher": [],
             "group": "build",
