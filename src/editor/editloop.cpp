@@ -1916,7 +1916,13 @@ void EditorMainLoop()
 			// Map scrolling
 			//
 			if (UI.MouseScroll) {
-				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
+				int tbX, tbY;
+				toolDropdown->getAbsolutePosition(tbX, tbY);
+				tbX += CursorScreenPos.x;
+				tbY += CursorScreenPos.y;
+				if (!(toolDropdown->getDimension().isPointInRect(tbX, tbY))) {
+					DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
+				}
 			}
 			if (UI.KeyScroll) {
 				if (CursorOn == CursorOnMap) {
