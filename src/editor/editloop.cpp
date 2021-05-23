@@ -1854,7 +1854,7 @@ void EditorMainLoop()
 				}
 				editorSlider->setVisible(true);
 				return;
-			case StartButton:
+			case 3:
 				Editor.State = EditorSetStartLocation;
 				editorSlider->setVisible(false);
 				return;
