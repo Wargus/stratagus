@@ -130,6 +130,7 @@ static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
+static gcn::DropDown *toolDropdown;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -1225,6 +1226,11 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		}
 	}
 	switch (key) {
+		case 't':
+			toolDropdown->setSelected((toolDropdown->getSelected() + 1) % (toolDropdown->getListModel()->getNumberOfElements()));
+			toolDropdown->action("");
+			break;
+
 		case 'f': // ALT+F, CTRL+F toggle fullscreen
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
@@ -1835,8 +1841,8 @@ void EditorMainLoop()
 
 	// Mode selection is put into the status line
 	gcn::ListModel *toolList = new StringListModel({ "Select", "Units", "Tiles", "Start Locations" });
-	gcn::DropDown *toolDropdown = new gcn::DropDown(toolList);
-	LambdaActionListener *toolDropdownListener = new LambdaActionListener([toolDropdown, editorSlider](const std::string&) {
+	toolDropdown = new gcn::DropDown(toolList);
+	LambdaActionListener *toolDropdownListener = new LambdaActionListener([editorSlider](const std::string&) {
 		int selected = toolDropdown->getSelected();
 		// Click on mode area
 		switch (selected) {
