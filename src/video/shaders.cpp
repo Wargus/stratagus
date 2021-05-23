@@ -139,7 +139,8 @@ static GLuint compileShader(const char* source, GLuint shaderType) {
 
 static GLuint compileProgramSource(std::string source) {
 	GLuint programId = 0;
-	GLuint vtxShaderId, fragShaderId;
+	GLuint vtxShaderId = 0;
+	GLuint fragShaderId = 0;
 
 	uint32_t offset = 0;
 	std::smatch m;
@@ -156,7 +157,9 @@ static GLuint compileProgramSource(std::string source) {
 	}
 
 	vtxShaderId = compileShader((std::string("#define VERTEX\n") + source).c_str(), GL_VERTEX_SHADER);
-	fragShaderId = compileShader((std::string("#define FRAGMENT\n") + source).c_str(), GL_FRAGMENT_SHADER);
+	if (vtxShaderId) {
+		fragShaderId = compileShader((std::string("#define FRAGMENT\n") + source).c_str(), GL_FRAGMENT_SHADER);
+	}
 
 	if(vtxShaderId && fragShaderId) {
 		programId = glCreateProgram();
