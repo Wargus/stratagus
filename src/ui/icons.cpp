@@ -255,7 +255,9 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 */
 bool IconConfig::LoadNoLog()
 {
-	Assert(!Name.empty());
+	if (Name.empty()) {
+		return false;
+	}
 
 	Icon = CIcon::Get(Name);
 	return Icon != NULL;
