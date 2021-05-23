@@ -397,12 +397,14 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-		Assert(type && type->Icon.Icon);
-		const CIcon &icon = *type->Icon.Icon;
+		if (!Editor.UnitTypes[i].empty()) {
+			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+			Assert(type && type->Icon.Icon);
+			const CIcon &icon = *type->Icon.Icon;
 
-		IconWidth = std::max(IconWidth, icon.G->Width);
-		IconHeight = std::max(IconHeight, icon.G->Height);
+			IconWidth = std::max(IconWidth, icon.G->Width);
+			IconHeight = std::max(IconHeight, icon.G->Height);
+		}
 	}
 }
 
@@ -414,8 +416,12 @@ static void RecalculateShownUnits()
 	Editor.ShownUnitTypes.clear();
 
 	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-		Editor.ShownUnitTypes.push_back(type);
+		if (!Editor.UnitTypes[i].empty()) {
+			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+			Editor.ShownUnitTypes.push_back(type);
+		} else {
+			Editor.ShownUnitTypes.push_back(NULL);
+		}
 	}
 
 	if (Editor.UnitIndex >= (int)Editor.ShownUnitTypes.size()) {
@@ -610,6 +616,9 @@ static bool forEachUnitIconArea(std::function<bool(int,ButtonStyle*,int,int,int,
 static void DrawUnitIcons()
 {
 	forEachUnitIconArea([](int i, ButtonStyle *style, int x, int y, int w, int h) {
+		if (Editor.ShownUnitTypes[i] == NULL) {
+			return true;
+		}
 		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		const PixelPos pos(x, y);
 		unsigned int flag = 0;
@@ -1464,6 +1473,9 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 	noHit = forEachUnitIconArea([screenPos](int i, ButtonStyle*, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
+			if (Editor.ShownUnitTypes[i] == NULL) {
+				return false;
+			}
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%s \"%s\"",
 					 Editor.ShownUnitTypes[i]->Ident.c_str(),
