@@ -200,6 +200,11 @@ class CUserInterface
 	CMinimap Minimap;
 	CStatusLine StatusLine;
 	CUITimer Timer;
+
+	Vec2i EditorSettingsAreaTopLeft;
+	Vec2i EditorSettingsAreaBottomRight;
+	Vec2i EditorButtonAreaTopLeft;
+	Vec2i EditorButtonAreaBottomRight;
 };
 
 extern CUserInterface UI;

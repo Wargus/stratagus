@@ -130,6 +130,7 @@ static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
 static gcn::Container *editorContainer;
+static gcn::Slider *editorSlider;
 static gcn::DropDown *toolDropdown;
 
 /*----------------------------------------------------------------------------
@@ -439,17 +440,24 @@ static std::vector<int> getSelectionArea() {
 	static bool cached = false;
 	static std::vector<int> playerButtonArea;
 	if (!cached) {
-		int x, y, x2, y2;
-		x = y = INT_MAX;
-		x2 = y2 = 0;
-		for (auto btn : UI.SelectedButtons) {
-			x = std::min(x, btn.X);
-			y = std::min(y, btn.Y);
-			x2 = std::max(x2, btn.X + btn.Style->Width);
-			y2 = std::max(y2, btn.Y + btn.Style->Height);
+		if (UI.EditorSettingsAreaBottomRight.x != 0 && UI.EditorSettingsAreaBottomRight.y != 0) {
+			// we have some explicit dimensions
+			playerButtonArea = {UI.EditorSettingsAreaTopLeft.x, UI.EditorSettingsAreaTopLeft.y,
+								UI.EditorSettingsAreaBottomRight.x, UI.EditorSettingsAreaBottomRight.y};
+			cached = true;
+		} else {
+			int x, y, x2, y2;
+			x = y = INT_MAX;
+			x2 = y2 = 0;
+			for (auto btn : UI.SelectedButtons) {
+				x = std::min(x, btn.X);
+				y = std::min(y, btn.Y);
+				x2 = std::max(x2, btn.X + btn.Style->Width);
+				y2 = std::max(y2, btn.Y + btn.Style->Height);
+			}
+			playerButtonArea = {x, y, x2, y2};
+			cached = true;
 		}
-		playerButtonArea = {x, y, x2, y2};
-		cached = true;
 	}
 	return playerButtonArea;
 }
@@ -459,18 +467,25 @@ static std::vector<int> getButtonArea() {
 	static bool cached = false;
 	static std::vector<int> buttonArea;
 	if (!cached) {
-		int x, y;
-		x = y = INT_MAX;
-		int x2, y2;
-		x2 = y2 = 0;
-		for (auto btn : UI.ButtonPanel.Buttons) {
-			x = std::min(x, btn.X);
-			y = std::min(y, btn.Y);
-			x2 = std::max(x2, btn.X + btn.Style->Width);
-			y2 = std::max(y2, btn.Y + btn.Style->Height);
+		if (UI.EditorButtonAreaBottomRight.x != 0 && UI.EditorButtonAreaBottomRight.y != 0) {
+			// we have some explicit dimensions
+			buttonArea = {UI.EditorButtonAreaTopLeft.x, UI.EditorButtonAreaTopLeft.y,
+						  UI.EditorButtonAreaBottomRight.x, UI.EditorButtonAreaBottomRight.y};
+			cached = true;
+		} else {
+			int x, y;
+			x = y = INT_MAX;
+			int x2, y2;
+			x2 = y2 = 0;
+			for (auto btn : UI.ButtonPanel.Buttons) {
+				x = std::min(x, btn.X);
+				y = std::min(y, btn.Y);
+				x2 = std::max(x2, btn.X + btn.Style->Width);
+				y2 = std::max(y2, btn.Y + btn.Style->Height);
+			}
+			buttonArea = {x, y, x2, y2};
+			cached = true;
 		}
-		buttonArea = {x, y, x2, y2};
-		cached = true;
 	}
 	return buttonArea;
 }
@@ -547,26 +562,45 @@ static void DrawPlayers()
  * iteration was requested.
  */
 static bool forEachUnitIconArea(std::function<bool(int,ButtonStyle*,int,int,int,int)> forEach) {
-	int i = Editor.UnitIndex;
+	int x1 = getButtonArea()[0];
+	int y1 = getButtonArea()[1];
+	int x2 = getButtonArea()[2];
+	int y2 = getButtonArea()[3];
 
+	int iconW = UI.ButtonPanel.Buttons[0].Style->Width + 2;
+	int iconH = UI.ButtonPanel.Buttons[0].Style->Height + 2;
+	int maxX = x2 - iconW;
+	int maxY = y2 - iconH;
+
+	// initialize on the first draw how many tile icons we can actually draw
 	if (VisibleUnitIcons == 0) {
-		VisibleUnitIcons = UI.ButtonPanel.Buttons.size();
+		int horizCnt = (x2 - x1) / iconW;
+		int vertCnt = (y2 - y1) / iconH;
+		VisibleUnitIcons = horizCnt * vertCnt;
 	}
 
-	for (auto btn : UI.ButtonPanel.Buttons) {
-		int x = btn.X;
-		int y = btn.Y;
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
-			return true;
+	int i = Editor.UnitIndex;
+	Assert(Editor.UnitIndex != -1);
+
+	int y = y1;
+	while (y < maxY) {
+		if (i >= (int)Editor.ShownUnitTypes.size()) {
+			break;
 		}
-		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
-		int w = btn.Style->Width;
-		int h = btn.Style->Height;
-		if (!forEach(i, btn.Style, x, y, w, h)) {
-			return false;
+		int x = x1;
+		while (x < maxX) {
+			if (i >= (int) Editor.ShownUnitTypes.size()) {
+				break;
+			}
+			if (!forEach(i, UI.ButtonPanel.Buttons[0].Style, x, y, iconW, iconH)) {
+				return false;
+			}
+			x += iconW;
+			++i;
 		}
-		++i;
+		y += iconH;
 	}
+
 	return true;
 }
 
@@ -696,6 +730,13 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 	int i = Editor.TileIndex;
 	Assert(Editor.TileIndex != -1);
 
+	if (VisibleTileIcons == 0) {
+		// initialize on the first draw how many tile icons we can actually draw
+		int horizCnt = (x2 - x1) / tileW;
+		int vertCnt = (y2 - y1) / tileH;
+		VisibleTileIcons = horizCnt * vertCnt;
+	}
+
 	int y = y1;
 	while (y < maxY) {
 		if (i >= (int)Editor.ShownTileTypes.size()) {
@@ -715,10 +756,6 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 		y += tileH;
 	}
 
-	// initialize on the first draw how many tile icons we can actually draw
-	if (VisibleTileIcons == 0) {
-		VisibleTileIcons = i - Editor.TileIndex;
-	}
 	return true;
 }
 
@@ -1226,6 +1263,22 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		}
 	}
 	switch (key) {
+		case SDLK_PAGEUP:
+			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
+				if (editorSlider->isVisible()) {
+					editorSlider->keyPress(gcn::Key::K_LEFT);
+				}
+			}
+			break;
+
+		case SDLK_PAGEDOWN:
+			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
+				if (editorSlider->isVisible()) {
+					editorSlider->keyPress(gcn::Key::K_RIGHT);
+				}
+			}
+			break;
+
 		case 't':
 			toolDropdown->setSelected((toolDropdown->getSelected() + 1) % (toolDropdown->getListModel()->getNumberOfElements()));
 			toolDropdown->action("");
@@ -1796,7 +1849,7 @@ void EditorMainLoop()
 	Gui->setTop(editorContainer);
 
 	// The slider is positioned in the bottom of the button area
-	gcn::Slider *editorSlider = new gcn::Slider();
+	editorSlider = new gcn::Slider();
 	editorSlider->setStepLength(1.0 / 50);
 	editorSlider->setWidth(getButtonArea()[2] - getButtonArea()[0]);
 	editorSlider->setHeight(GetSmallFont().getHeight());
@@ -1804,7 +1857,7 @@ void EditorMainLoop()
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setVisible(false);
-	LambdaActionListener *editorSliderListener = new LambdaActionListener([editorSlider](const std::string&) {
+	LambdaActionListener *editorSliderListener = new LambdaActionListener([](const std::string&) {
 		switch (Editor.State) {
 			case EditorEditTile:
 				{
@@ -1837,12 +1890,12 @@ void EditorMainLoop()
 		}
 	});
 	editorSlider->addActionListener(editorSliderListener);
-	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3]);
+	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
 	gcn::ListModel *toolList = new StringListModel({ "Select", "Units", "Tiles", "Start Locations" });
 	toolDropdown = new gcn::DropDown(toolList);
-	LambdaActionListener *toolDropdownListener = new LambdaActionListener([editorSlider](const std::string&) {
+	LambdaActionListener *toolDropdownListener = new LambdaActionListener([](const std::string&) {
 		int selected = toolDropdown->getSelected();
 		// Click on mode area
 		switch (selected) {

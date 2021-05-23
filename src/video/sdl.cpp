@@ -560,6 +560,37 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
 			break;
 
+		case SDL_MOUSEWHEEL:
+			{   // similar to Squeak, we fabricate Ctrl+Alt+PageUp/Down for wheel events
+				SDL_Keycode key = event.wheel.y > 0 ? SDLK_PAGEUP : SDLK_PAGEDOWN;
+				SDL_Event event;
+				SDL_zero(event);
+				event.type = SDL_KEYDOWN;
+				event.key.keysym.sym = SDLK_LCTRL;
+				SDL_PushEvent(&event);
+				SDL_zero(event);
+				event.type = SDL_KEYDOWN;
+				event.key.keysym.sym = SDLK_LALT;
+				SDL_PushEvent(&event);
+				SDL_zero(event);
+				event.type = SDL_KEYDOWN;
+				event.key.keysym.sym = key;
+				SDL_PushEvent(&event);
+				SDL_zero(event);
+				event.type = SDL_KEYUP;
+				event.key.keysym.sym = SDLK_PAGEUP;
+				SDL_PushEvent(&event);
+				SDL_zero(event);
+				event.type = SDL_KEYUP;
+				event.key.keysym.sym = SDLK_LALT;
+				SDL_PushEvent(&event);
+				SDL_zero(event);
+				event.type = SDL_KEYUP;
+				event.key.keysym.sym = SDLK_LCTRL;
+				SDL_PushEvent(&event);
+			}
+			break;
+
 		case SDL_WINDOWEVENT:
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_SIZE_CHANGED:

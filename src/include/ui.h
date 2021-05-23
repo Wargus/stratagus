@@ -482,6 +482,12 @@ public:
 	// Game timer
 	CUITimer Timer;                     /// game timer
 
+	// Offsets used by editor
+	Vec2i EditorSettingsAreaTopLeft;
+	Vec2i EditorSettingsAreaBottomRight;
+	Vec2i EditorButtonAreaTopLeft;
+	Vec2i EditorButtonAreaBottomRight;
+
 	// Offsets for 640x480 center used by menus
 	int Offset640X;                     /// Offset for 640x480 X position
 	int Offset480Y;                     /// Offset for 640x480 Y position
