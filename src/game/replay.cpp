@@ -555,7 +555,7 @@ static int CclLog(lua_State *l)
 		} else if (!strcmp(value, "Num")) {
 			log->Num = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "SyncRandSeed")) {
-			log->SyncRandSeed = LuaToUnsignedNumber(l, -1);
+			log->SyncRandSeed = lua_tointeger(l, -1);
 		} else {
 			LuaError(l, "Unsupported key: %s" _C_ value);
 		}
