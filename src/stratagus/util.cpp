@@ -64,6 +64,11 @@ uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
 void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
+	if (EnableDebugPrint) {
+		fprintf(stderr, "GameCycle: %d, init seed: %x\n", GameCycle, SyncRandSeed);
+		print_backtrace();
+		fflush(stderr);
+	}
 }
 
 /**
@@ -79,7 +84,12 @@ int SyncRand()
 	val = SyncRandSeed >> 16;
 
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
-
+	
+	if (EnableDebugPrint) {
+		fprintf(stderr, "GameCycle: %d, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
+		print_backtrace();
+		fflush(stderr);
+	}
 	return val;
 }
 
@@ -333,8 +343,8 @@ static void getopt_err(const char *argv0, const char *str, char opt)
 int getopt(int argc, char *const *argv, const char *opts)
 {
 	static int sp = 1;
-	register int c;
-	register const char *cp;
+	int c;
+	const char *cp;
 
 	optarg = NULL;
 
