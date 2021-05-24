@@ -199,10 +199,10 @@ static FullReplay *StartReplay()
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
 		replay->Players[i].PlayerColor = GameSettings.Presets[i].PlayerColor;
-		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
-		replay->Players[i].Race = GameSettings.Presets[i].Race;
-		replay->Players[i].Team = GameSettings.Presets[i].Team;
-		replay->Players[i].Type = GameSettings.Presets[i].Type;
+		replay->Players[i].AIScript = Players[i].AiName; // GameSettings.Presets[i].AIScript;
+		replay->Players[i].Race = Players[i].Race; // GameSettings.Presets[i].Race;
+		replay->Players[i].Team = Players[i].Team; // GameSettings.Presets[i].Team;
+		replay->Players[i].Type = Players[i].Type; // GameSettings.Presets[i].Type;
 	}
 
 	replay->LocalPlayer = ThisPlayer->Index;
