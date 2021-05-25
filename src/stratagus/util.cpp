@@ -65,7 +65,7 @@ void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
 	if (EnableDebugPrint) {
-		fprintf(stderr, "GameCycle: %d, init seed: %x\n", GameCycle, SyncRandSeed);
+		fprintf(stderr, "GameCycle: %lud, init seed: %x\n", GameCycle, SyncRandSeed);
 		print_backtrace();
 		fflush(stderr);
 	}
@@ -86,7 +86,7 @@ int SyncRand()
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
 	
 	if (EnableDebugPrint) {
-		fprintf(stderr, "GameCycle: %d, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
+		fprintf(stderr, "GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
 		print_backtrace();
 		fflush(stderr);
 	}
