@@ -362,6 +362,8 @@ static CAiType *GetAiTypesByName(const char *name)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define an AI engine.
 **
 **  @param l  Lua state.
@@ -504,11 +506,21 @@ static int CclAiGetRace(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get the number of cycles to sleep.
 **
 **  @param l  Lua state
 **
 **  @return   Number of return values
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		AiGetSleepCycles()
+** 	</code>
+** </div>
 */
 static int CclAiGetSleepCycles(lua_State *l)
 {
@@ -520,6 +532,8 @@ static int CclAiGetSleepCycles(lua_State *l)
 //----------------------------------------------------------------------------
 
 /**
+** <b>Description</b>
+**
 **  Set debugging flag of AI script
 **
 **  @param l  Lua state
@@ -582,11 +596,24 @@ static int CclAiDebugPlayer(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Need a unit.
 **
 **  @param l  Lua state.
 **
 **  @return   Number of return values
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		local ai_function = {
+**			-- Say to the A.I that it needs a Town Hall/Great Hall
+**    		function() return AiNeed(AiCityCenter()) end,
+**		}
+** 	</code>
+** </div>
 */
 static int CclAiNeed(lua_State *l)
 {
@@ -598,11 +625,23 @@ static int CclAiNeed(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the number of units.
 **
 **  @param l  Lua state
 **
 **  @return   Number of return values
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		local ai_function = {
+**			function() return AiSet("unit-peasant",3) end, 
+**		}
+** 	</code>
+** </div>
 */
 static int CclAiSet(lua_State *l)
 {
@@ -623,11 +662,21 @@ static int CclAiSet(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Wait for a unit.
 **
 **  @param l  Lua State.
 **
 **  @return   Number of return values
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		wait = AiWait("unit-human-barracks")
+** 	</code>
+** </div>
 */
 static int CclAiWait(lua_State *l)
 {
@@ -703,9 +752,20 @@ static int CclAiPendingBuildCount(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define a force, a groups of units.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Make a force of 2 soldiers and 1 archer
+**		AiForce(1,{"unit-footman",2, "unit-archer", 1})
+** 	</code>
+** </div>
 */
 static int CclAiForce(lua_State *l)
 {
@@ -781,9 +841,26 @@ static int CclAiForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define the role of a force.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		local ai_function = {
+**			-- Make the force number 1.
+**    		function() return AiForce(1, {AiSoldier(), 3}) end,
+**			-- Wait for force number 1 to be completed.
+**    		function() return AiWaitForce(1) end,
+**			-- Assign the role of defend to force number 1.
+**    		function() return AiForceRole(1,"defend") end,
+**		}
+** 	</code>
+** </div>
 */
 static int CclAiForceRole(lua_State *l)
 {
@@ -855,9 +932,24 @@ static int CclAiCheckForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Wait for a force ready.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		local ai_function = {
+**			-- Make the force number 1
+**			function() return AiForce(1,{"unit-footman",2, "unit-archer", 1}) end,
+**			-- Wait until force number 1 is completed and ready for orders
+**			function() return AiWaitForce(1) end,
+**		}
+** 	</code>
+** </div>
 */
 static int CclAiWaitForce(lua_State *l)
 {
@@ -880,9 +972,20 @@ static int CclAiWaitForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Attack with force.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Attack with force number 1
+**		AiAttackWithForce(1)
+** 	</code>
+** </div>
 */
 static int CclAiAttackWithForce(lua_State *l)
 {
@@ -952,9 +1055,20 @@ static int CclAiAttackWithForces(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Sleep n cycles.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Sleep for 1 minute
+**		AiSleep(1800)
+** 	</code>
+** </div>
 */
 static int CclAiSleep(lua_State *l)
 {
@@ -974,9 +1088,20 @@ static int CclAiSleep(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Research an upgrade.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Upgrade the human swords
+**		AiResearch("upgrade-sword1")
+** 	</code>
+** </div>
 */
 static int CclAiResearch(lua_State *l)
 {
@@ -996,9 +1121,20 @@ static int CclAiResearch(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Upgrade an unit to an new unit-type.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Upgrade the Town Hall to Keep
+**		AiUpgradeTo("unit-keep")
+** 	</code>
+** </div>
 */
 static int CclAiUpgradeTo(lua_State *l)
 {
@@ -1011,11 +1147,21 @@ static int CclAiUpgradeTo(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Return the player of the running AI.
 **
 **  @param l  Lua state.
 **
 **  @return  Player number of the AI.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ai_index = AiPlayer()
+** 	</code>
+** </div>
 */
 static int CclAiPlayer(lua_State *l)
 {
@@ -1049,9 +1195,20 @@ static int CclAiSetReserve(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set AI player resource collect percent.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- 70% gold and 30% lumber
+**		AiSetCollect({0,70,30,0,0,0,0})
+** 	</code>
+** </div>
 */
 static int CclAiSetCollect(lua_State *l)
 {

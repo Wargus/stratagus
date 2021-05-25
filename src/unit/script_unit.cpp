@@ -606,6 +606,8 @@ static int CclUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Move a unit on map.
 **
 **  @param l  Lua state.
@@ -636,11 +638,28 @@ static int CclMoveUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Remove unit from the map.
 **
 **  @param l  Lua state.
 **
 **  @return   Returns 1.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ogre = CreateUnit("unit-ogre", 0, {24, 89})
+**
+**		AddTrigger(
+**  		function() return (GameCycle > 150) end,
+**  		function()
+**    		RemoveUnit(ogre)
+**    		return false end
+**		)
+** 	</code>
+** </div>
 */
 static int CclRemoveUnit(lua_State *l)
 {
@@ -916,11 +935,22 @@ private:
 
 
 /**
+** <b>Description</b>
+**
 **  Kill a unit
 **
 **  @param l  Lua state.
 **
 **  @return   Returns true if a unit was killed.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Kills an ogre for player 3
+**		KillUnit("unit-ogre", 3)
+** 	</code>
+** </div>
 */
 static int CclKillUnit(lua_State *l)
 {
@@ -953,11 +983,22 @@ static int CclKillUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Kill a unit at a location
 **
 **  @param l  Lua state.
 **
 **  @return   Returns the number of units killed.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Kill 8 peasants at location
+**		KillUnitAt("unit-peasant",7,8,{27,1},{34,5})
+** 	</code>
+** </div>
 */
 static int CclKillUnitAt(lua_State *l)
 {
@@ -1182,11 +1223,22 @@ static int CclGetUnitVariable(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the value of the unit variable.
 **
 **  @param l  Lua state.
 **
 **  @return The new value of the unit.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
+**		SetUnitVariable(blacksmith,"HitPoints",344)
+** 	</code>
+** </div>
 */
 static int CclSetUnitVariable(lua_State *l)
 {

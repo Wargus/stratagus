@@ -154,7 +154,17 @@ static CompareFunction GetCompareFunction(const char *op)
 }
 
 /**
+** <b>Description</b>
+**
 **  Return the number of units of a given unit-type and player at a location.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		GetNumUnitsAt(1,"unit-footman",{10,5},{15,9})
+** 	</code>
+** </div>
 */
 static int CclGetNumUnitsAt(lua_State *l)
 {
@@ -331,7 +341,17 @@ static int CclIfRescuedNearUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Returns the number of opponents of a given player.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		opponents = GetNumOpponents(2)
+** 	</code>
+** </div>
 */
 int GetNumOpponents(int player)
 {
@@ -356,7 +376,17 @@ int GetNumOpponents(int player)
 }
 
 /**
+** <b>Description</b>
+**
 **  Check the timer value
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		t = GetTimer()
+** 	</code>
+** </div>
 */
 int GetTimer()
 {
@@ -381,7 +411,17 @@ void StopGame(GameResults result)
 }
 
 /**
+** <b>Description</b>
+**
 **  Action condition player wins.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ActionVictory()
+** 	</code>
+** </div>
 */
 void ActionVictory()
 {
@@ -389,7 +429,17 @@ void ActionVictory()
 }
 
 /**
+** <b>Description</b>
+**
 **  Action condition player lose.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ActionDefeat()
+** 	</code>
+** </div>
 */
 void ActionDefeat()
 {
@@ -397,7 +447,17 @@ void ActionDefeat()
 }
 
 /**
+** <b>Description</b>
+**
 **  Action condition player draw.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ActionDraw()
+** 	</code>
+** </div>
 */
 void ActionDraw()
 {
@@ -405,7 +465,20 @@ void ActionDraw()
 }
 
 /**
+** <b>Description</b>
+**
 **  Action set timer
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Increase the timer
+**		ActionSetTimer(0,true)
+**		-- Decrease the timer
+**		ActionSetTimer(9000,false)
+** 	</code>
+** </div>
 */
 void ActionSetTimer(int cycles, bool increasing)
 {
@@ -416,7 +489,17 @@ void ActionSetTimer(int cycles, bool increasing)
 }
 
 /**
+** <b>Description</b>
+**
 **  Action start timer
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ActionStartTimer()
+** 	</code>
+** </div>
 */
 void ActionStartTimer()
 {
@@ -426,6 +509,14 @@ void ActionStartTimer()
 
 /**
 **  Action stop timer
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ActionStopTimer()
+** 	</code>
+** </div>
 */
 void ActionStopTimer()
 {
