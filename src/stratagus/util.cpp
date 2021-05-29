@@ -162,11 +162,25 @@ long isqrt(long num)
 	return root;
 }
 
-// from wikipedia, simple checksumming of our lua files
+// from wikipedia, simple checksumming of our lua files. only considers a subset of 7-bit
+// ascii chars to hopefully avoid issues with filesystem encodings
 uint32_t fletcher32(const std::string &content)
 {
-	const uint16_t *data = (const uint16_t*)content.c_str();
-	size_t shorts = content.size() / 2;
+	uint16_t *alphas = new uint16_t[content.size() / 2];
+	size_t shorts = 0;
+	for (size_t i = 0; i < content.size(); i++) {
+		uint16_t c = content[i];
+		if (c >= 'A' && c <= 'z') {
+			if ((i % 2) == 0) {
+				alphas[shorts] = c << 8;
+			} else {
+				alphas[shorts] = alphas[shorts] || c;
+				shorts++;
+			}
+		}
+	}
+
+	uint16_t *data = alphas;
 	uint32_t sum1 = 0xffff, sum2 = 0xffff;
 	size_t tlen;
 
@@ -180,6 +194,7 @@ uint32_t fletcher32(const std::string &content)
 		sum1 = (sum1 & 0xffff) + (sum1 >> 16);
 		sum2 = (sum2 & 0xffff) + (sum2 >> 16);
 	}
+	delete[] alphas;
 	/* Second reduction step to reduce sums to 16 bits */
 	sum1 = (sum1 & 0xffff) + (sum1 >> 16);
 	sum2 = (sum2 & 0xffff) + (sum2 >> 16);
