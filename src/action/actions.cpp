@@ -450,7 +450,7 @@ static void DumpUnitInfo(CUnit &unit)
 		time_t now;
 		char buf[256];
 
-		snprintf(buf, sizeof(buf), "log_of_stratagus_%d.log", ThisPlayer->Index);
+		snprintf(buf, sizeof(buf), "unit_log_of_stratagus_%d.log", ThisPlayer->Index);
 		logf = fopen(buf, "wb");
 		if (!logf) {
 			return ;
