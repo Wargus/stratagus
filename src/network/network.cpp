@@ -921,6 +921,9 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 
 	if (syncSeed != NetworkSyncSeeds[gameNetCycle & 0xFF]
 		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
+		// if it wasn't already, force enable debug output right now. maybe we get lucky ...
+		EnableDebugPrint = true;
+		EnableUnitDebug = true;
 		if ((gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
