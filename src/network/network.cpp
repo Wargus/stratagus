@@ -911,6 +911,7 @@ void NetworkQuitGame()
 
 static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 {
+	static bool gameInSync = true;
 	Assert((ncq.Type & 0x7F) == MessageSync);
 
 	CNetworkCommandSync nc;
@@ -924,13 +925,16 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 		// if it wasn't already, force enable debug output right now. maybe we get lucky ...
 		EnableDebugPrint = true;
 		EnableUnitDebug = true;
-		if ((gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
+		if (gameInSync || (gameNetCycle % (CYCLES_PER_SECOND * 5)) == 0) {
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
+			gameInSync = false;
 		}
 		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
 				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
+	} else {
+		gameInSync = true;
 	}
 }
 
