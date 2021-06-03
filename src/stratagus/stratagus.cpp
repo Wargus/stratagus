@@ -445,6 +445,7 @@ static void Usage()
 		"\t-e\t\tStart editor (instead of game)\n"
 		"\t-E file.lua\tEditor configuration start file (default editor.lua)\n"
 		"\t-F\t\tFull screen video mode\n"
+		"\t-g\t\tForce software rendering (implies no shaders)\n"
 		"\t-G \"options\"\tGame options (passed to game scripts)\n"
 		"\t-h\t\tHelp shows this page\n"
 		"\t-i\t\tEnables unit info dumping into log (for debugging)\n"
@@ -535,6 +536,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'F':
 				VideoForceFullScreen = 1;
 				Video.FullScreen = 1;
+				continue;
+			case 'g':
+				SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengl", SDL_HINT_OVERRIDE);
 				continue;
 			case 'G':
 				parameters.luaScriptArguments = optarg;

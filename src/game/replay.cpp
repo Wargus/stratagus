@@ -425,8 +425,10 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	// to the save file name, to test more than one player on one computer.
 	//
 	if (!LogFile) {
+		time_t now;
+		time(&now);
 		struct stat tmp;
-		char buf[16];
+
 		std::string path(Parameters::Instance.GetUserDirectory());
 		if (!GameName.empty()) {
 			path += "/";
@@ -438,10 +440,10 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			makedir(path.c_str(), 0777);
 		}
 
-		snprintf(buf, sizeof(buf), "%d", ThisPlayer->Index);
-
 		path += "/log_of_stratagus_";
-		path += buf;
+		path += std::to_string(ThisPlayer->Index);
+		path += "_";
+		path += std::to_string((intmax_t)now);
 		path += ".log";
 
 		LogFile = new CFile;
