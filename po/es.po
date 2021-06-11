@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-12-12 21:22-0800\n"
-"PO-Revision-Date: 2021-06-10 16:15-0300\n"
+"PO-Revision-Date: 2021-06-10 22:23-0300\n"
 "Last-Translator: Nahuel Medina <pointify@e.email>\n"
 "Language-Team: SPANISH\n"
 "MIME-Version: 1.0\n"
@@ -38,12 +38,12 @@ msgstr "No puedes construir mas unidades %s"
 #: src/action/action_build.cpp:255
 #, c-format
 msgid "Unable to create building %s"
-msgstr "No es posible crear un edificio %s"
+msgstr "Incapaz de crear edificio %s"
 
 #: src/action/action_build.cpp:515
 #, c-format
 msgid "New %s done"
-msgstr "Nuevo/a %s finalizado/a"
+msgstr "Nuevo/a %s terminado/a"
 
 #: src/action/action_repair.cpp:84
 #, c-format
@@ -181,7 +181,7 @@ msgstr "Fin de la repetición"
 #: src/network/network.cpp:928
 #, c-format
 msgid "%s sent bad command"
-msgstr "%s mandó un mal comando"
+msgstr "%s envió mal comando"
 
 #: src/network/network.cpp:1022
 msgid "Network out of sync"
