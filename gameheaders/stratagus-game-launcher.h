@@ -180,13 +180,19 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #define TITLE GAME_NAME
 #define EXTRACTOR_NOT_FOUND GAME_NAME " could not find its extraction tool.\n" EXTRACTOR_TOOL "!\n"
-#define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\nFirst install Stratagus from https://launchpad.net/stratagus"
+#define STRATAGUS_NOT_FOUND "Stratagus is not installed.\nYou need Stratagus to run " GAME_NAME "!\n"
 #define DATA_NOT_EXTRACTED GAME_NAME " data was not extracted, is corrupted, or outdated.\nYou need to extract it from original " GAME_CD "."
 
 #include "stratagus-gameutils.h"
 
 static void SetUserDataPath(char* data_path) {
 #if defined(WIN32)
+	char marker[MAX_PATH] = {'\0'};
+	if (PathCombine(marker, data_path, "portable-install")) {
+		if (PathFileExists(marker)) {
+			return;
+		}
+	}
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
 	// strcpy(data_path, getenv("APPDATA"));
 #else
@@ -349,7 +355,10 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 
 	if (stat(sourcepath, &st) != 0) {
 		// scripts not found, abort!
-		tinyfd_messageBox("Error", "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
+		char msg[BUFF_SIZE * 2];
+		strcpy(msg, "There was an error copying the data, could not discover scripts path: ");
+		strcat(msg, sourcepath);
+		tinyfd_messageBox("Error", msg, "ok", "error", 1);
 		return;
 	}
 
@@ -376,7 +385,10 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 				if (stat(contrib_src_path, &st) != 0) {
 					// contrib dir not found, abort!
 					if (!optional) {
-						tinyfd_messageBox(contrib_directories[i], "There was an error copying the data, could not discover contributed directory path.", "ok", "error", 1);
+						char msg[BUFF_SIZE * 2];
+						strcpy(msg, "There was an error copying the data, could not discover contributed directory path: ");
+						strcat(msg, contrib_src_path);
+						tinyfd_messageBox("Error", msg, "ok", "error", 1);
 						return;
 					}
 				} else {
@@ -452,7 +464,7 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	if (exitcode != 0) {
 		char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
-		sprintf(extractortext, "The following command was used to extract the data\n%s", cmdbuf);
+		sprintf(extractortext, "The following command was used to extract the data (you can run it manually in a console to find out more):\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 #ifdef WIN32
 		_unlink(destination);
@@ -500,7 +512,12 @@ int main(int argc, char * argv[]) {
 		// Use extractor from PATH
 		strcpy(extractor_path, EXTRACTOR_TOOL);
 		if (!detectPresence(extractor_path)) {
-			error(TITLE, EXTRACTOR_NOT_FOUND);
+			char msg[BUFF_SIZE * 2];
+			strcpy(msg, EXTRACTOR_NOT_FOUND);
+			strcat(msg, " (expected at ");
+			strcat(msg, extractor_path);
+			strcat(msg, ")");
+			error(TITLE, msg);
 		}
 	}
 	strcat(extractor_path, " " EXTRACTOR_ARGS);
@@ -520,15 +537,11 @@ int main(int argc, char * argv[]) {
 	memset(data_path, 0, data_path_size);
 
 	if (executable_path[0] && executable_drive[0] && executable_dir[0]) {
-		strcpy(data_path, executable_drive);
-		strcpy(data_path+strlen(executable_drive), executable_dir);
+		PathCombine(data_path, executable_drive, executable_dir);
 	} else {
 		_getcwd(data_path, data_path_size);
 	}
-	const size_t data_path_length = strlen(data_path);
-	if (data_path_length != 0 && data_path[data_path_length - 1] == '\\') {
-		data_path[data_path_length - 1] = '\0';
-	}
+	PathRemoveBackslash(data_path);
 	sprintf(scripts_path, "\"%s\"", data_path);
 
 	char stratagus_path[BUFF_SIZE];
@@ -544,14 +557,24 @@ int main(int argc, char * argv[]) {
 		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
 			if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
 				if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
-					error(TITLE, STRATAGUS_NOT_FOUND);
+					char msg[BUFF_SIZE * 2];
+					strcat(msg, STRATAGUS_NOT_FOUND);
+					strcat(msg, " (expected globally installed or in ");
+					strcat(msg, stratagus_bin);
+					strcat(msg, ")");
+					error(TITLE, msg);
 				}
 			}
 			RegCloseKey(key);
 		}
 
 		if (_chdir(stratagus_path) != 0) {
-			error(TITLE, STRATAGUS_NOT_FOUND);
+			char msg[BUFF_SIZE * 2];
+			strcat(msg, STRATAGUS_NOT_FOUND);
+			strcat(msg, " (registry key found, but directory ");
+			strcat(msg, stratagus_path);
+			strcat(msg, " cannot be opened)");
+			error(TITLE, msg);
 		}
 		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
@@ -588,7 +611,12 @@ int main(int argc, char * argv[]) {
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 		if (stat(stratagus_bin, &st) != 0) {
-			error(TITLE, STRATAGUS_NOT_FOUND);
+			char msg[BUFF_SIZE * 2];
+			strcat(msg, STRATAGUS_NOT_FOUND);
+			strcat(msg, " (expected in ");
+			strcat(msg, stratagus_bin);
+			strcat(msg, ")");
+			error(TITLE, msg);
 		}
 #else
 		if (!detectPresence(stratagus_bin)) {
@@ -600,7 +628,12 @@ int main(int argc, char * argv[]) {
 				strcat(stratagus_bin, "./stratagus");
 			}
 			if ( stat(stratagus_bin, &st) != 0 ) {
-				error(TITLE, STRATAGUS_NOT_FOUND);
+				char msg[BUFF_SIZE * 2];
+				strcat(msg, STRATAGUS_NOT_FOUND);
+				strcat(msg, " (expected in ");
+				strcat(msg, stratagus_bin);
+				strcat(msg, ")");
+				error(TITLE, msg);
 			}
 		}
 #endif
@@ -614,7 +647,10 @@ int main(int argc, char * argv[]) {
 			ExtractData(extractor_path, data_path, scripts_path);
 		}
 		if ( stat(title_path, &st) != 0 ) {
-			error(TITLE, DATA_NOT_EXTRACTED);
+			char msg[BUFF_SIZE * 2];
+			strcat(msg, DATA_NOT_EXTRACTED);
+			strcat(msg, " (extraction was attempted, but it seems an error occurred)");
+			error(TITLE, msg);
 		}
 	}
 
@@ -688,7 +724,19 @@ int main(int argc, char * argv[]) {
 	}
 #endif
 	if (ret == ENOENT) {
-		error(TITLE, STRATAGUS_NOT_FOUND);
+		char msg[BUFF_SIZE * 8];
+		strcpy(msg, "Execution failed for: ");
+		strcat(msg, stratagus_bin);
+		strcat(msg, " ");
+		char *subargv;
+		for (int i = 1; stratagus_argv[i] != NULL; i++) {
+			if (strlen(msg) + strlen(stratagus_argv[i]) > BUFF_SIZE * 8) {
+				break;
+			}
+			strcat(msg, stratagus_argv[i]);
+			strcat(msg, " ");
+		}
+		error(TITLE, msg);
 	} else if (ret != 0) {
 		char message[8096] = {'\0'};
 		snprintf(message, 8096,
@@ -696,7 +744,10 @@ int main(int argc, char * argv[]) {
 				 "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
 				 "Please report this on https://github.com/Wargus/stratagus/issues/new, "
 				 "and please give details, including: operating system, installation path, username, kind of source CD. "
-				 "A possible solution is to remove the hidden folder %s).", data_path);
+				 "If you got an error message about the extraction command failing, please try to run it in a console "
+				 "post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
+				 "or the username (like an & or !). Try changing these. "
+				 "Try also to remove the folder %s and try the extraction again.).", data_path);
 		error(TITLE, message);
 #ifdef WIN32
 		_unlink(title_path);

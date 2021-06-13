@@ -97,7 +97,11 @@ void copy_dir(const char* source_folder, const char* target_folder);
 
 #include "stratagus-tinyfiledialogs.h"
 
+#ifdef WIN32
+#define BUFF_SIZE MAX_PATH
+#else
 #define BUFF_SIZE 4096
+#endif
 char dst_root[BUFF_SIZE];
 char src_root[BUFF_SIZE];
 
