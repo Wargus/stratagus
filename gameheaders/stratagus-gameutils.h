@@ -218,4 +218,28 @@ void copy_dir(const char* src_path, const char* dst_path) {
 }
 #endif
 
+
+#ifdef WIN32
+char* GetExtractionLogPath(const char* game_name, char* data_path) {
+	static char *marker = (char*)calloc(MAX_PATH, sizeof(char));
+	if (marker[0] != '\0') {
+		return marker;
+	}
+	if (PathCombine(marker, data_path, "portable-install")) {
+		if (PathFileExists(marker)) {
+			PathCombine(marker, data_path, "data-extraction.log");
+			return marker;
+		}
+	}
+	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, marker);
+	PathAppend(marker, "Stratagus");
+	mkdir_p(marker);
+	char logname[MAX_PATH];
+	strcpy(logname, game_name);
+	strcat(logname, "-extraction.log");
+	PathAppend(marker, logname);
+	return marker;
+}
+#endif
+
 #endif
