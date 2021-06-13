@@ -142,6 +142,9 @@ void mkdir_p(const char* path) {
 #include <string>
 void copy_dir(const char* source_folder, const char* target_folder)
 {
+	if (!strcmp(source_folder, target_folder)) {
+		return;
+	}
 	// make the parentdir of the target folder
 	char* ptarget = _strdup(target_folder);
 	parentdir(ptarget);
