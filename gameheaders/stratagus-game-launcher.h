@@ -187,7 +187,10 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #ifdef WIN32
 char* GetExtractionLogPath(char* data_path) {
-	char *marker = (char*)calloc(MAX_PATH, sizeof(char));
+	static char *marker = (char*)calloc(MAX_PATH, sizeof(char));
+	if (marker[0] != '\0') {
+		return marker;
+	}
 	if (PathCombine(marker, data_path, "portable-install")) {
 		if (PathFileExists(marker)) {
 			PathCombine(marker, data_path, "data-extraction.log");
@@ -755,16 +758,23 @@ int main(int argc, char * argv[]) {
 		}
 		error(TITLE, msg);
 	} else if (ret != 0) {
-		char message[8096] = {'\0'};
-		snprintf(message, 8096,
+		char message[8096 * 2] = {'\0'};
+		snprintf(message, 8096 * 2,
 				 "Stratagus failed to load game data. "
 				 "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
 				 "Please report this on https://github.com/Wargus/stratagus/issues/new, "
 				 "and please give details, including: operating system, installation path, username, kind of source CD. "
 				 "If you got an error message about the extraction command failing, please try to run it in a console "
-				 "post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
+				 "and post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
 				 "or the username (like an & or !). Try changing these. "
-				 "Try also to remove the folder %s and try the extraction again.).", data_path);
+#ifdef WIN32
+				 "Also check if the file '%s' exists and check for errors or post it to the issue. "
+#endif
+				 "Try also to remove the folder %s and try the extraction again.",
+#ifdef WIN32
+				 GetExtractionLogPath(data_path),
+#endif
+				 data_path);
 		error(TITLE, message);
 #ifdef WIN32
 		_unlink(title_path);
