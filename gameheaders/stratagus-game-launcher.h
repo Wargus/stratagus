@@ -185,6 +185,23 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #include "stratagus-gameutils.h"
 
+#ifdef WIN32
+char* GetExtractionLogPath(char* data_path) {
+	char *marker = (char*)calloc(MAX_PATH, sizeof(char));
+	if (PathCombine(marker, data_path, "portable-install")) {
+		if (PathFileExists(marker)) {
+			PathCombine(marker, data_path, "data-extraction.log");
+			return marker;
+		}
+	}
+	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, marker);
+	PathAppend(marker, "Stratagus");
+	mkdir_p(marker);
+	PathAppend(marker, GAME_NAME "-extraction.log")
+	return marker;
+}
+#endif
+
 static void SetUserDataPath(char* data_path) {
 #if defined(WIN32)
 	char marker[MAX_PATH] = {'\0'};
