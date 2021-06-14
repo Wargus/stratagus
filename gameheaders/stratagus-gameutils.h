@@ -140,9 +140,10 @@ void mkdir_p(const char* path) {
 #ifdef WIN32
 #include <wchar.h>
 #include <string>
+#include <filesystem>
 void copy_dir(const char* source_folder, const char* target_folder)
 {
-	if (!strcmp(source_folder, target_folder)) {
+	if (std::filesystem::equivalent(source_folder, target_folder)) {
 		return;
 	}
 	// make the parentdir of the target folder
@@ -225,18 +226,18 @@ char* GetExtractionLogPath(const char* game_name, char* data_path) {
 	if (marker[0] != '\0') {
 		return marker;
 	}
+	char logname[MAX_PATH];
+	strcpy(logname, game_name);
+	strcat(logname, "-extraction.log");
 	if (PathCombine(marker, data_path, "portable-install")) {
 		if (PathFileExists(marker)) {
-			PathCombine(marker, data_path, "data-extraction.log");
+			PathCombine(marker, data_path, logname);
 			return marker;
 		}
 	}
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, marker);
 	PathAppend(marker, "Stratagus");
 	mkdir_p(marker);
-	char logname[MAX_PATH];
-	strcpy(logname, game_name);
-	strcat(logname, "-extraction.log");
 	PathAppend(marker, logname);
 	return marker;
 }
