@@ -36,11 +36,11 @@ public:
 	void SetDefaultValues();
 	void SetLocalPlayerNameFromEnv();
 
-	void SetUserDirectory(const std::string &path) { userDirectory = path; }
+	void SetUserDirectory(const std::string &path) { (path.size() == 0) ? SetDefaultUserDirectory(true) : userDirectory = path; }
 	const std::string &GetUserDirectory() const { return userDirectory; }
 
 private:
-	void SetDefaultUserDirectory();
+	void SetDefaultUserDirectory(bool noPortable = false);
 
 public:
 	std::string applicationName;

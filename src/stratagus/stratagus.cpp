@@ -456,7 +456,7 @@ static void Usage()
 		"\t-P port\t\tNetwork port to use\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
-		"\t-u userpath\tPath where stratagus saves preferences, log and savegame\n"
+		"\t-u userpath\tPath where stratagus saves preferences, log and savegame. Use 'userhome' to force platform-default userhome directory.\n"
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode. Optionally takes a window size in <xres>x<yres>\n"
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
@@ -568,7 +568,11 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				VideoSyncSpeed = atoi(optarg);
 				continue;
 			case 'u':
-				Parameters::Instance.SetUserDirectory(optarg);
+				if (!strcmp(optarg, "userhome")) {
+					Parameters::Instance.SetUserDirectory("");
+				} else {
+					Parameters::Instance.SetUserDirectory(optarg);
+				}
 				continue;
 			case 'v': {
 				sep = strchr(optarg, 'x');
