@@ -505,7 +505,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FG:hiI:lN:oOP:ps:S:u:v:W?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FgG:hiI:lN:oOP:ps:S:u:v:W?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
