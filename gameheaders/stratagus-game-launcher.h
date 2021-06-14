@@ -268,19 +268,15 @@ int check_version(char* tool_path, char* data_path) {
 }
 
 static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
-	struct stat st;
 	int canJustReextract;
 #ifdef EXTRACTION_FILES
 	if (force == 0) {
 		canJustReextract = 1;
 		char* extraction_files[] = { EXTRACTION_FILES, NULL };
 		char* efile = extraction_files[0];
-		char efile_path[PATH_MAX] = {'\0'};
 		for (int i = 0; efile != NULL; i++) {
-			strcpy(efile_path, destination);
-			strcat(efile_path, SLASH);
-			strcat(efile_path, efile);
-			if (stat(efile_path, &st) != 0) {
+			std::filesystem::path efile_path = std::filesystem::path(destination) / efile;
+			if (!std::filesystem::exists(efile_path)) {
 				// file to extract not found
 				canJustReextract = 0;
 			}
@@ -311,17 +307,16 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
 #endif
-	char srcfolder[1024] = {'\0'};
+	std::filesystem::path srcfolder;
 	if (!canJustReextract) {
 		const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
 													 patterncount - 1, filepatterns, NULL, 0);
 		if (datafile == NULL) {
 			exit(-1);
 		}
-		strcpy(srcfolder, datafile);
-		parentdir(srcfolder);
+		srcfolder = std::filesystem::path(datafile).parent_path();
 	} else {
-		strcpy(srcfolder, destination);
+		srcfolder = std::filesystem::path(destination);
 	}
 
 #ifdef WIN32
@@ -337,34 +332,32 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #else
 	char* sourcepath = strdup(scripts_path);
 #endif
-	mkdir_p(destination);
 
-	if (stat(sourcepath, &st) != 0) {
+	std::filesystem::create_directories(std::filesystem::path(destination));
+
+	if (!std::filesystem::exists(sourcepath)) {
 		// deployment time path not found, try compile time path
-		strcpy(sourcepath, SRC_PATH());
-		parentdir(sourcepath);
+		strcpy(sourcepath, std::filesystem::path(SRC_PATH()).parent_path().string().c_str());
 	}
 
 #ifndef WIN32
-	if (stat(sourcepath, &st) != 0) {
+	if (!std::filesystem::exists(sourcepath)) {
 		// deployment time path might be same as extractor 
-		strcpy(sourcepath, extractor_tool);
-		parentdir(sourcepath);
+		strcpy(sourcepath, std::filesystem::path(extractor_tool).parent_path().string().c_str());
 	}
 #endif
 
-	if (stat(sourcepath, &st) != 0) {
+	if (!std::filesystem::exists(sourcepath)) {
 		// scripts not found, abort!
-		char msg[BUFF_SIZE * 2];
-		strcpy(msg, "There was an error copying the data, could not discover scripts path: ");
-		strcat(msg, sourcepath);
-		tinyfd_messageBox("Error", msg, "ok", "error", 1);
+		std::string msg("There was an error copying the data, could not discover scripts path: ");
+		msg += sourcepath;
+		tinyfd_messageBox("Error", msg.c_str(), "ok", "error", 1);
 		return;
 	}
 
 	if (force != 2) {
-		char contrib_src_path[BUFF_SIZE];
-		char contrib_dest_path[BUFF_SIZE];
+		std::filesystem::path contrib_src_path;
+		std::filesystem::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
 		char* contrib_directories[] = CONTRIB_DIRECTORIES;
@@ -375,27 +368,22 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 			} else {
 				if (contrib_directories[i][0] != '/') {
 					// absolute Unix paths are not appended to the source path
-					strcpy(contrib_src_path, sourcepath);
-					strcat(contrib_src_path, SLASH);
-					strcat(contrib_src_path, contrib_directories[i]);
+					contrib_src_path = std::filesystem::path(sourcepath);
+					contrib_src_path /= contrib_directories[i];
 				} else {
-					strcpy(contrib_src_path, contrib_directories[i]);
+					contrib_src_path = std::filesystem::path(contrib_directories[i]);
 				}
 
-				if (stat(contrib_src_path, &st) != 0) {
+				if (!std::filesystem::exists(contrib_src_path)) {
 					// contrib dir not found, abort!
 					if (!optional) {
-						char msg[BUFF_SIZE * 2];
-						strcpy(msg, "There was an error copying the data, could not discover contributed directory path: ");
-						strcat(msg, contrib_src_path);
-						tinyfd_messageBox("Error", msg, "ok", "error", 1);
+						std::string msg("There was an error copying the data, could not discover contributed directory path: ");
+						msg += contrib_src_path.string();
+						error("Error", msg.c_str());
 						return;
 					}
 				} else {
-					strcpy(contrib_dest_path, destination);
-					strcat(contrib_dest_path, SLASH);
-					strcat(contrib_dest_path, contrib_directories[i + 1]);
-					copy_dir(contrib_src_path, contrib_dest_path);
+					copy_dir(contrib_src_path, contrib_dest_path / contrib_directories[i + 1]);
 				}
 				i += 2;
 			}
@@ -416,7 +404,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	strcat(cmdbuf, extractor_tool);
 	strcat(cmdbuf, " " QUOTE);
-	strcat(cmdbuf, srcfolder);
+	strcat(cmdbuf, srcfolder.string().c_str());
+#ifdef WIN32
+	// a trailing backslash will break the extractor because of quoting
+	if (cmdbuf[strlen(cmdbuf) - 1] == '\\') {
+		cmdbuf[strlen(cmdbuf) - 1] = '\0';
+	}
+#endif
 	strcat(cmdbuf, QUOTE " " QUOTE);
 	strcat(cmdbuf, destination);
 	strcat(cmdbuf, QUOTE);
@@ -647,10 +641,9 @@ int main(int argc, char * argv[]) {
 			ExtractData(extractor_path, data_path, scripts_path);
 		}
 		if ( stat(title_path, &st) != 0 ) {
-			char msg[BUFF_SIZE * 2];
-			strcat(msg, DATA_NOT_EXTRACTED);
-			strcat(msg, " (extraction was attempted, but it seems an error occurred)");
-			error(TITLE, msg);
+			std::string msg(DATA_NOT_EXTRACTED);
+			msg += " (extraction was attempted, but it seems an error occurred)";
+			error(TITLE, msg.c_str());
 		}
 	}
 
@@ -728,7 +721,6 @@ int main(int argc, char * argv[]) {
 		strcpy(msg, "Execution failed for: ");
 		strcat(msg, stratagus_bin);
 		strcat(msg, " ");
-		char *subargv;
 		for (int i = 1; stratagus_argv[i] != NULL; i++) {
 			if (strlen(msg) + strlen(stratagus_argv[i]) > BUFF_SIZE * 8) {
 				break;

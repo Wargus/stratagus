@@ -95,6 +95,9 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <string>
+#include <filesystem>
+
 #include "stratagus-tinyfiledialogs.h"
 
 #ifdef WIN32
@@ -102,8 +105,6 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #else
 #define BUFF_SIZE 4096
 #endif
-char dst_root[BUFF_SIZE];
-char src_root[BUFF_SIZE];
 
 void error(const char* title, const char* text) {
 	tinyfd_messageBox(title, text, "ok", "error", 1);
@@ -111,114 +112,23 @@ void error(const char* title, const char* text) {
 }
 
 void mkdir_p(const char* path) {
-	int error = 0;	
-	printf("mkdir %s\n", path);
-	if (mkdir(path, 0777)) {
-		error = errno;
-		if (error == ENOENT) {	
-			char *sep = strrchr((char*)path, '/');
-			if (sep == NULL) {
-				sep = strrchr((char*)path, SLASH[0]);
-			}
-			if (sep != NULL) {
-				*sep = '\0';
-				if (strlen(path) > 0) {
-					// will be null if the we reach the first /
-					mkdir_p(path);
-				}
-				*sep = '/';
-				mkdir(path, 0777);
-			}
-		} else if (error != EEXIST) {
-			if (mkdir(path, 0777)) {
-				printf("Error while trying to create '%s'\n", path);
-			}
-		}
-	}
+	std::filesystem::create_directories(path);
 }
 
-#ifdef WIN32
-#include <wchar.h>
-#include <string>
-#include <filesystem>
-void copy_dir(const char* source_folder, const char* target_folder)
-{
-	if (std::filesystem::equivalent(source_folder, target_folder)) {
-		return;
+void copy_dir(std::filesystem::path source_folder, std::filesystem::path target_folder) {
+	if (std::filesystem::exists(target_folder)) {
+		if (std::filesystem::equivalent(source_folder, target_folder)) {
+			return;
+		}
+		// first delete the target_folder, if it exists, to ensure clean slate
+		std::filesystem::remove_all(target_folder);
+	} else {
+		// make the parentdir of the target folder
+		std::filesystem::create_directories(target_folder.parent_path());
 	}
-	// make the parentdir of the target folder
-	char* ptarget = _strdup(target_folder);
-	parentdir(ptarget);
-	mkdir_p(ptarget);
-	// convert source and target folder strings to windows wide strings
-	wchar_t *wsource_folder = new wchar_t[strlen(source_folder) + 1];
-	size_t convertedChars = 0;
-	mbstowcs_s(&convertedChars, wsource_folder, strlen(source_folder) + 1, source_folder, _TRUNCATE);
-	wchar_t *wtarget_folder = new wchar_t[strlen(target_folder) + 1];
-	mbstowcs_s(&convertedChars, wtarget_folder, strlen(target_folder) + 1, target_folder, _TRUNCATE);
-	WCHAR sf[MAX_PATH + 1];
-	WCHAR tf[MAX_PATH + 1];
-	wcscpy_s(sf, MAX_PATH, wsource_folder);
-	wcscpy_s(tf, MAX_PATH, wtarget_folder);
-	// ensure we have double-null terminated strings like Windows docs demand
-	sf[lstrlenW(sf) + 1] = 0;
-	tf[lstrlenW(tf) + 1] = 0;
-	// first delete the target_folder, if it exists
-	SHFILEOPSTRUCTW deleteS = { 0 };
-	deleteS.wFunc = FO_DELETE;
-	deleteS.pTo = tf;
-	deleteS.pFrom = tf;
-	deleteS.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
-	SHFileOperationW(&deleteS);
 	// now copy the new folder in its place
-	SHFILEOPSTRUCTW s = { 0 };
-	s.wFunc = FO_COPY;
-	s.pTo = tf;
-	s.pFrom = sf;
-	s.fFlags = FOF_SILENT | FOF_NOCONFIRMMKDIR | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NO_UI;
-	SHFileOperationW(&s);
+	std::filesystem::copy(source_folder, target_folder, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 }
-#else
-int copy_file(const char* src_path, const struct stat* sb, int typeflag) {
-	char dst_path[BUFF_SIZE];
-	printf("%s to %s\n", src_path, dst_root);
-	strcpy(dst_path, dst_root);
-	strcat(dst_path, src_path + strlen(src_root));
-	switch(typeflag) {
-	case FTW_D:
-		mkdir_p(dst_path);
-		break;
-	case FTW_F:
-		mkdir_p(parentdir(strdup(dst_path)));
-		FILE* in = fopen(src_path, "rb");
-		FILE* out = fopen(dst_path, "wb");
-		char buf[4096];
-		int c = 0;
-		if (!in) {
-			error("Extraction error", "Could not open source folder for reading.");
-		}
-		if (!out) {
-			error("Extraction error", "Could not open data folder for writing.");
-		}
-		while ((c = fread(buf, sizeof(char), 4096, in))) {
-			fwrite(buf, sizeof(char), c, out);
-		}
-		fclose(in);
-		fclose(out);
-		break;
-	}
-	return 0;
-}
-
-void copy_dir(const char* src_path, const char* dst_path) {
-	printf("Copying %s to %s\n", src_path, dst_path);
-	mkdir_p(parentdir(strdup(dst_path)));
-	strcpy(dst_root, dst_path);
-	strcpy(src_root, src_path);
-	ftw(src_path, copy_file, 20);
-}
-#endif
-
 
 #ifdef WIN32
 char* GetExtractionLogPath(const char* game_name, char* data_path) {
