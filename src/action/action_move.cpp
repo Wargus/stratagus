@@ -117,7 +117,7 @@
 	input.SetGoal(this->goalPos, tileSize);
 
 	int distance = this->Range;
-	if (GameSettings.Inside) {
+	if (GameSettings.SharedSettings.Inside) {
 		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
 	}
 	input.SetMaxRange(distance);

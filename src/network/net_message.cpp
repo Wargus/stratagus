@@ -33,6 +33,7 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include "settings.h"
 #include "stratagus.h"
 
 #include "net_message.h"
@@ -240,16 +241,27 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
 
-	p += serialize8(p, this->ResourcesOption);
-	p += serialize8(p, this->UnitsOption);
-	p += serialize8(p, this->FogOfWar);
-	p += serialize8(p, this->Inside);
-	p += serialize8(p, this->RevealMap);
-	p += serialize8(p, this->TilesetSelection);
-	p += serialize8(p, this->GameTypeOption);
-	p += serialize8(p, this->Difficulty);
-	p += serialize8(p, this->MapRichness);
-	p += serialize8(p, this->Opponents);
+	p += serialize8(p, this->SharedSettings.Resources);
+	p += serialize8(p, this->SharedSettings.NumUnits);
+	p += serialize8(p, this->SharedSettings.Opponents);
+	p += serialize8(p, this->SharedSettings.Difficulty);
+	p += serialize8(p, this->SharedSettings.GameType);
+	p += serialize8(p, this->SharedSettings.NoFogOfWar);
+	p += serialize8(p, this->SharedSettings.Inside);
+	p += serialize8(p, this->SharedSettings.RevealMap);
+	p += serialize8(p, this->SharedSettings.MapRichness);
+	p += serialize8(p, this->SharedSettings.TilesetSelection);
+	p += serialize8(p, this->SharedSettings.AiExplores);
+	p += serialize8(p, this->SharedSettings.SimplifiedAutoTargeting);
+	p += serialize8(p, this->SharedSettings.AiChecksDependencies);
+	p += serialize8(p, this->SharedSettings.AllyDepositsAllowed);
+	p += serialize8(p, this->SharedSettings.GameSetting01);
+	p += serialize8(p, this->SharedSettings.GameSetting02);
+	p += serialize8(p, this->SharedSettings.GameSetting03);
+	p += serialize8(p, this->SharedSettings.GameSetting04);
+	p += serialize8(p, this->SharedSettings.GameSetting05);
+	p += serialize8(p, this->SharedSettings.GameSetting06);
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->CompOpt[i]);
 	}
@@ -265,16 +277,28 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 size_t CServerSetup::Deserialize(const unsigned char *p)
 {
 	const unsigned char *buf = p;
-	p += deserialize8(p, &this->ResourcesOption);
-	p += deserialize8(p, &this->UnitsOption);
-	p += deserialize8(p, &this->FogOfWar);
-	p += deserialize8(p, &this->Inside);
-	p += deserialize8(p, &this->RevealMap);
-	p += deserialize8(p, &this->TilesetSelection);
-	p += deserialize8(p, &this->GameTypeOption);
-	p += deserialize8(p, &this->Difficulty);
-	p += deserialize8(p, &this->MapRichness);
-	p += deserialize8(p, &this->Opponents);
+
+	p += deserialize8(p, &this->SharedSettings.Resources);
+	p += deserialize8(p, &this->SharedSettings.NumUnits);
+	p += deserialize8(p, &this->SharedSettings.Opponents);
+	p += deserialize8(p, &this->SharedSettings.Difficulty);
+	p += deserialize8(p, &this->SharedSettings.GameType);
+	p += deserialize8(p, &this->SharedSettings.NoFogOfWar);
+	p += deserialize8(p, &this->SharedSettings.Inside);
+	p += deserialize8(p, &this->SharedSettings.RevealMap);
+	p += deserialize8(p, &this->SharedSettings.MapRichness);
+	p += deserialize8(p, &this->SharedSettings.TilesetSelection);
+	p += deserialize8(p, &this->SharedSettings.AiExplores);
+	p += deserialize8(p, &this->SharedSettings.SimplifiedAutoTargeting);
+	p += deserialize8(p, &this->SharedSettings.AiChecksDependencies);
+	p += deserialize8(p, &this->SharedSettings.AllyDepositsAllowed);
+	p += deserialize8(p, &this->SharedSettings.GameSetting01);
+	p += deserialize8(p, &this->SharedSettings.GameSetting02);
+	p += deserialize8(p, &this->SharedSettings.GameSetting03);
+	p += deserialize8(p, &this->SharedSettings.GameSetting04);
+	p += deserialize8(p, &this->SharedSettings.GameSetting05);
+	p += deserialize8(p, &this->SharedSettings.GameSetting06);
+
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->CompOpt[i]);
 	}
@@ -289,16 +313,7 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 
 void CServerSetup::Clear()
 {
-	ResourcesOption = 0;
-	UnitsOption = 0;
-	FogOfWar = 0;
-	Inside = 0;
-	RevealMap = 0;
-	TilesetSelection = 0;
-	GameTypeOption = 0;
-	Difficulty = 0;
-	MapRichness = 0;
-	Opponents = 0;
+	memset(&SharedSettings, 0, sizeof(SharedGameSettings));
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
 	memset(Race, 0, sizeof(Race));
@@ -306,16 +321,7 @@ void CServerSetup::Clear()
 
 bool CServerSetup::operator == (const CServerSetup &rhs) const
 {
-	return (ResourcesOption == rhs.ResourcesOption
-			&& UnitsOption == rhs.UnitsOption
-			&& FogOfWar == rhs.FogOfWar
-			&& Inside == rhs.Inside
-			&& RevealMap == rhs.RevealMap
-			&& TilesetSelection == rhs.TilesetSelection
-			&& GameTypeOption == rhs.GameTypeOption
-			&& Difficulty == rhs.Difficulty
-			&& MapRichness == rhs.MapRichness
-			&& Opponents == rhs.Opponents
+	return (memcmp(&SharedSettings, &rhs.SharedSettings, sizeof(SharedGameSettings)) == 0
 			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
 			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
 			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);

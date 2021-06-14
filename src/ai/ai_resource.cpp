@@ -34,6 +34,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "settings.h"
 #include "stratagus.h"
 
 #include "ai_local.h"
@@ -784,7 +785,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table;
 
-	if (Preference.AiChecksDependencies || IsNetworkGame()) {
+	if (GameSettings.SharedSettings.AiChecksDependencies) {
 		if (!CheckDependByType(*AiPlayer->Player, what)) {
 			return false;
 		}
@@ -1445,7 +1446,7 @@ void AiAddUnitTypeRequest(CUnitType &type, int count)
 */
 void AiExplore(const Vec2i &pos, int mask)
 {
-	if (!Preference.AiExplores) {
+	if (!GameSettings.SharedSettings.AiExplores) {
 		return;
 	}
 	AiExplorationRequest req(pos, mask);

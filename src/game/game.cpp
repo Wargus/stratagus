@@ -118,15 +118,26 @@ void SaveGameSettings(CFile &file)
 		file.printf("GameSettings.Presets[%d].Team = %d\n", i, GameSettings.Presets[i].Team);
 		file.printf("GameSettings.Presets[%d].Type = %d\n", i, GameSettings.Presets[i].Type);
 	}
-	file.printf("GameSettings.Resources = %d\n", GameSettings.Resources);
-	file.printf("GameSettings.Difficulty = %d\n", GameSettings.Difficulty);
-	file.printf("GameSettings.NumUnits = %d\n", GameSettings.NumUnits);
-	file.printf("GameSettings.Opponents = %d\n", GameSettings.Opponents);
-	file.printf("GameSettings.GameType = %d\n", GameSettings.GameType);
-	file.printf("GameSettings.NoFogOfWar = %s\n", GameSettings.NoFogOfWar ? "true" : "false");
-	file.printf("GameSettings.RevealMap = %d\n", GameSettings.RevealMap);
-	file.printf("GameSettings.MapRichness = %d\n", GameSettings.MapRichness);
-	file.printf("GameSettings.Inside = %s\n", GameSettings.Inside ? "true" : "false");
+	file.printf("GameSettings.SharedSettings.Resources = %d\n", GameSettings.SharedSettings.Resources);
+	file.printf("GameSettings.SharedSettings.NumUnits = %d\n", GameSettings.SharedSettings.NumUnits);
+	file.printf("GameSettings.SharedSettings.Opponents = %d\n", GameSettings.SharedSettings.Opponents);
+	file.printf("GameSettings.SharedSettings.Difficulty = %d\n", GameSettings.SharedSettings.Difficulty);
+	file.printf("GameSettings.SharedSettings.GameType = %d\n", GameSettings.SharedSettings.GameType);
+	file.printf("GameSettings.SharedSettings.NoFogOfWar = %d\n", GameSettings.SharedSettings.NoFogOfWar);
+	file.printf("GameSettings.SharedSettings.Inside = %d\n", GameSettings.SharedSettings.Inside);
+	file.printf("GameSettings.SharedSettings.RevealMap = %d\n", GameSettings.SharedSettings.RevealMap);
+	file.printf("GameSettings.SharedSettings.MapRichness = %d\n", GameSettings.SharedSettings.MapRichness);
+	file.printf("GameSettings.SharedSettings.TilesetSelection = %d\n", GameSettings.SharedSettings.TilesetSelection);
+	file.printf("GameSettings.SharedSettings.AiExplores = %d\n", GameSettings.SharedSettings.AiExplores);
+	file.printf("GameSettings.SharedSettings.SimplifiedAutoTargeting = %d\n", GameSettings.SharedSettings.SimplifiedAutoTargeting);
+	file.printf("GameSettings.SharedSettings.AiChecksDependencies = %d\n", GameSettings.SharedSettings.AiChecksDependencies);
+	file.printf("GameSettings.SharedSettings.AllyDepositsAllowed = %d\n", GameSettings.SharedSettings.AllyDepositsAllowed);
+	file.printf("GameSettings.SharedSettings.GameSetting01 = %d\n", GameSettings.SharedSettings.GameSetting01);
+	file.printf("GameSettings.SharedSettings.GameSetting02 = %d\n", GameSettings.SharedSettings.GameSetting02);
+	file.printf("GameSettings.SharedSettings.GameSetting03 = %d\n", GameSettings.SharedSettings.GameSetting03);
+	file.printf("GameSettings.SharedSettings.GameSetting04 = %d\n", GameSettings.SharedSettings.GameSetting04);
+	file.printf("GameSettings.SharedSettings.GameSetting05 = %d\n", GameSettings.SharedSettings.GameSetting05);
+	file.printf("GameSettings.SharedSettings.GameSetting06 = %d\n", GameSettings.SharedSettings.GameSetting06);
 	file.printf("\n");
 }
 
@@ -919,8 +930,8 @@ void CreateGame(const std::string &filename, CMap *map)
 	// Setup game types
 	//
 	// FIXME: implement more game types
-	if (GameSettings.GameType != SettingsGameTypeMapDefault) {
-		switch (GameSettings.GameType) {
+	if (GameSettings.SharedSettings.GameType != SettingsGameTypeMapDefault) {
+		switch (GameSettings.SharedSettings.GameType) {
 			case SettingsGameTypeMelee:
 				break;
 			case SettingsGameTypeFreeForAll:
@@ -1083,12 +1094,13 @@ void InitSettings()
 		GameSettings.Presets[i].Team = SettingsPresetMapDefault;
 		GameSettings.Presets[i].Type = SettingsPresetMapDefault;
 	}
-	GameSettings.Resources = SettingsPresetMapDefault;
-	GameSettings.NumUnits = SettingsPresetMapDefault;
-	GameSettings.Opponents = SettingsPresetMapDefault;
-	GameSettings.Difficulty = SettingsPresetMapDefault;
-	GameSettings.GameType = SettingsPresetMapDefault;
-	GameSettings.MapRichness = SettingsPresetMapDefault;
+	memset(&GameSettings.SharedSettings, 0, sizeof(GameSettings.SharedSettings));
+	GameSettings.SharedSettings.Resources = SettingsPresetMapDefault;
+	GameSettings.SharedSettings.NumUnits = SettingsPresetMapDefault;
+	GameSettings.SharedSettings.Opponents = SettingsPresetMapDefault;
+	GameSettings.SharedSettings.Difficulty = SettingsPresetMapDefault;
+	GameSettings.SharedSettings.GameType = SettingsPresetMapDefault;
+	GameSettings.SharedSettings.MapRichness = SettingsPresetMapDefault;
 	GameSettings.NetGameType = SettingsSinglePlayerGame;
 }
 

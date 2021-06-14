@@ -32,6 +32,8 @@
 
 //@{
 
+#include "stratagus.h"
+
 #include <string>
 #include <vector>
 
@@ -56,12 +58,46 @@ struct SettingsPresets {
 };
 
 /**
+ **
+ **  This structure contains all settings that must be synchronized across
+ **  clients in a network game or saved+restored to the same values during a
+ **  replay to avoid desyncs.
+ */
+typedef struct _SharedGameSettings {
+	int8_t Resources;   /// Preset resource factor
+	int8_t NumUnits;    /// Preset # of units
+	int8_t Opponents;   /// Preset # of ai-opponents
+	int8_t Difficulty;
+
+	int8_t GameType;    /// Game type (melee, free for all,...)
+	int8_t NoFogOfWar; /// No fog of war
+	int8_t Inside;     /// If game uses interior tileset
+	int8_t RevealMap;   /// Reveal map
+
+	int8_t MapRichness; /// Map richness
+	int8_t TilesetSelection;  /// Tileset select option
+	int8_t AiExplores; /// If true, AI sends explorers to search for resources (almost useless thing)
+	int8_t SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
+
+	int8_t AiChecksDependencies; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
+	int8_t AllyDepositsAllowed;  /// If true, allies can deposit resources in each others buildings
+
+	// Game-specific settings that may cause desyncs can be stored in the following fields
+	int8_t GameSetting01;
+	int8_t GameSetting02;
+	int8_t GameSetting03;
+	int8_t GameSetting04;
+	int8_t GameSetting05;
+	int8_t GameSetting06;
+} SharedGameSettings;
+
+/**
 **  Settings structure
 **
-**  This structure one day should contain all common game settings,
-**  in-game, or pre-start, and the individual (per player) presets.
-**  This allows central maintenance, easy (network-)negotiation,
-**  simplifies load/save/reinitialization, etc...
+**  This structure one day should contain all common game settings, in-game, or
+**  pre-start, and the individual (per player) presets.  This allows central
+**  maintenance, easy (network-)negotiation, simplifies
+**  load/save/reinitialization, etc...
 **
 */
 struct Settings {
@@ -71,16 +107,7 @@ struct Settings {
 	//  For single-player game only Presets[0] will be used..
 	SettingsPresets Presets[PlayerMax];
 
-	//  Common settings:
-	int Resources;   /// Preset resource factor
-	int NumUnits;    /// Preset # of units
-	int Opponents;   /// Preset # of ai-opponents
-	int Difficulty;  /// Terrain type (summer,winter,...)
-	int GameType;    /// Game type (melee, free for all,...)
-	bool NoFogOfWar; /// No fog of war
-	bool Inside;     /// If game uses interior tileset
-	int RevealMap;   /// Reveal map
-	int MapRichness; /// Map richness
+	SharedGameSettings SharedSettings;
 };
 
 #define SettingsPresetMapDefault  -1  /// Special: Use map supplied

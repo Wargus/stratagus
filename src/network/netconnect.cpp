@@ -46,6 +46,7 @@
 #include "player.h"
 #include "script.h"
 #include "settings.h"
+#include "unit.h"
 #include "version.h"
 #include "video.h"
 #include "mdns.h"
@@ -1536,7 +1537,7 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
-	int compPlayers = ServerSetupState.Opponents;
+	int compPlayers = ServerSetupState.SharedSettings.Opponents;
 	for (int i = 1; i < h; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
 			NetPlayers--;
@@ -1779,6 +1780,8 @@ void NetworkInitServerConnect(int openslots)
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
 		ServerSetupState.CompOpt[i] = 1;
 	}
+
+	ServerSetupState.SharedSettings = GameSettings.SharedSettings;
 }
 
 /**
@@ -1858,6 +1861,31 @@ void NetworkGamePrepareGameSettings()
 		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
 	}
 	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerPerson);
+#endif
+
+	GameSettings.SharedSettings = ServerSetupState.SharedSettings;
+
+#ifdef DEBUG
+	DebugPrint("GameSettings.Resources = %d\n" _C_ GameSettings.SharedSettings.Resources);
+	DebugPrint("GameSettings.NumUnits = %d\n" _C_ GameSettings.SharedSettings.NumUnits);
+	DebugPrint("GameSettings.Opponents = %d\n" _C_ GameSettings.SharedSettings.Opponents);
+	DebugPrint("GameSettings.Difficulty = %d\n" _C_ GameSettings.SharedSettings.Difficulty);
+	DebugPrint("GameSettings.GameType = %d\n" _C_ GameSettings.SharedSettings.GameType);
+	DebugPrint("GameSettings.NoFogOfWar = %d\n" _C_ GameSettings.SharedSettings.NoFogOfWar);
+	DebugPrint("GameSettings.Inside = %d\n" _C_ GameSettings.SharedSettings.Inside);
+	DebugPrint("GameSettings.RevealMap = %d\n" _C_ GameSettings.SharedSettings.RevealMap);
+	DebugPrint("GameSettings.MapRichness = %d\n" _C_ GameSettings.SharedSettings.MapRichness);
+	DebugPrint("GameSettings.TilesetSelection = %d\n" _C_ GameSettings.SharedSettings.TilesetSelection);
+	DebugPrint("GameSettings.AiExplores = %d\n" _C_ GameSettings.SharedSettings.AiExplores);
+	DebugPrint("GameSettings.SimplifiedAutoTargeting = %d\n" _C_ GameSettings.SharedSettings.SimplifiedAutoTargeting);
+	DebugPrint("GameSettings.AiChecksDependencies = %d\n" _C_ GameSettings.SharedSettings.AiChecksDependencies);
+	DebugPrint("GameSettings.AllyDepositsAllowed = %d\n" _C_ GameSettings.SharedSettings.AllyDepositsAllowed);
+	DebugPrint("GameSettings.GameSetting01 = %d\n" _C_ GameSettings.SharedSettings.GameSetting01);
+	DebugPrint("GameSettings.GameSetting02 = %d\n" _C_ GameSettings.SharedSettings.GameSetting02);
+	DebugPrint("GameSettings.GameSetting03 = %d\n" _C_ GameSettings.SharedSettings.GameSetting03);
+	DebugPrint("GameSettings.GameSetting04 = %d\n" _C_ GameSettings.SharedSettings.GameSetting04);
+	DebugPrint("GameSettings.GameSetting05 = %d\n" _C_ GameSettings.SharedSettings.GameSetting05);
+	DebugPrint("GameSettings.GameSetting06 = %d\n" _C_ GameSettings.SharedSettings.GameSetting06);
 #endif
 }
 

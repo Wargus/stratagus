@@ -50,6 +50,32 @@ struct SettingsPresets {
 	int Race;
 	int Team;
 	int Type;
+
+struct SharedGameSettings {
+        char Resources;
+        char NumUnits;
+        char Opponents;
+        char Difficulty;
+
+        char GameType;
+        char NoFogOfWar;
+        char Inside;
+        char RevealMap;
+
+        char MapRichness;
+        char TilesetSelection;
+        char AiExplores;
+        char SimplifiedAutoTargeting;
+
+        char AiChecksDependencies;
+        char AllyDepositsAllowed;
+
+        char GameSetting01;
+        char GameSetting02;
+        char GameSetting03;
+        char GameSetting04;
+        char GameSetting05;
+        char GameSetting06;
 };
 
 class Settings {
@@ -57,15 +83,7 @@ class Settings {
 
 	SettingsPresets Presets[PlayerMax];
 
-	int Resources;
-	int NumUnits;
-	int Opponents;
-	int Difficulty;
-	int GameType;
-	bool NoFogOfWar;
-	bool Inside;
-	int RevealMap;
-	int MapRichness;
+        SharedGameSettings SharedSettings;
 };
 
 extern Settings GameSettings;
