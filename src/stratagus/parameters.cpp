@@ -37,6 +37,7 @@
 
 #ifdef USE_WIN32
 #include <Shlobj.h>
+#include <filesystem>
 #endif
 
 /* static */ Parameters Parameters::Instance;
@@ -55,6 +56,14 @@ void Parameters::SetDefaultUserDirectory()
 #ifdef USE_GAME_DIR
 	userDirectory = StratagusLibPath;
 #elif USE_WIN32
+	// if launcher is in the same directory as the data, we are in a portable install
+	char executable_path[MAX_PATH];
+	memset(executable_path, 0, sizeof(executable_path));
+	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
+	if (std::filesystem::equivalent(std::filesystem::path(StratagusLibPath), std::filesystem::path(executable_path).parent_path())) {
+		userDirectory = StratagusLibPath;
+		return;
+	}
 	char data_path[4096] = {'\0'};
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
 	userDirectory = data_path;
