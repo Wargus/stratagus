@@ -258,6 +258,7 @@ static GLint InputSize;
 static GLint VertexCoord;
 static GLint TexCoord;
 // caches that don't change for a window size
+static int RecacheCount = 0; // rechache multiple times - races!
 extern uint8_t SizeChangeCounter; // from sdl.cpp
 static uint16_t LastSizeVersion = -1;
 static int LastVideoWidth = -1;
@@ -313,7 +314,12 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 		glUseProgram(ShaderProgram);
 	}
 
-	if (LastSizeVersion != SizeChangeCounter || LastVideoWidth != Video.Width || LastVideoHeight != Video.Height || LastVideoVerticalPixelSize != Video.VerticalPixelSize) {
+	if (RecacheCount > 0 || LastSizeVersion != SizeChangeCounter || LastVideoWidth != Video.Width || LastVideoHeight != Video.Height || LastVideoVerticalPixelSize != Video.VerticalPixelSize) {
+		if (RecacheCount == 0) {
+			RecacheCount = 60;
+		} else {
+			RecacheCount--;
+		}
 		LastSizeVersion = SizeChangeCounter;
 		LastVideoWidth = Video.Width;
 		LastVideoHeight = Video.Height;
