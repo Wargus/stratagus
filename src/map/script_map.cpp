@@ -152,9 +152,20 @@ static int CclRevealMap(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Center the map.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  -- Center the view at position x=11 and y=1.<br>
+**		  CenterMap(11, 1)
+** 	</code>
+** </div>
 */
 static int CclCenterMap(lua_State *l)
 {
@@ -166,9 +177,22 @@ static int CclCenterMap(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define the starting viewpoint for a given player.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  -- Start view for player 0.<br>
+**		  SetStartView(0, 25, 12)<br>
+**		  -- Start view for player 1.<br>
+**		  SetStartView(0, 71, 38)
+** 	</code>
+** </div>
 */
 static int CclSetStartView(lua_State *l)
 {
@@ -547,11 +571,26 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set forest regeneration speed.
 **
 **  @param l  Lua state.
 **
 **  @return   Old speed
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  -- No regeneration.<br>
+**		  SetForestRegeneration(0)<br>
+**		  -- Slow regeneration.<br>
+**		  SetForestRegeneration(50)<br>
+**		  -- Maximum value for regeneration.<br>
+**		  SetForestRegeneration(255)
+** 	</code>
+** </div>
 */
 static int CclSetForestRegeneration(lua_State *l)
 {
