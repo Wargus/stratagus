@@ -399,11 +399,12 @@ static void CalculateMaxIconSize()
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		if (!Editor.UnitTypes[i].empty()) {
 			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-			Assert(type && type->Icon.Icon);
-			const CIcon &icon = *type->Icon.Icon;
+			if (type != NULL && type->Icon.Icon) {
+				const CIcon &icon = *type->Icon.Icon;
 
-			IconWidth = std::max(IconWidth, icon.G->Width);
-			IconHeight = std::max(IconHeight, icon.G->Height);
+				IconWidth = std::max(IconWidth, icon.G->Width);
+				IconHeight = std::max(IconHeight, icon.G->Height);
+			}
 		}
 	}
 }
@@ -411,11 +412,11 @@ static void CalculateMaxIconSize()
 /**
 **  Recalculate the shown units.
 */
-static void RecalculateShownUnits()
+static void RecalculateShownUnits(size_t start = 0, size_t stop = INT_MAX)
 {
 	Editor.ShownUnitTypes.clear();
 
-	for (size_t i = 0; i != Editor.UnitTypes.size(); ++i) {
+	for (size_t i = start; i < Editor.UnitTypes.size() && i < stop; i++) {
 		if (!Editor.UnitTypes[i].empty()) {
 			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
 			Editor.ShownUnitTypes.push_back(type);
@@ -1905,9 +1906,10 @@ void EditorMainLoop()
 	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
-	gcn::ListModel *toolList = new StringListModel({ "Select", "Units", "Tiles", "Start Locations" });
+	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
+	gcn::ListModel *toolList = new StringListModel(toolListStrings);
 	toolDropdown = new gcn::DropDown(toolList);
-	LambdaActionListener *toolDropdownListener = new LambdaActionListener([](const std::string&) {
+	LambdaActionListener *toolDropdownListener = new LambdaActionListener([&toolListStrings](const std::string&) {
 		int selected = toolDropdown->getSelected();
 		// Click on mode area
 		switch (selected) {
@@ -1916,21 +1918,48 @@ void EditorMainLoop()
 				editorSlider->setVisible(false);
 				return;
 			case 1:
-				Editor.State = EditorEditUnit;
-				editorSlider->setVisible(true);
-				return;
-			case 2:
 				if (EditorEditTile) {
 					Editor.State = EditorEditTile;
 				}
 				editorSlider->setVisible(true);
+				editorSlider->setValue(0);
+				Editor.TileIndex = 0;
 				return;
-			case 3:
+			case 2:
 				Editor.State = EditorSetStartLocation;
 				editorSlider->setVisible(false);
 				return;
-			default:
+			case 3:
+				Editor.State = EditorEditUnit;
+				RecalculateShownUnits();
+				editorSlider->setVisible(true);
+				editorSlider->setValue(0);
+				Editor.UnitIndex = 0;
+				return;
+			default: {
+				std::string selectedString = toolListStrings[selected];
+				Editor.State = EditorEditUnit;
+				size_t startIndex = 0;
+				size_t endIndex = INT_MAX;
+				for (size_t i = 0; i < Editor.UnitTypes.size(); i++) {
+					std::string entry = Editor.UnitTypes[i];
+					if (startIndex == 0) {
+						if (entry.find(selectedString, 2) != std::string::npos) {
+							startIndex = i + 1;	
+						}
+					} else {
+						if (entry.rfind("--", 0) != std::string::npos) {
+							endIndex = i;
+							break;
+						}
+					}
+				}
+				RecalculateShownUnits(startIndex, endIndex);
+				editorSlider->setVisible(true);
+				editorSlider->setValue(0);
+				Editor.UnitIndex = 0;
 				break;
+			}
 		}
 	});
 	toolDropdown->setWidth(100);
@@ -1954,6 +1983,24 @@ void EditorMainLoop()
 
 		Editor.Init();
 
+		// Unit Types is now valid, update the tools
+		// TODO (timfel): This is very ugly/hacky, but the entire editor is, unfortunately...
+		int newW = toolDropdown->getWidth();
+		for (std::string entry : Editor.UnitTypes) {
+			if (entry.rfind("--", 0) != std::string::npos) {
+				std::string e = entry.substr(2);
+				toolListStrings.push_back(e);
+				int strW = toolDropdown->getFont()->getWidth(e);
+				if (newW < strW) {
+					newW = strW;
+				}
+			}
+		}
+		toolDropdown->setListModel(new StringListModel(toolListStrings));
+		toolDropdown->setWidth(newW);
+		toolDropdown->getScrollArea()->setWidth(newW);
+		toolDropdown->getListBox()->setWidth(newW);
+
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
 
@@ -1964,6 +2011,8 @@ void EditorMainLoop()
 		Editor.State = EditorSelecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
+
+		boolean start = true;
 
 		while (Editor.Running) {
 			CheckMusicFinished();
@@ -1997,6 +2046,13 @@ void EditorMainLoop()
 					(Editor.State == EditorEditTile ||
 					 Editor.State == EditorEditUnit)) {
 					EditorCallbackButtonDown(0);
+				}
+			}
+
+			if (start) {
+				start = false;
+				if (UI.MenuButton.Callback) {
+					UI.MenuButton.Callback->action("");
 				}
 			}
 
