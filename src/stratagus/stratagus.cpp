@@ -538,7 +538,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Video.FullScreen = 1;
 				continue;
 			case 'g':
-				SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengl", SDL_HINT_OVERRIDE);
+				SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
 				continue;
 			case 'G':
 				parameters.luaScriptArguments = optarg;
