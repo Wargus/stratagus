@@ -190,7 +190,7 @@ static int CclCenterMap(lua_State *l)
 **		  -- Start view for player 0.<br>
 **		  SetStartView(0, 25, 12)<br>
 **		  -- Start view for player 1.<br>
-**		  SetStartView(0, 71, 38)
+**		  SetStartView(1, 71, 38)
 ** 	</code>
 ** </div>
 */
