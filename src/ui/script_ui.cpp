@@ -283,8 +283,8 @@ static int CclSetVideoResolution(lua_State *l)
 **
 ** <div class="example">
 ** 	<code>
-**		resolution = GetVideoResolution()
-**		print(resolution)
+**		width,height = GetVideoResolution()<br>
+**		print("Resolution  is " .. width .. "x" .. height)
 ** 	</code>
 ** </div>
 */
