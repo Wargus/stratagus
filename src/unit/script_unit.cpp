@@ -66,11 +66,24 @@
 extern unsigned CclGetResourceByName(lua_State *l);
 
 /**
+** <b>Description</b>
+**
 **  Set training queue
 **
 **  @param l  Lua state.
 **
 **  @return  The old state of the training queue
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Training queue available. Train multiple units.
+**		SetTrainingQueue(true)
+**		-- Train one unit at a time.
+**		SetTrainingQueue(false)
+** 	</code>
+** </div>
 */
 static int CclSetTrainingQueue(lua_State *l)
 {
