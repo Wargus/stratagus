@@ -70,9 +70,19 @@ CPreference Preference;
 ----------------------------------------------------------------------------*/
 
 /**
+** <b>Description</b>
+**
 **  Set speed of key scroll
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		SetKeyScrollSpeed(4)
+** 	</code>
+** </div>
 */
 static int CclSetKeyScrollSpeed(lua_State *l)
 {
@@ -82,9 +92,20 @@ static int CclSetKeyScrollSpeed(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get speed of key scroll
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		scroll_speed = GetKeyScrollSpeed()
+**		print(scroll_speed)
+** 	</code>
+** </div>
 */
 static int CclGetKeyScrollSpeed(lua_State *l)
 {
@@ -94,9 +115,19 @@ static int CclGetKeyScrollSpeed(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set speed of mouse scroll
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		SetMouseScrollSpeed(2)
+** 	</code>
+** </div>
 */
 static int CclSetMouseScrollSpeed(lua_State *l)
 {
@@ -106,9 +137,20 @@ static int CclSetMouseScrollSpeed(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get speed of mouse scroll
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		scroll_speed = GetMouseScrollSpeed()
+**		print(scroll_speed)
+** 	</code>
+** </div>
 */
 static int CclGetMouseScrollSpeed(lua_State *l)
 {
@@ -203,9 +245,19 @@ static int CclSetDamageMissile(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the video resolution.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		SetVideoResolution(640,480)
+** 	</code>
+** </div>
 */
 static int CclSetVideoResolution(lua_State *l)
 {
@@ -221,9 +273,20 @@ static int CclSetVideoResolution(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get the video resolution.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		resolution = GetVideoResolution()
+**		print(resolution)
+** 	</code>
+** </div>
 */
 static int CclGetVideoResolution(lua_State *l)
 {
@@ -234,9 +297,22 @@ static int CclGetVideoResolution(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the video fullscreen mode.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Full Screen mode enabled
+**		SetVideoFullScreen(true)
+**		-- Full Screen mode disabled
+**		SetVideoFullScreen(false)
+** 	</code>
+** </div>
 */
 static int CclSetVideoFullScreen(lua_State *l)
 {
@@ -251,9 +327,20 @@ static int CclSetVideoFullScreen(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get the video fullscreen mode.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		fullscreenmode = GetVideoFullScreen()
+**		print(fullscreenmode)
+** 	</code>
+** </div>
 */
 static int CclGetVideoFullScreen(lua_State *l)
 {
