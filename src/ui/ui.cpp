@@ -359,7 +359,9 @@ void CleanUserInterface()
 
 	// Resource Icons
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
-		CGraphic::Free(UI.Resources[i].G);
+		if (UI.Resources[i].G) {
+			CGraphic::Free(UI.Resources[i].G);
+		}
 	}
 
 	// Info Panel
