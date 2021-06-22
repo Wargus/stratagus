@@ -66,11 +66,24 @@
 extern unsigned CclGetResourceByName(lua_State *l);
 
 /**
+** <b>Description</b>
+**
 **  Set training queue
 **
 **  @param l  Lua state.
 **
 **  @return  The old state of the training queue
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Training queue available. Train multiple units.
+**		SetTrainingQueue(true)
+**		-- Train one unit at a time.
+**		SetTrainingQueue(false)
+** 	</code>
+** </div>
 */
 static int CclSetTrainingQueue(lua_State *l)
 {
@@ -636,11 +649,28 @@ static int CclMoveUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Remove unit from the map.
 **
 **  @param l  Lua state.
 **
 **  @return   Returns 1.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		ogre = CreateUnit("unit-ogre", 0, {24, 89})
+**
+**		AddTrigger(
+**  		function() return (GameCycle > 150) end,
+**  		function()
+**    			RemoveUnit(ogre)
+**    			return false end -- end of function
+**		)
+** 	</code>
+** </div>
 */
 static int CclRemoveUnit(lua_State *l)
 {
@@ -719,11 +749,24 @@ static int CclCreateUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  'Upgrade' a unit in place to a unit of different type.
 **
 **  @param l  Lua state.
 **
 **  @return   Returns success.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Make a peon for player 5
+**		peon = CreateUnit("unit-peon", 5, {58, 9})
+**		-- The peon will be trasformed into a Grunt
+**		TransformUnit(peon,"unit-grunt")
+** 	</code>
+** </div>
 */
 static int CclTransformUnit(lua_State *l)
 {
@@ -739,11 +782,24 @@ static int CclTransformUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Damages unit, additionally using another unit as first's attacker
 **
 **  @param l  Lua state.
 **
 **  @return   Returns the slot number of the made unit.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Make a grunt for player 5
+**		grunt = CreateUnit("unit-grunt", 5, {58, 8})
+**		-- Damage the grunt with 15 points
+**		DamageUnit(-1,grunt,15)
+** 	</code>
+** </div>
 */
 static int CclDamageUnit(lua_State *l)
 {
@@ -826,6 +882,7 @@ static int CclSetTeleportDestination(lua_State *l)
 **
 ** <div class="example">
 ** 	<code>
+**		-- Move transport from position x=94,y=0 to x=80,y=9
 **		OrderUnit(1,"unit-human-transport",{94,0},{80,9},"move")
 ** 	</code>
 ** </div>
@@ -916,11 +973,22 @@ private:
 
 
 /**
+** <b>Description</b>
+**
 **  Kill a unit
 **
 **  @param l  Lua state.
 **
 **  @return   Returns true if a unit was killed.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Kills an ogre controlled by player 3
+**		KillUnit("unit-ogre", 3)
+** 	</code>
+** </div>
 */
 static int CclKillUnit(lua_State *l)
 {
@@ -953,11 +1021,22 @@ static int CclKillUnit(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Kill a unit at a location
 **
 **  @param l  Lua state.
 **
 **  @return   Returns the number of units killed.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Kill 8 peasants controlled by player 7 from position {27,1} to {34,5}
+**		KillUnitAt("unit-peasant",7,8,{27,1},{34,5})
+** 	</code>
+** </div>
 */
 static int CclKillUnitAt(lua_State *l)
 {
@@ -1002,6 +1081,8 @@ static int CclKillUnitAt(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get a player's units
 **
 **  @param l  Lua state.
@@ -1095,11 +1176,30 @@ static int CclGetUnitBoolFlag(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get the value of the unit variable.
 **
 **  @param l  Lua state.
 **
 **  @return   The value of the variable of the unit.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Make a grunt for player 5
+**		grunt = CreateUnit("unit-grunt", 5, {58, 8})
+**		-- Take the name of the unit
+**		unit_name = GetUnitVariable(grunt,"Name")
+**		-- Take the player number based on the unit
+**		player_type = GetUnitVariable(grunt,"PlayerType")
+**		-- Take the value of the armor
+**		armor_value = GetUnitVariable(grunt,"Armor")
+**		-- Show the message in the game.
+**		AddMessage(unit_name .. " " .. player_type .. " " .. armor_value)
+** 	</code>
+** </div>
 */
 static int CclGetUnitVariable(lua_State *l)
 {
@@ -1182,11 +1282,24 @@ static int CclGetUnitVariable(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the value of the unit variable.
 **
 **  @param l  Lua state.
 **
 **  @return The new value of the unit.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Create a blacksmith for player 2
+**		blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
+**		-- Specify the amount of hit points to assign to the blacksmith
+**		SetUnitVariable(blacksmith,"HitPoints",344)
+** 	</code>
+** </div>
 */
 static int CclSetUnitVariable(lua_State *l)
 {
@@ -1291,6 +1404,26 @@ static int CclSlotUsage(lua_State *l)
 	return 0;
 }
 
+/**
+** <b>Description</b>
+**
+**  Select a single unit 
+**
+**  @param l  Lua state.
+**
+**  @return 0, meaning the unit is selected.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Make the hero unit Grom Hellscream for player 5
+**		grom = CreateUnit("unit-beast-cry", 5, {58, 8})
+**		-- Select only the unit Grom Hellscream
+**		SelectSingleUnit(grom)
+** 	</code>
+** </div>
+*/
 static int CclSelectSingleUnit(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
