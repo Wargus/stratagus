@@ -1161,9 +1161,23 @@ static int CclDefineUnitType(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Parse unit-stats.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  DefineUnitStats("unit-berserker", 2, {<br>
+**    		"HitPoints", {Value = 55, Max = 55, Increase = 0, Enable = true},<br>
+**    		"AttackRange", {Value = 5, Max = 6, Increase = 0, Enable = true},<br>
+**    		"SightRange", {Value = 7, Max = 7, Increase = 0, Enable = true},<br>
+**  		})
+** 	</code>
+** </div>
 */
 static int CclDefineUnitStats(lua_State *l)
 {
@@ -1336,11 +1350,22 @@ static int CclGetUnitTypeIdent(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get the name of the unit-type structure.
 **
 **  @param l  Lua state.
 **
 **  @return   The name of the unit-type.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  name = GetUnitTypeName("unit-knight")<br>
+**		  print(name)
+** 	</code>
+** </div>
 */
 static int CclGetUnitTypeName(lua_State *l)
 {
@@ -1352,11 +1377,21 @@ static int CclGetUnitTypeName(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set the name of the unit-type structure.
 **
 **  @param l  Lua state.
 **
 **  @return   The name of the unit-type.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  SetUnitTypeName("unit-beast-cry","Doomhammer")
+** 	</code>
+** </div>
 */
 static int CclSetUnitTypeName(lua_State *l)
 {
