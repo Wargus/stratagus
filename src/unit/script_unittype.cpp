@@ -632,6 +632,8 @@ static int CclDefineUnitType(lua_State *l)
 			CclGetPos(l, &type->TileWidth, &type->TileHeight);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
+		} else if (!strcmp(value, "Neutral")) {
+			type->Neutral = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BoxSize")) {
 			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
 		} else if (!strcmp(value, "BoxOffset")) {
