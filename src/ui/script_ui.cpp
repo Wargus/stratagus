@@ -771,9 +771,22 @@ static int CclRightButtonMoves(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Enable/disable the fancy buildings.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  -- Enable fancy buildings
+**		  SetFancyBuildings(true)
+**		  -- Disable fancy buildings
+**		  SetFancyBuildings(false)
+** 	</code>
+** </div>
 */
 static int CclSetFancyBuildings(lua_State *l)
 {
@@ -1266,9 +1279,19 @@ static int CclSetGroupKeys(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 ** Set basic map caracteristics.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		PresentMap("Map description", 1, 128, 128, 17)
+** 	</code>
+** </div>
 */
 static int CclPresentMap(lua_State *l)
 {
@@ -1284,9 +1307,20 @@ static int CclPresentMap(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 ** Define the lua file that will build the map
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		-- Load map setup from file
+**		DefineMapSetup("Setup.sms")
+** 	</code>
+** </div>
 */
 static int CclDefineMapSetup(lua_State *l)
 {
