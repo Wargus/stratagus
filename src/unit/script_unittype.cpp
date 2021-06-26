@@ -1444,9 +1444,21 @@ static int CclSetUnitTypeName(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get unit type data.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		  -- Get the amount of supply from Human Farms
+**		  supply = GetUnitTypeData("unit-farm","Supply")
+**		  print(supply)
+** 	</code>
+** </div>
 */
 static int CclGetUnitTypeData(lua_State *l)
 {
