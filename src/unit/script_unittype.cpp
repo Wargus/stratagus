@@ -435,9 +435,46 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 }
 
 /**
+** <b>Description</b>
+**
 **  Parse unit-type.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example">
+** 	<code>
+**		DefineUnitType("unit-silvermoon-archer", { Name = _("Silvermoon Archer"),
+**			Image = {"file", "human/units/elven_archer.png", "size", {72, 72}},
+**			Animations = "animations-archer", Icon = "icon-archer",
+**			Costs = {"time", 70, "gold", 500, "wood", 50},
+**			Speed = 10,
+**			HitPoints = 45,
+**			DrawLevel = 40,
+**			TileSize = {1, 1}, BoxSize = {33, 33},
+**			SightRange = 6, ComputerReactionRange = 7, PersonReactionRange = 6,
+**			BasicDamage = 4, PiercingDamage = 6, Missile = "missile-arrow",
+**			MaxAttackRange = 4,
+**			Priority = 75,
+**			Points = 60,
+**			Demand = 1,
+**			Corpse = "unit-human-dead-body",
+**			Type = "land",
+**			RightMouseAction = "attack",
+**			CanAttack = true,
+**			CanTargetLand = true, CanTargetSea = true, CanTargetAir = true,
+**			LandUnit = true,
+**			organic = true,
+**			SelectableByRectangle = true,
+**			Sounds = {
+**				"selected", "archer-selected",
+**				"acknowledge", "archer-acknowledge",
+**				"ready", "archer-ready",
+**				"help", "basic human voices help 1",
+**				"dead", "basic human voices dead"} } )
+** 	</code>
+** </div>
 */
 static const std::string shadowMarker = std::string("MARKER");
 static int CclDefineUnitType(lua_State *l)
