@@ -265,11 +265,7 @@ static int CclIfNearUnit(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		IfRescuedNearUnit("this", ">=", 1, "unit-archer", "unit-circle-of-power")
-** 	</code>
-** </div>
+** <div class="example"><code>IfRescuedNearUnit("this", ">=", 1, "unit-archer", "unit-circle-of-power")</code></div>
 */
 static int CclIfRescuedNearUnit(lua_State *l)
 {
@@ -439,14 +435,10 @@ void ActionStopTimer()
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-** 		AddTrigger(<br>
-**			function() return (GetPlayerData(1,"UnitTypesCount","unit-farm") >= 4) end,<br>
-**			function() return ActionVictory() end<br>
-**		)
-** 	</code>
-** </div>
+** <div class="example"><code>AddTrigger(
+**			function() return (GetPlayerData(1,"UnitTypesCount","unit-farm") >= 4) end,
+**			function() return ActionVictory() end
+**		)</code></div>
 */
 static int CclAddTrigger(lua_State *l)
 {
