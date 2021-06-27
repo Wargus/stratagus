@@ -388,13 +388,9 @@ static int CclDefineUnitAllow(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		DefineAllow("unit-town-hall","AAAAAAAAAAAAAAAA") -- Available for everybody<br>
-**		DefineAllow("unit-stables","FFFFFFFFFFFFFFFF") -- Not available<br>
-**		DefineAllow("upgrade-sword1","RRRRRRRRRRRRRRRR") -- Upgrade already researched.
-** 	</code>
-** </div>
+** <div class="example"><code>DefineAllow("unit-town-hall","AAAAAAAAAAAAAAAA") -- Available for everybody
+**		DefineAllow("unit-stables","FFFFFFFFFFFFFFFF") -- Not available
+**		DefineAllow("upgrade-sword1","RRRRRRRRRRRRRRRR") -- Upgrade already researched.</code></div>
 **
 */
 static int CclDefineAllow(lua_State *l)
