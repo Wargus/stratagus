@@ -309,12 +309,77 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #endif
 	std::filesystem::path srcfolder;
 	if (!canJustReextract) {
-		const char* datafile = tinyfd_openFileDialog(GAME_CD " location", "",
+		const char* datafileCstr = tinyfd_openFileDialog(GAME_CD " location", "",
 													 patterncount - 1, filepatterns, NULL, 0);
-		if (datafile == NULL) {
+		if (datafileCstr == NULL) {
 			exit(-1);
 		}
-		srcfolder = std::filesystem::path(datafile).parent_path();
+		std::string datafile = datafileCstr;
+		if (datafile.compare(datafile.length() - 4, 4, ".exe") == 0) {
+			// test if this is an innoextract installer and if so, extract it to a tempdir and pass that
+#ifdef WIN32
+			std::string cmdline = "innoextract.exe -i \"";
+#else
+			std::string cmdline = "innoextract -i \"";
+#endif
+			cmdline += datafile;
+			cmdline += "\"";
+			if (system(cmdline.c_str()) == 0) {
+				// innoextract exists and this exe file is an innosetup file
+				bool success = false;
+				std::filesystem::path tmpp = std::filesystem::temp_directory_path() / GAME;
+				std::filesystem::create_directories(tmpp);
+#ifdef WIN32
+				wchar_t *curdir = _wgetcwd(NULL, 0);
+#else
+				char *curdir = getcwd(NULL, 0);
+#endif
+				if (curdir != NULL) {
+#ifdef WIN32
+					if (_wchdir(tmpp.wstring().c_str()) == 0) {
+						cmdline = "innoextract.exe -m \"";
+#else
+					if (chdir(tmpp.string().c_str()) == 0) {
+						cmdline = "innoextract -m \"";
+#endif
+						cmdline += datafile;
+						cmdline += "\"";
+						success = system(cmdline.c_str()) == 0;
+#ifdef WIN32
+						_wchdir(curdir);
+#else
+						chdir(curdir);
+#endif
+					}
+					free(curdir);
+				}
+				if (!success) {
+					error("Problem with installer",
+							"You selected an innosetup installer, and we could not extract it. "
+							"Please extract it manually and point the extraction tool there.");
+				} else {
+					srcfolder = tmpp;
+				}
+			} else {
+				// we cannot test if this is an innoextract installer, assume not but maybe warn
+				if (datafile.compare("INSTALL.EXE") == 0 ||
+					datafile.compare("install.exe") == 0 ||
+					datafile.compare("INSTALL.exe") == 0 ||
+					datafile.compare("SETUP.EXE") == 0 ||
+					datafile.compare("setup.exe") == 0 ||
+					datafile.compare("SETUP.exe") == 0) {
+					// probably not a packaged installer
+				} else {
+					// warn
+					tinyfd_messageBox("", "You selected an exe file, but I cannot run innoextract "
+							"to check if its a single-file installer. If it is, please extract/install "
+							"manually first and then run " GAME " again.", "ok", "question", 1);
+				}
+				srcfolder = std::filesystem::path(datafile).parent_path();
+			}
+		} else {
+			srcfolder = std::filesystem::path(datafile).parent_path();
+		}
 	} else {
 		srcfolder = std::filesystem::path(destination);
 	}
