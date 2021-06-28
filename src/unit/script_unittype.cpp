@@ -435,9 +435,42 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 }
 
 /**
+** <b>Description</b>
+**
 **  Parse unit-type.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>DefineUnitType("unit-silvermoon-archer", { Name = _("Silvermoon Archer"),
+**			Image = {"file", "human/units/elven_archer.png", "size", {72, 72}},
+**			Animations = "animations-archer", Icon = "icon-archer",
+**			Costs = {"time", 70, "gold", 500, "wood", 50},
+**			Speed = 10,
+**			HitPoints = 45,
+**			DrawLevel = 40,
+**			TileSize = {1, 1}, BoxSize = {33, 33},
+**			SightRange = 6, ComputerReactionRange = 7, PersonReactionRange = 6,
+**			BasicDamage = 4, PiercingDamage = 6, Missile = "missile-arrow",
+**			MaxAttackRange = 4,
+**			Priority = 75,
+**			Points = 60,
+**			Demand = 1,
+**			Corpse = "unit-human-dead-body",
+**			Type = "land",
+**			RightMouseAction = "attack",
+**			CanAttack = true,
+**			CanTargetLand = true, CanTargetSea = true, CanTargetAir = true,
+**			LandUnit = true,
+**			organic = true,
+**			SelectableByRectangle = true,
+**			Sounds = {
+**				"selected", "archer-selected",
+**				"acknowledge", "archer-acknowledge",
+**				"ready", "archer-ready",
+**				"help", "basic human voices help 1",
+**				"dead", "basic human voices dead"} } )</code></div>
 */
 static const std::string shadowMarker = std::string("MARKER");
 static int CclDefineUnitType(lua_State *l)
@@ -1169,15 +1202,11 @@ static int CclDefineUnitType(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		  DefineUnitStats("unit-berserker", 2, {<br>
-**    		"HitPoints", {Value = 55, Max = 55, Increase = 0, Enable = true},<br>
-**    		"AttackRange", {Value = 5, Max = 6, Increase = 0, Enable = true},<br>
-**    		"SightRange", {Value = 7, Max = 7, Increase = 0, Enable = true},<br>
-**  		})
-** 	</code>
-** </div>
+** <div class="example"><code>DefineUnitStats("unit-berserker", 2, {
+**    		"HitPoints", {Value = 55, Max = 55, Increase = 0, Enable = true},
+**    		"AttackRange", {Value = 5, Max = 6, Increase = 0, Enable = true},
+**    		"SightRange", {Value = 7, Max = 7, Increase = 0, Enable = true},
+**  		})</code></div>
 */
 static int CclDefineUnitStats(lua_State *l)
 {
@@ -1360,12 +1389,8 @@ static int CclGetUnitTypeIdent(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		  name = GetUnitTypeName("unit-knight")<br>
-**		  print(name)
-** 	</code>
-** </div>
+** <div class="example"><code>name = GetUnitTypeName("unit-knight")
+**		  print(name)</code></div>
 */
 static int CclGetUnitTypeName(lua_State *l)
 {
@@ -1387,11 +1412,7 @@ static int CclGetUnitTypeName(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		  SetUnitTypeName("unit-beast-cry","Doomhammer")
-** 	</code>
-** </div>
+** <div class="example"><code>SetUnitTypeName("unit-beast-cry","Doomhammer")</code></div>
 */
 static int CclSetUnitTypeName(lua_State *l)
 {
@@ -1407,9 +1428,17 @@ static int CclSetUnitTypeName(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get unit type data.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Get the amount of supply from Human Farms
+**		  supply = GetUnitTypeData("unit-farm","Supply")
+**		  print(supply)</code></div>
 */
 static int CclGetUnitTypeData(lua_State *l)
 {

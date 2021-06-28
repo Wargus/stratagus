@@ -78,11 +78,7 @@ CPreference Preference;
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		SetKeyScrollSpeed(4)
-** 	</code>
-** </div>
+** <div class="example"><code>SetKeyScrollSpeed(4)</code></div>
 */
 static int CclSetKeyScrollSpeed(lua_State *l)
 {
@@ -100,12 +96,8 @@ static int CclSetKeyScrollSpeed(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		scroll_speed = GetKeyScrollSpeed()
-**		print(scroll_speed)
-** 	</code>
-** </div>
+** <div class="example"><code>scroll_speed = GetKeyScrollSpeed()
+**		print(scroll_speed)</code></div>
 */
 static int CclGetKeyScrollSpeed(lua_State *l)
 {
@@ -123,11 +115,7 @@ static int CclGetKeyScrollSpeed(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		SetMouseScrollSpeed(2)
-** 	</code>
-** </div>
+** <div class="example"><code>SetMouseScrollSpeed(2)</code></div>
 */
 static int CclSetMouseScrollSpeed(lua_State *l)
 {
@@ -146,11 +134,8 @@ static int CclSetMouseScrollSpeed(lua_State *l)
 ** Example:
 **
 ** <div class="example">
-** 	<code>
-**		scroll_speed = GetMouseScrollSpeed()
-**		print(scroll_speed)
-** 	</code>
-** </div>
+** 	<code>scroll_speed = GetMouseScrollSpeed()
+**		print(scroll_speed)</code></div>
 */
 static int CclGetMouseScrollSpeed(lua_State *l)
 {
@@ -253,11 +238,7 @@ static int CclSetDamageMissile(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		SetVideoResolution(640,480)
-** 	</code>
-** </div>
+** <div class="example"><code>SetVideoResolution(640,480)</code></div>
 */
 static int CclSetVideoResolution(lua_State *l)
 {
@@ -281,12 +262,8 @@ static int CclSetVideoResolution(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		width,height = GetVideoResolution()<br>
-**		print("Resolution  is " .. width .. "x" .. height)
-** 	</code>
-** </div>
+** <div class="example"><code>width,height = GetVideoResolution()
+**		print("Resolution  is " .. width .. "x" .. height)</code></div>
 */
 static int CclGetVideoResolution(lua_State *l)
 {
@@ -305,14 +282,10 @@ static int CclGetVideoResolution(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		-- Full Screen mode enabled
+** <div class="example"><code>-- Full Screen mode enabled
 **		SetVideoFullScreen(true)
 **		-- Full Screen mode disabled
-**		SetVideoFullScreen(false)
-** 	</code>
-** </div>
+**		SetVideoFullScreen(false)</code></div>
 */
 static int CclSetVideoFullScreen(lua_State *l)
 {
@@ -335,12 +308,8 @@ static int CclSetVideoFullScreen(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		fullscreenmode = GetVideoFullScreen()
-**		print(fullscreenmode)
-** 	</code>
-** </div>
+** <div class="example"><code>fullscreenmode = GetVideoFullScreen()
+**		print(fullscreenmode)</code></div>
 */
 static int CclGetVideoFullScreen(lua_State *l)
 {
@@ -771,9 +740,18 @@ static int CclRightButtonMoves(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Enable/disable the fancy buildings.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Enable fancy buildings
+**		  SetFancyBuildings(true)
+**		  -- Disable fancy buildings
+**		  SetFancyBuildings(false)</code></div>
 */
 static int CclSetFancyBuildings(lua_State *l)
 {
@@ -1238,11 +1216,7 @@ static int CclSetSelectionStyle(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		AddMessage("Hello World!")
-** 	</code>
-** </div>
+** <div class="example"><code>AddMessage("Hello World!")</code></div>
 **
 **  @param l  Lua state.
 */
@@ -1266,9 +1240,15 @@ static int CclSetGroupKeys(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 ** Set basic map caracteristics.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>PresentMap("Map description", 1, 128, 128, 17)</code></div>
 */
 static int CclPresentMap(lua_State *l)
 {
@@ -1284,9 +1264,16 @@ static int CclPresentMap(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 ** Define the lua file that will build the map
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Load map setup from file
+**		DefineMapSetup("Setup.sms")</code></div>
 */
 static int CclDefineMapSetup(lua_State *l)
 {

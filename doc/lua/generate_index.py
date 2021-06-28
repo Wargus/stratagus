@@ -8,11 +8,12 @@ try:
     def highlight(src):
         return pygments.highlight(src, CppLexer(), HtmlFormatter())
     CSS = HtmlFormatter().get_style_defs()
+    code_CSS = "div.example { width: 50%; background-color: lightgrey; border: 1px solid; padding-left: 10px;}"
 except:
     print("Pygments is not installed, no syntax highlighting")
     def highlight(src):
         return src.replace("\n", "<br>").replace(" ", "&nbsp;").replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-    CSS = ""
+    CSS,code_CSS = "",""
 
 from os.path import join, dirname, basename, abspath
 
@@ -112,13 +113,18 @@ if __name__ == "__main__":
 
     with open("index.html", "w") as toc:
         toc.write("""
-        <html>
+        <!DOCTYPE html>
+        <html lang="en">
         <head>
         <title>TOC</title>
-        <style type=text/css>{0}</style>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style type=text/css>{0}
+        {1}
+        </style>
         </head>
         <body>
-        """.format(CSS))
+        """.format(CSS, code_CSS))
         for cppfile in walk_files(root, exts=[".cpp"]):
             rule = False
             for lua_register in walk_lua_registers(cppfile):

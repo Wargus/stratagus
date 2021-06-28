@@ -1136,15 +1136,11 @@ void CleanGame()
 **
 **  Return of game name.
 **
+**  @param l  Lua state.
+**
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		SetGameName("Wargus Map - Chapter 1")
-** 	</code>
-** </div>
-**
-**  @param l  Lua state.
+** <div class="example"><code>SetGameName("Wargus Map - Chapter 1")</code></div>
 */
 static int CclSetGameName(lua_State *l)
 {
@@ -1451,15 +1447,11 @@ static int ScriptSetUseHPForXp(lua_State *l)
 **
 **  Set the local player name
 **
+**  @param l  Lua state.
+**
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		SetLocalPlayerName("Stormreaver Clan")
-** 	</code>
-** </div>
-**
-**  @param l  Lua state.
+** <div class="example"><code>SetLocalPlayerName("Stormreaver Clan")</code></div>
 */
 static int CclSetLocalPlayerName(lua_State *l)
 {
@@ -1473,15 +1465,11 @@ static int CclSetLocalPlayerName(lua_State *l)
 **
 **  Get the local player name
 **
+**  @param l  Lua state.
+**
 ** Example:
 **
-** <div class="example">
-** 	<code>
-**		GetLocalPlayerName()
-** 	</code>
-** </div>
-**
-**  @param l  Lua state.
+** <div class="example"><code>GetLocalPlayerName()</code></div>
 */
 static int CclGetLocalPlayerName(lua_State *l)
 {
