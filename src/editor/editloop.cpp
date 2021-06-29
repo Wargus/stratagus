@@ -2012,7 +2012,7 @@ void EditorMainLoop()
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
 
-		boolean start = true;
+		bool start = true;
 
 		while (Editor.Running) {
 			CheckMusicFinished();
