@@ -27,7 +27,7 @@ PKG_EXPORT_RE = re.compile(r'^(?:extern )?((?:unsigned )?[a-zA-Z0-9_]+ [a-zA-Z0-
 
 
 def get_c_func_re(c_func):
-    return re.compile(r'int\s+' + c_func + '[^;]+$', re.MULTILINE)
+    return re.compile(r'int\s+' + c_func + r'[^a-zA-Z0-9_][^;]+$', re.MULTILINE)
 
 
 def walk_files(directory, exts):
