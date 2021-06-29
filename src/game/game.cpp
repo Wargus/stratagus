@@ -1172,11 +1172,20 @@ static int CclSetFullGameName(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set God mode.
 **
 **  @param l  Lua state.
 **
 **  @return   The old mode.
+**
+** Example:
+**
+** <div class="example"><code>-- God Mode enabled
+**		SetGodMode(true)
+**		-- God Mode disabled
+**		SetGodMode(false)</code></div>
 */
 static int CclSetGodMode(lua_State *l)
 {
@@ -1186,11 +1195,18 @@ static int CclSetGodMode(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get God mode.
 **
 **  @param l  Lua state.
 **
 **  @return   God mode.
+**
+** Example:
+**
+** <div class="example"><code>g_mode = GetGodMode()
+**		print(g_mode)</code></div>
 */
 static int CclGetGodMode(lua_State *l)
 {
@@ -1479,7 +1495,14 @@ static int CclGetLocalPlayerName(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get Stratagus Version
+**
+** Example:
+**
+** <div class="example"><code>version = GetStratagusVersion()
+**		print(version)</code></div>
 */
 static int CclGetStratagusVersion(lua_State *l)
 {
@@ -1489,7 +1512,14 @@ static int CclGetStratagusVersion(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get Stratagus Homepage
+**
+** Example:
+**
+** <div class="example"><code>url = GetStratagusHomepage()
+**	print(url)</code></div>
 */
 static int CclGetStratagusHomepage(lua_State *l)
 {
