@@ -434,6 +434,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 }
 
+static const std::string shadowMarker = std::string("MARKER");
 /**
 ** <b>Description</b>
 **
@@ -472,7 +473,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 **				"help", "basic human voices help 1",
 **				"dead", "basic human voices dead"} } )</code></div>
 */
-static const std::string shadowMarker = std::string("MARKER");
 static int CclDefineUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
