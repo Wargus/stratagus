@@ -318,10 +318,17 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		if (datafile.compare(datafile.length() - 4, 4, ".exe") == 0) {
 			// test if this is an innoextract installer and if so, extract it to a tempdir and pass that
 #ifdef WIN32
-			std::string cmdline = "innoextract.exe -i \"";
+			char moduleFileName[BUFF_SIZE];
+			memset(moduleFileName, 0, sizeof(moduleFileName));
+			GetModuleFileName(NULL, moduleFileName, sizeof(moduleFileName)-1);
+			std::filesystem::path innoextractPath = std::filesystem::path(moduleFileName).parent_path() / "innoextract.exe";
+			std::string innoextractString = "\"";
+			innoextractString += innoextractPath.string();
+			innoextractString += "\"";
 #else
-			std::string cmdline = "innoextract -i \"";
+			std::string innoextractString = "innoextract";
 #endif
+			std::string cmdline = innoextractString + " -i \"";
 			cmdline += datafile;
 			cmdline += "\"";
 			if (system(cmdline.c_str()) == 0) {
@@ -337,11 +344,10 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 				if (curdir != NULL) {
 #ifdef WIN32
 					if (_wchdir(tmpp.wstring().c_str()) == 0) {
-						cmdline = "innoextract.exe -m \"";
 #else
 					if (chdir(tmpp.string().c_str()) == 0) {
-						cmdline = "innoextract -m \"";
 #endif
+						cmdline = innoextractString + " -m \"";
 						cmdline += datafile;
 						cmdline += "\"";
 						success = system(cmdline.c_str()) == 0;
