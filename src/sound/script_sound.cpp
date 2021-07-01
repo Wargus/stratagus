@@ -200,7 +200,7 @@ static int CclMapSound(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>PlaySound("rescue (orc)")</code></div>
+** <div class="example"><code><strong>PlaySound</strong>("rescue (orc)")</code></div>
 */
 static int CclPlaySound(lua_State *l)
 {
@@ -324,7 +324,7 @@ static int CclDefineGameSounds(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetGlobalSoundRange(200)</code></div>
+** <div class="example"><code><strong>SetGlobalSoundRange</strong>(200)</code></div>
 */
 static int CclSetGlobalSoundRange(lua_State *l)
 {

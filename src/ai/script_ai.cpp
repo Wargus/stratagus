@@ -389,7 +389,7 @@ static CAiType *GetAiTypesByName(const char *name)
 **			-- Basic buildings
 **			function() return AiSet("unit-farm", 4) end, -- Make 4 farms
 **			function() return AiWait("unit-farm") end, -- Wait until all 4 farms are build.
-**			function() return AiNeed("unit-human-barracks") end, -- Need a Barrarck
+**			function() return AiNeed("unit-human-barracks") end, -- Need a Barracks
 **			function() return AiWait("unit-human-barracks") end, -- Wait until the Barracks has been built
 **			-- Defense force for the base
 **			function() return AiForce(1, {"unit-footman", 3}) end, -- Make a force of 3 footmen
@@ -1241,7 +1241,7 @@ static int CclAiWaitForces(lua_State *l)
 **		-- Wait all three forces to be ready
 **		function() return AiWaitForces({1,2,3}) end,
 **		-- Attack with all three forces
-**		function() return AiAttackWithForces({1,2,3}) end,
+**		function() return <strong>AiAttackWithForces</strong>({1,2,3}) end,
 **		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
 **	}
 **

@@ -78,7 +78,7 @@ CPreference Preference;
 **
 ** Example:
 **
-** <div class="example"><code>SetKeyScrollSpeed(4)</code></div>
+** <div class="example"><code><strong>SetKeyScrollSpeed</strong>(4)</code></div>
 */
 static int CclSetKeyScrollSpeed(lua_State *l)
 {
@@ -96,7 +96,7 @@ static int CclSetKeyScrollSpeed(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>scroll_speed = GetKeyScrollSpeed()
+** <div class="example"><code>scroll_speed = <strong>GetKeyScrollSpeed</strong>()
 **		print(scroll_speed)</code></div>
 */
 static int CclGetKeyScrollSpeed(lua_State *l)
@@ -115,7 +115,7 @@ static int CclGetKeyScrollSpeed(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetMouseScrollSpeed(2)</code></div>
+** <div class="example"><code><strong>SetMouseScrollSpeed</strong>(2)</code></div>
 */
 static int CclSetMouseScrollSpeed(lua_State *l)
 {
@@ -133,8 +133,7 @@ static int CclSetMouseScrollSpeed(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** 	<code>scroll_speed = GetMouseScrollSpeed()
+** <div class="example"><code>scroll_speed = <strong>GetMouseScrollSpeed</strong>()
 **		print(scroll_speed)</code></div>
 */
 static int CclGetMouseScrollSpeed(lua_State *l)
@@ -238,7 +237,7 @@ static int CclSetDamageMissile(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetVideoResolution(640,480)</code></div>
+** <div class="example"><code><strong>SetVideoResolution</strong>(640,480)</code></div>
 */
 static int CclSetVideoResolution(lua_State *l)
 {
@@ -262,7 +261,7 @@ static int CclSetVideoResolution(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>width,height = GetVideoResolution()
+** <div class="example"><code>width,height = <strong>GetVideoResolution</strong>()
 **		print("Resolution  is " .. width .. "x" .. height)</code></div>
 */
 static int CclGetVideoResolution(lua_State *l)
@@ -283,9 +282,9 @@ static int CclGetVideoResolution(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>-- Full Screen mode enabled
-**		SetVideoFullScreen(true)
+**		<strong>SetVideoFullScreen</strong>(true)
 **		-- Full Screen mode disabled
-**		SetVideoFullScreen(false)</code></div>
+**		<strong>SetVideoFullScreen</strong>(false)</code></div>
 */
 static int CclSetVideoFullScreen(lua_State *l)
 {
@@ -308,7 +307,7 @@ static int CclSetVideoFullScreen(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>fullscreenmode = GetVideoFullScreen()
+** <div class="example"><code>fullscreenmode = <strong>GetVideoFullScreen</strong>()
 **		print(fullscreenmode)</code></div>
 */
 static int CclGetVideoFullScreen(lua_State *l)
@@ -749,9 +748,9 @@ static int CclRightButtonMoves(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>-- Enable fancy buildings
-**		  SetFancyBuildings(true)
+**		  <strong>SetFancyBuildings</strong>(true)
 **		  -- Disable fancy buildings
-**		  SetFancyBuildings(false)</code></div>
+**		  <strong>SetFancyBuildings</strong>(false)</code></div>
 */
 static int CclSetFancyBuildings(lua_State *l)
 {
@@ -1216,7 +1215,7 @@ static int CclSetSelectionStyle(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>AddMessage("Hello World!")</code></div>
+** <div class="example"><code><strong>AddMessage</strong>("Hello World!")</code></div>
 **
 **  @param l  Lua state.
 */
@@ -1248,7 +1247,7 @@ static int CclSetGroupKeys(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>PresentMap("Map description", 1, 128, 128, 17)</code></div>
+** <div class="example"><code><strong>PresentMap</strong>("Map description", 1, 128, 128, 17)</code></div>
 */
 static int CclPresentMap(lua_State *l)
 {
@@ -1273,7 +1272,7 @@ static int CclPresentMap(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>-- Load map setup from file
-**		DefineMapSetup("Setup.sms")</code></div>
+**		<strong>DefineMapSetup</strong>("Setup.sms")</code></div>
 */
 static int CclDefineMapSetup(lua_State *l)
 {
