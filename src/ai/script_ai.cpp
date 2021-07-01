@@ -402,7 +402,7 @@ static CAiType *GetAiTypesByName(const char *name)
 **		-- function that calls the instructions in simple_ai inside DefineAi
 **		function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
 **		-- Make an A.I for the human race that calls the function custom_ai
-**		DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
+**		<strong>DefineAi</strong>("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclDefineAi(lua_State *l)
 {
@@ -559,7 +559,7 @@ static int CclAiGetRace(lua_State *l)
 **
 **		local simple_ai = {
 **			-- Get the number of cycles to sleep.
-**			function() return AiSleep(<b>AiGetSleepCycles()</b>) end,
+**			function() return AiSleep(<strong>AiGetSleepCycles()</strong>) end,
 **			-- Execute the instructions in simple_ai_loop
 **			function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
 **		}
@@ -659,7 +659,7 @@ static int CclAiDebugPlayer(lua_State *l)
 **		local simple_ai = {
 **			function() return AiSleep(AiGetSleepCycles()) end,
 **			-- Tell to the A.I that it needs a Town Hall.
-**			function() return <b>AiNeed</b>("unit-town-hall") end,
+**			function() return <strong>AiNeed</strong>("unit-town-hall") end,
 **			-- Execute the instructions in simple_ai_loop
 **			function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
 **		}
@@ -701,7 +701,7 @@ static int CclAiNeed(lua_State *l)
 **		-- Wait until the town-hall has been built.
 **		function() return AiWait("unit-town-hall") end,
 **		-- Tell to the A.I that it needs 4 peasants
-**		function() return <b>AiSet</b>("unit-peasant",4) end,
+**		function() return <strong>AiSet</strong>("unit-peasant",4) end,
 **		-- Execute the instructions in simple_ai_loop
 **		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
 **	}
@@ -750,7 +750,7 @@ static int CclAiSet(lua_State *l)
 **		-- Tell to the A.I that it needs a Town Hall.
 **		function() return AiNeed("unit-town-hall") end,
 **		-- Wait until the Town Hall has been built.
-**		function() return <b>AiWait</b>("unit-town-hall") end,
+**		function() return <strong>AiWait</strong>("unit-town-hall") end,
 **		-- Execute the instructions in simple_ai_loop
 **		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
 **	}
@@ -864,11 +864,11 @@ static int CclAiPendingBuildCount(lua_State *l)
 **		-- Wait until the Lumbermill has been built.
 **		function() return AiWait("unit-elven-lumber-mill") end,
 **		-- Specify the force number 1 made only of 3 footmen
-**		function() return <b>AiForce</b>(1,{"unit-footman", 3}) end,
+**		function() return <strong>AiForce</strong>(1,{"unit-footman", 3}) end,
 **		-- Specify the force number 2 made only of 2 archers
-**		function() return <b>AiForce</b>(2,{"unit-archer", 2}) end,
+**		function() return <strong>AiForce</strong>(2,{"unit-archer", 2}) end,
 **		-- Specify the force number 3 made of 2 footmen and 1 archer
-**		function() return <b>AiForce</b>(3,{"unit-footman", 2, "unit-archer", 1}) end,
+**		function() return <strong>AiForce</strong>(3,{"unit-footman", 2, "unit-archer", 1}) end,
 **		-- Wait for all three forces
 **		function() return AiWaitForce(1) end,
 **		function() return AiWaitForce(2) end,
@@ -954,9 +954,40 @@ static int CclAiForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define the role of a force.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiNeed("unit-elven-lumber-mill") end,
+**		-- Force 1 has the role of attacker
+**		function() return <strong>AiForceRole</strong>(1,"<u>attack</u>") end,
+**		-- Force 2 has the role of defender
+**		function() return <strong>AiForceRole</strong>(2,"<u>defend</u>") end,
+**		function() return AiForce(1,{"unit-footman", 3}) end,
+**		function() return AiForce(2,{"unit-archer", 2}) end,
+**		function() return AiWaitForce(1) end,
+**		function() return AiWaitForce(2) end,
+**		-- Execute the instructions in simple_ai_loop
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiForceRole(lua_State *l)
 {
@@ -1028,9 +1059,34 @@ static int CclAiCheckForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Wait for a force ready.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiForce(1,{"unit-footman", 3}) end,
+**		-- Wait until force 1 is completed
+**		function() return <strong>AiWaitForce</strong>(1) end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiWaitForce(lua_State *l)
 {
@@ -1053,9 +1109,40 @@ static int CclAiWaitForce(lua_State *l)
 }
 
 /**
-**  Attack with force.
+** <b>Description</b>
+**
+**  Attack with one single force.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiForce(1,{"unit-footman", 3}) end,
+**		function() return AiWaitForce(1) end,
+**		-- Attack with Force 1
+**		function() return <strong>AiAttackWithForce</strong>(<u>1</u>) end,
+**
+**		function() return AiForce(2,{"unit-footman",5}) end,
+**		function() return AiWaitForce(2) end,
+**		-- Attack with Force 2
+**		function() return <strong>AiAttackWithForce</strong>(<u>2</u>) end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiAttackWithForce(lua_State *l)
 {
@@ -1070,9 +1157,38 @@ static int CclAiAttackWithForce(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Wait for a forces ready.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiNeed("unit-elven-lumber-mill") end,
+**		function() return AiWait("unit-elven-lumber-mill") end,
+**		function() return AiForce(1,{"unit-footman", 2}) end,
+**		function() return AiForce(2,{"unit-archer",1}) end,
+**		function() return AiForce(3,{"unit-archer",1,"unit-footman",3}) end,
+**		-- Wait all three forces to be ready
+**		function() return <strong>AiWaitForces</strong>({1,2,3}) end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiWaitForces(lua_State *l)
 {
@@ -1097,9 +1213,40 @@ static int CclAiWaitForces(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Attack with forces.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiNeed("unit-elven-lumber-mill") end,
+**		function() return AiWait("unit-elven-lumber-mill") end,
+**		function() return AiForce(1,{"unit-footman", 2}) end,
+**		function() return AiForce(2,{"unit-archer",1}) end,
+**		function() return AiForce(3,{"unit-archer",1,"unit-footman",3}) end,
+**		-- Wait all three forces to be ready
+**		function() return AiWaitForces({1,2,3}) end,
+**		-- Attack with all three forces
+**		function() return AiAttackWithForces({1,2,3}) end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiAttackWithForces(lua_State *l)
 {
@@ -1125,9 +1272,35 @@ static int CclAiAttackWithForces(lua_State *l)
 }
 
 /**
-**  Sleep n cycles.
+** <b>Description</b>
+**
+**  Sleep for n cycles.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**			-- Sleep for 5 in game minutes
+**			function() return <strong>AiSleep</strong>(9000) end,
+**			function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**		}
+**
+**		local simple_ai = {
+**			-- Get the number of cycles to sleep
+**			function() return <strong>AiSleep</strong>(AiGetSleepCycles()) end,
+**			function() return AiNeed("unit-town-hall") end,
+**			function() return AiWait("unit-town-hall") end,
+**			function() return AiSet("unit-peasant",4) end,
+**			-- Sleep for 1 in game minute
+**			function() return <strong>AiSleep</strong>(1800) end,
+**			function() return AiNeed("unit-human-blacksmith") end,
+**			function() return AiWait("unit-human-blacksmith") end,
+**			function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**		}
+**
+**		function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**		DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiSleep(lua_State *l)
 {
@@ -1147,9 +1320,38 @@ static int CclAiSleep(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Research an upgrade.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		-- Get the number of cycles to sleep
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiNeed("unit-elven-lumber-mill") end,
+**		function() return AiWait("unit-elven-lumber-mill") end,
+**		function() return AiForce(1,{"unit-footman", 1, "unit-archer", 2}) end,
+**		function() return AiWaitForce(1) end,
+**		-- Upgrade the archers arrow.
+**		function() return <strong>AiResearch</strong>("upgrade-arrow1") end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiResearch(lua_State *l)
 {
@@ -1169,9 +1371,37 @@ static int CclAiResearch(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Upgrade an unit to an new unit-type.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiNeed("unit-human-barracks") end,
+**		function() return AiWait("unit-human-barracks") end,
+**		function() return AiNeed("unit-elven-lumber-mill") end,
+**		function() return AiWait("unit-elven-lumber-mill") end,
+**		function() return AiSleep(1800) end,
+**		-- Upgrade the Town Hall to Keep
+**		function() return <strong>AiUpgradeTo</strong>("unit-keep") end,
+**		function() return AiWait("unit-keep") end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiUpgradeTo(lua_State *l)
 {
@@ -1222,9 +1452,35 @@ static int CclAiSetReserve(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set AI player resource collect percent.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(9000) end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		-- The peasants will focus only on gathering gold
+**		function() return <strong>AiSetCollect</strong>({0,100,0,0,0,0,0}) end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiWait("unit-peasant") end,
+**		function() return AiSleep(1800) end,
+**		-- The peasants will now focus 50% on gathering gold and 50% on gathering lumber
+**		function() return <strong>AiSetCollect</strong>({0,50,50,0,0,0,0}) end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiSetCollect(lua_State *l)
 {
@@ -1254,9 +1510,32 @@ static int CclAiSetBuildDepots(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Dump some AI debug information.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>local simple_ai_loop = {
+**		function() return AiSleep(3600) end,
+**		-- Get the information from all the A.I players
+**		function() return <strong>AiDump</strong>() end,
+**		function() stratagus.gameData.AIState.loop_index[1 + AiPlayer()] = 0; return false; end,
+**	}
+**
+**	local simple_ai = {
+**		function() return AiSleep(AiGetSleepCycles()) end,
+**		function() return AiNeed("unit-town-hall") end,
+**		function() return AiWait("unit-town-hall") end,
+**		function() return AiSet("unit-peasant",4) end,
+**		function() return AiWait("unit-peasant") end,
+**		function() return AiLoop(simple_ai_loop, stratagus.gameData.AIState.loop_index) end,
+**	}
+**
+**	function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
+**	DefineAi("example_ai","human","class_ai",custom_ai)</code></div>
 */
 static int CclAiDump(lua_State *l)
 {
