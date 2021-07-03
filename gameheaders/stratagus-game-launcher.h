@@ -68,7 +68,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
  * #define GAME "my_game"
  * #define GAME_CD_FILE_PATTERNS "*.WAR", "*.war"
  * #define EXTRACTOR_TOOL "gametool"
- * #define EXTRACTOR_ARGS "-v"
+ * #define EXTRACTOR_ARGS {"-v", NULL}
  *
  * #ifndef WIN32
  * #define DATA_PATH "/usr/share/games/stratagus/my_game"
@@ -132,6 +132,7 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #define STRATAGUS_GAME_LAUNCHER_H
 
 /* Fake definitions for Doxygen */
+#include <sys/types.h>
 #ifdef DOXYGEN
 #define GAME_NAME
 #define GAME_CD
@@ -267,7 +268,7 @@ int check_version(char* tool_path, char* data_path) {
     return 0;
 }
 
-static void ExtractData(char* extractor_tool, char* destination, char* scripts_path, int force=0) {
+static void ExtractData(char* extractor_tool, char *const extractor_args[], char* destination, char* scripts_path, int force=0) {
 	int canJustReextract;
 #ifdef EXTRACTION_FILES
 	if (force == 0) {
@@ -322,16 +323,13 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 			memset(moduleFileName, 0, sizeof(moduleFileName));
 			GetModuleFileName(NULL, moduleFileName, sizeof(moduleFileName)-1);
 			std::filesystem::path innoextractPath = std::filesystem::path(moduleFileName).parent_path() / "innoextract.exe";
-			std::string innoextractString = "\"";
-			innoextractString += innoextractPath.string();
-			innoextractString += "\"";
+			std::wstring file = innoextractPath.wstring();
+			std::vector<std::wstring> argv = {L"-i", std::filesystem::path(datafile).wstring()};
 #else
-			std::string innoextractString = "innoextract";
+			const char *file = "innoextract";
+			char *const argv[] = {"-i", datafile.c_str(), NULL};
 #endif
-			std::string cmdline = innoextractString + " -i \"";
-			cmdline += datafile;
-			cmdline += "\"";
-			if (system(cmdline.c_str()) == 0) {
+			if (runCommand(file, argv) == 0) {
 				// innoextract exists and this exe file is an innosetup file
 				bool success = false;
 				std::filesystem::path tmpp = std::filesystem::temp_directory_path() / GAME;
@@ -347,10 +345,12 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 #else
 					if (chdir(tmpp.string().c_str()) == 0) {
 #endif
-						cmdline = innoextractString + " -m \"";
-						cmdline += datafile;
-						cmdline += "\"";
-						success = system(cmdline.c_str()) == 0;
+#ifdef WIN32
+						argv[0] = L"-m";
+#else
+						argv[0] = "-m";
+#endif
+						success = runCommand(file, argv) == 0;
 #ifdef WIN32
 						_wchdir(curdir);
 #else
@@ -461,30 +461,57 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
 		}
 	}
 
-	char cmdbuf[4096] = {'\0'};
+	int exitcode = 0;
+
+ 	char cmdbuf[4096] = {'\0'};
+#ifdef WIN32
+	std::wstring file;
+	std::vector<std::wstring> args;
+
+	file = std::filesystem::path(extractor_tool).wstring();
+	for (int i = 0; ; i++) {
+		const char *earg = extractor_args[i];
+		if (earg == NULL) {
+			break;
+		} else {
+			const size_t WCHARBUF = 100;
+			wchar_t  wszDest[WCHARBUF];
+			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, earg, -1, wszDest, WCHARBUF);
+			args.push_back(wszDest);
+		}
+	}
+	args.push_back(srcfolder.wstring());
+	args.push_back(std::filesystem::path(destination).wstring());
+	std::wstring combinedCommandline;
+	exitcode = runCommand(file, args, true, &combinedCommandline);
+#else
+
 #ifdef USE_MAC
 	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\"\n"
                        "    set w to do script \\\"");
-#elif defined(WIN32)
-	strcat(cmdbuf, "/C \"");
 #else
 	if (!isatty(1)) {
 		strcat(cmdbuf, "xterm -e bash -c ");
 		strcat(cmdbuf, " \"");
 	}
 #endif
+
 	strcat(cmdbuf, extractor_tool);
+	for (int i = 0; ; i++) {
+		const char *earg = extractor_args[i];
+		if (earg == NULL) {
+			break;
+		} else {
+			strcat(cmdbuf, " ");
+			strcat(earg);
+		}
+	}
 	strcat(cmdbuf, " " QUOTE);
 	strcat(cmdbuf, srcfolder.string().c_str());
-#ifdef WIN32
-	// a trailing backslash will break the extractor because of quoting
-	if (cmdbuf[strlen(cmdbuf) - 1] == '\\') {
-		cmdbuf[strlen(cmdbuf) - 1] = '\0';
-	}
-#endif
 	strcat(cmdbuf, QUOTE " " QUOTE);
 	strcat(cmdbuf, destination);
 	strcat(cmdbuf, QUOTE);
+
 #ifdef USE_MAC
 	strcat(cmdbuf, "; exit\\\"\n"
                        "    repeat\n"
@@ -492,52 +519,25 @@ static void ExtractData(char* extractor_tool, char* destination, char* scripts_p
                        "        if not busy of w then exit repeat\n"
                        "    end repeat\n"
                        "end tell\"");
-#elif defined(WIN32)
-	strcat(cmdbuf, "\"");
 #else
 	if (!isatty(1)) {
 	    strcat(cmdbuf, "; echo 'Press RETURN to continue...'; read\"");
 	}
 #endif
-#ifdef WIN32
-	DWORD exitcode = 0;
-	SHELLEXECUTEINFO ShExecInfo = { 0 };
-	char* toolpath = _strdup(extractor_tool);
-	if (PathRemoveFileSpec(toolpath)) {
-		// remove the leading quote
-		if (toolpath[0] == '"') memmove(toolpath, toolpath + 1, strlen(toolpath) + 1);
-	} else {
-		// nothing was removed, use current dir
-		toolpath = NULL;
-	}
-	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-	ShExecInfo.hwnd = NULL;
-	ShExecInfo.lpVerb = NULL;
-	ShExecInfo.lpFile = "cmd";
-	ShExecInfo.lpParameters = cmdbuf;
-	ShExecInfo.lpDirectory = toolpath;
-	ShExecInfo.nShow = SW_SHOW;
-	ShExecInfo.hInstApp = NULL;
-	ShellExecuteEx(&ShExecInfo);
-	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-	GetExitCodeProcess(ShExecInfo.hProcess, &exitcode);
-#else
+
 	printf("Running extractor as %s\n", cmdbuf);
-	int exitcode = 0;
 	exitcode = system(cmdbuf);
 #endif
+
 	if (exitcode != 0) {
+#ifdef WIN32
+		WideCharToMultiByte(CP_ACP, 0, combinedCommandline.c_str(), combinedCommandline.size(), cmdbuf, sizeof(cmdbuf) - 1, NULL, NULL);
+#endif
 		char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
 		sprintf(extractortext, "The following command was used to extract the data (you can run it manually in a console to find out more):\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
-#ifdef WIN32
-		_unlink(destination);
-#else
-		unlink(destination);
-#endif
 	} else if (!canJustReextract && GAME_SHOULD_EXTRACT_AGAIN) {
-		ExtractData(extractor_tool, destination, scripts_path, 2);
+		ExtractData(extractor_tool, extractor_args, destination, scripts_path, 2);
 	}
 }
 
@@ -561,6 +561,7 @@ int main(int argc, char * argv[]) {
 		}
 #endif
 		if (stat(extractor_path, &st) == 0) {
+#ifndef WIN32
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
 			// bytes. Then we add the arguments.
@@ -569,6 +570,7 @@ int main(int argc, char * argv[]) {
 			extractor_path[0] = QUOTE[0];
 			extractor_path[strlen(extractor_path) + 1] = '\0';
 			extractor_path[strlen(extractor_path)] = QUOTE[0];
+#endif
 		} else {
 			extractor_path[0] = '\0';
 		}
@@ -585,7 +587,6 @@ int main(int argc, char * argv[]) {
 			error(TITLE, msg);
 		}
 	}
-	strcat(extractor_path, " " EXTRACTOR_ARGS);
 
 #ifdef WIN32
 	char executable_path[BUFF_SIZE];
@@ -643,6 +644,9 @@ int main(int argc, char * argv[]) {
 		}
 		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
+
+	char *const extractor_args[] = EXTRACTOR_ARGS;
+
 #ifdef DATA_PATH
 	// usually this isn't defined for windows builds. if it is, use it
 	strcpy(data_path, DATA_PATH);
@@ -657,7 +661,7 @@ int main(int argc, char * argv[]) {
 		if (!strcmp(argv[1], "--extract")) {
 			// Force extraction and exit
 			SetUserDataPath(data_path);
-			ExtractData(extractor_path, data_path, scripts_path, 1);
+			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 1);
 			return 0;
 		}
 
@@ -665,7 +669,7 @@ int main(int argc, char * argv[]) {
 			// Force extraction without ui and exit
 			tinyfd_forceConsole = 1;
 			SetUserDataPath(data_path);
-			ExtractData(extractor_path, data_path, scripts_path, 1);
+			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 1);
 			return 0;
 		}
 	}
@@ -709,7 +713,7 @@ int main(int argc, char * argv[]) {
 		SetUserDataPath(data_path);
 		sprintf(title_path, TITLE_PNG, data_path);
 		if ( stat(title_path, &st) != 0 ) {
-			ExtractData(extractor_path, data_path, scripts_path);
+			ExtractData(extractor_path, extractor_args, data_path, scripts_path);
 		}
 		if ( stat(title_path, &st) != 0 ) {
 			std::string msg(DATA_NOT_EXTRACTED);
@@ -719,7 +723,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	if (!check_version(extractor_path, data_path)) {
-		ExtractData(extractor_path, data_path, scripts_path);
+		ExtractData(extractor_path, extractor_args, data_path, scripts_path);
 	}
 
 #ifdef WIN32

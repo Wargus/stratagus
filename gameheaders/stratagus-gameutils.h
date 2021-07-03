@@ -96,6 +96,10 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #include <sys/types.h>
 
 #include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <istream>
 #include <filesystem>
 
 #include "stratagus-tinyfiledialogs.h"
@@ -150,6 +154,155 @@ char* GetExtractionLogPath(const char* game_name, char* data_path) {
 	mkdir_p(marker);
 	PathAppend(marker, logname);
 	return marker;
+}
+#endif
+
+#ifdef WIN32
+// quoting logic taken from "Everyone quotes command line arguments the wrong way" by Daniel Colascione
+/*++
+    
+Routine Description:
+    
+    This routine appends the given argument to a command line such
+    that CommandLineToArgvW will return the argument string unchanged.
+    Arguments in a command line should be separated by spaces; this
+    function does not add these spaces.
+    
+Arguments:
+    
+    Argument - Supplies the argument to encode.
+
+    CommandLine - Supplies the command line to which we append the encoded argument string.
+
+    Force - Supplies an indication of whether we should quote
+            the argument even if it does not contain any characters that would
+            ordinarily require quoting.
+    
+Return Value:
+    
+    None.
+    
+Environment:
+    
+    Arbitrary.
+    
+--*/
+void ArgvQuote(const std::wstring& Argument, std::wstring& CommandLine, bool Force) {
+    //
+    // Unless we're told otherwise, don't quote unless we actually
+    // need to do so --- hopefully avoid problems if programs won't
+    // parse quotes properly
+    //
+    if (Force == false && Argument.empty () == false && Argument.find_first_of(L" \t\n\v\"") == Argument.npos) {
+        CommandLine.append(Argument);
+    } else {
+        CommandLine.push_back(L'"');
+
+        for (auto It = Argument.begin(); ; ++It) {
+            unsigned NumberBackslashes = 0;
+
+            while (It != Argument.end() && *It == L'\\') {
+                ++It;
+                ++NumberBackslashes;
+            }
+
+            if (It == Argument.end()) {
+                //
+                // Escape all backslashes, but let the terminating
+                // double quotation mark we add below be interpreted
+                // as a metacharacter.
+                //
+                CommandLine.append(NumberBackslashes * 2, L'\\');
+                break;
+            } else if (*It == L'"') {
+                //
+                // Escape all backslashes and the following
+                // double quotation mark.
+                //
+                CommandLine.append(NumberBackslashes * 2 + 1, L'\\');
+                CommandLine.push_back(*It);
+            } else {  
+                //
+                // Backslashes aren't special here.
+                //
+                CommandLine.append(NumberBackslashes, L'\\');
+                CommandLine.push_back(*It);
+            }
+        }
+        CommandLine.push_back(L'"');
+    }
+}
+
+int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = false, std::wstring *outputCommandline = NULL) {
+	std::wstring cmdline;
+
+	ArgvQuote(file, cmdline, false);
+	if (argv.size() > 0) {
+		cmdline.push_back(L' ');
+	}
+
+	for (size_t i = 0; i < argv.size(); i++) {
+		std::wstring arg = argv[i];
+		ArgvQuote(arg, cmdline, false);
+		if (i + 1 < argv.size()) {
+			cmdline.push_back(L' ');
+		}
+	}
+	std::wstring cmdcmdline;
+	for (auto c : cmdline) {
+		cmdcmdline.push_back(L'^');
+		cmdcmdline.push_back(c);
+	}
+	if (outputCommandline != NULL) {
+		outputCommandline->append(cmdline);
+	}
+	if (echo) {
+		std::wcout << cmdline << L'\n';
+	}
+	_flushall();
+	int code = _wsystem(cmdline.c_str());
+	if (code == -1) {
+		std::wcout << _wcserror(errno) << L'\n';
+	}
+	return code;
+}
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = NULL) {) {
+	pid_t pid = fork();
+
+	if (echo || outputCommandline) {
+		std::string commandline = file;
+		for (int i = 0; ; i++) {
+			if (argv[i] == NULL) {
+				break;
+			}
+		}
+		commandline += " ";
+		commandline += argv[i];
+		if (echo) {
+			std::cout << commandline << std::endl;
+		}
+		if (outputCommandline) {
+			outputCommandline->append(commandline);
+		}
+	}
+
+	if (pid == 0) {
+		// child
+		exit(execvp(file, argv));
+	} else {
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) {
+			return WEXITSTATUS(status);
+		} else {
+			return -1;
+		}
+	}
 }
 #endif
 
