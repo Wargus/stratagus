@@ -444,7 +444,7 @@ static const std::string shadowMarker = std::string("MARKER");
 **
 ** Example:
 **
-** <div class="example"><code>DefineUnitType("unit-silvermoon-archer", { Name = _("Silvermoon Archer"),
+** <div class="example"><code><strong>DefineUnitType</strong>("unit-silvermoon-archer", { Name = _("Silvermoon Archer"),
 **			Image = {"file", "human/units/elven_archer.png", "size", {72, 72}},
 **			Animations = "animations-archer", Icon = "icon-archer",
 **			Costs = {"time", 70, "gold", 500, "wood", 50},
@@ -1202,7 +1202,7 @@ static int CclDefineUnitType(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>DefineUnitStats("unit-berserker", 2, {
+** <div class="example"><code><strong>DefineUnitStats</strong>("unit-berserker", 2, {
 **    		"HitPoints", {Value = 55, Max = 55, Increase = 0, Enable = true},
 **    		"AttackRange", {Value = 5, Max = 6, Increase = 0, Enable = true},
 **    		"SightRange", {Value = 7, Max = 7, Increase = 0, Enable = true},
@@ -1389,7 +1389,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>name = GetUnitTypeName("unit-knight")
+** <div class="example"><code>name = <strong>GetUnitTypeName</strong>("unit-knight")
 **		  print(name)</code></div>
 */
 static int CclGetUnitTypeName(lua_State *l)
@@ -1412,7 +1412,7 @@ static int CclGetUnitTypeName(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetUnitTypeName("unit-beast-cry","Doomhammer")</code></div>
+** <div class="example"><code><strong>SetUnitTypeName</strong>("unit-beast-cry","Doomhammer")</code></div>
 */
 static int CclSetUnitTypeName(lua_State *l)
 {
@@ -1437,7 +1437,7 @@ static int CclSetUnitTypeName(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>-- Get the amount of supply from Human Farms
-**		  supply = GetUnitTypeData("unit-farm","Supply")
+**		  supply = <strong>GetUnitTypeData</strong>("unit-farm","Supply")
 **		  print(supply)</code></div>
 */
 static int CclGetUnitTypeData(lua_State *l)

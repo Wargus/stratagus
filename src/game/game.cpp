@@ -1140,7 +1140,7 @@ void CleanGame()
 **
 ** Example:
 **
-** <div class="example"><code>SetGameName("Wargus Map - Chapter 1")</code></div>
+** <div class="example"><code><strong>SetGameName</strong>("Wargus Map - Chapter 1")</code></div>
 */
 static int CclSetGameName(lua_State *l)
 {
@@ -1183,9 +1183,9 @@ static int CclSetFullGameName(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>-- God Mode enabled
-**		SetGodMode(true)
+**		<strong>SetGodMode</strong>(true)
 **		-- God Mode disabled
-**		SetGodMode(false)</code></div>
+**		<strong>SetGodMode</strong>(false)</code></div>
 */
 static int CclSetGodMode(lua_State *l)
 {
@@ -1205,7 +1205,7 @@ static int CclSetGodMode(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>g_mode = GetGodMode()
+** <div class="example"><code>g_mode = <strong>GetGodMode</strong>()
 **		print(g_mode)</code></div>
 */
 static int CclGetGodMode(lua_State *l)
@@ -1467,7 +1467,7 @@ static int ScriptSetUseHPForXp(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetLocalPlayerName("Stormreaver Clan")</code></div>
+** <div class="example"><code><strong>SetLocalPlayerName</strong>("Stormreaver Clan")</code></div>
 */
 static int CclSetLocalPlayerName(lua_State *l)
 {
@@ -1485,7 +1485,7 @@ static int CclSetLocalPlayerName(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>GetLocalPlayerName()</code></div>
+** <div class="example"><code><strong>GetLocalPlayerName</strong>()</code></div>
 */
 static int CclGetLocalPlayerName(lua_State *l)
 {
@@ -1501,7 +1501,7 @@ static int CclGetLocalPlayerName(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>version = GetStratagusVersion()
+** <div class="example"><code>version = <strong>GetStratagusVersion</strong>()
 **		print(version)</code></div>
 */
 static int CclGetStratagusVersion(lua_State *l)
@@ -1518,7 +1518,7 @@ static int CclGetStratagusVersion(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>url = GetStratagusHomepage()
+** <div class="example"><code>url = <strong>GetStratagusHomepage</strong>()
 **	print(url)</code></div>
 */
 static int CclGetStratagusHomepage(lua_State *l)
