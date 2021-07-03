@@ -140,12 +140,16 @@ public:
 };
 
 #ifdef USE_MNG
+#ifdef WIN32
 #ifdef HAVE_STDDEF_H
 #undef HAVE_STDDEF_H
 #endif
+#endif
 #include <libmng.h>
+#ifdef WIN32
 #ifndef HAVE_STDDEF_H
 #undef HAVE_STDDEF_H
+#endif
 #endif
 
 class Mng : public gcn::Image
