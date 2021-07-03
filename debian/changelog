@@ -1,9 +1,17 @@
-stratagus (3.0.1) UNRELEASED; urgency=medium
+stratagus (3.1.0) focal; urgency=medium
 
   * Be more compliant with server discovery and announcement to better support introspecting firewalls
   * Be more conservative and use pure SDL when shader 0 ("none") is selected
+  * Optimized shared vison code.
+  * Now field of view parameters and auto targeting algorithm can be changed simultaneously for all computers of already started network game. It prevents desync causes. Mostly useful for debug.
+  * Map grid is optional now and can be disabled. Actual only for debug builds.
+  * Added enhanced type of fog of war, as long as original sprite-based fog can't be used when shadow caster is enabled. Also added few parameters to tune it (blur radius, number of blur iterations, number fog easing steps, bilinear interpolation).
+  * Added "elevated" flag for units/buildings which can look over opaque fields (f.eg. towers).
+  * Implemented shadow caster field of view type, which blocks vision through opaque obstacles (f.eg. cave walls in war1gus) or certain map tiles with enabled "opaque" flag. In additional there is a possibility to enable opacity for all rocks- OR forest- OR wall-tiles. This feature makes it possible to implement sight blocking for high/low ground.
+  * Extended editor abilities to support games adding dynamic unit lists
+  * Support innoextract single-file installers for game launchers, such as those used by GOG
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Mon, 21 Dec 2020 15:48:15 +0100
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 03 Jul 2021 20:11:43 +0200
 
 stratagus (3.0.0) focal; urgency=medium
 
