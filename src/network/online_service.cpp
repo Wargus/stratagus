@@ -221,7 +221,11 @@ public:
             // didn't get the complete header yet
             return -1;
         }
-        assert(pos == 0);
+        if (pos != 0) {
+            debugDump();
+            finishMessage();
+            return -1;
+        }
         uint8_t headerbyte = read8();
         if (headerbyte != 0xff) {
             // Likely a bug on our side. We just skip this byte.
@@ -1759,6 +1763,11 @@ class S2C_LOGONRESPONSE2 : public NetworkState {
                 return;
             }
             if (msg != 0x3a) {
+                if (msg == 0x59) {
+                    // SID_SETEMAIL, server is asking for an email address. We ignore that.
+                    ctx->getMsgIStream()->finishMessage();
+                    return;
+                }
                 std::string error = std::string("Expected SID_LOGONRESPONSE2, got msg id ");
                 error += std::to_string(msg);
                 ctx->showError(error);
