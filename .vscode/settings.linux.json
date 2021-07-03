@@ -1,0 +1,6 @@
+{
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug"
+    },
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
+}

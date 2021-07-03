@@ -1,3 +1,4 @@
+.cache
 debian/*.debhelper
 debian/*.log
 debian/*.substvars

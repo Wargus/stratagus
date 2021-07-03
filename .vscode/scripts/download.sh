@@ -1,6 +1,10 @@
 #!/bin/bash
 stratagus_folder="$1"
 
+if [ ! -e "${stratagus_folder}/.vscode/settings.json" ]; then
+    cp "${stratagus_folder}/.vscode/settings.linux.json" "${stratagus_folder}/.vscode/settings.json"
+fi
+
 if [ ! -d "${stratagus_folder}/../wargus" ]; then
     git clone https://github.com/Wargus/wargus "${stratagus_folder}/../wargus"
 fi
