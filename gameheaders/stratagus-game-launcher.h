@@ -327,7 +327,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 			std::vector<std::wstring> argv = {L"-i", std::filesystem::path(datafile).wstring()};
 #else
 			const char *file = "innoextract";
-			char *const argv[] = {"-i", datafile.c_str(), NULL};
+			char *argv[] = {"-i", (char*)datafile.c_str(), NULL};
 #endif
 			if (runCommand(file, argv) == 0) {
 				// innoextract exists and this exe file is an innosetup file
@@ -503,7 +503,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 			break;
 		} else {
 			strcat(cmdbuf, " ");
-			strcat(earg);
+			strcat(cmdbuf, earg);
 		}
 	}
 	strcat(cmdbuf, " " QUOTE);
@@ -645,8 +645,6 @@ int main(int argc, char * argv[]) {
 		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
 
-	char *const extractor_args[] = EXTRACTOR_ARGS;
-
 #ifdef DATA_PATH
 	// usually this isn't defined for windows builds. if it is, use it
 	strcpy(data_path, DATA_PATH);
@@ -656,6 +654,8 @@ int main(int argc, char * argv[]) {
 	strcpy(scripts_path, SCRIPTS_PATH);
 	strcpy(stratagus_bin, STRATAGUS_BIN);
 #endif
+
+	char *const extractor_args[] = EXTRACTOR_ARGS;
 
 	if (argc > 1) {
 		if (!strcmp(argv[1], "--extract")) {

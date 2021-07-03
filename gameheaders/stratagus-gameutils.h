@@ -271,7 +271,7 @@ int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = f
 #include <unistd.h>
 #include <sys/wait.h>
 
-int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = NULL) {) {
+int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = NULL) {
 	pid_t pid = fork();
 
 	if (echo || outputCommandline) {
@@ -280,9 +280,9 @@ int runCommand(const char *file, char *const argv[], bool echo = false, std::str
 			if (argv[i] == NULL) {
 				break;
 			}
+			commandline += " ";
+			commandline += argv[i];
 		}
-		commandline += " ";
-		commandline += argv[i];
 		if (echo) {
 			std::cout << commandline << std::endl;
 		}
