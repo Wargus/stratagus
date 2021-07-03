@@ -250,7 +250,9 @@ int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = f
 	}
 	std::wstring cmdcmdline;
 	for (auto c : cmdline) {
-		cmdcmdline.push_back(L'^');
+		if (c == L'(' || c == L')' || c == L'%' || c == L'!' || c == L'^' || c == L'"' || c == L'<' || c == L'>' || c == L'&' || c == L'|') {
+			cmdcmdline.push_back(L'^');
+		}
 		cmdcmdline.push_back(c);
 	}
 	if (outputCommandline != NULL) {
@@ -260,7 +262,7 @@ int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = f
 		std::wcout << cmdline << L'\n';
 	}
 	_flushall();
-	int code = _wsystem(cmdline.c_str());
+	int code = _wsystem(cmdcmdline.c_str());
 	if (code == -1) {
 		std::wcout << _wcserror(errno) << L'\n';
 	}
