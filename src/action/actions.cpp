@@ -357,7 +357,9 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {
 			continue;
 		}
-		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
+		unsigned char freq = unit.Variable[i].IncreaseFrequency;
+		if (unit.Variable[i].Enable && unit.Variable[i].Increase &&
+				(freq == 1 || (GameCycle / CYCLES_PER_SECOND % freq) == 0)) {
 			IncreaseVariable(unit, i);
 		}
 	}

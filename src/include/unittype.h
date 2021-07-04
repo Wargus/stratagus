@@ -118,13 +118,14 @@ public:
 class CVariable
 {
 public:
-	CVariable() : Max(0), Value(0), Increase(0), Enable(0) {}
+	CVariable() : Max(0), Value(0), Increase(0), IncreaseFrequency(1), Enable(0) {}
 
 	bool operator ==(const CVariable &rhs) const
 	{
 		return this->Max == rhs.Max
 			   && this->Value == rhs.Value
 			   && this->Increase == rhs.Increase
+			   && this->IncreaseFrequency == rhs.IncreaseFrequency
 			   && this->Enable == rhs.Enable;
 	}
 	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
@@ -133,7 +134,8 @@ public:
 	int Max;        /// Maximum for the variable. (Assume min is 0.)
 	int Value;      /// Current (or initial) value of the variable (or initial value).
 	char Increase;  /// Number to increase(decrease) Value by second.
-	char Enable;    /// True if the unit doesn't have this variable. (f.e shield)
+	unsigned char IncreaseFrequency:7;    /// Every how many seconds we should apply the increase
+	unsigned char Enable:1;    /// True if the unit doesn't have this variable. (f.e shield)
 };
 
 // Index for boolflag already defined

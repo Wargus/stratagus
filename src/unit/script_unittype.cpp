@@ -646,6 +646,12 @@ static int CclDefineUnitType(lua_State *l)
 			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {
 			type->DefaultStat.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "RegenerationFrequency")) {
+			int value = LuaToNumber(l, -1);
+			type->DefaultStat.Variables[HP_INDEX].IncreaseFrequency = value;
+			if (type->DefaultStat.Variables[HP_INDEX].IncreaseFrequency != value) {
+				LuaError(l, "RegenerationFrequency out of range!");
+			}
 		} else if (!strcmp(value, "BurnPercent")) {
 			type->BurnPercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnDamageRate")) {
@@ -1677,6 +1683,12 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 			var->Max = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Increase")) {
 			var->Increase = LuaToNumber(l, -1);
+		} else if (!strcmp(key, "IncreaseFrequency")) {
+			int value = LuaToNumber(l, -1);
+			var->IncreaseFrequency = value;
+			if (var->IncreaseFrequency != value) {
+				LuaError(l, "IncreaseFrequency out of range!" _C_ type);
+			}
 		} else if (!strcmp(key, "Enable")) {
 			var->Enable = LuaToBoolean(l, -1);
 		} else { // Error.
@@ -2078,6 +2090,14 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 				type->MapDefaultStat.Variables[variable_index].Increase = value;
 				for (int player = 0; player < PlayerMax; ++player) {
 					type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+				}
+			} else if (variable_type == "IncreaseFrequency") {
+				type->MapDefaultStat.Variables[variable_index].IncreaseFrequency = value;
+				if (type->MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
+					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ variable_key.c_str());
+				}
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].IncreaseFrequency = type->MapDefaultStat.Variables[variable_index].IncreaseFrequency;
 				}
 			} else if (variable_type == "Enable") {
 				type->MapDefaultStat.Variables[variable_index].Enable = value;
