@@ -571,22 +571,26 @@ static int CclSetFogOfWarOpacity(lua_State *l)
 **
 ** <div class="example"><code>-- No regeneration.
 **		  <strong>SetForestRegeneration</strong>(0)
-**		  -- Slow regeneration.
+**		  -- Slow regeneration every 50 seconds
 **		  <strong>SetForestRegeneration</strong>(50)
-**		  -- Maximum value for regeneration.
-**		  <strong>SetForestRegeneration</strong>(255)</code></div>
+**		  -- Extremely slow regeneration every 1h of game time
+**		  <strong>SetForestRegeneration</strong>(3600)</code></div>
 */
 static int CclSetForestRegeneration(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int i = LuaToNumber(l, 1);
-	if (i < 0 || i > 255) {
-		PrintFunction();
-		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
-		i = 100;
+	int frequency = 1;
+	if (i < 0) {
+		LuaError(l, "Regeneration speed should be >= 0\n");
 	}
-	const int old = ForestRegeneration;
+	while (i / frequency > 255) {
+		frequency++;
+	}
+	i = i / frequency;
+	const int old = ForestRegeneration * ForestRegenerationFrequency;
 	ForestRegeneration = i;
+	ForestRegenerationFrequency = frequency;
 
 	lua_pushnumber(l, old);
 	return 1;

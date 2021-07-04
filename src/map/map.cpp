@@ -56,6 +56,7 @@ CMap Map;                   /// The current map
 int FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
+int ForestRegenerationFrequency;     /// Forest regeneration frequency (every how many seconds we apply 1 point of regeneration)
 char CurrentMapPath[1024];  /// Path of the current map
 
 /*----------------------------------------------------------------------------
@@ -678,6 +679,9 @@ void CMap::RegenerateForest()
 {
 	if (!ForestRegeneration) {
 		return;
+	}
+	if (ForestRegenerationFrequency != 1 && (GameCycle / CYCLES_PER_SECOND % ForestRegenerationFrequency) != 0) {
+		return; // not this second
 	}
 	Vec2i pos;
 	for (pos.y = 0; pos.y < Info.MapHeight; ++pos.y) {
