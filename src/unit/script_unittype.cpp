@@ -1687,7 +1687,7 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 			int value = LuaToNumber(l, -1);
 			var->IncreaseFrequency = value;
 			if (var->IncreaseFrequency != value) {
-				LuaError(l, "IncreaseFrequency out of range!" _C_ type);
+				LuaError(l, "IncreaseFrequency out of range!");
 			}
 		} else if (!strcmp(key, "Enable")) {
 			var->Enable = LuaToBoolean(l, -1);
@@ -2093,9 +2093,10 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 				}
 			} else if (variable_type == "IncreaseFrequency") {
 				type->MapDefaultStat.Variables[variable_index].IncreaseFrequency = value;
-				if (type->MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
-					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ variable_key.c_str());
-				}
+				// TODO: error
+				// if (type->MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
+				// 	LuaError(l, "%s.IncreaseFrequency out of range!" _C_ variable_key.c_str());
+				// }
 				for (int player = 0; player < PlayerMax; ++player) {
 					type->Stats[player].Variables[variable_index].IncreaseFrequency = type->MapDefaultStat.Variables[variable_index].IncreaseFrequency;
 				}

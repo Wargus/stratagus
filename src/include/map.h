@@ -289,6 +289,8 @@ extern int FogOfWarOpacity;
 extern CColor FogOfWarColor;
 /// Forest regeneration
 extern int ForestRegeneration;
+/// Forest regeneration
+extern int ForestRegenerationFrequency;
 /// Flag must reveal the map
 extern int FlagRevealMap;
 /// Flag must reveal map when in replay
