@@ -285,6 +285,8 @@ static int CclDefineModifier(lua_State *l)
 #endif
 		if (!strcmp(key, "regeneration-rate")) {
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
+		} else if (!strcmp(key, "regeneration-frequency")) {
+			um->Modifier.Variables[HP_INDEX].IncreaseFrequency = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "cost")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -630,6 +632,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				varModified |= um->Modifier.Variables[j].Value
 							   | um->Modifier.Variables[j].Max
 							   | um->Modifier.Variables[j].Increase
+							   | um->Modifier.Variables[j].IncreaseFrequency
 							   | um->Modifier.Variables[j].Enable
 							   | um->ModifyPercent[j];
 				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
@@ -640,6 +643,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					stat.Variables[j].Value += um->Modifier.Variables[j].Value;
 					stat.Variables[j].Max += um->Modifier.Variables[j].Max;
 					stat.Variables[j].Increase += um->Modifier.Variables[j].Increase;
+					stat.Variables[j].IncreaseFrequency += um->Modifier.Variables[j].IncreaseFrequency;
 				}
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
@@ -665,6 +669,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						} else {
 							unit.Variable[j].Value += um->Modifier.Variables[j].Value;
 							unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
+							unit.Variable[j].IncreaseFrequency += um->Modifier.Variables[j].IncreaseFrequency;
 						}
 
 						unit.Variable[j].Max += um->Modifier.Variables[j].Max;
@@ -876,6 +881,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		} else {
 			unit.Variable[j].Value += um->Modifier.Variables[j].Value;
 			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
+			unit.Variable[j].IncreaseFrequency += um->Modifier.Variables[j].IncreaseFrequency;
 		}
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);

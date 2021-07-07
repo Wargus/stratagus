@@ -1235,6 +1235,8 @@ static int CclGetUnitVariable(lua_State *l)
 				lua_pushnumber(l, unit->Variable[index].Max);
 			} else if (!strcmp(type, "Increase")) {
 				lua_pushnumber(l, unit->Variable[index].Increase);
+			} else if (!strcmp(type, "IncreaseFrequency")) {
+				lua_pushnumber(l, unit->Variable[index].IncreaseFrequency);
 			} else if (!strcmp(type, "Enable")) {
 				lua_pushnumber(l, unit->Variable[index].Enable);
 			} else {
@@ -1281,8 +1283,12 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->Summoned = value;
 	} else if (!strcmp(name, "RegenerationRate")) {
-		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
+	} else if (!strcmp(name, "RegenerationFrequency")) {
+		unit->Variable[HP_INDEX].IncreaseFrequency = value;
+		if (unit->Variable[HP_INDEX].IncreaseFrequency != value) {
+			LuaError(l, "RegenerationFrequency out of range!");
+		}
 	} else if (!strcmp(name, "IndividualUpgrade")) {
 		LuaCheckArgs(l, 4);
 		std::string upgrade_ident = LuaToString(l, 3);
@@ -1327,6 +1333,11 @@ static int CclSetUnitVariable(lua_State *l)
 				unit->Stats->Variables[index].Max = value;
 			} else if (!strcmp(type, "Increase")) {
 				unit->Stats->Variables[index].Increase = value;
+			} else if (!strcmp(type, "IncreaseFrequency")) {
+				unit->Stats->Variables[index].IncreaseFrequency = value;
+				if (unit->Stats->Variables[index].IncreaseFrequency != value) {
+					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ type);
+				}
 			} else if (!strcmp(type, "Enable")) {
 				unit->Stats->Variables[index].Enable = value;
 			} else {
@@ -1342,6 +1353,11 @@ static int CclSetUnitVariable(lua_State *l)
 				unit->Variable[index].Max = value;
 			} else if (!strcmp(type, "Increase")) {
 				unit->Variable[index].Increase = value;
+			} else if (!strcmp(type, "IncreaseFrequency")) {
+				unit->Variable[index].IncreaseFrequency = value;
+				if (unit->Variable[index].IncreaseFrequency != value) {
+					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ type);
+				}
 			} else if (!strcmp(type, "Enable")) {
 				unit->Variable[index].Enable = value;
 			} else {
