@@ -168,10 +168,12 @@ uint32_t fletcher32(const std::string &content)
 {
 	uint16_t *alphas = new uint16_t[content.size() / 2];
 	size_t shorts = 0;
+	size_t consideredChars = 0;
 	for (size_t i = 0; i < content.size(); i++) {
 		uint16_t c = content[i];
 		if (c >= 'A' && c <= 'z') {
-			if ((i % 2) == 0) {
+			consideredChars++;
+			if ((consideredChars % 2) == 0) {
 				alphas[shorts] = c << 8;
 			} else {
 				alphas[shorts] = alphas[shorts] || c;
