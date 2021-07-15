@@ -100,7 +100,15 @@ void copy_dir(const char* source_folder, const char* target_folder);
 #include <iostream>
 #include <sstream>
 #include <istream>
-#include <filesystem>
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem> 
+    namespace fs = std::experimental::filesystem;
+#else
+    error "Missing the <filesystem> header."
+#endif
 
 #include "stratagus-tinyfiledialogs.h"
 
@@ -116,22 +124,22 @@ void error(const char* title, const char* text) {
 }
 
 void mkdir_p(const char* path) {
-	std::filesystem::create_directories(path);
+	fs::create_directories(path);
 }
 
-void copy_dir(std::filesystem::path source_folder, std::filesystem::path target_folder) {
-	if (std::filesystem::exists(target_folder)) {
-		if (std::filesystem::equivalent(source_folder, target_folder)) {
+void copy_dir(fs::path source_folder, fs::path target_folder) {
+	if (fs::exists(target_folder)) {
+		if (fs::equivalent(source_folder, target_folder)) {
 			return;
 		}
 		// first delete the target_folder, if it exists, to ensure clean slate
-		std::filesystem::remove_all(target_folder);
+		fs::remove_all(target_folder);
 	} else {
 		// make the parentdir of the target folder
-		std::filesystem::create_directories(target_folder.parent_path());
+		fs::create_directories(target_folder.parent_path());
 	}
 	// now copy the new folder in its place
-	std::filesystem::copy(source_folder, target_folder, std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+	fs::copy(source_folder, target_folder, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
 }
 
 #ifdef WIN32
