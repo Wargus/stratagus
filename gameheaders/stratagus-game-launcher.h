@@ -276,8 +276,8 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 		char* extraction_files[] = { EXTRACTION_FILES, NULL };
 		char* efile = extraction_files[0];
 		for (int i = 0; efile != NULL; i++) {
-			std::filesystem::path efile_path = std::filesystem::path(destination) / efile;
-			if (!std::filesystem::exists(efile_path)) {
+			fs::path efile_path = fs::path(destination) / efile;
+			if (!fs::exists(efile_path)) {
 				// file to extract not found
 				canJustReextract = 0;
 			}
@@ -308,7 +308,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
 #endif
-	std::filesystem::path srcfolder;
+	fs::path srcfolder;
 	if (!canJustReextract) {
 		const char* datafileCstr = tinyfd_openFileDialog(GAME_CD " location", "",
 													 patterncount - 1, filepatterns, NULL, 0);
@@ -322,9 +322,9 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 			char moduleFileName[BUFF_SIZE];
 			memset(moduleFileName, 0, sizeof(moduleFileName));
 			GetModuleFileName(NULL, moduleFileName, sizeof(moduleFileName)-1);
-			std::filesystem::path innoextractPath = std::filesystem::path(moduleFileName).parent_path() / "innoextract.exe";
+			fs::path innoextractPath = fs::path(moduleFileName).parent_path() / "innoextract.exe";
 			std::wstring file = innoextractPath.wstring();
-			std::vector<std::wstring> argv = {L"-i", std::filesystem::path(datafile).wstring()};
+			std::vector<std::wstring> argv = {L"-i", fs::path(datafile).wstring()};
 #else
 			const char *file = "innoextract";
 			char *argv[] = {"-i", (char*)datafile.c_str(), NULL};
@@ -332,8 +332,8 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 			if (runCommand(file, argv) == 0) {
 				// innoextract exists and this exe file is an innosetup file
 				bool success = false;
-				std::filesystem::path tmpp = std::filesystem::temp_directory_path() / GAME;
-				std::filesystem::create_directories(tmpp);
+				fs::path tmpp = fs::temp_directory_path() / GAME;
+				fs::create_directories(tmpp);
 #ifdef WIN32
 				wchar_t *curdir = _wgetcwd(NULL, 0);
 #else
@@ -381,13 +381,13 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 							"to check if its a single-file installer. If it is, please extract/install "
 							"manually first and then run " GAME " again.", "ok", "question", 1);
 				}
-				srcfolder = std::filesystem::path(datafile).parent_path();
+				srcfolder = fs::path(datafile).parent_path();
 			}
 		} else {
-			srcfolder = std::filesystem::path(datafile).parent_path();
+			srcfolder = fs::path(datafile).parent_path();
 		}
 	} else {
-		srcfolder = std::filesystem::path(destination);
+		srcfolder = fs::path(destination);
 	}
 
 #ifdef WIN32
@@ -404,21 +404,21 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	char* sourcepath = strdup(scripts_path);
 #endif
 
-	std::filesystem::create_directories(std::filesystem::path(destination));
+	fs::create_directories(fs::path(destination));
 
-	if (!std::filesystem::exists(sourcepath)) {
+	if (!fs::exists(sourcepath)) {
 		// deployment time path not found, try compile time path
-		strcpy(sourcepath, std::filesystem::path(SRC_PATH()).parent_path().string().c_str());
+		strcpy(sourcepath, fs::path(SRC_PATH()).parent_path().string().c_str());
 	}
 
 #ifndef WIN32
-	if (!std::filesystem::exists(sourcepath)) {
+	if (!fs::exists(sourcepath)) {
 		// deployment time path might be same as extractor 
-		strcpy(sourcepath, std::filesystem::path(extractor_tool).parent_path().string().c_str());
+		strcpy(sourcepath, fs::path(extractor_tool).parent_path().string().c_str());
 	}
 #endif
 
-	if (!std::filesystem::exists(sourcepath)) {
+	if (!fs::exists(sourcepath)) {
 		// scripts not found, abort!
 		std::string msg("There was an error copying the data, could not discover scripts path: ");
 		msg += sourcepath;
@@ -427,8 +427,8 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	}
 
 	if (force != 2) {
-		std::filesystem::path contrib_src_path;
-		std::filesystem::path contrib_dest_path(destination);
+		fs::path contrib_src_path;
+		fs::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
 		char* contrib_directories[] = CONTRIB_DIRECTORIES;
@@ -439,13 +439,13 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 			} else {
 				if (contrib_directories[i][0] != '/') {
 					// absolute Unix paths are not appended to the source path
-					contrib_src_path = std::filesystem::path(sourcepath);
+					contrib_src_path = fs::path(sourcepath);
 					contrib_src_path /= contrib_directories[i];
 				} else {
-					contrib_src_path = std::filesystem::path(contrib_directories[i]);
+					contrib_src_path = fs::path(contrib_directories[i]);
 				}
 
-				if (!std::filesystem::exists(contrib_src_path)) {
+				if (!fs::exists(contrib_src_path)) {
 					// contrib dir not found, abort!
 					if (!optional) {
 						std::string msg("There was an error copying the data, could not discover contributed directory path: ");
@@ -468,7 +468,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	std::wstring file;
 	std::vector<std::wstring> args;
 
-	file = std::filesystem::path(extractor_tool).wstring();
+	file = fs::path(extractor_tool).wstring();
 	for (int i = 0; ; i++) {
 		const char *earg = extractor_args[i];
 		if (earg == NULL) {
@@ -481,7 +481,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 		}
 	}
 	args.push_back(srcfolder.wstring());
-	args.push_back(std::filesystem::path(destination).wstring());
+	args.push_back(fs::path(destination).wstring());
 	std::wstring combinedCommandline;
 	exitcode = runCommand(file, args, true, &combinedCommandline);
 #else
