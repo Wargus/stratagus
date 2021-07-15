@@ -279,7 +279,7 @@ static void setDpiAware() {
 	shcoreDLL = SDL_LoadObject("SHCORE.DLL");
 	if (shcoreDLL) {
 		SetProcessDpiAwareness = (HRESULT(WINAPI *)(PROCESS_DPI_AWARENESS)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
-	}
+	} else SetProcessDpiAwareness = NULL;
 
 	if (SetProcessDpiAwareness) {
 		/* Try Windows 8.1+ version */
@@ -293,6 +293,7 @@ static void setDpiAware() {
 		BOOL success = SetProcessDPIAware();
 		DebugPrint("called SetProcessDPIAware: %d" _C_ (int)success);
 	}
+
 }
 #else
 static void setDpiAware() {
