@@ -107,7 +107,7 @@ void LuaCallback::pushString(const std::string &s)
  */
 void LuaCallback::pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list) {
 	lua_createtable(Lua, 0, list.size());
-	for (const auto entry : list) {
+	for (const auto& entry : list) {
 		if (std::holds_alternative<std::string>(entry.second)) {
 			lua_pushstring(Lua, std::get<std::string>(entry.second).c_str());
 		} else {
@@ -123,7 +123,7 @@ void LuaCallback::pushTable(std::initializer_list<std::pair<std::string, std::va
  */
 void LuaCallback::pushTable(std::map<std::string, std::variant<std::string, int>> map) {
 	lua_createtable(Lua, 0, map.size());
-	for (const auto entry : map) {
+	for (const auto& entry : map) {
 		if (std::holds_alternative<std::string>(entry.second)) {
 			lua_pushstring(Lua, std::get<std::string>(entry.second).c_str());
 		} else {

@@ -827,7 +827,7 @@ public:
         msg.serialize32NativeByteOrder((uint32_t) extendedInfoNames.size());
         extendedInfoNames.push_back(username);
         msg.serialize(username.c_str());
-        for (const auto key : defaultUserKeys) {
+        for (const auto& key : defaultUserKeys) {
             msg.serialize(key.c_str());
         }
         msg.flush(getTCPSocket());
@@ -1062,7 +1062,7 @@ public:
     void setCurrentChannel(std::string name) {
         this->currentChannel = name;
         bool unlisted = true;
-        for (const auto c : channelList) {
+        for (const auto& c : channelList) {
             if (c == name) {
                 unlisted = false;
                 break;
@@ -1207,7 +1207,7 @@ public:
         this->channelList = channels;
         if (SetChannels != NULL) {
             SetChannels->pushPreamble();
-            for (const auto value : channels) {
+            for (const auto& value : channels) {
                 SetChannels->pushString(value);
             }
             SetChannels->run();
