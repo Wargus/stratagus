@@ -41,6 +41,7 @@ set(STRATAGUS_PATCH_LEVEL2 0)
 
 project(stratagus)
 cmake_minimum_required(VERSION 2.6)
+cmake_policy(VERSION 3.10..3.20.2)
 
 # useful for clangd LSP server
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
