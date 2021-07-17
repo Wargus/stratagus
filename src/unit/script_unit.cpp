@@ -1285,8 +1285,10 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->Summoned = value;
 	} else if (!strcmp(name, "RegenerationRate")) {
+		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
 	} else if (!strcmp(name, "RegenerationFrequency")) {
+		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].IncreaseFrequency = value;
 		if (unit->Variable[HP_INDEX].IncreaseFrequency != value) {
 			LuaError(l, "RegenerationFrequency out of range!");
