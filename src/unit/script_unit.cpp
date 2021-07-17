@@ -1181,6 +1181,8 @@ static int CclGetUnitVariable(lua_State *l)
 	const char *const value = LuaToString(l, 2);
 	if (!strcmp(value, "RegenerationRate")) {
 		lua_pushnumber(l, unit->Variable[HP_INDEX].Increase);
+	} else if (!strcmp(value, "RegenerationFrequency")) {
+		lua_pushnumber(l, std::max((int)unit->Variable[HP_INDEX].IncreaseFrequency, 1));
 	} else if (!strcmp(value, "Ident")) {
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
@@ -1236,7 +1238,7 @@ static int CclGetUnitVariable(lua_State *l)
 			} else if (!strcmp(type, "Increase")) {
 				lua_pushnumber(l, unit->Variable[index].Increase);
 			} else if (!strcmp(type, "IncreaseFrequency")) {
-				lua_pushnumber(l, unit->Variable[index].IncreaseFrequency);
+				lua_pushnumber(l, std::max((int)unit->Variable[index].IncreaseFrequency, 1));
 			} else if (!strcmp(type, "Enable")) {
 				lua_pushnumber(l, unit->Variable[index].Enable);
 			} else {

@@ -118,7 +118,7 @@ public:
 class CVariable
 {
 public:
-	CVariable() : Max(0), Value(0), Increase(0), IncreaseFrequency(1), Enable(0) {}
+	CVariable() : Max(0), Value(0), Increase(0), IncreaseFrequency(0), Enable(0) {}
 
 	bool operator ==(const CVariable &rhs) const
 	{
