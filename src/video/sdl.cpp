@@ -274,25 +274,38 @@ static void setDpiAware() {
 	userDLL = SDL_LoadObject("USER32.DLL");
 	if (userDLL) {
 		SetProcessDPIAware = (BOOL(WINAPI *)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
+	} else {
+		SetProcessDPIAware = NULL;
 	}
 
 	shcoreDLL = SDL_LoadObject("SHCORE.DLL");
 	if (shcoreDLL) {
 		SetProcessDpiAwareness = (HRESULT(WINAPI *)(PROCESS_DPI_AWARENESS)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
+	} else {
+		SetProcessDpiAwareness = NULL;
 	}
 
 	if (SetProcessDpiAwareness) {
 		/* Try Windows 8.1+ version */
 		HRESULT result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 		DebugPrint("called SetProcessDpiAwareness: %d" _C_ (result == S_OK) ? 1 : 0);
+	} else {
+		if (SetProcessDPIAware) {
+			/* Try Vista - Windows 8 version.
+			   This has a constant scale factor for all monitors.
+			*/
+			BOOL success = SetProcessDPIAware();
+			DebugPrint("called SetProcessDPIAware: %d" _C_ (int)success);
+		}
+		// In any case, on these old Windows versions we have to do a bit of
+		// compatibility hacking. Windows 7 and below don't play well with
+		// opengl rendering and (for some odd reason) fullscreen.
+		fprintf(stdout, "\n!!! Detected old Windows version - forcing software renderer and windowed mode !!!\n\n");
+		SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
+		VideoForceFullScreen = 1;
+		Video.FullScreen = 0;
 	}
-	else if (SetProcessDPIAware) {
-		/* Try Vista - Windows 8 version.
-		This has a constant scale factor for all monitors.
-		*/
-		BOOL success = SetProcessDPIAware();
-		DebugPrint("called SetProcessDPIAware: %d" _C_ (int)success);
-	}
+
 }
 #else
 static void setDpiAware() {
@@ -333,6 +346,8 @@ void InitVideoSdl()
 
 	// Initialize the display
 
+	setDpiAware();
+
 	// Sam said: better for windows.
 	/* SDL_HWSURFACE|SDL_HWPALETTE | */
 	if (Video.FullScreen) {
@@ -363,8 +378,6 @@ void InitVideoSdl()
 		win_title = Parameters::Instance.applicationName.c_str();
 	}
 
-	setDpiAware();
-
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                             Video.WindowWidth, Video.WindowHeight, flags);
 	if (TheWindow == NULL) {
@@ -375,7 +388,7 @@ void InitVideoSdl()
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 	if (!TheRenderer) {
-		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
 	}
 	SDL_RendererInfo rendererInfo;
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);

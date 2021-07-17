@@ -579,7 +579,7 @@ int main(int argc, char * argv[]) {
 		// Use extractor from PATH
 		strcpy(extractor_path, EXTRACTOR_TOOL);
 		if (!detectPresence(extractor_path)) {
-			char msg[BUFF_SIZE * 2];
+			char msg[BUFF_SIZE * 2] = {'\0'};;
 			strcpy(msg, EXTRACTOR_NOT_FOUND);
 			strcat(msg, " (expected at ");
 			strcat(msg, extractor_path);
@@ -623,7 +623,7 @@ int main(int argc, char * argv[]) {
 		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
 			if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
 				if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
-					char msg[BUFF_SIZE * 2];
+					char msg[BUFF_SIZE * 2] = {'\0'};
 					strcat(msg, STRATAGUS_NOT_FOUND);
 					strcat(msg, " (expected globally installed or in ");
 					strcat(msg, stratagus_bin);
@@ -635,7 +635,7 @@ int main(int argc, char * argv[]) {
 		}
 
 		if (_chdir(stratagus_path) != 0) {
-			char msg[BUFF_SIZE * 2];
+			char msg[BUFF_SIZE * 2] = {'\0'};
 			strcat(msg, STRATAGUS_NOT_FOUND);
 			strcat(msg, " (registry key found, but directory ");
 			strcat(msg, stratagus_path);
@@ -680,7 +680,7 @@ int main(int argc, char * argv[]) {
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 		if (stat(stratagus_bin, &st) != 0) {
-			char msg[BUFF_SIZE * 2];
+			char msg[BUFF_SIZE * 2] = {'\0'};
 			strcat(msg, STRATAGUS_NOT_FOUND);
 			strcat(msg, " (expected in ");
 			strcat(msg, stratagus_bin);
@@ -697,7 +697,7 @@ int main(int argc, char * argv[]) {
 				strcat(stratagus_bin, "./stratagus");
 			}
 			if ( stat(stratagus_bin, &st) != 0 ) {
-				char msg[BUFF_SIZE * 2];
+				char msg[BUFF_SIZE * 2] = {'\0'};
 				strcat(msg, STRATAGUS_NOT_FOUND);
 				strcat(msg, " (expected in ");
 				strcat(msg, stratagus_bin);

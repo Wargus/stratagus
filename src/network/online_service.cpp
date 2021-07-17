@@ -711,9 +711,9 @@ private:
 };
 
 class Context;
-class NetworkState {
+class OnlineState {
 public:
-    virtual ~NetworkState() {};
+    virtual ~OnlineState() {};
     virtual void doOneStep(Context *ctx) = 0;
 
 protected:
@@ -1311,7 +1311,7 @@ public:
         return true;
     }
 
-    void setState(NetworkState* newState) {
+    void setState(OnlineState* newState) {
         assert (newState != this->state);
         if (this->state != NULL) {
             delete this->state;
@@ -1339,7 +1339,7 @@ private:
         return username + "'s game";
     }
 
-    NetworkState *state;
+    OnlineState *state;
     CHost *host;
     int8_t canDoUdp = -1; // -1,0,1 --- not tried, doesn't work, I created it
     CTCPSocket *tcpSocket;
@@ -1365,11 +1365,11 @@ private:
     std::vector<std::string> defaultUserKeys;
 };
 
-int NetworkState::send(Context *ctx, BNCSOutputStream *buf) {
+int OnlineState::send(Context *ctx, BNCSOutputStream *buf) {
     return buf->flush(ctx->getTCPSocket());
 }
 
-class DisconnectedState : public NetworkState {
+class DisconnectedState : public OnlineState {
 public:
     DisconnectedState(std::string message) {
         this->message = message;
@@ -1386,7 +1386,7 @@ private:
     std::string message;
 };
 
-class S2C_CHATEVENT : public NetworkState {
+class S2C_CHATEVENT : public OnlineState {
 public:
     S2C_CHATEVENT() {
         this->ticks = 0;
@@ -1620,7 +1620,7 @@ private:
     uint64_t ticks;
 };
 
-class S2C_ENTERCHAT : public NetworkState {
+class S2C_ENTERCHAT : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -1662,7 +1662,7 @@ class S2C_ENTERCHAT : public NetworkState {
     }
 };
 
-class C2S_ENTERCHAT : public NetworkState {
+class C2S_ENTERCHAT : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         // does all of enterchar, getchannellist, and first-join joinchannel
         BNCSOutputStream enterchat(0x0a);
@@ -1686,11 +1686,11 @@ class C2S_ENTERCHAT : public NetworkState {
     }
 };
 
-class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public NetworkState {
+class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public OnlineState {
     virtual void doOneStep(Context *ctx);
 };
 
-class S2C_CREATEACCOUNT2 : public NetworkState {
+class S2C_CREATEACCOUNT2 : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -1754,7 +1754,7 @@ class S2C_CREATEACCOUNT2 : public NetworkState {
     }
 };
 
-class S2C_LOGONRESPONSE2 : public NetworkState {
+class S2C_LOGONRESPONSE2 : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -1859,7 +1859,7 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx) {
     }
 };
 
-class S2C_SID_AUTH_CHECK : public NetworkState {
+class S2C_SID_AUTH_CHECK : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -1921,7 +1921,7 @@ class S2C_SID_AUTH_CHECK : public NetworkState {
     }
 };
 
-class S2C_SID_AUTH_INFO : public NetworkState {
+class S2C_SID_AUTH_INFO : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -1985,7 +1985,7 @@ class S2C_SID_AUTH_INFO : public NetworkState {
     }
 };
 
-class S2C_SID_PING : public NetworkState {
+class S2C_SID_PING : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         if (ctx->getTCPSocket()->HasDataToRead(0)) {
             uint8_t msg = ctx->getMsgIStream()->readMessageId();
@@ -2015,7 +2015,7 @@ class S2C_SID_PING : public NetworkState {
     }
 };
 
-class ConnectState : public NetworkState {
+class ConnectState : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         // Connect
 

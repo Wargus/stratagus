@@ -243,11 +243,9 @@ void ArgvQuote(const std::wstring& Argument, std::wstring& CommandLine, bool For
 
 int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = false, std::wstring *outputCommandline = NULL) {
 	std::wstring cmdline;
+	std::wstring executable;
 
-	ArgvQuote(file, cmdline, false);
-	if (argv.size() > 0) {
-		cmdline.push_back(L' ');
-	}
+	ArgvQuote(file, executable, false);
 
 	for (size_t i = 0; i < argv.size(); i++) {
 		std::wstring arg = argv[i];
@@ -263,11 +261,19 @@ int runCommand(std::wstring& file, std::vector<std::wstring> argv, bool echo = f
 		}
 		cmdcmdline.push_back(c);
 	}
+
+	if (argv.size() > 0) {
+		cmdcmdline = std::wstring(L"@") + executable + std::wstring(L" ") + cmdcmdline;
+	} else {
+		cmdcmdline = std::wstring(L"@") + executable;
+	}
+
 	if (outputCommandline != NULL) {
-		outputCommandline->append(cmdline);
+		outputCommandline->append(cmdcmdline);
 	}
 	if (echo) {
-		std::wcout << cmdline << L'\n';
+		std::wcout << executable << L' ' << cmdline << L'\n';
+		std::wcout << cmdcmdline << L'\n';
 	}
 	_flushall();
 	int code = _wsystem(cmdcmdline.c_str());
