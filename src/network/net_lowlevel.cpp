@@ -257,7 +257,7 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 			if ((pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == 0) continue;
 			if (pAddresses->IfType != IF_TYPE_ETHERNET_CSMACD && pAddresses->IfType != IF_TYPE_IEEE80211) continue;
 			if (pAddresses->OperStatus != IfOperStatusUp) continue;
-			if (strlen((char*)pAddresses->PhysicalAddress) == 0) continue;
+			if (pAddresses->PhysicalAddressLength == 0) continue;
 			ips[idx++] = ((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr;
 		}
 	}
