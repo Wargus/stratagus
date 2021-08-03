@@ -242,7 +242,7 @@ std::string NetGetHostname()
 int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	int idx = 0;
-	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+	PIP_ADAPTER_ADDRESSES pFirstAddresses, pAddresses = NULL;
 	ULONG outBufLen = 0;
 	GetAdaptersAddresses(AF_INET,
 						 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
@@ -251,6 +251,7 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 	if (GetAdaptersAddresses(AF_INET,
 							 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
 							 NULL, pAddresses, &outBufLen) == NO_ERROR) {
+		pFirstAddresses = pAddresses;
 		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
 			if (idx == maxAddr) break;
 			if (pAddresses->Flags & IP_ADAPTER_RECEIVE_ONLY) continue;
@@ -261,6 +262,7 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 			ips[idx++] = ((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr;
 		}
 	}
+	free(pFirstAddresses);
 
 	return idx;
 }
