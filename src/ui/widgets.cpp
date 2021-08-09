@@ -912,7 +912,8 @@ void MultiLineLabel::draw(gcn::Graphics *graphics)
 	}
 
 	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
-		graphics->drawText(this->mTextRows[i], textX, textY + i * this->getFont()->getHeight(),
+		if (this->mTextRows[i].length() != 0)
+			graphics->drawText(this->mTextRows[i], textX, textY + i * this->getFont()->getHeight(),
 						   this->getAlignment());
 	}
 }

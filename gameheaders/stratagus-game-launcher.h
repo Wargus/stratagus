@@ -237,6 +237,7 @@ int check_version(char* tool_path, char* data_path) {
 	sprintf(buf, "%s -V", tool_path); // tool_path is already quoted
 	HANDLE g_hChildStd_OUT_Rd = NULL;
 	HANDLE g_hChildStd_OUT_Wr = NULL;
+	DWORD nbByteRead;
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = TRUE;
@@ -257,7 +258,7 @@ int check_version(char* tool_path, char* data_path) {
 		return 1;
 	CloseHandle(piProcInfo.hProcess);
 	CloseHandle(piProcInfo.hThread);
-	ReadFile(g_hChildStd_OUT_Rd, toolversion, 20, NULL, NULL);
+	ReadFile(g_hChildStd_OUT_Rd, toolversion, 20, &nbByteRead, NULL);
 #endif
     // strip whitespace
     for (size_t i=0, j=0; toolversion[j]=toolversion[i]; j+=!isspace(toolversion[i++]));
