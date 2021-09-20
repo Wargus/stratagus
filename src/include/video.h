@@ -69,11 +69,14 @@ extern SDL_Texture *TheTexture;
 #define AMASK   0x000000ff
 #endif
 
+/// Class for modifiers for custom pixel manipulations
 class PixelModifier
 {
 public:
-	static uint32_t CopyWithSrcAlphaKey(uint32_t const srcPixel, uint32_t const dstPixel, uint32_t reqAlpha) {
-		
+	/// This one returns srcRGB+A(modulated) only if srcA is present. Otherwise returns dstRGBA. 
+	/// Used to copy (without alpha modulating) those pixels which has alpha chanel values
+	static uint32_t CopyWithSrcAlphaKey(const uint32_t srcPixel, const uint32_t dstPixel, const uint32_t reqAlpha)
+	{
 		uint32_t srcAlpha = (srcPixel >> ASHIFT) & 0xFF;
 		if (srcAlpha) {
 			srcAlpha = (srcAlpha * reqAlpha) >> 8;
@@ -81,7 +84,9 @@ public:
 		}
 		return dstPixel;
 	}
+	/// Add more modifiers here
 };
+
 class CGraphic : public gcn::Image
 {
 
@@ -107,7 +112,8 @@ public:
 				 SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
-					      std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+					      std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+						  const uint32_t param,
 						  SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y,
@@ -120,7 +126,8 @@ public:
 						  SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-							  std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+							  std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+							  const uint32_t param,
 							  SDL_Surface *surface = TheScreen) const;
 
 	// Draw frame
@@ -134,7 +141,8 @@ public:
 							SDL_Surface *surface = TheScreen) const;
 
 	void DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-								std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+								std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+								const uint32_t param,
 								SDL_Surface *surface = TheScreen) const;
 
 	// Draw frame flipped horizontally

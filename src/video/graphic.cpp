@@ -64,8 +64,9 @@ static std::list<CGraphic *> Graphics;
 /**
 **  Video draw the graphic clipped.
 **
-**  @param x   X screen position
-**  @param y   Y screen position
+**  @param x   X position on the target surface
+**  @param y   Y position on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawClip(int x, int y,
 						SDL_Surface *surface /*= TheScreen*/) const
@@ -85,8 +86,9 @@ void CGraphic::DrawClip(int x, int y,
 **  @param gy  Y offset into object
 **  @param w   width to display
 **  @param h   height to display
-**  @param x   X screen position
-**  @param y   Y screen position
+**  @param x   X position on the target surface
+**  @param y   Y position on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 					   SDL_Surface *surface /*= TheScreen*/) const
@@ -99,10 +101,22 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 	SDL_BlitSurface(Surface, &srect, surface, &drect);
 }
 
-
-// 32bpp only (yet?)
+/**
+**  Video draw part of graphic by custom pixel modifier.
+**  32bpp only (yet?)
+**
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X position on the target surface
+**  @param y   Y position on the target surface
+**  @param modifier method used to draw pixels instead of SDL_BlitSurface
+**  @param param    parameter for modifier
+**	@param surface  target surface
+*/
 void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
-							    std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+							    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, const uint32_t param,
 								SDL_Surface *surface /*= TheScreen*/) const
 {
 	Assert(surface);
@@ -112,14 +126,14 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 	size_t srcOffset = Surface->w * gy + gx;
 	size_t dstOffset = surface->w * y + x;
 
-	uint32_t *src = reinterpret_cast<uint32_t *>(Surface->pixels);
-	uint32_t *dst = reinterpret_cast<uint32_t *>(surface->pixels);
+	uint32_t *const src = reinterpret_cast<uint32_t *>(Surface->pixels);
+	uint32_t *const dst = reinterpret_cast<uint32_t *>(surface->pixels);
 
 	for (uint16_t posY = 0; posY < h; posY++) {
 		for (uint16_t posX = 0; posX < w; posX++) {
-			uint32_t srcColor = src[srcOffset + posX];
-			uint32_t dstColor = dst[dstOffset + posX];
-			uint32_t resColor =  modifier(srcColor, dstColor, param);
+			const uint32_t srcColor = src[srcOffset + posX];
+			const uint32_t dstColor = dst[dstOffset + posX];
+			const uint32_t resColor =  modifier(srcColor, dstColor, param);
 
 			dst[dstOffset + posX] = resColor;
 		}
@@ -137,8 +151,9 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 **  @param gy  Y offset into object
 **  @param w   width to display
 **  @param h   height to display
-**  @param x   X screen position
-**  @param y   Y screen position
+**  @param x   X position on the target surface
+**  @param y   Y position on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, 
 						   SDL_Surface *surface /*= TheScreen*/) const
@@ -163,9 +178,10 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y,
 **  @param gy     Y offset into object
 **  @param w      width to display
 **  @param h      height to display
-**  @param x      X screen position
-**  @param y      Y screen position
+**  @param x      X position on the target surface
+**  @param y      Y position on the target surface
 **  @param alpha  Alpha
+**	@param surface target surface
 */
 void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 							unsigned char alpha,
@@ -187,9 +203,10 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param gy     Y offset into object
 **  @param w      width to display
 **  @param h      height to display
-**  @param x      X screen position
-**  @param y      Y screen position
+**  @param x      X position on the target surface
+**  @param y      Y position on the target surface
 **  @param alpha  Alpha
+**	@param surface target surface
 */
 void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 								unsigned char alpha, 
@@ -201,8 +218,24 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, surface);
 }
 
+
+/**
+**  Video draw clipped part of graphic by custom pixel modifier.
+**  32bpp only (yet?)
+**
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X position on the target surface
+**  @param y   Y position on the target surface
+**  @param modifier method used to draw pixels instead of SDL_BlitSurface
+**  @param param    parameter for modifier
+**	@param surface  target surface
+*/
 void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-								    std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+								    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+									const uint32_t param,
 								    SDL_Surface *surface /*= TheScreen*/) const
 {
 	int oldx = x;
@@ -215,8 +248,9 @@ void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
 **  Draw graphic object unclipped.
 **
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawFrame(unsigned frame, int x, int y,
 						 SDL_Surface *surface /*= TheScreen*/) const
@@ -229,8 +263,9 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y,
 **  Draw graphic object clipped.
 **
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y, 
 							 SDL_Surface *surface /*= TheScreen*/) const
@@ -254,7 +289,8 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha,
 }
 
 void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-									  std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+									  std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+									  const uint32_t param,
 									  SDL_Surface *surface /* = TheScreen*/) const
 {
 	DrawSubClipCustomMod(frame_map[frame].x, frame_map[frame].y,
@@ -266,8 +302,9 @@ void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y,
 **
 **  @param player  player number
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 												   int x, int y,
@@ -281,8 +318,9 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 **  Draw graphic object unclipped and flipped in X direction.
 **
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawFrameX(unsigned frame, int x, int y,
 						  SDL_Surface *surface /*= TheScreen*/) const
@@ -297,8 +335,9 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y,
 **  Draw graphic object clipped and flipped in X direction.
 **
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 							  SDL_Surface *surface /*= TheScreen*/) const
@@ -356,8 +395,9 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 **
 **  @param player  player number
 **  @param frame   number of frame (object index)
-**  @param x       x coordinate on the screen
-**  @param y       y coordinate on the screen
+**  @param x       x coordinate on the target surface
+**  @param y       y coordinate on the target surface
+**	@param surface target surface
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 													int x, int y,
