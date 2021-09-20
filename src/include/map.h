@@ -283,10 +283,6 @@ public:
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
-/// Contrast of fog of war
-extern int FogOfWarOpacity;
-/// fog of war color
-extern CColor FogOfWarColor;
 /// Forest regeneration
 extern int ForestRegeneration;
 /// Forest regeneration

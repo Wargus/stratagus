@@ -57,9 +57,6 @@
 ----------------------------------------------------------------------------*/
 CFieldOfView FieldOfView;
 
-int FogOfWarOpacity;				/// Fog of war Opacity.
-Uint32 FogOfWarColorSDL;
-CColor FogOfWarColor;
 
 CGraphic *CMap::LegacyFogGraphic { nullptr };
 
@@ -730,14 +727,6 @@ void CViewport::CleanFog()
 */
 void CMap::InitLegacyFogOfWar()
 {
-	//calculate this once from the settings and store it
-	FogOfWarColorSDL = Video.MapRGB(TheScreen->format, FogOfWarColor);
-
-	Uint8 r, g, b;
-	SDL_Surface *s;
-
-	LegacyFogGraphic->Load();
-
 	//
 	// Generate Only Fog surface.
 	//

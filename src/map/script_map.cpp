@@ -480,7 +480,7 @@ static int CclGetFogOfWarType(lua_State *l)
 }
 
 /**
-**  Set opacity (alpha) for different levels of fog of war - explored, revealed, unexplored
+**  Set opacity (alpha) for different levels of fog of war - explored, revealed, unseen
 **
 **  @param l  Lua state.
 **
@@ -570,30 +570,6 @@ static int CclGetIsFogOfWarBilinear(lua_State *l)
 }
 
 /**
-**  Fog of war opacity.
-**
-**  @param l  Lua state.
-*/
-static int CclSetFogOfWarOpacity(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int i = LuaToNumber(l, 1);
-	if (i < 0 || i > 255) {
-		PrintFunction();
-		fprintf(stdout, "Opacity should be 0 - 256\n");
-		i = 100;
-	}
-	FogOfWarOpacity = i;
-
-	if (!CclInConfigFile) {
-		Map.Init();
-	}
-	return 0;
-}
-
-/**
-** <b>Description</b>
-**
 **  Set forest regeneration speed.
 **
 **  @param l  Lua state.
@@ -646,9 +622,6 @@ static int CclSetFogOfWarColor(lua_State *l)
 		(b < 0 || b > 255)) {
 		LuaError(l, "Arguments must be in the range 0-255");
 	}
-	FogOfWarColor.R = r;
-	FogOfWarColor.G = g;
-	FogOfWarColor.B = b;
 
 	FogOfWar.SetFogColor(r, g, b);
 
@@ -1007,7 +980,6 @@ void MapCclRegister()
 	lua_register(Lua, "GetIsFogOfWarBilinear", CclGetIsFogOfWarBilinear);
 	
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
-	lua_register(Lua, "SetFogOfWarOpacity", CclSetFogOfWarOpacity);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
 
 	lua_register(Lua, "SetMMFogOfWarOpacityLevels", CclSetMMFogOfWarOpacityLevels);
