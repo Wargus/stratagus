@@ -727,6 +727,10 @@ void CViewport::CleanFog()
 */
 void CMap::InitLegacyFogOfWar()
 {
+	if (OnlyFogSurface || AlphaFogG) {
+		CleanLegacyFogOfWar();
+	}
+
 	//
 	// Generate Only Fog surface.
 	//
@@ -776,8 +780,8 @@ void CMap::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 	}
 
 	if (AlphaFogG) {
-			CGraphic::Free(AlphaFogG);
-			AlphaFogG = nullptr;
+		CGraphic::Free(AlphaFogG);
+		AlphaFogG = nullptr;
 	}
 }
 
