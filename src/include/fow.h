@@ -62,9 +62,13 @@ public:
     bool SetType(const FogOfWarTypes fowType);
     void SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
-    FogOfWarTypes GetType()   const { return Settings.FOW_Type; }
-    CColor   GetFogColor()    const { return Settings.FogColor; }
-    uint32_t GetFogColorSDL() const { return Settings.FogColorSDL; }
+    FogOfWarTypes GetType()       const { return Settings.FOW_Type; }
+    
+    CColor   GetFogColor()        const { return Settings.FogColor; }
+    uint32_t GetFogColorSDL()     const { return Settings.FogColorSDL; }
+    uint8_t  GetExploredOpacity() const { return Settings.ExploredOpacity; }
+    uint8_t  GetRevealedOpacity() const { return Settings.RevealedOpacity; }
+    uint8_t  GetUnseenOpacity()   const { return Settings.UnseenOpacity; }
 
     void ShowVisionFor(const CPlayer &player) { VisionFor.insert(player.Index); }
     void HideVisionFor(const CPlayer &player) { VisionFor.erase(player.Index); }
