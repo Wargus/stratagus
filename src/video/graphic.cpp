@@ -67,14 +67,15 @@ static std::list<CGraphic *> Graphics;
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawClip(int x, int y) const
+void CGraphic::DrawClip(int x, int y,
+						SDL_Surface *surface /*= TheScreen*/) const
 {
 	int oldx = x;
 	int oldy = y;
 	int w = Width;
 	int h = Height;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSub(x - oldx, y - oldy, w, h, x, y);
+	DrawSub(x - oldx, y - oldy, w, h, x, y, surface);
 }
 
 /**
@@ -87,14 +88,47 @@ void CGraphic::DrawClip(int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
+					   SDL_Surface *surface /*= TheScreen*/) const
 {
+	Assert(surface);
+
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	//SDL_LockSurface(TheScreen);
-	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
-	//SDL_UnlockSurface(TheScreen);
+	
+	SDL_BlitSurface(Surface, &srect, surface, &drect);
 }
+
+
+// 32bpp only (yet?)
+void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
+							    std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+								SDL_Surface *surface /*= TheScreen*/) const
+{
+	Assert(surface);
+	Assert(surface->format->BitsPerPixel == 32);
+
+
+	size_t srcOffset = Surface->w * gy + gx;
+	size_t dstOffset = surface->w * y + x;
+
+	uint32_t *src = reinterpret_cast<uint32_t *>(Surface->pixels);
+	uint32_t *dst = reinterpret_cast<uint32_t *>(surface->pixels);
+
+	for (uint16_t posY = 0; posY < h; posY++) {
+		for (uint16_t posX = 0; posX < w; posX++) {
+			uint32_t srcColor = src[srcOffset + posX];
+			uint32_t dstColor = dst[dstOffset + posX];
+			uint32_t resColor =  modifier(srcColor, dstColor, param);
+
+			dst[dstOffset + posX] = resColor;
+		}
+		dstOffset += surface->w;
+		srcOffset += Surface->w;
+	}
+
+}
+
 
 /**
 **  Video draw part of graphic clipped.
@@ -106,8 +140,11 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, 
+						   SDL_Surface *surface /*= TheScreen*/) const
 {
+	Assert(surface);
+
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
@@ -116,7 +153,7 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+	SDL_BlitSurface(Surface, &srect, surface, &drect);
 }
 
 /**
@@ -131,12 +168,15 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 **  @param alpha  Alpha
 */
 void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-							unsigned char alpha) const
+							unsigned char alpha,
+							SDL_Surface *surface /*= TheScreen*/) const
 {
+	Assert(surface);
+
 	Uint8 oldalpha = 0xff;
 	SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
 	SDL_SetSurfaceAlphaMod(Surface, alpha);
-	DrawSub(gx, gy, w, h, x, y);
+	DrawSub(gx, gy, w, h, x, y, surface);
 	SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 }
 
@@ -152,12 +192,23 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param alpha  Alpha
 */
 void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-								unsigned char alpha) const
+								unsigned char alpha, 
+								SDL_Surface *surface /*= TheScreen*/) const
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, surface);
+}
+
+void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
+								    std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+								    SDL_Surface *surface /*= TheScreen*/) const
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSubCustomMod(gx + x - oldx, gy + y - oldy, w, h, x, y, modifier, param, surface);
 }
 
 /**
@@ -167,10 +218,11 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrame(unsigned frame, int x, int y) const
+void CGraphic::DrawFrame(unsigned frame, int x, int y,
+						 SDL_Surface *surface /*= TheScreen*/) const
 {
 	DrawSub(frame_map[frame].x, frame_map[frame].y,
-			Width, Height, x, y);
+			Width, Height, x, y, surface);
 }
 
 /**
@@ -180,22 +232,33 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y) const
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, 
+							 SDL_Surface *surface /*= TheScreen*/) const
 {
 	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
-				Width, Height, x, y);
+				Width, Height, x, y, surface);
 }
 
-void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
+							  SDL_Surface *surface /*= TheScreen*/) const
 {
 	DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
-				 Width, Height, x, y, alpha);
+				 Width, Height, x, y, alpha, surface);
 }
 
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+								  SDL_Surface *surface /* = TheScreen*/) const
 {
 	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
-					 Width, Height, x, y, alpha);
+					 Width, Height, x, y, alpha, surface);
+}
+
+void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
+									  std::function<const uint32_t(uint32_t, uint32_t, uint32_t)> modifier, uint32_t param,
+									  SDL_Surface *surface /* = TheScreen*/) const
+{
+	DrawSubClipCustomMod(frame_map[frame].x, frame_map[frame].y,
+						 Width, Height, x, y, modifier, param, surface);
 }
 
 /**
@@ -207,10 +270,11 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
-												   int x, int y)
+												   int x, int y,
+												   SDL_Surface *surface /*= TheScreen*/)
 {
 	GraphicPlayerPixels(Players[player], *this);
-	DrawFrameClip(frame, x, y);
+	DrawFrameClip(frame, x, y, surface);
 }
 
 /**
@@ -220,12 +284,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameX(unsigned frame, int x, int y,
+						  SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 }
 
 /**
@@ -235,7 +300,8 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y) const
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
+							  SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
@@ -249,10 +315,11 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
 
 	int ret;
 	//SDL_SetSurfaceAlphaMod(SurfaceFlip, 0xFF);
-	ret = SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	ret = SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 }
 
-void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
+							   SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
@@ -260,11 +327,12 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
-void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
+								   SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
@@ -279,7 +347,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
 
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
 
@@ -292,10 +360,11 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
-													int x, int y)
+													int x, int y,
+													SDL_Surface *surface /*= TheScreen*/)
 {
 	GraphicPlayerPixels(Players[player], *this);
-	DrawFrameClipX(frame, x, y);
+	DrawFrameClipX(frame, x, y, surface);
 }
 
 /*----------------------------------------------------------------------------
