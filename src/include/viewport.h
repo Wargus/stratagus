@@ -121,13 +121,15 @@ private:
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
+	void VideoDrawOnlyFog(int x, int y, uint8_t alpha, SDL_Surface *onlyFogSurface);
+	void DrawFogOfWarTile(int sx, int sy, int dx, int dy);
 	void DrawMapFogOfWar();
-	void DrawLegacyFogOfWar() const;
-	void DrawEnhancedFogOfWar(const bool isSoftwareRender = true);
+	void DrawLegacyFogOfWar();
+	void DrawEnhancedFogOfWar();
 	/// Adjust fog of war surface to viewport
 	void AdjustFogSurface();
-	/// Clean enhanced fog of war texture
-	void CleanEnhFog();
+	/// Clean fog of war texture
+	void CleanFog();
 
 public:
 	//private:
@@ -142,7 +144,7 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	SDL_Surface *EnhFogSurface { nullptr }; /// Texture for enhanced fog of war. Viewport sized.
+	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
 	static bool ShowGrid;
 
 };
