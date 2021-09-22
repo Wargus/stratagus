@@ -637,11 +637,13 @@ void CViewport::DrawLegacyFogOfWar()
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
-
+	const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
 	unsigned int my_index = my * Map.Info.MapWidth;
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
-			VisibleTable[my_index + mx] = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			const uint8_t visCell = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			VisibleTable[my_index + mx] = visCell >= visibleThreshold ? 2 
+															 		  : visCell;
 		}
 		my_index += Map.Info.MapWidth;
 	}
