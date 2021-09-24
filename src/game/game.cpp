@@ -912,7 +912,7 @@ void CreateGame(const std::string &filename, CMap *map)
 #endif
 
 	if (FlagRevealMap) {
-		Map.Reveal();
+		Map.Reveal(FlagRevealMap);
 	}
 
 	//

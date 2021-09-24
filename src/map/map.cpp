@@ -130,19 +130,25 @@ void CMap::MarkSeenTile(CMapField &mf)
 /**
 **  Reveal the entire map.
 */
-void CMap::Reveal()
+void CMap::Reveal(const int mode /* = MapRevealModes::cKnown */ )
 {
-	//  Mark every explored tile as visible. 1 turns into 2.
-	/*
-	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
-		CMapField &mf = *this->Field(i);
-		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
-		for (int p = 0; p < PlayerMax; ++p) {
-			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-		}
-		MarkSeenTile(mf);
+	/// We can't do "unrevealing" yet
+	if (mode < GameSettings.RevealMap || mode >= MapRevealModes::cNumOfModes) {
+		return;
 	}
-	*/
+
+	//  Mark every explored tile as visible. 1 turns into 2.
+	if (mode >= MapRevealModes::cExplored) {
+		for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
+			CMapField &mf = *this->Field(i);
+			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
+			for (int p = 0; p < PlayerMax; ++p) {
+				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+			}
+			MarkSeenTile(mf);
+		}
+	}	
+
 	//  Global seen recount. Simple and effective.
 	for (CUnit *unit : UnitManager.GetUnits()) {
 		//  Reveal neutral buildings. Gold mines:)
@@ -156,9 +162,7 @@ void CMap::Reveal()
 		}
 		UnitCountSeen(*unit);
 	}
-	if (!GameSettings.RevealMap) { 
-		GameSettings.RevealMap = 1; 
-	}
+	GameSettings.RevealMap = mode; 
 }
 
 /*----------------------------------------------------------------------------
@@ -365,7 +369,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
 
-	FlagRevealMap = 0;
+	FlagRevealMap = MapRevealModes::cHidden;
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();

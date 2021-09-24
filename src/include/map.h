@@ -31,6 +31,7 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
+#include "settings.h"
 //@{
 
 /*----------------------------------------------------------------------------
@@ -206,8 +207,8 @@ public:
 
 	/// Regenerate the forest.
 	void RegenerateForest();
-	/// Reveal the complete map, make everything known.
-	void Reveal();
+	/// Set map reveal mode: hidden/known/fully explored.
+	void Reveal(const int mode = MapRevealModes::cKnown);
 	/// Save the map.
 	void Save(CFile &file) const;
 

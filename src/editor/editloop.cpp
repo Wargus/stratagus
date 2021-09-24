@@ -1722,7 +1722,7 @@ void CEditor::Init()
 
 	ThisPlayer = &Players[0];
 
-	FlagRevealMap = 1; // editor without fog and all visible
+	FlagRevealMap = MapRevealModes::cExplored; // editor without fog and all visible
 	Map.NoFogOfWar = true;
 
 	if (!*CurrentMapPath) { // new map!
@@ -1756,7 +1756,7 @@ void CEditor::Init()
 	}
 
 	ReplayRevealMap = 1;
-	FlagRevealMap = 0;
+	FlagRevealMap = MapRevealModes::cHidden;
 	Editor.SelectedPlayer = PlayerNumNeutral;
 
 	// Place the start points, which the loader discarded.
