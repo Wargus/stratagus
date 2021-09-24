@@ -831,6 +831,17 @@ void ExecExtendedCommand(unsigned char type, int status,
 			FieldOfView.SetOpaqueFields(arg2);
 			/// CommandLog(...);
 			break;
+		case ExtendedMessageRevealMapDB:
+			Map.Reveal(arg1);
+			break;
+		case ExtendedMessageFogOfWarDB:
+			/// arg1: enable/disable fog
+			Map.NoFogOfWar = arg1 == 0 ? true : false;
+			/// arg2: request for update 
+			if (arg2 != 0) {
+				UpdateFogOfWarChange();
+			}
+			break;
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
 					   type _C_ status ? "flush" : "-" _C_

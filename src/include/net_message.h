@@ -321,11 +321,13 @@ enum _message_type_ {
 **  Network extended message types.
 */
 enum _extended_message_type_ {
-	ExtendedMessageDiplomacy,         /// Change diplomacy
-	ExtendedMessageSharedVision,      /// Change shared vision
-	ExtendedMessageAutoTargetingDB,   /// Change Auto targetting algorithm. Used for debug purposes
-	ExtendedMessageFieldOfViewDB,     /// Change field of view type (shadow casting or radial). Used for debug purposes
-	ExtendedMessageMapFieldsOpacityDB /// Change opaque flag for forest, rocks or walls. Used for debug purposes
+	ExtendedMessageDiplomacy,			/// Change diplomacy
+	ExtendedMessageSharedVision,		/// Change shared vision
+	ExtendedMessageAutoTargetingDB,		/// Change Auto targetting algorithm. Used for debug purposes
+	ExtendedMessageFieldOfViewDB,		/// Change field of view type (shadow casting or radial). Used for debug purposes
+	ExtendedMessageMapFieldsOpacityDB,	/// Change opaque flag for forest, rocks or walls. Used for debug purposes
+	ExtendedMessageRevealMapDB,			/// Change map reveal mode. Used for debug purposes
+	ExtendedMessageFogOfWarDB			/// Enable/Disable fog of war. Used for debug purposes
 };
 
 /**
