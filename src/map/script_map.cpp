@@ -142,11 +142,28 @@ static int CclStratagusMap(lua_State *l)
 */
 static int CclRevealMap(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
-	if (CclInConfigFile || !Map.Fields) {
-		FlagRevealMap = 1;
+	LuaCheckArgs(l, 1);
+
+	int newMode;
+	const char *revealMode = LuaToString(l, 1);
+	if (!strcmp(revealMode, "hidden")) {
+		newMode = MapRevealModes::cHidden;
+	} else 	if (!strcmp(revealMode, "known")) {
+		newMode = MapRevealModes::cKnown;
+	} else if (!strcmp(revealMode, "explored")) {
+		newMode = MapRevealModes::cExplored;
 	} else {
-		Map.Reveal();
+		PrintFunction();
+		fprintf(stdout, "Accessible reveal modes: \"hidden\", \"known\", \"explored\", \"revealed\".\n");
+		return 1;
+	}
+
+	if (CclInConfigFile || !Map.Fields) {
+		FlagRevealMap = newMode;
+	} else if (!IsNetworkGame()) {
+		Map.Reveal(newMode);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageRevealMapDB, int(newMode), 0, 0, 0, 0);
 	}
 	return 0;
 }
@@ -242,12 +259,18 @@ static int CclShowMapLocation(lua_State *l)
 static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	Map.NoFogOfWar = !LuaToBoolean(l, 1);
-	if (!CclInConfigFile && Map.Fields) {
-		UpdateFogOfWarChange();
-		// FIXME: save setting in replay log
-		//CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
+	const bool fog = LuaToBoolean(l, 1);
+	const bool updReq = (!CclInConfigFile && Map.Fields);
+
+	if (!IsNetworkGame()) {
+		Map.NoFogOfWar = !fog;
+		if (updReq) {
+			UpdateFogOfWarChange();
+		}
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageFogOfWarDB, int(fog), int(updReq), 0, 0, 0);		
 	}
+	
 	return 0;
 }
 
