@@ -833,6 +833,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 			break;
 		case ExtendedMessageRevealMapDB:
 			Map.Reveal(arg1);
+			/// CommandLog(...);
 			break;
 		case ExtendedMessageFogOfWarDB:
 			/// arg1: enable/disable fog
@@ -841,6 +842,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 			if (arg2 != 0) {
 				UpdateFogOfWarChange();
 			}
+			/// CommandLog(...);
 			break;
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_

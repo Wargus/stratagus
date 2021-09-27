@@ -659,7 +659,6 @@ void CViewport::DrawLegacyFogOfWar()
 			if (VisibleTable[sx]) {
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
-
 				VideoDrawOnlyFog(dx, dy, GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
 																: FogOfWar.GetUnseenOpacity(),
 										 OnlyFogSurface);
