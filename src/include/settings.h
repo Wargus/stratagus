@@ -116,7 +116,9 @@ enum GameTypes {
 	SettingsGameTypeTeamCaptureTheFlag
 #endif
 };
-enum MapRevealModes { cHidden = 0, cKnown,	cExplored, cNumOfModes };
+/// Map revealing modes: cHidden - unrevealed, cKnown - you can see unexplored tiles, but they are darker than explored
+/// cExplored - all tiles became explored, and covered only by the fog of war if it's enabled.
+enum MapRevealModes { cHidden = 0, cKnown, cExplored, cNumOfModes };
 
 /*----------------------------------------------------------------------------
 --  Variables

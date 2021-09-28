@@ -154,7 +154,7 @@ static int CclRevealMap(lua_State *l)
 		newMode = MapRevealModes::cExplored;
 	} else {
 		PrintFunction();
-		fprintf(stdout, "Accessible reveal modes: \"hidden\", \"known\", \"explored\", \"revealed\".\n");
+		fprintf(stdout, "Accessible reveal modes: \"hidden\", \"known\", \"explored\".\n");
 		return 1;
 	}
 
