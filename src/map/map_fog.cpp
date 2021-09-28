@@ -70,7 +70,6 @@ static const int FogTable[16] = {
 static std::vector<unsigned short> VisibleTable;
 
 static SDL_Surface *OnlyFogSurface;
-static CGraphic *AlphaFogG;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -543,7 +542,7 @@ void CViewport::DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 
 	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
 		if (fogTile && fogTile != blackFogTile) {
-			AlphaFogG->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+			Map.LegacyFogGraphic->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
 											 				   FogOfWar.GetExploredOpacity(), 
 															   this->FogSurface);
 		}
@@ -551,7 +550,7 @@ void CViewport::DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 		VideoDrawOnlyFog(dx, dy, FogOfWar.GetExploredOpacity(), OnlyFogSurface);
 	}
 	if (blackFogTile) {
-		AlphaFogG->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+		Map.LegacyFogGraphic->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
 																GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
 																					   : FogOfWar.GetUnseenOpacity(), 
 																this->FogSurface);
@@ -728,7 +727,7 @@ void CViewport::CleanFog()
 */
 void CMap::InitLegacyFogOfWar()
 {
-	if (OnlyFogSurface || AlphaFogG) {
+	if (OnlyFogSurface) {
 		CleanLegacyFogOfWar();
 	}
 
@@ -745,17 +744,13 @@ void CMap::InitLegacyFogOfWar()
 	// Generate Alpha Fog surface.
 	//
 	LegacyFogGraphic->Load();
+	SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(LegacyFogGraphic->Surface, 
+												  				 SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
+	SDL_FreeSurface(LegacyFogGraphic->Surface);
+	LegacyFogGraphic->Surface = newFogSurface;
 
-	AlphaFogG = CGraphic::New("");
-	AlphaFogG->Surface = SDL_ConvertSurfaceFormat(LegacyFogGraphic->Surface, 
-												  SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
-	SDL_SetSurfaceBlendMode(AlphaFogG->Surface, SDL_BLENDMODE_BLEND);
-	AlphaFogG->Width = PixelTileSize.x;
-	AlphaFogG->Height = PixelTileSize.y;
-	AlphaFogG->GraphicWidth  = AlphaFogG->Surface->w;
-	AlphaFogG->GraphicHeight = AlphaFogG->Surface->h;
-	AlphaFogG->NumFrames = 16;
-	AlphaFogG->GenFramesMap();
+	SDL_SetSurfaceBlendMode(LegacyFogGraphic->Surface, SDL_BLENDMODE_BLEND);
+
 	VisibleTable.clear();
 	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 }
@@ -778,11 +773,6 @@ void CMap::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 		VideoPaletteListRemove(OnlyFogSurface);
 		SDL_FreeSurface(OnlyFogSurface);
 		OnlyFogSurface = nullptr;
-	}
-
-	if (AlphaFogG) {
-		CGraphic::Free(AlphaFogG);
-		AlphaFogG = nullptr;
 	}
 }
 
