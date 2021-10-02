@@ -57,10 +57,19 @@
 ----------------------------------------------------------------------------*/
 /// FIXME: Maybe move it into CMap
 CFogOfWar FogOfWar; /// Fog of war itself
+CGraphic *CFogOfWar::LegacyFogGraphic {nullptr}; // Graphic tiles set for legacy fog
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
+void CFogOfWar::SetLegacyFogGraphic(const std::string &fogGraphicFile)
+{
+	if (CFogOfWar::LegacyFogGraphic) {
+		CGraphic::Free(CFogOfWar::LegacyFogGraphic);
+	}
+	CFogOfWar::LegacyFogGraphic = CGraphic::New(fogGraphicFile, PixelTileSize.x, PixelTileSize.y);
+}
+
 /// Calculate values of upscale table for explored/unexplored tiles
 void CFogOfWar::GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo)
 {
@@ -130,14 +139,14 @@ void CFogOfWar::InitLegacyFogOfWar()
 	SDL_FillRect(LegacyFogFullShroud, NULL, Settings.FogColorSDL | (uint32_t(0xFF) << ASHIFT));
     VideoPaletteListAdd(LegacyFogFullShroud);
 
-	Map.LegacyFogGraphic->Load();
+	CFogOfWar::LegacyFogGraphic->Load();
 
-    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(Map.LegacyFogGraphic->Surface, 
+    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::LegacyFogGraphic->Surface, 
 												  				 SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
-	SDL_FreeSurface(Map.LegacyFogGraphic->Surface);
-	Map.LegacyFogGraphic->Surface = newFogSurface;
+	SDL_FreeSurface(CFogOfWar::LegacyFogGraphic->Surface);
+	CFogOfWar::LegacyFogGraphic->Surface = newFogSurface;
 
-	SDL_SetSurfaceBlendMode(Map.LegacyFogGraphic->Surface, SDL_BLENDMODE_BLEND);
+	SDL_SetSurfaceBlendMode(CFogOfWar::LegacyFogGraphic->Surface, SDL_BLENDMODE_BLEND);
 }
 
 /**
@@ -772,18 +781,18 @@ void CFogOfWar::DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, c
 
 	if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
 		if (fogTile && fogTile != blackFogTile) {
-			Map.LegacyFogGraphic->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-											 				              FogOfWar.GetExploredOpacity(),
-                                                                          vpFogSurface);
+			CFogOfWar::LegacyFogGraphic->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+                                                                FogOfWar.GetExploredOpacity(),
+                                                                vpFogSurface);
 		}
 	} else {
 		DrawFullShroudOfFog(dx, dy, FogOfWar.GetExploredOpacity(), vpFogSurface);
 	}
 	if (blackFogTile) {
-		Map.LegacyFogGraphic->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-																           GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
-																					              : FogOfWar.GetUnseenOpacity(),
-                                                                           vpFogSurface);
+		CFogOfWar::LegacyFogGraphic->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+                                                            GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
+                                                                                   : FogOfWar.GetUnseenOpacity(),
+                                                            vpFogSurface);
 	}
 }
 /**
@@ -850,9 +859,9 @@ void CFogOfWar::DrawLegacy(CViewport &viewport)
 void CFogOfWar::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 {
 
-	if (isHardClean && Map.LegacyFogGraphic) {
-		CGraphic::Free(Map.LegacyFogGraphic);
-		Map.LegacyFogGraphic = nullptr;
+	if (isHardClean && CFogOfWar::LegacyFogGraphic) {
+		CGraphic::Free(CFogOfWar::LegacyFogGraphic);
+		CFogOfWar::LegacyFogGraphic = nullptr;
 	}
 	
 	if (LegacyFogFullShroud) {

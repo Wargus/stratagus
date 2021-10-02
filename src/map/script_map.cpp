@@ -662,10 +662,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
-	if (CMap::LegacyFogGraphic) {
-		CGraphic::Free(CMap::LegacyFogGraphic);
-	}
-	CMap::LegacyFogGraphic = CGraphic::New(FogGraphicFile, PixelTileSize.x, PixelTileSize.y);
+	CFogOfWar::SetLegacyFogGraphic(FogGraphicFile);
 
 	return 0;
 }

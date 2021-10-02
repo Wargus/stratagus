@@ -56,7 +56,9 @@ public:
     enum VisionType   { cUnseen  = 0, cExplored = 0b001, cVisible = 0b010 };
     enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
-    
+
+    static void SetLegacyFogGraphic(const std::string &fogGraphicFile);
+
     void Init();
     void Clean(const bool isHardClean = false);
     bool SetType(const FogOfWarTypes fowType);
@@ -140,6 +142,7 @@ private:
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
 
+    static CGraphic *LegacyFogGraphic;  /// graphic for legacy fog of war
     SDL_Surface *LegacyFogFullShroud {nullptr};
     
     /**

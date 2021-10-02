@@ -270,7 +270,6 @@ public:
 	CTileset *Tileset;          		/// tileset data
 	std::string TileModelsFileName; 	/// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     			/// graphic for all the tiles
-	static CGraphic *LegacyFogGraphic;  /// graphic for legacy fog of war
 	bool isMapInitialized { false };
 
 	CMapInfo Info;             			/// descriptive information
