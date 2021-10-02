@@ -10,8 +10,8 @@
 //
 /**@name map_fog.cpp - The map fog of war handling. */
 //
-//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Shabanski,
-//		Russell Smith, Jimmy Salmon, Pali Rohár and Andrettin
+//      (c) Copyright 1999-2021 by Lutz Sammer, Vladi Shabanski,
+//		Russell Smith, Jimmy Salmon, Pali Rohár, Andrettin and Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -57,19 +57,9 @@
 ----------------------------------------------------------------------------*/
 CFieldOfView FieldOfView;
 
-
+/// FIXME: Maybe move it into CFogOfWar
 CGraphic *CMap::LegacyFogGraphic { nullptr };
 
-/**
-**  Mapping for fog of war tiles.
-*/
-static const int FogTable[16] = {
-	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
-};
-
-static std::vector<unsigned short> VisibleTable;
-
-static SDL_Surface *OnlyFogSurface;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -364,201 +354,6 @@ void UpdateFogOfWarChange()
 	}
 }
 
-/*----------------------------------------------------------------------------
---  Draw fog solid
-----------------------------------------------------------------------------*/
-
-/**
-**  Draw only fog of war
-**
-**  @param x  X position into video memory
-**  @param y  Y position into video memory
-*/
-void CViewport::VideoDrawOnlyFog(int x, int y, uint8_t alpha, SDL_Surface *onlyFogSurface)
-{
-	int oldx;
-	int oldy;
-	SDL_Rect srect;
-	SDL_Rect drect;
-
-	srect.x = 0;
-	srect.y = 0;
-	srect.w = onlyFogSurface->w;
-	srect.h = onlyFogSurface->h;
-
-	oldx = x;
-	oldy = y;
-	CLIP_RECTANGLE(x, y, srect.w, srect.h);
-	srect.x += x - oldx;
-	srect.y += y - oldy;
-
-	drect.x = x;
-	drect.y = y;
-	
-	uint8_t oldalpha = 0xFF;
-	SDL_GetSurfaceAlphaMod(onlyFogSurface, &oldalpha);
-	SDL_SetSurfaceAlphaMod(onlyFogSurface, alpha);
-	SDL_BlitSurface(onlyFogSurface, &srect, this->FogSurface, &drect);
-	SDL_SetSurfaceAlphaMod(onlyFogSurface, oldalpha);
-}
-
-/*----------------------------------------------------------------------------
---  Old version correct working but not 100% original
-----------------------------------------------------------------------------*/
-
-static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
-{
-#define IsMapFieldExploredTable(index) (VisibleTable[(index)])
-#define IsMapFieldVisibleTable(index) (VisibleTable[(index)] > 1)
-
-	int w = Map.Info.MapWidth;
-	int fogTileIndex = 0;
-	int blackFogTileIndex = 0;
-	int x = sx - sy;
-
-	if (ReplayRevealMap) {
-		*fogTile = 0;
-		*blackFogTile = 0;
-		return;
-	}
-
-	//
-	//  Which Tile to draw for fog
-	//
-	// Investigate tiles around current tile
-	// 1 2 3
-	// 4 * 5
-	// 6 7 8
-
-	//    2  3 1
-	//   10 ** 5
-	//    8 12 4
-
-	if (sy) {
-		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
-		if (sx != sy) {
-			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
-				blackFogTileIndex |= 2;
-				fogTileIndex |= 2;
-				//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-				fogTileIndex |= 2;
-			}
-		}
-		//if (!IsMapFieldExploredTable(x, y - 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
-			blackFogTileIndex |= 3;
-			fogTileIndex |= 3;
-			//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
-			fogTileIndex |= 3;
-		}
-		if (sx != sy + w - 1) {
-			//if (!IsMapFieldExploredTable(x + 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
-				blackFogTileIndex |= 1;
-				fogTileIndex |= 1;
-				//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-				fogTileIndex |= 1;
-			}
-		}
-	}
-
-	if (sx != sy) {
-		unsigned int index = sy;//(y) * Map.Info.MapWidth;
-		//if (!IsMapFieldExploredTable(x - 1, y)) {
-		if (!IsMapFieldExploredTable(x - 1 + index)) {
-			blackFogTileIndex |= 10;
-			fogTileIndex |= 10;
-			//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-			fogTileIndex |= 10;
-		}
-	}
-	if (sx != sy + w - 1) {
-		unsigned int index = sy;//(y) * Map.Info.MapWidth;
-		//if (!IsMapFieldExploredTable(x + 1, y)) {
-		if (!IsMapFieldExploredTable(x + 1 + index)) {
-			blackFogTileIndex |= 5;
-			fogTileIndex |= 5;
-			//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-			fogTileIndex |= 5;
-		}
-	}
-
-	if (sy + w < Map.Info.MapHeight * w) {
-		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
-		if (sx != sy) {
-			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
-				blackFogTileIndex |= 8;
-				fogTileIndex |= 8;
-				//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
-				fogTileIndex |= 8;
-			}
-		}
-		//if (!IsMapFieldExploredTable(x, y + 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
-			blackFogTileIndex |= 12;
-			fogTileIndex |= 12;
-			//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
-			fogTileIndex |= 12;
-		}
-		if (sx != sy + w - 1) {
-			//if (!IsMapFieldExploredTable(x + 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
-				blackFogTileIndex |= 4;
-				fogTileIndex |= 4;
-				//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
-				fogTileIndex |= 4;
-			}
-		}
-	}
-
-	*fogTile = FogTable[fogTileIndex];
-	*blackFogTile = FogTable[blackFogTileIndex];
-}
-
-/**
-**  Draw fog of war tile.
-**
-**  @param sx  Offset into fields to current tile.
-**  @param sy  Start of the current row.
-**  @param dx  X position into video memory.
-**  @param dy  Y position into video memory.
-*/
-void CViewport::DrawFogOfWarTile(int sx, int sy, int dx, int dy)
-{
-	int fogTile = 0;
-	int blackFogTile = 0;
-
-	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
-
-	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
-		if (fogTile && fogTile != blackFogTile) {
-			Map.LegacyFogGraphic->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-											 				   FogOfWar.GetExploredOpacity(), 
-															   this->FogSurface);
-		}
-	} else {
-		VideoDrawOnlyFog(dx, dy, FogOfWar.GetExploredOpacity(), OnlyFogSurface);
-	}
-	if (blackFogTile) {
-		Map.LegacyFogGraphic->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-																GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
-																					   : FogOfWar.GetUnseenOpacity(), 
-																this->FogSurface);
-	}
-
-#undef IsMapFieldExploredTable
-#undef IsMapFieldVisibleTable
-}
 
 /**
 **  Draw the map fog of war.
@@ -579,17 +374,7 @@ void CViewport::DrawMapFogOfWar()
 		this->AdjustFogSurface();
 	}
 
-	switch (FogOfWar.GetType()) {
-		case FogOfWarTypes::cLegacy:
-			this->DrawLegacyFogOfWar();
-			break;
-		
-		case FogOfWarTypes::cEnhanced: 
-			this->DrawEnhancedFogOfWar(); 
-			break;
-		default: 
-		break;
-	}
+	FogOfWar.Draw(*this);
 	
 	/// TODO: switch to hardware rendering
 	const bool isSoftwareRender {true}; // FIXME: remove this
@@ -609,77 +394,6 @@ void CViewport::DrawMapFogOfWar()
 		/// Alpha blending of the fog texture into the screen	
 		BlitSurfaceAlphaBlending_32bpp(this->FogSurface, &fogRect, TheScreen, &screenRect);
 	}
-}
-
-
-/**
-**  Draw the map fog of war (legacy type).
-*/
-void CViewport::DrawLegacyFogOfWar()
-{
-	SDL_FillRect(this->FogSurface, NULL, 0x00);
-	SDL_Rect fogSurfaceClipRect {this->Offset.x, 
-							 	 this->Offset.y, 
-							 	 this->BottomRightPos.x - this->TopLeftPos.x + 1,
-							 	 this->BottomRightPos.y - this->TopLeftPos.y + 1};
-
-	// Set clipping to FogSurface coordinates
-	::SetClipping(fogSurfaceClipRect.x, 
-				  fogSurfaceClipRect.y, 
-				  fogSurfaceClipRect.x + fogSurfaceClipRect.w,
-				  fogSurfaceClipRect.y + fogSurfaceClipRect.h);
-
-	int sx = std::max<int>(MapPos.x - 1, 0);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
-	int my = std::max<int>(MapPos.y - 1, 0);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
-
-	// Update for visibility all tile in viewport
-	// and 1 tile around viewport (for fog-of-war connection display)
-	const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
-	unsigned int my_index = my * Map.Info.MapWidth;
-	for (; my < ey; ++my) {
-		for (int mx = sx; mx < ex; ++mx) {
-			const uint8_t visCell = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
-			VisibleTable[my_index + mx] = visCell >= visibleThreshold ? 2 
-															 		  : visCell;
-		}
-		my_index += Map.Info.MapWidth;
-	}
-	ex = fogSurfaceClipRect.x + fogSurfaceClipRect.w;
-	int sy = MapPos.y * Map.Info.MapWidth;
-	int dy = 0;
-	ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
-
-	while (dy <= ey) {
-		sx = MapPos.x + sy;
-		int dx = 0;
-		while (dx <= ex) {
-			if (VisibleTable[sx]) {
-				DrawFogOfWarTile(sx, sy, dx, dy);
-			} else {
-				VideoDrawOnlyFog(dx, dy, GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
-																: FogOfWar.GetUnseenOpacity(),
-										 OnlyFogSurface);
-			}
-			++sx;
-			dx += PixelTileSize.x;
-		}
-		sy += Map.Info.MapWidth;
-		dy += PixelTileSize.y;
-	}
-	
-	// Restore Clipping to Viewport coordinates
-	SetClipping();
-}
-
-
-/**
-**  Draw the map fog of war (enhanced type).
-*/
-void CViewport::DrawEnhancedFogOfWar()
-{
- 	FogOfWar.GetFogForViewport(*this, this->FogSurface);
 }
 
 
@@ -704,7 +418,6 @@ void CViewport::AdjustFogSurface()
     SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
 	
 	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-
 	SDL_FillRect(this->FogSurface, NULL, fogColorSolid);
 }
 
@@ -721,59 +434,5 @@ void CViewport::CleanFog()
 	this->FogSurface = nullptr;
 }
 
-/**
-**  Initialize the fog of war.
-**  Build tables, setup functions.
-*/
-void CMap::InitLegacyFogOfWar()
-{
-	if (OnlyFogSurface) {
-		CleanLegacyFogOfWar();
-	}
-
-	//
-	// Generate Only Fog surface.
-	//
-	OnlyFogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
-										  32, RMASK, GMASK, BMASK, AMASK);
-	SDL_SetSurfaceBlendMode(OnlyFogSurface, SDL_BLENDMODE_NONE);
-	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-	SDL_FillRect(OnlyFogSurface, NULL, fogColorSolid);
-
-	//
-	// Generate Alpha Fog surface.
-	//
-	LegacyFogGraphic->Load();
-	SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(LegacyFogGraphic->Surface, 
-												  				 SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
-	SDL_FreeSurface(LegacyFogGraphic->Surface);
-	LegacyFogGraphic->Surface = newFogSurface;
-
-	SDL_SetSurfaceBlendMode(LegacyFogGraphic->Surface, SDL_BLENDMODE_BLEND);
-
-	VisibleTable.clear();
-	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
-}
-
-/**
-**  Cleanup the fog of war.
-**  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during game
-**  It's safe to call this for both types of FOW. 
-*/
-void CMap::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
-{
-	VisibleTable.clear();
-
-	if (isHardClean) {
-		CGraphic::Free(Map.LegacyFogGraphic);
-		LegacyFogGraphic = nullptr;
-	}
-	
-	if (OnlyFogSurface) {
-		VideoPaletteListRemove(OnlyFogSurface);
-		SDL_FreeSurface(OnlyFogSurface);
-		OnlyFogSurface = nullptr;
-	}
-}
 
 //@}

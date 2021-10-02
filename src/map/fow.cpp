@@ -10,7 +10,8 @@
 //
 /**@name fow.cpp - The fog of war. */
 //
-//      (c) Copyright 2020-2021 by Alyokhin
+//      (c) Copyright 1999-2021 by Lutz Sammer, Vladi Shabanski,
+//		Russell Smith, Jimmy Salmon, Pali Rohár, Andrettin and Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -45,6 +46,7 @@
 #include "tile.h"
 #include "ui.h"
 #include "viewport.h"
+#include "../video/intern_video.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -53,6 +55,7 @@
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+/// FIXME: Maybe move it into CMap
 CFogOfWar FogOfWar; /// Fog of war itself
 
 /*----------------------------------------------------------------------------
@@ -86,7 +89,7 @@ void CFogOfWar::Init()
 {
     /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
     /// Extra tiles will always be VisionType::cUnseen. 
-                   VisTableWidth  = Map.Info.MapWidth  + 2;
+             this->VisTableWidth  = Map.Info.MapWidth  + 2;
     const uint16_t visTableHeight = Map.Info.MapHeight + 2;
     const size_t   tableSize      = VisTableWidth * visTableHeight;
     VisTable.clear();
@@ -94,6 +97,55 @@ void CFogOfWar::Init()
     std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
     
     VisTable_Index0 = VisTableWidth + 1;
+
+    if (Settings.FOW_Type == FogOfWarTypes::cLegacy) {
+        InitLegacyFogOfWar();
+    } else { // Settings.FOW_Type == FogOfWarTypes::cEnhanced
+        InitEnhancedFogOfWar();
+    }
+
+    /// TODO: Add fog initialization for replays and observer players
+    VisionFor.clear();
+    ShowVisionFor(*ThisPlayer);
+
+    this->State = cFirstEntry;
+}
+
+/**
+**  Initialize the legacy fog of war.
+**  Build tables, setup functions.
+*/
+void CFogOfWar::InitLegacyFogOfWar()
+{
+	if (LegacyFogFullShroud) {
+		this->Clean();
+	}
+
+	//
+	// Generate Only Fog surface.
+	//
+	LegacyFogFullShroud = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
+										  32, RMASK, GMASK, BMASK, AMASK);
+	SDL_SetSurfaceBlendMode(LegacyFogFullShroud, SDL_BLENDMODE_NONE);
+	SDL_FillRect(LegacyFogFullShroud, NULL, Settings.FogColorSDL | (uint32_t(0xFF) << ASHIFT));
+    VideoPaletteListAdd(LegacyFogFullShroud);
+
+	Map.LegacyFogGraphic->Load();
+
+    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(Map.LegacyFogGraphic->Surface, 
+												  				 SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
+	SDL_FreeSurface(Map.LegacyFogGraphic->Surface);
+	Map.LegacyFogGraphic->Surface = newFogSurface;
+
+	SDL_SetSurfaceBlendMode(Map.LegacyFogGraphic->Surface, SDL_BLENDMODE_BLEND);
+}
+
+/**
+**  Initialize the enhanced fog of war.
+**  Build tables, setup functions.
+*/
+void CFogOfWar::InitEnhancedFogOfWar()
+{
 
     /// +1 to the top & left for 4x scale algorithm purposes, 
     const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 1) * 4;
@@ -108,34 +160,49 @@ void CFogOfWar::Init()
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
     SetFogColor(Settings.FogColor);
-    
-    /// TODO: Add fog initialization for replays and observer players
-    ShowVisionFor(*ThisPlayer);
-
-    this->State = cFirstEntry;
 }
 
-void CFogOfWar::SetFogColor(uint8_t r, uint8_t g, uint8_t b)
+void CFogOfWar::SetFogColor(const uint8_t r, const uint8_t g, const uint8_t b)
 {
     SetFogColor(CColor(r, g, b));
 }
 
-void CFogOfWar::SetFogColor(CColor color)
+void CFogOfWar::SetFogColor(const CColor color)
 {
     Settings.FogColor = color;
     Settings.FogColorSDL = (color.R << RSHIFT) | (color.G << GSHIFT) | (color.B << BSHIFT);
 }
 
-void CFogOfWar::Clean()
+void CFogOfWar::Clean(const bool isHardClean /*= false*/)
 {
-    VisTable.clear();
-    VisTableWidth   = 0;
-    VisTable_Index0 = 0;
+    if(isHardClean) {
+        VisionFor.clear();
+    }
 
-    FogTexture.Clean();
-    RenderedFog.clear();
+    switch (Settings.FOW_Type) {
+        case FogOfWarTypes::cLegacy:
 
-    Blurer.Clean();
+            CleanLegacyFogOfWar(isHardClean); 
+            break;
+
+        case FogOfWarTypes::cEnhanced:
+           
+            if (isHardClean) {
+                CleanLegacyFogOfWar(isHardClean);
+            }
+            
+            VisTable.clear();
+            VisTableWidth   = 0;
+            VisTable_Index0 = 0;
+
+            FogTexture.Clean();
+            RenderedFog.clear();
+
+            Blurer.Clean();
+            break;
+        default:
+            break;
+    }
 }
 
 /** 
@@ -148,20 +215,12 @@ bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 {
 	if (fowType != Settings.FOW_Type && fowType < FogOfWarTypes::cNumOfTypes) {
         if (Map.isInitialized()) {
-            switch (fowType) {
-                case FogOfWarTypes::cLegacy:
-                    this->Clean();
-                    Map.InitLegacyFogOfWar();
-                    break;
-                case FogOfWarTypes::cEnhanced:
-                    Map.CleanLegacyFogOfWar();
-                    this->Init();
-                    break;
-                default:
-                    break;
-            }
+            this->Clean();
+            Settings.FOW_Type = fowType;
+            this->Init();
+        } else {
+            Settings.FOW_Type = fowType;
         }
-    	Settings.FOW_Type = fowType;
 		return true;
 	} else {
 		return false;
@@ -212,13 +271,11 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
 /** 
 ** Generate fog of war:
 ** fill map-sized table with values of visiblty for current player/players 
-** TODO: Add posibility to select players (actual for replays or observers)
-**
 ** 
 */
 void CFogOfWar::GenerateFog()
 {
-    /// FIXME: Maybe to move this set into the CFogOfWar and recalt with every change of shared vision
+    /// FIXME: Maybe to update this with every change of shared vision
     std::set<uint8_t> playersToRenderView;
     for (const uint8_t player : VisionFor) {
         playersToRenderView.insert(player);
@@ -250,7 +307,7 @@ void CFogOfWar::GenerateFog()
                 visCell = 0; /// Clear it before check for players
                 const CMapField *mapField = Map.Field(mapIndex + col);
                 for (const uint8_t player : playersToRenderView) {
-                    visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]); // mapField->playerInfo.TeamVisibilityState(Players[player]));
+                    visCell = std::max<uint8_t>(visCell, mapField->playerInfo.Visible[player]);
                     if (visCell >= visibleThreshold) {
                         visCell = 2;
                         break;
@@ -270,15 +327,32 @@ void CFogOfWar::GenerateFog()
 void CFogOfWar::Update(bool doAtOnce /*= false*/)
 {
     if (Settings.FOW_Type == FogOfWarTypes::cLegacy) {
+        if (doAtOnce || this->State == States::cFirstEntry){
+            GenerateFog();
+            this->State = States::cGenerateFog;
+        } else {
+            switch (this->State) {
+                case States::cReady:
+                    this->State = cGenerateFog;
+                    break;
+
+                case States::cGenerateFog:
+                    GenerateFog();
+                    
+                default:
+                    this->State++;
+                    break;
+            }
+        }
         return;
     }
-
+    
+    /// FogOfWarTypes::cEnhanced
     FogTexture.Ease();
 
     if (Settings.NumOfEasingSteps < States::cReady) doAtOnce = true;
 
     if (doAtOnce || this->State == States::cFirstEntry) {
-        /// TODO: Add posibility to generate fog for different players (for replays purposes)
         GenerateFog();
         FogUpscale4x4();
         Blurer.Blur(FogTexture.GetNext());
@@ -287,7 +361,6 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
     } else {
         switch (this->State) {
             case States::cGenerateFog:
-                /// TODO: Add posibility to generate fog for different players (for replays purposes)
                 GenerateFog();
                 this->State++;
                 break;
@@ -320,9 +393,25 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
 **  @param viewport     viewport to generate fog of war texture for
 **  @param vpFogSurface surface where to put the generated texture
 */
-void CFogOfWar::GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpFogSurface)
+void CFogOfWar::Draw(CViewport &viewport)
 {
+    SDL_FillRect(viewport.GetFogSurface(), NULL, 0x00);
+    if (Settings.FOW_Type == FogOfWarTypes::cLegacy) {
+        DrawLegacy(viewport);
+    } else if (Settings.FOW_Type == FogOfWarTypes::cEnhanced) {
+        DrawEnhanced(viewport);
+    }
+}
 
+
+/**
+**  Draw enhanced fog of war texture into certain viewport's surface.
+**
+**  @param viewport     viewport to generate fog of war texture for
+**  @param vpFogSurface surface where to put the generated texture
+*/
+void CFogOfWar::DrawEnhanced(CViewport &viewport)
+{
     SDL_Rect srcRect;
     srcRect.x = (viewport.MapPos.x + 1) * 4 - 2;  /// '+1' because of 1 tile frame around the texture 
     srcRect.y = (viewport.MapPos.y + 1) * 4 - 2;  /// '-2' is a half-tile compensation
@@ -334,7 +423,7 @@ void CFogOfWar::GetFogForViewport(const CViewport &viewport, SDL_Surface *const 
 
     FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
 
-    /// TOTO: This part may be replaced by GPU shaders. 
+    /// TODO: This part may be replaced by GPU shaders. 
     /// In that case vpFogSurface shall be filled up with FogTexture.DrawRegion()
 
     srcRect.x = x0;
@@ -348,11 +437,11 @@ void CFogOfWar::GetFogForViewport(const CViewport &viewport, SDL_Surface *const 
    
     switch (this->Settings.UpscaleType) {
         case cBilinear:
-            UpscaleBilinear(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpFogSurface, trgRect);
+            UpscaleBilinear(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, viewport.GetFogSurface(), trgRect);
             break;
         case cSimple:
         default:
-            UpscaleSimple(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, vpFogSurface, trgRect);
+            UpscaleSimple(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, viewport.GetFogSurface(), trgRect);
             break;
     }
 }
@@ -528,4 +617,250 @@ void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const
         }
     } /// pragma omp parallel
 }
+
+/**
+**  Draw only fog of war
+**
+**  @param x  X position into video memory
+**  @param y  Y position into video memory
+*/
+void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, SDL_Surface *const vpFogSurface)
+{
+	int oldx;
+	int oldy;
+	SDL_Rect srect;
+	SDL_Rect drect;
+
+	srect.x = 0;
+	srect.y = 0;
+	srect.w = LegacyFogFullShroud->w;
+	srect.h = LegacyFogFullShroud->h;
+
+	oldx = x;
+	oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	drect.x = x;
+	drect.y = y;
+	
+	uint8_t oldalpha = 0xFF;
+	SDL_GetSurfaceAlphaMod(LegacyFogFullShroud, &oldalpha);
+	SDL_SetSurfaceAlphaMod(LegacyFogFullShroud, alpha);
+	SDL_BlitSurface(LegacyFogFullShroud, &srect, vpFogSurface, &drect);
+	SDL_SetSurfaceAlphaMod(LegacyFogFullShroud, oldalpha);
+}
+
+void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, const size_t mapIndexBase, 
+                                int *fogTile, int *blackFogTile) const
+{
+	int w = Map.Info.MapWidth;
+	int fogTileIndex = 0;
+	int blackFogTileIndex = 0;
+	int x = mapIndex - mapIndexBase;
+
+	if (ReplayRevealMap) {
+		*fogTile = 0;
+		*blackFogTile = 0;
+		return;
+	}
+
+	//
+	//  Which Tile to draw for fog
+	//
+	// Investigate tiles around current tile
+	// 1 2 3
+	// 4 * 5
+	// 6 7 8
+
+	//    2  3 1
+	//   10 ** 5
+	//    8 12 4
+
+	if (mapIndexBase) {
+		size_t index = (visIndex - x) - VisTableWidth;
+		if (mapIndex != mapIndexBase) {
+			if (!IsMapFieldExplored(x - 1 + index)) {
+				blackFogTileIndex |= 2;
+				fogTileIndex |= 2;
+			} else if (!IsMapFieldVisible(x - 1 + index)) {
+				fogTileIndex |= 2;
+			}
+		}
+		if (!IsMapFieldExplored(x + index)) {
+			blackFogTileIndex |= 3;
+			fogTileIndex |= 3;
+		} else if (!IsMapFieldVisible(x + index)) {
+			fogTileIndex |= 3;
+		}
+		if (mapIndex != mapIndexBase + w - 1) {
+			if (!IsMapFieldExplored(x + 1 + index)) {
+				blackFogTileIndex |= 1;
+				fogTileIndex |= 1;
+
+			} else if (!IsMapFieldVisible(x + 1 + index)) {
+				fogTileIndex |= 1;
+			}
+		}
+	}
+
+	if (mapIndex != mapIndexBase) {
+		size_t index = (visIndex - x);
+		if (!IsMapFieldExplored(x - 1 + index)) {
+			blackFogTileIndex |= 10;
+			fogTileIndex |= 10;
+		} else if (!IsMapFieldVisible(x - 1 + index)) {
+			fogTileIndex |= 10;
+		}
+	}
+	if (mapIndex != mapIndexBase + w - 1) {
+		size_t index = (visIndex - x);
+		if (!IsMapFieldExplored(x + 1 + index)) {
+			blackFogTileIndex |= 5;
+			fogTileIndex |= 5;
+		} else if (!IsMapFieldVisible(x + 1 + index)) {
+			fogTileIndex |= 5;
+		}
+	}
+
+	if (mapIndexBase + w < Map.Info.MapHeight * w) {
+		size_t index = (visIndex - x) + VisTableWidth;
+		if (mapIndex != mapIndexBase) {
+			if (!IsMapFieldExplored(x - 1 + index)) {
+				blackFogTileIndex |= 8;
+				fogTileIndex |= 8;
+			} else if (!IsMapFieldVisible(x - 1 + index)) {
+				fogTileIndex |= 8;
+			}
+		}
+		if (!IsMapFieldExplored(x + index)) {
+			blackFogTileIndex |= 12;
+			fogTileIndex |= 12;
+		} else if (!IsMapFieldVisible(x + index)) {
+			fogTileIndex |= 12;
+		}
+		if (mapIndex != mapIndexBase + w - 1) {
+			if (!IsMapFieldExplored(x + 1 + index)) {
+				blackFogTileIndex |= 4;
+				fogTileIndex |= 4;
+			} else if (!IsMapFieldVisible(x + 1 + index)) {
+				fogTileIndex |= 4;
+			}
+		}
+	}
+
+	*fogTile = this->LegacyFogTable[fogTileIndex];
+	*blackFogTile = this->LegacyFogTable[blackFogTileIndex];
+}
+
+/**
+**  Draw fog of war tile.
+**
+**  @param mapIndex  Offset into fields to current tile.
+**  @param mapIndexBase  Start of the current row.
+**  @param dx  X position into video memory.
+**  @param dy  Y position into video memory.
+*/
+void CFogOfWar::DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+                                 const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface)
+{
+	int fogTile = 0;
+	int blackFogTile = 0;
+
+	GetFogOfWarTile(visIndex, mapIndex, mapIndexBase, &fogTile, &blackFogTile);
+
+	if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
+		if (fogTile && fogTile != blackFogTile) {
+			Map.LegacyFogGraphic->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+											 				              FogOfWar.GetExploredOpacity(),
+                                                                          vpFogSurface);
+		}
+	} else {
+		DrawFullShroudOfFog(dx, dy, FogOfWar.GetExploredOpacity(), vpFogSurface);
+	}
+	if (blackFogTile) {
+		Map.LegacyFogGraphic->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+																           GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
+																					              : FogOfWar.GetUnseenOpacity(),
+                                                                           vpFogSurface);
+	}
+}
+/**
+**  Draw legacy fog of war texture into certain viewport's surface.
+**
+**  @param viewport     viewport to generate fog of war texture for
+**  @param vpFogSurface surface where to put the generated texture
+*/
+void CFogOfWar::DrawLegacy(CViewport &viewport)
+{
+    /// Save current clipping
+    PushClipping();
+	
+    // Set clipping to FogSurface coordinates
+	SDL_Rect fogSurfaceClipRect {viewport.Offset.x, 
+							 	 viewport.Offset.y, 
+							 	 viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1,
+							 	 viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1};
+	SetClipping(fogSurfaceClipRect.x, 
+				fogSurfaceClipRect.y, 
+				fogSurfaceClipRect.x + fogSurfaceClipRect.w,
+				fogSurfaceClipRect.y + fogSurfaceClipRect.h);
+
+    size_t mapIndexBase = viewport.MapPos.y * Map.Info.MapWidth;
+    size_t visIndexBase = viewport.MapPos.y * VisTableWidth + VisTable_Index0;
+
+	int ex = fogSurfaceClipRect.x + fogSurfaceClipRect.w;
+	int ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
+
+	int dy = 0;
+    
+	while (dy <= ey) {
+		size_t mapIndex = viewport.MapPos.x + mapIndexBase;
+        size_t visIndex = viewport.MapPos.x + visIndexBase;
+
+		int dx = 0;
+		while (dx <= ex) {
+			if (VisTable[visIndex /*sx*/]) {
+				DrawFogOfWarTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
+			} else {
+				DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
+																   : FogOfWar.GetUnseenOpacity(),
+										    viewport.GetFogSurface());
+			}
+			mapIndex++;
+            visIndex++;
+			dx += PixelTileSize.x;
+		}
+		mapIndexBase += Map.Info.MapWidth;
+        visIndexBase += VisTableWidth;
+		dy += PixelTileSize.y;
+	}
+	
+	// Restore Clipping to Viewport coordinates
+	PopClipping();
+
+}
+
+/**
+**  Cleanup the fog of war.
+**  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during the game
+**  It's safe to call this for both types of FOW. 
+*/
+void CFogOfWar::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
+{
+
+	if (isHardClean && Map.LegacyFogGraphic) {
+		CGraphic::Free(Map.LegacyFogGraphic);
+		Map.LegacyFogGraphic = nullptr;
+	}
+	
+	if (LegacyFogFullShroud) {
+		VideoPaletteListRemove(LegacyFogFullShroud);
+		SDL_FreeSurface(LegacyFogFullShroud);
+		LegacyFogFullShroud = nullptr;
+	}
+}
+
+
 //@}

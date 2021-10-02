@@ -58,7 +58,7 @@ public:
     enum UpscaleTypes { cSimple = 0, cBilinear };
     
     void Init();
-    void Clean();
+    void Clean(const bool isHardClean = false);
     bool SetType(const FogOfWarTypes fowType);
     void SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
@@ -73,22 +73,22 @@ public:
     void ShowVisionFor(const CPlayer &player) { VisionFor.insert(player.Index); }
     void HideVisionFor(const CPlayer &player) { VisionFor.erase(player.Index); }
 
-    void SetFogColor(uint8_t r, uint8_t g, uint8_t b);
-    void SetFogColor(CColor color);
+    void SetFogColor(const uint8_t r, const uint8_t g, const uint8_t b);
+    void SetFogColor(const CColor color);
 
     void EnableBilinearUpscale(const bool enable);
-    bool IsBilinearUpscaleEnabled() const 
-    {
-        return Settings.UpscaleType == UpscaleTypes::cBilinear;
-    }
+    bool IsBilinearUpscaleEnabled() const { return Settings.UpscaleType == UpscaleTypes::cBilinear; }
     void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
     void Update(bool doAtOnce = false);
-    void GetFogForViewport(const CViewport &viewport, SDL_Surface *const vpFogSurface);
+    void Draw(CViewport &viewport);
     
     uint8_t GetVisibilityForTile(const Vec2i tilePos) const;
 
 private:
+    void InitEnhancedFogOfWar();
+    void DrawEnhanced(CViewport &viewport);
+
     void GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo);
 
     void GenerateFog();
@@ -103,6 +103,19 @@ private:
 
     void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                        SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const;
+
+    void InitLegacyFogOfWar();
+    void CleanLegacyFogOfWar(const bool isHardClean = false);
+
+    void DrawFullShroudOfFog(const int16_t x, const int16_t y, const uint8_t alpha, 
+                             SDL_Surface *const vpFogSurface);
+    void GetFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+                         int *fogTile, int *blackFogTile) const;
+    bool IsMapFieldExplored(const size_t index) const { return (VisTable[index] != 0); }
+    bool IsMapFieldVisible(const size_t index)  const { return (VisTable[index]  > 1); }
+    void DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+                          const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface);
+    void DrawLegacy(CViewport &viewport);
     
 public:
 
@@ -123,9 +136,17 @@ private:
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
     
-    std::set<uint8_t>    VisionFor;           /// Visibilty through the fog is generated for this players
-                                              /// ThisPlayer and his allies in normal games
-                                              /// Any set of players for observers and in the replays
+    std::set<uint8_t>   VisionFor;  /// Visibilty through the fog is generated for this players
+                                    /// ThisPlayer and his allies in normal games
+                                    /// Any set of players for observers and in the replays
+
+    SDL_Surface *LegacyFogFullShroud {nullptr};
+    
+    /**
+    **  Mapping for fog of war tiles.
+    */
+    const int LegacyFogTable[16] = {0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0};
+
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
     size_t               VisTable_Index0 {0}; /// index in the vision table for [0:0] map tile
     size_t               VisTableWidth   {0}; /// width of the vision table
