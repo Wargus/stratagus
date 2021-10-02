@@ -69,9 +69,9 @@ static constexpr int SCALE_PRECISION       {100};
 --  Variables
 ----------------------------------------------------------------------------*/
 
-SDL_Surface 	   *MinimapSurface;        /// generated minimap
-static SDL_Surface *MinimapTerrainSurface; /// generated minimap terrain
-static SDL_Surface *MinimapFogSurface;		/// generated minimap fog of war
+SDL_Surface 	   *MinimapSurface{nullptr};        /// generated minimap
+static SDL_Surface *MinimapTerrainSurface{nullptr}; /// generated minimap terrain
+static SDL_Surface *MinimapFogSurface{nullptr};		/// generated minimap fog of war
 
 static int *Minimap2MapX;                  /// fast conversion table
 static int *Minimap2MapY;                  /// fast conversion table
