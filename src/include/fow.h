@@ -255,7 +255,6 @@ inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t texture
 
 inline uint8_t CFogOfWar::GetVisibilityForTile(const Vec2i tilePos) const
 {
-    return (this->Settings.FOW_Type == FogOfWarTypes::cEnhanced) ? VisTable[VisTable_Index0 + tilePos.x + VisTableWidth * tilePos.y]
-                                                                 : Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
+    return VisTable[VisTable_Index0 + tilePos.x + VisTableWidth * tilePos.y];
 }
 #endif // !__FOW_H__
