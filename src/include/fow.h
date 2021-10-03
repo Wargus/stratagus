@@ -142,8 +142,9 @@ private:
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
 
-    static CGraphic *LegacyFogGraphic;  /// graphic for legacy fog of war
-    SDL_Surface *LegacyFogFullShroud {nullptr};
+    static CGraphic *LegacyFogGraphic;          /// Graphic for legacy fog of war
+    CGraphic *LegacyAlphaFogG {nullptr};        /// Working set of graphic for legacy fog of war with alpha channel
+    SDL_Surface *LegacyFogFullShroud {nullptr}; /// 1-tile sized surface for full covered by fog tiles
     
     /**
     **  Mapping for fog of war tiles.
