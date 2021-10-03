@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "linux": {
               "program": "${workspaceFolder}/build/stratagus-dbg",
-              "args": ["-W", "2048x1280" ,"-v", "960x600", "-a", "-d", "data.${input:game}", "-u", "./"],
+              "args": ["-W", "-a", "-d", "${workspaceFolder}/../data.${input:game}"],
               "environment": [
                 {"name": "OMP_WAIT_POLICY", "value": "passive"}
               ],
@@ -22,7 +22,7 @@
               "externalConsole": false,
             },
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../../data",
+            "cwd": "${workspaceFolder}/../${input:game}",
         }
     ],
     "inputs": [
