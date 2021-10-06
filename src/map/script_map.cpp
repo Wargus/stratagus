@@ -258,19 +258,14 @@ static int CclShowMapLocation(lua_State *l)
 */
 static int CclSetFogOfWar(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	const bool fog = LuaToBoolean(l, 1);
-	const bool updReq = (!CclInConfigFile && Map.Fields);
 
-	if (!IsNetworkGame()) {
-		Map.NoFogOfWar = !fog;
-		if (updReq) {
-			UpdateFogOfWarChange();
-		}
-	} else {
-		NetworkSendExtendedCommand(ExtendedMessageFogOfWarDB, int(fog), int(updReq), 0, 0, 0);		
+	LuaCheckArgs(l, 1);
+	Map.NoFogOfWar = !LuaToBoolean(l, 1);
+	if (!CclInConfigFile && Map.Fields) {
+		UpdateFogOfWarChange();
+		// FIXME: save setting in replay log
+		//CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
 	}
-	
 	return 0;
 }
 
