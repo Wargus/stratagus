@@ -510,19 +510,19 @@ static int CclSetFogOfWarOpacityLevels(lua_State *l)
 	const int explored = LuaToNumber(l, 1);
 	if (explored <= 0 || explored > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Explored tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", explored);
+		fprintf(stderr, "Invalid value (%d) of opacity for Explored tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", explored);
 		return 1;
 	}
 	const int revealed = LuaToNumber(l, 2);
 	if (revealed <= explored || revealed > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Revealed tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", revealed);
+		fprintf(stderr, "Invalid value (%d) of opacity for Revealed tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", revealed);
 		return 1;
 	}
 	const int unseen = LuaToNumber(l, 3);
 	if (unseen < revealed || unseen > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Unseen tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", unseen);
+		fprintf(stderr, "Invalid value (%d) of opacity for Unseen tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", unseen);
 		return 1;
 	}
 
@@ -588,6 +588,8 @@ static int CclGetIsFogOfWarBilinear(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set forest regeneration speed.
 **
 **  @param l  Lua state.
@@ -676,19 +678,19 @@ static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
 	const int explored = LuaToNumber(l, 1);
 	if (explored <= 0 || explored > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's Explored tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", explored);
+		fprintf(stderr, "Invalid value (%d) of opacity for Minimap's Explored tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", explored);
 		return 1;
 	}
 	const int revealed = LuaToNumber(l, 2);
 	if (revealed <= explored || revealed > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's  Revealed tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", revealed);
+		fprintf(stderr, "Invalid value (%d) of opacity for Minimap's  Revealed tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", revealed);
 		return 1;
 	}
 	const int unseen = LuaToNumber(l, 3);
 	if (unseen < revealed || unseen > 255) {
 		PrintFunction();
-		fprintf(stderr, "Invalid value (%d) of alpha channel for Minimap's Unseen tiles. Acceptable range is [0 <= Explored <= Revealed <= Unseen <= 255].\n", unseen);
+		fprintf(stderr, "Invalid value (%d) of opacity for Minimap's Unseen tiles. Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n", unseen);
 		return 1;
 	}
 
@@ -724,11 +726,11 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		return;
 	}
 	if (Map.Tileset->getTileCount() <= tileIndex) {
-		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
+		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
 		return;
 	}
 	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
+		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
 		return;
 	}
 

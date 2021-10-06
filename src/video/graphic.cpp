@@ -66,7 +66,7 @@ static std::list<CGraphic *> Graphics;
 **
 **  @param x   X position on the target surface
 **  @param y   Y position on the target surface
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawClip(int x, int y,
 						SDL_Surface *surface /*= TheScreen*/) const
@@ -113,7 +113,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 **  @param y   Y position on the target surface
 **  @param modifier method used to draw pixels instead of SDL_BlitSurface
 **  @param param    parameter for modifier
-**	@param surface  target surface
+**  @param surface  target surface
 */
 void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 							    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, const uint32_t param,
@@ -153,7 +153,7 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 **  @param h   height to display
 **  @param x   X position on the target surface
 **  @param y   Y position on the target surface
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, 
 						   SDL_Surface *surface /*= TheScreen*/) const
@@ -181,7 +181,7 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y,
 **  @param x      X position on the target surface
 **  @param y      Y position on the target surface
 **  @param alpha  Alpha
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 							unsigned char alpha,
@@ -206,7 +206,7 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param x      X position on the target surface
 **  @param y      Y position on the target surface
 **  @param alpha  Alpha
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 								unsigned char alpha, 
@@ -231,7 +231,7 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param y   Y position on the target surface
 **  @param modifier method used to draw pixels instead of SDL_BlitSurface
 **  @param param    parameter for modifier
-**	@param surface  target surface
+**  @param surface  target surface
 */
 void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
 								    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
@@ -250,7 +250,7 @@ void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
 **  @param frame   number of frame (object index)
 **  @param x       x coordinate on the target surface
 **  @param y       y coordinate on the target surface
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawFrame(unsigned frame, int x, int y,
 						 SDL_Surface *surface /*= TheScreen*/) const
@@ -265,7 +265,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y,
 **  @param frame   number of frame (object index)
 **  @param x       x coordinate on the target surface
 **  @param y       y coordinate on the target surface
-**	@param surface target surface
+**  @param surface target surface
 */
 void CGraphic::DrawFrameClip(unsigned frame, int x, int y, 
 							 SDL_Surface *surface /*= TheScreen*/) const
@@ -352,9 +352,7 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
-	int ret;
-	//SDL_SetSurfaceAlphaMod(SurfaceFlip, 0xFF);
-	ret = SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
@@ -397,7 +395,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 **  @param frame   number of frame (object index)
 **  @param x       x coordinate on the target surface
 **  @param y       y coordinate on the target surface
-**	@param surface target surface
+**  @param surface target surface
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 													int x, int y,

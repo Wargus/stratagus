@@ -147,7 +147,7 @@ void CMap::Reveal(const int mode /* = MapRevealModes::cKnown */ )
 			}
 			MarkSeenTile(mf);
 		}
-	}	
+	}
 
 	//  Global seen recount. Simple and effective.
 	for (CUnit *unit : UnitManager.GetUnits()) {

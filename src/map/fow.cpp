@@ -126,7 +126,7 @@ void CFogOfWar::Init()
 */
 void CFogOfWar::InitLegacyFogOfWar()
 {
-	if (CFogOfWar::LegacyFogFullShroud || LegacyAlphaFogG) {
+	if (LegacyFogFullShroud || LegacyAlphaFogG) {
 		this->Clean();
 	}
 
@@ -436,7 +436,7 @@ void CFogOfWar::DrawEnhanced(CViewport &viewport)
 
     FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
 
-    /// TODO: This part may be replaced by GPU shaders. 
+    /// TODO: This part might be replaced by GPU shaders. 
     /// In that case vpFogSurface shall be filled up with FogTexture.DrawRegion()
 
     srcRect.x = x0;
@@ -691,8 +691,9 @@ void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, c
 	//   10 ** 5
 	//    8 12 4
 
+    const size_t visIndexBase = (visIndex - x);
 	if (mapIndexBase) {
-		size_t index = (visIndex - x) - VisTableWidth;
+		const size_t index = visIndexBase - VisTableWidth;
 		if (mapIndex != mapIndexBase) {
 			if (!IsMapFieldExplored(x - 1 + index)) {
 				blackFogTileIndex |= 2;
@@ -719,7 +720,7 @@ void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, c
 	}
 
 	if (mapIndex != mapIndexBase) {
-		size_t index = (visIndex - x);
+		const size_t index = visIndexBase;
 		if (!IsMapFieldExplored(x - 1 + index)) {
 			blackFogTileIndex |= 10;
 			fogTileIndex |= 10;
@@ -728,7 +729,7 @@ void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, c
 		}
 	}
 	if (mapIndex != mapIndexBase + w - 1) {
-		size_t index = (visIndex - x);
+		const size_t index = visIndexBase;
 		if (!IsMapFieldExplored(x + 1 + index)) {
 			blackFogTileIndex |= 5;
 			fogTileIndex |= 5;
@@ -738,7 +739,7 @@ void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, c
 	}
 
 	if (mapIndexBase + w < Map.Info.MapHeight * w) {
-		size_t index = (visIndex - x) + VisTableWidth;
+		const size_t index = visIndexBase + VisTableWidth;
 		if (mapIndex != mapIndexBase) {
 			if (!IsMapFieldExplored(x - 1 + index)) {
 				blackFogTileIndex |= 8;
@@ -770,10 +771,12 @@ void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, c
 /**
 **  Draw fog of war tile.
 **
-**  @param mapIndex  Offset into fields to current tile.
-**  @param mapIndexBase  Start of the current row.
-**  @param dx  X position into video memory.
-**  @param dy  Y position into video memory.
+**  @param visIndex  Offset in fields to current tile in VisTable
+**  @param mapIndex  Offset in fields to current tile on the map
+**  @param mapIndexBase  Start of the current row on the map
+**  @param dx  X position into fog surface
+**  @param dy  Y position into fog surface
+**  @param vpFogSurface surface to draw fog
 */
 void CFogOfWar::DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
                                  const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface)
@@ -803,7 +806,6 @@ void CFogOfWar::DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, c
 **  Draw legacy fog of war texture into certain viewport's surface.
 **
 **  @param viewport     viewport to generate fog of war texture for
-**  @param vpFogSurface surface where to put the generated texture
 */
 void CFogOfWar::DrawLegacy(CViewport &viewport)
 {
@@ -857,8 +859,6 @@ void CFogOfWar::DrawLegacy(CViewport &viewport)
 
 /**
 **  Cleanup the fog of war.
-**  Note: If current type of FOW is cEnhanced it has to be called too in case of FOW type was changed during the game
-**  It's safe to call this for both types of FOW. 
 */
 void CFogOfWar::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
 {
