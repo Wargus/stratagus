@@ -116,7 +116,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 **  @param surface  target surface
 */
 void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
-							    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, const uint32_t param,
+							    pixelModifier modifier, const uint32_t param,
 								SDL_Surface *surface /*= TheScreen*/) const
 {
 	Assert(surface);
@@ -234,7 +234,7 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param surface  target surface
 */
 void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-								    std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+								    pixelModifier modifier, 
 									const uint32_t param,
 								    SDL_Surface *surface /*= TheScreen*/) const
 {
@@ -289,7 +289,7 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha,
 }
 
 void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-									  std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+									  pixelModifier modifier, 
 									  const uint32_t param,
 									  SDL_Surface *surface /* = TheScreen*/) const
 {

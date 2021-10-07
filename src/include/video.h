@@ -69,6 +69,8 @@ extern SDL_Texture *TheTexture;
 #define AMASK   0x000000ff
 #endif
 
+using pixelModifier = uint32_t(*)(const uint32_t, const uint32_t, const uint32_t); // type alias
+
 /// Class for modifiers for custom pixel manipulations
 class PixelModifier
 {
@@ -112,7 +114,7 @@ public:
 				 SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
-					      std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+					      pixelModifier modifier, 
 						  const uint32_t param,
 						  SDL_Surface *surface = TheScreen) const;
 
@@ -126,7 +128,7 @@ public:
 						  SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-							  std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+							  pixelModifier modifier, 
 							  const uint32_t param,
 							  SDL_Surface *surface = TheScreen) const;
 
@@ -141,7 +143,7 @@ public:
 							SDL_Surface *surface = TheScreen) const;
 
 	void DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-								std::function<uint32_t(const uint32_t, const uint32_t, const uint32_t)> modifier, 
+								pixelModifier modifier, 
 								const uint32_t param,
 								SDL_Surface *surface = TheScreen) const;
 
