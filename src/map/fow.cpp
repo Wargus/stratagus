@@ -126,17 +126,9 @@ void CFogOfWar::Init()
 */
 void CFogOfWar::InitLegacyFogOfWar()
 {
-	if (LegacyFogFullShroud || LegacyAlphaFogG) {
+	if (LegacyAlphaFogG) {
 		this->Clean();
 	}
-
-	//
-	// Generate Only Fog surface.
-	//
-	LegacyFogFullShroud = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
-										  32, RMASK, GMASK, BMASK, AMASK);
-	SDL_SetSurfaceBlendMode(LegacyFogFullShroud, SDL_BLENDMODE_NONE);
-	SDL_FillRect(LegacyFogFullShroud, NULL, Settings.FogColorSDL | (uint32_t(0xFF) << ASHIFT));
 
 	CFogOfWar::LegacyFogGraphic->Load();
 
@@ -646,8 +638,8 @@ void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, S
 
 	srect.x = 0;
 	srect.y = 0;
-	srect.w = LegacyFogFullShroud->w;
-	srect.h = LegacyFogFullShroud->h;
+	srect.w = PixelTileSize.x;
+	srect.h = PixelTileSize.y;
 
 	oldx = x;
 	oldy = y;
@@ -657,12 +649,15 @@ void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, S
 
 	drect.x = x;
 	drect.y = y;
-	
-	uint8_t oldalpha = 0xFF;
-	SDL_GetSurfaceAlphaMod(LegacyFogFullShroud, &oldalpha);
-	SDL_SetSurfaceAlphaMod(LegacyFogFullShroud, alpha);
-	SDL_BlitSurface(LegacyFogFullShroud, &srect, vpFogSurface, &drect);
-	SDL_SetSurfaceAlphaMod(LegacyFogFullShroud, oldalpha);
+
+    const uint32_t fogColor = FogOfWar.GetFogColorSDL() | (uint32_t(alpha) << ASHIFT);
+    size_t index = drect.y * vpFogSurface->w + drect.x;
+    uint32_t *const dst = reinterpret_cast<uint32_t*>(vpFogSurface->pixels);
+    for (uint16_t row = 0; row < srect.h; row++) {
+        std::fill_n(&dst[index], srect.w, fogColor);
+        index += vpFogSurface->w;
+    }
+
 }
 
 void CFogOfWar::GetFogOfWarTile(const size_t visIndex, const  size_t mapIndex, const size_t mapIndexBase, 
@@ -822,36 +817,50 @@ void CFogOfWar::DrawLegacy(CViewport &viewport)
 				fogSurfaceClipRect.x + fogSurfaceClipRect.w,
 				fogSurfaceClipRect.y + fogSurfaceClipRect.h);
 
-    size_t mapIndexBase = viewport.MapPos.y * Map.Info.MapWidth;
-    size_t visIndexBase = viewport.MapPos.y * VisTableWidth + VisTable_Index0;
+	const int ex = fogSurfaceClipRect.x + fogSurfaceClipRect.w;
+	const int ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
 
-	int ex = fogSurfaceClipRect.x + fogSurfaceClipRect.w;
-	int ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
+    #pragma omp parallel
+    {    
+        const uint16_t thisThread   = omp_get_thread_num();
+        const uint16_t numOfThreads = omp_get_num_threads();
+      
+        uint16_t lBound = thisThread * fogSurfaceClipRect.h / numOfThreads;
+        lBound -= lBound % PixelTileSize.y;
+        uint16_t uBound = ey;
+        if (thisThread != numOfThreads - 1) {
+            uBound = (thisThread + 1) * fogSurfaceClipRect.h / numOfThreads;
+            uBound -= uBound % PixelTileSize.y;
+        }
 
-	int dy = 0;
-    
-	while (dy <= ey) {
-		size_t mapIndex = viewport.MapPos.x + mapIndexBase;
-        size_t visIndex = viewport.MapPos.x + visIndexBase;
+        size_t mapIndexBase = (viewport.MapPos.y + lBound / PixelTileSize.y) * Map.Info.MapWidth;
+        size_t visIndexBase = (viewport.MapPos.y + lBound / PixelTileSize.y) * VisTableWidth + VisTable_Index0;
 
-		int dx = 0;
-		while (dx <= ex) {
-			if (VisTable[visIndex /*sx*/]) {
-				DrawFogOfWarTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
-			} else {
-				DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
-																   : FogOfWar.GetUnseenOpacity(),
-										    viewport.GetFogSurface());
-			}
-			mapIndex++;
-            visIndex++;
-			dx += PixelTileSize.x;
-		}
-		mapIndexBase += Map.Info.MapWidth;
-        visIndexBase += VisTableWidth;
-		dy += PixelTileSize.y;
-	}
-	
+        int dy = lBound;
+        
+        while (dy < uBound) {
+            size_t mapIndex = viewport.MapPos.x + mapIndexBase;
+            size_t visIndex = viewport.MapPos.x + visIndexBase;
+
+            int dx = 0;
+            while (dx < ex) {
+                if (VisTable[visIndex]) {
+                    DrawFogOfWarTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
+                } else {
+                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap ? FogOfWar.GetRevealedOpacity() 
+                                                                       : FogOfWar.GetUnseenOpacity(),
+                                                viewport.GetFogSurface());
+                }
+                mapIndex++;
+                visIndex++;
+                dx += PixelTileSize.x;
+            }
+            mapIndexBase += Map.Info.MapWidth;
+            visIndexBase += VisTableWidth;
+            dy += PixelTileSize.y;
+        }
+    } /// pragma omp parallel
+
 	// Restore Clipping to Viewport coordinates
 	PopClipping();
 
@@ -871,10 +880,5 @@ void CFogOfWar::CleanLegacyFogOfWar(const bool isHardClean /*= false*/)
         CGraphic::Free(LegacyAlphaFogG);
         LegacyAlphaFogG = nullptr;
     }
-	
-	if (LegacyFogFullShroud) {
-		SDL_FreeSurface(LegacyFogFullShroud);
-		LegacyFogFullShroud = nullptr;
-	}
 }
 //@}

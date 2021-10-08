@@ -144,7 +144,6 @@ private:
 
     static CGraphic *LegacyFogGraphic;          /// Graphic for legacy fog of war
     CGraphic *LegacyAlphaFogG {nullptr};        /// Working set of graphic for legacy fog of war with alpha channel
-    SDL_Surface *LegacyFogFullShroud {nullptr}; /// 1-tile sized surface for full covered by fog tiles
     
     /**
     **  Mapping for fog of war tiles.
