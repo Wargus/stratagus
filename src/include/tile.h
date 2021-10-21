@@ -239,6 +239,10 @@ public:
 #ifdef DEBUG
 	int64_t lastAStarCost;    /// debugging pathfinder
 #endif
+
+	uint8_t getElevation() const { return this->ElevationLevel; }
+	void 	setElevation(const uint8_t newLevel) { this->ElevationLevel = newLevel; }
+
 private:
 #ifdef DEBUG
 	unsigned int tilesetTile;  /// tileset tile number
@@ -253,6 +257,10 @@ public:
 	CUnitCache UnitCache;      /// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
+
+private:
+	uint8_t ElevationLevel {0};		/// highground elevation level
+
 };
 
 extern PixelSize PixelTileSize; /// Size of a tile in pixels

@@ -413,6 +413,8 @@ void CFieldOfView::PrepareShadowCaster(const CPlayer &player, const CUnit &unit,
 {
 	Player 		= &player;
 	Unit 		= &unit;
+	/// TODO: maybe should set current level + 1 for units with 'elevated' flag (f.e. towers)
+	Elevation 	= Map.Field(pos.x, pos.y)->getElevation();
 	map_setFoV 	= marker;
 }
 
@@ -420,6 +422,7 @@ void CFieldOfView::ResetShadowCaster()
 {
 	Player 		= nullptr;
 	Unit 		= nullptr;
+	Elevation	= 0;
 	map_setFoV 	= nullptr;
 	currTilePos = { 0, 0 };
 
