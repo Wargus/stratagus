@@ -124,7 +124,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bo
 			tile += i;
 		}
 	}
-	mf.setTileIndex(*Map.Tileset, tile, 0);
+	mf.setTileIndex(*Map.Tileset, tile, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);

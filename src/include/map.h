@@ -351,11 +351,11 @@ extern void MapFixWallTile(const Vec2i &pos);
 // in script_map.cpp
 //
 /// Set a tile
-extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
-inline void SetTile(unsigned int tile, int x, int y, int value = 0)
+extern void SetTile(const unsigned int tile, const Vec2i &pos, const int value = 0, const int elevation = 0);
+inline void SetTile(unsigned int tile, int x, int y, int value = 0, int elevation = 0)
 {
 	const Vec2i pos(x, y);
-	SetTile(tile, pos, value);
+	SetTile(tile, pos, value, elevation);
 }
 
 /// register ccl features

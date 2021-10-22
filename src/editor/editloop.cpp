@@ -166,7 +166,7 @@ static void EditTile(const Vec2i &pos, int tile)
 		baseTileIndex = baseTileIndex / 16 * 16;
 	}
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
-	mf.setTileIndex(tileset, tileIndex, 0);
+	mf.setTileIndex(tileset, tileIndex, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -1839,7 +1839,7 @@ void CEditor::Init()
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
+			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0, 0);
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);

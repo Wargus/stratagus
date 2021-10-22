@@ -250,10 +250,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value, mf.getElevation());
 	} else {
 		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value, mf.getElevation());
 	}
 
 	UI.Minimap.UpdateXY(pos);

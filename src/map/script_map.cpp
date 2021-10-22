@@ -754,14 +754,22 @@ static int CclSetTileSize(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
+void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, const int elevation)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
-		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
+		fprintf(stderr, "Invalid map coordinates: (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
 	if (Map.Tileset->getTileCount() <= tileIndex) {
 		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
+		return;
+	}
+	if (value < 0 || value >= 256) {
+		fprintf(stderr, "Invalid tile value: %d\n", value);
+		return;
+	}
+	if (elevation < 0 || elevation >= 256) {
+		fprintf(stderr, "Invalid tile elevation level: %d\n", elevation);
 		return;
 	}
 
@@ -773,12 +781,12 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 			for (int i = 0; i < multiplier; i++) {
 				for (int j = 0; j < multiplier; j++) {
 					CMapField &mf = *Map.Field(Vec2i(pos.x + j, pos.y + i));
-					mf.setTileIndex(*Map.Tileset, tileIndex, value, subtile++);
+					mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation), subtile++);
 				}
 			}
 		} else {
 			CMapField &mf = *Map.Field(pos);
-			mf.setTileIndex(*Map.Tileset, tileIndex, value);
+			mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation));
 		}
 	}
 }
