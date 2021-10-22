@@ -975,9 +975,10 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.getFlag();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
+			mf.getElevation(),
 			mf.Value, flag,
-			flag & MapFieldOpaque       ? 'o' : '_',
+			flag & MapFieldOpaque       ? 'o' : '-',
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldNoBuilding   ? 'n' : '-',
 			flag & MapFieldHuman        ? 'h' : '-',
