@@ -1483,7 +1483,9 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		}
-
+		case 'g':
+			CViewport::EnableGrid(!CViewport::isGridEnabled());
+			break;
 		default:
 			HandleCommandKey(key);
 			return;
