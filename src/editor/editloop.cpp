@@ -900,14 +900,10 @@ static void DrawMapCursor()
 			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x * TileCursorSize, Map.Tileset->getPixelTileSize().y * TileCursorSize);
 			PopClipping();
 		} else {
-			// If there is an unit under the cursor, it's selection thing
-			//  is drawn somewhere else (Check DrawUnitSelection.)
-			if (UnitUnderCursor != NULL) {
-				PushClipping();
-				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
-				PopClipping();
-			}
+			PushClipping();
+			UI.MouseViewport->SetClipping();
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+			PopClipping();
 		}
 	}
 }
