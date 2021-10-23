@@ -32,7 +32,6 @@
 #define __VIDEO_H__
 
 //@{
-#include <functional>
 
 #include "SDL.h"
 #include "shaders.h"
