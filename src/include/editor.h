@@ -58,7 +58,8 @@ enum EditorStateType {
 	EditorSelecting,         /// Select
 	EditorEditTile,          /// Edit tiles
 	EditorEditUnit,          /// Edit units
-	EditorSetStartLocation   /// Set the start location
+	EditorSetStartLocation,  /// Set the start location
+	EditorElevationLevel	 /// Edit elevation levels
 };
 
 class CEditor
@@ -93,6 +94,9 @@ public:
 	int TileIndex;              /// tile icon draw index.
 	int CursorTileIndex;		/// tile icon under cursor.
 	int SelectedTileIndex;       /// tile type to draw.
+
+	uint8_t	HighlightElevationLevel {0};
+	uint8_t	SelectedElevationLevel {0};
 
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.

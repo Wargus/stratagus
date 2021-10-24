@@ -229,6 +229,15 @@ static void EditTiles(const Vec2i &pos, int tile, int size)
 	EditTilesInternal(mirror, tile, size);
 }
 
+/**
+**  Set map tile's elevation level
+**
+**  @param pos   map tile coordinate.
+**/
+static void EditorSetElevationLevel(const Vec2i &pos, const uint8_t elevation)
+{
+	Map.Field(pos)->setElevation(elevation);
+}
 /*----------------------------------------------------------------------------
 --  Actions
 ----------------------------------------------------------------------------*/
@@ -904,6 +913,9 @@ static void DrawMapCursor()
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+			if (Editor.State == EditorStateType::EditorElevationLevel) {
+				CLabel(GetGameFont()).DrawClip(screenPos.x + 2, screenPos.y + 1, Editor.SelectedElevationLevel);
+			}
 			PopClipping();
 		}
 	}
@@ -1318,6 +1330,9 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				GameCursor = UI.Cross.Cursor;
 				CursorState = CursorStateRectangle;
+			} else if (Editor.State == EditorStateType::EditorElevationLevel &&
+					  Editor.SelectedTileIndex != -1) {
+				EditorSetElevationLevel(tilePos, Editor.SelectedElevationLevel);
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1480,8 +1495,33 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		}
-		case 'g':
+		case 'g': // Toggle map grid
 			CViewport::EnableGrid(!CViewport::isGridEnabled());
+			break;
+		case '+': /// Increace brush's elevation level
+		case '=':
+			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel < 255) {
+				Editor.SelectedElevationLevel++;
+			}
+			break;
+		case '-': /// Decreace brush's elevation level
+			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel > 0) {
+				Editor.SelectedElevationLevel--;
+			}
+			break;
+		case '[': /// Increace highlighted elevation level
+			if (layersDropdown->getSelected() == EditorLayers::cElevation 
+				&& Editor.HighlightElevationLevel < 255) {
+				
+				Editor.HighlightElevationLevel++;
+			}
+			break;
+		case ']': /// Decreacehighlighted elevation level
+			if (layersDropdown->getSelected() == EditorLayers::cElevation 
+				&& Editor.HighlightElevationLevel > 0) {
+				
+				Editor.HighlightElevationLevel--;
+			}
 			break;
 		default:
 			HandleCommandKey(key);
@@ -1998,7 +2038,7 @@ void EditorMainLoop()
 	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
-	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
+	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units", "Elevation" };
 	gcn::ListModel *toolList = new StringListModel(toolListStrings);
 	toolDropdown = new gcn::DropDown(toolList);
 	LambdaActionListener *toolDropdownListener = new LambdaActionListener([&toolListStrings](const std::string&) {
@@ -2026,6 +2066,11 @@ void EditorMainLoop()
 				RecalculateShownUnits();
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
+				return;
+			case 4:
+				Editor.State = EditorElevationLevel;
+				editorSlider->setVisible(false);
+				Editor.SelectedElevationLevel = 0;
 				return;
 			default: {
 				std::string selectedString = toolListStrings[selected];
