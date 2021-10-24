@@ -72,6 +72,7 @@ extern void DrawGuichanWidgets();
 extern void CleanGame();
 extern void CreateGame(const std::string &filename, CMap *map);
 
+extern void DrawMapArea(const fieldHighlightChecker highlightChecker);
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -1028,7 +1029,7 @@ void EditorUpdateDisplay()
 {
 	ColorCycle();
 
-	DrawMapArea(); // draw the map area
+	DrawMapArea(Editor.LayerHighlighter); // draw the map area
 
 	DrawStartLocations();
 

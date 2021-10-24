@@ -36,6 +36,7 @@
 #include <string>
 #include <tuple>
 #include "icons.h"
+#include "viewport.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
 #endif
@@ -106,6 +107,7 @@ public:
 	int PopUpX;
 	int PopUpY;
 
+	fieldHighlightChecker LayerHighlighter {nullptr};
 };
 
 /*----------------------------------------------------------------------------

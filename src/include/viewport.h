@@ -34,6 +34,7 @@
 #include "fow.h"
 #include "vec2i.h"
 class CUnit;
+class CMapField;
 
 /**
 **  A map viewport.
@@ -60,6 +61,9 @@ class CUnit;
 **    Viewport is bound to a unit. If the unit moves the viewport
 **    changes the position together with the unit.
 */
+
+using fieldHighlightChecker = bool(*)(const CMapField&); // type alias
+
 class CViewport
 {
 public:
@@ -93,7 +97,7 @@ public:
 	void SetClipping() const;
 
 	/// Draw the full Viewport.
-	void Draw();
+	void Draw(const fieldHighlightChecker highlightChecker = nullptr);
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
@@ -128,7 +132,8 @@ private:
 	 * work, so the caller should pass this as a compile-time flag to select the
 	 * specialized variant of the method.
 	 */
-	template<bool graphicalTileIsLogicalTile> void DrawMapBackgroundInViewport() const;
+	template<bool graphicalTileIsLogicalTile> 
+	void DrawMapBackgroundInViewport(const fieldHighlightChecker highlightChecker = nullptr) const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar();
 	/// Adjust fog of war surface to viewport
