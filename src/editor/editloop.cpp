@@ -1369,8 +1369,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				GameCursor = UI.Cross.Cursor;
 				CursorState = CursorStateRectangle;
-			} else if (Editor.State == EditorStateType::EditorElevationLevel &&
-					  Editor.SelectedTileIndex != -1) {
+			} else if (Editor.State == EditorStateType::EditorElevationLevel) {
 				EditorSetElevationLevel(tilePos, Editor.SelectedElevationLevel);
 			}
 		} else if (MouseButtons & MiddleButton) {
