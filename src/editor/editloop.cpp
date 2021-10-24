@@ -116,6 +116,13 @@ enum EditorActionType {
 	EditorActionTypeRemoveUnit
 };
 
+enum EditorLayers {
+	cNone,
+	cUnpassable,
+	cNoBuildingAllowed,
+	cElevation,
+	cOpaque
+};
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
@@ -131,10 +138,10 @@ static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
-static gcn::Container *editorContainer;
-static gcn::Slider *editorSlider;
-static gcn::DropDown *toolDropdown;
-
+static gcn::Container	*editorContainer {nullptr};
+static gcn::Slider 		*editorSlider {nullptr};
+static gcn::DropDown	*toolDropdown {nullptr};
+static gcn::DropDown	*layersDropdown {nullptr};
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -847,6 +854,14 @@ static void DrawIntoButtonArea()
 	}
 }
 
+static void DrawInfoHighlightedLayer()
+{
+	if (layersDropdown->getSelected() == EditorLayers::cElevation) {
+		CLabel(GetGameFont()).Draw(layersDropdown->getX() + layersDropdown->getWidth() + 5, 2, 
+								   Editor.HighlightElevationLevel);
+	}
+}
+
 /**
 **  Draw the editor panels.
 */
@@ -854,6 +869,7 @@ static void DrawEditorPanel()
 {
 	DrawIntoSelectionArea();
 	DrawIntoButtonArea();
+	DrawInfoHighlightedLayer();
 }
 
 /**
@@ -1093,6 +1109,29 @@ void EditorUpdateDisplay()
 	// refresh entire screen, so no further invalidate needed
 	Invalidate();
 	RealizeVideoMemory();
+}
+
+/*----------------------------------------------------------------------------
+--  Highlight layers
+----------------------------------------------------------------------------*/
+static inline bool LayerElevation(const CMapField &mapField)
+{
+	return mapField.getElevation() == Editor.HighlightElevationLevel;
+}
+
+static inline bool LayerUnpassable(const CMapField &mapField)
+{
+	return mapField.getFlag() & MapFieldUnpassable;
+}
+
+static inline bool LayerNoBuildingAllowed(const CMapField &mapField)
+{
+	return mapField.getFlag() & MapFieldNoBuilding;
+}
+
+static inline bool LayerOpaque(const CMapField &mapField)
+{
+	return mapField.isOpaque();
 }
 
 /*----------------------------------------------------------------------------
@@ -1509,14 +1548,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.SelectedElevationLevel--;
 			}
 			break;
-		case '[': /// Increace highlighted elevation level
+		case ']': /// Increace highlighted elevation level
 			if (layersDropdown->getSelected() == EditorLayers::cElevation 
 				&& Editor.HighlightElevationLevel < 255) {
 				
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case ']': /// Decreacehighlighted elevation level
+		case '[': /// Decreacehighlighted elevation level
 			if (layersDropdown->getSelected() == EditorLayers::cElevation 
 				&& Editor.HighlightElevationLevel > 0) {
 				
@@ -2105,10 +2144,55 @@ void EditorMainLoop()
 	// toolDropdown->setFont(GetSmallFont());
 	if (UI.MenuButton.Y < toolDropdown->getHeight()) {
 		// menu button is up top, move the selection tool right
-		editorContainer->add(toolDropdown, UI.MenuButton.X + UI.MenuButton.Style->Width, 0);
+		editorContainer->add(toolDropdown, UI.MenuButton.X + UI.MenuButton.Style->Width + 10, 0);
 	} else {
 		editorContainer->add(toolDropdown, 0, 0);
 	}
+
+	std::vector<std::string> layersListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
+	gcn::ListModel *layersList = new StringListModel(layersListStrings);
+	layersDropdown = new gcn::DropDown(layersList);
+	LambdaActionListener *layersDropdownListener = new LambdaActionListener([&layersListStrings](const std::string&) {
+		const int selected = layersDropdown->getSelected();
+		switch (selected) {
+			case EditorLayers::cNone:
+				Editor.LayerHighlighter = nullptr;
+				return;
+			case EditorLayers::cUnpassable:
+				Editor.LayerHighlighter = LayerUnpassable;
+				return;
+			case EditorLayers::cNoBuildingAllowed:
+				Editor.LayerHighlighter = LayerNoBuildingAllowed;
+				return;
+			case EditorLayers::cElevation:
+				Editor.HighlightElevationLevel = 1;
+				Editor.LayerHighlighter = LayerElevation;
+				return;
+			case EditorLayers::cOpaque:
+				Editor.LayerHighlighter = LayerOpaque;
+				return;
+			default:
+				Editor.LayerHighlighter = nullptr;			
+				break;
+		}
+
+	});
+
+	int layersWidth = 0;
+	for (std::string &entry : layersListStrings) {
+		toolDropdown->getFont()->getWidth(entry);
+		layersWidth = std::max(layersWidth, toolDropdown->getFont()->getWidth(entry) + 20);
+	}
+
+	layersDropdown->setWidth(layersWidth);
+	layersDropdown->getScrollArea()->setWidth(layersWidth);
+	layersDropdown->getListBox()->setWidth(layersWidth);
+	
+	layersDropdown->setBaseColor(gcn::Color(38, 38, 78));
+	layersDropdown->setForegroundColor(gcn::Color(200, 200, 120));
+	layersDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
+	layersDropdown->addActionListener(layersDropdownListener);
+	editorContainer->add(layersDropdown, toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
 
 	UpdateMinimap = true;
 
@@ -2125,7 +2209,7 @@ void EditorMainLoop()
 			if (entry.rfind("--", 0) != std::string::npos) {
 				std::string e = entry.substr(2);
 				toolListStrings.push_back(e);
-				int strW = toolDropdown->getFont()->getWidth(e);
+				int strW = toolDropdown->getFont()->getWidth(e) + 20;
 				if (newW < strW) {
 					newW = strW;
 				}
@@ -2135,6 +2219,8 @@ void EditorMainLoop()
 		toolDropdown->setWidth(newW);
 		toolDropdown->getScrollArea()->setWidth(newW);
 		toolDropdown->getListBox()->setWidth(newW);
+
+		layersDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
@@ -2216,6 +2302,10 @@ void EditorMainLoop()
 	delete toolDropdown;
 	delete toolList;
 	delete toolDropdownListener;
+		
+	delete layersDropdown;
+	delete layersList;
+	delete layersDropdownListener;
 
 	delete editorContainer;
 	delete editorSliderListener;
