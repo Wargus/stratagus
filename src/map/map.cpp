@@ -130,31 +130,39 @@ void CMap::MarkSeenTile(CMapField &mf)
 /**
 **  Reveal the entire map.
 */
-void CMap::Reveal()
+void CMap::Reveal(const int mode /* = MapRevealModes::cKnown */ )
 {
-	//  Mark every explored tile as visible. 1 turns into 2.
-	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
-		CMapField &mf = *this->Field(i);
-		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
-		for (int p = 0; p < PlayerMax; ++p) {
-			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
-		}
-		MarkSeenTile(mf);
+	/// We can't do "unrevealing" yet
+	if (mode < GameSettings.RevealMap || mode >= MapRevealModes::cNumOfModes) {
+		return;
 	}
-	//  Global seen recount. Simple and effective.
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		//  Reveal neutral buildings. Gold mines:)
-		if (unit.Player->Type == PlayerNeutral) {
+
+	//  Mark every explored tile as visible. 1 turns into 2.
+	if (mode >= MapRevealModes::cExplored) {
+		for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
+			CMapField &mf = *this->Field(i);
+			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
-					UnitGoesOutOfFog(unit, Players[p]);
-					UnitGoesUnderFog(unit, Players[p]);
+				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+			}
+			MarkSeenTile(mf);
+		}
+	}
+
+	//  Global seen recount. Simple and effective.
+	for (CUnit *unit : UnitManager.GetUnits()) {
+		//  Reveal neutral buildings. Gold mines:)
+		if (unit->Player->Type == PlayerNeutral) {
+			for (const CPlayer &player : Players) {
+				if (player.Type != PlayerNobody && (!(unit->Seen.ByPlayer & (1 << player.Index )))) {
+					UnitGoesOutOfFog(*unit, player);
+					UnitGoesUnderFog(*unit, player);
 				}
 			}
 		}
-		UnitCountSeen(unit);
+		UnitCountSeen(*unit);
 	}
+	GameSettings.RevealMap = mode; 
 }
 
 /*----------------------------------------------------------------------------
@@ -336,11 +344,7 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	switch (FogOfWar.GetType()) {
-		case FogOfWarTypes::cLegacy:   InitLegacyFogOfWar(); break;
-		case FogOfWarTypes::cEnhanced: FogOfWar.Init(); break;
-		default: break;
-	}
+	FogOfWar.Init();
 	this->isMapInitialized = true;
 }
 
@@ -361,27 +365,16 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
 
-	FlagRevealMap = 0;
+	FlagRevealMap = MapRevealModes::cHidden;
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
 
 	FieldOfView.Clean();
 	
-	switch (FogOfWar.GetType()) {
-		case FogOfWarTypes::cLegacy:   
-			CleanLegacyFogOfWar(isHardClean); 
-			break;
-		case FogOfWarTypes::cEnhanced: 
-			if (FogOfWar.GetType() == FogOfWarTypes::cEnhanced) {
-				FogOfWar.Clean();
-				for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-					vp->Clean();
-				}
-			}
-			break;
-		default: 
-			break;
+	FogOfWar.Clean(isHardClean);
+	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
+		vp->Clean();
 	}
 
 	this->isMapInitialized = false;

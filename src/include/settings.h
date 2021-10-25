@@ -79,7 +79,7 @@ struct Settings {
 	int GameType;    /// Game type (melee, free for all,...)
 	bool NoFogOfWar; /// No fog of war
 	bool Inside;     /// If game uses interior tileset
-	int RevealMap;   /// Reveal map
+	int RevealMap;   /// Reveal map { cHidden = 0, cKnown,	cExplored };
 	int MapRichness; /// Map richness
 };
 
@@ -116,6 +116,9 @@ enum GameTypes {
 	SettingsGameTypeTeamCaptureTheFlag
 #endif
 };
+/// Map revealing modes: cHidden - unrevealed, cKnown - you can see unexplored tiles, but they are darker than explored
+/// cExplored - all tiles became explored, and covered only by the fog of war if it's enabled.
+enum MapRevealModes { cHidden = 0, cKnown, cExplored, cNumOfModes };
 
 /*----------------------------------------------------------------------------
 --  Variables

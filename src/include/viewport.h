@@ -81,6 +81,10 @@ public:
 	/// convert tilepos coordonates into screen (take the center of the tile)
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 
+	SDL_Surface* GetFogSurface() {
+		return this->FogSurface;
+	}
+
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);
 	/// Center map on point in viewport
@@ -122,12 +126,10 @@ private:
 	void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar();
-	void DrawLegacyFogOfWar() const;
-	void DrawEnhancedFogOfWar(const bool isSoftwareRender = true);
 	/// Adjust fog of war surface to viewport
 	void AdjustFogSurface();
-	/// Clean enhanced fog of war texture
-	void CleanEnhFog();
+	/// Clean fog of war texture
+	void CleanFog();
 
 public:
 	//private:
@@ -142,7 +144,7 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	SDL_Surface *EnhFogSurface { nullptr }; /// Texture for enhanced fog of war. Viewport sized.
+	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
 	static bool ShowGrid;
 
 };

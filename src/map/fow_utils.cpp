@@ -72,9 +72,6 @@ void CEasedTexture::Init(const uint16_t width, const uint16_t height, const uint
         frame.clear();
         frame.resize(TextureSize);
 
-        const size_t size = frame.size();
-        const uint8_t *ptr = frame.data();
-
         std::fill(frame.begin(), frame.end(), 0xFF);
     }
 
@@ -142,8 +139,6 @@ void CEasedTexture::PushNext(const bool forcedShowNext /*= false*/)
 */
 void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect)
 {
-    const uint16_t xEnd   = srcRect.x + srcRect.w;
-    
     size_t trgIndex     = y0 * trgWidth + x0;
     size_t textureIndex = srcRect.y * Width + srcRect.x;
    

@@ -53,22 +53,25 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-#define MINIMAP_FAC (16 * 3)  /// integer scale factor
-
+/// integer scale factor
+static constexpr int MINIMAP_FAC           {16 * 3};  
 /// unit attacked are shown red for at least this amount of cycles
-#define ATTACK_RED_DURATION (1 * CYCLES_PER_SECOND)
+static constexpr int ATTACK_RED_DURATION   {1 * CYCLES_PER_SECOND};
 /// unit attacked are shown blinking for this amount of cycles
-#define ATTACK_BLINK_DURATION (7 * CYCLES_PER_SECOND)
+static constexpr int ATTACK_BLINK_DURATION {7 * CYCLES_PER_SECOND};
 
-#define SCALE_PRECISION 100
+static constexpr int SCALE_PRECISION       {100};
+
+
 
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-SDL_Surface *MinimapSurface;        /// generated minimap
-SDL_Surface *MinimapTerrainSurface; /// generated minimap terrain
+SDL_Surface 	   *MinimapSurface{nullptr};        /// generated minimap
+static SDL_Surface *MinimapTerrainSurface{nullptr}; /// generated minimap terrain
+static SDL_Surface *MinimapFogSurface{nullptr};		/// generated minimap fog of war
 
 static int *Minimap2MapX;                  /// fast conversion table
 static int *Minimap2MapY;                  /// fast conversion table
@@ -138,10 +141,16 @@ void CMinimap::Create()
 	}
 
 	// Palette updated from UpdateMinimapTerrain()
-	SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
+	SDL_PixelFormat *f 	  = Map.TileGraphic->Surface->format;
 	MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
-	MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,  W, H, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0);
+	MinimapSurface 		  = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, 0);
+	MinimapFogSurface 	  = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, AMASK);
 
+    SDL_SetSurfaceBlendMode(MinimapFogSurface, SDL_BLENDMODE_BLEND);
+	
+	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
+	SDL_FillRect(MinimapFogSurface, NULL, fogColorSolid);
+	
 	UpdateTerrain();
 
 	NumMinimapEvents = 0;
@@ -208,6 +217,22 @@ void CMinimap::UpdateTerrain()
 
 		}
 	}
+}
+
+
+/** 
+** Set fog of war opacity (alpha chanel values) for different levels of visibility
+** 
+** @param explored  alpha channel value for explored tiles
+** @param revealed  alpha channel value for revealed tiles (when the map revealed)
+** @param unseen    alpha channel value for unseen tiles
+** 
+*/
+void CMinimap::SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen)
+{
+    this->Settings.FogExploredOpacity = explored;
+    this->Settings.FogRevealedOpacity = revealed;
+    this->Settings.FogUnseenOpacity   = unseen;
 }
 
 /**
@@ -361,41 +386,34 @@ void CMinimap::Update()
 		SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
 	}
 
-	int bpp;
-	bpp = MinimapSurface->format->BytesPerPixel;
-
 	//
 	// Draw the terrain
 	//
 	if (WithTerrain) {
 		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
 	}
+	const uint32_t fogColorSDL = FogOfWar.GetFogColorSDL();
+	if (!ReplayRevealMap) {
+		uint32_t *const minimapFog = static_cast<uint32_t *>(MinimapFogSurface->pixels);
+		size_t index = 0;
+		for (uint16_t my = 0; my < H; ++my) {
+			for (uint16_t mx = 0; mx < W; ++mx) {
 
-	Assert(SDL_MUSTLOCK(MinimapSurface) == 0);
-	Assert(SDL_MUSTLOCK(MinimapTerrainSurface) == 0);
-
-	for (int my = 0; my < H; ++my) {
-		for (int mx = 0; mx < W; ++mx) {
-			int visiontype; // 0 unexplored, 1 explored, >1 visible.
-
-			if (ReplayRevealMap) {
-				visiontype = 2;
-			} else {
 				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
-				visiontype = Map.Field(tilePos)->playerInfo.TeamVisibilityState(*ThisPlayer);
-			}
+				const uint8_t vis = FogOfWar.GetVisibilityForTile(tilePos); 
 
-			if (visiontype == 0 || (visiontype == 1 && ((mx & 1) != (my & 1)))) {
-				const int index = mx * bpp + my * MinimapSurface->pitch;
-				if (bpp == 2) {
-					*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-				} else {
-					*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
-				}
+				const uint32_t fogAlpha = vis == 0 ? (GameSettings.RevealMap ? Settings.FogRevealedOpacity : Settings.FogUnseenOpacity)
+											   	   : vis == 1 ? Settings.FogExploredOpacity 
+										   		   			  : Settings.FogVisibleOpacity;
+
+				minimapFog[index++] = fogColorSDL | (fogAlpha << ASHIFT);
 			}
 		}
+		/// Alpha blending the fog of war texture to minimap
+		/// TODO: switch to hardware rendering
+		const SDL_Rect fogRect {0, 0, W, H};
+		BlitSurfaceAlphaBlending_32bpp(MinimapFogSurface, &fogRect, MinimapSurface, &fogRect);
 	}
-
 	//
 	// Draw units on map
 	//
@@ -478,6 +496,10 @@ void CMinimap::Destroy()
 	if (MinimapSurface) {
 		VideoPaletteListRemove(MinimapSurface);
 		SDL_FreeSurface(MinimapSurface);
+		MinimapSurface = NULL;
+	}
+	if (MinimapFogSurface) {
+		SDL_FreeSurface(MinimapFogSurface);
 		MinimapSurface = NULL;
 	}
 	delete[] Minimap2MapX;

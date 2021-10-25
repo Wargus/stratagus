@@ -42,6 +42,52 @@
 
 class CFont;
 
+/// The SDL screen
+extern SDL_Window *TheWindow;
+extern SDL_Renderer *TheRenderer;
+extern SDL_Surface *TheScreen;
+extern SDL_Texture *TheTexture;
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define RSHIFT  16
+#define GSHIFT  8
+#define BSHIFT  0
+#define ASHIFT  24
+#define RMASK   0x00ff0000
+#define GMASK   0x0000ff00
+#define BMASK   0x000000ff
+#define AMASK   0xff000000
+#else
+#define RSHIFT  8
+#define GSHIFT  16
+#define BSHIFT  24
+#define ASHIFT  0
+#define RMASK   0x0000ff00
+#define GMASK   0x00ff0000
+#define BMASK   0xff000000
+#define AMASK   0x000000ff
+#endif
+
+using pixelModifier = uint32_t(*)(const uint32_t, const uint32_t, const uint32_t); // type alias
+
+/// Class for modifiers for custom pixel manipulations
+class PixelModifier
+{
+public:
+	/// This one returns srcRGB+A(modulated) only if srcA is present. Otherwise returns dstRGBA. 
+	/// Used to copy (without alpha modulating) those pixels which has alpha chanel values
+	static uint32_t CopyWithSrcAlphaKey(const uint32_t srcPixel, const uint32_t dstPixel, const uint32_t reqAlpha)
+	{
+		uint32_t srcAlpha = (srcPixel >> ASHIFT) & 0xFF;
+		if (srcAlpha) {
+			srcAlpha = (srcAlpha * reqAlpha) >> 8;
+			return (srcPixel - (srcPixel & AMASK)) + (srcAlpha << ASHIFT);
+		}
+		return dstPixel;
+	}
+	/// Add more modifiers here
+};
+
 class CGraphic : public gcn::Image
 {
 
@@ -61,25 +107,54 @@ protected:
 
 public:
 	// Draw
-	void DrawClip(int x, int y) const;
-	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
-	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
+	void DrawClip(int x, int y,
+				  SDL_Surface *surface = TheScreen) const;
+	void DrawSub(int gx, int gy, int w, int h, int x, int y,
+				 SDL_Surface *surface = TheScreen) const;
+
+	void DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
+					      pixelModifier modifier, 
+						  const uint32_t param,
+						  SDL_Surface *surface = TheScreen) const;
+
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y,
+					 SDL_Surface *surface = TheScreen) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-					  unsigned char alpha) const;
+					  unsigned char alpha,
+					  SDL_Surface *surface = TheScreen) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-						  unsigned char alpha) const;
+						  unsigned char alpha, 
+						  SDL_Surface *surface = TheScreen) const;
+
+	void DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
+							  pixelModifier modifier, 
+							  const uint32_t param,
+							  SDL_Surface *surface = TheScreen) const;
 
 	// Draw frame
-	void DrawFrame(unsigned frame, int x, int y) const;
-	void DrawFrameClip(unsigned frame, int x, int y) const;
-	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrame(unsigned frame, int x, int y,
+				   SDL_Surface *surface = TheScreen) const;
+	void DrawFrameClip(unsigned frame, int x, int y,
+					   SDL_Surface *surface = TheScreen) const;
+	void DrawFrameTrans(unsigned frame, int x, int y, int alpha,
+						SDL_Surface *surface = TheScreen) const;
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+							SDL_Surface *surface = TheScreen) const;
+
+	void DrawFrameClipCustomMod(unsigned frame, int x, int y, 
+								pixelModifier modifier, 
+								const uint32_t param,
+								SDL_Surface *surface = TheScreen) const;
 
 	// Draw frame flipped horizontally
-	void DrawFrameX(unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y) const;
-	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrameX(unsigned frame, int x, int y,
+					SDL_Surface *surface = TheScreen) const;
+	void DrawFrameClipX(unsigned frame, int x, int y,
+						SDL_Surface *surface = TheScreen) const;
+	void DrawFrameTransX(unsigned frame, int x, int y, int alpha,
+						 SDL_Surface *surface = TheScreen) const;
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
+							 SDL_Surface *surface = TheScreen) const;
 
 
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
@@ -129,8 +204,10 @@ protected:
 	}
 
 public:
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y,
+								   SDL_Surface *surface = TheScreen);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y,
+								  SDL_Surface *surface = TheScreen);
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
@@ -224,25 +301,6 @@ struct EventCallback {
 
 };
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-#define RSHIFT  16
-#define GSHIFT  8
-#define BSHIFT  0
-#define ASHIFT  24
-#define RMASK   0x00ff0000
-#define GMASK   0x0000ff00
-#define BMASK   0x000000ff
-#define AMASK   0xff000000
-#else
-#define RSHIFT  8
-#define GSHIFT  16
-#define BSHIFT  24
-#define ASHIFT  0
-#define RMASK   0x0000ff00
-#define GMASK   0x00ff0000
-#define BMASK   0xff000000
-#define AMASK   0x000000ff
-#endif
 
 class CVideo
 {
@@ -356,12 +414,6 @@ extern unsigned long SlowFrameCounter;
 /// Initialize Pixels[] for all players.
 /// (bring Players[] in sync with Pixels[])
 extern void SetPlayersPalette();
-
-/// The SDL screen
-extern SDL_Window *TheWindow;
-extern SDL_Renderer *TheRenderer;
-extern SDL_Surface *TheScreen;
-extern SDL_Texture *TheTexture;
 
 /// register lua function
 extern void VideoCclRegister();
@@ -489,6 +541,10 @@ extern void RestoreColorCyclingSurface();
 
 /// Does ColorCycling..
 extern void ColorCycle();
+
+/// Blit a surface into another with alpha blending
+extern void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect, 
+												 SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT = true);
 
 //@}
 

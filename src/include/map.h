@@ -31,6 +31,7 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
+#include "settings.h"
 //@{
 
 /*----------------------------------------------------------------------------
@@ -206,8 +207,8 @@ public:
 
 	/// Regenerate the forest.
 	void RegenerateForest();
-	/// Reveal the complete map, make everything known.
-	void Reveal();
+	/// Set map reveal mode: hidden/known/fully explored.
+	void Reveal(const int mode = MapRevealModes::cKnown);
 	/// Save the map.
 	void Save(CFile &file) const;
 
@@ -269,7 +270,6 @@ public:
 	CTileset *Tileset;          		/// tileset data
 	std::string TileModelsFileName; 	/// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     			/// graphic for all the tiles
-	static CGraphic *LegacyFogGraphic;  /// graphic for legacy fog of war
 	bool isMapInitialized { false };
 
 	CMapInfo Info;             			/// descriptive information
@@ -283,10 +283,6 @@ public:
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
-/// Contrast of fog of war
-extern int FogOfWarOpacity;
-/// fog of war color
-extern CColor FogOfWarColor;
 /// Forest regeneration
 extern int ForestRegeneration;
 /// Forest regeneration

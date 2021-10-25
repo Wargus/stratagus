@@ -446,7 +446,7 @@ void GameMainLoop()
 
 	GameCycle = 0;
 	CParticleManager::exit();
-	FlagRevealMap = 0;
+	FlagRevealMap = MapRevealModes::cHidden;
 	ReplayRevealMap = 0;
 	GamePaused = false;
 	GodMode = false;
