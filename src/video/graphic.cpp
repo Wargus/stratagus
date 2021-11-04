@@ -994,6 +994,58 @@ void CGraphic::SetOriginalSize()
 }
 
 /**
+**  Expand graphic set for certain number of frames
+**
+**  @param numOfFramesToAdd  Number of frames to add into the graphic set
+**  
+*/
+void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
+{
+
+	const uint16_t cols = GraphicWidth / Width;
+	GraphicHeight += Height * (numOfFramesToAdd / cols + (numOfFramesToAdd % cols == 0 ? 1 : 0));
+
+	const SDL_PixelFormat *pf = Surface->format;
+	const uint8_t bpp = Surface->format->BytesPerPixel;
+	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GraphicWidth, GraphicHeight, 
+													8 * bpp, 
+													pf->Rmask, 
+													pf->Gmask, 
+													pf->Bmask, 
+													pf->Amask);
+	uint32_t ckey;
+	const bool useckey = !SDL_GetColorKey(Surface, &ckey);
+	if (useckey) {
+		SDL_SetColorKey(newSurface, SDL_TRUE, ckey);
+	}
+
+	SDL_FillRect(newSurface, NULL, useckey ? ckey : 0);
+
+	/// Copy pixels
+	const uint8_t *src = static_cast<uint8_t*>(Surface->pixels);
+		  uint8_t *dst = static_cast<uint8_t*>(newSurface->pixels);
+	const size_t dataSize= Surface->pitch * Surface->h;
+	std::copy(src, &src[dataSize], dst);
+
+
+	if (bpp == 1) {
+		VideoPaletteListRemove(Surface);
+
+		const SDL_Palette *palette = Surface->format->palette;
+		SDL_SetPaletteColors(newSurface->format->palette, palette->colors, 0, palette->ncolors);
+
+		VideoPaletteListAdd(newSurface);
+	}
+
+	SDL_FreeSurface(Surface);
+	Surface = newSurface;
+
+	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
+
+	GenFramesMap();
+}
+
+/**
 **  Check if a pixel is transparent
 **
 **  @param x  X coordinate

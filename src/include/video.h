@@ -167,6 +167,7 @@ public:
 	void Flip();
 	void Resize(int w, int h);
 	void SetOriginalSize();
+	void ExpandFor(const uint16_t numOfFramesToAdd);
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow(int xOffset, int yOffset);
