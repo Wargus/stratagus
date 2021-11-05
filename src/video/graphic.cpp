@@ -1001,9 +1001,13 @@ void CGraphic::SetOriginalSize()
 */
 void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 {
+	Assert(numOfFramesToAdd > 0 && !Resized); /// We can't add frames into a resized graphic set
 
+	if (numOfFramesToAdd == 0) {
+		return;
+	}
 	const uint16_t cols = GraphicWidth / Width;
-	GraphicHeight += Height * (numOfFramesToAdd / cols + (numOfFramesToAdd % cols == 0 ? 1 : 0));
+	GraphicHeight += Height * ((numOfFramesToAdd - 1) / cols + 1);
 
 	const SDL_PixelFormat *pf = Surface->format;
 	const uint8_t bpp = Surface->format->BytesPerPixel;
