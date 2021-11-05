@@ -167,7 +167,7 @@ public:
 	void Flip();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	void ExpandFor(const uint16_t numOfFramesToAdd);
+	void AddFrames(const std::vector<SDL_Surface *> &frames);
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow(int xOffset, int yOffset);
@@ -182,6 +182,10 @@ public:
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
 
+private:
+	void ExpandFor(const uint16_t numOfFramesToAdd);
+
+public:
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface

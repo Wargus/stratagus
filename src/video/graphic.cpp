@@ -994,6 +994,26 @@ void CGraphic::SetOriginalSize()
 }
 
 /**
+**  Add additional frames to the end of this graphic set
+**
+**  @param frames  Vector of frame-sized SDL surfaces with frames to add
+**  
+*/
+void CGraphic::AddFrames(const std::vector<SDL_Surface *> &frames)
+{
+	Assert(!Resized); /// We can't add frames into a resized graphic set
+
+	uint16_t currFrame = this->NumFrames;
+	ExpandFor(frames.size());
+	
+	for (SDL_Surface *frame : frames) {
+		SDL_Rect dstRect {frame_map[currFrame].x, frame_map[currFrame].y, Width, Height};
+		SDL_BlitSurface(frame, NULL, Surface, &dstRect);
+		currFrame++;
+	}
+}
+
+/**
 **  Expand graphic set for certain number of frames
 **
 **  @param numOfFramesToAdd  Number of frames to add into the graphic set
