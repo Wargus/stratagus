@@ -1085,11 +1085,19 @@ static int CclGetUnits(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Get a player's units in rectangle box specified with 2 coordinates
 **
 **  @param l  Lua state.
 **
 **  @return   Array of units.
+**
+** Example:
+**
+** <div class="example"><code>circlePower = CreateUnit("unit-circle-of-power", 15, {59, 4})
+**		-- Get the units near the circle of power.
+**      unitsOnCircle = <strong>GetUnitsAroundUnit</strong>(circle,1,true)</code></div>
 */
 static int CclGetUnitsAroundUnit(lua_State *l)
 {
