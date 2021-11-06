@@ -242,7 +242,7 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 	if (GetFileContent(file, content) == false) {
 		return -1;
 	}
-	if ((file.rfind("stratagus.lua") != -1 || file.find("scripts/") != -1) && (file.rfind("-config.lua") == -1)) {
+	if (file.rfind("stratagus.lua") != -1) {
 		FileChecksums ^= fletcher32(content);
 		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.c_str() _C_ FileChecksums);
 	}
