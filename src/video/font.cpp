@@ -256,8 +256,8 @@ static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
 		utf8 |= (c & 0x3F);
 	}
 
-	int ascii = utf8_to_ascii(utf8);
-	utf8 = ascii;
+	//int ascii = utf8_to_ascii(utf8);
+	//utf8 = ascii;
 
 	return true;
 }
@@ -311,8 +311,8 @@ static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 		utf8 |= (c & 0x3F);
 	}
 	
-	int ascii = utf8_to_ascii(utf8);
-	utf8 = ascii;
+	//int ascii = utf8_to_ascii(utf8);
+	//utf8 = ascii;
 
 	return true;
 }
@@ -843,7 +843,8 @@ void CFont::MeasureWidths()
 		while (sp < gp) {
 			// Some accented glyphes are not perfectly aligned on the glyph grid (like ï or î ).
 			// So we need to do -1 to not compute width on the next glyph.
-			const unsigned char *lp = sp + (G->Width - 1); 
+			//const unsigned char *lp = sp + (G->Width - 1); 
+			const unsigned char *lp = sp + G->Width;
 
 			for (; sp < lp; --lp) {
 				if (*lp != ckey && *lp != 7) {
