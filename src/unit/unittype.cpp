@@ -650,17 +650,18 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	// Non-solid units can always be entered and they don't block anything
 	if (type.BoolFlag[NONSOLID_INDEX].value) {
 		if (type.Building) {
-			type.MovementMask = MapFieldLandUnit |
-								MapFieldSeaUnit |
-								MapFieldBuilding |
-								MapFieldCoastAllowed |
-								MapFieldWaterAllowed |
-								MapFieldNoBuilding |
-								MapFieldUnpassable;
 			if (type.BoolFlag[DECORATION_INDEX].value && type.MapDefaultStat.Variables[HP_INDEX].Max == 0) {
 				// special case, a decoration with no HP can always be built over
+				type.MovementMask = 0;
 				type.FieldFlags = 0;
 			} else {
+				type.MovementMask = MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding |
+					MapFieldCoastAllowed |
+					MapFieldWaterAllowed |
+					MapFieldNoBuilding |
+					MapFieldUnpassable;
 				type.FieldFlags = MapFieldNoBuilding;
 			}
 		} else {
