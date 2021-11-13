@@ -670,8 +670,10 @@ static int CclRemoveUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	unit->Remove(NULL);
-	LetUnitDie(*unit);
+	if (unit) {
+		unit->Remove(NULL);
+		LetUnitDie(*unit);
+	}
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -760,7 +762,9 @@ static int CclTransformUnit(lua_State *l)
 	lua_pushvalue(l, 2);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1, true);
+	if (unittype && targetUnit) {
+		CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1, true);
+	}
 	lua_pushvalue(l, 1);
 	return 1;
 }
