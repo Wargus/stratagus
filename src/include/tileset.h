@@ -197,6 +197,9 @@ private:
 	void parseSolid(lua_State *l);
 	void parseMixed(lua_State *l);
 	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
+
+	void parseTilesRange(lua_State *l, const uint16_t frstArgPos, std::vector<uint16_t> &tilesSet);
+
 public:
 	std::string Name;           /// Nice name to display
 	std::string ImageFile;      /// File containing image data
