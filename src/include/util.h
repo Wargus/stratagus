@@ -166,6 +166,25 @@ void aligned_free(void *block);
 
 std::string GetExecutablePath();
 
+
+/*----------------------------------------------------------------------------
+--  Ranges
+----------------------------------------------------------------------------*/
+namespace ranges
+{
+    template<typename Range, typename UnaryFunction>
+    UnaryFunction for_each(Range& range, UnaryFunction fn)
+    {
+        return std::for_each(begin(range), end(range), fn);
+    }
+	
+	template<typename Range, typename Value>
+	void fill(Range& range, const Value& value)
+	{
+		std::fill(begin(range), end(range), value);
+	}
+}
+
 //@}
 
 #endif /* __UTIL_H__ */
