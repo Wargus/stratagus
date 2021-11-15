@@ -79,10 +79,15 @@ static const char *MissileClassNames[] = {
 
 void MissileType::Load(lua_State *l)
 {
-	this->NumDirections = 1;
-	this->Flip = true;
-	// Ensure we don't divide by zero.
-	this->SplashFactor = 100;
+	if (this->G) {
+		// reload, just ensure no div by zero
+		this->NumDirections = this->NumDirections ? this->NumDirections : 1;
+		this->SplashFactor = this->SplashFactor ? this->SplashFactor : 100;
+	} else {
+		this->NumDirections = 1;
+		this->Flip = true;
+		this->SplashFactor = 100;
+	}
 
 	// Parse the arguments
 	std::string file;
