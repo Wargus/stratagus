@@ -45,6 +45,7 @@ error "Missing the <filesystem> header."
 #include <cstdlib>
 #include <cstdint>
 #include <string>
+#include <algorithm>
 
 /*----------------------------------------------------------------------------
 --  Random
