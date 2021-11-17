@@ -184,6 +184,12 @@ namespace ranges
 	{
 		std::fill(begin(range), end(range), value);
 	}
+
+	template<typename Range, typename Value>
+	void iota(Range& range, const Value value)
+	{
+		std::iota(begin(range), end(range), value);
+	}
 }
 
 //@}

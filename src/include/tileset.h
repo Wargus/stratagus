@@ -198,7 +198,7 @@ private:
 	void parseMixed(lua_State *l);
 	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
 
-	void parseTilesRange(lua_State *l, const uint16_t frstArgPos, std::vector<uint16_t> &tilesSet);
+	std::vector<uint16_t> parseTilesRange(lua_State *luaStack, const uint16_t frstArgPos);
 
 public:
 	std::string Name;           /// Nice name to display

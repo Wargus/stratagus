@@ -317,71 +317,80 @@ void CTileset::parseMixed(lua_State *l)
 	}
 }
 
-void CTileset::parseTilesRange(lua_State *l, const uint16_t frstArgPos, std::vector<uint16_t> &tilesSet)
+std::vector<uint16_t> CTileset::parseTilesRange(lua_State *luaStack, const uint16_t frstArgPos)
 {
-	const uint16_t argsNum = lua_rawlen(l, -1);
+	std::vector<uint16_t> resultSet;
 
-	if (lua_isnumber(l, -1)) { 
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+
+	if (lua_isnumber(luaStack, -1)) { 
 		/// tile|image
-		const uint16_t tileNumber = LuaToUnsignedNumber(l, -1);
-		tilesSet.push_back(tileNumber);
-	} else if (lua_istable(l, -1)) {
+		resultSet.push_back(LuaToUnsignedNumber(luaStack, -1));
+
+	} else if (lua_istable(luaStack, -1)) {
 		/**
 		{          tile|image[, tile|image] ...}
 		{["img", ]"slot", slot_num}
 		{["img", ]"range", from, to}
 		**/
-		lua_rawgeti(l, -1, frstArgPos);
-		if (lua_isnumber(l, -1)) { 
+		lua_rawgeti(luaStack, -1, frstArgPos);
+
+		if (lua_isnumber(luaStack, -1)) { 
 			/// {tile[, tile] ...}
-			lua_pop(l, 1);
+			lua_pop(luaStack, 1);
+			
 			for (uint16_t arg = frstArgPos; arg <= argsNum; arg++) {
-				const uint16_t tileNumber = LuaToUnsignedNumber(l, -1, arg);
-				tilesSet.push_back(tileNumber);
+				resultSet.push_back(LuaToUnsignedNumber(luaStack, -1, arg));
 			}
-		} else if (lua_isstring(l, -1)) {
-			lua_pop(l, 1);
+
+		} else if (lua_isstring(luaStack, -1)) {
+			lua_pop(luaStack, 1);
 
 			uint16_t arg = frstArgPos;
-			const char *rangeType = LuaToString(l, -1, frstArgPos);
+			const char *rangeType = LuaToString(luaStack, -1, frstArgPos);
 
 			if (!strcmp(rangeType, "slot")) { 
 				/// {"slot", slot_num}
 				if (argsNum != frstArgPos + 1) {
-					LuaError(l, "Tiles range: Wrong num of arguments in {\"slot\", slot_num} construct");	
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {\"slot\", slot_num} construct");
 				}
-				const uint16_t slotNum = LuaToUnsignedNumber(l, -1, ++arg);
-				
-				if (!(slotNum & uint16_t(0xF))) {
-					for (uint16_t i = 0; i < 16; i++) {
-						tilesSet.push_back(slotNum + i);
-					}
-				} else {
-					LuaError(l, "Tiles range: In {\"slot\", slot_num} construct \'slot_num\' must end with 0");		
+
+				const uint16_t slotNum = LuaToUnsignedNumber(luaStack, -1, ++arg);
+
+				if (slotNum & uint16_t(0xF)) {
+					LuaError(luaStack, "Tiles range: In {\"slot\", slot_num} construct \'slot_num\' must end with 0");
 				}
+
+				resultSet.resize(16);
+				ranges::iota(resultSet, slotNum); /// fill vector with incremented (slotNum++) values
+					
 			} else if (!strcmp(rangeType, "range")) {
 				/// {["img", ]"range", from, to}
 				if (argsNum != frstArgPos + 2) {
-					LuaError(l, "Tiles range: Wrong num of arguments in {[\"img\", ]\"range\", from, to} construct");	
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\", ]\"range\", from, to} construct");
 				}
-				const uint16_t rangeFrom = LuaToUnsignedNumber(l, -1, ++arg);
-				const uint16_t rangeTo   = LuaToUnsignedNumber(l, -1, ++arg);
+
+				const uint16_t rangeFrom = LuaToUnsignedNumber(luaStack, -1, ++arg);
+				const uint16_t rangeTo   = LuaToUnsignedNumber(luaStack, -1, ++arg);
 
 				if (rangeFrom >= rangeTo) {
-					LuaError(l, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");	
+					LuaError(luaStack, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
 				}
-				for (uint16_t tile = rangeFrom; tile <= rangeTo; tile++) {
-					tilesSet.push_back(tile);
-				}
+
+				resultSet.resize(rangeFrom - rangeTo + 1);
+				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
+
 			} else {
-				LuaError(l, "Tiles range: unsupported tag: %s" _C_ rangeType);
+				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType);
 			}
 		} else {
-			LuaError(l, "Unsupported tiles range format");
+			LuaError(luaStack, "Unsupported tiles range format");
 		}
 	} else {
-		LuaError(l, "Unsupported tiles range format");
+		LuaError(luaStack, "Unsupported tiles range format");
 	}
+	return resultSet;
+}
 }
 
 
