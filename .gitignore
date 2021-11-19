@@ -35,3 +35,4 @@ build
 .clangd
 compile_commands.json
 pytorchenv
+**/.DS_Store
