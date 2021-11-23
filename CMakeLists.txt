@@ -643,6 +643,11 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
+if(APPLE)
+list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
+endif()
+
+
 find_package(Lua51 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
