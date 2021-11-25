@@ -1562,7 +1562,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case '[': /// Decreacehighlighted elevation level
+		case '[': /// Decreace highlighted elevation level
 			if (layersDropdown->getSelected() == EditorLayers::cElevation 
 				&& Editor.HighlightElevationLevel > 0) {
 				
