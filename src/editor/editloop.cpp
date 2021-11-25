@@ -683,7 +683,7 @@ static void DrawUnitIcons()
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
  * iteration was requested.
  */
-static bool forEachTileOptionArea(std::function<bool(bool,std::string,int,int,int,int,int)> forEach) {
+static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,int,int,int)> forEach) {
 	int x1 = getSelectionArea()[0];
 	int y1 = getSelectionArea()[1];
 	int x2 = getSelectionArea()[2];
@@ -1672,7 +1672,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	int bx = UI.InfoPanel.X + 4;
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
-	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string label, int i, int x, int y, int w, int h) {
+	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string &label, int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 			ButtonUnderCursor = i + 300;
 			CursorOn = CursorOnButton;
