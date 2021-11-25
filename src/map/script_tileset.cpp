@@ -46,11 +46,11 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
+bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount)
 {
 	const struct {
 		const char *name;
-		unsigned int flag;
+		tile_flags flag;
 	} flags[] = {
 		{"opaque", MapFieldOpaque},
 		{"water", MapFieldWaterAllowed},
@@ -69,7 +69,8 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 		{"sea-unit", MapFieldSeaUnit},
 		{"building", MapFieldBuilding},
 		{"human", MapFieldHuman},
-		{"decorative", MapFieldDecorative}
+		{"decorative", MapFieldDecorative},
+		{"non-mixing", MapFieldNonMixing}
 	};
 
 	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
@@ -99,7 +100,7 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 		if (strlen(flagName) != subtileCount) {
 			return false;
 		}
-		uint64_t subtileFlags = 0;
+		tile_flags subtileFlags = 0;
 		for (int i = 0; i < subtileCount; i++) {
 			if (flagName[i] == 'u') {
 				subtileFlags |= (1 << i);
@@ -117,16 +118,15 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 **  Parse the flag section of a tile definition.
 **
 **  @param l     Lua state.
-**  @param back  pointer for the flags (return).
 **  @param j     pointer for the location in the array. in and out
 **
-**  @return      index for basename, if the name this tile should be available as a different basename, or 0
+**  @return     parsed set of flags
 **
 */
-int CTileset::parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j)
+tile_flags CTileset::parseTilesetTileFlags(lua_State *l, int *j)
 {
-	uint64_t flags = 3;
-	bool nonMixing = false;
+	tile_flags flags = 3;
+
 	//  Parse the list: flags of the slot
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
@@ -140,24 +140,14 @@ int CTileset::parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j)
 
 		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags, logicalTileToGraphicalTileMultiplier * logicalTileToGraphicalTileMultiplier) == false) {
-			if (!strcmp(value, "non-mixing")) {
-				nonMixing = true;
-			} else {
-				LuaError(l, "solid: unsupported tag: %s" _C_ value);
-			}
+			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}
 	}
-	*back = flags;
-
-	if (flags & MapFieldDecorative) {
-		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
-	} else {
-		if (nonMixing) {
-			// special flag - this isn't it's own name, but it doesn't mix
-			*back |= MapFieldDecorative;
-		}
-		return 0;
+	
+	if (flags & MapFieldNonMixing) {
+		flags |= MapFieldDecorative;
 	}
+	return flags;
 }
 
 /**
@@ -216,20 +206,23 @@ void CTileset::parseSpecial(lua_State *l)
 */
 void CTileset::parseSolid(lua_State *l)
 {
-	const int index = tiles.size();
+	const tile_index index = getTileCount();
 
-	this->tiles.resize(index + 16);
+	if (!increaseTileCountBy(16)) {
+		LuaError(l, "Number of tiles limit has been reached.");
+	}
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 
 	int j = 0;
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	uint64_t f = 0;
-	if (parseTilesetTileFlags(l, &f, &j)) {
-		LuaError(l, "cannot set a custom basename in the main set of flags");
+	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
+	
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(l, "cannot set a decorative flag / custom basename in the main set of flags");
 	}
 
 	//  Vector: the tiles.
@@ -244,13 +237,13 @@ void CTileset::parseSolid(lua_State *l)
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
 			int k = 0;
-			uint64_t tile_flag = 0;
-			unsigned char new_basename = parseTilesetTileFlags(l, &tile_flag, &k);
+			const tile_flags tile_flag = parseTilesetTileFlags(l, &k);
 			--j;
 			lua_pop(l, 1);
 			tiles[index + j].flag = tile_flag;
-			if (new_basename) {
-				tiles[index + j].tileinfo.BaseTerrain = new_basename;
+
+			if (tile_flag & MapFieldDecorative) {
+				tiles[index + j].tileinfo.BaseTerrain = addDecoTerrainType();
 			}
 			continue;
 		}
@@ -259,12 +252,14 @@ void CTileset::parseSolid(lua_State *l)
 
 		// ugly hack for sc tilesets, remove when fixed
 		if (j > 15) {
-			this->tiles.resize(index + j);
+			if (!increaseTileCountBy(j)) {
+				LuaError(l, "Number of tiles limit has been reached.");
+			}
 		}
 		CTile &tile = tiles[index + j];
 
 		tile.tile = pud;
-		tile.flag = f;
+		tile.flag = flagsCommon;
 		tile.tileinfo.BaseTerrain = basic_name;
 		tile.tileinfo.MixTerrain = 0;
 	}
@@ -278,22 +273,30 @@ void CTileset::parseSolid(lua_State *l)
 */
 void CTileset::parseMixed(lua_State *l)
 {
-	int index = tiles.size();
-	tiles.resize(index + 256);
+	tile_index index = getTileCount();
+
+	if (!increaseTileCountBy(256)) {
+		LuaError(l, "Number of tiles limit has been reached.");
+	}
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 	int j = 0;
 	const int args = lua_rawlen(l, -1);
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
-	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	uint64_t f = 0;
-	if (parseTilesetTileFlags(l, &f, &j)) {
-		LuaError(l, "cannot set a custom basename in the main set of flags");
+	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
+	
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(l, "cannot set a decorative flag / custom basename in the main set of flags");
 	}
 
 	for (; j < args; ++j) {
@@ -308,7 +311,7 @@ void CTileset::parseMixed(lua_State *l)
 			CTile &tile = tiles[index + i];
 
 			tile.tile = pud;
-			tile.flag = f;
+			tile.flag = flagsCommon;
 			tile.tileinfo.BaseTerrain = basic_name;
 			tile.tileinfo.MixTerrain = mixed_name;
 		}
@@ -519,19 +522,19 @@ void CTileset::parse(lua_State *l)
 void CTileset::buildTable(lua_State *l)
 {
 	//  Calculate number of tiles in graphic tile
-	const int n = tiles.size();
+	const size_t n = getTileCount();
 
 	mixedLookupTable.clear();
 	mixedLookupTable.resize(n, 0);
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
-	for (int i = 0; i < n; ++i) {
-		const int tile = tiles[i].tile;
+	for (auto &currTile : tiles) {		
+		const graphic_index tile = currTile.tile;
 		if (tile == 0) {
 			continue;
 		}
-		const unsigned flag = tiles[i].flag;
+		const tile_flags flag = currTile.flag;
 		if (flag & MapFieldWaterAllowed) {
 			TileTypeTable[tile] = TileTypeWater;
 		} else if (flag & MapFieldCoastAllowed) {
@@ -569,9 +572,9 @@ void CTileset::buildTable(lua_State *l)
 	}
 
 	//  Build wood removement table.
-	int solid = 0;
-	int mixed = 0;
-	for (int i = 0; i < n;) {
+	tile_index solid = 0;
+	tile_index mixed = 0;
+	for (size_t i = 0; i < n;) {
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
@@ -617,11 +620,11 @@ void CTileset::buildTable(lua_State *l)
 	//8 Top Left
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
-	for (int i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
+	for (size_t i = mixed; i < mixed + 256; ++i) {
+		int check = int((i - mixed) / 16);
 
 		switch (check) {
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
@@ -651,7 +654,7 @@ void CTileset::buildTable(lua_State *l)
 	//  Build rock removement table.
 	mixed = 0;
 	solid = 0;
-	for (int i = 0; i < n;) {
+	for (size_t i = 0; i < n;) {
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
@@ -675,11 +678,11 @@ void CTileset::buildTable(lua_State *l)
 	//2 Bottom Right
 	//4 Top Right
 	//8 Top Left
-	for (int i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
+	for (size_t i = mixed; i < mixed + 256; ++i) {
+		int check = int((i - mixed) / 16);
 		switch (check) {
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
 			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
@@ -767,7 +770,7 @@ void CTileset::buildWallReplacementTable()
 	// Set destroyed walls to TileTypeUnknown
 	for (int i = 0; i < 16; ++i) {
 		int n = 0;
-		unsigned int tileIndex = humanWallTable[i];
+		tile_index tileIndex = humanWallTable[i];
 		while (tiles[tileIndex].tile) { // Skip good tiles
 			++tileIndex;
 			++n;

@@ -191,9 +191,9 @@ public:
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
-	void setTileIndex(const CTileset &tileset, const unsigned int tileIndex, const int value, const uint8_t elevation, const int subtile = -1);
+	void setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile = -1);
 
-	unsigned int getGraphicTile() const { return tile; }
+	graphic_index getGraphicTile() const { return tile; }
 
 	/// Check if a field is opaque for field of view
 	bool isOpaque() const;
@@ -245,11 +245,11 @@ public:
 
 private:
 #ifdef DEBUG
-	unsigned int tilesetTile;  /// tileset tile number
+	tile_index tilesetTile;  /// tileset tile number
 #endif
-	unsigned short tile;       /// graphic tile number
+	graphic_index tile;       /// graphic tile number
 public:
-	unsigned int Flags;        /// field flags
+	tile_flags Flags;        /// field flags
 private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:

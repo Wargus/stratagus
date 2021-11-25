@@ -790,6 +790,7 @@ void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, co
 		}
 	}
 }
+}
 
 /**
 **  Define the type of each player available for the map
@@ -892,18 +893,17 @@ static int CclSetTileFlags(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "No flags defined");
 	}
-	const unsigned int tilenumber = LuaToNumber(l, 1);
+	const tile_index tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= Map.Tileset->tiles.size()) {
+	if (tilenumber >= Map.Tileset->getTileCount()) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
-	uint64_t flags = 0;
-
-	unsigned char newBase = Map.Tileset->parseTilesetTileFlags(l, &flags, &j);
+	const tile_flags flags {Map.Tileset->parseTilesetTileFlags(l, &j)};
 	Map.Tileset->tiles[tilenumber].flag = flags;
-	if (newBase) {
-		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = newBase;
+	
+	if (flags & MapFieldDecorative && !(flags & MapFieldNonMixing)) {
+		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = Map.Tileset->addDecoTerrainType();
 	}
 	return 0;
 }
@@ -923,9 +923,9 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	const int32_t index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	return 1;
@@ -949,7 +949,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		return 1;
 	}
 
-	unsigned short flag = 0;
+	tile_flags flag = 0;
 	const char *flag_name = LuaToString(l, 3);
 	if (!strcmp(flag_name, "opaque")) {
 		flag = MapFieldOpaque;

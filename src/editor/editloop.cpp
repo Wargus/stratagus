@@ -161,19 +161,21 @@ static void EditTile(const Vec2i &pos, int tile)
  	Assert(Map.Info.IsPointOnMap(pos));	
 
 	const CTileset &tileset = *Map.Tileset;
-	int baseTileIndex = tileset.findTileIndexByTile(tile);
+
 	CMapField &mf = *Map.Field(pos);
+	
+	int32_t baseTileIndex = tileset.findTileIndexByTile(tile);
 	if (baseTileIndex <= 0) {
 		// use the tile under the cursor and randomize *that* if it's
 		// not a mix tile
 		baseTileIndex = tileset.findTileIndexByTile(mf.getGraphicTile());
-		const int mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
+		const int32_t mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
 		if (mixTerrainIdx > 0) {
 			return;
 		}
 		baseTileIndex = baseTileIndex / 16 * 16;
 	}
-	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
+	const tile_index tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	mf.setTileIndex(tileset, tileIndex, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
@@ -1023,9 +1025,9 @@ static void DrawEditorInfo()
 	const CTileset &tileset = *Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
-	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
+	const terrain_typeIdx mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight(), buf);
@@ -1238,11 +1240,17 @@ static void EditorCallbackButtonDown(unsigned button)
 					if (TileToolNoFixup) {
 						Editor.ShownTileTypes.clear();
 						Editor.SelectedTileIndex = -1;
-						for (size_t i = 0; i < Map.Tileset->getTileCount(); i++) {
-							const CTileInfo &info = Map.Tileset->tiles[i].tileinfo;
-							if (Map.Tileset->tiles[i].tile) {
-								Editor.ShownTileTypes.push_back(Map.Tileset->tiles[i].tile);
+
+						tile_index index = 0;
+						for (auto &currTile : Map.Tileset->tiles) {
+							
+							/// FIXME: @tim, check pls why this line was added here with commit: 2da51da
+							const CTileInfo &info = currTile.tileinfo; 
+							
+							if (currTile.tile) {
+								Editor.ShownTileTypes.push_back(currTile.tile);
 							}
+							index++;
 						}
 					} else {
 						Editor.ShownTileTypes.clear();
@@ -1676,8 +1684,9 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
 			const int tile = Editor.ShownTileTypes[i];
-			const int tileindex = Map.Tileset->findTileIndexByTile(tile);
-			const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
+			const int32_t tileindex = Map.Tileset->findTileIndexByTile(tile);
+			Assert(tileindex != -1);
+			const terrain_typeIdx base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 			UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 			Editor.CursorTileIndex = i;
 			return false;

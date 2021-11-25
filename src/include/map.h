@@ -257,9 +257,9 @@ private:
 	void ClearRockTile(const Vec2i &pos);
 
 	/// Correct the surrounding seen wood fields
-	void FixNeighbors(unsigned short type, int seen, const Vec2i &pos);
+	void FixNeighbors(tile_flags type, int seen, const Vec2i &pos);
 	/// Correct the seen wood field, depending on the surrounding
-	void FixTile(unsigned short type, int seen, const Vec2i &pos);
+	void FixTile(tile_flags type, int seen, const Vec2i &pos);
 
 	/// Regenerate the forest.
 	void RegenerateForestTile(const Vec2i &pos);

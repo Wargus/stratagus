@@ -82,7 +82,7 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-void CMapField::setTileIndex(const CTileset &tileset, const unsigned int tileIndex, const int value, const uint8_t elevation, const int subtile /* = -1 */)
+void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile /* = -1 */)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
 	this->tile = tile.tile;

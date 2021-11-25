@@ -225,7 +225,16 @@ void CTileset::clear()
 	memset(orcWallTable, 0, sizeof(orcWallTable));
 }
 
-unsigned int CTileset::getDefaultTileIndex() const
+bool CTileset::setTileCount(const size_t newCount) 
+{
+	if (newCount < tiles.size() || newCount >= (1 << (sizeof(tile_index) * 8))) { 
+		return false; 
+	}
+	tiles.resize(newCount);
+	return true;
+}
+
+tile_index CTileset::getDefaultTileIndex() const
 {
 	const int n = tiles.size();
     int solid = 0;
@@ -246,20 +255,20 @@ unsigned int CTileset::getDefaultTileIndex() const
     return 0x50;
 }
 
-unsigned int CTileset::getDefaultWoodTileIndex() const
+tile_index CTileset::getDefaultWoodTileIndex() const
 {
-    const int n = tiles.size();
-    int solid = 0;
-    for (int i = 0; i < n;) {
+    const size_t n = getTileCount();
+    tile_index solid = 0;
+    for (size_t i = 0; i < n;) {
 	const CTile &tile = tiles[i];
 	const CTileInfo &tileinfo = tile.tileinfo;
 	if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
 	    i += 256;
 	} else {
 	    if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-		if (tile.flag & MapFieldForest) {
-		    solid = i;
-		}
+			if (tile.flag & MapFieldForest) {
+				solid = i;
+			}
 	    }
 	    i += 16;
 	}
@@ -267,7 +276,7 @@ unsigned int CTileset::getDefaultWoodTileIndex() const
     return solid;
 }
 
-bool CTileset::isAWallTile(unsigned tile) const
+bool CTileset::isAWallTile(tile_index tile) const
 {
 	if (TileTypeTable.empty() == false) {
 		return (TileTypeTable[tile] == TileTypeHumanWall
@@ -276,7 +285,7 @@ bool CTileset::isAWallTile(unsigned tile) const
 	return false;
 }
 
-bool CTileset::isARaceWallTile(unsigned tile, bool human) const
+bool CTileset::isARaceWallTile(tile_index tile, bool human) const
 {
 	if (TileTypeTable.empty() == false) {
 		if (human) {
@@ -289,14 +298,14 @@ bool CTileset::isARaceWallTile(unsigned tile, bool human) const
 }
 
 
-bool CTileset::isAWoodTile(unsigned tile) const
+bool CTileset::isAWoodTile(tile_index tile) const
 {
 	if (TileTypeTable.empty() == false) {
 		return TileTypeTable[tile] == TileTypeWood;
 	}
 	return false;
 }
-bool CTileset::isARockTile(unsigned tile) const
+bool CTileset::isARockTile(tile_index tile) const
 {
 	if (TileTypeTable.empty() == false) {
 		return TileTypeTable[tile] == TileTypeRock;
@@ -304,7 +313,7 @@ bool CTileset::isARockTile(unsigned tile) const
 	return false;
 }
 
-unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
+terrain_typeIdx CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 {
 	for (size_t i = 0; i != solidTerrainTypes.size(); ++i) {
 		if (solidTerrainTypes[i].TerrainName == name) {
@@ -312,27 +321,33 @@ unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 		}
 	}
 	// Can't find it, then we add another solid terrain type.
+	if (solidTerrainTypes.size() < (1 << (sizeof(terrain_typeIdx) * 8))) {
+		DebugPrint("CTile::solidTerrainTypes: Number of types limit exceeded.\n");
+		Assert(0);
+	}
+
 	SolidTerrainInfo s;
 	s.TerrainName = name;
 	solidTerrainTypes.push_back(s);
 	return solidTerrainTypes.size() - 1;
 }
 
-const std::string &CTileset::getTerrainName(int solidTerrainIndex) const
+const std::string &CTileset::getTerrainName(terrain_typeIdx solidTerrainIndex) const
 {
 	return solidTerrainTypes[solidTerrainIndex].TerrainName;
 }
 
-unsigned int CTileset::getSolidTerrainCount() const
+terrain_typeIdx CTileset::getSolidTerrainCount() const
 {
 	return solidTerrainTypes.size();
 }
 
-int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain) const
+int32_t CTileset::findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain) const
 {
 	const CTileInfo tileInfo(baseTerrain, mixTerrain);
 
-	for (size_t i = 0; i != tiles.size();) {
+	const size_t tilesCount = getTileCount();
+	for (size_t i = 0; i != tilesCount;) {
 		if (tiles[i].tileinfo == tileInfo) {
 			return i;
 		}
@@ -346,9 +361,9 @@ int CTileset::findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain)
 	return -1;
 }
 
-int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const
+int32_t CTileset::getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const
 {
-	int tileIndex = findTileIndex(baseTerrain, mixTerrain);
+	int32_t tileIndex = findTileIndex(baseTerrain, mixTerrain);
 	if (tileIndex == -1) {
 		tileIndex = findTileIndex(mixTerrain, baseTerrain);
 		if (tileIndex == -1) {
@@ -356,7 +371,7 @@ int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, 
 		}
 		std::swap(baseTerrain, mixTerrain);
 	}
-	int base = tileIndex;
+	tile_index base = tileIndex;
 
 	int direction = 0;
 	for (int i = 0; i != 4; ++i) {
@@ -378,9 +393,9 @@ int CTileset::getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, 
 **  @param marks   Already visited tile types.
 **  @param tileIndex    Tile pointer.
 */
-int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const
+int32_t CTileset::findTilePath(int base, int goal, int length, std::vector<char> &marks, tile_index *tileIndex) const
 {
-	int tileres = findTileIndex(base, goal);
+	int32_t tileres = findTileIndex(base, goal);
 	if (tileres == -1) {
 		tileres = findTileIndex(goal, base);
 	}
@@ -392,8 +407,9 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 		return TILE_PATH_MAX;
 	}
 	// Find any mixed tile
-	int l = TILE_PATH_MAX;
-	for (size_t i = 0; i != tiles.size();) {
+	int32_t l = TILE_PATH_MAX;
+	const size_t tilesCount = getTileCount();
+	for (size_t i = 0; i != tilesCount;) {
 		int j = 0;
 		if (base == tiles[i].tileinfo.BaseTerrain) {
 			j = tiles[i].tileinfo.MixTerrain;
@@ -402,7 +418,7 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 		}
 		if (j != 0 && marks[j] == 0) { // possible path found
 			marks[j] = j;
-			int dummytileIndex;
+			tile_index dummytileIndex;
 			const int n = findTilePath(j, goal, length + 1, marks, &dummytileIndex);
 			marks[j] = 0;
 			if (n < l) {
@@ -427,10 +443,10 @@ int CTileset::findTilePath(int base, int goal, int length, std::vector<char> &ma
 **  @param quad   Quad of the tile type.
 **  @return       Best matching tile.
 */
-int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
+tile_index CTileset::tileFromQuad(uint32_t fixed, uint32_t quad) const
 {
-	unsigned type1;
-	unsigned type2;
+	uint32_t type1;
+	uint32_t type2;
 
 	// Get tile type from fixed.
 	while (!(type1 = (fixed & 0xFF))) {
@@ -451,13 +467,13 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 			fixed >>= 8;
 		}
 		if (type1 == type2) { // Oooh a solid tile.
-			const int res = findTileIndex(type1);
+			const int32_t res = findTileIndex(type1);
 			Assert(res != -1);
 			return res;
 		}
 	} else {
 		std::vector<char> marks;
-		int dummytileIndex;
+		tile_index dummytileIndex;
 
 		marks.resize(getSolidTerrainCount(), 0);
 
@@ -466,7 +482,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 
 		// What fixed tile-type should replace the non useable tile-types.
 		for (int i = 0; i != 4; ++i) {
-			unsigned int type3 = (quad >> (8 * i)) & 0xFF;
+			uint32_t type3 = (quad >> (8 * i)) & 0xFF;
 			if (type3 != type1 && type3 != type2) {
 				quad &= ~(0xFF << (8 * i));
 				if (findTilePath(type1, type3, 0, marks, &dummytileIndex) < findTilePath(type2, fixed, 0, marks, &dummytileIndex)) {
@@ -479,17 +495,19 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	}
 
 	// Need a mixed tile
-	int tileIndex = getTileIndex(type1, type2, quad);
-	if (tileIndex != -1) {
-		return tileIndex;
+	const int32_t retIndex = getTileIndex(type1, type2, quad);
+	if (retIndex != -1) {
+		return retIndex;
 	}
 	// Find the best tile path.
 	std::vector<char> marks;
 	marks.resize(getSolidTerrainCount(), 0);
 	marks[type1] = type1;
+
+	tile_index tileIndex = 0;
 	if (findTilePath(type1, type2, 0, marks, &tileIndex) == TILE_PATH_MAX) {
 		DebugPrint("Huch, no mix found!!!!!!!!!!!\n");
-		const int res = findTileIndex(type1);
+		const int32_t res = findTileIndex(type1);
 		Assert(res != -1);
 		return res;
 	}
@@ -497,7 +515,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 		// Other mixed
 		std::swap(type1, type2);
 	}
-	int base = tileIndex;
+	tile_index base = tileIndex;
 	int direction = 0;
 	for (int i = 0; i != 4; ++i) {
 		if (((quad >> (8 * i)) & 0xFF) == type1) {
@@ -509,7 +527,7 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	return base | (table[direction] << 4);
 }
 
-int CTileset::getTileBySurrounding(unsigned short type,
+int CTileset::getTileBySurrounding(tile_flags type,
 								   int ttup, int ttright,
 								   int ttdown, int ttleft) const
 {
@@ -570,12 +588,14 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
 }
 
-int CTileset::findTileIndexByTile(unsigned int tile) const
+int32_t CTileset::findTileIndexByTile(graphic_index tile) const
 {
-	for (size_t i = 0; i != tiles.size(); ++i) {
-		if (tile == tiles[i].tile) {
-			return i;
+	tile_index index = 0;
+	for (auto &checkTile : tiles) {
+		if (tile == checkTile.tile) {
+			return index;
 		}
+		index++;
 	}
 	return -1;
 }
@@ -591,9 +611,9 @@ int CTileset::findTileIndexByTile(unsigned int tile) const
 **
 **  @todo  FIXME: Solid tiles are here still hardcoded.
 */
-unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
+tile_index CTileset::getTileNumber(tile_index basic, bool random, bool filler) const
 {
-	int tile = basic;
+	tile_index tile = basic;
 	if (random) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
@@ -643,13 +663,13 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 **  If the tile is 3/4 light grass and dark grass(0x06) in upper left corner
 **    the value is 0x06050505.
 */
-unsigned CTileset::getQuadFromTile(unsigned int tile) const
+uint32_t CTileset::getQuadFromTile(graphic_index tile) const
 {
-	const int tileIndex = findTileIndexByTile(tile);
+	const int32_t tileIndex = findTileIndexByTile(tile);
 	Assert(tileIndex != -1);
 
-	const unsigned base = tiles[tileIndex].tileinfo.BaseTerrain;
-	const unsigned mix = tiles[tileIndex].tileinfo.MixTerrain;
+	const uint32_t base = tiles[tileIndex].tileinfo.BaseTerrain;
+	const uint32_t mix = tiles[tileIndex].tileinfo.MixTerrain;
 
 	if (mix == 0) { // a solid tile
 		return base | (base << 8) | (base << 16) | (base << 24);
@@ -679,8 +699,8 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 {
 	std::vector<int> seen_types;
 	seen_types.resize(solidTerrainTypes.size(), 0);
-
-	for (size_t i = 16; i < tiles.size(); i++) {
+	const size_t tilesCount = getTileCount();
+	for (size_t i = 16; i < tilesCount; i++) {
 		const CTileInfo &info = tiles[i].tileinfo;
 		if (info.BaseTerrain && info.MixTerrain == 0) {
 			if (seen_types[info.BaseTerrain] == 0) {
@@ -691,7 +711,7 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 	}
 }
 
-unsigned CTileset::getWallDirection(int tileIndex, bool human) const
+unsigned CTileset::getWallDirection(tile_index tileIndex, bool human) const
 {
 	int i;
 	tileIndex &= 0xff0; // only the base indices are in the tables
@@ -702,16 +722,16 @@ unsigned CTileset::getWallDirection(int tileIndex, bool human) const
 	}
 	return 0;
 }
-unsigned CTileset::getHumanWallTileIndex(int dirFlag) const
+tile_index CTileset::getHumanWallTileIndex(int dirFlag) const
 {
 	return humanWallTable[dirFlag];
 }
-unsigned CTileset::getOrcWallTileIndex(int dirFlag) const
+tile_index CTileset::getOrcWallTileIndex(int dirFlag) const
 {
 	return orcWallTable[dirFlag];
 }
 
-static unsigned int NextSection(const CTileset &tileset, unsigned int tileIndex)
+static tile_index NextSection(const CTileset &tileset, tile_index tileIndex)
 {
 	while (tileset.tiles[tileIndex].tile) { // Skip good tiles
 		++tileIndex;
@@ -722,31 +742,31 @@ static unsigned int NextSection(const CTileset &tileset, unsigned int tileIndex)
 	return tileIndex;
 }
 
-unsigned CTileset::getHumanWallTileIndex_broken(int dirFlag) const
+tile_index CTileset::getHumanWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tileIndex = humanWallTable[dirFlag];
+	tile_index tileIndex = humanWallTable[dirFlag];
 	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
-unsigned CTileset::getOrcWallTileIndex_broken(int dirFlag) const
+tile_index CTileset::getOrcWallTileIndex_broken(int dirFlag) const
 {
-	unsigned tileIndex = orcWallTable[dirFlag];
+	tile_index tileIndex = orcWallTable[dirFlag];
 	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
-unsigned CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
+tile_index CTileset::getHumanWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tileIndex = humanWallTable[dirFlag];
+	tile_index tileIndex = humanWallTable[dirFlag];
 	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	tileIndex = NextSection(*this, tileIndex);
 	return tileIndex;
 }
-unsigned CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
+tile_index CTileset::getOrcWallTileIndex_destroyed(int dirFlag) const
 {
-	unsigned tileIndex = orcWallTable[dirFlag];
+	tile_index tileIndex = orcWallTable[dirFlag];
 	if (!tiles[tileIndex].tile) return 0;
 	tileIndex = NextSection(*this, tileIndex);
 	tileIndex = NextSection(*this, tileIndex);

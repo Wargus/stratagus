@@ -84,10 +84,10 @@ void ChangeTile(const Vec2i &pos, int tile)
 **  ab
 **  cd -> abcd
 */
-static unsigned QuadFromTile(const Vec2i &pos)
+static uint32_t QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	const int tile = Map.Field(pos)->getGraphicTile();
+	const graphic_index tile = Map.Field(pos)->getGraphicTile();
 	return Map.Tileset->getQuadFromTile(tile);
 }
 
