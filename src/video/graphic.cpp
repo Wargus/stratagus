@@ -418,7 +418,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned fra
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, int w, int h)
+CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 {
 	if (filename.empty()) {
 		return new CGraphic;
@@ -492,7 +492,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
+CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 {
 	CGraphic *g = new CGraphic;
 	if (!g) {

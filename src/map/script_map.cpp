@@ -869,6 +869,25 @@ static int CclDefineTileset(lua_State *l)
 	Map.TileGraphic->Load();
 	return 0;
 }
+
+/**
+**  Generate extended tiles (which is not represented in the original tilesets)
+**
+**  @param luaStack  Lua state.
+*/
+static int CclGenerateExtendedTileset(lua_State *luaStack)
+{
+	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic);
+	
+	if (!Map.Tileset->insertTiles(parser.getTiles())) {
+		LuaError(luaStack, "Tiles number limit exceeded.");
+	}
+	/// Add new graphic
+	Map.TileGraphic->AddFrames(parser.getGraphic());
+	
+	return 0;
+}
+
 /**
 ** Build tileset tables like humanWallTable or mixedLookupTable
 **
@@ -1061,6 +1080,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
+	lua_register(Lua, "GenerateExtendedTileset", CclGenerateExtendedTileset);
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 

@@ -234,6 +234,22 @@ bool CTileset::setTileCount(const size_t newCount)
 	return true;
 }
 
+bool CTileset::insertTiles(const std::map<tile_index, CTile> &newTiles)
+{
+	/// Resize tileset
+	const size_t newSize = newTiles.rbegin()->first + 1;
+	if (getTileCount() < newSize) {
+		if (!setTileCount(newSize)) {
+			return false;
+		}
+	}
+	/// Copy new tiles
+	for (auto &insertTile : newTiles) {
+		tiles[insertTile.first] = insertTile.second;
+	}
+	return true;
+}
+
 tile_index CTileset::getDefaultTileIndex() const
 {
 	const int n = tiles.size();

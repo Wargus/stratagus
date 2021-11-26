@@ -157,8 +157,8 @@ public:
 							 SDL_Surface *surface = TheScreen) const;
 
 
-	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
-	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
+	static CGraphic *ForceNew(const std::string &file, const int w = 0, const int h = 0);
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);

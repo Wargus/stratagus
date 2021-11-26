@@ -35,10 +35,13 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+#include "SDL_image.h"
 
+#include "video.h"
 #include "vec2i.h"
 #include <string>
 #include <vector>
+#include <map>
 
 struct lua_State;
 
@@ -144,6 +147,8 @@ public:
 	size_t getTileCount() const { return tiles.size(); }
 	bool setTileCount(const size_t newCount);
 	bool increaseTileCountBy(const size_t increaseBy) { return setTileCount(tiles.size() + increaseBy); }
+
+	bool CTileset::insertTiles(const std::map<tile_index, CTile> &newTiles);
 
 	tile_index getDefaultTileIndex() const;
 	tile_index getDefaultWoodTileIndex() const;
@@ -254,6 +259,57 @@ private:
 #endif
 };
 
+class CTilesetGraphicGenerator
+{
+public:
+	CTilesetGraphicGenerator(lua_State *luaStack, int &argPos, const CTileset *srcTileset,
+															   const CGraphic *srcGraphic,
+															   const CGraphic *srcImgGraphic);
+	SDL_Surface* get(const uint16_t imgNum);
+	uint16_t getIndex(const uint16_t imgNum);
+private:
+};
+
+
+class CTilesetParser
+{
+public:
+	enum slot_type {cSolid, cMixed, cUnsupported};
+	enum {cSlotType = 1, cSlotDefinition = 2};
+
+	/// Constructor for extended tileset generator
+	explicit CTilesetParser(lua_State *luaStack, CTileset *baseTileset, const CGraphic *baseGraphic) 
+							: BaseTileset(baseTileset), BaseGraphic(baseGraphic)
+	{
+		parseExtended(luaStack);
+	}
+	/// TODO: add constructor to parse base tileset (if we deside to move base tileset parser here)
+
+	~CTilesetParser()
+	{
+		ranges::for_each(ExtGraphic, SDL_FreeSurface);
+		if (SrcImgGraphic) {
+			CGraphic::Free(SrcImgGraphic);
+		}
+	}
+
+	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; };
+	const std::vector<SDL_Surface *> getGraphic() const { return ExtGraphic; };
+
+	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int frstArgPos);
+
+private:
+	void parseExtendedSlot(lua_State *luaStack, const slot_type slotType);
+	void parseExtendedSlots(lua_State *luaStack, int arg);
+	void parseExtended(lua_State *luaStack);
+
+private:
+	CTileset *BaseTileset {nullptr};
+	const CGraphic *BaseGraphic {nullptr};
+	CGraphic *SrcImgGraphic {nullptr};
+	std::vector<SDL_Surface *>  ExtGraphic;
+	std::map<tile_index, CTile> ExtTiles;
+};
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

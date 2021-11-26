@@ -34,9 +34,12 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+#include "SDL_image.h"
 
 #include "tileset.h"
 #include "tile.h"
+#include "map.h"
+#include "video.h"
 
 #include "script.h"
 #include <cstring>
@@ -319,83 +322,6 @@ void CTileset::parseMixed(lua_State *l)
 		lua_pop(l, 1);
 	}
 }
-
-std::vector<uint16_t> CTileset::parseTilesRange(lua_State *luaStack, const uint16_t frstArgPos)
-{
-	std::vector<uint16_t> resultSet;
-
-	const uint16_t argsNum = lua_rawlen(luaStack, -1);
-
-	if (lua_isnumber(luaStack, -1)) { 
-		/// tile|image
-		resultSet.push_back(LuaToUnsignedNumber(luaStack, -1));
-
-	} else if (lua_istable(luaStack, -1)) {
-		/**
-		{          tile|image[, tile|image] ...}
-		{["img", ]"slot", slot_num}
-		{["img", ]"range", from, to}
-		**/
-		lua_rawgeti(luaStack, -1, frstArgPos);
-
-		if (lua_isnumber(luaStack, -1)) { 
-			/// {tile[, tile] ...}
-			lua_pop(luaStack, 1);
-			
-			for (uint16_t arg = frstArgPos; arg <= argsNum; arg++) {
-				resultSet.push_back(LuaToUnsignedNumber(luaStack, -1, arg));
-			}
-
-		} else if (lua_isstring(luaStack, -1)) {
-			lua_pop(luaStack, 1);
-
-			uint16_t arg = frstArgPos;
-			const char *rangeType = LuaToString(luaStack, -1, frstArgPos);
-
-			if (!strcmp(rangeType, "slot")) { 
-				/// {"slot", slot_num}
-				if (argsNum != frstArgPos + 1) {
-					LuaError(luaStack, "Tiles range: Wrong num of arguments in {\"slot\", slot_num} construct");
-				}
-
-				const uint16_t slotNum = LuaToUnsignedNumber(luaStack, -1, ++arg);
-
-				if (slotNum & uint16_t(0xF)) {
-					LuaError(luaStack, "Tiles range: In {\"slot\", slot_num} construct \'slot_num\' must end with 0");
-				}
-
-				resultSet.resize(16);
-				ranges::iota(resultSet, slotNum); /// fill vector with incremented (slotNum++) values
-					
-			} else if (!strcmp(rangeType, "range")) {
-				/// {["img", ]"range", from, to}
-				if (argsNum != frstArgPos + 2) {
-					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\", ]\"range\", from, to} construct");
-				}
-
-				const uint16_t rangeFrom = LuaToUnsignedNumber(luaStack, -1, ++arg);
-				const uint16_t rangeTo   = LuaToUnsignedNumber(luaStack, -1, ++arg);
-
-				if (rangeFrom >= rangeTo) {
-					LuaError(luaStack, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
-				}
-
-				resultSet.resize(rangeFrom - rangeTo + 1);
-				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
-
-			} else {
-				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType);
-			}
-		} else {
-			LuaError(luaStack, "Unsupported tiles range format");
-		}
-	} else {
-		LuaError(luaStack, "Unsupported tiles range format");
-	}
-	return resultSet;
-}
-}
-
 
 /**
 **  Parse the slot part of a tileset definition
@@ -794,5 +720,233 @@ void CTileset::buildWallReplacementTable()
 		}
 	}
 }
+
+
+std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, const int frstArgPos)
+{
+	std::vector<tile_index> resultSet;
+
+	if (lua_isnumber(luaStack, -1)) { 
+		/// tile|image
+		resultSet.push_back(LuaToUnsignedNumber(luaStack, -1));
+
+	} else if (lua_istable(luaStack, -1)) {
+		/**
+		{          tile|image[, tile|image] ...}
+		{["img", ]"slot", slot_num}
+		{["img", ]"range", from, to}
+		**/
+		if (lua_rawlen(luaStack, -1) == 0) {
+			return resultSet;
+		}
+		
+		const uint16_t argsNum = lua_rawlen(luaStack, -1);
+		
+		lua_rawgeti(luaStack, -1, frstArgPos);
+
+		if (lua_isnumber(luaStack, -1)) { 
+			/// {tile[, tile] ...}
+			lua_pop(luaStack, 1);
+			
+			for (uint16_t arg = frstArgPos; arg <= argsNum; arg++) {
+				resultSet.push_back(LuaToUnsignedNumber(luaStack, -1, arg));
+			}
+
+		} else if (lua_isstring(luaStack, -1)) {
+			lua_pop(luaStack, 1);
+
+			int arg = frstArgPos;
+			const std::string rangeType {LuaToString(luaStack, -1, frstArgPos)};
+
+			if (rangeType == "slot") { 
+				/// {"slot", slot_num}
+				if (argsNum != frstArgPos + 1) {
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {\"slot\", slot_num} construct");
+				}
+
+				const tile_index slotNum = LuaToUnsignedNumber(luaStack, -1, ++arg);
+
+				if (slotNum & tile_index(0xF)) {
+					LuaError(luaStack, "Tiles range: In {\"slot\", slot_num} construct \'slot_num\' must end with 0");
+				}
+
+				resultSet.resize(16);
+				ranges::iota(resultSet, slotNum); /// fill vector with incremented (slotNum++) values
+					
+			} else if (rangeType == "range") {
+				/// {["img", ]"range", from, to}
+				if (argsNum != frstArgPos + 2) {
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\", ]\"range\", from, to} construct");
+				}
+
+				const tile_index rangeFrom = LuaToUnsignedNumber(luaStack, -1, ++arg);
+				const tile_index rangeTo   = LuaToUnsignedNumber(luaStack, -1, ++arg);
+
+				if (rangeFrom >= rangeTo) {
+					LuaError(luaStack, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
+				}
+
+				resultSet.resize(rangeFrom - rangeTo + 1);
+				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
+
+			} else {
+				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType);
+			}
+		} else {
+			LuaError(luaStack, "Unsupported tiles range format");
+		}
+	} else {
+		LuaError(luaStack, "Unsupported tiles range format");
+	}
+	return resultSet;
+}
+
+/**
+	{"terrain-name", ["terrain-name",]  [list-of-flags-for-all-tiles-of-this-slot,]
+		{ dst_tile,                      ["img", src_image_frame] | src_tile, {list-of-flags-for-this-range}},
+		{{dst_tiles_range/set},          {{src_image_frames_range/set|src_tiles_range/set},
+										  {src_image_frames_range/set|src_tiles_range/set},
+										  {src_image_frames_range/set|src_tiles_range/set}}, {list-of-flags-for-this-range}}
+	}
+**/
+void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slotType)
+{
+	enum { cBase = 0, cMixed = 1 };
+
+	terrain_typeIdx terrainNameIdx[2] {0, 0};
+
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+	int arg = 1;
+
+	/// parse terrain name/names
+	if (slotType == cSolid) {
+		terrainNameIdx[cBase]  = BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
+	} else if (slotType == cMixed) {
+		terrainNameIdx[cBase]  =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
+		terrainNameIdx[cMixed] =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, ++arg));
+	} else {
+		LuaError(luaStack, "Slots: unsupported slot type: %d" _C_ slotType);
+	}
+	if (BaseTileset->getTerrainName(terrainNameIdx[cBase]) == "unused") {
+		return;
+	}
+	/// parse the flags that are common to every tiles in the slot
+	const tile_flags flagsCommon = BaseTileset->parseTilesetTileFlags(luaStack, &arg);
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(luaStack, "cannot set a decorative flag / custom basename in the main set of flags");
+	}
+
+	while (arg < argsNum) {
+		lua_rawgeti(luaStack, -1, ++arg);
+		if (!lua_istable(luaStack, -1)) {
+			LuaError(luaStack, "incorrect argument");
+		}
+		int tableArg = 1;
+		std::vector<tile_index> dstTileIndexes = parseTilesRange(luaStack, tableArg);
+
+		/// load src-graphic-genetator
+		CTilesetGraphicGenerator srcGraphic(luaStack, tableArg, BaseTileset, BaseGraphic, SrcImgGraphic);
+
+		tile_flags flagsAdditional = 0;
+		terrain_typeIdx baseTerrain = terrainNameIdx[cBase];
+
+		if (tableArg < lua_rawlen(luaStack, -1)) {
+			tableArg++;
+			flagsAdditional = CTileset::parseTilesetTileFlags(luaStack, &tableArg);
+			if (flagsAdditional & MapFieldDecorative) {
+				baseTerrain = BaseTileset->addDecoTerrainType();
+			}
+		}
+	
+		tile_index srcIndex = 0;
+		for (tile_index &dstIndex: dstTileIndexes) {
+			/// add new graphic tile into tileGraphic if needed
+			SDL_Surface *graphic = srcGraphic.get(srcIndex);
+			if (graphic) {
+				ExtGraphic.push_back(graphic);
+			}
+			CTile newTile;
+			newTile.tile = graphic ? ExtGraphic.size() - 1 + BaseGraphic->NumFrames
+								   : srcGraphic.getIndex(srcIndex);
+			newTile.flag = flagsCommon | flagsAdditional;
+			newTile.tileinfo.BaseTerrain = baseTerrain;
+			newTile.tileinfo.MixTerrain  = terrainNameIdx[cMixed];
+			
+			ExtTiles.insert({dstIndex, newTile});
+
+			srcIndex++;
+		}
+		lua_pop(luaStack, 1);
+	}
+}
+
+void CTilesetParser::parseExtendedSlots(lua_State *luaStack, int arg)
+{
+	enum { cSlotType = 1, cSlotDefinition = 2 };
+
+	const uint16_t slotsNum = lua_rawlen(luaStack, arg) / 2; // "slot_type", {slot_definitions}
+
+	for (int slot = 0; slot < slotsNum; slot++) {
+		const uint16_t slotPos0 = slot * 2;
+		const std::string slotType { LuaToString(luaStack, arg, slotPos0 + cSlotType) };
+		const slot_type typeIdx = [&slotType]() {	if (slotType == "solid") return cSolid;
+													else if (slotType == "mixed") return cMixed;
+													else return cUnsupported;
+												}();
+		lua_rawgeti(luaStack, arg, slotPos0 + cSlotDefinition);
+		parseExtendedSlot(luaStack, typeIdx);
+		lua_pop(luaStack, 1);
+	}
+}
+
+/**
+**  Parse the extended tileset definition with graphic generation 
+**
+**  @param luaStack        	Lua state.
+**
+**  "image", "path-to-image/image.png", 
+**  "slots", {
+**    "solid", {"terrain-name", [list-of-flags-for-all-tiles-of-this-slot,]
+**              {dst_tile,                      {["img", src_image_frame] | src_tile}, {list-of-flags-for-this-range}}
+**              {{dst_tiles_range/set},         {src_image_frames_range/set|src_tiles_range/set}, {list-of-flags-for-this-range}}
+**
+**              -- destination:
+**              {dst_tile,
+**              {{"set", tile, tile, ...},
+**              {{"slot", slot_num},            -- f.e. {"slot", 0x1010} - put src continuously to slot 0x101[0..15] until there is a src (up to 16, if less then fill slot with 0 for absent srcs)
+**              {{"range", from, to}, 
+**                    
+**                                              -- source:
+**                                              ["img"], image|tile
+**                                              {         "slot", slot_num}                     -- f.e. {"slot", 0x0430} - to take continuously from slot 0x0430
+**                                              {["img",] "range", from, to}                    -- if "img" then from frame to frame. Otherwise from tile to tile.
+**                                              {["img",] image|tile[, image|tile]...}}         -- if "img" then frames, otherwise tiles.
+**                                              {{{source} [,{"do_something", parameter}...] }, -- layer 1
+**                                               {source}, -- layer 2
+**                                               {source}} -- layer n
+*/
+
+void CTilesetParser::parseExtended(lua_State *luaStack)
+{
+	const int argsNum = lua_gettop(luaStack);
+	for (int arg = 1; arg <= argsNum; ++arg) {
+		const std::string value {LuaToString(luaStack, arg)};
+
+		if (value == "image") {
+			const std::string imageFile = LuaToString(luaStack, ++arg);
+			SrcImgGraphic = CGraphic::New(imageFile, BaseTileset->getPixelTileSize().x, 
+													 BaseTileset->getPixelTileSize().y);
+			SrcImgGraphic->Load();
+
+		} else if (value == "slots") {
+			if (!lua_istable(luaStack, ++arg)) {
+				LuaError(luaStack, "incorrect argument");
+			}
+			parseExtendedSlots(luaStack, arg);
+		} else {
+			LuaError(luaStack, "Unsupported tag: %s" _C_ value);
+		}
+	}
+}	
 
 //@}
