@@ -186,9 +186,9 @@ namespace ranges
 	}
 
 	template<typename Range, typename Value>
-	void iota(Range& range, const Value value)
+	void iota(Range& range, const Value startValue)
 	{
-		std::iota(begin(range), end(range), value);
+		std::iota(begin(range), end(range), startValue);
 	}
 }
 
