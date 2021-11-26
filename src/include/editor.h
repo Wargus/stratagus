@@ -111,7 +111,7 @@ public:
 	int PopUpX;
 	int PopUpY;
 
-	fieldHighlightChecker LayerHighlighter {nullptr};
+	fieldHighlightChecker OverlayHighlighter {nullptr};
 };
 
 /*----------------------------------------------------------------------------

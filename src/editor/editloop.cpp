@@ -116,7 +116,7 @@ enum EditorActionType {
 	EditorActionTypeRemoveUnit
 };
 
-enum EditorLayers {
+enum EditorOverlays {
 	cNone,
 	cUnpassable,
 	cNoBuildingAllowed,
@@ -141,7 +141,7 @@ extern gcn::Gui *Gui;
 static gcn::Container	*editorContainer {nullptr};
 static gcn::Slider 		*editorSlider {nullptr};
 static gcn::DropDown	*toolDropdown {nullptr};
-static gcn::DropDown	*layersDropdown {nullptr};
+static gcn::DropDown	*overlaysDropdown {nullptr};
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -856,10 +856,10 @@ static void DrawIntoButtonArea()
 	}
 }
 
-static void DrawInfoHighlightedLayer()
+static void DrawInfoHighlightedOverlay()
 {
-	if (layersDropdown->getSelected() == EditorLayers::cElevation) {
-		CLabel(GetGameFont()).Draw(layersDropdown->getX() + layersDropdown->getWidth() + 5, 2, 
+	if (overlaysDropdown->getSelected() == EditorOverlays::cElevation) {
+		CLabel(GetGameFont()).Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5, 2, 
 								   Editor.HighlightElevationLevel);
 	}
 }
@@ -871,7 +871,7 @@ static void DrawEditorPanel()
 {
 	DrawIntoSelectionArea();
 	DrawIntoButtonArea();
-	DrawInfoHighlightedLayer();
+	DrawInfoHighlightedOverlay();
 }
 
 /**
@@ -1059,7 +1059,7 @@ void EditorUpdateDisplay()
 {
 	ColorCycle();
 
-	DrawMapArea(Editor.LayerHighlighter); // draw the map area
+	DrawMapArea(Editor.OverlayHighlighter); // draw the map area
 
 	DrawStartLocations();
 
@@ -1116,22 +1116,22 @@ void EditorUpdateDisplay()
 /*----------------------------------------------------------------------------
 --  Highlight layers
 ----------------------------------------------------------------------------*/
-static inline bool LayerElevation(const CMapField &mapField)
+static inline bool OverlayElevation(const CMapField &mapField)
 {
 	return mapField.getElevation() == Editor.HighlightElevationLevel;
 }
 
-static inline bool LayerUnpassable(const CMapField &mapField)
+static inline bool OverlayUnpassable(const CMapField &mapField)
 {
 	return mapField.getFlag() & MapFieldUnpassable;
 }
 
-static inline bool LayerNoBuildingAllowed(const CMapField &mapField)
+static inline bool OverlayNoBuildingAllowed(const CMapField &mapField)
 {
 	return mapField.getFlag() & MapFieldNoBuilding;
 }
 
-static inline bool LayerOpaque(const CMapField &mapField)
+static inline bool OverlayOpaque(const CMapField &mapField)
 {
 	return mapField.isOpaque();
 }
@@ -1556,14 +1556,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		case ']': /// Increace highlighted elevation level
-			if (layersDropdown->getSelected() == EditorLayers::cElevation 
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
 				&& Editor.HighlightElevationLevel < 255) {
 				
 				Editor.HighlightElevationLevel++;
 			}
 			break;
 		case '[': /// Decreace highlighted elevation level
-			if (layersDropdown->getSelected() == EditorLayers::cElevation 
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
 				&& Editor.HighlightElevationLevel > 0) {
 				
 				Editor.HighlightElevationLevel--;
@@ -2157,50 +2157,50 @@ void EditorMainLoop()
 		editorContainer->add(toolDropdown, 0, 0);
 	}
 
-	std::vector<std::string> layersListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
-	gcn::ListModel *layersList = new StringListModel(layersListStrings);
-	layersDropdown = new gcn::DropDown(layersList);
-	LambdaActionListener *layersDropdownListener = new LambdaActionListener([&layersListStrings](const std::string&) {
-		const int selected = layersDropdown->getSelected();
+	std::vector<std::string> overlaysListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
+	gcn::ListModel *overlaysList = new StringListModel(overlaysListStrings);
+	overlaysDropdown = new gcn::DropDown(overlaysList);
+	LambdaActionListener *overlaysDropdownListener = new LambdaActionListener([&overlaysListStrings](const std::string&) {
+		const int selected = overlaysDropdown->getSelected();
 		switch (selected) {
-			case EditorLayers::cNone:
-				Editor.LayerHighlighter = nullptr;
+			case EditorOverlays::cNone:
+				Editor.OverlayHighlighter = nullptr;
 				return;
-			case EditorLayers::cUnpassable:
-				Editor.LayerHighlighter = LayerUnpassable;
+			case EditorOverlays::cUnpassable:
+				Editor.OverlayHighlighter = OverlayUnpassable;
 				return;
-			case EditorLayers::cNoBuildingAllowed:
-				Editor.LayerHighlighter = LayerNoBuildingAllowed;
+			case EditorOverlays::cNoBuildingAllowed:
+				Editor.OverlayHighlighter = OverlayNoBuildingAllowed;
 				return;
-			case EditorLayers::cElevation:
+			case EditorOverlays::cElevation:
 				Editor.HighlightElevationLevel = 1;
-				Editor.LayerHighlighter = LayerElevation;
+				Editor.OverlayHighlighter = OverlayElevation;
 				return;
-			case EditorLayers::cOpaque:
-				Editor.LayerHighlighter = LayerOpaque;
+			case EditorOverlays::cOpaque:
+				Editor.OverlayHighlighter = OverlayOpaque;
 				return;
 			default:
-				Editor.LayerHighlighter = nullptr;			
+				Editor.OverlayHighlighter = nullptr;			
 				break;
 		}
 
 	});
 
-	int layersWidth = 0;
-	for (std::string &entry : layersListStrings) {
+	int overlaysWidth = 0;
+	for (std::string &entry : overlaysListStrings) {
 		toolDropdown->getFont()->getWidth(entry);
-		layersWidth = std::max(layersWidth, toolDropdown->getFont()->getWidth(entry) + 20);
+		overlaysWidth = std::max(overlaysWidth, toolDropdown->getFont()->getWidth(entry) + 20);
 	}
 
-	layersDropdown->setWidth(layersWidth);
-	layersDropdown->getScrollArea()->setWidth(layersWidth);
-	layersDropdown->getListBox()->setWidth(layersWidth);
+	overlaysDropdown->setWidth(overlaysWidth);
+	overlaysDropdown->getScrollArea()->setWidth(overlaysWidth);
+	overlaysDropdown->getListBox()->setWidth(overlaysWidth);
 	
-	layersDropdown->setBaseColor(gcn::Color(38, 38, 78));
-	layersDropdown->setForegroundColor(gcn::Color(200, 200, 120));
-	layersDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
-	layersDropdown->addActionListener(layersDropdownListener);
-	editorContainer->add(layersDropdown, toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
+	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
+	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));
+	overlaysDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
+	overlaysDropdown->addActionListener(overlaysDropdownListener);
+	editorContainer->add(overlaysDropdown, toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
 
 	UpdateMinimap = true;
 
@@ -2228,7 +2228,7 @@ void EditorMainLoop()
 		toolDropdown->getScrollArea()->setWidth(newW);
 		toolDropdown->getListBox()->setWidth(newW);
 
-		layersDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
+		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
@@ -2311,9 +2311,9 @@ void EditorMainLoop()
 	delete toolList;
 	delete toolDropdownListener;
 		
-	delete layersDropdown;
-	delete layersList;
-	delete layersDropdownListener;
+	delete overlaysDropdown;
+	delete overlaysList;
+	delete overlaysDropdownListener;
 
 	delete editorContainer;
 	delete editorSliderListener;
