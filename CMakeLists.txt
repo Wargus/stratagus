@@ -39,8 +39,15 @@ set(STRATAGUS_PATCH_LEVEL 3)
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
 
+###############################
+# Build vendored dependencies #
+###############################
+# Build lua 5.1
+option(BUILD_VENDORED_LUA OFF)
+###############################
+
 project(stratagus)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.9)
 cmake_policy(VERSION 3.10..3.20.2)
 
 # useful for clangd LSP server
@@ -647,13 +654,30 @@ if(APPLE)
 list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
 endif()
 
+include(ExternalProject)
+if(BUILD_VENDORED_LUA)
+  ExternalProject_Add( Lua51B
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/lua-5.1.5/
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/lua/"
+    INSTALL_COMMAND ""
+  )
 
-find_package(Lua51 REQUIRED)
+  set(Lua51_FOUND true)
+  set(LUA_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/liblua51.a")
+  set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/")
+  set(TOLUA++_FOUND true)
+  set(TOLUA++_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/lua-5.1.5/toluapp/include/)
+  set(TOLUA++_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/libtoluapp51.a")
+  set(TOLUA++_APP "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/toluapp")
+else()
+  find_package(Lua51 REQUIRED)
+  find_package(Tolua++ REQUIRED)
+endif()
+
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(SDL2_image REQUIRED)
-find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(OpenMP)
 
@@ -1108,6 +1132,10 @@ endif()
 if(APPLE)
   set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${SDL2main_LIBRARY}")
   set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
+endif()
+
+if(BUILD_VENDORED_LUA)
+  add_dependencies(stratagus Lua51B)
 endif()
 
 ########### next target ###############
