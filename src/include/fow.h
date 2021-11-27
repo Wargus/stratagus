@@ -44,7 +44,7 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-enum class FogOfWarTypes { cLegacy, cEnhanced, cNumOfTypes };  /// Types of the fog of war
+enum class FogOfWarTypes { cTiled, cEnhanced, cTiledLegacy, cNumOfTypes };  /// Types of the fog of war
 class CFogOfWar
 {
 public:
@@ -57,14 +57,14 @@ public:
     enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
 
-    static void SetLegacyFogGraphic(const std::string &fogGraphicFile);
+    static void SetTiledFogGraphic(const std::string &fogGraphicFile);
 
     void Init();
     void Clean(const bool isHardClean = false);
     bool SetType(const FogOfWarTypes fowType);
     void SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
-    FogOfWarTypes GetType()       const { return Settings.FOW_Type; }
+    FogOfWarTypes GetType()       const { return Settings.Type; }
     
     CColor   GetFogColor()        const { return Settings.FogColor; }
     uint32_t GetFogColorSDL()     const { return Settings.FogColorSDL; }
@@ -88,7 +88,7 @@ public:
     uint8_t GetVisibilityForTile(const Vec2i tilePos) const;
 
 private:
-    void InitEnhancedFogOfWar();
+    void InitEnhanced();
     void DrawEnhanced(CViewport &viewport);
 
     void GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo);
@@ -106,25 +106,26 @@ private:
     void UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const int16_t srcWidth,
                        SDL_Surface *const trgSurface, const SDL_Rect &trgRect) const;
 
-    void InitLegacyFogOfWar();
-    void CleanLegacyFogOfWar(const bool isHardClean = false);
+    void InitTiled();
+    void CleanTiled(const bool isHardClean = false);
 
     void DrawFullShroudOfFog(const int16_t x, const int16_t y, const uint8_t alpha, 
                              SDL_Surface *const vpFogSurface);
-    void GetFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+    void GetFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
                          int *fogTile, int *blackFogTile) const;
     bool IsMapFieldExplored(const size_t index) const { return (VisTable[index] != 0); }
     bool IsMapFieldVisible(const size_t index)  const { return (VisTable[index]  > 1); }
-    void DrawFogOfWarTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+    void DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
                           const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface);
-    void DrawLegacy(CViewport &viewport);
+    void DrawTiled(CViewport &viewport);
+    void DrawTiledLegacy(CViewport &viewport);
     
 public:
 
 private:
     struct FogOfWarSettings 
 	{
-		FogOfWarTypes FOW_Type         {FogOfWarTypes::cEnhanced}; /// Type of fog of war - legacy or enhanced(smooth)
+		FogOfWarTypes Type             {FogOfWarTypes::cEnhanced}; /// Type of fog of war - tiled or enhanced(smooth)
         uint8_t       NumOfEasingSteps {8};                        /// Number of the texture easing steps
         float         BlurRadius[2]    {2.0, 1.5};                 /// Radiuses or standard deviation
         uint8_t       BlurIterations   {3};                        /// Number of blur iterations
@@ -142,13 +143,14 @@ private:
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
 
-    static CGraphic *LegacyFogGraphic;          /// Graphic for legacy fog of war
-    CGraphic *LegacyAlphaFogG {nullptr};        /// Working set of graphic for legacy fog of war with alpha channel
+    static CGraphic *TiledFogSrc;           /// Graphic for tiled fog of war
+    CGraphic *TiledAlphaFog {nullptr};      /// Working set of graphic for tiled fog of war with alpha channel
+    SDL_Surface *TileOfFogOnly {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
     
     /**
     **  Mapping for fog of war tiles.
     */
-    const int LegacyFogTable[16] = {0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0};
+    const int TiledFogTable[16] = {0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0};
 
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
     size_t               VisTable_Index0 {0}; /// index in the vision table for [0:0] map tile

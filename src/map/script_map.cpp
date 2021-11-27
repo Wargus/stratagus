@@ -327,8 +327,8 @@ static int CclSetFieldOfViewType(lua_State *l)
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "shadow-casting")) {
 		new_type = FieldOfViewTypes::cShadowCasting;
-		/// Legacy type of FOW doesn't work with shadow casting
-		if (FogOfWar.GetType() == FogOfWarTypes::cLegacy) {
+		/// Tiled type of FOW doesn't work with shadow casting
+		if (FogOfWar.GetType() != FogOfWarTypes::cEnhanced) {
 			FogOfWar.SetType(FogOfWarTypes::cEnhanced);
 		}	
 	} else if (!strcmp(type_name, "simple-radial")) {
@@ -464,10 +464,10 @@ static int CclSetFogOfWarType(lua_State *l)
 	LuaCheckArgs(l, 1);
 	
 	FogOfWarTypes new_type;
-	const char *type_name = LuaToString(l, 1);
-	if (!strcmp(type_name, "legacy")) {
-		new_type = FogOfWarTypes::cLegacy;
-		/// Legacy type of FOW doesn't work with shadow casting
+	const std::string type_name {LuaToString(l, 1)};
+	if (type_name == "tiled" || type_name == "fast") {
+		new_type = type_name == "tiled" ? FogOfWarTypes::cTiled : FogOfWarTypes::cTiledLegacy;
+		/// Tiled type of FOW doesn't work with shadow casting
 		if (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting) {
 			if (!IsNetworkGame()) {
 				FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
@@ -476,11 +476,11 @@ static int CclSetFogOfWarType(lua_State *l)
 										   int(FieldOfViewTypes::cSimpleRadial), 0, 0, 0, 0);
 			}
 		}
-	} else if (!strcmp(type_name, "enhanced")) {
+	} else if (type_name == "enhanced") {
 		new_type = FogOfWarTypes::cEnhanced;
 	} else {
 		PrintFunction();
-		fprintf(stdout, "Accessible Fog of War types: \"legacy\", \"enhanced\".\n");
+		fprintf(stdout, "Accessible Fog of War types: \"tiled\", \"enhanced\" and \"fast\".\n");
 		return 1;
 	}
 	FogOfWar.SetType(new_type);
@@ -659,7 +659,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
-	CFogOfWar::SetLegacyFogGraphic(FogGraphicFile);
+	CFogOfWar::SetTiledFogGraphic(FogGraphicFile);
 
 	return 0;
 }
