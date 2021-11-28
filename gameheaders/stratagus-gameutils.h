@@ -181,16 +181,16 @@ wchar_t *GetExtractionLogPath(const wchar_t *game_name, const wchar_t *data_path
     wchar_t logname[MAX_PATH];
     wcscpy(logname, game_name);
     wcscat(logname, L"-extraction.log");
-    if (PathCombine(marker, data_path, L"portable-install")) {
-        if (PathFileExists(marker)) {
-            PathCombine(marker, data_path, logname);
+    if (PathCombineW(marker, data_path, L"portable-install")) {
+        if (PathFileExistsW(marker)) {
+            PathCombineW(marker, data_path, logname);
             return marker;
         }
     }
-    SHGetFolderPath(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
-    PathAppend(marker, L"Stratagus");
+    SHGetFolderPathW(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
+    PathAppendW(marker, L"Stratagus");
     mkdir_p(marker);
-    PathAppend(marker, logname);
+    PathAppendW(marker, logname);
     return marker;
 }
 #endif
