@@ -128,6 +128,10 @@ void mkdir_p(const char *path)
 {
 	fs::create_directories(path);
 }
+void mkdir_p(const wchar_t *path)
+{
+    fs::create_directories(path);
+}
 
 void copy_dir(fs::path source_folder, fs::path target_folder)
 {
@@ -149,23 +153,45 @@ void copy_dir(fs::path source_folder, fs::path target_folder)
 char *GetExtractionLogPath(const char *game_name, char *data_path)
 {
     static char *marker = (char *)calloc(MAX_PATH, sizeof(char));
-	if (marker[0] != '\0') {
-		return marker;
-	}
-	char logname[MAX_PATH];
-	strcpy(logname, game_name);
-	strcat(logname, "-extraction.log");
-	if (PathCombine(marker, data_path, "portable-install")) {
-		if (PathFileExists(marker)) {
-			PathCombine(marker, data_path, logname);
-			return marker;
-		}
-	}
+    if (marker[0] != '\0') {
+        return marker;
+    }
+    char logname[MAX_PATH];
+    strcpy(logname, game_name);
+    strcat(logname, "-extraction.log");
+    if (PathCombineA(marker, data_path, "portable-install")) {
+        if (PathFileExistsA(marker)) {
+            PathCombineA(marker, data_path, logname);
+            return marker;
+        }
+    }
     SHGetFolderPathA(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
-	PathAppend(marker, "Stratagus");
-	mkdir_p(marker);
-	PathAppend(marker, logname);
-	return marker;
+    PathAppendA(marker, "Stratagus");
+    mkdir_p(marker);
+    PathAppendA(marker, logname);
+    return marker;
+}
+
+wchar_t *GetExtractionLogPath(const wchar_t *game_name, const wchar_t *data_path)
+{
+    static wchar_t *marker = (wchar_t *)calloc(MAX_PATH, sizeof(wchar_t));
+    if (marker[0] != '\0') {
+        return marker;
+    }
+    wchar_t logname[MAX_PATH];
+    wcscpy(logname, game_name);
+    wcscat(logname, L"-extraction.log");
+    if (PathCombine(marker, data_path, L"portable-install")) {
+        if (PathFileExists(marker)) {
+            PathCombine(marker, data_path, logname);
+            return marker;
+        }
+    }
+    SHGetFolderPath(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
+    PathAppend(marker, L"Stratagus");
+    mkdir_p(marker);
+    PathAppend(marker, logname);
+    return marker;
 }
 #endif
 
