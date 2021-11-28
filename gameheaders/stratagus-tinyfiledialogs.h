@@ -178,6 +178,11 @@ char *tinyfd_colorChooser(
 /************ WINDOWS ONLY SECTION ************************/
 #ifdef _WIN32
 
+static int detectPresence(char const *const aExecutable)
+{
+    return 0;
+}
+
 /* windows only - utf-16 version */
 int tinyfd_notifyPopupW(
     wchar_t const *aTitle,  /* NULL or L"" */
@@ -2922,12 +2927,12 @@ char *tinyfd_inputBox(
             if (tinyfd_winUtf8) { writeUtf8(aMessage); }
             else { printf("%s", aMessage); }
             printf("\n");
-		}
+        }
         printf("(ctrl-Z + enter to cancel): ");
         if (! aDefaultInput) {
             (void) GetConsoleMode(hStdin, &mode);
             (void) SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
-        }
+		}
         if (tinyfd_winUtf8) {
             lConsoleHandle = GetStdHandle(STD_INPUT_HANDLE);
             (void) ReadConsoleW(lConsoleHandle, lBuffW, MAX_PATH_OR_CMD, &lNum, NULL);
@@ -5559,7 +5564,7 @@ char *tinyfd_saveFileDialog(
                 strcat(lDialogString, "initialfile='") ;
                 strcat(lDialogString, lString) ;
                 strcat(lDialogString, "',") ;
-			}
+            }
         }
         if ((aNumOfFilterPatterns > 1)
             || ((aNumOfFilterPatterns == 1)  /* test because poor osx behaviour */
@@ -5574,7 +5579,7 @@ char *tinyfd_saveFileDialog(
                 strcat(lDialogString, "'") ;
                 strcat(lDialogString, aFilterPatterns[i]) ;
                 strcat(lDialogString, "',") ;
-            }
+			}
             strcat(lDialogString, ")),") ;
             strcat(lDialogString, "('All files','*'))") ;
 		}
@@ -5972,13 +5977,13 @@ char *tinyfd_openFileDialog(
             if (strlen(lString)) {
                 strcat(lDialogString, "initialdir='") ;
                 strcat(lDialogString, lString) ;
-				strcat(lDialogString, "',") ;
-			}
+                strcat(lDialogString, "',") ;
+            }
             getLastName(lString, aDefaultPathAndFile) ;
             if (strlen(lString)) {
                 strcat(lDialogString, "initialfile='") ;
                 strcat(lDialogString, lString) ;
-                strcat(lDialogString, "',") ;
+				strcat(lDialogString, "',") ;
 			}
         }
         if ((aNumOfFilterPatterns > 1)
@@ -5994,7 +5999,7 @@ char *tinyfd_openFileDialog(
                 strcat(lDialogString, "'") ;
                 strcat(lDialogString, aFilterPatterns[i]) ;
                 strcat(lDialogString, "',") ;
-            }
+			}
             strcat(lDialogString, ")),") ;
             strcat(lDialogString, "('All files','*'))") ;
         }
