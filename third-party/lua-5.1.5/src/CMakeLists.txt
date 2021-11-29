@@ -45,9 +45,16 @@ set_target_properties(lua51_static PROPERTIES OUTPUT_NAME "lua51")
 
 add_executable(lua51 "${LUA_SRC}" "${LUA_LIB_SRC}")
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
 if(UNIX)
-target_compile_definitions(lua51_static PUBLIC "LUA_USE_DLOPEN")
-target_compile_definitions(lua51 PUBLIC "LUA_USE_DLOPEN")
+target_compile_definitions(lua51_static PUBLIC "LUA_USE_DLOPEN" "LUA_USE_MKSTEMP")
+target_compile_definitions(lua51 PUBLIC "LUA_USE_DLOPEN" "LUA_USE_MKSTEMP")
 target_link_libraries(lua51 PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(lua51_static PUBLIC ${CMAKE_DL_LIBS})
 endif()
