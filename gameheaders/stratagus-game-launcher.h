@@ -616,34 +616,37 @@ int main(int argc, char * argv[]) {
 	// Try to use stratagus.exe from data (install) directory first
 	sprintf(stratagus_bin, "%s\\stratagus.exe", data_path);
 	if (stat(stratagus_bin, &st) != 0) {
-		// If no local stratagus.exe is present, look for a globally installed version
-		DWORD stratagus_path_size = sizeof(stratagus_path);
-		memset(stratagus_path, 0, stratagus_path_size);
-		HKEY key;
+		// If no local stratagus.exe is present, search PATH
+		if (!SearchPath(NULL, "stratagus", ".exe", MAX_PATH, stratagus_bin, NULL)) {
+			// If no local or PATH stratagus.exe is present, look for a globally installed version
+			DWORD stratagus_path_size = sizeof(stratagus_path);
+			memset(stratagus_path, 0, stratagus_path_size);
+			HKEY key;
 
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
-			if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
-				if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
-					char msg[BUFF_SIZE * 2] = {'\0'};
-					strcat(msg, STRATAGUS_NOT_FOUND);
-					strcat(msg, " (expected globally installed or in ");
-					strcat(msg, stratagus_bin);
-					strcat(msg, ")");
-					error(TITLE, msg);
+			if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
+				if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
+					if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
+						char msg[BUFF_SIZE * 2] = {'\0'};
+						strcat(msg, STRATAGUS_NOT_FOUND);
+						strcat(msg, " (expected globally installed or in ");
+						strcat(msg, stratagus_bin);
+						strcat(msg, ")");
+						error(TITLE, msg);
+					}
 				}
+				RegCloseKey(key);
 			}
-			RegCloseKey(key);
-		}
 
-		if (_chdir(stratagus_path) != 0) {
-			char msg[BUFF_SIZE * 2] = {'\0'};
-			strcat(msg, STRATAGUS_NOT_FOUND);
-			strcat(msg, " (registry key found, but directory ");
-			strcat(msg, stratagus_path);
-			strcat(msg, " cannot be opened)");
-			error(TITLE, msg);
+			if (_chdir(stratagus_path) != 0) {
+				char msg[BUFF_SIZE * 2] = {'\0'};
+				strcat(msg, STRATAGUS_NOT_FOUND);
+				strcat(msg, " (registry key found, but directory ");
+				strcat(msg, stratagus_path);
+				strcat(msg, " cannot be opened)");
+				error(TITLE, msg);
+			}
+			sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 		}
-		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
 
 #ifdef DATA_PATH
