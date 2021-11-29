@@ -2169,6 +2169,20 @@ void InitLua()
 		lua_call(Lua, 1, 0);
 #endif
 	}
+#ifdef DEBUG
+	static const char* mobdebug =
+#include "./lua/mobdebug.h"
+;
+	int status = luaL_loadbuffer(Lua, mobdebug, strlen(mobdebug), "mobdebug.lua");
+	if (!status) {
+		status = LuaCall(0, 0, false);
+		if (!status) {
+			fprintf(stderr, "mobdebug loaded and available via mobdebug.start()\n");
+			lua_setglobal(Lua, "mobdebug");
+		}
+	}
+	report(status, false);
+#endif
 	tolua_stratagus_open(Lua);
 	lua_settop(Lua, 0);  // discard any results
 }
