@@ -23,8 +23,8 @@ tolua_to.c
 add_library(toluapp51 STATIC "${TOLUA_LIB_SRC}")
 add_executable(toluapp "${TOLUA_BIN_SRC}" "${TOLUA_LIB_SRC}")
 
-target_link_libraries(toluapp51 PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a")
-target_link_libraries(toluapp PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a")
+target_link_libraries(toluapp51 PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a" ${CMAKE_DL_LIBS})
+target_link_libraries(toluapp PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a" ${CMAKE_DL_LIBS})
 
 
 add_custom_command(TARGET toluapp51 POST_BUILD COMMAND cp "${PROJECT_SOURCE_DIR}/toluapp-simple/tolua++.h" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
