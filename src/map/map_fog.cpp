@@ -374,7 +374,7 @@ void CViewport::DrawMapFogOfWar()
 	
 	/// TODO: switch to hardware rendering
 	const bool isSoftwareRender {true}; // FIXME: remove this
-	if (isSoftwareRender) {
+	if (isSoftwareRender && FogOfWar.GetType() != FogOfWarTypes::cTiledLegacy) {
 		SDL_Rect screenRect;
 		screenRect.x = this->TopLeftPos.x;
 		screenRect.y = this->TopLeftPos.y;

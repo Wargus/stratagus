@@ -269,6 +269,17 @@ static int CclSetFogOfWar(lua_State *l)
 	return 0;
 }
 
+/**
+** <b>Description</b>
+**
+**  Get if the fog of war is enabled.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code><strong>GetFogOfWar</strong>()</code></div>
+*/
 static int CclGetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
@@ -277,9 +288,16 @@ static int CclGetFogOfWar(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Enable display of terrain in minimap.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Show the minimap terrain
+**		<strong>SetMinimapTerrain</strong>(true)</code></div>
 */
 static int CclSetMinimapTerrain(lua_State *l)
 {
@@ -327,8 +345,8 @@ static int CclSetFieldOfViewType(lua_State *l)
 	const char *type_name = LuaToString(l, 1);
 	if (!strcmp(type_name, "shadow-casting")) {
 		new_type = FieldOfViewTypes::cShadowCasting;
-		/// Legacy type of FOW doesn't work with shadow casting
-		if (FogOfWar.GetType() == FogOfWarTypes::cLegacy) {
+		/// Tiled types of FOW don't work with shadow casting
+		if (FogOfWar.GetType() != FogOfWarTypes::cEnhanced) {
 			FogOfWar.SetType(FogOfWarTypes::cEnhanced);
 		}	
 	} else if (!strcmp(type_name, "simple-radial")) {
@@ -464,10 +482,10 @@ static int CclSetFogOfWarType(lua_State *l)
 	LuaCheckArgs(l, 1);
 	
 	FogOfWarTypes new_type;
-	const char *type_name = LuaToString(l, 1);
-	if (!strcmp(type_name, "legacy")) {
-		new_type = FogOfWarTypes::cLegacy;
-		/// Legacy type of FOW doesn't work with shadow casting
+	const std::string type_name {LuaToString(l, 1)};
+	if (type_name == "tiled" || type_name == "fast") {
+		new_type = type_name == "tiled" ? FogOfWarTypes::cTiled : FogOfWarTypes::cTiledLegacy;
+		/// Tiled types of FOW don't work with shadow casting
 		if (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting) {
 			if (!IsNetworkGame()) {
 				FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
@@ -476,11 +494,11 @@ static int CclSetFogOfWarType(lua_State *l)
 										   int(FieldOfViewTypes::cSimpleRadial), 0, 0, 0, 0);
 			}
 		}
-	} else if (!strcmp(type_name, "enhanced")) {
+	} else if (type_name == "enhanced") {
 		new_type = FogOfWarTypes::cEnhanced;
 	} else {
 		PrintFunction();
-		fprintf(stdout, "Accessible Fog of War types: \"legacy\", \"enhanced\".\n");
+		fprintf(stdout, "Accessible Fog of War types: \"tiled\", \"enhanced\" and \"fast\".\n");
 		return 1;
 	}
 	FogOfWar.SetType(new_type);
@@ -626,9 +644,16 @@ static int CclSetForestRegeneration(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Set Fog color.
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Red fog of war
+**		<strong>SetFogOfWarColor</strong>(128,0,0)</code></div>
 */
 static int CclSetFogOfWarColor(lua_State *l)
 {
@@ -659,7 +684,7 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	FogGraphicFile = LuaToString(l, 1);
-	CFogOfWar::SetLegacyFogGraphic(FogGraphicFile);
+	CFogOfWar::SetTiledFogGraphic(FogGraphicFile);
 
 	return 0;
 }
@@ -700,9 +725,15 @@ static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
 **  Define size in pixels (x,y) of a tile in this game
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code><strong>SetTileSize</strong>(32,32)</code></div>
 */
 static int CclSetTileSize(lua_State *l)
 {
