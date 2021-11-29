@@ -16,6 +16,24 @@
             "args": ["-v", "${input:datadir}", "${workspaceFolder}/../data.wargus"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
+        },
+        {
+            "name": "Wargus",
+            "request": "launch",
+            "type": "cppdbg",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/Debug/wargus.exe",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${workspaceFolder}\\..\\stratagus\\build\\Debug;${workspaceFolder}\\..\\stratagus\\build\\Release;${env:PATH}"}],
+                "externalConsole": true
+            },
+            "linux": {
+                "program": "${workspaceRoot}/build/wargus",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}/../stratagus/build/:${env:PATH}"}]
+            },
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}"
         }
     ],
     "inputs": [

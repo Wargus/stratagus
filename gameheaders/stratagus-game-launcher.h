@@ -269,7 +269,7 @@ int check_version(char* tool_path, char* data_path) {
     return 0;
 }
 
-static void ExtractData(char* extractor_tool, char *const extractor_args[], char* destination, char* scripts_path, int force=0) {
+static void ExtractData(char* extractor_tool, char *const extractor_args[], char* destination, char* scripts_path, int force=0, char* datafileCstr=NULL) {
 	int canJustReextract;
 #ifdef EXTRACTION_FILES
 	if (force == 0) {
@@ -310,9 +310,11 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	while (filepatterns[patterncount++] != NULL);
 #endif
 	fs::path srcfolder;
-	if (!canJustReextract) {
-		const char* datafileCstr = tinyfd_openFileDialog(GAME_CD " location", "",
+	if (!canJustReextract || datafileCstr != NULL) {
+		if (datafileCstr == NULL) {
+			datafileCstr = tinyfd_openFileDialog(GAME_CD " location", "",
 													 patterncount - 1, filepatterns, NULL, 0);
+		}
 		if (datafileCstr == NULL) {
 			exit(-1);
 		}
@@ -616,34 +618,38 @@ int main(int argc, char * argv[]) {
 	// Try to use stratagus.exe from data (install) directory first
 	sprintf(stratagus_bin, "%s\\stratagus.exe", data_path);
 	if (stat(stratagus_bin, &st) != 0) {
-		// If no local stratagus.exe is present, look for a globally installed version
-		DWORD stratagus_path_size = sizeof(stratagus_path);
-		memset(stratagus_path, 0, stratagus_path_size);
-		HKEY key;
+		// If no local stratagus.exe is present, search PATH
+		if (!SearchPath(NULL, "stratagus", ".exe", MAX_PATH, stratagus_bin, NULL) &&
+			!SearchPath(NULL, "stratagus-dbg", ".exe", MAX_PATH, stratagus_bin, NULL)) {
+			// If no local or PATH stratagus.exe is present, look for a globally installed version
+			DWORD stratagus_path_size = sizeof(stratagus_path);
+			memset(stratagus_path, 0, stratagus_path_size);
+			HKEY key;
 
-		if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
-			if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
-				if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
-					char msg[BUFF_SIZE * 2] = {'\0'};
-					strcat(msg, STRATAGUS_NOT_FOUND);
-					strcat(msg, " (expected globally installed or in ");
-					strcat(msg, stratagus_bin);
-					strcat(msg, ")");
-					error(TITLE, msg);
+			if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key) == ERROR_SUCCESS) {
+				if (RegQueryValueEx(key, "InstallLocation", NULL, NULL, (LPBYTE)stratagus_path, &stratagus_path_size) == ERROR_SUCCESS) {
+					if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
+						char msg[BUFF_SIZE * 2] = {'\0'};
+						strcat(msg, STRATAGUS_NOT_FOUND);
+						strcat(msg, " (expected globally installed or in ");
+						strcat(msg, stratagus_bin);
+						strcat(msg, ")");
+						error(TITLE, msg);
+					}
 				}
+				RegCloseKey(key);
 			}
-			RegCloseKey(key);
-		}
 
-		if (_chdir(stratagus_path) != 0) {
-			char msg[BUFF_SIZE * 2] = {'\0'};
-			strcat(msg, STRATAGUS_NOT_FOUND);
-			strcat(msg, " (registry key found, but directory ");
-			strcat(msg, stratagus_path);
-			strcat(msg, " cannot be opened)");
-			error(TITLE, msg);
+			if (_chdir(stratagus_path) != 0) {
+				char msg[BUFF_SIZE * 2] = {'\0'};
+				strcat(msg, STRATAGUS_NOT_FOUND);
+				strcat(msg, " (registry key found, but directory ");
+				strcat(msg, stratagus_path);
+				strcat(msg, " cannot be opened)");
+				error(TITLE, msg);
+			}
+			sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 		}
-		sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 	}
 
 #ifdef DATA_PATH
@@ -658,21 +664,33 @@ int main(int argc, char * argv[]) {
 
 	char *const extractor_args[] = EXTRACTOR_ARGS;
 
-	if (argc > 1) {
-		if (!strcmp(argv[1], "--extract")) {
+	if (argc == 2) {
+		if (stat(argv[1], &st) == 0) {
+			// extraction file given as argument and it is accessible => force extraction and exit
+			tinyfd_forceConsole = 1;
+			SetUserDataPath(data_path);
+			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 2, argv[1]);
+			return 0;
+		} else if (!strcmp(argv[1], "--extract")) {
 			// Force extraction and exit
 			SetUserDataPath(data_path);
 			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 1);
 			return 0;
-		}
-
-		if (!strcmp(argv[1], "--extract-no-gui")) {
+		} else if (!strcmp(argv[1], "--extract-no-gui")) {
 			// Force extraction without ui and exit
 			tinyfd_forceConsole = 1;
 			SetUserDataPath(data_path);
 			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 1);
 			return 0;
 		}
+	}
+	if (argc > 1) {
+		printf("Usage: %s [path to extraction file|--extract|--extract-no-gui]\n"
+			"\tpath to extraction file - will be used as file to start the extraction process on\n"
+			"\t--extract - force extraction even if data is already extracted\n"
+			"\t--extract-no-gui - force extraction even if data is already extracted, using the console only for prompts\n",
+			argv[0]);
+		return -1;
 	}
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
@@ -814,7 +832,7 @@ int main(int argc, char * argv[]) {
 				 "and please give details, including: operating system, installation path, username, kind of source CD. "
 				 "If you got an error message about the extraction command failing, please try to run it in a console "
 				 "and post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
-				 "or the username (like an & or !). Try changing these. "
+				 "or the username (like an ampersand or exclamation mark). Try changing these. "
 #ifdef WIN32
 				 "Also check if the file '%s' exists and check for errors or post it to the issue. "
 #endif
