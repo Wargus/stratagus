@@ -91,17 +91,6 @@ namespace gcn
          */
         virtual void setTarget(SDL_Surface** surface);
 
-        /**
-         * Draws an SDL_Surface on the target surface. Normaly you'll
-         * use drawImage, but if you want to write SDL specific code
-         * this function might come in handy.
-         *
-         * NOTE: The clip areas will be taken into account.
-         */
-        virtual void drawSDLSurface(SDL_Surface* surface, SDL_Rect source,
-                                    SDL_Rect destination);
-
-
         // Inherited from Graphics
 
         virtual void _beginDraw();
@@ -148,6 +137,7 @@ namespace gcn
         virtual void drawVLine(int x, int y1, int y2);
 
         SDL_Surface** mTarget;
+        SDL_Texture* mSrcDataTexture; // lazily initialized
         Color mColor;
         bool mAlpha;
     };

@@ -97,7 +97,7 @@ public:
 	};
 
 protected:
-	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
+	CGraphic() : Surface(NULL), SurfaceFlip(NULL), Texture(NULL), TextureFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 	{
@@ -185,6 +185,8 @@ public:
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
 	SDL_Surface *SurfaceFlip;  /// Flipped surface
+	SDL_Texture *Texture;      /// Surface
+	SDL_Texture *TextureFlip;  /// Flipped surface
 	frame_pos_t *frame_map;
 	frame_pos_t *frameFlip_map;
 	void GenFramesMap();

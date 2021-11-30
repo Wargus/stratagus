@@ -33,6 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL_render.h"
 #include "stratagus.h"
 
 #include "font.h"
@@ -138,10 +139,11 @@ static void VideoDrawChar(const CGraphic &g,
 						  int gx, int gy, int w, int h, int x, int y, const CFontColor &fc)
 {
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
 	std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
 	SDL_SetPaletteColors(g.Surface->format->palette, &sdlColors[0], 0, MaxFontColors);
-	SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
+	SDL_RenderCopy(TheRenderer, g.Texture, &srect, &drect);
+	// SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 }
 
 /**

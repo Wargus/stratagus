@@ -279,7 +279,7 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	GLint oldProgramId;
 	// Detach the texture
 	SDL_SetRenderTarget(renderer, NULL);
-	SDL_RenderClear(renderer);
+	// SDL_RenderClear(renderer);
 
 	SDL_GL_BindTexture(backBuffer, NULL, NULL);
 	if (LastShaderIndex != currentShaderIdx) {
