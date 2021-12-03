@@ -301,8 +301,9 @@ bool CVideo::ResizeScreen(int w, int h)
 	}
 	TheTexture = SDL_CreateTexture(TheRenderer,
 	                               SDL_PIXELFORMAT_ARGB8888,
-	                               SDL_TEXTUREACCESS_STREAMING,
+	                               SDL_TEXTUREACCESS_TARGET,
 	                               w, h);
+	SDL_SetRenderTarget(TheRenderer, TheTexture);
 
 	SetClipping(0, 0, w - 1, h - 1);
 

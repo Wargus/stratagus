@@ -279,7 +279,7 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	GLint oldProgramId;
 	// Detach the texture
 	SDL_SetRenderTarget(renderer, NULL);
-	// SDL_RenderClear(renderer);
+	SDL_RenderClear(renderer);
 
 	SDL_GL_BindTexture(backBuffer, NULL, NULL);
 	if (LastShaderIndex != currentShaderIdx) {
@@ -368,8 +368,8 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 
 	const GLfloat minu = 0.0f;
 	const GLfloat maxu = 1.0f;
-	const GLfloat minv = 0.0f;
-	const GLfloat maxv = 1.0f;
+	const GLfloat minv = 1.0f;
+	const GLfloat maxv = 0.0f;
 
 	lazyGlMatrixMode(GL_PROJECTION);
 	lazyGlLoadIdentity();

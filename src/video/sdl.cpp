@@ -798,27 +798,24 @@ void RealizeVideoMemory()
 	if (dummyRenderer) {
 		return;
 	}
-	if (NumRects) {
-		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
-		if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
-			SDL_SetTextureBlendMode(TheTexture, SDL_BLENDMODE_BLEND);
-			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
-			if (EnableDebugPrint) {
-				// show a bar representing fps scaled by 10
-				SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
-				Uint32 nextTick = SDL_GetTicks();
-				double fps = 10000.0 / (nextTick - LastTick);
-				SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
-				SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-				LastTick = nextTick;
-			}
-			SDL_RenderPresent(TheRenderer);
-			// SDL_RenderClear(TheRenderer);
-		}
-		NumRects = 0;
-	} else {
+	if (EnableDebugPrint) {
+		// show a bar representing fps scaled by 10
+		SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+		Uint32 nextTick = SDL_GetTicks();
+		double fps = 10000.0 / (nextTick - LastTick);
+		SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
+		SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+		LastTick = nextTick;
+	}
+	if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
+		SDL_SetRenderTarget(TheRenderer, NULL);
+		SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
+		// SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+		// SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
 		SDL_RenderPresent(TheRenderer);
 	}
+	SDL_SetRenderTarget(TheRenderer, TheTexture);
+	// SDL_RenderClear(TheRenderer);
 	if (!Preference.HardwareCursor) {
 		HideCursor();
 	}
