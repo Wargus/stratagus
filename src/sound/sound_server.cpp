@@ -60,6 +60,8 @@ static bool EffectsEnabled = true;
 static double VolumeScale = 1.0;
 static int MusicVolume = 0;
 
+extern volatile bool MusicFinished;
+
 /// Channels for sound effects and unit speech
 struct SoundChannel {
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any
@@ -346,6 +348,7 @@ int PlayMusic(Mix_Music *sample)
 {
 	if (sample) {
 		Mix_VolumeMusic(MusicVolume);
+		MusicFinished = false;
 		Mix_PlayMusic(sample, 0);
 		Mix_VolumeMusic(MusicVolume / 4.0);
 		return 0;
@@ -371,6 +374,7 @@ int PlayMusic(const std::string &file)
 	Mix_Music *music = LoadMusic(file);
 
 	if (music) {
+		MusicFinished = false;
 		Mix_FadeInMusic(music, 0, 200);
 		return 0;
 	} else {

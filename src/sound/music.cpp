@@ -51,7 +51,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-static volatile bool MusicFinished;       /// Music ended and we need a new file
+volatile bool MusicFinished;       /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
