@@ -427,7 +427,7 @@ int tinyfd_verbose = 0 ; /* on unix: prints the command line calls */
 int tinyfd_silent = 1 ; /* 1 (default) or 0 : on unix, hide errors and warnings from called dialogs */
 
 /* Curses dialogs are difficult to use, on windows they are only ascii and uses the unix backslah */
-int tinyfd_allowCursesDialogs = 0 ; /* 0 (default) or 1 */
+int tinyfd_allowCursesDialogs = 1 ; /* 0 (default) or 1 */
 int tinyfd_forceConsole = 0 ; /* 0 (default) or 1 */
 /* for unix & windows: 0 (graphic mode) or 1 (console mode).
 0: try to use a graphic solution, if it fails then it uses console mode.
