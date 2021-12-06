@@ -296,7 +296,9 @@ public:
 	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; };
 	const std::vector<SDL_Surface *> getGraphic() const { return ExtGraphic; };
 
-	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int frstArgPos);
+	static std::vector<tile_index> parseDstRange(lua_State *luaStack, const int tablePos, const int argPos);
+	static std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int tablePos, const int argPos, bool &isImg);
+	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int parseFromPos = 1);
 
 private:
 	void parseExtendedSlot(lua_State *luaStack, const slot_type slotType);
