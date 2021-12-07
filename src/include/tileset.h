@@ -259,6 +259,74 @@ private:
 #endif
 };
 
+/**
+GenerateExtendedTileset(
+    "image", path-to-image-with-tileset-graphic, -- optional for extended tileset
+    "slots", {
+              slot-type, {"terrain-name", ["terrain-name",] [list-of-flags-for-all-tiles-of-this-slot,]
+                          {dst, src[, additional-flags-list]}
+                          [, {dst, src[, additional-flags-list]}]
+                          ...
+                         }
+                        ...
+              }
+)
+            
+      where:
+      slot-type: 
+        "solid" or "mixed"
+        Each slot consist of 16 tiles which represent one of terrain type ("solid") 
+        or mix of two different solid terrains ("mixed" f.e. gras-coast, water-coast etc.)
+        Second "terrain-name" in the slot definition is for mixed type.
+
+      list-of-flags-for-all-tiles-of-this-slot: 
+        comma separated list of flags wihich are common for all tiles in this slot
+
+      dst:
+        single agrgument (number or table) at position 1.
+        index of defined tile (or set of indexes). Each slot consist of 16 tiles only. 
+        For extended tileset indexes must be greater than already defined.
+        Each slot's indexes set starts from xxx0 and ended with xxxF (where discription of xxx see in PUD format explanation)
+        
+        'dst' can take one of the following forms:
+        tile                    -- single tile index
+        {tile[, tile,] ...}     -- set of tile indexes
+        {"range", from, to}     -- range of indexes [from, to]
+        {"slot", slot_num}      -- whole slot indexes f.e. {"slot", 0x1010} - put src continuously to slot 0x101[0..F] 
+                                -- until there is a src (up to 16, if less then fill slot with 0 for absent srcs)
+
+      src:
+        single agrgument (number or table) at position 2.
+        Describes where to get graphics for dst. It can be graphics from a tile defined in main tileset,
+        or frame from image file defined by "image" field (see above), or it can be generated from
+        several graphic frames by composing them as layers (with simple per-pixel manipulations)
+
+        'src' in general looks like:
+        { "layers",  { src_range [,{"do_something", parameter}...] }, -- layer 1
+                     { src_range [,{"do_something", parameter}...] }, -- layer 2
+                     ...
+                     { src_range [,{"do_something", parameter}...] }  -- layer n
+        }
+
+        "layers" can be omitted if we have a single layer, then src takes this form:
+        { src_range [,{"do_something", parameter}...] } 
+        or even: 
+        src_range                     -- then we just use images from src_range without any manipulations with them
+
+        'src_range' can take one of the following forms:
+        tile                          -- tile index (within main tileset) to get graphic from
+        {tile[, tile]...}}            -- set of tiles indexes (within main tileset) to get graphics from
+        {"img", image[, image]...}    -- set of numbers of frames from the "image" file.
+        {["img",] "range", from, to}  -- if "img" then from frame to frame (for "image"),
+                                      -- otherwise indexes from tile to tile (within main tileset) to get graphics from
+        {"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+
+      additional-flags-list:
+        strings which started from position 3
+        comma separated list of additional flags for this range of tiles
+**/
+
+
 class CTilesetGraphicGenerator
 {
 public:
