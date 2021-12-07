@@ -874,12 +874,12 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 }
 
 /**
-	{"terrain-name", ["terrain-name",]  [list-of-flags-for-all-tiles-of-this-slot,]
-		{ dst_tile,                      ["img", src_image_frame] | src_tile, {list-of-flags-for-this-range}},
-		{{dst_tiles_range/set},          {{src_image_frames_range/set|src_tiles_range/set},
-										  {src_image_frames_range/set|src_tiles_range/set},
-										  {src_image_frames_range/set|src_tiles_range/set}}, {list-of-flags-for-this-range}}
-	}
+**
+    {"terrain-name", ["terrain-name",] [list-of-flags-for-all-tiles-of-this-slot,]
+        {dst, src[, additional-flags-list]}
+        [, {dst, src[, additional-flags-list]}]
+        ...
+    }
 **/
 void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slotType)
 {
@@ -972,28 +972,18 @@ void CTilesetParser::parseExtendedSlots(lua_State *luaStack, int arg)
 /**
 **  Parse the extended tileset definition with graphic generation 
 **
-**  @param luaStack        	Lua state.
+**  @param luaStack        Lua state.
 **
-**  "image", "path-to-image/image.png", 
-**  "slots", {
-**    "solid", {"terrain-name", [list-of-flags-for-all-tiles-of-this-slot,]
-**              {dst_tile,                      {["img", src_image_frame] | src_tile}, {list-of-flags-for-this-range}}
-**              {{dst_tiles_range/set},         {src_image_frames_range/set|src_tiles_range/set}, {list-of-flags-for-this-range}}
 **
-**              -- destination:
-**              {dst_tile,
-**              {{"set", tile, tile, ...},
-**              {{"slot", slot_num},            -- f.e. {"slot", 0x1010} - put src continuously to slot 0x101[0..15] until there is a src (up to 16, if less then fill slot with 0 for absent srcs)
-**              {{"range", from, to}, 
-**                    
-**                                              -- source:
-**                                              ["img"], image|tile
-**                                              {         "slot", slot_num}                     -- f.e. {"slot", 0x0430} - to take continuously from slot 0x0430
-**                                              {["img",] "range", from, to}                    -- if "img" then from frame to frame. Otherwise from tile to tile.
-**                                              {["img",] image|tile[, image|tile]...}}         -- if "img" then frames, otherwise tiles.
-**                                              {{{source} [,{"do_something", parameter}...] }, -- layer 1
-**                                               {source}, -- layer 2
-**                                               {source}} -- layer n
+  "image", path-to-image-with-tileset-graphic, -- optional for extended tileset
+  "slots", {
+            slot-type, {"terrain-name", ["terrain-name",] [list-of-flags-for-all-tiles-of-this-slot,]
+                         {dst, src[, additional-flags-list]}
+                         [, {dst, src[, additional-flags-list]}]
+                         ...
+                        }
+                        ...
+          }
 */
 
 void CTilesetParser::parseExtended(lua_State *luaStack)
