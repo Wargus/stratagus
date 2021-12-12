@@ -721,6 +721,179 @@ void CTileset::buildWallReplacementTable()
 	}
 }
 
+/**
+** 	Checks top argument in the lua state for number of layers to parse
+**
+**	@param luaStack		lua state
+**/
+uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack)
+{
+	bool isMultipleLayers = false;
+	if (lua_istable(luaStack, -1)) {
+
+		lua_rawgeti(luaStack, -1, 1);
+		isMultipleLayers = lua_isstring(luaStack, -1) && std::string(LuaToString(luaStack, -1)) == "layers";
+		lua_pop(luaStack, 1);
+
+	} else if (!lua_isnumber(luaStack, -1)) {
+		LuaError(luaStack, "incorrect argument");
+	}
+	return isMultipleLayers ? lua_rawlen(luaStack, -1) - 1
+							: 1;
+}
+
+/**
+** Parse top argument in the lua state for range of source indexes
+**	
+**	tile                          -- tile index (within main tileset) to get graphic from
+**	{tile[, tile]...}}            -- set of tiles indexes (within main tileset) to get graphics from
+**	{"img", image[, image]...}    -- set of numbers of frames from the "image" file.
+**	{["img",] "range", from, to}  -- if "img" then from frame to frame (for "image"),
+**								  -- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**	{"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**
+**	@param luaStack		lua state, top argument to be parsed
+**	@param argPos		argument in the table to parse (or 0 if need to parse not a table but just a number)
+**	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
+**	@return 			vector of parsed indexes
+**/
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg)
+{
+	isImg = false;
+
+	std::vector<tile_index> result;
+
+	if (argPos == 0 && lua_isnumber(luaStack, -1)) {
+		result = CTilesetParser::parseTilesRange(luaStack);
+
+	} else if (lua_istable(luaStack, -1)) {
+
+		lua_rawgeti(luaStack, -1, argPos);
+		int parseFrom = 1;
+		/// check if "img" tag is present
+		if (lua_istable(luaStack, -1)) {
+			lua_rawgeti(luaStack, -1, 1);
+			if (lua_isstring(luaStack, -1)) {
+				const std::string parsedValue { LuaToString(luaStack, -1) };
+				if (parsedValue == "img") {
+					isImg = true;
+					parseFrom++;
+				}
+			}
+			lua_pop(luaStack, 1);
+		}
+		result = CTilesetParser::parseTilesRange(luaStack, parseFrom);
+		lua_pop(luaStack, 1);
+	} else {
+		LuaError(luaStack, "incorrect argument");
+	}
+	return result;
+}
+
+/**
+**
+** {"do_something", parameter}
+** where 'do_something':
+** 	"remove"
+** 	usage:		{"remove", colors[, colors]..} where 'color':
+** 														color		-- single color
+** 														{from, to}	-- range of colors
+**/
+void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images)
+{
+	lua_rawgeti(luaStack, -1, argPos);
+	if (!lua_istable(luaStack, -1)) {
+		LuaError(luaStack, "incorrect argument");
+	}
+
+	lua_pop(luaStack, 1);
+}
+
+/** 
+**	Parse a layer of source graphics
+**
+** src_range
+** or	
+** { src_range [,{"do_something", parameter}...] }
+**
+**	@param	luaStack 	lua state, top argument to be parsed - it can be table of layers or single layer
+**	@param	argPos		position of the layer to parse in the table of layers (or 0 in case of single layer)
+**
+**/
+std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const int argPos)
+{
+	enum { cSrcIndexOnly = 0, cSrcRange = 1, cModifier = 2 };
+
+	if (argPos != 0) {
+		lua_rawgeti(luaStack, -1, argPos);
+	}
+	int arg = lua_istable(luaStack, -1) ? cSrcRange : cSrcIndexOnly;
+
+	bool isImg {false};
+	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, arg, isImg) };
+	std::vector<SDL_Surface*> imgLayer;
+
+	for (auto srcIndex : srcIndexes) {
+		const SDL_Surface *srcSurface = SrcGraphic->Surface;
+		
+		SDL_Surface *img = SDL_CreateRGBSurface(srcSurface->flags,
+												SrcTileset->getPixelTileSize().x,
+												SrcTileset->getPixelTileSize().y,
+                                             	srcSurface->format->BitsPerPixel,
+												srcSurface->format->Rmask,
+												srcSurface->format->Gmask,
+												srcSurface->format->Bmask,
+												srcSurface->format->Amask);
+		const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
+										   : SrcGraphic;
+		const graphic_index frame = isImg ? srcIndex 
+										  : SrcTileset->tiles[srcIndex].tile;
+
+		srcGraphic->DrawFrame(frame, 0, 0, img);
+		imgLayer.push_back(img);
+	}
+	
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+	arg = cModifier;
+	while(arg <= argsNum) {
+		parseModifier(luaStack, arg, imgLayer);
+		arg++;	
+	}
+	if (argPos != 0) {
+		lua_pop(luaStack, 1);
+	}
+	return imgLayer;
+}
+
+/**
+** Parse top argument in the lua state.
+
+	{ "layers",  { src_range [,{"do_something", parameter}...] }, -- layer 1
+				 { src_range [,{"do_something", parameter}...] }, -- layer 2
+				 ...
+				 { src_range [,{"do_something", parameter}...] }  -- layer n
+	}
+	or
+	{ src_range [,{"do_something", parameter}...] }
+	or
+	src_range
+
+**/
+void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
+{
+	enum { cSinglelayer = 0, cFirstLayer = 2 };
+	
+	if (lua_isnumber(luaStack, -1) || lua_istable(luaStack, -1)) {
+		const uint16_t layersNum = checkForLayers(luaStack);
+		int arg = layersNum > 1 ? cFirstLayer : cSinglelayer;
+		for (uint16_t layer = 1; layer <= layersNum; layer++) {
+			SrcImgLayers.push_back(parseLayer(luaStack, arg));
+			arg++;
+		}
+	} else {
+		LuaError(luaStack, "incorrect argument");
+	}
+}
 
 /** 
 ** Parse range of destination indexes
@@ -743,48 +916,6 @@ std::vector<tile_index> CTilesetParser::parseDstRange(lua_State *luaStack, const
 	}
 	lua_rawgeti(luaStack, tablePos, argPos);
 	std::vector<tile_index> result { parseTilesRange(luaStack) };
-	lua_pop(luaStack, 1);
-	return result;
-}
-
-/**
-** Parse range of source indexes
-**	
-**	tile                          -- tile index (within main tileset) to get graphic from
-**	{tile[, tile]...}}            -- set of tiles indexes (within main tileset) to get graphics from
-**	{"img", image[, image]...}    -- set of numbers of frames from the "image" file.
-**	{["img",] "range", from, to}  -- if "img" then from frame to frame (for "image"),
-**								  -- otherwise indexes from tile to tile (within main tileset) to get graphics from
-**	{"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
-**
-**	@param luaStack		lua state
-**	@param tablePos		position of the table containing range to parse
-**	@param argPos		argument in the table to parse
-**	@param isImg		if 'img' tag exist then it will be setted by this function to true, false otherwise
-**	@return 			vector of parsed indexes
-**/
-std::vector<tile_index> CTilesetParser::parseSrcRange(lua_State *luaStack, const int tablePos, const int argPos, bool &isImg)
-{
-	if (!lua_istable(luaStack, tablePos)) {
-		LuaError(luaStack, "incorrect argument");
-	}
-	int parseFrom = 1;
-	lua_rawgeti(luaStack, tablePos, argPos);
-	
-	/// check if "img" tag is present
-	if (lua_istable(luaStack, -1)) {
-		lua_rawgeti(luaStack, -1, 1);
-		if (lua_isstring(luaStack, -1)) {
-			const std::string parsedValue { LuaToString(luaStack, -1) };
-			if (parsedValue == "img") {
-				isImg = true;
-				parseFrom++;
-			}
-		}
-		lua_pop(luaStack, 1);
-	}
-
-	std::vector<tile_index> result { parseTilesRange(luaStack, parseFrom) };
 	lua_pop(luaStack, 1);
 	return result;
 }
@@ -912,10 +1043,10 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 	while (arg < argsNum) {
 		lua_rawgeti(luaStack, -1, ++arg);
 		
-		std::vector<tile_index> dstTileIndexes = parseDstRange(luaStack, -1, cDst);
+		std::vector<tile_index> dstTileIndexes { parseDstRange(luaStack, -1, cDst) };
 		
 		/// load src-graphic-generator
-		CTilesetGraphicGenerator srcGraphic(luaStack, cSrc, BaseTileset, BaseGraphic, SrcImgGraphic);
+		CTilesetGraphicGenerator srcGraphic(luaStack, -1, cSrc, BaseTileset, BaseGraphic, SrcImgGraphic);
 
 		tile_flags flagsAdditional = 0;
 		terrain_typeIdx baseTerrain = terrainNameIdx[cBase];

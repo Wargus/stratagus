@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 #include "SDL_image.h"
 
+#include "util.h"
 #include "video.h"
 #include "vec2i.h"
 #include <string>
@@ -330,12 +331,39 @@ GenerateExtendedTileset(
 class CTilesetGraphicGenerator
 {
 public:
-	CTilesetGraphicGenerator(lua_State *luaStack, int &argPos, const CTileset *srcTileset,
-															   const CGraphic *srcGraphic,
-															   const CGraphic *srcImgGraphic);
+	CTilesetGraphicGenerator(lua_State *luaStack, int tablePos, int argPos, const CTileset *srcTileset,
+															  				const CGraphic *srcGraphic,
+															  				const CGraphic *srcImgGraphic)
+							: SrcTileset(srcTileset), SrcGraphic(srcGraphic), SrcImgGraphic (srcImgGraphic)
+	{
+		lua_rawgeti(luaStack, tablePos, argPos);
+		parseExtended(luaStack);
+		lua_pop(luaStack, 1);
+	}
+	
+	~CTilesetGraphicGenerator()
+	{
+		for (auto &layer : SrcImgLayers) {
+			ranges::for_each(layer, SDL_FreeSurface);
+		}
+	}
+
+private:
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg);
+	uint16_t checkForLayers(lua_State *luaStack);
+	void parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images);
+	std::vector<SDL_Surface*> parseLayer(lua_State *luaStack, const int argPos);
+
+	void parseExtended(lua_State *luaStack);
+	
+
 	SDL_Surface* get(const uint16_t imgNum);
 	uint16_t getIndex(const uint16_t imgNum);
 private:
+	std::vector<std::vector<SDL_Surface*>> SrcImgLayers;
+	const CTileset *SrcTileset;
+	const CGraphic *SrcGraphic;
+	const CGraphic *SrcImgGraphic;
 };
 
 
@@ -351,7 +379,7 @@ public:
 	{
 		parseExtended(luaStack);
 	}
-	/// TODO: add constructor to parse base tileset (if we deside to move base tileset parser here)
+	/// TODO: add constructor to parse base tileset (if we decide to move base tileset parser here)
 
 	~CTilesetParser()
 	{
@@ -365,7 +393,6 @@ public:
 	const std::vector<SDL_Surface *> getGraphic() const { return ExtGraphic; };
 
 	static std::vector<tile_index> parseDstRange(lua_State *luaStack, const int tablePos, const int argPos);
-	static std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int tablePos, const int argPos, bool &isImg);
 	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int parseFromPos = 1);
 
 private:
