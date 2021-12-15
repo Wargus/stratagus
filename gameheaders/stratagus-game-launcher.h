@@ -682,15 +682,13 @@ int main(int argc, char * argv[]) {
 			SetUserDataPath(data_path);
 			ExtractData(extractor_path, extractor_args, data_path, scripts_path, 1);
 			return 0;
-		}
-	}
-	if (argc > 1) {
-		printf("Usage: %s [path to extraction file|--extract|--extract-no-gui]\n"
-			"\tpath to extraction file - will be used as file to start the extraction process on\n"
-			"\t--extract - force extraction even if data is already extracted\n"
-			"\t--extract-no-gui - force extraction even if data is already extracted, using the console only for prompts\n",
-			argv[0]);
-		return -1;
+		} else if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
+                    printf("Usage: %s [path to extraction file|--extract|--extract-no-gui]\n"
+                           "\tpath to extraction file - will be used as file to start the extraction process on\n"
+                           "\t--extract - force extraction even if data is already extracted\n"
+                           "\t--extract-no-gui - force extraction even if data is already extracted, using the console only for prompts\n\n",
+                           argv[0]);
+                }
 	}
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
