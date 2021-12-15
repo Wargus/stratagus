@@ -442,7 +442,7 @@ class CPreference
 {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
+		ShowAttackRange(false), ShowMessages(true), ShowNoSelectionStats(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(false),
@@ -454,6 +454,7 @@ public:
 	bool ShowReactionRange;    /// Show reaction range.
 	bool ShowAttackRange;      /// Show attack range.
 	bool ShowMessages;		   /// Show messages.
+	bool ShowNoSelectionStats; /// Show stats when no selection is active
 	bool BigScreen;			   /// If true, shows the big screen(without panels)
 	bool PauseOnLeave;         /// If true, game pauses when cursor is gone
 	bool AiExplores;           /// If true, AI sends explorers to search for resources (almost useless thing)

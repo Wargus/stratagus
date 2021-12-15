@@ -1060,7 +1060,7 @@ static void InfoPanel_draw_no_selection()
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(*UnitUnderCursor);
-	} else {
+	} else if (Preference.ShowNoSelectionStats) {
 		// FIXME: need some cool ideas for this.
 		int x = UI.InfoPanel.X + 16;
 		int y = UI.InfoPanel.Y + 8;
