@@ -843,9 +843,11 @@ void CFont::MeasureWidths()
 			break;
 		}
 		while (sp < gp) {
-			// Some accented glyphes are not perfectly aligned on the glyph grid (like ï or î ).
-			// So we need to do -1 to not compute width on the next glyph.
-			const unsigned char *lp = sp + (G->Width - 1); 
+			// Some accented glyphes are not perfectly aligned on the glyph grid
+			// (like ï or î ).  So we could do -1 to not compute width on the
+			// next glyph, but that breaks other fonts like the one used in
+			// war1gus. TODO: figure out what to do
+			const unsigned char *lp = sp + G->Width;
 
 			for (; sp < lp; --lp) {
 				if (*lp != ckey && *lp != 7) {
