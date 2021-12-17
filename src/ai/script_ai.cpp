@@ -522,9 +522,7 @@ static void InsertUpgradeToRequests(CUnitType *type)
 */
 static void InsertResearchRequests(CUpgrade *upgrade)
 {
-	if (AiPlayer->ResearchRequestsSet.insert(upgrade).second) {
-		AiPlayer->ResearchRequests.push_back(upgrade);
-	}
+	AiPlayer->ResearchRequests.push_back(upgrade);
 }
 
 //----------------------------------------------------------------------------
@@ -1882,10 +1880,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const char *ident = LuaToString(l, j + 1, k + 1);
-				CUpgrade *upgrade = CUpgrade::Get(ident);
-				if (ai->ResearchRequestsSet.insert(upgrade).second) {
-					ai->ResearchRequests.push_back(upgrade);
-				}
+				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (!strcmp(value, "building")) {
 			CclParseBuildQueue(l, ai, j + 1);

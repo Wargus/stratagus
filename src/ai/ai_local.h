@@ -37,7 +37,6 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
-#include <set>
 
 #include "upgrade_structs.h" // MaxCost
 #include "unit_cache.h"
@@ -314,8 +313,7 @@ public:
 	unsigned long LastCanNotMoveGameCycle;        /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;  /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;   /// Upgrade to unit-type requested and priority list
-	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested as priority list
-	std::set<CUpgrade *> ResearchRequestsSet;     /// Upgrades requested for uniqueness
+	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
 	int LastRepairBuilding;                       /// Last building checked for repair in this turn
 };
