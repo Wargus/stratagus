@@ -286,8 +286,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonResearch : {
 				int researchId = UpgradeIdByIdent(button.ValueStr);
 
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Research, researchId, **j);
+				if (button.Allowed == ButtonCheckSingleResearch) {
+					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+						AiHelperInsert(aiHelper.SingleResearch, researchId, **j);
+					}
+				} else {
+					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+						AiHelperInsert(aiHelper.Research, researchId, **j);
+					}
 				}
 				break;
 			}
