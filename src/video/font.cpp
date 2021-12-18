@@ -74,7 +74,7 @@ static CFont *GameFont;   /// Normal font used in game
 
 static int FormatNumber(int number, char *buf);
 
-static const int extended_ascii[] = { 
+static const unsigned char extended_ascii[] = {
 	// char translation table to convert UTF8 (index) into Stratagus char (value)
 	// relevant for char > 0x80 (extendend ascii range)
 	// ______ascii value__________________________     __utf8___
@@ -198,10 +198,12 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 */
 static int utf8_to_ascii(const int utf8)
 {
-	int newutf8;
-	newutf8 = extended_ascii[(utf8 & 0xFF) - 0x90];
-	if (newutf8 == 0x00)
-	{
+	int ascii_idx = (utf8 & 0xFF) - 0x90;
+	int newutf8 = 0x00;
+	if (ascii_idx >= 0 && ascii_idx < sizeof(extended_ascii)) {
+		newutf8 = extended_ascii[(utf8 & 0xFF) - 0x90];
+	}
+	if (newutf8 == 0x00) {
 		fprintf(stderr, "Can't convert UTF8 char to Ascii : '%c' d=%d (0x%04x)\r\n", utf8, utf8, utf8);
 		newutf8 = '?';
 	}
@@ -841,9 +843,11 @@ void CFont::MeasureWidths()
 			break;
 		}
 		while (sp < gp) {
-			// Some accented glyphes are not perfectly aligned on the glyph grid (like ï or î ).
-			// So we need to do -1 to not compute width on the next glyph.
-			const unsigned char *lp = sp + (G->Width - 1); 
+			// Some accented glyphes are not perfectly aligned on the glyph grid
+			// (like ï or î ).  So we could do -1 to not compute width on the
+			// next glyph, but that breaks other fonts like the one used in
+			// war1gus. TODO: figure out what to do
+			const unsigned char *lp = sp + G->Width;
 
 			for (; sp < lp; --lp) {
 				if (*lp != ckey && *lp != 7) {

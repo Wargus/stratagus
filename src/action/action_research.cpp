@@ -131,6 +131,14 @@
 	}
 #endif
 	CPlayer &player = *unit.Player;
+	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
+		// completed in between our last step, possibly due to another unit
+		// finishing the upgrade n.b.: this is a feature: you can speed up
+		// research by using multiple buildings! This feature is only available
+		// if the button is marked "check-research", not "check-single-research"
+		this->Finished = true;
+		return;
+	}
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.Name.empty()) {

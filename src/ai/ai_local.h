@@ -345,9 +345,18 @@ public:
 	std::vector<std::vector<CUnitType *> > Upgrade;
 	/**
 	** The index is the research that should be made, giving a table of all
-	** units/buildings which could research this upgrade.
+	** units/buildings which could research this upgrade. This table only
+	** includes those unit types which have the research defined as a button
+	** without the "check-single-research" restriction.
 	*/
 	std::vector<std::vector<CUnitType *> > Research;
+	/**
+	** The index is the research that should be made, giving a table of all
+	** units/buildings which could research this upgrade. This table only
+	** includes those unit types which have the research defined as a button
+	** with the "check-single-research" restriction.
+	*/
+	std::vector<std::vector<CUnitType *> > SingleResearch;
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.

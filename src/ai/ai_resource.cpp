@@ -747,29 +747,51 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	//
 	// Check if we have a place for the upgrade to research
 	//
-	const int n = AiHelpers.Research.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+	{ // multi-research case
+		const int n = AiHelpers.Research.size();
+		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
 
-	if (upgrade->ID > n) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
-		return;
-	}
-	std::vector<CUnitType *> &table = tablep[upgrade->ID];
-	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddResearchRequest II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
-		return;
-	}
-
-	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-	for (unsigned int i = 0; i < table.size(); ++i) {
-		// The type is available
-		if (unit_count[table[i]->Slot]
-			&& AiResearchUpgrade(*table[i], *upgrade)) {
-			return;
+		if (upgrade->ID < n) { // not known as multi-researchable upgrade
+			std::vector<CUnitType *> &table = tablep[upgrade->ID];
+			if (!table.empty()) { // not known as multi-researchable upgrade
+				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+				for (unsigned int i = 0; i < table.size(); ++i) {
+					// The type is available
+					if (unit_count[table[i]->Slot]
+						&& AiResearchUpgrade(*table[i], *upgrade)) {
+						return;
+					}
+				}
+				return;
+			}
 		}
 	}
+	{ // single-research case
+		const int n = AiHelpers.SingleResearch.size();
+		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.SingleResearch;
+
+		if (upgrade->ID < n) { // not known
+			std::vector<CUnitType *> &table = tablep[upgrade->ID];
+			if (!table.empty()) { // not known
+				// known as a single-research upgrade, check if we're already
+				// researching it. if so, ignore this request.
+				if (AiPlayer->Player->UpgradeTimers.Upgrades[upgrade->ID]) {
+					return;
+				}
+				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+				for (unsigned int i = 0; i < table.size(); ++i) {
+					// The type is available
+					if (unit_count[table[i]->Slot]
+						&& AiResearchUpgrade(*table[i], *upgrade)) {
+						return;
+					}
+				}
+				return;
+			}
+		}
+	}
+	DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
+			   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
 }
 
 /**
