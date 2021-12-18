@@ -351,6 +351,10 @@ public:
 private:
 	std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg);
 	uint16_t checkForLayers(lua_State *luaStack);
+	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack);
+	bool checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp);
+	void removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp);
+	void removeColors(lua_State *luaStack, std::vector<SDL_Surface*> &images);
 	void parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images);
 	std::vector<SDL_Surface*> parseLayer(lua_State *luaStack, const int argPos);
 

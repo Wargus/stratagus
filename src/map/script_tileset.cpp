@@ -44,6 +44,7 @@
 #include "script.h"
 #include <cstring>
 #include <math.h>
+#include <set>
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -752,7 +753,7 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack)
 **								  -- otherwise indexes from tile to tile (within main tileset) to get graphics from
 **	{"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 **
-**	@param luaStack		lua state, top argument to be parsed
+**	@param luaStack		lua state, top argument will be parsed
 **	@param argPos		argument in the table to parse (or 0 if need to parse not a table but just a number)
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
 **	@return 			vector of parsed indexes
@@ -791,22 +792,194 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 }
 
 /**
+**	Parse arguments for pixel modifiers as colors
+**	It parses table in form	{"do_something", colors[, colors]..} from the top of lua state
+**	where 'colors' is arguments to parse and can be in one of these forms:
+**		color		-- single color
+** 		{from, to}	-- range of colors
 **
+**	@param	luaStack	lua state
+**	@return	set of parsed colors as uint32_t values
+**
+**/
+std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack)
+{
+	enum { cFirsrArg = 2, cFrom = 1, cTo = 2 };
+
+	std::set<uint32_t> colors;
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+
+	for (int arg = cFirsrArg; arg <= argsNum; arg++)
+	{
+		lua_rawgeti(luaStack, -1, arg);	/// #1<
+		if (lua_istable(luaStack, -1)) {
+			uint32_t color = LuaToUnsignedNumber(luaStack, -1, cFrom);
+			const uint32_t rangeTo = LuaToUnsignedNumber(luaStack, -1, cTo);
+			while (color <= rangeTo) {
+				colors.insert(color++);
+			}
+		} else if (lua_isnumber(luaStack, -1)) {
+			colors.insert(LuaToUnsignedNumber(luaStack, -1));
+
+		} else {
+			LuaError(luaStack, "Incorrect argument");
+		}
+		lua_pop(luaStack, 1);	/// #1>
+	}
+	return colors;
+}
+
+/**
+**	Check if current pixel matches one of passed colors
+**
+**	@param	pixel		pointer to address of current pixel
+**	@param	colors		set of colors to check
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**	@return				true if pixels's color matches one of passed colors, false otherwise
+**
+**/
+bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp)
+{
+	for (auto &color : colors) {
+		switch (bpp) {
+			case 1:
+				{
+					const uint8_t pixelColor = *(static_cast<const uint8_t*>(pixel));
+					if (pixelColor == uint8_t(color)) {
+						return true;
+					}
+				}
+				break;
+			case 2:
+				{
+					const uint16_t pixelColor = *(static_cast<const uint16_t*>(pixel));
+					if (pixelColor == uint16_t(color)) {
+						return true;
+					}
+				}
+				break;
+			case 3:
+				{
+					const uint8_t *pixelPtr = static_cast<const uint8_t*>(pixel);
+					const uint32_t pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]       | pixelPtr[1] << 8  | pixelPtr[2] << 16
+																				: pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
+					if (pixelColor == color) {
+						return true;
+					}				
+				}
+				break;
+			case 4:
+				{
+					const uint32_t pixelColor = *(static_cast<const uint32_t*>(pixel));
+					if (pixelColor == color) {
+						return true;
+					}
+				}
+				break;
+			default:
+				/// unsupported format
+				Assert(0);
+		}
+	}
+	return false;
+}
+
+/**
+**	Remove pixel's color
+**
+**	@param	pixel		pointer to address of pixel to clean
+**	@param	transColor	transparent color (we remove pixel by changing it's color to transparent)
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp)
+{
+	switch (bpp) {
+		case 1:
+			*(static_cast<uint8_t*>(pixel)) = uint8_t(transpColor);
+			break;
+		case 2:
+			*(static_cast<uint16_t*>(pixel)) = uint16_t(transpColor);
+			break;
+		case 3:
+			{
+				const uint8_t* src = reinterpret_cast<const uint8_t*>(&transpColor);
+				if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
+					static_cast<uint8_t*>(pixel)[0] = src[0];
+					static_cast<uint8_t*>(pixel)[1] = src[1];
+					static_cast<uint8_t*>(pixel)[2] = src[2];
+				} else {
+					static_cast<uint8_t*>(pixel)[0] = src[3];
+					static_cast<uint8_t*>(pixel)[1] = src[2];
+					static_cast<uint8_t*>(pixel)[2] = src[1];
+				}
+			}
+			break;
+		case 4:
+			*(static_cast<uint32_t*>(pixel)) = transpColor;
+			break;
+		default:
+			/// unsupported format
+			Assert(0);
+	}
+}
+
+/**
+**	Remove certain colors from tiles images
+**	It parses table in the format of {"remove", colors[, colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to remove colors from
+**
+**/
+void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, std::vector<SDL_Surface*> &images)
+{
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack) };
+
+	uint32_t colorKey = 0;
+	if (images.size()) {
+		SDL_GetColorKey(images[0], &colorKey);
+	}
+	
+	for (auto &img : images) {
+		/// Do remove colors
+		const size_t pixelsNum = img->w * img->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *pixelPos = img->pixels + pixel * img->format->BytesPerPixel;
+			if (checkPixel(pixelPos, colors, img->format->BytesPerPixel)) {
+				removePixel(pixelPos, colorKey, img->format->BytesPerPixel);
+			}
+		}
+	}
+}
+
+/**
+**	Parse pixel modifiers in the lua state
 ** {"do_something", parameter}
 ** where 'do_something':
 ** 	"remove"
-** 	usage:		{"remove", colors[, colors]..} where 'color':
-** 														color		-- single color
-** 														{from, to}	-- range of colors
+** 	usage:		{"remove", colors[, colors]..} where 'colors':
+** 															color		-- single color
+** 															{from, to}	-- range of colors
+**
+**	@param	luaStack	lua state, a table in the top will be parsed
+**	@param	argPos		position in the table to parse
+**	@param	images		vector of one-frame sized SDL_Surfaces to apply modifier to
 **/
 void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images)
 {
-	lua_rawgeti(luaStack, -1, argPos);
+	lua_rawgeti(luaStack, -1, argPos); /// #1<
 	if (!lua_istable(luaStack, -1)) {
-		LuaError(luaStack, "incorrect argument");
+		LuaError(luaStack, "Incorrect argument");
 	}
-
-	lua_pop(luaStack, 1);
+	int arg = 1;
+	std::string modifier { LuaToString(luaStack, -1, arg) };
+	if (modifier == "remove") {
+		removeColors(luaStack, images);
+	} else {
+		LuaError(luaStack, "Unknown modifier");	
+	}
+	lua_pop(luaStack, 1); /// #1>
 }
 
 /** 
@@ -816,7 +989,7 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 ** or	
 ** { src_range [,{"do_something", parameter}...] }
 **
-**	@param	luaStack 	lua state, top argument to be parsed - it can be table of layers or single layer
+**	@param	luaStack 	lua state, top argument will be parsed - it can be table of layers or single layer
 **	@param	argPos		position of the layer to parse in the table of layers (or 0 in case of single layer)
 **
 **/
@@ -844,6 +1017,14 @@ std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaSta
 												srcSurface->format->Gmask,
 												srcSurface->format->Bmask,
 												srcSurface->format->Amask);
+		uint32_t colorKey = 0;
+		if (!SDL_GetColorKey(img, &colorKey)) {
+			SDL_SetColorKey(img, SDL_TRUE, colorKey);
+		}
+		if (srcSurface->format->palette) {
+			SDL_SetSurfacePalette(img, srcSurface->format->palette);
+		}
+
 		const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
 										   : SrcGraphic;
 		const graphic_index frame = isImg ? srcIndex 
