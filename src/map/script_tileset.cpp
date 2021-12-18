@@ -945,7 +945,7 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, std::vector<SDL
 		/// Do remove colors
 		const size_t pixelsNum = img->w * img->h;
 		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
-			void *pixelPos = img->pixels + pixel * img->format->BytesPerPixel;
+			void *pixelPos = reinterpret_cast<void *>(uintptr_t(img->pixels) + pixel * img->format->BytesPerPixel);
 			if (checkPixel(pixelPos, colors, img->format->BytesPerPixel)) {
 				removePixel(pixelPos, colorKey, img->format->BytesPerPixel);
 			}

@@ -136,6 +136,7 @@
 #include "unit_cache.h"
 #endif
 
+#include <tileset.h>
 #include <vec2i.h>
 
 class CFile;

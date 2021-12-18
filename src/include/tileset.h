@@ -40,9 +40,11 @@
 #include "util.h"
 #include "video.h"
 #include "vec2i.h"
+#include "script.h"
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 struct lua_State;
 
@@ -149,7 +151,7 @@ public:
 	bool setTileCount(const size_t newCount);
 	bool increaseTileCountBy(const size_t increaseBy) { return setTileCount(tiles.size() + increaseBy); }
 
-	bool CTileset::insertTiles(const std::map<tile_index, CTile> &newTiles);
+	bool insertTiles(const std::map<tile_index, CTile> &newTiles);
 
 	tile_index getDefaultTileIndex() const;
 	tile_index getDefaultWoodTileIndex() const;
