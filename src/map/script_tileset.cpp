@@ -1006,8 +1006,11 @@ std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaSta
 	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, arg, isImg) };
 	std::vector<SDL_Surface*> imgLayer;
 
-	for (auto srcIndex : srcIndexes) {
-		const SDL_Surface *srcSurface = SrcGraphic->Surface;
+	for (auto const srcIndex : srcIndexes) {
+		if (!isImg && SrcTileset->tiles[srcIndex].tile == 0) { /// empty frame
+			continue;
+		}
+		const SDL_Surface *srcSurface = SrcTilesetGraphic->Surface;
 		
 		SDL_Surface *img = SDL_CreateRGBSurface(srcSurface->flags,
 												SrcTileset->getPixelTileSize().x,
