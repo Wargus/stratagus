@@ -336,7 +336,7 @@ public:
 	CTilesetGraphicGenerator(lua_State *luaStack, int tablePos, int argPos, const CTileset *srcTileset,
 															  				const CGraphic *srcGraphic,
 															  				const CGraphic *srcImgGraphic)
-							: SrcTileset(srcTileset), SrcGraphic(srcGraphic), SrcImgGraphic (srcImgGraphic)
+							: SrcTileset(srcTileset), SrcTilesetGraphic(srcGraphic), SrcImgGraphic (srcImgGraphic)
 	{
 		lua_rawgeti(luaStack, tablePos, argPos);
 		parseExtended(luaStack);
@@ -367,9 +367,9 @@ private:
 	uint16_t getIndex(const uint16_t imgNum);
 private:
 	std::vector<std::vector<SDL_Surface*>> SrcImgLayers;
-	const CTileset *SrcTileset;
-	const CGraphic *SrcGraphic;
-	const CGraphic *SrcImgGraphic;
+	const CTileset *SrcTileset 			{nullptr};
+	const CGraphic *SrcTilesetGraphic	{nullptr};
+	const CGraphic *SrcImgGraphic		{nullptr};
 };
 
 
@@ -377,8 +377,7 @@ class CTilesetParser
 {
 public:
 	enum slot_type {cSolid, cMixed, cUnsupported};
-	enum {cSlotType = 1, cSlotDefinition = 2};
-
+	
 	/// Constructor for extended tileset generator
 	explicit CTilesetParser(lua_State *luaStack, CTileset *baseTileset, const CGraphic *baseGraphic) 
 							: BaseTileset(baseTileset), BaseGraphic(baseGraphic)
@@ -407,9 +406,9 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	CTileset *BaseTileset {nullptr};
+	CTileset *BaseTileset 		{nullptr};
 	const CGraphic *BaseGraphic {nullptr};
-	CGraphic *SrcImgGraphic {nullptr};
+	CGraphic *SrcImgGraphic 	{nullptr};
 	std::vector<SDL_Surface *>  ExtGraphic;
 	std::map<tile_index, CTile> ExtTiles;
 };

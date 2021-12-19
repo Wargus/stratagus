@@ -860,7 +860,7 @@ bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint
 				break;
 			case 3:
 				{
-					const uint8_t *pixelPtr = static_cast<const uint8_t*>(pixel);
+					const uint8_t *const pixelPtr = static_cast<const uint8_t*>(pixel);
 					const uint32_t pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]       | pixelPtr[1] << 8  | pixelPtr[2] << 16
 																				: pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
 					if (pixelColor == color) {
@@ -903,15 +903,16 @@ void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t tra
 			break;
 		case 3:
 			{
-				const uint8_t* src = reinterpret_cast<const uint8_t*>(&transpColor);
+				const uint8_t *const src = reinterpret_cast<const uint8_t*>(&transpColor);
+				uint8_t *const dst = static_cast<uint8_t*>(pixel);
 				if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
-					static_cast<uint8_t*>(pixel)[0] = src[0];
-					static_cast<uint8_t*>(pixel)[1] = src[1];
-					static_cast<uint8_t*>(pixel)[2] = src[2];
+					dst[0] = src[0];
+					dst[1] = src[1];
+					dst[2] = src[2];
 				} else {
-					static_cast<uint8_t*>(pixel)[0] = src[3];
-					static_cast<uint8_t*>(pixel)[1] = src[2];
-					static_cast<uint8_t*>(pixel)[2] = src[1];
+					dst[0] = src[3];
+					dst[1] = src[2];
+					dst[2] = src[1];
 				}
 			}
 			break;
@@ -945,7 +946,7 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, std::vector<SDL
 		/// Do remove colors
 		const size_t pixelsNum = img->w * img->h;
 		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
-			void *pixelPos = reinterpret_cast<void *>(uintptr_t(img->pixels) + pixel * img->format->BytesPerPixel);
+			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(img->pixels) + pixel * img->format->BytesPerPixel);
 			if (checkPixel(pixelPos, colors, img->format->BytesPerPixel)) {
 				removePixel(pixelPos, colorKey, img->format->BytesPerPixel);
 			}
@@ -1029,7 +1030,7 @@ std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaSta
 		}
 
 		const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
-										   : SrcGraphic;
+										   : SrcTilesetGraphic;
 		const graphic_index frame = isImg ? srcIndex 
 										  : SrcTileset->tiles[srcIndex].tile;
 
