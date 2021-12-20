@@ -221,7 +221,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	if ((condition->ShowOnlySelected && !unit.Selected)
 		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
 		|| (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
-		|| (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && condition->HideAllied)) {
+		|| ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
 	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
