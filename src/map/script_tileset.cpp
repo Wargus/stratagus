@@ -1011,22 +1011,22 @@ std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaSta
 		if (!isImg && SrcTileset->tiles[srcIndex].tile == 0) { /// empty frame
 			continue;
 		}
-		const SDL_Surface *srcSurface = SrcTilesetGraphic->Surface;
+		const SDL_PixelFormat *format = SrcTilesetGraphic->Surface->format;
 		
-		SDL_Surface *img = SDL_CreateRGBSurface(srcSurface->flags,
+		SDL_Surface *img = SDL_CreateRGBSurface(SrcTilesetGraphic->Surface->flags,
 												SrcTileset->getPixelTileSize().x,
 												SrcTileset->getPixelTileSize().y,
-                                             	srcSurface->format->BitsPerPixel,
-												srcSurface->format->Rmask,
-												srcSurface->format->Gmask,
-												srcSurface->format->Bmask,
-												srcSurface->format->Amask);
+                                             	format->BitsPerPixel,
+												format->Rmask,
+												format->Gmask,
+												format->Bmask,
+												format->Amask);
 		uint32_t colorKey = 0;
-		if (!SDL_GetColorKey(img, &colorKey)) {
+		if (!SDL_GetColorKey(SrcTilesetGraphic->Surface, &colorKey)) {
 			SDL_SetColorKey(img, SDL_TRUE, colorKey);
 		}
-		if (srcSurface->format->palette) {
-			SDL_SetSurfacePalette(img, srcSurface->format->palette);
+		if (format->palette) {
+			SDL_SetSurfacePalette(img, format->palette);
 		}
 
 		const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
