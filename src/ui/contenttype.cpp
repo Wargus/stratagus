@@ -562,7 +562,18 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				LuaError(l, "the last {percentage, color} pair must be for 0%%");
 			}
 		} else if (!strcmp(key, "Border")) {
-			this->hasBorder = LuaToBoolean(l, -1);
+			if (lua_isboolean(l, -1)) {
+				if (LuaToBoolean(l, -1)) {
+					this->hasBorder = 1;
+				} else {
+					this->hasBorder = 0;
+				}
+			} else {
+				this->hasBorder = LuaToUnsignedNumber(l, -1);
+				if (this->hasBorder == 0) {
+					this->hasBorder = 1; // complete black is set to 1
+				}
+			}
 		} else {
 			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key);
 		}
