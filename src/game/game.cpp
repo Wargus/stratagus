@@ -361,6 +361,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		// MAPTODO Copyright notice in generated file
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
+		f->printf("-- preamble\n");
+		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\") end\n\n");
+
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (Map.Info.PlayerType[i] == PlayerNobody) {
@@ -507,6 +510,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
 		}
 		f->printf("\n\n");
+
+		f->printf("-- postamble\n");
+		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\") end\n\n");
+
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
 		delete f;

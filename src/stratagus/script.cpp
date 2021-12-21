@@ -249,6 +249,8 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
+		lua_pushstring(Lua, file.c_str());
+		lua_setglobal(Lua, "__file__");
 		if (!strArg.empty()) {
 			lua_pushstring(Lua, strArg.c_str());
 			LuaCall(1, 1);
