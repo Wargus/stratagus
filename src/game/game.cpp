@@ -394,8 +394,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 				f->printf("    end\n");
 				f->printf("end\n");
 			} else {
-				newSize.x = map.Info.MapHeight;
-				newSize.y = map.Info.MapWidth;
+				newSize.x = map.Info.MapWidth;
+				newSize.y = map.Info.MapHeight;
 			}
 
 			f->printf("-- Tiles Map\n");
@@ -415,8 +415,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		}
 
 		if (newSize.x == 0 || newSize.y == 0) {
-			newSize.x = map.Info.MapHeight;
-			newSize.y = map.Info.MapWidth;
+			newSize.x = map.Info.MapWidth;
+			newSize.y = map.Info.MapHeight;
 		}
 
 		f->printf("\n-- set map default stat and map sound for unit types\n");
