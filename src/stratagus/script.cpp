@@ -246,6 +246,9 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 		FileChecksums ^= fletcher32(content);
 		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.c_str() _C_ FileChecksums);
 	}
+	// save the current __file__
+	lua_getglobal(Lua, "__file__");
+
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
@@ -260,6 +263,8 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 	} else {
 		report(status, true);
 	}
+	// restore the old __file__
+	lua_setglobal(Lua, "__file__");
 	return status;
 }
 
