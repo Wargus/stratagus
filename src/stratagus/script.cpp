@@ -2176,7 +2176,7 @@ void InitLua()
 		lua_call(Lua, 1, 0);
 #endif
 	}
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(WIN32)
 	static const char* mobdebug =
 #include "./lua/mobdebug.h"
 ;

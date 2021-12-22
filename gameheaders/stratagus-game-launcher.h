@@ -831,6 +831,7 @@ int main(int argc, char * argv[]) {
 				 "If you got an error message about the extraction command failing, please try to run it in a console "
 				 "and post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
 				 "or the username (like an ampersand or exclamation mark). Try changing these. "
+#ifndef WIN32
 #ifdef WIN32
 				 "Also check if the file '%s' exists and check for errors or post it to the issue. "
 #endif
@@ -839,6 +840,10 @@ int main(int argc, char * argv[]) {
 				 GetExtractionLogPath(GAME_NAME, data_path),
 #endif
 				 data_path);
+#else
+				 "If not already done, please try using the portable version and check for stdout.txt, stderr.txt, and an extraction.log in the folder."
+				 );
+#endif
 		error(TITLE, message);
 #ifdef WIN32
 		_unlink(title_path);
