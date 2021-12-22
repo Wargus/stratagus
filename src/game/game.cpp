@@ -363,6 +363,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 
 		f->printf("-- preamble\n");
 		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\") end\n\n");
+		if (!Map.Info.Preamble.empty()) {
+			FileWriter *preamble = CreateFileWriter(std::string(mapSetup) + ".preamble");
+			preamble->write(Map.Info.Preamble.c_str(), Map.Info.Preamble.size());
+			delete preamble;
+		}
 
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
@@ -513,6 +518,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 
 		f->printf("-- postamble\n");
 		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\") end\n\n");
+		if (!Map.Info.Postamble.empty()) {
+			FileWriter *postamble = CreateFileWriter(std::string(mapSetup) + ".postamble");
+			postamble->write(Map.Info.Postamble.c_str(), Map.Info.Postamble.size());
+			delete postamble;
+		}
 
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);

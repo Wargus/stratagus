@@ -135,6 +135,8 @@ public:
 public:
 	std::string Description;    /// Map description
 	std::string Filename;       /// Map filename
+	std::string Preamble;       /// Map preamble script
+	std::string Postamble;      /// Map postamble script
 	int MapWidth;               /// Map width
 	int MapHeight;              /// Map height
 	int PlayerType[PlayerMax];  /// Same player->Type

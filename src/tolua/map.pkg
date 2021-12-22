@@ -3,6 +3,9 @@ $#include "tileset.h"
 class CMapInfo
 {
 	string Description;
+	string Filename;
+        string Preamble;
+        string Postamble;
 	int MapWidth;
 	int MapHeight;
 	int PlayerType[PlayerMax];
