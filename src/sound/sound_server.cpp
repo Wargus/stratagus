@@ -39,13 +39,10 @@
 
 #include "sound_server.h"
 
-#ifdef USE_FLUIDSYNTH
-#include "fluidsynth.h"
-#endif
-
 #include "iocompat.h"
 #include "iolib.h"
 #include "unit.h"
+#include "script.h"
 
 #include "SDL.h"
 #include "SDL_mixer.h"
@@ -57,10 +54,10 @@
 static bool SoundInitialized;    /// is sound initialized
 static bool MusicEnabled = true;
 static bool EffectsEnabled = true;
-static double VolumeScale = 1.0;
-static int MusicVolume = 0;
+static int EffectsVolume = 255;
+static int MusicVolume = 255;
 
-extern volatile bool MusicFinished;
+volatile bool MusicFinished;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
@@ -106,8 +103,10 @@ static void ChannelFinished(int channel)
 	if (Channels[channel].FinishedCallback) {
 		Channels[channel].FinishedCallback(channel);
 	}
-	delete Channels[channel].Unit;
-	Channels[channel].Unit = NULL;
+	if (Channels[channel].Unit) {
+		delete Channels[channel].Unit;
+		Channels[channel].Unit = NULL;
+	}
 }
 
 /**
@@ -120,7 +119,7 @@ static void ChannelFinished(int channel)
 */
 int SetChannelVolume(int channel, int volume)
 {
-	return Mix_Volume(channel, volume * VolumeScale);
+	return Mix_Volume(channel, volume);
 }
 
 /**
@@ -191,26 +190,19 @@ void StopAllChannels()
 	Mix_HaltChannel(-1);
 }
 
-static Mix_Music *currentMusic = NULL;
+static Mix_Chunk *currentMusic = NULL;
+static int currentMusicChannel = -1;
 
-static Mix_Music *LoadMusic(const char *name)
+static Mix_Chunk *LoadMusic(const char *name)
 {
+	if (currentMusicChannel >= 0) {
+		Mix_HaltChannel(currentMusicChannel);
+	}
 	if (currentMusic) {
-		Mix_HaltMusic();
-		Mix_FreeMusic(currentMusic);
+		Mix_FreeChunk(currentMusic);
+		currentMusic = NULL;
 	}
-	currentMusic = Mix_LoadMUS(name);
-	if (currentMusic) {
-		return currentMusic;
-	}
-
-	CFile *f = new CFile;
-	if (f->open(name, CL_OPEN_READ) == -1) {
-		printf("Can't open file '%s'\n", name);
-		delete f;
-		return NULL;
-	}
-	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 0);
+	currentMusic = LoadSample(name);
 	return currentMusic;
 }
 
@@ -236,10 +228,10 @@ static Mix_Chunk *LoadSample(const char *name)
 **
 **  @return      Mix_Music pointer
 */
-Mix_Music *LoadMusic(const std::string &name)
+Mix_Chunk *LoadMusic(const std::string &name)
 {
 	const std::string filename = LibraryFileName(name.c_str());
-	Mix_Music *music = LoadMusic(filename.c_str());
+	Mix_Chunk *music = LoadMusic(filename.c_str());
 
 	if (music == NULL) {
 		fprintf(stderr, "Can't load the music '%s'\n", name.c_str());
@@ -280,6 +272,7 @@ int PlaySample(Mix_Chunk *sample, Origin *origin)
 	DebugPrint("play sample %d\n" _C_ sample->volume);
 	if (SoundEnabled() && EffectsEnabled && sample) {
 		channel = Mix_PlayChannel(-1, sample, 0);
+		SetChannelVolume(channel, EffectsVolume);
 		Channels[channel].FinishedCallback = NULL;
 		if (origin && origin->Base) {
 			Origin *source = new Origin;
@@ -298,7 +291,7 @@ int PlaySample(Mix_Chunk *sample, Origin *origin)
 */
 void SetEffectsVolume(int volume)
 {
-	VolumeScale = (volume * 1.0) / 255.0;
+	EffectsVolume = volume;
 }
 
 /**
@@ -306,7 +299,7 @@ void SetEffectsVolume(int volume)
 */
 int GetEffectsVolume()
 {
-	return VolumeScale * 255;
+	return EffectsVolume;
 }
 
 /**
@@ -329,12 +322,40 @@ bool IsEffectsEnabled()
 --  Music
 ----------------------------------------------------------------------------*/
 
+bool CallbackMusic;                       /// flag true callback ccl if stops
+
+/*----------------------------------------------------------------------------
+-- Functions
+----------------------------------------------------------------------------*/
+
+
 /**
-**  Set the music finished callback
+**  Check if music is finished and play the next song
 */
-void SetMusicFinishedCallback(void (*callback)())
+void CheckMusicFinished(bool force)
 {
-	Mix_HookMusicFinished(callback);
+	// this races, but that's just fine, since we'll just miss a frame of we're unlucky
+	bool proceed = MusicFinished;
+	if (!(((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic))) {
+		return;
+	}
+	lua_getglobal(Lua, "MusicStopped");
+	if (!lua_isfunction(Lua, -1)) {
+		fprintf(stderr, "No MusicStopped function in Lua\n");
+	} else {
+		LuaCall(0, 1);
+	}
+	MusicFinished = false;
+}
+
+/**
+**  Callback for when music has finished
+**  Note: we are in the sdl audio thread
+*/
+static void MusicFinishedCallback(int channel)
+{
+	currentMusicChannel = -1;
+	MusicFinished = true;
 }
 
 /**
@@ -344,13 +365,13 @@ void SetMusicFinishedCallback(void (*callback)())
 **
 **  @return        0 if music is playing, -1 if not.
 */
-int PlayMusic(Mix_Music *sample)
+int PlayMusic(Mix_Chunk *sample)
 {
 	if (sample) {
-		Mix_VolumeMusic(MusicVolume);
 		MusicFinished = false;
-		Mix_PlayMusic(sample, 0);
-		Mix_VolumeMusic(MusicVolume / 4.0);
+		Mix_VolumeChunk(sample, MusicVolume);
+		int channel = Mix_FadeInChannel(-1, sample, 0, 500);
+		Channels[channel].FinishedCallback = MusicFinishedCallback;
 		return 0;
 	} else {
 		DebugPrint("Could not play sample\n");
@@ -371,16 +392,8 @@ int PlayMusic(const std::string &file)
 		return -1;
 	}
 	DebugPrint("play music %s\n" _C_ file.c_str());
-	Mix_Music *music = LoadMusic(file);
-
-	if (music) {
-		MusicFinished = false;
-		Mix_FadeInMusic(music, 0, 200);
-		return 0;
-	} else {
-		DebugPrint("Could not play %s\n" _C_ file.c_str());
-		return -1;
-	}
+	Mix_Chunk *music = LoadMusic(file);
+	return PlayMusic(music);
 }
 
 /**
@@ -388,7 +401,9 @@ int PlayMusic(const std::string &file)
 */
 void StopMusic()
 {
-	Mix_FadeOutMusic(200);
+	if (currentMusicChannel) {
+		Mix_FadeOutChannel(currentMusicChannel, 500);
+	}
 }
 
 /**
@@ -398,10 +413,10 @@ void StopMusic()
 */
 void SetMusicVolume(int volume)
 {
-	// due to left-right separation, sound effect volume is effectively halfed,
-	// so we adjust the music
 	MusicVolume = volume;
-	Mix_VolumeMusic(volume / 4.0);
+	if (currentMusicChannel) {
+		Mix_Volume(currentMusicChannel, volume);
+	}
 }
 
 /**
@@ -438,7 +453,7 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	return Mix_PlayingMusic();
+	return !MusicFinished;
 }
 
 /*----------------------------------------------------------------------------
@@ -496,12 +511,12 @@ int InitSound()
 		SoundInitialized = false;
 		return 1;
 	}
+	MusicFinished = false;
 	SoundInitialized = true;
 	Mix_AllocateChannels(MaxChannels);
 	Mix_ChannelFinished(ChannelFinished);
 
 	// Now we're ready for the callback to run
-	Mix_ResumeMusic();
 	Mix_Resume(-1);
 	return 0;
 }

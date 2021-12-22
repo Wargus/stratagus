@@ -269,7 +269,6 @@ set(pathfinder_SRCS
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(sound_SRCS
-	src/sound/music.cpp
 	src/sound/script_sound.cpp
 	src/sound/sound.cpp
 	src/sound/sound_id.cpp
