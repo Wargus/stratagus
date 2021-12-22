@@ -1460,7 +1460,7 @@ bool CPlayer::IsEnemy(const CUnit &unit) const
 */
 bool CPlayer::IsAllied(const CPlayer &player) const
 {
-	return (Allied & (1 << player.Index)) != 0;
+	return IsAllied(player.Index);
 }
 
 /**
