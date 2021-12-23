@@ -1234,6 +1234,14 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Idle")) {
 		lua_pushboolean(l, unit->IsIdle());
 		return 1;
+	} else if (!strcmp(value, "PixelPos")) {
+		PixelPos pos = unit->GetMapPixelPosCenter();
+		lua_newtable(l);
+		lua_pushnumber(l, pos.x);
+		lua_setfield(l, -2, "x");
+		lua_pushnumber(l, pos.y);
+		lua_setfield(l, -2, "y");
+		return 1;
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
