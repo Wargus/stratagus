@@ -720,7 +720,9 @@ int stratagusMain(int argc, char **argv)
 
 		// Setup sound card, must be done before loading sounds, so that
 		// SDL_mixer can auto-convert to the target format
-		InitSound();
+		if (!InitSound()) {
+			InitMusic();
+		}
 
 		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 

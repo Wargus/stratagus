@@ -68,7 +68,7 @@ extern bool UnitSoundIsPlaying(Origin *origin);
 /// Check, if this sample is already playing
 extern bool SampleIsPlaying(Mix_Chunk *sample);
 /// Load music
-extern Mix_Chunk *LoadMusic(const std::string &name);
+extern Mix_Music *LoadMusic(const std::string &name);
 /// Load a sample
 extern Mix_Chunk *LoadSample(const std::string &name);
 /// Play a sample
@@ -85,8 +85,10 @@ extern void SetEffectsEnabled(bool enabled);
 /// Check if effects are enabled
 extern bool IsEffectsEnabled();
 
+/// Set the music finished callback
+void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
-extern int PlayMusic(Mix_Chunk *sample);
+extern int PlayMusic(Mix_Music *sample);
 /// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Stop music playing
