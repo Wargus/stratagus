@@ -1237,6 +1237,15 @@ static int CclGetUnitVariable(lua_State *l)
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
+			if (nargs == 2) {
+				index = UnitTypeVar.BoolFlagNameLookup[value];
+				if (index != -1) {
+					lua_pushboolean(l, unit->Type->BoolFlag[index].value);
+					return 1;
+				}
+			}
+		}
+		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ value);
 		}
 		if (nargs == 2) {
