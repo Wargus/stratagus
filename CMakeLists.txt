@@ -32,9 +32,9 @@
 # Stratagus major version
 set(STRATAGUS_MAJOR_VERSION 3)
 # Stratagus minor version (maximum 99)
-set(STRATAGUS_MINOR_VERSION 1)
+set(STRATAGUS_MINOR_VERSION 2)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 3)
+set(STRATAGUS_PATCH_LEVEL 0)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################

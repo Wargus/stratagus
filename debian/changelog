@@ -1,9 +1,141 @@
 stratagus (3.1.3) UNRELEASED; urgency=medium
 
+  [ Tim Felgentreff ]
   * Fix mana IncreaseFrequency increasing with each update, which slowed down mana regeneration
   * Fix setting RegenerationRate and RegenerationFrequency per unit using SetUnitVariable
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 17 Jul 2021 21:31:09 +0200
+  [ Jerome FORESTIER ]
+  * Fix accented char by using when .po files are UTF8
+
+  [ psa-jforestier ]
+  * Fix german sz
+
+  [ Jerome FORESTIER ]
+  * Add optimization to not draw text when text is empty (mostly in mission briefing)
+  * Prevent a crash in Wargus.exe
+  * Fix #359
+  * fix memory leak on network game (Win32)
+
+  [ alyokhin ]
+  * Added upscale table for explored map (alternative way to reveal map)
+  * Added blit surface with alpha blending function.
+  * Switched enhanced fog render to new BlitSurface with alpha blenfing.
+  * Added posibility to get a single pixel value from an eased texture.
+  * TODO comments
+  * Implemented possibility to set opacity values for different levels of visibility.
+  * Const correctnes stuff.
+  * Added possibility to set opacity for differen levels of fog in the mini map.
+  * Enable alpha blending for fog of war in the minimap.
+  * Disable of force explore for unseen tiles for map reveleation.
+  * Aded methods to get opacity setpoints for different layers of fog
+  * Implemented revealed/unseen levels of opacity for legacy fog. Switch to 2-staged rendering for legacy FOW (1: to Viewport's fog surface, 2: to theScreen).
+  * Added CGraphic's draw method with custom modifier for every pixel. Implemented pixel modifier for drawing legacy fog.  Also added posibility to draw CGraphic to any surfaces (not only to TheScreen)
+  * Removed unneded anymore legacy global variables for fog color and opacity.
+  * Comments and const correctness
+  * Fixed potentially memory leak
+  * Added missed check for NoFogOfWar option
+  * Added reveal map modes
+  * Added extended network messages for changing map reveal and fog of war.
+  * Update RevealMap() for new modes
+  * Added missed comments with CommandLog's
+  * Added comments, and fixed error message for reveal modes.
+  * Removed unnecessary AlphaFogG
+  * Move legacy fog into the CFogOfWar. Refactor.
+  * Legacy fog gtraphic moved from CMap to CFogOfWar
+  * Enabled initialization of minimap variables with nullptr
+  * Revert accidental comitted local changes for launch.json
+  * Swithing back to render legacy fog via AlphaFogG graphic set to fix broken color cycling.
+  * Minimap update: checking visibility for tile now realized via CFogOfWar::VisTable for both fog types.
+  * Removed unused variables
+  * Revert changes in SetFogOfWar
+  * Cleanup
+  * performance optimization: std::function replaced by pointer to func
+  * performance optimization: enable multithreading for legacy fog drawing
+  * Removed unnecessary #include
+
+  [ Tim Felgentreff ]
+  * only checksum stratagus.lua. this has at least the game version
+
+  [ Andreas Volz ]
+  * enable LUA debugging
+
+  [ Tim Felgentreff ]
+  * do not crash when unit to remove or transform no longer exists (fixes war1gus#213)
+  * Extend 0-hp non-solid decorations edge case to allow building under things. fixes war1gus #220
+  * do not reset SplashFactor or NumDirections when redefining missiles
+
+  [ Alex Grant Benedict ]
+  * Minor fix for compiling on macOS.  Fixes linker error for libSDL2main.
+  * Add .DS_Store to .gitignore.
+  * Some minor changes to build files to get this to build and run on macOS.
+  * Some additions to build vendored libs
+  * Add some editor files to .gitignore
+  * Add in vendored depenedencies.
+  * Some cleanup, removed the full toluapp source directory, so only using the simple one.
+  * Delete unused folder in lua source tree.
+
+  [ alyokhin ]
+  * added back legacy renderer for tiled fog. some refact.
+  * fixed comments
+
+  [ Alex Grant Benedict ]
+  * Update stratagus-tinyfiledialogs.h
+  * Remove old include. Auto formatted.
+  * Add in wchar_t version of GetExtractionLogPath
+
+  [ Simone Starace ]
+  * Added code example for CclGetUnitsAroundUnit
+  * Added example codes in script_map.cpp
+
+  [ Alex Grant Benedict ]
+  * Minor fix ups for TCHAR == char on XP. Add in stub function for detectpresence on windows.
+  * Fix linking to libdl on Ubuntu
+  * Fix warning about tempnam, add in basic optimization for release build
+
+  [ Tim Felgentreff ]
+  * add launch config for wargus/war1gus game launchers
+  * On windows, prefer stratagus from PATH over registry
+  * minor improvement for argument handling in game launcher
+  * include mobdebug
+
+  [ Alyokhin ]
+  * Enabled curses dialogs
+
+  [ Tim Felgentreff ]
+  * fix music playback. fixes Wargus/wargus#345
+  * fix help message for wargus tool
+  * avoid crashing with arbitrary utf8 codepoints. fixes #364
+  * fix fullscreen flag
+  * add a preference for the stats shown when no selection is active
+  * do not accept multiple research requests for the same upgrade. fixes #352
+  * fix broken fonts on war1gus
+  * Revert "do not accept multiple research requests for the same upgrade. fixes #352"
+  * do not apply the effects of an upgrade multiple times. fixes #352
+  * force the AI to honour single-research vs multi-research and document that a bit
+  * for the purposes of UI panels, HideAllied also hides from the player
+  * allow configuration of Border color for lifebar
+  * add simple heuristic for border size for life bar
+
+  [ Dmitry Marakasov ]
+  * Fix compiler detection and flags
+
+  [ Tim Felgentreff ]
+  * actually close files used through sdl. should fix #373
+  * fix swapped map width/height. fixes Wargus/wargus#402
+  * expose __file__ as current script name and use that for pre- and postscript for maps
+  * expose TextBox widget and add map preamble/postamble script storage
+  * make sure to reset the __file__ global as we go through files
+  * add GetDiplomacy lua function
+  * just treat music like a sound channel to fix war1gus#195
+  * workarounds for win32
+  * Revert "just treat music like a sound channel to fix war1gus#195"
+  * allow querying type bool flags on units
+  * add way to get the pixel position of a unit
+  * keep debug symbols for windows builds
+  * fix path to pdb
+  * allow loading a file ignoring errors, and ignore preamble/postamble errors in editor
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Fri, 24 Dec 2021 21:10:19 +0100
 
 stratagus (3.1.2) focal; urgency=medium
 
