@@ -122,6 +122,9 @@ static int report(int status, bool exitOnError)
 		fprintf(stderr, "%s\n", msg);
 		if (exitOnError) {
 			::exit(1);
+		} else {
+			lua_pushstring(Lua, msg);
+			lua_setglobal(Lua, "__last_error__");
 		}
 		lua_pop(Lua, 1);
 	}
@@ -234,7 +237,7 @@ static bool GetFileContent(const std::string &file, std::string &content)
 **
 **  @return      0 for success, else exit.
 */
-int LuaLoadFile(const std::string &file, const std::string &strArg)
+int LuaLoadFile(const std::string &file, const std::string &strArg, bool exitOnError)
 {
 	DebugPrint("Loading '%s'\n" _C_ file.c_str());
 
@@ -256,12 +259,12 @@ int LuaLoadFile(const std::string &file, const std::string &strArg)
 		lua_setglobal(Lua, "__file__");
 		if (!strArg.empty()) {
 			lua_pushstring(Lua, strArg.c_str());
-			LuaCall(1, 1);
+			LuaCall(1, 1, exitOnError);
 		} else {
-			LuaCall(0, 1);
+			LuaCall(0, 1, exitOnError);
 		}
 	} else {
-		report(status, true);
+		report(status, exitOnError);
 	}
 	// restore the old __file__
 	lua_setglobal(Lua, "__file__");
@@ -289,9 +292,13 @@ static int CclSavePreferences(lua_State *l)
 */
 static int CclLoad(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
+	const int arg = lua_gettop(l);
+	if (arg < 1 || arg > 2) {
+		LuaError(l, "incorrect argument");
+	}
 	const std::string filename = LibraryFileName(LuaToString(l, 1));
-	if (LuaLoadFile(filename) == -1) {
+	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
+	if (LuaLoadFile(filename, "", exitOnError) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}
 	return 0;

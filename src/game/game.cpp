@@ -362,7 +362,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
 		f->printf("-- preamble\n");
-		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\") end\n\n");
+		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\", Editor.Running == 0) end\n\n");
 		if (!Map.Info.Preamble.empty()) {
 			FileWriter *preamble = CreateFileWriter(std::string(mapSetup) + ".preamble");
 			preamble->write(Map.Info.Preamble.c_str(), Map.Info.Preamble.size());
@@ -517,7 +517,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		f->printf("\n\n");
 
 		f->printf("-- postamble\n");
-		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\") end\n\n");
+		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\", Editor.Running == 0) end\n\n");
 		if (!Map.Info.Postamble.empty()) {
 			FileWriter *postamble = CreateFileWriter(std::string(mapSetup) + ".postamble");
 			postamble->write(Map.Info.Postamble.c_str(), Map.Info.Postamble.size());
