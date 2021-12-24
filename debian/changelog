@@ -1,4 +1,4 @@
-stratagus (3.1.3) UNRELEASED; urgency=medium
+stratagus (3.2.0) focal; urgency=medium
 
   [ Tim Felgentreff ]
   * Fix mana IncreaseFrequency increasing with each update, which slowed down mana regeneration
@@ -135,7 +135,7 @@ stratagus (3.1.3) UNRELEASED; urgency=medium
   * fix path to pdb
   * allow loading a file ignoring errors, and ignore preamble/postamble errors in editor
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Fri, 24 Dec 2021 21:10:19 +0100
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Fri, 24 Dec 2021 21:45:12 +0100
 
 stratagus (3.1.2) focal; urgency=medium
 
