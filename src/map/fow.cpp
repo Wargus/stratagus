@@ -319,7 +319,7 @@ void CFogOfWar::GenerateFog()
         for (uint16_t row = lBound; row < uBound; row++) {
 
             const size_t visIndex = VisTable_Index0 + row * VisTableWidth;
-            const size_t mapIndex = size_t(row) * Map.Info.MapHeight;
+            const size_t mapIndex = size_t(row) * Map.Info.MapWidth;
 
             for (uint16_t col = 0; col < Map.Info.MapWidth; col++) {
 
