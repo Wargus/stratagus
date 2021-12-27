@@ -3,6 +3,10 @@ Here is small HOWTO release new version of Stratagus (and also Wargus/War1gus/St
 Increase version in file:
  CMakeLists.txt
 
+You can do
+ gbp dch
+to generate a debian changelog update.
+
 Update changelog in file:
  doc/changelog.html
 

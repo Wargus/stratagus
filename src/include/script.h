@@ -68,7 +68,7 @@ enum {
 
 extern lua_State *Lua;
 
-extern int LuaLoadFile(const std::string &file, const std::string &strArg = "");
+extern int LuaLoadFile(const std::string &file, const std::string &strArg = "", bool exitOnError = true);
 extern int LuaCall(int narg, int clear, bool exitOnError = true);
 extern int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError = true);
 

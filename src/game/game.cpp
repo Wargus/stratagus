@@ -361,6 +361,14 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		// MAPTODO Copyright notice in generated file
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
 
+		f->printf("-- preamble\n");
+		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\", Editor.Running == 0) end\n\n");
+		if (!Map.Info.Preamble.empty()) {
+			FileWriter *preamble = CreateFileWriter(std::string(mapSetup) + ".preamble");
+			preamble->write(Map.Info.Preamble.c_str(), Map.Info.Preamble.size());
+			delete preamble;
+		}
+
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (Map.Info.PlayerType[i] == PlayerNobody) {
@@ -394,8 +402,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 				f->printf("    end\n");
 				f->printf("end\n");
 			} else {
-				newSize.x = map.Info.MapHeight;
-				newSize.y = map.Info.MapWidth;
+				newSize.x = map.Info.MapWidth;
+				newSize.y = map.Info.MapHeight;
 			}
 
 			f->printf("-- Tiles Map\n");
@@ -415,8 +423,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		}
 
 		if (newSize.x == 0 || newSize.y == 0) {
-			newSize.x = map.Info.MapHeight;
-			newSize.y = map.Info.MapWidth;
+			newSize.x = map.Info.MapWidth;
+			newSize.y = map.Info.MapHeight;
 		}
 
 		f->printf("\n-- set map default stat and map sound for unit types\n");
@@ -507,6 +515,15 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
 		}
 		f->printf("\n\n");
+
+		f->printf("-- postamble\n");
+		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\", Editor.Running == 0) end\n\n");
+		if (!Map.Info.Postamble.empty()) {
+			FileWriter *postamble = CreateFileWriter(std::string(mapSetup) + ".postamble");
+			postamble->write(Map.Info.Postamble.c_str(), Map.Info.Postamble.size());
+			delete postamble;
+		}
+
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup);
 		delete f;

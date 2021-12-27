@@ -297,9 +297,15 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	color = IndexToColor(this->colors[i]);
 
 	if (this->hasBorder) {
-		// Border
-		Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
-								this->Width + 3, this->Height + 3);
+		// Border. We have a simple heuristic to determine how big it is...
+		// TODO: make configurable?
+		if (this->Height <= 6) {
+			Video.FillRectangleClip(this->hasBorder, this->Pos.x - 2, this->Pos.y - 2,
+									this->Width + 2, this->Height + 2);
+		} else {
+			Video.FillRectangleClip(this->hasBorder, this->Pos.x - 2, this->Pos.y - 2,
+									this->Width + 3, this->Height + 3);
+		}
 	}
 
 	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
@@ -562,7 +568,18 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				LuaError(l, "the last {percentage, color} pair must be for 0%%");
 			}
 		} else if (!strcmp(key, "Border")) {
-			this->hasBorder = LuaToBoolean(l, -1);
+			if (lua_isboolean(l, -1)) {
+				if (LuaToBoolean(l, -1)) {
+					this->hasBorder = 1;
+				} else {
+					this->hasBorder = 0;
+				}
+			} else {
+				this->hasBorder = LuaToUnsignedNumber(l, -1);
+				if (this->hasBorder == 0) {
+					this->hasBorder = 1; // complete black is set to 1
+				}
+			}
 		} else {
 			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key);
 		}

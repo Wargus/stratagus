@@ -1234,8 +1234,25 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Idle")) {
 		lua_pushboolean(l, unit->IsIdle());
 		return 1;
+	} else if (!strcmp(value, "PixelPos")) {
+		PixelPos pos = unit->GetMapPixelPosCenter();
+		lua_newtable(l);
+		lua_pushnumber(l, pos.x);
+		lua_setfield(l, -2, "x");
+		lua_pushnumber(l, pos.y);
+		lua_setfield(l, -2, "y");
+		return 1;
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
+		if (index == -1) {
+			if (nargs == 2) {
+				index = UnitTypeVar.BoolFlagNameLookup[value];
+				if (index != -1) {
+					lua_pushboolean(l, unit->Type->BoolFlag[index].value);
+					return 1;
+				}
+			}
+		}
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ value);
 		}

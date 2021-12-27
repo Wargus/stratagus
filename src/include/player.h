@@ -245,6 +245,14 @@ public:
 		return (Index != index && (Enemy & (1 << index)) != 0);
 	}
 
+	/**
+	**  Check if the player index is an enemy
+	*/
+	bool IsAllied(const int index) const
+	{
+		return (Index != index && (Allied & (1 << index)) != 0);
+	}
+
 	bool IsEnemy(const CPlayer &player) const;
 	bool IsEnemy(const CUnit &unit) const;
 	bool IsAllied(const CPlayer &player) const;

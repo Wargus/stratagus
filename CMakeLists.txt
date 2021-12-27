@@ -32,9 +32,9 @@
 # Stratagus major version
 set(STRATAGUS_MAJOR_VERSION 3)
 # Stratagus minor version (maximum 99)
-set(STRATAGUS_MINOR_VERSION 1)
+set(STRATAGUS_MINOR_VERSION 2)
 # Stratagus patch level (maximum 99)
-set(STRATAGUS_PATCH_LEVEL 3)
+set(STRATAGUS_PATCH_LEVEL 1)
 # Stratagus patch level 2
 set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
@@ -843,10 +843,10 @@ endif()
 
 # Stratagus needs to have char by default signed
 # No idea how to tell this to other compilers
-if(CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char -Werror")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
 endif()
-if(CMAKE_COMPILER_IS_GNUC)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
 endif()
 if(WIN32 AND MSVC)
@@ -1126,6 +1126,12 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(WIN32)
+  if(MSVC)
+	target_compile_options(stratagus PRIVATE "$<$<CONFIG:Release>:/Zi>")
+	target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
+	target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
+	target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
+  endif()
   set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
   set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
 endif()

@@ -212,7 +212,9 @@ static size_t sdl_write(SDL_RWops * context, const void *ptr, size_t size, size_
 }
 
 static int sdl_close(SDL_RWops * context) {
-	return -1;
+	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
+	free(context);
+	return self->close();
 }
 
 SDL_RWops * CFile::as_SDL_RWops()
@@ -224,6 +226,7 @@ SDL_RWops * CFile::as_SDL_RWops()
 	ops->seek = sdl_seek;
 	ops->read = sdl_read;
 	ops->write = sdl_write;
+	ops->close = sdl_close;
 	return ops;
 }
 

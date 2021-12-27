@@ -546,6 +546,31 @@ static int CclDiplomacy(lua_State *l)
 }
 
 /**
+**  Get diplomacy from one player to another. Returns the strings "allied",
+**  "enemy", "neutral", or "crazy".
+*/
+static int CclGetDiplomacy(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	const int base = LuaToNumber(l, 1);
+	const int plynr = LuaToNumber(l, 2);
+	const char *state;
+
+	if (Players[base].IsEnemy(plynr)) {
+		if (Players[base].IsAllied(plynr)) {
+			lua_pushstring(l, "crazy");
+		} else {
+			lua_pushstring(l, "enemy");
+		}
+	} else if (Players[base].IsAllied(plynr)) {
+		lua_pushstring(l, "allied");
+	} else {
+		lua_pushstring(l, "neutral");
+	}
+	return 1;
+}
+
+/**
 ** <b>Description</b>
 **
 **  Change the shared vision from player to another player.
@@ -1088,6 +1113,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "SetAllPlayersTotalUnitLimit", CclSetAllPlayersTotalUnitLimit);
 
 	lua_register(Lua, "SetDiplomacy", CclSetDiplomacy);
+	lua_register(Lua, "GetDiplomacy", CclGetDiplomacy);
 	lua_register(Lua, "Diplomacy", CclDiplomacy);
 	lua_register(Lua, "SetSharedVision", CclSetSharedVision);
 	lua_register(Lua, "SharedVision", CclSharedVision);

@@ -32,6 +32,7 @@
 
 //@{
 
+#include "color.h"
 #include "script.h"
 #include "vec2i.h"
 #include <vector>
@@ -149,7 +150,7 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), ValueFunc(NULL), ValueMax(-1), Width(0), Height(0), hasBorder(true), colors(NULL), values(NULL) {}
+	CContentTypeLifeBar() : Index(-1), ValueFunc(NULL), ValueMax(-1), Width(0), Height(0), hasBorder(1), colors(NULL), values(NULL) {}
 	virtual ~CContentTypeLifeBar()
 	{
 		FreeNumberDesc(ValueFunc);
@@ -166,7 +167,7 @@ private:
 	int ValueMax;         /// Max, when used with a value function
 	int Width;            /// Width of the bar.
 	int Height;           /// Height of the bar.
-	bool hasBorder;       /// True for additional border.
+	IntColor hasBorder;   /// True for additional border.
 	unsigned int *colors; /// array of color to show (depend of value)
 	unsigned int *values; /// list of percentage to change color.
 };
