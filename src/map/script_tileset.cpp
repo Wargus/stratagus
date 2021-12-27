@@ -1080,6 +1080,17 @@ void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 	}
 }
 
+std::vector<graphic_index> CTilesetGraphicGenerator::genSequence(const uint16_t seqNumber) {
+
+
+}
+
+SDL_Surface* CTilesetGraphicGenerator::get(const uint16_t imgNo)
+{
+	std::vector<graphic_index> framesSequence { genSequence(imgNo) };
+
+}
+
 /** 
 ** Parse range of destination indexes
 **

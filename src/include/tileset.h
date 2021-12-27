@@ -362,9 +362,9 @@ private:
 
 	void parseExtended(lua_State *luaStack);
 	
+	std::vector<graphic_index> genSequence(const uint16_t seqNumber);
+	SDL_Surface* get(const tile_index imgIdx);
 
-	SDL_Surface* get(const uint16_t imgNum);
-	uint16_t getIndex(const uint16_t imgNum);
 private:
 	std::vector<std::vector<SDL_Surface*>> SrcImgLayers;
 	const CTileset *SrcTileset 			{nullptr};
@@ -393,7 +393,6 @@ public:
 			CGraphic::Free(SrcImgGraphic);
 		}
 	}
-
 	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; };
 	const std::vector<SDL_Surface *> getGraphic() const { return ExtGraphic; };
 
