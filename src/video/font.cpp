@@ -203,7 +203,7 @@ static int utf8_to_ascii(const int utf8)
 	if (ascii_idx >= 0 && ascii_idx < sizeof(extended_ascii)) {
 		newutf8 = extended_ascii[(utf8 & 0xFF) - 0x90];
 	}
-	if (newutf8 == 0x00) {
+	if (newutf8 < 0x32) {
 		fprintf(stderr, "Can't convert UTF8 char to Ascii : '%c' d=%d (0x%04x)\r\n", utf8, utf8, utf8);
 		newutf8 = '?';
 	}

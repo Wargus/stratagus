@@ -89,25 +89,25 @@ class BNCSInputStream {
 public:
     BNCSInputStream(CTCPSocket *socket) {
         this->sock = socket;
-        this->bufsize = 1024;
-        this->buffer = (char*)calloc(sizeof(char), bufsize);
-        this->received_bytes = 0;
-        this->pos = 0;
+        this->messageLength = -1;
     };
     ~BNCSInputStream() {};
 
     std::string readString() {
-        if (received_bytes - pos <= 0) {
+        if (buffer.empty()) {
             return "";
         }
         std::stringstream strstr;
-        int i = pos;
         char c;
-        while ((c = buffer[i]) != '\0' && i < received_bytes) {
-            strstr.put(c);
-            i += 1;
+        while (!buffer.empty()) {
+            c = buffer.front();
+            buffer.pop();
+            if (c != '\0') {
+                strstr.put(c);
+            } else {
+                break;
+            }
         }
-        consumeData(i + 1 - pos);
         return strstr.str();
     };
 
@@ -138,39 +138,79 @@ public:
     };
 
     uint8_t read8() {
-        if (pos > received_bytes) {
+        if (buffer.empty()) {
             return 0;
         }
-        uint8_t byte = buffer[pos];
-        consumeData(1);
+        uint8_t byte = buffer.front();
+        buffer.pop();
         return byte;
     }
 
     uint16_t read16() {
-        if (pos + 1 > received_bytes) {
+        if (buffer.size() < 2) {
             return 0;
         }
-        uint16_t byte = ntohs(reinterpret_cast<uint16_t *>(buffer + pos)[0]);
-        consumeData(2);
+        uint16_t byte = buffer.front();
+        buffer.pop();
+        byte <<= 8;
+        byte |= buffer.front();
+        buffer.pop();
         return ntohs(byte);
     }
 
     uint32_t read32() {
-        if (pos + 3 > received_bytes) {
+        if (buffer.size() < 4) {
             return 0;
         }
-        uint32_t byte = ntohl(reinterpret_cast<uint32_t *>(buffer + pos)[0]);
-        consumeData(4);
+        uint32_t byte = buffer.front();
+        buffer.pop();
+        byte <<= 8;
+        byte |= buffer.front();
+        buffer.pop();
+        byte <<= 8;
+        byte |= buffer.front();
+        buffer.pop();
+        byte <<= 8;
+        byte |= buffer.front();
+        buffer.pop();
         return ntohl(byte);
     }
 
     uint64_t read64() {
-        if (pos + 7 > received_bytes) {
+        if (buffer.size() < 8) {
             return 0;
         }
-        uint64_t byte = reinterpret_cast<uint64_t *>(buffer + pos)[0];
-        consumeData(8);
-        return ntohl(byte & (uint32_t)-1) | ntohl(byte >> 32);
+        uint32_t wordOne = buffer.front();
+        buffer.pop();
+        wordOne <<= 8;
+        wordOne |= buffer.front();
+        buffer.pop();
+        wordOne <<= 8;
+        wordOne |= buffer.front();
+        buffer.pop();
+        wordOne <<= 8;
+        wordOne |= buffer.front();
+        buffer.pop();
+        uint32_t wordTwo = buffer.front();
+        buffer.pop();
+        wordTwo <<= 8;
+        wordTwo |= buffer.front();
+        buffer.pop();
+        wordTwo <<= 8;
+        wordTwo |= buffer.front();
+        buffer.pop();
+        wordTwo <<= 8;
+        wordTwo |= buffer.front();
+        buffer.pop();
+        uint32_t nativeWordOne = ntohl(wordOne);
+        uint32_t nativeWordTwo = ntohl(wordTwo);
+        if (nativeWordOne == wordOne) {
+            // we are in network byte order (BE) on this system
+            return ((uint64_t)wordOne << 32) | wordTwo;
+        } else {
+            // we are little endian
+            return ((uint64_t)wordTwo << 32) | wordOne;
+        }
     }
 
     bool readBool8() {
@@ -187,12 +227,17 @@ public:
 
     /**
      * For debugging and development: read the entire thing as a char
-     * array. Caller must "free" the out-char
+     * array. Caller must "delete[]" the out-char
      */
     int readAll(char** out) {
-        *out = (char*)calloc(received_bytes, sizeof(char));
-        strncpy(*out, buffer, received_bytes);
-        return received_bytes;
+        std::queue<uint8_t> outQueue = std::queue(buffer);
+        int sz = outQueue.size();
+        *out = new char[sz];
+        for (int i = 0; i < sz; i++) {
+            (*out)[i] = outQueue.front();
+            outQueue.pop();
+        }
+        return sz;
     }
 
     std::string string32() {
@@ -213,85 +258,75 @@ public:
         //  (UINT8) Message ID
         // (UINT16) Message length, including this header
         //   (VOID) Message data
-        if (received_bytes < 4) {
-            // in case of retry, we may already have the first 4 bytes
-            received_bytes += this->sock->Recv(buffer + received_bytes, 4 - received_bytes);
-        }
-        if (received_bytes < 4) {
-            // didn't get the complete header yet
-            return -1;
-        }
-        if (pos != 0) {
-            debugDump();
-            finishMessage();
-            return -1;
-        }
-        uint8_t headerbyte = read8();
-        if (headerbyte != 0xff) {
-            // Likely a bug on our side. We just skip this byte.
-            debugDump();
-            memmove(buffer, buffer + 1, received_bytes - 1);
-            received_bytes -= 1;
-            pos = 0;
-            return -1;
-        }
-        uint8_t msgId = read8();
-        uint16_t len = read16();
-        // we still need to have len in total for this message, so if we have
-        // more available than len minus the current position and minus the
-        // first 4 bytes that we already consumed, we'll have enough
-        assert(pos == 4);
-        long needed = len - received_bytes;
-        if (needed > 0) {
-            if (needed >= bufsize + received_bytes) {
-                // we never shrink the buffer again while we're online
-                buffer = (char*)realloc(buffer, sizeof(char) * len + 1);
-                bufsize = len + 1;
+        if (messageLength < 0) {
+            // we don't know what we have yet
+            if (buffer.size() < 4) {
+                // in case of retry, we may already have the first 4 bytes
+                uint8_t temp[4];
+                int count = this->sock->Recv(temp, 4 - buffer.size());
+                for (int i = 0; i < count; i++) {
+                    buffer.push(temp[i]);
+                }
             }
-            received_bytes += this->sock->Recv(buffer + received_bytes, needed);
-            if (received_bytes < len) {
-                // Didn't receive full message on the socket, yet. Reset position so
-                // this method can be used to try again
-                pos = 0;
+            if (buffer.size() < 4) {
+                // didn't get the complete header yet
+                return -1;
+            }
+            uint8_t headerbyte = read8();
+            if (headerbyte != 0xff) {
+                // Likely a bug on our side. We just skip this byte.
+                debugDump();
+                return -1;
+            }
+            messageId = read8();
+            uint16_t len = read16();
+            // we still need to have len in total for this message, so if we have
+            // more available than len minus the current position and minus the
+            // first 4 bytes that we already consumed, we'll have enough
+            Assert(buffer.empty());
+            messageLength = len - 4;
+        }
+        uint32_t needed = messageLength - buffer.size();
+        if (needed > 0) {
+            uint8_t *temp = new uint8_t[needed];
+            int count = this->sock->Recv(temp, needed);
+            for (int i = 0; i < count; i++) {
+                buffer.push(temp[i]);
+            }
+            delete[] temp;
+            if (buffer.size() < needed) {
+                // Didn't receive full message on the socket, yet.
+                // This method can be used to try again
                 return -1;
             }
         }
-        return msgId;
+        return messageId;
     };
 
     void debugDump() {
         if (EnableDebugPrint) {
-            std::cout << "Input stream state: pos(" << pos << "), received_bytes(" << received_bytes << ")" << std::endl;
-            dump((uint8_t*)buffer, received_bytes);
+            std::cout << "Input stream state: messageLength(" << messageLength << ")" << std::endl;
+            char *temp;
+            int sz = readAll(&temp);
+            dump((uint8_t*)temp, sz);
+            delete[] temp;
         }
     }
 
     void finishMessage() {
-        assert(pos <= received_bytes);
-        received_bytes = received_bytes - pos;
-        if (received_bytes > 0) {
-            // move the remaining received bytes to the start of the buffer, to
-            // be used for the next message
-            memmove(buffer, buffer + pos, received_bytes);
+        messageId = -1;
+        messageLength = -1;
+        while (!buffer.empty()) {
+            buffer.pop();
         }
-        pos = 0;
     }
 
 private:
-    void consumeData(int bytes) {
-        if (pos + bytes > received_bytes) {
-            // XXX: This is probably a symptom of missing error handling
-            // somewhere else, but we'll try just not to crash here
-            return;
-        }
-        pos += bytes;
-    }
 
     CTCPSocket *sock;
-    char *buffer;
-    int received_bytes;
-    int pos;
-    int bufsize;
+    std::queue<uint8_t> buffer;
+    int32_t messageLength;
+    uint8_t messageId;
 };
 
 class BNCSOutputStream {
@@ -562,6 +597,10 @@ public:
         return gameStats[10];
     };
 
+    bool isValid() {
+        return gameStats.size() > 10 && !gameStats[10].empty();
+    }
+
     std::string getGameStatus() {
         switch (gameStatus) {
         case 0x0:
@@ -711,6 +750,7 @@ private:
 };
 
 class Context;
+
 class OnlineState {
 public:
     virtual ~OnlineState() {};
@@ -718,6 +758,67 @@ public:
 
 protected:
     int send(Context *ctx, BNCSOutputStream *buf);
+
+    void handleNull(Context *);
+    void handlePing(Context *);
+    void handleChannelList(Context *);
+    void handleChatevent(Context *);
+    void handleGamelist(Context *);
+    void handleStartAdvertising(Context *);
+    void handleFriendlist(Context *);
+    void handleUserdata(Context *);
+    void finishMessage(Context *);
+
+    boolean handleGenericMessages(Context *ctx, uint8_t msg) {
+        switch (msg) {
+        case 0x00: // SID_NULL
+            handleNull(ctx);
+            break;
+        case 0x25: // SID_PING
+            handlePing(ctx);
+            break;
+        case 0x0b: // SID_CHANNELLIST
+            handleChannelList(ctx);
+            break;
+        case 0x0f: // CHATEVENT
+            handleChatevent(ctx);
+            break;
+        case 0x09:
+            // S>C 0x09 SID_GETADVLISTEX
+            handleGamelist(ctx);
+            break;
+        case 0x1c:
+            // S>C 0x1C SID_STARTADVEX3
+            handleStartAdvertising(ctx);
+            break;
+        case 0x3a:
+            // pvpgn seems to send a successful logonresponse again sometimes
+            DebugPrint("TCP Recv: 0x3a LOGONRESPONSE\n");
+            break;
+        case 0x59:
+            // SID_SETEMAIL, server is asking for an email address. We ignore that.
+            DebugPrint("TCP Recv: 0x3a SETEMAIL\n");
+            break;
+        case 0x65:
+            // S>C 0x65 SID_FRIENDSLIST
+            handleFriendlist(ctx);
+            break;
+        case 0x26:
+            // S>C 0x26 SID_READUSERDATA
+            handleUserdata(ctx);
+            break;
+        default:
+            // TODO:
+            // S>C 0x68 SID_FRIENDSREMOVE
+            // S>C 0x67 SID_FRIENDSADD
+            // Do not finish message, since the caller should handle it
+            return false;
+        }
+        finishMessage(ctx);
+        return true;
+    }
+
+    uint32_t pingValue;
 };
 
 class Context : public OnlineContext {
@@ -749,7 +850,7 @@ public:
     }
 
     bool isConnected() {
-        return !getCurrentChannel().empty();
+        return state != NULL && !getCurrentChannel().empty();
     }
 
     bool isConnecting() {
@@ -1090,7 +1191,7 @@ public:
         if (requestedAddress && !externalAddress.isValid()) {
             for (unsigned int i = 0; i < games.size(); i++) {
                 const auto game = games[i];
-                if (game->getCreator() == getUsername() && game->getMap() == "udp") {
+                if (game->isValid() && game->getCreator() == getUsername() && game->getMap() == "udp") {
                     // our fake game, remove and break;
                     games.erase(games.begin() + i);
                     externalAddress = game->getHost();
@@ -1105,16 +1206,18 @@ public:
         if (SetGames != NULL) {
             SetGames->pushPreamble();
             for (const auto value : games) {
-                SetGames->pushTable({{"Creator", value->getCreator()},
-                                     {"Host", value->getHost().toString()},
-                                     {"IsSavedGame", value->isSavedGame()},
-                                     {"Map", value->getMap()},
-                                     {"MaxPlayers", value->maxPlayers()},
-                                     {"Speed", value->getSpeed()},
-                                     {"Approval", value->getApproval()},
-                                     {"Settings", value->getGameSettings()},
-                                     {"Status", value->getGameStatus()},
-                                     {"Type", value->getGameType()}});
+                if (value->isValid()) {
+                    SetGames->pushTable({{"Creator", value->getCreator()},
+                                        {"Host", value->getHost().toString()},
+                                        {"IsSavedGame", value->isSavedGame()},
+                                        {"Map", value->getMap()},
+                                        {"MaxPlayers", value->maxPlayers()},
+                                        {"Speed", value->getSpeed()},
+                                        {"Approval", value->getApproval()},
+                                        {"Settings", value->getGameSettings()},
+                                        {"Status", value->getGameStatus()},
+                                        {"Type", value->getGameType()}});
+                }
             }
             SetGames->run();
         }
@@ -1369,9 +1472,175 @@ int OnlineState::send(Context *ctx, BNCSOutputStream *buf) {
     return buf->flush(ctx->getTCPSocket());
 }
 
+
+void OnlineState::handleNull(Context *ctx) {
+    BNCSOutputStream buffer(0x00);
+    send(ctx, &buffer);
+    DebugPrint("TCP Sent: 0x00 NULL\n");
+}
+
+void OnlineState::handleChannelList(Context *ctx) {
+    ctx->setChannels(ctx->getMsgIStream()->readStringlist());
+}
+
+void OnlineState::handlePing(Context *ctx) {
+    DebugPrint("TCP Recv: 0x25 PING\n");
+    pingValue = ctx->getMsgIStream()->read32();
+    ctx->getMsgIStream()->finishMessage();
+    // immediately respond with C2S_SID_PING
+    BNCSOutputStream buffer(0x25);
+    buffer.serialize32(htonl(pingValue));
+    send(ctx, &buffer);
+    DebugPrint("TCP Sent: 0x25 PING\n");
+}
+
+void OnlineState::handleGamelist(Context *ctx) {
+    uint32_t cnt = ctx->getMsgIStream()->read32();
+    if (cnt > 255) {
+        return;
+    }
+    if (cnt > 100) {
+        cnt = 100;
+    }
+    std::vector<Game*> games;
+    while (cnt--) {
+        uint32_t settings = ctx->getMsgIStream()->read32();
+        uint32_t lang = ctx->getMsgIStream()->read32();
+        uint16_t addr_fam = ctx->getMsgIStream()->read16();
+        // the port is not in network byte order, since it's sent to
+        // directly go into a sockaddr_in struct
+        uint16_t port = (ctx->getMsgIStream()->read8() << 8) | ctx->getMsgIStream()->read8();
+        uint32_t ip = ctx->getMsgIStream()->read32();
+        uint32_t sinzero1 = ctx->getMsgIStream()->read32();
+        uint32_t sinzero2 = ctx->getMsgIStream()->read32();
+        uint32_t status = ctx->getMsgIStream()->read32();
+        uint32_t time = ctx->getMsgIStream()->read32();
+        std::string name = ctx->getMsgIStream()->readString();
+        std::string pw = ctx->getMsgIStream()->readString();
+        std::string stat = ctx->getMsgIStream()->readString();
+        games.push_back(new Game(settings, port, ip, status, time, name, pw, stat));
+    }
+    ctx->setGamelist(games);
+}
+
+void OnlineState::handleFriendlist(Context *ctx) {
+    uint8_t cnt = ctx->getMsgIStream()->read8();
+    if (cnt > 100) {
+        cnt = 100;
+    }
+    std::vector<Friend*> friends;
+    while (cnt--) {
+        std::string user = ctx->getMsgIStream()->readString();
+        uint8_t status = ctx->getMsgIStream()->read8();
+        uint8_t location = ctx->getMsgIStream()->read8();
+        uint32_t product = ctx->getMsgIStream()->read32();
+        std::string locname = ctx->getMsgIStream()->readString();
+        friends.push_back(new Friend(user, status, location, product, locname));
+    }
+    ctx->setFriendslist(friends);
+}
+
+void OnlineState::handleUserdata(Context *ctx) {
+    uint32_t cnt = ctx->getMsgIStream()->read32();
+    assert(cnt == 1);
+    uint32_t keys = ctx->getMsgIStream()->read32();
+    uint32_t reqId = ctx->getMsgIStream()->read32();
+    std::vector<std::string> values = ctx->getMsgIStream()->readStringlist(keys);
+    ctx->reportUserdata(reqId, values);
+}
+
+void OnlineState::handleChatevent(Context *ctx) {
+    uint32_t eventId = ctx->getMsgIStream()->read32();
+    uint32_t userFlags = ctx->getMsgIStream()->read32();
+    uint32_t ping = ctx->getMsgIStream()->read32();
+    uint32_t ip = ctx->getMsgIStream()->read32();
+    uint32_t acn = ctx->getMsgIStream()->read32();
+    uint32_t reg = ctx->getMsgIStream()->read32();
+    std::string username = ctx->getMsgIStream()->readString();
+    std::string text = ctx->getMsgIStream()->readString();
+    switch (eventId) {
+    case 0x01: // sent for user that is already in channel
+        ctx->addUser(username);
+        break;
+    case 0x02: // user joined channel
+        ctx->addUser(username); 
+        ctx->showInfo(username + " joined");
+        break;
+    case 0x03: // user left channel
+        ctx->removeUser(username);
+        ctx->showInfo(username + " left");
+    case 0x04: // recv whisper
+        if (!text.empty()) {
+            std::string prefix = "/udppunch ";
+            unsigned int a, b, c, d, ip, port;
+            if (text.size() > prefix.size() && text.rfind(prefix, 0) != std::string::npos) {
+                int res = sscanf(text.substr(prefix.size()).c_str(), "%d.%d.%d.%d:%d", &a, &b, &c, &d, &port);
+                if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port >= 1024) {
+                    ip = a | b << 8 | c << 16 | d << 24;
+                    if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
+                        const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
+                        NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
+                        DebugPrint("UDP Sent: UDP punch\n");
+                    } else {
+                        // the client will connect now and send packages, anyway.
+                        // any other state shouldn't try to udp hole punch at this stage
+                    }
+                    return;
+                } else {
+                    // incorrect format, fall through and treat as normal whisper;
+                }
+            }
+        }
+        ctx->showChat(username + " whispers " + text);
+        break;
+    case 0x05: // recv chat
+        ctx->showChat(username + ": " + text);
+        break;
+    case 0x06: // recv broadcast
+        ctx->showInfo("[BROADCAST]: " + text);
+        break;
+    case 0x07: // channel info
+        ctx->setCurrentChannel(text);
+        ctx->showInfo("Joined channel " + text);
+        break;
+    case 0x09: // user flags update
+        break;
+    case 0x0a: // sent whisper
+        break;
+    case 0x0d: // channel full
+        ctx->showInfo("Channel full");
+        break;
+    case 0x0e: // channel does not exist
+        ctx->showInfo("Channel does not exist");
+        break;
+    case 0x0f: // channel is restricted
+        ctx->showInfo("Channel restricted");
+        break;
+    case 0x12: // general info text
+        ctx->showInfo(text);
+        break;
+    case 0x13: // error message
+        ctx->showError(text);
+        break;
+    case 0x17: // emote
+        break;
+    }
+}
+
+void OnlineState::handleStartAdvertising(Context *ctx) {
+    if (ctx->getMsgIStream()->read32()) {
+        ctx->showError("Online game creation failed");
+    }
+}
+
+void OnlineState::finishMessage(Context *ctx) {
+    ctx->getMsgIStream()->finishMessage();
+}
+
 class DisconnectedState : public OnlineState {
 public:
     DisconnectedState(std::string message) {
+        DebugPrint("Disconnecting: %s" _C_ message.c_str());
         this->message = message;
     };
 
@@ -1423,200 +1692,20 @@ public:
             }
             DebugPrint("TCP Recv: 0x%x\n" _C_ msg);
 
-            switch (msg) {
-            case 0x00: // SID_NULL
-                handleNull(ctx);
-                break;
-            case 0x25: // SID_PING
-                handlePing(ctx);
-                break;
-            case 0x0b: // SID_CHANNELLIST
-                ctx->setChannels(ctx->getMsgIStream()->readStringlist());
-                break;
-            case 0x0f: // CHATEVENT
-                handleChatevent(ctx);
-                break;
-            case 0x09:
-                // S>C 0x09 SID_GETADVLISTEX
-                handleGamelist(ctx);
-                break;
-            case 0x1c:
-                // S>C 0x1C SID_STARTADVEX3
-                if (ctx->getMsgIStream()->read32()) {
-                    ctx->showError("Online game creation failed");
-                }
-                break;
-            case 0x65:
-                // S>C 0x65 SID_FRIENDSLIST
-                handleFriendlist(ctx);
-                break;
-            case 0x26:
-                // S>C 0x26 SID_READUSERDATA
-                handleUserdata(ctx);
-                break;
-            default:
-                // TODO:
-                // S>C 0x68 SID_FRIENDSREMOVE
-                // S>C 0x67 SID_FRIENDSADD
+            if (!handleGenericMessages(ctx, msg)) {
                 std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
                 std::cout << "Raw contents >>>" << std::endl;
                 char* out;
                 int len = ctx->getMsgIStream()->readAll(&out);
                 std::cout.write(out, len);
                 std::cout << "<<<" << std::endl;
-                free(out);
+                delete[] out;
+                ctx->getMsgIStream()->finishMessage();
             }
-
-            ctx->getMsgIStream()->finishMessage();
         }
     }
 
 private:
-    void handleNull(Context *ctx) {
-        BNCSOutputStream buffer(0x00);
-        send(ctx, &buffer);
-        DebugPrint("TCP Sent: 0x00 NULL\n");
-    }
-
-    void handlePing(Context *ctx) {
-        uint32_t pingValue = ctx->getMsgIStream()->read32();
-        BNCSOutputStream buffer(0x25);
-        buffer.serialize32(htonl(pingValue));
-        send(ctx, &buffer);
-        DebugPrint("TCP Sent: 0x25 PING\n");
-    }
-
-    void handleGamelist(Context *ctx) {
-        uint32_t cnt = ctx->getMsgIStream()->read32();
-        if (cnt > 100) {
-            cnt = 100;
-        }
-        std::vector<Game*> games;
-        while (cnt--) {
-            uint32_t settings = ctx->getMsgIStream()->read32();
-            uint32_t lang = ctx->getMsgIStream()->read32();
-            uint16_t addr_fam = ctx->getMsgIStream()->read16();
-            // the port is not in network byte order, since it's sent to
-            // directly go into a sockaddr_in struct
-            uint16_t port = (ctx->getMsgIStream()->read8() << 8) | ctx->getMsgIStream()->read8();
-            uint32_t ip = ctx->getMsgIStream()->read32();
-            uint32_t sinzero1 = ctx->getMsgIStream()->read32();
-            uint32_t sinzero2 = ctx->getMsgIStream()->read32();
-            uint32_t status = ctx->getMsgIStream()->read32();
-            uint32_t time = ctx->getMsgIStream()->read32();
-            std::string name = ctx->getMsgIStream()->readString();
-            std::string pw = ctx->getMsgIStream()->readString();
-            std::string stat = ctx->getMsgIStream()->readString();
-            games.push_back(new Game(settings, port, ip, status, time, name, pw, stat));
-        }
-        ctx->setGamelist(games);
-    }
-
-
-    void handleFriendlist(Context *ctx) {
-        uint8_t cnt = ctx->getMsgIStream()->read8();
-        if (cnt > 100) {
-            cnt = 100;
-        }
-        std::vector<Friend*> friends;
-        while (cnt--) {
-            std::string user = ctx->getMsgIStream()->readString();
-            uint8_t status = ctx->getMsgIStream()->read8();
-            uint8_t location = ctx->getMsgIStream()->read8();
-            uint32_t product = ctx->getMsgIStream()->read32();
-            std::string locname = ctx->getMsgIStream()->readString();
-            friends.push_back(new Friend(user, status, location, product, locname));
-        }
-        ctx->setFriendslist(friends);
-    }
-
-    void handleUserdata(Context *ctx) {
-        uint32_t cnt = ctx->getMsgIStream()->read32();
-        assert(cnt == 1);
-        uint32_t keys = ctx->getMsgIStream()->read32();
-        uint32_t reqId = ctx->getMsgIStream()->read32();
-        std::vector<std::string> values = ctx->getMsgIStream()->readStringlist(keys);
-        ctx->reportUserdata(reqId, values);
-    }
-
-    void handleChatevent(Context *ctx) {
-        uint32_t eventId = ctx->getMsgIStream()->read32();
-        uint32_t userFlags = ctx->getMsgIStream()->read32();
-        uint32_t ping = ctx->getMsgIStream()->read32();
-        uint32_t ip = ctx->getMsgIStream()->read32();
-        uint32_t acn = ctx->getMsgIStream()->read32();
-        uint32_t reg = ctx->getMsgIStream()->read32();
-        std::string username = ctx->getMsgIStream()->readString();
-        std::string text = ctx->getMsgIStream()->readString();
-        switch (eventId) {
-        case 0x01: // sent for user that is already in channel
-            ctx->addUser(username);
-            break;
-        case 0x02: // user joined channel
-            ctx->addUser(username);
-            ctx->showInfo(username + " joined");
-            break;
-        case 0x03: // user left channel
-            ctx->removeUser(username);
-            ctx->showInfo(username + " left");
-        case 0x04: // recv whisper
-            if (!text.empty()) {
-                std::string prefix = "/udppunch ";
-                unsigned int a, b, c, d, ip, port;
-                if (text.size() > prefix.size() && text.rfind(prefix, 0) != std::string::npos) {
-                    int res = sscanf(text.substr(prefix.size()).c_str(), "%d.%d.%d.%d:%d", &a, &b, &c, &d, &port);
-                    if (res == 5 && a < 255 && b < 255 && c < 255 && d < 255 && port >= 1024) {
-                        ip = a | b << 8 | c << 16 | d << 24;
-                        if (NetConnectType == 1 && !GameRunning) { // the server, waiting for clients
-                            const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
-                            NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
-                            DebugPrint("UDP Sent: UDP punch\n");
-                        } else {
-                            // the client will connect now and send packages, anyway.
-                            // any other state shouldn't try to udp hole punch at this stage
-                        }
-                        return;
-                    } else {
-                        // incorrect format, fall through and treat as normal whisper;
-                    }
-                }
-            }
-            ctx->showChat(username + " whispers " + text);
-            break;
-        case 0x05: // recv chat
-            ctx->showChat(username + ": " + text);
-            break;
-        case 0x06: // recv broadcast
-            ctx->showInfo("[BROADCAST]: " + text);
-            break;
-        case 0x07: // channel info
-            ctx->setCurrentChannel(text);
-            ctx->showInfo("Joined channel " + text);
-            break;
-        case 0x09: // user flags update
-            break;
-        case 0x0a: // sent whisper
-            break;
-        case 0x0d: // channel full
-            ctx->showInfo("Channel full");
-            break;
-        case 0x0e: // channel does not exist
-            ctx->showInfo("Channel does not exist");
-            break;
-        case 0x0f: // channel is restricted
-            ctx->showInfo("Channel restricted");
-            break;
-        case 0x12: // general info text
-            ctx->showInfo(text);
-            break;
-        case 0x13: // error message
-            ctx->showError(text);
-            break;
-        case 0x17: // emote
-            break;
-        }
-    }
-
     uint64_t ticks;
 };
 
@@ -1628,15 +1717,10 @@ class S2C_ENTERCHAT : public OnlineState {
                 // try again next time
                 return;
             }
-            if (msg == 0x3a) {
-                DebugPrint("TCP Recv: 0x3a LOGONRESPONSE\n");
-                // pvpgn seems to send a successful logonresponse again
-                uint32_t status = ctx->getMsgIStream()->read32();
-                assert(status == 0);
-                ctx->getMsgIStream()->finishMessage();
-                return;
-            }
             if (msg != 0x0a) {
+                if (handleGenericMessages(ctx, msg)) {
+                    return;
+                }
                 std::string error = std::string("Expected SID_ENTERCHAT, got msg id ");
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
@@ -1699,6 +1783,9 @@ class S2C_CREATEACCOUNT2 : public OnlineState {
                 return;
             }
             if (msg != 0x3d) {
+                if (handleGenericMessages(ctx, msg)) {
+                    return;
+                }
                 std::string error = std::string("Expected SID_CREATEACCOUNT2, got msg id ");
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
@@ -1763,9 +1850,7 @@ class S2C_LOGONRESPONSE2 : public OnlineState {
                 return;
             }
             if (msg != 0x3a) {
-                if (msg == 0x59) {
-                    // SID_SETEMAIL, server is asking for an email address. We ignore that.
-                    ctx->getMsgIStream()->finishMessage();
+                if (handleGenericMessages(ctx, msg)) {
                     return;
                 }
                 std::string error = std::string("Expected SID_LOGONRESPONSE2, got msg id ");
@@ -1868,6 +1953,9 @@ class S2C_SID_AUTH_CHECK : public OnlineState {
                 return;
             }
             if (msg != 0x51) {
+                if (handleGenericMessages(ctx, msg)) {
+                    return;
+                }
                 std::string error = std::string("Expected SID_AUTH_CHECK, got msg id ");
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
@@ -1930,6 +2018,9 @@ class S2C_SID_AUTH_INFO : public OnlineState {
                 return;
             }
             if (msg != 0x50) {
+                if (handleGenericMessages(ctx, msg)) {
+                    return;
+                }
                 std::string error = std::string("Expected SID_AUTH_INFO, got msg id ");
                 error += std::to_string(msg);
                 ctx->setState(new DisconnectedState(error));
@@ -1985,37 +2076,7 @@ class S2C_SID_AUTH_INFO : public OnlineState {
     }
 };
 
-class S2C_SID_PING : public OnlineState {
-    virtual void doOneStep(Context *ctx) {
-        if (ctx->getTCPSocket()->HasDataToRead(0)) {
-            uint8_t msg = ctx->getMsgIStream()->readMessageId();
-            if (msg == 0xff) {
-                // try again next time
-                return;
-            }
-            if (msg != 0x25) {
-                // not a ping
-                std::string error = std::string("Expected SID_PING, got msg id ");
-                error += std::to_string(msg);
-                ctx->setState(new DisconnectedState(error));
-                return;
-            }
-            DebugPrint("TCP Recv: 0x25 PING\n");
-            uint32_t pingValue = ctx->getMsgIStream()->read32();
-            ctx->getMsgIStream()->finishMessage();
-
-            // immediately respond with C2S_SID_PING
-            BNCSOutputStream buffer(0x25);
-            buffer.serialize32(htonl(pingValue));
-            send(ctx, &buffer);
-            DebugPrint("TCP Sent: 0x25 PING\n");
-
-            ctx->setState(new S2C_SID_AUTH_INFO());
-        }
-    }
-};
-
-class ConnectState : public OnlineState {
+class C2S_SID_AUTH_INFO : public OnlineState {
     virtual void doOneStep(Context *ctx) {
         // Connect
 
@@ -2034,7 +2095,10 @@ class ConnectState : public OnlineState {
             }
         }
         if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
-            if (--retries < 0) {
+            retries--;
+            if (retries == 15) {
+                ctx->getTCPSocket()->Close();
+            } else if (retries < 0) {
                 ctx->setState(new DisconnectedState("TCP connect failed for server " + ctx->getHost()->toString()));
             }
             return;
@@ -2115,11 +2179,11 @@ class ConnectState : public OnlineState {
 
         send(ctx, &buffer);
         DebugPrint("TCP Sent: 0x50 AUTH_INFO\n");
-        ctx->setState(new S2C_SID_PING());
+        ctx->setState(new S2C_SID_AUTH_INFO());
     }
 
 private:
-    int retries = 15;
+    int retries = 30;
 };
 
 static Context _ctx;
@@ -2232,7 +2296,7 @@ static int CclConnect(lua_State *l) {
     int port = LuaToNumber(l, 2);
 
     _ctx.setHost(new CHost(host, port));
-    _ctx.setState(new ConnectState());
+    _ctx.setState(new C2S_SID_AUTH_INFO());
     return 0;
 }
 
