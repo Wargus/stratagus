@@ -880,6 +880,7 @@ public:
         clientToken = MyRand();
         username = "";
         setPassword("");
+        currentChannel = "";
     }
 
     void sendText(std::string txt, bool silent = false) {
