@@ -2124,6 +2124,73 @@ static int CclDebugPrint(lua_State *l)
 	return 1;
 }
 
+/**
+ * Restart the entire game. This function only returns when an error happens.
+ */
+static int CclRestartStratagus(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+#ifdef WIN32
+	char executable_path[MAX_PATH];
+	memset(executable_path, 0, sizeof(executable_path));
+	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
+#else
+	char *executable_path = OriginalArgv[0].c_str();
+#endif
+	bool insertRestartArgument = true;
+	for (auto arg : OriginalArgv) {
+		if (arg == "-r") {
+			insertRestartArgument = false;
+			break;
+		}
+	}
+	int newArgc = OriginalArgv.size() + (insertRestartArgument ? 2 : 1);
+	char **argv = new char*[newArgc];
+	for (unsigned int i = 0; i < OriginalArgv.size(); i++) {
+#ifdef WIN32
+		if (!OriginalArgv[i].empty() && OriginalArgv[i].find_first_of(" \t\n\v\"") == std::string::npos) {
+			argv[i] = const_cast<char*>(OriginalArgv[i].c_str());
+		} else {
+			// Windows always needs argument quoting around arguments with spaces
+			std::string ss = "\"";
+			for (auto ch = OriginalArgv[i].begin(); ; ch++) {
+				int backslashes = 0;
+				while (ch != OriginalArgv[i].end() && *ch == '\\') {
+					ch++;
+					backslashes++;
+				}
+				if (ch == OriginalArgv[i].end()) {
+					ss.append(backslashes * 2, '\\');
+					break;
+				} else if (*ch == '"') {
+					ss.append(backslashes * 2 + 1, '\\');
+					ss.push_back(*ch);
+				} else {
+					ss.append(backslashes, '\\');
+					ss.push_back(*ch);
+				}
+			}
+			ss.push_back('"');
+			argv[i] = strdup(ss.c_str());
+		}
+#else
+		argv[i] = const_cast<char*>(OriginalArgv[i].c_str());
+#endif
+	}
+	if (insertRestartArgument) {
+		argv[newArgc - 2] = "-r";
+	}
+	argv[newArgc - 1] = (char *)0;
+#ifdef WIN32
+	_execv(executable_path, argv);
+#else
+	execvp(executable_path, argv);
+#endif
+	delete[] argv;
+
+	return 0;
+}
+
 /*............................................................................
 ..  Commands
 ............................................................................*/
@@ -2504,6 +2571,8 @@ void ScriptRegister()
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
+
+	lua_register(Lua, "RestartStratagus", CclRestartStratagus);
 }
 
 //@}

@@ -246,6 +246,9 @@ std::string MenuRace;
 bool EnableDebugPrint;           /// if enabled, print the debug messages
 bool EnableAssert;               /// if enabled, halt on assertion failures
 bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
+bool IsRestart;                  /// if true, the game skips some things like title screens
+
+std::vector<std::string> OriginalArgv;
 
 #ifdef DEBUG
 bool IsDebugEnabled {true};      /// Is debug enabled? Flag to pass into lua code. 
@@ -454,6 +457,7 @@ static void Usage()
 		"\t-N name\t\tName of the player\n"
 		"\t-p\t\tEnables debug messages printing in console\n"
 		"\t-P port\t\tNetwork port to use\n"
+		"\t-r\t\tIndicate a rapid start. Skips a few things like title screens\n"
 		"\t-s sleep\tNumber of frames for the AI to sleep before it starts\n"
 		"\t-S speed\tSync speed (100 = 30 frames/s)\n"
 		"\t-u userpath\tPath where stratagus saves preferences, log and savegame. Use 'userhome' to force platform-default userhome directory.\n"
@@ -503,9 +507,16 @@ static void RedirectOutput()
 
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
+#ifdef DEBUG
+	fprintf(stderr, "optind(%d), argc(%d) at startup\n", optind, argc);
+	for (int i = 0; i < argc; i++) {
+		fprintf(stderr, "%s ", argv[i]);
+	}
+	fprintf(stderr, "\n");
+#endif
 	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FgG:hiI:lN:oOP:ps:S:u:v:W?-")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FgG:hiI:lN:oOP:prs:S:u:v:W?-")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -560,6 +571,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			case 'p':
 				EnableDebugPrint = true;
+				continue;
+			case 'r':
+				IsRestart = true;
 				continue;
 			case 's':
 				AiSleepCycles = atoi(optarg);
@@ -666,6 +680,9 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 */
 int stratagusMain(int argc, char **argv)
 {
+	for (int i = 0; i < argc; i++) {
+		OriginalArgv.push_back(std::string(argv[i]));
+	}
 #ifdef USE_BEOS
 	//  Parse arguments for BeOS
 	beos_init(argc, argv);
@@ -741,7 +758,9 @@ int stratagusMain(int argc, char **argv)
 		LoadFonts();
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 		Video.ClearScreen();
-		ShowTitleScreens();
+		if (!IsRestart) {
+			ShowTitleScreens();
+		}
 
 		// Init player data
 		ThisPlayer = NULL;
