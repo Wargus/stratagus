@@ -495,6 +495,7 @@ class TextField : public Widget
 	TextField(const std::string text);
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
+	virtual void setPassword(bool flag);
 };
 
 class ImageTextField : public Widget
@@ -503,6 +504,7 @@ class ImageTextField : public Widget
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
 	void setItemImage(CGraphic *image);
+	virtual void setPassword(bool flag);
 };
 
 class ListBox : public Widget
