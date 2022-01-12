@@ -288,7 +288,7 @@ namespace gcn
 			}
         }
 
-        else if (key.getValue() == Key::K_BACKSPACE || key.getValue() == 'h' - 'a' + 1)
+        else if (key.getValue() == Key::K_BACKSPACE || (key.isControlPressed() && key.getValue() == 'h'))
         {
 			if (selLen > 0) {
 				mText.erase(selFirst, selLen);
@@ -313,7 +313,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_HOME || key.getValue() == 'a' - 'a' + 1) // ctrl-a
+        else if (key.getValue() == Key::K_HOME || (key.isControlPressed() && key.getValue() == 'a')) // ctrl-a
         {
 			if (key.isShiftPressed()) {
 				mSelectEndOffset -= mCaretPosition;
@@ -325,7 +325,7 @@ namespace gcn
 			ret = true;
         }
 
-        else if (key.getValue() == Key::K_END || key.getValue() == 'e' - 'a' + 1)  //ctrl-e
+        else if (key.getValue() == Key::K_END || (key.isControlPressed() && key.getValue() == 'e'))  //ctrl-e
         {
 			if (key.isShiftPressed()) {
 				mSelectEndOffset += mText.size() - mCaretPosition;
@@ -338,13 +338,22 @@ namespace gcn
 			ret = true;
         }
 
-        else if (key.getValue() == 'u' - 'a' + 1) // ctrl-u
+        else if (key.isControlPressed() && key.getValue() == 'u') // ctrl-u
         {
             setText("");
             ret = true;
         }
 
-        else if (key.getValue() == 'v' - 'a' + 1) // ctrl-v
+        else if (key.isControlPressed() && key.getValue() == 'c')
+        {
+            unsigned int f,l;
+            getTextSelectionPositions(&f, &l);
+			std::string s = std::string(mText.substr(f, l));
+            SetClipboard(s);
+            ret = true;
+        }
+
+        else if (key.isControlPressed() && key.getValue() == 'v') // ctrl-v
         {
             std::string str;
 			if (selLen > 0) {
