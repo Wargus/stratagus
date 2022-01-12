@@ -651,7 +651,39 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 if(APPLE)
-list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
+	list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
+endif()
+
+if(NOT WIN32 OR NOT MSVC)
+	include(CheckCXXSourceCompiles)
+	set(FS_SRC "
+	#include <experimental/filesystem> 
+	namespace fs = std::experimental::filesystem;
+	int main(int argc, char **argv) {
+		fs::path p = fs::path(\".\");
+		if (fs::absolute(p).is_absolute()) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	")
+	check_cxx_source_compiles("${FS_SRC}" HAS_17_FS)
+	if(NOT HAS_17_FS)
+		set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
+		check_cxx_source_compiles("${FS_SRC}" HAS_EXP_17_FS_WITH_STDC)
+		if(HAS_EXP_17_FS_WITH_STDC)
+			set(stratagus_LIBS ${stratagus_LIBS} stdc++fs)
+		else()
+			set(CMAKE_REQUIRED_LIBRARIES c++fs)
+			check_cxx_source_compiles("${FS_SRC}" HAS_EXP_17_FS_WITH_CLIB)
+			if(HAS_EXP_17_FS_WITH_CLIB)
+				set(stratagus_LIBS ${stratagus_LIBS} c++fs)
+			else()
+				message(FATAL_ERROR "I don't know how to compile with C++17 filesystem support on your system")
+			endif()
+		endif()
+	endif()
 endif()
 
 include(ExternalProject)
