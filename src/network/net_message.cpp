@@ -523,6 +523,54 @@ void CInitMessage_Map::Deserialize(const unsigned char *p)
 }
 
 //
+// CInitMessage_MapFileFragment
+//
+
+CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(uint32_t FragmentIdx) :
+	header(MessageInit_FromClient, ICMMapNeeded)
+{
+	this->PathSize = 0;
+	this->DataSize = 0;
+	this->FragmentIndex = FragmentIndex;
+}
+
+CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t Fragment) :
+	header(MessageInit_FromServer, ICMMapNeeded)
+{
+	int pathSize = strlen(path);
+	Assert(pathSize <= 256);
+	Assert(sizeof(this->Data) < pathSize + 1 + dataSize);
+	this->PathSize = pathSize;
+	this->DataSize = dataSize;
+	memcpy(this->Data, path, pathSize);
+	memcpy(this->Data + pathSize, data, dataSize);
+	this->FragmentIndex = FragmentIndex;
+}
+
+
+const unsigned char *CInitMessage_MapFileFragment::Serialize() const
+{
+	unsigned char *buf = new unsigned char[Size()];
+	unsigned char *p = buf;
+
+	p += header.Serialize(p);
+	p += serialize32(p, this->FragmentIndex);
+	p += serialize16(p, this->DataSize);
+	p += serialize8(p, this->PathSize);
+	p += serialize(p, this->Data);
+	return buf;
+}
+
+void CInitMessage_MapFileFragment::Deserialize(const unsigned char *p)
+{
+	p += header.Deserialize(p);
+	p += deserialize32(p, &this->FragmentIndex);
+	p += deserialize16(p, &this->DataSize);
+	p += deserialize8(p, &this->PathSize);
+	p += deserialize(p, this->Data);
+}
+
+//
 // CInitMessage_State
 //
 
