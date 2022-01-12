@@ -235,7 +235,7 @@ static bool GetFileContent(const std::string &file, std::string &content)
 **  @param file  File to load and execute
 **  @param nargs Number of arguments that caller has put on the stack
 **
-**  @return      0 for success, else exit.
+**  @return      0 for success, -1 if the file was not found, else exit.
 */
 int LuaLoadFile(const std::string &file, const std::string &strArg, bool exitOnError)
 {
