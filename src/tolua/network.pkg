@@ -43,6 +43,9 @@ extern CNetworkHost Hosts[PlayerMax];
 $extern string NetworkMapName;
 string NetworkMapName;
 
+$extern string NetworkMapFragmentName;
+string NetworkMapFragmentName;
+
 $void NetworkGamePrepareGameSettings(void);
 void NetworkGamePrepareGameSettings(void);
 

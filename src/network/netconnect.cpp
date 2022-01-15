@@ -105,6 +105,7 @@ int NetLocalPlayerNumber;              /// Player number of local client
 
 int NetPlayers;                         /// How many network players
 std::string NetworkMapName;             /// Name of the map received with ICMMap
+std::string NetworkMapFragmentName;     /// Name of the map currently loading via ICMMapNeeded
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
@@ -864,6 +865,7 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	// msg.PathSize is 8bits, so smaller than msg.Data by construction
 	memcpy(path, msg.Data, msg.PathSize);
 	path[msg.PathSize] = '\0';
+	NetworkMapFragmentName = std::string(path);
 	mappath /= path;
 	delete[] path;
 
