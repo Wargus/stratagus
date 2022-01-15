@@ -857,26 +857,26 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 
 	// FIXME: what if the file exists before even the first fragment creates it?
 
+	fs::path mappath(StratagusLibPath);
 	char *path = new char[msg.PathSize];
 	// msg.PathSize is 8bits, so smaller than msg.Data by construction
 	memcpy(path, msg.Data, msg.PathSize);
-	const std::string mappath = StratagusLibPath + "/" + path;
+	mappath /= path;
 	delete[] path;
 
-	std::ofstream mapfile;
-	mapfile.open(mappath, std::ios::out | std::ios::app | std::ios::binary); 
+	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary); 
 	if (!mapfile.is_open()) {
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Could not open %s for appending map data\n", mappath.c_str());
+		fprintf(stderr, "Could not open %s for appending map data\n", mappath.u8string().c_str());
 		return;
 	} else {
-		Assert(msg.DataSize + msg.PathSize < sizeof(msg.Data));
+		Assert(msg.DataSize + msg.PathSize <= sizeof(msg.Data));
 		mapfile.write(msg.Data + msg.PathSize, msg.DataSize);
 		mapfile.close();
 	}
 
 	networkState.State = ccs_needmap;
-	networkState.StateArg = msg.FragmentIndex++;
+	networkState.StateArg++;
 	networkState.MsgCnt = 0;
 }
 
