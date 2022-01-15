@@ -526,15 +526,15 @@ void CInitMessage_Map::Deserialize(const unsigned char *p)
 // CInitMessage_MapFileFragment
 //
 
-CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(uint32_t FragmentIdx) :
+CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(uint32_t fragment) :
 	header(MessageInit_FromClient, ICMMapNeeded)
 {
 	this->PathSize = 0;
 	this->DataSize = 0;
-	this->FragmentIndex = FragmentIndex;
+	this->FragmentIndex = fragment;
 }
 
-CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t Fragment) :
+CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t fragment) :
 	header(MessageInit_FromServer, ICMMapNeeded)
 {
 	int pathSize = strlen(path);
@@ -544,7 +544,7 @@ CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, con
 	this->DataSize = dataSize;
 	memcpy(this->Data, path, pathSize);
 	memcpy(this->Data + pathSize, data, dataSize);
-	this->FragmentIndex = FragmentIndex;
+	this->FragmentIndex = fragment;
 }
 
 
