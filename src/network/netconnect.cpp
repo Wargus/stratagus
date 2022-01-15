@@ -1140,7 +1140,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 			networkPathEnd = *--networkPathStart.end() / networkPathEnd;
 			networkPathStart = networkPathStart.parent_path();
 		}
-		networkName = networkPathEnd.u8string();
+		networkName = networkPathEnd.generic_u8string();
 
 		fragmentDataSize = sizeof(CInitMessage_MapFileFragment::Data) - networkName.size();
 		fileSize = fs::file_size(p);
