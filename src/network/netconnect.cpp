@@ -287,6 +287,8 @@ static const char *icmsgsubtypenames[] = {
 	"Go",                      // Client is ready to run
 	"AreYouThere",             // Server asks are you there
 	"IAmHere",                 // Client answers I am here
+
+	"MapNeeded",               // Map data exchange
 };
 
 template <typename T>
