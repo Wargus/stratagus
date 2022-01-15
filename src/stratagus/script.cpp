@@ -2135,7 +2135,7 @@ static int CclRestartStratagus(lua_State *l)
 	memset(executable_path, 0, sizeof(executable_path));
 	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
 #else
-	char *executable_path = OriginalArgv[0].c_str();
+	char *executable_path = const_cast<char*>(OriginalArgv[0].c_str());
 #endif
 	bool insertRestartArgument = true;
 	for (auto arg : OriginalArgv) {
