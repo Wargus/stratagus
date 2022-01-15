@@ -277,6 +277,8 @@ class Widget
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
+	virtual void setDirty(bool isDirty);
+
 	virtual void setBaseColor(const Color color);
 	virtual const Color &getBaseColor() const;
 	virtual void setForegroundColor(const Color color);
