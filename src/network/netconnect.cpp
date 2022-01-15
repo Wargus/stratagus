@@ -1096,15 +1096,21 @@ void CServer::Send_Map(const CNetworkHost &host)
 
 void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 {
-	std::string prefix = NetworkMapName;
-	size_t loc = NetworkMapName.find(".smp");
-	if (loc != std::string::npos) {
-		prefix = NetworkMapName.substr(0, loc);
+	fs::path prefix = fs::path(NetworkMapName);
+	while (prefix.stem() != prefix) { // may have 	.gz, .bz2 ...
+		prefix = prefix.stem();
 	}
+	fs::path mapDirectory(StratagusLibPath);
+	mapDirectory /= NetworkMapName;
+	mapDirectory = mapDirectory.parent_path();
 
 	std::set<fs::path> sortedFilenames;
-	for (const auto &entry : fs::directory_iterator(StratagusLibPath)) {
-		if (entry.path().u8string().rfind(prefix, 0) == 0) {
+	for (const auto &entry : fs::directory_iterator(mapDirectory)) {
+		fs::path entryPath(entry.path());
+		while (entryPath.stem() != entryPath) {
+			entryPath = entryPath.stem();
+		}
+		if (entryPath == prefix) {
 			sortedFilenames.insert(entry.path());
 		}
 	}
@@ -1113,14 +1119,24 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 	std::string networkName;
 	uint32_t fragmentDataSize;
 	uint32_t fragmentIdxStartForFile = 0;
+	fs::path libPath(StratagusLibPath);
 
 	for (fs::path p : sortedFilenames) {
 		currentPath = p;
-		networkName = fs::relative(p, fs::path(StratagusLibPath)).u8string();
+
+		// work around fs::relative not being available in some experimental fs impls
+		fs::path networkPathEnd(p.filename());
+		fs::path networkPathStart(p.parent_path());
+		while (networkPathStart != libPath) {
+			networkPathEnd = *--networkPathStart.end() / networkPathEnd;
+			networkPathStart = networkPathStart.parent_path();
+		}
+		networkName = networkPathEnd.u8string();
+
 		fragmentDataSize = sizeof(CInitMessage_MapFileFragment::Data) - networkName.size();
 		uint32_t fileSize = fs::file_size(p);
 		uint32_t fragmentCountForFile = (fileSize + fragmentDataSize - 1) / fragmentDataSize;
-		if (fragmentIdxStartForFile + fragmentCountForFile < fragmentIdx) {
+		if ((fragmentIdxStartForFile <= fragmentIdx) && (fragmentIdx < fragmentIdxStartForFile + fragmentCountForFile)) {
 			break;
 		} else {
 			// next file starts at the next fragment

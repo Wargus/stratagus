@@ -539,14 +539,13 @@ CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, con
 {
 	int pathSize = strlen(path);
 	Assert(pathSize <= 256);
-	Assert(sizeof(this->Data) < pathSize + 1 + dataSize);
+	Assert(sizeof(this->Data) >= pathSize + dataSize);
 	this->PathSize = pathSize;
 	this->DataSize = dataSize;
 	memcpy(this->Data, path, pathSize);
 	memcpy(this->Data + pathSize, data, dataSize);
 	this->FragmentIndex = FragmentIndex;
 }
-
 
 const unsigned char *CInitMessage_MapFileFragment::Serialize() const
 {
