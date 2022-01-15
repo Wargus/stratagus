@@ -177,7 +177,7 @@ private:
 	void Send_Go(unsigned long tick);
 	void Send_Config(unsigned long tick);
 	void Send_MapUidMismatch(unsigned long tick);
-	void Send_MapNeeded(unsigned long tick, unsigned int fragmentIdx);
+	void Send_MapNeeded(unsigned long tick, unsigned int fragmentIdx, bool limit = true);
 	void Send_Map(unsigned long tick);
 	void Send_Resync(unsigned long tick);
 	void Send_State(unsigned long tick);
@@ -516,7 +516,7 @@ bool CClient::Update_needmap(unsigned long tick)
 {
 	Assert(networkState.State == ccs_needmap);
 
-	if (networkState.MsgCnt < 30) { // 30 retries per fragment
+	if (networkState.MsgCnt < 50) {
 		Send_MapNeeded(tick, networkState.StateArg);
 		return true;
 	} else {
@@ -573,11 +573,11 @@ void CClient::Send_MapUidMismatch(unsigned long tick)
 	SendRateLimited(message, tick, 650);
 }
 
-void CClient::Send_MapNeeded(unsigned long tick, unsigned int fragment)
+void CClient::Send_MapNeeded(unsigned long tick, unsigned int fragment, bool limit)
 {
 	const CInitMessage_MapFileFragment message((uint32_t)fragment); // Request map files from server
 
-	SendRateLimited(message, tick, 2000);
+	SendRateLimited(message, tick, limit ? 1000 : 0);
 }
 
 void CClient::Send_Map(unsigned long tick)
@@ -826,7 +826,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 
 void CClient::Parse_MapFragment(const unsigned char *buf)
 {
-	if (networkState.State != ccs_connected) {
+	if (networkState.State != ccs_needmap) {
 		return;
 	}
 	CInitMessage_MapFileFragment msg;
@@ -860,9 +860,10 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	// FIXME: what if the file exists before even the first fragment creates it?
 
 	fs::path mappath(StratagusLibPath);
-	char *path = new char[msg.PathSize];
+	char *path = new char[msg.PathSize + 1];
 	// msg.PathSize is 8bits, so smaller than msg.Data by construction
 	memcpy(path, msg.Data, msg.PathSize);
+	path[msg.PathSize] = '\0';
 	mappath /= path;
 	delete[] path;
 
@@ -880,6 +881,9 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	networkState.State = ccs_needmap;
 	networkState.StateArg++;
 	networkState.MsgCnt = 0;
+
+	// immediately ask for the next one
+	Send_MapNeeded(networkState.LastFrame, networkState.StateArg, false);
 }
 
 void CClient::Parse_Welcome(const unsigned char *buf)
@@ -1120,6 +1124,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 	fs::path currentPath;
 	std::string networkName;
 	uint32_t fragmentDataSize;
+	uint32_t fileSize;
 	uint32_t fragmentIdxStartForFile = 0;
 	fs::path libPath(StratagusLibPath);
 
@@ -1136,7 +1141,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 		networkName = networkPathEnd.u8string();
 
 		fragmentDataSize = sizeof(CInitMessage_MapFileFragment::Data) - networkName.size();
-		uint32_t fileSize = fs::file_size(p);
+		fileSize = fs::file_size(p);
 		uint32_t fragmentCountForFile = (fileSize + fragmentDataSize - 1) / fragmentDataSize;
 		if ((fragmentIdxStartForFile <= fragmentIdx) && (fragmentIdx < fragmentIdxStartForFile + fragmentCountForFile)) {
 			break;
@@ -1152,7 +1157,8 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 		if (file.is_open()) {
 			uint32_t offset = (fragmentIdx - fragmentIdxStartForFile) * fragmentDataSize;
 			file.seekg(offset);
-			char *data = new char[fragmentDataSize]; 
+			fragmentDataSize = std::min<uint32_t>(fragmentDataSize, fileSize - offset);
+			char *data = new char[fragmentDataSize];
 			file.read(data, fragmentDataSize);
 			file.close();
 
