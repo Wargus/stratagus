@@ -100,6 +100,7 @@ extern int NetLocalHostsSlot;              /// Network menu: Slot # in Hosts arr
 extern int NetLocalPlayerNumber;           /// Player number of local client
 
 extern std::string NetworkMapName;         /// Name of the map received with ICMMap
+extern std::string NetworkMapFragmentName; /// Name of the map currently loading via ICMMapNeeded
 
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
