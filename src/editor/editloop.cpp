@@ -1105,22 +1105,17 @@ static void EditorCallbackButtonUp(unsigned button)
 		if (pos0.y > pos1.y) {
 			std::swap(pos0.y, pos1.y);
 		}
-		if (KeyModifiers & ModifierShift) {
-			if (KeyModifiers & ModifierAlt) {
-				num = AddSelectedGroundUnitsInRectangle(pos0, pos1);
-			} else if (KeyModifiers & ModifierControl) {
-				num = AddSelectedAirUnitsInRectangle(pos0, pos1);
-			} else {
-				num = AddSelectedUnitsInRectangle(pos0, pos1);
-			}
-		} else {
-			if (KeyModifiers & ModifierAlt) {
-				num = SelectGroundUnitsInRectangle(pos0, pos1);
-			} else if (KeyModifiers & ModifierControl) {
-				num = SelectAirUnitsInRectangle(pos0, pos1);
-			} else {
-				num = SelectUnitsInRectangle(pos0, pos1);
-			}
+
+		const Vec2i t0 = Map.MapPixelPosToTilePos(pos0);
+		const Vec2i t1 = Map.MapPixelPosToTilePos(pos1);
+		std::vector<CUnit *> table;
+		Select(t0, t1, table);
+
+		if (!(KeyModifiers & ModifierShift)) {
+			UnSelectAll();
+		}
+		for (auto u : table) {
+			SelectUnit(*u);
 		}
 		CursorStartScreenPos.x = 0;
 		CursorStartScreenPos.y = 0;
