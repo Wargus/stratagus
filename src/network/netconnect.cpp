@@ -866,6 +866,12 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	memcpy(path, msg.Data, msg.PathSize);
 	path[msg.PathSize] = '\0';
 	NetworkMapFragmentName = std::string(path);
+	if (NetworkMapFragmentName.find("..") != std::string::npos) {
+		// bad path
+		networkState.State = ccs_badmap;
+		fprintf(stderr, "Bad network filename %s\n", path);
+		return;
+	}
 	mappath /= path;
 	delete[] path;
 
