@@ -498,7 +498,7 @@ void CMinimap::Destroy()
 		SDL_FreeSurface(MinimapSurface);
 		MinimapSurface = NULL;
 	}
-	if (MinimapFogSurface) {
+	if (MinimapFogSurface && MinimapFogSurface->format != NULL) {
 		SDL_FreeSurface(MinimapFogSurface);
 		MinimapSurface = NULL;
 	}

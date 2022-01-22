@@ -1220,7 +1220,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				lua_getglobal(Lua, "EditUnitTypeProperties"); // function to be called
 				if (lua_isfunction(Lua, -1) == 1) {
 					lua_pushstring(Lua, Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
-					LuaCall(Lua, 1, 0, -2, false);
+					LuaCall(1, 1, false);
 					Editor.CursorUnitIndex = -1;
 				} else {
 					lua_pop(Lua, 1);
@@ -1246,11 +1246,10 @@ static void EditorCallbackButtonDown(unsigned button)
 					lua_pushnumber(Lua, UnitNumber(*UnitUnderCursor));
 					lua_rawseti(Lua, -2, ++n);
 				}
-				LuaCall(Lua, 1, 0, -2, false);
+				LuaCall(1, 1, false);
 			} else {
 				lua_pop(Lua, 1);
 			}
-			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
 		}
 	}
@@ -1437,21 +1436,33 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			KeyScrollState |= ScrollRight;
 			break;
 		case '0':
-			if (UnitUnderCursor != NULL) {
-				UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
-				UI.StatusLine.Set(_("Unit owner modified"));
+			if (!(KeyModifiers & ModifierAlt)) {
+				if (UnitUnderCursor != NULL) {
+					UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
+					UI.StatusLine.Set(_("Unit owner modified"));
+				}
+				break;
+			} else {
+				// fallthrough
 			}
-			break;
 		case '1': case '2':
 		case '3': case '4': case '5':
 		case '6': case '7': case '8':
-		case '9':
-			if (UnitUnderCursor != NULL && Map.Info.PlayerType[(int) key - '1'] != PlayerNobody) {
-				UnitUnderCursor->ChangeOwner(Players[(int) key - '1']);
+		case '9': {
+			int pnum = (int) key - '1';
+			if (KeyModifiers & ModifierAlt) {
+				pnum += 10;
+				if (pnum >= PlayerMax) {
+					break;
+				}
+			}
+			if (UnitUnderCursor != NULL && Map.Info.PlayerType[pnum] != PlayerNobody) {
+				UnitUnderCursor->ChangeOwner(Players[pnum]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
 			}
 			break;
+		}
 
 		default:
 			HandleCommandKey(key);
