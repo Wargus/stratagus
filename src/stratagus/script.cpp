@@ -33,6 +33,16 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+error "Missing the <filesystem> header."
+#endif
+
 #include <signal.h>
 
 #include "stratagus.h"
@@ -255,7 +265,7 @@ int LuaLoadFile(const std::string &file, const std::string &strArg, bool exitOnE
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
-		lua_pushstring(Lua, file.c_str());
+		lua_pushstring(Lua, fs::absolute(fs::path(file)).generic_u8string().c_str());
 		lua_setglobal(Lua, "__file__");
 		if (!strArg.empty()) {
 			lua_pushstring(Lua, strArg.c_str());
@@ -2555,6 +2565,164 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	LuaGarbageCollect();
 }
 
+#ifdef WIN32
+// copied from msdn
+fs::path GetAVolumePath(__in PWCHAR VolumeName)
+{
+    DWORD  CharCount = MAX_PATH + 1;
+    PWCHAR Names     = NULL;
+    PWCHAR NameIdx   = NULL;
+    BOOL   Success   = FALSE;
+
+    for (;;) {
+        Names = (PWCHAR) new BYTE [CharCount * sizeof(WCHAR)];
+
+        if (!Names) {
+            ExitFatal(1);
+        }
+
+        Success = GetVolumePathNamesForVolumeNameW(VolumeName, Names, CharCount, &CharCount);
+        if (Success) {
+            break;
+        }
+
+        if (GetLastError() != ERROR_MORE_DATA) {
+            break;
+        }
+
+        delete [] Names;
+        Names = NULL;
+    }
+
+	for (NameIdx = Names; NameIdx[0] != L'\0'; NameIdx += wcslen(NameIdx) + 1) {	
+		fs::path result(NameIdx);
+		delete [] Names;
+		Names = NULL;
+		return result;
+	}
+
+    return fs::path();
+}
+
+std::vector<fs::path> getVolumes()
+{
+    DWORD  CharCount            = 0;
+    WCHAR  DeviceName[MAX_PATH] = L"";
+    DWORD  Error                = ERROR_SUCCESS;
+    HANDLE FindHandle           = INVALID_HANDLE_VALUE;
+    BOOL   Found                = FALSE;
+    size_t Index                = 0;
+    BOOL   Success              = FALSE;
+    WCHAR  VolumeName[MAX_PATH] = L"";
+
+	int curIndex = 0;
+	std::vector<fs::path> result;
+
+    //  Enumerate all volumes in the system.
+    FindHandle = FindFirstVolumeW(VolumeName, ARRAYSIZE(VolumeName));
+
+    if (FindHandle == INVALID_HANDLE_VALUE) {
+        Error = GetLastError();
+        wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
+        ExitFatal(1);
+    }
+
+    for (;;) {
+        //  Skip the \\?\ prefix and remove the trailing backslash.
+        Index = wcslen(VolumeName) - 1;
+
+        if (VolumeName[0]     != L'\\' ||
+            VolumeName[1]     != L'\\' ||
+            VolumeName[2]     != L'?'  ||
+            VolumeName[3]     != L'\\' ||
+            VolumeName[Index] != L'\\') {
+            Error = ERROR_BAD_PATHNAME;
+            wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", VolumeName);
+            ExitFatal(1);
+        }
+
+        //  QueryDosDeviceW does not allow a trailing backslash,
+        //  so temporarily remove it.
+        VolumeName[Index] = L'\0';
+        CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName)); 
+        VolumeName[Index] = L'\\';
+
+        if (CharCount == 0) {
+            Error = GetLastError();
+            wprintf(L"QueryDosDeviceW failed with error code %d\n", Error);
+            ExitFatal(1);
+        }
+
+        wprintf(L"\nFound a device:\n %s", DeviceName);
+        wprintf(L"\nVolume name: %s", VolumeName);
+		fs::path r = GetAVolumePath(VolumeName);
+		if (!r.empty()) {
+			result.push_back(r);
+ 	       	wprintf(L"\nPath: %s", r.wstring().c_str());
+		}
+
+        //  Move on to the next volume.
+        Success = FindNextVolumeW(FindHandle, VolumeName, ARRAYSIZE(VolumeName));
+
+        if (!Success) {
+            Error = GetLastError();
+
+            if (Error != ERROR_NO_MORE_FILES) {
+                wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
+                ExitFatal(1);
+            }
+
+            //  Finished iterating through all the volumes.
+            Error = ERROR_SUCCESS;
+            break;
+        }
+    }
+
+    FindVolumeClose(FindHandle);
+    FindHandle = INVALID_HANDLE_VALUE;
+
+    return result;
+}
+#endif
+
+static int CclListFilesystem(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const char *dir = LuaToString(l, 1);
+
+#ifdef WIN32
+	if (strcmp(dir, "/") == 0) {
+		std::vector<fs::path> vols = getVolumes();
+		lua_newtable(l);	
+		int j = 0;
+		for (auto const& vol: vols) {
+			if (!access(vol.generic_u8string().c_str(), R_OK)) {
+				lua_pushnumber(l, ++j);
+				lua_pushstring(l, vol.generic_u8string().c_str());
+				lua_settable(l, -3);
+			}
+		}
+		return 1;
+	}
+#endif
+
+	lua_newtable(l);
+	int j = 0;
+	for (auto const& dir_entry: fs::directory_iterator(fs::path(dir))) {
+		if ((dir_entry.is_regular_file() || dir_entry.is_directory()) && !access(dir_entry.path().generic_u8string().c_str(), R_OK)) {
+			std::string name = dir_entry.path().generic_u8string();
+			if (dir_entry.is_directory()) {
+				name += "/";
+			}
+			lua_pushnumber(l, ++j);
+			lua_pushstring(l, name.c_str());
+			lua_settable(l, -3);
+		}
+	}
+
+	return 1;
+}
+
 void ScriptRegister()
 {
 	AliasRegister();
@@ -2563,6 +2731,9 @@ void ScriptRegister()
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
+
+	// TODO: Only allow this when extractor tool runs
+	// lua_register(Lua, "ListFilesystem", CclListFilesystem);
 
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
