@@ -2709,9 +2709,9 @@ static int CclListFilesystem(lua_State *l)
 	lua_newtable(l);
 	int j = 0;
 	for (auto const& dir_entry: fs::directory_iterator(fs::path(dir))) {
-		if ((dir_entry.is_regular_file() || dir_entry.is_directory()) && !access(dir_entry.path().generic_u8string().c_str(), R_OK)) {
+		if ((fs::is_regular_file(dir_entry.path()) || fs::is_directory(dir_entry.path())) && !access(dir_entry.path().generic_u8string().c_str(), R_OK)) {
 			std::string name = dir_entry.path().generic_u8string();
-			if (dir_entry.is_directory()) {
+			if (fs::is_directory(dir_entry.path())) {
 				name += "/";
 			}
 			lua_pushnumber(l, ++j);
