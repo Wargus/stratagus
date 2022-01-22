@@ -1306,7 +1306,7 @@ static int CclSetUnitVariable(lua_State *l)
 	int value = 0;
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
-		unit->AssignToPlayer(Players[value]);
+		unit->ChangeOwner(Players[value]);
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);
 		unit->TTL = GameCycle + value;
