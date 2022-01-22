@@ -1093,6 +1093,40 @@ static void EditorCallbackButtonUp(unsigned button)
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
 	}
+
+	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
+		int num = 0;
+		PixelPos pos0 = CursorStartMapPos;
+		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+		PixelPos pos1 = cursorMapPos;
+		if (pos0.x > pos1.x) {
+			std::swap(pos0.x, pos1.x);
+		}
+		if (pos0.y > pos1.y) {
+			std::swap(pos0.y, pos1.y);
+		}
+		if (KeyModifiers & ModifierShift) {
+			if (KeyModifiers & ModifierAlt) {
+				num = AddSelectedGroundUnitsInRectangle(pos0, pos1);
+			} else if (KeyModifiers & ModifierControl) {
+				num = AddSelectedAirUnitsInRectangle(pos0, pos1);
+			} else {
+				num = AddSelectedUnitsInRectangle(pos0, pos1);
+			}
+		} else {
+			if (KeyModifiers & ModifierAlt) {
+				num = SelectGroundUnitsInRectangle(pos0, pos1);
+			} else if (KeyModifiers & ModifierControl) {
+				num = SelectAirUnitsInRectangle(pos0, pos1);
+			} else {
+				num = SelectUnitsInRectangle(pos0, pos1);
+			}
+		}
+		CursorStartScreenPos.x = 0;
+		CursorStartScreenPos.y = 0;
+		GameCursor = UI.Point.Cursor;
+		CursorState = CursorStatePoint;
+	}
 }
 
 /**
@@ -1183,10 +1217,14 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
 				return;
 			} else if (MouseButtons & RightButton) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
-				Editor.CursorUnitIndex = -1;
-				CclCommand(buf);
+				lua_getglobal(Lua, "EditUnitTypeProperties"); // function to be called
+				if (lua_isfunction(Lua, -1) == 1) {
+					lua_pushstring(Lua, Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
+					LuaCall(Lua, 1, 0, -2, false);
+					Editor.CursorUnitIndex = -1;
+				} else {
+					lua_pop(Lua, 1);
+				}
 				return;
 			}
 		}
@@ -1194,7 +1232,24 @@ static void EditorCallbackButtonDown(unsigned button)
 
 	// Right click on a resource
 	if (Editor.State == EditorSelecting) {
-		if ((MouseButtons & RightButton) && UnitUnderCursor != NULL) {
+		if ((MouseButtons & RightButton) && (UnitUnderCursor != NULL || !Selected.empty())) {
+			lua_getglobal(Lua, "EditUnitProperties");
+			if (lua_isfunction(Lua, -1) == 1) {
+				lua_newtable(Lua);
+				int n = 0;
+				if (!Selected.empty()) {
+					for (auto u : Selected) {
+						lua_pushnumber(Lua, UnitNumber(*u));
+						lua_rawseti(Lua, -2, ++n);
+					}
+				} else {
+					lua_pushnumber(Lua, UnitNumber(*UnitUnderCursor));
+					lua_rawseti(Lua, -2, ++n);
+				}
+				LuaCall(Lua, 1, 0, -2, false);
+			} else {
+				lua_pop(Lua, 1);
+			}
 			CclCommand("if (EditUnitProperties ~= nil) then EditUnitProperties() end;");
 			return;
 		}
@@ -1242,6 +1297,11 @@ static void EditorCallbackButtonDown(unsigned button)
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
 				Players[Editor.SelectedPlayer].StartPos = tilePos;
+			} else if (Editor.State == EditorSelecting) {
+				CursorStartScreenPos = CursorScreenPos;
+				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
+				GameCursor = UI.Cross.Cursor;
+				CursorState = CursorStateRectangle;
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1915,6 +1975,7 @@ void EditorMainLoop()
 		switch (selected) {
 			case 0:
 				Editor.State = EditorSelecting;
+				Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
 				editorSlider->setVisible(false);
 				return;
 			case 1:
