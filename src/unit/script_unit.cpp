@@ -1289,10 +1289,15 @@ static int CclGetUnitVariable(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>-- Create a blacksmith for player 2
-**		blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
-**		-- Specify the amount of hit points to assign to the blacksmith
-**		<strong>SetUnitVariable</strong>(blacksmith,"HitPoints",344)</code></div>
+** <div class="example">
+** <code>
+** -- Create a blacksmith for player 2
+** blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
+** -- Specify the amount of hit points to assign to the blacksmith
+** <strong>SetUnitVariable</strong>(blacksmith,"HitPoints",344)
+** -- Set the blacksmiths color to the color of player 4
+** <strong>SetUnitVariable</strong>(blacksmith,"Color",4)
+** </code></div>
 */
 static int CclSetUnitVariable(lua_State *l)
 {
@@ -1307,6 +1312,9 @@ static int CclSetUnitVariable(lua_State *l)
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
 		unit->ChangeOwner(Players[value]);
+	} else if (!strcmp(name, "Color")) {
+		value = LuaToNumber(l, 3);
+		unit->Colors = &Players[value].UnitColors;
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);
 		unit->TTL = GameCycle + value;
