@@ -198,12 +198,13 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 */
 static int utf8_to_ascii(const int utf8)
 {
+	Assert(utf8 > 0x80);
 	int ascii_idx = (utf8 & 0xFF) - 0x90;
 	int newutf8 = 0x00;
 	if (ascii_idx >= 0 && ascii_idx < sizeof(extended_ascii)) {
 		newutf8 = extended_ascii[(utf8 & 0xFF) - 0x90];
 	}
-	if (newutf8 == 0x00) {
+	if (newutf8 < 0x32) {
 		fprintf(stderr, "Can't convert UTF8 char to Ascii : '%c' d=%d (0x%04x)\r\n", utf8, utf8, utf8);
 		newutf8 = '?';
 	}
@@ -279,7 +280,7 @@ static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
 
 	// ascii
 	if (!(c & 0x80)) {
-		utf8 = c;
+		utf8 = c < 32 ? '?' : c;
 		return true;
 	}
 

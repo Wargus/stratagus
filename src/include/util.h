@@ -133,6 +133,7 @@ int getopt(int argc, char *const argv[], const char *optstring);
 #include <string>
 
 int GetClipboard(std::string &str);
+void SetClipboard(std::string &str);
 
 /*----------------------------------------------------------------------------
 --  UTF8

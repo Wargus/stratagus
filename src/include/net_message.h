@@ -124,7 +124,9 @@ enum _ic_message_subtype_ {
 	ICMGo,                  /// Client is ready to run
 
 	ICMAYT,                 /// Server asks are you there
-	ICMIAH                  /// Client answers I am here
+	ICMIAH,                 /// Client answers I am here
+
+	ICMMapNeeded,			/// Client requests the map files, Server serves them
 };
 
 class CInitMessage_Header
@@ -238,6 +240,25 @@ private:
 public:
 	char MapPath[256];
 	uint32_t MapUID;  /// UID of map to play.
+};
+
+class CInitMessage_MapFileFragment
+{
+public:
+	CInitMessage_MapFileFragment() {}
+	CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t Fragment);
+	CInitMessage_MapFileFragment(uint32_t Fragment);
+	const CInitMessage_Header &GetHeader() const { return header; }
+	const unsigned char *Serialize() const;
+	void Deserialize(const unsigned char *p);
+	static size_t Size() { return CInitMessage_Header::Size() + 384 + 1 + 2 + 4; }
+private:
+	CInitMessage_Header header;
+public:
+	char Data[384]; // path directly followed by data fragment
+	uint8_t PathSize;
+	uint16_t DataSize;
+	uint32_t FragmentIndex;
 };
 
 class CInitMessage_State

@@ -411,13 +411,16 @@ int GetClipboard(std::string &str)
 	char* txt = SDL_GetClipboardText();
 	if (txt) {
 		str = txt;
-		free(txt);
+		SDL_free(txt);
 		return 0;
 	} else {
 		return -1;
 	}
 }
 
+void SetClipboard(std::string &str) {
+	SDL_SetClipboardText(str.c_str());
+}
 
 /*----------------------------------------------------------------------------
 --  UTF8
