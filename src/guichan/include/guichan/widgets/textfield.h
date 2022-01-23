@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -135,6 +135,11 @@ namespace gcn
          */
         virtual unsigned int getCaretPosition() const;
 
+        /**
+         * @brief Set's the flag to make this a password field.
+         */
+        virtual void setPassword(bool flag);
+
 		/// Gets the currently selected text
 		virtual void getTextSelectionPositions(unsigned int* first, unsigned int* len);
 
@@ -168,6 +173,7 @@ namespace gcn
         int mXScroll;
 		int mSelectStart;
 		int mSelectEndOffset;
+        bool isPassword;
     };
 }
 

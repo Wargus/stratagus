@@ -689,8 +689,9 @@ void CMap::RegenerateForest()
 **  Load the map presentation
 **
 **  @param mapname  map filename
+**  @return true on successful load, else false
 */
-void LoadStratagusMapInfo(const std::string &mapname)
+bool LoadStratagusMapInfo(const std::string &mapname)
 {
 	// Set the default map setup by replacing .smp with .sms
 	size_t loc = mapname.find(".smp");
@@ -699,7 +700,7 @@ void LoadStratagusMapInfo(const std::string &mapname)
 		Map.Info.Filename.replace(loc, 4, ".sms");
 	}
 
-	LuaLoadFile(mapname);
+	return LuaLoadFile(mapname) == 0;
 }
 
 //@}

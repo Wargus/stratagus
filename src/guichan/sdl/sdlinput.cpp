@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -60,6 +60,14 @@
 #include "guichan/exception.h"
 
 extern uint32_t SDL_CUSTOM_KEY_UP;
+
+// Ugh... This entire file is so redundant with sdl.cpp - but I don't feel like refactoring the entire guichan mess...
+// So... more mess!!
+static char ControlIsDown = 0;
+
+static bool isTextInput(int key) {
+	return key >= 32 && key < 128 && !ControlIsDown;
+}
 
 namespace gcn
 {
@@ -133,7 +141,7 @@ namespace gcn
           case SDL_TEXTINPUT:
               {
                   char* text = event.text.text;
-                  if ((uint8_t)text[0] >= 32 || (uint8_t)text[0] < 128) {
+                  if (isTextInput((uint8_t)text[0])) {
                       mLastKey = text[0];
                       mIsRepeating = true;
                       keyInput.setKey(mLastKey);
@@ -152,7 +160,14 @@ namespace gcn
               }
 
           case SDL_KEYDOWN:
-              if (event.key.keysym.sym < 32 || event.key.keysym.sym >= 128) {
+              if (!isTextInput(event.key.keysym.sym)) {
+                  switch (event.key.keysym.sym) {
+                      case SDLK_LCTRL:
+                        ControlIsDown |= 0b01;
+                        break;
+                      case SDLK_RCTRL:
+                        ControlIsDown |= 0b10;
+                  }
                   mLastKey = convertKeyCharacter(event.key.keysym);
                   mIsRepeating = true;
                   keyInput.setKey(mLastKey);
@@ -162,7 +177,14 @@ namespace gcn
               break;
 
           case SDL_KEYUP:
-              if (event.key.keysym.sym < 32 || event.key.keysym.sym >= 128) {
+              if (!isTextInput(event.key.keysym.sym)) {
+                  switch (event.key.keysym.sym) {
+                      case SDLK_LCTRL:
+                        ControlIsDown &= 0b10;
+                        break;
+                      case SDLK_RCTRL:
+                        ControlIsDown &= 0b01;
+                  }
                   mIsRepeating = false;
                   keyInput.setKey(convertKeyCharacter(event.key.keysym));
                   keyInput.setType(KeyInput::RELEASE);

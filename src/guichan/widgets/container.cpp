@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -297,8 +297,10 @@ namespace gcn
             if (*iter == widget)
             {
                 mWidgets.erase(iter);
-                widget->_setFocusHandler(NULL);
-                widget->_setParent(NULL);
+                if (this->isParentOfWidget(widget)) {
+                    widget->_setFocusHandler(NULL);
+                    widget->_setParent(NULL);
+                }
                 return;
             }
         }
@@ -314,8 +316,10 @@ namespace gcn
 
         for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
         {
-            (*iter)->_setFocusHandler(NULL);
-            (*iter)->_setParent(NULL);
+            if (this->isParentOfWidget(*iter)) {
+                (*iter)->_setFocusHandler(NULL);
+                (*iter)->_setParent(NULL);
+            }
         }
 
         mWidgets.clear();

@@ -277,6 +277,8 @@ class Widget
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
+	virtual void setDirty(bool isDirty);
+
 	virtual void setBaseColor(const Color color);
 	virtual const Color &getBaseColor() const;
 	virtual void setForegroundColor(const Color color);
@@ -307,18 +309,30 @@ class Widget
 
 $[
 Widget.setActionCallback = function(w, f)
-  w._actioncb = LuaActionListener(f)
-  w:addActionListener(w._actioncb)
+  local lal = LuaActionListener(f)
+  if not w._actioncb then
+    w._actioncb = {}
+  end
+  table.insert(w._actioncb, lal)
+  w:addActionListener(lal)
 end
 
 Widget.setMouseCallback = function(w, f)
-  w._mousecb = LuaActionListener(f)
-  w:addMouseListener(w._mousecb)
+  local lal = LuaActionListener(f)
+  if not w._mousecb then
+    w._mousecb = {}
+  end
+  table.insert(w._mousecb, lal)
+  w:addMouseListener(lal)
 end
 
 Widget.setKeyCallback = function(w, f)
-  w._keycb = LuaActionListener(f)
-  w:addKeyListener(w._keycb)
+  local lal = LuaActionListener(f)
+  if not w._keycb then
+    w._keycb = {}
+  end
+  table.insert(w._keycb, lal)
+  w:addKeyListener(lal)
 end
 $]
 
@@ -495,6 +509,7 @@ class TextField : public Widget
 	TextField(const std::string text);
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
+	virtual void setPassword(bool flag);
 };
 
 class ImageTextField : public Widget
@@ -503,6 +518,7 @@ class ImageTextField : public Widget
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
 	void setItemImage(CGraphic *image);
+	virtual void setPassword(bool flag);
 };
 
 class ListBox : public Widget

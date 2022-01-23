@@ -34,6 +34,9 @@
 #include <coz.h>
 #endif
 
+#include <string>
+#include <vector>
+
 //@{
 
 /*============================================================================
@@ -49,7 +52,11 @@
 
 #ifdef _MSC_VER
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+
+#include <Shlobj.h>
 
 #if _MSC_VER >= 1800
 // From VS2013 onwards, std::min/max are only defined if algorithm is included
@@ -59,6 +66,7 @@
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
+#pragma warning(disable:4996)               /// Warning about POSIX names
 
 #ifndef __func__
 #define __func__ __FUNCTION__
@@ -112,8 +120,11 @@ extern void PrintLocation(const char *file, int line, const char *funcName);
 extern bool EnableDebugPrint;
 extern bool EnableAssert;
 extern bool EnableUnitDebug;
+extern bool IsRestart;
 extern bool IsDebugEnabled;
 extern bool EnableWallsInSinglePlayer;
+
+extern std::vector<std::string> OriginalArgv;
 
 extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
 extern void PrintOnStdOut(const char *format, ...);
@@ -133,8 +144,6 @@ extern void PrintOnStdOut(const char *format, ...);
 /*============================================================================
 ==  Definitions
 ============================================================================*/
-
-#include <string.h>
 
 #ifndef __UTIL_H__
 #include "util.h"

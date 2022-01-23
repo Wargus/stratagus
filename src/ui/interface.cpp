@@ -1376,7 +1376,9 @@ void InputMouseButtonPress(const EventCallback &callbacks,
 	}
 	LastMouseTicks = ticks;
 
-	callbacks.ButtonPressed(button);
+	if (callbacks.ButtonPressed) {
+		callbacks.ButtonPressed(button);
+	}
 }
 
 /**
@@ -1410,7 +1412,9 @@ void InputMouseButtonRelease(const EventCallback &callbacks,
 	}
 	MouseButtons &= ~(0x01010101 << button);
 
-	callbacks.ButtonReleased(button | mask);
+	if (callbacks.ButtonReleased) {
+		callbacks.ButtonReleased(button | mask);
+	}
 }
 
 /**
@@ -1431,7 +1435,9 @@ void InputMouseMove(const EventCallback &callbacks,
 		LastMouseTicks = ticks;
 		LastMousePos = mousePos;
 	}
-	callbacks.MouseMoved(mousePos);
+	if (callbacks.MouseMoved) {
+		callbacks.MouseMoved(mousePos);
+	}
 }
 
 /**
@@ -1444,7 +1450,9 @@ void InputMouseExit(const EventCallback &callbacks, unsigned /* ticks */)
 {
 	// FIXME: should we do anything here with ticks? don't know, but conform others
 	// JOHNS: called by callback HandleMouseExit();
-	callbacks.MouseExit();
+	if (callbacks.MouseExit) {
+		callbacks.MouseExit();
+	}
 }
 
 /**
@@ -1462,7 +1470,9 @@ void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks)
 		if (ticks > LastMouseTicks + HoldClickDelay) {
 			LastMouseTicks = ticks;
 			MouseButtons |= (1 << LastMouseButton) << MouseHoldShift;
-			callbacks.ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
+			if (callbacks.ButtonPressed) {
+				callbacks.ButtonPressed(LastMouseButton | (LastMouseButton << MouseHoldShift));
+			}
 		}
 	}
 }
@@ -1494,7 +1504,9 @@ void InputKeyButtonPress(const EventCallback &callbacks,
 	LastIKey = ikey;
 	LastIKeyChar = ikeychar;
 	LastKeyTicks = ticks;
-	callbacks.KeyPressed(ikey, ikeychar);
+	if (callbacks.KeyPressed) {
+		callbacks.KeyPressed(ikey, ikeychar);
+	}
 	KeyModifiers &= ~ModifierDoublePress;
 }
 
@@ -1513,7 +1525,9 @@ void InputKeyButtonRelease(const EventCallback &callbacks,
 		LastIKey = 0;
 	}
 	LastKeyTicks = ticks;
-	callbacks.KeyReleased(ikey, ikeychar);
+	if (callbacks.KeyReleased) {
+		callbacks.KeyReleased(ikey, ikeychar);
+	}
 }
 
 /**
@@ -1526,7 +1540,9 @@ void InputKeyTimeout(const EventCallback &callbacks, unsigned ticks)
 {
 	if (LastIKey && ticks > LastKeyTicks + HoldKeyDelay) {
 		LastKeyTicks = ticks - (HoldKeyDelay - HoldKeyAdditionalDelay);
-		callbacks.KeyRepeated(LastIKey, LastIKeyChar);
+		if (callbacks.KeyRepeated) {
+			callbacks.KeyRepeated(LastIKey, LastIKeyChar);
+		}
 	}
 }
 

@@ -767,7 +767,9 @@ void WaitEventsOneFrame()
 		if (IsNetworkGame()) {
 			s = NetworkFildes.HasDataToRead(0);
 			if (s > 0) {
-				GetCallbacks()->NetworkEvent();
+				if (GetCallbacks()->NetworkEvent) {
+					GetCallbacks()->NetworkEvent();
+				}
 			}
 		}
 
