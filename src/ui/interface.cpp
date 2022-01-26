@@ -927,6 +927,9 @@ static void InputKey(int key)
 		case SDLK_UP:
 			removeCursorFromInput();
 			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			if (InputHistorySize == 0) {
+				break;
+			}
 			InputHistoryPos = ((InputHistoryPos - 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
 			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
 			InputIndex = strlen(Input);
@@ -937,6 +940,9 @@ static void InputKey(int key)
 		case SDLK_DOWN:
 			removeCursorFromInput();
 			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			if (InputHistorySize == 0) {
+				break;
+			}
 			InputHistoryPos = ((InputHistoryPos + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
 			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
 			InputIndex = strlen(Input);

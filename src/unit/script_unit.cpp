@@ -1315,6 +1315,7 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Color")) {
 		value = LuaToNumber(l, 3);
 		unit->Colors = &Players[value].UnitColors;
+		unit->RescuedFrom = &Players[value];
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);
 		unit->TTL = GameCycle + value;

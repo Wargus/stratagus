@@ -1281,6 +1281,27 @@ static int CclDefineMapSetup(lua_State *l)
 
 	return 0;
 }
+/**
+** <b>Description</b>
+**
+** Declare which codepage the font files are in. Text is handled internally
+** as UTF-8 everywhere, but the font rendering system uses graphics with 256
+** symbols. Commonly, DOS and early Windows games used codepage 437 or 1252 for
+** western European languages, or 866 for Russian and some other cyrillic
+** writing systems. These are the only ones that are currently supported, but
+** more can easily be added. All text is mapped into the codepage that is set
+** for the font files. If something doesn't map (for example, some accented
+** characters with codepage 866, or cyrillic letters with codepage 437), a simple
+** "visual" mapping is used to at least print something.
+**
+*/
+static int CclSetFontCodePage(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	FontCodePage = LuaToNumber(l, 1);
+
+	return 0;
+}
 
 /**
 **  Register CCL features for UI.
@@ -1308,6 +1329,8 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "GetVideoFullScreen", CclGetVideoFullScreen);
 	lua_register(Lua, "SetWindowSize", CclSetWindowSize);
 	lua_register(Lua, "SetVerticalPixelSize", CclSetVerticalPixelSize);
+
+	lua_register(Lua, "SetFontCodePage", CclSetFontCodePage);
 
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);
