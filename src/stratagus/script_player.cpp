@@ -338,33 +338,43 @@ void CPlayer::Load(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Change unit owner
+**  Change all units owned by one player or change only specific units owned by one player
 **
 **  @param l  Lua state.
 **
 ** Example:
 **
-** <div class="example"><code>-- Changes the unit owner from player 0 to player 1
-**		ChangeUnitsOwner({16, 17},{30, 32},0,1)</code></div>
+** <div class="example"><code>-- Changes all units owned by player 0 and give to player 1
+**		<strong>ChangeUnitsOwner</strong>({16, 17}, {30, 32}, 0, 1)
+**		-- Changes all farms owned by player 0 and give to player 1
+**		<strong>ChangeUnitsOwner</strong>({16, 17}, {30, 32}, 0, 1, "unit-farm")</code></div>
 **
 */
 static int CclChangeUnitsOwner(lua_State *l)
 {
-	LuaCheckArgs(l, 4);
+    int args = lua_gettop(l);
+    if (args != 4 && args != 5) {
+        LuaError(l, "incorrect argument count, need 4 or 5 args");
+    }
 
-	Vec2i pos1;
-	Vec2i pos2;
-	CclGetPos(l, &pos1.x, &pos1.y, 1);
-	CclGetPos(l, &pos2.x, &pos2.y, 2);
-	const int oldp = LuaToNumber(l, 3);
-	const int newp = LuaToNumber(l, 4);
-	std::vector<CUnit *> table;
-
-	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
-	for (size_t i = 0; i != table.size(); ++i) {
-		table[i]->ChangeOwner(Players[newp]);
-	}
-	return 0;
+    Vec2i pos1;
+    Vec2i pos2;
+    CclGetPos(l, &pos1.x, &pos1.y, 1);
+    CclGetPos(l, &pos2.x, &pos2.y, 2);
+    const int oldp = LuaToNumber(l, 3);
+    const int newp = LuaToNumber(l, 4);
+    std::vector<CUnit *> table;
+	// Change all units
+    if (args == 4) {
+        Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+    } else { //Change only specific units by the type.
+        CUnitType *type = UnitTypeByIdent(LuaToString(l, 5));
+        Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
+    }
+    for (auto unit : table) {
+        unit->ChangeOwner(Players[newp]);
+    }
+    return 0;
 }
 
 /**
