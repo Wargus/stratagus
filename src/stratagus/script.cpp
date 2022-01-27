@@ -2262,7 +2262,7 @@ void InitLua()
 	}
 #if defined(DEBUG) && !defined(WIN32)
 	static const char* mobdebug =
-#include "./lua/mobdebug.h"
+#include "./lua/mobdebug.luaheader"
 ;
 	int status = luaL_loadbuffer(Lua, mobdebug, strlen(mobdebug), "mobdebug.lua");
 	if (!status) {
