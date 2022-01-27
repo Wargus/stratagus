@@ -423,42 +423,14 @@ bool CFont::IsLoaded() const
 int CFont::Width(const int number) const
 {
 	int width = 0;
-#if 0
-	bool isformat = false;
-#endif
 	int utf8;
 	size_t pos = 0;
-	char text[ sizeof(int) * 10 + 2];
+	char text[sizeof(int) * 10 + 2];
 	const int len = FormatNumber(number, text);
 
 	DynamicLoad();
-	while (GetUTF8(text, len, pos, utf8)) {
-#if 0
-		if (utf8 == '~') {
-			//if (pos >= text.size()) {  // bad formatted string
-			if (pos >= size) {  // bad formatted string
-				break;
-			}
-			if (text[pos] == '<' || text[pos] == '>') {
-				isformat = false;
-				++pos;
-				continue;
-			}
-			if (text[pos] == '!') {
-				++pos;
-				continue;
-			}
-			if (text[pos] != '~') { // ~~ -> ~
-				isformat = !isformat;
-				continue;
-			}
-		}
-		if (!isformat) {
-			width += this->CharWidth[utf8 - 32] + 1;
-		}
-#else
-		width += this->CharWidth[utf8 - 32] + 1;
-#endif
+	for (int i = 0; i < len; i++) {
+		width += this->CharWidth[text[i] - 32] + 1;
 	}
 	return width;
 }
