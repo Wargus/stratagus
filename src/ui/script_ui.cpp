@@ -1290,10 +1290,10 @@ static int CclDefineMapSetup(lua_State *l)
 ** western European languages, or 866 for Russian and some other cyrillic
 ** writing systems. These are the only ones that are currently supported, but
 ** more can easily be added. All text is mapped into the codepage that is set
-** for the font files. If something doesn't map (for example, some accented
-** characters with codepage 866, or cyrillic letters with codepage 437), a simple
-** "visual" mapping is used to at least print something.
-**
+** for the font files. If the codepage is not one of the supported ones, or if
+** something doesn't map (for example, some accented characters with codepage
+** 866, or cyrillic letters with codepage 437), a simple "visual" mapping to
+** 7-bit ASCII is used to at least print something that may be recognizable.
 */
 static int CclSetFontCodePage(lua_State *l)
 {
