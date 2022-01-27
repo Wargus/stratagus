@@ -631,14 +631,14 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 					if (IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)) {
 						IsSDLWindowVisible = false;
 						if (!GamePaused) {
-							DoTogglePause = true;
+							DoTogglePause = !GamePaused;
 							GamePaused = true;
 						}
 					} else if (!IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)) {
 						IsSDLWindowVisible = true;
 						if (GamePaused && DoTogglePause) {
 							DoTogglePause = false;
-							GamePaused = true;
+							GamePaused = false;
 						}
 					}
 				}
