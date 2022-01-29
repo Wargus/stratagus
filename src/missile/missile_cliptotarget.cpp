@@ -48,8 +48,9 @@ void MissileClipToTarget::Action()
 	this->Wait = this->Type->Sleep;
 
 	if (this->TargetUnit != NULL) {
-		this->position.x = this->TargetUnit->tilePos.x * PixelTileSize.x + this->TargetUnit->IX;
-		this->position.y = this->TargetUnit->tilePos.y * PixelTileSize.y + this->TargetUnit->IY;
+		const PixelPos halfSize = this->Type->size / 2;
+		this->position.x = this->TargetUnit->tilePos.x * PixelTileSize.x + this->TargetUnit->IX - halfSize.x;
+		this->position.y = this->TargetUnit->tilePos.y * PixelTileSize.y + this->TargetUnit->IY - halfSize.y;
 	}
 
 	if (!this->State) {
