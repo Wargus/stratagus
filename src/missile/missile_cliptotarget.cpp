@@ -52,7 +52,15 @@ void MissileClipToTarget::Action()
 		this->position.y = this->TargetUnit->tilePos.y * PixelTileSize.y + this->TargetUnit->IY;
 	}
 
+	if (!this->State) {
+		this->State = this->Type->NumBounces + 1;
+	}
 	if (this->NextMissileFrame(1, 0)) {
+		this->State--;
+		if (this->State > 0) {
+			this->SpriteFrame = 0;
+			return;
+		}
 		if (this->SourceUnit && this->SourceUnit->IsAliveOnMap() && this->TargetUnit->IsAliveOnMap()) {
 			this->MissileHit();
 		}
