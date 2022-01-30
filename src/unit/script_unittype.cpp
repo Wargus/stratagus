@@ -2088,6 +2088,17 @@ static int CclDefineDecorations(lua_State *l)
 						decovarstaticsprite->FadeValue = LuaToNumber(l, -1, 3);
 					}
 					decovar = decovarstaticsprite;
+				} else if (!strcmp(key, "animated-sprite")) {
+					CDecoVarAnimatedSprite *decovarspritebar = new CDecoVarAnimatedSprite;
+					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
+					if (decovarspritebar->NSprite == -1) {
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1));
+					}
+					decovarspritebar->WaitFrames = LuaToNumber(l, -1, 2);
+					if (decovarspritebar->WaitFrames <= 0) {
+						LuaError(l, "invalid wait-frames, must be > 0");
+					}
+					decovar = decovarspritebar;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}

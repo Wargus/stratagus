@@ -533,6 +533,35 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const C
 }
 
 /**
+**  Draw an animated sprite.
+**
+**  @param x       X screen pixel position
+**  @param y       Y screen pixel position
+**  @param unit    Unit pointer
+**
+**  @todo fix sprite configuration configuration.
+*/
+void CDecoVarAnimatedSprite::Draw(int x, int y, const CUnitType &/*type*/, const CVariable &var) const
+{
+	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
+	CGraphic &sprite = *decosprite.Sprite;
+
+	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
+	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
+	if (this->IsCenteredInX) {
+		x -= sprite.Width / 2;
+	}
+	if (this->IsCenteredInY) {
+		y -= sprite.Height / 2;
+	}
+	sprite.DrawFrameClip(this->n / this->WaitFrames, x, y);
+	if (this->lastFrame != (char)GameCycle) {
+		const_cast<CDecoVarAnimatedSprite*>(this)->lastFrame = (char)GameCycle;
+		const_cast<CDecoVarAnimatedSprite*>(this)->n = (this->n + 1) % (sprite.NumFrames * this->WaitFrames);
+	}	
+}
+
+/**
 **  Draw decoration (invis, for the unit.)
 **
 **  @param unit       Pointer to the unit.

@@ -334,6 +334,21 @@ public:
 	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
 };
 
+/// use to show specific frame in a sprite.
+class CDecoVarAnimatedSprite : public CDecoVar
+{
+public:
+	CDecoVarAnimatedSprite() : NSprite(-1), n(0), WaitFrames(0) {}
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+
+	char NSprite;    /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	char WaitFrames; /// Frames to wait between each sprite animation step
+private:
+	char lastFrame; /// last update
+	int n;         /// identifiant in SpellSprite
+};
+
 enum UnitTypeType {
 	UnitTypeLand,  /// Unit lives on land
 	UnitTypeFly,   /// Unit lives in air
