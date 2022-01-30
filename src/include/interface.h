@@ -407,8 +407,10 @@ extern bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &butto
 extern bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed units exists
 extern bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button);
-/// Check if units don't exist
+/// Check if not one unit exist
 extern bool ButtonCheckUnitsNot(const CUnit &unit, const ButtonAction &button);
+/// Check if none of the units exist
+extern bool ButtonCheckUnitsNor(const CUnit &unit, const ButtonAction &button);
 /// Check if have network play
 extern bool ButtonCheckNetwork(const CUnit &unit, const ButtonAction &button);
 /// Check if don't have network play

@@ -1080,6 +1080,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckUnitsAnd;
 			} else if (!strcmp(value, "check-units-not")) {
 				ba.Allowed = ButtonCheckUnitsNot;
+			} else if (!strcmp(value, "check-units-nor")) {
+				ba.Allowed = ButtonCheckUnitsNor;
 			} else if (!strcmp(value, "check-network")) {
 				ba.Allowed = ButtonCheckNetwork;
 			} else if (!strcmp(value, "check-no-network")) {

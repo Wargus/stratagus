@@ -1288,7 +1288,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->ReactRangeComputer = from->ReactRangeComputer;
 	to->ReactRangePerson = from->ReactRangePerson;
 	to->Missile.Name = from->Missile.Name;
-	to->Missile.Missile = from->Missile.Missile;
+	to->Missile.Missile = NULL; // filled in later
 	to->MinAttackRange = from->MinAttackRange;
 	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
 	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
@@ -1305,7 +1305,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->DamageType = from->DamageType;
 	to->ExplodeWhenKilled = from->ExplodeWhenKilled;
 	to->Explosion.Name = from->Explosion.Name;
-	to->Explosion.Missile = from->Explosion.Missile;
+	to->Explosion.Missile = NULL; // filled later
 	to->TeleportCost = from->TeleportCost;
 	to->TeleportEffectIn = from->TeleportEffectIn;
 	to->TeleportEffectOut = from->TeleportEffectOut;
@@ -1334,13 +1334,21 @@ static int CclCopyUnitType(lua_State *l)
 	to->CanTarget = from->CanTarget;
 	to->Building = from->Building;
 	to->BuildingRules.clear();
-	for (auto rule : from->BuildingRules) {
-		to->BuildingRules.push_back(rule);
+	if (!from->BuildingRules.empty()) {
+		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName, toName);
 	}
+	// XXX: should copy, not share, this will crash
+	// for (auto rule : from->BuildingRules) {
+	// 	to->BuildingRules.push_back(rule);
+	// }
 	to->AiBuildingRules.clear();
-	for (auto rule : from->AiBuildingRules) {
-		to->AiBuildingRules.push_back(rule);
+	if (!from->AiBuildingRules.empty()) {
+		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName, toName);
 	}
+	// XXX: should copy, not share, this would crash
+	// for (auto rule : from->AiBuildingRules) {
+	// 	to->AiBuildingRules.push_back(rule);
+	// }
 	to->AutoBuildRate = from->AutoBuildRate;
 	to->LandUnit = from->LandUnit;
 	to->AirUnit = from->AirUnit;
@@ -1371,7 +1379,9 @@ static int CclCopyUnitType(lua_State *l)
 	}
 	to->Sound.Help.Name = from->Sound.Help.Name;
 	to->Sound.WorkComplete.Name = from->Sound.WorkComplete.Name;
-	memcpy(to->Sound.Dead, from->Sound.Dead, sizeof(from->Sound.Dead));
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES + 1; i++) {
+		to->Sound.Dead[i].Name = from->Sound.Dead[i].Name;
+	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		to->DefaultStat.Variables[i].Enable = from->DefaultStat.Variables[i].Enable;
 		to->DefaultStat.Variables[i].Value = from->DefaultStat.Variables[i].Value;
@@ -1384,6 +1394,7 @@ static int CclCopyUnitType(lua_State *l)
 	if (!CclInConfigFile) {
 		UpdateUnitStats(*to, 1);
 	}
+	LoadUnitTypes();
 	return 0;
 }
 
