@@ -63,6 +63,9 @@
 */
 static std::vector<CCursor *> AllCursors;
 
+extern uint8_t SizeChangeCounter; // from sdl.cpp
+static uint8_t LastSizeVersion;
+
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
@@ -97,14 +100,35 @@ SDL_Cursor *CCursor::GetSDLCursor()
 		// slow path
 		for (int i = SdlCursors.size(); i <= SpriteFrame; i++) {
 			G->Load();
-			SDL_Surface *cursorFrame = SDL_CreateRGBSurfaceWithFormat(0, G->getWidth(), G->getHeight(), TheScreen->format->BitsPerPixel, TheScreen->format->format);
-			G->DrawFrame(i, 0, 0, cursorFrame);
-			printf("%s\n", SDL_GetError());
+			int ww, wh;
+			SDL_GetWindowSize(TheWindow, &ww, &wh);
+
+			double xScale = (double)ww / Video.Width;
+			double yScale = (double)wh / (Video.Height * Video.VerticalPixelSize);
+			if (xScale > yScale) {
+				xScale = yScale;
+				// ww = Video.Width * yScale;
+			} else {
+				yScale = xScale;
+				xScale = xScale * Video.VerticalPixelSize;
+				// wh = Video.Height * xScale;
+			}
+
+			int w = floor(G->getWidth() * xScale);
+			int h = floor(G->getHeight() * yScale);
+			
+			SDL_Rect srect = {G->frame_map[i].x, G->frame_map[i].y, G->getWidth(), G->getHeight()};
+
+			SDL_Surface *intermediate = SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK);
+			SDL_BlitSurface(G->Surface, &srect, intermediate, NULL);
+
+			SDL_Surface *cursorFrame = SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK);
+			SDL_BlitScaled(intermediate, NULL, cursorFrame, NULL);
+
+			SDL_FreeSurface(intermediate);
+
 			SdlCursorSurfaces.push_back(cursorFrame);
 			SDL_Cursor *cur = SDL_CreateColorCursor(cursorFrame, HotPos.x, HotPos.y);
-			if (!cur) {
-				printf("%s\n", SDL_GetError());
-			}
 			SdlCursors.push_back(cur);
 		}
 	}
@@ -119,6 +143,17 @@ CCursor::~CCursor()
 	for (auto sdlSurface : SdlCursorSurfaces) {
 		SDL_FreeSurface(sdlSurface);
 	}
+}
+
+void CCursor::Reset() {
+	for (auto sdlCur : SdlCursors) {
+		SDL_FreeCursor(sdlCur);
+	}
+	for (auto sdlSurface : SdlCursorSurfaces) {
+		SDL_FreeSurface(sdlSurface);
+	}
+	SdlCursors.clear();
+	SdlCursorSurfaces.clear();
 }
 
 /**
@@ -278,6 +313,14 @@ static void DrawBuildingCursor()
 */
 void DrawCursor()
 {
+	if (LastSizeVersion != SizeChangeCounter) {
+		HideCursor();
+		for (auto cur : AllCursors) {
+			cur->Reset();
+		}
+		LastSizeVersion = SizeChangeCounter;
+	}
+
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
@@ -291,7 +334,7 @@ void DrawCursor()
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
 	if (GameCursor == NULL || IsDemoMode()) {
-		SDL_ShowCursor(SDL_DISABLE);
+		SDL_SetCursor(Video.blankCursor);
 		ActuallyVisibleGameCursor = NULL;
 		return;
 	}
@@ -302,7 +345,6 @@ void DrawCursor()
 			GameCursor->G->Load();
 		}
 		SDL_SetCursor(GameCursor->GetSDLCursor());
-		SDL_ShowCursor(SDL_ENABLE);
 		ActuallyVisibleGameCursor = GameCursor;
 		VisibleGameCursorFrame = GameCursor->SpriteFrame;
 	}
@@ -313,7 +355,7 @@ void DrawCursor()
 */
 void HideCursor()
 {
-	SDL_ShowCursor(SDL_DISABLE);
+	SDL_SetCursor(Video.blankCursor);
 	ActuallyVisibleGameCursor = NULL;
 }
 

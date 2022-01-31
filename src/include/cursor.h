@@ -142,6 +142,7 @@ public:
 	CGraphic *G; /// Cursor sprite image
 
 	SDL_Cursor *GetSDLCursor();
+	void Reset(); // Clear all cursor surfaces
 
 private:
 	std::vector<SDL_Cursor*> SdlCursors;
