@@ -174,7 +174,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (pos.y) {
 		const Vec2i offset(0, -1);
 		// Insert into the bottom the new tile.
-		if (!(Map.Field(pos + offset)->isDecorative())) {
+		CMapField *f = Map.Field(pos + offset);
+		if (f->isAWall()) {
+			EditorChangeSurrounding(pos + offset, pos);
+		} else if (!f->isDecorative()) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
@@ -189,7 +192,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (pos.y < Map.Info.MapHeight - 1) {
 		const Vec2i offset(0, 1);
 		// Insert into the top the new tile.
-		if (!(Map.Field(pos + offset)->isDecorative())) {
+		CMapField *f = Map.Field(pos + offset);
+		if (f->isAWall()) {
+			EditorChangeSurrounding(pos + offset, pos);
+		} else if (!f->isDecorative()) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
@@ -204,7 +210,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (pos.x) {
 		const Vec2i offset(-1, 0);
 		// Insert into the left the new tile.
-		if (!(Map.Field(pos + offset)->isDecorative())) {
+		CMapField *f = Map.Field(pos + offset);
+		if (f->isAWall()) {
+			EditorChangeSurrounding(pos + offset, pos);
+		} else if (!f->isDecorative()) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
@@ -219,7 +228,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	if (pos.x < Map.Info.MapWidth - 1) {
 		const Vec2i offset(1, 0);
 		// Insert into the right the new tile.
-		if (!(Map.Field(pos + offset)->isDecorative())) {
+		CMapField *f = Map.Field(pos + offset);
+		if (f->isAWall()) {
+			EditorChangeSurrounding(pos + offset, pos);
+		} else if (!f->isDecorative()) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
