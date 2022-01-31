@@ -820,7 +820,6 @@ void RealizeVideoMemory()
 		}
 		NumRects = 0;
 	}
-	HideCursor();
 }
 
 /**
