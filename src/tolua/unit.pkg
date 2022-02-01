@@ -34,6 +34,7 @@ class CPreference
 	bool NoStatusLineTooltips;
 	bool SimplifiedAutoTargeting;
 	bool AiChecksDependencies;
+	bool HardwareCursor;
 
 	unsigned int ShowOrders;
 	unsigned int ShowNameDelay;

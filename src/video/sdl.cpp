@@ -823,6 +823,9 @@ void RealizeVideoMemory()
 		}
 		NumRects = 0;
 	}
+	if (!Preference.HardwareCursor) {
+		HideCursor();
+	}
 }
 
 /**
