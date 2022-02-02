@@ -247,6 +247,8 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const = 0;
 
+	bool BoolFlagMatches(const CUnitType &type) const;
+
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
 	int OffsetX;            /// Offset in X coord.
@@ -267,6 +269,9 @@ public:
 	bool HideNeutral;       /// if true, don't show for neutral unit.
 	bool HideAllied;        /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;      /// if true, show for opponent unit.
+
+	bool BoolFlagInvert;    /// if 1, invert the bool flag check
+	int BoolFlag;           /// if !=-1, show only for units with this flag
 };
 
 class CDecoVarBar : public CDecoVar

@@ -365,6 +365,21 @@ void CleanDecorations()
 }
 
 /**
+ * @brief Check if this decoration defines a condition on boolean flags and if so, if that condition matches.
+ * 
+ * @param type the unit type to check against
+ * @return true if the decoration has a condition on a boolean variable and that condition matches, false otherwise
+ */
+bool CDecoVar::BoolFlagMatches(const CUnitType &type) const
+{
+	if (BoolFlag != -1) {
+		return type.BoolFlag[BoolFlag].value != BoolFlagInvert;
+	} else {
+		return false;
+	}
+}
+
+/**
 **  Draw bar for variables.
 **
 **  @param x       X screen pixel position
@@ -593,6 +608,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
 			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
+			  || var.BoolFlagMatches(type)
 			  || max == 0)) {
 			var.Draw(
 				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,

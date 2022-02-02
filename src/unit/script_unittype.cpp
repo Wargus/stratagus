@@ -1977,6 +1977,8 @@ static int CclDefineDecorations(lua_State *l)
 		bool HideNeutral;
 		bool HideAllied;
 		bool ShowOpponent;
+		bool BoolFlagInvert;
+		int BoolFlag;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -2114,8 +2116,14 @@ static int CclDefineDecorations(lua_State *l)
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}
 				lua_pop(l, 2); // MethodName and data
-			} else { // Error
-				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
+			} else {
+				tmp.BoolFlag = UnitTypeVar.BoolFlagNameLookup[key];
+				if (tmp.BoolFlag != -1) {
+					tmp.BoolFlagInvert = LuaToBoolean(l, -1);
+				} else {
+					// Error
+					LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
+				}
 			}
 			lua_pop(l, 1); // Pop the value
 		}
@@ -2134,6 +2142,8 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->HideNeutral = tmp.HideNeutral;
 		decovar->HideAllied = tmp.HideAllied;
 		decovar->ShowOpponent = tmp.ShowOpponent;
+		decovar->BoolFlag = tmp.BoolFlag;
+		decovar->BoolFlagInvert = tmp.BoolFlagInvert;
 		UnitTypeVar.DecoVar.push_back(decovar);
 	}
 	Assert(lua_gettop(l));
