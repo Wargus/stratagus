@@ -1409,6 +1409,11 @@ void ImageListBox::mousePress(int, int y, int button)
 		setSelected(y / (itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight()));
 		generateAction();
 	}
+	else if (button == gcn::MouseInput::RIGHT && hasMouse())
+	{
+		setSelected(-1);
+		generateAction();
+	}
 }
 
 void ImageListBox::setSelected(int selected)

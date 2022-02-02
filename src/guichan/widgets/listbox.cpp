@@ -225,6 +225,9 @@ namespace gcn
         {
             setSelected(y / getFont()->getHeight());
             generateAction();
+        } else if (button == MouseInput::RIGHT && hasMouse()) {
+            setSelected(-1);
+            generateAction();
         }
     }
 
