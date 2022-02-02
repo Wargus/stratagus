@@ -128,7 +128,7 @@ SDL_Cursor *CCursor::GetSDLCursor()
 			SDL_FreeSurface(intermediate);
 
 			SdlCursorSurfaces.push_back(cursorFrame);
-			SDL_Cursor *cur = SDL_CreateColorCursor(cursorFrame, HotPos.x, HotPos.y);
+			SDL_Cursor *cur = SDL_CreateColorCursor(cursorFrame, floor(HotPos.x * xScale), floor(HotPos.y * yScale));
 			SdlCursors.push_back(cur);
 		}
 	}
