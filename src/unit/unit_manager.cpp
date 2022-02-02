@@ -120,6 +120,7 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 		unit->UnitManagerData.unitSlot = -1;
 		units.pop_back();
 	}
+	Assert(unit->PlayerSlot == -1);
 	releasedUnits.push_back(unit);
 	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time

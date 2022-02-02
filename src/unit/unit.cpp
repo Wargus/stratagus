@@ -491,6 +491,9 @@ void CUnit::Release(bool final)
 		DebugPrint("unit already free\n");
 		return;
 	}
+	if (PlayerSlot != static_cast<size_t>(-1)) {
+		Player->RemoveUnit(*this);
+	}
 	Assert(Orders.size() == 1);
 	// Must be removed before here
 	Assert(Removed);

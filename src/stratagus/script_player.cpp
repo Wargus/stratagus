@@ -94,8 +94,8 @@ void CPlayer::Load(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	this->Units.resize(0);
-	this->FreeWorkers.resize(0);
+	this->Units.clear();
+	this->FreeWorkers.clear();
 
 	// j = 0 represent player Index.
 	for (int j = 1; j < args; ++j) {
