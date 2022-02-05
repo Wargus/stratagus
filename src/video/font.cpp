@@ -324,6 +324,9 @@ static int CodepageIndexFromUTF8(const char text[], const size_t len, size_t &po
 	// ascii
 	if (!(c & 0x80)) {
 		pos = postUtf8CharPos;
+		if (c < 32) {
+			return '?';
+		}
 		return c;
 	} else if ((c & 0xE0) == 0xC0) {
 		codepoint = (c & 0x1F);
