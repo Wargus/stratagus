@@ -2032,6 +2032,12 @@ static int CclDefineDecorations(lua_State *l)
 							decovarbar->Height = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "Width")) {
 							decovarbar->Width = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "MinValue")) {
+							decovarbar->MinValue = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "MaxValue")) {
+							decovarbar->MaxValue = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Invert")) {
+							decovarbar->Invert = LuaToBoolean(l, -1);
 						} else if (!strcmp(key, "Orientation")) {
 							key = LuaToString(l, -1);
 							if (!strcmp(key, "horizontal")) {

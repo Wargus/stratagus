@@ -277,7 +277,7 @@ public:
 class CDecoVarBar : public CDecoVar
 {
 public:
-	/// function to draw the decorations.
+	CDecoVarBar() : MinValue(0), MaxValue(100), Invert(false) {};
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
@@ -285,6 +285,9 @@ public:
 	int Height;                 /// Height of the bar.
 	int Width;                  /// Width of the bar.
 	bool ShowFullBackground;    /// if true, show background like value equal to max.
+	bool Invert;                /// if true, invert length
+	int MinValue;               /// show only above percent
+	int MaxValue;               /// show only below percent
 	char BorderSize;            /// Size of the border, 0 for no border.
 	// FIXME color depend of percent (red, Orange, Yellow, Green...)
 	IntColor Color;             /// Color of bar.

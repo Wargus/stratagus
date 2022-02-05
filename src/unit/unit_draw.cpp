@@ -391,6 +391,11 @@ void CDecoVarBar::Draw(int x, int y,
 					   const CUnitType &type, const CVariable &var) const
 {
 	Assert(var.Max);
+	
+	int percentage = var.Value * 100 / var.Max;
+	if (MinValue > percentage || MaxValue < percentage) {
+		return;
+	}
 
 	int height = this->Height;
 	if (height == 0) { // Default value
@@ -405,8 +410,14 @@ void CDecoVarBar::Draw(int x, int y,
 	if (this->IsVertical)  { // Vertical
 		w = width;
 		h = var.Value * height / var.Max;
+		if (Invert) {
+			h = height - h;
+		}
 	} else {
 		w = var.Value * width / var.Max;
+		if (Invert) {
+			w = width - w;
+		}
 		h = height;
 	}
 	if (this->IsCenteredInX) {
