@@ -636,7 +636,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 	}
 
 	// Draw group number
-	if (unit.Selected && unit.GroupId != 0
+	if (Preference.ShowOrders && unit.Selected && unit.GroupId != 0
 #ifndef DEBUG
 		&& unit.Player == ThisPlayer
 #endif
