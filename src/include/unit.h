@@ -446,7 +446,7 @@ public:
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(false),
-		AiChecksDependencies(false),
+		AiChecksDependencies(false), SelectionRectangleIndicatesDamage(false),
 		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -467,6 +467,7 @@ public:
 	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
 	bool AiChecksDependencies; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
 	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
+	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
 
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.

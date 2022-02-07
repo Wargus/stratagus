@@ -73,6 +73,16 @@ public:
 
 typedef uint32_t IntColor; // Uint32 in SDL
 
+/**
+ * interpolate 2 RGB colors
+ * @param color1    integer containing color as 0x00RRGGBB
+ * @param color2    integer containing color as 0x00RRGGBB
+ * @param fraction  how much interpolation (0..1)
+ * - 0: full color 1
+ * - 1: full color 2
+ * @return the new color after interpolation
+ */
+IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction);
 
 //@}
 

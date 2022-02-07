@@ -130,6 +130,7 @@ const CViewport *CurrentViewport;  /// FIXME: quick hack for split screen
 void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 {
 	IntColor color;
+	IntColor color2 = 0;
 
 	// FIXME: make these colors customizable with scripts.
 
@@ -141,6 +142,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		} else if ((unit.Selected || (unit.Blink & 1))
 				   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 			color = ColorGreen;
+			color2 = ColorRed;
 		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
@@ -165,6 +167,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
 	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
+
+	if (color2 && Preference.SelectionRectangleIndicatesDamage) {
+		float fraction = (float)unit.Variable[HP_INDEX].Value / unit.Variable[HP_INDEX].Max;
+		color = InterpolateColor(color2, color, fraction);
+	}
 
 	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
 }
