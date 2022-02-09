@@ -636,6 +636,7 @@ static char MessagesEvent[MESSAGES_MAX][256];  /// Array of event messages
 static Vec2i MessagesEventPos[MESSAGES_MAX];   /// coordinate of event
 static int MessagesEventCount;                 /// Number of event messages
 static int MessagesEventIndex;                 /// FIXME: docu
+static int MaxMessagesCount = MESSAGES_MAX;
 
 class MessagesDisplay
 {
@@ -665,7 +666,6 @@ protected:
 private:
 	char Messages[MESSAGES_MAX][256];         /// Array of messages
 	int  MessagesCount;                       /// Number of messages
-	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
 	bool show;
@@ -784,9 +784,6 @@ void MessagesDisplay::DrawMessages()
 					PopClipping();
 				}
 			}
-			if (MessagesCount < 1) {
-				MessagesSameCount = 0;
-			}
 #ifdef DEBUG
 		}
 #endif
@@ -807,7 +804,7 @@ void MessagesDisplay::AddMessage(const char *msg)
 		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
 	}
 
-	if (MessagesCount == MESSAGES_MAX) {
+	if (MessagesCount == MaxMessagesCount) {
 		// Out of space to store messages, can't scroll smoothly
 		ShiftMessages();
 		MessagesFrameTimeout = ticks + UI.MessageScrollSpeed * 1000;
@@ -879,18 +876,34 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 	if (MessagesCount < 1) {
 		return false;
 	}
-	if (!strcmp(msg, Messages[MessagesCount - 1])) {
-		++MessagesSameCount;
-		return true;
-	}
-	if (MessagesSameCount > 0) {
-		char temp[256];
-		int n = MessagesSameCount;
+	size_t sz = strlen(msg);
+	for (int i = 0; i < MessagesCount; i++) {
+		const char *pMsg = Messages[i];
+		if (!strncmp(msg, pMsg, sz)) {
 
-		MessagesSameCount = 0;
-		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
-		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
-		AddMessage(temp);
+			size_t msgSz = strlen(pMsg);
+			int n = 0;
+
+#define REPEAT " (~<%d~>x)"
+			if (msgSz == sz || sscanf(pMsg + sz, REPEAT, &n) == 1) {
+				// This exact message was printed already.
+				// n now holds the previous repeat count.
+
+				// 1. Shift all following messages down
+				for (int z = i; z < MessagesCount - 1; ++z) {
+					strcpy_s(Messages[z], sizeof(Messages[z]), Messages[z + 1]);
+				}
+
+				// Update the message and append it to the end with the
+				// new repeat count
+				char temp[256];
+				snprintf(temp, sizeof(temp), "%s " REPEAT, msg, n + 1);
+				MessagesCount--;
+				AddMessage(temp);
+			}
+#undef REPEAT
+			return true;
+		}
 	}
 	return false;
 }
@@ -911,7 +924,6 @@ void MessagesDisplay::AddUniqueMessage(const char *s)
 void MessagesDisplay::CleanMessages()
 {
 	MessagesCount = 0;
-	MessagesSameCount = 0;
 	MessagesScrollY = 0;
 	MessagesFrameTimeout = 0;
 
@@ -998,7 +1010,7 @@ void SetMessageEvent(const Vec2i &pos, const char *fmt, ...)
 	va_end(va);
 	allmessages.AddUniqueMessage(temp);
 
-	if (MessagesEventCount == MESSAGES_MAX) {
+	if (MessagesEventCount == MaxMessagesCount) {
 		ShiftMessagesEvent();
 	}
 
@@ -1036,6 +1048,14 @@ void ToggleShowBuilListMessages()
 	allmessages.ToggleShowBuilListMessages();
 }
 #endif
+
+void SetMaxMessageCount(int newMax)
+{
+	MaxMessagesCount = std::min(MESSAGES_MAX, newMax);
+	allmessages.CleanMessages();
+	MessagesEventCount = 0;
+	MessagesEventIndex = 0;
+}
 
 /*----------------------------------------------------------------------------
 --  INFO PANEL

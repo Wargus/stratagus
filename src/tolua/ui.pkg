@@ -678,6 +678,7 @@ $]
 
 void CenterOnMessage();
 void ToggleShowMessages();
+void SetMaxMessageCount(int max);
 void UiFindIdleWorker();
 void CycleViewportMode(int step);
 void UiToggleTerrain();

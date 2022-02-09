@@ -375,6 +375,8 @@ extern void CenterOnMessage();
 extern void CleanMessages();
 /// show/hide messages
 extern void ToggleShowMessages();
+/// max message count
+extern void SetMaxMessageCount(int newMax);
 
 /// Draw the timer
 extern void DrawTimer();
