@@ -1158,6 +1158,32 @@ static int CclDefineButton(lua_State *l)
 	return 0;
 }
 
+static int CclCopyButtonsForUnitType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	// Slot identifier
+	const char* fromName = LuaToString(l, 1);
+	CUnitType *from = UnitTypeByIdent(fromName);
+	const char* toName = LuaToString(l, 2);
+	CUnitType *to = UnitTypeByIdent(toName);
+	if (!to) {
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ toName);
+	}
+	if (!from) {
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName);
+	}
+
+	for (auto btn : UnitButtonTable) {
+		if (btn->UnitMask.find(fromName) != std::string::npos) {
+			btn->UnitMask += toName;
+			btn->UnitMask += ",";
+		}
+	}
+
+	return 0;
+}
+
 /**
 **  Run the set-selection-changed-hook.
 */
@@ -1347,6 +1373,8 @@ void UserInterfaceCclRegister()
 
 	lua_register(Lua, "DefineButton", CclDefineButton);
 	lua_register(Lua, "ClearButtons", CclClearButtons);
+
+	lua_register(Lua, "CopyButtonsForUnitType", CclCopyButtonsForUnitType);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
 
