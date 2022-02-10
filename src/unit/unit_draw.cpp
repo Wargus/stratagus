@@ -988,13 +988,13 @@ void CUnit::Draw(const CViewport &vp) const
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			DrawConstruction(GameSettings.Presets[player].PlayerColor, cframe, *type, frame, pos);
 		} else {
-			DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
+			DrawUnitType(*type, sprite, CUnitColorsOrPlayerIndex(GameSettings.Presets[player].PlayerColor), frame, screenPos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
+		DrawUnitType(*type, sprite, CUnitColorsOrPlayerIndex(Colors), frame, screenPos);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.

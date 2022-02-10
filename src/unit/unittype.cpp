@@ -891,7 +891,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, CUnitColorsOrPlayerIndex player, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.

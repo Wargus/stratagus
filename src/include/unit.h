@@ -135,6 +135,11 @@ class CUnit
 {
 public:
 	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	~CUnit() {
+		if (Colors->isCustom) {
+			delete Colors;
+		}
+	}
 
 	void Init();
 

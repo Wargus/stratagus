@@ -1257,12 +1257,18 @@ void PlayersEachSecond(int playerIdx)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
+void GraphicPlayerPixels(CUnitColorsOrPlayerIndex colorsOrPlayer, const CGraphic &sprite)
 {
 	Assert(PlayerColorIndexCount);
 
 	Assert(SDL_MUSTLOCK(sprite.Surface) == 0);
-	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	std::vector<SDL_Color> sdlColors;
+	if (colorsOrPlayer.isPlayer()) {
+		CPlayer &player = Players[colorsOrPlayer.asPlayer()];
+		sdlColors = std::vector<SDL_Color>(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	} else {
+		sdlColors = std::vector<SDL_Color>(colorsOrPlayer.asUnitColors()->Colors.begin(), colorsOrPlayer.asUnitColors()->Colors.end());
+	}
 	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
 		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);

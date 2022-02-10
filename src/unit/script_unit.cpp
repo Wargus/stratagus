@@ -1313,9 +1313,26 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->ChangeOwner(Players[value]);
 	} else if (!strcmp(name, "Color")) {
-		value = LuaToNumber(l, 3);
-		unit->Colors = &Players[value].UnitColors;
-		unit->RescuedFrom = &Players[value];
+		if (lua_istable(l, 3)) {
+			const int numcolors = lua_rawlen(l, 3);
+			if (numcolors != PlayerColorIndexCount) {
+				LuaError(l, "You should use %d, not %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount _C_ numcolors);
+			}
+			CUnitColors *customColor = new CUnitColors;
+			customColor->isCustom = true;
+			for (int j = 0; j < numcolors; ++j) {
+				lua_rawgeti(l, 3, j + 1);
+				CColor color;
+				color.Parse(l);
+				customColor->Colors.push_back(color);
+				lua_pop(l, 1);
+			}
+			unit->Colors = customColor;
+		} else {
+			value = LuaToNumber(l, 3);
+			unit->Colors = &Players[value].UnitColors;
+			unit->RescuedFrom = &Players[value];
+		}
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);
 		unit->TTL = GameCycle + value;
