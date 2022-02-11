@@ -146,11 +146,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		} else if (ThisPlayer->IsEnemy(unit)) {
 			color = ColorRed;
 		} else {
-			color = PlayerColors[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
+			color = PlayerColorsRGB[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
 
 			for (int i = 0; i < PlayerMax; ++i) {
 				if (unit.TeamSelected & (1 << i)) {
-					color = PlayerColors[GameSettings.Presets[i].PlayerColor][0];
+					color = PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0];
 				}
 			}
 		}
@@ -988,13 +988,13 @@ void CUnit::Draw(const CViewport &vp) const
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			DrawConstruction(GameSettings.Presets[player].PlayerColor, cframe, *type, frame, pos);
 		} else {
-			DrawUnitType(*type, sprite, CUnitColorsOrPlayerIndex(GameSettings.Presets[player].PlayerColor), frame, screenPos);
+			DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, CUnitColorsOrPlayerIndex(Colors), frame, screenPos);
+		DrawUnitType(*type, sprite, Colors < 0 ? GameSettings.Presets[player].PlayerColor : Colors, frame, screenPos);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.

@@ -606,11 +606,6 @@ static int CclUnit(lua_State *l)
 		MapMarkUnitSight(*unit);
 	}
 
-	// Fix Colors for rescued units.
-	if (unit->RescuedFrom) {
-		unit->Colors = &unit->RescuedFrom->UnitColors;
-	}
-
 	return 0;
 }
 
@@ -1313,25 +1308,19 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->ChangeOwner(Players[value]);
 	} else if (!strcmp(name, "Color")) {
-		if (lua_istable(l, 3)) {
-			const int numcolors = lua_rawlen(l, 3);
-			if (numcolors != PlayerColorIndexCount) {
-				LuaError(l, "You should use %d, not %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount _C_ numcolors);
+		if (lua_isstring(l, 3)) {
+			const char *colorName = LuaToString(l, 3);
+			for (size_t i = 0; i < PlayerColorNames.size(); i++) {
+				if (PlayerColorNames[i] == colorName) {
+					unit->Colors = i;
+					break;
+				}
 			}
-			CUnitColors *customColor = new CUnitColors;
-			customColor->isCustom = true;
-			for (int j = 0; j < numcolors; ++j) {
-				lua_rawgeti(l, 3, j + 1);
-				CColor color;
-				color.Parse(l);
-				customColor->Colors.push_back(color);
-				lua_pop(l, 1);
-			}
-			unit->Colors = customColor;
+		} else if (lua_isnil(l, 3)) {
+			unit->Colors = -1;
 		} else {
 			value = LuaToNumber(l, 3);
-			unit->Colors = &Players[value].UnitColors;
-			unit->RescuedFrom = &Players[value];
+			unit->Colors = value;
 		}
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);

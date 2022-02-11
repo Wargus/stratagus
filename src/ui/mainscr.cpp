@@ -1109,7 +1109,7 @@ static void InfoPanel_draw_no_selection()
 				label.Draw(x + 15, y, i);
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
-				Video.FillRectangleClip(PlayerColors[GameSettings.Presets[i].PlayerColor][0], x + 1, y + 1, 10, 10);
+				Video.FillRectangleClip(PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], x + 1, y + 1, 10, 10);
 
 				label.Draw(x + 27, y, Players[i].Name);
 				label.Draw(x + 117, y, Players[i].Score);

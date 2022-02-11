@@ -399,9 +399,8 @@ extern int NumPlayers;             /// How many player slots used
 extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
 extern bool NoRescueCheck;          /// Disable rescue check
-extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
-extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
-extern std::string PlayerColorNames[PlayerMax];  /// Player color names
+extern std::vector<std::vector<CColor>> PlayerColorsRGB; /// Player colors
+extern std::vector<std::string> PlayerColorNames;  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races
 
@@ -433,8 +432,8 @@ extern void PlayersEachCycle();
 /// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
 
-/// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(CUnitColorsOrPlayerIndex player, const CGraphic &sprite);
+/// Change current color set to the player color of the sprite
+extern void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite);
 
 /// Output debug information for players
 extern void DebugPlayers();

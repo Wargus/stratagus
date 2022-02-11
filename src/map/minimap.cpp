@@ -339,7 +339,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = PlayerColors[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
+		color = PlayerColorsRGB[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
 	}
 
 	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];

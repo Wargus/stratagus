@@ -32,6 +32,10 @@
 
 //@{
 
+#include <stdint.h>
+
+typedef uint32_t IntColor; // Uint32 in SDL
+
 struct SDL_Color;
 struct lua_State;
 
@@ -48,6 +52,9 @@ public:
 
 	/// Cast to a SDL_Color
 	operator SDL_Color() const;
+
+	/// Cast to IntColor
+	operator IntColor() const;
 
 public:
 	unsigned char R;       /// Red
@@ -66,40 +73,7 @@ public:
 
 public:
 	std::vector<CColor> Colors;
-	bool isCustom = false;
 };
-
-#include <stdint.h>
-
-class CUnitColorsOrPlayerIndex
-{
-public:
-	CUnitColorsOrPlayerIndex(int player) {
-		playerIndexOrColors = static_cast<intptr_t>(player);
-	};
-
-	CUnitColorsOrPlayerIndex(CUnitColors *colors) {
-		playerIndexOrColors = reinterpret_cast<intptr_t>(colors);
-	};
-
-	bool isPlayer() {
-		// no valid pointer is smaller than PlayerMax
-		return playerIndexOrColors <= PlayerMax;
-	}
-
-	int asPlayer() {
-		return static_cast<int>(playerIndexOrColors);
-	}
-
-	CUnitColors *asUnitColors() {
-		return reinterpret_cast<CUnitColors*>(playerIndexOrColors);
-	}
-
-private:
-	intptr_t playerIndexOrColors;
-};
-
-typedef uint32_t IntColor; // Uint32 in SDL
 
 /**
  * interpolate 2 RGB colors

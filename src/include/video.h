@@ -204,9 +204,9 @@ protected:
 	}
 
 public:
-	void DrawPlayerColorFrameClipX(CUnitColorsOrPlayerIndex player, unsigned frame, int x, int y,
+	void DrawPlayerColorFrameClipX(int colorIndex, unsigned frame, int x, int y,
 								   SDL_Surface *surface = TheScreen);
-	void DrawPlayerColorFrameClip(CUnitColorsOrPlayerIndex player, unsigned frame, int x, int y,
+	void DrawPlayerColorFrameClip(int colorIndex, unsigned frame, int x, int y,
 								  SDL_Surface *surface = TheScreen);
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);

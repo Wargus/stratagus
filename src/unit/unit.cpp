@@ -429,7 +429,7 @@ void CUnit::Init()
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
-	Colors = NULL;
+	Colors = -1;
 	IX = 0;
 	IY = 0;
 	Frame = 0;
@@ -746,7 +746,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	Player = &player;
 	Stats = &type.Stats[Player->Index];
-	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);

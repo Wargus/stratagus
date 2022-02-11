@@ -544,7 +544,7 @@ static void DrawPlayers()
 		// if player exists, draw player color 2px inside highlight
 		if (Map.Info.PlayerType[i] != PlayerNobody) {
 			Video.FillRectangle(
-				PlayerColors[GameSettings.Presets[i].PlayerColor][0], 
+				PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], 
 				x + 2, y + 2, getPlayerButtonSize() - 2, getPlayerButtonSize() - 2);
 		}
 

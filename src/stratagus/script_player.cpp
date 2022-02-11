@@ -816,7 +816,8 @@ static int CclDefineRaceNames(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Define player colors
+**  Define player colors. Pass "false" as an optional second
+**  argument to add the colors to the existing ones.
 **
 **  @param l  Lua state.
 **
@@ -843,14 +844,24 @@ static int CclDefineRaceNames(lua_State *l)
 */
 static int CclDefinePlayerColors(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
+	int nargs = lua_gettop(l);
+	if (nargs < 1 || nargs > 2) {
+		LuaError(l, "wrong number of arguments");
+	}
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-
 	const int args = lua_rawlen(l, 1);
+	if (nargs < 2 || LuaToBoolean(l, 2)) {
+		PlayerColorNames.clear();
+		PlayerColorsRGB.clear();
+		if (args / 2 < PlayerMax) {
+			LuaError(l, "You need to define at least %d colors" _C_ PlayerMax);
+		}
+	}
+
 	for (int i = 0; i < args; ++i) {
-		PlayerColorNames[i / 2] = LuaToString(l, 1, i + 1);
+		PlayerColorNames.push_back(LuaToString(l, 1, i + 1));
 		++i;
 		lua_rawgeti(l, 1, i + 1);
 		if (!lua_istable(l, -1)) {
@@ -860,11 +871,15 @@ static int CclDefinePlayerColors(lua_State *l)
 		if (numcolors != PlayerColorIndexCount) {
 			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
+		std::vector<CColor> newColors;
 		for (int j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
-			PlayerColorsRGB[i / 2][j].Parse(l);
+			CColor newColor;
+			newColor.Parse(l);
+			newColors.push_back(newColor);
 			lua_pop(l, 1);
 		}
+		PlayerColorsRGB.push_back(newColors);
 	}
 
 	return 0;
@@ -894,12 +909,7 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	PlayerColorIndexStart = LuaToNumber(l, 1);
 	PlayerColorIndexCount = LuaToNumber(l, 2);
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		PlayerColorsRGB[i].clear();
-		PlayerColorsRGB[i].resize(PlayerColorIndexCount);
-		PlayerColors[i].clear();
-		PlayerColors[i].resize(PlayerColorIndexCount, 0);
-	}
+	PlayerColorsRGB.clear();
 	return 0;
 }
 

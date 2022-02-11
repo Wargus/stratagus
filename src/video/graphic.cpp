@@ -306,11 +306,11 @@ void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y,
 **  @param y       y coordinate on the target surface
 **	@param surface target surface
 */
-void CPlayerColorGraphic::DrawPlayerColorFrameClip(CUnitColorsOrPlayerIndex player, unsigned frame,
+void CPlayerColorGraphic::DrawPlayerColorFrameClip(int colorIndex, unsigned frame,
 												   int x, int y,
 												   SDL_Surface *surface /*= TheScreen*/)
 {
-	GraphicPlayerPixels(player, *this);
+	GraphicPlayerPixels(colorIndex, *this);
 	DrawFrameClip(frame, x, y, surface);
 }
 
@@ -397,11 +397,11 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 **  @param y       y coordinate on the target surface
 **  @param surface target surface
 */
-void CPlayerColorGraphic::DrawPlayerColorFrameClipX(CUnitColorsOrPlayerIndex player, unsigned frame,
+void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned frame,
 													int x, int y,
 													SDL_Surface *surface /*= TheScreen*/)
 {
-	GraphicPlayerPixels(player, *this);
+	GraphicPlayerPixels(colorIndex, *this);
 	DrawFrameClipX(frame, x, y, surface);
 }
 

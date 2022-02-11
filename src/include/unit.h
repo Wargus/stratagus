@@ -134,12 +134,7 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
-	~CUnit() {
-		if (Colors->isCustom) {
-			delete Colors;
-		}
-	}
+	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL), Colors(-1) { Init(); }
 
 	void Init();
 
@@ -354,7 +349,7 @@ public:
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
-	CUnitColors *Colors;    /// Player colors
+	int  Colors;            /// custom colors
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
