@@ -178,6 +178,13 @@ static int CclGetNumUnitsAt(lua_State *l)
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
 
+	if (minPos.x > maxPos.x) {
+		std::swap(minPos.x, maxPos.x);
+	}
+	if (minPos.y > maxPos.y) {
+		std::swap(minPos.y, maxPos.y);
+	}
+
 	std::vector<CUnit *> units;
 
 	Select(minPos, maxPos, units);

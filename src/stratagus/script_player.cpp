@@ -361,6 +361,13 @@ static int CclChangeUnitsOwner(lua_State *l)
     Vec2i pos2;
     CclGetPos(l, &pos1.x, &pos1.y, 1);
     CclGetPos(l, &pos2.x, &pos2.y, 2);
+	if (pos1.x > pos2.x) {
+		std::swap(pos1.x, pos2.x);
+	}
+	if (pos1.y > pos2.y) {
+		std::swap(pos1.y, pos2.y);
+	}
+
     const int oldp = LuaToNumber(l, 3);
     const int newp = LuaToNumber(l, 4);
     std::vector<CUnit *> table;
@@ -450,6 +457,12 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 			Vec2i pos2;
 			CclGetPos(l, &pos1.x, &pos1.y, 3);
 			CclGetPos(l, &pos2.x, &pos2.y, 4);
+			if (pos1.x > pos2.x) {
+				std::swap(pos1.x, pos2.x);
+			}
+			if (pos1.y > pos2.y) {
+				std::swap(pos1.y, pos2.y);
+			}
 			if (any) {
 				Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
 			} else if (onlyUnits) {

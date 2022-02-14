@@ -1024,6 +1024,12 @@ static int CclKillUnitAt(lua_State *l)
 	Vec2i pos2;
 	CclGetPos(l, &pos1.x, &pos1.y, 4);
 	CclGetPos(l, &pos2.x, &pos2.y, 5);
+	if (pos1.x > pos2.x) {
+		std::swap(pos1.x, pos2.x);
+	}
+	if (pos1.y > pos2.y) {
+		std::swap(pos1.y, pos2.y);
+	}
 
 	std::vector<CUnit *> table;
 
