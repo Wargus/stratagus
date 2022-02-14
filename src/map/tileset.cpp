@@ -596,8 +596,9 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 			while (++i < 16 && !tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
-		Assert(i != 16);
-		return tile + i;
+		if (i != 16) {
+			return tile + i;
+		}
 	}
 	if (filler) {
 		int i = 0;

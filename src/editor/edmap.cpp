@@ -116,8 +116,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 			while (++i < 16 && !Map.Tileset->tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
-		Assert(i != 16);
-		tile += i;
+		if (i < 16) {
+			tile += i;
+		}
 	}
 	mf.setTileIndex(*Map.Tileset, tile, 0);
 	mf.playerInfo.SeenTile = mf.getGraphicTile();

@@ -145,16 +145,26 @@ static gcn::DropDown *toolDropdown;
 **  Edit tile.
 **
 **  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit.
+**  @param tile  Tile type to edit or -1, to edit the tile under the brush according to the modifiers
 */
 static void EditTile(const Vec2i &pos, int tile)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	const CTileset &tileset = *Map.Tileset;
-	const int baseTileIndex = tileset.findTileIndexByTile(tile);
-	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
+	int baseTileIndex = tileset.findTileIndexByTile(tile);
 	CMapField &mf = *Map.Field(pos);
+	if (baseTileIndex <= 0) {
+		// use the tile under the cursor and randomize *that* if it's
+		// not a mix tile
+		baseTileIndex = tileset.findTileIndexByTile(mf.getGraphicTile());
+		const int mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
+		if (mixTerrainIdx > 0) {
+			return;
+		}
+		baseTileIndex = baseTileIndex / 16 * 16;
+	}
+	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
@@ -668,7 +678,9 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string,int,int,in
 		{ TileCursorSize == 1, "1x1" },
 		{ TileCursorSize == 2, "2x2" },
 		{ TileCursorSize == 3, "3x3" },
-		{ TileCursorSize == 4, "4x4" }
+		{ TileCursorSize == 4, "4x4" },
+		{ TileCursorSize == 10, "5x5" },
+		{ TileCursorSize == 10, "10x10" }
 	};
 
 	std::vector<std::pair<bool, std::string>> options = {
@@ -1161,9 +1173,11 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 301: TileCursorSize = 2; return;
 				case 302: TileCursorSize = 3; return;
 				case 303: TileCursorSize = 4; return;
-				case 304: TileToolRandom ^= 1; return;
-				case 305: TileToolDecoration ^= 1; return;
-			    case 306: {
+				case 304: TileCursorSize = 5; return;
+				case 305: TileCursorSize = 10; return;
+				case 306: TileToolRandom ^= 1; return;
+				case 307: TileToolDecoration ^= 1; return;
+			    case 308: {
 					TileToolNoFixup = !TileToolNoFixup;
 					// switch the selected tiles
 					if (TileToolNoFixup) {
@@ -1185,9 +1199,14 @@ static void EditorCallbackButtonDown(unsigned button)
 			}
 		}
 		
-		if (Editor.CursorTileIndex != -1) {
-			Editor.SelectedTileIndex = Editor.CursorTileIndex;
+		if (MouseButtons & RightButton) {
+			Editor.SelectedTileIndex = -1;
 			return;
+		} else {
+			if (Editor.CursorTileIndex != -1) {
+				Editor.SelectedTileIndex = Editor.CursorTileIndex;
+				return;
+			}
 		}
 	}
 
@@ -1272,9 +1291,8 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorEditTile &&
-				Editor.SelectedTileIndex != -1) {
-				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			if (Editor.State == EditorEditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+				EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
@@ -1667,8 +1685,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+		if (Editor.State == EditorEditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+			EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
@@ -1722,6 +1740,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonUnderCursor = ButtonUnderMenu;
 		CursorOn = CursorOnButton;
 		return;
+	} else {
+		ButtonAreaUnderCursor = -1;
 	}
 
 	// Minimap
