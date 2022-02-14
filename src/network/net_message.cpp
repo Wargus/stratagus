@@ -733,8 +733,14 @@ size_t CNetworkCommandQuit::Serialize(unsigned char *buf) const
 size_t CNetworkCommandQuit::Deserialize(const unsigned char *buf)
 {
 	const unsigned char *p = buf;
-	p += deserialize16(p, &this->player);
-	return p - buf;
+	if (p) {
+		p += deserialize16(p, &this->player);
+		return p - buf;
+	} else {
+		// can happen when the other end crashed hard
+		this->player = -1;
+		return 0;
+	}
 }
 
 //

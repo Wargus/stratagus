@@ -135,6 +135,7 @@ class CUnit
 {
 public:
 	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL), Colors(-1) { Init(); }
+	~CUnit();
 
 	void Init();
 

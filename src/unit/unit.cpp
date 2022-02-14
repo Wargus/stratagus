@@ -479,6 +479,14 @@ void CUnit::Init()
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 }
 
+CUnit::~CUnit() {
+	Type = NULL;
+
+	delete pathFinderData;
+	delete[] AutoCastSpell;
+	delete[] SpellCoolDownTimers;
+	delete[] Variable;
+}
 
 /**
 **  Release an unit.
@@ -487,7 +495,10 @@ void CUnit::Init()
 */
 void CUnit::Release(bool final)
 {
-	if (Type == NULL) {
+	// If the unit has no more references remaining, 
+	// the unit manager will set the ReleaseCycle,
+	// which prevents any more calls to this function.
+	if (ReleaseCycle) {
 		DebugPrint("unit already free\n");
 		return;
 	}
@@ -529,13 +540,14 @@ void CUnit::Release(bool final)
 	// on the way. We must wait a little time before we could free the
 	// memory.
 	//
-
-	Type = NULL;
-
-	delete pathFinderData;
-	delete[] AutoCastSpell;
-	delete[] SpellCoolDownTimers;
-	delete[] Variable;
+	// Because the network may have an order on the way, that order may still
+	// need access to the type. Deleting the Type pointer causes all sorts of
+	// trouble when we need some info about "almost" dead units, like what their
+	// old tile size was (e.g. when a repair command from the network is applied
+	// to a destroyed unit, we want to send the worker to the middle of the old
+	// location, so we need access to the Type->TileSize; or when a unit is
+	// removed, but fog of war calculations are still underway, where we want to
+	// read a BoolFlag; there are more instances of this...)
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
 	}
@@ -1708,7 +1720,7 @@ void UnitCountSeen(CUnit &unit)
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
 				// be released
-				if (!unit.Type) {
+				if (unit.ReleaseCycle) {
 					break;
 				}
 				UnitGoesOutOfFog(unit, Players[p]);
