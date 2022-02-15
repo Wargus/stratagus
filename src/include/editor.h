@@ -34,6 +34,7 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
 #include "icons.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
