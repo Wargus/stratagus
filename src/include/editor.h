@@ -66,9 +66,13 @@ public:
 	~CEditor() {}
 
 	void Init();
+
 	/// Make random map
 	void CreateRandomMap() const;
-
+	/// Variables for random map creation
+	int BaseTileIndex; /// Tile to fill the map with initially;
+	std::vector<std::tuple<int, int, int>> RandomTiles; /// other tiles to fill randomly. (tile, count, area size)
+	std::vector<std::tuple<std::string, int, int, int>> RandomUnits; /// neutral units to add randomly. (name, count, initial resources, tile under unit)
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.

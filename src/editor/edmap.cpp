@@ -320,12 +320,6 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 	}
 }
 
-#define WATER_TILE  0x10
-#define COAST_TILE  0x30
-#define GRASS_TILE  0x50
-#define WOOD_TILE   0x70
-#define ROCK_TILE   0x80
-
 /**
 **  Add a unit to random locations on the map, unit will be neutral
 **
@@ -333,7 +327,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 **  @param count      the number of times to add the unit
 **  @param value      resources to be stored in that unit
 */
-static void EditorRandomizeUnit(const char *unit_type, int count, int value)
+static void EditorRandomizeUnit(const char *unit_type, int count, int value, int tileIndexUnderUnit)
 {
 	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
@@ -352,7 +346,7 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		const Vec2i tmirror(mpos.x - rpos.x - tpos.x, mpos.y - rpos.y - tpos.y);
 		const Vec2i tmirrorh(rpos.x, tmirror.y);
 		const Vec2i tmirrorv(tmirror.x, rpos.y);
-		int tile = GRASS_TILE;
+		int tile = tileIndexUnderUnit;
 		const int z = type.TileHeight;
 
 		// FIXME: vladi: the idea is simple: make proper land for unit(s) :)
@@ -419,24 +413,21 @@ void CEditor::CreateRandomMap() const
 	EditorDestroyAllUnits();
 	// make water-base
 	const Vec2i zeros(0, 0);
-	TileFill(zeros, WATER_TILE, mz * 3);
+	TileFill(zeros, BaseTileIndex, mz * 3);
 	UI.Minimap.Update();
 	EditorUpdateDisplay();
-	EditorRandomizeTile(COAST_TILE, mz / 64 * 2, 16);
-	UI.Minimap.Update();
-	EditorUpdateDisplay();
-	EditorRandomizeTile(GRASS_TILE, mz / 64 * 4, 16);
-	UI.Minimap.Update();
-	EditorUpdateDisplay();
-	EditorRandomizeTile(WOOD_TILE,  mz / 64 * 12,  4);
-	UI.Minimap.Update();
-	EditorUpdateDisplay();
-	EditorRandomizeTile(ROCK_TILE,  mz / 64 * 4,  2);
-	UI.Minimap.Update();
-	EditorUpdateDisplay();
-	EditorRandomizeUnit("unit-gold-mine", mz / 64, 50000);
-	UI.Minimap.Update();
-	EditorUpdateDisplay();
+
+	for (std::tuple<int, int, int> t : RandomTiles) {
+		EditorRandomizeTile(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t));
+		UI.Minimap.Update();
+		EditorUpdateDisplay();
+	}
+
+	for (std::tuple<std::string, int, int, int> t : RandomUnits) {
+		EditorRandomizeUnit(std::get<0>(t).c_str(), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
+		UI.Minimap.Update();
+		EditorUpdateDisplay();
+	}
 }
 
 //@}

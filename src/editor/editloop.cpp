@@ -149,7 +149,7 @@ static gcn::DropDown *toolDropdown;
 */
 static void EditTile(const Vec2i &pos, int tile)
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+ 	Assert(Map.Info.IsPointOnMap(pos));	
 
 	const CTileset &tileset = *Map.Tileset;
 	int baseTileIndex = tileset.findTileIndexByTile(tile);
