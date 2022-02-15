@@ -864,12 +864,16 @@ static int CclDefinePlayerColors(lua_State *l)
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
+	bool defaultNeutralPlayer = false;
 	const int args = lua_rawlen(l, 1);
 	if (nargs < 2 || LuaToBoolean(l, 2)) {
 		PlayerColorNames.clear();
 		PlayerColorsRGB.clear();
+		if (args / 2 < PlayerMax - 1) { // accept no color for neutral player
+			LuaError(l, "You need to define at least %d colors" _C_ PlayerMax - 1);
+		}
 		if (args / 2 < PlayerMax) {
-			LuaError(l, "You need to define at least %d colors" _C_ PlayerMax);
+			defaultNeutralPlayer = true;
 		}
 	}
 
@@ -895,8 +899,18 @@ static int CclDefinePlayerColors(lua_State *l)
 		PlayerColorsRGB.push_back(newColors);
 	}
 
+	if (defaultNeutralPlayer) {
+		PlayerColorNames.push_back("neutral-black");
+		std::vector<CColor> neutralColors;
+		for (int j = 0; j < PlayerColorIndexCount; ++j) {
+			CColor neutralColor;
+			neutralColors.push_back(neutralColor);
+		}
+		PlayerColorsRGB.push_back(neutralColors);
+	}
+
 	return 0;
-}
+} 
 
 /**
 **  Make new player colors
