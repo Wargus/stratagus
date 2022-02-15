@@ -1998,19 +1998,18 @@ void EditorMainLoop()
 	LambdaActionListener *toolDropdownListener = new LambdaActionListener([&toolListStrings](const std::string&) {
 		int selected = toolDropdown->getSelected();
 		// Click on mode area
+		Editor.CursorUnitIndex = Editor.CursorTileIndex = Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
+		CursorBuilding = nullptr;
+		Editor.UnitIndex = Editor.TileIndex = 0;
 		switch (selected) {
 			case 0:
 				Editor.State = EditorSelecting;
-				Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
 				editorSlider->setVisible(false);
 				return;
 			case 1:
-				if (EditorEditTile) {
-					Editor.State = EditorEditTile;
-				}
+				Editor.State = EditorEditTile;
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
-				Editor.TileIndex = 0;
 				return;
 			case 2:
 				Editor.State = EditorSetStartLocation;
@@ -2021,7 +2020,6 @@ void EditorMainLoop()
 				RecalculateShownUnits();
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
-				Editor.UnitIndex = 0;
 				return;
 			default: {
 				std::string selectedString = toolListStrings[selected];
@@ -2044,7 +2042,6 @@ void EditorMainLoop()
 				RecalculateShownUnits(startIndex, endIndex);
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
-				Editor.UnitIndex = 0;
 				break;
 			}
 		}
