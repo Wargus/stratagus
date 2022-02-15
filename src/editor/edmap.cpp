@@ -94,7 +94,7 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param lock_pos   map tile coordinate, that should not be changed in callback.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
+void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -126,7 +126,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	if (!mf.isDecorative()) {
+	if (!mf.isDecorative() && changeSurroundings) {
 		if (TileToolNoFixup) {
 			mf.Flags |= MapFieldDecorative;
 		} else {
@@ -185,7 +185,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 				int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos);
+					EditorChangeTile(pos + offset, tile, lock_pos, true);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 				int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos);
+					EditorChangeTile(pos + offset, tile, lock_pos, true);
 				}
 			}
 		}
@@ -221,7 +221,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 				int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos);
+					EditorChangeTile(pos + offset, tile, lock_pos, true);
 				}
 			}
 		}
@@ -239,7 +239,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 				int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos);
+					EditorChangeTile(pos + offset, tile, lock_pos, true);
 				}
 			}
 		}
@@ -283,10 +283,14 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 
 	Map.FixSelectionArea(ipos, apos);
 
+	// change surroundings unless the fill covers the entire map
+	bool changeSurroundings = (ipos.x > 0 || ipos.y > 0 || 
+			Map.Info.MapWidth - 1 > apos.x || Map.Info.MapHeight - 1 > apos.y);
+
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
-			EditorChangeTile(itPos, tile, itPos);
+			EditorChangeTile(itPos, tile, itPos, changeSurroundings);
 		}
 	}
 }
@@ -411,18 +415,28 @@ void CEditor::CreateRandomMap() const
 {
 	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
 
+	// remove all units
+	EditorDestroyAllUnits();
 	// make water-base
 	const Vec2i zeros(0, 0);
 	TileFill(zeros, WATER_TILE, mz * 3);
-	// remove all units
-	EditorDestroyAllUnits();
-
-	EditorRandomizeTile(COAST_TILE, 10, 16);
-	EditorRandomizeTile(GRASS_TILE, 20, 16);
-	EditorRandomizeTile(WOOD_TILE,  60,  4);
-	EditorRandomizeTile(ROCK_TILE,  30,  2);
-
-	EditorRandomizeUnit("unit-gold-mine", 5, 50000);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
+	EditorRandomizeTile(COAST_TILE, mz / 64 * 2, 16);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
+	EditorRandomizeTile(GRASS_TILE, mz / 64 * 4, 16);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
+	EditorRandomizeTile(WOOD_TILE,  mz / 64 * 12,  4);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
+	EditorRandomizeTile(ROCK_TILE,  mz / 64 * 4,  2);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
+	EditorRandomizeUnit("unit-gold-mine", mz / 64, 50000);
+	UI.Minimap.Update();
+	EditorUpdateDisplay();
 }
 
 //@}
