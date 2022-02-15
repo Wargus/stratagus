@@ -307,16 +307,19 @@ static void AStarPrepare()
 /**
 **  Clean up A*
 */
+static void CostMoveToCacheCleanUp();
 static void AStarCleanUp()
 {
 	ProfileBegin("AStarCleanUp");
 
 	if (CloseSetSize >= Threshold) {
 		AStarPrepare();
+		CostMoveToCacheCleanUp();
 	} else {
 		for (int i = 0; i < CloseSetSize; ++i) {
 			AStarMatrix[CloseSet[i]].CostFromStart = 0;
 			AStarMatrix[CloseSet[i]].InGoal = 0;
+			CostMoveToCache[CloseSet[i]] = CacheNotSet;
 		}
 	}
 	ProfileEnd("AStarCleanUp");
@@ -936,7 +939,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	//  Initialize
 	AStarCleanUp();
-	CostMoveToCacheCleanUp();
 
 	OpenSetSize = 0;
 	CloseSetSize = 0;
