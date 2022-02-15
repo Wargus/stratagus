@@ -426,6 +426,7 @@ void CUnit::Init()
 	Stats = NULL;
 	CurrentSightRange = 0;
 
+	delete pathFinderData;
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
@@ -447,6 +448,7 @@ void CUnit::Init()
 	RescuedFrom = NULL;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
+	delete Variable;
 	Variable = NULL;
 	TTL = 0;
 	Threshold = 0;
@@ -472,7 +474,9 @@ void CUnit::Init()
 	NewOrder = NULL;
 	delete CriticalOrder;
 	CriticalOrder = NULL;
+	delete AutoCastSpell;
 	AutoCastSpell = NULL;
+	delete SpellCoolDownTimers;
 	SpellCoolDownTimers = NULL;
 	AutoRepair = 0;
 	Goal = NULL;
