@@ -417,11 +417,15 @@ void CEditor::CreateRandomMap() const
 	UI.Minimap.Update();
 	EditorUpdateDisplay();
 
+
+	const char oldRandom = TileToolRandom;
+	TileToolRandom = 1;
 	for (std::tuple<int, int, int> t : RandomTiles) {
 		EditorRandomizeTile(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t));
 		UI.Minimap.Update();
 		EditorUpdateDisplay();
 	}
+	TileToolRandom = oldRandom;
 
 	for (std::tuple<std::string, int, int, int> t : RandomUnits) {
 		EditorRandomizeUnit(std::get<0>(t).c_str(), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
