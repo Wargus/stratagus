@@ -627,6 +627,10 @@ static int CclMoveUnit(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 2);
 
+	if (!unit->Removed) {
+		unit->Remove(unit->Container);
+	}
+
 	if (UnitCanBeAt(*unit, ipos)) {
 		unit->Place(ipos);
 	} else {
@@ -1463,6 +1467,44 @@ static int CclSelectSingleUnit(lua_State *l)
 }
 
 /**
+**  Find the next reachable resource unit that gives resource starting from a worker.
+**  Optional third argument is the range to search.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>
+**		peon = CreateUnit("unit-peon", 5, {58, 8})
+**      goldmine = <strong>FindNextResource(peon, 0)</strong></code></div>
+*/
+static int CclFindNextResource(lua_State *l)
+{
+	const int nargs = lua_gettop(l);
+	if (nargs < 2 || nargs > 3) {
+		LuaError(l, "incorrect argument count");
+	}
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 2);
+	const int resource = CclGetResourceByName(l);
+	lua_pop(l, 1);
+
+	const int range = nargs == 3 ? LuaToNumber(l, 3) : 1000;
+
+	CUnit *resourceUnit = UnitFindResource(*unit, *unit, range, resource);
+	if (resourceUnit) {
+		lua_pushnumber(l, UnitNumber(*unit));
+	} else {
+		lua_pushnil(l);
+	}
+	return 1;
+}
+
+/**
 **  Enable/disable simplified auto targeting 
 **
 **  @param l  Lua state.
@@ -1504,6 +1546,7 @@ void UnitCclRegister()
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
+	lua_register(Lua, "FindNextResource", CclFindNextResource);
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
