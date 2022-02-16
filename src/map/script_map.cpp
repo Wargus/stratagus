@@ -925,6 +925,11 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	LuaCheckArgs(l, 3);
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+	if (pos.x >= Map.Info.MapWidth || pos.y >= Map.Info.MapHeight || pos.x < 0 || pos.y < 0) {
+		// out of bounds, doesn't have it
+		lua_pushboolean(l, 0);
+		return 1;
+	}
 
 	unsigned short flag = 0;
 	const char *flag_name = LuaToString(l, 3);

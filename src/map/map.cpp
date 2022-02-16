@@ -255,8 +255,10 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 
 	for (int addy = 0; addy < type.TileHeight; ++addy) {
 		for (int addx = 0; addx < type.TileWidth; ++addx) {
-			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
-				|| Map.Field(pos.x + addx + index)->CheckMask(mask) == true) {
+			if (!Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy)) {
+				return false;
+			}
+			if (!type.BoolFlag[NONSOLID_INDEX].value && Map.Field(pos.x + addx + index)->CheckMask(mask)) {
 				return false;
 			}
 		}
@@ -276,9 +278,6 @@ bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
 bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 {
 	Assert(unit.Type);
-	if (unit.Type->BoolFlag[NONSOLID_INDEX].value) {
-		return true;
-	}
 	return UnitTypeCanBeAt(*unit.Type, pos);
 }
 
