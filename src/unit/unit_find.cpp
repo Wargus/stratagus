@@ -208,10 +208,6 @@ class BestDepotFinder
 					return;
 				}
 
-				if (this->best_dist == INT_MAX) {
-					this->best_depot = dest;
-				}
-
 				if (distance >= this->best_dist) {
 					//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance 
 					return;
