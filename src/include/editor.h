@@ -69,7 +69,7 @@ public:
 	void Init();
 
 	/// Make random map
-	void CreateRandomMap() const;
+	void CreateRandomMap(bool shuffleTransitions = false) const;
 	/// Variables for random map creation
 	int BaseTileIndex; /// Tile to fill the map with initially;
 	std::vector<std::tuple<int, int, int>> RandomTiles; /// other tiles to fill randomly. (tile, count, area size)

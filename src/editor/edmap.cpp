@@ -402,10 +402,25 @@ static void EditorDestroyAllUnits()
 	}
 }
 
+static void RandomizeTransition(int x, int y)
+{
+	CMapField &mf = *Map.Field(x, y);
+	const CTileset &tileset = *Map.Tileset;
+	int baseTileIndex = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.BaseTerrain;
+	int mixTerrainIdx = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.MixTerrain;
+	if (mixTerrainIdx != 0) {
+		if (rand() % 8 == 0) {
+			// change only in ~12% of cases
+			const int tileIdx = tileset.findTileIndex(rand() % 2 ? baseTileIndex : mixTerrainIdx, 0);
+			EditorChangeTile(Vec2i(x, y), tileIdx, Vec2i(x, y), true);
+		}
+	}
+}
+
 /**
 **  Create a random map
 */
-void CEditor::CreateRandomMap() const
+void CEditor::CreateRandomMap(bool shuffleTranslitions) const
 {
 	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
 
@@ -425,6 +440,27 @@ void CEditor::CreateRandomMap() const
 		UI.Minimap.Update();
 		EditorUpdateDisplay();
 	}
+
+	if (shuffleTranslitions) {
+		// shuffle transitions in all directions
+		// from top left to bottom right
+		for (int x = 0; x < Map.Info.MapWidth; x++) {
+			for (int y = 0; y < Map.Info.MapHeight; y++) {
+				RandomizeTransition(x, y);
+			}
+		}
+		UI.Minimap.Update();
+		EditorUpdateDisplay();
+		// from bottom right to top left
+		for (int x = Map.Info.MapWidth - 1; x >= 0; x--) {
+			for (int y = Map.Info.MapHeight - 1; y >= 0; y--) {
+				RandomizeTransition(x, y);
+			}
+		}
+		UI.Minimap.Update();
+		EditorUpdateDisplay();
+	}
+
 	TileToolRandom = oldRandom;
 
 	for (std::tuple<std::string, int, int, int> t : RandomUnits) {

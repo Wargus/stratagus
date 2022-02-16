@@ -14,7 +14,7 @@ class CEditor
 	const CUnitType *StartUnit;
 	bool WriteCompressedMaps;
 	EditorRunningType Running;
-	void CreateRandomMap() const;
+	void CreateRandomMap(bool shuffleTranslitions) const;
 };
 
 extern CEditor Editor;
