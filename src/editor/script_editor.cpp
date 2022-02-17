@@ -94,6 +94,62 @@ static int CclEditorResizeMap(lua_State *l)
 }
 
 /**
+**  Confgure the randomize map feature of the editor.
+**
+**  @param l  Lua state.
+*/
+static int CclEditorRandomizeProperties(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	Editor.RandomTiles.clear();
+	Editor.RandomUnits.clear();
+
+	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		if (!strcmp(value, "BaseTile")) {
+			Editor.BaseTileIndex = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "RandomTiles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; j++) {
+				lua_rawgeti(l, -1, j + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				if (lua_rawlen(l, -1) != 3) {
+					LuaError(l, "incorrect RandomTiles entry length, need 3 integers");
+				}
+				Editor.RandomTiles.push_back(std::make_tuple(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3)));
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "RandomUnits")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; j++) {
+				lua_rawgeti(l, -1, j + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				if (lua_rawlen(l, -1) != 4) {
+					LuaError(l, "incorrect RandomUnits entry length, need 1 string followed by 3 integers");
+				}
+				Editor.RandomUnits.push_back(std::make_tuple(std::string(LuaToString(l, -1, 1)), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3), LuaToNumber(l, -1, 4)));
+				lua_pop(l, 1);
+			}
+		}
+	}
+	return 0;
+}
+
+/**
 **  Register CCL features for the editor.
 */
 void EditorCclRegister()
@@ -102,6 +158,8 @@ void EditorCclRegister()
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
 	lua_register(Lua, "EditorResizeMap", CclEditorResizeMap);
+
+	lua_register(Lua, "SetEditorRandomizeProperties", CclEditorRandomizeProperties);
 }
 
 //@}

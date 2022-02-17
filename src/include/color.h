@@ -32,6 +32,10 @@
 
 //@{
 
+#include <stdint.h>
+
+typedef uint32_t IntColor; // Uint32 in SDL
+
 struct SDL_Color;
 struct lua_State;
 
@@ -48,6 +52,9 @@ public:
 
 	/// Cast to a SDL_Color
 	operator SDL_Color() const;
+
+	/// Cast to IntColor
+	operator IntColor() const;
 
 public:
 	unsigned char R;       /// Red
@@ -68,11 +75,16 @@ public:
 	std::vector<CColor> Colors;
 };
 
-
-#include <stdint.h>
-
-typedef uint32_t IntColor; // Uint32 in SDL
-
+/**
+ * interpolate 2 RGB colors
+ * @param color1    integer containing color as 0x00RRGGBB
+ * @param color2    integer containing color as 0x00RRGGBB
+ * @param fraction  how much interpolation (0..1)
+ * - 0: full color 1
+ * - 1: full color 2
+ * @return the new color after interpolation
+ */
+IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction);
 
 //@}
 

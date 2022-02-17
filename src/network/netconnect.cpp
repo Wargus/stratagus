@@ -33,6 +33,20 @@
 // Includes
 //----------------------------------------------------------------------------
 
+#include <iostream>
+#include <fstream>
+#include <set>
+#include <vector>
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+error "Missing the <filesystem> header."
+#endif
+
 #include "game.h"
 #include "online_service.h"
 #include "stratagus.h"
@@ -66,11 +80,13 @@ struct NetworkState {
 	{
 		State = ccs_unused;
 		MsgCnt = 0;
+		StateArg = 0;
 		LastFrame = 0;
 	}
 
 	unsigned char State;     /// Menu: ConnectState
 	unsigned short MsgCnt;   /// Menu: Counter for state msg of same type (detect unreachable)
+	unsigned int StateArg;   /// Arbitrary argument for state to keep track of things
 	unsigned long LastFrame; /// Last message received
 	// Fill in here...
 };
@@ -89,6 +105,7 @@ int NetLocalPlayerNumber;              /// Player number of local client
 
 int NetPlayers;                         /// How many network players
 std::string NetworkMapName;             /// Name of the map received with ICMMap
+std::string NetworkMapFragmentName;     /// Name of the map currently loading via ICMMapNeeded
 int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
 
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
@@ -111,6 +128,7 @@ private:
 	void Parse_Resync(const int h);
 	void Parse_Waiting(const int h);
 	void Parse_Map(const int h);
+	void Parse_MapFragment(const int h, uint32_t fragmentIdx);
 	void Parse_State(const int h, const CInitMessage_State &msg);
 	void Parse_GoodBye(const int h);
 	void Parse_SeeYou(const int h);
@@ -120,6 +138,7 @@ private:
 	void Send_Welcome(const CNetworkHost &host, int hostIndex);
 	void Send_Resync(const CNetworkHost &host, int hostIndex);
 	void Send_Map(const CNetworkHost &host);
+	void Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx);
 	void Send_State(const CNetworkHost &host);
 	void Send_GoodBye(const CNetworkHost &host);
 private:
@@ -152,12 +171,14 @@ private:
 	bool Update_async(unsigned long tick);
 	bool Update_mapinfo(unsigned long tick);
 	bool Update_badmap(unsigned long tick);
+	bool Update_needmap(unsigned long tick);
 	bool Update_goahead(unsigned long tick);
 	bool Update_started(unsigned long tick);
 
 	void Send_Go(unsigned long tick);
 	void Send_Config(unsigned long tick);
 	void Send_MapUidMismatch(unsigned long tick);
+	void Send_MapNeeded(unsigned long tick, unsigned int fragmentIdx, bool limit = true);
 	void Send_Map(unsigned long tick);
 	void Send_Resync(unsigned long tick);
 	void Send_State(unsigned long tick);
@@ -178,6 +199,7 @@ private:
 	void Parse_State(const unsigned char *buf);
 	void Parse_Welcome(const unsigned char *buf);
 	void Parse_Map(const unsigned char *buf);
+	void Parse_MapFragment(const unsigned char *buf);
 	void Parse_AreYouThere();
 
 private:
@@ -239,6 +261,7 @@ static const char *ncconstatenames[] = {
 	"ccs_started",             // server has started game
 	"ccs_incompatibleengine",  // incompatible engine version
 	"ccs_incompatibleluafiles", // incompatible network version
+	"ccs_needmap",             // client needs to be sent the map
 };
 
 static const char *icmsgsubtypenames[] = {
@@ -265,6 +288,8 @@ static const char *icmsgsubtypenames[] = {
 	"Go",                      // Client is ready to run
 	"AreYouThere",             // Server asks are you there
 	"IAmHere",                 // Client answers I am here
+
+	"MapNeeded",               // Map data exchange
 };
 
 template <typename T>
@@ -488,6 +513,20 @@ bool CClient::Update_badmap(unsigned long tick)
 	}
 }
 
+bool CClient::Update_needmap(unsigned long tick)
+{
+	Assert(networkState.State == ccs_needmap);
+
+	if (networkState.MsgCnt < 50) {
+		Send_MapNeeded(tick, networkState.StateArg);
+		return true;
+	} else {
+		networkState.State = ccs_unreachable;
+		DebugPrint("ccs_needmap: Above message limit %d\n" _C_ networkState.MsgCnt);
+		return false;
+	}
+}
+
 bool CClient::Update_goahead(unsigned long tick)
 {
 	Assert(networkState.State == ccs_goahead);
@@ -533,6 +572,13 @@ void CClient::Send_MapUidMismatch(unsigned long tick)
 	const CInitMessage_Header message(MessageInit_FromClient, ICMMapUidMismatch); // MAP Uid doesn't match
 
 	SendRateLimited(message, tick, 650);
+}
+
+void CClient::Send_MapNeeded(unsigned long tick, unsigned int fragment, bool limit)
+{
+	const CInitMessage_MapFileFragment message((uint32_t)fragment); // Request map files from server
+
+	SendRateLimited(message, tick, limit ? 1000 : 0);
 }
 
 void CClient::Send_Map(unsigned long tick)
@@ -592,6 +638,7 @@ bool CClient::Update(unsigned long tick)
 		case ccs_async: return Update_async(tick);
 		case ccs_mapinfo: return Update_mapinfo(tick);
 		case ccs_badmap: return Update_badmap(tick);
+		case ccs_needmap: return Update_needmap(tick);
 		case ccs_goahead: return Update_goahead(tick);
 		case ccs_started: return Update_started(tick);
 		default: break;
@@ -688,6 +735,10 @@ bool CClient::Parse(const unsigned char *buf, const CHost &host)
 			Parse_Map(buf);
 			break;
 		}
+		case ICMMapNeeded: { // Server has sent us new map data
+			Parse_MapFragment(buf);
+			break;
+		}
 		case ICMState: {
 			Parse_State(buf);
 			break;
@@ -760,8 +811,11 @@ void CClient::Parse_Map(const unsigned char *buf)
 	}
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
 	const std::string mappath = StratagusLibPath + "/" + NetworkMapName;
-	LoadStratagusMapInfo(mappath);
-	if (msg.MapUID != Map.Info.MapUID) {
+	if (!LoadStratagusMapInfo(mappath) && !networkState.StateArg) {
+		networkState.State = ccs_needmap;
+		networkState.MsgCnt = 0;
+		return;
+	} else if (msg.MapUID != Map.Info.MapUID) {
 		networkState.State = ccs_badmap;
 		fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
 				Map.Info.MapUID, static_cast<unsigned int>(msg.MapUID));
@@ -769,6 +823,75 @@ void CClient::Parse_Map(const unsigned char *buf)
 	}
 	networkState.State = ccs_mapinfo;
 	networkState.MsgCnt = 0;
+}
+
+void CClient::Parse_MapFragment(const unsigned char *buf)
+{
+	if (networkState.State != ccs_needmap) {
+		return;
+	}
+	CInitMessage_MapFileFragment msg;
+
+	msg.Deserialize(buf);
+
+	if (msg.FragmentIndex < networkState.StateArg) {
+		// this is a udp package from a fragment we already have, ignore
+		networkState.State = ccs_needmap;
+		return;
+	}
+
+	if (msg.FragmentIndex > networkState.StateArg) {
+		// we got a fragment that is newer, too new, that is bad
+		networkState.State = ccs_badmap;
+		fprintf(stderr, "Missed map fragment %d, already got %d\n", networkState.StateArg, msg.FragmentIndex);
+		return;
+	}
+
+	if (msg.PathSize == 0) {
+		// this is the last fragment, nothing left, we got the map.
+		// go back to the state just after connecting
+		networkState.State = ccs_connected;
+		networkState.MsgCnt = 0;
+		networkState.StateArg = 1; // set to 1 as a flag that we don't try receiving the map again
+		return;
+	}
+
+	// this is the fragment we requested, open the file and write it
+
+	// FIXME: what if the file exists before even the first fragment creates it?
+
+	fs::path mappath(StratagusLibPath);
+	char *path = new char[msg.PathSize + 1];
+	// msg.PathSize is 8bits, so smaller than msg.Data by construction
+	memcpy(path, msg.Data, msg.PathSize);
+	path[msg.PathSize] = '\0';
+	NetworkMapFragmentName = std::string(path);
+	if (NetworkMapFragmentName.find("..") != std::string::npos) {
+		// bad path
+		networkState.State = ccs_badmap;
+		fprintf(stderr, "Bad network filename %s\n", path);
+		return;
+	}
+	mappath /= path;
+	delete[] path;
+
+	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary); 
+	if (!mapfile.is_open()) {
+		networkState.State = ccs_badmap;
+		fprintf(stderr, "Could not open %s for appending map data\n", mappath.u8string().c_str());
+		return;
+	} else {
+		Assert(msg.DataSize + msg.PathSize <= sizeof(msg.Data));
+		mapfile.write(msg.Data + msg.PathSize, msg.DataSize);
+		mapfile.close();
+	}
+
+	networkState.State = ccs_needmap;
+	networkState.StateArg++;
+	networkState.MsgCnt = 0;
+
+	// immediately ask for the next one
+	Send_MapNeeded(networkState.LastFrame, networkState.StateArg, false);
 }
 
 void CClient::Parse_Welcome(const unsigned char *buf)
@@ -781,6 +904,7 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	msg.Deserialize(buf);
 	networkState.State = ccs_connected;
 	networkState.MsgCnt = 0;
+	networkState.StateArg = 0;
 	NetLocalHostsSlot = msg.hosts[0].PlyNr;
 	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
@@ -984,6 +1108,85 @@ void CServer::Send_Map(const CNetworkHost &host)
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
+void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
+{
+	fs::path prefix = fs::path(NetworkMapName);
+	while (prefix.stem() != prefix) { // may have 	.gz, .bz2 ...
+		prefix = prefix.stem();
+	}
+	fs::path mapDirectory(StratagusLibPath);
+	mapDirectory /= NetworkMapName;
+	mapDirectory = mapDirectory.parent_path();
+
+	std::set<fs::path> sortedFilenames;
+	for (const auto &entry : fs::directory_iterator(mapDirectory)) {
+		fs::path entryPath(entry.path());
+		while (entryPath.stem() != entryPath) {
+			entryPath = entryPath.stem();
+		}
+		if (entryPath == prefix) {
+			sortedFilenames.insert(entry.path());
+		}
+	}
+
+	fs::path currentPath;
+	std::string networkName;
+	uint32_t fragmentDataSize;
+	uint32_t fileSize;
+	uint32_t fragmentIdxStartForFile = 0;
+	fs::path libPath(StratagusLibPath);
+
+	for (fs::path p : sortedFilenames) {
+		currentPath = p;
+
+		// work around fs::relative not being available in some experimental fs impls
+		fs::path networkPathEnd(p.filename());
+		fs::path networkPathStart(p.parent_path());
+		while (networkPathStart != libPath) {
+			networkPathEnd = *--networkPathStart.end() / networkPathEnd;
+			networkPathStart = networkPathStart.parent_path();
+		}
+		networkName = networkPathEnd.generic_u8string();
+
+		fragmentDataSize = sizeof(CInitMessage_MapFileFragment::Data) - networkName.size();
+		fileSize = fs::file_size(p);
+		uint32_t fragmentCountForFile = (fileSize + fragmentDataSize - 1) / fragmentDataSize;
+		if ((fragmentIdxStartForFile <= fragmentIdx) && (fragmentIdx < fragmentIdxStartForFile + fragmentCountForFile)) {
+			break;
+		} else {
+			// next file starts at the next fragment
+			fragmentIdxStartForFile += fragmentCountForFile;
+			fragmentDataSize = 0;
+		}
+	}
+
+	if (fragmentDataSize > 0) {
+		std::ifstream file(currentPath.c_str(), std::ios::in | std::ios::binary);
+		if (file.is_open()) {
+			uint32_t offset = (fragmentIdx - fragmentIdxStartForFile) * fragmentDataSize;
+			file.seekg(offset);
+			fragmentDataSize = std::min<uint32_t>(fragmentDataSize, fileSize - offset);
+			char *data = new char[fragmentDataSize];
+			file.read(data, fragmentDataSize);
+			file.close();
+
+			DebugPrint("Sending map fragment %d for %s (size %d, offset %d)\n" _C_ fragmentIdx _C_ networkName.c_str() _C_ fragmentDataSize _C_ offset);
+			const CInitMessage_MapFileFragment message(networkName.c_str(), data, fragmentDataSize, fragmentIdx);
+			NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+			delete[] data;
+			return;
+		} else {
+			// FIXME: ouch! we cannot read this map file. very strange, and very bad
+			// fall through for now and end the transmission
+		}
+	}
+
+	// no file content found for this fragment index, we're done
+	DebugPrint("Sending end fragment %d for %s\n" _C_ fragmentIdx _C_ NetworkMapName);
+	const CInitMessage_MapFileFragment message("", nullptr, 0, fragmentIdx);
+	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
+}
+
 void CServer::Send_State(const CNetworkHost &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *serverSetup);
@@ -1120,6 +1323,10 @@ void CServer::Parse_Waiting(const int h)
 			networkStates[h].State = ccs_connected;
 			networkStates[h].MsgCnt = 0;
 		/* Fall through */
+		case ccs_needmap: // client has finished receiving the map and wants the info again
+			networkStates[h].State = ccs_connected;
+			networkStates[h].MsgCnt = 0;		
+		/* Fall through */
 		case ccs_connected: {
 			// this code path happens until client acknowledges the map
 			Send_Map(Hosts[h]);
@@ -1186,6 +1393,29 @@ void CServer::Parse_Map(const int h)
 			networkStates[h].MsgCnt++;
 			if (networkStates[h].MsgCnt > 50) {
 				// FIXME: Client sends mapinfo, but doesn't receive our state info....
+			}
+			break;
+		}
+		default:
+			DebugPrint("Server: ICMMap: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			break;
+	}
+}
+
+void CServer::Parse_MapFragment(const int h, uint32_t fragmentIdx)
+{
+	switch (networkStates[h].State) {
+		// client has recvd map info but needs the map
+		case ccs_connected:
+			networkStates[h].State = ccs_needmap;
+			networkStates[h].MsgCnt = 0;
+			Assert(fragmentIdx == 0); // client keep asking for this fragment initially
+		/* Fall through */
+		case ccs_needmap: {
+			Send_MapFragment(Hosts[h], fragmentIdx);
+			networkStates[h].MsgCnt++;
+			if (networkStates[h].MsgCnt > 50) {
+				// FIXME: Client asks for map, but doesn't receive our fragment ....
 			}
 			break;
 		}
@@ -1351,6 +1581,13 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 		case ICMResync: Parse_Resync(index); break;
 		case ICMWaiting: Parse_Waiting(index); break;
 		case ICMMap: Parse_Map(index); break;
+
+		case ICMMapNeeded: {
+			CInitMessage_MapFileFragment msg;
+			msg.Deserialize(buf);
+			Parse_MapFragment(index, msg.FragmentIndex);
+			break;
+		}
 
 		case ICMState: {
 			CInitMessage_State msg;

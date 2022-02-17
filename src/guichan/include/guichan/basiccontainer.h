@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -112,6 +112,19 @@ namespace gcn
          * @param widget the destroyed Widget.
          */
         virtual void _announceDeath(Widget *widget) = 0;
+
+        /**
+         * Function to check if a widget regards this container as parent. This
+         * avoids using function calls so it can work with garbage collected widgets
+         * from Lua.
+         * 
+         * @param widget 
+         * @return true if the parent pointer of the widget points to this container
+         * @return false if the parent pointer of the widget points to something else
+         */
+        bool isParentOfWidget(Widget *widget) {
+            return widget->mParent == this;
+        }
 
     };
 }

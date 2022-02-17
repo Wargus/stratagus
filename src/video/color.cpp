@@ -30,17 +30,21 @@
 //@{
 
 #include "stratagus.h"
-
 #include "color.h"
-
 #include "script.h"
-
 #include "SDL.h"
 
 CColor::operator SDL_Color() const
 {
 	SDL_Color c = { R, G, B, A };
 	return c;
+}
+
+extern SDL_Surface *TheScreen;
+
+CColor::operator IntColor() const
+{
+	return SDL_MapRGB(TheScreen->format, R, G, B);
 }
 
 void CColor::Parse(lua_State *l, const int offset)
@@ -61,6 +65,20 @@ void CColor::Parse(lua_State *l, const int offset)
 	this->G = g;
 	this->B = b;
 	this->A = 255;
+}
+
+IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction)
+{
+        unsigned char r1 = (color1 >> 16) & 0xff;
+        unsigned char r2 = (color2 >> 16) & 0xff;
+        unsigned char g1 = (color1 >> 8) & 0xff;
+        unsigned char g2 = (color2 >> 8) & 0xff;
+        unsigned char b1 = color1 & 0xff;
+        unsigned char b2 = color2 & 0xff;
+
+        return (int) ((r2 - r1) * fraction + r1) << 16 |
+                (int) ((g2 - g1) * fraction + g1) << 8 |
+                (int) ((b2 - b1) * fraction + b1);
 }
 
 //@}

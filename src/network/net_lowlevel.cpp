@@ -360,6 +360,10 @@ Socket NetOpenTCP(const char *addr, int port)
 
 		int opt = 1;
 		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (setsockopttype)&opt, sizeof(opt));
+#ifdef WIN32
+		opt = 0;
+		setsockopt(sockfd, SOL_SOCKET, SO_DONTLINGER, (setsockopttype)&opt, sizeof(opt));
+#endif
 
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
@@ -385,8 +389,8 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 #ifndef __BEOS__
 	int opt = 1;
 	setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (setsockopttype)&opt, sizeof(opt));
-	opt = 0;
-	setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (setsockopttype)&opt, sizeof(opt));
+	// opt = 0;
+	// setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (setsockopttype)&opt, sizeof(opt));
 #endif
 
 	if (addr == INADDR_NONE) {

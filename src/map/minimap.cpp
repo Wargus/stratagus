@@ -339,7 +339,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 			color = ColorGreen;
 		}
 	} else {
-		color = PlayerColors[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
+		color = PlayerColorsRGB[GameSettings.Presets[unit.Player->Index].PlayerColor][0];
 	}
 
 	int mx = 1 + UI.Minimap.XOffset + Map2MinimapX[unit.tilePos.x];
@@ -498,7 +498,7 @@ void CMinimap::Destroy()
 		SDL_FreeSurface(MinimapSurface);
 		MinimapSurface = NULL;
 	}
-	if (MinimapFogSurface) {
+	if (MinimapFogSurface && MinimapFogSurface->format != NULL) {
 		SDL_FreeSurface(MinimapFogSurface);
 		MinimapSurface = NULL;
 	}

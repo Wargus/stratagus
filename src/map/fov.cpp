@@ -131,7 +131,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 							const uint16_t height, const uint16_t range, MapMarkerFunc *marker)
 {
 	/// FIXME: sometimes when quit from game this assert is triggered
-	if (!unit.Type) return;
+	if (unit.ReleaseCycle) return;
 	Assert(unit.Type != NULL);
 	// Units under construction have no sight range.
 	if (!range) {

@@ -80,6 +80,22 @@ CEditor::CEditor() :
 	TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 	MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
-{}
+{
+	
+#define WATER_TILE  0x10
+#define COAST_TILE  0x30
+#define GRASS_TILE  0x50
+#define WOOD_TILE   0x70
+#define ROCK_TILE   0x80
+	BaseTileIndex = WATER_TILE;
+
+	RandomTiles.push_back(std::make_tuple(COAST_TILE, 2, 16));
+	RandomTiles.push_back(std::make_tuple(GRASS_TILE, 4, 16));
+	RandomTiles.push_back(std::make_tuple(WOOD_TILE, 12, 4));
+	RandomTiles.push_back(std::make_tuple(ROCK_TILE, 4, 2));
+
+	RandomUnits.push_back(std::make_tuple("unit-gold-mine", 1, 50000, GRASS_TILE));
+	RandomUnits.push_back(std::make_tuple("unit-oil-patch", 1, 20000, WATER_TILE));
+}
 
 //@}

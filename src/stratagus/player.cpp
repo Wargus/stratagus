@@ -318,10 +318,9 @@ bool NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-std::vector<CColor> PlayerColorsRGB[PlayerMax];
-std::vector<IntColor> PlayerColors[PlayerMax];
+std::vector<std::vector<CColor>> PlayerColorsRGB;
 
-std::string PlayerColorNames[PlayerMax];
+std::vector<std::string> PlayerColorNames;
 
 /**
 **  Which indexes to replace with player color
@@ -375,9 +374,6 @@ void InitPlayers()
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
-		for (int x = 0; x < PlayerColorIndexCount; ++x) {
-			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
-		}
 	}
 }
 
@@ -399,9 +395,8 @@ void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].UnitColors.Colors.clear();
-		PlayerColorsRGB[i].clear();
-		PlayerColors[i].clear();
 	}
+	PlayerColorsRGB.clear();
 }
 
 /**
@@ -742,7 +737,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->NumBuildings = 0;
 	this->Score = 0;
 
-	this->Color = PlayerColors[NumPlayers][0];
+	this->Color = PlayerColorsRGB[NumPlayers][0];
 
 	if (Players[NumPlayers].Type == PlayerComputer || Players[NumPlayers].Type == PlayerRescueActive) {
 		this->AiEnabled = true;
@@ -1257,12 +1252,12 @@ void PlayersEachSecond(int playerIdx)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
+void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 {
 	Assert(PlayerColorIndexCount);
 
 	Assert(SDL_MUSTLOCK(sprite.Surface) == 0);
-	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	std::vector<SDL_Color> sdlColors = std::vector<SDL_Color>(PlayerColorsRGB[colorIndex].begin(), PlayerColorsRGB[colorIndex].end());
 	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
 		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);

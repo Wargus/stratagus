@@ -74,26 +74,6 @@ static CFont *GameFont;   /// Normal font used in game
 
 static int FormatNumber(int number, char *buf);
 
-static const unsigned char extended_ascii[] = {
-	// char translation table to convert UTF8 (index) into Stratagus char (value)
-	// relevant for char > 0x80 (extendend ascii range)
-	// ______ascii value__________________________     __utf8___
-	0x00, 0x00, 0x9f, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0x90-0x97 */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0x98-0x9f */
-	0x00,  '!', 0x9b, 0x9c, 0x00, 0x9d, 0x00, 0x00, /* 0xa0-0xa7 */ // Convert ¡ to !
-	0x00, 0x00, 0x00, 0x00, 0xaa,  '-', 0xa9, 0x00, /* 0xa8-0xaf */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0xb0-0xb7 */
-	0x00, 0x00, 0xa8, 0x00, 0x00, 0x00, 0x00, 0xa8, /* 0xb8-0xbf */
-	0x00, 0xa0, 0x00, 0x00, 0x8e, 0x8f, 0x92, 0x80, /* 0xc0-0xc7 */
-	0x00, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 0xc8-0xcf */
-	0x00, 0xa5, 0x00, 0x95, 0x00, 0x00, 0x99, 0x00, /* 0xd0-0xd7 */
-	0x9d, 0x97, 0x00, 0x00, 0x9a, 0x00, 0x00, 0xe1, /* 0xd8-0xdf */
-	0x85, 0xa0, 0x83, 0x00, 0x84, 0x86, 0x91, 0x87, /* 0xe0-0xe7 */
-	0x8a, 0x82, 0x88, 0x89, 0x00, 0xa1, 0x8c, 0x8b, /* 0xe8-0xef */
-	0x00, 0xa4, 0x95, 0xa2, 0x93, 0x00, 0x94, 0x00, /* 0xf0-0xf7 */
-	0x9b, 0x97, 0xa3, 0x96, 0x81, 0x00, 0x00, 0x98, /* 0xf8-0xff */
-};
-
 CFont &GetSmallFont()
 {
 	if (!SmallFont) {
@@ -190,135 +170,219 @@ void GetDefaultTextColors(std::string &normalp, std::string &reversep)
 	reversep = DefaultReverseColorIndex;
 }
 
+static const unsigned char codepoint_to_cp437[] = {
+    0xff, 0xad, 0x9b, 0x9c, 0x00, 0x9d, 0x00, 0x00, 0x00, 0x00, 0xa6, 0xae, 0xaa, 0x00, 0x00, 0x00, // 0xa0
+    0xf8, 0xf1, 0xfd, 0x00, 0x00, 0xe6, 0x00, 0xfa, 0x00, 0x00, 0xa7, 0xaf, 0xac, 0xab, 0x00, 0xa8, // 0xb0
+    0x00, 0x00, 0x00, 0x00, 0x8e, 0x8f, 0x92, 0x80, 0x00, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 0xc0
+    0x00, 0xa5, 0x00, 0x00, 0x00, 0x00, 0x99, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9a, 0x00, 0x00, 0xe1, // 0xd0
+    0x85, 0xa0, 0x83, 0x00, 0x84, 0x86, 0x91, 0x87, 0x8a, 0x82, 0x88, 0x89, 0x8d, 0xa1, 0x8c, 0x8b, // 0xe0
+    0x00, 0xa4, 0x95, 0xa2, 0x93, 0x00, 0x94, 0xf6, 0x00, 0x97, 0xa3, 0x96, 0x81, 0x00, 0x00, 0x98  // 0xf0
+};
+
+static const unsigned char codepoint_to_cp1252[] = {
+    0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, // 0xa0
+    0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, // 0xb0
+    0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, // 0xc0
+    0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, // 0xd0
+    0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, // 0xe0
+    0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff  // 0xf0
+};
+
+static const unsigned char codepoint_to_cp866[] = {
+    0x00, 0xf0, 0x00, 0x00, 0xf2, 0x00, 0x00, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf6, 0x00, // 0x400
+    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, // 0x410
+    0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, // 0x420
+    0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, // 0x430
+    0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef, // 0x440
+    0x00, 0xf1, 0x00, 0x00, 0xf3, 0x00, 0x00, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7, 0x00  // 0x450
+};
+
+static const char * codepoint_from_0xa0_to_ascii[] = {
+         " ",      "!",     "C/",     "PS",     "$?",     "Y=",      "|",     "SS",     "\"",    "(c)",      "a",     "<<",      "!",      "?",    "(r)",      "-", // 0xa0
+       "deg",     "+-",      "2",      "3",      "'",      "u",      "P",      "*",      ",",      "1",      "o",     ">>",  " 1/4 ",  " 1/2 ",  " 3/4 ",      "?", // 0xb0
+         "A",      "A",      "A",      "A",      "A",      "A",     "AE",      "C",      "E",      "E",      "E",      "E",      "I",      "I",      "I",      "I", // 0xc0
+         "D",      "N",      "O",      "O",      "O",      "O",      "O",      "x",      "O",      "U",      "U",      "U",      "U",      "Y",     "Th",     "ss", // 0xd0
+         "a",      "a",      "a",      "a",      "a",      "a",     "ae",      "c",      "e",      "e",      "e",      "e",      "i",      "i",      "i",      "i", // 0xe0
+         "d",      "n",      "o",      "o",      "o",      "o",      "o",      "/",      "o",      "u",      "u",      "u",      "u",      "y",     "th",      "y", // 0xf0
+};
+
+static const char * codepoint_from_0x400_to_ascii[] = {
+        "Ie",     "Io",     "Dj",     "Gj",     "Ie",     "Dz",      "I",     "Yi",      "J",     "Lj",     "Nj",    "Tsh",     "Kj",      "I",      "U",    "Dzh", // 0x400
+         "A",      "B",      "V",      "G",      "D",      "E",     "Zh",      "Z",      "I",      "I",      "K",      "L",      "M",      "N",      "O",      "P", // 0x410
+         "R",      "S",      "T",      "U",      "F",     "Kh",     "Ts",     "Ch",     "Sh",   "Shch",      "'",      "Y",      "'",      "E",     "Iu",     "Ia", // 0x420
+         "a",      "b",      "v",      "g",      "d",      "e",     "zh",      "z",      "i",      "i",      "k",      "l",      "m",      "n",      "o",      "p", // 0x430
+         "r",      "s",      "t",      "u",      "f",     "kh",     "ts",     "ch",     "sh",   "shch",      "'",      "y",      "'",      "e",     "iu",     "ia", // 0x440
+        "ie",     "io",     "dj",     "gj",     "ie",     "dz",      "i",     "yi",      "j",     "lj",     "nj",    "tsh",     "kj",      "i",      "u",    "dzh", // 0x450
+};
+
+// default to codepage 437
+int FontCodePage = 437;
+
 /**
-** Convert a UTF8 char to an ASCII-extended char, based on the
-** convert table to work with Stratagus char.
-** @param utf8 the char to convert (must be in range 0x90..0xFF)
-** @return the ASCII equivalent, or '?' if char is unsuported.
+** Convert a Unicode codepoint to a codepage index, based on the
+** convert table to work with Stratagus char. This maps Unicode
+** codepoints into codepages commonly used for DOS and early Windows
+** games; currently CP437, CP1251, and CP866. More can be added.
+** The games need to ensure that the font graphic represents the
+** appropriate codepage.
+**
+** @param codepoint the char to convert
+** @param subst out variable for a char pointer with a substitution string if the codepage doesn't support the char
+** @return the equivalent codepage index; 0 if a substitution string is set; or '?' if codepoint is unsupported.
 */
-static int utf8_to_ascii(const int utf8)
+static unsigned char codepoint_to_codepage_index(int codepoint, const char **subst)
 {
-	int ascii_idx = (utf8 & 0xFF) - 0x90;
-	int newutf8 = 0x00;
-	if (ascii_idx >= 0 && ascii_idx < sizeof(extended_ascii)) {
-		newutf8 = extended_ascii[(utf8 & 0xFF) - 0x90];
+	Assert(codepoint >= 0x80);
+
+	unsigned char cpChar = 0;
+
+	switch (codepoint) {
+		case 0xa1: // special case: print inverted exclamation mark as normal one
+			cpChar = '!';
+			break;
+		case 0x192: // index for this letter in cp437 is 0x9f
+			if (FontCodePage == 437) {
+				cpChar = 0x9f;
+			} else {
+				cpChar = 'f';
+			}
+			break;
+		case 0x2502:
+			cpChar = 0xb3;
+		case 0x2591:
+			cpChar = 0xb0;
+			break;
+		case 0x2592:
+			cpChar = 0xb1;
+			break;
+		case 0x2593:
+			cpChar = 0xb2;
+			break;
+		default:
+			codepoint -= 0xa0;
+			if (codepoint >= 0 && codepoint < sizeof(codepoint_to_cp437)) {
+				// western european
+				switch (FontCodePage) {
+					case 437:
+						cpChar = codepoint_to_cp437[codepoint];
+						break;
+					case 1252:
+						cpChar = codepoint_to_cp1252[codepoint];
+						break;
+					default:
+						*subst = codepoint_from_0xa0_to_ascii[codepoint];
+						return 0;
+				}
+			} else {
+				codepoint -= (0x400 - 0xa0);
+				if (codepoint >= 0 && codepoint < sizeof(codepoint_to_cp866)) {
+					// cyrillic
+					switch (FontCodePage) {
+						case 866:
+							cpChar = codepoint_to_cp866[codepoint];
+							break;
+						default:
+							*subst = codepoint_from_0x400_to_ascii[codepoint];
+							return 0;
+					}
+				}
+			}
+			break;
 	}
-	if (newutf8 == 0x00) {
-		fprintf(stderr, "Can't convert UTF8 char to Ascii : '%c' d=%d (0x%04x)\r\n", utf8, utf8, utf8);
-		newutf8 = '?';
+
+	if (cpChar < 0x32) {
+		fprintf(stderr, "Can't convert codepoint to codepage %d: '%c' d=%d (0x%04x)\r\n", FontCodePage, codepoint, codepoint, codepoint);
+		cpChar = '?';
 	}
-	return newutf8;
+
+	return cpChar;
 }
-/**
-**  Get the next utf8 character from a string
-*/
-static bool GetUTF8(const std::string &text, size_t &pos, int &utf8)
-{
-	// end of string
-	if (pos >= text.size()) {
-		return false;
-	}
-
-	int count;
-	char c = text[pos++];
-
-	// ascii
-	if (!(c & 0x80)) {
-		utf8 = c;
-		return true;
-	}
-
-	if ((c & 0xE0) == 0xC0) {
-		utf8 = (c & 0x1F);
-		count = 1;
-	} else if ((c & 0xF0) == 0xE0) {
-		utf8 = (c & 0x0F);
-		count = 2;
-	} else if ((c & 0xF8) == 0xF0) {
-		utf8 = (c & 0x07);
-		count = 3;
-	} else if ((c & 0xFC) == 0xF8) {
-		utf8 = (c & 0x03);
-		count = 4;
-	} else if ((c & 0xFE) == 0xFC) {
-		utf8 = (c & 0x01);
-		count = 5;
-	} else {
-		DebugPrint("Invalid utf8\n");
-		return false;
-	}
-
-	while (count--) {
-		c = text[pos++];
-		if ((c & 0xC0) != 0x80) {
-			DebugPrint("Invalid utf8\n");
-			return false;
-		}
-		utf8 <<= 6;
-		utf8 |= (c & 0x3F);
-	}
-
-	int ascii = utf8_to_ascii(utf8);
-	utf8 = ascii;
-
-	return true;
-}
 
 /**
-**  Get the next utf8 character from an array of chars
+**  Get the next codepage index to render from a utf8 encoded string. This maps utf8 encoded
+**  unicode codepoints into the codepage index of the active FontCodePage. If no mapping into
+**  the codepage exists, this may offer a single- or multi-char replacement string. The subpos
+**  out-parameter is used to communicate at which position in a multi-char replacement string
+**  we are. Callers should pass in the same pos and subpos arguments while iterating over a loop.
+**  When the subpos is 0 after a call, the utf8 character was completely processed, otherwise
+**  more codepoint indices are needed to substitute the utf8 char.
+**
+**  @return 0 on failure, else the codepage index to print next for the current utf8 character
 */
-static bool GetUTF8(const char text[], const size_t len, size_t &pos, int &utf8)
+static int CodepageIndexFromUTF8(const char text[], const size_t len, size_t &pos, size_t &subpos)
 {
 	// end of string
 	if (pos >= len) {
-		return false;
+		return 0;
 	}
 
+	int codepoint;
 	int count;
-	char c = text[pos++];
+	int postUtf8CharPos = pos;
+	char c = text[postUtf8CharPos++];
 
 	// ascii
 	if (!(c & 0x80)) {
-		utf8 = c;
-		return true;
-	}
-
-	if ((c & 0xE0) == 0xC0) {
-		utf8 = (c & 0x1F);
+		pos = postUtf8CharPos;
+		if (c < 32) {
+			return '?';
+		}
+		return c;
+	} else if ((c & 0xE0) == 0xC0) {
+		codepoint = (c & 0x1F);
 		count = 1;
 	} else if ((c & 0xF0) == 0xE0) {
-		utf8 = (c & 0x0F);
+		codepoint = (c & 0x0F);
 		count = 2;
 	} else if ((c & 0xF8) == 0xF0) {
-		utf8 = (c & 0x07);
+		codepoint = (c & 0x07);
 		count = 3;
 	} else if ((c & 0xFC) == 0xF8) {
-		utf8 = (c & 0x03);
+		codepoint = (c & 0x03);
 		count = 4;
 	} else if ((c & 0xFE) == 0xFC) {
-		utf8 = (c & 0x01);
+		codepoint = (c & 0x01);
 		count = 5;
 	} else {
-		DebugPrint("Invalid utf8 I %c <%s> [%lu]\n" _C_ c _C_ text _C_(long) pos);
-		return false;
+		DebugPrint("Invalid utf8\n");
+		pos = postUtf8CharPos;
+		return 0;
 	}
 
 	while (count--) {
-		c = text[pos++];
+		c = text[postUtf8CharPos++];
 		if ((c & 0xC0) != 0x80) {
-			DebugPrint("Invalid utf8 II\n");
-			return false;
+			DebugPrint("Invalid utf8\n");
+			pos = postUtf8CharPos;
+			return 0;
 		}
-		utf8 <<= 6;
-		utf8 |= (c & 0x3F);
+		codepoint <<= 6;
+		codepoint |= (c & 0x3F);
 	}
-	
-	int ascii = utf8_to_ascii(utf8);
-	utf8 = ascii;
 
-	return true;
+	const char *subst;
+	const unsigned char cpIdx = codepoint_to_codepage_index(codepoint, &subst);
+	if (cpIdx) {
+		pos = postUtf8CharPos;
+		return cpIdx;
+	} else {
+		const unsigned char idx = subst[subpos++];
+		if (subpos >= strlen(subst)) {
+			// replacement processed, advance past this utf8 codepoint
+			pos = postUtf8CharPos;
+			subpos = 0;
+		}
+		return idx;
+	}
 }
 
+/**
+**  Get the next codepage index to render from a utf8 encoded string
+*/
+static int CodepageIndexFromUTF8(const std::string &text, size_t &pos, size_t &subpos)
+{
+	return CodepageIndexFromUTF8(text.c_str(), text.size(), pos, subpos);
+}
 
 int CFont::Height() const
 {
@@ -341,42 +405,13 @@ bool CFont::IsLoaded() const
 int CFont::Width(const int number) const
 {
 	int width = 0;
-#if 0
-	bool isformat = false;
-#endif
-	int utf8;
 	size_t pos = 0;
-	char text[ sizeof(int) * 10 + 2];
+	char text[sizeof(int) * 10 + 2];
 	const int len = FormatNumber(number, text);
 
 	DynamicLoad();
-	while (GetUTF8(text, len, pos, utf8)) {
-#if 0
-		if (utf8 == '~') {
-			//if (pos >= text.size()) {  // bad formatted string
-			if (pos >= size) {  // bad formatted string
-				break;
-			}
-			if (text[pos] == '<' || text[pos] == '>') {
-				isformat = false;
-				++pos;
-				continue;
-			}
-			if (text[pos] == '!') {
-				++pos;
-				continue;
-			}
-			if (text[pos] != '~') { // ~~ -> ~
-				isformat = !isformat;
-				continue;
-			}
-		}
-		if (!isformat) {
-			width += this->CharWidth[utf8 - 32] + 1;
-		}
-#else
-		width += this->CharWidth[utf8 - 32] + 1;
-#endif
+	for (int i = 0; i < len; i++) {
+		width += this->CharWidth[text[i] - 32] + 1;
 	}
 	return width;
 }
@@ -394,10 +429,11 @@ int CFont::Width(const std::string &text) const
 	bool isformat = false;
 	int utf8;
 	size_t pos = 0;
+	size_t subpos = 0;
 
 	DynamicLoad();
-	while (GetUTF8(text, pos, utf8)) {
-		if (utf8 == '~') {
+	while (utf8 = CodepageIndexFromUTF8(text, pos, subpos)) {
+		if (utf8 == '~' && !subpos) {
 			if (text[pos] == '|') {
 				++pos;
 				continue;
@@ -439,7 +475,7 @@ int GetHotKey(const std::string &text)
 	if (text.length() > 1) {
 		hotkey = convertKey(text.c_str());
 	} else if (text.length() == 1) {
-		GetUTF8(text, pos, hotkey);
+		hotkey = CodepageIndexFromUTF8(text, pos, pos);
 	}
 
 	return hotkey;
@@ -529,16 +565,17 @@ int CLabel::DoDrawText(int x, int y,
 	bool tab;
 	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
+	size_t subpos = 0;
 	const CFontColor *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
-	while (GetUTF8(text, len, pos, utf8)) {
+	while (utf8 = CodepageIndexFromUTF8(text, len, pos, subpos)) {
 		tab = false;
 		if (utf8 == '\t') {
 			tab = true;
-		} else if (utf8 == '~') {
+		} else if (utf8 == '~' && !subpos) {
 			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
 					DebugPrint("oops, format your ~\n");

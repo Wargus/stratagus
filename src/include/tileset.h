@@ -170,10 +170,10 @@ public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 	int parseTilesetTileFlags(lua_State *l, int *back, int *j);
+	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 
 private:
 	unsigned int getOrAddSolidTileIndexByName(const std::string &name);
-	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 	int getTileIndex(unsigned char baseTerrain, unsigned char mixTerrain, unsigned int quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);

@@ -134,7 +134,9 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL), Colors(-1),
+				AutoCastSpell(NULL), SpellCoolDownTimers(NULL), Variable(NULL) { Init(); }
+	~CUnit();
 
 	void Init();
 
@@ -349,7 +351,7 @@ public:
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
-	CUnitColors *Colors;    /// Player colors
+	int  Colors;            /// custom colors
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
@@ -446,8 +448,8 @@ public:
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(false),
-		AiChecksDependencies(false),
-		IconFrameG(NULL), PressedIconFrameG(NULL),
+		AiChecksDependencies(false), SelectionRectangleIndicatesDamage(false),
+		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
 	bool ShowSightRange;       /// Show sight range.
@@ -466,6 +468,8 @@ public:
 	bool NoStatusLineTooltips; /// Don't show messages on status line
 	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
 	bool AiChecksDependencies; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
+	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
+	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
 
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.

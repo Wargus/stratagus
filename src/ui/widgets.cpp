@@ -1234,6 +1234,12 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 {
 	gcn::Font *font;
 	int x, y;
+	std::string drawText;
+	if (isPassword) {
+		drawText = std::string(mText.size(), '*');
+	} else {
+		drawText = mText;
+	}
 	CGraphic *img = this->itemImage;
 	if (!img) {
 		fprintf(stderr, "Not all graphics for ImageTextField were set\n");
@@ -1244,7 +1250,7 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 
 	if (hasFocus())
 	{
-		drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
+		drawCaret(graphics, getFont()->getWidth(drawText.substr(0, mCaretPosition)) - mXScroll);
 	}
 
 	graphics->setColor(getForegroundColor());
@@ -1264,17 +1270,17 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 
 		getTextSelectionPositions(&first, &len);
 
-		tmpStr = std::string(mText.substr(0, first));
+		tmpStr = std::string(drawText.substr(0, first));
 		selX = font->getWidth(tmpStr);
 
-		tmpStr = std::string(mText.substr(first, len));
+		tmpStr = std::string(drawText.substr(first, len));
 		selW = font->getWidth(tmpStr);
 
 		graphics->setColor(gcn::Color(127, 127, 127));
 		graphics->fillRectangle(gcn::Rectangle(x + selX, y, selW, font->getHeight()));
 	}
 
-	graphics->drawText(mText, x, y);
+	graphics->drawText(drawText, x, y);
 }
 
 void ImageTextField::drawBorder(gcn::Graphics *graphics)
@@ -1401,6 +1407,11 @@ void ImageListBox::mousePress(int, int y, int button)
 	if (button == gcn::MouseInput::LEFT && hasMouse())
 	{
 		setSelected(y / (itemImage ? std::max<int>(getFont()->getHeight(), itemImage->getHeight()) : getFont()->getHeight()));
+		generateAction();
+	}
+	else if (button == gcn::MouseInput::RIGHT && hasMouse())
+	{
+		setSelected(-1);
 		generateAction();
 	}
 }

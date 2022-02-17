@@ -606,11 +606,6 @@ static int CclUnit(lua_State *l)
 		MapMarkUnitSight(*unit);
 	}
 
-	// Fix Colors for rescued units.
-	if (unit->RescuedFrom) {
-		unit->Colors = &unit->RescuedFrom->UnitColors;
-	}
-
 	return 0;
 }
 
@@ -631,6 +626,10 @@ static int CclMoveUnit(lua_State *l)
 
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 2);
+
+	if (!unit->Removed) {
+		unit->Remove(unit->Container);
+	}
 
 	if (UnitCanBeAt(*unit, ipos)) {
 		unit->Place(ipos);
@@ -1029,6 +1028,12 @@ static int CclKillUnitAt(lua_State *l)
 	Vec2i pos2;
 	CclGetPos(l, &pos1.x, &pos1.y, 4);
 	CclGetPos(l, &pos2.x, &pos2.y, 5);
+	if (pos1.x > pos2.x) {
+		std::swap(pos1.x, pos2.x);
+	}
+	if (pos1.y > pos2.y) {
+		std::swap(pos1.y, pos2.y);
+	}
 
 	std::vector<CUnit *> table;
 
@@ -1289,10 +1294,15 @@ static int CclGetUnitVariable(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>-- Create a blacksmith for player 2
-**		blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
-**		-- Specify the amount of hit points to assign to the blacksmith
-**		<strong>SetUnitVariable</strong>(blacksmith,"HitPoints",344)</code></div>
+** <div class="example">
+** <code>
+** -- Create a blacksmith for player 2
+** blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
+** -- Specify the amount of hit points to assign to the blacksmith
+** <strong>SetUnitVariable</strong>(blacksmith,"HitPoints",344)
+** -- Set the blacksmiths color to the color of player 4
+** <strong>SetUnitVariable</strong>(blacksmith,"Color",4)
+** </code></div>
 */
 static int CclSetUnitVariable(lua_State *l)
 {
@@ -1306,7 +1316,22 @@ static int CclSetUnitVariable(lua_State *l)
 	int value = 0;
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
-		unit->AssignToPlayer(Players[value]);
+		unit->ChangeOwner(Players[value]);
+	} else if (!strcmp(name, "Color")) {
+		if (lua_isstring(l, 3)) {
+			const char *colorName = LuaToString(l, 3);
+			for (size_t i = 0; i < PlayerColorNames.size(); i++) {
+				if (PlayerColorNames[i] == colorName) {
+					unit->Colors = i;
+					break;
+				}
+			}
+		} else if (lua_isnil(l, 3)) {
+			unit->Colors = -1;
+		} else {
+			value = LuaToNumber(l, 3);
+			unit->Colors = value;
+		}
 	} else if (!strcmp(name, "TTL")) {
 		value = LuaToNumber(l, 3);
 		unit->TTL = GameCycle + value;
@@ -1442,6 +1467,44 @@ static int CclSelectSingleUnit(lua_State *l)
 }
 
 /**
+**  Find the next reachable resource unit that gives resource starting from a worker.
+**  Optional third argument is the range to search.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>
+**		peon = CreateUnit("unit-peon", 5, {58, 8})
+**      goldmine = <strong>FindNextResource(peon, 0)</strong></code></div>
+*/
+static int CclFindNextResource(lua_State *l)
+{
+	const int nargs = lua_gettop(l);
+	if (nargs < 2 || nargs > 3) {
+		LuaError(l, "incorrect argument count");
+	}
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 2);
+	const int resource = CclGetResourceByName(l);
+	lua_pop(l, 1);
+
+	const int range = nargs == 3 ? LuaToNumber(l, 3) : 1000;
+
+	CUnit *resourceUnit = UnitFindResource(*unit, *unit, range, resource);
+	if (resourceUnit) {
+		lua_pushnumber(l, UnitNumber(*unit));
+	} else {
+		lua_pushnil(l);
+	}
+	return 1;
+}
+
+/**
 **  Enable/disable simplified auto targeting 
 **
 **  @param l  Lua state.
@@ -1483,6 +1546,7 @@ void UnitCclRegister()
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
+	lua_register(Lua, "FindNextResource", CclFindNextResource);
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);

@@ -63,6 +63,9 @@
 */
 static std::vector<CCursor *> AllCursors;
 
+extern uint8_t SizeChangeCounter; // from sdl.cpp
+static uint8_t LastSizeVersion;
+
 CursorStates CursorState;    /// current cursor state (point,...)
 int CursorAction;            /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
@@ -81,10 +84,77 @@ CUnitType *CursorBuilding;           /// building cursor
 /*--- DRAW SPRITE CURSOR ---------------------------------------------------*/
 CCursor *GameCursor;                 /// current shown cursor-type
 
+static CCursor *ActuallyVisibleGameCursor;
+static int VisibleGameCursorFrame;
+
+
 static SDL_Surface *HiddenSurface;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+SDL_Cursor *CCursor::GetSDLCursor()
+{
+	if (SdlCursors.size() <= SpriteFrame) {
+		// slow path
+		for (int i = SdlCursors.size(); i <= SpriteFrame; i++) {
+			G->Load();
+			int ww, wh;
+			SDL_GetWindowSize(TheWindow, &ww, &wh);
+
+			double xScale = (double)ww / Video.Width;
+			double yScale = (double)wh / (Video.Height * Video.VerticalPixelSize);
+			if (xScale > yScale) {
+				xScale = yScale;
+				// ww = Video.Width * yScale;
+			} else {
+				yScale = xScale;
+				xScale = xScale * Video.VerticalPixelSize;
+				// wh = Video.Height * xScale;
+			}
+
+			int w = floor(G->getWidth() * xScale);
+			int h = floor(G->getHeight() * yScale);
+
+			SDL_Rect srect = {G->frame_map[i].x, G->frame_map[i].y, G->getWidth(), G->getHeight()};
+
+			SDL_Surface *intermediate = SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK);
+			SDL_BlitSurface(G->Surface, &srect, intermediate, NULL);
+
+			SDL_Surface *cursorFrame = SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK);
+			SDL_BlitScaled(intermediate, NULL, cursorFrame, NULL);
+
+			SDL_FreeSurface(intermediate);
+
+			SdlCursorSurfaces.push_back(cursorFrame);
+			SDL_Cursor *cur = SDL_CreateColorCursor(cursorFrame, floor(HotPos.x * xScale), floor(HotPos.y * yScale));
+			SdlCursors.push_back(cur);
+		}
+	}
+	return SdlCursors[SpriteFrame];
+}
+
+CCursor::~CCursor()
+{
+	for (auto sdlCur : SdlCursors) {
+		SDL_FreeCursor(sdlCur);
+	}
+	for (auto sdlSurface : SdlCursorSurfaces) {
+		SDL_FreeSurface(sdlSurface);
+	}
+}
+
+void CCursor::Reset() {
+	for (auto sdlCur : SdlCursors) {
+		SDL_FreeCursor(sdlCur);
+	}
+	for (auto sdlSurface : SdlCursorSurfaces) {
+		SDL_FreeSurface(sdlSurface);
+	}
+	SdlCursors.clear();
+	SdlCursorSurfaces.clear();
+}
 
 /**
 **  Load all cursor sprites.
@@ -243,6 +313,19 @@ static void DrawBuildingCursor()
 */
 void DrawCursor()
 {
+	if (Preference.HardwareCursor) {
+		if (LastSizeVersion != SizeChangeCounter) {
+			HideCursor();
+			for (auto cur : AllCursors) {
+				cur->Reset();
+			}
+			LastSizeVersion = SizeChangeCounter;
+		}
+	} else if (ActuallyVisibleGameCursor) {
+		SDL_SetCursor(Video.blankCursor);
+		ActuallyVisibleGameCursor = NULL;
+	}
+
 	// Selecting rectangle
 	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
@@ -256,38 +339,53 @@ void DrawCursor()
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
 	if (GameCursor == NULL || IsDemoMode()) {
-		return;
-	}
-	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
-
-	if (!GameRunning && !Editor.Running) {
-		if (!HiddenSurface
-			|| HiddenSurface->w != GameCursor->G->getWidth()
-			|| HiddenSurface->h != GameCursor->G->getHeight()) {
-			if (HiddenSurface) {
-				VideoPaletteListRemove(HiddenSurface);
-				SDL_FreeSurface(HiddenSurface);
-			}
-
-			HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-												 GameCursor->G->getWidth(),
-												 GameCursor->G->getHeight(),
-												 TheScreen->format->BitsPerPixel,
-												 TheScreen->format->Rmask,
-												 TheScreen->format->Gmask,
-												 TheScreen->format->Bmask,
-												 TheScreen->format->Amask);
+		if (Preference.HardwareCursor) {
+			SDL_SetCursor(Video.blankCursor);
+			ActuallyVisibleGameCursor = NULL;
 		}
-
-		SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
-		SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+		return;
 	}
 
 	//  Last, Normal cursor.
-	if (!GameCursor->G->IsLoaded()) {
-		GameCursor->G->Load();
+	if (!Preference.HardwareCursor) {
+    	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+
+    	if (!GameRunning && !Editor.Running) {
+    		if (!HiddenSurface
+            		|| HiddenSurface->w != GameCursor->G->getWidth()
+                    || HiddenSurface->h != GameCursor->G->getHeight()) {
+                    if (HiddenSurface) {
+						VideoPaletteListRemove(HiddenSurface);
+						SDL_FreeSurface(HiddenSurface);
+					}
+					HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+														GameCursor->G->getWidth(),
+														GameCursor->G->getHeight(),
+														TheScreen->format->BitsPerPixel,
+														TheScreen->format->Rmask,
+														TheScreen->format->Gmask,
+														TheScreen->format->Bmask,
+														TheScreen->format->Amask);
+			}
+			SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
+			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+		}
+
+		if (!GameCursor->G->IsLoaded()) {
+			GameCursor->G->Load();
+		}
+		GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame, pos.x, pos.y);
+	} else {
+		// This is a (hardware) cursor drawn by SDL, so only should be set if something changed
+		if (ActuallyVisibleGameCursor != GameCursor || GameCursor->SpriteFrame != VisibleGameCursorFrame) {
+			if (!GameCursor->G->IsLoaded()) {
+				GameCursor->G->Load();
+			}
+			SDL_SetCursor(GameCursor->GetSDLCursor());
+			ActuallyVisibleGameCursor = GameCursor;
+			VisibleGameCursorFrame = GameCursor->SpriteFrame;
+		}
 	}
-	GameCursor->G->DrawFrameClip(GameCursor->SpriteFrame, pos.x, pos.y);
 }
 
 /**
@@ -295,10 +393,13 @@ void DrawCursor()
 */
 void HideCursor()
 {
-	if (!GameRunning && !Editor.Running && GameCursor) {
+	if (!Preference.HardwareCursor && !GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
 		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
+	} else {
+		SDL_SetCursor(Video.blankCursor);
+		ActuallyVisibleGameCursor = NULL;
 	}
 }
 

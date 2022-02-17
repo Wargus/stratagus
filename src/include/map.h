@@ -366,7 +366,7 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 
 
 /// Load map presentation
-extern void LoadStratagusMapInfo(const std::string &mapname);
+extern bool LoadStratagusMapInfo(const std::string &mapname);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);

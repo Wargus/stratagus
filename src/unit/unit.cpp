@@ -426,10 +426,11 @@ void CUnit::Init()
 	Stats = NULL;
 	CurrentSightRange = 0;
 
+	delete pathFinderData;
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
-	Colors = NULL;
+	Colors = -1;
 	IX = 0;
 	IY = 0;
 	Frame = 0;
@@ -447,6 +448,7 @@ void CUnit::Init()
 	RescuedFrom = NULL;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
+	delete Variable;
 	Variable = NULL;
 	TTL = 0;
 	Threshold = 0;
@@ -472,13 +474,23 @@ void CUnit::Init()
 	NewOrder = NULL;
 	delete CriticalOrder;
 	CriticalOrder = NULL;
+	delete AutoCastSpell;
 	AutoCastSpell = NULL;
+	delete SpellCoolDownTimers;
 	SpellCoolDownTimers = NULL;
 	AutoRepair = 0;
 	Goal = NULL;
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 }
 
+CUnit::~CUnit() {
+	Type = NULL;
+
+	delete pathFinderData;
+	delete[] AutoCastSpell;
+	delete[] SpellCoolDownTimers;
+	delete[] Variable;
+}
 
 /**
 **  Release an unit.
@@ -487,9 +499,15 @@ void CUnit::Init()
 */
 void CUnit::Release(bool final)
 {
-	if (Type == NULL) {
+	// If the unit has no more references remaining, 
+	// the unit manager will set the ReleaseCycle,
+	// which prevents any more calls to this function.
+	if (ReleaseCycle) {
 		DebugPrint("unit already free\n");
 		return;
+	}
+	if (PlayerSlot != static_cast<size_t>(-1)) {
+		Player->RemoveUnit(*this);
 	}
 	Assert(Orders.size() == 1);
 	// Must be removed before here
@@ -526,13 +544,14 @@ void CUnit::Release(bool final)
 	// on the way. We must wait a little time before we could free the
 	// memory.
 	//
-
-	Type = NULL;
-
-	delete pathFinderData;
-	delete[] AutoCastSpell;
-	delete[] SpellCoolDownTimers;
-	delete[] Variable;
+	// Because the network may have an order on the way, that order may still
+	// need access to the type. Deleting the Type pointer causes all sorts of
+	// trouble when we need some info about "almost" dead units, like what their
+	// old tile size was (e.g. when a repair command from the network is applied
+	// to a destroyed unit, we want to send the worker to the middle of the old
+	// location, so we need access to the Type->TileSize; or when a unit is
+	// removed, but fog of war calculations are still underway, where we want to
+	// read a BoolFlag; there are more instances of this...)
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		delete *order;
 	}
@@ -743,7 +762,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	Player = &player;
 	Stats = &type.Stats[Player->Index];
-	Colors = &player.UnitColors;
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);
@@ -1706,7 +1724,7 @@ void UnitCountSeen(CUnit &unit)
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
 				// be released
-				if (!unit.Type) {
+				if (unit.ReleaseCycle) {
 					break;
 				}
 				UnitGoesOutOfFog(unit, Players[p]);

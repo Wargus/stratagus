@@ -1,0 +1,3 @@
+Editor: right click on a unit type calls EditUnitTypeProperties(ident)
+
+Editor: right click on a unit calls EditUnitTypeProperties(tableOfSelectedUnits)

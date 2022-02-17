@@ -1202,6 +1202,205 @@ static int CclDefineUnitType(lua_State *l)
 /**
 ** <b>Description</b>
 **
+**  Copy a unit type.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code><strong>CopyUnitType</strong>("unit-peasant", "unit-peasant-copy")</code></div>
+*/
+static int CclCopyUnitType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	// Slot identifier
+	const char* fromName = LuaToString(l, 1);
+	CUnitType *from = UnitTypeByIdent(fromName);
+	const char* toName = LuaToString(l, 2);
+	CUnitType *to = UnitTypeByIdent(toName);
+	if (to) {
+		DebugPrint("Redefining unit-type '%s'\n" _C_ toName);
+	} else {
+		to = NewUnitTypeSlot(toName);
+	}
+	if (!from) {
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName);
+	}
+
+	to->Flip = from->Flip;
+	to->Name = toName;
+	to->File = from->File;
+	to->Width = from->Width;
+	to->Height = from->Height;
+	if (to->Sprite) {
+		CGraphic::Free(to->Sprite);
+		to->Sprite = NULL;
+	}
+	to->ShadowFile = from->ShadowFile;
+	to->ShadowWidth = from->ShadowWidth;
+	to->ShadowHeight = from->ShadowHeight;
+	to->ShadowOffsetX = from->ShadowOffsetX;
+	to->ShadowOffsetY = from->ShadowOffsetY;
+	to->ShadowSpriteFrame = from->ShadowSpriteFrame;
+	to->ShadowScale = from->ShadowScale;
+	if (to->ShadowSprite) {
+		CGraphic::Free(to->ShadowSprite);
+		to->ShadowSprite = NULL;
+	}
+	to->OffsetX = from->OffsetX;
+	to->OffsetY = from->OffsetY;
+	to->Animations = from->Animations;
+	to->Icon.Name = from->Icon.Name;
+	to->Icon.Icon = NULL;
+#ifdef USE_MNG
+	to->Portrait.Num = from->Portrait.Num;
+	to->Portrait.Files = from->Portrait.Files;
+	to->Portrait.Mngs = from->Portrait.Mngs;
+#endif
+	memcpy(to->DefaultStat.Costs, from->DefaultStat.Costs, sizeof(from->DefaultStat.Costs));
+	memcpy(to->DefaultStat.Storing, from->DefaultStat.Storing, sizeof(from->DefaultStat.Storing));
+	memcpy(to->DefaultStat.ImproveIncomes, from->DefaultStat.ImproveIncomes, sizeof(from->DefaultStat.ImproveIncomes));
+	to->Construction = from->Construction;
+	to->DrawLevel = from->DrawLevel;
+	to->MaxOnBoard = from->MaxOnBoard;
+	to->BoardSize = from->BoardSize;
+	to->ButtonLevelForTransporter = from->ButtonLevelForTransporter;
+	to->StartingResources = from->StartingResources;
+	to->DefaultStat.Variables[HP_INDEX].Increase = from->DefaultStat.Variables[HP_INDEX].Increase;
+	to->DefaultStat.Variables[HP_INDEX].IncreaseFrequency = from->DefaultStat.Variables[HP_INDEX].IncreaseFrequency;
+	to->BurnPercent = from->BurnPercent;
+	to->BurnDamageRate = from->BurnDamageRate;
+	to->PoisonDrain = from->PoisonDrain;
+	to->DefaultStat.Variables[SHIELD_INDEX].Max = from->DefaultStat.Variables[SHIELD_INDEX].Max;
+	to->DefaultStat.Variables[SHIELD_INDEX].Value = from->DefaultStat.Variables[SHIELD_INDEX].Value;
+	to->DefaultStat.Variables[SHIELD_INDEX].Increase = from->DefaultStat.Variables[SHIELD_INDEX].Increase;
+	to->DefaultStat.Variables[SHIELD_INDEX].Enable = from->DefaultStat.Variables[SHIELD_INDEX].Enable;
+	to->TileWidth = from->TileWidth;
+	to->TileHeight = from->TileHeight;
+	to->NeutralMinimapColorRGB = from->NeutralMinimapColorRGB;
+	to->Neutral = from->Neutral;
+	to->BoxWidth = from->BoxWidth;
+	to->BoxHeight = from->BoxHeight;
+	to->BoxOffsetX = from->BoxOffsetX;
+	to->BoxOffsetY = from->BoxOffsetY;
+	to->NumDirections = from->NumDirections;
+	to->ReactRangeComputer = from->ReactRangeComputer;
+	to->ReactRangePerson = from->ReactRangePerson;
+	to->Missile.Name = from->Missile.Name;
+	to->Missile.Missile = NULL; // filled in later
+	to->MinAttackRange = from->MinAttackRange;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable;
+	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = from->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value;
+	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = from->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max;
+	to->DefaultStat.Variables[PRIORITY_INDEX].Value = from->DefaultStat.Variables[PRIORITY_INDEX].Value;
+	to->DefaultStat.Variables[PRIORITY_INDEX].Max = from->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	to->AnnoyComputerFactor = from->AnnoyComputerFactor;
+	to->AiAdjacentRange = from->AiAdjacentRange;
+	to->DecayRate = from->DecayRate;
+	to->CorpseName = from->CorpseName;
+	to->CorpseType = from->CorpseType;
+	to->DamageType = from->DamageType;
+	to->ExplodeWhenKilled = from->ExplodeWhenKilled;
+	to->Explosion.Name = from->Explosion.Name;
+	to->Explosion.Missile = NULL; // filled later
+	to->TeleportCost = from->TeleportCost;
+	to->TeleportEffectIn = from->TeleportEffectIn;
+	to->TeleportEffectOut = from->TeleportEffectOut;
+	to->OnDeath = from->OnDeath;
+	to->OnHit = from->OnHit;
+	to->OnEachCycle = from->OnEachCycle;
+	to->OnEachSecond = from->OnEachSecond;
+	to->OnInit = from->OnInit;
+	to->OnReady = from->OnReady;
+	to->UnitType = from->UnitType;
+	for (int k = 0; k < MaxAttackPos; ++k) {
+		for (int m = 0; m < UnitSides; ++m) {
+			to->MissileOffsets[m][k].x = from->MissileOffsets[m][k].x;
+			to->MissileOffsets[m][k].y = from->MissileOffsets[m][k].y;
+		}
+	}
+	for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; i++) {
+		to->Impact[i].Name = from->Impact[i].Name;
+		to->Impact[i].Missile = from->Impact[i].Missile;
+	}
+	to->MouseAction = from->MouseAction;
+	to->CanAttack = from->CanAttack;
+	to->RepairRange = from->RepairRange;
+	to->RepairHP = from->RepairHP;
+	memcpy(to->RepairCosts, from->RepairCosts, sizeof(from->RepairCosts));
+	to->CanTarget = from->CanTarget;
+	to->Building = from->Building;
+	to->BuildingRules.clear();
+	if (!from->BuildingRules.empty()) {
+		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName, toName);
+	}
+	// XXX: should copy, not share, this will crash
+	// for (auto rule : from->BuildingRules) {
+	// 	to->BuildingRules.push_back(rule);
+	// }
+	to->AiBuildingRules.clear();
+	if (!from->AiBuildingRules.empty()) {
+		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName, toName);
+	}
+	// XXX: should copy, not share, this would crash
+	// for (auto rule : from->AiBuildingRules) {
+	// 	to->AiBuildingRules.push_back(rule);
+	// }
+	to->AutoBuildRate = from->AutoBuildRate;
+	to->LandUnit = from->LandUnit;
+	to->AirUnit = from->AirUnit;
+	to->SeaUnit = from->SeaUnit;
+	to->RandomMovementProbability = from->RandomMovementProbability;
+	to->RandomMovementDistance = from->RandomMovementDistance;
+	to->ClicksToExplode = from->ClicksToExplode;
+	to->MaxOnBoard = from->MaxOnBoard;
+	for (unsigned int i = 0; i < from->BoolFlag.size(); i++) {
+		to->BoolFlag[i].value = from->BoolFlag[i].value;
+		to->BoolFlag[i].CanTransport = from->BoolFlag[i].CanTransport;
+		to->BoolFlag[i].CanTargetFlag = from->BoolFlag[i].CanTargetFlag;
+		to->BoolFlag[i].AiPriorityTarget = from->BoolFlag[i].AiPriorityTarget;
+	}
+	memcpy(to->ResInfo, from->ResInfo, sizeof(from->ResInfo));
+	to->GivesResource = from->GivesResource;
+	memcpy(to->CanStore, from->CanStore, sizeof(from->CanStore));
+	to->CanCastSpell = from->CanCastSpell;
+	to->AutoCastActive = from->AutoCastActive;
+	to->Sound.Selected.Name = from->Sound.Selected.Name;
+	to->Sound.Acknowledgement.Name = from->Sound.Acknowledgement.Name;
+	to->Sound.Attack.Name = from->Sound.Attack.Name;
+	to->Sound.Build.Name = from->Sound.Build.Name;
+	to->Sound.Ready.Name = from->Sound.Ready.Name;
+	to->Sound.Repair.Name = from->Sound.Repair.Name;
+	for (int i = 0; i < MaxCosts; i++) {
+		to->Sound.Harvest[i].Name = from->Sound.Harvest[i].Name;
+	}
+	to->Sound.Help.Name = from->Sound.Help.Name;
+	to->Sound.WorkComplete.Name = from->Sound.WorkComplete.Name;
+	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES + 1; i++) {
+		to->Sound.Dead[i].Name = from->Sound.Dead[i].Name;
+	}
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		to->DefaultStat.Variables[i].Enable = from->DefaultStat.Variables[i].Enable;
+		to->DefaultStat.Variables[i].Value = from->DefaultStat.Variables[i].Value;
+		to->DefaultStat.Variables[i].Max = from->DefaultStat.Variables[i].Max;
+		to->DefaultStat.Variables[i].Increase = from->DefaultStat.Variables[i].Increase;
+		to->DefaultStat.Variables[i].IncreaseFrequency = from->DefaultStat.Variables[i].IncreaseFrequency;
+	}
+
+	UpdateDefaultBoolFlags(*to);
+	if (!CclInConfigFile) {
+		UpdateUnitStats(*to, 1);
+	}
+	LoadUnitTypes();
+	return 0;
+}
+
+/**
+** <b>Description</b>
+**
 **  Parse unit-stats.
 **
 **  @param l  Lua state.
@@ -1778,6 +1977,8 @@ static int CclDefineDecorations(lua_State *l)
 		bool HideNeutral;
 		bool HideAllied;
 		bool ShowOpponent;
+		bool BoolFlagInvert;
+		int BoolFlag;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -1831,6 +2032,12 @@ static int CclDefineDecorations(lua_State *l)
 							decovarbar->Height = LuaToNumber(l, -1);
 						} else if (!strcmp(key, "Width")) {
 							decovarbar->Width = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "MinValue")) {
+							decovarbar->MinValue = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "MaxValue")) {
+							decovarbar->MaxValue = LuaToNumber(l, -1);
+						} else if (!strcmp(key, "Invert")) {
+							decovarbar->Invert = LuaToBoolean(l, -1);
 						} else if (!strcmp(key, "Orientation")) {
 							key = LuaToString(l, -1);
 							if (!strcmp(key, "horizontal")) {
@@ -1900,12 +2107,29 @@ static int CclDefineDecorations(lua_State *l)
 						decovarstaticsprite->FadeValue = LuaToNumber(l, -1, 3);
 					}
 					decovar = decovarstaticsprite;
+				} else if (!strcmp(key, "animated-sprite")) {
+					CDecoVarAnimatedSprite *decovarspritebar = new CDecoVarAnimatedSprite;
+					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
+					if (decovarspritebar->NSprite == -1) {
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1));
+					}
+					decovarspritebar->WaitFrames = LuaToNumber(l, -1, 2);
+					if (decovarspritebar->WaitFrames <= 0) {
+						LuaError(l, "invalid wait-frames, must be > 0");
+					}
+					decovar = decovarspritebar;
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key);
 				}
 				lua_pop(l, 2); // MethodName and data
-			} else { // Error
-				LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
+			} else {
+				tmp.BoolFlag = UnitTypeVar.BoolFlagNameLookup[key];
+				if (tmp.BoolFlag != -1) {
+					tmp.BoolFlagInvert = LuaToBoolean(l, -1);
+				} else {
+					// Error
+					LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key);
+				}
 			}
 			lua_pop(l, 1); // Pop the value
 		}
@@ -1924,6 +2148,8 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->HideNeutral = tmp.HideNeutral;
 		decovar->HideAllied = tmp.HideAllied;
 		decovar->ShowOpponent = tmp.ShowOpponent;
+		decovar->BoolFlag = tmp.BoolFlag;
+		decovar->BoolFlagInvert = tmp.BoolFlagInvert;
 		UnitTypeVar.DecoVar.push_back(decovar);
 	}
 	Assert(lua_gettop(l));
@@ -2169,6 +2395,7 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 void UnitTypeCclRegister()
 {
 	lua_register(Lua, "DefineUnitType", CclDefineUnitType);
+	lua_register(Lua, "CopyUnitType", CclCopyUnitType);
 	lua_register(Lua, "DefineUnitStats", CclDefineUnitStats);
 	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 	lua_register(Lua, "DefineVariables", CclDefineVariables);

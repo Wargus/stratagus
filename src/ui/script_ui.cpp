@@ -1080,6 +1080,8 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckUnitsAnd;
 			} else if (!strcmp(value, "check-units-not")) {
 				ba.Allowed = ButtonCheckUnitsNot;
+			} else if (!strcmp(value, "check-units-nor")) {
+				ba.Allowed = ButtonCheckUnitsNor;
 			} else if (!strcmp(value, "check-network")) {
 				ba.Allowed = ButtonCheckNetwork;
 			} else if (!strcmp(value, "check-no-network")) {
@@ -1153,6 +1155,32 @@ static int CclDefineButton(lua_State *l)
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
 			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
 			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
+	return 0;
+}
+
+static int CclCopyButtonsForUnitType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	// Slot identifier
+	const char* fromName = LuaToString(l, 1);
+	CUnitType *from = UnitTypeByIdent(fromName);
+	const char* toName = LuaToString(l, 2);
+	CUnitType *to = UnitTypeByIdent(toName);
+	if (!to) {
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ toName);
+	}
+	if (!from) {
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName);
+	}
+
+	for (auto btn : UnitButtonTable) {
+		if (btn->UnitMask.find(fromName) != std::string::npos) {
+			btn->UnitMask += toName;
+			btn->UnitMask += ",";
+		}
+	}
+
 	return 0;
 }
 
@@ -1281,6 +1309,27 @@ static int CclDefineMapSetup(lua_State *l)
 
 	return 0;
 }
+/**
+** <b>Description</b>
+**
+** Declare which codepage the font files are in. Text is handled internally
+** as UTF-8 everywhere, but the font rendering system uses graphics with 256
+** symbols. Commonly, DOS and early Windows games used codepage 437 or 1252 for
+** western European languages, or 866 for Russian and some other cyrillic
+** writing systems. These are the only ones that are currently supported, but
+** more can easily be added. All text is mapped into the codepage that is set
+** for the font files. If the codepage is not one of the supported ones, or if
+** something doesn't map (for example, some accented characters with codepage
+** 866, or cyrillic letters with codepage 437), a simple "visual" mapping to
+** 7-bit ASCII is used to at least print something that may be recognizable.
+*/
+static int CclSetFontCodePage(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	FontCodePage = LuaToNumber(l, 1);
+
+	return 0;
+}
 
 /**
 **  Register CCL features for UI.
@@ -1309,6 +1358,8 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetWindowSize", CclSetWindowSize);
 	lua_register(Lua, "SetVerticalPixelSize", CclSetVerticalPixelSize);
 
+	lua_register(Lua, "SetFontCodePage", CclSetFontCodePage);
+
 	lua_register(Lua, "SetTitleScreens", CclSetTitleScreens);
 	lua_register(Lua, "ShowTitleScreens", CclShowTitleScreens);
 
@@ -1322,6 +1373,8 @@ void UserInterfaceCclRegister()
 
 	lua_register(Lua, "DefineButton", CclDefineButton);
 	lua_register(Lua, "ClearButtons", CclClearButtons);
+
+	lua_register(Lua, "CopyButtonsForUnitType", CclCopyButtonsForUnitType);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
 

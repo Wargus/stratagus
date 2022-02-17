@@ -247,6 +247,8 @@ public:
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const = 0;
 
+	bool BoolFlagMatches(const CUnitType &type) const;
+
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
 	int OffsetX;            /// Offset in X coord.
@@ -267,12 +269,15 @@ public:
 	bool HideNeutral;       /// if true, don't show for neutral unit.
 	bool HideAllied;        /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;      /// if true, show for opponent unit.
+
+	bool BoolFlagInvert;    /// if 1, invert the bool flag check
+	int BoolFlag;           /// if !=-1, show only for units with this flag
 };
 
 class CDecoVarBar : public CDecoVar
 {
 public:
-	/// function to draw the decorations.
+	CDecoVarBar() : MinValue(0), MaxValue(100), Invert(false) {};
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
 	bool IsVertical;            /// if true, vertical bar, else horizontal.
@@ -280,6 +285,9 @@ public:
 	int Height;                 /// Height of the bar.
 	int Width;                  /// Width of the bar.
 	bool ShowFullBackground;    /// if true, show background like value equal to max.
+	bool Invert;                /// if true, invert length
+	int MinValue;               /// show only above percent
+	int MaxValue;               /// show only below percent
 	char BorderSize;            /// Size of the border, 0 for no border.
 	// FIXME color depend of percent (red, Orange, Yellow, Green...)
 	IntColor Color;             /// Color of bar.
@@ -332,6 +340,21 @@ public:
 	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
 	int n;         /// identifiant in SpellSprite
 	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
+};
+
+/// use to show specific frame in a sprite.
+class CDecoVarAnimatedSprite : public CDecoVar
+{
+public:
+	CDecoVarAnimatedSprite() : NSprite(-1), n(0), WaitFrames(0) {}
+	/// function to draw the decorations.
+	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+
+	char NSprite;    /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	char WaitFrames; /// Frames to wait between each sprite animation step
+private:
+	char lastFrame; /// last update
+	int n;         /// identifiant in SpellSprite
 };
 
 enum UnitTypeType {
@@ -789,7 +812,7 @@ extern void SaveUnitTypes(CFile &file);              /// Save the unit-type tabl
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 int player, int frame, const PixelPos &screenPos);
+						 int colorIndex, int frame, const PixelPos &screenPos);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype

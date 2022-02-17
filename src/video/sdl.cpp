@@ -562,14 +562,17 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 	switch (event.type) {
 		case SDL_MOUSEBUTTONDOWN:
+			event.button.y = static_cast<int>(std::floor(event.button.y / Video.VerticalPixelSize + 0.5));
 			InputMouseButtonPress(callbacks, SDL_GetTicks(), event.button.button);
 			break;
 
 		case SDL_MOUSEBUTTONUP:
+			event.button.y = static_cast<int>(std::floor(event.button.y / Video.VerticalPixelSize + 0.5));
 			InputMouseButtonRelease(callbacks, SDL_GetTicks(), event.button.button);
 			break;
 
 		case SDL_MOUSEMOTION:
+			event.motion.y = static_cast<int>(std::floor(event.button.y / Video.VerticalPixelSize + 0.5));
 			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
 			break;
 
@@ -631,14 +634,14 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 					if (IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)) {
 						IsSDLWindowVisible = false;
 						if (!GamePaused) {
-							DoTogglePause = true;
+							DoTogglePause = !GamePaused;
 							GamePaused = true;
 						}
 					} else if (!IsSDLWindowVisible && (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)) {
 						IsSDLWindowVisible = true;
 						if (GamePaused && DoTogglePause) {
 							DoTogglePause = false;
-							GamePaused = true;
+							GamePaused = false;
 						}
 					}
 				}
@@ -767,7 +770,9 @@ void WaitEventsOneFrame()
 		if (IsNetworkGame()) {
 			s = NetworkFildes.HasDataToRead(0);
 			if (s > 0) {
-				GetCallbacks()->NetworkEvent();
+				if (GetCallbacks()->NetworkEvent) {
+					GetCallbacks()->NetworkEvent();
+				}
 			}
 		}
 
@@ -818,7 +823,9 @@ void RealizeVideoMemory()
 		}
 		NumRects = 0;
 	}
-	HideCursor();
+	if (!Preference.HardwareCursor) {
+		HideCursor();
+	}
 }
 
 /**

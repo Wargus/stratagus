@@ -891,7 +891,7 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 **  @todo  Do screen position caculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
-void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int colorIndex, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
@@ -902,9 +902,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 
 	if (type.Flip) {
 		if (frame < 0) {
-			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+			sprite->DrawPlayerColorFrameClipX(colorIndex, -frame - 1, pos.x, pos.y);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			sprite->DrawPlayerColorFrameClip(colorIndex, frame, pos.x, pos.y);
 		}
 	} else {
 		const int row = type.NumDirections / 2 + 1;
@@ -914,7 +914,7 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 		} else {
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
-		sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		sprite->DrawPlayerColorFrameClip(colorIndex, frame, pos.x, pos.y);
 	}
 }
 

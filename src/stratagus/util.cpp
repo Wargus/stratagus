@@ -411,13 +411,16 @@ int GetClipboard(std::string &str)
 	char* txt = SDL_GetClipboardText();
 	if (txt) {
 		str = txt;
-		free(txt);
+		SDL_free(txt);
 		return 0;
 	} else {
 		return -1;
 	}
 }
 
+void SetClipboard(std::string &str) {
+	SDL_SetClipboardText(str.c_str());
+}
 
 /*----------------------------------------------------------------------------
 --  UTF8
@@ -430,7 +433,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 		return curpos;
 	}
 	while (curpos >= 0) {
-		if ((text[curpos] & 0xC0) != 0x80) {
+		if (curpos < text.size() && (text[curpos] & 0xC0) != 0x80) {
 			return curpos;
 		}
 		--curpos;

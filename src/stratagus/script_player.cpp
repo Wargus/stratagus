@@ -94,8 +94,8 @@ void CPlayer::Load(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	this->Units.resize(0);
-	this->FreeWorkers.resize(0);
+	this->Units.clear();
+	this->FreeWorkers.clear();
 
 	// j = 0 represent player Index.
 	for (int j = 1; j < args; ++j) {
@@ -338,33 +338,162 @@ void CPlayer::Load(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Change unit owner
+**  Change all units owned by one player or change only specific units owned by one player
 **
 **  @param l  Lua state.
 **
 ** Example:
 **
-** <div class="example"><code>-- Changes the unit owner from player 0 to player 1
-**		ChangeUnitsOwner({16, 17},{30, 32},0,1)</code></div>
+** <div class="example"><code>-- Changes all units owned by player 0 and give to player 1
+**		<strong>ChangeUnitsOwner</strong>({16, 17}, {30, 32}, 0, 1)
+**		-- Changes all farms owned by player 0 and give to player 1
+**		<strong>ChangeUnitsOwner</strong>({16, 17}, {30, 32}, 0, 1, "unit-farm")</code></div>
 **
 */
 static int CclChangeUnitsOwner(lua_State *l)
 {
-	LuaCheckArgs(l, 4);
+    int args = lua_gettop(l);
+    if (args != 4 && args != 5) {
+        LuaError(l, "incorrect argument count, need 4 or 5 args");
+    }
 
-	Vec2i pos1;
-	Vec2i pos2;
-	CclGetPos(l, &pos1.x, &pos1.y, 1);
-	CclGetPos(l, &pos2.x, &pos2.y, 2);
-	const int oldp = LuaToNumber(l, 3);
-	const int newp = LuaToNumber(l, 4);
-	std::vector<CUnit *> table;
-
-	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
-	for (size_t i = 0; i != table.size(); ++i) {
-		table[i]->ChangeOwner(Players[newp]);
+    Vec2i pos1;
+    Vec2i pos2;
+    CclGetPos(l, &pos1.x, &pos1.y, 1);
+    CclGetPos(l, &pos2.x, &pos2.y, 2);
+	if (pos1.x > pos2.x) {
+		std::swap(pos1.x, pos2.x);
 	}
-	return 0;
+	if (pos1.y > pos2.y) {
+		std::swap(pos1.y, pos2.y);
+	}
+
+    const int oldp = LuaToNumber(l, 3);
+    const int newp = LuaToNumber(l, 4);
+    std::vector<CUnit *> table;
+	// Change all units
+    if (args == 4) {
+        Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+    } else { //Change only specific units by the type.
+        CUnitType *type = UnitTypeByIdent(LuaToString(l, 5));
+        Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
+    }
+    for (auto unit : table) {
+        unit->ChangeOwner(Players[newp]);
+    }
+    return 0;
+}
+
+/**
+** <b>Description</b>
+**
+**  <strong>GiveUnitsToPlayer(amount, type, fromPlayer, toPlayer)</strong>
+**  <strong>GiveUnitsToPlayer(amount, type, topLeft, bottomRight, fromPlayer, toPlayer)</strong>
+**  Give some units of a specific type from a player to another player. Optionally only inside a rectangle.
+**  Returns number of units actually assigned. This can be smaller than the requested amount if the
+**  <code>fromPlayer</code> did not have enough units.<br/>
+**
+**  Instead of a number you can pass "all" as the first argument, to hand over all units.<br/>
+**  
+**  Instead of a unit type name, you can pass "any", "unit", "building" as the second argument,
+**  to hand over anything, and unit, or any building.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>
+**   -- Give 2 peasants from player 4 to player 2
+**   GiveUnitsToPlayer(2, "unit-peasant", 4, 2)
+**   -- Give 4 knights from player 5 to player 1 inside the rectangle 2,2 - 14,14
+**   GiveUnitsToPlayer(2, "unit-peasant", {2,2}, {14,14}, 4, 2)
+**   -- Give any 4 units from player 5 to player 1 inside the rectangle 2,2 - 14,14
+**   GiveUnitsToPlayer(2, "any", 4, 2)
+** </code></div>
+**
+*/
+static int CclGiveUnitsToPlayer(lua_State *l)
+{
+	int args = lua_gettop(l);
+	if (args != 4 && args != 6) {
+		LuaError(l, "incorrect argument count for GiveUnitsToPlayer, need 4 or 6 args");
+	}
+
+	int cnt;
+	if (lua_isnumber(l, 1)) {
+		cnt = LuaToNumber(l, 1);
+	} else {
+		std::string cntStr = std::string(LuaToString(l, 1));
+		if (cntStr != "all") {
+			LuaError(l, "incorrect 1st argument to GiveUnitsToPlayer. Must be number or 'all'");
+		}
+		cnt = std::numeric_limits<int>::max();
+	}
+
+	const int oldp = LuaToNumber(l, args == 4 ? 3 : 5);
+	const int newp = LuaToNumber(l, args == 4 ? 4 : 6);
+
+	std::string typestr = std::string(LuaToString(l, 2));
+	int assignedCnt = 0;
+
+	CUnitType *type = nullptr;
+	bool any = false;
+	bool onlyUnits = false;
+	bool onlyBuildings = false;
+	if (any = (typestr == "any")) {
+	} else if (onlyUnits = (typestr == "unit")) {
+	} else if (onlyBuildings = (typestr == "building")) {
+	} else {
+		type = UnitTypeByIdent(LuaToString(l, 2));
+		if (!type) {
+			LuaError(l, "incorrect 2nd argument to GiveUnitsToPlayer. Must be a unit type or 'any', 'unit', or 'building'");
+		}
+	}
+
+	if (cnt > 0) {
+		std::vector<CUnit *> table;
+		if (args == 6) {
+			Vec2i pos1;
+			Vec2i pos2;
+			CclGetPos(l, &pos1.x, &pos1.y, 3);
+			CclGetPos(l, &pos2.x, &pos2.y, 4);
+			if (pos1.x > pos2.x) {
+				std::swap(pos1.x, pos2.x);
+			}
+			if (pos1.y > pos2.y) {
+				std::swap(pos1.y, pos2.y);
+			}
+			if (any) {
+				Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+			} else if (onlyUnits) {
+				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), NotPredicate(IsBuildingType())));
+			} else if (onlyBuildings) {
+				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), IsBuildingType()));
+			} else {
+				Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
+			}
+			for (size_t i = 0; i != table.size() && cnt > 0; ++i) {
+				table[i]->ChangeOwner(Players[newp]);
+				assignedCnt++;
+				cnt--;
+			}
+		} else {
+			std::vector<CUnit *> table;
+			for (std::vector<CUnit *>::const_iterator it = Players[oldp].UnitBegin(); it != Players[oldp].UnitEnd() && cnt > 0; ++it) {
+				CUnit *unit = *it;
+				if (any || (onlyUnits && !unit->Type->Building) || (onlyBuildings && unit->Type->Building) || (type == unit->Type)) {
+					table.push_back(unit);
+				}
+			}
+			for (auto unit : table) {
+				unit->ChangeOwner(Players[newp]);
+			}
+			assignedCnt = table.size();
+		}
+	}
+
+	lua_pushnumber(l, assignedCnt);
+	return 1;
 }
 
 /**
@@ -700,7 +829,8 @@ static int CclDefineRaceNames(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Define player colors
+**  Define player colors. Pass "false" as an optional second
+**  argument to add the colors to the existing ones.
 **
 **  @param l  Lua state.
 **
@@ -727,14 +857,28 @@ static int CclDefineRaceNames(lua_State *l)
 */
 static int CclDefinePlayerColors(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
+	int nargs = lua_gettop(l);
+	if (nargs < 1 || nargs > 2) {
+		LuaError(l, "wrong number of arguments");
+	}
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
 	}
-
+	bool defaultNeutralPlayer = false;
 	const int args = lua_rawlen(l, 1);
+	if (nargs < 2 || LuaToBoolean(l, 2)) {
+		PlayerColorNames.clear();
+		PlayerColorsRGB.clear();
+		if (args / 2 < PlayerMax - 1) { // accept no color for neutral player
+			LuaError(l, "You need to define at least %d colors" _C_ PlayerMax - 1);
+		}
+		if (args / 2 < PlayerMax) {
+			defaultNeutralPlayer = true;
+		}
+	}
+
 	for (int i = 0; i < args; ++i) {
-		PlayerColorNames[i / 2] = LuaToString(l, 1, i + 1);
+		PlayerColorNames.push_back(LuaToString(l, 1, i + 1));
 		++i;
 		lua_rawgeti(l, 1, i + 1);
 		if (!lua_istable(l, -1)) {
@@ -744,15 +888,29 @@ static int CclDefinePlayerColors(lua_State *l)
 		if (numcolors != PlayerColorIndexCount) {
 			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
 		}
+		std::vector<CColor> newColors;
 		for (int j = 0; j < numcolors; ++j) {
 			lua_rawgeti(l, -1, j + 1);
-			PlayerColorsRGB[i / 2][j].Parse(l);
+			CColor newColor;
+			newColor.Parse(l);
+			newColors.push_back(newColor);
 			lua_pop(l, 1);
 		}
+		PlayerColorsRGB.push_back(newColors);
+	}
+
+	if (defaultNeutralPlayer) {
+		PlayerColorNames.push_back("neutral-black");
+		std::vector<CColor> neutralColors;
+		for (int j = 0; j < PlayerColorIndexCount; ++j) {
+			CColor neutralColor;
+			neutralColors.push_back(neutralColor);
+		}
+		PlayerColorsRGB.push_back(neutralColors);
 	}
 
 	return 0;
-}
+} 
 
 /**
 **  Make new player colors
@@ -778,12 +936,7 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	PlayerColorIndexStart = LuaToNumber(l, 1);
 	PlayerColorIndexCount = LuaToNumber(l, 2);
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		PlayerColorsRGB[i].clear();
-		PlayerColorsRGB[i].resize(PlayerColorIndexCount);
-		PlayerColors[i].clear();
-		PlayerColors[i].resize(PlayerColorIndexCount, 0);
-	}
+	PlayerColorsRGB.clear();
 	return 0;
 }
 
@@ -1103,6 +1256,7 @@ void PlayerCclRegister()
 {
 	lua_register(Lua, "Player", CclPlayer);
 	lua_register(Lua, "ChangeUnitsOwner", CclChangeUnitsOwner);
+	lua_register(Lua, "GiveUnitsToPlayer", CclGiveUnitsToPlayer);
 	lua_register(Lua, "GetThisPlayer", CclGetThisPlayer);
 	lua_register(Lua, "SetThisPlayer", CclSetThisPlayer);
 

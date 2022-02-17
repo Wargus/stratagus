@@ -1067,12 +1067,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	//
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
-		// I don't really think that there can be any rescued units at this point.
-		if (unit.RescuedFrom) {
-			unit.Colors = &unit.RescuedFrom->UnitColors;
-		} else {
-			unit.Colors = &unit.Player->UnitColors;
-		}
 		if (unit.Type->OnReady) {
 			unit.Type->OnReady->pushPreamble();
 			unit.Type->OnReady->pushInteger(UnitNumber(unit));
