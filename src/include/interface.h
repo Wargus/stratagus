@@ -127,7 +127,8 @@ enum _button_area_ {
 enum _menu_button_under_ {
 	ButtonUnderMenu,              /// Menu button
 	ButtonUnderNetworkMenu,       /// Network menu button
-	ButtonUnderNetworkDiplomacy   /// Diplomacy button
+	ButtonUnderNetworkDiplomacy,  /// Diplomacy button
+	ButtonUnderFreeWorkers        /// Free workers icon
 };
 
 /// current interface state
