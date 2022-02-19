@@ -14,7 +14,7 @@
             "windows": {
               "type": "cppvsdbg",
               "program": "${workspaceFolder}/build/Debug/stratagus-dbg.exe",
-              "args": ["-W", "-p", "-P", "${input:port}", "-a", "-d", "${workspaceFolder}\\..\\data.${input:game}"],
+              "args": ["-W", "-i", "-p", "-P", "${input:port}", "-a", "-d", "${workspaceFolder}\\..\\data.${input:game}"],
               "environment": [
                 {"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"},
                 {"name": "OMP_WAIT_POLICY", "value": "passive"}
