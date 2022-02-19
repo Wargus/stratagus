@@ -483,11 +483,38 @@ static void DumpUnitInfo(CUnit &unit)
 	}
 
 	fprintf(logf, "%lu: ", GameCycle);
-	fprintf(logf, "%d %s %d P%d Refs %d: %X %d,%d %d,%d\n",
+
+	const char *currentAction;
+	switch (!unit.Orders.empty() ? unit.CurrentAction() : -1) {
+		case -1: currentAction = "No Orders"; break;
+		case UnitActionNone: currentAction = "None"; break;
+		case UnitActionStill: currentAction = "Still"; break;      
+		case UnitActionStandGround: currentAction = "StandGround"; break;
+		case UnitActionFollow: currentAction = "Follow"; break;     
+		case UnitActionDefend: currentAction = "Defend"; break;     
+		case UnitActionMove: currentAction = "Move"; break;       
+		case UnitActionAttack: currentAction = "Attack"; break;     
+		case UnitActionAttackGround: currentAction = "AttackGround"; break;
+		case UnitActionDie: currentAction = "Die"; break;        
+		case UnitActionSpellCast: currentAction = "SpellCast"; break;  
+		case UnitActionTrain: currentAction = "Train"; break;      
+		case UnitActionUpgradeTo: currentAction = "UpgradeTo"; break;  
+		case UnitActionResearch: currentAction = "Research"; break;   
+		case UnitActionBuilt: currentAction = "Built"; break;      
+		case UnitActionBoard: currentAction = "Board"; break;      
+		case UnitActionUnload: currentAction = "Unload"; break;     
+		case UnitActionPatrol: currentAction = "Patrol"; break;     
+		case UnitActionBuild: currentAction = "Build"; break;      
+		case UnitActionExplore: currentAction = "Explore"; break;    
+		case UnitActionRepair: currentAction = "Repair"; break;     
+		case UnitActionResource: currentAction = "Resource"; break;
+		case UnitActionTransformInto: currentAction = "TransformInto"; break;
+	}
+
+	fprintf(logf, "%d %s %s P%d Refs %d: Seed %X Hash %X %d@%d %d@%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
-			!unit.Orders.empty() ? unit.CurrentAction() : -1,
-			unit.Player ? unit.Player->Index : -1, unit.Refs, SyncRandSeed,
-			unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
+			currentAction, unit.Player ? unit.Player->Index : -1, unit.Refs,
+			SyncRandSeed, SyncHash, unit.tilePos.x, unit.tilePos.y, unit.IX, unit.IY);
 #if 0
 	SaveUnit(unit, logf);
 #endif
