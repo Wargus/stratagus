@@ -51,6 +51,13 @@
 #include "video.h"
 #include "../video/intern_video.h"
 
+#ifdef USE_STACKTRACE
+#include <stdexcept>
+#include <stacktrace/call_stack.hpp>
+#include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -205,6 +212,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 {
 	CMapField &mf = *Map.Field(index);
 	unsigned short *v = &(mf.playerInfo.Visible[player.Index]);
+
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!Map.NoFogOfWar || *v == 0) {
@@ -214,10 +222,23 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			Map.MarkSeenTile(mf);
 		}
-		return;
+	} else {
+		Assert(*v != 65535);
+		++*v;
 	}
-	Assert(*v != 65535);
-	++*v;
+	if (EnableDebugPrint) {
+		fprintf(stderr, "Mapsight: GameCycle: %lud, SyncHash before: %x", GameCycle, SyncHash);
+	}
+	// Calculate some hash.
+	SyncHash = (SyncHash << 5) | (SyncHash >> 27);
+	SyncHash ^= (*v << 16) | *v;
+
+	if (EnableDebugPrint) {
+		fprintf(stderr, ", after: %x (mapfield: %d, player: %d, sight: %d)\n", SyncHash,
+							index, player.Index, *v);
+		print_backtrace(8);
+		fflush(stderr);
+	}
 }
 
 void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)

@@ -250,6 +250,8 @@
 //  Declaration
 //----------------------------------------------------------------------------
 
+extern int SaveGame(const std::string &filename); /// Save game
+
 /**
 **  Network command input/output queue.
 */
@@ -930,6 +932,15 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			SetMessage("%s", _("Network out of sync"));
 			gameInSync = false;
 			SetGamePaused(true);
+
+			time_t now;
+			time(&now);
+			std::string savefile = "desync_savegame_";
+			savefile += std::to_string(ThisPlayer->Index);
+			savefile += "_";
+			savefile += std::to_string((intmax_t)now);
+			savefile += ".sav";
+			SaveGame(savefile);
 		}
 		DebugPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
