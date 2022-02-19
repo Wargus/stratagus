@@ -579,7 +579,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		if (EnableDebugPrint) {
 			fprintf(stderr, ", after: %x (unit: %d:%s, order: %d, refs: %d)\n", SyncHash,
 								UnitNumber(unit), unit.Type->Ident.c_str(), unit.Orders.empty() ? -1 : unit.CurrentAction(), unit.Refs);
-			print_backtrace();
+			print_backtrace(8);
 			fflush(stderr);
 		}
 	}

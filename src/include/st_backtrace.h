@@ -16,13 +16,12 @@ inline void print_backtrace(int sz = 100) {
 
 #elif defined(USE_WIN32)
 
-#if 1 // the below would mean we give up XP support
 #include "windows.h"
 #include "winbase.h"
 #include "dbghelp.h"
 #include "process.h"
 
-inline void print_backtrace(void) {
+inline void print_backtrace(int sz = 100) {
     unsigned int i;
     void *stack[100];
     unsigned short frames;
@@ -34,7 +33,7 @@ inline void print_backtrace(void) {
 
     process = GetCurrentProcess();
     SymInitialize(process, NULL, TRUE);
-    frames = CaptureStackBackTrace(0, 100, stack, NULL);
+    frames = CaptureStackBackTrace(0, sz, stack, NULL);
     fprintf(stderr, "backtrace returned %d addresses\n", frames);
     symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
     symbol->MaxNameLen = 1024;
@@ -58,17 +57,12 @@ inline void print_backtrace(void) {
     }
     free(symbol);
 }
-#else
-inline void print_backtrace(void) {
-}
-#endif
 
 #else
 
-inline void print_backtrace(void) {
+inline void print_backtrace(int sz = 100) {
 }
 
 #endif
-
 
 #endif
