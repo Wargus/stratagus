@@ -77,6 +77,14 @@
 #include "unit_manager.h"
 #include "unittype.h"
 
+#ifdef USE_STACKTRACE
+#include <stdexcept>
+#include <stacktrace/call_stack.hpp>
+#include <stacktrace/stack_exception.hpp>
+#else
+#include "st_backtrace.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -559,10 +567,21 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 		if (EnableUnitDebug) {
 			DumpUnitInfo(unit);
 		}
+		if (EnableDebugPrint) {
+			fprintf(stderr, "GameCycle: %lud, SyncHash before: %x", GameCycle, SyncHash);
+		}
+
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;
 		SyncHash ^= unit.Refs << 3;
+
+		if (EnableDebugPrint) {
+			fprintf(stderr, ", after: %x (unit: %d:%s, order: %d, refs: %d)\n", SyncHash,
+								UnitNumber(unit), unit.Type->Ident.c_str(), unit.Orders.empty() ? -1 : unit.CurrentAction(), unit.Refs);
+			print_backtrace();
+			fflush(stderr);
+		}
 	}
 }
 
