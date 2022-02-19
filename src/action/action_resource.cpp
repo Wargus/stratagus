@@ -221,6 +221,8 @@ COrder_Resource::~COrder_Resource()
 		worker->DeAssignWorkerFromMine(*mine);
 	}
 
+	Depot = NULL;
+
 	CUnit *goal = this->GetGoal();
 	if (goal) {
 		// If mining decrease the active count on the resource.
@@ -908,6 +910,16 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 	// Find and send to resource deposit.
 	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+	// There's a bug in the traversal that leads to workers "sometimes" not finding their way to the old depot
+	// TODO: once we figure out that bug, this workaround can probably be removed.
+	// timfel: of course, maybe it's actually nice that workers drop out towards their last depot...
+	if (!depot && (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) && Depot && Depot->IsAlive()) {
+		Assert(unit.Container);
+		DropOutNearest(unit, Depot->tilePos + depot->Type->GetHalfTileSize(), source);
+		// try to path again
+		depot = FindDeposit(unit, 1000, unit.CurrentResource);
+	}
+	Depot = depot;
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 			Assert(unit.Container);
@@ -921,13 +933,15 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
-				   _C_ unit.Player->Index _C_ UnitNumber(unit) _C_ unit.CurrentResource);
+				_C_ unit.Player->Index _C_ UnitNumber(unit) _C_ unit.CurrentResource);
 		this->Finished = true;
 		return 0;
 	} else {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-			Assert(unit.Container);
-			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);
+			if (unit.Container) {
+				// may have dropped out above
+				DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);
+			}
 		}
 		UnitGotoGoal(unit, depot, SUB_MOVE_TO_DEPOT);
 	}
