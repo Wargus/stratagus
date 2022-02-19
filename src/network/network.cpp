@@ -929,6 +929,7 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
 			gameInSync = false;
+			SetGamePaused(true);
 		}
 		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
