@@ -926,7 +926,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
 	AiPlayer = unit.Player->Ai;
-	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255)) {
+	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255, false)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 	}

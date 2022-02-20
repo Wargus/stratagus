@@ -2984,7 +2984,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
-					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
 						order.OfferNewTarget(target, &attacker);
 					}
@@ -3018,7 +3018,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
 									? attacker.tilePos 
 									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
-			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 				return;
 			}
 			COrder *savedOrder = NULL;

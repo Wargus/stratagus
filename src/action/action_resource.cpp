@@ -910,20 +910,19 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 	// Find and send to resource deposit.
 	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
-	// There's a bug in the traversal that leads to workers "sometimes" not finding their way to the old depot
-	// TODO: once we figure out that bug, this workaround can probably be removed.
+	// There's a bug in the traversal that leads to workers "sometimes" not finding their way to the old depot.
 	// timfel: of course, maybe it's actually nice that workers drop out towards their last depot...
 	if (!depot && (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) && Depot && Depot->IsAlive()) {
+		CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
 		Assert(unit.Container);
-		DropOutNearest(unit, Depot->tilePos + depot->Type->GetHalfTileSize(), source);
-		// try to path again
-		depot = FindDeposit(unit, 1000, unit.CurrentResource);
+		DropOutNearest(unit, Depot->tilePos + Depot->Type->GetHalfTileSize(), source);
 	}
 	Depot = depot;
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-			Assert(unit.Container);
-			DropOutOnSide(unit, LookingW, source);
+			if (unit.Container) {
+				DropOutOnSide(unit, LookingW, source);
+			}
 		}
 		CUnit *mine = this->Resource.Mine;
 
