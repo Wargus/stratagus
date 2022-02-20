@@ -250,6 +250,8 @@
 //  Declaration
 //----------------------------------------------------------------------------
 
+extern int SaveGame(const std::string &filename); /// Save game
+
 /**
 **  Network command input/output queue.
 */
@@ -298,8 +300,8 @@ CUDPSocket NetworkFildes;                  /// Network file descriptor
 static unsigned long NetworkLastFrame[PlayerMax]; /// Last frame received packet
 static unsigned long NetworkLastCycle[PlayerMax]; /// Last cycle received packet
 
-static int NetworkSyncSeeds[256];          /// Network sync seeds.
-static int NetworkSyncHashs[256];          /// Network sync hashs.
+static unsigned int NetworkSyncSeeds[256];          /// Network sync seeds.
+static unsigned int NetworkSyncHashs[256];          /// Network sync hashs.
 static CNetworkCommandQueue NetworkIn[256][PlayerMax][MaxNetworkCommands]; /// Per-player network packet input queue
 static std::deque<CNetworkCommandQueue> CommandsIn;    /// Network command input queue
 static std::deque<CNetworkCommandQueue> MsgCommandsIn; /// Network message input queue
@@ -917,8 +919,8 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 	CNetworkCommandSync nc;
 	nc.Deserialize(&ncq.Data[0]);
 	const unsigned long gameNetCycle = GameCycle;
-	const int syncSeed = nc.syncSeed;
-	const int syncHash = nc.syncHash;
+	const unsigned int syncSeed = nc.syncSeed;
+	const unsigned int syncHash = nc.syncHash;
 
 	if (syncSeed != NetworkSyncSeeds[gameNetCycle & 0xFF]
 		|| syncHash != NetworkSyncHashs[gameNetCycle & 0xFF]) {
@@ -929,10 +931,20 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			// only print this message circa every 5 seconds...
 			SetMessage("%s", _("Network out of sync"));
 			gameInSync = false;
+			SetGamePaused(true);
+
+			time_t now;
+			time(&now);
+			std::string savefile = "desync_savegame_";
+			savefile += std::to_string(ThisPlayer->Index);
+			savefile += "_";
+			savefile += std::to_string((intmax_t)now);
+			savefile += ".sav";
+			SaveGame(savefile);
 		}
-		DebugPrint("\nNetwork out of sync %x!=%x! %d!=%d! Cycle %lu\n\n" _C_
+		DebugPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n" _C_
 				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
-				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);
+				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);	
 	} else {
 		gameInSync = true;
 	}

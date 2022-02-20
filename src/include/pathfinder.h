@@ -219,13 +219,13 @@ extern void FreePathfinder();
 /// Returns the next element of the path
 extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
 /// Return path length to unit 'dst'.
-extern int UnitReachable(const CUnit &src, const CUnit &dst, int range);
+extern int UnitReachable(const CUnit &src, const CUnit &dst, int range, bool from_outside_container);
 /// Return path length to unit 'dst' or error code.
 extern int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst,
 						  const int minrange, const int range);
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
-						  int minrange, int maxrange);
+						  int minrange, int maxrange, bool from_outside_container);
 
 //
 // in astar.cpp

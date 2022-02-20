@@ -183,33 +183,68 @@ void FreePathfinder()
 **
 **  @return          Distance to place.
 */
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, bool from_outside_container)
 {
 	SetAStarFixedEnemyUnitsUnpassable(true); /// change Path Finder setting to don't count tiles with enemy units as passable
-	int i = AStarFindPath(src.tilePos, goalPos, w, h,
-						  src.Type->TileWidth, src.Type->TileHeight,
-						  minrange, range, NULL, 0, src);
+	int i;
+	Vec2i srcTilePos = src.tilePos;
+	int srcTW = src.Type->TileWidth;
+	int srcTH = src.Type->TileHeight;
+	if (!from_outside_container || !src.Container) {
+		i = AStarFindPath(srcTilePos, goalPos, w, h,
+						  srcTW, srcTH,
+						  minrange, range, nullptr, 0, src);
+	} else {
+		const CUnit *first_container = GetFirstContainer(src);
+
+        const Vec2i offset(1, 1);
+		int containerW = first_container->Type->TileWidth;
+		int containerH = first_container->Type->TileHeight;
+		Vec2i containerTilePos = first_container->tilePos;
+		// check top and bottom rows and left and right columns around the container
+		for (int x = -1; x <= containerW; x++) {
+			for (int y = -1; y <= containerH; y++) {
+				if (x >= 0 && x < containerW && y >= 0 && y < containerH) {
+					// inside the container, no need to check
+					continue;
+				}
+				Vec2i tile_pos = containerTilePos + Vec2i(x, y);
+				if (!Map.Info.IsPointOnMap(tile_pos)) {
+					continue;
+				}
+				if (!CanMoveToMask(tile_pos, src.Type->MovementMask)) {
+					//ignore tiles to which the unit cannot be dropped from its container
+					continue;
+				}
+
+				i = AStarFindPath(tile_pos, goalPos, w, h,
+					srcTW, srcTH,
+					minrange, range, nullptr, 0, src);
+
+				switch (i) {
+					case PF_FAILED:
+					case PF_UNREACHABLE:
+					case PF_WAIT:
+						continue;
+				}
+				goto finished;
+			}
+		}
+	}
+finished:
 	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (i) {
 		case PF_FAILED:
 		case PF_UNREACHABLE:
-			i = 0;
-			break;
+		case PF_WAIT:
+			return 0;
 		case PF_REACHED:
 			/* since most of this function usage check return value as bool
-			 * then reached state should be track as true value */
-			i = 1;
-			break;
-		case PF_WAIT:
-			Assert(0);
-			i = 0;
-			break;
-		case PF_MOVE:
-			break;
+			* then reached state should be track as true value */
+			return std::max(i, 1);
 		default:
-			break;
+			return i;
 	}
-	return i;
 }
 
 /**
@@ -221,14 +256,14 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 **
 **  @return       Distance to place.
 */
-int UnitReachable(const CUnit &src, const CUnit &dst, int range)
+int UnitReachable(const CUnit &src, const CUnit &dst, int range, bool from_outside_container)
 {
 	//  Find a path to the goal.
 	if (src.Type->Building) {
 		return 0;
 	}
 	const int depth = PlaceReachable(src, dst.tilePos,
-									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
+									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, from_outside_container);
 	if (depth <= 0) {
 		return 0;
 	}

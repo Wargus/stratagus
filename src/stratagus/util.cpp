@@ -87,7 +87,7 @@ int SyncRand()
 	
 	if (EnableDebugPrint) {
 		fprintf(stderr, "GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
-		print_backtrace();
+		print_backtrace(8);
 		fflush(stderr);
 	}
 	return val;
