@@ -534,12 +534,18 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
+#ifdef DEBUG
+					const_cast<CMapField *>(mf)->lastAStarCost = -1;
+#endif
 					return -1;
 				}
 				CUnit *goal = mf->UnitCache.find(unit_finder);
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
 					Assert(0);
+#ifdef DEBUG
+					const_cast<CMapField *>(mf)->lastAStarCost = -1;
+#endif
 					return -1;
 				}
 				if (goal->Moving)  {
@@ -549,6 +555,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 					// for non moving unit Always Fail unless goal is unit, or unit can attack the target
 					if (&unit != goal) {
 						if (GetAStarFixedEnemyUnitsUnpassable() == true) {
+#ifdef DEBUG
+							const_cast<CMapField *>(mf)->lastAStarCost = -1;
+#endif
 							return -1;
 						}
 						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
@@ -556,6 +565,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 								cost += 2 * AStarMovingUnitCrossingCost;
 						} else {
 						// FIXME: Need support for moving a fixed unit to add cost
+#ifdef DEBUG
+							const_cast<CMapField *>(mf)->lastAStarCost = -1;
+#endif
 							return -1;
 						}
 						//cost += AStarFixedUnitCrossingCost;
@@ -569,6 +581,9 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 			}
 			// Add tile movement cost
 			cost += mf->getCost();
+#ifdef DEBUG
+			const_cast<CMapField *>(mf)->lastAStarCost = cost;
+#endif
 			++mf;
 		} while (--i);
 		index += AStarMapWidth;

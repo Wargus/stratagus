@@ -286,6 +286,38 @@ void CViewport::DrawMapBackgroundInViewport() const
 				tile = mf.playerInfo.SeenTile;
 			}
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+#if 0
+			int64_t cost = mf.lastAStarCost;
+			int32_t alpha;
+			// we use the msb as marker, but only consider the lower 32-bits as numeric value
+			if (cost != 0) {
+				if (cost == -1) {
+					// non traversible tiles always start full red
+					alpha = -60;
+				} else if (cost > 0) {
+					// msb not set means this has not been scaled
+					// scale cost to be between 1 and 60
+					cost <<= 3;
+					if (cost > 60) {
+						cost = 60;
+					}
+					alpha = static_cast<int32_t>(cost);
+				} else {
+					// consider only low 32-bits of already scaled value
+					alpha = static_cast<int32_t>(cost);
+				}
+			}
+			if (alpha > 0) {
+				Video.FillTransRectangleClip(ColorGreen, dx, dy,
+								 dx + Map.TileGraphic->getWidth(), dy + dx + Map.TileGraphic->getWidth(), alpha * 200 / 60);
+				alpha--;
+			} else if (alpha < 0) {
+				Video.FillTransRectangleClip(ColorRed, dx, dy,
+								 dx + Map.TileGraphic->getWidth(), dy + dx + Map.TileGraphic->getWidth(), -alpha * 200 / 60);
+				alpha++;
+			}
+			const_cast<CMapField &>(mf).lastAStarCost = alpha | ((uint64_t)1 << 63);
+#endif
 			++sx;
 			dx += PixelTileSize.x;
 		}
