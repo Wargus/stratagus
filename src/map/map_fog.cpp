@@ -226,6 +226,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 		Assert(*v != 65535);
 		++*v;
 	}
+#if 0
 	if (EnableDebugPrint) {
 		fprintf(stderr, "Mapsight: GameCycle: %lud, SyncHash before: %x", GameCycle, SyncHash);
 	}
@@ -239,6 +240,7 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 		print_backtrace(8);
 		fflush(stderr);
 	}
+#endif
 }
 
 void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
