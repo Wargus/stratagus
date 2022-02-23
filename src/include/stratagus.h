@@ -145,9 +145,8 @@ extern void PrintOnStdOut(const char *format, ...);
 ==  Definitions
 ============================================================================*/
 
-#ifndef __UTIL_H__
 #include "util.h"
-#endif
+#include "settings.h"
 
 inline char *new_strdup(const char *str)
 {
@@ -163,21 +162,6 @@ inline char *new_strdup(const char *str)
 
 /// Text string: Name, Version, Copyright
 extern const char NameLine[];
-
-/*----------------------------------------------------------------------------
---  Some limits
-----------------------------------------------------------------------------*/
-
-constexpr unsigned char PlayerMax = 16;        /// How many players are supported
-constexpr unsigned short UnitTypeMax = 2048;                /// How many unit types supported
-constexpr unsigned short UpgradeMax = 2048;                /// How many upgrades supported
-constexpr unsigned char MAX_RACES = 8;
-constexpr unsigned char PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
-
-/// Frames per second to display (original 30-40)
-constexpr unsigned char FRAMES_PER_SECOND = 30; // 1/30s
-/// Game cycles per second to simulate (original 30-40)
-constexpr unsigned char CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
 
 /*----------------------------------------------------------------------------
 --  stratagus.cpp

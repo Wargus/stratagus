@@ -1,7 +1,0 @@
-
-/// Attack with force at position
-extern void AiAttackWithForceAt(unsigned int force, unsigned int x, unsigned int y);
-
-/// Attack with force
-extern void AiAttackWithForce(unsigned int force);
-

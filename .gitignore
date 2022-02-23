@@ -25,8 +25,6 @@ obj-*
 ./stratagus.sdf
 ./stratagus.sln
 ./stratagus.suo
-./tolua.cpp
-./tolua.cpp.rule
 build
 .vscode/*
 !.vscode/tasks.json

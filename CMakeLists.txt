@@ -371,29 +371,9 @@ set(win32_SRCS
 )
 source_group(win32 FILES ${win32_SRCS})
 
-set(tolua_FILES
-	src/tolua/ai.pkg
-	src/tolua/editor.pkg
-	src/tolua/font.pkg
-	src/tolua/game.pkg
-	src/tolua/map.pkg
-	src/tolua/minimap.pkg
-	src/tolua/network.pkg
-	src/tolua/particle.pkg
-	src/tolua/pathfinder.pkg
-	src/tolua/player.pkg
-	src/tolua/sound.pkg
-	src/tolua/stratagus.pkg
-	src/tolua/translate.pkg
-	src/tolua/trigger.pkg
-	src/tolua/ui.pkg
-	src/tolua/unit.pkg
-	src/tolua/unittype.pkg
-	src/tolua/upgrade.pkg
-	src/tolua/video.pkg
-	src/tolua/stratagus.lua
+set(luabridge_SRCS
+	src/stratagus/lua/lua_bindings.cpp
 )
-source_group(tolua FILES ${tolua_FILES})
 
 set(stratagus_SRCS
 	${action_SRCS}
@@ -413,9 +393,9 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
-        ${hqx_SRCS}
-        ${xbrz_SRCS}
-	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
+	${hqx_SRCS}
+	${xbrz_SRCS}
+	${luabridge_SRCS}
 )
 
 set(stratagus_guichan_HDRS
@@ -697,14 +677,11 @@ if(BUILD_VENDORED_LUA)
   set(Lua51_FOUND true)
   set(LUA_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/liblua51.a")
   set(LUA_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/")
-  set(TOLUA++_FOUND true)
-  set(TOLUA++_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/lua-5.1.5/toluapp/include/)
-  set(TOLUA++_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/libtoluapp51.a")
-  set(TOLUA++_APP "${CMAKE_CURRENT_BINARY_DIR}/lua/src/Lua51B-build/toluapp")
 else()
   find_package(Lua51 REQUIRED)
-  find_package(Tolua++ REQUIRED)
 endif()
+
+set(LUABRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/LuaBridge3-2.6/Source)
 
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
@@ -793,8 +770,8 @@ endif()
 # Stratagus definitions
 
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS})
-set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES})
+include_directories(${LUA_INCLUDE_DIR} ${LUABRIDGE_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${ZLIB_LIBRARIES})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
 	add_definitions(-DNO_STDIO_REDIRECT)
@@ -1124,13 +1101,6 @@ else()
 	endif()
 	list(APPEND CLEAN_FILES version-generated.h)
 endif()
-
-add_custom_command(OUTPUT tolua.cpp
-	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
-	DEPENDS ${tolua_FILES}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
-	VERBATIM
-)
 
 if (ENABLE_STDIO_REDIRECT)
    add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})

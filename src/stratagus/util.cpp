@@ -433,7 +433,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 		return curpos;
 	}
 	while (curpos >= 0) {
-		if (curpos < text.size() && (text[curpos] & 0xC0) != 0x80) {
+		if (static_cast<unsigned int>(curpos) < text.size() && (text[curpos] & 0xC0) != 0x80) {
 			return curpos;
 		}
 		--curpos;

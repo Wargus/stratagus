@@ -3,7 +3,7 @@ Section: games
 Priority: optional
 Maintainer: cybermind <iddqd_mail@mail.ru>
 Build-Depends: debhelper (>= 7), cmake (>= 2.6), doxygen,
- imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev, libtolua++5.1-dev,
+ imagemagick, sharutils, liblua5.1-dev | liblua5.1-0-dev,
  zlib1g-dev, libbz2-dev, libsdl2-dev, libsdl2-image-dev, libsdl2-mixer-dev,
  libogg-dev, libvorbis-dev, libtheora-dev, libmng-dev,
  libpng12-dev (>= 1.2.5) | libpng-dev (>= 1.2.5), graphviz

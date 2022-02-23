@@ -2357,13 +2357,7 @@ static bool ShouldGlobalTableBeSaved(const std::string &key)
 
 static bool ShouldLocalTableBeSaved(const std::string &key)
 {
-	if (IsAValidTableName(key) == false) {
-		return false;
-	}
-	const std::string forbiddenNames[] = { "tolua_ubox" }; // other string to protected ?
-	const int size = sizeof(forbiddenNames) / sizeof(*forbiddenNames);
-
-	return std::find(forbiddenNames, forbiddenNames + size, key) == forbiddenNames + size;
+	return IsAValidTableName(key);
 }
 
 static bool LuaValueToString(lua_State *l, std::string &value)

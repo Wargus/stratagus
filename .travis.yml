@@ -14,8 +14,6 @@ addons:
       - libsdl2-mixer-dev
       - libsdl2-image-dev
       - liblua5.1-0-dev
-      - libtolua++5.1-dev
-      - libtolua-dev
       - libtheora-dev
       - libvorbis-dev
       - libogg-dev
@@ -23,14 +21,7 @@ addons:
       - libpng-dev
       - zlib1g-dev
 before_script:
-  - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl2 sdl2_mixer sdl2_image; \
-         git clone https://github.com/LuaDist/toluapp.git; \
-         cd toluapp; mkdir build;
-           cd build; cmake ..; make; \
-             export CMAKEARGS=\"-DTOLUA++_INCLUDE_DIR=$(pwd)/../include/ -DTOLUA++_LIBRARY=$(pwd)/libtoluapp.dylib -DTOLUA++_APP=$(pwd)/toluapp -DWITH_X11=OFF\";
-           cd ..;
-         cd ..;
-    fi"
+  - "if [ $TRAVIS_OS_NAME == osx ]; then brew install lua51 sdl2 sdl2_mixer sdl2_image; fi"
   - mkdir build
   - cd build
   - cmake $CMAKEARGS ..
