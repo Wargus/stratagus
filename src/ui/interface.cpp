@@ -782,7 +782,7 @@ int HandleCheats(const std::string &input)
 #endif
 		} else {
 			ThisPlayer->AiEnabled = true;
-			ThisPlayer->Type = PlayerComputer;
+			ThisPlayer->Type = PlayerTypes::PlayerComputer;
 			if (!ThisPlayer->Ai) {
 				AiInit(*ThisPlayer);
 			}
@@ -881,7 +881,7 @@ static void InputKey(int key)
 #ifdef DEBUG
 			if (strncmp(Input, "ffw ", 4) == 0) {
 #else
-			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
+			if (strncmp(Input, "ffw ", 4) == 0 && CurrentReplay != nullptr) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
@@ -977,7 +977,7 @@ static void InputKey(int key)
 			}
 			if (strlen(namestart)) {
 				for (int i = 0; i < PlayerMax; ++i) {
-					if (Players[i].Type != PlayerPerson) {
+					if (Players[i].Type != PlayerTypes::PlayerPerson) {
 						continue;
 					}
 					if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {

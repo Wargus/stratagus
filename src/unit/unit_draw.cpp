@@ -623,7 +623,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (var.HideHalf && value != 0 && value != max)
 			  || (!var.ShowIfNotEnable && !unit.Variable[var.Index].Enable)
 			  || (var.ShowOnlySelected && !unit.Selected)
-			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
+			  || (unit.Player->Type == PlayerTypes::PlayerNeutral && var.HideNeutral)
 			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
 			  || var.BoolFlagMatches(type)
@@ -778,7 +778,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		}
 		if (type.CanAttack) {
 			if (Preference.ShowReactionRange) {
-				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+				const int value = (unit.Player->Type == PlayerTypes::PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
 				if (value) {

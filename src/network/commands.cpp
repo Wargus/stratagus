@@ -832,7 +832,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 			/// CommandLog(...);
 			break;
 		case ExtendedMessageRevealMapDB:
-			Map.Reveal(arg1);
+			Map.Reveal(static_cast<MapRevealModes>(arg1));
 			/// CommandLog(...);
 			break;
 		case ExtendedMessageFogOfWarDB:

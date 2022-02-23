@@ -735,7 +735,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
 
 	if (unit && (unit->Player->Index == player
-				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerNeutral)) {
+				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerTypes::PlayerNeutral)) {
 		return true;
 	} else {
 		return false;

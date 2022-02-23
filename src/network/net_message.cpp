@@ -240,24 +240,28 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
 
-	p += serialize8(p, this->ResourcesOption);
-	p += serialize8(p, this->UnitsOption);
-	p += serialize8(p, this->FogOfWar);
-	p += serialize8(p, this->Inside);
-	p += serialize8(p, this->RevealMap);
-	p += serialize8(p, this->TilesetSelection);
-	p += serialize8(p, this->GameTypeOption);
-	p += serialize8(p, this->Difficulty);
-	p += serialize8(p, this->MapRichness);
-	p += serialize8(p, this->Opponents);
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.DefeatReveal));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Difficulty));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.FoV));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.GameType));
+	// Inside is part of the bitfield
+	// NetGameType is not needed
+	// NoFogOfWar is part of the bitfield
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.NumUnits));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Opponents));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Resources));
+	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.RevealMap));
+	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
+	p += serialize32(p, this->ServerGameSettings._Bitfield);
+
 	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->CompOpt[i]);
+		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Race));
+	}
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += serialize8(p, static_cast<int8_t>(this->CompOpt[i]));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->Ready[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->Race[i]);
 	}
 	return p - buf;
 }
@@ -265,60 +269,44 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 size_t CServerSetup::Deserialize(const unsigned char *p)
 {
 	const unsigned char *buf = p;
-	p += deserialize8(p, &this->ResourcesOption);
-	p += deserialize8(p, &this->UnitsOption);
-	p += deserialize8(p, &this->FogOfWar);
-	p += deserialize8(p, &this->Inside);
-	p += deserialize8(p, &this->RevealMap);
-	p += deserialize8(p, &this->TilesetSelection);
-	p += deserialize8(p, &this->GameTypeOption);
-	p += deserialize8(p, &this->Difficulty);
-	p += deserialize8(p, &this->MapRichness);
-	p += deserialize8(p, &this->Opponents);
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.DefeatReveal));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Difficulty));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.FoV));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.GameType));
+	// Inside is part of the bitfield
+	// NetGameType is not needed
+	// NoFogOfWar is part of the bitfield
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.NumUnits));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Opponents));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Resources));
+	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.RevealMap));
+	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
+	p += deserialize32(p, &static_cast<uint32_t>(this->ServerGameSettings._Bitfield));
+
 	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->CompOpt[i]);
+		p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Presets[i].Race));
+	}
+	for (int i = 0; i < PlayerMax; ++i) {
+		p += deserialize8(p, &static_cast<int8_t>(this->CompOpt[i]));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->Ready[i]);
-	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->Race[i]);
 	}
 	return p - buf;
 }
 
 void CServerSetup::Clear()
 {
-	ResourcesOption = 0;
-	UnitsOption = 0;
-	FogOfWar = 0;
-	Inside = 0;
-	RevealMap = 0;
-	TilesetSelection = 0;
-	GameTypeOption = 0;
-	Difficulty = 0;
-	MapRichness = 0;
-	Opponents = 0;
+	ServerGameSettings.Init();
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
-	memset(Race, 0, sizeof(Race));
 }
 
 bool CServerSetup::operator == (const CServerSetup &rhs) const
 {
-	return (ResourcesOption == rhs.ResourcesOption
-			&& UnitsOption == rhs.UnitsOption
-			&& FogOfWar == rhs.FogOfWar
-			&& Inside == rhs.Inside
-			&& RevealMap == rhs.RevealMap
-			&& TilesetSelection == rhs.TilesetSelection
-			&& GameTypeOption == rhs.GameTypeOption
-			&& Difficulty == rhs.Difficulty
-			&& MapRichness == rhs.MapRichness
-			&& Opponents == rhs.Opponents
+	return (ServerGameSettings == rhs.ServerGameSettings
 			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
-			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
-			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
+			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0);
 }
 
 //

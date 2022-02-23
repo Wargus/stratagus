@@ -439,7 +439,7 @@ bool CClient::Update_connected(unsigned long tick)
 
 static bool IsLocalSetupInSync(const CServerSetup &state1, const CServerSetup &state2, int index)
 {
-	return (state1.Race[index] == state2.Race[index]
+	return (state1.ServerGameSettings.Presets[index].Race == state2.ServerGameSettings.Presets[index].Race
 			&& state1.Ready[index] == state2.Ready[index]);
 }
 
@@ -1040,7 +1040,7 @@ void CServer::KickClient(int c)
 	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
 	Hosts[c].Clear();
 	serverSetup->Ready[c] = 0;
-	serverSetup->Race[c] = 0;
+	serverSetup->ServerGameSettings.Presets[c].Race = 0;
 	networkStates[c].Clear();
 	// Resync other clients
 	for (int n = 1; n < PlayerMax - 1; ++n) {
@@ -1241,7 +1241,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
 			// occupy first available slot, excepting the first slot (the host)
-			if (serverSetup->CompOpt[i] == 0) {
+			if (serverSetup->CompOpt[i] == SlotOption::Available) {
 				if (Hosts[i].PlyNr == 0) {
 					h = i;
 					break;
@@ -1443,7 +1443,7 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			networkStates[h].MsgCnt = 0;
 			// Use information supplied by the client:
 			serverSetup->Ready[h] = msg.State.Ready[h];
-			serverSetup->Race[h] = msg.State.Race[h];
+			serverSetup->ServerGameSettings.Presets[h].Race = msg.State.ServerGameSettings.Presets[h].Race;
 			// Add additional info usage here!
 
 			// Resync other clients (and us..)
@@ -1714,7 +1714,7 @@ void NetworkInitClientConnect()
 */
 void NetworkServerStartGame()
 {
-	Assert(ServerSetupState.CompOpt[0] == 0); // the host should be slot 0
+	Assert(ServerSetupState.CompOpt[0] == SlotOption::Available); // the host should be slot 0
 
 	// save it first..
 	LocalSetupState = ServerSetupState;
@@ -1724,7 +1724,7 @@ void NetworkServerStartGame()
 	int rev[PlayerMax];
 	int h = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 			rev[i] = h;
 			num[h++] = i;
 			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
@@ -1733,25 +1733,25 @@ void NetworkServerStartGame()
 	// Make a list of the available computer slots.
 	int n = h;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerComputer) {
 			rev[i] = n++;
 			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
 		}
 	}
 	// Make a list of the remaining slots.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] != PlayerPerson
-			&& Map.Info.PlayerType[i] != PlayerComputer) {
+		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerPerson
+			&& Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
 			rev[i] = n++;
-			// PlayerNobody - not available to anything..
+			// PlayerTypes::PlayerNobody - not available to anything..
 		}
 	}
 
 #ifdef DEBUG
 	printf("INITIAL ServerSetupState:\n");
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-		if (ServerSetupState.CompOpt[i] == 0) {
+		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
+		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
 			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
 		}
@@ -1773,19 +1773,19 @@ void NetworkServerStartGame()
 
 	// Calculate NetPlayers
 	NetPlayers = h;
-	int compPlayers = ServerSetupState.Opponents;
+	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
 	for (int i = 1; i < h; ++i) {
-		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != 0) {
+		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != SlotOption::Available) {
 			NetPlayers--;
 		} else if (Hosts[i].PlyName[0] == 0) {
 			NetPlayers--;
 			if (--compPlayers >= 0) {
 				// Unused slot gets a computer player
-				ServerSetupState.CompOpt[i] = 1;
-				LocalSetupState.CompOpt[i] = 1;
+				ServerSetupState.CompOpt[i] = SlotOption::Computer;
+				LocalSetupState.CompOpt[i] = SlotOption::Computer;
 			} else {
-				ServerSetupState.CompOpt[i] = 2;
-				LocalSetupState.CompOpt[i] = 2;
+				ServerSetupState.CompOpt[i] = SlotOption::Closed;
+				LocalSetupState.CompOpt[i] = SlotOption::Closed;
 			}
 		}
 	}
@@ -1800,7 +1800,7 @@ void NetworkServerStartGame()
 					Hosts[i] = Hosts[j];
 					Hosts[j].Clear();
 					std::swap(LocalSetupState.CompOpt[i], LocalSetupState.CompOpt[j]);
-					std::swap(LocalSetupState.Race[i], LocalSetupState.Race[j]);
+					std::swap(LocalSetupState.ServerGameSettings.Presets[i].Race, LocalSetupState.ServerGameSettings.Presets[j].Race);
 					break;
 				}
 			}
@@ -1816,7 +1816,7 @@ void NetworkServerStartGame()
 
 	if (NoRandomPlacementMultiplayer == 1) {
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (Map.Info.PlayerType[i] != PlayerComputer) {
+			if (Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
 				org[i] = Hosts[i].PlyNr;
 			}
 		}
@@ -1849,7 +1849,7 @@ void NetworkServerStartGame()
 		num[i] = 1;
 		n = org[i];
 		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
-		ServerSetupState.Race[n] = LocalSetupState.Race[i];
+		ServerSetupState.ServerGameSettings.Presets[n].Race = LocalSetupState.ServerGameSettings.Presets[i].Race;
 	}
 
 	/* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
@@ -2014,7 +2014,7 @@ void NetworkInitServerConnect(int openslots)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
 
 	for (int i = openslots; i < PlayerMax - 1; ++i) {
-		ServerSetupState.CompOpt[i] = 1;
+		ServerSetupState.CompOpt[i] = SlotOption::Computer;
 	}
 }
 
@@ -2034,13 +2034,13 @@ void NetworkServerResyncClients()
 void NetworkGamePrepareGameSettings()
 {
 	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
-
-	GameSettings.NetGameType = SettingsMultiPlayerGame;
+	GameSettings = ServerSetupState.ServerGameSettings;
+	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 
 #ifdef DEBUG
 	for (int i = 0; i < PlayerMax - 1; i++) {
-		printf("%02d: CO: %d   Race: %d   Name: ", i, ServerSetupState.CompOpt[i], ServerSetupState.Race[i]);
-		if (ServerSetupState.CompOpt[i] == 0) {
+		printf("%02d: CO: %d   Race: %d   Name: ", i, ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
+		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			for (int h = 0; h != HostsCount; ++h) {
 				if (Hosts[h].PlyNr == i) {
 					printf("%s", Hosts[h].PlyName);
@@ -2060,41 +2060,41 @@ void NetworkGamePrepareGameSettings()
 	int c = 0;
 	int h = 0;
 	for (int i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerPerson) {
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 			num[h++] = i;
 		}
-		if (Map.Info.PlayerType[i] == PlayerComputer) {
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerComputer) {
 			comp[c++] = i; // available computer player slots
 		}
 	}
 	for (int i = 0; i < h; i++) {
-		GameSettings.Presets[num[i]].Race = ServerSetupState.Race[num[i]];
+		GameSettings.Presets[num[i]].Race = ServerSetupState.ServerGameSettings.Presets[num[i]].Race;
 		switch (ServerSetupState.CompOpt[num[i]]) {
 			case 0: {
-				GameSettings.Presets[num[i]].Type = PlayerPerson;
+				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerPerson;
 				break;
 			}
 			case 1:
-				GameSettings.Presets[num[i]].Type = PlayerComputer;
+				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerComputer;
 				break;
 			case 2:
-				GameSettings.Presets[num[i]].Type = PlayerNobody;
+				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerNobody;
 			default:
 				break;
 		}
 	}
 	for (int i = 0; i < c; i++) {
-		if (ServerSetupState.CompOpt[comp[i]] == 2) { // closed..
-			GameSettings.Presets[comp[i]].Type = PlayerNobody;
+		if (ServerSetupState.CompOpt[comp[i]] == SlotOption::Closed) { // closed..
+			GameSettings.Presets[comp[i]].Type = PlayerTypes::PlayerNobody;
 			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
 		}
 	}
 
 #ifdef DEBUG
 	for (int i = 0; i != HostsCount; ++i) {
-		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerPerson);
+		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerTypes::PlayerPerson);
 	}
-	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerPerson);
+	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerTypes::PlayerPerson);
 #endif
 }
 

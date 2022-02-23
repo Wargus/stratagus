@@ -38,10 +38,9 @@
 #include "vec2i.h"
 #include "map.h"
 #include "tileset.h"
-
+#include "settings.h"
 
 /// Select algorithm for field of view
-enum class FieldOfViewTypes { cShadowCasting,  cSimpleRadial, NumOfTypes }; 
 
 class CFieldOfView
 {

@@ -464,7 +464,7 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 	if (number > 1) { // load a sound group
 		id->Sound.OneGroup = new Mix_Chunk *[number];
 		memset(id->Sound.OneGroup, 0, sizeof(Mix_Chunk *) * number);
-		id->Number = number;
+		id->Number = static_cast<unsigned char>(number);
 		for (unsigned int i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {

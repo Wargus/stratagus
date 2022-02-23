@@ -114,7 +114,7 @@ void ShowLoadProgress(const char *fmt, ...)
 */
 bool IsDemoMode()
 {
-	return GameRunning && ThisPlayer->Type == PlayerNobody;
+	return GameRunning && ThisPlayer->Type == PlayerTypes::PlayerNobody;
 }
 
 CUnitInfoPanel::~CUnitInfoPanel()

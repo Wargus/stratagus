@@ -947,7 +947,7 @@ public:
 			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
-					if (pos >= good->size()) {
+					if (pos < 0 || static_cast<unsigned int>(pos) >= good->size()) {
 						DebugPrint("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
 								   "size: %d, pos: %d, "				\
 								   "x: %d, xx: %d, y: %d, yy: %d\n" _C_
@@ -1039,7 +1039,7 @@ private:
 			for (int xx = -1; xx <= 1; ++xx) {
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
-				if (pos >= good->size()) {
+				if (pos < 0 || static_cast<unsigned int>(pos) >= good->size()) {
 					DebugPrint("BUG: RangeTargetFinder.Compute out of range. " \
 							   "size: %d, pos: %d, "	\
 							   "x: %d, xx: %d, y: %d, yy: %d \n" _C_
@@ -1217,7 +1217,7 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 {
 	Assert(unit.Type->CanAttack);
-	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
+	const int range = unit.Player->Type == PlayerTypes::PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
 	return AttackUnitsInDistance(unit, range, pred);
 }
 

@@ -824,7 +824,7 @@ void SaveUnitTypes(CFile &file)
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
-			if (Players[j].Type != PlayerNobody) {
+			if (Players[j].Type != PlayerTypes::PlayerNobody) {
 				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
 			}
 		}
