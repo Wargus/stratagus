@@ -681,7 +681,7 @@ else()
   find_package(Lua51 REQUIRED)
 endif()
 
-set(LUABRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/LuaBridge3-2.6/Source)
+set(LUABRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/third-party/LuaBridge3-3.0-beta1)
 
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)

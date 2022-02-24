@@ -41,6 +41,8 @@
 #include "map.h"
 #include "tileset.h"
 #include "minimap.h"
+#include "network.h"
+#include "netconnect.h"
 
 extern bool IsReplayGame();
 extern void StartMap(const std::string &filename, bool clean = true);
@@ -50,8 +52,17 @@ extern int SaveReplay(const std::string &filename);
 
 #include <LuaBridge/LuaBridge.h>
 
+/**
+ * @brief Expose C++ functions, variables, classes, and structures to Lua.
+ * 
+ * This replaces the generated code from tolua++. For backwards compatibility,
+ * we export the old exposed APIs first. This should be kept until the end of
+ * the 3.x series. These APIs are copied from the "sg" module to the global
+ * namespace so that games continue to work. Any new API will only be exposed
+ * on the "sg" module.
+ */
 int tolua_stratagus_open(lua_State *Lua) {
-    luabridge::getGlobalNamespace(Lua)
+    luabridge::getGlobalNamespace(Lua).beginNamespace("sg")
         // ai.pkg
         .addFunction("AiAttackWithForceAt", AiAttackWithForceAt)
         .addFunction("AiAttackWithForce", AiAttackWithForce)
@@ -177,6 +188,41 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("Transparent", &CMinimap::Transparent)
         .endClass()
         // network.pkg
+        .addFunction("InitNetwork1", InitNetwork1)
+        .addFunction("ExitNetwork1", ExitNetwork1)
+        .addFunction("IsNetworkGame", IsNetworkGame)
+        .addFunction("NetworkSetupServerAddress", NetworkSetupServerAddress)
+        .addFunction("NetworkInitClientConnect", NetworkInitClientConnect)
+        .addFunction("NetworkInitServerConnect", NetworkInitServerConnect)
+        .addFunction("NetworkServerStartGame", NetworkServerStartGame)
+        .addFunction("NetworkProcessClientRequest", NetworkProcessClientRequest)
+        .addFunction("GetNetworkState", GetNetworkState)
+        .addFunction("NetworkServerResyncClients", NetworkServerResyncClients)
+        .addFunction("NetworkDetachFromServer", NetworkDetachFromServer)
+        .beginClass<CServerSetup>("ServerSetup")
+            .addProperty("ResourcesOption", +[](const CServerSetup *s) { return s->ServerGameSettings.Resources; },
+                                            +[](CServerSetup *s, int value) { s->ServerGameSettings.Resources = value; })
+            .addProperty("UnitsOption", +[](const CServerSetup *s) { return s->ServerGameSettings.NumUnits; },
+                                        +[](CServerSetup *s, int value) { s->ServerGameSettings.NumUnits = value; })
+            .addProperty("FogOfWar", +[](const CServerSetup *s) { return s->ServerGameSettings.NoFogOfWar != 1; },
+                                     +[](CServerSetup *s, int value) { s->ServerGameSettings.NoFogOfWar = value ? 0 : 1; })
+            .addProperty("Inside", +[](const CServerSetup *s) { return s->ServerGameSettings.Inside == 1; },
+                                   +[](CServerSetup *s, int value) { s->ServerGameSettings.Inside = value ? 1 : 0; })
+            .addProperty("RevealMap", +[](const CServerSetup *s) { return static_cast<int>(s->ServerGameSettings.RevealMap); },
+                                      +[](CServerSetup *s, int value) { s->ServerGameSettings.RevealMap = static_cast<MapRevealModes>(value); })
+            .addProperty("GameTypeOption", +[](const CServerSetup *s) { return static_cast<int>(s->ServerGameSettings.GameType); },
+                                           +[](CServerSetup *s, int value) { s->ServerGameSettings.GameType = static_cast<GameTypes>(value); })
+            .addProperty("Difficulty", +[](const CServerSetup *s) { return s->ServerGameSettings.Difficulty; },
+                                       +[](CServerSetup *s, int value) { s->ServerGameSettings.Difficulty = value; })
+            .addProperty("MapRichness", +[](const CServerSetup*) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); return 0; },
+                                        +[](CServerSetup*, int) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); })
+            .addProperty("Opponents", +[](const CServerSetup *s) { return s->ServerGameSettings.Opponents; },
+                                       +[](CServerSetup *s, int value) { s->ServerGameSettings.Opponents = value; })
+            .addProperty("CompOpt", +[](const CServerSetup *s) { return s->CompOpt; })
+	// unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
+	// unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
+	// unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.
+        .endClass()
         // particle.pkg
         // pathfinder.pkg
         // player.pkg
@@ -189,7 +235,27 @@ int tolua_stratagus_open(lua_State *Lua) {
         // unittype.pkg
         // upgrade.pkg
         // video.pkg
-    ;
+    .endNamespace();
+
+    // Backwards compatibility: copy everything above from StratagusEngine to the global namespace
+    lua_getglobal(Lua, "sg");
+    lua_pushnil(Lua);
+    // [nil, table]
+    while (lua_next(Lua, -2)) {
+        // [value, key, table]
+        lua_pushvalue(Lua, -2);
+        // [key, value, key, table]
+        lua_pushvalue(Lua, -2);
+        // [value, key, value, key, table]
+        lua_settable(Lua, LUA_GLOBALSINDEX);
+        // [value, key, table]
+        lua_pop(Lua, 1);
+        // [key, table]
+    }
+    // [table]
+    lua_pop(Lua, 1);
+
+    // any newly exposed APIs should go below
 
     return 0;
 }
