@@ -5601,6 +5601,63 @@ class Namespace : public detail::Registrar
         }
 
         template <class TG, class TS = TG>
+        Class<T>& addArrayProperty(char const* name, TG (*get)(const T*, int), void (*set)(T*, int, TS) = nullptr)
+        {
+            assert(name != nullptr);
+            assertStackState(); // Stack: const table (co), class table (cl), static table (st)
+
+            lua_pushlightuserdata(L, get);
+            lua_pushlightuserdata(L, set);
+            lua_pushcclosure(L, +[](lua_State *l) {
+                // make the proxy table
+                lua_newtable(l); // table
+                lua_newtable(l); // metatable, table
+
+                lua_pushstring(l, "__index"); // key, metatable, table
+                lua_pushvalue(l, 1); // this pointer
+                lua_pushvalue(l, lua_upvalueindex(1)); // getter pointer
+                lua_pushcclosure(l, +[](lua_State *l) {
+                    // Args: table, name
+                    if (!lua_isnumber(l, 2)) {
+                        return luaL_error(l, "Not an index '%s'", lua_tostring(l, 2));
+                    }
+                    T *s = reinterpret_cast<T *>(lua_touserdata(l, lua_upvalueindex(1)));
+                    int idx = lua_tointeger(l, 2);
+                    Stack<TG>::push(l, reinterpret_cast<TG(*)(const T*, int)>(lua_touserdata(l, lua_upvalueindex(2)))(s, idx));
+                    return 1;
+                }, 2); // func, key, metatable, table
+                lua_rawset(l, -2); // metatable, table
+
+                lua_pushstring(l, "__newindex"); // key, metatable, table
+                lua_pushvalue(l, 1); // this pointer
+                lua_pushvalue(l, lua_upvalueindex(2)); // setter pointer
+                lua_pushcclosure(l, +[](lua_State *l) {
+                    // Args: table, name, new value
+                    if (!lua_isnumber(l, 2)) {
+                        return luaL_error(l, "Not an index '%s'", lua_tostring(l, 2));
+                    }
+                    T *s = reinterpret_cast<T *>(lua_touserdata(l, lua_upvalueindex(1)));
+                    int idx = lua_tointeger(l, 2);
+                    void *setter = lua_touserdata(l, lua_upvalueindex(2));
+                    if (setter == nullptr) {
+                        return luaL_error(l, "read-only array");
+                    } else {
+                        reinterpret_cast<void(*)(T*, int, TS)>(setter)(s, idx, Stack<TS>::get(l, 3));
+                    }
+                    return 0;
+                }, 2); // func, key, metatable, table
+                lua_rawset(l, -2); // metatable, table
+                lua_setmetatable(l, -1); // table
+                return 1;
+            }, 2); // Stack: co, cl, st, getter
+            lua_pushvalue(L, -1); // Stack: co, cl, st, getter, getter
+            CFunc::addGetter(L, name, -5); // Stack: co, cl, st, getter
+            CFunc::addGetter(L, name, -3); // Stack: co, cl, st,
+            
+            return *this;
+        }
+
+        template <class TG, class TS = TG>
         Class<T>& addProperty(char const* name, std::function<TG(const T*)> get, std::function<void(T*, TS)> set = nullptr)
         {
             using GetType = decltype(get);
@@ -6111,6 +6168,62 @@ public:
             CFunc::addSetter(L, name, -2); // Stack: ns
         }
 
+        return *this;
+    }
+    
+    template <class TG, class TS = TG>
+    Namespace& addArrayProperty(char const* name, TG (*get)(int), void (*set)(int, TS) = 0)
+    {
+        if (m_stackSize == 1)
+            throw std::logic_error("addProperty () called on global namespace");
+
+        assert(name != nullptr);
+        assert(lua_istable(L, -1)); // Stack: namespace table (ns)
+
+        lua_pushlightuserdata(L, get);
+        lua_pushlightuserdata(L, set);
+        lua_pushcclosure(L, +[](lua_State *l) {
+            // make the proxy table
+            lua_newtable(l); // table
+            lua_newtable(l); // metatable, table
+
+            lua_pushstring(l, "__index"); // key, metatable, table
+            lua_pushvalue(l, lua_upvalueindex(1)); // getter pointer
+            lua_pushcclosure(l, +[](lua_State *l) {
+                // Args: table, name
+                if (!lua_isnumber(l, 2)) {
+                    return luaL_error(l, "Not an index '%s'", lua_tostring(l, 2));
+                }
+                int idx = lua_tointeger(l, 2);
+                Stack<TG>::push(l, reinterpret_cast<TG(*)(int)>(lua_touserdata(l, lua_upvalueindex(1)))(idx));
+                return 1;
+            }, 1); // func, key, metatable, table
+            lua_rawset(l, -2); // metatable, table
+
+            lua_pushstring(l, "__newindex"); // key, metatable, table
+            lua_pushvalue(l, lua_upvalueindex(2)); // setter pointer
+            lua_pushcclosure(l, +[](lua_State *l) {
+                // Args: table, name, new value
+                if (!lua_isnumber(l, 2)) {
+                    return luaL_error(l, "Not an index '%s'", lua_tostring(l, 2));
+                }
+                int idx = lua_tointeger(l, 2);
+                void *setter = lua_touserdata(l, lua_upvalueindex(1));
+                if (setter == nullptr) {
+                    return luaL_error(l, "read-only array");
+                } else {
+                    reinterpret_cast<void(*)(int, TS)>(setter)(idx, Stack<TS>::get(l, 3));
+                }
+                return 0;
+            }, 1); // func, key, metatable, table
+            lua_rawset(l, -2); // metatable, table
+            lua_setmetatable(l, -1); // table
+            return 1;
+        }, 2); // Stack: co, cl, st, getter
+        lua_pushvalue(L, -1); // Stack: co, cl, st, getter, getter
+        CFunc::addGetter(L, name, -5); // Stack: co, cl, st, getter
+        CFunc::addGetter(L, name, -3); // Stack: co, cl, st,
+        
         return *this;
     }
 

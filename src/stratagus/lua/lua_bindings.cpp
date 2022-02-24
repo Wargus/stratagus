@@ -50,6 +50,9 @@ extern void StartReplay(const std::string &filename, bool reveal = true);
 extern void StartSavedGame(const std::string &filename);
 extern int SaveReplay(const std::string &filename);
 
+extern std::string NetworkMapName;
+extern std::string NetworkMapFragmentName;
+
 #include <LuaBridge/LuaBridge.h>
 
 /**
@@ -94,7 +97,8 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<CFontColor>("CFontColor")
             .addStaticFunction("New", &CFontColor::New)
             .addStaticFunction("Get", &CFontColor::Get)
-            .addProperty("Colors", +[](const CFontColor *color) { return color->Colors; })
+            .addArrayProperty("Colors", +[](const CFontColor *color, int idx) { return color->Colors[idx]; },
+                                        +[](CFontColor *color, int idx, CColor &value) { color->Colors[idx] = value; })
         .endClass()
         // game.pkg
         .addFunction("IsReplayGame", IsReplayGame)
@@ -131,7 +135,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<Settings>("Settings")
             .addProperty("NetGameType", +[](const Settings* settings) { return static_cast<int>(settings->NetGameType); },
                                         +[](Settings* settings, int type) { settings->NetGameType = static_cast<NetGameTypes>(type); })
-            .addProperty("Presets", +[](const Settings *settings) { return settings->Presets; })
+            .addArrayProperty("Presets", +[](const Settings *settings, int idx) { return settings->Presets[idx]; })
             .addProperty("Resources", &Settings::Resources)
             .addProperty("NumUnits", &Settings::NumUnits)
             .addProperty("Opponents", &Settings::Opponents)
@@ -166,7 +170,8 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("Postamble", &CMapInfo::Postamble)
             .addProperty("MapWidth", &CMapInfo::MapWidth)
             .addProperty("MapHeight", &CMapInfo::MapHeight)
-            .addProperty("PlayerType", +[](const CMapInfo *info) { return info->PlayerType; })
+            .addArrayProperty("PlayerType", +[](const CMapInfo *info, int idx) { return static_cast<int>(info->PlayerType[idx]); },
+                                            +[](CMapInfo *info, int idx, int value) { info->PlayerType[idx] = static_cast<PlayerTypes>(value); })
         .endClass()
         .beginClass<CTileset>("CTileset")
             .addProperty("Name", &CTileset::Name)
@@ -218,11 +223,27 @@ int tolua_stratagus_open(lua_State *Lua) {
                                         +[](CServerSetup*, int) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); })
             .addProperty("Opponents", +[](const CServerSetup *s) { return s->ServerGameSettings.Opponents; },
                                        +[](CServerSetup *s, int value) { s->ServerGameSettings.Opponents = value; })
-            .addProperty("CompOpt", +[](const CServerSetup *s) { return s->CompOpt; })
-	// unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
-	// unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
-	// unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.
+            .addArrayProperty("CompOpt", +[](const CServerSetup *s, int idx) { return static_cast<int>(s->CompOpt[idx]); },
+                                         +[](CServerSetup *s, int idx, int value) { s->CompOpt[idx] = static_cast<SlotOption>(value); })
+            .addArrayProperty("Ready", +[](const CServerSetup *s, int idx) { return s->Ready[idx]; },
+                                       +[](CServerSetup *s, int idx, int value) { s->Ready[idx] = value; })
+            .addArrayProperty("Race", +[](const CServerSetup *s, int idx) { return s->ServerGameSettings.Presets[idx].Race; },
+                                      +[](CServerSetup *s, int idx, int value) { s->ServerGameSettings.Presets[idx].Race = value; })
         .endClass()
+        .addProperty("LocalSetupState", &LocalSetupState, false)
+        .addProperty("ServerSetupState", &ServerSetupState, false)
+        .addProperty("NetLocalHostsSlot", &NetLocalHostsSlot, false)
+        .addProperty("NetPlayerNameSize", &NetLocalHostsSlot, false)
+        .beginClass<CNetworkHost>("CNetworkHost")
+            .addProperty("Host", &CNetworkHost::Host, false)
+            .addProperty("Port", &CNetworkHost::Port, false)
+            .addProperty("PlyNr", &CNetworkHost::PlyNr, false)
+            .addProperty("PlyName", +[](const CNetworkHost *s) { return std::string(s->PlyName); })
+        .endClass()
+        .addArrayProperty("Hosts", +[](int idx) { return Hosts[idx]; })
+        .addProperty("NetworkMapName", &NetworkMapName)
+        .addProperty("NetworkMapFragmentName", &NetworkMapFragmentName)
+        .addFunction("NetworkGamePrepareGameSettings", NetworkGamePrepareGameSettings)
         // particle.pkg
         // pathfinder.pkg
         // player.pkg
