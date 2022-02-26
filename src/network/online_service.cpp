@@ -769,7 +769,7 @@ protected:
     void handleUserdata(Context *);
     void finishMessage(Context *);
 
-    boolean handleGenericMessages(Context *ctx, uint8_t msg) {
+    bool handleGenericMessages(Context *ctx, uint8_t msg) {
         switch (msg) {
         case 0x00: // SID_NULL
             handleNull(ctx);
