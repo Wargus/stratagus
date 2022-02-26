@@ -35,25 +35,73 @@
 #include "editor.h"
 #include "font.h"
 #include "game.h"
+#include "interface.h"
+#include "iolib.h"
+#include "map.h"
+#include "minimap.h"
+#include "movie.h"
+#include "netconnect.h"
+#include "network.h"
+#include "particle.h"
+#include "pathfinder.h"
+#include "player.h"
 #include "replay.h"
 #include "results.h"
-#include "interface.h"
-#include "map.h"
+#include "sound_server.h"
+#include "sound.h"
 #include "tileset.h"
-#include "minimap.h"
-#include "network.h"
-#include "netconnect.h"
+#include "translate.h"
+#include "ui.h"
+#include "unit_manager.h"
+#include "unit.h"
+#include "unittype.h"
+#include "video.h"
+#include "widgets.h"
+
+
+#include <LuaBridge/LuaBridge.h>
+
 
 extern bool IsReplayGame();
 extern void StartMap(const std::string &filename, bool clean = true);
 extern void StartReplay(const std::string &filename, bool reveal = true);
 extern void StartSavedGame(const std::string &filename);
 extern int SaveReplay(const std::string &filename);
-
 extern std::string NetworkMapName;
 extern std::string NetworkMapFragmentName;
+extern std::string CliMapName;
+extern int GetNumOpponents(int player);
+extern int GetTimer();
+extern void ActionVictory();
+extern void ActionDefeat();
+extern void ActionDraw();
+extern void ActionSetTimer(int cycles, bool increasing);
+extern void ActionStartTimer();
+extern void ActionStopTimer();
+extern void SetTrigger(int trigger);
 
-#include <LuaBridge/LuaBridge.h>
+
+template <class T, int SZ>
+struct CArray {
+    CArray(T *array) {
+        this->array = array;
+    }
+
+    int size() {
+        return SZ;
+    }
+
+    T& operator[](int idx) {
+        return array[idx];
+    }
+
+    T operator[](int idx) const {
+        return array[idx];
+    }
+
+    T *array;
+};
+
 
 /**
  * @brief Expose C++ functions, variables, classes, and structures to Lua.
@@ -65,7 +113,167 @@ extern std::string NetworkMapFragmentName;
  * on the "sg" module.
  */
 int tolua_stratagus_open(lua_State *Lua) {
+    using IntArray = CArray<int, PlayerMax>;
+    using Int7Array = CArray<int, MaxCosts>;
+    using ReadyArray = CArray<const uint8_t, PlayerMax>;
+    using SlotOptionArray = CArray<const SlotOption, PlayerMax>;
+    using ConstIntArray = CArray<const int, PlayerMax>;
+    using ConstInt7Array = CArray<const int, MaxCosts>;
+    using ConstInt2048Array = CArray<const int, UnitTypeMax>;
+    using CColorArray = CArray<const CColor, MaxFontColors>;
+    using SettingsPresetsArray = CArray<const SettingsPresets, PlayerMax>;
+    using PlayerTypesArray = CArray<const PlayerTypes, PlayerMax>;
+    using SettingsPresetsRaceArray = CArray<const SettingsPresets, PlayerMax>;
+    using CNetworkHostArray = CArray<CNetworkHost, PlayerMax>;
+    using CPlayerArray = CArray<CPlayer, PlayerMax>;
+
     luabridge::getGlobalNamespace(Lua).beginNamespace("sg")
+        // proxy array definitions
+        .beginClass<IntArray>("__IntArray")
+            .addFunction("__index", +[](IntArray* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](IntArray* thiz, int index, const int value, lua_State* L) {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                (*thiz)[index] = value;
+            })
+        .endClass()
+        .beginClass<Int7Array>("__Int7Array")
+            .addFunction("__index", +[](Int7Array* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index > MaxCosts)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](Int7Array* thiz, int index, const int value, lua_State* L) {
+                if (index < 0 || index > MaxCosts)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                (*thiz)[index] = value;
+            })
+        .endClass()
+        .beginClass<ReadyArray>("__ReadyArray")
+            .addFunction("__index", +[](ReadyArray* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](ReadyArray* thiz, int index, const int value, lua_State* L) {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<uint8_t *>(thiz->array)[index] = value;
+            })
+        .endClass()
+        .beginClass<SlotOptionArray>("__SlotOptionArray")
+            .addFunction("__index", +[](SlotOptionArray* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return static_cast<int>((*thiz)[index]);
+            })
+            .addFunction("__newindex", +[](SlotOptionArray* thiz, int index, const int value, lua_State* L) {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<SlotOption *>(thiz->array)[index] = static_cast<SlotOption>(value);
+            })
+        .endClass()
+        .beginClass<ConstIntArray>("__ConstIntArray")
+            .addFunction("__index", +[](ConstIntArray* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](ConstIntArray* thiz, int index, const int value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<ConstInt7Array>("__ConstInt7Array")
+            .addFunction("__index", +[](ConstInt7Array* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= MaxCosts)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](ConstInt7Array* thiz, int index, const int value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<ConstInt2048Array>("__ConstInt2048Array")
+            .addFunction("__index", +[](ConstInt2048Array* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= UnitTypeMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](ConstInt2048Array* thiz, int index, const int value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<CColorArray>("__CColorArray")
+            .addFunction("__index", +[](CColorArray* thiz, int index, lua_State* L) -> CColor {
+                if (index < 0 || index >= MaxFontColors)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](CColorArray* thiz, int index, const CColor &value, lua_State* L) {
+                if (index < 0 || index >= MaxFontColors)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<CColor *>(thiz->array)[index] = value;
+            })
+        .endClass()
+        .beginClass<SettingsPresetsArray>("__SettingsPresetsArray")
+            .addFunction("__index", +[](SettingsPresetsArray* thiz, int index, lua_State* L) -> SettingsPresets {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](SettingsPresetsArray* thiz, int index, const SettingsPresets &value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<PlayerTypesArray>("__PlayerTypesArray")
+            .addFunction("__index", +[](PlayerTypesArray* thiz, int index, lua_State* L) -> PlayerTypes {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](PlayerTypesArray* thiz, int index, const PlayerTypes &value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<SettingsPresetsRaceArray>("__SettingsPresetsRaceArray")
+            .addFunction("__index", +[](SettingsPresetsRaceArray* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index].Race;
+            })
+            .addFunction("__newindex", +[](SettingsPresetsRaceArray* thiz, int index, int value, lua_State* L) {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<SettingsPresets *>(thiz->array)[index].Race = value;
+            })
+        .endClass()
+        .beginClass<CNetworkHostArray>("__CNetworkHostArray")
+            .addFunction("__index", +[](CNetworkHostArray* thiz, int index, lua_State* L) -> CNetworkHost {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](CNetworkHostArray* thiz, int index, const CNetworkHost &value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+        .beginClass<CPlayerArray>("__CPlayerArray")
+            .addFunction("__index", +[](CPlayerArray* thiz, int index, lua_State* L) -> CPlayer {
+                if (index < 0 || index >= PlayerMax)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](CPlayerArray* thiz, int index, const CPlayer &value, lua_State* L) {
+                luaL_error(L, "Read-only array");
+            })
+        .endClass()
+
         // ai.pkg
         .addFunction("AiAttackWithForceAt", AiAttackWithForceAt)
         .addFunction("AiAttackWithForce", AiAttackWithForce)
@@ -97,8 +305,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<CFontColor>("CFontColor")
             .addStaticFunction("New", &CFontColor::New)
             .addStaticFunction("Get", &CFontColor::Get)
-            .addArrayProperty("Colors", +[](const CFontColor *color, int idx) { return color->Colors[idx]; },
-                                        +[](CFontColor *color, int idx, CColor &value) { color->Colors[idx] = value; })
+            .addProperty("Colors", +[](const CFontColor* fc) { return static_cast<CColorArray>(fc->Colors); })
         .endClass()
         // game.pkg
         .addFunction("IsReplayGame", IsReplayGame)
@@ -135,7 +342,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<Settings>("Settings")
             .addProperty("NetGameType", +[](const Settings* settings) { return static_cast<int>(settings->NetGameType); },
                                         +[](Settings* settings, int type) { settings->NetGameType = static_cast<NetGameTypes>(type); })
-            .addArrayProperty("Presets", +[](const Settings *settings, int idx) { return settings->Presets[idx]; })
+            .addProperty("Presets", +[](const Settings *settings) { return static_cast<SettingsPresetsArray>(settings->Presets); })
             .addProperty("Resources", &Settings::Resources)
             .addProperty("NumUnits", &Settings::NumUnits)
             .addProperty("Opponents", &Settings::Opponents)
@@ -170,8 +377,7 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("Postamble", &CMapInfo::Postamble)
             .addProperty("MapWidth", &CMapInfo::MapWidth)
             .addProperty("MapHeight", &CMapInfo::MapHeight)
-            .addArrayProperty("PlayerType", +[](const CMapInfo *info, int idx) { return static_cast<int>(info->PlayerType[idx]); },
-                                            +[](CMapInfo *info, int idx, int value) { info->PlayerType[idx] = static_cast<PlayerTypes>(value); })
+            .addProperty("PlayerType", +[](const CMapInfo *info) { return static_cast<PlayerTypesArray>(info->PlayerType); })
         .endClass()
         .beginClass<CTileset>("CTileset")
             .addProperty("Name", &CTileset::Name)
@@ -223,12 +429,9 @@ int tolua_stratagus_open(lua_State *Lua) {
                                         +[](CServerSetup*, int) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); })
             .addProperty("Opponents", +[](const CServerSetup *s) { return s->ServerGameSettings.Opponents; },
                                        +[](CServerSetup *s, int value) { s->ServerGameSettings.Opponents = value; })
-            .addArrayProperty("CompOpt", +[](const CServerSetup *s, int idx) { return static_cast<int>(s->CompOpt[idx]); },
-                                         +[](CServerSetup *s, int idx, int value) { s->CompOpt[idx] = static_cast<SlotOption>(value); })
-            .addArrayProperty("Ready", +[](const CServerSetup *s, int idx) { return s->Ready[idx]; },
-                                       +[](CServerSetup *s, int idx, int value) { s->Ready[idx] = value; })
-            .addArrayProperty("Race", +[](const CServerSetup *s, int idx) { return s->ServerGameSettings.Presets[idx].Race; },
-                                      +[](CServerSetup *s, int idx, int value) { s->ServerGameSettings.Presets[idx].Race = value; })
+            .addProperty("CompOpt", +[](const CServerSetup *s) { return static_cast<SlotOptionArray>(s->CompOpt); })
+            .addProperty("Ready", +[](const CServerSetup *s) { return static_cast<ReadyArray>(s->Ready); })
+            .addProperty("Race", +[](const CServerSetup *s) { return static_cast<SettingsPresetsRaceArray>(s->ServerGameSettings.Presets); })
         .endClass()
         .addProperty("LocalSetupState", &LocalSetupState, false)
         .addProperty("ServerSetupState", &ServerSetupState, false)
@@ -240,17 +443,210 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("PlyNr", &CNetworkHost::PlyNr, false)
             .addProperty("PlyName", +[](const CNetworkHost *s) { return std::string(s->PlyName); })
         .endClass()
-        .addArrayProperty("Hosts", +[](int idx) { return Hosts[idx]; })
+        .addProperty("Hosts", +[]() { return static_cast<CNetworkHostArray>(Hosts); })
         .addProperty("NetworkMapName", &NetworkMapName)
         .addProperty("NetworkMapFragmentName", &NetworkMapFragmentName)
         .addFunction("NetworkGamePrepareGameSettings", NetworkGamePrepareGameSettings)
         // particle.pkg
+        .beginClass<CPosition>("CPosition")
+            .addConstructor<void (*) (int, int)>()
+            .addProperty("x", &CPosition::x)
+            .addProperty("y", &CPosition::y)
+        .endClass()
+        .beginClass<GraphicAnimation>("GraphicAnimation")
+            .addConstructor<void (*) (CGraphic *, int)>()
+            .addFunction("clone", &GraphicAnimation::clone)
+        .endClass()
+        .beginClass<CParticle>("CParticle")
+            .addFunction("clone", &CParticle::clone)
+            .addFunction("setDrawLevel", &CParticle::setDrawLevel)
+        .endClass()
+        .deriveClass<StaticParticle, CParticle>("StaticParticle")
+            .addConstructor<void (*) (CPosition, GraphicAnimation *, int)>()
+        .endClass()
+        .deriveClass<CChunkParticle, CParticle>("CChunkParticle")
+            .addConstructor<void (*) (CPosition, GraphicAnimation *, GraphicAnimation *, GraphicAnimation *, int, int, int, int, int)>()
+            .addFunction("getSmokeDrawLevel", &CChunkParticle::getSmokeDrawLevel)
+            .addFunction("getDestroyDrawLevel", &CChunkParticle::getDestroyDrawLevel)      
+            .addFunction("setSmokeDrawLevel", &CChunkParticle::setSmokeDrawLevel)
+            .addFunction("setDestroyDrawLevel", &CChunkParticle::setDestroyDrawLevel)
+        .endClass()
+        .deriveClass<CSmokeParticle, CParticle>("CSmokeParticle")
+            .addConstructor<void (*) (CPosition, GraphicAnimation *, float, float, int)>()
+        .endClass()
+        .deriveClass<CRadialParticle, CParticle>("CRadialParticle")
+            .addConstructor<void (*) (CPosition, GraphicAnimation *, int, int)>()
+        .endClass()
+        .beginClass<CParticleManager>("CParticleManager")
+            .addConstructor<void (*) ()>()
+            .addFunction("add", &CParticleManager::add)
+        .endClass()
+        .addProperty("CParticleManager", &ParticleManager)
         // pathfinder.pkg
+        .addProperty("AStarFixedUnitCrossingCost", +[]() { return GetAStarFixedUnitCrossingCost(); }, +[](int v) { SetAStarFixedUnitCrossingCost(v); })
+        .addProperty("AStarMovingUnitCrossingCost", +[]() { return GetAStarMovingUnitCrossingCost(); }, +[](int v) { SetAStarMovingUnitCrossingCost(v); })
+        .addProperty("AStarKnowUnseenTerrain", &AStarKnowUnseenTerrain)
+        .addProperty("AStarUnknownTerrainCost", +[]() { return GetAStarUnknownTerrainCost(); }, +[](int v) { SetAStarUnknownTerrainCost(v); })
         // player.pkg
+        .addProperty("PlayerNeutral", +[]() { return static_cast<int>(PlayerTypes::PlayerNeutral); })
+        .addProperty("PlayerNobody", +[]() { return static_cast<int>(PlayerTypes::PlayerNobody); })
+        .addProperty("PlayerComputer", +[]() { return static_cast<int>(PlayerTypes::PlayerComputer); })
+        .addProperty("PlayerPerson", +[]() { return static_cast<int>(PlayerTypes::PlayerPerson); })
+        .addProperty("PlayerRescuePassive", +[]() { return static_cast<int>(PlayerTypes::PlayerRescuePassive); })
+        .addProperty("PlayerRescueActive", +[]() { return static_cast<int>(PlayerTypes::PlayerRescueActive); })
+        .beginClass<CPlayer>("CPlayer")
+            .addProperty("Index", &CPlayer::Index)
+            .addProperty("Name", &CPlayer::Name)
+            .addProperty("Type", +[](const CPlayer *p) { return static_cast<int>(p->Type); }, +[](CPlayer *p, int t) { p->Type = static_cast<PlayerTypes>(t); })
+            .addProperty("Race", &CPlayer::Race)
+            .addProperty("AiName", &CPlayer::AiName)
+            .addProperty("StartPos", &CPlayer::StartPos)
+            .addFunction("SetStartView", &CPlayer::SetStartView)
+            .addProperty("Resources", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->Resources); })
+            .addProperty("StoredResources", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->StoredResources); })
+            .addProperty("Incomes", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->Incomes); })
+            .addProperty("Revenue", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->Revenue); })
+            .addProperty("UnitTypesCount", +[](const CPlayer *p) { return static_cast<ConstInt2048Array>(p->UnitTypesCount); })
+            .addProperty("UnitTypesAiActiveCount", +[](const CPlayer *p) { return static_cast<ConstInt2048Array>(p->UnitTypesAiActiveCount); })
+            .addProperty("AiEnabled", &CPlayer::AiEnabled)
+            .addProperty("NumBuildings", &CPlayer::NumBuildings)
+            .addProperty("Supply", &CPlayer::Supply)
+            .addProperty("Demand", &CPlayer::Demand)
+            .addProperty("UnitLimit", &CPlayer::UnitLimit)
+            .addProperty("BuildingLimit", &CPlayer::BuildingLimit)
+            .addProperty("TotalUnitLimit", &CPlayer::TotalUnitLimit)
+            .addProperty("Score", &CPlayer::Score)
+            .addProperty("TotalUnits", &CPlayer::TotalUnits)
+            .addProperty("TotalBuildings", &CPlayer::TotalBuildings)
+            .addProperty("TotalResources", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->TotalResources); })
+            .addProperty("TotalRazings", &CPlayer::TotalRazings)
+            .addProperty("TotalKills", &CPlayer::TotalKills)
+            .addProperty("SpeedResourcesHarvest", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->SpeedResourcesHarvest); })
+            .addProperty("SpeedResourcesReturn", +[](const CPlayer *p) { return static_cast<ConstInt7Array>(p->SpeedResourcesReturn); })
+            .addProperty("SpeedBuild", &CPlayer::SpeedBuild)
+            .addProperty("SpeedTrain", &CPlayer::SpeedTrain)
+            .addProperty("SpeedUpgrade", &CPlayer::SpeedUpgrade)
+            .addProperty("SpeedResearch", &CPlayer::SpeedResearch)
+            // .addFunction("GetUnit", &CPlayer::GetUnit) TODO:
+            .addFunction("GetUnitCount", &CPlayer::GetUnitCount)
+            .addFunction("IsEnemy", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsEnemy(player); }) // TODO: unit overload
+            .addFunction("IsAllied", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsAllied(player); }) // TODO: unit overload
+            .addFunction("HasSharedVisionWith", &CPlayer::HasSharedVisionWith)
+            .addFunction("IsTeamed", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsTeamed(player); }) // TODO: unit overload
+        .endClass()
+        .addProperty("Players", +[]() { return static_cast<CPlayerArray>(Players); })
+        .addProperty("ThisPlayer", &ThisPlayer)
         // sound.pkg
+        .addFunction("GetEffectsVolume", GetEffectsVolume)
+        .addFunction("SetEffectsVolume", SetEffectsVolume)
+        .addFunction("GetMusicVolume", GetMusicVolume)
+        .addFunction("SetMusicVolume", SetMusicVolume)
+        .addFunction("SetEffectsEnabled", SetEffectsEnabled)
+        .addFunction("IsEffectsEnabled", IsEffectsEnabled)
+        .addFunction("SetMusicEnabled", SetMusicEnabled)
+        .addFunction("IsMusicEnabled", IsMusicEnabled)
+        // .addFunction("PlayFile", PlayFile) // TODO: once we defined LuaActionListener class
+        .addFunction("PlaySoundFile", +[](lua_State *l) {
+            if (lua_gettop(l) != 2) {
+                return luaL_error(l, "wrong number of arguments");
+            }
+            if (!lua_isstring(l, 1)) {
+                return luaL_error(l, "arg 1 must be string");
+            }
+            // int r = PlayFile(lua_tostring(l, 1), );
+            // return PlayFile(file, LuaActionListener:new(callback))
+            return 0;
+        })
+        .addFunction("PlayMusic", +[](std::string &file) { return PlayMusic(file); })
+        .addFunction("StopMusic", StopMusic)
+        .addFunction("IsMusicPlaying", IsMusicPlaying)
+        .addFunction("SetChannelVolume", SetChannelVolume)
+        .addFunction("SetChannelStereo", SetChannelStereo)
+        .addFunction("StopChannel", StopChannel)
+        .addFunction("StopAllChannels", StopAllChannels)
         // stratagus.pkg
+        .beginClass<CArray<CIcon, 0>>("__CIconsAccessor")
+            .addFunction("__index", +[](CArray<CIcon, 0>* thiz, std::string &key) -> CIcon* {
+                return CIcon::Get(key);
+            })
+        .endClass()
+        .addProperty("Icons", +[]() { return static_cast<CArray<CIcon, 0>>(nullptr); })
+        .beginClass<CArray<CUpgrade, 0>>("__CUpgradesAccessor")
+            .addFunction("__index", +[](CArray<CUpgrade, 0>* thiz, std::string &key) -> CUpgrade* {
+                return CUpgrade::Get(key);
+            })
+        .endClass()
+        .addProperty("Fonts", +[]() { return static_cast<CArray<CFont, 0>>(nullptr); })
+        .beginClass<CArray<CFont, 0>>("__CFontsAccessor")
+            .addFunction("__index", +[](CArray<CFont, 0>* thiz, std::string &key) -> CFont* {
+                return CFont::Get(key);
+            })
+        .endClass()
+        .addProperty("Fonts", +[]() { return static_cast<CArray<CFont, 0>>(nullptr); })
+        .beginClass<CArray<CFontColor, 0>>("__CFontColorsAccessor")
+            .addFunction("__index", +[](CArray<CFontColor, 0>* thiz, std::string &key) -> CFontColor* {
+                return CFontColor::Get(key);
+            })
+        .endClass()
+        .addProperty("FontColors", +[]() { return static_cast<CArray<CFontColor, 0>>(nullptr); })
+        .beginClass<CArray<CUnitType, 0>>("__CUnitTypesAccessor")
+            .addFunction("__index", +[](CArray<CUnitType, 0>* thiz, std::string &key) -> CUnitType* {
+                return UnitTypeByIdent(key);
+            })
+        .endClass()
+        .addProperty("UnitTypes", +[]() { return static_cast<CArray<CUnitType, 0>>(nullptr); })
+        .addProperty("MaxCosts", +[]() { return MaxCosts; })
+        .addProperty("FoodCost", +[]() { return FoodCost; })
+        .addProperty("ScoreCost", +[]() { return ScoreCost; })
+        .addProperty("ManaResCost", +[]() { return ManaResCost; })
+        .addProperty("FreeWorkersCount", +[]() { return FreeWorkersCount; })
+        .addProperty("MaxResouceInfo", +[]() { return MaxResourceInfo; })
+        .addProperty("PlayerMax", +[]() { return PlayerMax; })
+        .addProperty("PlayerNumNeutral", +[]() { return PlayerNumNeutral; })
+        .addProperty("InfiniteRepairRange", +[]() { return InfiniteRepairRange; })
+        .addProperty("NoButton", +[]() { return NoButton; })
+        .addProperty("LeftButton", +[]() { return LeftButton; })
+        .addProperty("MiddleButton", +[]() { return MiddleButton; })
+        .addProperty("RightButton", +[]() { return RightButton; })
+        .addProperty("UpButton", +[]() { return UpButton; })
+        .addProperty("DownButton", +[]() { return DownButton; })
+        .addFunction("SaveGame", SaveGame)
+        .addFunction("DeleteSaveGame", DeleteSaveGame)
+        .addFunction("_", Translate)
+        .addFunction("SyncRand", +[](lua_State *l) {
+            switch (lua_gettop(l)) {
+                case 0:
+                    lua_pushinteger(l, SyncRand());
+                    return 1;
+                case 1:
+                    if (lua_isnumber(l, 1)) {
+                        lua_pushinteger(l, SyncRand(lua_tonumber(l, 1)));
+                        return 1;
+                    }
+                default:
+                    return luaL_error(l, "SyncRand needs none or a single integer argument");
+            }
+        })
+        .addFunction("CanAccessFile", CanAccessFile)
+        .addFunction("Exit", Exit)
+        .addProperty("CliMapName", +[]() { return CliMapName; })
+        .addProperty("StratagusLibPath", +[]() { return StratagusLibPath; })
+        .addProperty("IsDebugEnabled", +[]() { return IsDebugEnabled; })
         // translate.pkg
+        .addFunction("Translate", Translate)
+        .addFunction("AddTranslation", AddTranslation)
+        .addFunction("LoadPO", LoadPO)
+        .addFunction("SetTranslationFiles", SetTranslationsFiles)
         // trigger.pkg
+        .addFunction("GetNumOpponents", GetNumOpponents)
+        .addFunction("GetTimer", GetTimer)
+        .addFunction("ActionVictory", ActionVictory)
+        .addFunction("ActionDefeat", ActionDefeat)
+        .addFunction("ActionDraw", ActionDraw)
+        .addFunction("ActionSetTimer", ActionSetTimer)
+        .addFunction("ActionStartTimer", ActionStartTimer)
+        .addFunction("ActionStopTimer", ActionStopTimer)
+        .addFunction("SetTrigger", SetTrigger)
         // ui.pkg
         // unit.pkg
         // unittype.pkg
@@ -258,23 +654,19 @@ int tolua_stratagus_open(lua_State *Lua) {
         // video.pkg
     .endNamespace();
 
-    // Backwards compatibility: copy everything above from StratagusEngine to the global namespace
-    lua_getglobal(Lua, "sg");
-    lua_pushnil(Lua);
-    // [nil, table]
-    while (lua_next(Lua, -2)) {
-        // [value, key, table]
-        lua_pushvalue(Lua, -2);
-        // [key, value, key, table]
-        lua_pushvalue(Lua, -2);
-        // [value, key, value, key, table]
-        lua_settable(Lua, LUA_GLOBALSINDEX);
-        // [value, key, table]
-        lua_pop(Lua, 1);
-        // [key, table]
-    }
-    // [table]
-    lua_pop(Lua, 1);
+    // Backwards compatibility: forward everything above from sg to the global namespace
+    Assert(lua_getmetatable(Lua, LUA_GLOBALSINDEX) == 0);
+    lua_newtable(Lua); // metatable
+    lua_pushstring(Lua, "__index"); // key, metatable
+    lua_getglobal(Lua, "sg"); // sg table, key, metatable
+    lua_pushcclosure(Lua, +[](lua_State *l) {
+        // Args: table, name
+        lua_pushvalue(l, 2); // [name]
+        lua_gettable(l, lua_upvalueindex(1)); // [value from sg]
+        return 1;
+    }, 1); // closure, key, metatable
+    lua_rawset(Lua, -3); // metatable
+    lua_setmetatable(Lua, LUA_GLOBALSINDEX);
 
     // any newly exposed APIs should go below
 
