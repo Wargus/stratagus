@@ -55,6 +55,7 @@
 #include "unit_manager.h"
 #include "unit.h"
 #include "unittype.h"
+#include "upgrade.h"
 #include "video.h"
 #include "widgets.h"
 
@@ -79,7 +80,7 @@ extern void ActionSetTimer(int cycles, bool increasing);
 extern void ActionStartTimer();
 extern void ActionStopTimer();
 extern void SetTrigger(int trigger);
-
+extern void ShowFullImage(const std::string &filename, unsigned int timeOutInSecond);
 
 template <class T, int SZ>
 struct CArray {
@@ -355,8 +356,8 @@ int tolua_stratagus_open(lua_State *Lua) {
                                    +[](Settings* settings, bool v) { settings->Inside = v; })
             .addProperty("RevealMap", +[](const Settings* settings) { return static_cast<int>(settings->RevealMap); },
                                       +[](Settings* settings, int type) { settings->RevealMap = static_cast<MapRevealModes>(type); })
-            .addProperty("MapRichness", +[](const Settings*) { PrintOnStdOut("GameSettings.MapRichness is deprecated."); return 0; },
-                                        +[](Settings*, int) { PrintOnStdOut("GameSettings.MapRichness is deprecated."); })
+            .addProperty("MapRichness", +[](const Settings*) { PrintOnStdOut("[DEPRECATION WARNING] GameSettings.MapRichness is deprecated."); return 0; },
+                                        +[](Settings*, int) { PrintOnStdOut("[DEPRECATION WARNING] GameSettings.MapRichness is deprecated."); })
         .endClass()
         .addProperty("GameSettings", &GameSettings, false)
         .addProperty("SettingsPresetMapDefault", +[]() { return SettingsPresetMapDefault; })
@@ -425,8 +426,8 @@ int tolua_stratagus_open(lua_State *Lua) {
                                            +[](CServerSetup *s, int value) { s->ServerGameSettings.GameType = static_cast<GameTypes>(value); })
             .addProperty("Difficulty", +[](const CServerSetup *s) { return s->ServerGameSettings.Difficulty; },
                                        +[](CServerSetup *s, int value) { s->ServerGameSettings.Difficulty = value; })
-            .addProperty("MapRichness", +[](const CServerSetup*) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); return 0; },
-                                        +[](CServerSetup*, int) { PrintOnStdOut("ServerSetup.MapRichness is deprecated."); })
+            .addProperty("MapRichness", +[](const CServerSetup*) { PrintOnStdOut("[DEPRECATION WARNING] ServerSetup.MapRichness is deprecated."); return 0; },
+                                        +[](CServerSetup*, int) { PrintOnStdOut("[DEPRECATION WARNING] ServerSetup.MapRichness is deprecated."); })
             .addProperty("Opponents", +[](const CServerSetup *s) { return s->ServerGameSettings.Opponents; },
                                        +[](CServerSetup *s, int value) { s->ServerGameSettings.Opponents = value; })
             .addProperty("CompOpt", +[](const CServerSetup *s) { return static_cast<SlotOptionArray>(s->CompOpt); })
@@ -648,10 +649,125 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addFunction("ActionStopTimer", ActionStopTimer)
         .addFunction("SetTrigger", SetTrigger)
         // ui.pkg
+        
         // unit.pkg
+        .beginClass<Vec2i>("Vec2i")
+            .addProperty("x", &Vec2i::x)
+            .addProperty("y", &Vec2i::y)
+        .endClass()
+        .beginClass<CUnit>("CUnit")
+            .addProperty("tilePos", &CUnit::tilePos, false)
+            .addProperty("Type", &CUnit::Type, false)
+            .addProperty("Player", &CUnit::Player, false)
+            .addProperty("Goal", &CUnit::Goal)
+            .addProperty("Active", +[](const CUnit* unit) { return static_cast<int>(unit->Active); }, +[](CUnit *unit, int value) { unit->Active = value; })
+            .addProperty("ResourcesHeld", &CUnit::ResourcesHeld)
+        .endClass()
+        .beginClass<CPreference>("CPreference")
+            .addProperty("ShowSightRange", &CPreference::ShowSightRange)
+            .addProperty("ShowReactionRange", &CPreference::ShowReactionRange)
+            .addProperty("ShowAttackRange", &CPreference::ShowAttackRange)
+            .addProperty("ShowMessages", &CPreference::ShowMessages)
+            .addProperty("ShowNoSelectionStats", &CPreference::ShowNoSelectionStats)
+            .addProperty("BigScreen", &CPreference::BigScreen)
+            .addProperty("PauseOnLeave", &CPreference::PauseOnLeave)
+            .addProperty("AiExplores", &CPreference::AiExplores)
+            .addProperty("GrayscaleIcons", &CPreference::GrayscaleIcons)
+            .addProperty("IconsShift", &CPreference::IconsShift)
+            .addProperty("StereoSound", &CPreference::StereoSound)
+            .addProperty("MineNotifications", &CPreference::MineNotifications)
+            .addProperty("DeselectInMine", &CPreference::DeselectInMine)
+            .addProperty("NoStatusLineTooltips", &CPreference::NoStatusLineTooltips)
+            .addProperty("SimplifiedAutoTargeting", &CPreference::SimplifiedAutoTargeting)
+            .addProperty("AiChecksDependencies", &CPreference::AiChecksDependencies)
+            .addProperty("HardwareCursor", &CPreference::HardwareCursor)
+            .addProperty("SelectionRectangleIndicatesDamage", &CPreference::SelectionRectangleIndicatesDamage)
+            .addProperty("ShowOrders", &CPreference::ShowOrders)
+            .addProperty("ShowNameDelay", &CPreference::ShowNameDelay)
+            .addProperty("ShowNameTime", &CPreference::ShowNameTime)
+            .addProperty("AutosaveMinutes", &CPreference::AutosaveMinutes)
+            .addProperty("IconFrameG", &CPreference::IconFrameG)
+            .addProperty("PressedIconFrameG", &CPreference::PressedIconFrameG)
+        .endClass()
+        .beginClass<CUnitManager>("CUnitManager")
+            .addFunction("GetSlotUnit", +[](const CUnitManager *m, int idx) { return m->GetSlotUnit(idx); })
+        .endClass()
+        .addProperty("UnitManager", &UnitManager, false)
+        .addProperty("Preference", &Preference, false)
+        .addFunction("GetUnitUnderCursor", GetUnitUnderCursor)
+        .addFunction("UnitNumber", +[](CUnit &unit) { return UnitNumber(unit); })
         // unittype.pkg
+        .beginClass<CUnitType>("CUnitType")
+            .addProperty("Ident", &CUnitType::Ident, false)
+            .addProperty("Name", &CUnitType::Name, false)
+            .addProperty("Slot", &CUnitType::Slot, false)
+            .addProperty("MinAttackRange", &CUnitType::MinAttackRange)
+            .addProperty("ClicksToExplode", &CUnitType::ClicksToExplode)
+            .addProperty("GivesResource", &CUnitType::GivesResource)
+            .addProperty("TileWidth", &CUnitType::TileWidth, false)
+            .addProperty("TileHeight", &CUnitType::TileHeight, false)
+        .endClass()
+        .addFunction("UnitTypeByIdent", UnitTypeByIdent)
+        .addProperty("UnitTypeHumanWall", &UnitTypeHumanWall)
+        .addProperty("UnitTypeOrcWall", &UnitTypeOrcWall)
+        .addFunction("SetMapStat", SetMapStat)
+        .addFunction("SetMapSound", SetMapSound)
         // upgrade.pkg
+        .beginClass<CUpgrade>("CUpgrade")
+            .addStaticFunction("New", &CUpgrade::New)
+            .addStaticFunction("New", &CUpgrade::Get)
+            .addProperty("Name", &CUpgrade::Name)
+            .addProperty("Costs", +[](const CUpgrade *u) { return static_cast<ConstInt7Array>(u->Costs); })
+            .addProperty("Icon", &CUpgrade::Icon)
+        .endClass()
         // video.pkg
+        .addFunction("InitVideo", InitVideo)
+        .addFunction("PlayMovie", PlayMovie)
+        .addFunction("ShowFullImage", ShowFullImage)
+        .addFunction("SaveMapPNG", SaveMapPNG)
+        .beginClass<CVideo>("CVideo")
+            .addProperty("Width", &CVideo::Width, false)
+            .addProperty("Height", &CVideo::Height, false)
+            .addProperty("Depth", &CVideo::Depth, false)
+            .addProperty("FullScreen", &CVideo::FullScreen, false)
+            .addFunction("ResizeScreen", &CVideo::ResizeScreen)
+        .endClass()
+        .addProperty("Video", &Video, false)
+        .addFunction("ToggleFullScreen", ToggleFullScreen)
+        .beginClass<CGraphic>("CGraphic")
+            .addStaticFunction("New", &CGraphic::New)
+            .addStaticFunction("ForceNew", &CGraphic::ForceNew)
+            .addStaticFunction("Get", &CGraphic::Get)
+            .addStaticFunction("Free", &CGraphic::Free)
+            .addFunction("Load", &CGraphic::Load)
+            .addFunction("Resize", &CGraphic::Resize)
+            .addFunction("SetPaletteColor", &CGraphic::SetPaletteColor)
+        .endClass()
+        .beginClass<CPlayerColorGraphic>("CPlayerColorGraphic")
+        	.addStaticFunction("New", &CPlayerColorGraphic::New)
+	        .addStaticFunction("Get", &CPlayerColorGraphic::Get)
+        .endClass()
+        .beginClass<CColor>("CColor")
+            .addConstructor<void (*)(unsigned char, unsigned char, unsigned char, unsigned char)>()
+            .addProperty("R", &CColor::R)
+            .addProperty("G", &CColor::G)
+            .addProperty("B", &CColor::B)
+            .addProperty("A", &CColor::A)
+        .endClass()
+        .addFunction("SetColorCycleAll", SetColorCycleAll)
+        .addFunction("ClearAllColorCyclingRange", ClearAllColorCyclingRange)
+        .addFunction("AddColorCyclingRange", AddColorCyclingRange)
+        .beginClass<Mng>("Mng")
+            .addConstructor<void (*)()>()
+            .addFunction("Load", &Mng::Load)
+            .addFunction("Draw", &Mng::Draw)
+            .addFunction("Reset", &Mng::Reset)
+        .endClass()
+        .beginClass<Movie>("Movie")
+            .addConstructor<void (*)()>()
+            .addFunction("Load", &Movie::Load)
+            .addFunction("IsPlaying", &Movie::IsPlaying)
+        .endClass()
     .endNamespace();
 
     // Backwards compatibility: forward everything above from sg to the global namespace
@@ -662,6 +778,12 @@ int tolua_stratagus_open(lua_State *Lua) {
     lua_pushcclosure(Lua, +[](lua_State *l) {
         // Args: table, name
         lua_pushvalue(l, 2); // [name]
+#ifdef DEBUG
+        lua_pushvalue(l, -1);
+        const char *key = lua_tostring(l, -1);
+        lua_pop(l, 1);
+        PrintOnStdOut("[DEPRECATION WARNING]: Accessing global '%s'\n" _C_ key);
+#endif
         lua_gettable(l, lua_upvalueindex(1)); // [value from sg]
         return 1;
     }, 1); // closure, key, metatable
