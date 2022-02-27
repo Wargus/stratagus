@@ -1663,6 +1663,8 @@ struct Stack<T&>
     static void push(lua_State* L, T& value) { Helper::push(L, value); }
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
+
+    static bool isInstance(lua_State* L, int index) { return Helper::isInstance(L, index); }
 };
 
 template<class T>
@@ -1674,6 +1676,8 @@ struct Stack<const T&>
     static void push(lua_State* L, const T& value) { Helper::push(L, value); }
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
+
+    static bool isInstance(lua_State* L, int index) { return Helper::isInstance(L, index); }
 };
 
 template<class T>
@@ -1685,6 +1689,8 @@ struct Stack<T*>
     static void push(lua_State* L, T* value) { Helper::push(L, value); }
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
+
+    static bool isInstance(lua_State* L, int index) { return Helper::isInstance(L, index); }
 };
 
 template<class T>
@@ -1696,6 +1702,8 @@ struct Stack<const T*>
     static void push(lua_State* L, const T* value) { Helper::push(L, value); }
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
+
+    static bool isInstance(lua_State* L, int index) { return Helper::isInstance(L, index); }
 };
 
 //------------------------------------------------------------------------------
