@@ -115,11 +115,13 @@ struct CArray {
  */
 int tolua_stratagus_open(lua_State *Lua) {
     using IntArray = CArray<int, PlayerMax>;
-    using Int7Array = CArray<int, MaxCosts>;
+    using Int7Array = CArray<const int, MaxCosts>;
+    using Int8Array = CArray<const int, 8>;
     using ReadyArray = CArray<const uint8_t, PlayerMax>;
     using SlotOptionArray = CArray<const SlotOption, PlayerMax>;
     using ConstIntArray = CArray<const int, PlayerMax>;
     using ConstInt7Array = CArray<const int, MaxCosts>;
+    using CResourceInfoArray = CArray<const CResourceInfo, MaxResourceInfo>;
     using ConstInt2048Array = CArray<const int, UnitTypeMax>;
     using CColorArray = CArray<const CColor, MaxFontColors>;
     using SettingsPresetsArray = CArray<const SettingsPresets, PlayerMax>;
@@ -151,7 +153,29 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addFunction("__newindex", +[](Int7Array* thiz, int index, const int value, lua_State* L) {
                 if (index < 0 || index > MaxCosts)
                     luaL_error(L, "Invalid index access in table %d", index);
-                (*thiz)[index] = value;
+                const_cast<int *>(thiz->array)[index] = value;
+            })
+        .endClass()
+        .beginClass<Int8Array>("__Int8Array")
+            .addFunction("__index", +[](Int8Array* thiz, int index, lua_State* L) -> int {
+                if (index < 0 || index > 8)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](Int8Array* thiz, int index, const int value, lua_State* L) {
+                if (index < 0 || index > 8)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<int *>(thiz->array)[index] = value;
+            })
+        .endClass()
+        .beginClass<CResourceInfoArray>("__CResourceInfoArray")
+            .addFunction("__index", +[](CResourceInfoArray* thiz, int index, lua_State* L) {
+                if (index < 0 || index > MaxResourceInfo)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                return (*thiz)[index];
+            })
+            .addFunction("__newindex", +[](CResourceInfoArray* thiz, int index, const CResourceInfo &value, lua_State* L) {
+                luaL_error(L, "Read-only array");
             })
         .endClass()
         .beginClass<ReadyArray>("__ReadyArray")
@@ -195,7 +219,9 @@ int tolua_stratagus_open(lua_State *Lua) {
                 return (*thiz)[index];
             })
             .addFunction("__newindex", +[](ConstInt7Array* thiz, int index, const int value, lua_State* L) {
-                luaL_error(L, "Read-only array");
+                if (index < 0 || index > MaxCosts)
+                    luaL_error(L, "Invalid index access in table %d", index);
+                const_cast<int *>(thiz->array)[index] = value;
             })
         .endClass()
         .beginClass<ConstInt2048Array>("__ConstInt2048Array")
@@ -297,15 +323,32 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addProperty("Editor", &Editor)
         // font.pkg
         .beginClass<CFont>("CFont")
-            .addStaticFunction("New", &CFont::New)
-            .addStaticFunction("Get", &CFont::Get)
+            .addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(luabridge::Stack<std::string>::get(l, nargs - 1));
+                CGraphic *g = luabridge::Stack<CGraphic*>::get(l, nargs);
+                return CFont::New(ident, g);
+            })
+            .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CFont::Get(ident);
+            })
             .addFunction("Height", &CFont::Height)
             .addFunction("Width", +[](const CFont* font, std::string &text) { return font->Width(text); })
         .endClass()
         .addProperty("MaxFontColors", +[]() { return MaxFontColors; })
         .beginClass<CFontColor>("CFontColor")
-            .addStaticFunction("New", &CFontColor::New)
-            .addStaticFunction("Get", &CFontColor::Get)
+            .addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CFontColor::New(ident);
+            })
+            .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CFontColor::Get(ident);
+            })
             .addProperty("Colors", +[](const CFontColor* fc) { return static_cast<CColorArray>(fc->Colors); })
         .endClass()
         // game.pkg
@@ -528,12 +571,36 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("SpeedTrain", &CPlayer::SpeedTrain)
             .addProperty("SpeedUpgrade", &CPlayer::SpeedUpgrade)
             .addProperty("SpeedResearch", &CPlayer::SpeedResearch)
-            // .addFunction("GetUnit", &CPlayer::GetUnit) TODO:
+            .addFunction("GetUnit", &CPlayer::GetUnit)
             .addFunction("GetUnitCount", &CPlayer::GetUnitCount)
-            .addFunction("IsEnemy", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsEnemy(player); }) // TODO: unit overload
-            .addFunction("IsAllied", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsAllied(player); }) // TODO: unit overload
+            .addFunction("IsEnemy", +[](const CPlayer *p, lua_State *l) -> bool {
+                if (luabridge::Stack<CUnit&>::isInstance(l, 2)) {
+                    return p->IsEnemy(luabridge::Stack<CUnit&>::get(l, 2));
+                } else if (luabridge::Stack<CPlayer&>::isInstance(l, 2)) {
+                    return p->IsEnemy(luabridge::Stack<CPlayer&>::get(l, 2));
+                } else {
+                    return false;
+                }
+            })
+            .addFunction("IsAllied", +[](const CPlayer *p, lua_State *l) -> bool {
+                if (luabridge::Stack<CUnit&>::isInstance(l, 2)) {
+                    return p->IsAllied(luabridge::Stack<CUnit&>::get(l, 2));
+                } else if (luabridge::Stack<CPlayer&>::isInstance(l, 2)) {
+                    return p->IsAllied(luabridge::Stack<CPlayer&>::get(l, 2));
+                } else {
+                    return false;
+                }
+            })
             .addFunction("HasSharedVisionWith", &CPlayer::HasSharedVisionWith)
-            .addFunction("IsTeamed", +[](const CPlayer *p, CPlayer &player) -> bool { return p->IsTeamed(player); }) // TODO: unit overload
+            .addFunction("IsTeamed", +[](const CPlayer *p, lua_State *l) -> bool {
+                if (luabridge::Stack<CUnit&>::isInstance(l, 2)) {
+                    return p->IsTeamed(luabridge::Stack<CUnit&>::get(l, 2));
+                } else if (luabridge::Stack<CPlayer&>::isInstance(l, 2)) {
+                    return p->IsTeamed(luabridge::Stack<CPlayer&>::get(l, 2));
+                } else {
+                    return false;
+                }
+            })
         .endClass()
         .addProperty("Players", +[]() { return static_cast<CPlayerArray>(Players); })
         .addProperty("ThisPlayer", &ThisPlayer)
@@ -546,7 +613,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addFunction("IsEffectsEnabled", IsEffectsEnabled)
         .addFunction("SetMusicEnabled", SetMusicEnabled)
         .addFunction("IsMusicEnabled", IsMusicEnabled)
-        // .addFunction("PlayFile", PlayFile) // TODO: once we defined LuaActionListener class
+        .addFunction("PlayFile", PlayFile)
         .addFunction("PlaySoundFile", +[](lua_State *l) {
             if (lua_gettop(l) != 2) {
                 return luaL_error(l, "wrong number of arguments");
@@ -554,9 +621,9 @@ int tolua_stratagus_open(lua_State *Lua) {
             if (!lua_isstring(l, 1)) {
                 return luaL_error(l, "arg 1 must be string");
             }
-            // int r = PlayFile(lua_tostring(l, 1), );
-            // return PlayFile(file, LuaActionListener:new(callback))
-            return 0;
+            int r = PlayFile(lua_tostring(l, 1), new LuaActionListener(l, 2));
+            lua_pushnumber(l, r);
+            return 1;
         })
         .addFunction("PlayMusic", +[](std::string &file) { return PlayMusic(file); })
         .addFunction("StopMusic", StopMusic)
@@ -637,7 +704,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addFunction("Translate", Translate)
         .addFunction("AddTranslation", AddTranslation)
         .addFunction("LoadPO", LoadPO)
-        .addFunction("SetTranslationFiles", SetTranslationsFiles)
+        .addFunction("SetTranslationsFiles", SetTranslationsFiles)
         // trigger.pkg
         .addFunction("GetNumOpponents", GetNumOpponents)
         .addFunction("GetTimer", GetTimer)
@@ -649,7 +716,611 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addFunction("ActionStopTimer", ActionStopTimer)
         .addFunction("SetTrigger", SetTrigger)
         // ui.pkg
-        
+        .addProperty("VIEWPORT_SINGLE", +[]() { return VIEWPORT_SINGLE; })
+        .addProperty("VIEWPORT_SPLIT_HORIZ", +[]() { return VIEWPORT_SPLIT_HORIZ; })
+        .addProperty("VIEWPORT_SPLIT_HORIZ3", +[]() { return VIEWPORT_SPLIT_HORIZ3; })
+        .addProperty("VIEWPORT_SPLIT_VERT", +[]() { return VIEWPORT_SPLIT_VERT; })
+        .addProperty("VIEWPORT_QUAD", +[]() { return VIEWPORT_QUAD; })
+
+        .beginClass<LuaActionListener>("LuaActionListener")
+            .addStaticFunction("__call", +[](lua_State *l) {
+                // custom constructor, first arg is the table, second the lua function
+                return new LuaActionListener(l, lua_gettop(l) < 2 ? 0 : 2);
+            })
+        .endClass()
+
+        .beginClass<CUIButton>("CUIButton")
+            .addConstructor<void (*) ()>()
+            .addProperty("X", &CUIButton::X)
+            .addProperty("Y", &CUIButton::Y)
+            .addProperty("Text", &CUIButton::Text)
+            .addProperty("Style", &CUIButton::Style)
+            .addProperty("Callback", &CUIButton::Callback)
+            .addFunction("SetCallback", +[](CUIButton *btn, lua_State *l) { btn->Callback = new LuaActionListener(l, 2); })
+        .endClass()
+
+        .beginClass<CMapArea>("CMapArea")
+            .addProperty("X", &CMapArea::X)
+            .addProperty("Y", &CMapArea::Y)
+            .addProperty("EndX", &CMapArea::EndX)
+            .addProperty("EndY", &CMapArea::EndY)
+            .addProperty("ScrollPaddingLeft", &CMapArea::ScrollPaddingLeft)
+            .addProperty("ScrollPaddingRight", &CMapArea::ScrollPaddingRight)
+            .addProperty("ScrollPaddingTop", &CMapArea::ScrollPaddingTop)
+            .addProperty("ScrollPaddingBottom", &CMapArea::ScrollPaddingBottom)
+        .endClass()
+
+        .beginClass<CViewport>("CViewport")
+        .endClass()
+
+        .beginClass<CFiller>("CFiller")
+            .addConstructor<void (*) ()>()
+            .addProperty("G", &CFiller::G)
+            .addProperty("X", &CFiller::X)
+            .addProperty("Y", &CFiller::Y)
+        .endClass()
+
+        .beginClass<CButtonPanel>("CButtonPanel")
+            .addProperty("X", &CButtonPanel::X)
+            .addProperty("Y", &CButtonPanel::Y)
+            //TODO: vector<CUIButton> Buttons;
+            .addProperty("AutoCastBorderColorRGB", &CButtonPanel::AutoCastBorderColorRGB)
+            .addProperty("ShowCommandKey", &CButtonPanel::ShowCommandKey)
+        .endClass()
+
+        .beginClass<CPieMenu>("CPieMenu")
+            .addProperty("G", &CPieMenu::G)
+            .addProperty("MouseButton", &CPieMenu::MouseButton)
+            .addProperty("X", +[](const CPieMenu* m) { return static_cast<Int8Array>(m->X); })
+            .addProperty("Y", +[](const CPieMenu* m) { return static_cast<Int8Array>(m->Y); })
+            .addFunction("SetRadius", &CPieMenu::SetRadius)
+        .endClass()
+
+        .beginClass<CResourceInfo>("CResourceInfo")
+            .addProperty("G", &CResourceInfo::G)
+            .addProperty("IconFrame", &CResourceInfo::IconFrame)
+            .addProperty("IconX", &CResourceInfo::IconX)
+            .addProperty("IconY", &CResourceInfo::IconY)
+            .addProperty("IconWidth", &CResourceInfo::IconWidth)
+            .addProperty("TextX", &CResourceInfo::TextX)
+            .addProperty("TextY", &CResourceInfo::TextY)
+        .endClass()
+
+        .beginClass<CInfoPanel>("CInfoPanel")
+            .addProperty("G", &CInfoPanel::G)
+            .addProperty("X", &CInfoPanel::X)
+            .addProperty("Y", &CInfoPanel::Y)
+        .endClass()
+
+        .beginClass<CUIUserButton>("CUIUserButton")
+            .addConstructor<void (*) ()>()
+            .addProperty("Clicked", &CUIUserButton::Clicked)
+            .addProperty("Button", &CUIUserButton::Button)
+        .endClass()
+
+        .beginClass<CStatusLine>("CStatusLine")
+            .addFunction("Set", &CStatusLine::Set)
+            .addFunction("Get", &CStatusLine::Get)
+            .addFunction("Clear", &CStatusLine::Clear)
+
+            .addProperty("Width", &CStatusLine::Width)
+            .addProperty("TextX", &CStatusLine::TextX)
+            .addProperty("TextY", &CStatusLine::TextY)
+            .addProperty("Font", &CStatusLine::Font)
+        .endClass()
+
+        .beginClass<CUITimer>("CUITimer")
+            .addProperty("X", &CUITimer::X)
+            .addProperty("Y", &CUITimer::Y)
+            .addProperty("Font", &CUITimer::Font)
+        .endClass()
+
+        .beginClass<CUserInterface>("CUserInterface")
+            .addProperty("NormalFontColor", &CUserInterface::NormalFontColor)
+            .addProperty("ReverseFontColor", &CUserInterface::ReverseFontColor)
+
+            // vector<CFiller> Fillers;
+
+            .addProperty("Resources", +[](const CUserInterface *ui) { return static_cast<CResourceInfoArray>(ui->Resources); })
+            .addProperty("InfoPanel", &CUserInterface::InfoPanel)
+            .addProperty("SingleSelectedButton", &CUserInterface::SingleSelectedButton)
+
+            // vector<CUIButton> SelectedButtons;
+            .addProperty("MaxSelectedFont", &CUserInterface::MaxSelectedFont)
+            .addProperty("MaxSelectedTextX", &CUserInterface::MaxSelectedTextX)
+            .addProperty("MaxSelectedTextY", &CUserInterface::MaxSelectedTextY)
+
+            .addProperty("SingleTrainingButton", &CUserInterface::SingleTrainingButton)
+            // vector<CUIButton> TrainingButtons;
+            .addProperty("UpgradingButton", &CUserInterface::UpgradingButton)
+            .addProperty("ResearchingButton", &CUserInterface::ResearchingButton)
+            // vector<CUIButton> TransportingButtons;
+
+            // vector<string> LifeBarColorNames;
+            // vector<int> LifeBarPercents;
+            .addProperty("LifeBarYOffset", &CUserInterface::LifeBarYOffset)
+            .addProperty("LifeBarPadding", &CUserInterface::LifeBarPadding)
+            .addProperty("LifeBarBorder", &CUserInterface::LifeBarBorder)
+
+            .addProperty("CompletedBarColorRGB", &CUserInterface::CompletedBarColorRGB)
+            .addProperty("CompletedBarShadow", &CUserInterface::CompletedBarShadow)
+
+            .addProperty("ButtonPanel", &CUserInterface::ButtonPanel)
+
+            .addProperty("PieMenu", &CUserInterface::PieMenu)
+
+            .addProperty("MouseViewport", &CUserInterface::MouseViewport)
+            .addProperty("MapArea", &CUserInterface::MapArea)
+
+            .addProperty("MessageFont", &CUserInterface::MessageFont)
+            .addProperty("MessageScrollSpeed", &CUserInterface::MessageScrollSpeed)
+
+            .addProperty("MenuButton", &CUserInterface::MenuButton)
+            .addProperty("NetworkMenuButton", &CUserInterface::NetworkMenuButton)
+            .addProperty("NetworkDiplomacyButton", &CUserInterface::NetworkDiplomacyButton)
+
+            // vector<CUIUserButton> UserButtons;
+
+            .addProperty("Minimap", &CUserInterface::Minimap)
+            .addProperty("StatusLine", &CUserInterface::StatusLine)
+            .addProperty("Timer", &CUserInterface::Timer)
+
+            .addProperty("EditorSettingsAreaTopLeft", &CUserInterface::EditorSettingsAreaTopLeft)
+            .addProperty("EditorSettingsAreaBottomRight", &CUserInterface::EditorSettingsAreaBottomRight)
+            .addProperty("EditorButtonAreaTopLeft", &CUserInterface::EditorButtonAreaTopLeft)
+            .addProperty("EditorButtonAreaBottomRight", &CUserInterface::EditorButtonAreaBottomRight)
+        .endClass()
+
+        .addProperty("UI", &UI)
+
+        .beginClass<CIcon>("CIcon")
+            .addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CIcon::New(ident);
+            })
+            .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CIcon::Get(ident);
+            })
+            .addProperty("Ident", +[](const CIcon *i) { return i->GetIdent(); })
+            .addProperty("G", &CIcon::G)
+            .addProperty("Frame", &CIcon::Frame)
+        .endClass()
+
+        .addFunction("FindButtonStyle", FindButtonStyle)
+
+        .addFunction("GetMouseScroll", GetMouseScroll)
+        .addFunction("SetMouseScroll", SetMouseScroll)
+        .addFunction("GetKeyScroll", GetKeyScroll)
+        .addFunction("SetKeyScroll", SetKeyScroll)
+        .addFunction("GetGrabMouse", GetGrabMouse)
+        .addFunction("SetGrabMouse", SetGrabMouse)
+        .addFunction("GetLeaveStops", GetLeaveStops)
+        .addFunction("SetLeaveStops", SetLeaveStops)
+        .addFunction("GetDoubleClickDelay", GetDoubleClickDelay)
+        .addFunction("SetDoubleClickDelay", SetDoubleClickDelay)
+        .addFunction("GetHoldClickDelay", GetHoldClickDelay)
+        .addFunction("SetHoldClickDelay", SetHoldClickDelay)
+
+        .addProperty("CursorScreenPos", &CursorScreenPos)
+
+        //
+        //  Guichan
+        //
+
+        .beginClass<gcn::Color>("Color")
+            .addConstructor<void (*) (int, int, int, int)>()
+            .addProperty("r", &gcn::Color::r)
+            .addProperty("g", &gcn::Color::g)
+            .addProperty("b", &gcn::Color::b)
+            .addProperty("a", &gcn::Color::a)
+        .endClass()
+
+        .beginClass<gcn::Graphics>("Graphics")
+            .addStaticProperty("LEFT", +[]() { return gcn::Graphics::LEFT; })
+            .addStaticProperty("CENTER", +[]() { return gcn::Graphics::CENTER; })
+            .addStaticProperty("RIGHT", +[]() { return gcn::Graphics::RIGHT; })
+        .endClass()
+/*
+        .beginClass<Widget>("Widget")
+            .addFunction("setWidth", &::setWidth)
+            virtual int getWidth() const;
+            .addFunction("setHeight", &::setHeight)
+            virtual int getHeight() const;
+            .addFunction("setSize", &::setSize)
+            .addFunction("setX", &::setX)
+            virtual int getX() const;
+            .addFunction("setY", &::setY)
+            virtual int getY() const;
+            .addFunction("setPosition", &::setPosition)
+            .addFunction("setBorderSize", &::setBorderSize)
+            virtual unsigned int getBorderSize() const;
+            .addFunction("setEnabled", &::setEnabled)
+            virtual bool isEnabled() const;
+            .addFunction("setVisible", &::setVisible)
+            virtual bool isVisible() const;
+
+            .addFunction("setDirty", &::setDirty)
+
+            .addFunction("setBaseColor", &::setBaseColor)
+            virtual const Color &getBaseColor() const;
+            .addFunction("setForegroundColor", &::setForegroundColor)
+            virtual const Color &getForegroundColor() const;
+            .addFunction("setBackgroundColor", &::setBackgroundColor)
+            virtual const Color &getBackgroundColor() const;
+            .addFunction("setDisabledColor", &::setDisabledColor)
+            virtual const Color &getDisabledColor() const;
+
+            .addStaticFunction("setGlobalFont", &::setGlobalFont)
+            .addFunction("setForegroundColor", &::setForegroundColor)
+            .addFunction("setBackgroundColor", &::setBackgroundColor)
+            .addFunction("setBaseColor", &::setBaseColor)
+            .addFunction("setSize", &::setSize)
+            .addFunction("setBorderSize", &::setBorderSize)
+            .addFunction("setFont", &::setFont)
+
+            virtual int getHotKey() const;
+            .addFunction("setHotKey", &::setHotKey)
+            .addFunction("setHotKey", &::setHotKey)
+
+            .addFunction("requestFocus", &::requestFocus)
+
+            .addFunction("addActionListener", &::addActionListener)
+            .addFunction("addMouseListener", &::addMouseListener)
+            .addFunction("addKeyListener", &::addKeyListener)
+        .endClass()
+
+        $[
+        Widget.setActionCallback = function(w, f)
+        local lal = LuaActionListener(f)
+        if not w._actioncb then
+            w._actioncb = {}
+        end
+        table.insert(w._actioncb, lal)
+        w:addActionListener(lal)
+        end
+
+        Widget.setMouseCallback = function(w, f)
+        local lal = LuaActionListener(f)
+        if not w._mousecb then
+            w._mousecb = {}
+        end
+        table.insert(w._mousecb, lal)
+        w:addMouseListener(lal)
+        end
+
+        Widget.setKeyCallback = function(w, f)
+        local lal = LuaActionListener(f)
+        if not w._keycb then
+            w._keycb = {}
+        end
+        table.insert(w._keycb, lal)
+        w:addKeyListener(lal)
+        end
+        $]
+
+        .deriveClass<BasicContainer, Widget>("BasicContainer")
+        .endClass()
+
+        .deriveClass<ScrollArea, BasicContainer>("ScrollArea")
+            ScrollArea();
+            .addFunction("setContent", &::setContent)
+            .addFunction("getContent", &::getContent)
+            .addFunction("setScrollbarWidth", &::setScrollbarWidth)
+            .addFunction("getScrollbarWidth", &::getScrollbarWidth)
+            .addFunction("scrollToBottom", &::scrollToBottom)
+            .addFunction("scrollToTop", &::scrollToTop)
+        .endClass()
+
+        .deriveClass<ImageWidget, Widget>("ImageWidget")
+            ImageWidget(CGraphic *image);
+                ImageWidget(Mng *image);
+                ImageWidget(Movie *image);
+        .endClass()
+
+        .deriveClass<Button, Widget>("Button")
+        .endClass()
+
+        .deriveClass<ButtonWidget, Button>("ButtonWidget")
+            ButtonWidget(const std::string caption);
+            .addFunction("setCaption", &::setCaption)
+            virtual const std::string &getCaption() const;
+            .addFunction("adjustSize", &::adjustSize)
+        .endClass()
+
+        .deriveClass<ImageButton, Button>("ImageButton")
+            ImageButton();
+            ImageButton(const std::string caption);
+
+            .addFunction("setNormalImage", &::setNormalImage)
+            .addFunction("setPressedImage", &::setPressedImage)
+            .addFunction("setDisabledImage", &::setDisabledImage)
+        .endClass()
+
+        .deriveClass<RadioButton, Widget>("RadioButton")
+            RadioButton();
+            RadioButton(const std::string caption, const std::string group, bool marked = false);
+
+            .addFunction("isMarked", &::isMarked)
+            .addFunction("setMarked", &::setMarked)
+            virtual const std::string &getCaption() const;
+            .addFunction("setCaption", &::setCaption)
+            .addFunction("setGroup", &::setGroup)
+            virtual const std::string &getGroup() const;
+            .addFunction("adjustSize", &::adjustSize)
+        .endClass()
+
+        .deriveClass<ImageRadioButton, RadioButton>("ImageRadioButton")
+            ImageRadioButton();
+            ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
+
+            .addFunction("setUncheckedNormalImage", &::setUncheckedNormalImage)
+            .addFunction("setUncheckedPressedImage", &::setUncheckedPressedImage)
+            .addFunction("setUncheckedDisabledImage", &::setUncheckedDisabledImage)
+            .addFunction("setCheckedNormalImage", &::setCheckedNormalImage)
+            .addFunction("setCheckedPressedImage", &::setCheckedPressedImage)
+            .addFunction("setCheckedDisabledImage", &::setCheckedDisabledImage)
+        .endClass()
+
+        .deriveClass<CheckBox, Widget>("CheckBox")
+            CheckBox();
+            CheckBox(const std::string caption, bool marked = false);
+
+            virtual bool isMarked() const;
+            .addFunction("setMarked", &::setMarked)
+            virtual const std::string &getCaption() const;
+            .addFunction("setCaption", &::setCaption)
+            .addFunction("adjustSize", &::adjustSize)
+        .endClass()
+
+        .deriveClass<ImageCheckBox, CheckBox>("ImageCheckBox")
+            ImageCheckBox();
+            ImageCheckBox(const std::string caption, bool marked = false);
+
+            .addFunction("setUncheckedNormalImage", &::setUncheckedNormalImage)
+            .addFunction("setUncheckedPressedImage", &::setUncheckedPressedImage)
+            .addFunction("setUncheckedDisabledImage", &::setUncheckedDisabledImage)
+            .addFunction("setCheckedNormalImage", &::setCheckedNormalImage)
+            .addFunction("setCheckedPressedImage", &::setCheckedPressedImage)
+            .addFunction("setCheckedDisabledImage", &::setCheckedDisabledImage)
+        .endClass()
+
+        .deriveClass<Slider, Widget>("Slider")
+            Slider(double scaleEnd = 1.0);
+            Slider(double scaleStart, double scaleEnd);
+            .addFunction("setScale", &::setScale)
+            virtual double getScaleStart() const;
+            .addFunction("setScaleStart", &::setScaleStart)
+            virtual double getScaleEnd() const;
+            .addFunction("setScaleEnd", &::setScaleEnd)
+            .addFunction("getValue", &::getValue)
+            .addFunction("setValue", &::setValue)
+            .addFunction("setMarkerLength", &::setMarkerLength)
+            virtual int getMarkerLength() const;
+            .addFunction("setOrientation", &::setOrientation)
+            virtual unsigned int getOrientation() const;
+            .addFunction("setStepLength", &::setStepLength)
+            virtual double getStepLength() const;
+
+            enum { HORIZONTAL = 0, VERTICAL };
+        .endClass()
+
+        .deriveClass<ImageSlider, Slider>("ImageSlider")
+            ImageSlider(double scaleEnd = 1.0);
+            ImageSlider(double scaleStart, double scaleEnd);
+            .addFunction("setMarkerImage", &::setMarkerImage)
+            .addFunction("setBackgroundImage", &::setBackgroundImage)
+            .addFunction("setDisabledBackgroundImage", &::setDisabledBackgroundImage)
+        .endClass()
+
+        .deriveClass<Label, Widget>("Label")
+            Label(const std::string caption);
+            const std::string &getCaption() const;
+            .addFunction("setCaption", &::setCaption)
+            .addFunction("setAlignment", &::setAlignment)
+            virtual unsigned    .addFunction("getAlignment", &::getAlignment)
+            .addFunction("adjustSize", &::adjustSize)
+        .endClass()
+
+        .deriveClass<MultiLineLabel, Widget>("MultiLineLabel")
+            MultiLineLabel();
+            MultiLineLabel(const std::string caption);
+
+            .addFunction("setCaption", &::setCaption)
+            virtual const std::string &getCaption() const;
+            .addFunction("setAlignment", &::setAlignment)
+            virtual unsigned    .addFunction("getAlignment", &::getAlignment)
+            .addFunction("setVerticalAlignment", &::setVerticalAlignment)
+            virtual unsigned    .addFunction("getVerticalAlignment", &::getVerticalAlignment)
+            .addFunction("setLineWidth", &::setLineWidth)
+            .addFunction("getLineWidth", &::getLineWidth)
+            .addFunction("adjustSize", &::adjustSize)
+            .addFunction("draw", &::draw)
+
+            enum {
+                LEFT = 0,
+                CENTER,
+                RIGHT,
+                TOP,
+                BOTTOM
+            };
+        .endClass()
+
+        .deriveClass<TextBox, Widget>("TextBox")
+            TextBox(const std::string text);
+            .addFunction("setEditable", &::setEditable)
+                virtual std::string getText();
+        .endClass()
+
+        .deriveClass<TextField, Widget>("TextField")
+            TextField(const std::string text);
+            .addFunction("setText", &::setText)
+            virtual std::string &getText();
+            .addFunction("setPassword", &::setPassword)
+        .endClass()
+
+        .deriveClass<ImageTextField, Widget>("ImageTextField")
+            ImageTextField(const std::string text);
+            .addFunction("setText", &::setText)
+            virtual std::string &getText();
+            .addFunction("setItemImage", &::setItemImage)
+            .addFunction("setPassword", &::setPassword)
+        .endClass()
+
+        .deriveClass<ListBox, Widget>("ListBox")
+        .endClass()
+
+        .deriveClass<ImageListBox, ListBox>("ImageListBox")
+        .endClass()
+
+        .deriveClass<ListBoxWidget, ScrollArea>("ListBoxWidget")
+            ListBoxWidget(unsigned int width, unsigned int height);
+            .addFunction("setList", &::setList)
+            .addFunction("setSelected", &::setSelected)
+            .addFunction("getSelected", &::getSelected)
+        .endClass()
+
+        .deriveClass<ImageListBoxWidget, ListBoxWidget>("ImageListBoxWidget")
+            ImageListBoxWidget(unsigned int width, unsigned int height);
+            .addFunction("setList", &::setList)
+            .addFunction("setSelected", &::setSelected)
+            .addFunction("getSelected", &::getSelected)
+            .addFunction("setItemImage", &::setItemImage)
+            .addFunction("setUpButtonImage", &::setUpButtonImage)
+            .addFunction("setUpPressedButtonImage", &::setUpPressedButtonImage)
+            .addFunction("setDownButtonImage", &::setDownButtonImage)
+            .addFunction("setDownPressedButtonImage", &::setDownPressedButtonImage)
+            .addFunction("setLeftButtonImage", &::setLeftButtonImage)
+            .addFunction("setLeftPressedButtonImage", &::setLeftPressedButtonImage)
+            .addFunction("setRightButtonImage", &::setRightButtonImage)
+            .addFunction("setRightPressedButtonImage", &::setRightPressedButtonImage)
+            .addFunction("setHBarImage", &::setHBarImage)
+            .addFunction("setVBarImage", &::setVBarImage)
+            .addFunction("setMarkerImage", &::setMarkerImage)
+        .endClass()
+
+        .deriveClass<Window, BasicContainer>("Window")
+            Window();
+            Window(const std::string caption);
+            Window(Widget *content, const std::string caption = "");
+
+            .addFunction("setCaption", &::setCaption)
+            virtual const std::string &getCaption() const;
+            .addFunction("setAlignment", &::setAlignment)
+            virtual unsigned int getAlignment() const;
+            .addFunction("setContent", &::setContent)
+            virtual Widget* getContent() const;
+            .addFunction("setPadding", &::setPadding)
+            virtual unsigned int getPadding() const;
+            .addFunction("setTitleBarHeight", &::setTitleBarHeight)
+            virtual unsigned    .addFunction("getTitleBarHeight", &::getTitleBarHeight)
+            .addFunction("setMovable", &::setMovable)
+            virtual bool isMovable() const;
+            .addFunction("resizeToContent", &::resizeToContent)
+            .addFunction("setOpaque", &::setOpaque)
+            .addFunction("isOpaque", &::isOpaque)
+        .endClass()
+
+        .deriveClass<Windows, Window>("Windows")
+            Windows(const std::string text, int width, int height);
+            .addFunction("add", &::add)
+        .endClass()
+
+        .deriveClass<ScrollingWidget, ScrollArea>("ScrollingWidget")
+            ScrollingWidget(int width, int height);
+            .addFunction("add", &::add)
+            .addFunction("restart", &::restart)
+            .addFunction("setSpeed", &::setSpeed)
+            .addFunction("getSpeed", &::getSpeed)
+        .endClass()
+
+        .deriveClass<DropDown, BasicContainer>("DropDown")
+            .addFunction("getSelected", &::getSelected)
+            .addFunction("setSelected", &::setSelected)
+            .addFunction("setScrollArea", &::setScrollArea)
+            .addFunction("getScrollArea", &::getScrollArea)
+            .addFunction("setListBox", &::setListBox)
+            .addFunction("getListBox", &::getListBox)
+        .endClass()
+
+        .deriveClass<DropDownWidget, DropDown>("DropDownWidget")
+            DropDownWidget();
+            .addFunction("setList", &::setList)
+            .addFunction("getListBox", &::getListBox)
+            .addFunction("setSize", &::setSize)
+        .endClass()
+
+        .deriveClass<ImageDropDownWidget, DropDown>("ImageDropDownWidget")
+            ImageDropDownWidget();
+            .addFunction("setList", &::setList)
+            .addFunction("getListBox", &::getListBox)
+            .addFunction("setSize", &::setSize)
+            .addFunction("setItemImage", &::setItemImage)
+            .addFunction("setDownNormalImage", &::setDownNormalImage)
+            .addFunction("setDownPressedImage", &::setDownPressedImage)
+        .endClass()
+
+        .deriveClass<StatBoxWidget, Widget>("StatBoxWidget")
+            StatBoxWidget(int width, int height);
+
+            .addFunction("setCaption", &::setCaption)
+            const std::string &getCaption() const;
+            .addFunction("setPercent", &::setPercent)
+            int getPercent() const;
+        .endClass()
+
+        .deriveClass<Container, BasicContainer>("Container")
+            Container();
+            .addFunction("setOpaque", &::setOpaque)
+            virtual bool isOpaque() const;
+            .addFunction("add", &::add)
+            .addFunction("remove", &::remove)
+            .addFunction("clear", &::clear)
+        .endClass()
+
+        .deriveClass<MenuScreen, Container>("MenuScreen")
+            MenuScreen();
+
+            .addFunction("run", &::run)
+            .addFunction("stop", &::stop)
+            .addFunction("stopAll", &::stopAll)
+            .addFunction("addLogicCallback", &::addLogicCallback)
+            .addFunction("setDrawMenusUnder", &::setDrawMenusUnder)
+            .addFunction("getDrawMenusUnder", &::getDrawMenusUnder)
+        .endClass()
+        $renaming MenuScreen @ CMenuScreen
+
+        $[
+        function MenuScreen()
+        local menu = CMenuScreen()
+
+        -- Store the widget in the container. This way we keep a reference
+        -- to the widget until the container gets deleted.
+        local guichanadd = Container.add
+        function menu:add(widget, x, y)
+            if not self._addedWidgets then
+            self._addedWidgets = {}
+            end
+            self._addedWidgets[widget] = true
+            guichanadd(self, widget, x, y)
+        end
+
+        return menu
+        end
+        $]
+
+        */
+        .addFunction("CenterOnMessage", CenterOnMessage)
+        .addFunction("ToggleShowMessages", ToggleShowMessages)
+        .addFunction("SetMaxMessageCount", SetMaxMessageCount)
+        .addFunction("UiFindIdleWorker", UiFindIdleWorker)
+        .addFunction("CycleViewportMode", CycleViewportMode)
+        .addFunction("UiToggleTerrain", UiToggleTerrain)
+        .addFunction("UiTrackUnit", UiTrackUnit)
+        .addFunction("SetNewViewportMode", +[](int mode) { SetNewViewportMode(static_cast<ViewportModeType>(mode)); })
+        .addFunction("SetDefaultTextColors", SetDefaultTextColors)
         // unit.pkg
         .beginClass<Vec2i>("Vec2i")
             .addProperty("x", &Vec2i::x)
@@ -714,10 +1385,18 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addFunction("SetMapSound", SetMapSound)
         // upgrade.pkg
         .beginClass<CUpgrade>("CUpgrade")
-            .addStaticFunction("New", &CUpgrade::New)
-            .addStaticFunction("New", &CUpgrade::Get)
+            .addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CUpgrade::New(ident);
+            })
+            .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(lua_tostring(l, nargs));
+                return CUpgrade::Get(ident);
+            })
             .addProperty("Name", &CUpgrade::Name)
-            .addProperty("Costs", +[](const CUpgrade *u) { return static_cast<ConstInt7Array>(u->Costs); })
+            .addProperty("Costs", +[](const CUpgrade *u) { return static_cast<Int7Array>(u->Costs); })
             .addProperty("Icon", &CUpgrade::Icon)
         .endClass()
         // video.pkg
@@ -735,20 +1414,48 @@ int tolua_stratagus_open(lua_State *Lua) {
         .addProperty("Video", &Video, false)
         .addFunction("ToggleFullScreen", ToggleFullScreen)
         .beginClass<CGraphic>("CGraphic")
-            .addStaticFunction("New", &CGraphic::New)
-            .addStaticFunction("ForceNew", &CGraphic::ForceNew)
-            .addStaticFunction("Get", &CGraphic::Get)
-            .addStaticFunction("Free", &CGraphic::Free)
+            .addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                return CGraphic::New((luabridge::Stack<std::string>::get(l, nargs - 2)), luabridge::Stack<int>::get(l, nargs - 1), luabridge::Stack<int>::get(l, nargs));
+            })
+            .addStaticFunction("ForceNew", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                return CGraphic::ForceNew((luabridge::Stack<std::string>::get(l, nargs - 2)), luabridge::Stack<int>::get(l, nargs - 1), luabridge::Stack<int>::get(l, nargs));
+            })
+            .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(luabridge::Stack<std::string>::get(l, nargs));
+                return CGraphic::Get(ident);
+            })
+            .addFunction("Free", &CGraphic::Free)
             .addFunction("Load", &CGraphic::Load)
             .addFunction("Resize", &CGraphic::Resize)
             .addFunction("SetPaletteColor", &CGraphic::SetPaletteColor)
         .endClass()
-        .beginClass<CPlayerColorGraphic>("CPlayerColorGraphic")
-        	.addStaticFunction("New", &CPlayerColorGraphic::New)
-	        .addStaticFunction("Get", &CPlayerColorGraphic::Get)
+        .deriveClass<CPlayerColorGraphic, CGraphic>("CPlayerColorGraphic")
+        	.addStaticFunction("New", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                return CPlayerColorGraphic::New((luabridge::Stack<std::string>::get(l, nargs - 2)), luabridge::Stack<int>::get(l, nargs - 1), luabridge::Stack<int>::get(l, nargs));
+            })
+            .addStaticFunction("ForceNew", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                return CPlayerColorGraphic::ForceNew((luabridge::Stack<std::string>::get(l, nargs - 2)), luabridge::Stack<int>::get(l, nargs - 1), luabridge::Stack<int>::get(l, nargs));
+            })
+	        .addStaticFunction("Get", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                std::string ident(luabridge::Stack<std::string>::get(l, nargs));
+                return CPlayerColorGraphic::Get(ident);
+            })
         .endClass()
         .beginClass<CColor>("CColor")
-            .addConstructor<void (*)(unsigned char, unsigned char, unsigned char, unsigned char)>()
+            .addStaticFunction("__call", +[](lua_State *l) {
+                int nargs = lua_gettop(l);
+                uint8_t r = luabridge::Stack<uint8_t>::get(l, 2);
+                uint8_t g = luabridge::Stack<uint8_t>::get(l, 3);
+                uint8_t b = luabridge::Stack<uint8_t>::get(l, 4);
+                uint8_t a = nargs == 5 ? luabridge::Stack<uint8_t>::get(l, 5) : 0;
+                return new CColor(r, g, b, a);
+            })
             .addProperty("R", &CColor::R)
             .addProperty("G", &CColor::G)
             .addProperty("B", &CColor::B)
