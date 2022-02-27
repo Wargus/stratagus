@@ -103,6 +103,14 @@ struct CArray {
     T *array;
 };
 
+template <class T>
+struct ExposedVector {
+    ExposedVector(const std::vector<T> *v) {
+        this->vectorPtr = const_cast<std::vector<T> *>(v);
+    }
+
+    std::vector<T> *vectorPtr;
+};
 
 /**
  * @brief Expose C++ functions, variables, classes, and structures to Lua.
@@ -664,11 +672,11 @@ int tolua_stratagus_open(lua_State *Lua) {
         .endClass()
         .addProperty("UnitTypes", +[]() { return static_cast<CArray<CUnitType, 0>>(nullptr); })
         .addProperty("MaxCosts", +[]() { return MaxCosts; })
-        .addProperty("FoodCost", +[]() { return FoodCost; })
-        .addProperty("ScoreCost", +[]() { return ScoreCost; })
-        .addProperty("ManaResCost", +[]() { return ManaResCost; })
-        .addProperty("FreeWorkersCount", +[]() { return FreeWorkersCount; })
-        .addProperty("MaxResouceInfo", +[]() { return MaxResourceInfo; })
+        .addProperty("FoodCost", +[]() -> int { return FoodCost; })
+        .addProperty("ScoreCost", +[]() -> int { return ScoreCost; })
+        .addProperty("ManaResCost", +[]() -> int { return ManaResCost; })
+        .addProperty("FreeWorkersCount", +[]() -> int { return FreeWorkersCount; })
+        .addProperty("MaxResouceInfo", +[]() -> int { return MaxResourceInfo; })
         .addProperty("PlayerMax", +[]() { return PlayerMax; })
         .addProperty("PlayerNumNeutral", +[]() { return PlayerNumNeutral; })
         .addProperty("InfiniteRepairRange", +[]() { return InfiniteRepairRange; })
@@ -725,12 +733,18 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<LuaActionListener>("LuaActionListener")
             .addStaticFunction("__call", +[](lua_State *l) {
                 // custom constructor, first arg is the table, second the lua function
-                return new LuaActionListener(l, lua_gettop(l) < 2 ? 0 : 2);
+                return LuaActionListener(l, lua_gettop(l) < 2 ? 0 : 2);
             })
         .endClass()
 
         .beginClass<CUIButton>("CUIButton")
             .addConstructor<void (*) ()>()
+            .addStaticFunction("new", +[](lua_State *l) {
+                return new CUIButton(); // C++ lifetime
+            })
+            .addStaticFunction("new_local", +[](lua_State *l) {
+                return CUIButton(); // Lua lifetime
+            })
             .addProperty("X", &CUIButton::X)
             .addProperty("Y", &CUIButton::Y)
             .addProperty("Text", &CUIButton::Text)
@@ -755,6 +769,9 @@ int tolua_stratagus_open(lua_State *Lua) {
 
         .beginClass<CFiller>("CFiller")
             .addConstructor<void (*) ()>()
+            .addStaticFunction("new_local", +[](lua_State *l) -> CFiller {  
+                return CFiller();
+            })
             .addProperty("G", &CFiller::G)
             .addProperty("X", &CFiller::X)
             .addProperty("Y", &CFiller::Y)
@@ -763,7 +780,7 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<CButtonPanel>("CButtonPanel")
             .addProperty("X", &CButtonPanel::X)
             .addProperty("Y", &CButtonPanel::Y)
-            //TODO: vector<CUIButton> Buttons;
+            .addProperty("Buttons", +[](const CButtonPanel *p) -> ExposedVector<CUIButton> { return &(p->Buttons); })
             .addProperty("AutoCastBorderColorRGB", &CButtonPanel::AutoCastBorderColorRGB)
             .addProperty("ShowCommandKey", &CButtonPanel::ShowCommandKey)
         .endClass()
@@ -815,29 +832,48 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("Font", &CUITimer::Font)
         .endClass()
 
+        .beginClass<ExposedVector<CFiller>>("__vector_CFiller")
+            .addFunction("clear", +[](ExposedVector<CFiller> *thiz) { thiz->vectorPtr->clear(); })
+            .addFunction("push_back", +[](ExposedVector<CFiller> *thiz, CFiller filler) { thiz->vectorPtr->push_back(filler); })
+        .endClass()
+        .beginClass<ExposedVector<CUIButton>>("__vector_CUIButton")
+            .addFunction("clear", +[](ExposedVector<CUIButton> *thiz) { thiz->vectorPtr->clear(); })
+            .addFunction("push_back", +[](ExposedVector<CUIButton> *thiz, CUIButton btn) { thiz->vectorPtr->push_back(btn); })
+        .endClass()
+        .beginClass<ExposedVector<CUIUserButton>>("__vector_CUIUserButton")
+            .addFunction("clear", +[](ExposedVector<CUIUserButton> *thiz) { thiz->vectorPtr->clear(); })
+        .endClass()
+        .beginClass<ExposedVector<std::string>>("__vector_string")
+            .addFunction("clear", +[](ExposedVector<std::string> *thiz) { thiz->vectorPtr->clear(); })
+        .endClass()
+        .beginClass<ExposedVector<int>>("__vector_int")
+            .addFunction("clear", +[](ExposedVector<int> *thiz) { thiz->vectorPtr->clear(); })
+        .endClass()
+
         .beginClass<CUserInterface>("CUserInterface")
             .addProperty("NormalFontColor", &CUserInterface::NormalFontColor)
             .addProperty("ReverseFontColor", &CUserInterface::ReverseFontColor)
 
-            // vector<CFiller> Fillers;
+            .addProperty("Fillers", +[](const CUserInterface *ui) -> ExposedVector<CFiller> { return &(ui->Fillers); })
 
             .addProperty("Resources", +[](const CUserInterface *ui) { return static_cast<CResourceInfoArray>(ui->Resources); })
             .addProperty("InfoPanel", &CUserInterface::InfoPanel)
             .addProperty("SingleSelectedButton", &CUserInterface::SingleSelectedButton)
 
-            // vector<CUIButton> SelectedButtons;
+            .addProperty("SelectedButtons", +[](const CUserInterface *ui) -> ExposedVector<CUIButton> { return &(ui->SelectedButtons); })
+
             .addProperty("MaxSelectedFont", &CUserInterface::MaxSelectedFont)
             .addProperty("MaxSelectedTextX", &CUserInterface::MaxSelectedTextX)
             .addProperty("MaxSelectedTextY", &CUserInterface::MaxSelectedTextY)
 
             .addProperty("SingleTrainingButton", &CUserInterface::SingleTrainingButton)
-            // vector<CUIButton> TrainingButtons;
+            .addProperty("TrainingButtons", +[](const CUserInterface *ui) -> ExposedVector<CUIButton> { return &(ui->TrainingButtons); })
             .addProperty("UpgradingButton", &CUserInterface::UpgradingButton)
             .addProperty("ResearchingButton", &CUserInterface::ResearchingButton)
-            // vector<CUIButton> TransportingButtons;
+            .addProperty("TransportingButtons", +[](const CUserInterface *ui) -> ExposedVector<CUIButton> { return &(ui->TransportingButtons); })
 
-            // vector<string> LifeBarColorNames;
-            // vector<int> LifeBarPercents;
+            .addProperty("LifeBarColorNames", +[](const CUserInterface *ui) -> ExposedVector<std::string> { return &(ui->LifeBarColorNames); })
+            .addProperty("LifeBarColorNames", +[](const CUserInterface *ui) -> ExposedVector<int> { return &(ui->LifeBarPercents); })
             .addProperty("LifeBarYOffset", &CUserInterface::LifeBarYOffset)
             .addProperty("LifeBarPadding", &CUserInterface::LifeBarPadding)
             .addProperty("LifeBarBorder", &CUserInterface::LifeBarBorder)
@@ -859,7 +895,7 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("NetworkMenuButton", &CUserInterface::NetworkMenuButton)
             .addProperty("NetworkDiplomacyButton", &CUserInterface::NetworkDiplomacyButton)
 
-            // vector<CUIUserButton> UserButtons;
+            .addProperty("UserButtons", +[](const CUserInterface *ui) -> ExposedVector<CUIUserButton> { return &(ui->UserButtons); })
 
             .addProperty("Minimap", &CUserInterface::Minimap)
             .addProperty("StatusLine", &CUserInterface::StatusLine)
@@ -887,6 +923,9 @@ int tolua_stratagus_open(lua_State *Lua) {
             .addProperty("Ident", +[](const CIcon *i) { return i->GetIdent(); })
             .addProperty("G", &CIcon::G)
             .addProperty("Frame", &CIcon::Frame)
+        .endClass()
+
+        .beginClass<ButtonStyle>("__ButtonStyle")
         .endClass()
 
         .addFunction("FindButtonStyle", FindButtonStyle)
@@ -1416,7 +1455,15 @@ int tolua_stratagus_open(lua_State *Lua) {
         .beginClass<CGraphic>("CGraphic")
             .addStaticFunction("New", +[](lua_State *l) {
                 int nargs = lua_gettop(l);
-                return CGraphic::New((luabridge::Stack<std::string>::get(l, nargs - 2)), luabridge::Stack<int>::get(l, nargs - 1), luabridge::Stack<int>::get(l, nargs));
+                std::string name(luabridge::Stack<std::string>::get(l, 2));
+                int w = 0, h = 0;
+                if (nargs > 2) {
+                    w = luabridge::Stack<int>::get(l, nargs - 1);
+                    if (nargs > 3) {
+                        h = luabridge::Stack<int>::get(l, nargs);
+                    }
+                }
+                return CGraphic::New(name, w, h);
             })
             .addStaticFunction("ForceNew", +[](lua_State *l) {
                 int nargs = lua_gettop(l);
@@ -1454,7 +1501,7 @@ int tolua_stratagus_open(lua_State *Lua) {
                 uint8_t g = luabridge::Stack<uint8_t>::get(l, 3);
                 uint8_t b = luabridge::Stack<uint8_t>::get(l, 4);
                 uint8_t a = nargs == 5 ? luabridge::Stack<uint8_t>::get(l, 5) : 0;
-                return new CColor(r, g, b, a);
+                return CColor(r, g, b, a);
             })
             .addProperty("R", &CColor::R)
             .addProperty("G", &CColor::G)
