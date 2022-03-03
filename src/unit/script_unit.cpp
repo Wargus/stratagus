@@ -1516,7 +1516,7 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const bool isSimplified = LuaToBoolean(l, 1);
 	if (!IsNetworkGame()) {
-		Preference.SimplifiedAutoTargeting = isSimplified;
+		GameSettings.SimplifiedAutoTargeting = isSimplified;
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB, 
 								   int(isSimplified), 0, 0, 0, 0);

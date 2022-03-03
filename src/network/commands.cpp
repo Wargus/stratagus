@@ -806,7 +806,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		case ExtendedMessageAutoTargetingDB:
 			/// arg1: 0:true / 1:false
 			if (arg1 == 0 || arg1 == 1) {
-				Preference.SimplifiedAutoTargeting = arg1 ? true : false;
+				GameSettings.SimplifiedAutoTargeting = arg1 ? true : false;
 				/// CommandLog(...);
 			} else {
 				/// CommandLog(...);

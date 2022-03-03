@@ -137,7 +137,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 	if (!range) {
 		return;
 	}
-	if (GameSettings.FoV == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) { 
+	if (GameSettings.FoV == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
 		/// FIXME: add high-/lowground
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {

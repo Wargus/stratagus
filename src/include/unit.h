@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "settings.h"
 #include <vector>
 
 #ifndef __UNITTYPE_H__
@@ -445,10 +446,10 @@ class CPreference
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
 		ShowAttackRange(false), ShowMessages(true), ShowNoSelectionStats(true), BigScreen(false),
-		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
+		PauseOnLeave(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false), SimplifiedAutoTargeting(false),
-		AiChecksDependencies(false), SelectionRectangleIndicatesDamage(false),
+		DeselectInMine(false), NoStatusLineTooltips(false),
+		SelectionRectangleIndicatesDamage(false),
 		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -459,15 +460,12 @@ public:
 	bool ShowNoSelectionStats; /// Show stats when no selection is active
 	bool BigScreen;			   /// If true, shows the big screen(without panels)
 	bool PauseOnLeave;         /// If true, game pauses when cursor is gone
-	bool AiExplores;           /// If true, AI sends explorers to search for resources (almost useless thing)
 	bool GrayscaleIcons;       /// Use grayscaled icons for unavailable units, upgrades, etc
 	bool IconsShift;           /// Shift icons slightly when you press on them
 	bool StereoSound;          /// Enables/disables stereo sound effects
 	bool MineNotifications;    /// Show mine is running low/depleted messages
 	bool DeselectInMine;       /// Deselect peasants in mines
 	bool NoStatusLineTooltips; /// Don't show messages on status line
-	bool SimplifiedAutoTargeting; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
-	bool AiChecksDependencies; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
 	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
 	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
 
@@ -475,9 +473,27 @@ public:
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.
 	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
-
 	CGraphic *IconFrameG;
 	CGraphic *PressedIconFrameG;
+
+#if USING_TOLUAPP
+	// these are "preferences" in the sense that the user wants to set these
+	// persistently across launches for single player games. However, they are
+	// relevant for network sync and replays, so the actually relevant storage
+	// is in GameSettings, and we just have properties for the lua code here
+private:
+	bool AiExplores;
+	bool SimplifiedAutoTargeting;
+	bool AiChecksDependencies;
+
+public:
+	bool get_AiExplores() { return AiExplores; }
+	void set_AiExplores(bool v) { AiExplores = GameSettings.AiExplores = v; }
+	bool get_SimplifiedAutoTargeting() { return SimplifiedAutoTargeting; }
+	void set_SimplifiedAutoTargeting(bool v) { SimplifiedAutoTargeting = GameSettings.SimplifiedAutoTargeting = v; }
+	bool get_AiChecksDependencies() { return AiChecksDependencies; }
+	void set_AiChecksDependencies(bool v) { AiChecksDependencies = GameSettings.AiChecksDependencies = v; }
+#endif
 };
 
 extern CPreference Preference;

@@ -246,7 +246,10 @@ struct Settings {
 		struct {
 			unsigned NoFogOfWar:1;        /// if dynamic fog of war is disabled
 			unsigned Inside:1;            /// if game uses interior tileset or is generally "inside" for the purpose of obstacles
-			unsigned UserGameSettings:30; /// A bitfield for use by games and their settings
+			unsigned AiExplores:1;        /// If true, AI sends explorers to search for resources (almost useless thing)
+			unsigned SimplifiedAutoTargeting:1; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
+			unsigned AiChecksDependencies:1; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
+			unsigned UserGameSettings:27; /// A bitfield for use by games and their settings
 		};
 		uint32_t _Bitfield;
 	};
@@ -340,6 +343,9 @@ struct Settings {
 		DefeatReveal = RevealTypes::cAllUnits;
 		NoFogOfWar = 0;
 		Inside = 0;
+		AiExplores = 1;
+		AiChecksDependencies = 0;
+		SimplifiedAutoTargeting = 0;
 		UserGameSettings = 0;
 	}
 };

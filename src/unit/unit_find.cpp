@@ -692,12 +692,12 @@ private:
 	CUnit *Find(Iterator begin, Iterator end) const
 	{
 		CUnit *enemy = NULL;
-		int best_cost = Preference.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
+		int best_cost = GameSettings.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
 
 		for (Iterator it = begin; it != end; ++it) {
-			int cost = Preference.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
+			int cost = GameSettings.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
 
-			if (Preference.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
+			if (GameSettings.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
 				enemy = *it;
 				best_cost = cost;
 			}
@@ -975,7 +975,7 @@ public:
 
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
-		if (!Preference.SimplifiedAutoTargeting) {
+		if (!GameSettings.SimplifiedAutoTargeting) {
 			FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
 		}
 		return Find(table.begin(), table.end());
@@ -1005,7 +1005,7 @@ private:
 			return;
 		}
 
-		if (Preference.SimplifiedAutoTargeting) {
+		if (GameSettings.SimplifiedAutoTargeting) {
 			const int cost = TargetPriorityCalculate(attacker, dest);
 			if (cost > best_cost) {
 				best_unit = dest;

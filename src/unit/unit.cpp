@@ -2553,7 +2553,7 @@ void DestroyAllInside(CUnit &source)
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SimplifiedAutoTargeting) {
 		// Original algorithm return smaler values for better targets
 		return -TargetPriorityCalculate(&unit, &dest);
 	}
@@ -3157,7 +3157,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SimplifiedAutoTargeting) {
 		target.Threshold = 0;
 	} else {		
 		const int threshold = 30;
