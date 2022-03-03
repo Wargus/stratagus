@@ -107,17 +107,17 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "type")) {
 			value = LuaToString(l, j + 1);
 			if (!strcmp(value, "neutral")) {
-				this->Type = PlayerNeutral;
+				this->Type = PlayerTypes::PlayerNeutral;
 			} else if (!strcmp(value, "nobody")) {
-				this->Type = PlayerNobody;
+				this->Type = PlayerTypes::PlayerNobody;
 			} else if (!strcmp(value, "computer")) {
-				this->Type = PlayerComputer;
+				this->Type = PlayerTypes::PlayerComputer;
 			} else if (!strcmp(value, "person")) {
-				this->Type = PlayerPerson;
+				this->Type = PlayerTypes::PlayerPerson;
 			} else if (!strcmp(value, "rescue-passive")) {
-				this->Type = PlayerRescuePassive;
+				this->Type = PlayerTypes::PlayerRescuePassive;
 			} else if (!strcmp(value, "rescue-active")) {
-				this->Type = PlayerRescueActive;
+				this->Type = PlayerTypes::PlayerRescueActive;
 			} else {
 				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
@@ -683,7 +683,6 @@ static int CclGetDiplomacy(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const int base = LuaToNumber(l, 1);
 	const int plynr = LuaToNumber(l, 2);
-	const char *state;
 
 	if (Players[base].IsEnemy(plynr)) {
 		if (Players[base].IsAllied(plynr)) {

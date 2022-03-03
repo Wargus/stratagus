@@ -234,7 +234,7 @@ public:
 		if (this->Type->BoolFlag[REVEALER_INDEX].value) {
 			return false;
 		}
-		if ((player.Type == PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
+		if ((player.Type == PlayerTypes::PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
 			|| IsVisible(player) || IsVisibleOnRadar(player)) {
 			return IsAliveOnMap();
 		} else {

@@ -284,14 +284,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	} else {
 		f = (100 * EvalNumber(this->ValueFunc)) / this->ValueMax;
 		f = f > 100 ? 100 : f;
-		if (f < 0) {
-			return;
-		}
+	}
+	if (f < 0) {
+		return;
 	}
 	int i = 0;
 
 	// get to right color
-	while (f < this->values[i]) {
+	while (static_cast<unsigned int>(f) < this->values[i]) {
 		i++;
 	}
 	color = IndexToColor(this->colors[i]);

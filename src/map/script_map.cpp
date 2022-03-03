@@ -144,7 +144,7 @@ static int CclRevealMap(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
-	int newMode;
+	MapRevealModes newMode;
 	const char *revealMode = LuaToString(l, 1);
 	if (!strcmp(revealMode, "hidden")) {
 		newMode = MapRevealModes::cHidden;
@@ -348,7 +348,7 @@ static int CclSetFieldOfViewType(lua_State *l)
 		/// Tiled types of FOW don't work with shadow casting
 		if (FogOfWar.GetType() != FogOfWarTypes::cEnhanced) {
 			FogOfWar.SetType(FogOfWarTypes::cEnhanced);
-		}	
+		}
 	} else if (!strcmp(type_name, "simple-radial")) {
 		new_type = FieldOfViewTypes::cSimpleRadial;
 	} else {
@@ -791,26 +791,26 @@ static int CclDefinePlayerTypes(lua_State *l)
 		}
 		const char *type = LuaToString(l, i + 1);
 		if (!strcmp(type, "neutral")) {
-			Map.Info.PlayerType[i] = PlayerNeutral;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerNeutral;
 		} else if (!strcmp(type, "nobody")) {
-			Map.Info.PlayerType[i] = PlayerNobody;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerNobody;
 		} else if (!strcmp(type, "computer")) {
-			Map.Info.PlayerType[i] = PlayerComputer;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerComputer;
 		} else if (!strcmp(type, "person")) {
-			Map.Info.PlayerType[i] = PlayerPerson;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerPerson;
 		} else if (!strcmp(type, "rescue-passive")) {
-			Map.Info.PlayerType[i] = PlayerRescuePassive;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerRescuePassive;
 		} else if (!strcmp(type, "rescue-active")) {
-			Map.Info.PlayerType[i] = PlayerRescueActive;
+			Map.Info.PlayerType[i] = PlayerTypes::PlayerRescueActive;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ type);
 		}
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {
-		Map.Info.PlayerType[i] = PlayerNobody;
+		Map.Info.PlayerType[i] = PlayerTypes::PlayerNobody;
 	}
 	if (numplayers < PlayerMax) {
-		Map.Info.PlayerType[PlayerMax - 1] = PlayerNeutral;
+		Map.Info.PlayerType[PlayerMax - 1] = PlayerTypes::PlayerNeutral;
 	}
 	return 0;
 }

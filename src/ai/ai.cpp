@@ -744,7 +744,7 @@ void AiUnitKilled(CUnit &unit)
 	DebugPrint("%d: %d(%s) killed\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 
 	if (unit.GroupId) {
 		AiForce &force = unit.Player->Ai->Force[unit.GroupId - 1];
@@ -780,7 +780,7 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 				   what.Player->Index _C_ what.Type->Ident.c_str() _C_ what.tilePos.x _C_ what.tilePos.y);
 	}
 
-	Assert(what.Player->Type != PlayerPerson);
+	Assert(what.Player->Type != PlayerTypes::PlayerPerson);
 	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
 }
 
@@ -796,7 +796,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 }
 
@@ -808,7 +808,7 @@ void AiCanNotBuild(const CUnit &unit, const CUnitType &what)
 */
 void AiCanNotReach(CUnit &unit, const CUnitType &what)
 {
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 	AiReduceMadeInBuilt(*unit.Player->Ai, what);
 }
 
@@ -939,7 +939,7 @@ void AiCanNotMove(CUnit &unit)
 */
 void AiNeedMoreSupply(const CPlayer &player)
 {
-	Assert(player.Type != PlayerPerson);
+	Assert(player.Type != PlayerTypes::PlayerPerson);
 	player.Ai->NeedSupply = true;
 }
 
@@ -955,7 +955,7 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Type->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 
 	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
 
@@ -976,7 +976,7 @@ void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what.Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 }
 
 /**
@@ -991,7 +991,7 @@ void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str() _C_
 			   what->Ident.c_str() _C_ unit.tilePos.x _C_ unit.tilePos.y);
 
-	Assert(unit.Player->Type != PlayerPerson);
+	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
 
 	// FIXME: upgrading knights -> paladins, must rebuild lists!
 }

@@ -352,7 +352,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		unit.Player->LostMainFacilityTimer = 0;
 		unit.Player->SetRevealed(false);
 		for (int j = 0; j < NumPlayers; ++j) {
-			if (unit.Player->Index != j && Players[j].Type != PlayerNobody) {
+			if (unit.Player->Index != j && Players[j].Type != PlayerTypes::PlayerNobody) {
 				Players[j].Notify(_("%s has rebuilt a base, and will no longer be revealed!"), unit.Player->Name.c_str());
 			} else {
 				Players[j].Notify("%s", _("You have rebuilt a base, and will no longer be revealed!"));

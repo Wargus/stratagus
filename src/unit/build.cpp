@@ -508,7 +508,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 
 	CPlayer *player = NULL;
 
-	if (unit && unit->Player->Type == PlayerPerson) {
+	if (unit && unit->Player->Type == PlayerTypes::PlayerPerson) {
 		player = unit->Player;
 	}
 	int testmask;

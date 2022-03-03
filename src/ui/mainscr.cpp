@@ -219,7 +219,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		return true;
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
-		|| (unit.Player->Type == PlayerNeutral && condition->HideNeutral)
+		|| (unit.Player->Type == PlayerTypes::PlayerNeutral && condition->HideNeutral)
 		|| (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
 		|| ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
 		return false;
@@ -1110,7 +1110,7 @@ static void InfoPanel_draw_no_selection()
 
 		GetDefaultTextColors(nc, rc);
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerNobody) {
+			if (Players[i].Type != PlayerTypes::PlayerNobody) {
 				if (ThisPlayer->IsAllied(Players[i])) {
 					label.SetNormalColor(FontGreen);
 				} else if (ThisPlayer->IsEnemy(Players[i])) {

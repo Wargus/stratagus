@@ -70,6 +70,7 @@
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
 extern void CleanGame();
+extern void CreateGame(const std::string &filename, CMap *map);
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -542,17 +543,17 @@ static void DrawPlayers()
 {
 	forEachPlayerSelectionBoxArea([](int i, int x, int y, int w, int h) {
 		// draw highlight
-		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
+		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
 			Video.DrawRectangle(ColorWhite, x, y, getPlayerButtonSize(), getPlayerButtonSize());
 		}
 
 		// draw border 1px inside highlight
 		Video.DrawRectangle(
-			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody ? ColorWhite : ColorGray,
+			i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody ? ColorWhite : ColorGray,
 			x + 1, y + 1, getPlayerButtonSize() - 1, getPlayerButtonSize() - 1);
 
 		// if player exists, draw player color 2px inside highlight
-		if (Map.Info.PlayerType[i] != PlayerNobody) {
+		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
 			Video.FillRectangle(
 				PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], 
 				x + 2, y + 2, getPlayerButtonSize() - 2, getPlayerButtonSize() - 2);
@@ -933,7 +934,7 @@ static void DrawStartLocations()
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
+			if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody && Map.Info.PlayerType[i] != PlayerTypes::PlayerNeutral) {
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
@@ -1214,7 +1215,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
-			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerNobody) {
+			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerTypes::PlayerNobody) {
 				Editor.SelectedPlayer = Editor.CursorPlayer;
 				ThisPlayer = Players + Editor.SelectedPlayer;
 			}
@@ -1469,7 +1470,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 					break;
 				}
 			}
-			if (UnitUnderCursor != NULL && Map.Info.PlayerType[pnum] != PlayerNobody) {
+			if (UnitUnderCursor != NULL && Map.Info.PlayerType[pnum] != PlayerTypes::PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(Players[pnum]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -1542,7 +1543,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 	bool noHit = forEachPlayerSelectionBoxArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
-			if (Map.Info.PlayerType[i] != PlayerNobody) {
+			if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), _("Select player #%d"), i + 1);
 				UI.StatusLine.Set(buf);
@@ -1819,12 +1820,12 @@ void CEditor::Init()
 		InitPlayers();
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (i == PlayerNumNeutral) {
-				CreatePlayer(PlayerNeutral);
-				Map.Info.PlayerType[i] = PlayerNeutral;
+				CreatePlayer(PlayerTypes::PlayerNeutral);
+				Map.Info.PlayerType[i] = PlayerTypes::PlayerNeutral;
 				Map.Info.PlayerSide[i] = Players[i].Race = 0;
 			} else {
-				CreatePlayer(PlayerNobody);
-				Map.Info.PlayerType[i] = PlayerNobody;
+				CreatePlayer(PlayerTypes::PlayerNobody);
+				Map.Info.PlayerType[i] = PlayerTypes::PlayerNobody;
 			}
 		}
 
@@ -1847,7 +1848,7 @@ void CEditor::Init()
 
 	// Place the start points, which the loader discarded.
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] != PlayerNobody) {
+		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
 			// Set SelectedPlayer to a valid player
 			if (Editor.SelectedPlayer == PlayerNumNeutral) {
 				Editor.SelectedPlayer = i;
