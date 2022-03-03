@@ -110,7 +110,6 @@ private:
 private:
 	struct FieldOfViewSettings 
 	{
-		FieldOfViewTypes Type	  	  {FieldOfViewTypes::cSimpleRadial}; 	/// Type of field of view - Shadowcasting or Simple Radial
 		uint16_t 		 OpaqueFields {MapFieldOpaque};    				/// Flags for opaque MapFields
 	} Settings;
 
