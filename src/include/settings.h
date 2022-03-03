@@ -132,7 +132,7 @@ struct SettingsPresets {
 		AIScript = "ai-passive";
 		Race = SettingsPresetMapDefault;
 		Team = SettingsPresetMapDefault;
-		Type = PlayerTypes::Unset;
+		Type = PlayerTypes::MapDefault;
 	}
 
 	bool operator==(const SettingsPresets &other) const {
