@@ -57,6 +57,18 @@ inline bool operator != (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
 }
 
 template <typename T>
+inline bool operator < (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	return lhs.x < rhs.x && lhs.y < rhs.y;
+}
+
+template <typename T>
+inline bool operator > (const Vec2T<T> &lhs, const Vec2T<T> &rhs)
+{
+	return lhs.x > rhs.x && lhs.y > rhs.y;
+}
+
+template <typename T>
 inline const Vec2T<T> &operator += (Vec2T<T> &lhs, const Vec2T<T> &rhs)
 {
 	lhs.x += rhs.x;

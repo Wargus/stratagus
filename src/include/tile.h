@@ -227,6 +227,9 @@ public:
 	unsigned char getCost() const { return cost; }
 	unsigned int getFlag() const { return Flags; }
 	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+#ifdef DEBUG
+	int64_t lastAStarCost;    /// debugging pathfinder
+#endif
 private:
 #ifdef DEBUG
 	unsigned int tilesetTile;  /// tileset tile number

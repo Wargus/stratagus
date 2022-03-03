@@ -430,43 +430,45 @@ void CUnit::Init()
 	pathFinderData = new PathFinderData;
 	pathFinderData->input.SetUnit(*this);
 
+	Frame = 0;
 	Colors = -1;
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 	IX = 0;
 	IY = 0;
-	Frame = 0;
 	Direction = 0;
+	CurrentResource = 0;
+	ResourcesHeld = 0;
 	DamagedType = ANIMATIONS_DEATHTYPES;
 	Attacked = 0;
+	Summoned = 0;
+	Blink = 0;
+	Moving = 0;
+	ReCast = 0;
+	AutoRepair = 0;
 	Burning = 0;
 	Destroyed = 0;
 	Removed = 0;
 	Selected = 0;
-	TeamSelected = 0;
 	Constructed = 0;
 	Active = 0;
 	Boarded = 0;
+	CacheLock = 0;
+	Waiting = 0;
+	MineLow = 0;
+	TeamSelected = 0;
 	RescuedFrom = NULL;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
 	delete Variable;
 	Variable = NULL;
 	TTL = 0;
-	Threshold = 0;
-	UnderAttack = 0;
 	GroupId = 0;
 	LastGroup = 0;
-	ResourcesHeld = 0;
 	Wait = 0;
-	Blink = 0;
-	Moving = 0;
-	ReCast = 0;
-	CacheLock = 0;
-	Summoned = 0;
-	Waiting = 0;
-	MineLow = 0;
+	Threshold = 0;
+	UnderAttack = 0;
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
-	CurrentResource = 0;
 	Orders.clear();
 	delete SavedOrder;
 	SavedOrder = NULL;
@@ -478,9 +480,7 @@ void CUnit::Init()
 	AutoCastSpell = NULL;
 	delete SpellCoolDownTimers;
 	SpellCoolDownTimers = NULL;
-	AutoRepair = 0;
 	Goal = NULL;
-	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 }
 
 CUnit::~CUnit() {
@@ -2984,7 +2984,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
-					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
 						order.OfferNewTarget(target, &attacker);
 					}
@@ -3018,7 +3018,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
 									? attacker.tilePos 
 									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
-			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 				return;
 			}
 			COrder *savedOrder = NULL;

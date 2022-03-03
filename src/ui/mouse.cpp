@@ -713,6 +713,21 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	}
+	if (UI.Resources[FreeWorkersCount].TextX != -1) {
+		int x, y;
+		CGraphic* g = UI.Resources[FreeWorkersCount].G;
+		if (g && (x = UI.Resources[FreeWorkersCount].IconX) && (y = UI.Resources[FreeWorkersCount].IconY)) {
+			int textX = UI.Resources[FreeWorkersCount].TextX;
+			if (textX > 0 || ThisPlayer->FreeWorkers.size() > 0) {
+				if (screenPos > PixelPos(x, y) && screenPos < PixelPos(x + g->getWidth(), y + g->getHeight())) {
+					ButtonAreaUnderCursor = ButtonAreaMenu;
+					ButtonUnderCursor = ButtonUnderFreeWorkers;
+					CursorOn = CursorOnButton;
+					return;
+				}
+			}
+		}
+	}
 	for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 		const CUIUserButton &button = UI.UserButtons[i];
 
@@ -1735,6 +1750,8 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				GameDiplomacyButtonClicked = true;
+			} else if (ButtonUnderCursor == ButtonUnderFreeWorkers) {
+				UiFindIdleWorker();
 			}
 			//  clicked on user buttons
 		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {

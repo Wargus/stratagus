@@ -578,7 +578,7 @@ void DrawResources()
 	CLabel label(GetGameFont());
 
 	// Draw all icons of resource.
-	for (int i = 0; i <= FreeWorkersCount; ++i) {
+	for (int i = 0; i < FreeWorkersCount; ++i) {
 		if (UI.Resources[i].G) {
 			UI.Resources[i].G->DrawFrameClip(UI.Resources[i].IconFrame,
 											 UI.Resources[i].IconX, UI.Resources[i].IconY);
@@ -620,9 +620,21 @@ void DrawResources()
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
 		const int workers = ThisPlayer->FreeWorkers.size();
-
+		int textX = UI.Resources[FreeWorkersCount].TextX;
+		if (textX < 0) {
+			// XXX: this is hacky, but what use is that bit otherwise
+			if (workers == 0) {
+				return;
+			} else {
+				textX = -textX;
+			}
+		}
+		if (UI.Resources[FreeWorkersCount].G) {
+			UI.Resources[FreeWorkersCount].G->DrawFrameClip(UI.Resources[FreeWorkersCount].IconFrame,
+											 UI.Resources[FreeWorkersCount].IconX, UI.Resources[FreeWorkersCount].IconY);
+		}
 		label.SetFont(GetGameFont());
-		label.Draw(UI.Resources[FreeWorkersCount].TextX, UI.Resources[FreeWorkersCount].TextY, workers);
+		label.Draw(textX, UI.Resources[FreeWorkersCount].TextY, workers);
 	}
 }
 

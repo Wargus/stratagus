@@ -213,14 +213,8 @@ class BestDepotFinder
 					return;
 				}
 
-				// calck real travel distance
-				if (worker->Container != nullptr) {
-					UnmarkUnitFieldFlags(*first_container);
-				}
-				const int travel_distance = UnitReachable(*worker, *dest, 1);
-				if (worker->Container != nullptr) {
-					MarkUnitFieldFlags(*first_container);
-				}
+				// calc real travel distance
+				const int travel_distance = UnitReachable(*worker, *dest, 1, worker->Container != nullptr);
 				//
 				// Take this depot?
 				//
@@ -730,7 +724,7 @@ private:
 		// Unit in range ?
 		const int d = attacker->MapDistanceTo(*dest);
 
-		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange)) {
+		if (d > attackrange && !UnitReachable(*attacker, *dest, attackrange, false)) {
 			return INT_MAX;
 		}
 
@@ -934,7 +928,7 @@ public:
 
 				int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				if (d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
+					(d <= range && UnitReachable(*attacker, *dest, attackrange, false))) {
 					++enemy_count;
 				} else {
 					dest->CacheLock = 1;
