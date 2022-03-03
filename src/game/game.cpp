@@ -908,15 +908,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	SyncHash = 0;
 	InitSyncRand();
 
-	if (IsNetworkGame()) { // Prepare network play
-		NetworkOnStartGame();
-	} else {
-		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
-
-		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
-			ThisPlayer->SetName(localPlayerName);
-		}
-	}
+	NetworkOnStartGame();
 
 	CallbackMusicOn();
 

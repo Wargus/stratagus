@@ -469,6 +469,12 @@ void ExitNetwork1()
 */
 void NetworkOnStartGame()
 {
+	if (!IsNetworkGame()) {
+		// really a single player game, but we use the command queue for determinism in replays
+		CNetworkParameter::Instance.NetworkLag = 1;
+	} else {
+		CNetworkParameter::Instance.NetworkLag = 10;
+	}
 	ThisPlayer->SetName(Parameters::Instance.LocalPlayerName);
 	for (int i = 0; i < HostsCount; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
@@ -1081,7 +1087,9 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 	}
 	NetworkSyncSeeds[gameNetCycle & 0xFF] = SyncRandSeed;
 	NetworkSyncHashs[gameNetCycle & 0xFF] = SyncHash;
-	NetworkSendPacket(ncq);
+	if (IsNetworkGame()) {
+		NetworkSendPacket(ncq);
+	}
 }
 
 /**
@@ -1109,9 +1117,6 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 */
 void NetworkCommands()
 {
-	if (!IsNetworkGame()) {
-		return;
-	}
 	if ((GameCycle % CNetworkParameter::Instance.gameCyclesPerUpdate) != 0) {
 		return;
 	}
