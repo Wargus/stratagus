@@ -1111,9 +1111,12 @@ static int CclGetPlayerData(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code>SetPlayerData(0,"Name","Nation of Stromgarde")
-**		SetPlayerData(0,"RaceName","human")
-** 		SetPlayerData(0,"Resources","gold",1700)</code></div>
+** <div class="example"><code>
+**  SetPlayerData(0,"Name","Nation of Stromgarde") -- set the name of this player
+**	SetPlayerData(0,"RaceName","human") -- the the race to human
+** 	SetPlayerData(0,"Resources","gold",1700) -- set the player to have 1700 gold
+**  SetPlayerData(0, "Allow", "upgrade-paladin", "R") -- give the player the Paladin upgrade
+** </code></div>
 */
 static int CclSetPlayerData(lua_State *l)
 {
