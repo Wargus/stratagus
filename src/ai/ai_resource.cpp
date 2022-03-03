@@ -807,7 +807,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table;
 
-	if (GameSettings.AiChecksDependencies || IsNetworkGame()) {
+	if (GameSettings.AiChecksDependencies) {
 		if (!CheckDependByType(*AiPlayer->Player, what)) {
 			return false;
 		}
