@@ -113,10 +113,10 @@ static_assert(MAX_RACES < 256, "Race selection needs to fit into 8 bits");
 static_assert(PlayerMax < 256, "Team number must fit into 8 bits");
 
 struct SettingsPresets {
-	uint8_t PlayerColor;      /// Color of a player
+	int8_t PlayerColor;       /// Color of a player
 	std::string AIScript;     /// AI script for computer to use
-	uint8_t Race;             /// Race of the player
-	uint8_t Team;             /// Team of player
+	int8_t Race;              /// Race of the player
+	int8_t Team;              /// Team of player
 	PlayerTypes Type;         /// Type of player (for network games)
 
 	void Save(const std::function <void (std::string)>& f) {
