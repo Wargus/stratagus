@@ -234,10 +234,10 @@ struct Settings {
 	SettingsPresets Presets[PlayerMax];
 
 	//  Common settings:
-	uint8_t Resources;         /// Preset resource factor
-	uint8_t NumUnits;          /// Preset # of units
-	uint8_t Opponents;         /// Preset # of ai-opponents
-	uint8_t Difficulty;        /// Terrain type (summer,winter,...)
+	int8_t Resources;          /// Preset resource factor
+	int8_t NumUnits;           /// Preset # of units
+	int8_t Opponents;          /// Preset # of ai-opponents
+	int8_t Difficulty;         /// Terrain type (summer,winter,...)
 	GameTypes GameType;        /// Game type (melee, free for all,...)
 	FieldOfViewTypes FoV;      /// Which field of view is used - important to be shared for unit sight
 	MapRevealModes RevealMap;  /// Reveal map kind

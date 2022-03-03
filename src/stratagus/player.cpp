@@ -1307,6 +1307,11 @@ void DebugPlayers()
 				   PlayerRaces.Name[Players[i].Race].c_str() _C_
 				   Players[i].AiName.c_str());
 	}
+	DebugPrint("GameSettings\n");
+	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
+	GameSettings.Save(+[](std::string f) {
+		DebugPrint("%s\n" _C_ f.c_str());
+	}, true);
 #endif
 }
 
