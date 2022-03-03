@@ -74,9 +74,13 @@ class Settings {
 	int Opponents;
 	int Difficulty;
 	GameTypes GameType;
-	bool NoFogOfWar;
-	bool Inside;
+        FieldOfViewTypes FoV;
 	MapRevealModes RevealMap;
+        RevealTypes DefeatReveal;
+        int _Bitfield @ Flags;
+
+        bool GetUserGameSetting(int i);
+        void SetUserGameSetting(int i, bool v);
 };
 
 $[

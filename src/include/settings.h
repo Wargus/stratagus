@@ -254,6 +254,14 @@ struct Settings {
 		uint32_t _Bitfield;
 	};
 
+	bool GetUserGameSetting(int i) {
+		return UserGameSettings & (1 << i);
+	}
+
+	void SetUserGameSetting(int i, bool v) {
+		UserGameSettings |= (1 << i);
+	}
+
 	bool operator==(const Settings &other) const {
 		for (int i = 0; i < PlayerMax; i++) {
 			if (Presets[i] == other.Presets[i]) {
@@ -277,7 +285,7 @@ struct Settings {
 	void Save(const std::function <void (std::string)>& f, bool withPlayers = true) {
 		f(std::string("NetGameType = ") + std::to_string(static_cast<int>(NetGameType)));
 		if (withPlayers) {
-			for (int i = 0; i < PlayerMax - 1; ++i) {
+			for (int i = 0; i < PlayerMax; ++i) {
 				Presets[i].Save([&] (std::string field) {
 					f(std::string("Presets[") + std::to_string(i) + "]." + field);
 				});
@@ -291,9 +299,7 @@ struct Settings {
 		f(std::string("FoV = ") + std::to_string(static_cast<int>(FoV)));
 		f(std::string("RevealMap = ") + std::to_string(static_cast<int>(RevealMap)));
 		f(std::string("DefeatReveal = ") + std::to_string(static_cast<int>(DefeatReveal)));
-		f(std::string("NoFogOfWar = ") + std::to_string(NoFogOfWar));
-		f(std::string("Inside = ") + std::to_string(Inside));
-		f(std::string("UserGameSettings = ") + std::to_string(UserGameSettings));
+		f(std::string("Flags = ") + std::to_string(_Bitfield));
 	}
 
 	bool SetField(std::string field, int value) {
@@ -315,12 +321,8 @@ struct Settings {
 			RevealMap = static_cast<MapRevealModes>(value);
 		} else if (field == "DefeatReveal") {
 			DefeatReveal = static_cast<RevealTypes>(value);
-		} else if (field == "NoFogOfWar") {
-			NoFogOfWar = value;
-		} else if (field == "Inside") {
-			Inside = value;
-		} else if (field == "UserGameSettings") {
-			UserGameSettings = value;
+		} else if (field == "Flags") {
+			_Bitfield = value;
 		} else {
 			return false;
 		}
