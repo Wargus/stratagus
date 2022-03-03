@@ -371,7 +371,7 @@ void InitPlayers()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
 		Players[p].Index = p;
-		if (Players[p].Type == PlayerTypes::Unset) {
+		if (Players[p].Type == PlayerTypes::PlayerUnset) {
 			Players[p].Type = PlayerTypes::PlayerNobody;
 		}
 	}
@@ -769,7 +769,7 @@ void CPlayer::Clear()
 {
 	Index = 0;
 	Name.clear();
-	Type = PlayerTypes::Unset;
+	Type = PlayerTypes::PlayerUnset;
 	Race = 0;
 	AiName.clear();
 	Team = 0;
@@ -1291,7 +1291,7 @@ void DebugPlayers()
 		const char *playertype;
 
 		switch (Players[i].Type) {
-			case PlayerTypes::Unset: playertype = "unset     "; break;
+			case PlayerTypes::PlayerUnset: playertype = "unset     "; break;
 			case PlayerTypes::PlayerNeutral: playertype = "neutral     "; break;
 			case PlayerTypes::PlayerNobody: playertype = "nobody      "; break;
 			case PlayerTypes::PlayerComputer: playertype = "computer    "; break;

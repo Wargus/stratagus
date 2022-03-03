@@ -68,7 +68,7 @@ public:
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
-enum class SlotOption : uint8_t {
+ENUM_CLASS SlotOption : uint8_t {
 	Available,
 	Computer,
 	Closed

@@ -44,6 +44,16 @@
 #include <variant>
 
 /*----------------------------------------------------------------------------
+--  TODO: Remove this once we move off of tolua++ and can properly support strongly typed enums
+----------------------------------------------------------------------------*/
+#if 1
+// using tolua++
+#define ENUM_CLASS enum
+#else
+#define ENUM_CLASS enum class
+#endif
+
+/*----------------------------------------------------------------------------
 --  Settings
 ----------------------------------------------------------------------------*/
 
@@ -87,9 +97,9 @@ constexpr int8_t SettingsPresetMapDefault = -1;  /// Special: Use map supplied
 **    can rescue them. If the city center is rescued, than all units
 **    of this player are rescued.
 */
-enum class PlayerTypes : int8_t {
+ENUM_CLASS PlayerTypes : int8_t {
 	MapDefault = SettingsPresetMapDefault, /// use default
-	Unset = 0,                             /// not set
+	PlayerUnset = 0,                       /// not set
 	PlayerNeutral = 2,                     /// neutral
 	PlayerNobody  = 3,                     /// unused slot
 	PlayerComputer = 4,                    /// computer player
@@ -144,7 +154,7 @@ struct SettingsPresets {
 	}
 };
 
-enum class RevealTypes : uint8_t { 
+ENUM_CLASS RevealTypes : uint8_t { 
 	cNoRevelation, 
 	cAllUnits, 
 	cBuildingsOnly 
@@ -153,7 +163,7 @@ enum class RevealTypes : uint8_t {
 /**
 **  Single or multiplayer settings
 */
-enum class NetGameTypes : uint8_t {
+ENUM_CLASS NetGameTypes : uint8_t {
 	SettingsSinglePlayerGame,
 	SettingsMultiPlayerGame,
 	Unset
@@ -162,7 +172,7 @@ enum class NetGameTypes : uint8_t {
 /**
 **  GameType settings
 */
-enum class GameTypes : int8_t {
+ENUM_CLASS GameTypes : int8_t {
 	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
 	SettingsGameTypeMelee = 0,
 	SettingsGameTypeFreeForAll,
@@ -187,14 +197,14 @@ enum class GameTypes : int8_t {
 
 /// Map revealing modes: cHidden - unrevealed, cKnown - you can see unexplored tiles, but they are darker than explored
 /// cExplored - all tiles became explored, and covered only by the fog of war if it's enabled.
-enum class MapRevealModes : uint8_t {
+ENUM_CLASS MapRevealModes : uint8_t {
 	cHidden = 0,
 	cKnown,
 	cExplored,
 	cNumOfModes
 };
 
-enum class FieldOfViewTypes : uint8_t {
+ENUM_CLASS FieldOfViewTypes : uint8_t {
 	cShadowCasting,
 	cSimpleRadial,
 	NumOfTypes
