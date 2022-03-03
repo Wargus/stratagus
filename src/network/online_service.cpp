@@ -1054,8 +1054,6 @@ public:
             game_settings |= 0x400;
         }
         switch (GameSettings.Resources) {
-        case -1:
-            break;
         case 1:
             game_settings |= 0x1000;
             break;

@@ -298,7 +298,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, Vec2i new
 			--topplayer;
 		}
 		for (int i = 0; i <= topplayer; ++i) {
-			f->printf("%s\"%s\"", (i ? ", " : ""), PlayerTypeNames[static_cast<int>(map.Info.PlayerType[i])]);
+			f->printf("%s\"%s\"", (i ? ", " : ""), PlayerTypeNames[static_cast<int>(map.Info.PlayerType[i])].c_str());
 			if (map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 				++numplayers;
 			}

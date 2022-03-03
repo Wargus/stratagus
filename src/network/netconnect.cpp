@@ -1750,7 +1750,7 @@ void NetworkServerStartGame()
 #ifdef DEBUG
 	printf("INITIAL ServerSetupState:\n");
 	for (int i = 0; i < PlayerMax - 1; ++i) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
+		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
 			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
@@ -2039,7 +2039,7 @@ void NetworkGamePrepareGameSettings()
 
 #ifdef DEBUG
 	for (int i = 0; i < PlayerMax - 1; i++) {
-		printf("%02d: CO: %d   Race: %d   Name: ", i, ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
+		printf("%02d: CO: %d   Race: %d   Name: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			for (int h = 0; h != HostsCount; ++h) {
 				if (Hosts[h].PlyNr == i) {
@@ -2070,14 +2070,14 @@ void NetworkGamePrepareGameSettings()
 	for (int i = 0; i < h; i++) {
 		GameSettings.Presets[num[i]].Race = ServerSetupState.ServerGameSettings.Presets[num[i]].Race;
 		switch (ServerSetupState.CompOpt[num[i]]) {
-			case 0: {
+			case SlotOption::Available: {
 				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerPerson;
 				break;
 			}
-			case 1:
+			case SlotOption::Computer:
 				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerComputer;
 				break;
-			case 2:
+			case SlotOption::Closed:
 				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerNobody;
 			default:
 				break;

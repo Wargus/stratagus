@@ -452,7 +452,7 @@ void CPlayer::Save(CFile &file) const
 		case PlayerTypes::PlayerPerson:        file.printf("\"person\",");          break;
 		case PlayerTypes::PlayerRescuePassive: file.printf("\"rescue-passive\","); break;
 		case PlayerTypes::PlayerRescueActive:  file.printf("\"rescue-active\","); break;
-		default:                  file.printf("%d,", p.Type); break;
+		default:                  file.printf("%d,", (int)p.Type); break;
 	}
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
@@ -1291,14 +1291,13 @@ void DebugPlayers()
 		const char *playertype;
 
 		switch (Players[i].Type) {
-			case 0: playertype = "Don't know 0"; break;
-			case 1: playertype = "Don't know 1"; break;
-			case 2: playertype = "neutral     "; break;
-			case 3: playertype = "nobody      "; break;
-			case 4: playertype = "computer    "; break;
-			case 5: playertype = "person      "; break;
-			case 6: playertype = "rescue pas. "; break;
-			case 7: playertype = "rescue akt. "; break;
+			case PlayerTypes::Unset: playertype = "unset     "; break;
+			case PlayerTypes::PlayerNeutral: playertype = "neutral     "; break;
+			case PlayerTypes::PlayerNobody: playertype = "nobody      "; break;
+			case PlayerTypes::PlayerComputer: playertype = "computer    "; break;
+			case PlayerTypes::PlayerPerson: playertype = "person      "; break;
+			case PlayerTypes::PlayerRescuePassive: playertype = "rescue pas. "; break;
+			case PlayerTypes::PlayerRescueActive: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
 		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_

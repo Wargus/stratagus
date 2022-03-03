@@ -269,25 +269,25 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 size_t CServerSetup::Deserialize(const unsigned char *p)
 {
 	const unsigned char *buf = p;
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.DefeatReveal));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Difficulty));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.FoV));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.GameType));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.DefeatReveal));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Difficulty));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.FoV));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.GameType));
 	// Inside is part of the bitfield
 	// NetGameType is not needed
 	// NoFogOfWar is part of the bitfield
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.NumUnits));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Opponents));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Resources));
-	p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.RevealMap));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.NumUnits));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Opponents));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Resources));
+	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.RevealMap));
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
-	p += deserialize32(p, &static_cast<uint32_t>(this->ServerGameSettings._Bitfield));
+	p += deserialize32(p, reinterpret_cast<uint32_t*>(&this->ServerGameSettings._Bitfield));
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &static_cast<int8_t>(this->ServerGameSettings.Presets[i].Race));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Race));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &static_cast<int8_t>(this->CompOpt[i]));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->CompOpt[i]));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->Ready[i]);
