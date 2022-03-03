@@ -476,16 +476,22 @@ public:
 	CGraphic *IconFrameG;
 	CGraphic *PressedIconFrameG;
 
-#if USING_TOLUAPP
 	// these are "preferences" in the sense that the user wants to set these
 	// persistently across launches for single player games. However, they are
 	// relevant for network sync and replays, so the actually relevant storage
-	// is in GameSettings, and we just have properties for the lua code here
+	// is in GameSettings, and we just have properties for the lua code here and
+	// to initialize GameSettings to the user preferred defaults
+	void InitializeSettingsFromPreferences(Settings &s) {
+		s.AiExplores = AiExplores;
+		s.SimplifiedAutoTargeting = SimplifiedAutoTargeting;
+		s.AiChecksDependencies = AiChecksDependencies;
+	}
 private:
-	bool AiExplores;
-	bool SimplifiedAutoTargeting;
-	bool AiChecksDependencies;
+	bool AiExplores = true;
+	bool SimplifiedAutoTargeting = false;
+	bool AiChecksDependencies = false;
 
+#if USING_TOLUAPP
 public:
 	bool get_AiExplores() { return AiExplores; }
 	void set_AiExplores(bool v) { AiExplores = GameSettings.AiExplores = v; }

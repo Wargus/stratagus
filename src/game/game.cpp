@@ -1084,6 +1084,7 @@ void CreateGame(const std::string &filename, CMap *map)
 void InitSettings()
 {
 	GameSettings.Init();
+	Preference.InitializeSettingsFromPreferences(GameSettings);
 }
 
 // call the lua function: CleanGame_Lua.

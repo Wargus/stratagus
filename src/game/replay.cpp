@@ -168,9 +168,13 @@ static FullReplay *StartReplay()
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->PlayerNames[i] = Players[i].Name;
 		replay->ReplaySettings.Presets[i].PlayerColor = GameSettings.Presets[i].PlayerColor;
+		// Some settings are determined during CreateGame and then stored on the
+		// Players array. For replay, we want to store these,
+		// generally. However, this is not true for teams, since there is
+		// automatic handling of alliance flags for rescueable players.
 		replay->ReplaySettings.Presets[i].AIScript = Players[i].AiName; // GameSettings.Presets[i].AIScript;
 		replay->ReplaySettings.Presets[i].Race = Players[i].Race; // GameSettings.Presets[i].Race;
-		replay->ReplaySettings.Presets[i].Team = Players[i].Team; // GameSettings.Presets[i].Team;
+		replay->ReplaySettings.Presets[i].Team = GameSettings.Presets[i].Team; // Players[i].Team;
 		replay->ReplaySettings.Presets[i].Type = Players[i].Type; // GameSettings.Presets[i].Type;
 	}
 
