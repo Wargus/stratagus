@@ -54,6 +54,21 @@
 #endif
 
 /*----------------------------------------------------------------------------
+--  Some limits
+----------------------------------------------------------------------------*/
+
+constexpr unsigned char PlayerMax = 16;        /// How many players are supported
+constexpr unsigned short UnitTypeMax = 2048;                /// How many unit types supported
+constexpr unsigned short UpgradeMax = 2048;                /// How many upgrades supported
+constexpr unsigned char MAX_RACES = 8;
+constexpr unsigned char PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
+
+/// Frames per second to display (original 30-40)
+constexpr unsigned char FRAMES_PER_SECOND = 30; // 1/30s
+/// Game cycles per second to simulate (original 30-40)
+constexpr unsigned char CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
+
+/*----------------------------------------------------------------------------
 --  Settings
 ----------------------------------------------------------------------------*/
 
@@ -108,16 +123,7 @@ ENUM_CLASS PlayerTypes : int8_t {
 	PlayerRescueActive = 7                 /// rescued  active
 };
 
-std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 1] = {
-	"",
-	"",
-	"neutral",
-	"nobody",
-	"computer",
-	"person",
-	"rescue-passive",
-	"rescue-active"
-};
+extern std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 1];
 
 static_assert(MAX_RACES < 256, "Race selection needs to fit into 8 bits");
 static_assert(PlayerMax < 256, "Team number must fit into 8 bits");

@@ -226,7 +226,6 @@ static int loadShaders() {
 	cShaderPath = (char*)shaderPath.c_str();
 #endif
 	int n = ReadDataDirectory(cShaderPath, flp);
-	int shaderFileToIdx[1024];
 	for (int i = 0; i < n; ++i) {
 		int pos = flp[i].name.find(".glsl");
 		if (pos > 0) {

@@ -277,6 +277,16 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	SDL_FreeSurface(preview);
 }
 
+std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 1] = {
+	"",
+	"",
+	"neutral",
+	"nobody",
+	"computer",
+	"person",
+	"rescue-passive",
+	"rescue-active"
+};
 
 // Write the map presentation file
 static int WriteMapPresentation(const std::string &mapname, CMap &map, Vec2i newSize)
