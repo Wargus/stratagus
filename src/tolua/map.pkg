@@ -8,7 +8,7 @@ class CMapInfo
         string Postamble;
 	int MapWidth;
 	int MapHeight;
-	int PlayerType[PlayerMax];
+	PlayerTypes PlayerType[PlayerMax];
 };
 
 class CTileset

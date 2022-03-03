@@ -12,7 +12,7 @@ class CPlayer
 	int Index;
 	string Name;
 
-	int Type;
+	PlayerTypes Type;
 	int Race;
 	string AiName;
 

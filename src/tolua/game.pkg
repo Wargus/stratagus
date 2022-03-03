@@ -49,11 +49,23 @@ struct SettingsPresets {
 	string AIScript;
 	int Race;
 	int Team;
-	int Type;
+	PlayerTypes Type;
+};
+
+enum RevealTypes { 
+	cNoRevelation, 
+	cAllUnits, 
+	cBuildingsOnly 
+};
+
+enum NetGameTypes {
+	SettingsSinglePlayerGame,
+	SettingsMultiPlayerGame,
+	Unset
 };
 
 class Settings {
-	int NetGameType;
+	NetGameTypes NetGameType;
 
 	SettingsPresets Presets[PlayerMax];
 
@@ -61,16 +73,33 @@ class Settings {
 	int NumUnits;
 	int Opponents;
 	int Difficulty;
-	int GameType;
+	GameTypes GameType;
 	bool NoFogOfWar;
 	bool Inside;
-	int RevealMap;
-	int MapRichness;
+	MapRevealModes RevealMap;
 };
+
+$[
+Settings.MapRichness = 0
+$]
+
 
 extern Settings GameSettings;
 
 #define SettingsPresetMapDefault -1
+
+enum MapRevealModes {
+	cHidden,
+	cKnown,
+	cExplored,
+	cNumOfModes
+};
+
+enum FieldOfViewTypes {
+	cShadowCasting,
+	cSimpleRadial,
+	NumOfTypes
+};
 
 enum GameTypes {
 	SettingsGameTypeMapDefault = SettingsPresetMapDefault,

@@ -74,6 +74,16 @@ ENUM_CLASS SlotOption : uint8_t {
 	Closed
 };
 
+#if USING_TOLUAPP
+class ServerSetupStateRacesArray {
+public:
+	ServerSetupStateRacesArray() : p(nullptr) {}
+	int8_t& operator[](int idx) { return p[idx].Race; }
+	int8_t& operator[](int idx) const { return p[idx].Race; }
+	SettingsPresets *p;
+};
+#endif
+
 /**
 **  Multiplayer game setup menu state
 */
@@ -93,6 +103,34 @@ public:
 	SlotOption CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint8_t Ready[PlayerMax];      /// Client ready state
 	// Fill in here...
+
+#if USING_TOLUAPP
+	// TODO: can be removed once tolua++ is gone
+	inline char get_ResourcesOption() { return (char)ServerGameSettings.Resources; }
+	inline char get_UnitsOption() { return (char)ServerGameSettings.NumUnits; }
+	inline char get_FogOfWar() { return (char)!ServerGameSettings.NoFogOfWar; }
+	inline char get_Inside() { return (char)ServerGameSettings.Inside; }
+	inline char get_RevealMap() { return (char)ServerGameSettings.RevealMap; }
+	inline char get_GameTypeOption() { return (char)ServerGameSettings.GameType; }
+	inline char get_Difficulty() { return (char)ServerGameSettings.Difficulty; }
+	inline char get_Opponents() { return (char)ServerGameSettings.Opponents; }
+	inline char set_ResourcesOption(char v) { return ServerGameSettings.Resources = v; }
+	inline char set_UnitsOption(char v) { return ServerGameSettings.NumUnits = v; }
+	inline char set_FogOfWar(char v) { return ServerGameSettings.NoFogOfWar = !v; }
+	inline char set_Inside(char v) { return ServerGameSettings.Inside = v; }
+	inline char set_RevealMap(char v) { return ServerGameSettings.RevealMap = (MapRevealModes)v; }
+	inline char set_GameTypeOption(char v) { return ServerGameSettings.GameType = (GameTypes)v; }
+	inline char set_Difficulty(char v) { return ServerGameSettings.Difficulty = v; }
+	inline char set_Opponents(char v) { return ServerGameSettings.Opponents = v; }
+
+	ServerSetupStateRacesArray racesArray;
+	inline ServerSetupStateRacesArray *get_Race() {
+		if (racesArray.p == nullptr) {
+			racesArray.p = ((SettingsPresets*)ServerGameSettings.Presets);
+		}
+		return &racesArray;
+	}
+#endif
 };
 
 /**

@@ -44,7 +44,7 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-ENUM_CLASS FogOfWarTypes { cTiled, cEnhanced, cTiledLegacy, cNumOfTypes };  /// Types of the fog of war
+enum class FogOfWarTypes { cTiled, cEnhanced, cTiledLegacy, cNumOfTypes };  /// Types of the fog of war
 class CFogOfWar
 {
 public:

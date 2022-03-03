@@ -46,7 +46,8 @@
 /*----------------------------------------------------------------------------
 --  TODO: Remove this once we move off of tolua++ and can properly support strongly typed enums
 ----------------------------------------------------------------------------*/
-#if 1
+#define USING_TOLUAPP 1
+#if USING_TOLUAPP
 // using tolua++
 #define ENUM_CLASS enum
 #else
