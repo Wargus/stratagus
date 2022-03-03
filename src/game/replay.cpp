@@ -98,14 +98,15 @@ public:
 class MPPlayer
 {
 public:
-	MPPlayer() : PlayerColor(0), Race(0), Team(0), Type(0) {}
+	MPPlayer() {
+		Preset.PlayerColor = 0;
+		Preset.Race = 0;
+		Preset.Team = 0;
+		Preset.Type = 0;
+	}
 
 	std::string Name;
-	std::string AIScript;
-	int PlayerColor;
-	int Race;
-	int Team;
-	int Type;
+	SettingsPresets Preset;
 };
 
 /**
@@ -115,10 +116,17 @@ class FullReplay
 {
 public:
 	FullReplay() :
-		MapId(0), Type(0), Race(0), LocalPlayer(0),
-		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
-		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
+		MapId(0), Type(0), LocalPlayer(0), Commands(NULL)
 	{
+		ReplaySettings.Resources = 0;
+		ReplaySettings.NumUnits = 0;
+		ReplaySettings.Difficulty = 0;
+		ReplaySettings.NoFogOfWar = false;
+		ReplaySettings.Inside = false;
+		ReplaySettings.RevealMap = 0;
+		ReplaySettings.MapRichness = 0;
+		ReplaySettings.GameType = 0;
+		ReplaySettings.Opponents = 0;
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
 	}
@@ -131,19 +139,10 @@ public:
 	unsigned MapId;
 
 	int Type;
-	int Race;
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
 
-	int Resource;
-	int NumUnits;
-	int Difficulty;
-	bool NoFow;
-	bool Inside;
-	int RevealMap;
-	int MapRichness;
-	int GameType;
-	int Opponents;
+	Settings ReplaySettings;
 	int Engine[3];
 	int Network[3];
 	LogEntry *Commands;
@@ -198,11 +197,11 @@ static FullReplay *StartReplay()
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
-		replay->Players[i].PlayerColor = GameSettings.Presets[i].PlayerColor;
-		replay->Players[i].AIScript = Players[i].AiName; // GameSettings.Presets[i].AIScript;
-		replay->Players[i].Race = Players[i].Race; // GameSettings.Presets[i].Race;
-		replay->Players[i].Team = Players[i].Team; // GameSettings.Presets[i].Team;
-		replay->Players[i].Type = Players[i].Type; // GameSettings.Presets[i].Type;
+		replay->Players[i].Preset.PlayerColor = GameSettings.Presets[i].PlayerColor;
+		replay->Players[i].Preset.AIScript = Players[i].AiName; // GameSettings.Presets[i].AIScript;
+		replay->Players[i].Preset.Race = Players[i].Race; // GameSettings.Presets[i].Race;
+		replay->Players[i].Preset.Team = Players[i].Team; // GameSettings.Presets[i].Team;
+		replay->Players[i].Preset.Type = Players[i].Type; // GameSettings.Presets[i].Type;
 	}
 
 	replay->LocalPlayer = ThisPlayer->Index;
@@ -211,15 +210,15 @@ static FullReplay *StartReplay()
 	replay->Map = Map.Info.Description;
 	replay->MapId = (signed int)Map.Info.MapUID;
 	replay->MapPath = CurrentMapPath;
-	replay->Resource = GameSettings.Resources;
-	replay->NumUnits = GameSettings.NumUnits;
-	replay->Difficulty = GameSettings.Difficulty;
-	replay->NoFow = GameSettings.NoFogOfWar;
-	replay->Inside = GameSettings.Inside;
-	replay->GameType = GameSettings.GameType;
-	replay->RevealMap = GameSettings.RevealMap;
-	replay->MapRichness = GameSettings.MapRichness;
-	replay->Opponents = GameSettings.Opponents;
+	replay->ReplaySettings.Resources = GameSettings.Resources;
+	replay->ReplaySettings.NumUnits = GameSettings.NumUnits;
+	replay->ReplaySettings.Difficulty = GameSettings.Difficulty;
+	replay->ReplaySettings.NoFogOfWar = GameSettings.NoFogOfWar;
+	replay->ReplaySettings.Inside = GameSettings.Inside;
+	replay->ReplaySettings.GameType = GameSettings.GameType;
+	replay->ReplaySettings.RevealMap = GameSettings.RevealMap;
+	replay->ReplaySettings.MapRichness = GameSettings.MapRichness;
+	replay->ReplaySettings.Opponents = GameSettings.Opponents;
 
 	replay->Engine[0] = StratagusMajorVersion;
 	replay->Engine[1] = StratagusMinorVersion;
@@ -249,11 +248,11 @@ static void ApplyReplaySettings()
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		GameSettings.Presets[i].PlayerColor = CurrentReplay->Players[i].PlayerColor;
-		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
-		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
-		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
-		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
+		GameSettings.Presets[i].PlayerColor = CurrentReplay->Players[i].Preset.PlayerColor;
+		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].Preset.AIScript;
+		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Preset.Race;
+		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Preset.Team;
+		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Preset.Type;
 	}
 
 	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
@@ -261,15 +260,15 @@ static void ApplyReplaySettings()
 		// FIXME: need to handle errors better
 		Exit(1);
 	}
-	GameSettings.Resources = CurrentReplay->Resource;
-	GameSettings.NumUnits = CurrentReplay->NumUnits;
-	GameSettings.Difficulty = CurrentReplay->Difficulty;
-	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->NoFow;
-	GameSettings.Inside = CurrentReplay->Inside;
-	GameSettings.GameType = CurrentReplay->GameType;
-	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
-	GameSettings.MapRichness = CurrentReplay->MapRichness;
-	GameSettings.Opponents = CurrentReplay->Opponents;
+	GameSettings.Resources = CurrentReplay->ReplaySettings.Resources;
+	GameSettings.NumUnits = CurrentReplay->ReplaySettings.NumUnits;
+	GameSettings.Difficulty = CurrentReplay->ReplaySettings.Difficulty;
+	Map.NoFogOfWar = GameSettings.NoFogOfWar = CurrentReplay->ReplaySettings.NoFogOfWar;
+	GameSettings.Inside = CurrentReplay->ReplaySettings.Inside;
+	GameSettings.GameType = CurrentReplay->ReplaySettings.GameType;
+	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->ReplaySettings.RevealMap;
+	GameSettings.MapRichness = CurrentReplay->ReplaySettings.MapRichness;
+	GameSettings.Opponents = CurrentReplay->ReplaySettings.Opponents;
 
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
@@ -339,8 +338,8 @@ static void SaveFullLog(CFile &file)
 	file.printf("  MapPath = \"%s\",\n", CurrentReplay->MapPath.c_str());
 	file.printf("  MapId = %u,\n", CurrentReplay->MapId);
 	file.printf("  Type = %d,\n", CurrentReplay->Type);
-	file.printf("  Race = %d,\n", CurrentReplay->Race);
 	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
+	file.printf("  Race = %d,\n", CurrentReplay->Players[CurrentReplay->LocalPlayer].Preset.Race);
 	file.printf("  Players = {\n");
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (!CurrentReplay->Players[i].Name.empty()) {
@@ -348,23 +347,23 @@ static void SaveFullLog(CFile &file)
 		} else {
 			file.printf("\t{");
 		}
-		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
-		file.printf(" PlayerColor = %d,", CurrentReplay->Players[i].PlayerColor);
-		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
-		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
-		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
+		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].Preset.AIScript.c_str());
+		file.printf(" PlayerColor = %d,", CurrentReplay->Players[i].Preset.PlayerColor);
+		file.printf(" Race = %d,", CurrentReplay->Players[i].Preset.Race);
+		file.printf(" Team = %d,", CurrentReplay->Players[i].Preset.Team);
+		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Preset.Type,
 					i != PlayerMax - 1 ? ",\n" : "\n");
 	}
 	file.printf("  },\n");
-	file.printf("  Resource = %d,\n", CurrentReplay->Resource);
-	file.printf("  NumUnits = %d,\n", CurrentReplay->NumUnits);
-	file.printf("  Difficulty = %d,\n", CurrentReplay->Difficulty);
-	file.printf("  NoFow = %s,\n", CurrentReplay->NoFow ? "true" : "false");
-	file.printf("  Inside = %s,\n", CurrentReplay->Inside ? "true" : "false");
-	file.printf("  RevealMap = %d,\n", CurrentReplay->RevealMap);
-	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
-	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
-	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
+	file.printf("  Resource = %d,\n", CurrentReplay->ReplaySettings.Resources);
+	file.printf("  NumUnits = %d,\n", CurrentReplay->ReplaySettings.NumUnits);
+	file.printf("  Difficulty = %d,\n", CurrentReplay->ReplaySettings.Difficulty);
+	file.printf("  NoFow = %s,\n", CurrentReplay->ReplaySettings.NoFogOfWar ? "true" : "false");
+	file.printf("  Inside = %s,\n", CurrentReplay->ReplaySettings.Inside ? "true" : "false");
+	file.printf("  RevealMap = %d,\n", CurrentReplay->ReplaySettings.RevealMap);
+	file.printf("  GameType = %d,\n", CurrentReplay->ReplaySettings.GameType);
+	file.printf("  Opponents = %d,\n", CurrentReplay->ReplaySettings.Opponents);
+	file.printf("  MapRichness = %d,\n", CurrentReplay->ReplaySettings.MapRichness);
 	file.printf("  Engine = { %d, %d, %d },\n",
 				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
 	file.printf("  Network = { %d, %d, %d }\n",
@@ -613,7 +612,7 @@ static int CclReplayLog(lua_State *l)
 		} else if (!strcmp(value, "Type")) {
 			replay->Type = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Race")) {
-			replay->Race = LuaToNumber(l, -1);
+			replay->Players[replay->LocalPlayer].Preset.Race = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
@@ -634,15 +633,15 @@ static int CclReplayLog(lua_State *l)
 					if (!strcmp(value, "Name")) {
 						replay->Players[j].Name = LuaToString(l, -1);
 					} else if (!strcmp(value, "AIScript")) {
-						replay->Players[j].AIScript = LuaToString(l, -1);
+						replay->Players[j].Preset.AIScript = LuaToString(l, -1);
 					} else if (!strcmp(value, "PlayerColor")) {
-						replay->Players[j].PlayerColor = LuaToNumber(l, -1);
+						replay->Players[j].Preset.PlayerColor = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Race")) {
-						replay->Players[j].Race = LuaToNumber(l, -1);
+						replay->Players[j].Preset.Race = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Team")) {
-						replay->Players[j].Team = LuaToNumber(l, -1);
+						replay->Players[j].Preset.Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {
-						replay->Players[j].Type = LuaToNumber(l, -1);
+						replay->Players[j].Preset.Type = LuaToNumber(l, -1);
 					} else {
 						LuaError(l, "Unsupported key: %s" _C_ value);
 					}
@@ -651,23 +650,23 @@ static int CclReplayLog(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "Resource")) {
-			replay->Resource = LuaToNumber(l, -1);
+			replay->ReplaySettings.Resources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NumUnits")) {
-			replay->NumUnits = LuaToNumber(l, -1);
+			replay->ReplaySettings.NumUnits = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Difficulty")) {
-			replay->Difficulty = LuaToNumber(l, -1);
+			replay->ReplaySettings.Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "NoFow")) {
-			replay->NoFow = LuaToBoolean(l, -1);
+			replay->ReplaySettings.NoFogOfWar = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Inside")) {
-			replay->Inside = LuaToBoolean(l, -1);
+			replay->ReplaySettings.Inside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RevealMap")) {
-			replay->RevealMap = LuaToNumber(l, -1);
+			replay->ReplaySettings.RevealMap = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "GameType")) {
-			replay->GameType = LuaToNumber(l, -1);
+			replay->ReplaySettings.GameType = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Opponents")) {
-			replay->Opponents = LuaToNumber(l, -1);
+			replay->ReplaySettings.Opponents = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MapRichness")) {
-			replay->MapRichness = LuaToNumber(l, -1);
+			replay->ReplaySettings.MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
