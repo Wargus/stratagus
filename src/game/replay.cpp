@@ -132,11 +132,12 @@ public:
 //----------------------------------------------------------------------------
 
 bool CommandLogDisabled;           /// True if command log is off
+ReplayType ReplayGameType;         /// Replay game type
 static bool DisabledLog;           /// Disabled log for replay
 static CFile *LogFile;             /// Replay log file
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
-FullReplay *CurrentReplay;
+static FullReplay *CurrentReplay;
 static LogEntry *ReplayStep;
 
 //----------------------------------------------------------------------------
@@ -194,18 +195,20 @@ static FullReplay *StartReplay()
 */
 static void ApplyReplaySettings()
 {
+	if (CurrentReplay->ReplaySettings.NetGameType == NetGameTypes::SettingsMultiPlayerGame) {
+		ExitNetwork1();
+		NetPlayers = 2;
+		NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
+		ReplayGameType = ReplayMultiPlayer;
+	} else {
+		ReplayGameType = ReplaySinglePlayer;
+	}
 	GameSettings = CurrentReplay->ReplaySettings;
 
 	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
 		fprintf(stderr, "Replay map path is too long\n");
 		// FIXME: need to handle errors better
 		Exit(1);
-	}
-
-	if (CurrentReplay->ReplaySettings.NetGameType == NetGameTypes::SettingsMultiPlayerGame) {
-		ExitNetwork1();
-		NetPlayers = 2;
-		NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
 	}
 
 	Map.NoFogOfWar = GameSettings.NoFogOfWar;
@@ -611,7 +614,7 @@ static int CclReplayLog(lua_State *l)
 */
 bool IsReplayGame()
 {
-	return CurrentReplay != nullptr;
+	return ReplayGameType != ReplayNone;
 }
 
 /**
@@ -632,6 +635,7 @@ void SaveReplayList(CFile &file)
 int LoadReplay(const std::string &name)
 {
 	CleanReplayLog();
+	ReplayGameType = ReplaySinglePlayer;
 	LuaLoadFile(name);
 
 	NextLogCycle = ~0UL;
@@ -679,6 +683,7 @@ void CleanReplayLog()
 	// }
 	GameObserve = false;
 	NetPlayers = 0;
+	ReplayGameType = ReplayNone;
 }
 
 /**
@@ -863,7 +868,7 @@ static void ReplayEachCycle()
 */
 void SinglePlayerReplayEachCycle()
 {
-	if (IsReplayGame() && CurrentReplay->ReplaySettings.NetGameType == NetGameTypes::SettingsSinglePlayerGame) {
+	if (ReplayGameType == ReplaySinglePlayer) {
 		ReplayEachCycle();
 	}
 }
@@ -873,7 +878,7 @@ void SinglePlayerReplayEachCycle()
 */
 void MultiPlayerReplayEachCycle()
 {
-	if (IsReplayGame() && CurrentReplay->ReplaySettings.NetGameType == NetGameTypes::SettingsMultiPlayerGame) {
+	if (ReplayGameType == ReplayMultiPlayer) {
 		ReplayEachCycle();
 	}
 }

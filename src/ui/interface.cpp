@@ -881,7 +881,7 @@ static void InputKey(int key)
 #ifdef DEBUG
 			if (strncmp(Input, "ffw ", 4) == 0) {
 #else
-			if (strncmp(Input, "ffw ", 4) == 0 && CurrentReplay != nullptr) {
+			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
