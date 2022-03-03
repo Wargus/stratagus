@@ -43,7 +43,7 @@ set(STRATAGUS_PATCH_LEVEL2 0)
 # Build vendored dependencies #
 ###############################
 # Build lua 5.1
-option(BUILD_VENDORED_LUA OFF)
+option(BUILD_VENDORED_LUA ON)
 ###############################
 
 project(stratagus)
