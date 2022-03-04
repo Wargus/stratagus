@@ -191,6 +191,68 @@ namespace ranges
 	{
 		std::iota(begin(range), end(range), startValue);
 	}
+
+	template<typename Range, typename Value>
+	auto find(Range& range, const Value& value)
+	{
+		return std::find(begin(range), end(range), value);
+	}
+
+	template<typename Range, typename Value>
+	bool consist(Range& range, const Value& value)
+	{
+		return std::find(begin(range), end(range), value) == end(range) ? false : true;
+	}
+
+    template<typename Range>
+	void reverse(Range& range)
+	{
+		std::reverse(begin(range), end(range));
+	}
+
+    template<typename Range>
+    auto min_element(Range& range)
+    {
+        return std::min_element(begin(range), end(range));
+    }
+
+    template<typename Range, typename CmpFunction>
+    auto min_element(Range& range, CmpFunction cmp)
+    {
+        return std::min_element(begin(range), end(range), cmp);
+    }
+   
+    template<typename Range, typename Value>
+    auto lower_bound(Range& range, Value value)
+    {
+        return std::lower_bound(begin(range), end(range), value);
+    }
+
+    template<typename Range, typename OutputIt>
+    auto copy(Range& range, OutputIt copy_to)
+    {
+        return std::copy(begin(range), end(range), copy_to);
+    }
+
+    template<typename Range, typename OutputIt, typename UnaryPredicate>
+    auto copy_if(Range& range, OutputIt copy_to, UnaryPredicate pred )
+    {
+        return std::copy_if(begin(range), end(range), copy_to, pred);
+    }
+	
+    template<typename Range>
+	void rotate_n(Range& range, const int shift)
+	{
+        if (shift >= 0) {
+            for (int i = 0; i < shift; i++) {
+                std::rotate(rbegin(range), rbegin(range) + 1, rend(range));
+            }
+        } else { 
+            for (int i = 0; i > shift; i--) {
+                std::rotate(begin(range), begin(range) + 1, end(range));
+            }
+        }
+    }	
 }
 
 //@}
