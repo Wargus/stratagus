@@ -537,7 +537,7 @@ void CUnit::Release(bool final)
 		}
 	}
 
-	Assert(!Refs);
+	Assert(!GameCycle || !Refs); // it's fine to have remaining refs if we're no longer in the game
 
 	//
 	// No more references remaining, but the network could have an order
