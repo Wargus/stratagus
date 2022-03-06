@@ -493,7 +493,7 @@ static void DumpUnitInfo(CUnit &unit)
 	fprintf(logf, "%lu: ", GameCycle);
 
 	const char *currentAction;
-	switch (!unit.Orders.empty() ? unit.CurrentAction() : -1) {
+	switch (!unit.Orders.empty() ? int(unit.CurrentAction()) : -1) {
 		case -1: currentAction = "No Orders"; break;
 		case UnitActionNone: currentAction = "None"; break;
 		case UnitActionStill: currentAction = "Still"; break;      
