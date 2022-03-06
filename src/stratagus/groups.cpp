@@ -84,7 +84,7 @@ public:
 	{
 		std::vector<CUnit *>::iterator it = find(units.begin(), units.end(), &unit);
 
-		Assert(it == units.end());
+		Assert(it != units.end());
 		*it = units.back();
 		units.pop_back();
 
