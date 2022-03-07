@@ -106,7 +106,7 @@ int NetLocalPlayerNumber;              /// Player number of local client
 int NetPlayers;                         /// How many network players
 std::string NetworkMapName;             /// Name of the map received with ICMMap
 std::string NetworkMapFragmentName;     /// Name of the map currently loading via ICMMapNeeded
-int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of players in muliplayer mode
+bool NoRandomPlacementMultiplayer = false; /// Disable the random placement of players in muliplayer mode
 
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
@@ -1747,7 +1747,6 @@ void NetworkServerStartGame()
 		}
 	}
 
-#ifdef DEBUG
 	printf("INITIAL ServerSetupState:\n");
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
@@ -1757,7 +1756,6 @@ void NetworkServerStartGame()
 		}
 		printf("\n");
 	}
-#endif
 
 	int org[PlayerMax];
 	// Reverse to assign slots to menu setup state positions.
@@ -1814,7 +1812,7 @@ void NetworkServerStartGame()
 	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
 	// Players slots are then mapped to players numbers(and colors).
 
-	if (NoRandomPlacementMultiplayer == 1) {
+	if (NoRandomPlacementMultiplayer) {
 		for (int i = 0; i < PlayerMax; ++i) {
 			if (Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
 				org[i] = Hosts[i].PlyNr;
@@ -1872,6 +1870,16 @@ void NetworkServerStartGame()
 		message.hosts[i].PlyNr = Hosts[i].PlyNr;
 	}
 
+	printf("FINAL ServerSetupState:\n");
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
+		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
+			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
+			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
+		}
+		printf("\n");
+	}
+
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
@@ -1898,10 +1906,8 @@ breakout:
 			CHost host;
 			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
 			if (len < 0) {
-#ifdef DEBUG
 				const std::string hostStr = host.toString();
 				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
-#endif
 				continue;
 			}
 			CInitMessage_Header header;
@@ -1912,10 +1918,8 @@ breakout:
 			if (type == MessageInit_FromClient) {
 				switch (subtype) {
 					case ICMConfig: {
-#ifdef DEBUG
 						const std::string hostStr = host.toString();
 						DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
-#endif
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (num[Hosts[index].PlyNr] == 1) {
@@ -1926,10 +1930,8 @@ breakout:
 						break;
 					}
 					case ICMGo: {
-#ifdef DEBUG
 						const std::string hostStr = host.toString();
 						DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
-#endif
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (num[Hosts[index].PlyNr] == 2) {
@@ -2099,15 +2101,33 @@ void NetworkGamePrepareGameSettings()
 }
 
 /**
-**  Removes Randomization of Player position in Multiplayer mode
+**  Controls Randomization of Player position in Multiplayer mode.
+**  Without arguments, disables randomization. Otherwise, sets the
+**  NoRandomization flag to the boolean argument value.
 **
 **  @param l  Lua state.
 */
 static int CclNoRandomPlacementMultiplayer(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
-	NoRandomPlacementMultiplayer = 1;
+	int nargs = lua_gettop(l);
+	if (nargs > 1) {
+		LuaError(l, "incorrect argument");
+	}
+	bool flag = nargs ? LuaToBoolean(l, 1) : false;
+	NoRandomPlacementMultiplayer = flag;
 	return 0;
+}
+
+/**
+**  Return if player positions in multiplayer mode are randomized.
+**
+**  @param l  Lua state.
+*/
+static int CclUsesRandomPlacementMultiplayer(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, !NoRandomPlacementMultiplayer);
+	return 1;
 }
 
 static int CclNetworkDiscoverServers(lua_State *l)
@@ -2134,6 +2154,7 @@ static int CclNetworkDiscoverServers(lua_State *l)
 void NetworkCclRegister()
 {
 	lua_register(Lua, "NoRandomPlacementMultiplayer", CclNoRandomPlacementMultiplayer);
+	lua_register(Lua, "UsesRandomPlacementMultiplayer", CclUsesRandomPlacementMultiplayer);
 	lua_register(Lua, "NetworkDiscoverServers", CclNetworkDiscoverServers);
 }
 

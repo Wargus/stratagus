@@ -105,7 +105,7 @@ extern std::string NetworkMapFragmentName; /// Name of the map currently loading
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 
-extern int NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
+extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -1050,7 +1050,7 @@ public:
         if (GameSettings.NumUnits == 1) {
             game_settings |= 0x200;
         }
-        if (NoRandomPlacementMultiplayer == 1) {
+        if (NoRandomPlacementMultiplayer) {
             game_settings |= 0x400;
         }
         switch (GameSettings.Resources) {
