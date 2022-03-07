@@ -93,7 +93,22 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	static size_t Size() {
+		// This must be kept in sync with GameSettings
+		return \
+		1 + // DefeatReveal
+		1 + // Difficulty
+		1 + // FoV
+		1 + // GameType
+		1 + // NumUnits
+		1 + // Opponents
+		1 + // Resources
+		1 + // RevealMap
+		4 + // Bitfield
+		1 * PlayerMax + // Races
+		1 * PlayerMax + // CompOpt
+		1 * PlayerMax; // Ready
+	}
 	void Clear();
 
 	bool operator == (const CServerSetup &rhs) const;
