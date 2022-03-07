@@ -45,7 +45,7 @@ tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
-	unsigned short PlyNr;        /// Player nummer
+	short PlayerIndex @ PlyNr;   /// Desired player number when in game
 	char           PlyName[NetPlayerNameSize];  /// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];

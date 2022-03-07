@@ -37,6 +37,10 @@
 #include <fstream>
 #include <set>
 #include <vector>
+#include <functional>
+#include <algorithm>
+#include <array>
+#include <utility>
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -1720,29 +1724,29 @@ void NetworkServerStartGame()
 	LocalSetupState = ServerSetupState;
 
 	// Make a list of the available player slots.
-	int num[PlayerMax];
-	int rev[PlayerMax];
-	int h = 0;
+	int humanPlayerIndexToMapPlayerIndex[PlayerMax];
+	int mapPlayerIndexToHumanPlayerIndexAndBeyond[PlayerMax];
+	int humanPlayerCount = 0;
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
-			rev[i] = h;
-			num[h++] = i;
-			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ rev[i]);
+			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = humanPlayerCount;
+			humanPlayerIndexToMapPlayerIndex[humanPlayerCount++] = i;
+			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ mapPlayerIndexToHumanPlayerIndexAndBeyond[i]);
 		}
 	}
 	// Make a list of the available computer slots.
-	int n = h;
+	int n = humanPlayerCount;
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerComputer) {
-			rev[i] = n++;
-			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ rev[i]);
+			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = n++;
+			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ mapPlayerIndexToHumanPlayerIndexAndBeyond[i]);
 		}
 	}
 	// Make a list of the remaining slots.
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerPerson
 			&& Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
-			rev[i] = n++;
+			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = n++;
 			// PlayerTypes::PlayerNobody - not available to anything..
 		}
 	}
@@ -1757,25 +1761,27 @@ void NetworkServerStartGame()
 		printf("\n");
 	}
 
-	int org[PlayerMax];
+	int slotIndexToMapPlayerIndex[PlayerMax];
 	// Reverse to assign slots to menu setup state positions.
 	for (int i = 0; i < PlayerMax; ++i) {
-		org[i] = -1;
+		slotIndexToMapPlayerIndex[i] = -1;
 		for (int j = 0; j < PlayerMax; ++j) {
-			if (rev[j] == i) {
-				org[i] = j;
+			if (mapPlayerIndexToHumanPlayerIndexAndBeyond[j] == i) {
+				slotIndexToMapPlayerIndex[i] = j;
 				break;
 			}
 		}
 	}
 
 	// Calculate NetPlayers
-	NetPlayers = h;
+	NetPlayers = humanPlayerCount;
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
-	for (int i = 1; i < h; ++i) {
+	for (int i = 1; i < humanPlayerCount; ++i) {
 		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != SlotOption::Available) {
+			// no host connectd and the slot is not available, not a net player
 			NetPlayers--;
 		} else if (Hosts[i].PlyName[0] == 0) {
+			// the slot is available, but no host connected to it
 			NetPlayers--;
 			if (--compPlayers >= 0) {
 				// Unused slot gets a computer player
@@ -1789,8 +1795,9 @@ void NetworkServerStartGame()
 	}
 
 	// Compact host list.. (account for computer/closed slots in the middle..)
-	for (int i = 1; i < h; ++i) {
+	for (int i = 1; i < humanPlayerCount; ++i) {
 		if (Hosts[i].PlyNr == 0) {
+			// this host is not connected, so we can move some later host down
 			int j;
 			for (j = i + 1; j < PlayerMax - 1; ++j) {
 				if (Hosts[j].PlyNr) {
@@ -1802,6 +1809,7 @@ void NetworkServerStartGame()
 					break;
 				}
 			}
+			// early return, in case there are no more hosts later
 			if (j == PlayerMax - 1) {
 				break;
 			}
@@ -1810,42 +1818,95 @@ void NetworkServerStartGame()
 
 	// Randomize the position.
 	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
-	// Players slots are then mapped to players numbers(and colors).
+	// Players slots are then mapped to players numbers(and colors) or by PlayerIndex preference
+	// (set in lua via Hosts[i].PlyNr, which is not really changing it, just "requesting" the change).
 
 	if (NoRandomPlacementMultiplayer) {
+		std::array<std::pair<int, CNetworkHost>, PlayerMax> s;
 		for (int i = 0; i < PlayerMax; ++i) {
-			if (Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
-				org[i] = Hosts[i].PlyNr;
+			s[i] = std::make_pair(i, Hosts[i]);
+		}
+		std::sort(s.begin(), s.end(), [](std::pair<int, CNetworkHost> &a, std::pair<int, CNetworkHost> &b) {
+			if (std::get<1>(a).PlayerIndex < 0 && std::get<1>(b).PlayerIndex < 0) {
+				// no preferences here, first slot first
+				return std::get<0>(a) < std::get<0>(b);
+			} else {
+				if (std::get<1>(b).PlayerIndex < 0) {
+					return true; // a has preference, b not, a first
+				} else if (std::get<1>(a).PlayerIndex < 0) {
+					return false; // b has preference, a not, b first
+				} else {
+					return std::get<1>(a).PlayerIndex < std::get<1>(b).PlayerIndex;
+				}
+			}
+		});
+		int j = 0;
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+				std::get<1>(s[j]).PlyNr = i;
+				int netPlayer = std::get<0>(s[j]);
+				int k = slotIndexToMapPlayerIndex[netPlayer];
+				// k is the in-game PlayerIndex for the slot i.
+				// we need to swap it with the in-game PlayerIndex
+				// that we just assigned
+				if (k != i) {
+					for (int o = 0; o < PlayerMax; ++o) {
+						if (slotIndexToMapPlayerIndex[o] == i) {
+							slotIndexToMapPlayerIndex[o] = k;
+							break;
+						}
+					}
+					slotIndexToMapPlayerIndex[i] = i;
+				}
+				DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ netPlayer _C_ i _C_ slotIndexToMapPlayerIndex[netPlayer]);
+				j++;
 			}
 		}
 	} else {
-		int j = h;
+		// j is the number of human player slots the map info provides
+		int j = humanPlayerCount;
 		for (int i = 0; i < NetPlayers; ++i) {
 			Assert(j > 0);
-			int chosen = MyRand() % j;
-
-			n = num[chosen];
+			int chosenHumanPlayerNumber = MyRand() % j;
+			// we've chosen a slot on the map to assign
+			n = humanPlayerIndexToMapPlayerIndex[chosenHumanPlayerNumber];
+			// n is now the in-game PlayerIndex for this slot
 			Hosts[i].PlyNr = n;
-			int k = org[i];
+
+			int k = slotIndexToMapPlayerIndex[i];
+			// k is the in-game PlayerIndex for the slot i.
+			// we need to swap it with the in-game PlayerIndex
+			// that we just assigned
 			if (k != n) {
 				for (int o = 0; o < PlayerMax; ++o) {
-					if (org[o] == n) {
-						org[o] = k;
+					if (slotIndexToMapPlayerIndex[o] == n) {
+						slotIndexToMapPlayerIndex[o] = k;
 						break;
 					}
 				}
-				org[i] = n;
+				slotIndexToMapPlayerIndex[i] = n;
 			}
-			DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ org[i]);
+			DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ slotIndexToMapPlayerIndex[i]);
 
-			num[chosen] = num[--j];
+			// we replace the in-game PlayerIndex we have just assigned
+			// with the last one available to human players in our map
+			// for the next MyRand() % j call. We won't be needing this
+			// mapping to be correct anymore afterwards
+			humanPlayerIndexToMapPlayerIndex[chosenHumanPlayerNumber] = humanPlayerIndexToMapPlayerIndex[--j];
 		}
 	}
 
+	int mapPlayerIndexToAckStatus[PlayerMax];
 	// Complete all setup states for the assigned slots.
+	// At this point, LocalSetupState has all the info
+	// assigned in-order, that is, LocalSetupState first has
+	// the settings for the human players, then computers, then
+	// nothing. We now go through the players and set it up through
+	// the mapping that the server assigns each slot index to the
+	// correct map player index
 	for (int i = 0; i < PlayerMax; ++i) {
-		num[i] = 1;
-		n = org[i];
+		mapPlayerIndexToAckStatus[i] = 1;
+		n = slotIndexToMapPlayerIndex[i];
 		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
 		ServerSetupState.ServerGameSettings.Presets[n].Race = LocalSetupState.ServerGameSettings.Presets[i].Race;
 	}
@@ -1892,10 +1953,10 @@ breakout:
 		for (int i = 0; i < HostsCount; ++i) {
 			const CHost host(message.hosts[i].Host, message.hosts[i].Port);
 
-			if (num[Hosts[i].PlyNr] == 1) { // not acknowledged yet
+			if (mapPlayerIndexToAckStatus[Hosts[i].PlyNr] == 1) { // not acknowledged yet
 				message.clientIndex = i;
 				NetworkSendICMessage_Log(NetworkFildes, host, message);
-			} else if (num[Hosts[i].PlyNr] == 2) {
+			} else if (mapPlayerIndexToAckStatus[Hosts[i].PlyNr] == 2) {
 				NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 			}
 		}
@@ -1922,8 +1983,8 @@ breakout:
 						DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
-							if (num[Hosts[index].PlyNr] == 1) {
-								num[Hosts[index].PlyNr]++;
+							if (mapPlayerIndexToAckStatus[Hosts[index].PlyNr] == 1) {
+								mapPlayerIndexToAckStatus[Hosts[index].PlyNr]++;
 							}
 							goto breakout;
 						}
@@ -1934,8 +1995,8 @@ breakout:
 						DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
-							if (num[Hosts[index].PlyNr] == 2) {
-								num[Hosts[index].PlyNr] = 0;
+							if (mapPlayerIndexToAckStatus[Hosts[index].PlyNr] == 2) {
+								mapPlayerIndexToAckStatus[Hosts[index].PlyNr] = 0;
 								--j;
 								DebugPrint("Removing host %d from waiting list\n" _C_ j);
 							}

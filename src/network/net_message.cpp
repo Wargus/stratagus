@@ -224,6 +224,7 @@ void CNetworkHost::Clear()
 	this->Host = 0;
 	this->Port = 0;
 	this->PlyNr = 0;
+	this->PlayerIndex = -1;
 	memset(this->PlyName, 0, sizeof(this->PlyName));
 }
 

@@ -65,6 +65,7 @@ public:
 	uint32_t Host;         /// Host address
 	uint16_t Port;         /// Port on host
 	uint16_t PlyNr;        /// Player number
+	int16_t  PlayerIndex;  /// Desired player index in game, or -1 for default
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
