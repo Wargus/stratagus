@@ -224,7 +224,6 @@ void CNetworkHost::Clear()
 	this->Host = 0;
 	this->Port = 0;
 	this->PlyNr = 0;
-	this->PlayerIndex = -1;
 	memset(this->PlyName, 0, sizeof(this->PlyName));
 }
 
@@ -377,9 +376,7 @@ const unsigned char *CInitMessage_Config::Serialize() const
 	unsigned char *p = buf;
 
 	p += header.Serialize(p);
-	p += serialize8(p, this->clientIndex);
-	p += serialize8(p, this->hostsCount);
-	for (int i = 0; i != PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
 	return buf;
@@ -388,9 +385,7 @@ const unsigned char *CInitMessage_Config::Serialize() const
 void CInitMessage_Config::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	p += deserialize8(p, &this->clientIndex);
-	p += deserialize8(p, &this->hostsCount);
-	for (int i = 0; i != PlayerMax; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
 }
@@ -467,6 +462,7 @@ const unsigned char *CInitMessage_Welcome::Serialize() const
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
+	p += serialize16(p, this->NetHostSlot);
 	p += serialize32(p, this->Lag);
 	p += serialize32(p, this->gameCyclesPerUpdate);
 	return buf;
@@ -478,6 +474,7 @@ void CInitMessage_Welcome::Deserialize(const unsigned char *p)
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
+	p += deserialize16(p, &this->NetHostSlot);
 	p += deserialize32(p, &this->Lag);
 	p += deserialize32(p, &this->gameCyclesPerUpdate);
 }

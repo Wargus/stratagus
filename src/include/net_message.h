@@ -62,10 +62,11 @@ public:
 
 	void SetName(const char *name);
 
+	bool IsValid() { return (PlyNr != 0) || (PlyName[0] != '\0'); }
+
 	uint32_t Host;         /// Host address
 	uint16_t Port;         /// Port on host
 	uint16_t PlyNr;        /// Player number
-	int16_t  PlayerIndex;  /// Desired player index in game, or -1 for default
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
@@ -86,7 +87,22 @@ public:
 #endif
 
 /**
-**  Multiplayer game setup menu state
+**  Multiplayer game setup menu state.
+**
+**  Some words. The ServerSetupState and LocalSetupState are "kind of" kept in sync.
+**  Most ServerGameSettings are only pushed from the server to the clients, but the
+**  CServerSetup::ServerGameSettings::Presets and CServerSetup::Ready arrays are synced.
+**  The ready array is in Host-index order, that is, it corresponds to the global #Hosts array.
+**  In contrast, the CServerSetup::ServerGameSettings::Presets and CServerSetup::CompOpt arrays are set up
+**  in Player-index order, that is, they corresponds to the player slots in the map definition. This
+**  is prepared in #NetworkInitServerConnect.
+**
+**  While in the lobby, hosts, settings, presets, and ready states are synced between client and server.
+**  The CompOpt array is not touched until the server starts the game. At this point the lua scripts
+**  will call #NetworkServerStartGame and then #NetworkServerPrepareGameSettings. The first will finalize the
+**  assignments of hosts to player indices and propagate that info to all clients. The second will
+**  ensure the GameSettings are copied from the ServerSettings so that all game-relevant settings are the
+**  same on all clients.
 */
 class CServerSetup
 {
@@ -117,7 +133,7 @@ public:
 public:
 	Settings ServerGameSettings;
 	SlotOption CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax];      /// Client ready state
+	uint8_t Ready[PlayerMax];         /// Client ready state
 	// Fill in here...
 
 #if USING_TOLUAPP
@@ -225,12 +241,10 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + 4 + PlayerMax * CNetworkHost::Size(); }
+	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size(); }
 private:
 	CInitMessage_Header header;
 public:
-	uint8_t clientIndex; /// index of receiver in hosts[]
-	uint8_t hostsCount;  /// Number of hosts
 	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 
@@ -269,11 +283,12 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 * 4; }
+	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 + 4 + 4; }
 private:
 	CInitMessage_Header header;
 public:
 	CNetworkHost hosts[PlayerMax]; /// Participants information
+	uint16_t NetHostSlot;          /// slot for the receiving host in the server host array
 	int32_t Lag;                   /// Lag time
 	int32_t gameCyclesPerUpdate;   /// Update frequency
 };

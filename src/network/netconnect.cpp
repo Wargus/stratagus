@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <array>
 #include <utility>
+#include <random>
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -99,8 +100,7 @@ struct NetworkState {
 // Variables
 //----------------------------------------------------------------------------
 
-int HostsCount;                        /// Number of hosts.
-CNetworkHost Hosts[PlayerMax];         /// Host and ports of all players.
+CNetworkHost Hosts[PlayerMax];         /// Host, ports, and assigned player numbers of all players.
 
 int NetConnectRunning = 0;             /// Network menu: Setup mode active
 int NetConnectType = 0;             /// Network menu: Setup mode active
@@ -115,7 +115,7 @@ bool NoRandomPlacementMultiplayer = false; /// Disable the random placement of p
 CServerSetup ServerSetupState; // Server selection state for Multiplayer clients
 CServerSetup LocalSetupState;  // Local selection state for Multiplayer clients
 
-MDNS MdnsService;
+MDNS MdnsService; // Service discovery for open LAN games
 
 class CServer
 {
@@ -652,40 +652,24 @@ bool CClient::Update(unsigned long tick)
 
 void CClient::SetConfig(const CInitMessage_Config &msg)
 {
-	HostsCount = 0;
-	for (int i = 0; i < msg.hostsCount - 1; ++i) {
-		if (i != msg.clientIndex) {
-			Hosts[HostsCount] = msg.hosts[i];
-			HostsCount++;
-#ifdef DEBUG
-			const std::string hostStr = CHost(msg.hosts[i].Host, msg.hosts[i].Port).toString();
-			DebugPrint("Client %d = %s [%.*s]\n" _C_
-					   msg.hosts[i].PlyNr _C_ hostStr.c_str() _C_
-					   static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
-					   msg.hosts[i].PlyName);
-#endif
-		} else { // Own client
-			NetLocalPlayerNumber = msg.hosts[i].PlyNr;
-			DebugPrint("SELF %d [%.*s]\n" _C_ msg.hosts[i].PlyNr _C_
-					   static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
-					   msg.hosts[i].PlyName);
+	NetPlayers = 0;
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i] = msg.hosts[i];
+		if (Hosts[i].IsValid()) {
+			NetPlayers++;
 		}
+		const std::string hostStr = CHost(msg.hosts[i].Host, msg.hosts[i].Port).toString();
+		DebugPrint("%s %d = %s [%.*s]\n" _C_
+					(i == 0 ? "Server" : (i == NetLocalHostsSlot ? "SELF" : "Client")) _C_
+					msg.hosts[i].PlyNr _C_ hostStr.c_str() _C_
+					static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
+					msg.hosts[i].PlyName);
 	}
-	// server is last:
-	Hosts[HostsCount].Host = serverHost.getIp();
-	Hosts[HostsCount].Port = serverHost.getPort();
-	Hosts[HostsCount].PlyNr = msg.hosts[msg.hostsCount - 1].PlyNr;
-	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
-	++HostsCount;
-	NetPlayers = HostsCount + 1;
-#ifdef DEBUG
+	NetLocalPlayerNumber = msg.hosts[NetLocalHostsSlot].PlyNr;
+	// server is first, set our view of ip:port
+	Hosts[0].Host = serverHost.getIp();
+	Hosts[0].Port = serverHost.getPort();
 	const std::string serverHostStr = serverHost.toString();
-	DebugPrint("Server %d = %s [%.*s]\n" _C_
-			   msg.hosts[msg.hostsCount - 1].PlyNr _C_
-			   serverHostStr.c_str() _C_
-			   static_cast<int>(sizeof(msg.hosts[msg.hostsCount - 1].PlyName)) _C_
-			   msg.hosts[msg.hostsCount - 1].PlyName);
-#endif
 }
 
 bool CClient::Parse(const unsigned char *buf, const CHost &host)
@@ -909,23 +893,21 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	networkState.State = ccs_connected;
 	networkState.MsgCnt = 0;
 	networkState.StateArg = 0;
-	NetLocalHostsSlot = msg.hosts[0].PlyNr;
-	Hosts[0].SetName(msg.hosts[0].PlyName); // Name of server player
+	NetLocalHostsSlot = msg.NetHostSlot;
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
 	CNetworkParameter::Instance.gameCyclesPerUpdate = msg.gameCyclesPerUpdate;
 
 	OnlineContextHandler->joinGame(msg.hosts[0].PlyName, "");
 
-	Hosts[0].Host = serverHost.getIp();
-	Hosts[0].Port = serverHost.getPort();
-	for (int i = 1; i < PlayerMax; ++i) {
-		if (i != NetLocalHostsSlot) {
-			Hosts[i] = msg.hosts[i];
-		} else {
-			Hosts[i].PlyNr = i;
-			Hosts[i].SetName(name.c_str());
+	for (int i = 0; i < PlayerMax; ++i) {
+		Hosts[i] = msg.hosts[i];
+		if (i == NetLocalHostsSlot) {
+			Assert(name == Hosts[i].PlyName);
 		}
 	}
+	// server is first, set ip:port from our perspective
+	Hosts[0].Host = serverHost.getIp();
+	Hosts[0].Port = serverHost.getPort();
 }
 
 void CClient::Parse_State(const unsigned char *buf)
@@ -972,12 +954,10 @@ void CClient::Parse_Resync(const unsigned char *buf)
 	CInitMessage_Resync msg;
 
 	msg.Deserialize(buf);
-	for (int i = 1; i < PlayerMax - 1; ++i) {
-		if (i != NetLocalHostsSlot) {
-			Hosts[i] = msg.hosts[i];
-		} else {
-			Hosts[i].PlyNr = msg.hosts[i].PlyNr;
-			Hosts[i].SetName(name.c_str());
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		Hosts[i] = msg.hosts[i];
+		if (i == NetLocalHostsSlot) {
+			Assert(name == Hosts[i].PlyName);
 		}
 	}
 	networkState.State = ccs_synced;
@@ -1041,14 +1021,14 @@ void CClient::Parse_AreYouThere()
 
 void CServer::KickClient(int c)
 {
-	DebugPrint("kicking client %d\n" _C_ Hosts[c].PlyNr);
+	DebugPrint("kicking client %d, player number %d\n" _C_ c _C_ Hosts[c].PlyNr);
 	Hosts[c].Clear();
 	serverSetup->Ready[c] = 0;
 	serverSetup->ServerGameSettings.Presets[c].Race = 0;
 	networkStates[c].Clear();
 	// Resync other clients
-	for (int n = 1; n < PlayerMax - 1; ++n) {
-		if (n != c && Hosts[n].PlyNr) {
+	for (int n = 1; n < PlayerMax; ++n) {
+		if (Hosts[n].IsValid()) {
 			networkStates[n].State = ccs_async;
 		}
 	}
@@ -1058,7 +1038,9 @@ void CServer::Init(const std::string &name, CUDPSocket *socket, CServerSetup *se
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		networkStates[i].Clear();
-		//Hosts[i].Clear();
+		if (i) { // don't clear ourselves
+			Hosts[i].Clear();
+		}
 	}
 	this->serverSetup = serverSetup;
 	this->name = name;
@@ -1083,13 +1065,10 @@ void CServer::Send_Welcome(const CNetworkHost &host, int index)
 {
 	CInitMessage_Welcome message;
 
-	message.hosts[0].PlyNr = index; // Host array slot number
-	message.hosts[0].SetName(name.c_str()); // Name of server player
-	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
-		if (i != index && Hosts[i].PlyNr) {
-			message.hosts[i] = Hosts[i];
-		}
+	for (int i = 0; i < PlayerMax; ++i) { // Info about clients
+		message.hosts[i] = Hosts[i];
 	}
+	message.NetHostSlot = index;
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 
@@ -1097,10 +1076,8 @@ void CServer::Send_Resync(const CNetworkHost &host, int hostIndex)
 {
 	CInitMessage_Resync message;
 
-	for (int i = 1; i < PlayerMax - 1; ++i) { // Info about other clients
-		if (i != hostIndex && Hosts[i].PlyNr) {
-			message.hosts[i] = Hosts[i];
-		}
+	for (int i = 0; i < PlayerMax; ++i) { // Info about clients
+		message.hosts[i] = Hosts[i];
 	}
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1207,8 +1184,8 @@ void CServer::Send_GoodBye(const CNetworkHost &host)
 
 void CServer::Update(unsigned long frameCounter)
 {
-	for (int i = 1; i < PlayerMax - 1; ++i) {
-		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
+	for (int i = 1; i < PlayerMax; ++i) {
+		if (Hosts[i].IsValid() && Hosts[i].Host && Hosts[i].Port) {
 			const unsigned long fcd = frameCounter - networkStates[i].LastFrame;
 			if (fcd >= CLIENT_LIVE_BEAT) {
 				if (fcd > CLIENT_IS_DEAD) {
@@ -1225,7 +1202,7 @@ void CServer::Update(unsigned long frameCounter)
 void CServer::MarkClientsAsResync()
 {
 	for (int i = 1; i < PlayerMax - 1; ++i) {
-		if (Hosts[i].PlyNr && networkStates[i].State == ccs_synced) {
+		if (Hosts[i].IsValid() && networkStates[i].State == ccs_synced) {
 			networkStates[i].State = ccs_async;
 		}
 	}
@@ -1243,24 +1220,29 @@ void CServer::MarkClientsAsResync()
 int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (h == -1) { // it is a new client
-		for (int i = 1; i < PlayerMax - 1; ++i) {
-			// occupy first available slot, excepting the first slot (the host)
+		std::vector<int> availableSlots;
+		for (int i = 0; i < PlayerMax; ++i) {
 			if (serverSetup->CompOpt[i] == SlotOption::Available) {
-				if (Hosts[i].PlyNr == 0) {
-					h = i;
-					break;
-				}
+				availableSlots.push_back(i);
+			}
+		}
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (availableSlots.empty()) {
+				break;
+			} else if (!Hosts[i].IsValid()) {
+				h = i;
+				break;
+			} else {
+				availableSlots.erase(std::remove(availableSlots.begin(), availableSlots.end(), Hosts[i].PlyNr));
 			}
 		}
 		if (h != -1) {
 			Hosts[h].Host = host.getIp();
 			Hosts[h].Port = host.getPort();
-			Hosts[h].PlyNr = h;
+			Hosts[h].PlyNr = availableSlots.front();
 			Hosts[h].SetName(msg.PlyName);
-#ifdef DEBUG
 			const std::string hostStr = host.toString();
 			DebugPrint("New client %s [%s]\n" _C_ hostStr.c_str() _C_ Hosts[h].PlyName);
-#endif
 			networkStates[h].State = ccs_connecting;
 			networkStates[h].MsgCnt = 0;
 		} else {
@@ -1714,7 +1696,8 @@ void NetworkInitClientConnect()
 }
 
 /**
-** Server user has finally hit the start game button
+** Server user has finally hit the start game button.
+** (This is run on the server)
 */
 void NetworkServerStartGame()
 {
@@ -1723,220 +1706,112 @@ void NetworkServerStartGame()
 	// save it first..
 	LocalSetupState = ServerSetupState;
 
-	// Make a list of the available player slots.
-	int humanPlayerIndexToMapPlayerIndex[PlayerMax];
-	int mapPlayerIndexToHumanPlayerIndexAndBeyond[PlayerMax];
-	int humanPlayerCount = 0;
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
-			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = humanPlayerCount;
-			humanPlayerIndexToMapPlayerIndex[humanPlayerCount++] = i;
-			DebugPrint("Slot %d is available for an interactive player (%d)\n" _C_ i _C_ mapPlayerIndexToHumanPlayerIndexAndBeyond[i]);
-		}
-	}
-	// Make a list of the available computer slots.
-	int n = humanPlayerCount;
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerComputer) {
-			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = n++;
-			DebugPrint("Slot %d is available for an ai computer player (%d)\n" _C_ i _C_ mapPlayerIndexToHumanPlayerIndexAndBeyond[i]);
-		}
-	}
-	// Make a list of the remaining slots.
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerPerson
-			&& Map.Info.PlayerType[i] != PlayerTypes::PlayerComputer) {
-			mapPlayerIndexToHumanPlayerIndexAndBeyond[i] = n++;
-			// PlayerTypes::PlayerNobody - not available to anything..
-		}
-	}
-
 	printf("INITIAL ServerSetupState:\n");
-	for (int i = 0; i < PlayerMax - 1; ++i) {
+	NetPlayers = 0;
+	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
+	
+	// most game settings are already fine, that is, they are on default. however, for human player slots, we need
+	// to adapt the game settings from their defaults to either set the type to person if a human player is assigned,
+	// computer if an AI player is assigned, or nobody if the slot will not be used in this game.
+	for (int i = 0; i < PlayerMax; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
-			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
+			bool hasHumanPlayer = false;
+			for (auto h : Hosts) {
+				if (h.IsValid() && h.PlyNr == i) {
+					NetPlayers++;
+					hasHumanPlayer = true;
+					ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerPerson;
+					const std::string hostStr = CHost(h.Host, h.Port).toString();
+					printf(" %s %s", hostStr.c_str(), h.PlyName);
+				}
+			}
+			if (!hasHumanPlayer && compPlayers) {
+				compPlayers--;
+				ServerSetupState.CompOpt[i] = LocalSetupState.CompOpt[i] = SlotOption::Computer;
+				ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerComputer;
+			} else if (!hasHumanPlayer) {
+				ServerSetupState.CompOpt[i] = LocalSetupState.CompOpt[i] = SlotOption::Closed;
+				ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerNobody;
+			}
 		}
 		printf("\n");
 	}
 
-	int slotIndexToMapPlayerIndex[PlayerMax];
-	// Reverse to assign slots to menu setup state positions.
+	// all players are assigned already, and the ServerSetupState should be valid already.
+	// just assert that this is true.
 	for (int i = 0; i < PlayerMax; ++i) {
-		slotIndexToMapPlayerIndex[i] = -1;
-		for (int j = 0; j < PlayerMax; ++j) {
-			if (mapPlayerIndexToHumanPlayerIndexAndBeyond[j] == i) {
-				slotIndexToMapPlayerIndex[i] = j;
-				break;
-			}
-		}
-	}
-
-	// Calculate NetPlayers
-	NetPlayers = humanPlayerCount;
-	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
-	for (int i = 1; i < humanPlayerCount; ++i) {
-		if (Hosts[i].PlyNr == 0 && ServerSetupState.CompOpt[i] != SlotOption::Available) {
-			// no host connectd and the slot is not available, not a net player
-			NetPlayers--;
-		} else if (Hosts[i].PlyName[0] == 0) {
-			// the slot is available, but no host connected to it
-			NetPlayers--;
-			if (--compPlayers >= 0) {
-				// Unused slot gets a computer player
-				ServerSetupState.CompOpt[i] = SlotOption::Computer;
-				LocalSetupState.CompOpt[i] = SlotOption::Computer;
-			} else {
-				ServerSetupState.CompOpt[i] = SlotOption::Closed;
-				LocalSetupState.CompOpt[i] = SlotOption::Closed;
-			}
-		}
-	}
-
-	// Compact host list.. (account for computer/closed slots in the middle..)
-	for (int i = 1; i < humanPlayerCount; ++i) {
-		if (Hosts[i].PlyNr == 0) {
-			// this host is not connected, so we can move some later host down
-			int j;
-			for (j = i + 1; j < PlayerMax - 1; ++j) {
-				if (Hosts[j].PlyNr) {
-					DebugPrint("Compact: Hosts %d -> Hosts %d\n" _C_ j _C_ i);
-					Hosts[i] = Hosts[j];
-					Hosts[j].Clear();
-					std::swap(LocalSetupState.CompOpt[i], LocalSetupState.CompOpt[j]);
-					std::swap(LocalSetupState.ServerGameSettings.Presets[i].Race, LocalSetupState.ServerGameSettings.Presets[j].Race);
-					break;
-				}
-			}
-			// early return, in case there are no more hosts later
-			if (j == PlayerMax - 1) {
-				break;
-			}
-		}
-	}
-
-	// Randomize the position.
-	// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
-	// Players slots are then mapped to players numbers(and colors) or by PlayerIndex preference
-	// (set in lua via Hosts[i].PlyNr, which is not really changing it, just "requesting" the change).
-
-	if (NoRandomPlacementMultiplayer) {
-		std::array<std::pair<int, CNetworkHost>, PlayerMax> s;
-		for (int i = 0; i < PlayerMax; ++i) {
-			s[i] = std::make_pair(i, Hosts[i]);
-		}
-		std::sort(s.begin(), s.end(), [](std::pair<int, CNetworkHost> &a, std::pair<int, CNetworkHost> &b) {
-			if (std::get<1>(a).PlayerIndex < 0 && std::get<1>(b).PlayerIndex < 0) {
-				// no preferences here, first slot first
-				return std::get<0>(a) < std::get<0>(b);
-			} else {
-				if (std::get<1>(b).PlayerIndex < 0) {
-					return true; // a has preference, b not, a first
-				} else if (std::get<1>(a).PlayerIndex < 0) {
-					return false; // b has preference, a not, b first
-				} else {
-					return std::get<1>(a).PlayerIndex < std::get<1>(b).PlayerIndex;
-				}
-			}
-		});
-		int j = 0;
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
-				std::get<1>(s[j]).PlyNr = i;
-				int netPlayer = std::get<0>(s[j]);
-				int k = slotIndexToMapPlayerIndex[netPlayer];
-				// k is the in-game PlayerIndex for the slot i.
-				// we need to swap it with the in-game PlayerIndex
-				// that we just assigned
-				if (k != i) {
-					for (int o = 0; o < PlayerMax; ++o) {
-						if (slotIndexToMapPlayerIndex[o] == i) {
-							slotIndexToMapPlayerIndex[o] = k;
-							break;
-						}
-					}
-					slotIndexToMapPlayerIndex[i] = i;
-				}
-				DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ netPlayer _C_ i _C_ slotIndexToMapPlayerIndex[netPlayer]);
-				j++;
-			}
-		}
-	} else {
-		// j is the number of human player slots the map info provides
-		int j = humanPlayerCount;
-		for (int i = 0; i < NetPlayers; ++i) {
-			Assert(j > 0);
-			int chosenHumanPlayerNumber = MyRand() % j;
-			// we've chosen a slot on the map to assign
-			n = humanPlayerIndexToMapPlayerIndex[chosenHumanPlayerNumber];
-			// n is now the in-game PlayerIndex for this slot
-			Hosts[i].PlyNr = n;
-
-			int k = slotIndexToMapPlayerIndex[i];
-			// k is the in-game PlayerIndex for the slot i.
-			// we need to swap it with the in-game PlayerIndex
-			// that we just assigned
-			if (k != n) {
-				for (int o = 0; o < PlayerMax; ++o) {
-					if (slotIndexToMapPlayerIndex[o] == n) {
-						slotIndexToMapPlayerIndex[o] = k;
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+			if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
+				bool hasHumanPlayer = false;
+				for (auto h : Hosts) {
+					if (hasHumanPlayer = (h.PlyNr == i)) {
 						break;
 					}
 				}
-				slotIndexToMapPlayerIndex[i] = n;
+				// if the slot is still marked as available, we should have a host for it
+				Assert(hasHumanPlayer);
 			}
-			DebugPrint("Assigning player %d to slot %d (%d)\n" _C_ i _C_ n _C_ slotIndexToMapPlayerIndex[i]);
-
-			// we replace the in-game PlayerIndex we have just assigned
-			// with the last one available to human players in our map
-			// for the next MyRand() % j call. We won't be needing this
-			// mapping to be correct anymore afterwards
-			humanPlayerIndexToMapPlayerIndex[chosenHumanPlayerNumber] = humanPlayerIndexToMapPlayerIndex[--j];
 		}
 	}
 
-	int mapPlayerIndexToAckStatus[PlayerMax];
-	// Complete all setup states for the assigned slots.
-	// At this point, LocalSetupState has all the info
-	// assigned in-order, that is, LocalSetupState first has
-	// the settings for the human players, then computers, then
-	// nothing. We now go through the players and set it up through
-	// the mapping that the server assigns each slot index to the
-	// correct map player index
-	for (int i = 0; i < PlayerMax; ++i) {
-		mapPlayerIndexToAckStatus[i] = 1;
-		n = slotIndexToMapPlayerIndex[i];
-		ServerSetupState.CompOpt[n] = LocalSetupState.CompOpt[i];
-		ServerSetupState.ServerGameSettings.Presets[n].Race = LocalSetupState.ServerGameSettings.Presets[i].Race;
+	if (!NoRandomPlacementMultiplayer) {
+		// Randomize the player assignment.
+		// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
+		DebugPrint("Randomizing player index assignments\n");
+		std::vector<int> humanSlotIndices;
+		for (int i = 0; i < PlayerMax; i++) {
+			if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+				humanSlotIndices.push_back(i);
+			}
+		}
+		std::random_device dev;
+		std::mt19937 rng_engine(dev());
+		for (int i = 0; i < 100; i++) {
+			std::shuffle(humanSlotIndices.begin(), humanSlotIndices.end(), rng_engine);
+			auto h = Hosts[MyRand() % NetPlayers];
+			int newPlyNr = humanSlotIndices.front();
+			if (ServerSetupState.CompOpt[newPlyNr] == SlotOption::Available) {
+				// a human host is currently assigned to this new player number, swap with it
+				for (auto otherH : Hosts) {
+					if (otherH.PlyNr == newPlyNr) {
+						std::swap(h.PlyNr, otherH.PlyNr);
+						break;
+					}
+				}
+			} else {
+				// this newPlyNr was currently used by an AI or no one
+				h.PlyNr = newPlyNr;
+			}
+			std::swap(ServerSetupState.CompOpt[h.PlyNr], ServerSetupState.CompOpt[newPlyNr]);
+			std::swap(ServerSetupState.ServerGameSettings.Presets[h.PlyNr], ServerSetupState.ServerGameSettings.Presets[newPlyNr]);
+		}
 	}
 
-	/* NOW we have NetPlayers in Hosts array, with ServerSetupState shuffled up to match it.. */
+	bool waitingForConfigAck[PlayerMax] = {true};
+	bool waitingForInitAck[PlayerMax] = {false};
 
-	//
 	// Send all clients host:ports to all clients.
-	//  Slot 0 is the server!
-	//
+	// Slot 0 is the server!
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
-	HostsCount = NetPlayers - 1;
-
-	// Move ourselves (server slot 0) to the end of the list
-	std::swap(Hosts[0], Hosts[HostsCount]);
 
 	// Prepare the final config message:
 	CInitMessage_Config message;
-	message.hostsCount = NetPlayers;
-	for (int i = 0; i < NetPlayers; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		message.hosts[i] = Hosts[i];
-		message.hosts[i].PlyNr = Hosts[i].PlyNr;
 	}
 
 	printf("FINAL ServerSetupState:\n");
-	for (int i = 0; i < PlayerMax - 1; ++i) {
+	for (int i = 0; i < PlayerMax; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			const std::string hostStr = CHost(Hosts[i].Host, Hosts[i].Port).toString();
-			printf(" %s %s", hostStr.c_str(), Hosts[i].PlyName);
+			for (auto h : Hosts) {
+				if (h.IsValid() && h.PlyNr == i) {
+					const std::string hostStr = CHost(h.Host, h.Port).toString();
+					printf(" %s %s", hostStr.c_str(), h.PlyName);
+					break;
+				}
+			}
 		}
 		printf("\n");
 	}
@@ -1944,26 +1819,24 @@ void NetworkServerStartGame()
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
-	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ HostsCount);
+	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ NetPlayers);
 	// Send all clients host:ports to all clients.
-	for (int j = HostsCount; j;) {
-
+	int hostsToAck = NetPlayers - 1;
+	while (hostsToAck) {
 breakout:
-		// Send to all clients.
-		for (int i = 0; i < HostsCount; ++i) {
+		// Send to all clients, skip server host in Hosts[0]
+		for (int i = 1; i < NetPlayers; ++i) {
 			const CHost host(message.hosts[i].Host, message.hosts[i].Port);
-
-			if (mapPlayerIndexToAckStatus[Hosts[i].PlyNr] == 1) { // not acknowledged yet
-				message.clientIndex = i;
+			if (waitingForConfigAck[i]) { // not acknowledged yet
 				NetworkSendICMessage_Log(NetworkFildes, host, message);
-			} else if (mapPlayerIndexToAckStatus[Hosts[i].PlyNr] == 2) {
+			} else if (waitingForInitAck[i]) {
 				NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 			}
 		}
 
 		// Wait for acknowledge
 		unsigned char buf[1024];
-		while (j && NetworkFildes.HasDataToRead(1000)) {
+		while (hostsToAck && NetworkFildes.HasDataToRead(1000)) {
 			CHost host;
 			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
 			if (len < 0) {
@@ -1983,8 +1856,9 @@ breakout:
 						DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
-							if (mapPlayerIndexToAckStatus[Hosts[index].PlyNr] == 1) {
-								mapPlayerIndexToAckStatus[Hosts[index].PlyNr]++;
+							if (waitingForConfigAck[index]) {
+								waitingForConfigAck[index] = false;
+								waitingForInitAck[index] = true;
 							}
 							goto breakout;
 						}
@@ -1995,10 +1869,10 @@ breakout:
 						DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
-							if (mapPlayerIndexToAckStatus[Hosts[index].PlyNr] == 2) {
-								mapPlayerIndexToAckStatus[Hosts[index].PlyNr] = 0;
-								--j;
-								DebugPrint("Removing host %d from waiting list\n" _C_ j);
+							if (waitingForInitAck[index]) {
+								waitingForInitAck[index] = false;
+								hostsToAck--;
+								DebugPrint("Removing host %d from waiting list\n" _C_ index);
 							}
 						}
 						break;
@@ -2020,7 +1894,7 @@ breakout:
 
 	// Give clients a quick-start kick..
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
-	for (int i = 0; i < HostsCount; ++i) {
+	for (int i = 1; i < NetPlayers; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
 		NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}
@@ -2076,8 +1950,19 @@ void NetworkInitServerConnect(int openslots)
 	// preset the server (initially always slot 0)
 	Hosts[0].SetName(Parameters::Instance.LocalPlayerName.c_str());
 
-	for (int i = openslots; i < PlayerMax - 1; ++i) {
-		ServerSetupState.CompOpt[i] = SlotOption::Computer;
+	bool assignedHostPlayer = false;
+	for (int i = 0; i < PlayerMax; i++) {
+		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
+			if (!assignedHostPlayer) {
+				assignedHostPlayer = true;
+				Hosts[0].PlyNr = i;
+			}
+			ServerSetupState.CompOpt[i] = SlotOption::Available;
+		} else if (Map.Info.PlayerType[i] == PlayerTypes::PlayerNobody) {
+			ServerSetupState.CompOpt[i] = SlotOption::Closed;
+		} else {
+			ServerSetupState.CompOpt[i] = SlotOption::Computer;
+		}
 	}
 }
 
@@ -2092,7 +1977,7 @@ void NetworkServerResyncClients()
 }
 
 /**
-** Multiplayer network game final race and player type setup.
+** Multiplayer network game final copy of server settings to game settings.
 */
 void NetworkGamePrepareGameSettings()
 {
@@ -2100,65 +1985,24 @@ void NetworkGamePrepareGameSettings()
 	GameSettings = ServerSetupState.ServerGameSettings;
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 
-#ifdef DEBUG
+	printf("FINAL NETWORK GAME SETUP\n");
 	for (int i = 0; i < PlayerMax - 1; i++) {
 		printf("%02d: CO: %d   Race: %d   Name: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			for (int h = 0; h != HostsCount; ++h) {
-				if (Hosts[h].PlyNr == i) {
-					printf("%s", Hosts[h].PlyName);
+			for (auto h : Hosts) {
+				if (h.IsValid() && h.PlyNr == i) {
+					printf("%s", h.PlyName);
 				}
 			}
 			if (i == NetLocalPlayerNumber) {
-				printf("%s (localhost)", Parameters::Instance.LocalPlayerName.c_str());
+				printf(" (%s localhost)", Parameters::Instance.LocalPlayerName.c_str());
 			}
 		}
 		printf("\n");
 	}
-#endif
 
-	// Make a list of the available player slots.
-	int num[PlayerMax];
-	int comp[PlayerMax];
-	int c = 0;
-	int h = 0;
-	for (int i = 0; i < PlayerMax; i++) {
-		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
-			num[h++] = i;
-		}
-		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerComputer) {
-			comp[c++] = i; // available computer player slots
-		}
-	}
-	for (int i = 0; i < h; i++) {
-		GameSettings.Presets[num[i]].Race = ServerSetupState.ServerGameSettings.Presets[num[i]].Race;
-		switch (ServerSetupState.CompOpt[num[i]]) {
-			case SlotOption::Available: {
-				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerPerson;
-				break;
-			}
-			case SlotOption::Computer:
-				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerComputer;
-				break;
-			case SlotOption::Closed:
-				GameSettings.Presets[num[i]].Type = PlayerTypes::PlayerNobody;
-			default:
-				break;
-		}
-	}
-	for (int i = 0; i < c; i++) {
-		if (ServerSetupState.CompOpt[comp[i]] == SlotOption::Closed) { // closed..
-			GameSettings.Presets[comp[i]].Type = PlayerTypes::PlayerNobody;
-			DebugPrint("Settings[%d].Type == Closed\n" _C_ comp[i]);
-		}
-	}
-
-#ifdef DEBUG
-	for (int i = 0; i != HostsCount; ++i) {
-		Assert(GameSettings.Presets[Hosts[i].PlyNr].Type == PlayerTypes::PlayerPerson);
-	}
-	Assert(GameSettings.Presets[NetLocalPlayerNumber].Type == PlayerTypes::PlayerPerson);
-#endif
+	printf("FINAL NETWORK GAME SETTINGS\n");
+	GameSettings.Save(+[](std::string f) { printf("%s\n", f.c_str()); });
 }
 
 /**

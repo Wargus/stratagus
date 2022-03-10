@@ -19,6 +19,12 @@ class ServerSetupStateRacesArray {
     int& operator[](int idx) const { return p[idx].Race; }
 }
 
+enum SlotOption {
+	Available @ SlotAvailable,
+	Computer @ SlotComputer,
+	Closed @ SlotClosed,
+};
+
 class CServerSetup {
 	Settings ServerGameSettings;
 	SlotOption CompOpt[PlayerMax];
@@ -45,7 +51,7 @@ tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
-	short PlayerIndex @ PlyNr;   /// Desired player number when in game
+	unsigned short PlyNr;        /// Player number for game
 	char           PlyName[NetPlayerNameSize];  /// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];
