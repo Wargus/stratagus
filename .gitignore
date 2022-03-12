@@ -28,6 +28,7 @@ obj-*
 ./tolua.cpp
 ./tolua.cpp.rule
 build
+build_linux
 .vscode/*
 !.vscode/tasks.json
 !.vscode/launch.json
