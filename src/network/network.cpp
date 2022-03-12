@@ -358,7 +358,7 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 
 	// Send to all clients.
 	if (NetConnectType == 1) { // server
-		for (int i = 1; i < NetPlayers; ++i) {
+		for (int i = 0; i < NetPlayers; ++i) {
 			if (Hosts[i].IsValid()) {
 				const CHost host(Hosts[i].Host, Hosts[i].Port);
 				if (Hosts[i].PlyNr == player) {
@@ -502,7 +502,7 @@ void NetworkOnStartGame()
 	// push initial sync messages into command queues
 	// timfel: why is this done on all clients and not just on the server?
 	for (unsigned int i = 0; i <= CNetworkParameter::Instance.NetworkLag; i += CNetworkParameter::Instance.gameCyclesPerUpdate) {
-		for (int n = 1; n < NetPlayers; ++n) {
+		for (int n = 0; n < NetPlayers; ++n) {
 			CNetworkCommandQueue(&ncqs)[MaxNetworkCommands] = NetworkIn[i][Hosts[n].PlyNr];
 
 			ncqs[0].Time = i;
@@ -613,7 +613,7 @@ void NetworkSendSelection(CUnit **units, int count)
 {
 	// Check if we have any teammates to send to
 	bool hasteammates = false;
-	for (int i = 1; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		if (Hosts[i].IsValid() && Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
 			hasteammates = true;
 			break;
@@ -664,7 +664,7 @@ void NetworkSendChatMessage(const std::string &msg)
 static void NetworkRemovePlayer(int player)
 {
 	// Remove player from Hosts and clear NetworkIn
-	for (int i = 1; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		if (Hosts[i].IsValid() && Hosts[i].PlyNr == player) {
 			Hosts[i].Clear();
 			break;
@@ -694,7 +694,7 @@ static bool IsNetworkCommandReady(int hostIndex, unsigned long gameNetCycle)
 static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 {
 	// Check if all next messages are available.
-	for (int i = 1; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		if (IsNetworkCommandReady(i, gameNetCycle) == false) {
 			return false;
 		}
@@ -719,7 +719,7 @@ static void ParseResendCommand(const CNetworkPacket &packet)
 	}
 	NetworkSendPacket(NetworkIn[gameNetCycle & 0xFF][ThisPlayer->Index]);
 	// Check if a player quit this cycle
-	for (int j = 1; j < NetPlayers; ++j) {
+	for (int j = 0; j < NetPlayers; ++j) {
 		if (!Hosts[j].IsValid()) {
 			continue;
 		}
@@ -1210,7 +1210,7 @@ void NetworkRecover()
 	if (FrameCounter % CNetworkParameter::Instance.gameCyclesPerUpdate != 0) {
 		return;
 	}
-	for (int i = 1; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		CheckPlayerThatTimeOut(i);
 	}
 	NetworkResendCommands();

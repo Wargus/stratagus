@@ -1900,7 +1900,7 @@ breakout:
 
 	// Give clients a quick-start kick..
 	const CInitMessage_Header message_go(MessageInit_FromServer, ICMGo);
-	for (int i = 1; i < NetPlayers; ++i) {
+	for (int i = 0; i < NetPlayers; ++i) {
 		const CHost host(Hosts[i].Host, Hosts[i].Port);
 		NetworkSendICMessage_Log(NetworkFildes, host, message_go);
 	}
