@@ -256,6 +256,9 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Race));
+		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].PlayerColor));
+		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Team));
+		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Type));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, static_cast<int8_t>(this->CompOpt[i]));
@@ -285,6 +288,9 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Race));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].PlayerColor));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Team));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Type));
 	}
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->CompOpt[i]));

@@ -1788,8 +1788,10 @@ void NetworkServerStartGame()
 		}
 	}
 
-	bool waitingForConfigAck[PlayerMax] = {true};
-	bool waitingForInitAck[PlayerMax] = {false};
+	bool waitingForConfigAck[PlayerMax];
+	bool waitingForInitAck[PlayerMax];
+	std::fill_n(waitingForConfigAck, PlayerMax, true);
+	std::fill_n(waitingForInitAck, PlayerMax, false);
 
 	// Send all clients host:ports to all clients.
 	// Slot 0 is the server!
@@ -1819,18 +1821,22 @@ void NetworkServerStartGame()
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
-	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ NetPlayers);
-	// Send all clients host:ports to all clients.
 	int hostsToAck = NetPlayers - 1;
+	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ hostsToAck);
+	// Send all clients host:ports to all clients.
 	while (hostsToAck) {
 breakout:
-		// Send to all clients, skip server host in Hosts[0]
-		for (int i = 1; i < NetPlayers; ++i) {
-			const CHost host(message.hosts[i].Host, message.hosts[i].Port);
-			if (waitingForConfigAck[i]) { // not acknowledged yet
-				NetworkSendICMessage_Log(NetworkFildes, host, message);
-			} else if (waitingForInitAck[i]) {
-				NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
+		// Send to all clients, skip ourselves (the server) host in Hosts[0]
+		for (int i = 1; i <= PlayerMax; ++i) {
+			if (Hosts[i].IsValid()) {
+				const CHost host(message.hosts[i].Host, message.hosts[i].Port);
+				if (waitingForConfigAck[i]) { // not acknowledged yet
+					DebugPrint("Sending InitConfig to %s\n" _C_ host.toString().c_str());
+					NetworkSendICMessage_Log(NetworkFildes, host, message);
+				} else if (waitingForInitAck[i]) {
+					DebugPrint("Sending InitState to %s\n" _C_ host.toString().c_str());
+					NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
+				}
 			}
 		}
 
@@ -1986,7 +1992,7 @@ void NetworkGamePrepareGameSettings()
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 
 	printf("FINAL NETWORK GAME SETUP\n");
-	for (int i = 0; i < PlayerMax - 1; i++) {
+	for (int i = 0; i < PlayerMax; i++) {
 		printf("%02d: CO: %d   Race: %d   Name: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			for (auto h : Hosts) {

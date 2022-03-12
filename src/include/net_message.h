@@ -122,7 +122,7 @@ public:
 		1 + // Resources
 		1 + // RevealMap
 		4 + // Bitfield
-		1 * PlayerMax + // Races
+		4 * PlayerMax + // Races, PlayerColors, Teams, Types
 		1 * PlayerMax + // CompOpt
 		1 * PlayerMax; // Ready
 	}
