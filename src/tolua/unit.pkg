@@ -25,15 +25,15 @@ class CPreference
 	bool ShowNoSelectionStats;
 	bool BigScreen;
 	bool PauseOnLeave;
-	bool AiExplores;
+	tolua_property bool AiExplores;
 	bool GrayscaleIcons;
 	bool IconsShift;
 	bool StereoSound;
 	bool MineNotifications;
 	bool DeselectInMine;
 	bool NoStatusLineTooltips;
-	bool SimplifiedAutoTargeting;
-	bool AiChecksDependencies;
+	tolua_property bool SimplifiedAutoTargeting;
+	tolua_property bool AiChecksDependencies;
 	bool HardwareCursor;
 	bool SelectionRectangleIndicatesDamage;
 

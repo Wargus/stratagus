@@ -91,7 +91,6 @@ enum _net_client_con_state_ {
 
 extern int NetPlayers;                /// Network players
 
-extern int HostsCount;                /// Number of hosts.
 extern CNetworkHost Hosts[PlayerMax]; /// Host, port, and number of all players.
 
 extern int NetConnectRunning;              /// Network menu: Setup mode active
@@ -105,7 +104,7 @@ extern std::string NetworkMapFragmentName; /// Name of the map currently loading
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 
-extern int NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
+extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
 
 /*----------------------------------------------------------------------------
 --  Functions

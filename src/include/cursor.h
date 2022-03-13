@@ -134,7 +134,7 @@ public:
 
 	PixelPos HotPos;     /// Hot point
 
-	int SpriteFrame;  /// Current displayed cursor frame
+	unsigned int SpriteFrame;  /// Current displayed cursor frame
 	int FrameRate;    /// Rate of changing the frames
 
 	// --- FILLED UP ---

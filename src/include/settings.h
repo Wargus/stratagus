@@ -30,71 +30,156 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
+/*
+ * This header file defines all the structures that need to be consistent for replays, savegame loading, and
+ * multiplayer games.
+ */
+
 //@{
 
+#include <stdint.h>
 #include <string>
 #include <vector>
+#include <functional>
+#include <variant>
 
 /*----------------------------------------------------------------------------
---  Declarations
+--  TODO: Remove this once we move off of tolua++ and can properly support strongly typed enums
+----------------------------------------------------------------------------*/
+#define USING_TOLUAPP 1
+#if USING_TOLUAPP
+// using tolua++
+#define ENUM_CLASS enum
+#else
+#define ENUM_CLASS enum class
+#endif
+
+/*----------------------------------------------------------------------------
+--  Some limits
 ----------------------------------------------------------------------------*/
 
-class CFile;
-class CMap;
+constexpr unsigned char PlayerMax = 16;        /// How many players are supported
+constexpr unsigned short UnitTypeMax = 2048;                /// How many unit types supported
+constexpr unsigned short UpgradeMax = 2048;                /// How many upgrades supported
+constexpr unsigned char MAX_RACES = 8;
+constexpr unsigned char PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
+/// Frames per second to display (original 30-40)
+constexpr unsigned char FRAMES_PER_SECOND = 30; // 1/30s
+/// Game cycles per second to simulate (original 30-40)
+constexpr unsigned char CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
 
 /*----------------------------------------------------------------------------
 --  Settings
 ----------------------------------------------------------------------------*/
 
-struct SettingsPresets {
-	int PlayerColor;          /// Color of a player
-	std::string AIScript;     /// AI script for computer to use
-	int Race;                 /// Race of the player
-	int Team;                 /// Team of player
-	int Type;                 /// Type of player (for network games)
-};
+constexpr int8_t SettingsPresetMapDefault = -1;  /// Special: Use map supplied
 
 /**
-**  Settings structure
+**  Types for the player
 **
-**  This structure one day should contain all common game settings,
-**  in-game, or pre-start, and the individual (per player) presets.
-**  This allows central maintenance, easy (network-)negotiation,
-**  simplifies load/save/reinitialization, etc...
+**  #PlayerNeutral
 **
+**    This player is controlled by the computer doing nothing.
+**
+**  #PlayerNobody
+**
+**    This player is unused. Nobody controls this player.
+**
+**  #PlayerComputer
+**
+**    This player is controlled by the computer. CPlayer::AiNum
+**    selects the AI strategy.
+**
+**  #PlayerPerson
+**
+**    This player is contolled by a person. This can be the player
+**    sitting on the local computer or player playing over the
+**    network.
+**
+**  #PlayerRescuePassive
+**
+**    This player does nothing, the game pieces just sit in the game
+**    (being passive)... when a person player moves next to a
+**    PassiveRescue unit/building, then it is "rescued" and becomes
+**    part of that persons team. If the city center is rescued, than
+**    all units of this player are rescued.
+**
+**  #PlayerRescueActive
+**
+**    This player is controlled by the computer. CPlayer::AiNum
+**    selects the AI strategy. Until it is rescued it plays like
+**    an ally. The first person which reaches units of this player,
+**    can rescue them. If the city center is rescued, than all units
+**    of this player are rescued.
 */
-struct Settings {
-	int NetGameType;   /// Multiplayer or single player
-
-	//  Individual presets:
-	//  For single-player game only Presets[0] will be used..
-	SettingsPresets Presets[PlayerMax];
-
-	//  Common settings:
-	int Resources;   /// Preset resource factor
-	int NumUnits;    /// Preset # of units
-	int Opponents;   /// Preset # of ai-opponents
-	int Difficulty;  /// Terrain type (summer,winter,...)
-	int GameType;    /// Game type (melee, free for all,...)
-	bool NoFogOfWar; /// No fog of war
-	bool Inside;     /// If game uses interior tileset
-	int RevealMap;   /// Reveal map { cHidden = 0, cKnown,	cExplored };
-	int MapRichness; /// Map richness
+ENUM_CLASS PlayerTypes : int8_t {
+	MapDefault = SettingsPresetMapDefault, /// use default
+	PlayerUnset = 0,                       /// not set
+	PlayerNeutral = 2,                     /// neutral
+	PlayerNobody  = 3,                     /// unused slot
+	PlayerComputer = 4,                    /// computer player
+	PlayerPerson = 5,                      /// human player
+	PlayerRescuePassive = 6,               /// rescued passive
+	PlayerRescueActive = 7                 /// rescued  active
 };
 
-#define SettingsPresetMapDefault  -1  /// Special: Use map supplied
+extern std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 1];
+
+static_assert(MAX_RACES < 256, "Race selection needs to fit into 8 bits");
+static_assert(PlayerMax < 256, "Team number must fit into 8 bits");
+
+struct SettingsPresets {
+	int8_t PlayerColor;       /// Color of a player
+	std::string AIScript;     /// AI script for computer to use
+	int8_t Race;              /// Race of the player
+	int8_t Team;              /// Team of player
+	PlayerTypes Type;         /// Type of player (for network games)
+
+	void Save(const std::function <void (std::string)>& f) {
+		f(std::string("PlayerColor = ") + std::to_string(PlayerColor));
+		f(std::string("AIScript = \"") + AIScript + "\"");
+		f(std::string("Race = ") + std::to_string(Race));
+		f(std::string("Team = ") + std::to_string(Team));
+		f(std::string("Type = ") + std::to_string(static_cast<int>(Type)));
+	}
+
+	void Init() {
+		PlayerColor = 0;
+		AIScript = "ai-passive";
+		Race = SettingsPresetMapDefault;
+		Team = SettingsPresetMapDefault;
+		Type = PlayerTypes::MapDefault;
+	}
+
+	bool operator==(const SettingsPresets &other) const {
+		return PlayerColor == other.PlayerColor &&
+			AIScript == other.AIScript &&
+			Race == other.Race &&
+			Team == other.Team &&
+			Type == other.Type;
+	}
+};
+
+ENUM_CLASS RevealTypes : uint8_t { 
+	cNoRevelation, 
+	cAllUnits, 
+	cBuildingsOnly 
+}; /// Revelation types
 
 /**
 **  Single or multiplayer settings
 */
-#define SettingsSinglePlayerGame  1
-#define SettingsMultiPlayerGame   2
+ENUM_CLASS NetGameTypes : uint8_t {
+	SettingsSinglePlayerGame,
+	SettingsMultiPlayerGame,
+	Unset
+};
 
 /**
 **  GameType settings
 */
-enum GameTypes {
+ENUM_CLASS GameTypes : int8_t {
 	SettingsGameTypeMapDefault = SettingsPresetMapDefault,
 	SettingsGameTypeMelee = 0,
 	SettingsGameTypeFreeForAll,
@@ -116,9 +201,156 @@ enum GameTypes {
 	SettingsGameTypeTeamCaptureTheFlag
 #endif
 };
+
 /// Map revealing modes: cHidden - unrevealed, cKnown - you can see unexplored tiles, but they are darker than explored
 /// cExplored - all tiles became explored, and covered only by the fog of war if it's enabled.
-enum MapRevealModes { cHidden = 0, cKnown, cExplored, cNumOfModes };
+ENUM_CLASS MapRevealModes : uint8_t {
+	cHidden = 0,
+	cKnown,
+	cExplored,
+	cNumOfModes
+};
+
+ENUM_CLASS FieldOfViewTypes : uint8_t {
+	cShadowCasting,
+	cSimpleRadial,
+	NumOfTypes
+};
+
+/**
+**  Settings structure
+**
+**  This structure one day should contain all common game settings,
+**  in-game, or pre-start, and the individual (per player) presets.
+**  This allows central maintenance, easy (network-)negotiation,
+**  simplifies load/save/reinitialization, etc...
+**
+*/
+struct Settings {
+	NetGameTypes NetGameType;   /// Multiplayer or single player
+
+	//  Individual presets:
+	//  For single-player game only Presets[0] will be used..
+	SettingsPresets Presets[PlayerMax];
+
+	//  Common settings:
+	int8_t Resources;          /// Preset resource factor
+	int8_t NumUnits;           /// Preset # of units
+	int8_t Opponents;          /// Preset # of ai-opponents
+	int8_t Difficulty;         /// Terrain type (summer,winter,...)
+	GameTypes GameType;        /// Game type (melee, free for all,...)
+	FieldOfViewTypes FoV;      /// Which field of view is used - important to be shared for unit sight
+	MapRevealModes RevealMap;  /// Reveal map kind
+	RevealTypes DefeatReveal;
+	union {
+		struct {
+			unsigned NoFogOfWar:1;        /// if dynamic fog of war is disabled
+			unsigned Inside:1;            /// if game uses interior tileset or is generally "inside" for the purpose of obstacles
+			unsigned AiExplores:1;        /// If true, AI sends explorers to search for resources (almost useless thing)
+			unsigned SimplifiedAutoTargeting:1; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
+			unsigned AiChecksDependencies:1; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
+			unsigned UserGameSettings:27; /// A bitfield for use by games and their settings
+		};
+		uint32_t _Bitfield;
+	};
+
+	bool GetUserGameSetting(int i) {
+		return UserGameSettings & (1 << i);
+	}
+
+	void SetUserGameSetting(int i, bool v) {
+		UserGameSettings |= (1 << i);
+	}
+
+	bool operator==(const Settings &other) const {
+		for (int i = 0; i < PlayerMax; i++) {
+			if (Presets[i] == other.Presets[i]) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+		return NetGameType == other.NetGameType &&
+			Resources == other.Resources &&
+			NumUnits == other.NumUnits &&
+			Opponents == other.Opponents &&
+			Difficulty == other.Difficulty &&
+			GameType == other.GameType &&
+			FoV == other.FoV &&
+			RevealMap == other.RevealMap &&
+			DefeatReveal == other.DefeatReveal &&
+			_Bitfield == other._Bitfield;
+	}
+
+	void Save(const std::function <void (std::string)>& f, bool withPlayers = true) {
+		f(std::string("NetGameType = ") + std::to_string(static_cast<int>(NetGameType)));
+		if (withPlayers) {
+			for (int i = 0; i < PlayerMax; ++i) {
+				Presets[i].Save([&] (std::string field) {
+					f(std::string("Presets[") + std::to_string(i) + "]." + field);
+				});
+			}
+		}
+		f(std::string("Resources = ") + std::to_string(Resources));
+		f(std::string("NumUnits = ") + std::to_string(NumUnits));
+		f(std::string("Opponents = ") + std::to_string(Opponents));
+		f(std::string("Difficulty = ") + std::to_string(Difficulty));
+		f(std::string("GameType = ") + std::to_string(static_cast<int>(GameType)));
+		f(std::string("FoV = ") + std::to_string(static_cast<int>(FoV)));
+		f(std::string("RevealMap = ") + std::to_string(static_cast<int>(RevealMap)));
+		f(std::string("DefeatReveal = ") + std::to_string(static_cast<int>(DefeatReveal)));
+		f(std::string("Flags = ") + std::to_string(_Bitfield));
+	}
+
+	bool SetField(std::string field, int value) {
+		if (field == "NetGameType") {
+			NetGameType = static_cast<NetGameTypes>(value);
+		} else if (field == "Resources") {
+			Resources = value;
+		} else if (field == "NumUnits") {
+			NumUnits = value;
+		} else if (field == "Opponents") {
+			Opponents = value;
+		} else if (field == "Difficulty") {
+			Difficulty = value;
+		} else if (field == "GameType") {
+			GameType = static_cast<GameTypes>(value);
+		} else if (field == "FoV") {
+			FoV = static_cast<FieldOfViewTypes>(value);
+		} else if (field == "RevealMap") {
+			RevealMap = static_cast<MapRevealModes>(value);
+		} else if (field == "DefeatReveal") {
+			DefeatReveal = static_cast<RevealTypes>(value);
+		} else if (field == "Flags") {
+			_Bitfield = value;
+		} else {
+			return false;
+		}
+		return true;
+	}
+
+	void Init() {
+		NetGameType = NetGameTypes::SettingsSinglePlayerGame;
+		for (int i = 0; i < PlayerMax; ++i) {
+			Presets[i].Init();
+			Presets[i].PlayerColor = i;
+		}
+		Resources = SettingsPresetMapDefault;
+		NumUnits = SettingsPresetMapDefault;
+		Opponents = SettingsPresetMapDefault;
+		Difficulty = SettingsPresetMapDefault;
+		GameType = GameTypes::SettingsGameTypeMapDefault;
+		FoV = FieldOfViewTypes::cSimpleRadial;
+		RevealMap = MapRevealModes::cHidden;
+		DefeatReveal = RevealTypes::cAllUnits;
+		NoFogOfWar = 0;
+		Inside = 0;
+		AiExplores = 1;
+		AiChecksDependencies = 0;
+		SimplifiedAutoTargeting = 0;
+		UserGameSettings = 0;
+	}
+};
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -130,10 +362,6 @@ extern Settings GameSettings;  /// Game settings
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Show stats
-extern void ShowStats();
-/// Create a game
-extern void CreateGame(const std::string &filename, CMap *map);
 /// Init Setting to default values
 extern void InitSettings();
 

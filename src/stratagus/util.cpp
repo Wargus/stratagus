@@ -27,6 +27,8 @@
 //      02111-1307, USA.
 //
 
+#include <random>
+
 #include "stratagus.h"
 
 #include "util.h"
@@ -103,11 +105,13 @@ int SyncRand(int max)
 	return SyncRand() % max;
 }
 
-
+static std::random_device dev;
+static std::mt19937 rng_engine(dev());
+static std::uniform_int_distribution<std::mt19937::result_type> rng_dist(0,RAND_MAX);
 
 int MyRand()
 {
-	return rand();
+	return rng_dist(rng_engine);
 }
 
 /*----------------------------------------------------------------------------
@@ -433,7 +437,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 		return curpos;
 	}
 	while (curpos >= 0) {
-		if (curpos < text.size() && (text[curpos] & 0xC0) != 0x80) {
+		if (static_cast<unsigned int>(curpos) < text.size() && (text[curpos] & 0xC0) != 0x80) {
 			return curpos;
 		}
 		--curpos;

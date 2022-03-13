@@ -1,6 +1,6 @@
 {
     "cmake.generator": "Visual Studio 16 2019",
-    "cmake.toolset": "v141_xp",
+    "cmake.toolset": "v142",
     "cmake.platform": "win32",
     "cmake.configureSettings": {
         "WIN32_CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies",

@@ -997,7 +997,7 @@ public:
         BNCSOutputStream msg(0x1c);
         int maxSlots = 0;
         for (int i = 0; i < PlayerMax; i++) {
-            if (ServerSetupState.CompOpt[i] == 0) { // available
+            if (ServerSetupState.CompOpt[i] == SlotOption::Available) { // available
                 maxSlots++;
             }
         }
@@ -1050,12 +1050,10 @@ public:
         if (GameSettings.NumUnits == 1) {
             game_settings |= 0x200;
         }
-        if (NoRandomPlacementMultiplayer == 1) {
+        if (NoRandomPlacementMultiplayer) {
             game_settings |= 0x400;
         }
         switch (GameSettings.Resources) {
-        case -1:
-            break;
         case 1:
             game_settings |= 0x1000;
             break;

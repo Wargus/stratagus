@@ -79,6 +79,8 @@ extern void SaveReplayList(CFile &file);
 /// Register ccl functions related to network
 extern void ReplayCclRegister();
 
+extern bool IsReplayGame();
+
 //@}
 
 #endif // !__REPLAY_H__

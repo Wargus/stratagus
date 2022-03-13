@@ -14,20 +14,36 @@ int GetNetworkState();
 void NetworkServerResyncClients(void);
 void NetworkDetachFromServer(void);
 
-class CServerSetup {
-	unsigned char ResourcesOption;
-	unsigned char UnitsOption;
-	unsigned char FogOfWar;
-	unsigned char Inside;
-	unsigned char RevealMap;
-	unsigned char GameTypeOption;
-	unsigned char Difficulty;
-	unsigned char MapRichness;
-	unsigned char Opponents;
-	unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
-	unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
-	unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.
+class ServerSetupStateRacesArray {
+    int& operator[](int idx) { return p[idx].Race; }
+    int& operator[](int idx) const { return p[idx].Race; }
+}
+
+enum SlotOption {
+	Available @ SlotAvailable,
+	Computer @ SlotComputer,
+	Closed @ SlotClosed,
 };
+
+class CServerSetup {
+	Settings ServerGameSettings;
+	SlotOption CompOpt[PlayerMax];
+	unsigned short Ready[PlayerMax]; // cannot use char since tolua interpret variable as string.
+	tolua_property unsigned char ResourcesOption;
+	tolua_property unsigned char UnitsOption;
+	tolua_property unsigned char FogOfWar;
+	tolua_property unsigned char Inside;
+	tolua_property unsigned char RevealMap;
+	tolua_property unsigned char GameTypeOption;
+	tolua_property unsigned char Difficulty;
+	tolua_property unsigned char Opponents;
+        tolua_property tolua_readonly ServerSetupStateRacesArray *Race;
+};
+
+$[
+CServerSetup.MapRichness = 0
+$]
+
 extern CServerSetup LocalSetupState;
 extern CServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
@@ -35,7 +51,7 @@ tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
 	unsigned long  Host;         /// Host address
 	unsigned short Port;         /// Port on host
-	unsigned short PlyNr;        /// Player nummer
+	unsigned short PlyNr;        /// Player number for game
 	char           PlyName[NetPlayerNameSize];  /// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];

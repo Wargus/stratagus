@@ -537,7 +537,7 @@ void CUnit::Release(bool final)
 		}
 	}
 
-	Assert(!Refs);
+	Assert(!GameCycle || !Refs); // it's fine to have remaining refs if we're no longer in the game
 
 	//
 	// No more references remaining, but the network could have an order
@@ -1416,7 +1416,7 @@ void UnitLost(CUnit &unit)
 		if (lost_town_hall) {
 			player.LostMainFacilityTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 			for (int j = 0; j < NumPlayers; ++j) {
-				if (player.Index != j && Players[j].Type != PlayerNobody) {
+				if (player.Index != j && Players[j].Type != PlayerTypes::PlayerNobody) {
 					Players[j].Notify(_("%s has lost their last base, and will be revealed in thirty seconds!"), player.Name.c_str());
 				} else {
 					Players[j].Notify("%s", _("You have lost your last base, and will be revealed in thirty seconds!"));
@@ -1609,7 +1609,7 @@ void CorrectWallNeighBours(CUnit &unit)
 void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
 	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
-		if (player.Type == PlayerPerson && !unit.Destroyed) {
+		if (player.Type == PlayerTypes::PlayerPerson && !unit.Destroyed) {
 			unit.RefsIncrease();
 		}
 		//
@@ -1653,7 +1653,7 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 		return;
 	}
 	if (unit.Seen.ByPlayer & (1 << (player.Index))) {
-		if ((player.Type == PlayerPerson) && (!(unit.Seen.Destroyed & (1 << player.Index)))) {
+		if ((player.Type == PlayerTypes::PlayerPerson) && (!(unit.Seen.Destroyed & (1 << player.Index)))) {
 			unit.RefsDecrease();
 		}
 	} else {
@@ -1679,7 +1679,7 @@ void UnitCountSeen(CUnit &unit)
 	//  unit before this calc.
 	int oldv[PlayerMax];
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
+		if (Players[p].Type != PlayerTypes::PlayerNobody || p == ThisPlayer->Index) {
 			oldv[p] = unit.IsVisible(Players[p]);
 		}
 	}
@@ -1689,7 +1689,7 @@ void UnitCountSeen(CUnit &unit)
 	const int width = unit.Type->TileWidth;
 
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
+		if (Players[p].Type != PlayerTypes::PlayerNobody || p == ThisPlayer->Index) {
 			int newv = 0;
 			int y = height;
 			unsigned int index = unit.Offset;
@@ -1698,7 +1698,7 @@ void UnitCountSeen(CUnit &unit)
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
-						if (mf->playerInfo.VisCloak[p] || Players[p].Type == PlayerNobody) {
+						if (mf->playerInfo.VisCloak[p] || Players[p].Type == PlayerTypes::PlayerNobody) {
 							newv++;
 						}
 					} else {
@@ -1719,7 +1719,7 @@ void UnitCountSeen(CUnit &unit)
 	// for players. Hopefully this works with shared vision just great.
 	//
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (Players[p].Type != PlayerNobody || p == ThisPlayer->Index) {
+		if (Players[p].Type != PlayerTypes::PlayerNobody || p == ThisPlayer->Index) {
 			int newv = unit.IsVisible(Players[p]);
 			if (!oldv[p] && newv) {
 				// Might have revealed a destroyed unit which caused it to
@@ -2013,7 +2013,7 @@ void RescueUnits()
 
 	//  Look if player could be rescued.
 	for (CPlayer *p = Players; p < Players + NumPlayers; ++p) {
-		if (p->Type != PlayerRescuePassive && p->Type != PlayerRescueActive) {
+		if (p->Type != PlayerTypes::PlayerRescuePassive && p->Type != PlayerTypes::PlayerRescueActive) {
 			continue;
 		}
 		if (p->GetUnitCount() != 0) {
@@ -2035,7 +2035,7 @@ void RescueUnits()
 				SelectAroundUnit(unit, 1, around);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
-					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
+					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerTypes::PlayerRescuePassive && around[i]->Player->Type != PlayerTypes::PlayerRescueActive) {
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
@@ -2553,7 +2553,7 @@ void DestroyAllInside(CUnit &source)
 int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SimplifiedAutoTargeting) {
 		// Original algorithm return smaler values for better targets
 		return -TargetPriorityCalculate(&unit, &dest);
 	}
@@ -2628,7 +2628,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	const int pathLength 	 = CalcPathLengthToUnit(*attacker, *dest, minAttackRange, attackRange);
 	int distance		 	 = attacker->MapDistanceTo(*dest);
 
-	const int reactionRange  = (player.Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+	const int reactionRange  = (player.Type == PlayerTypes::PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 
 
 	if (!InAttackRange(*attacker, *dest)
@@ -2705,7 +2705,7 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 {
 	Assert(&target != NULL);
 	const int distance 	= unit.MapDistanceTo(target);
-	const int range 	= (unit.Player->Type == PlayerPerson)
+	const int range 	= (unit.Player->Type == PlayerTypes::PlayerPerson)
 						  ? unit.Type->ReactRangePerson
 						  : unit.Type->ReactRangeComputer;
 	return distance <= range;
@@ -3157,7 +3157,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	if (Preference.SimplifiedAutoTargeting) {
+	if (GameSettings.SimplifiedAutoTargeting) {
 		target.Threshold = 0;
 	} else {		
 		const int threshold = 30;

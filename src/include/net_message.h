@@ -34,6 +34,8 @@
 #include <stdint.h>
 #include <vector>
 
+#include "settings.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -60,14 +62,47 @@ public:
 
 	void SetName(const char *name);
 
+	bool IsValid() { return (PlyNr != 0) || (PlyName[0] != '\0'); }
+
 	uint32_t Host;         /// Host address
 	uint16_t Port;         /// Port on host
 	uint16_t PlyNr;        /// Player number
 	char PlyName[NetPlayerNameSize];  /// Name of player
 };
 
+ENUM_CLASS SlotOption : uint8_t {
+	Available,
+	Computer,
+	Closed
+};
+
+#if USING_TOLUAPP
+class ServerSetupStateRacesArray {
+public:
+	ServerSetupStateRacesArray() : p(nullptr) {}
+	int8_t& operator[](int idx) { return p[idx].Race; }
+	int8_t& operator[](int idx) const { return p[idx].Race; }
+	SettingsPresets *p;
+};
+#endif
+
 /**
-**  Multiplayer game setup menu state
+**  Multiplayer game setup menu state.
+**
+**  Some words. The ServerSetupState and LocalSetupState are "kind of" kept in sync.
+**  Most ServerGameSettings are only pushed from the server to the clients, but the
+**  CServerSetup::ServerGameSettings::Presets and CServerSetup::Ready arrays are synced.
+**  The ready array is in Host-index order, that is, it corresponds to the global #Hosts array.
+**  In contrast, the CServerSetup::ServerGameSettings::Presets and CServerSetup::CompOpt arrays are set up
+**  in Player-index order, that is, they corresponds to the player slots in the map definition. This
+**  is prepared in #NetworkInitServerConnect.
+**
+**  While in the lobby, hosts, settings, presets, and ready states are synced between client and server.
+**  The CompOpt array is not touched until the server starts the game. At this point the lua scripts
+**  will call #NetworkServerStartGame and then #NetworkServerPrepareGameSettings. The first will finalize the
+**  assignments of hosts to player indices and propagate that info to all clients. The second will
+**  ensure the GameSettings are copied from the ServerSettings so that all game-relevant settings are the
+**  same on all clients.
 */
 class CServerSetup
 {
@@ -75,26 +110,59 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	static size_t Size() {
+		// This must be kept in sync with GameSettings
+		return \
+		1 + // DefeatReveal
+		1 + // Difficulty
+		1 + // FoV
+		1 + // GameType
+		1 + // NumUnits
+		1 + // Opponents
+		1 + // Resources
+		1 + // RevealMap
+		4 + // Bitfield
+		4 * PlayerMax + // Races, PlayerColors, Teams, Types
+		1 * PlayerMax + // CompOpt
+		1 * PlayerMax; // Ready
+	}
 	void Clear();
 
 	bool operator == (const CServerSetup &rhs) const;
 	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
 public:
-	uint8_t ResourcesOption;       /// Resources option
-	uint8_t UnitsOption;           /// Unit # option
-	uint8_t FogOfWar;              /// Fog of war option
-	uint8_t Inside;                /// Inside option
-	uint8_t RevealMap;             /// Reveal all the map
-	uint8_t TilesetSelection;      /// Tileset select option
-	uint8_t GameTypeOption;        /// Game type option
-	uint8_t Difficulty;            /// Difficulty option
-	uint8_t MapRichness;           /// Map richness option
-	uint8_t Opponents;             /// Number of AI opponents
-	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax];      /// Client ready state
-	uint8_t Race[PlayerMax];       /// Client race selection
+	Settings ServerGameSettings;
+	SlotOption CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
+	uint8_t Ready[PlayerMax];         /// Client ready state
 	// Fill in here...
+
+#if USING_TOLUAPP
+	// TODO: can be removed once tolua++ is gone
+	inline char get_ResourcesOption() { return (char)ServerGameSettings.Resources; }
+	inline char get_UnitsOption() { return (char)ServerGameSettings.NumUnits; }
+	inline char get_FogOfWar() { return (char)!ServerGameSettings.NoFogOfWar; }
+	inline char get_Inside() { return (char)ServerGameSettings.Inside; }
+	inline char get_RevealMap() { return (char)ServerGameSettings.RevealMap; }
+	inline char get_GameTypeOption() { return (char)ServerGameSettings.GameType; }
+	inline char get_Difficulty() { return (char)ServerGameSettings.Difficulty; }
+	inline char get_Opponents() { return (char)ServerGameSettings.Opponents; }
+	inline char set_ResourcesOption(char v) { return ServerGameSettings.Resources = v; }
+	inline char set_UnitsOption(char v) { return ServerGameSettings.NumUnits = v; }
+	inline char set_FogOfWar(char v) { return ServerGameSettings.NoFogOfWar = !v; }
+	inline char set_Inside(char v) { return ServerGameSettings.Inside = v; }
+	inline char set_RevealMap(char v) { return ServerGameSettings.RevealMap = (MapRevealModes)v; }
+	inline char set_GameTypeOption(char v) { return ServerGameSettings.GameType = (GameTypes)v; }
+	inline char set_Difficulty(char v) { return ServerGameSettings.Difficulty = v; }
+	inline char set_Opponents(char v) { return ServerGameSettings.Opponents = v; }
+
+	ServerSetupStateRacesArray racesArray;
+	inline ServerSetupStateRacesArray *get_Race() {
+		if (racesArray.p == nullptr) {
+			racesArray.p = ((SettingsPresets*)ServerGameSettings.Presets);
+		}
+		return &racesArray;
+	}
+#endif
 };
 
 /**
@@ -173,12 +241,10 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + 4 + PlayerMax * CNetworkHost::Size(); }
+	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size(); }
 private:
 	CInitMessage_Header header;
 public:
-	uint8_t clientIndex; /// index of receiver in hosts[]
-	uint8_t hostsCount;  /// Number of hosts
 	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 
@@ -217,11 +283,12 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 * 4; }
+	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size() + 2 + 4 + 4; }
 private:
 	CInitMessage_Header header;
 public:
 	CNetworkHost hosts[PlayerMax]; /// Participants information
+	uint16_t NetHostSlot;          /// slot for the receiving host in the server host array
 	int32_t Lag;                   /// Lag time
 	int32_t gameCyclesPerUpdate;   /// Update frequency
 };

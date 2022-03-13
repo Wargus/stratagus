@@ -53,7 +53,7 @@
 ----------------------------------------------------------------------------*/
 
 CMap Map;                   /// The current map
-int FlagRevealMap;          /// Flag must reveal the map
+MapRevealModes FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
 int ForestRegenerationFrequency;     /// Forest regeneration frequency (every how many seconds we apply 1 point of regeneration)
@@ -130,15 +130,16 @@ void CMap::MarkSeenTile(CMapField &mf)
 /**
 **  Reveal the entire map.
 */
-void CMap::Reveal(const int mode /* = MapRevealModes::cKnown */ )
+void CMap::Reveal(MapRevealModes mode /* = MapRevealModes::cKnown */ )
 {
 	/// We can't do "unrevealing" yet
-	if (mode < GameSettings.RevealMap || mode >= MapRevealModes::cNumOfModes) {
+	if (static_cast<int>(mode) < static_cast<int>(GameSettings.RevealMap)
+		|| static_cast<int>(mode) >= static_cast<int>(MapRevealModes::cNumOfModes)) {
 		return;
 	}
 
 	//  Mark every explored tile as visible. 1 turns into 2.
-	if (mode >= MapRevealModes::cExplored) {
+	if (static_cast<int>(mode) >= static_cast<int>(MapRevealModes::cExplored)) {
 		for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
 			CMapField &mf = *this->Field(i);
 			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
@@ -152,9 +153,9 @@ void CMap::Reveal(const int mode /* = MapRevealModes::cKnown */ )
 	//  Global seen recount. Simple and effective.
 	for (CUnit *unit : UnitManager.GetUnits()) {
 		//  Reveal neutral buildings. Gold mines:)
-		if (unit->Player->Type == PlayerNeutral) {
+		if (unit->Player->Type == PlayerTypes::PlayerNeutral) {
 			for (const CPlayer &player : Players) {
-				if (player.Type != PlayerNobody && (!(unit->Seen.ByPlayer & (1 << player.Index )))) {
+				if (player.Type != PlayerTypes::PlayerNobody && (!(unit->Seen.ByPlayer & (1 << player.Index )))) {
 					UnitGoesOutOfFog(*unit, player);
 					UnitGoesUnderFog(*unit, player);
 				}

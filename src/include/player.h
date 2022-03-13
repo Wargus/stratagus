@@ -45,6 +45,8 @@
 
 #include "vec2i.h"
 
+#include "settings.h"
+
 class CGraphic;
 
 /*----------------------------------------------------------------------------
@@ -77,13 +79,6 @@ enum _diplomacy_ {
 	DiplomacyCrazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
-enum class RevealTypes 
-{ 
-	cNoRevelation, 
-	cAllUnits, 
-	cBuildingsOnly 
-}; /// Revelation types
-
 ///  Player structure
 class CPlayer
 {
@@ -113,7 +108,7 @@ public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
 
-	int   Type;         /// type of player (human,computer,...)
+	PlayerTypes Type;   /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
 	std::string AiName; /// AI for computer
 
@@ -283,7 +278,7 @@ public:
 	void UnshareVisionWith(CPlayer &player);
 	void DisableSharedVisionFrom(const CPlayer &player);
 
-	void Init(/* PlayerTypes */ int type);
+	void Init(PlayerTypes type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
 	
@@ -327,61 +322,6 @@ public:
 	unsigned int Count;             /// number of races
 };
 
-
-enum PlayerRacesOld {
-	PlayerRaceHuman = 0,  /// belongs to human
-	PlayerRaceOrc  = 1    /// belongs to orc
-};
-
-/**
-**  Types for the player
-**
-**  #PlayerNeutral
-**
-**    This player is controlled by the computer doing nothing.
-**
-**  #PlayerNobody
-**
-**    This player is unused. Nobody controls this player.
-**
-**  #PlayerComputer
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy.
-**
-**  #PlayerPerson
-**
-**    This player is contolled by a person. This can be the player
-**    sitting on the local computer or player playing over the
-**    network.
-**
-**  #PlayerRescuePassive
-**
-**    This player does nothing, the game pieces just sit in the game
-**    (being passive)... when a person player moves next to a
-**    PassiveRescue unit/building, then it is "rescued" and becomes
-**    part of that persons team. If the city center is rescued, than
-**    all units of this player are rescued.
-**
-**  #PlayerRescueActive
-**
-**    This player is controlled by the computer. CPlayer::AiNum
-**    selects the AI strategy. Until it is rescued it plays like
-**    an ally. The first person which reaches units of this player,
-**    can rescue them. If the city center is rescued, than all units
-**    of this player are rescued.
-*/
-enum PlayerTypes {
-	PlayerNeutral = 2,        /// neutral
-	PlayerNobody  = 3,        /// unused slot
-	PlayerComputer = 4,       /// computer player
-	PlayerPerson = 5,         /// human player
-	PlayerRescuePassive = 6,  /// rescued passive
-	PlayerRescueActive = 7    /// rescued  active
-};
-
-#define PlayerNumNeutral (PlayerMax - 1)  /// this is the neutral player slot
-
 /**
 **  Notify types. Noties are send to the player.
 */
@@ -422,7 +362,7 @@ extern void CleanPlayers();
 extern void SavePlayers(CFile &file);
 
 /// Create a new player
-extern void CreatePlayer(int type);
+extern void CreatePlayer(PlayerTypes type);
 
 
 /// Initialize the computer opponent AI

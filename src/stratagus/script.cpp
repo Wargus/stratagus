@@ -2188,7 +2188,7 @@ static int CclRestartStratagus(lua_State *l)
 #endif
 	}
 	if (insertRestartArgument) {
-		argv[newArgc - 2] = "-r";
+		argv[newArgc - 2] = (char*)"-r";
 	}
 	argv[newArgc - 1] = (char *)0;
 #ifdef WIN32

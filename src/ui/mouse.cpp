@@ -385,11 +385,12 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	if (Map.WallOnMap(pos)) {
-		if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
+		// XXX: hardcoded for humans and orcs
+		if (PlayerRaces.Name[unit.Player->Race] == "human" && Map.OrcWallOnMap(pos)) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
 			return;
 		}
-		if (unit.Player->Race == PlayerRaceOrc && Map.HumanWallOnMap(pos)) {
+		if (PlayerRaces.Name[unit.Player->Race] == "orc" && Map.HumanWallOnMap(pos)) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
 			return;
 		}
@@ -2132,7 +2133,7 @@ void UIHandleButtonUp(unsigned button)
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0])
-						   || Selected[0]->Player->Type == PlayerNeutral) {
+						   || Selected[0]->Player->Type == PlayerTypes::PlayerNeutral) {
 					PlayUnitSound(*Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);

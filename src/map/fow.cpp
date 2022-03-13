@@ -303,8 +303,7 @@ void CFogOfWar::GenerateFog()
             playersToRenderView.insert(playersSharedVision);
         }
     }
-    CurrUpscaleTableExplored = GameSettings.RevealMap ? UpscaleTableRevealed
-                                                      : UpscaleTableExplored;
+    CurrUpscaleTableExplored = GameSettings.RevealMap != MapRevealModes::cHidden ? UpscaleTableRevealed : UpscaleTableExplored;
 
     const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
     
@@ -756,7 +755,7 @@ void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const 
 		}
 	}
 
-	if (mapIndexBase + w < Map.Info.MapHeight * w) {
+	if (mapIndexBase + w < static_cast<unsigned int>(Map.Info.MapHeight) * w) {
 		const size_t index = visIndexBase + VisTableWidth;
 		if (mapIndex != mapIndexBase) {
 			if (!IsMapFieldExplored(x - 1 + index)) {
@@ -816,7 +815,7 @@ void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const 
         }
         if (blackFogTile) {
             TiledAlphaFog->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-                                                                        GameSettings.RevealMap ? GetRevealedOpacity() 
+                                                                        GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
                                                                                                : GetUnseenOpacity(),
                                                                         vpFogSurface);
         }
@@ -882,7 +881,7 @@ void CFogOfWar::DrawTiled(CViewport &viewport)
                 if (VisTable[visIndex]) {
                     DrawFogTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
                 } else {
-                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap ? GetRevealedOpacity() 
+                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
                                                                        : GetUnseenOpacity(),
                                                 viewport.GetFogSurface());
                 }

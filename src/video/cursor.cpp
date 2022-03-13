@@ -98,7 +98,7 @@ SDL_Cursor *CCursor::GetSDLCursor()
 {
 	if (SdlCursors.size() <= SpriteFrame) {
 		// slow path
-		for (int i = SdlCursors.size(); i <= SpriteFrame; i++) {
+		for (unsigned int i = SdlCursors.size(); i <= SpriteFrame; i++) {
 			G->Load();
 			int ww, wh;
 			SDL_GetWindowSize(TheWindow, &ww, &wh);
@@ -418,7 +418,7 @@ void CursorAnimate(unsigned ticks)
 	if (ticks > last + GameCursor->FrameRate) {
 		last = ticks + GameCursor->FrameRate;
 		GameCursor->SpriteFrame++;
-		if ((GameCursor->SpriteFrame & 127) >= GameCursor->G->NumFrames) {
+		if ((GameCursor->SpriteFrame & 127) >= static_cast<unsigned int>(GameCursor->G->NumFrames)) {
 			GameCursor->SpriteFrame = 0;
 		}
 	}

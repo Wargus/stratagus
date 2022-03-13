@@ -58,7 +58,7 @@
 */
 void SendCommandStopUnit(CUnit &unit)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("stop", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandStopUnit(unit);
 	} else {
@@ -74,7 +74,7 @@ void SendCommandStopUnit(CUnit &unit)
 */
 void SendCommandStandGround(CUnit &unit, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("stand-ground", &unit, flush, -1, -1, NoUnitP, NULL, -1);
 		CommandStandGround(unit, flush);
 	} else {
@@ -91,7 +91,7 @@ void SendCommandStandGround(CUnit &unit, int flush)
 */
 void SendCommandDefend(CUnit &unit, CUnit &dest, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("defend", &unit, flush, -1, -1, &dest, NULL, -1);
 		CommandDefend(unit, dest, flush);
 	} else {
@@ -108,7 +108,7 @@ void SendCommandDefend(CUnit &unit, CUnit &dest, int flush)
 */
 void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("follow", &unit, flush, -1, -1, &dest, NULL, -1);
 		CommandFollow(unit, dest, flush);
 	} else {
@@ -125,7 +125,7 @@ void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 */
 void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("move", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
 		CommandMove(unit, pos, flush);
 	} else {
@@ -143,7 +143,7 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 */
 void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("repair", &unit, flush, pos.x, pos.y, dest, NULL, -1);
 		CommandRepair(unit, pos, dest, flush);
 	} else {
@@ -159,7 +159,7 @@ void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 */
 void SendCommandAutoRepair(CUnit &unit, int on)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("auto-repair", &unit, FlushCommands, on, -1, NoUnitP, NULL, 0);
 		CommandAutoRepair(unit, on);
 	} else {
@@ -177,7 +177,7 @@ void SendCommandAutoRepair(CUnit &unit, int on)
 */
 void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("attack", &unit, flush, pos.x, pos.y, attack, NULL, -1);
 		CommandAttack(unit, pos, attack, flush);
 	} else {
@@ -194,7 +194,7 @@ void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 */
 void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("attack-ground", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
 		CommandAttackGround(unit, pos, flush);
 	} else {
@@ -211,7 +211,7 @@ void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 */
 void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("patrol", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
 		CommandPatrolUnit(unit, pos, flush);
 	} else {
@@ -228,7 +228,7 @@ void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
 */
 void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("board", &unit, flush, -1, -1, &dest, NULL, -1);
 		CommandBoard(unit, dest, flush);
 	} else {
@@ -246,7 +246,7 @@ void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 */
 void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("unload", &unit, flush, pos.x, pos.y, what, NULL, -1);
 		CommandUnload(unit, pos, what, flush);
 	} else {
@@ -264,7 +264,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 */
 void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
 		CommandBuildBuilding(unit, pos, what, flush);
 	} else {
@@ -280,7 +280,7 @@ void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, in
 */
 void SendCommandExplore(CUnit &unit, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("explore", &unit, flush, -1, -1, NoUnitP, NULL, -1);
 		CommandExplore(unit, flush);
 	} else {
@@ -296,7 +296,7 @@ void SendCommandExplore(CUnit &unit, int flush)
 void SendCommandDismiss(CUnit &unit)
 {
 	// FIXME: currently unit and worker are same?
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("dismiss", &unit, FlushCommands, -1, -1, NULL, NULL, -1);
 		CommandDismiss(unit);
 	} else {
@@ -313,7 +313,7 @@ void SendCommandDismiss(CUnit &unit)
 */
 void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("resource-loc", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
 		CommandResourceLoc(unit, pos, flush);
 	} else {
@@ -330,7 +330,7 @@ void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 */
 void SendCommandResource(CUnit &unit, CUnit &dest, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("resource", &unit, flush, -1, -1, &dest, NULL, -1);
 		CommandResource(unit, dest, flush);
 	} else {
@@ -347,7 +347,7 @@ void SendCommandResource(CUnit &unit, CUnit &dest, int flush)
 */
 void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("return", &unit, flush, -1, -1, goal, NULL, -1);
 		CommandReturnGoods(unit, goal, flush);
 	} else {
@@ -364,7 +364,7 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 */
 void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandTrainUnit(unit, what, flush);
 	} else {
@@ -381,7 +381,7 @@ void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
 */
 void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, NoUnitP,
 				   type ? type->Ident.c_str() : NULL, slot);
 		CommandCancelTraining(unit, slot, type);
@@ -400,7 +400,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 */
 void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandUpgradeTo(unit, what, flush);
 	} else {
@@ -415,7 +415,7 @@ void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
 */
 void SendCommandCancelUpgradeTo(CUnit &unit)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandCancelUpgradeTo(unit);
 	} else {
@@ -433,7 +433,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 */
 void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("research", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandResearch(unit, what, flush);
 	} else {
@@ -449,7 +449,7 @@ void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
 */
 void SendCommandCancelResearch(CUnit &unit)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 		CommandCancelResearch(unit);
 	} else {
@@ -469,7 +469,7 @@ void SendCommandCancelResearch(CUnit &unit)
 */
 void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, NULL, spellid);
 		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush);
 	} else {
@@ -487,7 +487,7 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 */
 void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, NoUnitP, NULL, spellid);
 		CommandAutoSpellCast(unit, spellid, on);
 	} else {
@@ -505,7 +505,7 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 */
 void SendCommandDiplomacy(int player, int state, int opponent)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		switch (state) {
 			case DiplomacyNeutral:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
@@ -540,7 +540,7 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 */
 void SendCommandSharedVision(int player, bool state, int opponent)
 {
-	if (!IsNetworkGame()) {
+	if (IsReplayGame()) {
 		if (state == false) {
 			CommandLog("shared-vision", NoUnitP, 0, player, opponent,
 					   NoUnitP, "0", -1);
@@ -806,7 +806,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		case ExtendedMessageAutoTargetingDB:
 			/// arg1: 0:true / 1:false
 			if (arg1 == 0 || arg1 == 1) {
-				Preference.SimplifiedAutoTargeting = arg1 ? true : false;
+				GameSettings.SimplifiedAutoTargeting = arg1 ? true : false;
 				/// CommandLog(...);
 			} else {
 				/// CommandLog(...);
@@ -832,7 +832,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 			/// CommandLog(...);
 			break;
 		case ExtendedMessageRevealMapDB:
-			Map.Reveal(arg1);
+			Map.Reveal(static_cast<MapRevealModes>(arg1));
 			/// CommandLog(...);
 			break;
 		case ExtendedMessageFogOfWarDB:

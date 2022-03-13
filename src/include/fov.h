@@ -38,10 +38,9 @@
 #include "vec2i.h"
 #include "map.h"
 #include "tileset.h"
-
+#include "settings.h"
 
 /// Select algorithm for field of view
-enum class FieldOfViewTypes { cShadowCasting,  cSimpleRadial, NumOfTypes }; 
 
 class CFieldOfView
 {
@@ -111,7 +110,6 @@ private:
 private:
 	struct FieldOfViewSettings 
 	{
-		FieldOfViewTypes Type	  	  {FieldOfViewTypes::cSimpleRadial}; 	/// Type of field of view - Shadowcasting or Simple Radial
 		uint16_t 		 OpaqueFields {MapFieldOpaque};    				/// Flags for opaque MapFields
 	} Settings;
 

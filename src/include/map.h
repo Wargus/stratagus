@@ -92,6 +92,8 @@
 #include "color.h"
 #include "vec2i.h"
 
+#include "settings.h"
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -139,7 +141,7 @@ public:
 	std::string Postamble;      /// Map postamble script
 	int MapWidth;               /// Map width
 	int MapHeight;              /// Map height
-	int PlayerType[PlayerMax];  /// Same player->Type
+	PlayerTypes PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
 };
@@ -205,7 +207,7 @@ public:
 	/// Regenerate the forest.
 	void RegenerateForest();
 	/// Set map reveal mode: hidden/known/fully explored.
-	void Reveal(const int mode = MapRevealModes::cKnown);
+	void Reveal(MapRevealModes mode = MapRevealModes::cKnown);
 	/// Save the map.
 	void Save(CFile &file) const;
 
@@ -285,7 +287,7 @@ extern int ForestRegeneration;
 /// Forest regeneration
 extern int ForestRegenerationFrequency;
 /// Flag must reveal the map
-extern int FlagRevealMap;
+extern MapRevealModes FlagRevealMap;
 /// Flag must reveal map when in replay
 extern int ReplayRevealMap;
 

@@ -711,7 +711,7 @@ static int CclCreateUnit(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerNobody) {
+	if (Players[playerno].Type == PlayerTypes::PlayerNobody) {
 		printf("CreateUnit: player %d does not exist\n", playerno);
 		LuaError(l, "bad player");
 		return 0;
@@ -1211,7 +1211,7 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
-		lua_pushinteger(l, unit->Player->Type);
+		lua_pushstring(l, PlayerTypeNames[static_cast<int>(unit->Player->Type)].c_str());
 	} else if (!strcmp(value, "TTLPercent")) {
 		if (unit->Summoned && unit->TTL) {
 			unsigned long time_lived = GameCycle - unit->Summoned;
@@ -1516,7 +1516,7 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const bool isSimplified = LuaToBoolean(l, 1);
 	if (!IsNetworkGame()) {
-		Preference.SimplifiedAutoTargeting = isSimplified;
+		GameSettings.SimplifiedAutoTargeting = isSimplified;
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB, 
 								   int(isSimplified), 0, 0, 0, 0);

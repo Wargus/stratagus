@@ -402,7 +402,7 @@ void CMinimap::Update()
 				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
 				const uint8_t vis = FogOfWar.GetVisibilityForTile(tilePos); 
 
-				const uint32_t fogAlpha = vis == 0 ? (GameSettings.RevealMap ? Settings.FogRevealedOpacity : Settings.FogUnseenOpacity)
+				const uint32_t fogAlpha = vis == 0 ? (GameSettings.RevealMap != MapRevealModes::cHidden ? Settings.FogRevealedOpacity : Settings.FogUnseenOpacity)
 											   	   : vis == 1 ? Settings.FogExploredOpacity 
 										   		   			  : Settings.FogVisibleOpacity;
 

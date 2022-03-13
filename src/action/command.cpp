@@ -918,8 +918,8 @@ void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 	CPlayer *player = &Players[playerIndex];
 	CPlayer *opponent = &Players[opponentIndex];
 
-	if (state == player->HasSharedVisionWith(*opponent) || opponent->Type == PlayerNobody 
-														|| player->Type == PlayerNobody) {
+	if (state == player->HasSharedVisionWith(*opponent) || opponent->Type == PlayerTypes::PlayerNobody 
+														|| player->Type == PlayerTypes::PlayerNobody) {
 		return;
 	}
 
@@ -968,7 +968,7 @@ void CommandQuit(int player)
 {
 	// Set player to neutral, remove allied/enemy/shared vision status
 	// If the player doesn't have any units then this is pointless?
-	Players[player].Type = PlayerNeutral;
+	Players[player].Type = PlayerTypes::PlayerNeutral;
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (i != player && Players[i].Team != Players[player].Team) {
 			Players[i].SetDiplomacyNeutralWith(Players[player]);
