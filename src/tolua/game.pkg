@@ -74,13 +74,17 @@ class Settings {
 	int Opponents;
 	int Difficulty;
 	GameTypes GameType;
-        FieldOfViewTypes FoV;
+	FieldOfViewTypes FoV;
 	MapRevealModes RevealMap;
-        RevealTypes DefeatReveal;
-        int _Bitfield @ Flags;
+	RevealTypes DefeatReveal;
+	bool NoFogOfWar;
+	bool Inside;
+	bool AiExplores;
+	bool SimplifiedAutoTargeting;
+	int _Bitfield @ Flags;
 
-        bool GetUserGameSetting(int i);
-        void SetUserGameSetting(int i, bool v);
+	bool GetUserGameSetting(int i);
+	void SetUserGameSetting(int i, bool v);
 };
 
 $[
