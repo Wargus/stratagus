@@ -614,6 +614,9 @@ void NetworkSendSelection(CUnit **units, int count)
 	// Check if we have any teammates to send to
 	bool hasteammates = false;
 	for (int i = 0; i < NetPlayers; ++i) {
+		if (ThisPlayer->Index == Hosts[i].PlyNr) {
+			continue; // skip self
+		}
 		if (Hosts[i].IsValid() && Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
 			hasteammates = true;
 			break;
@@ -1211,6 +1214,9 @@ void NetworkRecover()
 		return;
 	}
 	for (int i = 0; i < NetPlayers; ++i) {
+		if (ThisPlayer->Index == Hosts[i].PlyNr) {
+			continue; // skip self
+		}
 		CheckPlayerThatTimeOut(i);
 	}
 	NetworkResendCommands();

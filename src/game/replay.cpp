@@ -172,6 +172,13 @@ static FullReplay *StartReplay()
 		// Players array. For replay, we want to store these,
 		// generally. However, this is not true for teams, since there is
 		// automatic handling of alliance flags for rescueable players.
+		// Additionally, teams are automatically created in CPlayer::Init.
+		// The presets team is actually not used verbatim, but instead used
+		// as the basis of further calculation for the actual player's team
+		// (see game.cpp CreateGame right after the CreatePlayer call where
+		// we check GameSettings.Presets[i].Team != SettingsPresetMapDefault)
+		// So in order for the replay to work, we must not save the actual player
+		// teams, but instead the preset teams.
 		replay->ReplaySettings.Presets[i].AIScript = Players[i].AiName; // GameSettings.Presets[i].AIScript;
 		replay->ReplaySettings.Presets[i].Race = Players[i].Race; // GameSettings.Presets[i].Race;
 		replay->ReplaySettings.Presets[i].Team = GameSettings.Presets[i].Team; // Players[i].Team;

@@ -865,10 +865,14 @@ void CreateGame(const std::string &filename, CMap *map)
 		}
 		CreatePlayer(playertype);
 		if (GameSettings.Presets[i].Team != SettingsPresetMapDefault) {
-			int presetTeam = GameSettings.Presets[i].Team;
+			// why this calculation? Well. The CreatePlayer function assigns some
+			// default team values, starting from up to PlayerMax + some constant (2 at the time
+			// of this writing). So to not accidentally interfere with those teams, we assign the team
+			// offset by 2 * PlayerMax.
+			Players[i].Team = GameSettings.Presets[i].Team + 2 * PlayerMax;
 			for (int j = 0; j < i; j++) {
-				if (Players[j].Team != SettingsPresetMapDefault) {
-					if (Players[j].Team != presetTeam) {
+				if (GameSettings.Presets[j].Team != SettingsPresetMapDefault) {
+					if (GameSettings.Presets[j].Team != GameSettings.Presets[i].Team) {
 						Players[i].SetDiplomacyEnemyWith(Players[j]);
 						Players[j].SetDiplomacyEnemyWith(Players[i]);
 					} else {
