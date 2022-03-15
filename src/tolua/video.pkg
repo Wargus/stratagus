@@ -26,7 +26,7 @@ public:
 	static CGraphic *ForceNew(const std::string file, int w = 0, int h = 0);
 	static CGraphic *Get(const std::string file);
 	static void Free(CGraphic *);
-	void Load();
+	void Load(bool grayscale = false);
 	void Resize(int w, int h);
         void SetPaletteColor(int idx, int r, int g, int b);
 };
