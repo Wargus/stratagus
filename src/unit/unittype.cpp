@@ -652,7 +652,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		if (type.Building) {
 			if (type.BoolFlag[DECORATION_INDEX].value && type.MapDefaultStat.Variables[HP_INDEX].Max == 0) {
 				// special case, a decoration with no HP can always be built over
-				type.MovementMask = 0;
+				type.MovementMask = MapFieldNoBuilding;
 				type.FieldFlags = 0;
 			} else {
 				type.MovementMask = MapFieldLandUnit |
