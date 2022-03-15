@@ -52,6 +52,7 @@ public:
 	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
 
 	virtual void Execute(CUnit &unit);
+	virtual void Cancel(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 

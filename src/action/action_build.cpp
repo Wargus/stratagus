@@ -489,6 +489,14 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	}
 }
 
+/* virtual */ void COrder_Build::Cancel(CUnit &unit)
+{
+	if (this->State == State_BuildFromOutside && this->BuildingUnit != NULL && this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
+		targetOrder.Cancel(*this->BuildingUnit);
+	}
+}
+
 /**
 **  Get goal position
 */

@@ -37,6 +37,7 @@
 
 #include "actions.h"
 #include "action/action_built.h"
+#include "action/action_build.h"
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
@@ -69,6 +70,8 @@ static void ReleaseOrders(CUnit &unit)
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
 		if (unit.Orders[i]->Action == UnitActionBuilt) {
 			(dynamic_cast<COrder_Built *>(unit.Orders[i]))->Cancel(unit);
+		} if (unit.Orders[i]->Action == UnitActionBuild) {
+			(dynamic_cast<COrder_Build *>(unit.Orders[i]))->Cancel(unit);
 		} else if (unit.Orders[i]->Action == UnitActionResearch) {
 			(dynamic_cast<COrder_Research *>(unit.Orders[i]))->Cancel(unit);
 		} else if (unit.Orders[i]->Action == UnitActionTrain) {
