@@ -241,10 +241,11 @@ public:
 	const CInitMessage_Header &GetHeader() const { return header; }
 	const unsigned char *Serialize() const;
 	void Deserialize(const unsigned char *p);
-	static size_t Size() { return CInitMessage_Header::Size() + PlayerMax * CNetworkHost::Size(); }
+	static size_t Size() { return CInitMessage_Header::Size() + 1 + PlayerMax * CNetworkHost::Size(); }
 private:
 	CInitMessage_Header header;
 public:
+	uint8_t clientIndex; /// index of the receiving client in the compacted host array
 	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 

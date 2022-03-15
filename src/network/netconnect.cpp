@@ -653,6 +653,8 @@ bool CClient::Update(unsigned long tick)
 void CClient::SetConfig(const CInitMessage_Config &msg)
 {
 	NetPlayers = 0;
+	// the local host slot may have changed due to Hosts array compaction on the server
+	NetLocalHostsSlot = msg.clientIndex;
 	for (int i = 0; i < PlayerMax; ++i) {
 		Hosts[i] = msg.hosts[i];
 		if (Hosts[i].IsValid()) {
@@ -669,6 +671,9 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 	// server is first, set our view of ip:port
 	Hosts[0].Host = serverHost.getIp();
 	Hosts[0].Port = serverHost.getPort();
+	// for ourselves we use the loopback ip:port
+	Hosts[NetLocalHostsSlot].Host = INADDR_LOOPBACK; // FIXME: use CNetworkParameter::Instance.localHost, but also in InitNetwork1
+	Hosts[NetLocalHostsSlot].Port = CNetworkParameter::Instance.localPort;
 	const std::string serverHostStr = serverHost.toString();
 }
 
@@ -908,6 +913,9 @@ void CClient::Parse_Welcome(const unsigned char *buf)
 	// server is first, set ip:port from our perspective
 	Hosts[0].Host = serverHost.getIp();
 	Hosts[0].Port = serverHost.getPort();
+	// for ourselves we use the loopback ip:port
+	Hosts[NetLocalHostsSlot].Host = INADDR_LOOPBACK; // FIXME: use CNetworkParameter::Instance.localHost, but also in InitNetwork1
+	Hosts[NetLocalHostsSlot].Port = CNetworkParameter::Instance.localPort;
 }
 
 void CClient::Parse_State(const unsigned char *buf)
@@ -1797,14 +1805,21 @@ void NetworkServerStartGame()
 	// Slot 0 is the server!
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 
-	for (int i = 0; i < PlayerMax;) {
-		if (Hosts[i].IsValid()) {
-			i++;
-		} else {
-			for (int j = i; j < PlayerMax - 1; j++) {
-				Hosts[j] = Hosts[j + 1];
+	// compact hosts array
+	for (int i = 0; i < PlayerMax; i++) {
+		if (!Hosts[i].IsValid()) {
+			bool any_more_hosts = false;
+			for (int j = i + 1; j < PlayerMax; j++) {
+				if (Hosts[j].IsValid()) {
+					Hosts[i] = Hosts[j];
+					Hosts[j].Clear();
+					any_more_hosts = true;
+					break;
+				}
 			}
-			Hosts[PlayerMax - 1].Clear();
+			if (!any_more_hosts) {
+				break;
+			}
 		}
 	}
 
@@ -1843,6 +1858,7 @@ breakout:
 				const CHost host(message.hosts[i].Host, message.hosts[i].Port);
 				if (waitingForConfigAck[i]) { // not acknowledged yet
 					DebugPrint("Sending InitConfig to %s\n" _C_ host.toString().c_str());
+					message.clientIndex = i;
 					NetworkSendICMessage_Log(NetworkFildes, host, message);
 				} else if (waitingForInitAck[i]) {
 					DebugPrint("Sending InitState to %s\n" _C_ host.toString().c_str());

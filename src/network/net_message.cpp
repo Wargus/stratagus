@@ -382,6 +382,7 @@ const unsigned char *CInitMessage_Config::Serialize() const
 	unsigned char *p = buf;
 
 	p += header.Serialize(p);
+	p += serialize8(p, clientIndex);
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Serialize(p);
 	}
@@ -391,6 +392,7 @@ const unsigned char *CInitMessage_Config::Serialize() const
 void CInitMessage_Config::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
+	p += deserialize8(p, &clientIndex);
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += this->hosts[i].Deserialize(p);
 	}
