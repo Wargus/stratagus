@@ -394,7 +394,7 @@ void CleanPlayers()
 void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].UnitColors.Colors.clear();
+		Players[i].ClearUnitColors();
 	}
 	PlayerColorsRGB.clear();
 }
@@ -850,6 +850,36 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
 }
 
+std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersBegin() const
+{
+	return FreeWorkers.begin();
+}
+
+std::vector<CUnit *>::iterator CPlayer::FreeWorkersBegin()
+{
+	return FreeWorkers.begin();
+}
+
+std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersEnd() const
+{
+	return FreeWorkers.end();
+}
+
+std::vector<CUnit *>::iterator CPlayer::FreeWorkersEnd()
+{
+	return FreeWorkers.end();
+}
+
+CUnit *CPlayer::GetFreeWorker(int index) const
+{
+	return FreeWorkers[index];
+}
+
+int CPlayer::GetFreeWorkersCount() const
+{
+	return static_cast<int>(FreeWorkers.size());
+}
+
 void CPlayer::UpdateFreeWorkers()
 {
 	FreeWorkers.clear();
@@ -870,7 +900,6 @@ void CPlayer::UpdateFreeWorkers()
 		}
 	}
 }
-
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {
@@ -1272,7 +1301,7 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].UnitColors.Colors = PlayerColorsRGB[i];
+		Players[i].SetUnitColors(PlayerColorsRGB[i]);
 	}
 }
 
@@ -1491,6 +1520,16 @@ bool CPlayer::IsTeamed(const CPlayer &player) const
 bool CPlayer::IsTeamed(const CUnit &unit) const
 {
 	return this->IsTeamed(*unit.Player);
+}
+
+void CPlayer::ClearUnitColors()
+{
+	UnitColors.Clear();
+}
+
+void CPlayer::SetUnitColors(std::vector<CColor> &colors)
+{
+	UnitColors.Set(colors);
 }
 
 //@}

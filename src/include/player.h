@@ -160,10 +160,6 @@ public:
 	
 	IntColor Color;           /// color of units on minimap
 
-	CUnitColors UnitColors; /// Unit colors for new units
-
-	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
-
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
 	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
@@ -187,7 +183,18 @@ public:
 
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
+
+	std::vector<CUnit *>::const_iterator FreeWorkersBegin() const;
+	std::vector<CUnit *>::const_iterator FreeWorkersEnd() const;
+	std::vector<CUnit *>::iterator FreeWorkersBegin();
+	std::vector<CUnit *>::iterator FreeWorkersEnd();
+
+	CUnit *GetFreeWorker(int index) const;
+	int GetFreeWorkersCount() const;
 	void UpdateFreeWorkers();
+
+	void ClearUnitColors();
+	void SetUnitColors(std::vector<CColor> &colors);
 
 	/// Get a resource of the player
 	int GetResource(const int resource, const int type);
@@ -289,7 +296,9 @@ public:
 	void SetRevealed(const bool revealed);
 
 private:
+	CUnitColors UnitColors;            /// Unit colors for new units
 	std::vector<CUnit *> Units;        /// units of this player
+	std::vector<CUnit *> FreeWorkers;  /// Container for free workers
 	unsigned int Enemy;                /// enemy bit field for this player
 	unsigned int Allied;               /// allied bit field for this player
 	std::set<uint8_t> HasVisionFrom;   /// set of player indexes that have shared their vision with this player

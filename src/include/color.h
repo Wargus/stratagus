@@ -71,7 +71,11 @@ class CUnitColors
 public:
 	CUnitColors() {}
 
-public:
+	void Clear();
+
+	void Set(std::vector<CColor> &colors);
+
+private:
 	std::vector<CColor> Colors;
 };
 

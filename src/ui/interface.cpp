@@ -449,18 +449,18 @@ void UiToggleTerrain()
 */
 void UiFindIdleWorker()
 {
-	if (ThisPlayer->FreeWorkers.empty()) {
+	if (ThisPlayer->GetFreeWorkersCount() == 0) {
 		return;
 	}
-	CUnit *unit = ThisPlayer->FreeWorkers[0];
+	CUnit *unit = ThisPlayer->GetFreeWorker(0);
 	if (LastIdleWorker) {
-		const std::vector<CUnit *> &freeWorkers = ThisPlayer->FreeWorkers;
-		std::vector<CUnit *>::const_iterator it = std::find(freeWorkers.begin(),
-															freeWorkers.end(),
-															LastIdleWorker);
-		if (it != ThisPlayer->FreeWorkers.end()) {
-			if (*it != ThisPlayer->FreeWorkers.back()) {
-				unit = *(++it);
+		bool found = false;
+		for(auto it = ThisPlayer->FreeWorkersBegin(); it != ThisPlayer->FreeWorkersEnd(); ++it) {
+			if (found) {
+				unit = *it;
+				break;
+			} else if (*it == unit) {
+				found = true;
 			}
 		}
 	}

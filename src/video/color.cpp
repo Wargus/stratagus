@@ -67,6 +67,16 @@ void CColor::Parse(lua_State *l, const int offset)
 	this->A = 255;
 }
 
+void CUnitColors::Clear()
+{
+	Colors.clear();
+}
+
+void CUnitColors::Set(std::vector<CColor> &colors)
+{
+	Colors = colors;
+}
+
 IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction)
 {
         unsigned char r1 = (color1 >> 16) & 0xff;
