@@ -1797,6 +1797,17 @@ void NetworkServerStartGame()
 	// Slot 0 is the server!
 	NetLocalPlayerNumber = Hosts[0].PlyNr;
 
+	for (int i = 0; i < PlayerMax;) {
+		if (Hosts[i].IsValid()) {
+			i++;
+		} else {
+			for (int j = i; j < PlayerMax - 1; j++) {
+				Hosts[j] = Hosts[j + 1];
+			}
+			Hosts[PlayerMax - 1].Clear();
+		}
+	}
+
 	// Prepare the final config message:
 	CInitMessage_Config message;
 	for (int i = 0; i < PlayerMax; ++i) {
