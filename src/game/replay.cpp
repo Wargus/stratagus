@@ -219,6 +219,8 @@ static void ApplyReplaySettings()
 	Map.NoFogOfWar = GameSettings.NoFogOfWar;
 	FlagRevealMap = GameSettings.RevealMap;
 
+	GameSettings.Save(+[](std::string s) { DebugPrint("%s\n" _C_ s.c_str()); });
+
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
 	// FIXME : check mapid
