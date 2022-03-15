@@ -55,6 +55,8 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
 
+	virtual void UpdateUnitVariables(CUnit &unit) const;
+
 	virtual void AiUnitKilled(CUnit &unit);
 
 	const CUnitType &GetUnitType() const { return *Type; }

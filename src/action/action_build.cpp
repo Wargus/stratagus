@@ -423,7 +423,6 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
 		CUnit &goal = *const_cast<COrder_Build *>(this)->BuildingUnit;
 
-
 		targetOrder.ProgressHp(goal, 100);
 	}
 	if (unit.Anim.Unbreakable) {
@@ -432,6 +431,13 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	return this->BuildingUnit->CurrentAction() != UnitActionBuilt;
 }
 
+/* virtual */ void COrder_Build::UpdateUnitVariables(CUnit &unit) const
+{
+	if (this->State == State_BuildFromOutside && this->BuildingUnit != NULL) {
+		unit.Variable[TRAINING_INDEX].Value = this->BuildingUnit->Variable[BUILD_INDEX].Value;
+		unit.Variable[TRAINING_INDEX].Max = this->BuildingUnit->Variable[BUILD_INDEX].Max;
+	}
+}
 
 /* virtual */ void COrder_Build::Execute(CUnit &unit)
 {
