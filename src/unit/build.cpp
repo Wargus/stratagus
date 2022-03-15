@@ -150,23 +150,31 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 				case GreaterThan :
 				case GreaterThanEqual :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
+						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
+							return false;
+						}
 					}
 					break;
 				case LessThan :
 				case LessThanEqual :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
+						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
+							return true;
+						};
 					}
 					break;
 				case Equal :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
-						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
+						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
+							return true;
+						};
 					}
 					break;
 				case NotEqual :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
-						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
+						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
+							return false;
+						};
 					}
 					break;
 			}
