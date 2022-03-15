@@ -1725,7 +1725,7 @@ void NetworkServerStartGame()
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 			bool hasHumanPlayer = false;
-			for (auto h : Hosts) {
+			for (auto &h : Hosts) {
 				if (h.IsValid() && h.PlyNr == i) {
 					NetPlayers++;
 					hasHumanPlayer = true;
@@ -1752,7 +1752,7 @@ void NetworkServerStartGame()
 		if (Map.Info.PlayerType[i] == PlayerTypes::PlayerPerson) {
 			if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 				bool hasHumanPlayer = false;
-				for (auto h : Hosts) {
+				for (auto &h : Hosts) {
 					if (hasHumanPlayer = (h.PlyNr == i)) {
 						break;
 					}
@@ -1777,11 +1777,15 @@ void NetworkServerStartGame()
 		std::mt19937 rng_engine(dev());
 		for (int i = 0; i < 100; i++) {
 			std::shuffle(humanSlotIndices.begin(), humanSlotIndices.end(), rng_engine);
-			auto h = Hosts[MyRand() % NetPlayers];
+			auto &h = Hosts[MyRand() % NetPlayers];
 			int newPlyNr = humanSlotIndices.front();
+			int oldPlyNr = h.PlyNr;
+			if (oldPlyNr == newPlyNr) {
+				continue;
+			}
 			if (ServerSetupState.CompOpt[newPlyNr] == SlotOption::Available) {
 				// a human host is currently assigned to this new player number, swap with it
-				for (auto otherH : Hosts) {
+				for (auto &otherH : Hosts) {
 					if (otherH.PlyNr == newPlyNr) {
 						std::swap(h.PlyNr, otherH.PlyNr);
 						break;
@@ -1791,8 +1795,8 @@ void NetworkServerStartGame()
 				// this newPlyNr was currently used by an AI or no one
 				h.PlyNr = newPlyNr;
 			}
-			std::swap(ServerSetupState.CompOpt[h.PlyNr], ServerSetupState.CompOpt[newPlyNr]);
-			std::swap(ServerSetupState.ServerGameSettings.Presets[h.PlyNr], ServerSetupState.ServerGameSettings.Presets[newPlyNr]);
+			std::swap(ServerSetupState.CompOpt[oldPlyNr], ServerSetupState.CompOpt[newPlyNr]);
+			std::swap(ServerSetupState.ServerGameSettings.Presets[oldPlyNr], ServerSetupState.ServerGameSettings.Presets[newPlyNr]);
 		}
 	}
 
@@ -1833,7 +1837,7 @@ void NetworkServerStartGame()
 	for (int i = 0; i < PlayerMax; ++i) {
 		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			for (auto h : Hosts) {
+			for (auto &h : Hosts) {
 				if (h.IsValid() && h.PlyNr == i) {
 					const std::string hostStr = CHost(h.Host, h.Port).toString();
 					printf(" %s %s", hostStr.c_str(), h.PlyName);
@@ -2022,7 +2026,7 @@ void NetworkGamePrepareGameSettings()
 	for (int i = 0; i < PlayerMax; i++) {
 		printf("%02d: CO: %d   Race: %d   Name: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
 		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			for (auto h : Hosts) {
+			for (auto &h : Hosts) {
 				if (h.IsValid() && h.PlyNr == i) {
 					printf("%s", h.PlyName);
 				}
