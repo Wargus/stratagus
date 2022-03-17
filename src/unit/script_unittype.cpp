@@ -490,10 +490,9 @@ static int CclDefineUnitType(lua_State *l)
 	} else {
 		type = NewUnitTypeSlot(str);
 		redefine = 0;
+		type->NumDirections = 0;
+		type->Flip = 1;
 	}
-
-	type->NumDirections = 0;
-	type->Flip = 1;
 
 	//  Parse the list: (still everything could be changed!)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
