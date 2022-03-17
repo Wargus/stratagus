@@ -37,6 +37,7 @@
 
 //@{
 
+#include <bitset>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -255,11 +256,13 @@ struct Settings {
 	};
 
 	bool GetUserGameSetting(int i) {
-		return UserGameSettings & (1 << i);
+		return std::bitset<27>(UserGameSettings).test(i);
 	}
 
 	void SetUserGameSetting(int i, bool v) {
-		UserGameSettings |= (1 << i);
+		std::bitset<27> bs(UserGameSettings);
+		bs.set(i, v);
+		UserGameSettings = bs.to_ulong();
 	}
 
 	bool operator==(const Settings &other) const {
