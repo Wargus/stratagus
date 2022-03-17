@@ -59,5 +59,6 @@ namespace sdl2 {
     using RendererShPtr = _shared_ptr<SDL_Renderer>;
     using WindowShPtr   = _shared_ptr<SDL_Window>;
 }
-
+using sequence_of_imagesPtrs    = std::vector<SDL_Surface*>;
+using sequence_of_images        = std::vector<sdl2::SurfacePtr>;
 //@}
