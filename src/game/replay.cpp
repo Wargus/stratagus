@@ -135,6 +135,7 @@ bool CommandLogDisabled;           /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static bool DisabledLog;           /// Disabled log for replay
 static CFile *LogFile;             /// Replay log file
+static std::string LastLogFileName;/// Last log file name
 static unsigned long NextLogCycle; /// Next log cycle number
 static int InitReplay;             /// Initialize replay
 static FullReplay *CurrentReplay;
@@ -397,7 +398,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			LogFile = NULL;
 			return;
 		}
-
+		LastLogFileName = path;
 		if (CurrentReplay) {
 			SaveFullLog(*LogFile);
 		}
@@ -908,7 +909,6 @@ int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
 	char *buf;
-	std::ostringstream logfile;
 	std::string destination;
 	struct stat sb;
 	size_t size;
@@ -920,9 +920,7 @@ int SaveReplay(const std::string &filename)
 
 	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
 
-	logfile << Parameters::Instance.GetUserDirectory() << "/" << GameName << "/logs/log_of_stratagus_" << ThisPlayer->Index << ".log";
-
-	if (stat(logfile.str().c_str(), &sb)) {
+	if (!LastLogFileName.empty() && stat(LastLogFileName.c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
 		return -1;
 	}
@@ -931,7 +929,7 @@ int SaveReplay(const std::string &filename)
 		fprintf(stderr, "Out of memory\n");
 		return -1;
 	}
-	fd = fopen(logfile.str().c_str(), "rb");
+	fd = fopen(LastLogFileName.c_str(), "rb");
 	if (!fd) {
 		fprintf(stderr, "fopen failed\n");
 		delete[] buf;
