@@ -883,7 +883,7 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 		LuaError(luaStack, "Tiles number limit exceeded.");
 	}
 	/// Add new graphic
-	Map.TileGraphic->AddFrames(parser.getGraphic());
+	Map.TileGraphic->AppendFrames(parser.getGraphic());
 	
 	return 0;
 }

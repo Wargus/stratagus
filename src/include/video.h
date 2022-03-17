@@ -34,6 +34,8 @@
 //@{
 
 #include "SDL.h"
+#include "sdl2_helper.h"
+
 #include "shaders.h"
 #include "guichan.h"
 
@@ -167,7 +169,7 @@ public:
 	void Flip();
 	void Resize(int w, int h);
 	void SetOriginalSize();
-	void AddFrames(const std::vector<SDL_Surface *> &frames);
+	void AppendFrames(const sequence_of_images &frames);
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow(int xOffset, int yOffset);
