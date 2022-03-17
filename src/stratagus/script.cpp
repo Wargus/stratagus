@@ -2128,7 +2128,7 @@ static int CclDebugPrint(lua_State *l)
 	lua_Debug ar;
 	lua_getstack(l, 1, &ar);
 	lua_getinfo(l, "nSl", &ar);
-	fprintf(stdout, "%s:%d: %s: %s", ar.source, ar.currentline, ar.what, LuaToString(l, 1));
+	fprintf(stdout, "%s:%d: %s: %s\n", ar.source, ar.currentline, ar.what, LuaToString(l, 1));
 #endif
 
 	return 1;
