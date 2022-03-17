@@ -878,6 +878,8 @@ void CreateGame(const std::string &filename, CMap *map)
 					} else {
 						Players[i].SetDiplomacyAlliedWith(Players[j]);
 						Players[j].SetDiplomacyAlliedWith(Players[i]);
+						Players[i].ShareVisionWith(Players[j]);
+						Players[j].ShareVisionWith(Players[i]);
 					}
 				}
 			}
