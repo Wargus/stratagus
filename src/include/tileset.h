@@ -36,6 +36,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 #include "SDL_image.h"
+#include "sdl2_helper.h"
 
 #include "util.h"
 #include "video.h"
@@ -44,6 +45,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <queue>
 #include <set>
 
 struct lua_State;
@@ -341,35 +343,63 @@ public:
 		lua_rawgeti(luaStack, tablePos, argPos);
 		parseExtended(luaStack);
 		lua_pop(luaStack, 1);
-	}
+	}	
 	
-	~CTilesetGraphicGenerator()
+	bool hasIndexesOnly() const { return !Result.Indexes.empty(); };
+	bool isEmpty() const { return Result.Indexes.empty() && Result.Images.empty(); }
+	
+	graphic_index pullOutIndex() 
 	{
-		for (auto &layer : SrcImgLayers) {
-			ranges::for_each(layer, SDL_FreeSurface);
+		if (Result.Indexes.empty()) {
+			return 0;	
 		}
+		const graphic_index index {Result.Indexes.front()};
+		Result.Indexes.pop();
+
+		return index;
+	}
+
+	sdl2::SurfacePtr pullOutImage() 
+	{
+		if (Result.Images.empty()) {
+			return  nullptr;
+		}
+		sdl2::SurfacePtr image {std::move(Result.Images.front())};
+		Result.Images.pop();
+
+		return image;
 	}
 
 private:
-	std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg);
-	uint16_t checkForLayers(lua_State *luaStack);
-	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack);
-	bool checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp);
-	void removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp);
-	void removeColors(lua_State *luaStack, std::vector<SDL_Surface*> &images);
-	void parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images);
-	std::vector<SDL_Surface*> parseLayer(lua_State *luaStack, const int argPos);
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg) const;
+	uint16_t checkForLayers(lua_State *luaStack) const;
+	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack) const;
+	bool checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const;
+	void removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const;
+	void removeColors(lua_State *luaStack, sequence_of_images &images) const;
+	void parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const;
+	sdl2::SurfacePtr newBlankImage() const;
+	auto parseLayer(lua_State *luaStack, const int argPos, const bool isSingleLayer = false) const;
 
+	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght = 16) const;
+	std::vector<sequence_of_imagesPtrs> buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const;
+	std::vector<sequence_of_imagesPtrs> buildSequences_Fair(std::vector<sequence_of_images> const &src) const;
+	std::vector<sequence_of_imagesPtrs> buildSequences(std::vector<sequence_of_images> const &src, const bool isFairMethod = true) const;
+
+	sdl2::SurfacePtr composeImage(sequence_of_imagesPtrs &src) const;
 	void parseExtended(lua_State *luaStack);
-	
-	std::vector<graphic_index> genSequence(const uint16_t seqNumber);
-	SDL_Surface* get(const tile_index imgIdx);
 
 private:
-	std::vector<std::vector<SDL_Surface*>> SrcImgLayers;
-	const CTileset *SrcTileset 			{nullptr};
+	const CTileset *SrcTileset 			{nullptr};	
 	const CGraphic *SrcTilesetGraphic	{nullptr};
 	const CGraphic *SrcImgGraphic		{nullptr};
+
+	struct TilesGraphics
+	{
+		std::queue<graphic_index> 	 Indexes;
+		std::queue<sdl2::SurfacePtr> Images;
+	};
+	TilesGraphics Result;
 };
 
 

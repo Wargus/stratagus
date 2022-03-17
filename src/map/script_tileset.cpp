@@ -727,14 +727,14 @@ void CTileset::buildWallReplacementTable()
 **
 **	@param luaStack		lua state
 **/
-uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack)
+uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 {
 	bool isMultipleLayers = false;
 	if (lua_istable(luaStack, -1)) {
 
-		lua_rawgeti(luaStack, -1, 1);
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
 		isMultipleLayers = lua_isstring(luaStack, -1) && std::string(LuaToString(luaStack, -1)) == "layers";
-		lua_pop(luaStack, 1);
+		lua_pop(luaStack, 1);	/// #1>
 
 	} else if (!lua_isnumber(luaStack, -1)) {
 		LuaError(luaStack, "incorrect argument");
@@ -758,7 +758,7 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack)
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
 **	@return 			vector of parsed indexes
 **/
-std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg)
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg) const
 {
 	isImg = false;
 
@@ -769,22 +769,22 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 
 	} else if (lua_istable(luaStack, -1)) {
 
-		lua_rawgeti(luaStack, -1, argPos);
+		lua_rawgeti(luaStack, -1, argPos);	/// #1<
 		int parseFrom = 1;
 		/// check if "img" tag is present
 		if (lua_istable(luaStack, -1)) {
-			lua_rawgeti(luaStack, -1, 1);
+			lua_rawgeti(luaStack, -1, 1);	/// #2<
 			if (lua_isstring(luaStack, -1)) {
-				const std::string parsedValue { LuaToString(luaStack, -1) };
+				const std::string parsedValue {LuaToString(luaStack, -1)};
 				if (parsedValue == "img") {
 					isImg = true;
 					parseFrom++;
 				}
 			}
-			lua_pop(luaStack, 1);
+			lua_pop(luaStack, 1);	/// #2>
 		}
 		result = CTilesetParser::parseTilesRange(luaStack, parseFrom);
-		lua_pop(luaStack, 1);
+		lua_pop(luaStack, 1);	/// #1>
 	} else {
 		LuaError(luaStack, "incorrect argument");
 	}
@@ -802,7 +802,7 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 **	@return	set of parsed colors as uint32_t values
 **
 **/
-std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack)
+std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack) const
 {
 	enum { cFirsrArg = 2, cFrom = 1, cTo = 2 };
 
@@ -838,7 +838,7 @@ std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaSta
 **	@return				true if pixels's color matches one of passed colors, false otherwise
 **
 **/
-bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp)
+bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const
 {
 	for (auto &color : colors) {
 		switch (bpp) {
@@ -892,7 +892,7 @@ bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint
 **	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
 **
 **/
-void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp)
+void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const
 {
 	switch (bpp) {
 		case 1:
@@ -933,22 +933,23 @@ void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t tra
 **	@param	images			vector of tiles images to remove colors from
 **
 **/
-void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, std::vector<SDL_Surface*> &images)
+void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_images &images) const
 {
-	std::set<uint32_t> colors { parseArgsAsColors(luaStack) };
+	std::set<uint32_t> colors {parseArgsAsColors(luaStack)};
 
 	uint32_t colorKey = 0;
-	if (images.size()) {
-		SDL_GetColorKey(images[0], &colorKey);
+	if (!images.empty()) {
+		SDL_GetColorKey(images[0].get(), &colorKey);
 	}
 	
-	for (auto &img : images) {
+	for (auto &image : images) {
 		/// Do remove colors
-		const size_t pixelsNum = img->w * img->h;
+		SDL_Surface *const imgSurface {image.get()};
+		const size_t pixelsNum = imgSurface->w * imgSurface->h;
 		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
-			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(img->pixels) + pixel * img->format->BytesPerPixel);
-			if (checkPixel(pixelPos, colors, img->format->BytesPerPixel)) {
-				removePixel(pixelPos, colorKey, img->format->BytesPerPixel);
+			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+			if (checkPixel(pixelPos, colors, imgSurface->format->BytesPerPixel)) {
+				removePixel(pixelPos, colorKey, imgSurface->format->BytesPerPixel);
 			}
 		}
 	}
@@ -967,20 +968,47 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, std::vector<SDL
 **	@param	argPos		position in the table to parse
 **	@param	images		vector of one-frame sized SDL_Surfaces to apply modifier to
 **/
-void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argPos, std::vector<SDL_Surface*> &images)
+void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const
 {
 	lua_rawgeti(luaStack, -1, argPos); /// #1<
 	if (!lua_istable(luaStack, -1)) {
 		LuaError(luaStack, "Incorrect argument");
 	}
 	int arg = 1;
-	std::string modifier { LuaToString(luaStack, -1, arg) };
+	std::string modifier {LuaToString(luaStack, -1, arg)};
 	if (modifier == "remove") {
 		removeColors(luaStack, images);
 	} else {
 		LuaError(luaStack, "Unknown modifier");	
 	}
 	lua_pop(luaStack, 1); /// #1>
+}
+
+/**
+**	Generates new tile-sized empty image
+**
+**	@return	generated image
+**/
+sdl2::SurfacePtr CTilesetGraphicGenerator::newBlankImage() const
+{
+		const SDL_PixelFormat *format = SrcTilesetGraphic->Surface->format;
+		
+		sdl2::SurfacePtr blankImg {SDL_CreateRGBSurface(SrcTilesetGraphic->Surface->flags,
+														SrcTileset->getPixelTileSize().x,
+														SrcTileset->getPixelTileSize().y,
+														format->BitsPerPixel,
+														format->Rmask,
+														format->Gmask,
+														format->Bmask,
+														format->Amask)};
+		uint32_t colorKey = 0;
+		if (!SDL_GetColorKey(SrcTilesetGraphic->Surface, &colorKey)) {
+			SDL_SetColorKey(blankImg.get(), SDL_TRUE, colorKey);
+		}
+		if (format->palette) {
+			SDL_SetSurfacePalette(blankImg.get(), format->palette);
+		}
+	return blankImg;
 }
 
 /** 
@@ -990,64 +1018,201 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 ** or	
 ** { src_range [,{"do_something", parameter}...] }
 **
-**	@param	luaStack 	lua state, top argument will be parsed - it can be table of layers or single layer
-**	@param	argPos		position of the layer to parse in the table of layers (or 0 in case of single layer)
-**
+**	@param	luaStack 		lua state, top argument will be parsed - it can be table of layers or single layer
+**	@param	argPos			position of the layer to parse in the table of layers (or 0 in case of single layer)
+**	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
+**	@return					set of images described in this layer or set of indexes of existing tileset graphics
 **/
-std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const int argPos)
+auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const int argPos, const bool isSingleLayer /*= false*/) const
 {
 	enum { cSrcIndexOnly = 0, cSrcRange = 1, cModifier = 2 };
 
 	if (argPos != 0) {
-		lua_rawgeti(luaStack, -1, argPos);
+		lua_rawgeti(luaStack, -1, argPos);	/// #1<
 	}
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
 	int arg = lua_istable(luaStack, -1) ? cSrcRange : cSrcIndexOnly;
 
-	bool isImg {false};
-	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, arg, isImg) };
-	std::vector<SDL_Surface*> imgLayer;
+	bool isImg = false;
+	std::vector<tile_index> srcIndexes {parseSrcRange(luaStack, arg, isImg)};
+	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer	/* there is an only layer */
+											 && !isImg 		/* this leyer consist of indexes of base graphics */
+											 && argsNum <= cModifier) /* there are no any modifiers */
+											 						  ? true 
+																	  : false;
+
+	std::vector<graphic_index> parsedIndexes;
+	sequence_of_images parsedImages;
 
 	for (auto const srcIndex : srcIndexes) {
 		if (!isImg && SrcTileset->tiles[srcIndex].tile == 0) { /// empty frame
 			continue;
 		}
-		const SDL_PixelFormat *format = SrcTilesetGraphic->Surface->format;
-		
-		SDL_Surface *img = SDL_CreateRGBSurface(SrcTilesetGraphic->Surface->flags,
-												SrcTileset->getPixelTileSize().x,
-												SrcTileset->getPixelTileSize().y,
-                                             	format->BitsPerPixel,
-												format->Rmask,
-												format->Gmask,
-												format->Bmask,
-												format->Amask);
-		uint32_t colorKey = 0;
-		if (!SDL_GetColorKey(SrcTilesetGraphic->Surface, &colorKey)) {
-			SDL_SetColorKey(img, SDL_TRUE, colorKey);
-		}
-		if (format->palette) {
-			SDL_SetSurfacePalette(img, format->palette);
-		}
+		const graphic_index frameIdx = isImg ? srcIndex 
+										  	 : SrcTileset->tiles[srcIndex].tile;
+		if (isUntouchedSrcGraphicsOnly) {
+			parsedIndexes.push_back(frameIdx);
 
-		const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
-										   : SrcTilesetGraphic;
-		const graphic_index frame = isImg ? srcIndex 
-										  : SrcTileset->tiles[srcIndex].tile;
-
-		srcGraphic->DrawFrame(frame, 0, 0, img);
-		imgLayer.push_back(img);
+		} else {
+			const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
+											   : SrcTilesetGraphic;
+			auto image {newBlankImage()};		
+			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
+			parsedImages.push_back(std::move(image));
+		}
 	}
 	
-	const uint16_t argsNum = lua_rawlen(luaStack, -1);
 	arg = cModifier;
-	while(arg <= argsNum) {
-		parseModifier(luaStack, arg, imgLayer);
+	while (arg <= argsNum) {
+		parseModifier(luaStack, arg, parsedImages);
 		arg++;	
 	}
 	if (argPos != 0) {
-		lua_pop(luaStack, 1);
+		lua_pop(luaStack, 1);	/// #1>
 	}
-	return imgLayer;
+	return std::make_pair(parsedIndexes, std::move(parsedImages));
+}
+
+/**
+**	Generates a sequence of repeating indexes whose maximum value is limited to 16. 
+**	Used the idea of "Cicada Principle" (prime numbers to generate continuous sequences)
+**
+**	@param	upperBound	upper value if generated indexes (must be <= 16)
+**	@param	length		length of the sequence to generate
+**	@return				generated sequence
+**/
+std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght/* = 16*/) const
+{
+    const std::vector<std::vector<uint8_t>> masks {{1},                                                                 // 1
+                                                   {0,  2},                                                             // 2
+                                                   {3,  0,  0},                                                         // 3
+                                                   {0,  5,  0,  4,  0,  0,  4},                                         // 7
+                                                   {7,  0,  0,  6,  0,  0,  8,  0,  8,  0,  0},                         // 11
+                                                   {0,  0,  0, 11, 12,  0,  9,  0,  0,  0,  0,  0, 10},                 // 13
+                                                   {0, 13,  0,  0,  0,  0,  0, 14,  0,  0,  0, 15,  0, 16,  0,  0, 0}}; // 17
+    std::vector<uint8_t> indexes (lenght, 0);
+
+    for (auto &curr : indexes) {
+        const size_t currIdx = std::distance(indexes.data(), &curr);
+        for (auto &mask : masks) {
+            const uint8_t value = mask[currIdx % mask.size()];
+            if (value && value - 1 > curr && value <= upperBound) {
+                curr = value - 1;
+            }
+            if (ranges::consist(mask, upperBound)) {
+                break;
+            }
+        }
+    }    
+    return indexes;
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**	It uses the idea of "Cicada Principle" (prime numbers to generate continuous sequences)
+**
+**	@param	src		sequences of images distributed in layers
+**	@return			cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const
+{
+    const uint16_t SequencesCount = 16;
+    std::vector<std::vector<uint8_t>> indexes;
+    for (auto &srcLayer : src) 
+    {
+        indexes.push_back(buildIndexesRow16(srcLayer.size(), SequencesCount));
+        
+        const auto layerIdx = std::distance(src.data(), &srcLayer);
+        if (layerIdx % 2 == 1) {
+            ranges::reverse(indexes.back());
+        }
+    }
+
+    std::vector<sequence_of_imagesPtrs> result;
+
+    std::vector<uint8_t> shifts(indexes.size());
+    ranges::iota(shifts, 0);
+
+    uint16_t iterCount = 0;
+    do {
+        auto wrkIndexes {indexes};
+        if (!result.empty()) {
+            for (size_t i = 0; i < wrkIndexes.size(); i++) {
+                ranges::rotate_n(wrkIndexes[i], shifts[i]);
+            }
+        }
+        for (size_t seqIdx = 0; seqIdx < SequencesCount; seqIdx++) {
+            sequence_of_imagesPtrs sequence;
+            
+            size_t layerIdx = 0;
+            for (auto &srcLayer : src) {
+                sequence.push_back(srcLayer[wrkIndexes[layerIdx][seqIdx]].get());
+                layerIdx++;
+            }
+            if (!ranges::consist(result, sequence)) {
+                result.push_back(sequence);
+            }
+            if (result.size() >= SequencesCount) {
+                break;
+            }
+        }
+        iterCount++;
+    } while (std::next_permutation(begin(shifts), end(shifts)) && result.size() < SequencesCount);
+    return result;
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**	It uses the algorithm of fair (uniform) distribution of sequences according to the criterion of variety
+**	TODO: implement this algorithm
+**
+**	@param	src		sequences of images distributed in layers
+**	@return			cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Fair(std::vector<sequence_of_images> const &src) const
+{
+	if (src.size() == 1) {  // if layer is single
+		sequence_of_imagesPtrs images;
+		for (auto &srcImg : src[0]) {
+			images.push_back(srcImg.get());
+		}
+		return std::vector {images} ;
+	}
+
+    return buildSequences_Cicadas(src);    
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**
+**	@param	src				sequences of images distributed in layers
+**	@param	isFairMethod	using fair method of generation if true, "cicadas" otherwise
+**	@return					cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences(std::vector<sequence_of_images> const &src, 
+																		 	 const bool isFairMethod/* = true*/) const
+{
+	if (isFairMethod || src.size() == 1) {
+        return buildSequences_Fair(src);
+    } else {
+        return buildSequences_Cicadas(src);
+    }
+}
+
+/**
+**	Composes an image out of several ones by overlaying them one each other
+**
+**	@param	srcSequence		images to overlap
+**	@return					composed image
+**/
+sdl2::SurfacePtr CTilesetGraphicGenerator::composeImage(sequence_of_imagesPtrs &srcSequence) const
+{
+	auto dst {newBlankImage()};
+
+	for (auto &src : srcSequence) {
+		SDL_BlitSurface(src, NULL, dst.get(), NULL);
+	}
+	return dst;
 }
 
 /**
@@ -1067,28 +1232,33 @@ std::vector<SDL_Surface*> CTilesetGraphicGenerator::parseLayer(lua_State *luaSta
 void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 {
 	enum { cSinglelayer = 0, cFirstLayer = 2 };
-	
+	std::vector<sequence_of_images> srcImgLayers;
+
 	if (lua_isnumber(luaStack, -1) || lua_istable(luaStack, -1)) {
 		const uint16_t layersNum = checkForLayers(luaStack);
+
 		int arg = layersNum > 1 ? cFirstLayer : cSinglelayer;
-		for (uint16_t layer = 1; layer <= layersNum; layer++) {
-			SrcImgLayers.push_back(parseLayer(luaStack, arg));
+		for (uint16_t layerIdx = 0; layerIdx < layersNum; layerIdx++) {
+			
+			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, arg, layersNum == 1 ? true : false);
+
+			if (layersNum == 1 && parcedImages.empty()) { // If the only layer has no new graphics
+				for (auto index : parcedIndexes) {
+					Result.Indexes.push(index);
+				}
+			} else {
+				srcImgLayers.push_back(std::move(parcedImages));
+			}
 			arg++;
+		}
+		if (!srcImgLayers.empty()) {
+			for (auto &sequence : buildSequences(srcImgLayers)) {
+				Result.Images.push(composeImage(sequence));
+			}
 		}
 	} else {
 		LuaError(luaStack, "incorrect argument");
 	}
-}
-
-std::vector<graphic_index> CTilesetGraphicGenerator::genSequence(const uint16_t seqNumber) {
-
-
-}
-
-SDL_Surface* CTilesetGraphicGenerator::get(const uint16_t imgNo)
-{
-	std::vector<graphic_index> framesSequence { genSequence(imgNo) };
-
 }
 
 /** 
