@@ -227,14 +227,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
 
 	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
-		AiHelperInsert(aiHelper.UnitLimit, 0, **i);
+		AiHelperInsert(aiHelper.UnitLimit(), 0, **i);
 	}
 
 	for (int i = 1; i < MaxCosts; ++i) {
 		for (std::vector<CUnitType *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
 			if ((*j)->GivesResource == i) {
 				/* HACK : we can't mine TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Refinery, i - 1, **j);
+				AiHelperInsert(aiHelper.Refinery(), i - 1, **j);
 			}
 		}
 		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
@@ -242,7 +242,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 			if (type.CanStore[i] > 0) {
 				/* HACK : we can't store TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Depots, i - 1, type);
+				AiHelperInsert(aiHelper.Depots(), i - 1, type);
 			}
 		}
 	}
@@ -255,7 +255,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 			case ButtonRepair :
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
 					for (std::vector<CUnitType *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
-						AiHelperInsert(aiHelper.Repair, (*k)->Slot, **j);
+						AiHelperInsert(aiHelper.Repair(), (*k)->Slot, **j);
 					}
 				}
 				break;
@@ -263,7 +263,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Build, buildingType->Slot, (**j));
+					AiHelperInsert(aiHelper.Build(), buildingType->Slot, (**j));
 				}
 				break;
 			}
@@ -271,7 +271,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Train, trainingType->Slot, (**j));
+					AiHelperInsert(aiHelper.Train(), trainingType->Slot, (**j));
 				}
 				break;
 			}
@@ -279,7 +279,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Upgrade, upgradeToType->Slot, **j);
+					AiHelperInsert(aiHelper.Upgrade(), upgradeToType->Slot, **j);
 				}
 				break;
 			}
@@ -288,11 +288,11 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 				if (button.Allowed == ButtonCheckSingleResearch) {
 					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-						AiHelperInsert(aiHelper.SingleResearch, researchId, **j);
+						AiHelperInsert(aiHelper.SingleResearch(), researchId, **j);
 					}
 				} else {
 					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-						AiHelperInsert(aiHelper.Research, researchId, **j);
+						AiHelperInsert(aiHelper.Research(), researchId, **j);
 					}
 				}
 				break;
@@ -349,7 +349,7 @@ static int CclDefineAiHelper(lua_State *l)
 			if (!type) {
 				LuaError(l, "unknown unittype: %s" _C_ equivTypeName);
 			}
-			AiHelperInsert(AiHelpers.Equiv, base->Slot, *type);
+			AiHelperInsert(AiHelpers.Equiv(), base->Slot, *type);
 			AiNewUnitTypeEquiv(*base, *type);
 		}
 	}
@@ -778,9 +778,9 @@ static int CclAiWait(lua_State *l)
 		}
 
 		// Look if we have equivalent unit-types.
-		if (type->Slot < (int)AiHelpers.Equiv.size()) {
-			for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
-				if (unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot]) {
+		if (type->Slot < (int)AiHelpers.Equiv().size()) {
+			for (size_t j = 0; j < AiHelpers.Equiv()[type->Slot].size(); ++j) {
+				if (unit_types_count[AiHelpers.Equiv()[type->Slot][j]->Slot]) {
 					lua_pushboolean(l, 0);
 					return 1;
 				}
@@ -799,9 +799,9 @@ static int CclAiWait(lua_State *l)
 	// Add equivalent units
 	//
 	unsigned int n = unit_types_count[type->Slot];
-	if (type->Slot < (int)AiHelpers.Equiv.size()) {
-		for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
-			n += unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot];
+	if (type->Slot < (int)AiHelpers.Equiv().size()) {
+		for (size_t j = 0; j < AiHelpers.Equiv()[type->Slot].size(); ++j) {
+			n += unit_types_count[AiHelpers.Equiv()[type->Slot][j]->Slot];
 		}
 	}
 	// units available?

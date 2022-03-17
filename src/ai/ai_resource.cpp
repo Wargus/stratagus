@@ -315,9 +315,9 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 
 static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 {
-	const size_t size = AiHelpers.Build[type.Slot].size();
+	const size_t size = AiHelpers.Build()[type.Slot].size();
 	for (size_t i = 0; i != size; ++i) {
-		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
+		CUnitType &builder = *AiHelpers.Build()[type.Slot][i];
 
 		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
 			&& CheckDependByType(player, type)) {
@@ -383,10 +383,10 @@ void AiNewDepotRequest(CUnit &worker)
 
 	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
 
-	const int n = AiHelpers.Depots[resource - 1].size();
+	const int n = AiHelpers.Depots()[resource - 1].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.Depots[resource - 1][i];
+		CUnitType &type = *AiHelpers.Depots()[resource - 1][i];
 
 		if (counter[type.Slot]) { // Already ordered.
 			return;
@@ -532,10 +532,10 @@ static bool AiRequestSupply()
 	// Check if we can build this?
 	//
 	int j = 0;
-	const int n = AiHelpers.UnitLimit[0].size();
+	const int n = AiHelpers.UnitLimit()[0].size();
 
 	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.UnitLimit[0][i];
+		CUnitType &type = *AiHelpers.UnitLimit()[0][i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
@@ -666,11 +666,11 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 		// Check if we have a place for building or a unit to build.
 		//
 		if (type.Building) {
-			n = AiHelpers.Build.size();
-			tablep = &AiHelpers.Build;
+			n = AiHelpers.Build().size();
+			tablep = &AiHelpers.Build();
 		} else {
-			n = AiHelpers.Train.size();
-			tablep = &AiHelpers.Train;
+			n = AiHelpers.Train().size();
+			tablep = &AiHelpers.Train();
 		}
 		if (type.Slot > n) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
@@ -749,8 +749,8 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 	// Check if we have a place for the upgrade to research
 	//
 	{ // multi-research case
-		const int n = AiHelpers.Research.size();
-		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+		const int n = AiHelpers.Research().size();
+		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research();
 
 		if (upgrade->ID < n) { // not known as multi-researchable upgrade
 			std::vector<CUnitType *> &table = tablep[upgrade->ID];
@@ -768,8 +768,8 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 		}
 	}
 	{ // single-research case
-		const int n = AiHelpers.SingleResearch.size();
-		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.SingleResearch;
+		const int n = AiHelpers.SingleResearch().size();
+		std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.SingleResearch();
 
 		if (upgrade->ID < n) { // not known
 			std::vector<CUnitType *> &table = tablep[upgrade->ID];
@@ -845,8 +845,8 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	//
 	// Check if we have a place for the upgrade to.
 	//
-	const int n = AiHelpers.Upgrade.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade;
+	const int n = AiHelpers.Upgrade().size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade();
 
 	if (type.Slot > n) { // Oops not known.
 		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
@@ -1324,8 +1324,8 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 */
 static int AiRepairUnit(CUnit &unit)
 {
-	int n = AiHelpers.Repair.size();
-	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair;
+	int n = AiHelpers.Repair().size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair();
 	const CUnitType &type = *unit.Type;
 	if (type.Slot > n) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"

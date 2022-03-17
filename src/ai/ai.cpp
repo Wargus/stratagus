@@ -204,9 +204,9 @@ static void AiCheckUnits()
 
 		// Add equivalent units
 		int e = unit_types_count[t];
-		if (t < AiHelpers.Equiv.size()) {
-			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+		if (t < AiHelpers.Equiv().size()) {
+			for (unsigned int j = 0; j < AiHelpers.Equiv()[t].size(); ++j) {
+				e += unit_types_count[AiHelpers.Equiv()[t][j]->Slot];
 			}
 		}
 		const int requested = x - e - counter[t];
@@ -227,9 +227,9 @@ static void AiCheckUnits()
 
 		//  Add equivalent units
 		int e = unit_types_count[t];
-		if (t < AiHelpers.Equiv.size()) {
-			for (unsigned int j = 0; j < AiHelpers.Equiv[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv[t][j]->Slot];
+		if (t < AiHelpers.Equiv().size()) {
+			for (unsigned int j = 0; j < AiHelpers.Equiv()[t].size(); ++j) {
+				e += unit_types_count[AiHelpers.Equiv()[t][j]->Slot];
 			}
 		}
 
@@ -517,15 +517,15 @@ void FreeAi()
 	AiTypes.clear();
 
 	//  Free AiHelpers.
-	AiHelpers.Train.clear();
-	AiHelpers.Build.clear();
-	AiHelpers.Upgrade.clear();
-	AiHelpers.Research.clear();
-	AiHelpers.Repair.clear();
-	AiHelpers.UnitLimit.clear();
-	AiHelpers.Equiv.clear();
-	AiHelpers.Refinery.clear();
-	AiHelpers.Depots.clear();
+	AiHelpers.Train().clear();
+	AiHelpers.Build().clear();
+	AiHelpers.Upgrade().clear();
+	AiHelpers.Research().clear();
+	AiHelpers.Repair().clear();
+	AiHelpers.UnitLimit().clear();
+	AiHelpers.Equiv().clear();
+	AiHelpers.Refinery().clear();
+	AiHelpers.Depots().clear();
 
 	AiResetUnitTypeEquiv();
 }
@@ -1039,6 +1039,66 @@ void AiEachSecond(CPlayer &player)
 	if (GameCycle > AiPlayer->LastExplorationGameCycle + 5 * CYCLES_PER_SECOND) {
 		AiSendExplorers();
 	}
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Train()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Build()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Upgrade()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Research()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::SingleResearch()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Repair()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::UnitLimit()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Equiv()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Refinery()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
+}
+
+std::vector<std::vector<CUnitType *> > &AiHelper::Depots()
+{
+	static std::vector<std::vector<CUnitType *> > vec;
+	return vec;
 }
 
 //@}

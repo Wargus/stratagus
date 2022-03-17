@@ -332,58 +332,58 @@ public:
 	** The index is the unit that should be trained, giving a table of all
 	** units/buildings which could train this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Train;
+	std::vector<std::vector<CUnitType *> > &Train();
 	/**
 	** The index is the unit that should be build, giving a table of all
 	** units/buildings which could build this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Build;
+	std::vector<std::vector<CUnitType *> > &Build();
 	/**
 	** The index is the upgrade that should be made, giving a table of all
 	** units/buildings which could do the upgrade.
 	*/
-	std::vector<std::vector<CUnitType *> > Upgrade;
+	std::vector<std::vector<CUnitType *> > &Upgrade();
 	/**
 	** The index is the research that should be made, giving a table of all
 	** units/buildings which could research this upgrade. This table only
 	** includes those unit types which have the research defined as a button
 	** without the "check-single-research" restriction.
 	*/
-	std::vector<std::vector<CUnitType *> > Research;
+	std::vector<std::vector<CUnitType *> > &Research();
 	/**
 	** The index is the research that should be made, giving a table of all
 	** units/buildings which could research this upgrade. This table only
 	** includes those unit types which have the research defined as a button
 	** with the "check-single-research" restriction.
 	*/
-	std::vector<std::vector<CUnitType *> > SingleResearch;
+	std::vector<std::vector<CUnitType *> > &SingleResearch();
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > Repair;
+	std::vector<std::vector<CUnitType *> > &Repair();
 	/**
 	** The index is the unit-limit that should be solved, giving a table of all
 	** units/buildings which could reduce this unit-limit.
 	*/
-	std::vector<std::vector<CUnitType *> > UnitLimit;
+	std::vector<std::vector<CUnitType *> > &UnitLimit();
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<CUnitType *> > Equiv;
+	std::vector<std::vector<CUnitType *> > &Equiv();
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > Refinery;
+	std::vector<std::vector<CUnitType *> > &Refinery();
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > Depots;
+	std::vector<std::vector<CUnitType *> > &Depots();
 };
 
 /*----------------------------------------------------------------------------
