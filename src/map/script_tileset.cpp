@@ -1427,14 +1427,17 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 	
 		tile_index srcIndex = 0;
 		for (tile_index &dstIndex: dstTileIndexes) {
-			/// add new graphic tile into tileGraphic if needed
-			SDL_Surface *graphic = srcGraphic.get(srcIndex);
-			if (graphic) {
-				ExtGraphic.push_back(graphic);
+			if (srcGraphic.isEmpty()) {
+				break;
 			}
+			/// add new graphic tile into tileGraphic if needed
 			CTile newTile;
-			newTile.tile = graphic ? ExtGraphic.size() - 1 + BaseGraphic->NumFrames
-								   : srcGraphic.getIndex(srcIndex);
+			if (srcGraphic.hasIndexesOnly()) {
+				newTile.tile = srcGraphic.pullOutIndex();
+			} else {
+				ExtGraphic.push_back(std::move(srcGraphic.pullOutImage()));
+				newTile.tile = ExtGraphic.size() - 1 + BaseGraphic->NumFrames;
+			}
 			newTile.flag = flagsCommon | flagsAdditional;
 			newTile.tileinfo.BaseTerrain = baseTerrain;
 			newTile.tileinfo.MixTerrain  = terrainNameIdx[cMixed];

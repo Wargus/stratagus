@@ -418,13 +418,12 @@ public:
 
 	~CTilesetParser()
 	{
-		ranges::for_each(ExtGraphic, SDL_FreeSurface);
 		if (SrcImgGraphic) {
 			CGraphic::Free(SrcImgGraphic);
 		}
 	}
 	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; };
-	const std::vector<SDL_Surface *> getGraphic() const { return ExtGraphic; };
+	const sequence_of_images& getGraphic() const { return ExtGraphic; };
 
 	static std::vector<tile_index> parseDstRange(lua_State *luaStack, const int tablePos, const int argPos);
 	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int parseFromPos = 1);
@@ -435,10 +434,11 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	CTileset *BaseTileset 		{nullptr};
-	const CGraphic *BaseGraphic {nullptr};
-	CGraphic *SrcImgGraphic 	{nullptr};
-	std::vector<SDL_Surface *>  ExtGraphic;
+	CTileset 		*BaseTileset 	{nullptr};
+	const CGraphic 	*BaseGraphic 	{nullptr};
+	CGraphic 		*SrcImgGraphic 	{nullptr};
+	
+	sequence_of_images	 		ExtGraphic;
 	std::map<tile_index, CTile> ExtTiles;
 };
 /*----------------------------------------------------------------------------
