@@ -760,10 +760,6 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
 		return;
 	}
-	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
-		return;
-	}
 
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);

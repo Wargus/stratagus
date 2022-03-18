@@ -100,7 +100,7 @@ public:
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
+	unsigned char TerrainHarvester;    /// Unit will harvest terrain.
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
 	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
 	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.

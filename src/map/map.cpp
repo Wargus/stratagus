@@ -451,7 +451,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	int flags;
 	if (type == MapFieldForest) {
 		removedtile = this->Tileset->getRemovedTreeTile();
-		flags = (MapFieldForest | MapFieldUnpassable);
+		flags = (MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
 	} else { // (type == MapFieldRocks)
 		removedtile = this->Tileset->getRemovedRockTile();
 		flags = (MapFieldRocks | MapFieldUnpassable);
@@ -571,7 +571,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	CMapField &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
-	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
+	mf.Flags &= ~(MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
 	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
@@ -641,7 +641,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
+		topMf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
@@ -650,7 +650,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
+		mf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);

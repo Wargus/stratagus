@@ -100,7 +100,7 @@
 **    ::MapFieldUnpassable field is movement blocked.
 **    ::MapFieldWall field contains wall.
 **    ::MapFieldRocks field contains rocks.
-**    ::MapFieldForest field contains forest.
+**    ::MapFieldForest field contains forest or other harvestable resource
 **    ::MapFieldLandUnit land unit on field.
 **    ::MapFieldAirUnit air unit on field.
 **    ::MapFieldSeaUnit water unit on field.
@@ -240,8 +240,7 @@ public:
 private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:
-	// FIXME: Value should be removed, walls and regeneration can be handled differently.
-	unsigned char Value;       /// HP for walls/ Wood Regeneration
+	unsigned int Value;        /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
 	CUnitCache UnitCache;      /// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player

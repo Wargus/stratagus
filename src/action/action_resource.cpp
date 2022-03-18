@@ -134,13 +134,29 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	COrder_Resource *order = new COrder_Resource(harvester);
 	Vec2i ressourceLoc;
 
+	int targetFlag;
+	CMapField *mf = Map.Field(pos);
+	int flags = mf->getFlag();
+	if (flags & MapFieldCost4) {
+		order->CurrentResource = Cost4;
+		targetFlag = MapFieldCost4;
+	} else if (flags & MapFieldCost5) {
+		order->CurrentResource = Cost5;
+		targetFlag = MapFieldCost5;
+	} else if (flags & MapFieldCost6) {
+		order->CurrentResource = Cost6;
+		targetFlag = MapFieldCost6;
+	} else {
+		order->CurrentResource = WoodCost;
+		targetFlag = MapFieldForest;
+	}
+
 	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, MapFieldForest, 20, *harvester.Player, pos, &ressourceLoc)) {
+	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, targetFlag, 20, *harvester.Player, pos, &ressourceLoc)) {
 		DebugPrint("FIXME: Give up???\n");
 		ressourceLoc = pos;
 	}
 	order->goalPos = ressourceLoc;
-	order->CurrentResource = WoodCost; // Hard-coded resource.
 	return order;
 }
 
@@ -735,11 +751,18 @@ int COrder_Resource::GatherResource(CUnit &unit)
 		}
 
 		if (resinfo.TerrainHarvester) {
+			CMapField *mf = Map.Field(this->goalPos);
+			addload = std::min((int)mf->Value, addload);
 			unit.ResourcesHeld += addload;
-
-			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
+			mf->Value -= addload;
+			if (mf->Value == 0) {
 				Map.ClearTile(this->goalPos);
+				this->DoneHarvesting = true;
+			} else if (unit.ResourcesHeld == resinfo.ResourceCapacity) {
+				// Mark as complete.
+				this->DoneHarvesting = true;
 			}
+			return 0;
 		} else {
 			if (resinfo.HarvestFromOutside) {
 				source = this->GetGoal();
@@ -792,14 +815,6 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				source = NULL;
 				return 0;
 			}
-		}
-		if (resinfo.TerrainHarvester) {
-			if (unit.ResourcesHeld == resinfo.ResourceCapacity) {
-				// Mark as complete.
-				this->DoneHarvesting = true;
-			}
-			return 0;
-		} else {
 			if (resinfo.HarvestFromOutside) {
 				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == NULL)) {
 					// Mark as complete.
