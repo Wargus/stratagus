@@ -108,7 +108,7 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
 {
 	unsigned int flags = 3;
-
+	bool nonMixing = false;
 	//  Parse the list: flags of the slot
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
@@ -122,7 +122,11 @@ int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
 
 		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags) == false) {
-			LuaError(l, "solid: unsupported tag: %s" _C_ value);
+			if (!strcmp(value, "non-mixing")) {
+				nonMixing = true;
+			} else {
+				LuaError(l, "solid: unsupported tag: %s" _C_ value);
+			}
 		}
 	}
 	*back = flags;
@@ -130,6 +134,10 @@ int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
 	if (flags & MapFieldDecorative) {
 		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
 	} else {
+		if (nonMixing) {
+			// special flag - this isn't it's own name, but it doesn't mix
+			*back |= MapFieldDecorative;
+		}
 		return 0;
 	}
 }
