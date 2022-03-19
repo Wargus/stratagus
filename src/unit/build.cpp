@@ -453,22 +453,24 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		}
 	}
 
-	size_t count = type.BuildingRules.size();
-	if (count > 0) {
-		for (unsigned int i = 0; i < count; ++i) {
-			CBuildRestriction *rule = type.BuildingRules[i];
-			CUnit *ontoptarget = NULL;
-			// All checks processed, did we really have success
-			if (rule->Check(unit, type, pos, ontoptarget)) {
-				// We passed a full ruleset return
-				if (unit == NULL) {
-					return ontoptarget ? ontoptarget : (CUnit *)1;
-				} else {
-					return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
+	if (GameCycle != 0) {
+		size_t count = type.BuildingRules.size();
+		if (count > 0) {
+			for (unsigned int i = 0; i < count; ++i) {
+				CBuildRestriction *rule = type.BuildingRules[i];
+				CUnit *ontoptarget = NULL;
+				// All checks processed, did we really have success
+				if (rule->Check(unit, type, pos, ontoptarget)) {
+					// We passed a full ruleset return
+					if (unit == NULL) {
+						return ontoptarget ? ontoptarget : (CUnit *)1;
+					} else {
+						return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
+					}
 				}
 			}
+			return NULL;
 		}
-		return NULL;
 	}
 
 	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
