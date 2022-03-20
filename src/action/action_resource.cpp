@@ -136,14 +136,13 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 	int targetFlag;
 	CMapField *mf = Map.Field(pos);
-	int flags = mf->getFlag();
-	if (flags & MapFieldCost4) {
+	if (mf->Cost4OnMap()) {
 		order->CurrentResource = Cost4;
 		targetFlag = MapFieldCost4;
-	} else if (flags & MapFieldCost5) {
+	} else if (mf->Cost5OnMap()) {
 		order->CurrentResource = Cost5;
 		targetFlag = MapFieldCost5;
-	} else if (flags & MapFieldCost6) {
+	} else if (mf->Cost6OnMap()) {
 		order->CurrentResource = Cost6;
 		targetFlag = MapFieldCost6;
 	} else {

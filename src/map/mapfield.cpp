@@ -63,11 +63,11 @@ bool CMapField::IsTerrainResourceOnMap(int resource) const
 		case WoodCost:
 			return ForestOnMap();
 		case Cost4:
-			return CheckMask(MapFieldCost4);
+			return Cost4OnMap();
 		case Cost5:
-			return CheckMask(MapFieldCost5);
+			return Cost5OnMap();
 		case Cost6:
-			return CheckMask(MapFieldCost6);
+			return Cost6OnMap();
 	}
 	return false;
 }
@@ -95,11 +95,11 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
 	this->Flags |= tile.flag;
 	if (!value && (tile.flag & MapFieldForest)) {
-		if (tile.flag & MapFieldCost4) {
+		if ((tile.flag & MapFieldCost4) == MapFieldCost4) {
 			this->Value = DefaultResourceAmounts[Cost4];
-		} else if (tile.flag & MapFieldCost5) {
+		} else if ((tile.flag & MapFieldCost5) == MapFieldCost5) {
 			this->Value = DefaultResourceAmounts[Cost4];
-		} else if (tile.flag & MapFieldCost6) {
+		} else if ((tile.flag & MapFieldCost6) == MapFieldCost6) {
 			this->Value = DefaultResourceAmounts[Cost4];
 		} else if (tile.flag & MapFieldForest) {
 			this->Value = 100; // TODO: should be DefaultResourceAmounts[WoodCost] once all games are migrated
@@ -150,13 +150,13 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldForest) {
 		file.printf(", \"wood\"");
 	}
-	if (Flags & MapFieldCost4) {
+	if (Cost4OnMap()) {
 		file.printf(", \"cost4\"");
 	}
-	if (Flags & MapFieldCost5) {
+	if (Cost5OnMap()) {
 		file.printf(", \"cost5\"");
 	}
-	if (Flags & MapFieldCost6) {
+	if (Cost6OnMap()) {
 		file.printf(", \"cost6\"");
 	}
 #if 1
@@ -270,10 +270,31 @@ bool CMapField::CoastOnMap() const
 	return CheckMask(MapFieldCoastAllowed);
 }
 
-/// Returns true, if water on the map tile field
+/// Returns true, if forest on the map tile field
 bool CMapField::ForestOnMap() const
 {
 	return CheckMask(MapFieldForest);
+}
+
+/// Returns true, if any terrain resource giving Cost4 on the map tile field
+/// Cannot use CheckMask, since two bits need to be tested.
+bool CMapField::Cost4OnMap() const
+{
+	return (this->Flags & MapFieldCost4) == MapFieldCost4;
+}
+
+/// Returns true, if any terrain resource giving Cost5 on the map tile field
+/// Cannot use CheckMask, since two bits need to be tested.
+bool CMapField::Cost5OnMap() const
+{
+	return (this->Flags & MapFieldCost5) == MapFieldCost5;
+}
+
+/// Returns true, if any terrain resource giving Cost6 on the map tile field
+/// Cannot use CheckMask, since two bits need to be tested.
+bool CMapField::Cost6OnMap() const
+{
+	return (this->Flags & MapFieldCost6) == MapFieldCost6;
 }
 
 /// Returns true, if coast on the map tile field

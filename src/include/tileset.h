@@ -65,9 +65,9 @@ struct lua_State;
 #define MapFieldBuilding 0x8000  /// Building on field
 
 #define MapFieldDecorative 0x10000  /// A field that needs no mixing with the surroundings, for the editor
-#define MapFieldCost4 0x20000 | MapFieldForest  		/// This field is terrain harvestable, but gives Cost4 instead of wood
-#define MapFieldCost5 0x40000 | MapFieldForest  		/// This field is terrain harvestable, but gives Cost5 instead of wood
-#define MapFieldCost6 0x80000 | MapFieldForest  		/// This field is terrain harvestable, but gives Cost6 instead of wood
+#define MapFieldCost4 (0x20000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost4 instead of wood
+#define MapFieldCost5 (0x40000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost5 instead of wood
+#define MapFieldCost6 (0x80000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost6 instead of wood
 
 /**
 **  These are used for lookup tiles types

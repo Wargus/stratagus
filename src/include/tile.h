@@ -210,6 +210,15 @@ public:
 	/// Returns true, if water on the map tile field
 	bool ForestOnMap() const;
 
+	/// Returns true, if any terrain resource giving Cost4 on the map tile field
+	bool Cost4OnMap() const;
+
+	/// Returns true, if any terrain resource giving Cost5 on the map tile field
+	bool Cost5OnMap() const;
+
+	/// Returns true, if any terrain resource giving Cost6 on the map tile field
+	bool Cost6OnMap() const;
+
 	/// Returns true, if coast on the map tile field
 	bool RockOnMap() const;
 
