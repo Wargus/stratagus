@@ -896,24 +896,25 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 			size_t msgSz = strlen(pMsg);
 			int n = 0;
 
-#define REPEAT " (~<%d~>x)"
-			if (msgSz == sz || sscanf(pMsg + sz, REPEAT, &n) == 1) {
+			if (msgSz == sz || sscanf(pMsg + sz, " (~<%d~>", &n) == 1) {
 				// This exact message was printed already.
 				// n now holds the previous repeat count.
+				if (n < 10) {
+					// 1. Shift all following messages down
+					for (int z = i; z < MessagesCount - 1; ++z) {
+						strcpy_s(Messages[z], sizeof(Messages[z]), Messages[z + 1]);
+					}
 
-				// 1. Shift all following messages down
-				for (int z = i; z < MessagesCount - 1; ++z) {
-					strcpy_s(Messages[z], sizeof(Messages[z]), Messages[z + 1]);
+					// Update the message and append it to the end with the
+					// new repeat count
+					char temp[256];
+					snprintf(temp, sizeof(temp), "%s (~<%d~>%s)", msg, n + 1, n == 9 ? "+" : "");
+					MessagesCount--;
+					AddMessage(temp);
+				} else {
+					return true; // skip so many repeated messages
 				}
-
-				// Update the message and append it to the end with the
-				// new repeat count
-				char temp[256];
-				snprintf(temp, sizeof(temp), "%s " REPEAT, msg, n + 1);
-				MessagesCount--;
-				AddMessage(temp);
 			}
-#undef REPEAT
 			return true;
 		}
 	}
