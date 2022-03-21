@@ -1083,8 +1083,8 @@ void CButtonPanel::Update()
 	}
 
 	CUnit &unit = *Selected[0];
-	// foreign unit
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
+	// foreign unit, but not *the* neutral player
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit) && unit.Player->Index != PlayerMax - 1) {
 		CurrentButtons.clear();
 		return;
 	}
@@ -1415,7 +1415,7 @@ void CButtonPanel::DoClicked(int button)
 	//  Button not available.
 	//  or Not Teamed
 	//
-	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
+	if (CurrentButtons[button].Pos == -1 || !(ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Index == PlayerMax - 1)) {
 		return;
 	}
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);

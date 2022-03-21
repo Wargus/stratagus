@@ -1827,7 +1827,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Index == PlayerMax - 1)) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
