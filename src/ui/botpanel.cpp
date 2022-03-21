@@ -1388,11 +1388,12 @@ void CButtonPanel::DoClicked_Research(int button)
 	}
 }
 
-void CButtonPanel::DoClicked_CallbackAction(int button)
+void CButtonPanel::DoClicked_CallbackAction(int button, int clickingPlayer)
 {
 	LuaCallback* callback = (LuaCallback*)(CurrentButtons[button].Payload);
 	callback->pushPreamble();
 	callback->pushInteger(UnitNumber(*Selected[0]));
+	callback->pushInteger(clickingPlayer);
 	callback->run();
 }
 
@@ -1446,7 +1447,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonTrain: { DoClicked_Train(button); break; }
 		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
 		case ButtonResearch: { DoClicked_Research(button); break; }
-		case ButtonCallbackAction: { DoClicked_CallbackAction(button); break; }
+		case ButtonCallbackAction: { DoClicked_CallbackAction(button, ThisPlayer->Index); break; }
 	}
 }
 

@@ -300,7 +300,7 @@ private:
 	void DoClicked_Train(int button);
 	void DoClicked_UpgradeTo(int button);
 	void DoClicked_Research(int button);
-	void DoClicked_CallbackAction(int button);
+	void DoClicked_CallbackAction(int button, int clickingPlayer);
 
 
 public:
