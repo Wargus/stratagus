@@ -897,9 +897,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		case ButtonReturn:
-		    if (unit.CurrentResource
-		        && ((unit.ResourcesHeld > 0 && !unit.Type->ResInfo[unit.CurrentResource]->TerrainHarvester)
-		            || (unit.ResourcesHeld >= unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity))) {
+		    if (unit.CurrentResource && unit.ResourcesHeld > 0) {
 				res = true;
 			}
 			break;

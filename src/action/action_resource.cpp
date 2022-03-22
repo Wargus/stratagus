@@ -183,11 +183,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 	if (harvester.CurrentResource) {
 		const ResourceInfo &resinfo = *harvester.Type->ResInfo[harvester.CurrentResource];
-		if (resinfo.TerrainHarvester && harvester.ResourcesHeld < resinfo.ResourceCapacity) {
-			// Need to finish harvesting first!
-			delete order;
-			return NewActionResource(harvester, harvester.tilePos);
-		}
 	}
 
 	if (depot == NULL) {

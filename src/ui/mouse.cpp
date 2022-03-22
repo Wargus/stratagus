@@ -208,15 +208,13 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& (dest.Player == unit.Player
 			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
 		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
-		if (!resinfo.TerrainHarvester || unit.ResourcesHeld >= resinfo.ResourceCapacity) {
-			dest.Blink = 4;
-			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
-				acknowledged = 1;
-			}
-			SendCommandReturnGoods(unit, &dest, flush);
-			return true;
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
 		}
+		SendCommandReturnGoods(unit, &dest, flush);
+		return true;
 	}
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;

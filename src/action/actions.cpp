@@ -418,8 +418,7 @@ static void HandleUnitAction(CUnit &unit)
 		}
 		if (unit.CurrentResource) {
 			const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
-			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitActionResource
-				&& (!resinfo.TerrainHarvester || unit.ResourcesHeld < resinfo.ResourceCapacity)) {
+			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitActionResource) {
 				unit.CurrentResource = 0;
 				unit.ResourcesHeld = 0;
 			}
