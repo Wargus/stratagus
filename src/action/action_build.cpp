@@ -157,7 +157,7 @@ enum {
 
 /* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
 {
-	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
+	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value && input.GetUnit()->CanMove() ? 1 : 0);
 	input.SetMaxRange(this->Range);
 
 	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
