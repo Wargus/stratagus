@@ -423,9 +423,9 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 /* virtual */ void CPopupContentTypeVariable::Parse(lua_State *l)
 {
-	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
+	Assert(lua_istable(l, -1) || lua_isstring(l, -1) || lua_isfunction(l, -1));
 
-	if (lua_isstring(l, -1)) {
+	if (lua_isstring(l, -1) || lua_isfunction(l, -1)) {
 		this->Text = CclParseStringDesc(l);
 		lua_pushnil(l); // ParseStringDesc eat token
 	} else {
