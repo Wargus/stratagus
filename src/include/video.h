@@ -538,6 +538,7 @@ extern void VideoPaletteListAdd(SDL_Surface *surface);
 extern void VideoPaletteListRemove(SDL_Surface *surface);
 extern void ClearAllColorCyclingRange();
 extern void AddColorCyclingRange(unsigned int begin, unsigned int end);
+extern unsigned int SetColorCycleSpeed(unsigned int speed);
 extern void SetColorCycleAll(bool value);
 extern void RestoreColorCyclingSurface();
 
