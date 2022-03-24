@@ -1011,7 +1011,7 @@ static void ShowUnitInfo(const CUnit &unit)
 	char buf[256];
 
 	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
-					unit.Type->Name.c_str(), unit.Player->Index,
+					unit.Type->Name.c_str(), unit.Player->Index + 1,
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
 		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
