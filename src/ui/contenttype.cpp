@@ -263,6 +263,17 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 }
 
 /**
+**  Draw the graphic
+*/
+/* virtual */ void CContentTypeGraphic::Draw(const CUnit &, CFont *) const
+{
+	CGraphic *g = CGraphic::Get(this->graphic);
+	if (g) {
+		g->DrawClip(this->Pos.x, this->Pos.y);
+	}
+}
+
+/**
 **  Draw life bar of a unit using selected variable.
 **  Placed under icons on top-panel.
 **
@@ -501,6 +512,11 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key);
 		}
 	}
+}
+
+/* virtual */ void CContentTypeGraphic::Parse(lua_State *l)
+{
+	this->graphic = LuaToString(l, -1);
 }
 
 /* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)

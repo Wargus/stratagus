@@ -550,6 +550,8 @@ static CContentType *CclParseContent(lua_State *l)
 				content = new CContentTypeFormattedText2;
 			} else if (!strcmp(key, "Icon")) {
 				content = new CContentTypeIcon;
+			} else if (!strcmp(key, "Graphic")) {
+				content = new CContentTypeGraphic;
 			} else if (!strcmp(key, "LifeBar")) {
 				content = new CContentTypeLifeBar;
 			} else if (!strcmp(key, "CompleteBar")) {

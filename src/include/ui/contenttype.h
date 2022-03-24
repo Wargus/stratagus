@@ -145,6 +145,19 @@ private:
 };
 
 /**
+**  Show a graphic
+*/
+class CContentTypeGraphic : public CContentType
+{
+public:
+	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
+	virtual void Parse(lua_State *l);
+
+private:
+	std::string graphic;
+};
+
+/**
 **  Show bar which change color depend of value.
 */
 class CContentTypeLifeBar : public CContentType
