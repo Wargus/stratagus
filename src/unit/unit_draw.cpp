@@ -265,6 +265,29 @@ void DrawSelectionCorners(IntColor color, int x1, int y1, int x2, int y2)
 	Video.DrawHLineClip(color, x2 - CORNER_PIXELS + 1, y2, CORNER_PIXELS - 1);
 }
 
+/**
+**  Show selected units with ellipse. (Useful for fake-isometric views)
+**
+**  @param color  Color to draw circle
+**  @param x1,y1  Coordinates of the top left corner.
+**  @param x2,y2  Coordinates of the bottom right corner.
+**  @param factor Stretch factor in horizontal direction
+*/
+static float DrawSelectionEllipseFactor = 0.0f;
+void DrawSelectionEllipseFunc(IntColor color, int x1, int y1, int x2, int y2)
+{
+	float rx = (x2 - x1) / 2.0f;
+	float ry = (y2 - y1) * DrawSelectionEllipseFactor / 2.0f;
+	int xc = static_cast<int>(x1 + rx);
+	int yc = static_cast<int>(y2 - ry);
+
+	Video.DrawEllipseClip(color, xc, yc, static_cast<int>(rx), static_cast<int>(ry));
+}
+void (*DrawSelectionEllipse(float factor))(IntColor, int, int, int, int)
+{
+	DrawSelectionEllipseFactor = factor;
+	return DrawSelectionEllipseFunc;
+}
 
 /**
 **  Return the index of the sprite named SpriteName.

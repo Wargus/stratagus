@@ -346,6 +346,8 @@ public:
 	void DrawCircleClip(Uint32 color, int x, int y, int r);
 	void DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha);
 
+	void DrawEllipseClip(Uint32 color, int x, int y, int rx, int ry);
+
 	void FillCircle(Uint32 color, int x, int y, int radius);
 	void FillTransCircle(Uint32 color, int x, int y, int radius, unsigned char alpha);
 	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);

@@ -741,6 +741,44 @@ void DrawTransCircleClip(Uint32 color, int x, int y,
 }
 
 /**
+**  Draw an ellipse clipped
+*/
+void DrawEllipseClip(Uint32 color, int xc, int yc, int rx, int ry)
+{
+	int rx2 = rx*rx, ry2 = ry*ry , frx2 = 4*rx2, fry2 = 4*ry2;
+
+	int x, y, sigma;
+
+	for (x = 0, y = ry, sigma = 2*ry2+rx2*(1-2*ry); ry2*x <= rx2*y ; x++) {
+		VideoDoDrawPixelClip(color, xc + x, yc + y);
+		VideoDoDrawPixelClip(color, xc - x, yc + y);
+		VideoDoDrawPixelClip(color, xc + x, yc - y);
+		VideoDoDrawPixelClip(color, xc - x, yc - y);
+
+		if (sigma >= 0) {
+			sigma += frx2*(1-y);
+			y--;
+		}
+		sigma += ry2*(4*x+6);
+	}
+
+	for (x = rx, y = 0, sigma = 2*rx2+ry2*(1-2*rx); rx2*y <= ry2*x ; y++) {
+		VideoDoDrawPixelClip(color, xc + x, yc + y);
+		VideoDoDrawPixelClip(color, xc - x, yc + y);
+		VideoDoDrawPixelClip(color, xc + x, yc - y);
+		VideoDoDrawPixelClip(color, xc - x, yc - y);
+
+		if (sigma >= 0) {
+			sigma += fry2*(1-x);
+			x--;
+		}
+		sigma += rx2*(4*y+6);
+	}
+
+	Video.UnlockScreen();
+}
+
+/**
 **  Draw a filled circle
 */
 void FillCircle(Uint32 color, int x, int y, int r)
@@ -1009,6 +1047,11 @@ void CVideo::DrawCircleClip(Uint32 color, int x, int y, int r)
 void CVideo::DrawTransCircleClip(Uint32 color, int x, int y, int r, unsigned char alpha)
 {
 	linedraw_sdl::DrawTransCircleClip(color, x, y, r, alpha);
+}
+
+void CVideo::DrawEllipseClip(Uint32 color, int xc, int yc, int rx, int ry)
+{
+	linedraw_sdl::DrawEllipseClip(color, xc, yc, rx, ry);
 }
 
 void CVideo::FillCircle(Uint32 color, int x, int y, int r)

@@ -660,6 +660,8 @@ extern void DrawSelectionRectangle(IntColor, int, int, int, int);
 extern void DrawSelectionRectangleWithTrans(IntColor, int, int, int, int);
 /// Draw corners around unit
 extern void DrawSelectionCorners(IntColor, int, int, int, int);
+/// Draw ellipse around unit
+extern void (*DrawSelectionEllipse(float factor))(IntColor, int, int, int, int);
 
 /// Register CCL decorations features
 extern void DecorationCclRegister();

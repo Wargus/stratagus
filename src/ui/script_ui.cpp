@@ -1219,19 +1219,30 @@ void SelectedUnitChanged()
 */
 static int CclSetSelectionStyle(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
+	if (lua_gettop(l) < 1) {
+		LuaError(l, "incorrect argument");
+	}
 
 	const char *style = LuaToString(l, 1);
 	if (!strcmp(style, "rectangle")) {
+		LuaCheckArgs(l, 1);
 		DrawSelection = DrawSelectionRectangle;
 	} else if (!strcmp(style, "alpha-rectangle")) {
+		LuaCheckArgs(l, 1);
 		DrawSelection = DrawSelectionRectangleWithTrans;
 	} else if (!strcmp(style, "circle")) {
+		LuaCheckArgs(l, 1);
 		DrawSelection = DrawSelectionCircle;
 	} else if (!strcmp(style, "alpha-circle")) {
+		LuaCheckArgs(l, 1);
 		DrawSelection = DrawSelectionCircleWithTrans;
 	} else if (!strcmp(style, "corners")) {
+		LuaCheckArgs(l, 1);
 		DrawSelection = DrawSelectionCorners;
+	} else if (!strcmp(style, "ellipse")) {
+		LuaCheckArgs(l, 2);
+		float factor = LuaToFloat(l, 2);
+		DrawSelection = DrawSelectionEllipse(factor);
 	} else {
 		LuaError(l, "Unsupported selection style");
 	}
