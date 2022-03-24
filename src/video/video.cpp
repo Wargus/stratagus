@@ -83,7 +83,9 @@
 #include "stratagus.h"
 
 #include <vector>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #include "video.h"
 #include "intern_video.h"
@@ -394,8 +396,13 @@ void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rec
 	#pragma omp parallel if(enableMT)
 	{    
 		/// TODO: change numOfThreads for small rectangles to prevent False Sharing
+#ifdef _OPENMP
 		const uint16_t thisThread   = omp_get_thread_num();
 		const uint16_t numOfThreads = omp_get_num_threads();
+#else
+		const uint16_t thisThread   = 0;
+		const uint16_t numOfThreads = 1;
+#endif
 		
 		const uint16_t lBound = (thisThread    ) * dstWrkRect.h / numOfThreads; 
 		const uint16_t uBound = (thisThread + 1) * dstWrkRect.h / numOfThreads; 
