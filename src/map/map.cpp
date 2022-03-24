@@ -55,7 +55,7 @@
 CMap Map;                   /// The current map
 MapRevealModes FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
-int ForestRegeneration;     /// Forest regeneration
+unsigned int ForestRegeneration;     /// Forest regeneration
 int ForestRegenerationFrequency;     /// Forest regeneration frequency (every how many seconds we apply 1 point of regeneration)
 char CurrentMapPath[1024];  /// Path of the current map
 

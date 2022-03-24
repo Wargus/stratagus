@@ -283,7 +283,7 @@ extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
 /// Forest regeneration
-extern int ForestRegeneration;
+extern unsigned int ForestRegeneration;
 /// Forest regeneration
 extern int ForestRegenerationFrequency;
 /// Flag must reveal the map
