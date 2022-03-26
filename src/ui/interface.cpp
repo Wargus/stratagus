@@ -59,25 +59,21 @@
 --  Defines
 ----------------------------------------------------------------------------*/
 
-/// Scrolling area (<= 15 y)
-#define SCROLL_UP     15
-/// Scrolling area (>= VideoHeight - 16 y)
-#define SCROLL_DOWN   (Video.Height - 16)
-/// Scrolling area (<= 15 y)
-#define SCROLL_LEFT   15
-/// Scrolling area (>= VideoWidth - 16 x)
-#define SCROLL_RIGHT  (Video.Width - 16)
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+int ScrollMarginTop = 15;
+int ScrollMarginBottom = 16;
+int ScrollMarginLeft = 15;
+int ScrollMarginRight = 16;
 
 const char Cursor[] = "~!_";         /// Input cursor
 static Vec2i SavedMapPosition[3];    /// Saved map position
 static char Input[80];               /// line input for messages/long commands
 static int InputIndex;               /// current index into input
 static char InputStatusLine[99];     /// Last input status line
-const int MaxInputHistorySize = 16;  /// Max history of inputs
+constexpr int MaxInputHistorySize = 16;  /// Max history of inputs
 static char InputHistory[MaxInputHistorySize * sizeof(Input)] = { '\0' }; /// History of inputs
 static int InputHistoryIdx = 0;      /// Next history idx
 static int InputHistoryPos = 0;      /// Current position in history
@@ -1241,12 +1237,12 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 */
 bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
-	if (mousePos.x < SCROLL_LEFT) {
-		if (mousePos.y < SCROLL_UP) {
+	if (mousePos.x < ScrollMarginLeft) {
+		if (mousePos.y < ScrollMarginTop) {
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = UI.ArrowSW.Cursor;
@@ -1255,12 +1251,12 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			MouseScrollState = ScrollLeft;
 			GameCursor = UI.ArrowW.Cursor;
 		}
-	} else if (mousePos.x > SCROLL_RIGHT) {
-		if (mousePos.y < SCROLL_UP) {
+	} else if (mousePos.x > (Video.Width - ScrollMarginRight)) {
+		if (mousePos.y < ScrollMarginTop) {
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = UI.ArrowSE.Cursor;
@@ -1270,11 +1266,11 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowE.Cursor;
 		}
 	} else {
-		if (mousePos.y < SCROLL_UP) {
+		if (mousePos.y < ScrollMarginTop) {
 			CursorOn = CursorOnScrollUp;
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;
 			GameCursor = UI.ArrowS.Cursor;
@@ -1586,6 +1582,17 @@ int GetHoldClickDelay()
 void SetHoldClickDelay(int delay)
 {
 	HoldClickDelay = delay;
+}
+
+/**
+ * Configure margins (in pixels) on screen where map scrolling starts.
+ */
+void SetScrollMargins(unsigned int top, unsigned int right, unsigned int bottom, unsigned int left)
+{
+	ScrollMarginTop = top;
+	ScrollMarginBottom = bottom + 1;
+	ScrollMarginLeft = left;
+	ScrollMarginRight = right + 1;
 }
 
 //@}

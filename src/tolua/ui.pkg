@@ -234,6 +234,8 @@ extern void SetDoubleClickDelay(int delay);
 extern int GetHoldClickDelay(void);
 extern void SetHoldClickDelay(int delay);
 
+extern void SetScrollMargins(unsigned int top, unsigned int right, unsigned int bottom, unsigned int left);
+
 extern PixelPos CursorScreenPos;
 
 //

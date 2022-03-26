@@ -344,6 +344,9 @@ extern void UiFindIdleWorker();
 /// Track unit, the viewport follows the unit.
 extern void UiTrackUnit();
 
+/// Scroll margins on screen
+extern void SetScrollMargins(unsigned int top, unsigned int right, unsigned int bottom, unsigned int left);
+
 /// Handle cheats
 extern int HandleCheats(const std::string &input);
 
