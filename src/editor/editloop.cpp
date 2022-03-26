@@ -680,7 +680,7 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string,int,int,in
 		{ TileCursorSize == 2, "2x2" },
 		{ TileCursorSize == 3, "3x3" },
 		{ TileCursorSize == 4, "4x4" },
-		{ TileCursorSize == 10, "5x5" },
+		{ TileCursorSize == 5, "5x5" },
 		{ TileCursorSize == 10, "10x10" }
 	};
 
