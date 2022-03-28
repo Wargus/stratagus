@@ -38,7 +38,7 @@ class COrder_Unload : public COrder
 {
 	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0)
+	COrder_Unload() : COrder(UnitActionUnload), State(0), Retries(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -60,7 +60,7 @@ private:
 	bool LeaveTransporter(CUnit &transporter);
 private:
 	int State;
-	int Range;
+	int Retries;
 	Vec2i goalPos;
 };
 

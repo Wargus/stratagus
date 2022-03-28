@@ -69,7 +69,7 @@
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	file.printf(" \"range\", %d,", this->Range);
+	file.printf(" \"retries\", %d,", this->Retries);
 	if (this->HasGoal()) {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
@@ -83,9 +83,9 @@
 	if (!strcmp("state", value)) {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "range")) {
+	} else if (!strcmp(value, "retries")) {
 		++j;
-		this->Range = LuaToNumber(l, -1, j + 1);
+		this->Retries = LuaToNumber(l, -1, j + 1);
 	} else if (!strcmp(value, "tile")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -215,7 +215,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 */
 static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 {
-	const int maxUnloadRange = 1;
+	constexpr int maxUnloadRange = 1;
 
 	if (!UnitCanBeAt(transporter, pos)) {
 		return false;
@@ -319,29 +319,6 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	return res;
 }
 
-
-/**
-**  Move to dropzone.
-**
-**  @param unit  Pointer to unit.
-**
-**  @return      -1 if unreachable, True if reached, False otherwise.
-*/
-static int MoveToDropZone(CUnit &unit)
-{
-	switch (DoActionMove(unit)) { // reached end-point?
-		case PF_UNREACHABLE:
-			return PF_UNREACHABLE;
-		case PF_REACHED:
-			break;
-		default:
-			return 0;
-	}
-
-	Assert(unit.CurrentAction() == UnitActionUnload);
-	return 1;
-}
-
 /**
 **  Make one or more unit leave the transporter.
 **
@@ -385,21 +362,23 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 	// We still have some units to unload, find a piece of free coast.
 	if (stillonboard) {
-		// We tell it to unload at it's current position. This can't be done,
-		// so it will search for a piece of free coast nearby.
-		this->State = 0;
 		return false;
 	} else {
 		return true;
 	}
 }
 
+constexpr int MAX_SEARCH_RANGE = 20;
+constexpr int MAX_RETRIES = 20;
+constexpr int FIND_DROPZONE_STATE = 0;
+constexpr int MOVE_TO_DROPZONE_STATE = 1;
+constexpr int UNLOAD_STATE = 2;
+
 /* virtual */ void COrder_Unload::Execute(CUnit &unit)
 {
-	const int maxSearchRange = 20;
 
 	if (!unit.CanMove()) {
-		this->State = 2;
+		this->State = UNLOAD_STATE;
 	}
 
 	if (unit.Wait) {
@@ -415,57 +394,56 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
-	if (this->State == 1 && this->Range >= 5) {
+	if (this->Retries >= MAX_RETRIES) {
 		// failed to reach the goal
-		this->State = 2;
+		Assert(!unit.Moving && !unit.Anim.Unbreakable);
+		this->Finished = true;
+		return;
 	}
 
 	switch (this->State) {
-		case 0: // Choose destination
-			if (!this->HasGoal()) {
+		case FIND_DROPZONE_STATE:
+			{
 				Vec2i pos;
-
-				if (!ClosestFreeDropZone(unit, this->goalPos, maxSearchRange, &pos)) {
-					this->Finished = true;
-					return ;
+				if (!ClosestFreeDropZone(unit, this->goalPos, MAX_SEARCH_RANGE, &pos)) {
+					this->Retries = MAX_RETRIES;
+					return;
 				}
 				this->goalPos = pos;
 			}
-
-			this->State = 1;
-		// follow on next case
-		case 1: // Move unit to destination
-			// The Goal is the unit that we have to unload.
-			if (!this->HasGoal()) {
-				const int moveResult = MoveToDropZone(unit);
-
-				// We have to unload everything
-				if (moveResult) {
-					if (moveResult == PF_REACHED) {
-						if (++this->State == 1) {
-							this->Finished = true;
-							return ;
-						}
-					} else if (moveResult == PF_UNREACHABLE) {
-						unit.Wait = 30;
-						this->Range++;
-						break;
-					} else {
-						this->State = 2;
-					}
-				}
-				return ;
+			this->Retries = 0;
+			this->State = MOVE_TO_DROPZONE_STATE;
+			// fall through and move immediately
+		case MOVE_TO_DROPZONE_STATE:
+			switch (DoActionMove(unit)) {
+				case PF_UNREACHABLE:
+					unit.Wait = 5;
+					this->Retries++;
+					return;
+				case PF_REACHED:
+					this->Retries = 0;
+					this->State = 2;
+					break;
+				default:
+					// still moving or waiting to move
+					return;
 			}
-		case 2: { // Leave the transporter
+			// fall through
+		case UNLOAD_STATE:
+			// Leave the transporter
 			// FIXME: show still animations ?
 			if (LeaveTransporter(unit)) {
-				this->Finished = true;
-				return ;
+				this->Retries = MAX_RETRIES;
+			} else {
+				// We tell try to unload from the beginning at it's current position.
+				// Since this didn't work just now, it will search for a piece of free
+				// coast nearby.
+				this->State = FIND_DROPZONE_STATE;
+				this->Retries++;
 			}
-			return ;
-		}
+			break;
 		default:
-			return ;
+			Assert(false);
 	}
 }
 
