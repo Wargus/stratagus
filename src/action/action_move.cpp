@@ -177,7 +177,7 @@ int DoActionMove(CUnit &unit)
 					const CMapField &mf_next = *Map.Field(unit.tilePos + posd + offset);
 					const CMapField &mf_cur = *Map.Field(unit.tilePos + offset);
 
-					if (mf_cur.CoastOnMap() || mf_next.CoastOnMap()) {
+					if (mf_cur.CoastOnMap() ^ mf_next.CoastOnMap()) {
 						foundCoast = true;
 					}
 				}
