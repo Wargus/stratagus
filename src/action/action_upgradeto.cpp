@@ -85,6 +85,7 @@
 */
 static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 {
+	bool removed = false;
 	const CUnitType &oldtype = *unit.Type;
 	if (&oldtype == &newtype) { // nothing to do
 		return 1;
@@ -95,13 +96,24 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (container) {
 		MapUnmarkUnitSight(unit);
 	} else {
-		SaveSelection();
-		unit.Remove(NULL);
-		if (!UnitTypeCanBeAt(newtype, pos)) {
-			unit.Place(unit.tilePos);
-			RestoreSelection();
-			// FIXME unit is not modified, try later ?
-			return 0;
+		// shortcut for quicker checking
+		if (unit.Type->FieldFlags == newtype.FieldFlags &&
+			unit.Type->MovementMask == newtype.MovementMask &&
+			unit.Type->TileHeight == newtype.TileHeight &&
+			unit.Type->TileWidth == newtype.TileWidth) {
+			// the unit is the same size and has the same flags,
+			// it can be here
+		} else {
+			// the new type is sufficiently different, we check
+			// by removing the unit and looking at the map fields
+			removed = true;
+			SaveSelection();
+			unit.Remove(NULL);
+			if (!UnitTypeCanBeAt(newtype, pos)) {
+				unit.Place(unit.tilePos);
+				RestoreSelection();
+				return 0;
+			}
 		}
 	}
 	CPlayer &player = *unit.Player;
@@ -157,8 +169,10 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
-		unit.Place(pos);
-		RestoreSelection();
+		if (removed) {
+			unit.Place(pos);
+			RestoreSelection();
+		}
 	} else {
 		MapMarkUnitSight(unit);
 	}
@@ -285,6 +299,8 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
 		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+		// give resources back
+		player.AddCosts(newstats.Costs);
 		this->Finished = true;
 		return ;
 	}
