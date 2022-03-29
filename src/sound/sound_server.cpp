@@ -60,6 +60,119 @@ static bool EffectsEnabled = true;
 static double VolumeScale = 1.0;
 static int MusicVolume = 0;
 
+static void (*MusicFinishedCallback)();
+
+#ifdef USE_WIN32
+static volatile bool threadWaiting = false;
+static std::string externalFile;
+static HANDLE hWaitingThread;
+static PROCESS_INFORMATION pi;
+
+DWORD WINAPI MyThreadFunction(LPVOID lpParam) {
+	WaitForSingleObject(pi.hProcess, INFINITE);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+	if (threadWaiting) {
+		MusicFinishedCallback();
+		threadWaiting = false;
+	}
+	return 0;
+}
+
+static void killPlayingProcess() {
+	if (threadWaiting) {
+		threadWaiting = false;
+		TerminateProcess(pi.hProcess, 0);
+		WaitForSingleObject(hWaitingThread, INFINITE);
+		threadWaiting = false;
+	} else {
+		TerminateProcess(pi.hProcess, 0);
+	}
+}
+
+static bool External_Play(const std::string &file) {
+	if (threadWaiting && file == externalFile) {
+		return true;
+	}
+
+	static std::string midi = ".mid";
+	auto it = midi.begin();
+	if (file.size() > midi.size() &&
+			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
+		// midi file, use external player, since windows vista+ does not allow midi volume control independent of process volume
+		std::string full_filename = LibraryFileName(file.c_str());
+
+		static const char* midiplayerExe = "stratagus-midiplayer.exe";
+		static const int midiplayerExeSz = strlen(midiplayerExe);
+		
+		// set up a job so our children die with us
+		static bool firstRun = true;
+		static HANDLE hJob;
+		if (firstRun) {
+			hJob = CreateJobObject(NULL, NULL);
+			JOBOBJECT_BASIC_LIMIT_INFORMATION limitInfo;
+			ZeroMemory(&limitInfo, sizeof(limitInfo));
+			limitInfo.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+			SetInformationJobObject(hJob, JobObjectBasicLimitInformation, &limitInfo, sizeof(limitInfo));
+			AssignProcessToJobObject(hJob, GetCurrentProcess());
+			firstRun = false;
+		}
+
+		int sz = midiplayerExeSz + 2 + 3 + 2 + full_filename.size() + 1; // exe + 2 spaces + 3 volume + 2 quotes + filename + nullbyte
+		char *cmdline = new char[sz];
+		snprintf(cmdline, sz, "%s %3d \"%s\"", midiplayerExe, std::min(MusicVolume, 255), full_filename.c_str());
+		DebugPrint("Using external command to play midi on windows: %s\n" _C_ cmdline);
+		killPlayingProcess();
+		STARTUPINFO si;
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+		bool result = true;
+		if (CreateProcess(NULL, cmdline, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+			AssignProcessToJobObject(hJob, pi.hProcess);
+			externalFile = file;
+			hWaitingThread = CreateThread(NULL, 0, MyThreadFunction, NULL, 0, NULL);
+			threadWaiting = true;
+		} else {
+			result = false;
+			DebugPrint("CreateProcess failed (%d).\n" _C_ GetLastError());
+		}
+		delete[] cmdline;
+		return result;
+	}
+	killPlayingProcess();
+	return false;
+}
+
+static bool External_IsPlaying() {
+	return threadWaiting;
+}
+
+static bool External_Stop() {
+	if (External_IsPlaying()) {
+		killPlayingProcess();
+		return true;
+	}
+	return false;
+}
+
+static bool External_Volume(int volume, int oldVolume) {
+	if (External_IsPlaying() && externalFile.size() > 0) {
+		if (oldVolume != volume) {
+			External_Stop();
+			External_Play(externalFile);
+		}
+		return true;
+	}
+	return false;
+}
+#else
+#define External_Play(file) false
+#define External_IsPlaying() false
+#define External_Stop()
+#define External_Volume(volume) false
+#endif
+
 extern volatile bool MusicFinished;
 
 /// Channels for sound effects and unit speech
@@ -334,28 +447,8 @@ bool IsEffectsEnabled()
 */
 void SetMusicFinishedCallback(void (*callback)())
 {
+	MusicFinishedCallback = callback;
 	Mix_HookMusicFinished(callback);
-}
-
-/**
-**  Play a music file.
-**
-**  @param sample  Music sample.
-**
-**  @return        0 if music is playing, -1 if not.
-*/
-int PlayMusic(Mix_Music *sample)
-{
-	if (sample) {
-		Mix_VolumeMusic(MusicVolume);
-		MusicFinished = false;
-		Mix_PlayMusic(sample, 0);
-		Mix_VolumeMusic(MusicVolume / 4.0);
-		return 0;
-	} else {
-		DebugPrint("Could not play sample\n");
-		return -1;
-	}
 }
 
 /**
@@ -371,8 +464,13 @@ int PlayMusic(const std::string &file)
 		return -1;
 	}
 	DebugPrint("play music %s\n" _C_ file.c_str());
-	Mix_Music *music = LoadMusic(file);
 
+	if (External_Play(file)) {
+		MusicFinished = false;
+		return 0;
+	}
+
+	Mix_Music *music = LoadMusic(file);
 	if (music) {
 		MusicFinished = false;
 		Mix_FadeInMusic(music, 0, 200);
@@ -388,6 +486,9 @@ int PlayMusic(const std::string &file)
 */
 void StopMusic()
 {
+	if (External_Stop()) {
+		return;
+	}
 	Mix_FadeOutMusic(200);
 }
 
@@ -400,7 +501,11 @@ void SetMusicVolume(int volume)
 {
 	// due to left-right separation, sound effect volume is effectively halfed,
 	// so we adjust the music
+	int oldVolume = MusicVolume;
 	MusicVolume = volume;
+	if (External_Volume(volume, oldVolume)) {
+		return;
+	}
 	Mix_VolumeMusic(volume / 4.0);
 }
 

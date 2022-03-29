@@ -1265,10 +1265,19 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	add_custom_target(nsis ALL DEPENDS Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX})
 endif()
 
+if (WIN32)
+	add_executable(midiplayer WIN32 "src/sound/win32/midiplayer.c")
+	set_target_properties(midiplayer PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+	set_target_properties(midiplayer PROPERTIES OUTPUT_NAME "stratagus-midiplayer")
+endif()
+
 ########### install files ###############
 
 install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
+if (WIN32)
+	install(TARGETS midiplayer DESTINATION ${GAMEDIR})
+endif()
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
 	install(FILES doc/stratagus.6 DESTINATION ${MANDIR})

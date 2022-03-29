@@ -361,10 +361,7 @@ int PlayMovie(const std::string &name)
 	}
 
 	StopMusic();
-	Mix_Music *sample = LoadMusic(filename);
-	if (sample) {
-		PlayMusic(sample);
-	}
+	PlayMusic(filename);
 
 	EventCallback callbacks;
 

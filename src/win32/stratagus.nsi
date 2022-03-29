@@ -215,6 +215,7 @@ Section "${NAME}"
 
 	SetOutPath $INSTDIR
 	File "${EXE}"
+	File midiplayer.exe
 	File *.dll
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""

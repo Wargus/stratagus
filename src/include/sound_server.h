@@ -88,8 +88,6 @@ extern bool IsEffectsEnabled();
 /// Set the music finished callback
 void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
-extern int PlayMusic(Mix_Music *sample);
-/// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Stop music playing
 extern void StopMusic();
