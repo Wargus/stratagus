@@ -49,6 +49,16 @@
 #include "video.h"
 
 /*----------------------------------------------------------------------------
+--  Constants
+----------------------------------------------------------------------------*/
+
+constexpr int MAX_SEARCH_RANGE = 20;
+constexpr int MAX_RETRIES = 20;
+constexpr int FIND_DROPZONE_STATE = 0;
+constexpr int MOVE_TO_DROPZONE_STATE = 1;
+constexpr int UNLOAD_STATE = 2;
+
+/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -115,7 +125,7 @@
 /* virtual */ void COrder_Unload::UpdatePathFinderData(PathFinderInput &input)
 {
 	input.SetMinRange(0);
-	input.SetMaxRange(0);
+	input.SetMaxRange(this->State == FIND_DROPZONE_STATE ? 1 : 0);
 
 	const Vec2i tileSize(0, 0);
 
@@ -367,12 +377,6 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		return true;
 	}
 }
-
-constexpr int MAX_SEARCH_RANGE = 20;
-constexpr int MAX_RETRIES = 20;
-constexpr int FIND_DROPZONE_STATE = 0;
-constexpr int MOVE_TO_DROPZONE_STATE = 1;
-constexpr int UNLOAD_STATE = 2;
 
 /* virtual */ void COrder_Unload::Execute(CUnit &unit)
 {
