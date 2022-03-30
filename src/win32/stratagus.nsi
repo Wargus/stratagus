@@ -55,7 +55,7 @@
 !define EXE "stratagus.exe"
 ; copy, in case VS put the exe under Release or Debug
 !system "powershell -Command $\"& {cp **\${EXE} ${EXE}}$\""
-
+!system "powershell -Command $\"& {cp **\stratagus-midiplayer.exe stratagus-midiplayer.exe}$\""
 
 !define UNINSTALL "uninstall.exe"
 !define INSTALLER "${NAME}-${VERSION}.exe"
