@@ -356,8 +356,9 @@ unsigned int example9(char* filename, int volume)
 	if(midiStreamRestart(out) != MMSYSERR_NOERROR)
 		goto error6;
 
-	if (midiOutSetVolume((HMIDIOUT)out, (DWORD)((volume & 0xFF) << 4)) != MMSYSERR_NOERROR)
-		goto error6;
+	if (midiOutSetVolume((HMIDIOUT)out, (DWORD)((volume & 0xFF) << 8) | (volume & 0xFF)) != MMSYSERR_NOERROR) {
+		printf("Cannot set volume, will have to use windows application volume control");
+	}
 
 	printf("buffering...\n");
 	get_buffer(tracks, ntracks, streambuf, &streamlen);
