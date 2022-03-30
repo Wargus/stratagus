@@ -120,7 +120,7 @@ static bool External_Play(const std::string &file) {
 
 		int sz = midiplayerExeSz + 2 + 3 + 2 + full_filename.size() + 1; // exe + 2 spaces + 3 volume + 2 quotes + filename + nullbyte
 		char *cmdline = new char[sz];
-		snprintf(cmdline, sz, "%s %3d \"%s\"", midiplayerExe, std::min(MusicVolume, 255), full_filename.c_str());
+		snprintf(cmdline, sz, "%s %3d \"%s\"", midiplayerExe, std::min(MusicVolume, 127), full_filename.c_str());
 		DebugPrint("Using external command to play midi on windows: %s\n" _C_ cmdline);
 		killPlayingProcess();
 		STARTUPINFO si;
@@ -473,7 +473,7 @@ int PlayMusic(const std::string &file)
 	Mix_Music *music = LoadMusic(file);
 	if (music) {
 		MusicFinished = false;
-		Mix_FadeInMusic(music, 0, 200);
+		Mix_PlayMusic(music, 0);
 		return 0;
 	} else {
 		DebugPrint("Could not play %s\n" _C_ file.c_str());
@@ -503,10 +503,8 @@ void SetMusicVolume(int volume)
 	// so we adjust the music
 	int oldVolume = MusicVolume;
 	MusicVolume = volume;
-	if (External_Volume(volume, oldVolume)) {
-		return;
-	}
-	Mix_VolumeMusic(volume / 4.0);
+	Mix_VolumeMusic(MusicVolume);
+	External_Volume(MusicVolume, oldVolume);
 }
 
 /**
