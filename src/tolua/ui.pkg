@@ -205,6 +205,8 @@ class CUserInterface
 	Vec2i EditorSettingsAreaBottomRight;
 	Vec2i EditorButtonAreaTopLeft;
 	Vec2i EditorButtonAreaBottomRight;
+
+	void Load();
 };
 
 extern CUserInterface UI;
@@ -688,3 +690,6 @@ void UiTrackUnit();
 void SetNewViewportMode(ViewportModeType new_mode);
 
 void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
+
+void LoadDecorations();
+void InitUserInterface();

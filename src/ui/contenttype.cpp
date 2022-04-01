@@ -269,7 +269,11 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
 	CGraphic *g = CGraphic::Get(this->graphic);
 	if (g) {
-		g->DrawClip(this->Pos.x, this->Pos.y);
+		if (this->frame) {
+			g->DrawFrameClip(this->frame, this->Pos.x, this->Pos.y);
+		} else {
+			g->DrawClip(this->Pos.x, this->Pos.y);
+		}
 	}
 }
 
@@ -516,7 +520,19 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 
 /* virtual */ void CContentTypeGraphic::Parse(lua_State *l)
 {
-	this->graphic = LuaToString(l, -1);
+	if (lua_isstring(l, -1)) {
+		this->graphic = LuaToString(l, -1);
+		this->frame = 0;
+	} else if (lua_istable(l, -1)) {
+		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+			const char *key = LuaToString(l, -2);
+			if (!strcmp(key, "Graphic")) {
+				this->graphic = LuaToString(l, -1);
+			} else if (!strcmp(key, "Frame")) {
+				this->frame = LuaToNumber(l, -1);
+			}
+		}
+	}
 }
 
 /* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)

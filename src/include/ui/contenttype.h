@@ -155,6 +155,7 @@ public:
 
 private:
 	std::string graphic;
+	int frame;
 };
 
 /**

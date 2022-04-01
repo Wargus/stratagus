@@ -229,8 +229,25 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-			if (condition->Variables[i] != CONDITION_TRUE) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ unit.Variable[i].Enable) {
+			char v = condition->Variables[i];
+			if (v < 0) {
+				// only show for less than -v%
+				if (unit.Variable[i].Enable) {
+					const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
+					if (f >= -v) {
+						return false;
+					}
+				}
+			} else if (v > CONDITION_ONLY) {
+				// only show for more than (v-CONDITION_ONLY)%
+				if (unit.Variable[i].Enable) {
+					const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
+					if (f <= v - CONDITION_ONLY) {
+						return false;
+					}
+				}
+			} else if (v != CONDITION_TRUE) {
+				if ((v == CONDITION_ONLY) ^ unit.Variable[i].Enable) {
 					return false;
 				}
 			}

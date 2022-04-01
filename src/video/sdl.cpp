@@ -497,10 +497,6 @@ void InitVideoSdl()
 	ColorGreen = Video.MapRGB(TheScreen->format, 0, 252, 0);
 	ColorYellow = Video.MapRGB(TheScreen->format, 252, 252, 0);
 
-	for(std::vector<std::string>::iterator it = UI.LifeBarColorNames.begin(); it != UI.LifeBarColorNames.end(); ++it) {
-		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName((*it).c_str())));
-	}
-
 	UI.MouseWarpPos.x = UI.MouseWarpPos.y = -1;
 }
 

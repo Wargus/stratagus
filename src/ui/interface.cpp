@@ -866,7 +866,7 @@ static void InputKey(int key)
 			} else
 #endif
 				if (!IsNetworkGame()) {
-					if (!GameObserve && !GamePaused && !GameEstablishing) {
+					if (!GameObserve && !GameEstablishing) {
 						if (HandleCheats(Input)) {
 							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
 						}
