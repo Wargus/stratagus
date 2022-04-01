@@ -169,8 +169,8 @@ static bool External_Volume(int volume, int oldVolume) {
 #else
 #define External_Play(file) false
 #define External_IsPlaying() false
-#define External_Stop()
-#define External_Volume(volume) false
+#define External_Stop() false
+#define External_Volume(volume, oldVolume) false
 #endif
 
 extern volatile bool MusicFinished;
