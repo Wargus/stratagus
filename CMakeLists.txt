@@ -125,6 +125,7 @@ set(animation_SRCS
 	src/animation/animation_spawnunit.cpp
 	src/animation/animation_unbreakable.cpp
 	src/animation/animation_wait.cpp
+	src/animation/animation_wiggle.cpp
 )
 source_group(animation FILES ${animation_SRCS})
 
@@ -507,6 +508,7 @@ set(stratagus_animation_HDRS
 	src/include/animation/animation_spawnunit.h
 	src/include/animation/animation_unbreakable.h
 	src/include/animation/animation_wait.h
+	src/include/animation/animation_wiggle.h
 )
 
 set(stratagus_spell_HDRS

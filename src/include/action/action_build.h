@@ -63,6 +63,8 @@ public:
 	const CUnitType &GetUnitType() const { return *Type; }
 	virtual const Vec2i GetGoalPos() const;
 
+	CUnit *GetBuildingUnit() const;
+
 private:
 	bool MoveToLocation(CUnit &unit);
 	CUnit *CheckCanBuild(CUnit &unit);

@@ -37,6 +37,7 @@
 #include "stratagus.h"
 
 #include "action/action_spellcast.h"
+#include "action/action_build.h"
 
 #include "animation.h"
 
@@ -61,6 +62,7 @@
 #include "animation/animation_spawnunit.h"
 #include "animation/animation_unbreakable.h"
 #include "animation/animation_wait.h"
+#include "animation/animation_wiggle.h"
 
 #include "actions.h"
 #include "iolib.h"
@@ -150,6 +152,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		if (s[0] == 't') {
 			if (unit.CurrentOrder()->HasGoal()) {
 				goal = unit.CurrentOrder()->GetGoal();
+			} else if (unit.CurrentOrder()->Action == UnitActionBuild) {
+				goal = static_cast<const COrder_Build *>(unit.CurrentOrder())->GetBuildingUnit();
 			} else {
 				return 0;
 			}
@@ -254,6 +258,14 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	} else if (s[0] == 'l') { //player number
 		return ParseAnimPlayer(unit, cur);
 
+	} else if (s[0] == 'U') { //unit itself
+		return UnitNumber(unit);
+	} else if (s[0] == 'G') { //goal
+		if (unit.CurrentOrder()->HasGoal()) {
+			return UnitNumber(*unit.CurrentOrder()->GetGoal());
+		} else {
+			return 0;
+		}
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');
@@ -614,6 +626,8 @@ static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
 		anim = new CAnimation_RandomGoto;
 	} else if (op1 == "lua-callback") {
 		anim = new CAnimation_LuaCallback;
+	} else if (op1 == "wiggle") {
+		anim = new CAnimation_Wiggle;
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}

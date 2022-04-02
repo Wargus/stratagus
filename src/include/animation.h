@@ -73,7 +73,8 @@ enum AnimationType {
 	AnimationSetVar,
 	AnimationSetPlayerVar,
 	AnimationDie,
-	AnimationLuaCallback
+	AnimationLuaCallback,
+	AnimationWiggle,
 };
 
 //Modify types

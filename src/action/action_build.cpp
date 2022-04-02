@@ -431,6 +431,11 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	return this->BuildingUnit->CurrentAction() != UnitActionBuilt;
 }
 
+CUnit *COrder_Build::GetBuildingUnit() const
+{
+	return this->BuildingUnit;
+}
+
 /* virtual */ void COrder_Build::UpdateUnitVariables(CUnit &unit) const
 {
 	if (this->State == State_BuildFromOutside && this->BuildingUnit != NULL) {
