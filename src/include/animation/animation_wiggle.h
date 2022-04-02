@@ -38,7 +38,7 @@
 class CAnimation_Wiggle : public CAnimation
 {
 public:
-	CAnimation_Wiggle() : CAnimation(AnimationWiggle), isHeading(false), deltaSpeed(""), gotoLabel(NULL), notReachedLabel(NULL) {}
+	CAnimation_Wiggle() : CAnimation(AnimationWiggle), isHeading(false) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
