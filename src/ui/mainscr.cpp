@@ -237,6 +237,8 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 					if (f >= -v) {
 						return false;
 					}
+				} else {
+					return false;
 				}
 			} else if (v > CONDITION_ONLY) {
 				// only show for more than (v-CONDITION_ONLY)%
@@ -245,6 +247,8 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 					if (f <= v - CONDITION_ONLY) {
 						return false;
 					}
+				} else {
+					return false;
 				}
 			} else if (v != CONDITION_TRUE) {
 				if ((v == CONDITION_ONLY) ^ unit.Variable[i].Enable) {
