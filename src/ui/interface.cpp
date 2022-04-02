@@ -847,7 +847,7 @@ static void InputKey(int key)
 			removeCursorFromInput();		
 			// save to history
 			strncpy(InputHistory + (InputHistoryIdx * sizeof(Input)), Input, sizeof(Input));
-			if (InputHistorySize < MaxInputHistorySize) {
+			if (InputHistorySize < MaxInputHistorySize - 1) {
 				InputHistorySize++;
 				InputHistoryIdx = InputHistorySize;
 			} else {
