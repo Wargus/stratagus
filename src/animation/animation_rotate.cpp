@@ -38,6 +38,8 @@
 #include "animation/animation_rotate.h"
 
 #include "actions.h"
+#include "action/action_build.h"
+#include "tile.h"
 #include "unit.h"
 
 /**
@@ -56,15 +58,23 @@ void UnitRotate(CUnit &unit, int rotate)
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (!strcmp(this->rotateStr.c_str(), "target") && unit.CurrentOrder()->HasGoal()) {
-		COrder &order = *unit.CurrentOrder();
-		const CUnit &target = *order.GetGoal();
-		if (target.Destroyed) {
-			order.ClearGoal();
-			return;
+	if (!strcmp(this->rotateStr.c_str(), "target")) {
+		COrder *order = unit.CurrentOrder();
+		CUnit *target;
+		if (order->HasGoal()) {
+			target = order->GetGoal();
+			if (target->Destroyed) {
+				order->ClearGoal();
+				return;	
+			}
+		} else if (unit.CurrentOrder()->Action == UnitActionBuild) {
+			target = static_cast<const COrder_Build *>(order)->GetBuildingUnit();
 		}
-		const Vec2i pos = target.tilePos + target.Type->GetHalfTileSize() - unit.tilePos;
-		UnitHeadingFromDeltaXY(unit, pos);
+		Vec2i dpos = target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos;
+		Vec2i doff = Vec2i(target->IX / 2, target->IY / 2) - Vec2i(unit.IX, unit.IY);
+		dpos.x += doff.x / PixelTileSize.x;
+		dpos.y += doff.y / PixelTileSize.y;
+		UnitHeadingFromDeltaXY(unit, dpos);
 	} else {
 		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
 	}
