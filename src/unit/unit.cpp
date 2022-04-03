@@ -601,9 +601,16 @@ bool CUnit::IsAlive() const
 
 int CUnit::GetDrawLevel() const
 {
-	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-			Type->CorpseType->DrawLevel :
-			((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));;
+	if (Type->CorpseType && CurrentAction() == UnitActionDie) {
+		return Type->CorpseType->DrawLevel;
+	} else if (CurrentAction() == UnitActionDie) {
+		return Type->DrawLevel - 10;
+	} else if (CurrentAction() == UnitActionBuilt) {
+		// TODO: configurable?
+		return Type->DrawLevel - 10;
+	} else {
+		return Type->DrawLevel;
+	}
 }
 
 /**
