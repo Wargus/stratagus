@@ -52,6 +52,55 @@
 		y *= Heading2Y[unit.Direction / NextDirection];
 		unit.IX += x;
 		unit.IY += y;
+	} else if (this->ifNotReached) {
+		int targetX = x * PixelTileSize.x;
+		int targetY = y * PixelTileSize.y;
+		int curX = unit.tilePos.x * PixelTileSize.x + unit.IX;
+		int curY = unit.tilePos.y * PixelTileSize.y + unit.IY;
+		int speed = ParseAnimInt(unit, this->speed.c_str());
+
+		bool reachedX = curX == targetX;
+		if (reachedX && curY == targetY) {
+			return;
+		}
+
+		// watch out for overflow: IX/IY are only signed chars
+		// we treat the target as reached if we cannot get closer
+
+		signed char newDisplacement;
+		if (curX > targetX) {
+			newDisplacement = unit.IX - speed;
+			if (newDisplacement < unit.IX) {
+				unit.IX = newDisplacement;
+			} else {
+				reachedX = true;
+			}
+		} else if (curX < targetX) {
+			newDisplacement = unit.IX + speed;
+			if (newDisplacement > unit.IX) {
+				unit.IX = newDisplacement;
+			} else {
+				reachedX = true;
+			}
+		}
+		if (curY > targetY) {
+			newDisplacement = unit.IY - speed;
+			if (newDisplacement < unit.IY) {
+				unit.IY = newDisplacement;
+			} else if (reachedX) {
+				return;
+			}
+		} else if (curY < targetY) {
+			newDisplacement = unit.IY + speed;
+			if (newDisplacement > unit.IY) {
+				unit.IY = newDisplacement;
+			} else if (reachedX) {
+				return;
+			}
+		} else if (reachedX) {
+			return;
+		}
+		unit.Anim.Anim = this->ifNotReached;
 	} else {
 		unit.IX += x;
 		unit.IY += y;
@@ -73,10 +122,15 @@
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
-	std::string mode(str, begin, end - begin);
-	if (mode == "absolute") {
-	} else if (mode == "heading") {
+	this->speed.assign(str, begin, end - begin);
+	if (this->speed == "absolute") {
+	} else if (this->speed == "heading") {
 		this->isHeading = true;
+	} else {
+		begin = std::min(len, str.find_first_not_of(' ', end));
+		end = std::min(len, str.find(' ', begin));
+		std::string label(str, begin, end - begin);
+		FindLabelLater(&this->ifNotReached, label);
 	}
 }
 
