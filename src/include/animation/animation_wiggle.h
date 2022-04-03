@@ -38,7 +38,7 @@
 class CAnimation_Wiggle : public CAnimation
 {
 public:
-	CAnimation_Wiggle() : CAnimation(AnimationWiggle), isHeading(false) {}
+	CAnimation_Wiggle() : CAnimation(AnimationWiggle), isHeading(false), speed(0), ifNotReached(NULL) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);
@@ -47,6 +47,8 @@ private:
 	std::string x;
 	std::string y;
 	bool isHeading;
+	std::string speed;
+	CAnimation *ifNotReached;
 };
 
 //@}
