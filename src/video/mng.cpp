@@ -181,7 +181,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 
 
 Mng::Mng() :
-	name(NULL), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
+	name(""), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
 	ticks(0), iteration(0), is_dirty(false)
 {
 }
