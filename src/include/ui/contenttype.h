@@ -142,6 +142,10 @@ public:
 
 private:
 	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
+	unsigned ButtonIcon:1;
+	unsigned SingleSelectionIcon:1;
+	unsigned GroupSelectionIcon:1;
+	unsigned TransportIcon:1;
 };
 
 /**

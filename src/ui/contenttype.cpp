@@ -257,8 +257,16 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
 	if (unitToDraw && unitToDraw->Type->Icon.Icon) {
-		unitToDraw->Type->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
-			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
+		if (this->ButtonIcon) {
+			unitToDraw->Type->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
+				unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
+		} else if (this->SingleSelectionIcon) {
+			unitToDraw->Type->Icon.Icon->DrawSingleSelectionIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "", *unitToDraw);
+		} else if (this->GroupSelectionIcon) {
+			unitToDraw->Type->Icon.Icon->DrawGroupSelectionIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "", *unitToDraw);
+		} else if (this->TransportIcon) {
+			unitToDraw->Type->Icon.Icon->DrawContainedIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "", *unitToDraw);
+		}
 	}
 }
 
@@ -508,10 +516,33 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 
 /* virtual */ void CContentTypeIcon::Parse(lua_State *l)
 {
+	SingleSelectionIcon = GroupSelectionIcon = TransportIcon = 0;
+	ButtonIcon = 1;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Unit")) {
 			this->UnitRef = Str2EnumUnit(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "SingleSelection")) {
+			bool flag = LuaToBoolean(l, -1);
+			if (!ButtonIcon && flag) {
+				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
+			}
+			ButtonIcon = !flag;
+			SingleSelectionIcon = flag;
+		} else if (!strcmp(key, "GroupSelection")) {
+			bool flag = LuaToBoolean(l, -1);
+			if (!ButtonIcon && flag) {
+				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
+			}
+			ButtonIcon = !flag;
+			GroupSelectionIcon = flag;
+		} else if (!strcmp(key, "TransportSelection")) {
+			bool flag = LuaToBoolean(l, -1);
+			if (!ButtonIcon && flag) {
+				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
+			}
+			ButtonIcon = !flag;
+			TransportIcon = flag;
 		} else {
 			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key);
 		}
