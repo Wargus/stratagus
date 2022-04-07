@@ -446,7 +446,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
 #ifdef USE_MNG
-	if (type.Portrait.Num) {
+	if (UI.SingleSelectedButton && type.Portrait.Num) {
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
@@ -1187,6 +1187,13 @@ static void InfoPanel_draw_multiple_selection()
 {
 	//  If there are more units selected draw their pictures and a health bar
 	DrawInfoPanelBackground(0);
+
+#ifdef USE_MNG
+	if (Selected[0]->Type->Portrait.Num) {
+		DrawUnitInfo_portrait(*Selected[i]);
+	}
+#endif
+
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
