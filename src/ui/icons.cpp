@@ -72,6 +72,7 @@ CIcon::~CIcon()
 {
 	CPlayerColorGraphic::Free(this->G);
 	CPlayerColorGraphic::Free(this->GScale);
+	ClearExtraGraphics();
 }
 
 /**
@@ -117,6 +118,24 @@ void CIcon::Load()
 	if (Frame >= G->NumFrames) {
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
 		Frame = 0;
+	}
+	for (auto g : this->SingleSelectionG) {
+		g->Load();
+		if (Frame >= G->NumFrames) {
+			DebugPrint("Invalid icon frame for single selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		}
+	}
+	for (auto g : this->GroupSelectionG) {
+		g->Load();
+		if (Frame >= G->NumFrames) {
+			DebugPrint("Invalid icon frame for group selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		}
+	}
+	for (auto g : this->ContainedG) {
+		g->Load();
+		if (Frame >= G->NumFrames) {
+			DebugPrint("Invalid icon frame for transport selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		}
 	}
 }
 
@@ -169,6 +188,65 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 		DebugPrint("Enable grayscale icon drawing in your game to achieve special effects for cooldown spell icons");
 		this->DrawIcon(pos);
 	}
+}
+
+static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGraphic *> &graphics,
+						const ButtonStyle &style, unsigned flags,
+						const PixelPos &pos, const std::string &text, const CUnit &unit) {
+	int playerColor = unit.RescuedFrom
+				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
+				: GameSettings.Presets[unit.Player->Index].PlayerColor;
+	int sz = graphics.size();
+	if (!sz) {
+		icon->DrawUnitIcon(style, flags, pos, text, playerColor);
+	} else {
+		// TODO: we could have this more configurable?
+		int graphicIdx = ((sz - 1) * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+		ButtonStyle s(style);
+		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = graphics[graphicIdx];
+		s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = icon->Frame;
+		DrawUIButton(&s, flags, pos.x, pos.y, text, playerColor);
+	}
+}
+
+void CIcon::DrawSingleSelectionIcon(const ButtonStyle &style, unsigned flags,
+						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
+{
+	DrawByHealthIcon(this, this->SingleSelectionG, style, flags, pos, text, unit);
+}
+
+void CIcon::DrawGroupSelectionIcon(const ButtonStyle &style, unsigned flags,
+						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
+{
+	DrawByHealthIcon(this, this->GroupSelectionG, style, flags, pos, text, unit);
+}
+
+void CIcon::DrawContainedIcon(const ButtonStyle &style, unsigned flags,
+						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
+{
+	DrawByHealthIcon(this, this->ContainedG, style, flags, pos, text, unit);
+}
+
+void CIcon::ClearExtraGraphics()
+{
+	this->SingleSelectionG.clear();
+	this->GroupSelectionG.clear();
+	this->ContainedG.clear();
+}
+
+void CIcon::AddSingleSelectionGraphic(CPlayerColorGraphic *g)
+{
+	this->SingleSelectionG.push_back(g);
+}
+
+void CIcon::AddGroupSelectionGraphic(CPlayerColorGraphic *g)
+{
+	this->GroupSelectionG.push_back(g);
+}
+
+void CIcon::AddContainedGraphic(CPlayerColorGraphic *g)
+{
+	this->ContainedG.push_back(g);
 }
 
 /**

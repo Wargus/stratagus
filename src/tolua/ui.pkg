@@ -219,6 +219,11 @@ class CIcon
 	tolua_readonly tolua_property__s std::string Ident;
 	CPlayerColorGraphic *G;
 	int Frame;
+
+	void ClearExtraGraphics();
+	void AddSingleSelectionGraphic(CPlayerColorGraphic *g);
+	void AddGroupSelectionGraphic(CPlayerColorGraphic *g);
+	void AddContainedGraphic(CPlayerColorGraphic *g);
 };
 
 extern ButtonStyle *FindButtonStyle(const std::string style);

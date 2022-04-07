@@ -468,9 +468,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom
-			? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
-			: GameSettings.Presets[unit.Player->Index].PlayerColor);
+		type.Icon.Icon->DrawSingleSelectionIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit);
 	}
 }
 
@@ -527,9 +525,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom
-			? GameSettings.Presets[uins->RescuedFrom->Index].PlayerColor
-			: GameSettings.Presets[uins->Player->Index].PlayerColor);
+		icon.DrawContainedIcon(*UI.TransportingButtons[j].Style, flag, pos, "", *uins);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -1190,19 +1186,17 @@ static void InfoPanel_draw_multiple_selection()
 
 #ifdef USE_MNG
 	if (Selected[0]->Type->Portrait.Num) {
-		DrawUnitInfo_portrait(*Selected[i]);
+		DrawUnitInfo_portrait(*Selected[0]);
 	}
 #endif
 
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
-		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+		icon.DrawGroupSelectionIcon(*UI.SelectedButtons[i].Style,
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
-						  pos, "", Selected[i]->RescuedFrom
-						  ? GameSettings.Presets[Selected[i]->RescuedFrom->Index].PlayerColor
-						  : GameSettings.Presets[Selected[i]->Player->Index].PlayerColor);
+						  pos, "", *Selected[i]);
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {

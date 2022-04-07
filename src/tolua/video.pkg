@@ -35,6 +35,7 @@ class CPlayerColorGraphic : public CGraphic
 {
 public:
 	static CPlayerColorGraphic *New(const std::string file, int w = 0, int h = 0);
+	static CPlayerColorGraphic *ForceNew(const std::string file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *Get(const std::string file);
 };
 
