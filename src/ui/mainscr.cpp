@@ -442,10 +442,8 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
-static void DrawUnitInfo_portrait(const CUnit &unit)
+static bool DrawTypePortrait(const CUnitType &type)
 {
-	const CUnitType &type = *unit.Type;
-#ifdef USE_MNG
 	if (UI.SingleSelectedButton && type.Portrait.Num) {
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
@@ -460,6 +458,16 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 				type.Portrait.NumIterations = MyRand() % 16 + 1;
 			}
 		}
+		return true;
+	}
+	return false;
+}
+
+static void DrawUnitInfo_portrait(const CUnit &unit)
+{
+	const CUnitType &type = *unit.Type;
+#ifdef USE_MNG
+	if (DrawTypePortrait(type)) {
 		return;
 	}
 #endif
@@ -1110,40 +1118,50 @@ static void InfoPanel_draw_no_selection()
 		&& !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		// FIXME: not correct for enemies units
 		DrawUnitInfo(*UnitUnderCursor);
-	} else if (Preference.ShowNoSelectionStats) {
-		// FIXME: need some cool ideas for this.
-		int x = UI.InfoPanel.X + 16;
-		int y = UI.InfoPanel.Y + 8;
+	} else {
+#ifdef USE_MNG
+		if (UI.DefaultUnitPortrait.size() > 0) {
+			CUnitType *type = UnitTypeByIdent(UI.DefaultUnitPortrait);
+			if (type) {
+				DrawTypePortrait(*type);
+			}
+		}
+#endif
+		if (Preference.ShowNoSelectionStats) {
+			// FIXME: need some cool ideas for this.
+			int x = UI.InfoPanel.X + 16;
+			int y = UI.InfoPanel.Y + 8;
 
-		CLabel label(GetGameFont());
-		label.Draw(x, y, "Stratagus");
-		y += 16;
-		label.Draw(x, y,  _("Cycle:"));
-		label.Draw(x + 48, y, GameCycle);
-		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
-		y += 20;
+			CLabel label(GetGameFont());
+			label.Draw(x, y, "Stratagus");
+			y += 16;
+			label.Draw(x, y,  _("Cycle:"));
+			label.Draw(x + 48, y, GameCycle);
+			label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+			y += 20;
 
-		std::string nc;
-		std::string rc;
+			std::string nc;
+			std::string rc;
 
-		GetDefaultTextColors(nc, rc);
-		for (int i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerTypes::PlayerNobody) {
-				if (ThisPlayer->IsAllied(Players[i])) {
-					label.SetNormalColor(FontGreen);
-				} else if (ThisPlayer->IsEnemy(Players[i])) {
-					label.SetNormalColor(FontRed);
-				} else {
-					label.SetNormalColor(nc);
+			GetDefaultTextColors(nc, rc);
+			for (int i = 0; i < PlayerMax - 1; ++i) {
+				if (Players[i].Type != PlayerTypes::PlayerNobody) {
+					if (ThisPlayer->IsAllied(Players[i])) {
+						label.SetNormalColor(FontGreen);
+					} else if (ThisPlayer->IsEnemy(Players[i])) {
+						label.SetNormalColor(FontRed);
+					} else {
+						label.SetNormalColor(nc);
+					}
+					label.Draw(x + 15, y, i);
+
+					Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
+					Video.FillRectangleClip(PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], x + 1, y + 1, 10, 10);
+
+					label.Draw(x + 27, y, Players[i].Name);
+					label.Draw(x + 117, y, Players[i].Score);
+					y += 14;
 				}
-				label.Draw(x + 15, y, i);
-
-				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
-				Video.FillRectangleClip(PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], x + 1, y + 1, 10, 10);
-
-				label.Draw(x + 27, y, Players[i].Name);
-				label.Draw(x + 117, y, Players[i].Score);
-				y += 14;
 			}
 		}
 	}
