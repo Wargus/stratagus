@@ -451,7 +451,7 @@ static bool DrawTypePortrait(const CUnitType &type)
 			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
 			if (type.Portrait.CurrMng == 0) {
-				type.Portrait.CurrMng = (MyRand() % (type.Portrait.Num - 1)) + 1;
+				type.Portrait.CurrMng = (MyRand() % (type.Portrait.Num - type.Portrait.Talking - 1)) + 1;
 				type.Portrait.NumIterations = 1;
 			} else {
 				type.Portrait.CurrMng = 0;
