@@ -549,6 +549,7 @@ public:
 	struct _portrait_ {
 		std::string *Files;
 		int Num;
+		int Talking; /// offset into portraits for talking portraits
 		Mng **Mngs;
 		mutable int CurrMng;
 		mutable int NumIterations;

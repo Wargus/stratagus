@@ -589,11 +589,18 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			type->Portrait.Num = subargs;
+			type->Portrait.Talking = 0;
 			type->Portrait.Files = new std::string[type->Portrait.Num];
 			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
 			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
 			for (int k = 0; k < subargs; ++k) {
-				type->Portrait.Files[k] = LuaToString(l, -1, k + 1);
+				const char *s = LuaToString(l, -1, k + 1);
+				if (!strcmp("talking", s)) {
+					type->Portrait.Talking = k;
+					type->Portrait.Num--;
+				} else {
+					type->Portrait.Files[k - (type->Portrait.Talking ? 1 : 0)] = s;
+				}
 			}
 #endif
 		} else if (!strcmp(value, "Costs")) {
