@@ -1063,16 +1063,20 @@ static inline void dither(SDL_Surface *Surface) {
 void CGraphic::MakeShadow()
 {
 	if (Surface->format->BytesPerPixel == 1) {
-		SDL_Color colors[256];
-
-		// Set all colors in the palette to black and use dithering for alpha
-		memset(colors, 0, sizeof(colors));
-		SDL_SetPaletteColors(Surface->format->palette, colors, 0, 256);
-		dither(Surface);
+		SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
+		SDL_BlitSurface(Surface, NULL, alphaSurface, NULL);
+		SDL_SetSurfaceAlphaMod(alphaSurface, 80);
+		SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
+		SDL_FreeSurface(Surface);
+		Surface = alphaSurface;
 
 		if (SurfaceFlip) {
-			SDL_SetPaletteColors(SurfaceFlip->format->palette, colors, 0, 256);
-			dither(Surface);
+			SDL_Surface *alphaSurfaceFlip = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
+			SDL_BlitSurface(SurfaceFlip, NULL, alphaSurfaceFlip, NULL);
+			SDL_SetSurfaceAlphaMod(alphaSurfaceFlip, 80);
+			SDL_SetSurfaceColorMod(alphaSurfaceFlip, 0, 0, 0);
+			SDL_FreeSurface(SurfaceFlip);
+			SurfaceFlip = alphaSurfaceFlip;
 		}
 	}
 }
