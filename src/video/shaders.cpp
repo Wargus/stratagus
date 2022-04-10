@@ -402,6 +402,16 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	return true;
 }
 
+/**
+** <b>Description</b>
+**
+**  Get the active shader.
+**
+** Example:
+**
+** <div class="example"><code>shader_name = <strong>GetShader</strong>()
+**	print(shader_name)</code></div>
+*/
 static int CclGetShader(lua_State *l) {
 	LuaCheckArgs(l, 0);
 	const char* shaderName = shaderNames[currentShaderIdx];
@@ -413,6 +423,16 @@ static int CclGetShader(lua_State *l) {
 	return 1;
 }
 
+/**
+** <b>Description</b>
+**
+**  Apply a shader.
+**
+** Example:
+**
+** <div class="example"><code>-- Apply a VHS shader
+**	<strong>SetShader</strong>("VHS")</code></div>
+*/
 static int CclSetShader(lua_State *l) {
 	LuaCheckArgs(l, 1);
 	const char* shaderName = LuaToString(l, 1);
@@ -434,6 +454,18 @@ static int CclSetShader(lua_State *l) {
 	return 1;
 }
 
+/**
+** <b>Description</b>
+**
+**  Get the list of shaders.
+**
+** Example:
+**
+** <div class="example"><code>shaders = <strong>GetShaderNames</strong>()
+**	for i,name in ipairs(shaders) do
+**		print(name)
+**	end</code></div>
+*/
 static int CclGetShaderNames(lua_State *l) {
 	LuaCheckArgs(l, 0);
 	lua_newtable(l);
