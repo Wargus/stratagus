@@ -94,6 +94,11 @@ static int CclSetTrainingQueue(lua_State *l)
 **  @param l  Lua state.
 **
 **  @return   The old state of the flag
+**
+** Example:
+**
+** <div class="example"><code><strong>SetBuildingCapture</strong>(true)
+**	<strong>SetBuildingCapture</strong>(false)</code></div>
 */
 static int CclSetBuildingCapture(lua_State *l)
 {
@@ -108,6 +113,11 @@ static int CclSetBuildingCapture(lua_State *l)
 **  @param l  Lua state.
 **
 **  @return   The old state of the flag
+**
+** Example:
+**
+** <div class="example"><code><strong>SetRevealAttacker</strong>(true)
+**	<strong>SetRevealAttacker</strong>(false)</code></div>
 */
 static int CclSetRevealAttacker(lua_State *l)
 {
@@ -120,6 +130,15 @@ static int CclSetRevealAttacker(lua_State *l)
 **  Set cost multiplier to RepairCost for buildings additional workers helping (0 = no additional cost)
 **
 **  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- No cost
+**	<strong>ResourcesMultiBuildersMultiplier</strong>(0)
+**	-- Each builder helping will cost 1 resource
+**	<strong>ResourcesMultiBuildersMultiplier</strong>(1)
+**	-- Each builder helping will cost 10 resource
+**	<strong>ResourcesMultiBuildersMultiplier</strong>(10)</code></div>
 */
 static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 {
@@ -282,6 +301,26 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 **
 **  @todo  Verify that vision table is always correct (transporter)
 **  @todo (PlaceUnit() and host-info).
+**
+** Example:
+**
+** <div class="example"><code>footman = CreateUnit("unit-footman", 0, {0, 1})
+**	-- The unit will appear selected
+**	<strong>Unit</strong>(footman,{"selected"})
+**	-- The unit will be considered destroyed
+**	<strong>Unit</strong>(footman,{"destroyed"})
+**	-- The unit will be considered removed
+**	<strong>Unit</strong>(footman,{"removed"})
+**	-- The unit will be considered as a summoned unit
+**	<strong>Unit</strong>(footman,{"summoned",500})
+**	-- The unit will face on south
+**	<strong>Unit</strong>(footman,{"direction",0})
+**	-- The unit will be displayed with his 3rd frame
+**	<strong>Unit</strong>(footman,{"frame", 3})
+**	-- The footman will have a high sight
+**	<strong>Unit</strong>(footman,{"current-sight-range",9})
+**	-- Change the unit color to be the ones from player 1
+**	<strong>Unit</strong>(footman,{"rescued-from",1})</code></div>
 */
 static int CclUnit(lua_State *l)
 {
@@ -615,6 +654,13 @@ static int CclUnit(lua_State *l)
 **  @param l  Lua state.
 **
 **  @return   Returns the slot number of the made placed.
+**
+** Example:
+**
+** <div class="example"><code>-- Create the unit
+**	footman = CreateUnit("unit-footman", 0, {7, 4})
+**	-- Move the unit to position 20 (x) and 10 (y)
+**	<strong>MoveUnit</strong>(footman,{20,10})</code></div>
 */
 static int CclMoveUnit(lua_State *l)
 {
@@ -1065,6 +1111,14 @@ static int CclKillUnitAt(lua_State *l)
 **  @param l  Lua state.
 **
 **  @return   Array of units.
+**
+** Example:
+**
+** <div class="example"><code>-- Get units from player 0
+**	units = <strong>GetUnits</strong>(0)
+**	for i, id_unit in ipairs(units) do
+**	    print(id_unit)
+**	end</code></div>
 */
 static int CclGetUnits(lua_State *l)
 {
@@ -1294,9 +1348,7 @@ static int CclGetUnitVariable(lua_State *l)
 **
 ** Example:
 **
-** <div class="example">
-** <code>
-** -- Create a blacksmith for player 2
+** <div class="example"><code>-- Create a blacksmith for player 2
 ** blacksmith = CreateUnit("unit-human-blacksmith", 2, {66, 71})
 ** -- Specify the amount of hit points to assign to the blacksmith
 ** <strong>SetUnitVariable</strong>(blacksmith,"HitPoints",344)

@@ -1800,6 +1800,10 @@ static int CclInverseVideo(lua_State *l)
 **  @param l  Lua state.
 **
 **  @return   equivalent lua table.
+**
+** Example:
+**
+** <div class="example"><code>u_data = <strong>UnitType</strong>("unit-footman")</code></div>
 */
 static int CclUnitName(lua_State *l)
 {
