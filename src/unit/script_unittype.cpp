@@ -2182,6 +2182,83 @@ static int CclDefineExtraDeathTypes(lua_State *l)
 	}
 	return 0;
 }
+
+static int CclDefinePaletteSwap(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	const char *iconName = LuaToString(l, 1);
+	CIcon *icon = CIcon::Get(iconName);
+	if (!icon) {
+		LuaError(l, "icon %s not found" _C_ iconName);
+	}
+
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument");
+	}
+	const int subargs = lua_rawlen(l, 2);
+	std::vector<PaletteSwap> newSwaps;
+	for (int k = 0; k < subargs; k += 2) {
+		const char *value = LuaToString(l, 2, k + 1);
+		int index = UnitTypeVar.VariableNameLookup[value];
+		if (index == -1) {
+			LuaError(l, "unknown variable name %s" _C_ value);
+		}
+
+		lua_rawgeti(l, 2, k + 2); // swap table
+		if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
+			LuaError(l, "incorrect argument, need length 2 table with {startColorIndex, { ... color steps ... }");
+		}
+		int startColorIndex = LuaToNumber(l, -1, 1);
+
+		lua_rawgeti(l, -1, 2); // swap table, steps table
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "incorrect argument, need table with color steps");
+		}
+
+		int steps = lua_rawlen(l, -1);
+		std::vector<CColor> colors;
+		int colorCount = 0;
+		int alternativesCount = 0;
+		for (int step = 0; step < steps; step++) {
+			lua_rawgeti(l, -1, step + 1); // swap table, steps table, alternatives table
+			if (alternativesCount) {
+				if (lua_rawlen(l, -1) != alternativesCount) {
+					LuaError(l, "incorrect argument, need table with %d alternatives, got %d" _C_ alternativesCount _C_ lua_rawlen(l, -1));
+				}
+			} else {
+				alternativesCount = lua_rawlen(l, -1);
+			}
+			for (int alt = 0; alt < alternativesCount; alt++) {
+				lua_rawgeti(l, -1, alt + 1); // swap table, steps table, alternatives table, color table
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument, need table with colors");
+				}
+				if (colorCount) {
+					if (lua_rawlen(l, -1) != colorCount) {
+						LuaError(l, "incorrect argument, need table with %d colors, got %d" _C_ colorCount _C_ lua_rawlen(l, -1));
+					}
+				} else {
+					colorCount = lua_rawlen(l, -1);
+				}
+				for (int color = 0; color < colorCount; color++) {
+					lua_rawgeti(l, -1, color + 1);
+					CColor c;
+					c.Parse(l);
+					colors.push_back(c);
+					lua_pop(l, 1);
+				}
+				lua_pop(l, 1); // swap table, steps table, alternatives table
+			}
+			lua_pop(l, 1);  // swap table, steps table
+		}
+		lua_pop(l, 1); // swap table
+		lua_pop(l, 1); // <emtpy>
+		newSwaps.emplace_back(index, startColorIndex, colorCount, steps, alternativesCount, colors);
+	}
+	icon->SetPaletteSwaps(newSwaps);
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -2412,6 +2489,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineBoolFlags", CclDefineBoolFlags);
 	lua_register(Lua, "DefineVariables", CclDefineVariables);
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
+	lua_register(Lua, "DefinePaletteSwap", CclDefinePaletteSwap);
 
 	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 

@@ -33,6 +33,7 @@
 //@{
 
 #include "vec2i.h"
+#include "color.h"
 #include <string>
 
 /*----------------------------------------------------------------------------
@@ -140,6 +141,8 @@ public:
 	void AddGroupSelectionGraphic(CPlayerColorGraphic *g);
 	void AddContainedGraphic(CPlayerColorGraphic *g);
 
+	void SetPaletteSwaps(std::vector<PaletteSwap> &newSwaps);
+
 public:
 	CPlayerColorGraphic *G;              /// Graphic data
 	CPlayerColorGraphic *GScale;         /// Icon when drawn grayscaled
@@ -157,6 +160,12 @@ private:
 	std::vector<CPlayerColorGraphic *> SingleSelectionG; /// graphics by health status for single-selection
 	std::vector<CPlayerColorGraphic *> GroupSelectionG;  /// graphics by health status for multi-selection
 	std::vector<CPlayerColorGraphic *> ContainedG;       /// graphics by health status when in a container
+
+	/*
+	 * These following lists are used to map percentages of arbitrary unit variables (e.g. health, shield,
+	 * mana, ...) to palette swaps in the selection icons.
+	 */
+	std::vector<PaletteSwap> PaletteSwaps;
 };
 
 /// Icon reference (used in config tables)

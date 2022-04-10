@@ -77,6 +77,38 @@ void CUnitColors::Set(std::vector<CColor> &colors)
 	Colors = colors;
 }
 
+PaletteSwap::PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, std::vector<CColor> &colors)
+{
+	this->UnitVariableIndex = variable;
+	this->ColorIndexStart = colorStart;
+	this->ColorCount = colorCount;
+	this->Steps = steps;
+	this->AlternativesCount = alternatives;
+	this->Colors = new SDL_Color[colorCount * steps * alternatives];
+	Assert(colors.size() == colorCount * steps * alternatives);
+	for (unsigned int i = 0; i < colors.size(); i++) {
+		this->Colors[i] = colors[i];
+	}
+}
+
+PaletteSwap::~PaletteSwap()
+{
+	if (Colors) {
+		// delete[] Colors;
+	}
+}
+
+SDL_Color *PaletteSwap::GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt)
+{
+	if (max == 0) {
+		return Colors;
+	}
+	unsigned int step = (this->Steps - 1) * value / max;
+	unsigned char alternative = alt % AlternativesCount;
+
+	return &Colors[step * ColorCount * AlternativesCount + alternative * ColorCount];
+}
+
 IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction)
 {
         unsigned char r1 = (color1 >> 16) & 0xff;

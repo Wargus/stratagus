@@ -63,6 +63,7 @@ static IconMap Icons;   /// Map of ident to icon.
 */
 CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident)
 {
+	this->PaletteSwaps.clear();
 }
 
 /**
@@ -190,20 +191,37 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 	}
 }
 
+static void ApplyPaletteSwaps(const std::vector<PaletteSwap> &swaps, const CUnit &unit, CGraphic *graphic)
+{
+	for (PaletteSwap swap : swaps) {
+		unsigned int varIdx = swap.GetUnitVariableIndex();
+		if (unit.Variable[varIdx].Enable) {
+			const SDL_Color *colors = swap.GetColorsForPercentAndAlternative(unit.Variable[varIdx].Value, unit.Variable[varIdx].Max, UnitNumber(unit));
+			SDL_SetPaletteColors(graphic->Surface->format->palette, colors, swap.GetColorIndexStart(), swap.GetColorCount());
+		}
+	}
+}
+
 static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGraphic *> &graphics,
 						const ButtonStyle &style, unsigned flags,
-						const PixelPos &pos, const std::string &text, const CUnit &unit) {
+						const PixelPos &pos, const std::string &text, const CUnit &unit, const std::vector<PaletteSwap> &swaps) {
 	int playerColor = unit.RescuedFrom
 				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 				: GameSettings.Presets[unit.Player->Index].PlayerColor;
 	int sz = graphics.size();
 	if (!sz) {
+		ApplyPaletteSwaps(swaps, unit, dynamic_cast<CGraphic *>(icon->G));
 		icon->DrawUnitIcon(style, flags, pos, text, playerColor);
 	} else {
 		// TODO: we could have this more configurable?
-		int graphicIdx = ((sz - 1) * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+		int graphicIdx = 0;
+		if (sz > 1 && unit.Variable[HP_INDEX].Max) {
+			graphicIdx = ((sz - 1) * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+		}
 		ButtonStyle s(style);
-		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = graphics[graphicIdx];
+		CGraphic *g = graphics[graphicIdx];
+		ApplyPaletteSwaps(swaps, unit, g);
+		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = g;
 		s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = icon->Frame;
 		DrawUIButton(&s, flags, pos.x, pos.y, text, playerColor);
 	}
@@ -212,19 +230,19 @@ static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGr
 void CIcon::DrawSingleSelectionIcon(const ButtonStyle &style, unsigned flags,
 						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
 {
-	DrawByHealthIcon(this, this->SingleSelectionG, style, flags, pos, text, unit);
+	DrawByHealthIcon(this, this->SingleSelectionG, style, flags, pos, text, unit, this->PaletteSwaps);
 }
 
 void CIcon::DrawGroupSelectionIcon(const ButtonStyle &style, unsigned flags,
 						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
 {
-	DrawByHealthIcon(this, this->GroupSelectionG, style, flags, pos, text, unit);
+	DrawByHealthIcon(this, this->GroupSelectionG, style, flags, pos, text, unit, this->PaletteSwaps);
 }
 
 void CIcon::DrawContainedIcon(const ButtonStyle &style, unsigned flags,
 						 const PixelPos &pos, const std::string &text, const CUnit &unit) const
 {
-	DrawByHealthIcon(this, this->ContainedG, style, flags, pos, text, unit);
+	DrawByHealthIcon(this, this->ContainedG, style, flags, pos, text, unit, this->PaletteSwaps);
 }
 
 void CIcon::ClearExtraGraphics()
@@ -247,6 +265,14 @@ void CIcon::AddGroupSelectionGraphic(CPlayerColorGraphic *g)
 void CIcon::AddContainedGraphic(CPlayerColorGraphic *g)
 {
 	this->ContainedG.push_back(g);
+}
+
+void CIcon::SetPaletteSwaps(std::vector<PaletteSwap> &newSwaps)
+{
+	this->PaletteSwaps.clear();
+	for (auto s : newSwaps) {
+		this->PaletteSwaps.push_back(s);
+	}
 }
 
 /**
