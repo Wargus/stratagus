@@ -512,6 +512,8 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "file")) {
 					type->File = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "alt-file")) {
+					type->AltFile = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "size")) {
 					lua_rawgeti(l, -1, k + 1);
 					CclGetPos(l, &type->Width, &type->Height);
@@ -520,9 +522,15 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "Unsupported image tag: %s" _C_ value);
 				}
 			}
-			if (redefine && type->Sprite) {
-				CGraphic::Free(type->Sprite);
-				type->Sprite = NULL;
+			if (redefine) {
+				if (type->Sprite && type->Sprite->File != type->File) {
+					CGraphic::Free(type->Sprite);
+					type->Sprite = NULL;
+				}
+				if (type->AltSprite && type->AltSprite->File != type->AltFile) {
+					CGraphic::Free(type->AltSprite);
+					type->AltSprite = NULL;
+				}
 			}
 			if (type->ShadowFile == shadowMarker) {
 				type->ShadowFile = type->File;
@@ -1239,11 +1247,16 @@ static int CclCopyUnitType(lua_State *l)
 	to->Flip = from->Flip;
 	to->Name = toName;
 	to->File = from->File;
+	to->AltFile = from->AltFile;
 	to->Width = from->Width;
 	to->Height = from->Height;
 	if (to->Sprite) {
 		CGraphic::Free(to->Sprite);
 		to->Sprite = NULL;
+	}
+	if (to->AltSprite) {
+		CGraphic::Free(to->AltSprite);
+		to->AltSprite = NULL;
 	}
 	to->ShadowFile = from->ShadowFile;
 	to->ShadowWidth = from->ShadowWidth;

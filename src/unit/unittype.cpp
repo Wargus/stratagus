@@ -536,7 +536,7 @@ CUnitType::CUnitType() :
 	CanAttack(0),
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	Sprite(NULL), ShadowSprite(NULL), ShadowSpriteFrame(0), ShadowScale(1)
+	Sprite(NULL), AltSprite(NULL), ShadowSprite(NULL), ShadowSpriteFrame(0), ShadowScale(1)
 {
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
@@ -588,6 +588,7 @@ CUnitType::~CUnitType()
 	}
 
 	CGraphic::Free(Sprite);
+	CGraphic::Free(AltSprite);
 	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
@@ -1027,6 +1028,14 @@ void LoadUnitTypeSprite(CUnitType &type)
 		type.Sprite->Load();
 		if (type.Flip) {
 			type.Sprite->Flip();
+		}
+	}
+
+	if (!type.AltFile.empty()) {
+		type.AltSprite = CPlayerColorGraphic::New(type.AltFile, type.Width, type.Height);
+		type.AltSprite->Load();
+		if (type.Flip) {
+			type.AltSprite->Flip();
 		}
 	}
 

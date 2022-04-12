@@ -1000,6 +1000,9 @@ void CUnit::Draw(const CViewport &vp) const
 				sprite = resinfo->SpriteWhenEmpty;
 			}
 		}
+	} else if (type->AltSprite && this->Variable[HP_INDEX].Value < (this->Variable[HP_INDEX].Max >> 1)) {
+		// TODO: (timfel) do we need more configurability? This at least is pretty fast to check
+		sprite = type->AltSprite;
 	}
 
 	//

@@ -525,6 +525,7 @@ public:
 	std::string Name;               /// Pretty name shown from the engine
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
+	std::string AltFile;            /// Alternative sprite files
 	std::string ShadowFile;         /// Shadow file
 
 	int Width;                                            /// Sprite width
@@ -665,6 +666,7 @@ public:
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
 	CPlayerColorGraphic *Sprite;     /// Sprite images
+	CPlayerColorGraphic *AltSprite;  /// Alternative sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 };
 
