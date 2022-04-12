@@ -1044,6 +1044,100 @@ void CGraphic::SetPaletteColor(int idx, int r, int g, int b) {
 	SDL_SetPaletteColors(Surface->format->palette, &color, idx, 1);
 }
 
+void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
+{
+	this->Load();
+	other->Load();
+	if (!Surface) {
+		PrintOnStdOut("ERROR: Graphic %s not loaded in call to OverlayGraphic" _C_ this->File.c_str());
+		return;
+	}
+	if (!other->Surface) {
+		PrintOnStdOut("ERROR: Graphic %s not loaded in call to OverlayGraphic" _C_ other->File.c_str());
+		return;
+	}
+	if (Surface->w != other->Surface->w || Surface->h != other->Surface->h) {
+		PrintOnStdOut("ERROR: Graphic %s has different size than %s OverlayGraphic" _C_ File.c_str() _C_ other->File.c_str());
+		return;
+	}
+
+	int bpp = Surface->format->BytesPerPixel;
+	unsigned int srcColorKey;
+	unsigned int dstColorKey;
+
+	if (!((bpp == 1 && SDL_GetColorKey(other->Surface, &srcColorKey) == 0 && SDL_GetColorKey(Surface, &dstColorKey) == 0) || bpp == 4)) {
+		PrintOnStdOut("ERROR: OverlayGraphic only supported for 8-bit graphics with transparency or RGBA graphics (%s)" _C_ File.c_str());
+		return;
+	}
+	if ((bpp != other->Surface->format->BytesPerPixel)) {
+		PrintOnStdOut("ERROR: OverlayGraphic only supported graphics with same depth (%s depth != %s depth)" _C_ File.c_str() _C_ other->File.c_str());
+		return;
+	}
+
+	SDL_LockSurface(Surface);
+	SDL_LockSurface(other->Surface);
+
+	switch (bpp) {
+		case 1: {
+			uint8_t *dst = (uint8_t *)Surface->pixels;
+			uint8_t *src = (uint8_t *)other->Surface->pixels;
+
+			for (int x = 0; x < Surface->w; x++) {
+				for (int y = 0; y < Surface->h; y++) {
+					uint8_t* src = ((uint8_t*)(other->Surface->pixels)) + x + y * other->Surface->pitch;
+					uint8_t* dst = ((uint8_t*)(Surface->pixels)) + x + y * Surface->pitch;
+					if (*src != srcColorKey) {
+						if (!mask) {
+							*dst = *src;
+						} else {
+							*dst = dstColorKey;
+						}
+					}
+				}
+			}
+			break;
+		}
+		case 4: {
+			uint32_t *dst = (uint32_t *)Surface->pixels;
+			uint32_t *src = (uint32_t *)other->Surface->pixels;
+
+			for (int x = 0; x < Surface->w; x++) {
+				for (int y = 0; y < Surface->h; y++) {
+					uint32_t* src = ((uint32_t*)(other->Surface->pixels)) + x + y * other->Surface->pitch;
+					uint32_t* dst = ((uint32_t*)(Surface->pixels)) + x + y * Surface->pitch;
+					double alphaSrc = (*src & other->Surface->format->Amask) / 255.0;
+					if (mask) {
+						alphaSrc = 1 - alphaSrc;
+					}
+					double alphaDst = (*dst & Surface->format->Amask) / 255.0;
+					uint8_t rSrc = *src & other->Surface->format->Rmask;
+					uint8_t rDst = *dst & Surface->format->Rmask;
+					uint8_t gSrc = *src & other->Surface->format->Gmask;
+					uint8_t gDst = *dst & Surface->format->Gmask;
+					uint8_t bSrc = *src & other->Surface->format->Bmask;
+					uint8_t bDst = *dst & Surface->format->Bmask;
+
+					double aOut = std::min(1.0, alphaSrc + alphaDst * (1 - alphaSrc));
+					uint8_t rOut = static_cast<uint8_t>((rSrc * alphaSrc + rDst * alphaDst * (1 - alphaSrc)) / aOut);
+					uint8_t gOut = static_cast<uint8_t>((gSrc * alphaSrc + gDst * alphaDst * (1 - alphaSrc)) / aOut);
+					uint8_t bOut = static_cast<uint8_t>((bSrc * alphaSrc + bDst * alphaDst * (1 - alphaSrc)) / aOut);
+
+					*dst = (static_cast<uint8_t>(aOut * 255) << Surface->format->Ashift) |
+						(rOut << Surface->format->Rshift) |
+						(gOut << Surface->format->Gshift) |
+						(bOut << Surface->format->Bshift);
+				}
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+	SDL_UnlockSurface(Surface);
+	SDL_UnlockSurface(other->Surface);
+}
+
 static inline void dither(SDL_Surface *Surface) {
 	for (int x = 0; x < Surface->w; x++) {
 		for (int y = 0; y < Surface->h; y++) {

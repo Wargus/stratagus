@@ -171,6 +171,9 @@ public:
 	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow();
 
+	// minor programmatic editing features
+	void OverlayGraphic(CGraphic *other, bool mask = false);
+
 	inline bool IsLoaded() const { return Surface != NULL; }
 
 	//guichan

@@ -28,7 +28,8 @@ public:
 	static void Free(CGraphic *);
 	void Load(bool grayscale = false);
 	void Resize(int w, int h);
-        void SetPaletteColor(int idx, int r, int g, int b);
+	void SetPaletteColor(int idx, int r, int g, int b);
+	void OverlayGraphic(CGraphic *g, bool mask = false);
 };
 
 class CPlayerColorGraphic : public CGraphic
