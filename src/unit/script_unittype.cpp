@@ -485,6 +485,9 @@ static int CclDefineUnitType(lua_State *l)
 	// Slot identifier
 	const char *str = LuaToString(l, 1);
 	CUnitType *type = UnitTypeByIdent(str);
+
+	constexpr int redefineSprite = 2;
+
 	int redefine;
 	if (type) {
 		redefine = 1;
@@ -524,12 +527,19 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (redefine) {
 				if (type->Sprite && type->Sprite->File != type->File) {
+					redefine |= redefineSprite;
 					CGraphic::Free(type->Sprite);
 					type->Sprite = NULL;
 				}
 				if (type->AltSprite && type->AltSprite->File != type->AltFile) {
+					redefine |= redefineSprite;
 					CGraphic::Free(type->AltSprite);
 					type->AltSprite = NULL;
+				}
+				if (redefine && type->ShadowSprite) {
+					redefine |= redefineSprite;
+					CGraphic::Free(type->ShadowSprite);
+					type->ShadowSprite = NULL;
 				}
 			}
 			if (type->ShadowFile == shadowMarker) {
@@ -575,6 +585,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 			if (redefine && type->ShadowSprite) {
+				redefine |= redefineSprite;
 				CGraphic::Free(type->ShadowSprite);
 				type->ShadowSprite = NULL;
 			}
@@ -1210,6 +1221,9 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	UpdateDefaultBoolFlags(*type);
 	if (!CclInConfigFile) {
+		if (redefine & redefineSprite) {
+			LoadUnitTypeSprite(*type);
+		}
 		UpdateUnitStats(*type, 1);
 	}
 	return 0;

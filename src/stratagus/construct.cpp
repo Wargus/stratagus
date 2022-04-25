@@ -108,7 +108,7 @@ void CConstruction::Load()
 		this->ShadowSprite = CGraphic::ForceNew(file, this->ShadowWidth, this->ShadowHeight);
 		this->ShadowSprite->Load();
 		this->ShadowSprite->Flip();
-		this->ShadowSprite->MakeShadow();
+		this->ShadowSprite->MakeShadow(0, 0); // FIXME: TODO: (timfel): construction shadows don't have X offset, so no shear?
 	}
 }
 

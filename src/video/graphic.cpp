@@ -1154,24 +1154,75 @@ static inline void dither(SDL_Surface *Surface) {
 **
 **  @todo FIXME: 32bpp
 */
-void CGraphic::MakeShadow()
+void CGraphic::MakeShadow(int xOffset, int yOffset)
 {
-	if (Surface->format->BytesPerPixel == 1) {
-		SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
-		SDL_BlitSurface(Surface, NULL, alphaSurface, NULL);
-		SDL_SetSurfaceAlphaMod(alphaSurface, 80);
-		SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
-		SDL_FreeSurface(Surface);
-		Surface = alphaSurface;
+	VideoPaletteListRemove(Surface);
+	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
+	SDL_BlitSurface(Surface, NULL, alphaSurface, NULL);
+	SDL_SetSurfaceAlphaMod(alphaSurface, 80);
+	SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
+	SDL_FreeSurface(Surface);
+	Surface = alphaSurface;
+	if (SurfaceFlip) {
+		VideoPaletteListRemove(SurfaceFlip);
+		SDL_Surface *alphaSurfaceFlip = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
+		SDL_BlitSurface(SurfaceFlip, NULL, alphaSurfaceFlip, NULL);
+		SDL_SetSurfaceAlphaMod(alphaSurfaceFlip, 80);
+		SDL_SetSurfaceColorMod(alphaSurfaceFlip, 0, 0, 0);
+		SDL_FreeSurface(SurfaceFlip);
+		SurfaceFlip = alphaSurfaceFlip;
+	}
 
-		if (SurfaceFlip) {
-			SDL_Surface *alphaSurfaceFlip = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitSurface(SurfaceFlip, NULL, alphaSurfaceFlip, NULL);
-			SDL_SetSurfaceAlphaMod(alphaSurfaceFlip, 80);
-			SDL_SetSurfaceColorMod(alphaSurfaceFlip, 0, 0, 0);
-			SDL_FreeSurface(SurfaceFlip);
-			SurfaceFlip = alphaSurfaceFlip;
+	// Apply shearing effect. same angle for Surface and SurfaceFlip!
+	// The sun shines from the same angle on to both normal and flipped sprites :)
+
+	// BEGIN HACK: XXX: FIXME: positive yOffset is used for fliers for now, these should not get shearing.
+	// We need to find a better way to communicate that. The rest of the code already supports shearing
+	// in both directions for y.
+	yOffset = std::min(0, yOffset);
+	// END HACK
+
+	if (yOffset || xOffset) {
+		SDL_LockSurface(Surface);
+		uint32_t* pixels = (uint32_t *)Surface->pixels;
+		int pitch = Surface->pitch / sizeof(uint32_t);
+		for (int f = 0; f < NumFrames; f++) {
+			int frameX = frame_map[f].x;
+			int frameY = frame_map[f].y;
+			for (int x = xOffset > 0 ? 0 : Width - 1; xOffset > 0 ? x < Width : x >= 0; xOffset > 0 ? x++ : x--) {
+				for (int y = yOffset > 0 ? 0 : Height - 1; yOffset > 0 ? y < Height : y >= 0; yOffset > 0 ? y++ : y--) {
+					int xNew = x + xOffset * y / Height;
+					int yNew = y + yOffset * x / Width;
+					if (xNew < 0 || yNew < 0 || xNew >= Width || yNew >= Height) {
+						pixels[x + frameX + (y + frameY) * pitch] = 0;
+					} else {
+						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
+					}
+				}
+			}
 		}
+		SDL_UnlockSurface(Surface);
+	}
+	if ((yOffset || xOffset) && SurfaceFlip) {
+		SDL_LockSurface(SurfaceFlip);
+		uint32_t* pixels = (uint32_t *)SurfaceFlip->pixels;
+		int pitch = SurfaceFlip->pitch / sizeof(uint32_t);
+		for (int f = 0; f < NumFrames; f++) {
+			int frameX = frameFlip_map[f].x;
+			int frameY = frameFlip_map[f].y;
+			for (int x = xOffset > 0 ? 0 : Width - 1; xOffset > 0 ? x < Width : x >= 0; xOffset > 0 ? x++ : x--) {
+				for (int y = yOffset > 0 ? 0 : Height - 1; yOffset > 0 ? y < Height : y >= 0; yOffset > 0 ? y++ : y--) {
+					int xNew = x + xOffset * y / Height;
+					int yNew = y + yOffset * x / Width;
+					if (xNew < 0 || yNew < 0 || xNew >= Width || yNew >= Height) {
+						pixels[x + frameX + (y + frameY) * pitch] = 0;
+					} else {
+						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
+					}
+				}
+			}
+		}
+		SDL_UnlockSurface(SurfaceFlip);
 	}
 }
 

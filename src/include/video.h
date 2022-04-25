@@ -169,7 +169,7 @@ public:
 	void SetOriginalSize();
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
-	void MakeShadow();
+	void MakeShadow(int xOffset, int yOffset);
 
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);

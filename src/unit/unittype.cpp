@@ -994,7 +994,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (type.Flip) {
 				type.ShadowSprite->Flip();
 			}
-			type.ShadowSprite->MakeShadow();
+			type.ShadowSprite->MakeShadow(type.ShadowOffsetX, type.ShadowOffsetY);
 		}
 	}
 
