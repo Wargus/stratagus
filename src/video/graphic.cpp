@@ -1165,16 +1165,13 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 	Surface = alphaSurface;
 	if (SurfaceFlip) {
 		VideoPaletteListRemove(SurfaceFlip);
-		SDL_Surface *alphaSurfaceFlip = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
-		SDL_BlitSurface(SurfaceFlip, NULL, alphaSurfaceFlip, NULL);
-		SDL_SetSurfaceAlphaMod(alphaSurfaceFlip, 80);
-		SDL_SetSurfaceColorMod(alphaSurfaceFlip, 0, 0, 0);
+		alphaSurface = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
+		SDL_BlitSurface(SurfaceFlip, NULL, alphaSurface, NULL);
+		SDL_SetSurfaceAlphaMod(alphaSurface, 80);
+		SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
 		SDL_FreeSurface(SurfaceFlip);
-		SurfaceFlip = alphaSurfaceFlip;
+		SurfaceFlip = alphaSurface;
 	}
-
-	// Apply shearing effect. same angle for Surface and SurfaceFlip!
-	// The sun shines from the same angle on to both normal and flipped sprites :)
 
 	// BEGIN HACK: XXX: FIXME: positive yOffset is used for fliers for now, these should not get shearing.
 	// We need to find a better way to communicate that. The rest of the code already supports shearing
@@ -1182,6 +1179,34 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 	yOffset = std::min(0, yOffset);
 	// END HACK
 
+	// Apply shearing effect. same angle for Surface and SurfaceFlip!
+	// The sun shines from the same angle on to both normal and flipped sprites :)
+
+	// 1. Shrink each frame in y-direction based on the x offset
+	alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
+	for (int f = 0; f < NumFrames; f++) {
+		int frameX = frame_map[f].x;
+		int frameY = frame_map[f].y;
+		const SDL_Rect srcRect = { frameX, frameY, Width, Height };
+		SDL_Rect dstRect = { frameX, frameY + std::abs(xOffset) / 2, Width, Height - (std::abs(xOffset) - std::abs(xOffset) / 2) };
+		SDL_BlitScaled(Surface, &srcRect, alphaSurface, &dstRect);
+	}
+	SDL_FreeSurface(Surface);
+	Surface = alphaSurface;
+	if (SurfaceFlip) {
+		alphaSurface = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
+		for (int f = 0; f < NumFrames; f++) {
+			int frameX = frameFlip_map[f].x;
+			int frameY = frameFlip_map[f].y;
+			const SDL_Rect srcRect = { frameX, frameY, Width, Height };
+			SDL_Rect dstRect = { frameX, frameY + std::abs(xOffset) / 2, Width, Height - (std::abs(xOffset) - std::abs(xOffset) / 2) };
+			SDL_BlitScaled(SurfaceFlip, &srcRect, alphaSurface, &dstRect);
+		}
+		SDL_FreeSurface(SurfaceFlip);
+		SurfaceFlip = alphaSurface;
+	}
+
+	// 2. Apply shearing
 	if (yOffset || xOffset) {
 		SDL_LockSurface(Surface);
 		uint32_t* pixels = (uint32_t *)Surface->pixels;
