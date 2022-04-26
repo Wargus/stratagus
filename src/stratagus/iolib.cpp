@@ -194,7 +194,12 @@ int CFile::printf(const char *format, ...)
 }
 
 static Sint64 sdl_size(SDL_RWops * context) {
-	return -1;
+	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
+	long currentPosition = self->tell();
+	self->seek(0, SEEK_END);
+	long size = self->tell();
+	self->seek(currentPosition, SEEK_SET);
+	return size;
 }
 
 static Sint64 sdl_seek(SDL_RWops * context, Sint64 offset, int whence) {
