@@ -1149,6 +1149,56 @@ static inline void dither(SDL_Surface *Surface) {
 	}
 }
 
+static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
+{
+	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
+	SDL_BlitSurface(*src, NULL, alphaSurface, NULL);
+	SDL_SetSurfaceAlphaMod(alphaSurface, alpha);
+	SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
+	SDL_FreeSurface(*src);
+	*src = alphaSurface;
+}
+
+static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames, CGraphic::frame_pos_t *frameMap, int frameW, int frameH)
+{
+	shrink = std::abs(shrink);
+	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
+	for (int f = 0; f < numFrames; f++) {
+		int frameX = frameMap[f].x;
+		int frameY = frameMap[f].y;
+		const SDL_Rect srcRect = { frameX, frameY, frameW, frameH };
+		SDL_Rect dstRect = { frameX, frameY + shrink / 2, frameW, frameH - (shrink - shrink / 2) };
+		SDL_BlitScaled(*src, &srcRect, alphaSurface, &dstRect);
+	}
+	SDL_FreeSurface(*src);
+	*src = alphaSurface;
+}
+
+static void shearSurface(SDL_Surface *surface, int xOffset, int yOffset, int numFrames, CGraphic::frame_pos_t *frameMap, int frameW, int frameH)
+{
+	if (yOffset || xOffset) {
+		SDL_LockSurface(surface);
+		uint32_t* pixels = (uint32_t *)surface->pixels;
+		int pitch = surface->pitch / sizeof(uint32_t);
+		for (int f = 0; f < numFrames; f++) {
+			int frameX = frameMap[f].x;
+			int frameY = frameMap[f].y;
+			for (int x = xOffset > 0 ? 0 : frameW - 1; xOffset > 0 ? x < frameW : x >= 0; xOffset > 0 ? x++ : x--) {
+				for (int y = yOffset > 0 ? 0 : frameH - 1; yOffset > 0 ? y < frameH : y >= 0; yOffset > 0 ? y++ : y--) {
+					int xNew = x + xOffset * y / frameH;
+					int yNew = y + yOffset * x / frameW;
+					if (xNew < 0 || yNew < 0 || xNew >= frameW || yNew >= frameH) {
+						pixels[x + frameX + (y + frameY) * pitch] = 0;
+					} else {
+						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
+					}
+				}
+			}
+		}
+		SDL_UnlockSurface(surface);
+	}
+}
+
 /**
 **  Make shadow sprite
 **
@@ -1157,20 +1207,10 @@ static inline void dither(SDL_Surface *Surface) {
 void CGraphic::MakeShadow(int xOffset, int yOffset)
 {
 	VideoPaletteListRemove(Surface);
-	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
-	SDL_BlitSurface(Surface, NULL, alphaSurface, NULL);
-	SDL_SetSurfaceAlphaMod(alphaSurface, 80);
-	SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
-	SDL_FreeSurface(Surface);
-	Surface = alphaSurface;
+	applyAlphaGrayscaleToSurface(&Surface, 80);
 	if (SurfaceFlip) {
 		VideoPaletteListRemove(SurfaceFlip);
-		alphaSurface = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
-		SDL_BlitSurface(SurfaceFlip, NULL, alphaSurface, NULL);
-		SDL_SetSurfaceAlphaMod(alphaSurface, 80);
-		SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
-		SDL_FreeSurface(SurfaceFlip);
-		SurfaceFlip = alphaSurface;
+		applyAlphaGrayscaleToSurface(&SurfaceFlip, 80);
 	}
 
 	// BEGIN HACK: XXX: FIXME: positive yOffset is used for fliers for now, these should not get shearing.
@@ -1183,71 +1223,15 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 	// The sun shines from the same angle on to both normal and flipped sprites :)
 
 	// 1. Shrink each frame in y-direction based on the x offset
-	alphaSurface = SDL_CreateRGBSurface(0, Surface->w, Surface->h, 32, RMASK, GMASK, BMASK, AMASK);
-	for (int f = 0; f < NumFrames; f++) {
-		int frameX = frame_map[f].x;
-		int frameY = frame_map[f].y;
-		const SDL_Rect srcRect = { frameX, frameY, Width, Height };
-		SDL_Rect dstRect = { frameX, frameY + std::abs(xOffset) / 2, Width, Height - (std::abs(xOffset) - std::abs(xOffset) / 2) };
-		SDL_BlitScaled(Surface, &srcRect, alphaSurface, &dstRect);
-	}
-	SDL_FreeSurface(Surface);
-	Surface = alphaSurface;
+	shrinkSurfaceFramesInY(&Surface, xOffset, NumFrames, frame_map, Width, Height);
 	if (SurfaceFlip) {
-		alphaSurface = SDL_CreateRGBSurface(0, SurfaceFlip->w, SurfaceFlip->h, 32, RMASK, GMASK, BMASK, AMASK);
-		for (int f = 0; f < NumFrames; f++) {
-			int frameX = frameFlip_map[f].x;
-			int frameY = frameFlip_map[f].y;
-			const SDL_Rect srcRect = { frameX, frameY, Width, Height };
-			SDL_Rect dstRect = { frameX, frameY + std::abs(xOffset) / 2, Width, Height - (std::abs(xOffset) - std::abs(xOffset) / 2) };
-			SDL_BlitScaled(SurfaceFlip, &srcRect, alphaSurface, &dstRect);
-		}
-		SDL_FreeSurface(SurfaceFlip);
-		SurfaceFlip = alphaSurface;
+		shrinkSurfaceFramesInY(&SurfaceFlip, xOffset, NumFrames, frameFlip_map, Width, Height);
 	}
 
 	// 2. Apply shearing
-	if (yOffset || xOffset) {
-		SDL_LockSurface(Surface);
-		uint32_t* pixels = (uint32_t *)Surface->pixels;
-		int pitch = Surface->pitch / sizeof(uint32_t);
-		for (int f = 0; f < NumFrames; f++) {
-			int frameX = frame_map[f].x;
-			int frameY = frame_map[f].y;
-			for (int x = xOffset > 0 ? 0 : Width - 1; xOffset > 0 ? x < Width : x >= 0; xOffset > 0 ? x++ : x--) {
-				for (int y = yOffset > 0 ? 0 : Height - 1; yOffset > 0 ? y < Height : y >= 0; yOffset > 0 ? y++ : y--) {
-					int xNew = x + xOffset * y / Height;
-					int yNew = y + yOffset * x / Width;
-					if (xNew < 0 || yNew < 0 || xNew >= Width || yNew >= Height) {
-						pixels[x + frameX + (y + frameY) * pitch] = 0;
-					} else {
-						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
-					}
-				}
-			}
-		}
-		SDL_UnlockSurface(Surface);
-	}
-	if ((yOffset || xOffset) && SurfaceFlip) {
-		SDL_LockSurface(SurfaceFlip);
-		uint32_t* pixels = (uint32_t *)SurfaceFlip->pixels;
-		int pitch = SurfaceFlip->pitch / sizeof(uint32_t);
-		for (int f = 0; f < NumFrames; f++) {
-			int frameX = frameFlip_map[f].x;
-			int frameY = frameFlip_map[f].y;
-			for (int x = xOffset > 0 ? 0 : Width - 1; xOffset > 0 ? x < Width : x >= 0; xOffset > 0 ? x++ : x--) {
-				for (int y = yOffset > 0 ? 0 : Height - 1; yOffset > 0 ? y < Height : y >= 0; yOffset > 0 ? y++ : y--) {
-					int xNew = x + xOffset * y / Height;
-					int yNew = y + yOffset * x / Width;
-					if (xNew < 0 || yNew < 0 || xNew >= Width || yNew >= Height) {
-						pixels[x + frameX + (y + frameY) * pitch] = 0;
-					} else {
-						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
-					}
-				}
-			}
-		}
-		SDL_UnlockSurface(SurfaceFlip);
+	shearSurface(Surface, xOffset, yOffset, NumFrames, frame_map, Width, Height);
+	if (SurfaceFlip) {
+		shearSurface(SurfaceFlip, xOffset, yOffset, NumFrames, frameFlip_map, Width, Height);
 	}
 }
 

@@ -90,7 +90,7 @@ public:
 
 class CGraphic : public gcn::Image
 {
-
+public:
 	struct frame_pos_t {
 		short int x;
 		short int y;
