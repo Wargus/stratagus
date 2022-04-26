@@ -30,3 +30,16 @@ fi
 if [ ! -e "${stratagus_folder}/../war1gus/.vscode/launch.json" ]; then
     cp "${stratagus_folder}/.vscode/launch.war1gus.json" "${stratagus_folder}/../war1gus/.vscode/launch.json"
 fi
+
+if [ ! -d "${stratagus_folder}/../stargus" ]; then
+    git clone https://github.com/Wargus/stargus "${stratagus_folder}/../stargus"
+fi
+if [ ! -d "${stratagus_folder}/../stargus/.vscode" ]; then
+    mkdir "${stratagus_folder}/../stargus/.vscode"
+fi
+if [ ! -e "${stratagus_folder}/../stargus/.vscode/settings.json" ]; then
+    cp "${stratagus_folder}/.vscode/settings.linux.stargus.json" "${stratagus_folder}/../stargus/.vscode/settings.json"
+fi
+if [ ! -e "${stratagus_folder}/../stargus/.vscode/launch.json" ]; then
+    cp "${stratagus_folder}/.vscode/launch.stargus.json" "${stratagus_folder}/../stargus/.vscode/launch.json"
+fi
