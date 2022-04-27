@@ -759,6 +759,8 @@ endif()
 
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
+option(EAGER_LOAD "Load all game data at startup, may avoid stutter during gameplay at the cost of memory" OFF)
+
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
@@ -963,6 +965,12 @@ if(ENABLE_TOUCHSCREEN)
 	add_definitions(-DUSE_TOUCHSCREEN)
 endif()
 
+if(EAGER_LOAD)
+	# nothing
+else()
+	add_definitions(-DDYNAMIC_LOAD)
+endif()
+
 if(ENABLE_MULTIBUILD)
     if(WIN32 AND MSVC)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
@@ -1058,6 +1066,13 @@ if(ENABLE_TOUCHSCREEN)
 else()
 	message("Touchscreen input: No (Enable by param -DENABLE_TOUCHSCREEN=ON)")
 endif()
+
+if(EAGER_LOAD)
+	message("Eager load: Yes (Disable by param -DEAGER_LOAD=OFF)")
+else()
+	message("Eager load: No (Enable by param -DEAGER_LOAD=ON)")
+endif()
+
 
 if(ENABLE_DOC AND DOXYGEN_FOUND)
 	message("Doxygen documentation: Yes (Disable by param -DENABLE_DOC=OFF)")
