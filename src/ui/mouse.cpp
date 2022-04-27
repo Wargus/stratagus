@@ -1811,16 +1811,20 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
 							continue;
 						}
-					if (ButtonAreaUnderCursor == ButtonAreaTransporting
-						&& static_cast<size_t>(ButtonUnderCursor) == j) {
-							Assert(uins->Boarded);
-							const int flush = !(KeyModifiers & ModifierShift);
-							if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-								PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-								SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+						int lastOccupiedButton = j + uins->Type->BoardSize - 1;
+						if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+							for (int sub_j = j; sub_j <= lastOccupiedButton; sub_j++) {
+								if (static_cast<size_t>(ButtonUnderCursor) == sub_j) {
+									Assert(uins->Boarded);
+									const int flush = !(KeyModifiers & ModifierShift);
+									if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+										PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+									}
+								}
 							}
 						}
-						++j;
+						j = lastOccupiedButton + 1;
 					}
 				}
 			}

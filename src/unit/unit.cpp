@@ -1090,13 +1090,21 @@ void CUnit::AddInContainer(CUnit &host)
 	Container = &host;
 	if (host.InsideCount == 0) {
 		NextContained = PrevContained = this;
+		host.UnitInside = this;
 	} else {
+		// keep sorted by size
+		int mySize = Type->BoardSize;
 		NextContained = host.UnitInside;
-		PrevContained = host.UnitInside->PrevContained;
-		host.UnitInside->PrevContained->NextContained = this;
-		host.UnitInside->PrevContained = this;
+		while (NextContained->Type->BoardSize > mySize && NextContained->PrevContained != NextContained) {
+			NextContained = NextContained->PrevContained;
+		}
+		PrevContained = NextContained->PrevContained;
+		NextContained->PrevContained->NextContained = this;
+		NextContained->PrevContained = this;
+		if (NextContained->Type->BoardSize <= mySize) {
+			host.UnitInside = this;
+		}
 	}
-	host.UnitInside = this;
 	host.InsideCount++;
 }
 

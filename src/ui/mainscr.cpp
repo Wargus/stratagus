@@ -537,17 +537,22 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		CIcon &icon = *uins->Type->Icon.Icon;
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
-		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawContainedIcon(*UI.TransportingButtons[j].Style, flag, pos, "", *uins);
+		const PixelPos posIcon(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+		icon.DrawContainedIcon(*UI.TransportingButtons[j].Style, flag, posIcon, "", *uins);
+		int lastOccupiedButton = j + uins->Type->BoardSize - 1;
+		const PixelPos pos = PixelPos(UI.TransportingButtons[lastOccupiedButton].X, UI.TransportingButtons[lastOccupiedButton].Y);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);
 		}
-		if (ButtonAreaUnderCursor == ButtonAreaTransporting
-			&& static_cast<size_t>(ButtonUnderCursor) == j) {
-			UI.StatusLine.Set(uins->Type->Name);
+		if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+			for (int sub_j = j; sub_j <= lastOccupiedButton; sub_j++) {
+				if (static_cast<size_t>(ButtonUnderCursor) == sub_j) {
+					UI.StatusLine.Set(uins->Type->Name);
+				}
+			}
 		}
-		++j;
+		j = lastOccupiedButton + 1;
 	}
 }
 
