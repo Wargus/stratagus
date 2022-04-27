@@ -189,7 +189,6 @@ Mng::Mng() :
 
 Mng::~Mng()
 {
-	//	delete[] name;
 	if (handle) {
 		mng_cleanup(&handle);
 	}
@@ -216,14 +215,38 @@ void Mng::Draw(int x, int y)
 	SDL_BlitSurface(surface, NULL, TheScreen, &rect);
 }
 
+static std::map<std::string, Mng *> MngCache;
+
+Mng *Mng::New(const std::string &name)
+{
+	const std::string file = LibraryFileName(name.c_str());
+	Mng *mng = MngCache[file];
+	if (mng == NULL) {
+		mng = new Mng();
+		mng->name = LibraryFileName(name.c_str());
+		Assert(mng);
+	} else {
+		mng->refcnt++;
+	}
+	return mng;
+}
+
+void Mng::Free(Mng *mng)
+{
+	mng->refcnt--;
+	if (mng->refcnt == 0) {
+		MngCache.erase(mng->name);
+		delete mng;
+	}
+}
+
 /**
 **  Load a MNG
 **
 **  @param name  Name of the MNG file
 */
-bool Mng::Load(const std::string &name)
+bool Mng::Load()
 {
-	this->name = LibraryFileName(name.c_str());
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return false;

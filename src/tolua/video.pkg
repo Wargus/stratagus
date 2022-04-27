@@ -58,8 +58,9 @@ unsigned int SetColorCycleSpeed(unsigned int speed);
 class Mng
 {
 public:
-        Mng();
-        bool Load(const std::string name);
+		static Mng *New(const std::string name);
+		static void Free(Mng *mng);
+        bool Load();
         void Draw(int x, int y);
         void Reset();
 }

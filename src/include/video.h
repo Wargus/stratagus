@@ -234,10 +234,15 @@ public:
 
 class Mng : public gcn::Image
 {
-public:
 	Mng();
 	~Mng();
-	bool Load(const std::string &name);
+
+	uint32_t refcnt = 0;
+
+public:
+	static Mng *New(const std::string &name);
+	static void Free(Mng *mng);
+	bool Load();
 	void Reset();
 	void Draw(int x, int y);
 
@@ -260,10 +265,12 @@ public:
 /// empty class for lua scripts
 class Mng : public gcn::Image
 {
-public:
 	Mng() {};
 	~Mng() {};
-	bool Load(const std::string &name) { return false; };
+public:
+	Mng *New(const std::string &name) { return NULL; }
+	static void Free(Mng *mng) {};
+	bool Load() { return false; };
 	void Reset() {};
 	void Draw(int x, int y) {};
 

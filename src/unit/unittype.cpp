@@ -593,8 +593,7 @@ CUnitType::~CUnitType()
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
 		for (int j = 0; j < this->Portrait.Num; ++j) {
-			delete this->Portrait.Mngs[j];
-			// delete[] this->Portrait.Files[j];
+			Mng::Free(this->Portrait.Mngs[j]);
 		}
 		delete[] this->Portrait.Mngs;
 		delete[] this->Portrait.Files;
@@ -1042,8 +1041,8 @@ void LoadUnitTypeSprite(CUnitType &type)
 #ifdef USE_MNG
 	if (type.Portrait.Num) {
 		for (int i = 0; i < type.Portrait.Num; ++i) {
-			type.Portrait.Mngs[i] = new Mng;
-			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
+			type.Portrait.Mngs[i] = Mng::New(type.Portrait.Files[i]);
+			type.Portrait.Mngs[i]->Load();
 		}
 		// FIXME: should be configurable
 		type.Portrait.CurrMng = 0;
