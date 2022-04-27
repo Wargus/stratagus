@@ -445,6 +445,11 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 static bool DrawTypePortrait(const CUnitType &type)
 {
 	if (UI.SingleSelectedButton && type.Portrait.Num) {
+#ifdef DYNAMIC_LOAD
+		if (!type.Sprite) {
+			LoadUnitTypeSprite(const_cast<CUnitType &>(type));
+		}
+#endif
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
