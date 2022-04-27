@@ -323,7 +323,7 @@ static Mix_Music *LoadMusic(const char *name)
 		delete f;
 		return NULL;
 	}
-	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 0);
+	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 1);
 	return currentMusic;
 }
 
@@ -339,7 +339,7 @@ static Mix_Chunk *LoadSample(const char *name)
 		delete f;
 		return NULL;
 	}
-	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 0);
+	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 1);
 }
 
 /**
