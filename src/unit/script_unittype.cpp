@@ -607,7 +607,14 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			type->Portrait.Num = subargs;
+			int number = 0;
+			for (int k = 0; k < subargs; ++k) {
+				const char *s = LuaToString(l, -1, k + 1);
+				if (strcmp("talking", s)) {
+					number++;
+				}
+			}
+			type->Portrait.Num = number;
 			type->Portrait.Talking = 0;
 			type->Portrait.Files = new std::string[type->Portrait.Num];
 			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
@@ -616,7 +623,6 @@ static int CclDefineUnitType(lua_State *l)
 				const char *s = LuaToString(l, -1, k + 1);
 				if (!strcmp("talking", s)) {
 					type->Portrait.Talking = k;
-					type->Portrait.Num--;
 				} else {
 					type->Portrait.Files[k - (type->Portrait.Talking ? 1 : 0)] = s;
 				}
