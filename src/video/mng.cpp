@@ -225,9 +225,8 @@ Mng *Mng::New(const std::string &name)
 		mng = new Mng();
 		mng->name = LibraryFileName(name.c_str());
 		Assert(mng);
-	} else {
-		mng->refcnt++;
 	}
+	mng->refcnt++;
 	return mng;
 }
 

@@ -1152,6 +1152,10 @@ static inline void dither(SDL_Surface *Surface) {
 static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
 {
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
+	if (!alphaSurface) {
+		DebugPrint("%s\n" _C_ SDL_GetError());
+		Assert(false);
+	}
 	SDL_BlitSurface(*src, NULL, alphaSurface, NULL);
 	SDL_SetSurfaceAlphaMod(alphaSurface, alpha);
 	SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
@@ -1163,6 +1167,10 @@ static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames,
 {
 	shrink = std::abs(shrink);
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
+	if (!alphaSurface) {
+		DebugPrint("%s\n" _C_ SDL_GetError());
+		Assert(false);
+	}
 	for (int f = 0; f < numFrames; f++) {
 		int frameX = frameMap[f].x;
 		int frameY = frameMap[f].y;
