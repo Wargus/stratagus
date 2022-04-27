@@ -882,9 +882,14 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 {
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
-		const CConstruction &construction = *type.Construction;
+		CConstruction &construction = *type.Construction;
 		pos.x -= construction.Width / 2;
 		pos.y -= construction.Height / 2;
+#ifdef DYNAMIC_LOAD
+		if (!construction.Sprite) {
+			construction.Load(true);
+		}
+#endif
 		if (frame < 0) {
 			construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
 		} else {

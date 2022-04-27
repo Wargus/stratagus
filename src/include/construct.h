@@ -135,7 +135,7 @@ public:
 	}
 	~CConstruction();
 	void Clean();
-	void Load();
+	void Load(bool force = false);
 
 public:
 	std::string Ident;   /// construction identifier
