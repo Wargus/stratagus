@@ -329,6 +329,18 @@ static Mix_Music *LoadMusic(const char *name)
 
 static Mix_Chunk *LoadSample(const char *name)
 {
+#ifdef DYNAMIC_LOAD
+	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
+	r->allocated = 0xcafebeef;
+	r->abuf = (Uint8 *)(strdup(name));
+	return r;
+#else
+	return ForceLoadSample(name);
+#endif
+}
+
+static Mix_Chunk *ForceLoadSample(const char *name)
+{
 	Mix_Chunk *r = Mix_LoadWAV(name);
 	if (r) {
 		return r;
@@ -389,6 +401,14 @@ Mix_Chunk *LoadSample(const std::string &name)
 */
 int PlaySample(Mix_Chunk *sample, Origin *origin)
 {
+#ifdef DYNAMIC_LOAD
+	if (sample->allocated == 0xcafebeef) {
+		char *name = (char*)(sample->abuf);
+		Mix_Chunk *loadedSample = ForceLoadSample(name);
+		memcpy(sample, loadedSample, sizeof(Mix_Chunk));
+		free(name);
+	}
+#endif
 	int channel = -1;
 	DebugPrint("play sample %d\n" _C_ sample->volume);
 	if (SoundEnabled() && EffectsEnabled && sample) {
