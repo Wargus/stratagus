@@ -146,6 +146,8 @@ extern bool CanAccessFile(const char *filename);
 /// Read the contents of a directory
 extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp);
 
+extern std::vector<std::string> QuoteArguments(std::vector<std::string> args);
+
 //@}
 
 #endif // !__IOLIB_H__

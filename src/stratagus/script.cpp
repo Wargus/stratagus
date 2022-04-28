@@ -2158,38 +2158,12 @@ static int CclRestartStratagus(lua_State *l)
 			break;
 		}
 	}
-	int newArgc = OriginalArgv.size() + (insertRestartArgument ? 2 : 1);
+	std::vector<std::string> quotedArgs = QuoteArguments(OriginalArgv);
+
+	int newArgc = quotedArgs.size() + (insertRestartArgument ? 2 : 1);
 	char **argv = new char*[newArgc];
-	for (unsigned int i = 0; i < OriginalArgv.size(); i++) {
-#ifdef WIN32
-		if (!OriginalArgv[i].empty() && OriginalArgv[i].find_first_of(" \t\n\v\"") == std::string::npos) {
-			argv[i] = const_cast<char*>(OriginalArgv[i].c_str());
-		} else {
-			// Windows always needs argument quoting around arguments with spaces
-			std::string ss = "\"";
-			for (auto ch = OriginalArgv[i].begin(); ; ch++) {
-				int backslashes = 0;
-				while (ch != OriginalArgv[i].end() && *ch == '\\') {
-					ch++;
-					backslashes++;
-				}
-				if (ch == OriginalArgv[i].end()) {
-					ss.append(backslashes * 2, '\\');
-					break;
-				} else if (*ch == '"') {
-					ss.append(backslashes * 2 + 1, '\\');
-					ss.push_back(*ch);
-				} else {
-					ss.append(backslashes, '\\');
-					ss.push_back(*ch);
-				}
-			}
-			ss.push_back('"');
-			argv[i] = strdup(ss.c_str());
-		}
-#else
-		argv[i] = const_cast<char*>(OriginalArgv[i].c_str());
-#endif
+	for (unsigned int i = 0; i < quotedArgs.size(); i++) {
+		argv[i] = const_cast<char*>(quotedArgs[i].c_str());
 	}
 	if (insertRestartArgument) {
 		argv[newArgc - 2] = (char*)"-r";
