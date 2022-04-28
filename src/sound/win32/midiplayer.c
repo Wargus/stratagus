@@ -16,6 +16,16 @@
 #include <mmsystem.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <io.h>
+
+HMIXER sMixerHandle;
+HMIDISTRM sOut;
+HANDLE hWaitingThread;
+int sVolume = 127;
+char *sFilename = NULL;
+unsigned int sDeviceId = 0;
 
 #define MAX_BUFFER_SIZE (512 * 12)
 HANDLE event;
@@ -142,7 +152,7 @@ static int is_track_end(const struct evt* e)
 
 static void CALLBACK example9_callback(HMIDIOUT out, UINT msg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
 {
-    switch (msg)
+	switch (msg)
     {
 	case MOM_DONE:
  		SetEvent(event);
@@ -283,7 +293,7 @@ static unsigned int get_buffer(struct trk* tracks, unsigned int ntracks, unsigne
 	return 1;
 }
 
-unsigned int example9(char* filename, int volume)
+unsigned int example9(char *filename)
 {
 	unsigned char* midibuf = NULL;
 	unsigned int midilen = 0;
@@ -299,15 +309,14 @@ unsigned int example9(char* filename, int volume)
 	unsigned int* streambuf = NULL;
 	unsigned int streamlen = 0;
 
-	HMIDISTRM out;
 	MIDIPROPTIMEDIV prop;
 	MIDIHDR mhdr;
-	unsigned int device = 0;
 
 	midibuf = load_file((unsigned char*)filename, &midilen);
 	if(midibuf == NULL)
 	{
-		printf("could not open %s\n", filename);
+		fprintf(stderr, "could not open %s\n", filename);
+		fflush(stderr);
 		return 0;
 	}
 
@@ -338,52 +347,57 @@ unsigned int example9(char* filename, int volume)
     if ((event = CreateEvent(0, FALSE, FALSE, 0)) == NULL)
     	goto error3;
 
-	if (midiStreamOpen(&out, &device, 1, (DWORD)example9_callback, 0, CALLBACK_FUNCTION) != MMSYSERR_NOERROR)
+	if (midiStreamOpen(&sOut, &sDeviceId, 1, (DWORD)example9_callback, 0, CALLBACK_FUNCTION) != MMSYSERR_NOERROR)
 		goto error4;
 
 	prop.cbStruct = sizeof(MIDIPROPTIMEDIV);
 	prop.dwTimeDiv = swap_bytes_short(hdr->ticks);
-	if(midiStreamProperty(out, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TIMEDIV) != MMSYSERR_NOERROR)
+	if(midiStreamProperty(sOut, (LPBYTE)&prop, MIDIPROP_SET|MIDIPROP_TIMEDIV) != MMSYSERR_NOERROR)
 		goto error5;
 
 	mhdr.lpData = (char*)streambuf;
 	mhdr.dwBufferLength = mhdr.dwBytesRecorded = streambufsize;
 	mhdr.dwFlags = 0;
 
-	if(midiOutPrepareHeader((HMIDIOUT)out, &mhdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR)
+	if(midiOutPrepareHeader((HMIDIOUT)sOut, &mhdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR)
 		goto error5;
 
-	if(midiStreamRestart(out) != MMSYSERR_NOERROR)
+	if(midiStreamRestart(sOut) != MMSYSERR_NOERROR)
 		goto error6;
 
-	if (midiOutSetVolume((HMIDIOUT)out, (DWORD)((volume & 0xFF) << 8) | (volume & 0xFF)) != MMSYSERR_NOERROR) {
-		printf("Cannot set volume, will have to use windows application volume control");
-	}
-
-	printf("buffering...\n");
+	fprintf(stderr, "buffering...\n");
+	fflush(stderr);
 	get_buffer(tracks, ntracks, streambuf, &streamlen);
 	while(streamlen > 0)
 	{
 		mhdr.dwBytesRecorded = streamlen;
 
-		if(midiStreamOut(out, &mhdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR)
+		if(midiStreamOut(sOut, &mhdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR)
 			goto error7;
 
 		WaitForSingleObject(event, INFINITE);
 
-		printf("buffering...\n");
+		if (sFilename != filename) {
+			fprintf(stderr, "switch to new file %s.\n", sFilename);
+			fflush(stderr);
+			break;
+		}
+
+		fprintf(stderr, "buffering...\n");
+		fflush(stderr);
 		get_buffer(tracks, ntracks, streambuf, &streamlen);
 	}
-	printf("done.\n");
+	fprintf(stderr, "done.\n");
+	fflush(stderr);
 
 error7:
-	midiOutReset((HMIDIOUT)out);
+	midiOutReset((HMIDIOUT)sOut);
 
 error6:
-	midiOutUnprepareHeader((HMIDIOUT)out, &mhdr, sizeof(MIDIHDR));
+	midiOutUnprepareHeader((HMIDIOUT)sOut, &mhdr, sizeof(MIDIHDR));
 
 error5:
-	midiStreamClose(out);
+	midiStreamClose(sOut);
 
 error4:
 	CloseHandle(event);
@@ -400,13 +414,244 @@ error1:
 	return(0);
 }
 
+DWORD WINAPI MyThreadFunction(LPVOID lpParam) {
+	while (1) {
+		MMRESULT r = midiOutSetVolume((HMIDIOUT)sOut, (DWORD)((sVolume & 0xFF) << 8) | (sVolume & 0xFF));
+		if (r != MMSYSERR_NOERROR) {
+			fprintf(stderr, "Cannot set volume via midi...");
+			switch (r) {
+				case MMSYSERR_INVALHANDLE:
+					fprintf(stderr, "Reason: handle not valid\n");
+					break;
+				case MMSYSERR_NOMEM:
+					fprintf(stderr, "Reason: memory error\n");
+					break;
+				case MMSYSERR_NOTSUPPORTED:
+					fprintf(stderr, "Reason: not supported\n");
+					break;
+				default:
+					fprintf(stderr, "Reason: unknown\n");
+			}
+			fflush(stderr);
+			MMRESULT err = mixerOpen(&sMixerHandle, sDeviceId, 0, 0, 0);
+			if (err) {
+				fprintf(stderr, "ERROR: Can't open Mixer Device! -- %08X\n", err);
+				switch (err) {
+						case MMSYSERR_ALLOCATED:
+							fprintf(stderr, "MMSYSERR_ALLOCATED\n");
+							break;
+						case MMSYSERR_BADDEVICEID:
+							fprintf(stderr, "MMSYSERR_BADDEVICEID\n");
+							break;
+						case MMSYSERR_INVALFLAG:
+							fprintf(stderr, "MMSYSERR_INVALFLAG\n");
+							break;
+						case MMSYSERR_INVALHANDLE:
+							fprintf(stderr, "MMSYSERR_INVALHANDLE\n");
+							break;
+						case MMSYSERR_INVALPARAM:
+							fprintf(stderr, "MMSYSERR_INVALPARAM\n");
+							break;
+						case MMSYSERR_NODRIVER:
+							fprintf(stderr, "MMSYSERR_NODRIVER\n");
+							break;
+						case MMSYSERR_NOMEM:
+							fprintf(stderr, "MMSYSERR_NOMEM\n");
+							break;
+						default:
+							fprintf(stderr, "Reason: unknown\n");
+					}
+					fflush(stderr);
+			} else {
+				MIXERCAPS     mixcaps;
+				MIXERLINE     mixerline;
+				MMRESULT      err;
+				unsigned long i;
+				/* Get info about the first Mixer Device */
+				if (!(err = mixerGetDevCaps((UINT)sMixerHandle, &mixcaps, sizeof(MIXERCAPS)))) {
+					/* Print out the name of each destination line */
+					for (i = 0; i < mixcaps.cDestinations; i++) {
+						mixerline.cbStruct = sizeof(MIXERLINE);
+						mixerline.dwDestination = i;
+
+						if (!(err = mixerGetLineInfo((HMIXEROBJ)sMixerHandle, &mixerline, MIXER_GETLINEINFOF_DESTINATION)))
+						{
+							fprintf(stderr, "Destination #%lu = %s\n", i, mixerline.szName);
+							fflush(stderr);
+						}
+					}
+				}
+				mixerline.cbStruct = sizeof(MIXERLINE);
+				mixerline.dwDestination = 0;
+				mixerline.dwSource = 0;
+
+				if ((err = mixerGetLineInfo((HMIXEROBJ)sMixerHandle, &mixerline, MIXER_GETLINEINFOF_DESTINATION))) {
+					/* An error */
+					fprintf(stderr, "Error #%d calling mixerGetLineInfo()\n", err);
+					switch (err) {
+						case MIXERR_INVALLINE:
+							fprintf(stderr, "MIXERR_INVALLINE\n");
+							break;
+						case MMSYSERR_BADDEVICEID:
+							fprintf(stderr, "MMSYSERR_BADDEVICEID\n");
+							break;
+						case MMSYSERR_INVALFLAG:
+							fprintf(stderr, "MMSYSERR_INVALFLAG\n");
+							break;
+						case MMSYSERR_INVALHANDLE:
+							fprintf(stderr, "MMSYSERR_INVALHANDLE\n");
+							break;
+						case MMSYSERR_INVALPARAM:
+							fprintf(stderr, "MMSYSERR_INVALPARAM\n");
+							break;
+						case MMSYSERR_NODRIVER:
+							fprintf(stderr, "MMSYSERR_NODRIVER\n");
+							break;
+						default:
+							fprintf(stderr, "Reason: unknown\n");
+					}
+					fflush(stderr);
+				} else {
+					fprintf(stderr, "Mixerline: %s\n", mixerline.szName);
+					MIXERCONTROL       mixerControlArray;
+					MIXERLINECONTROLS  mixerLineControls;
+					mixerLineControls.cbStruct = sizeof(MIXERLINECONTROLS);
+					/* Tell mixerGetLineControls() for which line we're retrieving info.
+					We do this by putting the desired line's ID number in dwLineID */
+					mixerLineControls.dwLineID = mixerline.dwLineID;
+					/* We want to fetch info on only 1 control */
+					mixerLineControls.cControls = 1;
+					/* Tell mixerGetLineControls() for which type of control we're
+					retrieving info. We do this by putting the desired control type
+					in dwControlType */
+					mixerLineControls.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
+					/* Give mixerGetLineControls() the address of the MIXERCONTROL
+					struct to hold info */
+					mixerLineControls.pamxctrl = &mixerControlArray;
+					/* Tell mixerGetLineControls() how big the MIXERCONTROL is. This
+					saves having to initialize the cbStruct of the MIXERCONTROL itself */
+					mixerLineControls.cbmxctrl = sizeof(MIXERCONTROL);
+					/* Retrieve info on only any volume slider control for this line */
+					if ((err = mixerGetLineControls((HMIXEROBJ)sMixerHandle, &mixerLineControls, MIXER_GETLINECONTROLSF_ONEBYTYPE))) {
+						/* An error */
+						fprintf(stderr, "Error #%d calling mixerGetLineControls()\n", err);
+						fflush(stderr);
+					} else {
+						fprintf(stderr, "Mixercontrol: %s\n", mixerControlArray.szName);
+						fflush(stderr);
+						// try via mixer controls
+						MIXERCONTROLDETAILS_UNSIGNED value;
+						MIXERCONTROLDETAILS          mixerControlDetails;
+						MMRESULT                     err;
+						mixerControlDetails.cbStruct = sizeof(MIXERCONTROLDETAILS);
+						/* Tell mixerSetControlDetails() which control whose value we
+						want to set. We do this by putting the desired control's
+						ID number in dwControlID. The "Speaker Out" line's
+						volume slider has an ID of 0x00000000 */
+						mixerControlDetails.dwControlID = mixerControlArray.dwControlID;
+						/* This is always 1 for a MIXERCONTROL_CONTROLF_UNIFORM control */
+						mixerControlDetails.cChannels = 1;
+						/* This is always 0 except for a MIXERCONTROL_CONTROLF_MULTIPLE control */
+						mixerControlDetails.cMultipleItems = 0;
+						/* Give mixerSetControlDetails() the address of the
+						MIXERCONTROLDETAILS_UNSIGNED struct into which we place the value */
+						mixerControlDetails.paDetails = &value;
+						/* Tell mixerSetControlDetails() how big the MIXERCONTROLDETAILS_UNSIGNED is */
+						mixerControlDetails.cbDetails = sizeof(MIXERCONTROLDETAILS_UNSIGNED);
+						/* Store the value */
+						value.dwValue = (sVolume & 0xFF) << 8;
+						/* Set the value of the volume slider control for this line */
+						if ((err = mixerSetControlDetails((HMIXEROBJ)sMixerHandle, &mixerControlDetails, MIXER_SETCONTROLDETAILSF_VALUE))) {
+							fprintf(stderr, "Error #%d calling mixerSetControlDetails() ", err);
+							switch (err) {
+								case MIXERR_INVALCONTROL:
+									fprintf(stderr, "Invalid control\n");
+									break;
+								case MMSYSERR_BADDEVICEID:
+									fprintf(stderr, "bad device id\n");
+									break;
+								case MMSYSERR_INVALFLAG:
+									fprintf(stderr, "invalid flag\n");
+									break;
+								case MMSYSERR_INVALHANDLE:
+									fprintf(stderr, "Invalid handle\n");
+									break;
+								case MMSYSERR_INVALPARAM:
+									fprintf(stderr, "Invalid param\n");
+									break;
+								case MMSYSERR_NODRIVER:
+									fprintf(stderr, "No driver\n");
+									break;
+								default:
+									fprintf(stderr, "\n");
+							}
+							fprintf(stderr, "Will have to use windows application volume control.\n");
+							fflush(stderr);
+						}
+					}
+				}
+			}
+		}
+
+		char data1, data2;
+		fprintf(stderr, "read from stdin...");
+		fflush(stderr);
+		if (fread(&data1, sizeof(char), 1, stdin) != 1) {
+			exit(0);
+		} else {
+			if (fread(&data2, sizeof(char), 1, stdin) != 1) {
+				exit(0);
+			}
+		}
+		fprintf(stderr, "got %x %x\n", data1, data2);
+		fflush(stderr);
+		if (data1 > 0) {
+			// new filename
+			short length = data1 | (data2 << 8);
+			fprintf(stderr, "New filename sending: %d bytes\n", length);
+			fflush(stderr);
+			static char buf[0xffff];
+			int lastRead, totalRead = 0;
+			while ((lastRead = fread(buf + totalRead, sizeof(char), length - totalRead, stdin)) > 0 && totalRead < length) {
+				totalRead += lastRead;
+			}
+			if (totalRead < length) {
+				fprintf(stderr, "not enough data, got %d, expected %d bytes\n", totalRead, length);
+				fflush(stderr);
+				exit(0);
+			}
+			buf[length] = '\0';
+			sFilename = buf;
+			fprintf(stderr, "New filename received: %s\n", sFilename);
+			fflush(stderr);
+			SetEvent(event);
+		} else {
+			fprintf(stderr, "New volume received: %d\n", data2);
+			fflush(stderr);
+			sVolume = data2;
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char* argv[])
 {
 	if(argc != 3) {
-		return printf("Usage: %s <volume 0-255> <filename.mid>\n", argv[0]);
+		return fprintf(stderr, "Usage: %s <volume 0-255> <filename.mid>\n", argv[0]);
 	}
-	
-	example9(argv[2], atoi(argv[1]));
+
+	sVolume = atoi(argv[1]);
+	_setmode(_fileno(stdin), _O_BINARY);
+	hWaitingThread = CreateThread(NULL, 0, MyThreadFunction, NULL, 0, NULL);
+
+	sFilename = argv[2];
+
+	while (1) {
+		example9(sFilename);
+		fprintf(stdout, "1");
+		fflush(stdout);
+		WaitForSingleObject(event, INFINITE);
+	}
 
 	return 0;
 }
