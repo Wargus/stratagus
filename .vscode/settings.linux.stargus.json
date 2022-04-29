@@ -1,0 +1,7 @@
+{
+    "cmake.configureSettings": {
+        "STRATAGUS_INCLUDE_DIR": "${workspaceFolder}/../stratagus/gameheaders",
+        "STRATAGUS": "stratagus"
+    },
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
+}

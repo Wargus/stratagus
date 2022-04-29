@@ -1,0 +1,46 @@
+{
+    "configurations": [
+        {
+            "name": "startool",
+            "request": "launch",
+            "type": "cppdbg",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/Debug/startool.exe",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${env:PATH}"}],
+                "externalConsole": true
+            },
+            "linux": {
+                "program": "${workspaceRoot}/build/startool"
+            },
+            "args": ["-v", "${input:datadir}", "${workspaceFolder}/../data.stargus"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+        },
+        {
+            "name": "stargus",
+            "request": "launch",
+            "type": "cppdbg",
+            "windows": {
+                "type": "cppvsdbg",
+                "program": "${workspaceFolder}/build/Debug/stargus.exe",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}\\..\\dependencies\\bin;${workspaceFolder}\\..\\stratagus\\build\\Debug;${workspaceFolder}\\..\\stratagus\\build\\Release;${env:PATH}"}],
+                "externalConsole": true
+            },
+            "linux": {
+                "program": "${workspaceRoot}/build/stargus",
+                "environment": [{"name": "PATH", "value": "${workspaceFolder}/../stratagus/build/:${env:PATH}"}]
+            },
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}"
+        }
+    ],
+    "inputs": [
+        {
+          "type": "promptString",
+          "id": "datadir",
+          "description": "Enter path to DATA folder"
+        },
+    ]
+}
