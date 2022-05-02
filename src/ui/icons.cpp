@@ -191,12 +191,13 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 	}
 }
 
-static void ApplyPaletteSwaps(const std::vector<PaletteSwap> &swaps, const CUnit &unit, CGraphic *graphic)
+static void ApplyPaletteSwaps(const std::vector<PaletteSwap> &swaps, const CUnit &unit, CGraphic *graphic, bool def = false)
 {
 	for (PaletteSwap swap : swaps) {
 		unsigned int varIdx = swap.GetUnitVariableIndex();
 		if (unit.Variable[varIdx].Enable) {
-			const SDL_Color *colors = swap.GetColorsForPercentAndAlternative(unit.Variable[varIdx].Value, unit.Variable[varIdx].Max, UnitNumber(unit));
+			int value = def ? unit.Variable[varIdx].Max : unit.Variable[varIdx].Value;
+			const SDL_Color *colors = swap.GetColorsForPercentAndAlternative(value, unit.Variable[varIdx].Max, UnitNumber(unit));
 			SDL_SetPaletteColors(graphic->Surface->format->palette, colors, swap.GetColorIndexStart(), swap.GetColorCount());
 		}
 	}
@@ -212,6 +213,8 @@ static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGr
 	if (!sz) {
 		ApplyPaletteSwaps(swaps, unit, dynamic_cast<CGraphic *>(icon->G));
 		icon->DrawUnitIcon(style, flags, pos, text, playerColor);
+		// the normal icons are used outside this code path as well, so undo the swap immediately
+		ApplyPaletteSwaps(swaps, unit, dynamic_cast<CGraphic *>(icon->G), true);
 	} else {
 		// TODO: we could have this more configurable?
 		int graphicIdx = 0;
