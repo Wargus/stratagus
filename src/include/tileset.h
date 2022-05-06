@@ -216,9 +216,10 @@ public:
 	{
 		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
 	}
+	
+	int32_t findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain = 0) const;
 
 private:
-	int32_t findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain = 0) const;
 	int32_t getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
