@@ -1176,7 +1176,7 @@ std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Fai
 		for (auto &srcImg : src[0]) {
 			images.push_back(srcImg.get());
 		}
-		return std::vector {images} ;
+		return std::vector<sequence_of_imagesPtrs> {images};
 	}
 
     return buildSequences_Cicadas(src);    
