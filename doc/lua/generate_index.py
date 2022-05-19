@@ -27,7 +27,7 @@ END_OF_DOC_RE = re.compile(r'\*/\s*$')
 C_COMMENT_RE = re.compile(r'/\*[^*]*\*+(?:[^/*][^*]*\*+)*/', re.MULTILINE);
 BLANK_RE = re.compile(r'^\s*$')
 COMMENT_RE = re.compile(r'^\s*/?\*+/?', re.MULTILINE)
-PKG_EXPORT_RE = re.compile(r'^(?:extern )?((?:unsigned|const)? *[a-zA-Z0-9_<>]+ [a-zA-Z0-9_\[\]\*]+(?:\([^)]+\))?)(?: const)?;')
+PKG_EXPORT_RE = re.compile(r'^(?:extern|static|virtual|tolua_property)? *((?:unsigned|const)? *[a-zA-Z0-9_<>]+[ \*]+[a-zA-Z0-9_\[\]\*]+(?:\([^)]*\))?)(?: const)?;')
 
 
 class MLStripper(HTMLParser):
@@ -428,6 +428,16 @@ local api = {
 PLUGIN_END = r"""
 }
 
+local interpreter = {
+  name = "Stratagus",
+  description = "Stratagus engine",
+  api = {"baselib", "stratagus"},
+  frun = function(self,wfilename,rundebug)
+    ide:Print("Run stratagus normally")
+  end,
+  hasdebugger = true,
+}
+
 -- the actual plugin
 return {
   name = "Stratagus plugin",
@@ -438,12 +448,14 @@ return {
   onRegister = function(self)
     ide:AddAPI("lua", "stratagus", api)
     ide:AddSpec("stratagus-maps", mapspec)
+    ide:AddInterpreter("Stratagus", interpreter)
     ide:Print("Stratagus plugin registered")
   end,
 
   onUnRegister = function(self)
-    ide:RemoveAPI("lua", "stratagus")
+    ide:RemoveInterpreter("Stratagus")
     ide:RemoveSpec("stratagus-maps")
+    ide:RemoveAPI("lua", "stratagus")
     ide:Print("Stratagus plugin unloaded")
   end,
 }
@@ -473,6 +485,9 @@ def pkg_function_to_api(code, doc):
         luaargs = luaargs[:m.span(0)[0]] + m.group(2) + ": " + m.group(1) + luaargs[m.span(2)[1]:]
     luaretval = ""
     if " " in luaname:
+        if "*" in luaname:
+            luaname = luaname.replace(" *", " * ")
+            luaname = luaname.replace(" *", "*")
         luaretval = cpp_type_to_lua_type(luaname.split()[-2])
         luaretval = f', valuetype = "{luaretval}", returns = "({luaretval})"'
         luaname = luaname.split()[-1]
@@ -530,11 +545,16 @@ def pkg_class_to_api(code, doc, apifile):
                     apifile.write(f'  {pkg_function_to_api(item, "")}')
                 else:
                     apifile.write(f'  {pkg_global_to_api(item, "")}')
+            elif (m := re.search(f'^{luaname}\([^\)]*\);', line)):
+                # constructor
+                item = m.group(0)
+                apifile.write(f'  {pkg_function_to_api(f"{luaname} " + item.replace(luaname, "new"), "")}')
+                apifile.write(f'  {pkg_function_to_api(f"{luaname} " + item.replace(luaname, "local_new"), "")}')
         apifile.write('  }},\n')
     elif "enum" in code:
         for line in code.split("\n")[1:]:
-            if (m := re.search(r"([a-zA-Z0-9_]+)", line)):
-                apifile.write(f'  {m.group(1)} = {{ type = "value", valuetype = "number" }},\n')
+            if (m := re.search(r"([a-zA-Z0-9_]+)(?: *@ *([a-zA-Z0-9_]+))?", line)):
+                apifile.write(f'  {m.group(2) or m.group(1)} = {{ type = "value", valuetype = "number" }},\n')
 
 
 if __name__ == "__main__":
