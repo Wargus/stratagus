@@ -1287,8 +1287,7 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 
 	Assert(SDL_MUSTLOCK(sprite.Surface) == 0);
 	std::vector<SDL_Color> sdlColors = std::vector<SDL_Color>(PlayerColorsRGB[colorIndex].begin(), PlayerColorsRGB[colorIndex].end());
-	Assert(sprite.Surface->format->palette);
-	Assert(sprite.Surface->format->palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
+	Assert(!sprite.Surface->format->palette || sprite.Surface->format->palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
 	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
 		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
