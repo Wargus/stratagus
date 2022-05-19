@@ -480,6 +480,7 @@ void CViewport::Draw()
 	// If there was a click missile, draw it again here above the fog
 	if (clickMissile != NULL) {
 		Vec2i pos = Map.MapPixelPosToTilePos(clickMissile->position);
+		Map.Clamp(pos);
 		if (Map.Field(pos.x, pos.y)->playerInfo.TeamVisibilityState(*ThisPlayer) != 2) {
 			// if this tile is not visible, we want to draw the click on top of
 			// the fog again
