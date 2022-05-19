@@ -17,7 +17,7 @@ void NetworkDetachFromServer(void);
 class ServerSetupStateRacesArray {
     int& operator[](int idx) { return p[idx].Race; }
     int& operator[](int idx) const { return p[idx].Race; }
-}
+};
 
 enum SlotOption {
 	Available @ SlotAvailable,
