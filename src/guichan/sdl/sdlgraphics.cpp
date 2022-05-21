@@ -56,6 +56,7 @@
  * For comments regarding functions please see the header file.
  */
 
+#include "SDL_render.h"
 #include "guichan/exception.h"
 #include "guichan/font.h"
 #include "guichan/sdl/sdlgraphics.h"
@@ -77,6 +78,7 @@ namespace gcn
     {
         mAlpha = false;
         mTarget = NULL;
+        mSrcDataTexture = NULL;
     }
 
     void SDLGraphics::_beginDraw()
@@ -110,7 +112,11 @@ namespace gcn
         rect.w = carea.width;
         rect.h = carea.height;
 
-        SDL_SetClipRect(*mTarget, &rect);
+        if (mTarget == &TheScreen) {
+            SDL_RenderSetClipRect(TheRenderer, &rect);
+        } else {
+            SDL_SetClipRect(*mTarget, &rect);
+        }
 
         return result;
     }
@@ -131,7 +137,11 @@ namespace gcn
         rect.w = carea.width;
         rect.h = carea.height;
 
-        SDL_SetClipRect(*mTarget, &rect);
+        if (mTarget == &TheScreen) {
+            SDL_RenderSetClipRect(TheRenderer, &rect);
+        } else {
+            SDL_SetClipRect(*mTarget, &rect);
+        }
     }
 
     void SDLGraphics::drawImage(const Image* image, int srcX,
@@ -147,17 +157,32 @@ namespace gcn
         src.h = height;
         dst.x = dstX + top.xOffset;
         dst.y = dstY + top.yOffset;
+        dst.w = width;
+        dst.h = height;
 
-        SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
-
-        Color c = getColor();
-        if (!SDL_SetSurfaceColorMod(srcImage, c.r, c.g, c.b)) {
-            SDL_SetSurfaceColorMod(srcImage, 255, 255, 255);
+        if (mTarget == &TheScreen) {
+            if (!mSrcDataTexture) {
+                mSrcDataTexture = SDL_CreateTextureFromSurface(TheRenderer, (SDL_Surface*)image->_getData());
+            }
+            Color c = getColor();
+            if (!SDL_SetTextureColorMod(mSrcDataTexture, c.r, c.g, c.b)) {
+                SDL_SetTextureColorMod(mSrcDataTexture, 255, 255, 255);
+            }
+            if (!SDL_SetTextureAlphaMod(mSrcDataTexture, c.a)) {
+                SDL_SetTextureAlphaMod(mSrcDataTexture, 255);
+            }            
+            SDL_RenderCopy(TheRenderer, mSrcDataTexture, &src, &dst);
+        } else {
+            SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
+            Color c = getColor();
+            if (!SDL_SetSurfaceColorMod(srcImage, c.r, c.g, c.b)) {
+                SDL_SetSurfaceColorMod(srcImage, 255, 255, 255);
+            }
+            if (!SDL_SetSurfaceAlphaMod(srcImage, c.a)) {
+                SDL_SetSurfaceAlphaMod(srcImage, 255);
+            }
+            SDL_BlitSurface(srcImage, &src, *mTarget, &dst);
         }
-        if (!SDL_SetSurfaceAlphaMod(srcImage, c.a)) {
-            SDL_SetSurfaceAlphaMod(srcImage, 255);
-        }
-        SDL_BlitSurface(srcImage, &src, *mTarget, &dst);
     }
 
     void SDLGraphics::fillRectangle(const Rectangle& rectangle)
@@ -168,36 +193,40 @@ namespace gcn
         area.x += top.xOffset;
         area.y += top.yOffset;
 
-        if(!area.intersect(top) || mColor.a == 0)
-        {
+        if (!area.intersect(top) || mColor.a == 0) {
             return;
         }
 
-        if (mAlpha)
-        {
-			int x1 = std::max<int>(area.x, top.x);
-			int y1 = std::max<int>(area.y, top.y);
-			int x2 = std::min<int>(area.x + area.width, top.x + top.width);
-			int y2 = std::min<int>(area.y + area.height, top.y + top.height);
-			int x, y;
-			for (y = y1; y < y2; y++)
-			{
-			    for (x = x1; x < x2; x++)
-			    {
-			        SDLputPixelAlpha(*mTarget, x, y, mColor);
-			    }
-			}
-	}
-        else
-        {
+        if (mTarget == &TheScreen) {
             SDL_Rect rect;
             rect.x = area.x;
             rect.y = area.y;
             rect.w = area.width;
             rect.h = area.height;
+            SDL_SetRenderDrawColor(TheRenderer, mColor.r, mColor.g, mColor.b, mAlpha ? mColor.a : 0);
+            SDL_RenderFillRect(TheRenderer, &rect);
+        } else {
+            if (mAlpha) {
+                int x1 = std::max<int>(area.x, top.x);
+                int y1 = std::max<int>(area.y, top.y);
+                int x2 = std::min<int>(area.x + area.width, top.x + top.width);
+                int y2 = std::min<int>(area.y + area.height, top.y + top.height);
+                int x, y;
+                for (y = y1; y < y2; y++) {
+                    for (x = x1; x < x2; x++) {
+                        SDLputPixelAlpha(*mTarget, x, y, mColor);
+                    }
+                }
+            } else {
+                SDL_Rect rect;
+                rect.x = area.x;
+                rect.y = area.y;
+                rect.w = area.width;
+                rect.h = area.height;
 
-            Uint32 color = SDL_MapRGBA((*mTarget)->format, mColor.r, mColor.g, mColor.b, mColor.a);
-            SDL_FillRect(*mTarget, &rect, color);
+                Uint32 color = SDL_MapRGBA((*mTarget)->format, mColor.r, mColor.g, mColor.b, mColor.a);
+                SDL_FillRect(*mTarget, &rect, color);
+            }
         }
     }
 
@@ -207,16 +236,19 @@ namespace gcn
         x += top.xOffset;
         y += top.yOffset;
 
-        if(!top.isPointInRect(x,y))
+        if (!top.isPointInRect(x,y)) {
             return;
-
-        if (mAlpha)
-        {
-            SDLputPixelAlpha(*mTarget, x, y, mColor);
         }
-        else
-        {
-            SDLputPixel(*mTarget, x, y, mColor);
+
+        if (mTarget == &TheScreen) {
+            SDL_SetRenderDrawColor(TheRenderer, mColor.r, mColor.g, mColor.b, mAlpha ? mColor.a : 0);
+            SDL_RenderDrawPoint(TheRenderer, x, y);
+        } else {
+            if (mAlpha) {
+                SDLputPixelAlpha(*mTarget, x, y, mColor);
+            } else {
+                SDLputPixel(*mTarget, x, y, mColor);
+            }
         }
     }
 
@@ -338,6 +370,12 @@ namespace gcn
         y1 += top.yOffset;
         x2 += top.xOffset;
         y2 += top.yOffset;
+
+        if (mTarget == &TheScreen) {
+            SDL_SetRenderDrawColor(TheRenderer, mColor.r, mColor.g, mColor.b, mAlpha ? mColor.a : 0);
+            SDL_RenderDrawLine(TheRenderer, x1, y1, x2, y2);
+            return;
+        }
 
         // Draw a line with Bresenham
 
@@ -500,15 +538,5 @@ namespace gcn
     const Color& SDLGraphics::getColor()
     {
         return mColor;
-    }
-
-    void SDLGraphics::drawSDLSurface(SDL_Surface* surface, SDL_Rect source,
-                                     SDL_Rect destination)
-    {
-        ClipRectangle top = mClipStack.top();
-        destination.x += top.xOffset;
-        destination.y += top.yOffset;
-
-        SDL_BlitSurface(surface, &source, *mTarget, &destination);
     }
 }

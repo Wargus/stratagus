@@ -34,6 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL_blendmode.h"
+#include "SDL_render.h"
 #include "stratagus.h"
 
 #include <string>
@@ -96,9 +98,13 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 	Assert(surface);
 
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	
-	SDL_BlitSurface(Surface, &srect, surface, &drect);
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
+
+	if (surface == TheScreen) {
+		SDL_RenderCopy(TheRenderer, Texture, &srect, &drect);
+	} else {
+		SDL_BlitSurface(Surface, &srect, surface, &drect);
+	}
 }
 
 /**
@@ -122,25 +128,35 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 	Assert(surface);
 	Assert(surface->format->BitsPerPixel == 32);
 
+	if (surface == TheScreen) {
+		SDL_Rect srcrect = {gx, gy, w, h};
+		SDL_Rect dstrect = {x, y, w, h};
+		Uint8 alpha;
+		SDL_GetTextureAlphaMod(Texture, &alpha);
+		SDL_SetTextureAlphaMod(Texture, alpha * param);
+		SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_ADD);
+		SDL_RenderCopy(TheRenderer, Texture, &srcrect, &dstrect);
+		SDL_SetTextureAlphaMod(Texture, alpha);
+		return;
+	} else {
+		size_t srcOffset = Surface->w * gy + gx;
+		size_t dstOffset = surface->w * y + x;
 
-	size_t srcOffset = Surface->w * gy + gx;
-	size_t dstOffset = surface->w * y + x;
+		uint32_t *const src = reinterpret_cast<uint32_t *>(Surface->pixels);
+		uint32_t *const dst = reinterpret_cast<uint32_t *>(surface->pixels);
 
-	uint32_t *const src = reinterpret_cast<uint32_t *>(Surface->pixels);
-	uint32_t *const dst = reinterpret_cast<uint32_t *>(surface->pixels);
+		for (uint16_t posY = 0; posY < h; posY++) {
+			for (uint16_t posX = 0; posX < w; posX++) {
+				const uint32_t srcColor = src[srcOffset + posX];
+				const uint32_t dstColor = dst[dstOffset + posX];
+				const uint32_t resColor =  modifier(srcColor, dstColor, param);
 
-	for (uint16_t posY = 0; posY < h; posY++) {
-		for (uint16_t posX = 0; posX < w; posX++) {
-			const uint32_t srcColor = src[srcOffset + posX];
-			const uint32_t dstColor = dst[dstOffset + posX];
-			const uint32_t resColor =  modifier(srcColor, dstColor, param);
-
-			dst[dstOffset + posX] = resColor;
+				dst[dstOffset + posX] = resColor;
+			}
+			dstOffset += surface->w;
+			srcOffset += Surface->w;
 		}
-		dstOffset += surface->w;
-		srcOffset += Surface->w;
 	}
-
 }
 
 
@@ -167,8 +183,12 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y,
 	gy += y - oldy;
 
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	SDL_BlitSurface(Surface, &srect, surface, &drect);
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
+	if (surface == TheScreen) {
+		SDL_RenderCopy(TheRenderer, Texture, &srect, &drect);
+	} else {
+		SDL_BlitSurface(Surface, &srect, surface, &drect);
+	}
 }
 
 /**
@@ -190,10 +210,19 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 	Assert(surface);
 
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
-	SDL_SetSurfaceAlphaMod(Surface, alpha);
+	if (surface == TheScreen) {
+		SDL_GetTextureAlphaMod(Texture, &oldalpha);
+		SDL_SetTextureAlphaMod(Texture, alpha);
+	} else {
+		SDL_GetSurfaceAlphaMod(Surface, &oldalpha);
+		SDL_SetSurfaceAlphaMod(Surface, alpha);
+	}
 	DrawSub(gx, gy, w, h, x, y, surface);
-	SDL_SetSurfaceAlphaMod(Surface, oldalpha);
+	if (surface == TheScreen) {
+		SDL_SetTextureAlphaMod(Texture, oldalpha);
+	} else {
+		SDL_SetSurfaceAlphaMod(Surface, oldalpha);
+	}
 }
 
 /**
@@ -326,9 +355,13 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y,
 						  SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(Width), Uint16(Height)};
 
-	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+	if (surface == TheScreen) {
+		SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	} else {
+		SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+	}
 }
 
 /**
@@ -350,22 +383,31 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 	srect.x += x - oldx;
 	srect.y += y - oldy;
 
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-
-	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
+	if (surface == TheScreen) {
+		SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+	} else {
+		SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+	}
 }
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
 							   SDL_Surface *surface /*= TheScreen*/) const
 {
 	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(Width), Uint16(Height)};
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
-
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	if (surface == TheScreen) {
+		SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+		SDL_SetTextureAlphaMod(TextureFlip, alpha);
+		SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+		SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
+	} else {
+		SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
+		SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	}
 }
 
 void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
@@ -379,13 +421,19 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 	srect.x += x - oldx;
 	srect.y += y - oldy;
 
-	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
 	Uint8 oldalpha = 0xff;
-	SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
-
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
-	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
-	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	if (surface == TheScreen) {
+		SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+		SDL_SetTextureAlphaMod(TextureFlip, alpha);
+		SDL_RenderCopy(TheRenderer, TextureFlip, &srect, &drect);
+		SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
+	} else {
+		SDL_GetSurfaceAlphaMod(SurfaceFlip, &oldalpha);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
+		SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+		SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+	}
 }
 
 /**
@@ -662,17 +710,21 @@ void CGraphic::Load(bool grayscale)
 		return;
 	}
 
-	CFile fp;
 	const std::string name = LibraryFileName(File.c_str());
 	if (name.empty()) {
 		perror("Cannot find file");
 		goto error;
 	}
-	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {
-		perror("Can't open file");
-		goto error;
+	Surface = IMG_Load(name.c_str());
+	if (Surface == NULL) {
+		CFile fp;
+		if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {
+			perror("Can't open file");
+			goto error;
+		}
+		Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
+		fp.close();
 	}
-	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
 	if (Surface == NULL) {
 		fprintf(stderr, "Couldn't load file %s: %s", name.c_str(), IMG_GetError());
 		goto error;
@@ -680,7 +732,6 @@ void CGraphic::Load(bool grayscale)
 
 	GraphicWidth = Surface->w;
 	GraphicHeight = Surface->h;
-	fp.close();
 
 	if (Surface->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(Surface);
@@ -710,6 +761,9 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	GenFramesMap();
+
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+
 	return;
 
  error:
@@ -756,10 +810,18 @@ void CGraphic::Free(CGraphic *g)
 	--g->Refs;
 	if (!g->Refs) {
 		FreeSurface(&g->Surface);
+		if (g->Texture) {
+			SDL_DestroyTexture(g->Texture);
+			g->Texture = NULL;
+		}
 		delete[] g->frame_map;
 		g->frame_map = NULL;
 
 		FreeSurface(&g->SurfaceFlip);
+		if (g->TextureFlip) {
+			SDL_DestroyTexture(g->TextureFlip);
+			g->TextureFlip = NULL;
+		}
 		delete[] g->frameFlip_map;
 		g->frameFlip_map = NULL;
 
@@ -820,6 +882,8 @@ void CGraphic::Flip()
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
 
+	TextureFlip = SDL_CreateTextureFromSurface(TheRenderer, SurfaceFlip);
+
 	delete[] frameFlip_map;
 
 	frameFlip_map = new frame_pos_t[NumFrames];
@@ -879,6 +943,7 @@ void CGraphic::Resize(int w, int h)
 
 		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 		SDL_FreeSurface(Surface);
+		SDL_DestroyTexture(Texture);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
 		if (Surface->format->BytesPerPixel == 1) {
@@ -943,6 +1008,7 @@ void CGraphic::Resize(int w, int h)
 		SDL_UnlockSurface(Surface);
 		VideoPaletteListRemove(Surface);
 		SDL_FreeSurface(Surface);
+		SDL_DestroyTexture(Texture);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 										   Rmask, Gmask, Bmask, Amask);
@@ -958,6 +1024,7 @@ void CGraphic::Resize(int w, int h)
 	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
 
 	GenFramesMap();
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 }
 
 /**
@@ -977,17 +1044,24 @@ void CGraphic::SetOriginalSize()
 		FreeSurface(&Surface);
 		Surface = NULL;
 	}
+	if (Texture) {
+		SDL_DestroyTexture(Texture);
+		Texture = NULL;
+	}
 	delete[] frame_map;
 	frame_map = NULL;
 	if (SurfaceFlip) {
 		FreeSurface(&SurfaceFlip);
 		SurfaceFlip = NULL;
 	}
+	if (TextureFlip) {
+		SDL_DestroyTexture(TextureFlip);
+		TextureFlip = NULL;
+	}
 	delete[] frameFlip_map;
 	frameFlip_map = NULL;
 
 	this->Width = this->Height = 0;
-	this->Surface = NULL;
 	this->Load();
 
 	Resized = false;
@@ -1042,6 +1116,8 @@ void CGraphic::SetPaletteColor(int idx, int r, int g, int b) {
 	color.g = g;
 	color.b = b;
 	SDL_SetPaletteColors(Surface->format->palette, &color, idx, 1);
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 }
 
 void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
@@ -1241,6 +1317,14 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 	if (SurfaceFlip) {
 		shearSurface(SurfaceFlip, xOffset, yOffset, NumFrames, frameFlip_map, Width, Height);
 	}
+
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
+
+	if (SurfaceFlip) {
+		SDL_DestroyTexture(TextureFlip);
+		TextureFlip = SDL_CreateTextureFromSurface(TheRenderer, SurfaceFlip);
+	}
 }
 
 void FreeGraphics()
@@ -1353,6 +1437,8 @@ void CFiller::bits_map::Init(CGraphic *g)
 	}
 
 	SDL_UnlockSurface(s);
+	SDL_DestroyTexture(g->Texture);
+	g->Texture = SDL_CreateTextureFromSurface(TheRenderer, g->Surface);
 }
 
 void CFiller::Load()

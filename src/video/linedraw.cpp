@@ -34,6 +34,8 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
+#include "SDL_pixels.h"
+#include "SDL_render.h"
 #include "stratagus.h"
 #include "video.h"
 
@@ -68,7 +70,8 @@ static void (*VideoDoDrawTransPixel)(Uint32 color, int x, int y, unsigned char a
 */
 static void VideoDoDrawPixel16(Uint32 color, int x, int y)
 {
-	((Uint16 *)TheScreen->pixels)[x + y * Video.Width] = color;
+	throw "no 16 bit";
+	// ((Uint16 *)TheScreen->pixels)[x + y * Video.Width] = color;
 }
 
 /**
@@ -86,7 +89,10 @@ void VideoDrawPixel16(Uint32 color, int x, int y)
 */
 static void VideoDoDrawPixel32(Uint32 color, int x, int y)
 {
-	((Uint32 *)TheScreen->pixels)[x + y * Video.Width] = color;
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, a);
+	SDL_RenderDrawPoint(TheRenderer, x, y);
 }
 
 /**
@@ -104,15 +110,16 @@ void VideoDrawPixel32(Uint32 color, int x, int y)
 */
 static void VideoDoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 {
+	throw "no 16bit";
 	// Loses precision for speed
-	alpha = (255 - alpha) >> 3;
+	// alpha = (255 - alpha) >> 3;
 
-	Uint16 *p = &((Uint16 *)TheScreen->pixels)[x + y * Video.Width];
-	color = (((color << 16) | color) & 0x07E0F81F);
-	unsigned long dp = *p;
-	dp = ((dp << 16) | dp) & 0x07E0F81F;
-	dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
-	*p = (Uint16)((dp >> 16) | dp);
+	// Uint16 *p = &((Uint16 *)TheScreen->pixels)[x + y * Video.Width];
+	// color = (((color << 16) | color) & 0x07E0F81F);
+	// unsigned long dp = *p;
+	// dp = ((dp << 16) | dp) & 0x07E0F81F;
+	// dp = ((((dp - color) * alpha) >> 5) + color) & 0x07E0F81F;
+	// *p = (Uint16)((dp >> 16) | dp);
 }
 
 /**
@@ -130,20 +137,10 @@ void VideoDrawTransPixel16(Uint32 color, int x, int y, unsigned char alpha)
 */
 static void VideoDoDrawTransPixel32(Uint32 color, int x, int y, unsigned char alpha)
 {
-	alpha = 255 - alpha;
-
-	Uint32 *p = &((Uint32 *)TheScreen->pixels)[x + y * Video.Width];
-
-	const unsigned long sp2 = (color & 0xFF00FF00) >> 8;
-	color &= 0x00FF00FF;
-
-	unsigned long dp1 = *p;
-	unsigned long dp2 = (dp1 & 0xFF00FF00) >> 8;
-	dp1 &= 0x00FF00FF;
-
-	dp1 = ((((dp1 - color) * alpha) >> 8) + color) & 0x00FF00FF;
-	dp2 = ((((dp2 - sp2) * alpha) >> 8) + sp2) & 0x00FF00FF;
-	*p = (dp1 | (dp2 << 8));
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, alpha);
+	SDL_RenderDrawPoint(TheRenderer, x, y);
 }
 
 /**
@@ -297,96 +294,10 @@ void DrawTransHLineClip(Uint32 color, int x, int y,
 */
 void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	if (sx == dx) {
-		if (sy < dy) {
-			DrawVLine(color, sx, sy, dy - sy + 1);
-		} else {
-			DrawVLine(color, dx, dy, sy - dy + 1);
-		}
-		return;
-	}
-
-	if (sy == dy) {
-		if (sx < dx) {
-			DrawHLine(color, sx, sy, dx - sx + 1);
-		} else {
-			DrawHLine(color, dx, dy, sx - dx + 1);
-		}
-		return;
-	}
-
-	// exchange coordinates
-	if (sy > dy) {
-		std::swap(dx, sx);
-		std::swap(dy, sy);
-	}
-	int xlen;
-	int incr;
-
-	int ylen = dy - sy;
-
-	if (sx > dx) {
-		xlen = sx - dx;
-		incr = -1;
-	} else {
-		xlen = dx - sx;
-		incr = 1;
-	}
-
-	int y = sy;
-	int x = sx;
-
-	if (xlen > ylen) {
-		int p;
-
-		if (sx > dx) {
-			std::swap(sx, dx);
-			y = dy;
-		}
-
-		p = (ylen << 1) - xlen;
-
-		Video.LockScreen();
-		for (x = sx; x < dx; ++x) {
-			VideoDoDrawPixel(color, x, y);
-			if (p >= 0) {
-				y += incr;
-				p += (ylen - xlen) << 1;
-			} else {
-				p += (ylen << 1);
-			}
-		}
-		Video.UnlockScreen();
-		return;
-	}
-
-	if (ylen > xlen) {
-		int p = (xlen << 1) - ylen;
-
-		Video.LockScreen();
-		for (y = sy; y < dy; ++y) {
-			VideoDoDrawPixel(color, x, y);
-			if (p >= 0) {
-				x += incr;
-				p += (xlen - ylen) << 1;
-			} else {
-				p += (xlen << 1);
-			}
-		}
-		Video.UnlockScreen();
-		return;
-	}
-
-	// Draw a diagonal line
-	if (ylen == xlen) {
-		Video.LockScreen();
-		while (y != dy) {
-			VideoDoDrawPixel(color, x, y);
-			x += incr;
-			++y;
-		}
-		Video.UnlockScreen();
-	}
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, a);
+	SDL_RenderDrawLine(TheRenderer, sx, sy, dx, dy);
 }
 
 /**
@@ -394,93 +305,19 @@ void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 */
 void DrawLineClip(Uint32 color, int sx, int sy, int dx, int dy)
 {
-	if (sx == dx) {
-		if (sy < dy) {
-			DrawVLineClip(color, sx, sy, dy - sy + 1);
-		} else {
-			DrawVLineClip(color, dx, dy, sy - dy + 1);
-		}
-		return;
-	}
-
-	if (sy == dy) {
-		if (sx < dx) {
-			DrawHLineClip(color, sx, sy, dx - sx + 1);
-		} else {
-			DrawHLineClip(color, dx, dy, sx - dx + 1);
-		}
-		return;
-	}
-
-	// exchange coordinates
-	if (sy > dy) {
-		std::swap(dx, sx);
-		std::swap(dy, sy);
-	}
-	int ylen = dy - sy;
-	int xlen;
-	int incr;
-
-	if (sx > dx) {
-		xlen = sx - dx;
-		incr = -1;
-	} else {
-		xlen = dx - sx;
-		incr = 1;
-	}
-
-	int y = sy;
-	int x = sx;
-
-	if (xlen > ylen) {
-		if (sx > dx) {
-			std::swap(dx, sx);
-			y = dy;
-		}
-
-		int p = (ylen << 1) - xlen;
-
-		Video.LockScreen();
-		for (x = sx; x < dx; ++x) {
-			VideoDoDrawPixelClip(color, x, y);
-			if (p >= 0) {
-				y += incr;
-				p += (ylen - xlen) << 1;
-			} else {
-				p += (ylen << 1);
-			}
-		}
-		Video.UnlockScreen();
-		return;
-	}
-
-	if (ylen > xlen) {
-		int p = (xlen << 1) - ylen;
-
-		Video.LockScreen();
-		for (y = sy; y < dy; ++y) {
-			VideoDoDrawPixelClip(color, x, y);
-			if (p >= 0) {
-				x += incr;
-				p += (xlen - ylen) << 1;
-			} else {
-				p += (xlen << 1);
-			}
-		}
-		Video.UnlockScreen();
-		return;
-	}
-
-	// Draw a diagonal line
-	if (ylen == xlen) {
-		Video.LockScreen();
-		while (y != dy) {
-			VideoDoDrawPixelClip(color, x, y);
-			x += incr;
-			++y;
-		}
-		Video.UnlockScreen();
-	}
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, a);
+	SDL_Rect clipRect;
+	clipRect.x = ClipX1;
+	clipRect.y = ClipY1;
+	clipRect.w = ClipX2 - ClipX1;
+	clipRect.h = ClipY2 - ClipY1;
+	SDL_Rect oldClip;
+	SDL_RenderGetClipRect(TheRenderer, &oldClip);
+	SDL_RenderSetClipRect(TheRenderer, &clipRect);
+	SDL_RenderDrawLine(TheRenderer, sx, sy, dx, dy);
+	SDL_RenderSetClipRect(TheRenderer, &oldClip);
 }
 
 /**
@@ -565,8 +402,11 @@ void DrawTransRectangleClip(Uint32 color, int x, int y,
 */
 void FillRectangle(Uint32 color, int x, int y, int w, int h)
 {
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, a);
 	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
-	SDL_FillRect(TheScreen, &drect, color);
+	SDL_RenderDrawRect(TheRenderer, &drect);
 }
 
 /**
@@ -576,17 +416,15 @@ void FillRectangleClip(Uint32 color, int x, int y,
 					   int w, int h)
 {
 	SDL_Rect oldrect;
-	SDL_Rect newrect;
-
-	SDL_GetClipRect(TheScreen, &oldrect);
-	newrect.x = ClipX1;
-	newrect.y = ClipY1;
-	newrect.w = ClipX2 + 1 - ClipX1;
-	newrect.h = ClipY2 + 1 - ClipY1;
-
-	SDL_SetClipRect(TheScreen, &newrect);
-	FillRectangle(color, x, y, w, h);
-	SDL_SetClipRect(TheScreen, &oldrect);
+	SDL_Rect clipRect = {ClipX1, ClipY1, ClipX2 - ClipX1, ClipY2 - ClipY1};
+	SDL_Rect drawRect = {x, y, w, h};
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, a);
+	SDL_RenderGetClipRect(TheRenderer, &oldrect);
+	SDL_RenderSetClipRect(TheRenderer, &clipRect);
+	SDL_RenderFillRect(TheRenderer, &drawRect);
+	SDL_RenderSetClipRect(TheRenderer, &oldrect);
 }
 
 /**
@@ -595,17 +433,16 @@ void FillRectangleClip(Uint32 color, int x, int y,
 void FillTransRectangle(Uint32 color, int x, int y,
 						int w, int h, unsigned char alpha)
 {
-	int ex = x + w;
-	int ey = y + h;
-	int sx = x;
-
-	Video.LockScreen();
-	for (; y < ey; ++y) {
-		for (x = sx; x < ex; ++x) {
-			VideoDoDrawTransPixel(color, x, y, alpha);
-		}
-	}
-	Video.UnlockScreen();
+	SDL_Rect oldrect;
+	SDL_Rect clipRect = {ClipX1, ClipY1, ClipX2 - ClipX1, ClipY2 - ClipY1};
+	SDL_Rect drawRect = {x, y, w, h};
+	Uint8 r, g, b, a;
+	SDL_GetRGBA(color, TheScreen->format, &r, &g, &b, &a);
+	SDL_SetRenderDrawColor(TheRenderer, r, g, b, alpha);
+	SDL_RenderGetClipRect(TheRenderer, &oldrect);
+	SDL_RenderSetClipRect(TheRenderer, &clipRect);
+	SDL_RenderFillRect(TheRenderer, &drawRect);
+	SDL_RenderSetClipRect(TheRenderer, &oldrect);
 }
 
 /**
