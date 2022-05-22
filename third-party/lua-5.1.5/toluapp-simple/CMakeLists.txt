@@ -21,9 +21,12 @@ tolua_to.c
 
 
 add_library(toluapp51 STATIC "${TOLUA_LIB_SRC}")
+add_library(toluapp51_shared SHARED "${TOLUA_LIB_SRC}")
+set_target_properties(toluapp51_shared PROPERTIES OUTPUT_NAME "toluapp51")
 add_executable(toluapp "${TOLUA_BIN_SRC}" "${TOLUA_LIB_SRC}")
 
 target_link_libraries(toluapp51 PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a" ${CMAKE_DL_LIBS})
+target_link_libraries(toluapp51_shared PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a" ${CMAKE_DL_LIBS})
 target_link_libraries(toluapp PUBLIC "${PROJECT_BINARY_DIR}/liblua51.a" ${CMAKE_DL_LIBS})
 
 
@@ -34,6 +37,7 @@ set_target_properties(toluapp PROPERTIES
     )
 
 set_target_properties(toluapp51 PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(toluapp51_shared PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(toluapp PROPERTIES LINKER_LANGUAGE CXX)
 
 include_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})

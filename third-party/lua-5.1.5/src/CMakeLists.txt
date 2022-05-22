@@ -43,6 +43,9 @@ set(LUA_SRC "lua.c")
 add_library(lua51_static STATIC "${LUA_LIB_SRC}")
 set_target_properties(lua51_static PROPERTIES OUTPUT_NAME "lua51")
 
+add_library(lua51_shared SHARED "${LUA_LIB_SRC}")
+set_target_properties(lua51_shared PROPERTIES OUTPUT_NAME "lua51")
+
 add_executable(lua51 "${LUA_SRC}" "${LUA_LIB_SRC}")
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -54,12 +57,15 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 if(UNIX)
 target_compile_definitions(lua51_static PUBLIC "LUA_USE_DLOPEN" "LUA_USE_MKSTEMP")
+target_compile_definitions(lua51_shared PUBLIC "LUA_USE_DLOPEN" "LUA_USE_MKSTEMP")
 target_compile_definitions(lua51 PUBLIC "LUA_USE_DLOPEN" "LUA_USE_MKSTEMP")
 target_link_libraries(lua51 PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(lua51_static PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries(lua51_shared PUBLIC ${CMAKE_DL_LIBS})
 endif()
 
 set_target_properties(lua51_static PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(lua51_shared PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(lua51 PROPERTIES LINKER_LANGUAGE CXX)
 
 set_target_properties(lua51 PROPERTIES
