@@ -72,7 +72,7 @@ static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 static CFont *SmallFont;  /// Small font used in stats
 static CFont *GameFont;   /// Normal font used in game
 
-static int FormatNumber(int number, char *buf);
+static std::string FormatNumber(const int number);
 
 CFont &GetSmallFont()
 {
@@ -395,7 +395,8 @@ bool CFont::IsLoaded() const
 }
 
 /**
-**  Returns the pixel width of text.
+**  Returns the pixel width of text. This is intimately
+**  tied to FormatNumber
 **
 **  @param number  number to calculate the width of.
 **
@@ -404,14 +405,16 @@ bool CFont::IsLoaded() const
 int CFont::Width(const int number) const
 {
 	int width = 0;
-	size_t pos = 0;
-	char text[sizeof(int) * 10 + 2];
-	const int len = FormatNumber(number, text);
+	static_assert(sizeof(int) <= 8); // 64bit numbers need at most 20 decimal places
+	char buf[20] = {'\0'};
+	int len = snprintf(buf, sizeof(buf), "%d", number);
+	int commas = (len - (number < 0 ? 1 : 0) - 1) / 3;
 
 	DynamicLoad();
 	for (int i = 0; i < len; i++) {
-		width += this->CharWidth[text[i] - 32] + 1;
+		width += this->CharWidth[buf[i] - 32] + 1;
 	}
+	width += (this->CharWidth[',' - 32] + 1) * commas;
 	return width;
 }
 
@@ -671,9 +674,9 @@ int CLabel::Draw(int x, int y, const std::string &text) const
 
 int CLabel::Draw(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<false>(x, y, buf, len, normal);
+	std::string text = FormatNumber(number);
+	size_t len = text.size();
+	return DoDrawText<false>(x, y, text.c_str(), len, normal);
 }
 
 /// Draw text/number clipped
@@ -696,9 +699,9 @@ int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal) cons
 
 int CLabel::DrawClip(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<true>(x, y, buf, len, normal);
+	std::string text = FormatNumber(number);
+	size_t len = text.size();
+	return DoDrawText<true>(x, y, text.c_str(), len, normal);
 }
 
 
@@ -715,9 +718,9 @@ int CLabel::DrawReverse(int x, int y, const std::string &text) const
 
 int CLabel::DrawReverse(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<false>(x, y, buf, len, reverse);
+	std::string text = FormatNumber(number);
+	size_t len = text.size();
+	return DoDrawText<false>(x, y, text.c_str(), len, reverse);
 }
 
 /// Draw reverse text/number clipped
@@ -733,9 +736,9 @@ int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
 
 int CLabel::DrawReverseClip(int x, int y, int number) const
 {
-	char buf[sizeof(int) * 10 + 2];
-	size_t len = FormatNumber(number, buf);
-	return DoDrawText<true>(x, y, buf, len, reverse);
+	std::string text = FormatNumber(number);
+	size_t len = text.size();
+	return DoDrawText<true>(x, y, text.c_str(), len, reverse);
 }
 
 int CLabel::DrawCentered(int x, int y, const std::string &text) const
@@ -752,31 +755,37 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 	return dx / 2;
 }
 
-
 /**
-**  Format a number using commas
+**	@brief	Format a number using commas
 **
-**  @param number  Number to be formatted
-**  @param buf     Buffer to save the formatted number to
+**  This is closely tied to CFont::Width(int number).
 **
-**  @return      The real length of the Formated Number.
+**	@param	number	Number to be formatted
+**
+**	@return	The formatted number as a string
 */
-static int FormatNumber(int number, char *buf)
+static std::string FormatNumber(const int number)
 {
+	std::string str;
 	const char sep = ',';
-	char bufs[sizeof(int) * 10 + 2];
-	int s = 0;
-	int d = number < 0 ? 1 : 0;
-	const int sl = snprintf(bufs, sizeof(bufs), "%d", abs(number));
+	int n = abs(number);
 
-	while (s <= sl) {
-		if (s > 0 && s < sl && (s - (sl % 3)) % 3 == 0) {
-			buf[d++] = sep;
+	int loop = 0;
+	while (n > 0 || loop == 0) {
+		if (loop > 0 && loop % 3 == 0) {
+			str.insert(0, 1, sep);
 		}
-		buf[d++] = bufs[s++];
+		const char c = n % 10 + 48;
+		str.insert(0, 1, c);
+		n /= 10;
+		loop++;
 	}
-	buf[0] = number < 0 ? '-' : buf[0];
-	return d - 1;
+
+	if (number < 0) {
+		str.insert(0, 1, '-');
+	}
+	
+	return str;
 }
 
 /**
