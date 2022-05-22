@@ -1171,7 +1171,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 	}
 
 	// no file content found for this fragment index, we're done
-	DebugPrint("Sending end fragment %d for %s\n" _C_ fragmentIdx _C_ NetworkMapName);
+	DebugPrint("Sending end fragment %d for %s\n" _C_ fragmentIdx _C_ NetworkMapName.c_str());
 	const CInitMessage_MapFileFragment message("", nullptr, 0, fragmentIdx);
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1753,7 +1753,7 @@ void NetworkServerStartGame()
 			if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
 				bool hasHumanPlayer = false;
 				for (auto &h : Hosts) {
-					if (hasHumanPlayer = (h.PlyNr == i)) {
+					if ((hasHumanPlayer = (h.PlyNr == i))) {
 						break;
 					}
 				}

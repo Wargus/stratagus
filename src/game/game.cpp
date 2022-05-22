@@ -979,6 +979,8 @@ void CreateGame(const std::string &filename, CMap *map)
 			case GameTypes::SettingsGameTypeTeamCaptureTheFlag:
 				break;
 #endif
+            default:
+				break;
 		}
 	}
 

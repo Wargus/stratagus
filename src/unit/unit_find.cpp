@@ -486,7 +486,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo && !unit.Removed) {
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
 			if (unit.CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;

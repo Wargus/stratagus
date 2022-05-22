@@ -440,9 +440,9 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 	bool any = false;
 	bool onlyUnits = false;
 	bool onlyBuildings = false;
-	if (any = (typestr == "any")) {
-	} else if (onlyUnits = (typestr == "unit")) {
-	} else if (onlyBuildings = (typestr == "building")) {
+	if ((any = (typestr == "any"))) {
+	} else if ((onlyUnits = (typestr == "unit"))) {
+	} else if ((onlyBuildings = (typestr == "building"))) {
 	} else {
 		type = UnitTypeByIdent(LuaToString(l, 2));
 		if (!type) {

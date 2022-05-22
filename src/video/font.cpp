@@ -434,7 +434,7 @@ int CFont::Width(const std::string &text) const
 	size_t subpos = 0;
 
 	DynamicLoad();
-	while (utf8 = CodepageIndexFromUTF8(text, pos, subpos)) {
+	while ((utf8 = CodepageIndexFromUTF8(text, pos, subpos))) {
 		if (utf8 == '~' && !subpos) {
 			if (text[pos] == '|') {
 				++pos;
@@ -573,7 +573,7 @@ int CLabel::DoDrawText(int x, int y,
 	font->DynamicLoad();
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
-	while (utf8 = CodepageIndexFromUTF8(text, len, pos, subpos)) {
+	while ((utf8 = CodepageIndexFromUTF8(text, len, pos, subpos))) {
 		tab = false;
 		if (utf8 == '\t') {
 			tab = true;

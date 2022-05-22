@@ -2256,7 +2256,7 @@ static int CclDefinePaletteSwap(lua_State *l)
 			lua_rawgeti(l, -1, step + 1); // swap table, steps table, alternatives table
 			if (alternativesCount) {
 				if (lua_rawlen(l, -1) != alternativesCount) {
-					LuaError(l, "incorrect argument, need table with %d alternatives, got %d" _C_ alternativesCount _C_ lua_rawlen(l, -1));
+					LuaError(l, "incorrect argument, need table with %d alternatives, got %zu" _C_ alternativesCount _C_ lua_rawlen(l, -1));
 				}
 			} else {
 				alternativesCount = lua_rawlen(l, -1);
@@ -2268,7 +2268,7 @@ static int CclDefinePaletteSwap(lua_State *l)
 				}
 				if (colorCount) {
 					if (lua_rawlen(l, -1) != colorCount) {
-						LuaError(l, "incorrect argument, need table with %d colors, got %d" _C_ colorCount _C_ lua_rawlen(l, -1));
+						LuaError(l, "incorrect argument, need table with %d colors, got %zu" _C_ colorCount _C_ lua_rawlen(l, -1));
 					}
 				} else {
 					colorCount = lua_rawlen(l, -1);

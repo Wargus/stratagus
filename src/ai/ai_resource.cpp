@@ -437,7 +437,7 @@ public:
 	explicit IsAWorker() {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && unit->Type->ResInfo && !unit->Removed);
+		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && !unit->Removed);
 	}
 };
 
