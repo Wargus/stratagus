@@ -429,10 +429,9 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 	Mix_Chunk *sample = LoadSample(name);
 
 	if (sample) {
-		channel = PlaySample(sample, NULL);
+		channel = PlaySample(sample, PlaySoundFileCallback);
 		if (channel != -1) {
 			SetChannelVolume(channel, MaxVolume);
-			SetChannelFinishedCallback(channel, PlaySoundFileCallback);
 			ChannelMap[channel] = listener;
 		}
 	}

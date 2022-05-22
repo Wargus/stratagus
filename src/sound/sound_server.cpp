@@ -268,6 +268,10 @@ bool UnitSoundIsPlaying(Origin *origin)
 */
 static void ChannelFinished(int channel)
 {
+	if (channel < 0 || channel >= MaxChannels) {
+		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
+		return;
+	}
 	if (Channels[channel].FinishedCallback) {
 		Channels[channel].FinishedCallback(channel);
 	}
@@ -311,20 +315,6 @@ void SetChannelStereo(int channel, int stereo)
 		}
 		Mix_SetPanning(channel, left, right);
 	}
-}
-
-/**
-**  Set the channel's callback for when a sound finishes playing
-**
-**  @param channel   Channel to set
-**  @param callback  Callback to call when the sound finishes
-*/
-void SetChannelFinishedCallback(int channel, void (*callback)(int channel))
-{
-	if (channel < 0 || channel >= MaxChannels) {
-		return;
-	}
-	Channels[channel].FinishedCallback = callback;
 }
 
 /**
@@ -466,7 +456,7 @@ void FreeSample(Mix_Chunk *sample)
 **
 **  @return        Channel number, -1 for error
 */
-int PlaySample(Mix_Chunk *sample, Origin *origin)
+static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int channel))
 {
 #ifdef DYNAMIC_LOAD
 	if (sample->allocated == 0xcafebeef) {
@@ -480,15 +470,27 @@ int PlaySample(Mix_Chunk *sample, Origin *origin)
 	DebugPrint("play sample %d\n" _C_ sample->volume);
 	if (SoundEnabled() && EffectsEnabled && sample) {
 		channel = Mix_PlayChannel(-1, sample, 0);
-		Channels[channel].FinishedCallback = NULL;
-		if (origin && origin->Base) {
-			Origin *source = new Origin;
-			source->Base = origin->Base;
-			source->Id = origin->Id;
-			Channels[channel].Unit = source;
+		if (channel >= 0 && channel < MaxChannels) {
+			Channels[channel].FinishedCallback = callback;
+			if (origin && origin->Base) {
+				Origin *source = new Origin;
+				source->Base = origin->Base;
+				source->Id = origin->Id;
+				Channels[channel].Unit = source;
+			}
 		}
 	}
 	return channel;
+}
+
+int PlaySample(Mix_Chunk *sample, Origin *origin)
+{
+	return PlaySample(sample, origin, NULL);
+}
+
+int PlaySample(Mix_Chunk *sample, void (*callback)(int channel))
+{
+	return PlaySample(sample, NULL, callback);
 }
 
 /**
