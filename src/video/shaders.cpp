@@ -393,7 +393,7 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 		lazyGlTexCoord2f(maxu, maxv);
 		lazyGlVertex2f(maxx, maxy);
 	} lazyGlEnd();
-	SDL_GL_SwapWindow(win);
+	// SDL_GL_SwapWindow(win);
 
 	if (ShaderProgram != 0) {
 		glUseProgram(oldProgramId);

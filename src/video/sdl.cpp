@@ -790,6 +790,7 @@ void WaitEventsOneFrame()
 */
 
 static Uint32 LastTick = 0;
+static int RefreshRate = 0;
 
 void RealizeVideoMemory()
 {
@@ -805,17 +806,38 @@ void RealizeVideoMemory()
 			//for (int i = 0; i < NumRects; i++)
 			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
 			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
-			if (EnableDebugPrint) {
-				// show a bar representing fps scaled by 10
-				SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
-				Uint32 nextTick = SDL_GetTicks();
-				double fps = 10000.0 / (nextTick - LastTick);
-				SDL_RenderDrawLine(TheRenderer, 0, 0, floorl(fps), 0);
-				SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-				LastTick = nextTick;
-			}
-			SDL_RenderPresent(TheRenderer);
 		}
+		if (Parameters::Instance.benchmark) {
+			if (!RefreshRate) {
+				int displayCount = SDL_GetNumVideoDisplays();
+				SDL_DisplayMode mode;
+				for (int i = 0; i < displayCount; i++) {
+					SDL_GetDesktopDisplayMode(0, &mode);
+					if (mode.refresh_rate > RefreshRate) {
+						RefreshRate = mode.refresh_rate;
+					}
+				}
+			}
+
+			// show a bar representing fps, where the entire bar is the max refresh rate of attached displays
+			Uint32 nextTick = SDL_GetTicks();
+			Uint32 frameTime = nextTick - LastTick;
+			int fps = std::min(RefreshRate, static_cast<int>(frameTime > 0 ? (1000.0 / frameTime) : 0));
+			LastTick = nextTick;
+
+			// draw the full bar
+			SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+			SDL_Rect frame = { Video.Width - 10, 2, 8, RefreshRate };
+			SDL_RenderDrawRect(TheRenderer, &frame);
+
+			// draw the inner fps gage
+			SDL_SetRenderDrawColor(TheRenderer, 0, 255, 0, 255);
+			SDL_Rect bar = { Video.Width - 8, 2 + RefreshRate - fps, 4, fps };
+			SDL_RenderFillRect(TheRenderer, &bar);
+
+			SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+		}
+		SDL_RenderPresent(TheRenderer);
 		NumRects = 0;
 	}
 	if (!Preference.HardwareCursor) {
