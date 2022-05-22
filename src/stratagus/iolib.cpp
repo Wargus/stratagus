@@ -46,6 +46,7 @@
 
 #include "SDL.h"
 
+#include <map>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -675,9 +676,17 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 
 extern std::string LibraryFileName(const char *file)
 {
-	char buffer[PATH_MAX];
-	LibraryFileName(file, buffer);
-	return buffer;
+	static std::unordered_map<std::string, std::string> FileNameMap;
+	auto result = FileNameMap.find(file);
+	if (result == std::end(FileNameMap)) {
+		char buffer[PATH_MAX];
+		LibraryFileName(file, buffer);
+		std::string r(buffer);
+		FileNameMap[file] = r;
+		return r;
+	} else {
+		return result->second;
+	}
 }
 
 bool CanAccessFile(const char *filename)
