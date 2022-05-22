@@ -9,6 +9,9 @@ if (-not (Test-Path "$stratagus_folder\\..\\dependencies")) {
 if (-not (Test-Path "$stratagus_folder\\..\\dependencies\\bin\\ffmpeg.exe")) {
     Invoke-WebRequest https://github.com/Wargus/stratagus/releases/download/2015-30-11/ffmpeg.exe -OutFile "$stratagus_folder\\..\\dependencies\\bin\\ffmpeg.exe"
 }
+if (-not (Test-Path "$stratagus_folder\\..\\dependencies\\bin\\magick.exe")) {
+    Invoke-WebRequest https://github.com/Wargus/stratagus/releases/download/2015-30-11/magick.exe -OutFile "$stratagus_folder\\..\\dependencies\\bin\\magick.exe"
+}
 
 if (-not (Test-Path "$stratagus_folder\\.vscode\\settings.json")) {
     Copy-Item "$stratagus_folder\\.vscode\\settings.windows.json" "$stratagus_folder\\.vscode\\settings.json"
