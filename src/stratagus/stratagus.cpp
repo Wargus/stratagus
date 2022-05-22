@@ -442,6 +442,7 @@ static void Usage()
 	printf(
 		"\n\nUsage: %s [OPTIONS] [map.smp|map.smp.gz]\n"
 		"\t-a\t\tEnables asserts check in engine code (for debugging)\n"
+		"\t-b\t\tBenchmark mode. Runs as fast as possible and reports FPS.\n"
 		"\t-c file.lua\tConfiguration start file (default stratagus.lua)\n"
 		"\t-d datapath\tPath to stratagus data (default current directory)\n"
 		"\t-D depth\tVideo mode depth = pixel per point\n"
@@ -516,9 +517,12 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 #endif
 	char *sep;
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FgG:hiI:lN:oOP:prs:S:u:v:W?-")) {
+		switch (getopt(argc, argv, "abc:d:D:eE:FgG:hiI:lN:oOP:prs:S:u:v:W?-")) {
 			case 'a':
 				EnableAssert = true;
+				continue;
+			case 'b':
+				parameters.benchmark = true;
 				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;

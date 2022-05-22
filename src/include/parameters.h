@@ -54,6 +54,7 @@ public:
 	std::string luaEditorStartFilename;
 	std::string luaScriptArguments;
 	std::string LocalPlayerName;        /// Name of local player
+	bool benchmark = false;             /// If true, run as fast as possible and report fps at the end of a game
 private:
 	std::string userDirectory;          /// Directory containing user settings and data
 public:

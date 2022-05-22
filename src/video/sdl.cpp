@@ -726,8 +726,6 @@ const EventCallback *GetCallbacks()
 */
 void WaitEventsOneFrame()
 {
-	++FrameCounter;
-
 	if (dummyRenderer) {
 		return;
 	}
@@ -741,7 +739,7 @@ void WaitEventsOneFrame()
 	InputKeyTimeout(*GetCallbacks(), ticks);
 	CursorAnimate(ticks);
 
-	int interrupts = 0;
+	int interrupts = Parameters::Instance.benchmark;
 
 	for (;;) {
 		// Time of frame over? This makes the CPU happy. :(
@@ -795,6 +793,7 @@ static Uint32 LastTick = 0;
 
 void RealizeVideoMemory()
 {
+	++FrameCounter;
 	if (dummyRenderer) {
 		return;
 	}
