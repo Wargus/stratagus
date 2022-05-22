@@ -319,6 +319,7 @@ bool NoRescueCheck;               /// Disable rescue check
 **  Colors used for minimap.
 */
 std::vector<std::vector<CColor>> PlayerColorsRGB;
+std::vector<std::vector<SDL_Color>> PlayerColorsSDL;
 
 std::vector<std::string> PlayerColorNames;
 
@@ -1286,7 +1287,8 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 	Assert(PlayerColorIndexCount);
 
 	Assert(SDL_MUSTLOCK(sprite.Surface) == 0);
-	std::vector<SDL_Color> sdlColors = std::vector<SDL_Color>(PlayerColorsRGB[colorIndex].begin(), PlayerColorsRGB[colorIndex].end());
+	// TODO: This vector allocation is costly in profiles
+	std::vector<SDL_Color> sdlColors = PlayerColorsSDL[colorIndex];
 	Assert(!sprite.Surface->format->palette || sprite.Surface->format->palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
 	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
@@ -1301,8 +1303,10 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 */
 void SetPlayersPalette()
 {
+	PlayerColorsSDL.clear();
 	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].SetUnitColors(PlayerColorsRGB[i]);
+		PlayerColorsSDL.push_back(std::vector<SDL_Color>(PlayerColorsRGB[i].begin(), PlayerColorsRGB[i].end()));
 	}
 }
 
