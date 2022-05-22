@@ -127,7 +127,7 @@ public:
 	static CFontColor *Get(const std::string &ident);
 
 	std::string Ident;
-	CColor Colors[MaxFontColors];
+	SDL_Color *Colors;
 };
 
 /*----------------------------------------------------------------------------

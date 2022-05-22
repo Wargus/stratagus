@@ -15,6 +15,6 @@ class CFontColor
 	static CFontColor *New(const std::string ident);
 	static CFontColor *Get(const std::string ident);
 
-	CColor Colors[MaxFontColors];
+	SDL_Color Colors[MaxFontColors];
 };
 

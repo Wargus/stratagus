@@ -139,8 +139,7 @@ static void VideoDrawChar(const CGraphic &g,
 {
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	std::vector<SDL_Color> sdlColors(fc.Colors, fc.Colors + MaxFontColors);
-	SDL_SetPaletteColors(g.Surface->format->palette, &sdlColors[0], 0, MaxFontColors);
+	SDL_SetPaletteColors(g.Surface->format->palette, fc.Colors, 0, MaxFontColors);
 	SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 }
 
@@ -1006,10 +1005,13 @@ void ReloadFonts()
 CFontColor::CFontColor(const std::string &ident)
 {
 	Ident = ident;
+	Colors = (SDL_Color*)calloc(sizeof(SDL_Color), MaxFontColors);
+	Assert(Colors);
 }
 
 CFontColor::~CFontColor()
 {
+	free(Colors);
 }
 
 /**
