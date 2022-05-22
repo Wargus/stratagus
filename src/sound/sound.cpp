@@ -411,7 +411,7 @@ static void PlaySoundFileCallback(int channel)
 	}
 	Mix_Chunk *sample = GetChannelSample(channel);
 	if (sample) {
-		Mix_FreeChunk(sample);
+		FreeSample(sample);
 	}
 }
 
@@ -590,13 +590,13 @@ CSound::~CSound()
 {
 	if (this->Number == ONE_SOUND) {
 		if (Sound.OneSound) {
-			Mix_FreeChunk(Sound.OneSound);
+			FreeSample(Sound.OneSound);
 		}
 	} else if (this->Number == TWO_GROUPS) {
 	} else {
 		for (int i = 0; i < this->Number; ++i) {
 			if (this->Sound.OneGroup[i]) {
-				Mix_FreeChunk(this->Sound.OneGroup[i]);
+				FreeSample(this->Sound.OneGroup[i]);
 			}
 			this->Sound.OneGroup[i] = NULL;
 		}

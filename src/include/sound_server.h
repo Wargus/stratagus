@@ -71,6 +71,7 @@ extern bool SampleIsPlaying(Mix_Chunk *sample);
 extern Mix_Music *LoadMusic(const std::string &name);
 /// Load a sample
 extern Mix_Chunk *LoadSample(const std::string &name);
+extern void FreeSample(Mix_Chunk *sample);
 /// Play a sample
 extern int PlaySample(Mix_Chunk *sample, Origin *origin = NULL);
 /// Play a sound file

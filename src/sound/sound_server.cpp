@@ -445,6 +445,21 @@ Mix_Chunk *LoadSample(const std::string &name)
 }
 
 /**
+ * Free a sample loaded with LoadSample.
+ * 
+ * @param sample 
+ */
+void FreeSample(Mix_Chunk *sample)
+{
+#ifdef DYNAMIC_LOAD
+	if (sample->allocated == 0xcafebeef) {
+		return;
+	}
+#endif
+	Mix_FreeChunk(sample);
+}
+
+/**
 **  Play a sound sample
 **
 **  @param sample  Sample to play
