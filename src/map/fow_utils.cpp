@@ -35,7 +35,6 @@
 
 #include <string.h>
 #include <algorithm>
-#include <omp.h>
 
 #include "stratagus.h"
 #include "fow_utils.h"

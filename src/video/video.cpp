@@ -83,7 +83,6 @@
 #include "stratagus.h"
 
 #include <vector>
-#include <omp.h>
 
 #include "video.h"
 #include "intern_video.h"

@@ -34,7 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 #include <queue>
-#include <omp.h>
 
 #include "stratagus.h"
 
