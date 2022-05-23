@@ -766,6 +766,7 @@ option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
+option(WITH_OPENMP "Compile Stratagus with OpenMP for parallel processing" ON)
 
 option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OFF)
 option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
@@ -1105,6 +1106,7 @@ log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")
 log_package("StackTrace" "STACKTRACE")
 log_package("Theora" "THEORA")
+log_package("OpenMP" "OPENMP")
 
 message("==================================")
 
@@ -1157,6 +1159,7 @@ endif ()
 target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(OpenMP_CXX_FOUND)
+	add_definitions(-DUSE_OPENMP)
 	target_compile_options(stratagus PRIVATE ${OpenMP_CXX_FLAGS})
 	target_link_libraries(stratagus OpenMP::OpenMP_CXX)
 endif()
