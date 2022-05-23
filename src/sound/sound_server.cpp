@@ -229,8 +229,8 @@ extern volatile bool MusicFinished;
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	Origin *Unit;          /// pointer to unit, who plays the sound, if any
-	void (*FinishedCallback)(int channel); /// Callback for when a sample finishes playing
+	Origin *Unit = NULL;          /// pointer to unit, who plays the sound, if any
+	void (*FinishedCallback)(int channel) = NULL; /// Callback for when a sample finishes playing
 };
 
 #define MaxChannels 64     /// How many channels are supported
@@ -272,7 +272,7 @@ static void ChannelFinished(int channel)
 		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
 		return;
 	}
-	if (Channels[channel].FinishedCallback) {
+	if (Channels[channel].FinishedCallback != NULL) {
 		Channels[channel].FinishedCallback(channel);
 	}
 	delete Channels[channel].Unit;
