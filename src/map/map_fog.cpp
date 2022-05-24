@@ -392,11 +392,11 @@ void CViewport::DrawMapFogOfWar()
 		this->AdjustFogSurface();
 	}
 
-	FogOfWar.Draw(*this);
+	FogOfWar->Draw(*this);
 	
 	/// TODO: switch to hardware rendering
 	const bool isSoftwareRender {true}; // FIXME: remove this
-	if (isSoftwareRender && FogOfWar.GetType() != FogOfWarTypes::cTiledLegacy) {
+	if (isSoftwareRender && FogOfWar->GetType() != FogOfWarTypes::cTiledLegacy) {
 		SDL_Rect screenRect;
 		screenRect.x = this->TopLeftPos.x;
 		screenRect.y = this->TopLeftPos.y;
@@ -435,7 +435,7 @@ void CViewport::AdjustFogSurface()
                                                      	   32, RMASK, GMASK, BMASK, AMASK);
     SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
 	
-	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
+	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 	SDL_FillRect(this->FogSurface, NULL, fogColorSolid);
 }
 

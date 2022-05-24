@@ -746,6 +746,7 @@ int stratagusMain(int argc, char **argv)
 		}
 
 		UnitManager = new CUnitManager();
+		FogOfWar = new CFogOfWar();
 
 		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 

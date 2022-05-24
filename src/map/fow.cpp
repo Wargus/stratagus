@@ -55,7 +55,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 /// FIXME: Maybe move it into CMap
-CFogOfWar FogOfWar; /// Fog of war itself
+CFogOfWar *FogOfWar; /// Fog of war itself
 CGraphic *CFogOfWar::TiledFogSrc {nullptr}; // Graphic tiles set for tiled fog
 
 /*----------------------------------------------------------------------------
@@ -810,7 +810,7 @@ void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const 
                                                                        vpFogSurface);
             }
         } else {
-            DrawFullShroudOfFog(dx, dy, FogOfWar.GetExploredOpacity(), vpFogSurface);
+            DrawFullShroudOfFog(dx, dy, FogOfWar->GetExploredOpacity(), vpFogSurface);
         }
         if (blackFogTile) {
             TiledAlphaFog->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 

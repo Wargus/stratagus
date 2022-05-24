@@ -204,7 +204,7 @@ private:
     const uint32_t (*CurrUpscaleTableExplored)[4] = UpscaleTableVisible;
 };
 
-extern CFogOfWar FogOfWar;
+extern CFogOfWar *FogOfWar;
 
 
 /**

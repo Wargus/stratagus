@@ -346,8 +346,8 @@ static int CclSetFieldOfViewType(lua_State *l)
 	if (!strcmp(type_name, "shadow-casting")) {
 		new_type = FieldOfViewTypes::cShadowCasting;
 		/// Tiled types of FOW don't work with shadow casting
-		if (FogOfWar.GetType() != FogOfWarTypes::cEnhanced) {
-			FogOfWar.SetType(FogOfWarTypes::cEnhanced);
+		if (FogOfWar->GetType() != FogOfWarTypes::cEnhanced) {
+			FogOfWar->SetType(FogOfWarTypes::cEnhanced);
 		}
 	} else if (!strcmp(type_name, "simple-radial")) {
 		new_type = FieldOfViewTypes::cSimpleRadial;
@@ -501,7 +501,7 @@ static int CclSetFogOfWarType(lua_State *l)
 		fprintf(stdout, "Accessible Fog of War types: \"tiled\", \"enhanced\" and \"fast\".\n");
 		return 1;
 	}
-	FogOfWar.SetType(new_type);
+	FogOfWar->SetType(new_type);
 	return 0;
 }
 
@@ -511,7 +511,7 @@ static int CclSetFogOfWarType(lua_State *l)
 static int CclGetFogOfWarType(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushinteger(l, int(FogOfWar.GetType()));
+	lua_pushinteger(l, int(FogOfWar->GetType()));
 	return 1;
 }
 
@@ -544,7 +544,7 @@ static int CclSetFogOfWarOpacityLevels(lua_State *l)
 		return 1;
 	}
 
-	FogOfWar.SetOpacityLevels(explored, revealed, unseen);
+	FogOfWar->SetOpacityLevels(explored, revealed, unseen);
 
 	return 0;	
 }
@@ -577,7 +577,7 @@ static int CclSetFogOfWarBlur(lua_State *l)
 		PrintFunction();
 		fprintf(stdout, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
 	}
-	FogOfWar.InitBlurer(radiusSimple, radiusBilinear, iterations);
+	FogOfWar->InitBlurer(radiusSimple, radiusBilinear, iterations);
 	return 0;
 }
 
@@ -591,7 +591,7 @@ static int CclSetFogOfWarBlur(lua_State *l)
 static int CclSetFogOfWarBilinear(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	FogOfWar.EnableBilinearUpscale(LuaToBoolean(l, 1));
+	FogOfWar->EnableBilinearUpscale(LuaToBoolean(l, 1));
 	return 0;
 }
 
@@ -601,7 +601,7 @@ static int CclSetFogOfWarBilinear(lua_State *l)
 static int CclGetIsFogOfWarBilinear(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, FogOfWar.IsBilinearUpscaleEnabled());
+	lua_pushboolean(l, FogOfWar->IsBilinearUpscaleEnabled());
 	return 1;
 }
 
@@ -668,7 +668,7 @@ static int CclSetFogOfWarColor(lua_State *l)
 		LuaError(l, "Arguments must be in the range 0-255");
 	}
 
-	FogOfWar.SetFogColor(r, g, b);
+	FogOfWar->SetFogColor(r, g, b);
 
 	return 0;
 }

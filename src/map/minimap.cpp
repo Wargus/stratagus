@@ -148,7 +148,7 @@ void CMinimap::Create()
 
     SDL_SetSurfaceBlendMode(MinimapFogSurface, SDL_BLENDMODE_BLEND);
 	
-	const uint32_t fogColorSolid = FogOfWar.GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
+	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 	SDL_FillRect(MinimapFogSurface, NULL, fogColorSolid);
 	
 	UpdateTerrain();
@@ -392,7 +392,7 @@ void CMinimap::Update()
 	if (WithTerrain) {
 		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
 	}
-	const uint32_t fogColorSDL = FogOfWar.GetFogColorSDL();
+	const uint32_t fogColorSDL = FogOfWar->GetFogColorSDL();
 	if (!ReplayRevealMap) {
 		uint32_t *const minimapFog = static_cast<uint32_t *>(MinimapFogSurface->pixels);
 		size_t index = 0;
@@ -400,7 +400,7 @@ void CMinimap::Update()
 			for (uint16_t mx = 0; mx < W; ++mx) {
 
 				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
-				const uint8_t vis = FogOfWar.GetVisibilityForTile(tilePos); 
+				const uint8_t vis = FogOfWar->GetVisibilityForTile(tilePos); 
 
 				const uint32_t fogAlpha = vis == 0 ? (GameSettings.RevealMap != MapRevealModes::cHidden ? Settings.FogRevealedOpacity : Settings.FogUnseenOpacity)
 											   	   : vis == 1 ? Settings.FogExploredOpacity 

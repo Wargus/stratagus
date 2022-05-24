@@ -344,7 +344,7 @@ void CMap::Create()
 */
 void CMap::Init()
 {
-	FogOfWar.Init();
+	FogOfWar->Init();
 	this->isMapInitialized = true;
 }
 
@@ -372,7 +372,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 
 	FieldOfView.Clean();
 	
-	FogOfWar.Clean(isHardClean);
+	FogOfWar->Clean(isHardClean);
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		vp->Clean();
 	}
