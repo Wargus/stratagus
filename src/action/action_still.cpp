@@ -374,6 +374,14 @@ bool AutoAttack(CUnit &unit)
 	}
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitActionStill);
+
+	if (this->Sleep > 0) {
+		this->Sleep -= 1;
+		return;
+	}
+	// sleep some time before trying again for automatic actions
+	this->Sleep = CYCLES_PER_SECOND / 2;
+
 	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {
 		if (unit.AutoCastSpell) {
 			this->AutoCastStand(unit);
