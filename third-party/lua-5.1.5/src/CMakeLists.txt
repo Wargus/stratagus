@@ -72,4 +72,4 @@ set_target_properties(lua51 PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
 
-add_custom_command(TARGET lua51_static POST_BUILD COMMAND cp -t  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} "${PROJECT_SOURCE_DIR}/src/lua.h" "${PROJECT_SOURCE_DIR}/src/luaconf.h" "${PROJECT_SOURCE_DIR}/src/lualib.h" "${PROJECT_SOURCE_DIR}/src/lauxlib.h")
+add_custom_command(TARGET lua51_static POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/src/lua.h" "${PROJECT_SOURCE_DIR}/src/luaconf.h" "${PROJECT_SOURCE_DIR}/src/lualib.h" "${PROJECT_SOURCE_DIR}/src/lauxlib.h" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
