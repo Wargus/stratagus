@@ -417,7 +417,7 @@ void CMinimap::Update()
 	//
 	// Draw units on map
 	//
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (unit.IsVisibleOnMinimap() && !unit.Removed && !unit.Type->BoolFlag[REVEALER_INDEX].value) {
 			DrawUnitOn(unit, red_phase);
@@ -490,9 +490,11 @@ PixelPos CMinimap::TilePosToScreenPos(const Vec2i &tilePos) const
 */
 void CMinimap::Destroy()
 {
-	VideoPaletteListRemove(MinimapTerrainSurface);
-	SDL_FreeSurface(MinimapTerrainSurface);
-	MinimapTerrainSurface = NULL;
+	if (MinimapTerrainSurface) {
+		VideoPaletteListRemove(MinimapTerrainSurface);
+		SDL_FreeSurface(MinimapTerrainSurface);
+		MinimapTerrainSurface = NULL;
+	}
 	if (MinimapSurface) {
 		VideoPaletteListRemove(MinimapSurface);
 		SDL_FreeSurface(MinimapSurface);

@@ -589,7 +589,7 @@ void UnitActions()
 {
 	const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
 	// Unit list may be modified during loop... so make a copy
-	std::vector<CUnit *> table(UnitManager.begin(), UnitManager.end());
+	std::vector<CUnit *> table(UnitManager->begin(), UnitManager->end());
 
 	// Check for things that only happen every second
 	if (isASecondCycle) {

@@ -576,7 +576,7 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 void ExecCommand(unsigned char msgnr, UnitRef unum,
 				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
-	CUnit &unit = UnitManager.GetSlotUnit(unum);
+	CUnit &unit = UnitManager->GetSlotUnit(unum);
 	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
@@ -610,7 +610,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("defend", &unit, status, -1, -1, &dest, NULL, -1);
 				CommandDefend(unit, dest, status);
@@ -619,7 +619,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		}
 		case MessageCommandFollow: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("follow", &unit, status, -1, -1, &dest, NULL, -1);
 				CommandFollow(unit, dest, status);
@@ -633,7 +633,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandRepair: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, NULL, -1);
@@ -647,7 +647,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandAttack: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, NULL, -1);
@@ -664,7 +664,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("board", &unit, status, arg1, arg2, &dest, NULL, -1);
 				CommandBoard(unit, dest, status);
@@ -674,7 +674,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandUnload: {
 			CUnit *dest = NULL;
 			if (dstnr != (unsigned short)0xFFFF) {
-				dest = &UnitManager.GetSlotUnit(dstnr);
+				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest && dest->Type);
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, NULL, -1);
@@ -699,7 +699,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandResource: {
 			if (dstnr != (unsigned short)0xFFFF) {
-				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
 				CommandLog("resource", &unit, status, -1, -1, &dest, NULL, -1);
 				CommandResource(unit, dest, status);
@@ -707,7 +707,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandReturn: {
-			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &UnitManager.GetSlotUnit(dstnr) : NULL;
+			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &UnitManager->GetSlotUnit(dstnr) : NULL;
 			CommandLog("return", &unit, status, -1, -1, dest, NULL, -1);
 			CommandReturnGoods(unit, dest, status);
 			break;
@@ -750,7 +750,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			if (arg2 != (unsigned short)0xFFFF) {
 				CUnit *dest = NULL;
 				if (dstnr != (unsigned short)0xFFFF) {
-					dest = &UnitManager.GetSlotUnit(dstnr);
+					dest = &UnitManager->GetSlotUnit(dstnr);
 					Assert(dest && dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, NULL, id);

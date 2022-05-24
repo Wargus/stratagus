@@ -89,7 +89,7 @@ private:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern CUnitManager UnitManager;   /// Unit manager
+extern CUnitManager *UnitManager;   /// Unit manager
 
 //@}
 

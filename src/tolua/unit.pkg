@@ -51,7 +51,7 @@ class CUnitManager
 	CUnit &GetSlotUnit(int index) const;
 };
 
-CUnitManager UnitManager;   /// Unit manager
+tolua_readonly CUnitManager *UnitManager;   /// Unit manager
 
 CPreference Preference;
 

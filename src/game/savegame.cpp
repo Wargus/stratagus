@@ -165,7 +165,7 @@ int SaveGame(const std::string &filename)
 	SaveUpgrades(file);
 	SavePlayers(file);
 	Map.Save(file);
-	UnitManager.Save(file);
+	UnitManager->Save(file);
 	SaveUserInterface(file);
 	SaveAi(file);
 	SaveSelections(file);

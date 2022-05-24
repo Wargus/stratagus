@@ -178,7 +178,7 @@ void LoadModules()
 
 static void PlaceUnits()
 {
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (!unit.Removed) {
 			unit.Removed = 1;

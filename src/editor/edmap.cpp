@@ -401,8 +401,8 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value, int
 */
 static void EditorDestroyAllUnits()
 {
-	while (UnitManager.empty() == false) {
-		CUnit &unit = **UnitManager.begin();
+	while (UnitManager->empty() == false) {
+		CUnit &unit = **UnitManager->begin();
 
 		unit.Remove(NULL);
 		UnitLost(unit);

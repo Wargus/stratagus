@@ -1754,7 +1754,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						const char *ident = LuaToString(l, -1, subk + 1);
 						UNUSED(ident);
 #endif
-						ai->Force[forceIdx].Units.Insert(&UnitManager.GetSlotUnit(num));
+						ai->Force[forceIdx].Units.Insert(&UnitManager->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (!strcmp(value, "state")) {

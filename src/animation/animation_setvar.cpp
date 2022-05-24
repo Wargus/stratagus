@@ -56,7 +56,7 @@
 	if (this->unitSlotStr.empty() == false) {
 		switch (this->unitSlotStr[0]) {
 			case 'l': // last created unit
-				goal = UnitManager.lastCreatedUnit();
+				goal = UnitManager->lastCreatedUnit();
 				break;
 			case 't': // target unit
 				goal = unit.CurrentOrder()->GetGoal();

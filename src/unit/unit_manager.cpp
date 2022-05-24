@@ -45,7 +45,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-CUnitManager UnitManager;          /// Unit manager
+CUnitManager *UnitManager;          /// Unit manager
 
 /*----------------------------------------------------------------------------
 --  Functions

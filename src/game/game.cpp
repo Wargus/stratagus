@@ -491,7 +491,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 			const CUnit &unit = **it;
 			const int x = unit.tilePos.x + offset.x;
 			const int y = unit.tilePos.y + offset.y;
@@ -1067,7 +1067,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
 	//
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (unit.Type->OnReady) {
 			unit.Type->OnReady->pushPreamble();

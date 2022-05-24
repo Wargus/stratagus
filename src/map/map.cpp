@@ -151,7 +151,7 @@ void CMap::Reveal(MapRevealModes mode /* = MapRevealModes::cKnown */ )
 	}
 
 	//  Global seen recount. Simple and effective.
-	for (CUnit *unit : UnitManager.GetUnits()) {
+	for (CUnit *unit : UnitManager->GetUnits()) {
 		//  Reveal neutral buildings. Gold mines:)
 		if (unit->Player->Type == PlayerTypes::PlayerNeutral) {
 			for (const CPlayer &player : Players) {

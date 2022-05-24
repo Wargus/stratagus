@@ -165,7 +165,7 @@ static CUnit *CclGetUnit(lua_State *l)
 		}
 		return NULL;
 	}
-	return &UnitManager.GetSlotUnit(num);
+	return &UnitManager->GetSlotUnit(num);
 }
 
 /**
@@ -179,8 +179,8 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
 	unsigned int slot = strtol(value + 1, NULL, 16);
-	Assert(slot < UnitManager.GetUsedSlotCount());
-	return &UnitManager.GetSlotUnit(slot);
+	Assert(slot < UnitManager->GetUsedSlotCount());
+	return &UnitManager->GetSlotUnit(slot);
 }
 
 
@@ -330,7 +330,7 @@ static int CclUnit(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CUnit *unit = &UnitManager.GetSlotUnit(slot);
+	CUnit *unit = &UnitManager->GetSlotUnit(slot);
 	CUnitType *type = NULL;
 	CUnitType *seentype = NULL;
 	CPlayer *player = NULL;
@@ -595,7 +595,7 @@ static int CclUnit(lua_State *l)
 			CclParseOrder(l, *unit, &unit->NewOrder);
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "goal")) {
-			unit->Goal = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
+			unit->Goal = &UnitManager->GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (!strcmp(value, "auto-cast")) {
 			const char *s = LuaToString(l, 2, j + 1);
 			Assert(SpellTypeByIdent(s));
@@ -837,7 +837,7 @@ static int CclDamageUnit(lua_State *l)
 	const int attacker = LuaToNumber(l, 1);
 	CUnit *attackerUnit = NULL;
 	if (attacker != -1) {
-		attackerUnit = &UnitManager.GetSlotUnit(attacker);
+		attackerUnit = &UnitManager->GetSlotUnit(attacker);
 	}
 	lua_pushvalue(l, 2);
 	CUnit *targetUnit = CclGetUnit(l);
@@ -1020,9 +1020,9 @@ static int CclKillUnit(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		CUnitManager::Iterator it = std::find_if(UnitManager.begin(), UnitManager.end(), HasSameUnitTypeAs(unittype));
+		CUnitManager::Iterator it = std::find_if(UnitManager->begin(), UnitManager->end(), HasSameUnitTypeAs(unittype));
 
-		if (it != UnitManager.end()) {
+		if (it != UnitManager->end()) {
 			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;
@@ -1129,7 +1129,7 @@ static int CclGetUnits(lua_State *l)
 	lua_newtable(l);
 	if (plynr == -1) {
 		int i = 0;
-		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it, ++i) {
+		for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it, ++i) {
 			const CUnit &unit = **it;
 			lua_pushnumber(l, UnitNumber(unit));
 			lua_rawseti(l, -2, i + 1);
@@ -1166,7 +1166,7 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	}
 
 	const int slot = LuaToNumber(l, 1);
-	const CUnit &unit = UnitManager.GetSlotUnit(slot);
+	const CUnit &unit = UnitManager->GetSlotUnit(slot);
 	const int range = LuaToNumber(l, 2);
 	bool allUnits = false;
 	if (nargs == 3) {
@@ -1486,7 +1486,7 @@ static int CclSetUnitVariable(lua_State *l)
 */
 static int CclSlotUsage(lua_State *l)
 {
-	UnitManager.Load(l);
+	UnitManager->Load(l);
 	return 0;
 }
 

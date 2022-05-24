@@ -560,7 +560,7 @@ int AddGroupFromUnitToSelection(CUnit &unit)
     }
     //Wyrmgus end
 
-    for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+    for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
         CUnit &unit = **it;
         if (unit.LastGroup == group && !unit.Removed) {
             SelectUnit(unit);
@@ -1135,7 +1135,7 @@ static int CclSelection(lua_State *l)
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 2, j + 1);
-		Selected.push_back(&UnitManager.GetSlotUnit(strtol(str + 1, NULL, 16)));
+		Selected.push_back(&UnitManager->GetSlotUnit(strtol(str + 1, NULL, 16)));
 	}
 	return 0;
 }

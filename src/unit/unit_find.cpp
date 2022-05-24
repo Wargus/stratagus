@@ -515,7 +515,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 */
 void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody)
 {
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 
 		if (unit.Type == &type && !unit.IsUnusable(everybody)) {

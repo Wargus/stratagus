@@ -745,6 +745,8 @@ int stratagusMain(int argc, char **argv)
 			InitMusic();
 		}
 
+		UnitManager = new CUnitManager();
+
 		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
 		// Setup video display
@@ -772,7 +774,7 @@ int stratagusMain(int argc, char **argv)
 		// memset(Players, 0, sizeof(Players));
 		NumPlayers = 0;
 
-		UnitManager.Init(); // Units memory management
+		UnitManager->Init(); // Units memory management
 		PreMenuSetup();     // Load everything needed for menus
 
 		MenuLoop();

@@ -2375,7 +2375,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// SlotNumber
 	unit.Variable[SLOT_INDEX].Value = UnitNumber(unit);
-	unit.Variable[SLOT_INDEX].Max = UnitManager.GetUsedSlotCount();
+	unit.Variable[SLOT_INDEX].Max = UnitManager->GetUsedSlotCount();
 
 	// Is Alive
 	unit.Variable[ISALIVE_INDEX].Value = unit.IsAlive() ? 1 : 0;

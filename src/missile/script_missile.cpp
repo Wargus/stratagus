@@ -399,8 +399,8 @@ static int CclCreateMissile(lua_State *l)
 	const int destUnitId = LuaToNumber(l, 5);
 	const bool dealDamage = LuaToBoolean(l, 6);
 	const bool mapRelative = arg == 7 ? LuaToBoolean(l, 7) : false;
-	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager.GetSlotUnit(sourceUnitId) : NULL;
-	CUnit *destUnit = destUnitId != -1 ? &UnitManager.GetSlotUnit(destUnitId) : NULL;
+	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager->GetSlotUnit(sourceUnitId) : NULL;
+	CUnit *destUnit = destUnitId != -1 ? &UnitManager->GetSlotUnit(destUnitId) : NULL;
 
 	if (mapRelative == false) {
 		if (sourceUnit != NULL) {

@@ -571,7 +571,7 @@ void CUnit::Release(bool final)
 	}
 
 	// Remove the unit from the global units table.
-	UnitManager.ReleaseUnit(this);
+	UnitManager->ReleaseUnit(this);
 }
 
 unsigned int CUnit::CurrentAction() const
@@ -624,7 +624,7 @@ void CUnit::Init(const CUnitType &type)
 	Refs = 1;
 
 	//  Build all unit table
-	UnitManager.Add(this);
+	UnitManager->Add(this);
 
 	//  Initialise unit structure (must be zero filled!)
 	Type = &type;
@@ -788,7 +788,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 */
 CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 {
-	CUnit *unit = UnitManager.AllocUnit();
+	CUnit *unit = UnitManager->AllocUnit();
 	if (unit == NULL) {
 		return NULL;
 	}
@@ -958,7 +958,7 @@ void MapRefreshUnitsSight(const Vec2i &tilePos, const bool resetSight /*= false*
 */
 void MapRefreshUnitsSight(const bool resetSight /*= false*/)
 {
-	for (CUnit *const unit : UnitManager.GetUnits()) {
+	for (CUnit *const unit : UnitManager->GetUnits()) {
 		if (!unit->Destroyed) {
 			if (resetSight) {
 				MapUnmarkUnitSight(*unit);
@@ -2393,7 +2393,7 @@ void DropOutAll(const CUnit &source)
 CUnit *UnitOnScreen(int x, int y)
 {
 	CUnit *candidate = NULL;
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
 			continue;
@@ -3473,7 +3473,7 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 void InitUnits()
 {
 	if (!SaveGameLoading) {
-		UnitManager.Init();
+		UnitManager->Init();
 	}
 }
 
@@ -3483,7 +3483,7 @@ void InitUnits()
 void CleanUnits()
 {
 	//  Free memory for all units in unit table.
-	std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
+	std::vector<CUnit *> units(UnitManager->begin(), UnitManager->end());
 
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit *unit = *it;
@@ -3500,7 +3500,7 @@ void CleanUnits()
 		unit->Release(true);
 	}
 
-	UnitManager.Init();
+	UnitManager->Init();
 
 	FancyBuildings = false;
 	HelpMeLastCycle = 0;

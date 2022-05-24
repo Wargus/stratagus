@@ -705,7 +705,7 @@ static int CclDefineViewports(lua_State *l)
 			UI.Viewports[i].MapPos.y = LuaToNumber(l, j + 1, 2);
 			const int slot = LuaToNumber(l, j + 1, 3);
 			if (slot != -1) {
-				UI.Viewports[i].Unit = &UnitManager.GetSlotUnit(slot);
+				UI.Viewports[i].Unit = &UnitManager->GetSlotUnit(slot);
 			}
 			++i;
 		} else {

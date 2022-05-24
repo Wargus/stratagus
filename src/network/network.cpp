@@ -749,7 +749,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : NULL;
 
 	if (unit && (unit->Player->Index == player
 				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerTypes::PlayerNeutral)) {
@@ -764,7 +764,7 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager.GetUsedSlotCount() ? &UnitManager.GetSlotUnit(slot) : NULL;
+	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : NULL;
 
 	if (unit && unit->Type->ClicksToExplode) {
 		return true;
@@ -980,7 +980,7 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	std::vector<CUnit *> units;
 
 	for (size_t i = 0; i != ns.Units.size(); ++i) {
-		units.push_back(&UnitManager.GetSlotUnit(ns.Units[i]));
+		units.push_back(&UnitManager->GetSlotUnit(ns.Units[i]));
 	}
 	ChangeTeamSelectedUnits(Players[ns.player], units);
 }
@@ -1073,7 +1073,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 				CNetworkCommand nc;
 				nc.Deserialize(&incommand.Data[0]);
 
-				const CUnit &unit = UnitManager.GetSlotUnit(nc.Unit);
+				const CUnit &unit = UnitManager->GetSlotUnit(nc.Unit);
 				// FIXME: we can send destoyed units over network :(
 				if (unit.Destroyed) {
 					DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_ nc.Unit);
