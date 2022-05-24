@@ -2424,7 +2424,6 @@ int MenuScreen::run(bool loop)
 		while (runLoop) {
 			UpdateDisplay();
 			RealizeVideoMemory();
-			CheckMusicFinished();
 			WaitEventsOneFrame();
 		}
 		SetCallbacks(old_callbacks);

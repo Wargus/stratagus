@@ -151,14 +151,6 @@ namespace gcn
               }
               break;
 
-          case SDL_USEREVENT:
-              if (reinterpret_cast<uintptr_t>(event.user.data1) == SDL_CUSTOM_KEY_UP) {
-                  mIsRepeating = false;
-                  keyInput.setKey(static_cast<char>(event.user.code));
-                  keyInput.setType(KeyInput::RELEASE);
-                  mKeyInputQueue.push(keyInput);
-              }
-
           case SDL_KEYDOWN:
               if (!isTextInput(event.key.keysym.sym)) {
                   switch (event.key.keysym.sym) {
@@ -259,6 +251,15 @@ namespace gcn
                   case SDL_WINDOWEVENT_ENTER:
                       mMouseInWindow = true;
                       break;
+              }
+              break;
+
+            default:
+              if (event.type == SDL_CUSTOM_KEY_UP) {
+                  mIsRepeating = false;
+                  keyInput.setKey(static_cast<char>(event.user.code));
+                  keyInput.setType(KeyInput::RELEASE);
+                  mKeyInputQueue.push(keyInput);
               }
               break;
 

@@ -52,9 +52,12 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
+
+uint32_t SDL_SOUND_FINISHED;
 
 static bool SoundInitialized;    /// is sound initialized
 static bool MusicEnabled = true;
@@ -225,8 +228,6 @@ static bool External_Volume(int volume, int oldVolume) {
 #define External_Volume(volume, oldVolume) false
 #endif
 
-extern volatile bool MusicFinished;
-
 /// Channels for sound effects and unit speech
 struct SoundChannel {
 	Origin *Unit = NULL;          /// pointer to unit, who plays the sound, if any
@@ -273,10 +274,20 @@ static void ChannelFinished(int channel)
 		return;
 	}
 	if (Channels[channel].FinishedCallback != NULL) {
-		Channels[channel].FinishedCallback(channel);
+		SDL_Event event;
+		SDL_zero(event);
+		event.type = SDL_SOUND_FINISHED;
+		event.user.code = channel;
+		event.user.data1 = Channels[channel].FinishedCallback;
+		SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
 	delete Channels[channel].Unit;
 	Channels[channel].Unit = NULL;
+}
+
+void HandleSoundEvent(SDL_Event &event)
+{
+	((void (*)(int channel))(event.user.data1))((int) event.user.code);
 }
 
 /**
@@ -555,13 +566,11 @@ int PlayMusic(const std::string &file)
 	DebugPrint("play music %s\n" _C_ file.c_str());
 
 	if (External_Play(file)) {
-		MusicFinished = false;
 		return 0;
 	}
 
 	Mix_Music *music = LoadMusic(file);
 	if (music) {
-		MusicFinished = false;
 		Mix_PlayMusic(music, 0);
 		return 0;
 	} else {
@@ -688,6 +697,7 @@ int InitSound()
 		SoundInitialized = false;
 		return 1;
 	}
+	SDL_SOUND_FINISHED = SDL_RegisterEvents(1);
 	SoundInitialized = true;
 	Mix_AllocateChannels(MaxChannels);
 	Mix_ChannelFinished(ChannelFinished);

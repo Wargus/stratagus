@@ -110,6 +110,9 @@ extern int InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
 
+extern uint32_t SDL_SOUND_FINISHED;
+extern void HandleSoundEvent(SDL_Event &event);
+
 //@}
 
 #endif  // !__SOUND_SERVER_H__

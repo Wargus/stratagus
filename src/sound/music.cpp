@@ -51,8 +51,6 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-volatile bool MusicFinished;       /// Music ended and we need a new file
-
 bool CallbackMusic;                       /// flag true callback ccl if stops
 
 /*----------------------------------------------------------------------------
@@ -61,21 +59,24 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 
 /**
 **  Callback for when music has finished
-**  Note: we are in the sdl audio thread
+**  Note: we are in the sdl audio thread, so dispatch an event to the main event loop
 */
 static void MusicFinishedCallback()
 {
-	MusicFinished = true;
+	SDL_Event event;
+	SDL_zero(event);
+	event.type = SDL_SOUND_FINISHED;
+	event.user.code = 1;
+	event.user.data1 = CheckMusicFinished;
+	SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 }
 
 /**
 **  Check if music is finished and play the next song
 */
-void CheckMusicFinished(bool force)
+void CheckMusicFinished(int force)
 {
-	// this races, but that's just fine, since we'll just miss a frame of we're unlucky
-	bool proceed = MusicFinished;
-	if (!(((proceed || force) && SoundEnabled() && IsMusicEnabled() && CallbackMusic))) {
+	if (!(SoundEnabled() && IsMusicEnabled() && CallbackMusic)) {
 		return;
 	}
 	lua_getglobal(Lua, "MusicStopped");
@@ -84,7 +85,6 @@ void CheckMusicFinished(bool force)
 	} else {
 		LuaCall(0, 1);
 	}
-	MusicFinished = false;
 }
 
 /**
@@ -92,7 +92,6 @@ void CheckMusicFinished(bool force)
 */
 void InitMusic()
 {
-	MusicFinished = false;
 	SetMusicFinishedCallback(MusicFinishedCallback);
 #ifdef USE_FLUIDSYNTH
 	InitFluidSynth();

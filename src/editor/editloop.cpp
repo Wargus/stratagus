@@ -2100,8 +2100,6 @@ void EditorMainLoop()
 		bool start = true;
 
 		while (Editor.Running) {
-			CheckMusicFinished();
-
 			if (FrameCounter % FRAMES_PER_SECOND == 0) {
 				if (UpdateMinimap) {
 					UI.Minimap.Update();

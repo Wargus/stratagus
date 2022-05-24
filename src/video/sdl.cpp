@@ -590,7 +590,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				SDL_PushEvent(&event);
 				SDL_zero(event);
 				event.type = SDL_KEYUP;
-				event.key.keysym.sym = SDLK_PAGEUP;
+				event.key.keysym.sym = key;
 				SDL_PushEvent(&event);
 				SDL_zero(event);
 				event.type = SDL_KEYUP;
@@ -656,19 +656,10 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 					// fabricate a keyup event for later
 					SDL_Event event;
 					SDL_zero(event);
-					event.type = SDL_USEREVENT;
+					event.type = SDL_CUSTOM_KEY_UP;
 					event.user.code = lastKey;
-					event.user.data1 = reinterpret_cast<void*>(SDL_CUSTOM_KEY_UP);
-					SDL_PushEvent(&event);
+					SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 				}
-			}
-			break;
-
-		case SDL_USEREVENT:
-			{
-				Assert(reinterpret_cast<uintptr_t>(event.user.data1) == SDL_CUSTOM_KEY_UP);
-				char key = static_cast<char>(event.user.code);
-				InputKeyButtonRelease(callbacks, SDL_GetTicks(), key, key);
 			}
 			break;
 
@@ -690,6 +681,15 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 
 		case SDL_QUIT:
 			Exit(0);
+			break;
+
+		default:
+			if (event.type == SDL_SOUND_FINISHED) {
+				HandleSoundEvent(event);
+			} else if (event.type == SDL_CUSTOM_KEY_UP) {
+				char key = static_cast<char>(event.user.code);
+				InputKeyButtonRelease(callbacks, SDL_GetTicks(), key, key);
+			}
 			break;
 	}
 

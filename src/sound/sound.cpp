@@ -398,6 +398,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;
+static std::map<int, Mix_Chunk *> SampleMap;
 
 /**
 **  Callback for PlaySoundFile
@@ -405,15 +406,17 @@ static std::map<int, LuaActionListener *> ChannelMap;
 static void PlaySoundFileCallback(int channel)
 {
 	LuaActionListener *listener = ChannelMap[channel];
+	ChannelMap[channel] = NULL;
+	// free any previously loaded sample that was playing on this channel before
+	if (SampleMap[channel]) {
+		FreeSample(SampleMap[channel]);
+		SampleMap[channel] = NULL;
+	}
 	if (listener != NULL) {
 		listener->action("");
-		ChannelMap[channel] = NULL;
-	}
-	Mix_Chunk *sample = GetChannelSample(channel);
-	if (sample) {
-		FreeSample(sample);
 	}
 }
+
 
 /**
 **  Play a sound file
@@ -431,8 +434,11 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 	if (sample) {
 		channel = PlaySample(sample, PlaySoundFileCallback);
 		if (channel != -1) {
+			SampleMap[channel] = sample;
 			SetChannelVolume(channel, MaxVolume);
 			ChannelMap[channel] = listener;
+		} else {
+			FreeSample(sample);
 		}
 	}
 	return channel;

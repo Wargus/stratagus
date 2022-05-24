@@ -318,7 +318,6 @@ static void GameLogicLoop()
 
 	UpdateMessages();     // update messages
 	ParticleManager.update(); // handle particles
-	CheckMusicFinished(); // Check for next song
 
 	if (FastForwardCycle <= GameCycle || !(GameCycle & CallPeriod::cEvery256th)) {
 		WaitEventsOneFrame();

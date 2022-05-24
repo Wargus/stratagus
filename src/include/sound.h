@@ -194,7 +194,7 @@ extern void InitSoundClient();
 // music.cpp
 
 /// Check if music is finished and play the next song
-extern void CheckMusicFinished(bool force = false);
+extern void CheckMusicFinished(int force = 0);
 
 /// Initialize music
 extern void InitMusic();
