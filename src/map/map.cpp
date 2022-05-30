@@ -318,9 +318,8 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
+CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL), Tileset(NULL)
 {
-	Tileset = new CTileset;
 }
 
 CMap::~CMap()
@@ -333,6 +332,10 @@ CMap::~CMap()
 */
 void CMap::Create()
 {
+	if (!Tileset) {
+		Tileset = new CTileset;
+	}
+
 	Assert(!this->Fields);
 
 	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
