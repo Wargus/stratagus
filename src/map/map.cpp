@@ -363,7 +363,9 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	this->Info.Clear();
 	this->Fields = NULL;
 	this->NoFogOfWar = false;
-	this->Tileset->clear();
+	if (Tileset) {
+		this->Tileset->clear();
+	}
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
