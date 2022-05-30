@@ -232,6 +232,10 @@ Mng *Mng::New(const std::string &name)
 
 void Mng::Free(Mng *mng)
 {
+	// XXX: Weird free bug that I don't understand, just skip it if already NULL
+	if ((intptr_t)mng < 40) {
+		return;
+	}
 	mng->refcnt--;
 	if (mng->refcnt == 0) {
 		MngCache.erase(mng->name);
