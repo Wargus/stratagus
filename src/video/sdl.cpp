@@ -387,8 +387,12 @@ void InitVideoSdl()
 	}
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	int rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
+	if (!Parameters::Instance.benchmark) {
+		rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
+	}
 	if (!TheRenderer) {
-		TheRenderer = SDL_CreateRenderer(TheWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_PRESENTVSYNC);
+		TheRenderer = SDL_CreateRenderer(TheWindow, -1, rendererFlags);
 	}
 	SDL_RendererInfo rendererInfo;
 	SDL_GetRendererInfo(TheRenderer, &rendererInfo);
