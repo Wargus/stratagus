@@ -246,6 +246,9 @@ void Mng::Free(Mng *mng)
 */
 bool Mng::Load()
 {
+	if (handle) {
+		return handle != MNG_NULL && surface && iteration != 0x7fffffff;
+	}
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return false;
@@ -277,6 +280,9 @@ bool Mng::Load()
 */
 void Mng::Reset()
 {
+	if (!handle) {
+		return;
+	}
 	mng_display_reset(handle);
 	iteration = 0;
 	mng_display(handle);
