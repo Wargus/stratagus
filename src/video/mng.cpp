@@ -116,6 +116,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 
 	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 										8 * 3, Rmask, Gmask, Bmask, 0);
+	SDL_SetColorKey(mng->surface, 1, 0);
 	if (mng->surface == NULL) {
 		fprintf(stderr, "Out of memory");
 		exit(1);
