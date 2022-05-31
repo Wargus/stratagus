@@ -261,22 +261,26 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
+	const int mapW = Map.Info.MapWidth;
+	const int mapH = Map.Info.MapHeight;
+	const int map_max = mapW * mapH;
+	bool canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
 
 	while (sy  < 0) {
 		sy++;
 		dy += PixelTileSize.y;
 	}
-	sy *=  Map.Info.MapWidth;
+	sy *=  mapW;
 
 	while (dy <= ey && sy  < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+		while (dx <= ex && (sx - sy < mapW)) {
 			if (sx - sy < 0) {
-				++sx;
-				dx += PixelTileSize.x;
-				continue;
+				goto next;
+			}
+			if (canShortcut && !FogOfWar->GetVisibilityForTile(Vec2i(sx % mapW, sx / mapH))) {
+				goto next;
 			}
 			const CMapField &mf = Map.Fields[sx];
 			unsigned short int tile;
@@ -318,10 +322,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			const_cast<CMapField &>(mf).lastAStarCost = alpha | ((uint64_t)1 << 63);
 #endif
+next:
 			++sx;
 			dx += PixelTileSize.x;
 		}
-		sy += Map.Info.MapWidth;
+		sy += mapW;
 		dy += PixelTileSize.y;
 	}
 	if (CViewport::isGridEnabled()) {
