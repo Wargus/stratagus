@@ -248,8 +248,8 @@ public:
 
 	//guichan
 	virtual void *_getData() const;
-	virtual int getWidth() const { return surface->h; }
-	virtual int getHeight() const { return surface->w; }
+	virtual int getWidth() const { return surface->w; }
+	virtual int getHeight() const { return surface->h; }
 	virtual bool isDirty() const { return is_dirty; }
 
 	mutable bool is_dirty;
