@@ -276,11 +276,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
 		while (dx <= ex && (sx - sy < mapW)) {
-			if (sx - sy < 0) {
-				goto next;
-			}
-			if (canShortcut && !FogOfWar->GetVisibilityForTile(Vec2i(sx % mapW, sx / mapH))) {
-				goto next;
+			if (sx - sy < 0 || (canShortcut && !FogOfWar->GetVisibilityForTile(Vec2i(sx % mapW, sx / mapH)))) {
+				++sx;
+				dx += PixelTileSize.x;
+				continue;
 			}
 			const CMapField &mf = Map.Fields[sx];
 			unsigned short int tile;
@@ -322,7 +321,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			const_cast<CMapField &>(mf).lastAStarCost = alpha | ((uint64_t)1 << 63);
 #endif
-next:
 			++sx;
 			dx += PixelTileSize.x;
 		}
