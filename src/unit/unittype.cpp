@@ -592,8 +592,10 @@ CUnitType::~CUnitType()
 	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
-		for (int j = 0; j < this->Portrait.Num; ++j) {
-			Mng::Free(this->Portrait.Mngs[j]);
+		if (this->Portrait.Mngs[0]) {
+			for (int j = 0; j < this->Portrait.Num; ++j) {
+				Mng::Free(this->Portrait.Mngs[j]);
+			}
 		}
 		delete[] this->Portrait.Mngs;
 		delete[] this->Portrait.Files;
