@@ -43,9 +43,9 @@ struct lua_State;
 class CColor
 {
 public:
-	CColor() : R(0), G(0), B(0), A(0) {}
+	CColor() : R(0), G(0), B(0), A(255) {}
 	CColor(unsigned char r, unsigned char g, unsigned char b,
-		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
+		   unsigned char a = 255) : R(r), G(g), B(b), A(a) {}
 	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A) {}
 
 	void Parse(lua_State *l, int index = -1);
