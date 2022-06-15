@@ -1353,8 +1353,7 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 				if (rangeFrom >= rangeTo) {
 					LuaError(luaStack, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
 				}
-
-				resultSet.resize(rangeFrom - rangeTo + 1);
+				resultSet.resize(rangeTo - rangeFrom + 1);
 				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
 
 			} else {
