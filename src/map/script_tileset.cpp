@@ -754,41 +754,29 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 **	{"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 **
 **	@param luaStack		lua state, top argument will be parsed
-**	@param argPos		argument in the table to parse (or 0 if need to parse not a table but just a number)
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
 **	@return 			vector of parsed indexes
 **/
-std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg) const
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, bool &isImg) const
 {
 	isImg = false;
 
-	std::vector<tile_index> result;
+	if (lua_istable(luaStack, -1)) {
 
-	if (argPos == 0 && lua_isnumber(luaStack, -1)) {
-		result = CTilesetParser::parseTilesRange(luaStack);
-
-	} else if (lua_istable(luaStack, -1)) {
-
-		lua_rawgeti(luaStack, -1, argPos);	/// #1<
-		int parseFrom = 1;
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
 		/// check if "img" tag is present
-		if (lua_istable(luaStack, -1)) {
-			lua_rawgeti(luaStack, -1, 1);	/// #2<
-			if (lua_isstring(luaStack, -1)) {
-				const std::string parsedValue {LuaToString(luaStack, -1)};
-				if (parsedValue == "img") {
-					isImg = true;
-					parseFrom++;
-				}
+		if (lua_isstring(luaStack, -1)) {
+			const std::string parsedValue { LuaToString(luaStack, -1) };
+			if (parsedValue == "img") {
+				isImg = true;
 			}
-			lua_pop(luaStack, 1);	/// #2>
 		}
-		result = CTilesetParser::parseTilesRange(luaStack, parseFrom);
 		lua_pop(luaStack, 1);	/// #1>
-	} else {
+	} else if (!lua_isnumber(luaStack, -1)) {
 		LuaError(luaStack, "incorrect argument");
 	}
-	return result;
+	
+	return { CTilesetParser::parseTilesRange(luaStack, isImg ? 2 : 1) };
 }
 
 /**
@@ -1011,6 +999,21 @@ sdl2::SurfacePtr CTilesetGraphicGenerator::newBlankImage() const
 	return blankImg;
 }
 
+bool CTilesetGraphicGenerator::isModifierPresent(lua_State *luaStack) const
+{
+	bool result = false;
+	if (lua_rawlen(luaStack, -1) > 1) {
+		if (lua_istable(luaStack, -1)) {
+			lua_rawgeti(luaStack, -1, 2);	/// #1<
+			if (lua_istable(luaStack, -1)) { 
+				result = true;
+			}
+			lua_pop(luaStack, 1);	/// #1>
+		}
+	}
+	return result;
+}
+
 /** 
 **	Parse a layer of source graphics
 **
@@ -1019,27 +1022,39 @@ sdl2::SurfacePtr CTilesetGraphicGenerator::newBlankImage() const
 ** { src_range [,{"do_something", parameter}...] }
 **
 **	@param	luaStack 		lua state, top argument will be parsed - it can be table of layers or single layer
-**	@param	argPos			position of the layer to parse in the table of layers (or 0 in case of single layer)
 **	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
 **	@return					set of images described in this layer or set of indexes of existing tileset graphics
 **/
-auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const int argPos, const bool isSingleLayer /*= false*/) const
+auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSingleLayer /*= false*/) const
 {
-	enum { cSrcIndexOnly = 0, cSrcRange = 1, cModifier = 2 };
+	enum { cSrcRange = 1, cModifier = 2 };
 
-	if (argPos != 0) {
-		lua_rawgeti(luaStack, -1, argPos);	/// #1<
+	const bool withModifier = isModifierPresent(luaStack);
+
+	/// make sure that src_range is at the top of the lua stack
+	bool needToPopSrcBack = false;
+	if (lua_istable(luaStack, -1)) {
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		if (lua_istable(luaStack, -1)
+			|| (lua_isnumber(luaStack, -1) && withModifier)) {
+			needToPopSrcBack = true;
+		} else {
+			lua_pop(luaStack, 1);	/// #1>
+		}
 	}
-	const uint16_t argsNum = lua_rawlen(luaStack, -1);
-	int arg = lua_istable(luaStack, -1) ? cSrcRange : cSrcIndexOnly;
 
 	bool isImg = false;
-	std::vector<tile_index> srcIndexes {parseSrcRange(luaStack, arg, isImg)};
-	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer	/* there is an only layer */
-											 && !isImg 		/* this leyer consist of indexes of base graphics */
-											 && argsNum <= cModifier) /* there are no any modifiers */
-											 						  ? true 
-																	  : false;
+	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
+	
+	if (needToPopSrcBack) {
+		lua_pop(luaStack, 1);	/// #1>	
+	}
+
+	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer		/* there is an only layer */
+											 && !isImg 			/* this leyer consist of indexes of base graphics */
+											 && !withModifier) 	/* there are no any modifiers */
+											 					? true 
+																: false;
 
 	std::vector<graphic_index> parsedIndexes;
 	sequence_of_images parsedImages;
@@ -1056,19 +1071,18 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const int argPos,
 		} else {
 			const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
 											   : SrcTilesetGraphic;
-			auto image {newBlankImage()};		
+			auto image { newBlankImage() };		
 			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
 			parsedImages.push_back(std::move(image));
 		}
 	}
-	
-	arg = cModifier;
-	while (arg <= argsNum) {
-		parseModifier(luaStack, arg, parsedImages);
-		arg++;	
-	}
-	if (argPos != 0) {
-		lua_pop(luaStack, 1);	/// #1>
+	if (withModifier) {
+		const uint16_t argsNum = lua_rawlen(luaStack, -1);
+		int arg = cModifier;
+		while (arg <= argsNum) {
+			parseModifier(luaStack, arg, parsedImages);
+			arg++;	
+		}
 	}
 	return std::make_pair(parsedIndexes, std::move(parsedImages));
 }
@@ -1206,7 +1220,7 @@ std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences(std
 **/
 sdl2::SurfacePtr CTilesetGraphicGenerator::composeImage(sequence_of_imagesPtrs &srcSequence) const
 {
-	auto dst {newBlankImage()};
+	auto dst { newBlankImage() };
 
 	for (auto &src : srcSequence) {
 		SDL_BlitSurface(src, NULL, dst.get(), NULL);
@@ -1239,7 +1253,15 @@ void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 		int arg = layersNum > 1 ? cFirstLayer : cSinglelayer;
 		for (uint16_t layerIdx = 0; layerIdx < layersNum; layerIdx++) {
 			
-			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, arg, layersNum == 1 ? true : false);
+			if (layersNum > 1) {
+				lua_rawgeti(luaStack, -1, arg);
+			}
+
+			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, layersNum == 1 ? true : false);
+
+			if (layersNum > 1) {
+				lua_pop(luaStack, 1);
+			}
 
 			if (layersNum == 1 && parcedImages.empty()) { // If the only layer has no new graphics
 				for (auto index : parcedIndexes) {

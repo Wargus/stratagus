@@ -372,7 +372,7 @@ public:
 	}
 
 private:
-	std::vector<tile_index> parseSrcRange(lua_State *luaStack, const int argPos, bool &isImg) const;
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, bool &isImg) const;
 	uint16_t checkForLayers(lua_State *luaStack) const;
 	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack) const;
 	bool checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const;
@@ -380,7 +380,8 @@ private:
 	void removeColors(lua_State *luaStack, sequence_of_images &images) const;
 	void parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const;
 	sdl2::SurfacePtr newBlankImage() const;
-	auto parseLayer(lua_State *luaStack, const int argPos, const bool isSingleLayer = false) const;
+	bool isModifierPresent(lua_State *luaStack) const;
+	auto parseLayer(lua_State *luaStack, const bool isSingleLayer = false) const;
 
 	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght = 16) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const;
