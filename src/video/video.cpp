@@ -171,6 +171,7 @@ static std::vector<Clip> Clips;
 int CyclesPerSecond = CYCLES_PER_SECOND;
 double SkipCycles;                      /// Skip this frames
 
+Uint32 ColorTransparent;
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
 Uint32 ColorLightBlue;
@@ -256,7 +257,7 @@ void CVideo::UnlockScreen()
 */
 void CVideo::ClearScreen()
 {
-	FillRectangle(ColorBlack, 0, 0, Video.Width, Video.Height);
+	FillRectangle(ColorTransparent, 0, 0, Video.Width, Video.Height);
 }
 
 /**

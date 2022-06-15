@@ -511,6 +511,7 @@ void InitVideoSdl()
 
 	InitKey2Str();
 
+	ColorTransparent = Video.MapRGBA(TheScreen->format, 0, 0, 0, 0);
 	ColorBlack = Video.MapRGB(TheScreen->format, 0, 0, 0);
 	ColorDarkGreen = Video.MapRGB(TheScreen->format, 48, 100, 4);
 	ColorLightBlue = Video.MapRGB(TheScreen->format, 52, 113, 166);

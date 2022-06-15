@@ -416,7 +416,7 @@ void CFogOfWar::Draw(CViewport &viewport)
     if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
         DrawTiledLegacy(viewport);
     } else {
-        SDL_FillRect(viewport.GetFogSurface(), NULL, 0x00);
+        SDL_FillRect(viewport.GetFogSurface(), NULL, ColorTransparent);
 
         if (Settings.Type == FogOfWarTypes::cTiled) {
             DrawTiled(viewport);
