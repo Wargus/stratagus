@@ -480,8 +480,12 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 	if (sample->allocated == 0xcafebeef) {
 		char *name = (char*)(sample->abuf);
 		Mix_Chunk *loadedSample = ForceLoadSample(name);
-		memcpy(sample, loadedSample, sizeof(Mix_Chunk));
-		free(name);
+		if (loadedSample) {
+			memcpy(sample, loadedSample, sizeof(Mix_Chunk));
+			free(name);
+		} else {
+			return -1;
+		}
 	}
 #endif
 	int channel = -1;
