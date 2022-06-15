@@ -473,6 +473,12 @@ extern void InvalidateArea(int x, int y, int w, int h);
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
 
+/// Update a texture from a surface
+extern void StreamSurfaceToTexture(SDL_Texture *t, SDL_Surface *s);
+
+/// Copy a texture to the currently active backbuffer
+extern void RenderTexture(SDL_Texture *t, SDL_Rect *srcrect, SDL_Rect *dstrect);
+
 /// Realize video memory.
 extern void RealizeVideoMemory();
 

@@ -842,6 +842,32 @@ static void RenderBenchmarkOverlay()
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
 }
 
+void StreamSurfaceToTexture(SDL_Texture *t, SDL_Surface *s)
+{
+	void *pixels;
+	int pitch;
+	SDL_LockTexture(t, NULL, &pixels, &pitch);
+	int spitch = s->pitch;
+	if (pitch == spitch) {
+		memcpy(pixels, s->pixels, s->h * pitch);
+	} else {
+		int mpitch = std::min(pitch, spitch);
+		void *spixels = s->pixels;
+		for (int y = 0; y < s->h; y++) {
+			memcpy(reinterpret_cast<uint8_t*>(pixels) + pitch * y, reinterpret_cast<uint8_t*>(spixels) + spitch * y, mpitch);
+		}
+	}
+	SDL_UnlockTexture(t);
+}
+
+void RenderTexture(SDL_Texture *t, SDL_Rect *srcrect, SDL_Rect *dstrect)
+{
+	if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
+		SDL_RenderClear(TheRenderer);
+		SDL_RenderCopy(TheRenderer, TheTexture, srcrect, dstrect);
+	}
+}
+
 void RealizeVideoMemory()
 {
 	++FrameCounter;
@@ -853,17 +879,13 @@ void RealizeVideoMemory()
 	}
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
-		if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
-			SDL_RenderClear(TheRenderer);
-			//for (int i = 0; i < NumRects; i++)
-			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
-			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
-		}
+		StreamSurfaceToTexture(TheTexture, TheScreen);
+		RenderTexture(TheTexture, NULL, NULL);
 		if (Parameters::Instance.benchmark) {
 			RenderBenchmarkOverlay();
 		}
 		SDL_RenderPresent(TheRenderer);
+		SDL_RenderClear(TheRenderer);
 		NumRects = 0;
 	}
 	if (!Preference.HardwareCursor) {
