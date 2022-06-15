@@ -413,6 +413,13 @@ void Exit(int err)
 	DeInitVideo();
 	DeInitImageLoaders();
 
+	if (UnitManager) {
+		delete UnitManager;
+	}
+	if (FogOfWar) {
+		delete FogOfWar;
+	}
+
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
 }
