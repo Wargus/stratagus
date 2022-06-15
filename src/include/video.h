@@ -250,7 +250,7 @@ public:
 	virtual void *_getData() const;
 	virtual int getWidth() const { return surface->w; }
 	virtual int getHeight() const { return surface->h; }
-	virtual bool isDirty() const { return is_dirty; }
+	virtual bool isDirty() const { return true; }
 
 	mutable bool is_dirty;
 	std::string name;
