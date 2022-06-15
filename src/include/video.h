@@ -270,7 +270,7 @@ class Mng : public gcn::Image
 	Mng() {};
 	~Mng() {};
 public:
-	Mng *New(const std::string &name) { return NULL; }
+	static Mng *New(const std::string &name) { return NULL; }
 	static void Free(Mng *mng) {};
 	bool Load() { return false; };
 	void Reset() {};

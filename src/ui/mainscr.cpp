@@ -442,6 +442,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
+#ifdef USE_MNG
 static bool DrawTypePortrait(const CUnitType &type)
 {
 	if (UI.SingleSelectedButton && type.Portrait.Num) {
@@ -467,6 +468,7 @@ static bool DrawTypePortrait(const CUnitType &type)
 	}
 	return false;
 }
+#endif
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {

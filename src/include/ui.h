@@ -408,9 +408,7 @@ public:
 
 	CInfoPanel InfoPanel;               /// Info panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
-#ifdef USE_MNG
 	std::string DefaultUnitPortrait;    /// Name of the unit portrait to show when there is no selection
-#endif
 	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons
 
 	CUIButton *SingleSelectedButton;    /// Button for single selected unit

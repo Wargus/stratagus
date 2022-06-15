@@ -601,8 +601,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
-#ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {
+#ifdef USE_MNG
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
