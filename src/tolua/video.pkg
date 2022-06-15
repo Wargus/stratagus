@@ -63,6 +63,8 @@ public:
         bool Load();
         void Draw(int x, int y);
         void Reset();
+
+		static int MaxFPS;
 }
 
 class Movie

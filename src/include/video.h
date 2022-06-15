@@ -252,6 +252,8 @@ public:
 	virtual int getHeight() const { return surface->h; }
 	virtual bool isDirty() const { return true; }
 
+	static uint32_t MaxFPS;
+
 	mutable bool is_dirty;
 	std::string name;
 	FILE *fd;
@@ -279,6 +281,8 @@ public:
 	virtual int getWidth() const { return 0; };
 	virtual int getHeight() const { return 0; };
 	virtual bool isDirty() const { return false; };
+
+	static inline uint32_t MaxFPS = 15;
 };
 #endif
 
