@@ -1359,7 +1359,7 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
 
 			} else {
-				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType);
+				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType.c_str());
 			}
 		} else {
 			LuaError(luaStack, "Unsupported tiles range format");
@@ -1395,7 +1395,7 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 		terrainNameIdx[cBase]  =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
 		terrainNameIdx[cMixed] =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, ++arg));
 	} else {
-		LuaError(luaStack, "Slots: unsupported slot type: %d" _C_ slotType);
+		LuaError(luaStack, "Slots: unsupported slot type");
 	}
 	if (BaseTileset->getTerrainName(terrainNameIdx[cBase]) == "unused") {
 		return;
@@ -1504,7 +1504,7 @@ void CTilesetParser::parseExtended(lua_State *luaStack)
 			}
 			parseExtendedSlots(luaStack, arg);
 		} else {
-			LuaError(luaStack, "Unsupported tag: %s" _C_ parsedValue);
+			LuaError(luaStack, "Unsupported tag: %s" _C_ parsedValue.c_str());
 		}
 	}
 }	
