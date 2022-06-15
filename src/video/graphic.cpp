@@ -1007,7 +1007,7 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 	ExpandFor(frames.size());
 	
 	for (auto &frame : frames) {
-		SDL_Rect dstRect {frame_map[currFrame].x, frame_map[currFrame].y, Width, Height};
+		SDL_Rect dstRect { frame_map[currFrame].x, frame_map[currFrame].y, Width, Height };
 		SDL_BlitSurface(frame.get(), NULL, Surface, &dstRect);
 		currFrame++;
 	}
@@ -1021,7 +1021,7 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 */
 void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 {
-	Assert(numOfFramesToAdd > 0 && !Resized); /// We can't add frames into a resized graphic set
+	Assert(!Resized); /// We can't add frames into a resized graphic set
 
 	if (numOfFramesToAdd == 0) {
 		return;
@@ -1063,9 +1063,8 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 
 	SDL_FreeSurface(Surface);
 	Surface = newSurface;
-
-	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
-
+	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
+	
 	GenFramesMap();
 }
 
