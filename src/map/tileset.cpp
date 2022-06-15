@@ -337,7 +337,7 @@ terrain_typeIdx CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 		}
 	}
 	// Can't find it, then we add another solid terrain type.
-	if (solidTerrainTypes.size() < (1 << (sizeof(terrain_typeIdx) * 8))) {
+	if (solidTerrainTypes.size() >= (1 << (sizeof(terrain_typeIdx) * 8))) {
 		DebugPrint("CTile::solidTerrainTypes: Number of types limit exceeded.\n");
 		Assert(0);
 	}
