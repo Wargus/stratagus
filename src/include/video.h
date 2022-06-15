@@ -315,7 +315,7 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), VerticalPixelSize(1), Depth(0), FullScreen(false) {}
+	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), VerticalPixelSize(1), Zoom(1.0), Depth(0), FullScreen(false) {}
 
 	void LockScreen();
 	void UnlockScreen();
@@ -394,6 +394,7 @@ public:
 	int WindowHeight;
 	double VerticalPixelSize;
 	SDL_Cursor *blankCursor;
+	float Zoom;
 	int Depth;
 	bool FullScreen;
 };
@@ -461,6 +462,12 @@ extern void InvalidateArea(int x, int y, int w, int h);
 /// Set clipping for nearly all vector primitives. Functions which support
 /// clipping will be marked Clip. Set the system-wide clipping rectangle.
 extern void SetClipping(int left, int top, int right, int bottom);
+
+/// Update a texture from a surface
+extern void StreamSurfaceToTexture(SDL_Texture *t, SDL_Surface *s);
+
+/// Copy a texture to the currently active backbuffer
+extern void RenderTexture(SDL_Texture *t, SDL_Rect *srcrect, SDL_Rect *dstrect);
 
 /// Realize video memory.
 extern void RealizeVideoMemory();

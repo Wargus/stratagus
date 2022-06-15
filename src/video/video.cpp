@@ -283,6 +283,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	Height = h;
 
 	SDL_RenderSetLogicalSize(TheRenderer, w, h * VerticalPixelSize);
+	SDL_SetRenderDrawBlendMode(TheRenderer, SDL_BLENDMODE_BLEND);
 
 	// new surface
 	if (TheScreen) {
@@ -292,7 +293,7 @@ bool CVideo::ResizeScreen(int w, int h)
 									 RMASK,
 									 GMASK,
 									 BMASK,
-									 0); // AMASK);
+									 AMASK);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
 
 	// new texture

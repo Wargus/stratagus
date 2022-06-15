@@ -83,6 +83,11 @@ void (CCONV *lazyGlViewport)(GLint, GLint, GLsizei, GLsizei);
 void (CCONV *lazyGlMatrixMode)(GLenum);
 void (CCONV *lazyGlLoadIdentity)(void);
 void (CCONV *lazyGlOrtho)(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble);
+void (CCONV *lazyGlEnable)(GLenum);
+void (CCONV *lazyGlDisable)(GLenum);
+void (CCONV *lazyGlBlendFunc)(GLenum, GLenum);
+void (CCONV *lazyGlDepthMask)(GLboolean);
+void (CCONV *lazyGlColor4f)(GLfloat, GLfloat, GLfloat, GLfloat);
 
 static const int MAX_SHADERS = 128;
 static GLuint shaderPrograms[MAX_SHADERS + 1] = { (GLuint) 0 };
@@ -271,16 +276,19 @@ static GLfloat modelview[4 * 4];
 static GLfloat projection[4 * 4];
 static GLfloat matrix[4 * 4] = {0.0f};
 
-bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
+bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer, SDL_Rect *srcrect, SDL_Rect *dstrect) {
 	if (!canUseShaders || currentShaderIdx == 0) {
 		return false;
 	}
 
-	GLint oldProgramId;
-	// Detach the texture
-	SDL_SetRenderTarget(renderer, NULL);
-	SDL_RenderClear(renderer);
+	lazyGlEnable(GL_BLEND);
+	lazyGlBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	lazyGlDisable(GL_LIGHTING);
+	lazyGlDisable(GL_DEPTH_TEST);
+	lazyGlDepthMask(GL_FALSE);
+	lazyGlEnable(GL_TEXTURE_2D);
 
+	GLint oldProgramId;
 	SDL_GL_BindTexture(backBuffer, NULL, NULL);
 	if (LastShaderIndex != currentShaderIdx) {
 		LastShaderIndex = currentShaderIdx;
@@ -366,17 +374,17 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 	const GLfloat maxx = DrawableWidth;
 	const GLfloat maxy = DrawableHeight;
 
-	const GLfloat minu = 0.0f;
-	const GLfloat maxu = 1.0f;
-	const GLfloat minv = 0.0f;
-	const GLfloat maxv = 1.0f;
+	const GLfloat minu = srcrect ? (static_cast<float>(srcrect->x) / Video.Width) : 0.0f;
+	const GLfloat maxu = srcrect ? (static_cast<float>(srcrect->w) / Video.Width) : 1.0f;
+	const GLfloat minv = srcrect ? (static_cast<float>(srcrect->y) / Video.Height) : 0.0f;
+	const GLfloat maxv = srcrect ? (static_cast<float>(srcrect->h) / Video.Height) : 1.0f;
 
 	lazyGlMatrixMode(GL_PROJECTION);
 	lazyGlLoadIdentity();
 	lazyGlOrtho(0.0f, DrawableWidth, DrawableHeight, 0.0f, 0.0f, 1.0f);
 	lazyGlViewport(XBorder, YBorder, DrawableWidth, DrawableHeight);
 
-	lazyGlBegin(GL_TRIANGLE_STRIP); {
+	lazyGlBegin(GL_QUADS); {
 		glVertexAttrib4f(TexCoord, minu, minv, 0, 0);
 		lazyGlTexCoord2f(minu, minv);
 		lazyGlVertex2f(minx, miny);
@@ -385,15 +393,15 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 		lazyGlTexCoord2f(maxu, minv);
 		lazyGlVertex2f(maxx, miny);
 
-		glVertexAttrib4f(TexCoord, minu, maxv, 0, 0);
-		lazyGlTexCoord2f(minu, maxv);
-		lazyGlVertex2f(minx, maxy);
-
 		glVertexAttrib4f(TexCoord, maxu, maxv, 0, 0);
 		lazyGlTexCoord2f(maxu, maxv);
 		lazyGlVertex2f(maxx, maxy);
+
+		glVertexAttrib4f(TexCoord, minu, maxv, 0, 0);
+		lazyGlTexCoord2f(minu, maxv);
+		lazyGlVertex2f(minx, maxy);
 	} lazyGlEnd();
-	// SDL_GL_SwapWindow(win);
+	SDL_GL_SwapWindow(win);
 
 	if (ShaderProgram != 0) {
 		glUseProgram(oldProgramId);
@@ -491,6 +499,11 @@ bool LoadShaderExtensions() {
 	*(void **) (&lazyGlMatrixMode) = SDL_GL_GetProcAddress("glMatrixMode");
 	*(void **) (&lazyGlOrtho) = SDL_GL_GetProcAddress("glOrtho");
 	*(void **) (&lazyGlLoadIdentity) = SDL_GL_GetProcAddress("glLoadIdentity");
+	*(void **) (&lazyGlEnable) = SDL_GL_GetProcAddress("glEnable");
+	*(void **) (&lazyGlDisable) = SDL_GL_GetProcAddress("glDisable");
+	*(void **) (&lazyGlBlendFunc) = SDL_GL_GetProcAddress("glBlendFunc");
+	*(void **) (&lazyGlDepthMask) = SDL_GL_GetProcAddress("glDepthMask");
+	*(void **) (&lazyGlColor4f) = SDL_GL_GetProcAddress("glColor4f");
 
 	glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
 	glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");

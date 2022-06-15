@@ -747,6 +747,16 @@ static bool CommandKey(int key)
 		case SDLK_KP_6:
 			KeyScrollState |= ScrollRight;
 			break;
+		case SDLK_PAGEDOWN:
+		case SDLK_PAGEUP:
+			if (KeyModifiers == (ModifierAlt | ModifierControl | ModifierShift)) {
+				if (key == SDLK_PAGEDOWN) {
+					Video.Zoom = std::min(Video.Zoom + 0.1, 1.0);
+				} else {
+					Video.Zoom = std::max(Video.Zoom - 0.1, 0.1);
+				}
+			}
+			// fall through
 		default:
 			if (HandleCommandKey(key)) {
 				break;

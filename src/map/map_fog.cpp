@@ -433,7 +433,7 @@ void CViewport::AdjustFogSurface()
     this->FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
                                                      	   surfaceHeight,
                                                      	   32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
+    SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_BLEND);
 	
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 	SDL_FillRect(this->FogSurface, NULL, fogColorSolid);
