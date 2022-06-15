@@ -1172,13 +1172,12 @@ std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Cic
 std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Fair(std::vector<sequence_of_images> const &src) const
 {
 	if (src.size() == 1) {  // if layer is single
-		sequence_of_imagesPtrs images;
+		std::vector<sequence_of_imagesPtrs> result;
 		for (auto &srcImg : src[0]) {
-			images.push_back(srcImg.get());
+			result.push_back(sequence_of_imagesPtrs { srcImg.get() });
 		}
-		return std::vector<sequence_of_imagesPtrs> {images};
+		return result;
 	}
-
     return buildSequences_Cicadas(src);    
 }
 
