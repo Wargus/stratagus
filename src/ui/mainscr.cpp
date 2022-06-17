@@ -237,7 +237,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 					if (f >= -v) {
 						return false;
 					}
-				} else {
+				} else if (v != -1) {
+					// special case: the condition "<1" should apply
+					// to units that do not have the variable at all
 					return false;
 				}
 			} else if (v > CONDITION_ONLY) {
