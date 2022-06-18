@@ -875,7 +875,7 @@ bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint
 /**
 **	Remove pixel's color
 **
-**	@param	pixel		pointer to address of pixel to clean
+**	@param	pixel		pointer to address of target pixel
 **	@param	transColor	transparent color (we remove pixel by changing it's color to transparent)
 **	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
 **
@@ -916,7 +916,7 @@ void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t tra
 /**
 **	Shift pixel's color
 **
-**	@param	pixel		pointer to address of pixel to clean
+**	@param	pixel		pointer to address of target pixel
 **	@param	shift		shift to be applied to pixel's color
 **	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
 **
@@ -968,7 +968,7 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_ima
 **	It parses table in the format of {"shift", inc, colors[, colors]..} from the top of the lua state
 **
 **	@param	luaStack		lua state
-**	@param	images			vector of tiles images to remove colors from
+**	@param	images			vector of tiles images to shift colors
 **
 **/
 void CTilesetGraphicGenerator::shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const
