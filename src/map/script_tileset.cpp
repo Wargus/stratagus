@@ -790,14 +790,14 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 **	@return	set of parsed colors as uint32_t values
 **
 **/
-std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack) const
+std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack,  const int firstArgPos /* = 2 */) const
 {
-	enum { cFirsrArg = 2, cFrom = 1, cTo = 2 };
+	enum { cFrom = 1, cTo = 2 };
 
 	std::set<uint32_t> colors;
 	const uint16_t argsNum = lua_rawlen(luaStack, -1);
 
-	for (int arg = cFirsrArg; arg <= argsNum; arg++)
+	for (int arg = firstArgPos; arg <= argsNum; arg++)
 	{
 		lua_rawgeti(luaStack, -1, arg);	/// #1<
 		if (lua_istable(luaStack, -1)) {
@@ -914,6 +914,26 @@ void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t tra
 }
 
 /**
+**	Shift pixel's color
+**
+**	@param	pixel		pointer to address of pixel to clean
+**	@param	shift		shift to be applied to pixel's color
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::shiftIndexedColor(void *const pixel, const int16_t shift, const uint8_t bpp) const
+{
+	switch (bpp) {
+		case 1:
+			*(static_cast<uint8_t*>(pixel)) += shift;
+			break;
+		default:
+			/// only indexed colors supported
+			Assert(0);
+	}
+}
+
+/**
 **	Remove certain colors from tiles images
 **	It parses table in the format of {"remove", colors[, colors]..} from the top of the lua state
 **
@@ -923,7 +943,7 @@ void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t tra
 **/
 void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_images &images) const
 {
-	std::set<uint32_t> colors {parseArgsAsColors(luaStack)};
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack) };
 
 	uint32_t colorKey = 0;
 	if (!images.empty()) {
@@ -932,7 +952,7 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_ima
 	
 	for (auto &image : images) {
 		/// Do remove colors
-		SDL_Surface *const imgSurface {image.get()};
+		SDL_Surface *const imgSurface { image.get() };
 		const size_t pixelsNum = imgSurface->w * imgSurface->h;
 		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
 			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
@@ -944,11 +964,44 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_ima
 }
 
 /**
+**	Shift certain colors from tiles images by a given increment
+**	It parses table in the format of {"shift", inc, colors[, colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to remove colors from
+**
+**/
+void CTilesetGraphicGenerator::shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const
+{
+	enum { cShift = 2, cColors = 3 };
+
+	const int16_t shift = LuaToUnsignedNumber(luaStack, -1, cShift);
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack, cColors) };
+
+	for (auto &image : images) {
+		/// Do shift colors
+		SDL_Surface *const imgSurface { image.get() };
+		const size_t pixelsNum = imgSurface->w * imgSurface->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+			if (checkPixel(pixelPos, colors, imgSurface->format->BytesPerPixel)) {
+				shiftIndexedColor(pixelPos, shift, imgSurface->format->BytesPerPixel);
+			}
+		}
+	}
+}
+
+/**
 **	Parse pixel modifiers in the lua state
 ** {"do_something", parameter}
 ** where 'do_something':
 ** 	"remove"
 ** 	usage:		{"remove", colors[, colors]..} where 'colors':
+** 															color		-- single color
+** 															{from, to}	-- range of colors
+**				{"shift", inc, colors[, colors]..} where 'inc':
+															increment (positive or negative) to be implemented on the colors
+														 'colors':
 ** 															color		-- single color
 ** 															{from, to}	-- range of colors
 **
@@ -963,9 +1016,11 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 		LuaError(luaStack, "Incorrect argument");
 	}
 	int arg = 1;
-	std::string modifier {LuaToString(luaStack, -1, arg)};
+	std::string modifier { LuaToString(luaStack, -1, arg) };
 	if (modifier == "remove") {
 		removeColors(luaStack, images);
+	} else if (modifier == "shift") {
+		shiftIndexedColors(luaStack, images);
 	} else {
 		LuaError(luaStack, "Unknown modifier");	
 	}
