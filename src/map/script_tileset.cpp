@@ -134,7 +134,7 @@ tile_flags CTileset::parseTilesetTileFlags(lua_State *l, int *j)
 	//  Parse the list: flags of the slot
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
-		if (!lua_isstring(l, -1)) {
+		if (!lua_isstring_strict(l, -1)) {
 			lua_pop(l, 1);
 			break;
 		}
@@ -733,7 +733,7 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 	if (lua_istable(luaStack, -1)) {
 
 		lua_rawgeti(luaStack, -1, 1);	/// #1<
-		isMultipleLayers = lua_isstring(luaStack, -1) && std::string(LuaToString(luaStack, -1)) == "layers";
+		isMultipleLayers = lua_isstring_strict(luaStack, -1) && std::string(LuaToString(luaStack, -1)) == "layers";
 		lua_pop(luaStack, 1);	/// #1>
 
 	} else if (!lua_isnumber(luaStack, -1)) {
@@ -765,7 +765,7 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 
 		lua_rawgeti(luaStack, -1, 1);	/// #1<
 		/// check if "img" tag is present
-		if (lua_isstring(luaStack, -1)) {
+		if (lua_isstring_strict(luaStack, -1)) {
 			const std::string parsedValue { LuaToString(luaStack, -1) };
 			if (parsedValue == "img") {
 				isImg = true;
@@ -1397,7 +1397,7 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 				resultSet.push_back(LuaToUnsignedNumber(luaStack, -1, arg));
 			}
 
-		} else if (lua_isstring(luaStack, -1)) {
+		} else if (lua_isstring_strict(luaStack, -1)) {
 			lua_pop(luaStack, 1);
 
 			int arg = parseFromPos;
