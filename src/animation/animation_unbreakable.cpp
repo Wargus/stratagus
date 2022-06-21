@@ -42,7 +42,7 @@
 /* virtual */ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
-	Assert(unit.Anim.Unbreakable ^ this->state);
+	// Assert(unit.Anim.Unbreakable ^ this->state);
 
 	unit.Anim.Unbreakable = this->state;
 }
