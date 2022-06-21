@@ -42,32 +42,36 @@
 
 struct lua_State;
 
-// Not used until now:
-#define MapFieldSpeedMask 0x0003  /// Move faster on this tile
+// Not used until now:    
+#define MapFieldSpeedMask               0x0000'0000'0000'0003  /// Move faster on this tile
 
-#define MapFieldOpaque 0x0004  /// Units can't see through this field (FoW)
+#define MapFieldOpaque                  0x0000'0000'0000'0004  /// Units can't see through this field (FoW)
 
-#define MapFieldHuman 0x0008  /// Human is owner of the field (walls)
+#define MapFieldHuman                   0x0000'0000'0000'0008  /// Human is owner of the field (walls)
 
-#define MapFieldLandAllowed  0x0010  /// Land units allowed
-#define MapFieldCoastAllowed 0x0020  /// Coast (transporter) units allowed
-#define MapFieldWaterAllowed 0x0040  /// Water units allowed
-#define MapFieldNoBuilding   0x0080  /// No buildings allowed
+#define MapFieldLandAllowed             0x0000'0000'0000'0010  /// Land units allowed
+#define MapFieldCoastAllowed            0x0000'0000'0000'0020  /// Coast (transporter) units allowed
+#define MapFieldWaterAllowed            0x0000'0000'0000'0040  /// Water units allowed
+#define MapFieldNoBuilding              0x0000'0000'0000'0080  /// No buildings allowed
 
-#define MapFieldUnpassable 0x0100  /// Field is movement blocked
-#define MapFieldWall       0x0200  /// Field contains wall
-#define MapFieldRocks      0x0400  /// Field contains rocks
-#define MapFieldForest     0x0800  /// Field contains forest or other harvestable resource
+#define MapFieldUnpassable              0x0000'0000'0000'0100  /// Field is movement blocked
+#define MapFieldWall                    0x0000'0000'0000'0200  /// Field contains wall
+#define MapFieldRocks                   0x0000'0000'0000'0400  /// Field contains rocks
+#define MapFieldForest                  0x0000'0000'0000'0800  /// Field contains forest or other harvestable resource
 
-#define MapFieldLandUnit 0x1000  /// Land unit on field
-#define MapFieldAirUnit  0x2000  /// Air unit on field
-#define MapFieldSeaUnit  0x4000  /// Water unit on field
-#define MapFieldBuilding 0x8000  /// Building on field
+#define MapFieldLandUnit                0x0000'0000'0000'1000  /// Land unit on field
+#define MapFieldAirUnit                 0x0000'0000'0000'2000  /// Air unit on field
+#define MapFieldSeaUnit                 0x0000'0000'0000'4000  /// Water unit on field
+#define MapFieldBuilding                0x0000'0000'0000'8000  /// Building on field
 
-#define MapFieldDecorative 0x10000  /// A field that needs no mixing with the surroundings, for the editor
-#define MapFieldCost4 (0x20000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost4 instead of wood
-#define MapFieldCost5 (0x40000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost5 instead of wood
-#define MapFieldCost6 (0x80000 | MapFieldForest)  		/// This field is terrain harvestable, but gives Cost6 instead of wood
+#define MapFieldDecorative              0x0000'0000'0001'0000  /// A field that needs no mixing with the surroundings, for the editor
+#define MapFieldCost4                  (0x0000'0000'0002'0000 | MapFieldForest) /// This field is terrain harvestable, but gives Cost4 instead of wood
+#define MapFieldCost5                  (0x0000'0000'0004'0000 | MapFieldForest) /// This field is terrain harvestable, but gives Cost5 instead of wood
+#define MapFieldCost6                  (0x0000'0000'0008'0000 | MapFieldForest) /// This field is terrain harvestable, but gives Cost6 instead of wood
+
+#define MapFieldSubtilesMax             16
+#define MapFieldSubtilesUnpassableShift 48
+#define MapFieldSubtilesUnpassableMask  0xffffL << MapFieldSubtilesUnpassableShift /// Up to 16 unpassable subtiles, never used in MapField, only in CTile
 
 /**
 **  These are used for lookup tiles types
@@ -118,7 +122,7 @@ public:
 
 public:
 	unsigned short tile;  /// graphical pos
-	unsigned int flag;    /// Flag
+	uint64_t flag;        /// tile flags
 	CTileInfo tileinfo;   /// Tile descriptions
 };
 
@@ -138,7 +142,16 @@ public:
 	bool isAWoodTile(unsigned tile) const;
 	bool isARockTile(unsigned tile) const;
 
+	/**
+	 * Size of a graphical (not logical!) tile in pixels.
+	 * 
+	 * @return const PixelSize& 
+	 */
 	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
+	const int getLogicalToGraphicalTileSizeMultiplier() const { return logicalTileToGraphicalTileMultiplier; }
+	const int getLogicalToGraphicalTileSizeShift() const { return logicalTileToGraphicalTileShift; }
+	const int getGraphicalTileSizeShiftX() const { return graphicalTileSizeShiftX; }
+	const int getGraphicalTileSizeShiftY() const { return graphicalTileSizeShiftY; }
 
 	unsigned getRemovedRockTile() const { return removedRockTile; }
 	unsigned getRemovedTreeTile() const { return removedTreeTile; }
@@ -172,7 +185,7 @@ public:
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
-	int parseTilesetTileFlags(lua_State *l, int *back, int *j);
+	int parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j);
 	int findTileIndex(unsigned char baseTerrain, unsigned char mixTerrain = 0) const;
 
 private:
@@ -195,6 +208,13 @@ public:
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
+
+	// some cached values based on pixelTileSize and the logical tile size in the game
+	uint8_t logicalTileToGraphicalTileMultiplier; /// By what to multiply logical tile coordinates to get graphical tile coordinates
+	uint8_t logicalTileToGraphicalTileShift;      /// By what to shift logical tile coordinates to get graphical tile coordinates
+	uint8_t graphicalTileSizeShiftX; /// 1<<shift size for graphical tiles in X direction
+	uint8_t graphicalTileSizeShiftY; /// 1<<shift size for graphical tiles in Y direction
+	
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 #if 1
 	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used

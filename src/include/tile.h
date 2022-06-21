@@ -191,7 +191,7 @@ public:
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
-	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
+	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value, int subtile = -1);
 
 	unsigned int getGraphicTile() const { return tile; }
 

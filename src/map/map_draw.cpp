@@ -40,11 +40,13 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "player.h"
+#include "tileset.h"
 #include "unit.h"
 #include "unittype.h"
 #include "ui.h"
 #include "video.h"
 
+#include <cstdlib>
 
 bool CViewport::ShowGrid = false;
 
@@ -257,6 +259,7 @@ void CViewport::DrawMapGridInViewport() const
 
 void CViewport::DrawMapBackgroundInViewport() const
 {
+	int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
 	int ex = this->BottomRightPos.x;
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
@@ -264,21 +267,34 @@ void CViewport::DrawMapBackgroundInViewport() const
 	const int mapW = Map.Info.MapWidth;
 	const int mapH = Map.Info.MapHeight;
 	const int map_max = mapW * mapH;
-	bool canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
+	PixelSize graphicTileSize = Map.Tileset->getPixelTileSize();
+	int graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+	bool graphicalTileIsLogicalTile = graphicTileSize == PixelTileSize;
+	bool canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap && graphicalTileIsLogicalTile;
 
-	while (sy  < 0) {
-		sy++;
-		dy += PixelTileSize.y;
+	while (sy < 0) {
+		sy += graphicTileOffset;
+		dy += graphicTileSize.y;
 	}
-	sy *=  mapW;
+	if (!graphicalTileIsLogicalTile) {
+		auto dv = std::div(sy * PixelTileSize.y, graphicTileSize.y);
+		sy = dv.quot * graphicTileOffset;
+		dy -= dv.rem;
+	}
+	sy *= mapW;
 
-	while (dy <= ey && sy  < map_max) {
+	while (dy <= ey && sy < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
+		if (!graphicalTileIsLogicalTile) {
+			auto dv = std::div(sx * PixelTileSize.x, graphicTileSize.x);
+			sx = dv.quot * graphicTileOffset;
+			dx -= dv.rem;
+		}
 		while (dx <= ex && (sx - sy < mapW)) {
 			if (sx - sy < 0 || (canShortcut && !FogOfWar->GetVisibilityForTile(Vec2i(sx % mapW, sx / mapH)))) {
-				++sx;
-				dx += PixelTileSize.x;
+				sx += graphicTileOffset;
+				dx += graphicTileSize.x;
 				continue;
 			}
 			const CMapField &mf = Map.Fields[sx];
@@ -289,47 +305,35 @@ void CViewport::DrawMapBackgroundInViewport() const
 				tile = mf.playerInfo.SeenTile;
 			}
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
-#if 0
-			int64_t cost = mf.lastAStarCost;
-			int32_t alpha;
-			// we use the msb as marker, but only consider the lower 32-bits as numeric value
-			if (cost != 0) {
-				if (cost == -1) {
-					// non traversible tiles always start full red
-					alpha = -60;
-				} else if (cost > 0) {
-					// msb not set means this has not been scaled
-					// scale cost to be between 1 and 60
-					cost <<= 3;
-					if (cost > 60) {
-						cost = 60;
+#ifdef DEBUG
+			// AStar passability overlay
+			if (CViewport::isGridEnabled()) {
+				for (int i = 0; i < graphicTileOffset; i++) {
+					for (int j = 0; j < graphicTileOffset; j++) {
+						if (Map.Fields[sx + j + (mapW * i)].getFlag() & MapFieldUnpassable) {
+							Video.FillTransRectangleClip(ColorRed, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
+						} else {
+							Video.FillTransRectangleClip(ColorGreen, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
+						}
+
+						if (Map.Fields[sx + j + (mapW * i)].getFlag() & (MapFieldLandUnit | MapFieldBuilding | MapFieldSeaUnit)) {
+							Video.FillTransRectangleClip(ColorOrange, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
+						}
 					}
-					alpha = static_cast<int32_t>(cost);
-				} else {
-					// consider only low 32-bits of already scaled value
-					alpha = static_cast<int32_t>(cost);
 				}
 			}
-			if (alpha > 0) {
-				Video.FillTransRectangleClip(ColorGreen, dx, dy,
-								 dx + Map.TileGraphic->getWidth(), dy + dx + Map.TileGraphic->getWidth(), alpha * 200 / 60);
-				alpha--;
-			} else if (alpha < 0) {
-				Video.FillTransRectangleClip(ColorRed, dx, dy,
-								 dx + Map.TileGraphic->getWidth(), dy + dx + Map.TileGraphic->getWidth(), -alpha * 200 / 60);
-				alpha++;
-			}
-			const_cast<CMapField &>(mf).lastAStarCost = alpha | ((uint64_t)1 << 63);
 #endif
-			++sx;
-			dx += PixelTileSize.x;
+			sx += graphicTileOffset;
+			dx += graphicTileSize.x;
 		}
-		sy += mapW;
-		dy += PixelTileSize.y;
+		sy += mapW << shift;
+		dy += graphicTileSize.y;
 	}
+#ifdef DEBUG
 	if (CViewport::isGridEnabled()) {
 		DrawMapGridInViewport();
 	}
+#endif
 }
 
 /**
