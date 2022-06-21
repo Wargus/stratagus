@@ -36,15 +36,17 @@
 #include "stratagus.h"
 
 #include "tileset.h"
+#include "tile.h"
 
 #include "script.h"
 #include <cstring>
+#include <math.h>
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static bool ModifyFlag(const char *flagName, unsigned int *flag)
+static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 {
 	const struct {
 		const char *name;
@@ -92,6 +94,22 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 			return true;
 		}
 	}
+
+	if (flagName[0] == 'p' || flagName[0] == 'u') {
+		if (strlen(flagName) != subtileCount) {
+			return false;
+		}
+		uint64_t subtileFlags = 0;
+		for (int i = 0; i < subtileCount; i++) {
+			if (flagName[i] == 'u') {
+				subtileFlags |= (1 << i);
+			} else if (flagName[i] != 'p') {
+				return false;
+			}
+		}
+		*flag |= (subtileFlags << MapFieldSubtilesUnpassableShift);
+		return true;
+	}
 	return false;
 }
 
@@ -105,9 +123,9 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 **  @return      index for basename, if the name this tile should be available as a different basename, or 0
 **
 */
-int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
+int CTileset::parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j)
 {
-	unsigned int flags = 3;
+	uint64_t flags = 3;
 	bool nonMixing = false;
 	//  Parse the list: flags of the slot
 	while (1) {
@@ -121,7 +139,7 @@ int CTileset::parseTilesetTileFlags(lua_State *l, int *back, int *j)
 		lua_pop(l, 1);
 
 		//  Flags are mostly needed for the editor
-		if (ModifyFlag(value, &flags) == false) {
+		if (ModifyFlag(value, &flags, logicalTileToGraphicalTileMultiplier * logicalTileToGraphicalTileMultiplier) == false) {
 			if (!strcmp(value, "non-mixing")) {
 				nonMixing = true;
 			} else {
@@ -209,7 +227,7 @@ void CTileset::parseSolid(lua_State *l)
 	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	int f = 0;
+	uint64_t f = 0;
 	if (parseTilesetTileFlags(l, &f, &j)) {
 		LuaError(l, "cannot set a custom basename in the main set of flags");
 	}
@@ -226,7 +244,7 @@ void CTileset::parseSolid(lua_State *l)
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
 			int k = 0;
-			int tile_flag = 0;
+			uint64_t tile_flag = 0;
 			unsigned char new_basename = parseTilesetTileFlags(l, &tile_flag, &k);
 			--j;
 			lua_pop(l, 1);
@@ -273,7 +291,7 @@ void CTileset::parseMixed(lua_State *l)
 	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	int f = 0;
+	uint64_t f = 0;
 	if (parseTilesetTileFlags(l, &f, &j)) {
 		LuaError(l, "cannot set a custom basename in the main set of flags");
 	}
@@ -337,8 +355,8 @@ void CTileset::parse(lua_State *l)
 {
 	clear();
 
-	this->pixelTileSize.x = 32;
-	this->pixelTileSize.y = 32;
+	this->pixelTileSize.x = PixelTileSize.x;
+	this->pixelTileSize.y = PixelTileSize.y;
 
 	const int args = lua_gettop(l);
 	for (int j = 1; j < args; ++j) {
@@ -351,6 +369,65 @@ void CTileset::parse(lua_State *l)
 			this->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {
 			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.y, j);
+		} else if (!strcmp(value, "slots")) {
+			// must be deferred to later, after the size is parsed
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	// precalculate some other representations for performance in hot loops later
+	double sizeShiftX = std::log2(this->pixelTileSize.x);
+	this->graphicalTileSizeShiftX = std::lround(sizeShiftX);
+	if (sizeShiftX != this->graphicalTileSizeShiftX) {
+		LuaError(l, "graphical tile size x %d must be a power of 2" _C_ this->pixelTileSize.x);
+	}
+
+	double sizeShiftY = std::log2(this->pixelTileSize.y);
+	this->graphicalTileSizeShiftY = std::lround(sizeShiftY);
+	if (sizeShiftX != this->graphicalTileSizeShiftY) {
+		LuaError(l, "graphical tile size y %d must be a power of 2" _C_ this->pixelTileSize.y);
+	}
+
+	int multiplier = this->pixelTileSize.x / PixelTileSize.x;
+	if (multiplier != this->pixelTileSize.y / PixelTileSize.y) {
+		LuaError(l, "logical tile sizes must use the same subdivision in x and y, not %d and %d" _C_ multiplier _C_ (this->pixelTileSize.y / PixelTileSize.y));
+	}
+	if (PixelTileSize.x * multiplier != this->pixelTileSize.x) {
+		LuaError(l, "graphical tile size x %d must be a multiple of logical tile size %d" _C_ this->pixelTileSize.x _C_ PixelTileSize.x);
+	}
+	if (PixelTileSize.y * multiplier != this->pixelTileSize.y) {
+		LuaError(l, "graphical tile size y %d must be a multiple of logical tile size %d" _C_ this->pixelTileSize.y _C_ PixelTileSize.y);
+	}
+	this->logicalTileToGraphicalTileMultiplier = multiplier;
+
+	double logicalSizePowerX = std::log2(PixelTileSize.x);
+	if (logicalSizePowerX != std::lround(logicalSizePowerX)) {
+		LuaError(l, "logical tile size x %d must be a power of 2" _C_ PixelTileSize.x);
+	}
+	double logicalSizePowerY = std::log2(PixelTileSize.y);
+	if (logicalSizePowerY != std::lround(logicalSizePowerY)) {
+		LuaError(l, "logical tile size y %d must be a power of 2" _C_ PixelTileSize.y);
+	}
+	long logicalToGraphicalShift = std::lround(sizeShiftX - logicalSizePowerX);
+	if (logicalToGraphicalShift < 0) {
+		LuaError(l, "logical tile size must be smaller than graphical tile size");
+	}
+	if (std::lround(sizeShiftY - logicalSizePowerY) != logicalToGraphicalShift) {
+		LuaError(l, "logical tile size x and y must be the same shiftable by the same amount to get to the graphical tile size");
+	}
+	this->logicalTileToGraphicalTileShift = logicalToGraphicalShift;
+
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j);
+		++j;
+
+		if (!strcmp(value, "name")) {
+			// done
+		} else if (!strcmp(value, "image")) {
+			// done
+		} else if (!strcmp(value, "size")) {
+			// done
 		} else if (!strcmp(value, "slots")) {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");

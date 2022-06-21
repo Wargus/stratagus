@@ -727,7 +727,11 @@ static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Define size in pixels (x,y) of a tile in this game
+**  Define size in pixels (x,y) of a tile in this game. This is not required
+**  to be the graphical tile size, but the logical tile size that is used for
+**  path finding and is the minimum size for units. Graphical tile sizes can
+**  be exact multiples of this size, defined using DefineTileset with the "size"
+**  option.
 **
 **  @param l  Lua state.
 **
@@ -762,9 +766,20 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 	}
 
 	if (Map.Fields) {
-		CMapField &mf = *Map.Field(pos);
-
-		mf.setTileIndex(*Map.Tileset, tileIndex, value);
+		int multiplier = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		if (multiplier > 1) {
+			// fill subtile fields
+			int subtile = 0;
+			for (int i = 0; i < multiplier; i++) {
+				for (int j = 0; j < multiplier; j++) {
+					CMapField &mf = *Map.Field(Vec2i(pos.x + j, pos.y + i));
+					mf.setTileIndex(*Map.Tileset, tileIndex, value, subtile++);
+				}
+			}
+		} else {
+			CMapField &mf = *Map.Field(pos);
+			mf.setTileIndex(*Map.Tileset, tileIndex, value);
+		}
 	}
 }
 
@@ -840,10 +855,9 @@ static int CclDefineTileset(lua_State *l)
 	Map.Tileset->parse(l);
 
 	//  Load and prepare the tileset
-	PixelTileSize = Map.Tileset->getPixelTileSize();
 
 	ShowLoadProgress(_("Tileset '%s'"), Map.Tileset->ImageFile.c_str());
-	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
+	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
 	Map.TileGraphic->Load();
 	return 0;
 }
@@ -877,7 +891,7 @@ static int CclSetTileFlags(lua_State *l)
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
-	int flags = 0;
+	uint64_t flags = 0;
 
 	unsigned char newBase = Map.Tileset->parseTilesetTileFlags(l, &flags, &j);
 	Map.Tileset->tiles[tilenumber].flag = flags;

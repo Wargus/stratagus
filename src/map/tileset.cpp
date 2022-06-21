@@ -192,7 +192,7 @@
 ----------------------------------------------------------------------------*/
 
 /**
-** Size of a tile in pixel
+** Size of a logical tile in pixel
 */
 PixelSize PixelTileSize(32, 32);
 

@@ -82,7 +82,7 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
+void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value, int subtile /* = 0 */)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
 	this->tile = tile.tile;
@@ -94,6 +94,13 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
 					 MapFieldWall | MapFieldRocks | MapFieldForest);
 	this->Flags |= tile.flag;
+	if (subtile >= 0) {
+		uint32_t subtileUnpassabilityFlags = tile.flag >> MapFieldSubtilesUnpassableShift;
+		bool subtileUnpassable = (subtileUnpassabilityFlags >> subtile) & 1;
+		if (subtileUnpassable) {
+			this->Flags |= MapFieldUnpassable;
+		}
+	}
 	if (!value && (tile.flag & MapFieldForest)) {
 		if ((tile.flag & MapFieldCost4) == MapFieldCost4) {
 			this->Value = DefaultResourceAmounts[Cost4];
