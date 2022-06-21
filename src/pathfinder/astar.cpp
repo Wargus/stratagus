@@ -51,10 +51,10 @@
 ----------------------------------------------------------------------------*/
 
 struct Node {
-	int CostFromStart;  /// Real costs to reach this point
-	short int CostToGoal;     /// Estimated cost to goal
-	char InGoal;        /// is this point in the goal
-	char Direction;     /// Direction for trace back
+	int32_t CostFromStart;  /// Real costs to reach this point
+	int16_t CostToGoal;     /// Estimated cost to goal
+	int8_t InGoal;        /// is this point in the goal
+	int8_t Direction;     /// Direction for trace back
 };
 
 struct Open {
@@ -88,9 +88,6 @@ const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 static Node *AStarMatrix;
 
 /// a list of close nodes, helps to speed up the matrix cleaning
-static int *CloseSet;
-static int CloseSetSize;
-static int Threshold;
 static int OpenSetMaxSize;
 static int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4
@@ -106,6 +103,7 @@ static bool AStarFixedEnemyUnitsUnpassable = false;
 
 static int AStarMapWidth;
 static int AStarMapHeight;
+static int AStarMapMax;
 
 static int AStarGoalX;
 static int AStarGoalY;
@@ -120,8 +118,9 @@ static Open *OpenSet;
 /// The size of the open node set
 static int OpenSetSize;
 
-static int *CostMoveToCache;
-static const int CacheNotSet = -5;
+static int32_t *CostMoveToCache;
+static int CostMoveToCacheSize;
+static constexpr int CacheNotSet = -1;
 
 /*----------------------------------------------------------------------------
 --  Profile
@@ -257,19 +256,23 @@ void InitAStar(int mapWidth, int mapHeight)
 
 	AStarMapWidth = mapWidth;
 	AStarMapHeight = mapHeight;
+	AStarMapMax =  AStarMapWidth * AStarMapHeight;
 
-	AStarMatrixSize = sizeof(Node) * AStarMapWidth * AStarMapHeight;
-	AStarMatrix = new Node[AStarMapWidth * AStarMapHeight];
+	// align the matrix, the open set, and the cost to move cache
+	// on 32-byte boundary, in case the memset/memmove operations
+	// of the libc we're using has a 128/256/512bit SIMD vector
+	// instruction branch, since we might be clearing 8M of
+	// memory for a 2048x2048 map
+	AStarMatrixSize = sizeof(Node) * AStarMapMax;
+	AStarMatrix = (Node *)aligned_malloc(32, AStarMatrixSize);
 	memset(AStarMatrix, 0, AStarMatrixSize);
 
-	Threshold = AStarMapWidth * AStarMapHeight / MAX_CLOSE_SET_RATIO;
-	CloseSetSize = Threshold;
-	CloseSet = new int[Threshold];
+	OpenSetMaxSize = AStarMapMax / MAX_OPEN_SET_RATIO;
+	OpenSet = (Open *)aligned_malloc(32, OpenSetMaxSize * sizeof(Open));
 
-	OpenSetMaxSize = AStarMapWidth * AStarMapHeight / MAX_OPEN_SET_RATIO;
-	OpenSet = new Open[OpenSetMaxSize];
-
-	CostMoveToCache = new int[AStarMapWidth * AStarMapHeight];
+	CostMoveToCacheSize = sizeof(int32_t) * AStarMapMax;
+	CostMoveToCache = (int32_t*)aligned_malloc(32, CostMoveToCacheSize);
+	memset(CostMoveToCache, CacheNotSet, CostMoveToCacheSize);
 
 	for (int i = 0; i < 9; ++i) {
 		Heading2O[i] = Heading2Y[i] * AStarMapWidth;
@@ -283,15 +286,12 @@ void InitAStar(int mapWidth, int mapHeight)
 */
 void FreeAStar()
 {
-	delete[] AStarMatrix;
+	aligned_free(AStarMatrix);
 	AStarMatrix = NULL;
-	delete[] CloseSet;
-	CloseSet = NULL;
-	CloseSetSize = 0;
-	delete[] OpenSet;
+	aligned_free(OpenSet);
 	OpenSet = NULL;
 	OpenSetSize = 0;
-	delete[] CostMoveToCache;
+	aligned_free(CostMoveToCache);
 	CostMoveToCache = NULL;
 
 	ProfilePrint();
@@ -312,62 +312,14 @@ static void CostMoveToCacheCleanUp();
 static void AStarCleanUp()
 {
 	ProfileBegin("AStarCleanUp");
-
-	if (CloseSetSize >= Threshold) {
-		AStarPrepare();
-		CostMoveToCacheCleanUp();
-	} else {
-		for (int i = 0; i < CloseSetSize; ++i) {
-			AStarMatrix[CloseSet[i]].CostFromStart = 0;
-			AStarMatrix[CloseSet[i]].InGoal = 0;
-			CostMoveToCache[CloseSet[i]] = CacheNotSet;
-		}
-	}
+	AStarPrepare();
+	CostMoveToCacheCleanUp();
 	ProfileEnd("AStarCleanUp");
 }
 
 static void CostMoveToCacheCleanUp()
 {
-	ProfileBegin("CostMoveToCacheCleanUp");
-	int AStarMapMax =  AStarMapWidth * AStarMapHeight;
-#if 1
-	int *ptr = CostMoveToCache;
-#ifdef __x86_64__
-	union {
-		intptr_t d;
-		int i[2];
-	} conv;
-	conv.i[0] = CacheNotSet;
-	conv.i[1] = CacheNotSet;
-
-	if (((uintptr_t)ptr) & 4) {
-		*ptr++ = CacheNotSet;
-		--AStarMapMax;
-	}
-#endif
-	while (AStarMapMax > 3) {
-#ifdef __x86_64__
-		*((intptr_t *)ptr) = conv.d;
-		*((intptr_t *)(ptr + 2)) = conv.d;
-		ptr += 4;
-#else
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-		*ptr++ = CacheNotSet;
-#endif
-		AStarMapMax -= 4;
-	};
-	while (AStarMapMax) {
-		*ptr++ = CacheNotSet;
-		--AStarMapMax;
-	}
-#else
-	for (int i = 0; i < AStarMapMax; ++i) {
-		CostMoveToCache[i] = CacheNotSet;
-	}
-#endif
-	ProfileEnd("CostMoveToCacheCleanUp");
+	memset(CostMoveToCache, CacheNotSet, CostMoveToCacheSize);
 }
 
 /**
@@ -496,16 +448,6 @@ static int AStarFindNode(int eo)
 	return -1;
 }
 
-/**
-**  Add a node to the closed set
-*/
-static void AStarAddToClose(int node)
-{
-	if (CloseSetSize < Threshold) {
-		CloseSet[CloseSetSize++] = node;
-	}
-}
-
 #define GetIndex(x, y) (x) + (y) * AStarMapWidth
 
 /* build-in costmoveto code */
@@ -605,12 +547,19 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 */
 static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 {
-	int *c = &CostMoveToCache[index];
+	int32_t *c = &CostMoveToCache[index];
 	if (*c != CacheNotSet) {
-		return *c;
+		// for performance reasons, CostMoveToCache uses -1 to
+		// indicate it is unset, but the algorithm is simpler
+		// if the range of costs is [-1, INT_MAX]. so we always
+		// store everything +1
+		return *c - 1;
 	}
-	*c = CostMoveToCallBack_Default(index, unit);
-	return *c;
+	*c = CostMoveToCallBack_Default(index, unit) + 1;
+#ifdef DEBUG
+	Assert(c >= 0);
+#endif
+	return *c - 1;
 }
 
 class AStarGoalMarker
@@ -626,7 +575,6 @@ public:
 			AStarMatrix[offset].InGoal = 1;
 			*goal_reachable = true;
 		}
-		AStarAddToClose(offset);
 	}
 private:
 	const CUnit &unit;
@@ -957,7 +905,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	AStarCleanUp();
 
 	OpenSetSize = 0;
-	CloseSetSize = 0;
 
 	if (!AStarMarkGoal(goalPos, gw, gh, tilesizex, tilesizey, minrange, maxrange, unit)) {
 		// goal is not reachable
@@ -981,7 +928,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		ProfileEnd("AStarFindPath");
 		return ret;
 	}
-	AStarAddToClose(OpenSet[0].O);
 	if (AStarMatrix[eo].InGoal) {
 		ret = PF_REACHED;
 		ProfileEnd("AStarFindPath");
@@ -1067,8 +1013,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 					ProfileEnd("AStarFindPath");
 					return ret;
 				}
-				// we add the point to the close set
-				AStarAddToClose(eo);
 			} else if (new_cost < AStarMatrix[eo].CostFromStart) {
 				// Already visited node, but we have here a better path
 				// I know, it's redundant (but simpler like this)
