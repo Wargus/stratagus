@@ -1020,18 +1020,83 @@ void CTilesetGraphicGenerator::shiftIndexedColors(lua_State *luaStack, sequence_
 }
 
 /**
+**	Flip images
+**	It parses table in the format of {"flip", direction} from the top of the lua state
+**	where direction is "vertical", "horizontal" or "both"
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to flip
+**
+**/
+void CTilesetGraphicGenerator::flipImages(lua_State *luaStack, sequence_of_images &images) const
+{
+	enum { cVertical = 0b01, cHorizontal = 0b10 };
+
+	if (images.empty()) { 
+		return;
+	}
+	
+	uint8_t direction = 0;
+
+	const std::string dirToParse { LuaToString(luaStack, -1, 2) };
+	
+	if (dirToParse == "vertical") {
+		direction = cVertical;
+	} else if (dirToParse == "horizontal") {
+		direction = cHorizontal;
+	} else if (dirToParse == "both") {
+		direction = cHorizontal | cVertical;
+	} else {
+		LuaError(luaStack, "Wrong modifier argument");
+	}
+	uint32_t colorKey = 0;
+	SDL_GetColorKey(images[0].get(), &colorKey);
+
+	std::vector<uint32_t> flippedImage(images[0].get()->w * images[0].get()->h);
+	
+	for (auto &image : images) {
+		/// Do flip image
+		SDL_Surface *const imgSurface { image.get() };
+		size_t ySrc, rySrc;
+		size_t xSrc, rxSrc;
+		size_t &xDst = direction & cHorizontal ? rxSrc : xSrc;
+		size_t &yDst = direction & cVertical   ? rySrc : ySrc;
+
+		for (ySrc = 0, rySrc = imgSurface->h - 1; ySrc < imgSurface->h; ySrc++, rySrc--) {
+			for (xSrc = 0, rxSrc = imgSurface->w - 1; xSrc < imgSurface->w; xSrc++, rxSrc--) {
+				const size_t pixel = xSrc + ySrc * imgSurface->w;
+				void *const srcPixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+				flippedImage[xDst + yDst * imgSurface->w] = getPixel(srcPixelPos, imgSurface->format->BytesPerPixel);
+			}
+		}
+		uintptr_t dstPixelPos = uintptr_t(imgSurface->pixels);
+		for (auto pixel : flippedImage) {
+			setPixel(reinterpret_cast<void *>(dstPixelPos), pixel, imgSurface->format->BytesPerPixel);
+			dstPixelPos += imgSurface->format->BytesPerPixel;
+		}
+	}
+}
+
+/**
 **	Parse pixel modifiers in the lua state
 ** {"do_something", parameter}
 ** where 'do_something':
 ** 	"remove"
-** 	usage:		{"remove", colors[, colors]..} where 'colors':
-** 															color		-- single color
-** 															{from, to}	-- range of colors
-**				{"shift", inc, colors[, colors]..} where 'inc':
-															increment (positive or negative) to be implemented on the colors
-														 'colors':
-** 															color		-- single color
-** 															{from, to}	-- range of colors
+** 	usage:		{"remove", colors[, colors]..}
+**					where 'colors':
+** 									color		-- single color
+** 									{from, to}	-- range of colors
+**				{"shift", inc, colors[, colors]..}
+**					where 	'inc':
+**								increment (positive or negative) to be implemented on the colors
+**						 	'colors':
+** 								color		-- single color
+** 								{from, to}	-- range of colors
+** 				{"flip", direction}
+**					where 'direction':
+** 								"vertical"
+** 								"horizontal"
+**								"both"
 **
 **	@param	luaStack	lua state, a table in the top will be parsed
 **	@param	argPos		position in the table to parse
@@ -1049,6 +1114,8 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 		removeColors(luaStack, images);
 	} else if (modifier == "shift") {
 		shiftIndexedColors(luaStack, images);
+	} else if (modifier == "flip") {
+		flipImages(luaStack, images);
 	} else {
 		LuaError(luaStack, "Unknown modifier");	
 	}
