@@ -1035,7 +1035,7 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 													8 * bpp, 
 													pf->Rmask, 
 													pf->Gmask, 
-													pf->Bmask, 
+													pf->Bmask,
 													pf->Amask);
 	uint32_t ckey;
 	const bool useckey = !SDL_GetColorKey(Surface, &ckey);

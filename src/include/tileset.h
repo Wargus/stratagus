@@ -375,8 +375,11 @@ private:
 	std::vector<tile_index> parseSrcRange(lua_State *luaStack, bool &isImg) const;
 	uint16_t checkForLayers(lua_State *luaStack) const;
 	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack, const int firstArgPos = 2) const;
+	uint32_t getPixel(const void *const pixel, const uint8_t bpp) const;
+	void setPixel(void *const pixel, const uint32_t color, const uint8_t bpp) const;
 	bool checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const;
 	void removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const;
+	void swapPixels(void *const pixel1, void *const pixel2, const uint8_t bpp) const;
 	void shiftIndexedColor(void *const pixel, const int16_t shift, const uint8_t bpp) const;
 	void removeColors(lua_State *luaStack, sequence_of_images &images) const;
 	void shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const;

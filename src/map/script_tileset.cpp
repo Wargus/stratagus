@@ -818,6 +818,98 @@ std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaSta
 }
 
 /**
+**	Get pixels's color
+**
+**	@param	pixel		pointer to address of current pixel
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**	@return				pixel's color as 32 bit value
+**
+**/
+uint32_t CTilesetGraphicGenerator::getPixel(const void *const pixel, const uint8_t bpp) const
+{
+	uint32_t pixelColor = 0;
+
+	switch (bpp) {
+		case 1:
+			pixelColor = uint32_t(*(static_cast<const uint8_t*>(pixel)));
+			break;
+		case 2:
+			pixelColor = uint32_t(*(static_cast<const uint16_t*>(pixel)));
+			break;
+		case 3:
+			{
+				const uint8_t *const pixelPtr = static_cast<const uint8_t*>(pixel);
+				pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]       | pixelPtr[1] << 8  | pixelPtr[2] << 16
+															 : pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
+			}
+			break;
+		case 4:
+			pixelColor = *(static_cast<const uint32_t*>(pixel));
+			break;
+		default:
+			/// unsupported format
+			Assert(0);
+	}
+	return pixelColor;
+}
+
+/**
+**	Set pixel's color
+**
+**	@param	pixel		pointer to address of target pixel
+**	@param	color		color to set
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::setPixel(void *const pixel, const uint32_t color, const uint8_t bpp) const
+{
+	switch (bpp) {
+		case 1:
+			*(static_cast<uint8_t*>(pixel)) = uint8_t(color);
+			break;
+		case 2:
+			*(static_cast<uint16_t*>(pixel)) = uint16_t(color);
+			break;
+		case 3:
+			{
+				const uint8_t *const src = reinterpret_cast<const uint8_t*>(&color);
+				uint8_t *const dst = static_cast<uint8_t*>(pixel);
+				if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
+					dst[0] = src[0];
+					dst[1] = src[1];
+					dst[2] = src[2];
+				} else {
+					dst[0] = src[3];
+					dst[1] = src[2];
+					dst[2] = src[1];
+				}
+			}
+			break;
+		case 4:
+			*(static_cast<uint32_t*>(pixel)) = color;
+			break;
+		default:
+			/// unsupported format
+			Assert(0);
+	}
+}
+
+/**
+**	Swap two pixels
+**
+**	@param	pixel1		pointer to address of pixel1 to swap
+**	@param	pixel1		pointer to address of pixel2 to swap
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::swapPixels(void *const pixel1, void *const pixel2, const uint8_t bpp) const
+{
+	const uint32_t tmp = getPixel(pixel1, bpp);
+	setPixel(pixel1, getPixel(pixel2, bpp), bpp);
+	setPixel(pixel2, tmp, bpp);
+}
+
+/**
 **	Check if current pixel matches one of passed colors
 **
 **	@param	pixel		pointer to address of current pixel
@@ -829,44 +921,8 @@ std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaSta
 bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const
 {
 	for (auto &color : colors) {
-		switch (bpp) {
-			case 1:
-				{
-					const uint8_t pixelColor = *(static_cast<const uint8_t*>(pixel));
-					if (pixelColor == uint8_t(color)) {
-						return true;
-					}
-				}
-				break;
-			case 2:
-				{
-					const uint16_t pixelColor = *(static_cast<const uint16_t*>(pixel));
-					if (pixelColor == uint16_t(color)) {
-						return true;
-					}
-				}
-				break;
-			case 3:
-				{
-					const uint8_t *const pixelPtr = static_cast<const uint8_t*>(pixel);
-					const uint32_t pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]       | pixelPtr[1] << 8  | pixelPtr[2] << 16
-																				: pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
-					if (pixelColor == color) {
-						return true;
-					}				
-				}
-				break;
-			case 4:
-				{
-					const uint32_t pixelColor = *(static_cast<const uint32_t*>(pixel));
-					if (pixelColor == color) {
-						return true;
-					}
-				}
-				break;
-			default:
-				/// unsupported format
-				Assert(0);
+		if (getPixel(pixel, bpp) == color) {
+			return true;
 		}
 	}
 	return false;
@@ -882,35 +938,7 @@ bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint
 **/
 void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const
 {
-	switch (bpp) {
-		case 1:
-			*(static_cast<uint8_t*>(pixel)) = uint8_t(transpColor);
-			break;
-		case 2:
-			*(static_cast<uint16_t*>(pixel)) = uint16_t(transpColor);
-			break;
-		case 3:
-			{
-				const uint8_t *const src = reinterpret_cast<const uint8_t*>(&transpColor);
-				uint8_t *const dst = static_cast<uint8_t*>(pixel);
-				if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
-					dst[0] = src[0];
-					dst[1] = src[1];
-					dst[2] = src[2];
-				} else {
-					dst[0] = src[3];
-					dst[1] = src[2];
-					dst[2] = src[1];
-				}
-			}
-			break;
-		case 4:
-			*(static_cast<uint32_t*>(pixel)) = transpColor;
-			break;
-		default:
-			/// unsupported format
-			Assert(0);
-	}
+	setPixel(pixel, transpColor, bpp);
 }
 
 /**
