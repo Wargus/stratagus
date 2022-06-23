@@ -746,29 +746,31 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 /**
 ** Parse top argument in the lua state for range of source indexes
 **	
-**	tile                          -- tile index (within main tileset) to get graphic from
-**	{tile[, tile]...}}            -- set of tiles indexes (within main tileset) to get graphics from
-**	{"img", image[, image]...}    -- set of numbers of frames from the "image" file.
-**	{["img",] "range", from, to}  -- if "img" then from frame to frame (for "image"),
-**								  -- otherwise indexes from tile to tile (within main tileset) to get graphics from
-**	{"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**	tile                          			-- tile index (within main tileset) to get graphic from
+**	{tile[, tile]...}}            			-- set of tiles indexes (within main tileset) to get graphics from
+**	{"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
+**	{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"),
+**								  			-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**	{"slot", slot_num}            			-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 **
 **	@param luaStack		lua state, top argument will be parsed
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
 **	@return 			vector of parsed indexes
 **/
-std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, bool &isImg) const
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const
 {
-	isImg = false;
+	isImg = SrcImageOption::cNone;
 
 	if (lua_istable(luaStack, -1)) {
 
 		lua_rawgeti(luaStack, -1, 1);	/// #1<
-		/// check if "img" tag is present
+		/// check if "img"/"img-base" tag is present
 		if (lua_isstring_strict(luaStack, -1)) {
-			const std::string parsedValue { LuaToString(luaStack, -1) };
-			if (parsedValue == "img") {
-				isImg = true;
+			const std::string parsingValue { LuaToString(luaStack, -1) };
+			if (parsingValue == "img") {
+				isImg = SrcImageOption::cNewGraphics;
+			} else if (parsingValue == "img-base") {
+				isImg = SrcImageOption::cBaseGraphics;
 			}
 		}
 		lua_pop(luaStack, 1);	/// #1>
@@ -1193,16 +1195,16 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 		}
 	}
 
-	bool isImg = false;
+	SrcImageOption isImg = SrcImageOption::cNone;
 	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
 	
 	if (needToPopSrcBack) {
 		lua_pop(luaStack, 1);	/// #1>	
 	}
 
-	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer		/* there is an only layer */
-											 && !isImg 			/* this leyer consist of indexes of base graphics */
-											 && !withModifier) 	/* there are no any modifiers */
+	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
+											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
+											 && !withModifier) 							/* there are no any modifiers */
 											 					? true 
 																: false;
 
@@ -1219,8 +1221,8 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 			parsedIndexes.push_back(frameIdx);
 
 		} else {
-			const CGraphic *srcGraphic = isImg ? SrcImgGraphic 
-											   : SrcTilesetGraphic;
+			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics ? SrcImgGraphic 
+											   				   				   : SrcTilesetGraphic;
 			auto image { newBlankImage() };		
 			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
 			parsedImages.push_back(std::move(image));
@@ -1474,8 +1476,8 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 
 	} else if (lua_istable(luaStack, -1)) {
 		/**
-		{["img", ]tile|image[, tile|image] ...}
-		{["img", ]"range", from, to}
+		{["img"|"img-base", ]tile|image[, tile|image] ...}
+		{["img"|"img-base", ]"range", from, to}
 		{"slot", slot_num}
 		**/
 		const uint16_t argsNum = lua_rawlen(luaStack, -1);
@@ -1485,7 +1487,7 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 		lua_rawgeti(luaStack, -1, parseFromPos);
 
 		if (lua_isnumber(luaStack, -1)) { 
-			/// {["img", ]tile|image[, tile|image] ...}
+			/// {["img"|"img-base", ]tile|image[, tile|image] ...}
 			lua_pop(luaStack, 1);
 			
 			for (uint16_t arg = parseFromPos; arg <= argsNum; arg++) {
@@ -1514,16 +1516,16 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 				ranges::iota(resultSet, slotNum); /// fill vector with incremented (slotNum++) values
 					
 			} else if (rangeType == "range") {
-				/// {["img", ]"range", from, to}
+				/// {["img"|"img-base", ]"range", from, to}
 				if (argsNum != parseFromPos + 2) {
-					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\", ]\"range\", from, to} construct");
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\"|\"img-base\", ]\"range\", from, to} construct");
 				}
 
 				const tile_index rangeFrom = LuaToUnsignedNumber(luaStack, -1, ++arg);
 				const tile_index rangeTo   = LuaToUnsignedNumber(luaStack, -1, ++arg);
 
 				if (rangeFrom >= rangeTo) {
-					LuaError(luaStack, "Tiles range: In {[\"img\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
+					LuaError(luaStack, "Tiles range: In {[\"img\"|\"img-base\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
 				}
 				resultSet.resize(rangeTo - rangeFrom + 1);
 				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
@@ -1660,21 +1662,21 @@ void CTilesetParser::parseExtended(lua_State *luaStack)
 {
 	const int argsNum = lua_gettop(luaStack);
 	for (int arg = 1; arg <= argsNum; ++arg) {
-		const std::string parsedValue { LuaToString(luaStack, arg) };
+		const std::string parsingValue { LuaToString(luaStack, arg) };
 
-		if (parsedValue == "image") {
+		if (parsingValue == "image") {
 			const std::string imageFile { LuaToString(luaStack, ++arg) };
 			SrcImgGraphic = CGraphic::New(imageFile, BaseTileset->getPixelTileSize().x, 
 													 BaseTileset->getPixelTileSize().y);
 			SrcImgGraphic->Load();
 
-		} else if (parsedValue == "slots") {
+		} else if (parsingValue == "slots") {
 			if (!lua_istable(luaStack, ++arg)) {
 				LuaError(luaStack, "incorrect argument");
 			}
 			parseExtendedSlots(luaStack, arg);
 		} else {
-			LuaError(luaStack, "Unsupported tag: %s" _C_ parsedValue.c_str());
+			LuaError(luaStack, "Unsupported tag: %s" _C_ parsingValue.c_str());
 		}
 	}
 }	

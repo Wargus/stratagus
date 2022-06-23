@@ -320,12 +320,12 @@ GenerateExtendedTileset(
         src_range                     -- then we just use images from src_range without any manipulations with them
 
         'src_range' can take one of the following forms:
-        tile                          -- tile index (within main tileset) to get graphic from
-        {tile[, tile]...}}            -- set of tiles indexes (within main tileset) to get graphics from
-        {"img", image[, image]...}    -- set of numbers of frames from the "image" file.
-        {["img",] "range", from, to}  -- if "img" then from frame to frame (for "image"),
-                                      -- otherwise indexes from tile to tile (within main tileset) to get graphics from
-        {"slot", slot_num}            -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+        tile                          			-- tile index (within main tileset) to get graphic from
+        {tile[, tile]...}}            			-- set of tiles indexes (within main tileset) to get graphics from
+        {"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
+		{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"), 
+                                      			-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+        {"slot", slot_num}            			-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 
       additional-flags-list:
         strings which started from position 3
@@ -370,9 +370,11 @@ public:
 
 		return image;
 	}
+private:
+	enum SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
 
 private:
-	std::vector<tile_index> parseSrcRange(lua_State *luaStack, bool &isImg) const;
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const;
 	uint16_t checkForLayers(lua_State *luaStack) const;
 	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack, const int firstArgPos = 2) const;
 	uint32_t getPixel(const void *const pixel, const uint8_t bpp) const;
