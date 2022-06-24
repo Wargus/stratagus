@@ -96,6 +96,7 @@ static int AStarMatrixSize;
 /// see pathfinder.h
 int AStarFixedUnitCrossingCost;// = MaxMapWidth * MaxMapHeight;
 int AStarMovingUnitCrossingCost = 5;
+int AStarMaxSearchIterations = INT_MAX;
 bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
 /// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
@@ -935,6 +936,8 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	}
 	Vec2i endPos;
 
+	int counter = AStarMaxSearchIterations;
+
 	//  Begin search
 	while (1) {
 		// Find the best node of from the open set
@@ -952,17 +955,13 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			break;
 		}
 
-#if 0
 		// If we have looked too long, then exit.
 		if (!counter--) {
-			// FIXME: Select a "good" point from the open set.
-			// Nearest point to goal.
+			// TODO: Select a "good" point from the open set.
 			AstarDebugPrint("way too long\n");
-			ret = PF_FAILED;
 			ProfileEnd("AStarFindPath");
-			return ret;
+			return PF_UNREACHABLE;
 		}
-#endif
 
 		// Generate successors of this node.
 

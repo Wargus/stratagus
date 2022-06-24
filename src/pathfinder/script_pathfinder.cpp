@@ -93,6 +93,15 @@ static int CclAStar(lua_State *l)
 			} else {
 				AStarUnknownTerrainCost = i;
 			}
+		} else if (!strcmp(value, "max-search-iterations")) {
+			++j;
+			i = LuaToNumber(l, j + 1);
+			if (i <= 0) {
+				PrintFunction();
+				fprintf(stdout, "Max A* search iterations must be strictly > 0\n");
+			} else {
+				AStarMaxSearchIterations = i;
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
