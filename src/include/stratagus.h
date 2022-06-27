@@ -139,14 +139,22 @@ extern void PrintOnStdOut(const char *format, ...);
 /**
 **  Assert a condition. If cond is not true abort with file,line.
 */
+#ifdef DEBUG
 #define Assert(cond) \
 	do { if (EnableAssert && !(cond)) { AbortAt(__FILE__, __LINE__, __func__, #cond); }} while (0)
+#else
+#define Assert(cond)
+#endif
 
 /**
 **  Print debug information with function name.
 */
+#ifdef DEBUG
 #define DebugPrint(args) \
 	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(args); } } while (0)
+#else
+#define DebugPrint(args)
+#endif
 
 /*============================================================================
 ==  Definitions
