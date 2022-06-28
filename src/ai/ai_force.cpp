@@ -1137,7 +1137,13 @@ void AiForce::Update()
 
 void AiForceManager::Update()
 {
-	for (unsigned int f = 0; f < forces.size(); ++f) {
+	unsigned int fsize = forces.size();
+	int maxPathing = 2; // reduce load by stopping after issuing a few map searches
+	for (unsigned int f = 0; f < fsize; ++f) {
+		if (maxPathing < 0) {
+			return;
+		}
+
 		AiForce &force = forces[f];
 		//  Look if our defenders still have enemies in range.
 
@@ -1160,6 +1166,7 @@ void AiForceManager::Update()
 					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = NULL;
+						maxPathing--;
 						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
 							force.ReturnToHome();
 						}
@@ -1175,6 +1182,7 @@ void AiForceManager::Update()
 				// Don't attack if there aren't our units near goal point
 				std::vector<CUnit *> nearGoal;
 				const Vec2i offset(15, 15);
+				maxPathing--;
 				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
 					   IsAnAlliedUnitOf(*force.Units[0]->Player));
 				if (nearGoal.empty()) {
@@ -1206,6 +1214,7 @@ void AiForceManager::Update()
 			}
 		} else if (force.Attacking) {
 			force.RemoveDeadUnit();
+			maxPathing--;
 			force.Update();
 		}
 	}
