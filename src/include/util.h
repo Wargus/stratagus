@@ -145,8 +145,8 @@ int UTF8GetPrev(const std::string &text, int curpos);
 /*----------------------------------------------------------------------------
 --  SIMD support
 ----------------------------------------------------------------------------*/
-bool supportsSSE2();
-bool supportsAVX();
+// bool supportsSSE2();
+// bool supportsAVX();
 void *aligned_malloc(size_t alignment, size_t size);
 void aligned_free(void *block);
 

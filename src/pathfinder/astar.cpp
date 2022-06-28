@@ -260,19 +260,19 @@ void InitAStar(int mapWidth, int mapHeight)
 	AStarMapMax =  AStarMapWidth * AStarMapHeight;
 
 	// align the matrix, the open set, and the cost to move cache
-	// on 32-byte boundary, in case the memset/memmove operations
+	// on 64-byte boundary, in case the memset/memmove operations
 	// of the libc we're using has a 128/256/512bit SIMD vector
 	// instruction branch, since we might be clearing 8M of
 	// memory for a 2048x2048 map
 	AStarMatrixSize = sizeof(Node) * AStarMapMax;
-	AStarMatrix = (Node *)aligned_malloc(32, AStarMatrixSize);
+	AStarMatrix = (Node *)aligned_malloc(64, AStarMatrixSize);
 	memset(AStarMatrix, 0, AStarMatrixSize);
 
 	OpenSetMaxSize = AStarMapMax / MAX_OPEN_SET_RATIO;
-	OpenSet = (Open *)aligned_malloc(32, OpenSetMaxSize * sizeof(Open));
+	OpenSet = (Open *)aligned_malloc(64, OpenSetMaxSize * sizeof(Open));
 
 	CostMoveToCacheSize = sizeof(int32_t) * AStarMapMax;
-	CostMoveToCache = (int32_t*)aligned_malloc(32, CostMoveToCacheSize);
+	CostMoveToCache = (int32_t*)aligned_malloc(64, CostMoveToCacheSize);
 	memset(CostMoveToCache, CacheNotSet, CostMoveToCacheSize);
 
 	for (int i = 0; i < 9; ++i) {
