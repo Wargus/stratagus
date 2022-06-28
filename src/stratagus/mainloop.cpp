@@ -451,7 +451,7 @@ void GameMainLoop()
 	if (Parameters::Instance.benchmark) {
 		ticks = SDL_GetTicks() - ticks;
 		double fps = FrameCounter * 1000.0 / ticks;
-		fprintf(stderr, "BENCHMARK RESULT: %f fps, %f fpc (%ldms for %ldframes in %ldcycles)\n", fps, GameCycle * 1000.0 / ticks, ticks, FrameCounter, GameCycle);
+		fprintf(stderr, "BENCHMARK RESULT: %f fps, %f cps (%ldms for %ldframes in %ldcycles)\n", fps, GameCycle * 1000.0 / ticks, ticks, FrameCounter, GameCycle);
 	}
 
 	GameCycle = 0;
