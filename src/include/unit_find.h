@@ -259,6 +259,16 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 }
 
 template <int selectMax = 0, typename Pred>
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+{
+	Vec2i minPos = ltPos;
+	Vec2i maxPos = rbPos;
+
+	Map.FixSelectionArea(minPos, maxPos);
+	SelectFixed<selectMax>(minPos, maxPos, units, pred);
+}
+
+template <int selectMax = 0, typename Pred>
 void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
 {
 	const Vec2i offset(range, range);
@@ -267,16 +277,6 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 	Select<selectMax>(unit.tilePos - offset,
 		   unit.tilePos + typeSize + offset, around,
 		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
-}
-
-template <int selectMax = 0, typename Pred>
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
-{
-	Vec2i minPos = ltPos;
-	Vec2i maxPos = rbPos;
-
-	Map.FixSelectionArea(minPos, maxPos);
-	SelectFixed<selectMax>(minPos, maxPos, units, pred);
 }
 
 template <typename Pred>
