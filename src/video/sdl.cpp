@@ -744,18 +744,18 @@ void WaitEventsOneFrame()
 			unsigned long pct = (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1);
 			bool warn = false;
 			if (pct >= 40) {
-				warn = (SkipFrameMask > 0b1);
-				SkipFrameMask = 0b1;
+				warn = (SkipFrameMask < 0b101);
+				SkipFrameMask = 0b101;
 			} else if (pct >= 20) {
-				warn = (SkipFrameMask > 0b11);
+				warn = (SkipFrameMask < 0b11);
 				SkipFrameMask = 0b11;
 			} else if (pct >= 10) {
-				warn = (SkipFrameMask == 0);
-				SkipFrameMask = 0b111;
+				warn = (SkipFrameMask < 0b1);
+				SkipFrameMask = 0b1;
 			}
 			if (warn) {
 				fprintf(stdout, "WARNING WARNING WARNING\n"
-								"Frames %lu, Slow frames %d = %lu%%, starting to skip every %d%s frame.\n",
+								"Frames %lu, Slow frames %d = %lu%%, starting to render only every %d%s frame.\n",
 								FrameCounter, SlowFrameCounter, pct, SkipFrameMask + 1, SkipFrameMask == 1 ? "nd" : "th");
 				fflush(stdout);
 				SlowFrameCounter = 0;
@@ -826,7 +826,7 @@ void RealizeVideoMemory()
 	if (dummyRenderer) {
 		return;
 	}
-	if (SkipFrameMask && (FrameCounter & SkipFrameMask) == SkipFrameMask) {
+	if (FrameCounter & SkipFrameMask) {
 		return;
 	}
 	if (NumRects) {
