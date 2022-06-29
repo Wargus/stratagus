@@ -221,12 +221,14 @@ void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
 void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
 void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
 
-template <typename Pred>
+template <int selectMax = 0, typename Pred>
 void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
 {
 	Assert(Map.Info.IsPointOnMap(ltPos));
 	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(units.empty());
+	units.reserve(selectMax << 1);
+	int max = selectMax || INT_MAX;
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
@@ -236,9 +238,17 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 			for (size_t i = 0; i != cache.size(); ++i) {
 				CUnit &unit = *cache[i];
 
-				if (unit.CacheLock == 0 && pred(&unit)) {
-					unit.CacheLock = 1;
-					units.push_back(&unit);
+				if ((selectMax == 1 || unit.CacheLock == 0) && pred(&unit)) {
+					if (selectMax == 1) {
+						units.push_back(&unit);
+						return;
+					} else {
+						unit.CacheLock = 1;
+						units.push_back(&unit);
+						if (--max == 0) {
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -248,25 +258,25 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	}
 }
 
-template <typename Pred>
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
-{
-	const Vec2i offset(range, range);
-	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
-
-	Select(unit.tilePos - offset,
-		   unit.tilePos + typeSize + offset, around,
-		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
-}
-
-template <typename Pred>
+template <int selectMax = 0, typename Pred>
 void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
 {
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
 	Map.FixSelectionArea(minPos, maxPos);
-	SelectFixed(minPos, maxPos, units, pred);
+	SelectFixed<selectMax>(minPos, maxPos, units, pred);
+}
+
+template <int selectMax = 0, typename Pred>
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
+{
+	const Vec2i offset(range, range);
+	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
+
+	Select<selectMax>(unit.tilePos - offset,
+		   unit.tilePos + typeSize + offset, around,
+		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
 }
 
 template <typename Pred>

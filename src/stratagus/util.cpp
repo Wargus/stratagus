@@ -41,8 +41,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include <malloc.h>
 #ifdef WIN32
 #include <windows.h>
+#include <intrin.h>
 #endif
 
 #ifdef USE_STACKTRACE
@@ -499,4 +501,149 @@ void PrintOnStdOut(const char *format, ...)
 	vprintf(format, valist);
 	va_end(valist);
 	fflush(stdout);
+}
+
+/*----------------------------------------------------------------------------
+	Check SSE/AVX support.
+	This can detect the instruction support of
+	SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, SSE4a, SSE5, and AVX.
+  ----------------------------------------------------------------------------*/
+
+#ifdef __x86_64__
+
+#ifdef __GNUC__
+
+static void __cpuid(int* cpuinfo, int info)
+{
+	__asm__ __volatile__(
+		"xchg %%ebx, %%edi;"
+		"cpuid;"
+		"xchg %%ebx, %%edi;"
+		:"=a" (cpuinfo[0]), "=D" (cpuinfo[1]), "=c" (cpuinfo[2]), "=d" (cpuinfo[3])
+		:"0" (info)
+	);
+}
+
+static unsigned long long _my_xgetbv(unsigned int index)
+{
+	unsigned int eax, edx;
+	__asm__ __volatile__(
+		"xgetbv;"
+		: "=a" (eax), "=d"(edx)
+		: "c" (index)
+	);
+	return ((unsigned long long)edx << 32) | eax;
+}
+
+#else // __GNUC__
+
+#define _my_xgetbv(index) _xgetbv(index)
+
+#endif // __GNUC__
+
+struct SIMDSupport {
+	bool sseSupportted = false;
+	bool sse2Supportted = false;
+	bool sse3Supportted = false;
+	bool ssse3Supportted = false;
+	bool sse4_1Supportted = false;
+	bool sse4_2Supportted = false;
+	bool sse4aSupportted = false;
+	bool sse5Supportted = false;
+	bool avxSupportted = false;
+};
+
+static struct SIMDSupport checkSIMDSupport() {
+	struct SIMDSupport s;
+
+	int cpuinfo[4];
+	__cpuid(cpuinfo, 1);
+
+	// Check SSE, SSE2, SSE3, SSSE3, SSE4.1, and SSE4.2 support
+	s.sseSupportted		= cpuinfo[3] & (1 << 25) || false;
+	s.sse2Supportted	= cpuinfo[3] & (1 << 26) || false;
+	s.sse3Supportted	= cpuinfo[2] & (1 << 0) || false;
+	s.ssse3Supportted	= cpuinfo[2] & (1 << 9) || false;
+	s.sse4_1Supportted	= cpuinfo[2] & (1 << 19) || false;
+	s.sse4_2Supportted	= cpuinfo[2] & (1 << 20) || false;
+
+	// ----------------------------------------------------------------------
+
+	// Check AVX support
+	// References
+	// http://software.intel.com/en-us/blogs/2011/04/14/is-avx-enabled/
+	// http://insufficientlycomplicated.wordpress.com/2011/11/07/detecting-intel-advanced-vector-extensions-avx-in-visual-studio/
+
+	s.avxSupportted = cpuinfo[2] & (1 << 28) || false;
+	bool osxsaveSupported = cpuinfo[2] & (1 << 27) || false;
+	if (osxsaveSupported && s.avxSupportted)
+	{
+		// _XCR_XFEATURE_ENABLED_MASK = 0
+		unsigned long long xcrFeatureMask = _my_xgetbv(0);
+		s.avxSupportted = (xcrFeatureMask & 0x6) == 0x6;
+	}
+
+	// ----------------------------------------------------------------------
+
+	// Check SSE4a and SSE5 support
+
+	// Get the number of valid extended IDs
+	__cpuid(cpuinfo, 0x80000000);
+	int numExtendedIds = cpuinfo[0];
+	if (numExtendedIds >= 0x80000001)
+	{
+		__cpuid(cpuinfo, 0x80000001);
+		s.sse4aSupportted = cpuinfo[2] & (1 << 6) || false;
+		s.sse5Supportted = cpuinfo[2] & (1 << 11) || false;
+	}
+
+	// ----------------------------------------------------------------------
+
+	return s;
+}
+
+bool supportsSSE2()
+{
+	static struct SIMDSupport s = checkSIMDSupport();
+	return s.sse2Supportted;
+}
+
+bool supportsAVX()
+{
+	static struct SIMDSupport s = checkSIMDSupport();
+	return s.avxSupportted;
+}
+
+#else // __x86_64__
+
+bool supportsSSE2()
+{
+	return false;
+}
+
+bool supportsAVX()
+{
+	return false;
+}
+
+#endif // __x86_64__
+
+void *aligned_malloc(size_t alignment, size_t size)
+{
+#ifdef WIN32
+	return _aligned_malloc(size, alignment);
+#elif _ISOC11_SOURCE
+	return aligned_alloc(alignment, size);
+#else
+	return memalign(alignment, size);
+#endif
+}
+
+void aligned_free(void *block)
+{
+#ifdef WIN32
+	_aligned_free(block);
+#else
+	free(block);
+#endif
 }

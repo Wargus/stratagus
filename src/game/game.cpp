@@ -146,14 +146,8 @@ void StartMap(const std::string &filename, bool clean)
 	UI.StatusLine.Set(NameLine);
 	SetMessage("%s", _("Do it! Do it now!"));
 
-	long ticks = SDL_GetTicks();
 	//  Play the game.
 	GameMainLoop();
-	if (Parameters::Instance.benchmark) {
-		ticks = SDL_GetTicks() - ticks;
-		double fps = FrameCounter * 1000.0 / ticks;
-		fprintf(stderr, "BENCHMARK RESULT: %f fps (%ldms for %ldframes)\n", fps, ticks, FrameCounter);
-	}
 
 	//  Clear screen
 	Video.ClearScreen();
