@@ -1212,7 +1212,8 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 	sequence_of_images parsedImages;
 
 	for (auto const srcIndex : srcIndexes) {
-		if (!isImg && SrcTileset->tiles[srcIndex].tile == 0) { /// empty frame
+		if (!isImg && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
+			parsedIndexes.push_back(0);
 			continue;
 		}
 		const graphic_index frameIdx = isImg ? srcIndex 
