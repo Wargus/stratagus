@@ -66,7 +66,7 @@ int main(int argc, char * argv[]) {
 	if ( file ) {
 		git_rev = (char*)calloc(sizeof(char), 1024);
 		if (fscanf(file, "ref: %s", git_rev) != 1 ) {
-			int ignored = fscanf(file, "%s", git_rev);
+			fscanf(file, "%s", git_rev);
 		}
 		fclose(file);
 		gitrevfile = (char*)calloc(sizeof(char), strlen(git_rev) + 6);
@@ -75,7 +75,7 @@ int main(int argc, char * argv[]) {
 		free(gitrevfile);
 		if (file) {
 			git_rev = (char*)calloc(sizeof(char), 1024);
-			int ignored = fscanf(file, "%s", git_rev);
+			fscanf(file, "%s", git_rev);
 			fclose(file);
 		}
 	} else {
