@@ -553,21 +553,26 @@ void CUnit::Release(bool final)
 	// removed, but fog of war calculations are still underway, where we want to
 	// read a BoolFlag; there are more instances of this...)
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
-		delete *order;
+		COrder *orderToDelete = *order;
+		*order = NULL;
+		delete orderToDelete;
 	}
 	Orders.clear();
 
 	if (SavedOrder != NULL) {
-		delete SavedOrder;
+		COrder *order = SavedOrder;
 		SavedOrder = NULL;
+		delete order;
 	}
 	if (NewOrder != NULL) {
-		delete NewOrder;
+		COrder *order = NewOrder;
 		NewOrder = NULL;
+		delete order;
 	}
 	if (CriticalOrder != NULL) {
-		delete CriticalOrder;
+		COrder *order = CriticalOrder;
 		CriticalOrder = NULL;
+		delete order;
 	}
 
 	// Remove the unit from the global units table.
