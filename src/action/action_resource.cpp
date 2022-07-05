@@ -181,10 +181,6 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
-	if (harvester.CurrentResource) {
-		const ResourceInfo &resinfo = *harvester.Type->ResInfo[harvester.CurrentResource];
-	}
-
 	if (depot == NULL) {
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
