@@ -374,8 +374,9 @@ private:
 	enum SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
 
 private:
-	std::vector<tile_index> parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const;
 	uint16_t checkForLayers(lua_State *luaStack) const;
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const;
+	auto parseLayer(lua_State *luaStack, const bool isSingleLayer = false) const;
 	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack, const int firstArgPos = 2) const;
 	uint32_t getPixel(const void *const pixel, const uint8_t bpp) const;
 	void setPixel(void *const pixel, const uint32_t color, const uint8_t bpp) const;
@@ -386,11 +387,11 @@ private:
 	void removeColors(lua_State *luaStack, sequence_of_images &images) const;
 	void shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const;
 	void flipImages(lua_State *luaStack, sequence_of_images &images) const;
+	void composeByChromaKey(lua_State *luaStack, sequence_of_images &dstImages) const;
 	void parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const;
 	sdl2::SurfacePtr newBlankImage() const;
 	bool isModifierPresent(lua_State *luaStack) const;
-	auto parseLayer(lua_State *luaStack, const bool isSingleLayer = false) const;
-
+	
 	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght = 16) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Fair(std::vector<sequence_of_images> const &src) const;

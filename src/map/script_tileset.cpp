@@ -781,6 +781,80 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 	return { CTilesetParser::parseTilesRange(luaStack, isImg ? 2 : 1) };
 }
 
+/** 
+**	Parse a layer of source graphics
+**
+** src_range
+** or	
+** { src_range [,{"do_something", parameter}...] }
+**
+**	@param	luaStack 		lua state, top argument will be parsed - it can be table of layers or single layer
+**	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
+**	@return					set of images described in this layer or set of indexes of existing tileset graphics
+**/
+auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSingleLayer /*= false*/) const
+{
+	enum { cSrcRange = 1, cModifier = 2 };
+
+	const bool withModifier = isModifierPresent(luaStack);
+
+	/// make sure that src_range is at the top of the lua stack
+	bool needToPopSrcBack = false;
+	if (lua_istable(luaStack, -1)) {
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		if (lua_istable(luaStack, -1)
+			|| (lua_isnumber(luaStack, -1) && withModifier)) {
+			needToPopSrcBack = true;
+		} else {
+			lua_pop(luaStack, 1);	/// #1>
+		}
+	}
+
+	SrcImageOption isImg = SrcImageOption::cNone;
+	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
+	
+	if (needToPopSrcBack) {
+		lua_pop(luaStack, 1);	/// #1>	
+	}
+
+	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
+											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
+											 && !withModifier) 							/* there are no any modifiers */
+											 					? true 
+																: false;
+
+	std::vector<graphic_index> parsedIndexes;
+	sequence_of_images parsedImages;
+
+	for (auto const srcIndex : srcIndexes) {
+		if (!isImg && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
+			parsedIndexes.push_back(0);
+			continue;
+		}
+		const graphic_index frameIdx = isImg ? srcIndex 
+										  	 : SrcTileset->tiles[srcIndex].tile;
+		if (isUntouchedSrcGraphicsOnly) {
+			parsedIndexes.push_back(frameIdx);
+
+		} else {
+			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics ? SrcImgGraphic 
+											   				   				   : SrcTilesetGraphic;
+			auto image { newBlankImage() };		
+			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
+			parsedImages.push_back(std::move(image));
+		}
+	}
+	if (withModifier) {
+		const uint16_t argsNum = lua_rawlen(luaStack, -1);
+		int arg = cModifier;
+		while (arg <= argsNum) {
+			parseModifier(luaStack, arg, parsedImages);
+			arg++;	
+		}
+	}
+	return std::make_pair(parsedIndexes, std::move(parsedImages));
+}
+
 /**
 **	Parse arguments for pixel modifiers as colors
 **	It parses table in form	{"do_something", colors[, colors]..} from the top of lua state
@@ -1080,6 +1154,55 @@ void CTilesetGraphicGenerator::flipImages(lua_State *luaStack, sequence_of_image
 }
 
 /**
+** 	Compose set of images with images from src_range. Are taken consecutively one for each from src_range.
+**	If pixel from src image has chroma key color it will be replaced by pixel from src2 image
+**	It parses table in the format of {"chroma-key", src_range2, key_colors[, key_colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	dstImages		vector of tiles images to compose with src images which will be parsed from luaStack
+**
+**/
+void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_of_images &dstImages) const
+{
+	enum { cSrcRange2 = 2, cColors = 3 };
+
+	lua_rawgeti(luaStack, -1, cSrcRange2);	/// #1<
+	auto [parcedSrcIndexes, parcedSrcImages] = parseLayer(luaStack, true);
+	lua_pop(luaStack, 1);					/// #1>
+
+
+	if (!parcedSrcImages.size() && !parcedSrcIndexes.size()) { /// nothing to do
+		return;
+	}
+	
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack, cColors) };
+	
+	auto srcImage { newBlankImage() };
+
+	size_t srcImgIdx = 0;
+	for (auto &image : dstImages) {
+		SDL_Surface *const dstImgSurface { image.get() };
+		SDL_Surface *const srcImgSurface = parcedSrcImages.size() ? parcedSrcImages[srcImgIdx % parcedSrcImages.size()].get()
+																  : srcImage.get();
+		if (parcedSrcIndexes.size()) {
+ 			const graphic_index frameIdx = parcedSrcIndexes[srcImgIdx % parcedSrcIndexes.size()];
+			SrcTilesetGraphic->DrawFrame(frameIdx, 0, 0, srcImage.get());
+		}
+
+		const size_t pixelsNum = dstImgSurface->w * dstImgSurface->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *const dstPixelPos = reinterpret_cast<void *>(uintptr_t(dstImgSurface->pixels) + pixel * dstImgSurface->format->BytesPerPixel);
+			void *const srcPixelPos = reinterpret_cast<void *>(uintptr_t(srcImgSurface->pixels) + pixel * dstImgSurface->format->BytesPerPixel);
+
+			if (checkPixel(dstPixelPos, colors, dstImgSurface->format->BytesPerPixel)) {
+				setPixel(dstPixelPos, getPixel(srcPixelPos, srcImgSurface->format->BytesPerPixel), dstImgSurface->format->BytesPerPixel);
+			}
+		}
+		srcImgIdx++;
+	}
+}
+
+/**
 **	Parse pixel modifiers in the lua state
 ** {"do_something", parameter}
 ** where 'do_something':
@@ -1099,6 +1222,17 @@ void CTilesetGraphicGenerator::flipImages(lua_State *luaStack, sequence_of_image
 ** 								"vertical"
 ** 								"horizontal"
 **								"both"
+** 				{"chroma-key", src_range2, key_colors[, key_colors]..}
+**					where 'src_range2': (set of images to compose with images from src_range. Are taken consecutively one for each from src_range)
+**								{tile}                                  -- tile index (within main tileset) to get graphic from
+**								{tile[, tile]...}}                      -- set of tiles indexes (within main tileset) to get graphics from
+**								{"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
+**								{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"),        
+**																		-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**								{"slot", slot_num}                      -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**						 'key_colors': (chroma keys)
+** 								color		-- single color
+** 								{from, to}	-- range of colors
 **
 **	@param	luaStack	lua state, a table in the top will be parsed
 **	@param	argPos		position in the table to parse
@@ -1118,6 +1252,8 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 		shiftIndexedColors(luaStack, images);
 	} else if (modifier == "flip") {
 		flipImages(luaStack, images);
+	} else if (modifier == "chroma-key") {
+		composeByChromaKey(luaStack, images);
 	} else {
 		LuaError(luaStack, "Unknown modifier");	
 	}
@@ -1166,79 +1302,6 @@ bool CTilesetGraphicGenerator::isModifierPresent(lua_State *luaStack) const
 	return result;
 }
 
-/** 
-**	Parse a layer of source graphics
-**
-** src_range
-** or	
-** { src_range [,{"do_something", parameter}...] }
-**
-**	@param	luaStack 		lua state, top argument will be parsed - it can be table of layers or single layer
-**	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
-**	@return					set of images described in this layer or set of indexes of existing tileset graphics
-**/
-auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSingleLayer /*= false*/) const
-{
-	enum { cSrcRange = 1, cModifier = 2 };
-
-	const bool withModifier = isModifierPresent(luaStack);
-
-	/// make sure that src_range is at the top of the lua stack
-	bool needToPopSrcBack = false;
-	if (lua_istable(luaStack, -1)) {
-		lua_rawgeti(luaStack, -1, 1);	/// #1<
-		if (lua_istable(luaStack, -1)
-			|| (lua_isnumber(luaStack, -1) && withModifier)) {
-			needToPopSrcBack = true;
-		} else {
-			lua_pop(luaStack, 1);	/// #1>
-		}
-	}
-
-	SrcImageOption isImg = SrcImageOption::cNone;
-	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
-	
-	if (needToPopSrcBack) {
-		lua_pop(luaStack, 1);	/// #1>	
-	}
-
-	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
-											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
-											 && !withModifier) 							/* there are no any modifiers */
-											 					? true 
-																: false;
-
-	std::vector<graphic_index> parsedIndexes;
-	sequence_of_images parsedImages;
-
-	for (auto const srcIndex : srcIndexes) {
-		if (!isImg && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
-			parsedIndexes.push_back(0);
-			continue;
-		}
-		const graphic_index frameIdx = isImg ? srcIndex 
-										  	 : SrcTileset->tiles[srcIndex].tile;
-		if (isUntouchedSrcGraphicsOnly) {
-			parsedIndexes.push_back(frameIdx);
-
-		} else {
-			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics ? SrcImgGraphic 
-											   				   				   : SrcTilesetGraphic;
-			auto image { newBlankImage() };		
-			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
-			parsedImages.push_back(std::move(image));
-		}
-	}
-	if (withModifier) {
-		const uint16_t argsNum = lua_rawlen(luaStack, -1);
-		int arg = cModifier;
-		while (arg <= argsNum) {
-			parseModifier(luaStack, arg, parsedImages);
-			arg++;	
-		}
-	}
-	return std::make_pair(parsedIndexes, std::move(parsedImages));
-}
 
 /**
 **	Generates a sequence of repeating indexes whose maximum value is limited to 16. 
