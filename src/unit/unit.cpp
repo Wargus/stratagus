@@ -1097,11 +1097,12 @@ void CUnit::AddInContainer(CUnit &host)
 		NextContained = PrevContained = this;
 		host.UnitInside = this;
 	} else {
-		// keep sorted by size
-		int mySize = Type->BoardSize;
+		// keep sorted by size.
+		// FIXME: if we're loading a game, the Type may not have been initialized yet!!
+		int mySize = Type ? Type->BoardSize : 1;
 		NextContained = host.UnitInside;
 		bool becomeFirst = true;
-		while (NextContained->Type->BoardSize > mySize) {
+		while (NextContained->Type ? NextContained->Type->BoardSize : 1 > mySize) {
 			becomeFirst = false;
 			NextContained = NextContained->NextContained;
 			if (NextContained == host.UnitInside) {
