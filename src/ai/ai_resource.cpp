@@ -169,18 +169,20 @@ static int AiCheckUnitTypeCosts(const CUnitType &type)
 	return AiCheckCosts(type.Stats[AiPlayer->Player->Index].Costs);
 }
 
+template <bool ignoreVisibility = false>
 class IsAEnemyUnitOf
 {
 public:
 	explicit IsAEnemyUnitOf(const CPlayer &_player) : player(&_player) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player) && unit->IsEnemy(*player);
+		return (ignoreVisibility || unit->IsVisibleAsGoal(*player)) && unit->IsEnemy(*player);
 	}
 private:
 	const CPlayer *player;
 };
 
+template <bool ignoreVisibility = false>
 class IsAEnemyUnitWhichCanCounterAttackOf
 {
 public:
@@ -189,7 +191,7 @@ public:
 	{}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsVisibleAsGoal(*player)
+		return (ignoreVisibility || unit->IsVisibleAsGoal(*player))
 			   && unit->IsEnemy(*player)
 			   && CanTarget(*unit->Type, *type);
 	}
@@ -199,42 +201,42 @@ private:
 };
 
 /**
-**  Enemy units in distance.
+**  Check if there are enemy units in a given range.
 **
 **  @param player  Find enemies of this player
 **  @param type    Optional unit type to check if enemy can target this
 **  @param pos     location
 **  @param range   Distance range to look.
 **
-**  @return       Number of enemy units.
+**  @return        If there are any enemy units in the range
 */
-int AiEnemyUnitsInDistance(const CPlayer &player,
-						   const CUnitType *type, const Vec2i &pos, unsigned range)
+bool AiEnemyUnitsInDistance(const CPlayer &player,
+						    const CUnitType *type, const Vec2i &pos, unsigned range)
 {
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
 	if (type == NULL) {
-		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
+		Select<1>(pos - offset, pos + offset, units, IsAEnemyUnitOf<true>(player));
 		return static_cast<int>(units.size());
 	} else {
 		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
-		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
+		const IsAEnemyUnitWhichCanCounterAttackOf<true> pred(player, *type);
 
-		Select(pos - offset, pos + typeSize + offset, units, pred);
+		Select<1>(pos - offset, pos + typeSize + offset, units, pred);
 		return static_cast<int>(units.size());
 	}
 }
 
 /**
-**  Enemy units in distance.
+**  Check if there are enemy units in a given range.
 **
 **  @param unit   Find in distance for this unit.
 **  @param range  Distance range to look.
 **
-**  @return       Number of enemy units.
+**  @return       If there are any enemy units in the range
 */
-int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
+bool AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 {
 	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
 }

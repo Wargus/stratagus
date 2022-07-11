@@ -601,8 +601,8 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
-#ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {
+#ifdef USE_MNG
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1296,8 +1296,13 @@ static int CclCopyUnitType(lua_State *l)
 	to->Icon.Icon = NULL;
 #ifdef USE_MNG
 	to->Portrait.Num = from->Portrait.Num;
-	to->Portrait.Files = from->Portrait.Files;
-	to->Portrait.Mngs = from->Portrait.Mngs;
+	to->Portrait.Talking = from->Portrait.Talking;
+	to->Portrait.Files = new std::string[to->Portrait.Num];
+	for (int i = 0; i < to->Portrait.Num; i++) {
+		to->Portrait.Files[i] = from->Portrait.Files[i];
+	}
+	to->Portrait.Mngs = new Mng *[to->Portrait.Num];
+	memset(to->Portrait.Mngs, 0, to->Portrait.Num * sizeof(Mng *));
 #endif
 	memcpy(to->DefaultStat.Costs, from->DefaultStat.Costs, sizeof(from->DefaultStat.Costs));
 	memcpy(to->DefaultStat.Storing, from->DefaultStat.Storing, sizeof(from->DefaultStat.Storing));

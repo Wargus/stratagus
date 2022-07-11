@@ -42,6 +42,11 @@
 #include "iocompat.h"
 
 /*----------------------------------------------------------------------------
+--  Variables
+----------------------------------------------------------------------------*/
+uint32_t Mng::MaxFPS = 15;
+
+/*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
@@ -155,7 +160,9 @@ static mng_uint32 MNG_DECL my_gettickcount(mng_handle)
 static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
 {
 	Mng *mng = (Mng *)mng_get_userdata(handle);
-	mng->ticks = GetTicks() + msecs;
+	unsigned long ticks = GetTicks();
+	uint32_t offset = std::max(static_cast<uint32_t>(msecs), static_cast<uint32_t>(1000 / mng->MaxFPS));
+	mng->ticks = std::max(ticks + offset, mng->ticks + offset);
 
 	return MNG_TRUE;
 }
@@ -198,7 +205,6 @@ Mng::~Mng()
 	}
 	delete[] buffer;
 }
-
 
 /**
 **  Display a MNG

@@ -876,6 +876,8 @@ endif()
 
 if(LINUX)
 	add_definitions(-DUSE_LINUX)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -ggdb")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
 endif()
 
 if(BEOS)

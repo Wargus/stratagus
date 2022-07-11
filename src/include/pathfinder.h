@@ -199,6 +199,8 @@ extern int AStarMovingUnitCrossingCost;
 extern bool AStarKnowUnseenTerrain;
 /// Cost of using a square we haven't seen before.
 extern int AStarUnknownTerrainCost;
+/// Maximum number of iterations of A* before giving up.
+extern int AStarMaxSearchIterations;
 
 //
 //  Convert heading into direction.

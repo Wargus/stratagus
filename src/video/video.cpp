@@ -201,7 +201,7 @@ void SetClipping(int left, int top, int right, int bottom)
 {
 	Assert(left <= right && top <= bottom && left >= 0 && left < Video.Width
 		   && top >= 0 && top < Video.Height && right >= 0
-		   && right < Video.Width && bottom >= 0 && bottom < Video.Height);
+		   && right <= Video.Width && bottom >= 0 && bottom <= Video.Height);
 
 	ClipX1 = left;
 	ClipY1 = top;

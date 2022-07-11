@@ -39,7 +39,7 @@ int main(int argc, char * argv[]) {
 	FILE * file;
 	int old_ver[4] = { -1, -1, -1, -1 };
 	int new_ver[4] = { -1, -1, -1, -1 };
-	char* old_rev = (char*)calloc(sizeof(char), 1024);
+	char old_rev[1024] {};
 
 	if ( argc != 3 )
 		return 1;
@@ -62,11 +62,12 @@ int main(int argc, char * argv[]) {
 	}
 
 	file = fopen(".git/HEAD", "r");
+	char git_rev_buf[1024] {};
 	char *git_rev, *gitrevfile;
 	if ( file ) {
-		git_rev = (char*)calloc(sizeof(char), 1024);
+		git_rev = git_rev_buf;
 		if (fscanf(file, "ref: %s", git_rev) != 1 ) {
-			int ignored = fscanf(file, "%s", git_rev);
+			fscanf(file, "%s", git_rev);
 		}
 		fclose(file);
 		gitrevfile = (char*)calloc(sizeof(char), strlen(git_rev) + 6);
@@ -74,8 +75,8 @@ int main(int argc, char * argv[]) {
 		file = fopen(gitrevfile, "r");
 		free(gitrevfile);
 		if (file) {
-			git_rev = (char*)calloc(sizeof(char), 1024);
-			int ignored = fscanf(file, "%s", git_rev);
+			git_rev = git_rev_buf;
+			fscanf(file, "%s", git_rev);
 			fclose(file);
 		}
 	} else {

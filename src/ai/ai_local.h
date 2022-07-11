@@ -459,8 +459,8 @@ extern int AiFindWall(AiForce *force);
 /// Plan the an attack
 /// Send explorers around the map
 extern void AiSendExplorers();
-/// Enemy units in distance
-extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
+/// Check if there are enemy units in a given range (optionally of type)
+extern bool AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
 								  const Vec2i &pos, unsigned range);
 
 //

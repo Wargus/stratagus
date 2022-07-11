@@ -52,6 +52,7 @@
 #include "ui.h"
 #include "unit.h"
 #include "video.h"
+#include "parameters.h"
 
 #include <guichan.h>
 void DrawGuichanWidgets();
@@ -421,6 +422,8 @@ void GameMainLoop()
 
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
+	long ticks = SDL_GetTicks();
+
 	MultiPlayerReplayEachCycle();
 
 	SingleGameLoop();
@@ -444,6 +447,12 @@ void GameMainLoop()
 #endif
 	NetworkQuitGame();
 	EndReplayLog();
+
+	if (Parameters::Instance.benchmark) {
+		ticks = SDL_GetTicks() - ticks;
+		double fps = FrameCounter * 1000.0 / ticks;
+		fprintf(stderr, "BENCHMARK RESULT: %f fps, %f cps (%ldms for %ldframes in %ldcycles)\n", fps, GameCycle * 1000.0 / ticks, ticks, FrameCounter, GameCycle);
+	}
 
 	GameCycle = 0;
 	CParticleManager::exit();

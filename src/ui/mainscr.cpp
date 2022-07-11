@@ -237,7 +237,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 					if (f >= -v) {
 						return false;
 					}
-				} else {
+				} else if (v != -1) {
+					// special case: the condition "<1" should apply
+					// to units that do not have the variable at all
 					return false;
 				}
 			} else if (v > CONDITION_ONLY) {
@@ -442,6 +444,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 	}
 }
 
+#ifdef USE_MNG
 static bool DrawTypePortrait(const CUnitType &type)
 {
 	if (UI.SingleSelectedButton && type.Portrait.Num) {
@@ -467,6 +470,7 @@ static bool DrawTypePortrait(const CUnitType &type)
 	}
 	return false;
 }
+#endif
 
 static void DrawUnitInfo_portrait(const CUnit &unit)
 {
