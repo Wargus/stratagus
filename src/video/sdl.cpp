@@ -720,6 +720,7 @@ const EventCallback *GetCallbacks()
 }
 
 static int SkipFrameMask = 0;
+static unsigned long NextSlowFrameReaction = FRAMES_PER_SECOND * 10;
 
 /**
 **  Wait for interactive input event for one frame.
@@ -740,26 +741,22 @@ void WaitEventsOneFrame()
 	Uint32 ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
 		++SlowFrameCounter;
-		if (SlowFrameCounter > FRAMES_PER_SECOND) {
+		if (SlowFrameCounter > NextSlowFrameReaction) {
 			unsigned long pct = (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1);
-			bool warn = false;
-			if (pct >= 40) {
-				warn = (SkipFrameMask < 0b101);
+			if (pct >= 60) {
+				SkipFrameMask = 0b111;
+			} else if (pct >= 40) {
 				SkipFrameMask = 0b101;
 			} else if (pct >= 20) {
-				warn = (SkipFrameMask < 0b11);
 				SkipFrameMask = 0b11;
 			} else if (pct >= 10) {
-				warn = (SkipFrameMask < 0b1);
 				SkipFrameMask = 0b1;
 			}
-			if (warn) {
-				fprintf(stdout, "WARNING WARNING WARNING\n"
-								"Frames %lu, Slow frames %d = %lu%%, starting to render only every %d%s frame.\n",
-								FrameCounter, SlowFrameCounter, pct, SkipFrameMask + 1, SkipFrameMask == 1 ? "nd" : "th");
-				fflush(stdout);
-				SlowFrameCounter = 0;
-			}
+			NextSlowFrameReaction += FRAMES_PER_SECOND * 10;
+			fprintf(stdout, "WARNING WARNING WARNING\n"
+							"Frames %lu, Slow frames %d = %lu%%, starting to render only every %d%s frame.\n",
+							FrameCounter, SlowFrameCounter, pct, SkipFrameMask + 1, SkipFrameMask == 1 ? "nd" : "th");
+			fflush(stdout);
 		}
 	}
 
@@ -820,6 +817,38 @@ void WaitEventsOneFrame()
 static Uint32 LastTick = 0;
 static int RefreshRate = 0;
 
+static void RenderBenchmarkOverlay()
+{
+	if (!RefreshRate) {
+		int displayCount = SDL_GetNumVideoDisplays();
+		SDL_DisplayMode mode;
+		for (int i = 0; i < displayCount; i++) {
+			SDL_GetDesktopDisplayMode(0, &mode);
+			if (mode.refresh_rate > RefreshRate) {
+				RefreshRate = mode.refresh_rate;
+			}
+		}
+	}
+
+	// show a bar representing fps, where the entire bar is the max refresh rate of attached displays
+	Uint32 nextTick = SDL_GetTicks();
+	Uint32 frameTime = nextTick - LastTick;
+	int fps = std::min(RefreshRate, static_cast<int>(frameTime > 0 ? (1000.0 / frameTime) : 0));
+	LastTick = nextTick;
+
+	// draw the full bar
+	SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
+	SDL_Rect frame = { Video.Width - 10, 2, 8, RefreshRate };
+	SDL_RenderDrawRect(TheRenderer, &frame);
+
+	// draw the inner fps gage
+	SDL_SetRenderDrawColor(TheRenderer, 0, 255, 0, 255);
+	SDL_Rect bar = { Video.Width - 8, 2 + RefreshRate - fps, 4, fps };
+	SDL_RenderFillRect(TheRenderer, &bar);
+
+	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+}
+
 void RealizeVideoMemory()
 {
 	++FrameCounter;
@@ -839,34 +868,7 @@ void RealizeVideoMemory()
 			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
 		}
 		if (Parameters::Instance.benchmark) {
-			if (!RefreshRate) {
-				int displayCount = SDL_GetNumVideoDisplays();
-				SDL_DisplayMode mode;
-				for (int i = 0; i < displayCount; i++) {
-					SDL_GetDesktopDisplayMode(0, &mode);
-					if (mode.refresh_rate > RefreshRate) {
-						RefreshRate = mode.refresh_rate;
-					}
-				}
-			}
-
-			// show a bar representing fps, where the entire bar is the max refresh rate of attached displays
-			Uint32 nextTick = SDL_GetTicks();
-			Uint32 frameTime = nextTick - LastTick;
-			int fps = std::min(RefreshRate, static_cast<int>(frameTime > 0 ? (1000.0 / frameTime) : 0));
-			LastTick = nextTick;
-
-			// draw the full bar
-			SDL_SetRenderDrawColor(TheRenderer, 255, 0, 0, 255);
-			SDL_Rect frame = { Video.Width - 10, 2, 8, RefreshRate };
-			SDL_RenderDrawRect(TheRenderer, &frame);
-
-			// draw the inner fps gage
-			SDL_SetRenderDrawColor(TheRenderer, 0, 255, 0, 255);
-			SDL_Rect bar = { Video.Width - 8, 2 + RefreshRate - fps, 4, fps };
-			SDL_RenderFillRect(TheRenderer, &bar);
-
-			SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+			RenderBenchmarkOverlay();
 		}
 		SDL_RenderPresent(TheRenderer);
 		NumRects = 0;

@@ -271,11 +271,17 @@ static GLfloat modelview[4 * 4];
 static GLfloat projection[4 * 4];
 static GLfloat matrix[4 * 4] = {0.0f};
 
+static bool RenderWithShaderInternal(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer);
+
+// keep this function small, so the compiler can inline it
 bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
 	if (!canUseShaders || currentShaderIdx == 0) {
 		return false;
 	}
+	return RenderWithShaderInternal(renderer, win, backBuffer);
+}
 
+static bool RenderWithShaderInternal(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
 	GLint oldProgramId;
 	// Detach the texture
 	SDL_SetRenderTarget(renderer, NULL);
