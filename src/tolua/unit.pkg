@@ -37,6 +37,8 @@ class CPreference
 	bool HardwareCursor;
 	bool SelectionRectangleIndicatesDamage;
 
+        unsigned int FrameSkip;
+
 	unsigned int ShowOrders;
 	unsigned int ShowNameDelay;
 	unsigned int ShowNameTime;

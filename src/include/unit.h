@@ -469,6 +469,8 @@ public:
 	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
 	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
 
+	int FrameSkip;          /// Mask used to skip rendering frames (useful for slow renderers that keep up with the game logic, but not the rendering to screen like e.g. original Raspberry Pi)
+
 	int ShowOrders;			/// How many second show orders of unit on map.
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.

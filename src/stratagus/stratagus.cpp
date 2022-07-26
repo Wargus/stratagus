@@ -405,7 +405,7 @@ void Exit(int err)
 	FreeButtonStyles();
 	FreeAllContainers();
 	freeGuichan();
-	fprintf(stdout, "Frames %lu, Slow frames %d = %ld%%\n",
+	fprintf(stdout, "Frames %lu, Slow frames %ld = %ld%%\n",
 			   FrameCounter, SlowFrameCounter,
 			   (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	lua_settop(Lua, 0);
