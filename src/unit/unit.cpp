@@ -1093,16 +1093,21 @@ void CUnit::AddInContainer(CUnit &host)
 {
 	Assert(Container == NULL);
 	Container = &host;
+	if (!Type) {
+		// if we're loading a game, the Type may not have been initialized
+		// yet. so we ignore this and the unit gets added later when it is
+		// loaded via CclUnit
+		return;
+	}
 	if (host.InsideCount == 0) {
 		NextContained = PrevContained = this;
 		host.UnitInside = this;
 	} else {
 		// keep sorted by size.
-		// FIXME: if we're loading a game, the Type may not have been initialized yet!!
-		int mySize = Type ? Type->BoardSize : 1;
+		int mySize = Type->BoardSize;
 		NextContained = host.UnitInside;
 		bool becomeFirst = true;
-		while (NextContained->Type ? NextContained->Type->BoardSize : 1 > mySize) {
+		while (NextContained->Type->BoardSize > mySize) {
 			becomeFirst = false;
 			NextContained = NextContained->NextContained;
 			if (NextContained == host.UnitInside) {
