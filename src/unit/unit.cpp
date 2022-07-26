@@ -377,7 +377,7 @@ extern int ExtraDeathIndex(const char *death);
 */
 void CUnit::RefsIncrease()
 {
-	Assert(Refs && !Destroyed);
+	Assert(!Refs || (Refs && !Destroyed));
 	if (!SaveGameLoading) {
 		++Refs;
 	}
