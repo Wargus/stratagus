@@ -752,6 +752,8 @@ int stratagusMain(int argc, char **argv)
 			InitMusic();
 		}
 
+		// init globals
+		Map.AllocateTileset();
 		UnitManager = new CUnitManager();
 		FogOfWar = new CFogOfWar();
 

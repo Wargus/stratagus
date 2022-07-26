@@ -327,15 +327,17 @@ CMap::~CMap()
 	delete Tileset;
 }
 
+void CMap::AllocateTileset()
+{
+	Assert(!Tileset);
+	Tileset = new CTileset();
+}
+
 /**
 **  Alocate and initialise map table
 */
 void CMap::Create()
 {
-	if (!Tileset) {
-		Tileset = new CTileset;
-	}
-
 	Assert(!this->Fields);
 
 	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
@@ -363,9 +365,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	this->Info.Clear();
 	this->Fields = NULL;
 	this->NoFogOfWar = false;
-	if (Tileset) {
-		this->Tileset->clear();
-	}
+	this->Tileset->clear();
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = NULL;
