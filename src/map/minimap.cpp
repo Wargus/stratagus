@@ -502,7 +502,7 @@ void CMinimap::Destroy()
 	}
 	if (MinimapFogSurface && MinimapFogSurface->format != NULL) {
 		SDL_FreeSurface(MinimapFogSurface);
-		MinimapSurface = NULL;
+		MinimapFogSurface = NULL;
 	}
 	delete[] Minimap2MapX;
 	Minimap2MapX = NULL;
