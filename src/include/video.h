@@ -174,7 +174,7 @@ public:
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);
 
-	inline bool IsLoaded() const { return Surface != NULL; }
+	inline bool IsLoaded(bool flipped = false) const { return Surface != NULL && (!flipped || SurfaceFlip != NULL); }
 
 	//guichan
 	virtual void *_getData() const { return Surface; }
