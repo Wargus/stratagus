@@ -630,7 +630,9 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 	int y = screenPos.y;
 #ifdef DEBUG
 	// Show the number of references.
-	CLabel(GetGameFont()).DrawClip(x + 1, y + 1, unit.Refs);
+	if (EnableDebugPrint) {
+		CLabel(GetGameFont()).DrawClip(x + 1, y + 1, unit.Refs);
+	}
 #endif
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
