@@ -387,18 +387,6 @@ static Mix_Music *LoadMusic(const char *name)
 	return currentMusic;
 }
 
-static Mix_Chunk *LoadSample(const char *name)
-{
-#ifdef DYNAMIC_LOAD
-	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
-	r->allocated = 0xcafebeef;
-	r->abuf = (Uint8 *)(strdup(name));
-	return r;
-#else
-	return ForceLoadSample(name);
-#endif
-}
-
 static Mix_Chunk *ForceLoadSample(const char *name)
 {
 	Mix_Chunk *r = Mix_LoadWAV(name);
@@ -412,6 +400,18 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 		return NULL;
 	}
 	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 1);
+}
+
+static Mix_Chunk *LoadSample(const char *name)
+{
+#ifdef DYNAMIC_LOAD
+	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
+	r->allocated = 0xcafebeef;
+	r->abuf = (Uint8 *)(strdup(name));
+	return r;
+#else
+	return ForceLoadSample(name);
+#endif
 }
 
 /**
