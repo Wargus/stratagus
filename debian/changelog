@@ -1,3 +1,15 @@
+stratagus (3.3.1) UNRELEASED; urgency=medium
+
+  [ Tim Felgentreff ]
+  * fix potential crash in editor with dynamic load
+  * ony draw references on units with debug print
+  * fix wrong assert, compilation on ubuntu 22.04
+
+  [ Northfear ]
+  * Fix build with enabled DYNAMIC_LOAD
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 30 Jul 2022 13:22:22 +0200
+
 stratagus (3.3.0) focal; urgency=medium
 
   [ Alex Grant Benedict ]
