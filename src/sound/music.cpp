@@ -63,13 +63,6 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 */
 static void MusicFinishedCallback()
 {
-	static long MusicCallbackDebounce = 0;
-	long ticks = SDL_GetTicks();
-	if (MusicCallbackDebounce + 1000 < ticks) {
-		// only accept music finished callbacks for music playing longer than 1s
-		return;
-	}
-	MusicCallbackDebounce = ticks;
 	SDL_Event event;
 	SDL_zero(event);
 	event.type = SDL_SOUND_FINISHED;

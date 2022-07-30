@@ -269,17 +269,10 @@ bool UnitSoundIsPlaying(Origin *origin)
 */
 static void ChannelFinished(int channel)
 {
-	static long ChannelCallbackDebounce[MaxChannels] = {0};
 	if (channel < 0 || channel >= MaxChannels) {
 		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
 		return;
 	}
-	long ticks = SDL_GetTicks();
-	if (ChannelCallbackDebounce[channel] + 200 < ticks) {
-		// only accept sound finished callbacks for sounds playing longer than 0.2s
-		return;
-	}
-	ChannelCallbackDebounce[channel] = ticks;
 	if (Channels[channel].FinishedCallback != NULL) {
 		SDL_Event event;
 		SDL_zero(event);
@@ -650,7 +643,7 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	return Mix_PlayingMusic();
+	return Mix_PlayingMusic() || External_IsPlaying();
 }
 
 /*----------------------------------------------------------------------------
