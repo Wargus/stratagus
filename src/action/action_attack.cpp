@@ -460,12 +460,12 @@ void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 **/
 bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 {
-	// don't check if we want to switch targets each cycle, once every second is enough
+	// don't check if we want to switch targets each cycle, but not too rarely either, because then attack-move doesn't work properly anymore
 	if (Sleep > 0) {
 		Sleep -= 1;
 		return true;
 	}
-	Sleep = CYCLES_PER_SECOND / 2;
+	Sleep = CYCLES_PER_SECOND / 5;
 
 	// if unit can't attack, or if unit is not bunkered and removed - exit, no targets
 	if (unit.Type->CanAttack == false
