@@ -558,7 +558,7 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 	}
 	*c = CostMoveToCallBack_Default(index, unit) + 1;
 #ifdef DEBUG
-	Assert(c >= 0);
+	Assert(*c >= 0);
 #endif
 	return *c - 1;
 }

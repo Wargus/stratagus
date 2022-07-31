@@ -836,7 +836,6 @@ static int CclLoadTileModels(lua_State *l)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	Map.Create();
 	Map.Tileset->parse(l);
 
 	//  Load and prepare the tileset

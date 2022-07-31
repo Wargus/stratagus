@@ -157,6 +157,8 @@ public:
 	CMap();
 	~CMap();
 
+	void AllocateTileset();
+
 	unsigned int getIndex(int x, int y) const
 	{
 		return x + y * this->Info.MapWidth;

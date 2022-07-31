@@ -719,9 +719,6 @@ const EventCallback *GetCallbacks()
 	return Callbacks;
 }
 
-static int SkipFrameMask = 0;
-static unsigned long NextSlowFrameReaction = FRAMES_PER_SECOND * 10;
-
 /**
 **  Wait for interactive input event for one frame.
 **
@@ -741,23 +738,6 @@ void WaitEventsOneFrame()
 	Uint32 ticks = SDL_GetTicks();
 	if (ticks > NextFrameTicks) { // We are too slow :(
 		++SlowFrameCounter;
-		if (SlowFrameCounter > NextSlowFrameReaction) {
-			unsigned long pct = (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1);
-			if (pct >= 60) {
-				SkipFrameMask = 0b111;
-			} else if (pct >= 40) {
-				SkipFrameMask = 0b101;
-			} else if (pct >= 20) {
-				SkipFrameMask = 0b11;
-			} else if (pct >= 10) {
-				SkipFrameMask = 0b1;
-			}
-			NextSlowFrameReaction += FRAMES_PER_SECOND * 10;
-			fprintf(stdout, "WARNING WARNING WARNING\n"
-							"Frames %lu, Slow frames %d = %lu%%, starting to render only every %d%s frame.\n",
-							FrameCounter, SlowFrameCounter, pct, SkipFrameMask + 1, SkipFrameMask == 1 ? "nd" : "th");
-			fflush(stdout);
-		}
 	}
 
 	InputMouseTimeout(*GetCallbacks(), ticks);
@@ -855,7 +835,7 @@ void RealizeVideoMemory()
 	if (dummyRenderer) {
 		return;
 	}
-	if (FrameCounter & SkipFrameMask) {
+	if (Preference.FrameSkip && (FrameCounter & Preference.FrameSkip)) {
 		return;
 	}
 	if (NumRects) {

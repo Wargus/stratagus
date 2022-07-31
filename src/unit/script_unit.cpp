@@ -331,6 +331,7 @@ static int CclUnit(lua_State *l)
 	}
 
 	CUnit *unit = &UnitManager->GetSlotUnit(slot);
+	bool hadType = unit->Type != NULL;
 	CUnitType *type = NULL;
 	CUnitType *seentype = NULL;
 	CPlayer *player = NULL;
@@ -643,6 +644,15 @@ static int CclUnit(lua_State *l)
 	//  Revealers are units that can see while removed
 	if (unit->Removed && unit->Type->BoolFlag[REVEALER_INDEX].value) {
 		MapMarkUnitSight(*unit);
+	}
+
+	if (!hadType && unit->Container) {
+		// this unit was assigned to a container before it had a type, so we
+		// need to actually add it now, since only with a type do we know the
+		// BoardSize it takes up in the container
+		CUnit *host = unit->Container;
+		unit->Container = NULL;
+		unit->AddInContainer(*host);
 	}
 
 	return 0;

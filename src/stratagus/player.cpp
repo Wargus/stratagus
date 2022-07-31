@@ -398,6 +398,7 @@ void FreePlayerColors()
 		Players[i].ClearUnitColors();
 	}
 	PlayerColorsRGB.clear();
+	PlayerColorsSDL.clear();
 }
 
 /**
@@ -1303,10 +1304,8 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 */
 void SetPlayersPalette()
 {
-	PlayerColorsSDL.clear();
 	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].SetUnitColors(PlayerColorsRGB[i]);
-		PlayerColorsSDL.push_back(std::vector<SDL_Color>(PlayerColorsRGB[i].begin(), PlayerColorsRGB[i].end()));
 	}
 }
 

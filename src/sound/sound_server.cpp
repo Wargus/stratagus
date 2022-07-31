@@ -269,17 +269,10 @@ bool UnitSoundIsPlaying(Origin *origin)
 */
 static void ChannelFinished(int channel)
 {
-	static long ChannelCallbackDebounce[MaxChannels] = {0};
 	if (channel < 0 || channel >= MaxChannels) {
 		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
 		return;
 	}
-	long ticks = SDL_GetTicks();
-	if (ChannelCallbackDebounce[channel] + 200 < ticks) {
-		// only accept sound finished callbacks for sounds playing longer than 0.2s
-		return;
-	}
-	ChannelCallbackDebounce[channel] = ticks;
 	if (Channels[channel].FinishedCallback != NULL) {
 		SDL_Event event;
 		SDL_zero(event);
@@ -387,18 +380,6 @@ static Mix_Music *LoadMusic(const char *name)
 	return currentMusic;
 }
 
-static Mix_Chunk *LoadSample(const char *name)
-{
-#ifdef DYNAMIC_LOAD
-	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
-	r->allocated = 0xcafebeef;
-	r->abuf = (Uint8 *)(strdup(name));
-	return r;
-#else
-	return ForceLoadSample(name);
-#endif
-}
-
 static Mix_Chunk *ForceLoadSample(const char *name)
 {
 	Mix_Chunk *r = Mix_LoadWAV(name);
@@ -412,6 +393,18 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 		return NULL;
 	}
 	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 1);
+}
+
+static Mix_Chunk *LoadSample(const char *name)
+{
+#ifdef DYNAMIC_LOAD
+	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
+	r->allocated = 0xcafebeef;
+	r->abuf = (Uint8 *)(strdup(name));
+	return r;
+#else
+	return ForceLoadSample(name);
+#endif
 }
 
 /**
@@ -650,7 +643,7 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
-	return Mix_PlayingMusic();
+	return Mix_PlayingMusic() || External_IsPlaying();
 }
 
 /*----------------------------------------------------------------------------

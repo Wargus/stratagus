@@ -83,7 +83,7 @@ extern NumberDesc *Damage;                   /// Damage calculation for missile.
 */
 void MissileType::LoadMissileSprite()
 {
-	if (this->G && !this->G->IsLoaded()) {
+	if (this->G && !this->G->IsLoaded(this->Flip)) {
 		this->G->Load();
 		if (this->Flip) {
 			this->G->Flip();
@@ -495,7 +495,7 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 {
 #ifdef DYNAMIC_LOAD
-	if (!this->G->IsLoaded()) {
+	if (!this->G->IsLoaded(this->Flip)) {
 		((MissileType*)this)->LoadMissileSprite();
 	}
 #endif
@@ -540,7 +540,7 @@ void Missile::DrawMissile(const CViewport &vp) const
 	// FIXME: I should copy SourcePlayer for second level missiles.
 	if (sunit && sunit->Player) {
 #ifdef DYNAMIC_LOAD
-		if (!this->Type->G->IsLoaded()) {
+		if (!this->Type->G->IsLoaded(this->Type->Flip)) {
 			((MissileType*)this->Type)->LoadMissileSprite();
 		}
 #endif

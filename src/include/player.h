@@ -349,6 +349,7 @@ extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
 extern bool NoRescueCheck;          /// Disable rescue check
 extern std::vector<std::vector<CColor>> PlayerColorsRGB; /// Player colors
+extern std::vector<std::vector<SDL_Color>> PlayerColorsSDL; /// Player colors
 extern std::vector<std::string> PlayerColorNames;  /// Player color names
 
 extern PlayerRace PlayerRaces;  /// Player races

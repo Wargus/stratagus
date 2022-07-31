@@ -1,4 +1,7 @@
 .cache
+debian/tmp/*
+gmon.*
+valgrind.*
 debian/*.debhelper
 debian/*.log
 debian/*.substvars

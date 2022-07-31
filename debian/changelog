@@ -1,8 +1,334 @@
-stratagus (3.2.1) UNRELEASED; urgency=medium
+stratagus (3.3.1) UNRELEASED; urgency=medium
 
-  * 
+  [ Tim Felgentreff ]
+  * fix potential crash in editor with dynamic load
+  * ony draw references on units with debug print
+  * fix wrong assert, compilation on ubuntu 22.04
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 25 Dec 2021 06:45:52 +0100
+  [ Northfear ]
+  * Fix build with enabled DYNAMIC_LOAD
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 30 Jul 2022 13:22:22 +0200
+
+stratagus (3.3.0) focal; urgency=medium
+
+  [ Alex Grant Benedict ]
+  * Update stratagus-tinyfiledialogs.h
+
+  [ Tim Felgentreff ]
+  * On windows, prefer stratagus from PATH over registry
+
+  [ Alyokhin ]
+  * Fixed fog for non-square maps
+
+  [ Tim Felgentreff ]
+  * workaround a few crashes in the online service
+  * add password flag to text fields
+  * HACK: make ctrl+keys work again in guichan
+  * add a lua function to restart the game
+  * guard against potential crashes due to bad lua coding of menus
+  * allow immediate reconnect to online service
+  * guard against lost network callbacks
+  * return success/failure from LoadStratagusMapInfo
+  * compile with c++17 filesystem support
+  * implement transmitting maps from server to client during join
+  * fix idle crash when online
+  * expose full file path in __file__; add disabled filesystem listing lua function
+  * allow unit selection in editor
+  * use ChangeOwner in SetUnitVariable(..."Player")
+  * add ability to change unit color in SetUnitVariable
+  * editor fixes
+  * add CopyUnitType function
+  * fix SetUnitVariable("Color")
+  * add GiveUnitsToPlayer function
+  * use lookup tables for cp437 and cp866 font graphics
+  * add support for mapping between codepages
+
+  [ Simone Starace ]
+  * Changed the body of function ChangeUnitsOwner.
+
+  [ Tim Felgentreff ]
+  * better docs for SetFontCodePage
+  * avoid useless utf8 work for numbers
+  * update codepoint mapping to allow multichar subst
+  * rename mobdebug.h, not a real header
+  * allow setting NumBounces for missile-clip-to-target
+  * draw missile cliptotarget centered on top left corner of target
+  * add animated sprite decoration
+  * add button check units-nor and fix CopyUnitType
+  * fix walls disappearing when changing surroundings
+  * use sdl hardware cursor to decouple the cursor speed from the game speed
+  * fix cursor drawing, now only the offset may be wrong
+  * fix mouse event coordinates for vertical pixel stretching
+  * make hardware cursor a preference
+  * fix scaled cursor hot pos
+  * deselect for list boxes
+  * try to clean up a bit better
+  * allow using bool flags for enable/disable decoration
+  * a bit more configurability for the decoration bar
+  * fix one more potential crash with font rendering
+  * add option to indicate damage in selection rect
+  * only show group if ShowOrders is true
+  * Make max messages configurable with SetMaxMessageCount and rework repeated message handling
+  * add a simple function to copy unit buttons to another unit
+  * add ability to set completely custom Colors for a unit
+  * add ability to define additional colors and set custom unit color
+  * fix a class of potential NPEs
+  * fix a crash in select script functions
+  * first attempt at a "randomizer" tool for the editor
+  * fix memory leak, thanks @Andrettin
+  * improve astar cleanup performance. thanks @Andrettin
+  * don't return depots unconditionally
+  * fix start location sticking to cursor
+  * tweak map randomize
+  * be backwards compatible with war1gus colorsets
+  * make randomize editor feature configurable
+  * add import
+  * expose Randomize map to lua
+  * Revert "improve astar cleanup performance. thanks @Andrettin"
+  * Revert "don't return depots unconditionally"
+  * tweak map randomization
+  * fix two potential crashes
+  * Revert "Revert "don't return depots unconditionally""
+  * Revert "Revert "improve astar cleanup performance. thanks @Andrettin""
+  * better random for random maps
+  * Add FindNextResource lua function
+  * make free workers icon clickable and hideable when no free workers available
+  * pause game when network is out of sync
+  * improve UnitDump logging
+  * improve logging of network out of sync
+  * SyncHash change logging
+  * ask for port for easy multiplayer debugging
+  * reduce backtrace size
+  * dump unit debug in dev launch
+  * more debugging and sync hashing
+  * sort the CUnit::Init variables as in the header
+  * workaround for not finding depot from mine
+  * port depot finder change from  Wyrmgus that searches from outside mine
+  * add disabled astar overlay
+  * disable a bit of the extra much logging again
+
+  [ sviscapi ]
+  * Changed boolean into bool in online_service.cpp
+
+  [ Tim Felgentreff ]
+  * reuse game structures in replay types
+  * delete metaserver
+  * WIP: start unifying all GameSettings
+  * doc update for SetPlayerData
+  * fix SettingsPresets#Init
+  * more room for backtrace
+  * fix replay refactpring
+  * fix team assignments again
+  * fix build issues on linux
+  * don't use enum class until we remove tolua++
+  * always use vendored lua
+  * cleanups
+  * make changes work with tolua++, trying to be backwards compatible
+  * since FoV is relevant for sync, make it part of GameSettings
+  * move sync-relevant preferences into GameSettings
+  * debugprint game settings, fix sign of some settings
+  * give games the opportunity to store custom settings in GameSettings that get synced across the network
+  * ensure we store team preferences in replay and always re-init GameSettings with user preferences where applicable
+  * Revert "always use vendored lua"
+  * AiChecksDependencies is now synced across network clients
+  * don't autosave during replay
+  * always use network command queue, even in single player, for replays to work
+  * fix wrong assert
+  * fixed another assert problem when game is cleaning up
+
+  [ alyokhin ]
+  * fix compile error for gcc version >9.3.0
+
+  [ Tim Felgentreff ]
+  * dirty expansion to multiplayer random placement option
+  * fix server setup message size
+  * new idea for player order pref
+  * simplify network code
+  * ignore linux build
+  * fix game start, also serialize presets in server state
+  * fix wrong bounds for network commands after refactoring
+  * debug: try building with v142 toolset
+  * drop XP support from settings file
+  * show it as training when building from outside
+  * fix diagonal rule checks for buildings
+  * cancel building when building from outside and stopping
+  * make sure we cannot build nonsolid decorative buildings on water
+  * compact host array before game start
+  * send the new client index out to clients after compacting host array
+  * allow grayscale graphic loading
+  * debug print replay settings
+  * fix and document player team assignement via presets
+  * use references instead of copy of hosts
+  * avoid vectors as public static global members
+  * expose the boolean flags that moved to GameSettings
+  * set shared vision for teamed players
+  * newline in lua DebugPrint
+  * make SaveReplay work again
+  * minimum fix for "static initializer fiasco"
+  * don't reset NumDirections and Flip
+  * use std::bitset for user settings manipulation
+  * more flexibile default tile index
+  * implement terrain harvesting of other resources than wood.
+  * add "non-mixing" flag for solid tiles that don't need mixing
+  * ignore building rules when not in game (i.e. editor)
+  * don't count more than 10 repeats of a message
+  * fix checking of resource for terrain resources
+  * show buttons from *the* neutral player 16
+  * push clicking player into button callback action
+  * allow terrain harvesters to return resources early
+  * fix outside builder for buildings
+  * make popups accept functions
+  * allow plain graphic as panel content
+  * 1-based player index for users
+  * add option for ellipse selection with y-stretch factor
+  * fix compiler warning
+  * make color cycling speed configurable
+  * make scroll margins configurable
+  * fix editor ui bug with 5x5 cursor
+  * fix transports getting stuck during unloading. fixes https://github.com/Wargus/wargus/issues/121
+  * simplify upgrade_to check, give back resources when upgrade fails. fixes https://github.com/Wargus/wargus/issues/172
+  * play shore sound only when really docking/undocking
+  * minor fix for transporter pathing
+  * use an external command to play midi music on windows
+  * exe name fix
+  * ship midiplayer to clients
+  * minor cleanup for movie playing
+  * let midiplayer work with non-standard windows midi
+  * fix linux build
+  * add some more flexibility for live reloading of ui, allow using frames in panel graphics
+  * fix negative condition for panel content on variable value
+  * fix a crash
+  * add a wiggle animation for ships and planes to have sub-tile movement
+  * fixup last commit
+  * Expose unit variables PosBottom and PosRight
+  * allow rotating towards building unit, take displacement into account
+  * implement displacement move towards a unit
+  * use GetDrawLevel() for map drawing order calculation
+  * fix potential crash when portraits are used, draw portrait of first selected unit in group
+  * add support for different icons drawn based on health for single, multi, and transport selection
+  * allow content type icon to select icon kind (group, single, button, transport)
+  * fix mng constructor
+  * add "talking" as a tag in portrait definitions to show when unit is playing sound
+  * add support for UI.DefaultUnitPortrait to draw when no selection is active
+  * do not randomly play talking animations
+
+  [ Simone Starace ]
+  * Bold text on some examples.
+  * Added examples in shaders.cpp
+
+  [ Tim Felgentreff ]
+  * use 32-bit alpha for fancy shadows
+
+  [ Simone Starace ]
+  * Added more example codes for units scripts.
+
+  [ Tim Felgentreff ]
+  * new code  for palette changes in icons based on unit variables
+  * support alternative spritesheet for units below 50% health
+  * add a simple mechanism to combine graphics from lua with overlay/mask
+  * apply a shearing effect to generated shadows
+  * add shrinking for shadows
+  * clean up MakeShadow function a bit
+  * download/setup stargus
+  * support size in SDL_RWops from CFile
+  * share mngs
+  * let sdl mixer free our sdl_rwops
+  * allow dynamic load of sounds as well
+  * make dynamic load the default to start up faster
+  * don't overallocate mng array
+  * deal with a few minor errors
+  * make construction lazy loaded as well
+  * fix lazy loading of mng portraits
+  * keep units in transports sorted by size and give them space in UI
+  * fix ordering of units in transports by size
+  * extract arg quoting for iwndows
+  * make midiplayer more fancy with pipes for communication
+  * add missing stargus json
+  * download magick executable
+  * fix icon color palette swaps not being swapped back to default
+  * add assertions to avoid crash with wrongly indexed graphics
+  * update generate_index script to create api definition
+  * add a todo
+  * fix potential crash
+  * fix wrong assert
+  * fix missing semicolon
+  * make generated api better
+  * cache mapping of strings to filenames
+  * avoid runtime conversion to SDL_Color for font colors
+  * cache SDL colors for player colors at beginning of the game
+  * add simple benchmarking option
+  * fix a crash when freeing dynamically loaded sounds
+  * nicer fps bar
+  * set callback immediately when playing, not delayed
+  * port Wyrmgus change to FormatNumber, which has better performance
+  * fix a bunch of clang warnings
+  * make compilation without openmp work
+  * also build shared libraries of vendored lua
+  * fix omp_get_thread_num stub
+  * explicit sound channel initialization
+  * openmp cmake option
+  * add gprof linker flag
+  * make unit manager a global pointer, not a static global
+  * make FogOfWar a global pointer, not a static global
+  * check automatic attacks/spells fewer times to avoid performance penalty of AStar each cycle
+  * make vendored lua also work on windows
+  * dispatch audio callbacks to the event loop
+  * fixup failing music callback - don't let music play failure spam the event queue
+  * don't wait for vsync in benchmark mode
+  * allocate tileset on map creation, not statically
+  * fix lazy mng loading
+  * hackaround for mng free bug
+  * fix exit when no map was created
+  * make full black in mngs be transparent
+  * don't waste time drawing map tiles below fog of war
+  * fix debug printing with dummy renderer
+  * fix swapped mng sizes
+  * fix compile error
+  * fix wrong condition for mng lazy loading
+  * fix invalid sharing of mngs in copied unit type
+  * mng widgets are always dirty
+  * fix potential crash when lazily loading a sound that doesn't exist
+  * delete manually allocated UnitManager and FogOfWar
+  * expose Mng.MaxFPS to lua to set the max playback speed for mngs
+  * fix compilation without Mng support
+  * minor usability improvement for panel conditions
+  * no assert/debugprint in release builds
+  * XXX: do not crash on exit
+  * improve performance of AiEnemyUnitsInDistance
+  * reduce load on AI cycles by limiting how many forces may scan the map in one cycle
+  * change astar reset optimization to instead rely on memory alignment and the compiler optimizations for memset/memmove on aligned memory chunks with modern CPUs
+  * make max iterations for astar configurable
+  * comment unused cpu feature test code, align 512bits for AVX-512
+  * report benchmark results with cycles
+  * no assert/debugprint in release builds
+  * XXX: do not crash on exit
+  * re-enable simd test functions
+  * re-order to fix compilation
+  * start skipping frames when we are too slow
+  * fix typo
+  * more frame skipping, to work decently on rpi without accelleration
+  * avoid free-cycle
+
+  [ Sebastien Alaiwan ]
+  * Cleanup: dead local variables
+  * genversion: fix minor memory leak
+
+  [ Tim Felgentreff ]
+  * minor tweaks to micro-optimize performance for really slow machines
+  * fix potential crash on map load
+  * add workaround for potential crash on load
+  * Revert "XXX: do not crash on exit"
+  * Revert "no assert/debugprint in release builds"
+  * make frame skip a preference
+  * fix loading games with units in containers that do not have a type yet
+  * move tileset allocation to the explicit list of globals allocated in stratagusMain
+  * fix accidental double-free
+  * (i think) fix an assertion
+  * fix crash when graphic for flipped missile is loaded already as sprite
+  * add a bit of documentation about complex map building
+
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Wed, 27 Jul 2022 14:16:51 +0200
 
 stratagus (3.2.0) focal; urgency=medium
 

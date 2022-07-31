@@ -938,6 +938,11 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
+#ifdef DYNAMIC_LOAD
+					if (!type->Sprite) {
+						LoadUnitTypeSprite(*const_cast<CUnitType *>(type));
+					}
+#endif
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
 					DrawCross(startScreenPos, Map.Tileset->getPixelTileSize(), Players[i].Color);
