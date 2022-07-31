@@ -1,4 +1,4 @@
-stratagus (3.3.1) UNRELEASED; urgency=medium
+stratagus (3.3.1) focal; urgency=medium
 
   [ Tim Felgentreff ]
   * fix potential crash in editor with dynamic load
@@ -8,7 +8,7 @@ stratagus (3.3.1) UNRELEASED; urgency=medium
   [ Northfear ]
   * Fix build with enabled DYNAMIC_LOAD
 
- -- Tim Felgentreff <timfelgentreff@gmail.com>  Sat, 30 Jul 2022 13:22:22 +0200
+ -- Tim Felgentreff <timfelgentreff@gmail.com>  Sun, 31 Jul 2022 11:43:53 +0200
 
 stratagus (3.3.0) focal; urgency=medium
 
