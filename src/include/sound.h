@@ -155,8 +155,6 @@ struct Origin {
 
 extern GameSound GameSounds;  /// Game sound configuration
 
-extern bool CallbackMusic;  /// flag true callback ccl if stops
-
 /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
 
@@ -198,14 +196,6 @@ extern void CheckMusicFinished(int force = 0);
 
 /// Initialize music
 extern void InitMusic();
-
-/// Turn music stopped callback on
-#define CallbackMusicOn() \
-	CallbackMusic = true;
-/// Turn music stopped callback off
-#define CallbackMusicOff() \
-	CallbackMusic = false;
-
 
 // sound_id.cpp
 

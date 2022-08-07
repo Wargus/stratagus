@@ -119,7 +119,6 @@ void InitModules()
 	FastForwardCycle = 0;
 	SyncHash = 0;
 
-	CallbackMusicOn();
 	InitSyncRand();
 	InitVideoCursors();
 	InitUserInterface();

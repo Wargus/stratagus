@@ -2416,8 +2416,6 @@ int MenuScreen::run(bool loop)
 	GameCursor = UI.Point.Cursor;
 	CursorOn = CursorOnUnknown;
 
-	CallbackMusicOn();
-
 	if (loop) {
 		const EventCallback *old_callbacks = GetCallbacks();
 		SetCallbacks(&GuichanCallbacks);
