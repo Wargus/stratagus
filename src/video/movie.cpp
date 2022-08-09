@@ -366,7 +366,7 @@ int PlayMovie(const std::string &name)
 	int prevMusicVolume = GetMusicVolume();
 	SetMusicVolume(GetEffectsVolume());
 	PlayMusic(filename);
-	CallbackMusicSkip(); // do not run the lua callback when the video audio finished
+	CallbackMusicDisable(); // do not run the lua callback when the video audio finished
 
 	EventCallback callbacks;
 
@@ -418,6 +418,7 @@ int PlayMovie(const std::string &name)
 	StopMusic();
 	SetMusicVolume(prevMusicVolume);
 	SDL_DestroyTexture(yuv_overlay);
+	CallbackMusicEnable();
 
 	OggFree(&data);
 	f.close();

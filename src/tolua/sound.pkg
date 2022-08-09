@@ -16,7 +16,7 @@ end
 $]
 
 extern int PlayMusic(const std::string name);
-extern void StopMusic(bool fade = true);
+extern void StopMusic();
 extern bool IsMusicPlaying();
 
 extern int SetChannelVolume(int channel, int volume);

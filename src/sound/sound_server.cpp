@@ -360,7 +360,7 @@ static Mix_Music *currentMusic = NULL;
 static Mix_Music *LoadMusic(const char *name)
 {
 	if (currentMusic) {
-		StopMusic(false);
+		StopMusic();
 		Mix_FreeMusic(currentMusic);
 	}
 	currentMusic = Mix_LoadMUS(name);
@@ -584,17 +584,13 @@ int PlayMusic(const std::string &file)
 /**
 **  Stop the current playing music. This does not trigger the music finished callback.
 */
-void StopMusic(bool fade)
+void StopMusic()
 {
-	CallbackMusicSkip();
-	if (External_Stop()) {
-		return;
-	}
-	if (fade) {
-		Mix_FadeOutMusic(200);
-	} else {
+	CallbackMusicDisable();
+	if (!External_Stop()) {
 		Mix_HaltMusic();
 	}
+	CallbackMusicEnable();
 }
 
 /**

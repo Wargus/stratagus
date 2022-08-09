@@ -191,9 +191,6 @@ extern void InitSoundClient();
 
 // music.cpp
 
-/// Check if music is finished and play the next song
-extern void CheckMusicFinished(int force = 0);
-
 /// Initialize music
 extern void InitMusic();
 
@@ -201,7 +198,7 @@ extern void InitMusic();
 extern void CallbackMusicEnable();
 
 /// Skip the next music stopped callback invocation
-extern void CallbackMusicSkip();
+extern void CallbackMusicDisable();
 
 /// Turn music stopped callback on and trigger it immediately
 extern void CallbackMusicTrigger();

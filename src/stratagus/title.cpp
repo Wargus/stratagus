@@ -193,7 +193,10 @@ void ShowTitleScreens()
 		Video.ClearScreen();
 	}
 	Invalidate();
-	CallbackMusicTrigger();
+	CallbackMusicEnable();
+	if (!IsMusicPlaying()) {
+		CallbackMusicTrigger();
+	}
 }
 
 
