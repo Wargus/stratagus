@@ -65,8 +65,6 @@ static bool EffectsEnabled = true;
 static double VolumeScale = 1.0;
 static int MusicVolume = 0;
 
-static void (*MusicFinishedCallback)();
-
 #ifdef USE_WIN32
 static bool externalPlayerIsPlaying = false;
 
@@ -86,7 +84,7 @@ static DWORD WINAPI StatusThreadFunction(LPVOID lpParam) {
 		// any write means we finished
 		if (externalPlayerIsPlaying) {
 			externalPlayerIsPlaying = false;
-			MusicFinishedCallback();
+			CallbackMusicTrigger();
 		}
 	}
 	return 0;
@@ -362,7 +360,7 @@ static Mix_Music *currentMusic = NULL;
 static Mix_Music *LoadMusic(const char *name)
 {
 	if (currentMusic) {
-		Mix_HaltMusic();
+		StopMusic(false);
 		Mix_FreeMusic(currentMusic);
 	}
 	currentMusic = Mix_LoadMUS(name);
@@ -551,12 +549,11 @@ bool IsEffectsEnabled()
 */
 void SetMusicFinishedCallback(void (*callback)())
 {
-	MusicFinishedCallback = callback;
 	Mix_HookMusicFinished(callback);
 }
 
 /**
-**  Play a music file.
+**  Play a music file. This also enables the music finished callback.
 **
 **  @param file  Name of music file, format is automatically detected.
 **
@@ -568,6 +565,7 @@ int PlayMusic(const std::string &file)
 		return -1;
 	}
 	DebugPrint("play music %s\n" _C_ file.c_str());
+	CallbackMusicEnable();
 
 	if (External_Play(file)) {
 		return 0;
@@ -584,14 +582,19 @@ int PlayMusic(const std::string &file)
 }
 
 /**
-**  Stop the current playing music.
+**  Stop the current playing music. This does not trigger the music finished callback.
 */
-void StopMusic()
+void StopMusic(bool fade)
 {
+	CallbackMusicSkip();
 	if (External_Stop()) {
 		return;
 	}
-	Mix_FadeOutMusic(200);
+	if (fade) {
+		Mix_FadeOutMusic(200);
+	} else {
+		Mix_HaltMusic();
+	}
 }
 
 /**

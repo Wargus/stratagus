@@ -91,7 +91,7 @@ void SetMusicFinishedCallback(void (*callback)());
 /// Play a music file
 extern int PlayMusic(const std::string &file);
 /// Stop music playing
-extern void StopMusic();
+extern void StopMusic(bool fade = true);
 /// Set music volume
 extern void SetMusicVolume(int volume);
 /// Get music volume

@@ -366,6 +366,7 @@ int PlayMovie(const std::string &name)
 	int prevMusicVolume = GetMusicVolume();
 	SetMusicVolume(GetEffectsVolume());
 	PlayMusic(filename);
+	CallbackMusicSkip(); // do not run the lua callback when the video audio finished
 
 	EventCallback callbacks;
 

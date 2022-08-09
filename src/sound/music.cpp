@@ -53,7 +53,8 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-std::atomic_flag MusicFinishedEventQueued = ATOMIC_FLAG_INIT; // flag is set when a MusicFinishedCallback was enqueued in the event loop and unset when it is handled
+/// flag is set when a MusicFinishedCallback was enqueued in the event loop and should be handled, and unset when the handler has run.
+static std::atomic_flag MusicFinishedEventQueued = ATOMIC_FLAG_INIT;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -85,7 +86,7 @@ static void MusicFinishedCallback()
 */
 void CheckMusicFinished(int force)
 {
-	if (SoundEnabled() && IsMusicEnabled()) {
+	if (SoundEnabled() && IsMusicEnabled() && MusicFinishedEventQueued.test_and_set()) {
 		lua_getglobal(Lua, "MusicStopped");
 		if (!lua_isfunction(Lua, -1)) {
 			fprintf(stderr, "No MusicStopped function in Lua\n");
@@ -106,6 +107,19 @@ void InitMusic()
 #ifdef USE_FLUIDSYNTH
 	InitFluidSynth();
 #endif
+}
+
+void CallbackMusicEnable() {
+	MusicFinishedEventQueued.clear();
+}
+
+void CallbackMusicSkip() {
+	MusicFinishedEventQueued.test_and_set();
+}
+
+void CallbackMusicTrigger() {
+	MusicFinishedEventQueued.clear();
+	MusicFinishedCallback();
 }
 
 //@}

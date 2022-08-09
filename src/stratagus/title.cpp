@@ -193,6 +193,7 @@ void ShowTitleScreens()
 		Video.ClearScreen();
 	}
 	Invalidate();
+	CallbackMusicTrigger();
 }
 
 

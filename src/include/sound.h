@@ -197,6 +197,15 @@ extern void CheckMusicFinished(int force = 0);
 /// Initialize music
 extern void InitMusic();
 
+/// Turn music stopped callback on
+extern void CallbackMusicEnable();
+
+/// Skip the next music stopped callback invocation
+extern void CallbackMusicSkip();
+
+/// Turn music stopped callback on and trigger it immediately
+extern void CallbackMusicTrigger();
+
 // sound_id.cpp
 
 /// Map sound to identifier
