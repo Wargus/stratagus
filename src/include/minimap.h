@@ -57,7 +57,8 @@ class CMinimap
 public:
 	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
 		WithTerrain(false), ShowSelected(false),
-		Transparent(false), UpdateCache(false) {}
+		Transparent(false), UpdateCache(false),
+		MinimapScaleX(0), MinimapScaleY(0) {}
 
 	void SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
@@ -85,6 +86,14 @@ public:
 	bool ShowSelected;
 	bool Transparent;
 	bool UpdateCache;
+	
+private:
+	// MinimapScale:
+	// 32x32 64x64 96x96 128x128 256x256 512x512 ...
+	// *4 *2 *4/3   *1 *1/2 *1/4
+	int MinimapScaleX;                  /// Minimap scale to fit into window
+	int MinimapScaleY;                  /// Minimap scale to fit into window
+
 private:
 	struct MinimapSettings
 	{
