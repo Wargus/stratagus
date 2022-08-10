@@ -989,6 +989,11 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			//eo = GetIndex(ex, ey);
 			eo = endPos.x + (o - x) + Heading2O[i];
 
+			if (eo < 0 || eo >= CostMoveToCacheSize) {
+				// unaccessible tile
+				continue;
+			}
+
 			// if the point is "move to"-able and
 			// if we have not reached this point before,
 			// or if we have a better path to it, we add it to open set

@@ -78,12 +78,6 @@ static int *Minimap2MapY;                  /// fast conversion table
 static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
 static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 
-// MinimapScale:
-// 32x32 64x64 96x96 128x128 256x256 512x512 ...
-// *4 *2 *4/3   *1 *1/2 *1/4
-static int MinimapScaleX;                  /// Minimap scale to fit into window
-static int MinimapScaleY;                  /// Minimap scale to fit into window
-
 #define MAX_MINIMAP_EVENTS 8
 
 struct MinimapEvent {

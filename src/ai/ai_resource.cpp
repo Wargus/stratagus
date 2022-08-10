@@ -470,7 +470,6 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
-	const Vec2i offset(MaxMapWidth, MaxMapHeight);
 
 	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
 		CUnit &unit = **it;
