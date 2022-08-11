@@ -691,7 +691,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
+void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, char zDisplacement)
 {
 	// Draw normal shadow sprite if available
 	if (!type.ShadowSprite) {
@@ -701,7 +701,7 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 	pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
 	pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
 	pos.x += type.OffsetX + type.ShadowOffsetX;
-	pos.y += type.OffsetY + type.ShadowOffsetY;
+	pos.y += type.OffsetY + type.ShadowOffsetY - (2 * zDisplacement);
 
 	if (!type.ShadowSpriteFrame) {
 		// the shadow is a full unit shadow
@@ -983,7 +983,11 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawConstructionShadow(*type, cframe, frame, screenPos);
 	} else {
 		if (action != UnitActionDie) {
-			DrawShadow(*type, frame, screenPos);
+			if (this->ZDisplaced) {
+				DrawShadow(*type, frame, screenPos, this->IY);
+			} else {
+				DrawShadow(*type, frame, screenPos);
+			}
 		}
 	}
 
