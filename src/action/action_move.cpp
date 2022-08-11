@@ -138,8 +138,7 @@ int DoActionMove(CUnit &unit)
 	int d;
 
 	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
-		// (timfel): We used to have Assert(!unit.Anim.Unbreakable); here, but I think
-		// this is wrong for subtile movement.
+		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
 		unit.IX = 0;
@@ -154,16 +153,14 @@ int DoActionMove(CUnit &unit)
 				if (unit.Player->AiEnabled) {
 					AiCanNotMove(unit);
 				}
-				unit.Anim.Unbreakable = 0;
 				unit.Moving = 0;
 				return d;
 			case PF_REACHED: // Reached goal, stop
-				unit.Anim.Unbreakable = 0;
 				unit.Moving = 0;
 				return d;
 			case PF_WAIT: // No path, wait
 				unit.Wait = 10;
-				unit.Anim.Unbreakable = 0;
+
 				unit.Moving = 0;
 				return d;
 			default: // On the way moving
@@ -221,9 +218,10 @@ int DoActionMove(CUnit &unit)
 	unit.IX += posd.x * move;
 	unit.IY += posd.y * move;
 
-	// Finished move to next tile, set Moving to 0 so we recalculate the path
-	// next frame and continue animation to the next tile
-	if (!unit.IX && !unit.IY) {
+	// Finished move animation, set Moving to 0 so we recalculate the path
+	// next frame
+	// FIXME: this is broken for subtile movement
+	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
 		unit.Moving = 0;
 	}
 	return d;
