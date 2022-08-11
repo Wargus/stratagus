@@ -105,6 +105,10 @@
 		unit.IX += x;
 		unit.IY += y;
 	}
+
+	if (this->isZDisplacement) {
+		unit.ZDisplaced = unit.IY ? 1 : 0;
+	}
 }
 
 /* virtual */ void CAnimation_Wiggle::Init(const char *s, lua_State *)
@@ -131,6 +135,19 @@
 		end = std::min(len, str.find(' ', begin));
 		std::string label(str, begin, end - begin);
 		FindLabelLater(&this->ifNotReached, label);
+	}
+
+	if (end != len) {
+		begin = std::min(len, str.find_first_not_of(' ', end));
+		end = std::min(len, str.find(' ', begin));
+		std::string zarg;
+		zarg.assign(str, begin, end - begin);
+		if (zarg == "z-displacement") {
+			this->isZDisplacement = true;
+		} else {
+			fprintf(stderr, "Bad flag, only 'z-displacement' expected at the end of wiggle animation, found '%s'\n", zarg.c_str());
+			ExitFatal(1);
+		}
 	}
 }
 

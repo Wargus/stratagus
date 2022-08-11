@@ -455,6 +455,7 @@ void CUnit::Init()
 	CacheLock = 0;
 	Waiting = 0;
 	MineLow = 0;
+	ZDisplaced = 0;
 	TeamSelected = 0;
 	RescuedFrom = NULL;
 	memset(VisCount, 0, sizeof(VisCount));
@@ -2534,6 +2535,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 #endif
 		unit.IX = (type->CorpseType->Width - type->CorpseType->Sprite->Width) / 2;
 		unit.IY = (type->CorpseType->Height - type->CorpseType->Sprite->Height) / 2;
+		unit.ZDisplaced = 0;
 
 		unit.CurrentSightRange = type->CorpseType->Stats[unit.Player->Index].Variables[SIGHTRANGE_INDEX].Max;
 	} else {

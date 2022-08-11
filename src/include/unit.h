@@ -382,6 +382,8 @@ public:
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
 
+	unsigned ZDisplaced : 1;     /// The IY displacement of this unit is simulating a "height" displacement (for flyers). This is useful to draw shadows appropriately
+
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 	/// NULL if the unit was not rescued.
@@ -673,7 +675,7 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
+extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, char zDisplacement = 0);
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);
 
