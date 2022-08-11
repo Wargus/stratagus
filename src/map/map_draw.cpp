@@ -257,26 +257,41 @@ void CViewport::DrawMapGridInViewport() const
 	}
 }
 
+template<bool graphicalTileIsLogicalTile>
 void CViewport::DrawMapBackgroundInViewport() const
 {
-	int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
 	int ex = this->BottomRightPos.x;
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
 	const int mapW = Map.Info.MapWidth;
 	const int mapH = Map.Info.MapHeight;
+	/// uninitialized when graphicalTileIsLogicalTile
+	int logicalMapW;
+	if constexpr(!graphicalTileIsLogicalTile) {
+		logicalMapW = mapW << Map.Tileset->getLogicalToGraphicalTileSizeShift();
+	}
 	const int map_max = mapW * mapH;
 	PixelSize graphicTileSize = Map.Tileset->getPixelTileSize();
-	int graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
-	bool graphicalTileIsLogicalTile = graphicTileSize == PixelTileSize;
-	bool canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap && graphicalTileIsLogicalTile;
+	/// uninitialized when graphicalTileIsLogicalTile
+	int graphicTileOffset;
+	bool canShortcut;
+	if constexpr(!graphicalTileIsLogicalTile) {
+		graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		canShortcut = false;
+	} else {
+		canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
+	}
 
 	while (sy < 0) {
-		sy += graphicTileOffset;
+		if constexpr(graphicalTileIsLogicalTile) {
+			++sy;
+		} else {
+			sy += graphicTileOffset;
+		}
 		dy += graphicTileSize.y;
 	}
-	if (!graphicalTileIsLogicalTile) {
+	if constexpr(!graphicalTileIsLogicalTile) {
 		auto dv = std::div(sy * PixelTileSize.y, graphicTileSize.y);
 		sy = dv.quot * graphicTileOffset;
 		dy -= dv.rem;
@@ -286,14 +301,18 @@ void CViewport::DrawMapBackgroundInViewport() const
 	while (dy <= ey && sy < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
-		if (!graphicalTileIsLogicalTile) {
+		if constexpr(!graphicalTileIsLogicalTile) {
 			auto dv = std::div(sx * PixelTileSize.x, graphicTileSize.x);
 			sx = dv.quot * graphicTileOffset;
 			dx -= dv.rem;
 		}
 		while (dx <= ex && (sx - sy < mapW)) {
 			if (sx - sy < 0 || (canShortcut && !FogOfWar->GetVisibilityForTile(Vec2i(sx % mapW, sx / mapH)))) {
-				sx += graphicTileOffset;
+				if constexpr(graphicalTileIsLogicalTile) {
+					++sx;
+				} else {
+					sx += graphicTileOffset;
+				}
 				dx += graphicTileSize.x;
 				continue;
 			}
@@ -323,10 +342,18 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 #endif
-			sx += graphicTileOffset;
+			if constexpr(graphicalTileIsLogicalTile) {
+				++sx;
+			} else {
+				sx += graphicTileOffset;
+			}
 			dx += graphicTileSize.x;
 		}
-		sy += mapW << shift;
+		if constexpr(graphicalTileIsLogicalTile) {
+			sy += mapW;
+		} else {
+			sy += logicalMapW;
+		}
 		dy += graphicTileSize.y;
 	}
 #ifdef DEBUG
@@ -389,7 +416,11 @@ void CViewport::Draw()
 	this->SetClipping();
 
 	/* this may take while */
-	this->DrawMapBackgroundInViewport();
+	if (Map.Tileset->getLogicalToGraphicalTileSizeShift() > 0) {
+		this->DrawMapBackgroundInViewport<false>();
+	} else {
+		this->DrawMapBackgroundInViewport<true>();
+	}
 
 	Missile *clickMissile = NULL;
 	CurrentViewport = this;
