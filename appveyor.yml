@@ -1,18 +1,18 @@
 os: Visual Studio 2019
-shallow_clone: true
+clone_depth: 2
 configuration:
   - Release
 before_build:
+  - git submodule update --init --recursive --depth 2
   - mkdir build
   - cd build
-  - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/master-builds/dependencies.zip
-  - 7z x dependencies.zip
   - appveyor DownloadFile https://github.com/jimpark/unsis/releases/download/2.50.0/nsis-2.50.0-Unicode-setup.exe
   - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
-  - cmake -G "Visual Studio 16 2019" -T v142 -A win32 -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON ..
+  - cmake -G "Visual Studio 16 2019" -T v142 -A win32 -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON ..
   - cd ..
+build_script: cmake --build build --config Release --target ALL_BUILD -j
 after_build:
-  - 7z a compiled-binaries.zip %cd%\build\Release\*.pdb %cd%\build\stratagus.exe %cd%\build\stratagus-midiplayer.exe %cd%\build\dependencies\bin\*.dll
+  - 7z a compiled-binaries.zip %cd%\build\Release\*.pdb %cd%\build\stratagus.exe %cd%\build\stratagus-midiplayer.exe
 artifacts:
   - path: build\Stratagus-*.exe
   - path: compiled-binaries.zip

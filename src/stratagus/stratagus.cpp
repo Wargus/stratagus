@@ -158,6 +158,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#ifdef BUILD_VENDORED_SDL
+#pragma comment(lib, "Setupapi.lib")
+#pragma comment(lib, "Version.lib")
+#pragma comment(lib, "Imm32.lib")
+#endif
+
 #include <ctype.h>
 
 #ifdef USE_BEOS
