@@ -122,8 +122,13 @@ private:
 	void Set(const PixelPos &mapPixelPos);
 	/// Draw the map grid for dubug purposes
 	void DrawMapGridInViewport() const;
-	/// Draw the map background
-	void DrawMapBackgroundInViewport() const;
+	/** Draw the map background.
+	 * The template parameter graphicalTileIsLogicalTile selects the specialization.
+	 * Drawing maps where graphical and logical tile sizes differ implies some extra
+	 * work, so the caller should pass this as a compile-time flag to select the
+	 * specialized variant of the method.
+	 */
+	template<bool graphicalTileIsLogicalTile> void DrawMapBackgroundInViewport() const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar();
 	/// Adjust fog of war surface to viewport
