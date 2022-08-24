@@ -405,21 +405,21 @@ public:
 extern CVideo Video;
 
 /**
-**  Video synchronization speed. Synchronization time in percent.
-**  If =0, video framerate is not synchronized. 100 is exact
-**  CYCLES_PER_SECOND (30). Game will try to redraw screen within
-**  intervals of VideoSyncSpeed, not more, not less.
+**  Target CyclesPerSecond that are simulated. The default is CYCLES_PER_SECOND.
 **  @see CYCLES_PER_SECOND
 */
-extern int VideoSyncSpeed;
+extern int CyclesPerSecond;
 
-extern int SkipFrames;
+extern double SkipCycles;
 
 /// Fullscreen or windowed set from commandline.
 extern char VideoForceFullScreen;
 
 /// Next frame ticks
 extern double NextFrameTicks;
+
+/// Target refresh rate for renderer
+extern int RefreshRate;
 
 /// Counts frames
 extern unsigned long FrameCounter;

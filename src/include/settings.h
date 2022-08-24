@@ -65,8 +65,6 @@ constexpr unsigned short UpgradeMax = 2048;                /// How many upgrades
 constexpr unsigned char MAX_RACES = 8;
 constexpr unsigned char PlayerNumNeutral = PlayerMax - 1;  /// this is the neutral player slot
 
-/// Frames per second to display (original 30-40)
-constexpr unsigned char FRAMES_PER_SECOND = 30; // 1/30s
 /// Game cycles per second to simulate (original 30-40)
 constexpr unsigned char CYCLES_PER_SECOND = 30;  // 1/30s 0.33ms
 

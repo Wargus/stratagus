@@ -590,7 +590,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				AiSleepCycles = atoi(optarg);
 				continue;
 			case 'S':
-				VideoSyncSpeed = atoi(optarg);
+				RefreshRate = atoi(optarg);
 				continue;
 			case 'u':
 				if (!strcmp(optarg, "userhome")) {

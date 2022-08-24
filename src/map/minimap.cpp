@@ -370,7 +370,7 @@ void CMinimap::Update()
 {
 	static int red_phase;
 
-	int red_phase_changed = red_phase != (int)((FrameCounter / FRAMES_PER_SECOND) & 1);
+	int red_phase_changed = red_phase != (int)((FrameCounter / CYCLES_PER_SECOND) & 1);
 	if (red_phase_changed) {
 		red_phase = !red_phase;
 	}

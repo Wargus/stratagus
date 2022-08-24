@@ -1205,21 +1205,20 @@ Sets the resolution of the video display, valid options are 640x480, 800x600, 10
 <a name="SetVideoSyncSpeed"></a>
 <h3>SetVideoSyncSpeed(speed)</h3>
 
-Sets the video sync speed for the game. 100 is equivilent to 30 frames/second.  200
-is equivilent to 60 frames/second.
+Sets the video render speed for the game. 30 means 30 frames/second. 60 means 60 frames/second. Default is the native monitor refresh rate.
 
 <dl>
 <dt>speed</dt>
-<dd>The speed to set the game to as described, 100 is default</dd>
+<dd>The speed to set the game to as described, default is the monitor refresh rate.</dd>
 <dt><i>RETURNS</i></dt>
 <dd>Nothing</dd>
 </dl>
 
-<h4>Exmaple</h4>
+<h4>Example</h4>
 
 <pre>
     -- Set Speed to 60 frames/second
-    SetVideoSyncSpeed(200)
+    SetVideoSyncSpeed(60)
 </pre>
 
 <a name="ShowEnergySelectedOnly"></a>

@@ -1148,11 +1148,10 @@ static void CheckPlayerThatTimeOut(int hostIndex)
 	if (!lastFrame) {
 		return;
 	}
-	const int framesPerSecond = FRAMES_PER_SECOND * VideoSyncSpeed / 100;
-	const int secs = (FrameCounter - lastFrame) / framesPerSecond;
+	const int secs = (FrameCounter - lastFrame) / CyclesPerSecond;
 	// FIXME: display a menu while we wait
 	const int timeoutInS = CNetworkParameter::Instance.timeoutInS;
-	if (3 <= secs && secs < timeoutInS && FrameCounter % framesPerSecond == 0) {
+	if (3 <= secs && secs < timeoutInS && FrameCounter % CyclesPerSecond == 0) {
 		SetMessage(_("Waiting for player \"%s\": %d:%02d"), Hosts[hostIndex].PlyName,
 				   (timeoutInS - secs) / 60, (timeoutInS - secs) % 60);
 	}

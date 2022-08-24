@@ -99,7 +99,11 @@ static int NumRects;
 static std::map<int, std::string> Key2Str;
 static std::map<std::string, int> Str2Key;
 
-double FrameTicks;     /// Frame length in ms
+/// Frame length in ms
+static double FrameTicks;
+
+/// Target refresh rate for renderer
+int RefreshRate = 0;
 
 const EventCallback *Callbacks;
 
@@ -116,29 +120,47 @@ uint32_t SDL_CUSTOM_KEY_UP;
 --  Sync
 ----------------------------------------------------------------------------*/
 
+static int GetRefreshRate()
+{
+	if (!RefreshRate) {
+		int displayCount = SDL_GetNumVideoDisplays();
+		SDL_DisplayMode mode;
+		for (int i = 0; i < displayCount; i++) {
+			SDL_GetDesktopDisplayMode(0, &mode);
+			if (mode.refresh_rate > RefreshRate) {
+				RefreshRate = mode.refresh_rate;
+			}
+		}
+		if (!RefreshRate) {
+			RefreshRate = 60;
+		}
+	}
+	return RefreshRate;
+}
+
 /**
 **  Initialise video sync.
 **  Calculate the length of video frame and any simulation skips.
 **
-**  @see VideoSyncSpeed @see SkipFrames @see FrameTicks
+**  @see CyclesPerSecond @see SkipCycles @see SkipFrames @see FrameTicks
 */
 void SetVideoSync()
 {
-	double ms;
-
-	if (VideoSyncSpeed) {
-		ms = (1000.0 * 1000.0 / CYCLES_PER_SECOND) / VideoSyncSpeed;
+	int fps = GetRefreshRate();
+	int nativeFps = fps;
+	if (fps < CyclesPerSecond) {
+		fprintf(stdout, "WARNING: Game speed is faster than monitor refresh rate.\n");
+		FrameTicks = 1000.0 / CyclesPerSecond;
+		SDL_GL_SetSwapInterval(0); // disable vsync, so we can run faster than the refresh
 	} else {
-		ms = (double)INT_MAX;
+		FrameTicks = 1000.0 / fps;
+		if (SDL_GL_SetSwapInterval(-1) < 0) { // try to set adaptive vsync
+			SDL_GL_SetSwapInterval(1); // if it failed, set vsync
+		}
 	}
-	SkipFrames = ms / 400;
-	while (SkipFrames && ms / SkipFrames < 200) {
-		--SkipFrames;
-	}
-	ms /= SkipFrames + 1;
+	SkipCycles = (static_cast<double>(fps) / CyclesPerSecond) - 1;
 
-	FrameTicks = ms / 10;
-	DebugPrint("frames %d - %5.2fms\n" _C_ SkipFrames _C_ ms / 10);
+	DebugPrint("native fps: %d, render frame skip: %d, game cycle skip: %f\n" _C_ nativeFps _C_ Preference.FrameSkip _C_ SkipCycles);
 }
 
 /*----------------------------------------------------------------------------
@@ -785,8 +807,10 @@ void WaitEventsOneFrame()
 	}
 	handleInput(NULL);
 
-	if (!SkipGameCycle--) {
-		SkipGameCycle = SkipFrames;
+	if (SkipGameCycle < 0) {
+		SkipGameCycle += SkipCycles;
+	} else {
+		SkipGameCycle--;
 	}
 }
 
@@ -795,21 +819,10 @@ void WaitEventsOneFrame()
 */
 
 static Uint32 LastTick = 0;
-static int RefreshRate = 0;
 
 static void RenderBenchmarkOverlay()
 {
-	if (!RefreshRate) {
-		int displayCount = SDL_GetNumVideoDisplays();
-		SDL_DisplayMode mode;
-		for (int i = 0; i < displayCount; i++) {
-			SDL_GetDesktopDisplayMode(0, &mode);
-			if (mode.refresh_rate > RefreshRate) {
-				RefreshRate = mode.refresh_rate;
-			}
-		}
-	}
-
+	int RefreshRate = GetRefreshRate();
 	// show a bar representing fps, where the entire bar is the max refresh rate of attached displays
 	Uint32 nextTick = SDL_GetTicks();
 	Uint32 frameTime = nextTick - LastTick;
