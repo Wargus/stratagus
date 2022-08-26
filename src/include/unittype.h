@@ -503,6 +503,19 @@ public:
 	bool CheckBuilder;
 };
 
+class CBuildRestrictionLuaCallback : public CBuildRestriction
+{
+public:
+	CBuildRestrictionLuaCallback(LuaCallback *callback) : Func(callback) {};
+	CBuildRestrictionLuaCallback() = delete;
+	virtual ~CBuildRestrictionLuaCallback();
+	virtual void Init() {};
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+
+private:
+	LuaCallback *Func;
+};
+
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType

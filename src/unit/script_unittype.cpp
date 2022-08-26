@@ -240,7 +240,12 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 		const char *value = LuaToString(l, -1, i + 1);
 		++i;
 		lua_rawgeti(l, -1, i + 1);
-		if (!lua_istable(l, -1)) {
+		if (!strcmp(value, "lua-callback")) {
+			CBuildRestrictionLuaCallback *b = new CBuildRestrictionLuaCallback(new LuaCallback(l, -1));
+			lua_pop(l, 1);
+			andlist->push_back(b);
+			continue;
+		} else if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
 		if (!strcmp(value, "distance")) {
