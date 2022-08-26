@@ -458,8 +458,9 @@ static bool DrawTypePortrait(const CUnitType &type)
 		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
 			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
-			if (type.Portrait.CurrMng == 0) {
-				type.Portrait.CurrMng = (MyRand() % (type.Portrait.Num - type.Portrait.Talking - 1)) + 1;
+			if (type.Portrait.CurrMng == 0 && type.Portrait.Num > 1) {
+				// choose only from before the talking portraits (from all, if no talking portrait offset is defined)
+				type.Portrait.CurrMng = MyRand() % ((type.Portrait.Talking ? type.Portrait.Talking : type.Portrait.Num) - 1) + 1;
 				type.Portrait.NumIterations = 1;
 			} else {
 				type.Portrait.CurrMng = 0;
