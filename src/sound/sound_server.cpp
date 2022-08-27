@@ -673,10 +673,11 @@ static int InitSdlSound()
 {
 	fs::path timidityCfg(StratagusLibPath);
 	timidityCfg = timidityCfg / "timidity" / "timidity.cfg";
-	if (fs::exists(timidityCfg)) {
-		Mix_SetTimidityCfg(timidityCfg.generic_u8string().c_str());
+	const char *cfg = SDL_getenv("TIMIDITY_CFG");
+	if (!cfg && fs::exists(timidityCfg)) {
+		SDL_setenv("TIMIDITY_CFG", timidityCfg.generic_u8string().c_str(), 0);
 	} else {
-		Mix_SetTimidityCfg((fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str());
+		SDL_setenv("TIMIDITY_CFG", (fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str(), 0);
 	}
 	// just activate everything we can by setting all bits
 	Mix_Init(std::numeric_limits<unsigned int>::max());
