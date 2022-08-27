@@ -115,7 +115,11 @@ static void KillPlayingProcess() {
 }
 
 static bool External_Play(const std::string &file) {
-	static std::string midi = ".mid";
+	static bool useNativeMidi = !Mix_HasMusicDecoder("TIMIDITY") || SDL_GetHintBoolean("SDL_NATIVE_MUSIC", SDL_FALSE);
+	if (!useNativeMidi) {
+		return false;
+	}
+ 	static std::string midi = ".mid";
 	auto it = midi.begin();
 	if (file.size() > midi.size() &&
 			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
@@ -667,6 +671,13 @@ bool SoundEnabled()
 */
 static int InitSdlSound()
 {
+	fs::path timidityCfg(StratagusLibPath);
+	timidityCfg = timidityCfg / "timidity" / "timidity.cfg";
+	if (fs::exists(timidityCfg)) {
+		Mix_SetTimidityCfg(timidityCfg.generic_u8string().c_str());
+	} else {
+		Mix_SetTimidityCfg((fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str());
+	}
 	// just activate everything we can by setting all bits
 	Mix_Init(std::numeric_limits<unsigned int>::max());
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024)) {

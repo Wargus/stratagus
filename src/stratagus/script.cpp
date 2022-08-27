@@ -2144,13 +2144,7 @@ static int CclDebugPrint(lua_State *l)
 static int CclRestartStratagus(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-#ifdef WIN32
-	char executable_path[MAX_PATH];
-	memset(executable_path, 0, sizeof(executable_path));
-	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
-#else
-	char *executable_path = const_cast<char*>(OriginalArgv[0].c_str());
-#endif
+	std::string executable_path = GetExecutablePath();
 	bool insertRestartArgument = true;
 	for (auto arg : OriginalArgv) {
 		if (arg == "-r") {
@@ -2170,9 +2164,9 @@ static int CclRestartStratagus(lua_State *l)
 	}
 	argv[newArgc - 1] = (char *)0;
 #ifdef WIN32
-	_execv(executable_path, argv);
+	_execv(executable_path.c_str(), argv);
 #else
-	execvp(executable_path, argv);
+	execvp(executable_path.c_str(), argv);
 #endif
 	delete[] argv;
 

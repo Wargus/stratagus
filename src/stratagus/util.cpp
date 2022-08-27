@@ -650,3 +650,15 @@ void aligned_free(void *block)
 	free(block);
 #endif
 }
+
+std::string GetExecutablePath()
+{
+#ifdef WIN32
+	char executable_path[MAX_PATH];
+	memset(executable_path, 0, sizeof(executable_path));
+	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
+#else
+	char *executable_path = const_cast<char*>(OriginalArgv[0].c_str());
+#endif
+	return std::string(executable_path);
+}
