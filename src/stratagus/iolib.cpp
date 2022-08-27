@@ -47,6 +47,7 @@
 #include "SDL.h"
 
 #include <map>
+#include <unordered_map>
 #include <stdarg.h>
 #include <stdio.h>
 
