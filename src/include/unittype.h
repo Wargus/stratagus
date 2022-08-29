@@ -594,8 +594,10 @@ public:
 	int RepairHP;                   /// Amount of HP per repair
 	int RepairCosts[MaxCosts];      /// How much it costs to repair
 
-	int TileWidth;                  /// Tile size on map width
-	int TileHeight;                 /// Tile size on map height
+	short TileWidth;                /// Tile size on map width
+	short TileHeight;               /// Tile size on map height
+	short GraphicalTileWidth;       /// Tile size on map width in graphical tiles
+	short GraphicalTileHeight;      /// Tile size on map height in graphical tiles
 	int BoxWidth;                   /// Selected box size width
 	int BoxHeight;                  /// Selected box size height
 	int BoxOffsetX;                 /// Selected box size horizontal offset

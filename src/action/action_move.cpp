@@ -271,6 +271,10 @@ int DoActionMove(CUnit &unit)
 		default:
 			break;
 	}
+
+	if (this->Finished && !unit.JustMoved) {
+		unit.JustMoved = 0b111;
+	}
 }
 
 /**

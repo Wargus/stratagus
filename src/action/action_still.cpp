@@ -164,30 +164,32 @@ void UnHideUnit(CUnit &unit)
 static bool MoveRandomly(CUnit &unit)
 {
 	if (unit.Type->RandomMovementProbability == false) {
+		if (!unit.JustMoved) {
+			return false;
+		}
 		int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
-		if (shift) {
-			int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
-			auto pos = unit.tilePos;
-			auto w = unit.Type->TileWidth;
-			auto h = unit.Type->TileHeight;
-			w = (w + mult - 1) / mult * mult - w;
-			h = (w + mult - 1) / mult * mult - h;
-			if (w || h) {
-				std::vector<CUnit *> around;
-				SelectAroundUnit(unit, (w + h) / 4, around, IsSameMovementType(unit));
-				Vec2i vec(0, 0);
-				for (auto u : around) {
-					if (u != &unit) {
-						vec += pos - u->tilePos;
-					}
+		if (!shift) {
+			return false;
+		}
+		int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		auto pos = unit.tilePos;
+		auto w = unit.Type->GraphicalTileWidth * mult - unit.Type->TileWidth;
+		auto h = unit.Type->GraphicalTileHeight * mult - unit.Type->TileHeight;
+		if (w || h) {
+			std::vector<CUnit *> around;
+			SelectAroundUnit(unit, (w + h) / 4, around, IsSameMovementType(unit));
+			Vec2i vec(0, 0);
+			for (auto u : around) {
+				if (u != &unit) {
+					vec += pos - u->tilePos;
 				}
-				if (vec.x || vec.y) {
-					auto newPos = pos + vec;
-					Map.Clamp(newPos);
-					if (newPos.x || newPos.y) {
-						CommandMove(unit, newPos, FlushCommands);
-						return true;
-					}
+			}
+			if (vec.x || vec.y) {
+				auto newPos = pos + vec;
+				Map.Clamp(newPos);
+				if (newPos.x || newPos.y) {
+					CommandMove(unit, newPos, FlushCommands);
+					return true;
 				}
 			}
 		}
@@ -420,6 +422,7 @@ bool AutoAttack(CUnit &unit)
 			this->AutoAttackStand(unit);
 		}
 	} else {
+		if (unit.JustMoved) --unit.JustMoved;
 		if (AutoCast(unit) || (unit.IsAgressive() && AutoAttack(unit))
 			|| AutoRepair(unit)
 			|| MoveRandomly(unit)) {

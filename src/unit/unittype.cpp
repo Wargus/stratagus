@@ -56,6 +56,7 @@
 #include "util.h"
 #include "video.h"
 
+#include <cmath>
 #include <ctype.h>
 
 #include <string>
@@ -1058,8 +1059,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 */
 void LoadUnitTypes()
 {
+	int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CUnitType &type = *UnitTypes[i];
+
+		// precalculate tile sizes in graphical tiles (rounding up)
+		type.GraphicalTileWidth = std::ceil(static_cast<double>(type.TileWidth) / mult);
+		type.GraphicalTileHeight = std::ceil(static_cast<double>(type.TileHeight) / mult);
 
 		// Lookup icons.
 		type.Icon.Load();

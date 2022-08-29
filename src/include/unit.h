@@ -384,6 +384,8 @@ public:
 
 	unsigned ZDisplaced : 1;     /// The IY displacement of this unit is simulating a "height" displacement (for flyers). This is useful to draw shadows appropriately
 
+	unsigned JustMoved : 3;      /// The unit last moved of its own accord this amount of cycles of standing still ago
+
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 	/// NULL if the unit was not rescued.
