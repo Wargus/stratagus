@@ -179,7 +179,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 		depot = NULL;
 	}
 	// clicking on an allied depot still doesn't allow you to deposit there depending on preference
-	if (!GameSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
+	if (depot && !GameSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
 		depot = NULL;
 	}
 	order->CurrentResource = harvester.CurrentResource;
@@ -798,8 +798,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
-					if (Preference.MineNotifications 
-						&& unit.Player->Index == ThisPlayer->Index 
+					if (Preference.MineNotifications
+						&& unit.Player->Index == ThisPlayer->Index
 						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
 					}
@@ -863,11 +863,11 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		Assert(source->Resource.Active >= 0);
 		//Store resource position.
 		this->Resource.Mine = source;
-		
-		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
-			&& source->IsAlive() 
-			&& !source->MineLow 
-			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10 
+
+		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index
+			&& source->IsAlive()
+			&& !source->MineLow
+			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
 			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
 				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				source->MineLow = 1;
@@ -1119,11 +1119,11 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				} else if (depot != nullptr) {
 					start_unit = depot;
 				}
-				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource, 
+				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource,
 										unit.Player->AiEnabled, (newdepot ? newdepot : depot));
 			}
 
-									
+
 		}
 
 		if (goal) {
