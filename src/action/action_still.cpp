@@ -163,10 +163,40 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (unit.Type->RandomMovementProbability == false
-		|| ((SyncRand() % 100) > unit.Type->RandomMovementProbability)) {
+	if (unit.Type->RandomMovementProbability == false) {
+		int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		if (shift) {
+			int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+			auto pos = unit.tilePos;
+			auto w = unit.Type->TileWidth;
+			auto h = unit.Type->TileHeight;
+			w = (w + mult - 1) / mult * mult - w;
+			h = (w + mult - 1) / mult * mult - h;
+			if (w || h) {
+				std::vector<CUnit *> around;
+				SelectAroundUnit(unit, (w + h) / 4, around, IsSameMovementType(unit));
+				Vec2i vec(0, 0);
+				for (auto u : around) {
+					if (u != &unit) {
+						vec += pos - u->tilePos;
+					}
+				}
+				if (vec.x || vec.y) {
+					auto newPos = pos + vec;
+					Map.Clamp(newPos);
+					if (newPos.x || newPos.y) {
+						CommandMove(unit, newPos, FlushCommands);
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
+	if ((SyncRand() % 100) > unit.Type->RandomMovementProbability) {
+		return false;
+	}
+
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
