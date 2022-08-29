@@ -451,7 +451,7 @@ public:
 		PauseOnLeave(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
-		SelectionRectangleIndicatesDamage(false),
+		SelectionRectangleIndicatesDamage(false), FormationMovement(true),
 		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -470,6 +470,7 @@ public:
 	bool NoStatusLineTooltips; /// Don't show messages on status line
 	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
 	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
+	bool FormationMovement; /// If true, player controlled units stay in formation
 
 	int FrameSkip;          /// Mask used to skip rendering frames (useful for slow renderers that keep up with the game logic, but not the rendering to screen like e.g. original Raspberry Pi)
 

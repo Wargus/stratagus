@@ -37,6 +37,7 @@ class CPreference
 	tolua_property bool AllyDepositsAllowed;
 	bool HardwareCursor;
 	bool SelectionRectangleIndicatesDamage;
+	bool FormationMovement;
 
         unsigned int FrameSkip;
 
