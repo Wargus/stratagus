@@ -281,6 +281,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		canShortcut = false;
 	} else {
 		canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
+		graphicTileOffset = 1;
 	}
 
 	while (sy < 0) {

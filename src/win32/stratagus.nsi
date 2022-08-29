@@ -216,7 +216,6 @@ Section "${NAME}"
 	SetOutPath $INSTDIR
 	File "${EXE}"
 	File stratagus-midiplayer.exe
-	File *.dll
 	WriteRegStr HKLM "${REGKEY}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${REGKEY}" "UninstallString" "$\"$INSTDIR\${UNINSTALL}$\""
 	WriteRegStr HKLM "${REGKEY}" "QuietUninstallString" "$\"$INSTDIR\${UNINSTALL}$\" /S"
@@ -239,7 +238,6 @@ Section "un.${NAME}" Executable
 	SectionIn RO
 
 	Delete "$INSTDIR\${EXE}"
-	Delete "$INSTDIR\*.dll"
 	Delete "$INSTDIR\${UNINSTALL}"
 	RMDir "$INSTDIR"
 	DeleteRegKey /ifempty HKLM "${REGKEY}"

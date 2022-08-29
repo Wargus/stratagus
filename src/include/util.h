@@ -32,6 +32,16 @@
 
 //@{
 
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+error "Missing the <filesystem> header."
+#endif
+
 #include <cstdlib>
 #include <cstdint>
 #include <string>
@@ -149,6 +159,12 @@ bool supportsSSE2();
 bool supportsAVX();
 void *aligned_malloc(size_t alignment, size_t size);
 void aligned_free(void *block);
+
+/*----------------------------------------------------------------------------
+--  SIMD support
+----------------------------------------------------------------------------*/
+
+std::string GetExecutablePath();
 
 //@}
 

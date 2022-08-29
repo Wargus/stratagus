@@ -3,8 +3,11 @@
     "cmake.toolset": "v142",
     "cmake.platform": "win32",
     "cmake.configureSettings": {
-        "WIN32_CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ENABLE_NSIS": "NO",
+        "BUILD_VENDORED_LUA": "ON",
+        "BUILD_VENDORED_SDL": "ON",
+        "BUILD_VENDORED_MEDIA_LIBS": "ON",
     },
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"

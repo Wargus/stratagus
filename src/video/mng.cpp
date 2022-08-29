@@ -100,7 +100,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 {
 	mng_imgtype type = mng_get_sigtype(handle);
 	if (type != mng_it_mng) {
-		return TRUE;
+		return MNG_TRUE;
 	}
 
 	Mng *mng = (Mng *)mng_get_userdata(handle);
@@ -184,7 +184,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 	if (errortext) {
 		DebugPrint("MNG error: %s\n" _C_ errortext);
 	}
-	return TRUE;
+	return MNG_TRUE;
 }
 
 
