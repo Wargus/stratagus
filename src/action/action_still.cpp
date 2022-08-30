@@ -185,7 +185,7 @@ static bool MoveRandomly(CUnit &unit)
 				}
 			}
 			if (vec.x || vec.y) {
-				auto newPos = pos + vec;
+				auto newPos = pos + Vec2i(std::clamp(vec.x, (short)-1, (short)1), std::clamp(vec.y, (short)-1, (short)1));
 				Map.Clamp(newPos);
 				if (newPos.x || newPos.y) {
 					CommandMove(unit, newPos, FlushCommands);
