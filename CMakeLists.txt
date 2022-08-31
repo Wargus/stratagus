@@ -816,7 +816,7 @@ endif()
 # Stratagus definitions
 
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
+include_directories(SYSTEM ${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
 set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES} ${PNG_LIBRARY})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
@@ -825,26 +825,26 @@ endif()
 
 if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
-	include_directories(${BZIP2_INCLUDE_DIR})
+	include_directories(SYSTEM ${BZIP2_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
 endif()
 
 if(WITH_MNG AND MNG_FOUND)
 	add_definitions(-DUSE_MNG)
-	include_directories(${MNG_INCLUDE_DIR})
+	include_directories(SYSTEM ${MNG_INCLUDE_DIR})
 	add_definitions(${MNG_DEFINITIONS})
 	set(stratagus_LIBS ${stratagus_LIBS} ${MNG_LIBRARY})
 endif()
 
 if(WITH_OGGVORBIS AND OGGVORBIS_FOUND)
 	add_definitions(-DUSE_VORBIS)
-	include_directories(${OGGVORBIS_INCLUDE_DIR})
+	include_directories(SYSTEM ${OGGVORBIS_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${OGG_LIBRARY} ${VORBIS_LIBRARY})
 endif()
 
 if(WITH_THEORA AND THEORA_FOUND)
 	add_definitions(-DUSE_THEORA)
-	include_directories(${THEORA_INCLUDE_DIR})
+	include_directories(SYSTEM ${THEORA_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${THEORA_LIBRARY})
 endif()
 
