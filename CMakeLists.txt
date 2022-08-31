@@ -1346,8 +1346,8 @@ if (WIN32)
 	install(TARGETS midiplayer DESTINATION ${GAMEDIR})
 endif()
 
-if(ENABLE_DOC AND DOXYGEN_FOUND)
 	install(FILES doc/stratagus.6 DESTINATION ${MANDIR})
+if(ENABLE_DOC)
 	install(FILES
 		doc/development.html
 		doc/faq.html
@@ -1360,8 +1360,11 @@ if(ENABLE_DOC AND DOXYGEN_FOUND)
 		doc/README-SDL.txt
 		DESTINATION share/doc/stratagus
 	)
-	install(DIRECTORY doc/graphics doc/scripts ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION ${DOCDIR})
-endif(ENABLE_DOC AND DOXYGEN_FOUND)
+	install(DIRECTORY doc/graphics doc/scripts DESTINATION ${DOCDIR})
+	if(DOXYGEN_FOUND)
+		install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doxygen DESTINATION ${DOCDIR})
+	endif()
+endif()
 
 if(ENABLE_DEV)
 	install(FILES ${gameheaders_HDRS} DESTINATION ${STRATAGUS_HEADERS})
