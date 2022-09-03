@@ -524,6 +524,7 @@ CUnitType::CUnitType() :
 	OnDeath(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
 	OnReady(NULL), TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
 	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
+	PersonalSpaceWidth(0), PersonalSpaceHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
@@ -1062,10 +1063,6 @@ void LoadUnitTypes()
 	int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CUnitType &type = *UnitTypes[i];
-
-		// precalculate tile sizes in graphical tiles (rounding up)
-		type.GraphicalTileWidth = std::ceil(static_cast<double>(type.TileWidth) / mult);
-		type.GraphicalTileHeight = std::ceil(static_cast<double>(type.TileHeight) / mult);
 
 		// Lookup icons.
 		type.Icon.Load();

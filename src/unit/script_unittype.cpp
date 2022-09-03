@@ -707,6 +707,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "TileSize")) {
 			CclGetPos(l, &type->TileWidth, &type->TileHeight);
+		} else if (!strcmp(value, "PersonalSpace")) {
+			CclGetPos(l, &type->PersonalSpaceWidth, &type->PersonalSpaceHeight);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "Neutral")) {

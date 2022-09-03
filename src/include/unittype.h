@@ -596,8 +596,8 @@ public:
 
 	short TileWidth;                /// Tile size on map width
 	short TileHeight;               /// Tile size on map height
-	short GraphicalTileWidth;       /// Tile size on map width in graphical tiles
-	short GraphicalTileHeight;      /// Tile size on map height in graphical tiles
+	short PersonalSpaceWidth;       /// How much "personal space" the unit tries to leave in X direction
+	short PersonalSpaceHeight;      /// How much "personal space" the unit tries to leave in Y direction
 	int BoxWidth;                   /// Selected box size width
 	int BoxHeight;                  /// Selected box size height
 	int BoxOffsetX;                 /// Selected box size horizontal offset

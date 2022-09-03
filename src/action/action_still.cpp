@@ -173,11 +173,11 @@ static bool MoveRandomly(CUnit &unit)
 		}
 		int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 		auto pos = unit.tilePos;
-		auto w = unit.Type->GraphicalTileWidth * mult - unit.Type->TileWidth;
-		auto h = unit.Type->GraphicalTileHeight * mult - unit.Type->TileHeight;
+		auto w = unit.Type->PersonalSpaceWidth;
+		auto h = unit.Type->PersonalSpaceHeight;
 		if (w || h) {
 			std::vector<CUnit *> around;
-			SelectAroundUnit(unit, (w + h) / 4, around, IsSameMovementType(unit));
+			SelectAroundUnit(unit, (w + h) / 2, around, IsSameMovementType(unit));
 			Vec2i vec(0, 0);
 			for (auto u : around) {
 				if (u != &unit) {
