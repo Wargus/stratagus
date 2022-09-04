@@ -1602,6 +1602,42 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 }
 
 /**
+**  Turn towards another unit or a location.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>
+**		<strong>TurnTowardsLocation(peon, {10, 10})</strong> -- turn peon towards location 10x10
+**		<strong>TurnTowardsLocation(peon, goldmine)</strong> -- turn peon towards the goldmine unit
+** </code></div>
+*/
+static int CclTurnTowardsLocation(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	Vec2i dir;
+	if (lua_istable(l, 2)) {
+		CclGetPos(l, &dir.x, &dir.y, 2);
+		dir = dir - unit->tilePos;
+	} else {
+		lua_pushvalue(l, 2);
+		CUnit *target = CclGetUnit(l);
+		lua_pop(l, 1);
+		dir = target->tilePos + target->Type->GetHalfTileSize() - unit->tilePos;
+	}
+
+	UnitHeadingFromDeltaXY(*unit, dir);
+
+	return 0;
+}
+
+/**
 **  Register CCL features for unit.
 */
 void UnitCclRegister()
@@ -1637,6 +1673,8 @@ void UnitCclRegister()
 
 	lua_register(Lua, "SelectSingleUnit", CclSelectSingleUnit);
 	lua_register(Lua, "EnableSimplifiedAutoTargeting", CclEnableSimplifiedAutoTargeting);
+
+	lua_register(Lua, "TurnTowardsLocation", CclTurnTowardsLocation);
 }
 
 //@}
