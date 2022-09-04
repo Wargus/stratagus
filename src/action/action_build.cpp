@@ -385,8 +385,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	} else {
 		this->State = State_BuildFromOutside;
 		this->BuildingUnit = build;
-		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
-		UnitUpdateHeading(unit);
+		UnitHeadingFromDeltaXY(unit, build->tilePos - unit.tilePos);
 	}
 	return true;
 }
@@ -446,19 +445,10 @@ CUnit *COrder_Build::GetBuildingUnit() const
 
 /* virtual */ void COrder_Build::Execute(CUnit &unit)
 {
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 	if (this->State <= State_MoveToLocationMax) {
 		if (this->MoveToLocation(unit)) {
 			this->Finished = true;

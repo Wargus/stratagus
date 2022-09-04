@@ -232,19 +232,10 @@ int DoActionMove(CUnit &unit)
 {
 	Assert(unit.CanMove());
 
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 	// FIXME: (mr-russ) Make a reachable goal here with GoalReachable ...
 
 	switch (DoActionMove(unit)) { // reached end-point?

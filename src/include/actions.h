@@ -126,6 +126,9 @@ public:
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
+	bool IsWaiting(CUnit &unit);
+	void StopWaiting(CUnit &unit);
+
 	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
 	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
 	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);

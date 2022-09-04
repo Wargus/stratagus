@@ -1278,19 +1278,10 @@ void COrder_Resource::Execute(CUnit &unit)
 	// can be different by Cloning (trained unit)...
 	this->worker = &unit;
 
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 
 	// Let's start mining.
 	if (this->State == SUB_START_RESOURCE) {

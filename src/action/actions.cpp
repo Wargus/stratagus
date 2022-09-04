@@ -111,6 +111,28 @@ void COrder::ClearGoal()
 	Goal.Reset();
 }
 
+bool COrder::IsWaiting(CUnit &unit)
+{
+	if (unit.Wait) {
+		if (!unit.Waiting) {
+			unit.Waiting = 1;
+			unit.WaitBackup = unit.Anim;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		unit.Wait--;
+		return true;
+	}
+	return false;
+}
+
+void COrder::StopWaiting(CUnit &unit)
+{
+	if (unit.Waiting) {
+		unit.Anim = unit.WaitBackup;
+		unit.Waiting = 0;
+	}
+}
+
 void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 {
 	Assert(false); // should not be called.
