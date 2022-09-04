@@ -659,7 +659,7 @@ static int CclUnit(lua_State *l)
 }
 
 /**
-**  Move a unit on map.
+**  Move a unit on map, optionally with offset.
 **
 **  @param l  Lua state.
 **
@@ -670,11 +670,17 @@ static int CclUnit(lua_State *l)
 ** <div class="example"><code>-- Create the unit
 **	footman = CreateUnit("unit-footman", 0, {7, 4})
 **	-- Move the unit to position 20 (x) and 10 (y)
-**	<strong>MoveUnit</strong>(footman,{20,10})</code></div>
+**	<strong>MoveUnit</strong>(footman,{20,10})
+**	-- Move the unit to position 15 (x) and 9 (y) + 4 (x) and 7 (y) pixels overlap into the next tile
+**	<strong>MoveUnit</strong>(footman,{15,9},{4,7})
+** </code></div>
 */
 static int CclMoveUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	int nargs = lua_gettop(l);
+	if (nargs < 2 || nargs > 3) {
+		LuaError(l, "incorrect argument, expected 2 or 3 arguments");
+	}
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
@@ -695,6 +701,13 @@ static int CclMoveUnit(lua_State *l)
 		unit->tilePos = ipos;
 		DropOutOnSide(*unit, heading, NULL);
 	}
+
+	if (nargs == 3) {
+		CclGetPos(l, &ipos.x, &ipos.y, 3);
+		unit->IX = ipos.x;
+		unit->IY = ipos.y;
+	}
+
 	lua_pushvalue(l, 1);
 	return 1;
 }
