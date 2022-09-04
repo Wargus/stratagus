@@ -409,6 +409,9 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 */
 void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 {
+	if (unit.Type->BoolFlag[SURROUND_ATTACK_INDEX].value) {
+		return;
+	}
 	const Vec2i dir = target ? (target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos)
 					  			: (this->goalPos - unit.tilePos);
 	const unsigned char oldDir = unit.Direction;

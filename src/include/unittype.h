@@ -171,7 +171,8 @@ enum {
 	WALL_INDEX,						/// Use special logic for Direction field.
 	NORANDOMPLACING_INDEX,			/// Don't use random frame rotation
 	ORGANIC_INDEX,					/// Organic unit (used for death coil spell)
-	SIDEATTACK_INDEX,
+	SIDEATTACK_INDEX,               /// Unit turns sideways to attack (like e.g. a galley would before firing a broadside)
+	SURROUND_ATTACK_INDEX,          /// Unit doesn't turn towards the attack (it can shoot in any direction)
 	SKIRMISHER_INDEX,
 	ALWAYSTHREAT_INDEX,				/// Unit always considered as threat for auto targeting algorihm, useful for unit without main attack ability, but which can cast spells (f.e. defiler in SC:BW)
 	ELEVATED_INDEX,					/// Unit is elevated and can see over opaque tiles placed in the same ground level with the unit.
