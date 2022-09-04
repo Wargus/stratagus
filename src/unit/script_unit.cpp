@@ -1289,6 +1289,8 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushstring(l, PlayerTypeNames[static_cast<int>(unit->Player->Type)].c_str());
+	} else if (!strcmp(value, "Summoned")) {
+		lua_pushnumber(l, unit->Summoned);
 	} else if (!strcmp(value, "TTLPercent")) {
 		if (unit->Summoned && unit->TTL) {
 			unsigned long time_lived = GameCycle - unit->Summoned;
