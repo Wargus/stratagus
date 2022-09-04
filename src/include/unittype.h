@@ -628,6 +628,7 @@ public:
 	int AnnoyComputerFactor;        /// How much this annoys the computer
 	int AiAdjacentRange;            /// Min radius for AI build surroundings checking
 	int MouseAction;                /// Right click action
+	uint8_t RotationSpeed = 128;    /// Max unit.Direction change per frame. 128 is maximum
 #define MouseActionNone      0      /// Nothing
 #define MouseActionAttack    1      /// Attack
 #define MouseActionMove      2      /// Move

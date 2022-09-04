@@ -419,8 +419,9 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim
 		const CAnimation *CurrAnim;  /// CurrAnim
-		int Wait;                    /// Wait
-		int Unbreakable;             /// Unbreakable
+		short Wait;                  /// Wait time
+		signed char Rotate;          /// Rotation target and direction
+		unsigned char Unbreakable;   /// Unbreakable
 	} Anim, WaitBackup;
 
 

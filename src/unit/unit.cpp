@@ -2175,8 +2175,14 @@ void UnitUpdateHeading(CUnit &unit)
 	unit.Frame *= unit.Type->NumDirections / 2 + 1;
 	// Remove heading, keep animation frame
 
+	// show next rotation frame as per rotation animation
+	unsigned char unitDir = unit.Direction;
+	if (unit.Anim.Rotate) {
+		unitDir -= unit.Anim.Rotate;
+	}
+
 	nextdir = 256 / unit.Type->NumDirections;
-	dir = ((unit.Direction + nextdir / 2) & 0xFF) / nextdir;
+	dir = ((unitDir + nextdir / 2) & 0xFF) / nextdir;
 	if (dir <= LookingS / nextdir) { // north->east->south
 		unit.Frame += dir;
 	} else {
@@ -2196,8 +2202,21 @@ void UnitUpdateHeading(CUnit &unit)
 */
 void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 {
-	unit.Direction = DirectionToHeading(delta);
-	UnitUpdateHeading(unit);
+	unsigned char newDirection = DirectionToHeading(delta);
+	unsigned char diffLeft = unit.Direction - newDirection;
+	unsigned char diffRight = newDirection - unit.Direction;
+	if (diffLeft <= diffRight) {
+		if (diffLeft == 128) {
+			unit.Anim.Rotate = -128;
+		} else {
+			Assert((signed char)diffLeft >= 0);
+			unit.Anim.Rotate = -((signed char)(diffLeft));
+		}
+	} else {
+		Assert((signed char)diffRight >= 0);
+		unit.Anim.Rotate = diffRight;
+	}
+	unit.Direction = newDirection;
 }
 
 /*----------------------------------------------------------------------------

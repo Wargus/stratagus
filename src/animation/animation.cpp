@@ -266,6 +266,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		} else {
 			return 0;
 		}
+	} else if (s[0] == 'R') { //pending rotational value
+		return unit.Anim.Rotate;
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');
@@ -350,6 +352,19 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		Assert(!unit.Anim.Unbreakable || unit.Waiting);
 		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
 		unit.Anim.Wait = 0;
+	}
+
+	if (unit.Anim.Rotate) {
+		signed char r = unit.Anim.Rotate;
+		if (r < 0) {
+			unit.Anim.Rotate += unit.Type->RotationSpeed;
+		} else {
+			unit.Anim.Rotate -= unit.Type->RotationSpeed;
+		}
+		if ((unit.Anim.Rotate ^ r) < 0) {
+			unit.Anim.Rotate = 0; // overflow, done
+		}
+		UnitUpdateHeading(unit);
 	}
 
 	// Currently waiting

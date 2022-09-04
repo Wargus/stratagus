@@ -867,6 +867,8 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 				type->RepairCosts[res] = LuaToNumber(l, -1, k + 1);
 			}
+		} else if (!strcmp(value, "RotationSpeed")) {
+			type->RotationSpeed = std::min(std::max(1, std::abs(LuaToNumber(l, -1))), 128);
 		} else if (!strcmp(value, "CanTargetLand")) {
 			if (LuaToBoolean(l, -1)) {
 				type->CanTarget |= CanTargetLand;
