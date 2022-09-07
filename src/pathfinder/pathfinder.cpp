@@ -414,6 +414,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 	// to know if there exists a path.
 	if (path != NULL) {
 		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
+		output.OverflowLength = std::min<int>(i - output.Length, PathFinderOutput::MAX_OVERFLOW);
 		if (output.Length == 0) {
 			++output.Length;
 		}
@@ -447,7 +448,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		const int result = NewPath(input, output);
 
 		if (result == PF_UNREACHABLE) {
-			output.Length = 0;
+			output.OverflowLength = output.Length = 0;
 			return result;
 		}
 		if (result == PF_REACHED) {
@@ -467,7 +468,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			AstarDebugPrint("WAIT at %d\n" _C_ output.Fast);
 			result = PF_WAIT;
 		} else {
-			output.Fast = 10;
+			output.Fast = PathFinderOutput::MAX_FAST;
 			AstarDebugPrint("SET WAIT to 10\n");
 			result = PF_WAIT;
 		}

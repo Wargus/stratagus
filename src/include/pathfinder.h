@@ -43,6 +43,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <queue>
+#include <sys/types.h>
 #include "vec2i.h"
 
 class CUnit;
@@ -100,16 +101,21 @@ private:
 class PathFinderOutput
 {
 public:
-	enum {MAX_PATH_LENGTH = 28}; /// max length of precalculated path
+	enum {
+		MAX_PATH_LENGTH = 28,
+		MAX_FAST = 10,
+		MAX_OVERFLOW = 15           /// max length of precalculated path
+	};
 public:
 	PathFinderOutput();
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
 public:
-	unsigned short int Cycles;  /// how much Cycles we move.
-	char Fast;                  /// Flag fast move (one step)
-	char Length;                /// stored path length
-	char Path[MAX_PATH_LENGTH]; /// directions of stored path
+	u_int16_t Cycles;               /// how much Cycles we move.
+	unsigned Fast:4;                /// Flag fast move (one step). Fits at most MAX_FAST
+	unsigned OverflowLength:4;      /// overflow length not stored in Path (may be more). Fits at most MAX_OVERFLOW
+	u_int8_t Length;                /// stored path length
+	char Path[MAX_PATH_LENGTH];     /// directions of stored path
 };
 
 class PathFinderData

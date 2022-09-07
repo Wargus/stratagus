@@ -71,6 +71,7 @@
 #include "spells.h"
 #include "unit.h"
 #include "unittype.h"
+#include "pathfinder.h"
 
 #define ANIMATIONS_MAXANIM 4096
 
@@ -268,6 +269,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 	} else if (s[0] == 'R') { //pending rotational value
 		return unit.Anim.Rotate;
+	} else if (s[0] == 'W') { //remaining way
+		return unit.pathFinderData->output.Length + 1 + unit.pathFinderData->output.OverflowLength;
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');

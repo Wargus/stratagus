@@ -248,8 +248,9 @@ void PathFinderOutput::Load(lua_State *l)
 		if (!strcmp(tag, "cycles")) {
 			this->Cycles = LuaToNumber(l, -1, i);
 		} else if (!strcmp(tag, "fast")) {
-			this->Fast = 1;
-			--i;
+			this->Fast = LuaToNumber(l, -1, i);
+		} else if (!strcmp(tag, "overflow-length")) {
+			this->OverflowLength = LuaToNumber(l, -1, i);
 		} else if (!strcmp(tag, "path")) {
 			lua_rawgeti(l, -1, i);
 			if (!lua_istable(l, -1)) {

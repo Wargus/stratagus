@@ -100,7 +100,10 @@ void PathFinderOutput::Save(CFile &file) const
 	file.printf("\"pathfinder-output\", {");
 
 	if (this->Fast) {
-		file.printf("\"fast\", ");
+		file.printf("\"fast\", %d, ", this->Fast);
+	}
+	if (this->OverflowLength) {
+		file.printf("\"overflow-length\", %d, ", this->OverflowLength);
 	}
 	if (this->Length > 0) {
 		file.printf("\"path\", {");
