@@ -701,6 +701,10 @@ endif()
 
 if(BUILD_VENDORED_LUA)
   vendored_lua()
+else()
+  include_directories(${LUA_INCLUDE_DIR})
+  set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES})
+  find_package(Tolua++)
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
