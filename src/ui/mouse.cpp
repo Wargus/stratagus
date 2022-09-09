@@ -29,6 +29,7 @@
 
 //@{
 
+#include "tileset.h"
 #define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
 #define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
 
@@ -636,7 +637,54 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	int acknowledged = 0; // to play sound
-	for (size_t i = 0; i != Selected.size(); ++i) {
+
+	auto sz = Selected.size();
+	if (dest == NULL && sz < 12 && Preference.FormationMovement) {
+		const short magicBoxSize = 7 << Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		std::vector<Vec2i> targetPositions(sz);
+		Vec2i max, min, center;
+		max = min = center = Selected[0]->tilePos;
+		bool tooBig = false;
+
+		for (auto i = 1; i < sz; ++i) {
+			auto unit = Selected[i];
+			auto unitTilePos = unit->tilePos;
+			max.x = std::max(unitTilePos.x, max.x);
+			min.x = std::min(unitTilePos.x, min.x);
+			if (max.x - min.x > magicBoxSize) {
+				tooBig = true;
+				break;
+			}
+
+			max.y = std::max(unitTilePos.y, max.y);
+			min.y = std::min(unitTilePos.y, min.y);
+			if (max.y - min.y > magicBoxSize) {
+				tooBig = true;
+				break;
+			}
+
+			center.x += unitTilePos.x;
+			center.y += unitTilePos.y;
+		}
+
+		if (!tooBig) {
+			center.x = center.x / sz;
+			center.y = center.y / sz;
+
+			for (auto i = 0; i < sz; ++i) {
+				auto unit = Selected[i];
+				auto unitTilePos = unit->tilePos;
+				
+				auto targetPosForUnit = pos + (unitTilePos - center);
+				Map.Clamp(targetPosForUnit);
+
+				DoRightButton_ForSelectedUnit(*unit, dest, targetPosForUnit, acknowledged);
+			}
+			return;
+		}
+	}
+
+	for (size_t i = 0; i < sz; ++i) {
 		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
 

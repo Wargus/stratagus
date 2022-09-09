@@ -178,6 +178,10 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	if (depot && depot->Destroyed) {
 		depot = NULL;
 	}
+	// clicking on an allied depot still doesn't allow you to deposit there depending on preference
+	if (depot && !GameSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
+		depot = NULL;
+	}
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
@@ -794,8 +798,8 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
-					if (Preference.MineNotifications 
-						&& unit.Player->Index == ThisPlayer->Index 
+					if (Preference.MineNotifications
+						&& unit.Player->Index == ThisPlayer->Index
 						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
 							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
 					}
@@ -859,11 +863,11 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		Assert(source->Resource.Active >= 0);
 		//Store resource position.
 		this->Resource.Mine = source;
-		
-		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
-			&& source->IsAlive() 
-			&& !source->MineLow 
-			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10 
+
+		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index
+			&& source->IsAlive()
+			&& !source->MineLow
+			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
 			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
 				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				source->MineLow = 1;
@@ -1115,11 +1119,11 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				} else if (depot != nullptr) {
 					start_unit = depot;
 				}
-				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource, 
+				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource,
 										unit.Player->AiEnabled, (newdepot ? newdepot : depot));
 			}
 
-									
+
 		}
 
 		if (goal) {
@@ -1274,19 +1278,10 @@ void COrder_Resource::Execute(CUnit &unit)
 	// can be different by Cloning (trained unit)...
 	this->worker = &unit;
 
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 
 	// Let's start mining.
 	if (this->State == SUB_START_RESOURCE) {

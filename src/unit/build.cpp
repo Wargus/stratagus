@@ -38,6 +38,8 @@
 
 #include "unittype.h"
 
+#include "luacallback.h"
+
 #include "actions.h"
 #include "map.h"
 #include "player.h"
@@ -338,6 +340,27 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 		}
 	}
 	return true;
+}
+
+/**
+**  Check AddOn Restriction via lua
+*/
+bool CBuildRestrictionLuaCallback::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontop) const
+{
+	this->Func->pushPreamble();
+	this->Func->pushInteger(UnitNumber(*builder));
+	this->Func->pushString(type.Ident);
+	this->Func->pushInteger(pos.x);
+	this->Func->pushInteger(pos.y);
+	this->Func->pushInteger((ontop && ontop->IsAlive()) ? UnitNumber(*ontop) : -1);
+	this->Func->run(1);
+	bool result = this->Func->popBoolean();
+	return result;
+}
+
+CBuildRestrictionLuaCallback::~CBuildRestrictionLuaCallback()
+{
+	delete Func;
 }
 
 class AliveConstructedAndSameTypeAs

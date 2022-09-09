@@ -158,6 +158,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#ifdef BUILD_VENDORED_SDL
+#pragma comment(lib, "Setupapi.lib")
+#pragma comment(lib, "Version.lib")
+#pragma comment(lib, "Imm32.lib")
+#endif
+
 #include <ctype.h>
 
 #ifdef USE_BEOS
@@ -590,7 +596,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				AiSleepCycles = atoi(optarg);
 				continue;
 			case 'S':
-				VideoSyncSpeed = atoi(optarg);
+				RefreshRate = atoi(optarg);
 				continue;
 			case 'u':
 				if (!strcmp(optarg, "userhome")) {

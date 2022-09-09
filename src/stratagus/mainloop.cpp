@@ -110,15 +110,15 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = (int)(speed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * vp->MapWidth / 2 * PixelTileSize.x * CYCLES_PER_SECOND / 4);
+		stepy = (int)(speed * vp->MapHeight / 2 * PixelTileSize.y * CYCLES_PER_SECOND / 4);
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
-		stepx = (int)(speed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * PixelTileSize.x * CYCLES_PER_SECOND / 4);
+		stepy = (int)(speed * PixelTileSize.y * CYCLES_PER_SECOND / 4);
 	}
 	if ((state & (ScrollLeft | ScrollRight)) && (state & (ScrollLeft | ScrollRight)) != (ScrollLeft | ScrollRight)) {
-		stepx = stepx * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
+		stepx = stepx * 3;
 		remx += stepx - (stepx / 100) * 100;
 		stepx /= 100;
 		if (remx > 100) {
@@ -129,7 +129,7 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 		stepx = 0;
 	}
 	if ((state & (ScrollUp | ScrollDown)) && (state & (ScrollUp | ScrollDown)) != (ScrollUp | ScrollDown)) {
-		stepy = stepy * 100 * 100 / VideoSyncSpeed / FRAMES_PER_SECOND / (SkipFrames + 1);
+		stepy = stepy * 3;
 		remy += stepy - (stepy / 100) * 100;
 		stepy /= 100;
 		if (remy > 100) {
@@ -255,7 +255,7 @@ static void GameLogicLoop()
 	//
 	// Game logic part
 	//
-	if (!GamePaused && NetworkInSync && !SkipGameCycle) {
+	if (!GamePaused && NetworkInSync && SkipGameCycle < 1) {
 		SinglePlayerReplayEachCycle();
 		++GameCycle;
 		MultiPlayerReplayEachCycle();
@@ -333,11 +333,6 @@ static void GameLogicLoop()
 #endif
 }
 
-//#define REALVIDEO
-#ifdef REALVIDEO
-static	int RealVideoSyncSpeed;
-#endif
-
 static void DisplayLoop()
 {
 	/* update only if viewmode changed */
@@ -359,12 +354,6 @@ static void DisplayLoop()
 
 	ColorCycle();
 
-#ifdef REALVIDEO
-	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
-		RealVideoSyncSpeed = VideoSyncSpeed;
-		VideoSyncSpeed = 3000;
-	}
-#endif
 	if (FastForwardCycle <= GameCycle || GameCycle <= 10 || !(GameCycle & CallPeriod::cEvery256th)) {
 		//FIXME: this might be better placed somewhere at front of the
 		// program, as we now still have a game on the background and
@@ -375,11 +364,6 @@ static void DisplayLoop()
 		UpdateDisplay();
 		RealizeVideoMemory();
 	}
-#ifdef REALVIDEO
-	if (FastForwardCycle == GameCycle) {
-		VideoSyncSpeed = RealVideoSyncSpeed;
-	}
-#endif
 }
 
 static void SingleGameLoop()
@@ -416,10 +400,6 @@ void GameMainLoop()
 
 	CParticleManager::init();
 
-#ifdef REALVIDEO
-	RealVideoSyncSpeed = VideoSyncSpeed;
-#endif
-
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
 	long ticks = SDL_GetTicks();
@@ -440,11 +420,6 @@ void GameMainLoop()
 		return;
 	}
 
-#ifdef REALVIDEO
-	if (FastForwardCycle > GameCycle) {
-		VideoSyncSpeed = RealVideoSyncSpeed;
-	}
-#endif
 	NetworkQuitGame();
 	EndReplayLog();
 

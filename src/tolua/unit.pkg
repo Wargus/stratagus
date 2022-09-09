@@ -34,8 +34,10 @@ class CPreference
 	bool NoStatusLineTooltips;
 	tolua_property bool SimplifiedAutoTargeting;
 	tolua_property bool AiChecksDependencies;
+	tolua_property bool AllyDepositsAllowed;
 	bool HardwareCursor;
 	bool SelectionRectangleIndicatesDamage;
+	bool FormationMovement;
 
         unsigned int FrameSkip;
 

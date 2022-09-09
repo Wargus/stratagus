@@ -635,14 +635,14 @@ bool GetGamePaused()
 }
 
 /**
-**  Set the game speed
+**  Set the game speed in range 0 .. 100
 **
 **  @param speed  New game speed.
 */
 void SetGameSpeed(int speed)
 {
 	if (GameCycle == 0 || FastForwardCycle < GameCycle) {
-		VideoSyncSpeed = speed * 100 / CYCLES_PER_SECOND;
+		CyclesPerSecond = (static_cast<double>(speed) / 100) * CYCLES_PER_SECOND + static_cast<double>(CYCLES_PER_SECOND) / 3;
 		SetVideoSync();
 	}
 }
@@ -654,7 +654,7 @@ void SetGameSpeed(int speed)
 */
 int GetGameSpeed()
 {
-	return CYCLES_PER_SECOND * VideoSyncSpeed / 100;
+	return ((static_cast<double>(CyclesPerSecond) - static_cast<double>(CYCLES_PER_SECOND) / 3) / CYCLES_PER_SECOND) * 100;
 }
 
 /*----------------------------------------------------------------------------

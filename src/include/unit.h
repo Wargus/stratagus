@@ -384,6 +384,8 @@ public:
 
 	unsigned ZDisplaced : 1;     /// The IY displacement of this unit is simulating a "height" displacement (for flyers). This is useful to draw shadows appropriately
 
+	unsigned JustMoved : 3;      /// The unit last moved of its own accord this amount of cycles of standing still ago
+
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
 	/// NULL if the unit was not rescued.
@@ -417,8 +419,9 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	struct _unit_anim_ {
 		const CAnimation *Anim;      /// Anim
 		const CAnimation *CurrAnim;  /// CurrAnim
-		int Wait;                    /// Wait
-		int Unbreakable;             /// Unbreakable
+		short Wait;                  /// Wait time
+		signed char Rotate;          /// Rotation target and direction
+		unsigned char Unbreakable;   /// Unbreakable
 	} Anim, WaitBackup;
 
 
@@ -451,7 +454,7 @@ public:
 		PauseOnLeave(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
-		SelectionRectangleIndicatesDamage(false),
+		SelectionRectangleIndicatesDamage(false), FormationMovement(true),
 		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
@@ -470,6 +473,7 @@ public:
 	bool NoStatusLineTooltips; /// Don't show messages on status line
 	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
 	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
+	bool FormationMovement; /// If true, player controlled units stay in formation
 
 	int FrameSkip;          /// Mask used to skip rendering frames (useful for slow renderers that keep up with the game logic, but not the rendering to screen like e.g. original Raspberry Pi)
 
@@ -489,11 +493,13 @@ public:
 		s.AiExplores = AiExplores;
 		s.SimplifiedAutoTargeting = SimplifiedAutoTargeting;
 		s.AiChecksDependencies = AiChecksDependencies;
+		s.AllyDepositsAllowed = AllyDepositsAllowed;
 	}
 private:
 	bool AiExplores = true;
 	bool SimplifiedAutoTargeting = false;
 	bool AiChecksDependencies = false;
+	bool AllyDepositsAllowed = false;
 
 #if USING_TOLUAPP
 public:
@@ -503,6 +509,8 @@ public:
 	void set_SimplifiedAutoTargeting(bool v) { SimplifiedAutoTargeting = GameSettings.SimplifiedAutoTargeting = v; }
 	bool get_AiChecksDependencies() { return AiChecksDependencies; }
 	void set_AiChecksDependencies(bool v) { AiChecksDependencies = GameSettings.AiChecksDependencies = v; }
+	bool get_AllyDepositsAllowed() { return AllyDepositsAllowed; }
+	void set_AllyDepositsAllowed(bool v) { AllyDepositsAllowed = GameSettings.AllyDepositsAllowed = v; }
 #endif
 };
 

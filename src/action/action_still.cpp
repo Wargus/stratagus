@@ -163,10 +163,42 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (unit.Type->RandomMovementProbability == false
-		|| ((SyncRand() % 100) > unit.Type->RandomMovementProbability)) {
+	if (unit.Type->RandomMovementProbability == false) {
+		if (!unit.JustMoved) {
+			return false;
+		}
+		int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		if (!shift) {
+			return false;
+		}
+		int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		auto pos = unit.tilePos;
+		auto w = unit.Type->PersonalSpaceWidth;
+		auto h = unit.Type->PersonalSpaceHeight;
+		if (w || h) {
+			std::vector<CUnit *> around;
+			SelectAroundUnit(unit, (w + h) / 2, around, IsSameMovementType(unit));
+			Vec2i vec(0, 0);
+			for (auto u : around) {
+				if (u != &unit) {
+					vec += pos - u->tilePos;
+				}
+			}
+			if (vec.x || vec.y) {
+				auto newPos = pos + Vec2i(std::clamp(vec.x, (short)-1, (short)1), std::clamp(vec.y, (short)-1, (short)1));
+				Map.Clamp(newPos);
+				if (newPos.x || newPos.y) {
+					CommandMove(unit, newPos, FlushCommands);
+					return true;
+				}
+			}
+		}
 		return false;
 	}
+	if ((SyncRand() % 100) > unit.Type->RandomMovementProbability) {
+		return false;
+	}
+
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
@@ -390,6 +422,7 @@ bool AutoAttack(CUnit &unit)
 			this->AutoAttackStand(unit);
 		}
 	} else {
+		if (unit.JustMoved) --unit.JustMoved;
 		if (AutoCast(unit) || (unit.IsAgressive() && AutoAttack(unit))
 			|| AutoRepair(unit)
 			|| MoveRandomly(unit)) {

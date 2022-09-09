@@ -93,6 +93,7 @@ static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
+static const char SURROUND_ATTACK_KEY[] = "SurroundAttack";
 static const char SKIRMISHER_KEY[] = "Skirmisher";
 static const char ALWAYSTHREAT_KEY[] = "AlwaysThreat";
 static const char ELEVATED_KEY[] = "Elevated";
@@ -157,7 +158,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   SHOREBUILDING_KEY, CANATTACK_KEY, BUILDEROUTSIDE_KEY,
 							   BUILDERLOST_KEY, CANHARVEST_KEY, HARVESTER_KEY, SELECTABLEBYRECTANGLE_KEY,
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, SKIRMISHER_KEY,
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, SURROUND_ATTACK_KEY, SKIRMISHER_KEY,
 							   ALWAYSTHREAT_KEY, ELEVATED_KEY, NOFRIENDLYFIRE_KEY, MAINFACILITY_KEY
 							  };
 
@@ -240,7 +241,12 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 		const char *value = LuaToString(l, -1, i + 1);
 		++i;
 		lua_rawgeti(l, -1, i + 1);
-		if (!lua_istable(l, -1)) {
+		if (!strcmp(value, "lua-callback")) {
+			CBuildRestrictionLuaCallback *b = new CBuildRestrictionLuaCallback(new LuaCallback(l, -1));
+			lua_pop(l, 1);
+			andlist->push_back(b);
+			continue;
+		} else if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
 		if (!strcmp(value, "distance")) {
@@ -702,6 +708,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "TileSize")) {
 			CclGetPos(l, &type->TileWidth, &type->TileHeight);
+		} else if (!strcmp(value, "PersonalSpace")) {
+			CclGetPos(l, &type->PersonalSpaceWidth, &type->PersonalSpaceHeight);
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "Neutral")) {
@@ -859,6 +867,8 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 				type->RepairCosts[res] = LuaToNumber(l, -1, k + 1);
 			}
+		} else if (!strcmp(value, "RotationSpeed")) {
+			type->RotationSpeed = std::min(std::max(1, std::abs(LuaToNumber(l, -1))), 128);
 		} else if (!strcmp(value, "CanTargetLand")) {
 			if (LuaToBoolean(l, -1)) {
 				type->CanTarget |= CanTargetLand;

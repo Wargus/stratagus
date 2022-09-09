@@ -386,7 +386,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 
 	Mix_Chunk *sample = ChooseSample(sound, false, source);
 
-	if (!always && SampleIsPlaying(sample)) {
+	if (!sample || (!always && SampleIsPlaying(sample))) {
 		return;
 	}
 

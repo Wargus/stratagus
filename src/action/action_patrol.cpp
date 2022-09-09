@@ -133,19 +133,10 @@
 
 /* virtual */ void COrder_Patrol::Execute(CUnit &unit)
 {
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 
 	switch (DoActionMove(unit)) {
 		case PF_FAILED:

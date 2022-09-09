@@ -5,7 +5,7 @@
     "cmake.configureSettings": {
         "STRATAGUS_INCLUDE_DIR": "${workspaceFolder}/../stratagus/gameheaders",
         "STRATAGUS": "stratagus",
-        "WIN32_CMAKE_PREFIX_PATH": "${workspaceFolder}\\..\\dependencies"
+        "ENABLE_VENDORED_LIBS": "ON"
     },
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"

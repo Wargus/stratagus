@@ -2105,7 +2105,7 @@ void EditorMainLoop()
 		bool start = true;
 
 		while (Editor.Running) {
-			if (FrameCounter % FRAMES_PER_SECOND == 0) {
+			if (FrameCounter % CYCLES_PER_SECOND == 0) {
 				if (UpdateMinimap) {
 					UI.Minimap.Update();
 					UpdateMinimap = false;

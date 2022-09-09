@@ -248,8 +248,9 @@ void PathFinderOutput::Load(lua_State *l)
 		if (!strcmp(tag, "cycles")) {
 			this->Cycles = LuaToNumber(l, -1, i);
 		} else if (!strcmp(tag, "fast")) {
-			this->Fast = 1;
-			--i;
+			this->Fast = LuaToNumber(l, -1, i);
+		} else if (!strcmp(tag, "overflow-length")) {
+			this->OverflowLength = LuaToNumber(l, -1, i);
 		} else if (!strcmp(tag, "path")) {
 			lua_rawgeti(l, -1, i);
 			if (!lua_istable(l, -1)) {
@@ -659,7 +660,7 @@ static int CclUnit(lua_State *l)
 }
 
 /**
-**  Move a unit on map.
+**  Move a unit on map, optionally with offset.
 **
 **  @param l  Lua state.
 **
@@ -670,11 +671,17 @@ static int CclUnit(lua_State *l)
 ** <div class="example"><code>-- Create the unit
 **	footman = CreateUnit("unit-footman", 0, {7, 4})
 **	-- Move the unit to position 20 (x) and 10 (y)
-**	<strong>MoveUnit</strong>(footman,{20,10})</code></div>
+**	<strong>MoveUnit</strong>(footman,{20,10})
+**	-- Move the unit to position 15 (x) and 9 (y) + 4 (x) and 7 (y) pixels overlap into the next tile
+**	<strong>MoveUnit</strong>(footman,{15,9},{4,7})
+** </code></div>
 */
 static int CclMoveUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	int nargs = lua_gettop(l);
+	if (nargs < 2 || nargs > 3) {
+		LuaError(l, "incorrect argument, expected 2 or 3 arguments");
+	}
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
@@ -695,6 +702,13 @@ static int CclMoveUnit(lua_State *l)
 		unit->tilePos = ipos;
 		DropOutOnSide(*unit, heading, NULL);
 	}
+
+	if (nargs == 3) {
+		CclGetPos(l, &ipos.x, &ipos.y, 3);
+		unit->IX = ipos.x;
+		unit->IY = ipos.y;
+	}
+
 	lua_pushvalue(l, 1);
 	return 1;
 }
@@ -1276,6 +1290,8 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushstring(l, PlayerTypeNames[static_cast<int>(unit->Player->Type)].c_str());
+	} else if (!strcmp(value, "Summoned")) {
+		lua_pushnumber(l, unit->Summoned);
 	} else if (!strcmp(value, "TTLPercent")) {
 		if (unit->Summoned && unit->TTL) {
 			unsigned long time_lived = GameCycle - unit->Summoned;
@@ -1587,6 +1603,42 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 }
 
 /**
+**  Turn towards another unit or a location.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>
+**		<strong>TurnTowardsLocation(peon, {10, 10})</strong> -- turn peon towards location 10x10
+**		<strong>TurnTowardsLocation(peon, goldmine)</strong> -- turn peon towards the goldmine unit
+** </code></div>
+*/
+static int CclTurnTowardsLocation(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	Vec2i dir;
+	if (lua_istable(l, 2)) {
+		CclGetPos(l, &dir.x, &dir.y, 2);
+		dir = dir - unit->tilePos;
+	} else {
+		lua_pushvalue(l, 2);
+		CUnit *target = CclGetUnit(l);
+		lua_pop(l, 1);
+		dir = target->tilePos + target->Type->GetHalfTileSize() - unit->tilePos;
+	}
+
+	UnitHeadingFromDeltaXY(*unit, dir);
+
+	return 0;
+}
+
+/**
 **  Register CCL features for unit.
 */
 void UnitCclRegister()
@@ -1622,6 +1674,8 @@ void UnitCclRegister()
 
 	lua_register(Lua, "SelectSingleUnit", CclSelectSingleUnit);
 	lua_register(Lua, "EnableSimplifiedAutoTargeting", CclEnableSimplifiedAutoTargeting);
+
+	lua_register(Lua, "TurnTowardsLocation", CclTurnTowardsLocation);
 }
 
 //@}

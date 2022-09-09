@@ -43,3 +43,4 @@ pytorchenv
 **/*~
 .*.kate-swp
 .swp.*
+appbuild/

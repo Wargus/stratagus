@@ -207,8 +207,8 @@ extern bool GamePaused;
 extern bool GameObserve;
 /// Flag telling if the game is in establishing mode
 extern bool GameEstablishing;
-/// Flag telling not to advance to the next game cycle
-extern char SkipGameCycle;
+/// Counter of how many game cycles to skip for each rendered frame
+extern double SkipGameCycle;
 /// Invincibility cheat
 extern bool GodMode;
 /// Whether the map is the only thing displayed or not

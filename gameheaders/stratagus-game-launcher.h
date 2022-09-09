@@ -499,7 +499,11 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	}
 #endif
 
+#ifdef USE_MAC
+	strcat(cmdbuf, fs::absolute(fs::path(extractor_tool)).c_str());
+#else
 	strcat(cmdbuf, extractor_tool);
+#endif
 	for (int i = 0; ; i++) {
 		const char *earg = extractor_args[i];
 		if (earg == NULL) {

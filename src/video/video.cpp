@@ -168,8 +168,8 @@ int ClipY2;                          /// current clipping bottom right
 
 static std::vector<Clip> Clips;
 
-int VideoSyncSpeed = 100;            /// 0 disable interrupts
-int SkipFrames;                      /// Skip this frames
+int CyclesPerSecond = CYCLES_PER_SECOND;
+double SkipCycles;                      /// Skip this frames
 
 Uint32 ColorBlack;
 Uint32 ColorDarkGreen;
@@ -348,9 +348,10 @@ void DeInitVideo()
 */
 static int CclSetVideoSyncSpeed(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	VideoSyncSpeed = LuaToNumber(l, 1);
-	return 0;
+       LuaCheckArgs(l, 1);
+       RefreshRate = LuaToNumber(l, 1);
+	   SetVideoSync();
+       return 0;
 }
 
 void VideoCclRegister()

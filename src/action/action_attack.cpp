@@ -409,6 +409,9 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 */
 void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 {
+	if (unit.Type->BoolFlag[SURROUND_ATTACK_INDEX].value) {
+		return;
+	}
 	const Vec2i dir = target ? (target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos)
 					  			: (this->goalPos - unit.tilePos);
 	const unsigned char oldDir = unit.Direction;
@@ -832,19 +835,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 {
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	if (unit.Wait) {
-		if (!unit.Waiting) {
-			unit.Waiting = 1;
-			unit.WaitBackup = unit.Anim;
-		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		unit.Wait--;
+	if (IsWaiting(unit)) {
 		return;
 	}
-	if (unit.Waiting) {
-		unit.Anim = unit.WaitBackup;
-		unit.Waiting = 0;
-	}
+	StopWaiting(unit);
 
 	if (this->State != ATTACK_TARGET && unit.CanStoreOrder(this) && AutoCast(unit)) {
 		this->Finished = true;

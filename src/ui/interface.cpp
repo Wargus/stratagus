@@ -84,7 +84,7 @@ bool GameRunning;                    /// Current running state
 bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
 bool GameEstablishing;               /// Game establishing mode
-char SkipGameCycle;                  /// Skip the next game cycle
+double SkipGameCycle;                /// Skip the next n game cycles
 char BigMapMode;                     /// Show only the map
 enum _iface_state_ InterfaceState;   /// Current interface state
 bool GodMode;                        /// Invincibility cheat
@@ -349,7 +349,7 @@ static void UiIncreaseGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	VideoSyncSpeed += 10;
+	CyclesPerSecond++;
 	SetVideoSync();
 	UI.StatusLine.Set(_("Faster"));
 }
@@ -362,12 +362,8 @@ static void UiDecreaseGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	if (VideoSyncSpeed <= 10) {
-		if (VideoSyncSpeed > 1) {
-			--VideoSyncSpeed;
-		}
-	} else {
-		VideoSyncSpeed -= 10;
+	if (CyclesPerSecond > 1) {
+		--CyclesPerSecond;
 	}
 	SetVideoSync();
 	UI.StatusLine.Set(_("Slower"));
@@ -381,7 +377,7 @@ static void UiSetDefaultGameSpeed()
 	if (FastForwardCycle >= GameCycle) {
 		return;
 	}
-	VideoSyncSpeed = 100;
+	CyclesPerSecond = CYCLES_PER_SECOND;
 	SetVideoSync();
 	UI.StatusLine.Set(_("Set default game speed"));
 }
