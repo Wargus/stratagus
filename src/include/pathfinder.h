@@ -111,10 +111,10 @@ public:
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
 public:
-	u_int16_t Cycles;               /// how much Cycles we move.
+	uint16_t Cycles;               /// how much Cycles we move.
 	unsigned Fast:4;                /// Flag fast move (one step). Fits at most MAX_FAST
 	unsigned OverflowLength:4;      /// overflow length not stored in Path (may be more). Fits at most MAX_OVERFLOW
-	u_int8_t Length;                /// stored path length
+	uint8_t Length;                /// stored path length
 	char Path[MAX_PATH_LENGTH];     /// directions of stored path
 };
 
