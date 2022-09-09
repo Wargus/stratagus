@@ -1212,6 +1212,9 @@ endif()
 
 if(BUILD_VENDORED_LUA)
   add_dependencies(stratagus lua)
+else()
+  find_package(Lua51 REQUIRED)
+  find_package(Tolua++ REQUIRED)
 endif()
 
 if(BUILD_VENDORED_SDL)
