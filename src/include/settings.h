@@ -42,7 +42,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include <variant>
+// #include <variant>
 
 /*----------------------------------------------------------------------------
 --  TODO: Remove this once we move off of tolua++ and can properly support strongly typed enums

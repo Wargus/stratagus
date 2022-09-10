@@ -107,7 +107,8 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-error "Missing the <filesystem> header."
+#include "ghc_filesystem.hpp"
+namespace fs = ghc::filesystem;
 #endif
 
 #include "stratagus-tinyfiledialogs.h"

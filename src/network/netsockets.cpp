@@ -69,25 +69,25 @@ bool CHost::isValid() const
 class CUDPSocket_Impl
 {
 public:
-	CUDPSocket_Impl() : socket(Socket(-1)) {}
+	CUDPSocket_Impl() : socketFd(SocketFD(-1)) {}
 	~CUDPSocket_Impl() { if (IsValid()) { Close(); } }
-	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
-	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
-	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
+	bool Open(const CHost &host) { socketFd = NetOpenUDP(host.getIp(), host.getPort()); return socketFd != INVALID_SOCKET; }
+	void Close() { NetCloseUDP(socketFd); socketFd = SocketFD(-1); }
+	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socketFd, host.getIp(), host.getPort(), buf, len); }
 	int Recv(void *buf, int len, CHost *hostFrom)
 	{
 		unsigned long ip;
 		int port;
-		int res = NetRecvUDP(socket, buf, len, &ip, &port);
+		int res = NetRecvUDP(socketFd, buf, len, &ip, &port);
 		*hostFrom = CHost(ip, port);
 		return res;
 	}
-	void SetNonBlocking() { NetSetNonBlocking(socket); }
-	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
-	bool IsValid() const { return socket != Socket(-1); }
+	void SetNonBlocking() { NetSetNonBlocking(socketFd); }
+	int HasDataToRead(int timeout) { return NetSocketReady(socketFd, timeout); }
+	bool IsValid() const { return socketFd != SocketFD(-1); }
 	int GetSocketAddresses(unsigned long *ips, int maxAddr) { return NetSocketAddr(ips, maxAddr); }
 private:
-	Socket socket;
+	SocketFD socketFd;
 };
 
 //
@@ -187,22 +187,22 @@ int CUDPSocket::GetSocketAddresses(unsigned long *ips, int maxAddr) {
 class CTCPSocket_Impl
 {
 public:
-	CTCPSocket_Impl() : socket(Socket(-1)) {}
+	CTCPSocket_Impl() : socketFd(SocketFD(-1)) {}
 	~CTCPSocket_Impl() { if (IsValid()) { Close(); } }
 	bool Open(const CHost &host);
-	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
-	bool Connect(const CHost &host) { return NetConnectTCP(socket, host.getIp(), host.getPort()) != -1; }
-	int Send(const void *buf, unsigned int len) { return NetSendTCP(socket, buf, len); }
+	void Close() { NetCloseTCP(socketFd); socketFd = SocketFD(-1); }
+	bool Connect(const CHost &host) { return NetConnectTCP(socketFd, host.getIp(), host.getPort()) != -1; }
+	int Send(const void *buf, unsigned int len) { return NetSendTCP(socketFd, buf, len); }
 	int Recv(void *buf, int len)
 	{
-		int res = NetRecvTCP(socket, buf, len);
+		int res = NetRecvTCP(socketFd, buf, len);
 		return res;
 	}
-	void SetNonBlocking() { NetSetNonBlocking(socket); }
-	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
-	bool IsValid() const { return socket != Socket(-1); }
+	void SetNonBlocking() { NetSetNonBlocking(socketFd); }
+	int HasDataToRead(int timeout) { return NetSocketReady(socketFd, timeout); }
+	bool IsValid() const { return socketFd != SocketFD(-1); }
 private:
-	Socket socket;
+	SocketFD socketFd;
 };
 
 bool CTCPSocket_Impl::Open(const CHost &host)
@@ -210,8 +210,8 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 	char ip[24]; // 127.255.255.255:65555
 	memset(&ip, 0, sizeof(ip));
 	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
-	this->socket = NetOpenTCP(ip, host.getPort());
-	return this->socket != INVALID_SOCKET;
+	this->socketFd = NetOpenTCP(ip, host.getPort());
+	return this->socketFd != INVALID_SOCKET;
 }
 
 //

@@ -598,7 +598,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			event.motion.y = static_cast<int>(std::floor(event.button.y / Video.VerticalPixelSize + 0.5));
 			InputMouseMove(callbacks, SDL_GetTicks(), event.motion.x, event.motion.y);
 			break;
-
+#ifndef OLD_SYSTEM
 		case SDL_MOUSEWHEEL:
 			{   // similar to Squeak, we fabricate Ctrl+Alt+PageUp/Down for wheel events
 				SDL_Keycode key = event.wheel.y > 0 ? SDLK_PAGEUP : SDLK_PAGEDOWN;
@@ -689,7 +689,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				}
 			}
 			break;
-
+#endif
 		case SDL_KEYDOWN:
 			keysym = event.key.keysym.sym;
 			if (!isTextInput(keysym)) {
@@ -822,6 +822,7 @@ static Uint32 LastTick = 0;
 
 static void RenderBenchmarkOverlay()
 {
+#ifndef OLD_SYSTEM
 	int RefreshRate = GetRefreshRate();
 	// show a bar representing fps, where the entire bar is the max refresh rate of attached displays
 	Uint32 nextTick = SDL_GetTicks();
@@ -840,6 +841,7 @@ static void RenderBenchmarkOverlay()
 	SDL_RenderFillRect(TheRenderer, &bar);
 
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
+#endif
 }
 
 void RealizeVideoMemory()
@@ -926,7 +928,9 @@ int Str2SdlKey(const char *str)
 */
 bool SdlGetGrabMouse()
 {
+#ifndef OLD_SYSTEM
 	return SDL_GetWindowGrab(TheWindow);
+#endif
 }
 
 /**
@@ -936,6 +940,7 @@ bool SdlGetGrabMouse()
 */
 void ToggleGrabMouse(int mode)
 {
+#ifndef OLD_SYSTEM
 	bool grabbed = SdlGetGrabMouse();
 
 	if (mode <= 0 && grabbed) {
@@ -943,6 +948,7 @@ void ToggleGrabMouse(int mode)
 	} else if (mode >= 0 && !grabbed) {
 		SDL_SetWindowGrab(TheWindow, SDL_TRUE);
 	}
+#endif
 }
 
 /**

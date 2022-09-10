@@ -204,17 +204,29 @@ static Sint64 sdl_size(SDL_RWops * context) {
 	return size;
 }
 
+#ifdef OLD_SYSTEM
+static int sdl_seek(SDL_RWops * context, int offset, int whence) {
+#else
 static Sint64 sdl_seek(SDL_RWops * context, Sint64 offset, int whence) {
+#endif
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
 	return self->seek(offset, whence);
 }
 
+#ifdef OLD_SYSTEM
+static int sdl_read(SDL_RWops * context, void *ptr, int size, int maxnum) {
+#else
 static size_t sdl_read(SDL_RWops * context, void *ptr, size_t size, size_t maxnum) {
+#endif
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
 	return self->read(ptr, size * maxnum) / size;
 }
 
+#ifdef OLD_SYSTEM
+static int sdl_write(SDL_RWops * context, const void *ptr, int size, int num) {
+#else
 static size_t sdl_write(SDL_RWops * context, const void *ptr, size_t size, size_t num) {
+#endif
 	return 0;
 }
 
@@ -229,7 +241,9 @@ SDL_RWops * CFile::as_SDL_RWops()
 	SDL_RWops *ops = (SDL_RWops *) calloc(1, sizeof(SDL_RWops));
 	ops->type = SDL_RWOPS_UNKNOWN;
 	ops->hidden.unknown.data1 = this;
+#ifndef OLD_SYSTEM
 	ops->size = sdl_size;
+#endif
 	ops->seek = sdl_seek;
 	ops->read = sdl_read;
 	ops->write = sdl_write;

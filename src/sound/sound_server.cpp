@@ -671,6 +671,7 @@ bool SoundEnabled()
 */
 static int InitSdlSound()
 {
+#ifndef OLD_SYSTEM
 	fs::path timidityCfg(StratagusLibPath);
 	timidityCfg = timidityCfg / "timidity" / "timidity.cfg";
 #ifndef BUILD_VENDORED_SDL
@@ -686,6 +687,7 @@ static int InitSdlSound()
 	} else {
 		Mix_SetTimidityCfg((fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str());
 	}
+#endif
 #endif
 	// just activate everything we can by setting all bits
 	Mix_Init(std::numeric_limits<unsigned int>::max());

@@ -273,7 +273,9 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	}
 
 	SDL_UnlockSurface(preview);
+#ifndef OLD_SYSTEM
 	IMG_SavePNG(preview, mapname);
+#endif
 	SDL_FreeSurface(preview);
 }
 

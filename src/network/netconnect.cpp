@@ -49,7 +49,8 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-error "Missing the <filesystem> header."
+#include "ghc_filesystem.hpp"
+namespace fs = ghc::filesystem;
 #endif
 
 #include "game.h"
@@ -72,6 +73,10 @@ error "Missing the <filesystem> header."
 //----------------------------------------------------------------------------
 // Declaration
 //----------------------------------------------------------------------------
+
+#ifndef INADDR_LOOPBACK
+#define INADDR_LOOPBACK ((in_addr_t) 0x7f000001) /* Inet 127.0.0.1.  */
+#endif
 
 // received nothing from client for xx frames?
 #define CLIENT_LIVE_BEAT 60

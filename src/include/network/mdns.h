@@ -12,6 +12,8 @@
  *
  */
 
+#ifndef OLD_SYSTEM
+
 #pragma once
 
 #include <stdint.h>
@@ -1265,4 +1267,6 @@ mdns_record_parse_txt(const void* buffer, size_t size, size_t offset, size_t len
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

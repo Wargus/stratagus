@@ -33,6 +33,9 @@
 //@{
 
 #include "SDL.h"
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 #include "guichan.h"
 #ifdef USE_VORBIS
 

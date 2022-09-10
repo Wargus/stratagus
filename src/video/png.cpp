@@ -56,7 +56,9 @@
 */
 void SaveScreenshotPNG(const char *name)
 {
+#ifndef OLD_SYSTEM
 	IMG_SavePNG(TheScreen, name);
+#endif
 }
 
 /**
@@ -93,7 +95,9 @@ void SaveMapPNG(const char *name)
 		}
 	}
 
+#ifndef OLD_SYSTEM
 	IMG_SavePNG(mapImage, name);
+#endif
 	SDL_FreeSurface(mapImage);
 	fclose(fp);
 }

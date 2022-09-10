@@ -32,6 +32,7 @@ obj-*
 ./tolua.cpp.rule
 build
 build_linux
+build_amiga
 .vscode/*
 !.vscode/tasks.json
 !.vscode/launch.json

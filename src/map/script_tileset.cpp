@@ -317,6 +317,14 @@ void CTileset::parseMixed(lua_State *l)
 	}
 }
 
+#ifdef OLD_SYSTEM
+#define Log2 log2
+#define LRound lround
+#else
+#define Log2 std::log2
+#define LRound std::lround
+#endif
+
 /**
 **  Parse the slot part of a tileset definition
 **
@@ -377,14 +385,14 @@ void CTileset::parse(lua_State *l)
 	}
 
 	// precalculate some other representations for performance in hot loops later
-	double sizeShiftX = std::log2(this->pixelTileSize.x);
-	this->graphicalTileSizeShiftX = std::lround(sizeShiftX);
+	double sizeShiftX = Log2(this->pixelTileSize.x);
+	this->graphicalTileSizeShiftX = LRound(sizeShiftX);
 	if (sizeShiftX != this->graphicalTileSizeShiftX) {
 		LuaError(l, "graphical tile size x %d must be a power of 2" _C_ this->pixelTileSize.x);
 	}
 
-	double sizeShiftY = std::log2(this->pixelTileSize.y);
-	this->graphicalTileSizeShiftY = std::lround(sizeShiftY);
+	double sizeShiftY = Log2(this->pixelTileSize.y);
+	this->graphicalTileSizeShiftY = LRound(sizeShiftY);
 	if (sizeShiftX != this->graphicalTileSizeShiftY) {
 		LuaError(l, "graphical tile size y %d must be a power of 2" _C_ this->pixelTileSize.y);
 	}
@@ -401,19 +409,19 @@ void CTileset::parse(lua_State *l)
 	}
 	this->logicalTileToGraphicalTileMultiplier = multiplier;
 
-	double logicalSizePowerX = std::log2(PixelTileSize.x);
-	if (logicalSizePowerX != std::lround(logicalSizePowerX)) {
+	double logicalSizePowerX = Log2(PixelTileSize.x);
+	if (logicalSizePowerX != LRound(logicalSizePowerX)) {
 		LuaError(l, "logical tile size x %d must be a power of 2" _C_ PixelTileSize.x);
 	}
-	double logicalSizePowerY = std::log2(PixelTileSize.y);
-	if (logicalSizePowerY != std::lround(logicalSizePowerY)) {
+	double logicalSizePowerY = Log2(PixelTileSize.y);
+	if (logicalSizePowerY != LRound(logicalSizePowerY)) {
 		LuaError(l, "logical tile size y %d must be a power of 2" _C_ PixelTileSize.y);
 	}
-	long logicalToGraphicalShift = std::lround(sizeShiftX - logicalSizePowerX);
+	long logicalToGraphicalShift = LRound(sizeShiftX - logicalSizePowerX);
 	if (logicalToGraphicalShift < 0) {
 		LuaError(l, "logical tile size must be smaller than graphical tile size");
 	}
-	if (std::lround(sizeShiftY - logicalSizePowerY) != logicalToGraphicalShift) {
+	if (LRound(sizeShiftY - logicalSizePowerY) != logicalToGraphicalShift) {
 		LuaError(l, "logical tile size x and y must be the same shiftable by the same amount to get to the graphical tile size");
 	}
 	this->logicalTileToGraphicalTileShift = logicalToGraphicalShift;

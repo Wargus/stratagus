@@ -466,9 +466,9 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 			if (any) {
 				Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
 			} else if (onlyUnits) {
-				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), NotPredicate(IsBuildingType())));
+				Select(pos1, pos2, table, AndPredicate<HasSamePlayerAs, NotPredicate<IsBuildingType>>(HasSamePlayerAs(Players[oldp]), NotPredicate<IsBuildingType>(IsBuildingType())));
 			} else if (onlyBuildings) {
-				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), IsBuildingType()));
+				Select(pos1, pos2, table, AndPredicate<HasSamePlayerAs, IsBuildingType>(HasSamePlayerAs(Players[oldp]), IsBuildingType()));
 			} else {
 				Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
 			}

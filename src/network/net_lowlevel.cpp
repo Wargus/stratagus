@@ -146,7 +146,7 @@ void NetExit()
 **
 **  @param sockfd  Socket fildes
 */
-void NetCloseUDP(Socket sockfd)
+void NetCloseUDP(SocketFD sockfd)
 {
 	close(sockfd);
 }
@@ -156,7 +156,7 @@ void NetCloseUDP(Socket sockfd)
 **
 **  @param sockfd  Socket fildes
 */
-void NetCloseTCP(Socket sockfd)
+void NetCloseTCP(SocketFD sockfd)
 {
 	close(sockfd);
 }
@@ -177,7 +177,7 @@ int NetSetNonBlocking(Socket sockfd)
 	return ioctlsocket(sockfd, FIONBIO, &opt);
 }
 #else
-int NetSetNonBlocking(Socket sockfd)
+int NetSetNonBlocking(SocketFD sockfd)
 {
 	int flags = fcntl(sockfd, F_GETFL, 0);
 	return fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
@@ -305,13 +305,13 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 **
 **  @return If success the socket fildes, -1 otherwise.
 */
-Socket NetOpenUDP(unsigned long ip, int port)
+SocketFD NetOpenUDP(unsigned long ip, int port)
 {
 	// open the socket
-	Socket sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	SocketFD sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sockfd == INVALID_SOCKET) {
-		return static_cast<Socket>(-1);
+		return static_cast<SocketFD>(-1);
 	}
 	// bind local port
 	if (port) {
@@ -325,7 +325,7 @@ Socket NetOpenUDP(unsigned long ip, int port)
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseUDP(sockfd);
-			return static_cast<Socket>(-1);
+			return static_cast<SocketFD>(-1);
 		}
 	}
 	return sockfd;
@@ -338,12 +338,12 @@ Socket NetOpenUDP(unsigned long ip, int port)
 **
 **  @return If success the socket fildes, -1 otherwise
 */
-Socket NetOpenTCP(const char *addr, int port)
+SocketFD NetOpenTCP(const char *addr, int port)
 {
-	Socket sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	SocketFD sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (sockfd == INVALID_SOCKET) {
-		return static_cast<Socket>(-1);
+		return static_cast<SocketFD>(-1);
 	}
 	// bind local port
 	if (port) {
@@ -368,7 +368,7 @@ Socket NetOpenTCP(const char *addr, int port)
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
 			fprintf(stderr, "Couldn't bind to local port\n");
 			NetCloseTCP(sockfd);
-			return static_cast<Socket>(-1);
+			return static_cast<SocketFD>(-1);
 		}
 	}
 	return sockfd;
@@ -383,7 +383,7 @@ Socket NetOpenTCP(const char *addr, int port)
 **
 **  @return 0 if success, -1 if failure
 */
-int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
+int NetConnectTCP(SocketFD sockfd, unsigned long addr, int port)
 {
 	struct sockaddr_in sa;
 #ifndef __BEOS__
@@ -418,7 +418,7 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 **
 **  @return 1 if data is available, 0 if not, -1 if failure.
 */
-int NetSocketReady(Socket sockfd, int timeout)
+int NetSocketReady(SocketFD sockfd, int timeout)
 {
 	int retval;
 	struct timeval tv;
@@ -492,7 +492,7 @@ int SocketSet::Select(int timeout)
 **
 **  @return        Non-zero if socket is ready
 */
-int SocketSet::HasDataToRead(Socket socket) const
+int SocketSet::HasDataToRead(SocketFD socket) const
 {
 	for (size_t i = 0; i < this->Sockets.size(); ++i) {
 		if (this->Sockets[i] == socket) {
@@ -514,7 +514,7 @@ int SocketSet::HasDataToRead(Socket socket) const
 **
 **  @return Number of bytes placed in buffer, or -1 if failure.
 */
-int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *portFrom)
+int NetRecvUDP(SocketFD sockfd, void *buf, int len, unsigned long *hostFrom, int *portFrom)
 {
 	struct sockaddr_in sock_addr;
 	socklen_t n = sizeof(struct sockaddr_in);
@@ -544,7 +544,7 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 **
 **  @return Number of bytes placed in buffer or -1 if failure.
 */
-int NetRecvTCP(Socket sockfd, void *buf, int len)
+int NetRecvTCP(SocketFD sockfd, void *buf, int len)
 {
 	int ret = recv(sockfd, (recvbuftype)buf, len, 0);
 	if (ret > 0) {
@@ -574,7 +574,7 @@ int NetRecvTCP(Socket sockfd, void *buf, int len)
 **
 **  @return Number of bytes sent.
 */
-int NetSendUDP(Socket sockfd, unsigned long host, int port,
+int NetSendUDP(SocketFD sockfd, unsigned long host, int port,
 			   const void *buf, int len)
 {
 	struct sockaddr_in sock_addr;
@@ -596,7 +596,7 @@ int NetSendUDP(Socket sockfd, unsigned long host, int port,
 **
 **  @return Number of bytes sent.
 */
-int NetSendTCP(Socket sockfd, const void *buf, int len)
+int NetSendTCP(SocketFD sockfd, const void *buf, int len)
 {
 	return send(sockfd, (sendbuftype)buf, len, 0);
 }
@@ -608,7 +608,7 @@ int NetSendTCP(Socket sockfd, const void *buf, int len)
 **
 **  @return 0 for success, -1 for error
 */
-int NetListenTCP(Socket sockfd)
+int NetListenTCP(SocketFD sockfd)
 {
 	return listen(sockfd, PlayerMax);
 }
@@ -622,12 +622,12 @@ int NetListenTCP(Socket sockfd)
 **
 **  @return If success the new socket fildes, -1 otherwise.
 */
-Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
+SocketFD NetAcceptTCP(SocketFD sockfd, unsigned long *clientHost, int *clientPort)
 {
 	struct sockaddr_in sa;
 	socklen_t len = sizeof(struct sockaddr_in);
 
-	Socket socket = accept(sockfd, (struct sockaddr *)&sa, &len);
+	SocketFD socket = accept(sockfd, (struct sockaddr *)&sa, &len);
 	*clientHost = sa.sin_addr.s_addr;
 	*clientPort = ntohs(sa.sin_port);
 	return socket;
@@ -638,7 +638,7 @@ Socket NetAcceptTCP(Socket sockfd, unsigned long *clientHost, int *clientPort)
 **
 **  @param socket  Socket to add to the socket set
 */
-void SocketSet::AddSocket(Socket socket)
+void SocketSet::AddSocket(SocketFD socket)
 {
 	Sockets.push_back(socket);
 	SocketReady.push_back(0);
@@ -650,9 +650,9 @@ void SocketSet::AddSocket(Socket socket)
 **
 **  @param socket  Socket to delete from the socket set
 */
-void SocketSet::DelSocket(Socket socket)
+void SocketSet::DelSocket(SocketFD socket)
 {
-	std::vector<Socket>::iterator i;
+	std::vector<SocketFD>::iterator i;
 	std::vector<int>::iterator j;
 
 	for (i = Sockets.begin(), j = SocketReady.begin(); i != Sockets.end(); ++i, ++j) {

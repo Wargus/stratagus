@@ -38,6 +38,9 @@
 
 #include "unitsound.h"
 #include "SDL.h"
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 #include "SDL_mixer.h"
 
 /*----------------------------------------------------------------------------

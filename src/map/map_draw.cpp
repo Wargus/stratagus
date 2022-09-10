@@ -257,6 +257,10 @@ void CViewport::DrawMapGridInViewport() const
 	}
 }
 
+#ifdef OLD_SYSTEM
+#define constexpr(X) (X)
+#endif
+
 template<bool graphicalTileIsLogicalTile>
 void CViewport::DrawMapBackgroundInViewport() const
 {

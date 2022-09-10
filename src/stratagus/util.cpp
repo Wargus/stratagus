@@ -34,6 +34,9 @@
 #include "util.h"
 
 #include "SDL.h"
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 
 #include <ctype.h>
 #include <errno.h>
@@ -637,6 +640,8 @@ void *aligned_malloc(size_t alignment, size_t size)
 	return aligned_alloc(alignment, size);
 #elif __APPLE__
 	return malloc(size);
+#elif OLD_SYSTEM
+    return malloc(size);
 #else
 	return memalign(alignment, size);
 #endif

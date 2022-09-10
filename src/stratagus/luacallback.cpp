@@ -102,6 +102,7 @@ void LuaCallback::pushString(const std::string &s)
 	arguments++;
 }
 
+#ifndef OLD_SYSTEM
 /**
  ** Push a table with string keys and string or integer values.
  */
@@ -133,6 +134,7 @@ void LuaCallback::pushTable(std::map<std::string, std::variant<std::string, int>
 	}
 	arguments++;
 }
+#endif
 
 /**
 **  Pops a boolean value for the callback on the stack.

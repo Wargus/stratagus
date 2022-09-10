@@ -33,7 +33,9 @@
 #include <string>
 #include <vector>
 #include <utility>
+#ifndef OLD_SYSTEM
 #include <variant>
+#endif
 
 typedef int lua_Object; // from tolua++.h
 struct lua_State;
@@ -47,8 +49,10 @@ public:
 	void pushInteger(int value);
 	void pushIntegers(const std::vector<int> &values);
 	void pushString(const std::string &eventId);
+#ifndef OLD_SYSTEM
 	void pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list);
 	void pushTable(std::map<std::string, std::variant<std::string, int>> map);
+#endif
 	void run(int results = 0);
 	bool popBoolean();
 	int popInteger();

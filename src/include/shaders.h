@@ -2,8 +2,11 @@
 #define __SHADERS_H__
 
 #include <SDL.h>
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(OLD_SYSTEM)
 extern bool LoadShaderExtensions();
 extern bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer);
 #else

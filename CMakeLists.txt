@@ -26,6 +26,26 @@
 #
 #
 
+## Building for AmigaOS3
+# Get bebbo gcc
+## make update && make all PREFIX=/home/tim/amiga/prefix/
+# Get AmigaPorts/SDL-1.2
+## make -f Makefile.amigaos3 CPU=68040 PREFX=/home/tim/amiga/prefix/
+# Get libsdl-org/SDL_mixer on SDL-1.2 branch
+## SDL_CFLAGS="-I$PWD/../SDL-1.2/include -I$PWD/../SDL-1.2/amiga/makefile-support/ -noixemul" SDL_LIBS="-L$PWD/../SDL-1.2/lib -lSDL -lm" PATH=$PATH:../prefix/bin/ ./configure --host m68k-amigaos --disable-music-ogg && PATH=$PATH:../prefix/bin/ make VERBOSE=1
+# Get libsdl-org/SDL_image on SDL-1.2 branch
+# Now we need libpng and zlib for SDL_image. We want to use the exact same as for stratagus, so configure that first
+## cmake -DWITH_BZIP2=OFF -DWITH_OGGVORBIS=OFF -DWITH_THEORA=OFF -DWITH_MNG=OFF -DTOOLCHAIN_PATH=/home/tim/amiga/prefix/ -DTOOLCHAIN_PREFIX=m68k-amigaos -DCMAKE_TOOLCHAIN_FILE=$PWD/../cmake/m68k-amigaos.cmake  -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=OFF -DBUILD_VENDORED_MEDIA_LIBS=ON -DWITH_SDL1=ON -DSDL_INCLUDE_DIR=/home/tim/amiga/SDL-1.2/include/:/home/tim/amiga/SDL-1.2/amiga/makefile-support/ -DSDL_LIBRARY=/home/tim/amiga/SDL-1.2/libSDL.a -DSDL_MIXER_LIBRARY=/home/tim/amiga/SDL_mixer/build/.libs/libSDL_mixer.a -DSDL_MIXER_INCLUDE_DIR=/home/tim/amiga/SDL_mixer/ -DSDL_IMAGE_LIBRARY=/home/tim/amiga/SDL_image/.libs/libSDL_image.a -DSDL_IMAGE_INCLUDE_DIR=/home/tim/amiga/SDL_image/  ..
+## make png VERBOSE=1
+# now back for SDL_image
+## LIBPNG_CFLAGS="-I/home/tim/stratagus/stratagus/build_amiga/png/src/png-build/ -L/home/tim/stratagus/stratagus/build_amiga/png/src/png-build/ -L/home/tim/stratagus/stratagus/build_amiga/zlib/src/zlib-build/" LIBPNG_LIBS="-l:libpng16.a -l:libzlibstatic.a" SDL_CFLAGS="-I$PWD/../SDL-1.2/include -I$PWD/../SDL-1.2/amiga/makefile-support/ -noixemul" SDL_LIBS="-L$PWD/../SDL-1.2/lib -lSDL -lm" PATH=$PATH:../prefix/bin/ ./configure --host m68k-amigaos --disable-tga --disable-tif --disable-tif-shared --disable-gif --disable-jpg --disable-jpg-shared --disable-bmp --disable-lbm --disable-pcx --disable-png-shared --disable-pnm --disable-xcf --disable-xpm --disable-xv --disable-webp --disable-webp-shared --disable-shared --enable-static && PATH=$PATH:../prefix/bin/ make VERBOSE=1
+# now back in stratagus
+# need to copy tolua.cpp from a host build to the current build dir
+# need to cp /home/tim/amiga/SDL-1.2/amiga/makefile-support/*.h /home/tim/amiga/SDL-1.2/include/
+# then
+## make stratagus VERBOSE=1
+# have to fix tolua.cpp manually because of SDL Window* and gcn::Window ambiguity
+
 #########################
 # Version configuration #
 #########################
@@ -47,6 +67,7 @@ option(BUILD_VENDORED_LUA OFF)
 option(BUILD_VENDORED_SDL OFF)
 option(BUILD_VENDORED_MEDIA_LIBS OFF)
 option(DOWNLOAD_FREEPATS OFF)
+option(OLD_SYSTEM OFF)
 ###############################
 
 project(stratagus)
@@ -59,7 +80,7 @@ else()
   message(WARNING "Third-party directory not populated, cannot vendor any dependencies.")
 endif()
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
 # useful for clangd LSP server
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -70,7 +91,9 @@ if(EXISTS ${WIN32_CMAKE_PREFIX_PATH})
 endif()
 
 # C++ standard
-set(CMAKE_CXX_STANDARD 17)
+if(NOT OLD_SYSTEM)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
 
 set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
 set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
@@ -252,14 +275,14 @@ set(missile_SRCS
 source_group(missile FILES ${missile_SRCS})
 
 set(network_SRCS
-	src/network/commands.cpp
-	src/network/net_lowlevel.cpp
-	src/network/net_message.cpp
-	src/network/netconnect.cpp
-	src/network/network.cpp
-	src/network/netsockets.cpp
-        src/network/online_service.cpp
-        src/network/mdns.cpp
+    src/network/commands.cpp
+    src/network/net_lowlevel.cpp
+    src/network/net_message.cpp
+    src/network/netconnect.cpp
+    src/network/network.cpp
+    src/network/netsockets.cpp
+    src/network/online_service.cpp
+    src/network/mdns.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -373,7 +396,7 @@ set(video_SRCS
 	src/video/png.cpp
 	src/video/sdl.cpp
 	src/video/video.cpp
-        src/video/shaders.cpp
+	src/video/shaders.cpp
 )
 source_group(video FILES ${video_SRCS})
 
@@ -667,7 +690,7 @@ if(APPLE)
 	list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
 endif()
 
-if(NOT WIN32 OR NOT MSVC)
+if(NOT WIN32 OR NOT MSVC AND NOT OLD_SYSTEM)
 	include(CheckCXXSourceCompiles)
 	set(FS_SRC "
 	#include <experimental/filesystem> 
@@ -706,10 +729,18 @@ endif()
 if(BUILD_VENDORED_MEDIA_LIBS)
   vendored_zlib()
   vendored_png()
-  vendored_bzip2()
-  vendored_mng()
-  vendored_oggvorbis()
-  vendored_theora()
+  if (WITH_BZIP2)
+    vendored_bzip2()
+  endif()
+  if (WITH_MNG)
+    vendored_mng()
+  endif()
+  if (WITH_OGGVORBIS)
+    vendored_oggvorbis()
+  endif()
+  if (WITH_THEORA)
+    vendored_theora()
+  endif()
 else()
   find_package(PNG REQUIRED)
   find_package(ZLIB REQUIRED)
@@ -729,6 +760,28 @@ if (BUILD_VENDORED_SDL)
     vendored_unsf()
     add_dependencies(SDL2_mixer freepats unsf)
   endif()
+elseif(OLD_SYSTEM)
+  set(stratagus_SRCS ${stratagus_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/src/polyfills/sdl1_wrapper.cpp)
+  set(stratagus_HDRS ${stratagus_HDRS} ${CMAKE_CURRENT_SOURCE_DIR}/src/polyfills/sdl1_wrapper.h)
+  
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/polyfills/)
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  
+  set(stratagus_LIBS ${stratagus_LIBS} -lsocket)
+
+  add_definitions(-DOLD_SYSTEM)
+  
+  find_package(SDL REQUIRED)
+  find_package(SDL_mixer REQUIRED)
+  find_package(SDL_image REQUIRED)
+ 
+  set(SDL2_INCLUDE_DIR ${SDL_INCLUDE_DIR})
+  set(SDL2_MIXER_INCLUDE_DIRS ${SDL_MIXER_INCLUDE_DIR})
+  set(SDL2_IMAGE_INCLUDE_DIRS ${SDL_IMAGE_INCLUDE_DIR})
+  set(SDL2_LIBRARY ${SDL_LIBRARY})
+  set(SDL2_MIXER_LIBRARIES ${SDL_MIXER_LIBRARY})
+  set(SDL2_IMAGE_LIBRARIES ${SDL_IMAGE_LIBRARY})
 else()
   find_package(SDL2 REQUIRED)
   find_package(SDL2_mixer REQUIRED)
@@ -921,10 +974,12 @@ endif()
 # TODO: Add support for other compilers
 
 check_type_size(errno_t ERRNOT)
-check_function_exists("strcpy_s" HAVE_STRCPYS)
-check_function_exists("strncpy_s" HAVE_STRNCPYS)
-check_function_exists("strcasestr" HAVE_STRCASESTR)
-check_function_exists("strnlen" HAVE_STRNLEN)
+if(NOT OLD_SYSTEM)
+    check_function_exists("strcpy_s" HAVE_STRCPYS)
+    check_function_exists("strncpy_s" HAVE_STRNCPYS)
+    check_function_exists("strcasestr" HAVE_STRCASESTR)
+    check_function_exists("strnlen" HAVE_STRNLEN)
+endif()
 check_function_exists("getopt" HAVE_GETOPT)
 
 # mingw-w64 does not have strcat_s in any include file, but function symbol in library exists
@@ -1174,7 +1229,7 @@ if (ENABLE_STDIO_REDIRECT)
 else ()
    add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
 endif ()
-target_link_libraries(stratagus ${stratagus_LIBS} ${CMAKE_DL_LIBS})
+target_link_libraries(stratagus ${stratagus_LIBS})
 
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)
@@ -1234,11 +1289,19 @@ endif()
 if(BUILD_VENDORED_MEDIA_LIBS)
   add_dependencies(stratagus zlib)
   add_dependencies(stratagus png)
-  add_dependencies(stratagus bzip2)
-  add_dependencies(stratagus mng)
-  add_dependencies(stratagus ogg)
-  add_dependencies(stratagus vorbis)
-  add_dependencies(stratagus theora)
+  if (WITH_BZIP2)
+    add_dependencies(stratagus bzip2)
+  endif()
+  if (WITH_MNG)
+    add_dependencies(stratagus mng)
+  endif()
+  if (WITH_OGGVORBIS)
+    add_dependencies(stratagus ogg)
+    add_dependencies(stratagus vorbis)
+  endif()
+  if (WITH_THEORA)
+    add_dependencies(stratagus theora)
+  endif()
 endif()
 
 ########### next target ###############

@@ -175,6 +175,10 @@ bool FindTerrainType(int movemask, int resmask, int range,
 }
 
 
+#ifdef OLD_SYSTEM
+#define constexpr(X) (X)
+#endif
+
 template <const bool NEARLOCATION>
 class BestDepotFinder
 {
@@ -186,7 +190,7 @@ class BestDepotFinder
 			&& dest->CurrentAction() != UnitActionBuilt) {
 			// Unit in range?
 
-			if constexpr (NEARLOCATION) {
+			if constexpr(NEARLOCATION) {
 				const int d = dest->MapDistanceTo(u_near.loc);
 
 				//

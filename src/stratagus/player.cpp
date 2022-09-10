@@ -329,6 +329,8 @@ std::vector<std::string> PlayerColorNames;
 int PlayerColorIndexStart;
 int PlayerColorIndexCount;
 
+std::vector<const CPlayer *> CPlayer::RevealedPlayers = std::vector<const CPlayer *>();
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/

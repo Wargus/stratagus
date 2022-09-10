@@ -138,6 +138,7 @@ namespace gcn
 
         switch (event.type)
         {
+#ifndef OLD_SYSTEM
           case SDL_TEXTINPUT:
               {
                   char* text = event.text.text;
@@ -150,7 +151,7 @@ namespace gcn
                   }
               }
               break;
-
+#endif
           case SDL_KEYDOWN:
               if (!isTextInput(event.key.keysym.sym)) {
                   switch (event.key.keysym.sym) {
@@ -203,7 +204,7 @@ namespace gcn
               mouseInput.setTimeStamp(SDL_GetTicks());
               mMouseInputQueue.push(mouseInput);
               break;
-
+#ifndef OLD_SYSTEM
           case SDL_MOUSEWHEEL:
               if (event.wheel.y != 0) {
                   SDL_GetMouseState(&mouseInput.x, &mouseInput.y);
@@ -216,7 +217,7 @@ namespace gcn
                   mMouseInputQueue.push(mouseInput);
               }
               break;
-
+#endif
           case SDL_MOUSEMOTION:
               mouseInput.x = event.button.x;
               mouseInput.y = event.button.y;
@@ -225,7 +226,7 @@ namespace gcn
               mouseInput.setTimeStamp(SDL_GetTicks());
               mMouseInputQueue.push(mouseInput);
               break;
-
+#ifndef OLD_SYSTEM
           case SDL_WINDOWEVENT:
               /*
                * This occurs when the mouse leaves the window and the Gui-chan
@@ -253,7 +254,7 @@ namespace gcn
                       break;
               }
               break;
-
+#endif
             default:
               if (event.type == SDL_CUSTOM_KEY_UP) {
                   mIsRepeating = false;

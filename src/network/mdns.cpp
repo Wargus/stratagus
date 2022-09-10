@@ -28,11 +28,13 @@
 //      02111-1307, USA.
 //
 
+
 #include "mdns.h"
 #include "game.h"
 #include "net_lowlevel.h"
 #include "network.h"
 
+#ifndef OLD_SYSTEM
 static int service_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,
                             uint16_t query_id, uint16_t rtype, uint16_t rclass, uint32_t ttl, const void* data,
                             size_t size, size_t name_offset, size_t name_length, size_t record_offset,
@@ -139,3 +141,11 @@ MDNS::~MDNS() {
         queryId = -1;
     }
 }
+
+#else
+
+void MDNS::AnswerServerQueries() { }
+void MDNS::QueryServers(std::function<void(char*)> callback) { }
+MDNS::~MDNS() { }
+
+#endif

@@ -34,8 +34,10 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#ifndef OLD_SYSTEM
 #include "network.h"
 #include "net_lowlevel.h"
+#endif
 #include "stratagus.h"
 
 #include "ai.h"
@@ -1899,6 +1901,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	return 0;
 }
 
+#ifndef OLD_SYSTEM
 /**
  * AiProcessorSetup(host, port, number_of_state_variables, number_of_actions)
  *
@@ -1994,6 +1997,7 @@ static int CclAiProcessorEnd(lua_State *l)
 	delete s;
 	return 0;
 }
+#endif
 
 /**
 **  Register CCL features for unit-type.
@@ -2040,10 +2044,12 @@ void AiCclRegister()
 	lua_register(Lua, "AiAttackWithForces", CclAiAttackWithForces);
 	lua_register(Lua, "AiWaitForces", CclAiWaitForces);
 
+#ifndef OLD_SYSTEM
 	// for external AI processors
 	lua_register(Lua, "AiProcessorSetup", CclAiProcessorSetup);
 	lua_register(Lua, "AiProcessorStep", CclAiProcessorStep);
 	lua_register(Lua, "AiProcessorEnd", CclAiProcessorEnd);
+#endif
 }
 
 //@}

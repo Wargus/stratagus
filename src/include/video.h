@@ -34,6 +34,9 @@
 //@{
 
 #include "SDL.h"
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 #include "shaders.h"
 #include "guichan.h"
 
@@ -282,8 +285,10 @@ public:
 	virtual int getHeight() const { return 0; };
 	virtual bool isDirty() const { return false; };
 
-	static inline uint32_t MaxFPS = 15;
+	static uint32_t MaxFPS;
 };
+
+uint32_t Mng::MaxFPS = 15;
 #endif
 
 /**

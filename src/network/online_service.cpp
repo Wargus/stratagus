@@ -1,9 +1,11 @@
+#include "script.h"
+
 #include "online_service.h"
 #include "results.h"
 
 #ifdef USE_WIN32
 #include <winsock2.h>
-#else
+#elif !defined(OLD_SYSTEM)
 #include <arpa/inet.h>
 #endif
 #include <clocale>
@@ -33,7 +35,6 @@
 #endif
 
 #include "stratagus.h"
-#include "script.h"
 #include "map.h"
 #include "netconnect.h"
 #include "script.h"
@@ -230,7 +231,7 @@ public:
      * array. Caller must "delete[]" the out-char
      */
     int readAll(char** out) {
-        std::queue<uint8_t> outQueue = std::queue(buffer);
+        std::queue<uint8_t> outQueue = std::queue<uint8_t>(buffer);
         int sz = outQueue.size();
         *out = new char[sz];
         for (int i = 0; i < sz; i++) {
@@ -1206,6 +1207,7 @@ public:
             SetGames->pushPreamble();
             for (const auto value : games) {
                 if (value->isValid()) {
+#ifndef OLD_SYSTEM
                     SetGames->pushTable({{"Creator", value->getCreator()},
                                         {"Host", value->getHost().toString()},
                                         {"IsSavedGame", value->isSavedGame()},
@@ -1216,6 +1218,7 @@ public:
                                         {"Settings", value->getGameSettings()},
                                         {"Status", value->getGameStatus()},
                                         {"Type", value->getGameType()}});
+#endif
                 }
             }
             SetGames->run();
@@ -1232,9 +1235,11 @@ public:
         if (SetFriends != NULL) {
             SetFriends->pushPreamble();
             for (const auto value : friends) {
+#ifndef OLD_SYSTEM
                 SetFriends->pushTable({ { "Name", value->getName() },
                                         { "Status", value->getStatus() },
                                         { "Product", value->getProduct() } });
+#endif
             }
             SetFriends->run();
         }
@@ -1244,6 +1249,7 @@ public:
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
         if (ShowUserInfo != NULL) {
+#ifndef OLD_SYSTEM
             ShowUserInfo->pushPreamble();
             std::map<std::string, std::variant<std::string, int>> m;
             m["User"] = extendedInfoNames.at(id);
@@ -1252,6 +1258,7 @@ public:
             }
             ShowUserInfo->pushTable(m);
             ShowUserInfo->run();
+#endif
         }
     }
 
@@ -2059,8 +2066,14 @@ class S2C_SID_AUTH_INFO : public OnlineState {
             std::string exeInfo("");
             exeInfo += gameName();
             exeInfo += " ";
+#ifndef StratagusLastModifiedDate
+#define StratagusLastModifiedDate "09/05/2022"
+#endif
             exeInfo += StratagusLastModifiedDate;
             exeInfo += " ";
+#ifndef StratagusLastModifiedTime
+#define StratagusLastModifiedTime "17:52:41"
+#endif
             exeInfo += StratagusLastModifiedTime;
             exeInfo += " ";
             exeInfo += std::to_string(StratagusVersion);
@@ -2125,10 +2138,12 @@ class C2S_SID_AUTH_INFO : public OnlineState {
 #ifdef USE_WIN32
             uint32_t addr = inet_addr(CNetworkParameter::Instance.localHost.c_str());
             buffer.serialize32(addr);
-#else
+#elif !defined(OLD_SYSTEM)
             struct in_addr addr;
             inet_aton(CNetworkParameter::Instance.localHost.c_str(), &addr);
             buffer.serialize32(addr.s_addr);
+#else
+            buffer.serialize32(0);
 #endif
         } else {
             unsigned long ips[20];
@@ -2395,6 +2410,7 @@ static int CclPunchNAT(lua_State *l) {
 void OnlineServiceCclRegister() {
     lua_createtable(Lua, 0, 3);
 
+#ifndef OLD_SYSTEM
     lua_pushcfunction(Lua, CclSetup);
     lua_setfield(Lua, -2, "setup");
 
@@ -2428,6 +2444,7 @@ void OnlineServiceCclRegister() {
     lua_setfield(Lua, -2, "stopadvertising");
     lua_pushcfunction(Lua, CclPunchNAT);
     lua_setfield(Lua, -2, "punchNAT");
+#endif
 
     lua_setglobal(Lua, "OnlineService");
 }

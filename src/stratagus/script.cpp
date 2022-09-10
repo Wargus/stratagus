@@ -33,6 +33,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#ifndef OLD_SYSTEM
 #if __has_include(<filesystem>)
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -40,7 +41,9 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-error "Missing the <filesystem> header."
+#include "ghc_filesystem.hpp"
+namespace fs = ghc::filesystem;
+#endif
 #endif
 
 #include <signal.h>
@@ -265,8 +268,10 @@ int LuaLoadFile(const std::string &file, const std::string &strArg, bool exitOnE
 	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
 
 	if (!status) {
+#ifndef OLD_SYSTEM
 		lua_pushstring(Lua, fs::absolute(fs::path(file)).generic_u8string().c_str());
 		lua_setglobal(Lua, "__file__");
+#endif
 		if (!strArg.empty()) {
 			lua_pushstring(Lua, strArg.c_str());
 			LuaCall(1, 1, exitOnError);
@@ -2657,6 +2662,7 @@ std::vector<fs::path> getVolumes()
 }
 #endif
 
+#ifndef OLD_SYSTEM
 static int CclListFilesystem(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
@@ -2694,6 +2700,7 @@ static int CclListFilesystem(lua_State *l)
 
 	return 1;
 }
+#endif
 
 void ScriptRegister()
 {

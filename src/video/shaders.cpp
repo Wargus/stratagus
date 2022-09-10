@@ -26,7 +26,7 @@
 #include "shaders.h"
 #include <stdint.h>
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(OLD_SYSTEM)
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>

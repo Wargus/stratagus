@@ -83,8 +83,7 @@ enum _diplomacy_ {
 class CPlayer
 {
 public:
-	static inline RevealTypes RevelationFor { RevealTypes::cNoRevelation }; /// type of revelation (when player lost their last main facility)
-
+	static RevealTypes RevelationFor; /// type of revelation (when player lost their last main facility)
 public:
 	/// Check if relevation enabled
 	static const bool IsRevelationEnabled()
@@ -102,8 +101,8 @@ public:
 
 private:
 	/// List of players revealed after losing their last Town Hall
-	static inline std::vector<const CPlayer *> RevealedPlayers;	
-	
+	static std::vector<const CPlayer *> RevealedPlayers;
+
 public:
 	int Index;          /// player as number
 	std::string Name;   /// name of non computer
@@ -308,6 +307,8 @@ private:
 
 	friend void CleanPlayers();
 };
+
+RevealTypes CPlayer::RevelationFor = RevealTypes::cNoRevelation;
 
 /**
 **  Races for the player

@@ -38,6 +38,9 @@
 
 #include <vector>
 #include "SDL.h"
+#ifdef OLD_SYSTEM
+#include "sdl1_wrapper.h"
+#endif
 
 /*----------------------------------------------------------------------------
 --  Definitons
