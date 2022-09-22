@@ -1214,22 +1214,29 @@ void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_
 **					where 'colors':
 ** 									color		-- single color
 ** 									{from, to}	-- range of colors
-**				{"remove-all-except", colors[, colors]..}
+**
+** 	"remove-all-except"
+** 	usage:		{"remove-all-except", colors[, colors]..}
 **					where 'colors':
 ** 									color		-- single color
 ** 									{from, to}	-- range of colors
-**				{"shift", inc, colors[, colors]..}
+**
+** 	"shift"
+** 	usage		{"shift", inc, colors[, colors]..}
 **					where 	'inc':
 **								increment (positive or negative) to be implemented on the colors
 **						 	'colors':
 ** 								color		-- single color
 ** 								{from, to}	-- range of colors
-** 				{"flip", direction}
+** 	"flip"
+** 	usage:		{"flip", direction}
 **					where 'direction':
 ** 								"vertical"
 ** 								"horizontal"
 **								"both"
-** 				{"chroma-key", src_range2, key_colors[, key_colors]..}
+**
+** 	"chroma-key"
+** 	usage:		{"chroma-key", src_range2, key_colors[, key_colors]..}
 **					where 'src_range2': (set of images to compose with images from src_range. Are taken consecutively one for each from src_range)
 **								{tile}                                  -- tile index (within main tileset) to get graphic from
 **								{tile[, tile]...}}                      -- set of tiles indexes (within main tileset) to get graphics from
