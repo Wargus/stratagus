@@ -384,7 +384,7 @@ private:
 	void removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const;
 	void swapPixels(void *const pixel1, void *const pixel2, const uint8_t bpp) const;
 	void shiftIndexedColor(void *const pixel, const int16_t shift, const uint8_t bpp) const;
-	void removeColors(lua_State *luaStack, sequence_of_images &images) const;
+	void removeColors(lua_State *luaStack, sequence_of_images &images, const bool except = false) const;
 	void shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const;
 	void flipImages(lua_State *luaStack, sequence_of_images &images) const;
 	void composeByChromaKey(lua_State *luaStack, sequence_of_images &dstImages) const;

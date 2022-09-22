@@ -1043,9 +1043,10 @@ void CTilesetGraphicGenerator::shiftIndexedColor(void *const pixel, const int16_
 **
 **	@param	luaStack		lua state
 **	@param	images			vector of tiles images to remove colors from
+** 	@param	except			flag to invert action - remove specified colors/ remove all colors except specified
 **
 **/
-void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_images &images) const
+void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_images &images, const bool except /* =false */) const
 {
 	std::set<uint32_t> colors { parseArgsAsColors(luaStack) };
 
@@ -1061,6 +1062,8 @@ void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_ima
 		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
 			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
 			if (checkPixel(pixelPos, colors, imgSurface->format->BytesPerPixel)) {
+				if (!except) removePixel(pixelPos, colorKey, imgSurface->format->BytesPerPixel);
+			} else if (except) {
 				removePixel(pixelPos, colorKey, imgSurface->format->BytesPerPixel);
 			}
 		}
@@ -1211,6 +1214,10 @@ void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_
 **					where 'colors':
 ** 									color		-- single color
 ** 									{from, to}	-- range of colors
+**				{"remove-all-except", colors[, colors]..}
+**					where 'colors':
+** 									color		-- single color
+** 									{from, to}	-- range of colors
 **				{"shift", inc, colors[, colors]..}
 **					where 	'inc':
 **								increment (positive or negative) to be implemented on the colors
@@ -1248,6 +1255,8 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 	std::string modifier { LuaToString(luaStack, -1, arg) };
 	if (modifier == "remove") {
 		removeColors(luaStack, images);
+	} else if (modifier == "remove-all-except") {
+		removeColors(luaStack, images, true);
 	} else if (modifier == "shift") {
 		shiftIndexedColors(luaStack, images);
 	} else if (modifier == "flip") {
