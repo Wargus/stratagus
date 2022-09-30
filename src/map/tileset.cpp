@@ -358,12 +358,13 @@ terrain_typeIdx CTileset::getSolidTerrainCount() const
 	return solidTerrainTypes.size();
 }
 
+/// TODO: Fix it for extended tilesets
 int32_t CTileset::findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain) const
 {
 	const CTileInfo tileInfo(baseTerrain, mixTerrain);
 
 	const size_t tilesCount = getTileCount();
-	for (size_t i = 0; i != tilesCount;) {
+	for (size_t i = 0; i != tilesCount && i <= 0x09D0;) { /// FIXME: 'i <= 0x09D0' is a temporary hack, so this loop works only for base tileset
 		if (tiles[i].tileinfo == tileInfo) {
 			return i;
 		}
@@ -409,6 +410,7 @@ int32_t CTileset::getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixT
 **  @param marks   Already visited tile types.
 **  @param tileIndex    Tile pointer.
 */
+/// TODO: Fix it for extended tilesets
 int32_t CTileset::findTilePath(int base, int goal, int length, std::vector<char> &marks, tile_index *tileIndex) const
 {
 	int32_t tileres = findTileIndex(base, goal);
@@ -425,7 +427,8 @@ int32_t CTileset::findTilePath(int base, int goal, int length, std::vector<char>
 	// Find any mixed tile
 	int32_t l = TILE_PATH_MAX;
 	const size_t tilesCount = getTileCount();
-	for (size_t i = 0; i != tilesCount;) {
+	
+	for (size_t i = 0; i != tilesCount && i <= 0x09D0;) { /// FIXME: 'i <= 0x09D0' is a temporary hack, so this loop works only for base tileset
 		int j = 0;
 		if (base == tiles[i].tileinfo.BaseTerrain) {
 			j = tiles[i].tileinfo.MixTerrain;
