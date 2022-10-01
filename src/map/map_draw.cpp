@@ -280,8 +280,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 		graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 		canShortcut = false;
 	} else {
-		canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
 		graphicTileOffset = 1;
+		canShortcut = (GameSettings.RevealMap == MapRevealModes::cHidden || FogOfWar->GetType() == FogOfWarTypes::cTiledLegacy)
+					  && !ReplayRevealMap; 
 	}
 
 	while (sy < 0) {
