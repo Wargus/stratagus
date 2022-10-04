@@ -790,7 +790,6 @@ void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, co
 		}
 	}
 }
-}
 
 /**
 **  Define the type of each player available for the map

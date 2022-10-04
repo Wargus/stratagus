@@ -1671,7 +1671,7 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 
 		if (lua_rawlen(luaStack, -1) > cSrc) {
 			int tableArg = cAddFlags - 1; /// Because parseTilesetTileFlags() takes previous argument idx
-			flagsAdditional = CTileset::parseTilesetTileFlags(luaStack, &tableArg);
+			flagsAdditional = BaseTileset->parseTilesetTileFlags(luaStack, &tableArg);
 			if (flagsAdditional & MapFieldDecorative) {
 				baseTerrain = BaseTileset->addDecoTerrainType();
 			}

@@ -87,7 +87,7 @@ constexpr tile_flags MapFieldNonMixing		{0x0000'0000'8000'0000};	/// special fla
 
 constexpr uint8_t MapFieldSubtilesMax				{16};
 constexpr uint8_t MapFieldSubtilesUnpassableShift	{48};
-constexpr tile_flags MapFieldSubtilesUnpassableMask	{0xFFFFL << MapFieldSubtilesUnpassableShift}; /// Up to 16 unpassable subtiles, never used in MapField, only in CTile
+constexpr tile_flags MapFieldSubtilesUnpassableMask	{tile_flags(0xFFFF) << MapFieldSubtilesUnpassableShift}; /// Up to 16 unpassable subtiles, never used in MapField, only in CTile
 
 
 /**
@@ -206,8 +206,7 @@ public:
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
-	static bool ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount);
-	static tile_flags parseTilesetTileFlags(lua_State *l, int *j);
+	tile_flags parseTilesetTileFlags(lua_State *l, int *j);
 	
 	terrain_typeIdx getOrAddSolidTileIndexByName(const std::string &name);
 	
@@ -220,6 +219,7 @@ public:
 	int32_t findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain = 0) const;
 
 private:
+	bool ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount);
 	int32_t getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
