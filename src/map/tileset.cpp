@@ -244,7 +244,7 @@ bool CTileset::insertTiles(const std::map<tile_index, CTile> &newTiles)
 		}
 	}
 	/// Copy new tiles
-	for (auto &insertTile : newTiles) {
+	for (const auto &insertTile : newTiles) {
 		tiles[insertTile.first] = insertTile.second;
 	}
 	return true;
@@ -253,8 +253,7 @@ bool CTileset::insertTiles(const std::map<tile_index, CTile> &newTiles)
 tile_index CTileset::getDefaultTileIndex() const
 {
 	const int n = tiles.size();
-    int solid = 0;
-    for (int i = 0; i < n;) {
+	for (int i = 0; i < n;) {
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
@@ -276,20 +275,20 @@ tile_index CTileset::getDefaultWoodTileIndex() const
     const size_t n = getTileCount();
     tile_index solid = 0;
     for (size_t i = 0; i < n;) {
-	const CTile &tile = tiles[i];
-	const CTileInfo &tileinfo = tile.tileinfo;
-	if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
-	    i += 256;
-	} else {
-	    if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
-			if (tile.flag & MapFieldForest) {
-				solid = i;
+		const CTile &tile = tiles[i];
+		const CTileInfo &tileinfo = tile.tileinfo;
+		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
+			i += 256;
+		} else {
+			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
+				if (tile.flag & MapFieldForest) {
+					solid = i;
+				}
 			}
-	    }
-	    i += 16;
+			i += 16;
+		}
 	}
-    }
-    return solid;
+	return solid;
 }
 
 bool CTileset::isAWallTile(tile_index tile) const
@@ -404,11 +403,11 @@ int32_t CTileset::getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixT
 /**
 **  Find a tile path.
 **
-**  @param base    Start tile type.
-**  @param goal    Goal tile type.
-**  @param length  Best found path length.
-**  @param marks   Already visited tile types.
-**  @param tileIndex    Tile pointer.
+**  @param base			Start tile type.
+**  @param goal			Goal tile type.
+**  @param length		Best found path length.
+**  @param marks		Already visited tile types.
+**  @param tileIndex	Tile pointer.
 */
 /// TODO: Fix it for extended tilesets
 int32_t CTileset::findTilePath(int base, int goal, int length, std::vector<char> &marks, tile_index *tileIndex) const
@@ -610,7 +609,7 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 int32_t CTileset::findTileIndexByTile(graphic_index tile) const
 {
 	tile_index index = 0;
-	for (auto &checkTile : tiles) {
+	for (const auto &checkTile : tiles) {
 		if (tile == checkTile.tile) {
 			return index;
 		}

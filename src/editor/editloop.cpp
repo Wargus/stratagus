@@ -138,10 +138,10 @@ static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
-static gcn::Container	*editorContainer {nullptr};
-static gcn::Slider 		*editorSlider {nullptr};
-static gcn::DropDown	*toolDropdown {nullptr};
-static gcn::DropDown	*overlaysDropdown {nullptr};
+static gcn::Container	*editorContainer	{nullptr};
+static gcn::Slider		*editorSlider		{nullptr};
+static gcn::DropDown	*toolDropdown		{nullptr};
+static gcn::DropDown	*overlaysDropdown	{nullptr};
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1164,7 +1164,6 @@ static void EditorCallbackButtonUp(unsigned button)
 	}
 
 	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
-		int num = 0;
 		PixelPos pos0 = CursorStartMapPos;
 		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		PixelPos pos1 = cursorMapPos;

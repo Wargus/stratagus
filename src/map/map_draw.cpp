@@ -274,7 +274,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 	const int map_max = mapW * mapH;
 	PixelSize graphicTileSize = Map.Tileset->getPixelTileSize();
 	/// uninitialized when graphicalTileIsLogicalTile
-	int graphicTileOffset {1};
+	int graphicTileOffset;
 	bool canShortcut;
 	if constexpr(!graphicalTileIsLogicalTile) {
 		graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();

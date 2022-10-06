@@ -50,10 +50,10 @@
 
 struct lua_State;
 
-using tile_index 		= uint16_t;
+using tile_index		= uint16_t;
 using graphic_index		= uint16_t;
-using tile_flags 		= uint64_t;
-using terrain_typeIdx 	= uint8_t;
+using tile_flags		= uint64_t;
+using terrain_typeIdx	= uint8_t;
 
 // Not used until now: 
 constexpr tile_flags MapFieldSpeedMask		{0x0000'0000'0000'0003};	/// Move faster on this tile
@@ -261,7 +261,7 @@ private:
 	graphic_index removedRockTile;		/// Tile placed where rocks are gone
 	int rockTable[20];					/// Removed rock placement table
 	tile_index humanWallTable[16];		/// Human wall placement table
-	tile_index orcWallTable[16];			/// Orc wall placement table
+	tile_index orcWallTable[16];		/// Orc wall placement table
 #endif
 };
 
@@ -401,7 +401,7 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	const CTileset *SrcTileset 			{nullptr};	
+	const CTileset *SrcTileset			{nullptr};
 	const CGraphic *SrcTilesetGraphic	{nullptr};
 	const CGraphic *SrcImgGraphic		{nullptr};
 
@@ -445,12 +445,12 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	CTileset 		*BaseTileset 	{nullptr};
-	const CGraphic 	*BaseGraphic 	{nullptr};
-	CGraphic 		*SrcImgGraphic 	{nullptr};
+	CTileset		*BaseTileset	{nullptr};
+	const CGraphic	*BaseGraphic	{nullptr};
+	CGraphic		*SrcImgGraphic	{nullptr};
 	
-	sequence_of_images	 		ExtGraphic;
-	std::map<tile_index, CTile> ExtTiles;
+	sequence_of_images			ExtGraphic;
+	std::map<tile_index, CTile>	ExtTiles;
 };
 /*----------------------------------------------------------------------------
 --  Functions

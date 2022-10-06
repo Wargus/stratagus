@@ -456,7 +456,7 @@ void CTileset::buildTable(lua_State *l)
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
-	for (auto &currTile : tiles) {		
+	for (auto &currTile : tiles) {
 		const graphic_index tile = currTile.tile;
 		if (tile == 0) {
 			continue;
@@ -746,12 +746,12 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 /**
 ** Parse top argument in the lua state for range of source indexes
 **	
-**	tile                          			-- tile index (within main tileset) to get graphic from
-**	{tile[, tile]...}}            			-- set of tiles indexes (within main tileset) to get graphics from
-**	{"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
-**	{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"),
-**								  			-- otherwise indexes from tile to tile (within main tileset) to get graphics from
-**	{"slot", slot_num}            			-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**	tile									-- tile index (within main tileset) to get graphic from
+**	{tile[, tile]...}}						-- set of tiles indexes (within main tileset) to get graphics from
+**	{"img"|"img-base", image[, image]...}	-- set of numbers of frames from the extended (or base tileset) "image" file.
+**	{["img"|"img-base",] "range", from, to}	-- if "img" then from frame to frame (for "image"),
+**											-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**	{"slot", slot_num}						-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 **
 **	@param luaStack		lua state, top argument will be parsed
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
@@ -788,7 +788,7 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 ** or	
 ** { src_range [,{"do_something", parameter}...] }
 **
-**	@param	luaStack 		lua state, top argument will be parsed - it can be table of layers or single layer
+**	@param	luaStack		lua state, top argument will be parsed - it can be table of layers or single layer
 **	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
 **	@return					set of images described in this layer or set of indexes of existing tileset graphics
 **/
@@ -819,7 +819,7 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 
 	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
 											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
-											 && !withModifier) 							/* there are no any modifiers */
+											 && !withModifier)							/* there are no any modifiers */
 											 					? true 
 																: false;
 
@@ -837,8 +837,8 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 			parsedIndexes.push_back(frameIdx);
 
 		} else {
-			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics ? SrcImgGraphic 
-											   				   				   : SrcTilesetGraphic;
+			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics	? SrcImgGraphic 
+															   					: SrcTilesetGraphic;
 			auto image { newBlankImage() };		
 			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
 			parsedImages.push_back(std::move(image));
@@ -915,7 +915,7 @@ uint32_t CTilesetGraphicGenerator::getPixel(const void *const pixel, const uint8
 		case 3:
 			{
 				const uint8_t *const pixelPtr = static_cast<const uint8_t*>(pixel);
-				pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]       | pixelPtr[1] << 8  | pixelPtr[2] << 16
+				pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]		 | pixelPtr[1] << 8	 | pixelPtr[2] << 16
 															 : pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
 			}
 			break;
@@ -1209,44 +1209,44 @@ void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_
 **	Parse pixel modifiers in the lua state
 ** {"do_something", parameter}
 ** where 'do_something':
-** 	"remove"
+**	"remove"
 ** 	usage:		{"remove", colors[, colors]..}
 **					where 'colors':
-** 									color		-- single color
-** 									{from, to}	-- range of colors
+**									color		-- single color
+**									{from, to}	-- range of colors
 **
-** 	"remove-all-except"
-** 	usage:		{"remove-all-except", colors[, colors]..}
+**	"remove-all-except"
+**	usage:		{"remove-all-except", colors[, colors]..}
 **					where 'colors':
-** 									color		-- single color
-** 									{from, to}	-- range of colors
+**									color		-- single color
+**									{from, to}	-- range of colors
 **
-** 	"shift"
-** 	usage		{"shift", inc, colors[, colors]..}
+**	"shift"
+**	usage		{"shift", inc, colors[, colors]..}
 **					where 	'inc':
 **								increment (positive or negative) to be implemented on the colors
 **						 	'colors':
-** 								color		-- single color
-** 								{from, to}	-- range of colors
-** 	"flip"
-** 	usage:		{"flip", direction}
+**								color		-- single color
+**								{from, to}	-- range of colors
+**	"flip"
+**	usage:		{"flip", direction}
 **					where 'direction':
-** 								"vertical"
-** 								"horizontal"
+**								"vertical"
+**								"horizontal"
 **								"both"
 **
-** 	"chroma-key"
-** 	usage:		{"chroma-key", src_range2, key_colors[, key_colors]..}
+**	"chroma-key"
+**	usage:		{"chroma-key", src_range2, key_colors[, key_colors]..}
 **					where 'src_range2': (set of images to compose with images from src_range. Are taken consecutively one for each from src_range)
-**								{tile}                                  -- tile index (within main tileset) to get graphic from
-**								{tile[, tile]...}}                      -- set of tiles indexes (within main tileset) to get graphics from
-**								{"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
-**								{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"),        
+**								{tile}									-- tile index (within main tileset) to get graphic from
+**								{tile[, tile]...}}						-- set of tiles indexes (within main tileset) to get graphics from
+**								{"img"|"img-base", image[, image]...}	-- set of numbers of frames from the extended (or base tileset) "image" file.
+**								{["img"|"img-base",] "range", from, to}	-- if "img" then from frame to frame (for "image"),        
 **																		-- otherwise indexes from tile to tile (within main tileset) to get graphics from
-**								{"slot", slot_num}                      -- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**								{"slot", slot_num}						-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 **						 'key_colors': (chroma keys)
-** 								color		-- single color
-** 								{from, to}	-- range of colors
+**								color		-- single color
+**								{from, to}	-- range of colors
 **
 **	@param	luaStack	lua state, a table in the top will be parsed
 **	@param	argPos		position in the table to parse
@@ -1435,13 +1435,13 @@ std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Fai
 **	@return					cartesian product of src sets
 **/
 std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences(std::vector<sequence_of_images> const &src, 
-																		 	 const bool isFairMethod/* = true*/) const
+																			 const bool isFairMethod/* = true*/) const
 {
 	if (isFairMethod || src.size() == 1) {
-        return buildSequences_Fair(src);
-    } else {
-        return buildSequences_Cicadas(src);
-    }
+		return buildSequences_Fair(src);
+	} else {
+		return buildSequences_Cicadas(src);
+	}
 }
 
 /**
@@ -1525,7 +1525,7 @@ void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 **	@param luaStack		lua state
 **	@param tablePos		position of the table containing range to parse
 **	@param argPos		argument in the table to parse
-**	@return 			vector of parsed indexes
+**	@return				vector of parsed indexes
 **
 **/
 std::vector<tile_index> CTilesetParser::parseDstRange(lua_State *luaStack, const int tablePos, const int argPos)
@@ -1544,7 +1544,7 @@ std::vector<tile_index> CTilesetParser::parseDstRange(lua_State *luaStack, const
 **
 **	@param luaStack		lua state
 **	@param parseFromPos	if argument to parse is a table, then start to parse from this pos
-**	@return 			vector of parsed indexes	
+**	@return				vector of parsed indexes	
 **/
 std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, const int parseFromPos/* = 1*/)
 {
@@ -1724,7 +1724,7 @@ void CTilesetParser::parseExtendedSlots(lua_State *luaStack, int arg)
 /**
 **  Parse the extended tileset definition with graphic generation 
 **
-**  @param luaStack        Lua state.
+**  @param luaStack		Lua state.
 **
 **
   "image", path-to-image-with-tileset-graphic, -- optional for extended tileset
