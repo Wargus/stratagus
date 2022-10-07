@@ -282,6 +282,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 	} else {
 		graphicTileOffset = 1;
 		canShortcut = (GameSettings.RevealMap == MapRevealModes::cHidden || FogOfWar->GetType() == FogOfWarTypes::cTiledLegacy)
+					  && FogOfWar->GetType() != FogOfWarTypes::cEnhanced
 					  && !ReplayRevealMap; 
 	}
 
