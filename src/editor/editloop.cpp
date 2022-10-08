@@ -1242,10 +1242,6 @@ static void EditorCallbackButtonDown(unsigned button)
 
 						tile_index index = 0;
 						for (auto &currTile : Map.Tileset->tiles) {
-							
-							/// FIXME: @tim, check pls why this line was added here with commit: 2da51da
-							const CTileInfo &info = currTile.tileinfo; 
-							
 							if (currTile.tile) {
 								Editor.ShownTileTypes.push_back(currTile.tile);
 							}
