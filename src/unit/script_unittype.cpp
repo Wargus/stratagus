@@ -727,6 +727,9 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
+			if (GameRunning) {
+				type->Missile.MapMissile();
+			}
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
