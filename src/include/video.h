@@ -34,6 +34,8 @@
 //@{
 
 #include "SDL.h"
+#include "sdl2_helper.h"
+
 #include "shaders.h"
 #include "guichan.h"
 
@@ -157,8 +159,8 @@ public:
 							 SDL_Surface *surface = TheScreen) const;
 
 
-	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
-	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
+	static CGraphic *ForceNew(const std::string &file, const int w = 0, const int h = 0);
 	static CGraphic *Get(const std::string &file);
 
 	static void Free(CGraphic *g);
@@ -167,6 +169,7 @@ public:
 	void Flip();
 	void Resize(int w, int h);
 	void SetOriginalSize();
+	void AppendFrames(const sequence_of_images &frames);
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
 	void MakeShadow(int xOffset, int yOffset);
@@ -181,6 +184,10 @@ public:
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
 
+private:
+	void ExpandFor(const uint16_t numOfFramesToAdd);
+
+public:
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface

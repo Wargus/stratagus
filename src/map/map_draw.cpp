@@ -258,7 +258,7 @@ void CViewport::DrawMapGridInViewport() const
 }
 
 template<bool graphicalTileIsLogicalTile>
-void CViewport::DrawMapBackgroundInViewport() const
+void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highlightChecker /* = nullptr */) const
 {
 	int ex = this->BottomRightPos.x;
 	int ey = this->BottomRightPos.y;
@@ -280,8 +280,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 		graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 		canShortcut = false;
 	} else {
-		canShortcut = FogOfWar->GetType() != FogOfWarTypes::cEnhanced && !ReplayRevealMap;
 		graphicTileOffset = 1;
+		canShortcut = (GameSettings.RevealMap == MapRevealModes::cHidden || FogOfWar->GetType() == FogOfWarTypes::cTiledLegacy)
+					  && FogOfWar->GetType() != FogOfWarTypes::cEnhanced
+					  && !ReplayRevealMap; 
 	}
 
 	while (sy < 0) {
@@ -343,6 +345,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 #endif
+			/// Highlight layer if needed (editor stuff)
+			if (highlightChecker && highlightChecker(mf)) {
+				Video.FillTransRectangleClip(ColorRed, dx, dy, PixelTileSize.x, PixelTileSize.y, 128);
+			}
 			if constexpr(graphicalTileIsLogicalTile) {
 				++sx;
 			} else {
@@ -411,16 +417,16 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 /**
 **  Draw a map viewport.
 */
-void CViewport::Draw()
+void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr */)
 {
 	PushClipping();
 	this->SetClipping();
 
 	/* this may take while */
 	if (Map.Tileset->getLogicalToGraphicalTileSizeShift() > 0) {
-		this->DrawMapBackgroundInViewport<false>();
+		this->DrawMapBackgroundInViewport<false>(highlightChecker);
 	} else {
-		this->DrawMapBackgroundInViewport<true>();
+		this->DrawMapBackgroundInViewport<true>(highlightChecker);
 	}
 
 	Missile *clickMissile = NULL;

@@ -113,10 +113,11 @@ private:
 		uint16_t 		 OpaqueFields {MapFieldOpaque};    				/// Flags for opaque MapFields
 	} Settings;
 
-	Vec2i            currTilePos  {0, 0};	/// Current work tile pos in global (Map) system coordinates
-	uint8_t		 	 currOctant   {0};		/// Current octant
-	Vec2i		 	 Origin 	  {0, 0};	/// Position of the spectator in the global (Map) coordinate system
-	uint16_t		 OpaqueFields {0};		/// Flags for opaque MapTiles for current calculation
+	Vec2i		currTilePos		{0, 0};	/// Current work tile pos in global (Map) system coordinates
+	uint8_t		currOctant		{0};	/// Current octant
+	Vec2i		Origin			{0, 0};	/// Position of the spectator in the global (Map) coordinate system
+	uint8_t		Elevation		{0};	/// highground elevation level of origin
+	uint16_t	OpaqueFields	{0};	/// Flags for opaque MapTiles for current calculation
 	
 	const CPlayer   *Player 	  {nullptr};	/// Pointer to player to set FoV for
 	const CUnit     *Unit 		  {nullptr};	/// Pointer to unit to calculate FoV for
@@ -150,8 +151,12 @@ inline bool CFieldOfView::SetCurrentTile(const int16_t col, const int16_t row)
 
 inline bool CFieldOfView::IsTileOpaque() const
 {
-	/// FIXME: add high-/lowground
-	return (Map.Field(currTilePos.x, currTilePos.y)->Flags & OpaqueFields);
+	const CMapField &mf = *Map.Field(currTilePos.x, currTilePos.y);
+	if (this->Elevation > mf.getElevation()) {
+		return false;
+	} else if (this->Elevation < mf.getElevation()) {
+		return true;
+	} else return (mf.Flags & OpaqueFields);
 }
 
 inline void CFieldOfView::MarkTile()

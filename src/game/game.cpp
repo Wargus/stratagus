@@ -407,12 +407,13 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSi
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
 					const int tile = mf.getGraphicTile();
-					const int n = map.Tileset->findTileIndexByTile(tile);
+					const int32_t n = map.Tileset->findTileIndexByTile(tile);
 					const int value = mf.Value;
+					const int elevation = mf.getElevation();
 					const int x = j + offset.x;
 					const int y = i + offset.y;
 					if (x < newSize.x && y < newSize.y) {
-						f->printf("SetTile(%3d, %d, %d, %d)\n", n, x, y, value);
+						f->printf("SetTile(%3d, %d, %d, %d, %d)\n", n, x, y, value, elevation);
 					}
 				}
 			}

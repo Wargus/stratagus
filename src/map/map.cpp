@@ -430,7 +430,7 @@ void CMap::Save(CFile &file) const
 **  @param seen  1 if updating seen value, 0 for real
 **  @param pos   Map tile-position.
 */
-void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
+void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 {
 	Assert(type == MapFieldForest || type == MapFieldRocks);
 
@@ -530,7 +530,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 **  @param seen  1 if updating seen value, 0 for real
 **  @param pos   Map tile-position.
 */
-void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
+void CMap::FixNeighbors(tile_flags type, int seen, const Vec2i &pos)
 {
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
 							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)
@@ -643,7 +643,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0, mf.getElevation());
 		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
@@ -652,7 +652,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		UI.Minimap.UpdateXY(pos + offset);
 
 
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0, mf.getElevation());
 		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
