@@ -84,10 +84,10 @@ void ChangeTile(const Vec2i &pos, int tile)
 **  ab
 **  cd -> abcd
 */
-static unsigned QuadFromTile(const Vec2i &pos)
+static uint32_t QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	const int tile = Map.Field(pos)->getGraphicTile();
+	const graphic_index tile = Map.Field(pos)->getGraphicTile();
 	return Map.Tileset->getQuadFromTile(tile);
 }
 
@@ -124,7 +124,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bo
 			tile += i;
 		}
 	}
-	mf.setTileIndex(*Map.Tileset, tile, 0);
+	mf.setTileIndex(*Map.Tileset, tile, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);

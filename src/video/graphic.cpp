@@ -418,7 +418,7 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned fra
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, int w, int h)
+CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 {
 	if (filename.empty()) {
 		return new CGraphic;
@@ -492,7 +492,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::ForceNew(const std::string &file, int w, int h)
+CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 {
 	CGraphic *g = new CGraphic;
 	if (!g) {
@@ -991,6 +991,81 @@ void CGraphic::SetOriginalSize()
 	this->Load();
 
 	Resized = false;
+}
+
+/**
+**  Add additional frames to the end of this graphic set
+**
+**  @param frames  Vector of frame-sized SDL surfaces with frames to add
+**  
+*/
+void CGraphic::AppendFrames(const sequence_of_images &frames)
+{
+	Assert(!Resized); /// We can't add frames into a resized graphic set
+
+	uint16_t currFrame = this->NumFrames;
+	ExpandFor(frames.size());
+	
+	for (auto &frame : frames) {
+		SDL_Rect dstRect { frame_map[currFrame].x, frame_map[currFrame].y, Width, Height };
+		SDL_BlitSurface(frame.get(), NULL, Surface, &dstRect);
+		currFrame++;
+	}
+}
+
+/**
+**  Expand graphic set for certain number of frames
+**
+**  @param numOfFramesToAdd  Number of frames to add into the graphic set
+**  
+*/
+void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
+{
+	Assert(!Resized); /// We can't add frames into a resized graphic set
+
+	if (numOfFramesToAdd == 0) {
+		return;
+	}
+	const uint16_t cols = GraphicWidth / Width;
+	GraphicHeight += Height * ((numOfFramesToAdd - 1) / cols + 1);
+
+	const SDL_PixelFormat *pf = Surface->format;
+	const uint8_t bpp = Surface->format->BytesPerPixel;
+	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GraphicWidth, GraphicHeight, 
+													8 * bpp, 
+													pf->Rmask, 
+													pf->Gmask, 
+													pf->Bmask,
+													pf->Amask);
+	uint32_t ckey;
+	const bool useckey = !SDL_GetColorKey(Surface, &ckey);
+	if (useckey) {
+		SDL_SetColorKey(newSurface, SDL_TRUE, ckey);
+	}
+
+	SDL_FillRect(newSurface, NULL, useckey ? ckey : 0);
+
+	/// Copy pixels
+	const uint8_t *src = static_cast<uint8_t*>(Surface->pixels);
+		  uint8_t *dst = static_cast<uint8_t*>(newSurface->pixels);
+	const size_t dataSize= Surface->pitch * Surface->h;
+	std::copy(src, &src[dataSize], dst);
+
+
+	if (bpp == 1) {
+		VideoPaletteListRemove(Surface);
+
+		const SDL_Palette *palette = Surface->format->palette;
+		SDL_SetPaletteColors(newSurface->format->palette, palette->colors, 0, palette->ncolors);
+
+		VideoPaletteListAdd(newSurface);
+	}
+
+	SDL_FreeSurface(Surface);
+	Surface = newSurface;
+	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
+	
+	GenFramesMap();
 }
 
 /**

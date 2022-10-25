@@ -29,7 +29,6 @@
 
 //@{
 
-#include "tileset.h"
 #define ICON_SIZE_X (UI.ButtonPanel.Buttons[0].Style->Width)
 #define ICON_SIZE_Y (UI.ButtonPanel.Buttons[0].Style->Height)
 
@@ -41,7 +40,6 @@
 #include <stdexcept>
 
 #include "stratagus.h"
-
 #include "ui.h"
 
 #include "action/action_build.h"
@@ -66,6 +64,8 @@
 #include "unittype.h"
 #include "video.h"
 #include "widgets.h"
+
+#include "tileset.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -72,6 +72,7 @@ extern void DrawGuichanWidgets();
 extern void CleanGame();
 extern void CreateGame(const std::string &filename, CMap *map);
 
+extern void DrawMapArea(const fieldHighlightChecker highlightChecker);
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -115,6 +116,13 @@ enum EditorActionType {
 	EditorActionTypeRemoveUnit
 };
 
+enum EditorOverlays {
+	cNone,
+	cUnpassable,
+	cNoBuildingAllowed,
+	cElevation,
+	cOpaque
+};
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
@@ -130,10 +138,10 @@ static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
-static gcn::Container *editorContainer;
-static gcn::Slider *editorSlider;
-static gcn::DropDown *toolDropdown;
-
+static gcn::Container	*editorContainer	{nullptr};
+static gcn::Slider		*editorSlider		{nullptr};
+static gcn::DropDown	*toolDropdown		{nullptr};
+static gcn::DropDown	*overlaysDropdown	{nullptr};
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -153,20 +161,22 @@ static void EditTile(const Vec2i &pos, int tile)
  	Assert(Map.Info.IsPointOnMap(pos));	
 
 	const CTileset &tileset = *Map.Tileset;
-	int baseTileIndex = tileset.findTileIndexByTile(tile);
+
 	CMapField &mf = *Map.Field(pos);
+	
+	int32_t baseTileIndex = tileset.findTileIndexByTile(tile);
 	if (baseTileIndex <= 0) {
 		// use the tile under the cursor and randomize *that* if it's
 		// not a mix tile
 		baseTileIndex = tileset.findTileIndexByTile(mf.getGraphicTile());
-		const int mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
+		const int32_t mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
 		if (mixTerrainIdx > 0) {
 			return;
 		}
 		baseTileIndex = baseTileIndex / 16 * 16;
 	}
-	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
-	mf.setTileIndex(tileset, tileIndex, 0);
+	const tile_index tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
+	mf.setTileIndex(tileset, tileIndex, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -228,6 +238,15 @@ static void EditTiles(const Vec2i &pos, int tile, int size)
 	EditTilesInternal(mirror, tile, size);
 }
 
+/**
+**  Set map tile's elevation level
+**
+**  @param pos   map tile coordinate.
+**/
+static void EditorSetElevationLevel(const Vec2i &pos, const uint8_t elevation)
+{
+	Map.Field(pos)->setElevation(elevation);
+}
 /*----------------------------------------------------------------------------
 --  Actions
 ----------------------------------------------------------------------------*/
@@ -664,7 +683,7 @@ static void DrawUnitIcons()
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
  * iteration was requested.
  */
-static bool forEachTileOptionArea(std::function<bool(bool,std::string,int,int,int,int,int)> forEach) {
+static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,int,int,int)> forEach) {
 	int x1 = getSelectionArea()[0];
 	int y1 = getSelectionArea()[1];
 	int x2 = getSelectionArea()[2];
@@ -837,6 +856,14 @@ static void DrawIntoButtonArea()
 	}
 }
 
+static void DrawInfoHighlightedOverlay()
+{
+	if (overlaysDropdown->getSelected() == EditorOverlays::cElevation) {
+		CLabel(GetGameFont()).Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5, 2, 
+								   Editor.HighlightElevationLevel);
+	}
+}
+
 /**
 **  Draw the editor panels.
 */
@@ -844,6 +871,7 @@ static void DrawEditorPanel()
 {
 	DrawIntoSelectionArea();
 	DrawIntoButtonArea();
+	DrawInfoHighlightedOverlay();
 }
 
 /**
@@ -900,14 +928,13 @@ static void DrawMapCursor()
 			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x * TileCursorSize, Map.Tileset->getPixelTileSize().y * TileCursorSize);
 			PopClipping();
 		} else {
-			// If there is an unit under the cursor, it's selection thing
-			//  is drawn somewhere else (Check DrawUnitSelection.)
-			if (UnitUnderCursor != NULL) {
-				PushClipping();
-				UI.MouseViewport->SetClipping();
-				Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
-				PopClipping();
+			PushClipping();
+			UI.MouseViewport->SetClipping();
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+			if (Editor.State == EditorStateType::EditorElevationLevel) {
+				CLabel(GetGameFont()).DrawClip(screenPos.x + 2, screenPos.y + 1, Editor.SelectedElevationLevel);
 			}
+			PopClipping();
 		}
 	}
 }
@@ -975,9 +1002,10 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.getFlag();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
+			mf.getElevation(),
 			mf.Value, flag,
-			flag & MapFieldOpaque       ? 'o' : '_',
+			flag & MapFieldOpaque       ? 'o' : '-',
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldNoBuilding   ? 'n' : '-',
 			flag & MapFieldHuman        ? 'h' : '-',
@@ -997,9 +1025,9 @@ static void DrawEditorInfo()
 	const CTileset &tileset = *Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
-	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
+	const terrain_typeIdx mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight(), buf);
@@ -1031,7 +1059,7 @@ void EditorUpdateDisplay()
 {
 	ColorCycle();
 
-	DrawMapArea(); // draw the map area
+	DrawMapArea(Editor.OverlayHighlighter); // draw the map area
 
 	DrawStartLocations();
 
@@ -1086,6 +1114,29 @@ void EditorUpdateDisplay()
 }
 
 /*----------------------------------------------------------------------------
+--  Highlight layers
+----------------------------------------------------------------------------*/
+static inline bool OverlayElevation(const CMapField &mapField)
+{
+	return mapField.getElevation() == Editor.HighlightElevationLevel;
+}
+
+static inline bool OverlayUnpassable(const CMapField &mapField)
+{
+	return mapField.getFlag() & MapFieldUnpassable;
+}
+
+static inline bool OverlayNoBuildingAllowed(const CMapField &mapField)
+{
+	return mapField.getFlag() & MapFieldNoBuilding;
+}
+
+static inline bool OverlayOpaque(const CMapField &mapField)
+{
+	return mapField.isOpaque();
+}
+
+/*----------------------------------------------------------------------------
 --  Input / Keyboard / Mouse
 ----------------------------------------------------------------------------*/
 
@@ -1113,7 +1164,6 @@ static void EditorCallbackButtonUp(unsigned button)
 	}
 
 	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
-		int num = 0;
 		PixelPos pos0 = CursorStartMapPos;
 		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		PixelPos pos1 = cursorMapPos;
@@ -1189,11 +1239,13 @@ static void EditorCallbackButtonDown(unsigned button)
 					if (TileToolNoFixup) {
 						Editor.ShownTileTypes.clear();
 						Editor.SelectedTileIndex = -1;
-						for (size_t i = 0; i < Map.Tileset->getTileCount(); i++) {
-							const CTileInfo &info = Map.Tileset->tiles[i].tileinfo;
-							if (Map.Tileset->tiles[i].tile) {
-								Editor.ShownTileTypes.push_back(Map.Tileset->tiles[i].tile);
+
+						tile_index index = 0;
+						for (auto &currTile : Map.Tileset->tiles) {
+							if (currTile.tile) {
+								Editor.ShownTileTypes.push_back(currTile.tile);
 							}
+							index++;
 						}
 					} else {
 						Editor.ShownTileTypes.clear();
@@ -1320,6 +1372,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				GameCursor = UI.Cross.Cursor;
 				CursorState = CursorStateRectangle;
+			} else if (Editor.State == EditorStateType::EditorElevationLevel) {
+				EditorSetElevationLevel(tilePos, Editor.SelectedElevationLevel);
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode
@@ -1482,7 +1536,34 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		}
-
+		case 'g': // Toggle map grid
+			CViewport::EnableGrid(!CViewport::isGridEnabled());
+			break;
+		case '+': /// Increace brush's elevation level
+		case '=':
+			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel < 255) {
+				Editor.SelectedElevationLevel++;
+			}
+			break;
+		case '-': /// Decreace brush's elevation level
+			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel > 0) {
+				Editor.SelectedElevationLevel--;
+			}
+			break;
+		case ']': /// Increace highlighted elevation level
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
+				&& Editor.HighlightElevationLevel < 255) {
+				
+				Editor.HighlightElevationLevel++;
+			}
+			break;
+		case '[': /// Decreace highlighted elevation level
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
+				&& Editor.HighlightElevationLevel > 0) {
+				
+				Editor.HighlightElevationLevel--;
+			}
+			break;
 		default:
 			HandleCommandKey(key);
 			return;
@@ -1586,7 +1667,7 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	int bx = UI.InfoPanel.X + 4;
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
-	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string label, int i, int x, int y, int w, int h) {
+	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string &label, int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 			ButtonUnderCursor = i + 300;
 			CursorOn = CursorOnButton;
@@ -1598,8 +1679,9 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
 			const int tile = Editor.ShownTileTypes[i];
-			const int tileindex = Map.Tileset->findTileIndexByTile(tile);
-			const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
+			const int32_t tileindex = Map.Tileset->findTileIndexByTile(tile);
+			Assert(tileindex != -1);
+			const terrain_typeIdx base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 			UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 			Editor.CursorTileIndex = i;
 			return false;
@@ -1839,7 +1921,7 @@ void CEditor::Init()
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
+			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0, 0);
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
@@ -1998,7 +2080,7 @@ void EditorMainLoop()
 	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
-	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
+	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units", "Elevation" };
 	gcn::ListModel *toolList = new StringListModel(toolListStrings);
 	toolDropdown = new gcn::DropDown(toolList);
 	LambdaActionListener *toolDropdownListener = new LambdaActionListener([&toolListStrings](const std::string&) {
@@ -2026,6 +2108,11 @@ void EditorMainLoop()
 				RecalculateShownUnits();
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
+				return;
+			case 4:
+				Editor.State = EditorElevationLevel;
+				editorSlider->setVisible(false);
+				Editor.SelectedElevationLevel = 0;
 				return;
 			default: {
 				std::string selectedString = toolListStrings[selected];
@@ -2060,10 +2147,55 @@ void EditorMainLoop()
 	// toolDropdown->setFont(GetSmallFont());
 	if (UI.MenuButton.Y < toolDropdown->getHeight()) {
 		// menu button is up top, move the selection tool right
-		editorContainer->add(toolDropdown, UI.MenuButton.X + UI.MenuButton.Style->Width, 0);
+		editorContainer->add(toolDropdown, UI.MenuButton.X + UI.MenuButton.Style->Width + 10, 0);
 	} else {
 		editorContainer->add(toolDropdown, 0, 0);
 	}
+
+	std::vector<std::string> overlaysListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
+	gcn::ListModel *overlaysList = new StringListModel(overlaysListStrings);
+	overlaysDropdown = new gcn::DropDown(overlaysList);
+	LambdaActionListener *overlaysDropdownListener = new LambdaActionListener([&overlaysListStrings](const std::string&) {
+		const int selected = overlaysDropdown->getSelected();
+		switch (selected) {
+			case EditorOverlays::cNone:
+				Editor.OverlayHighlighter = nullptr;
+				return;
+			case EditorOverlays::cUnpassable:
+				Editor.OverlayHighlighter = OverlayUnpassable;
+				return;
+			case EditorOverlays::cNoBuildingAllowed:
+				Editor.OverlayHighlighter = OverlayNoBuildingAllowed;
+				return;
+			case EditorOverlays::cElevation:
+				Editor.HighlightElevationLevel = 1;
+				Editor.OverlayHighlighter = OverlayElevation;
+				return;
+			case EditorOverlays::cOpaque:
+				Editor.OverlayHighlighter = OverlayOpaque;
+				return;
+			default:
+				Editor.OverlayHighlighter = nullptr;			
+				break;
+		}
+
+	});
+
+	int overlaysWidth = 0;
+	for (std::string &entry : overlaysListStrings) {
+		toolDropdown->getFont()->getWidth(entry);
+		overlaysWidth = std::max(overlaysWidth, toolDropdown->getFont()->getWidth(entry) + 20);
+	}
+
+	overlaysDropdown->setWidth(overlaysWidth);
+	overlaysDropdown->getScrollArea()->setWidth(overlaysWidth);
+	overlaysDropdown->getListBox()->setWidth(overlaysWidth);
+	
+	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
+	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));
+	overlaysDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
+	overlaysDropdown->addActionListener(overlaysDropdownListener);
+	editorContainer->add(overlaysDropdown, toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
 
 	UpdateMinimap = true;
 
@@ -2080,7 +2212,7 @@ void EditorMainLoop()
 			if (entry.rfind("--", 0) != std::string::npos) {
 				std::string e = entry.substr(2);
 				toolListStrings.push_back(e);
-				int strW = toolDropdown->getFont()->getWidth(e);
+				int strW = toolDropdown->getFont()->getWidth(e) + 20;
 				if (newW < strW) {
 					newW = strW;
 				}
@@ -2090,6 +2222,8 @@ void EditorMainLoop()
 		toolDropdown->setWidth(newW);
 		toolDropdown->getScrollArea()->setWidth(newW);
 		toolDropdown->getListBox()->setWidth(newW);
+
+		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;
@@ -2171,6 +2305,10 @@ void EditorMainLoop()
 	delete toolDropdown;
 	delete toolList;
 	delete toolDropdownListener;
+		
+	delete overlaysDropdown;
+	delete overlaysList;
+	delete overlaysDropdownListener;
 
 	delete editorContainer;
 	delete editorSliderListener;

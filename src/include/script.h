@@ -66,6 +66,12 @@ enum {
 	LuaSoundType
 };
 
+/**	
+**	original lua_isstring() returns true for either a string or a number
+**	this do strict checking for strings only
+**/
+extern int lua_isstring_strict(lua_State *luaStack, int idx);
+
 extern lua_State *Lua;
 
 extern int LuaLoadFile(const std::string &file, const std::string &strArg = "", bool exitOnError = true);
