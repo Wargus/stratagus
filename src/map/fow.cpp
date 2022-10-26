@@ -192,6 +192,12 @@ void CFogOfWar::SetFogColor(const CColor color)
     Settings.FogColorSDL = (color.R << RSHIFT) | (color.G << GSHIFT) | (color.B << BSHIFT);
 }
 
+void CFogOfWar::SetEasingSteps(const uint8_t num)
+{ 
+    Settings.NumOfEasingSteps = num;
+    FogTexture.SetNumOfSteps(num); 
+}
+
 void CFogOfWar::Clean(const bool isHardClean /*= false*/)
 {
     if(isHardClean) {

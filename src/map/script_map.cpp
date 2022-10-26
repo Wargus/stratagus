@@ -674,6 +674,23 @@ static int CclSetFogOfWarColor(lua_State *l)
 }
 
 /**
+**  Set nember of steps for Fog textures easing
+**
+**  @param l  Lua state.
+*/
+static int CclSetFogOfWarEasingSteps(lua_State *l)
+{
+	std::string FogGraphicFile;
+
+	LuaCheckArgs(l, 1);
+	int numOfSteps = LuaToNumber(l, 1);
+	clamp(&numOfSteps, 1, 255);
+	FogOfWar->SetEasingSteps(numOfSteps);
+
+	return 0;
+}
+
+/**
 **  Define Fog graphics
 **
 **  @param l  Lua state.
@@ -1070,6 +1087,7 @@ void MapCclRegister()
 	
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
+	lua_register(Lua, "SetFogOfWarEasingSteps", CclSetFogOfWarEasingSteps);
 
 	lua_register(Lua, "SetMMFogOfWarOpacityLevels", CclSetMMFogOfWarOpacityLevels);
 
