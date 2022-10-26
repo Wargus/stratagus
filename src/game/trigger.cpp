@@ -459,7 +459,11 @@ void ActionStopTimer()
 /**
 ** <b>Description</b>
 **
-**  Add a trigger.
+**  Add a trigger. A trigger is a set of two functions. The first is run every
+**  cycle and checks a condition. Once it returns <code>true</code>, the second
+**  function runs. If the second function returns <code>false</code>, the
+**  trigger is removed and never runs again. Otherwise, it is kept and may run
+**  again next cycle.
 **
 ** Example:
 **
