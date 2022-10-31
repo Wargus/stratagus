@@ -290,7 +290,7 @@ static unsigned char codepoint_to_codepage_index(int codepoint, const char **sub
 	}
 
 	if (cpChar < 0x32) {
-		fprintf(stderr, "Can't convert codepoint to codepage %d: '%c' d=%d (0x%04x)\r\n", FontCodePage, codepoint, codepoint, codepoint);
+		DebugPrint("Can't convert codepoint to codepage %d: '%c' d=%d (0x%04x)\r\n" _C_ FontCodePage _C_ codepoint _C_ codepoint _C_ codepoint);
 		cpChar = '?';
 	}
 
