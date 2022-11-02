@@ -183,7 +183,7 @@ void UpdateDisplay()
 {
 	if (GameRunning || Editor.Running == EditorEditing) {
 		// to prevent empty spaces in the UI
-		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height);
+		Video.FillRectangleClip(ColorTransparent, 0, 0, Video.Width, Video.Height);
 		DrawMapArea();
 		// TODO: for e.g. environmental effects, we want to push to the renderer here with appropriate shaders set,
 		// then do the rest.
