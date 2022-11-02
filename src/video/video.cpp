@@ -292,7 +292,7 @@ bool CVideo::ResizeScreen(int w, int h)
 									 RMASK,
 									 GMASK,
 									 BMASK,
-									 0); // AMASK);
+									 AMASK);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
 
 	// new texture
@@ -303,6 +303,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	                               SDL_PIXELFORMAT_ARGB8888,
 	                               SDL_TEXTUREACCESS_STREAMING,
 	                               w, h);
+	SDL_SetTextureBlendMode(TheTexture, SDL_BLENDMODE_BLEND);
 
 	SetClipping(0, 0, w - 1, h - 1);
 

@@ -326,7 +326,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 			} else {
 				tile = mf.playerInfo.SeenTile;
 			}
-			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			Map.TileGraphic->DrawFrameClip(tile, dx, dy, TheRenderer);
 #ifdef DEBUG
 			// AStar passability overlay
 			if (CViewport::isGridEnabled()) {

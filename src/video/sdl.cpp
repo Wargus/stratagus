@@ -863,10 +863,10 @@ void StreamSurfaceToTexture(SDL_Texture *t, SDL_Surface *s)
 
 void RenderTexture(SDL_Texture *t, SDL_Rect *srcrect, SDL_Rect *dstrect)
 {
-	if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
-		SDL_RenderClear(TheRenderer);
+	// if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
+		// SDL_RenderClear(TheRenderer);
 		SDL_RenderCopy(TheRenderer, TheTexture, srcrect, dstrect);
-	}
+	// }
 }
 
 void RealizeVideoMemory()
@@ -886,7 +886,7 @@ void RealizeVideoMemory()
 			RenderBenchmarkOverlay();
 		}
 		SDL_RenderPresent(TheRenderer);
-		SDL_RenderClear(TheRenderer);
+		// SDL_RenderClear(TheRenderer);
 		NumRects = 0;
 	}
 	if (!Preference.HardwareCursor) {
