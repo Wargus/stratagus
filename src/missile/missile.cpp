@@ -503,15 +503,15 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency), TheRenderer);
 			} else {
-				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y, TheRenderer);
 			}
 		} else {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), TheRenderer);
 			} else {
-				this->G->DrawFrameClip(frame, pos.x, pos.y);
+				this->G->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 			}
 		}
 	} else {
@@ -523,9 +523,9 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 			frame = (frame / row) * this->NumDirections + frame % row;
 		}
 		if (this->Transparency > 0) {
-			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), TheRenderer);
 		} else {
-			this->G->DrawFrameClip(frame, pos.x, pos.y);
+			this->G->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 		}
 	}
 }

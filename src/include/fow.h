@@ -44,7 +44,7 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-enum class FogOfWarTypes { cTiled, cEnhanced, cTiledLegacy, cNumOfTypes };  /// Types of the fog of war
+enum class FogOfWarTypes { cEnhanced, cTiledLegacy, cNumOfTypes };  /// Types of the fog of war
 class CFogOfWar
 {
 public:
@@ -110,14 +110,13 @@ private:
     void CleanTiled(const bool isHardClean = false);
 
     void DrawFullShroudOfFog(const int16_t x, const int16_t y, const uint8_t alpha, 
-                             SDL_Surface *const vpFogSurface);
+                             SDL_Renderer *renderer);
     void GetFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
                          int *fogTile, int *blackFogTile) const;
     bool IsMapFieldExplored(const size_t index) const { return (VisTable[index] != 0); }
     bool IsMapFieldVisible(const size_t index)  const { return (VisTable[index]  > 1); }
     void DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
-                          const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface);
-    void DrawTiled(CViewport &viewport);
+                          const int16_t dx, const int16_t dy, SDL_Renderer *renderer);
     void DrawTiledLegacy(CViewport &viewport);
     
 public:
@@ -146,6 +145,7 @@ private:
     static CGraphic *TiledFogSrc;           /// Graphic for tiled fog of war
     CGraphic *TiledAlphaFog {nullptr};      /// Working set of graphic for tiled fog of war with alpha channel
     SDL_Surface *TileOfFogOnly {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
+    SDL_Texture *TileOfFogOnlyTex {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
     
     /**
     **  Mapping for fog of war tiles.
@@ -158,6 +158,7 @@ private:
     CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map 
                                               /// + 1 tile to the left and up (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
+    SDL_Texture *RenderedFogTexture { nullptr }; /// Texture to hold the enhanced fog
     CBlurer              Blurer;              /// Blurer for fog of war texture
 
     /// Tables with patterns to generate fog of war texture from vision table

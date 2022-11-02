@@ -483,8 +483,8 @@ static int CclSetFogOfWarType(lua_State *l)
 	
 	FogOfWarTypes new_type;
 	const std::string type_name {LuaToString(l, 1)};
-	if (type_name == "tiled" || type_name == "fast") {
-		new_type = type_name == "tiled" ? FogOfWarTypes::cTiled : FogOfWarTypes::cTiledLegacy;
+	if (type_name == "fast") {
+		new_type = FogOfWarTypes::cTiledLegacy;
 		/// Tiled types of FOW don't work with shadow casting
 		if (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting) {
 			if (!IsNetworkGame()) {

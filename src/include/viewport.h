@@ -85,10 +85,6 @@ public:
 	/// convert tilepos coordonates into screen (take the center of the tile)
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 
-	SDL_Surface* GetFogSurface() {
-		return this->FogSurface;
-	}
-
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const Vec2i &tilePos, const PixelDiff &offset);
 	/// Center map on point in viewport
@@ -105,7 +101,6 @@ public:
 	bool Contains(const PixelPos &screenPos) const;
 
 	void Restrict(int &screenPosX, int &screenPosY) const;
-	void Clean();
 
 	static bool isGridEnabled()
 	{
@@ -136,10 +131,6 @@ private:
 	void DrawMapBackgroundInViewport(const fieldHighlightChecker highlightChecker = nullptr) const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar();
-	/// Adjust fog of war surface to viewport
-	void AdjustFogSurface();
-	/// Clean fog of war texture
-	void CleanFog();
 
 public:
 	//private:
@@ -154,7 +145,6 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
 	static bool ShowGrid;
 
 };

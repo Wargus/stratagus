@@ -378,9 +378,6 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	FieldOfView.Clean();
 	
 	FogOfWar->Clean(isHardClean);
-	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
-		vp->Clean();
-	}
 
 	this->isMapInitialized = false;
 }

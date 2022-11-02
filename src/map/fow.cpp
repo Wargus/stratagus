@@ -44,6 +44,7 @@
 #include "player.h"
 #include "tile.h"
 #include "ui.h"
+#include "video.h"
 #include "viewport.h"
 #include "../video/intern_video.h"
 
@@ -107,7 +108,6 @@ void CFogOfWar::Init()
     VisTable_Index0 = VisTableWidth + 1;
 
     switch (Settings.Type) {
-        case FogOfWarTypes::cTiled:
         case FogOfWarTypes::cTiledLegacy:
 
             InitTiled();
@@ -144,6 +144,7 @@ void CFogOfWar::InitTiled()
         TileOfFogOnly = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
                                              32, RMASK, GMASK, BMASK, AMASK);
         SDL_FillRect(TileOfFogOnly, NULL, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
+        TileOfFogOnlyTex = SDL_CreateTextureFromSurface(TheRenderer, TileOfFogOnly);
     }
 
     SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->Surface, 
@@ -175,6 +176,13 @@ void CFogOfWar::InitEnhanced()
     RenderedFog.clear();
     RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
     std::fill(RenderedFog.begin(), RenderedFog.end(), 0xFF);
+    if (RenderedFogTexture) {
+        SDL_DestroyTexture(RenderedFogTexture);
+    }
+    RenderedFogTexture = SDL_CreateTexture(TheRenderer, SDL_PIXELFORMAT_ARGB8888,
+	                               SDL_TEXTUREACCESS_STREAMING,
+	                               Map.Info.MapWidth * 4, Map.Info.MapHeight * 4);
+    SDL_SetTextureBlendMode(RenderedFogTexture, SDL_BLENDMODE_BLEND);
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
@@ -203,7 +211,6 @@ void CFogOfWar::Clean(const bool isHardClean /*= false*/)
     VisTable_Index0 = 0;
 
     switch (Settings.Type) {
-        case FogOfWarTypes::cTiled:
         case FogOfWarTypes::cTiledLegacy:
 
             CleanTiled(isHardClean); 
@@ -216,6 +223,10 @@ void CFogOfWar::Clean(const bool isHardClean /*= false*/)
             }
             FogTexture.Clean();
             RenderedFog.clear();
+            if (RenderedFogTexture) {
+                SDL_DestroyTexture(RenderedFogTexture);
+                RenderedFogTexture = nullptr;
+            }
             Blurer.Clean();
             break;
 
@@ -344,7 +355,7 @@ void CFogOfWar::GenerateFog()
 */
 void CFogOfWar::Update(bool doAtOnce /*= false*/)
 {
-    if (Settings.Type == FogOfWarTypes::cTiled || Settings.Type == FogOfWarTypes::cTiledLegacy) {
+    if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
         if (doAtOnce || this->State == States::cFirstEntry){
             GenerateFog();
             this->State = States::cGenerateFog;
@@ -416,13 +427,7 @@ void CFogOfWar::Draw(CViewport &viewport)
     if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
         DrawTiledLegacy(viewport);
     } else {
-        SDL_FillRect(viewport.GetFogSurface(), NULL, ColorTransparent);
-
-        if (Settings.Type == FogOfWarTypes::cTiled) {
-            DrawTiled(viewport);
-        } else if (Settings.Type == FogOfWarTypes::cEnhanced) {
-            DrawEnhanced(viewport);
-        }
+        DrawEnhanced(viewport);
     }
 }
 
@@ -446,27 +451,21 @@ void CFogOfWar::DrawEnhanced(CViewport &viewport)
 
     FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
 
-    /// TODO: This part might be replaced by GPU shaders. 
-    /// In that case vpFogSurface shall be filled up with FogTexture.DrawRegion()
-
-    srcRect.x = x0;
-    srcRect.y = y0;
-    
-    SDL_Rect trgRect;
-    trgRect.x = 0;
-    trgRect.y = 0;
-    trgRect.w = viewport.MapWidth  * PixelTileSize.x;
-    trgRect.h = viewport.MapHeight * PixelTileSize.y;
-   
-    switch (this->Settings.UpscaleType) {
-        case cBilinear:
-            UpscaleBilinear(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, viewport.GetFogSurface(), trgRect);
-            break;
-        case cSimple:
-        default:
-            UpscaleSimple(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, viewport.GetFogSurface(), trgRect);
-            break;
+    // Update the texture, let the GPU handle the upscaling
+    uint8_t *alphaValues = RenderedFog.data();
+    int len = RenderedFog.size();
+    void *pixels;
+    int pitch;
+    SDL_LockTexture(RenderedFogTexture, NULL, &pixels, &pitch);
+    for (int i = 0; i < len; i++) {
+        const uint32_t texelValue = (uint32_t(alphaValues[i]) << 24) | Settings.FogColorSDL;
+        ((uint32_t *)pixels)[i] = texelValue;
     }
+    SDL_UnlockTexture(RenderedFogTexture);
+    SDL_Rect srcrect = { x0, y0, viewport.MapWidth * 4, viewport.MapHeight * 4 };
+    SDL_Rect dstrect = { viewport.TopLeftPos.x, viewport.TopLeftPos.y, viewport.GetPixelSize().x, viewport.GetPixelSize().y };
+    SDL_RenderCopy(TheRenderer, RenderedFogTexture, &srcRect, &dstrect);
+    return;
 }
 
 /**
@@ -647,7 +646,7 @@ void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const
 **  @param x  X position into video memory
 **  @param y  Y position into video memory
 */
-void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, SDL_Surface *const vpFogSurface)
+void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, SDL_Renderer *renderer)
 {
 	int oldx;
 	int oldy;
@@ -667,18 +666,11 @@ void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, S
 
 	drect.x = x;
 	drect.y = y;
+    drect.w = srect.w;
+    drect.h = srect.h;
 
-    if (vpFogSurface == TheScreen) { /// FogOfWarTypes::cTiledLegacy
-        SDL_BlitSurface(TileOfFogOnly, &srect, TheScreen, &drect);
-    } else {
-        const uint32_t fogColor = GetFogColorSDL() | (uint32_t(alpha) << ASHIFT);
-        size_t index = drect.y * vpFogSurface->w + drect.x;
-        uint32_t *const dst = reinterpret_cast<uint32_t*>(vpFogSurface->pixels);
-        for (uint16_t row = 0; row < srect.h; row++) {
-            std::fill_n(&dst[index], srect.w, fogColor);
-            index += vpFogSurface->w;
-        }
-    }
+    SDL_SetTextureAlphaMod(TileOfFogOnlyTex, alpha);
+    SDL_RenderCopy(renderer, TileOfFogOnlyTex, &srect, &drect);
 }
 
 void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const size_t mapIndexBase, 
@@ -795,109 +787,27 @@ void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const 
 **  @param vpFogSurface surface to draw fog
 */
 void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
-                            const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface)
+                            const int16_t dx, const int16_t dy, SDL_Renderer *renderer)
 {
 	int fogTile = 0;
 	int blackFogTile = 0;
 
 	GetFogTile(visIndex, mapIndex, mapIndexBase, &fogTile, &blackFogTile);
 
-    if (vpFogSurface != TheScreen) {
-        if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
-            if (fogTile && fogTile != blackFogTile) {
-                TiledAlphaFog->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-                                                                       GetExploredOpacity(),
-                                                                       vpFogSurface);
-            }
-        } else {
-            DrawFullShroudOfFog(dx, dy, FogOfWar->GetExploredOpacity(), vpFogSurface);
+    if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
+        if (fogTile && fogTile != blackFogTile) {
+            TiledAlphaFog->DrawFrameClipTrans(fogTile, dx, dy, GetExploredOpacity(), renderer);
         }
-        if (blackFogTile) {
-            TiledAlphaFog->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-                                                                        GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
-                                                                                               : GetUnseenOpacity(),
-                                                                        vpFogSurface);
-        }
-    } else { /// legacy draw tiled fog into TheScreen surface (for slow machines)
-        if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
-            if (fogTile && fogTile != blackFogTile) {
-                TiledAlphaFog->DrawFrameClipTrans(fogTile, dx, dy, GetExploredOpacity());
-            }
-        } else {
-            DrawFullShroudOfFog(dx, dy, GetExploredOpacity(), TheScreen);	
-        }
-        if (blackFogTile) {
-            TiledFogSrc->DrawFrameClip(blackFogTile, dx, dy);
-        }
+    } else {
+        DrawFullShroudOfFog(dx, dy, GetExploredOpacity(), renderer);
+    }
+    if (blackFogTile) {
+        TiledFogSrc->DrawFrameClipTrans(blackFogTile, dx, dy,
+                GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() : GetUnseenOpacity(),
+                renderer);
     }
 }
-/**
-**  Draw tiled fog of war texture into certain viewport's surface.
-**
-**  @param viewport     viewport to generate fog of war texture for
-*/
-void CFogOfWar::DrawTiled(CViewport &viewport)
-{
-    /// Save current clipping
-    PushClipping();
-	
-    // Set clipping to FogSurface coordinates
-	SDL_Rect fogSurfaceClipRect {viewport.Offset.x, 
-							 	 viewport.Offset.y, 
-							 	 viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1,
-							 	 viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1};
-    SetClipping(fogSurfaceClipRect.x, 
-				fogSurfaceClipRect.y, 
-				fogSurfaceClipRect.x + fogSurfaceClipRect.w,
-				fogSurfaceClipRect.y + fogSurfaceClipRect.h);
 
-	const int ex = fogSurfaceClipRect.x + fogSurfaceClipRect.w;
-	const int ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
-
-    #pragma omp parallel
-    {    
-        const uint16_t thisThread   = omp_get_thread_num();
-        const uint16_t numOfThreads = omp_get_num_threads();
-      
-        uint16_t lBound = thisThread * fogSurfaceClipRect.h / numOfThreads;
-        lBound -= lBound % PixelTileSize.y;
-        uint16_t uBound = ey;
-        if (thisThread != numOfThreads - 1) {
-            uBound = (thisThread + 1) * fogSurfaceClipRect.h / numOfThreads;
-            uBound -= uBound % PixelTileSize.y;
-        }
-
-        size_t mapIndexBase = (viewport.MapPos.y + lBound / PixelTileSize.y) * Map.Info.MapWidth;
-        size_t visIndexBase = (viewport.MapPos.y + lBound / PixelTileSize.y) * VisTableWidth + VisTable_Index0;
-
-        int dy = lBound;
-        while (dy < uBound) {
-            size_t mapIndex = viewport.MapPos.x + mapIndexBase;
-            size_t visIndex = viewport.MapPos.x + visIndexBase;
-
-            int dx = 0;
-            while (dx < ex) {
-                if (VisTable[visIndex]) {
-                    DrawFogTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
-                } else {
-                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
-                                                                       : GetUnseenOpacity(),
-                                                viewport.GetFogSurface());
-                }
-                mapIndex++;
-                visIndex++;
-                dx += PixelTileSize.x;
-            }
-            mapIndexBase += Map.Info.MapWidth;
-            visIndexBase += VisTableWidth;
-            dy += PixelTileSize.y;
-        }
-    } /// pragma omp parallel
-
-	// Restore Clipping to Viewport coordinates
-	PopClipping();
-
-}
 /**
 **  Legacy draw tiled fog of war texture into TheScreen surface.
 **
@@ -919,11 +829,7 @@ void CFogOfWar::DrawTiledLegacy(CViewport &viewport)
         int dx = viewport.TopLeftPos.x - viewport.Offset.x;
 
         while (dx < ex) {
-            if (VisTable[visIndex]) {
-                DrawFogTile(visIndex, mapIndex, mapIndexBase, dx, dy, TheScreen);
-            } else {
-                Video.FillRectangleClip(Settings.FogColorSDL, dx, dy, PixelTileSize.x, PixelTileSize.y);
-            }
+            DrawFogTile(visIndex, mapIndex, mapIndexBase, dx, dy, TheRenderer);
             mapIndex++;
             visIndex++;
             dx += PixelTileSize.x;
@@ -946,6 +852,8 @@ void CFogOfWar::CleanTiled(const bool isHardClean /*= false*/)
     if (TileOfFogOnly) {
 		SDL_FreeSurface(TileOfFogOnly);
 		TileOfFogOnly = nullptr;
+        SDL_DestroyTexture(TileOfFogOnlyTex);
+        TileOfFogOnlyTex = nullptr;
 	}
     if (TiledAlphaFog) {
         CGraphic::Free(TiledAlphaFog);

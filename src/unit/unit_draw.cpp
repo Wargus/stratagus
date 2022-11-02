@@ -707,9 +707,9 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, cha
 		// the shadow is a full unit shadow
 		if (type.Flip) {
 			if (frame < 0) {
-				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, TheRenderer);
 			} else {
-				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 			}
 		} else {
 			int row = type.NumDirections / 2 + 1;
@@ -718,11 +718,11 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, cha
 			} else {
 				frame = (frame / row) * type.NumDirections + frame % row;
 			}
-			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 		}
 	} else {
 		// the shadow is a simple sprite without directions, like in WC2
-		type.ShadowSprite->DrawFrameClip(type.ShadowSpriteFrame - 1, pos.x, pos.y);
+		type.ShadowSprite->DrawFrameClip(type.ShadowSpriteFrame - 1, pos.x, pos.y, TheRenderer);
 	}
 }
 
@@ -850,9 +850,9 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 			pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
 			pos.y += type.OffsetY;
 			if (frame < 0) {
-				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, TheRenderer);
 			} else {
-				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 			}
 		}
 	} else {
@@ -862,9 +862,9 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
 			pos.y += type.ShadowOffsetY + type.OffsetY;
 			if (frame < 0) {
-				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, TheRenderer);
 			} else {
-				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y, TheRenderer);
 			}
 		}
 	}

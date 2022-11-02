@@ -383,74 +383,7 @@ void CViewport::DrawMapFogOfWar()
 		return;
 	}
 
-	if (!this->FogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
-									/ PixelTileSize.x + 2) 
-									* PixelTileSize.x != this->FogSurface->w 
-								|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
-									/ PixelTileSize.y + 2) 
-									* PixelTileSize.y != this->FogSurface->h) ) {
-		this->AdjustFogSurface();
-	}
-
 	FogOfWar->Draw(*this);
-	
-	/// TODO: switch to hardware rendering
-	const bool isSoftwareRender {true}; // FIXME: remove this
-	if (isSoftwareRender && FogOfWar->GetType() != FogOfWarTypes::cTiledLegacy) {
-		SDL_Rect screenRect;
-		screenRect.x = this->TopLeftPos.x;
-		screenRect.y = this->TopLeftPos.y;
-		screenRect.w = this->BottomRightPos.x - this->TopLeftPos.x + 1;
-		screenRect.h = this->BottomRightPos.y - this->TopLeftPos.y + 1;
-
-		SDL_Rect fogRect;
-		fogRect.x = this->Offset.x;
-		fogRect.y = this->Offset.y;
-		fogRect.w = screenRect.w;
-		fogRect.h = screenRect.h;
-		
-		/// Alpha blending of the fog texture into the screen	
-		BlitSurfaceAlphaBlending_32bpp(this->FogSurface, &fogRect, TheScreen, &screenRect);
-	}
 }
-
-
-/**
-**  Adjust fog of war surface to viewport
-**
-*/
-void CViewport::AdjustFogSurface()
-{
-	this->CleanFog();
-
-    const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x) 
-									/ PixelTileSize.x + 2) 
-									* PixelTileSize.x;  /// +2 because of Offset.x
-    const uint16_t surfaceHeight = ((this->BottomRightPos.y - this->TopLeftPos.y) 
-									/ PixelTileSize.y + 2) 
-									* PixelTileSize.y; /// +2 because of Offset.y
-    
-    this->FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
-                                                     	   surfaceHeight,
-                                                     	   32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
-	
-	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-	SDL_FillRect(this->FogSurface, NULL, fogColorSolid);
-}
-
-void CViewport::Clean()
-{
-	if (this->FogSurface) {
-		CleanFog();
-	}
-}
-
-void CViewport::CleanFog()
-{
-	SDL_FreeSurface(this->FogSurface);
-	this->FogSurface = nullptr;
-}
-
 
 //@}

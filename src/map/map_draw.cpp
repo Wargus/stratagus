@@ -61,7 +61,6 @@ CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
 
 CViewport::~CViewport()
 {
-	this->Clean();
 }
 
 bool CViewport::Contains(const PixelPos &screenPos) const
@@ -281,9 +280,9 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 		canShortcut = false;
 	} else {
 		graphicTileOffset = 1;
-		canShortcut = (GameSettings.RevealMap == MapRevealModes::cHidden || FogOfWar->GetType() == FogOfWarTypes::cTiledLegacy)
+		canShortcut = GameSettings.RevealMap == MapRevealModes::cHidden
 					  && FogOfWar->GetType() != FogOfWarTypes::cEnhanced
-					  && !ReplayRevealMap; 
+					  && !ReplayRevealMap;
 	}
 
 	while (sy < 0) {
