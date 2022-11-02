@@ -101,7 +101,7 @@ public:
 protected:
 	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1), Resized(false)
+		Refs(1), Resized(false), Texture(NULL), TextureFlip(NULL)
 	{
 		frameFlip_map = NULL;
 	}
@@ -158,6 +158,56 @@ public:
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 							 SDL_Surface *surface = TheScreen) const;
 
+	// Draw texture
+	void DrawClip(int x, int y,
+				  SDL_Renderer *renderer) const;
+	void DrawSub(int gx, int gy, int w, int h, int x, int y,
+				 SDL_Renderer *renderer) const;
+
+	void DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
+					      pixelModifier modifier, 
+						  const uint32_t param,
+						  SDL_Renderer *renderer) const;
+
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y,
+					 SDL_Renderer *renderer) const;
+	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+					  unsigned char alpha,
+					  SDL_Renderer *renderer) const;
+	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+						  unsigned char alpha, 
+						  SDL_Renderer *renderer) const;
+
+	void DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
+							  pixelModifier modifier, 
+							  const uint32_t param,
+							  SDL_Renderer *renderer) const;
+
+	// Draw frame texture
+	void DrawFrame(unsigned frame, int x, int y,
+				   SDL_Renderer *renderer) const;
+	void DrawFrameClip(unsigned frame, int x, int y,
+					   SDL_Renderer *renderer) const;
+	void DrawFrameTrans(unsigned frame, int x, int y, int alpha,
+						SDL_Renderer *renderer) const;
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+							SDL_Renderer *renderer) const;
+
+	void DrawFrameClipCustomMod(unsigned frame, int x, int y, 
+								pixelModifier modifier, 
+								const uint32_t param,
+								SDL_Renderer *renderer) const;
+
+	// Draw frame flipped horizontally texture
+	void DrawFrameX(unsigned frame, int x, int y,
+					SDL_Renderer *renderer) const;
+	void DrawFrameClipX(unsigned frame, int x, int y,
+						SDL_Renderer *renderer) const;
+	void DrawFrameTransX(unsigned frame, int x, int y, int alpha,
+						 SDL_Renderer *renderer) const;
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
+							 SDL_Renderer *renderer) const;
+
 
 	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
 	static CGraphic *ForceNew(const std::string &file, const int w = 0, const int h = 0);
@@ -203,6 +253,10 @@ public:
 	int Refs;                  /// Uses of this graphic
 	bool Resized;              /// Image has been resized
 
+private:
+	SDL_Texture *Texture;
+	SDL_Texture *TextureFlip;
+
 	friend class CFont;
 };
 
@@ -218,6 +272,11 @@ public:
 								   SDL_Surface *surface = TheScreen);
 	void DrawPlayerColorFrameClip(int colorIndex, unsigned frame, int x, int y,
 								  SDL_Surface *surface = TheScreen);
+
+	void DrawPlayerColorFrameClipX(int colorIndex, unsigned frame, int x, int y,
+								   SDL_Renderer *renderer);
+	void DrawPlayerColorFrameClip(int colorIndex, unsigned frame, int x, int y,
+								  SDL_Renderer *renderer);
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);

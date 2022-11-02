@@ -78,6 +78,16 @@ void CGraphic::DrawClip(int x, int y,
 	CLIP_RECTANGLE(x, y, w, h);
 	DrawSub(x - oldx, y - oldy, w, h, x, y, surface);
 }
+void CGraphic::DrawClip(int x, int y,
+						SDL_Renderer *renderer) const
+{
+	int oldx = x;
+	int oldy = y;
+	int w = Width;
+	int h = Height;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSub(x - oldx, y - oldy, w, h, x, y, renderer);
+}
 
 /**
 **  Video draw part of graphic.
@@ -99,6 +109,16 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 	
 	SDL_BlitSurface(Surface, &srect, surface, &drect);
+}
+void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
+					   SDL_Renderer *renderer) const
+{
+	Assert(renderer);
+
+	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
+	
+	SDL_RenderCopy(renderer, Texture, &srect, &drect);
 }
 
 /**
@@ -142,7 +162,12 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 	}
 
 }
-
+void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
+							    pixelModifier modifier, const uint32_t param,
+								SDL_Renderer *renderer) const
+{
+	AbortAt(__FILE__, __LINE__, "CGraphic::DrawSubCustomMod", "");
+}
 
 /**
 **  Video draw part of graphic clipped.
@@ -170,6 +195,19 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y,
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 	SDL_BlitSurface(Surface, &srect, surface, &drect);
 }
+void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, 
+						   SDL_Renderer *renderer) const
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	gx += x - oldx;
+	gy += y - oldy;
+
+	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(w), Uint16(h)};
+	SDL_RenderCopy(renderer, Texture, &srect, &drect);
+}
 
 /**
 **  Video draw part of graphic with alpha.
@@ -195,6 +233,16 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 	DrawSub(gx, gy, w, h, x, y, surface);
 	SDL_SetSurfaceAlphaMod(Surface, oldalpha);
 }
+void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+							unsigned char alpha,
+							SDL_Renderer *renderer) const
+{
+	Uint8 oldalpha = 0xff;
+	SDL_GetTextureAlphaMod(Texture, &oldalpha);
+	SDL_SetTextureAlphaMod(Texture, alpha);
+	DrawSub(gx, gy, w, h, x, y, renderer);
+	SDL_SetTextureAlphaMod(Texture, oldalpha);
+}
 
 /**
 **  Video draw part of graphic with alpha and clipped.
@@ -217,7 +265,15 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 	CLIP_RECTANGLE(x, y, w, h);
 	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, surface);
 }
-
+void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+								unsigned char alpha, 
+								SDL_Renderer *renderer) const
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, renderer);
+}
 
 /**
 **  Video draw clipped part of graphic by custom pixel modifier.
@@ -243,6 +299,16 @@ void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
 	CLIP_RECTANGLE(x, y, w, h);
 	DrawSubCustomMod(gx + x - oldx, gy + y - oldy, w, h, x, y, modifier, param, surface);
 }
+void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
+								    pixelModifier modifier, 
+									const uint32_t param,
+								    SDL_Renderer *renderer) const
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawSubCustomMod(gx + x - oldx, gy + y - oldy, w, h, x, y, modifier, param, renderer);
+}
 
 /**
 **  Draw graphic object unclipped.
@@ -257,6 +323,12 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y,
 {
 	DrawSub(frame_map[frame].x, frame_map[frame].y,
 			Width, Height, x, y, surface);
+}
+void CGraphic::DrawFrame(unsigned frame, int x, int y,
+						 SDL_Renderer *renderer) const
+{
+	DrawSub(frame_map[frame].x, frame_map[frame].y,
+			Width, Height, x, y, renderer);
 }
 
 /**
@@ -273,6 +345,12 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y,
 	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
 				Width, Height, x, y, surface);
 }
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, 
+							 SDL_Renderer *renderer) const
+{
+	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
+				Width, Height, x, y, renderer);
+}
 
 void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 							  SDL_Surface *surface /*= TheScreen*/) const
@@ -280,12 +358,24 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 	DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
 				 Width, Height, x, y, alpha, surface);
 }
+void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
+							  SDL_Renderer *renderer) const
+{
+	DrawSubTrans(frame_map[frame].x, frame_map[frame].y,
+				 Width, Height, x, y, alpha, renderer);
+}
 
 void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
 								  SDL_Surface *surface /* = TheScreen*/) const
 {
 	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 					 Width, Height, x, y, alpha, surface);
+}
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+								  SDL_Renderer *renderer) const
+{
+	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
+					 Width, Height, x, y, alpha, renderer);
 }
 
 void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
@@ -295,6 +385,14 @@ void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y,
 {
 	DrawSubClipCustomMod(frame_map[frame].x, frame_map[frame].y,
 						 Width, Height, x, y, modifier, param, surface);
+}
+void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
+									  pixelModifier modifier, 
+									  const uint32_t param,
+									  SDL_Renderer *renderer) const
+{
+	DrawSubClipCustomMod(frame_map[frame].x, frame_map[frame].y,
+						 Width, Height, x, y, modifier, param, renderer);
 }
 
 /**
@@ -313,6 +411,14 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int colorIndex, unsigned fram
 	GraphicPlayerPixels(colorIndex, *this);
 	DrawFrameClip(frame, x, y, surface);
 }
+void CPlayerColorGraphic::DrawPlayerColorFrameClip(int colorIndex, unsigned frame,
+												   int x, int y,
+												   SDL_Renderer *renderer)
+{
+	AbortAt(__FILE__, __LINE__, "DrawPlayerColorFrameClip", "");
+	GraphicPlayerPixels(colorIndex, *this);
+	DrawFrameClip(frame, x, y, renderer);
+}
 
 /**
 **  Draw graphic object unclipped and flipped in X direction.
@@ -329,6 +435,14 @@ void CGraphic::DrawFrameX(unsigned frame, int x, int y,
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
 	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
+}
+void CGraphic::DrawFrameX(unsigned frame, int x, int y,
+						  SDL_Renderer *renderer) const
+{
+	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+	SDL_Rect drect = {Sint16(x), Sint16(y), Uint16(Width), Uint16(Height)};
+
+	SDL_RenderCopy(renderer, TextureFlip, &srect, &drect);
 }
 
 /**
@@ -354,6 +468,21 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
 
 	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 }
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y,
+							  SDL_Renderer *renderer) const
+{
+	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+
+	const int oldx = x;
+	const int oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
+
+	SDL_RenderCopy(renderer, TextureFlip, &srect, &drect);
+}
 
 void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
 							   SDL_Surface *surface /*= TheScreen*/) const
@@ -366,6 +495,18 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, alpha);
 	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
+}
+void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha,
+							   SDL_Renderer *renderer) const
+{
+	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
+	Uint8 oldalpha = 0xff;
+	SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+
+	SDL_SetTextureAlphaMod(TextureFlip, alpha);
+	SDL_RenderCopy(renderer, TextureFlip, &srect, &drect);
+	SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
 }
 
 void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
@@ -387,6 +528,25 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 	SDL_BlitSurface(SurfaceFlip, &srect, surface, &drect);
 	SDL_SetSurfaceAlphaMod(SurfaceFlip, oldalpha);
 }
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
+								   SDL_Renderer *renderer) const
+{
+	SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, srect.w, srect.h);
+	srect.x += x - oldx;
+	srect.y += y - oldy;
+
+	SDL_Rect drect = {Sint16(x), Sint16(y), srect.w, srect.h};
+	Uint8 oldalpha = 0xff;
+	SDL_GetTextureAlphaMod(TextureFlip, &oldalpha);
+
+	SDL_SetTextureAlphaMod(TextureFlip, alpha);
+	SDL_RenderCopy(renderer, TextureFlip, &srect, &drect);
+	SDL_SetTextureAlphaMod(TextureFlip, oldalpha);
+}
 
 /**
 **  Draw graphic object clipped, flipped, and with player colors.
@@ -403,6 +563,14 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned fra
 {
 	GraphicPlayerPixels(colorIndex, *this);
 	DrawFrameClipX(frame, x, y, surface);
+}
+void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned frame,
+													int x, int y,
+													SDL_Renderer *renderer)
+{
+	AbortAt(__FILE__, __LINE__, "DrawPlayerColorFrameClipX", "");
+	GraphicPlayerPixels(colorIndex, *this);
+	DrawFrameClipX(frame, x, y, renderer);
 }
 
 /*----------------------------------------------------------------------------
@@ -710,6 +878,7 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	GenFramesMap();
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 	return;
 
  error:
@@ -756,10 +925,16 @@ void CGraphic::Free(CGraphic *g)
 	--g->Refs;
 	if (!g->Refs) {
 		FreeSurface(&g->Surface);
+		if (g->Texture) {
+			SDL_DestroyTexture(g->Texture);
+		}
 		delete[] g->frame_map;
 		g->frame_map = NULL;
 
 		FreeSurface(&g->SurfaceFlip);
+		if (g->TextureFlip) {
+			SDL_DestroyTexture(g->TextureFlip);
+		}
 		delete[] g->frameFlip_map;
 		g->frameFlip_map = NULL;
 
@@ -828,6 +1003,8 @@ void CGraphic::Flip()
 		frameFlip_map[frame].x = ((NumFrames - frame - 1) % (SurfaceFlip->w / Width)) * Width;
 		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
 	}
+
+	TextureFlip = SDL_CreateTextureFromSurface(TheRenderer, SurfaceFlip);
 }
 
 /**
@@ -879,6 +1056,7 @@ void CGraphic::Resize(int w, int h)
 
 		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
 		SDL_FreeSurface(Surface);
+		SDL_DestroyTexture(Texture);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
 		if (Surface->format->BytesPerPixel == 1) {
@@ -943,6 +1121,7 @@ void CGraphic::Resize(int w, int h)
 		SDL_UnlockSurface(Surface);
 		VideoPaletteListRemove(Surface);
 		SDL_FreeSurface(Surface);
+		SDL_DestroyTexture(Texture);
 
 		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
 										   Rmask, Gmask, Bmask, Amask);
@@ -958,6 +1137,8 @@ void CGraphic::Resize(int w, int h)
 	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
 
 	GenFramesMap();
+
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 }
 
 /**
@@ -975,13 +1156,17 @@ void CGraphic::SetOriginalSize()
 	
 	if (Surface) {
 		FreeSurface(&Surface);
+		SDL_DestroyTexture(Texture);
 		Surface = NULL;
+		Texture = NULL;
 	}
 	delete[] frame_map;
 	frame_map = NULL;
 	if (SurfaceFlip) {
 		FreeSurface(&SurfaceFlip);
+		SDL_DestroyTexture(TextureFlip);
 		SurfaceFlip = NULL;
+		TextureFlip = NULL;
 	}
 	delete[] frameFlip_map;
 	frameFlip_map = NULL;
@@ -1011,6 +1196,9 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 		SDL_BlitSurface(frame.get(), NULL, Surface, &dstRect);
 		currFrame++;
 	}
+
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 }
 
 /**
@@ -1063,6 +1251,8 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 
 	SDL_FreeSurface(Surface);
 	Surface = newSurface;
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 	
 	GenFramesMap();
@@ -1117,6 +1307,9 @@ void CGraphic::SetPaletteColor(int idx, int r, int g, int b) {
 	color.g = g;
 	color.b = b;
 	SDL_SetPaletteColors(Surface->format->palette, &color, idx, 1);
+
+	SDL_DestroyTexture(Texture);
+	Texture = SDL_CreateTextureFromSurface(TheRenderer, Surface);
 }
 
 void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
