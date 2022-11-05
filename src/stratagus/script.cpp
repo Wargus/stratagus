@@ -91,6 +91,13 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, in
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+/**	
+**	original lua_isstring() returns true for either a string or a number
+**	this do strict checking for strings only
+**/
+int lua_isstring_strict(lua_State *luaStack, int idx) {
+	return lua_type(luaStack, idx) == LUA_TSTRING;
+}
 
 /**
 **  FIXME: docu

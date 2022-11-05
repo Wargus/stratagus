@@ -25,5 +25,5 @@ class CMap
 
 extern CMap Map;
 
-void SetTile(int tile, int w, int h, int value = 0);
+void SetTile(int tile, int w, int h, int value = 0, int elevation = 0);
 

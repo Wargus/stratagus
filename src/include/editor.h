@@ -36,6 +36,7 @@
 #include <string>
 #include <tuple>
 #include "icons.h"
+#include "viewport.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
 #endif
@@ -57,7 +58,8 @@ enum EditorStateType {
 	EditorSelecting,         /// Select
 	EditorEditTile,          /// Edit tiles
 	EditorEditUnit,          /// Edit units
-	EditorSetStartLocation   /// Set the start location
+	EditorSetStartLocation,  /// Set the start location
+	EditorElevationLevel	 /// Edit elevation levels
 };
 
 class CEditor
@@ -93,6 +95,9 @@ public:
 	int CursorTileIndex;		/// tile icon under cursor.
 	int SelectedTileIndex;       /// tile type to draw.
 
+	uint8_t	HighlightElevationLevel {0};
+	uint8_t	SelectedElevationLevel {0};
+
 	int CursorPlayer;            /// Player under the cursor.
 	int SelectedPlayer;          /// Player selected for draw.
 
@@ -106,6 +111,7 @@ public:
 	int PopUpX;
 	int PopUpY;
 
+	fieldHighlightChecker OverlayHighlighter {nullptr};
 };
 
 /*----------------------------------------------------------------------------

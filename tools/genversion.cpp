@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <sstream>
 
 /* usage: genversion "/path/to/version-generated.h" "major.minor.path.patch2" */
 
@@ -127,6 +128,15 @@ int main(int argc, char * argv[]) {
 		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
 
 	time_t tt = time(NULL);
+	char *source_date_epoch = std::getenv("SOURCE_DATE_EPOCH");
+	if (source_date_epoch) {
+		std::istringstream iss(source_date_epoch);
+		iss >> tt;
+		if (iss.fail() || !iss.eof()) {
+			fprintf(stderr, "Error: Cannot parse SOURCE_DATE_EPOCH as integer\n");
+			exit(27);
+		}
+	}
 	struct tm *tm = gmtime(&tt);
 	fprintf(file, "#define StratagusLastModifiedDate \"%02d/%02d/%02d\"\n", tm->tm_mon + 1, tm->tm_mday, tm->tm_year + 1900);
 	fprintf(file, "#define StratagusLastModifiedTime \"%02d:%02d:%02d\"\n", tm->tm_hour, tm->tm_min, tm->tm_sec);

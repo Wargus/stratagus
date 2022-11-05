@@ -607,6 +607,9 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
+			if (GameRunning) {
+				type->Icon.Load();
+			}
 		} else if (!strcmp(value, "Portrait")) {
 #ifdef USE_MNG
 			if (!lua_istable(l, -1)) {
@@ -727,6 +730,9 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
+			if (GameRunning) {
+				type->Missile.MapMissile();
+			}
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
@@ -748,6 +754,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
+			if (GameRunning) {
+				if (!type->CorpseName.empty()) {
+					type->CorpseType = UnitTypeByIdent(type->CorpseName);
+				}
+			}
 		} else if (!strcmp(value, "DamageType")) {
 			value = LuaToString(l, -1);
 			//int check = ExtraDeathIndex(value);
@@ -756,6 +767,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = LuaToString(l, -1);
 			type->Explosion.Missile = NULL;
+			if (GameRunning) {
+				type->Explosion.MapMissile();
+			}
 		} else if (!strcmp(value, "TeleportCost")) {
 			type->TeleportCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TeleportEffectIn")) {
@@ -814,9 +828,15 @@ static int CclDefineUnitType(lua_State *l)
 				if (!strcmp(dtype, "general")) {
 					type->Impact[ANIMATIONS_DEATHTYPES].Name = LuaToString(l, -1, k + 1);
 					type->Impact[ANIMATIONS_DEATHTYPES].Missile = NULL;
+					if (GameRunning) {
+						type->Impact[ANIMATIONS_DEATHTYPES].MapMissile();
+					}
 				} else if (!strcmp(dtype, "shield")) {
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Name = LuaToString(l, -1, k + 1);
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = NULL;
+					if (GameRunning) {
+						type->Impact[ANIMATIONS_DEATHTYPES + 1].MapMissile();
+					}
 				} else {
 					int num = 0;
 					for (; num < ANIMATIONS_DEATHTYPES; ++num) {
@@ -829,6 +849,9 @@ static int CclDefineUnitType(lua_State *l)
 					} else {
 						type->Impact[num].Name = LuaToString(l, -1, k + 1);
 						type->Impact[num].Missile = NULL;
+						if (GameRunning) {
+							type->Impact[num].MapMissile();
+						}
 					}
 				}
 			}

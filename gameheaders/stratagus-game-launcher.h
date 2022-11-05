@@ -269,7 +269,7 @@ int check_version(char* tool_path, char* data_path) {
     return 0;
 }
 
-static void ExtractData(char* extractor_tool, char *const extractor_args[], char* destination, char* scripts_path, int force=0, char* datafileCstr=NULL) {
+static void ExtractData(char* extractor_tool, const char *const extractor_args[], char* destination, char* scripts_path, int force=0, char* datafileCstr=NULL) {
 	int canJustReextract;
 #ifdef EXTRACTION_FILES
 	if (force == 0) {
@@ -305,7 +305,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 	char* filepatterns[] = { NULL };
 	// file types as names not working at least on macOS sierra
 #else
-	char* filepatterns[] = { GAME_CD_FILE_PATTERNS, NULL };
+	const char* filepatterns[] = { GAME_CD_FILE_PATTERNS, NULL };
 	int patterncount = 0;
 	while (filepatterns[patterncount++] != NULL);
 #endif
@@ -434,7 +434,7 @@ static void ExtractData(char* extractor_tool, char *const extractor_args[], char
 		fs::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
-		char* contrib_directories[] = CONTRIB_DIRECTORIES;
+		const char* contrib_directories[] = CONTRIB_DIRECTORIES;
 		while (contrib_directories[i] != NULL && contrib_directories[i + 1] != NULL) {
 			if (!strcmp(contrib_directories[i], ":optional:")) {
 				i += 1;
@@ -666,7 +666,7 @@ int main(int argc, char * argv[]) {
 	strcpy(stratagus_bin, STRATAGUS_BIN);
 #endif
 
-	char *const extractor_args[] = EXTRACTOR_ARGS;
+	const char *const extractor_args[] = EXTRACTOR_ARGS;
 
 	if (argc == 2) {
 		if (stat(argv[1], &st) == 0) {
@@ -778,7 +778,7 @@ int main(int argc, char * argv[]) {
 	stratagus_argv[0] = argv[0];
 #endif
 
-	stratagus_argv[1] = "-d";
+	stratagus_argv[1] = (char*)"-d";
 	stratagus_argv[2] = data_path;
 
 	for (int i = 3; i < argc + 2; ++i ) {

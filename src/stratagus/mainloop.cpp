@@ -157,7 +157,7 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 /**
 **  Draw map area
 */
-void DrawMapArea()
+void DrawMapArea(const fieldHighlightChecker highlightChecker = nullptr)
 {
 	// Draw all of the viewports
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
@@ -169,7 +169,7 @@ void DrawMapArea()
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}
 		}
-		vp->Draw();
+		vp->Draw(highlightChecker);
 	}
 }
 

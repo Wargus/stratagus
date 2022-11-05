@@ -582,6 +582,7 @@ set(stratagus_generic_HDRS
 	src/include/results.h
 	src/include/script.h
 	src/include/script_sound.h
+	src/include/sdl2_helper.h
 	src/include/settings.h
 	src/include/sound.h
 	src/include/sound_server.h
@@ -1216,6 +1217,9 @@ endif()
 
 if(BUILD_VENDORED_LUA)
   add_dependencies(stratagus lua)
+else()
+  find_package(Lua51 REQUIRED)
+  find_package(Tolua++ REQUIRED)
 endif()
 
 if(BUILD_VENDORED_SDL)

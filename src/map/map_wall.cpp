@@ -83,7 +83,8 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 	}
 	newTile = tileset.tiles[tileIndex].tile;
 	if (!newTile && oldTile) {
-		unsigned int oldTileIndex = tileset.findTileIndexByTile(oldTile);
+		int32_t oldTileIndex = tileset.findTileIndexByTile(oldTile);
+		Assert(oldTileIndex != -1);
 		return getWallTile(tileset, humanWall, tileset.getWallDirection(oldTileIndex, humanWall), value);
 	} else {
 		return newTile;
@@ -250,10 +251,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value, mf.getElevation());
 	} else {
 		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
+		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value, mf.getElevation());
 	}
 
 	UI.Minimap.UpdateXY(pos);

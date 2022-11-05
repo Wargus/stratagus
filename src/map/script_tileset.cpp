@@ -34,23 +34,27 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+#include "SDL_image.h"
 
 #include "tileset.h"
 #include "tile.h"
+#include "map.h"
+#include "video.h"
 
 #include "script.h"
 #include <cstring>
 #include <math.h>
+#include <set>
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
+bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount)
 {
 	const struct {
 		const char *name;
-		unsigned int flag;
+		tile_flags flag;
 	} flags[] = {
 		{"opaque", MapFieldOpaque},
 		{"water", MapFieldWaterAllowed},
@@ -69,7 +73,8 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 		{"sea-unit", MapFieldSeaUnit},
 		{"building", MapFieldBuilding},
 		{"human", MapFieldHuman},
-		{"decorative", MapFieldDecorative}
+		{"decorative", MapFieldDecorative},
+		{"non-mixing", MapFieldNonMixing}
 	};
 
 	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
@@ -99,7 +104,7 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 		if (strlen(flagName) != subtileCount) {
 			return false;
 		}
-		uint64_t subtileFlags = 0;
+		tile_flags subtileFlags = 0;
 		for (int i = 0; i < subtileCount; i++) {
 			if (flagName[i] == 'u') {
 				subtileFlags |= (1 << i);
@@ -117,20 +122,19 @@ static bool ModifyFlag(const char *flagName, uint64_t *flag, int subtileCount)
 **  Parse the flag section of a tile definition.
 **
 **  @param l     Lua state.
-**  @param back  pointer for the flags (return).
 **  @param j     pointer for the location in the array. in and out
 **
-**  @return      index for basename, if the name this tile should be available as a different basename, or 0
+**  @return     parsed set of flags
 **
 */
-int CTileset::parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j)
+tile_flags CTileset::parseTilesetTileFlags(lua_State *l, int *j)
 {
-	uint64_t flags = 3;
-	bool nonMixing = false;
+	tile_flags flags = 3;
+
 	//  Parse the list: flags of the slot
 	while (1) {
 		lua_rawgeti(l, -1, *j + 1);
-		if (!lua_isstring(l, -1)) {
+		if (!lua_isstring_strict(l, -1)) {
 			lua_pop(l, 1);
 			break;
 		}
@@ -140,24 +144,14 @@ int CTileset::parseTilesetTileFlags(lua_State *l, uint64_t *back, int *j)
 
 		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags, logicalTileToGraphicalTileMultiplier * logicalTileToGraphicalTileMultiplier) == false) {
-			if (!strcmp(value, "non-mixing")) {
-				nonMixing = true;
-			} else {
-				LuaError(l, "solid: unsupported tag: %s" _C_ value);
-			}
+			LuaError(l, "solid: unsupported tag: %s" _C_ value);
 		}
 	}
-	*back = flags;
-
-	if (flags & MapFieldDecorative) {
-		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
-	} else {
-		if (nonMixing) {
-			// special flag - this isn't it's own name, but it doesn't mix
-			*back |= MapFieldDecorative;
-		}
-		return 0;
+	
+	if (flags & MapFieldNonMixing) {
+		flags |= MapFieldDecorative;
 	}
+	return flags;
 }
 
 /**
@@ -216,20 +210,23 @@ void CTileset::parseSpecial(lua_State *l)
 */
 void CTileset::parseSolid(lua_State *l)
 {
-	const int index = tiles.size();
+	const tile_index index = getTileCount();
 
-	this->tiles.resize(index + 16);
+	if (!increaseTileCountBy(16)) {
+		LuaError(l, "Number of tiles limit has been reached.");
+	}
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 
 	int j = 0;
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	uint64_t f = 0;
-	if (parseTilesetTileFlags(l, &f, &j)) {
-		LuaError(l, "cannot set a custom basename in the main set of flags");
+	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
+	
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(l, "cannot set a decorative flag / custom basename in the main set of flags");
 	}
 
 	//  Vector: the tiles.
@@ -244,13 +241,13 @@ void CTileset::parseSolid(lua_State *l)
 		lua_rawgeti(l, -1, i + 1);
 		if (lua_istable(l, -1)) {
 			int k = 0;
-			uint64_t tile_flag = 0;
-			unsigned char new_basename = parseTilesetTileFlags(l, &tile_flag, &k);
+			const tile_flags tile_flag = parseTilesetTileFlags(l, &k);
 			--j;
 			lua_pop(l, 1);
 			tiles[index + j].flag = tile_flag;
-			if (new_basename) {
-				tiles[index + j].tileinfo.BaseTerrain = new_basename;
+
+			if (tile_flag & MapFieldDecorative) {
+				tiles[index + j].tileinfo.BaseTerrain = addDecoTerrainType();
 			}
 			continue;
 		}
@@ -259,12 +256,14 @@ void CTileset::parseSolid(lua_State *l)
 
 		// ugly hack for sc tilesets, remove when fixed
 		if (j > 15) {
-			this->tiles.resize(index + j);
+			if (!increaseTileCountBy(j)) {
+				LuaError(l, "Number of tiles limit has been reached.");
+			}
 		}
 		CTile &tile = tiles[index + j];
 
 		tile.tile = pud;
-		tile.flag = f;
+		tile.flag = flagsCommon;
 		tile.tileinfo.BaseTerrain = basic_name;
 		tile.tileinfo.MixTerrain = 0;
 	}
@@ -278,22 +277,30 @@ void CTileset::parseSolid(lua_State *l)
 */
 void CTileset::parseMixed(lua_State *l)
 {
-	int index = tiles.size();
-	tiles.resize(index + 256);
+	tile_index index = getTileCount();
+
+	if (!increaseTileCountBy(256)) {
+		LuaError(l, "Number of tiles limit has been reached.");
+	}
+
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 	int j = 0;
 	const int args = lua_rawlen(l, -1);
-	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
-	const int mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 
-	uint64_t f = 0;
-	if (parseTilesetTileFlags(l, &f, &j)) {
-		LuaError(l, "cannot set a custom basename in the main set of flags");
+	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
+	
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(l, "cannot set a decorative flag / custom basename in the main set of flags");
 	}
 
 	for (; j < args; ++j) {
@@ -308,7 +315,7 @@ void CTileset::parseMixed(lua_State *l)
 			CTile &tile = tiles[index + i];
 
 			tile.tile = pud;
-			tile.flag = f;
+			tile.flag = flagsCommon;
 			tile.tileinfo.BaseTerrain = basic_name;
 			tile.tileinfo.MixTerrain = mixed_name;
 		}
@@ -442,19 +449,19 @@ void CTileset::parse(lua_State *l)
 void CTileset::buildTable(lua_State *l)
 {
 	//  Calculate number of tiles in graphic tile
-	const int n = tiles.size();
+	const size_t n = getTileCount();
 
 	mixedLookupTable.clear();
 	mixedLookupTable.resize(n, 0);
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
-	for (int i = 0; i < n; ++i) {
-		const int tile = tiles[i].tile;
+	for (auto &currTile : tiles) {
+		const graphic_index tile = currTile.tile;
 		if (tile == 0) {
 			continue;
 		}
-		const unsigned flag = tiles[i].flag;
+		const tile_flags flag = currTile.flag;
 		if (flag & MapFieldWaterAllowed) {
 			TileTypeTable[tile] = TileTypeWater;
 		} else if (flag & MapFieldCoastAllowed) {
@@ -492,9 +499,9 @@ void CTileset::buildTable(lua_State *l)
 	}
 
 	//  Build wood removement table.
-	int solid = 0;
-	int mixed = 0;
-	for (int i = 0; i < n;) {
+	tile_index solid = 0;
+	tile_index mixed = 0;
+	for (size_t i = 0; i < n;) {
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
@@ -540,11 +547,11 @@ void CTileset::buildTable(lua_State *l)
 	//8 Top Left
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
-	for (int i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
+	for (size_t i = mixed; i < mixed + 256; ++i) {
+		int check = int((i - mixed) / 16);
 
 		switch (check) {
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
@@ -574,7 +581,7 @@ void CTileset::buildTable(lua_State *l)
 	//  Build rock removement table.
 	mixed = 0;
 	solid = 0;
-	for (int i = 0; i < n;) {
+	for (size_t i = 0; i < n;) {
 		const CTile &tile = tiles[i];
 		const CTileInfo &tileinfo = tile.tileinfo;
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
@@ -598,11 +605,11 @@ void CTileset::buildTable(lua_State *l)
 	//2 Bottom Right
 	//4 Top Right
 	//8 Top Left
-	for (int i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (int i = mixed; i < mixed + 256; ++i) {
-		int check = (int)((i - mixed) / 16);
+	for (size_t i = mixed; i < mixed + 256; ++i) {
+		int check = int((i - mixed) / 16);
 		switch (check) {
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
 			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
@@ -690,7 +697,7 @@ void CTileset::buildWallReplacementTable()
 	// Set destroyed walls to TileTypeUnknown
 	for (int i = 0; i < 16; ++i) {
 		int n = 0;
-		unsigned int tileIndex = humanWallTable[i];
+		tile_index tileIndex = humanWallTable[i];
 		while (tiles[tileIndex].tile) { // Skip good tiles
 			++tileIndex;
 			++n;
@@ -714,5 +721,1044 @@ void CTileset::buildWallReplacementTable()
 		}
 	}
 }
+
+/**
+** 	Checks top argument in the lua state for number of layers to parse
+**
+**	@param luaStack		lua state
+**/
+uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
+{
+	bool isMultipleLayers = false;
+	if (lua_istable(luaStack, -1)) {
+
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		isMultipleLayers = lua_isstring_strict(luaStack, -1) && std::string(LuaToString(luaStack, -1)) == "layers";
+		lua_pop(luaStack, 1);	/// #1>
+
+	} else if (!lua_isnumber(luaStack, -1)) {
+		LuaError(luaStack, "incorrect argument");
+	}
+	return isMultipleLayers ? lua_rawlen(luaStack, -1) - 1
+							: 1;
+}
+
+/**
+** Parse top argument in the lua state for range of source indexes
+**	
+**	tile									-- tile index (within main tileset) to get graphic from
+**	{tile[, tile]...}}						-- set of tiles indexes (within main tileset) to get graphics from
+**	{"img"|"img-base", image[, image]...}	-- set of numbers of frames from the extended (or base tileset) "image" file.
+**	{["img"|"img-base",] "range", from, to}	-- if "img" then from frame to frame (for "image"),
+**											-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**	{"slot", slot_num}						-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**
+**	@param luaStack		lua state, top argument will be parsed
+**	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
+**	@return 			vector of parsed indexes
+**/
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const
+{
+	isImg = SrcImageOption::cNone;
+
+	if (lua_istable(luaStack, -1)) {
+
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		/// check if "img"/"img-base" tag is present
+		if (lua_isstring_strict(luaStack, -1)) {
+			const std::string parsingValue { LuaToString(luaStack, -1) };
+			if (parsingValue == "img") {
+				isImg = SrcImageOption::cNewGraphics;
+			} else if (parsingValue == "img-base") {
+				isImg = SrcImageOption::cBaseGraphics;
+			}
+		}
+		lua_pop(luaStack, 1);	/// #1>
+	} else if (!lua_isnumber(luaStack, -1)) {
+		LuaError(luaStack, "incorrect argument");
+	}
+	
+	return { CTilesetParser::parseTilesRange(luaStack, isImg ? 2 : 1) };
+}
+
+/** 
+**	Parse a layer of source graphics
+**
+** src_range
+** or	
+** { src_range [,{"do_something", parameter}...] }
+**
+**	@param	luaStack		lua state, top argument will be parsed - it can be table of layers or single layer
+**	@param	isSingleLayer	true if this layer is single. It's used to determine if indexes should be returned
+**	@return					set of images described in this layer or set of indexes of existing tileset graphics
+**/
+auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSingleLayer /*= false*/) const
+{
+	enum { cSrcRange = 1, cModifier = 2 };
+
+	const bool withModifier = isModifierPresent(luaStack);
+
+	/// make sure that src_range is at the top of the lua stack
+	bool needToPopSrcBack = false;
+	if (lua_istable(luaStack, -1)) {
+		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		if (lua_istable(luaStack, -1)
+			|| (lua_isnumber(luaStack, -1) && withModifier)) {
+			needToPopSrcBack = true;
+		} else {
+			lua_pop(luaStack, 1);	/// #1>
+		}
+	}
+
+	SrcImageOption isImg = SrcImageOption::cNone;
+	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
+	
+	if (needToPopSrcBack) {
+		lua_pop(luaStack, 1);	/// #1>	
+	}
+
+	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
+											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
+											 && !withModifier)							/* there are no any modifiers */
+											 					? true 
+																: false;
+
+	std::vector<graphic_index> parsedIndexes;
+	sequence_of_images parsedImages;
+
+	for (auto const srcIndex : srcIndexes) {
+		if (!isImg && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
+			parsedIndexes.push_back(0);
+			continue;
+		}
+		const graphic_index frameIdx = isImg ? srcIndex 
+										  	 : SrcTileset->tiles[srcIndex].tile;
+		if (isUntouchedSrcGraphicsOnly) {
+			parsedIndexes.push_back(frameIdx);
+
+		} else {
+			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics	? SrcImgGraphic 
+															   					: SrcTilesetGraphic;
+			auto image { newBlankImage() };		
+			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
+			parsedImages.push_back(std::move(image));
+		}
+	}
+	if (withModifier) {
+		const uint16_t argsNum = lua_rawlen(luaStack, -1);
+		int arg = cModifier;
+		while (arg <= argsNum) {
+			parseModifier(luaStack, arg, parsedImages);
+			arg++;	
+		}
+	}
+	return std::make_pair(parsedIndexes, std::move(parsedImages));
+}
+
+/**
+**	Parse arguments for pixel modifiers as colors
+**	It parses table in form	{"do_something", colors[, colors]..} from the top of lua state
+**	where 'colors' is arguments to parse and can be in one of these forms:
+**		color		-- single color
+** 		{from, to}	-- range of colors
+**
+**	@param	luaStack	lua state
+**	@return	set of parsed colors as uint32_t values
+**
+**/
+std::set<uint32_t> CTilesetGraphicGenerator::parseArgsAsColors(lua_State *luaStack,  const int firstArgPos /* = 2 */) const
+{
+	enum { cFrom = 1, cTo = 2 };
+
+	std::set<uint32_t> colors;
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+
+	for (int arg = firstArgPos; arg <= argsNum; arg++)
+	{
+		lua_rawgeti(luaStack, -1, arg);	/// #1<
+		if (lua_istable(luaStack, -1)) {
+			uint32_t color = LuaToUnsignedNumber(luaStack, -1, cFrom);
+			const uint32_t rangeTo = LuaToUnsignedNumber(luaStack, -1, cTo);
+			while (color <= rangeTo) {
+				colors.insert(color++);
+			}
+		} else if (lua_isnumber(luaStack, -1)) {
+			colors.insert(LuaToUnsignedNumber(luaStack, -1));
+
+		} else {
+			LuaError(luaStack, "Incorrect argument");
+		}
+		lua_pop(luaStack, 1);	/// #1>
+	}
+	return colors;
+}
+
+/**
+**	Get pixels's color
+**
+**	@param	pixel		pointer to address of current pixel
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**	@return				pixel's color as 32 bit value
+**
+**/
+uint32_t CTilesetGraphicGenerator::getPixel(const void *const pixel, const uint8_t bpp) const
+{
+	uint32_t pixelColor = 0;
+
+	switch (bpp) {
+		case 1:
+			pixelColor = uint32_t(*(static_cast<const uint8_t*>(pixel)));
+			break;
+		case 2:
+			pixelColor = uint32_t(*(static_cast<const uint16_t*>(pixel)));
+			break;
+		case 3:
+			{
+				const uint8_t *const pixelPtr = static_cast<const uint8_t*>(pixel);
+				pixelColor = SDL_BYTEORDER == SDL_LIL_ENDIAN ? pixelPtr[0]		 | pixelPtr[1] << 8	 | pixelPtr[2] << 16
+															 : pixelPtr[0] << 24 | pixelPtr[1] << 16 | pixelPtr[2] << 8;
+			}
+			break;
+		case 4:
+			pixelColor = *(static_cast<const uint32_t*>(pixel));
+			break;
+		default:
+			/// unsupported format
+			Assert(0);
+	}
+	return pixelColor;
+}
+
+/**
+**	Set pixel's color
+**
+**	@param	pixel		pointer to address of target pixel
+**	@param	color		color to set
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::setPixel(void *const pixel, const uint32_t color, const uint8_t bpp) const
+{
+	switch (bpp) {
+		case 1:
+			*(static_cast<uint8_t*>(pixel)) = uint8_t(color);
+			break;
+		case 2:
+			*(static_cast<uint16_t*>(pixel)) = uint16_t(color);
+			break;
+		case 3:
+			{
+				const uint8_t *const src = reinterpret_cast<const uint8_t*>(&color);
+				uint8_t *const dst = static_cast<uint8_t*>(pixel);
+				if (SDL_BYTEORDER == SDL_LIL_ENDIAN) {
+					dst[0] = src[0];
+					dst[1] = src[1];
+					dst[2] = src[2];
+				} else {
+					dst[0] = src[3];
+					dst[1] = src[2];
+					dst[2] = src[1];
+				}
+			}
+			break;
+		case 4:
+			*(static_cast<uint32_t*>(pixel)) = color;
+			break;
+		default:
+			/// unsupported format
+			Assert(0);
+	}
+}
+
+/**
+**	Swap two pixels
+**
+**	@param	pixel1		pointer to address of pixel1 to swap
+**	@param	pixel1		pointer to address of pixel2 to swap
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::swapPixels(void *const pixel1, void *const pixel2, const uint8_t bpp) const
+{
+	const uint32_t tmp = getPixel(pixel1, bpp);
+	setPixel(pixel1, getPixel(pixel2, bpp), bpp);
+	setPixel(pixel2, tmp, bpp);
+}
+
+/**
+**	Check if current pixel matches one of passed colors
+**
+**	@param	pixel		pointer to address of current pixel
+**	@param	colors		set of colors to check
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**	@return				true if pixels's color matches one of passed colors, false otherwise
+**
+**/
+bool CTilesetGraphicGenerator::checkPixel(const void *const pixel, std::set<uint32_t> &colors, const uint8_t bpp) const
+{
+	for (auto &color : colors) {
+		if (getPixel(pixel, bpp) == color) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+**	Remove pixel's color
+**
+**	@param	pixel		pointer to address of target pixel
+**	@param	transColor	transparent color (we remove pixel by changing it's color to transparent)
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::removePixel(void *const pixel, const uint32_t transpColor, const uint8_t bpp) const
+{
+	setPixel(pixel, transpColor, bpp);
+}
+
+/**
+**	Shift pixel's color
+**
+**	@param	pixel		pointer to address of target pixel
+**	@param	shift		shift to be applied to pixel's color
+**	@param	bpp			bytes per pixel (1, 2, 3, 4 is allowed)
+**
+**/
+void CTilesetGraphicGenerator::shiftIndexedColor(void *const pixel, const int16_t shift, const uint8_t bpp) const
+{
+	switch (bpp) {
+		case 1:
+			*(static_cast<uint8_t*>(pixel)) += shift;
+			break;
+		default:
+			/// only indexed colors supported
+			Assert(0);
+	}
+}
+
+/**
+**	Remove certain colors from tiles images
+**	It parses table in the format of {"remove", colors[, colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to remove colors from
+** 	@param	except			flag to invert action - remove specified colors/ remove all colors except specified
+**
+**/
+void CTilesetGraphicGenerator::removeColors(lua_State *luaStack, sequence_of_images &images, const bool except /* =false */) const
+{
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack) };
+
+	uint32_t colorKey = 0;
+	if (!images.empty()) {
+		SDL_GetColorKey(images[0].get(), &colorKey);
+	}
+	
+	for (auto &image : images) {
+		/// Do remove colors
+		SDL_Surface *const imgSurface { image.get() };
+		const size_t pixelsNum = imgSurface->w * imgSurface->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+			if (checkPixel(pixelPos, colors, imgSurface->format->BytesPerPixel)) {
+				if (!except) removePixel(pixelPos, colorKey, imgSurface->format->BytesPerPixel);
+			} else if (except) {
+				removePixel(pixelPos, colorKey, imgSurface->format->BytesPerPixel);
+			}
+		}
+	}
+}
+
+/**
+**	Shift certain colors from tiles images by a given increment
+**	It parses table in the format of {"shift", inc, colors[, colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to shift colors
+**
+**/
+void CTilesetGraphicGenerator::shiftIndexedColors(lua_State *luaStack, sequence_of_images &images) const
+{
+	enum { cShift = 2, cColors = 3 };
+
+	const int16_t shift = LuaToUnsignedNumber(luaStack, -1, cShift);
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack, cColors) };
+
+	for (auto &image : images) {
+		/// Do shift colors
+		SDL_Surface *const imgSurface { image.get() };
+		const size_t pixelsNum = imgSurface->w * imgSurface->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *const pixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+			if (checkPixel(pixelPos, colors, imgSurface->format->BytesPerPixel)) {
+				shiftIndexedColor(pixelPos, shift, imgSurface->format->BytesPerPixel);
+			}
+		}
+	}
+}
+
+/**
+**	Flip images
+**	It parses table in the format of {"flip", direction} from the top of the lua state
+**	where direction is "vertical", "horizontal" or "both"
+**
+**	@param	luaStack		lua state
+**	@param	images			vector of tiles images to flip
+**
+**/
+void CTilesetGraphicGenerator::flipImages(lua_State *luaStack, sequence_of_images &images) const
+{
+	enum { cVertical = 0b01, cHorizontal = 0b10 };
+
+	if (images.empty()) { 
+		return;
+	}
+	
+	uint8_t direction = 0;
+
+	const std::string dirToParse { LuaToString(luaStack, -1, 2) };
+	
+	if (dirToParse == "vertical") {
+		direction = cVertical;
+	} else if (dirToParse == "horizontal") {
+		direction = cHorizontal;
+	} else if (dirToParse == "both") {
+		direction = cHorizontal | cVertical;
+	} else {
+		LuaError(luaStack, "Wrong modifier argument");
+	}
+	uint32_t colorKey = 0;
+	SDL_GetColorKey(images[0].get(), &colorKey);
+
+	std::vector<uint32_t> flippedImage(images[0].get()->w * images[0].get()->h);
+	
+	for (auto &image : images) {
+		/// Do flip image
+		SDL_Surface *const imgSurface { image.get() };
+		size_t ySrc, rySrc;
+		size_t xSrc, rxSrc;
+		size_t &xDst = direction & cHorizontal ? rxSrc : xSrc;
+		size_t &yDst = direction & cVertical   ? rySrc : ySrc;
+
+		for (ySrc = 0, rySrc = imgSurface->h - 1; ySrc < imgSurface->h; ySrc++, rySrc--) {
+			for (xSrc = 0, rxSrc = imgSurface->w - 1; xSrc < imgSurface->w; xSrc++, rxSrc--) {
+				const size_t pixel = xSrc + ySrc * imgSurface->w;
+				void *const srcPixelPos = reinterpret_cast<void *>(uintptr_t(imgSurface->pixels) + pixel * imgSurface->format->BytesPerPixel);
+				flippedImage[xDst + yDst * imgSurface->w] = getPixel(srcPixelPos, imgSurface->format->BytesPerPixel);
+			}
+		}
+		uintptr_t dstPixelPos = uintptr_t(imgSurface->pixels);
+		for (auto pixel : flippedImage) {
+			setPixel(reinterpret_cast<void *>(dstPixelPos), pixel, imgSurface->format->BytesPerPixel);
+			dstPixelPos += imgSurface->format->BytesPerPixel;
+		}
+	}
+}
+
+/**
+** 	Compose set of images with images from src_range. Are taken consecutively one for each from src_range.
+**	If pixel from src image has chroma key color it will be replaced by pixel from src2 image
+**	It parses table in the format of {"chroma-key", src_range2, key_colors[, key_colors]..} from the top of the lua state
+**
+**	@param	luaStack		lua state
+**	@param	dstImages		vector of tiles images to compose with src images which will be parsed from luaStack
+**
+**/
+void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_of_images &dstImages) const
+{
+	enum { cSrcRange2 = 2, cColors = 3 };
+
+	lua_rawgeti(luaStack, -1, cSrcRange2);	/// #1<
+	auto [parcedSrcIndexes, parcedSrcImages] = parseLayer(luaStack, true);
+	lua_pop(luaStack, 1);					/// #1>
+
+
+	if (!parcedSrcImages.size() && !parcedSrcIndexes.size()) { /// nothing to do
+		return;
+	}
+	
+	std::set<uint32_t> colors { parseArgsAsColors(luaStack, cColors) };
+	
+	auto srcImage { newBlankImage() };
+
+	size_t srcImgIdx = 0;
+	for (auto &image : dstImages) {
+		SDL_Surface *const dstImgSurface { image.get() };
+		SDL_Surface *const srcImgSurface = parcedSrcImages.size() ? parcedSrcImages[srcImgIdx % parcedSrcImages.size()].get()
+																  : srcImage.get();
+		if (parcedSrcIndexes.size()) {
+ 			const graphic_index frameIdx = parcedSrcIndexes[srcImgIdx % parcedSrcIndexes.size()];
+			SrcTilesetGraphic->DrawFrame(frameIdx, 0, 0, srcImage.get());
+		}
+
+		const size_t pixelsNum = dstImgSurface->w * dstImgSurface->h;
+		for (size_t pixel = 0; pixel < pixelsNum; pixel++) {
+			void *const dstPixelPos = reinterpret_cast<void *>(uintptr_t(dstImgSurface->pixels) + pixel * dstImgSurface->format->BytesPerPixel);
+			void *const srcPixelPos = reinterpret_cast<void *>(uintptr_t(srcImgSurface->pixels) + pixel * dstImgSurface->format->BytesPerPixel);
+
+			if (checkPixel(dstPixelPos, colors, dstImgSurface->format->BytesPerPixel)) {
+				setPixel(dstPixelPos, getPixel(srcPixelPos, srcImgSurface->format->BytesPerPixel), dstImgSurface->format->BytesPerPixel);
+			}
+		}
+		srcImgIdx++;
+	}
+}
+
+/**
+**	Parse pixel modifiers in the lua state
+** {"do_something", parameter}
+** where 'do_something':
+**	"remove"
+** 	usage:		{"remove", colors[, colors]..}
+**					where 'colors':
+**									color		-- single color
+**									{from, to}	-- range of colors
+**
+**	"remove-all-except"
+**	usage:		{"remove-all-except", colors[, colors]..}
+**					where 'colors':
+**									color		-- single color
+**									{from, to}	-- range of colors
+**
+**	"shift"
+**	usage		{"shift", inc, colors[, colors]..}
+**					where 	'inc':
+**								increment (positive or negative) to be implemented on the colors
+**						 	'colors':
+**								color		-- single color
+**								{from, to}	-- range of colors
+**	"flip"
+**	usage:		{"flip", direction}
+**					where 'direction':
+**								"vertical"
+**								"horizontal"
+**								"both"
+**
+**	"chroma-key"
+**	usage:		{"chroma-key", src_range2, key_colors[, key_colors]..}
+**					where 'src_range2': (set of images to compose with images from src_range. Are taken consecutively one for each from src_range)
+**								{tile}									-- tile index (within main tileset) to get graphic from
+**								{tile[, tile]...}}						-- set of tiles indexes (within main tileset) to get graphics from
+**								{"img"|"img-base", image[, image]...}	-- set of numbers of frames from the extended (or base tileset) "image" file.
+**								{["img"|"img-base",] "range", from, to}	-- if "img" then from frame to frame (for "image"),        
+**																		-- otherwise indexes from tile to tile (within main tileset) to get graphics from
+**								{"slot", slot_num}						-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
+**						 'key_colors': (chroma keys)
+**								color		-- single color
+**								{from, to}	-- range of colors
+**
+**	@param	luaStack	lua state, a table in the top will be parsed
+**	@param	argPos		position in the table to parse
+**	@param	images		vector of one-frame sized SDL_Surfaces to apply modifier to
+**/
+void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const
+{
+	lua_rawgeti(luaStack, -1, argPos); /// #1<
+	if (!lua_istable(luaStack, -1)) {
+		LuaError(luaStack, "Incorrect argument");
+	}
+	int arg = 1;
+	std::string modifier { LuaToString(luaStack, -1, arg) };
+	if (modifier == "remove") {
+		removeColors(luaStack, images);
+	} else if (modifier == "remove-all-except") {
+		removeColors(luaStack, images, true);
+	} else if (modifier == "shift") {
+		shiftIndexedColors(luaStack, images);
+	} else if (modifier == "flip") {
+		flipImages(luaStack, images);
+	} else if (modifier == "chroma-key") {
+		composeByChromaKey(luaStack, images);
+	} else {
+		LuaError(luaStack, "Unknown modifier");	
+	}
+	lua_pop(luaStack, 1); /// #1>
+}
+
+/**
+**	Generates new tile-sized empty image
+**
+**	@return	generated image
+**/
+sdl2::SurfacePtr CTilesetGraphicGenerator::newBlankImage() const
+{
+		const SDL_PixelFormat *format = SrcTilesetGraphic->Surface->format;
+		
+		sdl2::SurfacePtr blankImg {SDL_CreateRGBSurface(SrcTilesetGraphic->Surface->flags,
+														SrcTileset->getPixelTileSize().x,
+														SrcTileset->getPixelTileSize().y,
+														format->BitsPerPixel,
+														format->Rmask,
+														format->Gmask,
+														format->Bmask,
+														format->Amask)};
+		uint32_t colorKey = 0;
+		if (!SDL_GetColorKey(SrcTilesetGraphic->Surface, &colorKey)) {
+			SDL_SetColorKey(blankImg.get(), SDL_TRUE, colorKey);
+		}
+		if (format->palette) {
+			SDL_SetSurfacePalette(blankImg.get(), format->palette);
+		}
+	return blankImg;
+}
+
+bool CTilesetGraphicGenerator::isModifierPresent(lua_State *luaStack) const
+{
+	bool result = false;
+	if (lua_rawlen(luaStack, -1) > 1) {
+		if (lua_istable(luaStack, -1)) {
+			lua_rawgeti(luaStack, -1, 2);	/// #1<
+			if (lua_istable(luaStack, -1)) { 
+				result = true;
+			}
+			lua_pop(luaStack, 1);	/// #1>
+		}
+	}
+	return result;
+}
+
+
+/**
+**	Generates a sequence of repeating indexes whose maximum value is limited to 16. 
+**	Used the idea of "Cicada Principle" (prime numbers to generate continuous sequences)
+**
+**	@param	upperBound	upper value if generated indexes (must be <= 16)
+**	@param	length		length of the sequence to generate
+**	@return				generated sequence
+**/
+std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght/* = 16*/) const
+{
+    const std::vector<std::vector<uint8_t>> masks {{1},                                                                 // 1
+                                                   {0,  2},                                                             // 2
+                                                   {3,  0,  0},                                                         // 3
+                                                   {0,  5,  0,  4,  0,  0,  4},                                         // 7
+                                                   {7,  0,  0,  6,  0,  0,  8,  0,  8,  0,  0},                         // 11
+                                                   {0,  0,  0, 11, 12,  0,  9,  0,  0,  0,  0,  0, 10},                 // 13
+                                                   {0, 13,  0,  0,  0,  0,  0, 14,  0,  0,  0, 15,  0, 16,  0,  0, 0}}; // 17
+    std::vector<uint8_t> indexes (lenght, 0);
+
+    for (auto &curr : indexes) {
+        const size_t currIdx = std::distance(indexes.data(), &curr);
+        for (auto &mask : masks) {
+            const uint8_t value = mask[currIdx % mask.size()];
+            if (value && value - 1 > curr && value <= upperBound) {
+                curr = value - 1;
+            }
+            if (ranges::consist(mask, upperBound)) {
+                break;
+            }
+        }
+    }    
+    return indexes;
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**	It uses the idea of "Cicada Principle" (prime numbers to generate continuous sequences)
+**
+**	@param	src		sequences of images distributed in layers
+**	@return			cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const
+{
+    const uint16_t SequencesCount = 16;
+    std::vector<std::vector<uint8_t>> indexes;
+    for (auto &srcLayer : src) 
+    {
+        indexes.push_back(buildIndexesRow16(srcLayer.size(), SequencesCount));
+        
+        const auto layerIdx = std::distance(src.data(), &srcLayer);
+        if (layerIdx % 2 == 1) {
+            ranges::reverse(indexes.back());
+        }
+    }
+
+    std::vector<sequence_of_imagesPtrs> result;
+
+    std::vector<uint8_t> shifts(indexes.size());
+    ranges::iota(shifts, 0);
+
+    uint16_t iterCount = 0;
+    do {
+        auto wrkIndexes {indexes};
+        if (!result.empty()) {
+            for (size_t i = 0; i < wrkIndexes.size(); i++) {
+                ranges::rotate_n(wrkIndexes[i], shifts[i]);
+            }
+        }
+        for (size_t seqIdx = 0; seqIdx < SequencesCount; seqIdx++) {
+            sequence_of_imagesPtrs sequence;
+            
+            size_t layerIdx = 0;
+            for (auto &srcLayer : src) {
+                sequence.push_back(srcLayer[wrkIndexes[layerIdx][seqIdx]].get());
+                layerIdx++;
+            }
+            if (!ranges::consist(result, sequence)) {
+                result.push_back(sequence);
+            }
+            if (result.size() >= SequencesCount) {
+                break;
+            }
+        }
+        iterCount++;
+    } while (std::next_permutation(begin(shifts), end(shifts)) && result.size() < SequencesCount);
+    return result;
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**	It uses the algorithm of fair (uniform) distribution of sequences according to the criterion of variety
+**	TODO: implement this algorithm
+**
+**	@param	src		sequences of images distributed in layers
+**	@return			cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Fair(std::vector<sequence_of_images> const &src) const
+{
+	if (src.size() == 1) {  // if layer is single
+		std::vector<sequence_of_imagesPtrs> result;
+		for (auto &srcImg : src[0]) {
+			result.push_back(sequence_of_imagesPtrs { srcImg.get() });
+		}
+		return result;
+	}
+    return buildSequences_Cicadas(src);    
+}
+
+/**
+**	Generates a cartesian product from several layers of image sequences 
+**
+**	@param	src				sequences of images distributed in layers
+**	@param	isFairMethod	using fair method of generation if true, "cicadas" otherwise
+**	@return					cartesian product of src sets
+**/
+std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences(std::vector<sequence_of_images> const &src, 
+																			 const bool isFairMethod/* = true*/) const
+{
+	if (isFairMethod || src.size() == 1) {
+		return buildSequences_Fair(src);
+	} else {
+		return buildSequences_Cicadas(src);
+	}
+}
+
+/**
+**	Composes an image out of several ones by overlaying them one each other
+**
+**	@param	srcSequence		images to overlap
+**	@return					composed image
+**/
+sdl2::SurfacePtr CTilesetGraphicGenerator::composeImage(sequence_of_imagesPtrs &srcSequence) const
+{
+	auto dst { newBlankImage() };
+
+	for (auto &src : srcSequence) {
+		SDL_BlitSurface(src, NULL, dst.get(), NULL);
+	}
+	return dst;
+}
+
+/**
+** Parse top argument in the lua state.
+
+	{ "layers",  { src_range [,{"do_something", parameter}...] }, -- layer 1
+				 { src_range [,{"do_something", parameter}...] }, -- layer 2
+				 ...
+				 { src_range [,{"do_something", parameter}...] }  -- layer n
+	}
+	or
+	{ src_range [,{"do_something", parameter}...] }
+	or
+	src_range
+
+**/
+void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
+{
+	enum { cSinglelayer = 0, cFirstLayer = 2 };
+	std::vector<sequence_of_images> srcImgLayers;
+
+	if (lua_isnumber(luaStack, -1) || lua_istable(luaStack, -1)) {
+		const uint16_t layersNum = checkForLayers(luaStack);
+
+		int arg = layersNum > 1 ? cFirstLayer : cSinglelayer;
+		for (uint16_t layerIdx = 0; layerIdx < layersNum; layerIdx++) {
+			
+			if (layersNum > 1) {
+				lua_rawgeti(luaStack, -1, arg);
+			}
+
+			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, layersNum == 1 ? true : false);
+
+			if (layersNum > 1) {
+				lua_pop(luaStack, 1);
+			}
+
+			if (layersNum == 1 && parcedImages.empty()) { // If the only layer has no new graphics
+				for (auto index : parcedIndexes) {
+					Result.Indexes.push(index);
+				}
+			} else {
+				srcImgLayers.push_back(std::move(parcedImages));
+			}
+			arg++;
+		}
+		if (!srcImgLayers.empty()) {
+			for (auto &sequence : buildSequences(srcImgLayers)) {
+				Result.Images.push(composeImage(sequence));
+			}
+		}
+	} else {
+		LuaError(luaStack, "incorrect argument");
+	}
+}
+
+/** 
+** Parse range of destination indexes
+**
+**	tile
+**	{tile[, tile,] ...}
+**	{"range", from, to}
+**	{"slot", slot_num}
+**
+**	@param luaStack		lua state
+**	@param tablePos		position of the table containing range to parse
+**	@param argPos		argument in the table to parse
+**	@return				vector of parsed indexes
+**
+**/
+std::vector<tile_index> CTilesetParser::parseDstRange(lua_State *luaStack, const int tablePos, const int argPos)
+{
+	if (!lua_istable(luaStack, tablePos)) {
+		LuaError(luaStack, "incorrect argument");
+	}
+	lua_rawgeti(luaStack, tablePos, argPos);
+	std::vector<tile_index> result { parseTilesRange(luaStack) };
+	lua_pop(luaStack, 1);
+	return result;
+}
+
+/**
+**	Parse argument from top of the lua stack for range of tiles
+**
+**	@param luaStack		lua state
+**	@param parseFromPos	if argument to parse is a table, then start to parse from this pos
+**	@return				vector of parsed indexes	
+**/
+std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, const int parseFromPos/* = 1*/)
+{
+	std::vector<tile_index> resultSet;
+	
+	if (lua_isnumber(luaStack, -1)) { 
+		/// tile|image
+		resultSet.push_back(LuaToUnsignedNumber(luaStack, -1));
+
+	} else if (lua_istable(luaStack, -1)) {
+		/**
+		{["img"|"img-base", ]tile|image[, tile|image] ...}
+		{["img"|"img-base", ]"range", from, to}
+		{"slot", slot_num}
+		**/
+		const uint16_t argsNum = lua_rawlen(luaStack, -1);
+		if (argsNum == 0) {
+			return resultSet;
+		}
+		lua_rawgeti(luaStack, -1, parseFromPos);
+
+		if (lua_isnumber(luaStack, -1)) { 
+			/// {["img"|"img-base", ]tile|image[, tile|image] ...}
+			lua_pop(luaStack, 1);
+			
+			for (uint16_t arg = parseFromPos; arg <= argsNum; arg++) {
+				resultSet.push_back(LuaToUnsignedNumber(luaStack, -1, arg));
+			}
+
+		} else if (lua_isstring_strict(luaStack, -1)) {
+			lua_pop(luaStack, 1);
+
+			int arg = parseFromPos;
+			const std::string rangeType { LuaToString(luaStack, -1, parseFromPos) };
+
+			if (rangeType == "slot") { 
+				/// {"slot", slot_num}
+				if (argsNum != parseFromPos + 1) {
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {\"slot\", slot_num} construct");
+				}
+
+				const tile_index slotNum = LuaToUnsignedNumber(luaStack, -1, ++arg);
+
+				if (slotNum & tile_index(0xF)) {
+					LuaError(luaStack, "Tiles range: In {\"slot\", slot_num} construct \'slot_num\' must end with 0");
+				}
+
+				resultSet.resize(16);
+				ranges::iota(resultSet, slotNum); /// fill vector with incremented (slotNum++) values
+					
+			} else if (rangeType == "range") {
+				/// {["img"|"img-base", ]"range", from, to}
+				if (argsNum != parseFromPos + 2) {
+					LuaError(luaStack, "Tiles range: Wrong num of arguments in {[\"img\"|\"img-base\", ]\"range\", from, to} construct");
+				}
+
+				const tile_index rangeFrom = LuaToUnsignedNumber(luaStack, -1, ++arg);
+				const tile_index rangeTo   = LuaToUnsignedNumber(luaStack, -1, ++arg);
+
+				if (rangeFrom >= rangeTo) {
+					LuaError(luaStack, "Tiles range: In {[\"img\"|\"img-base\", ]\"range\", from, to} construct the condition \'from\' < \'to\' is not met");
+				}
+				resultSet.resize(rangeTo - rangeFrom + 1);
+				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
+
+			} else {
+				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType.c_str());
+			}
+		} else {
+			LuaError(luaStack, "Unsupported tiles range format");
+		}
+	} else {
+		LuaError(luaStack, "Unsupported tiles range format");
+	}
+	return resultSet;
+}
+
+/**
+**
+    {"terrain-name", ["terrain-name",] [list-of-flags-for-all-tiles-of-this-slot,]
+        {dst, src[, additional-flags-list]}
+        [, {dst, src[, additional-flags-list]}]
+        ...
+    }
+**/
+void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slotType)
+{
+	enum { cBase = 0, cMixed = 1 };
+	enum { cDst = 1, cSrc = 2, cAddFlags = 3 };
+
+	terrain_typeIdx terrainNameIdx[2] {0, 0};
+
+	const uint16_t argsNum = lua_rawlen(luaStack, -1);
+	int arg = 1;
+
+	/// parse terrain name/names
+	if (slotType == slot_type::cSolid) {
+		terrainNameIdx[cBase]  = BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
+	} else if (slotType == slot_type::cMixed) {
+		terrainNameIdx[cBase]  =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
+		terrainNameIdx[cMixed] =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, ++arg));
+	} else {
+		LuaError(luaStack, "Slots: unsupported slot type");
+	}
+	if (BaseTileset->getTerrainName(terrainNameIdx[cBase]) == "unused") {
+		return;
+	}
+	/// parse the flags that are common to every tiles in the slot
+	const tile_flags flagsCommon = BaseTileset->parseTilesetTileFlags(luaStack, &arg);
+	if (flagsCommon & MapFieldDecorative) {
+		LuaError(luaStack, "cannot set a decorative flag / custom basename in the main set of flags");
+	}
+
+	while (arg < argsNum) {
+		lua_rawgeti(luaStack, -1, ++arg);
+		
+		std::vector<tile_index> dstTileIndexes { parseDstRange(luaStack, -1, cDst) };
+		
+		/// load src-graphic-generator
+		CTilesetGraphicGenerator srcGraphic(luaStack, -1, cSrc, BaseTileset, BaseGraphic, SrcImgGraphic);
+
+		tile_flags flagsAdditional = 0;
+		terrain_typeIdx baseTerrain = terrainNameIdx[cBase];
+
+		if (lua_rawlen(luaStack, -1) > cSrc) {
+			int tableArg = cAddFlags - 1; /// Because parseTilesetTileFlags() takes previous argument idx
+			flagsAdditional = BaseTileset->parseTilesetTileFlags(luaStack, &tableArg);
+			if (flagsAdditional & MapFieldDecorative) {
+				baseTerrain = BaseTileset->addDecoTerrainType();
+			}
+		}
+	
+		tile_index srcIndex = 0;
+		for (tile_index &dstIndex: dstTileIndexes) {
+			if (srcGraphic.isEmpty()) {
+				break;
+			}
+			/// add new graphic tile into tileGraphic if needed
+			CTile newTile;
+			if (srcGraphic.hasIndexesOnly()) {
+				newTile.tile = srcGraphic.pullOutIndex();
+			} else {
+				ExtGraphic.push_back(std::move(srcGraphic.pullOutImage()));
+				newTile.tile = ExtGraphic.size() - 1 + BaseGraphic->NumFrames;
+			}
+			newTile.flag = flagsCommon | flagsAdditional;
+			newTile.tileinfo.BaseTerrain = baseTerrain;
+			newTile.tileinfo.MixTerrain  = terrainNameIdx[cMixed];
+			
+			ExtTiles.insert({dstIndex, newTile});
+
+			srcIndex++;
+		}
+		lua_pop(luaStack, 1);
+	}
+}
+
+void CTilesetParser::parseExtendedSlots(lua_State *luaStack, int arg)
+{
+	enum { cSlotType = 1, cSlotDefinition = 2 };
+
+	const uint16_t slotsNum = lua_rawlen(luaStack, arg) / 2; // "slot_type", {slot_definitions}
+
+	for (int slot = 0; slot < slotsNum; slot++) {
+		const uint16_t slotPos0 = slot * 2;
+		const std::string slotType { LuaToString(luaStack, arg, slotPos0 + cSlotType) };
+		const slot_type typeIdx = [&slotType]() {	if (slotType == "solid") return slot_type::cSolid;
+													else if (slotType == "mixed") return slot_type::cMixed;
+													else return slot_type::cUnsupported;
+												}();
+		lua_rawgeti(luaStack, arg, slotPos0 + cSlotDefinition);
+		parseExtendedSlot(luaStack, typeIdx);
+		lua_pop(luaStack, 1);
+	}
+}
+
+/**
+**  Parse the extended tileset definition with graphic generation 
+**
+**  @param luaStack		Lua state.
+**
+**
+  "image", path-to-image-with-tileset-graphic, -- optional for extended tileset
+  "slots", {
+            slot-type, {"terrain-name", ["terrain-name",] [list-of-flags-for-all-tiles-of-this-slot,]
+                         {dst, src[, additional-flags-list]}
+                         [, {dst, src[, additional-flags-list]}]
+                         ...
+                        }
+                        ...
+          }
+*/
+
+void CTilesetParser::parseExtended(lua_State *luaStack)
+{
+	const int argsNum = lua_gettop(luaStack);
+	for (int arg = 1; arg <= argsNum; ++arg) {
+		const std::string parsingValue { LuaToString(luaStack, arg) };
+
+		if (parsingValue == "image") {
+			const std::string imageFile { LuaToString(luaStack, ++arg) };
+			SrcImgGraphic = CGraphic::New(imageFile, BaseTileset->getPixelTileSize().x, 
+													 BaseTileset->getPixelTileSize().y);
+			SrcImgGraphic->Load();
+
+		} else if (parsingValue == "slots") {
+			if (!lua_istable(luaStack, ++arg)) {
+				LuaError(luaStack, "incorrect argument");
+			}
+			parseExtendedSlots(luaStack, arg);
+		} else {
+			LuaError(luaStack, "Unsupported tag: %s" _C_ parsingValue.c_str());
+		}
+	}
+}	
 
 //@}

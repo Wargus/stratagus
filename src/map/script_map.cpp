@@ -754,14 +754,22 @@ static int CclSetTileSize(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
+void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, const int elevation)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
-		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
+		fprintf(stderr, "Invalid map coordinates: (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
 	if (Map.Tileset->getTileCount() <= tileIndex) {
 		fprintf(stderr, "Invalid tile number: %u\n", tileIndex);
+		return;
+	}
+	if (value < 0 || value >= 256) {
+		fprintf(stderr, "Invalid tile value: %d\n", value);
+		return;
+	}
+	if (elevation < 0 || elevation >= 256) {
+		fprintf(stderr, "Invalid tile elevation level: %d\n", elevation);
 		return;
 	}
 
@@ -773,12 +781,12 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 			for (int i = 0; i < multiplier; i++) {
 				for (int j = 0; j < multiplier; j++) {
 					CMapField &mf = *Map.Field(Vec2i(pos.x + j, pos.y + i));
-					mf.setTileIndex(*Map.Tileset, tileIndex, value, subtile++);
+					mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation), subtile++);
 				}
 			}
 		} else {
 			CMapField &mf = *Map.Field(pos);
-			mf.setTileIndex(*Map.Tileset, tileIndex, value);
+			mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation));
 		}
 	}
 }
@@ -860,6 +868,25 @@ static int CclDefineTileset(lua_State *l)
 	Map.TileGraphic->Load();
 	return 0;
 }
+
+/**
+**  Generate extended tiles (which is not represented in the original tilesets)
+**
+**  @param luaStack  Lua state.
+*/
+static int CclGenerateExtendedTileset(lua_State *luaStack)
+{
+	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic);
+	
+	if (!Map.Tileset->insertTiles(parser.getTiles())) {
+		LuaError(luaStack, "Tiles number limit exceeded.");
+	}
+	/// Add new graphic
+	Map.TileGraphic->AppendFrames(parser.getGraphic());
+	
+	return 0;
+}
+
 /**
 ** Build tileset tables like humanWallTable or mixedLookupTable
 **
@@ -884,18 +911,17 @@ static int CclSetTileFlags(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "No flags defined");
 	}
-	const unsigned int tilenumber = LuaToNumber(l, 1);
+	const tile_index tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= Map.Tileset->tiles.size()) {
+	if (tilenumber >= Map.Tileset->getTileCount()) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
-	uint64_t flags = 0;
-
-	unsigned char newBase = Map.Tileset->parseTilesetTileFlags(l, &flags, &j);
+	const tile_flags flags {Map.Tileset->parseTilesetTileFlags(l, &j)};
 	Map.Tileset->tiles[tilenumber].flag = flags;
-	if (newBase) {
-		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = newBase;
+	
+	if (flags & MapFieldDecorative && !(flags & MapFieldNonMixing)) {
+		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = Map.Tileset->addDecoTerrainType();
 	}
 	return 0;
 }
@@ -915,9 +941,9 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	const int32_t index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	return 1;
@@ -941,7 +967,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		return 1;
 	}
 
-	unsigned short flag = 0;
+	tile_flags flag = 0;
 	const char *flag_name = LuaToString(l, 3);
 	if (!strcmp(flag_name, "opaque")) {
 		flag = MapFieldOpaque;
@@ -1053,6 +1079,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefinePlayerTypes", CclDefinePlayerTypes);
 
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
+	lua_register(Lua, "GenerateExtendedTileset", CclGenerateExtendedTileset);
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 
