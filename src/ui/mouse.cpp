@@ -677,8 +677,9 @@ void DoRightButton(const PixelPos &mapPixelPos)
 				
 				auto targetPosForUnit = pos + (unitTilePos - center);
 				Map.Clamp(targetPosForUnit);
-
-				DoRightButton_ForSelectedUnit(*unit, dest, targetPosForUnit, acknowledged);
+				if (targetPosForUnit != unitTilePos) {
+					DoRightButton_ForSelectedUnit(*unit, dest, targetPosForUnit, acknowledged);
+				}
 			}
 			return;
 		}
