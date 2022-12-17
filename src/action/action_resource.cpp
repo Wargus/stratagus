@@ -226,7 +226,7 @@ bool COrder_Resource::IsGatheringWaiting() const
 COrder_Resource::~COrder_Resource()
 {
 	CUnit *mine = this->Resource.Mine;
-
+	this->Resource.Mine = NULL;
 	if (mine && mine->IsAlive()) {
 		worker->DeAssignWorkerFromMine(*mine);
 	}
