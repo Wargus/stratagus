@@ -1760,9 +1760,13 @@ void UnitCountSeen(CUnit &unit)
 					break;
 				}
 				UnitGoesOutOfFog(unit, Players[p]);
+				unit.VisCount[p]++;
 			}
 			if (oldv[p] && !newv) {
 				UnitGoesUnderFog(unit, Players[p]);
+				if (unit.VisCount[p]) {
+					unit.VisCount[p]--;
+				}
 			}
 		}
 	}

@@ -1709,8 +1709,6 @@ void NetworkInitClientConnect()
 */
 void NetworkServerStartGame()
 {
-	Assert(ServerSetupState.CompOpt[0] == SlotOption::Available); // the host should be slot 0
-
 	// save it first..
 	LocalSetupState = ServerSetupState;
 
