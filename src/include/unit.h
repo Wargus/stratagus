@@ -365,7 +365,7 @@ public:
 	unsigned long Attacked;      /// gamecycle unit was last attacked
 	unsigned long Summoned;      /// GameCycle unit was summoned using spells
 	unsigned Blink : 3;          /// Let selection rectangle blink
-	unsigned Moving : 1;         /// The unit is moving
+	unsigned Moving : 2;         /// The unit is moving
 	unsigned ReCast : 1;         /// Recast again next cycle
 	unsigned AutoRepair : 1;     /// True if unit tries to repair on still action.
 

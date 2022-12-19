@@ -522,6 +522,12 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "moving")) {
 			unit->Moving = 1;
 			--j;
+		} else if (!strcmp(value, "moving-2")) {
+			unit->Moving = 2;
+			--j;
+		} else if (!strcmp(value, "moving-3")) {
+			unit->Moving = 3;
+			--j;
 		} else if (!strcmp(value, "re-cast")) {
 			unit->ReCast = 1;
 			--j;

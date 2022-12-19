@@ -248,8 +248,14 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"wait\", %d, ", unit.Wait);
 	CAnimations::SaveUnitAnim(file, unit);
 	file.printf(",\n  \"blink\", %d,", unit.Blink);
-	if (unit.Moving) {
+	if (unit.Moving == 1) {
 		file.printf(" \"moving\",");
+	} else if (unit.Moving == 2) {
+		file.printf(" \"moving-2\",");
+	} else if (unit.Moving == 3) {
+		file.printf(" \"moving-3\",");
+	} else {
+		Assert(!unit.Moving);
 	}
 	if (unit.ReCast) {
 		file.printf(" \"re-cast\",");

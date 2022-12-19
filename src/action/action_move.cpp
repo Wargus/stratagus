@@ -124,6 +124,22 @@
 	input.SetMinRange(0);
 }
 
+static inline void applyResidualDisplacementCorrection(signed char *id, int move) {
+	// in case of residual displacement due to non-tile
+	// aligned movement, apply correction at movement speed
+	if (*id > 0) {
+		*id = std::max(0, *id - move);
+	} else if (*id < 0) {
+		*id = std::min(0, *id + move);
+	}
+}
+
+static inline void resetDisplacement(CUnit &unit) {
+	unit.IX = 0;
+	unit.IY = 0;
+	unit.ZDisplaced = 0;
+}
+
 /**
 **  Unit moves! Generic function called from other actions.
 **
@@ -137,13 +153,21 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd; // movement in tile.
 	int d;
 
-	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
-		Assert(!unit.Anim.Unbreakable);
-
-		// FIXME: So units flying up and down are not affected.
-		unit.IX = 0;
-		unit.IY = 0;
-		unit.ZDisplaced = 0;
+	if (unit.Moving != 1 && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+		if (unit.Anim.Unbreakable && unit.Moving > 1) {
+			// subtile movement, we're finished, but inside an unbreakable animation that we have to finish
+			int m = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, 1) >> 1;
+			applyResidualDisplacementCorrection(&unit.IX, m);
+			applyResidualDisplacementCorrection(&unit.IY, m);
+			if (unit.Anim.Unbreakable) {
+				return PF_WAIT;
+			} else {
+				resetDisplacement(unit);
+				bool wasReached = unit.Moving == 3;
+				unit.Moving = 0;
+				return wasReached ? PF_REACHED : PF_UNREACHABLE;
+			}
+		}
 
 		UnmarkUnitFieldFlags(unit);
 		d = NextPathElement(unit, &posd.x, &posd.y);
@@ -153,15 +177,23 @@ int DoActionMove(CUnit &unit)
 				if (unit.Player->AiEnabled) {
 					AiCanNotMove(unit);
 				}
-				unit.Moving = 0;
-				return d;
+				if (unit.Anim.Unbreakable) {
+					unit.Moving = 2;
+					return PF_MOVE;
+				} else {
+					resetDisplacement(unit);
+					return d;
+				}
 			case PF_REACHED: // Reached goal, stop
-				unit.Moving = 0;
-				return d;
+				if (unit.Anim.Unbreakable) {
+					unit.Moving = 3;
+					return PF_MOVE;
+				} else {
+					resetDisplacement(unit);
+					return d;
+				}
 			case PF_WAIT: // No path, wait
 				unit.Wait = 10;
-
-				unit.Moving = 0;
 				return d;
 			default: // On the way moving
 				Assert(unit.CanMove());
@@ -202,8 +234,8 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 
-		unit.IX = -posd.x * PixelTileSize.x;
-		unit.IY = -posd.y * PixelTileSize.y;
+		unit.IX += -posd.x * PixelTileSize.x;
+		unit.IY += -posd.y * PixelTileSize.y;
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
@@ -215,13 +247,23 @@ int DoActionMove(CUnit &unit)
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
 
-	unit.IX += posd.x * move;
-	unit.IY += posd.y * move;
+	bool reached_next_tile = false;
+	if (posd.x) {
+		unit.IX += posd.x * move;
+		reached_next_tile = ((posd.x < 0) == (unit.IX < 0));
+	} else {
+		applyResidualDisplacementCorrection(&unit.IX, move);
+	}
+	if (posd.y) {
+		unit.IY += posd.y * move;
+		reached_next_tile = (reached_next_tile || ((posd.y < 0) == (unit.IY < 0)));
+	} else {
+		applyResidualDisplacementCorrection(&unit.IY, move);
+	}
 
-	// Finished move animation, set Moving to 0 so we recalculate the path
+	// Finished move to next tile, set Moving to 0 so we recalculate the path
 	// next frame
-	// FIXME: this is broken for subtile movement
-	if (!unit.Anim.Unbreakable && !unit.IX && !unit.IY) {
+	if ((!unit.Anim.Unbreakable && !unit.IX && !unit.IY) || reached_next_tile	) {
 		unit.Moving = 0;
 	}
 	return d;
@@ -253,7 +295,7 @@ int DoActionMove(CUnit &unit)
 			const CUnit *blocker = UnitOnMapTile(this->goalPos, unit.Type->UnitType);
 			if (blocker) { 
 				const int distToBlocker = MapDistanceBetweenTypes(*(unit.Type), unit.tilePos, *(blocker->Type), blocker->tilePos);
-				if (distToBlocker == 1 && (unit.IsEnemy(*blocker) || blocker->Moving == false)) {
+				if (distToBlocker == 1 && (unit.IsEnemy(*blocker) || blocker->Moving == 0)) {
 					unit.Wait = 0;
 					this->Finished = true;
 				}
