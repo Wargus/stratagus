@@ -128,7 +128,7 @@ extern int VorbisProcessData(OggData *data, char *buffer);
 
 #endif // USE_VORBIS
 
-#ifndef USE_THEORA
+#if !defined(USE_THEORA) || !defined(USE_VORBIS)
 /// empty class for lua scripts
 class Movie : public gcn::Image
 {
