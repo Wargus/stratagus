@@ -339,11 +339,6 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		unit.Variable[SpellEffects[i]].Increase = -1;
 		IncreaseVariable(unit, SpellEffects[i]);
 	}
-
-	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
-	if (lastStatusIsHidden && unit.Variable[INVISIBLE_INDEX].Value == 0) {
-		UnHideUnit(unit);
-	}
 }
 
 /**
