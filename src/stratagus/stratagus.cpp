@@ -397,7 +397,7 @@ void Exit(int err)
 		StopGame(GameExit);
 		return;
 	}
-
+	GameCycle = 0;
 	StopMusic();
 	QuitSound();
 	NetworkQuitGame();

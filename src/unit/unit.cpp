@@ -510,7 +510,7 @@ void CUnit::Release(bool final)
 	if (PlayerSlot != static_cast<size_t>(-1)) {
 		Player->RemoveUnit(*this);
 	}
-	Assert(Orders.size() == 1);
+	// Assert(Orders.size() == 1); // tfel: wrong assert?
 	// Must be removed before here
 	Assert(Removed);
 
