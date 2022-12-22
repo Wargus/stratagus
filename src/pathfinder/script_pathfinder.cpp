@@ -110,12 +110,26 @@ static int CclAStar(lua_State *l)
 	return 0;
 }
 
+#ifdef DEBUG
+bool DumpNextAStar = false;
+
+static int CclDumpNextAStar(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	DumpNextAStar = true;
+	return 0;
+}
+#endif
+
 /**
 **  Register CCL features for pathfinder.
 */
 void PathfinderCclRegister()
 {
 	lua_register(Lua, "AStar", CclAStar);
+#ifdef DEBUG
+	lua_register(Lua, "DumpNextAStar", CclDumpNextAStar);
+#endif
 }
 
 //@}
