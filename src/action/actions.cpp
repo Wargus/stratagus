@@ -417,12 +417,19 @@ static void HandleUnitAction(CUnit &unit)
 
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if ((unit.Orders[0]->Action == UnitActionStandGround || unit.Orders[0]->Finished)
+		if ((unit.CurrentAction() == UnitActionStandGround || unit.CurrentOrder()->Finished)
 			&& unit.Orders.size() > 1) {
-			if (unit.Removed && unit.Orders[0]->Action != UnitActionBoard) { // FIXME: johns I see this as an error
-				DebugPrint("Flushing removed unit\n");
-				// This happens, if building with ALT+SHIFT.
-				return;
+			if (unit.Removed && unit.CurrentAction() != UnitActionBoard) { // FIXME: johns I see this as an error
+				if (unit.CurrentAction() == UnitActionStill) {
+					// timfel: I observed this exactly once and could never reproduce it, so I don't know why this
+					// can happen, but in case it happens again, bring the unit back
+					DebugPrint("Dropping out stuck unit\n");
+					DropOutOnSide(unit, LookingW, NULL);
+				} else {
+					DebugPrint("Flushing removed unit\n");
+					// This happens, if building with ALT+SHIFT.
+					return;
+				}
 			}
 
 			delete unit.Orders[0];

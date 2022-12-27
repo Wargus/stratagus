@@ -130,21 +130,23 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 }
 
 
-static void CancelBuilt(COrder_Built &order, CUnit &unit)
+static void CancelBuilt(COrder_Built &order, CUnit *unit)
 {
-	Assert(unit.CurrentOrder() == &order);
+	Assert(unit == NULL || unit->CurrentOrder() == &order);
 	CUnit *worker = order.GetWorkerPtr();
 
 	// Drop out unit
-	if (worker != NULL) {
+	if (worker != NULL && worker->CurrentAction() == UnitActionBuild) {
 		worker->ClearAction();
 
-		DropOutOnSide(*worker, LookingW, &unit);
+		DropOutOnSide(*worker, LookingW, unit);
 	}
-	// Player gets back 75% of the original cost for a building.
-	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
-	// Cancel building
-	LetUnitDie(unit);
+	if (unit != NULL) {
+		// Player gets back 75% of the original cost for a building.
+		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
+		// Cancel building
+		LetUnitDie(*unit);
+	}
 }
 
 static void Finish(COrder_Built &order, CUnit &unit)
@@ -249,6 +251,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	order.Finished = true;
 }
 
+COrder_Built::~COrder_Built()
+{
+	CancelBuilt(*this, NULL);
+}
 
 /* virtual */ void COrder_Built::Execute(CUnit &unit)
 {
@@ -268,7 +274,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
 
-		CancelBuilt(*this, unit);
+		CancelBuilt(*this, &unit);
 		return ;
 	}
 
