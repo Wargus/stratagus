@@ -1736,6 +1736,9 @@ void NetworkServerStartGame()
 				compPlayers--;
 				ServerSetupState.CompOpt[i] = LocalSetupState.CompOpt[i] = SlotOption::Computer;
 				ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerComputer;
+				if (ServerSetupState.ServerGameSettings.Presets[i].AIScript == DEFAULT_PASSIVE_AI) {
+					ServerSetupState.ServerGameSettings.Presets[i].AIScript = DEFAULT_ACTIVE_AI;
+				}
 			} else if (!hasHumanPlayer) {
 				ServerSetupState.CompOpt[i] = LocalSetupState.CompOpt[i] = SlotOption::Closed;
 				ServerSetupState.ServerGameSettings.Presets[i].Type = PlayerTypes::PlayerNobody;

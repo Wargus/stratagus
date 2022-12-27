@@ -441,8 +441,8 @@ void AiInit(CPlayer &player)
 
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
-		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
-		DebugPrint("AI: Look at the DefineAi() documentation.\n");
+		LogPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
+		LogPrint("AI: Look at the DefineAi() documentation.\n");
 		Exit(0);
 	}
 	size_t i;
@@ -459,15 +459,14 @@ void AiInit(CPlayer &player)
 		break;
 	}
 	if (i == AiTypes.size()) {
-		DebugPrint("AI: Found no matching ai scripts at all!\n");
-		// FIXME: surely we can do something better than exit
-		exit(0);
+		LogPrint("AI: Found no matching ai scripts at all, defaulting to the first AI!\n");
+		ait = AiTypes[0];
 	}
 	if (player.AiName.empty()) {
-		DebugPrint("AI: not found!!!!!!!!!!\n");
-		DebugPrint("AI: Using fallback:\n");
+		LogPrint("AI: not found!!!!!!!!!!\n");
+		LogPrint("AI: Using fallback:\n");
 	}
-	DebugPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player.Race].c_str() _C_
+	LogPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player.Race].c_str() _C_
 			   !ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
 
 	pai->AiType = ait;

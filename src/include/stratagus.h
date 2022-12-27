@@ -148,6 +148,9 @@ extern void PrintOnStdOut(const char *format, ...);
 #define DebugPrint(args) \
 	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(args); } } while (0)
 
+#define LogPrint(args) \
+	do { PrintFunction(); PrintOnStdOut(args); } while (0)
+
 /*============================================================================
 ==  Definitions
 ============================================================================*/

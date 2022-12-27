@@ -370,11 +370,10 @@ static CAiType *GetAiTypesByName(const char *name)
 /**
 ** <b>Description</b>
 **
-**  Define an AI engine.
-**
-**  @param l  Lua state.
-**
-**  @return   FIXME: docu
+**  Define an AI engine. Every game should define at least two AIs: one called 'ai-passive' and
+**  one called 'ai-active'. These two are the default AI names used by the games. 'ai-passive'
+**  is used almost everywhere when no other AI is selected by a map, and 'ai-active' is the default
+**  AI used when adding AI players to a multiplayer game when no other AI is selected by the map.
 **
 ** Example:
 **
@@ -408,7 +407,7 @@ static CAiType *GetAiTypesByName(const char *name)
 **		-- function that calls the instructions in simple_ai inside DefineAi
 **		function custom_ai() return AiLoop(simple_ai,stratagus.gameData.AIState.index) end
 **		-- Make an A.I for the human race that calls the function custom_ai
-**		<strong>DefineAi</strong>("example_ai","human","class_ai",custom_ai)</code></div>
+**		<strong>DefineAi</strong>("ai-name","human","ai-class",custom_ai)</code></div>
 */
 static int CclDefineAi(lua_State *l)
 {

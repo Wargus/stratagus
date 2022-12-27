@@ -672,7 +672,7 @@ void CPlayer::Init(PlayerTypes type)
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
-	this->AiName = "ai-passive";
+	this->AiName = DEFAULT_PASSIVE_AI;
 
 	//  Calculate enemy/allied mask.
 	for (int i = 0; i < NumPlayers; ++i) {

@@ -68,6 +68,9 @@ class PlayerAi;
 class CFile;
 struct lua_State;
 
+constexpr char DEFAULT_PASSIVE_AI[] = "ai-passive";
+constexpr char DEFAULT_ACTIVE_AI[] = "ai-active";
+
 /*----------------------------------------------------------------------------
 --  Player type
 ----------------------------------------------------------------------------*/
