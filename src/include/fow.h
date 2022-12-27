@@ -77,6 +77,7 @@ public:
 
     void SetFogColor(const uint8_t r, const uint8_t g, const uint8_t b);
     void SetFogColor(const CColor color);
+    void SetEasingSteps(const uint8_t num);
 
     void EnableBilinearUpscale(const bool enable);
     bool IsBilinearUpscaleEnabled() const { return Settings.UpscaleType == UpscaleTypes::cBilinear; }
