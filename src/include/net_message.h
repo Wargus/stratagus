@@ -128,6 +128,8 @@ public:
 	}
 	void Clear();
 
+	void Save(const std::function <void (std::string)>& f);
+
 	bool operator == (const CServerSetup &rhs) const;
 	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
 public:

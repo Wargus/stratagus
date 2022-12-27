@@ -1314,7 +1314,6 @@ void SetPlayersPalette()
 */
 void DebugPlayers()
 {
-#ifdef DEBUG
 	DebugPrint("Nr   Color   I Name     Type         Race    Ai\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -1345,7 +1344,6 @@ void DebugPlayers()
 	GameSettings.Save(+[](std::string f) {
 		DebugPrint("%s\n" _C_ f.c_str());
 	}, true);
-#endif
 }
 
 /**

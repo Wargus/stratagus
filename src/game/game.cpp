@@ -886,16 +886,35 @@ void CreateGame(const std::string &filename, CMap *map)
 			}
 		}
 	}
-	if (!ThisPlayer && !IsNetworkGame()) {
-		// In demo or kiosk mode, pick first empty slot
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (Players[i].Type == PlayerTypes::PlayerNobody) {
-				ThisPlayer = &Players[i];
-				break;
+	if (!ThisPlayer) {
+		if (!IsNetworkGame()) {
+			// In demo or kiosk mode, pick first empty slot
+			for (int i = 0; i < PlayerMax; ++i) {
+				if (Players[i].Type == PlayerTypes::PlayerNobody) {
+					ThisPlayer = &Players[i];
+					break;
+				}
 			}
+		} else {
+			// this is bad - we are starting a network game, but ThisPlayer is not assigned!!
+			fprintf(stderr, "FATAL ENGINE BUG! We are starting a network game, but ThisPlayer is not assigned!\n"
+				"\tNetPlayers: %d\n"
+				"\tNumPlayers: %d\n"
+				"\tNetLocalPlayerNumber: %d\n",
+				NetPlayers,
+				NumPlayers,
+				NetLocalPlayerNumber);
+			EnableDebugPrint = true;
+			DebugPlayers();
+			printf("ServerSetupState\n");
+			ServerSetupState.Save(+[](std::string f) { printf("%s", f.c_str()); });
+			printf("LocalSetupState\n");
+			LocalSetupState.Save(+[](std::string f) { printf("%s", f.c_str()); });
+			printf("GameSettings\n");
+			GameSettings.Save(+[](std::string f) { printf("%s\n", f.c_str()); });
+			ExitFatal(-1);
 		}
 	}
-
 	if (!filename.empty()) {
 		if (CurrentMapPath != filename) {
 			strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename.c_str());

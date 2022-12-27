@@ -41,6 +41,7 @@
 #include "netconnect.h"
 #include "network.h"
 #include "version.h"
+#include "parameters.h"
 
 size_t serialize32(unsigned char *buf, uint32_t data)
 {
@@ -306,6 +307,35 @@ void CServerSetup::Clear()
 	ServerGameSettings.Init();
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
+}
+
+void CServerSetup::Save(const std::function <void (std::string)>& f) {
+	for (int i = 0; i < PlayerMax; i++) {
+		f(std::to_string(i));
+		f(": CO: ");
+		f(std::to_string((int)CompOpt[i]));
+		f("   Race: ");
+		f(std::to_string(ServerGameSettings.Presets[i].Race));
+		if (CompOpt[i] == SlotOption::Available) {
+			for (auto &h : Hosts) {
+				if (h.IsValid() && h.PlyNr == i) {
+					f("   Host: ");
+					const std::string hostStr = CHost(h.Host, h.Port).toString();
+					f(hostStr);
+					f("   Name: ");
+					f(h.PlyName);
+					if (i == NetLocalPlayerNumber) {
+						f(" (");
+						f(Parameters::Instance.LocalPlayerName);
+						f(" localhost)");
+					}
+					break;
+				}
+			}
+			
+		}
+		f("\n");
+	}
 }
 
 bool CServerSetup::operator == (const CServerSetup &rhs) const

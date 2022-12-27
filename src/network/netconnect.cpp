@@ -1832,19 +1832,7 @@ void NetworkServerStartGame()
 	}
 
 	printf("FINAL ServerSetupState:\n");
-	for (int i = 0; i < PlayerMax; ++i) {
-		printf("%02d: CO: %d   Race: %d   Host: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
-		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			for (auto &h : Hosts) {
-				if (h.IsValid() && h.PlyNr == i) {
-					const std::string hostStr = CHost(h.Host, h.Port).toString();
-					printf(" %s %s", hostStr.c_str(), h.PlyName);
-					break;
-				}
-			}
-		}
-		printf("\n");
-	}
+	ServerSetupState.Save(+[](std::string f) { printf("%s", f.c_str()); });
 
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
@@ -2021,20 +2009,7 @@ void NetworkGamePrepareGameSettings()
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 
 	printf("FINAL NETWORK GAME SETUP\n");
-	for (int i = 0; i < PlayerMax; i++) {
-		printf("%02d: CO: %d   Race: %d   Name: ", i, (int)ServerSetupState.CompOpt[i], ServerSetupState.ServerGameSettings.Presets[i].Race);
-		if (ServerSetupState.CompOpt[i] == SlotOption::Available) {
-			for (auto &h : Hosts) {
-				if (h.IsValid() && h.PlyNr == i) {
-					printf("%s", h.PlyName);
-				}
-			}
-			if (i == NetLocalPlayerNumber) {
-				printf(" (%s localhost)", Parameters::Instance.LocalPlayerName.c_str());
-			}
-		}
-		printf("\n");
-	}
+	ServerSetupState.Save(+[](std::string f) { printf("%s", f.c_str()); });
 
 	printf("FINAL NETWORK GAME SETTINGS\n");
 	GameSettings.Save(+[](std::string f) { printf("%s\n", f.c_str()); });
