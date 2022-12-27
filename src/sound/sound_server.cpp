@@ -400,7 +400,7 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 static Mix_Chunk *LoadSample(const char *name)
 {
 #ifdef DYNAMIC_LOAD
-	Mix_Chunk *r = (Mix_Chunk *)calloc(sizeof(Mix_Chunk), 1);
+	Mix_Chunk *r = (Mix_Chunk *)SDL_calloc(sizeof(Mix_Chunk), 1);
 	r->allocated = 0xcafebeef;
 	r->abuf = (Uint8 *)(strdup(name));
 	return r;
@@ -459,7 +459,9 @@ void FreeSample(Mix_Chunk *sample)
 		return;
 	}
 #endif
-	Mix_FreeChunk(sample);
+	if (sample->allocated == 1) {
+		Mix_FreeChunk(sample);
+	}
 }
 
 /**
@@ -478,6 +480,7 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 		if (loadedSample) {
 			memcpy(sample, loadedSample, sizeof(Mix_Chunk));
 			free(name);
+			SDL_free(loadedSample);
 		} else {
 			return -1;
 		}
