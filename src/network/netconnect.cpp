@@ -1761,7 +1761,7 @@ void NetworkServerStartGame()
 		}
 	}
 
-	if (!NoRandomPlacementMultiplayer) {
+	if (!NoRandomPlacementMultiplayer && NetPlayers) {
 		// Randomize the player assignment.
 		// It can be disabled by writing NoRandomPlacementMultiplayer() in lua files.
 		DebugPrint("Randomizing player index assignments\n");
@@ -1849,7 +1849,7 @@ void NetworkServerStartGame()
 	// Prepare the final state message:
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
-	int hostsToAck = NetPlayers - 1;
+	int hostsToAck = std::max(NetPlayers - 1, 0);
 	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ hostsToAck);
 	// Send all clients host:ports to all clients.
 	while (hostsToAck) {
