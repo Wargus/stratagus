@@ -118,7 +118,7 @@ extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 
 #ifndef HAVE_STRCASESTR
 /// case insensitive strstr
-extern char *strcasestr(const char *str, const char *substr);
+extern const char *strcasestr(const char *str, const char *substr);
 #endif // !HAVE_STRCASESTR
 
 #ifndef HAVE_STRNLEN
@@ -133,9 +133,11 @@ extern size_t strnlen(const char *str, size_t strsize);
 #ifdef HAVE_GETOPT
 #include <unistd.h>
 #else
+extern "C" {
 extern char *optarg;
 extern int optind, opterr, optopt;
-int getopt(int argc, char *const argv[], const char *optstring);
+int getopt(int argc, char *const *argv, const char *optstring) noexcept;
+}
 #endif
 
 /*----------------------------------------------------------------------------

@@ -67,9 +67,9 @@ private:
 };
 
 struct Open {
-	uint32_t Open::GetCosts() const;
-	void Open::SetCosts(uint64_t costs);
-	uint32_t Open::GetOffset() const;
+	uint32_t GetCosts() const;
+	void SetCosts(uint64_t costs);
+	uint32_t GetOffset() const;
 	Vec2i pos;
 private:
 	uint32_t Costs; /// complete costs to goal
@@ -1250,7 +1250,7 @@ void AStarDumpStats()
 		if (m->GetCostToGoal() && maxCostToGoal - minCostToGoal) {
 			r = (1.0 - ((double)(m->GetCostToGoal() - minCostToGoal) / (maxCostToGoal - minCostToGoal))) * 255;
 		}
-		char *direction;
+		const char *direction;
 		//  N NE  E SE  S SW  W NW
 		switch (m->GetDirection()) {
 			case 0:

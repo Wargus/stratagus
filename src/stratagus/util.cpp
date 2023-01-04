@@ -229,7 +229,7 @@ errno_t strcpy_s(char *dst, size_t dstsize, const char *src)
 #endif
 
 #ifndef HAVE_STRNLEN
-size_t strnlen(const char *str, size_t strsize)
+size_t strnlen(const char *str, size_t strsize) noexcept
 {
 	size_t len = 0;
 	while (len < strsize) {
@@ -304,7 +304,7 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 **
 **  @return   Pointer to first occurrence of b or NULL if not found.
 */
-char *strcasestr(const char *a, const char *b)
+const char *strcasestr(const char *a, const char *b) noexcept
 {
 	int x;
 
@@ -364,7 +364,7 @@ static void getopt_err(const char *argv0, const char *str, char opt)
 	}
 }
 
-int getopt(int argc, char *const *argv, const char *opts)
+int getopt(int argc, char *const *argv, const char *opts) noexcept
 {
 	static int sp = 1;
 	int c;
