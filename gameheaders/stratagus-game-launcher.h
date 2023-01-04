@@ -572,7 +572,7 @@ int main(int argc, char * argv[]) {
 	// we accept a special argument to get our own location, if we see that,
 	// shift the other arguments down. This is not documented, and right now
 	// mainly used for AppImages
-	const char const argv0prefix[] = "--argv0=";
+	const char argv0prefix[] = "--argv0=";
 	if (argv[1] && strstr(argv[1], argv0prefix) == argv[1]) {
 		argv0 = realpath(argv[1] + strlen(argv0prefix), NULL);
 		for (int i = 1; i < argc - 1; i++) {
@@ -802,7 +802,7 @@ int main(int argc, char * argv[]) {
 	stratagus_argv0_esc[strlen(argv0) + 2] = 0;
 	stratagus_argv[0] = stratagus_argv0_esc;
 #else
-	stratagus_argv[0] = argv0;
+	stratagus_argv[0] = strdup(argv0);
 #endif
 
 	stratagus_argv[1] = (char*)"-d";
