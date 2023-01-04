@@ -186,6 +186,8 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #include "stratagus-gameutils.h"
 
+const char *argv0;
+
 static void SetUserDataPath(char* data_path) {
 #if defined(WIN32)
 	char marker[MAX_PATH] = {'\0'};
@@ -405,6 +407,14 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 	}
 #else
 	char* sourcepath = strdup(scripts_path);
+	if (sourcepath[0] != '/') {
+		free(sourcepath);
+		sourcepath = (char*)malloc(strlen(scripts_path) + 1 + strlen(argv0));	
+		sourcepath[0] = '\0';
+		strcat(sourcepath, argv0);
+		strcat(sourcepath, "/");
+		strcat(sourcepath, scripts_path);
+	}
 #endif
 
 	fs::create_directories(fs::path(destination));
@@ -557,9 +567,26 @@ int main(int argc, char * argv[]) {
 	char title_path[BUFF_SIZE];
 	char extractor_path[BUFF_SIZE] = {'\0'};
 
+	// set global variable to this executable
+#ifndef WIN32
+	// we accept a special argument to get our own location, if we see that,
+	// shift the other arguments down. This is not documented, and right now
+	// mainly used for AppImages
+	const char const argv0prefix[] = "--argv0=";
+	if (argv[1] && strstr(argv[1], argv0prefix) == argv[1]) {
+		argv0 = realpath(argv[1] + strlen(argv0prefix), NULL);
+		for (int i = 1; i < argc - 1; i++) {
+			argv[i] = argv[i + 1];
+		}
+	} else {
+		argv0 = realpath(argv[0], NULL);
+	}
+#endif
+	argv0 = argv[0];
+
 	// Try the extractor from the same dir as we are
-	if (strchr(argv[0], SLASH[0])) {
-		strcpy(extractor_path, argv[0]);
+	if (strchr(argv0, SLASH[0])) {
+		strcpy(extractor_path, argv0);
 		parentdir(extractor_path);
 		strcat(extractor_path, SLASH EXTRACTOR_TOOL);
 #ifdef WIN32
@@ -697,7 +724,7 @@ int main(int argc, char * argv[]) {
 
 	if ( stat(stratagus_bin, &st) != 0 ) {
 #ifdef WIN32
-		_fullpath(stratagus_bin, argv[0], BUFF_SIZE);
+		_fullpath(stratagus_bin, argv0, BUFF_SIZE);
 		PathRemoveFileSpec(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 		if (stat(stratagus_bin, &st) != 0) {
@@ -710,7 +737,7 @@ int main(int argc, char * argv[]) {
 		}
 #else
 		if (!detectPresence(stratagus_bin)) {
-			realpath(argv[0], stratagus_bin);
+			realpath(argv0, stratagus_bin);
 			parentdir(stratagus_bin);
 			if (strlen(stratagus_bin) > 0) {
 				strcat(stratagus_bin, "/stratagus");
@@ -769,13 +796,13 @@ int main(int argc, char * argv[]) {
 #ifdef WIN32
 	char stratagus_argv0_esc[BUFF_SIZE];
 	memset(stratagus_argv0_esc, 0, sizeof(stratagus_argv0_esc));
-	strcpy(stratagus_argv0_esc + 1, argv[0]);
+	strcpy(stratagus_argv0_esc + 1, argv0);
 	stratagus_argv0_esc[0] = '"';
-	stratagus_argv0_esc[strlen(argv[0]) + 1] = '"';
-	stratagus_argv0_esc[strlen(argv[0]) + 2] = 0;
+	stratagus_argv0_esc[strlen(argv0) + 1] = '"';
+	stratagus_argv0_esc[strlen(argv0) + 2] = 0;
 	stratagus_argv[0] = stratagus_argv0_esc;
 #else
-	stratagus_argv[0] = argv[0];
+	stratagus_argv[0] = argv0;
 #endif
 
 	stratagus_argv[1] = (char*)"-d";
@@ -800,7 +827,7 @@ int main(int argc, char * argv[]) {
 	if (childpid == 0) {
 		execvp(stratagus_bin, stratagus_argv);
 		if (strcmp(stratagus_bin, "stratagus") == 0) {
-			realpath(argv[0], stratagus_bin);
+			realpath(argv0, stratagus_bin);
 			parentdir(stratagus_bin);
 			strcat(stratagus_bin, "/stratagus");
 		}
