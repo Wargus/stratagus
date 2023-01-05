@@ -589,6 +589,7 @@ int main(int argc, char * argv[]) {
 		for (int i = 1; i < argc - 1; i++) {
 			argv[i] = argv[i + 1];
 		}
+		argc--;
 	} else {
 		argv0 = realpath(argv[0], NULL);
 	}
@@ -866,24 +867,24 @@ int main(int argc, char * argv[]) {
 	} else if (ret != 0) {
 		char message[8096 * 2] = {'\0'};
 		snprintf(message, 8096 * 2,
-				 "Stratagus failed to load game data. "
-				 "If you just launched the game without any arguments, this may indicate a bug with the extraction process. "
-				 "Please report this on https://github.com/Wargus/stratagus/issues/new, "
-				 "and please give details, including: operating system, installation path, username, kind of source CD. "
-				 "If you got an error message about the extraction command failing, please try to run it in a console "
-				 "and post the output to the issue. A common problem is symbols in the path for the installation, the game data path, "
-				 "or the username (like an ampersand or exclamation mark). Try changing these. "
+				 "Stratagus failed to load game data.\n"
+				 "If you just launched the game without any arguments, this may indicate a bug with the extraction process.\n"
+				 "Please report this on https://github.com/Wargus/stratagus/issues/new,\n"
+				 "and please give details, including: operating system, installation path, username, kind of source CD.\n"
+				 "If you got an error message about the extraction command failing, please try to run it in a console\n"
+				 "and post the output to the issue. A common problem is symbols in the path for the installation, the game data path,\n"
+				 "or the username (like an ampersand or exclamation mark). Try changing these.\n"
 #ifndef WIN32
 #ifdef WIN32
-				 "Also check if the file '%s' exists and check for errors or post it to the issue. "
+				 "Also check if the file '%s' exists and check for errors or post it to the issue.\n"
 #endif
-				 "Try also to remove the folder %s and try the extraction again.",
+				 "Try also to remove the folder %s and try the extraction again.\n",
 #ifdef WIN32
 				 GetExtractionLogPath(GAME_NAME, data_path),
 #endif
 				 data_path);
 #else
-				 "If not already done, please try using the portable version and check for stdout.txt, stderr.txt, and an extraction.log in the folder."
+				 "If not already done, please try using the portable version and check for stdout.txt, stderr.txt, and an extraction.log in the folder.\n"
 				 );
 #endif
 		error(TITLE, message);
