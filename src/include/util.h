@@ -118,7 +118,7 @@ extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 
 #ifndef HAVE_STRCASESTR
 /// case insensitive strstr
-extern const char *strcasestr(const char *str, const char *substr);
+extern const char *strcasestr(const char *str, const char *substr) noexcept;
 #endif // !HAVE_STRCASESTR
 
 #ifndef HAVE_STRNLEN
