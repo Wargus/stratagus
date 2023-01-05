@@ -406,14 +406,20 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 		sourcepath[strlen(scripts_path) - 2] = '\0';
 	}
 #else
-	char* sourcepath = strdup(scripts_path);
-	if (sourcepath[0] != '/') {
-		free(sourcepath);
-		sourcepath = (char*)malloc(strlen(scripts_path) + 1 + strlen(argv0));	
-		sourcepath[0] = '\0';
-		strcat(sourcepath, argv0);
-		strcat(sourcepath, "/");
-		strcat(sourcepath, scripts_path);
+	char* sourcepath;
+	if (scripts_path[0] != '/') {
+		fs::path normalized_path(argv0);
+		fs::path relative_path(scripts_path);
+		for (auto it = relative_path.begin(); it != relative_path.end(); ++it) {
+			if (*it == fs::path("..")) {
+				normalized_path = normalized_path.parent_path();
+			} else {
+				normalized_path = normalized_path / *it;
+			}
+		}
+		sourcepath = strdup(normalized_path.string().c_str());
+	} else {
+		sourcepath = strdup(scripts_path);
 	}
 #endif
 
