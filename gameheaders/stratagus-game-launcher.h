@@ -557,6 +557,11 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 		WideCharToMultiByte(CP_ACP, 0, combinedCommandline.c_str(), combinedCommandline.size(), cmdbuf, sizeof(cmdbuf) - 1, NULL, NULL);
 #endif
 		char* extractortext = (char*)calloc(sizeof(char), strlen(cmdbuf) + 1024);
+		for (int i = 0; i < strlen(cmdbuf); i++) {
+			if (cmdbuf[i] == '"' || cmdbuf[i] == '\'') {
+				cmdbuf[i] = ' ';
+			}
+		}
 		sprintf(extractortext, "The following command was used to extract the data (you can run it manually in a console to find out more):\n%s", cmdbuf);
 		tinyfd_messageBox("Extraction failed!", extractortext, "ok", "error", 1);
 	} else if (!canJustReextract && GAME_SHOULD_EXTRACT_AGAIN) {
