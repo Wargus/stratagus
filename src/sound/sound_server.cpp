@@ -473,22 +473,22 @@ void FreeSample(Mix_Chunk *sample)
 */
 static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int channel))
 {
-#ifdef DYNAMIC_LOAD
-	if (sample->allocated == 0xcafebeef) {
-		char *name = (char*)(sample->abuf);
-		Mix_Chunk *loadedSample = ForceLoadSample(name);
-		if (loadedSample) {
-			memcpy(sample, loadedSample, sizeof(Mix_Chunk));
-			free(name);
-			SDL_free(loadedSample);
-		} else {
-			return -1;
-		}
-	}
-#endif
 	int channel = -1;
 	DebugPrint("play sample %d\n" _C_ sample->volume);
 	if (SoundEnabled() && EffectsEnabled && sample) {
+#ifdef DYNAMIC_LOAD
+		if (sample->allocated == 0xcafebeef) {
+			char *name = (char*)(sample->abuf);
+			Mix_Chunk *loadedSample = ForceLoadSample(name);
+			if (loadedSample) {
+				memcpy(sample, loadedSample, sizeof(Mix_Chunk));
+				free(name);
+				SDL_free(loadedSample);
+			} else {
+				return -1;
+			}
+		}
+#endif
 		channel = Mix_PlayChannel(-1, sample, 0);
 		if (channel >= 0 && channel < MaxChannels) {
 			Channels[channel].FinishedCallback = callback;
