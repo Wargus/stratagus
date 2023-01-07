@@ -370,14 +370,14 @@ class ImageWidget : public Widget
 
 class Button : public Widget
 {
+	virtual void setCaption(const std::string caption);
+	virtual const std::string &getCaption() const;
+	virtual void adjustSize();
 };
 
 class ButtonWidget : public Button
 {
 	ButtonWidget(const std::string caption);
-	virtual void setCaption(const std::string caption);
-	virtual const std::string &getCaption() const;
-	virtual void adjustSize();
 };
 
 class ImageButton : public Button
