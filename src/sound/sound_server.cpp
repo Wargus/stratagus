@@ -474,8 +474,8 @@ void FreeSample(Mix_Chunk *sample)
 static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int channel))
 {
 	int channel = -1;
-	DebugPrint("play sample %d\n" _C_ sample->volume);
 	if (SoundEnabled() && EffectsEnabled && sample) {
+		DebugPrint("play sample %d\n" _C_ sample->volume);
 #ifdef DYNAMIC_LOAD
 		if (sample->allocated == 0xcafebeef) {
 			char *name = (char*)(sample->abuf);
