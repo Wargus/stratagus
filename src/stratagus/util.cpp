@@ -27,6 +27,7 @@
 //      02111-1307, USA.
 //
 
+#include <cstdint>
 #include <random>
 
 #include "stratagus.h"
@@ -60,7 +61,7 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;               /// sync random seed value.
+uint32_t SyncRandSeed;               /// sync random seed value.
 uint32_t FileChecksums = 0;              /// checksums of all loaded lua files
 
 /**
