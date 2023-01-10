@@ -356,20 +356,19 @@ public:
 
     void serialize32(uint32_t data) {
         ensureSpace(sizeof(data));
-        uint32_t *view = reinterpret_cast<uint32_t *>(buf + pos);
-        *view = htonl(data);
+        uint32_t val = htonl(data);
+        memcpy(buf + pos, &val, sizeof(val));
         pos += sizeof(data);
     };
     void serialize32NativeByteOrder(uint32_t data) {
         ensureSpace(sizeof(data));
-        uint32_t *view = reinterpret_cast<uint32_t *>(buf + pos);
-        *view = data;
+        memcpy(buf + pos, &data, sizeof(data));
         pos += sizeof(data);
     };
     void serialize16(uint16_t data) {
         ensureSpace(sizeof(data));
-        uint16_t *view = reinterpret_cast<uint16_t *>(buf + pos);
-        *view = htons(data);
+        uint16_t val = htons(data);
+        memcpy(buf + pos, &val, sizeof(val));
         pos += sizeof(data);
     };
     void serialize8(uint8_t data) {
@@ -404,8 +403,8 @@ private:
     uint8_t *getBuffer() {
         // if needed, insert length to make it a valid buffer
         if (length_pos >= 0) {
-            uint16_t *view = reinterpret_cast<uint16_t *>(buf + length_pos);
-            *view = pos;
+            uint16_t val = pos;
+            memcpy(buf + length_pos, &val, sizeof(val));
         }
         return buf;
     };
@@ -1399,7 +1398,8 @@ public:
             // (UINT32) 0x05 0x00 0x00 0x00
             // (UINT32) UDP Code
             {
-                const uint32_t udpCode = reinterpret_cast<const uint32_t*>(buffer)[1];
+                uint32_t udpCode;
+                memcpy(&udpCode, buffer + (sizeof(uint32_t) / sizeof(uint8_t)), sizeof(udpCode));
                 BNCSOutputStream udppingresponse(0x14);
                 udppingresponse.serialize32(udpCode);
                 udppingresponse.flush(getTCPSocket());
