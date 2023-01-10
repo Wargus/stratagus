@@ -46,28 +46,32 @@
 size_t serialize32(unsigned char *buf, uint32_t data)
 {
 	if (buf) {
-		*reinterpret_cast<uint32_t *>(buf) = htonl(data);
+		uint32_t val = htonl(data);
+		memcpy(buf, &val, sizeof(val));
 	}
 	return sizeof(data);
 }
 size_t serialize32(unsigned char *buf, int32_t data)
 {
 	if (buf) {
-		*reinterpret_cast<int32_t *>(buf) = htonl(data);
+		int32_t val = htonl(data);
+		memcpy(buf, &val, sizeof(val));
 	}
 	return sizeof(data);
 }
 size_t serialize16(unsigned char *buf, uint16_t data)
 {
 	if (buf) {
-		*reinterpret_cast<uint16_t *>(buf) = htons(data);
+		uint16_t val = htons(data);
+		memcpy(buf, &val, sizeof(val));
 	}
 	return sizeof(data);
 }
 size_t serialize16(unsigned char *buf, int16_t data)
 {
 	if (buf) {
-		*reinterpret_cast<int16_t *>(buf) = htons(data);
+		int16_t val = htons(data);
+		memcpy(buf, &val, sizeof(val));
 	}
 	return sizeof(data);
 }
@@ -136,22 +140,26 @@ size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data)
 
 size_t deserialize32(const unsigned char *buf, uint32_t *data)
 {
-	*data = ntohl(*reinterpret_cast<const uint32_t *>(buf));
+	memcpy(data, buf, sizeof(*data));
+	*data = ntohl(*data);
 	return sizeof(*data);
 }
 size_t deserialize32(const unsigned char *buf, int32_t *data)
 {
-	*data = ntohl(*reinterpret_cast<const int32_t *>(buf));
+	memcpy(data, buf, sizeof(*data));
+	*data = ntohl(*data);
 	return sizeof(*data);
 }
 size_t deserialize16(const unsigned char *buf, uint16_t *data)
 {
-	*data = ntohs(*reinterpret_cast<const uint16_t *>(buf));
+	memcpy(data, buf, sizeof(*data));
+	*data = ntohs(*data);
 	return sizeof(*data);
 }
 size_t deserialize16(const unsigned char *buf, int16_t *data)
 {
-	*data = ntohs(*reinterpret_cast<const int16_t *>(buf));
+	memcpy(data, buf, sizeof(*data));
+	*data = ntohs(*data);
 	return sizeof(*data);
 }
 size_t deserialize8(const unsigned char *buf, uint8_t *data)
@@ -285,7 +293,7 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Resources));
 	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.RevealMap));
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
-	p += deserialize32(p, reinterpret_cast<uint32_t*>(&this->ServerGameSettings._Bitfield));
+	p += deserialize32(p, &this->ServerGameSettings._Bitfield);
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Race));

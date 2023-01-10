@@ -28,6 +28,19 @@
 //      02111-1307, USA.
 //
 
+// timfel: How to debug the pathfinder.
+// In debug builds, there is a lua function "DumpNextAStar". The way I use this
+// is to enter a game with stdout redirected to a file (that's the default on
+// Windows), make sure nothing is moving, then hit "Return/Enter" to write a
+// cheat code, and then type "eval DumpNextAStar()". Then send a unit somewhere.
+// Next, open the stdout file using "less -R -z64 stdout.txt". Replace the "64"
+// with the height of your map. The entire map will have been dumped using RGB colors
+// to stdout. I use the arrow keys to position the first line of the first A*
+// iteration at the top of my terminal, and then hit "Space" repeatedly. If the
+// "-z64" argument used the correct map height and the terminal is wide enough,
+// each time I hit space, it will scroll exactly far enough to have the next A*
+// iteration first line at the top of my terminal, giving a sort of poor animation.
+
 //@{
 
 /*----------------------------------------------------------------------------
