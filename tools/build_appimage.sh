@@ -45,7 +45,7 @@ if [ -n "$CENTOS" ]; then
 else
     # ubuntu (>= 18.04) build tools
     sudo apt-get update && apt-get install -yy git build-essential
-    sudo apt-get install -yy zlib1g-dev file squashfs-tools
+    sudo apt-get install -yy zlib1g-dev file
     # ubuntu SDL dependencies
     sudo apt-get install -yy libx11-dev libxext-dev libxrandr-dev libxi-dev libxfixes-dev libxcursor-dev
     sudo apt-get install -yy libpulse-dev
@@ -127,5 +127,11 @@ else
     echo    "        exec_args: '\"--argv0=\$APPDIR/usr/bin/${GAME_ID}\" \$@'" >> appimagebuilder.yaml
     echo    "AppImage:" >> appimagebuilder.yaml
     echo    "    arch: '${GAME_ARCH}'" >> appimagebuilder.yaml
-    appimage-builder --recipe appimagebuilder.yaml || true # in github, we run this after
+    APPIMAGEBUILDER=`which appimage-builder || true`
+    if [ -z "$APPIMAGEBUILDER" ]; then
+        wget https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+        chmod +x appimage-builder-1.1.0-x86_64.AppImage
+        APPIMAGEBUILDER=$(pwd)/appimage-builder-1.1.0-x86_64.AppImage
+    fi
+    $APPIMAGEBUILDER --recipe appimagebuilder.yaml
 fi
