@@ -2,21 +2,19 @@ name: AppImage Continuous
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
-
-env:
-  BUILD_TYPE: RelWithDebInfo
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  linux-appimage-continuous:
+  build-appimage:
     strategy:
       matrix:
         game: [{id: wargus, name: Wargus}, {id: war1gus, name: War1gus}]
     name: Linux x64_64 (Continuous)
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v2
       - name: Build game ${{ matrix.game.id }}
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
       - name: Build appimage
