@@ -79,7 +79,7 @@ git clone --depth 1 https://github.com/Wargus/${GAME_ID}
             -DCMAKE_BUILD_TYPE=Release                                  \
             -DCMAKE_INSTALL_PREFIX=/usr                                 \
             -DGAMEDIR=/usr/bin
-        make -j$(nproc) install DESTDIR=../../AppDir
+        make -j$(nproc) install DESTDIR=../AppDir
         popd
 #    popd
 pushd ${GAME_ID}
@@ -113,6 +113,7 @@ if [ -n "$CENTOS" ]; then
     curl -L -O "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
     chmod +x linuxdeploy-x86_64.AppImage
     ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir AppDir --output appimage
+    rm -f ./linuxdeploy-x86_64.AppImage
 else
     # using appimage-builder
     echo    "version: 1" > appimagebuilder.yaml
@@ -134,4 +135,5 @@ else
         APPIMAGEBUILDER=$(pwd)/appimage-builder-1.1.0-x86_64.AppImage
     fi
     $APPIMAGEBUILDER --recipe appimagebuilder.yaml
+    rm -f ./appimage-builder-1.1.0-x86_64.AppImage
 fi
