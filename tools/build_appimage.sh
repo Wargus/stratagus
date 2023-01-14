@@ -59,7 +59,7 @@ tar zxf cmake-3.20.0.tar.gz
 pushd cmake-3.20.0
     sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=OFF"/' bootstrap
     ./bootstrap --prefix=/usr/local
-    make -j
+    make -j$(nproc)
     make install
     popd
 
