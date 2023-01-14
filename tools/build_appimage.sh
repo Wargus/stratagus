@@ -53,15 +53,17 @@ else
     sudo apt-get install -yy libwayland-dev
 fi
 
-# cmake
-curl -L -O https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
-tar zxf cmake-3.20.0.tar.gz
-pushd cmake-3.20.0
-    sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=OFF"/' bootstrap
-    ./bootstrap --prefix=/usr/local
-    make -j$(nproc)
-    make install
-    popd
+if [ -n "$CENTOS" ]; then
+    # cmake
+    curl -L -O https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
+    tar zxf cmake-3.20.0.tar.gz
+    pushd cmake-3.20.0
+        sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=OFF"/' bootstrap
+        ./bootstrap --prefix=/usr/local
+        make -j$(nproc)
+        make install
+        popd
+fi
 
 # git clone --depth 1 https://github.com/Wargus/stratagus
 git clone --depth 1 https://github.com/Wargus/${GAME_ID}
@@ -87,7 +89,7 @@ pushd ${GAME_ID}
         cmake ..                                                        \
             -DENABLE_VENDORED_LIBS=ON                                   \
             -DCMAKE_BUILD_TYPE=Release                                  \
-            -DSTRATAGUS_INCLUDE_DIR=$PWD/../../stratagus/gameheaders    \
+            -DSTRATAGUS_INCLUDE_DIR=$PWD/../../gameheaders              \
             -DSTRATAGUS=stratagus                                       \
             -DCMAKE_INSTALL_PREFIX=/usr                                 \
             -DDATA_PATH=../../share/games/stratagus/${GAME_ID}/         \
@@ -122,7 +124,7 @@ else
     echo    "        icon: '${GAME_ID}'" >> appimagebuilder.yaml
     echo    "        version: '${GAME_VERSION}'" >> appimagebuilder.yaml
     echo    "        exec: usr/bin/${GAME_ID}" >> appimagebuilder.yaml
-    echo -n '        exec_args: --argv0=${APPDIR}/usr/bin/' >> appimagebuilder.yaml
+    echo -n '        exec_args: "--argv0=$APPDIR/usr/bin/"' >> appimagebuilder.yaml
     echo -n "${GAME_ID} " >> appimagebuilder.yaml
     echo    '$@' >> appimagebuilder.yaml
     echo    "AppImage:" >> appimagebuilder.yaml
