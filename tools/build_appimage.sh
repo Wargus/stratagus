@@ -45,7 +45,7 @@ if [ -n "$CENTOS" ]; then
 else
     # ubuntu (>= 18.04) build tools
     sudo apt-get update && apt-get install -yy git build-essential
-    sudo apt-get install -yy zlib1g-dev file
+    sudo apt-get install -yy zlib1g-dev file squashfs-tools
     # ubuntu SDL dependencies
     sudo apt-get install -yy libx11-dev libxext-dev libxrandr-dev libxi-dev libxfixes-dev libxcursor-dev
     sudo apt-get install -yy libpulse-dev
