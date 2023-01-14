@@ -197,17 +197,33 @@ static void SetUserDataPath(char* data_path) {
 		}
 	}
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
-	// strcpy(data_path, getenv("APPDATA"));
-#else
-	strcpy(data_path, getenv("HOME"));
-#endif
-	int datalen = strlen(data_path);
-#if defined(WIN32)
+	if (!data_path[0]) {
+		strcpy(data_path, getenv("APPDATA"));
+	}
 	strcat(data_path, "\\Stratagus\\");
-#elif defined(USE_MAC)
-	strcat(data_path, "/Library/Stratagus/");
 #else
-	strcat(data_path, "/.stratagus/");
+	std::string appimage = std::string(getenv("APPIMAGE"));
+	if (!appimage.empty() && fs::exists(fs::path(appimage))) {
+		if (fs::exists(fs::path(appimage + ".data"))) {
+			strcpy(data_path, (appimage + ".data/stratagus").c_str());
+			return;
+		}
+	}
+	char *dataDir = getenv("XDG_DATA_DIR");
+	if (dataDir) {
+		strcpy(data_path, dataDir);
+		strcat(data_path, "/stratagus/");
+	} else {
+		dataDir = getenv("HOME");
+		if (dataDir) {
+			strcpy(data_path, dataDir);
+#ifdef USE_MAC
+			strcat(data_path, "/Library/Stratagus/");
+#else
+			strcat(data_path, "/.local/share/stratagus/");
+#endif
+		}
+	}
 #endif
 	strcat(data_path, "data." GAME_NAME);
 }
