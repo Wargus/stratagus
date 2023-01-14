@@ -66,24 +66,26 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 	}
 	char data_path[4096] = {'\0'};
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
-	userDirectory = data_path;
-	// userDirectory = getenv("APPDATA");
-#else
-	userDirectory = getenv("HOME");
-#endif
-
-	if (!userDirectory.empty()) {
-		userDirectory += "/";
+	if (data_path[0]) {
+		userDirectory = std::string(data_path) + "/Stratagus";
+	} else if (getenv("APPDATA")) {
+		userDirectory = std::string(getenv("APPDATA")) + "/Stratagus";
 	}
-
-#ifdef USE_GAME_DIR
-#elif USE_WIN32
-	userDirectory += "Stratagus";
-#elif defined(USE_MAC)
-	userDirectory += "Library/Stratagus";
+#else // USE_GAME_DIR
+	char *configDir = getenv("XDG_CONFIG_DIR");
+	if (configDir) {
+		userDirectory = std::string(configDir) + "/stratagus";
+	} else {
+		configDir = getenv("HOME");
+		if (configDir) {
+#ifdef USE_MAC
+			userDirectory = std::string(configDir) + "/Library/Stratagus";
 #else
-	userDirectory += ".stratagus";
-#endif
+			userDirectory = std::string(configDir) + "/.config/stratagus";
+#endif // USE_MAC
+		}
+	}
+#endif // USE_GAME_DIR
 }
 
 static std::string GetLocalPlayerNameFromEnv()
