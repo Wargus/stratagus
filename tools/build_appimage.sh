@@ -44,19 +44,19 @@ if [ -n "$CENTOS" ]; then
     yum install -yy wayland-devel
 else
     # ubuntu (>= 18.04) build tools
-    apt-get update && apt-get install -yy git build-essential
-    apt-get install -yy zlib1g-dev file
+    sudo apt-get update && apt-get install -yy git build-essential
+    sudo apt-get install -yy zlib1g-dev file
     # ubuntu SDL dependencies
-    apt-get install -yy libx11-dev libxext-dev libxrandr-dev libxi-dev libxfixes-dev libxcursor-dev
-    apt-get install -yy libpulse-dev
-    apt-get install -yy libgl1-mesa-dev libgles2-mesa-dev
-    apt-get install -yy libwayland-dev
+    sudo apt-get install -yy libx11-dev libxext-dev libxrandr-dev libxi-dev libxfixes-dev libxcursor-dev
+    sudo apt-get install -yy libpulse-dev
+    sudo apt-get install -yy libgl1-mesa-dev libgles2-mesa-dev
+    sudo apt-get install -yy libwayland-dev
 fi
 
 # cmake
 curl -L -O https://cmake.org/files/v3.20/cmake-3.20.0.tar.gz
-tar zxf cmake-3.*
-pushd cmake-3.*
+tar zxf cmake-3.20.0.tar.gz
+pushd cmake-3.20.0
     sed -i 's/cmake_options="-DCMAKE_BOOTSTRAP=1"/cmake_options="-DCMAKE_BOOTSTRAP=1 -DCMAKE_USE_OPENSSL=OFF"/' bootstrap
     ./bootstrap --prefix=/usr/local
     make -j
@@ -77,7 +77,7 @@ git clone --depth 1 https://github.com/Wargus/${GAME_ID}
             -DCMAKE_BUILD_TYPE=Release                                  \
             -DCMAKE_INSTALL_PREFIX=/usr                                 \
             -DGAMEDIR=/usr/bin
-        make -j install DESTDIR=../../AppDir
+        make -j$(nproc) install DESTDIR=../../AppDir
         popd
 #    popd
 pushd ${GAME_ID}
@@ -94,7 +94,7 @@ pushd ${GAME_ID}
             -DGAMEDIR=/usr/bin                                          \
             -DICONDIR=/usr/share/icons/default/64x64/                   \
             -DGAMEDIRABS=""
-        make -j install DESTDIR=../../AppDir
+        make -j$(nproc) install DESTDIR=../../AppDir
         popd
     popd
 
