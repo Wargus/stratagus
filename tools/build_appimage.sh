@@ -124,9 +124,7 @@ else
     echo    "        icon: '${GAME_ID}'" >> appimagebuilder.yaml
     echo    "        version: '${GAME_VERSION}'" >> appimagebuilder.yaml
     echo    "        exec: usr/bin/${GAME_ID}" >> appimagebuilder.yaml
-    echo -n '        exec_args: "--argv0=$APPDIR/usr/bin/"' >> appimagebuilder.yaml
-    echo -n "${GAME_ID} " >> appimagebuilder.yaml
-    echo    '$@' >> appimagebuilder.yaml
+    echo    "        exec_args: '\"--argv0=\$APPDIR/usr/bin/${GAME_ID}\" \$@'" >> appimagebuilder.yaml
     echo    "AppImage:" >> appimagebuilder.yaml
     echo    "    arch: '${GAME_ARCH}'" >> appimagebuilder.yaml
     appimage-builder --recipe appimagebuilder.yaml || true # in github, we run this after
