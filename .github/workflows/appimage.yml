@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-appimage:
+  build:
     strategy:
       matrix:
         game: [{id: wargus, name: Wargus}, {id: war1gus, name: War1gus}]
