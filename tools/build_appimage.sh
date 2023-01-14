@@ -26,8 +26,7 @@ if [ -z "$GAME_VERSION" ]; then
     if [ $# -gt 2 ]; then
         export GAME_VERSION="$3"
     else
-        echo "Need GAME_VERSION set or passed as third argument"
-        exit 1
+        export GAME_VERSION="$(head -1 debian/changelog | cut -f2 -d' ' | sed 's/(//' | sed 's/)//')"
     fi
 fi
 export GAME_ARCH=$(uname -m)
@@ -64,10 +63,10 @@ pushd cmake-3.*
     make install
     popd
 
-git clone --depth 1 https://github.com/Wargus/stratagus
+# git clone --depth 1 https://github.com/Wargus/stratagus
 git clone --depth 1 https://github.com/Wargus/${GAME_ID}
 
-pushd stratagus
+# pushd stratagus
     git submodule update --init --recursive
     mkdir build
     pushd build
@@ -80,7 +79,7 @@ pushd stratagus
             -DGAMEDIR=/usr/bin
         make -j install DESTDIR=../../AppDir
         popd
-    popd
+#    popd
 pushd ${GAME_ID}
     git submodule update --init --recursive
     mkdir build
@@ -114,17 +113,19 @@ if [ -n "$CENTOS" ]; then
     ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir AppDir --output appimage
 else
     # using appimage-builder
-    echo "version: 1" > appimagebuilder.yaml
-    echo "AppDir:" >> appimagebuilder.yaml
-    echo "    path: ./AppDir" >> appimagebuilder.yaml
-    echo "    app_info:" >> appimagebuilder.yaml
-    echo "        id: com.stratagus.{{GAME_ID}}" >> appimagebuilder.yaml
-    echo "        name: '{{GAME_NAME}}'" >> appimagebuilder.yaml
-    echo "        icon: '{{GAME_ID}}'" >> appimagebuilder.yaml
-    echo "        version: '{{GAME_VERSION}}'" >> appimagebuilder.yaml
-    echo "        exec: usr/bin/{{GAME_ID}}" >> appimagebuilder.yaml
-    echo '        exec_args: --argv0=${APPDIR}/usr/bin/{{GAME_ID}} $@' >> appimagebuilder.yaml
-    echo "AppImage:" >> appimagebuilder.yaml
-    echo "    arch: '{{GAME_ARCH}}'" >> appimagebuilder.yaml
-    appimage-builder --recipe appimagebuilder.yaml
+    echo    "version: 1" > appimagebuilder.yaml
+    echo    "AppDir:" >> appimagebuilder.yaml
+    echo    "    path: ./AppDir" >> appimagebuilder.yaml
+    echo    "    app_info:" >> appimagebuilder.yaml
+    echo    "        id: com.stratagus.${GAME_ID}" >> appimagebuilder.yaml
+    echo    "        name: '${GAME_NAME}'" >> appimagebuilder.yaml
+    echo    "        icon: '${GAME_ID}'" >> appimagebuilder.yaml
+    echo    "        version: '${GAME_VERSION}'" >> appimagebuilder.yaml
+    echo    "        exec: usr/bin/${GAME_ID}" >> appimagebuilder.yaml
+    echo -n '        exec_args: --argv0=${APPDIR}/usr/bin/' >> appimagebuilder.yaml
+    echo -n "${GAME_ID} " >> appimagebuilder.yaml
+    echo    '$@' >> appimagebuilder.yaml
+    echo    "AppImage:" >> appimagebuilder.yaml
+    echo    "    arch: '${GAME_ARCH}'" >> appimagebuilder.yaml
+    appimage-builder --recipe appimagebuilder.yaml || true # in github, we run this after
 fi

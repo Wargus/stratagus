@@ -1,0 +1,42 @@
+name: AppImage Continuous
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  linux-appimage-continuous:
+    strategy:
+      matrix:
+        game: [{id: wargus, name: Wargus}, {id: war1gus, name: War1gus}]
+    name: Linux x64_64 (Continuous)
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Build game ${{ matrix.game.id }}
+        run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
+      - name: Build appimage
+        uses: AppImageCrafters/build-appimage@master
+        with:
+          recipe: "./appimagebuilder.yaml"
+    - name: Create continuous release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "*.AppImage*"
+        body: |
+          :heavy_check_mark: AppImage built from latest commit ([${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
+          :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
+        commit: ${{ github.sha }}
+        draft: false
+        name: Continuous appimage builds
+        prerelease: true
+        removeArtifacts: false
+        replacesArtifacts: true
+        skipIfReleaseExists: false
+        tag: continuous
+        token: "${{ secrets.GITHUB_TOKEN }}"
