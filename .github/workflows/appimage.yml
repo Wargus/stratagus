@@ -21,20 +21,20 @@ jobs:
         uses: AppImageCrafters/build-appimage@master
         with:
           recipe: "./appimagebuilder.yaml"
-    - name: Create continuous release
-      uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        artifacts: "*.AppImage*"
-        body: |
-          :heavy_check_mark: AppImage built from latest commit ([${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
-          :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
-        commit: ${{ github.sha }}
-        draft: false
-        name: Continuous appimage builds
-        prerelease: true
-        removeArtifacts: false
-        replacesArtifacts: true
-        skipIfReleaseExists: false
-        tag: continuous
-        token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Create continuous release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "*.AppImage*"
+          body: |
+            :heavy_check_mark: AppImage built from latest commit ([${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
+            :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
+          commit: ${{ github.sha }}
+          draft: false
+          name: Continuous appimage builds
+          prerelease: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          skipIfReleaseExists: false
+          tag: continuous
+          token: "${{ secrets.GITHUB_TOKEN }}"
