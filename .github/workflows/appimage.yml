@@ -19,6 +19,7 @@ jobs:
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
       - name: Create continuous release
         uses: ncipollo/release-action@v1
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
           allowUpdates: true
           artifacts: "*.AppImage*"
