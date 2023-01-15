@@ -27,7 +27,8 @@ jobs:
             :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
           commit: ${{ github.sha }}
           draft: false
-          name: Continuous appimage builds
+          repo: ${{ matrix.game.id }}
+          name: master-builds
           prerelease: true
           removeArtifacts: false
           replacesArtifacts: true
