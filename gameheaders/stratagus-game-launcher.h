@@ -536,9 +536,12 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 			strcat(cmdbuf, "xterm -e bash -c ");
 			strcat(cmdbuf, " \"");
 		} else {
-			tinyfd_messageBox("", "Extracting data, cannot find xterm to display output. "
+			tinyfd_messageBox("", "Extracting data, cannot find xterm to display output.\n"
 							"Please be patient. If something fails, re-run from terminal.", "ok", "info", 1);
 		}
+	}
+	if (getenv("APPIMAGE") && !detectPresence("ffmpeg")) {
+		tinyfd_messageBox("", "Could not find ffmpeg on PATH, video\nand/or audio conversion may not work...", "ok", "info", 1);
 	}
 #endif
 
