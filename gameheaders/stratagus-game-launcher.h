@@ -206,6 +206,7 @@ static void SetUserDataPath(char* data_path) {
 	if (!appimage.empty() && fs::exists(fs::path(appimage))) {
 		if (fs::exists(fs::path(appimage + ".data"))) {
 			strcpy(data_path, (appimage + ".data/stratagus").c_str());
+			strcat(data_path, "data." GAME_NAME);
 			return;
 		}
 	}
@@ -348,7 +349,7 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 			std::vector<std::wstring> argv = {L"-i", fs::path(datafile).wstring()};
 #else
 			const char *file = "innoextract";
-			char *argv[] = {"-i", (char*)datafile.c_str(), NULL};
+			char *argv[] = {"-i", (char*)datafile.c_str(), NULL, NULL, NULL};
 #endif
 			if (runCommand(file, argv) == 0) {
 				// innoextract exists and this exe file is an innosetup file
@@ -370,6 +371,9 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 						argv[0] = L"-m";
 #else
 						argv[0] = "-m";
+						argv[1] = "-d";
+						argv[2] = tmpp.string().c_str();
+						argv[3] = (char*)datafile.c_str();
 #endif
 						success = runCommand(file, argv) == 0;
 #ifdef WIN32
@@ -525,9 +529,16 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 	strcat(cmdbuf, "osascript -e \"tell application \\\"Terminal\\\"\n"
                        "    set w to do script \\\"");
 #else
+	int hasXterm = 0;
 	if (!isatty(1)) {
-		strcat(cmdbuf, "xterm -e bash -c ");
-		strcat(cmdbuf, " \"");
+		hasXterm = detectPresence("xterm");
+		if (hasXterm) {
+			strcat(cmdbuf, "xterm -e bash -c ");
+			strcat(cmdbuf, " \"");
+		} else {
+			tinyfd_messageBox("", "Extracting data, cannot find xterm to display output. "
+							"Please be patient. If something fails, re-run from terminal.", "ok", "info", 1);
+		}
 	}
 #endif
 
@@ -560,7 +571,9 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
                        "end tell\"");
 #else
 	if (!isatty(1)) {
-	    strcat(cmdbuf, "; echo 'Press RETURN to continue...'; read\"");
+		if (hasXterm) {
+	    	strcat(cmdbuf, "; echo 'Press RETURN to continue...'; read\"");
+		}
 	}
 #endif
 
