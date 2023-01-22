@@ -874,17 +874,18 @@ void CFont::MeasureWidths()
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
 	Uint32 ckey = 0;
 	const int ipr = G->Surface->w / G->Width; // images per row
+	const unsigned char* lsp = (const unsigned char *) G->Surface->pixels +
+		G->Surface->pitch * G->GraphicHeight; // last surface pointer + 1
 
 	SDL_LockSurface(G->Surface);
 	SDL_GetColorKey(G->Surface, &ckey);
 	for (int y = 1; y < maxy; ++y) {
 		const unsigned char *sp = (const unsigned char *)G->Surface->pixels +
 								  (y / ipr) * G->Surface->pitch * G->Height +
-								  (y % ipr) * G->Width - 1;
-		const unsigned char *gp = sp + G->Surface->pitch * G->Height;
+								  (y % ipr) * G->Width - 1; // start pointer of glyph
+		const unsigned char *gp = sp + G->Surface->pitch * (G->Height - 1) + G->Width; // last pointer of glyph + 1
 		// Bail out if no letters left
-		if (gp >= ((const unsigned char *)G->Surface->pixels +
-				   G->Surface->pitch * G->GraphicHeight)) {
+		if (gp >= lsp) {
 			break;
 		}
 		while (sp < gp) {
