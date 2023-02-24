@@ -17,22 +17,30 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build game ${{ matrix.game.id }}
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
-      - name: Create continuous release
-        uses: ncipollo/release-action@v1
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
         with:
-          allowUpdates: true
-          artifacts: "*.AppImage*"
-          body: |
-            :heavy_check_mark: AppImage built from latest commit ([${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
-            :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
-          commit: ${{ github.sha }}
-          draft: false
-          repo: ${{ matrix.game.id }}
-          name: master-builds
-          prerelease: true
-          removeArtifacts: false
-          replacesArtifacts: true
-          skipIfReleaseExists: false
-          tag: continuous
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          name: ${{ matrix.game.id }}
+          retention-days: 90
+          path: |
+            *.AppImage
+
+#       - name: Create continuous release
+#         uses: ncipollo/release-action@v1
+#         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+#         with:
+#           allowUpdates: true
+#           artifacts: "*.AppImage*"
+#           body: |
+#             :heavy_check_mark: AppImage built from latest commit ([${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})).
+#             :scroll: Build log: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks?check_suite_id=${{ github.run_id }}
+#           commit: ${{ github.sha }}
+#           draft: false
+#           repo: ${{ matrix.game.id }}
+#           name: master-builds
+#           prerelease: true
+#           removeArtifacts: false
+#           replacesArtifacts: true
+#           skipIfReleaseExists: false
+#           tag: continuous
+#           token: "${{ secrets.GITHUB_TOKEN }}"
