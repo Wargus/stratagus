@@ -210,7 +210,7 @@ static void SetUserDataPath(char* data_path) {
 			return;
 		}
 	}
-	char *dataDir = getenv("XDG_DATA_DIR");
+	char *dataDir = getenv("XDG_DATA_HOME");
 	if (dataDir) {
 		strcpy(data_path, dataDir);
 		strcat(data_path, "/stratagus/");
