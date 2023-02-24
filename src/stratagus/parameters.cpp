@@ -72,7 +72,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 		userDirectory = std::string(getenv("APPDATA")) + "/Stratagus";
 	}
 #else // USE_GAME_DIR
-	char *configDir = getenv("XDG_CONFIG_DIR");
+	char *configDir = getenv("XDG_CONFIG_HOME");
 	if (configDir) {
 		userDirectory = std::string(configDir) + "/stratagus";
 	} else {
