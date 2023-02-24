@@ -372,7 +372,7 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 #else
 						argv[0] = "-m";
 						argv[1] = "-d";
-						argv[2] = tmpp.string().c_str();
+						argv[2] = (char*)tmpp.string().c_str();
 						argv[3] = (char*)datafile.c_str();
 #endif
 						success = runCommand(file, argv) == 0;
