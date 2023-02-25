@@ -237,7 +237,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(units.empty());
 	units.reserve(selectMax << 1);
-	int max = selectMax || INT_MAX;
+	int max = selectMax | INT_MAX;
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
