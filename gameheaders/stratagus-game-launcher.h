@@ -202,7 +202,11 @@ static void SetUserDataPath(char* data_path) {
 	}
 	strcat(data_path, "\\Stratagus\\");
 #else
-	std::string appimage = std::string(getenv("APPIMAGE"));
+	char *appimage_ptr = getenv("APPIMAGE");
+	std::string appimage;
+	if (appimage_ptr != nullptr) {
+		appimage = std::string(appimage_ptr);
+	}
 	if (!appimage.empty() && fs::exists(fs::path(appimage))) {
 		if (fs::exists(fs::path(appimage + ".data"))) {
 			strcpy(data_path, (appimage + ".data/stratagus").c_str());
