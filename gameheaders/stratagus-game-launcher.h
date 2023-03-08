@@ -223,7 +223,7 @@ static void SetUserDataPath(char* data_path) {
 		if (dataDir) {
 			strcpy(data_path, dataDir);
 #ifdef USE_MAC
-			strcat(data_path, "/Library/Stratagus/");
+			strcat(data_path, "/Library/Application\ Support/Stratagus/");
 #else
 			strcat(data_path, "/.local/share/stratagus/");
 #endif
