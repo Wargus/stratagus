@@ -79,7 +79,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 		configDir = getenv("HOME");
 		if (configDir) {
 #ifdef USE_MAC
-			userDirectory = std::string(configDir) + "/Library/Stratagus";
+			userDirectory = std::string(configDir) + "/Library/Application\ Support/Stratagus";
 #else
 			userDirectory = std::string(configDir) + "/.config/stratagus";
 #endif // USE_MAC
