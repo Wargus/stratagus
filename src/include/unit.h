@@ -135,8 +135,8 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL), Colors(-1),
-				AutoCastSpell(NULL), SpellCoolDownTimers(NULL), Variable(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr), Colors(-1),
+				AutoCastSpell(nullptr), SpellCoolDownTimers(nullptr), Variable(nullptr) { Init(); }
 	~CUnit();
 
 	void Init();
@@ -388,11 +388,11 @@ public:
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
-	/// NULL if the unit was not rescued.
+	/// nullptr if the unit was not rescued.
 	/* Seen stuff. */
 	int VisCount[PlayerMax];     /// Unit visibility counts
 	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(NULL), Type(NULL), tilePos(-1, -1) {}
+		_seen_stuff_() : CFrame(nullptr), Type(nullptr), tilePos(-1, -1) {}
 		const CConstructionFrame  *CFrame;  /// Seen construction frame
 		int         Frame;                  /// last seen frame/stage of buildings
 		const CUnitType  *Type;             /// Pointer to last seen unit-type
@@ -455,7 +455,7 @@ public:
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		SelectionRectangleIndicatesDamage(false), FormationMovement(true),
-		IconFrameG(NULL), PressedIconFrameG(NULL), HardwareCursor(false),
+		IconFrameG(nullptr), PressedIconFrameG(nullptr), HardwareCursor(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 
 	bool ShowSightRange;       /// Show sight range.
@@ -633,7 +633,7 @@ extern Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, cons
 
 
 /// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
+extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = nullptr);
 
 /// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(const Vec2i &pos);

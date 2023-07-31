@@ -88,8 +88,8 @@ typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(NULL),
-		Allowed(NULL), Key(0) {}
+	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(nullptr),
+		Allowed(nullptr), Key(0) {}
 
 	int Pos;          /// button position in the grid
 	int Level;        /// requires button level

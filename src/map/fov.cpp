@@ -132,7 +132,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 {
 	/// FIXME: sometimes when quit from game this assert is triggered
 	if (unit.ReleaseCycle) return;
-	Assert(unit.Type != NULL);
+	Assert(unit.Type != nullptr);
 	// Units under construction have no sight range.
 	if (!range) {
 		return;

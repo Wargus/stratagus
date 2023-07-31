@@ -77,7 +77,7 @@ static DWORD WINAPI StatusThreadFunction(LPVOID lpParam) {
 	CHAR chStatus;
 	DWORD dwRead = 1;
 	while (1) {
-		if (!ReadFile((HANDLE)lpParam, &chStatus, 1, &dwRead, NULL) || dwRead == 0) {
+		if (!ReadFile((HANDLE)lpParam, &chStatus, 1, &dwRead, nullptr) || dwRead == 0) {
 			CloseHandle((HANDLE)lpParam);
 			break;
 		}
@@ -94,7 +94,7 @@ static DWORD WINAPI DebugThreadFunction(LPVOID lpParam) {
 	DWORD dwRead = 1;
 	while (1) {
 		char *chStatus[1024] = {'\0'};
-		if (!ReadFile((HANDLE)lpParam, &chStatus, 1024, &dwRead, NULL) || dwRead == 0) {
+		if (!ReadFile((HANDLE)lpParam, &chStatus, 1024, &dwRead, nullptr) || dwRead == 0) {
 			CloseHandle((HANDLE)lpParam);
 			break;
 		}
@@ -108,7 +108,7 @@ static void KillPlayingProcess() {
 	if (g_hChildStd_IN_Wr) {
 		TerminateProcess(pi.hProcess, 0);
 		CloseHandle(g_hChildStd_IN_Wr);
-		g_hChildStd_IN_Wr = NULL;
+		g_hChildStd_IN_Wr = nullptr;
 		WaitForSingleObject(StatusThreadFunction, 0);
 		WaitForSingleObject(DebugThreadFunction, 0);
 	}
@@ -128,7 +128,7 @@ static bool External_Play(const std::string &file) {
 		std::string full_filename = LibraryFileName(file.c_str());
 
 		// try to communicate with the running midiplayer if we can
-		if (g_hChildStd_IN_Wr != NULL) {
+		if (g_hChildStd_IN_Wr != nullptr) {
 			// already playing, just send the new song
 			// XXX: timfel: disabled, since the midiplayer behaves weirdly when it receives the next file, just kill and restart
 			KillPlayingProcess();
@@ -139,11 +139,11 @@ static bool External_Play(const std::string &file) {
 			char hiSize = (fileSize >> 8) & 0xff;
 			char buf[2] = {loSize, hiSize};
 			externalPlayerIsPlaying = true;
-			if (!WriteFile(g_hChildStd_IN_Wr, buf, 2, NULL, NULL)) {
+			if (!WriteFile(g_hChildStd_IN_Wr, buf, 2, nullptr, nullptr)) {
 				KillPlayingProcess();
 			} else {
 				// then write the filename
-				if (!WriteFile(g_hChildStd_IN_Wr, full_filename.c_str(), fileSize, NULL, NULL)) {
+				if (!WriteFile(g_hChildStd_IN_Wr, full_filename.c_str(), fileSize, nullptr, nullptr)) {
 					KillPlayingProcess();
 				} else {
 					return true;
@@ -154,15 +154,15 @@ static bool External_Play(const std::string &file) {
 		// need to start an external player first
 
 		// setup pipes to player
-		HANDLE hChildStd_IN_Rd = NULL;
-		HANDLE hChildStd_OUT_Rd = NULL;
-		HANDLE hChildStd_OUT_Wr = NULL;
-		HANDLE hChildStd_ERR_Rd = NULL;
-		HANDLE hChildStd_ERR_Wr = NULL;
+		HANDLE hChildStd_IN_Rd = nullptr;
+		HANDLE hChildStd_OUT_Rd = nullptr;
+		HANDLE hChildStd_OUT_Wr = nullptr;
+		HANDLE hChildStd_ERR_Rd = nullptr;
+		HANDLE hChildStd_ERR_Wr = nullptr;
 		SECURITY_ATTRIBUTES saAttr;
 		saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 		saAttr.bInheritHandle = TRUE;
-		saAttr.lpSecurityDescriptor = NULL;
+		saAttr.lpSecurityDescriptor = nullptr;
 		CreatePipe(&hChildStd_OUT_Rd, &hChildStd_OUT_Wr, &saAttr, 0);
 		CreatePipe(&hChildStd_ERR_Rd, &hChildStd_ERR_Wr, &saAttr, 0);
 		CreatePipe(&hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
@@ -182,13 +182,13 @@ static bool External_Play(const std::string &file) {
 		ZeroMemory(&pi, sizeof(pi));
 		bool result = true;
 		char* cmdline = strdup(cmd.c_str());
-		if (CreateProcess(NULL, cmdline, NULL, NULL, TRUE, /* Handles are inherited */ CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+		if (CreateProcess(nullptr, cmdline, nullptr, nullptr, TRUE, /* Handles are inherited */ CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
 			CloseHandle(hChildStd_OUT_Wr);
 			CloseHandle(hChildStd_ERR_Wr);
       		CloseHandle(hChildStd_IN_Rd);
 			externalPlayerIsPlaying = true;
-			g_hStatusThread = CreateThread(NULL, 0, StatusThreadFunction, hChildStd_OUT_Rd, 0, NULL);
-			g_hDebugThread = CreateThread(NULL, 0, DebugThreadFunction, hChildStd_ERR_Rd, 0, NULL);
+			g_hStatusThread = CreateThread(nullptr, 0, StatusThreadFunction, hChildStd_OUT_Rd, 0, nullptr);
+			g_hDebugThread = CreateThread(nullptr, 0, DebugThreadFunction, hChildStd_ERR_Rd, 0, nullptr);
 		} else {
 			result = false;
 			DebugPrint("CreateProcess failed (%d).\n" _C_ GetLastError());
@@ -215,7 +215,7 @@ static bool External_Stop() {
 static bool External_Volume(int volume, int oldVolume) {
 	if (External_IsPlaying()) {
 		char buf[2] = {0, volume & 0xFF};
-		if (!WriteFile(g_hChildStd_IN_Wr, buf, 2, NULL, NULL)) {
+		if (!WriteFile(g_hChildStd_IN_Wr, buf, 2, nullptr, nullptr)) {
 			External_Stop();
 			return false;
 		}
@@ -232,8 +232,8 @@ static bool External_Volume(int volume, int oldVolume) {
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	Origin *Unit = NULL;          /// pointer to unit, who plays the sound, if any
-	void (*FinishedCallback)(int channel) = NULL; /// Callback for when a sample finishes playing
+	Origin *Unit = nullptr;          /// pointer to unit, who plays the sound, if any
+	void (*FinishedCallback)(int channel) = nullptr; /// Callback for when a sample finishes playing
 };
 
 #define MaxChannels 64     /// How many channels are supported
@@ -275,7 +275,7 @@ static void ChannelFinished(int channel)
 		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
 		return;
 	}
-	if (Channels[channel].FinishedCallback != NULL) {
+	if (Channels[channel].FinishedCallback != nullptr) {
 		SDL_Event event;
 		SDL_zero(event);
 		event.type = SDL_SOUND_FINISHED;
@@ -284,7 +284,7 @@ static void ChannelFinished(int channel)
 		SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
 	delete Channels[channel].Unit;
-	Channels[channel].Unit = NULL;
+	Channels[channel].Unit = nullptr;
 }
 
 void HandleSoundEvent(SDL_Event &event)
@@ -338,7 +338,7 @@ Mix_Chunk *GetChannelSample(int channel)
 	if (Mix_Playing(channel)) {
 		return Mix_GetChunk(channel);
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -359,7 +359,7 @@ void StopAllChannels()
 	Mix_HaltChannel(-1);
 }
 
-static Mix_Music *currentMusic = NULL;
+static Mix_Music *currentMusic = nullptr;
 
 static Mix_Music *LoadMusic(const char *name)
 {
@@ -376,7 +376,7 @@ static Mix_Music *LoadMusic(const char *name)
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file '%s'\n", name);
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 1);
 	return currentMusic;
@@ -392,7 +392,7 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file '%s'\n", name);
 		delete f;
-		return NULL;
+		return nullptr;
 	}
 	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 1);
 }
@@ -421,7 +421,7 @@ Mix_Music *LoadMusic(const std::string &name)
 	const std::string filename = LibraryFileName(name.c_str());
 	Mix_Music *music = LoadMusic(filename.c_str());
 
-	if (music == NULL) {
+	if (music == nullptr) {
 		fprintf(stderr, "Can't load the music '%s'\n", name.c_str());
 	}
 	return music;
@@ -441,7 +441,7 @@ Mix_Chunk *LoadSample(const std::string &name)
 	const std::string filename = LibraryFileName(name.c_str());
 	Mix_Chunk *sample = LoadSample(filename.c_str());
 
-	if (sample == NULL) {
+	if (sample == nullptr) {
 		fprintf(stderr, "Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());
 	}
 	return sample;
@@ -505,12 +505,12 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 
 int PlaySample(Mix_Chunk *sample, Origin *origin)
 {
-	return PlaySample(sample, origin, NULL);
+	return PlaySample(sample, origin, nullptr);
 }
 
 int PlaySample(Mix_Chunk *sample, void (*callback)(int channel))
 {
-	return PlaySample(sample, NULL, callback);
+	return PlaySample(sample, nullptr, callback);
 }
 
 /**

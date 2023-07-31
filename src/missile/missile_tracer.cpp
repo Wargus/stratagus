@@ -58,7 +58,7 @@ static bool TracerMissile(Missile &missile)
 		return true;
 	}
 
-	Assert(missile.Type != NULL);
+	Assert(missile.Type != nullptr);
 	Assert(missile.TotalStep != 0);
 	if (missile.TargetUnit) {
 		missile.destination = missile.TargetUnit->GetMapPixelPosTopLeft();

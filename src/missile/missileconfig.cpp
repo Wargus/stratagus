@@ -40,11 +40,11 @@
 bool MissileConfig::MapMissileNoLog()
 {
 	if (this->Name.empty()) {
-		this->Missile = NULL;
+		this->Missile = nullptr;
 		return true;
 	}
 	this->Missile = MissileTypeByIdent(this->Name);
-	return this->Missile != NULL;
+	return this->Missile != nullptr;
 }
 
 bool MissileConfig::MapMissile()

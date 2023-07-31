@@ -172,7 +172,7 @@ private:
 class IconConfig
 {
 public:
-	IconConfig() : Icon(NULL) {}
+	IconConfig() : Icon(nullptr) {}
 
 	bool LoadNoLog();
 	bool Load();

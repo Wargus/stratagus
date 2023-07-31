@@ -426,7 +426,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
-	if (g == NULL) {
+	if (g == nullptr) {
 		g = new CGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -463,7 +463,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 
 	const std::string file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
-	if (g == NULL) {
+	if (g == nullptr) {
 		g = new CPlayerColorGraphic;
 		if (!g) {
 			fprintf(stderr, "Out of memory\n");
@@ -538,7 +538,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 CGraphic *CGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
@@ -557,7 +557,7 @@ CGraphic *CGraphic::Get(const std::string &filename)
 CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	const std::string file = LibraryFileName(filename.c_str());
@@ -599,7 +599,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 void CGraphic::GenFramesMap()
 {
 	Assert(NumFrames != 0);
-	Assert(Surface != NULL);
+	Assert(Surface != nullptr);
 	Assert(Width != 0);
 	Assert(Height != 0);
 
@@ -673,7 +673,7 @@ void CGraphic::Load(bool grayscale)
 		goto error;
 	}
 	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
-	if (Surface == NULL) {
+	if (Surface == nullptr) {
 		fprintf(stderr, "Couldn't load file %s: %s", name.c_str(), IMG_GetError());
 		goto error;
 	}
@@ -729,7 +729,7 @@ static void FreeSurface(SDL_Surface **surface)
 	}
 	VideoPaletteListRemove(*surface);
 
-	unsigned char *pixels = NULL;
+	unsigned char *pixels = nullptr;
 
 	if ((*surface)->flags & SDL_PREALLOC) {
 		pixels = (unsigned char *)(*surface)->pixels;
@@ -737,7 +737,7 @@ static void FreeSurface(SDL_Surface **surface)
 
 	SDL_FreeSurface(*surface);
 	delete[] pixels;
-	*surface = NULL;
+	*surface = nullptr;
 }
 
 /**
@@ -757,11 +757,11 @@ void CGraphic::Free(CGraphic *g)
 	if (!g->Refs) {
 		FreeSurface(&g->Surface);
 		delete[] g->frame_map;
-		g->frame_map = NULL;
+		g->frame_map = nullptr;
 
 		FreeSurface(&g->SurfaceFlip);
 		delete[] g->frameFlip_map;
-		g->frameFlip_map = NULL;
+		g->frameFlip_map = nullptr;
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
@@ -975,19 +975,19 @@ void CGraphic::SetOriginalSize()
 	
 	if (Surface) {
 		FreeSurface(&Surface);
-		Surface = NULL;
+		Surface = nullptr;
 	}
 	delete[] frame_map;
-	frame_map = NULL;
+	frame_map = nullptr;
 	if (SurfaceFlip) {
 		FreeSurface(&SurfaceFlip);
-		SurfaceFlip = NULL;
+		SurfaceFlip = nullptr;
 	}
 	delete[] frameFlip_map;
-	frameFlip_map = NULL;
+	frameFlip_map = nullptr;
 
 	this->Width = this->Height = 0;
-	this->Surface = NULL;
+	this->Surface = nullptr;
 	this->Load();
 
 	Resized = false;
@@ -1008,7 +1008,7 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 	
 	for (auto &frame : frames) {
 		SDL_Rect dstRect { frame_map[currFrame].x, frame_map[currFrame].y, Width, Height };
-		SDL_BlitSurface(frame.get(), NULL, Surface, &dstRect);
+		SDL_BlitSurface(frame.get(), nullptr, Surface, &dstRect);
 		currFrame++;
 	}
 }
@@ -1043,7 +1043,7 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 		SDL_SetColorKey(newSurface, SDL_TRUE, ckey);
 	}
 
-	SDL_FillRect(newSurface, NULL, useckey ? ckey : 0);
+	SDL_FillRect(newSurface, nullptr, useckey ? ckey : 0);
 
 	/// Copy pixels
 	const uint8_t *src = static_cast<uint8_t*>(Surface->pixels);
@@ -1231,7 +1231,7 @@ static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
 		DebugPrint("%s\n" _C_ SDL_GetError());
 		Assert(false);
 	}
-	SDL_BlitSurface(*src, NULL, alphaSurface, NULL);
+	SDL_BlitSurface(*src, nullptr, alphaSurface, nullptr);
 	SDL_SetSurfaceAlphaMod(alphaSurface, alpha);
 	SDL_SetSurfaceColorMod(alphaSurface, 0, 0, 0);
 	SDL_FreeSurface(*src);
@@ -1331,7 +1331,7 @@ CFiller::bits_map::~bits_map()
 {
 	if (bstore) {
 		free(bstore);
-		bstore = NULL;
+		bstore = nullptr;
 	}
 	Width = 0;
 	Height = 0;
@@ -1345,7 +1345,7 @@ void CFiller::bits_map::Init(CGraphic *g)
 
 	if (bstore) {
 		free(bstore);
-		bstore = NULL;
+		bstore = nullptr;
 		Width = 0;
 		Height = 0;
 	}

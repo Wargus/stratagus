@@ -1455,7 +1455,7 @@ sdl2::SurfacePtr CTilesetGraphicGenerator::composeImage(sequence_of_imagesPtrs &
 	auto dst { newBlankImage() };
 
 	for (auto &src : srcSequence) {
-		SDL_BlitSurface(src, NULL, dst.get(), NULL);
+		SDL_BlitSurface(src, nullptr, dst.get(), nullptr);
 	}
 	return dst;
 }

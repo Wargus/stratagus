@@ -157,7 +157,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	}
 
 	char *pos;
-	if ((pos = strstr(buf, "~|")) != NULL) {
+	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
 		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
@@ -202,7 +202,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 		}
 	}
 	char *pos;
-	if ((pos = strstr(buf, "~|")) != NULL) {
+	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);
 		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
 	} else if (this->Centered) {
@@ -236,14 +236,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 
 				return order.GetWorkerPtr();
 			} else {
-				return NULL;
+				return nullptr;
 			}
 		case UnitRefGoal:
 			return unit.Goal;
 		default:
 			Assert(0);
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -596,7 +596,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				if (this->ValueMax == -1) {
 					this->ValueMax = 100;
 				}
-				if (this->ValueFunc == NULL) {
+				if (this->ValueFunc == nullptr) {
 					LuaError(l, "didn't set a value function");
 				}
 			}
@@ -654,10 +654,10 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	if (this->Width <= 0) {
 		this->Width = 50; // Default value.
 	}
-	if (this->Index == -1 && this->ValueFunc == NULL) {
+	if (this->Index == -1 && this->ValueFunc == nullptr) {
 		LuaError(l, "variable undefined for LifeBar");
 	}
-	if (this->colors == NULL || this->values == NULL) {
+	if (this->colors == nullptr || this->values == nullptr) {
 		this->colors = new unsigned int[4];
 		this->values = new unsigned int[4];
 

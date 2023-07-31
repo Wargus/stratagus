@@ -81,7 +81,7 @@ int main(int argc, char * argv[]) {
 			fclose(file);
 		}
 	} else {
-		git_rev = NULL;
+		git_rev = nullptr;
 		fprintf(stderr, "Cannot get git revision\n");
 	}
 
@@ -94,7 +94,7 @@ int main(int argc, char * argv[]) {
 			break;
 		}
 	}
-	if (git_rev == NULL) {
+	if (git_rev == nullptr) {
 		needs_update = true;
 	}
 
@@ -112,7 +112,7 @@ int main(int argc, char * argv[]) {
 	if ( ! file )
 		return 1;
 
-	if (git_rev == NULL) {
+	if (git_rev == nullptr) {
 		fprintf(file, "/* %d %d %d %d no-rev */\n", new_ver[0], new_ver[1], new_ver[2], new_ver[3]);
 	} else {
 		fprintf(file, "/* %d %d %d %d %s */\n", new_ver[0], new_ver[1], new_ver[2], new_ver[3], git_rev);
@@ -124,10 +124,10 @@ int main(int argc, char * argv[]) {
 	fprintf(file, "#define StratagusPatchLevel2 %d\n", new_ver[3]);
 
 
-	if ( git_rev != NULL )
+	if ( git_rev != nullptr )
 		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
 
-	time_t tt = time(NULL);
+	time_t tt = time(nullptr);
 	char *source_date_epoch = std::getenv("SOURCE_DATE_EPOCH");
 	if (source_date_epoch) {
 		std::istringstream iss(source_date_epoch);

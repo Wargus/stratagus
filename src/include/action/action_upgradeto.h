@@ -38,7 +38,7 @@ class COrder_TransformInto : public COrder
 {
 	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
 public:
-	COrder_TransformInto() : COrder(UnitActionTransformInto), Type(NULL) {}
+	COrder_TransformInto() : COrder(UnitActionTransformInto), Type(nullptr) {}
 
 	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
 
@@ -60,7 +60,7 @@ class COrder_UpgradeTo : public COrder
 {
 	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant);
 public:
-	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(NULL), Ticks(0) {}
+	COrder_UpgradeTo() : COrder(UnitActionUpgradeTo), Type(nullptr), Ticks(0) {}
 
 	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
 

@@ -110,7 +110,7 @@ private:
 */
 static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 {
-	CUnit *enemy = NULL;
+	CUnit *enemy = nullptr;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
 	Map.Field(pos)->UnitCache.for_each(filter);
@@ -203,7 +203,7 @@ int AiFindWall(AiForce *force)
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
+				CommandAttack(aiunit, wallPos, nullptr, FlushCommands);
 			} else {
 				CommandMove(aiunit, wallPos, FlushCommands);
 			}
@@ -353,7 +353,7 @@ int AiForce::PlanAttack()
 
 	CUnit *transporter = Units.find(IsAFreeTransporter());
 
-	if (transporter != NULL) {
+	if (transporter != nullptr) {
 		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
@@ -370,7 +370,7 @@ int AiForce::PlanAttack()
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
-	if (landUnit == NULL) {
+	if (landUnit == nullptr) {
 		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
 		return 0;
 	}
@@ -428,7 +428,7 @@ int AiForce::PlanAttack()
 
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
-	Assert(pos != NULL);
+	Assert(pos != nullptr);
 
 	int ray = 3;
 	const int maxTryCount = 8;
@@ -450,11 +450,11 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	// Choose a target, "near"
 	const Vec2i &center = request.pos;
 	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
-		return NULL;
+		return nullptr;
 	}
 	// We have an unexplored tile in sight (pos)
 
-	CUnit *bestunit = NULL;
+	CUnit *bestunit = nullptr;
 	// Find an idle unit, responding to the mask
 	bool flyeronly = false;
 	int bestSquareDistance = -1;
@@ -517,7 +517,7 @@ void AiSendExplorers()
 
 		Vec2i pos;
 		CUnit *bestunit = GetBestExplorer(request, &pos);
-		if (bestunit != NULL) {
+		if (bestunit != nullptr) {
 			CommandMove(*bestunit, pos, FlushCommands);
 			AiPlayer->LastExplorationGameCycle = GameCycle;
 			break;

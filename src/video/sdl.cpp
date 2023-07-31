@@ -89,7 +89,7 @@
 ----------------------------------------------------------------------------*/
 
 SDL_Window *TheWindow; /// Internal screen
-SDL_Renderer *TheRenderer = NULL; /// Internal screen
+SDL_Renderer *TheRenderer = nullptr; /// Internal screen
 SDL_Texture *TheTexture; /// Internal screen
 SDL_Surface *TheScreen; /// Internal screen
 
@@ -297,14 +297,14 @@ static void setDpiAware() {
 	if (userDLL) {
 		SetProcessDPIAware = (BOOL(WINAPI *)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
 	} else {
-		SetProcessDPIAware = NULL;
+		SetProcessDPIAware = nullptr;
 	}
 
 	shcoreDLL = SDL_LoadObject("SHCORE.DLL");
 	if (shcoreDLL) {
 		SetProcessDpiAwareness = (HRESULT(WINAPI *)(PROCESS_DPI_AWARENESS)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
 	} else {
-		SetProcessDpiAwareness = NULL;
+		SetProcessDpiAwareness = nullptr;
 	}
 
 	if (SetProcessDpiAwareness) {
@@ -402,7 +402,7 @@ void InitVideoSdl()
 
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                             Video.WindowWidth, Video.WindowHeight, flags);
-	if (TheWindow == NULL) {
+	if (TheWindow == nullptr) {
 		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
 				Video.Width, Video.Height, Video.Depth, SDL_GetError());
 		exit(1);
@@ -430,8 +430,8 @@ void InitVideoSdl()
 	Video.ResizeScreen(Video.Width, Video.Height);
 
 // #ifdef USE_WIN32
-// 	HWND hwnd = NULL;
-// 	HICON hicon = NULL;
+// 	HWND hwnd = nullptr;
+// 	HICON hicon = nullptr;
 // 	SDL_SysWMinfo info;
 // 	SDL_VERSION(&info.version);
 
@@ -440,7 +440,7 @@ void InitVideoSdl()
 // 	}
 
 // 	if (hwnd) {
-// 		hicon = ExtractIcon(GetModuleHandle(NULL), Parameters::Instance.applicationName.c_str(), 0);
+// 		hicon = ExtractIcon(GetModuleHandle(nullptr), Parameters::Instance.applicationName.c_str(), 0);
 // 	}
 
 // 	if (hicon) {
@@ -451,8 +451,8 @@ void InitVideoSdl()
 
 #if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
 
-		SDL_Surface *icon = NULL;
-		CGraphic *g = NULL;
+		SDL_Surface *icon = nullptr;
+		CGraphic *g = nullptr;
 		struct stat st;
 
 		std::string FullGameNameL = FullGameName;
@@ -805,7 +805,7 @@ void WaitEventsOneFrame()
 			break;
 		}
 	}
-	handleInput(NULL);
+	handleInput(nullptr);
 
 	if (SkipGameCycle < 0) {
 		SkipGameCycle += SkipCycles;
@@ -853,12 +853,12 @@ void RealizeVideoMemory()
 	}
 	if (NumRects) {
 		//SDL_UpdateWindowSurfaceRects(TheWindow, Rects, NumRects);
-		SDL_UpdateTexture(TheTexture, NULL, TheScreen->pixels, TheScreen->pitch);
+		SDL_UpdateTexture(TheTexture, nullptr, TheScreen->pixels, TheScreen->pitch);
 		if (!RenderWithShader(TheRenderer, TheWindow, TheTexture)) {
 			SDL_RenderClear(TheRenderer);
 			//for (int i = 0; i < NumRects; i++)
 			//    SDL_UpdateTexture(TheTexture, &Rects[i], TheScreen->pixels, TheScreen->pitch);
-			SDL_RenderCopy(TheRenderer, TheTexture, NULL, NULL);
+			SDL_RenderCopy(TheRenderer, TheTexture, nullptr, nullptr);
 		}
 		if (Parameters::Instance.benchmark) {
 			RenderBenchmarkOverlay();

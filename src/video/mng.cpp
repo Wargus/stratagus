@@ -122,7 +122,7 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
 										8 * 3, Rmask, Gmask, Bmask, 0);
 	SDL_SetColorKey(mng->surface, 1, 0);
-	if (mng->surface == NULL) {
+	if (mng->surface == nullptr) {
 		fprintf(stderr, "Out of memory");
 		exit(1);
 	}
@@ -189,7 +189,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 
 
 Mng::Mng() :
-	name(""), fd(NULL), handle(NULL), surface(NULL), buffer(NULL),
+	name(""), fd(nullptr), handle(nullptr), surface(nullptr), buffer(nullptr),
 	ticks(0), iteration(0), is_dirty(false)
 {
 }
@@ -219,7 +219,7 @@ void Mng::Draw(int x, int y)
 	}
 
 	SDL_Rect rect = {(short int)x, (short int)y, (short unsigned int)(surface->w), (short unsigned int)(surface->h)};
-	SDL_BlitSurface(surface, NULL, TheScreen, &rect);
+	SDL_BlitSurface(surface, nullptr, TheScreen, &rect);
 }
 
 static std::map<std::string, Mng *> MngCache;
@@ -228,7 +228,7 @@ Mng *Mng::New(const std::string &name)
 {
 	const std::string file = LibraryFileName(name.c_str());
 	Mng *mng = MngCache[file];
-	if (mng == NULL) {
+	if (mng == nullptr) {
 		mng = new Mng();
 		mng->name = LibraryFileName(name.c_str());
 		Assert(mng);
@@ -239,7 +239,7 @@ Mng *Mng::New(const std::string &name)
 
 void Mng::Free(Mng *mng)
 {
-	// XXX: Weird free bug that I don't understand, just skip it if already NULL
+	// XXX: Weird free bug that I don't understand, just skip it if already nullptr
 	if ((intptr_t)mng < 40) {
 		return;
 	}

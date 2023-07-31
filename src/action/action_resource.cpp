@@ -176,16 +176,16 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 	// Destination could be killed. NETWORK!
 	if (depot && depot->Destroyed) {
-		depot = NULL;
+		depot = nullptr;
 	}
 	// clicking on an allied depot still doesn't allow you to deposit there depending on preference
 	if (depot && !GameSettings.AllyDepositsAllowed && depot->Player != harvester.Player) {
-		depot = NULL;
+		depot = nullptr;
 	}
 	order->CurrentResource = harvester.CurrentResource;
 	order->DoneHarvesting = true;
 
-	if (depot == NULL) {
+	if (depot == nullptr) {
 		depot = FindDeposit(harvester, 1000, harvester.CurrentResource);
 	}
 	if (depot) {
@@ -201,7 +201,7 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
-	if (this->Resource.Mine != NULL) {
+	if (this->Resource.Mine != nullptr) {
 		return this->Resource.Mine->tilePos;
 	} else {
 		return this->Resource.Pos;
@@ -226,12 +226,12 @@ bool COrder_Resource::IsGatheringWaiting() const
 COrder_Resource::~COrder_Resource()
 {
 	CUnit *mine = this->Resource.Mine;
-	this->Resource.Mine = NULL;
+	this->Resource.Mine = nullptr;
 	if (mine && mine->IsAlive()) {
 		worker->DeAssignWorkerFromMine(*mine);
 	}
 
-	Depot = NULL;
+	Depot = nullptr;
 
 	CUnit *goal = this->GetGoal();
 	if (goal) {
@@ -255,15 +255,15 @@ COrder_Resource::~COrder_Resource()
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	Assert(this->worker != NULL && worker->IsAlive());
+	Assert(this->worker != nullptr && worker->IsAlive());
 	file.printf(" \"worker\", \"%s\",", UnitReference(worker).c_str());
 	file.printf(" \"current-res\", %d,", this->CurrentResource);
 
 	file.printf(" \"res-pos\", {%d, %d},", this->Resource.Pos.x, this->Resource.Pos.y);
-	if (this->Resource.Mine != NULL) {
+	if (this->Resource.Mine != nullptr) {
 		file.printf(" \"res-mine\", \"%s\",", UnitReference(this->Resource.Mine).c_str());
 	}
-	if (this->Depot != NULL) {
+	if (this->Depot != nullptr) {
 		file.printf(" \"res-depot\", \"%s\",", UnitReference(this->Depot).c_str());
 	}
 	if (this->DoneHarvesting) {
@@ -702,7 +702,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
 		AnimateActionHarvest(unit);
 	} else {
-		unit.Anim.CurrAnim = NULL;
+		unit.Anim.CurrAnim = nullptr;
 	}
 
 	this->TimeToHarvest--;
@@ -806,11 +806,11 @@ int COrder_Resource::GatherResource(CUnit &unit)
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
 				}
-				source = NULL;
+				source = nullptr;
 				return 0;
 			}
 			if (resinfo.HarvestFromOutside) {
-				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == NULL)) {
+				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == nullptr)) {
 					// Mark as complete.
 					this->DoneHarvesting = true;
 				}
@@ -828,7 +828,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 	int ret = 0;
 	CUnit *worker = mine.Resource.Workers;
 
-	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i) {
+	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
 		Assert(worker->CurrentAction() == UnitActionResource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
@@ -876,8 +876,8 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
 			CUnit *worker = source->Resource.Workers;
-			CUnit *next = NULL;
-			for (; NULL != worker; worker = worker->NextWorker) {
+			CUnit *next = nullptr;
+			for (; nullptr != worker; worker = worker->NextWorker) {
 				Assert(worker->CurrentAction() == UnitActionResource);
 				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 				if (worker != &unit && order.IsGatheringWaiting()) {
@@ -908,7 +908,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	} else {
 		// Store resource position.
 		this->Resource.Pos = unit.tilePos;
-		Assert(this->Resource.Mine == NULL);
+		Assert(this->Resource.Mine == nullptr);
 	}
 
 #ifdef DEBUG
@@ -937,7 +937,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 		if (mine) {
 			unit.DeAssignWorkerFromMine(*mine);
-			this->Resource.Mine = NULL;
+			this->Resource.Mine = nullptr;
 		}
 
 		DebugPrint("%d: Worker %d report: Can't find a resource [%d] deposit.\n"
@@ -1037,7 +1037,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			SelectionChanged();
 			unit.Removed = 1;
 		}
-		unit.Anim.CurrAnim = NULL;
+		unit.Anim.CurrAnim = nullptr;
 	}
 
 	// Update resource.
@@ -1101,14 +1101,14 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			// Use depot's ref counter for that
 			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
-				if (newdepot == NULL && longWay) {
+				if (newdepot == nullptr && longWay) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
 				}
 			}
 		}
 
-		// If goal is not NULL, then we got it in AiGetSuitableDepot
+		// If goal is not nullptr, then we got it in AiGetSuitableDepot
 		if (!goal) {
 			if (mine != nullptr && mine->IsAlive()) {
 			goal = mine;
@@ -1153,7 +1153,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			}
 			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);
-				this->Resource.Mine = NULL;
+				this->Resource.Mine = nullptr;
 			}
 			this->Finished = true;
 			return false;
@@ -1174,7 +1174,7 @@ void COrder_Resource::DropResource(CUnit &unit)
 			}
 		}
 		//fast clean both resource data: pos and mine
-		this->Resource.Mine = NULL;
+		this->Resource.Mine = nullptr;
 		unit.CurrentResource = 0;
 		unit.ResourcesHeld = 0;
 	}
@@ -1252,7 +1252,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 
 	if (mine) {
 		unit.DeAssignWorkerFromMine(*mine);
-		this->Resource.Mine = NULL;
+		this->Resource.Mine = nullptr;
 	}
 	if (goal && goal->IsAlive() == false) {
 		return false;

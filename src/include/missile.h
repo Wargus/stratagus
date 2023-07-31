@@ -424,7 +424,7 @@ public:
 
 	void DrawMissile(const CViewport &vp) const;
 	void SaveMissile(CFile &file) const;
-	void MissileHit(CUnit *unit = NULL);
+	void MissileHit(CUnit *unit = nullptr);
 	bool NextMissileFrame(char sign, char longAnimation);
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
@@ -566,7 +566,7 @@ public:
 class BurningBuildingFrame
 {
 public:
-	BurningBuildingFrame() : Percent(0), Missile(NULL) {};
+	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
 
 	int          Percent;  /// HP percent
 	MissileType *Missile;  /// Missile to draw

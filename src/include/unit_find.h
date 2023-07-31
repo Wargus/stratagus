@@ -305,7 +305,7 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 template <typename Pred>
@@ -320,7 +320,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 
 /// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
+							   int resource, bool check_usage = false, const CUnit *deposit = nullptr);
 
 /// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
@@ -346,7 +346,7 @@ extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = t
 extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 
 /// Check map for obstacles in a line between 2 tiles
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
+extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = nullptr);
 /// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);

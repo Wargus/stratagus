@@ -86,7 +86,7 @@ void (CCONV *lazyGlOrtho)(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdo
 
 static const int MAX_SHADERS = 128;
 static GLuint shaderPrograms[MAX_SHADERS + 1] = { (GLuint) 0 };
-static const char* shaderNames[MAX_SHADERS + 1] = { NULL };
+static const char* shaderNames[MAX_SHADERS + 1] = { nullptr };
 static char shadersLoaded = -1;
 #define canUseShaders (shadersLoaded == 1)
 #define shadersAreInitialized (shadersLoaded != -1)
@@ -112,7 +112,7 @@ static GLuint compileShader(const char* source, GLuint shaderType) {
 	// Create ID for shader
 	GLuint result = glCreateShader(shaderType);
 	// Define shader text
-	glShaderSource(result, 1, &source, NULL);
+	glShaderSource(result, 1, &source, nullptr);
 	// Compile shader
 	glCompileShader(result);
 
@@ -218,7 +218,7 @@ static int loadShaders() {
 	char *cShaderPath;
 #ifdef _WIN32
 	shaderPath.append("\\shaders\\");
-	int fullpathsize = ExpandEnvironmentStrings(shaderPath.c_str(), NULL, 0);
+	int fullpathsize = ExpandEnvironmentStrings(shaderPath.c_str(), nullptr, 0);
 	cShaderPath = (char*)calloc(fullpathsize + 1, sizeof(char));
 	ExpandEnvironmentStrings(shaderPath.c_str(), cShaderPath, fullpathsize);
 #else
@@ -284,10 +284,10 @@ bool RenderWithShader(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* back
 static bool RenderWithShaderInternal(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer) {
 	GLint oldProgramId;
 	// Detach the texture
-	SDL_SetRenderTarget(renderer, NULL);
+	SDL_SetRenderTarget(renderer, nullptr);
 	SDL_RenderClear(renderer);
 
-	SDL_GL_BindTexture(backBuffer, NULL, NULL);
+	SDL_GL_BindTexture(backBuffer, nullptr, nullptr);
 	if (LastShaderIndex != currentShaderIdx) {
 		LastShaderIndex = currentShaderIdx;
 		// force to recalculate everything based on size, too
@@ -475,7 +475,7 @@ static int CclSetShader(lua_State *l) {
 static int CclGetShaderNames(lua_State *l) {
 	LuaCheckArgs(l, 0);
 	lua_newtable(l);
-	for (int i = 0; shaderNames[i] != NULL; i++) {
+	for (int i = 0; shaderNames[i] != nullptr; i++) {
 		lua_pushstring(l, shaderNames[i]);
 		lua_rawseti(l, -2, i + 1);
 	}

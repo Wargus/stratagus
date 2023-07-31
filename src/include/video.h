@@ -99,11 +99,11 @@ public:
 	};
 
 protected:
-	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
+	CGraphic() : Surface(nullptr), SurfaceFlip(nullptr), frame_map(nullptr),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		Refs(1), Resized(false)
 	{
-		frameFlip_map = NULL;
+		frameFlip_map = nullptr;
 	}
 	~CGraphic() {}
 
@@ -177,7 +177,7 @@ public:
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);
 
-	inline bool IsLoaded(bool flipped = false) const { return Surface != NULL && (!flipped || SurfaceFlip != NULL); }
+	inline bool IsLoaded(bool flipped = false) const { return Surface != nullptr && (!flipped || SurfaceFlip != nullptr); }
 
 	//guichan
 	virtual void *_getData() const { return Surface; }
@@ -277,14 +277,14 @@ class Mng : public gcn::Image
 	Mng() {};
 	~Mng() {};
 public:
-	static Mng *New(const std::string &name) { return NULL; }
+	static Mng *New(const std::string &name) { return nullptr; }
 	static void Free(Mng *mng) {};
 	bool Load() { return false; };
 	void Reset() {};
 	void Draw(int x, int y) {};
 
 	//guichan
-	virtual void *_getData() const { return NULL; };
+	virtual void *_getData() const { return nullptr; };
 	virtual int getWidth() const { return 0; };
 	virtual int getHeight() const { return 0; };
 	virtual bool isDirty() const { return false; };
@@ -536,11 +536,11 @@ inline Uint32 IndexToColor(unsigned int index) {
 
 static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
                                    "gray", "dark-gray", "white", "orange",
-                                   "light-blue", "blue", "dark-green", "black", NULL};
+                                   "light-blue", "blue", "dark-green", "black", nullptr};
 
 inline int GetColorIndexByName(const char *colorName) {
     int i = 0;
-    while (ColorNames[i] != NULL) {
+    while (ColorNames[i] != nullptr) {
         if (!strcmp(colorName, ColorNames[i])) {
             return i;
         }

@@ -143,7 +143,7 @@ void CFogOfWar::InitTiled()
     if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
         TileOfFogOnly = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
                                              32, RMASK, GMASK, BMASK, AMASK);
-        SDL_FillRect(TileOfFogOnly, NULL, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
+        SDL_FillRect(TileOfFogOnly, nullptr, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
     }
 
     SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->Surface, 
@@ -422,7 +422,7 @@ void CFogOfWar::Draw(CViewport &viewport)
     if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
         DrawTiledLegacy(viewport);
     } else {
-        SDL_FillRect(viewport.GetFogSurface(), NULL, 0x00);
+        SDL_FillRect(viewport.GetFogSurface(), nullptr, 0x00);
 
         if (Settings.Type == FogOfWarTypes::cTiled) {
             DrawTiled(viewport);

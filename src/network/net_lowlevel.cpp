@@ -242,15 +242,15 @@ std::string NetGetHostname()
 int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	int idx = 0;
-	PIP_ADAPTER_ADDRESSES pFirstAddresses, pAddresses = NULL;
+	PIP_ADAPTER_ADDRESSES pFirstAddresses, pAddresses = nullptr;
 	ULONG outBufLen = 0;
 	GetAdaptersAddresses(AF_INET,
 						 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
-						 NULL, pAddresses, &outBufLen);
+						 nullptr, pAddresses, &outBufLen);
 	pAddresses = (PIP_ADAPTER_ADDRESSES)malloc(outBufLen);
 	if (GetAdaptersAddresses(AF_INET,
 							 GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER,
-							 NULL, pAddresses, &outBufLen) == NO_ERROR) {
+							 nullptr, pAddresses, &outBufLen) == NO_ERROR) {
 		pFirstAddresses = pAddresses;
 		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
 			if (idx == maxAddr) break;
@@ -269,12 +269,12 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 #elif defined(USE_LINUX) || defined(USE_MAC)
 int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
-	struct ifaddrs *ifAddrStruct = NULL;
-	struct ifaddrs *ifa = NULL;
-	void *tmpAddrPtr = NULL;
+	struct ifaddrs *ifAddrStruct = nullptr;
+	struct ifaddrs *ifa = nullptr;
+	void *tmpAddrPtr = nullptr;
 	int idx = 0;
 	getifaddrs(&ifAddrStruct);
-	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+	for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
 		if (idx == maxAddr) break;
 		if (!ifa->ifa_addr) continue;
 		if (ifa->ifa_addr->sa_family != AF_INET) continue;
@@ -283,7 +283,7 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 		if ((ifa->ifa_flags & IFF_UP) == 0) continue;
 		ips[idx++] = ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
 	}
-	if (ifAddrStruct != NULL) {
+	if (ifAddrStruct != nullptr) {
 		freeifaddrs(ifAddrStruct);
 	}
 	return idx;
@@ -435,7 +435,7 @@ int NetSocketReady(Socket sockfd, int timeout)
 		tv.tv_usec = (timeout % 1000) * 1000;
 
 		// Data available?
-		retval = select(sockfd + 1, &mask, NULL, NULL, &tv);
+		retval = select(sockfd + 1, &mask, nullptr, nullptr, &tv);
 #ifdef USE_WINSOCK
 	} while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else
@@ -471,7 +471,7 @@ int SocketSet::Select(int timeout)
 		tv.tv_usec = (timeout % 1000) * 1000;
 
 		// Data available?
-		retval = select(this->MaxSockFD + 1, &mask, NULL, NULL, &tv);
+		retval = select(this->MaxSockFD + 1, &mask, nullptr, nullptr, &tv);
 #ifdef USE_WINSOCK
 	} while (retval == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
 #else

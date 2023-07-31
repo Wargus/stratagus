@@ -89,7 +89,7 @@ public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
-		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
+		SpriteWhenLoaded(nullptr), SpriteWhenEmpty(nullptr)
 	{}
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
@@ -310,7 +310,7 @@ public:
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(NULL) {};
+	CDecoVarText() : Font(nullptr) {};
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
 
@@ -420,7 +420,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Offset(0, 0), Parent(NULL) {}
+	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -443,7 +443,7 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
+	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -457,7 +457,7 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), Diagonal(true) {};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -474,7 +474,7 @@ public:
 class CBuildRestrictionHasUnit : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(NULL) {};
+	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -489,7 +489,7 @@ public:
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(NULL), CheckBuilder(false) {};
+	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {};
 	virtual ~CBuildRestrictionSurroundedBy() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -744,7 +744,7 @@ public:
 					return ((*it).first).c_str();
 				}
 			}
-			return NULL;
+			return nullptr;
 		}
 
 		/**

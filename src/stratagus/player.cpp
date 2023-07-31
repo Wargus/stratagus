@@ -383,7 +383,7 @@ void InitPlayers()
 */
 void CleanPlayers()
 {
-	ThisPlayer = NULL;
+	ThisPlayer = nullptr;
 	CPlayer::RevealedPlayers.clear();
 	for (unsigned int i = 0; i < PlayerMax; ++i) {
 		Players[i].Clear();
@@ -842,7 +842,7 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(unit.Player == this);
 	Assert(this->Units[unit.PlayerSlot] == &unit);
 
-	//	unit.Player = NULL; // we can remove dying unit...
+	//	unit.Player = nullptr; // we can remove dying unit...
 	CUnit *last = this->Units.back();
 
 	this->Units[unit.PlayerSlot] = last;

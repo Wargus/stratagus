@@ -199,7 +199,7 @@ int OggInit(CFile *f, OggData *data)
 
 	if (num_theora) {
 		theora_decode_init(&data->tstate, &data->tinfo);
-		data->tstate.internal_encode = NULL;  // needed for a bug in libtheora (fixed in next release)
+		data->tstate.internal_encode = nullptr;  // needed for a bug in libtheora (fixed in next release)
 	} else {
 		theora_info_clear(&data->tinfo);
 		theora_comment_clear(&data->tcomment);
@@ -270,9 +270,9 @@ static int OutputTheora(OggData *data, SDL_Texture *yuv_overlay, SDL_Rect *rect)
 
 	theora_decode_YUVout(&data->tstate, &yuv);
 
-	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
+	SDL_UpdateYUVTexture(yuv_overlay, nullptr, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
 	SDL_RenderClear(TheRenderer);
-	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, rect);
+	SDL_RenderCopy(TheRenderer, yuv_overlay, nullptr, rect);
 	SDL_RenderPresent(TheRenderer);
 
 	return 0;
@@ -352,7 +352,7 @@ int PlayMovie(const std::string &name)
 	                                             data.tinfo.frame_width,
 	                                             data.tinfo.frame_height);
 
-	if (yuv_overlay == NULL) {
+	if (yuv_overlay == nullptr) {
 		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 		fprintf(stderr, "SDL_CreateYUVOverlay: %dx%d\n", data.tinfo.frame_width, data.tinfo.frame_height);
 		OggFree(&data);
@@ -385,7 +385,7 @@ int PlayMovie(const std::string &name)
 	Invalidate();
 	SDL_RenderClear(TheRenderer);
 	SDL_SetRenderDrawColor(TheRenderer, 0, 0, 0, 255);
-	SDL_RenderDrawRect(TheRenderer, NULL);
+	SDL_RenderDrawRect(TheRenderer, nullptr);
 	// SDL_RenderPresent(TheRenderer);
 
 	MovieStop = false;
@@ -430,19 +430,19 @@ int PlayMovie(const std::string &name)
 
 Movie::~Movie()
 {
-	if (rect != NULL) {
+	if (rect != nullptr) {
 		free(rect);
 	}
-	if (surface != NULL) {
+	if (surface != nullptr) {
 		SDL_FreeSurface(surface);
 	}
-	if (yuv_overlay != NULL) {
+	if (yuv_overlay != nullptr) {
 		SDL_DestroyTexture(yuv_overlay);
 	}
-	if (data != NULL) {
+	if (data != nullptr) {
 		OggFree(data);
 	}
-	if (f != NULL) {
+	if (f != nullptr) {
 		delete f;
 	}
 }
@@ -450,7 +450,7 @@ Movie::~Movie()
 static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_Rect *rect, OggData *data) {
 	yuv_buffer *yuv = (yuv_buffer*)calloc(sizeof(yuv_buffer), 1);
 	theora_decode_YUVout(&data->tstate, yuv);
-	SDL_UpdateYUVTexture(yuv_overlay, NULL, yuv->y, yuv->y_stride, yuv->u, yuv->uv_stride, yuv->v, yuv->uv_stride);
+	SDL_UpdateYUVTexture(yuv_overlay, nullptr, yuv->y, yuv->y_stride, yuv->u, yuv->uv_stride, yuv->v, yuv->uv_stride);
 	SDL_RenderClear(TheRenderer);
 
 	// since SDL will render us at logical size, and SDL_RenderReadPixels will read the at
@@ -472,10 +472,10 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	read_rect.h = rect->h;
 	read_rect.x = (ww - (rw * scale)) / 2;
 	read_rect.y = (wh - (rh * scale)) / 2;
-	SDL_RenderCopy(TheRenderer, yuv_overlay, NULL, &render_rect);
+	SDL_RenderCopy(TheRenderer, yuv_overlay, nullptr, &render_rect);
 	if (SDL_RenderReadPixels(TheRenderer, &read_rect, surface->format->format, surface->pixels, surface->pitch)) {
 		fprintf(stderr, "Reading from renderer not supported\n");
-		SDL_FillRect(surface, NULL, 0); // completely transparent
+		SDL_FillRect(surface, nullptr, 0); // completely transparent
 	}
 	free(yuv);
 }
@@ -504,7 +504,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 								   0x000000ff,
 								   0xff000000);
 
-	if (surface == NULL) {
+	if (surface == nullptr) {
 		fprintf(stderr, "SDL_CreateRGBSurface: %s\n", SDL_GetError());
 		f->close();
 		return false;
@@ -515,7 +515,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 
 void *Movie::_getData() const
 {
-	if (data == NULL) {
+	if (data == nullptr) {
 		data = (OggData*)calloc(sizeof(OggData), 1);
 		if (OggInit(f, data) || !data->video) {
 			OggFree(data);
@@ -531,7 +531,7 @@ void *Movie::_getData() const
 										data->tinfo.frame_width,
 										data->tinfo.frame_height);
 
-		if (yuv_overlay == NULL) {
+		if (yuv_overlay == nullptr) {
 			fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 			fprintf(stderr, "SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
 			OggFree(data);

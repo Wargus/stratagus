@@ -64,7 +64,7 @@ static bool ParabolicMissile(Missile &missile)
 	if (missile.TotalStep == 0) {
 		return true;
 	}
-	Assert(missile.Type != NULL);
+	Assert(missile.Type != nullptr);
 	const PixelPos orig_pos = missile.position;
 	Assert(missile.TotalStep != 0);
 	const PixelPos diff = (missile.destination - missile.source);

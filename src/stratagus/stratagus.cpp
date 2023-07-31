@@ -675,12 +675,12 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 {
 	HANDLE hFile = CreateFile("crash.dmp", GENERIC_READ | GENERIC_WRITE,	FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,	NULL);
+		nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	MINIDUMP_EXCEPTION_INFORMATION mei;
 	mei.ThreadId = GetCurrentThreadId();
 	mei.ClientPointers = TRUE;
 	mei.ExceptionPointers = ExceptionInfo;
-	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
+	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, nullptr, nullptr);
 	fprintf(stderr, "Stratagus crashed!\n");
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
 	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
@@ -719,7 +719,7 @@ int stratagusMain(int argc, char **argv)
 	// Look for the specified data set inside the application bundle
 	// This should be a subdir of the Resources directory
 	CFURLRef pluginRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(),
-												 CFSTR(MAC_BUNDLE_DATADIR), NULL, NULL);
+												 CFSTR(MAC_BUNDLE_DATADIR), nullptr, nullptr);
 	CFStringRef macPath = CFURLCopyFileSystemPath(pluginRef,  kCFURLPOSIXPathStyle);
 	const char *pathPtr = CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding());
 	Assert(pathPtr);
@@ -772,7 +772,7 @@ int stratagusMain(int argc, char **argv)
 		PrintLicense();
 
 #ifndef DEBUG           // For debug it's better not to have:
-		srand(time(NULL));  // Random counter = random each start
+		srand(time(nullptr));  // Random counter = random each start
 #endif
 
 		//  Show title screens.
@@ -785,7 +785,7 @@ int stratagusMain(int argc, char **argv)
 		}
 
 		// Init player data
-		ThisPlayer = NULL;
+		ThisPlayer = nullptr;
 		//Don't clear the Players structure as it would erase the allowed units.
 		// memset(Players, 0, sizeof(Players));
 		NumPlayers = 0;

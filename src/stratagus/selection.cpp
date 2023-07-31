@@ -112,7 +112,7 @@ void UnSelectAll()
 		Selected[i]->Selected = 0;
 	}
 	Selected.clear();
-	UI.SelectedViewport->Unit = NULL;
+	UI.SelectedViewport->Unit = nullptr;
 }
 
 /**
@@ -292,7 +292,7 @@ void UnSelectUnit(CUnit &unit)
 	unit.Selected = 0;
 
 	//Turn track unit mode off
-	UI.SelectedViewport->Unit = NULL;
+	UI.SelectedViewport->Unit = nullptr;
 }
 
 /**
@@ -1135,7 +1135,7 @@ static int CclSelection(lua_State *l)
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 2, j + 1);
-		Selected.push_back(&UnitManager->GetSlotUnit(strtol(str + 1, NULL, 16)));
+		Selected.push_back(&UnitManager->GetSlotUnit(strtol(str + 1, nullptr, 16)));
 	}
 	return 0;
 }

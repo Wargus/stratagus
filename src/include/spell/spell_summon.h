@@ -41,7 +41,7 @@
 class Spell_Summon : public SpellActionType
 {
 public:
-	Spell_Summon() : SpellActionType(1), UnitType(NULL), TTL(0),
+	Spell_Summon() : SpellActionType(1), UnitType(nullptr), TTL(0),
 		RequireCorpse(false), JoinToAiForce(false) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *&target, const Vec2i &goalPos);

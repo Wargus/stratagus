@@ -222,7 +222,7 @@ enum {
 					goal->Variable[MANA_INDEX].Value -= goal->Goal->Type->TeleportCost;
 				}
 				// Everything is OK, now teleport the unit
-				unit.Remove(NULL);
+				unit.Remove(nullptr);
 				if (goal->Type->TeleportEffectIn) {
 					goal->Type->TeleportEffectIn->pushPreamble();
 					goal->Type->TeleportEffectIn->pushInteger(UnitNumber(unit));
@@ -232,7 +232,7 @@ enum {
 					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
-				DropOutOnSide(unit, unit.Direction, NULL);
+				DropOutOnSide(unit, unit.Direction, nullptr);
 
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
@@ -245,7 +245,7 @@ enum {
 					dest.Type->TeleportEffectOut->run();
 				}
 
-				if (dest.NewOrder == NULL
+				if (dest.NewOrder == nullptr
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
@@ -255,7 +255,7 @@ enum {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
 							delete dest.NewOrder;
-							dest.NewOrder = NULL;
+							dest.NewOrder = nullptr;
 							this->Finished = true;
 							return ;
 						}
@@ -278,7 +278,7 @@ enum {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		this->ClearGoal();
-		goal = NULL;
+		goal = nullptr;
 	}
 
 	if (unit.Anim.Unbreakable) {
@@ -293,7 +293,7 @@ enum {
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.
-			COrder *savedOrder = NULL;
+			COrder *savedOrder = nullptr;
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
 				savedOrder = this->Clone();
 			}
@@ -301,7 +301,7 @@ enum {
 			this->Finished = true;
 			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
 
-			if (savedOrder != NULL) {
+			if (savedOrder != nullptr) {
 				unit.SavedOrder = savedOrder;
 			}
 		}

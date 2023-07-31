@@ -258,7 +258,7 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 	const SDL_PixelFormat *fmt = MinimapSurface->format;
 	SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
 												UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
-	SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
+	SDL_BlitSurface(MinimapSurface, nullptr, preview, nullptr);
 
 	SDL_LockSurface(preview);
 
@@ -291,7 +291,7 @@ std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 
 // Write the map presentation file
 static int WriteMapPresentation(const std::string &mapname, CMap &map, Vec2i newSize)
 {
-	FileWriter *f = NULL;
+	FileWriter *f = nullptr;
 
 	int numplayers = 0;
 	int topplayer = PlayerMax - 2;
@@ -347,7 +347,7 @@ static int WriteMapPresentation(const std::string &mapname, CMap &map, Vec2i new
 */
 int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
-	FileWriter *f = NULL;
+	FileWriter *f = nullptr;
 
 	try {
 		f = CreateFileWriter(mapSetup);
@@ -837,7 +837,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
-		CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+		CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
 		return;
 	}
 
@@ -1090,7 +1090,7 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	GameResult = GameNoResult;
 
-	CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
+	CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
 	Video.ClearScreen();
 }
 
@@ -1139,8 +1139,8 @@ void CleanGame()
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();
-	CursorBuilding = NULL;
-	UnitUnderCursor = NULL;
+	CursorBuilding = nullptr;
+	UnitUnderCursor = nullptr;
 	GameEstablishing = false;
 }
 

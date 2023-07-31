@@ -67,8 +67,8 @@ TEST(STRCPY_S)
 {
 	char buffer[42];
 
-	CHECK_EQUAL(EINVAL, strcpy_s(NULL, 42, "NULL dest"));
-	CHECK_EQUAL(EINVAL, strcpy_s(buffer, 42, NULL));
+	CHECK_EQUAL(EINVAL, strcpy_s(nullptr, 42, "NULL dest"));
+	CHECK_EQUAL(EINVAL, strcpy_s(buffer, 42, nullptr));
 	CHECK_EQUAL(ERANGE, strcpy_s(buffer, 10, "longer than given size"));
 	CHECK_EQUAL(0, strcpy_s(buffer, 10, "correct"));
 	CHECK_EQUAL("correct", buffer);
@@ -78,8 +78,8 @@ TEST(STRNCPY_S)
 {
 	char buffer[42];
 
-	CHECK_EQUAL(EINVAL, strncpy_s(NULL, 42, "NULL dest", 5));
-	CHECK_EQUAL(EINVAL, strncpy_s(buffer, 42, NULL, 5));
+	CHECK_EQUAL(EINVAL, strncpy_s(nullptr, 42, "NULL dest", 5));
+	CHECK_EQUAL(EINVAL, strncpy_s(buffer, 42, nullptr, 5));
 	CHECK_EQUAL(EINVAL, strncpy_s(buffer, 10, "longer than given size", 12));
 	CHECK_EQUAL(0, strncpy_s(buffer, 10, "correct", 8));
 	CHECK_EQUAL("correct", buffer);
@@ -91,8 +91,8 @@ TEST(STRCAT_S)
 
 	buffer[0] = '\0';
 
-	CHECK_EQUAL(EINVAL, strcat_s(NULL, 42, "NULL dest"));
-	CHECK_EQUAL(EINVAL, strcat_s(buffer, 42, NULL));
+	CHECK_EQUAL(EINVAL, strcat_s(nullptr, 42, "NULL dest"));
+	CHECK_EQUAL(EINVAL, strcat_s(buffer, 42, nullptr));
 	CHECK_EQUAL(ERANGE, strcat_s(buffer, 10, "longer than given size"));
 	CHECK_EQUAL(0, strcat_s(buffer, 42, "hello"));
 	CHECK_EQUAL(0, strcat_s(buffer, 42, " world"));
@@ -103,7 +103,7 @@ TEST(STRCASESTR)
 {
 	const char *text = "HELLO world";
 
-	CHECK(NULL == strcasestr(text, "not found"));
+	CHECK(nullptr == strcasestr(text, "not found"));
 	CHECK(text == strcasestr(text, "HelLo"));
 	CHECK(text + 6 == strcasestr(text, "WoRlD"));
 	CHECK(text + 4 == strcasestr(text, "o"));

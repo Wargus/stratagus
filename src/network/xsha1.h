@@ -387,7 +387,7 @@ namespace pvpgn
 
 		if (!hash)
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		for (i = 0; i < 5; i++)

@@ -92,13 +92,13 @@ public:
     int bit_depth, color_type, interlace_type, compression_type, filter_type;
     int row_bytes;
 
-    if ((fp = fopen(filename.c_str (), "rb")) == NULL)
+    if ((fp = fopen(filename.c_str (), "rb")) == nullptr)
       {
 	perror (filename.c_str ());
 	exit (EXIT_FAILURE);
       }
 
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     info_ptr = png_create_info_struct(png_ptr);
     png_init_io(png_ptr, fp);
     png_read_info(png_ptr, info_ptr);
@@ -178,7 +178,7 @@ public:
 	m_palette[i].blue = lpalette[i].blue;
       }
 
-    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
+    png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)nullptr);
     fclose (fp);
   }
 
@@ -195,12 +195,12 @@ public:
     //png_uint_32 bytes_per_pixel = 1;
 
    fp = fopen(filename.c_str (), "wb");
-   if (fp == NULL)
+   if (fp == nullptr)
      assert (false);
 
-   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 
-   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
    info_ptr = png_create_info_struct(png_ptr);
    png_init_io(png_ptr, fp);
 

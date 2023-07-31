@@ -446,7 +446,7 @@ void AiInit(CPlayer &player)
 		Exit(0);
 	}
 	size_t i;
-	CAiType *ait = NULL;
+	CAiType *ait = nullptr;
 
 	for (i = 0; i < AiTypes.size(); ++i) {
 		ait = AiTypes[i];
@@ -495,7 +495,7 @@ void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
 		delete Players[p].Ai;
-		Players[p].Ai = NULL;
+		Players[p].Ai = nullptr;
 	}
 }
 
@@ -688,7 +688,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
-					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
 											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
 						shouldAttack = true;
 					}
@@ -700,7 +700,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 					if (aiunit.CanStoreOrder(savedOrder) == false) {
 						delete savedOrder;
-						savedOrder = NULL;
+						savedOrder = nullptr;
 					} else {
 						aiunit.SavedOrder = savedOrder;
 					}
@@ -899,14 +899,14 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		const int index = SyncRand() % movablenb;
-		COrder *savedOrder = NULL;
+		COrder *savedOrder = nullptr;
 		if (movableunits[index]->IsIdle() == false) {
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
 				savedOrder = unit.CurrentOrder()->Clone();
 			}
 		}
 		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
-		if (savedOrder != NULL) {
+		if (savedOrder != nullptr) {
 			unit.SavedOrder = savedOrder;
 		}
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;

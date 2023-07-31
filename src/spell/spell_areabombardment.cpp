@@ -58,7 +58,7 @@
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
 			this->Missile = MissileTypeByIdent(value);
-			if (this->Missile == NULL) {
+			if (this->Missile == nullptr) {
 				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
 			}
 		} else {
@@ -66,7 +66,7 @@
 		}
 	}
 	// Now, checking value.
-	if (this->Missile == NULL) {
+	if (this->Missile == nullptr) {
 		LuaError(l, "Use a missile for area-bombardment (with missile)");
 	}
 }

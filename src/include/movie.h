@@ -87,8 +87,8 @@ struct OggData {
 class Movie : public gcn::Image
 {
 public:
-    Movie() : rect(NULL), yuv_overlay(NULL), surface(NULL), need_data(true), start_time(0),
-              is_dirty(true), Width(0), Height(0), data(NULL), f(NULL) {};
+    Movie() : rect(nullptr), yuv_overlay(nullptr), surface(nullptr), need_data(true), start_time(0),
+              is_dirty(true), Width(0), Height(0), data(nullptr), f(nullptr) {};
     ~Movie();
     bool Load(const std::string &filename, int w, int h);
     bool IsPlaying() const { return is_dirty; }
@@ -138,7 +138,7 @@ public:
     bool Load(const std::string &filename, int w, int h) { return false; };
     bool IsPlaying() const { return false; };
     //guichan
-    virtual void *_getData() const { return NULL; };
+    virtual void *_getData() const { return nullptr; };
     virtual int getWidth() const { return 0; };
     virtual int getHeight() const { return 0; };
     virtual bool isDirty() const { return false; };

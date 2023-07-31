@@ -44,7 +44,7 @@ class MissileType;
 class MissileConfig
 {
 public:
-	MissileConfig() : Missile(NULL) {}
+	MissileConfig() : Missile(nullptr) {}
 
 	bool MapMissileNoLog();
 	bool MapMissile();

@@ -118,13 +118,13 @@ void LoadMissileSprites()
 MissileType *MissileTypeByIdent(const std::string &ident)
 {
 	if (ident.empty()) {
-		return NULL;
+		return nullptr;
 	}
 	MissileTypeMap::iterator it = MissileTypes.find(ident);
 	if (it != MissileTypes.end()) {
 		return it->second;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -146,7 +146,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 **  Constructor
 */
 Missile::Missile() :
-	Type(NULL), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
+	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
 	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
 	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
@@ -172,7 +172,7 @@ Missile::Missile() :
 */
 /* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
-	Missile *missile = NULL;
+	Missile *missile = nullptr;
 
 	switch (mtype.Class) {
 		case MissileClassNone :
@@ -335,8 +335,8 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 	TriggerData.Attacker = const_cast<CUnit *>(&attacker);
 	TriggerData.Defender = const_cast<CUnit *>(&goal);
 	const int res = EvalNumber(formula);
-	TriggerData.Attacker = NULL;
-	TriggerData.Defender = NULL;
+	TriggerData.Attacker = nullptr;
+	TriggerData.Defender = nullptr;
 	return res;
 }
 
@@ -361,7 +361,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		if (goal->CurrentAction() == UnitActionDie) {
 			if (unit.Type->Missile.Missile->AlwaysFire) {
 				newgoalPos = goal->tilePos;
-				goal = NULL;
+				goal = nullptr;
 			} else {
 				return;
 			}
@@ -751,7 +751,7 @@ bool PointToPointMissile(Missile &missile)
 	if (missile.TotalStep == 0) {
 		return true;
 	}
-	Assert(missile.Type != NULL);
+	Assert(missile.Type != nullptr);
 	Assert(missile.TotalStep != 0);
 
 	const PixelPos diff = (missile.destination - missile.source);
@@ -838,12 +838,12 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
-			Assert(missile.SourceUnit != NULL);
+			Assert(missile.SourceUnit != nullptr);
 			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
 		} else if (missile.Damage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
 		} else {
-			Assert(missile.SourceUnit != NULL);
+			Assert(missile.SourceUnit != nullptr);
 			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
 		}
 		if (missile.Type->Pierce) {  // Handle pierce factor
@@ -877,7 +877,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		return;
 	}
 
-	Assert(missile.SourceUnit != NULL);
+	Assert(missile.SourceUnit != nullptr);
 	if (Map.HumanWallOnMap(tilePos)) {
 		stats = UnitTypeHumanWall->Stats;
 	} else {
@@ -983,7 +983,7 @@ void Missile::MissileHit(CUnit *unit)
 				}
 			}
 			if (goal.Destroyed) {
-				this->TargetUnit = NULL;
+				this->TargetUnit = nullptr;
 				return;
 			}
 			MissileHitsGoal(*this, goal, 1);
@@ -1000,7 +1000,7 @@ void Missile::MissileHit(CUnit *unit)
 		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table;
 		Select(pos - range, pos + range, table);
-		Assert(this->SourceUnit != NULL);
+		Assert(this->SourceUnit != nullptr);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
 			//
@@ -1022,7 +1022,7 @@ void Missile::MissileHit(CUnit *unit)
 
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPosition = false;
-					if (this->TargetUnit == NULL) {
+					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
 							if (order.GetSpell().Target == TargetPosition) {
@@ -1037,7 +1037,7 @@ void Missile::MissileHit(CUnit *unit)
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == NULL || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->TargetUnit == nullptr || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
 							shouldHit = false;
 						}
 					}
@@ -1235,7 +1235,7 @@ MissileType *MissileBurningBuilding(int percent)
 			return (*i)->Missile;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -1264,10 +1264,10 @@ void Missile::SaveMissile(CFile &file) const
 	SavePixelPos(file, this->destination);
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
-	if (this->SourceUnit != NULL) {
+	if (this->SourceUnit != nullptr) {
 		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
 	}
-	if (this->TargetUnit != NULL) {
+	if (this->TargetUnit != nullptr) {
 		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
@@ -1337,9 +1337,9 @@ MissileType::MissileType(const std::string &ident) :
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	MissileStopFlags(0), Damage(NULL), Range(0), SplashFactor(0),
-	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
-	G(NULL)
+	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(0),
+	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
+	G(nullptr)
 {
 	size.x = 0;
 	size.y = 0;

@@ -38,7 +38,7 @@
 class CAnimation_RandomGoto : public CAnimation
 {
 public:
-	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto), gotoLabel(NULL) {}
+	CAnimation_RandomGoto() : CAnimation(AnimationRandomGoto), gotoLabel(nullptr) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);

@@ -94,8 +94,8 @@ static void AddDependency(const std::string &target, const std::string &required
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
 				DependRule *temp = new DependRule;
-				temp->Next = NULL;
-				temp->Rule = NULL;
+				temp->Next = nullptr;
+				temp->Rule = nullptr;
 				temp->Type = rule.Type;
 				temp->Kind = rule.Kind;
 				node->Next = temp;
@@ -106,8 +106,8 @@ static void AddDependency(const std::string &target, const std::string &required
 		}
 	} else {  // create new slow
 		node = new DependRule;
-		node->Next = NULL;
-		node->Rule = NULL;
+		node->Next = nullptr;
+		node->Rule = nullptr;
 		node->Type = rule.Type;
 		node->Kind = rule.Kind;
 		DependHash[hash] = node;
@@ -120,8 +120,8 @@ static void AddDependency(const std::string &target, const std::string &required
 	}
 
 	DependRule *temp = new DependRule;
-	temp->Rule = NULL;
-	temp->Next = NULL;
+	temp->Rule = nullptr;
+	temp->Next = nullptr;
 	temp->Count = count;
 
 	//  Setup structure.
@@ -408,7 +408,7 @@ void CleanDependencies()
 			node = node->Next;
 			delete temp;
 		}
-		DependHash[u] = NULL;
+		DependHash[u] = nullptr;
 	}
 }
 

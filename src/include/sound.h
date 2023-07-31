@@ -174,7 +174,7 @@ extern void PlayMissileSound(const Missile &missile, CSound *sound);
 extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = false);
 
 /// Play a sound file
-extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL);
+extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
 
 /// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);

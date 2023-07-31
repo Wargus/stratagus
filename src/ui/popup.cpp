@@ -376,7 +376,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	TriggerData.Type = UnitTypes[button.Value];
 	std::string text = EvalString(this->Text);
-	TriggerData.Type = NULL;
+	TriggerData.Type = nullptr;
 	return font.getWidth(text);
 }
 
@@ -398,7 +398,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (this->Text) {
 		TriggerData.Type = UnitTypes[button.Value];
 		text = EvalString(this->Text);
-		TriggerData.Type = NULL;
+		TriggerData.Type = nullptr;
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
@@ -557,8 +557,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	int minHeight = 0;
 	std::string textColor("white");
 	std::string highColor("red");
-	CPopupContentType *content = NULL;
-	PopupConditionPanel *condition = NULL;
+	CPopupContentType *content = nullptr;
+	PopupConditionPanel *condition = nullptr;
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
@@ -613,7 +613,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 
 CPopup::CPopup() :
 	Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
-	DefaultFont(NULL), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
+	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
 {}
 
 CPopup::~CPopup()

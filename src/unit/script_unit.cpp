@@ -163,7 +163,7 @@ static CUnit *CclGetUnit(lua_State *l)
 		} else if (UnitUnderCursor) {
 			return UnitUnderCursor;
 		}
-		return NULL;
+		return nullptr;
 	}
 	return &UnitManager->GetSlotUnit(num);
 }
@@ -178,7 +178,7 @@ static CUnit *CclGetUnit(lua_State *l)
 CUnit *CclGetUnitFromRef(lua_State *l)
 {
 	const char *const value = LuaToString(l, -1);
-	unsigned int slot = strtol(value + 1, NULL, 16);
+	unsigned int slot = strtol(value + 1, nullptr, 16);
 	Assert(slot < UnitManager->GetUsedSlotCount());
 	return &UnitManager->GetSlotUnit(slot);
 }
@@ -287,7 +287,7 @@ static void CclParseOrders(lua_State *l, CUnit &unit)
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 
-		unit.Orders.push_back(NULL);
+		unit.Orders.push_back(nullptr);
 		COrderPtr *order = &unit.Orders.back();
 
 		CclParseOrder(l, unit, order);
@@ -332,10 +332,10 @@ static int CclUnit(lua_State *l)
 	}
 
 	CUnit *unit = &UnitManager->GetSlotUnit(slot);
-	bool hadType = unit->Type != NULL;
-	CUnitType *type = NULL;
-	CUnitType *seentype = NULL;
-	CPlayer *player = NULL;
+	bool hadType = unit->Type != nullptr;
+	CUnitType *type = nullptr;
+	CUnitType *seentype = nullptr;
+	CPlayer *player = nullptr;
 
 	// Parse the list:
 	const int args = lua_rawlen(l, 2);
@@ -577,7 +577,7 @@ static int CclUnit(lua_State *l)
 			CclParseOrders(l, *unit);
 			lua_pop(l, 1);
 			// now we know unit's action so we can assign it to a player
-			Assert(player != NULL);
+			Assert(player != nullptr);
 			unit->AssignToPlayer(*player);
 			if (unit->CurrentAction() == UnitActionBuilt) {
 				DebugPrint("HACK: the building is not ready yet\n");
@@ -658,7 +658,7 @@ static int CclUnit(lua_State *l)
 		// need to actually add it now, since only with a type do we know the
 		// BoardSize it takes up in the container
 		CUnit *host = unit->Container;
-		unit->Container = NULL;
+		unit->Container = nullptr;
 		unit->AddInContainer(*host);
 	}
 
@@ -706,7 +706,7 @@ static int CclMoveUnit(lua_State *l)
 		const int heading = SyncRand() % 256;
 
 		unit->tilePos = ipos;
-		DropOutOnSide(*unit, heading, NULL);
+		DropOutOnSide(*unit, heading, nullptr);
 	}
 
 	if (nargs == 3) {
@@ -746,7 +746,7 @@ static int CclRemoveUnit(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	if (unit) {
-		unit->Remove(NULL);
+		unit->Remove(nullptr);
 		LetUnitDie(*unit);
 	}
 	lua_pushvalue(l, 1);
@@ -772,7 +772,7 @@ static int CclCreateUnit(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
-	if (unittype == NULL) {
+	if (unittype == nullptr) {
 		LuaError(l, "Bad unittype");
 	}
 	lua_pop(l, 1);
@@ -793,18 +793,18 @@ static int CclCreateUnit(lua_State *l)
 		return 0;
 	}
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+			|| (unit->Type->Building && CanBuildUnitType(nullptr, *unit->Type, ipos, 0))) {
 			unit->Place(ipos);
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = ipos;
-			DropOutOnSide(*unit, heading, NULL);
+			DropOutOnSide(*unit, heading, nullptr);
 		}
 		UpdateForNewUnit(*unit, 0);
 
@@ -871,7 +871,7 @@ static int CclDamageUnit(lua_State *l)
 	LuaCheckArgs(l, 3);
 
 	const int attacker = LuaToNumber(l, 1);
-	CUnit *attackerUnit = NULL;
+	CUnit *attackerUnit = nullptr;
 	if (attacker != -1) {
 		attackerUnit = &UnitManager->GetSlotUnit(attacker);
 	}
@@ -1279,7 +1279,7 @@ static int CclGetUnitVariable(lua_State *l)
 
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		return 1;
 	}
 	UpdateUnitVariables(*unit);

@@ -37,7 +37,7 @@
 class COrder_Research : public COrder
 {
 public:
-	COrder_Research() : COrder(UnitActionResearch), Upgrade(NULL) {}
+	COrder_Research() : COrder(UnitActionResearch), Upgrade(nullptr) {}
 
 	virtual COrder_Research *Clone() const { return new COrder_Research(*this); }
 

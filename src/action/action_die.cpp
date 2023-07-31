@@ -80,7 +80,7 @@ static bool AnimateActionDie(CUnit &unit)
 {
 	const CAnimations *animations = unit.Type->Animations;
 
-	if (animations == NULL) {
+	if (animations == nullptr) {
 		return false;
 	}
 	if (animations->Death[unit.DamagedType]) {
@@ -107,8 +107,8 @@ static bool AnimateActionDie(CUnit &unit)
 	const CUnitType &type = *unit.Type;
 
 	// Die sequence terminated, generate corpse.
-	if (type.CorpseType == NULL) {
-		unit.Remove(NULL);
+	if (type.CorpseType == nullptr) {
+		unit.Remove(nullptr);
 		unit.Release();
 		return ;
 	}
@@ -120,7 +120,7 @@ static bool AnimateActionDie(CUnit &unit)
 	// We have to unmark BEFORE changing the type.
 	// Always do that, since types can have different vision properties.
 
-	unit.Remove(NULL);
+	unit.Remove(nullptr);
 	unit.Type = &corpseType;
 	unit.Stats = &corpseType.Stats[unit.Player->Index];
 	UpdateUnitSightRange(unit);

@@ -70,7 +70,7 @@ static const char *MissileClassNames[] = {
 	"missile-class-clip-to-target",
 	"missile-class-continious",
 	"missile-class-straight-fly",
-	NULL
+	nullptr
 };
 
 /*----------------------------------------------------------------------------
@@ -246,11 +246,11 @@ static int CclDefineMissileType(lua_State *l)
 */
 static int CclMissile(lua_State *l)
 {
-	MissileType *type = NULL;
+	MissileType *type = nullptr;
 	PixelPos position(-1, -1);
 	PixelPos destination(-1, -1);
 	PixelPos source(-1, -1);
-	Missile *missile = NULL;
+	Missile *missile = nullptr;
 
 	DebugPrint("FIXME: not finished\n");
 
@@ -399,14 +399,14 @@ static int CclCreateMissile(lua_State *l)
 	const int destUnitId = LuaToNumber(l, 5);
 	const bool dealDamage = LuaToBoolean(l, 6);
 	const bool mapRelative = arg == 7 ? LuaToBoolean(l, 7) : false;
-	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager->GetSlotUnit(sourceUnitId) : NULL;
-	CUnit *destUnit = destUnitId != -1 ? &UnitManager->GetSlotUnit(destUnitId) : NULL;
+	CUnit *sourceUnit = sourceUnitId != -1 ? &UnitManager->GetSlotUnit(sourceUnitId) : nullptr;
+	CUnit *destUnit = destUnitId != -1 ? &UnitManager->GetSlotUnit(destUnitId) : nullptr;
 
 	if (mapRelative == false) {
-		if (sourceUnit != NULL) {
+		if (sourceUnit != nullptr) {
 			startpos += sourceUnit->GetMapPixelPosTopLeft();
 		}
-		if (destUnit != NULL) {
+		if (destUnit != nullptr) {
 			endpos += destUnit->GetMapPixelPosTopLeft();
 		}
 	}

@@ -105,7 +105,7 @@ int lua_isstring_strict(lua_State *luaStack, int idx) {
 static void lstop(lua_State *l, lua_Debug *ar)
 {
 	(void)ar;  // unused arg.
-	lua_sethook(l, NULL, 0, 0);
+	lua_sethook(l, nullptr, 0, 0);
 	luaL_error(l, "interrupted!");
 }
 
@@ -133,7 +133,7 @@ static int report(int status, bool exitOnError)
 {
 	if (status) {
 		const char *msg = lua_tostring(Lua, -1);
-		if (msg == NULL) {
+		if (msg == nullptr) {
 			msg = "(error with no message)";
 		}
 		fprintf(stderr, "%s\n", msg);
@@ -509,7 +509,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 
 	Assert(l);
 	Assert(s);
-	res = NULL;
+	res = nullptr;
 	if (!strcmp(s, "Attacker")) {
 		res = &TriggerData.Attacker;
 	} else if (!strcmp(s, "Defender")) {
@@ -535,7 +535,7 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 */
 static CUnitType **Str2TypeRef(lua_State *l, const char *s)
 {
-	CUnitType **res = NULL; // Result.
+	CUnitType **res = nullptr; // Result.
 
 	Assert(l);
 	if (!strcmp(s, "Type")) {
@@ -578,7 +578,7 @@ UnitDesc *CclParseUnitDesc(lua_State *l)
 */
 CUnitType **CclParseTypeDesc(lua_State *l)
 {
-	CUnitType **res = NULL;
+	CUnitType **res = nullptr;
 
 	if (lua_isstring(l, -1)) {
 		res = Str2TypeRef(l, LuaToString(l, -1));
@@ -938,7 +938,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				lua_rawgeti(l, -1, 3); // Length.
 				res->D.Line.MaxLen = CclParseNumberDesc(l);
 			}
-			res->D.Line.Font = NULL;
+			res->D.Line.Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
 				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
@@ -982,7 +982,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 		case EUnit_Ref :
 			return *unitdesc->D.AUnit;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -992,7 +992,7 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 **
 **  @return        the result number.
 **
-**  @todo Manage better the error (div/0, unit==NULL, ...).
+**  @todo Manage better the error (div/0, unit==nullptr, ...).
 */
 int EvalNumber(const NumberDesc *number)
 {
@@ -1059,7 +1059,7 @@ int EvalNumber(const NumberDesc *number)
 			return SyncRand() % a;
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
-			if (unit != NULL) {
+			if (unit != nullptr) {
 				return GetComponent(*unit, number->D.UnitStat.Index,
 									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
 			} else { // ERROR.
@@ -1067,21 +1067,21 @@ int EvalNumber(const NumberDesc *number)
 			}
 		case ENumber_TypeStat : // property of unit type.
 			type = number->D.TypeStat.Type;
-			if (type != NULL) {
+			if (type != nullptr) {
 				return GetComponent(**type, number->D.TypeStat.Index,
 									number->D.TypeStat.Component, number->D.TypeStat.Loc).i;
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			if (number->D.VideoTextLength.String != NULL
+			if (number->D.VideoTextLength.String != nullptr
 				&& !(s = EvalString(number->D.VideoTextLength.String)).empty()) {
 				return number->D.VideoTextLength.Font->Width(s);
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_StringFind : // s.find(c)
-			if (number->D.StringFind.String != NULL
+			if (number->D.StringFind.String != nullptr
 				&& !(s = EvalString(number->D.StringFind.String)).empty()) {
 				size_t pos = s.find(number->D.StringFind.C);
 				return pos != std::string::npos ? (int)pos : -1;
@@ -1144,7 +1144,7 @@ std::string EvalString(const StringDesc *s)
 			return res;
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL) {
+			if (unit != nullptr) {
 				return unit->Type->Name;
 			} else { // ERROR.
 				return std::string("");
@@ -1158,7 +1158,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_SubString : // substring(s, begin, end)
-			if (s->D.SubString.String != NULL
+			if (s->D.SubString.String != nullptr
 				&& !(tmp1 = EvalString(s->D.SubString.String)).empty()) {
 				int begin;
 				int end;
@@ -1181,7 +1181,7 @@ std::string EvalString(const StringDesc *s)
 				return std::string("");
 			}
 		case EString_Line : // line n of the string
-			if (s->D.Line.String == NULL || (tmp1 = EvalString(s->D.Line.String)).empty()) {
+			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String)).empty()) {
 				return std::string(""); // ERROR.
 			} else {
 				int line;
@@ -1404,18 +1404,18 @@ static int AliasTypeVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
 
 		key = LuaToString(l, 3);
-		for (i = 0; sloc[i] != NULL; i++) {
+		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
-		if (sloc[i] == NULL) {
+		if (sloc[i] == nullptr) {
 			LuaError(l, "Bad loc :'%s'" _C_ key);
 		}
 	} else {
@@ -1466,18 +1466,18 @@ static int AliasUnitVar(lua_State *l, const char *s)
 	if (nargs >= 3) {
 		//  Warning: type is for unit->Stats->Var...
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
-		const char *sloc[] = {"Unit", "Initial", "Type", NULL};
+		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
 		const char *key;
 
 		key = LuaToString(l, 3);
-		for (i = 0; sloc[i] != NULL; i++) {
+		for (i = 0; sloc[i] != nullptr; i++) {
 			if (!strcmp(key, sloc[i])) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
-		if (sloc[i] == NULL) {
+		if (sloc[i] == nullptr) {
 			LuaError(l, "Bad loc :'%s'" _C_ key);
 		}
 	} else {
@@ -2224,7 +2224,7 @@ void InitLua()
 		{LUA_STRLIBNAME, luaopen_string},
 		{LUA_MATHLIBNAME, luaopen_math},
 		{LUA_DBLIBNAME, luaopen_debug},
-		{NULL, NULL}
+		{nullptr, nullptr}
 	};
 
 	Lua = luaL_newstate();
@@ -2549,8 +2549,8 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 fs::path GetAVolumePath(__in PWCHAR VolumeName)
 {
     DWORD  CharCount = MAX_PATH + 1;
-    PWCHAR Names     = NULL;
-    PWCHAR NameIdx   = NULL;
+    PWCHAR Names     = nullptr;
+    PWCHAR NameIdx   = nullptr;
     BOOL   Success   = FALSE;
 
     for (;;) {
@@ -2570,13 +2570,13 @@ fs::path GetAVolumePath(__in PWCHAR VolumeName)
         }
 
         delete [] Names;
-        Names = NULL;
+        Names = nullptr;
     }
 
 	for (NameIdx = Names; NameIdx[0] != L'\0'; NameIdx += wcslen(NameIdx) + 1) {	
 		fs::path result(NameIdx);
 		delete [] Names;
-		Names = NULL;
+		Names = nullptr;
 		return result;
 	}
 

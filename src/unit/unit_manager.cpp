@@ -51,7 +51,7 @@ CUnitManager *UnitManager;          /// Unit manager
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUnitManager::CUnitManager() : lastCreated(NULL)
+CUnitManager::CUnitManager() : lastCreated(nullptr)
 {
 }
 
@@ -60,7 +60,7 @@ CUnitManager::CUnitManager() : lastCreated(NULL)
 */
 void CUnitManager::Init()
 {
-	lastCreated = NULL;
+	lastCreated = nullptr;
 	//Assert(units.empty());
 	units.clear();
 	// Release memory of units in release list.
@@ -109,7 +109,7 @@ void CUnitManager::ReleaseUnit(CUnit *unit)
 	Assert(unit);
 
 	if (lastCreated == unit) {
-		lastCreated = NULL;
+		lastCreated = nullptr;
 	}
 	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
 		Assert(units[unit->UnitManagerData.unitSlot] == unit);

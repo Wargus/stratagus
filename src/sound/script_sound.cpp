@@ -98,7 +98,7 @@ static CSound *CclGetSound(lua_State *l)
 		}
 	}
 	LuaError(l, "CclGetSound: not a sound");
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -231,7 +231,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "Unknown race: %s" _C_ raceName);
 	}
 	lua_rawgeti(l, j + 1, 2);
-	LuaUserData *data = NULL;
+	LuaUserData *data = nullptr;
 	if (!lua_isuserdata(l, -1)
 		|| (data = (LuaUserData *)lua_touserdata(l, -1))->Type != LuaSoundType) {
 		LuaError(l, "Sound id expected");
@@ -255,7 +255,7 @@ static int CclDefineGameSounds(lua_State *l)
 		const char *value = LuaToString(l, j + 1);
 		++j;
 
-		LuaUserData *data = NULL;
+		LuaUserData *data = nullptr;
 
 		// let's handle now the different cases
 		if (!strcmp(value, "click")) {

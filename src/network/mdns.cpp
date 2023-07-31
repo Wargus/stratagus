@@ -54,8 +54,8 @@ static int service_callback(int sock, const struct sockaddr* from, size_t addrle
                 mdns_query_answer(sock, from, addrlen, buffer, sizeof(buffer), query_id,
                                   offeredService.c_str(), offeredService.size(),
                                   hostname.c_str(), hostname.size(),
-                                  ips[i], NULL, CNetworkParameter::Instance.localPort,
-                                  NULL, 0);
+                                  ips[i], nullptr, CNetworkParameter::Instance.localPort,
+                                  nullptr, 0);
             }
         }
     }
@@ -81,7 +81,7 @@ void MDNS::AnswerServerQueries() {
     }
 
     char buffer[1024];
-    mdns_socket_listen(serviceSocket, buffer, sizeof(buffer), service_callback, NULL);
+    mdns_socket_listen(serviceSocket, buffer, sizeof(buffer), service_callback, nullptr);
 }
 
 static int query_callback(int sock, const struct sockaddr* from, size_t addrlen, mdns_entry_type_t entry,

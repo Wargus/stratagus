@@ -83,7 +83,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		cframe = cframe->Next;
 		++frame;
 	}
-	if (this->Worker != NULL) {
+	if (this->Worker != nullptr) {
 		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
 	}
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
@@ -109,7 +109,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
 		CConstructionFrame *cframe = unit.Type->Construction->Frames;
-		while (frame-- && cframe->Next != NULL) {
+		while (frame-- && cframe->Next != nullptr) {
 			cframe = cframe->Next;
 		}
 		this->Frame = cframe;
@@ -132,16 +132,16 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 static void CancelBuilt(COrder_Built &order, CUnit *unit)
 {
-	Assert(unit == NULL || unit->CurrentOrder() == &order);
+	Assert(unit == nullptr || unit->CurrentOrder() == &order);
 	CUnit *worker = order.GetWorkerPtr();
 
 	// Drop out unit
-	if (worker != NULL && worker->CurrentAction() == UnitActionBuild) {
+	if (worker != nullptr && worker->CurrentAction() == UnitActionBuild) {
 		worker->ClearAction();
 
 		DropOutOnSide(*worker, LookingW, unit);
 	}
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		// Player gets back 75% of the original cost for a building.
 		unit->Player->AddCostsFactor(unit->Stats->Costs, CancelBuildingCostsFactor);
 		// Cancel building
@@ -169,11 +169,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	CUnit *worker = order.GetWorkerPtr();
 
-	if (worker != NULL) {
+	if (worker != nullptr) {
 		if (type.BoolFlag[BUILDERLOST_INDEX].value) {
 			// Bye bye worker.
 			LetUnitDie(*worker);
-			worker = NULL;
+			worker = nullptr;
 		} else { // Drop out the worker.
 			worker->ClearAction();
 
@@ -207,7 +207,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 
 	if (player.AiEnabled) {
-		/* Worker can be NULL */
+		/* Worker can be nullptr */
 		AiWorkComplete(worker, unit);
 	}
 
@@ -222,7 +222,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// FIXME: Johns: hardcoded unit-type wall / more races!
 	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
 		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-		unit.Remove(NULL);
+		unit.Remove(nullptr);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();
@@ -253,7 +253,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 COrder_Built::~COrder_Built()
 {
-	CancelBuilt(*this, NULL);
+	CancelBuilt(*this, nullptr);
 }
 
 /* virtual */ void COrder_Built::Execute(CUnit &unit)
@@ -351,7 +351,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
 
-	Assert(cframe != NULL);
+	Assert(cframe != nullptr);
 
 	if (cframe != this->Frame) {
 		this->Frame = cframe;

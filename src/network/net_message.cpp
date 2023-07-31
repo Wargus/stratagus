@@ -727,7 +727,7 @@ size_t CNetworkChat::Deserialize(const unsigned char *buf)
 size_t CNetworkChat::Size() const
 {
 	size_t size = 0;
-	size += serialize(NULL, this->Text);
+	size += serialize(nullptr, this->Text);
 	return size;
 }
 
@@ -816,7 +816,7 @@ size_t CNetworkSelection::Size() const
 
 size_t CNetworkPacketHeader::Serialize(unsigned char *p) const
 {
-	if (p != NULL) {
+	if (p != nullptr) {
 		for (int i = 0; i != MaxNetworkCommands; ++i) {
 			p += serialize8(p, this->Type[i]);
 		}
@@ -870,9 +870,9 @@ size_t CNetworkPacket::Size(int numcommands) const
 {
 	size_t size = 0;
 
-	size += this->Header.Serialize(NULL);
+	size += this->Header.Serialize(nullptr);
 	for (int i = 0; i != numcommands; ++i) {
-		size += serialize(NULL, this->Command[i]);
+		size += serialize(nullptr, this->Command[i]);
 	}
 	return size;
 }

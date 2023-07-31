@@ -37,7 +37,7 @@ class CFont;
 class CUITimer
 {
 public:
-	CUITimer() : X(0), Y(0), Font(NULL) {}
+	CUITimer() : X(0), Y(0), Font(nullptr) {}
 
 	void Draw(int second) const;
 

@@ -134,7 +134,7 @@ private:
 /* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
 {
 	CUnit *goal = this->GetGoal();
-	if (goal == NULL) {
+	if (goal == nullptr) {
 		return;
 	}
 	if (IsTargetInRange(unit)(goal) == false) {
@@ -262,7 +262,7 @@ private:
 **  @param unit   unit which can repair.
 **  @param range  range to find a repairable unit.
 **
-**  @return       unit to repair if found, NULL otherwise
+**  @return       unit to repair if found, nullptr otherwise
 **
 **  @todo         FIXME: find the best unit (most damaged, ...).
 */
@@ -287,18 +287,18 @@ bool AutoRepair(CUnit &unit)
 	}
 	CUnit *repairedUnit = UnitToRepairInRange(unit, repairRange);
 
-	if (repairedUnit == NULL) {
+	if (repairedUnit == nullptr) {
 		return false;
 	}
 	const Vec2i invalidPos(-1, -1);
-	COrder *savedOrder = NULL;
+	COrder *savedOrder = nullptr;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 
 	//Command* will clear unit.SavedOrder
 	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
-	if (savedOrder != NULL) {
+	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
 	return true;
@@ -314,7 +314,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	// Removed units can only attack in AttackRange, from bunker
 	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
 
-	if (autoAttackUnit == NULL) {
+	if (autoAttackUnit == nullptr) {
 		return false;
 	}
 
@@ -364,10 +364,10 @@ bool AutoAttack(CUnit &unit)
 	// Normal units react in reaction range.
 	CUnit *goal = AttackUnitsInReactRange(unit);
 
-	if (goal == NULL) {
+	if (goal == nullptr) {
 		return false;
 	}
-	COrder *savedOrder = NULL;
+	COrder *savedOrder = nullptr;
 
 	if (unit.CurrentAction() == UnitActionStill) {
 		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
@@ -375,9 +375,9 @@ bool AutoAttack(CUnit &unit)
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands);
 
-	if (savedOrder != NULL) {
+	if (savedOrder != nullptr) {
 		unit.SavedOrder = savedOrder;
 	}
 	return true;
@@ -388,7 +388,7 @@ bool AutoAttack(CUnit &unit)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
-		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
+		&& (unit.Container == nullptr || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		return ;
 	}
 	this->Finished = false;

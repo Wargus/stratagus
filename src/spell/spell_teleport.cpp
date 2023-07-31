@@ -60,9 +60,9 @@
 {
 	if (Map.Info.IsPointOnMap(goalPos)) {
 		unsigned int selected = caster.Selected;
-		caster.Remove(NULL);
+		caster.Remove(nullptr);
 		caster.tilePos = goalPos;
-		DropOutNearest(caster, goalPos, NULL);
+		DropOutNearest(caster, goalPos, nullptr);
 		if (selected) {
 			SelectUnit(caster);
 		}

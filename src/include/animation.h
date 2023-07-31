@@ -94,12 +94,12 @@ enum SetVar_ModifyTypes {
 class CAnimation
 {
 public:
-	CAnimation(AnimationType type) : Type(type), Next(NULL) {}
+	CAnimation(AnimationType type) : Type(type), Next(nullptr) {}
 
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char *s, lua_State *l = NULL) {}
+	virtual void Init(const char *s, lua_State *l = nullptr) {}
 
 	const AnimationType Type;
 	CAnimation *Next;
@@ -108,9 +108,9 @@ public:
 class CAnimations
 {
 public:
-	CAnimations() : Attack(NULL), RangedAttack(NULL), Build(NULL), Move(NULL), Repair(NULL),
-		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
-		Train(NULL), Upgrade(NULL), hasDeathAnimation(false)
+	CAnimations() : Attack(nullptr), RangedAttack(nullptr), Build(nullptr), Move(nullptr), Repair(nullptr),
+		Research(nullptr), SpellCast(nullptr), Start(nullptr), Still(nullptr),
+		Train(nullptr), Upgrade(nullptr), hasDeathAnimation(false)
 	{
 		memset(Death, 0, sizeof(Death));
 		memset(Harvest, 0, sizeof(Harvest));

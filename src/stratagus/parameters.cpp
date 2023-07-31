@@ -65,7 +65,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 		}
 	}
 	char data_path[4096] = {'\0'};
-	SHGetFolderPathA(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, data_path);
+	SHGetFolderPathA(nullptr, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, nullptr, 0, data_path);
 	if (data_path[0]) {
 		userDirectory = std::string(data_path) + "/Stratagus";
 	} else if (getenv("APPDATA")) {
@@ -90,7 +90,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 
 static std::string GetLocalPlayerNameFromEnv()
 {
-	const char *userName = NULL;
+	const char *userName = nullptr;
 
 #ifdef USE_WIN32
 	userName = getenv("USERNAME");

@@ -380,12 +380,12 @@ void InitAStar(int mapWidth, int mapHeight)
 void FreeAStar()
 {
 	aligned_free(AStarMatrix);
-	AStarMatrix = NULL;
+	AStarMatrix = nullptr;
 	aligned_free(OpenSet);
-	OpenSet = NULL;
+	OpenSet = nullptr;
 	OpenSetSize = 0;
 	aligned_free(CostMoveToCache);
-	CostMoveToCache = NULL;
+	CostMoveToCache = nullptr;
 
 	ProfilePrint();
 }

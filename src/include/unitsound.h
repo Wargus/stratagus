@@ -54,8 +54,8 @@ class CSound;
 class SoundConfig
 {
 public:
-	SoundConfig() : Sound(NULL) {}
-	SoundConfig(std::string name) : Name(name), Sound(NULL) {}
+	SoundConfig() : Sound(nullptr) {}
+	SoundConfig(std::string name) : Name(name), Sound(nullptr) {}
 
 	bool MapSound();
 	void SetSoundRange(unsigned char range);

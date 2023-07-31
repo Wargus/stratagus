@@ -68,7 +68,7 @@ struct CompareUnitDistance {
 */
 static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *location)
 {
-	Assert(location != NULL);
+	Assert(location != nullptr);
 
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
@@ -125,7 +125,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		} else if (!strcmp(value, "missile")) {
 			value = LuaToString(l, -1, j + 1);
 			this->Missile = MissileTypeByIdent(value);
-			if (this->Missile == NULL) {
+			if (this->Missile == nullptr) {
 				DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value);
 			}
 		} else {
@@ -133,7 +133,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		}
 	}
 	// Now, checking value.
-	if (this->Missile == NULL) {
+	if (this->Missile == nullptr) {
 		LuaError(l, "Use a missile for spawn-missile (with missile)");
 	}
 }
