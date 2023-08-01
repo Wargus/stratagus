@@ -38,7 +38,7 @@ class COrder_Built : public COrder
 {
 	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Built() : COrder(UnitActionBuilt), ProgressCounter(0), IsCancelled(false), Frame(NULL) {}
+	COrder_Built() : COrder(UnitActionBuilt), ProgressCounter(0), IsCancelled(false), Frame(nullptr) {}
 	~COrder_Built();
 
 	virtual COrder_Built *Clone() const { return new COrder_Built(*this); }

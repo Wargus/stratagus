@@ -55,7 +55,7 @@ public:
 class TitleScreen
 {
 public:
-	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(NULL) {}
+	TitleScreen() : StretchImage(true), Timeout(0), Iterations(0), Editor(0), Labels(nullptr) {}
 	~TitleScreen()
 	{
 		if (this->Labels) {

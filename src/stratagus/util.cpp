@@ -218,7 +218,7 @@ uint32_t fletcher32(const std::string &content)
 #ifndef HAVE_STRCPYS
 errno_t strcpy_s(char *dst, size_t dstsize, const char *src)
 {
-	if (dst == NULL || src == NULL) {
+	if (dst == nullptr || src == nullptr) {
 		return EINVAL;
 	}
 	if (strlen(src) >= dstsize) {
@@ -247,7 +247,7 @@ size_t strnlen(const char *str, size_t strsize) noexcept
 #ifndef HAVE_STRNCPYS
 errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 {
-	if (dst == NULL || src == NULL || dstsize == 0) {
+	if (dst == nullptr || src == nullptr || dstsize == 0) {
 		return EINVAL;
 	}
 
@@ -276,7 +276,7 @@ errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t count)
 #ifndef HAVE_STRCATS
 errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 {
-	if (dst == NULL || src == NULL) {
+	if (dst == nullptr || src == nullptr) {
 		return EINVAL;
 	}
 	char *enddst = dst;
@@ -303,14 +303,14 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 **  @param a  String to search in
 **  @param b  Substring to search for
 **
-**  @return   Pointer to first occurrence of b or NULL if not found.
+**  @return   Pointer to first occurrence of b or nullptr if not found.
 */
 const char *strcasestr(const char *a, const char *b) noexcept
 {
 	int x;
 
 	if (!a || !*a || !b || !*b || strlen(a) < strlen(b)) {
-		return NULL;
+		return nullptr;
 	}
 
 	x = 0;
@@ -325,7 +325,7 @@ const char *strcasestr(const char *a, const char *b) noexcept
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 #endif // !HAVE_STRCASESTR
 
@@ -371,7 +371,7 @@ int getopt(int argc, char *const *argv, const char *opts) noexcept
 	int c;
 	const char *cp;
 
-	optarg = NULL;
+	optarg = nullptr;
 
 	if (sp == 1) {
 		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
@@ -382,7 +382,7 @@ int getopt(int argc, char *const *argv, const char *opts) noexcept
 		}
 	}
 	optopt = c = argv[optind][sp];
-	if (c == ':' || (cp = strchr(opts, c)) == NULL) {
+	if (c == ':' || (cp = strchr(opts, c)) == nullptr) {
 		getopt_err(argv[0], ": illegal option -", (char)c);
 		cp = "xx"; /* make the next if false */
 		c = '?';
@@ -657,7 +657,7 @@ std::string GetExecutablePath()
 #ifdef WIN32
 	char executable_path[MAX_PATH];
 	memset(executable_path, 0, sizeof(executable_path));
-	GetModuleFileName(NULL, executable_path, sizeof(executable_path)-1);
+	GetModuleFileName(nullptr, executable_path, sizeof(executable_path)-1);
 #else
 	char *executable_path = const_cast<char*>(OriginalArgv[0].c_str());
 #endif

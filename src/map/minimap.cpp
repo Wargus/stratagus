@@ -143,7 +143,7 @@ void CMinimap::Create()
     SDL_SetSurfaceBlendMode(MinimapFogSurface, SDL_BLENDMODE_BLEND);
 	
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-	SDL_FillRect(MinimapFogSurface, NULL, fogColorSolid);
+	SDL_FillRect(MinimapFogSurface, nullptr, fogColorSolid);
 	
 	UpdateTerrain();
 
@@ -377,14 +377,14 @@ void CMinimap::Update()
 
 	// Clear Minimap background if not transparent
 	if (!Transparent) {
-		SDL_FillRect(MinimapSurface, NULL, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
+		SDL_FillRect(MinimapSurface, nullptr, SDL_MapRGB(MinimapSurface->format, 0, 0, 0));
 	}
 
 	//
 	// Draw the terrain
 	//
 	if (WithTerrain) {
-		SDL_BlitSurface(MinimapTerrainSurface, NULL, MinimapSurface, NULL);
+		SDL_BlitSurface(MinimapTerrainSurface, nullptr, MinimapSurface, nullptr);
 	}
 	const uint32_t fogColorSDL = FogOfWar->GetFogColorSDL();
 	if (!ReplayRevealMap) {
@@ -444,7 +444,7 @@ static void DrawEvents()
 void CMinimap::Draw() const
 {
 	SDL_Rect drect = {Sint16(X), Sint16(Y), 0, 0};
-	SDL_BlitSurface(MinimapSurface, NULL, TheScreen, &drect);
+	SDL_BlitSurface(MinimapSurface, nullptr, TheScreen, &drect);
 
 	DrawEvents();
 }
@@ -487,21 +487,21 @@ void CMinimap::Destroy()
 	if (MinimapTerrainSurface) {
 		VideoPaletteListRemove(MinimapTerrainSurface);
 		SDL_FreeSurface(MinimapTerrainSurface);
-		MinimapTerrainSurface = NULL;
+		MinimapTerrainSurface = nullptr;
 	}
 	if (MinimapSurface) {
 		VideoPaletteListRemove(MinimapSurface);
 		SDL_FreeSurface(MinimapSurface);
-		MinimapSurface = NULL;
+		MinimapSurface = nullptr;
 	}
-	if (MinimapFogSurface && MinimapFogSurface->format != NULL) {
+	if (MinimapFogSurface && MinimapFogSurface->format != nullptr) {
 		SDL_FreeSurface(MinimapFogSurface);
-		MinimapFogSurface = NULL;
+		MinimapFogSurface = nullptr;
 	}
 	delete[] Minimap2MapX;
-	Minimap2MapX = NULL;
+	Minimap2MapX = nullptr;
 	delete[] Minimap2MapY;
-	Minimap2MapY = NULL;
+	Minimap2MapY = nullptr;
 }
 
 /**

@@ -318,7 +318,7 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL), Tileset(NULL)
+CMap::CMap() : Fields(nullptr), NoFogOfWar(false), TileGraphic(nullptr), Tileset(nullptr)
 {
 }
 
@@ -363,12 +363,12 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	// Tileset freed by Tileset?
 
 	this->Info.Clear();
-	this->Fields = NULL;
+	this->Fields = nullptr;
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);
-	this->TileGraphic = NULL;
+	this->TileGraphic = nullptr;
 
 	FlagRevealMap = MapRevealModes::cHidden;
 	ReplayRevealMap = 0;

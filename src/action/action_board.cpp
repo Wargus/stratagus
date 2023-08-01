@@ -223,7 +223,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 {
 	CUnit *transporter = order.GetGoal();
 
-	Assert(transporter != NULL);
+	Assert(transporter != nullptr);
 
 	if (!transporter->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Transporter gone\n");

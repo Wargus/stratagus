@@ -333,8 +333,8 @@ bool COrder_Attack::IsAttackGroundOrWall() const
 
 CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
 {
-	Assert(target1 != NULL);
-	Assert(target2 != NULL);
+	Assert(target1 != nullptr);
+	Assert(target2 != nullptr);
 
 	return (GameSettings.SimplifiedAutoTargeting 
 				? ((TargetPriorityCalculate(&unit, target1) > TargetPriorityCalculate(&unit, target2)) ? target1 : target2)
@@ -350,7 +350,7 @@ CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, 
 */
 void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 {
-	Assert(target != NULL);
+	Assert(target != nullptr);
 	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
 	
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
@@ -358,10 +358,10 @@ void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 	if (immobile && !InAttackRange(unit, *target)) {
 		return;
 	}
-	CUnit *best = (this->offeredTarget != NULL && this->offeredTarget->IsVisibleAsGoal(*unit.Player))
+	CUnit *best = (this->offeredTarget != nullptr && this->offeredTarget->IsVisibleAsGoal(*unit.Player))
 				? BestTarget(unit, this->offeredTarget, target)
 				: target;
-	if (this->offeredTarget != NULL) {
+	if (this->offeredTarget != nullptr) {
 		this->offeredTarget.Reset();
 	}
 	this->offeredTarget = best;
@@ -404,7 +404,7 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 **  Turn unit to Target or position on map for attack.
 **
 **  @param unit    Unit to turn.
-**  @param target  Turn to this Target. If NULL then turn to goalPos.
+**  @param target  Turn to this Target. If nullptr then turn to goalPos.
 **
 */
 void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
@@ -434,7 +434,7 @@ void COrder_Attack::TurnToTarget(CUnit &unit, const CUnit *target)
 **  Also if there is no active target Attack-Move action will be saved.
 **
 **  @param unit    Attacker.
-**  @param target  Turn to this Target. If NULL then turn to goalPos.
+**  @param target  Turn to this Target. If nullptr then turn to goalPos.
 **
 */
 void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
@@ -473,12 +473,12 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	// if unit can't attack, or if unit is not bunkered and removed - exit, no targets
 	if (unit.Type->CanAttack == false
 		|| (unit.Removed
-			&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false))) {
+			&& (unit.Container == nullptr || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false))) {
 		this->offeredTarget.Reset();
 		return false;
 	}
 	CUnit *goal = this->GetGoal();
-	CUnit *newTarget = NULL;
+	CUnit *newTarget = nullptr;
 	if (unit.Selected)
 	{
 		DebugPrint("UnderAttack counter: %d \n" _C_ unit.UnderAttack);
@@ -492,7 +492,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		newTarget = AttackUnitsInReactRange(unit); // search for enemies in reaction range
 	}
 	/// If we have target offered from outside - try it
-	if (this->offeredTarget != NULL) {
+	if (this->offeredTarget != nullptr) {
 		if (this->offeredTarget->IsVisibleAsGoal(*unit.Player)
 			&& (!immobile || InAttackRange(unit, *this->offeredTarget))) {
 
@@ -759,7 +759,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			&& InAttackRange(unit, this->goalPos)) {
 
 			// Reached wall or ground, now attacking it
-			TurnToTarget(unit, NULL);
+			TurnToTarget(unit, nullptr);
 			this->State &= AUTO_TARGETING;
 			this->State |= ATTACK_TARGET;
 			return;

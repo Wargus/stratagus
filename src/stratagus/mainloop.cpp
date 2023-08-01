@@ -164,7 +164,7 @@ void DrawMapArea(const fieldHighlightChecker highlightChecker = nullptr)
 		// Center viewport on tracked unit
 		if (vp->Unit) {
 			if (vp->Unit->Destroyed || vp->Unit->CurrentAction() == UnitActionDie) {
-				vp->Unit = NULL;
+				vp->Unit = nullptr;
 			} else {
 				vp->Center(vp->Unit->GetMapPixelPosCenter());
 			}

@@ -260,7 +260,7 @@ static int CclGroup(lua_State *l)
 	const int args = lua_rawlen(l, 3);
 	for (int j = 0; j < args; ++j) {
 		const char *str = LuaToString(l, 3, j + 1);
-		grp.add(UnitManager->GetSlotUnit(strtol(str + 1, NULL, 16)), grpNum);
+		grp.add(UnitManager->GetSlotUnit(strtol(str + 1, nullptr, 16)), grpNum);
 	}
 	return 0;
 }

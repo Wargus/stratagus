@@ -132,7 +132,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 	// Now, sort them, best first.
 	while (!res.empty()) {
 		float bestscore = 0;
-		CUnitType *besttype = NULL;
+		CUnitType *besttype = nullptr;
 
 		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
 			CUnitType &type = **i;
@@ -364,7 +364,7 @@ static CAiType *GetAiTypesByName(const char *name)
 			return ait;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -491,7 +491,7 @@ static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 			return &AiPlayer->UnitTypeRequests[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -614,7 +614,7 @@ static int CclAiDebugPlayer(lua_State *l)
 		if (lua_isstring(l, j + 1)) {
 			item = LuaToString(l, j + 1);
 		} else {
-			item = NULL;
+			item = nullptr;
 		}
 		if (item && !strcmp(item, "none")) {
 			for (int i = 0; i != NumPlayers; ++i) {
@@ -1368,7 +1368,7 @@ static int CclAiResearch(lua_State *l)
 		upgrade = CUpgrade::Get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
-		upgrade = NULL;
+		upgrade = nullptr;
 	}
 	InsertResearchRequests(upgrade);
 	lua_pushboolean(l, 0);
@@ -1679,7 +1679,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		if (!strcmp(value, "ai-type")) {
 			const char *aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
-			if (ait == NULL) {
+			if (ait == nullptr) {
 				LuaError(l, "ai-type not found: %s" _C_ aiName);
 			}
 			ai->AiType = ait;
@@ -1935,7 +1935,7 @@ static CTCPSocket * AiProcessorSendState(lua_State *l, char prefix)
 {
 	LuaCheckArgs(l, 3);
 	CTCPSocket *s = (CTCPSocket *)lua_touserdata(l, 1);
-	if (s == NULL) {
+	if (s == nullptr) {
 		LuaError(l, "first argument must be valid handle returned from a previous AiProcessorSetup call");
 	}
 

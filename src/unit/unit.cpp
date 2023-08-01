@@ -119,7 +119,7 @@
 **
 **  CUnit::Container
 **
-**  Pointer to the unit containing it, or NULL if the unit is
+**  Pointer to the unit containing it, or nullptr if the unit is
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
@@ -127,7 +127,7 @@
 **
 **  Pointer to the last unit added inside. Order doesn't really
 **  matter. All units inside are kept in a circular linked list.
-**  This is NULL if there are no units inside. Multiple levels
+**  This is nullptr if there are no units inside. Multiple levels
 **  of inclusion are allowed, though not very useful right now
 **
 **  CUnit::NextContained, CUnit::PrevContained
@@ -319,7 +319,7 @@
 **
 **  CUnit::RescuedFrom
 **
-**  Pointer to the original owner of a unit. It will be NULL if
+**  Pointer to the original owner of a unit. It will be nullptr if
 **  the unit was not rescued.
 **
 **  CUnit::Orders
@@ -408,22 +408,22 @@ void CUnit::Init()
 	PlayerSlot = static_cast<size_t>(-1);
 	InsideCount = 0;
 	BoardCount = 0;
-	UnitInside = NULL;
-	Container = NULL;
-	NextContained = NULL;
-	PrevContained = NULL;
-	NextWorker = NULL;
+	UnitInside = nullptr;
+	Container = nullptr;
+	NextContained = nullptr;
+	PrevContained = nullptr;
+	NextWorker = nullptr;
 
-	Resource.Workers = NULL;
+	Resource.Workers = nullptr;
 	Resource.Assigned = 0;
 	Resource.Active = 0;
 
 	tilePos.x = 0;
 	tilePos.y = 0;
 	Offset = 0;
-	Type = NULL;
-	Player = NULL;
-	Stats = NULL;
+	Type = nullptr;
+	Player = nullptr;
+	Stats = nullptr;
 	CurrentSightRange = 0;
 
 	delete pathFinderData;
@@ -457,11 +457,11 @@ void CUnit::Init()
 	MineLow = 0;
 	ZDisplaced = 0;
 	TeamSelected = 0;
-	RescuedFrom = NULL;
+	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
 	delete Variable;
-	Variable = NULL;
+	Variable = nullptr;
 	TTL = 0;
 	GroupId = 0;
 	LastGroup = 0;
@@ -472,20 +472,20 @@ void CUnit::Init()
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	Orders.clear();
 	delete SavedOrder;
-	SavedOrder = NULL;
+	SavedOrder = nullptr;
 	delete NewOrder;
-	NewOrder = NULL;
+	NewOrder = nullptr;
 	delete CriticalOrder;
-	CriticalOrder = NULL;
+	CriticalOrder = nullptr;
 	delete AutoCastSpell;
-	AutoCastSpell = NULL;
+	AutoCastSpell = nullptr;
 	delete SpellCoolDownTimers;
-	SpellCoolDownTimers = NULL;
-	Goal = NULL;
+	SpellCoolDownTimers = nullptr;
+	Goal = nullptr;
 }
 
 CUnit::~CUnit() {
-	Type = NULL;
+	Type = nullptr;
 
 	delete pathFinderData;
 	delete[] AutoCastSpell;
@@ -555,24 +555,24 @@ void CUnit::Release(bool final)
 	// read a BoolFlag; there are more instances of this...)
 	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
 		COrder *orderToDelete = *order;
-		*order = NULL;
+		*order = nullptr;
 		delete orderToDelete;
 	}
 	Orders.clear();
 
-	if (SavedOrder != NULL) {
+	if (SavedOrder != nullptr) {
 		COrder *order = SavedOrder;
-		SavedOrder = NULL;
+		SavedOrder = nullptr;
 		delete order;
 	}
-	if (NewOrder != NULL) {
+	if (NewOrder != nullptr) {
 		COrder *order = NewOrder;
-		NewOrder = NULL;
+		NewOrder = nullptr;
 		delete order;
 	}
-	if (CriticalOrder != NULL) {
+	if (CriticalOrder != nullptr) {
 		COrder *order = CriticalOrder;
-		CriticalOrder = NULL;
+		CriticalOrder = nullptr;
 		delete order;
 	}
 
@@ -645,7 +645,7 @@ void CUnit::Init(const CUnitType &type)
 		Variable = new CVariable[size];
 		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
 	} else {
-		Variable = NULL;
+		Variable = nullptr;
 	}
 
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
@@ -679,12 +679,12 @@ void CUnit::Init(const CUnitType &type)
 
 	Orders.push_back(COrder::NewActionStill());
 
-	Assert(NewOrder == NULL);
-	NewOrder = NULL;
-	Assert(SavedOrder == NULL);
-	SavedOrder = NULL;
-	Assert(CriticalOrder == NULL);
-	CriticalOrder = NULL;
+	Assert(NewOrder == nullptr);
+	NewOrder = nullptr;
+	Assert(SavedOrder == nullptr);
+	SavedOrder = nullptr;
+	Assert(CriticalOrder == nullptr);
+	CriticalOrder = nullptr;
 }
 
 /**
@@ -696,13 +696,13 @@ bool CUnit::RestoreOrder()
 {
 	COrder *savedOrder = this->SavedOrder;
 
-	if (savedOrder == NULL) {
+	if (savedOrder == nullptr) {
 		return false;
 	}
 
 	if (savedOrder->IsValid() == false) {
 		delete savedOrder;
-		this->SavedOrder = NULL;
+		this->SavedOrder = nullptr;
 		return false;
 	}
 
@@ -713,7 +713,7 @@ bool CUnit::RestoreOrder()
 	//copy
 	this->Orders.insert(this->Orders.begin() + 1, savedOrder);
 
-	this->SavedOrder = NULL;
+	this->SavedOrder = nullptr;
 	return true;
 }
 
@@ -729,7 +729,7 @@ bool CUnit::CanStoreOrder(COrder *order)
 	if ((order && order->Finished == true) || order->IsValid() == false) {
 		return false;
 	}
-	if (this->SavedOrder != NULL) {
+	if (this->SavedOrder != nullptr) {
 		return false;
 	}
 	return true;
@@ -795,8 +795,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 {
 	CUnit *unit = UnitManager->AllocUnit();
-	if (unit == NULL) {
-		return NULL;
+	if (unit == nullptr) {
+		return nullptr;
 	}
 	unit->Init(type);
 	// Only Assign if a Player was specified
@@ -1092,7 +1092,7 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 */
 void CUnit::AddInContainer(CUnit &host)
 {
-	Assert(Container == NULL);
+	Assert(Container == nullptr);
 	Container = &host;
 	if (!Type) {
 		// if we're loading a game, the Type may not have been initialized
@@ -1140,13 +1140,13 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	unit.NextContained->PrevContained = unit.PrevContained;
 	unit.PrevContained->NextContained = unit.NextContained;
 	if (host->InsideCount == 0) {
-		host->UnitInside = NULL;
+		host->UnitInside = nullptr;
 	} else {
 		if (host->UnitInside == &unit) {
 			host->UnitInside = unit.NextContained;
 		}
 	}
-	unit.Container = NULL;
+	unit.Container = nullptr;
 }
 
 
@@ -1244,7 +1244,7 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 {
 	CUnit *unit = MakeUnit(type, player);
 
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		unit->Place(pos);
 	}
 	return unit;
@@ -1358,7 +1358,7 @@ void CUnit::Remove(CUnit *host)
 
 	// Unit is seen as under cursor
 	if (UnitUnderCursor == this) {
-		UnitUnderCursor = NULL;
+		UnitUnderCursor = nullptr;
 	}
 }
 
@@ -1463,11 +1463,11 @@ void UnitLost(CUnit &unit)
 	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
-	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
-	if (b != NULL) {
+	CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
+	if (b != nullptr) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
-			if (temp == NULL) {
+			if (temp == nullptr) {
 				DebugPrint("Unable to allocate Unit\n");
 			} else {
 				temp->ResourcesHeld = unit.ResourcesHeld;
@@ -1597,7 +1597,7 @@ void CorrectWallDirections(CUnit &unit)
 			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 			const CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-			if (neighboor != NULL) {
+			if (neighboor != nullptr) {
 				flags |= dirFlag;
 			}
 		}
@@ -1625,7 +1625,7 @@ void CorrectWallNeighBours(CUnit &unit)
 		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 		CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
-		if (neighboor != NULL) {
+		if (neighboor != nullptr) {
 			CorrectWallDirections(*neighboor);
 			UnitUpdateHeading(*neighboor);
 		}
@@ -1959,7 +1959,7 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 	if (IsMineAssignedBy(mine, *this) == true) {
 		return;
 	}
-	Assert(this->NextWorker == NULL);
+	Assert(this->NextWorker == nullptr);
 
 	CUnit *head = mine.Resource.Workers;
 #if 0
@@ -1980,7 +1980,7 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 	if (IsMineAssignedBy(mine, *this) == false) {
 		return ;
 	}
-	CUnit *prev = NULL, *worker = mine.Resource.Workers;
+	CUnit *prev = nullptr, *worker = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
 			   _C_ this->Player->Index _C_ this->Slot
@@ -1988,10 +1988,10 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 			   _C_ mine.Slot
 			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
-	for (int i = 0; NULL != worker; worker = worker->NextWorker, ++i) {
+	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
 		if (worker == this) {
 			CUnit *next = worker->NextWorker;
-			worker->NextWorker = NULL;
+			worker->NextWorker = nullptr;
 			if (prev) {
 				prev->NextWorker = next;
 			}
@@ -2427,7 +2427,7 @@ void DropOutAll(const CUnit &source)
 */
 CUnit *UnitOnScreen(int x, int y)
 {
-	CUnit *candidate = NULL;
+	CUnit *candidate = nullptr;
 	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
@@ -2526,11 +2526,11 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 	// Handle Teleporter Destination Removal
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-		unit.Goal->Remove(NULL);
+		unit.Goal->Remove(nullptr);
 		UnitLost(*unit.Goal);
 		UnitClearOrders(*unit.Goal);
 		unit.Goal->Release();
-		unit.Goal = NULL;
+		unit.Goal = nullptr;
 	}
 
 	// Transporters lose or save their units and building their workers
@@ -2540,7 +2540,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		DestroyAllInside(unit);
 	}
 
-	unit.Remove(NULL);
+	unit.Remove(nullptr);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 
@@ -2662,8 +2662,8 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest)
 {
-	Assert(attacker != NULL);
-	Assert(dest != NULL);
+	Assert(attacker != nullptr);
+	Assert(dest != nullptr);
 
 	const CPlayer &player 	= *attacker->Player;
 	const CUnitType &type 	= *attacker->Type;
@@ -2759,7 +2759,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 */
 bool InReactRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != NULL);
+	Assert(&target != nullptr);
 	const int distance 	= unit.MapDistanceTo(target);
 	const int range 	= (unit.Player->Type == PlayerTypes::PlayerPerson)
 						  ? unit.Type->ReactRangePerson
@@ -2777,7 +2777,7 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 */
 bool InAttackRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != NULL);
+	Assert(&target != nullptr);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
 	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target) 
@@ -2824,7 +2824,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 */
 Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
-	Assert(&dirUnit != NULL);
+	Assert(&dirUnit != nullptr);
 	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
 	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
 }
@@ -3022,7 +3022,7 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
 	
 	if (target.IsAgressive()) { 
-		CommandAttack(target, pos, NULL, 0); /// Attack-move to pos
+		CommandAttack(target, pos, nullptr, 0); /// Attack-move to pos
 	} else {
 		CommandMove(target, pos, 0); /// Run away to pos
 	}
@@ -3077,16 +3077,16 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 				return;
 			}
-			COrder *savedOrder = NULL;
+			COrder *savedOrder = nullptr;
 			if (targetCurrAction == UnitActionStill || targetCurrAction == UnitActionStandGround) {
 				savedOrder = COrder::NewActionAttack(target, target.tilePos);
 			} else if (target.CanStoreOrder(target.CurrentOrder())) {
 				savedOrder = target.CurrentOrder()->Clone();
 			}
 			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-			CommandAttack(target, posToAttack, NULL, FlushCommands);
+			CommandAttack(target, posToAttack, nullptr, FlushCommands);
 
-			if (savedOrder != NULL) {
+			if (savedOrder != nullptr) {
 				target.SavedOrder = savedOrder;
 			}
 			break;
@@ -3524,12 +3524,12 @@ void CleanUnits()
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			continue;
 		}
 		if (!unit->Destroyed) {
 			if (!unit->Removed) {
-				unit->Remove(NULL);
+				unit->Remove(nullptr);
 			}
 			UnitClearOrders(*unit);
 		}

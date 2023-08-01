@@ -367,7 +367,7 @@ static int CclSetTitleScreens(lua_State *l)
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
-		TitleScreens = NULL;
+		TitleScreens = nullptr;
 	}
 
 	const int args = lua_gettop(l);
@@ -529,8 +529,8 @@ static CContentType *CclParseContent(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
-	CContentType *content = NULL;
-	ConditionPanel *condition = NULL;
+	CContentType *content = nullptr;
+	ConditionPanel *condition = nullptr;
 	PixelPos pos(0, 0);
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -766,7 +766,7 @@ static int CclSetFancyBuildings(lua_State *l)
 **
 **  @param style  Name of the style to find.
 **
-**  @return       Button style, NULL if not found.
+**  @return       Button style, nullptr if not found.
 */
 ButtonStyle *FindButtonStyle(const std::string &style)
 {
@@ -1195,11 +1195,11 @@ void SelectionChanged()
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 	CurrentButtonLevel = 0;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
-	CursorBuilding = NULL;
+	CursorBuilding = nullptr;
 	CursorState = CursorStatePoint;
 	UI.ButtonPanel.Update();
 }

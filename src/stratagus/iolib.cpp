@@ -164,7 +164,7 @@ int CFile::printf(const char *format, ...)
 {
 	int size = 500;
 	char *p = new char[size];
-	if (p == NULL) {
+	if (p == nullptr) {
 		return -1;
 	}
 	while (1) {
@@ -185,7 +185,7 @@ int CFile::printf(const char *format, ...)
 		}
 		delete[] p;
 		p = new char[size];
-		if (p == NULL) {
+		if (p == nullptr) {
 			return -1;
 		}
 	}
@@ -728,7 +728,7 @@ int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 	struct dirent *dp;
 
 	if (dirp) {
-		while ((dp = readdir(dirp)) != NULL) {
+		while ((dp = readdir(dirp)) != nullptr) {
 			filename = dp->d_name;
 #else
 	strcat_s(buffer, sizeof(buffer), "*.*");

@@ -55,8 +55,8 @@ class Job
 public:
 	virtual ~Job() {}
 
-	void Run() { pthread_create(&tid, NULL, Job::ThreadRun, this); }
-	void Wait() { pthread_join(tid, NULL); }
+	void Run() { pthread_create(&tid, nullptr, Job::ThreadRun, this); }
+	void Wait() { pthread_join(tid, nullptr); }
 
 private:
 	virtual void DoJob() = 0;
@@ -65,7 +65,7 @@ private:
 	{
 		Job *that = reinterpret_cast<Job*>(data);
 		that->DoJob();
-		return NULL;
+		return nullptr;
 	}
 
 private:
@@ -104,7 +104,7 @@ void TCPRead(Socket socket, T *obj)
 class ServerTCP
 {
 public:
-	explicit ServerTCP(int port) { socket = NetOpenTCP(NULL, port); }
+	explicit ServerTCP(int port) { socket = NetOpenTCP(nullptr, port); }
 	~ServerTCP() { NetCloseTCP(socket); }
 
 	bool Listen() { return NetListenTCP(socket) != -1; }
@@ -126,7 +126,7 @@ private:
 class ClientTCP
 {
 public:
-	explicit ClientTCP(int port) { socket = NetOpenTCP(NULL, port); }
+	explicit ClientTCP(int port) { socket = NetOpenTCP(nullptr, port); }
 	~ClientTCP() { NetCloseTCP(socket); }
 
 	bool Connect(const char *host, int port) { return NetConnectTCP(socket, NetResolveHost(host), port) != -1; }

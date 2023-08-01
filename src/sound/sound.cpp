@@ -94,15 +94,15 @@ static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 */
 static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 {
-	Mix_Chunk *result = NULL;
+	Mix_Chunk *result = nullptr;
 
 	if (!sound || !SoundEnabled()) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (sound->Number == TWO_GROUPS) {
 		// handle a special sound (selection)
-		if (SelectionHandler.Sound != NULL && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
+		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
 			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
@@ -137,7 +137,7 @@ static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 		result = SimpleChooseSample(*sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
 			SelectionHandler.HowMany = 0;
-			SelectionHandler.Sound = NULL;
+			SelectionHandler.Sound = nullptr;
 		}
 		if (selection) {
 			SelectionHandler.Source = source;
@@ -183,7 +183,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceWorkCompleted:
 			{
 				CSound *workCompleteSound = unit.Type->MapSound.WorkComplete.Sound;
-				if (workCompleteSound == NULL) {
+				if (workCompleteSound == nullptr) {
 					workCompleteSound = GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 				}
 				return workCompleteSound;
@@ -357,7 +357,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 				  ((UI.SelectedViewport->MapWidth - 1) * PixelTileSize.x)) - 128;
 	clamp(&stereo, -128, 127);
 
-	Origin source = {NULL, 0};
+	Origin source = {nullptr, 0};
 	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
 	if (volume == 0) {
 		return;
@@ -382,7 +382,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	if (!sound) {
 		return;
 	}
-	Origin source = {NULL, 0};
+	Origin source = {nullptr, 0};
 
 	Mix_Chunk *sample = ChooseSample(sound, false, source);
 
@@ -406,13 +406,13 @@ static std::map<int, Mix_Chunk *> SampleMap;
 static void PlaySoundFileCallback(int channel)
 {
 	LuaActionListener *listener = ChannelMap[channel];
-	ChannelMap[channel] = NULL;
+	ChannelMap[channel] = nullptr;
 	// free any previously loaded sample that was playing on this channel before
 	if (SampleMap[channel]) {
 		FreeSample(SampleMap[channel]);
-		SampleMap[channel] = NULL;
+		SampleMap[channel] = nullptr;
 	}
-	if (listener != NULL) {
+	if (listener != nullptr) {
 		listener->action("");
 	}
 }
@@ -603,7 +603,7 @@ CSound::~CSound()
 			if (this->Sound.OneGroup[i]) {
 				FreeSample(this->Sound.OneGroup[i]);
 			}
-			this->Sound.OneGroup[i] = NULL;
+			this->Sound.OneGroup[i] = nullptr;
 		}
 		delete[] this->Sound.OneGroup;
 	}

@@ -197,7 +197,7 @@ enum {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 		this->ClearGoal();
-		goal = NULL;
+		goal = nullptr;
 		if (this->State == State_Defending) {
 			this->Finished = true;
 			return;

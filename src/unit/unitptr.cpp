@@ -53,7 +53,7 @@ void CUnitPtr::Reset()
 	if (unit) {
 		unit->RefsDecrease();
 	}
-	unit = NULL;
+	unit = nullptr;
 }
 
 CUnitPtr &CUnitPtr::operator= (CUnit *u)

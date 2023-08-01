@@ -83,7 +83,7 @@
 			HitUnit(&caster, *target, this->Damage);
 			if (this->SacrificeEnable) {
 				// No corpse.
-				caster.Remove(NULL);
+				caster.Remove(nullptr);
 				caster.Release();
 			}
 			return 1;
@@ -118,7 +118,7 @@
 	}
 	if (this->SacrificeEnable) {
 		// No corpse.
-		caster.Remove(NULL);
+		caster.Remove(nullptr);
 		caster.Release();
 	} else {
 		caster.Variable[MANA_INDEX].Value -= spell.ManaCost;

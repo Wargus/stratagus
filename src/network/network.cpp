@@ -417,7 +417,7 @@ void InitNetwork1()
 
 	// Our communication port
 	const int port = CNetworkParameter::Instance.localPort;
-	const char *NetworkAddr = NULL; // FIXME : bad use
+	const char *NetworkAddr = nullptr; // FIXME : bad use
 	const CHost host(NetworkAddr, port);
 	NetworkFildes.Open(host);
 	if (NetworkFildes.IsValid() == false) {
@@ -749,7 +749,7 @@ static bool IsAValidCommand_Command(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : NULL;
+	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : nullptr;
 
 	if (unit && (unit->Player->Index == player
 				 || Players[player].IsTeamed(*unit) || unit->Player->Type == PlayerTypes::PlayerNeutral)) {
@@ -764,7 +764,7 @@ static bool IsAValidCommand_Dismiss(const CNetworkPacket &packet, int index, con
 	CNetworkCommand nc;
 	nc.Deserialize(&packet.Command[index][0]);
 	const unsigned int slot = nc.Unit;
-	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : NULL;
+	const CUnit *unit = slot < UnitManager->GetUsedSlotCount() ? &UnitManager->GetSlotUnit(slot) : nullptr;
 
 	if (unit && unit->Type->ClicksToExplode) {
 		return true;
@@ -1004,7 +1004,7 @@ static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
 
 	nc.Deserialize(&ncq.Data[0]);
 	NetworkRemovePlayer(nc.player);
-	CommandLog("quit", NoUnitP, FlushCommands, nc.player, -1, NoUnitP, NULL, -1);
+	CommandLog("quit", NoUnitP, FlushCommands, nc.player, -1, NoUnitP, nullptr, -1);
 	CommandQuit(nc.player);
 }
 

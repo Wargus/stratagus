@@ -62,7 +62,7 @@
 	FindNearestDrop(*type, pos, resPos, LookingW);
 	if (SquareDistance(pos, resPos) <= square(range)) {
 		CUnit *target = MakeUnit(*type, &player);
-		if (target != NULL) {
+		if (target != nullptr) {
 			target->tilePos = resPos;
 			target->Place(resPos);
 			if (flags & SU_Summoned) {
@@ -76,7 +76,7 @@
 					CommandDefend(*target, unit, FlushCommands);
 				}
 			}
-			//DropOutOnSide(*target, LookingW, NULL);
+			//DropOutOnSide(*target, LookingW, nullptr);
 		} else {
 			DebugPrint("Unable to allocate Unit");
 		}

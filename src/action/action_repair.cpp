@@ -90,7 +90,7 @@
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	if (this->ReparableTarget != NULL) {
+	if (this->ReparableTarget != nullptr) {
 		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
 	}
 
@@ -133,7 +133,7 @@
 {
 	PixelPos targetPos;
 
-	if (this->ReparableTarget != NULL) {
+	if (this->ReparableTarget != nullptr) {
 		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
 	} else {
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
@@ -149,10 +149,10 @@
 	const CUnit &unit = *input.GetUnit();
 
 	input.SetMinRange(0);
-	input.SetMaxRange(ReparableTarget != NULL ? unit.Type->RepairRange : 0);
+	input.SetMaxRange(ReparableTarget != nullptr ? unit.Type->RepairRange : 0);
 
 	Vec2i tileSize;
-	if (ReparableTarget != NULL) {
+	if (ReparableTarget != nullptr) {
 		tileSize.x = ReparableTarget->Type->TileWidth;
 		tileSize.y = ReparableTarget->Type->TileHeight;
 		input.SetGoal(ReparableTarget->tilePos, tileSize);
@@ -255,9 +255,9 @@ static void AnimateActionRepair(CUnit &unit)
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
-						ReparableTarget = NULL;
+						ReparableTarget = nullptr;
 						this->ClearGoal();
-						goal = NULL;
+						goal = nullptr;
 					}
 				} else if (unit.Player->AiEnabled) {
 					// Ai players workers should stop if target is killed
@@ -292,8 +292,8 @@ static void AnimateActionRepair(CUnit &unit)
 					this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
 					// FIXME: should I clear this here?
 					this->ClearGoal();
-					ReparableTarget = NULL;
-					goal = NULL;
+					ReparableTarget = nullptr;
+					goal = nullptr;
 				} else {
 					const int dist = unit.MapDistanceTo(*goal);
 

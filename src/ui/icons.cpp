@@ -61,7 +61,7 @@ static IconMap Icons;   /// Map of ident to icon.
 /**
 **  CIcon constructor
 */
-CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident)
+CIcon::CIcon(const std::string &ident) : G(nullptr), GScale(nullptr), Frame(0), Ident(ident)
 {
 	this->PaletteSwaps.clear();
 }
@@ -87,7 +87,7 @@ CIcon::~CIcon()
 {
 	CIcon *&icon = Icons[ident];
 
-	if (icon == NULL) {
+	if (icon == nullptr) {
 		icon = new CIcon(ident);
 	}
 	return icon;
@@ -367,7 +367,7 @@ bool IconConfig::LoadNoLog()
 	}
 
 	Icon = CIcon::Get(Name);
-	return Icon != NULL;
+	return Icon != nullptr;
 }
 
 /**

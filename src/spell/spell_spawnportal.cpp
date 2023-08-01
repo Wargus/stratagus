@@ -59,7 +59,7 @@
 		}
 	}
 	// Now, checking value.
-	if (this->PortalType == NULL) {
+	if (this->PortalType == nullptr) {
 		LuaError(l, "Use a unittype for spawn-portal (with portal-type)");
 	}
 }

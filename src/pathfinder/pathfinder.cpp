@@ -288,7 +288,7 @@ int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange,
 							   dst.Type->TileWidth, dst.Type->TileHeight,
 							   src.Type->TileWidth, src.Type->TileHeight,
 							   minrange, range,
-							   NULL, 0, src);
+							   nullptr, 0, src);
 	SetAStarFixedEnemyUnitsUnpassable(false); /// restore Path Finder setting
 	switch (length) {
 		case PF_FAILED:
@@ -306,7 +306,7 @@ int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange,
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
+PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0),
 	isRecalculatePathNeeded(true)
 {
 	unitSize.x = 0;
@@ -412,7 +412,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 
 	// Update path if it was requested. Otherwise we may only want
 	// to know if there exists a path.
-	if (path != NULL) {
+	if (path != nullptr) {
 		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
 		output.OverflowLength = std::min<int>(i - output.Length, PathFinderOutput::MAX_OVERFLOW);
 		if (output.Length == 0) {

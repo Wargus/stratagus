@@ -134,7 +134,7 @@ bool SetStreamAndFdFromStdConsole(FILE *stream, int fd, DWORD std, bool input) {
     *stream = *stream_new;
 
     /* Disable bufferring */
-    setvbuf(stream, NULL, _IONBF, 0);
+    setvbuf(stream, nullptr, _IONBF, 0);
 
     return true;
 

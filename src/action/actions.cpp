@@ -151,7 +151,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (unit.CurrentAction() == UnitActionDie) {
 		unit.Seen.State = 3;
 	}
-	unit.Seen.CFrame = NULL;
+	unit.Seen.CFrame = nullptr;
 }
 
 /* virtual */ bool COrder::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
@@ -188,7 +188,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	}
 	CUnit *goal = AttackUnitsInRange(unit);
 
-	if (goal != NULL) {
+	if (goal != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 
 		FireMissile(unit, goal, invalidPos);
@@ -399,10 +399,10 @@ static void HandleUnitAction(CUnit &unit)
 {
 	// If current action is breakable proceed with next one.
 	if (!unit.Anim.Unbreakable) {
-		if (unit.CriticalOrder != NULL) {
+		if (unit.CriticalOrder != nullptr) {
 			unit.CriticalOrder->Execute(unit);
 			delete unit.CriticalOrder;
-			unit.CriticalOrder = NULL;
+			unit.CriticalOrder = nullptr;
 		}
 
 		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
@@ -424,7 +424,7 @@ static void HandleUnitAction(CUnit &unit)
 					// timfel: I observed this exactly once and could never reproduce it, so I don't know why this
 					// can happen, but in case it happens again, bring the unit back
 					DebugPrint("Dropping out stuck unit\n");
-					DropOutOnSide(unit, LookingW, NULL);
+					DropOutOnSide(unit, LookingW, nullptr);
 				} else {
 					DebugPrint("Flushing removed unit\n");
 					// This happens, if building with ALT+SHIFT.
@@ -480,7 +480,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 static void DumpUnitInfo(CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
-	static FILE *logf = NULL;
+	static FILE *logf = nullptr;
 
 	if (!logf) {
 		time_t now;
@@ -549,7 +549,7 @@ static void DumpUnitInfo(CUnit &unit)
 #if 0
 	SaveUnit(unit, logf);
 #endif
-	fflush(NULL);
+	fflush(nullptr);
 }
 
 template <typename UNITP_ITERATOR>

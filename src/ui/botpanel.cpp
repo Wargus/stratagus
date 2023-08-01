@@ -181,7 +181,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	ba->UnitMask = buf;
 	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
-	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end
+	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
 	return 1;
 }
 
@@ -198,7 +198,7 @@ void CleanButtons()
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	CurrentButtons.clear();
 }
 
@@ -644,7 +644,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			CLabel label(font, "white", "red");
 			// FIXME: hardcoded image!!!
 			const int IconID = GoldCost;
-			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
+			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, nullptr);
 			const CGraphic *G = UI.Resources[IconID].G;
 			const SpellType *spell = SpellTypeTable[button->Value];
 
@@ -1233,7 +1233,7 @@ void CButtonPanel::DoClicked_StandGround()
 void CButtonPanel::DoClicked_Button(int button)
 {
 	CurrentButtonLevel = CurrentButtons[button].Value;
-	LastDrawnButtonPopup = NULL;
+	LastDrawnButtonPopup = nullptr;
 	UI.ButtonPanel.Update();
 }
 
@@ -1256,14 +1256,14 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
-	CursorBuilding = NULL;
+	CursorBuilding = nullptr;
 	CursorState = CursorStatePoint;
 }
 
 void CButtonPanel::DoClicked_CancelTrain()
 {
 	Assert(Selected[0]->CurrentAction() == UnitActionTrain);
-	SendCommandCancelTraining(*Selected[0], -1, NULL);
+	SendCommandCancelTraining(*Selected[0], -1, nullptr);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
 }

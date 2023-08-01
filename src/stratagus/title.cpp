@@ -139,7 +139,7 @@ void TitleScreen::ShowTitleImage()
 	callbacks.KeyReleased = WaitCallbackKeyReleased;
 	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
 	//callbacks.NetworkEvent = NetworkEvent;
-	callbacks.NetworkEvent = NULL;
+	callbacks.NetworkEvent = nullptr;
 
 	SetCallbacks(&callbacks);
 

@@ -316,7 +316,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 
 	if (!isTransporterRemoved) {
 		// Remove transporter to avoid "collision" with itself.
-		transporter.Remove(NULL);
+		transporter.Remove(nullptr);
 	}
 	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
 	if (!isTransporterRemoved) {
@@ -339,7 +339,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	int stillonboard = 0;
 
 	// Goal is the specific unit unit that you want to unload.
-	// This can be NULL, in case you want to unload everything.
+	// This can be nullptr, in case you want to unload everything.
 	if (this->HasGoal()) {
 		CUnit &goal = *this->GetGoal();
 

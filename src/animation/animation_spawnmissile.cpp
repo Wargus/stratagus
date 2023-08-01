@@ -62,7 +62,7 @@
 	PixelPos start;
 	PixelPos dest;
 	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
-	if (mtype == NULL) {
+	if (mtype == nullptr) {
 		return;
 	}
 

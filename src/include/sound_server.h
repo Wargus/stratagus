@@ -71,7 +71,7 @@ extern Mix_Music *LoadMusic(const std::string &name);
 extern Mix_Chunk *LoadSample(const std::string &name);
 extern void FreeSample(Mix_Chunk *sample);
 /// Play a sample
-extern int PlaySample(Mix_Chunk *sample, Origin *origin = NULL);
+extern int PlaySample(Mix_Chunk *sample, Origin *origin = nullptr);
 /// Play a sample, registering a "finished" callback
 extern int PlaySample(Mix_Chunk *sample, void (*callback)(int channel));
 /// Play a sound file

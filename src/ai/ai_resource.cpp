@@ -216,7 +216,7 @@ bool AiEnemyUnitsInDistance(const CPlayer &player,
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
-	if (type == NULL) {
+	if (type == nullptr) {
 		Select<1>(pos - offset, pos + offset, units, IsAEnemyUnitOf<true>(player));
 		return static_cast<int>(units.size());
 	} else {
@@ -370,14 +370,14 @@ void AiNewDepotRequest(CUnit &worker)
 	const Vec2i pos = order.GetHarvestLocation();
 	const int range = 15;
 
-	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
+	if (pos.x != -1 && nullptr != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
 		 */
 		return;
 	}
-	CUnitType *best_type = NULL;
+	CUnitType *best_type = nullptr;
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
@@ -404,7 +404,7 @@ void AiNewDepotRequest(CUnit &worker)
 			cost += type.Stats[worker.Player->Index].Costs[c];
 		}
 
-		if (best_type == NULL || (cost < best_cost)) {
+		if (best_type == nullptr || (cost < best_cost)) {
 			best_type = &type;
 			best_cost = cost;
 			//best_mask = needmask;
@@ -462,7 +462,7 @@ private:
 **  @param oldDepot  Old assigned depot.
 **  @param resUnit   Resource to harvest from, if succeed
 **
-**  @return          new depot if found, NULL otherwise.
+**  @return          new depot if found, nullptr otherwise.
 */
 CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
@@ -480,7 +480,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	// If there aren't any alternatives, exit
 	if (depots.size() < 2) {
-		return NULL;
+		return nullptr;
 	}
 	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
@@ -505,7 +505,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 			return &unit;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -1154,7 +1154,7 @@ static void AiCollectResources()
 				}
 			}
 		}
-		unit = NULL;
+		unit = nullptr;
 
 		// Try to complete each ressource in the priority order
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -1218,7 +1218,7 @@ static void AiCollectResources()
 
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
-							unit = NULL;
+							unit = nullptr;
 							continue;
 						}
 
@@ -1305,10 +1305,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 
 	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-	CUnit *unit = NULL;
+	CUnit *unit = nullptr;
 	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
 
-	if (terrainTraversal.Run(unitFinder) && unit != NULL) {
+	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
 		const Vec2i invalidPos(-1, -1);
 		CommandRepair(*unit, invalidPos, &building, FlushCommands);
 		return true;

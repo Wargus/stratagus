@@ -32,8 +32,8 @@ inline void print_backtrace(int sz = 100) {
     char* name;
 
     process = GetCurrentProcess();
-    SymInitialize(process, NULL, TRUE);
-    frames = CaptureStackBackTrace(0, sz, stack, NULL);
+    SymInitialize(process, nullptr, TRUE);
+    frames = CaptureStackBackTrace(0, sz, stack, nullptr);
     fprintf(stderr, "backtrace returned %d addresses\n", frames);
     symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 1024 * sizeof(char), 1);
     symbol->MaxNameLen = 1024;

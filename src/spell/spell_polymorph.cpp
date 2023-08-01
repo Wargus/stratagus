@@ -63,7 +63,7 @@
 		}
 	}
 	// Now, checking value.
-	if (this->NewForm == NULL) {
+	if (this->NewForm == nullptr) {
 		LuaError(l, "Use a unittype for polymorph (with new-form)");
 	}
 }
@@ -105,7 +105,7 @@
 	}
 
 	// as said somewhere else -- no corpses :)
-	target->Remove(NULL);
+	target->Remove(nullptr);
 	Vec2i offset;
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	Vec2i resPos;

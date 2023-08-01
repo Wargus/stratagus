@@ -129,7 +129,7 @@ extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 class CUnitStats
 {
 public:
-	CUnitStats() : Variables(NULL)
+	CUnitStats() : Variables(nullptr)
 	{
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
@@ -182,7 +182,7 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr)
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));

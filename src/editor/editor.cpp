@@ -75,7 +75,7 @@
 
 CEditor::CEditor() :
 	TerrainEditable(true),
-	StartUnit(NULL),
+	StartUnit(nullptr),
 	UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
 	TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
 	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),

@@ -65,11 +65,11 @@ CConstruction::~CConstruction()
 void CConstruction::Clean()
 {
 	CGraphic::Free(this->Sprite);
-	this->Sprite = NULL;
+	this->Sprite = nullptr;
 	CGraphic::Free(this->ShadowSprite);
-	this->ShadowSprite = NULL;
+	this->ShadowSprite = nullptr;
 	CConstructionFrame *cframe = this->Frames;
-	this->Frames = NULL;
+	this->Frames = nullptr;
 	while (cframe) {
 		CConstructionFrame *next = cframe->Next;
 		delete cframe;
@@ -170,7 +170,7 @@ CConstruction *ConstructionByIdent(const std::string &name)
 			return *it;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -192,7 +192,7 @@ static int CclDefineConstruction(lua_State *l)
 	CConstruction *construction = ConstructionByIdent(str);
 	std::vector<CConstruction *>::iterator i;
 
-	if (construction == NULL) {
+	if (construction == nullptr) {
 		construction = new CConstruction;
 		Constructions.push_back(construction);
 	} else { // redefine completely.
@@ -280,7 +280,7 @@ static int CclDefineConstruction(lua_State *l)
 				(*cframe)->Percent = percent;
 				(*cframe)->File = file;
 				(*cframe)->Frame = frame;
-				(*cframe)->Next = NULL;
+				(*cframe)->Next = nullptr;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

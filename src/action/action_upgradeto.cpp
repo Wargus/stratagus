@@ -108,7 +108,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			// by removing the unit and looking at the map fields
 			removed = true;
 			SaveSelection();
-			unit.Remove(NULL);
+			unit.Remove(nullptr);
 			if (!UnitTypeCanBeAt(newtype, pos)) {
 				unit.Place(unit.tilePos);
 				RestoreSelection();

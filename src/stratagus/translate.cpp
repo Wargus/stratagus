@@ -92,7 +92,7 @@ void LoadPO(const char *file)
 	enum { MSGNONE, MSGID, MSGSTR } state = MSGNONE;
 	char msgid[16 * 1024];
 	char msgstr[16 * 1024];
-	char *currmsg = NULL;
+	char *currmsg = nullptr;
 
 	msgid[0] = msgstr[0] = '\0';
 

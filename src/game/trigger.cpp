@@ -150,7 +150,7 @@ static CompareFunction GetCompareFunction(const char *op)
 	} else if (op[0] == '!' && op[1] == '=' && op[2] == '\0') {
 		return &CompareNEq;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -708,7 +708,7 @@ void CleanTriggers()
 	Trigger = 0;
 
 	delete[] ActiveTriggers;
-	ActiveTriggers = NULL;
+	ActiveTriggers = nullptr;
 
 	GameTimer.Reset();
 }

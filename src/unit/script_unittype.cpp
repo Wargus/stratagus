@@ -535,17 +535,17 @@ static int CclDefineUnitType(lua_State *l)
 				if (type->Sprite && type->Sprite->File != type->File) {
 					redefine |= redefineSprite;
 					CGraphic::Free(type->Sprite);
-					type->Sprite = NULL;
+					type->Sprite = nullptr;
 				}
 				if (type->AltSprite && type->AltSprite->File != type->AltFile) {
 					redefine |= redefineSprite;
 					CGraphic::Free(type->AltSprite);
-					type->AltSprite = NULL;
+					type->AltSprite = nullptr;
 				}
 				if (redefine && type->ShadowSprite) {
 					redefine |= redefineSprite;
 					CGraphic::Free(type->ShadowSprite);
-					type->ShadowSprite = NULL;
+					type->ShadowSprite = nullptr;
 				}
 			}
 			if (type->ShadowFile == shadowMarker) {
@@ -593,7 +593,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (redefine && type->ShadowSprite) {
 				redefine |= redefineSprite;
 				CGraphic::Free(type->ShadowSprite);
-				type->ShadowSprite = NULL;
+				type->ShadowSprite = nullptr;
 			}
 		} else if (!strcmp(value, "Offset")) {
 			CclGetPos(l, &type->OffsetX, &type->OffsetY);
@@ -606,7 +606,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
-			type->Icon.Icon = NULL;
+			type->Icon.Icon = nullptr;
 			if (GameRunning) {
 				type->Icon.Load();
 			}
@@ -729,7 +729,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->ReactRangePerson = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
-			type->Missile.Missile = NULL;
+			type->Missile.Missile = nullptr;
 			if (GameRunning) {
 				type->Missile.MapMissile();
 			}
@@ -753,7 +753,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DecayRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
-			type->CorpseType = NULL;
+			type->CorpseType = nullptr;
 			if (GameRunning) {
 				if (!type->CorpseName.empty()) {
 					type->CorpseType = UnitTypeByIdent(type->CorpseName);
@@ -766,7 +766,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "ExplodeWhenKilled")) {
 			type->ExplodeWhenKilled = 1;
 			type->Explosion.Name = LuaToString(l, -1);
-			type->Explosion.Missile = NULL;
+			type->Explosion.Missile = nullptr;
 			if (GameRunning) {
 				type->Explosion.MapMissile();
 			}
@@ -827,13 +827,13 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(dtype, "general")) {
 					type->Impact[ANIMATIONS_DEATHTYPES].Name = LuaToString(l, -1, k + 1);
-					type->Impact[ANIMATIONS_DEATHTYPES].Missile = NULL;
+					type->Impact[ANIMATIONS_DEATHTYPES].Missile = nullptr;
 					if (GameRunning) {
 						type->Impact[ANIMATIONS_DEATHTYPES].MapMissile();
 					}
 				} else if (!strcmp(dtype, "shield")) {
 					type->Impact[ANIMATIONS_DEATHTYPES + 1].Name = LuaToString(l, -1, k + 1);
-					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = NULL;
+					type->Impact[ANIMATIONS_DEATHTYPES + 1].Missile = nullptr;
 					if (GameRunning) {
 						type->Impact[ANIMATIONS_DEATHTYPES + 1].MapMissile();
 					}
@@ -848,7 +848,7 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Death type not found: %s" _C_ dtype);
 					} else {
 						type->Impact[num].Name = LuaToString(l, -1, k + 1);
-						type->Impact[num].Missile = NULL;
+						type->Impact[num].Missile = nullptr;
 						if (GameRunning) {
 							type->Impact[num].MapMissile();
 						}
@@ -1077,12 +1077,12 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				delete[] type->CanCastSpell;
-				type->CanCastSpell = NULL;
+				type->CanCastSpell = nullptr;
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				const SpellType *spell = SpellTypeByIdent(value);
-				if (spell == NULL) {
+				if (spell == nullptr) {
 					LuaError(l, "Unknown spell type: %s" _C_ value);
 				}
 				type->CanCastSpell[spell->Slot] = 1;
@@ -1102,13 +1102,13 @@ static int CclDefineUnitType(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
 				delete[] type->AutoCastActive;
-				type->AutoCastActive = NULL;
+				type->AutoCastActive = nullptr;
 
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				const SpellType *spell = SpellTypeByIdent(value);
-				if (spell == NULL) {
+				if (spell == nullptr) {
 					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value);
 				}
 				if (!spell->AutoCast) {
@@ -1305,11 +1305,11 @@ static int CclCopyUnitType(lua_State *l)
 	to->Height = from->Height;
 	if (to->Sprite) {
 		CGraphic::Free(to->Sprite);
-		to->Sprite = NULL;
+		to->Sprite = nullptr;
 	}
 	if (to->AltSprite) {
 		CGraphic::Free(to->AltSprite);
-		to->AltSprite = NULL;
+		to->AltSprite = nullptr;
 	}
 	to->ShadowFile = from->ShadowFile;
 	to->ShadowWidth = from->ShadowWidth;
@@ -1320,13 +1320,13 @@ static int CclCopyUnitType(lua_State *l)
 	to->ShadowScale = from->ShadowScale;
 	if (to->ShadowSprite) {
 		CGraphic::Free(to->ShadowSprite);
-		to->ShadowSprite = NULL;
+		to->ShadowSprite = nullptr;
 	}
 	to->OffsetX = from->OffsetX;
 	to->OffsetY = from->OffsetY;
 	to->Animations = from->Animations;
 	to->Icon.Name = from->Icon.Name;
-	to->Icon.Icon = NULL;
+	to->Icon.Icon = nullptr;
 #ifdef USE_MNG
 	to->Portrait.Num = from->Portrait.Num;
 	to->Portrait.Talking = from->Portrait.Talking;
@@ -1367,7 +1367,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->ReactRangeComputer = from->ReactRangeComputer;
 	to->ReactRangePerson = from->ReactRangePerson;
 	to->Missile.Name = from->Missile.Name;
-	to->Missile.Missile = NULL; // filled in later
+	to->Missile.Missile = nullptr; // filled in later
 	to->MinAttackRange = from->MinAttackRange;
 	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
 	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
@@ -1384,7 +1384,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->DamageType = from->DamageType;
 	to->ExplodeWhenKilled = from->ExplodeWhenKilled;
 	to->Explosion.Name = from->Explosion.Name;
-	to->Explosion.Missile = NULL; // filled later
+	to->Explosion.Missile = nullptr; // filled later
 	to->TeleportCost = from->TeleportCost;
 	to->TeleportEffectIn = from->TeleportEffectIn;
 	to->TeleportEffectOut = from->TeleportEffectOut;
@@ -1598,7 +1598,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 		}
 	}
 	LuaError(l, "CclGetUnitType: not a unit-type");
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -2063,7 +2063,7 @@ static int CclDefineDecorations(lua_State *l)
 	const int nargs = lua_gettop(l);
 	for (int i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		CDecoVar *decovar = NULL;
+		CDecoVar *decovar = nullptr;
 		memset(&tmp, 0, sizeof(tmp));
 		lua_pushnil(l);
 		while (lua_next(l, i + 1)) {

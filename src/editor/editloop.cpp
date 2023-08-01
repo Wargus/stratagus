@@ -271,12 +271,12 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
 	CUnit *unit = MakeUnitAndPlace(pos, type, player);
-	if (unit == NULL) {
+	if (unit == nullptr) {
 		DebugPrint("Unable to allocate Unit");
 		return;
 	}
 
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
 	if (b && b->ReplaceOnBuild) {
 		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
 		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
@@ -287,13 +287,13 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
 			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
 			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
-			replacedUnit.Remove(NULL); // Destroy building beneath
+			replacedUnit.Remove(nullptr); // Destroy building beneath
 			UnitLost(replacedUnit);
 			UnitClearOrders(replacedUnit);
 			replacedUnit.Release();
 		}
 	}
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		if (type.GivesResource) {
 			if (type.StartingResources != 0) {
 				unit->ResourcesHeld = type.StartingResources;
@@ -336,7 +336,7 @@ static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 */
 static void EditorActionRemoveUnit(CUnit &unit)
 {
-	unit.Remove(NULL);
+	unit.Remove(nullptr);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 	unit.Release();
@@ -429,7 +429,7 @@ static void CalculateMaxIconSize()
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		if (!Editor.UnitTypes[i].empty()) {
 			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
-			if (type != NULL && type->Icon.Icon) {
+			if (type != nullptr && type->Icon.Icon) {
 				const CIcon &icon = *type->Icon.Icon;
 
 				IconWidth = std::max(IconWidth, icon.G->Width);
@@ -451,7 +451,7 @@ static void RecalculateShownUnits(size_t start = 0, size_t stop = INT_MAX)
 			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
 			Editor.ShownUnitTypes.push_back(type);
 		} else {
-			Editor.ShownUnitTypes.push_back(NULL);
+			Editor.ShownUnitTypes.push_back(nullptr);
 		}
 	}
 
@@ -647,7 +647,7 @@ static bool forEachUnitIconArea(std::function<bool(int,ButtonStyle*,int,int,int,
 static void DrawUnitIcons()
 {
 	forEachUnitIconArea([](int i, ButtonStyle *style, int x, int y, int w, int h) {
-		if (Editor.ShownUnitTypes[i] == NULL) {
+		if (Editor.ShownUnitTypes[i] == nullptr) {
 			return true;
 		}
 		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
@@ -1304,7 +1304,7 @@ static void EditorCallbackButtonDown(unsigned button)
 
 	// Right click on a resource
 	if (Editor.State == EditorSelecting) {
-		if ((MouseButtons & RightButton) && (UnitUnderCursor != NULL || !Selected.empty())) {
+		if ((MouseButtons & RightButton) && (UnitUnderCursor != nullptr || !Selected.empty())) {
 			lua_getglobal(Lua, "EditUnitProperties");
 			if (lua_isfunction(Lua, -1) == 1) {
 				lua_newtable(Lua);
@@ -1331,11 +1331,11 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
-				CursorBuilding = NULL;
+				CursorBuilding = nullptr;
 				return;
 			} else if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
 				Editor.SelectedTileIndex = -1;
-				CursorBuilding = NULL;
+				CursorBuilding = nullptr;
 				return;
 			}
 		}
@@ -1353,7 +1353,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
-					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
+					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
@@ -1487,7 +1487,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 
 		case SDLK_BACKSPACE:
 		case SDLK_DELETE: // Delete
-			if (UnitUnderCursor != NULL) {
+			if (UnitUnderCursor != nullptr) {
 				EditorRemoveUnit(*UnitUnderCursor);
 			}
 			break;
@@ -1510,7 +1510,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '0':
 			if (!(KeyModifiers & ModifierAlt)) {
-				if (UnitUnderCursor != NULL) {
+				if (UnitUnderCursor != nullptr) {
 					UnitUnderCursor->ChangeOwner(Players[PlayerNumNeutral]);
 					UI.StatusLine.Set(_("Unit owner modified"));
 				}
@@ -1529,7 +1529,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 					break;
 				}
 			}
-			if (UnitUnderCursor != NULL && Map.Info.PlayerType[pnum] != PlayerTypes::PlayerNobody) {
+			if (UnitUnderCursor != nullptr && Map.Info.PlayerType[pnum] != PlayerTypes::PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(Players[pnum]);
 				UI.StatusLine.Set(_("Unit owner modified"));
 				UpdateMinimap = true;
@@ -1645,7 +1645,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 	noHit = forEachUnitIconArea([screenPos](int i, ButtonStyle*, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
-			if (Editor.ShownUnitTypes[i] == NULL) {
+			if (Editor.ShownUnitTypes[i] == nullptr) {
 				return false;
 			}
 			char buf[256];
@@ -1777,7 +1777,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
-				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
+				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;
 					UI.StatusLine.Clear();
@@ -1839,7 +1839,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Map
-	UnitUnderCursor = NULL;
+	UnitUnderCursor = nullptr;
 	if (UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
@@ -1854,7 +1854,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		UnitUnderCursor = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);
 
-		if (UnitUnderCursor != NULL) {
+		if (UnitUnderCursor != nullptr) {
 			ShowUnitInfo(*UnitUnderCursor);
 			return;
 		}
@@ -1943,9 +1943,9 @@ void CEditor::Init()
 			}
 		}
 	}
-	if (UI.ButtonPanel.G != NULL) {
+	if (UI.ButtonPanel.G != nullptr) {
 		ButtonPanelWidth = UI.ButtonPanel.G->Width;
-	} else if (UI.InfoPanel.G != NULL) {
+	} else if (UI.InfoPanel.G != nullptr) {
 		ButtonPanelWidth = UI.InfoPanel.G->Width;
 	} else {
 		ButtonPanelWidth = 170;
@@ -1957,9 +1957,9 @@ void CEditor::Init()
 	if (!StartUnitName.empty()) {
 		StartUnit = UnitTypeByIdent(StartUnitName);
 	}
-	Select.Icon = NULL;
+	Select.Icon = nullptr;
 	Select.Load();
-	Units.Icon = NULL;
+	Units.Icon = nullptr;
 	Units.Load();
 
 	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
@@ -2280,7 +2280,7 @@ void EditorMainLoop()
 
 			WaitEventsOneFrame();
 		}
-		CursorBuilding = NULL;
+		CursorBuilding = nullptr;
 		if (!Editor.MapLoaded) {
 			break;
 		}
@@ -2318,7 +2318,7 @@ void EditorMainLoop()
 /**
 **  Start the editor
 **
-**  @param filename  Map to load, NULL to create a new map
+**  @param filename  Map to load, nullptr to create a new map
 */
 void StartEditor(const char *filename)
 {
@@ -2327,7 +2327,7 @@ void StartEditor(const char *filename)
 	GetDefaultTextColors(nc, rc);
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
-			filename = NULL;
+			filename = nullptr;
 		}
 	}
 	if (!filename) {

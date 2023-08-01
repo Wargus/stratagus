@@ -383,7 +383,7 @@ public:
         serialize32(value);
     };
     void serialize(const char* str) {
-        int len = strlen(str) + 1; // include NULL byte
+        int len = strlen(str) + 1; // include nullptr byte
         ensureSpace(len);
         memcpy(buf + pos, str, len);
         pos += len;
@@ -825,7 +825,7 @@ public:
     Context() {
         this->tcpSocket = new CTCPSocket();
         this->istream = new BNCSInputStream(tcpSocket);
-        this->state = NULL;
+        this->state = nullptr;
         this->host = new CHost("127.0.0.1", 6112);
         this->clientToken = MyRand();
         this->username = "";
@@ -841,7 +841,7 @@ public:
     }
 
     ~Context() {
-        if (state != NULL) {
+        if (state != nullptr) {
             delete state;
         }
         delete tcpSocket;
@@ -849,7 +849,7 @@ public:
     }
 
     bool isConnected() {
-        return state != NULL && !getCurrentChannel().empty();
+        return state != nullptr && !getCurrentChannel().empty();
     }
 
     bool isConnecting() {
@@ -857,7 +857,7 @@ public:
     }
 
     bool isDisconnected() {
-        return state == NULL;
+        return state == nullptr;
     }
 
     // User and UI actions
@@ -875,7 +875,7 @@ public:
             ExitNetwork1();
         }
         tcpSocket->Close();
-        state = NULL;
+        state = nullptr;
         clientToken = MyRand();
         username = "";
         setPassword("");
@@ -1171,7 +1171,7 @@ public:
             channelList.push_back(name);
             setChannels(channelList);
         }
-        if (SetActiveChannel != NULL) {
+        if (SetActiveChannel != nullptr) {
             SetActiveChannel->pushPreamble();
             SetActiveChannel->pushString(name);
             SetActiveChannel->run();
@@ -1201,7 +1201,7 @@ public:
             }
         }
         this->games = games;
-        if (SetGames != NULL) {
+        if (SetGames != nullptr) {
             SetGames->pushPreamble();
             for (const auto value : games) {
                 if (value->isValid()) {
@@ -1228,7 +1228,7 @@ public:
             delete value;
         }
         this->friends = friends;
-        if (SetFriends != NULL) {
+        if (SetFriends != nullptr) {
             SetFriends->pushPreamble();
             for (const auto value : friends) {
                 SetFriends->pushTable({ { "Name", value->getName() },
@@ -1242,7 +1242,7 @@ public:
     std::vector<Friend*> getFriends() { return friends; }
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
-        if (ShowUserInfo != NULL) {
+        if (ShowUserInfo != nullptr) {
             ShowUserInfo->pushPreamble();
             std::map<std::string, std::variant<std::string, int>> m;
             m["User"] = extendedInfoNames.at(id);
@@ -1259,7 +1259,7 @@ public:
     void showInfo(std::string arg) {
         std::string infoStr = arg;
         info.push(infoStr);
-        if (ShowInfo != NULL) {
+        if (ShowInfo != nullptr) {
             ShowInfo->pushPreamble();
             ShowInfo->pushString(infoStr);
             ShowInfo->run();
@@ -1268,7 +1268,7 @@ public:
 
     void showError(std::string arg) {
         info.push("!!! " + arg + " !!!");
-        if (ShowError != NULL) {
+        if (ShowError != nullptr) {
             ShowError->pushPreamble();
             ShowError->pushString(arg);
             ShowError->run();
@@ -1277,7 +1277,7 @@ public:
 
     void showChat(std::string arg) {
         info.push(arg);
-        if (ShowChat != NULL) {
+        if (ShowChat != nullptr) {
             ShowChat->pushPreamble();
             ShowChat->pushString(arg);
             ShowChat->run();
@@ -1286,7 +1286,7 @@ public:
 
     void addUser(std::string name) {
         userList.insert(name);
-        if (AddUser != NULL) {
+        if (AddUser != nullptr) {
             AddUser->pushPreamble();
             AddUser->pushString(name);
             AddUser->run();
@@ -1295,7 +1295,7 @@ public:
 
     void removeUser(std::string name) {
         userList.erase(name);
-        if (RemoveUser != NULL) {
+        if (RemoveUser != nullptr) {
             RemoveUser->pushPreamble();
             RemoveUser->pushString(name);
             RemoveUser->run();
@@ -1306,7 +1306,7 @@ public:
 
     void setChannels(std::vector<std::string> channels) {
         this->channelList = channels;
-        if (SetChannels != NULL) {
+        if (SetChannels != nullptr) {
             SetChannels->pushPreamble();
             for (const auto& value : channels) {
                 SetChannels->pushString(value);
@@ -1329,7 +1329,7 @@ public:
                 return password;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     void setPassword(std::string pw) {
@@ -1354,7 +1354,7 @@ public:
     CHost *getHost() { return host; }
 
     void setHost(CHost *arg) {
-        if (host != NULL) {
+        if (host != nullptr) {
             delete host;
         }
         host = arg;
@@ -1380,7 +1380,7 @@ public:
 
     BNCSInputStream *getMsgIStream() { return istream; }
 
-    virtual void doOneStep() { if (this->state != NULL) this->state->doOneStep(this); }
+    virtual void doOneStep() { if (this->state != nullptr) this->state->doOneStep(this); }
 
     virtual bool handleUDP(const unsigned char *buffer, int len, CHost host) {
         if (host.getIp() != getHost()->getIp() || host.getPort() != getHost()->getPort()) {
@@ -1415,7 +1415,7 @@ public:
 
     void setState(OnlineState* newState) {
         assert (newState != this->state);
-        if (this->state != NULL) {
+        if (this->state != nullptr) {
             delete this->state;
         }
         this->state = newState;
@@ -1425,16 +1425,16 @@ public:
     uint32_t serverToken;
     uint32_t udpToken;
 
-    LuaCallback *AddUser = NULL;
-    LuaCallback *RemoveUser = NULL;
-    LuaCallback *SetFriends = NULL;
-    LuaCallback *SetGames = NULL;
-    LuaCallback *SetChannels = NULL;
-    LuaCallback *SetActiveChannel = NULL;
-    LuaCallback *ShowError = NULL;
-    LuaCallback *ShowInfo = NULL;
-    LuaCallback *ShowChat = NULL;
-    LuaCallback *ShowUserInfo = NULL;
+    LuaCallback *AddUser = nullptr;
+    LuaCallback *RemoveUser = nullptr;
+    LuaCallback *SetFriends = nullptr;
+    LuaCallback *SetGames = nullptr;
+    LuaCallback *SetChannels = nullptr;
+    LuaCallback *SetActiveChannel = nullptr;
+    LuaCallback *ShowError = nullptr;
+    LuaCallback *ShowInfo = nullptr;
+    LuaCallback *ShowChat = nullptr;
+    LuaCallback *ShowUserInfo = nullptr;
 
 private:
     std::string gameNameFromUsername(std::string username) {
@@ -1475,7 +1475,7 @@ int OnlineState::send(Context *ctx, BNCSOutputStream *buf) {
 void OnlineState::handleNull(Context *ctx) {
     BNCSOutputStream buffer(0x00);
     send(ctx, &buffer);
-    DebugPrint("TCP Sent: 0x00 NULL\n");
+    DebugPrint("TCP Sent: 0x00 nullptr\n");
 }
 
 void OnlineState::handleChannelList(Context *ctx) {
@@ -2152,9 +2152,9 @@ class C2S_SID_AUTH_INFO : public OnlineState {
         }
         // (UINT32) Time zone bias
         uint32_t bias = 0;
-        std::time_t systemtime = std::time(NULL);
+        std::time_t systemtime = std::time(nullptr);
         struct std::tm *utc = std::gmtime(&systemtime);
-        if (utc != NULL) {
+        if (utc != nullptr) {
             std::time_t utctime_since_epoch = std::mktime(utc);
             if (utctime_since_epoch != -1) {
                 struct std::tm *localtime = std::localtime(&systemtime);

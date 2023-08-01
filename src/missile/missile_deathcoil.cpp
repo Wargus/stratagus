@@ -56,7 +56,7 @@ void MissileDeathCoil::Action()
 	if (this->NextMissileFrame(1, 0) == false) {
 		return;
 	}
-	Assert(this->SourceUnit != NULL);
+	Assert(this->SourceUnit != nullptr);
 	CUnit &source = *this->SourceUnit;
 
 	if (source.Destroyed) {

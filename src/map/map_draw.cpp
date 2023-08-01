@@ -51,7 +51,7 @@
 bool CViewport::ShowGrid = false;
 
 
-CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(NULL)
+CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
 {
 	this->TopLeftPos.x = this->TopLeftPos.y = 0;
 	this->BottomRightPos.x = this->BottomRightPos.y = 0;
@@ -429,7 +429,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 		this->DrawMapBackgroundInViewport<true>(highlightChecker);
 	}
 
-	Missile *clickMissile = NULL;
+	Missile *clickMissile = nullptr;
 	CurrentViewport = this;
 	{
 		// Now we need to sort units, missiles, particles by draw level and draw them
@@ -454,7 +454,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 			if (i == nunits) {
 				if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
 					missiletable[j]->DrawMissile(*this);
-					if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+					if (clickMissile == nullptr && missiletable[j]->Type->Ident == ClickMissile) {
 						clickMissile = missiletable[j];
 					}
 					++j;
@@ -476,7 +476,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 					++i;
 				} else {
 					missiletable[j]->DrawMissile(*this);
-					if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+					if (clickMissile == nullptr && missiletable[j]->Type->Ident == ClickMissile) {
 						clickMissile = missiletable[j];
 					}
 					++j;
@@ -493,7 +493,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 				} else {
 					if (missiletable[j]->Type->DrawLevel < particletable[k]->getDrawLevel()) {
 						missiletable[j]->DrawMissile(*this);
-						if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+						if (clickMissile == nullptr && missiletable[j]->Type->Ident == ClickMissile) {
 							clickMissile = missiletable[j];
 						}
 						++j;
@@ -509,7 +509,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 		}
 		for (; j < nmissiles; ++j) {
 			missiletable[j]->DrawMissile(*this);
-			if (clickMissile == NULL && missiletable[j]->Type->Ident == ClickMissile) {
+			if (clickMissile == nullptr && missiletable[j]->Type->Ident == ClickMissile) {
 				clickMissile = missiletable[j];
 			}
 		}
@@ -523,7 +523,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	this->DrawMapFogOfWar();
 
 	// If there was a click missile, draw it again here above the fog
-	if (clickMissile != NULL) {
+	if (clickMissile != nullptr) {
 		Vec2i pos = Map.MapPixelPosToTilePos(clickMissile->position);
 		Map.Clamp(pos);
 		if (Map.Field(pos.x, pos.y)->playerInfo.TeamVisibilityState(*ThisPlayer) != 2) {
@@ -557,7 +557,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
 		} else if (!isMapFieldVisile) {
-			ShowUnitName(*this, CursorScreenPos, NULL, true);
+			ShowUnitName(*this, CursorScreenPos, nullptr, true);
 		}
 	}
 

@@ -64,7 +64,7 @@ bool SoundConfig::MapSound()
 	if (!this->Name.empty()) {
 		this->Sound = SoundForName(this->Name);
 	}
-	return this->Sound != NULL;
+	return this->Sound != nullptr;
 }
 
 void SoundConfig::SetSoundRange(unsigned char range)
@@ -99,7 +99,7 @@ static void MapAnimSound(CAnimation &anim)
 */
 static void MapAnimSounds2(CAnimation *anim)
 {
-	if (anim == NULL) {
+	if (anim == nullptr) {
 		return ;
 	}
 	MapAnimSound(*anim);

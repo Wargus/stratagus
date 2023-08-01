@@ -305,7 +305,7 @@
 **
 **  CUnitType::ResInfo[::MaxCosts]
 **
-**    Information about resource harvesting. If NULL, it can't
+**    Information about resource harvesting. If nullptr, it can't
 **    harvest it.
 **
 **  CUnitType::NeutralMinimapColorRGB
@@ -520,15 +520,15 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-	Animations(NULL), StillFrame(0),
-	OnDeath(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
-	OnReady(NULL), TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),
-	CorpseType(NULL), Construction(NULL), RepairHP(0), TileWidth(0), TileHeight(0),
+	Animations(nullptr), StillFrame(0),
+	OnDeath(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
+	OnReady(nullptr), TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
+	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileWidth(0), TileHeight(0),
 	PersonalSpaceWidth(0), PersonalSpaceHeight(0),
 	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	CanCastSpell(NULL), AutoCastActive(NULL),
+	CanCastSpell(nullptr), AutoCastActive(nullptr),
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
@@ -538,7 +538,7 @@ CUnitType::CUnitType() :
 	CanAttack(0),
 	Neutral(0),
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	Sprite(NULL), AltSprite(NULL), ShadowSprite(NULL), ShadowSpriteFrame(0), ShadowScale(1)
+	Sprite(nullptr), AltSprite(nullptr), ShadowSprite(nullptr), ShadowSpriteFrame(0), ShadowScale(1)
 {
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
@@ -851,7 +851,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 	if (ret != UnitTypeMap.end()) {
 		return (*ret).second;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -933,11 +933,11 @@ static int GetStillFrame(const CUnitType &type)
 		if (anim->Type == AnimationFrame) {
 			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
 			// Use the frame facing down
-			return a_frame.ParseAnimInt(NULL) + type.NumDirections / 2;
+			return a_frame.ParseAnimInt(nullptr) + type.NumDirections / 2;
 		} else if (anim->Type == AnimationExactFrame) {
 			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
 
-			return a_frame.ParseAnimInt(NULL);
+			return a_frame.ParseAnimInt(nullptr);
 		}
 		anim = anim->Next;
 	}
@@ -953,7 +953,7 @@ void InitUnitTypes(int reset_player_stats)
 		CUnitType &type = *UnitTypes[i];
 		Assert(type.Slot == (int)i);
 
-		if (type.Animations == NULL) {
+		if (type.Animations == nullptr) {
 			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
 			continue;
 		}
@@ -1127,8 +1127,8 @@ void CleanUnitTypes()
 	UnitTypeVar.Clear();
 
 	// Clean hardcoded unit types.
-	UnitTypeHumanWall = NULL;
-	UnitTypeOrcWall = NULL;
+	UnitTypeHumanWall = nullptr;
+	UnitTypeOrcWall = nullptr;
 }
 
 //@}

@@ -68,7 +68,7 @@ public:
 		find_type(find_type),
 		result_unit(result_unit)
 	{
-		*result_unit = NULL;
+		*result_unit = nullptr;
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -108,7 +108,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
 			*result_unit = dest;
 			return VisitResult_Finished;
-		} else if (*result_unit == NULL) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
+		} else if (*result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
 			*result_unit = dest;
 		}
 	}
@@ -121,24 +121,24 @@ class AiForceEnemyFinder
 public:
 	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
 	{
-		Assert(enemy != NULL);
-		*enemy = NULL;
+		Assert(enemy != nullptr);
+		*enemy = nullptr;
 		AiPlayer->Force[force].Units.for_each_if(*this);
 	}
 
 	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
 	{
-		Assert(enemy != NULL);
-		*enemy = NULL;
+		Assert(enemy != nullptr);
+		*enemy = nullptr;
 		force.Units.for_each_if(*this);
 	}
 
-	bool found() const { return *enemy != NULL; }
+	bool found() const { return *enemy != nullptr; }
 
 	bool operator()(const CUnit *const unit) const
 	{
 		if (unit->Type->CanAttack == false) {
-			return *enemy == NULL;
+			return *enemy == nullptr;
 		}
 		if (FIND_TYPE == AIATTACK_RANGE) {
 			*enemy = AttackUnitsInReactRange(*unit);
@@ -148,7 +148,7 @@ public:
 			terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 			terrainTraversal.Init();
 			terrainTraversal.PushUnitPosAndNeighboor(*unit);
-			CUnit *result_unit = NULL;
+			CUnit *result_unit = nullptr;
 			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE);
 			terrainTraversal.Run(enemyUnitFinder);
 			*enemy = result_unit;
@@ -161,17 +161,17 @@ public:
 		// } else if (FIND_TYPE == AIATTACK_BUILDING) {
 		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
 		// 	Assert(!*enemy);
-		// 	if (*enemy == NULL || !(*enemy)->Type->Building) {
+		// 	if (*enemy == nullptr || !(*enemy)->Type->Building) {
 		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		// 	}
 		// } else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
 		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
 		// 	Assert(!*enemy || (*enemy)->IsAgressive());
-		// 	if (*enemy == NULL) {
+		// 	if (*enemy == nullptr) {
 		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		// 	}
 		// }
-		return *enemy == NULL;
+		return *enemy == nullptr;
 	}
 private:
 	const CUnit **enemy;
@@ -404,7 +404,7 @@ private:
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	const int minDist = 15;
-	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
+	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist) == false
 		&& Distance(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
 		return VisitResult_Finished;
@@ -475,7 +475,7 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
-		const CUnit *enemy = NULL;
+		const CUnit *enemy = nullptr;
 		if (isTransporter) {
 			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
 		} else if (isNaval) {
@@ -513,7 +513,7 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	//  Send all units in the force to enemy.
 
-	CUnit *leader = NULL;
+	CUnit *leader = nullptr;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
@@ -525,12 +525,12 @@ void AiForce::Attack(const Vec2i &pos)
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
-		if (unit->Container == NULL) {
+		if (unit->Container == nullptr) {
 			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 			unit->Wait = delay;
 			if (unit->IsAgressive()) {
-				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
+				CommandAttack(*unit, this->GoalPos,  nullptr, FlushCommands);
 			} else {
 				if (leader) {
 					CommandDefend(*unit, *leader, FlushCommands);
@@ -877,7 +877,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		const CUnit &unit = *aiForce.Units[i];
 		const CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (CanTransport(transporter, unit) && unit.Container == NULL) {
+		if (CanTransport(transporter, unit) && unit.Container == nullptr) {
 			forceIsReady = false;
 			break;
 		}
@@ -896,7 +896,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		}
 		if (CanTransport(transporter, unit) && (unit.IsIdle() 
 			|| (unit.CurrentAction() == UnitActionBoard && !unit.Moving 
-			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == NULL) {
+			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == nullptr) {
 				CommandBoard(unit, transporter, FlushCommands);
 				CommandFollow(transporter, unit, 0);
 				if (--nbToTransport == 0) { // full : next transporter.
@@ -994,12 +994,12 @@ void AiForce::Update()
 				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 				trans.Wait = delay;
-				CommandUnload(trans, this->GoalPos, NULL, FlushCommands);
+				CommandUnload(trans, this->GoalPos, nullptr, FlushCommands);
 			}
 		}
 		return;
 	}
-	CUnit *leader = NULL;
+	CUnit *leader = nullptr;
 	for (unsigned int i = 0; i != Size(); ++i) {
 		CUnit &aiunit = *Units[i];
 
@@ -1026,7 +1026,7 @@ void AiForce::Update()
 			--WaitOnRallyPoint;
 		}
 		if (maxDist <= thresholdDist || !WaitOnRallyPoint) {
-			const CUnit *unit = NULL;
+			const CUnit *unit = nullptr;
 
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
 			if (!unit) {
@@ -1049,7 +1049,7 @@ void AiForce::Update()
 
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
-					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
 				} else {
 					if (leader) {
 						CommandDefend(aiunit, *leader, FlushCommands);
@@ -1075,7 +1075,7 @@ void AiForce::Update()
 	}
 
 	if (State == AiForceAttackingState_Attacking && idleUnits.size() == this->Size()) {
-		const CUnit *unit = NULL;
+		const CUnit *unit = nullptr;
 
 		bool isNaval = false;
 		for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -1118,16 +1118,16 @@ void AiForce::Update()
 		if (leader) {
 			if (aiunit.IsAgressive()) {
 				if (State == AiForceAttackingState_Attacking) {
-					CommandAttack(aiunit, leader->tilePos, NULL, FlushCommands);
+					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands);
 				} else {
-					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
 				}
 			} else {
 				CommandDefend(aiunit, *leader, FlushCommands);
 			}
 		} else {
 			if (aiunit.IsAgressive()) {
-				CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+				CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
 			} else {
 				CommandMove(aiunit, this->GoalPos, FlushCommands);
 			}
@@ -1165,7 +1165,7 @@ void AiForceManager::Update()
 				for (unsigned int i = 0; i != force.Size(); ++i) {
 					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
 						//  Look if still enemies in attack range.
-						const CUnit *dummy = NULL;
+						const CUnit *dummy = nullptr;
 						maxPathing--;
 						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
 							force.ReturnToHome();
@@ -1199,12 +1199,12 @@ void AiForceManager::Update()
 					for (unsigned int i = 0; i != idleUnits.size(); ++i) {
 						CUnit *const unit = idleUnits[i];
 
-						if (unit->Container == NULL) {
+						if (unit->Container == nullptr) {
 							const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 							unit->Wait = delay;
 							if (unit->Type->CanAttack) {
-								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
+								CommandAttack(*unit, force.GoalPos, nullptr, FlushCommands);
 							} else {
 								CommandMove(*unit, force.GoalPos, FlushCommands);
 							}

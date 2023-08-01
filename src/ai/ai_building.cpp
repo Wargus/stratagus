@@ -172,7 +172,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 #endif
 	if (CanBuildUnitType(&worker, type, pos, 1)
-		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
+		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8)) {
 		bool backupok;
 		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
 			*resultPos = pos;
@@ -207,7 +207,7 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	terrainTraversal.Init();
 
-	if (startUnit != NULL) {
+	if (startUnit != nullptr) {
 		terrainTraversal.PushUnitPosAndNeighboor(*startUnit);
 	} else {
 		Assert(Map.Info.IsPointOnMap(startPos));
@@ -339,7 +339,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 	if (terrainTraversal.Run(hallPlaceFinder)) {
 		return true;
 	}
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
+	return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
 }
 
 class LumberMillPlaceFinder
@@ -368,7 +368,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
-		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos)) {
+		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
 			return VisitResult_Finished;
 		}
 	}
@@ -414,7 +414,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 							  Vec2i *resultPos)
 {
 	// look near (mine = ResourceOnMap(pos, resource, false) ?
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, false, resultPos);
+	return AiFindBuildingPlace2(worker, type, startPos, nullptr, false, resultPos);
 }
 
 /**
@@ -456,12 +456,12 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 					return AiFindMiningPlace(worker, type, startPos, i, resultPos);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
-					return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
+					return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
 				}
 			}
 		}
 	}
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
+	return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
 }
 
 //@}

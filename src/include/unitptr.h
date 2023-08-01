@@ -41,7 +41,7 @@ class CUnit;
 class CUnitPtr
 {
 public:
-	CUnitPtr() : unit(NULL) {}
+	CUnitPtr() : unit(nullptr) {}
 	CUnitPtr(CUnit *u);
 	CUnitPtr(const CUnitPtr &u);
 	~CUnitPtr() { Reset(); }

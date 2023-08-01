@@ -118,7 +118,7 @@ public:
 
 	virtual void UpdatePathFinderData(PathFinderInput &input) = 0;
 
-	bool HasGoal() const { return Goal != NULL; }
+	bool HasGoal() const { return Goal != nullptr; }
 	CUnit *GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();

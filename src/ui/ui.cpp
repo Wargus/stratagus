@@ -131,17 +131,17 @@ CUserInterface::CUserInterface() :
 	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
 	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
 	NormalFontColor("yellow"), ReverseFontColor("white"),
-	SingleSelectedButton(NULL),
-	MaxSelectedFont(NULL), MaxSelectedTextX(0), MaxSelectedTextY(0),
-	SingleTrainingButton(NULL),
-	SingleTrainingFont(NULL), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingFont(NULL), TrainingTextX(0), TrainingTextY(0),
+	SingleSelectedButton(nullptr),
+	MaxSelectedFont(nullptr), MaxSelectedTextX(0), MaxSelectedTextY(0),
+	SingleTrainingButton(nullptr),
+	SingleTrainingFont(nullptr), SingleTrainingTextX(0), SingleTrainingTextY(0),
+	TrainingFont(nullptr), TrainingTextX(0), TrainingTextY(0),
 	CompletedBarColor(0), CompletedBarShadow(0),
-	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
-	SelectedViewport(NULL), NumViewports(0),
-	MessageFont(NULL), MessageScrollSpeed(5),
+	ViewportMode(VIEWPORT_SINGLE), MouseViewport(nullptr),
+	SelectedViewport(nullptr), NumViewports(0),
+	MessageFont(nullptr), MessageScrollSpeed(5),
 	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-	VictoryBackgroundG(NULL), DefeatBackgroundG(NULL)
+	VictoryBackgroundG(nullptr), DefeatBackgroundG(nullptr)
 {
 	MouseWarpPos.x = MouseWarpPos.y = -1;
 
@@ -194,7 +194,7 @@ CPopup *PopupByIdent(const std::string &ident)
 			return *i;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -250,7 +250,7 @@ void CursorConfig::Load()
 {
 	Assert(!Name.empty());
 	Cursor = CursorByIdent(Name);
-	if (Cursor == NULL) {
+	if (Cursor == nullptr) {
 		return ;
 	}
 	Assert(Name == Cursor->Ident);
@@ -418,7 +418,7 @@ void CleanUserInterface()
 			delete TitleScreens[i];
 		}
 		delete[] TitleScreens;
-		TitleScreens = NULL;
+		TitleScreens = nullptr;
 	}
 }
 
@@ -437,7 +437,7 @@ void FreeButtonStyles()
 **
 **  @param screenPos  pixel coordinate with origin at UL corner of screen
 **
-**  @return viewport pointer or NULL if this pixel is not inside
+**  @return viewport pointer or nullptr if this pixel is not inside
 **  any of the viewports.
 **
 **  @note This functions only works with rectangular viewports, when
@@ -450,7 +450,7 @@ CViewport *GetViewport(const PixelPos &screenPos)
 			return vp;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**

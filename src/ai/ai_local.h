@@ -71,7 +71,7 @@ public:
 class AiRequestType
 {
 public:
-	AiRequestType() : Count(0), Type(NULL) {}
+	AiRequestType() : Count(0), Type(nullptr) {}
 
 	unsigned int Count;  /// elements in table
 	CUnitType *Type;     /// the type
@@ -83,7 +83,7 @@ public:
 class AiUnitType
 {
 public:
-	AiUnitType() : Want(0), Type(NULL) {}
+	AiUnitType() : Want(0), Type(nullptr) {}
 
 	unsigned int Want; /// number of this unit-type wanted
 	CUnitType *Type;   /// unit-type self
@@ -246,7 +246,7 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
+	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0)
 	{
 		Pos.x = Pos.y = -1;
 	}
@@ -278,7 +278,7 @@ public:
 class PlayerAi
 {
 public:
-	PlayerAi() : Player(NULL), AiType(NULL),
+	PlayerAi() : Player(nullptr), AiType(nullptr),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
 		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)

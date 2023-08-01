@@ -72,7 +72,7 @@ class _filter_flags
 public:
 	_filter_flags(const CPlayer &p, int *fogmask) : player(&p), fogmask(fogmask)
 	{
-		Assert(fogmask != NULL);
+		Assert(fogmask != nullptr);
 	}
 
 	void operator()(const CUnit *const unit) const
@@ -436,7 +436,7 @@ void CViewport::AdjustFogSurface()
     SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
 	
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-	SDL_FillRect(this->FogSurface, NULL, fogColorSolid);
+	SDL_FillRect(this->FogSurface, nullptr, fogColorSolid);
 }
 
 void CViewport::Clean()

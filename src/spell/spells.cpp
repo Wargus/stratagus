@@ -130,7 +130,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 
 		unit = (condition->Variable[i].ConditionApplyOnCaster) ? &caster : target;
 		//  Spell should target location and have unit condition.
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			continue;
 		}
 		if (condition->Variable[i].Enable != CONDITION_TRUE) {
@@ -286,7 +286,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			}
 		}
 		if ((autocast->Combat == CONDITION_ONLY) ^ (inCombat)) {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -296,7 +296,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				&& PassCondition(caster, spell, &caster, pos, autocast->Condition)) {
 				return NewTargetUnit(caster);
 			}
-			return NULL;
+			return nullptr;
 		case TargetPosition: {
 			if (autocast->PositionAutoCast && table.empty() == false) {
 				size_t count = 0;
@@ -331,7 +331,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					autocast->PositionAutoCast->run(2);
 					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 					if (Map.Info.IsPointOnMap(resPos)) {
-						Target *target = new Target(TargetPosition, NULL, resPos);
+						Target *target = new Target(TargetPosition, nullptr, resPos);
 						return target;
 					}
 				}
@@ -387,10 +387,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			// Something is wrong
 			DebugPrint("Spell is screwed up, unknown target type\n");
 			Assert(0);
-			return NULL;
+			return nullptr;
 			break;
 	}
-	return NULL; // Can't spell the auto-cast.
+	return nullptr; // Can't spell the auto-cast.
 }
 
 // ****************************************************************************
@@ -422,7 +422,7 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 			return *i;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 // ****************************************************************************
@@ -457,7 +457,7 @@ bool SpellIsAvailable(const CPlayer &player, int spellid)
 bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 				  const CUnit *target, const Vec2i &goalPos)
 {
-	if (spell.Target == TargetUnit && target == NULL) {
+	if (spell.Target == TargetUnit && target == nullptr) {
 		return false;
 	}
 	return PassCondition(caster, spell, target, goalPos, spell.Condition);
@@ -480,18 +480,18 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 		return 0;
 	}
 	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);
-	if (target == NULL) {
+	if (target == nullptr) {
 		return 0;
 	} else {
 		// Save previous order
-		COrder *savedOrder = NULL;
+		COrder *savedOrder = nullptr;
 		if (caster.CurrentAction() != UnitActionStill && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
 		delete target;
-		if (savedOrder != NULL) {
+		if (savedOrder != nullptr) {
 			caster.SavedOrder = savedOrder;
 		}
 	}
@@ -574,8 +574,8 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 SpellType::SpellType(int slot, const std::string &ident) :
 	Ident(ident), Slot(slot), Target(), Action(),
 	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
-	DependencyId(-1), Condition(NULL),
-	AutoCast(NULL), AICast(NULL), ForceUseAnimation(false)
+	DependencyId(-1), Condition(nullptr),
+	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
 {
 	memset(Costs, 0, sizeof(Costs));
 }

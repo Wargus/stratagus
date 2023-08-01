@@ -120,10 +120,10 @@ SDL_Cursor *CCursor::GetSDLCursor()
 			SDL_Rect srect = {G->frame_map[i].x, G->frame_map[i].y, G->getWidth(), G->getHeight()};
 
 			SDL_Surface *intermediate = SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitSurface(G->Surface, &srect, intermediate, NULL);
+			SDL_BlitSurface(G->Surface, &srect, intermediate, nullptr);
 
 			SDL_Surface *cursorFrame = SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitScaled(intermediate, NULL, cursorFrame, NULL);
+			SDL_BlitScaled(intermediate, nullptr, cursorFrame, nullptr);
 
 			SDL_FreeSurface(intermediate);
 
@@ -200,7 +200,7 @@ CCursor *CursorByIdent(const std::string &ident)
 		}
 	}
 	DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -239,7 +239,7 @@ static void DrawBuildingCursor()
 	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
-	CUnit *ontop = NULL;
+	CUnit *ontop = nullptr;
 
 	//
 	//  Draw building
@@ -267,14 +267,14 @@ static void DrawBuildingCursor()
 	if (!Selected.empty()) {
 		f = 1;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
-			// Assign ontop or NULL
-			ontop = (ontop == Selected[i] ? NULL : ontop);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != nullptr);
+			// Assign ontop or nullptr
+			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != nullptr);
 		if (!Editor.Running || ontop == (CUnit *)1) {
-			ontop = NULL;
+			ontop = nullptr;
 		}
 	}
 
@@ -323,7 +323,7 @@ void DrawCursor()
 		}
 	} else if (ActuallyVisibleGameCursor) {
 		SDL_SetCursor(Video.blankCursor);
-		ActuallyVisibleGameCursor = NULL;
+		ActuallyVisibleGameCursor = nullptr;
 	}
 
 	// Selecting rectangle
@@ -338,10 +338,10 @@ void DrawCursor()
 
 	//  Cursor may not exist if we are loading a game or something.
 	//  Only draw it if it exists
-	if (GameCursor == NULL || IsDemoMode()) {
+	if (GameCursor == nullptr || IsDemoMode()) {
 		if (Preference.HardwareCursor) {
 			SDL_SetCursor(Video.blankCursor);
-			ActuallyVisibleGameCursor = NULL;
+			ActuallyVisibleGameCursor = nullptr;
 		}
 		return;
 	}
@@ -368,7 +368,7 @@ void DrawCursor()
 														TheScreen->format->Amask);
 			}
 			SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
-			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, NULL);
+			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, nullptr);
 		}
 
 		if (!GameCursor->G->IsLoaded()) {
@@ -396,10 +396,10 @@ void HideCursor()
 	if (!Preference.HardwareCursor && !GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
-		SDL_BlitSurface(HiddenSurface, NULL, TheScreen, &dstRect);
+		SDL_BlitSurface(HiddenSurface, nullptr, TheScreen, &dstRect);
 	} else {
 		SDL_SetCursor(Video.blankCursor);
-		ActuallyVisibleGameCursor = NULL;
+		ActuallyVisibleGameCursor = nullptr;
 	}
 }
 
@@ -442,9 +442,9 @@ void CleanCursors()
 	}
 	AllCursors.clear();
 
-	CursorBuilding = NULL;
-	GameCursor = NULL;
-	UnitUnderCursor = NULL;
+	CursorBuilding = nullptr;
+	GameCursor = nullptr;
+	UnitUnderCursor = nullptr;
 }
 
 /**
@@ -496,7 +496,7 @@ static int CclDefineCursor(lua_State *l)
 	//
 	//  Look if this kind of cursor already exists.
 	//
-	CCursor *ct = NULL;
+	CCursor *ct = nullptr;
 	for (size_t i = 0; i < AllCursors.size(); ++i) {
 		//  Race not same, not found.
 		if (AllCursors[i]->Race != race) {

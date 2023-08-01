@@ -113,7 +113,7 @@ class CConstructionFrame
 {
 public:
 	CConstructionFrame() : Percent(0), File(ConstructionFileConstruction),
-		Frame(0), Next(NULL) {}
+		Frame(0), Next(nullptr) {}
 
 	int Percent;                    /// Percent complete
 	ConstructionFileType File;      /// Graphic to use
@@ -125,8 +125,8 @@ public:
 class CConstruction
 {
 public:
-	CConstruction() : Frames(NULL), Sprite(NULL), Width(0),
-		Height(0), ShadowSprite(NULL), ShadowWidth(0), ShadowHeight(0)
+	CConstruction() : Frames(nullptr), Sprite(nullptr), Width(0),
+		Height(0), ShadowSprite(nullptr), ShadowWidth(0), ShadowHeight(0)
 	{
 		File.Width = 0;
 		File.Height = 0;

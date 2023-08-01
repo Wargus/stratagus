@@ -73,7 +73,7 @@ static SpellActionType *CclSpellAction(lua_State *l)
 
 	const char *value = LuaToString(l, -1, 1);
 
-	SpellActionType *spellaction = NULL;
+	SpellActionType *spellaction = nullptr;
 	if (!strcmp(value, "adjust-variable")) {
 		spellaction = new Spell_AdjustVariable;
 	} else if (!strcmp(value, "adjust-vitals")) {
@@ -307,7 +307,7 @@ static int CclDefineSpell(lua_State *l)
 	const int args = lua_gettop(l);
 	const std::string identname = LuaToString(l, 1);
 	SpellType *spell = SpellTypeByIdent(identname);
-	if (spell != NULL) {
+	if (spell != nullptr) {
 		DebugPrint("Redefining spell-type '%s'\n" _C_ identname.c_str());
 	} else {
 		spell = new SpellType(SpellTypeTable.size(), identname);

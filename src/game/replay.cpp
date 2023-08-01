@@ -73,7 +73,7 @@ class LogEntry
 {
 public:
 	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(NULL)
+		Num(0), SyncRandSeed(0), Next(nullptr)
 	{
 		UnitNumber = 0;
 	}
@@ -99,7 +99,7 @@ class FullReplay
 {
 public:
 	FullReplay() :
-		MapId(0), LocalPlayer(0), Commands(NULL)
+		MapId(0), LocalPlayer(0), Commands(nullptr)
 	{
 		ReplaySettings.Init();
 		memset(Engine, 0, sizeof(Engine));
@@ -395,7 +395,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 			// don't retry for each command
 			CommandLogDisabled = false;
 			delete LogFile;
-			LogFile = NULL;
+			LogFile = nullptr;
 			return;
 		}
 		LastLogFileName = path;
@@ -533,7 +533,7 @@ static int CclReplayLog(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	Assert(CurrentReplay == NULL);
+	Assert(CurrentReplay == nullptr);
 
 	replay = new FullReplay;
 
@@ -672,13 +672,13 @@ void EndReplayLog()
 	if (LogFile) {
 		LogFile->close();
 		delete LogFile;
-		LogFile = NULL;
+		LogFile = nullptr;
 	}
 	if (CurrentReplay) {
 		DeleteReplay(CurrentReplay);
-		CurrentReplay = NULL;
+		CurrentReplay = nullptr;
 	}
-	ReplayStep = NULL;
+	ReplayStep = nullptr;
 }
 
 /**
@@ -690,7 +690,7 @@ void CleanReplayLog()
 		DeleteReplay(CurrentReplay);
 		CurrentReplay = nullptr;
 	}
-	ReplayStep = NULL;
+	ReplayStep = nullptr;
 
 	// if (DisabledLog) {
 	CommandLogDisabled = false;
@@ -720,8 +720,8 @@ static void DoNextReplay()
 	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
-	CUnit *unit = unitSlot != -1 ? &UnitManager->GetSlotUnit(unitSlot) : NULL;
-	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep->DestUnitNumber) : NULL);
+	CUnit *unit = unitSlot != -1 ? &UnitManager->GetSlotUnit(unitSlot) : nullptr;
+	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep->DestUnitNumber) : nullptr);
 	const char *val = ReplayStep->Value.c_str();
 	const int num = ReplayStep->Num;
 
@@ -788,7 +788,7 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "train")) {
 		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : NULL);
+		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : nullptr);
 	} else if (!strcmp(action, "upgrade-to")) {
 		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {

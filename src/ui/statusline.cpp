@@ -73,7 +73,7 @@ void CStatusLine::Set(const std::string &status)
 **
 **  @param mana   Mana costs.
 **  @param food   Food costs.
-**  @param costs  Resource costs, NULL pointer if all are zero.
+**  @param costs  Resource costs, nullptr pointer if all are zero.
 */
 void CStatusLine::SetCosts(int mana, int food, const int *costs)
 {
@@ -91,7 +91,7 @@ void CStatusLine::SetCosts(int mana, int food, const int *costs)
 */
 void CStatusLine::ClearCosts()
 {
-	SetCosts(0, 0, NULL);
+	SetCosts(0, 0, nullptr);
 }
 
 /**

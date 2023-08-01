@@ -150,7 +150,7 @@ static void UiBeginInput()
 static void UiUnselectAll()
 {
 	UnSelectAll();
-	NetworkSendSelection((CUnit **)NULL, 0);
+	NetworkSendSelection((CUnit **)nullptr, 0);
 	SelectionChanged();
 }
 
@@ -457,7 +457,7 @@ void UiFindIdleWorker()
 		}
 	}
 
-	if (unit != NULL) {
+	if (unit != nullptr) {
 		LastIdleWorker = unit;
 		SelectSingleUnit(*unit);
 		UI.StatusLine.Clear();
@@ -486,11 +486,11 @@ void UiTrackUnit()
 {
 	//Check if player has selected at least 1 unit
 	if (Selected.empty()) {
-		UI.SelectedViewport->Unit = NULL;
+		UI.SelectedViewport->Unit = nullptr;
 		return;
 	}
 	if (UI.SelectedViewport->Unit == Selected[0]) {
-		UI.SelectedViewport->Unit = NULL;
+		UI.SelectedViewport->Unit = nullptr;
 	} else {
 		UI.SelectedViewport->Unit = Selected[0];
 	}

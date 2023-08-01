@@ -80,14 +80,14 @@ public:
 	 *  @brief Find the first unit in a tile cache for which a predicate is true.
 	 *  @param  pred   A predicate object vith bool operator()(const CUnit *).
 	 *  @return   The first unit u in the cache
-	 *  such that @p pred(u) is true, or NULL if no such unit exists.
+	 *  such that @p pred(u) is true, or nullptr if no such unit exists.
 	 */
 	template<typename _T>
 	CUnit *find(const _T &pred) const
 	{
 		std::vector<CUnit *>::const_iterator ret = std::find_if(Units.begin(), Units.end(), pred);
 
-		return ret != Units.end() ? (*ret) : NULL;
+		return ret != Units.end() ? (*ret) : nullptr;
 	}
 
 	/**

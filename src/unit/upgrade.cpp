@@ -159,7 +159,7 @@ CUpgrade *CUpgrade::New(const std::string &ident)
 **
 **  @param ident  Upgrade identifier
 **
-**  @return       Upgrade pointer or NULL if not found.
+**  @return       Upgrade pointer or nullptr if not found.
 */
 CUpgrade *CUpgrade::Get(const std::string &ident)
 {

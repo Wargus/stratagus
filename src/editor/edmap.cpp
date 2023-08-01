@@ -367,28 +367,28 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value, int
 
 		// FIXME: can overlap units
 		CUnit *unit = MakeUnitAndPlace(rpos, type, &Players[PlayerNumNeutral]);
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
 		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral]);
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
 		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral]);
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
 		}
 
 		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral]);
-		if (unit == NULL) {
+		if (unit == nullptr) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
 			unit->ResourcesHeld = value;
@@ -404,7 +404,7 @@ static void EditorDestroyAllUnits()
 	while (UnitManager->empty() == false) {
 		CUnit &unit = **UnitManager->begin();
 
-		unit.Remove(NULL);
+		unit.Remove(nullptr);
 		UnitLost(unit);
 		UnitClearOrders(unit);
 		unit.Release();

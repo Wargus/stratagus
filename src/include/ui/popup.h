@@ -53,7 +53,7 @@ class PopupConditionPanel
 {
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
-		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
+		ButtonAction(-1), BoolFlags(nullptr), Variables(nullptr) {}
 	~PopupConditionPanel()
 	{
 		delete[] BoolFlags;
@@ -75,7 +75,7 @@ class CPopupContentType
 public:
 	CPopupContentType() : pos(0, 0),
 		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
-		Wrap(true), Condition(NULL) {}
+		Wrap(true), Condition(nullptr) {}
 	virtual ~CPopupContentType() { delete Condition; }
 
 	/// Tell how show the variable Index.
@@ -100,7 +100,7 @@ protected:
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+	PopupConditionPanel *Condition; /// Condition to show the content; if nullptr, no condition.
 };
 
 enum PopupButtonInfo_Types {
@@ -112,7 +112,7 @@ enum PopupButtonInfo_Types {
 class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(NULL) {}
+	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeButtonInfo() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -131,7 +131,7 @@ private:
 class CPopupContentTypeText : public CPopupContentType
 {
 public:
-	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
+	CPopupContentTypeText() : MaxWidth(0), Font(nullptr) {}
 	virtual ~CPopupContentTypeText() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -150,7 +150,7 @@ private:
 class CPopupContentTypeCosts : public CPopupContentType
 {
 public:
-	CPopupContentTypeCosts() : Font(NULL), Centered(0) {}
+	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
 	virtual ~CPopupContentTypeCosts() {}
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
@@ -187,7 +187,7 @@ private:
 class CPopupContentTypeVariable : public CPopupContentType
 {
 public:
-	CPopupContentTypeVariable() : Text(NULL), Font(NULL), Centered(0), Index(-1) {}
+	CPopupContentTypeVariable() : Text(nullptr), Font(nullptr), Centered(0), Index(-1) {}
 	virtual ~CPopupContentTypeVariable()
 	{
 		FreeStringDesc(Text);

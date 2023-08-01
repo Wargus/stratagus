@@ -116,10 +116,10 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 {
 	char *buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *var = strtok(buf, ","); var; var = strtok(NULL, ",")) {
-		const char *type = strtok(NULL, ",");
-		const char *binop = strtok(NULL, ",");
-		const char *value = strtok(NULL, ",");
+	for (const char *var = strtok(buf, ","); var; var = strtok(nullptr, ",")) {
+		const char *type = strtok(nullptr, ",");
+		const char *binop = strtok(nullptr, ",");
+		const char *value = strtok(nullptr, ",");
 		const int index = UnitTypeVar.VariableNameLookup[var];// User variables
 		if (index == -1) {
 			fprintf(stderr, "Bad variable name '%s'\n", var);
@@ -183,7 +183,7 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
 		if (player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
 			return true;
@@ -206,7 +206,7 @@ bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 	CPlayer *player = unit.Player;
 	char *buf = new_strdup(button.AllowStr.c_str());
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
 		if (!player->HaveUnitTypeByIdent(s)) {
 			delete[] buf;
 			return false;

@@ -42,7 +42,7 @@
 class Spell_LuaCallback : public SpellActionType
 {
 public:
-	Spell_LuaCallback() : Func(NULL) {};
+	Spell_LuaCallback() : Func(nullptr) {};
 	~Spell_LuaCallback() { delete Func; };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *&target, const Vec2i &goalPos);

@@ -41,7 +41,7 @@ CParticleManager ParticleManager;
 
 
 CParticleManager::CParticleManager() :
-	vp(NULL), lastTicks(0)
+	vp(nullptr), lastTicks(0)
 {
 }
 
@@ -93,7 +93,7 @@ void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle 
 
 void CParticleManager::endDraw()
 {
-	this->vp = NULL;
+	this->vp = nullptr;
 }
 
 void CParticleManager::update()

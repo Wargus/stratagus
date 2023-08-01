@@ -100,7 +100,7 @@ enum {
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
-	if (this->BuildingUnit != NULL) {
+	if (this->BuildingUnit != nullptr) {
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
@@ -172,7 +172,7 @@ void COrder_Build::AiUnitKilled(CUnit &unit)
 	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
 			   unit.Player->Index _C_ UnitNumber(unit) _C_
 			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
-	if (this->BuildingUnit == NULL) {
+	if (this->BuildingUnit == nullptr) {
 		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
 	}
 }
@@ -276,7 +276,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 
 	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
 
-	if (ontop != NULL) {
+	if (ontop != nullptr) {
 		return ontop;
 	}
 #if 0
@@ -285,7 +285,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	 * enabled/disable via game lua scripting
 	 */
 	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
-	if (building != NULL) {
+	if (building != nullptr) {
 		if (unit.CurrentOrder() == this) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					   _C_ unit.Player->Index _C_ unit.Slot
@@ -294,7 +294,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 
 			delete this; // Bad
 			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
-			return NULL;
+			return nullptr;
 		}
 	}
 #endif
@@ -303,7 +303,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	// To keep the load low, retry each 10 cycles
 	// NOTE: we can already inform the AI about this problem?
 	unit.Wait = 10;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -316,7 +316,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
 
 	// If unable to make unit, stop, and report message
-	if (build == NULL) {
+	if (build == nullptr) {
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
 							_("Unable to create building %s"), type.Name.c_str());
@@ -339,7 +339,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			build->Variable[GIVERESOURCE_INDEX].Value = ontop.Variable[GIVERESOURCE_INDEX].Value;
 			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
 			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;
-			ontop.Remove(NULL); // Destroy building beneath
+			ontop.Remove(nullptr); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
 			ontop.Release();
@@ -394,7 +394,7 @@ static void AnimateActionBuild(CUnit &unit)
 {
 	CAnimations *animations = unit.Type->Animations;
 
-	if (animations == NULL) {
+	if (animations == nullptr) {
 		return ;
 	}
 	if (animations->Build) {
@@ -414,7 +414,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 {
 	AnimateActionBuild(unit);
 
-	if (this->BuildingUnit == NULL) {
+	if (this->BuildingUnit == nullptr) {
 		return false;
 	}
 
@@ -437,7 +437,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 
 /* virtual */ void COrder_Build::UpdateUnitVariables(CUnit &unit) const
 {
-	if (this->State == State_BuildFromOutside && this->BuildingUnit != NULL) {
+	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr) {
 		unit.Variable[TRAINING_INDEX].Value = this->BuildingUnit->Variable[BUILD_INDEX].Value;
 		unit.Variable[TRAINING_INDEX].Max = this->BuildingUnit->Variable[BUILD_INDEX].Max;
 	}
@@ -464,7 +464,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 		}
 		CUnit *ontop = this->CheckCanBuild(unit);
 
-		if (ontop != NULL) {
+		if (ontop != nullptr) {
 			this->StartBuilding(unit, *ontop);
 		}
 	}
@@ -486,7 +486,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 
 /* virtual */ void COrder_Build::Cancel(CUnit &unit)
 {
-	if (this->State == State_BuildFromOutside && this->BuildingUnit != NULL && this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr && this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
 		targetOrder.Cancel(*this->BuildingUnit);
 	}

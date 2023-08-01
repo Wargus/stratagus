@@ -67,7 +67,7 @@ void SaveScreenshotPNG(const char *name)
 void SaveMapPNG(const char *name)
 {
 	FILE *fp = fopen(name, "wb");
-	if (fp == NULL) {
+	if (fp == nullptr) {
 		return;
 	}
 

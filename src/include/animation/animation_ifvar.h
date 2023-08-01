@@ -38,7 +38,7 @@
 class CAnimation_IfVar : public CAnimation
 {
 public:
-	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(NULL), gotoLabel(NULL) {}
+	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(nullptr), gotoLabel(nullptr) {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const;
 	virtual void Init(const char *s, lua_State *l);

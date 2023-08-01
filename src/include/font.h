@@ -75,8 +75,8 @@ class CFont : public gcn::Font
 private:
 	explicit CFont(const std::string &ident) :
 		Ident(ident),
-		CharWidth(NULL),
-		G(NULL)
+		CharWidth(nullptr),
+		G(nullptr)
 	{}
 
 public:

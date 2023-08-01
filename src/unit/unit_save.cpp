@@ -71,7 +71,7 @@ std::string UnitReference(const CUnit &unit)
 */
 std::string UnitReference(const CUnitPtr &unit)
 {
-	Assert(unit != NULL);
+	Assert(unit != nullptr);
 
 	std::ostringstream ss;
 	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
@@ -276,7 +276,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
 	}
 
-	if (unit.Resource.Workers != NULL) {
+	if (unit.Resource.Workers != nullptr) {
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
 		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
 		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());

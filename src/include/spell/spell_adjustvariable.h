@@ -68,7 +68,7 @@ public:
 class Spell_AdjustVariable : public SpellActionType
 {
 public:
-	Spell_AdjustVariable() : Var(NULL) {};
+	Spell_AdjustVariable() : Var(nullptr) {};
 	~Spell_AdjustVariable() { delete [](this->Var); };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *&target, const Vec2i &goalPos);

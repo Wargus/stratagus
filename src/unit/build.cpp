@@ -93,7 +93,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -117,7 +117,7 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
-	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -194,7 +194,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
-	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 	int count = 0;
 	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
@@ -320,7 +320,7 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 		return false;
 	}
 	functor f(Parent, pos1);
-	return (Map.Field(pos1)->UnitCache.find(f) != NULL);
+	return (Map.Field(pos1)->UnitCache.find(f) != nullptr);
 }
 
 /**
@@ -335,7 +335,7 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 			ontop = unit;
 		} else {
 			// Something else is built on this already
-			ontop = NULL;
+			ontop = nullptr;
 			return false;
 		}
 	}
@@ -380,7 +380,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	ontoptarget = NULL;
+	ontoptarget = nullptr;
 	CUnitCache &cache = Map.Field(pos)->UnitCache;
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
@@ -417,16 +417,16 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 **  @param type  unit-type to be checked.
 **  @param pos   Map position.
 **
-**  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
+**  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, nullptr false.
 */
 CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 {
 	//  Can't build outside the map
 	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
-		return NULL;
+		return nullptr;
 	}
 	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
-		return NULL;
+		return nullptr;
 	}
 
 	// Must be checked before oil!
@@ -449,7 +449,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			index += Map.Info.MapWidth;
 		} while (!success && --h);
 		if (!success) {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -458,7 +458,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		bool aiChecked = true;
 		size_t count = type.AiBuildingRules.size();
 		if (count > 0) {
-			CUnit *ontoptarget = NULL;
+			CUnit *ontoptarget = nullptr;
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.AiBuildingRules[i];
 				// All checks processed, did we really have success
@@ -472,7 +472,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			}
 		}
 		if (aiChecked == false) {
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -481,22 +481,22 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		if (count > 0) {
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.BuildingRules[i];
-				CUnit *ontoptarget = NULL;
+				CUnit *ontoptarget = nullptr;
 				// All checks processed, did we really have success
 				if (rule->Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset return
-					if (unit == NULL) {
+					if (unit == nullptr) {
 						return ontoptarget ? ontoptarget : (CUnit *)1;
 					} else {
 						return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 					}
 				}
 			}
-			return NULL;
+			return nullptr;
 		}
 	}
 
-	return (unit == NULL) ? (CUnit *)1 : const_cast<CUnit *>(unit);
+	return (unit == nullptr) ? (CUnit *)1 : const_cast<CUnit *>(unit);
 }
 
 /**
@@ -515,20 +515,20 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 /**
 **  Can build unit-type at this point.
 **
-**  @param unit  Worker that want to build the building or NULL.
+**  @param unit  Worker that want to build the building or nullptr.
 **  @param type  Building unit-type.
 **  @param pos   tile map position.
 **  @param real  Really build, or just placement
 **
-**  @return      OnTop, parent unit, builder on true, NULL false.
+**  @return      OnTop, parent unit, builder on true, nullptr false.
 **
 */
 CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
 {
 	// Terrain Flags don't matter if building on top of a unit.
 	CUnit *ontop = CanBuildHere(unit, type, pos);
-	if (ontop == NULL) {
-		return NULL;
+	if (ontop == nullptr) {
+		return nullptr;
 	}
 	if (ontop != (CUnit *)1 && ontop != unit) {
 		return ontop;
@@ -539,7 +539,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 		UnmarkUnitFieldFlags(*unit);
 	}
 
-	CPlayer *player = NULL;
+	CPlayer *player = nullptr;
 
 	if (unit && unit->Player->Type == PlayerTypes::PlayerPerson) {
 		player = unit->Player;
@@ -551,7 +551,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
 				h = type.TileHeight;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 			if (player && !real) {
@@ -565,12 +565,12 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			const CMapField &mf = *Map.Field(index + pos.x + w);
 			if (mf.CheckMask(testmask)) {
 				h = type.TileHeight;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 			if (player && !mf.playerInfo.IsExplored(*player)) {
 				h = type.TileHeight;
-				ontop = NULL;
+				ontop = nullptr;
 				break;
 			}
 		}
