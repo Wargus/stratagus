@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Tested with 
 #   appimagecrafters/appimage-builder
 # and
@@ -31,12 +33,12 @@ if [ -z "$GAME_VERSION" ]; then
 fi
 export GAME_ARCH=$(uname -m)
 
-CENTOS=`which yum || true`
+CENTOS=`cat /etc/centos-release || true`
 if [ -n "$CENTOS" ]; then
     # centos (>= 7) build tools
     yum install -yy centos-release-scl && yum install -yy git devtoolset-7-toolchain
     yum install -yy zlib-devel file
-    scl enable devtoolset-7 bash
+    source /opt/rh/devtoolset-7/enable
     # centos SDL dependencies
     yum install -yy libX11-devel libXext-devel libXrandr-devel libXi-devel libXfixes-devel libXcursor-devel
     yum install -yy pulseaudio-libs-devel
@@ -65,7 +67,14 @@ if [ -n "$CENTOS" ]; then
         popd
 fi
 
-# git clone --depth 1 https://github.com/Wargus/stratagus
+if [ -n "$CENTOS" ]; then
+    if [ -n "$GITHUB_REF" ]; then
+        git clone https://github.com/Wargus/stratagus
+        pushd stratagus
+        git fetch origin "${GITHUB_REF}"
+        git checkout FETCH_HEAD
+    fi
+fi
 git clone --depth 1 https://github.com/Wargus/${GAME_ID}
 
 # pushd stratagus
@@ -114,6 +123,10 @@ if [ -n "$CENTOS" ]; then
     chmod +x linuxdeploy-x86_64.AppImage
     ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir AppDir --output appimage
     rm -f ./linuxdeploy-x86_64.AppImage
+    if [ -n "$GITHUB_REF" ]; then
+        cp *.AppImage "../${GAME_ID}-x86_64.AppImage"
+        popd
+    fi
 else
     # using appimage-builder
     echo    "version: 1" > appimagebuilder.yaml
