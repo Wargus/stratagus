@@ -39,7 +39,6 @@
 #include "iolib.h"
 
 #include "game.h"
-#include "iocompat.h"
 #include "map.h"
 #include "parameters.h"
 #include "util.h"
@@ -546,31 +545,29 @@ long CFile::PImpl::tell()
 /**
 **  Find a file with its correct extension ("", ".gz" or ".bz2")
 **
-**  @param file      The string with the file path. Upon success, the string
+**  @param fullpath  the file path. Upon success, the path
 **                   is replaced by the full filename with the correct extension.
-**  @param filesize  Size of the file buffer
 **
 **  @return true if the file has been found.
 */
-static bool FindFileWithExtension(char(&file)[PATH_MAX])
+static bool FindFileWithExtension(fs::path &fullpath)
 {
-	if (!access(file, R_OK)) {
+	if (fs::exists(fullpath)) {
 		return true;
 	}
 #if defined(USE_ZLIB) || defined(USE_BZ2LIB)
-	char buf[PATH_MAX + 4];
+	auto directory = fullpath.parent_path();
+	auto filename = fullpath.filename().string();
 #endif
 #ifdef USE_ZLIB // gzip or bzip2 in global shared directory
-	snprintf(buf, PATH_MAX, "%s.gz", file);
-	if (!access(buf, R_OK)) {
-		strcpy_s(file, PATH_MAX, buf);
+	if (fs::exists(directory / (filename + ".gz"))) {
+		fullpath = directory / (filename + ".gz");
 		return true;
 	}
 #endif
 #ifdef USE_BZ2LIB
-	snprintf(buf, PATH_MAX, "%s.bz2", file);
-	if (!access(buf, R_OK)) {
-		strcpy_s(file, PATH_MAX, buf);
+	if (fs::exists(directory / (filename + ".bz2"))) {
+		fullpath = directory / (filename + ".bz2");
 		return true;
 	}
 #endif
@@ -584,95 +581,81 @@ static bool FindFileWithExtension(char(&file)[PATH_MAX])
 **  This supports .gz, .bz2 and .zip.
 **
 **  @param file        Filename to open.
-**  @param buffer      Allocated buffer for generated filename.
+**  return generated filename.
 */
-static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
+static fs::path LibraryFileNameImpl(const char *file)
 {
 	// Absolute path or in current directory.
-	strcpy_s(buffer, PATH_MAX, file);
-	if (*buffer == '/') {
-		return;
+	fs::path candidate = file;
+	if (candidate.is_absolute()) {
+		return candidate;
 	}
-	if (FindFileWithExtension(buffer)) {
-		return;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
 
 	// Try in map directory
 	if (*CurrentMapPath) {
 		if (*CurrentMapPath == '.' || *CurrentMapPath == '/') {
-			strcpy_s(buffer, PATH_MAX, CurrentMapPath);
-			char *s = strrchr(buffer, '/');
-			if (s) {
-				s[1] = '\0';
-			}
-			strcat_s(buffer, PATH_MAX, file);
+			candidate = fs::path(CurrentMapPath) / file;
 		} else {
-			strcpy_s(buffer, PATH_MAX, StratagusLibPath.c_str());
-			if (*buffer) {
-				strcat_s(buffer, PATH_MAX, "/");
-			}
-			strcat_s(buffer, PATH_MAX, CurrentMapPath);
-			char *s = strrchr(buffer, '/');
-			if (s) {
-				s[1] = '\0';
-			}
-			strcat_s(buffer, PATH_MAX, file);
+			candidate = fs::path(StratagusLibPath) / CurrentMapPath / file;
 		}
-		if (FindFileWithExtension(buffer)) {
-			return;
+		if (FindFileWithExtension(candidate)) {
+			return candidate;
 		}
 	}
 
 	// In user home directory
 	if (!GameName.empty()) {
-		sprintf(buffer, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
-		if (FindFileWithExtension(buffer)) {
-			return;
+		candidate = Parameters::Instance.GetUserDirectory() / GameName / file;
+		if (FindFileWithExtension(candidate)) {
+			return candidate;
 		}
 	}
 
 	// In global shared directory
-	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path(StratagusLibPath) / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
 
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "graphics/%s", file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path("graphics") / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
-	sprintf(buffer, "%s/graphics/%s", StratagusLibPath.c_str(), file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path(StratagusLibPath) / "graphics" / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
 
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "sounds/%s", file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path("sounds") / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
-	sprintf(buffer, "%s/sounds/%s", StratagusLibPath.c_str(), file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path(StratagusLibPath) / "sounds" / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
 
 	// Support for scripts in default scripts dir.
-	sprintf(buffer, "scripts/%s", file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path("scripts") / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
-	sprintf(buffer, "%s/scripts/%s", StratagusLibPath.c_str(), file);
-	if (FindFileWithExtension(buffer)) {
-		return;
+	candidate = fs::path(StratagusLibPath) / "scripts" / file;
+	if (FindFileWithExtension(candidate)) {
+		return candidate;
 	}
 
 	DebugPrint("File '%s' not found\n" _C_ file);
-	strcpy_s(buffer, PATH_MAX, file);
+	return file;
 }
 
 extern std::string LibraryFileName(const char *file)
@@ -680,9 +663,8 @@ extern std::string LibraryFileName(const char *file)
 	static std::unordered_map<std::string, std::string> FileNameMap;
 	auto result = FileNameMap.find(file);
 	if (result == std::end(FileNameMap)) {
-		char buffer[PATH_MAX];
-		LibraryFileName(file, buffer);
-		std::string r(buffer);
+		fs::path path = LibraryFileNameImpl(file);
+		std::string r(path.string());
 		FileNameMap[file] = r;
 		return r;
 	} else {
@@ -693,10 +675,8 @@ extern std::string LibraryFileName(const char *file)
 bool CanAccessFile(const char *filename)
 {
 	if (filename && filename[0] != '\0') {
-		char name[PATH_MAX];
-		name[0] = '\0';
-		LibraryFileName(filename, name);
-		return (name[0] != '\0' && 0 == access(name, R_OK));
+		const auto path = LibraryFileNameImpl(filename);
+		return fs::exists(path);
 	}
 	return false;
 }
@@ -705,70 +685,27 @@ bool CanAccessFile(const char *filename)
 **  Generate a list of files within a specified directory
 **
 **  @param dirname  Directory to read.
-**  @param fl       Filelist pointer.
 **
-**  @return the number of entries added to FileList.
+**  @return list of files/directories.
 */
-int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
+std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 {
-	struct stat st;
-	char buffer[PATH_MAX];
-	char *filename;
+	std::vector<FileList> files;
 
-	strcpy_s(buffer, sizeof(buffer), dirname);
-	int n = strlen(buffer);
-	if (!n || buffer[n - 1] != '/') {
-		buffer[n++] = '/';
-		buffer[n] = 0;
-	}
-	char *np = buffer + n;
-
-#ifndef USE_WIN32
-	DIR *dirp = opendir(dirname);
-	struct dirent *dp;
-
-	if (dirp) {
-		while ((dp = readdir(dirp)) != nullptr) {
-			filename = dp->d_name;
-#else
-	strcat_s(buffer, sizeof(buffer), "*.*");
-	struct _finddata_t fileinfo;
-	intptr_t hFile = _findfirst(buffer, &fileinfo);
-	if (hFile != -1) {
-		do {
-			filename = fileinfo.name;
-#endif
-			if (strcmp(filename, ".") == 0) {
-				continue;
-			}
-			if (strcmp(filename, "..") == 0) {
-				continue;
-			}
-			strcpy_s(np, sizeof(buffer) - (np - buffer), filename);
-			if (stat(buffer, &st) == 0) {
-				int isdir = S_ISDIR(st.st_mode);
-				if (isdir || S_ISREG(st.st_mode)) {
-					FileList nfl;
-
-					if (isdir) {
-						nfl.name = np;
-					} else {
-						nfl.name = np;
-						nfl.type = 1;
-					}
-					// sorted instertion
-					fl.insert(std::lower_bound(fl.begin(), fl.end(), nfl), nfl);
-				}
-			}
-#ifndef USE_WIN32
+	for (auto it = std::filesystem::directory_iterator{directory};
+	     it != std::filesystem::directory_iterator{};
+	     ++it) {
+		if (std::filesystem::is_directory(it->path())) {
+			files.emplace_back();
+			files.back().name = it->path().filename().string();
+		} else if (std::filesystem::is_regular_file(it->path())) {
+			files.emplace_back();
+			files.back().name = it->path().filename().string();
+			files.back().type = 1;
 		}
-		closedir(dirp);
-#else
-		} while (_findnext(hFile, &fileinfo) == 0);
-		_findclose(hFile);
-#endif
 	}
-	return fl.size();
+	std::sort(files.begin(), files.end());
+	return files;
 }
 
 void FileWriter::printf(const char *format, ...)

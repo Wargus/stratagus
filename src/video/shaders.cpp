@@ -213,7 +213,6 @@ static int loadShaders() {
 	COMPILE_BUILTIN_SHADER(VHS);
 #undef COMPILE_BUILTIN_SHADER
 
-	std::vector<FileList> flp;
 	fs::path shaderPath(StratagusLibPath);
 	shaderPath /= "shaders";
 #ifdef _WIN32
@@ -229,14 +228,13 @@ static int loadShaders() {
 	ExpandEnvironmentStrings(shaderPathStr.c_str(), cShaderPath, fullpathsize);
 	shaderPath = cShaderPath;
 #endif
-	int n = ReadDataDirectory(shaderPath.string().c_str(), flp);
-	for (int i = 0; i < n; ++i) {
-		int pos = flp[i].name.find(".glsl");
+	for (const auto& flp : ReadDataDirectory(shaderPath)) {
+		int pos = flp.name.find(".glsl");
 		if (pos > 0) {
-			GLuint program = compileProgram((shaderPath / flp[i].name).string());
+			GLuint program = compileProgram((shaderPath / flp.name).string());
 			if (program) {
 				shaderPrograms[numShdr] = program;
-				shaderNames[numShdr] = strdup(flp[i].name.c_str());
+				shaderNames[numShdr] = strdup(flp.name.c_str());
 				numShdr += 1;
 				if (numShdr >= MAX_SHADERS) {
 					break;

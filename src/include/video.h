@@ -188,7 +188,7 @@ private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
 public:
-	std::string File;          /// Filename
+	fs::path File;             /// Filename
 	std::string HashFile;      /// Filename used in hash
 	SDL_Surface *Surface;      /// Surface
 	SDL_Surface *SurfaceFlip;  /// Flipped surface

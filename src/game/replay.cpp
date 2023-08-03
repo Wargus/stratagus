@@ -40,7 +40,6 @@
 #include "commands.h"
 #include "game.h"
 #include "interface.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "netconnect.h"
@@ -57,6 +56,7 @@
 #include "version.h"
 
 #include <sstream>
+#include <sys/stat.h>
 #include <time.h>
 
 extern void ExpandPath(std::string &newpath, const std::string &path);
@@ -371,34 +371,27 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	if (!LogFile) {
 		time_t now;
 		time(&now);
-		struct stat tmp;
 
-		std::string path(Parameters::Instance.GetUserDirectory());
+		fs::path path(Parameters::Instance.GetUserDirectory());
 		if (!GameName.empty()) {
-			path += "/";
-			path += GameName;
+			path /= GameName;
 		}
-		path += "/logs";
+		path /= "logs";
 
-		if (stat(path.c_str(), &tmp) < 0) {
-			makedir(path.c_str(), 0777);
-		}
+		fs::create_directories(path);
 
-		path += "/log_of_stratagus_";
-		path += std::to_string(ThisPlayer->Index);
-		path += "_";
-		path += std::to_string((intmax_t)now);
-		path += ".log";
+		path /= "/log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
+		      + std::to_string((intmax_t) now) + ".log";
 
 		LogFile = new CFile;
-		if (LogFile->open(path.c_str(), CL_OPEN_WRITE) == -1) {
+		if (LogFile->open(path.string().c_str(), CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = false;
 			delete LogFile;
 			LogFile = nullptr;
 			return;
 		}
-		LastLogFileName = path;
+		LastLogFileName = path.string();
 		if (CurrentReplay) {
 			SaveFullLog(*LogFile);
 		}
@@ -909,7 +902,6 @@ int SaveReplay(const std::string &filename)
 {
 	FILE *fd;
 	char *buf;
-	std::string destination;
 	struct stat sb;
 	size_t size;
 
@@ -918,7 +910,7 @@ int SaveReplay(const std::string &filename)
 		return -1;
 	}
 
-	destination = Parameters::Instance.GetUserDirectory() + "/" + GameName + "/logs/" + filename;
+	auto destination = Parameters::Instance.GetUserDirectory() / GameName / "logs" / filename;
 
 	if (!LastLogFileName.empty() && stat(LastLogFileName.c_str(), &sb)) {
 		fprintf(stderr, "stat failed\n");
@@ -938,9 +930,9 @@ int SaveReplay(const std::string &filename)
 	size = fread(buf, sb.st_size, 1, fd);
 	fclose(fd);
 
-	fd = fopen(destination.c_str(), "wb");
+	fd = fopen(destination.string().c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to '%s'\n", destination.c_str());
+		fprintf(stderr, "Can't save to '%s'\n", destination.string().c_str());
 		delete[] buf;
 		return -1;
 	}

@@ -83,8 +83,8 @@ void LoadPO(const char *file)
 		return;
 	}
 
-	const std::string fullfile = LibraryFileName(file);
-	FILE *fd = fopen(fullfile.c_str(), "rb");
+	const fs::path fullfile = LibraryFileName(file);
+	FILE *fd = fopen(fullfile.string().c_str(), "rb");
 	if (!fd) {
 		fprintf(stderr, "Could not open file: %s\n", file);
 		return;

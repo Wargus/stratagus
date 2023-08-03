@@ -190,7 +190,6 @@ extern void beos_init(int argc, char **argv);
 #include "game.h"
 #include "guichan.h"
 #include "interface.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "netconnect.h"
@@ -315,7 +314,7 @@ static int MenuLoop()
 	GameCursor = UI.Point.Cursor;
 
 	// FIXME delete this when switching to full guichan GUI
-	const std::string filename = LibraryFileName("scripts/guichan.lua");
+	const fs::path filename = LibraryFileName("scripts/guichan.lua");
 	status = LuaLoadFile(filename);
 
 	// We clean up later in Exit
@@ -502,12 +501,12 @@ static void CleanupOutput()
 
 static void RedirectOutput()
 {
-	std::string path = Parameters::Instance.GetUserDirectory();
+	const auto& path = Parameters::Instance.GetUserDirectory();
 
-	makedir(path.c_str(), 0777);
+	fs::create_directories(path);
 
-	stdoutFile = path + "\\stdout.txt";
-	stderrFile = path + "\\stderr.txt";
+	stdoutFile = (path / "stdout.txt").string();
+	stderrFile = (path / "stderr.txt").string();
 
 	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
 		printf("freopen stdout failed");
@@ -743,7 +742,7 @@ int stratagusMain(int argc, char **argv)
 		// Init the random number generator.
 		InitSyncRand();
 
-		makedir(parameters.GetUserDirectory().c_str(), 0777);
+		fs::create_directories(parameters.GetUserDirectory());
 
 		// Init Lua and register lua functions!
 		InitLua();

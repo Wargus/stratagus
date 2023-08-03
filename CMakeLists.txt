@@ -558,7 +558,6 @@ set(stratagus_generic_HDRS
 	src/include/game.h
 	src/include/icons.h
 	src/include/interface.h
-	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/luacallback.h
 	src/include/map.h

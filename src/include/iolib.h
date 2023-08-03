@@ -144,7 +144,7 @@ extern std::string LibraryFileName(const char *file);
 extern bool CanAccessFile(const char *filename);
 
 /// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp);
+extern std::vector<FileList> ReadDataDirectory(const fs::path& directory);
 
 extern std::vector<std::string> QuoteArguments(const std::vector<std::string>& args);
 extern std::vector<std::wstring> QuoteArguments(const std::vector<std::wstring>& args);
