@@ -31,7 +31,7 @@ if [ -z "$GAME_VERSION" ]; then
 fi
 export GAME_ARCH=$(uname -m)
 
-CENTOS=`which yum || true`
+CENTOS=`cat /etc/centos-release || true`
 if [ -n "$CENTOS" ]; then
     # centos (>= 7) build tools
     yum install -yy centos-release-scl && yum install -yy git devtoolset-7-toolchain
