@@ -68,7 +68,7 @@ if [ -n "$CENTOS" ]; then
 fi
 
 if [ -n "$CENTOS" ]; then
-    if [ -n "$GITHUB_REF"];
+    if [ -n "$GITHUB_REF"]; then
         git clone https://github.com/Wargus/stratagus
         pushd stratagus
         git checkout ${GITHUB_REF}
