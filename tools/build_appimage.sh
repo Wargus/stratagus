@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Tested with 
 #   appimagecrafters/appimage-builder
 # and
@@ -36,7 +38,7 @@ if [ -n "$CENTOS" ]; then
     # centos (>= 7) build tools
     yum install -yy centos-release-scl && yum install -yy git devtoolset-7-toolchain
     yum install -yy zlib-devel file
-    scl enable devtoolset-7 bash
+    source /opt/rh/devtoolset-7/enable
     # centos SDL dependencies
     yum install -yy libX11-devel libXext-devel libXrandr-devel libXi-devel libXfixes-devel libXcursor-devel
     yum install -yy pulseaudio-libs-devel
@@ -65,7 +67,13 @@ if [ -n "$CENTOS" ]; then
         popd
 fi
 
-# git clone --depth 1 https://github.com/Wargus/stratagus
+if [ -n "$CENTOS" ]; then
+    if [ -n "$GITHUB_REF"];
+        git clone https://github.com/Wargus/stratagus
+        pushd stratagus
+        git checkout ${GITHUB_REF}
+    fi
+fi
 git clone --depth 1 https://github.com/Wargus/${GAME_ID}
 
 # pushd stratagus
