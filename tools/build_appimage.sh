@@ -123,6 +123,10 @@ if [ -n "$CENTOS" ]; then
     chmod +x linuxdeploy-x86_64.AppImage
     ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir AppDir --output appimage
     rm -f ./linuxdeploy-x86_64.AppImage
+    if [ -n "$GITHUB_REF" ]; then
+        cp *.AppImage ../
+        popd
+    fi
 else
     # using appimage-builder
     echo    "version: 1" > appimagebuilder.yaml
