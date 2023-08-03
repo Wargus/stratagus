@@ -2151,7 +2151,7 @@ static int CclDebugPrint(lua_State *l)
 static int CclRestartStratagus(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	std::string executable_path = GetExecutablePath();
+	fs::path executable_path = GetExecutablePath();
 	bool insertRestartArgument = true;
 	for (auto arg : OriginalArgv) {
 		if (arg == "-r") {
@@ -2171,7 +2171,7 @@ static int CclRestartStratagus(lua_State *l)
 	}
 	argv[newArgc - 1] = (char *)0;
 #ifdef WIN32
-	_execv(executable_path.c_str(), argv);
+	_execv(executable_path.string().c_str(), argv);
 #else
 	execvp(executable_path.c_str(), argv);
 #endif
