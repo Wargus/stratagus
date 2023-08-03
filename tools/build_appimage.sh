@@ -124,7 +124,7 @@ if [ -n "$CENTOS" ]; then
     ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir AppDir --output appimage
     rm -f ./linuxdeploy-x86_64.AppImage
     if [ -n "$GITHUB_REF" ]; then
-        cp *.AppImage ../
+        cp *.AppImage "../${GAME_ID}-x86_64.AppImage"
         popd
     fi
 else
