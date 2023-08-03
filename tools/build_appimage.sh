@@ -68,10 +68,10 @@ if [ -n "$CENTOS" ]; then
 fi
 
 if [ -n "$CENTOS" ]; then
-    if [ -n "$GITHUB_REF"]; then
+    if [ -n "$GITHUB_REF" ]; then
         git clone https://github.com/Wargus/stratagus
         pushd stratagus
-        git checkout ${GITHUB_REF}
+        git checkout "${GITHUB_REF}"
     fi
 fi
 git clone --depth 1 https://github.com/Wargus/${GAME_ID}
