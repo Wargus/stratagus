@@ -66,7 +66,7 @@ void copy_dir(const char *source_folder, const char *target_folder);
 #include <direct.h>
 #define mkdir(f, m) _mkdir(f)
 // PathRemoveFileSpec on a drive (e.g. when extracting from CD) will leave the trailing \... remove that
-#define parentdir(x) PathRemoveFileSpec(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
+#define parentdir(x) PathRemoveFileSpecA(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
 #else
 #if defined(USE_MAC)
 #define parentdir(x) strcpy(x, dirname(x))
@@ -165,7 +165,7 @@ char *GetExtractionLogPath(const char *game_name, char *data_path)
             return marker;
         }
     }
-    SHGetFolderPathA(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
+    SHGetFolderPathA(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
     PathAppendA(marker, "Stratagus");
     mkdir_p(marker);
     PathAppendA(marker, logname);
@@ -187,7 +187,7 @@ wchar_t *GetExtractionLogPath(const wchar_t *game_name, const wchar_t *data_path
             return marker;
         }
     }
-    SHGetFolderPathW(NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, NULL, 0, marker);
+    SHGetFolderPathW(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
     PathAppendW(marker, L"Stratagus");
     mkdir_p(marker);
     PathAppendW(marker, logname);
@@ -272,7 +272,7 @@ void ArgvQuote(const std::wstring &Argument, std::wstring &CommandLine, bool For
     }
 }
 
-int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = false, std::wstring *outputCommandline = NULL)
+int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = false, std::wstring *outputCommandline = nullptr)
 {
 	std::wstring cmdline;
 	std::wstring executable;
@@ -300,7 +300,7 @@ int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = f
 		cmdcmdline = std::wstring(L"@") + executable;
 	}
 
-	if (outputCommandline != NULL) {
+	if (outputCommandline != nullptr) {
 		outputCommandline->append(cmdcmdline);
 	}
 	if (echo) {
@@ -319,14 +319,14 @@ int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = f
 #include <unistd.h>
 #include <sys/wait.h>
 
-int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = NULL)
+int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = nullptr)
 {
 	pid_t pid = fork();
 
 	if (echo || outputCommandline) {
 		std::string commandline = file;
 		for (int i = 0; ; i++) {
-			if (argv[i] == NULL) {
+			if (argv[i] == nullptr) {
 				break;
 			}
 			commandline += " ";

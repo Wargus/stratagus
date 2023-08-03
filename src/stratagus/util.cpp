@@ -652,14 +652,14 @@ void aligned_free(void *block)
 #endif
 }
 
-std::string GetExecutablePath()
+fs::path GetExecutablePath()
 {
 #ifdef WIN32
-	char executable_path[MAX_PATH];
+	TCHAR executable_path[MAX_PATH];
 	memset(executable_path, 0, sizeof(executable_path));
 	GetModuleFileName(nullptr, executable_path, sizeof(executable_path)-1);
 #else
-	char *executable_path = const_cast<char*>(OriginalArgv[0].c_str());
+	const auto& executable_path = OriginalArgv[0];
 #endif
-	return std::string(executable_path);
+	return executable_path;
 }

@@ -125,7 +125,7 @@ static bool External_Play(const std::string &file) {
 			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
 		// midi file, use external player, since windows vista+ does not allow midi volume control independent of process volume
 		
-		std::string full_filename = LibraryFileName(file.c_str());
+		fs::path full_filename = LibraryFileName(file.c_str());
 
 		// try to communicate with the running midiplayer if we can
 		if (g_hChildStd_IN_Wr != nullptr) {
@@ -169,8 +169,15 @@ static bool External_Play(const std::string &file) {
 		SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
 
 		// start the process
-		std::vector<std::string> args = QuoteArguments({ "stratagus-midiplayer.exe", std::to_string(std::min(MusicVolume, 127)), full_filename });
-		std::string cmd = std::accumulate(std::next(args.begin()), args.end(), args[0], [](std::string a, std::string b) { return a + " " + b; });
+#if defined(WIN32) && defined(UNICODE)
+		auto volumeStr = std::to_wstring(std::min(MusicVolume, 127));
+		auto full_filenameStr = full_filename.wstring();
+#else
+		auto volumeStr = std::to_string(std::min(MusicVolume, 127));
+		auto full_filenameStr = full_filename.string();
+#endif
+		auto args = QuoteArguments({L("stratagus-midiplayer.exe"), volumeStr, full_filenameStr});
+		auto cmd = std::accumulate(std::next(args.begin()), args.end(), args[0], [](const auto& lhs, const auto& rhs) { return lhs + L(" ") + rhs; });
 		DebugPrint("Using external command to play midi on windows: %s\n" _C_ cmd.c_str());
 		STARTUPINFO si;
 		ZeroMemory(&si, sizeof(si));
@@ -181,7 +188,8 @@ static bool External_Play(const std::string &file) {
    		si.dwFlags |= STARTF_USESTDHANDLES;
 		ZeroMemory(&pi, sizeof(pi));
 		bool result = true;
-		char* cmdline = strdup(cmd.c_str());
+		TCHAR cmdline[4096]{};
+		std::copy(cmd.begin(), cmd.end(), cmdline);
 		if (CreateProcess(nullptr, cmdline, nullptr, nullptr, TRUE, /* Handles are inherited */ CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
 			CloseHandle(hChildStd_OUT_Wr);
 			CloseHandle(hChildStd_ERR_Wr);
@@ -193,7 +201,6 @@ static bool External_Play(const std::string &file) {
 			result = false;
 			DebugPrint("CreateProcess failed (%d).\n" _C_ GetLastError());
 		}
-		free(cmdline);
 		return result;
 	}
 	KillPlayingProcess();
@@ -681,13 +688,13 @@ static int InitSdlSound()
 	if (!cfg && fs::exists(timidityCfg)) {
 		SDL_setenv("TIMIDITY_CFG", timidityCfg.generic_u8string().c_str(), 0);
 	} else {
-		SDL_setenv("TIMIDITY_CFG", (fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str(), 0);
+		SDL_setenv("TIMIDITY_CFG", (GetExecutablePath().parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str(), 0);
 	}
 #else
 	if (fs::exists(timidityCfg)) {
 		Mix_SetTimidityCfg(timidityCfg.generic_u8string().c_str());
 	} else {
-		Mix_SetTimidityCfg((fs::path(GetExecutablePath()).parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str());
+		Mix_SetTimidityCfg((GetExecutablePath().parent_path() / "freepats" / "crude.cfg").generic_u8string().c_str());
 	}
 #endif
 	// just activate everything we can by setting all bits

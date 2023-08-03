@@ -126,6 +126,13 @@ extern const char *strcasestr(const char *str, const char *substr) noexcept;
 extern size_t strnlen(const char *str, size_t strsize);
 #endif // !HAVE_STRNLEN
 
+#if defined(WIN32) && defined(UNICODE)
+#define L(LITERAL) L"" LITERAL
+#else
+#define L(LITERAL) "" LITERAL
+#endif
+
+
 /*----------------------------------------------------------------------------
 --  Getopt
 ----------------------------------------------------------------------------*/
@@ -165,10 +172,10 @@ void *aligned_malloc(size_t alignment, size_t size);
 void aligned_free(void *block);
 
 /*----------------------------------------------------------------------------
---  SIMD support
+--  Executable path
 ----------------------------------------------------------------------------*/
 
-std::string GetExecutablePath();
+fs::path GetExecutablePath();
 
 
 /*----------------------------------------------------------------------------

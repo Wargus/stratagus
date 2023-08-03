@@ -852,34 +852,35 @@ FileWriter *CreateFileWriter(const std::string &filename)
  * Really only needed on Windows, where all these calls just concatenate
  * all arguments with a space and pass the full string to the next process.
  */
-std::vector<std::string> QuoteArguments(std::vector<std::string> args)
+template <typename CHAR>
+std::vector<std::basic_string<CHAR>> QuoteArgumentsImpl(const std::vector<std::basic_string<CHAR>>& args, const CHAR* spaces, CHAR quote, CHAR escape)
 {
-	std::vector<std::string> outArgs;
-	for (auto arg : args) {
+	std::vector<std::basic_string<CHAR>> outArgs;
+	for (const auto& arg : args) {
 #ifdef WIN32
-		if (!arg.empty() && arg.find_first_of(" \t\n\v\"") == std::string::npos) {
+		if (!arg.empty() && arg.find_first_of(spaces) == std::basic_string<CHAR>::npos) {
 			outArgs.push_back(arg);
 		} else {
 			// Windows always needs argument quoting around arguments with spaces
-			std::string ss = "\"";
+			std::basic_string<CHAR> ss(1, quote);
 			for (auto ch = arg.begin(); ; ch++) {
 				int backslashes = 0;
-				while (ch != arg.end() && *ch == '\\') {
+				while (ch != arg.end() && *ch == escape) {
 					ch++;
 					backslashes++;
 				}
 				if (ch == arg.end()) {
-					ss.append(backslashes * 2, '\\');
+					ss.append(backslashes * 2, escape);
 					break;
-				} else if (*ch == '"') {
-					ss.append(backslashes * 2 + 1, '\\');
+				} else if (*ch == quote) {
+					ss.append(backslashes * 2 + 1, escape);
 					ss.push_back(*ch);
 				} else {
-					ss.append(backslashes, '\\');
+					ss.append(backslashes, escape);
 					ss.push_back(*ch);
 				}
 			}
-			ss.push_back('"');
+			ss.push_back(quote);
 			outArgs.push_back(ss);
 		}
 #else
@@ -887,6 +888,16 @@ std::vector<std::string> QuoteArguments(std::vector<std::string> args)
 #endif
 	}
 	return outArgs;
+}
+
+std::vector<std::string> QuoteArguments(const std::vector<std::string>& args)
+{
+	return QuoteArgumentsImpl(args, " \t\n\v\"", '"', '\\');
+}
+
+std::vector<std::wstring> QuoteArguments(const std::vector<std::wstring>& args)
+{
+	return QuoteArgumentsImpl(args, L" \t\n\v\"", L'"', L'\\');
 }
 
 //@}

@@ -214,22 +214,26 @@ static int loadShaders() {
 #undef COMPILE_BUILTIN_SHADER
 
 	std::vector<FileList> flp;
-	std::string shaderPath(StratagusLibPath);
-	char *cShaderPath;
+	fs::path shaderPath(StratagusLibPath);
+	shaderPath /= "shaders";
 #ifdef _WIN32
-	shaderPath.append("\\shaders\\");
-	int fullpathsize = ExpandEnvironmentStrings(shaderPath.c_str(), nullptr, 0);
-	cShaderPath = (char*)calloc(fullpathsize + 1, sizeof(char));
-	ExpandEnvironmentStrings(shaderPath.c_str(), cShaderPath, fullpathsize);
+	TCHAR *cShaderPath;
+#ifdef UNICODE
+	const int fullpathsize = ExpandEnvironmentStrings(shaderPath.wstring().c_str(), nullptr, 0);
+	auto shaderPathStr = shaderPath.wstring();
 #else
-	shaderPath.append("/shaders/");
-	cShaderPath = (char*)shaderPath.c_str();
+	const int fullpathsize = ExpandEnvironmentStrings(shaderPath.string().c_str(), nullptr, 0);
+	auto shaderPathStr = shaderPath.string();
 #endif
-	int n = ReadDataDirectory(cShaderPath, flp);
+	cShaderPath = (TCHAR*)calloc(fullpathsize + 1, sizeof(TCHAR));
+	ExpandEnvironmentStrings(shaderPathStr.c_str(), cShaderPath, fullpathsize);
+	shaderPath = cShaderPath;
+#endif
+	int n = ReadDataDirectory(shaderPath.string().c_str(), flp);
 	for (int i = 0; i < n; ++i) {
 		int pos = flp[i].name.find(".glsl");
 		if (pos > 0) {
-			GLuint program = compileProgram(shaderPath + flp[i].name);
+			GLuint program = compileProgram((shaderPath / flp[i].name).string());
 			if (program) {
 				shaderPrograms[numShdr] = program;
 				shaderNames[numShdr] = strdup(flp[i].name.c_str());

@@ -58,16 +58,16 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 #elif USE_WIN32
 	if (!noPortable) {
 		// if launcher is in the same directory as the data, we are in a portable install
-		std::string executable_path = GetExecutablePath();
-		if (std::filesystem::equivalent(std::filesystem::path(StratagusLibPath), std::filesystem::path(executable_path).parent_path())) {
+		fs::path executable_path = GetExecutablePath();
+		if (std::filesystem::equivalent(std::filesystem::path(StratagusLibPath), executable_path.parent_path())) {
 			userDirectory = StratagusLibPath;
 			return;
 		}
 	}
-	char data_path[4096] = {'\0'};
-	SHGetFolderPathA(nullptr, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, nullptr, 0, data_path);
+	TCHAR data_path[4096]{};
+	SHGetFolderPath(nullptr, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, nullptr, 0, data_path);
 	if (data_path[0]) {
-		userDirectory = std::string(data_path) + "/Stratagus";
+		userDirectory = (fs::path(data_path) / "Stratagus").string();
 	} else if (getenv("APPDATA")) {
 		userDirectory = std::string(getenv("APPDATA")) + "/Stratagus";
 	}
