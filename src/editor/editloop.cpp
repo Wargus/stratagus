@@ -46,7 +46,6 @@
 #include "game.h"
 #include "guichan.h"
 #include "interface.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "menus.h"
@@ -1882,15 +1881,15 @@ static void EditorCallbackExit()
 void CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
-	const std::string filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
-	if (access(filename.c_str(), R_OK)) {
+	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
+	if (!fs::exists(filename)) {
 		fprintf(stderr, "Editor configuration file '%s' was not found\n"
 				"Specify another with '-E file.lua'\n",
 				Parameters::Instance.luaEditorStartFilename.c_str());
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s"), filename.c_str());
+	ShowLoadProgress(_("Script %s"), filename.string().c_str());
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
 

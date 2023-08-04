@@ -45,7 +45,6 @@
 #include "fluidsynth.h"
 #endif
 
-#include "iocompat.h"
 #include "iolib.h"
 #include "unit.h"
 
@@ -425,8 +424,8 @@ static Mix_Chunk *LoadSample(const char *name)
 */
 Mix_Music *LoadMusic(const std::string &name)
 {
-	const std::string filename = LibraryFileName(name.c_str());
-	Mix_Music *music = LoadMusic(filename.c_str());
+	const fs::path filename = LibraryFileName(name.c_str());
+	Mix_Music *music = LoadMusic(filename.string().c_str());
 
 	if (music == nullptr) {
 		fprintf(stderr, "Can't load the music '%s'\n", name.c_str());
@@ -445,8 +444,8 @@ Mix_Music *LoadMusic(const std::string &name)
 */
 Mix_Chunk *LoadSample(const std::string &name)
 {
-	const std::string filename = LibraryFileName(name.c_str());
-	Mix_Chunk *sample = LoadSample(filename.c_str());
+	const fs::path filename = LibraryFileName(name.c_str());
+	Mix_Chunk *sample = LoadSample(filename.string().c_str());
 
 	if (sample == nullptr) {
 		fprintf(stderr, "Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());

@@ -45,7 +45,6 @@
 #include "video.h"
 #include "player.h"
 #include "intern_video.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "ui.h"
 
@@ -54,7 +53,7 @@
 ----------------------------------------------------------------------------*/
 
 static int HashCount;
-static std::map<std::string, CGraphic *> GraphicHash;
+static std::map<fs::path, CGraphic *> GraphicHash;
 static std::list<CGraphic *> Graphics;
 
 /*----------------------------------------------------------------------------
@@ -424,7 +423,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 		return new CGraphic;
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
 	if (g == nullptr) {
 		g = new CGraphic;
@@ -434,7 +433,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 		}
 		// FIXME: use a constructor for this
 		g->File = file;
-		g->HashFile = g->File;
+		g->HashFile = g->File.string();
 		g->Width = w;
 		g->Height = h;
 	} else {
@@ -461,7 +460,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 		return new CPlayerColorGraphic;
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
 		g = new CPlayerColorGraphic;
@@ -471,7 +470,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 		}
 		// FIXME: use a constructor for this
 		g->File = file;
-		g->HashFile = g->File;
+		g->HashFile = g->File.string();
 		g->Width = w;
 		g->Height = h;
 		GraphicHash[g->HashFile] = g;
@@ -519,7 +518,7 @@ CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 */
 CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 {
-	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File, this->Width, this->Height);
+	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File.string(), this->Width, this->Height);
 
 	if (this->IsLoaded()) {
 		g->Load(grayscale);
@@ -541,7 +540,7 @@ CGraphic *CGraphic::Get(const std::string &filename)
 		return nullptr;
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename.c_str());
 	CGraphic *&g = GraphicHash[file];
 
 	return g;
@@ -560,7 +559,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 		return nullptr;
 	}
 
-	const std::string file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename.c_str());
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 
 	return g;
@@ -663,18 +662,18 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	CFile fp;
-	const std::string name = LibraryFileName(File.c_str());
+	const fs::path name = LibraryFileName(File.string().c_str());
 	if (name.empty()) {
 		perror("Cannot find file");
 		goto error;
 	}
-	if (fp.open(name.c_str(), CL_OPEN_READ) == -1) {
+	if (fp.open(name.string().c_str(), CL_OPEN_READ) == -1) {
 		perror("Can't open file");
 		goto error;
 	}
 	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
 	if (Surface == nullptr) {
-		fprintf(stderr, "Couldn't load file %s: %s", name.c_str(), IMG_GetError());
+		fprintf(stderr, "Couldn't load file %s: %s", name.string().c_str(), IMG_GetError());
 		goto error;
 	}
 
@@ -697,7 +696,7 @@ void CGraphic::Load(bool grayscale)
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.c_str());
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.string().c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 				Width, Height, GraphicWidth, GraphicHeight);
 		ExitFatal(-1);
@@ -713,7 +712,7 @@ void CGraphic::Load(bool grayscale)
 	return;
 
  error:
-	fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
+	fprintf(stderr, "Can't load the graphic '%s'\n", File.string().c_str());
 	ExitFatal(-1);
 }
 
@@ -1320,10 +1319,9 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 
 void FreeGraphics()
 {
-	std::map<std::string, CGraphic *>::iterator i;
 	while (!GraphicHash.empty()) {
-		i = GraphicHash.begin();
-		CGraphic::Free((*i).second);
+		auto it = GraphicHash.begin();
+		CGraphic::Free((*it).second);
 	}
 }
 

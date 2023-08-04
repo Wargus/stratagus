@@ -8,9 +8,9 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name iocompat.h - IO platform compatibility header file. */
+/**@name filesystem - filesystem header selection. */
 //
-//      (c) Copyright 2002-2005 by Andreas Arens
+//      (c) Copyright 1998-2023 by Lutz Sammer, Jimmy Salmon and Joris Dauphin.
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,54 +27,25 @@
 //      02111-1307, USA.
 //
 
-#ifndef __IOCOMPAT_H__
-#define __IOCOMPAT_H__
+#ifndef __FILESYSTEM_H__
+#define __FILESYSTEM_H__
 
 //@{
 
 /*----------------------------------------------------------------------------
---  Platform dependent IO-related Includes and Definitions
+--  Includes
 ----------------------------------------------------------------------------*/
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <errno.h>
-
-#ifdef _MSC_VER
-
-#include <io.h>
-#include <fcntl.h>
-#include <direct.h>
-
-#define R_OK 4
-#define F_OK 0
-#define PATH_MAX _MAX_PATH
-#define S_ISDIR(x) ((x) & _S_IFDIR)
-#define S_ISREG(x) ((x) & _S_IFREG)
-
-#define mkdir _mkdir
-#define access _access
-
+#if __has_include(<filesystem>)
+# include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+# include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 #else
-
-#include <unistd.h>
-#include <dirent.h>
-
-#endif
-
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
-
-#ifdef USE_WIN32
-#define makedir(dir, permissions) mkdir(dir)
-#else
-#define makedir(dir, permissions) mkdir(dir, permissions)
+error "Missing the <filesystem> header."
 #endif
 
 //@}
 
-#endif // !__IOCOMPAT_H__
+#endif /* __FILESYSTEM_H__ */

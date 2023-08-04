@@ -551,6 +551,7 @@ set(stratagus_generic_HDRS
 	src/include/depend.h
 	src/include/editor.h
 	src/include/online_service.h
+	src/include/filesystem.h
 	src/include/font.h
 	src/include/fov.h
 	src/include/fow.h
@@ -558,7 +559,6 @@ set(stratagus_generic_HDRS
 	src/include/game.h
 	src/include/icons.h
 	src/include/interface.h
-	src/include/iocompat.h
 	src/include/iolib.h
 	src/include/luacallback.h
 	src/include/map.h

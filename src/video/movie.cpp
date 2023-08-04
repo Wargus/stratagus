@@ -45,7 +45,6 @@
 
 #include "movie.h"
 
-#include "iocompat.h"
 #include "iolib.h"
 #include "network.h"
 #include "sound.h"

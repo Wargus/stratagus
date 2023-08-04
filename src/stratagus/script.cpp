@@ -33,26 +33,16 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#if __has_include(<filesystem>)
-#include <filesystem>
-namespace fs = std::filesystem;
-#elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-error "Missing the <filesystem> header."
-#endif
+#include "script.h"
 
 #include <signal.h>
 
 #include "stratagus.h"
 
-#include "script.h"
-
 #include "animation/animation_setplayervar.h"
+#include "filesystem.h"
 #include "font.h"
 #include "game.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "parameters.h"
@@ -217,14 +207,14 @@ int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 /**
 **  Get the (uncompressed) content of the file into a string
 */
-static bool GetFileContent(const std::string &file, std::string &content)
+static bool GetFileContent(const fs::path& file, std::string &content)
 {
 	CFile fp;
 
 	content.clear();
-	if (fp.open(file.c_str(), CL_OPEN_READ) == -1) {
-		DebugPrint("Can't open file '%s\n" _C_ file.c_str());
-		fprintf(stderr, "Can't open file '%s': %s\n", file.c_str(), strerror(errno));
+	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
+		DebugPrint("Can't open file '%s\n" _C_ file.string().c_str());
+		fprintf(stderr, "Can't open file '%s': %s\n", file.string().c_str(), strerror(errno));
 		return false;
 	}
 
@@ -254,22 +244,22 @@ static bool GetFileContent(const std::string &file, std::string &content)
 **
 **  @return      0 for success, -1 if the file was not found, else exit.
 */
-int LuaLoadFile(const std::string &file, const std::string &strArg, bool exitOnError)
+int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnError)
 {
-	DebugPrint("Loading '%s'\n" _C_ file.c_str());
+	DebugPrint("Loading '%s'\n" _C_ file.string().c_str());
 
 	std::string content;
 	if (GetFileContent(file, content) == false) {
 		return -1;
 	}
-	if (file.rfind("stratagus.lua") != -1) {
+	if (file.string().rfind("stratagus.lua") != -1) {
 		FileChecksums ^= fletcher32(content);
-		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.c_str() _C_ FileChecksums);
+		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.string().c_str() _C_ FileChecksums);
 	}
 	// save the current __file__
 	lua_getglobal(Lua, "__file__");
 
-	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.c_str());
+	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.string().c_str());
 
 	if (!status) {
 		lua_pushstring(Lua, fs::absolute(fs::path(file)).generic_u8string().c_str());
@@ -313,10 +303,10 @@ static int CclLoad(lua_State *l)
 	if (arg < 1 || arg > 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const std::string filename = LibraryFileName(LuaToString(l, 1));
+	const fs::path filename = LibraryFileName(LuaToString(l, 1));
 	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
 	if (LuaLoadFile(filename, "", exitOnError) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
+		DebugPrint("Load failed: %s\n" _C_ filename.string().c_str());
 	}
 	return 0;
 }
@@ -331,8 +321,8 @@ static int CclLoad(lua_State *l)
 static int CclLoadBuffer(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	const std::string file = LibraryFileName(LuaToString(l, 1));
-	DebugPrint("Loading '%s'\n" _C_ file.c_str());
+	const fs::path file = LibraryFileName(LuaToString(l, 1));
+	DebugPrint("Loading '%s'\n" _C_ file.string().c_str());
 	std::string content;
 	if (GetFileContent(file, content) == false) {
 		return 0;
@@ -2053,30 +2043,26 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
 		LuaError(l, "Forbidden directory");
 	}
-	char directory[PATH_MAX];
+	fs::path dir;
 
 	if (pathtype == 1) {
 		++userdir;
-		std::string dir(Parameters::Instance.GetUserDirectory());
+		dir = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
-			dir += "/";
-			dir += GameName;
+			dir /= GameName;
 		}
-		snprintf(directory, sizeof(directory), "%s/%s", dir.c_str(), userdir);
+		dir /= userdir;
 	} else if (rel) {
-		std::string dir = LibraryFileName(userdir);
-		snprintf(directory, sizeof(directory), "%s", dir.c_str());
+		dir = LibraryFileName(userdir);
 	} else {
-		snprintf(directory, sizeof(directory), "%s/%s", StratagusLibPath.c_str(), userdir);
+		dir = fs::path(StratagusLibPath) / userdir;
 	}
 	lua_newtable(l);
-	std::vector<FileList> flp;
-	n = ReadDataDirectory(directory, flp);
 	int j = 0;
-	for (int i = 0; i < n; ++i) {
-		if ((flp[i].type & mask) == type) {
+	for (const auto& flp : ReadDataDirectory(dir)) {
+		if ((flp.type & mask) == type) {
 			lua_pushnumber(l, j + 1);
-			lua_pushstring(l, flp[i].name.c_str());
+			lua_pushstring(l, flp.name.c_str());
 			lua_settable(l, -3);
 			++j;
 		}
@@ -2502,17 +2488,16 @@ void SavePreferences()
 	}
 	blockTableNames.push_back("preferences");
 	if (lua_type(Lua, -1) == LUA_TTABLE) {
-		std::string path = Parameters::Instance.GetUserDirectory();
+		fs::path path = Parameters::Instance.GetUserDirectory();
 
 		if (!GameName.empty()) {
-			path += "/";
-			path += GameName;
+			path /= GameName;
 		}
-		path += "/preferences.lua";
+		path /= "preferences.lua";
 
-		FILE *fd = fopen(path.c_str(), "w");
+		FILE *fd = fopen(path.string().c_str(), "w");
 		if (!fd) {
-			DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
+			DebugPrint("Cannot open file %s for writing\n" _C_ path.string().c_str());
 			return;
 		}
 
@@ -2532,13 +2517,13 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 {
 	//  Load and evaluate configuration file
 	CclInConfigFile = 1;
-	const std::string name = LibraryFileName(filename.c_str());
-	if (access(name.c_str(), R_OK)) {
+	const fs::path name = LibraryFileName(filename.c_str());
+	if (!fs::exists(name)) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s\n"), name.c_str());
+	ShowLoadProgress(_("Script %s\n"), name.string().c_str());
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();
@@ -2675,7 +2660,7 @@ static int CclListFilesystem(lua_State *l)
 		lua_newtable(l);	
 		int j = 0;
 		for (auto const& vol: vols) {
-			if (!access(vol.generic_u8string().c_str(), R_OK)) {
+			if (fs::exists(vol)) {
 				lua_pushnumber(l, ++j);
 				lua_pushstring(l, vol.generic_u8string().c_str());
 				lua_settable(l, -3);
@@ -2688,7 +2673,7 @@ static int CclListFilesystem(lua_State *l)
 	lua_newtable(l);
 	int j = 0;
 	for (auto const& dir_entry: fs::directory_iterator(fs::path(dir))) {
-		if ((fs::is_regular_file(dir_entry.path()) || fs::is_directory(dir_entry.path())) && !access(dir_entry.path().generic_u8string().c_str(), R_OK)) {
+		if ((fs::is_regular_file(dir_entry.path()) || fs::is_directory(dir_entry.path())) && fs::exists(dir_entry.path())) {
 			std::string name = dir_entry.path().generic_u8string();
 			if (fs::is_directory(dir_entry.path())) {
 				name += "/";

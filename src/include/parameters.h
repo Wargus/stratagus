@@ -36,14 +36,14 @@ public:
 	void SetDefaultValues();
 	void SetLocalPlayerNameFromEnv();
 
-	void SetUserDirectory(const std::string &path) {
-	   if (path.size() == 0) {
-	      SetDefaultUserDirectory(true);
-	   } else {
-	      userDirectory = path;
-	   }
+	void SetUserDirectory(const fs::path& path) {
+		if (path.empty()) {
+			SetDefaultUserDirectory(true);
+		} else {
+			userDirectory = path;
+		}
 	}
-	const std::string &GetUserDirectory() const { return userDirectory; }
+	const fs::path& GetUserDirectory() const { return userDirectory; }
 
 private:
 	void SetDefaultUserDirectory(bool noPortable = false);
@@ -56,7 +56,7 @@ public:
 	std::string LocalPlayerName;        /// Name of local player
 	bool benchmark = false;             /// If true, run as fast as possible and report fps at the end of a game
 private:
-	std::string userDirectory;          /// Directory containing user settings and data
+	fs::path userDirectory;          /// Directory containing user settings and data
 public:
 	static Parameters Instance;
 };

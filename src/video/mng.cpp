@@ -39,7 +39,6 @@
 
 #include "video.h"
 #include "iolib.h"
-#include "iocompat.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

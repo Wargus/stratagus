@@ -39,7 +39,6 @@
 
 #include "actions.h"
 #include "ai.h"
-#include "iocompat.h"
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"
@@ -71,7 +70,7 @@ extern void StartMap(const std::string &filename, bool clean);
 void ExpandPath(std::string &newpath, const std::string &path)
 {
 	if (path[0] == '~') {
-		newpath = Parameters::Instance.GetUserDirectory();
+		newpath = Parameters::Instance.GetUserDirectory().string();
 		if (!GameName.empty()) {
 			newpath += "/";
 			newpath += GameName;
@@ -85,18 +84,14 @@ void ExpandPath(std::string &newpath, const std::string &path)
 /**
 ** Get the save directory and create dirs if needed
 */
-static std::string GetSaveDir()
+static fs::path GetSaveDir()
 {
-	struct stat tmp;
-	std::string dir(Parameters::Instance.GetUserDirectory());
+	fs::path dir(Parameters::Instance.GetUserDirectory());
 	if (!GameName.empty()) {
-		dir += "/";
-		dir += GameName;
+		dir /= GameName;
 	}
-	dir += "/save";
-	if (stat(dir.c_str(), &tmp) < 0) {
-		makedir(dir.c_str(), 0777);
-	}
+	dir /= "save";
+	fs::create_directories(dir);
 	return dir;
 }
 
@@ -111,11 +106,10 @@ static std::string GetSaveDir()
 int SaveGame(const std::string &filename)
 {
 	CFile file;
-	std::string fullpath(GetSaveDir());
+	fs::path fullpath(GetSaveDir());
 
-	fullpath += "/";
-	fullpath += filename;
-	if (file.open(fullpath.c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
+	fullpath /= filename;
+	if (file.open(fullpath.string().c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
 		fprintf(stderr, "Can't save to '%s'\n", filename.c_str());
 		return -1;
 	}
@@ -195,9 +189,9 @@ void DeleteSaveGame(const std::string &filename)
 		return;
 	}
 
-	std::string fullpath = GetSaveDir() + "/" + filename;
-	if (unlink(fullpath.c_str()) == -1) {
-		fprintf(stderr, "delete failed for %s", fullpath.c_str());
+	fs::path fullpath = GetSaveDir() / filename;
+	if (unlink(fullpath.string().c_str()) == -1) {
+		fprintf(stderr, "delete failed for %s", fullpath.string().c_str());
 	}
 }
 
