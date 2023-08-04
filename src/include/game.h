@@ -29,11 +29,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "filesystem.h"
+
 #include <string>
 
 class CFile;
 
-extern void LoadGame(const std::string &filename); /// Load saved game
+extern void LoadGame(const fs::path &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
 extern void DeleteSaveGame(const std::string &filename); /// Delete save game
 extern bool SaveGameLoading;                 /// Save game is in progress of loading

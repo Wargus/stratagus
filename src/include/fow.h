@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "filesystem.h"
 #include "fow_utils.h"
 #include "map.h"
 #include "player.h"
@@ -57,7 +58,7 @@ public:
     enum States       { cFirstEntry = 0, cGenerateFog, cGenerateTexture, cBlurTexture, cReady };
     enum UpscaleTypes { cSimple = 0, cBilinear };
 
-    static void SetTiledFogGraphic(const std::string &fogGraphicFile);
+    static void SetTiledFogGraphic(const fs::path &fogGraphicFile);
 
     void Init();
     void Clean(const bool isHardClean = false);

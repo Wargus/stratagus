@@ -394,7 +394,7 @@ void CMap::Save(CFile &file) const
 {
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: map\n");
-	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.c_str());
+	file.printf("LoadTileModels(\"%s\")\n\n", this->TileModelsFileName.string().c_str());
 	file.printf("StratagusMap(\n");
 	file.printf("  \"version\", \"%s\",\n", VERSION);
 	file.printf("  \"description\", \"%s\",\n", this->Info.Description.c_str());
@@ -696,12 +696,12 @@ void CMap::RegenerateForest()
 **  @param mapname  map filename
 **  @return true on successful load, else false
 */
-bool LoadStratagusMapInfo(const std::string &mapname)
+bool LoadStratagusMapInfo(const fs::path &mapname)
 {
 	// Set the default map setup by replacing .smp with .sms
-	size_t loc = mapname.find(".smp");
+	size_t loc = mapname.string().find(".smp");
 	if (loc != std::string::npos) {
-		Map.Info.Filename = mapname;
+		Map.Info.Filename = mapname.string();
 		Map.Info.Filename.replace(loc, 4, ".sms");
 	}
 

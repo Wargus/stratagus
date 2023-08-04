@@ -143,7 +143,7 @@ void TitleScreen::ShowTitleImage()
 
 	SetCallbacks(&callbacks);
 
-	CGraphic *g = CGraphic::New(this->File);
+	CGraphic *g = CGraphic::New(this->File.string());
 	g->Load();
 	if (this->StretchImage) {
 		g->Resize(Video.Width, Video.Height);
@@ -186,7 +186,7 @@ void ShowTitleScreens()
 			}
 		}
 
-		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File)) {
+		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File.string())) {
 			TitleScreens[i]->ShowTitleImage();
 		}
 

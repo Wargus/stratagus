@@ -61,12 +61,12 @@ CGraphic *CFogOfWar::TiledFogSrc {nullptr}; // Graphic tiles set for tiled fog
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
-void CFogOfWar::SetTiledFogGraphic(const std::string &fogGraphicFile)
+void CFogOfWar::SetTiledFogGraphic(const fs::path &fogGraphicFile)
 {
 	if (CFogOfWar::TiledFogSrc) {
 		CGraphic::Free(CFogOfWar::TiledFogSrc);
 	}
-	CFogOfWar::TiledFogSrc = CGraphic::New(fogGraphicFile, PixelTileSize.x, PixelTileSize.y);
+	CFogOfWar::TiledFogSrc = CGraphic::New(fogGraphicFile.string(), PixelTileSize.x, PixelTileSize.y);
 }
 
 /// Calculate values of upscale table for explored/unexplored tiles

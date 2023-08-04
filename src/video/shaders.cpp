@@ -36,6 +36,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "filesystem.h"
 #include "stratagus.h"
 #include "parameters.h"
 #include "video.h"
@@ -189,7 +190,8 @@ static GLuint compileProgramSource(std::string source) {
 	return programId;
 }
 
-static GLuint compileProgram(std::string shaderFile) {
+static GLuint compileProgram(const fs::path &shaderFile)
+{
 	std::ifstream f(shaderFile);
 	std::string source((std::istreambuf_iterator<char>(f)),
 						std::istreambuf_iterator<char>());
@@ -229,12 +231,11 @@ static int loadShaders() {
 	shaderPath = cShaderPath;
 #endif
 	for (const auto& flp : ReadDataDirectory(shaderPath)) {
-		int pos = flp.name.find(".glsl");
-		if (pos > 0) {
-			GLuint program = compileProgram((shaderPath / flp.name).string());
+		if (flp.name.extension() == ".glsl") {
+			GLuint program = compileProgram(shaderPath / flp.name);
 			if (program) {
 				shaderPrograms[numShdr] = program;
-				shaderNames[numShdr] = strdup(flp.name.c_str());
+				shaderNames[numShdr] = strdup(flp.name.string().c_str());
 				numShdr += 1;
 				if (numShdr >= MAX_SHADERS) {
 					break;

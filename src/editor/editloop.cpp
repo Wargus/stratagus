@@ -69,7 +69,7 @@
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
 extern void CleanGame();
-extern void CreateGame(const std::string &filename, CMap *map);
+extern void CreateGame(const fs::path &filename, CMap *map);
 
 extern void DrawMapArea(const fieldHighlightChecker highlightChecker);
 /*----------------------------------------------------------------------------
@@ -1881,11 +1881,12 @@ static void EditorCallbackExit()
 void CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
-	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
+	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.string().c_str());
 	if (!fs::exists(filename)) {
-		fprintf(stderr, "Editor configuration file '%s' was not found\n"
-				"Specify another with '-E file.lua'\n",
-				Parameters::Instance.luaEditorStartFilename.c_str());
+		fprintf(stderr,
+		        "Editor configuration file '%s' was not found\n"
+		        "Specify another with '-E file.lua'\n",
+		        Parameters::Instance.luaEditorStartFilename.u8string().c_str());
 		ExitFatal(-1);
 	}
 
@@ -1991,8 +1992,8 @@ void CEditor::Init()
 */
 int EditorSaveMap(const std::string &file)
 {
-	std::string fullName;
-	fullName = StratagusLibPath + "/" + file;
+	const fs::path fullName = fs::path(StratagusLibPath) / file;
+
 	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
@@ -2002,8 +2003,8 @@ int EditorSaveMap(const std::string &file)
 
 int EditorSaveMapWithResize(const std::string &file, Vec2i newSize, Vec2i offset)
 {
-	std::string fullName;
-	fullName = StratagusLibPath + "/" + file;
+	const fs::path fullName = fs::path(StratagusLibPath) / file;
+
 	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable, newSize, offset) == -1) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;

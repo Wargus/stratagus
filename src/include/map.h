@@ -31,7 +31,6 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
-#include "settings.h"
 //@{
 
 /*----------------------------------------------------------------------------
@@ -90,6 +89,7 @@
 #endif
 
 #include "color.h"
+#include "filesystem.h"
 #include "vec2i.h"
 
 #include "settings.h"
@@ -269,7 +269,7 @@ public:
 	bool NoFogOfWar;           			/// fog of war disabled
 
 	CTileset *Tileset;          		/// tileset data
-	std::string TileModelsFileName; 	/// lua filename that loads all tilemodels
+	fs::path TileModelsFileName; 	/// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     			/// graphic for all the tiles
 	bool isMapInitialized { false };
 
@@ -365,12 +365,12 @@ extern void MapCclRegister();
 // mixed sources
 //
 /// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTerrain,
+extern int SaveStratagusMap(const fs::path &filename, CMap &map, int writeTerrain,
 							Vec2i newSize = {0, 0}, Vec2i offset = {0, 0});
 
 
 /// Load map presentation
-extern bool LoadStratagusMapInfo(const std::string &mapname);
+extern bool LoadStratagusMapInfo(const fs::path &mapname);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
