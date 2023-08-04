@@ -932,7 +932,7 @@ int SaveReplay(const std::string &filename)
 
 	fd = fopen(destination.string().c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to '%s'\n", destination.string().c_str());
+		fprintf(stderr, "Can't save to '%s'\n", destination.u8string().c_str());
 		delete[] buf;
 		return -1;
 	}

@@ -203,7 +203,7 @@ static void LoadStratagusMap(const std::string &smpname, const std::string &mapn
 	InitPlayers();
 	LcmPreventRecurse = 1;
 	if (LuaLoadFile(mapfull) == -1) {
-		fprintf(stderr, "Can't load lua file: %s\n", mapfull.string().c_str());
+		fprintf(stderr, "Can't load lua file: %s\n", mapfull.u8string().c_str());
 		ExitFatal(-1);
 	}
 	LcmPreventRecurse = 0;
@@ -493,7 +493,7 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 		}
 
 	} catch (const FileException &) {
-		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup.string().c_str());
+		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup.u8string().c_str());
 		delete f;
 		return -1;
 	}
