@@ -31,6 +31,8 @@
 
 //@{
 
+#include "filesystem.h"
+
 #include <string>
 
 
@@ -71,7 +73,7 @@ public:
 private:
 	void ShowLabels();
 public:
-	std::string File;
+	fs::path File;
 	std::string Music;
 	bool StretchImage;
 	int Timeout;

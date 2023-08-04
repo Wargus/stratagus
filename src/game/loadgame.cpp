@@ -191,7 +191,7 @@ static void PlaceUnits()
 **
 **  @param filename  File name to be loaded.
 */
-void LoadGame(const std::string &filename)
+void LoadGame(const fs::path &filename)
 {
 	// log will be enabled if found in the save game
 	CommandLogDisabled = true;

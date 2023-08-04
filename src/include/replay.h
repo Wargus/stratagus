@@ -68,8 +68,6 @@ extern void CommandLog(const char *action, const CUnit *unit, int flush,
 extern void SinglePlayerReplayEachCycle();
 /// Replay user commands from log each cycle, multiplayer games
 extern void MultiPlayerReplayEachCycle();
-/// Load replay
-extern int LoadReplay(const std::string &name);
 /// End logging
 extern void EndReplayLog();
 /// Clean replay

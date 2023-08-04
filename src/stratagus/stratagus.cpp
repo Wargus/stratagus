@@ -187,6 +187,7 @@ extern void beos_init(int argc, char **argv);
 
 #include "ai.h"
 #include "editor.h"
+#include "filesystem.h"
 #include "game.h"
 #include "guichan.h"
 #include "interface.h"
@@ -482,8 +483,8 @@ static void Usage()
 
 #ifdef REDIRECT_OUTPUT
 
-static std::string stdoutFile;
-static std::string stderrFile;
+static fs::path stdoutFile;
+static fs::path stderrFile;
 
 static void CleanupOutput()
 {
@@ -491,11 +492,11 @@ static void CleanupOutput()
 	fclose(stderr);
 
 	struct stat st;
-	if (stat(stdoutFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stdoutFile.c_str());
+	if (stat(stdoutFile.string().c_str(), &st) == 0 && st.st_size == 0) {
+		unlink(stdoutFile.string().c_str());
 	}
-	if (stat(stderrFile.c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stderrFile.c_str());
+	if (stat(stderrFile.string().c_str(), &st) == 0 && st.st_size == 0) {
+		unlink(stderrFile.string().c_str());
 	}
 }
 
@@ -505,13 +506,13 @@ static void RedirectOutput()
 
 	fs::create_directories(path);
 
-	stdoutFile = (path / "stdout.txt").string();
-	stderrFile = (path / "stderr.txt").string();
+	stdoutFile = path / "stdout.txt";
+	stderrFile = path / "stderr.txt";
 
-	if (!freopen(stdoutFile.c_str(), "w", stdout)) {
+	if (!freopen(stdoutFile.string().c_str(), "w", stdout)) {
 		printf("freopen stdout failed");
 	}
-	if (!freopen(stderrFile.c_str(), "w", stderr)) {
+	if (!freopen(stderrFile.string().c_str(), "w", stderr)) {
 		printf("freopen stderr failed");
 	}
 	atexit(CleanupOutput);
@@ -538,9 +539,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			case 'c':
 				parameters.luaStartFilename = optarg;
-				if (strlen(optarg) > 4 &&
-				    !(strstr(optarg, ".lua") == optarg + strlen(optarg) - 4)) {
-					parameters.luaStartFilename += ".lua";
+				if (parameters.luaStartFilename.extension() != ".lua") {
+					parameters.luaStartFilename.concat(".lua");
 				}
 				continue;
 			case 'd': {

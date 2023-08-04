@@ -697,10 +697,8 @@ static int CclSetFogOfWarEasingSteps(lua_State *l)
 */
 static int CclSetFogOfWarGraphics(lua_State *l)
 {
-	std::string FogGraphicFile;
-
 	LuaCheckArgs(l, 1);
-	FogGraphicFile = LuaToString(l, 1);
+	fs::path FogGraphicFile = LuaToString(l, 1);
 	CFogOfWar::SetTiledFogGraphic(FogGraphicFile);
 
 	return 0;
@@ -862,7 +860,7 @@ static int CclLoadTileModels(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	Map.TileModelsFileName = LuaToString(l, 1);
-	const fs::path filename = LibraryFileName(Map.TileModelsFileName.c_str());
+	const fs::path filename = LibraryFileName(Map.TileModelsFileName.string().c_str());
 	if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}

@@ -67,17 +67,16 @@ extern void StartMap(const std::string &filename, bool clean);
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void ExpandPath(std::string &newpath, const std::string &path)
+fs::path ExpandPath(const std::string &path)
 {
 	if (path[0] == '~') {
-		newpath = Parameters::Instance.GetUserDirectory().string();
+		fs::path newpath = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
-			newpath += "/";
-			newpath += GameName;
+			newpath /= GameName;
 		}
-		newpath += "/" + path.substr(1);
+		return newpath / path.substr(1);
 	} else {
-		newpath = StratagusLibPath + "/" + path;
+		return fs::path(StratagusLibPath) / path;
 	}
 }
 
@@ -197,12 +196,9 @@ void DeleteSaveGame(const std::string &filename)
 
 void StartSavedGame(const std::string &filename)
 {
-	std::string path;
-
 	SaveGameLoading = true;
 	CleanPlayers();
-	ExpandPath(path, filename);
-	LoadGame(path);
+	LoadGame(ExpandPath(filename));
 
 	StartMap(filename, false);
 	//SetDefaultTextColors(nc, rc);

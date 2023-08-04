@@ -30,6 +30,10 @@
 #ifndef PARAMATERS_H
 #define PARAMATERS_H
 
+#include "filesystem.h"
+
+#include <string>
+
 class Parameters
 {
 public:
@@ -50,8 +54,8 @@ private:
 
 public:
 	std::string applicationName;
-	std::string luaStartFilename;
-	std::string luaEditorStartFilename;
+	fs::path luaStartFilename;
+	fs::path luaEditorStartFilename;
 	std::string luaScriptArguments;
 	std::string LocalPlayerName;        /// Name of local player
 	bool benchmark = false;             /// If true, run as fast as possible and report fps at the end of a game

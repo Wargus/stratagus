@@ -700,10 +700,10 @@ std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 	     ++it) {
 		if (fs::is_directory(it->path())) {
 			files.emplace_back();
-			files.back().name = it->path().filename().string();
+			files.back().name = it->path().filename();
 		} else if (fs::is_regular_file(it->path())) {
 			files.emplace_back();
-			files.back().name = it->path().filename().string();
+			files.back().name = it->path().filename();
 			files.back().type = 1;
 		}
 	}
@@ -730,11 +730,11 @@ class RawFileWriter : public FileWriter
 	FILE *file;
 
 public:
-	RawFileWriter(const std::string &filename)
+	explicit RawFileWriter(const fs::path &filename)
 	{
-		file = fopen(filename.c_str(), "wb");
+		file = fopen(filename.string().c_str(), "wb");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
+			fprintf(stderr, "Can't open file '%s' for writing\n", filename.u8string().c_str());
 			throw FileException();
 		}
 	}
@@ -755,11 +755,11 @@ class GzFileWriter : public FileWriter
 	gzFile file;
 
 public:
-	GzFileWriter(const std::string &filename)
+	explicit GzFileWriter(const fs::path &filename)
 	{
-		file = gzopen(filename.c_str(), "wb9");
+		file = gzopen(filename.string().c_str(), "wb9");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.c_str());
+			fprintf(stderr, "Can't open file '%s' for writing\n", filename.u8string().c_str());
 			throw FileException();
 		}
 	}
@@ -778,9 +778,9 @@ public:
 /**
 **  Create FileWriter
 */
-FileWriter *CreateFileWriter(const std::string &filename)
+FileWriter *CreateFileWriter(const fs::path &filename)
 {
-	if (strcasestr(filename.c_str(), ".gz")) {
+	if (filename.extension() == ".gz") {
 		return new GzFileWriter(filename);
 	} else {
 		return new RawFileWriter(filename);

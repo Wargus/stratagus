@@ -795,7 +795,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 		return;
 	}
 	NetworkMapName = std::string(msg.MapPath, sizeof(msg.MapPath));
-	const std::string mappath = StratagusLibPath + "/" + NetworkMapName;
+	const fs::path mappath = fs::path(StratagusLibPath) / NetworkMapName;
 	if (!LoadStratagusMapInfo(mappath) && !networkState.StateArg) {
 		networkState.State = ccs_needmap;
 		networkState.MsgCnt = 0;

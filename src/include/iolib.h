@@ -72,7 +72,7 @@ public:
 **  If the file name ends with '.gz', the file writer returned
 **  will compress the data with zlib.
 */
-FileWriter *CreateFileWriter(const std::string &filename);
+FileWriter *CreateFileWriter(const fs::path &filename);
 
 /**
 **  FileList struct used by directory access routine
@@ -90,8 +90,8 @@ public:
 		return name < rhs.name;
 	}
 public:
-	std::string name;  /// Name of the file
-	int type;          /// Type of the file
+	fs::path name; /// Name of the file
+	int type;      /// Type of the file
 };
 
 

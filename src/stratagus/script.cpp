@@ -2062,7 +2062,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	for (const auto& flp : ReadDataDirectory(dir)) {
 		if ((flp.type & mask) == type) {
 			lua_pushnumber(l, j + 1);
-			lua_pushstring(l, flp.name.c_str());
+			lua_pushstring(l, flp.name.string().c_str());
 			lua_settable(l, -3);
 			++j;
 		}
@@ -2513,11 +2513,11 @@ void SavePreferences()
 /**
 **  Load stratagus config file.
 */
-void LoadCcl(const std::string &filename, const std::string &luaArgStr)
+void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 {
 	//  Load and evaluate configuration file
 	CclInConfigFile = 1;
-	const fs::path name = LibraryFileName(filename.c_str());
+	const fs::path name = LibraryFileName(filename.string().c_str());
 	if (!fs::exists(name)) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
