@@ -33,23 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#if __has_include(<filesystem>)
-#include <filesystem>
-namespace fs = std::filesystem;
-#elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-error "Missing the <filesystem> header."
-#endif
+#include "script.h"
 
 #include <signal.h>
 
 #include "stratagus.h"
 
-#include "script.h"
-
 #include "animation/animation_setplayervar.h"
+#include "filesystem.h"
 #include "font.h"
 #include "game.h"
 #include "iolib.h"

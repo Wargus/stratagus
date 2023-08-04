@@ -692,13 +692,13 @@ std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 {
 	std::vector<FileList> files;
 
-	for (auto it = std::filesystem::directory_iterator{directory};
-	     it != std::filesystem::directory_iterator{};
+	for (auto it = fs::directory_iterator{directory};
+	     it != fs::directory_iterator{};
 	     ++it) {
-		if (std::filesystem::is_directory(it->path())) {
+		if (fs::is_directory(it->path())) {
 			files.emplace_back();
 			files.back().name = it->path().filename().string();
-		} else if (std::filesystem::is_regular_file(it->path())) {
+		} else if (fs::is_regular_file(it->path())) {
 			files.emplace_back();
 			files.back().name = it->path().filename().string();
 			files.back().type = 1;

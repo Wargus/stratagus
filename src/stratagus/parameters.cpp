@@ -31,13 +31,13 @@
 
 #include "stratagus.h"
 
+#include "filesystem.h"
 #include "parameters.h"
 
 #include <stdlib.h>
 
 #ifdef USE_WIN32
 #include <Shlobj.h>
-#include <filesystem>
 #endif
 
 /* static */ Parameters Parameters::Instance;
@@ -59,7 +59,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 	if (!noPortable) {
 		// if launcher is in the same directory as the data, we are in a portable install
 		fs::path executable_path = GetExecutablePath();
-		if (std::filesystem::equivalent(std::filesystem::path(StratagusLibPath), executable_path.parent_path())) {
+		if (fs::equivalent(fs::path(StratagusLibPath), executable_path.parent_path())) {
 			userDirectory = StratagusLibPath;
 			return;
 		}

@@ -551,6 +551,7 @@ set(stratagus_generic_HDRS
 	src/include/depend.h
 	src/include/editor.h
 	src/include/online_service.h
+	src/include/filesystem.h
 	src/include/font.h
 	src/include/fov.h
 	src/include/fow.h
