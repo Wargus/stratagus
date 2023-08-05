@@ -380,7 +380,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 
 		fs::create_directories(path);
 
-		path /= "/log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
+		path /= "log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
 		      + std::to_string((intmax_t) now) + ".log";
 
 		LogFile = new CFile;
