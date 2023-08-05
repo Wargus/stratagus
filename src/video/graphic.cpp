@@ -779,45 +779,25 @@ void CGraphic::Flip()
 	}
 
 	SDL_Surface *s = SurfaceFlip = SDL_ConvertSurface(Surface, Surface->format, 0);
-	Uint32 ckey;
-	if (!SDL_GetColorKey(Surface, &ckey)) {
-		SDL_SetColorKey(SurfaceFlip, SDL_TRUE, ckey);
+	Uint32 colorKey;
+	const bool hasColorKey = SDL_GetColorKey(Surface, &colorKey);
+	SDL_FillRect(s, nullptr, hasColorKey ? colorKey : SDL_MapRGBA(s->format, 0, 0, 0, 0));
+	auto renderer = SDL_CreateSoftwareRenderer(s);
+	auto texture = SDL_CreateTextureFromSurface(renderer, Surface);
+
+	SDL_RenderCopyEx(
+		renderer, texture, nullptr, nullptr, 0, nullptr, SDL_RendererFlip::SDL_FLIP_HORIZONTAL);
+
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
+
+	if (hasColorKey) {
+		SDL_SetColorKey(SurfaceFlip, SDL_TRUE, colorKey);
 	}
 	SDL_SetSurfaceBlendMode(SurfaceFlip, SDL_BLENDMODE_NONE);
 	if (SurfaceFlip->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(SurfaceFlip);
 	}
-	SDL_LockSurface(Surface);
-	SDL_LockSurface(s);
-	switch (s->format->BytesPerPixel) {
-		case 1:
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					((char *)s->pixels)[j + i * s->pitch] =
-						((char *)Surface->pixels)[s->w - j - 1 + i * Surface->pitch];
-				}
-			}
-			break;
-		case 3:
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					memcpy(&((char *)s->pixels)[j + i * s->pitch],
-						   &((char *)Surface->pixels)[(s->w - j - 1) * 3 + i * Surface->pitch], 3);
-				}
-			}
-			break;
-		case 4: {
-			for (int i = 0; i < s->h; ++i) {
-				for (int j = 0; j < s->w; ++j) {
-					memcpy(&((char *)s->pixels)[j + i * s->pitch],
-						   &((char *)Surface->pixels)[(s->w - j - 1) * 4 + i * Surface->pitch], 4);
-				}
-			}
-		}
-		break;
-	}
-	SDL_UnlockSurface(Surface);
-	SDL_UnlockSurface(s);
 
 	delete[] frameFlip_map;
 
@@ -855,99 +835,33 @@ void CGraphic::Resize(int w, int h)
 	Resized = true;
 	Uint32 ckey;
 	bool useckey = !SDL_GetColorKey(Surface, &ckey);
+	const auto* format = Surface->format;
+	auto resizedSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+	                                           w,
+	                                           h,
+	                                           format->BitsPerPixel,
+	                                           format->Rmask,
+	                                           format->Gmask,
+	                                           format->Bmask,
+	                                           format->Amask);
 
-	int bpp = Surface->format->BytesPerPixel;
-	if (bpp == 1) {
-		SDL_Color pal[256];
+	auto renderer = SDL_CreateSoftwareRenderer(resizedSurface);
+	auto texture = SDL_CreateTextureFromSurface(renderer, Surface);
 
-		SDL_LockSurface(Surface);
+	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 
-		unsigned char *pixels = (unsigned char *)Surface->pixels;
-		unsigned char *data = new unsigned char[w * h];
-		int x = 0;
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
 
-		for (int i = 0; i < h; ++i) {
-			for (int j = 0; j < w; ++j) {
-				data[x] = pixels[(i * GraphicHeight / h) * Surface->pitch + j * GraphicWidth / w];
-				++x;
-			}
-		}
+	VideoPaletteListRemove(Surface);
+	SDL_FreeSurface(Surface);
+	Surface = resizedSurface;
 
-		SDL_UnlockSurface(Surface);
-		VideoPaletteListRemove(Surface);
-
-		memcpy(pal, Surface->format->palette->colors, sizeof(SDL_Color) * 256);
-		SDL_FreeSurface(Surface);
-
-		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8, w, 0, 0, 0, 0);
-		if (Surface->format->BytesPerPixel == 1) {
-			VideoPaletteListAdd(Surface);
-		}
-		SDL_SetPaletteColors(Surface->format->palette, pal, 0, 256);
-	} else {
-		SDL_LockSurface(Surface);
-
-		unsigned char *pixels = (unsigned char *)Surface->pixels;
-		unsigned char *data = new unsigned char[w * h * bpp];
-		int x = 0;
-
-		for (int i = 0; i < h; ++i) {
-			float fy = (float)i * GraphicHeight / h;
-			int iy = (int)fy;
-			fy -= iy;
-			for (int j = 0; j < w; ++j) {
-				float fx = (float)j * GraphicWidth / w;
-				int ix = (int)fx;
-				fx -= ix;
-				float fz = (fx + fy) / 2;
-
-				unsigned char *p1 = &pixels[iy * Surface->pitch + ix * bpp];
-				unsigned char *p2 = (iy != Surface->h - 1) ?
-									&pixels[(iy + 1) * Surface->pitch + ix * bpp] :
-									p1;
-				unsigned char *p3 = (ix != Surface->w - 1) ?
-									&pixels[iy * Surface->pitch + (ix + 1) * bpp] :
-									p1;
-				unsigned char *p4 = (iy != Surface->h - 1 && ix != Surface->w - 1) ?
-									&pixels[(iy + 1) * Surface->pitch + (ix + 1) * bpp] :
-									p1;
-
-				data[x * bpp + 0] = static_cast<unsigned char>(
-										(p1[0] * (1 - fy) + p2[0] * fy +
-										 p1[0] * (1 - fx) + p3[0] * fx +
-										 p1[0] * (1 - fz) + p4[0] * fz) / 3.0 + .5);
-				data[x * bpp + 1] = static_cast<unsigned char>(
-										(p1[1] * (1 - fy) + p2[1] * fy +
-										 p1[1] * (1 - fx) + p3[1] * fx +
-										 p1[1] * (1 - fz) + p4[1] * fz) / 3.0 + .5);
-				data[x * bpp + 2] = static_cast<unsigned char>(
-										(p1[2] * (1 - fy) + p2[2] * fy +
-										 p1[2] * (1 - fx) + p3[2] * fx +
-										 p1[2] * (1 - fz) + p4[2] * fz) / 3.0 + .5);
-				if (bpp == 4) {
-					data[x * bpp + 3] = static_cast<unsigned char>(
-											(p1[3] * (1 - fy) + p2[3] * fy +
-											 p1[3] * (1 - fx) + p3[3] * fx +
-											 p1[3] * (1 - fz) + p4[3] * fz) / 3.0 + .5);
-				}
-				++x;
-			}
-		}
-
-		int Rmask = Surface->format->Rmask;
-		int Gmask = Surface->format->Gmask;
-		int Bmask = Surface->format->Bmask;
-		int Amask = Surface->format->Amask;
-
-		SDL_UnlockSurface(Surface);
-		VideoPaletteListRemove(Surface);
-		SDL_FreeSurface(Surface);
-
-		Surface = SDL_CreateRGBSurfaceFrom(data, w, h, 8 * bpp, w * bpp,
-										   Rmask, Gmask, Bmask, Amask);
-	}
 	if (useckey) {
 		SDL_SetColorKey(Surface, SDL_TRUE, ckey);
+	}
+	if (Surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(Surface);
 	}
 
 	Height = h / (GraphicHeight / Height);
