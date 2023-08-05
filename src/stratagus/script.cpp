@@ -213,8 +213,8 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 
 	content.clear();
 	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
-		DebugPrint("Can't open file '%s\n" _C_ file.string().c_str());
-		fprintf(stderr, "Can't open file '%s': %s\n", file.string().c_str(), strerror(errno));
+		DebugPrint("Can't open file '%s\n" _C_ file.u8string().c_str());
+		fprintf(stderr, "Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
 		return false;
 	}
 
@@ -246,7 +246,7 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 */
 int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnError)
 {
-	DebugPrint("Loading '%s'\n" _C_ file.string().c_str());
+	DebugPrint("Loading '%s'\n" _C_ file.u8string().c_str());
 
 	std::string content;
 	if (GetFileContent(file, content) == false) {
@@ -254,7 +254,7 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 	}
 	if (file.string().rfind("stratagus.lua") != -1) {
 		FileChecksums ^= fletcher32(content);
-		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.string().c_str() _C_ FileChecksums);
+		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.u8string().c_str() _C_ FileChecksums);
 	}
 	// save the current __file__
 	lua_getglobal(Lua, "__file__");
@@ -306,7 +306,7 @@ static int CclLoad(lua_State *l)
 	const fs::path filename = LibraryFileName(LuaToString(l, 1));
 	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
 	if (LuaLoadFile(filename, "", exitOnError) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ filename.string().c_str());
+		DebugPrint("Load failed: %s\n" _C_ filename.u8string().c_str());
 	}
 	return 0;
 }
@@ -322,7 +322,7 @@ static int CclLoadBuffer(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const fs::path file = LibraryFileName(LuaToString(l, 1));
-	DebugPrint("Loading '%s'\n" _C_ file.string().c_str());
+	DebugPrint("Loading '%s'\n" _C_ file.u8string().c_str());
 	std::string content;
 	if (GetFileContent(file, content) == false) {
 		return 0;
@@ -2497,7 +2497,7 @@ void SavePreferences()
 
 		FILE *fd = fopen(path.string().c_str(), "w");
 		if (!fd) {
-			DebugPrint("Cannot open file %s for writing\n" _C_ path.string().c_str());
+			DebugPrint("Cannot open file %s for writing\n" _C_ path.u8string().c_str());
 			return;
 		}
 
@@ -2523,7 +2523,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s\n"), name.string().c_str());
+	ShowLoadProgress(_("Script %s\n"), name.u8string().c_str());
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();

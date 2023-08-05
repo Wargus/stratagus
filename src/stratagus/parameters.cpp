@@ -67,21 +67,21 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 	TCHAR data_path[4096]{};
 	SHGetFolderPath(nullptr, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, nullptr, 0, data_path);
 	if (data_path[0]) {
-		userDirectory = (fs::path(data_path) / "Stratagus").string();
+		userDirectory = fs::path(data_path) / "Stratagus";
 	} else if (getenv("APPDATA")) {
-		userDirectory = std::string(getenv("APPDATA")) + "/Stratagus";
+		userDirectory = fs::path(getenv("APPDATA")) / "Stratagus";
 	}
 #else // USE_GAME_DIR
 	char *configDir = getenv("XDG_CONFIG_HOME");
 	if (configDir) {
-		userDirectory = std::string(configDir) + "/stratagus";
+		userDirectory = fs::path(configDir) / "stratagus";
 	} else {
 		configDir = getenv("HOME");
 		if (configDir) {
 #ifdef USE_MAC
-			userDirectory = std::string(configDir) + "/Library/Application\ Support/Stratagus";
+			userDirectory = fs::path(configDir) / "Library" / "Application\ Support" / "Stratagus";
 #else
-			userDirectory = std::string(configDir) + "/.config/stratagus";
+			userDirectory = fs::path(configDir) / ".config" / "stratagus";
 #endif // USE_MAC
 		}
 	}

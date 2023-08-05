@@ -673,7 +673,7 @@ void CGraphic::Load(bool grayscale)
 	}
 	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
 	if (Surface == nullptr) {
-		fprintf(stderr, "Couldn't load file %s: %s", name.string().c_str(), IMG_GetError());
+		fprintf(stderr, "Couldn't load file %s: %s", name.u8string().c_str(), IMG_GetError());
 		goto error;
 	}
 
@@ -696,7 +696,7 @@ void CGraphic::Load(bool grayscale)
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.string().c_str());
+		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.u8string().c_str());
 		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
 				Width, Height, GraphicWidth, GraphicHeight);
 		ExitFatal(-1);
@@ -712,7 +712,7 @@ void CGraphic::Load(bool grayscale)
 	return;
 
  error:
-	fprintf(stderr, "Can't load the graphic '%s'\n", File.string().c_str());
+	fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
 	ExitFatal(-1);
 }
 

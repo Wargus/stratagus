@@ -690,6 +690,9 @@ bool CanAccessFile(const char *filename)
 */
 std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 {
+	if (!fs::exists(directory) || !fs::is_directory(directory)) {
+		return {};
+	}
 	std::vector<FileList> files;
 
 	for (auto it = fs::directory_iterator{directory};

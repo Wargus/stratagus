@@ -380,7 +380,7 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 
 		fs::create_directories(path);
 
-		path /= "/log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
+		path /= "log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
 		      + std::to_string((intmax_t) now) + ".log";
 
 		LogFile = new CFile;
@@ -932,7 +932,7 @@ int SaveReplay(const std::string &filename)
 
 	fd = fopen(destination.string().c_str(), "wb");
 	if (!fd) {
-		fprintf(stderr, "Can't save to '%s'\n", destination.string().c_str());
+		fprintf(stderr, "Can't save to '%s'\n", destination.u8string().c_str());
 		delete[] buf;
 		return -1;
 	}

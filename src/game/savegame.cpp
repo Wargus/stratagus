@@ -191,7 +191,7 @@ void DeleteSaveGame(const std::string &filename)
 
 	fs::path fullpath = GetSaveDir() / filename;
 	if (unlink(fullpath.string().c_str()) == -1) {
-		fprintf(stderr, "delete failed for %s", fullpath.string().c_str());
+		fprintf(stderr, "delete failed for %s", fullpath.u8string().c_str());
 	}
 }
 
