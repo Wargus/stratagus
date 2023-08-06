@@ -140,7 +140,7 @@ enum VisitResult {
 class TerrainTraversal
 {
 public:
-	typedef short int dataType;
+	using dataType = short int;
 public:
 	void SetSize(unsigned int width, unsigned int height);
 	void Init();

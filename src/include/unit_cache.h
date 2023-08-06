@@ -50,8 +50,8 @@ class CMap;
 class CUnitCache
 {
 public:
-	typedef std::vector<CUnit *>::iterator iterator;
-	typedef std::vector<CUnit *>::const_iterator const_iterator;
+	using iterator = std::vector<CUnit *>::iterator;
+	using const_iterator = std::vector<CUnit *>::const_iterator;
 
 public:
 	CUnitCache() : Units() {}

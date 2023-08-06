@@ -34,7 +34,7 @@
 
 #include <stdint.h>
 
-typedef uint32_t IntColor; // Uint32 in SDL
+using IntColor = uint32_t; // Uint32 in SDL
 
 struct SDL_Color;
 struct lua_State;

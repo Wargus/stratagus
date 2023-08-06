@@ -85,10 +85,10 @@ namespace pvpgn
 		return temp;
 	}
 
-	typedef enum {
+	enum t_hash_variant{
 		do_blizzard_hash,
 		do_sha1_hash
-	} t_hash_variant;
+	};
 
 	static void hash_init(t_hash * hash);
 	static void do_hash(t_hash * hash, std::uint32_t * tmp);

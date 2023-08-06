@@ -300,7 +300,7 @@ extern int ReplayRevealMap;
 // in map_fog.c
 //
 /// Function to (un)mark the vision table.
-typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index);
+using MapMarkerFunc = void(const CPlayer &player, const unsigned int index);
 
 /// Filter map flags through fog
 extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
@@ -383,7 +383,7 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 extern void PreprocessMap();
 
 // in unit.c
-//typedef void MapClearField(const Vec2i &tilePos);
+//using MapClearField = void(const Vec2i &tilePos);
 
 /// Mark on vision table the Sight of the unit.
 void MapMarkUnitSight(CUnit &unit);

@@ -120,7 +120,7 @@ static int CompareGr(int a, int b) { return a > b; }
 static int CompareLeEq(int a, int b) { return a <= b; }
 static int CompareLe(int a, int b) { return a < b; }
 
-typedef int (*CompareFunction)(int, int);
+using CompareFunction = int (*)(int, int);
 
 /**
 **  Returns a function pointer to the comparison function

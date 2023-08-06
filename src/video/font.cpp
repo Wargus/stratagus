@@ -47,10 +47,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-typedef std::map<std::string, CFont *> FontMap;
+using FontMap = std::map<std::string, CFont *>;
 static FontMap Fonts;  /// Font mappings
 
-typedef std::map<std::string, CFontColor *> FontColorMap;
+using FontColorMap = std::map<std::string, CFontColor *>;
 static FontColorMap FontColors;  /// Map of ident to font color.
 
 static CFontColor *FontColor;                /// Current font color
@@ -65,7 +65,7 @@ static std::string DefaultReverseColorIndex; /// Default reverse color index
 **  Font color graphics
 **  Usage: FontColorGraphics[CFont *font][CFontColor *color]
 */
-typedef std::map<const CFontColor *, CGraphic *> FontColorGraphicMap;
+using FontColorGraphicMap = std::map<const CFontColor *, CGraphic *>;
 static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 
 // FIXME: remove these

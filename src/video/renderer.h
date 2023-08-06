@@ -874,9 +874,9 @@ class CRenderer : public CPrimitives
 
 };
 
-typedef CRenderer<2, 0xfbde> Primitive16_555_t;
-typedef CRenderer<2, 0xf7de> Primitive16_565_t;
-typedef CRenderer<4, 0> Primitive32_t;
+using Primitive16_555_t = CRenderer<2, 0xfbde>;
+using Primitive16_565_t = CRenderer<2, 0xf7de>;
+using Primitive32_t = CRenderer<4, 0>;
 
 #endif
 

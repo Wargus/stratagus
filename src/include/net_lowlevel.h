@@ -73,9 +73,9 @@
 	(int)(((ad) >> 8) & 0xff), (int)((ad) & 0xff)
 
 #ifdef USE_WINSOCK
-typedef SOCKET Socket;
+using Socket = SOCKET;
 #else
-typedef int Socket;
+using Socket = int;
 #endif
 
 /*----------------------------------------------------------------------------

@@ -44,7 +44,7 @@ public:
 	virtual void Init(const char *s, lua_State *l);
 
 private:
-	typedef bool BinOpFunc(int lhs, int rhs);
+	using BinOpFunc = bool (int lhs, int rhs);
 
 private:
 	std::string leftVar;

@@ -73,7 +73,7 @@ class PathFinderData;
 class SpellType;
 struct lua_State;
 
-typedef COrder *COrderPtr;
+using COrderPtr = COrder *;
 
 /*
 ** Configuration of the small (unit) AI.

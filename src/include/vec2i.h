@@ -159,11 +159,11 @@ inline int Distance(const Vec2T<T> &pos1, const Vec2T<T> &pos2)
 	return isqrt(SquareDistance(pos1, pos2));
 }
 
-typedef Vec2T<short int> Vec2i;
-typedef Vec2T<int> PixelPos;
-typedef Vec2T<int> PixelDiff;
-typedef Vec2T<int> PixelSize;
-typedef Vec2T<double> PixelPrecise;
+using Vec2i = Vec2T<short int>;
+using PixelPos = Vec2T<int>;
+using PixelDiff = Vec2T<int>;
+using PixelSize = Vec2T<int>;
+using PixelPrecise = Vec2T<double>;
 
 //@}
 

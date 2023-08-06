@@ -126,7 +126,7 @@ extern void CommandSharedVision(int player, bool state, int opponent);
 /**
 **  Unit references over network, or for memory saving.
 */
-typedef unsigned short UnitRef;
+using UnitRef = unsigned short;
 
 /// Send stop command
 extern void SendCommandStopUnit(CUnit &unit);

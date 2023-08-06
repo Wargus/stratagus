@@ -53,18 +53,18 @@
 #include <Iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
 
-typedef const char *setsockopttype;
-typedef char *recvfrombuftype;
-typedef char *recvbuftype;
-typedef const char *sendtobuftype;
-typedef const char *sendbuftype;
-typedef int socklen_t;
+using setsockopttype = const char *;
+using recvfrombuftype = char *;
+using recvbuftype = char *;
+using sendtobuftype = const char *;
+using sendbuftype = const char *;
+using socklen_t = int;
 #else
-typedef const void *setsockopttype;
-typedef void *recvfrombuftype;
-typedef void *recvbuftype;
-typedef const void *sendtobuftype;
-typedef const void *sendbuftype;
+using setsockopttype = const void *;
+using recvfrombuftype = void *;
+using recvbuftype = void *;
+using sendtobuftype = const void *;
+using sendbuftype = const void *;
 #endif
 
 //----------------------------------------------------------------------------

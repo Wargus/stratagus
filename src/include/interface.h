@@ -82,7 +82,7 @@ enum ButtonCmd {
 };
 
 class ButtonAction;
-typedef bool (*ButtonCheckFunc)(const CUnit &, const ButtonAction &);
+using ButtonCheckFunc = bool (*)(const CUnit &, const ButtonAction &);
 
 /// Action of button
 class ButtonAction
