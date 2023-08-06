@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <memory>
 #include <vector>
 #include "filesystem.h"
 #include "SDL.h"
@@ -72,7 +73,7 @@ public:
 **  If the file name ends with '.gz', the file writer returned
 **  will compress the data with zlib.
 */
-FileWriter *CreateFileWriter(const fs::path &filename);
+std::unique_ptr<FileWriter> CreateFileWriter(const fs::path &filename);
 
 /**
 **  FileList struct used by directory access routine

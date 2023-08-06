@@ -744,7 +744,7 @@ public:
 		if (file) { fclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size)
+	int write(const char *data, unsigned int size) override
 	{
 		return fwrite(data, size, 1, file);
 	}
@@ -769,7 +769,7 @@ public:
 		if (file) { gzclose(file); }
 	}
 
-	virtual int write(const char *data, unsigned int size)
+	int write(const char *data, unsigned int size) override
 	{
 		return gzwrite(file, data, size);
 	}
@@ -778,12 +778,12 @@ public:
 /**
 **  Create FileWriter
 */
-FileWriter *CreateFileWriter(const fs::path &filename)
+std::unique_ptr<FileWriter> CreateFileWriter(const fs::path &filename)
 {
 	if (filename.extension() == ".gz") {
-		return new GzFileWriter(filename);
+		return std::make_unique<GzFileWriter>(filename);
 	} else {
-		return new RawFileWriter(filename);
+		return std::make_unique<RawFileWriter>(filename);
 	}
 }
 
