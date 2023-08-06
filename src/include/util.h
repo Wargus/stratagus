@@ -93,7 +93,7 @@ extern uint32_t fletcher32(const std::string &content);
 #endif
 
 #ifndef HAVE_ERRNOT
-typedef int errno_t;
+using errno_t = int;
 #endif
 
 #ifndef HAVE_STRCPYS

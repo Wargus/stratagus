@@ -46,7 +46,7 @@
 -- Variables
 ----------------------------------------------------------------------------*/
 
-typedef std::map<std::string, std::string> EntriesType;
+using EntriesType = std::map<std::string, std::string>;
 static EntriesType Entries;
 
 /*----------------------------------------------------------------------------

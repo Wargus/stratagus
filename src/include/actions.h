@@ -166,7 +166,7 @@ public:
 	bool Instant; /// true to ignore TimeCost
 };
 
-typedef COrder *COrderPtr;
+using COrderPtr = COrder *;
 
 
 /*----------------------------------------------------------------------------

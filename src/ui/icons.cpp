@@ -50,7 +50,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-typedef std::map<std::string, CIcon *> IconMap;
+using IconMap = std::map<std::string, CIcon *>;
 static IconMap Icons;   /// Map of ident to icon.
 
 

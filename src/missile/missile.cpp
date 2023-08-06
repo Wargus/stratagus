@@ -67,7 +67,7 @@ static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
 static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
 
 /// lookup table for missile names
-typedef std::map<std::string, MissileType *> MissileTypeMap;
+using MissileTypeMap = std::map<std::string, MissileType *>;
 static MissileTypeMap MissileTypes;
 
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
@@ -576,11 +576,9 @@ static bool MissileDrawLevelCompare(const Missile *const l, const Missile *const
 */
 void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 {
-	typedef std::vector<Missile *>::const_iterator MissilePtrConstiterator;
-
 	// Loop through global missiles, then through locals.
-	for (MissilePtrConstiterator i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
-		Missile &missile = *(*i);
+	for (auto* missilePtr : GlobalMissiles) {
+		Missile &missile = *missilePtr;
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}
@@ -590,8 +588,8 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		}
 	}
 
-	for (MissilePtrConstiterator i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
-		Missile &missile = *(*i);
+	for (auto* missilePtr : LocalMissiles) {
+		Missile &missile = *missilePtr;
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
 		}

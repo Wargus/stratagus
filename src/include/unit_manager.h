@@ -50,7 +50,7 @@ struct lua_State;
 class CUnitManager
 {
 public:
-	typedef std::vector<CUnit *>::iterator Iterator;
+	using Iterator = std::vector<CUnit *>::iterator;
 public:
 	CUnitManager();
 	void Init();

@@ -35,7 +35,7 @@
 #include <utility>
 #include <variant>
 
-typedef int lua_Object; // from tolua++.h
+using lua_Object = int; // from tolua++.h
 struct lua_State;
 
 class LuaCallback
