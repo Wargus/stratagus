@@ -136,7 +136,7 @@ static void CancelBuilt(COrder_Built &order, CUnit *unit)
 	CUnit *worker = order.GetWorkerPtr();
 
 	// Drop out unit
-	if (worker != nullptr && worker->CurrentAction() == UnitActionBuild) {
+	if (worker != nullptr && worker->CurrentAction() == UnitActionBuild && !worker->CurrentOrder()->Finished) {
 		worker->ClearAction();
 
 		DropOutOnSide(*worker, LookingW, unit);
@@ -222,6 +222,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// FIXME: Johns: hardcoded unit-type wall / more races!
 	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
 		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+		order.Finished = true;
 		unit.Remove(nullptr);
 		UnitLost(unit);
 		UnitClearOrders(unit);
