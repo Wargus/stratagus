@@ -214,16 +214,15 @@ bool AiEnemyUnitsInDistance(const CPlayer &player,
 						    const CUnitType *type, const Vec2i &pos, unsigned range)
 {
 	const Vec2i offset(range, range);
-	std::vector<CUnit *> units;
 
 	if (type == nullptr) {
-		Select<1>(pos - offset, pos + offset, units, IsAEnemyUnitOf<true>(player));
+		std::vector<CUnit *> units = Select<1>(pos - offset, pos + offset, IsAEnemyUnitOf<true>(player));
 		return static_cast<int>(units.size());
 	} else {
 		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf<true> pred(player, *type);
 
-		Select<1>(pos - offset, pos + typeSize + offset, units, pred);
+		std::vector<CUnit *> units = Select<1>(pos - offset, pos + typeSize + offset, pred);
 		return static_cast<int>(units.size());
 	}
 }
@@ -273,9 +272,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 */
 static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
 {
-	std::vector<CUnit *> table;
-
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
 	int num = 0;
 
@@ -629,9 +626,8 @@ static bool AiRequestSupply()
 */
 static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 {
-	std::vector<CUnit *> table;
+	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -718,9 +714,8 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 */
 static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 {
-	std::vector<CUnit *> table;
+	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -806,8 +801,6 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 */
 static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 {
-	std::vector<CUnit *> table;
-
 	if (GameSettings.AiChecksDependencies) {
 		if (!CheckDependByType(*AiPlayer->Player, what)) {
 			return false;
@@ -815,7 +808,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 	}
 
 	// Remove all units already doing something.
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -1281,8 +1274,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	// We need to send all nearby free workers to repair that building
 	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
-	std::vector<CUnit *> table;
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 	int num = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];

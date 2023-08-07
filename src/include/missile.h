@@ -605,7 +605,7 @@ extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const Numbe
 /// fire a missile
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 
-extern void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table);
+extern std::vector<Missile *> FindAndSortMissiles(const CViewport &);
 
 /// handle all missiles
 extern void MissileActions();

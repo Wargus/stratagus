@@ -433,15 +433,12 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	CurrentViewport = this;
 	{
 		// Now we need to sort units, missiles, particles by draw level and draw them
-		std::vector<CUnit *> unittable;
-		std::vector<Missile *> missiletable;
-		std::vector<CParticle *> particletable;
+		const std::vector<CUnit *> unittable = FindAndSortUnits(*this);
+		const std::vector<Missile *> missiletable = FindAndSortMissiles(*this);
+		const std::vector<CParticle *> particletable = ParticleManager.prepareToDraw(*this);
 
-		FindAndSortUnits(*this, unittable);
 		const size_t nunits = unittable.size();
-		FindAndSortMissiles(*this, missiletable);
 		const size_t nmissiles = missiletable.size();
-		ParticleManager.prepareToDraw(*this, particletable);
 		const size_t nparticles = particletable.size();
 
 		size_t i = 0;

@@ -209,7 +209,7 @@ public:
 	static void init();
 	static void exit();
 
-	void prepareToDraw(const CViewport &vp, std::vector<CParticle *> &table);
+	std::vector<CParticle *> prepareToDraw(const CViewport &);
 	void endDraw();
 
 	void update();

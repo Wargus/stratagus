@@ -265,9 +265,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
 
-	// Select all units aroung the caster
-	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
+	// Select all units around the caster
+	std::vector<CUnit *> table = SelectAroundUnit(caster, range, OutOfMinRange(minRange, caster.tilePos));
 	if (minRange == 0)
 		table.push_back(&caster); // Allow self as target (we check conditions later)
 

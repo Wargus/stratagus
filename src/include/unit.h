@@ -684,8 +684,8 @@ extern void CleanDecorations();
 
 /// Draw unit's shadow
 extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, char zDisplacement = 0);
-/// Draw all units visible on map in viewport
-extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);
+/// Collect all units visible on map in viewport
+extern std::vector<CUnit *> FindAndSortUnits(const CViewport &);
 
 /// Show a unit's orders.
 extern void ShowOrder(const CUnit &unit);

@@ -226,16 +226,17 @@ private:
 	CUnit **unitP;
 };
 
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
+std::vector<CUnit *> Select(const Vec2i &ltPos, const Vec2i &rbPos);
+std::vector<CUnit *> SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos);
+std::vector<CUnit *> SelectAroundUnit(const CUnit &unit, int range);
 
 template <int selectMax = 0, typename Pred>
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+std::vector<CUnit *> SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 {
 	Assert(Map.Info.IsPointOnMap(ltPos));
 	Assert(Map.Info.IsPointOnMap(rbPos));
-	Assert(units.empty());
+
+	std::vector<CUnit *> units;
 	units.reserve(selectMax << 1);
 	int max = selectMax ? selectMax : INT_MAX;
 
@@ -250,7 +251,7 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 				if ((selectMax == 1 || unit.CacheLock == 0) && pred(&unit)) {
 					if (selectMax == 1) {
 						units.push_back(&unit);
-						return;
+						return units;
 					} else {
 						unit.CacheLock = 1;
 						units.push_back(&unit);
@@ -265,27 +266,28 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 	for (size_t i = 0; i != units.size(); ++i) {
 		units[i]->CacheLock = 0;
 	}
+	return units;
 }
 
 template <int selectMax = 0, typename Pred>
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+std::vector<CUnit *> Select(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 {
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
 	Map.FixSelectionArea(minPos, maxPos);
-	SelectFixed<selectMax>(minPos, maxPos, units, pred);
+	return SelectFixed<selectMax>(minPos, maxPos, pred);
 }
 
 template <int selectMax = 0, typename Pred>
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
+std::vector<CUnit *> SelectAroundUnit(const CUnit &unit, int range, Pred pred)
 {
 	const Vec2i offset(range, range);
 	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
 
-	Select<selectMax>(unit.tilePos - offset,
-		   unit.tilePos + typeSize + offset, around,
-		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
+	return Select<selectMax>(unit.tilePos - offset,
+	                         unit.tilePos + typeSize + offset,
+	                         MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
 }
 
 template <typename Pred>
@@ -331,10 +333,10 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 extern bool FindTerrainType(int movemask, int resmask, int range,
 							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
 
-extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
+extern std::vector<CUnit *> FindUnitsByType(const CUnitType &type, bool everybody = false);
 
 /// Find all units of this type of the player
-extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, bool ai_active = false);
+extern std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, bool ai_active = false);
 /// Return any unit on that map tile
 extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
 /// Return possible attack target on that map area

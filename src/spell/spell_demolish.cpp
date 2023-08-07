@@ -92,8 +92,7 @@
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
 	if (this->Damage) {
-		std::vector<CUnit *> table;
-		SelectFixed(minpos, maxpos, table);
+		std::vector<CUnit *> table = SelectFixed(minpos, maxpos);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()

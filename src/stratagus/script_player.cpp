@@ -373,10 +373,10 @@ static int CclChangeUnitsOwner(lua_State *l)
     std::vector<CUnit *> table;
 	// Change all units
     if (args == 4) {
-        Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+        table = Select(pos1, pos2, HasSamePlayerAs(Players[oldp]));
     } else { //Change only specific units by the type.
         CUnitType *type = UnitTypeByIdent(LuaToString(l, 5));
-        Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
+        table = Select(pos1, pos2, HasSamePlayerAndTypeAs(Players[oldp], *type));
     }
     for (auto unit : table) {
         unit->ChangeOwner(Players[newp]);
@@ -451,7 +451,6 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 	}
 
 	if (cnt > 0) {
-		std::vector<CUnit *> table;
 		if (args == 6) {
 			Vec2i pos1;
 			Vec2i pos2;
@@ -463,14 +462,15 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 			if (pos1.y > pos2.y) {
 				std::swap(pos1.y, pos2.y);
 			}
+			std::vector<CUnit *> table;
 			if (any) {
-				Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+				table = Select(pos1, pos2, HasSamePlayerAs(Players[oldp]));
 			} else if (onlyUnits) {
-				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), NotPredicate(IsBuildingType())));
+				table = Select(pos1, pos2, AndPredicate(HasSamePlayerAs(Players[oldp]), NotPredicate(IsBuildingType())));
 			} else if (onlyBuildings) {
-				Select(pos1, pos2, table, AndPredicate(HasSamePlayerAs(Players[oldp]), IsBuildingType()));
+				table = Select(pos1, pos2, AndPredicate(HasSamePlayerAs(Players[oldp]), IsBuildingType()));
 			} else {
-				Select(pos1, pos2, table, HasSamePlayerAndTypeAs(Players[oldp], *type));
+				table = Select(pos1, pos2, HasSamePlayerAndTypeAs(Players[oldp], *type));
 			}
 			for (size_t i = 0; i != table.size() && cnt > 0; ++i) {
 				table[i]->ChangeOwner(Players[newp]);

@@ -76,9 +76,10 @@ static inline bool DrawLevelCompare(const CParticle *lhs, const CParticle *rhs)
 	return lhs->getDrawLevel() < rhs->getDrawLevel();
 }
 
-void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle *> &table)
+std::vector<CParticle *> CParticleManager::prepareToDraw(const CViewport &vp)
 {
 	this->vp = &vp;
+	std::vector<CParticle *> table;
 
 	for (CParticle *p : particles) {
 		CParticle &particle = *p;
@@ -88,6 +89,7 @@ void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle 
 	}
 
 	ranges::sort(table, DrawLevelCompare);
+	return table;
 }
 
 void CParticleManager::endDraw()

@@ -373,7 +373,6 @@ int SelectUnitsByType(CUnit &base)
 	//
 	// Search for other visible units of the same type
 	//
-	std::vector<CUnit *> table;
 	// select all visible units.
 	// StephanR: should be (MapX,MapY,MapX+MapWidth-1,MapY+MapHeight-1) ???
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
@@ -382,7 +381,7 @@ int SelectUnitsByType(CUnit &base)
 	const Vec2i minPos = vp->MapPos - offset;
 	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
-	Select(minPos, maxPos, table, HasSameTypeAs(type));
+	std::vector<CUnit *> table = Select(minPos, maxPos, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
@@ -465,9 +464,7 @@ int ToggleUnitsByType(CUnit &base)
     const Vec2i minPos = vp->MapPos - offset;
     const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
     const Vec2i maxPos = vp->MapPos + vpSize + offset;
-    std::vector<CUnit *> table;
-
-    Select(minPos, maxPos, table, HasSameTypeAs(type));
+    std::vector<CUnit *> table = Select(minPos, maxPos, HasSameTypeAs(type));
 
     // FIXME: peon/peasant with gold/wood & co are considered from
     // different type... idem for tankers
@@ -706,9 +703,8 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
     const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table = Select(t0 - range, t1 + range);
 
-    Select(t0 - range, t1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
     // 1) search for the player units selectable with rectangle
@@ -797,9 +793,8 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
     const Vec2i tilePos0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i tilePos1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table= Select(tilePos0 - range, tilePos1 + range);
 
-    Select(tilePos0 - range, tilePos1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
     // If no unit in rectangle area... do nothing
     if (table.empty()) {
@@ -843,9 +838,8 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
     const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table = Select(t0 - range, t1 + range);
 
-    Select(t0 - range, t1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
     unsigned int n = 0;
@@ -893,9 +887,8 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
     const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table = Select(t0 - range, t1 + range);
 
-    Select(t0 - range, t1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
     unsigned int n = 0;
     for (size_t i = 0; i != table.size(); ++i) {
@@ -959,9 +952,8 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
     const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table = Select(t0 - range, t1 + range);
 
-    Select(t0 - range, t1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
     unsigned int n = 0;
@@ -1029,9 +1021,8 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
     const Vec2i t0 = Map.MapPixelPosToTilePos(corner_topleft);
     const Vec2i t1 = Map.MapPixelPosToTilePos(corner_bottomright);
     const Vec2i range(2, 2);
-    std::vector<CUnit *> table;
+    std::vector<CUnit *> table = Select(t0 - range, t1 + range);
 
-    Select(t0 - range, t1 + range, table);
     SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
     unsigned int n = 0;
     for (size_t i = 0; i < table.size(); ++i) {
