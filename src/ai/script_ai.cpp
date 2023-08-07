@@ -102,11 +102,9 @@ static std::vector<CUnitType *> getReparableUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.RepairHP > 0) {
-			res.push_back(&type);
+	for (CUnitType *type : UnitTypes) {
+		if (type->RepairHP > 0) {
+			res.push_back(type);
 		}
 	}
 	return res;
@@ -122,11 +120,9 @@ static std::vector<CUnitType *> getSupplyUnits()
 	std::vector<CUnitType *> res;
 	std::vector<CUnitType *> sorted_res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
-			res.push_back(&type);
+	for (CUnitType *type : UnitTypes) {
+		if (type->DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
+			res.push_back(type);
 		}
 	}
 	// Now, sort them, best first.
@@ -134,17 +130,16 @@ static std::vector<CUnitType *> getSupplyUnits()
 		float bestscore = 0;
 		CUnitType *besttype = nullptr;
 
-		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
-			CUnitType &type = **i;
+		for (CUnitType *type : res) {
 			unsigned int cost = 0;
 
 			for (unsigned j = 0; j < MaxCosts; ++j) {
-				cost += type.DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
+				cost += type->DefaultStat.Costs[j]; //this cannot be MapDefaultStat because this function is called when the AiHelper is defined, rather than when a game is started
 			}
-			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
+			const float score = ((float) type->DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
 			if (score > bestscore) {
 				bestscore = score;
-				besttype = &type;
+				besttype = type;
 			}
 		}
 		sorted_res.push_back(besttype);
@@ -165,11 +160,9 @@ static std::vector<CUnitType *> getRefineryUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
-		CUnitType &type = **i;
-
-		if (type.GivesResource > 0 && type.BoolFlag[CANHARVEST_INDEX].value) {
-			res.push_back(&type);
+	for (CUnitType *type : UnitTypes) {
+		if (type->GivesResource > 0 && type->BoolFlag[CANHARVEST_INDEX].value) {
+			res.push_back(type);
 		}
 	}
 #if 0
@@ -180,8 +173,7 @@ static std::vector<CUnitType *> getRefineryUnits()
 		CUnitType *besttype;
 
 		bestscore = 0;
-		for (std::vector<CUnitType *>::const_iterator i = res.begin(); i != res.end(); ++i) {
-			CUnitType *type = *i;
+		for (CUnitType *type : res) {
 			float score;
 			unsigned int cost = 0;
 
@@ -222,23 +214,21 @@ static void InitAiHelper(AiHelper &aiHelper)
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
 
-	for (std::vector<CUnitType *>::const_iterator i = supplyUnits.begin(); i != supplyUnits.end(); ++i) {
-		AiHelperInsert(aiHelper.UnitLimit(), 0, **i);
+	for (CUnitType *type : supplyUnits) {
+		AiHelperInsert(aiHelper.UnitLimit(), 0, *type);
 	}
 
 	for (int i = 1; i < MaxCosts; ++i) {
-		for (std::vector<CUnitType *>::const_iterator j = mineUnits.begin(); j != mineUnits.end(); ++j) {
-			if ((*j)->GivesResource == i) {
+		for (CUnitType *type : mineUnits) {
+			if (type->GivesResource == i) {
 				/* HACK : we can't mine TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Refinery(), i - 1, **j);
+				AiHelperInsert(aiHelper.Refinery(), i - 1, *type);
 			}
 		}
-		for (std::vector<CUnitType *>::const_iterator d = UnitTypes.begin(); d != UnitTypes.end(); ++d) {
-			CUnitType &type = **d;
-
-			if (type.CanStore[i] > 0) {
+		for (CUnitType *type : UnitTypes) {
+			if (type->CanStore[i] > 0) {
 				/* HACK : we can't store TIME then use 0 as 1 */
-				AiHelperInsert(aiHelper.Depots(), i - 1, type);
+				AiHelperInsert(aiHelper.Depots(), i - 1, *type);
 			}
 		}
 	}
@@ -249,33 +239,33 @@ static void InitAiHelper(AiHelper &aiHelper)
 
 		switch (button.Action) {
 			case ButtonRepair :
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					for (std::vector<CUnitType *>::const_iterator k = reparableUnits.begin(); k != reparableUnits.end(); ++k) {
-						AiHelperInsert(aiHelper.Repair(), (*k)->Slot, **j);
+				for (CUnitType *type : unitmask) {
+					for (CUnitType *reparableUnit : reparableUnits) {
+						AiHelperInsert(aiHelper.Repair(), reparableUnit->Slot, *type);
 					}
 				}
 				break;
 			case ButtonBuild: {
 				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
 
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Build(), buildingType->Slot, (**j));
+				for (CUnitType *type : unitmask) {
+					AiHelperInsert(aiHelper.Build(), buildingType->Slot, *type);
 				}
 				break;
 			}
 			case ButtonTrain : {
 				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
 
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Train(), trainingType->Slot, (**j));
+				for (CUnitType *type : unitmask) {
+					AiHelperInsert(aiHelper.Train(), trainingType->Slot, *type);
 				}
 				break;
 			}
 			case ButtonUpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
-				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.Upgrade(), upgradeToType->Slot, **j);
+				for (CUnitType *type : unitmask) {
+					AiHelperInsert(aiHelper.Upgrade(), upgradeToType->Slot, *type);
 				}
 				break;
 			}
@@ -283,12 +273,12 @@ static void InitAiHelper(AiHelper &aiHelper)
 				int researchId = UpgradeIdByIdent(button.ValueStr);
 
 				if (button.Allowed == ButtonCheckSingleResearch) {
-					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-						AiHelperInsert(aiHelper.SingleResearch(), researchId, **j);
+					for (CUnitType *type : unitmask) {
+						AiHelperInsert(aiHelper.SingleResearch(), researchId, *type);
 					}
 				} else {
-					for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-						AiHelperInsert(aiHelper.Research(), researchId, **j);
+					for (CUnitType *type : unitmask) {
+						AiHelperInsert(aiHelper.Research(), researchId, *type);
 					}
 				}
 				break;

@@ -571,10 +571,9 @@ static void DrawUnitInfo(CUnit &unit)
 	UpdateUnitVariables(unit);
 	for (size_t i = 0; i != UI.InfoPanelContents.size(); ++i) {
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
-			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
-				 content != UI.InfoPanelContents[i]->Contents.end(); ++content) {
-				if (CanShowContent((*content)->Condition, unit)) {
-					(*content)->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
+			for (CContentType *content : UI.InfoPanelContents[i]->Contents) {
+				if (CanShowContent(content->Condition, unit)) {
+					content->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
 				}
 			}
 		}

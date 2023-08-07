@@ -1052,9 +1052,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 				// We now need to check if there are another build commands on this build spot
 				bool buildable = true;
-				for (std::vector<COrderPtr>::const_iterator it = unit.Orders.begin();
-					 it != unit.Orders.end(); ++it) {
-					COrder &order = **it;
+				for (COrderPtr orderPtr : unit.Orders) {
+					COrder &order = *orderPtr;
 					if (order.Action == UnitActionBuild) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x

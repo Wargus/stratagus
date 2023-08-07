@@ -47,9 +47,7 @@
 	Assert(cb);
 
 	cb->pushPreamble();
-	for (std::vector<std::string>::const_iterator it = cbArgs.begin(); it != cbArgs.end(); ++it) {
-		const std::string str = *it;
-
+	for (const std::string &str : cbArgs) {
 		const int arg = ParseAnimInt(unit, str.c_str());
 		cb->pushInteger(arg);
 	}

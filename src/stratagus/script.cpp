@@ -2354,11 +2354,11 @@ static bool LuaValueToString(lua_State *l, std::string &value)
 			if ((s.find('\n') != std::string::npos)) {
 				value = std::string("[[") + s + "]]";
 			} else {
-				for (std::string::const_iterator it = s.begin(); it != s.end(); ++it) {
-					if (*it == '\"') {
+				for (char c : s) {
+					if (c == '\"') {
 						value.push_back('\\');
 					}
-					value.push_back(*it);
+					value.push_back(c);
 				}
 				value = std::string("\"") + value + "\"";
 			}

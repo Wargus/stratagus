@@ -172,15 +172,13 @@ void CUnitManager::Save(CFile &file) const
 {
 	file.printf("SlotUsage(%lu, {", (long unsigned int)unitSlots.size());
 
-	for (std::list<CUnit *>::const_iterator it = releasedUnits.begin(); it != releasedUnits.end(); ++it) {
-		const CUnit &unit = **it;
-		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), unit.ReleaseCycle);
+	for (const CUnit *unit : releasedUnits) {
+		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(*unit), unit->ReleaseCycle);
 	}
 	file.printf("})\n");
 
-	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
-		const CUnit &unit = **it;
-		SaveUnit(unit, file);
+	for (const CUnit * unit : units) {
+		SaveUnit(*unit, file);
 	}
 }
 
