@@ -484,8 +484,8 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
 
-	for (std::vector<CUnit *>::iterator it = depots.begin(); it != depots.end(); ++it) {
-		CUnit &unit = **it;
+	for (CUnit* unitPtr : depots) {
+		CUnit &unit = *unitPtr;
 
 		const unsigned int tooManyWorkers = 15;
 		const int range = 15;

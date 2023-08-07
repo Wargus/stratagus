@@ -542,17 +542,15 @@ void FreeAi()
 */
 static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 {
-	std::vector<AiBuildQueue>::iterator i;
-
-	for (i = pai->UnitTypeBuilt.begin(); i != pai->UnitTypeBuilt.end(); ++i) {
-		Assert((*i).Want);
-		if (&type == (*i).Type && (*i).Made) {
-			--(*i).Made;
-			if (!--(*i).Want) {
-				pai->UnitTypeBuilt.erase(i);
-			}
-			return 1;
+	auto it = ranges::find_if(pai->UnitTypeBuilt,
+	                          [&](const AiBuildQueue &q) { return q.Made && q.Type == &type; });
+	if (it != pai->UnitTypeBuilt.end())
+	{
+		--(*it).Made;
+		if (!--(*it).Want) {
+			pai->UnitTypeBuilt.erase(it);
 		}
+		return 1;
 	}
 	return 0;
 }
@@ -593,13 +591,13 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 */
 static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
 {
-	std::vector<AiBuildQueue>::iterator i;
+	auto it = ranges::find_if(pai.UnitTypeBuilt,
+	                          [&](const AiBuildQueue &q) { return q.Made && q.Type == &type; });
 
-	for (i = pai.UnitTypeBuilt.begin(); i != pai.UnitTypeBuilt.end(); ++i) {
-		if (&type == (*i).Type && (*i).Made) {
-			(*i).Made--;
-			return true;
-		}
+	if (it != pai.UnitTypeBuilt.end())
+	{
+		(*it).Made--;
+		return true;
 	}
 	return false;
 }

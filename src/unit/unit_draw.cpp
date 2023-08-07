@@ -373,11 +373,10 @@ void DecorationCclRegister()
 */
 void LoadDecorations()
 {
-	std::vector<Decoration>::iterator i;
-	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
-		ShowLoadProgress(_("Decorations '%s'"), (*i).File.c_str());
-		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
-		(*i).Sprite->Load();
+	for (Decoration& deco : DecoSprite.SpriteArray) {
+		ShowLoadProgress(_("Decorations '%s'"), deco.File.c_str());
+		deco.Sprite = CGraphic::New(deco.File, deco.Width, deco.Height);
+		deco.Sprite->Load();
 	}
 }
 

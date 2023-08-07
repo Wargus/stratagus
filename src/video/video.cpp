@@ -551,8 +551,7 @@ void ColorCycle()
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 	if (colorCycling.ColorCycleAll) {
 		++colorCycling.cycleCount;
-		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
-			SDL_Surface *surface = (*it);
+		for (SDL_Surface *surface : colorCycling.PaletteList) {
 			ColorCycleSurface(*surface);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
@@ -565,9 +564,7 @@ void RestoreColorCyclingSurface()
 {
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 	if (colorCycling.ColorCycleAll) {
-		for (std::vector<SDL_Surface *>::iterator it = colorCycling.PaletteList.begin(); it != colorCycling.PaletteList.end(); ++it) {
-			SDL_Surface *surface = (*it);
-
+		for (SDL_Surface *surface : colorCycling.PaletteList) {
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
 	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {

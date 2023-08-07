@@ -415,9 +415,7 @@ CAnimations *AnimationsByIdent(const std::string &ident)
 
 void FreeAnimations()
 {
-	std::map<std::string, CAnimations *>::iterator it;
-	for (it = AnimationMap.begin(); it != AnimationMap.end(); ++it) {
-		CAnimations *anims = (*it).second;
+	for (auto &[key, anims] : AnimationMap) {
 		delete anims;
 	}
 	AnimationMap.clear();

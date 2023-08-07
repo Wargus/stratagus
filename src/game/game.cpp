@@ -477,8 +477,8 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 			}
 		}
 		f->printf("\n\n");
-		for (std::vector<CUnit *>::iterator it = teleporters.begin(); it != teleporters.end(); ++it) {
-			CUnit &unit = **it;
+		for (const CUnit* unitPtr : teleporters) {
+			const CUnit &unit = *unitPtr;
 			f->printf("SetTeleportDestination(%d, %d)\n", UnitNumber(unit), UnitNumber(*unit.Goal));
 		}
 		f->printf("\n\n");

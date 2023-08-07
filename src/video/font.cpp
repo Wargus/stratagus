@@ -932,9 +932,8 @@ void CFont::DynamicLoad() const
 */
 void LoadFonts()
 {
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont &font = *it->second;
-		font.Load();
+	for (auto &[key, font] : Fonts) {
+		font->Load();
 	}
 
 	// TODO: remove this
@@ -946,9 +945,7 @@ void CFont::Reload() const
 {
 	if (this->G) {
 		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[this];
-		for (FontColorGraphicMap::iterator it = fontColorGraphicMap.begin();
-			 it != fontColorGraphicMap.end(); ++it) {
-			CGraphic *g = it->second;
+		for (auto &[key, g] : fontColorGraphicMap) {
 			delete g;
 		}
 		fontColorGraphicMap.clear();
@@ -961,10 +958,8 @@ void CFont::Reload() const
 */
 void ReloadFonts()
 {
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont &font = *it->second;
-
-		font.Reload();
+	for (auto &[key, font] : Fonts) {
+		font->Reload();
 	}
 }
 
@@ -1066,16 +1061,14 @@ void CFont::Clean()
 */
 void CleanFonts()
 {
-	for (FontMap::iterator it = Fonts.begin(); it != Fonts.end(); ++it) {
-		CFont *font = it->second;
-
+	for (auto &[key, font] : Fonts) {
 		font->Clean();
 		delete font;
 	}
 	Fonts.clear();
 
-	for (FontColorMap::iterator it = FontColors.begin(); it != FontColors.end(); ++it) {
-		delete it->second;
+	for (auto &[key, fontColor] : FontColors) {
+		delete fontColor;
 	}
 	FontColors.clear();
 

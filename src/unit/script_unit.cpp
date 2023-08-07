@@ -276,10 +276,8 @@ void PathFinderOutput::Load(lua_State *l)
 */
 static void CclParseOrders(lua_State *l, CUnit &unit)
 {
-	for (std::vector<COrderPtr>::iterator order = unit.Orders.begin();
-		 order != unit.Orders.end();
-		 ++order) {
-		delete *order;
+	for (COrderPtr order : unit.Orders) {
+		delete order;
 	}
 	unit.Orders.clear();
 	const int n = lua_rawlen(l, -1);

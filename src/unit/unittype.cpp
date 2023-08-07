@@ -563,14 +563,12 @@ CUnitType::~CUnitType()
 	BoolFlag.clear();
 
 	// Free Building Restrictions if there are any
-	for (std::vector<CBuildRestriction *>::iterator b = BuildingRules.begin();
-		 b != BuildingRules.end(); ++b) {
-		delete *b;
+	for (CBuildRestriction *b : BuildingRules) {
+		delete b;
 	}
 	BuildingRules.clear();
-	for (std::vector<CBuildRestriction *>::iterator b = AiBuildingRules.begin();
-		 b != AiBuildingRules.end(); ++b) {
-		delete *b;
+	for (CBuildRestriction *b : AiBuildingRules) {
+		delete b;
 	}
 	AiBuildingRules.clear();
 
@@ -964,15 +962,13 @@ void InitUnitTypes(int reset_player_stats)
 		type.StillFrame = GetStillFrame(type);
 
 		// Lookup BuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
-			 b < type.BuildingRules.end(); ++b) {
-			(*b)->Init();
+		for (CBuildRestriction *b : type.BuildingRules) {
+			b->Init();
 		}
 
 		// Lookup AiBuildingTypes
-		for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
-			 b < type.AiBuildingRules.end(); ++b) {
-			(*b)->Init();
+		for (CBuildRestriction *b : type.AiBuildingRules) {
+			b->Init();
 		}
 	}
 
@@ -1103,9 +1099,8 @@ void CUnitTypeVar::Clear()
 {
 	Variable.clear();
 
-	for (std::vector<CDecoVar *>::iterator it = DecoVar.begin();
-		 it != DecoVar.end(); ++it) {
-		delete(*it);
+	for (CDecoVar *deco : DecoVar) {
+		delete deco;
 	}
 	DecoVar.clear();
 }

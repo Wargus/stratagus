@@ -609,10 +609,9 @@ static int CclDefinePanelContents(lua_State *l)
 				LuaError(l, "'%s' invalid for DefinePanelContents" _C_ key);
 			}
 		}
-		for (std::vector<CContentType *>::iterator content = infopanel->Contents.begin();
-			 content != infopanel->Contents.end(); ++content) { // Default value for invalid value.
-			(*content)->Pos.x += infopanel->PosX;
-			(*content)->Pos.y += infopanel->PosY;
+		for (CContentType *content : infopanel->Contents) { // Default value for invalid value.
+			content->Pos.x += infopanel->PosX;
+			content->Pos.y += infopanel->PosY;
 		}
 		size_t j;
 		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {

@@ -618,9 +618,8 @@ CPopup::CPopup() :
 
 CPopup::~CPopup()
 {
-	for (std::vector<CPopupContentType *>::iterator content = Contents.begin();
-		 content != Contents.end(); ++content) {
-		delete *content;
+	for (CPopupContentType *content : Contents) {
+		delete content;
 	}
 }
 

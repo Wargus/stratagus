@@ -664,8 +664,8 @@ void SocketSet::DelSocket(Socket socket)
 	}
 	if (socket == MaxSockFD) {
 		MaxSockFD = 0;
-		for (i = Sockets.begin(); i != Sockets.end(); ++i) {
-			MaxSockFD = std::max(this->MaxSockFD, *i);
+		for (auto &socketFd : Sockets) {
+			MaxSockFD = std::max(this->MaxSockFD, socketFd);
 		}
 	}
 }

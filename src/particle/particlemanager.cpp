@@ -60,14 +60,13 @@ void CParticleManager::exit()
 
 void CParticleManager::clear()
 {
-	std::vector<CParticle *>::iterator i;
-	for (i = particles.begin(); i != particles.end(); ++i) {
-		delete *i;
+	for (auto *p : particles) {
+		delete p;
 	}
 	particles.clear();
 
-	for (i = new_particles.begin(); i != new_particles.end(); ++i) {
-		delete *i;
+	for (auto *p : new_particles) {
+		delete p;
 	}
 	new_particles.clear();
 }
@@ -81,8 +80,8 @@ void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle 
 {
 	this->vp = &vp;
 
-	for (std::vector<CParticle *>::iterator it = particles.begin(); it != particles.end(); ++it) {
-		CParticle &particle = **it;
+	for (CParticle *p : particles) {
+		CParticle &particle = *p;
 		if (particle.isVisible(vp)) {
 			table.push_back(&particle);
 		}

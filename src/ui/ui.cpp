@@ -119,9 +119,8 @@ bool IsDemoMode()
 
 CUnitInfoPanel::~CUnitInfoPanel()
 {
-	for (std::vector<CContentType *>::iterator content = Contents.begin();
-		 content != Contents.end(); ++content) {
-		delete *content;
+	for (CContentType *content : Contents) {
+		delete content;
 	}
 	delete Condition;
 }
@@ -189,10 +188,10 @@ CUserInterface::CUserInterface() :
 */
 CPopup *PopupByIdent(const std::string &ident)
 {
-	for (std::vector<CPopup *>::iterator i = UI.ButtonPopups.begin(); i < UI.ButtonPopups.end(); ++i) {
-		if ((*i)->Ident == ident) {
-			return *i;
-		}
+	const auto it =
+		ranges::find_if(UI.ButtonPopups, [&](CPopup *popup) { return popup->Ident == ident; });
+	if (it != UI.ButtonPopups.end()) {
+		return *it;
 	}
 	return nullptr;
 }
@@ -206,8 +205,8 @@ void InitUserInterface()
 	UI.Offset480Y = (Video.Height - 480) / 2;
 
 	UI.LifeBarColorsInt.clear();
-	for(std::vector<std::string>::iterator it = UI.LifeBarColorNames.begin(); it != UI.LifeBarColorNames.end(); ++it) {
-		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName((*it).c_str())));
+	for(const std::string& name : UI.LifeBarColorNames) {
+		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName(name.c_str())));
 	}
 
 	//
@@ -371,9 +370,8 @@ void CleanUserInterface()
 
 	// Info Panel
 	CGraphic::Free(UI.InfoPanel.G);
-	for (std::vector<CUnitInfoPanel *>::iterator panel = UI.InfoPanelContents.begin();
-		 panel != UI.InfoPanelContents.end(); ++panel) {
-		delete *panel;
+	for (CUnitInfoPanel *panel : UI.InfoPanelContents) {
+		delete panel;
 	}
 	UI.InfoPanelContents.clear();
 
@@ -385,9 +383,8 @@ void CleanUserInterface()
 	}
 
 	// Button Popups
-	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();
-		 popup != UI.ButtonPopups.end(); ++popup) {
-		delete *popup;
+	for (CPopup *popup : UI.ButtonPopups) {
+		delete popup;
 	}
 	UI.ButtonPopups.clear();
 
@@ -424,9 +421,8 @@ void CleanUserInterface()
 
 void FreeButtonStyles()
 {
-	std::map<std::string, ButtonStyle *>::iterator i;
-	for (i = ButtonStyleHash.begin(); i != ButtonStyleHash.end(); ++i) {
-		delete(*i).second;
+	for (auto &[key, value] : ButtonStyleHash) {
+		delete value;
 	}
 	ButtonStyleHash.clear();
 }

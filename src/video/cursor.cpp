@@ -163,8 +163,8 @@ void CCursor::Reset() {
 */
 void LoadCursors(const std::string &race)
 {
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor &cursor = **i;
+	for (CCursor *cursorPtr : AllCursors) {
+		CCursor &cursor = *cursorPtr;
 
 		//  Only load cursors of this race or universal cursors.
 		if (!cursor.Race.empty() && cursor.Race != race) {
@@ -189,8 +189,8 @@ void LoadCursors(const std::string &race)
 */
 CCursor *CursorByIdent(const std::string &ident)
 {
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CCursor &cursor = **i;
+	for (CCursor *cursorPtr : AllCursors) {
+		CCursor &cursor = *cursorPtr;
 
 		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
 			continue;
@@ -436,9 +436,9 @@ void InitVideoCursors()
 */
 void CleanCursors()
 {
-	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
-		CGraphic::Free((**i).G);
-		delete *i;
+	for (CCursor *cursor : AllCursors) {
+		CGraphic::Free(cursor->G);
+		delete cursor;
 	}
 	AllCursors.clear();
 

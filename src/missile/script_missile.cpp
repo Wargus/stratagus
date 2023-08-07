@@ -344,9 +344,8 @@ static int CclMissile(lua_State *l)
 */
 static int CclDefineBurningBuilding(lua_State *l)
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		delete *i;
+	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
+		delete frame;
 	}
 	BurningBuildingFrames.clear();
 

@@ -172,11 +172,10 @@ public:
 			}
 		}
 #else
-		for (std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end()); i != end; ++i) {
-			if ((*i) == unit) {
-				Units.erase(i);
-				return true;
-			}
+		auto it = ranges::find(Units, unit);
+		if (it != Units.end()) {
+			Units.erase(it);
+			return true;
 		}
 #endif
 		return false;
@@ -189,11 +188,9 @@ public:
 	*/
 	void RemoveS(CUnit *const unit)
 	{
-		for (std::vector<CUnit *>::iterator i(Units.begin()), end(Units.end()); i != end; ++i) {
-			if ((*i) == unit) {
-				Units.erase(i);
-				return;
-			}
+		auto it = ranges::find(Units, unit);
+		if (it != Units.end()) {
+			Units.erase(it);
 		}
 	}
 
