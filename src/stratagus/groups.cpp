@@ -82,7 +82,7 @@ public:
 
 	void remove(CUnit &unit)
 	{
-		std::vector<CUnit *>::iterator it = find(units.begin(), units.end(), &unit);
+		std::vector<CUnit *>::iterator it = ranges::find(units, &unit);
 
 		Assert(it != units.end());
 		*it = units.back();

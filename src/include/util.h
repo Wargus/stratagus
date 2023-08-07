@@ -175,12 +175,7 @@ fs::path GetExecutablePath();
 ----------------------------------------------------------------------------*/
 namespace ranges
 {
-    template<typename Range, typename UnaryFunction>
-    UnaryFunction for_each(Range& range, UnaryFunction fn)
-    {
-        return std::for_each(begin(range), end(range), fn);
-    }
-	
+
 	template<typename Range, typename Value>
 	void fill(Range& range, const Value& value)
 	{
@@ -229,12 +224,18 @@ namespace ranges
     {
         return std::min_element(begin(range), end(range), cmp);
     }
-   
+ 
     template<typename Range, typename Value>
-    auto lower_bound(Range& range, Value value)
+    auto lower_bound(Range& range, const Value& value)
     {
         return std::lower_bound(begin(range), end(range), value);
     }
+
+	template <typename Range, typename Value, typename Comparer = std::less<>>
+	auto upper_bound(Range &range, const Value &value, Comparer &&comparer = {})
+	{
+		return std::upper_bound(begin(range), end(range), value, std::forward<Comparer>(comparer));
+	}
 
     template<typename Range, typename OutputIt>
     auto copy(Range& range, OutputIt copy_to)
@@ -260,7 +261,14 @@ namespace ranges
                 std::rotate(begin(range), begin(range) + 1, end(range));
             }
         }
-    }	
+    }
+
+	template <typename Range, typename Comparer = std::less<>>
+	void sort(Range &range, Comparer &&comparer = {})
+	{
+		std::sort(begin(range), end(range), std::forward<Comparer>(comparer));
+	}
+
 }
 
 //@}

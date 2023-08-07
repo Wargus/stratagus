@@ -2443,8 +2443,7 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 					lua_pop(l, 1);
 				}
 				//res += "if (" + lhsLine + " == nil) then " + lhsLine + " = {} end\n";
-				if(std::find(blockTableNames.begin(), blockTableNames.end(), key) == blockTableNames.end()
-				 && key != "[]")
+				if (ranges::find(blockTableNames, key) == blockTableNames.end() && key != "[]")
 				{
 					lua_pushvalue(l, -1);
 					blockTableNames.push_back(key);

@@ -102,8 +102,8 @@ void CFogOfWar::Init()
     const size_t   tableSize      = VisTableWidth * visTableHeight;
     VisTable.clear();
     VisTable.resize(tableSize);
-    std::fill(VisTable.begin(), VisTable.end(), VisionType::cUnseen);
-    
+    ranges::fill(VisTable, VisionType::cUnseen);
+
     VisTable_Index0 = VisTableWidth + 1;
 
     switch (Settings.Type) {
@@ -174,7 +174,7 @@ void CFogOfWar::InitEnhanced()
     
     RenderedFog.clear();
     RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
-    std::fill(RenderedFog.begin(), RenderedFog.end(), 0xFF);
+    ranges::fill(RenderedFog, 0xFF);
 
     Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 

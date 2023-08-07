@@ -564,7 +564,7 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	ncq.Data.resize(nc.Size());
 	nc.Serialize(&ncq.Data[0]);
 	// Check for duplicate command in queue
-	if (std::find(CommandsIn.begin(), CommandsIn.end(), ncq) != CommandsIn.end()) {
+	if (ranges::find(CommandsIn, ncq) != CommandsIn.end()) {
 		return;
 	}
 	CommandsIn.push_back(ncq);

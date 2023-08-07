@@ -87,7 +87,7 @@ void CParticleManager::prepareToDraw(const CViewport &vp, std::vector<CParticle 
 		}
 	}
 
-	std::sort(table.begin(), table.end(), DrawLevelCompare);
+	ranges::sort(table, DrawLevelCompare);
 }
 
 void CParticleManager::endDraw()

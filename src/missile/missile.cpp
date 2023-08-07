@@ -596,7 +596,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		// Local missile are visible.
 		table.push_back(&missile);
 	}
-	std::sort(table.begin(), table.end(), MissileDrawLevelCompare);
+	ranges::sort(table, MissileDrawLevelCompare);
 }
 
 /**
