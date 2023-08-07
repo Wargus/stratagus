@@ -236,7 +236,7 @@ inline void ProfilePrint()
 	}
 	std::vector<ProfileData *> prof;
 	for (auto &[key, data] : functionProfiles) {
-		prof.insert(std::upper_bound(prof.begin(), prof.end(), &data, compProfileData), &data);
+		prof.insert(ranges::upper_bound(prof, &data, compProfileData), &data);
 	}
 
 	FILE *fd = fopen("profile.txt", "wb");

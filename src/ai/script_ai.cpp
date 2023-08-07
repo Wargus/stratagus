@@ -64,7 +64,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 		table.resize(n + 1);
 	}
 	// Look if already known
-	std::vector<CUnitType *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
+	std::vector<CUnitType *>::const_iterator it = ranges::find(table[n], &base);
 	if (it != table[n].end()) {
 		return;
 	}

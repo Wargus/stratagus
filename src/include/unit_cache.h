@@ -85,7 +85,7 @@ public:
 	template<typename _T>
 	CUnit *find(const _T &pred) const
 	{
-		std::vector<CUnit *>::const_iterator ret = std::find_if(Units.begin(), Units.end(), pred);
+		std::vector<CUnit *>::const_iterator ret = ranges::find_if(Units, pred);
 
 		return ret != Units.end() ? (*ret) : nullptr;
 	}
@@ -204,7 +204,7 @@ public:
 	bool InsertS(CUnit *unit)
 	{
 		if (!binary_search(Units.begin(), Units.end(), unit)) {
-			Units.insert(std::lower_bound(Units.begin(), Units.end(), unit), unit);
+			Units.insert(ranges::lower_bound(Units, unit), unit);
 			return true;
 		}
 		return false;

@@ -76,7 +76,7 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (std::find(units.begin(), units.end(), unit) != units.end()) {
+		if (ranges::find(units, unit) != units.end()) {
 			return unit;
 		}
 	}

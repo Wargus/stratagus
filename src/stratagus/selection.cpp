@@ -276,7 +276,7 @@ void UnSelectUnit(CUnit &unit)
 	if (!unit.Selected) {
 		return;
 	}
-	std::vector<CUnit *>::iterator it = std::find(Selected.begin(), Selected.end(), &unit);
+	std::vector<CUnit *>::iterator it = ranges::find(Selected, &unit);
 	Assert(it != Selected.end());
 
 	*it = Selected.back();

@@ -71,12 +71,12 @@ void CEasedTexture::Init(const uint16_t width, const uint16_t height, const uint
         frame.clear();
         frame.resize(TextureSize);
 
-        std::fill(frame.begin(), frame.end(), 0xFF);
+        ranges::fill(frame, 0xFF);
     }
 
     Deltas.clear();
     Deltas.resize(TextureSize);
-    std::fill(Deltas.begin(), Deltas.end(), 0xFF);
+    ranges::fill(Deltas, 0xFF);
 
     EasingStepsNum  = numOfSteps;
     CurrentStep     = numOfSteps;

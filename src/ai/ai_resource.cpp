@@ -482,7 +482,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	if (depots.size() < 2) {
 		return nullptr;
 	}
-	std::sort(depots.begin(), depots.end(), CompareDepotsByDistance(worker));
+	ranges::sort(depots, CompareDepotsByDistance(worker));
 
 	for (CUnit* unitPtr : depots) {
 		CUnit &unit = *unitPtr;
@@ -1140,7 +1140,7 @@ static void AiCollectResources()
 
 		if (c && num_units_assigned[c] > 1) {
 			//first should go workers with lower ResourcesHeld value
-			std::sort(units_assigned[c].begin(), units_assigned[c].end(), CmpWorkers);
+			ranges::sort(units_assigned[c], CmpWorkers);
 		}
 	}
 	CUnit *unit;

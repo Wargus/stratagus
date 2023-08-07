@@ -707,7 +707,7 @@ std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 			files.back().type = 1;
 		}
 	}
-	std::sort(files.begin(), files.end());
+	ranges::sort(files);
 	return files;
 }
 
