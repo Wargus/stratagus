@@ -159,11 +159,9 @@ void CleanConstructions()
 */
 CConstruction *ConstructionByIdent(const std::string &name)
 {
-	for (std::vector<CConstruction *>::const_iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		if ((*it)->Ident == name) {
-			return *it;
+	for (CConstruction *c : Constructions) {
+		if (c->Ident == name) {
+			return c;
 		}
 	}
 	return nullptr;

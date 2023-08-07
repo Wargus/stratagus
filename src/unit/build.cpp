@@ -62,9 +62,8 @@
 CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 {
 
-	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
-		 i != unit.Type->BuildingRules.end(); ++i) {
-		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
+	for (CBuildRestriction *p : unit.Type->BuildingRules) {
+		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(p);
 
 		if (ontopb) {
 			if (!parent) {
@@ -76,11 +75,11 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 			}
 			continue;
 		}
-		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(*i);
+		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(p);
 
 		if (andb) {
-			for (std::vector<CBuildRestriction *>::iterator j = andb->_or_list.begin(); j != andb->_or_list.end(); ++j) {
-				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*j);
+			for (CBuildRestriction *orRestriction : andb->_or_list) {
+				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(orRestriction);
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -101,8 +100,8 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 */
 bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
 {
-	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
-		if (!(*i)->Check(builder, type, pos, ontoptarget)) {
+	for (CBuildRestriction *restriction : _or_list) {
+		if (!restriction->Check(builder, type, pos, ontoptarget)) {
 			return false;
 		}
 	}

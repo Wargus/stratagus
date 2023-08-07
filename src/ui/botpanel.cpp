@@ -389,10 +389,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 	popupWidth = popup.MarginX;
 	popupHeight = popup.MarginY;
 
-	for (std::vector<CPopupContentType *>::const_iterator it = popup.Contents.begin();
-		 it != popup.Contents.end();
-		 ++it) {
-		CPopupContentType &content = **it;
+	for (CPopupContentType *contentPtr : popup.Contents) {
+		CPopupContentType &content = *contentPtr;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 			// Automatically write the calculated coordinates.
@@ -602,9 +600,8 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
-	for (std::vector<CPopupContentType *>::const_iterator it = popup->Contents.begin();
-		 it != popup->Contents.end(); ++it) {
-		const CPopupContentType &content = **it;
+	for (CPopupContentType *contentPtr : popup->Contents) {
+		const CPopupContentType &content = *contentPtr;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);

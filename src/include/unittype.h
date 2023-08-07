@@ -388,17 +388,15 @@ class CBuildRestrictionAnd : public CBuildRestriction
 public:
 	virtual ~CBuildRestrictionAnd()
 	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			delete *i;
+		for (CBuildRestriction *p : _or_list) {
+			delete p;
 		}
 		_or_list.clear();
 	}
 	virtual void Init()
 	{
-		for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin();
-			 i != _or_list.end(); ++i) {
-			(*i)->Init();
+		for (CBuildRestriction *restriction : _or_list) {
+			restriction->Init();
 		}
 	}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;

@@ -507,9 +507,7 @@ void ColorCycleSurface(SDL_Surface &surface)
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
 
 	memcpy(colors, palcolors, sizeof(colors));
-	for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
-		const ColorIndexRange &range = *it;
-
+	for (const ColorIndexRange &range : colorCycling.ColorIndexRanges) {
 		memcpy(colors + range.begin, palcolors + range.begin + 1, (range.end - range.begin) * sizeof(SDL_Color));
 		colors[range.end] = palcolors[range.begin];
 	}
@@ -528,9 +526,7 @@ static void ColorCycleSurface_Reverse(SDL_Surface &surface, unsigned int count)
 		CColorCycling &colorCycling = CColorCycling::GetInstance();
 
 		memcpy(colors, palcolors, sizeof(colors));
-		for (std::vector<ColorIndexRange>::const_iterator it = colorCycling.ColorIndexRanges.begin(); it != colorCycling.ColorIndexRanges.end(); ++it) {
-			const ColorIndexRange &range = *it;
-
+		for (const ColorIndexRange &range : colorCycling.ColorIndexRanges) {
 			memcpy(colors + range.begin + 1, palcolors + range.begin, (range.end - range.begin) * sizeof(SDL_Color));
 			colors[range.begin] = palcolors[range.end];
 		}

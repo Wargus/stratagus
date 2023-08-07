@@ -537,12 +537,11 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
 			}
 		}
-		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
-			 act != spell.Action.end(); ++act) {
-			if ((*act)->ModifyManaCaster) {
+		for (SpellActionType *act : spell.Action) {
+			if (act->ModifyManaCaster) {
 				mustSubtractMana = false;
 			}
-			cont = cont & (*act)->Cast(caster, spell, target, pos);
+			cont = cont & act->Cast(caster, spell, target, pos);
 		}
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;

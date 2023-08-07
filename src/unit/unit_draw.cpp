@@ -636,9 +636,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
-	for (std::vector<CDecoVar *>::const_iterator i = UnitTypeVar.DecoVar.begin();
-		 i < UnitTypeVar.DecoVar.end(); ++i) {
-		const CDecoVar &var = *(*i);
+	for (const CDecoVar *decoVarPtr : UnitTypeVar.DecoVar) {
+		const CDecoVar &var = *decoVarPtr;
 		const int value = unit.Variable[var.Index].Value;
 		const int max = unit.Variable[var.Index].Max;
 		Assert(value <= max);

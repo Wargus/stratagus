@@ -896,10 +896,8 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 static bool IsPiercedUnit(const Missile &missile, const CUnit &unit)
 {
-	for (std::vector<CUnit *>::const_iterator it = missile.PiercedUnits.begin();
-		 it != missile.PiercedUnits.end(); ++it) {
-		CUnit &punit = **it;
-		if (UnitNumber(unit) == UnitNumber(punit)) {
+	for (const CUnit *punit : missile.PiercedUnits) {
+		if (UnitNumber(unit) == UnitNumber(*punit)) {
 			return true;
 		}
 	}
@@ -922,9 +920,8 @@ void Missile::MissileHit(CUnit *unit)
 	// The impact generates a new missile.
 	//
 	if (mtype.Impact.empty() == false) {
-		for (std::vector<MissileConfig *>::const_iterator it = mtype.Impact.begin(); it != mtype.Impact.end(); ++it) {
-			const MissileConfig &mc = **it;
-			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
+		for (MissileConfig *mc : mtype.Impact) {
+			Missile *impact = MakeMissile(*mc->Missile, pixelPos, pixelPos);
 			if (impact && impact->Type->Damage) {
 				impact->SourceUnit = this->SourceUnit;
 			}
@@ -1288,13 +1285,11 @@ void SaveMissiles(CFile &file)
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: missiles\n\n");
 
-	std::vector<Missile *>::const_iterator i;
-
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
-		(*i)->SaveMissile(file);
+	for (const Missile *missile : GlobalMissiles) {
+		missile->SaveMissile(file);
 	}
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
-		(*i)->SaveMissile(file);
+	for (const Missile *missile : LocalMissiles) {
+		missile->SaveMissile(file);
 	}
 }
 
@@ -1384,14 +1379,12 @@ Missile::~Missile()
 */
 void CleanMissiles()
 {
-	std::vector<Missile *>::const_iterator i;
-
-	for (i = GlobalMissiles.begin(); i != GlobalMissiles.end(); ++i) {
-		delete *i;
+	for (Missile *missile : GlobalMissiles) {
+		delete missile;
 	}
 	GlobalMissiles.clear();
-	for (i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
-		delete *i;
+	for (Missile *missile : LocalMissiles) {
+		delete missile;
 	}
 	LocalMissiles.clear();
 }
