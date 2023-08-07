@@ -572,10 +572,11 @@ static bool MissileDrawLevelCompare(const Missile *const l, const Missile *const
 **  Sort visible missiles on map for display.
 **
 **  @param vp         Viewport pointer.
-**  @param table      OUT : array of missile to display sorted by DrawLevel.
+**  @return array of missile to display sorted by DrawLevel.
 */
-void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
+std::vector<Missile *> FindAndSortMissiles(const CViewport &vp)
 {
+	std::vector<Missile *> table;
 	// Loop through global missiles, then through locals.
 	for (auto* missilePtr : GlobalMissiles) {
 		Missile &missile = *missilePtr;
@@ -597,6 +598,7 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 		table.push_back(&missile);
 	}
 	ranges::sort(table, MissileDrawLevelCompare);
+	return table;
 }
 
 /**
@@ -667,8 +669,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 	if (Map.Info.IsPointOnMap(pos) == false) {
 		return;
 	}
-	std::vector<CUnit *> units;
-	Select(pos, pos, units);
+	std::vector<CUnit *> units = Select(pos, pos);
 	for (CUnit *unitPtr : units) {
 		CUnit &unit = *unitPtr;
 
@@ -692,9 +693,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 		}
 		if (shouldHit) {
 			// search for blocking units
-			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = Map.MapPixelPosToTilePos(position);
-			Select(missilePos, missilePos, blockingUnits);
+			std::vector<CUnit *> blockingUnits = Select(missilePos, missilePos);
 			for (CUnit *unitPtr : blockingUnits) {
 				CUnit &unit = *unitPtr;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
@@ -993,8 +993,7 @@ void Missile::MissileHit(CUnit *unit)
 		// Hits all units in range.
 		//
 		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
-		std::vector<CUnit *> table;
-		Select(pos - range, pos + range, table);
+		std::vector<CUnit *> table = Select(pos - range, pos + range);
 		Assert(this->SourceUnit != nullptr);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];

@@ -185,9 +185,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		std::swap(minPos.y, maxPos.y);
 	}
 
-	std::vector<CUnit *> units;
-
-	Select(minPos, maxPos, units);
+	std::vector<CUnit *> units = Select(minPos, maxPos);
 
 	int s = 0;
 	for (size_t i = 0; i != units.size(); ++i) {
@@ -249,14 +247,10 @@ static int CclIfNearUnit(lua_State *l)
 	// Get all unit types 'near'.
 	//
 
-	std::vector<CUnit *> unitsOfType;
-
-	FindUnitsByType(*ut2, unitsOfType);
+	std::vector<CUnit *> unitsOfType = FindUnitsByType(*ut2);
 	for (size_t i = 0; i != unitsOfType.size(); ++i) {
 		const CUnit &centerUnit = *unitsOfType[i];
-
-		std::vector<CUnit *> around;
-		SelectAroundUnit(centerUnit, 1, around);
+		std::vector<CUnit *> around = SelectAroundUnit(centerUnit, 1);
 
 		// Count the requested units
 		int s = 0;
@@ -316,13 +310,10 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	}
 
 	// Get all unit types 'near'.
-	std::vector<CUnit *> table;
-	FindUnitsByType(*ut2, table);
+	std::vector<CUnit *> table = FindUnitsByType(*ut2);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &centerUnit = *table[i];
-		std::vector<CUnit *> around;
-
-		SelectAroundUnit(centerUnit, 1, around);
+		std::vector<CUnit *> around = SelectAroundUnit(centerUnit, 1);
 		// Count the requested units
 		int s = 0;
 		for (size_t j = 0; j != around.size(); ++j) {

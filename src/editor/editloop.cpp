@@ -1175,8 +1175,7 @@ static void EditorCallbackButtonUp(unsigned button)
 
 		const Vec2i t0 = Map.MapPixelPosToTilePos(pos0);
 		const Vec2i t1 = Map.MapPixelPosToTilePos(pos1);
-		std::vector<CUnit *> table;
-		Select(t0, t1, table);
+		std::vector<CUnit *> table = Select(t0, t1);
 
 		if (!(KeyModifiers & ModifierShift)) {
 			UnSelectAll();

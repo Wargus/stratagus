@@ -189,8 +189,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	*/
 	if (this->Missile->Class == MissileClassDeathCoil) {
 		const Vec2i offset(2, 2);
-		std::vector<CUnit *> table;
-		Select(goalPos - offset, goalPos + offset, table);
+		std::vector<CUnit *> table = Select(goalPos - offset, goalPos + offset);
 		int count = 0;
 		for (CUnit *unitPtr : table) {
 			CUnit &unit = *unitPtr;

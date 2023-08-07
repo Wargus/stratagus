@@ -2066,9 +2066,7 @@ void RescueUnits()
 				if (unit.Removed) {
 					continue;
 				}
-				std::vector<CUnit *> around;
-
-				SelectAroundUnit(unit, 1, around);
+				std::vector<CUnit *> around = SelectAroundUnit(unit, 1);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerTypes::PlayerRescuePassive && around[i]->Player->Type != PlayerTypes::PlayerRescueActive) {

@@ -176,8 +176,7 @@ static bool MoveRandomly(CUnit &unit)
 		auto w = unit.Type->PersonalSpaceWidth;
 		auto h = unit.Type->PersonalSpaceHeight;
 		if (w || h) {
-			std::vector<CUnit *> around;
-			SelectAroundUnit(unit, (w + h) / 2, around, IsSameMovementType(unit));
+			std::vector<CUnit *> around = SelectAroundUnit(unit, (w + h) / 2, IsSameMovementType(unit));
 			Vec2i vec(0, 0);
 			for (auto u : around) {
 				if (u != &unit) {

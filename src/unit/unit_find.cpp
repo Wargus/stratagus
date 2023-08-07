@@ -54,19 +54,19 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+std::vector<CUnit *> Select(const Vec2i &ltPos, const Vec2i &rbPos)
 {
-	Select(ltPos, rbPos, units, NoFilter());
+	return Select(ltPos, rbPos, NoFilter());
 }
 
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+std::vector<CUnit *>  SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos)
 {
-	Select(ltPos, rbPos, units, NoFilter());
+	return Select(ltPos, rbPos, NoFilter());
 }
 
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
+std::vector<CUnit *> SelectAroundUnit(const CUnit &unit, int range)
 {
-	SelectAroundUnit(unit, range, around, NoFilter());
+	return SelectAroundUnit(unit, range, NoFilter());
 }
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
@@ -512,11 +512,12 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 **  Find all units of type.
 **
 **  @param type       type of unit requested
-**  @param units      array in which we have to store the units
 **  @param everybody  if true, include all units
+**  @return           all units of type
 */
-void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody)
+std::vector<CUnit *> FindUnitsByType(const CUnitType &type, bool everybody)
 {
+	std::vector<CUnit *> units;
 	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 
@@ -524,6 +525,7 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 			units.push_back(&unit);
 		}
 	}
+	return units;
 }
 
 /**
@@ -531,10 +533,11 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 **
 **  @param player  we're looking for the units of this player
 **  @param type    type of unit requested
-**  @param table   table in which we have to store the units
+**  @return the units
 */
-void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, bool ai_active)
+std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, bool ai_active)
 {
+	std::vector<CUnit *> table;
 	const int nunits = player.GetUnitCount();
 	int typecount = player.UnitTypesCount[type.Slot];
 
@@ -547,7 +550,7 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 	}
 
 	if (typecount == 0) {
-		return;
+		return table;
 	}
 
 	for (int i = 0; i < nunits; ++i) {
@@ -561,9 +564,10 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 		}
 		--typecount;
 		if (typecount == 0) {
-			return ;
+			return table;
 		}
 	}
+	return table;
 }
 
 /**
@@ -603,9 +607,8 @@ CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
 */
 CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 {
-	std::vector<CUnit *> table;
+	std::vector<CUnit *> table = Select(pos1, pos2);
 
-	Select(pos1, pos2, table);
 	CUnit *best = nullptr;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -1160,9 +1163,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
-		std::vector<CUnit *> table;
-		SelectAroundUnit(*firstContainer, missile_range, table,
-						 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+		std::vector<CUnit *> table =
+			SelectAroundUnit(*firstContainer,
+		                     missile_range,
+		                     MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -1171,10 +1175,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 	} else {
 		// If unit is removed, use containers x and y
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
-		std::vector<CUnit *> table;
-
-		SelectAroundUnit(*firstContainer, range, table,
-						 MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+		std::vector<CUnit *> table =
+			SelectAroundUnit(*firstContainer,
+		                     range,
+		                     MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {

@@ -85,10 +85,9 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		return VisitResult_DeadEnd;
 	}
 
-	std::vector<CUnit *> table;
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
 	Vec2i maxpos = pos + Vec2i(unit.Type->TileWidth - 1 + attackrange, unit.Type->TileHeight - 1 + attackrange);
-	Select(minpos, maxpos, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+	std::vector<CUnit *> table = Select(minpos, maxpos, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit *dest = table[i];
 		const CUnitType &dtype = *dest->Type;
@@ -1180,11 +1179,11 @@ void AiForceManager::Update()
 
 				// Find idle units and order them to defend
 				// Don't attack if there aren't our units near goal point
-				std::vector<CUnit *> nearGoal;
 				const Vec2i offset(15, 15);
 				maxPathing--;
-				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
-					   IsAnAlliedUnitOf(*force.Units[0]->Player));
+				std::vector<CUnit *> nearGoal = Select(force.GoalPos - offset,
+				                                       force.GoalPos + offset,
+				                                       IsAnAlliedUnitOf(*force.Units[0]->Player));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();
 				} else {

@@ -92,8 +92,7 @@ void MissileFlameShield::Action()
 		return;
 	}
 
-	std::vector<CUnit *> table;
-	SelectAroundUnit(*unit, 1, table);
+	std::vector<CUnit *> table = SelectAroundUnit(*unit, 1);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->CurrentAction() != UnitActionDie) {
 			HitUnit(this->SourceUnit, *table[i], this->Damage);

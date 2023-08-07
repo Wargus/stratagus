@@ -984,8 +984,7 @@ static int CclOrderUnit(lua_State *l)
 		dpos2 = dpos1;
 	}
 	const char *order = LuaToString(l, 5);
-	std::vector<CUnit *> table;
-	Select(pos1, pos2, table);
+	std::vector<CUnit *> table = Select(pos1, pos2);
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -1115,9 +1114,7 @@ static int CclKillUnitAt(lua_State *l)
 		std::swap(pos1.y, pos2.y);
 	}
 
-	std::vector<CUnit *> table;
-
-	Select(pos1, pos2, table);
+	std::vector<CUnit *> table = Select(pos1, pos2);
 
 	int s = 0;
 	for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end() && s < q; ++it) {
@@ -1207,12 +1204,10 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 		allUnits = LuaToBoolean(l, 3);
 	}
 	lua_newtable(l);
-	std::vector<CUnit *> table;
-	if (allUnits) {
-		SelectAroundUnit(unit, range, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
-	} else {
-		SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
-	}
+	std::vector<CUnit *> table =
+		allUnits ? SelectAroundUnit(unit, range, HasNotSamePlayerAs(Players[PlayerNumNeutral]))
+				 : SelectAroundUnit(unit, range, HasSamePlayerAs(*unit.Player));
+
 	size_t n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (table[i]->IsAliveOnMap()) {
