@@ -103,8 +103,8 @@ void MissileType::LoadMissileSprite()
 void LoadMissileSprites()
 {
 #ifndef DYNAMIC_LOAD
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		(*it).second->LoadMissileSprite();
+	for (auto &[key, missileType] : MissileTypes) {
+		missileType->LoadMissileSprite();
 	}
 #endif
 }
@@ -671,8 +671,8 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 	}
 	std::vector<CUnit *> units;
 	Select(pos, pos, units);
-	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
-		CUnit &unit = **it;
+	for (CUnit *unitPtr : units) {
+		CUnit &unit = *unitPtr;
 
 		if (unit.IsAliveOnMap()
 			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
@@ -697,8 +697,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = Map.MapPixelPosToTilePos(position);
 			Select(missilePos, missilePos, blockingUnits);
-			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
-				CUnit &unit = **it;
+			for (CUnit *unitPtr : blockingUnits) {
+				CUnit &unit = *unitPtr;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
 				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
 					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeLand) {
@@ -1229,10 +1229,9 @@ int ViewPointDistanceToMissile(const Missile &missile)
 */
 MissileType *MissileBurningBuilding(int percent)
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		if (percent > (*i)->Percent) {
-			return (*i)->Missile;
+	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
+		if (percent > frame->Percent) {
+			return frame->Missile;
 		}
 	}
 	return nullptr;
@@ -1309,10 +1308,8 @@ void MissileType::Init()
 	// Resolve impact missiles and sounds.
 	this->FiredSound.MapSound();
 	this->ImpactSound.MapSound();
-	for (std::vector<MissileConfig *>::iterator it = this->Impact.begin(); it != this->Impact.end(); ++it) {
-		MissileConfig &mc = **it;
-
-		mc.MapMissile();
+	for (MissileConfig *mc : this->Impact) {
+		mc->MapMissile();
 	}
 	this->Smoke.MapMissile();
 }
@@ -1322,8 +1319,8 @@ void MissileType::Init()
 */
 void InitMissileTypes()
 {
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		(*it).second->Init();
+	for (auto &[key, value] : MissileTypes) {
+		value->Init();
 	}
 }
 
@@ -1363,8 +1360,8 @@ MissileType::~MissileType()
 */
 void CleanMissileTypes()
 {
-	for (MissileTypeMap::iterator it = MissileTypes.begin(); it != MissileTypes.end(); ++it) {
-		delete it->second;
+	for (auto &[key, value] : MissileTypes) {
+		delete value;
 	}
 	MissileTypes.clear();
 }
@@ -1403,9 +1400,8 @@ void CleanMissiles()
 
 void FreeBurningBuildingFrames()
 {
-	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
-		 i != BurningBuildingFrames.end(); ++i) {
-		delete *i;
+	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
+		delete frame;
 	}
 	BurningBuildingFrames.clear();
 }

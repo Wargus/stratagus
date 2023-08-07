@@ -133,10 +133,8 @@ void InitConstructions()
 */
 void LoadConstructions()
 {
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		(*it)->Load();
+	for (CConstruction *c :Constructions) {
+		c->Load();
 	}
 }
 
@@ -146,10 +144,8 @@ void LoadConstructions()
 void CleanConstructions()
 {
 	//  Free the construction table.
-	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
-		 it != Constructions.end();
-		 ++it) {
-		delete *it;
+	for (CConstruction *c : Constructions) {
+		delete c;
 	}
 	Constructions.clear();
 }
@@ -190,7 +186,6 @@ static int CclDefineConstruction(lua_State *l)
 	// Slot identifier
 	const std::string str = LuaToString(l, 1);
 	CConstruction *construction = ConstructionByIdent(str);
-	std::vector<CConstruction *>::iterator i;
 
 	if (construction == nullptr) {
 		construction = new CConstruction;

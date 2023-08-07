@@ -908,16 +908,14 @@ int Str2SdlKey(const char *str)
 {
 	InitKey2Str();
 
-	std::map<int, std::string>::iterator i;
-	for (i = Key2Str.begin(); i != Key2Str.end(); ++i) {
-		if (!strcasecmp(str, (*i).second.c_str())) {
-			return (*i).first;
+	for (auto &[sdlkey, s] : Key2Str) {
+		if (!strcasecmp(str, s.c_str())) {
+			return sdlkey;
 		}
 	}
-	std::map<std::string, int>::iterator i2;
-	for (i2 = Str2Key.begin(); i2 != Str2Key.end(); ++i2) {
-		if (!strcasecmp(str, (*i2).first.c_str())) {
-			return (*i2).second;
+	for (auto &[s, sdlkey] : Str2Key) {
+		if (!strcasecmp(str, s.c_str())) {
+			return sdlkey;
 		}
 	}
 	return 0;

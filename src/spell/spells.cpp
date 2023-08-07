@@ -417,10 +417,9 @@ void InitSpells()
 */
 SpellType *SpellTypeByIdent(const std::string &ident)
 {
-	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		if ((*i)->Ident == ident) {
-			return *i;
-		}
+	auto it = ranges::find_if(SpellTypeTable, [&](SpellType* spell) { return spell->Ident == ident; });
+	if (it != SpellTypeTable.end()) {
+		return *it;
 	}
 	return nullptr;
 }
@@ -585,8 +584,8 @@ SpellType::SpellType(int slot, const std::string &ident) :
 */
 SpellType::~SpellType()
 {
-	for (std::vector<SpellActionType *>::iterator act = Action.begin(); act != Action.end(); ++act) {
-		delete *act;
+	for (auto *act : Action) {
+		delete act;
 	}
 	Action.clear();
 
@@ -605,8 +604,8 @@ SpellType::~SpellType()
 void CleanSpells()
 {
 	DebugPrint("Cleaning spells.\n");
-	for (std::vector<SpellType *>::iterator i = SpellTypeTable.begin(); i < SpellTypeTable.end(); ++i) {
-		delete *i;
+	for (SpellType *spell : SpellTypeTable) {
+		delete spell;
 	}
 	SpellTypeTable.clear();
 }

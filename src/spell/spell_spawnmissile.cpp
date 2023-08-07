@@ -192,8 +192,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		std::vector<CUnit *> table;
 		Select(goalPos - offset, goalPos + offset, table);
 		int count = 0;
-		for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end(); ++it) {
-			CUnit &unit = **it;
+		for (CUnit *unitPtr : table) {
+			CUnit &unit = *unitPtr;
 
 			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
 				table[count++] = &unit;

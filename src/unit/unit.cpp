@@ -3521,9 +3521,7 @@ void CleanUnits()
 	//  Free memory for all units in unit table.
 	std::vector<CUnit *> units(UnitManager->begin(), UnitManager->end());
 
-	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
-		CUnit *unit = *it;
-
+	for (CUnit *unit : units) {
 		if (unit == nullptr) {
 			continue;
 		}

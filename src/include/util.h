@@ -199,6 +199,13 @@ namespace ranges
 		return std::find(begin(range), end(range), value);
 	}
 
+	template <typename Range, typename Predicate>
+	auto find_if(Range &range, Predicate &&predicate)
+	{
+		return std::find_if(begin(range), end(range), std::forward<Predicate>(predicate));
+	}
+
+
 	template<typename Range, typename Value>
 	bool consist(Range& range, const Value& value)
 	{

@@ -737,11 +737,9 @@ public:
 					return buildin[i].key;
 				}
 			}
-			for (std::map<std::string, int>::iterator
-				 it(user.begin()), end(user.end());
-				 it != end; ++it) {
-				if ((*it).second == index) {
-					return ((*it).first).c_str();
+			for (const auto &[key, value] : user) {
+				if (value == index) {
+					return key.c_str();
 				}
 			}
 			return nullptr;

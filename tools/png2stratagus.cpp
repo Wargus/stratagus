@@ -249,19 +249,18 @@ public:
    fclose(fp);
   }
 
-  /** swaps color a and color b in both the palette and the image */
-  void swap_colors (int a, int b)
-  {
-    std::swap (m_palette[a], m_palette[b]);
+	/** swaps color a and color b in both the palette and the image */
+	void swap_colors(int a, int b)
+	{
+		std::swap(m_palette[a], m_palette[b]);
 
-    for (std::vector<int>::iterator i = m_image.begin (); i != m_image.end (); ++i)
-      {
-	if (*i == a)
-	  *i = b;
-	else if (*i == b)
-	  *i = a;
-      }
-  }
+		for (int &e : m_image) {
+			if (e == a)
+				e = b;
+			else if (e == b)
+				e = a;
+		}
+	}
 
   void set_color (int i, Color c) {
     m_palette[i] = c;

@@ -389,11 +389,9 @@ bool IconConfig::Load()
 */
 void LoadIcons()
 {
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon &icon = *(*it).second;
-
-		ShowLoadProgress(_("Icons %s"), icon.G->File.c_str());
-		icon.Load();
+	for (auto &[key, icon] : Icons) {
+		ShowLoadProgress(_("Icons %s"), icon->G->File.c_str());
+		icon->Load();
 	}
 }
 
@@ -402,8 +400,7 @@ void LoadIcons()
 */
 void CleanIcons()
 {
-	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
-		CIcon *icon = (*it).second;
+	for (auto &[key, icon] : Icons) {
 		delete icon;
 	}
 	Icons.clear();

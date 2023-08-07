@@ -235,29 +235,23 @@ inline void ProfilePrint()
 		return;
 	}
 	std::vector<ProfileData *> prof;
-	for (std::map<const char *const, ProfileData>::iterator i = functionProfiles.begin();
-		 i != functionProfiles.end(); ++i) {
-		ProfileData *data = &i->second;
-		prof.insert(std::upper_bound(prof.begin(), prof.end(), data, compProfileData), data);
+	for (auto &[key, data] : functionProfiles) {
+		prof.insert(std::upper_bound(prof.begin(), prof.end(), &data, compProfileData), &data);
 	}
 
 	FILE *fd = fopen("profile.txt", "wb");
 	fprintf(fd, "    total\t    calls\t      per\tname\n");
 
-	for (std::vector<ProfileData *>::iterator i = prof.begin(); i != prof.end(); ++i) {
-		ProfileData *data = (*i);
+	for (ProfileData *data : prof) {
 		fprintf(fd, "%9.3f\t%9lu\t%9.3f\t",
 				(double)data->TotalTime / frequency.QuadPart * 1000.0,
 				data->Calls,
 				(double)data->TotalTime / frequency.QuadPart * 1000.0 / data->Calls);
-		for (std::map<const char *const, ProfileData>::iterator j =
-				 functionProfiles.begin(); j != functionProfiles.end(); ++j) {
-			ProfileData *data2 = &j->second;
-			if (data == data2) {
-				fprintf(fd, "%s\n", j->first);
+		for (const auto &[key, data2] : functionProfiles) {
+			if (data == &data2) {
+				fprintf(fd, "%s\n", key);
 			}
 		}
-
 	}
 
 	fclose(fd);

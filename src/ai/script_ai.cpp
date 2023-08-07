@@ -148,11 +148,9 @@ static std::vector<CUnitType *> getSupplyUnits()
 			}
 		}
 		sorted_res.push_back(besttype);
-		for (std::vector<CUnitType *>::iterator i = res.begin(); i != res.end(); ++i) {
-			if (*i == besttype) {
-				i = res.erase(i);
-				break;
-			}
+		auto it = ranges::find(res, besttype);
+		if (it != res.end()) {
+			res.erase(it);
 		}
 	}
 	return sorted_res;
@@ -197,11 +195,9 @@ static std::vector<CUnitType *> getRefineryUnits()
 			}
 		}
 		sorted_res.push_back(besttype);
-		for (std::vector<CUnitType *>::iterator i = res.begin(); i != res.end(); ++i) {
-			if (*i == besttype) {
-				i = res.erase(i);
-				break;
-			}
+		auto it = ranges::find(res, besttype);
+		if (it != res.end()) {
+			res.erase(it);
 		}
 	}
 	return sorted_res;

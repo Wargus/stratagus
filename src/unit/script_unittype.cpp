@@ -918,9 +918,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			// Free any old restrictions if they are redefined
-			for (std::vector<CBuildRestriction *>::iterator b = type->BuildingRules.begin();
-				 b != type->BuildingRules.end(); ++b) {
-				delete *b;
+			for (CBuildRestriction *b : type->BuildingRules) {
+				delete b;
 			}
 			type->BuildingRules.clear();
 			for (int k = 0; k < subargs; ++k) {
@@ -937,9 +936,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			// Free any old restrictions if they are redefined
-			for (std::vector<CBuildRestriction *>::iterator b = type->AiBuildingRules.begin();
-				 b != type->AiBuildingRules.end(); ++b) {
-				delete *b;
+			for (CBuildRestriction *b : type->AiBuildingRules) {
+				delete b;
 			}
 			type->AiBuildingRules.clear();
 			for (int k = 0; k < subargs; ++k) {
