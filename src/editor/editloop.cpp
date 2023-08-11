@@ -103,9 +103,9 @@ static int MirrorEdit = 0;                /// Mirror editing enabled
 static int VisibleUnitIcons = 0;              /// Number of icons that are visible at a time
 static int VisibleTileIcons = 0;
 
-enum EditorActionType {
-	EditorActionTypePlaceUnit,
-	EditorActionTypeRemoveUnit
+enum class EditorActionType {
+	PlaceUnit,
+	RemoveUnit
 };
 
 enum EditorOverlays {
@@ -314,7 +314,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 {
 	EditorAction editorAction;
-	editorAction.Type = EditorActionTypePlaceUnit;
+	editorAction.Type = EditorActionType::PlaceUnit;
 	editorAction.tilePos = pos;
 	editorAction.UnitType = &type;
 	editorAction.Player = player;
@@ -342,7 +342,7 @@ static void EditorActionRemoveUnit(CUnit &unit)
 static void EditorRemoveUnit(CUnit &unit)
 {
 	EditorAction editorAction;
-	editorAction.Type = EditorActionTypeRemoveUnit;
+	editorAction.Type = EditorActionType::RemoveUnit;
 	editorAction.tilePos = unit.tilePos;
 	editorAction.UnitType = unit.Type;
 	editorAction.Player = unit.Player;
@@ -365,13 +365,13 @@ static void EditorUndoAction()
 	EditorUndoActions.pop_back();
 
 	switch (action.Type) {
-		case EditorActionTypePlaceUnit: {
+		case EditorActionType::PlaceUnit: {
 			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
 
-		case EditorActionTypeRemoveUnit:
+		case EditorActionType::RemoveUnit:
 			EditorActionPlaceUnit(action.tilePos, *action.UnitType, action.Player);
 			break;
 	}
@@ -387,11 +387,11 @@ static void EditorRedoAction()
 	EditorRedoActions.pop_back();
 
 	switch (action.Type) {
-		case EditorActionTypePlaceUnit:
+		case EditorActionType::PlaceUnit:
 			EditorActionPlaceUnit(action.tilePos, *action.UnitType, action.Player);
 			break;
 
-		case EditorActionTypeRemoveUnit: {
+		case EditorActionType::RemoveUnit: {
 			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
 			EditorActionRemoveUnit(*unit);
 			break;
