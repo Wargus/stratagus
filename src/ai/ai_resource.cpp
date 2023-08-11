@@ -91,7 +91,7 @@ static int AiCheckCosts(const int *costs)
 		for (size_t k = 0; k < unit.Orders.size(); ++k) {
 			const COrder &order = *unit.Orders[k];
 
-			if (order.Action == UnitActionBuild) {
+			if (order.Action == UnitAction::Build) {
 				const COrder_Build &orderBuild = static_cast<const COrder_Build &>(order);
 				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
 
@@ -243,12 +243,12 @@ bool AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 static bool IsAlreadyWorking(const CUnit &unit)
 {
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		const int action = unit.Orders[i]->Action;
+		const UnitAction action = unit.Orders[i]->Action;
 
-		if (action == UnitActionBuild || action == UnitActionRepair) {
+		if (action == UnitAction::Build || action == UnitAction::Repair) {
 			return true;
 		}
-		if (action == UnitActionResource) {
+		if (action == UnitAction::Resource) {
 			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i]);
 
 			if (order.IsGatheringStarted()) {
@@ -360,7 +360,7 @@ void AiNewDepotRequest(CUnit &worker)
 			   _C_ worker->CurrentResource
 			   _C_ worker->Data.Move.Cycles);
 #endif
-	Assert(worker.CurrentAction() == UnitActionResource);
+	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 
@@ -463,7 +463,7 @@ private:
 */
 CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
 {
-	Assert(worker.CurrentAction() == UnitActionResource);
+	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
@@ -1065,7 +1065,7 @@ static void AiCollectResources()
 
 		// See if it's assigned already
 		if (unit.Orders.size() == 1 &&
-			unit.CurrentAction() == UnitActionResource) {
+			unit.CurrentAction() == UnitAction::Resource) {
 			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 			const int c = order.GetCurrentResource();
 			units_assigned[c].push_back(&unit);
@@ -1201,7 +1201,7 @@ static void AiCollectResources()
 					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[src_c][k];
 
-						Assert(unit->CurrentAction() == UnitActionResource);
+						Assert(unit->CurrentAction() == UnitAction::Resource);
 						COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
 
 						if (order.IsGatheringFinished()) {
@@ -1247,7 +1247,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 {
 	if (unit.IsIdle()) {
 		return true;
-	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitActionResource) {
+	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitAction::Resource) {
 		COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 
 		if (order.IsGatheringStarted() == false) {
@@ -1373,8 +1373,8 @@ static void AiCheckRepair()
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit.Type->RepairHP
-			&& unit.CurrentAction() != UnitActionBuilt
-			&& unit.CurrentAction() != UnitActionUpgradeTo
+			&& unit.CurrentAction() != UnitAction::Built
+			&& unit.CurrentAction() != UnitAction::UpgradeTo
 			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
 			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 			//
@@ -1404,11 +1404,11 @@ static void AiCheckRepair()
 			}
 		}
 		// Building under construction but no worker
-		if (unit.CurrentAction() == UnitActionBuilt) {
+		if (unit.CurrentAction() == UnitAction::Built) {
 			int j;
 			for (j = 0; j < AiPlayer->Player->GetUnitCount(); ++j) {
 				COrder *order = AiPlayer->Player->GetUnit(j).CurrentOrder();
-				if (order->Action == UnitActionRepair) {
+				if (order->Action == UnitAction::Repair) {
 					COrder_Repair &orderRepair = *static_cast<COrder_Repair *>(order);
 
 					if (orderRepair.GetReparableTarget() == &unit) {

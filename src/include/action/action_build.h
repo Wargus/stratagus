@@ -38,7 +38,7 @@ class COrder_Build : public COrder
 {
 	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
-	COrder_Build() : COrder(UnitActionBuild), Type(nullptr), State(0), Range(0)
+	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;

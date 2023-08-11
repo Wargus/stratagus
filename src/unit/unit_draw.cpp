@@ -155,7 +155,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 			}
 		}
 	} else if (CursorBuilding && unit.Type->Building
-			   && unit.CurrentAction() != UnitActionDie
+			   && unit.CurrentAction() != UnitAction::Die
 			   && (unit.Player == ThisPlayer || ThisPlayer->IsTeamed(unit))) {
 		// If building mark all own buildings
 		color = ColorGray;
@@ -821,7 +821,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 	}
 
 	// FIXME: johns: ugly check here, should be removed!
-	if (unit.CurrentAction() != UnitActionDie && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
+	if (unit.CurrentAction() != UnitAction::Die && (unit.IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 		PixelPos offsetPos(screenPos);
 		if (unit.tilePos.y == Map.Info.MapHeight-1)
 			offsetPos.y -= 2;
@@ -930,22 +930,22 @@ void CUnit::Draw(const CViewport &vp) const
 	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
-	int action = this->CurrentAction();
+	UnitAction action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
 		screenPos = vp.MapToScreenPixelPos(this->GetMapPixelPosTopLeft());
 		type = this->Type;
 		frame = this->Frame;
-		state = (action == UnitActionBuilt) | ((action == UnitActionUpgradeTo) << 1);
+		state = (action == UnitAction::Built) | ((action == UnitAction::UpgradeTo) << 1);
 		constructed = this->Constructed;
 		// Reset Type to the type being upgraded to
-		if (action == UnitActionUpgradeTo) {
+		if (action == UnitAction::UpgradeTo) {
 			const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(this->CurrentOrder());
 
 			type = &order.GetUnitType();
 		}
 
-		if (this->CurrentAction() == UnitActionBuilt) {
+		if (this->CurrentAction() == UnitAction::Built) {
 			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
 
 			cframe = &order.GetFrame();
@@ -980,7 +980,7 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1 && constructed && cframe) {
 		DrawConstructionShadow(*type, cframe, frame, screenPos);
 	} else {
-		if (action != UnitActionDie) {
+		if (action != UnitAction::Die) {
 			if (this->ZDisplaced) {
 				DrawShadow(*type, frame, screenPos, this->IY);
 			} else {

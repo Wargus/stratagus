@@ -85,12 +85,12 @@
 			}
 		}
 		if (!target) {
-			if (goal->CurrentAction() == UnitActionStandGround) {
+			if (goal->CurrentAction() == UnitAction::StandGround) {
 				return;
-			} else if (goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionAttackGround) {
+			} else if (goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::AttackGround) {
 				COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
-			} else if (goal->CurrentAction() == UnitActionSpellCast) {
+			} else if (goal->CurrentAction() == UnitAction::SpellCast) {
 				COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 				dest = Map.TilePosToMapPixelPos_Center(order.GetGoalPos());
 			}

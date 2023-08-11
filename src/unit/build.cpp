@@ -326,8 +326,8 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 {
 	if (unit->tilePos == pos
-		&& !unit->Destroyed && unit->Orders[0]->Action != UnitActionDie) {
-		if (unit->Type == this->Parent && unit->Orders[0]->Action != UnitActionBuilt) {
+		&& !unit->Destroyed && unit->Orders[0]->Action != UnitAction::Die) {
+		if (unit->Type == this->Parent && unit->Orders[0]->Action != UnitAction::Built) {
 			// Available to build on
 			ontop = unit;
 		} else {
@@ -366,7 +366,7 @@ public:
 	explicit AliveConstructedAndSameTypeAs(const CUnitType &unitType) : type(&unitType) {}
 	bool operator()(const CUnit *unit) const
 	{
-		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitActionBuilt;
+		return unit->IsAlive() && unit->Type == type && unit->CurrentAction() != UnitAction::Built;
 	}
 private:
 	const CUnitType *type;

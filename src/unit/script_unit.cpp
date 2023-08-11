@@ -356,7 +356,7 @@ static int CclUnit(lua_State *l)
 			// be put on player's unit list!  However, this state is not
 			// easily detected from this place.  It seems that it is
 			// characterized by
-			// unit->CurrentAction()==UnitActionDie so we have to wait
+			// unit->CurrentAction()==UnitAction::Die so we have to wait
 			// until we parsed at least Unit::Orders[].
 			Assert(type);
 			unit->Init(*type);
@@ -577,7 +577,7 @@ static int CclUnit(lua_State *l)
 			// now we know unit's action so we can assign it to a player
 			Assert(player != nullptr);
 			unit->AssignToPlayer(*player);
-			if (unit->CurrentAction() == UnitActionBuilt) {
+			if (unit->CurrentAction() == UnitAction::Built) {
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;

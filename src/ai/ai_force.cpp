@@ -889,12 +889,12 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		CUnit &unit = *aiForce.Units[i];
 		CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (unit.CurrentAction() == UnitActionBoard
+		if (unit.CurrentAction() == UnitAction::Board
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
 		if (CanTransport(transporter, unit) && (unit.IsIdle() 
-			|| (unit.CurrentAction() == UnitActionBoard && !unit.Moving 
+			|| (unit.CurrentAction() == UnitAction::Board && !unit.Moving 
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == nullptr) {
 				CommandBoard(unit, transporter, FlushCommands);
 				CommandFollow(transporter, unit, 0);

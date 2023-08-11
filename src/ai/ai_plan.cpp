@@ -72,7 +72,7 @@ public:
 		// Invisible and not Visible
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value
 			// || (!UnitVisible(unit, source->Player))
-			|| unit->CurrentAction() == UnitActionDie) {
+			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
 		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {

@@ -59,7 +59,7 @@ void AiCheckMagic()
 		if (unit.Type->CanCastSpell) {
 			// Check only idle magic units
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitActionSpellCast) {
+				if (unit.Orders[i]->Action == UnitAction::SpellCast) {
 					return;
 				}
 			}

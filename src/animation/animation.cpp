@@ -153,7 +153,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		if (s[0] == 't') {
 			if (unit.CurrentOrder()->HasGoal()) {
 				goal = unit.CurrentOrder()->GetGoal();
-			} else if (unit.CurrentOrder()->Action == UnitActionBuild) {
+			} else if (unit.CurrentOrder()->Action == UnitAction::Build) {
 				goal = static_cast<const COrder_Build *>(unit.CurrentOrder())->GetBuildingUnit();
 			} else {
 				return 0;
@@ -205,7 +205,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		return goal->Type->BoolFlag[index].value;
 	} else if (s[0] == 's') { //spell type detected
-		Assert(goal->CurrentAction() == UnitActionSpellCast);
+		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const SpellType &spell = order.GetSpell();
 		if (!strcmp(spell.Ident.c_str(), cur)) {

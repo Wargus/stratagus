@@ -50,7 +50,7 @@ struct LandMineTargetFinder {
 	{
 		return (!(unit == source && !CanHitOwner)
 				&& unit->Type->UnitType != UnitTypeFly
-				&& unit->CurrentAction() != UnitActionDie);
+				&& unit->CurrentAction() != UnitAction::Die);
 	}
 	inline CUnit *FindOnTile(const CMapField *const mf) const
 	{

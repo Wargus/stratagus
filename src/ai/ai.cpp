@@ -682,7 +682,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-				if (aiunit.CurrentAction() == UnitActionAttack) {
+				if (aiunit.CurrentAction() == UnitAction::Attack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 

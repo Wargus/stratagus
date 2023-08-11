@@ -418,7 +418,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		return false;
 	}
 
-	if (this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+	if (this->BuildingUnit->CurrentAction() == UnitAction::Built) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
 		CUnit &goal = *const_cast<COrder_Build *>(this)->BuildingUnit;
 
@@ -427,7 +427,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	if (unit.Anim.Unbreakable) {
 		return false;
 	}
-	return this->BuildingUnit->CurrentAction() != UnitActionBuilt;
+	return this->BuildingUnit->CurrentAction() != UnitAction::Built;
 }
 
 CUnit *COrder_Build::GetBuildingUnit() const
@@ -486,7 +486,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 
 /* virtual */ void COrder_Build::Cancel(CUnit &unit)
 {
-	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr && this->BuildingUnit->CurrentAction() == UnitActionBuilt) {
+	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr && this->BuildingUnit->CurrentAction() == UnitAction::Built) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
 		targetOrder.Cancel(*this->BuildingUnit);
 	}

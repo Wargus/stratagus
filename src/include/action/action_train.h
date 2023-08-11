@@ -38,7 +38,7 @@ class COrder_Train : public COrder
 {
 	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
 public:
-	COrder_Train() : COrder(UnitActionTrain), Type(nullptr), Ticks(0) {}
+	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Ticks(0) {}
 
 	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
 

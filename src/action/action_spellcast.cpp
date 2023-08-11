@@ -130,7 +130,7 @@
 
 /* virtual */ bool COrder_SpellCast::IsValid() const
 {
-	Assert(Action == UnitActionSpellCast);
+	Assert(Action == UnitAction::SpellCast);
 	if (this->HasGoal()) {
 		return this->GetGoal()->IsAliveOnMap();
 	} else {
@@ -395,7 +395,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					}
 				}
 			}
-			if (!unit.ReCast && unit.CurrentAction() != UnitActionDie) {
+			if (!unit.ReCast && unit.CurrentAction() != UnitAction::Die) {
 				if (!unit.RestoreOrder()) {
 					this->Finished = true;
 				}

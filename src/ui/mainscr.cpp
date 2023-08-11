@@ -405,7 +405,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 
 static void DrawUnitInfo_Training(const CUnit &unit)
 {
-	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitActionTrain) {
+	if (unit.Orders.size() == 1 || unit.Orders[1]->Action != UnitAction::Train) {
 		if (!UI.SingleTrainingText.empty()) {
 			CLabel label(*UI.SingleTrainingFont);
 			label.Draw(UI.SingleTrainingTextX, UI.SingleTrainingTextY, UI.SingleTrainingText);
@@ -428,7 +428,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (!UI.TrainingButtons.empty()) {
 			for (size_t i = 0; i < unit.Orders.size()
 				 && i < UI.TrainingButtons.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitActionTrain) {
+				if (unit.Orders[i]->Action == UnitAction::Train) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
@@ -493,11 +493,13 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 static bool DrawUnitInfo_single_selection(const CUnit &unit)
 {
 	switch (unit.CurrentAction()) {
-		case UnitActionTrain: { //  Building training units.
+		case UnitAction::Train:
+		{ //  Building training units.
 			DrawUnitInfo_Training(unit);
 			return true;
 		}
-		case UnitActionUpgradeTo: { //  Building upgrading to better type.
+		case UnitAction::UpgradeTo:
+		{ //  Building upgrading to better type.
 			if (UI.UpgradingButton) {
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
 				CIcon &icon = *order.GetUnitType().Icon.Icon;
@@ -511,7 +513,8 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 			}
 			return true;
 		}
-		case UnitActionResearch: { //  Building research new technology.
+		case UnitAction::Research:
+		{ //  Building research new technology.
 			if (UI.ResearchingButton) {
 				COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
 				CIcon &icon = *order.GetUpgrade().Icon;
@@ -1191,10 +1194,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		|| ThisPlayer->IsTeamed(unit)
 		|| ThisPlayer->IsAllied(unit)
 		|| ReplayRevealMap) {
-		if (unit.Orders[0]->Action == UnitActionBuilt
-			|| unit.Orders[0]->Action == UnitActionResearch
-			|| unit.Orders[0]->Action == UnitActionUpgradeTo
-			|| unit.Orders[0]->Action == UnitActionTrain) {
+		if (unit.Orders[0]->Action == UnitAction::Built
+			|| unit.Orders[0]->Action == UnitAction::Research
+			|| unit.Orders[0]->Action == UnitAction::UpgradeTo
+			|| unit.Orders[0]->Action == UnitAction::Train) {
 			panelIndex = 3;
 		} else if (unit.Variable[MANA_INDEX].Max) {
 			panelIndex = 2;

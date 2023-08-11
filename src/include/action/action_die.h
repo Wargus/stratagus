@@ -37,7 +37,7 @@
 class COrder_Die : public COrder
 {
 public:
-	COrder_Die() : COrder(UnitActionDie) {}
+	COrder_Die() : COrder(UnitAction::Die) {}
 
 	virtual COrder_Die *Clone() const { return new COrder_Die(*this); }
 

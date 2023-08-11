@@ -246,9 +246,9 @@ enum {
 				}
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
-					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
+					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.Type->CanAttack)
+					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
 				} else {
@@ -289,7 +289,7 @@ enum {
 	// If don't set the goal, the unit can than choose a
 	//  better goal if moving nearer to enemy.
 	if (unit.Type->CanAttack
-		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
+		&& (!goal || goal->CurrentAction() == UnitAction::Attack || goal->CurrentAction() == UnitAction::Still)) {
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.

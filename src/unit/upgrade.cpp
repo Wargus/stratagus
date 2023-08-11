@@ -506,7 +506,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 			//  FIXME: what about buildings?
 		} else {
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
-				if (unit.Orders[j]->Action == UnitActionTrain) {
+				if (unit.Orders[j]->Action == UnitAction::Train) {
 					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
 
 					if (&order.GetUnitType() == &src) {

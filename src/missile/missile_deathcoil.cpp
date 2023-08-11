@@ -68,7 +68,7 @@ void MissileDeathCoil::Action()
 	//
 	if (this->TargetUnit && this->TargetUnit->IsAlive()) {
 		HitUnit(&source, *this->TargetUnit, this->Damage);
-		if (source.CurrentAction() != UnitActionDie) {
+		if (source.CurrentAction() != UnitAction::Die) {
 			source.Variable[HP_INDEX].Value += this->Damage;
 			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
 		}

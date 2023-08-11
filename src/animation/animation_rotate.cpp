@@ -67,7 +67,7 @@ void UnitRotate(CUnit &unit, int rotate)
 				order->ClearGoal();
 				return;	
 			}
-		} else if (unit.CurrentOrder()->Action == UnitActionBuild) {
+		} else if (unit.CurrentOrder()->Action == UnitAction::Build) {
 			target = static_cast<const COrder_Build *>(order)->GetBuildingUnit();
 		}
 		Vec2i dpos = target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos;
