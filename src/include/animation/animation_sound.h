@@ -39,12 +39,9 @@
 class CAnimation_Sound : public CAnimation
 {
 public:
-	CAnimation_Sound() : CAnimation(AnimationSound) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
-
-	void MapSound();
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
+	void MapSound() override;
 
 private:
 	SoundConfig sound;

@@ -121,7 +121,7 @@
 			break;
 		case modDiv:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetVar\n");
+				fprintf(stderr, "Division by zero in AnimationType::SetVar\n");
 				Exit(1);
 				return;
 			}
@@ -129,7 +129,7 @@
 			break;
 		case modMod:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetVar\n");
+				fprintf(stderr, "Division by zero in AnimationType::SetVar\n");
 				Exit(1);
 				return;
 			}

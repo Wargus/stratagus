@@ -40,14 +40,13 @@
 class CAnimation_LuaCallback : public CAnimation
 {
 public:
-	CAnimation_LuaCallback() : CAnimation(AnimationLuaCallback), cb(nullptr) {}
 	~CAnimation_LuaCallback() { delete cb; }
 
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
 
 private:
-	LuaCallback *cb;
+	LuaCallback *cb = nullptr;
 	std::string cbName;
 	std::vector<std::string> cbArgs;
 };

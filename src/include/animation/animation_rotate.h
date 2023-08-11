@@ -38,10 +38,8 @@
 class CAnimation_Rotate : public CAnimation
 {
 public:
-	CAnimation_Rotate() : CAnimation(AnimationRotate) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
 
 private:
 	std::string rotateStr;

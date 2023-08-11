@@ -81,19 +81,6 @@ void LoadUnitSounds()
 {
 }
 
-static void MapAnimSound(CAnimation &anim)
-{
-	if (anim.Type == AnimationSound) {
-		CAnimation_Sound &anim_sound = *static_cast<CAnimation_Sound *>(&anim);
-
-		anim_sound.MapSound();
-	} else if (anim.Type == AnimationRandomSound) {
-		CAnimation_RandomSound &anim_rsound = *static_cast<CAnimation_RandomSound *>(&anim);
-
-		anim_rsound.MapSound();
-	}
-}
-
 /**
 **  Map animation sounds
 */
@@ -102,9 +89,9 @@ static void MapAnimSounds2(CAnimation *anim)
 	if (anim == nullptr) {
 		return ;
 	}
-	MapAnimSound(*anim);
+	anim->MapSound();
 	for (CAnimation *it = anim->Next; it != anim; it = it->Next) {
-		MapAnimSound(*it);
+		it->MapSound();
 	}
 }
 
