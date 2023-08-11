@@ -103,13 +103,6 @@ static int MirrorEdit = 0;                /// Mirror editing enabled
 static int VisibleUnitIcons = 0;              /// Number of icons that are visible at a time
 static int VisibleTileIcons = 0;
 
-enum _mode_buttons_ {
-	SelectButton = 201,  /// Select mode button
-	UnitButton,          /// Unit mode button
-	TileButton,          /// Tile mode button
-	StartButton
-};
-
 enum EditorActionType {
 	EditorActionTypePlaceUnit,
 	EditorActionTypeRemoveUnit
