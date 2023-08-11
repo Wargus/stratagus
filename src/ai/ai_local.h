@@ -98,13 +98,13 @@ enum class AiForceRole {
 	Defend      /// Force should defend
 };
 
-enum AiForceAttackingState {
-	AiForceAttackingState_Free = -1,
-	AiForceAttackingState_Waiting = 0,
-	AiForceAttackingState_Boarding,
-	AiForceAttackingState_GoingToRallyPoint,
-	AiForceAttackingState_AttackingWithTransporter,
-	AiForceAttackingState_Attacking,
+enum class AiForceAttackingState {
+	Free = -1,
+	Waiting = 0,
+	Boarding,
+	GoingToRallyPoint,
+	AttackingWithTransporter,
+	Attacking,
 };
 
 #define AI_WAIT_ON_RALLY_POINT 60          /// Max seconds AI units will wait on rally point
@@ -120,7 +120,7 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState_Free),
+		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 	{
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
@@ -145,9 +145,9 @@ public:
 		WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 		if (types) {
 			UnitTypes.clear();
-			State = AiForceAttackingState_Free;
+			State = AiForceAttackingState::Free;
 		} else {
-			State = AiForceAttackingState_Waiting;
+			State = AiForceAttackingState::Waiting;
 		}
 		Units.for_each(InternalRemoveUnit);
 		Units.clear();

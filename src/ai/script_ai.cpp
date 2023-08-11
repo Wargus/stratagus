@@ -891,7 +891,7 @@ static int CclAiForce(lua_State *l)
 		aiforce.Reset(true);
 	}
 	AiForceRole role = aiforce.Role;
-	aiforce.State = AiForceAttackingState_Waiting;
+	aiforce.State = AiForceAttackingState::Waiting;
 	aiforce.Role = role;
 
 	int args = lua_rawlen(l, 2);
