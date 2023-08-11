@@ -358,7 +358,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		if (goal->Removed) {
 			return;
 		}
-		if (goal->CurrentAction() == UnitActionDie) {
+		if (goal->CurrentAction() == UnitAction::Die) {
 			if (unit.Type->Missile.Missile->AlwaysFire) {
 				newgoalPos = goal->tilePos;
 				goal = nullptr;
@@ -832,7 +832,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		return;
 	}
 
-	if (goal.CurrentAction() != UnitActionDie) {
+	if (goal.CurrentAction() != UnitAction::Die) {
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
@@ -1017,7 +1017,7 @@ void Missile::MissileHit(CUnit *unit)
 				if (mtype.CorrectSphashDamage == true) {
 					bool isPosition = false;
 					if (this->TargetUnit == nullptr) {
-						if (this->SourceUnit->CurrentAction() == UnitActionSpellCast) {
+						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
 							if (order.GetSpell().Target == TargetPosition) {
 								isPosition = true;
@@ -1026,7 +1026,7 @@ void Missile::MissileHit(CUnit *unit)
 							isPosition = true;
 						}
 					}
-					if (isPosition || this->SourceUnit->CurrentAction() == UnitActionAttackGround) {
+					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
 						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
 							shouldHit = false;
 						}

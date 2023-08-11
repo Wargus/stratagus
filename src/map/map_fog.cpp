@@ -142,9 +142,9 @@ public:
 			/*
 			 * HACK: UGLY !!!
 			 * There is bug in Seen code conneded with
-			 * UnitActionDie and Cloaked units.
+			 * UnitAction::Die and Cloaked units.
 			 */
-			if (!unit->VisCount[p] && unit->CurrentAction() == UnitActionDie) {
+			if (!unit->VisCount[p] && unit->CurrentAction() == UnitAction::Die) {
 				return;
 			}
 

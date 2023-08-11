@@ -557,7 +557,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	// If resource is still under construction, wait!
 	if ((goal->Type->MaxOnBoard && goal->Resource.Active >= goal->Type->MaxOnBoard)
-		|| goal->CurrentAction() == UnitActionBuilt) {
+		|| goal->CurrentAction() == UnitAction::Built) {
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
@@ -788,7 +788,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				LoseResource(unit, *source);
 				for (CUnit *uins = source->Resource.Workers;
 					 uins; uins = uins->NextWorker) {
-					if (uins != &unit && uins->CurrentOrder()->Action == UnitActionResource) {
+					if (uins != &unit && uins->CurrentOrder()->Action == UnitAction::Resource) {
 						COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
 						if (!uins->Anim.Unbreakable && order.State == SUB_GATHER_RESOURCE) {
 							order.LoseResource(*uins, *source);
@@ -829,7 +829,7 @@ int GetNumWaitingWorkers(const CUnit &mine)
 	CUnit *worker = mine.Resource.Workers;
 
 	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
-		Assert(worker->CurrentAction() == UnitActionResource);
+		Assert(worker->CurrentAction() == UnitAction::Resource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
 		if (order.IsGatheringWaiting()) {
@@ -878,7 +878,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			CUnit *worker = source->Resource.Workers;
 			CUnit *next = nullptr;
 			for (; nullptr != worker; worker = worker->NextWorker) {
-				Assert(worker->CurrentAction() == UnitActionResource);
+				Assert(worker->CurrentAction() == UnitAction::Resource);
 				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 				if (worker != &unit && order.IsGatheringWaiting()) {
 					count++;
@@ -1019,7 +1019,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// If resource depot is still under construction, wait!
-	if (goal.CurrentAction() == UnitActionBuilt) {
+	if (goal.CurrentAction() == UnitAction::Built) {
 		unit.Wait = 10;
 		return 0;
 	}
@@ -1257,7 +1257,7 @@ bool COrder_Resource::ActionResourceInit(CUnit &unit)
 	if (goal && goal->IsAlive() == false) {
 		return false;
 	}
-	if (goal && goal->CurrentAction() != UnitActionBuilt) {
+	if (goal && goal->CurrentAction() != UnitAction::Built) {
 		unit.AssignWorkerToMine(*goal);
 		this->Resource.Mine = goal;
 	}

@@ -136,7 +136,7 @@ static void CancelBuilt(COrder_Built &order, CUnit *unit)
 	CUnit *worker = order.GetWorkerPtr();
 
 	// Drop out unit
-	if (worker != nullptr && worker->CurrentAction() == UnitActionBuild && !worker->CurrentOrder()->Finished) {
+	if (worker != nullptr && worker->CurrentAction() == UnitAction::Build && !worker->CurrentOrder()->Finished) {
 		worker->ClearAction();
 
 		DropOutOnSide(*worker, LookingW, unit);

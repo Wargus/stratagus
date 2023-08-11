@@ -72,7 +72,7 @@ public:
 		// Invisible and not Visible
 		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value
 			// || (!UnitVisible(unit, source->Player))
-			|| unit->CurrentAction() == UnitActionDie) {
+			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
 		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
@@ -199,7 +199,7 @@ int AiFindWall(AiForce *force)
 	Vec2i wallPos;
 
 	if (FindWall(*unit, maxRange, &wallPos)) {
-		force->State = AiForceAttackingState_Waiting;
+		force->State = AiForceAttackingState::Waiting;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
 			if (aiunit.Type->CanAttack) {
@@ -420,7 +420,7 @@ int AiForce::PlanAttack()
 		}
 		DebugPrint("%d: Can attack\n" _C_ player.Index);
 		GoalPos = pos;
-		State = AiForceAttackingState_Boarding;
+		State = AiForceAttackingState::Boarding;
 		return 1;
 	}
 	return 0;

@@ -170,7 +170,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 	// Check if enough resources are available
 	for (int i = 1; i < MaxCosts; ++i) {
 		RepairCosts[i] = goal.Type->RepairCosts[i] *
-						 (goal.CurrentAction() == UnitActionBuilt ? ResourcesMultiBuildersMultiplier : 1);
+						 (goal.CurrentAction() == UnitAction::Built ? ResourcesMultiBuildersMultiplier : 1);
 	}
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (!player.CheckResource(i, RepairCosts[i])) {
@@ -197,7 +197,7 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 {
 	CPlayer &player = *unit.Player;
 
-	if (goal.CurrentAction() == UnitActionBuilt) {
+	if (goal.CurrentAction() == UnitAction::Built) {
 		COrder_Built &order = *static_cast<COrder_Built *>(goal.CurrentOrder());
 
 		order.ProgressHp(goal, 100 * this->RepairCycle);

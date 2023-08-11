@@ -279,10 +279,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 		file.printf(" \"role\", ");
 		switch (ai.Force[i].Role) {
-			case AiForceRoleAttack:
+			case AiForceRole::Attack:
 				file.printf("\"attack\",");
 				break;
-			case AiForceRoleDefend:
+			case AiForceRole::Defend:
 				file.printf("\"defend\",");
 				break;
 			default:
@@ -682,7 +682,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
 				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
 
-				if (aiunit.CurrentAction() == UnitActionAttack) {
+				if (aiunit.CurrentAction() == UnitAction::Attack) {
 					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
@@ -705,7 +705,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 			}
 		}
-		if (!aiForce.Defending && aiForce.State > 0) {
+		if (!aiForce.Defending && aiForce.State != AiForceAttackingState::Free
+		    && aiForce.State != AiForceAttackingState::Waiting) {
 			DebugPrint("%d: %d(%s) belong to attacking force, don't defend it\n" _C_
 					   defender.Player->Index _C_ UnitNumber(defender) _C_ defender.Type->Ident.c_str());
 			// unit belongs to an attacking force,
@@ -723,8 +724,9 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		AiForce &aiForce = pai.Force[i];
 
 		if (aiForce.Size() > 0
-			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
-				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
+		    && ((aiForce.Role == AiForceRole::Defend && !aiForce.Attacking)
+		        || (aiForce.Role == AiForceRole::Attack && !aiForce.Attacking
+		            && aiForce.State != AiForceAttackingState::Waiting))) { // none attacking
 			aiForce.Defending = true;
 			aiForce.Attack(pos);
 		}
@@ -749,7 +751,8 @@ void AiUnitKilled(CUnit &unit)
 		force.Remove(unit);
 		if (force.Size() == 0) {
 			force.Attacking = false;
-			if (!force.Defending && force.State > 0) {
+			if (!force.Defending && force.State != AiForceAttackingState::Free
+			    && force.State != AiForceAttackingState::Waiting) {
 				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
 						   _C_ unit.Player->Index _C_(long unsigned int)(&force  - & (unit.Player->Ai->Force[0])));
 				force.Reset(true);

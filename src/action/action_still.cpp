@@ -70,7 +70,7 @@ enum {
 
 /* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
 {
-	if (this->Action == UnitActionStill) {
+	if (this->Action == UnitAction::Still) {
 		file.printf("{\"action-still\",");
 	} else {
 		file.printf("{\"action-stand-ground\",");
@@ -102,7 +102,7 @@ enum {
 
 /* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
-	if (this->Action == UnitActionStandGround) {
+	if (this->Action == UnitAction::StandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
 	} else {
 		Video.FillCircleClip(ColorGray, lastScreenPos, 2);
@@ -368,7 +368,7 @@ bool AutoAttack(CUnit &unit)
 	}
 	COrder *savedOrder = nullptr;
 
-	if (unit.CurrentAction() == UnitActionStill) {
+	if (unit.CurrentAction() == UnitAction::Still) {
 		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
@@ -404,7 +404,7 @@ bool AutoAttack(CUnit &unit)
 		return;
 	}
 	this->State = SUB_STILL_STANDBY;
-	this->Finished = (this->Action == UnitActionStill);
+	this->Finished = (this->Action == UnitAction::Still);
 
 	if (this->Sleep > 0) {
 		this->Sleep -= 1;
@@ -413,7 +413,7 @@ bool AutoAttack(CUnit &unit)
 	// sleep some time before trying again for automatic actions
 	this->Sleep = CYCLES_PER_SECOND / 2;
 
-	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {
+	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
 		if (unit.AutoCastSpell) {
 			this->AutoCastStand(unit);
 		}

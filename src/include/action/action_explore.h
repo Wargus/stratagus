@@ -38,7 +38,7 @@ class COrder_Explore : public COrder
 {
 	friend COrder *COrder::NewActionExplore(const CUnit &unit);
 public:
-	COrder_Explore() : COrder(UnitActionExplore), WaitingCycle(0), Range(0)
+	COrder_Explore() : COrder(UnitAction::Explore), WaitingCycle(0), Range(0)
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;

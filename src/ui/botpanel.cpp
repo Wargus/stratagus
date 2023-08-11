@@ -232,35 +232,35 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		}
 	}
 
-	unsigned int action = UnitActionNone;
+	UnitAction action = UnitAction::None;
 	switch (button.Action) {
 		case ButtonStop:
-			action = UnitActionStill;
+			action = UnitAction::Still;
 			break;
 		case ButtonStandGround:
-			action = UnitActionStandGround;
+			action = UnitAction::StandGround;
 			break;
 		case ButtonAttack:
-			action = UnitActionAttack;
+			action = UnitAction::Attack;
 			break;
 		case ButtonAttackGround:
-			action = UnitActionAttackGround;
+			action = UnitAction::AttackGround;
 			break;
 		case ButtonPatrol:
-			action = UnitActionPatrol;
+			action = UnitAction::Patrol;
 			break;
 		case ButtonExplore:
-			action = UnitActionExplore;
+			action = UnitAction::Explore;
 			break;
 		case ButtonHarvest:
 		case ButtonReturn:
-			action = UnitActionResource;
+			action = UnitAction::Resource;
 			break;
 		default:
 			break;
 	}
 	// Simple case.
-	if (action != UnitActionNone) {
+	if (action != UnitAction::None) {
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			if (Selected[i]->CurrentAction() != action) {
 				return res;
@@ -274,11 +274,11 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	switch (button.Action) {
 		case ButtonMove:
 			for (i = 0; i < Selected.size(); ++i) {
-				int saction = Selected[i]->CurrentAction();
-				if (saction != UnitActionMove &&
-					saction != UnitActionBuild &&
-					saction != UnitActionFollow &&
-					saction != UnitActionDefend) {
+				const UnitAction saction = Selected[i]->CurrentAction();
+				if (saction != UnitAction::Move &&
+					saction != UnitAction::Build &&
+					saction != UnitAction::Follow &&
+					saction != UnitAction::Defend) {
 					break;
 				}
 			}
@@ -302,7 +302,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			break;
 		case ButtonRepair:
 			for (i = 0; i < Selected.size(); ++i) {
-				if (Selected[i]->CurrentAction() != UnitActionRepair) {
+				if (Selected[i]->CurrentAction() != UnitAction::Repair) {
 					break;
 				}
 			}
@@ -908,7 +908,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		case ButtonTrain:
 			// Check if building queue is enabled
-			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
+			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
 		// FALL THROUGH
@@ -930,14 +930,14 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = true;
 			break;
 		case ButtonCancelUpgrade:
-			res = unit.CurrentAction() == UnitActionUpgradeTo
-				  || unit.CurrentAction() == UnitActionResearch;
+			res = unit.CurrentAction() == UnitAction::UpgradeTo
+				  || unit.CurrentAction() == UnitAction::Research;
 			break;
 		case ButtonCancelTrain:
-			res = unit.CurrentAction() == UnitActionTrain;
+			res = unit.CurrentAction() == UnitAction::Train;
 			break;
 		case ButtonCancelBuild:
-			res = unit.CurrentAction() == UnitActionBuilt;
+			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 	}
 #if 0
@@ -1021,13 +1021,13 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
-	if (unit.CurrentAction() == UnitActionBuilt) {
+	if (unit.CurrentAction() == UnitAction::Built) {
 		// Trick 17 to get the cancel-build button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit.CurrentAction() == UnitActionUpgradeTo) {
+	} else if (unit.CurrentAction() == UnitAction::UpgradeTo) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit.CurrentAction() == UnitActionResearch) {
+	} else if (unit.CurrentAction() == UnitAction::Research) {
 		// Trick 17 to get the cancel-upgrade button
 		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
 	} else {
@@ -1128,7 +1128,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  That or a bunker.
 	//  Unload on coast valid only for sea units
 	//
-	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
+	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitAction::Still
 		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
@@ -1238,10 +1238,10 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 {
 	if (Selected.size() == 1) {
 		switch (Selected[0]->CurrentAction()) {
-			case UnitActionUpgradeTo:
+			case UnitAction::UpgradeTo:
 				SendCommandCancelUpgradeTo(*Selected[0]);
 				break;
-			case UnitActionResearch:
+			case UnitAction::Research:
 				SendCommandCancelResearch(*Selected[0]);
 				break;
 			default:
@@ -1259,7 +1259,7 @@ void CButtonPanel::DoClicked_CancelUpgrade()
 
 void CButtonPanel::DoClicked_CancelTrain()
 {
-	Assert(Selected[0]->CurrentAction() == UnitActionTrain);
+	Assert(Selected[0]->CurrentAction() == UnitAction::Train);
 	SendCommandCancelTraining(*Selected[0], -1, nullptr);
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
@@ -1268,7 +1268,7 @@ void CButtonPanel::DoClicked_CancelTrain()
 void CButtonPanel::DoClicked_CancelBuild()
 {
 	// FIXME: johns is this not sure, only building should have this?
-	Assert(Selected[0]->CurrentAction() == UnitActionBuilt);
+	Assert(Selected[0]->CurrentAction() == UnitAction::Built);
 	if (Selected.size() == 1) {
 		SendCommandDismiss(*Selected[0]);
 	}
@@ -1301,7 +1301,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		if (Selected[i]->Type == Selected[0]->Type) {
 			int selected_queue = 0;
 			for (size_t j = 0; j < Selected[i]->Orders.size(); ++j) {
-				if (Selected[i]->Orders[j]->Action == UnitActionTrain) {
+				if (Selected[i]->Orders[j]->Action == UnitAction::Train) {
 					selected_queue += 1;
 				}
 			}
@@ -1312,7 +1312,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		}
 	}
 
-	if (Selected[best_training_place]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+	if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
 	}
 	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
@@ -1339,7 +1339,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	// FIXME:        enough resources are available.
 	// FIXME: training queue full check is not correct for network.
 	// FIXME: this can be correct written, with a little more code.
-	if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
+	if (Selected[0]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
 	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
 		//PlayerSubUnitType(player,type);
@@ -1361,7 +1361,7 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
-			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
+			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
 				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();

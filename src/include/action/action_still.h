@@ -37,7 +37,7 @@
 class COrder_Still : public COrder
 {
 public:
-	explicit COrder_Still(bool stand) : COrder(stand ? UnitActionStandGround : UnitActionStill), State(0), Sleep(0) {}
+	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still), State(0), Sleep(0) {}
 
 	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
 

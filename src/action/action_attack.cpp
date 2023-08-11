@@ -154,9 +154,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 /* virtual */ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
 {
-	Assert(Action == UnitActionAttack || Action == UnitActionAttackGround);
+	Assert(Action == UnitAction::Attack || Action == UnitAction::AttackGround);
 
-	if (Action == UnitActionAttack) {
+	if (Action == UnitAction::Attack) {
 		file.printf("{\"action-attack\",");
 	} else {
 		file.printf("{\"action-attack-ground\",");
@@ -211,14 +211,14 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 /* virtual */ bool COrder_Attack::IsValid() const
 {
-	if (Action == UnitActionAttack) {
+	if (Action == UnitAction::Attack) {
 		if (this->HasGoal()) {
 			return this->GetGoal()->IsAliveOnMap();
 		} else {
 			return Map.Info.IsPointOnMap(this->goalPos);
 		}
 	} else {
-		Assert(Action == UnitActionAttackGround);
+		Assert(Action == UnitAction::AttackGround);
 		return Map.Info.IsPointOnMap(this->goalPos);
 	}
 }
@@ -302,7 +302,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (goal == attacker) {
 			return true;
 		}
-		if (goal->CurrentAction() == UnitActionAttack) {
+		if (goal->CurrentAction() == UnitAction::Attack) {
 			const COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 			if (order.GetGoal() == &unit) {
 				//we already fight with one of attackers;
@@ -328,7 +328,7 @@ bool COrder_Attack::IsMovingToAttackPos() const
 bool COrder_Attack::IsAttackGroundOrWall() const
 {
 	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)	
-	return (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos) ? true : false);
+	return (this->Action == UnitAction::AttackGround || Map.WallOnMap(this->goalPos) ? true : false);
 }
 
 CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
@@ -354,7 +354,7 @@ void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
 	
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
-	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	const bool immobile = (this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove()) ? true : false;
 	if (immobile && !InAttackRange(unit, *target)) {
 		return;
 	}
@@ -383,7 +383,7 @@ bool COrder_Attack::CheckIfGoalValid(CUnit &unit)
 	CUnit *goal = this->GetGoal();
 
 	// Wall was destroyed
-	if (!goal && this->State & ATTACK_TARGET && this->Action != UnitActionAttackGround && !Map.WallOnMap(this->goalPos)) {
+	if (!goal && this->State & ATTACK_TARGET && this->Action != UnitAction::AttackGround && !Map.WallOnMap(this->goalPos)) {
 		return false;
 	}
 	// Position or valid target, it is ok.
@@ -485,7 +485,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	}
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
-	const bool immobile = (this->Action == UnitActionStandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	const bool immobile = (this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove()) ? true : false;
 	if (immobile) {
 		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range
 	} else {

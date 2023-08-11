@@ -302,11 +302,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				for (size_t i = 0; i != table.size(); ++i) {
 					// Check for corpse
 					if (autocast->Corpse == CONDITION_ONLY) {
-						if (table[i]->CurrentAction() != UnitActionDie) {
+						if (table[i]->CurrentAction() != UnitAction::Die) {
 							continue;
 						}
 					} else if (autocast->Corpse == CONDITION_FALSE) {
-						if (table[i]->CurrentAction() == UnitActionDie || table[i]->IsAlive() == false) {
+						if (table[i]->CurrentAction() == UnitAction::Die || table[i]->IsAlive() == false) {
 							continue;
 						}
 					}
@@ -346,9 +346,9 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				// Check if unit in battle
 				if (autocast->Attacker == CONDITION_ONLY) {
 					const int range = table[i]->Player->Type == PlayerTypes::PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
-					if ((table[i]->CurrentAction() != UnitActionAttack
-						 && table[i]->CurrentAction() != UnitActionAttackGround
-						 && table[i]->CurrentAction() != UnitActionSpellCast)
+					if ((table[i]->CurrentAction() != UnitAction::Attack
+						 && table[i]->CurrentAction() != UnitAction::AttackGround
+						 && table[i]->CurrentAction() != UnitAction::SpellCast)
 						|| table[i]->CurrentOrder()->HasGoal() == false
 						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
 						continue;
@@ -356,11 +356,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				}
 				// Check for corpse
 				if (autocast->Corpse == CONDITION_ONLY) {
-					if (table[i]->CurrentAction() != UnitActionDie) {
+					if (table[i]->CurrentAction() != UnitAction::Die) {
 						continue;
 					}
 				} else if (autocast->Corpse == CONDITION_FALSE) {
-					if (table[i]->CurrentAction() == UnitActionDie) {
+					if (table[i]->CurrentAction() == UnitAction::Die) {
 						continue;
 					}
 				}
@@ -483,7 +483,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 	} else {
 		// Save previous order
 		COrder *savedOrder = nullptr;
-		if (caster.CurrentAction() != UnitActionStill && caster.CanStoreOrder(caster.CurrentOrder())) {
+		if (caster.CurrentAction() != UnitAction::Still && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?

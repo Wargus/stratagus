@@ -183,7 +183,7 @@ class BestDepotFinder
 		/* Only resource depots */
 		if (dest->Type->CanStore[resource]
 			&& dest->IsAliveOnMap()
-			&& dest->CurrentAction() != UnitActionBuilt) {
+			&& dest->CurrentAction() != UnitAction::Built) {
 			// Unit in range?
 
 			if constexpr (NEARLOCATION) {
@@ -489,7 +489,7 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
 		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-			if (unit.CurrentAction() == UnitActionStill) {
+			if (unit.CurrentAction() == UnitAction::Still) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;
 				}

@@ -146,8 +146,8 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
 {
-	unit.Seen.State = ((Action == UnitActionUpgradeTo) << 1);
-	if (unit.CurrentAction() == UnitActionDie) {
+	unit.Seen.State = ((Action == UnitAction::UpgradeTo) << 1);
+	if (unit.CurrentAction() == UnitAction::Die) {
 		unit.Seen.State = 3;
 	}
 	unit.Seen.CFrame = nullptr;
@@ -165,9 +165,9 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 /* virtual */ void COrder::AiUnitKilled(CUnit &unit)
 {
 	switch (Action) {
-		case UnitActionStill:
-		case UnitActionAttack:
-		case UnitActionMove:
+		case UnitAction::Still:
+		case UnitAction::Attack:
+		case UnitAction::Move:
 			break;
 		default:
 			DebugPrint("FIXME: %d: %d(%s) killed, with order %d!\n" _C_
@@ -348,8 +348,8 @@ static void HandleBuffsEachCycle(CUnit &unit)
 static bool HandleBurnAndPoison(CUnit &unit)
 {
 	if (unit.Removed || unit.Destroyed || unit.Variable[HP_INDEX].Max == 0
-		|| unit.CurrentAction() == UnitActionBuilt
-		|| unit.CurrentAction() == UnitActionDie) {
+		|| unit.CurrentAction() == UnitAction::Built
+		|| unit.CurrentAction() == UnitAction::Die) {
 		return false;
 	}
 	// Burn & poison
@@ -404,7 +404,7 @@ static void HandleUnitAction(CUnit &unit)
 			unit.CriticalOrder = nullptr;
 		}
 
-		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitActionStill
+		if (unit.Orders[0]->Finished && unit.Orders[0]->Action != UnitAction::Still
 			&& unit.Orders.size() == 1) {
 
 			delete unit.Orders[0];
@@ -416,10 +416,10 @@ static void HandleUnitAction(CUnit &unit)
 
 		// o Look if we have a new order and old finished.
 		// o Or the order queue should be flushed.
-		if ((unit.CurrentAction() == UnitActionStandGround || unit.CurrentOrder()->Finished)
+		if ((unit.CurrentAction() == UnitAction::StandGround || unit.CurrentOrder()->Finished)
 			&& unit.Orders.size() > 1) {
-			if (unit.Removed && unit.CurrentAction() != UnitActionBoard) { // FIXME: johns I see this as an error
-				if (unit.CurrentAction() == UnitActionStill) {
+			if (unit.Removed && unit.CurrentAction() != UnitAction::Board) { // FIXME: johns I see this as an error
+				if (unit.CurrentAction() == UnitAction::Still) {
 					// timfel: I observed this exactly once and could never reproduce it, so I don't know why this
 					// can happen, but in case it happens again, bring the unit back
 					DebugPrint("Dropping out stuck unit\n");
@@ -441,7 +441,7 @@ static void HandleUnitAction(CUnit &unit)
 		}
 		if (unit.CurrentResource) {
 			const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
-			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitActionResource) {
+			if (resinfo.LoseResources && unit.Orders[0]->Action != UnitAction::Resource) {
 				unit.CurrentResource = 0;
 				unit.ResourcesHeld = 0;
 			}
@@ -476,6 +476,35 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 	}
 }
 
+static const char* toCStr(UnitAction action)
+{
+	switch (action) {
+		case UnitAction::None: return "None";
+		case UnitAction::Still: return "Still";
+		case UnitAction::StandGround: return "StandGround";
+		case UnitAction::Follow: return "Follow";
+		case UnitAction::Defend: return "Defend";
+		case UnitAction::Move: return "Move";
+		case UnitAction::Attack: return "Attack";
+		case UnitAction::AttackGround: return "AttackGround";
+		case UnitAction::Die: return "Die";
+		case UnitAction::SpellCast: return "SpellCast";
+		case UnitAction::Train: return "Train";
+		case UnitAction::UpgradeTo: return "UpgradeTo";
+		case UnitAction::Research: return "Research";
+		case UnitAction::Built: return "Built";
+		case UnitAction::Board: return "Board";
+		case UnitAction::Unload: return "Unload";
+		case UnitAction::Patrol: return "Patrol";
+		case UnitAction::Build: return "Build";
+		case UnitAction::Explore: return "Explore";
+		case UnitAction::Repair: return "Repair";
+		case UnitAction::Resource: return "Resource";
+		case UnitAction::TransformInto: return "TransformInto";
+	}
+	return "";
+}
+
 static void DumpUnitInfo(CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
@@ -507,32 +536,7 @@ static void DumpUnitInfo(CUnit &unit)
 
 	fprintf(logf, "%lu: ", GameCycle);
 
-	const char *currentAction;
-	switch (!unit.Orders.empty() ? int(unit.CurrentAction()) : -1) {
-		case -1: currentAction = "No Orders"; break;
-		case UnitActionNone: currentAction = "None"; break;
-		case UnitActionStill: currentAction = "Still"; break;      
-		case UnitActionStandGround: currentAction = "StandGround"; break;
-		case UnitActionFollow: currentAction = "Follow"; break;     
-		case UnitActionDefend: currentAction = "Defend"; break;     
-		case UnitActionMove: currentAction = "Move"; break;       
-		case UnitActionAttack: currentAction = "Attack"; break;     
-		case UnitActionAttackGround: currentAction = "AttackGround"; break;
-		case UnitActionDie: currentAction = "Die"; break;        
-		case UnitActionSpellCast: currentAction = "SpellCast"; break;  
-		case UnitActionTrain: currentAction = "Train"; break;      
-		case UnitActionUpgradeTo: currentAction = "UpgradeTo"; break;  
-		case UnitActionResearch: currentAction = "Research"; break;   
-		case UnitActionBuilt: currentAction = "Built"; break;      
-		case UnitActionBoard: currentAction = "Board"; break;      
-		case UnitActionUnload: currentAction = "Unload"; break;     
-		case UnitActionPatrol: currentAction = "Patrol"; break;     
-		case UnitActionBuild: currentAction = "Build"; break;      
-		case UnitActionExplore: currentAction = "Explore"; break;    
-		case UnitActionRepair: currentAction = "Repair"; break;     
-		case UnitActionResource: currentAction = "Resource"; break;
-		case UnitActionTransformInto: currentAction = "TransformInto"; break;
-	}
+	const char *currentAction = unit.Orders.empty() ? "No Orders" : toCStr(unit.CurrentAction());
 
 	fprintf(logf, "%d %s %s P%d Refs %d: Seed %X Hash %X %d@%d %d@%d\n",
 			UnitNumber(unit), unit.Type ? unit.Type->Ident.c_str() : "unit-killed",
@@ -585,12 +589,23 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		// Calculate some hash.
 		SyncHash = (SyncHash << 5) | (SyncHash >> 27);
-		SyncHash ^= unit.Orders.empty() == false ? unit.CurrentAction() << 18 : 0;
+		SyncHash ^= unit.Orders.empty() == false
+		              ? static_cast<std::underlying_type_t<UnitAction>>(unit.CurrentAction()) << 18
+		              : 0;
 		SyncHash ^= unit.Refs << 3;
 
 		if (EnableUnitDebug) {
-			fprintf(stderr, "GameCycle: %lud, new SyncHash: %x (unit: %d:%s, order: %d, refs: %d)\n", GameCycle, SyncHash,
-								UnitNumber(unit), unit.Type->Ident.c_str(), unit.Orders.empty() ? -1 : unit.CurrentAction(), unit.Refs);
+			const char *currentAction =
+				unit.Orders.empty() ? "No Orders" : toCStr(unit.CurrentAction());
+
+			fprintf(stderr,
+			        "GameCycle: %lud, new SyncHash: %x (unit: %d:%s, order: %s, refs: %d)\n",
+			        GameCycle,
+			        SyncHash,
+			        UnitNumber(unit),
+			        unit.Type->Ident.c_str(),
+			        currentAction,
+			        unit.Refs);
 			print_backtrace(8);
 			fflush(stderr);
 		}

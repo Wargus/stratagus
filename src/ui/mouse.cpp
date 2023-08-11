@@ -378,7 +378,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 
 static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
-	if (dest != nullptr && unit.CurrentAction() != UnitActionBuilt) {
+	if (dest != nullptr && unit.CurrentAction() != UnitAction::Built) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
 			return;
 		}
@@ -815,7 +815,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 		if (Selected.size() == 1) {
-			if (Selected[0]->CurrentAction() == UnitActionTrain) {
+			if (Selected[0]->CurrentAction() == UnitAction::Train) {
 				if (Selected[0]->Orders.size() == 1) {
 					if (UI.SingleTrainingButton->Contains(screenPos)) {
 						ButtonAreaUnderCursor = ButtonAreaTraining;
@@ -828,7 +828,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 
 					for (size_t i = std::min(Selected[0]->Orders.size(), size); i != 0;) {
 						--i;
-						if (Selected[0]->Orders[i]->Action == UnitActionTrain
+						if (Selected[0]->Orders[i]->Action == UnitAction::Train
 							&& UI.TrainingButtons[i].Contains(screenPos)) {
 							ButtonAreaUnderCursor = ButtonAreaTraining;
 							ButtonUnderCursor = i;
@@ -837,14 +837,14 @@ static void HandleMouseOn(const PixelPos screenPos)
 						}
 					}
 				}
-			} else if (Selected[0]->CurrentAction() == UnitActionUpgradeTo) {
+			} else if (Selected[0]->CurrentAction() == UnitAction::UpgradeTo) {
 				if (UI.UpgradingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaUpgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
-			} else if (Selected[0]->CurrentAction() == UnitActionResearch) {
+			} else if (Selected[0]->CurrentAction() == UnitAction::Research) {
 				if (UI.ResearchingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonAreaResearching;
 					ButtonUnderCursor = 0;
@@ -1054,7 +1054,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				bool buildable = true;
 				for (COrderPtr orderPtr : unit.Orders) {
 					COrder &order = *orderPtr;
-					if (order.Action == UnitActionBuild) {
+					if (order.Action == UnitAction::Build) {
 						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
 						if (tilePos.x >= build.GetGoalPos().x
 							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
@@ -1821,7 +1821,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
-					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
+					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitAction::Train) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
 
 					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
@@ -2177,7 +2177,7 @@ void UIHandleButtonUp(unsigned button)
 			//    Other clicks.
 			//
 			if (Selected.size() == 1) {
-				if (Selected[0]->CurrentAction() == UnitActionBuilt && Selected[0]->Player->Index == ThisPlayer->Index) {
+				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player->Index == ThisPlayer->Index) {
 					PlayUnitSound(*Selected[0], VoiceBuilding);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning

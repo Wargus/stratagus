@@ -46,35 +46,35 @@
 **
 **  @see HandleActionTable
 */
-enum UnitAction {
-	UnitActionNone,         /// No valid action
+enum class UnitAction : char {
+	None,         /// No valid action
 
-	UnitActionStill,        /// unit stand still, does nothing
-	UnitActionStandGround,  /// unit stands ground
-	UnitActionFollow,       /// unit follows units
-	UnitActionDefend,       /// unit defends unit
-	UnitActionMove,         /// unit moves to position/unit
-	UnitActionAttack,       /// unit attacks position/unit
-	UnitActionAttackGround, /// unit attacks ground
-	UnitActionDie,          /// unit dies
+	Still,        /// unit stand still, does nothing
+	StandGround,  /// unit stands ground
+	Follow,       /// unit follows units
+	Defend,       /// unit defends unit
+	Move,         /// unit moves to position/unit
+	Attack,       /// unit attacks position/unit
+	AttackGround, /// unit attacks ground
+	Die,          /// unit dies
 
-	UnitActionSpellCast,    /// unit casts spell
+	SpellCast,    /// unit casts spell
 
-	UnitActionTrain,        /// building is training
-	UnitActionUpgradeTo,    /// building is upgrading itself
-	UnitActionResearch,     /// building is researching spell
-	UnitActionBuilt,      /// building is under construction
+	Train,        /// building is training
+	UpgradeTo,    /// building is upgrading itself
+	Research,     /// building is researching spell
+	Built,      /// building is under construction
 
 	// Compound actions
-	UnitActionBoard,        /// unit entering transporter
-	UnitActionUnload,       /// unit leaving transporter
-	UnitActionPatrol,       /// unit paroling area
-	UnitActionBuild,        /// unit builds building
-	UnitActionExplore,      /// unit explores map
+	Board,        /// unit entering transporter
+	Unload,       /// unit leaving transporter
+	Patrol,       /// unit paroling area
+	Build,        /// unit builds building
+	Explore,      /// unit explores map
 
-	UnitActionRepair,       /// unit repairing
-	UnitActionResource,     /// unit harvesting resources
-	UnitActionTransformInto /// unit transform into type.
+	Repair,       /// unit repairing
+	Resource,     /// unit harvesting resources
+	TransformInto /// unit transform into type.
 };
 
 class CAnimation;
@@ -94,7 +94,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(int action) : Goal(), Action(action), Finished(false), Instant(false)
+	explicit COrder(UnitAction action) : Goal(), Action(action), Finished(false), Instant(false)
 	{
 	}
 	virtual ~COrder();
@@ -161,7 +161,7 @@ protected:
 private:
 	CUnitPtr Goal;
 public:
-	const unsigned char Action;   /// global action
+	const UnitAction Action;   /// global action
 	bool Finished; /// true when order is finish
 	bool Instant; /// true to ignore TimeCost
 };

@@ -200,7 +200,7 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			}
 		case VoiceHarvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitActionResource) {
+				if (unit.Orders[i]->Action == UnitAction::Resource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;

@@ -580,7 +580,7 @@ void CUnit::Release(bool final)
 	UnitManager->ReleaseUnit(this);
 }
 
-unsigned int CUnit::CurrentAction() const
+UnitAction CUnit::CurrentAction() const
 {
 	return (CurrentOrder()->Action);
 }
@@ -597,21 +597,21 @@ void CUnit::ClearAction()
 
 bool CUnit::IsIdle() const
 {
-	return Orders.size() == 1 && CurrentAction() == UnitActionStill;
+	return Orders.size() == 1 && CurrentAction() == UnitAction::Still;
 }
 
 bool CUnit::IsAlive() const
 {
-	return !Destroyed && CurrentAction() != UnitActionDie;
+	return !Destroyed && CurrentAction() != UnitAction::Die;
 }
 
 int CUnit::GetDrawLevel() const
 {
-	if (Type->CorpseType && CurrentAction() == UnitActionDie) {
+	if (Type->CorpseType && CurrentAction() == UnitAction::Die) {
 		return Type->CorpseType->DrawLevel;
-	} else if (CurrentAction() == UnitActionDie) {
+	} else if (CurrentAction() == UnitAction::Die) {
 		return Type->DrawLevel - 10;
-	} else if (CurrentAction() == UnitActionBuilt) {
+	} else if (CurrentAction() == UnitAction::Built) {
 		// TODO: configurable?
 		return Type->DrawLevel - 10;
 	} else {
@@ -745,7 +745,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	const CUnitType &type = *Type;
 
 	// Build player unit table
-	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
+	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitAction::Die) {
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
@@ -767,7 +767,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
-	if (type.Building && CurrentAction() != UnitActionDie) {
+	if (type.Building && CurrentAction() != UnitAction::Die) {
 		// FIXME: support more races
 		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 			player.NumBuildings++;
@@ -1045,7 +1045,7 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
-		if (main != unit && unit->CurrentAction() != UnitActionDie) {
+		if (main != unit && unit->CurrentAction() != UnitAction::Die) {
 			mf->Flags |= unit->Type->FieldFlags;
 		}
 	}
@@ -1224,7 +1224,7 @@ void CUnit::Place(const Vec2i &pos)
 	MapMarkUnitSight(*this);
 
 	// Correct directions for wall units
-	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitActionBuilt) {
+	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitAction::Built) {
 		CorrectWallDirections(*this);
 		UnitUpdateHeading(*this);
 		CorrectWallNeighBours(*this);
@@ -1399,7 +1399,7 @@ void UnitLost(CUnit &unit)
 				player.NumBuildings--;
 			}
 		}
-		if (unit.CurrentAction() != UnitActionBuilt) {
+		if (unit.CurrentAction() != UnitAction::Built) {
 			player.UnitTypesCount[type.Slot]--;
 			if (unit.Active) {
 				player.UnitTypesAiActiveCount[type.Slot]--;
@@ -1411,7 +1411,7 @@ void UnitLost(CUnit &unit)
 	player.Demand -= type.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 
 	//  Update information.
-	if (unit.CurrentAction() != UnitActionBuilt) {
+	if (unit.CurrentAction() != UnitAction::Built) {
 		player.Supply -= type.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -3033,8 +3033,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		&& attacker.Player != target.Player && target.IsEnemy(attacker)
 		&& CanTarget(*target.Type, *attacker.Type))	{
 		
-		const unsigned char targetCurrAction = target.CurrentAction();
-		if (targetCurrAction == UnitActionAttack) {
+		const UnitAction targetCurrAction = target.CurrentAction();
+		if (targetCurrAction == UnitAction::Attack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsAutoTargeting() || target.Player->AiEnabled) {
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
@@ -3058,17 +3058,17 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	
 		switch (targetCurrAction)
 		{
-		case UnitActionStandGround:
-		case UnitActionFollow:
-		case UnitActionAttackGround:
-		case UnitActionExplore:
+		case UnitAction::StandGround:
+		case UnitAction::Follow:
+		case UnitAction::AttackGround:
+		case UnitAction::Explore:
 			if (target.Player->AiEnabled == false) {
 				return;
 			}
-		case UnitActionAttack:
-		case UnitActionStill:
-		case UnitActionDefend:
-		case UnitActionPatrol:
+		case UnitAction::Attack:
+		case UnitAction::Still:
+		case UnitAction::Defend:
+		case UnitAction::Patrol:
 			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
 									? attacker.tilePos 
 									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
@@ -3076,7 +3076,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				return;
 			}
 			COrder *savedOrder = nullptr;
-			if (targetCurrAction == UnitActionStill || targetCurrAction == UnitActionStandGround) {
+			if (targetCurrAction == UnitAction::Still || targetCurrAction == UnitAction::StandGround) {
 				savedOrder = COrder::NewActionAttack(target, target.tilePos);
 			} else if (target.CanStoreOrder(target.CurrentOrder())) {
 				savedOrder = target.CurrentOrder()->Clone();
@@ -3088,7 +3088,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				target.SavedOrder = savedOrder;
 			}
 			break;
-		}			
+		}
 	}
 }
 
@@ -3117,7 +3117,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
+	Assert(damage != 0 && target.CurrentAction() != UnitAction::Die && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {
@@ -3200,8 +3200,8 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	// Can't attack run away.
 	if (target.CanMove() 
-		&& target.CurrentAction() == UnitActionStill
-		&& (!CanTarget(*target.Type, *attacker->Type) 
+		&& target.CurrentAction() == UnitAction::Still
+		&& (!CanTarget(*target.Type, *attacker->Type)
 			|| !target.IsAgressive() 
 			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value 
 				&& !(attacker->IsVisible(*target.Player) || attacker->IsVisibleOnRadar(*target.Player))))
@@ -3228,7 +3228,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// What should we do with workers on :
-	// case UnitActionRepair:
+	// case UnitAction::Repair:
 	// Drop orders and run away or return after escape?
 }
 
@@ -3367,7 +3367,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	if (!transporter.Type->CanTransport()) {
 		return 0;
 	}
-	if (transporter.CurrentAction() == UnitActionBuilt) { // Under construction
+	if (transporter.CurrentAction() == UnitAction::Built) { // Under construction
 		return 0;
 	}
 	if (&transporter == &unit) { // Cannot transporter itself.
@@ -3458,11 +3458,11 @@ bool CUnit::IsTeamed(const CUnit &unit) const
 
 /**
 **  Check if the unit is unusable (for attacking...)
-**  @todo look if correct used (UnitActionBuilt is no problem if attacked)?
+**  @todo look if correct used (UnitAction::Built is no problem if attacked)?
 */
 bool CUnit::IsUnusable(bool ignore_built_state) const
 {
-	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitActionBuilt));
+	return (!IsAliveOnMap() || (!ignore_built_state && CurrentAction() == UnitAction::Built));
 }
 
 /**

@@ -76,7 +76,7 @@ void MissileFlameShield::Action()
 	const int uh = unit->Type->TileHeight;
 	this->position.x = upos.x * PixelTileSize.x + ix + uw * PixelTileSize.x / 2 + dx - 16;
 	this->position.y = upos.y * PixelTileSize.y + iy + uh * PixelTileSize.y / 2 + dy - 32;
-	if (unit->CurrentAction() == UnitActionDie) {
+	if (unit->CurrentAction() == UnitAction::Die) {
 		this->TTL = index;
 	}
 
@@ -94,7 +94,7 @@ void MissileFlameShield::Action()
 
 	std::vector<CUnit *> table = SelectAroundUnit(*unit, 1);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->CurrentAction() != UnitActionDie) {
+		if (table[i]->CurrentAction() != UnitAction::Die) {
 			HitUnit(this->SourceUnit, *table[i], this->Damage);
 		}
 	}

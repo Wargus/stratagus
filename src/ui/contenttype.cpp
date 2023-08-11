@@ -231,7 +231,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		case UnitRefContainer:
 			return unit.Container;
 		case UnitRefWorker :
-			if (unit.CurrentAction() == UnitActionBuilt) {
+			if (unit.CurrentAction() == UnitAction::Built) {
 				COrder_Built &order = *static_cast<COrder_Built *>(unit.CurrentOrder());
 
 				return order.GetWorkerPtr();

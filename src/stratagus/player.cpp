@@ -896,7 +896,7 @@ void CPlayer::UpdateFreeWorkers()
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
 		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-			if (unit.CurrentAction() == UnitActionStill) {
+			if (unit.CurrentAction() == UnitAction::Still) {
 				FreeWorkers.push_back(&unit);
 			}
 		}
@@ -1031,7 +1031,7 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
 		CUnit &unit = **it;
 
-		if (GameRunning && unit.CurrentAction() == UnitActionUpgradeTo) {
+		if (GameRunning && unit.CurrentAction() == UnitAction::UpgradeTo) {
 			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
 			if (order.GetUnitType().Slot == type.Slot) {
 				++count;
