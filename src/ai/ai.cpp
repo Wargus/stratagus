@@ -279,10 +279,10 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 
 		file.printf(" \"role\", ");
 		switch (ai.Force[i].Role) {
-			case AiForceRoleAttack:
+			case AiForceRole::Attack:
 				file.printf("\"attack\",");
 				break;
-			case AiForceRoleDefend:
+			case AiForceRole::Defend:
 				file.printf("\"defend\",");
 				break;
 			default:
@@ -723,8 +723,8 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		AiForce &aiForce = pai.Force[i];
 
 		if (aiForce.Size() > 0
-			&& ((aiForce.Role == AiForceRoleDefend && !aiForce.Attacking)
-				|| (aiForce.Role == AiForceRoleAttack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
+			&& ((aiForce.Role == AiForceRole::Defend && !aiForce.Attacking)
+				|| (aiForce.Role == AiForceRole::Attack && !aiForce.Attacking && !aiForce.State))) {  // none attacking
 			aiForce.Defending = true;
 			aiForce.Attack(pos);
 		}

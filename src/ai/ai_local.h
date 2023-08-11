@@ -92,10 +92,10 @@ public:
 /**
 **  Roles for forces
 */
-enum AiForceRole {
-	AiForceRoleDefault = 0, /// So default is attacking
-	AiForceRoleAttack = 0, /// Force should attack
-	AiForceRoleDefend      /// Force should defend
+enum class AiForceRole {
+	Default = 0, /// So default is attacking
+	Attack = 0, /// Force should attack
+	Defend      /// Force should defend
 };
 
 enum AiForceAttackingState {
@@ -120,7 +120,7 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
-		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
+		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState_Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 	{
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
@@ -231,7 +231,7 @@ public:
 	void RemoveDeadUnit();
 	bool Assign(CUnit &unit, int force = -1);
 	void Update();
-	unsigned int FindFreeForce(AiForceRole role = AiForceRoleDefault, int begin = 0);
+	unsigned int FindFreeForce(AiForceRole role = AiForceRole::Default, int begin = 0);
 	void CheckUnits(int *counter);
 private:
 	std::vector<AiForce> forces;

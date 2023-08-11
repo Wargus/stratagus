@@ -992,9 +992,9 @@ static int CclAiForceRole(lua_State *l)
 
 	const char *flag = LuaToString(l, 2);
 	if (!strcmp(flag, "attack")) {
-		aiforce.Role = AiForceRoleAttack;
+		aiforce.Role = AiForceRole::Attack;
 	} else if (!strcmp(flag, "defend")) {
-		aiforce.Role = AiForceRoleDefend;
+		aiforce.Role = AiForceRole::Defend;
 	} else {
 		LuaError(l, "Unknown force role '%s'" _C_ flag);
 	}
@@ -1683,7 +1683,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			const int cclforceIdx = LuaToNumber(l, j + 1, 1);
 			UNUSED(cclforceIdx);
-			const int forceIdx = ai->Force.FindFreeForce(AiForceRoleDefault);
+			const int forceIdx = ai->Force.FindFreeForce(AiForceRole::Default);
 
 			for (int k = 1; k < subargs; ++k) {
 				const char *value = LuaToString(l, j + 1, k + 1);
@@ -1703,9 +1703,9 @@ static int CclDefineAiPlayer(lua_State *l)
 				} else if (!strcmp(value, "role")) {
 					value = LuaToString(l, j + 1, k + 1);
 					if (!strcmp(value, "attack")) {
-						ai->Force[forceIdx].Role = AiForceRoleAttack;
+						ai->Force[forceIdx].Role = AiForceRole::Attack;
 					} else if (!strcmp(value, "defend")) {
-						ai->Force[forceIdx].Role = AiForceRoleDefend;
+						ai->Force[forceIdx].Role = AiForceRole::Defend;
 					} else {
 						LuaError(l, "Unsupported force tag: %s" _C_ value);
 					}

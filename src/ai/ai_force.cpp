@@ -448,8 +448,8 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
-		if (this->Role == AiForceRoleDefend
-			|| (this->Role == AiForceRoleAttack && this->State == AiForceAttackingState_Waiting)) {
+		if (this->Role == AiForceRole::Defend
+			|| (this->Role == AiForceRole::Attack && this->State == AiForceAttackingState_Waiting)) {
 			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
 		}
 		this->Attacking = true;
@@ -772,7 +772,7 @@ void AiAttackWithForce(unsigned int force)
 	// the first force, so we can reuse it
 	if (!AiPlayer->Force[intForce].Defending) {
 		unsigned int top;
-		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
+		unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRole::Default, AI_MAX_FORCE_INTERNAL);
 		AiPlayer->Force[f].Reset();
 		AiPlayer->Force[f].FormerForce = force;
 		AiPlayer->Force[f].Role = AiPlayer->Force[intForce].Role;
@@ -810,7 +810,7 @@ void AiAttackWithForces(int *forces)
 	const Vec2i invalidPos(-1, -1);
 	bool found = false;
 	unsigned int top;
-	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRoleDefault, AI_MAX_FORCE_INTERNAL);
+	unsigned int f = AiPlayer->Force.FindFreeForce(AiForceRole::Default, AI_MAX_FORCE_INTERNAL);
 
 	AiPlayer->Force[f].Reset();
 
