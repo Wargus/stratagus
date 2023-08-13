@@ -67,7 +67,7 @@ extern uint8_t SizeChangeCounter; // from sdl.cpp
 static uint8_t LastSizeVersion;
 
 CursorStates CursorState;    /// current cursor state (point,...)
-int CursorAction;            /// action for selection
+ButtonCmd CursorAction;      /// action for selection
 int CursorValue;             /// value for CursorAction (spell type f.e.)
 std::string CustomCursor;    /// custom cursor for button
 

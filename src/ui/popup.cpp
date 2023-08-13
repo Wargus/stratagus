@@ -475,47 +475,47 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "ButtonAction")) {
 			const char *value = LuaToString(l, -1);
 			if (!strcmp(value, "move")) {
-				condition->ButtonAction = ButtonMove;
+				condition->ButtonAction = ButtonCmd::Move;
 			} else if (!strcmp(value, "stop")) {
-				condition->ButtonAction = ButtonStop;
+				condition->ButtonAction = ButtonCmd::Stop;
 			} else if (!strcmp(value, "attack")) {
-				condition->ButtonAction = ButtonAttack;
+				condition->ButtonAction = ButtonCmd::Attack;
 			} else if (!strcmp(value, "repair")) {
-				condition->ButtonAction = ButtonRepair;
+				condition->ButtonAction = ButtonCmd::Repair;
 			} else if (!strcmp(value, "harvest")) {
-				condition->ButtonAction = ButtonHarvest;
+				condition->ButtonAction = ButtonCmd::Harvest;
 			} else if (!strcmp(value, "button")) {
-				condition->ButtonAction = ButtonButton;
+				condition->ButtonAction = ButtonCmd::Button;
 			} else if (!strcmp(value, "build")) {
-				condition->ButtonAction = ButtonBuild;
+				condition->ButtonAction = ButtonCmd::Build;
 			} else if (!strcmp(value, "train-unit")) {
-				condition->ButtonAction = ButtonTrain;
+				condition->ButtonAction = ButtonCmd::Train;
 			} else if (!strcmp(value, "patrol")) {
-				condition->ButtonAction = ButtonPatrol;
+				condition->ButtonAction = ButtonCmd::Patrol;
 			} else if (!strcmp(value, "explore")) {
-				condition->ButtonAction = ButtonExplore;
+				condition->ButtonAction = ButtonCmd::Explore;
 			} else if (!strcmp(value, "stand-ground")) {
-				condition->ButtonAction = ButtonStandGround;
+				condition->ButtonAction = ButtonCmd::StandGround;
 			} else if (!strcmp(value, "attack-ground")) {
-				condition->ButtonAction = ButtonAttackGround;
+				condition->ButtonAction = ButtonCmd::AttackGround;
 			} else if (!strcmp(value, "return-goods")) {
-				condition->ButtonAction = ButtonReturn;
+				condition->ButtonAction = ButtonCmd::Return;
 			} else if (!strcmp(value, "cast-spell")) {
-				condition->ButtonAction = ButtonSpellCast;
+				condition->ButtonAction = ButtonCmd::SpellCast;
 			} else if (!strcmp(value, "research")) {
-				condition->ButtonAction = ButtonResearch;
+				condition->ButtonAction = ButtonCmd::Research;
 			} else if (!strcmp(value, "upgrade-to")) {
-				condition->ButtonAction = ButtonUpgradeTo;
+				condition->ButtonAction = ButtonCmd::UpgradeTo;
 			} else if (!strcmp(value, "unload")) {
-				condition->ButtonAction = ButtonUnload;
+				condition->ButtonAction = ButtonCmd::Unload;
 			} else if (!strcmp(value, "cancel")) {
-				condition->ButtonAction = ButtonCancel;
+				condition->ButtonAction = ButtonCmd::Cancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {
-				condition->ButtonAction = ButtonCancelUpgrade;
+				condition->ButtonAction = ButtonCmd::CancelUpgrade;
 			} else if (!strcmp(value, "cancel-train-unit")) {
-				condition->ButtonAction = ButtonCancelTrain;
+				condition->ButtonAction = ButtonCmd::CancelTrain;
 			} else if (!strcmp(value, "cancel-build")) {
-				condition->ButtonAction = ButtonCancelBuild;
+				condition->ButtonAction = ButtonCmd::CancelBuild;
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}

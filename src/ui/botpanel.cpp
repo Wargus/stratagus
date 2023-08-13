@@ -123,7 +123,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	if (!value.empty()) {
 		ba->ValueStr = value;
 		switch (action) {
-			case ButtonSpellCast:
+			case ButtonCmd::SpellCast:
 				ba->Value = SpellTypeByIdent(value)->Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
@@ -132,16 +132,16 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 				}
 #endif
 				break;
-			case ButtonTrain:
+			case ButtonCmd::Train:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
-			case ButtonResearch:
+			case ButtonCmd::Research:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
-			case ButtonUpgradeTo:
+			case ButtonCmd::UpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
-			case ButtonBuild:
+			case ButtonCmd::Build:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			default:
@@ -234,26 +234,26 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 	UnitAction action = UnitAction::None;
 	switch (button.Action) {
-		case ButtonStop:
+		case ButtonCmd::Stop:
 			action = UnitAction::Still;
 			break;
-		case ButtonStandGround:
+		case ButtonCmd::StandGround:
 			action = UnitAction::StandGround;
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			action = UnitAction::Attack;
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			action = UnitAction::AttackGround;
 			break;
-		case ButtonPatrol:
+		case ButtonCmd::Patrol:
 			action = UnitAction::Patrol;
 			break;
-		case ButtonExplore:
+		case ButtonCmd::Explore:
 			action = UnitAction::Explore;
 			break;
-		case ButtonHarvest:
-		case ButtonReturn:
+		case ButtonCmd::Harvest:
+		case ButtonCmd::Return:
 			action = UnitAction::Resource;
 			break;
 		default:
@@ -272,7 +272,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	// other cases : manage AutoCast and different possible action.
 	size_t i;
 	switch (button.Action) {
-		case ButtonMove:
+		case ButtonCmd::Move:
 			for (i = 0; i < Selected.size(); ++i) {
 				const UnitAction saction = Selected[i]->CurrentAction();
 				if (saction != UnitAction::Move &&
@@ -286,7 +286,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				res |= IconSelected;
 			}
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			// FIXME : and IconSelected ?
 
 			// Autocast
@@ -300,7 +300,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				res |= IconAutoCast;
 			}
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			for (i = 0; i < Selected.size(); ++i) {
 				if (Selected[i]->CurrentAction() != UnitAction::Repair) {
 					break;
@@ -355,7 +355,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
+	if (condition->ButtonAction && button.Action != *condition->ButtonAction) {
 		return false;
 	}
 
@@ -561,16 +561,16 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 	memset(Costs, 0, sizeof(Costs));
 
 	switch (button.Action) {
-		case ButtonResearch:
+		case ButtonCmd::Research:
 			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			memcpy(Costs, SpellTypeTable[button.Value]->Costs, sizeof(SpellTypeTable[button.Value]->Costs));
 			Costs[ManaResCost] = SpellTypeTable[button.Value]->ManaCost;
 			break;
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo:
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo:
 			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
 			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
@@ -610,7 +610,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 
 #if 0 // Fixme: need to remove soon
 	switch (button.Action) {
-		case ButtonResearch: {
+		case ButtonCmd::Research: {
 			CLabel label(font, "white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsS(font, Costs);
@@ -637,7 +637,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			DrawPopupCosts(x + 5, y, label, Costs);
 		}
 		break;
-		case ButtonSpellCast: {
+		case ButtonCmd::SpellCast: {
 			CLabel label(font, "white", "red");
 			// FIXME: hardcoded image!!!
 			const int IconID = GoldCost;
@@ -696,9 +696,9 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		}
 		break;
 
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo:
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo:
 			DrawPopupUnitInfo(UnitTypes[button->Value],
 							  ThisPlayer->Index, font, backgroundColor,
 							  uibutton->X, uibutton->Y);
@@ -760,7 +760,7 @@ void CButtonPanel::Draw()
 			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
 				gray = true;
 				break;
-			} else if (buttons[i].Action == ButtonSpellCast
+			} else if (buttons[i].Action == ButtonCmd::SpellCast
 					   && (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
 				Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
@@ -825,18 +825,18 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 {
 	UI.StatusLine.Set(button.Hint);
 	switch (button.Action) {
-		case ButtonBuild:
-		case ButtonTrain:
-		case ButtonUpgradeTo: {
+		case ButtonCmd::Build:
+		case ButtonCmd::Train:
+		case ButtonCmd::UpgradeTo: {
 			// FIXME: store pointer in button table!
 			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
 			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			break;
 		}
-		case ButtonResearch:
+		case ButtonCmd::Research:
 			UI.StatusLine.SetCosts(0, 0, AllUpgrades[button.Value]->Costs);
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			UI.StatusLine.SetCosts(SpellTypeTable[button.Value]->ManaCost, 0, SpellTypeTable[button.Value]->Costs);
 			break;
 		default:
@@ -873,70 +873,70 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 
 	// Check button-specific cases
 	switch (buttonaction.Action) {
-		case ButtonStop:
-		case ButtonStandGround:
-		case ButtonButton:
-		case ButtonMove:
-		case ButtonCallbackAction:
+		case ButtonCmd::Stop:
+		case ButtonCmd::StandGround:
+		case ButtonCmd::Button:
+		case ButtonCmd::Move:
+		case ButtonCmd::CallbackAction:
 			res = true;
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			res = unit.Type->RepairRange > 0;
 			break;
-		case ButtonPatrol:
-		case ButtonExplore:
+		case ButtonCmd::Patrol:
+		case ButtonCmd::Explore:
 			res = unit.CanMove();
 			break;
-		case ButtonHarvest:
+		case ButtonCmd::Harvest:
 			if (!unit.CurrentResource
 				|| unit.ResourcesHeld < unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity) {
 				res = true;
 			}
 			break;
-		case ButtonReturn:
+		case ButtonCmd::Return:
 		    if (unit.CurrentResource && unit.ResourcesHeld > 0) {
 				res = true;
 			}
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 				res = true;
 			}
 			break;
-		case ButtonTrain:
+		case ButtonCmd::Train:
 			// Check if building queue is enabled
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
 		// FALL THROUGH
-		case ButtonUpgradeTo:
-		case ButtonResearch:
-		case ButtonBuild:
+		case ButtonCmd::UpgradeTo:
+		case ButtonCmd::Research:
+		case ButtonCmd::Build:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 			}
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
 			break;
-		case ButtonUnload:
+		case ButtonCmd::Unload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);
 			break;
-		case ButtonCancel:
+		case ButtonCmd::Cancel:
 			res = true;
 			break;
-		case ButtonCancelUpgrade:
+		case ButtonCmd::CancelUpgrade:
 			res = unit.CurrentAction() == UnitAction::UpgradeTo
 				  || unit.CurrentAction() == UnitAction::Research;
 			break;
-		case ButtonCancelTrain:
+		case ButtonCmd::CancelTrain:
 			res = unit.CurrentAction() == UnitAction::Train;
 			break;
-		case ButtonCancelBuild:
+		case ButtonCmd::CancelBuild:
 			res = unit.CurrentAction() == UnitAction::Built;
 			break;
 	}
@@ -1052,7 +1052,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 
 		// Special case for researches
 		int researchCheck = true;
-		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonResearch
+		if (buttonaction.AlwaysShow && !allow && buttonaction.Action == ButtonCmd::Research
 			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
 			researchCheck = false;
 		}
@@ -1421,28 +1421,28 @@ void CButtonPanel::DoClicked(int button)
 
 	//  Handle action on button.
 	switch (CurrentButtons[button].Action) {
-		case ButtonUnload: { DoClicked_Unload(button); break; }
-		case ButtonSpellCast: { DoClicked_SpellCast(button); break; }
-		case ButtonRepair: { DoClicked_Repair(button); break; }
-		case ButtonExplore: { DoClicked_Explore(); break; }
-		case ButtonMove:    // Follow Next
-		case ButtonPatrol:  // Follow Next
-		case ButtonHarvest: // Follow Next
-		case ButtonAttack:  // Follow Next
-		case ButtonAttackGround: { DoClicked_SelectTarget(button); break; }
-		case ButtonReturn: { DoClicked_Return(); break; }
-		case ButtonStop: { DoClicked_Stop(); break; }
-		case ButtonStandGround: { DoClicked_StandGround(); break; }
-		case ButtonButton: { DoClicked_Button(button); break; }
-		case ButtonCancel: // Follow Next
-		case ButtonCancelUpgrade: { DoClicked_CancelUpgrade(); break; }
-		case ButtonCancelTrain: { DoClicked_CancelTrain(); break; }
-		case ButtonCancelBuild: { DoClicked_CancelBuild(); break; }
-		case ButtonBuild: { DoClicked_Build(button); break; }
-		case ButtonTrain: { DoClicked_Train(button); break; }
-		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
-		case ButtonResearch: { DoClicked_Research(button); break; }
-		case ButtonCallbackAction: { DoClicked_CallbackAction(button, ThisPlayer->Index); break; }
+		case ButtonCmd::Unload: { DoClicked_Unload(button); break; }
+		case ButtonCmd::SpellCast: { DoClicked_SpellCast(button); break; }
+		case ButtonCmd::Repair: { DoClicked_Repair(button); break; }
+		case ButtonCmd::Explore: { DoClicked_Explore(); break; }
+		case ButtonCmd::Move:    // Follow Next
+		case ButtonCmd::Patrol:  // Follow Next
+		case ButtonCmd::Harvest: // Follow Next
+		case ButtonCmd::Attack:  // Follow Next
+		case ButtonCmd::AttackGround: { DoClicked_SelectTarget(button); break; }
+		case ButtonCmd::Return: { DoClicked_Return(); break; }
+		case ButtonCmd::Stop: { DoClicked_Stop(); break; }
+		case ButtonCmd::StandGround: { DoClicked_StandGround(); break; }
+		case ButtonCmd::Button: { DoClicked_Button(button); break; }
+		case ButtonCmd::Cancel: // Follow Next
+		case ButtonCmd::CancelUpgrade: { DoClicked_CancelUpgrade(); break; }
+		case ButtonCmd::CancelTrain: { DoClicked_CancelTrain(); break; }
+		case ButtonCmd::CancelBuild: { DoClicked_CancelBuild(); break; }
+		case ButtonCmd::Build: { DoClicked_Build(button); break; }
+		case ButtonCmd::Train: { DoClicked_Train(button); break; }
+		case ButtonCmd::UpgradeTo: { DoClicked_UpgradeTo(button); break; }
+		case ButtonCmd::Research: { DoClicked_Research(button); break; }
+		case ButtonCmd::CallbackAction: { DoClicked_CallbackAction(button, ThisPlayer->Index); break; }
 	}
 }
 

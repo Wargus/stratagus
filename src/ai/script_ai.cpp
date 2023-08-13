@@ -238,14 +238,14 @@ static void InitAiHelper(AiHelper &aiHelper)
 		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
 
 		switch (button.Action) {
-			case ButtonRepair :
+			case ButtonCmd::Repair :
 				for (CUnitType *type : unitmask) {
 					for (CUnitType *reparableUnit : reparableUnits) {
 						AiHelperInsert(aiHelper.Repair(), reparableUnit->Slot, *type);
 					}
 				}
 				break;
-			case ButtonBuild: {
+			case ButtonCmd::Build: {
 				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
@@ -253,7 +253,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonTrain : {
+			case ButtonCmd::Train : {
 				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
@@ -261,7 +261,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonUpgradeTo : {
+			case ButtonCmd::UpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
@@ -269,7 +269,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
-			case ButtonResearch : {
+			case ButtonCmd::Research : {
 				int researchId = UpgradeIdByIdent(button.ValueStr);
 
 				if (button.Allowed == ButtonCheckSingleResearch) {

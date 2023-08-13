@@ -56,29 +56,29 @@ struct EventCallback;
 ----------------------------------------------------------------------------*/
 
 /// Button Commands that need target selection
-enum ButtonCmd {
-	ButtonMove,           /// order move
-	ButtonAttack,         /// order attack
-	ButtonRepair,         /// order repair
-	ButtonHarvest,        /// order harvest
-	ButtonBuild,          /// order build
-	ButtonPatrol,         /// order patrol
-	ButtonExplore,        /// order explore
-	ButtonAttackGround,   /// order attack ground
-	ButtonSpellCast,      /// order cast spell
-	ButtonUnload,         /// order unload unit
-	ButtonStop,           /// order stop
-	ButtonButton,         /// choose other button set
-	ButtonTrain,          /// order train
-	ButtonStandGround,    /// order stand ground
-	ButtonReturn,         /// order return goods
-	ButtonResearch,       /// order reseach
-	ButtonUpgradeTo,      /// order upgrade
-	ButtonCancel,         /// cancel
-	ButtonCancelUpgrade,  /// cancel upgrade
-	ButtonCancelTrain,    /// cancel training
-	ButtonCancelBuild,    /// cancel building
-	ButtonCallbackAction
+enum class ButtonCmd {
+	Move,           /// order move
+	Attack,         /// order attack
+	Repair,         /// order repair
+	Harvest,        /// order harvest
+	Build,          /// order build
+	Patrol,         /// order patrol
+	Explore,        /// order explore
+	AttackGround,   /// order attack ground
+	SpellCast,      /// order cast spell
+	Unload,         /// order unload unit
+	Stop,           /// order stop
+	Button,         /// choose other button set
+	Train,          /// order train
+	StandGround,    /// order stand ground
+	Return,         /// order return goods
+	Research,       /// order reseach
+	UpgradeTo,      /// order upgrade
+	Cancel,         /// cancel
+	CancelUpgrade,  /// cancel upgrade
+	CancelTrain,    /// cancel training
+	CancelBuild,    /// cancel building
+	CallbackAction
 };
 
 class ButtonAction;
@@ -88,7 +88,7 @@ using ButtonCheckFunc = bool (*)(const CUnit &, const ButtonAction &);
 class ButtonAction
 {
 public:
-	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(nullptr),
+	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonCmd::Move), Value(0), Payload(nullptr),
 		Allowed(nullptr), Key(0) {}
 
 	int Pos;          /// button position in the grid

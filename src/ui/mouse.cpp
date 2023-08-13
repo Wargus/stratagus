@@ -1485,28 +1485,28 @@ static void SendCommand(const Vec2i &tilePos)
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
 	switch (CursorAction) {
-		case ButtonMove:
+		case ButtonCmd::Move:
 			ret = SendMove(tilePos);
 			break;
-		case ButtonRepair:
+		case ButtonCmd::Repair:
 			ret = SendRepair(tilePos);
 			break;
-		case ButtonAttack:
+		case ButtonCmd::Attack:
 			ret = SendAttack(tilePos);
 			break;
-		case ButtonAttackGround:
+		case ButtonCmd::AttackGround:
 			ret = SendAttackGround(tilePos);
 			break;
-		case ButtonPatrol:
+		case ButtonCmd::Patrol:
 			ret = SendPatrol(tilePos);
 			break;
-		case ButtonHarvest:
+		case ButtonCmd::Harvest:
 			ret = SendResource(tilePos);
 			break;
-		case ButtonUnload:
+		case ButtonCmd::Unload:
 			ret = SendUnload(tilePos);
 			break;
-		case ButtonSpellCast:
+		case ButtonCmd::SpellCast:
 			ret = SendSpellCast(tilePos);
 			break;
 		default:
@@ -1516,7 +1516,7 @@ static void SendCommand(const Vec2i &tilePos)
 	if (ret) {
 		// Acknowledge the command with first selected unit.
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
+			if (CursorAction == ButtonCmd::Attack || CursorAction == ButtonCmd::AttackGround || CursorAction == ButtonCmd::SpellCast) {
 				if (Selected[i]->Type->MapSound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
@@ -1524,10 +1524,10 @@ static void SendCommand(const Vec2i &tilePos)
 					PlayUnitSound(*Selected[i], VoiceAcknowledging);
 					break;
 				}
-			} else if (CursorAction == ButtonRepair && Selected[i]->Type->MapSound.Repair.Sound) {
+			} else if (CursorAction == ButtonCmd::Repair && Selected[i]->Type->MapSound.Repair.Sound) {
 				PlayUnitSound(*Selected[i], VoiceRepairing);
 				break;
-			} else if (CursorAction == ButtonBuild && Selected[i]->Type->MapSound.Build.Sound) {
+			} else if (CursorAction == ButtonCmd::Build && Selected[i]->Type->MapSound.Build.Sound) {
 				PlayUnitSound(*Selected[i], VoiceBuild);
 				break;
 			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
@@ -1652,7 +1652,7 @@ static void UISelectStateButtonDown(unsigned)
 		// FIXME: other buttons?
 		// 74145: Spell-cast on unit portrait
 		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected
-			&& CursorAction == ButtonSpellCast) {
+			&& CursorAction == ButtonCmd::SpellCast) {
 			if (GameObserve || GamePaused || GameEstablishing) {
 				return;
 			}
@@ -2316,7 +2316,7 @@ static void HandlePieMenuMouseSelection()
 	if (pie != -1) {
 		const ButtonCmd action = CurrentButtons[pie].Action;
 		UI.ButtonPanel.DoClicked(pie);
-		if (action == ButtonButton) {
+		if (action == ButtonCmd::Button) {
 			// there is a submenu => stay in piemenu mode
 			// and recenter the piemenu around the cursor
 			CursorStartScreenPos = CursorScreenPos;
