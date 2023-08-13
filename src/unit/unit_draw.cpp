@@ -134,7 +134,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	// FIXME: make these colors customizable with scripts.
 
-	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
+	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorStateType::Selecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
 		if (unit.Player->Index == PlayerNumNeutral) {

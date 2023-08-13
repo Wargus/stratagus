@@ -822,11 +822,11 @@ static void DrawTileIcons()
 static void DrawIntoSelectionArea()
 {
 	switch (Editor.State) {
-		case EditorSetStartLocation:
-		case EditorEditUnit:
+		case EditorStateType::SetStartLocation:
+		case EditorStateType::EditUnit:
 			DrawPlayers();
 			break;
-		case EditorEditTile:
+		case EditorStateType::EditTile:
 			DrawTileOptions();
 			break;
 		default:
@@ -837,10 +837,10 @@ static void DrawIntoSelectionArea()
 static void DrawIntoButtonArea()
 {
 	switch (Editor.State) {
-		case EditorEditTile:			
+		case EditorStateType::EditTile:			
 			DrawTileIcons();
 			break;
-		case EditorEditUnit:
+		case EditorStateType::EditUnit:
 			DrawUnitIcons(); // this draws directly into the UI.ButtonPanel.Buttons
 			break;
 		default:
@@ -877,15 +877,15 @@ static void DrawMapCursor()
 	//  (Menu reset CursorBuilding)
 	if (!CursorBuilding) {
 		switch (Editor.State) {
-			case EditorSelecting:
-			case EditorEditTile:
+			case EditorStateType::Selecting:
+			case EditorStateType::EditTile:
 				break;
-			case EditorEditUnit:
+			case EditorStateType::EditUnit:
 				if (Editor.SelectedUnitIndex != -1) {
 					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
 				}
 				break;
-			case EditorSetStartLocation:
+			case EditorStateType::SetStartLocation:
 				if (Editor.StartUnit) {
 					CursorBuilding = const_cast<CUnitType *>(Editor.StartUnit);
 				}
@@ -898,7 +898,7 @@ static void DrawMapCursor()
 		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
-		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
+		if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
 			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
 			PushClipping();
 			UI.MouseViewport->SetClipping();
@@ -923,7 +923,7 @@ static void DrawMapCursor()
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
-			if (Editor.State == EditorStateType::EditorElevationLevel) {
+			if (Editor.State == EditorStateType::ElevationLevel) {
 				CLabel(GetGameFont()).DrawClip(screenPos.x + 2, screenPos.y + 1, Editor.SelectedElevationLevel);
 			}
 			PopClipping();
@@ -1213,7 +1213,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		return;
 	}
 	// Click on tile area
-	if (Editor.State == EditorEditTile) {
+	if (Editor.State == EditorStateType::EditTile) {
 		if (CursorOn == CursorOnButton && ButtonUnderCursor >= 100) {
 			switch (ButtonUnderCursor) {
 				case 300: TileCursorSize = 1; return;
@@ -1260,7 +1260,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Click on player area
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
+	if (Editor.State == EditorStateType::EditUnit || Editor.State == EditorStateType::SetStartLocation) {
 		// Cursor on player icons
 		if (Editor.CursorPlayer != -1) {
 			if (Map.Info.PlayerType[Editor.CursorPlayer] != PlayerTypes::PlayerNobody) {
@@ -1272,7 +1272,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Click on unit area
-	if (Editor.State == EditorEditUnit) {
+	if (Editor.State == EditorStateType::EditUnit) {
 		// Cursor on unit icons
 		if (Editor.CursorUnitIndex != -1) {
 			if (MouseButtons & LeftButton) {
@@ -1294,7 +1294,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Right click on a resource
-	if (Editor.State == EditorSelecting) {
+	if (Editor.State == EditorStateType::Selecting) {
 		if ((MouseButtons & RightButton) && (UnitUnderCursor != nullptr || !Selected.empty())) {
 			lua_getglobal(Lua, "EditUnitProperties");
 			if (lua_isfunction(Lua, -1) == 1) {
@@ -1320,11 +1320,11 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on map area
 	if (CursorOn == CursorOnMap) {
 		if (MouseButtons & RightButton) {
-			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
+			if (Editor.State == EditorStateType::EditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
 				CursorBuilding = nullptr;
 				return;
-			} else if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
+			} else if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
 				Editor.SelectedTileIndex = -1;
 				CursorBuilding = nullptr;
 				return;
@@ -1340,9 +1340,9 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorEditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+			if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
 				EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
-			} else if (Editor.State == EditorEditUnit) {
+			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
@@ -1356,14 +1356,14 @@ static void EditorCallbackButtonDown(unsigned button)
 									  MaxSampleVolume);
 					}
 				}
-			} else if (Editor.State == EditorSetStartLocation) {
+			} else if (Editor.State == EditorStateType::SetStartLocation) {
 				Players[Editor.SelectedPlayer].StartPos = tilePos;
-			} else if (Editor.State == EditorSelecting) {
+			} else if (Editor.State == EditorStateType::Selecting) {
 				CursorStartScreenPos = CursorScreenPos;
 				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				GameCursor = UI.Cross.Cursor;
 				CursorState = CursorStates::Rectangle;
-			} else if (Editor.State == EditorStateType::EditorElevationLevel) {
+			} else if (Editor.State == EditorStateType::ElevationLevel) {
 				EditorSetElevationLevel(tilePos, Editor.SelectedElevationLevel);
 			}
 		} else if (MouseButtons & MiddleButton) {
@@ -1532,12 +1532,12 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '+': /// Increace brush's elevation level
 		case '=':
-			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel < 255) {
+			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel < 255) {
 				Editor.SelectedElevationLevel++;
 			}
 			break;
 		case '-': /// Decreace brush's elevation level
-			if (Editor.State == EditorElevationLevel && Editor.SelectedElevationLevel > 0) {
+			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel > 0) {
 				Editor.SelectedElevationLevel--;
 			}
 			break;
@@ -1616,7 +1616,7 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned)
 
 static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 {
-	Assert(Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation);
+	Assert(Editor.State == EditorStateType::EditUnit || Editor.State == EditorStateType::SetStartLocation);
 
 	bool noHit = forEachPlayerSelectionBoxArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
@@ -1741,7 +1741,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 	// Drawing tiles on map.
 	if (CursorOn == CursorOnMap && (MouseButtons & LeftButton)
-		&& (Editor.State == EditorEditTile || Editor.State == EditorEditUnit)) {
+		&& (Editor.State == EditorStateType::EditTile || Editor.State == EditorStateType::EditUnit)) {
 		Vec2i vpTilePos = UI.SelectedViewport->MapPos;
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
@@ -1764,9 +1764,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorEditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+		if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
 			EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
-		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
+		} else if (Editor.State == EditorStateType::EditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
@@ -1801,14 +1801,14 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		CursorOn = CursorOnMinimap;
 	}
 	// Handle edit unit area
-	if (Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation) {
+	if (Editor.State == EditorStateType::EditUnit || Editor.State == EditorStateType::SetStartLocation) {
 		if (EditorCallbackMouse_EditUnitArea(screenPos) == true) {
 			return;
 		}
 	}
 
 	// Handle tile area
-	if (Editor.State == EditorEditTile) {
+	if (Editor.State == EditorStateType::EditTile) {
 		if (EditorCallbackMouse_EditTileArea(screenPos) == true) {
 			return;
 		}
@@ -2038,7 +2038,7 @@ void EditorMainLoop()
 	editorSlider->setVisible(false);
 	LambdaActionListener *editorSliderListener = new LambdaActionListener([](const std::string&) {
 		switch (Editor.State) {
-			case EditorEditTile:
+			case EditorStateType::EditTile:
 				{
 					const int iconsPerStep = VisibleTileIcons;
 					const int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
@@ -2051,7 +2051,7 @@ void EditorMainLoop()
 					}
 				}
 				break;
-			case EditorEditUnit:
+			case EditorStateType::EditUnit:
 				{
 					const int iconsPerStep = VisibleUnitIcons;
 					const int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
@@ -2083,32 +2083,32 @@ void EditorMainLoop()
 		Editor.UnitIndex = Editor.TileIndex = 0;
 		switch (selected) {
 			case 0:
-				Editor.State = EditorSelecting;
+				Editor.State = EditorStateType::Selecting;
 				editorSlider->setVisible(false);
 				return;
 			case 1:
-				Editor.State = EditorEditTile;
+				Editor.State = EditorStateType::EditTile;
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
 				return;
 			case 2:
-				Editor.State = EditorSetStartLocation;
+				Editor.State = EditorStateType::SetStartLocation;
 				editorSlider->setVisible(false);
 				return;
 			case 3:
-				Editor.State = EditorEditUnit;
+				Editor.State = EditorStateType::EditUnit;
 				RecalculateShownUnits();
 				editorSlider->setVisible(true);
 				editorSlider->setValue(0);
 				return;
 			case 4:
-				Editor.State = EditorElevationLevel;
+				Editor.State = EditorStateType::ElevationLevel;
 				editorSlider->setVisible(false);
 				Editor.SelectedElevationLevel = 0;
 				return;
 			default: {
 				std::string selectedString = toolListStrings[selected];
-				Editor.State = EditorEditUnit;
+				Editor.State = EditorStateType::EditUnit;
 				size_t startIndex = 0;
 				size_t endIndex = INT_MAX;
 				for (size_t i = 0; i < Editor.UnitTypes.size(); i++) {
@@ -2224,7 +2224,7 @@ void EditorMainLoop()
 
 		GameCursor = UI.Point.Cursor;
 		InterfaceState = IfaceStateNormal;
-		Editor.State = EditorSelecting;
+		Editor.State = EditorStateType::Selecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
 
@@ -2257,8 +2257,8 @@ void EditorMainLoop()
 					DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
 				}
 				if (CursorOn == CursorOnMap && (MouseButtons & LeftButton) &&
-					(Editor.State == EditorEditTile ||
-					 Editor.State == EditorEditUnit)) {
+					(Editor.State == EditorStateType::EditTile ||
+					 Editor.State == EditorStateType::EditUnit)) {
 					EditorCallbackButtonDown(0);
 				}
 			}
