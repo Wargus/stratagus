@@ -32,14 +32,17 @@
 
 //@{
 
-#include <string>
 #include <map>
+#include <optional>
+#include <string>
+#include <string_view>
 
 #include "upgrade_structs.h" // MaxCost
 #define ANIMATIONS_DEATHTYPES 40
 
 class CFile;
 class CUnit;
+class CUnitType;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -50,32 +53,6 @@ struct lua_State;
 **  Default names for the extra death types.
 */
 extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
-
-enum AnimationType {
-	AnimationNone,
-	AnimationFrame,
-	AnimationExactFrame,
-	AnimationWait,
-	AnimationRandomWait,
-	AnimationSound,
-	AnimationRandomSound,
-	AnimationAttack,
-	AnimationRotate,
-	AnimationRandomRotate,
-	AnimationMove,
-	AnimationUnbreakable,
-	AnimationLabel,
-	AnimationGoto,
-	AnimationRandomGoto,
-	AnimationSpawnMissile,
-	AnimationSpawnUnit,
-	AnimationIfVar,
-	AnimationSetVar,
-	AnimationSetPlayerVar,
-	AnimationDie,
-	AnimationLuaCallback,
-	AnimationWiggle,
-};
 
 //Modify types
 enum SetVar_ModifyTypes {
@@ -94,15 +71,16 @@ enum SetVar_ModifyTypes {
 class CAnimation
 {
 public:
-	CAnimation(AnimationType type) : Type(type), Next(nullptr) {}
-
+	CAnimation() = default;
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
 	virtual void Init(const char *s, lua_State *l = nullptr) {}
+	virtual void MapSound() {}
+	virtual std::optional<int> GetStillFrame(const CUnitType &type) { return std::nullopt; }
+	virtual std::uint32_t ParseAnimFlags(const std::string_view& parseflag) const { return 0; }
 
-	const AnimationType Type;
-	CAnimation *Next;
+	CAnimation *Next = nullptr;
 };
 
 class CAnimations

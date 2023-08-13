@@ -38,10 +38,9 @@
 class CAnimation_ExactFrame : public CAnimation
 {
 public:
-	CAnimation_ExactFrame() : CAnimation(AnimationExactFrame) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
+	std::optional<int> GetStillFrame(const CUnitType &type) override;
 
 	int ParseAnimInt(const CUnit *unit) const;
 

@@ -928,14 +928,9 @@ static int GetStillFrame(const CUnitType &type)
 	CAnimation *anim = type.Animations->Still;
 
 	while (anim) {
-		if (anim->Type == AnimationFrame) {
-			CAnimation_Frame &a_frame = *static_cast<CAnimation_Frame *>(anim);
-			// Use the frame facing down
-			return a_frame.ParseAnimInt(nullptr) + type.NumDirections / 2;
-		} else if (anim->Type == AnimationExactFrame) {
-			CAnimation_ExactFrame &a_frame = *static_cast<CAnimation_ExactFrame *>(anim);
-
-			return a_frame.ParseAnimInt(nullptr);
+		auto frame = anim->GetStillFrame(type);
+		if (frame) {
+			return *frame;
 		}
 		anim = anim->Next;
 	}

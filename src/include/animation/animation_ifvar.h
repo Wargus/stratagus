@@ -38,10 +38,8 @@
 class CAnimation_IfVar : public CAnimation
 {
 public:
-	CAnimation_IfVar() : CAnimation(AnimationIfVar), binOpFunc(nullptr), gotoLabel(nullptr) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
 
 private:
 	using BinOpFunc = bool (int lhs, int rhs);
@@ -49,8 +47,8 @@ private:
 private:
 	std::string leftVar;
 	std::string rightVar;
-	BinOpFunc *binOpFunc;
-	CAnimation *gotoLabel;
+	BinOpFunc *binOpFunc = nullptr;
+	CAnimation *gotoLabel = nullptr;
 };
 
 //@}

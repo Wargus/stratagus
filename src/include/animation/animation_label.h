@@ -37,10 +37,8 @@
 class CAnimation_Label : public CAnimation
 {
 public:
-	CAnimation_Label() : CAnimation(AnimationLabel) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
 };
 
 //@}

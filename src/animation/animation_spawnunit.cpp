@@ -43,7 +43,7 @@
 #include "map.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -51,7 +51,7 @@
 	const int offY = ParseAnimInt(unit, this->offYStr.c_str());
 	const int range = ParseAnimInt(unit, this->rangeStr.c_str());
 	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
-	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
+	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(::ParseAnimFlags(unit, this->flagsStr.c_str()));
 
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
@@ -86,7 +86,7 @@
 /*
 **  s = "unitType offX offY range player [flags]"
 */
-/* virtual */ void CAnimation_SpawnUnit::Init(const char *s, lua_State *)
+void CAnimation_SpawnUnit::Init(const char *s, lua_State *) /* override */
 {
 	const std::string str(s);
 	const size_t len = str.size();
@@ -116,6 +116,32 @@
 	if (begin != end) {
 		this->flagsStr.assign(str, begin, end - begin);
 	}
+}
+
+std::uint32_t
+CAnimation_SpawnUnit::ParseAnimFlags(const std::string_view &parseflag) const /* override */
+{
+	std::uint32_t flags = 0;
+	auto cur = parseflag;
+	auto beg = 0;
+
+	while (beg < parseflag.size()) {
+		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
+		cur = parseflag.substr(beg, end - beg);
+		beg = end + 1;
+
+		if (cur == "none") {
+			return SU_None;
+		} else if (cur == "summoned") {
+			flags |= SU_Summoned;
+		} else if (cur == "jointoai") {
+			flags |= SU_JoinToAIForce;
+		} else {
+			fprintf(stderr, "Unknown animation flag: %s\n", cur.data());
+			ExitFatal(1);
+		}
+	}
+	return flags;
 }
 
 //@}

@@ -40,7 +40,7 @@
 #include "ui.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Type->Building && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.Frame < 0) {
@@ -51,9 +51,14 @@
 	UnitUpdateHeading(unit);
 }
 
-/* virtual */ void CAnimation_Frame::Init(const char *s, lua_State *)
+void CAnimation_Frame::Init(const char *s, lua_State *) /* override */
 {
 	this->frame = s;
+}
+
+std::optional<int> CAnimation_Frame::GetStillFrame(const CUnitType &type) /* override */
+{
+	return ParseAnimInt(nullptr) + type.NumDirections / 2;
 }
 
 int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const

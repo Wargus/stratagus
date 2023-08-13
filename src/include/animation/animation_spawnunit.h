@@ -45,10 +45,9 @@ enum SpawnUnit_Flags {
 class CAnimation_SpawnUnit : public CAnimation
 {
 public:
-	CAnimation_SpawnUnit() : CAnimation(AnimationSpawnUnit) {}
-
-	virtual void Action(CUnit &unit, int &move, int scale) const;
-	virtual void Init(const char *s, lua_State *l);
+	void Action(CUnit &unit, int &move, int scale) const override;
+	void Init(const char *s, lua_State *l) override;
+	std::uint32_t ParseAnimFlags(const std::string_view &parseflag) const override;
 
 private:
 	std::string unitTypeStr;

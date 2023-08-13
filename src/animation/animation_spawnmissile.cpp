@@ -46,7 +46,7 @@
 #include "pathfinder.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -54,7 +54,7 @@
 	const int starty = ParseAnimInt(unit, this->startYStr.c_str());
 	const int destx = ParseAnimInt(unit, this->destXStr.c_str());
 	const int desty = ParseAnimInt(unit, this->destYStr.c_str());
-	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(ParseAnimFlags(unit, this->flagsStr.c_str()));
+	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(::ParseAnimFlags(unit, this->flagsStr.c_str()));
 	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr.c_str());
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
@@ -145,7 +145,7 @@
 /*
 **  s = "missileType startX startY destX destY [flag1[.flagN]] [missileoffset]"
 */
-/* virtual */ void CAnimation_SpawnMissile::Init(const char *s, lua_State *)
+void CAnimation_SpawnMissile::Init(const char *s, lua_State *) /* override */
 {
 	const std::string str(s);
 	const size_t len = str.size();
@@ -177,6 +177,40 @@
 	begin = std::min(len, str.find_first_not_of(' ', end));
 	end = std::min(len, str.find(' ', begin));
 	this->offsetNumStr.assign(str, begin, end - begin);
+}
+
+std::uint32_t
+CAnimation_SpawnMissile::ParseAnimFlags(const std::string_view &parseflag) const /* override */
+{
+	std::uint32_t flags = 0;
+	auto cur = parseflag;
+	auto beg = 0;
+
+	while (beg < parseflag.size()) {
+		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
+		cur = parseflag.substr(beg, end - beg);
+		beg = end + 1;
+
+		if (cur == "none") {
+			return SM_None;
+		} else if (cur == "damage") {
+			flags |= SM_Damage;
+		} else if (cur == "totarget") {
+			flags |= SM_ToTarget;
+		} else if (cur == "pixel") {
+			flags |= SM_Pixel;
+		} else if (cur == "reltarget") {
+			flags |= SM_RelTarget;
+		} else if (cur == "ranged") {
+			flags |= SM_Ranged;
+		} else if (cur == "setdirection") {
+			flags |= SM_SetDirection;
+		} else {
+			fprintf(stderr, "Unknown animation flag: %s\n", cur.data());
+			ExitFatal(1);
+		}
+	}
+	return flags;
 }
 
 //@}

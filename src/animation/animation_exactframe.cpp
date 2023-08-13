@@ -39,15 +39,20 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_ExactFrame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_ExactFrame::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	unit.Frame = ParseAnimInt(&unit);
 }
 
-/* virtual */ void CAnimation_ExactFrame::Init(const char *s, lua_State *)
+void CAnimation_ExactFrame::Init(const char *s, lua_State *) /* override */
 {
 	this->frame = s;
+}
+
+std::optional<int> CAnimation_ExactFrame::GetStillFrame(const CUnitType &type) /* override */
+{
+	return ParseAnimInt(nullptr) + type.NumDirections / 2;
 }
 
 int CAnimation_ExactFrame::ParseAnimInt(const CUnit *unit) const

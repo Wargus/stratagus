@@ -206,14 +206,14 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 			break;
 		case modDiv:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+				fprintf(stderr, "Division by zero in AnimationType::SetPlayerVar\n");
 				Exit(1);
 			}
 			data /= rop;
 			break;
 		case modMod:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationSetPlayerVar\n");
+				fprintf(stderr, "Division by zero in AnimationType::SetPlayerVar\n");
 				Exit(1);
 			}
 			data %= rop;

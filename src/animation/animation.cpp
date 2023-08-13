@@ -287,56 +287,8 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 */
 int ParseAnimFlags(const CUnit &unit, const char *parseflag)
 {
-	char s[100];
-	int flags = 0;
-
-	strcpy(s, parseflag);
-	char *cur = s;
-	char *next = s;
-	while (next && *next) {
-		next = strchr(cur, '.');
-		if (next) {
-			*next = '\0';
-			++next;
-		}
-		if (unit.Anim.Anim->Type == AnimationSpawnMissile) {
-			if (!strcmp(cur, "none")) {
-				flags = SM_None;
-				return flags;
-			} else if (!strcmp(cur, "damage")) {
-				flags |= SM_Damage;
-			} else if (!strcmp(cur, "totarget")) {
-				flags |= SM_ToTarget;
-			} else if (!strcmp(cur, "pixel")) {
-				flags |= SM_Pixel;
-			} else if (!strcmp(cur, "reltarget")) {
-				flags |= SM_RelTarget;
-			} else if (!strcmp(cur, "ranged")) {
-				flags |= SM_Ranged;
-			}  else if (!strcmp(cur, "setdirection")) {
-				flags |= SM_SetDirection;
-			} else {
-				fprintf(stderr, "Unknown animation flag: %s\n", cur);
-				ExitFatal(1);
-			}
-		} else if (unit.Anim.Anim->Type == AnimationSpawnUnit) {
-			if (!strcmp(cur, "none")) {
-				flags = SU_None;
-				return flags;
-			} else if (!strcmp(cur, "summoned")) {
-				flags |= SU_Summoned;
-			} else if (!strcmp(cur, "jointoai")) {
-				flags |= SU_JoinToAIForce;
-			} else {
-				fprintf(stderr, "Unknown animation flag: %s\n", cur);
-				ExitFatal(1);
-			}
-		}
-		cur = next;
-	}
-	return flags;
+	return unit.Anim.Anim->ParseAnimFlags(parseflag);
 }
-
 
 /**
 **  Show unit animation.
