@@ -103,16 +103,16 @@ class CGraphic;
 class CPlayerColorGraphic;
 
 
-enum ConstructionFileType {
-	ConstructionFileConstruction,
-	ConstructionFileMain
+enum class ConstructionFileType {
+	Construction,
+	Main
 };
 
 /// Construction frame
 class CConstructionFrame
 {
 public:
-	CConstructionFrame() : Percent(0), File(ConstructionFileConstruction),
+	CConstructionFrame() : Percent(0), File(ConstructionFileType::Construction),
 		Frame(0), Next(nullptr) {}
 
 	int Percent;                    /// Percent complete
