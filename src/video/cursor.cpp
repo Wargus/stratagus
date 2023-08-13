@@ -327,7 +327,7 @@ void DrawCursor()
 	}
 
 	// Selecting rectangle
-	if (CursorState == CursorStateRectangle && CursorStartScreenPos != CursorScreenPos) {
+	if (CursorState == CursorStates::Rectangle && CursorStartScreenPos != CursorScreenPos) {
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);

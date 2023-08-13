@@ -2412,7 +2412,7 @@ int MenuScreen::run(bool loop)
 	this->loopResult = 0;
 	this->runLoop = loop;
 
-	CursorState = CursorStatePoint;
+	CursorState = CursorStates::Point;
 	GameCursor = UI.Point.Cursor;
 	CursorOn = CursorOnUnknown;
 

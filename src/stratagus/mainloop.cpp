@@ -189,7 +189,7 @@ void UpdateDisplay()
 		// then do the rest.
 		DrawMessages();
 
-		if (CursorState == CursorStateRectangle) {
+		if (CursorState == CursorStates::Rectangle) {
 			DrawCursor();
 		}
 
@@ -224,7 +224,7 @@ void UpdateDisplay()
 
 	DrawGuichanWidgets();
 
-	if (CursorState != CursorStateRectangle) {
+	if (CursorState != CursorStates::Rectangle) {
 		DrawCursor();
 	}
 

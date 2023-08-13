@@ -991,7 +991,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	OldCursorOn = CursorOn;
 	//  Selecting units.
-	if (CursorState == CursorStateRectangle) {
+	if (CursorState == CursorStates::Rectangle) {
 		// Restrict cursor to viewport.
 		UI.SelectedViewport->Restrict(CursorScreenPos.x, CursorScreenPos.y);
 		UI.MouseWarpPos = CursorScreenPos;
@@ -1009,7 +1009,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	HandleMouseOn(cursorPos);
 
 	//  Make the piemenu "follow" the mouse
-	if (CursorState == CursorStatePieMenu && CursorOn == CursorOnMap) {
+	if (CursorState == CursorStates::PieMenu && CursorOn == CursorOnMap) {
 		clamp(&CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
 		clamp(&CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
 		return;
@@ -1116,7 +1116,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  Selecting target.
-	if (CursorState == CursorStateSelect) {
+	if (CursorState == CursorStates::Select) {
 		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
 			if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 				GameCursor = CursorByIdent(CustomCursor);
@@ -1604,7 +1604,7 @@ static void UISelectStateButtonDown(unsigned)
 	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
-		CursorState = CursorStatePoint;
+		CursorState = CursorStates::Point;
 		GameCursor = UI.Point.Cursor;
 		CustomCursor.clear();
 		CurrentButtonLevel = 0;
@@ -1633,7 +1633,7 @@ static void UISelectStateButtonDown(unsigned)
 
 			UI.StatusLine.Clear();
 			UI.StatusLine.ClearCosts();
-			CursorState = CursorStatePoint;
+			CursorState = CursorStates::Point;
 			GameCursor = UI.Point.Cursor;
 			CustomCursor.clear();
 			CurrentButtonLevel = 0;
@@ -1677,7 +1677,7 @@ static void UISelectStateButtonDown(unsigned)
 
 	UI.StatusLine.Clear();
 	UI.StatusLine.ClearCosts();
-	CursorState = CursorStatePoint;
+	CursorState = CursorStates::Point;
 	if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 		GameCursor = CursorByIdent(CustomCursor);
 	} else {
@@ -1730,8 +1730,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		UnitUnderCursor = nullptr;
 		GameCursor = UI.Point.Cursor;  // Reset
 		CursorStartScreenPos = CursorScreenPos;
-		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CursorState == CursorStatePoint) {
-			CursorState = CursorStatePieMenu;
+		if (!Selected.empty() && Selected[0]->Player == ThisPlayer && CursorState == CursorStates::Point) {
+			CursorState = CursorStates::PieMenu;
 		}
 	} else if (MouseButtons & RightButton) {
 		if (!GameObserve && !GamePaused && !GameEstablishing && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
@@ -1757,7 +1757,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 		CursorStartScreenPos = CursorScreenPos;
 		CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		GameCursor = UI.Cross.Cursor;
-		CursorState = CursorStateRectangle;
+		CursorState = CursorStates::Rectangle;
 	} else if (MouseButtons & MiddleButton) {// enter move map mode
 		CursorStartScreenPos = CursorScreenPos;
 		GameCursor = UI.Scroll.Cursor;
@@ -1941,24 +1941,24 @@ void UIHandleButtonDown(unsigned button)
 	}
 
 	// select mode
-	if (CursorState == CursorStateRectangle) {
+	if (CursorState == CursorStates::Rectangle) {
 		return;
 	}
 	// CursorOn should have changed with BigMapMode, so recompute it.
 	HandleMouseOn(CursorScreenPos);
 	//  Selecting target. (Move,Attack,Patrol,... commands);
-	if (CursorState == CursorStateSelect) {
+	if (CursorState == CursorStates::Select) {
 		UISelectStateButtonDown(button);
 		return;
 	}
 
-	if (CursorState == CursorStatePieMenu) {
+	if (CursorState == CursorStates::PieMenu) {
 		if (CursorOn == CursorOnMap) {
 			HandlePieMenuMouseSelection();
 			return;
 		} else {
 			// Pie Menu canceled
-			CursorState = CursorStatePoint;
+			CursorState = CursorStates::Point;
 			// Don't return, we might be over another button
 		}
 	}
@@ -1993,7 +1993,7 @@ void UIHandleButtonUp(unsigned button)
 	//
 	//  Pie Menu
 	//
-	if (CursorState == CursorStatePieMenu) {
+	if (CursorState == CursorStates::PieMenu) {
 		// Little threshold
 		if (1 < abs(CursorStartScreenPos.x - CursorScreenPos.x)
 			|| 1 < abs(CursorStartScreenPos.y - CursorScreenPos.y)) {
@@ -2081,7 +2081,7 @@ void UIHandleButtonUp(unsigned button)
 	// add the content of the rectangle to the selectection
 	// ALT takes group of unit
 	// CTRL takes all units of same type (st*rcr*ft)
-	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
+	if (CursorState == CursorStates::Rectangle && !(MouseButtons & LeftButton)) { // leave select mode
 		int num = 0;
 		//
 		//  Little threshold
@@ -2207,7 +2207,7 @@ void UIHandleButtonUp(unsigned button)
 		CursorStartScreenPos.x = 0;
 		CursorStartScreenPos.y = 0;
 		GameCursor = UI.Point.Cursor;
-		CursorState = CursorStatePoint;
+		CursorState = CursorStates::Point;
 	}
 }
 
@@ -2236,12 +2236,12 @@ void DrawPieMenu()
 {
 	char buf[2] = "?";
 
-	if (CursorState != CursorStatePieMenu) {
+	if (CursorState != CursorStates::PieMenu) {
 		return;
 	}
 
 	if (CurrentButtons.empty()) { // no buttons
-		CursorState = CursorStatePoint;
+		CursorState = CursorStates::Point;
 		return;
 	}
 	std::vector<ButtonAction> &buttons(CurrentButtons);
@@ -2321,14 +2321,14 @@ static void HandlePieMenuMouseSelection()
 			// and recenter the piemenu around the cursor
 			CursorStartScreenPos = CursorScreenPos;
 		} else {
-			if (CursorState == CursorStatePieMenu) {
-				CursorState = CursorStatePoint;
+			if (CursorState == CursorStates::PieMenu) {
+				CursorState = CursorStates::Point;
 			}
 			CursorOn = CursorOnUnknown;
 			UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 		}
 	} else {
-		CursorState = CursorStatePoint;
+		CursorState = CursorStates::Point;
 		CursorOn = CursorOnUnknown;
 		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}

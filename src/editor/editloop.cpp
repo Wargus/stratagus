@@ -1155,7 +1155,7 @@ static void EditorCallbackButtonUp(unsigned button)
 		UnitPlacedThisPress = false;
 	}
 
-	if (CursorState == CursorStateRectangle && !(MouseButtons & LeftButton)) { // leave select mode
+	if (CursorState == CursorStates::Rectangle && !(MouseButtons & LeftButton)) { // leave select mode
 		PixelPos pos0 = CursorStartMapPos;
 		const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 		PixelPos pos1 = cursorMapPos;
@@ -1179,7 +1179,7 @@ static void EditorCallbackButtonUp(unsigned button)
 		CursorStartScreenPos.x = 0;
 		CursorStartScreenPos.y = 0;
 		GameCursor = UI.Point.Cursor;
-		CursorState = CursorStatePoint;
+		CursorState = CursorStates::Point;
 	}
 }
 
@@ -1362,7 +1362,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				CursorStartScreenPos = CursorScreenPos;
 				CursorStartMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 				GameCursor = UI.Cross.Cursor;
-				CursorState = CursorStateRectangle;
+				CursorState = CursorStates::Rectangle;
 			} else if (Editor.State == EditorStateType::EditorElevationLevel) {
 				EditorSetElevationLevel(tilePos, Editor.SelectedElevationLevel);
 			}

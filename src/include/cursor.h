@@ -162,11 +162,11 @@ public:
 };
 
 /// Cursor state
-enum CursorStates {
-	CursorStatePoint,      /// Normal cursor
-	CursorStateSelect,     /// Select position
-	CursorStateRectangle,  /// Rectangle selecting
-	CursorStatePieMenu     /// Displaying Pie Menu
+enum class CursorStates {
+	Point,      /// Normal cursor
+	Select,     /// Select position
+	Rectangle,  /// Rectangle selecting
+	PieMenu     /// Displaying Pie Menu
 };
 
 /*----------------------------------------------------------------------------
