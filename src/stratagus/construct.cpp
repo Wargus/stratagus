@@ -234,7 +234,7 @@ static int CclDefineConstruction(lua_State *l)
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent = 0;
-				ConstructionFileType file = ConstructionFileConstruction;
+				ConstructionFileType file = ConstructionFileType::Construction;
 				int frame = 0;
 
 				lua_rawgeti(l, -1, k + 1);
@@ -251,9 +251,9 @@ static int CclDefineConstruction(lua_State *l)
 						const char *value = LuaToString(l, -1);
 
 						if (!strcmp(value, "construction")) {
-							file = ConstructionFileConstruction;
+							file = ConstructionFileType::Construction;
 						} else if (!strcmp(value, "main")) {
-							file = ConstructionFileMain;
+							file = ConstructionFileType::Main;
 						} else {
 							LuaError(l, "Unsupported tag: %s" _C_ value);
 						}

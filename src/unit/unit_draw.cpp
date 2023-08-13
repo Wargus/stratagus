@@ -134,7 +134,7 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	// FIXME: make these colors customizable with scripts.
 
-	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
+	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorStateType::Selecting) {
 		color = ColorWhite;
 	} else if (unit.Selected || unit.TeamSelected || (unit.Blink & 1)) {
 		if (unit.Player->Index == PlayerNumNeutral) {
@@ -841,7 +841,7 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	if (cframe->File == ConstructionFileConstruction) {
+	if (cframe->File == ConstructionFileType::Construction) {
 		if (type.Construction->ShadowSprite) {
 			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
 			pos.x += type.OffsetX;
@@ -881,7 +881,7 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							 const CUnitType &type, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	if (cframe->File == ConstructionFileConstruction) {
+	if (cframe->File == ConstructionFileType::Construction) {
 		CConstruction &construction = *type.Construction;
 		pos.x -= construction.Width / 2;
 		pos.y -= construction.Height / 2;

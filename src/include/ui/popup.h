@@ -32,11 +32,13 @@
 
 //@{
 
-#include "script.h"
 #include "color.h"
+#include "script.h"
 #include "vec2i.h"
-#include <vector>
+
+#include <optional>
 #include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -45,6 +47,7 @@
 class ButtonAction;
 class CFont;
 class CPopup;
+enum class ButtonCmd;
 
 #define MARGIN_X 4
 #define MARGIN_Y 2
@@ -53,7 +56,7 @@ class PopupConditionPanel
 {
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
-		ButtonAction(-1), BoolFlags(nullptr), Variables(nullptr) {}
+		ButtonAction(std::nullopt), BoolFlags(nullptr), Variables(nullptr) {}
 	~PopupConditionPanel()
 	{
 		delete[] BoolFlags;
@@ -63,7 +66,7 @@ public:
 	bool HasHint;               /// check if button has hint.
 	bool HasDescription;        /// check if button has description.
 	bool HasDependencies;       /// check if button has dependencies or restrictions.
-	int ButtonAction;           /// action type of button
+	std::optional<ButtonCmd> ButtonAction;     /// action type of button
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
 	char *BoolFlags;            /// array of condition about user flags.

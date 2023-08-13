@@ -998,49 +998,49 @@ static int CclDefineButton(lua_State *l)
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "move")) {
-				ba.Action = ButtonMove;
+				ba.Action = ButtonCmd::Move;
 			} else if (!strcmp(value, "stop")) {
-				ba.Action = ButtonStop;
+				ba.Action = ButtonCmd::Stop;
 			} else if (!strcmp(value, "attack")) {
-				ba.Action = ButtonAttack;
+				ba.Action = ButtonCmd::Attack;
 			} else if (!strcmp(value, "repair")) {
-				ba.Action = ButtonRepair;
+				ba.Action = ButtonCmd::Repair;
 			} else if (!strcmp(value, "harvest")) {
-				ba.Action = ButtonHarvest;
+				ba.Action = ButtonCmd::Harvest;
 			} else if (!strcmp(value, "button")) {
-				ba.Action = ButtonButton;
+				ba.Action = ButtonCmd::Button;
 			} else if (!strcmp(value, "build")) {
-				ba.Action = ButtonBuild;
+				ba.Action = ButtonCmd::Build;
 			} else if (!strcmp(value, "train-unit")) {
-				ba.Action = ButtonTrain;
+				ba.Action = ButtonCmd::Train;
 			} else if (!strcmp(value, "patrol")) {
-				ba.Action = ButtonPatrol;
+				ba.Action = ButtonCmd::Patrol;
 			} else if (!strcmp(value, "explore")) {
-				ba.Action = ButtonExplore;
+				ba.Action = ButtonCmd::Explore;
 			} else if (!strcmp(value, "stand-ground")) {
-				ba.Action = ButtonStandGround;
+				ba.Action = ButtonCmd::StandGround;
 			} else if (!strcmp(value, "attack-ground")) {
-				ba.Action = ButtonAttackGround;
+				ba.Action = ButtonCmd::AttackGround;
 			} else if (!strcmp(value, "return-goods")) {
-				ba.Action = ButtonReturn;
+				ba.Action = ButtonCmd::Return;
 			} else if (!strcmp(value, "cast-spell")) {
-				ba.Action = ButtonSpellCast;
+				ba.Action = ButtonCmd::SpellCast;
 			} else if (!strcmp(value, "research")) {
-				ba.Action = ButtonResearch;
+				ba.Action = ButtonCmd::Research;
 			} else if (!strcmp(value, "upgrade-to")) {
-				ba.Action = ButtonUpgradeTo;
+				ba.Action = ButtonCmd::UpgradeTo;
 			} else if (!strcmp(value, "unload")) {
-				ba.Action = ButtonUnload;
+				ba.Action = ButtonCmd::Unload;
 			} else if (!strcmp(value, "cancel")) {
-				ba.Action = ButtonCancel;
+				ba.Action = ButtonCmd::Cancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {
-				ba.Action = ButtonCancelUpgrade;
+				ba.Action = ButtonCmd::CancelUpgrade;
 			} else if (!strcmp(value, "cancel-train-unit")) {
-				ba.Action = ButtonCancelTrain;
+				ba.Action = ButtonCmd::CancelTrain;
 			} else if (!strcmp(value, "cancel-build")) {
-				ba.Action = ButtonCancelBuild;
+				ba.Action = ButtonCmd::CancelBuild;
 			} else if (!strcmp(value, "callback")) {
-				ba.Action = ButtonCallbackAction;
+				ba.Action = ButtonCmd::CallbackAction;
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
@@ -1199,7 +1199,7 @@ void SelectionChanged()
 	UI.ButtonPanel.Update();
 	GameCursor = UI.Point.Cursor;
 	CursorBuilding = nullptr;
-	CursorState = CursorStatePoint;
+	CursorState = CursorStates::Point;
 	UI.ButtonPanel.Update();
 }
 

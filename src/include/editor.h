@@ -54,12 +54,12 @@ enum EditorRunningType {
 	EditorEditing = 4        /// Editor is fully running
 };
 
-enum EditorStateType {
-	EditorSelecting,         /// Select
-	EditorEditTile,          /// Edit tiles
-	EditorEditUnit,          /// Edit units
-	EditorSetStartLocation,  /// Set the start location
-	EditorElevationLevel	 /// Edit elevation levels
+enum class EditorStateType {
+	Selecting,         /// Select
+	EditTile,          /// Edit tiles
+	EditUnit,          /// Edit units
+	SetStartLocation,  /// Set the start location
+	ElevationLevel     /// Edit elevation levels
 };
 
 class CEditor
