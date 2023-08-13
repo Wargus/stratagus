@@ -41,6 +41,7 @@
 
 #include "unitsound.h"
 #include "vec2i.h"
+#include <optional>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -112,15 +113,16 @@ public:
 };
 
 /// Button area under cursor
-enum _button_area_ {
-	ButtonAreaSelected,      /// Selected button
-	ButtonAreaTraining,      /// Training button
-	ButtonAreaUpgrading,     /// Upgrading button
-	ButtonAreaResearching,   /// Researching button
-	ButtonAreaTransporting,  /// Transporting button
-	ButtonAreaButton,        /// Button panel button
-	ButtonAreaMenu,          /// Menu button
-	ButtonAreaUser           /// User buttons
+enum class ButtonArea
+{
+	Selected,      /// Selected button
+	Training,      /// Training button
+	Upgrading,     /// Upgrading button
+	Researching,   /// Researching button
+	Transporting,  /// Transporting button
+	Button,        /// Button panel button
+	Menu,          /// Menu button
+	User           /// User buttons
 };
 
 /// Menu button under cursor
@@ -231,7 +233,7 @@ extern enum _key_state_ KeyState;
 /// shared pointer to unit under the cursor
 extern CUnit *UnitUnderCursor;
 /// button area under the cursor
-extern int ButtonAreaUnderCursor;
+extern std::optional<ButtonArea> ButtonAreaUnderCursor;
 /// button number under the cursor
 extern int ButtonUnderCursor;
 /// oldbutton number under the cursor
