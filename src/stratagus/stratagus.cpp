@@ -304,7 +304,7 @@ static int MenuLoop()
 	int status;
 
 	initGuichan();
-	InterfaceState = IfaceStateMenu;
+	InterfaceState = IfaceState::Menu;
 	//  Clear screen
 	Video.ClearScreen();
 	Invalidate();

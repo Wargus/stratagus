@@ -1065,7 +1065,7 @@ void EditorUpdateDisplay()
 	}
 
 	// Menu button
-	const int flag_active = ButtonAreaUnderCursor == ButtonAreaMenu
+	const int flag_active = ButtonAreaUnderCursor == ButtonArea::Menu
 							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0;
 	const int flag_clicked = GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0;
 	DrawUIButton(UI.MenuButton.Style,
@@ -1198,7 +1198,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		return;
 	}
 	// Click on menu button
-	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
+	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonArea::Menu &&
 		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
 		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 		GameMenuButtonClicked = true;
@@ -1815,12 +1815,12 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {
-		ButtonAreaUnderCursor = ButtonAreaMenu;
+		ButtonAreaUnderCursor = ButtonArea::Menu;
 		ButtonUnderCursor = ButtonUnderMenu;
 		CursorOn = CursorOnButton;
 		return;
 	} else {
-		ButtonAreaUnderCursor = -1;
+		ButtonAreaUnderCursor.reset();
 	}
 
 	// Minimap
@@ -2218,12 +2218,12 @@ void EditorMainLoop()
 		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
 		//ProcessMenu("menu-editor-tips", 1);
-		InterfaceState = IfaceStateNormal;
+		InterfaceState = IfaceState::Normal;
 
 		SetVideoSync();
 
 		GameCursor = UI.Point.Cursor;
-		InterfaceState = IfaceStateNormal;
+		InterfaceState = IfaceState::Normal;
 		Editor.State = EditorStateType::Selecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
@@ -2283,7 +2283,7 @@ void EditorMainLoop()
 
 		PreMenuSetup();
 
-		InterfaceState = IfaceStateMenu;
+		InterfaceState = IfaceState::Menu;
 		GameCursor = UI.Point.Cursor;
 
 		Video.ClearScreen();

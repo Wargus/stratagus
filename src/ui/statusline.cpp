@@ -63,7 +63,7 @@ void CStatusLine::Draw()
 */
 void CStatusLine::Set(const std::string &status)
 {
-	if (KeyState != KeyStateInput) {
+	if (KeyState != EKeyState::Input) {
 		this->StatusLine = status;
 	}
 }
@@ -134,7 +134,7 @@ void CStatusLine::DrawCosts()
 */
 void CStatusLine::Clear()
 {
-	if (KeyState != KeyStateInput) {
+	if (KeyState != EKeyState::Input) {
 		this->StatusLine.clear();
 	}
 }

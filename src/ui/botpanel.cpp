@@ -224,7 +224,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 
 	// cursor is on that button
-	if (ButtonAreaUnderCursor == ButtonAreaButton && UnderCursor == button.Pos - 1) {
+	if (ButtonAreaUnderCursor == ButtonArea::Button && UnderCursor == button.Pos - 1) {
 		res |= IconActive;
 		if (MouseButtons & LeftButton) {
 			// Overwrite IconActive.
@@ -805,8 +805,8 @@ void CButtonPanel::Draw()
 	//  Update status line for this button and draw popups
 	//
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
-		if (ButtonAreaUnderCursor == ButtonAreaButton &&
-			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+		if (ButtonAreaUnderCursor == ButtonArea::Button &&
+			ButtonUnderCursor == i && KeyState != EKeyState::Input) {
 				if (!Preference.NoStatusLineTooltips) {
 					UpdateStatusLineForButton(buttons[i]);
 				}

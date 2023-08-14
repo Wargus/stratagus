@@ -86,9 +86,9 @@ bool GameObserve;                    /// Observe mode
 bool GameEstablishing;               /// Game establishing mode
 double SkipGameCycle;                /// Skip the next n game cycles
 char BigMapMode;                     /// Show only the map
-enum _iface_state_ InterfaceState;   /// Current interface state
+IfaceState InterfaceState;           /// Current interface state
 bool GodMode;                        /// Invincibility cheat
-enum _key_state_ KeyState;           /// current key state
+EKeyState KeyState;                  /// current key state
 CUnit *LastIdleWorker;               /// Last called idle worker
 
 /*----------------------------------------------------------------------------
@@ -121,10 +121,10 @@ static void ShowInput()
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
 		++input;
 	}
-	KeyState = KeyStateCommand;
+	KeyState = EKeyState::Command;
 	UI.StatusLine.Clear();
 	UI.StatusLine.Set(input);
-	KeyState = KeyStateInput;
+	KeyState = EKeyState::Input;
 }
 
 /**
@@ -132,7 +132,7 @@ static void ShowInput()
 */
 static void UiBeginInput()
 {
-	KeyState = KeyStateInput;
+	KeyState = EKeyState::Input;
 	memset(Input, 0, sizeof(Input));
 	InputIndex = 0;
 	addCursorToInput();
@@ -891,7 +891,7 @@ static void InputKey(int key)
 		}
 	// FALL THROUGH
 		case SDLK_ESCAPE:
-			KeyState = KeyStateCommand;
+			KeyState = EKeyState::Command;
 			UI.StatusLine.Clear();
 			break;
 
@@ -1053,7 +1053,7 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 		case SDLK_RALT:
 			KeyModifiers |= ModifierAlt;
 			// maxy: disabled
-			if (InterfaceState == IfaceStateNormal) {
+			if (InterfaceState == IfaceState::Normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
@@ -1097,7 +1097,7 @@ int HandleKeyModifiersUp(unsigned key, unsigned)
 		case SDLK_RALT:
 			KeyModifiers &= ~ModifierAlt;
 			// maxy: disabled
-			if (InterfaceState == IfaceStateNormal) {
+			if (InterfaceState == IfaceState::Normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
 			return 1;
@@ -1162,7 +1162,7 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 
 	// Command line input: for message or cheat
 	unsigned kp = 0;
-	if (KeyState == KeyStateInput && (keychar || IsKeyPad(key, &kp))) {
+	if (KeyState == EKeyState::Input && (keychar || IsKeyPad(key, &kp))) {
 		InputKey(kp ? kp : keychar);
 	} else {
 		// If no modifier look if button bound
@@ -1219,7 +1219,7 @@ void HandleKeyUp(unsigned key, unsigned keychar)
 */
 void HandleKeyRepeat(unsigned, unsigned keychar)
 {
-	if (KeyState == KeyStateInput && keychar) {
+	if (KeyState == EKeyState::Input && keychar) {
 		InputKey(keychar);
 	}
 }

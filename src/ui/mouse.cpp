@@ -76,7 +76,7 @@ int MouseButtons;                            /// Current pressed mouse buttons
 int KeyModifiers;                            /// Current keyboard modifiers
 
 CUnit *UnitUnderCursor;                      /// Unit under cursor
-int ButtonAreaUnderCursor = -1;              /// Button area under cursor
+std::optional<ButtonArea> ButtonAreaUnderCursor; /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 int OldButtonUnderCursor = -1;               /// Button under cursor
 bool GameMenuButtonClicked;                  /// Menu button was clicked
@@ -717,7 +717,7 @@ bool CUIButton::Contains(const PixelPos &screenPos) const
 static void HandleMouseOn(const PixelPos screenPos)
 {
 	MouseScrollState = ScrollNone;
-	ButtonAreaUnderCursor = -1;
+	ButtonAreaUnderCursor.reset();
 	ButtonUnderCursor = -1;
 
 	if (IsDemoMode()) {
@@ -737,7 +737,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	if (!IsNetworkGame()) {
 		if (UI.MenuButton.X != -1) {
 			if (UI.MenuButton.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaMenu;
+				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderMenu;
 				CursorOn = CursorOnButton;
 				return;
@@ -746,7 +746,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	} else {
 		if (UI.NetworkMenuButton.X != -1) {
 			if (UI.NetworkMenuButton.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaMenu;
+				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
 				return;
@@ -754,7 +754,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 		if (UI.NetworkDiplomacyButton.X != -1) {
 			if (UI.NetworkDiplomacyButton.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaMenu;
+				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
 				CursorOn = CursorOnButton;
 				return;
@@ -768,7 +768,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			int textX = UI.Resources[FreeWorkersCount].TextX;
 			if (textX > 0 || ThisPlayer->GetFreeWorkersCount() > 0) {
 				if (screenPos > PixelPos(x, y) && screenPos < PixelPos(x + g->getWidth(), y + g->getHeight())) {
-					ButtonAreaUnderCursor = ButtonAreaMenu;
+					ButtonAreaUnderCursor = ButtonArea::Menu;
 					ButtonUnderCursor = ButtonUnderFreeWorkers;
 					CursorOn = CursorOnButton;
 					return;
@@ -781,7 +781,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 
 		if (button.Button.X != -1) {
 			if (button.Button.Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaUser;
+				ButtonAreaUnderCursor = ButtonArea::User;
 				ButtonUnderCursor = i;
 				CursorOn = CursorOnButton;
 				return;
@@ -792,7 +792,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	const size_t buttonCount = UI.ButtonPanel.Buttons.size();
 	for (unsigned int j = 0; j < buttonCount; ++j) {
 		if (UI.ButtonPanel.Buttons[j].Contains(screenPos)) {
-			ButtonAreaUnderCursor = ButtonAreaButton;
+			ButtonAreaUnderCursor = ButtonArea::Button;
 			if (!CurrentButtons.empty() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
 				CursorOn = CursorOnButton;
@@ -807,7 +807,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			for (size_t i = std::min<size_t>(Selected[0]->BoardCount, size); i != 0;) {
 				--i;
 				if (UI.TransportingButtons[i].Contains(screenPos)) {
-					ButtonAreaUnderCursor = ButtonAreaTransporting;
+					ButtonAreaUnderCursor = ButtonArea::Transporting;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
 					return;
@@ -818,7 +818,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (Selected[0]->CurrentAction() == UnitAction::Train) {
 				if (Selected[0]->Orders.size() == 1) {
 					if (UI.SingleTrainingButton->Contains(screenPos)) {
-						ButtonAreaUnderCursor = ButtonAreaTraining;
+						ButtonAreaUnderCursor = ButtonArea::Training;
 						ButtonUnderCursor = 0;
 						CursorOn = CursorOnButton;
 						return;
@@ -830,7 +830,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 						--i;
 						if (Selected[0]->Orders[i]->Action == UnitAction::Train
 							&& UI.TrainingButtons[i].Contains(screenPos)) {
-							ButtonAreaUnderCursor = ButtonAreaTraining;
+							ButtonAreaUnderCursor = ButtonArea::Training;
 							ButtonUnderCursor = i;
 							CursorOn = CursorOnButton;
 							return;
@@ -839,14 +839,14 @@ static void HandleMouseOn(const PixelPos screenPos)
 				}
 			} else if (Selected[0]->CurrentAction() == UnitAction::UpgradeTo) {
 				if (UI.UpgradingButton->Contains(screenPos)) {
-					ButtonAreaUnderCursor = ButtonAreaUpgrading;
+					ButtonAreaUnderCursor = ButtonArea::Upgrading;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
 				}
 			} else if (Selected[0]->CurrentAction() == UnitAction::Research) {
 				if (UI.ResearchingButton->Contains(screenPos)) {
-					ButtonAreaUnderCursor = ButtonAreaResearching;
+					ButtonAreaUnderCursor = ButtonArea::Researching;
 					ButtonUnderCursor = 0;
 					CursorOn = CursorOnButton;
 					return;
@@ -855,7 +855,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 		if (Selected.size() == 1) {
 			if (UI.SingleSelectedButton && UI.SingleSelectedButton->Contains(screenPos)) {
-				ButtonAreaUnderCursor = ButtonAreaSelected;
+				ButtonAreaUnderCursor = ButtonArea::Selected;
 				ButtonUnderCursor = 0;
 				CursorOn = CursorOnButton;
 				return;
@@ -866,7 +866,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			for (size_t i = std::min(Selected.size(), size); i != 0;) {
 				--i;
 				if (UI.SelectedButtons[i].Contains(screenPos)) {
-					ButtonAreaUnderCursor = ButtonAreaSelected;
+					ButtonAreaUnderCursor = ButtonArea::Selected;
 					ButtonUnderCursor = i;
 					CursorOn = CursorOnButton;
 					return;
@@ -1651,7 +1651,7 @@ static void UISelectStateButtonDown(unsigned)
 	if (CursorOn == CursorOnButton) {
 		// FIXME: other buttons?
 		// 74145: Spell-cast on unit portrait
-		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected
+		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonArea::Selected
 			&& CursorAction == ButtonCmd::SpellCast) {
 			if (GameObserve || GamePaused || GameEstablishing) {
 				return;
@@ -1669,7 +1669,7 @@ static void UISelectStateButtonDown(unsigned)
 			SendSpellCast(tilePos);
 			UnitUnderCursor = nullptr;
 		}
-		if (ButtonAreaUnderCursor == ButtonAreaButton) {
+		if (ButtonAreaUnderCursor == ButtonArea::Button) {
 			OldButtonUnderCursor = ButtonUnderCursor;
 			return;
 		}
@@ -1784,12 +1784,12 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 static void UIHandleButtonDown_OnButton(unsigned button)
 {
 	// clicked on info panel - selection shown
-	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
+	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonArea::Selected) {
 		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 		DoSelectionButtons(ButtonUnderCursor, button);
 	} else if ((MouseButtons & LeftButton)) {
 		//  clicked on menu button
-		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
+		if (ButtonAreaUnderCursor == ButtonArea::Menu) {
 			if ((ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu)
 				&& !GameMenuButtonClicked) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
@@ -1801,7 +1801,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				UiFindIdleWorker();
 			}
 			//  clicked on user buttons
-		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::User) {
 			for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
 				CUIUserButton &button = UI.UserButtons[i];
 
@@ -1811,14 +1811,14 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 			//  clicked on selected button
-		} else if (ButtonAreaUnderCursor == ButtonAreaSelected) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Selected) {
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 			}
 			//  clicked on training button
-		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Training) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitAction::Train) {
@@ -1830,7 +1830,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 			//  clicked on upgrading button
-		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Upgrading) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
@@ -1839,7 +1839,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 			//  clicked on researching button
-		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Researching) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
@@ -1848,7 +1848,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 			//  clicked on button panel
-		} else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Transporting) {
 			//  for transporter
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
@@ -1860,7 +1860,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 							continue;
 						}
 						int lastOccupiedButton = j + uins->Type->BoardSize - 1;
-						if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+						if (ButtonAreaUnderCursor == ButtonArea::Transporting) {
 							for (int sub_j = j; sub_j <= lastOccupiedButton; sub_j++) {
 								if (static_cast<size_t>(ButtonUnderCursor) == sub_j) {
 									Assert(uins->Boarded);
@@ -1876,7 +1876,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					}
 				}
 			}
-		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
+		} else if (ButtonAreaUnderCursor == ButtonArea::Button) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Index == PlayerMax - 1)) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				OldButtonUnderCursor = ButtonUnderCursor;
@@ -1884,7 +1884,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		}
 	} else if ((MouseButtons & MiddleButton)) {
 		//  clicked on info panel - single unit shown
-		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
+		if (ButtonAreaUnderCursor == ButtonArea::Selected && ButtonUnderCursor == 0 && Selected.size() == 1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
 				UI.SelectedViewport->Unit = nullptr;
@@ -2008,7 +2008,7 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (GameMenuButtonClicked) {
 			GameMenuButtonClicked = false;
-			if (ButtonAreaUnderCursor == ButtonAreaMenu) {
+			if (ButtonAreaUnderCursor == ButtonArea::Menu) {
 				if (ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu) {
 					// FIXME: Not if, in input mode.
 					if (!IsNetworkGame()) {
@@ -2034,7 +2034,7 @@ void UIHandleButtonUp(unsigned button)
 		//
 		if (GameDiplomacyButtonClicked) {
 			GameDiplomacyButtonClicked = false;
-			if (ButtonAreaUnderCursor == ButtonAreaMenu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
+			if (ButtonAreaUnderCursor == ButtonArea::Menu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
 				if (UI.NetworkDiplomacyButton.Callback) {
 					UI.NetworkDiplomacyButton.Callback->action("");
 				}
@@ -2050,7 +2050,7 @@ void UIHandleButtonUp(unsigned button)
 
 			if (button.Clicked) {
 				button.Clicked = false;
-				if (ButtonAreaUnderCursor == ButtonAreaUser) {
+				if (ButtonAreaUnderCursor == ButtonArea::User) {
 					if (button.Button.Callback) {
 						button.Button.Callback->action("");
 					}
@@ -2067,7 +2067,7 @@ void UIHandleButtonUp(unsigned button)
 		}
 		if (CursorOn == CursorOnButton) {
 			// FIXME: other buttons?
-			if (ButtonAreaUnderCursor == ButtonAreaButton && OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
+			if (ButtonAreaUnderCursor == ButtonArea::Button && OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				return;
 			}
@@ -2294,7 +2294,7 @@ void DrawPieMenu()
 	PopClipping();
 
 	int i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
+	if (i != -1 && KeyState != EKeyState::Input && buttons[i].Pos != -1) {
 		if (!Preference.NoStatusLineTooltips) {
 			UpdateStatusLineForButton(buttons[i]);
 		}

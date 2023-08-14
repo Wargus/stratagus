@@ -2452,7 +2452,7 @@ void MenuScreen::stop(int result, bool stopAll)
 			}
 		}
 		if (MenuStack.empty()) {
-			//InterfaceState = IfaceStateNormal;
+			//InterfaceState = IfaceState::Normal;
 			if (!Editor.Running) {
 				SetCallbacks(&GameCallbacks);
 			} else {

@@ -41,6 +41,7 @@
 
 #include "unitsound.h"
 #include "vec2i.h"
+#include <optional>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -112,15 +113,16 @@ public:
 };
 
 /// Button area under cursor
-enum _button_area_ {
-	ButtonAreaSelected,      /// Selected button
-	ButtonAreaTraining,      /// Training button
-	ButtonAreaUpgrading,     /// Upgrading button
-	ButtonAreaResearching,   /// Researching button
-	ButtonAreaTransporting,  /// Transporting button
-	ButtonAreaButton,        /// Button panel button
-	ButtonAreaMenu,          /// Menu button
-	ButtonAreaUser           /// User buttons
+enum class ButtonArea
+{
+	Selected,      /// Selected button
+	Training,      /// Training button
+	Upgrading,     /// Upgrading button
+	Researching,   /// Researching button
+	Transporting,  /// Transporting button
+	Button,        /// Button panel button
+	Menu,          /// Menu button
+	User           /// User buttons
 };
 
 /// Menu button under cursor
@@ -132,40 +134,43 @@ enum _menu_button_under_ {
 };
 
 /// current interface state
-enum _iface_state_ {
-	IfaceStateNormal,  /// Normal Game state
-	IfaceStateMenu     /// Menu active
+enum class IfaceState {
+	Normal,  /// Normal Game state
+	Menu     /// Menu active
 };
 
-/// current key state
-enum _key_state_ {
-	KeyStateCommand = 0,  /// keys -> commands
-	KeyStateInput         /// keys -> line editor
-};                        /// current keyboard state
+/// current keyboard state
+enum class EKeyState {
+	Command = 0,  /// keys -> commands
+	Input         /// keys -> line editor
+};
 
 /// Key modifier
-#define ModifierShift 1        /// any shift key pressed
-#define ModifierControl 2      /// any control key pressed
-#define ModifierAlt 4          /// any alt key pressed
-#define ModifierSuper 8        /// super key (reserved for WM)
-#define ModifierDoublePress 16 /// key double pressed
+constexpr unsigned int ModifierShift = 1;        /// any shift key pressed
+constexpr unsigned int ModifierControl = 2;      /// any control key pressed
+constexpr unsigned int ModifierAlt = 4;          /// any alt key pressed
+constexpr unsigned int ModifierSuper = 8;        /// super key (reserved for WM)
+constexpr unsigned int ModifierDoublePress = 16; /// key double pressed
 
-#define MouseDoubleShift 8   /// shift for double click button
-#define MouseDragShift   16  /// shift for drag button
-#define MouseHoldShift   24  /// shift for hold button
+constexpr unsigned int MouseDoubleShift = 8 ; /// shift for double click button
+constexpr unsigned int MouseDragShift = 16;   /// shift for drag button
+constexpr unsigned int MouseHoldShift = 24;   /// shift for hold button
 
 /// pressed mouse button flags
-#define NoButton 0      /// No button
-#define LeftButton 2    /// Left button on mouse
-#define MiddleButton 4  /// Middle button on mouse
-#define RightButton 8   /// Right button on mouse
+constexpr unsigned int NoButton = 0;      /// No button
+constexpr unsigned int LeftButton = 2;    /// Left button on mouse
+constexpr unsigned int MiddleButton = 4;  /// Middle button on mouse
+constexpr unsigned int RightButton = 8; /// Right button on mouse
 
-#define UpButton 16    /// Scroll up button on mouse
-#define DownButton 32  /// Scroll down button on mouse
+constexpr unsigned int UpButton = 16; /// Scroll up button on mouse
+constexpr unsigned int DownButton = 32; /// Scroll down button on mouse
 
-#define LeftAndMiddleButton  (LeftButton | MiddleButton)  /// Left + Middle button on mouse
-#define LeftAndRightButton   (LeftButton | RightButton)   /// Left + Right button on mouse
-#define MiddleAndRightButton (MiddleButton | RightButton) /// Middle + Right button on mouse
+constexpr unsigned int LeftAndMiddleButton =
+	(LeftButton | MiddleButton); /// Left + Middle button on mouse
+constexpr unsigned int LeftAndRightButton =
+	(LeftButton | RightButton); /// Left + Right button on mouse
+constexpr unsigned int MiddleAndRightButton =
+	(MiddleButton | RightButton); /// Middle + Right button on mouse
 
 /// Where is our cursor ?
 enum _cursor_on_ {
@@ -184,15 +189,15 @@ enum _cursor_on_ {
 };
 
 /// Are We Scrolling With the Keyboard ?
-#define ScrollNone 0        /// not scrolling
-#define ScrollUp 1          /// scroll up only
-#define ScrollDown 2        /// scroll down only
-#define ScrollLeft 4        /// scroll left only
-#define ScrollRight 8       /// scroll right only
-#define ScrollLeftUp 5      /// scroll left + up
-#define ScrollLeftDown 6    /// scroll left + down
-#define ScrollRightUp 9     /// scroll right + up
-#define ScrollRightDown 10  /// scroll right + down
+constexpr unsigned int ScrollNone = 0;        /// not scrolling
+constexpr unsigned int ScrollUp = 1;          /// scroll up only
+constexpr unsigned int ScrollDown = 2;        /// scroll down only
+constexpr unsigned int ScrollLeft = 4;        /// scroll left only
+constexpr unsigned int ScrollRight = 8;       /// scroll right only
+constexpr unsigned int ScrollLeftUp = ScrollUp | ScrollLeft;       /// scroll left + up
+constexpr unsigned int ScrollLeftDown = ScrollDown | ScrollLeft;   /// scroll left + down
+constexpr unsigned int ScrollRightUp = ScrollUp | ScrollRight;     /// scroll right + up
+constexpr unsigned int ScrollRightDown = ScrollRight | ScrollLeft; /// scroll right + down
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -221,17 +226,17 @@ extern int MouseButtons;
 /// current active modifiers
 extern int KeyModifiers;
 /// current interface state
-extern enum _iface_state_ InterfaceState;
+extern IfaceState InterfaceState;
 /// current scroll state of keyboard
 extern int KeyScrollState;
 /// current scroll state of mouse
 extern int MouseScrollState;
 /// current key state
-extern enum _key_state_ KeyState;
+extern EKeyState KeyState;
 /// shared pointer to unit under the cursor
 extern CUnit *UnitUnderCursor;
 /// button area under the cursor
-extern int ButtonAreaUnderCursor;
+extern std::optional<ButtonArea> ButtonAreaUnderCursor;
 /// button number under the cursor
 extern int ButtonUnderCursor;
 /// oldbutton number under the cursor
