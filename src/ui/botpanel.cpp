@@ -806,7 +806,7 @@ void CButtonPanel::Draw()
 	//
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 		if (ButtonAreaUnderCursor == ButtonArea::Button &&
-			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			ButtonUnderCursor == i && KeyState != EKeyState::Input) {
 				if (!Preference.NoStatusLineTooltips) {
 					UpdateStatusLineForButton(buttons[i]);
 				}

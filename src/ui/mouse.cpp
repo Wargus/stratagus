@@ -2294,7 +2294,7 @@ void DrawPieMenu()
 	PopClipping();
 
 	int i = GetPieUnderCursor();
-	if (i != -1 && KeyState != KeyStateInput && buttons[i].Pos != -1) {
+	if (i != -1 && KeyState != EKeyState::Input && buttons[i].Pos != -1) {
 		if (!Preference.NoStatusLineTooltips) {
 			UpdateStatusLineForButton(buttons[i]);
 		}

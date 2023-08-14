@@ -139,11 +139,11 @@ enum class IfaceState {
 	Menu     /// Menu active
 };
 
-/// current key state
-enum _key_state_ {
-	KeyStateCommand = 0,  /// keys -> commands
-	KeyStateInput         /// keys -> line editor
-};                        /// current keyboard state
+/// current keyboard state
+enum class EKeyState {
+	Command = 0,  /// keys -> commands
+	Input         /// keys -> line editor
+};
 
 /// Key modifier
 #define ModifierShift 1        /// any shift key pressed
@@ -229,7 +229,7 @@ extern int KeyScrollState;
 /// current scroll state of mouse
 extern int MouseScrollState;
 /// current key state
-extern enum _key_state_ KeyState;
+extern EKeyState KeyState;
 /// shared pointer to unit under the cursor
 extern CUnit *UnitUnderCursor;
 /// button area under the cursor
