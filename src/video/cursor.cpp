@@ -331,7 +331,7 @@ void DrawCursor()
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
-	} else if (CursorBuilding && CursorOn == CursorOnMap) {
+	} else if (CursorBuilding && CursorOn == ECursorOn::Map) {
 		// Selecting position for building
 		DrawBuildingCursor();
 	}
