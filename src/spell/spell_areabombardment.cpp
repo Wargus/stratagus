@@ -43,26 +43,26 @@
 /* virtual */ void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "fields")) {
+		if (value == "fields") {
 			this->Fields = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "shards")) {
+		} else if (value == "shards") {
 			this->Shards = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "damage")) {
+		} else if (value == "damage") {
 			this->Damage = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "start-offset-x")) {
+		} else if (value == "start-offset-x") {
 			this->StartOffsetX = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "start-offset-y")) {
+		} else if (value == "start-offset-y") {
 			this->StartOffsetY = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "missile")) {
+		} else if (value == "missile") {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = MissileTypeByIdent(value);
+			this->Missile = MissileTypeByIdent(value.data());
 			if (this->Missile == nullptr) {
-				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value);
+				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value.data());
 			}
 		} else {
-			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value);
+			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value.data());
 		}
 	}
 	// Now, checking value.

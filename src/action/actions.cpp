@@ -217,52 +217,52 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 {
 	const int args = lua_rawlen(l, -1);
-	const char *actiontype = LuaToString(l, -1, 1);
+	const std::string_view actiontype = LuaToString(l, -1, 1);
 
-	if (!strcmp(actiontype, "action-attack")) {
+	if (actiontype == "action-attack") {
 		*orderPtr = new COrder_Attack(false);
-	} else if (!strcmp(actiontype, "action-attack-ground")) {
+	} else if (actiontype == "action-attack-ground") {
 		*orderPtr = new COrder_Attack(true);
-	} else if (!strcmp(actiontype, "action-board")) {
+	} else if (actiontype == "action-board") {
 		*orderPtr = new COrder_Board;
-	} else if (!strcmp(actiontype, "action-build")) {
+	} else if (actiontype == "action-build") {
 		*orderPtr = new COrder_Build;
-	} else if (!strcmp(actiontype, "action-built")) {
+	} else if (actiontype == "action-built") {
 		*orderPtr = new COrder_Built;
-	} else if (!strcmp(actiontype, "action-defend")) {
+	} else if (actiontype == "action-defend") {
 		*orderPtr = new COrder_Defend;
-	} else if (!strcmp(actiontype, "action-die")) {
+	} else if (actiontype == "action-die") {
 		*orderPtr = new COrder_Die;
-	} else if (!strcmp(actiontype, "action-explore")) {
+	} else if (actiontype == "action-explore") {
 		*orderPtr = new COrder_Explore;
-	} else if (!strcmp(actiontype, "action-follow")) {
+	} else if (actiontype == "action-follow") {
 		*orderPtr = new COrder_Follow;
-	} else if (!strcmp(actiontype, "action-move")) {
+	} else if (actiontype == "action-move") {
 		*orderPtr = new COrder_Move;
-	} else if (!strcmp(actiontype, "action-patrol")) {
+	} else if (actiontype == "action-patrol") {
 		*orderPtr = new COrder_Patrol;
-	} else if (!strcmp(actiontype, "action-repair")) {
+	} else if (actiontype == "action-repair") {
 		*orderPtr = new COrder_Repair;
-	} else if (!strcmp(actiontype, "action-research")) {
+	} else if (actiontype == "action-research") {
 		*orderPtr = new COrder_Research;
-	} else if (!strcmp(actiontype, "action-resource")) {
+	} else if (actiontype == "action-resource") {
 		*orderPtr = new COrder_Resource(unit);
-	} else if (!strcmp(actiontype, "action-spell-cast")) {
+	} else if (actiontype == "action-spell-cast") {
 		*orderPtr = new COrder_SpellCast;
-	} else if (!strcmp(actiontype, "action-stand-ground")) {
+	} else if (actiontype == "action-stand-ground") {
 		*orderPtr = new COrder_Still(true);
-	} else if (!strcmp(actiontype, "action-still")) {
+	} else if (actiontype == "action-still") {
 		*orderPtr = new COrder_Still(false);
-	} else if (!strcmp(actiontype, "action-train")) {
+	} else if (actiontype == "action-train") {
 		*orderPtr = new COrder_Train;
-	} else if (!strcmp(actiontype, "action-transform-into")) {
+	} else if (actiontype == "action-transform-into") {
 		*orderPtr = new COrder_TransformInto;
-	} else if (!strcmp(actiontype, "action-upgrade-to")) {
+	} else if (actiontype == "action-upgrade-to") {
 		*orderPtr = new COrder_UpgradeTo;
-	} else if (!strcmp(actiontype, "action-unload")) {
+	} else if (actiontype == "action-unload") {
 		*orderPtr = new COrder_Unload;
 	} else {
-		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
+		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype.data());
 	}
 
 	COrder &order = **orderPtr;

@@ -94,25 +94,25 @@ void MissileType::Load(lua_State *l)
 	// Parse the arguments
 	std::string file;
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
+		const std::string_view value = LuaToString(l, -2);
 
-		if (!strcmp(value, "File")) {
+		if (value == "File") {
 			file = LuaToString(l, -1);
-		} else if (!strcmp(value, "Size")) {
+		} else if (value == "Size") {
 			CclGetPos(l, &this->size.x, &this->size.y);
-		} else if (!strcmp(value, "Frames")) {
+		} else if (value == "Frames") {
 			this->SpriteFrames = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Flip")) {
+		} else if (value == "Flip") {
 			this->Flip = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NumDirections")) {
+		} else if (value == "NumDirections") {
 			this->NumDirections = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Transparency")) {
+		} else if (value == "Transparency") {
 			this->Transparency = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "FiredSound")) {
+		} else if (value == "FiredSound") {
 			this->FiredSound.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ImpactSound")) {
+		} else if (value == "ImpactSound") {
 			this->ImpactSound.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ChangeVariable")) {
+		} else if (value == "ChangeVariable") {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
 				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1));
@@ -120,46 +120,46 @@ void MissileType::Load(lua_State *l)
 				return;
 			}
 			this->ChangeVariable = index;
-		} else if (!strcmp(value, "ChangeAmount")) {
+		} else if (value == "ChangeAmount") {
 			this->ChangeAmount = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ChangeMax")) {
+		} else if (value == "ChangeMax") {
 			this->ChangeMax = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Class")) {
-			const char *className = LuaToString(l, -1);
+		} else if (value == "Class") {
+			const std::string_view className = LuaToString(l, -1);
 			const auto it = MissileClassNames.find(className);
 			if (it != MissileClassNames.end()) {
 				this->Class = it->second;
 			} else {
-				LuaError(l, "Unsupported class: %s" _C_ className);
+				LuaError(l, "Unsupported class: %s" _C_ className.data());
 			}
-		} else if (!strcmp(value, "NumBounces")) {
+		} else if (value == "NumBounces") {
 			this->NumBounces = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ParabolCoefficient")) {
+		} else if (value == "ParabolCoefficient") {
 			this->ParabolCoefficient = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Delay")) {
+		} else if (value == "Delay") {
 			this->StartDelay = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Sleep")) {
+		} else if (value == "Sleep") {
 			this->Sleep = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Speed")) {
+		} else if (value == "Speed") {
 			this->Speed = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "BlizzardSpeed")) {
+		} else if (value == "BlizzardSpeed") {
 			this->BlizzardSpeed = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "TTL")) {
+		} else if (value == "TTL") {
 			this->TTL = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Damage")) {
+		} else if (value == "Damage") {
 			this->Damage = CclParseNumberDesc(l);
 			lua_pushnil(l);
-		} else if (!strcmp(value, "ReduceFactor")) {
+		} else if (value == "ReduceFactor") {
 			this->ReduceFactor = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "SmokePrecision")) {
+		} else if (value == "SmokePrecision") {
 			this->SmokePrecision = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "MissileStopFlags")) {
+		} else if (value == "MissileStopFlags") {
 			this->MissileStopFlags = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DrawLevel")) {
+		} else if (value == "DrawLevel") {
 			this->DrawLevel = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Range")) {
+		} else if (value == "Range") {
 			this->Range = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ImpactMissile")) {
+		} else if (value == "ImpactMissile") {
 			if (!lua_istable(l, -1)) {
 				MissileConfig *mc = new MissileConfig();
 				mc->Name = LuaToString(l, -1);
@@ -172,34 +172,34 @@ void MissileType::Load(lua_State *l)
 					this->Impact.push_back(mc);
 				}
 			}
-		} else if (!strcmp(value, "SmokeMissile")) {
+		} else if (value == "SmokeMissile") {
 			this->Smoke.Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "ImpactParticle")) {
+		} else if (value == "ImpactParticle") {
 			this->ImpactParticle = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "SmokeParticle")) {
+		} else if (value == "SmokeParticle") {
 			this->SmokeParticle = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "OnImpact")) {
+		} else if (value == "OnImpact") {
 			this->OnImpact = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "CanHitOwner")) {
+		} else if (value == "CanHitOwner") {
 			this->CanHitOwner = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "AlwaysFire")) {
+		} else if (value == "AlwaysFire") {
 			this->AlwaysFire = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Pierce")) {
+		} else if (value == "Pierce") {
 			this->Pierce = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PierceOnce")) {
+		} else if (value == "PierceOnce") {
 			this->PierceOnce = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "IgnoreWalls")) {
+		} else if (value == "IgnoreWalls") {
 			this->IgnoreWalls = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "KillFirstUnit")) {
+		} else if (value == "KillFirstUnit") {
 			this->KillFirstUnit = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "FriendlyFire")) {
+		} else if (value == "FriendlyFire") {
 			this->FriendlyFire = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SplashFactor")) {
+		} else if (value == "SplashFactor") {
 			this->SplashFactor = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "CorrectSphashDamage")) {
+		} else if (value == "CorrectSphashDamage") {
 			this->CorrectSphashDamage = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 
@@ -209,7 +209,6 @@ void MissileType::Load(lua_State *l)
 	if (!file.empty()) {
 		this->G = CGraphic::New(file, this->Width(), this->Height());
 	}
-
 }
 
 /**
@@ -254,23 +253,23 @@ static int CclMissile(lua_State *l)
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
+		const std::string_view value = LuaToString(l, j + 1);
 		++j;
 
-		if (!strcmp(value, "type")) {
+		if (value == "type") {
 			type = MissileTypeByIdent(LuaToString(l, j + 1));
-		} else if (!strcmp(value, "pos")) {
+		} else if (value == "pos") {
 			CclGetPos(l, &position.x, &position.y, j + 1);
-		} else if (!strcmp(value, "origin-pos")) {
+		} else if (value == "origin-pos") {
 			CclGetPos(l, &source.x, &source.y, j + 1);
-		} else if (!strcmp(value, "goal")) {
+		} else if (value == "goal") {
 			CclGetPos(l, &destination.x, &destination.y, j + 1);
-		} else if (!strcmp(value, "local")) {
+		} else if (value == "local") {
 			Assert(type);
 			missile = MakeLocalMissile(*type, position, destination);
 			missile->Local = 1;
 			--j;
-		} else if (!strcmp(value, "global")) {
+		} else if (value == "global") {
 			Assert(type);
 			missile = MakeMissile(*type, position, destination);
 			missile->position = position;
@@ -278,42 +277,42 @@ static int CclMissile(lua_State *l)
 			missile->destination = destination;
 			missile->Local = 0;
 			--j;
-		} else if (!strcmp(value, "frame")) {
+		} else if (value == "frame") {
 			Assert(missile);
 			missile->SpriteFrame = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "state")) {
+		} else if (value == "state") {
 			Assert(missile);
 			missile->State = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "anim-wait")) {
+		} else if (value == "anim-wait") {
 			Assert(missile);
 			missile->AnimWait = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "wait")) {
+		} else if (value == "wait") {
 			Assert(missile);
 			missile->Wait = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "delay")) {
+		} else if (value == "delay") {
 			Assert(missile);
 			missile->Delay = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "source")) {
+		} else if (value == "source") {
 			Assert(missile);
 			lua_pushvalue(l, j + 1);
 			missile->SourceUnit = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "target")) {
+		} else if (value == "target") {
 			Assert(missile);
 			lua_pushvalue(l, j + 1);
 			missile->TargetUnit = CclGetUnitFromRef(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "damage")) {
+		} else if (value == "damage") {
 			Assert(missile);
 			missile->Damage = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "ttl")) {
+		} else if (value == "ttl") {
 			Assert(missile);
 			missile->TTL = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "hidden")) {
+		} else if (value == "hidden") {
 			Assert(missile);
 			missile->Hidden = 1;
 			--j;
-		} else if (!strcmp(value, "step")) {
+		} else if (value == "step") {
 			Assert(missile);
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -321,7 +320,7 @@ static int CclMissile(lua_State *l)
 			missile->CurrentStep = LuaToNumber(l, j + 1, 1);
 			missile->TotalStep = LuaToNumber(l, j + 1, 2);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 
@@ -356,12 +355,12 @@ static int CclDefineBurningBuilding(lua_State *l)
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
-			const char *value = LuaToString(l, j + 1, k + 1);
+			const std::string_view value = LuaToString(l, j + 1, k + 1);
 			++k;
 
-			if (!strcmp(value, "percent")) {
+			if (value == "percent") {
 				ptr->Percent = LuaToNumber(l, j + 1, k + 1);
-			} else if (!strcmp(value, "missile")) {
+			} else if (value == "missile") {
 				ptr->Missile = MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
 		}

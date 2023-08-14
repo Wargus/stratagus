@@ -79,13 +79,13 @@ int TriggerGetPlayer(lua_State *l)
 		}
 		return ret;
 	}
-	const char *player = LuaToString(l, -1);
-	if (!strcmp(player, "any")) {
+	const std::string_view player = LuaToString(l, -1);
+	if (player == "any") {
 		return -1;
-	} else if (!strcmp(player, "this")) {
+	} else if (player == "this") {
 		return ThisPlayer->Index;
 	}
-	LuaError(l, "bad player: %s" _C_ player);
+	LuaError(l, "bad player: %s" _C_ player.data());
 	return 0;
 }
 
@@ -98,13 +98,13 @@ int TriggerGetPlayer(lua_State *l)
 */
 const CUnitType *TriggerGetUnitType(lua_State *l)
 {
-	const char *unit = LuaToString(l, -1);
+	const std::string_view unit = LuaToString(l, -1);
 
-	if (!strcmp(unit, "any")) {
+	if (unit == "any") {
 		return ANY_UNIT;
-	} else if (!strcmp(unit, "units")) {
+	} else if (unit == "units") {
 		return ALL_FOODUNITS;
-	} else if (!strcmp(unit, "buildings")) {
+	} else if (unit == "buildings") {
 		return ALL_BUILDINGS;
 	}
 	return CclGetUnitType(l);

@@ -2215,18 +2215,18 @@ static int CclSetup(lua_State *l) {
     }
 
     for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
-        const char *value = LuaToString(l, -2);
-        if (!strcmp(value, "AddUser")) {
+        const std::string_view value = LuaToString(l, -2);
+        if (value == "AddUser") {
             if (_ctx.AddUser) {
                 delete _ctx.AddUser;
             }
             _ctx.AddUser = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "RemoveUser")) {
+        } else if (value == "RemoveUser") {
             if (_ctx.RemoveUser) {
                 delete _ctx.RemoveUser;
             }
             _ctx.RemoveUser = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "SetFriends")) {
+        } else if (value == "SetFriends") {
             if (_ctx.SetFriends) {
                 delete _ctx.SetFriends;
             }
@@ -2234,12 +2234,12 @@ static int CclSetup(lua_State *l) {
             if (_ctx.isConnected()) {
                 _ctx.setFriendslist(_ctx.getFriends());
             }
-        } else if (!strcmp(value, "SetGames")) {
+        } else if (value == "SetGames") {
             if (_ctx.SetGames) {
                 delete _ctx.SetGames;
             }
             _ctx.SetGames = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "SetChannels")) {
+        } else if (value == "SetChannels") {
             if (_ctx.SetChannels) {
                 delete _ctx.SetChannels;
             }
@@ -2247,7 +2247,7 @@ static int CclSetup(lua_State *l) {
                 _ctx.setChannels(_ctx.getChannels());
             }
             _ctx.SetChannels = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "SetActiveChannel")) {
+        } else if (value == "SetActiveChannel") {
             if (_ctx.SetActiveChannel) {
                 delete _ctx.SetActiveChannel;
             }
@@ -2255,28 +2255,28 @@ static int CclSetup(lua_State *l) {
             if (_ctx.isConnected()) {
                 _ctx.setCurrentChannel(_ctx.getCurrentChannel());
             }
-        } else if (!strcmp(value, "ShowChat")) {
+        } else if (value == "ShowChat") {
             if (_ctx.ShowChat) {
                 delete _ctx.ShowChat;
             }
             _ctx.ShowChat = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "ShowInfo")) {
+        } else if (value == "ShowInfo") {
             if (_ctx.ShowInfo) {
                 delete _ctx.ShowInfo;
             }
             _ctx.ShowInfo = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "ShowError")) {
+        } else if (value == "ShowError") {
             if (_ctx.ShowError) {
                 delete _ctx.ShowError;
             }
             _ctx.ShowError = new LuaCallback(l, -1);
-        } else if (!strcmp(value, "ShowUserInfo")) {
+        } else if (value == "ShowUserInfo") {
             if (_ctx.ShowUserInfo) {
                 delete _ctx.ShowUserInfo;
             }
             _ctx.ShowUserInfo = new LuaCallback(l, -1);
         } else {
-            LuaError(l, "Unsupported callback: %s" _C_ value);
+            LuaError(l, "Unsupported callback: %s" _C_ value.data());
         }
     }
     return 0;

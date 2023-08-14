@@ -66,10 +66,10 @@ static int CclStratagusMap(lua_State *l)
 {
 	int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
+		const std::string_view value = LuaToString(l, j + 1);
 		++j;
 
-		if (!strcmp(value, "version")) {
+		if (value == "version") {
 			char buf[32];
 
 			const char *version = LuaToString(l, j + 1);
@@ -77,20 +77,20 @@ static int CclStratagusMap(lua_State *l)
 			if (strcmp(buf, version)) {
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
-		} else if (!strcmp(value, "uid")) {
+		} else if (value == "uid") {
 			Map.Info.MapUID = LuaToNumber(l, j + 1);
-		} else if (!strcmp(value, "description")) {
+		} else if (value == "description") {
 			Map.Info.Description = LuaToString(l, j + 1);
-		} else if (!strcmp(value, "the-map")) {
+		} else if (value == "the-map") {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *value = LuaToString(l, j + 1, k + 1);
+				const std::string_view value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				if (!strcmp(value, "size")) {
+				if (value == "size") {
 					lua_rawgeti(l, j + 1, k + 1);
 					CclGetPos(l, &Map.Info.MapWidth, &Map.Info.MapHeight);
 					lua_pop(l, 1);
@@ -98,15 +98,15 @@ static int CclStratagusMap(lua_State *l)
 					delete[] Map.Fields;
 					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 					// FIXME: this should be CreateMap or InitMap?
-				} else if (!strcmp(value, "fog-of-war")) {
+				} else if (value == "fog-of-war") {
 					Map.NoFogOfWar = false;
 					--k;
-				} else if (!strcmp(value, "no-fog-of-war")) {
+				} else if (value == "no-fog-of-war") {
 					Map.NoFogOfWar = true;
 					--k;
-				} else if (!strcmp(value, "filename")) {
+				} else if (value == "filename") {
 					Map.Info.Filename = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "map-fields")) {
+				} else if (value == "map-fields") {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -125,11 +125,11 @@ static int CclStratagusMap(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
+					LuaError(l, "Unsupported tag: %s" _C_ value.data());
 				}
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 	return 0;
@@ -145,12 +145,12 @@ static int CclRevealMap(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	MapRevealModes newMode;
-	const char *revealMode = LuaToString(l, 1);
-	if (!strcmp(revealMode, "hidden")) {
+	const std::string_view revealMode = LuaToString(l, 1);
+	if (revealMode == "hidden") {
 		newMode = MapRevealModes::cHidden;
-	} else 	if (!strcmp(revealMode, "known")) {
+	} else 	if (revealMode == "known") {
 		newMode = MapRevealModes::cKnown;
-	} else if (!strcmp(revealMode, "explored")) {
+	} else if (revealMode == "explored") {
 		newMode = MapRevealModes::cExplored;
 	} else {
 		PrintFunction();
@@ -342,14 +342,14 @@ static int CclSetFieldOfViewType(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	FieldOfViewTypes new_type;
-	const char *type_name = LuaToString(l, 1);
-	if (!strcmp(type_name, "shadow-casting")) {
+	const std::string_view type_name = LuaToString(l, 1);
+	if (type_name == "shadow-casting") {
 		new_type = FieldOfViewTypes::cShadowCasting;
 		/// Tiled types of FOW don't work with shadow casting
 		if (FogOfWar->GetType() != FogOfWarTypes::cEnhanced) {
 			FogOfWar->SetType(FogOfWarTypes::cEnhanced);
 		}
-	} else if (!strcmp(type_name, "simple-radial")) {
+	} else if (type_name == "simple-radial") {
 		new_type = FieldOfViewTypes::cSimpleRadial;
 	} else {
 		PrintFunction();
@@ -390,12 +390,12 @@ static int CclSetOpaqueFor(lua_State *l)
 		return 1;
 	}
 	for (int arg = 0; arg < args; ++arg) {
-		const char *flag_name = LuaToString(l, arg + 1);
-		if (!strcmp(flag_name, "wall")) {
+		const std::string_view flag_name = LuaToString(l, arg + 1);
+		if (flag_name == "wall") {
 			new_flag |= MapFieldWall;
-		} else if (!strcmp(flag_name, "rock")) {
+		} else if (flag_name == "rock") {
 			new_flag |= MapFieldRocks;
-		} else if (!strcmp(flag_name, "forest")) {
+		} else if (flag_name == "forest") {
 			new_flag |= MapFieldForest;
 		} else {
 			PrintFunction();
@@ -422,12 +422,12 @@ static int CclGetIsOpaqueFor(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	uint16_t flagToCheck = 0;
-	const char *flag_name = LuaToString(l, 1);
-	if (!strcmp(flag_name, "wall")) {
+	const std::string_view flag_name = LuaToString(l, 1);
+	if (flag_name == "wall") {
 		flagToCheck = MapFieldWall;
-	} else if (!strcmp(flag_name, "rock")) {
+	} else if (flag_name == "rock") {
 		flagToCheck = MapFieldRocks;
-	} else if (!strcmp(flag_name, "forest")) {
+	} else if (flag_name == "forest") {
 		flagToCheck = MapFieldForest;
 	} else {
 		PrintFunction();
@@ -447,12 +447,12 @@ static int CclRemoveOpaqueFor(lua_State *l)
 		return 1;
 	}
 	for (int arg = 0; arg < args; ++arg) {
-		const char *flag_name = LuaToString(l, arg + 1);
-		if (!strcmp(flag_name, "wall")) {
+		const std::string_view flag_name = LuaToString(l, arg + 1);
+		if (flag_name == "wall") {
 			new_flag |= MapFieldWall;
-		} else if (!strcmp(flag_name, "rock")) {
+		} else if (flag_name == "rock") {
 			new_flag |= MapFieldRocks;
-		} else if (!strcmp(flag_name, "forest")) {
+		} else if (flag_name == "forest") {
 			new_flag |= MapFieldForest;
 		} else {
 			PrintFunction();
@@ -823,21 +823,21 @@ static int CclDefinePlayerTypes(lua_State *l)
 			numplayers = i;
 			break;
 		}
-		const char *type = LuaToString(l, i + 1);
-		if (!strcmp(type, "neutral")) {
+		const std::string_view type = LuaToString(l, i + 1);
+		if (type == "neutral") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerNeutral;
-		} else if (!strcmp(type, "nobody")) {
+		} else if (type == "nobody") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerNobody;
-		} else if (!strcmp(type, "computer")) {
+		} else if (type == "computer") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerComputer;
-		} else if (!strcmp(type, "person")) {
+		} else if (type == "person") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerPerson;
-		} else if (!strcmp(type, "rescue-passive")) {
+		} else if (type == "rescue-passive") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerRescuePassive;
-		} else if (!strcmp(type, "rescue-active")) {
+		} else if (type == "rescue-active") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerRescueActive;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ type);
+			LuaError(l, "Unsupported tag: %s" _C_ type.data());
 		}
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {
@@ -983,24 +983,24 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	}
 
 	tile_flags flag = 0;
-	const char *flag_name = LuaToString(l, 3);
-	if (!strcmp(flag_name, "opaque")) {
+	const std::string_view flag_name = LuaToString(l, 3);
+	if (flag_name == "opaque") {
 		flag = MapFieldOpaque;
-	} else if (!strcmp(flag_name, "water")) {
+	} else if (flag_name == "water") {
 		flag = MapFieldWaterAllowed;
-	} else if (!strcmp(flag_name, "land")) {
+	} else if (flag_name == "land") {
 		flag = MapFieldLandAllowed;
-	} else if (!strcmp(flag_name, "coast")) {
+	} else if (flag_name == "coast") {
 		flag = MapFieldCoastAllowed;
-	} else if (!strcmp(flag_name, "no-building")) {
+	} else if (flag_name == "no-building") {
 		flag = MapFieldNoBuilding;
-	} else if (!strcmp(flag_name, "unpassable")) {
+	} else if (flag_name == "unpassable") {
 		flag = MapFieldUnpassable;
-	} else if (!strcmp(flag_name, "wall")) {
+	} else if (flag_name == "wall") {
 		flag = MapFieldWall;
-	} else if (!strcmp(flag_name, "rock")) {
+	} else if (flag_name == "rock") {
 		flag = MapFieldRocks;
-	} else if (!strcmp(flag_name, "forest")) {
+	} else if (flag_name == "forest") {
 		flag = MapFieldForest;
 	}
 

@@ -1507,9 +1507,9 @@ static int CclSavedGameInfo(lua_State *l)
 	}
 
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
+		const std::string_view value = LuaToString(l, -2);
 
-		if (!strcmp(value, "SaveFile")) {
+		if (value == "SaveFile") {
 			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
 				LuaError(l, "SaveFile too long");
 			}
@@ -1517,12 +1517,12 @@ static int CclSavedGameInfo(lua_State *l)
 			if (LuaLoadFile(fs::path(StratagusLibPath) / filename) == -1) {
 				DebugPrint("Load failed: %s\n" _C_ value);
 			}
-		} else if (!strcmp(value, "SyncHash")) {
+		} else if (value == "SyncHash") {
 			SyncHash = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "SyncRandSeed")) {
+		} else if (value == "SyncRandSeed") {
 			SyncRandSeed = LuaToNumber(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 	return 0;

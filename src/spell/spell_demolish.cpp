@@ -42,14 +42,14 @@
 /* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "range")) {
+		if (value == "range") {
 			this->Range = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "damage")) {
+		} else if (value == "damage") {
 			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported demolish tag: %s" _C_ value);
+			LuaError(l, "Unsupported demolish tag: %s" _C_ value.data());
 		}
 	}
 }

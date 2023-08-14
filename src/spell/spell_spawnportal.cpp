@@ -40,22 +40,22 @@
 /* virtual */ void Spell_SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "portal-type")) {
+		if (value == "portal-type") {
 			value = LuaToString(l, -1, j + 1);
-			this->PortalType = UnitTypeByIdent(value);
+			this->PortalType = UnitTypeByIdent(value.data());
 			if (!this->PortalType) {
 				this->PortalType = 0;
-				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value);
+				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value.data());
 			}
-		} else if (!strcmp(value, "time-to-live")) {
+		} else if (value == "time-to-live") {
 			this->TTL = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "current-player")) {
+		} else if (value == "current-player") {
 			this->CurrentPlayer = true;
 			--j;
 		} else {
-			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value);
+			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value.data());
 		}
 	}
 	// Now, checking value.

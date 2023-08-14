@@ -493,21 +493,20 @@ static void ParseBinOp(lua_State *l, BinOp *binop)
 **
 **  @todo better check for error (restrict param).
 */
-static CUnit **Str2UnitRef(lua_State *l, const char *s)
+static CUnit **Str2UnitRef(lua_State *l, std::string_view s)
 {
 	CUnit **res; // Result.
 
 	Assert(l);
-	Assert(s);
 	res = nullptr;
-	if (!strcmp(s, "Attacker")) {
+	if (s == "Attacker") {
 		res = &TriggerData.Attacker;
-	} else if (!strcmp(s, "Defender")) {
+	} else if (s == "Defender") {
 		res = &TriggerData.Defender;
-	} else if (!strcmp(s, "Active")) {
+	} else if (s == "Active") {
 		res = &TriggerData.Active;
 	} else {
-		LuaError(l, "Invalid unit reference '%s'\n" _C_ s);
+		LuaError(l, "Invalid unit reference '%s'\n" _C_ s.data());
 	}
 	Assert(res); // Must check for error.
 	return res;
@@ -523,15 +522,15 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 **
 **  @todo better check for error (restrict param).
 */
-static CUnitType **Str2TypeRef(lua_State *l, const char *s)
+static CUnitType **Str2TypeRef(lua_State *l, std::string_view s)
 {
 	CUnitType **res = nullptr; // Result.
 
 	Assert(l);
-	if (!strcmp(s, "Type")) {
+	if (s == "Type") {
 		res = &TriggerData.Type;
 	} else {
-		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
+		LuaError(l, "Invalid type reference '%s'\n" _C_ s.data());
 	}
 	Assert(res); // Must check for error.
 	return res;
@@ -670,122 +669,122 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			LuaError(l, "Bad number of args in parse Number table\n");
 		}
 		lua_rawgeti(l, -1, 1); // key
-		const char *key = LuaToString(l, -1);
+		std::string_view key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
-		if (!strcmp(key, "Add")) {
+		if (key == "Add") {
 			res->e = ENumber_Add;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Sub")) {
+		} else if (key == "Sub") {
 			res->e = ENumber_Sub;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Mul")) {
+		} else if (key == "Mul") {
 			res->e = ENumber_Mul;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Div")) {
+		} else if (key == "Div") {
 			res->e = ENumber_Div;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Min")) {
+		} else if (key == "Min") {
 			res->e = ENumber_Min;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Max")) {
+		} else if (key == "Max") {
 			res->e = ENumber_Max;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Rand")) {
+		} else if (key == "Rand") {
 			res->e = ENumber_Rand;
 			res->D.N = CclParseNumberDesc(l);
-		} else if (!strcmp(key, "GreaterThan")) {
+		} else if (key == "GreaterThan") {
 			res->e = ENumber_Gt;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "GreaterThanOrEq")) {
+		} else if (key == "GreaterThanOrEq") {
 			res->e = ENumber_GtEq;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "LessThan")) {
+		} else if (key == "LessThan") {
 			res->e = ENumber_Lt;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "LessThanOrEq")) {
+		} else if (key == "LessThanOrEq") {
 			res->e = ENumber_LtEq;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "Equal")) {
+		} else if (key == "Equal") {
 			res->e = ENumber_Eq;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "NotEqual")) {
+		} else if (key == "NotEqual") {
 			res->e = ENumber_NEq;
 			ParseBinOp(l, &res->D.binOp);
-		} else if (!strcmp(key, "UnitVar")) {
+		} else if (key == "UnitVar") {
 			Assert(lua_istable(l, -1));
 
 			res->e = ENumber_UnitStat;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
-				if (!strcmp(key, "Unit")) {
+				if (key == "Unit") {
 					res->D.UnitStat.Unit = CclParseUnitDesc(l);
 					lua_pushnil(l);
-				} else if (!strcmp(key, "Variable")) {
+				} else if (key == "Variable") {
 					const char *const name = LuaToString(l, -1);
 					res->D.UnitStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.UnitStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
-				} else if (!strcmp(key, "Component")) {
+				} else if (key == "Component") {
 					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
-				} else if (!strcmp(key, "Loc")) {
+				} else if (key == "Loc") {
 					res->D.UnitStat.Loc = LuaToNumber(l, -1);
 					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
 						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
 					}
 				} else {
-					LuaError(l, "Bad param %s for Unit" _C_ key);
+					LuaError(l, "Bad param %s for Unit" _C_ key.data());
 				}
 			}
 			lua_pop(l, 1); // pop the table.
-		} else if (!strcmp(key, "TypeVar")) {
+		} else if (key == "TypeVar") {
 			Assert(lua_istable(l, -1));
 
 			res->e = ENumber_TypeStat;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
-				if (!strcmp(key, "Type")) {
+				if (key == "Type") {
 					res->D.TypeStat.Type = CclParseTypeDesc(l);
 					lua_pushnil(l);
-				} else if (!strcmp(key, "Component")) {
+				} else if (key == "Component") {
 					res->D.TypeStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
-				} else if (!strcmp(key, "Variable")) {
+				} else if (key == "Variable") {
 					const char *const name = LuaToString(l, -1);
 					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.TypeStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
 					}
-				} else if (!strcmp(key, "Loc")) {
+				} else if (key == "Loc") {
 					res->D.TypeStat.Loc = LuaToNumber(l, -1);
 					if (res->D.TypeStat.Loc < 0 || 2 < res->D.TypeStat.Loc) {
 						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
 					}
 				} else {
-					LuaError(l, "Bad param %s for Unit" _C_ key);
+					LuaError(l, "Bad param %s for Unit" _C_ key.data());
 				}
 			}
 			lua_pop(l, 1); // pop the table.
-		} else if (!strcmp(key, "VideoTextLength")) {
+		} else if (key == "VideoTextLength") {
 			Assert(lua_istable(l, -1));
 			res->e = ENumber_VideoTextLength;
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
-				if (!strcmp(key, "Text")) {
+				if (key == "Text") {
 					res->D.VideoTextLength.String = CclParseStringDesc(l);
 					lua_pushnil(l);
-				} else if (!strcmp(key, "Font")) {
+				} else if (key == "Font") {
 					res->D.VideoTextLength.Font = CFont::Get(LuaToString(l, -1));
 					if (!res->D.VideoTextLength.Font) {
 						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
 					}
 				} else {
-					LuaError(l, "Bad param %s for VideoTextLength" _C_ key);
+					LuaError(l, "Bad param %s for VideoTextLength" _C_ key.data());
 				}
 			}
 			lua_pop(l, 1); // pop the table.
-		} else if (!strcmp(key, "StringFind")) {
+		} else if (key == "StringFind") {
 			Assert(lua_istable(l, -1));
 			res->e = ENumber_StringFind;
 			if (lua_rawlen(l, -1) != 2) {
@@ -799,7 +798,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			lua_pop(l, 1); // pop the char
 
 			lua_pop(l, 1); // pop the table.
-		} else if (!strcmp(key, "NumIf")) {
+		} else if (key == "NumIf") {
 			res->e = ENumber_NumIf;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in NumIf\n");
@@ -813,7 +812,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				res->D.NumIf.BFalse = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "PlayerData")) {
+		} else if (key == "PlayerData") {
 			res->e = ENumber_PlayerData;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in PlayerData\n");
@@ -829,7 +828,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'" _C_ key);
+			LuaError(l, "unknow condition '%s'" _C_ key.data());
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseNumber");
@@ -861,10 +860,10 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			LuaError(l, "Bad number of args in parse String table\n");
 		}
 		lua_rawgeti(l, -1, 1); // key
-		const char *key = LuaToString(l, -1);
+		const std::string_view key = LuaToString(l, -1);
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
-		if (!strcmp(key, "Concat")) {
+		if (key == "Concat") {
 			int i; // iterator.
 
 			res->e = EString_Concat;
@@ -878,16 +877,16 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				res->D.Concat.Strings[i] = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "String")) {
+		} else if (key == "String") {
 			res->e = EString_String;
 			res->D.Number = CclParseNumberDesc(l);
-		} else if (!strcmp(key, "InverseVideo")) {
+		} else if (key == "InverseVideo") {
 			res->e = EString_InverseVideo;
 			res->D.String = CclParseStringDesc(l);
-		} else if (!strcmp(key, "UnitName")) {
+		} else if (key == "UnitName") {
 			res->e = EString_UnitName;
 			res->D.Unit = CclParseUnitDesc(l);
-		} else if (!strcmp(key, "If")) {
+		} else if (key == "If") {
 			res->e = EString_If;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in If\n");
@@ -901,7 +900,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				res->D.If.BFalse = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "SubString")) {
+		} else if (key == "SubString") {
 			res->e = EString_SubString;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in SubString\n");
@@ -915,7 +914,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				res->D.SubString.End = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "Line")) {
+		} else if (key == "Line") {
 			res->e = EString_Line;
 			if (lua_rawlen(l, -1) < 2 || lua_rawlen(l, -1) > 4) {
 				LuaError(l, "Bad number of args in Line\n");
@@ -938,12 +937,12 @@ StringDesc *CclParseStringDesc(lua_State *l)
 				lua_pop(l, 1); // font name.
 			}
 			lua_pop(l, 1); // table.
-		} else if (!strcmp(key, "PlayerName")) {
+		} else if (key == "PlayerName") {
 			res->e = EString_PlayerName;
 			res->D.PlayerName = CclParseNumberDesc(l);
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'" _C_ key);
+			LuaError(l, "unknow condition '%s'" _C_ key.data());
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseString");
@@ -1396,17 +1395,16 @@ static int AliasTypeVar(lua_State *l, const char *s)
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
 		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
-		const char *key;
 
-		key = LuaToString(l, 3);
+		const std::string_view key = LuaToString(l, 3);
 		for (i = 0; sloc[i] != nullptr; i++) {
-			if (!strcmp(key, sloc[i])) {
+			if (key == sloc[i]) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'" _C_ key);
+			LuaError(l, "Bad loc :'%s'" _C_ key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);
@@ -1458,17 +1456,16 @@ static int AliasUnitVar(lua_State *l, const char *s)
 		//           and Initial is for unit->Type->Var... (no upgrade modification)
 		const char *sloc[] = {"Unit", "Initial", "Type", nullptr};
 		int i;
-		const char *key;
 
-		key = LuaToString(l, 3);
+		std::string_view key = LuaToString(l, 3);
 		for (i = 0; sloc[i] != nullptr; i++) {
-			if (!strcmp(key, sloc[i])) {
+			if (key == sloc[i]) {
 				lua_pushnumber(l, i);
 				break ;
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'" _C_ key);
+			LuaError(l, "Bad loc :'%s'" _C_ key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);

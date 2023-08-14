@@ -71,35 +71,35 @@ static SpellActionType *CclSpellAction(lua_State *l)
 	}
 	const int args = lua_rawlen(l, -1);
 
-	const char *value = LuaToString(l, -1, 1);
+	const std::string_view value = LuaToString(l, -1, 1);
 
 	SpellActionType *spellaction = nullptr;
-	if (!strcmp(value, "adjust-variable")) {
+	if (value == "adjust-variable") {
 		spellaction = new Spell_AdjustVariable;
-	} else if (!strcmp(value, "adjust-vitals")) {
+	} else if (value == "adjust-vitals") {
 		spellaction = new Spell_AdjustVital;
-	} else if (!strcmp(value, "area-adjust-vitals")) {
+	} else if (value == "area-adjust-vitals") {
 		spellaction = new Spell_AreaAdjustVital;
-	} else if (!strcmp(value, "area-bombardment")) {
+	} else if (value == "area-bombardment") {
 		spellaction = new Spell_AreaBombardment;
-	} else if (!strcmp(value, "capture")) {
+	} else if (value == "capture") {
 		spellaction = new Spell_Capture;
-	} else if (!strcmp(value, "demolish")) {
+	} else if (value == "demolish") {
 		spellaction = new Spell_Demolish;
-	} else if (!strcmp(value, "lua-callback")) {
+	} else if (value == "lua-callback") {
 		spellaction = new Spell_LuaCallback;
-	} else if (!strcmp(value, "polymorph")) {
+	} else if (value == "polymorph") {
 		spellaction = new Spell_Polymorph;
-	} else if (!strcmp(value, "spawn-missile")) {
+	} else if (value == "spawn-missile") {
 		spellaction = new Spell_SpawnMissile;
-	} else if (!strcmp(value, "spawn-portal")) {
+	} else if (value == "spawn-portal") {
 		spellaction = new Spell_SpawnPortal;
-	} else if (!strcmp(value, "summon")) {
+	} else if (value == "summon") {
 		spellaction = new Spell_Summon;
-	} else if (!strcmp(value, "teleport")) {
+	} else if (value == "teleport") {
 		spellaction = new Spell_Teleport;
 	} else {
-		LuaError(l, "Unsupported action type: %s" _C_ value);
+		LuaError(l, "Unsupported action type: %s" _C_ value.data());
 	}
 	spellaction->Parse(l, 1, args);
 	return spellaction;
@@ -175,59 +175,59 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "alliance")) {
+		if (value == "alliance") {
 			condition->Alliance = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "opponent")) {
+		} else if (value == "opponent") {
 			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "self")) {
+		} else if (value == "self") {
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "callback")) {
+		} else if (value == "callback") {
 			lua_rawgeti(l, -1, j + 1);
 			condition->CheckFunc = new LuaCallback(l, -1);
 			lua_pop(l, 1);
 		} else {
-			int index = UnitTypeVar.BoolFlagNameLookup[value];
+			int index = UnitTypeVar.BoolFlagNameLookup[value.data()];
 			if (index != -1) {
 				condition->BoolFlag[index] = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 				continue;
 			}
-			index = UnitTypeVar.VariableNameLookup[value];
+			index = UnitTypeVar.VariableNameLookup[value.data()];
 			if (index != -1) { // Valid index.
 				lua_rawgeti(l, -1, j + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "Table expected in variable in condition");
 				}
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					const char *const key = LuaToString(l, -2);
+					const std::string_view key = LuaToString(l, -2);
 					condition->Variable[index].Check = true;
-					if (!strcmp(key, "Enable")) {
+					if (key == "Enable") {
 						condition->Variable[index].Enable = Ccl2Condition(l, LuaToString(l, -1));
-					} else if (!strcmp(key, "ExactValue")) {
+					} else if (key == "ExactValue") {
 						condition->Variable[index].ExactValue = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "ExceptValue")) {
+					} else if (key == "ExceptValue") {
 						condition->Variable[index].ExceptValue = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "MinValue")) {
+					} else if (key == "MinValue") {
 						condition->Variable[index].MinValue = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "MaxValue")) {
+					} else if (key == "MaxValue") {
 						condition->Variable[index].MaxValue = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "MinMax")) {
+					} else if (key == "MinMax") {
 						condition->Variable[index].MinMax = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "MinValuePercent")) {
+					} else if (key == "MinValuePercent") {
 						condition->Variable[index].MinValuePercent = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "MaxValuePercent")) {
+					} else if (key == "MaxValuePercent") {
 						condition->Variable[index].MaxValuePercent = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "ConditionApplyOnCaster")) {
+					} else if (key == "ConditionApplyOnCaster") {
 						condition->Variable[index].ConditionApplyOnCaster = LuaToBoolean(l, -1);
 					} else { // Error
-						LuaError(l, "%s invalid for Variable in condition" _C_ key);
+						LuaError(l, "%s invalid for Variable in condition" _C_ key.data());
 					}
 				}
 				lua_pop(l, 1); // lua_rawgeti()
 				continue;
 			}
-			LuaError(l, "Unsuported condition tag: %s" _C_ value);
+			LuaError(l, "Unsuported condition tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -247,23 +247,23 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "range")) {
+		if (value == "range") {
 			autocast->Range = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "min-range")) {
+		} else if (value == "min-range") {
 			autocast->MinRange = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "position-autocast")) {
+		} else if (value == "position-autocast") {
 			lua_rawgeti(l, -1, j + 1);
 			autocast->PositionAutoCast = new LuaCallback(l, -1);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "combat")) {
+		} else if (value == "combat") {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "attacker")) {
+		} else if (value == "attacker") {
 			autocast->Attacker = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "corpse")) {
+		} else if (value == "corpse") {
 			autocast->Corpse = Ccl2Condition(l, LuaToString(l, -1, j + 1));
-		} else if (!strcmp(value, "priority")) {
+		} else if (value == "priority") {
 			lua_rawgeti(l, -1, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
 				LuaError(l, "incorrect argument");
@@ -272,7 +272,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			std::string var = LuaToString(l, -1);
 			int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
 			if (index == -1) {
-				if (!strcmp(var.c_str(), "Distance")) {
+				if (var == "Distance") {
 					index = ACP_DISTANCE;
 				} else {
 					fprintf(stderr, "Bad variable name '%s'\n", var.c_str());
@@ -284,7 +284,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->ReverseSort = LuaToBoolean(l, -1, 2);
 
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "condition")) {
+		} else if (value == "condition") {
 			if (!autocast->Condition) {
 				autocast->Condition = new ConditionInfo;
 			}
@@ -292,7 +292,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			CclSpellCondition(l, autocast->Condition);
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "Unsupported autocast tag: %s" _C_ value);
+			LuaError(l, "Unsupported autocast tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -330,15 +330,15 @@ static int CclDefineSpell(lua_State *l)
 		SpellTypeTable.push_back(spell);
 	}
 	for (int i = 1; i < args; ++i) {
-		const char *value = LuaToString(l, i + 1);
+		std::string_view value = LuaToString(l, i + 1);
 		++i;
-		if (!strcmp(value, "showname")) {
+		if (value == "showname") {
 			spell->Name = LuaToString(l, i + 1);
-		} else if (!strcmp(value, "manacost")) {
+		} else if (value == "manacost") {
 			spell->ManaCost = LuaToNumber(l, i + 1);
-		} else if (!strcmp(value, "cooldown")) {
+		} else if (value == "cooldown") {
 			spell->CoolDown = LuaToNumber(l, i + 1);
-		} else if (!strcmp(value, "res-cost")) {
+		} else if (value == "res-cost") {
 			lua_pushvalue(l, i + 1);
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -351,7 +351,7 @@ static int CclDefineSpell(lua_State *l)
 				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
 			}
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "range")) {
+		} else if (value == "range") {
 			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -362,24 +362,24 @@ static int CclDefineSpell(lua_State *l)
 			} else {
 				LuaError(l, "Invalid range");
 			}
-		} else if (!strcmp(value, "repeat-cast")) {
+		} else if (value == "repeat-cast") {
 			spell->RepeatCast = 1;
 			--i;
-		} else if (!strcmp(value, "force-use-animation")) {
+		} else if (value == "force-use-animation") {
 			spell->ForceUseAnimation = true;
 			--i;
-		} else if (!strcmp(value, "target")) {
+		} else if (value == "target") {
 			value = LuaToString(l, i + 1);
-			if (!strcmp(value, "self")) {
+			if (value == "self") {
 				spell->Target = TargetSelf;
-			} else if (!strcmp(value, "unit")) {
+			} else if (value == "unit") {
 				spell->Target = TargetUnit;
-			} else if (!strcmp(value, "position")) {
+			} else if (value == "position") {
 				spell->Target = TargetPosition;
 			} else {
-				LuaError(l, "Unsupported spell target type tag: %s" _C_ value);
+				LuaError(l, "Unsupported spell target type tag: %s" _C_ value.data());
 			}
-		} else if (!strcmp(value, "action")) {
+		} else if (value == "action") {
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -389,28 +389,28 @@ static int CclDefineSpell(lua_State *l)
 				spell->Action.push_back(CclSpellAction(l));
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "condition")) {
+		} else if (value == "condition") {
 			if (!spell->Condition) {
 				spell->Condition = new ConditionInfo;
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellCondition(l, spell->Condition);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "autocast")) {
+		} else if (value == "autocast") {
 			if (!spell->AutoCast) {
 				spell->AutoCast = new AutoCastInfo();
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AutoCast);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "ai-cast")) {
+		} else if (value == "ai-cast") {
 			if (!spell->AICast) {
 				spell->AICast = new AutoCastInfo();
 			}
 			lua_pushvalue(l, i + 1);
 			CclSpellAutocast(l, spell->AICast);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "sound-when-cast")) {
+		} else if (value == "sound-when-cast") {
 			//  Free the old name, get the new one
 			spell->SoundWhenCast.Name = LuaToString(l, i + 1);
 			spell->SoundWhenCast.MapSound();
@@ -418,14 +418,14 @@ static int CclDefineSpell(lua_State *l)
 			if (!spell->SoundWhenCast.Sound) {
 				spell->SoundWhenCast.Name.clear();
 			}
-		} else if (!strcmp(value, "depend-upgrade")) {
+		} else if (value == "depend-upgrade") {
 			value = LuaToString(l, i + 1);
-			spell->DependencyId = UpgradeIdByIdent(value);
+			spell->DependencyId = UpgradeIdByIdent(value.data());
 			if (spell->DependencyId == -1) {
-				lua_pushfstring(l, "Bad upgrade name: %s", value);
+				lua_pushfstring(l, "Bad upgrade name: %s", value.data());
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 	return 0;

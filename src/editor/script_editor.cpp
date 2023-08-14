@@ -109,10 +109,10 @@ static int CclEditorRandomizeProperties(lua_State *l)
 	Editor.RandomUnits.clear();
 
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		if (!strcmp(value, "BaseTile")) {
+		const std::string_view value = LuaToString(l, -2);
+		if (value == "BaseTile") {
 			Editor.BaseTileIndex = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "RandomTiles")) {
+		} else if (value == "RandomTiles") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -128,7 +128,7 @@ static int CclEditorRandomizeProperties(lua_State *l)
 				Editor.RandomTiles.push_back(std::make_tuple(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3)));
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "RandomUnits")) {
+		} else if (value == "RandomUnits") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}

@@ -454,7 +454,6 @@ static int CclLog(lua_State *l)
 {
 	LogEntry *log;
 	LogEntry **last;
-	const char *value;
 
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
@@ -472,31 +471,31 @@ static int CclLog(lua_State *l)
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
-		value = LuaToString(l, -2);
-		if (!strcmp(value, "GameCycle")) {
+		const std::string_view value = LuaToString(l, -2);
+		if (value == "GameCycle") {
 			log->GameCycle = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "UnitNumber")) {
+		} else if (value == "UnitNumber") {
 			log->UnitNumber = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "UnitIdent")) {
+		} else if (value == "UnitIdent") {
 			log->UnitIdent = LuaToString(l, -1);
-		} else if (!strcmp(value, "Action")) {
+		} else if (value == "Action") {
 			log->Action = LuaToString(l, -1);
-		} else if (!strcmp(value, "Flush")) {
+		} else if (value == "Flush") {
 			log->Flush = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PosX")) {
+		} else if (value == "PosX") {
 			log->PosX = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PosY")) {
+		} else if (value == "PosY") {
 			log->PosY = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "DestUnitNumber")) {
+		} else if (value == "DestUnitNumber") {
 			log->DestUnitNumber = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Value")) {
+		} else if (value == "Value") {
 			log->Value = LuaToString(l, -1);
-		} else if (!strcmp(value, "Num")) {
+		} else if (value == "Num") {
 			log->Num = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "SyncRandSeed")) {
+		} else if (value == "SyncRandSeed") {
 			log->SyncRandSeed = lua_tointeger(l, -1);
 		} else {
-			LuaError(l, "Unsupported key: %s" _C_ value);
+			LuaError(l, "Unsupported key: %s" _C_ value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -518,7 +517,6 @@ static int CclLog(lua_State *l)
 static int CclReplayLog(lua_State *l)
 {
 	FullReplay *replay;
-	const char *value;
 	int j;
 
 	LuaCheckArgs(l, 1);
@@ -532,24 +530,24 @@ static int CclReplayLog(lua_State *l)
 
 	lua_pushnil(l);
 	while (lua_next(l, 1) != 0) {
-		value = LuaToString(l, -2);
-		if (!strcmp(value, "Comment1")) {
+		std::string_view value = LuaToString(l, -2);
+		if (value == "Comment1") {
 			replay->Comment1 = LuaToString(l, -1);
-		} else if (!strcmp(value, "Comment2")) {
+		} else if (value == "Comment2") {
 			replay->Comment2 = LuaToString(l, -1);
-		} else if (!strcmp(value, "Comment3")) {
+		} else if (value == "Comment3") {
 			replay->Comment3 = LuaToString(l, -1);
-		} else if (!strcmp(value, "Date")) {
+		} else if (value == "Date") {
 			replay->Date = LuaToString(l, -1);
-		} else if (!strcmp(value, "Map")) {
+		} else if (value == "Map") {
 			replay->Map = LuaToString(l, -1);
-		} else if (!strcmp(value, "MapPath")) {
+		} else if (value == "MapPath") {
 			replay->MapPath = LuaToString(l, -1);
-		} else if (!strcmp(value, "MapId")) {
+		} else if (value == "MapId") {
 			replay->MapId = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "LocalPlayer")) {
+		} else if (value == "LocalPlayer") {
 			replay->LocalPlayer = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Players")) {
+		} else if (value == "Players") {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != PlayerMax) {
 				LuaError(l, "incorrect argument");
 			}
@@ -564,33 +562,33 @@ static int CclReplayLog(lua_State *l)
 				lua_pushnil(l);
 				while (lua_next(l, top) != 0) {
 					value = LuaToString(l, -2);
-					if (!strcmp(value, "Name")) {
+					if (value == "Name") {
 						replay->PlayerNames[j] = LuaToString(l, -1);
-					} else if (!strcmp(value, "AIScript")) {
+					} else if (value == "AIScript") {
 						replay->ReplaySettings.Presets[j].AIScript = LuaToString(l, -1);
-					} else if (!strcmp(value, "PlayerColor")) {
+					} else if (value == "PlayerColor") {
 						replay->ReplaySettings.Presets[j].PlayerColor = LuaToNumber(l, -1);
-					} else if (!strcmp(value, "Race")) {
+					} else if (value == "Race") {
 						replay->ReplaySettings.Presets[j].Race = LuaToNumber(l, -1);
-					} else if (!strcmp(value, "Team")) {
+					} else if (value == "Team") {
 						replay->ReplaySettings.Presets[j].Team = LuaToNumber(l, -1);
-					} else if (!strcmp(value, "Type")) {
+					} else if (value == "Type") {
 						replay->ReplaySettings.Presets[j].Type = static_cast<PlayerTypes>(LuaToNumber(l, -1));
 					} else {
-						LuaError(l, "Unsupported key: %s" _C_ value);
+						LuaError(l, "Unsupported key: %s" _C_ value.data());
 					}
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "Engine")) {
+		} else if (value == "Engine") {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
 			replay->Engine[0] = LuaToNumber(l, -1, 1);
 			replay->Engine[1] = LuaToNumber(l, -1, 2);
 			replay->Engine[2] = LuaToNumber(l, -1, 3);
-		} else if (!strcmp(value, "Network")) {
+		} else if (value == "Network") {
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
@@ -598,8 +596,8 @@ static int CclReplayLog(lua_State *l)
 			replay->Network[1] = LuaToNumber(l, -1, 2);
 			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
-			if (!replay->ReplaySettings.SetField(value, LuaToNumber(l, -1))) {
-				LuaError(l, "Unsupported key: %s" _C_ value);
+			if (!replay->ReplaySettings.SetField({value.data(), value.size()}, LuaToNumber(l, -1))) {
+				LuaError(l, "Unsupported key: %s" _C_ value.data());
 			}
 		}
 		lua_pop(l, 1);
@@ -706,14 +704,14 @@ static void DoNextReplay()
 	}
 
 	const int unitSlot = ReplayStep->UnitNumber;
-	const char *action = ReplayStep->Action.c_str();
+	const auto& action = ReplayStep->Action;
 	const int flags = ReplayStep->Flush;
 	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
 	const int arg1 = ReplayStep->PosX;
 	const int arg2 = ReplayStep->PosY;
 	CUnit *unit = unitSlot != -1 ? &UnitManager->GetSlotUnit(unitSlot) : nullptr;
 	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep->DestUnitNumber) : nullptr);
-	const char *val = ReplayStep->Value.c_str();
+	const auto& val = ReplayStep->Value;
 	const int num = ReplayStep->Num;
 
 	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
@@ -740,87 +738,86 @@ static void DoNextReplay()
 #endif
 	}
 
-	if (!strcmp(action, "stop")) {
+	if (action == "stop") {
 		SendCommandStopUnit(*unit);
-	} else if (!strcmp(action, "stand-ground")) {
+	} else if (action == "stand-ground") {
 		SendCommandStandGround(*unit, flags);
-	} else if (!strcmp(action, "defend")) {
+	} else if (action == "defend") {
 		SendCommandDefend(*unit, *dunit, flags);
-	} else if (!strcmp(action, "follow")) {
+	} else if (action == "follow") {
 		SendCommandFollow(*unit, *dunit, flags);
-	} else if (!strcmp(action, "move")) {
+	} else if (action == "move") {
 		SendCommandMove(*unit, pos, flags);
-	} else if (!strcmp(action, "repair")) {
+	} else if (action == "repair") {
 		SendCommandRepair(*unit, pos, dunit, flags);
-	} else if (!strcmp(action, "auto-repair")) {
+	} else if (action == "auto-repair") {
 		SendCommandAutoRepair(*unit, arg1);
-	} else if (!strcmp(action, "attack")) {
+	} else if (action == "attack") {
 		SendCommandAttack(*unit, pos, dunit, flags);
-	} else if (!strcmp(action, "attack-ground")) {
+	} else if (action == "attack-ground") {
 		SendCommandAttackGround(*unit, pos, flags);
-	} else if (!strcmp(action, "patrol")) {
+	} else if (action == "patrol") {
 		SendCommandPatrol(*unit, pos, flags);
-	} else if (!strcmp(action, "board")) {
+	} else if (action == "board") {
 		SendCommandBoard(*unit, *dunit, flags);
-	} else if (!strcmp(action, "unload")) {
+	} else if (action == "unload") {
 		SendCommandUnload(*unit, pos, dunit, flags);
-	} else if (!strcmp(action, "build")) {
+	} else if (action == "build") {
 		SendCommandBuildBuilding(*unit, pos, *UnitTypeByIdent(val), flags);
-	} else if (!strcmp(action, "explore")) {
+	} else if (action == "explore") {
 		SendCommandExplore(*unit, flags);
-	} else if (!strcmp(action, "dismiss")) {
+	} else if (action == "dismiss") {
 		SendCommandDismiss(*unit);
-	} else if (!strcmp(action, "resource-loc")) {
+	} else if (action == "resource-loc") {
 		SendCommandResourceLoc(*unit, pos, flags);
-	} else if (!strcmp(action, "resource")) {
+	} else if (action == "resource") {
 		SendCommandResource(*unit, *dunit, flags);
-	} else if (!strcmp(action, "return")) {
+	} else if (action == "return") {
 		SendCommandReturnGoods(*unit, dunit, flags);
-	} else if (!strcmp(action, "train")) {
+	} else if (action == "train") {
 		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
-	} else if (!strcmp(action, "cancel-train")) {
-		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : nullptr);
-	} else if (!strcmp(action, "upgrade-to")) {
+	} else if (action == "cancel-train") {
+		SendCommandCancelTraining(*unit, num, !val.empty() ? UnitTypeByIdent(val.data()) : nullptr);
+	} else if (action == "upgrade-to") {
 		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
-	} else if (!strcmp(action, "cancel-upgrade-to")) {
+	} else if (action == "cancel-upgrade-to") {
 		SendCommandCancelUpgradeTo(*unit);
-	} else if (!strcmp(action, "research")) {
+	} else if (action == "research") {
 		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
-	} else if (!strcmp(action, "cancel-research")) {
+	} else if (action == "cancel-research") {
 		SendCommandCancelResearch(*unit);
-	} else if (!strcmp(action, "spell-cast")) {
+	} else if (action == "spell-cast") {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
-	} else if (!strcmp(action, "auto-spell-cast")) {
+	} else if (action == "auto-spell-cast") {
 		SendCommandAutoSpellCast(*unit, num, arg1);
-	} else if (!strcmp(action, "diplomacy")) {
+	} else if (action == "diplomacy") {
 		int state;
-		if (!strcmp(val, "neutral")) {
+		if (val == "neutral") {
 			state = DiplomacyNeutral;
-		} else if (!strcmp(val, "allied")) {
+		} else if (val == "allied") {
 			state = DiplomacyAllied;
-		} else if (!strcmp(val, "enemy")) {
+		} else if (val == "enemy") {
 			state = DiplomacyEnemy;
-		} else if (!strcmp(val, "crazy")) {
+		} else if (val == "crazy") {
 			state = DiplomacyCrazy;
 		} else {
-			DebugPrint("Invalid diplomacy command: %s" _C_ val);
+			DebugPrint("Invalid diplomacy command: %s" _C_ val.data());
 			state = -1;
 		}
 		SendCommandDiplomacy(arg1, state, arg2);
-	} else if (!strcmp(action, "shared-vision")) {
-		bool state;
-		state = atoi(val) ? true : false;
+	} else if (action == "shared-vision") {
+		bool state = atoi(val.data()) ? true : false;
 		SendCommandSharedVision(arg1, state, arg2);
-	} else if (!strcmp(action, "input")) {
+	} else if (action == "input") {
 		if (val[0] == '-') {
-			CclCommand(val + 1, false);
+			CclCommand(val.substr(1).data(), false);
 		} else {
 			HandleCheats(val);
 		}
-	} else if (!strcmp(action, "chat")) {
-		SetMessage("%s", val);
+	} else if (action == "chat") {
+		SetMessage("%s", val.data());
 		PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
-	} else if (!strcmp(action, "quit")) {
+	} else if (action == "quit") {
 		CommandQuit(arg1);
 	} else {
 		DebugPrint("Invalid action: %s" _C_ action);

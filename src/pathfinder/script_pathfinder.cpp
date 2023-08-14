@@ -54,15 +54,14 @@
 */
 static int CclAStar(lua_State *l)
 {
-	const char *value;
 	int i;
 	int j;
 	int args;
 
 	args = lua_gettop(l);
 	for (j = 0; j < args; ++j) {
-		value = LuaToString(l, j + 1);
-		if (!strcmp(value, "fixed-unit-cost")) {
+		const std::string_view value = LuaToString(l, j + 1);
+		if (value == "fixed-unit-cost") {
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
@@ -71,7 +70,7 @@ static int CclAStar(lua_State *l)
 			} else {
 				AStarFixedUnitCrossingCost = i;
 			}
-		} else if (!strcmp(value, "moving-unit-cost")) {
+		} else if (value == "moving-unit-cost") {
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
@@ -80,11 +79,11 @@ static int CclAStar(lua_State *l)
 			} else {
 				AStarMovingUnitCrossingCost = i;
 			}
-		} else if (!strcmp(value, "know-unseen-terrain")) {
+		} else if (value == "know-unseen-terrain") {
 			AStarKnowUnseenTerrain = true;
-		} else if (!strcmp(value, "dont-know-unseen-terrain")) {
+		} else if (value == "dont-know-unseen-terrain") {
 			AStarKnowUnseenTerrain = false;
-		} else if (!strcmp(value, "unseen-terrain-cost")) {
+		} else if (value == "unseen-terrain-cost") {
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i < 0) {
@@ -93,7 +92,7 @@ static int CclAStar(lua_State *l)
 			} else {
 				AStarUnknownTerrainCost = i;
 			}
-		} else if (!strcmp(value, "max-search-iterations")) {
+		} else if (value == "max-search-iterations") {
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 0) {
@@ -103,7 +102,7 @@ static int CclAStar(lua_State *l)
 				AStarMaxSearchIterations = i;
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 
