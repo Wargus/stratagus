@@ -187,7 +187,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	/*
 		hardcoded, will be done with Lua when it's possible
 	*/
-	if (this->Missile->Class == MissileClassDeathCoil) {
+	if (this->Missile->Class == MissileClass::DeathCoil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table = Select(goalPos - offset, goalPos + offset);
 		int count = 0;

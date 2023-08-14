@@ -44,6 +44,9 @@
 #include "unit_manager.h"
 #include "video.h"
 
+#include <map>
+#include <string_view>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -51,26 +54,25 @@
 /**
 **  Missile class names, used to load/save the missiles.
 */
-static const char *MissileClassNames[] = {
-	"missile-class-none",
-	"missile-class-point-to-point",
-	"missile-class-point-to-point-with-hit",
-	"missile-class-point-to-point-cycle-once",
-	"missile-class-point-to-point-bounce",
-	"missile-class-stay",
-	"missile-class-cycle-once",
-	"missile-class-fire",
-	"missile-class-hit",
-	"missile-class-parabolic",
-	"missile-class-land-mine",
-	"missile-class-whirlwind",
-	"missile-class-flame-shield",
-	"missile-class-death-coil",
-	"missile-class-tracer",
-	"missile-class-clip-to-target",
-	"missile-class-continious",
-	"missile-class-straight-fly",
-	nullptr
+static const std::map<std::string_view, MissileClass> MissileClassNames = {
+	{"missile-class-clip-to-target", MissileClass::ClipToTarget},
+	{"missile-class-continious", MissileClass::Continuous},
+	{"missile-class-cycle-once", MissileClass::CycleOnce},
+	{"missile-class-death-coil", MissileClass::DeathCoil},
+	{"missile-class-fire", MissileClass::Fire},
+	{"missile-class-flame-shield", MissileClass::FlameShield},
+	{"missile-class-hit", MissileClass::Hit},
+	{"missile-class-land-mine", MissileClass::LandMine},
+	{"missile-class-none", MissileClass::None},
+	{"missile-class-parabolic", MissileClass::Parabolic},
+	{"missile-class-point-to-point", MissileClass::PointToPoint},
+	{"missile-class-point-to-point-bounce", MissileClass::PointToPointBounce},
+	{"missile-class-point-to-point-cycle-once", MissileClass::PointToPointCycleOnce},
+	{"missile-class-point-to-point-with-hit", MissileClass::PointToPointWithHit},
+	{"missile-class-stay", MissileClass::Stay},
+	{"missile-class-straight-fly",MissileClass::StraightFly},
+	{"missile-class-tracer", MissileClass::Tracer},
+	{"missile-class-whirlwind", MissileClass::Whirlwind}
 };
 
 /*----------------------------------------------------------------------------
@@ -124,15 +126,11 @@ void MissileType::Load(lua_State *l)
 			this->ChangeMax = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Class")) {
 			const char *className = LuaToString(l, -1);
-			unsigned int i = 0;
-			for (; MissileClassNames[i]; ++i) {
-				if (!strcmp(className, MissileClassNames[i])) {
-					this->Class = i;
-					break;
-				}
-			}
-			if (!MissileClassNames[i]) {
-				LuaError(l, "Unsupported class: %s" _C_ value);
+			const auto it = MissileClassNames.find(className);
+			if (it != MissileClassNames.end()) {
+				this->Class = it->second;
+			} else {
+				LuaError(l, "Unsupported class: %s" _C_ className);
 			}
 		} else if (!strcmp(value, "NumBounces")) {
 			this->NumBounces = LuaToNumber(l, -1);

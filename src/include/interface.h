@@ -173,19 +173,19 @@ constexpr unsigned int MiddleAndRightButton =
 	(MiddleButton | RightButton); /// Middle + Right button on mouse
 
 /// Where is our cursor ?
-enum _cursor_on_ {
-	CursorOnUnknown = -1,     /// not known
-	CursorOnMinimap,          /// minimap area
-	CursorOnButton,           /// button area see: ButtonUnderCursor
-	CursorOnMap,              /// over map area
-	CursorOnScrollUp,         /// in scroll up area
-	CursorOnScrollDown,       /// in scroll down area
-	CursorOnScrollLeft,       /// in scroll left area
-	CursorOnScrollRight,      /// in scroll right area
-	CursorOnScrollLeftUp,     /// in scroll left+up area
-	CursorOnScrollLeftDown,   /// in scroll left+down area
-	CursorOnScrollRightUp,    /// in scroll right+up area
-	CursorOnScrollRightDown   /// in scroll right+down area
+enum class ECursorOn {
+	Unknown = -1,     /// not known
+	Minimap,          /// minimap area
+	Button,           /// button area see: ButtonUnderCursor
+	Map,              /// over map area
+	ScrollUp,         /// in scroll up area
+	ScrollDown,       /// in scroll down area
+	ScrollLeft,       /// in scroll left area
+	ScrollRight,      /// in scroll right area
+	ScrollLeftUp,     /// in scroll left+up area
+	ScrollLeftDown,   /// in scroll left+down area
+	ScrollRightUp,    /// in scroll right+up area
+	ScrollRightDown   /// in scroll right+down area
 };
 
 /// Are We Scrolling With the Keyboard ?
@@ -248,7 +248,7 @@ extern bool GameDiplomacyButtonClicked;
 /// Mouse leaves windows stops scroll
 extern bool LeaveStops;
 /// current CursorOn field
-extern enum _cursor_on_ CursorOn;
+extern ECursorOn CursorOn;
 
 /// vladi: used for unit buttons sub-menus etc
 extern int CurrentButtonLevel;

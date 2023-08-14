@@ -1235,39 +1235,39 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
 	if (mousePos.x < ScrollMarginLeft) {
 		if (mousePos.y < ScrollMarginTop) {
-			CursorOn = CursorOnScrollLeftUp;
+			CursorOn = ECursorOn::ScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
 		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
-			CursorOn = CursorOnScrollLeftDown;
+			CursorOn = ECursorOn::ScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = UI.ArrowSW.Cursor;
 		} else {
-			CursorOn = CursorOnScrollLeft;
+			CursorOn = ECursorOn::ScrollLeft;
 			MouseScrollState = ScrollLeft;
 			GameCursor = UI.ArrowW.Cursor;
 		}
 	} else if (mousePos.x > (Video.Width - ScrollMarginRight)) {
 		if (mousePos.y < ScrollMarginTop) {
-			CursorOn = CursorOnScrollRightUp;
+			CursorOn = ECursorOn::ScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
 		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
-			CursorOn = CursorOnScrollRightDown;
+			CursorOn = ECursorOn::ScrollRightDown;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = UI.ArrowSE.Cursor;
 		} else {
-			CursorOn = CursorOnScrollRight;
+			CursorOn = ECursorOn::ScrollRight;
 			MouseScrollState = ScrollRight;
 			GameCursor = UI.ArrowE.Cursor;
 		}
 	} else {
 		if (mousePos.y < ScrollMarginTop) {
-			CursorOn = CursorOnScrollUp;
+			CursorOn = ECursorOn::ScrollUp;
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
 		} else if (mousePos.y > (Video.Height - ScrollMarginBottom)) {
-			CursorOn = CursorOnScrollDown;
+			CursorOn = ECursorOn::ScrollDown;
 			MouseScrollState = ScrollDown;
 			GameCursor = UI.ArrowS.Cursor;
 		} else {

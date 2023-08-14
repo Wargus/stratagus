@@ -175,58 +175,58 @@ Missile::Missile() :
 	Missile *missile = nullptr;
 
 	switch (mtype.Class) {
-		case MissileClassNone :
+		case MissileClass::None :
 			missile = new MissileNone;
 			break;
-		case MissileClassPointToPoint :
+		case MissileClass::PointToPoint :
 			missile = new MissilePointToPoint;
 			break;
-		case MissileClassPointToPointWithHit :
+		case MissileClass::PointToPointWithHit :
 			missile = new MissilePointToPointWithHit;
 			break;
-		case MissileClassPointToPointCycleOnce :
+		case MissileClass::PointToPointCycleOnce :
 			missile = new MissilePointToPointCycleOnce;
 			break;
-		case MissileClassPointToPointBounce :
+		case MissileClass::PointToPointBounce :
 			missile = new MissilePointToPointBounce;
 			break;
-		case MissileClassStay :
+		case MissileClass::Stay :
 			missile = new MissileStay;
 			break;
-		case MissileClassCycleOnce :
+		case MissileClass::CycleOnce :
 			missile = new MissileCycleOnce;
 			break;
-		case MissileClassFire :
+		case MissileClass::Fire :
 			missile = new MissileFire;
 			break;
-		case MissileClassHit :
+		case MissileClass::Hit :
 			missile = new ::MissileHit;
 			break;
-		case MissileClassParabolic :
+		case MissileClass::Parabolic :
 			missile = new MissileParabolic;
 			break;
-		case MissileClassLandMine :
+		case MissileClass::LandMine :
 			missile = new MissileLandMine;
 			break;
-		case MissileClassWhirlwind :
+		case MissileClass::Whirlwind :
 			missile = new MissileWhirlwind;
 			break;
-		case MissileClassFlameShield :
+		case MissileClass::FlameShield :
 			missile = new MissileFlameShield;
 			break;
-		case MissileClassDeathCoil :
+		case MissileClass::DeathCoil :
 			missile = new MissileDeathCoil;
 			break;
-		case MissileClassTracer :
+		case MissileClass::Tracer :
 			missile = new MissileTracer;
 			break;
-		case MissileClassClipToTarget :
+		case MissileClass::ClipToTarget :
 			missile = new MissileClipToTarget;
 			break;
-		case MissileClassContinious :
+		case MissileClass::Continuous :
 			missile = new MissileContinious;
 			break;
-		case MissileClassStraightFly :
+		case MissileClass::StraightFly :
 			missile = new MissileStraightFly;
 			break;
 	}
@@ -370,7 +370,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// No missile hits immediately!
 	if (
-		unit.Type->Missile.Missile->Class == MissileClassNone
+		unit.Type->Missile.Missile->Class == MissileClass::None
 		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 	) {
 		// No goal, take target coordinates
@@ -548,7 +548,7 @@ void Missile::DrawMissile(const CViewport &vp) const
 	const PixelPos screenPixelPos = vp.MapToScreenPixelPos(this->position);
 
 	switch (this->Type->Class) {
-		case MissileClassHit:
+		case MissileClass::Hit:
 			CLabel(GetGameFont()).DrawClip(screenPixelPos.x, screenPixelPos.y, this->Damage);
 			break;
 		default:

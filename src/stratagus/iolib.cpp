@@ -58,6 +58,14 @@
 #include <bzlib.h>
 #endif
 
+enum class ClfType
+{
+	Invalid, /// invalid file handle
+	Plain, /// plain text file handle
+	Gzip, /// gzip file handle
+	Bzip2 /// bzip2 file handle
+};
+
 class CFile::PImpl
 {
 public:
@@ -77,7 +85,7 @@ private:
 	const PImpl &operator = (const PImpl &rhs); // No implementation
 
 private:
-	int   cl_type;   /// type of CFile
+	ClfType cl_type; /// type of CFile
 	FILE *cl_plain;  /// standard file pointer
 #ifdef USE_ZLIB
 	gzFile cl_gz;    /// gzip file pointer
@@ -242,12 +250,12 @@ SDL_RWops * CFile::as_SDL_RWops()
 
 CFile::PImpl::PImpl()
 {
-	cl_type = CLF_TYPE_INVALID;
+	cl_type = ClfType::Invalid;
 }
 
 CFile::PImpl::~PImpl()
 {
-	if (cl_type != CLF_TYPE_INVALID) {
+	if (cl_type != ClfType::Invalid) {
 		DebugPrint("File wasn't closed\n");
 		close();
 	}
@@ -318,50 +326,50 @@ int CFile::PImpl::open(const char *name, long openflags)
 		return -1;
 	}
 
-	cl_type = CLF_TYPE_INVALID;
+	cl_type = ClfType::Invalid;
 
 	if (openflags & CL_OPEN_WRITE) {
 #ifdef USE_BZ2LIB
 		if ((openflags & CL_WRITE_BZ2)
 			&& (cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), openstring))) {
-			cl_type = CLF_TYPE_BZIP2;
+			cl_type = ClfType::Bzip2;
 		} else
 #endif
 #ifdef USE_ZLIB
 			if ((openflags & CL_WRITE_GZ)
 				&& (cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), openstring))) {
-				cl_type = CLF_TYPE_GZIP;
+				cl_type = ClfType::Gzip;
 			} else
 #endif
 				if ((cl_plain = fopen(name, openstring))) {
-					cl_type = CLF_TYPE_PLAIN;
+					cl_type = ClfType::Plain;
 				}
 	} else {
 		if (!(cl_plain = fopen(name, openstring))) { // try plain first
 #ifdef USE_ZLIB
 			if ((cl_gz = gzopen(strcat(strcpy(buf, name), ".gz"), "rb"))) {
-				cl_type = CLF_TYPE_GZIP;
+				cl_type = ClfType::Gzip;
 			} else
 #endif
 #ifdef USE_BZ2LIB
 				if ((cl_bz = BZ2_bzopen(strcat(strcpy(buf, name), ".bz2"), "rb"))) {
-					cl_type = CLF_TYPE_BZIP2;
+					cl_type = ClfType::Bzip2;
 				} else
 #endif
 				{ }
 
 		} else {
-			cl_type = CLF_TYPE_PLAIN;
+			cl_type = ClfType::Plain;
 			// Hmm, plain worked, but nevertheless the file may be compressed!
 			if (fread(buf, 2, 1, cl_plain) == 1) {
 #ifdef USE_BZ2LIB
 				if (buf[0] == 'B' && buf[1] == 'Z') {
 					fclose(cl_plain);
 					if ((cl_bz = BZ2_bzopen(name, "rb"))) {
-						cl_type = CLF_TYPE_BZIP2;
+						cl_type = ClfType::Bzip2;
 					} else {
 						if (!(cl_plain = fopen(name, "rb"))) {
-							cl_type = CLF_TYPE_INVALID;
+							cl_type = ClfType::Invalid;
 						}
 					}
 				}
@@ -370,22 +378,22 @@ int CFile::PImpl::open(const char *name, long openflags)
 				if (buf[0] == 0x1f) { // don't check for buf[1] == 0x8b, so that old compress also works!
 					fclose(cl_plain);
 					if ((cl_gz = gzopen(name, "rb"))) {
-						cl_type = CLF_TYPE_GZIP;
+						cl_type = ClfType::Gzip;
 					} else {
 						if (!(cl_plain = fopen(name, "rb"))) {
-							cl_type = CLF_TYPE_INVALID;
+							cl_type = ClfType::Invalid;
 						}
 					}
 				}
 #endif // USE_ZLIB
 			}
-			if (cl_type == CLF_TYPE_PLAIN) { // ok, it is not compressed
+			if (cl_type == ClfType::Plain) { // ok, it is not compressed
 				rewind(cl_plain);
 			}
 		}
 	}
 
-	if (cl_type == CLF_TYPE_INVALID) {
+	if (cl_type == ClfType::Invalid) {
 		//fprintf(stderr, "%s in ", buf);
 		return -1;
 	}
@@ -395,19 +403,19 @@ int CFile::PImpl::open(const char *name, long openflags)
 int CFile::PImpl::close()
 {
 	int ret = EOF;
-	int tp = cl_type;
+	ClfType tp = cl_type;
 
-	if (tp != CLF_TYPE_INVALID) {
-		if (tp == CLF_TYPE_PLAIN) {
+	if (tp != ClfType::Invalid) {
+		if (tp == ClfType::Plain) {
 			ret = fclose(cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (tp == CLF_TYPE_GZIP) {
+		if (tp == ClfType::Gzip) {
 			ret = gzclose(cl_gz);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
+		if (tp == ClfType::Bzip2) {
 			BZ2_bzclose(cl_bz);
 			ret = 0;
 		}
@@ -415,7 +423,7 @@ int CFile::PImpl::close()
 	} else {
 		errno = EBADF;
 	}
-	cl_type = CLF_TYPE_INVALID;
+	cl_type = ClfType::Invalid;
 	return ret;
 }
 
@@ -423,17 +431,17 @@ int CFile::PImpl::read(void *buf, size_t len)
 {
 	int ret = 0;
 
-	if (cl_type != CLF_TYPE_INVALID) {
-		if (cl_type == CLF_TYPE_PLAIN) {
+	if (cl_type != ClfType::Invalid) {
+		if (cl_type == ClfType::Plain) {
 			ret = fread(buf, 1, len, cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (cl_type == CLF_TYPE_GZIP) {
+		if (cl_type == ClfType::Gzip) {
 			ret = gzread(cl_gz, buf, len);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
+		if (cl_type == ClfType::Bzip2) {
 			ret = BZ2_bzread(cl_bz, buf, len);
 		}
 #endif // USE_BZ2LIB
@@ -445,17 +453,17 @@ int CFile::PImpl::read(void *buf, size_t len)
 
 void CFile::PImpl::flush()
 {
-	if (cl_type != CLF_TYPE_INVALID) {
-		if (cl_type == CLF_TYPE_PLAIN) {
+	if (cl_type != ClfType::Invalid) {
+		if (cl_type == ClfType::Plain) {
 			fflush(cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (cl_type == CLF_TYPE_GZIP) {
+		if (cl_type == ClfType::Gzip) {
 			gzflush(cl_gz, Z_SYNC_FLUSH);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (cl_type == CLF_TYPE_BZIP2) {
+		if (cl_type == ClfType::Bzip2) {
 			BZ2_bzflush(cl_bz);
 		}
 #endif // USE_BZ2LIB
@@ -466,20 +474,20 @@ void CFile::PImpl::flush()
 
 int CFile::PImpl::write(const void *buf, size_t size)
 {
-	int tp = cl_type;
+	ClfType tp = cl_type;
 	int ret = -1;
 
-	if (tp != CLF_TYPE_INVALID) {
-		if (tp == CLF_TYPE_PLAIN) {
+	if (tp != ClfType::Invalid) {
+		if (tp == ClfType::Plain) {
 			ret = fwrite(buf, size, 1, cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (tp == CLF_TYPE_GZIP) {
+		if (tp == ClfType::Gzip) {
 			ret = gzwrite(cl_gz, buf, size);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
+		if (tp == ClfType::Bzip2) {
 			ret = BZ2_bzwrite(cl_bz, const_cast<void *>(buf), size);
 		}
 #endif // USE_BZ2LIB
@@ -492,19 +500,19 @@ int CFile::PImpl::write(const void *buf, size_t size)
 int CFile::PImpl::seek(long offset, int whence)
 {
 	int ret = -1;
-	int tp = cl_type;
+	ClfType tp = cl_type;
 
-	if (tp != CLF_TYPE_INVALID) {
-		if (tp == CLF_TYPE_PLAIN) {
+	if (tp != ClfType::Invalid) {
+		if (tp == ClfType::Plain) {
 			ret = fseek(cl_plain, offset, whence);
 		}
 #ifdef USE_ZLIB
-		if (tp == CLF_TYPE_GZIP) {
+		if (tp == ClfType::Gzip) {
 			ret = gzseek(cl_gz, offset, whence);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
+		if (tp == ClfType::Bzip2) {
 			bzseek(cl_bz, offset, whence);
 			ret = 0;
 		}
@@ -518,19 +526,19 @@ int CFile::PImpl::seek(long offset, int whence)
 long CFile::PImpl::tell()
 {
 	int ret = -1;
-	int tp = cl_type;
+	ClfType tp = cl_type;
 
-	if (tp != CLF_TYPE_INVALID) {
-		if (tp == CLF_TYPE_PLAIN) {
+	if (tp != ClfType::Invalid) {
+		if (tp == ClfType::Plain) {
 			ret = ftell(cl_plain);
 		}
 #ifdef USE_ZLIB
-		if (tp == CLF_TYPE_GZIP) {
+		if (tp == ClfType::Gzip) {
 			ret = gztell(cl_gz);
 		}
 #endif // USE_ZLIB
 #ifdef USE_BZ2LIB
-		if (tp == CLF_TYPE_BZIP2) {
+		if (tp == ClfType::Bzip2) {
 			// FIXME: need to implement this
 			ret = -1;
 		}

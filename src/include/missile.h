@@ -102,7 +102,7 @@
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
-**    information (::MissileClassNone, ...).
+**    information (::MissileClass::None, ...).
 **
 **  MissileType::NumBounces
 **
@@ -134,7 +134,7 @@
 **    animation step.  The real use of this member depends on the
 **    MissileType::Class
 **    @note This is currently only used by the point-to-point
-**    missiles (::MissileClassPointToPoint, ...).  Perhaps we should
+**    missiles (::MissileClass::PointToPoint, ...).  Perhaps we should
 **    later allow animation scripts for more complex animations.
 **
 **  MissileType::Range
@@ -318,25 +318,26 @@ class LuaCallback;
 /**
 **  Missile-class this defines how a missile-type reacts.
 */
-enum {
-	MissileClassNone,                     /// Missile does nothing
-	MissileClassPointToPoint,             /// Missile flies from x,y to x1,y1
-	MissileClassPointToPointWithHit,      /// Missile flies from x,y to x1,y1 than shows hit animation.
-	MissileClassPointToPointCycleOnce,    /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
-	MissileClassPointToPointBounce,       /// Missile flies from x,y to x1,y1 than bounces three times.
-	MissileClassStay,                     /// Missile appears at x,y, does it's anim and vanishes.
-	MissileClassCycleOnce,                /// Missile appears at x,y, then cycle through the frames once.
-	MissileClassFire,                     /// Missile doesn't move, than checks the source unit for HP.
-	MissileClassHit,                      /// Missile shows the hit points.
-	MissileClassParabolic,                /// Missile flies from x,y to x1,y1 using a parabolic path
-	MissileClassLandMine,                 /// Missile wait on x,y until a non-air unit comes by, the explodes.
-	MissileClassWhirlwind,                /// Missile appears at x,y, is whirlwind
-	MissileClassFlameShield,              /// Missile surround x,y
-	MissileClassDeathCoil,                /// Missile is death coil.
-	MissileClassTracer,                   /// Missile seeks towards to target unit
-	MissileClassClipToTarget,             /// Missile remains clipped to target's current goal and plays his animation once
-	MissileClassContinious,               /// Missile stays and plays it's animation several times
-	MissileClassStraightFly               /// Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
+enum class MissileClass
+{
+	None,                     /// Missile does nothing
+	PointToPoint,             /// Missile flies from x,y to x1,y1
+	PointToPointWithHit,      /// Missile flies from x,y to x1,y1 than shows hit animation.
+	PointToPointCycleOnce,    /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
+	PointToPointBounce,       /// Missile flies from x,y to x1,y1 than bounces three times.
+	Stay,                     /// Missile appears at x,y, does it's anim and vanishes.
+	CycleOnce,                /// Missile appears at x,y, then cycle through the frames once.
+	Fire,                     /// Missile doesn't move, than checks the source unit for HP.
+	Hit,                      /// Missile shows the hit points.
+	Parabolic,                /// Missile flies from x,y to x1,y1 using a parabolic path
+	LandMine,                 /// Missile wait on x,y until a non-air unit comes by, the explodes.
+	Whirlwind,                /// Missile appears at x,y, is whirlwind
+	FlameShield,              /// Missile surround x,y
+	DeathCoil,                /// Missile is death coil.
+	Tracer,                   /// Missile seeks towards to target unit
+	ClipToTarget,             /// Missile remains clipped to target's current goal and plays his animation once
+	Continuous,               /// Missile stays and plays it's animation several times
+	StraightFly               /// Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 };
 
 /// Base structure of missile-types
@@ -380,7 +381,7 @@ public:
 	bool IgnoreWalls;          /// missile ignores Wall units on it's way
 	bool KillFirstUnit;        /// missile kills first unit blocking it's way
 
-	int Class;                 /// missile class
+	MissileClass Class;        /// missile class
 	int NumBounces;            /// number of bounces
 	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
 	int StartDelay;            /// missile start delay

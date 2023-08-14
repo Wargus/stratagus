@@ -546,7 +546,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	//
 	// Draw unit's name popup
 	//
-	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
+	if (CursorOn == ECursorOn::Map && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 

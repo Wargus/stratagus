@@ -83,7 +83,7 @@ bool GameMenuButtonClicked;                  /// Menu button was clicked
 bool GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
 bool LeaveStops;                             /// Mouse leaves windows stops scroll
 
-enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
+ECursorOn CursorOn = ECursorOn::Unknown;        /// Cursor on field
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -727,7 +727,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 
 	// BigMapMode is the mode which show only the map (without panel, minimap)
 	if (BigMapMode) {
-		CursorOn = CursorOnMap;
+		CursorOn = ECursorOn::Map;
 		//  Scrolling Region Handling.
 		HandleMouseScrollArea(screenPos);
 		return;
@@ -739,7 +739,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (UI.MenuButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderMenu;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		}
@@ -748,7 +748,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (UI.NetworkMenuButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		}
@@ -756,7 +756,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (UI.NetworkDiplomacyButton.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonArea::Menu;
 				ButtonUnderCursor = ButtonUnderNetworkDiplomacy;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		}
@@ -770,7 +770,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 				if (screenPos > PixelPos(x, y) && screenPos < PixelPos(x + g->getWidth(), y + g->getHeight())) {
 					ButtonAreaUnderCursor = ButtonArea::Menu;
 					ButtonUnderCursor = ButtonUnderFreeWorkers;
-					CursorOn = CursorOnButton;
+					CursorOn = ECursorOn::Button;
 					return;
 				}
 			}
@@ -783,7 +783,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (button.Button.Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonArea::User;
 				ButtonUnderCursor = i;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		}
@@ -795,7 +795,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			ButtonAreaUnderCursor = ButtonArea::Button;
 			if (!CurrentButtons.empty() && CurrentButtons[j].Pos != -1) {
 				ButtonUnderCursor = j;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		}
@@ -809,7 +809,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 				if (UI.TransportingButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonArea::Transporting;
 					ButtonUnderCursor = i;
-					CursorOn = CursorOnButton;
+					CursorOn = ECursorOn::Button;
 					return;
 				}
 			}
@@ -820,7 +820,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 					if (UI.SingleTrainingButton->Contains(screenPos)) {
 						ButtonAreaUnderCursor = ButtonArea::Training;
 						ButtonUnderCursor = 0;
-						CursorOn = CursorOnButton;
+						CursorOn = ECursorOn::Button;
 						return;
 					}
 				} else {
@@ -832,7 +832,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 							&& UI.TrainingButtons[i].Contains(screenPos)) {
 							ButtonAreaUnderCursor = ButtonArea::Training;
 							ButtonUnderCursor = i;
-							CursorOn = CursorOnButton;
+							CursorOn = ECursorOn::Button;
 							return;
 						}
 					}
@@ -841,14 +841,14 @@ static void HandleMouseOn(const PixelPos screenPos)
 				if (UI.UpgradingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonArea::Upgrading;
 					ButtonUnderCursor = 0;
-					CursorOn = CursorOnButton;
+					CursorOn = ECursorOn::Button;
 					return;
 				}
 			} else if (Selected[0]->CurrentAction() == UnitAction::Research) {
 				if (UI.ResearchingButton->Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonArea::Researching;
 					ButtonUnderCursor = 0;
-					CursorOn = CursorOnButton;
+					CursorOn = ECursorOn::Button;
 					return;
 				}
 			}
@@ -857,7 +857,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 			if (UI.SingleSelectedButton && UI.SingleSelectedButton->Contains(screenPos)) {
 				ButtonAreaUnderCursor = ButtonArea::Selected;
 				ButtonUnderCursor = 0;
-				CursorOn = CursorOnButton;
+				CursorOn = ECursorOn::Button;
 				return;
 			}
 		} else {
@@ -868,7 +868,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 				if (UI.SelectedButtons[i].Contains(screenPos)) {
 					ButtonAreaUnderCursor = ButtonArea::Selected;
 					ButtonUnderCursor = i;
-					CursorOn = CursorOnButton;
+					CursorOn = ECursorOn::Button;
 					return;
 				}
 			}
@@ -877,7 +877,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 
 	//  Minimap
 	if (UI.Minimap.Contains(screenPos)) {
-		CursorOn = CursorOnMinimap;
+		CursorOn = ECursorOn::Minimap;
 		return;
 	}
 
@@ -903,9 +903,9 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 
 		// Note cursor on map can be in scroll area
-		CursorOn = CursorOnMap;
+		CursorOn = ECursorOn::Map;
 	} else {
-		CursorOn = CursorOnUnknown;
+		CursorOn = ECursorOn::Unknown;
 	}
 
 	//  Scrolling Region Handling.
@@ -925,7 +925,7 @@ void HandleMouseExit()
 		return;
 	}
 	// Denote cursor not on anything in window (used?)
-	CursorOn = CursorOnUnknown;
+	CursorOn = ECursorOn::Unknown;
 
 	// Prevent scrolling while out of focus (on other applications) */
 	KeyScrollState = MouseScrollState = ScrollNone;
@@ -944,7 +944,7 @@ void RestrictCursorToViewport()
 {
 	UI.SelectedViewport->Restrict(CursorScreenPos.x, CursorScreenPos.y);
 	UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
-	CursorOn = CursorOnMap;
+	CursorOn = ECursorOn::Map;
 }
 
 /**
@@ -956,7 +956,7 @@ void RestrictCursorToMinimap()
 	clamp(&CursorScreenPos.y, UI.Minimap.Y, UI.Minimap.Y + UI.Minimap.H - 1);
 
 	UI.MouseWarpPos = CursorStartScreenPos = CursorScreenPos;
-	CursorOn = CursorOnMinimap;
+	CursorOn = ECursorOn::Minimap;
 }
 
 /**
@@ -980,7 +980,7 @@ static void MouseScrollMap(const PixelPos &pos)
 */
 void UIHandleMouseMove(const PixelPos &cursorPos)
 {
-	enum _cursor_on_ OldCursorOn;
+	ECursorOn OldCursorOn;
 
 	if (IsDemoMode()) {
 		// If we are in "demo mode", exit now.
@@ -1009,14 +1009,14 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	HandleMouseOn(cursorPos);
 
 	//  Make the piemenu "follow" the mouse
-	if (CursorState == CursorStates::PieMenu && CursorOn == CursorOnMap) {
+	if (CursorState == CursorStates::PieMenu && CursorOn == ECursorOn::Map) {
 		clamp(&CursorStartScreenPos.x, CursorScreenPos.x - UI.PieMenu.X[2], CursorScreenPos.x + UI.PieMenu.X[2]);
 		clamp(&CursorStartScreenPos.y, CursorScreenPos.y - UI.PieMenu.Y[4], CursorScreenPos.y + UI.PieMenu.Y[4]);
 		return;
 	}
 
 	// Restrict mouse to minimap when dragging
-	if (OldCursorOn == CursorOnMinimap && CursorOn != CursorOnMinimap && (MouseButtons & LeftButton)) {
+	if (OldCursorOn == ECursorOn::Minimap && CursorOn != ECursorOn::Minimap && (MouseButtons & LeftButton)) {
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		RestrictCursorToMinimap();
@@ -1039,7 +1039,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	if (CursorOn == ECursorOn::Map && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
 		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 
@@ -1101,7 +1101,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 		}
-	} else if (CursorOn == CursorOnMinimap) {
+	} else if (CursorOn == ECursorOn::Minimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
 		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
@@ -1117,7 +1117,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	//  Selecting target.
 	if (CursorState == CursorStates::Select) {
-		if (CursorOn == CursorOnMap || CursorOn == CursorOnMinimap) {
+		if (CursorOn == ECursorOn::Map || CursorOn == ECursorOn::Minimap) {
 			if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 				GameCursor = CursorByIdent(CustomCursor);
 			} else {
@@ -1139,7 +1139,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					}
 				}
 			}
-			if (CursorOn == CursorOnMinimap && (MouseButtons & RightButton)) {
+			if (CursorOn == ECursorOn::Minimap && (MouseButtons & RightButton)) {
 				const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 				//  Minimap move viewpoint
 				UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(cursorPos));
@@ -1150,7 +1150,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  Cursor pointing.
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == ECursorOn::Map) {
 		//  Map
 		if (UnitUnderCursor != nullptr && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
 			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
@@ -1159,7 +1159,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		return;
 	}
 
-	if (CursorOn == CursorOnMinimap && (MouseButtons & LeftButton)) {
+	if (CursorOn == ECursorOn::Minimap && (MouseButtons & LeftButton)) {
 		//  Minimap move viewpoint
 		const Vec2i cursorPos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
@@ -1601,7 +1601,7 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	//  Clicking on the map.
 	//
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	if (CursorOn == ECursorOn::Map && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CursorState = CursorStates::Point;
@@ -1625,7 +1625,7 @@ static void UISelectStateButtonDown(unsigned)
 	//
 	//  Clicking on the minimap.
 	//
-	if (CursorOn == CursorOnMinimap) {
+	if (CursorOn == ECursorOn::Minimap) {
 		const Vec2i cursorTilePos = UI.Minimap.ScreenToTilePos(CursorScreenPos);
 
 		if (MouseButtons & LeftButton) {
@@ -1648,7 +1648,7 @@ static void UISelectStateButtonDown(unsigned)
 		return;
 	}
 
-	if (CursorOn == CursorOnButton) {
+	if (CursorOn == ECursorOn::Button) {
 		// FIXME: other buttons?
 		// 74145: Spell-cast on unit portrait
 		if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonArea::Selected
@@ -1953,7 +1953,7 @@ void UIHandleButtonDown(unsigned button)
 	}
 
 	if (CursorState == CursorStates::PieMenu) {
-		if (CursorOn == CursorOnMap) {
+		if (CursorOn == ECursorOn::Map) {
 			HandlePieMenuMouseSelection();
 			return;
 		} else {
@@ -1964,12 +1964,12 @@ void UIHandleButtonDown(unsigned button)
 	}
 
 	//  Cursor is on the map area
-	if (CursorOn == CursorOnMap) {
+	if (CursorOn == ECursorOn::Map) {
 		UIHandleButtonDown_OnMap(button);
-	} else if (CursorOn == CursorOnMinimap) {
+	} else if (CursorOn == ECursorOn::Minimap) {
 		//  Cursor is on the minimap area
 		UIHandleButtonDown_OnMinimap(button);
-	} else if (CursorOn == CursorOnButton) {
+	} else if (CursorOn == ECursorOn::Button) {
 		//  Cursor is on the buttons: group or command
 		UIHandleButtonDown_OnButton(button);
 	}
@@ -2065,7 +2065,7 @@ void UIHandleButtonUp(unsigned button)
 				return;
 			}
 		}
-		if (CursorOn == CursorOnButton) {
+		if (CursorOn == ECursorOn::Button) {
 			// FIXME: other buttons?
 			if (ButtonAreaUnderCursor == ButtonArea::Button && OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
@@ -2324,12 +2324,12 @@ static void HandlePieMenuMouseSelection()
 			if (CursorState == CursorStates::PieMenu) {
 				CursorState = CursorStates::Point;
 			}
-			CursorOn = CursorOnUnknown;
+			CursorOn = ECursorOn::Unknown;
 			UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 		}
 	} else {
 		CursorState = CursorStates::Point;
-		CursorOn = CursorOnUnknown;
+		CursorOn = ECursorOn::Unknown;
 		UIHandleMouseMove(CursorScreenPos); // recompute CursorOn and company
 	}
 }
