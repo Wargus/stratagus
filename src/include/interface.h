@@ -134,9 +134,9 @@ enum _menu_button_under_ {
 };
 
 /// current interface state
-enum _iface_state_ {
-	IfaceStateNormal,  /// Normal Game state
-	IfaceStateMenu     /// Menu active
+enum class IfaceState {
+	Normal,  /// Normal Game state
+	Menu     /// Menu active
 };
 
 /// current key state
@@ -223,7 +223,7 @@ extern int MouseButtons;
 /// current active modifiers
 extern int KeyModifiers;
 /// current interface state
-extern enum _iface_state_ InterfaceState;
+extern IfaceState InterfaceState;
 /// current scroll state of keyboard
 extern int KeyScrollState;
 /// current scroll state of mouse

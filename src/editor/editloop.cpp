@@ -2218,12 +2218,12 @@ void EditorMainLoop()
 		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
 		//ProcessMenu("menu-editor-tips", 1);
-		InterfaceState = IfaceStateNormal;
+		InterfaceState = IfaceState::Normal;
 
 		SetVideoSync();
 
 		GameCursor = UI.Point.Cursor;
-		InterfaceState = IfaceStateNormal;
+		InterfaceState = IfaceState::Normal;
 		Editor.State = EditorStateType::Selecting;
 		UI.SelectedViewport = UI.Viewports;
 		TileCursorSize = 1;
@@ -2283,7 +2283,7 @@ void EditorMainLoop()
 
 		PreMenuSetup();
 
-		InterfaceState = IfaceStateMenu;
+		InterfaceState = IfaceState::Menu;
 		GameCursor = UI.Point.Cursor;
 
 		Video.ClearScreen();
