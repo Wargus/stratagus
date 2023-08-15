@@ -62,40 +62,40 @@
 			this->Var[i].ModifMax = 1;
 		} else if (lua_istable(l, -1)) {
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-				const char *const key = LuaToString(l, -2);
-				if (!strcmp(key, "Enable")) {
+				const std::string_view key = LuaToString(l, -2);
+				if (key == "Enable") {
 					this->Var[i].Enable = LuaToBoolean(l, -1);
 					this->Var[i].ModifEnable = 1;
-				} else if (!strcmp(key, "Value")) {
+				} else if (key == "Value") {
 					this->Var[i].Value = LuaToNumber(l, -1);
 					this->Var[i].ModifValue = 1;
-				} else if (!strcmp(key, "Max")) {
+				} else if (key == "Max") {
 					this->Var[i].Max = LuaToNumber(l, -1);
 					this->Var[i].ModifMax = 1;
-				} else if (!strcmp(key, "Increase")) {
+				} else if (key == "Increase") {
 					this->Var[i].Increase = LuaToNumber(l, -1);
 					this->Var[i].ModifIncrease = 1;
-				} else if (!strcmp(key, "InvertEnable")) {
+				} else if (key == "InvertEnable") {
 					this->Var[i].InvertEnable = LuaToBoolean(l, -1);
-				} else if (!strcmp(key, "AddValue")) {
+				} else if (key == "AddValue") {
 					this->Var[i].AddValue = LuaToNumber(l, -1);
-				} else if (!strcmp(key, "AddMax")) {
+				} else if (key == "AddMax") {
 					this->Var[i].AddMax = LuaToNumber(l, -1);
-				} else if (!strcmp(key, "AddIncrease")) {
+				} else if (key == "AddIncrease") {
 					this->Var[i].AddIncrease = LuaToNumber(l, -1);
-				} else if (!strcmp(key, "IncreaseTime")) {
+				} else if (key == "IncreaseTime") {
 					this->Var[i].IncreaseTime = LuaToNumber(l, -1);
-				} else if (!strcmp(key, "TargetIsCaster")) {
-					const char *value = LuaToString(l, -1);
-					if (!strcmp(value, "caster")) {
+				} else if (key == "TargetIsCaster") {
+					const std::string_view value = LuaToString(l, -1);
+					if (value == "caster") {
 						this->Var[i].TargetIsCaster = 1;
-					} else if (!strcmp(value, "target")) {
+					} else if (value == "target") {
 						this->Var[i].TargetIsCaster = 0;
 					} else { // Error
-						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value);
+						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value.data());
 					}
 				} else { // Error
-					LuaError(l, "key '%s' not valid for adjustvariable" _C_ key);
+					LuaError(l, "key '%s' not valid for adjustvariable" _C_ key.data());
 				}
 			}
 		} else {

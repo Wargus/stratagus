@@ -42,24 +42,24 @@
 /* virtual */ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "new-form")) {
+		if (value == "new-form") {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = UnitTypeByIdent(value);
+			this->NewForm = UnitTypeByIdent(value.data());
 			if (!this->NewForm) {
 				this->NewForm = 0;
-				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value);
+				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value.data());
 			}
 			// FIXME: temp polymorphs? hard to do.
-		} else if (!strcmp(value, "player-neutral")) {
+		} else if (value == "player-neutral") {
 			this->PlayerNeutral = 1;
 			--j;
-		} else if (!strcmp(value, "player-caster")) {
+		} else if (value == "player-caster") {
 			this->PlayerNeutral = 2;
 			--j;
 		} else {
-			LuaError(l, "Unsupported polymorph tag: %s" _C_ value);
+			LuaError(l, "Unsupported polymorph tag: %s" _C_ value.data());
 		}
 	}
 	// Now, checking value.

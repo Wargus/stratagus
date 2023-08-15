@@ -204,47 +204,47 @@ void CMapField::parse(lua_State *l)
 	this->cost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 
-		if (!strcmp(value, "explored")) {
+		if (value == "explored") {
 			++j;
 			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
-		} else if (!strcmp(value, "opaque")) {
+		} else if (value == "opaque") {
 			this->Flags |= MapFieldOpaque;
-		} else if (!strcmp(value, "human")) {
+		} else if (value == "human") {
 			this->Flags |= MapFieldHuman;
-		} else if (!strcmp(value, "land")) {
+		} else if (value == "land") {
 			this->Flags |= MapFieldLandAllowed;
-		} else if (!strcmp(value, "coast")) {
+		} else if (value == "coast") {
 			this->Flags |= MapFieldCoastAllowed;
-		} else if (!strcmp(value, "water")) {
+		} else if (value == "water") {
 			this->Flags |= MapFieldWaterAllowed;
-		} else if (!strcmp(value, "mud")) {
+		} else if (value == "mud") {
 			this->Flags |= MapFieldNoBuilding;
-		} else if (!strcmp(value, "block")) {
+		} else if (value == "block") {
 			this->Flags |= MapFieldUnpassable;
-		} else if (!strcmp(value, "wall")) {
+		} else if (value == "wall") {
 			this->Flags |= MapFieldWall;
-		} else if (!strcmp(value, "rock")) {
+		} else if (value == "rock") {
 			this->Flags |= MapFieldRocks;
-		} else if (!strcmp(value, "wood")) {
+		} else if (value == "wood") {
 			this->Flags |= MapFieldForest;
-		} else if (!strcmp(value, "cost4")) {
+		} else if (value == "cost4") {
 			this->Flags |= MapFieldCost4;
-		} else if (!strcmp(value, "cost5")) {
+		} else if (value == "cost5") {
 			this->Flags |= MapFieldCost5;
-		} else if (!strcmp(value, "cost6")) {
+		} else if (value == "cost6") {
 			this->Flags |= MapFieldCost6;
-		} else if (!strcmp(value, "ground")) {
+		} else if (value == "ground") {
 			this->Flags |= MapFieldLandUnit;
-		} else if (!strcmp(value, "air")) {
+		} else if (value == "air") {
 			this->Flags |= MapFieldAirUnit;
-		} else if (!strcmp(value, "sea")) {
+		} else if (value == "sea") {
 			this->Flags |= MapFieldSeaUnit;
-		} else if (!strcmp(value, "building")) {
+		} else if (value == "building") {
 			this->Flags |= MapFieldBuilding;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 }

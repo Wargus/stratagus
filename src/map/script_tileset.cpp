@@ -53,7 +53,7 @@
 bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount)
 {
 	const struct {
-		const char *name;
+		std::string_view name;
 		tile_flags flag;
 	} flags[] = {
 		{"opaque", MapFieldOpaque},
@@ -78,14 +78,14 @@ bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int sub
 	};
 
 	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
-		if (!strcmp(flagName, flags[i].name)) {
+		if (flagName == flags[i].name) {
 			*flag |= flags[i].flag;
 			return true;
 		}
 	}
 
 	const struct {
-		const char *name;
+		std::string_view name;
 		unsigned int speed;
 	} speeds[] = {
 		{"fastest", 0},
@@ -94,7 +94,7 @@ bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int sub
 		{"slower", 3}
 	};
 	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
-		if (!strcmp(flagName, speeds[i].name)) {
+		if (flagName == speeds[i].name) {
 			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;
 			return true;
 		}
@@ -167,38 +167,38 @@ void CTileset::parseSpecial(lua_State *l)
 	const int args = lua_rawlen(l, -1);
 
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 
-		if (!strcmp(value, "top-one-tree")) {
+		if (value == "top-one-tree") {
 			++j;
 			topOneTreeTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "mid-one-tree")) {
+		} else if (value == "mid-one-tree") {
 			++j;
 			midOneTreeTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "bot-one-tree")) {
+		} else if (value == "bot-one-tree") {
 			++j;
 			botOneTreeTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "removed-tree")) {
+		} else if (value == "removed-tree") {
 			++j;
 			removedTreeTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "growing-tree")) {
+		} else if (value == "growing-tree") {
 			++j;
 			// keep for retro compatibility.
 			// TODO : remove when game data are updated.
-		} else if (!strcmp(value, "top-one-rock")) {
+		} else if (value == "top-one-rock") {
 			++j;
 			topOneRockTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "mid-one-rock")) {
+		} else if (value == "mid-one-rock") {
 			++j;
 			midOneRockTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "bot-one-rock")) {
+		} else if (value == "bot-one-rock") {
 			++j;
 			botOneRockTile = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "removed-rock")) {
+		} else if (value == "removed-rock") {
 			++j;
 			removedRockTile = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "special: unsupported tag: %s" _C_ value);
+			LuaError(l, "special: unsupported tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -337,23 +337,23 @@ void CTileset::parseSlots(lua_State *l, int t)
 	//  Parse the list: (still everything could be changed!)
 	const int args = lua_rawlen(l, t);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, t, j + 1);
+		const std::string_view value = LuaToString(l, t, j + 1);
 		++j;
 
-		if (!strcmp(value, "special")) {
+		if (value == "special") {
 			lua_rawgeti(l, t, j + 1);
 			parseSpecial(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "solid")) {
+		} else if (value == "solid") {
 			lua_rawgeti(l, t, j + 1);
 			parseSolid(l);
 			lua_pop(l, 1);
-		} else if (!strcmp(value, "mixed")) {
+		} else if (value == "mixed") {
 			lua_rawgeti(l, t, j + 1);
 			parseMixed(l);
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "slots: unsupported tag: %s" _C_ value);
+			LuaError(l, "slots: unsupported tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -367,19 +367,19 @@ void CTileset::parse(lua_State *l)
 
 	const int args = lua_gettop(l);
 	for (int j = 1; j < args; ++j) {
-		const char *value = LuaToString(l, j);
+		const std::string_view value = LuaToString(l, j);
 		++j;
 
-		if (!strcmp(value, "name")) {
+		if (value == "name") {
 			this->Name = LuaToString(l, j);
-		} else if (!strcmp(value, "image")) {
+		} else if (value == "image") {
 			this->ImageFile = LuaToString(l, j);
-		} else if (!strcmp(value, "size")) {
+		} else if (value == "size") {
 			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.y, j);
-		} else if (!strcmp(value, "slots")) {
+		} else if (value == "slots") {
 			// must be deferred to later, after the size is parsed
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 
@@ -426,22 +426,22 @@ void CTileset::parse(lua_State *l)
 	this->logicalTileToGraphicalTileShift = logicalToGraphicalShift;
 
 	for (int j = 1; j < args; ++j) {
-		const char *value = LuaToString(l, j);
+		const std::string_view value = LuaToString(l, j);
 		++j;
 
-		if (!strcmp(value, "name")) {
+		if (value == "name") {
 			// done
-		} else if (!strcmp(value, "image")) {
+		} else if (value == "image") {
 			// done
-		} else if (!strcmp(value, "size")) {
+		} else if (value == "size") {
 			// done
-		} else if (!strcmp(value, "slots")) {
+		} else if (value == "slots") {
 			if (!lua_istable(l, j)) {
 				LuaError(l, "incorrect argument");
 			}
 			parseSlots(l, j);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 }

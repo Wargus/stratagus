@@ -40,18 +40,18 @@
 /* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "hit-points")) {
+		if (value == "hit-points") {
 			this->HP = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "mana-points")) {
+		} else if (value == "mana-points") {
 			this->Mana = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "shield-points")) {
+		} else if (value == "shield-points") {
 			this->Shield = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "max-multi-cast")) {
+		} else if (value == "max-multi-cast") {
 			this->MaxMultiCast = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value);
+			LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value.data());
 		}
 	}
 }

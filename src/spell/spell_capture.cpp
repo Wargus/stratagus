@@ -44,18 +44,18 @@
 /* virtual */ void Spell_Capture::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "sacrifice")) {
+		if (value == "sacrifice") {
 			this->SacrificeEnable = true;
-		} else if (!strcmp(value, "join-to-ai-force")) {
+		} else if (value == "join-to-ai-force") {
 			this->JoinToAIForce = true;
-		} else if (!strcmp(value, "damage")) {
+		} else if (value == "damage") {
 			this->Damage = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "percent")) {
+		} else if (value == "percent") {
 			this->DamagePercent = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported Capture tag: %s" _C_ value);
+			LuaError(l, "Unsupported Capture tag: %s" _C_ value.data());
 		}
 	}
 }

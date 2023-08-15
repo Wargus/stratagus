@@ -47,25 +47,25 @@
 /* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
 {
 	for (int j = startIndex; j < endIndex; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		if (!strcmp(value, "unit-type")) {
+		if (value == "unit-type") {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = UnitTypeByIdent(value);
+			this->UnitType = UnitTypeByIdent(value.data());
 			if (!this->UnitType) {
 				this->UnitType = 0;
-				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value);
+				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value.data());
 			}
-		} else if (!strcmp(value, "time-to-live")) {
+		} else if (value == "time-to-live") {
 			this->TTL = LuaToNumber(l, -1, j + 1);
-		} else if (!strcmp(value, "require-corpse")) {
+		} else if (value == "require-corpse") {
 			this->RequireCorpse = true;
 			--j;
-		} else if (!strcmp(value, "join-to-ai-force")) {
+		} else if (value == "join-to-ai-force") {
 			this->JoinToAiForce = true;
 			--j;
 		} else {
-			LuaError(l, "Unsupported summon tag: %s" _C_ value);
+			LuaError(l, "Unsupported summon tag: %s" _C_ value.data());
 		}
 	}
 	// Now, checking value.

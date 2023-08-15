@@ -252,33 +252,33 @@ static int CclDefineGameSounds(lua_State *l)
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
+		const std::string_view value = LuaToString(l, j + 1);
 		++j;
 
 		LuaUserData *data = nullptr;
 
 		// let's handle now the different cases
-		if (!strcmp(value, "click")) {
+		if (value == "click") {
 			if (!lua_isuserdata(l, j + 1)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Click.Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "transport-docking")) {
+		} else if (value == "transport-docking") {
 			if (!lua_isuserdata(l, j + 1)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.Docking.Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "placement-error")) {
+		} else if (value == "placement-error") {
 			SetSoundConfigRace(l, j, GameSounds.PlacementError);
-		} else if (!strcmp(value, "placement-success")) {
+		} else if (value == "placement-success") {
 			SetSoundConfigRace(l, j, GameSounds.PlacementSuccess);
-		} else if (!strcmp(value, "work-complete")) {
+		} else if (value == "work-complete") {
 			SetSoundConfigRace(l, j, GameSounds.WorkComplete);
-		} else if (!strcmp(value, "research-complete")) {
+		} else if (value == "research-complete") {
 			SetSoundConfigRace(l, j, GameSounds.ResearchComplete);
-		} else if (!strcmp(value, "not-enough-res")) {
+		} else if (value == "not-enough-res") {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
@@ -296,20 +296,20 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			lua_pop(l, 1);
 			GameSounds.NotEnoughRes[raceIndex][resId].Sound = (CSound *)data->Data;
-		} else if (!strcmp(value, "not-enough-food")) {
+		} else if (value == "not-enough-food") {
 			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
-		} else if (!strcmp(value, "rescue")) {
+		} else if (value == "rescue") {
 			SetSoundConfigRace(l, j, GameSounds.Rescue);
-		} else if (!strcmp(value, "building-construction")) {
+		} else if (value == "building-construction") {
 			SetSoundConfigRace(l, j, GameSounds.BuildingConstruction);
-		} else if (!strcmp(value, "chat-message")) {
+		} else if (value == "chat-message") {
 			if (!lua_isuserdata(l, j + 1)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
 			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 	}
 	return 0;
