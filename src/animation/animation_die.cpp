@@ -49,7 +49,7 @@
 		Exit(1);
 	}
 	if (this->DeathType.empty() == false) {
-		unit.DamagedType = ExtraDeathIndex(this->DeathType.c_str());
+		unit.DamagedType = ExtraDeathIndex(this->DeathType);
 	}
 	throw AnimationDie_Exception();
 }

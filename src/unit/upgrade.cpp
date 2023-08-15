@@ -267,73 +267,73 @@ static int CclDefineModifier(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		const char *key = LuaToString(l, j + 1, 1);
+		const std::string_view key = LuaToString(l, j + 1, 1);
 #if 0 // To be removed. must modify lua file.
-		if (!strcmp(key, "attack-range")) {
+		if (key == "attack-range") {
 			key = "AttackRange";
-		} else if (!strcmp(key, "sight-range")) {
+		} else if (key == "sight-range") {
 			key = "SightRange";
-		} else if (!strcmp(key, "basic-damage")) {
+		} else if (key == "basic-damage") {
 			key = "BasicDamage";
-		} else if (!strcmp(key, "piercing-damage")) {
+		} else if (key == "piercing-damage") {
 			key = "PiercingDamage";
-		} else if (!strcmp(key, "armor")) {
+		} else if (key == "armor") {
 			key = "Armor";
-		} else if (!strcmp(key, "hit-points")) {
+		} else if (key == "hit-points") {
 			key = "HitPoints";
 		}
 #endif
-		if (!strcmp(key, "regeneration-rate")) {
+		if (key == "regeneration-rate") {
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
-		} else if (!strcmp(key, "regeneration-frequency")) {
+		} else if (key == "regeneration-frequency") {
 			um->Modifier.Variables[HP_INDEX].IncreaseFrequency = LuaToNumber(l, j + 1, 2);
-		} else if (!strcmp(key, "cost")) {
+		} else if (key == "cost") {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
-			const char *value = LuaToString(l, j + 1, 1);
+			const std::string_view value = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 2);
-		} else if (!strcmp(key, "storing")) {
+		} else if (key == "storing") {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");
 			}
-			const char *value = LuaToString(l, j + 1, 1);
+			const std::string_view value = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.Storing[resId] = LuaToNumber(l, j + 1, 2);
-		} else if (!strcmp(key, "improve-production")) {
-			const char *value = LuaToString(l, j + 1, 2);
+		} else if (key == "improve-production") {
+			const std::string_view value = LuaToString(l, j + 1, 2);
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.ImproveIncomes[resId] = LuaToNumber(l, j + 1, 3);
-		} else if (!strcmp(key, "allow-unit")) {
-			const char *value = LuaToString(l, j + 1, 2);
+		} else if (key == "allow-unit") {
+			const std::string_view value = LuaToString(l, j + 1, 2);
 
-			if (!strncmp(value, "unit-", 5)) {
-				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+			if (value.substr(0, 5) == "unit-") {
+				um->ChangeUnits[UnitTypeIdByIdent(value.data())] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
 			}
-		} else if (!strcmp(key, "allow")) {
-			const char *value = LuaToString(l, j + 1, 2);
-			if (!strncmp(value, "upgrade-", 8)) {
-				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+		} else if (key == "allow") {
+			const std::string_view value = LuaToString(l, j + 1, 2);
+			if (value.substr(0, 8) == "upgrade-") {
+				um->ChangeUpgrades[UpgradeIdByIdent(value.data())] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "upgrade expected");
 			}
-		} else if (!strcmp(key, "apply-to")) {
+		} else if (key == "apply-to") {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
-		} else if (!strcmp(key, "convert-to")) {
+		} else if (key == "convert-to") {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = UnitTypeByIdent(value);
-		} else if (!strcmp(key, "research-speed")) {
+		} else if (key == "research-speed") {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else {
-			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
+			int index = UnitTypeVar.VariableNameLookup[key.data()]; // variable index;
 			if (index != -1) {
 				if (lua_rawlen(l, j + 1) == 3) {
-					const char *value = LuaToString(l, j + 1, 3);
-					if (!strcmp(value, "Percent")) {
+					const std::string_view value = LuaToString(l, j + 1, 3);
+					if (value == "Percent") {
 						um->ModifyPercent[index] = LuaToNumber(l, j + 1, 2);
 					}
 				} else {
@@ -345,12 +345,12 @@ static int CclDefineModifier(lua_State *l)
 						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
 						um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
 					} else {
-						LuaError(l, "bad argument type for '%s'\n" _C_ key);
+						LuaError(l, "bad argument type for '%s'\n" _C_ key.data());
 					}
 					lua_pop(l, 1);
 				}
 			} else {
-				LuaError(l, "wrong tag: %s" _C_ key);
+				LuaError(l, "wrong tag: %s" _C_ key.data());
 			}
 		}
 	}

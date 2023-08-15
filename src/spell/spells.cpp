@@ -414,7 +414,7 @@ void InitSpells()
 **
 **  @return       spell-type struct pointer.
 */
-SpellType *SpellTypeByIdent(const std::string &ident)
+SpellType *SpellTypeByIdent(const std::string_view &ident)
 {
 	auto it = ranges::find_if(SpellTypeTable, [&](SpellType* spell) { return spell->Ident == ident; });
 	if (it != SpellTypeTable.end()) {

@@ -120,8 +120,8 @@ extern int DefaultResourceAmounts[MaxCosts];
 */
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
-extern int GetResourceIdByName(const char *resourceName);
-extern int GetResourceIdByName(lua_State *l, const char *resourceName);
+extern int GetResourceIdByName(std::string_view resourceName);
+extern int GetResourceIdByName(lua_State *l, std::string_view resourceName);
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.

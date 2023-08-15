@@ -74,7 +74,7 @@
 	if (next == nullptr) {
 		// Special case for non-CVariable variables
 		if (!strcmp(arg1, "DamageType")) {
-			int death = ExtraDeathIndex(this->valueStr.c_str());
+			int death = ExtraDeathIndex(this->valueStr);
 			if (death == ANIMATIONS_DEATHTYPES) {
 				fprintf(stderr, "Incorrect death type : %s \n" _C_ this->valueStr.c_str());
 				Exit(1);

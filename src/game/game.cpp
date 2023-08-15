@@ -1184,8 +1184,8 @@ static int CclSetSpeedResourcesHarvest(lua_State *l)
 	LuaCheckArgs(l, 3);
 
 	const int player = LuaToNumber(l, 1);
-	const std::string resource = LuaToString(l, 2);
-	const int resId = GetResourceIdByName(l, resource.c_str());
+	const std::string_view resource = LuaToString(l, 2);
+	const int resId = GetResourceIdByName(l, resource);
 
 	Players[player].SpeedResourcesHarvest[resId] = LuaToNumber(l, 3);
 	return 0;
@@ -1201,8 +1201,8 @@ static int CclSetSpeedResourcesReturn(lua_State *l)
 	LuaCheckArgs(l, 3);
 
 	const int player = LuaToNumber(l, 1);
-	const std::string resource = LuaToString(l, 2);
-	const int resId = GetResourceIdByName(l, resource.c_str());
+	const std::string_view resource = LuaToString(l, 2);
+	const int resId = GetResourceIdByName(l, resource);
 
 	Players[player].SpeedResourcesReturn[resId] = LuaToNumber(l, 3);
 	return 0;
@@ -1376,8 +1376,8 @@ static int CclDefineDefaultResourceAmounts(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	for (unsigned int j = 0; j < args; ++j) {
-		const std::string resource = LuaToString(l, j + 1);
-		const int resId = GetResourceIdByName(l, resource.c_str());
+		const std::string_view resource = LuaToString(l, j + 1);
+		const int resId = GetResourceIdByName(l, resource);
 
 		++j;
 		DefaultResourceAmounts[resId] = LuaToNumber(l, j + 1);

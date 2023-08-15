@@ -2648,12 +2648,12 @@ std::vector<fs::path> getVolumes()
 static int CclListFilesystem(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	const char *dir = LuaToString(l, 1);
+	const std::string_view dir = LuaToString(l, 1);
 
 #ifdef WIN32
-	if (strcmp(dir, "/") == 0) {
+	if (dir == "/") {
 		std::vector<fs::path> vols = getVolumes();
-		lua_newtable(l);	
+		lua_newtable(l);
 		int j = 0;
 		for (auto const& vol: vols) {
 			if (fs::exists(vol)) {

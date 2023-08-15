@@ -282,7 +282,7 @@ static int CclDefineGameSounds(lua_State *l)
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
 			}
-			const char *resName = LuaToString(l, j + 1, 1);
+			const std::string_view resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
 			const char *raceName = LuaToString(l, j + 1, 2);
 			const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);

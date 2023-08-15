@@ -450,9 +450,9 @@ static int CclDefineDependency(lua_State *l)
 		}
 		if (j + 1 < args) {
 			++j;
-			const char *value = LuaToString(l, j + 1);
-			if (strcmp(value, "or")) {
-				LuaError(l, "not or symbol: %s" _C_ value);
+			const std::string_view value = LuaToString(l, j + 1);
+			if (value != "or") {
+				LuaError(l, "not 'or' symbol: %s" _C_ value.data());
 				return 0;
 			}
 			or_flag = 1;

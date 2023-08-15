@@ -42,6 +42,8 @@
 #include "color.h"
 #include "vec2i.h"
 
+#include <string_view>
+
 class CFont;
 
 /// The SDL screen
@@ -538,10 +540,10 @@ static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
                                    "gray", "dark-gray", "white", "orange",
                                    "light-blue", "blue", "dark-green", "black", nullptr};
 
-inline int GetColorIndexByName(const char *colorName) {
+inline int GetColorIndexByName(std::string_view colorName) {
     int i = 0;
     while (ColorNames[i] != nullptr) {
-        if (!strcmp(colorName, ColorNames[i])) {
+        if (colorName == ColorNames[i]) {
             return i;
         }
         i++;

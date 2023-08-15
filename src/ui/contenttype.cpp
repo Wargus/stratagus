@@ -386,28 +386,28 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		lua_pushnil(l); // ParseStringDesc eat token
 	} else {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-			if (!strcmp(key, "Text")) {
+			const std::string_view key = LuaToString(l, -2);
+			if (key == "Text") {
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
-			} else if (!strcmp(key, "Font")) {
+			} else if (key == "Font") {
 				this->Font = CFont::Get(LuaToString(l, -1));
-			} else if (!strcmp(key, "Centered")) {
+			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "Variable")) {
-				const char *const name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name];
+			} else if (key == "Variable") {
+				const std::string_view name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
 				if (this->Index == -1) {
 					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 				}
-			} else if (!strcmp(key, "Component")) {
+			} else if (key == "Component") {
 				this->Component = Str2EnumVariable(l, LuaToString(l, -1));
-			} else if (!strcmp(key, "Stat")) {
+			} else if (key == "Stat") {
 				this->Stat = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "ShowName")) {
+			} else if (key == "ShowName") {
 				this->ShowName = LuaToBoolean(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Text' in DefinePanelContents" _C_ key);
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePanelContents" _C_ key.data());
 			}
 		}
 	}
@@ -418,23 +418,23 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	Assert(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "Format")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Format") {
 			this->Format = LuaToString(l, -1);
-		} else if (!strcmp(key, "Font")) {
+		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
-		} else if (!strcmp(key, "Variable")) {
-			const char *const name = LuaToString(l, -1);
-			this->Index = UnitTypeVar.VariableNameLookup[name];
+		} else if (key == "Variable") {
+			const std::string_view name = LuaToString(l, -1);
+			this->Index = UnitTypeVar.VariableNameLookup[name.data()];
 			if (this->Index == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
-		} else if (!strcmp(key, "Component")) {
+		} else if (key == "Component") {
 			this->Component = Str2EnumVariable(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "Centered")) {
+		} else if (key == "Centered") {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanelContents" _C_ key);
+			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanelContents" _C_ key.data());
 		}
 	}
 }
@@ -443,41 +443,41 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
 	Assert(lua_istable(l, -1));
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "Format")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Format") {
 			this->Format = LuaToString(l, -1);
-		} else if (!strcmp(key, "Font")) {
+		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
-		} else if (!strcmp(key, "Variable")) {
-			const char *const name = LuaToString(l, -1);
-			this->Index1 = UnitTypeVar.VariableNameLookup[name];
+		} else if (key == "Variable") {
+			const std::string_view name = LuaToString(l, -1);
+			this->Index1 = UnitTypeVar.VariableNameLookup[name.data()];
 			this->Index2 = this->Index1;
 			if (this->Index1 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
-		} else if (!strcmp(key, "Component")) {
+		} else if (key == "Component") {
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "Variable1")) {
+		} else if (key == "Variable1") {
 			const char *const name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index1 == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ name);
 			}
-		} else if (!strcmp(key, "Component1")) {
+		} else if (key == "Component1") {
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "Variable2")) {
-			const char *const name = LuaToString(l, -1);
-			this->Index2 = UnitTypeVar.VariableNameLookup[name];
+		} else if (key == "Variable2") {
+			const std::string_view name = LuaToString(l, -1);
+			this->Index2 = UnitTypeVar.VariableNameLookup[name.data()];
 			if (this->Index2 == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 			}
-		} else if (!strcmp(key, "Component2")) {
+		} else if (key == "Component2") {
 			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "Centered")) {
+		} else if (key == "Centered") {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanelContents" _C_ key);
+			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanelContents" _C_ key.data());
 		}
 	}
 }
@@ -491,7 +491,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @return  Corresponding value.
 **  @note    Stop on error.
 */
-static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
+static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 {
 	static struct {
 		const char *s;
@@ -501,16 +501,15 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		{"Inside", UnitRefInside},
 		{"Container", UnitRefContainer},
 		{"Worker", UnitRefWorker},
-		{"Goal", UnitRefGoal},
-		{0, UnitRefItSelf}
+		{"Goal", UnitRefGoal}
 	}; // List of possible values.
 
 	for (int i = 0; list[i].s; ++i) {
-		if (!strcmp(s, list[i].s)) {
+		if (s == list[i].s) {
 			return list[i].e;
 		}
 	}
-	LuaError(l, "'%s' is a invalid Unit reference" _C_ s);
+	LuaError(l, "'%s' is a invalid Unit reference" _C_ s.data());
 	return UnitRefItSelf;
 }
 
@@ -519,24 +518,24 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 	SingleSelectionIcon = GroupSelectionIcon = TransportIcon = 0;
 	ButtonIcon = 1;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "Unit")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Unit") {
 			this->UnitRef = Str2EnumUnit(l, LuaToString(l, -1));
-		} else if (!strcmp(key, "SingleSelection")) {
+		} else if (key == "SingleSelection") {
 			bool flag = LuaToBoolean(l, -1);
 			if (!ButtonIcon && flag) {
 				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
 			}
 			ButtonIcon = !flag;
 			SingleSelectionIcon = flag;
-		} else if (!strcmp(key, "GroupSelection")) {
+		} else if (key == "GroupSelection") {
 			bool flag = LuaToBoolean(l, -1);
 			if (!ButtonIcon && flag) {
 				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
 			}
 			ButtonIcon = !flag;
 			GroupSelectionIcon = flag;
-		} else if (!strcmp(key, "TransportSelection")) {
+		} else if (key == "TransportSelection") {
 			bool flag = LuaToBoolean(l, -1);
 			if (!ButtonIcon && flag) {
 				LuaError(l, "Only one of SingleSelection, GroupSelection, TransportSelection can be chosen");
@@ -544,7 +543,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 			ButtonIcon = !flag;
 			TransportIcon = flag;
 		} else {
-			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key);
+			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key.data());
 		}
 	}
 }
@@ -556,10 +555,10 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 		this->frame = 0;
 	} else if (lua_istable(l, -1)) {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-			if (!strcmp(key, "Graphic")) {
+			const std::string_view key = LuaToString(l, -2);
+			if (key == "Graphic") {
 				this->graphic = LuaToString(l, -1);
-			} else if (!strcmp(key, "Frame")) {
+			} else if (key == "Frame") {
 				this->frame = LuaToNumber(l, -1);
 			}
 		}
@@ -569,28 +568,28 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 /* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "Variable")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Variable") {
 			if (lua_isstring(l, -1)) {
-				const char *const name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name];
+				const std::string_view name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ name);
+					LuaError(l, "unknown variable '%s'" _C_ name.data());
 				}
 			} else {
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument, need list of size 2 with {function, max} or a string with the name of a unit variable");
 				}
 				for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-					const char *key = LuaToString(l, -2);
-					if (!strcmp(key, "Max")) {
+					const std::string_view key = LuaToString(l, -2);
+					if (key == "Max") {
 						this->ValueMax = LuaToNumber(l, -1);
-					} else if (!strcmp(key, "Value")) {
+					} else if (key == "Value") {
 						this->ValueFunc = CclParseNumberDesc(l);
 						lua_pushnil(l); // ParseStringDesc eat token
 					} else {
 						lua_pop(l, 1);
-						LuaError(l, "unknow value '%s'" _C_ key);
+						LuaError(l, "unknow value '%s'" _C_ key.data());
 					}
 				}
 				if (this->ValueMax == -1) {
@@ -600,11 +599,11 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 					LuaError(l, "didn't set a value function");
 				}
 			}
-		} else if (!strcmp(key, "Height")) {
+		} else if (key == "Height") {
 			this->Height = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Width")) {
+		} else if (key == "Width") {
 			this->Width = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Colors")) {
+		} else if (key == "Colors") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument, need list");
 			}
@@ -630,7 +629,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 			if (this->values[color_len - 1] != 0) {
 				LuaError(l, "the last {percentage, color} pair must be for 0%%");
 			}
-		} else if (!strcmp(key, "Border")) {
+		} else if (key == "Border") {
 			if (lua_isboolean(l, -1)) {
 				if (LuaToBoolean(l, -1)) {
 					this->hasBorder = 1;
@@ -644,7 +643,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 				}
 			}
 		} else {
-			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key);
+			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key.data());
 		}
 	}
 	// Default value and checking errors.
@@ -676,28 +675,28 @@ static EnumUnit Str2EnumUnit(lua_State *l, const char *s)
 /* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
+		const std::string_view key = LuaToString(l, -2);
 
-		if (!strcmp(key, "Variable")) {
-			const char *const name = LuaToString(l, -1);
-			this->varIndex = UnitTypeVar.VariableNameLookup[name];
+		if (key == "Variable") {
+			const std::string_view name = LuaToString(l, -1);
+			this->varIndex = UnitTypeVar.VariableNameLookup[name.data()];
 			if (this->varIndex == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
-		} else if (!strcmp(key, "Height")) {
+		} else if (key == "Height") {
 			this->height = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Width")) {
+		} else if (key == "Width") {
 			this->width = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Border")) {
+		} else if (key == "Border") {
 			this->hasBorder = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "Color")) {
-			const char *const colorName = LuaToString(l, -1);
+		} else if (key == "Color") {
+			const std::string_view colorName = LuaToString(l, -1);
 			this->colorIndex = GetColorIndexByName(colorName);
 			if (colorIndex == -1) {
-				LuaError(l, "incorrect color: '%s' " _C_ colorName);
+				LuaError(l, "incorrect color: '%s' " _C_ colorName.data());
 			}
 		} else {
-			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents" _C_ key);
+			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents" _C_ key.data());
 		}
 	}
 	// Default value and checking errors.

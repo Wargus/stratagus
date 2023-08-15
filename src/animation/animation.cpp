@@ -667,16 +667,16 @@ static int CclDefineAnimations(lua_State *l)
 
 	lua_pushnil(l);
 	while (lua_next(l, 2)) {
-		const char *value = LuaToString(l, -2);
+		const std::string_view value = LuaToString(l, -2);
 
-		if (!strcmp(value, "Start")) {
+		if (value == "Start") {
 			anims->Start = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "Still", 5)) {
+		} else if (value.substr(0, 5) == "Still") {
 			anims->Still = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "Death", 5)) {
+		} else if (value.substr(0, 5) == "Death") {
 			anims->hasDeathAnimation = true;
-			if (strlen(value) > 5) {
-				const int death = ExtraDeathIndex(value + 6);
+			if (value.size() > 5) {
+				const int death = ExtraDeathIndex(value.substr(6));
 				if (death == ANIMATIONS_DEATHTYPES) {
 					anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
 				} else {
@@ -685,29 +685,29 @@ static int CclDefineAnimations(lua_State *l)
 			} else {
 				anims->Death[ANIMATIONS_DEATHTYPES] = ParseAnimation(l, -1);
 			}
-		} else if (!strcmp(value, "Attack")) {
+		} else if (value == "Attack") {
 			anims->Attack = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "RangedAttack")) {
+		} else if (value == "RangedAttack") {
 			anims->RangedAttack = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "SpellCast")) {
+		} else if (value == "SpellCast") {
 			anims->SpellCast = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Move")) {
+		} else if (value == "Move") {
 			anims->Move = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Repair")) {
+		} else if (value == "Repair") {
 			anims->Repair = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Train")) {
+		} else if (value == "Train") {
 			anims->Train = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Research")) {
+		} else if (value == "Research") {
 			anims->Research = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Upgrade")) {
+		} else if (value == "Upgrade") {
 			anims->Upgrade = ParseAnimation(l, -1);
-		} else if (!strcmp(value, "Build")) {
+		} else if (value == "Build") {
 			anims->Build = ParseAnimation(l, -1);
-		} else if (!strncmp(value, "Harvest_", 8)) {
-			const int res = GetResourceIdByName(l, value + 8);
+		} else if (value.substr(0, 8) == "Harvest_") {
+			const int res = GetResourceIdByName(l, value.substr(8));
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else {
-			LuaError(l, "Unsupported animation: %s" _C_ value);
+			LuaError(l, "Unsupported animation: %s" _C_ value.data());
 		}
 		lua_pop(l, 1);
 	}
