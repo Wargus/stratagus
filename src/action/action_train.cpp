@@ -67,7 +67,7 @@
 	return order;
 }
 
-/* virtual */ void COrder_Train::Save(CFile &file, const CUnit &unit) const
+void COrder_Train::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-train\",");
 	if (this->Finished) {
@@ -78,12 +78,15 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Train::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Train::ParseSpecificData(lua_State *l,
+                                     int &j,
+                                     std::string_view value,
+                                     const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "type")) {
+	if (value == "type") {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-	} else if (!strcmp(value, "ticks")) {
+	} else if (value == "ticks") {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);
 	} else {
@@ -92,18 +95,18 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Train::IsValid() const
+bool COrder_Train::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Train::Show(const CViewport &, const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
 
 
-/* virtual */ void COrder_Train::Cancel(CUnit &unit)
+void COrder_Train::Cancel(CUnit &unit) /* override */
 {
 	DebugPrint("Cancel training\n");
 	CPlayer &player = *unit.Player;
@@ -111,7 +114,7 @@
 	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
 }
 
-/* virtual */ void COrder_Train::UpdateUnitVariables(CUnit &unit) const
+void COrder_Train::UpdateUnitVariables(CUnit &unit) const /* override */
 {
 	Assert(unit.CurrentOrder() == this);
 
@@ -174,7 +177,7 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 }
 
-/* virtual */ void COrder_Train::Execute(CUnit &unit)
+void COrder_Train::Execute(CUnit &unit) /* override */
 {
 	AnimateActionTrain(unit);
 	if (unit.Wait) {

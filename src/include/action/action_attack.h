@@ -43,25 +43,26 @@ public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitAction::AttackGround : UnitAction::Attack),
 		State(0), MinRange(0), Range(0), SkirmishRange(0), offeredTarget(nullptr), goalPos(-1, -1), attackMovePos(-1, -1), Sleep(0) {}
 
-	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
+	COrder_Attack *Clone() const override { return new COrder_Attack(*this); }
 
-	virtual bool IsValid() const;
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	bool IsValid() const override;
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+	void Execute(CUnit &unit) override;
+	void OnAnimationAttack(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
 
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	const Vec2i GetGoalPos() const override { return goalPos; }
 	bool IsWeakTargetSelected() const;
 	bool IsAutoTargeting() const;
 	bool IsMovingToAttackPos() const;
 	bool IsAttackGroundOrWall() const;
 	bool IsTargetTooClose(const CUnit &unit) const;
-	CUnit *const BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const;
+	CUnit *BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const;
 	void OfferNewTarget(const CUnit &unit, CUnit *const target);
 
 private:

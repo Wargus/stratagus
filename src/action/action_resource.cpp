@@ -244,7 +244,7 @@ COrder_Resource::~COrder_Resource()
 	}
 }
 
-/* virtual */ void COrder_Resource::Save(CFile &file, const CUnit &unit) const
+void COrder_Resource::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-resource\",");
 	if (this->Finished) {
@@ -274,40 +274,43 @@ COrder_Resource::~COrder_Resource()
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Resource::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Resource::ParseSpecificData(lua_State *l,
+                                        int &j,
+                                        std::string_view value,
+                                        const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "current-res")) {
+	if (value == "current-res") {
 		++j;
 		this->CurrentResource = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "done-harvesting")) {
+	} else if (value == "done-harvesting") {
 		this->DoneHarvesting = true;
-	} else if (!strcmp(value, "res-depot")) {
+	} else if (value == "res-depot") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Depot = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "res-mine")) {
+	} else if (value == "res-mine") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Resource.Mine = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "res-pos")) {
+	} else if (value == "res-pos") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->Resource.Pos.x , &this->Resource.Pos.y);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "state")) {
+	} else if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "timetoharvest")) {
+	} else if (value == "timetoharvest") {
 		++j;
 		this->TimeToHarvest = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "worker")) {
+	} else if (value == "worker") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->worker = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -318,12 +321,13 @@ COrder_Resource::~COrder_Resource()
 	return true;
 }
 
-/* virtual */ bool COrder_Resource::IsValid() const
+bool COrder_Resource::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Resource::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Resource::Show(const CViewport &vp,
+                               const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 
@@ -338,7 +342,7 @@ COrder_Resource::~COrder_Resource()
 	return targetPos;
 }
 
-/* virtual */ void COrder_Resource::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Resource::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(1);
@@ -357,7 +361,7 @@ COrder_Resource::~COrder_Resource()
 }
 
 
-/* virtual */ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
+bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/) /* override */
 {
 	if (this->IsGatheringFinished()) {
 		// Normal return to depot
@@ -1398,7 +1402,7 @@ void COrder_Resource::Execute(CUnit &unit)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Resource::GetGoalPos() const
+const Vec2i COrder_Resource::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

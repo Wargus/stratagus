@@ -51,7 +51,7 @@
 	return new COrder_Die;
 }
 
-/* virtual */ void COrder_Die::Save(CFile &file, const CUnit &unit) const
+void COrder_Die::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-die\"");
 	if (this->Finished) {
@@ -60,17 +60,20 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Die::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Die::ParseSpecificData(lua_State *l,
+                                   int &j,
+                                   std::string_view value,
+                                   const CUnit &unit) /* override */
 {
 	return false;
 }
 
-/* virtual */ bool COrder_Die::IsValid() const
+bool COrder_Die::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Die::Show(const CViewport &, const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
@@ -94,7 +97,7 @@ static bool AnimateActionDie(CUnit &unit)
 }
 
 
-/* virtual */ void COrder_Die::Execute(CUnit &unit)
+void COrder_Die::Execute(CUnit &unit) /* override */
 {
 	// Show death animation
 	if (AnimateActionDie(unit) == false) {

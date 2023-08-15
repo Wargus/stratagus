@@ -44,24 +44,26 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Build *Clone() const { return new COrder_Build(*this); }
+	COrder_Build *Clone() const override { return new COrder_Build(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	void Execute(CUnit &unit) override;
+	void Cancel(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	void UpdateUnitVariables(CUnit &unit) const override;
 
-	virtual void AiUnitKilled(CUnit &unit);
+	void AiUnitKilled(CUnit &unit) override;
+
+	const Vec2i GetGoalPos() const override;
 
 	const CUnitType &GetUnitType() const { return *Type; }
-	virtual const Vec2i GetGoalPos() const;
 
 	CUnit *GetBuildingUnit() const;
 

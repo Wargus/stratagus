@@ -69,7 +69,7 @@
 	return order;
 }
 
-/* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
+void COrder_Research::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-research\",");
 
@@ -82,9 +82,12 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Research::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Research::ParseSpecificData(lua_State *l,
+                                        int &j,
+                                        std::string_view value,
+                                        const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "upgrade")) {
+	if (value == "upgrade") {
 		++j;
 		this->Upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
 	} else {
@@ -93,17 +96,18 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Research::IsValid() const
+bool COrder_Research::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Research::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Research::Show(const CViewport &,
+                               const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
 
-/* virtual */ void COrder_Research::UpdateUnitVariables(CUnit &unit) const
+void COrder_Research::UpdateUnitVariables(CUnit &unit) const /* override */
 {
 	unit.Variable[RESEARCH_INDEX].Value = unit.Player->UpgradeTimers.Upgrades[this->Upgrade->ID];
 	unit.Variable[RESEARCH_INDEX].Max = this->Upgrade->Costs[TimeCost];
@@ -114,7 +118,7 @@
 **
 **  @return true when finished.
 */
-/* virtual */ void COrder_Research::Execute(CUnit &unit)
+void COrder_Research::Execute(CUnit &unit) /* override */
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	const CUnitType &type = *unit.Type;
@@ -163,7 +167,7 @@
 	unit.Wait = CYCLES_PER_SECOND / 6;
 }
 
-/* virtual */ void COrder_Research::Cancel(CUnit &unit)
+void COrder_Research::Cancel(CUnit &unit) /* override */
 {
 	const CUpgrade &upgrade = this->GetUpgrade();
 	unit.Player->UpgradeTimers.Upgrades[upgrade.ID] = 0;

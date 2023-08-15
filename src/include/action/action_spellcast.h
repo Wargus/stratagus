@@ -44,20 +44,20 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_SpellCast *Clone() const { return new COrder_SpellCast(*this); }
+	COrder_SpellCast *Clone() const override { return new COrder_SpellCast(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	void OnAnimationAttack(CUnit &unit) override;
+	const Vec2i GetGoalPos() const override;
 
-	virtual void OnAnimationAttack(CUnit &unit);
-
-	virtual const Vec2i GetGoalPos() const;
 	const SpellType &GetSpell() const { return *Spell; }
 	void SetSpell(const SpellType &spell) { Spell = &spell; }
 private:

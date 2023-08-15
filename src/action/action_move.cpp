@@ -67,7 +67,7 @@
 	return order;
 }
 
-/* virtual */ void COrder_Move::Save(CFile &file, const CUnit &unit) const
+void COrder_Move::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-move\",");
 
@@ -80,12 +80,15 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Move::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Move::ParseSpecificData(lua_State *l,
+                                    int &j,
+                                    std::string_view value,
+                                    const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "range")) {
+	if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -96,12 +99,12 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Move::IsValid() const
+bool COrder_Move::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const /* override */
 {
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
@@ -111,7 +114,7 @@
 	return targetPos;
 }
 
-/* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Move::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	const Vec2i tileSize(0, 0);
 	input.SetGoal(this->goalPos, tileSize);
@@ -270,7 +273,7 @@ int DoActionMove(CUnit &unit)
 }
 
 
-/* virtual */ void COrder_Move::Execute(CUnit &unit)
+void COrder_Move::Execute(CUnit &unit) /* override */
 {
 	Assert(unit.CanMove());
 
@@ -313,7 +316,7 @@ int DoActionMove(CUnit &unit)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Move::GetGoalPos() const
+const Vec2i COrder_Move::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

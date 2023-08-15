@@ -78,7 +78,7 @@
 	return order;
 }
 
-/* virtual */ void COrder_Repair::Save(CFile &file, const CUnit &unit) const
+void COrder_Repair::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-repair\",");
 
@@ -100,20 +100,20 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Repair::ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) /* override */
 {
-	if (!strcmp("repaircycle", value)) {
+	if (value == "repaircycle") {
 		++j;
 		this->RepairCycle = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp("repair-target", value)) {
+	} else if (value == "repair-target") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->ReparableTarget = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp("state", value)) {
+	} else if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -124,12 +124,13 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Repair::IsValid() const
+bool COrder_Repair::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Repair::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Repair::Show(const CViewport &vp,
+                             const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 
@@ -144,7 +145,7 @@
 	return targetPos;
 }
 
-/* virtual */ void COrder_Repair::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Repair::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	const CUnit &unit = *input.GetUnit();
 
@@ -235,7 +236,7 @@ static void AnimateActionRepair(CUnit &unit)
 	UnitShowAnimation(unit, unit.Type->Animations->Repair);
 }
 
-/* virtual */ void COrder_Repair::Execute(CUnit &unit)
+void COrder_Repair::Execute(CUnit &unit) /* override */
 {
 	Assert(this->ReparableTarget == this->GetGoal());
 
@@ -322,7 +323,7 @@ static void AnimateActionRepair(CUnit &unit)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Repair::GetGoalPos() const
+const Vec2i COrder_Repair::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

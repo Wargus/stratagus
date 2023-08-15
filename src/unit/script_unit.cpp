@@ -184,11 +184,11 @@ CUnit *CclGetUnitFromRef(lua_State *l)
 }
 
 
-bool COrder::ParseGenericData(lua_State *l, int &j, const char *value)
+bool COrder::ParseGenericData(lua_State *l, int &j, std::string_view value)
 {
-	if (!strcmp(value, "finished")) {
+	if (value == "finished") {
 		this->Finished = true;
-	} else if (!strcmp(value, "goal")) {
+	} else if (value == "goal") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->SetGoal(CclGetUnitFromRef(l));

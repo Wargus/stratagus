@@ -70,7 +70,7 @@ enum {
 	return order;
 }
 
-/* virtual */ void COrder_Board::Save(CFile &file, const CUnit &unit) const
+ void COrder_Board::Save(CFile &file, const CUnit &unit) const/* override */
 {
 	file.printf("{\"action-board\",");
 
@@ -86,15 +86,15 @@ enum {
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Board::ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) /* override */
 {
-	if (!strcmp("state", value)) {
+	if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp("range", value)) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -105,12 +105,12 @@ enum {
 	return true;
 }
 
-/* virtual */ bool COrder_Board::IsValid() const
+bool COrder_Board::IsValid() const /* override */
 {
 	return this->HasGoal() && this->GetGoal()->IsAliveOnMap();
 }
 
-/* virtual */ PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Board::Show(const CViewport &vp, const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 
@@ -125,7 +125,7 @@ enum {
 	return targetPos;
 }
 
-/* virtual */ void COrder_Board::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Board::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -248,7 +248,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 	DebugPrint("No free slot in transporter\n");
 }
 
-/* virtual */ void COrder_Board::Execute(CUnit &unit)
+void COrder_Board::Execute(CUnit &unit) /* override */
 {
 	switch (this->State) {
 		// Wait for transporter
@@ -299,7 +299,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Board::GetGoalPos() const
+const Vec2i COrder_Board::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

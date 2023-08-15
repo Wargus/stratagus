@@ -152,7 +152,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 
-/* virtual */ void COrder_Attack::Save(CFile &file, const CUnit &unit) const
+void COrder_Attack::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	Assert(Action == UnitAction::Attack || Action == UnitAction::AttackGround);
 
@@ -177,27 +177,30 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 }
 
 
-/* virtual */ bool COrder_Attack::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Attack::ParseSpecificData(lua_State *l,
+                                      int &j,
+                                      std::string_view value,
+                                      const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "state")) {
+	if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "min-range")) {
+	} else if (value == "min-range") {
 		++j;
 		this->MinRange = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "range")) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
 		if (unit.Type->BoolFlag[SKIRMISHER_INDEX].value) {
 			this->SkirmishRange = this->Range;
 		}
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x, &this->goalPos.y);
 		lua_pop(l, 1);
 
-	} else if (!strcmp(value, "amove-tile")) {
+	} else if (value == "amove-tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->attackMovePos.x, &this->attackMovePos.y);
@@ -209,7 +212,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return true;
 }
 
-/* virtual */ bool COrder_Attack::IsValid() const
+bool COrder_Attack::IsValid() const /* override */
 {
 	if (Action == UnitAction::Attack) {
 		if (this->HasGoal()) {
@@ -223,7 +226,8 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 }
 
-/* virtual */ PixelPos COrder_Attack::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Attack::Show(const CViewport &vp,
+                             const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 	PixelPos orderedPos;
@@ -245,7 +249,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		Video.DrawLineClip(ColorOrange, lastScreenPos, targetPos);
 		Video.FillCircleClip(ColorOrange, targetPos, 3);
 	}
-#ifdef DEBUG	
+#ifdef DEBUG
 	if (IsMovingToAttackPos()) {
 		Video.DrawLineClip(ColorGreen, lastScreenPos, vp.TilePosToScreen_Center(this->goalPos));
 		Video.FillCircleClip(ColorRed, vp.TilePosToScreen_Center(this->goalPos), 3);
@@ -255,7 +259,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return isAttackMove ? orderedPos : targetPos;
 }
 
-/* virtual */ void COrder_Attack::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Attack::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	Vec2i tileSize;
 	if (this->HasGoal() && !IsMovingToAttackPos()) {
@@ -281,7 +285,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 }
 
-/* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
+void COrder_Attack::OnAnimationAttack(CUnit &unit) /* override */
 {
 	Assert(unit.Type->CanAttack);
 
@@ -289,7 +293,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	UnHideUnit(unit); // unit is invisible until attacks
 }
 
-/* virtual */ bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/)
+bool COrder_Attack::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) /* override */
 {
 	CUnit *goal = this->GetGoal();
 
@@ -331,7 +335,7 @@ bool COrder_Attack::IsAttackGroundOrWall() const
 	return (this->Action == UnitAction::AttackGround || Map.WallOnMap(this->goalPos) ? true : false);
 }
 
-CUnit *const COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
+CUnit *COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
 {
 	Assert(target1 != nullptr);
 	Assert(target2 != nullptr);

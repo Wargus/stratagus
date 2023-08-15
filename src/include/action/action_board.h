@@ -40,17 +40,18 @@ class COrder_Board : public COrder
 public:
 	COrder_Board() : COrder(UnitAction::Board), State(0), Range(0), goalPos(-1, -1) {}
 
-	virtual COrder_Board *Clone() const { return new COrder_Board(*this); }
+	COrder_Board *Clone() const override { return new COrder_Board(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual const Vec2i GetGoalPos() const;
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	const Vec2i GetGoalPos() const override;
+
 private:
 	bool WaitForTransporter(CUnit &unit);
 	int MoveToTransporter(CUnit &unit);
