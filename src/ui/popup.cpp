@@ -137,8 +137,8 @@
 	Assert(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "InfoType")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "InfoType") {
 			std::string temp(LuaToString(l, -1));
 			if (temp == "Hint") {
 				this->InfoType = PopupButtonInfo_Hint;
@@ -147,12 +147,12 @@
 			} else if (temp == "Dependencies") {
 				this->InfoType = PopupButtonInfo_Dependencies;
 			}
-		} else if (!strcmp(key, "MaxWidth")) {
+		} else if (key == "MaxWidth") {
 			this->MaxWidth = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Font")) {
+		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else {
-			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key);
+			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key.data());
 		}
 	}
 }
@@ -205,15 +205,15 @@
 	Assert(lua_istable(l, -1));
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
-		if (!strcmp(key, "Text")) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Text") {
 			this->Text = LuaToString(l, -1);
-		} else if (!strcmp(key, "MaxWidth")) {
+		} else if (key == "MaxWidth") {
 			this->MaxWidth = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "Font")) {
+		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else {
-			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key);
+			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());
 		}
 	}
 }
@@ -318,13 +318,13 @@
 
 	if (!lua_isnil(l, -1)) {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-			if (!strcmp(key, "Font")) {
+			const std::string_view key = LuaToString(l, -2);
+			if (key == "Font") {
 				this->Font = CFont::Get(LuaToString(l, -1));
-			} else if (!strcmp(key, "Centered")) {
+			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
+				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key.data());
 			}
 		}
 	}
@@ -357,15 +357,15 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	if (!lua_isnil(l, -1)) {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-			if (!strcmp(key, "Width")) {
+			const std::string_view key = LuaToString(l, -2);
+			if (key == "Width") {
 				this->Width = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "Height")) {
+			} else if (key == "Height") {
 				this->Height = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "Color")) {
+			} else if (key == "Color") {
 				this->Color = LuaToUnsignedNumber(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key);
+				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key.data());
 			}
 		}
 	}
@@ -430,22 +430,22 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		lua_pushnil(l); // ParseStringDesc eat token
 	} else {
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
-			if (!strcmp(key, "Text")) {
+			const std::string_view key = LuaToString(l, -2);
+			if (key == "Text") {
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
-			} else if (!strcmp(key, "Font")) {
+			} else if (key == "Font") {
 				this->Font = CFont::Get(LuaToString(l, -1));
-			} else if (!strcmp(key, "Centered")) {
+			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
-			} else if (!strcmp(key, "Variable")) {
-				const char *const name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name];
+			} else if (key == "Variable") {
+				const std::string_view name = LuaToString(l, -1);
+				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
 				if (this->Index == -1) {
 					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 				}
 			} else {
-				LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key);
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());
 			}
 		}
 	}
@@ -462,65 +462,65 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 
 	PopupConditionPanel *condition = new PopupConditionPanel;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
+		const std::string_view key = LuaToString(l, -2);
 
-		if (!strcmp(key, "HasHint")) {
+		if (key == "HasHint") {
 			condition->HasHint = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "HasDescription")) {
+		} else if (key == "HasDescription") {
 			condition->HasDescription = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "HasDependencies")) {
+		} else if (key == "HasDependencies") {
 			condition->HasDependencies = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "ButtonValue")) {
+		} else if (key == "ButtonValue") {
 			condition->ButtonValue = LuaToString(l, -1);
-		} else if (!strcmp(key, "ButtonAction")) {
-			const char *value = LuaToString(l, -1);
-			if (!strcmp(value, "move")) {
+		} else if (key == "ButtonAction") {
+			const std::string_view value = LuaToString(l, -1);
+			if (value == "move") {
 				condition->ButtonAction = ButtonCmd::Move;
-			} else if (!strcmp(value, "stop")) {
+			} else if (value == "stop") {
 				condition->ButtonAction = ButtonCmd::Stop;
-			} else if (!strcmp(value, "attack")) {
+			} else if (value == "attack") {
 				condition->ButtonAction = ButtonCmd::Attack;
-			} else if (!strcmp(value, "repair")) {
+			} else if (value == "repair") {
 				condition->ButtonAction = ButtonCmd::Repair;
-			} else if (!strcmp(value, "harvest")) {
+			} else if (value == "harvest") {
 				condition->ButtonAction = ButtonCmd::Harvest;
-			} else if (!strcmp(value, "button")) {
+			} else if (value == "button") {
 				condition->ButtonAction = ButtonCmd::Button;
-			} else if (!strcmp(value, "build")) {
+			} else if (value == "build") {
 				condition->ButtonAction = ButtonCmd::Build;
-			} else if (!strcmp(value, "train-unit")) {
+			} else if (value == "train-unit") {
 				condition->ButtonAction = ButtonCmd::Train;
-			} else if (!strcmp(value, "patrol")) {
+			} else if (value == "patrol") {
 				condition->ButtonAction = ButtonCmd::Patrol;
-			} else if (!strcmp(value, "explore")) {
+			} else if (value == "explore") {
 				condition->ButtonAction = ButtonCmd::Explore;
-			} else if (!strcmp(value, "stand-ground")) {
+			} else if (value == "stand-ground") {
 				condition->ButtonAction = ButtonCmd::StandGround;
-			} else if (!strcmp(value, "attack-ground")) {
+			} else if (value == "attack-ground") {
 				condition->ButtonAction = ButtonCmd::AttackGround;
-			} else if (!strcmp(value, "return-goods")) {
+			} else if (value == "return-goods") {
 				condition->ButtonAction = ButtonCmd::Return;
-			} else if (!strcmp(value, "cast-spell")) {
+			} else if (value == "cast-spell") {
 				condition->ButtonAction = ButtonCmd::SpellCast;
-			} else if (!strcmp(value, "research")) {
+			} else if (value == "research") {
 				condition->ButtonAction = ButtonCmd::Research;
-			} else if (!strcmp(value, "upgrade-to")) {
+			} else if (value == "upgrade-to") {
 				condition->ButtonAction = ButtonCmd::UpgradeTo;
-			} else if (!strcmp(value, "unload")) {
+			} else if (value == "unload") {
 				condition->ButtonAction = ButtonCmd::Unload;
-			} else if (!strcmp(value, "cancel")) {
+			} else if (value == "cancel") {
 				condition->ButtonAction = ButtonCmd::Cancel;
-			} else if (!strcmp(value, "cancel-upgrade")) {
+			} else if (value == "cancel-upgrade") {
 				condition->ButtonAction = ButtonCmd::CancelUpgrade;
-			} else if (!strcmp(value, "cancel-train-unit")) {
+			} else if (value == "cancel-train-unit") {
 				condition->ButtonAction = ButtonCmd::CancelTrain;
-			} else if (!strcmp(value, "cancel-build")) {
+			} else if (value == "cancel-build") {
 				condition->ButtonAction = ButtonCmd::CancelBuild;
 			} else {
-				LuaError(l, "Unsupported button action: %s" _C_ value);
+				LuaError(l, "Unsupported button action: %s" _C_ value.data());
 			}
 		} else {
-			int index = UnitTypeVar.BoolFlagNameLookup[key];
+			int index = UnitTypeVar.BoolFlagNameLookup[key.data()];
 			if (index != -1) {
 				if (!condition->BoolFlags) {
 					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
@@ -530,7 +530,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			index = UnitTypeVar.VariableNameLookup[key];
+			index = UnitTypeVar.VariableNameLookup[key.data()];
 			if (index != -1) {
 				if (!condition->Variables) {
 					size_t new_variables_size = UnitTypeVar.GetNumberVariable();
@@ -540,7 +540,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			LuaError(l, "'%s' invalid for Condition in DefinePopups" _C_ key);
+			LuaError(l, "'%s' invalid for Condition in DefinePopups" _C_ key.data());
 		}
 	}
 	return condition;
@@ -561,43 +561,43 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	PopupConditionPanel *condition = nullptr;
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *key = LuaToString(l, -2);
+		std::string_view key = LuaToString(l, -2);
 
-		if (!strcmp(key, "Wrap")) {
+		if (key == "Wrap") {
 			wrap = LuaToBoolean(l, -1);
-		} else if (!strcmp(key, "TextColor")) {
+		} else if (key == "TextColor") {
 			textColor = LuaToString(l, -1);
-		} else if (!strcmp(key, "HighlightColor")) {
+		} else if (key == "HighlightColor") {
 			highColor = LuaToString(l, -1);
-		} else if (!strcmp(key, "Margin")) {
+		} else if (key == "Margin") {
 			CclGetPos(l, &marginX, &marginY);
-		} else if (!strcmp(key, "MinWidth")) {
+		} else if (key == "MinWidth") {
 			minWidth = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "MinHeight")) {
+		} else if (key == "MinHeight") {
 			minHeight = LuaToNumber(l, -1);
-		} else if (!strcmp(key, "More")) {
+		} else if (key == "More") {
 			Assert(lua_istable(l, -1));
 			key = LuaToString(l, -1, 1); // Method name
 			lua_rawgeti(l, -1, 2); // Method data
-			if (!strcmp(key, "ButtonInfo")) {
+			if (key == "ButtonInfo") {
 				content = new CPopupContentTypeButtonInfo;
-			} else if (!strcmp(key, "Text")) {
+			} else if (key == "Text") {
 				content = new CPopupContentTypeText;
-			} else if (!strcmp(key, "Costs")) {
+			} else if (key == "Costs") {
 				content = new CPopupContentTypeCosts;
-			} else if (!strcmp(key, "Line")) {
+			} else if (key == "Line") {
 				content = new CPopupContentTypeLine;
-			} else if (!strcmp(key, "Variable")) {
+			} else if (key == "Variable") {
 				content = new CPopupContentTypeVariable;
 			} else {
-				LuaError(l, "Invalid drawing method '%s' in DefinePopups" _C_ key);
+				LuaError(l, "Invalid drawing method '%s' in DefinePopups" _C_ key.data());
 			}
 			content->Parse(l);
 			lua_pop(l, 1); // Pop Variable Method data
-		} else if (!strcmp(key, "Condition")) {
+		} else if (key == "Condition") {
 			condition = ParsePopupConditions(l);
 		} else {
-			LuaError(l, "'%s' invalid for Contents in DefinePopups" _C_ key);
+			LuaError(l, "'%s' invalid for Contents in DefinePopups" _C_ key.data());
 		}
 	}
 	content->Wrap = wrap;

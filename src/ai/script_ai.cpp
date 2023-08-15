@@ -1758,7 +1758,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *type = LuaToString(l, j + 1, k + 1);
+				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				++k;
 				int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
@@ -1770,7 +1770,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *type = LuaToString(l, j + 1, k + 1);
+				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
@@ -1782,7 +1782,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *type = LuaToString(l, j + 1, k + 1);
+				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
@@ -1794,7 +1794,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *type = LuaToString(l, j + 1, k + 1);
+				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
@@ -1806,7 +1806,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *type = LuaToString(l, j + 1, k + 1);
+				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
 				ai->NeededMask |= (1 << resId);
 			}

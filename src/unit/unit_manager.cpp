@@ -204,14 +204,14 @@ void CUnitManager::Load(lua_State *l)
 		unsigned long cycle = static_cast<unsigned long>(-1);
 
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-			const char *key = LuaToString(l, -2);
+			const std::string_view key = LuaToString(l, -2);
 
-			if (!strcmp(key, "Slot")) {
+			if (key == "Slot") {
 				unit_index = LuaToNumber(l, -1);
-			} else if (!strcmp(key, "FreeCycle")) {
+			} else if (key == "FreeCycle") {
 				cycle = LuaToNumber(l, -1);
 			} else {
-				LuaError(l, "Wrong key %s" _C_ key);
+				LuaError(l, "Wrong key %s" _C_ key.data());
 			}
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));

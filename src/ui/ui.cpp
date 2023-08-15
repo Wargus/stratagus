@@ -206,7 +206,7 @@ void InitUserInterface()
 
 	UI.LifeBarColorsInt.clear();
 	for(const std::string& name : UI.LifeBarColorNames) {
-		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName(name.c_str())));
+		UI.LifeBarColorsInt.push_back(IndexToColor(GetColorIndexByName(name)));
 	}
 
 	//

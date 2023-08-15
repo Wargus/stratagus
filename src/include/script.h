@@ -351,7 +351,7 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 extern NumberDesc *Damage;  /// Damage calculation for missile.
 
 /// transform string in corresponding index.
-extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
+extern EnumVariable Str2EnumVariable(lua_State *l, std::string_view s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.

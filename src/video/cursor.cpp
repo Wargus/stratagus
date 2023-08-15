@@ -468,21 +468,21 @@ static int CclDefineCursor(lua_State *l)
 	}
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
-		const char *value = LuaToString(l, -2);
-		if (!strcmp(value, "Name")) {
+		const std::string_view value = LuaToString(l, -2);
+		if (value == "Name") {
 			name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Race")) {
+		} else if (value == "Race") {
 			race = LuaToString(l, -1);
-		} else if (!strcmp(value, "File")) {
+		} else if (value == "File") {
 			file = LuaToString(l, -1);
-		} else if (!strcmp(value, "HotSpot")) {
+		} else if (value == "HotSpot") {
 			CclGetPos(l, &hotpos.x, &hotpos.y);
-		} else if (!strcmp(value, "Size")) {
+		} else if (value == "Size") {
 			CclGetPos(l, &w, &h);
-		} else if (!strcmp(value, "Rate")) {
+		} else if (value == "Rate") {
 			rate = LuaToNumber(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unsupported tag: %s" _C_ value.data());
 		}
 		lua_pop(l, 1);
 	}

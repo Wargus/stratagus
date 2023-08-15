@@ -370,8 +370,6 @@ static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound pla
 
 static void RemoveUnitFromContainer(CUnit &unit);
 
-extern int ExtraDeathIndex(const char *death);
-
 /**
 **  Increase a unit's reference count.
 */
@@ -3130,7 +3128,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	HitUnit_LastAttack(attacker, target);
 	const CUnitType *type = target.Type;
 	if (attacker) {
-		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
+		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType);
 	}
 
 	if (attacker && !target.Type->BoolFlag[WALL_INDEX].value && target.Player->AiEnabled) {

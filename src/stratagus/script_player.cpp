@@ -171,7 +171,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->Resources[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "stored-resources") {
@@ -183,7 +183,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->StoredResources[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "max-resources") {
@@ -194,7 +194,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->MaxResources[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "last-resources") {
@@ -205,7 +205,7 @@ void CPlayer::Load(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->LastResources[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "incomes") {
@@ -217,7 +217,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->Incomes[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "revenue") {
@@ -229,7 +229,7 @@ void CPlayer::Load(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				++k;
 
-				const int resId = GetResourceIdByName(l, value.data());
+				const int resId = GetResourceIdByName(l, value);
 				this->Revenue[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else if (value == "ai-enabled") {
@@ -975,22 +975,22 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (data == "Resources") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->Resources[resId] + p->StoredResources[resId]);
 		return 1;
 	} else if (data == "StoredResources") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->StoredResources[resId]);
 		return 1;
 	} else if (data == "MaxResources") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->MaxResources[resId]);
 		return 1;
 	} else if (data == "UnitTypesCount") {
@@ -1041,8 +1041,8 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (data == "TotalResources") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->TotalResources[resId]);
 		return 1;
 	} else if (data == "TotalRazings") {
@@ -1054,15 +1054,15 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (data == "SpeedResourcesHarvest") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->SpeedResourcesHarvest[resId]);
 		return 1;
 	} else if (data == "SpeedResourcesReturn") {
 		LuaCheckArgs(l, 3);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		lua_pushnumber(l, p->SpeedResourcesReturn[resId]);
 		return 1;
 	} else if (data == "SpeedBuild") {
@@ -1144,14 +1144,14 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (data == "Resources") {
 		LuaCheckArgs(l, 4);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		p->SetResource(resId, LuaToNumber(l, 4));
 	} else if (data == "StoredResources") {
 		LuaCheckArgs(l, 4);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		p->SetResource(resId, LuaToNumber(l, 4), STORE_BUILDING);
 		// } else if (data == "UnitTypesCount") {
 		// } else if (data == "AiEnabled") {
@@ -1174,8 +1174,8 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (data == "TotalResources") {
 		LuaCheckArgs(l, 4);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		p->TotalResources[resId] = LuaToNumber(l, 4);
 	} else if (data == "TotalRazings") {
 		p->TotalRazings = LuaToNumber(l, 3);
@@ -1184,14 +1184,14 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (data == "SpeedResourcesHarvest") {
 		LuaCheckArgs(l, 4);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		p->SpeedResourcesHarvest[resId] = LuaToNumber(l, 4);
 	} else if (data == "SpeedResourcesReturn") {
 		LuaCheckArgs(l, 4);
 
-		const std::string res = LuaToString(l, 3);
-		const int resId = GetResourceIdByName(l, res.c_str());
+		const std::string_view res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res);
 		p->SpeedResourcesReturn[resId] = LuaToNumber(l, 4);
 	} else if (data == "SpeedBuild") {
 		p->SpeedBuild = LuaToNumber(l, 3);

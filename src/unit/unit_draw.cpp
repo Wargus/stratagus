@@ -296,11 +296,10 @@ void (*DrawSelectionEllipse(float factor))(IntColor, int, int, int, int)
 **
 **  @return              Index of the sprite. -1 if not found.
 */
-int GetSpriteIndex(const char *SpriteName)
+int GetSpriteIndex(std::string_view SpriteName)
 {
-	Assert(SpriteName);
 	for (unsigned int i = 0; i < DecoSprite.Name.size(); ++i) {
-		if (!strcmp(SpriteName, DecoSprite.Name[i].c_str())) {
+		if (SpriteName == DecoSprite.Name[i]) {
 			return i;
 		}
 	}
@@ -322,17 +321,17 @@ static int CclDefineSprites(lua_State *l)
 		lua_pushnil(l);
 		const char *name = nullptr;// name of the current sprite.
 		while (lua_next(l, i + 1)) {
-			const char *key = LuaToString(l, -2); // key name
-			if (!strcmp(key, "Name")) {
+			const std::string_view key = LuaToString(l, -2); // key name
+			if (key == "Name") {
 				name = LuaToString(l, -1);
-			} else if (!strcmp(key, "File")) {
+			} else if (key == "File") {
 				deco.File = LuaToString(l, -1);
-			} else if (!strcmp(key, "Offset")) {
+			} else if (key == "Offset") {
 				CclGetPos(l, &deco.HotPos.x, &deco.HotPos.y);
-			} else if (!strcmp(key, "Size")) {
+			} else if (key == "Size") {
 				CclGetPos(l, &deco.Width, &deco.Height);
 			} else { // Error.
-				LuaError(l, "incorrect field '%s' for the DefineSprite." _C_ key);
+				LuaError(l, "incorrect field '%s' for the DefineSprite." _C_ key.data());
 			}
 			lua_pop(l, 1); // pop the value;
 		}

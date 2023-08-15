@@ -444,11 +444,11 @@ static int CclGetShader(lua_State *l) {
 */
 static int CclSetShader(lua_State *l) {
 	LuaCheckArgs(l, 1);
-	const char* shaderName = LuaToString(l, 1);
+	const std::string_view shaderName = LuaToString(l, 1);
 	for (int i = 0; i < MAX_SHADERS; i++) {
 		const char* n = shaderNames[i];
 		if (n) {
-			if (!strcmp(n, shaderName)) {
+			if (n == shaderName) {
 				currentShaderIdx = i;
 				std::cout << "SetShader: " << shaderNames[currentShaderIdx] << std::endl;
 				lua_pushboolean(l, 1);
