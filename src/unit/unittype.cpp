@@ -454,7 +454,7 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CUnitType *> UnitTypes;   /// unit-types definition
-std::map<std::string, CUnitType *> UnitTypeMap;
+static std::map<std::string, CUnitType *, std::less<>> UnitTypeMap;
 
 /**
 **  Next unit type are used hardcoded in the source.
@@ -843,9 +843,9 @@ void SaveUnitTypes(CFile &file)
 **
 **  @return       Unit-type pointer.
 */
-CUnitType *UnitTypeByIdent(const std::string &ident)
+CUnitType *UnitTypeByIdent(std::string_view ident)
 {
-	std::map<std::string, CUnitType *>::iterator ret = UnitTypeMap.find(ident);
+	auto ret = UnitTypeMap.find(ident);
 	if (ret != UnitTypeMap.end()) {
 		return (*ret).second;
 	}
@@ -859,7 +859,7 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 **
 **  @return       New allocated (zeroed) unit-type pointer.
 */
-CUnitType *NewUnitTypeSlot(const std::string &ident)
+CUnitType *NewUnitTypeSlot(std::string_view ident)
 {
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 	CUnitType *type = new CUnitType;

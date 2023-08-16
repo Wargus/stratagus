@@ -75,7 +75,7 @@ class LuaCallback;
 #define UnitSides 8
 #define MaxAttackPos 5
 
-CUnitType *UnitTypeByIdent(const std::string &ident);
+CUnitType *UnitTypeByIdent(std::string_view ident); /// Get unit-type by ident
 
 enum GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
@@ -824,10 +824,9 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
-extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
+extern CUnitType *NewUnitTypeSlot(std::string_view ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 int colorIndex, int frame, const PixelPos &screenPos);

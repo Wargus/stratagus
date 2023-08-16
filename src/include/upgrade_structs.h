@@ -154,11 +154,11 @@ public:
 class CUpgrade
 {
 public:
-	CUpgrade(const std::string &ident);
+	explicit CUpgrade(std::string ident);
 	~CUpgrade();
 
-	static CUpgrade *New(const std::string &ident);
-	static CUpgrade *Get(const std::string &ident);
+	static CUpgrade *New(std::string ident);
+	static CUpgrade *Get(std::string_view ident);
 
 	void SetIcon(CIcon *icon);
 

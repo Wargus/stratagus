@@ -44,7 +44,7 @@
 		++j;
 		if (value == "portal-type") {
 			value = LuaToString(l, -1, j + 1);
-			this->PortalType = UnitTypeByIdent(value.data());
+			this->PortalType = UnitTypeByIdent(value);
 			if (!this->PortalType) {
 				this->PortalType = 0;
 				DebugPrint("unit type \"%s\" not found for spawn-portal.\n" _C_ value.data());

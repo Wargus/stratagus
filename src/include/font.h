@@ -124,7 +124,7 @@ public:
 	~CFontColor();
 
 	static CFontColor *New(const std::string &ident);
-	static CFontColor *Get(const std::string &ident);
+	static CFontColor *Get(std::string_view ident);
 
 	std::string Ident;
 	SDL_Color *Colors;
@@ -176,7 +176,7 @@ extern void CleanFonts();
 class CLabel
 {
 public:
-	CLabel(const CFont &f, const std::string &nc, const std::string &rc): font(&f)
+	CLabel(const CFont &f, std::string_view nc, std::string_view rc): font(&f)
 	{
 		normal = CFontColor::Get(nc);
 		reverse = CFontColor::Get(rc);
@@ -187,31 +187,26 @@ public:
 
 	void SetFont(const CFont &f) { font = &f; }
 
-	void SetNormalColor(const std::string &nc) { normal = CFontColor::Get(nc); }
+	void SetNormalColor(std::string_view nc) { normal = CFontColor::Get(nc); }
 
 	/// Draw text/number unclipped
-	int Draw(int x, int y, const char *const text) const;
-	int Draw(int x, int y, const std::string &text) const;
+	int Draw(int x, int y, std::string_view text) const;
 	int Draw(int x, int y, int number) const;
 	/// Draw text/number clipped
-	int DrawClip(int x, int y, const char *const text) const;
-	int DrawClip(int x, int y, const std::string &text, bool is_normal = true) const;
+	int DrawClip(int x, int y, std::string_view text, bool is_normal = true) const;
 	int DrawClip(int x, int y, int number) const;
 	/// Draw reverse text/number unclipped
-	int DrawReverse(int x, int y, const char *const text) const;
-	int DrawReverse(int x, int y, const std::string &text) const;
+	int DrawReverse(int x, int y, std::string_view text) const;
 	int DrawReverse(int x, int y, int number) const ;
 	/// Draw reverse text/number clipped
-	int DrawReverseClip(int x, int y, const char *const text) const;
-	int DrawReverseClip(int x, int y, const std::string &text) const;
+	int DrawReverseClip(int x, int y, std::string_view text) const;
 	int DrawReverseClip(int x, int y, int number) const;
 
 	int DrawCentered(int x, int y, const std::string &text) const;
 	int DrawReverseCentered(int x, int y, const std::string &text) const;
 private:
 	template <const bool CLIP>
-	int DoDrawText(int x, int y, const char *const text,
-				   const size_t len, const CFontColor *fc) const;
+	int DoDrawText(int x, int y, std::string_view text, const CFontColor *fc) const;
 private:
 	const CFontColor *normal;
 	const CFontColor *reverse;

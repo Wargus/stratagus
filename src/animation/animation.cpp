@@ -90,7 +90,7 @@ static std::vector<LabelsLaterStruct> LabelsLater;
 CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
 int NumAnimations;
 
-std::map<std::string, CAnimations *> AnimationMap;/// Animation map
+static std::map<std::string, CAnimations *, std::less<>> AnimationMap;/// Animation map
 
 
 /*----------------------------------------------------------------------------
@@ -285,7 +285,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 **
 **  @return The parsed value.
 */
-int ParseAnimFlags(const CUnit &unit, const char *parseflag)
+int ParseAnimFlags(const CUnit &unit, std::string_view parseflag)
 {
 	return unit.Anim.Anim->ParseAnimFlags(parseflag);
 }
@@ -356,11 +356,11 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 **
 **  @return  Pointer to the animation structure.
 */
-CAnimations *AnimationsByIdent(const std::string &ident)
+CAnimations *AnimationsByIdent(std::string_view ident)
 {
-	std::map<std::string, CAnimations *>::iterator ret = AnimationMap.find(ident);
-	if (ret != AnimationMap.end()) {
-		return (*ret).second;
+	auto it = AnimationMap.find(ident);
+	if (it != AnimationMap.end()) {
+		return it->second;
 	}
 	return nullptr;
 }
@@ -439,22 +439,22 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	const int nargs = lua_rawlen(l, luaIndex);
 
 	for (int j = 0; j != nargs; ++j) {
-		const char *value = LuaToString(l, luaIndex, j + 1);
+		const std::string_view value = LuaToString(l, luaIndex, j + 1);
 		++j;
 
-		if (!strcmp(value, "anim-wait")) {
+		if (value == "anim-wait") {
 			unit.Anim.Wait = LuaToNumber(l, luaIndex, j + 1);
-		} else if (!strcmp(value, "curr-anim")) {
+		} else if (value == "curr-anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.CurrAnim = AnimationsArray[animIndex];
-		} else if (!strcmp(value, "anim")) {
+		} else if (value == "anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
-		} else if (!strcmp(value, "unbreakable")) {
+		} else if (value == "unbreakable") {
 			unit.Anim.Unbreakable = 1;
 			--j;
 		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -467,22 +467,22 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	const int nargs = lua_rawlen(l, luaIndex);
 
 	for (int j = 0; j != nargs; ++j) {
-		const char *value = LuaToString(l, luaIndex, j + 1);
+		const std::string_view value = LuaToString(l, luaIndex, j + 1);
 		++j;
 
-		if (!strcmp(value, "anim-wait")) {
+		if (value == "anim-wait") {
 			unit.WaitBackup.Wait = LuaToNumber(l, luaIndex, j + 1);
-		} else if (!strcmp(value, "curr-anim")) {
+		} else if (value == "curr-anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.WaitBackup.CurrAnim = AnimationsArray[animIndex];
-		} else if (!strcmp(value, "anim")) {
+		} else if (value == "anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
-		} else if (!strcmp(value, "unbreakable")) {
+		} else if (value == "unbreakable") {
 			unit.WaitBackup.Unbreakable = 1;
 			--j;
 		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value);
+			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value.data());
 		}
 	}
 }
@@ -658,11 +658,10 @@ static int CclDefineAnimations(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	const char *name = LuaToString(l, 1);
-	CAnimations *anims = AnimationsByIdent(name);
+	const std::string name = LuaToString(l, 1);
+	CAnimations *&anims = AnimationMap[name];
 	if (!anims) {
 		anims = new CAnimations;
-		AnimationMap[name] = anims;
 	}
 
 	lua_pushnil(l);

@@ -483,7 +483,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// Slot identifier
 	const std::string_view str = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(str.data());
+	CUnitType *type = UnitTypeByIdent(str);
 
 	constexpr int redefineSprite = 2;
 
@@ -492,7 +492,7 @@ static int CclDefineUnitType(lua_State *l)
 		redefine = 1;
 		DebugPrint("Redefining unit-type '%s'\n" _C_ str.data());
 	} else {
-		type = NewUnitTypeSlot(str.data());
+		type = NewUnitTypeSlot(str);
 		redefine = 0;
 		type->NumDirections = 0;
 		type->Flip = 1;
@@ -1275,17 +1275,17 @@ static int CclCopyUnitType(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	// Slot identifier
-	const char* fromName = LuaToString(l, 1);
+	const std::string_view fromName = LuaToString(l, 1);
 	CUnitType *from = UnitTypeByIdent(fromName);
-	const char* toName = LuaToString(l, 2);
+	const std::string_view toName = LuaToString(l, 2);
 	CUnitType *to = UnitTypeByIdent(toName);
 	if (to) {
-		DebugPrint("Redefining unit-type '%s'\n" _C_ toName);
+		DebugPrint("Redefining unit-type '%s'\n" _C_ toName.data());
 	} else {
 		to = NewUnitTypeSlot(toName);
 	}
 	if (!from) {
-		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName);
+		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName.data());
 	}
 
 	to->Flip = from->Flip;
@@ -1405,7 +1405,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->Building = from->Building;
 	to->BuildingRules.clear();
 	if (!from->BuildingRules.empty()) {
-		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName, toName);
+		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName.data(), toName.data());
 	}
 	// XXX: should copy, not share, this will crash
 	// for (auto rule : from->BuildingRules) {
@@ -1413,7 +1413,7 @@ static int CclCopyUnitType(lua_State *l)
 	// }
 	to->AiBuildingRules.clear();
 	if (!from->AiBuildingRules.empty()) {
-		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName, toName);
+		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName.data(), toName.data());
 	}
 	// XXX: should copy, not share, this would crash
 	// for (auto rule : from->AiBuildingRules) {
@@ -2436,7 +2436,7 @@ void UpdateUnitVariables(CUnit &unit)
 */
 void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
 {
-	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	CUnitType *type = UnitTypeByIdent(ident);
 	
 	if (variable_key == "Costs") {
 		const int resId = GetResourceIdByName(variable_type.c_str());
@@ -2505,7 +2505,7 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 	if (sound.empty()) {
 		return;
 	}
-	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	CUnitType *type = UnitTypeByIdent(ident);
 	
 	if (sound_type == "selected") {
 		type->MapSound.Selected.Name = sound;

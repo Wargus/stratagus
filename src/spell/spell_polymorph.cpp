@@ -46,7 +46,7 @@
 		++j;
 		if (value == "new-form") {
 			value = LuaToString(l, -1, j + 1);
-			this->NewForm = UnitTypeByIdent(value.data());
+			this->NewForm = UnitTypeByIdent(value);
 			if (!this->NewForm) {
 				this->NewForm = 0;
 				DebugPrint("unit type \"%s\" not found for polymorph spell.\n" _C_ value.data());

@@ -777,7 +777,7 @@ static void DoNextReplay()
 	} else if (action == "train") {
 		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
 	} else if (action == "cancel-train") {
-		SendCommandCancelTraining(*unit, num, !val.empty() ? UnitTypeByIdent(val.data()) : nullptr);
+		SendCommandCancelTraining(*unit, num, !val.empty() ? UnitTypeByIdent(val) : nullptr);
 	} else if (action == "upgrade-to") {
 		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
 	} else if (action == "cancel-upgrade-to") {

@@ -142,7 +142,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 /// Get the animations structure by ident
-extern CAnimations *AnimationsByIdent(const std::string &ident);
+extern CAnimations *AnimationsByIdent(std::string_view ident);
 
 extern void AnimationCclRegister();
 
@@ -153,7 +153,7 @@ extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
 extern int ParseAnimInt(const CUnit &unit, const char *parseint);
-extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
+extern int ParseAnimFlags(const CUnit &unit, std::string_view parseflag);
 
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
 
