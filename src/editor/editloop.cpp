@@ -420,7 +420,7 @@ static void CalculateMaxIconSize()
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		if (!Editor.UnitTypes[i].empty()) {
-			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i]);
 			if (type != nullptr && type->Icon.Icon) {
 				const CIcon &icon = *type->Icon.Icon;
 
@@ -440,7 +440,7 @@ static void RecalculateShownUnits(size_t start = 0, size_t stop = INT_MAX)
 
 	for (size_t i = start; i < Editor.UnitTypes.size() && i < stop; i++) {
 		if (!Editor.UnitTypes[i].empty()) {
-			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i].c_str());
+			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i]);
 			Editor.ShownUnitTypes.push_back(type);
 		} else {
 			Editor.ShownUnitTypes.push_back(nullptr);

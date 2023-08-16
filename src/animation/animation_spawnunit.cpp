@@ -55,7 +55,7 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
-	CUnitType *type = UnitTypeByIdent(this->unitTypeStr.c_str());
+	CUnitType *type = UnitTypeByIdent(this->unitTypeStr);
 	Assert(type);
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());

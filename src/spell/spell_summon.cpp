@@ -51,7 +51,7 @@
 		++j;
 		if (value == "unit-type") {
 			value = LuaToString(l, -1, j + 1);
-			this->UnitType = UnitTypeByIdent(value.data());
+			this->UnitType = UnitTypeByIdent(value);
 			if (!this->UnitType) {
 				this->UnitType = 0;
 				DebugPrint("unit type \"%s\" not found for summon spell.\n" _C_ value.data());

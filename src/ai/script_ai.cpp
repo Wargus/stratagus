@@ -89,7 +89,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 		end = list.find(",", begin);
 		if (!unitName.empty()) {
 			Assert(unitName[0] != ',');
-			res.push_back(UnitTypeByIdent(unitName.c_str()));
+			res.push_back(UnitTypeByIdent(unitName));
 		}
 	}
 	return res;
@@ -1625,7 +1625,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			const int want = LuaToNumber(l, offset, k + 1);
 
 			AiBuildQueue queue;
-			queue.Type = UnitTypeByIdent(value.data());
+			queue.Type = UnitTypeByIdent(value);
 			queue.Want = want;
 			queue.Made = made;
 			queue.Pos = pos;
