@@ -39,17 +39,22 @@ class COrder_Still : public COrder
 public:
 	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still), State(0), Sleep(0) {}
 
-	virtual COrder_Still *Clone() const { return new COrder_Still(*this); }
+	COrder_Still *Clone() const override { return new COrder_Still(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void OnAnimationAttack(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	void Execute(CUnit &unit) override;
+	void OnAnimationAttack(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
+
 private:
 	bool AutoAttackStand(CUnit &unit);
 	bool AutoCastStand(CUnit &unit);

@@ -78,7 +78,7 @@ enum {
 	return order;
 }
 
-/* virtual */ void COrder_Follow::Save(CFile &file, const CUnit &unit) const
+void COrder_Follow::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-follow\",");
 
@@ -96,15 +96,18 @@ enum {
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Follow::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Follow::ParseSpecificData(lua_State *l,
+                                      int &j,
+                                      std::string_view value,
+                                      const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "state")) {
+	if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "range")) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -115,12 +118,13 @@ enum {
 	return true;
 }
 
-/* virtual */ bool COrder_Follow::IsValid() const
+bool COrder_Follow::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Follow::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Follow::Show(const CViewport &vp,
+                             const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 
@@ -135,7 +139,7 @@ enum {
 	return targetPos;
 }
 
-/* virtual */ void COrder_Follow::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Follow::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -154,7 +158,7 @@ enum {
 }
 
 
-/* virtual */ void COrder_Follow::Execute(CUnit &unit)
+void COrder_Follow::Execute(CUnit &unit) /* override */
 {
 	if (IsWaiting(unit)) {
 		return;
@@ -311,7 +315,7 @@ enum {
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Follow::GetGoalPos() const
+const Vec2i COrder_Follow::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

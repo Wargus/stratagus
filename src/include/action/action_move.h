@@ -44,17 +44,18 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Move *Clone() const { return new COrder_Move(*this); }
+	COrder_Move *Clone() const override { return new COrder_Move(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual const Vec2i GetGoalPos() const;
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	const Vec2i GetGoalPos() const override;
 
 private:
 	int Range;

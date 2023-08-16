@@ -40,16 +40,19 @@ class COrder_TransformInto : public COrder
 public:
 	COrder_TransformInto() : COrder(UnitAction::TransformInto), Type(nullptr) {}
 
-	virtual COrder_TransformInto *Clone() const { return new COrder_TransformInto(*this); }
+	COrder_TransformInto *Clone() const override { return new COrder_TransformInto(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
 
 private:
 	CUnitType *Type; /// Transform unit into this unit-type
@@ -62,19 +65,22 @@ class COrder_UpgradeTo : public COrder
 public:
 	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo), Type(nullptr), Ticks(0) {}
 
-	virtual COrder_UpgradeTo *Clone() const { return new COrder_UpgradeTo(*this); }
+	COrder_UpgradeTo *Clone() const override { return new COrder_UpgradeTo(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
+	void Execute(CUnit &unit) override;
+	void Cancel(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
 
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	void UpdateUnitVariables(CUnit &unit) const override;
 
 	const CUnitType &GetUnitType() const { return *Type; }
 private:

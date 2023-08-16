@@ -71,7 +71,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 }
 
 
-/* virtual */ void COrder_Built::Save(CFile &file, const CUnit &unit) const
+void COrder_Built::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-built\", ");
 	if (this->Finished) {
@@ -93,19 +93,22 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Built::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Built::ParseSpecificData(lua_State *l,
+                                     int &j,
+                                     std::string_view value,
+                                     const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "worker")) {
+	if (value == "worker") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Worker = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "progress")) {
+	} else if (value == "progress") {
 		++j;
 		this->ProgressCounter = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "cancel")) {
+	} else if (value == "cancel") {
 		this->IsCancelled = true;
-	} else if (!strcmp(value, "frame")) {
+	} else if (value == "frame") {
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
 		CConstructionFrame *cframe = unit.Type->Construction->Frames;
@@ -119,12 +122,12 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	return true;
 }
 
-/* virtual */ bool COrder_Built::IsValid() const
+bool COrder_Built::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Built::Show(const CViewport &, const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
@@ -257,7 +260,7 @@ COrder_Built::~COrder_Built()
 	CancelBuilt(*this, nullptr);
 }
 
-/* virtual */ void COrder_Built::Execute(CUnit &unit)
+void COrder_Built::Execute(CUnit &unit) /* override */
 {
 	const CUnitType &type = *unit.Type;
 
@@ -293,12 +296,12 @@ COrder_Built::~COrder_Built()
 	}
 }
 
-/* virtual */ void COrder_Built::Cancel(CUnit &unit)
+void COrder_Built::Cancel(CUnit &unit) /* override */
 {
 	this->IsCancelled = true;
 }
 
-/* virtual */ void COrder_Built::UpdateUnitVariables(CUnit &unit) const
+void COrder_Built::UpdateUnitVariables(CUnit &unit) const /* override */
 {
 	Assert(unit.CurrentOrder() == this);
 
@@ -311,7 +314,7 @@ COrder_Built::~COrder_Built()
 	unit.Variable[BUILD_INDEX].Value = std::min(unit.Variable[BUILD_INDEX].Max, unit.Variable[BUILD_INDEX].Value);
 }
 
-/* virtual */ void COrder_Built::FillSeenValues(CUnit &unit) const
+void COrder_Built::FillSeenValues(CUnit &unit) const /* override */
 {
 	unit.Seen.State = 1;
 	unit.Seen.CFrame = this->Frame;

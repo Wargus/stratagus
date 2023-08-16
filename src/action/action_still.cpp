@@ -68,7 +68,7 @@ enum {
 }
 
 
-/* virtual */ void COrder_Still::Save(CFile &file, const CUnit &unit) const
+void COrder_Still::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	if (this->Action == UnitAction::Still) {
 		file.printf("{\"action-still\",");
@@ -84,9 +84,9 @@ enum {
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Still::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Still::ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit)
 {
-	if (!strcmp("state", value)) {
+	if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
 	} else {
@@ -95,12 +95,12 @@ enum {
 	return true;
 }
 
-/* virtual */ bool COrder_Still::IsValid() const
+bool COrder_Still::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const /* override */
 {
 	if (this->Action == UnitAction::StandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
@@ -131,7 +131,7 @@ private:
 };
 
 
-/* virtual */ void COrder_Still::OnAnimationAttack(CUnit &unit)
+void COrder_Still::OnAnimationAttack(CUnit &unit) /* override */
 {
 	CUnit *goal = this->GetGoal();
 	if (goal == nullptr) {
@@ -383,7 +383,7 @@ bool AutoAttack(CUnit &unit)
 }
 
 
-/* virtual */ void COrder_Still::Execute(CUnit &unit)
+void COrder_Still::Execute(CUnit &unit) /* override */
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed

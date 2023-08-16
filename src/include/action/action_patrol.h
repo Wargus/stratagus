@@ -44,19 +44,20 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Patrol *Clone() const { return new COrder_Patrol(*this); }
+	COrder_Patrol *Clone() const override { return new COrder_Patrol(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	const Vec2i GetGoalPos() const override;
 
 	const Vec2i &GetWayPoint() const { return WayPoint; }
-	virtual const Vec2i GetGoalPos() const;
 private:
 	Vec2i WayPoint; /// position for patroling.
 	unsigned int WaitingCycle; /// number of cycle pathfinder wait.

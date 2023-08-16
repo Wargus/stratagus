@@ -90,7 +90,7 @@ enum {
 }
 
 
-/* virtual */ void COrder_Build::Save(CFile &file, const CUnit &unit) const
+void COrder_Build::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-build\",");
 
@@ -108,25 +108,28 @@ enum {
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Build::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Build::ParseSpecificData(lua_State *l,
+                                     int &j,
+                                     std::string_view value,
+                                     const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "building")) {
+	if (value == "building") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->BuildingUnit = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "range")) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "state")) {
+	} else if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "type")) {
+	} else if (value == "type") {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else {
@@ -135,12 +138,12 @@ enum {
 	return true;
 }
 
-/* virtual */ bool COrder_Build::IsValid() const
+bool COrder_Build::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
@@ -155,7 +158,7 @@ enum {
 	return targetPos;
 }
 
-/* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Build::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value && input.GetUnit()->CanMove() ? 1 : 0);
 	input.SetMaxRange(this->Range);
@@ -435,7 +438,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 	return this->BuildingUnit;
 }
 
-/* virtual */ void COrder_Build::UpdateUnitVariables(CUnit &unit) const
+void COrder_Build::UpdateUnitVariables(CUnit &unit) const /* override */
 {
 	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr) {
 		unit.Variable[TRAINING_INDEX].Value = this->BuildingUnit->Variable[BUILD_INDEX].Value;
@@ -443,7 +446,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 	}
 }
 
-/* virtual */ void COrder_Build::Execute(CUnit &unit)
+void COrder_Build::Execute(CUnit &unit) /* override */
 {
 	if (IsWaiting(unit)) {
 		return;
@@ -484,7 +487,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 	}
 }
 
-/* virtual */ void COrder_Build::Cancel(CUnit &unit)
+void COrder_Build::Cancel(CUnit &unit) /* override */
 {
 	if (this->State == State_BuildFromOutside && this->BuildingUnit != nullptr && this->BuildingUnit->CurrentAction() == UnitAction::Built) {
 		COrder_Built &targetOrder = *static_cast<COrder_Built *>(this->BuildingUnit->CurrentOrder());
@@ -495,7 +498,7 @@ CUnit *COrder_Build::GetBuildingUnit() const
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Build::GetGoalPos() const
+const Vec2i COrder_Build::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

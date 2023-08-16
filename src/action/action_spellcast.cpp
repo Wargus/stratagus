@@ -87,7 +87,7 @@
 	return order;
 }
 
-/* virtual */ void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const
+void COrder_SpellCast::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-spell-cast\",");
 
@@ -106,18 +106,21 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_SpellCast::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_SpellCast::ParseSpecificData(lua_State *l,
+                                         int &j,
+                                         std::string_view value,
+                                         const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "spell")) {
+	if (value == "spell") {
 		++j;
 		this->Spell = SpellTypeByIdent(LuaToString(l, -1, j + 1));
-	} else if (!strcmp(value, "range")) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "state")) {
+	} else if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -128,7 +131,7 @@
 	return true;
 }
 
-/* virtual */ bool COrder_SpellCast::IsValid() const
+bool COrder_SpellCast::IsValid() const /* override */
 {
 	Assert(Action == UnitAction::SpellCast);
 	if (this->HasGoal()) {
@@ -138,7 +141,8 @@
 	}
 }
 
-/* virtual */ PixelPos COrder_SpellCast::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_SpellCast::Show(const CViewport &vp,
+                                const PixelPos &lastScreenPos) const /* override */
 {
 	PixelPos targetPos;
 
@@ -153,7 +157,7 @@
 	return targetPos;
 }
 
-/* virtual */ void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input)
+void COrder_SpellCast::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -174,7 +178,7 @@
 /**
 **  Call when animation step is "attack"
 */
-/* virtual */ void COrder_SpellCast::OnAnimationAttack(CUnit &unit)
+void COrder_SpellCast::OnAnimationAttack(CUnit &unit) /* override */
 {
 	UnHideUnit(unit); // unit is invisible until attacks
 	CUnit *goal = GetGoal();
@@ -188,7 +192,7 @@
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_SpellCast::GetGoalPos() const
+const Vec2i COrder_SpellCast::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {
@@ -293,7 +297,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 }
 
 
-/* virtual */ void COrder_SpellCast::Execute(CUnit &unit)
+void COrder_SpellCast::Execute(CUnit &unit) /* override */
 {
 	COrder_SpellCast &order = *this;
 

@@ -109,8 +109,8 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	virtual void Save(CFile &file, const CUnit &unit) const = 0;
-	bool ParseGenericData(lua_State *l, int &j, const char *value);
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit) = 0;
+	bool ParseGenericData(lua_State *l, int &j, std::string_view value);
+	virtual bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) = 0;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const {}
 	virtual void FillSeenValues(CUnit &unit) const;

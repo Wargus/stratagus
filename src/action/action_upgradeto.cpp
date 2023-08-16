@@ -56,7 +56,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionTransformInto(CUnitType &type)
+COrder *COrder::NewActionTransformInto(CUnitType &type) /* override */
 {
 	COrder_TransformInto *order = new COrder_TransformInto;
 
@@ -64,7 +64,7 @@
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant)
+COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant) /* override */
 {
 	COrder_UpgradeTo *order = new COrder_UpgradeTo;
 
@@ -189,7 +189,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 #if 1 // TransFormInto
 
-/* virtual */ void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const
+void COrder_TransformInto::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-transform-into\",");
 	if (this->Finished) {
@@ -199,9 +199,12 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_TransformInto::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_TransformInto::ParseSpecificData(lua_State *l,
+                                             int &j,
+                                             std::string_view value,
+                                             const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "type")) {
+	if (value == "type") {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else {
@@ -210,19 +213,20 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	return true;
 }
 
-/* virtual */ bool COrder_TransformInto::IsValid() const
+bool COrder_TransformInto::IsValid() const /* override */
 {
 	return true;
 }
 
 
-/* virtual */ PixelPos COrder_TransformInto::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_TransformInto::Show(const CViewport &,
+                                    const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
 
 
-/* virtual */ void COrder_TransformInto::Execute(CUnit &unit)
+void COrder_TransformInto::Execute(CUnit &unit) /* override */
 {
 	TransformUnitIntoType(unit, *this->Type);
 	this->Finished = true;
@@ -232,7 +236,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 #if 1  //  COrder_UpgradeTo
 
-/* virtual */ void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const
+void COrder_UpgradeTo::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-upgrade-to\",");
 	if (this->Finished) {
@@ -243,12 +247,15 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_UpgradeTo::ParseSpecificData(lua_State *l,
+                                         int &j,
+                                         std::string_view value,
+                                         const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "type")) {
+	if (value == "type") {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-	} else if (!strcmp(value, "ticks")) {
+	} else if (value == "ticks") {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);
 	} else {
@@ -257,12 +264,13 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	return true;
 }
 
-/* virtual */ bool COrder_UpgradeTo::IsValid() const
+bool COrder_UpgradeTo::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_UpgradeTo::Show(const CViewport &, const PixelPos &lastScreenPos) const
+PixelPos COrder_UpgradeTo::Show(const CViewport &,
+                                const PixelPos &lastScreenPos) const /* override */
 {
 	return lastScreenPos;
 }
@@ -275,7 +283,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
 }
 
-/* virtual */ void COrder_UpgradeTo::Execute(CUnit &unit)
+void COrder_UpgradeTo::Execute(CUnit &unit) /* override */
 {
 	AnimateActionUpgradeTo(unit);
 	if (unit.Wait) {
@@ -313,14 +321,14 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	this->Finished = true;
 }
 
-/* virtual */ void COrder_UpgradeTo::Cancel(CUnit &unit)
+void COrder_UpgradeTo::Cancel(CUnit &unit) /* override */
 {
 	CPlayer &player = *unit.Player;
 
 	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelUpgradeCostsFactor);
 }
 
-/* virtual */ void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const
+void COrder_UpgradeTo::UpdateUnitVariables(CUnit &unit) const /* override */
 {
 	Assert(unit.CurrentOrder() == this);
 

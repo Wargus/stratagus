@@ -64,7 +64,7 @@
 }
 
 
-/* virtual */ void COrder_Patrol::Save(CFile &file, const CUnit &unit) const
+void COrder_Patrol::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-patrol\",");
 
@@ -81,20 +81,23 @@
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Patrol::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Patrol::ParseSpecificData(lua_State *l,
+                                      int &j,
+                                      std::string_view value,
+                                      const CUnit &unit) /* override */
 {
-	if (!strcmp(value, "patrol")) {
+	if (value == "patrol") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
 		lua_pop(l, 1);
-	} else if (!strcmp(value, "waiting-cycle")) {
+	} else if (value == "waiting-cycle") {
 		++j;
 		this->WaitingCycle = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "range")) {
+	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -105,12 +108,13 @@
 	return true;
 }
 
-/* virtual */ bool COrder_Patrol::IsValid() const
+bool COrder_Patrol::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Patrol::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Patrol::Show(const CViewport &vp,
+                             const PixelPos &lastScreenPos) const /* override */
 {
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
@@ -122,7 +126,7 @@
 	return pos2;
 }
 
-/* virtual */ void COrder_Patrol::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Patrol::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
@@ -131,7 +135,7 @@
 }
 
 
-/* virtual */ void COrder_Patrol::Execute(CUnit &unit)
+void COrder_Patrol::Execute(CUnit &unit) /* override */
 {
 	if (IsWaiting(unit)) {
 		return;
@@ -180,7 +184,7 @@
 /**
 **  Get goal position
 */
-/* virtual */ const Vec2i COrder_Patrol::GetGoalPos() const
+const Vec2i COrder_Patrol::GetGoalPos() const /* override */
 {
 	const Vec2i invalidPos(-1, -1);
 	if (goalPos != invalidPos) {

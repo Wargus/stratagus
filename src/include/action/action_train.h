@@ -40,18 +40,22 @@ class COrder_Train : public COrder
 public:
 	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Ticks(0) {}
 
-	virtual COrder_Train *Clone() const { return new COrder_Train(*this); }
+	COrder_Train *Clone() const override { return new COrder_Train(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual void Cancel(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
-	virtual void UpdateUnitVariables(CUnit &unit) const;
+	void Execute(CUnit &unit) override;
+	void Cancel(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override
+	{
+		UpdatePathFinderData_NotCalled(input);
+	}
+	void UpdateUnitVariables(CUnit &unit) const override;
 
 	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
 

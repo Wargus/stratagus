@@ -50,25 +50,25 @@ public:
 
 	~COrder_Resource();
 
-	virtual COrder_Resource *Clone() const { return new COrder_Resource(*this); }
+	COrder_Resource *Clone() const override { return new COrder_Resource(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
-
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
+	const Vec2i GetGoalPos() const override;
 
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
-	virtual const Vec2i GetGoalPos() const;
 private:
 	int MoveToResource_Terrain(CUnit &unit);
 	int MoveToResource_Unit(CUnit &unit);

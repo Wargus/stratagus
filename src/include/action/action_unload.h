@@ -44,17 +44,19 @@ public:
 		goalPos.y = -1;
 	}
 
-	virtual COrder_Unload *Clone() const { return new COrder_Unload(*this); }
+	COrder_Unload *Clone() const override { return new COrder_Unload(*this); }
 
-	virtual bool IsValid() const;
+	bool IsValid() const override;
 
-	virtual void Save(CFile &file, const CUnit &unit) const;
-	virtual bool ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit);
+	void Save(CFile &file, const CUnit &unit) const override;
+	bool
+	ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;
 
-	virtual void Execute(CUnit &unit);
-	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
-	virtual void UpdatePathFinderData(PathFinderInput &input);
-	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	void Execute(CUnit &unit) override;
+	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
+	void UpdatePathFinderData(PathFinderInput &input) override;
+
+	const Vec2i GetGoalPos() const override { return goalPos; }
 
 private:
 	bool LeaveTransporter(CUnit &transporter);

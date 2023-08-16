@@ -73,7 +73,7 @@ constexpr int UNLOAD_STATE = 2;
 	return order;
 }
 
-/* virtual */ void COrder_Unload::Save(CFile &file, const CUnit &unit) const
+void COrder_Unload::Save(CFile &file, const CUnit &unit) const /* override */
 {
 	file.printf("{\"action-unload\",");
 	if (this->Finished) {
@@ -88,15 +88,15 @@ constexpr int UNLOAD_STATE = 2;
 	file.printf("}");
 }
 
-/* virtual */ bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, const char *value, const CUnit &unit)
+bool COrder_Unload::ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit)
 {
-	if (!strcmp("state", value)) {
+	if (value == "state") {
 		++j;
 		this->State = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "retries")) {
+	} else if (value == "retries") {
 		++j;
 		this->Retries = LuaToNumber(l, -1, j + 1);
-	} else if (!strcmp(value, "tile")) {
+	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
@@ -107,12 +107,13 @@ constexpr int UNLOAD_STATE = 2;
 	return true;
 }
 
-/* virtual */ bool COrder_Unload::IsValid() const
+bool COrder_Unload::IsValid() const /* override */
 {
 	return true;
 }
 
-/* virtual */ PixelPos COrder_Unload::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
+PixelPos COrder_Unload::Show(const CViewport &vp,
+                             const PixelPos &lastScreenPos) const /* override */
 {
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
@@ -122,7 +123,7 @@ constexpr int UNLOAD_STATE = 2;
 	return targetPos;
 }
 
-/* virtual */ void COrder_Unload::UpdatePathFinderData(PathFinderInput &input)
+void COrder_Unload::UpdatePathFinderData(PathFinderInput &input) /* override */
 {
 	input.SetMinRange(0);
 	input.SetMaxRange(this->State == FIND_DROPZONE_STATE ? 1 : 0);
@@ -378,7 +379,7 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 	}
 }
 
-/* virtual */ void COrder_Unload::Execute(CUnit &unit)
+void COrder_Unload::Execute(CUnit &unit) /* override */
 {
 
 	if (!unit.CanMove()) {
