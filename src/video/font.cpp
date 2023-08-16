@@ -50,7 +50,7 @@
 using FontMap = std::map<std::string, CFont *>;
 static FontMap Fonts;  /// Font mappings
 
-using FontColorMap = std::map<std::string, CFontColor *>;
+using FontColorMap = std::map<std::string, CFontColor *, std::less<>>;
 static FontColorMap FontColors;  /// Map of ident to font color.
 
 static CFontColor *FontColor;                /// Current font color
@@ -559,8 +559,7 @@ CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
 **  @return      The length of the printed text.
 */
 template <const bool CLIP>
-int CLabel::DoDrawText(int x, int y,
-					   const char *const text, const size_t len, const CFontColor *fc) const
+int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc) const
 {
 	int widths = 0;
 	int utf8;
@@ -573,7 +572,7 @@ int CLabel::DoDrawText(int x, int y,
 	font->DynamicLoad();
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
-	while ((utf8 = CodepageIndexFromUTF8(text, len, pos, subpos))) {
+	while ((utf8 = CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos))) {
 		tab = false;
 		if (utf8 == '\t') {
 			tab = true;
@@ -614,18 +613,13 @@ int CLabel::DoDrawText(int x, int y,
 					continue;
 
 				default: {
-					const char *p = text + pos;
-					while (*p && *p != '~') {
-						++p;
-					}
-					if (!*p) {
+					auto end = text.find('~', pos);
+					if (end == std::string_view::npos) {
 						DebugPrint("oops, format your ~\n");
 						return widths;
 					}
-					std::string color;
-
-					color.insert(0, text + pos, p - (text + pos));
-					pos = p - text + 1;
+					std::string_view color = text.substr(pos, end - pos);
+					pos = end + 1;
 					LastTextColor = fc;
 					const CFontColor *fc_tmp = CFontColor::Get(color);
 					if (fc_tmp) {
@@ -662,96 +656,76 @@ CLabel::CLabel(const CFont &f) :
 }
 
 /// Draw text/number unclipped
-int CLabel::Draw(int x, int y, const char *const text) const
+int CLabel::Draw(int x, int y, std::string_view text) const
 {
-	return DoDrawText<false>(x, y, text, strlen(text), normal);
-}
-
-int CLabel::Draw(int x, int y, const std::string &text) const
-{
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), normal);
+	return DoDrawText<false>(x, y, text, normal);
 }
 
 int CLabel::Draw(int x, int y, int number) const
 {
 	std::string text = FormatNumber(number);
-	size_t len = text.size();
-	return DoDrawText<false>(x, y, text.c_str(), len, normal);
+
+	return DoDrawText<false>(x, y, text, normal);
 }
 
 /// Draw text/number clipped
-int CLabel::DrawClip(int x, int y, const char *const text) const
+int CLabel::DrawClip(int x, int y, std::string_view text, bool is_normal) const
 {
-	return DoDrawText<true>(x, y, text, strlen(text), normal);
-}
-
-int CLabel::DrawClip(int x, int y, const std::string &text, bool is_normal) const
-{
-	// return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+	// return DoDrawText<true>(x, y, text, normal);
 	if (is_normal) {
-	    return DoDrawText<true>(x, y, text.c_str(), text.size(), normal);
+		return DoDrawText<true>(x, y, text, normal);
 	}
 	else
 	{
-	    return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+		return DoDrawText<true>(x, y, text, reverse);
 	}
 }
 
 int CLabel::DrawClip(int x, int y, int number) const
 {
 	std::string text = FormatNumber(number);
-	size_t len = text.size();
-	return DoDrawText<true>(x, y, text.c_str(), len, normal);
+
+	return DoDrawText<true>(x, y, text, normal);
 }
 
 
 /// Draw reverse text/number unclipped
-int CLabel::DrawReverse(int x, int y, const char *const text) const
+int CLabel::DrawReverse(int x, int y, std::string_view text) const
 {
-	return DoDrawText<false>(x, y, text, strlen(text), reverse);
-}
-
-int CLabel::DrawReverse(int x, int y, const std::string &text) const
-{
-	return DoDrawText<false>(x, y, text.c_str(), text.size(), reverse);
+	return DoDrawText<false>(x, y, text, reverse);
 }
 
 int CLabel::DrawReverse(int x, int y, int number) const
 {
 	std::string text = FormatNumber(number);
-	size_t len = text.size();
-	return DoDrawText<false>(x, y, text.c_str(), len, reverse);
+
+	return DoDrawText<false>(x, y, text, reverse);
 }
 
 /// Draw reverse text/number clipped
-int CLabel::DrawReverseClip(int x, int y, const char *const text) const
+int CLabel::DrawReverseClip(int x, int y, std::string_view text) const
 {
-	return DoDrawText<true>(x, y, text, strlen(text), reverse);
-}
-
-int CLabel::DrawReverseClip(int x, int y, const std::string &text) const
-{
-	return DoDrawText<true>(x, y, text.c_str(), text.size(), reverse);
+	return DoDrawText<true>(x, y, text, reverse);
 }
 
 int CLabel::DrawReverseClip(int x, int y, int number) const
 {
 	std::string text = FormatNumber(number);
-	size_t len = text.size();
-	return DoDrawText<true>(x, y, text.c_str(), len, reverse);
+
+	return DoDrawText<true>(x, y, text, reverse);
 }
 
 int CLabel::DrawCentered(int x, int y, const std::string &text) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), normal);
+	DoDrawText<false>(x - dx / 2, y, text, normal);
 	return dx / 2;
 }
 
 int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 {
 	int dx = font->Width(text);
-	DoDrawText<false>(x - dx / 2, y, text.c_str(), text.size(), reverse);
+	DoDrawText<false>(x - dx / 2, y, text, reverse);
 	return dx / 2;
 }
 
@@ -1043,13 +1017,13 @@ CFontColor::~CFontColor()
 **
 **  @return       The font color
 */
-/* static */ CFontColor *CFontColor::Get(const std::string &ident)
+/* static */ CFontColor *CFontColor::Get(std::string_view ident)
 {
-	CFontColor *fc = FontColors[ident];
-	if (!fc) {
-		DebugPrint("font color not found: %s\n" _C_ ident.c_str());
+	auto it = FontColors.find(ident);
+	if (it == FontColors.end()) {
+		DebugPrint("font color not found: %s\n" _C_ ident.data());
 	}
-	return fc;
+	return it->second;
 }
 
 void CFont::Clean()
