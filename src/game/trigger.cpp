@@ -129,25 +129,19 @@ using CompareFunction = int (*)(int, int);
 **
 **  @return    Function pointer to the compare function
 */
-static CompareFunction GetCompareFunction(const char *op)
+static CompareFunction GetCompareFunction(std::string_view op)
 {
-	if (op[0] == '=') {
-		if ((op[1] == '=' && op[2] == '\0') || (op[1] == '\0')) {
-			return &CompareEq;
-		}
-	} else if (op[0] == '>') {
-		if (op[1] == '=' && op[2] == '\0') {
-			return &CompareGrEq;
-		} else if (op[1] == '\0') {
-			return &CompareGr;
-		}
-	} else if (op[0] == '<') {
-		if (op[1] == '=' && op[2] == '\0') {
-			return &CompareLeEq;
-		} else if (op[1] == '\0') {
-			return &CompareLe;
-		}
-	} else if (op[0] == '!' && op[1] == '=' && op[2] == '\0') {
+	if (op == "=" || op == "=") {
+		return &CompareEq;
+	} else if (op == ">=") {
+		return &CompareGrEq;
+	} else if (op == ">") {
+		return &CompareGr;
+	} else if (op == "<=") {
+		return &CompareLeEq;
+	} else if (op == "<") {
+		return &CompareLe;
+	} else if (op == "!=") {
 		return &CompareNEq;
 	}
 	return nullptr;
@@ -229,7 +223,7 @@ static int CclIfNearUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	const char *op = LuaToString(l, 2);
+	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
@@ -240,7 +234,7 @@ static int CclIfNearUnit(lua_State *l)
 	}
 	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op);
+		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op.data());
 	}
 
 	//
@@ -294,7 +288,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
-	const char *op = LuaToString(l, 2);
+	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
 	const CUnitType *unittype = TriggerGetUnitType(l);
@@ -306,7 +300,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 
 	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op);
+		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op.data());
 	}
 
 	// Get all unit types 'near'.
