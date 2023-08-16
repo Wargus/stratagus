@@ -322,18 +322,18 @@ static int CclDefineAiHelper(lua_State *l)
 			LuaError(l, "unknown tag: %s" _C_ value.data());
 		}
 		// Get the base unit type, which could handle the action.
-		const char *baseTypeName = LuaToString(l, j + 1, 2);
+		const std::string_view baseTypeName = LuaToString(l, j + 1, 2);
 		const CUnitType *base = UnitTypeByIdent(baseTypeName);
 		if (!base) {
-			LuaError(l, "unknown unittype: %s" _C_ baseTypeName);
+			LuaError(l, "unknown unittype: %s" _C_ baseTypeName.data());
 		}
 
 		// Get the unit types, which could be produced
 		for (int k = 2; k < subargs; ++k) {
-			const char *equivTypeName = LuaToString(l, j + 1, k + 1);
+			const std::string_view equivTypeName = LuaToString(l, j + 1, k + 1);
 			CUnitType *type = UnitTypeByIdent(equivTypeName);
 			if (!type) {
-				LuaError(l, "unknown unittype: %s" _C_ equivTypeName);
+				LuaError(l, "unknown unittype: %s" _C_ equivTypeName.data());
 			}
 			AiHelperInsert(AiHelpers.Equiv(), base->Slot, *type);
 			AiNewUnitTypeEquiv(*base, *type);
@@ -342,7 +342,7 @@ static int CclDefineAiHelper(lua_State *l)
 	return 0;
 }
 
-static CAiType *GetAiTypesByName(const char *name)
+static CAiType *GetAiTypesByName(const std::string_view name)
 {
 	for (size_t i = 0; i < AiTypes.size(); ++i) {
 		CAiType *ait = AiTypes[i];
@@ -405,19 +405,19 @@ static int CclDefineAi(lua_State *l)
 	CAiType *aitype = new CAiType;
 
 	// AI Name
-	const char *aiName = LuaToString(l, 1);
+	const std::string_view aiName = LuaToString(l, 1);
 	aitype->Name = aiName;
 
 #ifdef DEBUG
 	if (GetAiTypesByName(aiName)) {
-		DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ aiName);
+		DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ aiName.data());
 	}
 #endif
 	AiTypes.insert(AiTypes.begin(), aitype);
 
 	// AI Race
-	const char *value = LuaToString(l, 2);
-	if (*value != '*') {
+	const std::string_view value = LuaToString(l, 2);
+	if (!value.empty() && value[0] != '*') {
 		aitype->Race = value;
 	} else {
 		aitype->Race.clear();
@@ -1345,10 +1345,10 @@ static int CclAiSleep(lua_State *l)
 static int CclAiResearch(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	const char *str = LuaToString(l, 1);
+	const std::string_view str = LuaToString(l, 1);
 	CUpgrade *upgrade;
 
-	if (str) {
+	if (!str.empty()) {
 		upgrade = CUpgrade::Get(str);
 	} else {
 		LuaError(l, "Upgrade needed");
@@ -1661,10 +1661,10 @@ static int CclDefineAiPlayer(lua_State *l)
 		++j;
 
 		if (value == "ai-type") {
-			const char *aiName = LuaToString(l, j + 1);
+			const std::string_view aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
 			if (ait == nullptr) {
-				LuaError(l, "ai-type not found: %s" _C_ aiName);
+				LuaError(l, "ai-type not found: %s" _C_ aiName.data());
 			}
 			ai->AiType = ait;
 			ai->Script = ait->Script;
@@ -1716,7 +1716,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					for (int subk = 0; subk < subsubargs; ++subk) {
 						const int num = LuaToNumber(l, -1, subk + 1);
 						++subk;
-						const char *ident = LuaToString(l, -1, subk + 1);
+						const std::string_view ident = LuaToString(l, -1, subk + 1);
 						AiUnitType queue;
 
 						queue.Want = num;
@@ -1734,7 +1734,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						const int num = LuaToNumber(l, -1, subk + 1);
 						++subk;
 #if 0
-						const char *ident = LuaToString(l, -1, subk + 1);
+						const std::string_view ident = LuaToString(l, -1, subk + 1);
 						UNUSED(ident);
 #endif
 						ai->Force[forceIdx].Units.Insert(&UnitManager->GetSlotUnit(num));
@@ -1846,7 +1846,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				ai->UnitTypeRequests.resize(subargs / 2);
 			}
 			for (int k = 0; k < subargs; ++k) {
-				const char *ident = LuaToString(l, j + 1, k + 1);
+				const std::string_view ident = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int count = LuaToNumber(l, j + 1, k + 1);
 				ai->UnitTypeRequests[i].Type = UnitTypeByIdent(ident);
@@ -1859,7 +1859,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *ident = LuaToString(l, j + 1, k + 1);
+				const std::string_view ident = LuaToString(l, j + 1, k + 1);
 				ai->UpgradeToRequests.push_back(UnitTypeByIdent(ident));
 			}
 		} else if (value == "research") {
@@ -1868,7 +1868,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				const char *ident = LuaToString(l, j + 1, k + 1);
+				const std::string_view ident = LuaToString(l, j + 1, k + 1);
 				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (value == "building") {

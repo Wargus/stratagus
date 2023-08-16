@@ -268,7 +268,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	COrder &order = **orderPtr;
 
 	for (int j = 1; j < args; ++j) {
-		const char *value = LuaToString(l, -1, j + 1);
+		const std::string_view value = LuaToString(l, -1, j + 1);
 
 		if (order.ParseGenericData(l, j, value)) {
 			continue;
@@ -276,7 +276,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 			continue;
 		} else {
 			// This leaves a half initialized unit
-			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value);
+			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value.data());
 		}
 	}
 }

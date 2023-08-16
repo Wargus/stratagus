@@ -72,7 +72,7 @@ CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 /// Number of upgrades modifiers used
 int NumUpgradeModifiers;
 
-std::map<std::string, CUpgrade *> Upgrades;
+static std::map<std::string, CUpgrade *, std::less<>> Upgrades;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -125,8 +125,8 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 	return !(*this == rhs);
 }
 
-CUpgrade::CUpgrade(const std::string &ident) :
-	Ident(ident), ID(0)
+CUpgrade::CUpgrade(std::string ident) :
+	Ident(std::move(ident)), ID(0)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 }
@@ -140,7 +140,7 @@ CUpgrade::~CUpgrade()
 **
 **  @param ident  Upgrade identifier
 */
-CUpgrade *CUpgrade::New(const std::string &ident)
+/* static */ CUpgrade *CUpgrade::New(std::string ident)
 {
 	CUpgrade *upgrade = Upgrades[ident];
 	if (upgrade) {
@@ -161,13 +161,13 @@ CUpgrade *CUpgrade::New(const std::string &ident)
 **
 **  @return       Upgrade pointer or nullptr if not found.
 */
-CUpgrade *CUpgrade::Get(const std::string &ident)
+/* static */ CUpgrade *CUpgrade::Get(std::string_view ident)
 {
-	CUpgrade *upgrade = Upgrades[ident];
-	if (!upgrade) {
-		DebugPrint("upgrade not found: %s\n" _C_ ident.c_str());
+	auto it = Upgrades.find(ident);
+	if (it == Upgrades.end()) {
+		DebugPrint("upgrade not found: %s\n" _C_ ident.data());
 	}
-	return upgrade;
+	return it->second;
 }
 
 /**

@@ -51,7 +51,7 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 	const int offY = ParseAnimInt(unit, this->offYStr.c_str());
 	const int range = ParseAnimInt(unit, this->rangeStr.c_str());
 	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
-	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(::ParseAnimFlags(unit, this->flagsStr.c_str()));
+	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(::ParseAnimFlags(unit, this->flagsStr));
 
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
