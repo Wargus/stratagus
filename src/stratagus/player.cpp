@@ -354,10 +354,10 @@ void PlayerRace::Clean()
 	this->Count = 0;
 }
 
-int PlayerRace::GetRaceIndexByName(const char *raceName) const
+int PlayerRace::GetRaceIndexByName(std::string_view raceName) const
 {
 	for (unsigned int i = 0; i != this->Count; ++i) {
-		if (this->Name[i].compare(raceName) == 0) {
+		if (this->Name[i] == raceName) {
 			return i;
 		}
 	}

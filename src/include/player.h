@@ -325,7 +325,7 @@ public:
 	}
 
 	void Clean();
-	int GetRaceIndexByName(const char *raceName) const;
+	int GetRaceIndexByName(std::string_view raceName) const;
 
 public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
