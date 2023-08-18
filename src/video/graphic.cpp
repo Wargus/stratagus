@@ -427,10 +427,6 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 	CGraphic *&g = GraphicHash[file];
 	if (g == nullptr) {
 		g = new CGraphic;
-		if (!g) {
-			fprintf(stderr, "Out of memory\n");
-			ExitFatal(-1);
-		}
 		// FIXME: use a constructor for this
 		g->File = file;
 		g->HashFile = g->File.string();
@@ -464,10 +460,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
 		g = new CPlayerColorGraphic;
-		if (!g) {
-			fprintf(stderr, "Out of memory\n");
-			ExitFatal(-1);
-		}
 		// FIXME: use a constructor for this
 		g->File = file;
 		g->HashFile = g->File.string();
@@ -494,10 +486,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 {
 	CGraphic *g = new CGraphic;
-	if (!g) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
 	g->File = file;
 	int bufSize = file.size() + 32;
 	char *hashfile = new char[bufSize];
@@ -578,10 +566,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
 {
 	CPlayerColorGraphic *g = new CPlayerColorGraphic;
-	if (!g) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
 	g->File = file;
 	size_t bufSize = file.size() + 32;
 	char *hashfile = new char[bufSize];

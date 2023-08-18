@@ -429,11 +429,6 @@ void AiInit(CPlayer &player)
 {
 	PlayerAi *pai = new PlayerAi;
 
-	if (!pai) {
-		fprintf(stderr, "Out of memory.\n");
-		exit(0);
-	}
-
 	pai->Player = &player;
 
 	DebugPrint("%d - looking for class %s\n" _C_ player.Index _C_ player.AiName.c_str());
