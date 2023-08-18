@@ -864,10 +864,6 @@ CUnitType *NewUnitTypeSlot(std::string_view ident)
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 	CUnitType *type = new CUnitType;
 
-	if (!type) {
-		fprintf(stderr, "Out of memory\n");
-		ExitFatal(-1);
-	}
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
 	type->BoolFlag.resize(new_bool_size);
