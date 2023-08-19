@@ -329,7 +329,7 @@ static int CclDefineModifier(lua_State *l)
 		} else if (key == "research-speed") {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else {
-			int index = UnitTypeVar.VariableNameLookup[key.data()]; // variable index;
+			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
 				if (lua_rawlen(l, j + 1) == 3) {
 					const std::string_view value = LuaToString(l, j + 1, 3);

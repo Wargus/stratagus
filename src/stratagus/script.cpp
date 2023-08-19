@@ -721,7 +721,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					res->D.UnitStat.Unit = CclParseUnitDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Variable") {
-					const char *const name = LuaToString(l, -1);
+					const std::string_view name = LuaToString(l, -1);
 					res->D.UnitStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.UnitStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
@@ -750,7 +750,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				} else if (key == "Component") {
 					res->D.TypeStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else if (key == "Variable") {
-					const char *const name = LuaToString(l, -1);
+					const std::string_view name = LuaToString(l, -1);
 					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.TypeStat.Index == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));

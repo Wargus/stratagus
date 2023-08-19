@@ -188,12 +188,12 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->CheckFunc = new LuaCallback(l, -1);
 			lua_pop(l, 1);
 		} else {
-			int index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+			int index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {
 				condition->BoolFlag[index] = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 				continue;
 			}
-			index = UnitTypeVar.VariableNameLookup[value.data()];
+			index = UnitTypeVar.VariableNameLookup[value];
 			if (index != -1) { // Valid index.
 				lua_rawgeti(l, -1, j + 1);
 				if (!lua_istable(l, -1)) {
@@ -269,13 +269,13 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 				LuaError(l, "incorrect argument");
 			}
 			lua_rawgeti(l, -1, 1);
-			std::string var = LuaToString(l, -1);
-			int index = UnitTypeVar.VariableNameLookup[var.c_str()];// User variables
+			const std::string_view var = LuaToString(l, -1);
+			int index = UnitTypeVar.VariableNameLookup[var];// User variables
 			if (index == -1) {
 				if (var == "Distance") {
 					index = ACP_DISTANCE;
 				} else {
-					fprintf(stderr, "Bad variable name '%s'\n", var.c_str());
+					fprintf(stderr, "Bad variable name '%s'\n", var.data());
 					Exit(1);
 				}
 			}

@@ -624,7 +624,7 @@ static int CclUnit(lua_State *l)
 			}
 			lua_pop(l, 1);
 		} else {
-			const int index = UnitTypeVar.VariableNameLookup[value.data()];// User variables
+			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index
 				lua_rawgeti(l, 2, j + 1);
 				DefineVariableField(l, unit->Variable + index, -1);
@@ -1234,7 +1234,7 @@ static int CclGetUnitBoolFlag(lua_State *l)
 	const CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 
-	const char *const value = LuaToString(l, 2);
+	const std::string_view value = LuaToString(l, 2);
 	int index = UnitTypeVar.BoolFlagNameLookup[value];// User bool flags
 	if (index == -1) {
 		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value);
@@ -1333,10 +1333,10 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_setfield(l, -2, "y");
 		return 1;
 	} else {
-		int index = UnitTypeVar.VariableNameLookup[value.data()];// User variables
+		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
 			if (nargs == 2) {
-				index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+				index = UnitTypeVar.BoolFlagNameLookup[value];
 				if (index != -1) {
 					lua_pushboolean(l, unit->Type->BoolFlag[index].value);
 					return 1;
@@ -1457,7 +1457,7 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 		unit->Active = ai_active;
 	} else {
-		const int index = UnitTypeVar.VariableNameLookup[name.data()];// User variables
+		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {
 			LuaError(l, "Bad variable name '%s'\n" _C_ name.data());
 		}

@@ -499,7 +499,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 		} else if (key == "ShowOpponent") {
 			condition->ShowOpponent = LuaToBoolean(l, -1);
 		} else {
-			int index = UnitTypeVar.BoolFlagNameLookup[key.data()];
+			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
 				if (!condition->BoolFlags) {
 					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
@@ -509,7 +509,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			index = UnitTypeVar.VariableNameLookup[key.data()];
+			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
 				if (!condition->Variables) {
 					size_t new_variables_size = UnitTypeVar.GetNumberVariable();

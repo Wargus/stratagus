@@ -337,7 +337,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			} else {
 				val.type = USTRINT_STR;
 				val.i = index;
-				val.s = UnitTypeVar.VariableNameLookup[index];
+				val.s = UnitTypeVar.VariableNameLookup[index].data();
 			}
 			break;
 	}
@@ -396,7 +396,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			} else {
 				val.type = USTRINT_STR;
 				val.i = index;
-				val.s = UnitTypeVar.VariableNameLookup[index];
+				val.s = UnitTypeVar.VariableNameLookup[index].data();
 			}
 			break;
 	}
