@@ -47,7 +47,7 @@
 	}
 	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
-		const char *const name = LuaToString(l, -2);
+		const std::string_view name = LuaToString(l, -2);
 		int i = UnitTypeVar.VariableNameLookup[name];
 
 		if (i == -1) {

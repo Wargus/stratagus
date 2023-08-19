@@ -440,7 +440,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (key == "Variable") {
 				const std::string_view name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
+				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
 					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 				}
@@ -520,7 +520,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				LuaError(l, "Unsupported button action: %s" _C_ value.data());
 			}
 		} else {
-			int index = UnitTypeVar.BoolFlagNameLookup[key.data()];
+			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
 				if (!condition->BoolFlags) {
 					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
@@ -530,7 +530,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			index = UnitTypeVar.VariableNameLookup[key.data()];
+			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
 				if (!condition->Variables) {
 					size_t new_variables_size = UnitTypeVar.GetNumberVariable();

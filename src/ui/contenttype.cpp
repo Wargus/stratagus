@@ -396,7 +396,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (key == "Variable") {
 				const std::string_view name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
+				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
 					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 				}
@@ -425,7 +425,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else if (key == "Variable") {
 			const std::string_view name = LuaToString(l, -1);
-			this->Index = UnitTypeVar.VariableNameLookup[name.data()];
+			this->Index = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
@@ -450,7 +450,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else if (key == "Variable") {
 			const std::string_view name = LuaToString(l, -1);
-			this->Index1 = UnitTypeVar.VariableNameLookup[name.data()];
+			this->Index1 = UnitTypeVar.VariableNameLookup[name];
 			this->Index2 = this->Index1;
 			if (this->Index1 == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ name.data());
@@ -459,16 +459,16 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
 		} else if (key == "Variable1") {
-			const char *const name = LuaToString(l, -1);
+			const std::string_view name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index1 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name);
+				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
 		} else if (key == "Component1") {
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
 		} else if (key == "Variable2") {
 			const std::string_view name = LuaToString(l, -1);
-			this->Index2 = UnitTypeVar.VariableNameLookup[name.data()];
+			this->Index2 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index2 == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
 			}
@@ -572,7 +572,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 		if (key == "Variable") {
 			if (lua_isstring(l, -1)) {
 				const std::string_view name = LuaToString(l, -1);
-				this->Index = UnitTypeVar.VariableNameLookup[name.data()];
+				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
 					LuaError(l, "unknown variable '%s'" _C_ name.data());
 				}
@@ -679,7 +679,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 
 		if (key == "Variable") {
 			const std::string_view name = LuaToString(l, -1);
-			this->varIndex = UnitTypeVar.VariableNameLookup[name.data()];
+			this->varIndex = UnitTypeVar.VariableNameLookup[name];
 			if (this->varIndex == -1) {
 				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}

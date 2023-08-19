@@ -150,7 +150,6 @@ static const char PRIORITY_KEY[] = "Priority";
 
 CUnitTypeVar::CBoolKeys::CBoolKeys()
 {
-
 	const char *const tmp[] = {COWARD_KEY, BUILDING_KEY, FLIP_KEY, REVEALER_KEY,
 							   LANDUNIT_KEY, AIRUNIT_KEY, SEAUNIT_KEY, EXPLODEWHENKILLED_KEY,
 							   VISIBLEUNDERFOG_KEY, PERMANENTCLOAK_KEY, DETECTCLOAK_KEY,
@@ -164,7 +163,6 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 
 	for (int i = 0; i < NBARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
-		buildin[i].keylen = strlen(tmp[i]);
 		buildin[i].key = tmp[i];
 	}
 	Init();
@@ -186,7 +184,6 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
 		buildin[i].offset = i;
-		buildin[i].keylen = strlen(tmp[i]);
 		buildin[i].key = tmp[i];
 	}
 	Init();
@@ -974,7 +971,7 @@ static int CclDefineUnitType(lua_State *l)
 				value = LuaToString(l, -1, k + 1);
 				++k;
 
-				const int index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+				const int index = UnitTypeVar.BoolFlagNameLookup[value];
 				if (index != -1) {
 					value = LuaToString(l, -1, k + 1);
 					type->BoolFlag[index].CanTransport = Ccl2Condition(l, value.data());
@@ -1122,7 +1119,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				int index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+				int index = UnitTypeVar.BoolFlagNameLookup[value];
 				if (index != -1) {
 					value = LuaToString(l, -1, k + 1);
 					type->BoolFlag[index].CanTargetFlag = Ccl2Condition(l, value.data());
@@ -1145,7 +1142,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
 				++k;
-				int index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+				int index = UnitTypeVar.BoolFlagNameLookup[value];
 				if (index != -1) {
 					value = LuaToString(l, -1, k + 1);
 					type->BoolFlag[index].AiPriorityTarget = Ccl2Condition(l, value.data());
@@ -1203,7 +1200,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		} else {
-			int index = UnitTypeVar.VariableNameLookup[value.data()];
+			int index = UnitTypeVar.VariableNameLookup[value];
 			if (index != -1) { // valid index
 				if (lua_isboolean(l, -1)) {
 					type->DefaultStat.Variables[index].Enable = LuaToBoolean(l, -1);
@@ -1223,7 +1220,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->BoolFlag.resize(UnitTypeVar.GetNumberBoolFlag());
 			}
 
-			index = UnitTypeVar.BoolFlagNameLookup[value.data()];
+			index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {
 				if (lua_isnumber(l, -1)) {
 					type->BoolFlag[index].value = LuaToNumber(l, -1);
@@ -1548,7 +1545,7 @@ static int CclDefineUnitStats(lua_State *l)
 				lua_pop(l, 1);
 			}
 		} else {
-			int i = UnitTypeVar.VariableNameLookup[value.data()];// User variables
+			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
 				lua_rawgeti(l, 3, j + 1);
 				if (lua_istable(l, -1)) {
@@ -1904,7 +1901,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else {
-		int index = UnitTypeVar.VariableNameLookup[data.data()];
+		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
 			if (!GameRunning && Editor.Running != EditorEditing) {
 				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
@@ -1914,7 +1911,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			return 1;
 		}
 
-		index = UnitTypeVar.BoolFlagNameLookup[data.data()];
+		index = UnitTypeVar.BoolFlagNameLookup[data];
 		if (index != -1) {
 			lua_pushboolean(l, type->BoolFlag[index].value);
 			return 1;
@@ -1978,14 +1975,14 @@ static int CclDefineVariables(lua_State *l)
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const char *str = LuaToString(l, j + 1);
+		const std::string str = LuaToString(l, j + 1);
 
 		const int index = UnitTypeVar.VariableNameLookup.AddKey(str);
 		if (index == old) {
 			old++;
 			UnitTypeVar.Variable.resize(old);
 		} else {
-			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str);
+			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str.c_str());
 		}
 		if (!lua_istable(l, j + 2)) { // No change => default value.
 			continue;
@@ -2006,7 +2003,7 @@ static int CclDefineBoolFlags(lua_State *l)
 	const unsigned int old = UnitTypeVar.GetNumberBoolFlag();
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const char *str = LuaToString(l, j + 1);
+		const std::string str = LuaToString(l, j + 1);
 
 		UnitTypeVar.BoolFlagNameLookup.AddKey(str);
 
@@ -2061,7 +2058,7 @@ static int CclDefineDecorations(lua_State *l)
 			std::string_view key = LuaToString(l, -2);
 			if (key == "Index") {
 				const std::string_view value = LuaToString(l, -1);
-				tmp.Index = UnitTypeVar.VariableNameLookup[value.data()];// User variables
+				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
 			} else if (key == "Offset") {
 				CclGetPos(l, &tmp.OffsetX, &tmp.OffsetY);
@@ -2193,7 +2190,7 @@ static int CclDefineDecorations(lua_State *l)
 				}
 				lua_pop(l, 2); // MethodName and data
 			} else {
-				tmp.BoolFlag = UnitTypeVar.BoolFlagNameLookup[key.data()];
+				tmp.BoolFlag = UnitTypeVar.BoolFlagNameLookup[key];
 				if (tmp.BoolFlag != -1) {
 					tmp.BoolFlagInvert = LuaToBoolean(l, -1);
 				} else {
@@ -2260,10 +2257,10 @@ static int CclDefinePaletteSwap(lua_State *l)
 	const int subargs = lua_rawlen(l, 2);
 	std::vector<PaletteSwap> newSwaps;
 	for (int k = 0; k < subargs; k += 2) {
-		const char *value = LuaToString(l, 2, k + 1);
+		const std::string_view value = LuaToString(l, 2, k + 1);
 		int index = UnitTypeVar.VariableNameLookup[value];
 		if (index == -1) {
-			LuaError(l, "unknown variable name %s" _C_ value);
+			LuaError(l, "unknown variable name %s" _C_ value.data());
 		}
 
 		lua_rawgeti(l, 2, k + 2); // swap table
@@ -2451,7 +2448,7 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
 		}
 	} else {
-		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
+		int variable_index = UnitTypeVar.VariableNameLookup[variable_key];
 		if (variable_index != -1) { // valid index
 			if (variable_type == "Value") {
 				type->MapDefaultStat.Variables[variable_index].Value = value;

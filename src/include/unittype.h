@@ -706,21 +706,18 @@ public:
 	struct CKeys {
 
 		struct DataKey {
-			static bool key_pred(const DataKey &lhs,
-								 const DataKey &rhs)
+			static bool key_pred(const DataKey &lhs, const DataKey &rhs)
 			{
-				return ((lhs.keylen == rhs.keylen) ?
-						(strcmp(lhs.key, rhs.key) < 0) : (lhs.keylen < rhs.keylen));
+				return lhs.key < rhs.key;
 			}
+			std::string_view key;
 			int offset;
-			unsigned int keylen;
-			const char *key;
 		};
 
 		CKeys(): TotalKeys(SIZE) {}
 
 		DataKey buildin[SIZE];
-		std::map<std::string, int> user;
+		std::map<std::string, int, std::less<>> user;
 		unsigned int TotalKeys;
 
 		void Init()
@@ -728,7 +725,7 @@ public:
 			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
 		}
 
-		const char *operator[](int index)
+		std::string_view operator[](int index)
 		{
 			for (unsigned int i = 0; i < SIZE; ++i) {
 				if (buildin[i].offset == index) {
@@ -737,10 +734,10 @@ public:
 			}
 			for (const auto &[key, value] : user) {
 				if (value == index) {
-					return key.c_str();
+					return key;
 				}
 			}
-			return nullptr;
+			return ""; // Not found
 		}
 
 		/**
@@ -750,31 +747,28 @@ public:
 		**
 		**  @return Index of the variable, -1 if not found.
 		*/
-		int operator[](const char *const key)
+		int operator[](std::string_view key)
 		{
 			DataKey k;
 			k.key = key;
-			k.keylen = strlen(key);
 			const DataKey *p = std::lower_bound(buildin, buildin + SIZE,
 												k, DataKey::key_pred);
-			if ((p != buildin + SIZE) && p->keylen == k.keylen &&
-				0 == strcmp(p->key, key)) {
+			if ((p != buildin + SIZE) && p->key == key) {
 				return p->offset;
 			} else {
-				std::map<std::string, int>::iterator
-				ret(user.find(key));
-				if (ret != user.end()) {
-					return (*ret).second;
+				auto it = user.find(key);
+				if (it != user.end()) {
+					return it->second;
 				}
 			}
 			return -1;
 		}
 
-		int AddKey(const char *const key)
+		int AddKey(const std::string& key)
 		{
 			int index = this->operator[](key);
 			if (index != -1) {
-				DebugPrint("Warning, Key '%s' already defined\n" _C_ key);
+				DebugPrint("Warning, Key '%s' already defined\n" _C_ key.c_str());
 				return index;
 			}
 			user[key] = TotalKeys++;
