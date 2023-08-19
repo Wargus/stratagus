@@ -122,10 +122,10 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "Unsupported tag: %s" _C_ value.data());
 			}
 		} else if (value == "race") {
-			const char *raceName = LuaToString(l, j + 1);
+			const std::string_view raceName = LuaToString(l, j + 1);
 			this->Race = PlayerRaces.GetRaceIndexByName(raceName);
 			if (this->Race == -1) {
-				LuaError(l, "Unsupported race: %s" _C_ raceName);
+				LuaError(l, "Unsupported race: %s" _C_ raceName.data());
 			}
 		} else if (value == "ai-name") {
 			this->AiName = LuaToString(l, j + 1);
@@ -1079,15 +1079,15 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	} else if (data == "Allow") {
 		LuaCheckArgs(l, 3);
-		const char *ident = LuaToString(l, 3);
-		if (!strncmp(ident, "unit-", 5)) {
+		const std::string_view ident = LuaToString(l, 3);
+		if (ident.substr(0, 5) == "unit-") {
 			int id = UnitTypeIdByIdent(ident);
 			if (UnitIdAllowed(Players[p->Index], id) > 0) {
 				lua_pushstring(l, "A");
 			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
 				lua_pushstring(l, "F");
 			}
-		} else if (!strncmp(ident, "upgrade-", 8)) {
+		} else if (ident.substr(0, 8) == "upgrade-") {
 			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
 				lua_pushstring(l, "A");
 			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'R') {
@@ -1135,11 +1135,11 @@ static int CclSetPlayerData(lua_State *l)
 	if (data == "Name") {
 		p->SetName(LuaToString(l, 3));
 	} else if (data == "RaceName") {
-		const char *racename = LuaToString(l, 3);
+		const std::string_view racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
 
 		if (p->Race == -1) {
-			LuaError(l, "invalid race name '%s'" _C_ racename);
+			LuaError(l, "invalid race name '%s'" _C_ racename.data());
 		}
 	} else if (data == "Resources") {
 		LuaCheckArgs(l, 4);
@@ -1203,10 +1203,10 @@ static int CclSetPlayerData(lua_State *l)
 		p->SpeedResearch = LuaToNumber(l, 3);
 	} else if (data == "Allow") {
 		LuaCheckArgs(l, 4);
-		const char *ident = LuaToString(l, 3);
+		const std::string_view ident = LuaToString(l, 3);
 		const std::string acquire = LuaToString(l, 4);
 
-		if (!strncmp(ident, "upgrade-", 8)) {
+		if (ident.substr(0, 8) == "upgrade-") {
 			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
 				UpgradeAcquire(*p, CUpgrade::Get(ident));
 			} else if (acquire == "F" || acquire == "A") {
@@ -1216,7 +1216,7 @@ static int CclSetPlayerData(lua_State *l)
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
 		} else {
-			LuaError(l, " wrong ident %s\n" _C_ ident);
+			LuaError(l, " wrong ident %s\n" _C_ ident.data());
 		}
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data.data());

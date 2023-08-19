@@ -448,20 +448,20 @@ static int CclUnit(lua_State *l)
 		} else if (value == "rescued-from") {
 			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];
 		} else if (value == "seen-by-player") {
-			const char *s = LuaToString(l, 2, j + 1);
+			const std::string_view s = LuaToString(l, 2, j + 1);
 			unit->Seen.ByPlayer = 0;
-			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
-				if (*s == '-' || *s == '_' || *s == ' ') {
+			for (int i = 0; i < PlayerMax && s.size(); ++i) {
+				if (s[i] == '-' || s[i] == '_' || s[i] == ' ') {
 					unit->Seen.ByPlayer &= ~(1 << i);
 				} else {
 					unit->Seen.ByPlayer |= (1 << i);
 				}
 			}
 		} else if (value == "seen-destroyed") {
-			const char *s = LuaToString(l, 2, j + 1);
+			const std::string_view s = LuaToString(l, 2, j + 1);
 			unit->Seen.Destroyed = 0;
-			for (int i = 0; i < PlayerMax && *s; ++i, ++s) {
-				if (*s == '-' || *s == '_' || *s == ' ') {
+			for (int i = 0; i < PlayerMax && s.size(); ++i) {
+				if (s[i] == '-' || s[i] == '_' || s[i] == ' ') {
 					unit->Seen.Destroyed &= ~(1 << i);
 				} else {
 					unit->Seen.Destroyed |= (1 << i);
@@ -1402,7 +1402,7 @@ static int CclSetUnitVariable(lua_State *l)
 		unit->ChangeOwner(Players[value]);
 	} else if (name == "Color") {
 		if (lua_isstring(l, 3)) {
-			const char *colorName = LuaToString(l, 3);
+			const std::string_view colorName = LuaToString(l, 3);
 			for (size_t i = 0; i < PlayerColorNames.size(); i++) {
 				if (PlayerColorNames[i] == colorName) {
 					unit->Colors = i;

@@ -224,11 +224,11 @@ static int CclDefineMissileType(lua_State *l)
 	}
 
 	// Slot identifier
-	const char *str = LuaToString(l, 1);
+	const std::string str = LuaToString(l, 1);
 	MissileType *mtype = MissileTypeByIdent(str);
 
 	if (mtype) {
-		DebugPrint("Redefining missile-type '%s'\n" _C_ str);
+		DebugPrint("Redefining missile-type '%s'\n" _C_ str.c_str());
 	} else {
 		mtype = NewMissileTypeSlot(str);
 	}

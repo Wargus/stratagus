@@ -58,7 +58,7 @@ void UnitRotate(CUnit &unit, int rotate)
 {
 	Assert(unit.Anim.Anim == this);
 
-	if (!strcmp(this->rotateStr.c_str(), "target")) {
+	if (this->rotateStr == "target") {
 		COrder *order = unit.CurrentOrder();
 		CUnit *target;
 		if (order->HasGoal()) {

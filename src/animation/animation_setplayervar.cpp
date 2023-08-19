@@ -51,83 +51,81 @@
 **
 **  @return  Returning value (only integer).
 */
-int GetPlayerData(const int player, const char *prop, const char *arg)
+int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 {
-	if (!strcmp(prop, "RaceName")) {
+	if (prop == "RaceName") {
 		return Players[player].Race;
-	} else if (!strcmp(prop, "Resources")) {
+	} else if (prop == "Resources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].Resources[resId] + Players[player].StoredResources[resId];
-	} else if (!strcmp(prop, "StoredResources")) {
+	} else if (prop == "StoredResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].StoredResources[resId];
-	} else if (!strcmp(prop, "MaxResources")) {
+	} else if (prop == "MaxResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].MaxResources[resId];
-	} else if (!strcmp(prop, "Incomes")) {
+	} else if (prop == "Incomes") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].Incomes[resId];
-	} else if (!strcmp(prop, "UnitTypesCount")) {
-		const std::string unit(arg);
-		CUnitType *type = UnitTypeByIdent(unit);
+	} else if (prop == "UnitTypesCount") {
+		CUnitType *type = UnitTypeByIdent(arg);
 		Assert(type);
 		return Players[player].UnitTypesCount[type->Slot];
-	} else if (!strcmp(prop, "UnitTypesAiActiveCount")) {
-		const std::string unit(arg);
-		CUnitType *type = UnitTypeByIdent(unit);
+	} else if (prop == "UnitTypesAiActiveCount") {
+		CUnitType *type = UnitTypeByIdent(arg);
 		Assert(type);
 		return Players[player].UnitTypesAiActiveCount[type->Slot];
-	} else if (!strcmp(prop, "AiEnabled")) {
+	} else if (prop == "AiEnabled") {
 		return Players[player].AiEnabled;
-	} else if (!strcmp(prop, "TotalNumUnits")) {
+	} else if (prop == "TotalNumUnits") {
 		return Players[player].GetUnitCount();
-	} else if (!strcmp(prop, "NumBuildings")) {
+	} else if (prop == "NumBuildings") {
 		return Players[player].NumBuildings;
-	} else if (!strcmp(prop, "Supply")) {
+	} else if (prop == "Supply") {
 		return Players[player].Supply;
-	} else if (!strcmp(prop, "Demand")) {
+	} else if (prop == "Demand") {
 		return Players[player].Demand;
-	} else if (!strcmp(prop, "UnitLimit")) {
+	} else if (prop == "UnitLimit") {
 		return Players[player].UnitLimit;
-	} else if (!strcmp(prop, "BuildingLimit")) {
+	} else if (prop == "BuildingLimit") {
 		return Players[player].BuildingLimit;
-	} else if (!strcmp(prop, "TotalUnitLimit")) {
+	} else if (prop == "TotalUnitLimit") {
 		return Players[player].TotalUnitLimit;
-	} else if (!strcmp(prop, "Score")) {
+	} else if (prop == "Score") {
 		return Players[player].Score;
-	} else if (!strcmp(prop, "TotalUnits")) {
+	} else if (prop == "TotalUnits") {
 		return Players[player].TotalUnits;
-	} else if (!strcmp(prop, "TotalBuildings")) {
+	} else if (prop == "TotalBuildings") {
 		return Players[player].TotalBuildings;
-	} else if (!strcmp(prop, "TotalResources")) {
+	} else if (prop == "TotalResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].TotalResources[resId];
-	} else if (!strcmp(prop, "TotalRazings")) {
+	} else if (prop == "TotalRazings") {
 		return Players[player].TotalRazings;
-	} else if (!strcmp(prop, "TotalKills")) {
+	} else if (prop == "TotalKills") {
 		return Players[player].TotalKills;
 	} else {
-		fprintf(stderr, "Invalid field: %s" _C_ prop);
+		fprintf(stderr, "Invalid field: %s" _C_ prop.data());
 		Exit(1);
 	}
 	return 0;
@@ -136,49 +134,49 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 /**
 **  Sets the player data.
 */
-static void SetPlayerData(const int player, const char *prop, const char *arg, int value)
+static void SetPlayerData(const int player, std::string_view prop, std::string_view arg, int value)
 {
-	if (!strcmp(prop, "RaceName")) {
+	if (prop == "RaceName") {
 		Players[player].Race = value;
-	} else if (!strcmp(prop, "Resources")) {
+	} else if (prop == "Resources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].SetResource(resId, value, STORE_BOTH);
-	} else if (!strcmp(prop, "StoredResources")) {
+	} else if (prop == "StoredResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].SetResource(resId, value, STORE_BUILDING);
-	} else if (!strcmp(prop, "UnitLimit")) {
+	} else if (prop == "UnitLimit") {
 		Players[player].UnitLimit = value;
-	} else if (!strcmp(prop, "BuildingLimit")) {
+	} else if (prop == "BuildingLimit") {
 		Players[player].BuildingLimit = value;
-	} else if (!strcmp(prop, "TotalUnitLimit")) {
+	} else if (prop == "TotalUnitLimit") {
 		Players[player].TotalUnitLimit = value;
-	} else if (!strcmp(prop, "Score")) {
+	} else if (prop == "Score") {
 		Players[player].Score = value;
-	} else if (!strcmp(prop, "TotalUnits")) {
+	} else if (prop == "TotalUnits") {
 		Players[player].TotalUnits = value;
-	} else if (!strcmp(prop, "TotalBuildings")) {
+	} else if (prop == "TotalBuildings") {
 		Players[player].TotalBuildings = value;
-	} else if (!strcmp(prop, "TotalResources")) {
+	} else if (prop == "TotalResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg);
+			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].TotalResources[resId] = value;
-	} else if (!strcmp(prop, "TotalRazings")) {
+	} else if (prop == "TotalRazings") {
 		Players[player].TotalRazings = value;
-	} else if (!strcmp(prop, "TotalKills")) {
+	} else if (prop == "TotalKills") {
 		Players[player].TotalKills = value;
 	} else {
-		fprintf(stderr, "Invalid field: %s" _C_ prop);
+		fprintf(stderr, "Invalid field: %s" _C_ prop.data());
 		Exit(1);
 	}
 }
@@ -188,11 +186,9 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 {
 	Assert(unit.Anim.Anim == this);
 
-	const char *var = this->varStr.c_str();
-	const char *arg = this->argStr.c_str();
 	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
 	int rop = ParseAnimInt(unit, this->valueStr.c_str());
-	int data = GetPlayerData(playerId, var, arg);
+	int data = GetPlayerData(playerId, this->varStr, this->argStr);
 
 	switch (this->mod) {
 		case modAdd:
@@ -234,7 +230,7 @@ static void SetPlayerData(const int player, const char *prop, const char *arg, i
 			data = rop;
 	}
 	rop = data;
-	SetPlayerData(playerId, var, arg, rop);
+	SetPlayerData(playerId, this->varStr, this->argStr, rop);
 }
 
 /*

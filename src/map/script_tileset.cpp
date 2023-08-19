@@ -50,7 +50,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount)
+bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const int subtileCount)
 {
 	const struct {
 		std::string_view name;
@@ -101,7 +101,7 @@ bool  CTileset::ModifyFlag(const char *flagName, tile_flags *flag, const int sub
 	}
 
 	if (flagName[0] == 'p' || flagName[0] == 'u') {
-		if (strlen(flagName) != subtileCount) {
+		if (flagName.size() != subtileCount) {
 			return false;
 		}
 		tile_flags subtileFlags = 0;
@@ -139,12 +139,12 @@ tile_flags CTileset::parseTilesetTileFlags(lua_State *l, int *j)
 			break;
 		}
 		++(*j);
-		const char *value = LuaToString(l, -1);
+		const std::string_view value = LuaToString(l, -1);
 		lua_pop(l, 1);
 
 		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags, logicalTileToGraphicalTileMultiplier * logicalTileToGraphicalTileMultiplier) == false) {
-			LuaError(l, "solid: unsupported tag: %s" _C_ value);
+			LuaError(l, "solid: unsupported tag: %s" _C_ value.data());
 		}
 	}
 	

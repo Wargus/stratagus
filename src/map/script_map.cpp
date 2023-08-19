@@ -70,11 +70,8 @@ static int CclStratagusMap(lua_State *l)
 		++j;
 
 		if (value == "version") {
-			char buf[32];
-
-			const char *version = LuaToString(l, j + 1);
-			strncpy(buf, VERSION, sizeof(buf));
-			if (strcmp(buf, version)) {
+			const std::string_view version = LuaToString(l, j + 1);
+			if (version != VERSION) {
 				fprintf(stderr, "Warning not saved with this version.\n");
 			}
 		} else if (value == "uid") {
@@ -225,10 +222,10 @@ static int CclShowMapLocation(lua_State *l)
 	// what is listed below
 
 	LuaCheckArgs(l, 5);
-	const char *unitname = LuaToString(l, 5);
+	const std::string_view unitname = LuaToString(l, 5);
 	CUnitType *unitType = UnitTypeByIdent(unitname);
 	if (!unitType) {
-		DebugPrint("Unable to find UnitType '%s'" _C_ unitname);
+		DebugPrint("Unable to find UnitType '%s'" _C_ unitname.data());
 		return 0;
 	}
 	CUnit *target = MakeUnit(*unitType, ThisPlayer);

@@ -854,7 +854,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-	const char *style = LuaToString(l, 1);
+	const std::string style = LuaToString(l, 1);
 	ButtonStyle *&b = ButtonStyleHash[style];
 	if (!b) {
 		b = new ButtonStyle;
@@ -1112,7 +1112,7 @@ static int CclDefineButton(lua_State *l)
 			const unsigned int subargs = lua_rawlen(l, -1);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
-				const char *s2 = LuaToString(l, -1, k + 1);
+				const std::string_view s2 = LuaToString(l, -1, k + 1);
 				allowstr += s2;
 				if (k != subargs - 1) {
 					allowstr += ",";
@@ -1140,7 +1140,7 @@ static int CclDefineButton(lua_State *l)
 			std::string umask = ",";
 			const unsigned subargs = lua_rawlen(l, -1);
 			for (unsigned int k = 0; k < subargs; ++k) {
-				const char *s2 = LuaToString(l, -1, k + 1);
+				const std::string_view s2 = LuaToString(l, -1, k + 1);
 				umask += s2;
 				umask += ",";
 			}

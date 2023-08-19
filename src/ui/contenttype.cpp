@@ -619,10 +619,10 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 					LuaError(l, "incorrect argument, need list of size 2 with {percentage, color}");
 				}
 				this->values[i] = LuaToNumber(l, -1, 1);
-				const char *const colorName = LuaToString(l, -1, 2);
+				const std::string_view colorName = LuaToString(l, -1, 2);
 				this->colors[i] = GetColorIndexByName(colorName);
 				if (this->colors[i] == -1) {
-					LuaError(l, "incorrect color: '%s' " _C_ colorName);
+					LuaError(l, "incorrect color: '%s' " _C_ colorName.data());
 				}
 				i++;
 			}

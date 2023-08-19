@@ -50,7 +50,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-using IconMap = std::map<std::string, CIcon *>;
+using IconMap = std::map<std::string, CIcon *, std::less<>>;
 static IconMap Icons;   /// Map of ident to icon.
 
 
@@ -100,11 +100,11 @@ CIcon::~CIcon()
 **
 **  @return       The icon
 */
-/* static */ CIcon *CIcon::Get(const std::string &ident)
+/* static */ CIcon *CIcon::Get(std::string_view ident)
 {
 	IconMap::iterator it = Icons.find(ident);
 	if (it == Icons.end()) {
-		DebugPrint("icon not found: %s\n" _C_ ident.c_str());
+		DebugPrint("icon not found: %s\n" _C_ ident.data());
 	}
 	return it->second;
 }

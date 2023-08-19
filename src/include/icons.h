@@ -113,7 +113,7 @@ public:
 	~CIcon();
 
 	static CIcon *New(const std::string &ident);
-	static CIcon *Get(const std::string &ident);
+	static CIcon *Get(std::string_view ident);
 
 	void Load();
 

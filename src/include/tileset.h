@@ -219,7 +219,7 @@ public:
 	int32_t findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain = 0) const;
 
 private:
-	bool ModifyFlag(const char *flagName, tile_flags *flag, const int subtileCount);
+	bool ModifyFlag(std::string_view flagName, tile_flags *flag, const int subtileCount);
 	int32_t getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
