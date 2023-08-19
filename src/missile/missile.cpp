@@ -67,7 +67,7 @@ static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
 static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
 
 /// lookup table for missile names
-using MissileTypeMap = std::map<std::string, MissileType *>;
+using MissileTypeMap = std::map<std::string, MissileType *, std::less<>>;
 static MissileTypeMap MissileTypes;
 
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
@@ -115,7 +115,7 @@ void LoadMissileSprites()
 **
 **  @return       Missile type pointer.
 */
-MissileType *MissileTypeByIdent(const std::string &ident)
+MissileType *MissileTypeByIdent(std::string_view ident)
 {
 	if (ident.empty()) {
 		return nullptr;

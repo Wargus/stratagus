@@ -225,10 +225,10 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 	if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const char *raceName = LuaToString(l, j + 1, 1);
+	const std::string_view raceName = LuaToString(l, j + 1, 1);
 	const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 	if (raceIndex == -1) {
-		LuaError(l, "Unknown race: %s" _C_ raceName);
+		LuaError(l, "Unknown race: %s" _C_ raceName.data());
 	}
 	lua_rawgeti(l, j + 1, 2);
 	LuaUserData *data = nullptr;
@@ -284,10 +284,10 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			const std::string_view resName = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, resName);
-			const char *raceName = LuaToString(l, j + 1, 2);
+			const std::string_view raceName = LuaToString(l, j + 1, 2);
 			const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 			if (raceIndex == -1) {
-				LuaError(l, "Unknown race: %s" _C_ raceName);
+				LuaError(l, "Unknown race: %s" _C_ raceName.data());
 			}
 			lua_rawgeti(l, j + 1, 3);
 			if (!lua_isuserdata(l, -1)

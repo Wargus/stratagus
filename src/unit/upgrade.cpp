@@ -309,22 +309,22 @@ static int CclDefineModifier(lua_State *l)
 			const std::string_view value = LuaToString(l, j + 1, 2);
 
 			if (value.substr(0, 5) == "unit-") {
-				um->ChangeUnits[UnitTypeIdByIdent(value.data())] = LuaToNumber(l, j + 1, 3);
+				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
 			}
 		} else if (key == "allow") {
 			const std::string_view value = LuaToString(l, j + 1, 2);
 			if (value.substr(0, 8) == "upgrade-") {
-				um->ChangeUpgrades[UpgradeIdByIdent(value.data())] = LuaToNumber(l, j + 1, 3);
+				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "upgrade expected");
 			}
 		} else if (key == "apply-to") {
-			const char *value = LuaToString(l, j + 1, 2);
+			const std::string_view value = LuaToString(l, j + 1, 2);
 			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
 		} else if (key == "convert-to") {
-			const char *value = LuaToString(l, j + 1, 2);
+			const std::string_view value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = UnitTypeByIdent(value);
 		} else if (key == "research-speed") {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
@@ -367,9 +367,9 @@ static int CclDefineUnitAllow(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	const char *ident = LuaToString(l, 0 + 1);
+	const std::string_view ident = LuaToString(l, 0 + 1);
 
-	if (strncmp(ident, "unit-", 5)) {
+	if (ident.substr(0, 5) != "unit-") {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
@@ -401,17 +401,17 @@ static int CclDefineAllow(lua_State *l)
 	const int args = lua_gettop(l);
 
 	for (int j = 0; j < args; ++j) {
-		const char *ident = LuaToString(l, j + 1);
+		const std::string_view ident = LuaToString(l, j + 1);
 		++j;
-		const char *ids = LuaToString(l, j + 1);
+		const std::string_view ids = LuaToString(l, j + 1);
 
-		int n = strlen(ids);
+		int n = ids.size();
 		if (n > PlayerMax) {
-			fprintf(stderr, "%s: Allow string too long %d\n", ident, n);
+			fprintf(stderr, "%s: Allow string too long %d\n", ident.data(), n);
 			n = PlayerMax;
 		}
 
-		if (!strncmp(ident, "unit-", 5)) {
+		if (ident.substr(0, 5) == "unit-") {
 			int id = UnitTypeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
@@ -420,7 +420,7 @@ static int CclDefineAllow(lua_State *l)
 					AllowUnitId(Players[i], id, 0);
 				}
 			}
-		} else if (!strncmp(ident, "upgrade-", 8)) {
+		} else if (ident.substr(0, 8) == "upgrade-") {
 			int id = UpgradeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				AllowUpgradeId(Players[i], id, ids[i]);
@@ -455,14 +455,14 @@ void UpgradesCclRegister()
 **  @param ident  The unit-type identifier.
 **  @return       Unit-type ID (int) or -1 if not found.
 */
-int UnitTypeIdByIdent(const std::string &ident)
+int UnitTypeIdByIdent(std::string_view ident)
 {
 	const CUnitType *type = UnitTypeByIdent(ident);
 
 	if (type) {
 		return type->Slot;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.c_str());
+	DebugPrint(" fix this %s\n" _C_ ident.data());
 	return -1;
 }
 
@@ -472,14 +472,14 @@ int UnitTypeIdByIdent(const std::string &ident)
 **  @param ident  The upgrade identifier.
 **  @return       Upgrade ID (int) or -1 if not found.
 */
-int UpgradeIdByIdent(const std::string &ident)
+int UpgradeIdByIdent(std::string_view ident)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(ident);
 
 	if (upgrade) {
 		return upgrade->ID;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.c_str());
+	DebugPrint(" fix this %s\n" _C_ ident.data());
 	return -1;
 }
 
@@ -1104,14 +1104,14 @@ char UpgradeIdAllowed(const CPlayer &player, int id)
 **
 **  @note This function shouldn't be used during runtime, it is only for setup.
 */
-char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
+char UpgradeIdentAllowed(const CPlayer &player, std::string_view ident)
 {
 	int id = UpgradeIdByIdent(ident);
 
 	if (id != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong identifier '%s'\n" _C_ ident.c_str());
+	DebugPrint("Fix your code, wrong identifier '%s'\n" _C_ ident.data());
 	return '-';
 }
 

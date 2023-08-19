@@ -595,7 +595,7 @@ extern void LoadMissileSprites();
 /// allocate an empty missile-type slot
 extern MissileType *NewMissileTypeSlot(const std::string &ident);
 /// Get missile-type by ident
-extern MissileType *MissileTypeByIdent(const std::string &ident);
+extern MissileType *MissileTypeByIdent(std::string_view ident);
 /// create a missile
 extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 /// create a local missile

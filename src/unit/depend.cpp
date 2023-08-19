@@ -67,21 +67,21 @@ static DependRule *DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag)
+static void AddDependency(std::string_view target, std::string_view required, int count, int or_flag)
 {
 	DependRule rule;
 
 	//  Setup structure.
-	if (!strncmp(target.c_str(), "unit-", 5)) {
+	if (target.substr(0, 5) == "unit-") {
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = UnitTypeByIdent(target);
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+	} else if (target.substr(0, 8) == "upgrade-") {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
-		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.data());
 		return;
 	}
 
@@ -125,16 +125,16 @@ static void AddDependency(const std::string &target, const std::string &required
 	temp->Count = count;
 
 	//  Setup structure.
-	if (!strncmp(required.c_str(), "unit-", 5)) {
+	if (required.substr(0, 5) == "unit-") {
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = UnitTypeByIdent(required);
-	} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
+	} else if (required.substr(0, 8) == "upgrade-") {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
-		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.c_str());
+		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.data());
 		delete temp;
 		return;
 	}
@@ -323,21 +323,21 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CPlayer &player, const std::string &target)
+bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 {
 	DependRule rule;
 
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(target.c_str(), "unit-", 5)) {
+	if (target.substr(0, 5) == "unit-") {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = UnitTypeByIdent(target);
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
 		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+	} else if (target.substr(0, 8) == "upgrade-") {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
@@ -345,7 +345,7 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target)
 		}
 		rule.Type = DependRuleUpgrade;
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.data());
 		return false;
 	}
 	return CheckDependByRule(player, rule);
@@ -424,7 +424,7 @@ void CleanDependencies()
 static int CclDefineDependency(lua_State *l)
 {
 	const int args = lua_gettop(l);
-	const char *target = LuaToString(l, 1);
+	const std::string_view target = LuaToString(l, 1);
 
 	//  All or rules.
 	int or_flag = 0;
@@ -435,7 +435,7 @@ static int CclDefineDependency(lua_State *l)
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
-			const char *required = LuaToString(l, j + 1, k + 1);
+			const std::string_view required = LuaToString(l, j + 1, k + 1);
 			int count = 1;
 			if (k + 1 < subargs) {
 				lua_rawgeti(l, j + 1, k + 2);
@@ -487,7 +487,7 @@ static int CclGetDependency(lua_State *l)
 static int CclCheckDependency(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	const char *object = LuaToString(l, 2);
+	const std::string_view object = LuaToString(l, 2);
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {

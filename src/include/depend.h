@@ -130,7 +130,7 @@ extern void CleanDependencies();
 /// Print all unit dependencies into string
 extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &button);
 /// Check a dependency by identifier
-extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
+extern bool CheckDependByIdent(const CPlayer &player, std::string_view target);
 /// Check a dependency by unit type
 extern bool CheckDependByType(const CPlayer &player, const CUnitType &type);
 //@}

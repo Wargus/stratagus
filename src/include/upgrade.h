@@ -75,8 +75,8 @@ extern void UpgradesCclRegister();
 // AllowStruct and UpgradeTimers will be static in the player so will be
 // load/saved with the player struct
 
-extern int UnitTypeIdByIdent(const std::string &sid);
-extern int UpgradeIdByIdent(const std::string &sid);
+extern int UnitTypeIdByIdent(std::string_view sid);
+extern int UpgradeIdByIdent(std::string_view sid);
 
 /*----------------------------------------------------------------------------
 --  Upgrades
@@ -104,7 +104,7 @@ extern int UnitIdAllowed(const CPlayer &player, int id);
 extern void AllowUpgradeId(CPlayer &player, int id, char af);
 
 extern char UpgradeIdAllowed(const CPlayer &player, int id);
-extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
+extern char UpgradeIdentAllowed(const CPlayer &player, std::string_view ident);
 
 //@}
 

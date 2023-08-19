@@ -541,7 +541,7 @@ static void FixLabels(lua_State *l)
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static CAnimation *ParseAnimationFrame(lua_State *l, const char *str)
+static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 {
 	const std::string all(str);
 	const size_t len = all.size();
@@ -619,12 +619,12 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	Labels.clear();
 	LabelsLater.clear();
 
-	const char *str = LuaToString(l, idx, 1);
+	const std::string_view str = LuaToString(l, idx, 1);
 
 	CAnimation *firstAnim = ParseAnimationFrame(l, str);
 	CAnimation *prev = firstAnim;
 	for (int j = 1; j < args; ++j) {
-		const char *str = LuaToString(l, idx, j + 1);
+		const std::string_view str = LuaToString(l, idx, j + 1);
 		CAnimation *anim = ParseAnimationFrame(l, str);
 		prev->Next = anim;
 		prev = anim;

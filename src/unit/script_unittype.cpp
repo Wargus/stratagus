@@ -1580,7 +1580,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 {
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
-		const char *str = LuaToString(l, -1);
+		const std::string_view str = LuaToString(l, -1);
 		return UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
@@ -1603,7 +1603,7 @@ static int CclUnitType(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
-	const char *str = LuaToString(l, 1);
+	const std::string_view str = LuaToString(l, 1);
 	CUnitType *type = UnitTypeByIdent(str);
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
@@ -2248,10 +2248,10 @@ static int CclDefineExtraDeathTypes(lua_State *l)
 static int CclDefinePaletteSwap(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	const char *iconName = LuaToString(l, 1);
+	const std::string_view iconName = LuaToString(l, 1);
 	CIcon *icon = CIcon::Get(iconName);
 	if (!icon) {
-		LuaError(l, "icon %s not found" _C_ iconName);
+		LuaError(l, "icon %s not found" _C_ iconName.data());
 	}
 
 	if (!lua_istable(l, 2)) {

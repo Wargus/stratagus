@@ -124,7 +124,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 			lua_pop(l, 1);
 		} else if (value == "missile") {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = MissileTypeByIdent(value.data());
+			this->Missile = MissileTypeByIdent(value);
 			if (this->Missile == nullptr) {
 				DebugPrint("in spawn-missile : missile %s does not exist\n" _C_ value.data());
 			}

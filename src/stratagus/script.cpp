@@ -1089,7 +1089,7 @@ int EvalNumber(const NumberDesc *number)
 			int player = EvalNumber(number->D.PlayerData.Player);
 			std::string data = EvalString(number->D.PlayerData.DataType);
 			std::string res = EvalString(number->D.PlayerData.ResType);
-			return GetPlayerData(player, data.c_str(), res.c_str());
+			return GetPlayerData(player, data, res);
 	}
 	return 0;
 }
