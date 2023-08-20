@@ -113,11 +113,6 @@ extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 extern const char *strcasestr(const char *str, const char *substr) noexcept;
 #endif // !HAVE_STRCASESTR
 
-#ifndef HAVE_STRNLEN
-/// determine length of a fixed-length string
-extern size_t strnlen(const char *str, size_t strsize);
-#endif // !HAVE_STRNLEN
-
 #if defined(WIN32) && defined(UNICODE)
 #define L(LITERAL) L"" LITERAL
 #else
