@@ -197,7 +197,7 @@ namespace ranges
 
 
 	template<typename Range, typename Value>
-	bool consist(Range& range, const Value& value)
+	bool contains(Range& range, const Value& value)
 	{
 		return std::find(begin(range), end(range), value) == end(range) ? false : true;
 	}

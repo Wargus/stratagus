@@ -1345,7 +1345,7 @@ std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t u
             if (value && value - 1 > curr && value <= upperBound) {
                 curr = value - 1;
             }
-            if (ranges::consist(mask, upperBound)) {
+            if (ranges::contains(mask, upperBound)) {
                 break;
             }
         }
@@ -1395,7 +1395,7 @@ std::vector<sequence_of_imagesPtrs> CTilesetGraphicGenerator::buildSequences_Cic
                 sequence.push_back(srcLayer[wrkIndexes[layerIdx][seqIdx]].get());
                 layerIdx++;
             }
-            if (!ranges::consist(result, sequence)) {
+            if (!ranges::contains(result, sequence)) {
                 result.push_back(sequence);
             }
             if (result.size() >= SequencesCount) {
