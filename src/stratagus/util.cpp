@@ -230,7 +230,7 @@ errno_t strcpy_s(char *dst, size_t dstsize, const char *src)
 #endif
 
 #ifndef HAVE_STRNLEN
-size_t strnlen(const char *str, size_t strsize) noexcept
+static size_t strnlen(const char *str, size_t strsize) noexcept
 {
 	size_t len = 0;
 	while (len < strsize) {
