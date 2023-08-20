@@ -73,11 +73,7 @@ void clamp(T *value, T minValue, T maxValue)
 {
 	Assert(minValue <= maxValue);
 
-	if (*value < minValue) {
-		*value = minValue;
-	} else if (maxValue < *value) {
-		*value = maxValue;
-	}
+	*value = std::clamp(*value, minValue, maxValue);
 }
 
 extern uint32_t fletcher32(const std::string &content);
