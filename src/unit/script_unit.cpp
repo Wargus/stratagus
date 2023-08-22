@@ -177,8 +177,8 @@ static CUnit *CclGetUnit(lua_State *l)
 */
 CUnit *CclGetUnitFromRef(lua_State *l)
 {
-	const char *const value = LuaToString(l, -1);
-	unsigned int slot = strtol(value + 1, nullptr, 16);
+	const std::string_view value = LuaToString(l, -1);
+	unsigned int slot = to_number(value.substr(1), 16);
 	Assert(slot < UnitManager->GetUsedSlotCount());
 	return &UnitManager->GetSlotUnit(slot);
 }

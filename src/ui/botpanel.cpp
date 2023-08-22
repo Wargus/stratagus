@@ -145,7 +145,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
 			default:
-				ba->Value = atoi(value.c_str());
+				ba->Value = to_number(value);
 				break;
 		}
 	} else {

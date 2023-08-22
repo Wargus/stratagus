@@ -27,6 +27,7 @@
 //      02111-1307, USA.
 //
 
+#include <charconv>
 #include <cstdint>
 #include <random>
 
@@ -328,6 +329,24 @@ const char *strcasestr(const char *a, const char *b) noexcept
 	return nullptr;
 }
 #endif // !HAVE_STRCASESTR
+
+int to_number(std::string_view s, int base)
+{
+	int res{};
+	auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), res, base);
+	if (ec != std::errc()) {
+		if (ec == std::errc::invalid_argument) {
+			DebugPrint("That isn't a number %s." _C_ s.data());
+		} else if (ec == std::errc::result_out_of_range) {
+			DebugPrint("This number %s is larger than an int." _C_ s.data());
+		}
+		Exit(1);
+	} else if (ptr != s.data() + s.size()) {
+		DebugPrint("That isn't a number %s." _C_ s.data());
+		Exit(1);
+	}
+	return res;
+}
 
 
 /*----------------------------------------------------------------------------

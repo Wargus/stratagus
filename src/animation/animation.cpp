@@ -250,11 +250,11 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	} else if (s[0] == 'r') { //random value
 		char *next = strchr(cur, '.');
 		if (next == nullptr) {
-			return SyncRand(atoi(cur) + 1);
+			return SyncRand(to_number(cur) + 1);
 		} else {
 			*next = '\0';
-			const int min = atoi(cur);
-			return min + SyncRand(atoi(next + 1) - min + 1);
+			const int min = to_number(cur);
+			return min + SyncRand(to_number(next + 1) - min + 1);
 		}
 	} else if (s[0] == 'l') { //player number
 		return ParseAnimPlayer(unit, cur);
@@ -274,7 +274,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');
-	return atoi(parseint);
+	return to_number(parseint);
 }
 
 /**

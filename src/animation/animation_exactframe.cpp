@@ -58,7 +58,7 @@ std::optional<int> CAnimation_ExactFrame::GetStillFrame(const CUnitType &type) /
 int CAnimation_ExactFrame::ParseAnimInt(const CUnit *unit) const
 {
 	if (unit == nullptr) {
-		return atoi(this->frame.c_str());
+		return to_number(this->frame);
 	} else {
 		return ::ParseAnimInt(*unit, this->frame.c_str());
 	}

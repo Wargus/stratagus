@@ -806,7 +806,7 @@ static void DoNextReplay()
 		}
 		SendCommandDiplomacy(arg1, state, arg2);
 	} else if (action == "shared-vision") {
-		bool state = atoi(val.data()) ? true : false;
+		const bool state = to_number(val) != 0;
 		SendCommandSharedVision(arg1, state, arg2);
 	} else if (action == "input") {
 		if (val[0] == '-') {

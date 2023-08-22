@@ -1125,8 +1125,8 @@ static int CclSelection(lua_State *l)
 	//NumSelected = LuaToNumber(l, 1);
 	const int args = lua_rawlen(l, 2);
 	for (int j = 0; j < args; ++j) {
-		const char *str = LuaToString(l, 2, j + 1);
-		Selected.push_back(&UnitManager->GetSlotUnit(strtol(str + 1, nullptr, 16)));
+		const std::string_view str = LuaToString(l, 2, j + 1);
+		Selected.push_back(&UnitManager->GetSlotUnit(to_number(str.substr(1), 16)));
 	}
 	return 0;
 }

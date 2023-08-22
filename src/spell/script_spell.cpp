@@ -124,13 +124,13 @@ char Ccl2Condition(lua_State *l, const char *value)
 	} else if (!strcmp(value, "only")) {
 		return CONDITION_ONLY;
 	} else if (value[0] == '<') {
-		int v = atoi(value + 1);
+		int v = to_number(value + 1);
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
 		}
 		return -v;
 	} else if (value[0] == '>') {
-		int v = atoi(value + 1);
+		int v = to_number(value + 1);
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
 		}

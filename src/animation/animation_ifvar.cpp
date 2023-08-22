@@ -115,7 +115,7 @@ static bool returnFalse(int, int) { return false; }
 	} else if (op == "!") {
 		this->binOpFunc = binOpNot;
 	} else {
-		EIfVarBinOp type = static_cast<EIfVarBinOp>(atoi(op.c_str()));
+		EIfVarBinOp type = static_cast<EIfVarBinOp>(to_number(op));
 
 		switch (type) {
 			case IF_GREATER_EQUAL: this->binOpFunc = binOpGreaterEqual; break;

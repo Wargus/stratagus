@@ -526,16 +526,16 @@ public:
         if (gameStats[2].empty()) {
             return 8;
         } else {
-            return std::stoi(gameStats[2]) - 10;
+            return to_number(gameStats[2]) - 10;
         }
     };
 
     int getSpeed() {
-        return std::stol(gameStats[3]);
+        return to_number(gameStats[3]);
     }
 
     std::string getApproval() {
-        if (std::stol(gameStats[4]) == 0) {
+        if (to_number(gameStats[4]) == 0) {
             return "Not approved";
         } else {
             return "Approved";
@@ -546,7 +546,7 @@ public:
         if (gameStats[8].empty()) {
             return "Map default";
         }
-        long settings = std::stol(gameStats[8]);
+        long settings = to_number(gameStats[8]);
         std::string result;
         if (settings & 0x200) {
             result += " 1 worker";

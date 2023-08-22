@@ -552,7 +552,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				continue;
 			}
 			case 'D':
-				Video.Depth = atoi(optarg);
+				Video.Depth = to_number(optarg);
 				continue;
 			case 'e':
 				Editor.Running = EditorCommandLine;
@@ -583,7 +583,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				parameters.LocalPlayerName = optarg;
 				continue;
 			case 'P':
-				CNetworkParameter::Instance.localPort = atoi(optarg);
+				CNetworkParameter::Instance.localPort = to_number(optarg);
 				continue;
 			case 'p':
 				EnableDebugPrint = true;
@@ -592,10 +592,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				IsRestart = true;
 				continue;
 			case 's':
-				AiSleepCycles = atoi(optarg);
+				AiSleepCycles = to_number(optarg);
 				continue;
 			case 'S':
-				RefreshRate = atoi(optarg);
+				RefreshRate = to_number(optarg);
 				continue;
 			case 'u':
 				if (!strcmp(optarg, "userhome")) {
@@ -611,9 +611,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					Usage();
 					exit(-1);
 				}
-				Video.Height = atoi(sep + 1);
+				Video.Height = to_number(sep + 1);
 				*sep = 0;
-				Video.Width = atoi(optarg);
+				Video.Width = to_number(optarg);
 				if (!Video.Height || !Video.Width) {
 					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
 					Usage();
@@ -631,9 +631,9 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 						Usage();
 						exit(-1);
 					}
-					Video.WindowHeight = atoi(sep + 1);
+					Video.WindowHeight = to_number(sep + 1);
 					*sep = 0;
-					Video.WindowWidth = atoi(optarg);
+					Video.WindowWidth = to_number(optarg);
 					if (!Video.WindowHeight || !Video.WindowWidth) {
 						fprintf(stderr, "%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
 						Usage();

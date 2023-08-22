@@ -273,7 +273,7 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else if (modStr == "!") {
 		this->mod = modNot;
 	} else {
-		this->mod = (SetVar_ModifyTypes)(atoi(modStr.c_str()));
+		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
 	}
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
