@@ -115,6 +115,7 @@ extern const char *strcasestr(const char *str, const char *substr) noexcept;
 #define L(LITERAL) "" LITERAL
 #endif
 
+int to_number(std::string_view s, int base = 10);
 
 /*----------------------------------------------------------------------------
 --  Getopt

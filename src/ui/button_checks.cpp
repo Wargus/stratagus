@@ -142,7 +142,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 			Exit(1);
 			return false;
 		}
-		const int cmpValue = atoi(value);
+		const int cmpValue = to_number(value);
 		bool cmpResult = false;
 		if (!strcmp(binop, ">")) {
 			cmpResult = varValue > cmpValue;

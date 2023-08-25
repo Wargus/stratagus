@@ -259,8 +259,8 @@ static int CclGroup(lua_State *l)
 	//grp.Units.size() = LuaToNumber(l, 2);
 	const int args = lua_rawlen(l, 3);
 	for (int j = 0; j < args; ++j) {
-		const char *str = LuaToString(l, 3, j + 1);
-		grp.add(UnitManager->GetSlotUnit(strtol(str + 1, nullptr, 16)), grpNum);
+		const std::string_view str = LuaToString(l, 3, j + 1);
+		grp.add(UnitManager->GetSlotUnit(to_number(str.substr(1), 16)), grpNum);
 	}
 	return 0;
 }

@@ -64,7 +64,7 @@ std::optional<int> CAnimation_Frame::GetStillFrame(const CUnitType &type) /* ove
 int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const
 {
 	if (unit == nullptr) {
-		return atoi(this->frame.c_str());
+		return to_number(this->frame);
 	} else {
 		return ::ParseAnimInt(*unit, this->frame.c_str());
 	}

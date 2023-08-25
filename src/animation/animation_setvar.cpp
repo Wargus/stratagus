@@ -207,7 +207,7 @@
 	} else if (modStr == "!") {
 		this->mod = modNot;
 	} else {
-		this->mod = (SetVar_ModifyTypes)(atoi(modStr.c_str()));
+		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
 	}
 
 	begin = std::min(len, str.find_first_not_of(' ', end));
