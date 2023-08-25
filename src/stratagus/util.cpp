@@ -27,7 +27,10 @@
 //      02111-1307, USA.
 //
 
-#include <charconv>
+#if __has_include(<charconv>)
+#include <charconv> // from_chars
+#endif
+
 #include <cstdint>
 #include <random>
 
@@ -332,6 +335,7 @@ const char *strcasestr(const char *a, const char *b) noexcept
 
 int to_number(std::string_view s, int base)
 {
+#if __has_include(<charconv>)
 	int res{};
 	auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), res, base);
 	if (ec != std::errc()) {
@@ -346,6 +350,17 @@ int to_number(std::string_view s, int base)
 		Exit(1);
 	}
 	return res;
+#else
+	const std::string buf(s); // handle non nul-terminated string
+	char *end = nullptr;
+
+	int res = std::strtol(buf.data(), &end, base);
+	if (end != buf.data() + buf.size()) {
+		DebugPrint("That isn't a number %s." _C_ buf.c_str());
+		Exit(1);
+	}
+	return res;
+#endif
 }
 
 
