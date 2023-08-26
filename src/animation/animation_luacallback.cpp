@@ -48,7 +48,7 @@
 
 	cb->pushPreamble();
 	for (const std::string &str : cbArgs) {
-		const int arg = ParseAnimInt(unit, str.c_str());
+		const int arg = ParseAnimInt(unit, str);
 		cb->pushInteger(arg);
 	}
 	cb->run();

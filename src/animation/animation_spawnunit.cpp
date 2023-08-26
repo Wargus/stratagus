@@ -47,10 +47,10 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int offX = ParseAnimInt(unit, this->offXStr.c_str());
-	const int offY = ParseAnimInt(unit, this->offYStr.c_str());
-	const int range = ParseAnimInt(unit, this->rangeStr.c_str());
-	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
+	const int offX = ParseAnimInt(unit, this->offXStr);
+	const int offY = ParseAnimInt(unit, this->offYStr);
+	const int range = ParseAnimInt(unit, this->rangeStr);
+	const int playerId = ParseAnimInt(unit, this->playerStr);
 	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(::ParseAnimFlags(unit, this->flagsStr));
 
 	CPlayer &player = Players[playerId];

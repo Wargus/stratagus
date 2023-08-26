@@ -50,12 +50,12 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int startx = ParseAnimInt(unit, this->startXStr.c_str());
-	const int starty = ParseAnimInt(unit, this->startYStr.c_str());
-	const int destx = ParseAnimInt(unit, this->destXStr.c_str());
-	const int desty = ParseAnimInt(unit, this->destYStr.c_str());
+	const int startx = ParseAnimInt(unit, this->startXStr);
+	const int starty = ParseAnimInt(unit, this->startYStr);
+	const int destx = ParseAnimInt(unit, this->destXStr);
+	const int desty = ParseAnimInt(unit, this->destYStr);
 	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(::ParseAnimFlags(unit, this->flagsStr));
-	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr.c_str());
+	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr);
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];

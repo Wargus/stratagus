@@ -66,7 +66,7 @@ int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const
 	if (unit == nullptr) {
 		return to_number(this->frame);
 	} else {
-		return ::ParseAnimInt(*unit, this->frame.c_str());
+		return ::ParseAnimInt(*unit, this->frame);
 	}
 }
 

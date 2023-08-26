@@ -152,7 +152,7 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
-extern int ParseAnimInt(const CUnit &unit, const char *parseint);
+extern int ParseAnimInt(const CUnit &unit, std::string_view parseint);
 extern int ParseAnimFlags(const CUnit &unit, std::string_view parseflag);
 
 extern void FindLabelLater(CAnimation **anim, const std::string &name);

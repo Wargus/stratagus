@@ -43,10 +43,8 @@
 
 /* virtual */ void CAnimation_Wiggle::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	const char *xC = x.c_str();
-	const char *yC = y.c_str();
-	int x = ParseAnimInt(unit, xC);
-	int y = ParseAnimInt(unit, yC);
+	int x = ParseAnimInt(unit, this->x);
+	int y = ParseAnimInt(unit, this->y);
 	if (this->isHeading) {
 		x *= Heading2X[unit.Direction / NextDirection];
 		y *= Heading2Y[unit.Direction / NextDirection];
@@ -57,7 +55,7 @@
 		int targetY = y * PixelTileSize.y;
 		int curX = unit.tilePos.x * PixelTileSize.x + unit.IX;
 		int curY = unit.tilePos.y * PixelTileSize.y + unit.IY;
-		int speed = ParseAnimInt(unit, this->speed.c_str());
+		int speed = ParseAnimInt(unit, this->speed);
 
 		bool reachedX = curX == targetX;
 		if (reachedX && curY == targetY) {

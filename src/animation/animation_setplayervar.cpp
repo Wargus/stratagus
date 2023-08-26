@@ -186,8 +186,8 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
-	int rop = ParseAnimInt(unit, this->valueStr.c_str());
+	const int playerId = ParseAnimInt(unit, this->playerStr);
+	int rop = ParseAnimInt(unit, this->valueStr);
 	int data = GetPlayerData(playerId, this->varStr, this->argStr);
 
 	switch (this->mod) {
