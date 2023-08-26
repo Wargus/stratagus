@@ -44,7 +44,7 @@
 	Assert(unit.Anim.Anim == this);
 }
 
-/* virtual */ void CAnimation_Label::Init(const char *s, lua_State *)
+void CAnimation_Label::Init(std::string_view s, lua_State *) /* override */
 {
 }
 

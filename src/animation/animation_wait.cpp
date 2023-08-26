@@ -54,7 +54,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Wait::Init(const char *s, lua_State *)
+void CAnimation_Wait::Init(std::string_view s, lua_State *) /* override */
 {
 	this->wait = s;
 }

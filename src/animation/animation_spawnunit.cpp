@@ -43,6 +43,8 @@
 #include "map.h"
 #include "unit.h"
 
+#include <sstream>
+
 void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
@@ -86,36 +88,11 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 /*
 **  s = "unitType offX offY range player [flags]"
 */
-void CAnimation_SpawnUnit::Init(const char *s, lua_State *) /* override */
+void CAnimation_SpawnUnit::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
-
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->unitTypeStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->offXStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->offYStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->rangeStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->playerStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	if (begin != end) {
-		this->flagsStr.assign(str, begin, end - begin);
-	}
+	std::istringstream is{std::string(s)};
+	is >> this->unitTypeStr >> this->offXStr >> this->offYStr >> this->rangeStr >> this->playerStr
+		>> this->flagsStr;
 }
 
 std::uint32_t

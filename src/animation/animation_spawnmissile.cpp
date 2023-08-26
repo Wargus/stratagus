@@ -46,6 +46,8 @@
 #include "pathfinder.h"
 #include "unit.h"
 
+#include <sstream>
+
 void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
@@ -145,38 +147,12 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 /*
 **  s = "missileType startX startY destX destY [flag1[.flagN]] [missileoffset]"
 */
-void CAnimation_SpawnMissile::Init(const char *s, lua_State *) /* override */
+void CAnimation_SpawnMissile::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->missileTypeStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->startXStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->startYStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->destXStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->destYStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->flagsStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->offsetNumStr.assign(str, begin, end - begin);
+	is >> this->missileTypeStr >> this->startXStr >> this->startYStr >> this->destXStr
+		>> this->destYStr >> this->flagsStr >> this->offsetNumStr;
 }
 
 std::uint32_t

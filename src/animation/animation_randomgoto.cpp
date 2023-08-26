@@ -39,6 +39,8 @@
 
 #include "unit.h"
 
+#include <sstream>
+
 /* virtual */ void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
@@ -51,20 +53,13 @@
 /*
 **  s : "percent label"
 */
-/* virtual */ void CAnimation_RandomGoto::Init(const char *s, lua_State *)
+void CAnimation_RandomGoto::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
+	std::string label;
+	is >> this->randomStr >> label;
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->randomStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	const std::string label(str, begin, end - begin);
-
-	FindLabelLater(&this->gotoLabel, label);
+	FindLabelLater(&this->gotoLabel, std::move(label));
 }
 
 //@}

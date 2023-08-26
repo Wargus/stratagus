@@ -51,7 +51,7 @@ class CAnimation_SpawnMissile : public CAnimation
 {
 public:
 	void Action(CUnit &unit, int &move, int scale) const override;
-	void Init(const char *s, lua_State *l) override;
+	void Init(std::string_view s, lua_State *l) override;
 	std::uint32_t ParseAnimFlags(const std::string_view &parseflag) const override;
 
 private:

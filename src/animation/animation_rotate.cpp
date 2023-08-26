@@ -80,7 +80,7 @@ void UnitRotate(CUnit &unit, int rotate)
 	}
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char *s, lua_State *)
+void CAnimation_Rotate::Init(std::string_view s, lua_State *) /* override */
 {
 	this->rotateStr = s;
 }

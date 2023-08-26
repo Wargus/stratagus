@@ -47,7 +47,7 @@
 	move = ParseAnimInt(unit, this->moveStr);
 }
 
-/* virtual */ void CAnimation_Move::Init(const char *s, lua_State *)
+void CAnimation_Move::Init(std::string_view s, lua_State *) /* override */
 {
 	this->moveStr = s;
 }

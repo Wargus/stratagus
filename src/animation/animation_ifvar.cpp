@@ -39,6 +39,8 @@
 
 #include "unit.h"
 
+#include <sstream>
+
 //IfVar compare types
 enum EIfVarBinOp {
 	IF_GREATER_EQUAL = 1,
@@ -81,18 +83,13 @@ static bool returnFalse(int, int) { return false; }
 /*
 ** s = "leftOp Op rigthOp gotoLabel"
 */
-/* virtual */ void CAnimation_IfVar::Init(const char *s, lua_State *)
+void CAnimation_IfVar::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::stringstream is{std::string(s)};
 
-	size_t begin = 0;
-	size_t end = std::min(len, str.find(' ', begin));
-	this->leftVar.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	std::string op(str, begin, end - begin);
+	std::string op;
+	std::string label;
+	is >> this->leftVar >> op >> this->rightVar >> label;
 
 	if (op == ">=") {
 		this->binOpFunc = binOpGreaterEqual;
@@ -132,15 +129,7 @@ static bool returnFalse(int, int) { return false; }
 		}
 	}
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->rightVar.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	std::string label(str, begin, end - begin);
-
-	FindLabelLater(&this->gotoLabel, label);
+	FindLabelLater(&this->gotoLabel, std::move(label));
 }
 
 //@}

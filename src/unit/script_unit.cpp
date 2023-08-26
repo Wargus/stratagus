@@ -1237,7 +1237,7 @@ static int CclGetUnitBoolFlag(lua_State *l)
 	const std::string_view value = LuaToString(l, 2);
 	int index = UnitTypeVar.BoolFlagNameLookup[value];// User bool flags
 	if (index == -1) {
-		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value);
+		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value.data());
 	}
 	lua_pushboolean(l, unit->Type->BoolFlag[index].value);
 	return 1;

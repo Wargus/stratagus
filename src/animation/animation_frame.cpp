@@ -51,7 +51,7 @@ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /
 	UnitUpdateHeading(unit);
 }
 
-void CAnimation_Frame::Init(const char *s, lua_State *) /* override */
+void CAnimation_Frame::Init(std::string_view s, lua_State *) /* override */
 {
 	this->frame = s;
 }

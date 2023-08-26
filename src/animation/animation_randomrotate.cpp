@@ -51,7 +51,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_RandomRotate::Init(const char *s, lua_State *)
+void CAnimation_RandomRotate::Init(std::string_view s, lua_State *) /* override */
 {
 	this->rotateStr = s;
 }

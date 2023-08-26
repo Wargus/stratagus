@@ -535,13 +535,13 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 /**
 **  Find a label later
 */
-void FindLabelLater(CAnimation **anim, const std::string &name)
+void FindLabelLater(CAnimation **anim, std::string name)
 {
 	LabelsLaterStruct label;
 
 	label.Anim = anim;
-	label.Name = name;
-	LabelsLater.push_back(label);
+	label.Name = std::move(name);
+	LabelsLater.push_back(std::move(label));
 }
 
 /**

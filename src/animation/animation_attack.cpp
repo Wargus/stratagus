@@ -47,7 +47,7 @@
 }
 
 
-/* virtual */ void CAnimation_Attack::Init(const char *s, lua_State *)
+void CAnimation_Attack::Init(std::string_view s, lua_State *) /* override */
 {
 }
 
