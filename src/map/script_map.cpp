@@ -857,7 +857,7 @@ static int CclLoadTileModels(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	Map.TileModelsFileName = LuaToString(l, 1);
-	const fs::path filename = LibraryFileName(Map.TileModelsFileName.string().c_str());
+	const fs::path filename = LibraryFileName(Map.TileModelsFileName.string());
 	if (LuaLoadFile(filename) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.c_str());
 	}

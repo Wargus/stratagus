@@ -591,7 +591,7 @@ static bool FindFileWithExtension(fs::path &fullpath)
 **  @param file        Filename to open.
 **  return generated filename.
 */
-static fs::path LibraryFileNameImpl(const char *file)
+static fs::path LibraryFileNameImpl(const std::string_view file)
 {
 	// Absolute path or in current directory.
 	fs::path candidate = file;
@@ -666,7 +666,7 @@ static fs::path LibraryFileNameImpl(const char *file)
 	return file;
 }
 
-extern std::string LibraryFileName(const char *file)
+extern std::string LibraryFileName(const std::string &file)
 {
 	static std::unordered_map<std::string, std::string> FileNameMap;
 	auto result = FileNameMap.find(file);

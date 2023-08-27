@@ -423,7 +423,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 		return new CGraphic;
 	}
 
-	const fs::path file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename);
 	CGraphic *&g = GraphicHash[file];
 	if (g == nullptr) {
 		g = new CGraphic;
@@ -456,7 +456,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 		return new CPlayerColorGraphic;
 	}
 
-	const fs::path file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename);
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 	if (g == nullptr) {
 		g = new CPlayerColorGraphic;
@@ -528,7 +528,7 @@ CGraphic *CGraphic::Get(const std::string &filename)
 		return nullptr;
 	}
 
-	const fs::path file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename);
 	CGraphic *&g = GraphicHash[file];
 
 	return g;
@@ -547,7 +547,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 		return nullptr;
 	}
 
-	const fs::path file = LibraryFileName(filename.c_str());
+	const fs::path file = LibraryFileName(filename);
 	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
 
 	return g;
@@ -646,7 +646,7 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	CFile fp;
-	const fs::path name = LibraryFileName(File.string().c_str());
+	const fs::path name = LibraryFileName(File.string());
 	if (name.empty()) {
 		perror("Cannot find file");
 		goto error;
