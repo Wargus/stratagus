@@ -417,8 +417,7 @@ void InitNetwork1()
 
 	// Our communication port
 	const int port = CNetworkParameter::Instance.localPort;
-	const char *NetworkAddr = nullptr; // FIXME : bad use
-	const CHost host(NetworkAddr, port);
+	const CHost host("", port);
 	NetworkFildes.Open(host);
 	if (NetworkFildes.IsValid() == false) {
 		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);

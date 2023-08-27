@@ -2084,7 +2084,7 @@ class C2S_SID_AUTH_INFO : public OnlineState {
             localHost = "0.0.0.0";
         }
         if (!ctx->getTCPSocket()->IsValid()) {
-            if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
+            if (!ctx->getTCPSocket()->Open(CHost(localHost, CNetworkParameter::Instance.localPort))) {
                 ctx->setState(new DisconnectedState("TCP open failed"));
                 return;
             }
@@ -2291,7 +2291,7 @@ static int CclDisconnect(lua_State *l) {
 static int CclConnect(lua_State *l) {
     _ctx.disconnect();
     LuaCheckArgs(l, 2);
-    const char *host = LuaToString(l, 1);
+    const std::string host = LuaToString(l, 1);
     int port = LuaToNumber(l, 2);
 
     _ctx.setHost(new CHost(host, port));

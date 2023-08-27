@@ -44,9 +44,9 @@
 // CHost
 //
 
-CHost::CHost(const char *name, int port)
+CHost::CHost(const std::string& name, int port)
 {
-	this->ip = name ? NetResolveHost(name) : INADDR_ANY;
+	this->ip = !name.empty() ? NetResolveHost(name) : INADDR_ANY;
 	this->port = port;
 }
 
