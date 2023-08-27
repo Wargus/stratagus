@@ -46,9 +46,9 @@
 	unit.Anim.Anim = this->gotoLabel;
 }
 
-/* virtual */ void CAnimation_Goto::Init(const char *s, lua_State *)
+void CAnimation_Goto::Init(std::string_view s, lua_State *) /* override */
 {
-	FindLabelLater(&this->gotoLabel, s);
+	FindLabelLater(&this->gotoLabel, std::string(s));
 }
 
 //@}

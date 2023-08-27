@@ -49,7 +49,7 @@
 	}
 }
 
-/* virtual */ void CAnimation_Sound::Init(const char *s, lua_State *)
+void CAnimation_Sound::Init(std::string_view s, lua_State *) /* override */
 {
 	this->sound.Name = s;
 }

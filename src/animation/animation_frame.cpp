@@ -51,7 +51,7 @@ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /
 	UnitUpdateHeading(unit);
 }
 
-void CAnimation_Frame::Init(const char *s, lua_State *) /* override */
+void CAnimation_Frame::Init(std::string_view s, lua_State *) /* override */
 {
 	this->frame = s;
 }
@@ -66,7 +66,7 @@ int CAnimation_Frame::ParseAnimInt(const CUnit *unit) const
 	if (unit == nullptr) {
 		return to_number(this->frame);
 	} else {
-		return ::ParseAnimInt(*unit, this->frame.c_str());
+		return ::ParseAnimInt(*unit, this->frame);
 	}
 }
 

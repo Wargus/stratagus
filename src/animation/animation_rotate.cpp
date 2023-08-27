@@ -76,11 +76,11 @@ void UnitRotate(CUnit &unit, int rotate)
 		dpos.y += doff.y / PixelTileSize.y;
 		UnitHeadingFromDeltaXY(unit, dpos);
 	} else {
-		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr.c_str()));
+		UnitRotate(unit, ParseAnimInt(unit, this->rotateStr));
 	}
 }
 
-/* virtual */ void CAnimation_Rotate::Init(const char *s, lua_State *)
+void CAnimation_Rotate::Init(std::string_view s, lua_State *) /* override */
 {
 	this->rotateStr = s;
 }

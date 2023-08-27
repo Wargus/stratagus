@@ -39,12 +39,14 @@
 
 #include "unit.h"
 
+#include <sstream>
+
 /* virtual */ void CAnimation_RandomWait::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int arg1 = ParseAnimInt(unit, this->minWait.c_str());
-	const int arg2 = ParseAnimInt(unit, this->maxWait.c_str());
+	const int arg1 = ParseAnimInt(unit, this->minWait);
+	const int arg2 = ParseAnimInt(unit, this->maxWait);
 
 	unit.Anim.Wait = arg1 + SyncRand() % (arg2 - arg1 + 1);
 }
@@ -52,18 +54,11 @@
 /*
 ** s = "minWait MaxWait"
 */
-/* virtual */ void CAnimation_RandomWait::Init(const char *s, lua_State *)
+void CAnimation_RandomWait::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->minWait.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->maxWait.assign(str, begin, end - begin);
+	is >> this->minWait >> this->maxWait;
 }
 
 //@}

@@ -120,9 +120,9 @@ int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
 **  @return  The parsed value.
 */
 
-static int ParseAnimPlayer(const CUnit &unit, char *parseint)
+static int ParseAnimPlayer(const CUnit &unit, std::string_view parseint)
 {
-	if (!strcmp(parseint, "this")) {
+	if (parseint == "this") {
 		return unit.Player->Index;
 	}
 	return ParseAnimInt(unit, parseint);
@@ -133,22 +133,36 @@ static int ParseAnimPlayer(const CUnit &unit, char *parseint)
 **  Parse integer in animation frame.
 **
 **  @param unit      Unit of the animation.
-**  @param parseint  Integer to parse.
+**  @param s         Integer to parse.
+**         either:
+**           - v.UnitVar.Value // own value
+**           - t.UnitVar.Value // target value
+**           - b.BoolVar
+**           - g.BoolVar
+**           - s.SpellName
+**           - S.spellName // autocast
+**           - p.(player).prop
+**           - p.(player).prop.extra
+**           - p.prop
+**           - p.prop.extra
+**           - r.max // rand
+**           - r.min.max // rand
+**           - l.data // player data
+**           - U // Unit itself
+**           - G // order unit goal
+**           - R // unit rotation
+**           - W // remaining way
+**           - number
 **
 **  @return  The parsed value.
 */
-
-int ParseAnimInt(const CUnit &unit, const char *parseint)
+int ParseAnimInt(const CUnit &unit, const std::string_view s)
 {
-	char s[100];
 	const CUnit *goal = &unit;
 
-	if (!strlen(parseint)) {
+	if (s.empty()) {
 		return 0;
 	}
-
-	strcpy(s, parseint);
-	char *cur = &s[2];
 	if (s[0] == 'v' || s[0] == 't') { //unit variable detected
 		if (s[0] == 't') {
 			if (unit.CurrentOrder()->HasGoal()) {
@@ -159,34 +173,34 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return 0;
 			}
 		}
-		char *next = strchr(cur, '.');
-		if (next == nullptr) {
-			fprintf(stderr, "Need also specify the variable '%s' tag \n", cur);
+		auto dot_pos = s.find('.', 2);
+		if (dot_pos == std::string_view::npos) {
+			fprintf(stderr, "Need also specify the variable '%s' tag \n", s.substr(2).data());
 			ExitFatal(1);
-		} else {
-			*next = '\0';
 		}
+		auto cur = s.substr(2, dot_pos - 2);
+		auto next = s.substr(dot_pos + 1);
 		const int index = UnitTypeVar.VariableNameLookup[cur];// User variables
 		if (index == -1) {
-			if (!strcmp(cur, "ResourcesHeld")) {
+			if (cur == "ResourcesHeld") {
 				return goal->ResourcesHeld;
-			} else if (!strcmp(cur, "ResourceActive")) {
+			} else if (cur == "ResourceActive") {
 				return goal->Resource.Active;
-			} else if (!strcmp(cur, "_Distance")) {
+			} else if (cur == "_Distance") {
 				return unit.MapDistanceTo(*goal);
 			}
-			fprintf(stderr, "Bad variable name '%s'\n", cur);
+			fprintf(stderr, "Bad variable name '%s'\n", cur.data());
 			ExitFatal(1);
 		}
-		if (!strcmp(next + 1, "Value")) {
+		if (next == "Value") {
 			return goal->Variable[index].Value;
-		} else if (!strcmp(next + 1, "Max")) {
+		} else if (next == "Max") {
 			return goal->Variable[index].Max;
-		} else if (!strcmp(next + 1, "Increase")) {
+		} else if (next == "Increase") {
 			return goal->Variable[index].Increase;
-		} else if (!strcmp(next + 1, "Enable")) {
+		} else if (next == "Enable") {
 			return goal->Variable[index].Enable;
-		} else if (!strcmp(next + 1, "Percent")) {
+		} else if (next == "Percent") {
 			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 		}
 		return 0;
@@ -198,9 +212,10 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return 0;
 			}
 		}
-		const int index = UnitTypeVar.BoolFlagNameLookup[cur];// User bool flags
+		auto cur = s.substr(2);
+		const int index = UnitTypeVar.BoolFlagNameLookup[cur]; // User bool flags
 		if (index == -1) {
-			fprintf(stderr, "Bad bool-flag name '%s'\n", cur);
+			fprintf(stderr, "Bad bool-flag name '%s'\n", cur.data());
 			ExitFatal(1);
 		}
 		return goal->Type->BoolFlag[index].value;
@@ -208,14 +223,15 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		Assert(goal->CurrentAction() == UnitAction::SpellCast);
 		const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(goal->CurrentOrder());
 		const SpellType &spell = order.GetSpell();
-		if (!strcmp(spell.Ident.c_str(), cur)) {
+		if (spell.Ident == s.substr(2)) {
 			return 1;
 		}
 		return 0;
 	} else if (s[0] == 'S') { // check if autocast for this spell available
+		auto cur = s.substr(2);
 		const SpellType *spell = SpellTypeByIdent(cur);
 		if (!spell) {
-			fprintf(stderr, "Invalid spell: '%s'\n", cur);
+			fprintf(stderr, "Invalid spell: '%s'\n", cur.data());
 			ExitFatal(1);
 		}
 		if (unit.AutoCastSpell[spell->Slot]) {
@@ -223,42 +239,45 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 		}
 		return 0;
 	} else if (s[0] == 'p') { //player variable detected
-		char *next;
-		if (*cur == '(') {
-			++cur;
-			char *end = strchr(cur, ')');
-			if (end == nullptr) {
+		auto cur = s.substr(2);
+		std::string_view next;
+		if (cur[0] == '(') {
+			cur = cur.substr(1);
+			auto parent_pos = cur.find(')');
+			if (parent_pos == std::string_view::npos) {
 				fprintf(stderr, "ParseAnimInt: expected ')'\n");
 				ExitFatal(1);
 			}
-			*end = '\0';
-			next = end + 1;
+			next = cur.substr(parent_pos + 1);
+			cur = cur.substr(0, parent_pos);
 		} else {
-			next = strchr(cur, '.');
+			auto dot_pos = cur.find('.');
+
+			if (dot_pos == std::string_view::npos) {
+				fprintf(stderr, "Need also specify the %s player's property\n", cur.data());
+				ExitFatal(1);
+			} else {
+				next = cur.substr(dot_pos + 1);
+				cur = cur.substr(0, dot_pos);
+			}
 		}
-		if (next == nullptr) {
-			fprintf(stderr, "Need also specify the %s player's property\n", cur);
-			ExitFatal(1);
-		} else {
-			*next = '\0';
-		}
-		char *arg = strchr(next + 1, '.');
-		if (arg != nullptr) {
-			*arg = '\0';
-		}
-		return GetPlayerData(ParseAnimPlayer(unit, cur), next + 1, arg + 1);
+		auto dot_pos = next.find('.');
+		auto arg = dot_pos == std::string_view::npos ? "" : next.substr(dot_pos + 1);
+		next = next.substr(0, dot_pos);
+		return GetPlayerData(ParseAnimPlayer(unit, cur), next, arg);
 	} else if (s[0] == 'r') { //random value
-		char *next = strchr(cur, '.');
-		if (next == nullptr) {
+		auto cur = s.substr(2);
+		auto dot_pos = cur.find('.');
+
+		if (dot_pos == std::string_view::npos) {
 			return SyncRand(to_number(cur) + 1);
 		} else {
-			*next = '\0';
+			auto next = cur.substr(0, dot_pos);
 			const int min = to_number(cur);
-			return min + SyncRand(to_number(next + 1) - min + 1);
+			return min + SyncRand(to_number(cur.substr(dot_pos + 1)) - min + 1);
 		}
 	} else if (s[0] == 'l') { //player number
-		return ParseAnimPlayer(unit, cur);
-
+		return ParseAnimPlayer(unit, s.substr(2));
 	} else if (s[0] == 'U') { //unit itself
 		return UnitNumber(unit);
 	} else if (s[0] == 'G') { //goal
@@ -274,7 +293,7 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 	}
 	// Check if we trying to parse a number
 	Assert(isdigit(s[0]) || s[0] == '-');
-	return to_number(parseint);
+	return to_number(s);
 }
 
 /**
@@ -516,13 +535,13 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 /**
 **  Find a label later
 */
-void FindLabelLater(CAnimation **anim, const std::string &name)
+void FindLabelLater(CAnimation **anim, std::string name)
 {
 	LabelsLaterStruct label;
 
 	label.Anim = anim;
-	label.Name = name;
-	LabelsLater.push_back(label);
+	label.Name = std::move(name);
+	LabelsLater.push_back(std::move(label));
 }
 
 /**

@@ -45,7 +45,7 @@ void CAnimation_ExactFrame::Action(CUnit &unit, int & /*move*/, int /*scale*/) c
 	unit.Frame = ParseAnimInt(&unit);
 }
 
-void CAnimation_ExactFrame::Init(const char *s, lua_State *) /* override */
+void CAnimation_ExactFrame::Init(std::string_view s, lua_State *) /* override */
 {
 	this->frame = s;
 }
@@ -60,7 +60,7 @@ int CAnimation_ExactFrame::ParseAnimInt(const CUnit *unit) const
 	if (unit == nullptr) {
 		return to_number(this->frame);
 	} else {
-		return ::ParseAnimInt(*unit, this->frame.c_str());
+		return ::ParseAnimInt(*unit, this->frame);
 	}
 }
 

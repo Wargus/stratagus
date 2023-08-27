@@ -40,6 +40,7 @@
 #include "animation.h"
 #include "unit.h"
 
+#include <sstream>
 #include <stdio.h>
 
 /**
@@ -186,8 +187,8 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 {
 	Assert(unit.Anim.Anim == this);
 
-	const int playerId = ParseAnimInt(unit, this->playerStr.c_str());
-	int rop = ParseAnimInt(unit, this->valueStr.c_str());
+	const int playerId = ParseAnimInt(unit, this->playerStr);
+	int rop = ParseAnimInt(unit, this->valueStr);
 	int data = GetPlayerData(playerId, this->varStr, this->argStr);
 
 	switch (this->mod) {
@@ -236,22 +237,13 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 /*
 **  s = "player var mod value [arg2]"
 */
-/* virtual */ void CAnimation_SetPlayerVar::Init(const char *s, lua_State *)
+void CAnimation_SetPlayerVar::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->playerStr.assign(str, begin, end - begin);
+	std::string modStr;
+	is >> this->playerStr >> this->varStr >> modStr >> this->valueStr >> this->argStr;
 
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->varStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	const std::string modStr(str, begin, end - begin);
 	if (modStr == "=") {
 		this->mod = modSet;
 	} else if (modStr == "+=") {
@@ -275,14 +267,6 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else {
 		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
 	}
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->valueStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->argStr.assign(str, begin, end - begin);
 }
 
 //@}

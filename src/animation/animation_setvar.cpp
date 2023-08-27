@@ -43,7 +43,7 @@
 #include "map.h"
 
 #include <stdio.h>
-
+#include <sstream>
 
 /* virtual */ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
@@ -96,7 +96,7 @@
 		return;
 	}
 
-	const int rop = ParseAnimInt(unit, this->valueStr.c_str());
+	const int rop = ParseAnimInt(unit, this->valueStr);
 	int value = 0;
 	if (!strcmp(next + 1, "Value")) {
 		value = goal->Variable[index].Value;
@@ -173,18 +173,12 @@
 /*
 **  s = "var mod value [unitSlot]"
 */
-/* virtual */ void CAnimation_SetVar::Init(const char *s, lua_State *)
+void CAnimation_SetVar::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->varStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	const std::string modStr(str, begin, end - begin);
+	std::string modStr;
+	is >> this->varStr >> modStr >> this->valueStr >> this->unitSlotStr;
 
 	if (modStr == "=") {
 		this->mod = modSet;
@@ -209,14 +203,6 @@
 	} else {
 		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
 	}
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->valueStr.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->unitSlotStr.assign(str, begin, end - begin);
 }
 
 //@}

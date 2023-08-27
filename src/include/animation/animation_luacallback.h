@@ -43,7 +43,7 @@ public:
 	~CAnimation_LuaCallback() { delete cb; }
 
 	void Action(CUnit &unit, int &move, int scale) const override;
-	void Init(const char *s, lua_State *l) override;
+	void Init(std::string_view s, lua_State *l) override;
 
 private:
 	LuaCallback *cb = nullptr;

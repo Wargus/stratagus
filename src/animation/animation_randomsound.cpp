@@ -41,6 +41,9 @@
 #include "sound.h"
 #include "unit.h"
 
+#include <iterator>
+#include <sstream>
+
 /* virtual */ void CAnimation_RandomSound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
 	Assert(unit.Anim.Anim == this);
@@ -54,16 +57,16 @@
 /*
 **  s = "Sound1 [SoundN ...]"
 */
-/* virtual */ void CAnimation_RandomSound::Init(const char *s, lua_State *)
+void CAnimation_RandomSound::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
+	std::vector<std::string> args;
+	std::copy(std::istream_iterator<std::string>(is),
+	          std::istream_iterator<std::string>(),
+	          std::back_inserter(args));
 
-	for (size_t begin = 0; begin != std::string::npos;) {
-		const size_t end = std::min(len, str.find(' ', begin));
-
-		this->sounds.push_back(SoundConfig(str.substr(begin, end - begin)));
-		begin = str.find_first_not_of(' ', end);
+	for (auto& arg : args) {
+		this->sounds.push_back(SoundConfig(std::move(arg)));
 	}
 }
 

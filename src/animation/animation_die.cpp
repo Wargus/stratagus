@@ -54,7 +54,7 @@
 	throw AnimationDie_Exception();
 }
 
-/* virtual */ void CAnimation_Die::Init(const char *s, lua_State *)
+void CAnimation_Die::Init(std::string_view s, lua_State *) /* override */
 {
 	this->DeathType = s;
 }

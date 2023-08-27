@@ -75,7 +75,7 @@ public:
 	virtual ~CAnimation() {}
 
 	virtual void Action(CUnit &unit, int &move, int scale) const = 0;
-	virtual void Init(const char *s, lua_State *l = nullptr) {}
+	virtual void Init(std::string_view s, lua_State *l = nullptr) {}
 	virtual void MapSound() {}
 	virtual std::optional<int> GetStillFrame(const CUnitType &type) { return std::nullopt; }
 	virtual std::uint32_t ParseAnimFlags(const std::string_view& parseflag) const { return 0; }
@@ -152,10 +152,10 @@ extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scal
 extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
-extern int ParseAnimInt(const CUnit &unit, const char *parseint);
+extern int ParseAnimInt(const CUnit &unit, std::string_view parseint);
 extern int ParseAnimFlags(const CUnit &unit, std::string_view parseflag);
 
-extern void FindLabelLater(CAnimation **anim, const std::string &name);
+extern void FindLabelLater(CAnimation **anim, std::string name);
 
 extern void FreeAnimations();
 

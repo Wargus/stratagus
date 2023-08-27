@@ -41,12 +41,12 @@
 #include "pathfinder.h"
 #include "unit.h"
 
+#include <sstream>
+
 /* virtual */ void CAnimation_Wiggle::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
-	const char *xC = x.c_str();
-	const char *yC = y.c_str();
-	int x = ParseAnimInt(unit, xC);
-	int y = ParseAnimInt(unit, yC);
+	int x = ParseAnimInt(unit, this->x);
+	int y = ParseAnimInt(unit, this->y);
 	if (this->isHeading) {
 		x *= Heading2X[unit.Direction / NextDirection];
 		y *= Heading2Y[unit.Direction / NextDirection];
@@ -57,7 +57,7 @@
 		int targetY = y * PixelTileSize.y;
 		int curX = unit.tilePos.x * PixelTileSize.x + unit.IX;
 		int curY = unit.tilePos.y * PixelTileSize.y + unit.IY;
-		int speed = ParseAnimInt(unit, this->speed.c_str());
+		int speed = ParseAnimInt(unit, this->speed);
 
 		bool reachedX = curX == targetX;
 		if (reachedX && curY == targetY) {
@@ -111,43 +111,29 @@
 	}
 }
 
-/* virtual */ void CAnimation_Wiggle::Init(const char *s, lua_State *)
+void CAnimation_Wiggle::Init(std::string_view s, lua_State *) /* override */
 {
-	const std::string str(s);
-	const size_t len = str.size();
+	std::istringstream is{std::string(s)};
+	is >> this->x >> this->y >> this->speed;
 
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->x.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->y.assign(str, begin, end - begin);
-
-	begin = std::min(len, str.find_first_not_of(' ', end));
-	end = std::min(len, str.find(' ', begin));
-	this->speed.assign(str, begin, end - begin);
 	if (this->speed == "absolute") {
 	} else if (this->speed == "heading") {
 		this->isHeading = true;
 	} else {
-		begin = std::min(len, str.find_first_not_of(' ', end));
-		end = std::min(len, str.find(' ', begin));
-		std::string label(str, begin, end - begin);
-		FindLabelLater(&this->ifNotReached, label);
+		std::string label;
+		is >> label;
+		FindLabelLater(&this->ifNotReached, std::move(label));
 	}
 
-	if (end != len) {
-		begin = std::min(len, str.find_first_not_of(' ', end));
-		end = std::min(len, str.find(' ', begin));
-		std::string zarg;
-		zarg.assign(str, begin, end - begin);
-		if (zarg == "z-displacement") {
-			this->isZDisplacement = true;
-		} else {
-			fprintf(stderr, "Bad flag, only 'z-displacement' expected at the end of wiggle animation, found '%s'\n", zarg.c_str());
-			ExitFatal(1);
-		}
+	std::string zarg;
+	is >> zarg;
+	if (zarg.empty()) {
+		// Noop
+	} else if (zarg == "z-displacement") {
+		this->isZDisplacement = true;
+	} else {
+		fprintf(stderr, "Bad flag, only 'z-displacement' expected at the end of wiggle animation, found '%s'\n", zarg.c_str());
+		ExitFatal(1);
 	}
 }
 

@@ -40,6 +40,8 @@
 #include "script.h"
 #include "unit.h"
 
+#include <iterator>
+#include <sstream>
 
 /* virtual */ void CAnimation_LuaCallback::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
 {
@@ -48,7 +50,7 @@
 
 	cb->pushPreamble();
 	for (const std::string &str : cbArgs) {
-		const int arg = ParseAnimInt(unit, str.c_str());
+		const int arg = ParseAnimInt(unit, str);
 		cb->pushInteger(arg);
 	}
 	cb->run();
@@ -57,26 +59,23 @@
 /*
 ** s = "cbName cbArg1 [cbArgN ...]"
 */
-/* virtual */ void CAnimation_LuaCallback::Init(const char *s, lua_State *l)
+/* virtual */ void CAnimation_LuaCallback::Init(std::string_view s, lua_State *l)
 {
-	const std::string str(s);
-	const size_t len = str.size();
-
-	size_t begin = 0;
-	size_t end = str.find(' ', begin);
-	this->cbName.assign(str, begin, end - begin);
+	const auto space_pos = s.find(' ');
+	this->cbName = s.substr(0, space_pos);
 
 	lua_getglobal(l, cbName.c_str());
 	cb = new LuaCallback(l, -1);
 	lua_pop(l, 1);
 
-	for (size_t begin = std::min(len, str.find_first_not_of(' ', end));
-		 begin != std::string::npos;) {
-		end = std::min(len, str.find(' ', begin));
-
-		this->cbArgs.push_back(str.substr(begin, end - begin));
-		begin = str.find_first_not_of(' ', end);
+	if (space_pos == std::string_view::npos) {
+		return;
 	}
+
+	std::istringstream iss{std::string(s.substr(space_pos + 1))};
+	std::copy(std::istream_iterator<std::string>(iss),
+	          std::istream_iterator<std::string>(),
+	          std::back_inserter(this->cbArgs));
 }
 
 //@}
