@@ -2026,31 +2026,31 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	if (args < 1 || args > 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const char *userdir = LuaToString(l, 1);
+	std::string_view userdir = LuaToString(l, 1);
 	const bool rel = args > 1 ? lua_toboolean(l, 2) : false;
-	int n = strlen(userdir);
 
 	int pathtype = 0; // path relative to stratagus dir
-	if (n > 0 && *userdir == '~') {
+	if (userdir.substr(0, 1) == "~") {
 		// path relative to user preferences directory
 		pathtype = 1;
 	}
 
 	// security: disallow all special characters
-	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
+	if (userdir.find_first_of(":*?\"<>|") != std::string_view::npos
+	    || userdir.find("..") != std::string_view::npos) {
 		LuaError(l, "Forbidden directory");
 	}
 	fs::path dir;
 
 	if (pathtype == 1) {
-		++userdir;
+		userdir = userdir.substr(1);
 		dir = Parameters::Instance.GetUserDirectory();
 		if (!GameName.empty()) {
 			dir /= GameName;
 		}
 		dir /= userdir;
 	} else if (rel) {
-		dir = LibraryFileName(userdir);
+		dir = LibraryFileName(std::string(userdir));
 	} else {
 		dir = fs::path(StratagusLibPath) / userdir;
 	}
