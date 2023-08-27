@@ -308,13 +308,13 @@ extern int CclInConfigFile;        /// True while config file parsing
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern const char *LuaToString(lua_State *l, int narg);
+extern std::string_view LuaToString(lua_State *l, int narg);
 extern int LuaToNumber(lua_State *l, int narg);
 extern float LuaToFloat(lua_State *l, int narg);
 extern unsigned int LuaToUnsignedNumber(lua_State *l, int narg);
 extern bool LuaToBoolean(lua_State *l, int narg);
 
-extern const char *LuaToString(lua_State *l, int index, int subIndex);
+extern std::string_view LuaToString(lua_State *l, int index, int subIndex);
 extern int LuaToNumber(lua_State *l, int index, int subIndex);
 extern unsigned int LuaToUnsignedNumber(lua_State *l, int index, int subIndex);
 extern bool LuaToBoolean(lua_State *l, int index, int subIndex);

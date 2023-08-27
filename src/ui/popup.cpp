@@ -150,7 +150,7 @@
 		} else if (key == "MaxWidth") {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (key == "Font") {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 		} else {
 			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key.data());
 		}
@@ -211,7 +211,7 @@
 		} else if (key == "MaxWidth") {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (key == "Font") {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 		} else {
 			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());
 		}
@@ -320,7 +320,7 @@
 		for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 			const std::string_view key = LuaToString(l, -2);
 			if (key == "Font") {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
 			} else {
@@ -435,14 +435,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
 			} else if (key == "Font") {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (key == "Variable") {
 				const std::string_view name = LuaToString(l, -1);
 				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+					LuaError(l, "unknown variable '%s'" _C_ name.data());
 				}
 			} else {
 				LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());

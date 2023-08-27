@@ -303,7 +303,7 @@ static int CclLoad(lua_State *l)
 	if (arg < 1 || arg > 2) {
 		LuaError(l, "incorrect argument");
 	}
-	const fs::path filename = LibraryFileName(LuaToString(l, 1));
+	const fs::path filename = LibraryFileName(std::string{LuaToString(l, 1)});
 	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
 	if (LuaLoadFile(filename, "", exitOnError) == -1) {
 		DebugPrint("Load failed: %s\n" _C_ filename.u8string().c_str());
@@ -321,7 +321,7 @@ static int CclLoad(lua_State *l)
 static int CclLoadBuffer(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	const fs::path file = LibraryFileName(LuaToString(l, 1));
+	const fs::path file = LibraryFileName(std::string{LuaToString(l, 1)});
 	DebugPrint("Loading '%s'\n" _C_ file.u8string().c_str());
 	std::string content;
 	if (GetFileContent(file, content) == false) {
@@ -342,7 +342,7 @@ static int CclLoadBuffer(lua_State *l)
 **
 **  @return      char* from lua.
 */
-const char *LuaToString(lua_State *l, int narg)
+std::string_view LuaToString(lua_State *l, int narg)
 {
 	luaL_checktype(l, narg, LUA_TSTRING);
 	return lua_tostring(l, narg);
@@ -408,11 +408,11 @@ bool LuaToBoolean(lua_State *l, int narg)
 	return lua_toboolean(l, narg) != 0;
 }
 
-const char *LuaToString(lua_State *l, int index, int subIndex)
+std::string_view LuaToString(lua_State *l, int index, int subIndex)
 {
 	luaL_checktype(l, index, LUA_TTABLE);
 	lua_rawgeti(l, index, subIndex);
-	const char *res = LuaToString(l, -1);
+	std::string_view res = LuaToString(l, -1);
 	lua_pop(l, 1);
 	return res;
 }
@@ -641,7 +641,7 @@ static std::string CallLuaStringFunction(unsigned int handler)
 	if (lua_gettop(Lua) - narg != 2) {
 		LuaError(Lua, "Function must return one value.");
 	}
-	std::string res = LuaToString(Lua, -1);
+	std::string res = std::string{LuaToString(Lua, -1)};
 	lua_pop(Lua, 2);
 	return res;
 }
@@ -724,7 +724,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					res->D.UnitStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.UnitStat.Index == -1) {
-						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
+						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
 					}
 				} else if (key == "Component") {
 					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -753,7 +753,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];
 					if (res->D.TypeStat.Index == -1) {
-						LuaError(l, "Bad variable name :'%s'" _C_ LuaToString(l, -1));
+						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
 					}
 				} else if (key == "Loc") {
 					res->D.TypeStat.Loc = LuaToNumber(l, -1);
@@ -775,9 +775,9 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					res->D.VideoTextLength.String = CclParseStringDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Font") {
-					res->D.VideoTextLength.Font = CFont::Get(LuaToString(l, -1));
+					res->D.VideoTextLength.Font = CFont::Get(std::string{LuaToString(l, -1)});
 					if (!res->D.VideoTextLength.Font) {
-						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
+						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 					}
 				} else {
 					LuaError(l, "Bad param %s for VideoTextLength" _C_ key.data());
@@ -794,7 +794,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			res->D.StringFind.String = CclParseStringDesc(l);
 
 			lua_rawgeti(l, -1, 2); // right
-			res->D.StringFind.C = *LuaToString(l, -1);
+			res->D.StringFind.C = LuaToString(l, -1)[0];
 			lua_pop(l, 1); // pop the char
 
 			lua_pop(l, 1); // pop the table.
@@ -850,7 +850,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 
 	if (lua_isstring(l, -1)) {
 		res->e = EString_Dir;
-		res->D.Val = new_strdup(LuaToString(l, -1));
+		res->D.Val = new_strdup(LuaToString(l, -1).data());
 	} else if (lua_isfunction(l, -1)) {
 		res->e = EString_Lua;
 		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
@@ -930,9 +930,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Line.Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
-				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
+				res->D.Line.Font = CFont::Get(std::string{LuaToString(l, -1)});
 				if (!res->D.Line.Font) {
-					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1));
+					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 				}
 				lua_pop(l, 1); // font name.
 			}
@@ -2122,7 +2122,7 @@ static int CclDebugPrint(lua_State *l)
 	lua_Debug ar;
 	lua_getstack(l, 1, &ar);
 	lua_getinfo(l, "nSl", &ar);
-	fprintf(stdout, "%s:%d: %s: %s\n", ar.source, ar.currentline, ar.what, LuaToString(l, 1));
+	fprintf(stdout, "%s:%d: %s: %s\n", ar.source, ar.currentline, ar.what, LuaToString(l, 1).data());
 #endif
 
 	return 1;

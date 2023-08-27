@@ -1993,7 +1993,7 @@ int EditorSaveMap(const std::string &file)
 	return 0;
 }
 
-int EditorSaveMapWithResize(const std::string &file, Vec2i newSize, Vec2i offset)
+int EditorSaveMapWithResize(std::string_view file, Vec2i newSize, Vec2i offset)
 {
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 

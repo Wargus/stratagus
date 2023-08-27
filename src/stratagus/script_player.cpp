@@ -103,7 +103,7 @@ void CPlayer::Load(lua_State *l)
 		++j;
 
 		if (value == "name") {
-			this->SetName(LuaToString(l, j + 1));
+			this->SetName(std::string{LuaToString(l, j + 1)});
 		} else if (value == "type") {
 			value = LuaToString(l, j + 1);
 			if (value == "neutral") {
@@ -878,7 +878,7 @@ static int CclDefinePlayerColors(lua_State *l)
 	}
 
 	for (int i = 0; i < args; ++i) {
-		PlayerColorNames.push_back(LuaToString(l, 1, i + 1));
+		PlayerColorNames.push_back(std::string{LuaToString(l, 1, i + 1)});
 		++i;
 		lua_rawgeti(l, 1, i + 1);
 		if (!lua_istable(l, -1)) {
@@ -1133,7 +1133,7 @@ static int CclSetPlayerData(lua_State *l)
 	const std::string_view data = LuaToString(l, 2);
 
 	if (data == "Name") {
-		p->SetName(LuaToString(l, 3));
+		p->SetName(std::string{LuaToString(l, 3)});
 	} else if (data == "RaceName") {
 		const std::string_view racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
@@ -1204,7 +1204,7 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (data == "Allow") {
 		LuaCheckArgs(l, 4);
 		const std::string_view ident = LuaToString(l, 3);
-		const std::string acquire = LuaToString(l, 4);
+		const std::string_view acquire = LuaToString(l, 4);
 
 		if (ident.substr(0, 8) == "upgrade-") {
 			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {

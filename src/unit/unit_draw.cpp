@@ -319,7 +319,7 @@ static int CclDefineSprites(lua_State *l)
 		Decoration deco;
 
 		lua_pushnil(l);
-		const char *name = nullptr;// name of the current sprite.
+		std::string_view name;// name of the current sprite.
 		while (lua_next(l, i + 1)) {
 			const std::string_view key = LuaToString(l, -2); // key name
 			if (key == "Name") {
@@ -335,13 +335,13 @@ static int CclDefineSprites(lua_State *l)
 			}
 			lua_pop(l, 1); // pop the value;
 		}
-		if (name == nullptr) {
+		if (name.empty()) {
 			LuaError(l, "CclDefineSprites requires the Name flag for sprite.");
 		}
 		int index = GetSpriteIndex(name); // Index of the Sprite.
 		if (index == -1) { // new sprite.
 			index = DecoSprite.SpriteArray.size();
-			DecoSprite.Name.push_back(name);
+			DecoSprite.Name.push_back(std::string{name});
 			DecoSprite.SpriteArray.push_back(deco);
 		} else {
 			DecoSprite.SpriteArray[index].File.clear();

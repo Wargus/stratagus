@@ -1311,11 +1311,11 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 	} else if (value == "IndividualUpgrade") {
 		LuaCheckArgs(l, 3);
-		std::string upgrade_ident = LuaToString(l, 3);
+		std::string_view upgrade_ident = LuaToString(l, 3);
 		if (CUpgrade::Get(upgrade_ident)) {
 			lua_pushboolean(l, unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]);
 		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
 		}
 		return 1;
 	} else if (value == "Active") {
@@ -1432,7 +1432,7 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 	} else if (name == "IndividualUpgrade") {
 		LuaCheckArgs(l, 4);
-		std::string upgrade_ident = LuaToString(l, 3);
+		std::string_view upgrade_ident = LuaToString(l, 3);
 		bool has_upgrade = LuaToBoolean(l, 4);
 		if (CUpgrade::Get(upgrade_ident)) {
 			if (has_upgrade && unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID] == false) {
@@ -1441,7 +1441,7 @@ static int CclSetUnitVariable(lua_State *l)
 				IndividualUpgradeLost(*unit, CUpgrade::Get(upgrade_ident));
 			}
 		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
 		}
 	} else if (name == "Active") {
 		bool ai_active = LuaToBoolean(l, 3);

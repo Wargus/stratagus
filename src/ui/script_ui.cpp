@@ -412,7 +412,8 @@ static int CclSetTitleScreens(lua_State *l)
 						if (value == "Text") {
 							TitleScreens[j]->Labels[k]->Text = LuaToString(l, -1);
 						} else if (value == "Font") {
-							TitleScreens[j]->Labels[k]->Font = CFont::Get(LuaToString(l, -1));
+							TitleScreens[j]->Labels[k]->Font =
+								CFont::Get(std::string{LuaToString(l, -1)});
 						} else if (value == "Pos") {
 							CclGetPos(l, &TitleScreens[j]->Labels[k]->Xofs, &TitleScreens[j]->Labels[k]->Yofs);
 						} else if (value == "Flags") {
@@ -596,7 +597,7 @@ static int CclDefinePanelContents(lua_State *l)
 			} else if (key == "Pos") {
 				CclGetPos(l, &infopanel->PosX, &infopanel->PosY);
 			} else if (key == "DefaultFont") {
-				infopanel->DefaultFont = CFont::Get(LuaToString(l, -1));
+				infopanel->DefaultFont = CFont::Get(std::string{LuaToString(l, -1)});
 			} else if (key == "Condition") {
 				infopanel->Condition = ParseConditionPanel(l);
 			} else if (key == "Contents") {
@@ -648,7 +649,7 @@ static int CclDefinePopup(lua_State *l)
 		if (key == "Ident") {
 			popup->Ident = LuaToString(l, -1);
 		} else if (key == "DefaultFont") {
-			popup->DefaultFont = CFont::Get(LuaToString(l, -1));
+			popup->DefaultFont = CFont::Get(std::string{LuaToString(l, -1)});
 		} else if (key == "BackgroundColor") {
 			popup->BackgroundColor = LuaToUnsignedNumber(l, -1);
 		} else if (key == "BorderColor") {
@@ -854,7 +855,7 @@ static int CclDefineButtonStyle(lua_State *l)
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument");
 	}
-	const std::string style = LuaToString(l, 1);
+	const std::string style = std::string{LuaToString(l, 1)};
 	ButtonStyle *&b = ButtonStyleHash[style];
 	if (!b) {
 		b = new ButtonStyle;
@@ -869,7 +870,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		if (value == "Size") {
 			CclGetPos(l, &b->Width, &b->Height);
 		} else if (value == "Font") {
-			b->Font = CFont::Get(LuaToString(l, -1));
+			b->Font = CFont::Get(std::string{LuaToString(l, -1)});
 		} else if (value == "TextNormalColor") {
 			b->TextNormalColor = LuaToString(l, -1);
 		} else if (value == "TextReverseColor") {

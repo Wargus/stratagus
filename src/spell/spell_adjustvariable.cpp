@@ -51,7 +51,7 @@
 		int i = UnitTypeVar.VariableNameLookup[name];
 
 		if (i == -1) {
-			LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ LuaToString(l, -2));
+			LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ name.data());
 		}
 		if (lua_isnumber(l, -1)) {
 			this->Var[i].Enable = (LuaToNumber(l, -1) != 0);

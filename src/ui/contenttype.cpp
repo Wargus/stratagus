@@ -391,14 +391,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				this->Text = CclParseStringDesc(l);
 				lua_pushnil(l); // ParseStringDesc eat token
 			} else if (key == "Font") {
-				this->Font = CFont::Get(LuaToString(l, -1));
+				this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
 			} else if (key == "Variable") {
 				const std::string_view name = LuaToString(l, -1);
 				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+					LuaError(l, "unknown variable '%s'" _C_ name.data());
 				}
 			} else if (key == "Component") {
 				this->Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -422,7 +422,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		if (key == "Format") {
 			this->Format = LuaToString(l, -1);
 		} else if (key == "Font") {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 		} else if (key == "Variable") {
 			const std::string_view name = LuaToString(l, -1);
 			this->Index = UnitTypeVar.VariableNameLookup[name];
@@ -447,7 +447,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		if (key == "Format") {
 			this->Format = LuaToString(l, -1);
 		} else if (key == "Font") {
-			this->Font = CFont::Get(LuaToString(l, -1));
+			this->Font = CFont::Get(std::string{LuaToString(l, -1)});
 		} else if (key == "Variable") {
 			const std::string_view name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
@@ -470,7 +470,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			const std::string_view name = LuaToString(l, -1);
 			this->Index2 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index2 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ LuaToString(l, -1));
+				LuaError(l, "unknown variable '%s'" _C_ name.data());
 			}
 		} else if (key == "Component2") {
 			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));

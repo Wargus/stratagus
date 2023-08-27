@@ -1892,7 +1892,7 @@ static int CclAiProcessorSetup(lua_State *l)
 {
 	InitNetwork1();
 	LuaCheckArgs(l, 4);
-	std::string host = LuaToString(l, 1);
+	std::string host = std::string{LuaToString(l, 1)};
 	int port = LuaToNumber(l, 2);
 	int stateDim = LuaToNumber(l, 3);
 	int actionDim = LuaToNumber(l, 4);
