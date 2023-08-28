@@ -1,4 +1,4 @@
-//       _________ __                 __
+﻿//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -799,7 +799,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	}
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {
-		const std::string path = LibraryFileName(filename.string().c_str());
+		const std::string path = LibraryFileName(filename.string());
 
 		if (strcasestr(filename.string().c_str(), ".smp")) {
 			LuaLoadFile(path);
@@ -1510,10 +1510,12 @@ static int CclSavedGameInfo(lua_State *l)
 		const std::string_view value = LuaToString(l, -2);
 
 		if (value == "SaveFile") {
-			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
+			std::string_view filename = LuaToString(l, -1);
+
+			if (std::size(CurrentMapPath) <= filename.size()) {
 				LuaError(l, "SaveFile too long");
 			}
-			std::string filename = LuaToString(l, -1);
+			ranges::copy(filename, CurrentMapPath);
 			if (LuaLoadFile(fs::path(StratagusLibPath) / filename) == -1) {
 				DebugPrint("Load failed: %s\n" _C_ value);
 			}

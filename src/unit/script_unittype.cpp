@@ -1183,7 +1183,7 @@ static int CclDefineUnitType(lua_State *l)
 				} else if (value == "dead") {
 					int death;
 
-					const std::string name = LuaToString(l, -1, k + 1);
+					const std::string_view name = LuaToString(l, -1, k + 1);
 					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
 						if (name == ExtraDeathTypes[death]) {
 							++k;
@@ -1645,7 +1645,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 	if (type) {
 		lua_pushstring(l, type->Ident.c_str());
 	} else {
-		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1));
+		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1).data());
 	}
 	return 1;
 }
@@ -1816,7 +1816,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 	} else if (data == "Sounds") {
 		LuaCheckArgs(l, 3);
-		const std::string sound_type = LuaToString(l, 3);
+		const std::string_view sound_type = LuaToString(l, 3);
 		if (sound_type == "selected") {
 			if (!GameRunning && Editor.Running != EditorEditing) {
 				lua_pushstring(l, type->Sound.Selected.Name.c_str());
@@ -1877,7 +1877,7 @@ static int CclGetUnitTypeData(lua_State *l)
 				}
 			} else {
 				int death;
-				const std::string sound_subtype = LuaToString(l, 4);
+				const std::string_view sound_subtype = LuaToString(l, 4);
 
 				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
 					if (sound_subtype == ExtraDeathTypes[death]) {
@@ -1975,7 +1975,7 @@ static int CclDefineVariables(lua_State *l)
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const std::string str = LuaToString(l, j + 1);
+		const std::string str = std::string{LuaToString(l, j + 1)};
 
 		const int index = UnitTypeVar.VariableNameLookup.AddKey(str);
 		if (index == old) {
@@ -2003,10 +2003,9 @@ static int CclDefineBoolFlags(lua_State *l)
 	const unsigned int old = UnitTypeVar.GetNumberBoolFlag();
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {
-		const std::string str = LuaToString(l, j + 1);
+		const std::string str = std::string{LuaToString(l, j + 1)};
 
 		UnitTypeVar.BoolFlagNameLookup.AddKey(str);
-
 	}
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
@@ -2152,14 +2151,14 @@ static int CclDefineDecorations(lua_State *l)
 				} else if (key == "text") {
 					CDecoVarText *decovartext = new CDecoVarText;
 
-					decovartext->Font = CFont::Get(LuaToString(l, -1, 1));
+					decovartext->Font = CFont::Get(std::string{LuaToString(l, -1, 1)});
 					// FIXME : More arguments ? color...
 					decovar = decovartext;
 				} else if (key == "sprite") {
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
-						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1));
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1).data());
 					}
 					// FIXME : More arguments ?
 					decovar = decovarspritebar;
@@ -2178,7 +2177,7 @@ static int CclDefineDecorations(lua_State *l)
 					CDecoVarAnimatedSprite *decovarspritebar = new CDecoVarAnimatedSprite;
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
-						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1));
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1).data());
 					}
 					decovarspritebar->WaitFrames = LuaToNumber(l, -1, 2);
 					if (decovarspritebar->WaitFrames <= 0) {

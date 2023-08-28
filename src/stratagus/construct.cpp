@@ -157,7 +157,7 @@ void CleanConstructions()
 **
 **  @return       Construction structure pointer
 */
-CConstruction *ConstructionByIdent(const std::string &name)
+CConstruction *ConstructionByIdent(std::string_view name)
 {
 	for (CConstruction *c : Constructions) {
 		if (c->Ident == name) {
@@ -182,7 +182,7 @@ static int CclDefineConstruction(lua_State *l)
 	}
 
 	// Slot identifier
-	const std::string str = LuaToString(l, 1);
+	const std::string_view str = LuaToString(l, 1);
 	CConstruction *construction = ConstructionByIdent(str);
 
 	if (construction == nullptr) {

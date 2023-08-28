@@ -1930,7 +1930,7 @@ int NetworkSetupServerAddress(const std::string &serveraddr, int port)
 	if (port == 0) {
 		port = CNetworkParameter::Instance.defaultPort;
 	}
-	CHost host(serveraddr.c_str(), port);
+	CHost host(serveraddr, port);
 	if (host.isValid() == false) {
 		return 1;
 	}

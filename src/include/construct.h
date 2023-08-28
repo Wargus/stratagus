@@ -175,7 +175,7 @@ extern void LoadConstructions();
 /// Clean up the constructions module
 extern void CleanConstructions();
 /// Get construction by identifier
-extern CConstruction *ConstructionByIdent(const std::string &ident);
+extern CConstruction *ConstructionByIdent(std::string_view ident);
 
 /// Register ccl features
 extern void ConstructionCclRegister();

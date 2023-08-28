@@ -1873,7 +1873,7 @@ static void EditorCallbackExit()
 void CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
-	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.string().c_str());
+	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.string());
 	if (!fs::exists(filename)) {
 		fprintf(stderr,
 		        "Editor configuration file '%s' was not found\n"
@@ -1993,7 +1993,7 @@ int EditorSaveMap(const std::string &file)
 	return 0;
 }
 
-int EditorSaveMapWithResize(const std::string &file, Vec2i newSize, Vec2i offset)
+int EditorSaveMapWithResize(std::string_view file, Vec2i newSize, Vec2i offset)
 {
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 

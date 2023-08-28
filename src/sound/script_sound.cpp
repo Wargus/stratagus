@@ -58,14 +58,10 @@
 */
 static int CclSoundForName(lua_State *l)
 {
-	CSound *id;
-	const char *sound_name;
-	LuaUserData *data;
+	const std::string sound_name = std::string{LuaToString(l, -1)};
+	CSound *id = SoundForName(sound_name);
 
-	sound_name = LuaToString(l, -1);
-	id = SoundForName(sound_name);
-
-	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
+	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -116,19 +112,19 @@ static int CclMakeSound(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
-	std::string c_name = LuaToString(l, 1);
+	std::string c_name = std::string{LuaToString(l, 1)};
 	std::vector<std::string> files;
 	CSound *id;
 	if (lua_isstring(l, 2)) {
 		// only one file
-		files.push_back(LuaToString(l, 2));
+		files.push_back(std::string{LuaToString(l, 2)});
 		id = MakeSound(c_name, files);
 	} else if (lua_istable(l, 2)) {
 		// several files
 		const int args = lua_rawlen(l, 2);
 		files.reserve(args);
 		for (int j = 0; j < args; ++j) {
-			files.push_back(LuaToString(l, 2, j + 1));
+			files.push_back(std::string{LuaToString(l, 2, j + 1)});
 		}
 		id = MakeSound(c_name, files);
 	} else {
@@ -182,10 +178,8 @@ static int CclMakeSoundGroup(lua_State *l)
 */
 static int CclMapSound(lua_State *l)
 {
-	const char *sound_name;
-
 	LuaCheckArgs(l, 2);
-	sound_name = LuaToString(l, 1);
+	std::string sound_name = std::string{LuaToString(l, 1)};
 	MapSound(sound_name, CclGetSound(l));
 	lua_pushvalue(l, 2);
 	return 1;

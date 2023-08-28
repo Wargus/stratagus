@@ -283,7 +283,7 @@ extern int AutoCastSpell(CUnit &caster, const SpellType &spell);
 extern SpellType *SpellTypeByIdent(const std::string_view &ident);
 
 /// return 0, 1, 2 for true, only, false.
-extern char Ccl2Condition(lua_State *l, const char *value);
+extern char Ccl2Condition(lua_State *l, std::string_view value);
 
 //@}
 

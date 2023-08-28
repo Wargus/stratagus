@@ -220,7 +220,8 @@ void CTileset::parseSolid(lua_State *l)
 	}
 
 	int j = 0;
-	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name =
+		getOrAddSolidTileIndexByName(std::string{LuaToString(l, -1, j + 1)});
 	++j;
 
 	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
@@ -292,9 +293,11 @@ void CTileset::parseMixed(lua_State *l)
 	}
 	int j = 0;
 	const int args = lua_rawlen(l, -1);
-	const terrain_typeIdx basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx basic_name =
+		getOrAddSolidTileIndexByName(std::string{LuaToString(l, -1, j + 1)});
 	++j;
-	const terrain_typeIdx mixed_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
+	const terrain_typeIdx mixed_name =
+		getOrAddSolidTileIndexByName(std::string{LuaToString(l, -1, j + 1)});
 	++j;
 
 	const tile_flags flagsCommon = parseTilesetTileFlags(l, &j);
@@ -1642,10 +1645,13 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 
 	/// parse terrain name/names
 	if (slotType == slot_type::cSolid) {
-		terrainNameIdx[cBase]  = BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
+		terrainNameIdx[cBase] =
+			BaseTileset->getOrAddSolidTileIndexByName(std::string{LuaToString(luaStack, -1, arg)});
 	} else if (slotType == slot_type::cMixed) {
-		terrainNameIdx[cBase]  =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, arg));
-		terrainNameIdx[cMixed] =  BaseTileset->getOrAddSolidTileIndexByName(LuaToString(luaStack, -1, ++arg));
+		terrainNameIdx[cBase] =
+			BaseTileset->getOrAddSolidTileIndexByName(std::string{LuaToString(luaStack, -1, arg)});
+		terrainNameIdx[cMixed] = BaseTileset->getOrAddSolidTileIndexByName(
+			std::string{LuaToString(luaStack, -1, ++arg)});
 	} else {
 		LuaError(luaStack, "Slots: unsupported slot type");
 	}

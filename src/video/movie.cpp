@@ -312,7 +312,7 @@ int PlayMovie(const std::string &name)
 	videoWidth  = Video.Width;
 	videoHeight = Video.Height;
 
-	const std::string filename = LibraryFileName(name.c_str());
+	const std::string filename = LibraryFileName(name);
 
 	CFile f;
 	if (f.open(filename.c_str(), CL_OPEN_READ) == -1) {
@@ -483,7 +483,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 {
 	Width = w;
 	Height = h;
-	const std::string filename = LibraryFileName(name.c_str());
+	const std::string filename = LibraryFileName(name);
 
 	f = new CFile();
 	if (f->open(filename.c_str(), CL_OPEN_READ) == -1) {

@@ -677,7 +677,7 @@ static int CclDefineAnimations(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	const std::string name = LuaToString(l, 1);
+	const std::string name = std::string{LuaToString(l, 1)};
 	CAnimations *&anims = AnimationMap[name];
 	if (!anims) {
 		anims = new CAnimations;

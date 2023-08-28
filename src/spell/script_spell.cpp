@@ -115,28 +115,28 @@ static SpellActionType *CclSpellAction(lua_State *l)
 **  @note This is a helper function to make CclSpellCondition shorter
 **        and easier to understand.
 */
-char Ccl2Condition(lua_State *l, const char *value)
+char Ccl2Condition(lua_State *l, std::string_view value)
 {
-	if (!strcmp(value, "true")) {
+	if (value == "true") {
 		return CONDITION_TRUE;
-	} else if (!strcmp(value, "false")) {
+	} else if (value == "false") {
 		return CONDITION_FALSE;
-	} else if (!strcmp(value, "only")) {
+	} else if (value == "only") {
 		return CONDITION_ONLY;
 	} else if (value[0] == '<') {
-		int v = to_number(value + 1);
+		int v = to_number(value.substr(1));
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
 		}
 		return -v;
 	} else if (value[0] == '>') {
-		int v = to_number(value + 1);
+		int v = to_number(value.substr(1));
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
 		}
 		return v + CONDITION_ONLY;
 	} else {
-		LuaError(l, "Bad condition result: %s" _C_ value);
+		LuaError(l, "Bad condition result: %s" _C_ value.data());
 		return -1;
 	}
 }
@@ -305,7 +305,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 static int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
-	const std::string identname = LuaToString(l, 1);
+	const std::string identname = std::string{LuaToString(l, 1)};
 	SpellType *spell = SpellTypeByIdent(identname);
 	if (spell != nullptr) {
 		DebugPrint("Redefining spell-type '%s'\n" _C_ identname.c_str());

@@ -193,7 +193,7 @@ extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 extern void LoadCursors(const std::string &racename);
 
 /// Cursor by identifier
-extern CCursor *CursorByIdent(const std::string &ident);
+extern CCursor *CursorByIdent(std::string_view ident);
 
 /// Draw any cursor
 extern void DrawCursor();

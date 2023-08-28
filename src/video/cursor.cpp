@@ -187,7 +187,7 @@ void LoadCursors(const std::string &race)
 **
 **  @note If we have more cursors, we should add hash to find them faster.
 */
-CCursor *CursorByIdent(const std::string &ident)
+CCursor *CursorByIdent(std::string_view ident)
 {
 	for (CCursor *cursorPtr : AllCursors) {
 		CCursor &cursor = *cursorPtr;
@@ -199,7 +199,7 @@ CCursor *CursorByIdent(const std::string &ident)
 			return &cursor;
 		}
 	}
-	DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
+	DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.data());
 	return nullptr;
 }
 

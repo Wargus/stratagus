@@ -115,7 +115,7 @@ void MissileType::Load(lua_State *l)
 		} else if (value == "ChangeVariable") {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
-				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1));
+				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1).data());
 				Exit(1);
 				return;
 			}
@@ -224,7 +224,7 @@ static int CclDefineMissileType(lua_State *l)
 	}
 
 	// Slot identifier
-	const std::string str = LuaToString(l, 1);
+	const std::string str = std::string{LuaToString(l, 1)};
 	MissileType *mtype = MissileTypeByIdent(str);
 
 	if (mtype) {
@@ -382,7 +382,7 @@ static int CclCreateMissile(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	const std::string name = LuaToString(l, 1);
+	const std::string_view name = LuaToString(l, 1);
 	const MissileType *mtype = MissileTypeByIdent(name);
 	if (!mtype) {
 		LuaError(l, "Bad missile");

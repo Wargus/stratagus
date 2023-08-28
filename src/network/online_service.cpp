@@ -2084,7 +2084,7 @@ class C2S_SID_AUTH_INFO : public OnlineState {
             localHost = "0.0.0.0";
         }
         if (!ctx->getTCPSocket()->IsValid()) {
-            if (!ctx->getTCPSocket()->Open(CHost(localHost.c_str(), CNetworkParameter::Instance.localPort))) {
+            if (!ctx->getTCPSocket()->Open(CHost(localHost, CNetworkParameter::Instance.localPort))) {
                 ctx->setState(new DisconnectedState("TCP open failed"));
                 return;
             }
@@ -2291,7 +2291,7 @@ static int CclDisconnect(lua_State *l) {
 static int CclConnect(lua_State *l) {
     _ctx.disconnect();
     LuaCheckArgs(l, 2);
-    const char *host = LuaToString(l, 1);
+    const std::string host = std::string{LuaToString(l, 1)};
     int port = LuaToNumber(l, 2);
 
     _ctx.setHost(new CHost(host, port));
@@ -2299,19 +2299,20 @@ static int CclConnect(lua_State *l) {
     return 0;
 }
 
-static int CclLogin(lua_State *l) {
+static int CclLogin(lua_State *l)
+{
     LuaCheckArgs(l, 2);
     _ctx.setCreateAccount(false);
-    _ctx.setUsername(LuaToString(l, 1));
-    _ctx.setPassword(LuaToString(l, 2));
+    _ctx.setUsername(std::string{LuaToString(l, 1)});
+    _ctx.setPassword(std::string{LuaToString(l, 2)});
     return 0;
 }
 
 static int CclSignUp(lua_State *l) {
     LuaCheckArgs(l, 2);
     _ctx.setCreateAccount(true);
-    _ctx.setUsername(LuaToString(l, 1));
-    _ctx.setPassword(LuaToString(l, 2));
+    _ctx.setUsername(std::string{LuaToString(l, 1)});
+    _ctx.setPassword(std::string{LuaToString(l, 2)});
     return 0;
 }
 
@@ -2337,7 +2338,7 @@ static int CclSendMessage(lua_State *l) {
     if (!_ctx.isConnected()) {
         LuaError(l, "connect first");
     }
-    _ctx.sendText(LuaToString(l, 1));
+    _ctx.sendText(std::string{LuaToString(l, 1)});
     return 0;
 }
 
@@ -2346,7 +2347,7 @@ static int CclJoinChannel(lua_State *l) {
     if (!_ctx.isConnected()) {
         LuaError(l, "connect first");
     }
-    _ctx.joinChannel(LuaToString(l, 1));
+    _ctx.joinChannel(std::string{LuaToString(l, 1)});
     return 0;
 }
 
@@ -2355,7 +2356,7 @@ static int CclJoinGame(lua_State *l) {
     if (!_ctx.isConnected()) {
         LuaError(l, "connect first");
     }
-    _ctx.joinGame(LuaToString(l, 1), LuaToString(l, 2));
+    _ctx.joinGame(std::string{LuaToString(l, 1)}, std::string{LuaToString(l, 2)});
     return 0;
 }
 
@@ -2382,13 +2383,13 @@ static int CclRequestUserInfo(lua_State *l) {
     if (!_ctx.isConnected()) {
         LuaError(l, "not connected");
     }
-    _ctx.requestExtraUserInfo(LuaToString(l, 1));
+    _ctx.requestExtraUserInfo(std::string{LuaToString(l, 1)});
     return 0;
 }
 
 static int CclPunchNAT(lua_State *l) {
     LuaCheckArgs(l, 1);
-    _ctx.punchNAT(LuaToString(l, 1));
+    _ctx.punchNAT(std::string{LuaToString(l, 1)});
     return 0;
 }
 

@@ -134,7 +134,7 @@ private:
 ----------------------------------------------------------------------------*/
 
 /// Build library path name
-extern std::string LibraryFileName(const char *file);
+extern std::string LibraryFileName(const std::string &file);
 
 extern bool CanAccessFile(const char *filename);
 

@@ -257,10 +257,10 @@ static int CclDefineModifier(lua_State *l)
 	um->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
 	memset(um->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 
-	std::string upgrade_ident = LuaToString(l, 1);
+	std::string_view upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
 	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
 	}
 
 	for (int j = 1; j < args; ++j) {

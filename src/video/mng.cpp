@@ -225,11 +225,11 @@ static std::map<std::string, Mng *> MngCache;
 
 Mng *Mng::New(const std::string &name)
 {
-	const std::string file = LibraryFileName(name.c_str());
+	const std::string file = LibraryFileName(name);
 	Mng *mng = MngCache[file];
 	if (mng == nullptr) {
 		mng = new Mng();
-		mng->name = LibraryFileName(name.c_str());
+		mng->name = LibraryFileName(name);
 		Assert(mng);
 	}
 	mng->refcnt++;
