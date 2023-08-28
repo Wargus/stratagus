@@ -1510,10 +1510,12 @@ static int CclSavedGameInfo(lua_State *l)
 		const std::string_view value = LuaToString(l, -2);
 
 		if (value == "SaveFile") {
-			if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), LuaToString(l, -1)) != 0) {
+			std::string_view filename = LuaToString(l, -1);
+
+			if (std::size(CurrentMapPath) <= filename.size()) {
 				LuaError(l, "SaveFile too long");
 			}
-			std::string filename = LuaToString(l, -1);
+			ranges::copy(filename, CurrentMapPath);
 			if (LuaLoadFile(fs::path(StratagusLibPath) / filename) == -1) {
 				DebugPrint("Load failed: %s\n" _C_ value);
 			}
