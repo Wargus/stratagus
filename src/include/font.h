@@ -83,7 +83,7 @@ public:
 	virtual ~CFont();
 
 	static CFont *New(const std::string &ident, CGraphic *g);
-	static CFont *Get(const std::string &ident);
+	static CFont *Get(std::string_view ident);
 
 	int Height() const;
 	int Width(const std::string &text) const;

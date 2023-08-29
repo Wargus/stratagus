@@ -47,7 +47,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-using FontMap = std::map<std::string, CFont *>;
+using FontMap = std::map<std::string, CFont *, std::less<>>;
 static FontMap Fonts;  /// Font mappings
 
 using FontColorMap = std::map<std::string, CFontColor *, std::less<>>;
@@ -966,16 +966,16 @@ void ReloadFonts()
 **
 **  @return       The font
 */
-/* static */ CFont *CFont::Get(const std::string &ident)
+/* static */ CFont *CFont::Get(std::string_view ident)
 {
-	std::map<std::string, CFont *>::iterator it = Fonts.find(ident);
+	auto it = Fonts.find(ident);
 	if (it == Fonts.end()) {
-		DebugPrint("font not found: %s\n" _C_ ident.c_str());
+		DebugPrint("font not found: %s\n" _C_ ident.data());
 		return nullptr;
 	}
 	CFont *font = it->second;
 	if (font == nullptr) {
-		DebugPrint("font not found: %s\n" _C_ ident.c_str());
+		DebugPrint("font not found: %s\n" _C_ ident.data());
 		return nullptr;
 	}
 	return font;
