@@ -462,7 +462,6 @@ int UnitTypeIdByIdent(std::string_view ident)
 	if (type) {
 		return type->Slot;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.data());
 	return -1;
 }
 

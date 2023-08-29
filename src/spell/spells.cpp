@@ -420,6 +420,7 @@ SpellType *SpellTypeByIdent(const std::string_view &ident)
 	if (it != SpellTypeTable.end()) {
 		return *it;
 	}
+	DebugPrint("Unknown spellType '%s'\n" _C_ ident.data());
 	return nullptr;
 }
 

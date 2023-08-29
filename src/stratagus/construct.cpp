@@ -157,13 +157,14 @@ void CleanConstructions()
 **
 **  @return       Construction structure pointer
 */
-CConstruction *ConstructionByIdent(std::string_view name)
+CConstruction *ConstructionByIdent(std::string_view ident)
 {
 	for (CConstruction *c : Constructions) {
-		if (c->Ident == name) {
+		if (c->Ident == ident) {
 			return c;
 		}
 	}
+	DebugPrint("Unknown construction '%s'\n" _C_ ident.data());
 	return nullptr;
 }
 

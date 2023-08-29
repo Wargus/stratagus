@@ -193,6 +193,7 @@ CPopup *PopupByIdent(const std::string &ident)
 	if (it != UI.ButtonPopups.end()) {
 		return *it;
 	}
+	DebugPrint("Unknown popup '%s'\n" _C_ ident.data());
 	return nullptr;
 }
 

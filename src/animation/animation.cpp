@@ -381,6 +381,7 @@ CAnimations *AnimationsByIdent(std::string_view ident)
 	if (it != AnimationMap.end()) {
 		return it->second;
 	}
+	DebugPrint("Unknown animation '%s'\n" _C_ ident.data());
 	return nullptr;
 }
 
