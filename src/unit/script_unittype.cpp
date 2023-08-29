@@ -2151,7 +2151,7 @@ static int CclDefineDecorations(lua_State *l)
 				} else if (key == "text") {
 					CDecoVarText *decovartext = new CDecoVarText;
 
-					decovartext->Font = CFont::Get(std::string{LuaToString(l, -1, 1)});
+					decovartext->Font = CFont::Get(LuaToString(l, -1, 1));
 					// FIXME : More arguments ? color...
 					decovar = decovartext;
 				} else if (key == "sprite") {

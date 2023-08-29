@@ -775,7 +775,7 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 					res->D.VideoTextLength.String = CclParseStringDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Font") {
-					res->D.VideoTextLength.Font = CFont::Get(std::string{LuaToString(l, -1)});
+					res->D.VideoTextLength.Font = CFont::Get(LuaToString(l, -1));
 					if (!res->D.VideoTextLength.Font) {
 						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 					}
@@ -930,7 +930,7 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Line.Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
-				res->D.Line.Font = CFont::Get(std::string{LuaToString(l, -1)});
+				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
 				if (!res->D.Line.Font) {
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 				}
