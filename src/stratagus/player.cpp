@@ -1212,7 +1212,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 */
 int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
 {
-	return UnitTypesCount[UnitTypeByIdent(ident)->Slot];
+	return UnitTypesCount[UnitTypeByIdent(ident).Slot];
 }
 
 /**

@@ -75,7 +75,7 @@ class LuaCallback;
 #define UnitSides 8
 #define MaxAttackPos 5
 
-CUnitType *UnitTypeByIdent(std::string_view ident); /// Get unit-type by ident
+CUnitType &UnitTypeByIdent(std::string_view ident); /// Get unit-type by ident
 
 enum GroupSelectionMode {
 	SELECTABLE_BY_RECTANGLE_ONLY = 0,
@@ -420,7 +420,7 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 public:
 	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
 	virtual ~CBuildRestrictionAddOn() {}
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
+	virtual void Init() {this->Parent = &UnitTypeByIdent(this->ParentName);}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	Vec2i Offset;           /// offset from the main building to place this
@@ -441,9 +441,9 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {};
-	virtual ~CBuildRestrictionOnTop() {};
-	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
+	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {}
+	virtual ~CBuildRestrictionOnTop() {}
+	virtual void Init() {this->Parent = &UnitTypeByIdent(this->ParentName);}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	std::string ParentName;  /// building that is unit is an addon too.
@@ -455,9 +455,9 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), Diagonal(true) {};
-	virtual ~CBuildRestrictionDistance() {};
-	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), Diagonal(true) {}
+	virtual ~CBuildRestrictionDistance() {}
+	virtual void Init() {this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName);}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	int Distance;        /// distance to build (circle)
@@ -472,9 +472,9 @@ public:
 class CBuildRestrictionHasUnit : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {};
-	virtual ~CBuildRestrictionHasUnit() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {}
+	virtual ~CBuildRestrictionHasUnit() {}
+	virtual void Init() { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	int Count;
@@ -487,9 +487,9 @@ public:
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {};
-	virtual ~CBuildRestrictionSurroundedBy() {};
-	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {}
+	virtual ~CBuildRestrictionSurroundedBy() {}
+	virtual void Init() { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
 
 	int Distance;
@@ -820,7 +820,8 @@ extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Up
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
-extern CUnitType *NewUnitTypeSlot(std::string_view ident);/// Allocate an empty unit-type slot
+extern std::pair<CUnitType *, bool /*redefined*/>
+NewUnitTypeSlot(std::string_view ident); /// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 int colorIndex, int frame, const PixelPos &screenPos);

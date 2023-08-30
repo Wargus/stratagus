@@ -309,7 +309,7 @@ static int CclDefineModifier(lua_State *l)
 			const std::string_view value = LuaToString(l, j + 1, 2);
 
 			if (value.substr(0, 5) == "unit-") {
-				um->ChangeUnits[UnitTypeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+				um->ChangeUnits[UnitTypeByIdent(value).Slot] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
 			}
@@ -322,10 +322,10 @@ static int CclDefineModifier(lua_State *l)
 			}
 		} else if (key == "apply-to") {
 			const std::string_view value = LuaToString(l, j + 1, 2);
-			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
+			um->ApplyTo[UnitTypeByIdent(value).Slot] = 'X';
 		} else if (key == "convert-to") {
 			const std::string_view value = LuaToString(l, j + 1, 2);
-			um->ConvertTo = UnitTypeByIdent(value);
+			um->ConvertTo = &UnitTypeByIdent(value);
 		} else if (key == "research-speed") {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else {
@@ -373,7 +373,7 @@ static int CclDefineUnitAllow(lua_State *l)
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
-	int id = UnitTypeIdByIdent(ident);
+	int id = UnitTypeByIdent(ident).Slot;
 
 	int i = 0;
 	for (int j = 1; j < args && i < PlayerMax; ++j) {
@@ -412,7 +412,7 @@ static int CclDefineAllow(lua_State *l)
 		}
 
 		if (ident.substr(0, 5) == "unit-") {
-			int id = UnitTypeIdByIdent(ident);
+			int id = UnitTypeByIdent(ident).Slot;
 			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
 					AllowUnitId(Players[i], id, UnitMax);
@@ -448,23 +448,6 @@ void UpgradesCclRegister()
 
 // AllowStruct and UpgradeTimers will be static in the player so will be
 // load/saved with the player struct
-
-/**
-**  UnitType ID by identifier.
-**
-**  @param ident  The unit-type identifier.
-**  @return       Unit-type ID (int) or -1 if not found.
-*/
-int UnitTypeIdByIdent(std::string_view ident)
-{
-	const CUnitType *type = UnitTypeByIdent(ident);
-
-	if (type) {
-		return type->Slot;
-	}
-	DebugPrint(" fix this %s\n" _C_ ident.data());
-	return -1;
-}
 
 /**
 **  Upgrade ID by identifier.

@@ -480,20 +480,17 @@ static int CclDefineUnitType(lua_State *l)
 
 	// Slot identifier
 	const std::string_view str = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(str);
 
 	constexpr int redefineSprite = 2;
 
-	int redefine;
-	if (type) {
-		redefine = 1;
+	auto &[type, redefined] = NewUnitTypeSlot(str);
+	if (redefined) {
 		DebugPrint("Redefining unit-type '%s'\n" _C_ str.data());
 	} else {
-		type = NewUnitTypeSlot(str);
-		redefine = 0;
 		type->NumDirections = 0;
 		type->Flip = 1;
 	}
+	std::uint32_t redefine = 0;
 
 	//  Parse the list: (still everything could be changed!)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -746,7 +743,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->CorpseType = nullptr;
 			if (GameRunning) {
 				if (!type->CorpseName.empty()) {
-					type->CorpseType = UnitTypeByIdent(type->CorpseName);
+					type->CorpseType = &UnitTypeByIdent(type->CorpseName);
 				}
 			}
 		} else if (value == "DamageType") {
@@ -1273,24 +1270,19 @@ static int CclCopyUnitType(lua_State *l)
 
 	// Slot identifier
 	const std::string_view fromName = LuaToString(l, 1);
-	CUnitType *from = UnitTypeByIdent(fromName);
+	CUnitType &from = UnitTypeByIdent(fromName);
 	const std::string_view toName = LuaToString(l, 2);
-	CUnitType *to = UnitTypeByIdent(toName);
-	if (to) {
+	auto& [to, redefined] = NewUnitTypeSlot(toName);
+	if (redefined) {
 		DebugPrint("Redefining unit-type '%s'\n" _C_ toName.data());
-	} else {
-		to = NewUnitTypeSlot(toName);
-	}
-	if (!from) {
-		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName.data());
 	}
 
-	to->Flip = from->Flip;
+	to->Flip = from.Flip;
 	to->Name = toName;
-	to->File = from->File;
-	to->AltFile = from->AltFile;
-	to->Width = from->Width;
-	to->Height = from->Height;
+	to->File = from.File;
+	to->AltFile = from.AltFile;
+	to->Width = from.Width;
+	to->Height = from.Height;
 	if (to->Sprite) {
 		CGraphic::Free(to->Sprite);
 		to->Sprite = nullptr;
@@ -1299,162 +1291,162 @@ static int CclCopyUnitType(lua_State *l)
 		CGraphic::Free(to->AltSprite);
 		to->AltSprite = nullptr;
 	}
-	to->ShadowFile = from->ShadowFile;
-	to->ShadowWidth = from->ShadowWidth;
-	to->ShadowHeight = from->ShadowHeight;
-	to->ShadowOffsetX = from->ShadowOffsetX;
-	to->ShadowOffsetY = from->ShadowOffsetY;
-	to->ShadowSpriteFrame = from->ShadowSpriteFrame;
-	to->ShadowScale = from->ShadowScale;
+	to->ShadowFile = from.ShadowFile;
+	to->ShadowWidth = from.ShadowWidth;
+	to->ShadowHeight = from.ShadowHeight;
+	to->ShadowOffsetX = from.ShadowOffsetX;
+	to->ShadowOffsetY = from.ShadowOffsetY;
+	to->ShadowSpriteFrame = from.ShadowSpriteFrame;
+	to->ShadowScale = from.ShadowScale;
 	if (to->ShadowSprite) {
 		CGraphic::Free(to->ShadowSprite);
 		to->ShadowSprite = nullptr;
 	}
-	to->OffsetX = from->OffsetX;
-	to->OffsetY = from->OffsetY;
-	to->Animations = from->Animations;
-	to->Icon.Name = from->Icon.Name;
+	to->OffsetX = from.OffsetX;
+	to->OffsetY = from.OffsetY;
+	to->Animations = from.Animations;
+	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
 #ifdef USE_MNG
-	to->Portrait.Num = from->Portrait.Num;
-	to->Portrait.Talking = from->Portrait.Talking;
+	to->Portrait.Num = from.Portrait.Num;
+	to->Portrait.Talking = from.Portrait.Talking;
 	to->Portrait.Files = new std::string[to->Portrait.Num];
 	for (int i = 0; i < to->Portrait.Num; i++) {
-		to->Portrait.Files[i] = from->Portrait.Files[i];
+		to->Portrait.Files[i] = from.Portrait.Files[i];
 	}
 	to->Portrait.Mngs = new Mng *[to->Portrait.Num];
 	memset(to->Portrait.Mngs, 0, to->Portrait.Num * sizeof(Mng *));
 #endif
-	memcpy(to->DefaultStat.Costs, from->DefaultStat.Costs, sizeof(from->DefaultStat.Costs));
-	memcpy(to->DefaultStat.Storing, from->DefaultStat.Storing, sizeof(from->DefaultStat.Storing));
-	memcpy(to->DefaultStat.ImproveIncomes, from->DefaultStat.ImproveIncomes, sizeof(from->DefaultStat.ImproveIncomes));
-	to->Construction = from->Construction;
-	to->DrawLevel = from->DrawLevel;
-	to->MaxOnBoard = from->MaxOnBoard;
-	to->BoardSize = from->BoardSize;
-	to->ButtonLevelForTransporter = from->ButtonLevelForTransporter;
-	to->StartingResources = from->StartingResources;
-	to->DefaultStat.Variables[HP_INDEX].Increase = from->DefaultStat.Variables[HP_INDEX].Increase;
-	to->DefaultStat.Variables[HP_INDEX].IncreaseFrequency = from->DefaultStat.Variables[HP_INDEX].IncreaseFrequency;
-	to->BurnPercent = from->BurnPercent;
-	to->BurnDamageRate = from->BurnDamageRate;
-	to->PoisonDrain = from->PoisonDrain;
-	to->DefaultStat.Variables[SHIELD_INDEX].Max = from->DefaultStat.Variables[SHIELD_INDEX].Max;
-	to->DefaultStat.Variables[SHIELD_INDEX].Value = from->DefaultStat.Variables[SHIELD_INDEX].Value;
-	to->DefaultStat.Variables[SHIELD_INDEX].Increase = from->DefaultStat.Variables[SHIELD_INDEX].Increase;
-	to->DefaultStat.Variables[SHIELD_INDEX].Enable = from->DefaultStat.Variables[SHIELD_INDEX].Enable;
-	to->TileWidth = from->TileWidth;
-	to->TileHeight = from->TileHeight;
-	to->NeutralMinimapColorRGB = from->NeutralMinimapColorRGB;
-	to->Neutral = from->Neutral;
-	to->BoxWidth = from->BoxWidth;
-	to->BoxHeight = from->BoxHeight;
-	to->BoxOffsetX = from->BoxOffsetX;
-	to->BoxOffsetY = from->BoxOffsetY;
-	to->NumDirections = from->NumDirections;
-	to->ReactRangeComputer = from->ReactRangeComputer;
-	to->ReactRangePerson = from->ReactRangePerson;
-	to->Missile.Name = from->Missile.Name;
+	memcpy(to->DefaultStat.Costs, from.DefaultStat.Costs, sizeof(from.DefaultStat.Costs));
+	memcpy(to->DefaultStat.Storing, from.DefaultStat.Storing, sizeof(from.DefaultStat.Storing));
+	memcpy(to->DefaultStat.ImproveIncomes, from.DefaultStat.ImproveIncomes, sizeof(from.DefaultStat.ImproveIncomes));
+	to->Construction = from.Construction;
+	to->DrawLevel = from.DrawLevel;
+	to->MaxOnBoard = from.MaxOnBoard;
+	to->BoardSize = from.BoardSize;
+	to->ButtonLevelForTransporter = from.ButtonLevelForTransporter;
+	to->StartingResources = from.StartingResources;
+	to->DefaultStat.Variables[HP_INDEX].Increase = from.DefaultStat.Variables[HP_INDEX].Increase;
+	to->DefaultStat.Variables[HP_INDEX].IncreaseFrequency = from.DefaultStat.Variables[HP_INDEX].IncreaseFrequency;
+	to->BurnPercent = from.BurnPercent;
+	to->BurnDamageRate = from.BurnDamageRate;
+	to->PoisonDrain = from.PoisonDrain;
+	to->DefaultStat.Variables[SHIELD_INDEX].Max = from.DefaultStat.Variables[SHIELD_INDEX].Max;
+	to->DefaultStat.Variables[SHIELD_INDEX].Value = from.DefaultStat.Variables[SHIELD_INDEX].Value;
+	to->DefaultStat.Variables[SHIELD_INDEX].Increase = from.DefaultStat.Variables[SHIELD_INDEX].Increase;
+	to->DefaultStat.Variables[SHIELD_INDEX].Enable = from.DefaultStat.Variables[SHIELD_INDEX].Enable;
+	to->TileWidth = from.TileWidth;
+	to->TileHeight = from.TileHeight;
+	to->NeutralMinimapColorRGB = from.NeutralMinimapColorRGB;
+	to->Neutral = from.Neutral;
+	to->BoxWidth = from.BoxWidth;
+	to->BoxHeight = from.BoxHeight;
+	to->BoxOffsetX = from.BoxOffsetX;
+	to->BoxOffsetY = from.BoxOffsetY;
+	to->NumDirections = from.NumDirections;
+	to->ReactRangeComputer = from.ReactRangeComputer;
+	to->ReactRangePerson = from.ReactRangePerson;
+	to->Missile.Name = from.Missile.Name;
 	to->Missile.Missile = nullptr; // filled in later
-	to->MinAttackRange = from->MinAttackRange;
-	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
-	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
-	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = from->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable;
-	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = from->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value;
-	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = from->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max;
-	to->DefaultStat.Variables[PRIORITY_INDEX].Value = from->DefaultStat.Variables[PRIORITY_INDEX].Value;
-	to->DefaultStat.Variables[PRIORITY_INDEX].Max = from->DefaultStat.Variables[PRIORITY_INDEX].Max;
-	to->AnnoyComputerFactor = from->AnnoyComputerFactor;
-	to->AiAdjacentRange = from->AiAdjacentRange;
-	to->DecayRate = from->DecayRate;
-	to->CorpseName = from->CorpseName;
-	to->CorpseType = from->CorpseType;
-	to->DamageType = from->DamageType;
-	to->ExplodeWhenKilled = from->ExplodeWhenKilled;
-	to->Explosion.Name = from->Explosion.Name;
+	to->MinAttackRange = from.MinAttackRange;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = from.DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = from.DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	to->DefaultStat.Variables[ATTACKRANGE_INDEX].Enable = from.DefaultStat.Variables[ATTACKRANGE_INDEX].Enable;
+	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Value = from.DefaultStat.Variables[MAXHARVESTERS_INDEX].Value;
+	to->DefaultStat.Variables[MAXHARVESTERS_INDEX].Max = from.DefaultStat.Variables[MAXHARVESTERS_INDEX].Max;
+	to->DefaultStat.Variables[PRIORITY_INDEX].Value = from.DefaultStat.Variables[PRIORITY_INDEX].Value;
+	to->DefaultStat.Variables[PRIORITY_INDEX].Max = from.DefaultStat.Variables[PRIORITY_INDEX].Max;
+	to->AnnoyComputerFactor = from.AnnoyComputerFactor;
+	to->AiAdjacentRange = from.AiAdjacentRange;
+	to->DecayRate = from.DecayRate;
+	to->CorpseName = from.CorpseName;
+	to->CorpseType = from.CorpseType;
+	to->DamageType = from.DamageType;
+	to->ExplodeWhenKilled = from.ExplodeWhenKilled;
+	to->Explosion.Name = from.Explosion.Name;
 	to->Explosion.Missile = nullptr; // filled later
-	to->TeleportCost = from->TeleportCost;
-	to->TeleportEffectIn = from->TeleportEffectIn;
-	to->TeleportEffectOut = from->TeleportEffectOut;
-	to->OnDeath = from->OnDeath;
-	to->OnHit = from->OnHit;
-	to->OnEachCycle = from->OnEachCycle;
-	to->OnEachSecond = from->OnEachSecond;
-	to->OnInit = from->OnInit;
-	to->OnReady = from->OnReady;
-	to->UnitType = from->UnitType;
+	to->TeleportCost = from.TeleportCost;
+	to->TeleportEffectIn = from.TeleportEffectIn;
+	to->TeleportEffectOut = from.TeleportEffectOut;
+	to->OnDeath = from.OnDeath;
+	to->OnHit = from.OnHit;
+	to->OnEachCycle = from.OnEachCycle;
+	to->OnEachSecond = from.OnEachSecond;
+	to->OnInit = from.OnInit;
+	to->OnReady = from.OnReady;
+	to->UnitType = from.UnitType;
 	for (int k = 0; k < MaxAttackPos; ++k) {
 		for (int m = 0; m < UnitSides; ++m) {
-			to->MissileOffsets[m][k].x = from->MissileOffsets[m][k].x;
-			to->MissileOffsets[m][k].y = from->MissileOffsets[m][k].y;
+			to->MissileOffsets[m][k].x = from.MissileOffsets[m][k].x;
+			to->MissileOffsets[m][k].y = from.MissileOffsets[m][k].y;
 		}
 	}
 	for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; i++) {
-		to->Impact[i].Name = from->Impact[i].Name;
-		to->Impact[i].Missile = from->Impact[i].Missile;
+		to->Impact[i].Name = from.Impact[i].Name;
+		to->Impact[i].Missile = from.Impact[i].Missile;
 	}
-	to->MouseAction = from->MouseAction;
-	to->CanAttack = from->CanAttack;
-	to->RepairRange = from->RepairRange;
-	to->RepairHP = from->RepairHP;
-	memcpy(to->RepairCosts, from->RepairCosts, sizeof(from->RepairCosts));
-	to->CanTarget = from->CanTarget;
-	to->Building = from->Building;
+	to->MouseAction = from.MouseAction;
+	to->CanAttack = from.CanAttack;
+	to->RepairRange = from.RepairRange;
+	to->RepairHP = from.RepairHP;
+	memcpy(to->RepairCosts, from.RepairCosts, sizeof(from.RepairCosts));
+	to->CanTarget = from.CanTarget;
+	to->Building = from.Building;
 	to->BuildingRules.clear();
-	if (!from->BuildingRules.empty()) {
+	if (!from.BuildingRules.empty()) {
 		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName.data(), toName.data());
 	}
 	// XXX: should copy, not share, this will crash
-	// for (auto rule : from->BuildingRules) {
+	// for (auto rule : from.BuildingRules) {
 	// 	to->BuildingRules.push_back(rule);
 	// }
 	to->AiBuildingRules.clear();
-	if (!from->AiBuildingRules.empty()) {
+	if (!from.AiBuildingRules.empty()) {
 		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName.data(), toName.data());
 	}
 	// XXX: should copy, not share, this would crash
-	// for (auto rule : from->AiBuildingRules) {
+	// for (auto rule : from.AiBuildingRules) {
 	// 	to->AiBuildingRules.push_back(rule);
 	// }
-	to->AutoBuildRate = from->AutoBuildRate;
-	to->LandUnit = from->LandUnit;
-	to->AirUnit = from->AirUnit;
-	to->SeaUnit = from->SeaUnit;
-	to->RandomMovementProbability = from->RandomMovementProbability;
-	to->RandomMovementDistance = from->RandomMovementDistance;
-	to->ClicksToExplode = from->ClicksToExplode;
-	to->MaxOnBoard = from->MaxOnBoard;
-	for (unsigned int i = 0; i < from->BoolFlag.size(); i++) {
-		to->BoolFlag[i].value = from->BoolFlag[i].value;
-		to->BoolFlag[i].CanTransport = from->BoolFlag[i].CanTransport;
-		to->BoolFlag[i].CanTargetFlag = from->BoolFlag[i].CanTargetFlag;
-		to->BoolFlag[i].AiPriorityTarget = from->BoolFlag[i].AiPriorityTarget;
+	to->AutoBuildRate = from.AutoBuildRate;
+	to->LandUnit = from.LandUnit;
+	to->AirUnit = from.AirUnit;
+	to->SeaUnit = from.SeaUnit;
+	to->RandomMovementProbability = from.RandomMovementProbability;
+	to->RandomMovementDistance = from.RandomMovementDistance;
+	to->ClicksToExplode = from.ClicksToExplode;
+	to->MaxOnBoard = from.MaxOnBoard;
+	for (unsigned int i = 0; i < from.BoolFlag.size(); i++) {
+		to->BoolFlag[i].value = from.BoolFlag[i].value;
+		to->BoolFlag[i].CanTransport = from.BoolFlag[i].CanTransport;
+		to->BoolFlag[i].CanTargetFlag = from.BoolFlag[i].CanTargetFlag;
+		to->BoolFlag[i].AiPriorityTarget = from.BoolFlag[i].AiPriorityTarget;
 	}
-	memcpy(to->ResInfo, from->ResInfo, sizeof(from->ResInfo));
-	to->GivesResource = from->GivesResource;
-	memcpy(to->CanStore, from->CanStore, sizeof(from->CanStore));
-	to->CanCastSpell = from->CanCastSpell;
-	to->AutoCastActive = from->AutoCastActive;
-	to->Sound.Selected.Name = from->Sound.Selected.Name;
-	to->Sound.Acknowledgement.Name = from->Sound.Acknowledgement.Name;
-	to->Sound.Attack.Name = from->Sound.Attack.Name;
-	to->Sound.Build.Name = from->Sound.Build.Name;
-	to->Sound.Ready.Name = from->Sound.Ready.Name;
-	to->Sound.Repair.Name = from->Sound.Repair.Name;
+	memcpy(to->ResInfo, from.ResInfo, sizeof(from.ResInfo));
+	to->GivesResource = from.GivesResource;
+	memcpy(to->CanStore, from.CanStore, sizeof(from.CanStore));
+	to->CanCastSpell = from.CanCastSpell;
+	to->AutoCastActive = from.AutoCastActive;
+	to->Sound.Selected.Name = from.Sound.Selected.Name;
+	to->Sound.Acknowledgement.Name = from.Sound.Acknowledgement.Name;
+	to->Sound.Attack.Name = from.Sound.Attack.Name;
+	to->Sound.Build.Name = from.Sound.Build.Name;
+	to->Sound.Ready.Name = from.Sound.Ready.Name;
+	to->Sound.Repair.Name = from.Sound.Repair.Name;
 	for (int i = 0; i < MaxCosts; i++) {
-		to->Sound.Harvest[i].Name = from->Sound.Harvest[i].Name;
+		to->Sound.Harvest[i].Name = from.Sound.Harvest[i].Name;
 	}
-	to->Sound.Help.Name = from->Sound.Help.Name;
-	to->Sound.WorkComplete.Name = from->Sound.WorkComplete.Name;
+	to->Sound.Help.Name = from.Sound.Help.Name;
+	to->Sound.WorkComplete.Name = from.Sound.WorkComplete.Name;
 	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES + 1; i++) {
-		to->Sound.Dead[i].Name = from->Sound.Dead[i].Name;
+		to->Sound.Dead[i].Name = from.Sound.Dead[i].Name;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
-		to->DefaultStat.Variables[i].Enable = from->DefaultStat.Variables[i].Enable;
-		to->DefaultStat.Variables[i].Value = from->DefaultStat.Variables[i].Value;
-		to->DefaultStat.Variables[i].Max = from->DefaultStat.Variables[i].Max;
-		to->DefaultStat.Variables[i].Increase = from->DefaultStat.Variables[i].Increase;
-		to->DefaultStat.Variables[i].IncreaseFrequency = from->DefaultStat.Variables[i].IncreaseFrequency;
+		to->DefaultStat.Variables[i].Enable = from.DefaultStat.Variables[i].Enable;
+		to->DefaultStat.Variables[i].Value = from.DefaultStat.Variables[i].Value;
+		to->DefaultStat.Variables[i].Max = from.DefaultStat.Variables[i].Max;
+		to->DefaultStat.Variables[i].Increase = from.DefaultStat.Variables[i].Increase;
+		to->DefaultStat.Variables[i].IncreaseFrequency = from.DefaultStat.Variables[i].IncreaseFrequency;
 	}
 
 	UpdateDefaultBoolFlags(*to);
@@ -1482,13 +1474,12 @@ static int CclCopyUnitType(lua_State *l)
 */
 static int CclDefineUnitStats(lua_State *l)
 {
-	CUnitType *type = UnitTypeByIdent(LuaToString(l, 1));
+	CUnitType &type = UnitTypeByIdent(LuaToString(l, 1));
 	const int playerId = LuaToNumber(l, 2);
 
-	Assert(type);
 	Assert(playerId < PlayerMax);
 
-	CUnitStats *stats = &type->Stats[playerId];
+	CUnitStats *stats = &type.Stats[playerId];
 	if (!stats->Variables) {
 		stats->Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
 	}
@@ -1578,7 +1569,7 @@ CUnitType *CclGetUnitType(lua_State *l)
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		const std::string_view str = LuaToString(l, -1);
-		return UnitTypeByIdent(str);
+		return &UnitTypeByIdent(str);
 	} else if (lua_isuserdata(l, -1)) {
 		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaUnitType) {
@@ -1601,10 +1592,10 @@ static int CclUnitType(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 	const std::string_view str = LuaToString(l, 1);
-	CUnitType *type = UnitTypeByIdent(str);
+	CUnitType &type = UnitTypeByIdent(str);
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaUnitType;
-	data->Data = type;
+	data->Data = &type;
 	return 1;
 }
 
@@ -2432,51 +2423,51 @@ void UpdateUnitVariables(CUnit &unit)
 */
 void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
 {
-	CUnitType *type = UnitTypeByIdent(ident);
+	CUnitType &type = UnitTypeByIdent(ident);
 	
 	if (variable_key == "Costs") {
 		const int resId = GetResourceIdByName(variable_type.c_str());
-		type->MapDefaultStat.Costs[resId] = value;
+		type.MapDefaultStat.Costs[resId] = value;
 		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player].Costs[resId] = type->MapDefaultStat.Costs[resId];
+			type.Stats[player].Costs[resId] = type.MapDefaultStat.Costs[resId];
 		}
 	} else if (variable_key == "ImproveProduction") {
 		const int resId = GetResourceIdByName(variable_type.c_str());
-		type->MapDefaultStat.ImproveIncomes[resId] = value;
+		type.MapDefaultStat.ImproveIncomes[resId] = value;
 		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
+			type.Stats[player].ImproveIncomes[resId] = type.MapDefaultStat.ImproveIncomes[resId];
 		}
 	} else {
 		int variable_index = UnitTypeVar.VariableNameLookup[variable_key];
 		if (variable_index != -1) { // valid index
 			if (variable_type == "Value") {
-				type->MapDefaultStat.Variables[variable_index].Value = value;
+				type.MapDefaultStat.Variables[variable_index].Value = value;
 				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
+					type.Stats[player].Variables[variable_index].Value = type.MapDefaultStat.Variables[variable_index].Value;
 				}
 			} else if (variable_type == "Max") {
-				type->MapDefaultStat.Variables[variable_index].Max = value;
+				type.MapDefaultStat.Variables[variable_index].Max = value;
 				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
+					type.Stats[player].Variables[variable_index].Max = type.MapDefaultStat.Variables[variable_index].Max;
 				}
 			} else if (variable_type == "Increase") {
-				type->MapDefaultStat.Variables[variable_index].Increase = value;
+				type.MapDefaultStat.Variables[variable_index].Increase = value;
 				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+					type.Stats[player].Variables[variable_index].Increase = type.MapDefaultStat.Variables[variable_index].Increase;
 				}
 			} else if (variable_type == "IncreaseFrequency") {
-				type->MapDefaultStat.Variables[variable_index].IncreaseFrequency = value;
+				type.MapDefaultStat.Variables[variable_index].IncreaseFrequency = value;
 				// TODO: error
-				// if (type->MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
+				// if (type.MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
 				// 	LuaError(l, "%s.IncreaseFrequency out of range!" _C_ variable_key.c_str());
 				// }
 				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].IncreaseFrequency = type->MapDefaultStat.Variables[variable_index].IncreaseFrequency;
+					type.Stats[player].Variables[variable_index].IncreaseFrequency = type.MapDefaultStat.Variables[variable_index].IncreaseFrequency;
 				}
 			} else if (variable_type == "Enable") {
-				type->MapDefaultStat.Variables[variable_index].Enable = value;
+				type.MapDefaultStat.Variables[variable_index].Enable = value;
 				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
+					type.Stats[player].Variables[variable_index].Enable = type.MapDefaultStat.Variables[variable_index].Enable;
 				}
 			} else {
 				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
@@ -2501,25 +2492,25 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 	if (sound.empty()) {
 		return;
 	}
-	CUnitType *type = UnitTypeByIdent(ident);
+	CUnitType &type = UnitTypeByIdent(ident);
 	
 	if (sound_type == "selected") {
-		type->MapSound.Selected.Name = sound;
+		type.MapSound.Selected.Name = sound;
 	} else if (sound_type == "acknowledge") {
-		type->MapSound.Acknowledgement.Name = sound;
+		type.MapSound.Acknowledgement.Name = sound;
 	} else if (sound_type == "attack") {
-		type->MapSound.Attack.Name = sound;
+		type.MapSound.Attack.Name = sound;
 	} else if (sound_type == "build") {
-		type->MapSound.Build.Name = sound;
+		type.MapSound.Build.Name = sound;
 	} else if (sound_type == "ready") {
-		type->MapSound.Ready.Name = sound;
+		type.MapSound.Ready.Name = sound;
 	} else if (sound_type == "repair") {
-		type->MapSound.Repair.Name = sound;
+		type.MapSound.Repair.Name = sound;
 	} else if (sound_type == "harvest") {
 		const int resId = GetResourceIdByName(sound_subtype);
-		type->MapSound.Harvest[resId].Name = sound;
+		type.MapSound.Harvest[resId].Name = sound;
 	} else if (sound_type == "help") {
-		type->MapSound.Help.Name = sound;
+		type.MapSound.Help.Name = sound;
 	} else if (sound_type == "dead") {
 		int death;
 
@@ -2529,9 +2520,9 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 			}
 		}
 		if (death == ANIMATIONS_DEATHTYPES) {
-			type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
+			type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
 		} else {
-			type->MapSound.Dead[death].Name = sound;
+			type.MapSound.Dead[death].Name = sound;
 		}
 	}
 }

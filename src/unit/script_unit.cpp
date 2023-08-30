@@ -342,9 +342,9 @@ static int CclUnit(lua_State *l)
 		++j;
 
 		if (value == "type") {
-			type = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			type = &UnitTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (value == "seen-type") {
-			seentype = UnitTypeByIdent(LuaToString(l, 2, j + 1));
+			seentype = &UnitTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (value == "player") {
 			player = &Players[LuaToNumber(l, 2, j + 1)];
 

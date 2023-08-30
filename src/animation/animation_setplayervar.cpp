@@ -85,13 +85,9 @@ int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 		}
 		return Players[player].Incomes[resId];
 	} else if (prop == "UnitTypesCount") {
-		CUnitType *type = UnitTypeByIdent(arg);
-		Assert(type);
-		return Players[player].UnitTypesCount[type->Slot];
+		return Players[player].UnitTypesCount[UnitTypeByIdent(arg).Slot];
 	} else if (prop == "UnitTypesAiActiveCount") {
-		CUnitType *type = UnitTypeByIdent(arg);
-		Assert(type);
-		return Players[player].UnitTypesAiActiveCount[type->Slot];
+		return Players[player].UnitTypesAiActiveCount[UnitTypeByIdent(arg).Slot];
 	} else if (prop == "AiEnabled") {
 		return Players[player].AiEnabled;
 	} else if (prop == "TotalNumUnits") {

@@ -131,7 +131,7 @@ bool COrder_Build::ParseSpecificData(lua_State *l,
 		lua_pop(l, 1);
 	} else if (value == "type") {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = &UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}

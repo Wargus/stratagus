@@ -420,9 +420,9 @@ static void CalculateMaxIconSize()
 	IconHeight = 0;
 	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
 		if (!Editor.UnitTypes[i].empty()) {
-			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i]);
-			if (type != nullptr && type->Icon.Icon) {
-				const CIcon &icon = *type->Icon.Icon;
+			const CUnitType &type = UnitTypeByIdent(Editor.UnitTypes[i]);
+			if (type.Icon.Icon) {
+				const CIcon &icon = *type.Icon.Icon;
 
 				IconWidth = std::max(IconWidth, icon.G->Width);
 				IconHeight = std::max(IconHeight, icon.G->Height);
@@ -440,8 +440,7 @@ static void RecalculateShownUnits(size_t start = 0, size_t stop = INT_MAX)
 
 	for (size_t i = start; i < Editor.UnitTypes.size() && i < stop; i++) {
 		if (!Editor.UnitTypes[i].empty()) {
-			const CUnitType *type = UnitTypeByIdent(Editor.UnitTypes[i]);
-			Editor.ShownUnitTypes.push_back(type);
+			Editor.ShownUnitTypes.push_back(&UnitTypeByIdent(Editor.UnitTypes[i]));
 		} else {
 			Editor.ShownUnitTypes.push_back(nullptr);
 		}
@@ -1947,7 +1946,7 @@ void CEditor::Init()
 	CalculateMaxIconSize();
 
 	if (!StartUnitName.empty()) {
-		StartUnit = UnitTypeByIdent(StartUnitName);
+		StartUnit = &UnitTypeByIdent(StartUnitName);
 	}
 	Select.Icon = nullptr;
 	Select.Load();

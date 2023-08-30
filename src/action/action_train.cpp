@@ -85,7 +85,7 @@ bool COrder_Train::ParseSpecificData(lua_State *l,
 {
 	if (value == "type") {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = &UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else if (value == "ticks") {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);

@@ -339,12 +339,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 static void EditorRandomizeUnit(const char *unit_type, int count, int value, int tileIndexUnderUnit)
 {
 	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
-	CUnitType *typeptr = UnitTypeByIdent(unit_type);
-
-	if (!typeptr) { // Error
-		return;
-	}
-	CUnitType &type = *typeptr;
+	CUnitType &type = UnitTypeByIdent(unit_type);
 	const Vec2i tpos(type.TileWidth, type.TileHeight);
 
 	for (int i = 0; i < count; ++i) {
