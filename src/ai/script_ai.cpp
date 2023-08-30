@@ -74,7 +74,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 /**
 **  Transform list of unit separed with coma to a true list.
 */
-static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
+static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 {
 	std::vector<CUnitType *> res;
 
@@ -84,11 +84,10 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
 	while (end != std::string::npos) {
-		std::string unitName = list.substr(begin, end - begin);
+		std::string_view unitName = list.substr(begin, end - begin);
 		begin = end + 1;
 		end = list.find(",", begin);
-		if (!unitName.empty()) {
-			Assert(unitName[0] != ',');
+		if (unitName.substr(0, 5) == "unit-") {
 			res.push_back(&UnitTypeByIdent(unitName));
 		}
 	}
