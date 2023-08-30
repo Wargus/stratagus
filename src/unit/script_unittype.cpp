@@ -483,7 +483,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	constexpr int redefineSprite = 2;
 
-	auto &[type, redefined] = NewUnitTypeSlot(str);
+	auto [type, redefined] = NewUnitTypeSlot(str);
 	if (redefined) {
 		DebugPrint("Redefining unit-type '%s'\n" _C_ str.data());
 	} else {
@@ -1272,7 +1272,7 @@ static int CclCopyUnitType(lua_State *l)
 	const std::string_view fromName = LuaToString(l, 1);
 	CUnitType &from = UnitTypeByIdent(fromName);
 	const std::string_view toName = LuaToString(l, 2);
-	auto& [to, redefined] = NewUnitTypeSlot(toName);
+	auto [to, redefined] = NewUnitTypeSlot(toName);
 	if (redefined) {
 		DebugPrint("Redefining unit-type '%s'\n" _C_ toName.data());
 	}
