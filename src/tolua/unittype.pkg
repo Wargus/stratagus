@@ -13,7 +13,7 @@ class CUnitType
 	int TileHeight;
 };
 
-CUnitType *UnitTypeByIdent(const std::string ident);
+CUnitType &UnitTypeByIdent(std::string ident);
 
 extern CUnitType *UnitTypeHumanWall;
 extern CUnitType *UnitTypeOrcWall;

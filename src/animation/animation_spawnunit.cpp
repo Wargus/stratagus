@@ -57,13 +57,12 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
-	CUnitType *type = UnitTypeByIdent(this->unitTypeStr);
-	Assert(type);
+	CUnitType &type = UnitTypeByIdent(this->unitTypeStr);
 	Vec2i resPos;
-	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-	FindNearestDrop(*type, pos, resPos, LookingW);
+	DebugPrint("Creating a %s\n" _C_ type.Name.c_str());
+	FindNearestDrop(type, pos, resPos, LookingW);
 	if (SquareDistance(pos, resPos) <= square(range)) {
-		CUnit *target = MakeUnit(*type, &player);
+		CUnit *target = MakeUnit(type, &player);
 		if (target != nullptr) {
 			target->tilePos = resPos;
 			target->Place(resPos);

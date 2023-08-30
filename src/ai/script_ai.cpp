@@ -74,7 +74,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 /**
 **  Transform list of unit separed with coma to a true list.
 */
-static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
+static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 {
 	std::vector<CUnitType *> res;
 
@@ -84,12 +84,11 @@ static std::vector<CUnitType *> getUnitTypeFromString(const std::string &list)
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
 	while (end != std::string::npos) {
-		std::string unitName = list.substr(begin, end - begin);
+		std::string_view unitName = list.substr(begin, end - begin);
 		begin = end + 1;
 		end = list.find(",", begin);
-		if (!unitName.empty()) {
-			Assert(unitName[0] != ',');
-			res.push_back(UnitTypeByIdent(unitName));
+		if (unitName.substr(0, 5) == "unit-") {
+			res.push_back(&UnitTypeByIdent(unitName));
 		}
 	}
 	return res;
@@ -246,26 +245,26 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			case ButtonCmd::Build: {
-				CUnitType *buildingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &buildingType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
-					AiHelperInsert(aiHelper.Build(), buildingType->Slot, *type);
+					AiHelperInsert(aiHelper.Build(), buildingType.Slot, *type);
 				}
 				break;
 			}
 			case ButtonCmd::Train : {
-				CUnitType *trainingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &trainingType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
-					AiHelperInsert(aiHelper.Train(), trainingType->Slot, *type);
+					AiHelperInsert(aiHelper.Train(), trainingType.Slot, *type);
 				}
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &upgradeToType = UnitTypeByIdent(button.ValueStr);
 
 				for (CUnitType *type : unitmask) {
-					AiHelperInsert(aiHelper.Upgrade(), upgradeToType->Slot, *type);
+					AiHelperInsert(aiHelper.Upgrade(), upgradeToType.Slot, *type);
 				}
 				break;
 			}
@@ -323,20 +322,15 @@ static int CclDefineAiHelper(lua_State *l)
 		}
 		// Get the base unit type, which could handle the action.
 		const std::string_view baseTypeName = LuaToString(l, j + 1, 2);
-		const CUnitType *base = UnitTypeByIdent(baseTypeName);
-		if (!base) {
-			LuaError(l, "unknown unittype: %s" _C_ baseTypeName.data());
-		}
+		const CUnitType &base = UnitTypeByIdent(baseTypeName);
 
 		// Get the unit types, which could be produced
 		for (int k = 2; k < subargs; ++k) {
 			const std::string_view equivTypeName = LuaToString(l, j + 1, k + 1);
-			CUnitType *type = UnitTypeByIdent(equivTypeName);
-			if (!type) {
-				LuaError(l, "unknown unittype: %s" _C_ equivTypeName.data());
-			}
-			AiHelperInsert(AiHelpers.Equiv(), base->Slot, *type);
-			AiNewUnitTypeEquiv(*base, *type);
+			CUnitType &type = UnitTypeByIdent(equivTypeName);
+
+			AiHelperInsert(AiHelpers.Equiv(), base.Slot, type);
+			AiNewUnitTypeEquiv(base, type);
 		}
 	}
 	return 0;
@@ -1625,7 +1619,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			const int want = LuaToNumber(l, offset, k + 1);
 
 			AiBuildQueue queue;
-			queue.Type = UnitTypeByIdent(value);
+			queue.Type = &UnitTypeByIdent(value);
 			queue.Want = want;
 			queue.Made = made;
 			queue.Pos = pos;
@@ -1720,7 +1714,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						AiUnitType queue;
 
 						queue.Want = num;
-						queue.Type = UnitTypeByIdent(ident);
+						queue.Type = &UnitTypeByIdent(ident);
 						ai->Force[forceIdx].UnitTypes.push_back(queue);
 					}
 					lua_pop(l, 1);
@@ -1849,7 +1843,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				const std::string_view ident = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int count = LuaToNumber(l, j + 1, k + 1);
-				ai->UnitTypeRequests[i].Type = UnitTypeByIdent(ident);
+				ai->UnitTypeRequests[i].Type = &UnitTypeByIdent(ident);
 				ai->UnitTypeRequests[i].Count = count;
 				++i;
 			}
@@ -1860,7 +1854,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view ident = LuaToString(l, j + 1, k + 1);
-				ai->UpgradeToRequests.push_back(UnitTypeByIdent(ident));
+				ai->UpgradeToRequests.push_back(&UnitTypeByIdent(ident));
 			}
 		} else if (value == "research") {
 			if (!lua_istable(l, j + 1)) {

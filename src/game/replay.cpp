@@ -763,7 +763,7 @@ static void DoNextReplay()
 	} else if (action == "unload") {
 		SendCommandUnload(*unit, pos, dunit, flags);
 	} else if (action == "build") {
-		SendCommandBuildBuilding(*unit, pos, *UnitTypeByIdent(val), flags);
+		SendCommandBuildBuilding(*unit, pos, UnitTypeByIdent(val), flags);
 	} else if (action == "explore") {
 		SendCommandExplore(*unit, flags);
 	} else if (action == "dismiss") {
@@ -775,11 +775,11 @@ static void DoNextReplay()
 	} else if (action == "return") {
 		SendCommandReturnGoods(*unit, dunit, flags);
 	} else if (action == "train") {
-		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
+		SendCommandTrainUnit(*unit, UnitTypeByIdent(val), flags);
 	} else if (action == "cancel-train") {
-		SendCommandCancelTraining(*unit, num, !val.empty() ? UnitTypeByIdent(val) : nullptr);
+		SendCommandCancelTraining(*unit, num, !val.empty() ? &UnitTypeByIdent(val) : nullptr);
 	} else if (action == "upgrade-to") {
-		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
+		SendCommandUpgradeTo(*unit, UnitTypeByIdent(val), flags);
 	} else if (action == "cancel-upgrade-to") {
 		SendCommandCancelUpgradeTo(*unit);
 	} else if (action == "research") {

@@ -375,8 +375,8 @@ static int CclChangeUnitsOwner(lua_State *l)
     if (args == 4) {
         table = Select(pos1, pos2, HasSamePlayerAs(Players[oldp]));
     } else { //Change only specific units by the type.
-        CUnitType *type = UnitTypeByIdent(LuaToString(l, 5));
-        table = Select(pos1, pos2, HasSamePlayerAndTypeAs(Players[oldp], *type));
+        CUnitType &type = UnitTypeByIdent(LuaToString(l, 5));
+        table = Select(pos1, pos2, HasSamePlayerAndTypeAs(Players[oldp], type));
     }
     for (auto unit : table) {
         unit->ChangeOwner(Players[newp]);
@@ -444,10 +444,7 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 	} else if ((onlyUnits = (typestr == "unit"))) {
 	} else if ((onlyBuildings = (typestr == "building"))) {
 	} else {
-		type = UnitTypeByIdent(LuaToString(l, 2));
-		if (!type) {
-			LuaError(l, "incorrect 2nd argument to GiveUnitsToPlayer. Must be a unit type or 'any', 'unit', or 'building'");
-		}
+		type = &UnitTypeByIdent(typestr);
 	}
 
 	if (cnt > 0) {
@@ -1081,7 +1078,7 @@ static int CclGetPlayerData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string_view ident = LuaToString(l, 3);
 		if (ident.substr(0, 5) == "unit-") {
-			int id = UnitTypeIdByIdent(ident);
+			int id = UnitTypeByIdent(ident).Slot;
 			if (UnitIdAllowed(Players[p->Index], id) > 0) {
 				lua_pushstring(l, "A");
 			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {

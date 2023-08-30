@@ -75,7 +75,7 @@ static void AddDependency(std::string_view target, std::string_view required, in
 	if (target.substr(0, 5) == "unit-") {
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
-		rule.Kind.UnitType = UnitTypeByIdent(target);
+		rule.Kind.UnitType = &UnitTypeByIdent(target);
 	} else if (target.substr(0, 8) == "upgrade-") {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
@@ -128,7 +128,7 @@ static void AddDependency(std::string_view target, std::string_view required, in
 	if (required.substr(0, 5) == "unit-") {
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
-		temp->Kind.UnitType = UnitTypeByIdent(required);
+		temp->Kind.UnitType = &UnitTypeByIdent(required);
 	} else if (required.substr(0, 8) == "upgrade-") {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
@@ -243,7 +243,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	//
 	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
 		// target string refers to unit-XXX
-		rule.Kind.UnitType = UnitTypeByIdent(button.ValueStr);
+		rule.Kind.UnitType = &UnitTypeByIdent(button.ValueStr);
 		rule.Type = DependRuleUnitType;
 	} else if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
@@ -332,7 +332,7 @@ bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 	//
 	if (target.substr(0, 5) == "unit-") {
 		// target string refers to unit-XXX
-		rule.Kind.UnitType = UnitTypeByIdent(target);
+		rule.Kind.UnitType = &UnitTypeByIdent(target);
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}

@@ -223,12 +223,8 @@ static int CclShowMapLocation(lua_State *l)
 
 	LuaCheckArgs(l, 5);
 	const std::string_view unitname = LuaToString(l, 5);
-	CUnitType *unitType = UnitTypeByIdent(unitname);
-	if (!unitType) {
-		DebugPrint("Unable to find UnitType '%s'" _C_ unitname.data());
-		return 0;
-	}
-	CUnit *target = MakeUnit(*unitType, ThisPlayer);
+	CUnitType &unitType = UnitTypeByIdent(unitname);
+	CUnit *target = MakeUnit(unitType, ThisPlayer);
 	if (target != nullptr) {
 		target->Variable[HP_INDEX].Value = 0;
 		target->tilePos.x = LuaToNumber(l, 1);

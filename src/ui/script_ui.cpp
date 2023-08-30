@@ -1165,15 +1165,9 @@ static int CclCopyButtonsForUnitType(lua_State *l)
 
 	// Slot identifier
 	const std::string_view fromName = LuaToString(l, 1);
-	CUnitType *from = UnitTypeByIdent(fromName);
+	CUnitType &from = UnitTypeByIdent(fromName);
 	const std::string_view toName = LuaToString(l, 2);
-	CUnitType *to = UnitTypeByIdent(toName);
-	if (!to) {
-		LuaError(l, "Unknown unit-type '%s'\n" _C_ toName.data());
-	}
-	if (!from) {
-		LuaError(l, "Unknown unit-type '%s'\n" _C_ fromName.data());
-	}
+	CUnitType &to = UnitTypeByIdent(toName);
 
 	for (auto btn : UnitButtonTable) {
 		if (btn->UnitMask.find(fromName) != std::string::npos) {

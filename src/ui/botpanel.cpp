@@ -133,16 +133,16 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 #endif
 				break;
 			case ButtonCmd::Train:
-				ba->Value = UnitTypeIdByIdent(value);
+				ba->Value = UnitTypeByIdent(value).Slot;
 				break;
 			case ButtonCmd::Research:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
 			case ButtonCmd::UpgradeTo:
-				ba->Value = UnitTypeIdByIdent(value);
+				ba->Value = UnitTypeByIdent(value).Slot;
 				break;
 			case ButtonCmd::Build:
-				ba->Value = UnitTypeIdByIdent(value);
+				ba->Value = UnitTypeByIdent(value).Slot;
 				break;
 			default:
 				ba->Value = to_number(value);

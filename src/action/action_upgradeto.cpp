@@ -206,7 +206,7 @@ bool COrder_TransformInto::ParseSpecificData(lua_State *l,
 {
 	if (value == "type") {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = &UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else {
 		return false;
 	}
@@ -254,7 +254,7 @@ bool COrder_UpgradeTo::ParseSpecificData(lua_State *l,
 {
 	if (value == "type") {
 		++j;
-		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Type = &UnitTypeByIdent(LuaToString(l, -1, j + 1));
 	} else if (value == "ticks") {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);

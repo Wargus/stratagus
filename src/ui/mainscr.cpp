@@ -1138,10 +1138,7 @@ static void InfoPanel_draw_no_selection()
 	} else {
 #ifdef USE_MNG
 		if (UI.DefaultUnitPortrait.size() > 0) {
-			CUnitType *type = UnitTypeByIdent(UI.DefaultUnitPortrait);
-			if (type) {
-				DrawTypePortrait(*type);
-			}
+			DrawTypePortrait(UnitTypeByIdent(UI.DefaultUnitPortrait));
 		}
 #endif
 		if (Preference.ShowNoSelectionStats) {

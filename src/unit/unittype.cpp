@@ -843,24 +843,29 @@ void SaveUnitTypes(CFile &file)
 **
 **  @return       Unit-type pointer.
 */
-CUnitType *UnitTypeByIdent(std::string_view ident)
+CUnitType &UnitTypeByIdent(std::string_view ident)
 {
 	auto ret = UnitTypeMap.find(ident);
 	if (ret != UnitTypeMap.end()) {
-		return (*ret).second;
+		return *(*ret).second;
 	}
-	return nullptr;
+	DebugPrint("Unknown unitType '%s'\n" _C_ ident.data());
+	Exit(1);
 }
 
 /**
-**  Allocate an empty unit-type slot.
+**  Allocate an empty unit-type slot or return existing one.
 **
 **  @param ident  Identifier to identify the slot (malloced by caller!).
 **
-**  @return       New allocated (zeroed) unit-type pointer.
+**  @return       New allocated (zeroed) unit-type pointer and redefined flag.
 */
-CUnitType *NewUnitTypeSlot(std::string_view ident)
+std::pair<CUnitType *, bool> NewUnitTypeSlot(std::string_view ident)
 {
+	if (auto ret = UnitTypeMap.find(ident); ret != UnitTypeMap.end()) {
+		return {(*ret).second, true};
+	}
+
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 	CUnitType *type = new CUnitType;
 
@@ -874,7 +879,7 @@ CUnitType *NewUnitTypeSlot(std::string_view ident)
 	}
 	UnitTypes.push_back(type);
 	UnitTypeMap[type->Ident] = type;
-	return type;
+	return {type, false};
 }
 
 /**
@@ -1063,7 +1068,7 @@ void LoadUnitTypes()
 		}
 		// Lookup corpse.
 		if (!type.CorpseName.empty()) {
-			type.CorpseType = UnitTypeByIdent(type.CorpseName);
+			type.CorpseType = &UnitTypeByIdent(type.CorpseName);
 		}
 #ifndef DYNAMIC_LOAD
 		// Load Sprite
