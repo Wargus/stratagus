@@ -305,12 +305,16 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 static int CclDefineSpell(lua_State *l)
 {
 	const int args = lua_gettop(l);
-	const std::string identname = std::string{LuaToString(l, 1)};
-	SpellType *spell = SpellTypeByIdent(identname);
-	if (spell != nullptr) {
-		DebugPrint("Redefining spell-type '%s'\n" _C_ identname.c_str());
+	std::string_view identname = LuaToString(l, 1);
+
+	const auto it = ranges::find_if(SpellTypeTable,
+	                          [&](const SpellType *spell) { return spell->Ident == identname; });
+	SpellType *spell = nullptr;
+	if (it != SpellTypeTable.end()) {
+		spell = *it;
+		DebugPrint("Redefining spell-type '%s'\n" _C_ identname.data());
 	} else {
-		spell = new SpellType(SpellTypeTable.size(), identname);
+		spell = new SpellType(SpellTypeTable.size(), std::string{identname});
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
 			if (UnitTypes[i]->CanCastSpell) {
 				char *newc = new char[(SpellTypeTable.size() + 1) * sizeof(char)];

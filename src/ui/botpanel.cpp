@@ -124,7 +124,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 		ba->ValueStr = value;
 		switch (action) {
 			case ButtonCmd::SpellCast:
-				ba->Value = SpellTypeByIdent(value)->Slot;
+				ba->Value = SpellTypeByIdent(value).Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
 					DebugPrint("Spell %s does not exist?\n" _C_ value.c_str());
