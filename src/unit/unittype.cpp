@@ -850,7 +850,7 @@ CUnitType &UnitTypeByIdent(std::string_view ident)
 		return *(*ret).second;
 	}
 	DebugPrint("Unknown unitType '%s'\n" _C_ ident.data());
-	Exit(1);
+	ExitFatal(1);
 }
 
 /**

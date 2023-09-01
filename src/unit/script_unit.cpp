@@ -604,12 +604,11 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager->GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (value == "auto-cast") {
 			const std::string_view s = LuaToString(l, 2, j + 1);
-			Assert(SpellTypeByIdent(s));
 			if (!unit->AutoCastSpell) {
 				unit->AutoCastSpell = new char[SpellTypeTable.size()];
 				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
 			}
-			unit->AutoCastSpell[SpellTypeByIdent(s)->Slot] = 1;
+			unit->AutoCastSpell[SpellTypeByIdent(s).Slot] = 1;
 		} else if (value == "spell-cooldown") {
 			lua_rawgeti(l, 2, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {

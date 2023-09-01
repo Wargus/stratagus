@@ -113,7 +113,7 @@ bool COrder_SpellCast::ParseSpecificData(lua_State *l,
 {
 	if (value == "spell") {
 		++j;
-		this->Spell = SpellTypeByIdent(LuaToString(l, -1, j + 1));
+		this->Spell = &SpellTypeByIdent(LuaToString(l, -1, j + 1));
 	} else if (value == "range") {
 		++j;
 		this->Range = LuaToNumber(l, -1, j + 1);

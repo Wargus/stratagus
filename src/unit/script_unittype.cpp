@@ -1066,11 +1066,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				const SpellType *spell = SpellTypeByIdent(value);
-				if (spell == nullptr) {
-					LuaError(l, "Unknown spell type: %s" _C_ value.data());
-				}
-				type->CanCastSpell[spell->Slot] = 1;
+				const SpellType &spell = SpellTypeByIdent(value);
+				type->CanCastSpell[spell.Slot] = 1;
 			}
 		} else if (value == "AutoCastActive") {
 			if (!lua_istable(l, -1)) {
@@ -1092,14 +1089,11 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
-				const SpellType *spell = SpellTypeByIdent(value);
-				if (spell == nullptr) {
-					LuaError(l, "AutoCastActive : Unknown spell type: %s" _C_ value.data());
-				}
-				if (!spell->AutoCast) {
+				const SpellType &spell = SpellTypeByIdent(value);
+				if (!spell.AutoCast) {
 					LuaError(l, "AutoCastActive : Define autocast method for %s." _C_ value.data());
 				}
-				type->AutoCastActive[spell->Slot] = 1;
+				type->AutoCastActive[spell.Slot] = 1;
 			}
 		} else if (value == "CanTargetFlag") {
 			//
