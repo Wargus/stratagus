@@ -163,11 +163,7 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 		ba->CommentSound.MapSound();
 	}
 	if (!ba->Popup.empty()) {
-		CPopup *popup = PopupByIdent(ba->Popup);
-		if (!popup) {
-			fprintf(stderr, "Popup \"%s\" hasn't defined.\n ", ba->Popup.c_str());
-			Exit(1);
-		}
+		PopupByIdent(ba->Popup); // Checking for error
 	}
 	ba->ButtonCursor = cursor;
 	ba->Popup = popup;
@@ -545,12 +541,13 @@ static struct PopupDrawCache {
 */
 void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int y)
 {
-	CPopup *popup = PopupByIdent(button.Popup);
+	if (button.Popup.empty()) {
+		return;
+	}
+	CPopup &popup = PopupByIdent(button.Popup);
 	bool useCache = false;
 
-	if (!popup) {
-		return;
-	} else if (&button == LastDrawnButtonPopup) {
+	if (&button == LastDrawnButtonPopup) {
 		useCache = true;
 	} else {
 		LastDrawnButtonPopup = const_cast<ButtonAction *>(&button);
@@ -583,9 +580,9 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		popupWidth = popupCache.popupWidth;
 		popupHeight = popupCache.popupHeight;
 	} else {
-		GetPopupSize(*popup, button, popupWidth, popupHeight, Costs);
-		popupWidth = std::max(popupWidth, popup->MinWidth);
-		popupHeight = std::max(popupHeight, popup->MinHeight);
+		GetPopupSize(popup, button, popupWidth, popupHeight, Costs);
+		popupWidth = std::max(popupWidth, popup.MinWidth);
+		popupHeight = std::max(popupHeight, popup.MinHeight);
 		popupCache.popupWidth = popupWidth;
 		popupCache.popupHeight = popupHeight;
 	}
@@ -596,15 +593,15 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 	clamp<int>(&y, 0, Video.Height - 1);
 
 	// Background
-	Video.FillTransRectangle(popup->BackgroundColor, x, y, popupWidth, popupHeight, popup->BackgroundColor >> ASHIFT);
-	Video.DrawRectangle(popup->BorderColor, x, y, popupWidth, popupHeight);
+	Video.FillTransRectangle(popup.BackgroundColor, x, y, popupWidth, popupHeight, popup.BackgroundColor >> ASHIFT);
+	Video.DrawRectangle(popup.BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
-	for (CPopupContentType *contentPtr : popup->Contents) {
+	for (CPopupContentType *contentPtr : popup.Contents) {
 		const CPopupContentType &content = *contentPtr;
 
 		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
-			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
+			content.Draw(x + content.pos.x, y + content.pos.y, popup, popupWidth, button, Costs);
 		}
 	}
 

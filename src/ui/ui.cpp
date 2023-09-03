@@ -186,14 +186,15 @@ CUserInterface::CUserInterface() :
 **
 **  @return       popup class pointer.
 */
-CPopup *PopupByIdent(const std::string &ident)
+CPopup &PopupByIdent(std::string_view ident)
 {
 	const auto it =
 		ranges::find_if(UI.ButtonPopups, [&](CPopup *popup) { return popup->Ident == ident; });
 	if (it != UI.ButtonPopups.end()) {
-		return *it;
+		return **it;
 	}
-	return nullptr;
+	DebugPrint("Unknown popup '%s'\n" _C_ ident.data());
+	ExitFatal(1);
 }
 
 /**

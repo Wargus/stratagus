@@ -563,7 +563,7 @@ extern void FreeButtonStyles();
 extern void UserInterfaceCclRegister();
 
 /// return popup by ident string
-extern CPopup *PopupByIdent(const std::string &ident);
+extern CPopup &PopupByIdent(std::string_view ident);
 
 /// Find a button style
 extern ButtonStyle *FindButtonStyle(const std::string &style);
