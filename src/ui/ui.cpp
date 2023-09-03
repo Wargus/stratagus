@@ -188,8 +188,7 @@ CUserInterface::CUserInterface() :
 */
 CPopup &PopupByIdent(std::string_view ident)
 {
-	const auto it =
-		ranges::find_if(UI.ButtonPopups, [&](CPopup *popup) { return popup->Ident == ident; });
+	const auto it = ranges::find(UI.ButtonPopups, ident, &CPopup::Ident);
 	if (it != UI.ButtonPopups.end()) {
 		return **it;
 	}
