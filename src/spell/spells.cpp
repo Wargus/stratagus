@@ -416,7 +416,7 @@ void InitSpells()
 */
 SpellType &SpellTypeByIdent(const std::string_view &ident)
 {
-	auto it = ranges::find_if(SpellTypeTable, [&](const SpellType* spell) { return spell->Ident == ident; });
+	auto it = ranges::find(SpellTypeTable, ident, &SpellType::Ident);
 	if (it != SpellTypeTable.end()) {
 		return **it;
 	}

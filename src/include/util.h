@@ -165,6 +165,17 @@ fs::path GetExecutablePath();
 /*----------------------------------------------------------------------------
 --  Ranges
 ----------------------------------------------------------------------------*/
+#include <functional>
+
+struct identity
+{
+	template <typename T>
+	T &&operator()(T &&arg) const
+	{
+		return std::forward<T>(arg);
+	}
+};
+
 namespace ranges
 {
 
@@ -180,10 +191,11 @@ namespace ranges
 		std::iota(begin(range), end(range), startValue);
 	}
 
-	template<typename Range, typename Value>
-	auto find(Range& range, const Value& value)
+	template<typename Range, typename Value, typename Proj = identity>
+	auto find(Range& range, const Value& value, Proj proj = {})
 	{
-		return std::find(begin(range), end(range), value);
+		return std::find_if(
+			begin(range), end(range), [&](const auto &elem) { return std::invoke(proj, elem) == value; });
 	}
 
 	template <typename Range, typename Predicate>

@@ -307,8 +307,7 @@ static int CclDefineSpell(lua_State *l)
 	const int args = lua_gettop(l);
 	std::string_view identname = LuaToString(l, 1);
 
-	const auto it = ranges::find_if(SpellTypeTable,
-	                          [&](const SpellType *spell) { return spell->Ident == identname; });
+	const auto it = ranges::find(SpellTypeTable, identname, &SpellType::Ident);
 	SpellType *spell = nullptr;
 	if (it != SpellTypeTable.end()) {
 		spell = *it;
