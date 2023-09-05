@@ -45,13 +45,9 @@
 #include "ui.h"
 #include "video.h"
 
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
+#include <variant>
+
+using UStrInt = std::variant<int, const char *>;
 
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
 extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
@@ -98,21 +94,8 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 	if (this->Index != -1) {
 		if (!this->Stat) {
-			EnumVariable component = this->Component;
-			switch (component) {
-				case VariableValue:
-				case VariableMax:
-				case VariableIncrease:
-				case VariableDiff:
-				case VariablePercent:
-					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).i);
-					break;
-				case VariableName:
-					label.Draw(x, y, GetComponent(unit, this->Index, component, 0).s);
-					break;
-				default:
-					Assert(0);
-			}
+			std::visit([&](const auto &value) { label.Draw(x, y, value); },
+			           GetComponent(unit, this->Index, this->Component, 0));
 		} else {
 			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
 			int diff = unit.Stats->Variables[this->Index].Value - value;
@@ -128,6 +111,20 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	}
 }
 
+namespace
+{
+auto tr(const char *s)
+{
+	return _(s);
+}
+
+auto tr(int n)
+{
+	return n;
+}
+
+} // namespace
+
 /**
 **  Draw formatted text with variable value.
 **
@@ -140,8 +137,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 */
 /* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
 {
-	char buf[256];
-	UStrInt usi1;
+	char buf[256]{};
 
 	CFont &font = this->Font ? *this->Font : *defaultfont;
 	Assert(&font);
@@ -149,12 +145,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	CLabel label(font);
 
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	usi1 = GetComponent(unit, this->Index, this->Component, 0);
-	if (usi1.type == USTRINT_STR) {
-		snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s));
-	} else {
-		snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i);
-	}
+	const auto usi1 = GetComponent(unit, this->Index, this->Component, 0);
+	std::visit(
+		[&](auto v) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v)); },
+		usi1);
 
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
@@ -179,28 +173,18 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 */
 /* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
 {
-	char buf[256];
-	UStrInt usi1, usi2;
+	char buf[256]{};
 
 	CFont &font = this->Font ? *this->Font : *defaultfont;
 	Assert(&font);
 	CLabel label(font);
 
-	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
-	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
-	if (usi1.type == USTRINT_STR) {
-		if (usi2.type == USTRINT_STR) {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s), _(usi2.s));
-		} else {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), _(usi1.s), usi2.i);
-		}
-	} else {
-		if (usi2.type == USTRINT_STR) {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, _(usi2.s));
-		} else {
-			snprintf(buf, sizeof(buf), this->Format.c_str(), usi1.i, usi2.i);
-		}
-	}
+	const auto usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
+	const auto usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
+	std::visit(
+		[&](auto v1, auto v2) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v1), tr(v2)); },
+		usi1,
+		usi2);
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
 		std::string buf2(buf);

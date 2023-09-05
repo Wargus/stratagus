@@ -65,6 +65,7 @@
 #endif
 
 #include <sstream>
+#include <variant>
 
 /*----------------------------------------------------------------------------
 --  UI BUTTONS
@@ -262,13 +263,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	return true;
 }
 
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
+using UStrInt = std::variant<int, const char *>;
 
 /**
 **  Return the value corresponding.
@@ -282,7 +277,6 @@ struct UStrInt {
 */
 UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 {
-	UStrInt val;
 	CVariable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
@@ -304,56 +298,34 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	}
 
 	switch (e) {
-		case VariableValue:
-			val.type = USTRINT_INT;
-			val.i = var->Value;
-			break;
-		case VariableMax:
-			val.type = USTRINT_INT;
-			val.i = var->Max;
-			break;
-		case VariableIncrease:
-			val.type = USTRINT_INT;
-			val.i = var->Increase;
-			break;
-		case VariableDiff:
-			val.type = USTRINT_INT;
-			val.i = var->Max - var->Value;
-			break;
+		case VariableValue: return var->Value;
+		case VariableMax: return var->Max;
+		case VariableIncrease: return var->Increase;
+		case VariableDiff: return var->Max - var->Value;
 		case VariablePercent:
 			Assert(unit.Variable[index].Max != 0);
-			val.type = USTRINT_INT;
-			val.i = 100 * var->Value / var->Max;
-			break;
+			return 100 * var->Value / var->Max;
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
-				val.type = USTRINT_STR;
-				val.i = unit.Type->GivesResource;
-				val.s = DefaultResourceNames[unit.Type->GivesResource].c_str();
+				return DefaultResourceNames[unit.Type->GivesResource].c_str();
 			} else if (index == CARRYRESOURCE_INDEX) {
-				val.type = USTRINT_STR;
-				val.i = unit.CurrentResource;
-				val.s = DefaultResourceNames[unit.CurrentResource].c_str();
+				return DefaultResourceNames[unit.CurrentResource].c_str();
 			} else {
-				val.type = USTRINT_STR;
-				val.i = index;
-				val.s = UnitTypeVar.VariableNameLookup[index].data();
+				return UnitTypeVar.VariableNameLookup[index].data();
 			}
-			break;
 	}
-	return val;
+	return 0;
 }
 
 UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 {
-	UStrInt val;
 	CVariable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
 	switch (t) {
 		case 0: // Unit:
-			var = &type.Stats[ThisPlayer->Index].Variables[index];;
+			var = &type.Stats[ThisPlayer->Index].Variables[index];
 			break;
 		case 1: // Type:
 			var = &type.MapDefaultStat.Variables[index];
@@ -367,40 +339,21 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			break;
 	}
 	switch (e) {
-		case VariableValue:
-			val.type = USTRINT_INT;
-			val.i = var->Value;
-			break;
-		case VariableMax:
-			val.type = USTRINT_INT;
-			val.i = var->Max;
-			break;
-		case VariableIncrease:
-			val.type = USTRINT_INT;
-			val.i = var->Increase;
-			break;
-		case VariableDiff:
-			val.type = USTRINT_INT;
-			val.i = var->Max - var->Value;
-			break;
+		case VariableValue: return var->Value;
+		case VariableMax: return var->Max;
+		case VariableIncrease: return var->Increase;
+		case VariableDiff: return var->Max - var->Value;
 		case VariablePercent:
 			Assert(type.Stats[ThisPlayer->Index].Variables[index].Max != 0);
-			val.type = USTRINT_INT;
-			val.i = 100 * var->Value / var->Max;
-			break;
+			return 100 * var->Value / var->Max;
 		case VariableName:
 			if (index == GIVERESOURCE_INDEX) {
-				val.type = USTRINT_STR;
-				val.i = type.GivesResource;
-				val.s = DefaultResourceNames[type.GivesResource].c_str();
+				return DefaultResourceNames[type.GivesResource].c_str();
 			} else {
-				val.type = USTRINT_STR;
-				val.i = index;
-				val.s = UnitTypeVar.VariableNameLookup[index].data();
+				return UnitTypeVar.VariableNameLookup[index].data();
 			}
-			break;
 	}
-	return val;
+	return 0;
 }
 
 static void DrawUnitInfo_Training(const CUnit &unit)
