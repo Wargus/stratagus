@@ -157,14 +157,14 @@ void CleanConstructions()
 **
 **  @return       Construction structure pointer
 */
-CConstruction *ConstructionByIdent(std::string_view name)
+CConstruction &ConstructionByIdent(std::string_view name)
 {
-	for (CConstruction *c : Constructions) {
-		if (c->Ident == name) {
-			return c;
-		}
+	auto it = ranges::find(Constructions, name, &CConstruction::Ident);
+	if (it != Constructions.end()) {
+		return **it;
 	}
-	return nullptr;
+	DebugPrint("Unknown construction '%s'\n" _C_ name.data());
+	ExitFatal(1);
 }
 
 /**
@@ -183,12 +183,14 @@ static int CclDefineConstruction(lua_State *l)
 
 	// Slot identifier
 	const std::string_view str = LuaToString(l, 1);
-	CConstruction *construction = ConstructionByIdent(str);
+	auto it = ranges::find(Constructions, str, &CConstruction::Ident);
+	CConstruction *construction = nullptr;
 
-	if (construction == nullptr) {
+	if (it == Constructions.end()) {
 		construction = new CConstruction;
 		Constructions.push_back(construction);
 	} else { // redefine completely.
+		construction = *it;
 		construction->Clean();
 	}
 	construction->Ident = str;
