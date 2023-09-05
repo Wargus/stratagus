@@ -2960,10 +2960,10 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 	const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
 
 	if ((target.IsVisibleOnMap(*ThisPlayer) || ReplayRevealMap) && !DamageMissile.empty()) {
-		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
-		const PixelDiff offset(3, -mtype->Range);
+		const MissileType &mtype = MissileTypeByIdent(DamageMissile);
+		const PixelDiff offset(3, -mtype.Range);
 
-		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
+		MakeLocalMissile(mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
 	}
 }
 

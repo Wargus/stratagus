@@ -115,16 +115,14 @@ void LoadMissileSprites()
 **
 **  @return       Missile type pointer.
 */
-MissileType *MissileTypeByIdent(std::string_view ident)
+MissileType &MissileTypeByIdent(std::string_view ident)
 {
-	if (ident.empty()) {
-		return nullptr;
-	}
 	MissileTypeMap::iterator it = MissileTypes.find(ident);
 	if (it != MissileTypes.end()) {
-		return it->second;
+		return *it->second;
 	}
-	return nullptr;
+	DebugPrint("Unknown missilttype	 '%s'\n" _C_ ident.data());
+	ExitFatal(1);
 }
 
 /**
@@ -136,10 +134,14 @@ MissileType *MissileTypeByIdent(std::string_view ident)
 */
 MissileType *NewMissileTypeSlot(const std::string &ident)
 {
-	MissileType *mtype = new MissileType(ident);
+	auto &res = MissileTypes[ident];
 
-	MissileTypes[ident] = mtype;
-	return mtype;
+	if (res == nullptr) {
+		res = new MissileType(ident);
+	} else {
+		DebugPrint("Redefining missile-type '%s'\n" _C_ ident.c_str());
+	}
+	return res;
 }
 
 /**
