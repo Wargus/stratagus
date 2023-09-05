@@ -371,13 +371,14 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 **
 **  @return  Pointer to the animation structure.
 */
-CAnimations *AnimationsByIdent(std::string_view ident)
+CAnimations &AnimationsByIdent(std::string_view ident)
 {
 	auto it = AnimationMap.find(ident);
 	if (it != AnimationMap.end()) {
-		return it->second;
+		return *it->second;
 	}
-	return nullptr;
+	DebugPrint("Unknown animation '%s'\n" _C_ ident.data());
+	ExitFatal(1);
 }
 
 void FreeAnimations()
