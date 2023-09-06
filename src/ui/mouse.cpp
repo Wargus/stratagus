@@ -1615,7 +1615,7 @@ static void UISelectStateButtonDown(unsigned)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
 			SendCommand(Map.MapPixelPosToTilePos(mapPixelPos));
 		}
@@ -1639,7 +1639,7 @@ static void UISelectStateButtonDown(unsigned)
 			CurrentButtonLevel = 0;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
 			SendCommand(cursorTilePos);
 		} else {
@@ -1747,7 +1747,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				if (!ClickMissile.empty()) {
 					const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
-					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+					MakeLocalMissile(MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
@@ -1774,7 +1774,7 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
 			}
 			DoRightButton(mapPixelPos);
 		}

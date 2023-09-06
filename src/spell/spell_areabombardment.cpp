@@ -57,10 +57,7 @@
 			this->StartOffsetY = LuaToNumber(l, -1, j + 1);
 		} else if (value == "missile") {
 			value = LuaToString(l, -1, j + 1);
-			this->Missile = MissileTypeByIdent(value);
-			if (this->Missile == nullptr) {
-				DebugPrint("in area-bombardement : missile %s does not exist\n" _C_ value.data());
-			}
+			this->Missile = &MissileTypeByIdent(value);
 		} else {
 			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value.data());
 		}

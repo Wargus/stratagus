@@ -142,7 +142,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 /// Get the animations structure by ident
-extern CAnimations *AnimationsByIdent(std::string_view ident);
+extern CAnimations &AnimationsByIdent(std::string_view ident);
 
 extern void AnimationCclRegister();
 

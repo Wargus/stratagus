@@ -46,8 +46,8 @@ class MissileConfig
 public:
 	MissileConfig() : Missile(nullptr) {}
 
-	bool MapMissileNoLog();
-	bool MapMissile();
+	void MapMissileNoLog();
+	void MapMissile();
 
 public:
 	std::string Name;        /// Config missile name

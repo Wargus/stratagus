@@ -225,13 +225,8 @@ static int CclDefineMissileType(lua_State *l)
 
 	// Slot identifier
 	const std::string str = std::string{LuaToString(l, 1)};
-	MissileType *mtype = MissileTypeByIdent(str);
+	MissileType *mtype = NewMissileTypeSlot(str);
 
-	if (mtype) {
-		DebugPrint("Redefining missile-type '%s'\n" _C_ str.c_str());
-	} else {
-		mtype = NewMissileTypeSlot(str);
-	}
 	mtype->Load(l);
 	return 0;
 }
@@ -257,7 +252,7 @@ static int CclMissile(lua_State *l)
 		++j;
 
 		if (value == "type") {
-			type = MissileTypeByIdent(LuaToString(l, j + 1));
+			type = &MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (value == "pos") {
 			CclGetPos(l, &position.x, &position.y, j + 1);
 		} else if (value == "origin-pos") {
@@ -361,7 +356,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 			if (value == "percent") {
 				ptr->Percent = LuaToNumber(l, j + 1, k + 1);
 			} else if (value == "missile") {
-				ptr->Missile = MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
+				ptr->Missile = &MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
 		}
 		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
@@ -383,10 +378,7 @@ static int CclCreateMissile(lua_State *l)
 	}
 
 	const std::string_view name = LuaToString(l, 1);
-	const MissileType *mtype = MissileTypeByIdent(name);
-	if (!mtype) {
-		LuaError(l, "Bad missile");
-	}
+	const MissileType &mtype = MissileTypeByIdent(name);
 	PixelPos startpos, endpos;
 	CclGetPos(l, &startpos.x, &startpos.y, 2);
 	CclGetPos(l, &endpos.x, &endpos.y, 3);
@@ -407,7 +399,7 @@ static int CclCreateMissile(lua_State *l)
 		}
 	}
 
-	Missile *missile = MakeMissile(*mtype, startpos, endpos);
+	Missile *missile = MakeMissile(mtype, startpos, endpos);
 	if (!missile) {
 		return 0;
 	}

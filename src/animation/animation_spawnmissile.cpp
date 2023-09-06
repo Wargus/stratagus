@@ -63,10 +63,10 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
 	PixelPos dest;
-	MissileType *mtype = MissileTypeByIdent(this->missileTypeStr);
-	if (mtype == nullptr) {
+	if (this->missileTypeStr.empty()) {
 		return;
 	}
+	MissileType &mtype = MissileTypeByIdent(this->missileTypeStr);
 
 	if (!goal || goal->Destroyed) {
 		return;
@@ -81,8 +81,8 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 	if ((flags & SM_ToTarget)) {
 		CUnit *target = goal->CurrentOrder()->GetGoal();
 		if (!target || target->Destroyed) {
-			Assert(!mtype->AlwaysFire || mtype->Range);
-			if (!target && mtype->AlwaysFire == false) {
+			Assert(!mtype.AlwaysFire || mtype.Range);
+			if (!target && mtype.AlwaysFire == false) {
 				return;
 			}
 		}
@@ -127,7 +127,7 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
-		Missile *missile = MakeMissile(*mtype, start, dest);
+		Missile *missile = MakeMissile(mtype, start, dest);
 		if (flags & SM_SetDirection) {
 			PixelPos posd;
 			posd.x = Heading2X[goal->Direction / NextDirection];
