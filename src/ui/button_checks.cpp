@@ -114,59 +114,66 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 {
-	char *buf = new_strdup(button.AllowStr.c_str());
+	const std::string_view buf = button.AllowStr;
+	for (std::string_view::size_type pos = 0; pos != std::string_view::npos;) {
+		auto comma_pos = buf.find(",", pos);
+		const auto var = buf.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
+		comma_pos = buf.find(",", pos);
+		const auto type = buf.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
+		comma_pos = buf.find(",", pos);
+		const auto binop = buf.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
+		comma_pos = buf.find(",", pos);
+		const auto value = buf.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
 
-	for (const char *var = strtok(buf, ","); var; var = strtok(nullptr, ",")) {
-		const char *type = strtok(nullptr, ",");
-		const char *binop = strtok(nullptr, ",");
-		const char *value = strtok(nullptr, ",");
 		const int index = UnitTypeVar.VariableNameLookup[var];// User variables
 		if (index == -1) {
-			fprintf(stderr, "Bad variable name '%s'\n", var);
+			fprintf(stderr, "Bad variable name '%s'\n", var.data());
 			Exit(1);
 			return false;
 		}
 		int varValue;
-		if (!strcmp(type, "Value")) {
+		if (type == "Value") {
 			varValue = unit.Variable[index].Value;
-		} else if (!strcmp(type, "Max")) {
+		} else if (type == "Max") {
 			varValue = unit.Variable[index].Max;
-		} else if (!strcmp(type, "Increase")) {
+		} else if (type == "Increase") {
 			varValue = unit.Variable[index].Increase;
-		} else if (!strcmp(type, "Enable")) {
+		} else if (type == "Enable") {
 			varValue = unit.Variable[index].Enable;
-		} else if (!strcmp(type, "Percent")) {
+		} else if (type == "Percent") {
 			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
 		} else {
-			fprintf(stderr, "Bad variable type '%s'\n", type);
+			fprintf(stderr, "Bad variable type '%s'\n", type.data());
 			Exit(1);
 			return false;
 		}
 		const int cmpValue = to_number(value);
 		bool cmpResult = false;
-		if (!strcmp(binop, ">")) {
+		if (binop == ">") {
 			cmpResult = varValue > cmpValue;
-		} else if (!strcmp(binop, ">=")) {
+		} else if (binop == ">=") {
 			cmpResult = varValue >= cmpValue;
-		} else if (!strcmp(binop, "<")) {
+		} else if (binop == "<") {
 			cmpResult = varValue < cmpValue;
-		} else if (!strcmp(binop, "<=")) {
+		} else if (binop == "<=") {
 			cmpResult = varValue <= cmpValue;
-		} else if (!strcmp(binop, "==")) {
+		} else if (binop == "==") {
 			cmpResult = varValue == cmpValue;
-		} else if (!strcmp(binop, "!=")) {
+		} else if (binop == "!=") {
 			cmpResult = varValue != cmpValue;
 		} else {
-			fprintf(stderr, "Bad compare type '%s'\n", binop);
+			fprintf(stderr, "Bad compare type '%s'\n", binop.data());
 			Exit(1);
 			return false;
 		}
 		if (cmpResult == false) {
-			delete[] buf;
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 
