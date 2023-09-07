@@ -51,6 +51,8 @@
 #include "ui.h"
 #include "unit.h"
 
+#include <variant>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -65,13 +67,7 @@ static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
 
 /// Useful for getComponent.
-enum UStrIntType {
-	USTRINT_STR, USTRINT_INT
-};
-struct UStrInt {
-	union {const char *s; int i;};
-	UStrIntType type;
-};
+using UStrInt = std::variant<int, const char *>;
 
 /// Get component for unit variable.
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
@@ -1049,16 +1045,20 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_UnitStat : // property of unit.
 			unit = EvalUnit(number->D.UnitStat.Unit);
 			if (unit != nullptr) {
-				return GetComponent(*unit, number->D.UnitStat.Index,
-									number->D.UnitStat.Component, number->D.UnitStat.Loc).i;
+				return std::get<int>(GetComponent(*unit,
+				                                  number->D.UnitStat.Index,
+				                                  number->D.UnitStat.Component,
+				                                  number->D.UnitStat.Loc));
 			} else { // ERROR.
 				return 0;
 			}
 		case ENumber_TypeStat : // property of unit type.
 			type = number->D.TypeStat.Type;
 			if (type != nullptr) {
-				return GetComponent(**type, number->D.TypeStat.Index,
-									number->D.TypeStat.Component, number->D.TypeStat.Loc).i;
+				return std::get<int>(GetComponent(**type,
+				                        number->D.TypeStat.Index,
+				                        number->D.TypeStat.Component,
+				                        number->D.TypeStat.Loc));
 			} else { // ERROR.
 				return 0;
 			}
