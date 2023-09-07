@@ -658,8 +658,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
 			}
 		} else if (value == "Construction") {
-			// FIXME: What if constructions aren't yet loaded?
-			type->Construction = ConstructionByIdent(LuaToString(l, -1));
+			type->Construction = &ConstructionByIdent(LuaToString(l, -1));
 		} else if (value == "DrawLevel") {
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (value == "MaxOnBoard") {
