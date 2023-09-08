@@ -308,14 +308,14 @@ static int CclDefineModifier(lua_State *l)
 		} else if (key == "allow-unit") {
 			const std::string_view value = LuaToString(l, j + 1, 2);
 
-			if (value.substr(0, 5) == "unit-") {
+			if (starts_with(value, "unit-")) {
 				um->ChangeUnits[UnitTypeByIdent(value).Slot] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "unit expected");
 			}
 		} else if (key == "allow") {
 			const std::string_view value = LuaToString(l, j + 1, 2);
-			if (value.substr(0, 8) == "upgrade-") {
+			if (starts_with(value, "upgrade-")) {
 				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
 			} else {
 				LuaError(l, "upgrade expected");
@@ -369,7 +369,7 @@ static int CclDefineUnitAllow(lua_State *l)
 
 	const std::string_view ident = LuaToString(l, 0 + 1);
 
-	if (ident.substr(0, 5) != "unit-") {
+	if (!starts_with(ident, "unit-")) {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 		return 0;
 	}
@@ -411,7 +411,7 @@ static int CclDefineAllow(lua_State *l)
 			n = PlayerMax;
 		}
 
-		if (ident.substr(0, 5) == "unit-") {
+		if (starts_with(ident, "unit-")) {
 			int id = UnitTypeByIdent(ident).Slot;
 			for (int i = 0; i < n; ++i) {
 				if (ids[i] == 'A') {
@@ -420,7 +420,7 @@ static int CclDefineAllow(lua_State *l)
 					AllowUnitId(Players[i], id, 0);
 				}
 			}
-		} else if (ident.substr(0, 8) == "upgrade-") {
+		} else if (starts_with(ident, "upgrade-")) {
 			int id = UpgradeIdByIdent(ident);
 			for (int i = 0; i < n; ++i) {
 				AllowUpgradeId(Players[i], id, ids[i]);

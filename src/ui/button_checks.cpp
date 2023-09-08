@@ -362,7 +362,7 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	if (!CheckDependByIdent(*unit.Player, button.ValueStr)) {
 		return false;
 	}
-	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
+	if (starts_with(button.ValueStr, "upgrade-")
 		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A') {
 		return false;
 	}

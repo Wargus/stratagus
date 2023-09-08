@@ -1077,14 +1077,14 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (data == "Allow") {
 		LuaCheckArgs(l, 3);
 		const std::string_view ident = LuaToString(l, 3);
-		if (ident.substr(0, 5) == "unit-") {
+		if (starts_with(ident, "unit-")) {
 			int id = UnitTypeByIdent(ident).Slot;
 			if (UnitIdAllowed(Players[p->Index], id) > 0) {
 				lua_pushstring(l, "A");
 			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
 				lua_pushstring(l, "F");
 			}
-		} else if (ident.substr(0, 8) == "upgrade-") {
+		} else if (starts_with(ident, "upgrade-")) {
 			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
 				lua_pushstring(l, "A");
 			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'R') {
@@ -1203,7 +1203,7 @@ static int CclSetPlayerData(lua_State *l)
 		const std::string_view ident = LuaToString(l, 3);
 		const std::string_view acquire = LuaToString(l, 4);
 
-		if (ident.substr(0, 8) == "upgrade-") {
+		if (starts_with(ident, "upgrade-")) {
 			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
 				UpgradeAcquire(*p, CUpgrade::Get(ident));
 			} else if (acquire == "F" || acquire == "A") {

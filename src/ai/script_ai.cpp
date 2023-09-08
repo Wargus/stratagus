@@ -87,7 +87,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 		std::string_view unitName = list.substr(begin, end - begin);
 		begin = end + 1;
 		end = list.find(",", begin);
-		if (unitName.substr(0, 5) == "unit-") {
+		if (starts_with(unitName, "unit-")) {
 			res.push_back(&UnitTypeByIdent(unitName));
 		}
 	}

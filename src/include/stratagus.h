@@ -166,6 +166,11 @@ inline char *new_strdup(const char *str)
 	return newstr;
 }
 
+inline bool starts_with(std::string_view s, std::string_view prefix)
+{
+	return s.substr(0, prefix.size()) == prefix;
+}
+
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/
