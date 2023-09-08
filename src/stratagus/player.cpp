@@ -1210,7 +1210,7 @@ int CPlayer::HaveUnitTypeByType(const CUnitType &type) const
 **
 **  @note This function should not be used during run time.
 */
-int CPlayer::HaveUnitTypeByIdent(const std::string &ident) const
+int CPlayer::HaveUnitTypeByIdent(std::string_view ident) const
 {
 	return UnitTypesCount[UnitTypeByIdent(ident).Slot];
 }

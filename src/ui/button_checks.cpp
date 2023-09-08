@@ -188,15 +188,17 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::string_view s = button.AllowStr;
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (player->HaveUnitTypeByIdent(s)) {
-			delete[] buf;
+	for (std::string_view::size_type pos = 0; pos != std::string_view::npos;) {
+		const auto comma_pos = s.find(",", pos);
+		const auto ident = s.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
+
+		if (player->HaveUnitTypeByIdent(ident)) {
 			return true;
 		}
 	}
-	delete[] buf;
 	return false;
 }
 
@@ -211,15 +213,16 @@ bool ButtonCheckUnitsOr(const CUnit &unit, const ButtonAction &button)
 bool ButtonCheckUnitsAnd(const CUnit &unit, const ButtonAction &button)
 {
 	CPlayer *player = unit.Player;
-	char *buf = new_strdup(button.AllowStr.c_str());
+	std::string_view s = button.AllowStr;
 
-	for (const char *s = strtok(buf, ","); s; s = strtok(nullptr, ",")) {
-		if (!player->HaveUnitTypeByIdent(s)) {
-			delete[] buf;
+	for (std::string_view::size_type pos = 0; pos != std::string_view::npos;) {
+		const auto comma_pos = s.find(",", pos);
+		const auto ident = s.substr(pos, comma_pos - pos);
+		pos = comma_pos == std::string_view::npos ? comma_pos : comma_pos + 1;
+		if (!player->HaveUnitTypeByIdent(ident)) {
 			return false;
 		}
 	}
-	delete[] buf;
 	return true;
 }
 
