@@ -422,7 +422,7 @@ void InitVideoSdl()
 		if (strlen(rendererInfo.name) == 0) {
 			dummyRenderer = true;
 		}
-		if(!strncmp(rendererInfo.name, "opengl", 6)) {
+		if (starts_with(rendererInfo.name, "opengl")) {
 			LoadShaderExtensions();
 		}
 	}

@@ -49,10 +49,7 @@
 {
 	Assert(unit.Anim.Anim == this);
 
-	char arg1[128];
 	CUnit *goal = &unit;
-	strcpy(arg1, this->varStr.c_str());
-
 	if (this->unitSlotStr.empty() == false) {
 		switch (this->unitSlotStr[0]) {
 			case 'l': // last created unit
@@ -69,11 +66,11 @@
 	if (!goal) {
 		return;
 	}
-
-	char *next = strchr(arg1, '.');
-	if (next == nullptr) {
+	auto dot_pos = this->varStr.find('.');
+	auto arg1 = std::string_view{this->varStr.c_str(), dot_pos};
+	if (dot_pos == std::string_view::npos) {
 		// Special case for non-CVariable variables
-		if (!strcmp(arg1, "DamageType")) {
+		if (arg1 == "DamageType") {
 			int death = ExtraDeathIndex(this->valueStr);
 			if (death == ANIMATIONS_DEATHTYPES) {
 				fprintf(stderr, "Incorrect death type : %s \n" _C_ this->valueStr.c_str());
@@ -83,30 +80,29 @@
 			goal->Type->DamageType = this->valueStr;
 			return;
 		}
-		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1);
+		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1.data());
 		Exit(1);
 		return;
-	} else {
-		*next = '\0';
 	}
 	const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
 	if (index == -1) {
-		fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1);
+		fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1.data());
 		Exit(1);
 		return;
 	}
 
 	const int rop = ParseAnimInt(unit, this->valueStr);
+	auto next = std::string_view{this->varStr.c_str() + dot_pos + 1};
 	int value = 0;
-	if (!strcmp(next + 1, "Value")) {
+	if (next == "Value") {
 		value = goal->Variable[index].Value;
-	} else if (!strcmp(next + 1, "Max")) {
+	} else if (next == "Max") {
 		value = goal->Variable[index].Max;
-	} else if (!strcmp(next + 1, "Increase")) {
+	} else if (next == "Increase") {
 		value = goal->Variable[index].Increase;
-	} else if (!strcmp(next + 1, "Enable")) {
+	} else if (next == "Enable") {
 		value = goal->Variable[index].Enable;
-	} else if (!strcmp(next + 1, "Percent")) {
+	} else if (next == "Percent") {
 		value = goal->Variable[index].Value * 100 / goal->Variable[index].Max;
 	}
 	switch (this->mod) {
@@ -150,9 +146,9 @@
 		default:
 			value = rop;
 	}
-	if (!strcmp(next + 1, "Value")) {
+	if (next == "Value") {
 		goal->Variable[index].Value = value;
-	} else if (!strcmp(next + 1, "Max")) {
+	} else if (next == "Max") {
 		goal->Variable[index].Max = value;
 		// Special case: when adjusting the sight range, we need to update the visibility
 		if (index == SIGHTRANGE_INDEX) {
@@ -160,11 +156,11 @@
 			unit.CurrentSightRange = value;
 			MapMarkUnitSight(unit);
 		}
-	} else if (!strcmp(next + 1, "Increase")) {
+	} else if (next == "Increase") {
 		goal->Variable[index].Increase = value;
-	} else if (!strcmp(next + 1, "Enable")) {
+	} else if (next == "Enable") {
 		goal->Variable[index].Enable = value;
-	} else if (!strcmp(next + 1, "Percent")) {
+	} else if (next == "Percent") {
 		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
 	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);

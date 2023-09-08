@@ -2030,7 +2030,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	const bool rel = args > 1 ? lua_toboolean(l, 2) : false;
 
 	int pathtype = 0; // path relative to stratagus dir
-	if (userdir.substr(0, 1) == "~") {
+	if (starts_with(userdir, "~")) {
 		// path relative to user preferences directory
 		pathtype = 1;
 	}

@@ -913,7 +913,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonCmd::Research:
 		case ButtonCmd::Build:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
-			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
+			if (res && starts_with(buttonaction.ValueStr, "upgrade-")) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 			}
 			break;

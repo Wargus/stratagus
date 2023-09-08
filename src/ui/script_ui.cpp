@@ -1145,7 +1145,7 @@ static int CclDefineButton(lua_State *l)
 				umask += ",";
 			}
 			ba.UnitMask = umask;
-			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
+			if (starts_with(ba.UnitMask, ",*,")) {
 				ba.UnitMask = "*";
 			}
 		} else {

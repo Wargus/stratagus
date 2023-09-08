@@ -234,7 +234,7 @@ public:
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType &type) const;
 	/// Does the player have units of that type
-	int HaveUnitTypeByIdent(const std::string &ident) const;
+	int HaveUnitTypeByIdent(std::string_view ident) const;
 
 	/// Notify player about a problem
 	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this

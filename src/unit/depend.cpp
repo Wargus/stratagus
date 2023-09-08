@@ -72,11 +72,11 @@ static void AddDependency(std::string_view target, std::string_view required, in
 	DependRule rule;
 
 	//  Setup structure.
-	if (target.substr(0, 5) == "unit-") {
+	if (starts_with(target, "unit-")) {
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = &UnitTypeByIdent(target);
-	} else if (target.substr(0, 8) == "upgrade-") {
+	} else if (starts_with(target, "upgrade-")) {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
@@ -125,11 +125,11 @@ static void AddDependency(std::string_view target, std::string_view required, in
 	temp->Count = count;
 
 	//  Setup structure.
-	if (required.substr(0, 5) == "unit-") {
+	if (starts_with(required, "unit-")) {
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = &UnitTypeByIdent(required);
-	} else if (required.substr(0, 8) == "upgrade-") {
+	} else if (starts_with(required, "upgrade-")) {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
@@ -241,18 +241,18 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (!strncmp(button.ValueStr.c_str(), "unit-", 5)) {
+	if (starts_with(button.ValueStr, "unit-")) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = &UnitTypeByIdent(button.ValueStr);
 		rule.Type = DependRuleUnitType;
-	} else if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)) {
+	} else if (starts_with(button.ValueStr.c_str(), "upgrade-")) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(button.ValueStr);
 		rule.Type = DependRuleUpgrade;
-	} else if (!strncmp(button.ValueStr.c_str(), "spell-", 6)) {
+	} else if (starts_with(button.ValueStr, "spell-")) {
 		// Special case for spells
 		if (button.Allowed && IsButtonAllowed(*Selected[0], button) == false) {
-			if (!strncmp(button.AllowStr.c_str(), "upgrade-", 8)) {
+			if (starts_with(button.AllowStr, "upgrade-")) {
 				rules.insert(0, _("Requirements:\n"));
 				rules.append("-");
 				rules.append(AllUpgrades[UpgradeIdByIdent(button.AllowStr)]->Name);
@@ -330,14 +330,14 @@ bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 	//
 	//  first have to check, if target is allowed itself
 	//
-	if (target.substr(0, 5) == "unit-") {
+	if (starts_with(target, "unit-")) {
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = &UnitTypeByIdent(target);
 		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
 			return false;
 		}
 		rule.Type = DependRuleUnitType;
-	} else if (target.substr(0, 8) == "upgrade-") {
+	} else if (starts_with(target, "upgrade-")) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {

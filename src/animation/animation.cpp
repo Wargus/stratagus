@@ -686,9 +686,9 @@ static int CclDefineAnimations(lua_State *l)
 
 		if (value == "Start") {
 			anims->Start = ParseAnimation(l, -1);
-		} else if (value.substr(0, 5) == "Still") {
+		} else if (starts_with(value, "Still")) {
 			anims->Still = ParseAnimation(l, -1);
-		} else if (value.substr(0, 5) == "Death") {
+		} else if (starts_with(value, "Death")) {
 			anims->hasDeathAnimation = true;
 			if (value.size() > 5) {
 				const int death = ExtraDeathIndex(value.substr(6));
@@ -718,7 +718,7 @@ static int CclDefineAnimations(lua_State *l)
 			anims->Upgrade = ParseAnimation(l, -1);
 		} else if (value == "Build") {
 			anims->Build = ParseAnimation(l, -1);
-		} else if (value.substr(0, 8) == "Harvest_") {
+		} else if (starts_with(value, "Harvest_")) {
 			const int res = GetResourceIdByName(l, value.substr(8));
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else {

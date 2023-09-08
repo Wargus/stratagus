@@ -871,9 +871,9 @@ static void InputKey(int key)
 
 			// Check for Replay and ffw x
 #ifdef DEBUG
-			if (strncmp(Input, "ffw ", 4) == 0) {
+			if (starts_with(Input, "ffw ")) {
 #else
-			if (strncmp(Input, "ffw ", 4) == 0 && ReplayGameType != ReplayNone) {
+			if (starts_with(Input, "ffw ") && ReplayGameType != ReplayNone) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
