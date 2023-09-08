@@ -865,7 +865,7 @@ public:
 			int cost = 0;
 			int hp_damage_evaluate;
 			if (Damage) {
-				hp_damage_evaluate = CalculateDamage(*attacker, *dest, Damage);
+				hp_damage_evaluate = CalculateDamage(*attacker, *dest, Damage.get());
 			} else {
 				hp_damage_evaluate = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;

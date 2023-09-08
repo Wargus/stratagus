@@ -392,7 +392,7 @@ public:
 	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
 	int SmokePrecision;        /// How frequently the smoke missile will generate itself
 	int MissileStopFlags;      /// On which terrain types missile won't fly
-	NumberDesc *Damage;        /// missile damage (used for non-direct missiles, e.g. impacts)
+	std::unique_ptr<INumberDesc> Damage;    /// missile damage (used for non-direct missiles, e.g. impacts)
 
 	int Range;                             /// missile damage range
 	int SplashFactor;                      /// missile splash divisor
@@ -602,7 +602,7 @@ extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, 
 extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 /// Calculates damage done to goal by attacker using formula
-extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula);
+extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const INumberDesc *formula);
 /// fire a missile
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 

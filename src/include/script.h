@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <memory>
 #include <string>
 #ifdef __cplusplus
 extern "C" {
@@ -106,59 +107,19 @@ inline size_t lua_rawlen(lua_State *l, int index)
 #endif
 
 /// All possible value for a number.
-enum ENumber {
-	ENumber_Lua,         /// a lua function.
-	ENumber_Dir,         /// directly a number.
-	ENumber_Add,         /// a + b.
-	ENumber_Sub,         /// a - b.
-	ENumber_Mul,         /// a * b.
-	ENumber_Div,         /// a / b.
-	ENumber_Min,         /// Min(a, b).
-	ENumber_Max,         /// Max(a, b).
-	ENumber_Rand,        /// Rand(a) : number in [0..a-1].
-
-	ENumber_Gt,          /// a  > b.
-	ENumber_GtEq,        /// a >= b.
-	ENumber_Lt,          /// a  < b.
-	ENumber_LtEq,        /// a <= b.
-	ENumber_Eq,          /// a == b.
-	ENumber_NEq,         /// a <> b.
-
-	ENumber_VideoTextLength, /// VideoTextLength(font, string).
-	ENumber_StringFind,      /// strchr(string, char) - s.
-
-	ENumber_UnitStat,    /// Property of Unit.
-	ENumber_TypeStat,    /// Property of UnitType.
-
-	ENumber_NumIf,       /// If cond then Number1 else Number2.
-
-	ENumber_PlayerData   /// Numeric Player Data
-};
-
-/// All possible value for a unit.
-enum EUnit {
-	EUnit_Ref           /// Unit direct reference.
-	// FIXME: add others.
-};
-
-/// All possible value for a string.
-enum EString {
-	EString_Lua,          /// a lua function.
-	EString_Dir,          /// directly a string.
-	EString_Concat,       /// a + b [+ c ...].
-	EString_String,       /// Convert number in string.
-	EString_InverseVideo, /// Inverse video for the string ("a" -> "~<a~>").
-	EString_If,           /// If cond then String1 else String2.
-	EString_UnitName,     /// UnitType Name.
-	EString_SubString,    /// SubString.
-	EString_Line,         /// line n of the string.
-	EString_PlayerName    /// player name.
-	// add more...
-};
-
-/// All possible value for a game info string.
-enum ES_GameInfo {
-	ES_GameInfo_Objectives       /// All Objectives of the game.
+enum class EBinOp {
+	Add,         /// a + b.
+	Sub,         /// a - b.
+	Mul,         /// a * b.
+	Div,         /// a / b.
+	Min,         /// Min(a, b).
+	Max,         /// Max(a, b).
+	Gt,          /// a  > b.
+	GtEq,        /// a >= b.
+	Lt,          /// a  < b.
+	LtEq,        /// a <= b.
+	Eq,          /// a == b.
+	NEq,         /// a <> b.
 };
 
 /**
@@ -189,113 +150,332 @@ enum EnumUnit {
 **  Use to describe complex number in script to use when game running.
 ** [Deprecated]: give access to lua.
 */
-struct NumberDesc;
+struct INumberDesc
+{
+	virtual ~INumberDesc() = default;
+	virtual int eval() const = 0;
+};
 
 /**
 ** Unit description
 **  Use to describe complex unit in script to use when game running.
 */
-struct UnitDesc;
+struct IUnitDesc
+{
+	virtual ~IUnitDesc() = default;
+	virtual CUnit* eval() const = 0;
+};
 
 /**
 ** String description
 **  Use to describe complex string in script to use when game running.
 */
-struct StringDesc;
-
-/// for Bin operand  a ?? b
-struct BinOp {
-	NumberDesc *Left;           /// Left operand.
-	NumberDesc *Right;          /// Right operand.
+struct IStringDesc
+{
+	virtual ~IStringDesc() = default;
+	virtual std::string eval() const = 0;
 };
 
-/**
-**  Number description.
-*/
-struct NumberDesc {
-	ENumber e;       /// which number.
-	union {
-		unsigned int Index; /// index of the lua function.
-		int Val;       /// Direct value.
-		NumberDesc *N; /// Other number.
-		BinOp binOp;   /// For binary operand.
-		struct {
-			UnitDesc *Unit;            /// Which unit.
-			int Index;                 /// Which index variable.
-			EnumVariable Component;    /// Which component.
-			int Loc;                   /// Location of Variables[].
-		} UnitStat;
-		struct {
-			CUnitType **Type;           /// Which unit type.
-			int Index;                 /// Which index variable.
-			EnumVariable Component;    /// Which component.
-			int Loc;                   /// Location of Variables[].
-		} TypeStat;
-		struct {
-			StringDesc *String; /// String.
-			CFont *Font;        /// Font.
-		} VideoTextLength;
-		struct {
-			StringDesc *String; /// String.
-			char C;             /// Char.
-		} StringFind;
-		struct {
-			NumberDesc *Cond;   /// Branch condition.
-			NumberDesc *BTrue;  /// Number if Cond is true.
-			NumberDesc *BFalse; /// Number if Cond is false.
-		} NumIf; /// conditional string.
-		struct {
-			NumberDesc *Player;   /// Number of player
-			StringDesc *DataType; /// Player's data
-			StringDesc *ResType;  /// Resource type
-		} PlayerData; /// conditional string.
-	} D;
+class NumberDescLuaFunction : public INumberDesc
+{
+public:
+	explicit NumberDescLuaFunction(int index) : index(index) {}
+	int eval() const override;
+
+private:
+	int index;
+};
+
+class NumberDescInt : public INumberDesc
+{
+public:
+	explicit NumberDescInt(int n) : n(n) {}
+	int eval() const override;
+
+private:
+	int n;
+};
+
+/// for Bin operand  a ?? b
+class NumberDescBinOp : public INumberDesc
+{
+public:
+	NumberDescBinOp(EBinOp type,
+	                std::unique_ptr<INumberDesc> left,
+	                std::unique_ptr<INumberDesc> right) :
+		type(type),
+		left(std::move(left)),
+		right(std::move(right))
+	{}
+	int eval() const override;
+
+private:
+	EBinOp type;
+	std::unique_ptr<INumberDesc> left;
+	std::unique_ptr<INumberDesc> right;
+};
+
+class NumberDescRand : public INumberDesc
+{
+public:
+	explicit NumberDescRand(std::unique_ptr<INumberDesc> n) : n(std::move(n)) {}
+	int eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> n;
+};
+
+
+class NumberDescUnitStat : public INumberDesc
+{
+public:
+	NumberDescUnitStat(std::unique_ptr<IUnitDesc> unitDesc,
+	                   int varIndex,
+	                   EnumVariable component,
+	                   int loc) :
+		unitDesc(std::move(unitDesc)),
+		varIndex(varIndex),
+		component(component),
+		loc(loc)
+	{}
+	int eval() const override;
+
+private:
+	std::unique_ptr<IUnitDesc> unitDesc; /// Which unit.
+	int varIndex;                 /// Which index variable.
+	EnumVariable component;    /// Which component.
+	int loc;                   /// Location of Variables[].
+};
+
+class NumberDescTypeStat : public INumberDesc
+{
+public:
+	NumberDescTypeStat(CUnitType **type,
+	                   int varIndex,
+	                   EnumVariable component,
+	                   int loc) :
+		type(type),
+		varIndex(varIndex),
+		component(component),
+		loc(loc)
+	{}
+	int eval() const override;
+
+private:
+	CUnitType **type; /// Which unitType.
+	int varIndex;                 /// Which index variable.
+	EnumVariable component;    /// Which component.
+	int loc;                   /// Location of Variables[].
+};
+
+class NumberDescVideoTextLength : public INumberDesc
+{
+public:
+	NumberDescVideoTextLength(std::unique_ptr<IStringDesc> string, CFont *font) :
+		string(std::move(string)),
+		font(font)
+	{}
+	int eval() const override;
+
+private:
+	std::unique_ptr<IStringDesc> string;
+	CFont *font;
+};
+
+class NumberDescStringFind : public INumberDesc
+{
+public:
+	NumberDescStringFind(std::unique_ptr<IStringDesc> string, char c) :
+		string(std::move(string)),
+		c(c)
+	{}
+	int eval() const override;
+
+private:
+	std::unique_ptr<IStringDesc> string;
+	char c;
+};
+
+class NumberDescIf : public INumberDesc
+{
+public:
+	NumberDescIf(std::unique_ptr<INumberDesc> cond,
+	             std::unique_ptr<INumberDesc> trueValue,
+	             std::unique_ptr<INumberDesc> falseValue) :
+		cond(std::move(cond)),
+		trueValue(std::move(trueValue)),
+		falseValue(std::move(falseValue))
+	{}
+	int eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> cond;   /// Branch condition.
+	std::unique_ptr<INumberDesc> trueValue;  /// Number if Cond is true.
+	std::unique_ptr<INumberDesc> falseValue; /// Number if Cond is false.
+};
+
+class NumberDescPlayerData : public INumberDesc
+{
+public:
+	NumberDescPlayerData(std::unique_ptr<INumberDesc> playerIndex,
+	                     std::unique_ptr<IStringDesc> dataType,
+	                     std::unique_ptr<IStringDesc> resType) :
+		playerIndex(std::move(playerIndex)),
+		dataType(std::move(dataType)),
+		resType(std::move(resType))
+	{}
+	int eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> playerIndex;   /// Number of player
+	std::unique_ptr<IStringDesc> dataType; /// Player's data
+	std::unique_ptr<IStringDesc> resType;  /// Resource type
 };
 
 /**
 **  Unit description.
 */
-struct UnitDesc {
-	EUnit e;       /// which unit;
-	union {
-		CUnit **AUnit; /// Address of the unit.
-	} D;
+class UnitDescRef : public IUnitDesc {
+public:
+	explicit UnitDescRef(CUnit **AUnit) : AUnit(AUnit) {}
+
+	CUnit *eval() const override { return *AUnit; }
+
+private:
+	CUnit **AUnit; /// Address of the unit.
 };
 
-/**
-**  String description.
-*/
-struct StringDesc {
-	EString e;       /// which number.
-	union {
-		unsigned int Index; /// index of the lua function.
-		char *Val;       /// Direct value.
-		struct {
-			StringDesc **Strings;  /// Array of operands.
-			int n;                 /// number of operand to concat
-		} Concat; /// for Concat two string.
-		NumberDesc *Number;  /// Number.
-		StringDesc *String;  /// String.
-		UnitDesc *Unit;      /// Unit desciption.
-		struct {
-			NumberDesc *Cond;  /// Branch condition.
-			StringDesc *BTrue;  /// String if Cond is true.
-			StringDesc *BFalse; /// String if Cond is false.
-		} If; /// conditional string.
-		struct {
-			StringDesc *String;  /// Original string.
-			NumberDesc *Begin;   /// Begin of result string.
-			NumberDesc *End;     /// End of result string.
-		} SubString; /// For extract a substring
-		struct {
-			StringDesc *String;  /// Original string.
-			NumberDesc *Line;    /// Line number.
-			NumberDesc *MaxLen;  /// Max length of line.
-			CFont *Font;         /// Font to consider (else (-1) consider just char).
-		} Line; /// For specific line.
-		ES_GameInfo GameInfoType;
-		NumberDesc *PlayerName;  /// Player name.
-	} D;
+class StringDescLuaFunction : public IStringDesc
+{
+public:
+	explicit StringDescLuaFunction(int index) : index(index) {}
+
+	std::string eval() const override;
+
+private:
+	int index; /// index of the lua function.
+};
+
+class StringDescString : public IStringDesc
+{
+public:
+	explicit StringDescString(std::string s) : s(std::move(s)) {}
+	std::string eval() const override;
+
+private:
+	std::string s;
+};
+
+class StringDescInverseVideo : public IStringDesc
+{
+public:
+	explicit StringDescInverseVideo(std::unique_ptr<IStringDesc> string) : string(std::move(string))
+	{}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<IStringDesc> string;
+};
+
+class StringDescConcat : public IStringDesc
+{
+public:
+	explicit StringDescConcat(std::vector<std::unique_ptr<IStringDesc>> strings) :
+		strings(std::move(strings))
+	{}
+	std::string eval() const override;
+
+private:
+	std::vector<std::unique_ptr<IStringDesc>> strings;
+};
+
+class StringDescNumber : public IStringDesc
+{
+public:
+	explicit StringDescNumber(std::unique_ptr<INumberDesc> number) : number(std::move(number)) {}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> number;
+};
+
+class StringDescUnit : public IStringDesc
+{
+public:
+	explicit StringDescUnit(std::unique_ptr<IUnitDesc> unitDesc) : unitDesc(std::move(unitDesc)) {}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<IUnitDesc> unitDesc;
+};
+
+class StringDescIf : public IStringDesc
+{
+public:
+	StringDescIf(std::unique_ptr<INumberDesc> cond,
+	             std::unique_ptr<IStringDesc> trueValue,
+	             std::unique_ptr<IStringDesc> falseValue) :
+		cond(std::move(cond)),
+		trueValue(std::move(trueValue)),
+		falseValue(std::move(falseValue))
+	{}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> cond; /// Branch condition.
+	std::unique_ptr<IStringDesc> trueValue; /// String if Cond is true.
+	std::unique_ptr<IStringDesc> falseValue; /// String if Cond is false.
+};
+
+class StringDescSubString : public IStringDesc
+{
+public:
+	StringDescSubString(std::unique_ptr<IStringDesc> string,
+	                    std::unique_ptr<INumberDesc> begin,
+	                    std::unique_ptr<INumberDesc> end) :
+		string(std::move(string)),
+		begin(std::move(begin)),
+		end(std::move(end))
+	{}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<IStringDesc> string; /// Original string.
+	std::unique_ptr<INumberDesc> begin; /// Begin of result string.
+	std::unique_ptr<INumberDesc> end; /// End of result string.
+};
+
+class StringDescLine : public IStringDesc
+{
+public:
+	StringDescLine(std::unique_ptr<IStringDesc> string,
+	               std::unique_ptr<INumberDesc> line,
+	               std::unique_ptr<INumberDesc> maxLen,
+	               CFont *font) :
+		string(std::move(string)),
+		line(std::move(line)),
+		maxLen(std::move(maxLen)),
+		font(font)
+	{}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<IStringDesc> string; /// Original string.
+	std::unique_ptr<INumberDesc> line; /// Line number.
+	std::unique_ptr<INumberDesc> maxLen; /// Max length of line.
+	CFont *font;         /// Font to consider (else (-1) consider just char).
+};
+
+class StringDescPlayerName : public IStringDesc
+{
+public:
+	explicit StringDescPlayerName(std::unique_ptr<INumberDesc> playerIndex) :
+		playerIndex(std::move(playerIndex))
+	{}
+	std::string eval() const override;
+
+private:
+	std::unique_ptr<INumberDesc> playerIndex;
 };
 
 /*----------------------------------------------------------------------------
@@ -348,22 +528,18 @@ static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 	*y = LuaToNumber(l, offset, 2);
 }
 
-extern NumberDesc *Damage;  /// Damage calculation for missile.
+extern std::unique_ptr<INumberDesc> Damage;  /// Damage calculation for missile.
 
 /// transform string in corresponding index.
 extern EnumVariable Str2EnumVariable(lua_State *l, std::string_view s);
-extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
-extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
+extern std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l); /// Parse a number description.
+extern std::unique_ptr<IUnitDesc> CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
-StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
+std::unique_ptr<IStringDesc> CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
-extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.
-extern CUnit *EvalUnit(const UnitDesc *unitdesc);    /// Evaluate the unit.
-std::string EvalString(const StringDesc *s);         /// Evaluate the string.
-
-void FreeNumberDesc(NumberDesc *number);  /// Free number description content. (no pointer itself).
-void FreeUnitDesc(UnitDesc *unitdesc);    /// Free unit description content. (no pointer itself).
-void FreeStringDesc(StringDesc *s);       /// Frre string description content. (no pointer itself).
+extern int EvalNumber(const INumberDesc &numberdesc); /// Evaluate the number.
+extern CUnit *EvalUnit(const IUnitDesc &unitdesc);    /// Evaluate the unit.
+std::string EvalString(const IStringDesc &s);         /// Evaluate the string.
 
 //@}
 

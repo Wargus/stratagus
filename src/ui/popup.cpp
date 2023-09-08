@@ -375,7 +375,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	TriggerData.Type = UnitTypes[button.Value];
-	std::string text = EvalString(this->Text);
+	std::string text = EvalString(*this->Text);
 	TriggerData.Type = nullptr;
 	return font.getWidth(text);
 }
@@ -397,7 +397,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	if (this->Text) {
 		TriggerData.Type = UnitTypes[button.Value];
-		text = EvalString(this->Text);
+		text = EvalString(*this->Text);
 		TriggerData.Type = nullptr;
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);

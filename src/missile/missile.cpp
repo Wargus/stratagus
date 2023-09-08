@@ -72,7 +72,7 @@ static MissileTypeMap MissileTypes;
 
 std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
 
-extern NumberDesc *Damage;                   /// Damage calculation for missile.
+extern std::unique_ptr<INumberDesc> Damage;                   /// Damage calculation for missile.
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -324,7 +324,7 @@ static int CalculateDamageStats(const CUnitStats &attacker_stats,
 **
 **  @return          damage produces on goal.
 */
-int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
+int CalculateDamage(const CUnit &attacker, const CUnit &goal, const INumberDesc *formula)
 {
 	if (!formula) { // Use old method.
 		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
@@ -336,7 +336,7 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 	UpdateUnitVariables(const_cast<CUnit &>(goal));
 	TriggerData.Attacker = const_cast<CUnit *>(&attacker);
 	TriggerData.Defender = const_cast<CUnit *>(&goal);
-	const int res = EvalNumber(formula);
+	const int res = EvalNumber(*formula);
 	TriggerData.Attacker = nullptr;
 	TriggerData.Defender = nullptr;
 	return res;
@@ -392,7 +392,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
-		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
+		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage.get()));
 		return;
 	}
 
@@ -839,12 +839,12 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 
 		if (missile.Type->Damage) {   // custom formula
 			Assert(missile.SourceUnit != nullptr);
-			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage.get()) / splash;
 		} else if (missile.Damage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
 		} else {
 			Assert(missile.SourceUnit != nullptr);
-			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, Damage.get()) / splash;
 		}
 		if (missile.Type->Pierce) {  // Handle pierce factor
 			for (size_t i = 0; i < (missile.PiercedUnits.size() - 1); ++i) {
@@ -1328,7 +1328,7 @@ MissileType::MissileType(const std::string &ident) :
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	MissileStopFlags(0), Damage(nullptr), Range(0), SplashFactor(0),
+	MissileStopFlags(0), Range(0), SplashFactor(0),
 	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
 	G(nullptr)
 {
@@ -1346,7 +1346,6 @@ MissileType::~MissileType()
 	delete ImpactParticle;
 	delete SmokeParticle;
 	delete OnImpact;
-	FreeNumberDesc(this->Damage);
 }
 
 /**
