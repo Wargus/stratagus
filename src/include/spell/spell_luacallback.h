@@ -38,18 +38,17 @@
 #include "luacallback.h"
 #include "spells.h"
 
+#include <memory>
 
 class Spell_LuaCallback : public SpellActionType
 {
 public:
-	Spell_LuaCallback() : Func(nullptr) {};
-	~Spell_LuaCallback() { delete Func; };
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	Spell_LuaCallback() = default;
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	LuaCallback *Func;
+	std::unique_ptr<LuaCallback> Func;
 };
 
 //@}

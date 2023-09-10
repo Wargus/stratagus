@@ -55,33 +55,30 @@ enum LocBaseType {
 class SpellActionMissileLocation
 {
 public:
-	SpellActionMissileLocation(LocBaseType base) : Base(base), AddX(0), AddY(0),
-		AddRandX(0), AddRandY(0) {} ;
+	explicit SpellActionMissileLocation(LocBaseType base) : Base(base) {}
 
 	LocBaseType Base;   /// The base for the location (caster/target)
-	int AddX;           /// Add to the X coordinate
-	int AddY;           /// Add to the X coordinate
-	int AddRandX;       /// Random add to the X coordinate
-	int AddRandY;       /// Random add to the X coordinate
+	int AddX = 0;       /// Add to the X coordinate
+	int AddY = 0;       /// Add to the X coordinate
+	int AddRandX = 0;   /// Random add to the X coordinate
+	int AddRandY = 0;   /// Random add to the X coordinate
 };
 
 class Spell_SpawnMissile : public SpellActionType
 {
 public:
-	Spell_SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
-		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *lua, int startIndex, int endIndex);
+	Spell_SpawnMissile() = default;
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *lua, int startIndex, int endIndex) override;
 
 private:
-	int Damage;                             /// Missile damage.
-	int TTL;                                /// Missile TTL.
-	int Delay;                              /// Missile original delay.
-	bool UseUnitVar;                        /// Use the caster's damage parameters
-	SpellActionMissileLocation StartPoint;  /// Start point description.
-	SpellActionMissileLocation EndPoint;    /// Start point description.
-	MissileType *Missile;                   /// Missile fired on cast
+	int Damage = 0;                 /// Missile damage.
+	int TTL = -1;                   /// Missile TTL.
+	int Delay = 0;                  /// Missile original delay.
+	bool UseUnitVar = false;        /// Use the caster's damage parameters
+	SpellActionMissileLocation StartPoint{LocBaseCaster}; /// Start point description.
+	SpellActionMissileLocation EndPoint{LocBaseTarget};   /// Start point description.
+	MissileType *Missile = nullptr; /// Missile fired on cast
 };
 
 

@@ -41,14 +41,13 @@
 class Spell_Demolish : public SpellActionType
 {
 public:
-	Spell_Demolish() : Damage(0), Range(0) {};
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	Spell_Demolish() = default;
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	int Damage; /// Damage for every unit in range.
-	int Range;  /// Range of the explosion.
+	int Damage = 0; /// Damage for every unit in range.
+	int Range = 0;  /// Range of the explosion.
 };
 
 

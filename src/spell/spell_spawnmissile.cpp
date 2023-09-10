@@ -100,7 +100,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 	}
 }
 
-/* virtual */ void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		std::string_view value = LuaToString(l, -1, j + 1);
@@ -142,28 +142,33 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 ** @param caster       Unit that casts the spell
 ** @param target       Target unit that spell is addressed to
 ** @param goalPos      TilePos of target spot when/if target does not exist
-** @param res          pointer to PixelPos of the result
+** @return missilie location
 */
-static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
-									CUnit &caster, CUnit *target, const Vec2i &goalPos, PixelPos *res)
+static PixelPos EvaluateMissileLocation(const SpellActionMissileLocation &location,
+                                        CUnit &caster,
+                                        CUnit *target,
+                                        const Vec2i &goalPos)
 {
+	PixelPos res;
+
 	if (location.Base == LocBaseCaster) {
-		*res = caster.GetMapPixelPosCenter();
+		res = caster.GetMapPixelPosCenter();
 	} else {
 		if (target) {
-			*res = target->GetMapPixelPosCenter();
+			res = target->GetMapPixelPosCenter();
 		} else {
-			*res = Map.TilePosToMapPixelPos_Center(goalPos);
+			res = Map.TilePosToMapPixelPos_Center(goalPos);
 		}
 	}
-	res->x += location.AddX;
+	res.x += location.AddX;
 	if (location.AddRandX) {
-		res->x += SyncRand() % location.AddRandX;
+		res.x += SyncRand() % location.AddRandX;
 	}
-	res->y += location.AddY;
+	res.y += location.AddY;
 	if (location.AddRandY) {
-		res->y += SyncRand() % location.AddRandY;
+		res.y += SyncRand() % location.AddRandY;
 	}
+	return res;
 }
 
 /**
@@ -176,11 +181,11 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *&target, const Vec2i &goalPos)
+int Spell_SpawnMissile::Cast(CUnit &caster,
+                             const SpellType &,
+                             CUnit *&target,
+                             const Vec2i &goalPos) /* override */
 {
-	PixelPos startPos;
-	PixelPos endPos;
-
 	/*
 		hardcoded, will be done with Lua when it's possible
 	*/
@@ -201,8 +206,8 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
 				CUnit &unit = **it;
 				if (unit.IsAliveOnMap()) {
-					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos, &startPos);
-					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos, &endPos);
+					const PixelPos startPos = EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos);
+					const PixelPos endPos = EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos);
 					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 					missile->TTL = this->TTL;
 					missile->Delay = this->Delay;
@@ -221,9 +226,9 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		}
 		return 0;
 	} else {
-		EvaluateMissileLocation(this->StartPoint, caster, target, goalPos, &startPos);
-		EvaluateMissileLocation(this->EndPoint, caster, target, goalPos, &endPos);
-
+		const PixelPos startPos =
+			EvaluateMissileLocation(this->StartPoint, caster, target, goalPos);
+		const PixelPos endPos = EvaluateMissileLocation(this->EndPoint, caster, target, goalPos);
 		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;

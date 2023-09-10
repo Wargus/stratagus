@@ -41,17 +41,16 @@
 class Spell_AreaAdjustVital : public SpellActionType
 {
 public:
-	Spell_AreaAdjustVital() : HP(0), Mana(0), Shield(0), Range(1), UseMana(false) {};
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	Spell_AreaAdjustVital() = default;
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	int HP;         /// Target HP gain.(can be negative)
-	int Mana;       /// Target Mana gain.(can be negative)
-	int Shield;     /// Target SP gain.(can be negative)
-	int Range;      /// Range of spell
-	bool UseMana;   /// If true, use mana for spell cast
+	int HP = 0;           /// Target HP gain.(can be negative)
+	int Mana = 0;         /// Target Mana gain.(can be negative)
+	int Shield = 0;       /// Target SP gain.(can be negative)
+	int Range = 1;        /// Range of spell
+	bool UseMana = false; /// If true, use mana for spell cast
 };
 
 //@}

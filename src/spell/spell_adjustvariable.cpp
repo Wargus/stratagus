@@ -38,14 +38,14 @@
 #include "unit.h"
 
 
-/* virtual */ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "Table expected for adjust-variable.");
 	}
-	this->Var = new SpellActionTypeAdjustVariable[UnitTypeVar.GetNumberVariable()];
+	this->Var.resize(UnitTypeVar.GetNumberVariable());
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view name = LuaToString(l, -2);
 		int i = UnitTypeVar.VariableNameLookup[name];
@@ -116,7 +116,10 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVariable::Cast(CUnit &caster, const SpellType &, CUnit *&target, const Vec2i &/*goalPos*/)
+int Spell_AdjustVariable::Cast(CUnit &caster,
+                               const SpellType &,
+                               CUnit *&target,
+                               const Vec2i & /*goalPos*/) /* override */
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		CUnit *unit = (this->Var[i].TargetIsCaster) ? &caster : target;

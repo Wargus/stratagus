@@ -64,7 +64,7 @@
 **
 **  @param l  Lua state.
 */
-static SpellActionType *CclSpellAction(lua_State *l)
+static std::unique_ptr<SpellActionType> CclSpellAction(lua_State *l)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "expected a table of tables as spell action");
@@ -73,31 +73,31 @@ static SpellActionType *CclSpellAction(lua_State *l)
 
 	const std::string_view value = LuaToString(l, -1, 1);
 
-	SpellActionType *spellaction = nullptr;
+	std::unique_ptr<SpellActionType> spellaction;
 	if (value == "adjust-variable") {
-		spellaction = new Spell_AdjustVariable;
+		spellaction = std::make_unique<Spell_AdjustVariable>();
 	} else if (value == "adjust-vitals") {
-		spellaction = new Spell_AdjustVital;
+		spellaction = std::make_unique<Spell_AdjustVital>();
 	} else if (value == "area-adjust-vitals") {
-		spellaction = new Spell_AreaAdjustVital;
+		spellaction = std::make_unique<Spell_AreaAdjustVital>();
 	} else if (value == "area-bombardment") {
-		spellaction = new Spell_AreaBombardment;
+		spellaction = std::make_unique<Spell_AreaBombardment>();
 	} else if (value == "capture") {
-		spellaction = new Spell_Capture;
+		spellaction = std::make_unique<Spell_Capture>();
 	} else if (value == "demolish") {
-		spellaction = new Spell_Demolish;
+		spellaction = std::make_unique<Spell_Demolish>();
 	} else if (value == "lua-callback") {
-		spellaction = new Spell_LuaCallback;
+		spellaction = std::make_unique<Spell_LuaCallback>();
 	} else if (value == "polymorph") {
-		spellaction = new Spell_Polymorph;
+		spellaction = std::make_unique<Spell_Polymorph>();
 	} else if (value == "spawn-missile") {
-		spellaction = new Spell_SpawnMissile;
+		spellaction = std::make_unique<Spell_SpawnMissile>();
 	} else if (value == "spawn-portal") {
-		spellaction = new Spell_SpawnPortal;
+		spellaction = std::make_unique<Spell_SpawnPortal>();
 	} else if (value == "summon") {
-		spellaction = new Spell_Summon;
+		spellaction = std::make_unique<Spell_Summon>();
 	} else if (value == "teleport") {
-		spellaction = new Spell_Teleport;
+		spellaction = std::make_unique<Spell_Teleport>();
 	} else {
 		LuaError(l, "Unsupported action type: %s" _C_ value.data());
 	}
@@ -154,20 +154,20 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	// Flags are defaulted to 0(CONDITION_TRUE)
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 
-	condition->BoolFlag = new char[new_bool_size];
-	memset(condition->BoolFlag, 0, new_bool_size * sizeof(char));
+	condition->BoolFlag.resize(new_bool_size);
+	std::fill(std::begin(condition->BoolFlag), std::end(condition->BoolFlag), 0);
 
-	condition->Variable = new ConditionInfoVariable[UnitTypeVar.GetNumberVariable()];
+	condition->Variable.resize(UnitTypeVar.GetNumberVariable());
 	// Initialize min/max stuff to values with no effect.
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
-		condition->Variable[i].Check = false;
-		condition->Variable[i].ExactValue = -1;
-		condition->Variable[i].ExceptValue = -1;
-		condition->Variable[i].MinValue = -1;
-		condition->Variable[i].MaxValue = -1;
-		condition->Variable[i].MinMax = -1;
-		condition->Variable[i].MinValuePercent = -8;
-		condition->Variable[i].MaxValuePercent = 1024;
+	for (auto &var : condition->Variable) {
+		var.Check = false;
+		var.ExactValue = -1;
+		var.ExceptValue = -1;
+		var.MinValue = -1;
+		var.MaxValue = -1;
+		var.MinMax = -1;
+		var.MinValuePercent = -8;
+		var.MaxValuePercent = 1024;
 	}
 	//  Now parse the list and set values.
 	if (!lua_istable(l, -1)) {
@@ -185,7 +185,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (value == "callback") {
 			lua_rawgeti(l, -1, j + 1);
-			condition->CheckFunc = new LuaCallback(l, -1);
+			condition->CheckFunc = std::make_unique<LuaCallback>(l, -1);
 			lua_pop(l, 1);
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];
@@ -255,7 +255,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->MinRange = LuaToNumber(l, -1, j + 1);
 		} else if (value == "position-autocast") {
 			lua_rawgeti(l, -1, j + 1);
-			autocast->PositionAutoCast = new LuaCallback(l, -1);
+			autocast->PositionAutoCast = std::make_unique<LuaCallback>(l, -1);
 			lua_pop(l, 1);
 		} else if (value == "combat") {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));
@@ -286,10 +286,10 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			lua_pop(l, 1);
 		} else if (value == "condition") {
 			if (!autocast->Condition) {
-				autocast->Condition = new ConditionInfo;
+				autocast->Condition = std::make_unique<ConditionInfo>();
 			}
 			lua_rawgeti(l, -1, j + 1);
-			CclSpellCondition(l, autocast->Condition);
+			CclSpellCondition(l, autocast->Condition.get());
 			lua_pop(l, 1);
 		} else {
 			LuaError(l, "Unsupported autocast tag: %s" _C_ value.data());
@@ -394,24 +394,24 @@ static int CclDefineSpell(lua_State *l)
 			}
 		} else if (value == "condition") {
 			if (!spell->Condition) {
-				spell->Condition = new ConditionInfo;
+				spell->Condition = std::make_unique<ConditionInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellCondition(l, spell->Condition);
+			CclSpellCondition(l, spell->Condition.get());
 			lua_pop(l, 1);
 		} else if (value == "autocast") {
 			if (!spell->AutoCast) {
-				spell->AutoCast = new AutoCastInfo();
+				spell->AutoCast = std::make_unique<AutoCastInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellAutocast(l, spell->AutoCast);
+			CclSpellAutocast(l, spell->AutoCast.get());
 			lua_pop(l, 1);
 		} else if (value == "ai-cast") {
 			if (!spell->AICast) {
-				spell->AICast = new AutoCastInfo();
+				spell->AICast = std::make_unique<AutoCastInfo>();
 			}
 			lua_pushvalue(l, i + 1);
-			CclSpellAutocast(l, spell->AICast);
+			CclSpellAutocast(l, spell->AICast.get());
 			lua_pop(l, 1);
 		} else if (value == "sound-when-cast") {
 			//  Free the old name, get the new one

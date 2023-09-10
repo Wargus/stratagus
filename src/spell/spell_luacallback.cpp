@@ -37,13 +37,12 @@
 #include "unit.h"
 
 
-/* virtual */ void Spell_LuaCallback::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_LuaCallback::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
-	this->Func = new LuaCallback(l, -1);
+	this->Func = std::make_unique<LuaCallback>(l, -1);
 	lua_pop(l, 1); // pop table
-
 }
 
 /**
@@ -56,7 +55,10 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_LuaCallback::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
+int Spell_LuaCallback::Cast(CUnit &caster,
+                            const SpellType &spell,
+                            CUnit *&target,
+                            const Vec2i &goalPos) /* override */
 {
 	if (this->Func) {
 		this->Func->pushPreamble();

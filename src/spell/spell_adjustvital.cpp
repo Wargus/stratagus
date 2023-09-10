@@ -37,7 +37,7 @@
 #include "script.h"
 #include "unit.h"
 
-/* virtual */ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
@@ -67,7 +67,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &/*goalPos*/)
+int Spell_AdjustVital::Cast(CUnit &caster,
+                            const SpellType &spell,
+                            CUnit *&target,
+                            const Vec2i & /*goalPos*/) /* override */
 {
 	if (!target) {
 		return 0;
