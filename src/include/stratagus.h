@@ -95,13 +95,6 @@
 ==  Macro
 ============================================================================*/
 
-// To remove warning for unused variable.
-#ifdef __GNUC__
-#define UNUSED(var) do {__typeof__ (&var) __attribute__ ((unused)) __tmp = &var; } while(0)
-#else
-#define UNUSED(var) (var)
-#endif
-
 #ifdef __GNUC__
 #define PRINTF_VAARG_ATTRIBUTE(a, b) __attribute__((format (printf, a, b)))
 #else
