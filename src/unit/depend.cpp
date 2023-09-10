@@ -245,7 +245,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		// target string refers to unit-XXX
 		rule.Kind.UnitType = &UnitTypeByIdent(button.ValueStr);
 		rule.Type = DependRuleUnitType;
-	} else if (starts_with(button.ValueStr.c_str(), "upgrade-")) {
+	} else if (starts_with(button.ValueStr, "upgrade-")) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(button.ValueStr);
 		rule.Type = DependRuleUpgrade;
@@ -291,14 +291,14 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 				i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
 				if (temp->Count ? i < temp->Count : i) {
 					subrules.append("-");
-					subrules.append(temp->Kind.UnitType->Name.c_str());
+					subrules.append(temp->Kind.UnitType->Name);
 					subrules.append("\n");
 				}
 			} else if (temp->Type == DependRuleUpgrade) {
 				i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
 				if (temp->Count ? i : !i) {
 					subrules.append("-");
-					subrules.append(temp->Kind.Upgrade->Name.c_str());
+					subrules.append(temp->Kind.Upgrade->Name);
 					subrules.append("\n");
 				}
 			}

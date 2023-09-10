@@ -973,7 +973,7 @@ static void InputKey(int key)
 						continue;
 					}
 					if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
-						InputIndex += strlen(Players[i].Name.c_str()) - strlen(namestart);
+						InputIndex += Players[i].Name.size() - strlen(namestart);
 						strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
 						if (namestart == Input) {
 							InputIndex += 2;

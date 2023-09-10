@@ -2416,13 +2416,13 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 	CUnitType &type = UnitTypeByIdent(ident);
 	
 	if (variable_key == "Costs") {
-		const int resId = GetResourceIdByName(variable_type.c_str());
+		const int resId = GetResourceIdByName(variable_type);
 		type.MapDefaultStat.Costs[resId] = value;
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player].Costs[resId] = type.MapDefaultStat.Costs[resId];
 		}
 	} else if (variable_key == "ImproveProduction") {
-		const int resId = GetResourceIdByName(variable_type.c_str());
+		const int resId = GetResourceIdByName(variable_type);
 		type.MapDefaultStat.ImproveIncomes[resId] = value;
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player].ImproveIncomes[resId] = type.MapDefaultStat.ImproveIncomes[resId];
