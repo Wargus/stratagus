@@ -66,25 +66,19 @@ public:
 class CContentTypeText : public CContentType
 {
 public:
-	CContentTypeText() : Text(nullptr), Font(nullptr), Centered(0), Index(-1),
-		Component(VariableValue), ShowName(0), Stat(0) {}
-	virtual ~CContentTypeText()
-	{
-		FreeStringDesc(Text);
-		delete Text;
-	}
+	CContentTypeText() = default;
 
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
 	virtual void Parse(lua_State *l);
 
 private:
-	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show, -1 if not.
-	EnumVariable Component;      /// Component of the variable.
-	char ShowName;               /// If true, Show name's unit.
-	char Stat;                   /// true to special display.(value or value + diff)
+	std::unique_ptr<IStringDesc> Text; /// Text to display.
+	CFont *Font = nullptr;            /// Font to use.
+	bool Centered = false;            /// if true, center the display.
+	int Index = -1;                   /// Index of the variable to show, -1 if not.
+	EnumVariable Component = VariableValue; /// Component of the variable.
+	bool ShowName = false;            /// If true, Show name's unit.
+	bool Stat = false;                /// true to special display.(value or value + diff)
 };
 
 /**
@@ -168,10 +162,9 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), ValueFunc(nullptr), ValueMax(-1), Width(0), Height(0), hasBorder(1), colors(nullptr), values(nullptr) {}
+	CContentTypeLifeBar() : Index(-1), ValueMax(-1), Width(0), Height(0), hasBorder(1), colors(nullptr), values(nullptr) {}
 	virtual ~CContentTypeLifeBar()
 	{
-		FreeNumberDesc(ValueFunc);
 		delete[] colors;
 		delete[] values;
 	}
@@ -181,7 +174,7 @@ public:
 
 private:
 	int Index;            /// Index of the variable to show, -1 if not.
-	NumberDesc *ValueFunc;/// Handler of the value function
+	std::unique_ptr<INumberDesc> ValueFunc;/// Handler of the value function
 	int ValueMax;         /// Max, when used with a value function
 	int Width;            /// Width of the bar.
 	int Height;           /// Height of the bar.

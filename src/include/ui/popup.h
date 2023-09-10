@@ -190,12 +190,7 @@ private:
 class CPopupContentTypeVariable : public CPopupContentType
 {
 public:
-	CPopupContentTypeVariable() : Text(nullptr), Font(nullptr), Centered(0), Index(-1) {}
-	virtual ~CPopupContentTypeVariable()
-	{
-		FreeStringDesc(Text);
-		delete Text;
-	}
+	CPopupContentTypeVariable() = default;
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -205,10 +200,10 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	StringDesc *Text;            /// Text to display.
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show, -1 if not.
+	std::unique_ptr<IStringDesc> Text; /// Text to display.
+	CFont *Font = nullptr; /// Font to use.
+	bool Centered = false; /// if true, center the display.
+	int Index = -1;        /// Index of the variable to show, -1 if not.
 };
 
 class CPopup

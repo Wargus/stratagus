@@ -76,7 +76,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	CLabel label(font);
 
 	if (this->Text) {
-		text = EvalString(this->Text);
+		text = EvalString(*this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
 			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
@@ -289,7 +289,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		}
 		f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 	} else {
-		f = (100 * EvalNumber(this->ValueFunc)) / this->ValueMax;
+		f = (100 * EvalNumber(*this->ValueFunc)) / this->ValueMax;
 		f = f > 100 ? 100 : f;
 	}
 	if (f < 0) {

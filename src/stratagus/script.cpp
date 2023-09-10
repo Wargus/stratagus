@@ -61,7 +61,7 @@ lua_State *Lua;                       /// Structure to work with lua files.
 
 int CclInConfigFile;                  /// True while config file parsing
 
-NumberDesc *Damage;                   /// Damage calculation for missile.
+std::unique_ptr<INumberDesc> Damage; /// Damage calculation for missile.
 
 static int NumberCounter = 0; /// Counter for lua function.
 static int StringCounter = 0; /// Counter for lua function.
@@ -463,20 +463,21 @@ void LuaGarbageCollect()
 **  Parse binary operation with number.
 **
 **  @param l       lua state.
-**  @param binop   Where to stock info (must be malloced)
+**  @param type    type of binary operand
+**  @return binop   Where to stock info (must be malloced)
 */
-static void ParseBinOp(lua_State *l, BinOp *binop)
+static std::unique_ptr<NumberDescBinOp> MakeBinOp(lua_State *l, EBinOp type)
 {
 	Assert(l);
-	Assert(binop);
 	Assert(lua_istable(l, -1));
 	Assert(lua_rawlen(l, -1) == 2);
 
 	lua_rawgeti(l, -1, 1); // left
-	binop->Left = CclParseNumberDesc(l);
+	auto left = CclParseNumberDesc(l);
 	lua_rawgeti(l, -1, 2); // right
-	binop->Right = CclParseNumberDesc(l);
+	auto right = CclParseNumberDesc(l);
 	lua_pop(l, 1); // table.
+	return std::make_unique<NumberDescBinOp>(type, std::move(left), std::move(right));
 }
 
 /**
@@ -539,14 +540,12 @@ static CUnitType **Str2TypeRef(lua_State *l, std::string_view s)
 **
 **  @return   unit referernce definition.
 */
-UnitDesc *CclParseUnitDesc(lua_State *l)
+std::unique_ptr<IUnitDesc> CclParseUnitDesc(lua_State *l)
 {
-	UnitDesc *res;  // Result
+	std::unique_ptr<IUnitDesc> res;
 
-	res = new UnitDesc;
 	if (lua_isstring(l, -1)) {
-		res->e = EUnit_Ref;
-		res->D.AUnit = Str2UnitRef(l, LuaToString(l, -1));
+		res = std::make_unique<UnitDescRef>(Str2UnitRef(l, LuaToString(l, -1)));
 	} else {
 		LuaError(l, "Parse Error in ParseUnit\n");
 	}
@@ -649,16 +648,14 @@ static std::string CallLuaStringFunction(unsigned int handler)
 **
 **  @return   number.
 */
-NumberDesc *CclParseNumberDesc(lua_State *l)
+std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 {
-	NumberDesc *res = new NumberDesc;
+	std::unique_ptr<INumberDesc> res;
 
 	if (lua_isnumber(l, -1)) {
-		res->e = ENumber_Dir;
-		res->D.Val = LuaToNumber(l, -1);
+		res = std::make_unique<NumberDescInt>(LuaToNumber(l, -1));
 	} else if (lua_isfunction(l, -1)) {
-		res->e = ENumber_Lua;
-		res->D.Index = ParseLuaFunction(l, "_numberfunction_", &NumberCounter);
+		res = std::make_unique<NumberDescLuaFunction>(ParseLuaFunction(l, "_numberfunction_", &NumberCounter));
 	} else if (lua_istable(l, -1)) {
 		const int nargs = lua_rawlen(l, -1);
 		if (nargs != 2) {
@@ -669,110 +666,106 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 		lua_pop(l, 1);
 		lua_rawgeti(l, -1, 2); // table
 		if (key == "Add") {
-			res->e = ENumber_Add;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Add);
 		} else if (key == "Sub") {
-			res->e = ENumber_Sub;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Sub);
 		} else if (key == "Mul") {
-			res->e = ENumber_Mul;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Mul);
 		} else if (key == "Div") {
-			res->e = ENumber_Div;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Div);
 		} else if (key == "Min") {
-			res->e = ENumber_Min;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Min);
 		} else if (key == "Max") {
-			res->e = ENumber_Max;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Max);
 		} else if (key == "Rand") {
-			res->e = ENumber_Rand;
-			res->D.N = CclParseNumberDesc(l);
+			res = std::make_unique<NumberDescRand>(CclParseNumberDesc(l));
 		} else if (key == "GreaterThan") {
-			res->e = ENumber_Gt;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Gt);
 		} else if (key == "GreaterThanOrEq") {
-			res->e = ENumber_GtEq;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::GtEq);
 		} else if (key == "LessThan") {
-			res->e = ENumber_Lt;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Lt);
 		} else if (key == "LessThanOrEq") {
-			res->e = ENumber_LtEq;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::LtEq);
 		} else if (key == "Equal") {
-			res->e = ENumber_Eq;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::Eq);
 		} else if (key == "NotEqual") {
-			res->e = ENumber_NEq;
-			ParseBinOp(l, &res->D.binOp);
+			res = MakeBinOp(l, EBinOp::NEq);
 		} else if (key == "UnitVar") {
 			Assert(lua_istable(l, -1));
 
-			res->e = ENumber_UnitStat;
+			std::unique_ptr<IUnitDesc> unitDesc;
+			int varIndex = -1;
+			int loc = -1;
+			EnumVariable component;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
 				if (key == "Unit") {
-					res->D.UnitStat.Unit = CclParseUnitDesc(l);
+					unitDesc = CclParseUnitDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Variable") {
 					const std::string_view name = LuaToString(l, -1);
-					res->D.UnitStat.Index = UnitTypeVar.VariableNameLookup[name];
-					if (res->D.UnitStat.Index == -1) {
+					varIndex = UnitTypeVar.VariableNameLookup[name];
+					if (varIndex == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
 					}
 				} else if (key == "Component") {
-					res->D.UnitStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+					component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else if (key == "Loc") {
-					res->D.UnitStat.Loc = LuaToNumber(l, -1);
-					if (res->D.UnitStat.Loc < 0 || 2 < res->D.UnitStat.Loc) {
+					loc = LuaToNumber(l, -1);
+					if (loc < 0 || 2 < loc) {
 						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key.data());
 				}
 			}
+			res = std::make_unique<NumberDescUnitStat>(std::move(unitDesc), varIndex, component, loc);
 			lua_pop(l, 1); // pop the table.
 		} else if (key == "TypeVar") {
 			Assert(lua_istable(l, -1));
 
-			res->e = ENumber_TypeStat;
+			CUnitType **type = nullptr;
+			EnumVariable component;
+			int varIndex = -1;
+			int loc = -1;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
 				if (key == "Type") {
-					res->D.TypeStat.Type = CclParseTypeDesc(l);
+					type = CclParseTypeDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Component") {
-					res->D.TypeStat.Component = Str2EnumVariable(l, LuaToString(l, -1));
+					component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else if (key == "Variable") {
 					const std::string_view name = LuaToString(l, -1);
-					res->D.TypeStat.Index = UnitTypeVar.VariableNameLookup[name];
-					if (res->D.TypeStat.Index == -1) {
+					varIndex = UnitTypeVar.VariableNameLookup[name];
+					if (varIndex == -1) {
 						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
 					}
 				} else if (key == "Loc") {
-					res->D.TypeStat.Loc = LuaToNumber(l, -1);
-					if (res->D.TypeStat.Loc < 0 || 2 < res->D.TypeStat.Loc) {
+					loc = LuaToNumber(l, -1);
+					if (loc < 0 || 2 < loc) {
 						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit" _C_ key.data());
 				}
 			}
+			res = std::make_unique<NumberDescTypeStat>(type, varIndex, component, loc);
 			lua_pop(l, 1); // pop the table.
 		} else if (key == "VideoTextLength") {
 			Assert(lua_istable(l, -1));
-			res->e = ENumber_VideoTextLength;
 
+			std::unique_ptr<IStringDesc> string;
+			CFont *font = nullptr;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
 				if (key == "Text") {
-					res->D.VideoTextLength.String = CclParseStringDesc(l);
+					string = CclParseStringDesc(l);
 					lua_pushnil(l);
 				} else if (key == "Font") {
-					res->D.VideoTextLength.Font = CFont::Get(LuaToString(l, -1));
-					if (!res->D.VideoTextLength.Font) {
+					font = CFont::Get(LuaToString(l, -1));
+					if (!font) {
 						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 					}
 				} else {
@@ -780,47 +773,54 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 				}
 			}
 			lua_pop(l, 1); // pop the table.
+			res = std::make_unique<NumberDescVideoTextLength>(std::move(string), font);
 		} else if (key == "StringFind") {
 			Assert(lua_istable(l, -1));
-			res->e = ENumber_StringFind;
 			if (lua_rawlen(l, -1) != 2) {
 				LuaError(l, "Bad param for StringFind");
 			}
 			lua_rawgeti(l, -1, 1); // left
-			res->D.StringFind.String = CclParseStringDesc(l);
+			auto string = CclParseStringDesc(l);
 
 			lua_rawgeti(l, -1, 2); // right
-			res->D.StringFind.C = LuaToString(l, -1)[0];
+			auto c = LuaToString(l, -1)[0];
+			res = std::make_unique<NumberDescStringFind>(std::move(string), c);
+
 			lua_pop(l, 1); // pop the char
 
 			lua_pop(l, 1); // pop the table.
+
 		} else if (key == "NumIf") {
-			res->e = ENumber_NumIf;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in NumIf\n");
 			}
 			lua_rawgeti(l, -1, 1); // Condition.
-			res->D.NumIf.Cond = CclParseNumberDesc(l);
+			auto cond = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // Then.
-			res->D.NumIf.BTrue = CclParseNumberDesc(l);
+			auto trueValue = CclParseNumberDesc(l);
+			std::unique_ptr<INumberDesc> falseValue;
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Else.
-				res->D.NumIf.BFalse = CclParseNumberDesc(l);
+				falseValue = CclParseNumberDesc(l);
 			}
+			res = std::make_unique<NumberDescIf>(std::move(cond), std::move(trueValue), std::move(falseValue));
+
 			lua_pop(l, 1); // table.
 		} else if (key == "PlayerData") {
-			res->e = ENumber_PlayerData;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in PlayerData\n");
 			}
 			lua_rawgeti(l, -1, 1); // Player.
-			res->D.PlayerData.Player = CclParseNumberDesc(l);
+			auto player = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // DataType.
-			res->D.PlayerData.DataType = CclParseStringDesc(l);
+			auto dataType = CclParseStringDesc(l);
+			std::unique_ptr<IStringDesc> resType;
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Res type.
-				res->D.PlayerData.ResType = CclParseStringDesc(l);
+				resType = CclParseStringDesc(l);
 			}
+			res = std::make_unique<NumberDescPlayerData>(std::move(player), std::move(dataType), std::move(resType));
+
 			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
@@ -840,102 +840,95 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 **
 **  @return   String description.
 */
-StringDesc *CclParseStringDesc(lua_State *l)
+std::unique_ptr<IStringDesc> CclParseStringDesc(lua_State *l)
 {
-	StringDesc *res = new StringDesc;
+	std::unique_ptr<IStringDesc> res = nullptr;
 
 	if (lua_isstring(l, -1)) {
-		res->e = EString_Dir;
-		res->D.Val = new_strdup(LuaToString(l, -1).data());
+		res = std::make_unique<StringDescString>(std::string(LuaToString(l, -1)));
 	} else if (lua_isfunction(l, -1)) {
-		res->e = EString_Lua;
-		res->D.Index = ParseLuaFunction(l, "_stringfunction_", &StringCounter);
+		res = std::make_unique<StringDescLuaFunction>(ParseLuaFunction(l, "_stringfunction_", &StringCounter));
 	} else if (lua_istable(l, -1)) {
 		const int nargs = lua_rawlen(l, -1);
 		if (nargs != 2) {
 			LuaError(l, "Bad number of args in parse String table\n");
 		}
-		lua_rawgeti(l, -1, 1); // key
-		const std::string_view key = LuaToString(l, -1);
-		lua_pop(l, 1);
+		const std::string_view key = LuaToString(l, -1, 1);
 		lua_rawgeti(l, -1, 2); // table
 		if (key == "Concat") {
-			int i; // iterator.
-
-			res->e = EString_Concat;
-			res->D.Concat.n = lua_rawlen(l, -1);
-			if (res->D.Concat.n < 1) {
+			const auto n = lua_rawlen(l, -1);
+			if (n < 1) {
 				LuaError(l, "Bad number of args in Concat\n");
 			}
-			res->D.Concat.Strings = new StringDesc *[res->D.Concat.n];
-			for (i = 0; i < res->D.Concat.n; ++i) {
+			std::vector<std::unique_ptr<IStringDesc>> strings;
+			for (std::size_t i = 0; i < n; ++i) {
 				lua_rawgeti(l, -1, 1 + i);
-				res->D.Concat.Strings[i] = CclParseStringDesc(l);
+				strings.emplace_back(CclParseStringDesc(l));
 			}
 			lua_pop(l, 1); // table.
+			res = std::make_unique<StringDescConcat>(std::move(strings));
 		} else if (key == "String") {
-			res->e = EString_String;
-			res->D.Number = CclParseNumberDesc(l);
+			res = std::make_unique<StringDescNumber>(CclParseNumberDesc(l));
 		} else if (key == "InverseVideo") {
-			res->e = EString_InverseVideo;
-			res->D.String = CclParseStringDesc(l);
+			res = std::make_unique<StringDescInverseVideo>(CclParseStringDesc(l));
 		} else if (key == "UnitName") {
-			res->e = EString_UnitName;
-			res->D.Unit = CclParseUnitDesc(l);
+			res = std::make_unique<StringDescUnit>(CclParseUnitDesc(l));
 		} else if (key == "If") {
-			res->e = EString_If;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in If\n");
 			}
 			lua_rawgeti(l, -1, 1); // Condition.
-			res->D.If.Cond = CclParseNumberDesc(l);
+			auto Cond = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // Then.
-			res->D.If.BTrue = CclParseStringDesc(l);
+			auto BTrue = CclParseStringDesc(l);
+			std::unique_ptr<IStringDesc> BFalse;
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Else.
-				res->D.If.BFalse = CclParseStringDesc(l);
+				BFalse = CclParseStringDesc(l);
 			}
 			lua_pop(l, 1); // table.
+			res = std::make_unique<StringDescIf>(std::move(Cond), std::move(BTrue), std::move(BFalse));
 		} else if (key == "SubString") {
-			res->e = EString_SubString;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
 				LuaError(l, "Bad number of args in SubString\n");
 			}
 			lua_rawgeti(l, -1, 1); // String.
-			res->D.SubString.String = CclParseStringDesc(l);
+			auto String = CclParseStringDesc(l);
 			lua_rawgeti(l, -1, 2); // Begin.
-			res->D.SubString.Begin = CclParseNumberDesc(l);
+			auto Begin = CclParseNumberDesc(l);
+			std::unique_ptr<INumberDesc> End = nullptr;
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // End.
-				res->D.SubString.End = CclParseNumberDesc(l);
+				End = CclParseNumberDesc(l);
 			}
 			lua_pop(l, 1); // table.
+			res = std::make_unique<StringDescSubString>(std::move(String), std::move(Begin), std::move(End));
 		} else if (key == "Line") {
-			res->e = EString_Line;
 			if (lua_rawlen(l, -1) < 2 || lua_rawlen(l, -1) > 4) {
 				LuaError(l, "Bad number of args in Line\n");
 			}
 			lua_rawgeti(l, -1, 1); // Line.
-			res->D.Line.Line = CclParseNumberDesc(l);
+			auto Line = CclParseNumberDesc(l);
 			lua_rawgeti(l, -1, 2); // String.
-			res->D.Line.String = CclParseStringDesc(l);
+			auto String = CclParseStringDesc(l);
+			std::unique_ptr<INumberDesc> MaxLen = nullptr;
 			if (lua_rawlen(l, -1) >= 3) {
 				lua_rawgeti(l, -1, 3); // Length.
-				res->D.Line.MaxLen = CclParseNumberDesc(l);
+				MaxLen = CclParseNumberDesc(l);
 			}
-			res->D.Line.Font = nullptr;
+			CFont* Font = nullptr;
 			if (lua_rawlen(l, -1) >= 4) {
 				lua_rawgeti(l, -1, 4); // Font.
-				res->D.Line.Font = CFont::Get(LuaToString(l, -1));
-				if (!res->D.Line.Font) {
+				Font = CFont::Get(LuaToString(l, -1));
+				if (!Font) {
 					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
 				}
 				lua_pop(l, 1); // font name.
 			}
 			lua_pop(l, 1); // table.
+			res = std::make_unique<StringDescLine>(std::move(String), std::move(Line), std::move(MaxLen), Font);
 		} else if (key == "PlayerName") {
-			res->e = EString_PlayerName;
-			res->D.PlayerName = CclParseNumberDesc(l);
+			res = std::make_unique<StringDescPlayerName>(CclParseNumberDesc(l));
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'" _C_ key.data());
@@ -954,20 +947,123 @@ StringDesc *CclParseStringDesc(lua_State *l)
 **
 **  @return          the result unit.
 */
-CUnit *EvalUnit(const UnitDesc *unitdesc)
+CUnit *EvalUnit(const IUnitDesc &unitdesc)
 {
-	Assert(unitdesc);
-
 	if (!Selected.empty()) {
 		TriggerData.Active = Selected[0];
 	} else {
 		TriggerData.Active = UnitUnderCursor;
 	}
-	switch (unitdesc->e) {
-		case EUnit_Ref :
-			return *unitdesc->D.AUnit;
+	return unitdesc.eval();
+}
+
+
+int NumberDescLuaFunction::eval() const /* override */
+{
+	return CallLuaNumberFunction(index);
+}
+
+int NumberDescInt::eval() const /* override */
+{
+	return n;
+}
+
+int NumberDescBinOp::eval() const /* override */
+{
+	switch (type) {
+		case EBinOp::Add: // a + b.
+			return EvalNumber(*left) + EvalNumber(*right);
+		case EBinOp::Sub: // a - b.
+			return EvalNumber(*left) - EvalNumber(*right);
+		case EBinOp::Mul: // a * b.
+			return EvalNumber(*left) * EvalNumber(*right);
+		case EBinOp::Div: // a / b.
+		{
+			auto lhs = EvalNumber(*left);
+			auto rhs = EvalNumber(*right);
+			if (rhs == 0) { // FIXME : manage better this.
+				return 0;
+			}
+			return lhs / rhs;
+		}
+		case EBinOp::Min: // a <= b ? a : b
+			return std::min(EvalNumber(*left), EvalNumber(*right));
+		case EBinOp::Max: // a >= b ? a : b
+			return std::max(EvalNumber(*left), EvalNumber(*right));
+		case EBinOp::Gt: // a > b  ? 1 : 0
+			return (EvalNumber(*left) > EvalNumber(*right) ? 1 : 0);
+		case EBinOp::GtEq: // a >= b ? 1 : 0
+			return (EvalNumber(*left) >= EvalNumber(*right) ? 1 : 0);
+		case EBinOp::Lt: // a < b  ? 1 : 0
+			return (EvalNumber(*left) < EvalNumber(*right) ? 1 : 0);
+		case EBinOp::LtEq: // a <= b ? 1 : 0
+			return (EvalNumber(*left) <= EvalNumber(*right) ? 1 : 0);
+		case EBinOp::Eq: // a == b ? 1 : 0
+			return (EvalNumber(*left) == EvalNumber(*right) ? 1 : 0);
+		case EBinOp::NEq: // a != b ? 1 : 0
+			return (EvalNumber(*left) != EvalNumber(*right) ? 1 : 0);
 	}
-	return nullptr;
+	return 0;
+}
+
+int NumberDescRand::eval() const /* override */
+{
+	int number = EvalNumber(*n);
+	return SyncRand() % number;
+}
+int NumberDescUnitStat::eval() const /* override */
+{
+	const auto* unit = EvalUnit(*unitDesc);
+
+	if (unit != nullptr) {
+		return std::get<int>(GetComponent(*unit, varIndex, component, loc));
+	} else { // ERROR.
+		return 0;
+	}
+}
+int NumberDescTypeStat::eval() const /* override */
+{
+	if (type != nullptr) {
+		return std::get<int>(GetComponent(**type, varIndex, component, loc));
+	} else { // ERROR.
+		return 0;
+	}
+}
+int NumberDescVideoTextLength::eval() const /* override */
+{
+	if (string == nullptr || font == nullptr) // ERROR.
+	{
+		return 0;
+	}
+	return font->Width(EvalString(*string));
+}
+
+int NumberDescStringFind::eval() const /* override */
+{
+	if (string == nullptr) { // ERROR.
+		return 0;
+	}
+	auto s = EvalString(*string);
+	size_t pos = s.find(c);
+	return pos != std::string::npos ? (int) pos : -1;
+}
+
+int NumberDescIf::eval() const /* override */
+{
+	if (EvalNumber(*cond)) {
+		return EvalNumber(*trueValue);
+	} else if (falseValue) {
+		return EvalNumber(*falseValue);
+	} else {
+		return 0;
+	}
+}
+int NumberDescPlayerData::eval() const /* override */
+{
+	int player = EvalNumber(*playerIndex);
+	std::string data = EvalString(*dataType);
+	std::string res = EvalString(*resType);
+	return GetPlayerData(player, data, res);
 }
 
 /**
@@ -976,122 +1072,96 @@ CUnit *EvalUnit(const UnitDesc *unitdesc)
 **  @param number  struct with definition of the calculation.
 **
 **  @return        the result number.
-**
-**  @todo Manage better the error (div/0, unit==nullptr, ...).
 */
-int EvalNumber(const NumberDesc *number)
+int EvalNumber(const INumberDesc &number)
 {
-	CUnit *unit;
-	CUnitType **type;
-	std::string s;
-	int a;
-	int b;
+	return number.eval();
+}
 
-	Assert(number);
-	switch (number->e) {
-		case ENumber_Lua :     // a lua function.
-			return CallLuaNumberFunction(number->D.Index);
-		case ENumber_Dir :     // directly a number.
-			return number->D.Val;
-		case ENumber_Add :     // a + b.
-			return EvalNumber(number->D.binOp.Left) + EvalNumber(number->D.binOp.Right);
-		case ENumber_Sub :     // a - b.
-			return EvalNumber(number->D.binOp.Left) - EvalNumber(number->D.binOp.Right);
-		case ENumber_Mul :     // a * b.
-			return EvalNumber(number->D.binOp.Left) * EvalNumber(number->D.binOp.Right);
-		case ENumber_Div :     // a / b.
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			if (!b) { // FIXME : manage better this.
-				return 0;
-			}
-			return a / b;
-		case ENumber_Min :     // a <= b ? a : b
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return std::min(a, b);
-		case ENumber_Max :     // a >= b ? a : b
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return std::max(a, b);
-		case ENumber_Gt  :     // a > b  ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a > b ? 1 : 0);
-		case ENumber_GtEq :    // a >= b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a >= b ? 1 : 0);
-		case ENumber_Lt  :     // a < b  ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a < b ? 1 : 0);
-		case ENumber_LtEq :    // a <= b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a <= b ? 1 : 0);
-		case ENumber_Eq  :     // a == b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a == b ? 1 : 0);
-		case ENumber_NEq  :    // a != b ? 1 : 0
-			a = EvalNumber(number->D.binOp.Left);
-			b = EvalNumber(number->D.binOp.Right);
-			return (a != b ? 1 : 0);
+std::string StringDescLuaFunction::eval() const
+{
+	return CallLuaStringFunction(index);
+}
 
-		case ENumber_Rand :    // random(a) [0..a-1]
-			a = EvalNumber(number->D.N);
-			return SyncRand() % a;
-		case ENumber_UnitStat : // property of unit.
-			unit = EvalUnit(number->D.UnitStat.Unit);
-			if (unit != nullptr) {
-				return std::get<int>(GetComponent(*unit,
-				                                  number->D.UnitStat.Index,
-				                                  number->D.UnitStat.Component,
-				                                  number->D.UnitStat.Loc));
-			} else { // ERROR.
-				return 0;
-			}
-		case ENumber_TypeStat : // property of unit type.
-			type = number->D.TypeStat.Type;
-			if (type != nullptr) {
-				return std::get<int>(GetComponent(**type,
-				                        number->D.TypeStat.Index,
-				                        number->D.TypeStat.Component,
-				                        number->D.TypeStat.Loc));
-			} else { // ERROR.
-				return 0;
-			}
-		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			if (number->D.VideoTextLength.String != nullptr
-				&& !(s = EvalString(number->D.VideoTextLength.String)).empty()) {
-				return number->D.VideoTextLength.Font->Width(s);
-			} else { // ERROR.
-				return 0;
-			}
-		case ENumber_StringFind : // s.find(c)
-			if (number->D.StringFind.String != nullptr
-				&& !(s = EvalString(number->D.StringFind.String)).empty()) {
-				size_t pos = s.find(number->D.StringFind.C);
-				return pos != std::string::npos ? (int)pos : -1;
-			} else { // ERROR.
-				return 0;
-			}
-		case ENumber_NumIf : // cond ? True : False;
-			if (EvalNumber(number->D.NumIf.Cond)) {
-				return EvalNumber(number->D.NumIf.BTrue);
-			} else if (number->D.NumIf.BFalse) {
-				return EvalNumber(number->D.NumIf.BFalse);
-			} else {
-				return 0;
-			}
-		case ENumber_PlayerData : // getplayerdata(player, data, res);
-			int player = EvalNumber(number->D.PlayerData.Player);
-			std::string data = EvalString(number->D.PlayerData.DataType);
-			std::string res = EvalString(number->D.PlayerData.ResType);
-			return GetPlayerData(player, data, res);
+std::string StringDescString::eval() const
+{
+	return this->s;
+}
+
+std::string StringDescConcat::eval() const
+{
+	std::string res;
+
+	for (const auto& s : strings) {
+		res += EvalString(*s);
 	}
-	return 0;
+	return res;
+}
+
+std::string StringDescNumber::eval() const
+{
+	return std::to_string(EvalNumber(*number));
+}
+
+std::string StringDescInverseVideo::eval() const
+{
+	// FIXME handle existing "~<"/"~>".
+	return "~<" + EvalString(*string) + "~>";
+}
+
+std::string StringDescUnit::eval() const
+{
+	const auto *unit = EvalUnit(*unitDesc);
+	if (unit != nullptr) {
+		return unit->Type->Name;
+	} else { // ERROR.
+		return std::string("");
+	}
+}
+
+std::string StringDescIf::eval() const
+{
+	if (EvalNumber(*cond)) {
+		return EvalString(*trueValue);
+	} else if (falseValue) {
+		return EvalString(*falseValue);
+	} else {
+		return std::string("");
+	}
+}
+
+std::string StringDescSubString::eval() const
+{
+	if (string == nullptr) {
+		return ""; // Error
+	}
+	const auto s = EvalString(*string);
+	const int offset = EvalNumber(*begin);
+	const int end = this->end ? EvalNumber(*this->end) : std::string::npos;
+
+	if ((unsigned) offset > s.size() && offset > 0) {
+		return std::string("");
+	}
+	return s.substr(offset, end - offset);
+}
+
+std::string StringDescLine::eval() const
+{
+	if (string == nullptr) {
+		return std::string(""); // ERROR.
+	}
+	const auto s = EvalString(*string);
+	const int line = EvalNumber(*this->line);
+	const int maxlen = this->maxLen ? std::max(0, EvalNumber(*this->maxLen)) : 0;
+	if (line <= 0) {
+		return std::string("");
+	}
+	return GetLineFont(line, s, maxlen, font);
+}
+
+std::string StringDescPlayerName::eval() const
+{
+	return Players[EvalNumber(*playerIndex)].Name;
 }
 
 /**
@@ -1100,256 +1170,10 @@ int EvalNumber(const NumberDesc *number)
 **  @param s  struct with definition of the calculation.
 **
 **  @return   the result string.
-**
-**  @todo Manage better the error.
 */
-std::string EvalString(const StringDesc *s)
+std::string EvalString(const IStringDesc &s)
 {
-	std::string res;    // Result string.
-	std::string tmp1;   // Temporary string.
-	const CUnit *unit;  // Temporary unit
-
-	Assert(s);
-	switch (s->e) {
-		case EString_Lua :     // a lua function.
-			return CallLuaStringFunction(s->D.Index);
-		case EString_Dir :     // directly a string.
-			return std::string(s->D.Val);
-		case EString_Concat :     // a + b -> "ab"
-			res = EvalString(s->D.Concat.Strings[0]);
-			for (int i = 1; i < s->D.Concat.n; i++) {
-				res += EvalString(s->D.Concat.Strings[i]);
-			}
-			return res;
-		case EString_String : {   // 42 -> "42".
-			char buffer[16]; // Should be enough ?
-			sprintf(buffer, "%d", EvalNumber(s->D.Number));
-			return std::string(buffer);
-		}
-		case EString_InverseVideo : // "a" -> "~<a~>"
-			tmp1 = EvalString(s->D.String);
-			// FIXME replace existing "~<" by "~>" in tmp1.
-			res = std::string("~<") + tmp1 + "~>";
-			return res;
-		case EString_UnitName : // name of the UnitType
-			unit = EvalUnit(s->D.Unit);
-			if (unit != nullptr) {
-				return unit->Type->Name;
-			} else { // ERROR.
-				return std::string("");
-			}
-		case EString_If : // cond ? True : False;
-			if (EvalNumber(s->D.If.Cond)) {
-				return EvalString(s->D.If.BTrue);
-			} else if (s->D.If.BFalse) {
-				return EvalString(s->D.If.BFalse);
-			} else {
-				return std::string("");
-			}
-		case EString_SubString : // substring(s, begin, end)
-			if (s->D.SubString.String != nullptr
-				&& !(tmp1 = EvalString(s->D.SubString.String)).empty()) {
-				int begin;
-				int end;
-
-				begin = EvalNumber(s->D.SubString.Begin);
-				if ((unsigned) begin > tmp1.size() && begin > 0) {
-					return std::string("");
-				}
-				res = tmp1.c_str() + begin;
-				if (s->D.SubString.End) {
-					end = EvalNumber(s->D.SubString.End);
-				} else {
-					end = -1;
-				}
-				if ((unsigned)end < res.size() && end >= 0) {
-					res[end] = '\0';
-				}
-				return res;
-			} else { // ERROR.
-				return std::string("");
-			}
-		case EString_Line : // line n of the string
-			if (s->D.Line.String == nullptr || (tmp1 = EvalString(s->D.Line.String)).empty()) {
-				return std::string(""); // ERROR.
-			} else {
-				int line;
-				int maxlen;
-				CFont *font;
-
-				line = EvalNumber(s->D.Line.Line);
-				if (line <= 0) {
-					return std::string("");
-				}
-				if (s->D.Line.MaxLen) {
-					maxlen = EvalNumber(s->D.Line.MaxLen);
-					maxlen = std::max(maxlen, 0);
-				} else {
-					maxlen = 0;
-				}
-				font = s->D.Line.Font;
-				res = GetLineFont(line, tmp1, maxlen, font);
-				return res;
-			}
-		case EString_PlayerName : // player name
-			return std::string(Players[EvalNumber(s->D.PlayerName)].Name);
-	}
-	return std::string("");
-}
-
-
-/**
-**  Free the unit expression content. (not the pointer itself).
-**
-**  @param unitdesc  struct to free
-*/
-void FreeUnitDesc(UnitDesc *)
-{
-#if 0 // Nothing to free mow.
-	if (!unitdesc) {
-		return;
-	}
-#endif
-}
-
-/**
-**  Free the number expression content. (not the pointer itself).
-**
-**  @param number  struct to free
-*/
-void FreeNumberDesc(NumberDesc *number)
-{
-	if (number == 0) {
-		return;
-	}
-	switch (number->e) {
-		case ENumber_Lua :     // a lua function.
-		// FIXME: when lua table should be freed ?
-		case ENumber_Dir :     // directly a number.
-			break;
-		case ENumber_Add :     // a + b.
-		case ENumber_Sub :     // a - b.
-		case ENumber_Mul :     // a * b.
-		case ENumber_Div :     // a / b.
-		case ENumber_Min :     // a <= b ? a : b
-		case ENumber_Max :     // a >= b ? a : b
-		case ENumber_Gt  :     // a > b  ? 1 : 0
-		case ENumber_GtEq :    // a >= b ? 1 : 0
-		case ENumber_Lt  :     // a < b  ? 1 : 0
-		case ENumber_LtEq :    // a <= b ? 1 : 0
-		case ENumber_NEq  :    // a <> b ? 1 : 0
-		case ENumber_Eq  :     // a == b ? 1 : 0
-			FreeNumberDesc(number->D.binOp.Left);
-			FreeNumberDesc(number->D.binOp.Right);
-			delete number->D.binOp.Left;
-			delete number->D.binOp.Right;
-			break;
-		case ENumber_Rand :    // random(a) [0..a-1]
-			FreeNumberDesc(number->D.N);
-			delete number->D.N;
-			break;
-		case ENumber_UnitStat : // property of unit.
-			FreeUnitDesc(number->D.UnitStat.Unit);
-			delete number->D.UnitStat.Unit;
-			break;
-		case ENumber_TypeStat : // property of unit type.
-			delete *number->D.TypeStat.Type;
-			break;
-		case ENumber_VideoTextLength : // VideoTextLength(font, s)
-			FreeStringDesc(number->D.VideoTextLength.String);
-			delete number->D.VideoTextLength.String;
-			break;
-		case ENumber_StringFind : // strchr(s, c) - s.
-			FreeStringDesc(number->D.StringFind.String);
-			delete number->D.StringFind.String;
-			break;
-		case ENumber_NumIf : // cond ? True : False;
-			FreeNumberDesc(number->D.NumIf.Cond);
-			delete number->D.NumIf.Cond;
-			FreeNumberDesc(number->D.NumIf.BTrue);
-			delete number->D.NumIf.BTrue;
-			FreeNumberDesc(number->D.NumIf.BFalse);
-			delete number->D.NumIf.BFalse;
-			break;
-		case ENumber_PlayerData : // getplayerdata(player, data, res);
-			FreeNumberDesc(number->D.PlayerData.Player);
-			delete number->D.PlayerData.Player;
-			FreeStringDesc(number->D.PlayerData.DataType);
-			delete number->D.PlayerData.DataType;
-			FreeStringDesc(number->D.PlayerData.ResType);
-			delete number->D.PlayerData.ResType;
-			break;
-	}
-}
-
-/**
-**  Free the String expression content. (not the pointer itself).
-**
-**  @param s  struct to free
-*/
-void FreeStringDesc(StringDesc *s)
-{
-	int i;
-
-	if (s == 0) {
-		return;
-	}
-	switch (s->e) {
-		case EString_Lua :     // a lua function.
-			// FIXME: when lua table should be freed ?
-			break;
-		case EString_Dir :     // directly a string.
-			delete[] s->D.Val;
-			break;
-		case EString_Concat :  // "a" + "b" -> "ab"
-			for (i = 0; i < s->D.Concat.n; i++) {
-				FreeStringDesc(s->D.Concat.Strings[i]);
-				delete s->D.Concat.Strings[i];
-			}
-			delete[] s->D.Concat.Strings;
-
-			break;
-		case EString_String : // 42 -> "42"
-			FreeNumberDesc(s->D.Number);
-			delete s->D.Number;
-			break;
-		case EString_InverseVideo : // "a" -> "~<a~>"
-			FreeStringDesc(s->D.String);
-			delete s->D.String;
-			break;
-		case EString_UnitName : // Name of the UnitType
-			FreeUnitDesc(s->D.Unit);
-			delete s->D.Unit;
-			break;
-		case EString_If : // cond ? True : False;
-			FreeNumberDesc(s->D.If.Cond);
-			delete s->D.If.Cond;
-			FreeStringDesc(s->D.If.BTrue);
-			delete s->D.If.BTrue;
-			FreeStringDesc(s->D.If.BFalse);
-			delete s->D.If.BFalse;
-			break;
-		case EString_SubString : // substring(s, begin, end)
-			FreeStringDesc(s->D.SubString.String);
-			delete s->D.SubString.String;
-			FreeNumberDesc(s->D.SubString.Begin);
-			delete s->D.SubString.Begin;
-			FreeNumberDesc(s->D.SubString.End);
-			delete s->D.SubString.End;
-			break;
-		case EString_Line : // line n of the string
-			FreeStringDesc(s->D.Line.String);
-			delete s->D.Line.String;
-			FreeNumberDesc(s->D.Line.Line);
-			delete s->D.Line.Line;
-			FreeNumberDesc(s->D.Line.MaxLen);
-			delete s->D.Line.MaxLen;
-			break;
-		case EString_PlayerName : // player name
-			FreeNumberDesc(s->D.PlayerName);
-			delete s->D.PlayerName;
-			break;
-	}
+	return s.eval();
 }
 
 /*............................................................................
@@ -2099,10 +1923,6 @@ static int CclListDirsInDirectory(lua_State *l)
 static int CclSetDamageFormula(lua_State *l)
 {
 	Assert(l);
-	if (Damage) {
-		FreeNumberDesc(Damage);
-		delete Damage;
-	}
 	Damage = CclParseNumberDesc(l);
 	return 0;
 }
