@@ -1673,8 +1673,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
-			const int cclforceIdx = LuaToNumber(l, j + 1, 1);
-			UNUSED(cclforceIdx);
+			[[maybe_unused]]const int cclforceIdx = LuaToNumber(l, j + 1, 1);
 			const int forceIdx = ai->Force.FindFreeForce(AiForceRole::Default);
 
 			for (int k = 1; k < subargs; ++k) {
@@ -1728,8 +1727,7 @@ static int CclDefineAiPlayer(lua_State *l)
 						const int num = LuaToNumber(l, -1, subk + 1);
 						++subk;
 #if 0
-						const std::string_view ident = LuaToString(l, -1, subk + 1);
-						UNUSED(ident);
+						[[maybe_unused]]const std::string_view ident = LuaToString(l, -1, subk + 1);
 #endif
 						ai->Force[forceIdx].Units.Insert(&UnitManager->GetSlotUnit(num));
 					}
