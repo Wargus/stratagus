@@ -485,7 +485,7 @@ void InitVideoSdl()
 		for (size_t i = 0; i < pixmaps.size(); ++i) {
 			if (stat(pixmaps[i].c_str(), &st) == 0) {
 				if (g) { CGraphic::Free(g); }
-				g = CGraphic::New(pixmaps[i].c_str());
+				g = CGraphic::New(pixmaps[i]);
 				g->Load();
 				icon = g->Surface;
 				if (icon) { break; }

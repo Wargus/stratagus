@@ -1889,7 +1889,7 @@ static int CclAiProcessorSetup(lua_State *l)
 	int stateDim = LuaToNumber(l, 3);
 	int actionDim = LuaToNumber(l, 4);
 
-	CHost h(host.c_str(), port);
+	CHost h(host, port);
 	CTCPSocket *s = new CTCPSocket();
 	s->Open(CHost());
 	if (s->Connect(h)) {

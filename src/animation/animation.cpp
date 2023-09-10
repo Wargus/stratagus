@@ -615,7 +615,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 	} else {
 		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
 	}
-	anim->Init(extraArg.c_str(), l);
+	anim->Init(extraArg, l);
 	return anim;
 }
 
