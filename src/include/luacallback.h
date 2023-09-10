@@ -31,8 +31,11 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include <string_view>
+#include <tuple>
+#include <type_traits>
 #include <utility>
+#include <vector>
 #include <variant>
 
 using lua_Object = int; // from tolua++.h
@@ -46,12 +49,51 @@ public:
 	void pushPreamble();
 	void pushInteger(int value);
 	void pushIntegers(const std::vector<int> &values);
-	void pushString(const std::string &eventId);
+	void pushString(std::string_view s);
 	void pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list);
 	void pushTable(std::map<std::string, std::variant<std::string, int>> map);
 	void run(int results = 0);
 	bool popBoolean();
 	int popInteger();
+
+	template <typename T>
+	void pushT(const T &arg)
+	{
+		if constexpr (std::is_integral_v<T>) {
+			return pushInteger(arg);
+		} else if constexpr (std::is_same_v<T, std::vector<int>>) {
+			return pushIntegers(arg);
+		} else if constexpr (std::is_convertible_v<T, std::string_view>) {
+			return pushString(arg);
+		} else {
+			return pushTable(arg);
+		}
+	}
+
+	template<typename T>
+	T popT()
+	{
+		if constexpr (std::is_same_v<T, bool>) {
+			return popBoolean();
+		} else if constexpr (std::is_same_v<T, int>) {
+			return popInteger();
+		}
+	}
+
+	template <typename... Res, typename... Args>
+	auto call(const Args &...args)
+	{
+		pushPreamble();
+		(pushT(args), ...);
+		run(sizeof...(Res));
+
+		if constexpr (sizeof...(Res) <= 1) {
+			return (popT<Res>(), ...);
+		} else {
+			return std::tuple<Res...>{popT<Res>()...};
+		}
+	}
+
 private:
 	lua_State *luastate;
 	int luaref;

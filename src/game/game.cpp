@@ -1029,9 +1029,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
 		CUnit &unit = **it;
 		if (unit.Type->OnReady) {
-			unit.Type->OnReady->pushPreamble();
-			unit.Type->OnReady->pushInteger(UnitNumber(unit));
-			unit.Type->OnReady->run();
+			unit.Type->OnReady->call(UnitNumber(unit));
 		}
 	}
 

@@ -775,10 +775,7 @@ bool PointToPointMissile(Missile &missile)
 		}
 
 		if (missile.Type->SmokeParticle && (missile.CurrentStep || missile.State > 1)) {
-			missile.Type->SmokeParticle->pushPreamble();
-			missile.Type->SmokeParticle->pushInteger(position.x);
-			missile.Type->SmokeParticle->pushInteger(position.y);
-			missile.Type->SmokeParticle->run();
+			missile.Type->SmokeParticle->call(position.x, position.y);
 		}
 
 		if (missile.Type->Pierce) {
@@ -930,10 +927,7 @@ void Missile::MissileHit(CUnit *unit)
 		}
 	}
 	if (mtype.ImpactParticle) {
-		mtype.ImpactParticle->pushPreamble();
-		mtype.ImpactParticle->pushInteger(pixelPos.x);
-		mtype.ImpactParticle->pushInteger(pixelPos.y);
-		mtype.ImpactParticle->run();
+		mtype.ImpactParticle->call(pixelPos.x, pixelPos.y);
 	}
 
 	if (!this->SourceUnit) {  // no owner - green-cross ...

@@ -191,85 +191,51 @@ LuaActionListener::LuaActionListener(lua_State *l, lua_Object f) :
 */
 void LuaActionListener::action(const std::string &eventId)
 {
-	callback.pushPreamble();
-	callback.pushString(eventId.c_str());
-	callback.run();
+	callback.call(eventId);
 }
 
 bool LuaActionListener::keyPress(const gcn::Key& key) {
-	callback.pushPreamble();
-	callback.pushString("keyPress");
-	callback.pushString(key.toString());
-	callback.run(1);
-	return callback.popBoolean();
+	return callback.call<bool>("keyPress", key.toString());
 }
 
 bool LuaActionListener::keyRelease(const gcn::Key& key) {
-	callback.pushPreamble();
-	callback.pushString("keyRelease");
-	callback.pushString(key.toString());
-	callback.run(1);
-	return callback.popBoolean();
+	return callback.call<bool>("keyRelease", key.toString());
 }
 
 void LuaActionListener::hotKeyPress(const gcn::Key& key) {
-	callback.pushPreamble();
-	callback.pushString("hotKeyPress");
-	callback.pushString(key.toString());
-	callback.run();
+	callback.call("hotKeyPress", key.toString());
 }
 
 void LuaActionListener::hotKeyRelease(const gcn::Key& key) {
-	callback.pushPreamble();
-	callback.pushString("hotKeyRelease");
-	callback.pushString(key.toString());
-	callback.run();
+	callback.call("hotKeyRelease", key.toString());
 }
 
 void LuaActionListener::mouseIn() {
-	callback.pushPreamble();
-	callback.pushString("mouseIn");
-	callback.run();
+	callback.call("mouseIn");
 }
 
 void LuaActionListener::mouseOut() {
-	callback.pushPreamble();
-	callback.pushString("mouseOut");
-	callback.run();
+	callback.call("mouseOut");
 }
 
 void LuaActionListener::mousePress(int x, int y, int btn) {
-	callback.pushPreamble();
-	callback.pushString("mousePress");
-	callback.pushInteger(btn);
-	callback.run();
+	callback.call("mousePress", btn);
 }
 
 void LuaActionListener::mouseRelease(int x, int y, int btn) {
-	callback.pushPreamble();
-	callback.pushString("mouseRelease");
-	callback.pushInteger(btn);
-	callback.run();
+	callback.call("mouseRelease", btn);
 }
 
 void LuaActionListener::mouseClick(int x, int y, int btn, int cnt) {
-	callback.pushPreamble();
-	callback.pushString("mouseClick");
-	callback.pushInteger(btn);
-	callback.pushInteger(cnt);
-	callback.run();
+	callback.call("mouseClick", btn, cnt);
 }
 
 void LuaActionListener::mouseWheelUp(int x, int y) {
-	callback.pushPreamble();
-	callback.pushString("mouseWheelUp");
-	callback.run();
+	callback.call("mouseWheelUp");
 }
 
 void LuaActionListener::mouseWheelDown(int x, int y) {
-	callback.pushPreamble();
-	callback.pushString("mouseWheelDown");
-	callback.run();
+	callback.call("mouseWheelDown");
 }
 
 void LuaActionListener::mouseMotion(int x, int y) {}

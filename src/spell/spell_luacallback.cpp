@@ -61,14 +61,12 @@ int Spell_LuaCallback::Cast(CUnit &caster,
                             const Vec2i &goalPos) /* override */
 {
 	if (this->Func) {
-		this->Func->pushPreamble();
-		this->Func->pushString(spell.Ident);
-		this->Func->pushInteger(UnitNumber(caster));
-		this->Func->pushInteger(goalPos.x);
-		this->Func->pushInteger(goalPos.y);
-		this->Func->pushInteger((target && target->IsAlive()) ? UnitNumber(*target) : -1);
-		this->Func->run(1);
-		bool result = this->Func->popBoolean();
+		bool result =
+			this->Func->call<bool>(spell.Ident,
+		                           UnitNumber(caster),
+		                           goalPos.x,
+		                           goalPos.y,
+		                           (target && target->IsAlive()) ? UnitNumber(*target) : -1);
 		return result;
 	}
 	return 0;

@@ -1383,10 +1383,7 @@ void CButtonPanel::DoClicked_Research(int button)
 void CButtonPanel::DoClicked_CallbackAction(int button, int clickingPlayer)
 {
 	LuaCallback* callback = (LuaCallback*)(CurrentButtons[button].Payload);
-	callback->pushPreamble();
-	callback->pushInteger(UnitNumber(*Selected[0]));
-	callback->pushInteger(clickingPlayer);
-	callback->run();
+	callback->call(UnitNumber(*Selected[0]), clickingPlayer);
 }
 
 /**

@@ -1172,9 +1172,7 @@ public:
             setChannels(channelList);
         }
         if (SetActiveChannel != nullptr) {
-            SetActiveChannel->pushPreamble();
-            SetActiveChannel->pushString(name);
-            SetActiveChannel->run();
+            SetActiveChannel->call(name);
         }
     }
 
@@ -1243,14 +1241,12 @@ public:
 
     void reportUserdata(uint32_t id, std::vector<std::string> values) {
         if (ShowUserInfo != nullptr) {
-            ShowUserInfo->pushPreamble();
             std::map<std::string, std::variant<std::string, int>> m;
             m["User"] = extendedInfoNames.at(id);
             for (unsigned int i = 0; i < values.size(); i++) {
                 m[defaultUserKeys.at(i)] = values.at(i);
             }
-            ShowUserInfo->pushTable(m);
-            ShowUserInfo->run();
+            ShowUserInfo->call(m);
         }
     }
 
@@ -1260,45 +1256,35 @@ public:
         std::string infoStr = arg;
         info.push(infoStr);
         if (ShowInfo != nullptr) {
-            ShowInfo->pushPreamble();
-            ShowInfo->pushString(infoStr);
-            ShowInfo->run();
+            ShowInfo->call(infoStr);
         }
     }
 
     void showError(std::string arg) {
         info.push("!!! " + arg + " !!!");
         if (ShowError != nullptr) {
-            ShowError->pushPreamble();
-            ShowError->pushString(arg);
-            ShowError->run();
+            ShowError->call(arg);
         }
     }
 
     void showChat(std::string arg) {
         info.push(arg);
         if (ShowChat != nullptr) {
-            ShowChat->pushPreamble();
-            ShowChat->pushString(arg);
-            ShowChat->run();
+            ShowChat->call(arg);
         }
     }
 
     void addUser(std::string name) {
         userList.insert(name);
         if (AddUser != nullptr) {
-            AddUser->pushPreamble();
-            AddUser->pushString(name);
-            AddUser->run();
+            AddUser->call(name);
         }
     }
 
     void removeUser(std::string name) {
         userList.erase(name);
         if (RemoveUser != nullptr) {
-            RemoveUser->pushPreamble();
-            RemoveUser->pushString(name);
-            RemoveUser->run();
+            RemoveUser->call(name);
         }
     }
 

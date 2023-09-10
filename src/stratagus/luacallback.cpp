@@ -96,9 +96,9 @@ void LuaCallback::pushIntegers(const std::vector<int> &values)
 **
 **  @param s  the string to push on the stack
 */
-void LuaCallback::pushString(const std::string &s)
+void LuaCallback::pushString(std::string_view s)
 {
-	lua_pushstring(luastate, s.c_str());
+	lua_pushlstring(luastate, s.data(), s.size());
 	arguments++;
 }
 

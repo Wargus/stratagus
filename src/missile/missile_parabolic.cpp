@@ -95,10 +95,7 @@ static bool ParabolicMissile(Missile &missile)
 		if (missile.Type->SmokeParticle && missile.CurrentStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 									(int)pos.y + missile.Type->size.y / 2);
-			missile.Type->SmokeParticle->pushPreamble();
-			missile.Type->SmokeParticle->pushInteger(position.x);
-			missile.Type->SmokeParticle->pushInteger(position.y);
-			missile.Type->SmokeParticle->run();
+			missile.Type->SmokeParticle->call(position.x, position.y);
 		}
 
 		if (missile.Type->Pierce) {
