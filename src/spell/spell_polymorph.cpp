@@ -39,7 +39,7 @@
 #include "script.h"
 #include "unit.h"
 
-/* virtual */ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		std::string_view value = LuaToString(l, -1, j + 1);
@@ -74,7 +74,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Polymorph::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
+int Spell_Polymorph::Cast(CUnit &caster,
+                          const SpellType &spell,
+                          CUnit *&target,
+                          const Vec2i &goalPos) /* override */
 {
 	if (!target) {
 		return 0;
@@ -102,7 +105,6 @@
 
 	// as said somewhere else -- no corpses :)
 	target->Remove(nullptr);
-	Vec2i offset;
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
 	Vec2i resPos;
 	FindNearestDrop(type, pos, resPos, LookingW);

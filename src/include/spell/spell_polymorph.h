@@ -41,14 +41,13 @@
 class Spell_Polymorph : public SpellActionType
 {
 public:
-	Spell_Polymorph() : SpellActionType(1), NewForm(nullptr), PlayerNeutral(0) {};
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	Spell_Polymorph() : SpellActionType(1) {}
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	CUnitType *NewForm;         /// The new form
-	int PlayerNeutral;          /// Convert the unit to the neutral player, or to the caster's player.
+	CUnitType *NewForm = nullptr; /// The new form
+	int PlayerNeutral = 0;        /// Convert the unit to the neutral player, or to the caster's player.
 	// TODO: temporary polymorphs would be awesome, but hard to implement
 };
 

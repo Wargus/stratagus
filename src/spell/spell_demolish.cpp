@@ -39,7 +39,7 @@
 #include "unit.h"
 #include "unit_find.h"
 
-/* virtual */ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
@@ -63,7 +63,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *&, const Vec2i &goalPos)
+int Spell_Demolish::Cast(CUnit &caster,
+                         const SpellType &,
+                         CUnit *&,
+                         const Vec2i &goalPos) /* override */
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
@@ -93,12 +96,11 @@
 	//
 	if (this->Damage) {
 		std::vector<CUnit *> table = SelectFixed(minpos, maxpos);
-		for (size_t i = 0; i != table.size(); ++i) {
-			CUnit &unit = *table[i];
-			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
-				&& unit.MapDistanceTo(goalPos) <= this->Range) {
+		for (CUnit *unit : table) {
+			if (unit->Type->UnitType != UnitTypeFly && unit->IsAlive()
+			    && unit->MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!
-				HitUnit(&caster, unit, this->Damage);
+				HitUnit(&caster, *unit, this->Damage);
 			}
 		}
 	}

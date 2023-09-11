@@ -38,7 +38,7 @@
 #include "unit.h"
 #include "unit_find.h"
 
-/* virtual */ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
@@ -69,7 +69,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
+int Spell_AreaAdjustVital::Cast(CUnit &caster,
+                                const SpellType &spell,
+                                CUnit *&target,
+                                const Vec2i &goalPos) /* override */
 {
 	const Vec2i range(this->Range, this->Range);
 	const Vec2i typeSize(caster.Type->TileWidth, caster.Type->TileHeight);
@@ -79,9 +82,8 @@
 	int hp = this->HP;
 	int mana = this->Mana;
 	int shield = this->Shield;
-	CUnit* currentTarget;
-	for (size_t j = 0; j != units.size(); ++j) {
-		currentTarget = units[j];
+
+	for (CUnit* currentTarget : units) {
 		// if (!PassCondition(caster, spell, target, goalPos) {
 		if (!CanCastSpell(caster, spell, currentTarget, goalPos)) {
 			continue;

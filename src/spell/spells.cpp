@@ -79,9 +79,9 @@ std::vector<SpellType *> SpellTypeTable;
 **
 **  @return the new target.
 */
-static Target *NewTargetUnit(CUnit &unit)
+static std::unique_ptr<Target> NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, unit.tilePos);
+	return std::make_unique<Target>(TargetUnit, &unit, unit.tilePos);
 }
 
 // ****************************************************************************
@@ -122,13 +122,11 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		return true;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) { // for custom variables
-		const CUnit *unit;
-
 		if (!condition->Variable[i].Check) {
 			continue;
 		}
 
-		unit = (condition->Variable[i].ConditionApplyOnCaster) ? &caster : target;
+		const CUnit *unit = (condition->Variable[i].ConditionApplyOnCaster) ? &caster : target;
 		//  Spell should target location and have unit condition.
 		if (unit == nullptr) {
 			continue;
@@ -172,7 +170,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			return false;
 		}
 	}
-	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
+	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag.data())) {
 		return false;
 	}
 
@@ -216,7 +214,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 class AutoCastPrioritySort
 {
 public:
-	explicit AutoCastPrioritySort(const CUnit &caster, const int var, const bool reverse) :
+	AutoCastPrioritySort(const CUnit &caster, const int var, const bool reverse) :
 		caster(caster), variable(var), reverse(reverse) {}
 	bool operator()(const CUnit *lhs, const CUnit *rhs) const
 	{
@@ -250,15 +248,15 @@ private:
 **  @todo FIXME: should be global (for AI) ???
 **  @todo FIXME: write for position target.
 */
-static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
+static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
 {
 	AutoCastInfo *autocast;
 
 	// Ai cast should be a lot better. Use autocast if not found.
 	if (caster.Player->AiEnabled && spell.AICast) {
-		autocast = spell.AICast;
+		autocast = spell.AICast.get();
 	} else {
-		autocast = spell.AutoCast;
+		autocast = spell.AutoCast.get();
 	}
 	Assert(autocast);
 	const Vec2i &pos = caster.tilePos;
@@ -273,17 +271,16 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	// Check generic conditions. FIXME: a better way to do this?
 	if (autocast->Combat != CONDITION_TRUE) {
 		// Check each unit if it is hostile.
-		bool inCombat = false;
-		for (size_t i = 0; i < table.size(); ++i) {
-			const CUnit &target = *table[i];
-
-			// Note that CanTarget doesn't take into account (offensive) spells...
-			if (target.IsVisibleAsGoal(*caster.Player) && caster.IsEnemy(target)
-				&& (CanTarget(*caster.Type, *target.Type) || CanTarget(*target.Type, *caster.Type))) {
-				inCombat = true;
-				break;
-			}
-		}
+		const bool inCombat =
+			ranges::find_if(table,
+		                    [&](const auto *target) {
+								// Note that CanTarget doesn't take into account (offensive) spells...
+								return target->IsVisibleAsGoal(*caster.Player)
+			                        && caster.IsEnemy(*target)
+			                        && (CanTarget(*caster.Type, *target->Type)
+			                            || CanTarget(*target->Type, *caster.Type));
+							})
+			!= table.end();
 		if ((autocast->Combat == CONDITION_ONLY) ^ (inCombat)) {
 			return nullptr;
 		}
@@ -291,8 +288,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 
 	switch (spell.Target) {
 		case TargetSelf :
-			if (PassCondition(caster, spell, &caster, pos, spell.Condition)
-				&& PassCondition(caster, spell, &caster, pos, autocast->Condition)) {
+			if (PassCondition(caster, spell, &caster, pos, spell.Condition.get())
+				&& PassCondition(caster, spell, &caster, pos, autocast->Condition.get())) {
 				return NewTargetUnit(caster);
 			}
 			return nullptr;
@@ -310,8 +307,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 							continue;
 						}
 					}
-					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+					if (PassCondition(caster, spell, table[i], pos, spell.Condition.get())
+						&& PassCondition(caster, spell, table[i], pos, autocast->Condition.get())) {
 							table[count++] = table[i];
 					}
 				}
@@ -330,12 +327,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					autocast->PositionAutoCast->run(2);
 					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
 					if (Map.Info.IsPointOnMap(resPos)) {
-						Target *target = new Target(TargetPosition, nullptr, resPos);
-						return target;
+						return std::make_unique<Target>(TargetPosition, nullptr, resPos);
 					}
 				}
 			}
-			return 0;
+			return nullptr;
 		}
 		case TargetUnit: {
 			// The units are already selected.
@@ -364,8 +360,8 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						continue;
 					}
 				}
-				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-					&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+				if (PassCondition(caster, spell, table[i], pos, spell.Condition.get())
+					&& PassCondition(caster, spell, table[i], pos, autocast->Condition.get())) {
 					table[n++] = table[i];
 				}
 			}
@@ -387,7 +383,6 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			DebugPrint("Spell is screwed up, unknown target type\n");
 			Assert(0);
 			return nullptr;
-			break;
 	}
 	return nullptr; // Can't spell the auto-cast.
 }
@@ -459,7 +454,7 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 	if (spell.Target == TargetUnit && target == nullptr) {
 		return false;
 	}
-	return PassCondition(caster, spell, target, goalPos, spell.Condition);
+	return PassCondition(caster, spell, target, goalPos, spell.Condition.get());
 }
 
 /**
@@ -478,7 +473,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 		|| caster.SpellCoolDownTimers[spell.Slot]) {
 		return 0;
 	}
-	Target *target = SelectTargetUnitsOfAutoCast(caster, spell);
+	auto target = SelectTargetUnitsOfAutoCast(caster, spell);
 	if (target == nullptr) {
 		return 0;
 	} else {
@@ -489,7 +484,6 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 		}
 		// Must move before ?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
-		delete target;
 		if (savedOrder != nullptr) {
 			caster.SavedOrder = savedOrder;
 		}
@@ -537,7 +531,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
 			}
 		}
-		for (SpellActionType *act : spell.Action) {
+		for (auto& act : spell.Action) {
 			if (act->ModifyManaCaster) {
 				mustSubtractMana = false;
 			}
@@ -564,38 +558,6 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 	//
 	return 0;
 }
-
-
-/**
-**  SpellType constructor.
-*/
-SpellType::SpellType(int slot, const std::string &ident) :
-	Ident(ident), Slot(slot), Target(), Action(),
-	Range(0), ManaCost(0), RepeatCast(0), CoolDown(0),
-	DependencyId(-1), Condition(nullptr),
-	AutoCast(nullptr), AICast(nullptr), ForceUseAnimation(false)
-{
-	memset(Costs, 0, sizeof(Costs));
-}
-
-/**
-**  SpellType destructor.
-*/
-SpellType::~SpellType()
-{
-	for (auto *act : Action) {
-		delete act;
-	}
-	Action.clear();
-
-	delete Condition;
-	//
-	// Free Autocast.
-	//
-	delete AutoCast;
-	delete AICast;
-}
-
 
 /**
 ** Cleanup the spell subsystem.

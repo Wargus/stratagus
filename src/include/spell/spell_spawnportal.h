@@ -41,15 +41,14 @@
 class Spell_SpawnPortal : public SpellActionType
 {
 public:
-	Spell_SpawnPortal() : PortalType(0), TTL(0), CurrentPlayer(false) {};
-	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *&target, const Vec2i &goalPos);
-	virtual void Parse(lua_State *l, int startIndex, int endIndex);
+	Spell_SpawnPortal() = default;
+	int Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos) override;
+	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	CUnitType *PortalType;   /// The unit type spawned
-	int TTL;                 /// Time to live for summoned portal. 0 means infinite
-	bool CurrentPlayer;      /// If true, summon portal for caster's player rather than neutral
+	CUnitType *PortalType = nullptr; /// The unit type spawned
+	int TTL = 0;                     /// Time to live for summoned portal. 0 means infinite
+	bool CurrentPlayer = false;      /// If true, summon portal for caster's player rather than neutral
 };
 
 

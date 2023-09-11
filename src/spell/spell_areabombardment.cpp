@@ -40,7 +40,7 @@
 #include "unit.h"
 #include "video.h"
 
-/* virtual */ void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		std::string_view value = LuaToString(l, -1, j + 1);
@@ -81,7 +81,10 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *&, const Vec2i &goalPos)
+int Spell_AreaBombardment::Cast(CUnit &caster,
+                                const SpellType &,
+                                CUnit *&,
+                                const Vec2i &goalPos) /* override */
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;

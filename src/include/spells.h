@@ -63,8 +63,8 @@ class MissileType;
 class SpellActionType
 {
 public:
-	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {};
-	virtual ~SpellActionType() {};
+	SpellActionType(int mod = 0) : ModifyManaCaster(mod) {}
+	virtual ~SpellActionType() {}
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit* &target, const Vec2i &goalPos) = 0;
@@ -109,22 +109,20 @@ public:
 class ConditionInfoVariable
 {
 public:
-	ConditionInfoVariable() : Enable(0), Check(false), ExactValue(0), ExceptValue(0),
-		MinValue(0), MaxValue(0), MinMax(0), MinValuePercent(0), MaxValuePercent(0),
-		ConditionApplyOnCaster(0) {};
+	ConditionInfoVariable() = default;
 
-	char Enable;                /// Target is 'user defined variable'.
-	bool Check;                 /// True if need to check that variable.
+	char Enable = 0;                /// Target is 'user defined variable'.
+	bool Check = false;             /// True if need to check that variable.
 
-	int ExactValue;             /// Target must have exactly ExactValue of it's value.
-	int ExceptValue;            /// Target mustn't have ExceptValue of it's value.
-	int MinValue;               /// Target must have more Value than that.
-	int MaxValue;               /// Target must have less Value than that.
-	int MinMax;                 /// Target must have more Max than that.
-	int MinValuePercent;        /// Target must have more (100 * Value / Max) than that.
-	int MaxValuePercent;        /// Target must have less (100 * Value / Max) than that.
+	int ExactValue = 0;             /// Target must have exactly ExactValue of it's value.
+	int ExceptValue = 0;            /// Target mustn't have ExceptValue of it's value.
+	int MinValue = 0;               /// Target must have more Value than that.
+	int MaxValue = 0;               /// Target must have less Value than that.
+	int MinMax = 0;                 /// Target must have more Max than that.
+	int MinValuePercent = 0;        /// Target must have more (100 * Value / Max) than that.
+	int MaxValuePercent = 0;        /// Target must have less (100 * Value / Max) than that.
 
-	char ConditionApplyOnCaster; /// true if these condition are for caster.
+	bool ConditionApplyOnCaster = false; /// true if these condition are for caster.
 	// FIXME : More (increase, MaxMax) ?
 };
 
@@ -136,28 +134,21 @@ public:
 class ConditionInfo
 {
 public:
-	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(1),
-		BoolFlag(nullptr), Variable(nullptr), CheckFunc(nullptr) {};
-	~ConditionInfo()
-	{
-		delete[] BoolFlag;
-		delete[] Variable;
-		delete CheckFunc;
-	};
+	ConditionInfo() = default;
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
 #define CONDITION_FALSE 1
 #define CONDITION_TRUE  0
 #define CONDITION_ONLY  2
-	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
-	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
-	char TargetSelf;        /// Target is the same as the caster.
+	char Alliance = 0;          /// Target is allied. (neutral is neither allied, nor opponent)
+	char Opponent = 0;          /// Target is opponent. (neutral is neither allied, nor opponent)
+	char TargetSelf = 1;        /// Target is the same as the caster.
 
-	char *BoolFlag;         /// User defined boolean flag.
+	std::vector<char> BoolFlag;         /// User defined boolean flag.
 
-	ConditionInfoVariable *Variable;
-	LuaCallback *CheckFunc;
+	std::vector<ConditionInfoVariable> Variable;
+	std::unique_ptr<LuaCallback> CheckFunc;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -173,30 +164,24 @@ public:
 	// Special flags for priority sorting
 #define ACP_NOVALUE -1
 #define ACP_DISTANCE -2
-	AutoCastInfo() : Range(0), MinRange(0), PriorytyVar(ACP_NOVALUE), ReverseSort(false), Condition(nullptr),
-		Combat(0), Attacker(0), Corpse(CONDITION_FALSE), PositionAutoCast(nullptr) {};
-	~AutoCastInfo()
-	{
-		delete Condition;
-		delete PositionAutoCast;
-	};
+	AutoCastInfo() = default;
 	/// @todo this below is SQUARE!!!
-	int Range;                   /// Max range of the target.
-	int MinRange;                /// Min range of the target.
+	int Range = 0;                   /// Max range of the target.
+	int MinRange = 0;                /// Min range of the target.
 
-	int PriorytyVar;             /// Variable to sort autocast targets by priority.
-	bool ReverseSort;            /// If true, small values have the highest priority.
+	int PriorytyVar = ACP_NOVALUE;   /// Variable to sort autocast targets by priority.
+	bool ReverseSort = false;        /// If true, small values have the highest priority.
 
-	ConditionInfo *Condition;    /// Conditions to cast the spell.
+	std::unique_ptr<ConditionInfo> Condition;    /// Conditions to cast the spell.
 
 	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
-	int Combat;                  /// If it should be casted in combat
-	int Attacker;                /// If it should be casted on unit which attacks
-	int Corpse;                  /// If it should be casted on corpses
+	int Combat = 0;                  /// If it should be casted in combat
+	int Attacker = 0;                /// If it should be casted on unit which attacks
+	int Corpse = CONDITION_FALSE;    /// If it should be casted on corpses
 
 	// Position autocast callback
-	LuaCallback *PositionAutoCast;
+	std::unique_ptr<LuaCallback> PositionAutoCast;
 };
 
 /**
@@ -205,8 +190,9 @@ public:
 class SpellType
 {
 public:
-	SpellType(int slot, const std::string &ident);
-	~SpellType();
+	SpellType(int slot, const std::string &ident) : Ident(ident), Slot(slot) {}
+
+	bool IsCasterOnly() const { return !Range && Target == TargetSelf; }
 
 	// Identification stuff
 	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
@@ -215,31 +201,26 @@ public:
 
 	// Spell Specifications
 	TargetType Target;          /// Targeting information. See TargetType.
-	std::vector<SpellActionType *> Action; /// More arguments for spell (damage, delay, additional sounds...).
+	std::vector<std::unique_ptr<SpellActionType>> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
-	int Range;                  /// Max range of the target.
+	int Range = 0;                  /// Max range of the target.
 #define INFINITE_RANGE 0xFFFFFFF
-	int ManaCost;               /// Required mana for each cast.
-	int RepeatCast;             /// If the spell will be cast again until out of targets.
-	int Costs[MaxCosts];        /// Resource costs of spell.
-	int CoolDown;               /// How much time spell needs to be cast again.
+	int ManaCost = 0;               /// Required mana for each cast.
+	int RepeatCast = 0;             /// If the spell will be cast again until out of targets.
+	int Costs[MaxCosts]{};          /// Resource costs of spell.
+	int CoolDown = 0;               /// How much time spell needs to be cast again.
 
-	int DependencyId;           /// Id of upgrade, -1 if no upgrade needed for cast the spell.
-	ConditionInfo *Condition;   /// Conditions to cast the spell. (generic (no test for each target))
+	int DependencyId = -1;          /// Id of upgrade, -1 if no upgrade needed for cast the spell.
+	std::unique_ptr<ConditionInfo> Condition;   /// Conditions to cast the spell. (generic (no test for each target))
 
 	// Autocast information. No AICast means the AI use AutoCast.
-	AutoCastInfo *AutoCast;     /// AutoCast information for your own units
-	AutoCastInfo *AICast;       /// AutoCast information for ai. More detalied.
+	std::unique_ptr<AutoCastInfo> AutoCast;     /// AutoCast information for your own units
+	std::unique_ptr<AutoCastInfo> AICast;       /// AutoCast information for ai. More detailed.
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
 
-	bool IsCasterOnly() const
-	{
-		return !Range && Target == TargetSelf;
-	}
-	bool ForceUseAnimation;
-
+	bool ForceUseAnimation = false;
 };
 
 /*----------------------------------------------------------------------------

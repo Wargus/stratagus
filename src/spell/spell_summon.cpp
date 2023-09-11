@@ -44,7 +44,7 @@
 #include "unit.h"
 #include "unit_find.h"
 
-/* virtual */ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex)
+void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex) /* override */
 {
 	for (int j = startIndex; j < endIndex; ++j) {
 		std::string_view value = LuaToString(l, -1, j + 1);
@@ -70,16 +70,6 @@
 	}
 }
 
-class IsDyingAndNotABuilding
-{
-public:
-	bool operator()(const CUnit *unit) const
-	{
-		return unit->CurrentAction() == UnitAction::Die && !unit->Type->Building;
-	}
-};
-
-
 /**
 **  Cast summon spell.
 **
@@ -90,7 +80,10 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *&target, const Vec2i &goalPos)
+int Spell_Summon::Cast(CUnit &caster,
+                       const SpellType &spell,
+                       CUnit *&target,
+                       const Vec2i &goalPos) /* override */
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
@@ -102,7 +95,9 @@ public:
 		const Vec2i minPos = pos - offset;
 		const Vec2i maxPos = pos + offset;
 
-		CUnit *unit = FindUnit_If(minPos, maxPos, IsDyingAndNotABuilding());
+		CUnit *unit = FindUnit_If(minPos, maxPos, [](const CUnit* unit) {
+			return unit->CurrentAction() == UnitAction::Die && !unit->Type->Building;
+		});
 		cansummon = false;
 
 		if (unit != nullptr) { //  Found a corpse. eliminate it and proceed to summoning.
