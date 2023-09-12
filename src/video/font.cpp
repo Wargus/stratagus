@@ -50,7 +50,7 @@
 using FontMap = std::map<std::string, CFont *, std::less<>>;
 static FontMap Fonts;  /// Font mappings
 
-using FontColorMap = std::map<std::string, CFontColor *, std::less<>>;
+using FontColorMap = std::map<std::string, std::unique_ptr<CFontColor>, std::less<>>;
 static FontColorMap FontColors;  /// Map of ident to font color.
 
 static CFontColor *FontColor;                /// Current font color
@@ -102,7 +102,8 @@ CFont &GetGameFont()
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
-/* virtual */ void CFont::drawString(gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal)
+void CFont::drawString(
+	gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal) /* override */
 {
 	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
@@ -139,7 +140,7 @@ static void VideoDrawChar(const CGraphic &g,
 {
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	SDL_SetPaletteColors(g.Surface->format->palette, fc.Colors, 0, MaxFontColors);
+	SDL_SetPaletteColors(g.Surface->format->palette, fc.Colors.data(), 0, fc.Colors.size());
 	SDL_BlitSurface(g.Surface, &srect, TheScreen, &drect);
 }
 
@@ -404,15 +405,14 @@ bool CFont::IsLoaded() const
 */
 int CFont::Width(const int number) const
 {
-	int width = 0;
 	static_assert(sizeof(int) <= 8); // 64bit numbers need at most 20 decimal places
-	char buf[20] = {'\0'};
-	int len = snprintf(buf, sizeof(buf), "%d", number);
-	int commas = (len - (number < 0 ? 1 : 0) - 1) / 3;
+	auto s = std::to_string(number);
+	int commas = (s.size() - (number < 0 ? 1 : 0) - 1) / 3;
 
 	DynamicLoad();
-	for (int i = 0; i < len; i++) {
-		width += this->CharWidth[buf[i] - 32] + 1;
+	int width = 0;
+	for (auto c : s) {
+		width += this->CharWidth[c - 32] + 1;
 	}
 	width += (this->CharWidth[',' - 32] + 1) * commas;
 	return width;
@@ -471,16 +471,13 @@ extern int convertKey(const char *key);
 */
 int GetHotKey(const std::string &text)
 {
-	int hotkey = 0;
-	size_t pos = 0;
-
 	if (text.length() > 1) {
-		hotkey = convertKey(text.c_str());
+		return convertKey(text.c_str());
 	} else if (text.length() == 1) {
-		hotkey = CodepageIndexFromUTF8(text, pos, pos);
+		size_t pos = 0;
+		return CodepageIndexFromUTF8(text, pos, pos);
 	}
-
-	return hotkey;
+	return 0;
 }
 
 CFont::~CFont()
@@ -488,7 +485,6 @@ CFont::~CFont()
 	if (G) {
 		CGraphic::Free(G);
 	}
-	delete[] CharWidth;
 }
 
 /**
@@ -561,8 +557,6 @@ template <const bool CLIP>
 int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc) const
 {
 	int widths = 0;
-	int utf8;
-	bool tab;
 	const int tabSize = 4; // FIXME: will be removed when text system will be rewritten
 	size_t pos = 0;
 	size_t subpos = 0;
@@ -571,8 +565,8 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 	font->DynamicLoad();
 	CGraphic *g = font->GetFontColorGraphic(*FontColor);
 
-	while ((utf8 = CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos))) {
-		tab = false;
+	while (int utf8 = CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos)) {
+		bool tab = false;
 		if (utf8 == '\t') {
 			tab = true;
 		} else if (utf8 == '~' && !subpos) {
@@ -841,9 +835,8 @@ void CFont::MeasureWidths()
 {
 	const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
 
-	delete[] CharWidth;
-	CharWidth = new char[maxy];
-	memset(CharWidth, 0, maxy);
+	CharWidth.resize(maxy);
+	std::fill(std::begin(CharWidth), std::end(CharWidth), 0);
 	CharWidth[0] = G->Width / 2;  // a reasonable value for SPACE
 	Uint32 ckey = 0;
 	const int ipr = G->Surface->w / G->Width; // images per row
@@ -894,7 +887,7 @@ void CFont::Load()
 void CFont::DynamicLoad() const
 {
 	const_cast<CFont *>(this)->Load();
-	if (this->CharWidth == 0) {
+	if (this->CharWidth.empty()) {
 		const_cast<CFont *>(this)->MeasureWidths();
 	}
 }
@@ -980,18 +973,6 @@ void ReloadFonts()
 	return font;
 }
 
-CFontColor::CFontColor(const std::string &ident)
-{
-	Ident = ident;
-	Colors = (SDL_Color*)calloc(sizeof(SDL_Color), MaxFontColors);
-	Assert(Colors);
-}
-
-CFontColor::~CFontColor()
-{
-	free(Colors);
-}
-
 /**
 **  Create a new font color
 **
@@ -1001,12 +982,12 @@ CFontColor::~CFontColor()
 */
 /* static */ CFontColor *CFontColor::New(const std::string &ident)
 {
-	CFontColor *&fc = FontColors[ident];
+	auto &fc = FontColors[ident];
 
 	if (fc == nullptr) {
-		fc = new CFontColor(ident);
+		fc = std::make_unique<CFontColor>(ident);
 	}
-	return fc;
+	return fc.get();
 }
 
 /**
@@ -1022,7 +1003,7 @@ CFontColor::~CFontColor()
 	if (it == FontColors.end()) {
 		DebugPrint("font color not found: %s\n" _C_ ident.data());
 	}
-	return it->second;
+	return it->second.get();
 }
 
 void CFont::Clean()
@@ -1040,9 +1021,6 @@ void CleanFonts()
 	}
 	Fonts.clear();
 
-	for (auto &[key, fontColor] : FontColors) {
-		delete fontColor;
-	}
 	FontColors.clear();
 
 	SmallFont = nullptr;

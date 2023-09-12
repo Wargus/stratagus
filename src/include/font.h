@@ -59,9 +59,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string>
 #include "color.h"
 #include "guichan/font.h"
+
+#include <array>
+#include <string>
+#include <SDL.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -73,9 +76,8 @@ class CFontColor;
 class CFont : public gcn::Font
 {
 private:
-	explicit CFont(const std::string &ident) :
-		Ident(ident),
-		CharWidth(nullptr),
+	explicit CFont(std::string ident) :
+		Ident(std::move(ident)),
 		G(nullptr)
 	{}
 
@@ -90,9 +92,9 @@ public:
 	int Width(const int number) const;
 	bool IsLoaded() const;
 
-	virtual int getHeight() const { return Height(); }
-	virtual int getWidth(const std::string &text) const { return Width(text); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true);
+	int getHeight() const override { return Height(); }
+	int getWidth(const std::string &text) const override { return Width(text); }
+	void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true) override;
 
 	void Load();
 	void Reload() const;
@@ -110,7 +112,7 @@ private:
 
 private:
 	std::string Ident;    /// Ident of the font.
-	char *CharWidth;      /// Real font width (starting with ' ')
+	std::vector<char> CharWidth; /// Real font width (starting with ' ')
 	CGraphic *G;          /// Graphic object used to draw
 };
 
@@ -120,14 +122,13 @@ private:
 class CFontColor
 {
 public:
-	explicit CFontColor(const std::string &ident);
-	~CFontColor();
+	explicit CFontColor(std::string ident) : Ident(std::move(ident)) {}
 
 	static CFontColor *New(const std::string &ident);
 	static CFontColor *Get(std::string_view ident);
 
 	std::string Ident;
-	SDL_Color *Colors;
+	std::array<SDL_Color, MaxFontColors> Colors{};
 };
 
 /*----------------------------------------------------------------------------
