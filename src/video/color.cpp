@@ -29,10 +29,12 @@
 
 //@{
 
-#include "stratagus.h"
 #include "color.h"
+
 #include "script.h"
-#include "SDL.h"
+#include "stratagus.h"
+
+#include <SDL.h>
 
 CColor::operator SDL_Color() const
 {
@@ -72,36 +74,26 @@ void CUnitColors::Clear()
 	Colors.clear();
 }
 
-void CUnitColors::Set(std::vector<CColor> &colors)
+void CUnitColors::Set(const std::vector<CColor> &colors)
 {
 	Colors = colors;
 }
 
-PaletteSwap::PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, std::vector<CColor> &colors)
+PaletteSwap::PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, const std::vector<CColor> &colors) :
+	UnitVariableIndex(variable),
+	ColorIndexStart(colorStart),
+	ColorCount(colorCount),
+	Steps(steps),
+	AlternativesCount(alternatives),
+	Colors(std::begin(colors), std::end(colors))
 {
-	this->UnitVariableIndex = variable;
-	this->ColorIndexStart = colorStart;
-	this->ColorCount = colorCount;
-	this->Steps = steps;
-	this->AlternativesCount = alternatives;
-	this->Colors = new SDL_Color[colorCount * steps * alternatives];
 	Assert(colors.size() == colorCount * steps * alternatives);
-	for (unsigned int i = 0; i < colors.size(); i++) {
-		this->Colors[i] = colors[i];
-	}
 }
 
-PaletteSwap::~PaletteSwap()
-{
-	if (Colors) {
-		// delete[] Colors;
-	}
-}
-
-SDL_Color *PaletteSwap::GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt)
+const SDL_Color *PaletteSwap::GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt) const
 {
 	if (max == 0) {
-		return Colors;
+		return Colors.data();
 	}
 	unsigned int step = (this->Steps - 1) * value / max;
 	unsigned char alternative = alt % AlternativesCount;
@@ -109,18 +101,23 @@ SDL_Color *PaletteSwap::GetColorsForPercentAndAlternative(unsigned int value, un
 	return &Colors[step * ColorCount * AlternativesCount + alternative * ColorCount];
 }
 
+// Waiting for C++20
+static float lerp(float a, float b, float t)
+{
+	return (b - a) * t + a;
+}
+
 IntColor InterpolateColor(IntColor color1, IntColor color2, float fraction)
 {
-        unsigned char r1 = (color1 >> 16) & 0xff;
-        unsigned char r2 = (color2 >> 16) & 0xff;
-        unsigned char g1 = (color1 >> 8) & 0xff;
-        unsigned char g2 = (color2 >> 8) & 0xff;
-        unsigned char b1 = color1 & 0xff;
-        unsigned char b2 = color2 & 0xff;
+	unsigned char r1 = (color1 >> 16) & 0xff;
+	unsigned char r2 = (color2 >> 16) & 0xff;
+	unsigned char g1 = (color1 >> 8) & 0xff;
+	unsigned char g2 = (color2 >> 8) & 0xff;
+	unsigned char b1 = color1 & 0xff;
+	unsigned char b2 = color2 & 0xff;
 
-        return (int) ((r2 - r1) * fraction + r1) << 16 |
-                (int) ((g2 - g1) * fraction + g1) << 8 |
-                (int) ((b2 - b1) * fraction + b1);
+	return (int) lerp(r1, r2, fraction) << 16 | (int) lerp(g1, g2, fraction) << 8
+	     | (int) lerp(b1, b2, fraction);
 }
 
 //@}
