@@ -151,14 +151,6 @@ extern void PrintOnStdOut(const char *format, ...);
 #include "util.h"
 #include "settings.h"
 
-inline char *new_strdup(const char *str)
-{
-	int len = strlen(str) + 1;
-	char *newstr = new char[len];
-	strcpy_s(newstr, len, str);
-	return newstr;
-}
-
 inline bool starts_with(std::string_view s, std::string_view prefix)
 {
 	return s.substr(0, prefix.size()) == prefix;
