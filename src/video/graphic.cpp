@@ -434,7 +434,7 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 		g->Height = h;
 	} else {
 		++g->Refs;
-		DebugPrint("f:%s,w%d,W%d,H%d,h%d\n" _C_ filename.c_str() _C_ w _C_ g->Width _C_ g->Height _C_ h);
+		DebugPrint("f:%s,w%d,W%d,H%d,h%d\n", filename.c_str(), w, g->Width, g->Height, h);
 		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
 	}
 
@@ -1211,7 +1211,7 @@ static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
 {
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
 	if (!alphaSurface) {
-		DebugPrint("%s\n" _C_ SDL_GetError());
+		DebugPrint("%s\n", SDL_GetError());
 		Assert(false);
 	}
 	SDL_BlitSurface(*src, nullptr, alphaSurface, nullptr);
@@ -1226,7 +1226,7 @@ static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames,
 	shrink = std::abs(shrink);
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
 	if (!alphaSurface) {
-		DebugPrint("%s\n" _C_ SDL_GetError());
+		DebugPrint("%s\n", SDL_GetError());
 		Assert(false);
 	}
 	for (int f = 0; f < numFrames; f++) {

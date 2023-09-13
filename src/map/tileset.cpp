@@ -470,7 +470,7 @@ tile_index CTileset::tileFromQuad(uint32_t fixed, uint32_t quad) const
 	while (!(type1 = (fixed & 0xFF))) {
 		fixed >>= 8;
 		if (!fixed) {
-			DebugPrint("WARNING: No fixed tile found for %x" _C_ fixed);
+			DebugPrint("WARNING: No fixed tile found for %x", fixed);
 			return 0;
 		}
 	}

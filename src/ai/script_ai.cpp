@@ -404,7 +404,7 @@ static int CclDefineAi(lua_State *l)
 
 #ifdef DEBUG
 	if (GetAiTypesByName(aiName)) {
-		DebugPrint("Warning two or more AI's with the same name '%s'\n" _C_ aiName.data());
+		DebugPrint("Warning two or more AI's with the same name '%s'\n", aiName.data());
 	}
 #endif
 	AiTypes.insert(AiTypes.begin(), aitype);
@@ -768,7 +768,7 @@ static int CclAiWait(lua_State *l)
 			lua_pushboolean(l, 1);
 			return 1;
 		}
-		DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident.c_str());
+		DebugPrint("Broken? waiting on %s which wasn't requested.\n", type->Ident.c_str());
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -1641,7 +1641,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
 	Assert(playerIdx <= PlayerMax);
-	DebugPrint("%p %d\n" _C_(void *)Players[playerIdx].Ai _C_ Players[playerIdx].AiEnabled);
+	DebugPrint("%p %d\n", (void *)Players[playerIdx].Ai, Players[playerIdx].AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 

@@ -143,7 +143,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 #endif
 	// Look if found what was required.
 	if (Map.WallOnMap(pos)) {
-		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
+		DebugPrint("Wall found %d, %d\n", pos.x, pos.y);
 		if (resultPos) {
 			*resultPos = from;
 		}
@@ -279,7 +279,7 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 	}
 #endif
 	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
-		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
+		DebugPrint("Target found %d,%d\n", pos.x, pos.y);
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
@@ -343,8 +343,10 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 int AiForce::PlanAttack()
 {
 	CPlayer &player = *AiPlayer->Player;
-	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.Index
-			   _C_(long unsigned int)(this - & (AiPlayer->Force[0])) _C_ player.Index);
+	DebugPrint("%d: Planning for force #%lu of player #%d\n",
+	           player.Index,
+	           (long unsigned int) (this - &(AiPlayer->Force[0])),
+	           player.Index);
 
 	TerrainTraversal transporterTerrainTraversal;
 
@@ -354,7 +356,7 @@ int AiForce::PlanAttack()
 	CUnit *transporter = Units.find(IsAFreeTransporter());
 
 	if (transporter != nullptr) {
-		DebugPrint("%d: Transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+		DebugPrint("%d: Transporter #%d\n", player.Index, UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
 		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), IsAFreeTransporter());
@@ -362,7 +364,7 @@ int AiForce::PlanAttack()
 			transporter = *it;
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 		} else {
-			DebugPrint("%d: No transporter available\n" _C_ player.Index);
+			DebugPrint("%d: No transporter available\n", player.Index);
 			return 0;
 		}
 	}
@@ -371,7 +373,7 @@ int AiForce::PlanAttack()
 	// FIXME: if force is split over different places -> broken
 	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
 	if (landUnit == nullptr) {
-		DebugPrint("%d: No land unit in force\n" _C_ player.Index);
+		DebugPrint("%d: No land unit in force\n", player.Index);
 		return 0;
 	}
 
@@ -381,7 +383,7 @@ int AiForce::PlanAttack()
 		const unsigned int forceIndex = AiPlayer->Force.getIndex(this) + 1;
 
 		if (transporter->GroupId != forceIndex) {
-			DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(*transporter));
+			DebugPrint("%d: Assign any transporter #%d\n", player.Index, UnitNumber(*transporter));
 
 			if (transporter->GroupId) {
 				transporter->Player->Ai->Force[transporter->GroupId - 1].Remove(*transporter);
@@ -408,7 +410,7 @@ int AiForce::PlanAttack()
 				CUnit &unit = player.GetUnit(i);
 
 				if (isAFreeTransporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
-					DebugPrint("%d: Assign any transporter #%d\n" _C_ player.Index _C_ UnitNumber(unit));
+					DebugPrint("%d: Assign any transporter #%d\n", player.Index, UnitNumber(unit));
 					Insert(unit);
 					unit.GroupId = forceIndex;
 					totalBoardCapacity += unit.Type->MaxOnBoard - unit.BoardCount;
@@ -418,7 +420,7 @@ int AiForce::PlanAttack()
 				}
 			}
 		}
-		DebugPrint("%d: Can attack\n" _C_ player.Index);
+		DebugPrint("%d: Can attack\n", player.Index);
 		GoalPos = pos;
 		State = AiForceAttackingState::Boarding;
 		return 1;

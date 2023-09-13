@@ -407,7 +407,7 @@ SpellType &SpellTypeByIdent(const std::string_view &ident)
 	if (it != SpellTypeTable.end()) {
 		return **it;
 	}
-	DebugPrint("Unknown spellType '%s'\n" _C_ ident.data());
+	DebugPrint("Unknown spellType '%s'\n", ident.data());
 	ExitFatal(1);
 }
 
@@ -508,8 +508,12 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 		pos = caster.tilePos;
 		target = &caster;
 	}
-	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
-			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ pos.x _C_ pos.y);
+	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n",
+	           spell.Ident.c_str(),
+	           caster.Type->Name.c_str(),
+	           target ? target->Type->Name.c_str() : "none",
+	           pos.x,
+	           pos.y);
 	if (CanCastSpell(caster, spell, target, pos)) {
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.

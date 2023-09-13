@@ -584,7 +584,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	// Check if unit is already killed?
 	//
 	if (unit.Destroyed) {
-		DebugPrint(" destroyed unit skipping %d\n" _C_ UnitNumber(unit));
+		DebugPrint(" destroyed unit skipping %d\n", UnitNumber(unit));
 		return;
 	}
 	Assert(unit.Type);
@@ -845,9 +845,13 @@ void ExecExtendedCommand(unsigned char type, int status,
 			/// CommandLog(...);
 			break;
 		default:
-			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
-					   type _C_ status ? "flush" : "-" _C_
-					   arg1 _C_ arg2 _C_ arg3 _C_ arg4);
+			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n",
+			           type,
+			           status ? "flush" : "-",
+			           arg1,
+			           arg2,
+			           arg3,
+			           arg4);
 			break;
 	}
 }

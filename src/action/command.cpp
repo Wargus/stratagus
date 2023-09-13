@@ -699,8 +699,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 */
 void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 {
-	DebugPrint("Cancel %d type: %s\n" _C_ slot _C_
-			   type ? type->Ident.c_str() : "-any-");
+	DebugPrint("Cancel %d type: %s\n", slot, type ? type->Ident.c_str() : "-any-");
 
 	ClearSavedAction(unit);
 
@@ -851,8 +850,12 @@ void CommandCancelResearch(CUnit &unit)
 */
 void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast)
 {
-	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
-			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
+	DebugPrint(": %d casts %s at %d %d on %d\n",
+	           UnitNumber(unit),
+	           spell.Ident.c_str(),
+	           pos.x,
+	           pos.y,
+	           dest ? UnitNumber(*dest) : 0);
 	Assert(unit.Type->CanCastSpell[spell.Slot]);
 	Assert(Map.Info.IsPointOnMap(pos));
 

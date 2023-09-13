@@ -962,12 +962,12 @@ void ReloadFonts()
 {
 	auto it = Fonts.find(ident);
 	if (it == Fonts.end()) {
-		DebugPrint("font not found: %s\n" _C_ ident.data());
+		DebugPrint("font not found: %s\n", ident.data());
 		return nullptr;
 	}
 	CFont *font = it->second;
 	if (font == nullptr) {
-		DebugPrint("font not found: %s\n" _C_ ident.data());
+		DebugPrint("font not found: %s\n", ident.data());
 		return nullptr;
 	}
 	return font;
@@ -1001,7 +1001,7 @@ void ReloadFonts()
 {
 	auto it = FontColors.find(ident);
 	if (it == FontColors.end()) {
-		DebugPrint("font color not found: %s\n" _C_ ident.data());
+		DebugPrint("font color not found: %s\n", ident.data());
 	}
 	return it->second.get();
 }

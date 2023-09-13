@@ -97,7 +97,7 @@ static DWORD WINAPI DebugThreadFunction(LPVOID lpParam) {
 			CloseHandle((HANDLE)lpParam);
 			break;
 		}
-		DebugPrint("%s" _C_ chStatus);
+		DebugPrint("%s", chStatus);
 	}
 	return 0;
 }
@@ -177,7 +177,7 @@ static bool External_Play(const std::string &file) {
 #endif
 		auto args = QuoteArguments({L("stratagus-midiplayer.exe"), volumeStr, full_filenameStr});
 		auto cmd = std::accumulate(std::next(args.begin()), args.end(), args[0], [](const auto& lhs, const auto& rhs) { return lhs + L(" ") + rhs; });
-		DebugPrint("Using external command to play midi on windows: %s\n" _C_ cmd.c_str());
+		DebugPrint("Using external command to play midi on windows: %s\n", cmd.c_str());
 		STARTUPINFO si;
 		ZeroMemory(&si, sizeof(si));
 		si.cb = sizeof(si);
@@ -198,7 +198,7 @@ static bool External_Play(const std::string &file) {
 			g_hDebugThread = CreateThread(nullptr, 0, DebugThreadFunction, hChildStd_ERR_Rd, 0, nullptr);
 		} else {
 			result = false;
-			DebugPrint("CreateProcess failed (%d).\n" _C_ GetLastError());
+			DebugPrint("CreateProcess failed (%d).\n", GetLastError());
 		}
 		return result;
 	}
@@ -481,7 +481,7 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 {
 	int channel = -1;
 	if (SoundEnabled() && EffectsEnabled && sample) {
-		DebugPrint("play sample %d\n" _C_ sample->volume);
+		DebugPrint("play sample %d\n", sample->volume);
 #ifdef DYNAMIC_LOAD
 		if (sample->allocated == 0xcafebeef) {
 			char *name = (char*)(sample->abuf);
@@ -577,7 +577,7 @@ int PlayMusic(const std::string &file)
 	if (!SoundEnabled() || !IsMusicEnabled()) {
 		return -1;
 	}
-	DebugPrint("play music %s\n" _C_ file.c_str());
+	DebugPrint("play music %s\n", file.c_str());
 	CallbackMusicEnable();
 
 	if (External_Play(file)) {
@@ -589,7 +589,7 @@ int PlayMusic(const std::string &file)
 		Mix_PlayMusic(music, 0);
 		return 0;
 	} else {
-		DebugPrint("Could not play %s\n" _C_ file.c_str());
+		DebugPrint("Could not play %s\n", file.c_str());
 		return -1;
 	}
 }

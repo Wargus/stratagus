@@ -104,7 +104,7 @@ CIcon::~CIcon()
 {
 	IconMap::iterator it = Icons.find(ident);
 	if (it == Icons.end()) {
-		DebugPrint("icon not found: %s\n" _C_ ident.data());
+		DebugPrint("icon not found: %s\n", ident.data());
 	}
 	return it->second;
 }
@@ -117,25 +117,25 @@ void CIcon::Load()
 		GScale = G->Clone(true);
 	}
 	if (Frame >= G->NumFrames) {
-		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+		DebugPrint("Invalid icon frame: %s - %d\n", Ident.c_str(), Frame);
 		Frame = 0;
 	}
 	for (auto g : this->SingleSelectionG) {
 		g->Load();
 		if (Frame >= G->NumFrames) {
-			DebugPrint("Invalid icon frame for single selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+			DebugPrint("Invalid icon frame for single selection graphic: %s - %d\n", Ident.c_str(), Frame);
 		}
 	}
 	for (auto g : this->GroupSelectionG) {
 		g->Load();
 		if (Frame >= G->NumFrames) {
-			DebugPrint("Invalid icon frame for group selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+			DebugPrint("Invalid icon frame for group selection graphic: %s - %d\n", Ident.c_str(), Frame);
 		}
 	}
 	for (auto g : this->ContainedG) {
 		g->Load();
 		if (Frame >= G->NumFrames) {
-			DebugPrint("Invalid icon frame for transport selection graphic: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
+			DebugPrint("Invalid icon frame for transport selection graphic: %s - %d\n", Ident.c_str(), Frame);
 		}
 	}
 }

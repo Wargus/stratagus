@@ -663,7 +663,7 @@ static fs::path LibraryFileNameImpl(const std::string_view file)
 		return candidate;
 	}
 
-	DebugPrint("File '%s' not found\n" _C_ file);
+	DebugPrint("File '%s' not found\n", file.data());
 	return file;
 }
 

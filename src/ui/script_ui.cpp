@@ -616,7 +616,7 @@ static int CclDefinePanelContents(lua_State *l)
 		size_t j;
 		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {
 			if (infopanel->Name == UI.InfoPanelContents[j]->Name) {
-				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name.c_str());
+				DebugPrint("Redefinition of Panel '%s'\n", infopanel->Name.c_str());
 				delete UI.InfoPanelContents[j];
 				UI.InfoPanelContents[j] = infopanel;
 				break;
@@ -671,7 +671,7 @@ static int CclDefinePopup(lua_State *l)
 	}
 	for (size_t j = 0; j < UI.ButtonPopups.size(); ++j) {
 		if (popup->Ident == UI.ButtonPopups[j]->Ident) {
-			DebugPrint("Redefinition of Popup '%s'\n" _C_ popup->Ident.c_str());
+			DebugPrint("Redefinition of Popup '%s'\n", popup->Ident.c_str());
 			delete UI.ButtonPopups[j];
 			UI.ButtonPopups[j] = popup;
 			return 0;

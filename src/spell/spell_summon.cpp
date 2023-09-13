@@ -111,7 +111,7 @@ int Spell_Summon::Cast(CUnit &caster,
 	}
 
 	if (cansummon) {
-		DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
+		DebugPrint("Summoning a %s\n", unittype.Name.c_str());
 
 		//
 		// Create units.

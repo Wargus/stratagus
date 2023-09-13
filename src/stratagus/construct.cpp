@@ -163,7 +163,7 @@ CConstruction &ConstructionByIdent(std::string_view name)
 	if (it != Constructions.end()) {
 		return **it;
 	}
-	DebugPrint("Unknown construction '%s'\n" _C_ name.data());
+	DebugPrint("Unknown construction '%s'\n", name.data());
 	ExitFatal(1);
 }
 

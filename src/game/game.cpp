@@ -134,7 +134,7 @@ void StartMap(const std::string &filename, bool clean)
 	InterfaceState = IfaceState::Normal;
 
 	//  Create the game.
-	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
+	DebugPrint("Creating game with map: %s\n", filename.c_str());
 	if (clean) {
 		CleanPlayers();
 	}
@@ -1515,7 +1515,7 @@ static int CclSavedGameInfo(lua_State *l)
 			}
 			ranges::copy(filename, CurrentMapPath);
 			if (LuaLoadFile(fs::path(StratagusLibPath) / filename) == -1) {
-				DebugPrint("Load failed: %s\n" _C_ value);
+				DebugPrint("Load failed: %s\n", value.data());
 			}
 		} else if (value == "SyncHash") {
 			SyncHash = LuaToNumber(l, -1);

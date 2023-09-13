@@ -489,9 +489,9 @@ void AiForce::Attack(const Vec2i &pos)
 		isDefenceForce = true;
 	}
 	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
-		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
+		DebugPrint("%d: Need to plan an attack with transporter\n", AiPlayer->Player->Index);
 		if (State == AiForceAttackingState::Waiting && !PlanAttack()) {
-			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
+			DebugPrint("%d: Can't transport\n", AiPlayer->Player->Index);
 			Attacking = false;
 		}
 		return;
@@ -743,13 +743,13 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 	const Vec2i pos(x, y);
 
 	if (!(force < AI_MAX_FORCE_INTERNAL)) {
-		DebugPrint("Force out of range: %d" _C_ force);
+		DebugPrint("Force out of range: %d", force);
 		return ;
 	}
 
 	if (!Map.Info.IsPointOnMap(pos)) {
-		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
-				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
+		DebugPrint(
+			"(%d, %d) not in the map(%d, %d)", pos.x, pos.y, Map.Info.MapWidth, Map.Info.MapHeight);
 		return ;
 	}
 	AiPlayer->Force[force].Attack(pos);
@@ -763,7 +763,7 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 void AiAttackWithForce(unsigned int force)
 {
 	if (!(force < AI_MAX_FORCE_INTERNAL)) {
-		DebugPrint("Force out of range: %d" _C_ force);
+		DebugPrint("Force out of range: %d", force);
 		return ;
 	}
 
@@ -926,8 +926,9 @@ void AiForce::Update()
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState::Waiting) {
-			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n",
+			               AiPlayer->Player->Index,
+			               (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return;
@@ -943,8 +944,9 @@ void AiForce::Update()
 	}
 	if (Attacking == false) {
 		if (!Defending && State > AiForceAttackingState::Waiting) {
-			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n",
+			           AiPlayer->Player->Index,
+			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return ;
@@ -981,8 +983,9 @@ void AiForce::Update()
 		}
 		if (transporters.empty()) {
 			// Our transporters have been destroyed
-			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n"
-				_C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
+			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n",
+			           AiPlayer->Player->Index,
+			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
 		} else if (emptyTrans) {
 			// We have emptied our transporters, go go go
@@ -1033,8 +1036,9 @@ void AiForce::Update()
 				if (!unit) {
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
-					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n",
+					           AiPlayer->Player->Index,
+					           (long unsigned int) (this - &(AiPlayer->Force[0])));
 					Attacking = false;
 					State = AiForceAttackingState::Waiting;
 					return;
@@ -1092,8 +1096,9 @@ void AiForce::Update()
 		if (!unit) {
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
-			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
-					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
+			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n",
+			           AiPlayer->Player->Index,
+			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Attacking = false;
 			State = AiForceAttackingState::Waiting;
 			return;

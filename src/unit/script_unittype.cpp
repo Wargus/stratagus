@@ -485,7 +485,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	auto [type, redefined] = NewUnitTypeSlot(str);
 	if (redefined) {
-		DebugPrint("Redefining unit-type '%s'\n" _C_ str.data());
+		DebugPrint("Redefining unit-type '%s'\n", str.data());
 	} else {
 		type->NumDirections = 0;
 		type->Flip = 1;
@@ -1264,7 +1264,7 @@ static int CclCopyUnitType(lua_State *l)
 	const std::string_view toName = LuaToString(l, 2);
 	auto [to, redefined] = NewUnitTypeSlot(toName);
 	if (redefined) {
-		DebugPrint("Redefining unit-type '%s'\n" _C_ toName.data());
+		DebugPrint("Redefining unit-type '%s'\n", toName.data());
 	}
 
 	to->Flip = from.Flip;
@@ -1963,7 +1963,7 @@ static int CclDefineVariables(lua_State *l)
 			old++;
 			UnitTypeVar.Variable.resize(old);
 		} else {
-			DebugPrint("Warning, User Variable \"%s\" redefined\n" _C_ str.c_str());
+			DebugPrint("Warning, User Variable \"%s\" redefined\n", str.c_str());
 		}
 		if (!lua_istable(l, j + 2)) { // No change => default value.
 			continue;
@@ -2394,11 +2394,11 @@ void UpdateUnitVariables(CUnit &unit)
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;
 		if (unit.Variable[i].Value > unit.Variable[i].Max) {
-			DebugPrint("Value out of range: '%s'(%d), for variable '%s', value = %d, max = %d\n" _C_
-			           type->Ident.c_str() _C_
-			           UnitNumber(unit) _C_
-			           UnitTypeVar.VariableNameLookup[i].data() _C_
-			           unit.Variable[i].Value _C_
+			DebugPrint("Value out of range: '%s'(%d), for variable '%s', value = %d, max = %d\n",
+			           type->Ident.c_str(),
+			           UnitNumber(unit),
+			           UnitTypeVar.VariableNameLookup[i].data(),
+			           unit.Variable[i].Value,
 			           unit.Variable[i].Max);
 			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
 		}

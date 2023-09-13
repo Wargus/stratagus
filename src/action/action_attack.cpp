@@ -485,7 +485,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	CUnit *newTarget = nullptr;
 	if (unit.Selected)
 	{
-		DebugPrint("UnderAttack counter: %d \n" _C_ unit.UnderAttack);
+		DebugPrint("UnderAttack counter: %d \n", unit.UnderAttack);
 	}
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)

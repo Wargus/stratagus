@@ -138,8 +138,8 @@ extern void PrintOnStdOut(const char *format, ...);
 /**
 **  Print debug information with function name.
 */
-#define DebugPrint(args) \
-	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(args); } } while (0)
+#define DebugPrint(format, ...) \
+	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(format, __VA_ARGS__); } } while (0)
 
 #define LogPrint(args) \
 	do { PrintFunction(); PrintOnStdOut(args); } while (0)

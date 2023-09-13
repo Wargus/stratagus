@@ -317,7 +317,7 @@ public:
 
 	void print() const
 	{
-		DebugPrint("resent: %d packets\n" _C_ resentPacketCount);
+		DebugPrint("resent: %d packets\n", resentPacketCount);
 	}
 
 public:
@@ -326,13 +326,15 @@ public:
 
 static void printStatistic(const CUDPSocket::CStatistic &statistic)
 {
-	DebugPrint("Sent: %d packets %d bytes (max %d bytes).\n"
-			   _C_ statistic.sentPacketsCount _C_ statistic.sentBytesCount
-			   _C_ statistic.biggestSentPacketSize);
-	DebugPrint("Received: %d packets %d bytes (max %d bytes).\n" _C_
-			   statistic.receivedPacketsCount _C_ statistic.receivedBytesCount
-			   _C_ statistic.biggestReceivedPacketSize);
-	DebugPrint("Received: %d error(s).\n" _C_ statistic.receivedErrorCount);
+	DebugPrint("Sent: %d packets %d bytes (max %d bytes).\n",
+	           statistic.sentPacketsCount,
+	           statistic.sentBytesCount,
+	           statistic.biggestSentPacketSize);
+	DebugPrint("Received: %d packets %d bytes (max %d bytes).\n",
+	           statistic.receivedPacketsCount,
+	           statistic.receivedBytesCount,
+	           statistic.biggestReceivedPacketSize);
+	DebugPrint("Received: %d error(s).\n", statistic.receivedErrorCount);
 }
 
 static CNetworkStat NetworkStat;
@@ -426,15 +428,15 @@ void InitNetwork1()
 	}
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
-	DebugPrint("My host:port %s\n" _C_ hostStr.c_str());
+	DebugPrint("My host:port %s\n", hostStr.c_str());
 #endif
 
 	unsigned long ips[10];
 	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 10);
 	if (networkNumInterfaces) {
-		DebugPrint("Num IP: %d\n" _C_ networkNumInterfaces);
+		DebugPrint("Num IP: %d\n", networkNumInterfaces);
 		for (int i = 0; i < networkNumInterfaces; ++i) {
-			DebugPrint("IP: %d.%d.%d.%d\n" _C_ NIPQUAD(ntohl(ips[i])));
+			DebugPrint("IP: %d.%d.%d.%d\n", NIPQUAD(ntohl(ips[i])));
 		}
 	} else {
 		fprintf(stderr, "WARNING: Not connected to any external IPV4-network!\n");
@@ -479,9 +481,10 @@ void NetworkOnStartGame()
 	for (int i = 0; i < NetPlayers; ++i) {
 		Players[Hosts[i].PlyNr].SetName(Hosts[i].PlyName);
 	}
-	DebugPrint("Updates %d, Lag %d, Hosts %d\n" _C_
-			   CNetworkParameter::Instance.gameCyclesPerUpdate _C_
-			   CNetworkParameter::Instance.NetworkLag _C_ NetPlayers);
+	DebugPrint("Updates %d, Lag %d, Hosts %d\n",
+	           CNetworkParameter::Instance.gameCyclesPerUpdate,
+	           CNetworkParameter::Instance.NetworkLag,
+	           NetPlayers);
 
 	NetworkInSync = true;
 	CommandsIn.clear();
@@ -799,7 +802,7 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 		if (index == -1 || PlayerQuit[Hosts[index].PlyNr]) {
 #ifdef DEBUG
 			const std::string hostStr = host.toString();
-			DebugPrint("Not a host in play: %s\n" _C_ hostStr.c_str());
+			DebugPrint("Not a host in play: %s\n", hostStr.c_str());
 #endif
 			return;
 		}
@@ -847,8 +850,9 @@ static void NetworkParseInGameEvent(const unsigned char *buf, int len, const CHo
 			NetworkIn[packet.Header.Cycle][player][i].Data = packet.Command[i];
 		} else {
 			SetMessage(_("%s sent bad command"), Players[player].Name.c_str());
-			DebugPrint("%s sent bad command: 0x%x\n" _C_ Players[player].Name.c_str()
-					   _C_ packet.Header.Type[i] & 0x7F);
+			DebugPrint("%s sent bad command: 0x%x\n",
+			           Players[player].Name.c_str(),
+			           packet.Header.Type[i] & 0x7F);
 		}
 	}
 	for (int i = commands; i != MaxNetworkCommands; ++i) {
@@ -958,9 +962,12 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			savefile += ".sav";
 			SaveGame(savefile);
 		}
-		DebugPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n" _C_
-				   syncSeed _C_ NetworkSyncSeeds[gameNetCycle & 0xFF] _C_
-				   syncHash _C_ NetworkSyncHashs[gameNetCycle & 0xFF] _C_ GameCycle);	
+		DebugPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n",
+		           syncSeed,
+		           NetworkSyncSeeds[gameNetCycle & 0xFF],
+		           syncHash,
+		           NetworkSyncHashs[gameNetCycle & 0xFF],
+		           GameCycle);
 	} else {
 		gameInSync = true;
 	}
@@ -1075,7 +1082,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 				const CUnit &unit = UnitManager->GetSlotUnit(nc.Unit);
 				// FIXME: we can send destoyed units over network :(
 				if (unit.Destroyed) {
-					DebugPrint("Sending destroyed unit %d over network!!!!!!\n" _C_ nc.Unit);
+					DebugPrint("Sending destroyed unit %d over network!!!!!!\n", nc.Unit);
 				}
 			}
 #endif

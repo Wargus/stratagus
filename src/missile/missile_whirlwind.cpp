@@ -76,8 +76,10 @@ void MissileWhirlwind::Action()
 		this->destination = Map.TilePosToMapPixelPos_Center(newPos);
 		this->source = this->position;
 		this->State = 0;
-		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n" _C_
-				   this->destination.x _C_ this->destination.y _C_ this->TTL);
+		DebugPrint("Whirlwind new direction: %d, %d, TTL: %d\n",
+		           this->destination.x,
+		           this->destination.y,
+		           this->TTL);
 	}
 }
 

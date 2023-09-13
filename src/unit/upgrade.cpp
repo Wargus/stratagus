@@ -165,7 +165,7 @@ CUpgrade::~CUpgrade()
 {
 	auto it = Upgrades.find(ident);
 	if (it == Upgrades.end()) {
-		DebugPrint("upgrade not found: %s\n" _C_ ident.data());
+		DebugPrint("upgrade not found: %s\n", ident.data());
 	}
 	return it->second;
 }
@@ -370,7 +370,7 @@ static int CclDefineUnitAllow(lua_State *l)
 	const std::string_view ident = LuaToString(l, 0 + 1);
 
 	if (!starts_with(ident, "unit-")) {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
+		DebugPrint(" wrong ident %s\n", ident.data());
 		return 0;
 	}
 	int id = UnitTypeByIdent(ident).Slot;
@@ -426,7 +426,7 @@ static int CclDefineAllow(lua_State *l)
 				AllowUpgradeId(Players[i], id, ids[i]);
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n" _C_ ident);
+			DebugPrint(" wrong ident %s\n", ident.data());
 		}
 	}
 	return 0;
@@ -462,7 +462,7 @@ int UpgradeIdByIdent(std::string_view ident)
 	if (upgrade) {
 		return upgrade->ID;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.data());
+	DebugPrint(" fix this %s\n", ident.data());
 	return -1;
 }
 
@@ -1094,7 +1094,7 @@ char UpgradeIdentAllowed(const CPlayer &player, std::string_view ident)
 	if (id != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong identifier '%s'\n" _C_ ident.data());
+	DebugPrint("Fix your code, wrong identifier '%s'\n", ident.data());
 	return '-';
 }
 

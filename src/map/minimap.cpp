@@ -109,10 +109,13 @@ void CMinimap::Create()
 	XOffset = (W - (Map.Info.MapWidth * MinimapScaleX) / MINIMAP_FAC + 1) / 2;
 	YOffset = (H - (Map.Info.MapHeight * MinimapScaleY) / MINIMAP_FAC + 1) / 2;
 
-	DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n" _C_
-			   MinimapScaleX / MINIMAP_FAC _C_ MinimapScaleY / MINIMAP_FAC _C_
-			   MinimapScaleX _C_ MinimapScaleY _C_
-			   XOffset _C_ YOffset);
+	DebugPrint("MinimapScale %d %d (%d %d), X off %d, Y off %d\n",
+	           MinimapScaleX / MINIMAP_FAC,
+	           MinimapScaleY / MINIMAP_FAC,
+	           MinimapScaleX,
+	           MinimapScaleY,
+	           XOffset,
+	           YOffset);
 
 	//
 	// Calculate minimap fast lookup tables.

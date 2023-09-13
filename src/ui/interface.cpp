@@ -474,7 +474,7 @@ void UiFindIdleWorker()
 */
 static void UiToggleGrabMouse()
 {
-	DebugPrint("%x\n" _C_ KeyModifiers);
+	DebugPrint("%x\n", KeyModifiers);
 	ToggleGrabMouse(0);
 	UI.StatusLine.Set(_("Grab mouse toggled."));
 }

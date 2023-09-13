@@ -172,9 +172,11 @@ void COrder_Build::UpdatePathFinderData(PathFinderInput &input) /* override */
 */
 void COrder_Build::AiUnitKilled(CUnit &unit)
 {
-	DebugPrint("%d: %d(%s) killed, with order %s!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_
-			   unit.Type->Ident.c_str() _C_ this->Type->Ident.c_str());
+	DebugPrint("%d: %d(%s) killed, with order %s!\n",
+	           unit.Player->Index,
+	           UnitNumber(unit),
+	           unit.Type->Ident.c_str(),
+	           this->Type->Ident.c_str());
 	if (this->BuildingUnit == nullptr) {
 		AiReduceMadeInBuilt(*unit.Player->Ai, *this->Type);
 	}
@@ -290,10 +292,10 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
 	if (building != nullptr) {
 		if (unit.CurrentOrder() == this) {
-			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-					   _C_ unit.Player->Index _C_ unit.Slot
-					   _C_ building->Type->Name.c_str()
-					   _C_ building->Slot);
+			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n", 
+					   unit.Player->Index, unit.Slot, 
+					   building->Type->Name.c_str(), 
+					   building->Slot);
 
 			delete this; // Bad
 			unit.Orders[0] = COrder::NewActionRepair(unit, *building);

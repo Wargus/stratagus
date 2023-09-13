@@ -1093,7 +1093,7 @@ static int CclGetPlayerData(lua_State *l)
 				lua_pushstring(l, "F");
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n" _C_ ident);
+			DebugPrint(" wrong ident %s\n", ident);
 		}
 		return 1;
 	} else {

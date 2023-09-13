@@ -90,7 +90,7 @@ void MissileType::LoadMissileSprite()
 		}
 
 		// Correct the number of frames in graphic
-		DebugPrint("%s - %d>=%d\n" _C_ this->G->File.c_str() _C_ this->G->NumFrames _C_ this->SpriteFrames);
+		DebugPrint("%s - %d>=%d\n", this->G->File.c_str(), this->G->NumFrames, this->SpriteFrames);
 		Assert(this->G->NumFrames >= this->SpriteFrames);
 		this->G->NumFrames = this->SpriteFrames;
 		// FIXME: Don't use NumFrames as number of frames.
@@ -121,7 +121,7 @@ MissileType &MissileTypeByIdent(std::string_view ident)
 	if (it != MissileTypes.end()) {
 		return *it->second;
 	}
-	DebugPrint("Unknown missilttype	 '%s'\n" _C_ ident.data());
+	DebugPrint("Unknown missiletype '%s'\n", ident.data());
 	ExitFatal(1);
 }
 
@@ -139,7 +139,7 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 	if (res == nullptr) {
 		res = new MissileType(ident);
 	} else {
-		DebugPrint("Redefining missile-type '%s'\n" _C_ ident.c_str());
+		DebugPrint("Redefining missile-type '%s'\n", ident.c_str());
 	}
 	return res;
 }
@@ -409,8 +409,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		// Moved out of attack range?
 
 		if (unit.MapDistanceTo(*goal) < unit.Type->MinAttackRange) {
-			DebugPrint("Missile target too near %d,%d\n" _C_
-					   unit.MapDistanceTo(*goal) _C_ unit.Type->MinAttackRange);
+			DebugPrint("Missile target too near %d,%d\n",
+			           unit.MapDistanceTo(*goal),
+			           unit.Type->MinAttackRange);
 			// FIXME: do something other?
 			return;
 		}

@@ -1835,8 +1835,8 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
-			DebugPrint("active viewport changed to %ld.\n" _C_
-					   static_cast<long int>(UI.Viewports - vp));
+			DebugPrint("active viewport changed to %ld.\n",
+			           static_cast<long int>(UI.Viewports - vp));
 		}
 		CursorOn = ECursorOn::Map;
 
