@@ -781,9 +781,11 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 	file.printf("DefineUnitStats(\"%s\", %d, {\n  ", type.Ident.c_str(), plynr);
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d%s},\n  ",
-					UnitTypeVar.VariableNameLookup[i], stats.Variables[i].Value,
-					stats.Variables[i].Max, stats.Variables[i].Increase,
-					stats.Variables[i].Enable ? ", Enable = true" : "");
+		            UnitTypeVar.VariableNameLookup[i].data(),
+		            stats.Variables[i].Value,
+		            stats.Variables[i].Max,
+		            stats.Variables[i].Increase,
+		            stats.Variables[i].Enable ? ", Enable = true" : "");
 	}
 	file.printf("\"costs\", {");
 	for (unsigned int i = 0; i < MaxCosts; ++i) {

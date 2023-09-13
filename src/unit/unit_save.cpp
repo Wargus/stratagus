@@ -228,8 +228,11 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
 			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
-						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+			            UnitTypeVar.VariableNameLookup[i].data(),
+			            unit.Variable[i].Value,
+			            unit.Variable[i].Max,
+			            unit.Variable[i].Increase,
+			            unit.Variable[i].Enable ? "true" : "false");
 		}
 	}
 

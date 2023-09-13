@@ -401,10 +401,10 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 			}
 			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
 				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Max\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Max);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Enable\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Enable);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Increase);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j].data(), type.MapDefaultStat.Variables[j].Value);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Max\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j].data(), type.MapDefaultStat.Variables[j].Max);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Enable\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j].data(), type.MapDefaultStat.Variables[j].Enable);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j].data(), type.MapDefaultStat.Variables[j].Increase);
 				}
 			}
 			
