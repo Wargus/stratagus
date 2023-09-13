@@ -33,9 +33,9 @@
 //@{
 
 #if defined(DEBUG_ASTAR)
-#define AstarDebugPrint(x) DebugPrint(x)
+#define AstarDebugPrint(format, ...) DebugPrint(format, __VA_ARGS__)
 #else
-#define AstarDebugPrint(x)
+#define AstarDebugPrint(format, ...)
 #endif
 
 /*----------------------------------------------------------------------------
