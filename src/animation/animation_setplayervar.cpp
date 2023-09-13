@@ -122,7 +122,7 @@ int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 	} else if (prop == "TotalKills") {
 		return Players[player].TotalKills;
 	} else {
-		fprintf(stderr, "Invalid field: %s" _C_ prop.data());
+		fprintf(stderr, "Invalid field: %s", prop.data());
 		Exit(1);
 	}
 	return 0;
@@ -173,7 +173,7 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else if (prop == "TotalKills") {
 		Players[player].TotalKills = value;
 	} else {
-		fprintf(stderr, "Invalid field: %s" _C_ prop.data());
+		fprintf(stderr, "Invalid field: %s", prop.data());
 		Exit(1);
 	}
 }
