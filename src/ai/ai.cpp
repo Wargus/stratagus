@@ -461,8 +461,11 @@ void AiInit(CPlayer &player)
 		LogPrint("AI: not found!!!!!!!!!!\n");
 		LogPrint("AI: Using fallback:\n");
 	}
-	LogPrint("AI: %s:%s with %s:%s\n" _C_ PlayerRaces.Name[player.Race].c_str() _C_
-			   !ait->Race.empty() ? ait->Race.c_str() : "All" _C_ player.AiName.c_str() _C_ ait->Class.c_str());
+	LogPrint("AI: %s:%s with %s:%s\n",
+	         PlayerRaces.Name[player.Race].c_str(),
+	         !ait->Race.empty() ? ait->Race.c_str() : "All",
+	         player.AiName.c_str(),
+	         ait->Class.c_str());
 
 	pai->AiType = ait;
 	pai->Script = ait->Script;
