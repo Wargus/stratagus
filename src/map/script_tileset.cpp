@@ -144,7 +144,7 @@ tile_flags CTileset::parseTilesetTileFlags(lua_State *l, int *j)
 
 		//  Flags are mostly needed for the editor
 		if (ModifyFlag(value, &flags, logicalTileToGraphicalTileMultiplier * logicalTileToGraphicalTileMultiplier) == false) {
-			LuaError(l, "solid: unsupported tag: %s" _C_ value.data());
+			LuaError(l, "solid: unsupported tag: %s", value.data());
 		}
 	}
 	
@@ -198,7 +198,7 @@ void CTileset::parseSpecial(lua_State *l)
 			++j;
 			removedRockTile = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "special: unsupported tag: %s" _C_ value.data());
+			LuaError(l, "special: unsupported tag: %s", value.data());
 		}
 	}
 }
@@ -356,7 +356,7 @@ void CTileset::parseSlots(lua_State *l, int t)
 			parseMixed(l);
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "slots: unsupported tag: %s" _C_ value.data());
+			LuaError(l, "slots: unsupported tag: %s", value.data());
 		}
 	}
 }
@@ -382,7 +382,7 @@ void CTileset::parse(lua_State *l)
 		} else if (value == "slots") {
 			// must be deferred to later, after the size is parsed
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 
@@ -390,34 +390,43 @@ void CTileset::parse(lua_State *l)
 	double sizeShiftX = std::log2(this->pixelTileSize.x);
 	this->graphicalTileSizeShiftX = std::lround(sizeShiftX);
 	if (sizeShiftX != this->graphicalTileSizeShiftX) {
-		LuaError(l, "graphical tile size x %d must be a power of 2" _C_ this->pixelTileSize.x);
+		LuaError(l, "graphical tile size x %d must be a power of 2", this->pixelTileSize.x);
 	}
 
 	double sizeShiftY = std::log2(this->pixelTileSize.y);
 	this->graphicalTileSizeShiftY = std::lround(sizeShiftY);
 	if (sizeShiftX != this->graphicalTileSizeShiftY) {
-		LuaError(l, "graphical tile size y %d must be a power of 2" _C_ this->pixelTileSize.y);
+		LuaError(l, "graphical tile size y %d must be a power of 2", this->pixelTileSize.y);
 	}
 
 	int multiplier = this->pixelTileSize.x / PixelTileSize.x;
 	if (multiplier != this->pixelTileSize.y / PixelTileSize.y) {
-		LuaError(l, "logical tile sizes must use the same subdivision in x and y, not %d and %d" _C_ multiplier _C_ (this->pixelTileSize.y / PixelTileSize.y));
+		LuaError(l,
+		         "logical tile sizes must use the same subdivision in x and y, not %d and %d",
+		         multiplier,
+		         (this->pixelTileSize.y / PixelTileSize.y));
 	}
 	if (PixelTileSize.x * multiplier != this->pixelTileSize.x) {
-		LuaError(l, "graphical tile size x %d must be a multiple of logical tile size %d" _C_ this->pixelTileSize.x _C_ PixelTileSize.x);
+		LuaError(l,
+		         "graphical tile size x %d must be a multiple of logical tile size %d",
+		         this->pixelTileSize.x,
+		         PixelTileSize.x);
 	}
 	if (PixelTileSize.y * multiplier != this->pixelTileSize.y) {
-		LuaError(l, "graphical tile size y %d must be a multiple of logical tile size %d" _C_ this->pixelTileSize.y _C_ PixelTileSize.y);
+		LuaError(l,
+		         "graphical tile size y %d must be a multiple of logical tile size %d",
+		         this->pixelTileSize.y,
+		         PixelTileSize.y);
 	}
 	this->logicalTileToGraphicalTileMultiplier = multiplier;
 
 	double logicalSizePowerX = std::log2(PixelTileSize.x);
 	if (logicalSizePowerX != std::lround(logicalSizePowerX)) {
-		LuaError(l, "logical tile size x %d must be a power of 2" _C_ PixelTileSize.x);
+		LuaError(l, "logical tile size x %d must be a power of 2", PixelTileSize.x);
 	}
 	double logicalSizePowerY = std::log2(PixelTileSize.y);
 	if (logicalSizePowerY != std::lround(logicalSizePowerY)) {
-		LuaError(l, "logical tile size y %d must be a power of 2" _C_ PixelTileSize.y);
+		LuaError(l, "logical tile size y %d must be a power of 2", PixelTileSize.y);
 	}
 	long logicalToGraphicalShift = std::lround(sizeShiftX - logicalSizePowerX);
 	if (logicalToGraphicalShift < 0) {
@@ -444,7 +453,7 @@ void CTileset::parse(lua_State *l)
 			}
 			parseSlots(l, j);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 }
@@ -1614,7 +1623,7 @@ std::vector<tile_index> CTilesetParser::parseTilesRange(lua_State *luaStack, con
 				ranges::iota(resultSet, rangeFrom); /// fill vector with incremented (rangeFrom++) values
 
 			} else {
-				LuaError(luaStack, "Tiles range: unsupported tag: %s" _C_ rangeType.c_str());
+				LuaError(luaStack, "Tiles range: unsupported tag: %s", rangeType.c_str());
 			}
 		} else {
 			LuaError(luaStack, "Unsupported tiles range format");
@@ -1762,7 +1771,7 @@ void CTilesetParser::parseExtended(lua_State *luaStack)
 			}
 			parseExtendedSlots(luaStack, arg);
 		} else {
-			LuaError(luaStack, "Unsupported tag: %s" _C_ parsingValue.c_str());
+			LuaError(luaStack, "Unsupported tag: %s", parsingValue.c_str());
 		}
 	}
 }	

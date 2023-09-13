@@ -495,7 +495,7 @@ static int CclLog(lua_State *l)
 		} else if (value == "SyncRandSeed") {
 			log->SyncRandSeed = lua_tointeger(l, -1);
 		} else {
-			LuaError(l, "Unsupported key: %s" _C_ value.data());
+			LuaError(l, "Unsupported key: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -575,7 +575,7 @@ static int CclReplayLog(lua_State *l)
 					} else if (value == "Type") {
 						replay->ReplaySettings.Presets[j].Type = static_cast<PlayerTypes>(LuaToNumber(l, -1));
 					} else {
-						LuaError(l, "Unsupported key: %s" _C_ value.data());
+						LuaError(l, "Unsupported key: %s", value.data());
 					}
 					lua_pop(l, 1);
 				}
@@ -597,7 +597,7 @@ static int CclReplayLog(lua_State *l)
 			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
 			if (!replay->ReplaySettings.SetField({value.data(), value.size()}, LuaToNumber(l, -1))) {
-				LuaError(l, "Unsupported key: %s" _C_ value.data());
+				LuaError(l, "Unsupported key: %s", value.data());
 			}
 		}
 		lua_pop(l, 1);

@@ -318,7 +318,7 @@ static int CclDefineAiHelper(lua_State *l)
 			continue;
 		} else if (value == "unit-equiv") {
 		} else {
-			LuaError(l, "unknown tag: %s" _C_ value.data());
+			LuaError(l, "unknown tag: %s", value.data());
 		}
 		// Get the base unit type, which could handle the action.
 		const std::string_view baseTypeName = LuaToString(l, j + 1, 2);
@@ -876,7 +876,7 @@ static int CclAiForce(lua_State *l)
 	}
 	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
-		LuaError(l, "Force out of range: %d" _C_ force);
+		LuaError(l, "Force out of range: %d", force);
 	}
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
 	if (resetForce) {
@@ -977,7 +977,7 @@ static int CclAiForceRole(lua_State *l)
 	LuaCheckArgs(l, 2);
 	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
-		LuaError(l, "Force %i out of range" _C_ force);
+		LuaError(l, "Force %i out of range", force);
 	}
 
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
@@ -988,7 +988,7 @@ static int CclAiForceRole(lua_State *l)
 	} else if (flag == "defend") {
 		aiforce.Role = AiForceRole::Defend;
 	} else {
-		LuaError(l, "Unknown force role '%s'" _C_ flag.data());
+		LuaError(l, "Unknown force role '%s'", flag.data());
 	}
 	lua_pushboolean(l, 0);
 	return 1;
@@ -1004,7 +1004,7 @@ static int CclAiReleaseForce(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
-		LuaError(l, "Force out of range: %d" _C_ force);
+		LuaError(l, "Force out of range: %d", force);
 	}
 	for (int i = AI_MAX_FORCE_INTERNAL; i < AI_MAX_FORCES; ++i) {
 		if (AiPlayer->Force[i].FormerForce != -1 && AiPlayer->Force[i].FormerForce == force) {
@@ -1132,7 +1132,7 @@ static int CclAiAttackWithForce(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int force = LuaToNumber(l, 1);
 	if (force < 0 || force >= AI_MAX_FORCE_INTERNAL) {
-		LuaError(l, "Force out of range: %d" _C_ force);
+		LuaError(l, "Force out of range: %d", force);
 	}
 	AiAttackWithForce(force);
 	lua_pushboolean(l, 0);
@@ -1658,7 +1658,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const std::string_view aiName = LuaToString(l, j + 1);
 			CAiType *ait = GetAiTypesByName(aiName);
 			if (ait == nullptr) {
-				LuaError(l, "ai-type not found: %s" _C_ aiName.data());
+				LuaError(l, "ai-type not found: %s", aiName.data());
 			}
 			ai->AiType = ait;
 			ai->Script = ait->Script;
@@ -1698,7 +1698,7 @@ static int CclDefineAiPlayer(lua_State *l)
 					} else if (value == "defend") {
 						ai->Force[forceIdx].Role = AiForceRole::Defend;
 					} else {
-						LuaError(l, "Unsupported force tag: %s" _C_ value.data());
+						LuaError(l, "Unsupported force tag: %s", value.data());
 					}
 				} else if (value == "types") {
 					lua_rawgeti(l, j + 1, k + 1);
@@ -1741,7 +1741,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				} else if (value == "must-transport") {
 					// Keep for backward compatibility
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported tag: %s", value.data());
 				}
 			}
 		} else if (value == "reserve") {
@@ -1868,7 +1868,7 @@ static int CclDefineAiPlayer(lua_State *l)
 		} else if (value == "repair-building") {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;

@@ -49,7 +49,7 @@ void Spell_Demolish::Parse(lua_State *l, int startIndex, int endIndex) /* overri
 		} else if (value == "damage") {
 			this->Damage = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported demolish tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported demolish tag: %s", value.data());
 		}
 	}
 }

@@ -61,7 +61,7 @@ void Spell_Summon::Parse(lua_State *l, int startIndex, int endIndex) /* override
 			this->JoinToAiForce = true;
 			--j;
 		} else {
-			LuaError(l, "Unsupported summon tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported summon tag: %s", value.data());
 		}
 	}
 	// Now, checking value.

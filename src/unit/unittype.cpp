@@ -512,7 +512,7 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 {
 	const int res = GetResourceIdByName(resourceName);
 	if (res == -1) {
-		LuaError(l, "Resource not found: %s" _C_ resourceName.data());
+		LuaError(l, "Resource not found: %s", resourceName.data());
 	}
 	return res;
 }

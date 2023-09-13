@@ -382,7 +382,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 				const std::string_view name = LuaToString(l, -1);
 				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ name.data());
+					LuaError(l, "unknown variable '%s'", name.data());
 				}
 			} else if (key == "Component") {
 				this->Component = Str2EnumVariable(l, LuaToString(l, -1));
@@ -391,7 +391,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			} else if (key == "ShowName") {
 				this->ShowName = LuaToBoolean(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Text' in DefinePanelContents" _C_ key.data());
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePanelContents", key.data());
 			}
 		}
 	}
@@ -411,14 +411,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			const std::string_view name = LuaToString(l, -1);
 			this->Index = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name.data());
+				LuaError(l, "unknown variable '%s'", name.data());
 			}
 		} else if (key == "Component") {
 			this->Component = Str2EnumVariable(l, LuaToString(l, -1));
 		} else if (key == "Centered") {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'FormattedText' in DefinePanelContents", key.data());
 		}
 	}
 }
@@ -437,7 +437,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
 			this->Index2 = this->Index1;
 			if (this->Index1 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name.data());
+				LuaError(l, "unknown variable '%s'", name.data());
 			}
 		} else if (key == "Component") {
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
@@ -446,7 +446,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			const std::string_view name = LuaToString(l, -1);
 			this->Index1 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index1 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name.data());
+				LuaError(l, "unknown variable '%s'", name.data());
 			}
 		} else if (key == "Component1") {
 			this->Component1 = Str2EnumVariable(l, LuaToString(l, -1));
@@ -454,14 +454,14 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			const std::string_view name = LuaToString(l, -1);
 			this->Index2 = UnitTypeVar.VariableNameLookup[name];
 			if (this->Index2 == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name.data());
+				LuaError(l, "unknown variable '%s'", name.data());
 			}
 		} else if (key == "Component2") {
 			this->Component2 = Str2EnumVariable(l, LuaToString(l, -1));
 		} else if (key == "Centered") {
 			this->Centered = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'FormattedText2' in DefinePanelContents", key.data());
 		}
 	}
 }
@@ -493,7 +493,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 			return list[i].e;
 		}
 	}
-	LuaError(l, "'%s' is a invalid Unit reference" _C_ s.data());
+	LuaError(l, "'%s' is a invalid Unit reference", s.data());
 	return UnitRefItSelf;
 }
 
@@ -527,7 +527,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 			ButtonIcon = !flag;
 			TransportIcon = flag;
 		} else {
-			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'Icon' in DefinePanelContents", key.data());
 		}
 	}
 }
@@ -558,7 +558,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 				const std::string_view name = LuaToString(l, -1);
 				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ name.data());
+					LuaError(l, "unknown variable '%s'", name.data());
 				}
 			} else {
 				if (!lua_istable(l, -1)) {
@@ -573,7 +573,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 						lua_pushnil(l); // ParseStringDesc eat token
 					} else {
 						lua_pop(l, 1);
-						LuaError(l, "unknow value '%s'" _C_ key.data());
+						LuaError(l, "unknow value '%s'", key.data());
 					}
 				}
 				if (this->ValueMax == -1) {
@@ -606,7 +606,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 				const std::string_view colorName = LuaToString(l, -1, 2);
 				this->colors[i] = GetColorIndexByName(colorName);
 				if (this->colors[i] == -1) {
-					LuaError(l, "incorrect color: '%s' " _C_ colorName.data());
+					LuaError(l, "incorrect color: '%s' ", colorName.data());
 				}
 				i++;
 			}
@@ -627,7 +627,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 				}
 			}
 		} else {
-			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents", key.data());
 		}
 	}
 	// Default value and checking errors.
@@ -665,7 +665,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 			const std::string_view name = LuaToString(l, -1);
 			this->varIndex = UnitTypeVar.VariableNameLookup[name];
 			if (this->varIndex == -1) {
-				LuaError(l, "unknown variable '%s'" _C_ name.data());
+				LuaError(l, "unknown variable '%s'", name.data());
 			}
 		} else if (key == "Height") {
 			this->height = LuaToNumber(l, -1);
@@ -677,10 +677,10 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 			const std::string_view colorName = LuaToString(l, -1);
 			this->colorIndex = GetColorIndexByName(colorName);
 			if (colorIndex == -1) {
-				LuaError(l, "incorrect color: '%s' " _C_ colorName.data());
+				LuaError(l, "incorrect color: '%s' ", colorName.data());
 			}
 		} else {
-			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'CompleteBar' in DefinePanelContents", key.data());
 		}
 	}
 	// Default value and checking errors.

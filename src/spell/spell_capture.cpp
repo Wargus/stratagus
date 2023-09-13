@@ -55,7 +55,7 @@ void Spell_Capture::Parse(lua_State *l, int startIndex, int endIndex) /* overrid
 		} else if (value == "percent") {
 			this->DamagePercent = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported Capture tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported Capture tag: %s", value.data());
 		}
 	}
 }

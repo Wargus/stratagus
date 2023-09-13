@@ -55,7 +55,7 @@ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex) /* overr
 			this->PlayerNeutral = 2;
 			--j;
 		} else {
-			LuaError(l, "Unsupported polymorph tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported polymorph tag: %s", value.data());
 		}
 	}
 	// Now, checking value.

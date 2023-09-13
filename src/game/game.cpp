@@ -1522,7 +1522,7 @@ static int CclSavedGameInfo(lua_State *l)
 		} else if (value == "SyncRandSeed") {
 			SyncRandSeed = LuaToNumber(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;

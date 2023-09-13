@@ -2262,7 +2262,7 @@ static int CclSetup(lua_State *l) {
             }
             _ctx.ShowUserInfo = new LuaCallback(l, -1);
         } else {
-            LuaError(l, "Unsupported callback: %s" _C_ value.data());
+            LuaError(l, "Unsupported callback: %s", value.data());
         }
     }
     return 0;

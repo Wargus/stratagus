@@ -482,7 +482,7 @@ static int CclDefineCursor(lua_State *l)
 		} else if (value == "Rate") {
 			rate = LuaToNumber(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}

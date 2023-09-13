@@ -452,7 +452,7 @@ static int CclDefineDependency(lua_State *l)
 			++j;
 			const std::string_view value = LuaToString(l, j + 1);
 			if (value != "or") {
-				LuaError(l, "not 'or' symbol: %s" _C_ value.data());
+				LuaError(l, "not 'or' symbol: %s", value.data());
 				return 0;
 			}
 			or_flag = 1;
@@ -491,7 +491,7 @@ static int CclCheckDependency(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		LuaError(l, "bad player: %i" _C_ plynr);
+		LuaError(l, "bad player: %i", plynr);
 	}
 	CPlayer &player = Players[plynr];
 

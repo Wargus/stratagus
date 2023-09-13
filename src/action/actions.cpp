@@ -264,7 +264,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	} else if (actiontype == "action-unload") {
 		*orderPtr = new COrder_Unload;
 	} else {
-		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype.data());
+		LuaError(l, "ParseOrder: Unsupported type: %s", actiontype.data());
 	}
 
 	COrder &order = **orderPtr;
@@ -278,7 +278,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 			continue;
 		} else {
 			// This leaves a half initialized unit
-			LuaError(l, "ParseOrder: Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "ParseOrder: Unsupported tag: %s", value.data());
 		}
 	}
 }

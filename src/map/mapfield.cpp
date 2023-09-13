@@ -244,7 +244,7 @@ void CMapField::parse(lua_State *l)
 		} else if (value == "building") {
 			this->Flags |= MapFieldBuilding;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 }

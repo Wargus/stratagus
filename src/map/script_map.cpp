@@ -122,11 +122,11 @@ static int CclStratagusMap(lua_State *l)
 					}
 					lua_pop(l, 1);
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported tag: %s", value.data());
 				}
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;
@@ -830,7 +830,7 @@ static int CclDefinePlayerTypes(lua_State *l)
 		} else if (type == "rescue-active") {
 			Map.Info.PlayerType[i] = PlayerTypes::PlayerRescueActive;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ type.data());
+			LuaError(l, "Unsupported tag: %s", type.data());
 		}
 	}
 	for (int i = numplayers; i < PlayerMax - 1; ++i) {

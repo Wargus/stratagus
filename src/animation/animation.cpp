@@ -470,7 +470,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			unit.Anim.Unbreakable = 1;
 			--j;
 		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
 		}
 	}
 }
@@ -498,7 +498,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			unit.WaitBackup.Unbreakable = 1;
 			--j;
 		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
 		}
 	}
 }
@@ -525,7 +525,7 @@ static CAnimation *FindLabel(lua_State *l, const std::string &name)
 			return Labels[i].Anim;
 		}
 	}
-	LuaError(l, "Label not found: %s" _C_ name.c_str());
+	LuaError(l, "Label not found: %s", name.c_str());
 	return nullptr;
 }
 
@@ -613,7 +613,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 	} else if (op1 == "wiggle") {
 		anim = new CAnimation_Wiggle;
 	} else {
-		LuaError(l, "Unknown animation: %s" _C_ op1.c_str());
+		LuaError(l, "Unknown animation: %s", op1.c_str());
 	}
 	anim->Init(extraArg, l);
 	return anim;
@@ -722,7 +722,7 @@ static int CclDefineAnimations(lua_State *l)
 			const int res = GetResourceIdByName(l, value.substr(8));
 			anims->Harvest[res] = ParseAnimation(l, -1);
 		} else {
-			LuaError(l, "Unsupported animation: %s" _C_ value.data());
+			LuaError(l, "Unsupported animation: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}

@@ -218,7 +218,7 @@ static int CclDefineConstruction(lua_State *l)
 				} else if (value == "Size") {
 					CclGetPos(l, &w, &h);
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported tag: %s", value.data());
 				}
 				lua_pop(l, 1);
 			}
@@ -257,12 +257,12 @@ static int CclDefineConstruction(lua_State *l)
 						} else if (value == "main") {
 							file = ConstructionFileType::Main;
 						} else {
-							LuaError(l, "Unsupported tag: %s" _C_ value.data());
+							LuaError(l, "Unsupported tag: %s", value.data());
 						}
 					} else if (value == "Frame") {
 						frame = LuaToNumber(l, -1);
 					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value.data());
+						LuaError(l, "Unsupported tag: %s", value.data());
 					}
 					lua_pop(l, 1);
 				}
@@ -278,7 +278,7 @@ static int CclDefineConstruction(lua_State *l)
 				(*cframe)->Next = nullptr;
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}

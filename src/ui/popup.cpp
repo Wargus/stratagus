@@ -152,7 +152,7 @@
 		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else {
-			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'Name' in DefinePopups", key.data());
 		}
 	}
 }
@@ -213,7 +213,7 @@
 		} else if (key == "Font") {
 			this->Font = CFont::Get(LuaToString(l, -1));
 		} else {
-			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());
+			LuaError(l, "'%s' invalid for method 'Text' in DefinePopups", key.data());
 		}
 	}
 }
@@ -324,7 +324,7 @@
 			} else if (key == "Centered") {
 				this->Centered = LuaToBoolean(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key.data());
+				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups", key.data());
 			}
 		}
 	}
@@ -365,7 +365,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			} else if (key == "Color") {
 				this->Color = LuaToUnsignedNumber(l, -1);
 			} else {
-				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups" _C_ key.data());
+				LuaError(l, "'%s' invalid for method 'Costs' in DefinePopups", key.data());
 			}
 		}
 	}
@@ -442,10 +442,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				const std::string_view name = LuaToString(l, -1);
 				this->Index = UnitTypeVar.VariableNameLookup[name];
 				if (this->Index == -1) {
-					LuaError(l, "unknown variable '%s'" _C_ name.data());
+					LuaError(l, "unknown variable '%s'", name.data());
 				}
 			} else {
-				LuaError(l, "'%s' invalid for method 'Text' in DefinePopups" _C_ key.data());
+				LuaError(l, "'%s' invalid for method 'Text' in DefinePopups", key.data());
 			}
 		}
 	}
@@ -517,7 +517,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			} else if (value == "cancel-build") {
 				condition->ButtonAction = ButtonCmd::CancelBuild;
 			} else {
-				LuaError(l, "Unsupported button action: %s" _C_ value.data());
+				LuaError(l, "Unsupported button action: %s", value.data());
 			}
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
@@ -540,7 +540,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			LuaError(l, "'%s' invalid for Condition in DefinePopups" _C_ key.data());
+			LuaError(l, "'%s' invalid for Condition in DefinePopups", key.data());
 		}
 	}
 	return condition;
@@ -590,14 +590,14 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			} else if (key == "Variable") {
 				content = new CPopupContentTypeVariable;
 			} else {
-				LuaError(l, "Invalid drawing method '%s' in DefinePopups" _C_ key.data());
+				LuaError(l, "Invalid drawing method '%s' in DefinePopups", key.data());
 			}
 			content->Parse(l);
 			lua_pop(l, 1); // Pop Variable Method data
 		} else if (key == "Condition") {
 			condition = ParsePopupConditions(l);
 		} else {
-			LuaError(l, "'%s' invalid for Contents in DefinePopups" _C_ key.data());
+			LuaError(l, "'%s' invalid for Contents in DefinePopups", key.data());
 		}
 	}
 	content->Wrap = wrap;

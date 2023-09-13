@@ -331,7 +331,7 @@ static int CclDefineSprites(lua_State *l)
 			} else if (key == "Size") {
 				CclGetPos(l, &deco.Width, &deco.Height);
 			} else { // Error.
-				LuaError(l, "incorrect field '%s' for the DefineSprite." _C_ key.data());
+				LuaError(l, "incorrect field '%s' for the DefineSprite.", key.data());
 			}
 			lua_pop(l, 1); // pop the value;
 		}

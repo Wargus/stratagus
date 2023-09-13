@@ -276,7 +276,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "Diagonal") {
 					b->Diagonal = LuaToBoolean(l, -1);
 				} else {
-					LuaError(l, "Unsupported BuildingRules distance tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported BuildingRules distance tag: %s", value.data());
 				}
 			}
 			andlist->push_back(b);
@@ -292,7 +292,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "Type") {
 					b->ParentName = LuaToString(l, -1);
 				} else {
-					LuaError(l, "Unsupported BuildingRules addon tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported BuildingRules addon tag: %s", value.data());
 				}
 			}
 			andlist->push_back(b);
@@ -308,7 +308,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "ReplaceOnBuild") {
 					b->ReplaceOnBuild = LuaToBoolean(l, -1);
 				} else {
-					LuaError(l, "Unsupported BuildingRules ontop tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported BuildingRules ontop tag: %s", value.data());
 				}
 			}
 			andlist->push_back(b);
@@ -345,7 +345,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 						b->CountType = NotEqual;
 					}
 				} else {
-					LuaError(l, "Unsupported BuildingRules has-unit tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported BuildingRules has-unit tag: %s", value.data());
 				}
 			}
 			andlist->push_back(b);
@@ -408,12 +408,12 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "CheckBuilder") {
 					b->CheckBuilder = LuaToBoolean(l, -1);
 				} else {
-					LuaError(l, "Unsupported BuildingRules surrounded-by tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported BuildingRules surrounded-by tag: %s", value.data());
 				}
 			}
 			andlist->push_back(b);
 		} else {
-			LuaError(l, "Unsupported BuildingRules tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported BuildingRules tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -515,7 +515,7 @@ static int CclDefineUnitType(lua_State *l)
 					CclGetPos(l, &type->Width, &type->Height);
 					lua_pop(l, 1);
 				} else {
-					LuaError(l, "Unsupported image tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported image tag: %s", value.data());
 				}
 			}
 			if (redefine) {
@@ -574,7 +574,7 @@ static int CclDefineUnitType(lua_State *l)
 				} else if (value == "scale") {
 					type->ShadowScale = LuaToNumber(l, -1, k + 1);
 				} else {
-					LuaError(l, "Unsupported shadow tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported shadow tag: %s", value.data());
 				}
 			}
 			if (redefine && type->ShadowSprite) {
@@ -780,7 +780,7 @@ static int CclDefineUnitType(lua_State *l)
 			} else if (value == "naval") {
 				type->UnitType = UnitTypeNaval;
 			} else {
-				LuaError(l, "Unsupported Type: %s" _C_ value.data());
+				LuaError(l, "Unsupported Type: %s", value.data());
 			}
 		} else if (value == "MissileOffsets") {
 			if (!lua_istable(l, -1)) {
@@ -828,7 +828,7 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					}
 					if (num == ANIMATIONS_DEATHTYPES) {
-						LuaError(l, "Death type not found: %s" _C_ dtype.data());
+						LuaError(l, "Death type not found: %s", dtype.data());
 					} else {
 						type->Impact[num].Name = LuaToString(l, -1, k + 1);
 						type->Impact[num].Missile = nullptr;
@@ -853,7 +853,7 @@ static int CclDefineUnitType(lua_State *l)
 			} else if (value == "sail") {
 				type->MouseAction = MouseActionSail;
 			} else {
-				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value.data());
+				LuaError(l, "Unsupported RightMouseAction: %s", value.data());
 			}
 		} else if (value == "CanAttack") {
 			type->CanAttack = LuaToBoolean(l, -1);
@@ -970,7 +970,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].CanTransport = Ccl2Condition(l, value.data());
 					continue;
 				}
-				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value.data());
+				LuaError(l, "Unsupported flag tag for CanTransport: %s", value.data());
 			}
 		} else if (value == "CanGatherResources") {
 			const int args = lua_rawlen(l, -1);
@@ -1019,7 +1019,7 @@ static int CclDefineUnitType(lua_State *l)
 						res->FileWhenLoaded = LuaToString(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
-						LuaError(l, "Unsupported tag: %s" _C_ value.data());
+						LuaError(l, "Unsupported tag: %s", value.data());
 					}
 				}
 				if (!res->FinalResource) {
@@ -1087,7 +1087,7 @@ static int CclDefineUnitType(lua_State *l)
 				value = LuaToString(l, -1, k + 1);
 				const SpellType &spell = SpellTypeByIdent(value);
 				if (!spell.AutoCast) {
-					LuaError(l, "AutoCastActive : Define autocast method for %s." _C_ value.data());
+					LuaError(l, "AutoCastActive: Define autocast method for %s.", value.data());
 				}
 				type->AutoCastActive[spell.Slot] = 1;
 			}
@@ -1112,7 +1112,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].CanTargetFlag = Ccl2Condition(l, value.data());
 					continue;
 				}
-				LuaError(l, "Unsupported flag tag for can-target-flag: %s" _C_ value.data());
+				LuaError(l, "Unsupported flag tag for can-target-flag: %s", value.data());
 			}
 		} else if (value == "PriorityTarget") {
 			//
@@ -1135,7 +1135,7 @@ static int CclDefineUnitType(lua_State *l)
 					type->BoolFlag[index].AiPriorityTarget = Ccl2Condition(l, value.data());
 					continue;
 				}
-				LuaError(l, "Unsupported flag tag for ai-priority-target: %s" _C_ value.data());
+				LuaError(l, "Unsupported flag tag for ai-priority-target: %s", value.data());
 			}
 		} else if (value == "Sounds") {
 			if (!lua_istable(l, -1)) {
@@ -1183,7 +1183,7 @@ static int CclDefineUnitType(lua_State *l)
 						type->Sound.Dead[death].Name = LuaToString(l, -1, k + 1);
 					}
 				} else {
-					LuaError(l, "Unsupported sound tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported sound tag: %s", value.data());
 				}
 			}
 		} else {
@@ -1216,7 +1216,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			} else {
 				printf("\n%s\n", type->Name.c_str());
-				LuaError(l, "Unsupported tag: %s" _C_ value.data());
+				LuaError(l, "Unsupported tag: %s", value.data());
 			}
 		}
 	}
@@ -1231,7 +1231,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
-		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
+		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n", type->Name.c_str());
 	}
 	UpdateDefaultBoolFlags(*type);
 	if (!CclInConfigFile) {
@@ -1541,7 +1541,7 @@ static int CclDefineUnitStats(lua_State *l)
 				continue;
 			}
 			// This leaves a half initialized unit
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;
@@ -1626,7 +1626,7 @@ static int CclGetUnitTypeIdent(lua_State *l)
 	if (type) {
 		lua_pushstring(l, type->Ident.c_str());
 	} else {
-		LuaError(l, "unit '%s' not defined" _C_ LuaToString(l, -1).data());
+		LuaError(l, "unit '%s' not defined", LuaToString(l, -1).data());
 	}
 	return 1;
 }
@@ -1897,7 +1897,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushboolean(l, type->BoolFlag[index].value);
 			return 1;
 		} else {
-			LuaError(l, "Invalid field: %s" _C_ data.data());
+			LuaError(l, "Invalid field: %s", data.data());
 		}
 	}
 
@@ -1939,7 +1939,7 @@ void DefineVariableField(lua_State *l, CVariable *var, int lua_index)
 		} else if (key == "Enable") {
 			var->Enable = LuaToBoolean(l, -1);
 		} else { // Error.
-			LuaError(l, "incorrect field '%s' for variable\n" _C_ key.data());
+			LuaError(l, "incorrect field '%s' for variable\n", key.data());
 		}
 		lua_pop(l, 1); // pop the value;
 	}
@@ -2092,7 +2092,7 @@ static int CclDefineDecorations(lua_State *l)
 							} else if (key == "vertical") {
 								decovarbar->IsVertical = 1;
 							} else { // Error
-								LuaError(l, "invalid Orientation '%s' for bar in DefineDecorations" _C_ key.data());
+								LuaError(l, "invalid Orientation '%s' for bar in DefineDecorations", key.data());
 							}
 						} else if (key == "SEToNW") {
 							decovarbar->SEToNW = LuaToBoolean(l, -1);
@@ -2107,7 +2107,7 @@ static int CclDefineDecorations(lua_State *l)
 							decovar->BColor = // FIXME
 #endif
 						} else {
-							LuaError(l, "'%s' invalid for Method bar" _C_ key.data());
+							LuaError(l, "'%s' invalid for Method bar", key.data());
 						}
 						lua_pop(l, 1); // Pop value
 					}
@@ -2125,7 +2125,7 @@ static int CclDefineDecorations(lua_State *l)
 							const std::string_view colorName = LuaToString(l, -1);
 							frame->ColorIndex = GetColorIndexByName(colorName);
 						} else {
-							LuaError(l, "'%s' invalid for Method frame" _C_ innerkey.data());
+							LuaError(l, "'%s' invalid for Method frame", innerkey.data());
 						}
 					}
 					decovar = frame;
@@ -2139,7 +2139,7 @@ static int CclDefineDecorations(lua_State *l)
 					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
-						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1).data());
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations", LuaToString(l, -1, 1).data());
 					}
 					// FIXME : More arguments ?
 					decovar = decovarspritebar;
@@ -2158,7 +2158,7 @@ static int CclDefineDecorations(lua_State *l)
 					CDecoVarAnimatedSprite *decovarspritebar = new CDecoVarAnimatedSprite;
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
-						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations" _C_ LuaToString(l, -1, 1).data());
+						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations", LuaToString(l, -1, 1).data());
 					}
 					decovarspritebar->WaitFrames = LuaToNumber(l, -1, 2);
 					if (decovarspritebar->WaitFrames <= 0) {
@@ -2166,7 +2166,7 @@ static int CclDefineDecorations(lua_State *l)
 					}
 					decovar = decovarspritebar;
 				} else { // Error
-					LuaError(l, "invalid method '%s' for Method in DefineDecorations" _C_ key.data());
+					LuaError(l, "invalid method '%s' for Method in DefineDecorations", key.data());
 				}
 				lua_pop(l, 2); // MethodName and data
 			} else {
@@ -2175,7 +2175,7 @@ static int CclDefineDecorations(lua_State *l)
 					tmp.BoolFlagInvert = LuaToBoolean(l, -1);
 				} else {
 					// Error
-					LuaError(l, "invalid key '%s' for DefineDecorations" _C_ key.data());
+					LuaError(l, "invalid key '%s' for DefineDecorations", key.data());
 				}
 			}
 			lua_pop(l, 1); // Pop the value
@@ -2228,7 +2228,7 @@ static int CclDefinePaletteSwap(lua_State *l)
 	const std::string_view iconName = LuaToString(l, 1);
 	CIcon *icon = CIcon::Get(iconName);
 	if (!icon) {
-		LuaError(l, "icon %s not found" _C_ iconName.data());
+		LuaError(l, "icon %s not found", iconName.data());
 	}
 
 	if (!lua_istable(l, 2)) {
@@ -2240,7 +2240,7 @@ static int CclDefinePaletteSwap(lua_State *l)
 		const std::string_view value = LuaToString(l, 2, k + 1);
 		int index = UnitTypeVar.VariableNameLookup[value];
 		if (index == -1) {
-			LuaError(l, "unknown variable name %s" _C_ value.data());
+			LuaError(l, "unknown variable name %s", value.data());
 		}
 
 		lua_rawgeti(l, 2, k + 2); // swap table
@@ -2262,7 +2262,10 @@ static int CclDefinePaletteSwap(lua_State *l)
 			lua_rawgeti(l, -1, step + 1); // swap table, steps table, alternatives table
 			if (alternativesCount) {
 				if (lua_rawlen(l, -1) != alternativesCount) {
-					LuaError(l, "incorrect argument, need table with %d alternatives, got %zu" _C_ alternativesCount _C_ lua_rawlen(l, -1));
+					LuaError(l,
+					         "incorrect argument, need table with %d alternatives, got %zu",
+					         alternativesCount,
+					         lua_rawlen(l, -1));
 				}
 			} else {
 				alternativesCount = lua_rawlen(l, -1);
@@ -2274,7 +2277,10 @@ static int CclDefinePaletteSwap(lua_State *l)
 				}
 				if (colorCount) {
 					if (lua_rawlen(l, -1) != colorCount) {
-						LuaError(l, "incorrect argument, need table with %d colors, got %zu" _C_ colorCount _C_ lua_rawlen(l, -1));
+						LuaError(l,
+						         "incorrect argument, need table with %d colors, got %zu",
+						         colorCount,
+						         lua_rawlen(l, -1));
 					}
 				} else {
 					colorCount = lua_rawlen(l, -1);
@@ -2451,7 +2457,7 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 				type.MapDefaultStat.Variables[variable_index].IncreaseFrequency = value;
 				// TODO: error
 				// if (type.MapDefaultStat.Variables[variable_index].IncreaseFrequency != value) {
-				// 	LuaError(l, "%s.IncreaseFrequency out of range!" _C_ variable_key.c_str());
+				// 	LuaError(l, "%s.IncreaseFrequency out of range!", variable_key.c_str());
 				// }
 				for (int player = 0; player < PlayerMax; ++player) {
 					type.Stats[player].Variables[variable_index].IncreaseFrequency = type.MapDefaultStat.Variables[variable_index].IncreaseFrequency;

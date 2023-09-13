@@ -260,7 +260,7 @@ static int CclDefineModifier(lua_State *l)
 	std::string_view upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
 	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
+		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist.", upgrade_ident.data());
 	}
 
 	for (int j = 1; j < args; ++j) {
@@ -345,12 +345,12 @@ static int CclDefineModifier(lua_State *l)
 						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
 						um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
 					} else {
-						LuaError(l, "bad argument type for '%s'\n" _C_ key.data());
+						LuaError(l, "bad argument type for '%s'\n", key.data());
 					}
 					lua_pop(l, 1);
 				}
 			} else {
-				LuaError(l, "wrong tag: %s" _C_ key.data());
+				LuaError(l, "wrong tag: %s", key.data());
 			}
 		}
 	}

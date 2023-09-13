@@ -99,7 +99,7 @@ static std::unique_ptr<SpellActionType> CclSpellAction(lua_State *l)
 	} else if (value == "teleport") {
 		spellaction = std::make_unique<Spell_Teleport>();
 	} else {
-		LuaError(l, "Unsupported action type: %s" _C_ value.data());
+		LuaError(l, "Unsupported action type: %s", value.data());
 	}
 	spellaction->Parse(l, 1, args);
 	return spellaction;
@@ -126,17 +126,17 @@ char Ccl2Condition(lua_State *l, std::string_view value)
 	} else if (value[0] == '<') {
 		int v = to_number(value.substr(1));
 		if (v > 100) {
-			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
+			LuaError(l, "Can only encode condition '<' up to 100%%, got %d", v);
 		}
 		return -v;
 	} else if (value[0] == '>') {
 		int v = to_number(value.substr(1));
 		if (v > 100) {
-			LuaError(l, "Can only encode condition '<' up to 100%%, got %d" _C_ v);
+			LuaError(l, "Can only encode condition '<' up to 100%%, got %d", v);
 		}
 		return v + CONDITION_ONLY;
 	} else {
-		LuaError(l, "Bad condition result: %s" _C_ value.data());
+		LuaError(l, "Bad condition result: %s", value.data());
 		return -1;
 	}
 }
@@ -221,13 +221,13 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 					} else if (key == "ConditionApplyOnCaster") {
 						condition->Variable[index].ConditionApplyOnCaster = LuaToBoolean(l, -1);
 					} else { // Error
-						LuaError(l, "%s invalid for Variable in condition" _C_ key.data());
+						LuaError(l, "%s invalid for Variable in condition", key.data());
 					}
 				}
 				lua_pop(l, 1); // lua_rawgeti()
 				continue;
 			}
-			LuaError(l, "Unsuported condition tag: %s" _C_ value.data());
+			LuaError(l, "Unsuported condition tag: %s", value.data());
 		}
 	}
 }
@@ -292,7 +292,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			CclSpellCondition(l, autocast->Condition.get());
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "Unsupported autocast tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported autocast tag: %s", value.data());
 		}
 	}
 }
@@ -380,7 +380,7 @@ static int CclDefineSpell(lua_State *l)
 			} else if (value == "position") {
 				spell->Target = TargetPosition;
 			} else {
-				LuaError(l, "Unsupported spell target type tag: %s" _C_ value.data());
+				LuaError(l, "Unsupported spell target type tag: %s", value.data());
 			}
 		} else if (value == "action") {
 			if (!lua_istable(l, i + 1)) {
@@ -428,7 +428,7 @@ static int CclDefineSpell(lua_State *l)
 				lua_pushfstring(l, "Bad upgrade name: %s", value.data());
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;

@@ -51,7 +51,7 @@ void Spell_SpawnPortal::Parse(lua_State *l, int startIndex, int endIndex) /* ove
 			this->CurrentPlayer = true;
 			--j;
 		} else {
-			LuaError(l, "Unsupported spawn-portal tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported spawn-portal tag: %s", value.data());
 		}
 	}
 	// Now, checking value.

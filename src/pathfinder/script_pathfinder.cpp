@@ -102,7 +102,7 @@ static int CclAStar(lua_State *l)
 				AStarMaxSearchIterations = i;
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 
