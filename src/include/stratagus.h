@@ -105,13 +105,6 @@
 ==  Debug definitions
 ============================================================================*/
 
-/**
-**  This simulates vararg macros.
-**  Example:
-**    DebugPrint("Test %d %d\n" _C_ 1 _C_ 2);
-*/
-#define _C_  ,    /// Debug , to simulate vararg macros
-
 extern void PrintLocation(const char *file, int line, const char *funcName);
 
 /// Print function in debug macros
