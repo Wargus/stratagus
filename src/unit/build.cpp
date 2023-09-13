@@ -344,14 +344,11 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 */
 bool CBuildRestrictionLuaCallback::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontop) const
 {
-	this->Func->pushPreamble();
-	this->Func->pushInteger(UnitNumber(*builder));
-	this->Func->pushString(type.Ident);
-	this->Func->pushInteger(pos.x);
-	this->Func->pushInteger(pos.y);
-	this->Func->pushInteger((ontop && ontop->IsAlive()) ? UnitNumber(*ontop) : -1);
-	this->Func->run(1);
-	bool result = this->Func->popBoolean();
+	bool result = this->Func->call<bool>(UnitNumber(*builder),
+	                                     type.Ident,
+	                                     pos.x,
+	                                     pos.y,
+	                                     (ontop && ontop->IsAlive()) ? UnitNumber(*ontop) : -1);
 	return result;
 }
 

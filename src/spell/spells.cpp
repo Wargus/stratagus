@@ -175,14 +175,8 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	}
 
 	if (condition->CheckFunc) {
-		condition->CheckFunc->pushPreamble();
-		condition->CheckFunc->pushString(spell.Ident);
-		condition->CheckFunc->pushInteger(UnitNumber(caster));
-		condition->CheckFunc->pushInteger(goalPos.x);
-		condition->CheckFunc->pushInteger(goalPos.y);
-		condition->CheckFunc->pushInteger((target && target->IsAlive()) ? UnitNumber(*target) : -1);
-		condition->CheckFunc->run(1);
-		if (condition->CheckFunc->popBoolean() == false) {
+		auto res = condition->CheckFunc->call<bool>(spell.Ident, UnitNumber(caster), goalPos.x, goalPos.y, (target && target->IsAlive()) ? UnitNumber(*target) : -1);
+		if (res == false) {
 			return false;
 		}
 	}
@@ -322,10 +316,8 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 						array[i] = UnitNumber(*table[i - 1]);
 					}
 					array[0] = UnitNumber(caster);
-					autocast->PositionAutoCast->pushPreamble();
-					autocast->PositionAutoCast->pushIntegers(array);
-					autocast->PositionAutoCast->run(2);
-					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
+					const auto [x, y] = autocast->PositionAutoCast->call<int, int>(array);
+					Vec2i resPos(x, y);
 					if (Map.Info.IsPointOnMap(resPos)) {
 						return std::make_unique<Target>(TargetPosition, nullptr, resPos);
 					}

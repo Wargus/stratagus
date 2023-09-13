@@ -462,9 +462,7 @@ static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		// OnEachSecond callback
 		if (unit.Type->OnEachSecond  && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachSecond->pushPreamble();
-			unit.Type->OnEachSecond->pushInteger(UnitNumber(unit));
-			unit.Type->OnEachSecond->run();
+			unit.Type->OnEachSecond->call(UnitNumber(unit));
 		}
 
 		// 1) Blink flag.
@@ -565,9 +563,7 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 
 		// OnEachCycle callback
 		if (unit.Type->OnEachCycle && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachCycle->pushPreamble();
-			unit.Type->OnEachCycle->pushInteger(UnitNumber(unit));
-			unit.Type->OnEachCycle->run();
+			unit.Type->OnEachCycle->call(UnitNumber(unit));
 		}
 
 		// Handle each cycle buffs
