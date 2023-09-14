@@ -119,13 +119,13 @@ void CPlayer::Load(lua_State *l)
 			} else if (value == "rescue-active") {
 				this->Type = PlayerTypes::PlayerRescueActive;
 			} else {
-				LuaError(l, "Unsupported tag: %s" _C_ value.data());
+				LuaError(l, "Unsupported tag: %s", value.data());
 			}
 		} else if (value == "race") {
 			const std::string_view raceName = LuaToString(l, j + 1);
 			this->Race = PlayerRaces.GetRaceIndexByName(raceName);
 			if (this->Race == -1) {
-				LuaError(l, "Unsupported race: %s" _C_ raceName.data());
+				LuaError(l, "Unsupported race: %s", raceName.data());
 			}
 		} else if (value == "ai-name") {
 			this->AiName = LuaToString(l, j + 1);
@@ -269,7 +269,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of total-resources: %d" _C_ subargs);
+				LuaError(l, "Wrong number of total-resources: %d", subargs);
 			}
 			for (int k = 0; k < subargs; ++k) {
 				this->TotalResources[k] = LuaToNumber(l, j + 1, k + 1);
@@ -280,7 +280,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+				LuaError(l, "Wrong number of speed-resource-harvest: %d", subargs);
 			}
 			for (int k = 0; k < subargs; ++k) {
 				this->SpeedResourcesHarvest[k] = LuaToNumber(l, j + 1, k + 1);
@@ -291,7 +291,7 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+				LuaError(l, "Wrong number of speed-resource-harvest: %d", subargs);
 			}
 			for (int k = 0; k < subargs; ++k) {
 				this->SpeedResourcesReturn[k] = LuaToNumber(l, j + 1, k + 1);
@@ -318,13 +318,13 @@ void CPlayer::Load(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			if (subargs != UpgradeMax) {
-				LuaError(l, "Wrong upgrade timer length: %d" _C_ subargs);
+				LuaError(l, "Wrong upgrade timer length: %d", subargs);
 			}
 			for (int k = 0; k < subargs; ++k) {
 				this->UpgradeTimers.Upgrades[k] = LuaToNumber(l, j + 1, k + 1);
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	// Manage max
@@ -801,11 +801,11 @@ static int CclDefineNewRaceNames(lua_State *l)
 				} else if (value == "visible") {
 					PlayerRaces.Visible[i] = 1;
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported tag: %s", value.data());
 				}
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;
@@ -867,7 +867,7 @@ static int CclDefinePlayerColors(lua_State *l)
 		PlayerColorsRGB.clear();
 		PlayerColorsSDL.clear();
 		if (args / 2 < PlayerMax - 1) { // accept no color for neutral player
-			LuaError(l, "You need to define at least %d colors" _C_ PlayerMax - 1);
+			LuaError(l, "You need to define at least %d colors", PlayerMax - 1);
 		}
 		if (args / 2 < PlayerMax) {
 			defaultNeutralPlayer = true;
@@ -883,7 +883,7 @@ static int CclDefinePlayerColors(lua_State *l)
 		}
 		const int numcolors = lua_rawlen(l, -1);
 		if (numcolors != PlayerColorIndexCount) {
-			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())" _C_ PlayerColorIndexCount);
+			LuaError(l, "You should use %d colors (See DefinePlayerColorIndex())", PlayerColorIndexCount);
 		}
 		std::vector<CColor> newColors;
 		for (int j = 0; j < numcolors; ++j) {
@@ -1093,11 +1093,11 @@ static int CclGetPlayerData(lua_State *l)
 				lua_pushstring(l, "F");
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n" _C_ ident);
+			DebugPrint(" wrong ident %s\n", ident);
 		}
 		return 1;
 	} else {
-		LuaError(l, "Invalid field: %s" _C_ data.data());
+		LuaError(l, "Invalid field: %s", data.data());
 	}
 
 	return 0;
@@ -1136,7 +1136,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
 
 		if (p->Race == -1) {
-			LuaError(l, "invalid race name '%s'" _C_ racename.data());
+			LuaError(l, "invalid race name '%s'", racename.data());
 		}
 	} else if (data == "Resources") {
 		LuaCheckArgs(l, 4);
@@ -1213,10 +1213,10 @@ static int CclSetPlayerData(lua_State *l)
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
 		} else {
-			LuaError(l, " wrong ident %s\n" _C_ ident.data());
+			LuaError(l, " wrong ident %s\n", ident.data());
 		}
 	} else {
-		LuaError(l, "Invalid field: %s" _C_ data.data());
+		LuaError(l, "Invalid field: %s", data.data());
 	}
 
 	return 0;

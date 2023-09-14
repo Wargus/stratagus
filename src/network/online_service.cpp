@@ -1191,7 +1191,7 @@ public:
                     // our fake game, remove and break;
                     games.erase(games.begin() + i);
                     externalAddress = game->getHost();
-                    DebugPrint("My external address is %s\n" _C_ externalAddress.toString().c_str());
+                    DebugPrint("My external address is %s\n", externalAddress.toString().c_str());
                     showInfo("Your external route is " + externalAddress.toString());
                     stopAdvertising();
                     break;
@@ -1377,7 +1377,7 @@ public:
         if (len >= 4) {
             id = buffer[0];
         }
-        DebugPrint("UDP Recv: 0x%x\n" _C_ id);
+        DebugPrint("UDP Recv: 0x%x\n", id);
         switch (id) {
         case 0x05:
             // PKT_SERVERPING
@@ -1625,7 +1625,7 @@ void OnlineState::finishMessage(Context *ctx) {
 class DisconnectedState : public OnlineState {
 public:
     DisconnectedState(std::string message) {
-        DebugPrint("Disconnecting: %s" _C_ message.c_str());
+        DebugPrint("Disconnecting: %s", message.c_str());
         this->message = message;
     };
 
@@ -1675,7 +1675,7 @@ public:
                 // try again next time
                 return;
             }
-            DebugPrint("TCP Recv: 0x%x\n" _C_ msg);
+            DebugPrint("TCP Recv: 0x%x\n", msg);
 
             if (!handleGenericMessages(ctx, msg)) {
                 std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
@@ -2015,7 +2015,7 @@ class S2C_SID_AUTH_INFO : public OnlineState {
 
             uint32_t logonType = ctx->getMsgIStream()->read32();
             // assert(logonType == 0x00); // only support Broken SHA-1 logon for now
-            DebugPrint("logonType: 0x%x\n" _C_ logonType);
+            DebugPrint("logonType: 0x%x\n", logonType);
             uint32_t serverToken = ctx->getMsgIStream()->read32();
             ctx->serverToken = htonl(serverToken); // keep in network order
             uint32_t udpToken = ctx->getMsgIStream()->read32();
@@ -2262,7 +2262,7 @@ static int CclSetup(lua_State *l) {
             }
             _ctx.ShowUserInfo = new LuaCallback(l, -1);
         } else {
-            LuaError(l, "Unsupported callback: %s" _C_ value.data());
+            LuaError(l, "Unsupported callback: %s", value.data());
         }
     }
     return 0;

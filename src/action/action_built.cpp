@@ -157,7 +157,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const CUnitType &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	DebugPrint("%d: Building %s(%s) ready.\n", player.Index, type.Ident.c_str(), type.Name.c_str());
 
 	// HACK: the building is ready now
 	player.UnitTypesCount[type.Slot]++;
@@ -274,7 +274,7 @@ void COrder_Built::Execute(CUnit &unit) /* override */
 
 	// Check if construction should be canceled...
 	if (this->IsCancelled || this->ProgressCounter < 0) {
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
+		DebugPrint("%d: %s canceled.\n", unit.Player->Index, unit.Type->Name.c_str());
 
 		CancelBuilt(*this, &unit);
 		return ;
@@ -323,8 +323,10 @@ void COrder_Built::FillSeenValues(CUnit &unit) const /* override */
 */
 void COrder_Built::AiUnitKilled(CUnit &unit)
 {
-	DebugPrint("%d: %d(%s) killed, under construction!\n" _C_
-			   unit.Player->Index _C_ UnitNumber(unit) _C_ unit.Type->Ident.c_str());
+	DebugPrint("%d: %d(%s) killed, under construction!\n",
+	           unit.Player->Index,
+	           UnitNumber(unit),
+	           unit.Type->Ident.c_str());
 	AiReduceMadeInBuilt(*unit.Player->Ai, *unit.Type);
 }
 

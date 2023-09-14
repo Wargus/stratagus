@@ -230,7 +230,7 @@ void PathFinderInput::Load(lua_State *l)
 			this->isRecalculatePathNeeded = true;
 			--i;
 		} else {
-			LuaError(l, "PathFinderInput::Load: Unsupported tag: %s" _C_ tag.data());
+			LuaError(l, "PathFinderInput::Load: Unsupported tag: %s", tag.data());
 		}
 	}
 }
@@ -263,7 +263,7 @@ void PathFinderOutput::Load(lua_State *l)
 			this->Length = subargs;
 			lua_pop(l, 1);
 		} else {
-			LuaError(l, "PathFinderOutput::Load: Unsupported tag: %s" _C_ tag.data());
+			LuaError(l, "PathFinderOutput::Load: Unsupported tag: %s", tag.data());
 		}
 	}
 }
@@ -630,7 +630,7 @@ static int CclUnit(lua_State *l)
 				lua_pop(l, 1);
 				continue;
 			}
-			LuaError(l, "Unit: Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unit: Unsupported tag: %s", value.data());
 		}
 	}
 
@@ -1004,7 +1004,7 @@ static int CclOrderUnit(lua_State *l)
 				} else if (order == "patrol") {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 				} else {
-					LuaError(l, "Unsupported order: %s" _C_ order.data());
+					LuaError(l, "Unsupported order: %s", order.data());
 				}
 			}
 		}
@@ -1234,7 +1234,7 @@ static int CclGetUnitBoolFlag(lua_State *l)
 	const std::string_view value = LuaToString(l, 2);
 	int index = UnitTypeVar.BoolFlagNameLookup[value];// User bool flags
 	if (index == -1) {
-		LuaError(l, "Bad bool-flag name '%s'\n" _C_ value.data());
+		LuaError(l, "Bad bool-flag name '%s'\n", value.data());
 	}
 	lua_pushboolean(l, unit->Type->BoolFlag[index].value);
 	return 1;
@@ -1312,7 +1312,7 @@ static int CclGetUnitVariable(lua_State *l)
 		if (CUpgrade::Get(upgrade_ident)) {
 			lua_pushboolean(l, unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]);
 		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist.", upgrade_ident.data());
 		}
 		return 1;
 	} else if (value == "Active") {
@@ -1341,7 +1341,7 @@ static int CclGetUnitVariable(lua_State *l)
 			}
 		}
 		if (index == -1) {
-			LuaError(l, "Bad variable name '%s'\n" _C_ value.data());
+			LuaError(l, "Bad variable name '%s'\n", value.data());
 		}
 		if (nargs == 2) {
 			lua_pushnumber(l, unit->Variable[index].Value);
@@ -1358,7 +1358,7 @@ static int CclGetUnitVariable(lua_State *l)
 			} else if (type == "Enable") {
 				lua_pushnumber(l, unit->Variable[index].Enable);
 			} else {
-				LuaError(l, "Bad variable type '%s'\n" _C_ type.data());
+				LuaError(l, "Bad variable type '%s'\n", type.data());
 			}
 		}
 	}
@@ -1438,7 +1438,7 @@ static int CclSetUnitVariable(lua_State *l)
 				IndividualUpgradeLost(*unit, CUpgrade::Get(upgrade_ident));
 			}
 		} else {
-			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist.", upgrade_ident.data());
 		}
 	} else if (name == "Active") {
 		bool ai_active = LuaToBoolean(l, 3);
@@ -1456,7 +1456,7 @@ static int CclSetUnitVariable(lua_State *l)
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {
-			LuaError(l, "Bad variable name '%s'\n" _C_ name.data());
+			LuaError(l, "Bad variable name '%s'\n", name.data());
 		}
 		value = LuaToNumber(l, 3);
 		bool stats = false;
@@ -1474,12 +1474,12 @@ static int CclSetUnitVariable(lua_State *l)
 			} else if (type == "IncreaseFrequency") {
 				unit->Stats->Variables[index].IncreaseFrequency = value;
 				if (unit->Stats->Variables[index].IncreaseFrequency != value) {
-					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ type.data());
+					LuaError(l, "%s.IncreaseFrequency out of range!", type.data());
 				}
 			} else if (type == "Enable") {
 				unit->Stats->Variables[index].Enable = value;
 			} else {
-				LuaError(l, "Bad variable type '%s'\n" _C_ type.data());
+				LuaError(l, "Bad variable type '%s'\n", type.data());
 			}
 		} else if (nargs == 3) {
 			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
@@ -1494,12 +1494,12 @@ static int CclSetUnitVariable(lua_State *l)
 			} else if (type == "IncreaseFrequency") {
 				unit->Variable[index].IncreaseFrequency = value;
 				if (unit->Variable[index].IncreaseFrequency != value) {
-					LuaError(l, "%s.IncreaseFrequency out of range!" _C_ type.data());
+					LuaError(l, "%s.IncreaseFrequency out of range!", type.data());
 				}
 			} else if (type == "Enable") {
 				unit->Variable[index].Enable = value;
 			} else {
-				LuaError(l, "Bad variable type '%s'\n" _C_ type.data());
+				LuaError(l, "Bad variable type '%s'\n", type.data());
 			}
 		}
 	}

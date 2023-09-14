@@ -665,7 +665,7 @@ void CPlayer::Init(PlayerTypes type)
 			team = 2 + NumPlayers;
 			break;
 	}
-	DebugPrint("CreatePlayer name %s\n" _C_ this->Name.c_str());
+	DebugPrint("CreatePlayer name %s\n", this->Name.c_str());
 
 	this->Type = type;
 	this->Race = 0;
@@ -1332,18 +1332,21 @@ void DebugPlayers()
 			case PlayerTypes::PlayerRescueActive: playertype = "rescue akt. "; break;
 			default : playertype = "?unknown?   "; break;
 		}
-		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n" _C_ i _C_ PlayerColorNames[i].c_str() _C_
-				   ThisPlayer == &Players[i] ? '*' :
-				   Players[i].AiEnabled ? '+' : ' ' _C_
-				   Players[i].Name.c_str() _C_ playertype _C_
-				   PlayerRaces.Name[Players[i].Race].c_str() _C_
-				   Players[i].AiName.c_str());
+		DebugPrint("%2d: %8.8s %c %-8.8s %s %7s %s\n",
+		           i,
+		           PlayerColorNames[i].c_str(),
+		           ThisPlayer == &Players[i] ? '*'
+		           : Players[i].AiEnabled    ? '+'
+		                                     : ' ',
+		           Players[i].Name.c_str(),
+		           playertype,
+		           PlayerRaces.Name[Players[i].Race].c_str(),
+		           Players[i].AiName.c_str());
 	}
 	DebugPrint("GameSettings\n");
 	DebugPrint("--  -------- - -------- ------------ ------- -----\n");
-	GameSettings.Save(+[](std::string f) {
-		DebugPrint("%s\n" _C_ f.c_str());
-	}, true);
+	GameSettings.Save(
+		+[](std::string f) { DebugPrint("%s\n", f.c_str()); }, true);
 }
 
 /**

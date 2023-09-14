@@ -130,7 +130,7 @@ void MissileType::Load(lua_State *l)
 			if (it != MissileClassNames.end()) {
 				this->Class = it->second;
 			} else {
-				LuaError(l, "Unsupported class: %s" _C_ className.data());
+				LuaError(l, "Unsupported class: %s", className.data());
 			}
 		} else if (value == "NumBounces") {
 			this->NumBounces = LuaToNumber(l, -1);
@@ -199,7 +199,7 @@ void MissileType::Load(lua_State *l)
 		} else if (value == "CorrectSphashDamage") {
 			this->CorrectSphashDamage = LuaToBoolean(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 
@@ -315,7 +315,7 @@ static int CclMissile(lua_State *l)
 			missile->CurrentStep = LuaToNumber(l, j + 1, 1);
 			missile->TotalStep = LuaToNumber(l, j + 1, 2);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 

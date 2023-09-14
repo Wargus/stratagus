@@ -59,7 +59,7 @@ void Spell_AreaBombardment::Parse(lua_State *l, int startIndex, int endIndex) /*
 			value = LuaToString(l, -1, j + 1);
 			this->Missile = &MissileTypeByIdent(value);
 		} else {
-			LuaError(l, "Unsupported area-bombardment tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported area-bombardment tag: %s", value.data());
 		}
 	}
 	// Now, checking value.

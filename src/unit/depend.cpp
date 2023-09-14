@@ -81,7 +81,7 @@ static void AddDependency(std::string_view target, std::string_view required, in
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
 	} else {
-		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.data());
+		DebugPrint("dependency target '%s' should be unit-type or upgrade\n", target.data());
 		return;
 	}
 
@@ -115,7 +115,7 @@ static void AddDependency(std::string_view target, std::string_view required, in
 
 	//  Adjust count.
 	if (count < 0 || count > 255) {
-		DebugPrint("wrong count `%d' range 0 .. 255\n" _C_ count);
+		DebugPrint("wrong count `%d' range 0 .. 255\n", count);
 		count = 255;
 	}
 
@@ -134,7 +134,7 @@ static void AddDependency(std::string_view target, std::string_view required, in
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
 	} else {
-		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.data());
+		DebugPrint("dependency required '%s' should be unit-type or upgrade\n", required.data());
 		delete temp;
 		return;
 	}
@@ -261,7 +261,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		}
 		return rules;
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ button.ValueStr.c_str());
+		DebugPrint("target '%s' should be unit-type or upgrade\n", button.ValueStr.c_str());
 		return rules;
 	}
 
@@ -345,7 +345,7 @@ bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 		}
 		rule.Type = DependRuleUpgrade;
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.data());
+		DebugPrint("target '%s' should be unit-type or upgrade\n", target.data());
 		return false;
 	}
 	return CheckDependByRule(player, rule);
@@ -452,7 +452,7 @@ static int CclDefineDependency(lua_State *l)
 			++j;
 			const std::string_view value = LuaToString(l, j + 1);
 			if (value != "or") {
-				LuaError(l, "not 'or' symbol: %s" _C_ value.data());
+				LuaError(l, "not 'or' symbol: %s", value.data());
 				return 0;
 			}
 			or_flag = 1;
@@ -470,7 +470,7 @@ static int CclDefineDependency(lua_State *l)
 */
 static int CclGetDependency(lua_State *l)
 {
-	DebugPrint("FIXME: write this %p\n" _C_(void *)l);
+	DebugPrint("FIXME: write this %p\n", (void *)l);
 
 	return 0;
 }
@@ -491,7 +491,7 @@ static int CclCheckDependency(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		LuaError(l, "bad player: %i" _C_ plynr);
+		LuaError(l, "bad player: %i", plynr);
 	}
 	CPlayer &player = Players[plynr];
 

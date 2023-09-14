@@ -84,7 +84,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 			} else if (value == "target") {
 				location->Base = LocBaseTarget;
 			} else {
-				LuaError(l, "Unsupported missile location base flag: %s" _C_ value.data());
+				LuaError(l, "Unsupported missile location base flag: %s", value.data());
 			}
 		} else if (value == "add-x") {
 			location->AddX = LuaToNumber(l, -1, j + 1);
@@ -95,7 +95,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		} else if (value == "add-rand-y") {
 			location->AddRandY = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported missile location description flag: %s" _C_ value.data());
+			LuaError(l, "Unsupported missile location description flag: %s", value.data());
 		}
 	}
 }
@@ -126,7 +126,7 @@ void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex) /* ov
 			value = LuaToString(l, -1, j + 1);
 			this->Missile = &MissileTypeByIdent(value);
 		} else {
-			LuaError(l, "Unsupported spawn-missile tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported spawn-missile tag: %s", value.data());
 		}
 	}
 	// Now, checking value.

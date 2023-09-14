@@ -209,7 +209,7 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 
 	content.clear();
 	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
-		DebugPrint("Can't open file '%s\n" _C_ file.u8string().c_str());
+		DebugPrint("Can't open file '%s\n", file.u8string().c_str());
 		fprintf(stderr, "Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
 		return false;
 	}
@@ -242,7 +242,7 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 */
 int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnError)
 {
-	DebugPrint("Loading '%s'\n" _C_ file.u8string().c_str());
+	DebugPrint("Loading '%s'\n", file.u8string().c_str());
 
 	std::string content;
 	if (GetFileContent(file, content) == false) {
@@ -250,7 +250,7 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 	}
 	if (file.string().rfind("stratagus.lua") != -1) {
 		FileChecksums ^= fletcher32(content);
-		DebugPrint("FileChecksums after loading %s: %x\n" _C_ file.u8string().c_str() _C_ FileChecksums);
+		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
 	// save the current __file__
 	lua_getglobal(Lua, "__file__");
@@ -302,7 +302,7 @@ static int CclLoad(lua_State *l)
 	const fs::path filename = LibraryFileName(std::string{LuaToString(l, 1)});
 	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
 	if (LuaLoadFile(filename, "", exitOnError) == -1) {
-		DebugPrint("Load failed: %s\n" _C_ filename.u8string().c_str());
+		DebugPrint("Load failed: %s\n", filename.u8string().c_str());
 	}
 	return 0;
 }
@@ -318,7 +318,7 @@ static int CclLoadBuffer(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const fs::path file = LibraryFileName(std::string{LuaToString(l, 1)});
-	DebugPrint("Loading '%s'\n" _C_ file.u8string().c_str());
+	DebugPrint("Loading '%s'\n", file.u8string().c_str());
 	std::string content;
 	if (GetFileContent(file, content) == false) {
 		return 0;
@@ -447,13 +447,13 @@ bool LuaToBoolean(lua_State *l, int index, int subIndex)
 void LuaGarbageCollect()
 {
 #if LUA_VERSION_NUM >= 501
-	DebugPrint("Garbage collect (before): %d\n" _C_ lua_gc(Lua, LUA_GCCOUNT, 0));
+	DebugPrint("Garbage collect (before): %d\n", lua_gc(Lua, LUA_GCCOUNT, 0));
 	lua_gc(Lua, LUA_GCCOLLECT, 0);
-	DebugPrint("Garbage collect (after): %d\n" _C_ lua_gc(Lua, LUA_GCCOUNT, 0));
+	DebugPrint("Garbage collect (after): %d\n", lua_gc(Lua, LUA_GCCOUNT, 0));
 #else
-	DebugPrint("Garbage collect (before): %d/%d\n" _C_  lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+	DebugPrint("Garbage collect (before): %d/%d\n", lua_getgccount(Lua), lua_getgcthreshold(Lua));
 	lua_setgcthreshold(Lua, 0);
-	DebugPrint("Garbage collect (after): %d/%d\n" _C_ lua_getgccount(Lua) _C_ lua_getgcthreshold(Lua));
+	DebugPrint("Garbage collect (after): %d/%d\n", lua_getgccount(Lua), lua_getgcthreshold(Lua));
 #endif
 }
 
@@ -503,7 +503,7 @@ static CUnit **Str2UnitRef(lua_State *l, std::string_view s)
 	} else if (s == "Active") {
 		res = &TriggerData.Active;
 	} else {
-		LuaError(l, "Invalid unit reference '%s'\n" _C_ s.data());
+		LuaError(l, "Invalid unit reference '%s'\n", s.data());
 	}
 	Assert(res); // Must check for error.
 	return res;
@@ -527,7 +527,7 @@ static CUnitType **Str2TypeRef(lua_State *l, std::string_view s)
 	if (s == "Type") {
 		res = &TriggerData.Type;
 	} else {
-		LuaError(l, "Invalid type reference '%s'\n" _C_ s.data());
+		LuaError(l, "Invalid type reference '%s'\n", s.data());
 	}
 	Assert(res); // Must check for error.
 	return res;
@@ -707,17 +707,17 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					varIndex = UnitTypeVar.VariableNameLookup[name];
 					if (varIndex == -1) {
-						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
+						LuaError(l, "Bad variable name :'%s'", name.data());
 					}
 				} else if (key == "Component") {
 					component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else if (key == "Loc") {
 					loc = LuaToNumber(l, -1);
 					if (loc < 0 || 2 < loc) {
-						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number :'%d'", LuaToNumber(l, -1));
 					}
 				} else {
-					LuaError(l, "Bad param %s for Unit" _C_ key.data());
+					LuaError(l, "Bad param %s for Unit", key.data());
 				}
 			}
 			res = std::make_unique<NumberDescUnitStat>(std::move(unitDesc), varIndex, component, loc);
@@ -740,15 +740,15 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					varIndex = UnitTypeVar.VariableNameLookup[name];
 					if (varIndex == -1) {
-						LuaError(l, "Bad variable name :'%s'" _C_ name.data());
+						LuaError(l, "Bad variable name :'%s'", name.data());
 					}
 				} else if (key == "Loc") {
 					loc = LuaToNumber(l, -1);
 					if (loc < 0 || 2 < loc) {
-						LuaError(l, "Bad Loc number :'%d'" _C_ LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number :'%d'", LuaToNumber(l, -1));
 					}
 				} else {
-					LuaError(l, "Bad param %s for Unit" _C_ key.data());
+					LuaError(l, "Bad param %s for Unit", key.data());
 				}
 			}
 			res = std::make_unique<NumberDescTypeStat>(type, varIndex, component, loc);
@@ -766,10 +766,10 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 				} else if (key == "Font") {
 					font = CFont::Get(LuaToString(l, -1));
 					if (!font) {
-						LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
+						LuaError(l, "Bad Font name :'%s'", LuaToString(l, -1).data());
 					}
 				} else {
-					LuaError(l, "Bad param %s for VideoTextLength" _C_ key.data());
+					LuaError(l, "Bad param %s for VideoTextLength", key.data());
 				}
 			}
 			lua_pop(l, 1); // pop the table.
@@ -824,7 +824,7 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 			lua_pop(l, 1); // table.
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'" _C_ key.data());
+			LuaError(l, "unknow condition '%s'", key.data());
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseNumber");
@@ -921,7 +921,7 @@ std::unique_ptr<IStringDesc> CclParseStringDesc(lua_State *l)
 				lua_rawgeti(l, -1, 4); // Font.
 				Font = CFont::Get(LuaToString(l, -1));
 				if (!Font) {
-					LuaError(l, "Bad Font name :'%s'" _C_ LuaToString(l, -1).data());
+					LuaError(l, "Bad Font name :'%s'", LuaToString(l, -1).data());
 				}
 				lua_pop(l, 1); // font name.
 			}
@@ -931,7 +931,7 @@ std::unique_ptr<IStringDesc> CclParseStringDesc(lua_State *l)
 			res = std::make_unique<StringDescPlayerName>(CclParseNumberDesc(l));
 		} else {
 			lua_pop(l, 1);
-			LuaError(l, "unknow condition '%s'" _C_ key.data());
+			LuaError(l, "unknow condition '%s'", key.data());
 		}
 	} else {
 		LuaError(l, "Parse Error in ParseString");
@@ -1228,7 +1228,7 @@ static int AliasTypeVar(lua_State *l, const char *s)
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'" _C_ key.data());
+			LuaError(l, "Bad loc :'%s'", key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);
@@ -1289,7 +1289,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'" _C_ key.data());
+			LuaError(l, "Bad loc :'%s'", key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);
@@ -2313,7 +2313,7 @@ void SavePreferences()
 
 		FILE *fd = fopen(path.string().c_str(), "w");
 		if (!fd) {
-			DebugPrint("Cannot open file %s for writing\n" _C_ path.u8string().c_str());
+			DebugPrint("Cannot open file %s for writing\n", path.u8string().c_str());
 			return;
 		}
 

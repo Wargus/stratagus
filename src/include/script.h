@@ -82,13 +82,14 @@ extern int LuaLoadFile(const fs::path &file, const std::string &strArg = "", boo
 extern int LuaCall(int narg, int clear, bool exitOnError = true);
 extern int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError = true);
 
-#define LuaError(l, args) \
-	do { \
-		PrintFunction(); \
-		fprintf(stdout, args); \
-		fprintf(stdout, "\n"); \
-		lua_pushfstring(l, args); lua_error(l); \
-	} while (0)
+#define LuaError(l, format, ...) \
+ do { \
+  PrintFunction(); \
+  fprintf(stdout, format, ##__VA_ARGS__); \
+  fprintf(stdout, "\n"); \
+  lua_pushfstring(l, format, ##__VA_ARGS__); \
+  lua_error(l); \
+ } while (0)
 
 #define LuaCheckArgs(l, args) \
 	do { \

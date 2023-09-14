@@ -340,13 +340,13 @@ int to_number(std::string_view s, int base)
 	auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), res, base);
 	if (ec != std::errc()) {
 		if (ec == std::errc::invalid_argument) {
-			DebugPrint("That isn't a number %s." _C_ s.data());
+			DebugPrint("That isn't a number %s.", s.data());
 		} else if (ec == std::errc::result_out_of_range) {
-			DebugPrint("This number %s is larger than an int." _C_ s.data());
+			DebugPrint("This number %s is larger than an int.", s.data());
 		}
 		Exit(1);
 	} else if (ptr != s.data() + s.size()) {
-		DebugPrint("That isn't a number %s." _C_ s.data());
+		DebugPrint("That isn't a number %s.", s.data());
 		Exit(1);
 	}
 	return res;
@@ -356,7 +356,7 @@ int to_number(std::string_view s, int base)
 
 	int res = std::strtol(buf.data(), &end, base);
 	if (end != buf.data() + buf.size()) {
-		DebugPrint("That isn't a number %s." _C_ buf.c_str());
+		DebugPrint("That isn't a number %s.", buf.c_str());
 		Exit(1);
 	}
 	return res;

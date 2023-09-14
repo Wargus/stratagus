@@ -211,7 +211,7 @@ void CUnitManager::Load(lua_State *l)
 			} else if (key == "FreeCycle") {
 				cycle = LuaToNumber(l, -1);
 			} else {
-				LuaError(l, "Wrong key %s" _C_ key.data());
+				LuaError(l, "Wrong key %s", key.data());
 			}
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));

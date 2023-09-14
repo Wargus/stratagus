@@ -51,7 +51,7 @@ void Spell_AdjustVital::Parse(lua_State *l, int startIndex, int endIndex) /* ove
 		} else if (value == "max-multi-cast") {
 			this->MaxMultiCast = LuaToNumber(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported adjust-vitals tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported adjust-vitals tag: %s", value.data());
 		}
 	}
 }

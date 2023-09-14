@@ -227,7 +227,7 @@ static void ApplyReplaySettings()
 	Map.NoFogOfWar = GameSettings.NoFogOfWar;
 	FlagRevealMap = GameSettings.RevealMap;
 
-	GameSettings.Save(+[](std::string s) { DebugPrint("%s\n" _C_ s.c_str()); });
+	GameSettings.Save(+[](std::string s) { DebugPrint("%s\n", s.c_str()); });
 
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
@@ -495,7 +495,7 @@ static int CclLog(lua_State *l)
 		} else if (value == "SyncRandSeed") {
 			log->SyncRandSeed = lua_tointeger(l, -1);
 		} else {
-			LuaError(l, "Unsupported key: %s" _C_ value.data());
+			LuaError(l, "Unsupported key: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -575,7 +575,7 @@ static int CclReplayLog(lua_State *l)
 					} else if (value == "Type") {
 						replay->ReplaySettings.Presets[j].Type = static_cast<PlayerTypes>(LuaToNumber(l, -1));
 					} else {
-						LuaError(l, "Unsupported key: %s" _C_ value.data());
+						LuaError(l, "Unsupported key: %s", value.data());
 					}
 					lua_pop(l, 1);
 				}
@@ -597,7 +597,7 @@ static int CclReplayLog(lua_State *l)
 			replay->Network[2] = LuaToNumber(l, -1, 3);
 		} else {
 			if (!replay->ReplaySettings.SetField({value.data(), value.size()}, LuaToNumber(l, -1))) {
-				LuaError(l, "Unsupported key: %s" _C_ value.data());
+				LuaError(l, "Unsupported key: %s", value.data());
 			}
 		}
 		lua_pop(l, 1);
@@ -723,8 +723,8 @@ static void DoNextReplay()
 			ThisPlayer->Notify("%s", _("No sync info for this replay !"));
 		} else {
 			ThisPlayer->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
-			DebugPrint("OUT OF SYNC %u != %u\n" _C_ SyncRandSeed _C_ ReplayStep->SyncRandSeed);
-			DebugPrint("OUT OF SYNC GameCycle %lu \n" _C_ GameCycle);
+			DebugPrint("OUT OF SYNC %u != %u\n", SyncRandSeed, ReplayStep->SyncRandSeed);
+			DebugPrint("OUT OF SYNC GameCycle %lu \n", GameCycle);
 			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
@@ -801,7 +801,7 @@ static void DoNextReplay()
 		} else if (val == "crazy") {
 			state = DiplomacyCrazy;
 		} else {
-			DebugPrint("Invalid diplomacy command: %s" _C_ val.data());
+			DebugPrint("Invalid diplomacy command: %s", val.data());
 			state = -1;
 		}
 		SendCommandDiplomacy(arg1, state, arg2);
@@ -820,7 +820,7 @@ static void DoNextReplay()
 	} else if (action == "quit") {
 		CommandQuit(arg1);
 	} else {
-		DebugPrint("Invalid action: %s" _C_ action);
+		DebugPrint("Invalid action: %s", action.data());
 	}
 
 	ReplayStep = ReplayStep->Next;

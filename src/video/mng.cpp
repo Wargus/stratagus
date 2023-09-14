@@ -181,7 +181,7 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 	Mng *mng = (Mng *)mng_get_userdata(handle);
 	mng->iteration = 0x7fffffff;
 	if (errortext) {
-		DebugPrint("MNG error: %s\n" _C_ errortext);
+		DebugPrint("MNG error: %s\n", errortext);
 	}
 	return MNG_TRUE;
 }

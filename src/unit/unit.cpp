@@ -514,7 +514,7 @@ void CUnit::Release(bool final)
 
 	// First release, remove from lists/tables.
 	if (!Destroyed) {
-		DebugPrint("%d: First release %d\n" _C_ Player->Index _C_ UnitNumber(*this));
+		DebugPrint("%d: First release %d\n", Player->Index, UnitNumber(*this));
 
 		// Are more references remaining?
 		Destroyed = 1; // mark as destroyed
@@ -1319,7 +1319,7 @@ void CUnit::Remove(CUnit *host)
 {
 	if (Removed) { // could happen!
 		// If unit is removed (inside) and building is destroyed.
-		DebugPrint("unit '%s(%d)' already removed\n" _C_ Type->Ident.c_str() _C_ UnitNumber(*this));
+		DebugPrint("unit '%s(%d)' already removed\n", Type->Ident.c_str(), UnitNumber(*this));
 		return;
 	}
 	Map.Remove(*this);
@@ -1456,7 +1456,7 @@ void UnitLost(CUnit &unit)
 	//  Handle order cancels.
 	unit.CurrentOrder()->Cancel(unit);
 
-	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
+	DebugPrint("%d: Lost %s(%d)\n", player.Index, type.Ident.c_str(), UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
 	CBuildRestrictionOnTop *b = OnTopDetails(unit, nullptr);
@@ -1959,11 +1959,12 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 
 	CUnit *head = mine.Resource.Workers;
 #if 0
-	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n"
-			   _C_ this->Player->Index _C_ this->Slot
-			   _C_ mine.Type->Name.c_str()
-			   _C_ mine.Slot
-			   _C_ mine.Data.Resource.Assigned);
+	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n",
+	           this->Player->Index,
+	           this->Slot,
+	           mine.Type->Name.c_str(),
+	           mine.Slot,
+	           mine.Data.Resource.Assigned);
 #endif
 	this->RefsIncrease();
 	this->NextWorker = head;
@@ -1978,11 +1979,12 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 	}
 	CUnit *prev = nullptr, *worker = mine.Resource.Workers;
 #if 0
-	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n"
-			   _C_ this->Player->Index _C_ this->Slot
-			   _C_ mine.Type->Name.c_str()
-			   _C_ mine.Slot
-			   _C_ mine.CurrentOrder()->Data.Resource.Assigned);
+	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n",
+	           this->Player->Index,
+	           this->Slot,
+	           mine.Type->Name.c_str(),
+	           mine.Slot,
+	           mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
 	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
 		if (worker == this) {

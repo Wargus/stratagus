@@ -43,7 +43,7 @@ void Spell_Teleport::Parse(lua_State *l, int startIndex, int endIndex) /* overri
 	for (int j = startIndex; j < endIndex; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
-		LuaError(l, "Unsupported Teleport tag: %s" _C_ value.data());
+		LuaError(l, "Unsupported Teleport tag: %s", value.data());
 	}
 }
 

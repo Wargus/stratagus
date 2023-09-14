@@ -512,7 +512,7 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 {
 	const int res = GetResourceIdByName(resourceName);
 	if (res == -1) {
-		LuaError(l, "Resource not found: %s" _C_ resourceName.data());
+		LuaError(l, "Resource not found: %s", resourceName.data());
 	}
 	return res;
 }
@@ -851,7 +851,7 @@ CUnitType &UnitTypeByIdent(std::string_view ident)
 	if (ret != UnitTypeMap.end()) {
 		return *(*ret).second;
 	}
-	DebugPrint("Unknown unitType '%s'\n" _C_ ident.data());
+	DebugPrint("Unknown unitType '%s'\n", ident.data());
 	ExitFatal(1);
 }
 
@@ -950,7 +950,7 @@ void InitUnitTypes(int reset_player_stats)
 		Assert(type.Slot == (int)i);
 
 		if (type.Animations == nullptr) {
-			DebugPrint(_("unit-type '%s' without animations, ignored.\n") _C_ type.Ident.c_str());
+			DebugPrint(_("unit-type '%s' without animations, ignored.\n"), type.Ident.c_str());
 			continue;
 		}
 		//  Add idents to hash.

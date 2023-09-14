@@ -160,7 +160,10 @@ void SetVideoSync()
 	}
 	SkipCycles = (static_cast<double>(fps) / CyclesPerSecond) - 1;
 
-	DebugPrint("native fps: %d, render frame skip: %d, game cycle skip: %f\n" _C_ nativeFps _C_ Preference.FrameSkip _C_ SkipCycles);
+	DebugPrint("native fps: %d, render frame skip: %d, game cycle skip: %f\n",
+	           nativeFps,
+	           Preference.FrameSkip,
+	           SkipCycles);
 }
 
 /*----------------------------------------------------------------------------
@@ -310,14 +313,14 @@ static void setDpiAware() {
 	if (SetProcessDpiAwareness) {
 		/* Try Windows 8.1+ version */
 		HRESULT result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
-		DebugPrint("called SetProcessDpiAwareness: %d" _C_ (result == S_OK) ? 1 : 0);
+		DebugPrint("called SetProcessDpiAwareness: %d", (result == S_OK) ? 1 : 0);
 	} else {
 		if (SetProcessDPIAware) {
 			/* Try Vista - Windows 8 version.
 			   This has a constant scale factor for all monitors.
 			*/
 			BOOL success = SetProcessDPIAware();
-			DebugPrint("called SetProcessDPIAware: %d" _C_ (int)success);
+			DebugPrint("called SetProcessDPIAware: %d", (int)success);
 		}
 		// In any case, on these old Windows versions we have to do a bit of
 		// compatibility hacking. Windows 7 and below don't play well with

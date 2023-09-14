@@ -295,8 +295,8 @@ static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, cons
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-			   _C_ icmsgsubtypenames[msg.GetHeader().GetSubType()]);
+	DebugPrint(
+		"Sending to %s -> %s\n", hostStr.c_str(), icmsgsubtypenames[msg.GetHeader().GetSubType()]);
 #endif
 }
 
@@ -306,8 +306,7 @@ static void NetworkSendICMessage_Log(CUDPSocket &socket, const CHost &host, cons
 
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
-	DebugPrint("Sending to %s -> %s\n" _C_ hostStr.c_str()
-			   _C_ icmsgsubtypenames[msg.GetSubType()]);
+	DebugPrint("Sending to %s -> %s\n", hostStr.c_str(), icmsgsubtypenames[msg.GetSubType()]);
 #endif
 }
 
@@ -334,9 +333,10 @@ void CClient::SendRateLimited(const T &msg, unsigned long tick, unsigned long ms
 		lastMsgTypeSent = subtype;
 	}
 	NetworkSendICMessage(*socket, serverHost, msg);
-	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
-			   ncconstatenames[networkState.State] _C_
-			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
+	DebugPrint("[%s] Sending (%s:#%d)\n",
+	           ncconstatenames[networkState.State],
+	           icmsgsubtypenames[subtype],
+	           networkState.MsgCnt);
 }
 
 template<>
@@ -355,9 +355,10 @@ void CClient::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &ms
 		lastMsgTypeSent = subtype;
 	}
 	NetworkSendICMessage(*socket, serverHost, msg);
-	DebugPrint("[%s] Sending (%s:#%d)\n" _C_
-			   ncconstatenames[networkState.State] _C_
-			   icmsgsubtypenames[subtype] _C_ networkState.MsgCnt);
+	DebugPrint("[%s] Sending (%s:#%d)\n",
+	           ncconstatenames[networkState.State],
+	           icmsgsubtypenames[subtype],
+	           networkState.MsgCnt);
 }
 
 void CClient::Init(const std::string &name, CUDPSocket *socket, CServerSetup *serverSetup, CServerSetup *localSetup, unsigned long tick)
@@ -400,7 +401,7 @@ bool CClient::Update_detaching(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_detaching: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_detaching: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -414,7 +415,7 @@ bool CClient::Update_connecting(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_connecting: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_connecting: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -428,7 +429,7 @@ bool CClient::Update_connected(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_connected: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_connected: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -461,7 +462,7 @@ bool CClient::Update_changed(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_changed: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_changed: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -475,7 +476,7 @@ bool CClient::Update_async(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_async: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_async: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -490,7 +491,7 @@ bool CClient::Update_mapinfo(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_mapinfo: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_mapinfo: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -504,7 +505,7 @@ bool CClient::Update_badmap(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_badmap: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_badmap: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -518,7 +519,7 @@ bool CClient::Update_needmap(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_needmap: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_needmap: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -532,7 +533,7 @@ bool CClient::Update_goahead(unsigned long tick)
 		return true;
 	} else {
 		networkState.State = ccs_unreachable;
-		DebugPrint("ccs_goahead: Above message limit %d\n" _C_ networkState.MsgCnt);
+		DebugPrint("ccs_goahead: Above message limit %d\n", networkState.MsgCnt);
 		return false;
 	}
 }
@@ -653,11 +654,12 @@ void CClient::SetConfig(const CInitMessage_Config &msg)
 			NetPlayers++;
 		}
 		const std::string hostStr = CHost(msg.hosts[i].Host, msg.hosts[i].Port).toString();
-		DebugPrint("%s %d = %s [%.*s]\n" _C_
-					(i == 0 ? "Server" : (i == NetLocalHostsSlot ? "SELF" : "Client")) _C_
-					msg.hosts[i].PlyNr _C_ hostStr.c_str() _C_
-					static_cast<int>(sizeof(msg.hosts[i].PlyName)) _C_
-					msg.hosts[i].PlyName);
+		DebugPrint("%s %d = %s [%.*s]\n",
+		           (i == 0 ? "Server" : (i == NetLocalHostsSlot ? "SELF" : "Client")),
+		           msg.hosts[i].PlyNr,
+		           hostStr.c_str(),
+		           static_cast<int>(sizeof(msg.hosts[i].PlyName)),
+		           msg.hosts[i].PlyName);
 	}
 	NetLocalPlayerNumber = msg.hosts[NetLocalHostsSlot].PlyNr;
 	// server is first, set our view of ip:port
@@ -680,8 +682,9 @@ bool CClient::Parse(const unsigned char *buf, const CHost &host)
 	// Assert(host == this->serverHost);
 	const unsigned char msgsubtype = header.GetSubType();
 
-	DebugPrint("Received %s in state %s\n" _C_ icmsgsubtypenames[msgsubtype]
-			   _C_ ncconstatenames[networkState.State]);
+	DebugPrint("Received %s in state %s\n",
+	           icmsgsubtypenames[msgsubtype],
+	           ncconstatenames[networkState.State]);
 
 	switch (msgsubtype) {
 		case ICMServerQuit: { // Server user canceled, should work in all states
@@ -1021,7 +1024,7 @@ void CClient::Parse_AreYouThere()
 
 void CServer::KickClient(int c)
 {
-	DebugPrint("kicking client %d, player number %d\n" _C_ c _C_ Hosts[c].PlyNr);
+	DebugPrint("kicking client %d, player number %d\n", c, Hosts[c].PlyNr);
 	Hosts[c].Clear();
 	serverSetup->Ready[c] = 0;
 	serverSetup->ServerGameSettings.Presets[c].Race = 0;
@@ -1151,7 +1154,11 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 			file.read(data, fragmentDataSize);
 			file.close();
 
-			DebugPrint("Sending map fragment %d for %s (size %d, offset %d)\n" _C_ fragmentIdx _C_ networkName.c_str() _C_ fragmentDataSize _C_ offset);
+			DebugPrint("Sending map fragment %d for %s (size %d, offset %d)\n",
+			           fragmentIdx,
+			           networkName.c_str(),
+			           fragmentDataSize,
+			           offset);
 			const CInitMessage_MapFileFragment message(networkName.c_str(), data, fragmentDataSize, fragmentIdx);
 			NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 			delete[] data;
@@ -1163,7 +1170,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 	}
 
 	// no file content found for this fragment index, we're done
-	DebugPrint("Sending end fragment %d for %s\n" _C_ fragmentIdx _C_ NetworkMapName.c_str());
+	DebugPrint("Sending end fragment %d for %s\n", fragmentIdx, NetworkMapName.c_str());
 	const CInitMessage_MapFileFragment message("", nullptr, 0, fragmentIdx);
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
@@ -1242,7 +1249,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host
 			Hosts[h].PlyNr = availableSlots.front();
 			Hosts[h].SetName(msg.PlyName);
 			const std::string hostStr = host.toString();
-			DebugPrint("New client %s [%s]\n" _C_ hostStr.c_str() _C_ Hosts[h].PlyName);
+			DebugPrint("New client %s [%s]\n", hostStr.c_str(), Hosts[h].PlyName);
 			networkStates[h].State = ccs_connecting;
 			networkStates[h].MsgCnt = 0;
 		} else {
@@ -1291,7 +1298,8 @@ void CServer::Parse_Resync(const int h)
 			break;
 		}
 		default:
-			DebugPrint("Server: ICMResync: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			DebugPrint(
+				"Server: ICMResync: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1353,7 +1361,8 @@ void CServer::Parse_Waiting(const int h)
 			break;
 		}
 		default:
-			DebugPrint("Server: ICMWaiting: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			DebugPrint(
+				"Server: ICMWaiting: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1383,7 +1392,7 @@ void CServer::Parse_Map(const int h)
 			break;
 		}
 		default:
-			DebugPrint("Server: ICMMap: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			DebugPrint("Server: ICMMap: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1406,7 +1415,7 @@ void CServer::Parse_MapFragment(const int h, uint32_t fragmentIdx)
 			break;
 		}
 		default:
-			DebugPrint("Server: ICMMap: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			DebugPrint("Server: ICMMap: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1451,7 +1460,7 @@ void CServer::Parse_State(const int h, const CInitMessage_State &msg)
 			break;
 		}
 		default:
-			DebugPrint("Server: ICMState: Unhandled state %d Host %d\n" _C_ networkStates[h].State _C_ h);
+			DebugPrint("Server: ICMState: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1496,8 +1505,8 @@ void CServer::Parse_SeeYou(const int h)
 			break;
 
 		default:
-			DebugPrint("Server: ICMSeeYou: Unhandled state %d Host %d\n" _C_
-					   networkStates[h].State _C_ h);
+			DebugPrint(
+				"Server: ICMSeeYou: Unhandled state %d Host %d\n", networkStates[h].State, h);
 			break;
 	}
 }
@@ -1588,7 +1597,7 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 		case ICMIAH: break;
 
 		default:
-			DebugPrint("Server: Unhandled subtype %d from host %d\n" _C_ msgsubtype _C_ index);
+			DebugPrint("Server: Unhandled subtype %d from host %d\n", msgsubtype, index);
 			break;
 	}
 }
@@ -1626,9 +1635,10 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 #ifdef DEBUG
 	const unsigned char msgsubtype = header.GetSubType();
 	const std::string hostStr = host.toString();
-	DebugPrint("Received %s (%d) from %s\n" _C_
-			   icmsgsubtypenames[int(msgsubtype)] _C_ msgsubtype _C_
-			   hostStr.c_str());
+	DebugPrint("Received %s (%d) from %s\n",
+	           icmsgsubtypenames[int(msgsubtype)],
+	           msgsubtype,
+	           hostStr.c_str());
 #endif
 	if (NetConnectRunning == 2) { // client
 		if (Client.Parse(buf, host) == false) {
@@ -1833,7 +1843,7 @@ void NetworkServerStartGame()
 	const CInitMessage_State statemsg(MessageInit_FromServer, ServerSetupState);
 
 	int hostsToAck = std::max(NetPlayers - 1, 0);
-	DebugPrint("Ready, sending InitConfig to %d host(s)\n" _C_ hostsToAck);
+	DebugPrint("Ready, sending InitConfig to %d host(s)\n", hostsToAck);
 	// Send all clients host:ports to all clients.
 	while (hostsToAck) {
 breakout:
@@ -1842,11 +1852,11 @@ breakout:
 			if (Hosts[i].IsValid()) {
 				const CHost host(message.hosts[i].Host, message.hosts[i].Port);
 				if (waitingForConfigAck[i]) { // not acknowledged yet
-					DebugPrint("Sending InitConfig to %s\n" _C_ host.toString().c_str());
+					DebugPrint("Sending InitConfig to %s\n", host.toString().c_str());
 					message.clientIndex = i;
 					NetworkSendICMessage_Log(NetworkFildes, host, message);
 				} else if (waitingForInitAck[i]) {
-					DebugPrint("Sending InitState to %s\n" _C_ host.toString().c_str());
+					DebugPrint("Sending InitState to %s\n", host.toString().c_str());
 					NetworkSendICMessage_Log(NetworkFildes, host, statemsg);
 				}
 			}
@@ -1859,7 +1869,7 @@ breakout:
 			const int len = NetworkFildes.Recv(buf, sizeof(buf), &host);
 			if (len < 0) {
 				const std::string hostStr = host.toString();
-				DebugPrint("*Receive ack failed: (%d) from %s\n" _C_ len _C_ hostStr.c_str());
+				DebugPrint("*Receive ack failed: (%d) from %s\n", len, hostStr.c_str());
 				continue;
 			}
 			CInitMessage_Header header;
@@ -1871,7 +1881,7 @@ breakout:
 				switch (subtype) {
 					case ICMConfig: {
 						const std::string hostStr = host.toString();
-						DebugPrint("Got ack for InitConfig from %s\n" _C_ hostStr.c_str());
+						DebugPrint("Got ack for InitConfig from %s\n", hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (waitingForConfigAck[index]) {
@@ -1884,23 +1894,23 @@ breakout:
 					}
 					case ICMGo: {
 						const std::string hostStr = host.toString();
-						DebugPrint("Got ack for InitState from %s\n" _C_ hostStr.c_str());
+						DebugPrint("Got ack for InitState from %s\n", hostStr.c_str());
 						const int index = FindHostIndexBy(host);
 						if (index != -1) {
 							if (waitingForInitAck[index]) {
 								waitingForInitAck[index] = false;
 								hostsToAck--;
-								DebugPrint("Removing host %d from waiting list\n" _C_ index);
+								DebugPrint("Removing host %d from waiting list\n", index);
 							}
 						}
 						break;
 					}
 					default:
-						DebugPrint("Server: Config ACK: Unhandled subtype %d\n" _C_ subtype);
+						DebugPrint("Server: Config ACK: Unhandled subtype %d\n", subtype);
 						break;
 				}
 			} else {
-				DebugPrint("Unexpected Message Type %d while waiting for Config ACK\n" _C_ type);
+				DebugPrint("Unexpected Message Type %d while waiting for Config ACK\n", type);
 			}
 		}
 	}
@@ -1937,7 +1947,7 @@ int NetworkSetupServerAddress(const std::string &serveraddr, int port)
 	Client.SetServerHost(host);
 #ifdef DEBUG
 	const std::string hostStr = host.toString();
-	DebugPrint("SELECTED SERVER: %s [%s]\n" _C_ hostStr.c_str() _C_ serveraddr.c_str());
+	DebugPrint("SELECTED SERVER: %s [%s]\n", hostStr.c_str(), serveraddr.c_str());
 #endif
 	return 0;
 }
@@ -1999,7 +2009,7 @@ void NetworkServerResyncClients()
 */
 void NetworkGamePrepareGameSettings()
 {
-	DebugPrint("NetPlayers = %d\n" _C_ NetPlayers);
+	DebugPrint("NetPlayers = %d\n", NetPlayers);
 	GameSettings = ServerSetupState.ServerGameSettings;
 	GameSettings.NetGameType = NetGameTypes::SettingsMultiPlayerGame;
 

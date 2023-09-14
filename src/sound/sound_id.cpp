@@ -71,7 +71,7 @@ static CSound *FindSound(const std::string &name)
 void MapSound(const std::string &name, CSound *id)
 {
 	if (!id) {
-		DebugPrint("Null Sound for %s is not acceptable by sound table\n" _C_ name.c_str());
+		DebugPrint("Null Sound for %s is not acceptable by sound table\n", name.c_str());
 		return;
 	}
 	id->Mapref++;
@@ -92,7 +92,7 @@ CSound *SoundForName(const std::string &name)
 	if (sound) {
 		return sound;
 	}
-	DebugPrint("Can't find sound '%s' in sound table\n" _C_ name.c_str());
+	DebugPrint("Can't find sound '%s' in sound table\n", name.c_str());
 	return nullptr;
 }
 
@@ -113,7 +113,7 @@ CSound *MakeSound(const std::string &name, const std::vector<std::string> &files
 	CSound *sound = FindSound(name);
 
 	if (sound) {
-		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());
+		DebugPrint("re-register sound '%s'\n", name.c_str());
 		return sound;
 	}
 
@@ -142,7 +142,7 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	CSound *sound = FindSound(name);
 
 	if (sound) {
-		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());
+		DebugPrint("re-register sound '%s'\n", name.c_str());
 		return sound;
 	}
 

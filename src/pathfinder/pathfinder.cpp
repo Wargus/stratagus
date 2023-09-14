@@ -465,7 +465,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
-			AstarDebugPrint("WAIT at %d\n" _C_ output.Fast);
+			AstarDebugPrint("WAIT at %d\n", output.Fast);
 			result = PF_WAIT;
 		} else {
 			output.Fast = PathFinderOutput::MAX_FAST;

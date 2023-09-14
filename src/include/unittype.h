@@ -768,7 +768,7 @@ public:
 		{
 			int index = this->operator[](key);
 			if (index != -1) {
-				DebugPrint("Warning, Key '%s' already defined\n" _C_ key.c_str());
+				DebugPrint("Warning, Key '%s' already defined\n", key.c_str());
 				return index;
 			}
 			user[key] = TotalKeys++;

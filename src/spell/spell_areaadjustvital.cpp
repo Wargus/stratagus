@@ -54,7 +54,7 @@ void Spell_AreaAdjustVital::Parse(lua_State *l, int startIndex, int endIndex) /*
 		} else if (value == "use-mana") {
 			this->UseMana = LuaToBoolean(l, -1, j + 1);
 		} else {
-			LuaError(l, "Unsupported area-adjust-vitals tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported area-adjust-vitals tag: %s", value.data());
 		}
 	}
 }

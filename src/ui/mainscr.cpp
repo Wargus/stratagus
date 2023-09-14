@@ -292,7 +292,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 			var = &unit.Stats->Variables[index];
 			break;
 		default:
-			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
+			DebugPrint("Bad value for GetComponent: t = %d", t);
 			var = &unit.Variable[index];
 			break;
 	}
@@ -334,7 +334,7 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			var = &type.Stats[ThisPlayer->Index].Variables[index];
 			break;
 		default:
-			DebugPrint("Bad value for GetComponent: t = %d" _C_ t);
+			DebugPrint("Bad value for GetComponent: t = %d", t);
 			var = &type.Stats[ThisPlayer->Index].Variables[index];
 			break;
 	}

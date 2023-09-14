@@ -165,7 +165,7 @@ CUpgrade::~CUpgrade()
 {
 	auto it = Upgrades.find(ident);
 	if (it == Upgrades.end()) {
-		DebugPrint("upgrade not found: %s\n" _C_ ident.data());
+		DebugPrint("upgrade not found: %s\n", ident.data());
 	}
 	return it->second;
 }
@@ -260,7 +260,7 @@ static int CclDefineModifier(lua_State *l)
 	std::string_view upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
 	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.data());
+		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist.", upgrade_ident.data());
 	}
 
 	for (int j = 1; j < args; ++j) {
@@ -345,12 +345,12 @@ static int CclDefineModifier(lua_State *l)
 						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);
 						um->Modifier.Variables[index].Max = LuaToNumber(l, -1);
 					} else {
-						LuaError(l, "bad argument type for '%s'\n" _C_ key.data());
+						LuaError(l, "bad argument type for '%s'\n", key.data());
 					}
 					lua_pop(l, 1);
 				}
 			} else {
-				LuaError(l, "wrong tag: %s" _C_ key.data());
+				LuaError(l, "wrong tag: %s", key.data());
 			}
 		}
 	}
@@ -370,7 +370,7 @@ static int CclDefineUnitAllow(lua_State *l)
 	const std::string_view ident = LuaToString(l, 0 + 1);
 
 	if (!starts_with(ident, "unit-")) {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
+		DebugPrint(" wrong ident %s\n", ident.data());
 		return 0;
 	}
 	int id = UnitTypeByIdent(ident).Slot;
@@ -426,7 +426,7 @@ static int CclDefineAllow(lua_State *l)
 				AllowUpgradeId(Players[i], id, ids[i]);
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n" _C_ ident);
+			DebugPrint(" wrong ident %s\n", ident.data());
 		}
 	}
 	return 0;
@@ -462,7 +462,7 @@ int UpgradeIdByIdent(std::string_view ident)
 	if (upgrade) {
 		return upgrade->ID;
 	}
-	DebugPrint(" fix this %s\n" _C_ ident.data());
+	DebugPrint(" fix this %s\n", ident.data());
 	return -1;
 }
 
@@ -1094,7 +1094,7 @@ char UpgradeIdentAllowed(const CPlayer &player, std::string_view ident)
 	if (id != -1) {
 		return UpgradeIdAllowed(player, id);
 	}
-	DebugPrint("Fix your code, wrong identifier '%s'\n" _C_ ident.data());
+	DebugPrint("Fix your code, wrong identifier '%s'\n", ident.data());
 	return '-';
 }
 

@@ -355,10 +355,10 @@ extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int re
 void AiNewDepotRequest(CUnit &worker)
 {
 #if 0
-	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n"
-			   _C_ worker->Player->Index _C_ worker->Slot
-			   _C_ worker->CurrentResource
-			   _C_ worker->Data.Move.Cycles);
+	DebugPrint("%d: Worker %d report: Resource [%d] too far from depot, returning time [%d].\n",
+			   worker->Player->Index, worker->Slot,
+			   worker->CurrentResource,
+			   worker->Data.Move.Cycles);
 #endif
 	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -419,9 +419,11 @@ void AiNewDepotRequest(CUnit &worker)
 
 		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
-		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n"
-				   _C_ worker.Player->Index _C_ UnitNumber(worker)
-				   _C_ queue.Pos.x _C_ queue.Pos.y);
+		DebugPrint("%d: Worker %d report: Requesting new depot near [%d,%d].\n",
+		           worker.Player->Index,
+		           UnitNumber(worker),
+		           queue.Pos.x,
+		           queue.Pos.y);
 		/*
 		} else {
 			AiPlayer->NeededMask |= best_mask;
@@ -536,8 +538,8 @@ static bool AiRequestSupply()
 		CUnitType &type = *AiHelpers.UnitLimit()[0][i];
 		if (counter[type.Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
-			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n"
-					   _C_ AiPlayer->Player->Index _C_ type->Name.c_str());
+			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n",
+					   AiPlayer->Player->Index, type->Name.c_str());
 #endif
 			return false;
 		}
@@ -575,8 +577,8 @@ static bool AiRequestSupply()
 				AiPlayer->UnitTypeBuilt.insert(
 					AiPlayer->UnitTypeBuilt.begin(), newqueue);
 #if defined( DEBUG) && defined( DebugRequestSupply )
-				DebugPrint("%d: AiRequestSupply: build Supply in %s\n"
-						   _C_ AiPlayer->Player->Index _C_ type->Name.c_str());
+				DebugPrint("%d: AiRequestSupply: build Supply in %s\n",
+						   AiPlayer->Player->Index, type->Name.c_str());
 #endif
 				return false;
 			}
@@ -608,8 +610,8 @@ static bool AiRequestSupply()
 			needed += ">";
 		}
 	}
-	DebugPrint("%d: AiRequestSupply: needed build %s with %s resource\n"
-			   _C_ AiPlayer->Player->Index _C_ cache[0].type->Name.c_str() _C_ needed.c_str());
+	DebugPrint("%d: AiRequestSupply: needed build %s with %s resource\n",
+			   AiPlayer->Player->Index, cache[0].type->Name.c_str(), needed.c_str());
 #endif
 	return true;
 }
@@ -670,14 +672,16 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			tablep = &AiHelpers.Train();
 		}
 		if (type.Slot > n) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n",
+			           AiPlayer->Player->Index,
+			           type.Ident.c_str());
 			continue;
 		}
 		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
 		if (table.empty()) { // Oops not known.
-			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n"
-					   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n",
+			           AiPlayer->Player->Index,
+			           type.Ident.c_str());
 			continue;
 		}
 
@@ -787,8 +791,9 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 			}
 		}
 	}
-	DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n"
-			   _C_ AiPlayer->Player->Index _C_ upgrade->Ident.c_str());
+	DebugPrint("%d: AiAddResearchRequest I: Nothing known about '%s'\n",
+	           AiPlayer->Player->Index,
+	           upgrade->Ident.c_str());
 }
 
 /**
@@ -843,14 +848,16 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Upgrade();
 
 	if (type.Slot > n) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+		DebugPrint("%d: AiAddUpgradeToRequest I: Nothing known about '%s'\n",
+		           AiPlayer->Player->Index,
+		           type.Ident.c_str());
 		return;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+		DebugPrint("%d: AiAddUpgradeToRequest II: Nothing known about '%s'\n",
+		           AiPlayer->Player->Index,
+		           type.Ident.c_str());
 		return;
 	}
 
@@ -1321,14 +1328,16 @@ static int AiRepairUnit(CUnit &unit)
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair();
 	const CUnitType &type = *unit.Type;
 	if (type.Slot > n) { // Oops not known.
-		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n",
+		           AiPlayer->Player->Index,
+		           type.Ident.c_str());
 		return 0;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
-		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n"
-				   _C_ AiPlayer->Player->Index _C_ type.Ident.c_str());
+		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n",
+		           AiPlayer->Player->Index,
+		           type.Ident.c_str());
 		return 0;
 	}
 

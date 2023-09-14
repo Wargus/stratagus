@@ -222,7 +222,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 	const std::string_view raceName = LuaToString(l, j + 1, 1);
 	const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 	if (raceIndex == -1) {
-		LuaError(l, "Unknown race: %s" _C_ raceName.data());
+		LuaError(l, "Unknown race: %s", raceName.data());
 	}
 	lua_rawgeti(l, j + 1, 2);
 	LuaUserData *data = nullptr;
@@ -281,7 +281,7 @@ static int CclDefineGameSounds(lua_State *l)
 			const std::string_view raceName = LuaToString(l, j + 1, 2);
 			const int raceIndex = PlayerRaces.GetRaceIndexByName(raceName);
 			if (raceIndex == -1) {
-				LuaError(l, "Unknown race: %s" _C_ raceName.data());
+				LuaError(l, "Unknown race: %s", raceName.data());
 			}
 			lua_rawgeti(l, j + 1, 3);
 			if (!lua_isuserdata(l, -1)
@@ -303,7 +303,7 @@ static int CclDefineGameSounds(lua_State *l)
 			}
 			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	return 0;

@@ -898,8 +898,8 @@ static void HandleMouseOn(const PixelPos screenPos)
 		// viewport changed
 		if (UI.MouseViewport != vp) {
 			UI.MouseViewport = vp;
-			DebugPrint("current viewport changed to %ld.\n" _C_
-					   static_cast<long int>(vp - UI.Viewports));
+			DebugPrint("current viewport changed to %ld.\n",
+			           static_cast<long int>(vp - UI.Viewports));
 		}
 
 		// Note cursor on map can be in scroll area
@@ -1078,7 +1078,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 			}
 		} catch (const std::out_of_range &oor) {
-			DebugPrint("Selected is empty: %s\n" _C_ oor.what());
+			DebugPrint("Selected is empty: %s\n", oor.what());
 		}
 		if (Preference.ShowNameDelay) {
 			ShowNameDelay = GameCycle + Preference.ShowNameDelay;
@@ -1452,8 +1452,8 @@ static int SendSpellCast(const Vec2i &tilePos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 		if (!unit.Type->CanCastSpell) {
-			DebugPrint("but unit %d(%s) can't cast spells?\n" _C_
-					   UnitNumber(unit) _C_ unit.Type->Name.c_str());
+			DebugPrint(
+				"but unit %d(%s) can't cast spells?\n", UnitNumber(unit), unit.Type->Name.c_str());
 			// this unit cannot cast spell
 			continue;
 		}
@@ -1510,7 +1510,7 @@ static void SendCommand(const Vec2i &tilePos)
 			ret = SendSpellCast(tilePos);
 			break;
 		default:
-			DebugPrint("Unsupported send action %d\n" _C_ CursorAction);
+			DebugPrint("Unsupported send action %d\n", CursorAction);
 			break;
 	}
 	if (ret) {
@@ -1693,8 +1693,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 	Assert(UI.MouseViewport);
 	if ((MouseButtons & LeftButton) && UI.SelectedViewport != UI.MouseViewport) {
 		UI.SelectedViewport = UI.MouseViewport;
-		DebugPrint("selected viewport changed to %ld.\n" _C_
-				   static_cast<long int>(UI.SelectedViewport - UI.Viewports));
+		DebugPrint("selected viewport changed to %ld.\n",
+		           static_cast<long int>(UI.SelectedViewport - UI.Viewports));
 	}
 
 	// to redraw the cursor immediately (and avoid up to 1 sec delay
@@ -1824,7 +1824,9 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitAction::Train) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
 
-					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
+					DebugPrint("Cancel slot %d %s\n",
+					           ButtonUnderCursor,
+					           order.GetUnitType().Ident.c_str());
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelTraining(*Selected[0], ButtonUnderCursor, &order.GetUnitType());
 				}
@@ -1833,7 +1835,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonArea::Upgrading) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel upgrade %s\n", Selected[0]->Type->Ident.c_str());
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
@@ -1842,7 +1844,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonArea::Researching) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					DebugPrint("Cancel research %s\n", Selected[0]->Type->Ident.c_str());
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 					SendCommandCancelResearch(*Selected[0]);
 				}

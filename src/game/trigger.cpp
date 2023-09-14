@@ -75,7 +75,7 @@ int TriggerGetPlayer(lua_State *l)
 	if (lua_isnumber(l, -1)) {
 		const int ret = LuaToNumber(l, -1);
 		if (ret < 0 || ret > PlayerMax) {
-			LuaError(l, "bad player: %d" _C_ ret);
+			LuaError(l, "bad player: %d", ret);
 		}
 		return ret;
 	}
@@ -85,7 +85,7 @@ int TriggerGetPlayer(lua_State *l)
 	} else if (player == "this") {
 		return ThisPlayer->Index;
 	}
-	LuaError(l, "bad player: %s" _C_ player.data());
+	LuaError(l, "bad player: %s", player.data());
 	return 0;
 }
 
@@ -234,7 +234,7 @@ static int CclIfNearUnit(lua_State *l)
 	}
 	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-near-unit: %s" _C_ op.data());
+		LuaError(l, "Illegal comparison operation in if-near-unit: %s", op.data());
 	}
 
 	//
@@ -300,7 +300,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 
 	CompareFunction compare = GetCompareFunction(op);
 	if (!compare) {
-		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s" _C_ op.data());
+		LuaError(l, "Illegal comparison operation in if-rescued-near-unit: %s", op.data());
 	}
 
 	// Get all unit types 'near'.

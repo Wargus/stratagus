@@ -103,7 +103,7 @@ void ShowLoadProgress(const char *fmt, ...)
 		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		RealizeVideoMemory();
 	} else {
-		DebugPrint("!!!!%s\n" _C_ temp);
+		DebugPrint("!!!!%s\n", temp);
 	}
 }
 
@@ -192,7 +192,7 @@ CPopup &PopupByIdent(std::string_view ident)
 	if (it != UI.ButtonPopups.end()) {
 		return **it;
 	}
-	DebugPrint("Unknown popup '%s'\n" _C_ ident.data());
+	DebugPrint("Unknown popup '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

@@ -331,7 +331,7 @@ static int CclDefineSprites(lua_State *l)
 			} else if (key == "Size") {
 				CclGetPos(l, &deco.Width, &deco.Height);
 			} else { // Error.
-				LuaError(l, "incorrect field '%s' for the DefineSprite." _C_ key.data());
+				LuaError(l, "incorrect field '%s' for the DefineSprite.", key.data());
 			}
 			lua_pop(l, 1); // pop the value;
 		}
@@ -970,8 +970,9 @@ void CUnit::Draw(const CViewport &vp) const
 #endif
 
 	if (!IsVisible && frame == UnitNotSeen) {
-		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n" _C_
-				   UnitNumber(*this) _C_ GameCycle);
+		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n",
+		           UnitNumber(*this),
+		           GameCycle);
 		return;
 	}
 

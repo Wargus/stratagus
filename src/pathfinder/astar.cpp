@@ -1181,7 +1181,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 #ifdef DEBUG
 	DumpNextAStar = false;
 #endif
-	DebugPrint("AStar counter %d/%d\n" _C_ counter _C_ AStarMaxSearchIterations);
+	DebugPrint("AStar counter %d/%d\n", counter, AStarMaxSearchIterations);
 	const int path_length = AStarSavePath(startPos, endPos, path, pathlen);
 
 	ret = path_length;

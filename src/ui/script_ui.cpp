@@ -429,14 +429,14 @@ static int CclSetTitleScreens(lua_State *l)
 								}
 							}
 						} else {
-							LuaError(l, "Unsupported key: %s" _C_ value.data());
+							LuaError(l, "Unsupported key: %s", value.data());
 						}
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
 				}
 			} else {
-				LuaError(l, "Unsupported key: %s" _C_ value.data());
+				LuaError(l, "Unsupported key: %s", value.data());
 			}
 			lua_pop(l, 1);
 		}
@@ -473,7 +473,7 @@ EnumVariable Str2EnumVariable(lua_State *l, std::string_view s)
 			return list[i].e;
 		}
 	}
-	LuaError(l, "'%s' is a invalid variable component" _C_ s.data());
+	LuaError(l, "'%s' is a invalid variable component", s.data());
 	return VariableValue;
 }
 
@@ -519,7 +519,7 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
-			LuaError(l, "'%s' invalid for Condition in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for Condition in DefinePanelContents", key.data());
 		}
 	}
 	return condition;
@@ -557,14 +557,14 @@ static CContentType *CclParseContent(lua_State *l)
 			} else if (key == "CompleteBar") {
 				content = new CContentTypeCompleteBar;
 			} else {
-				LuaError(l, "Invalid drawing method '%s' in DefinePanelContents" _C_ key.data());
+				LuaError(l, "Invalid drawing method '%s' in DefinePanelContents", key.data());
 			}
 			content->Parse(l);
 			lua_pop(l, 2); // Pop Variable Name and Method
 		} else if (key == "Condition") {
 			condition = ParseConditionPanel(l);
 		} else {
-			LuaError(l, "'%s' invalid for Contents in DefinePanelContents" _C_ key.data());
+			LuaError(l, "'%s' invalid for Contents in DefinePanelContents", key.data());
 		}
 	}
 	content->Pos = pos;
@@ -606,7 +606,7 @@ static int CclDefinePanelContents(lua_State *l)
 					infopanel->Contents.push_back(CclParseContent(l));
 				}
 			} else {
-				LuaError(l, "'%s' invalid for DefinePanelContents" _C_ key.data());
+				LuaError(l, "'%s' invalid for DefinePanelContents", key.data());
 			}
 		}
 		for (CContentType *content : infopanel->Contents) { // Default value for invalid value.
@@ -616,7 +616,7 @@ static int CclDefinePanelContents(lua_State *l)
 		size_t j;
 		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {
 			if (infopanel->Name == UI.InfoPanelContents[j]->Name) {
-				DebugPrint("Redefinition of Panel '%s'\n" _C_ infopanel->Name.c_str());
+				DebugPrint("Redefinition of Panel '%s'\n", infopanel->Name.c_str());
 				delete UI.InfoPanelContents[j];
 				UI.InfoPanelContents[j] = infopanel;
 				break;
@@ -666,12 +666,12 @@ static int CclDefinePopup(lua_State *l)
 				popup->Contents.push_back(CPopupContentType::ParsePopupContent(l));
 			}
 		} else {
-			LuaError(l, "'%s' invalid for DefinePopups" _C_ key.data());
+			LuaError(l, "'%s' invalid for DefinePopups", key.data());
 		}
 	}
 	for (size_t j = 0; j < UI.ButtonPopups.size(); ++j) {
 		if (popup->Ident == UI.ButtonPopups[j]->Ident) {
-			DebugPrint("Redefinition of Popup '%s'\n" _C_ popup->Ident.c_str());
+			DebugPrint("Redefinition of Popup '%s'\n", popup->Ident.c_str());
 			delete UI.ButtonPopups[j];
 			UI.ButtonPopups[j] = popup;
 			return 0;
@@ -708,7 +708,7 @@ static int CclDefineViewports(lua_State *l)
 			}
 			++i;
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 	}
 	UI.NumViewports = i;
@@ -811,7 +811,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 					p->BorderColorRGB.Parse(l);
 					p->BorderColor = 1; // XXX: see uibuttons_proc.cpp#DrawUIButton
 				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value.data());
+					LuaError(l, "Unsupported tag: %s", value.data());
 				}
 				lua_pop(l, 1);
 			}
@@ -826,14 +826,14 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 			} else if (value == "Left") {
 				p->TextAlign = TextAlignLeft;
 			} else {
-				LuaError(l, "Invalid text alignment: %s" _C_ value.data());
+				LuaError(l, "Invalid text alignment: %s", value.data());
 			}
 		} else if (value == "TextNormalColor") {
 			p->TextNormalColor = LuaToString(l, -1);
 		} else if (value == "TextReverseColor") {
 			p->TextReverseColor = LuaToString(l, -1);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -885,7 +885,7 @@ static int CclDefineButtonStyle(lua_State *l)
 			} else if (value == "Left") {
 				b->TextAlign = TextAlignLeft;
 			} else {
-				LuaError(l, "Invalid text alignment: %s" _C_ value.data());
+				LuaError(l, "Invalid text alignment: %s", value.data());
 			}
 		} else if (value == "Default") {
 			ParseButtonStyleProperties(l, &b->Default);
@@ -894,7 +894,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (value == "Clicked") {
 			ParseButtonStyleProperties(l, &b->Clicked);
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
@@ -1042,7 +1042,7 @@ static int CclDefineButton(lua_State *l)
 			} else if (value == "callback") {
 				ba.Action = ButtonCmd::CallbackAction;
 			} else {
-				LuaError(l, "Unsupported button action: %s" _C_ value.data());
+				LuaError(l, "Unsupported button action: %s", value.data());
 			}
 		} else if (value == "Value") {
 			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1) && !lua_isfunction(l, -1)) {
@@ -1102,7 +1102,7 @@ static int CclDefineButton(lua_State *l)
 			} else if (value == "check-debug") {
 				ba.Allowed = ButtonCheckDebug;
 			} else {
-				LuaError(l, "Unsupported action: %s" _C_ value.data());
+				LuaError(l, "Unsupported action: %s", value.data());
 			}
 		} else if (value == "AllowArg") {
 			if (!lua_istable(l, -1)) {
@@ -1149,7 +1149,7 @@ static int CclDefineButton(lua_State *l)
 				ba.UnitMask = "*";
 			}
 		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value.data());
+			LuaError(l, "Unsupported tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}

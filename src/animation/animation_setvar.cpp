@@ -73,20 +73,20 @@
 		if (arg1 == "DamageType") {
 			int death = ExtraDeathIndex(this->valueStr);
 			if (death == ANIMATIONS_DEATHTYPES) {
-				fprintf(stderr, "Incorrect death type : %s \n" _C_ this->valueStr.c_str());
+				fprintf(stderr, "Incorrect death type : %s \n", this->valueStr.c_str());
 				Exit(1);
 				return;
 			}
 			goal->Type->DamageType = this->valueStr;
 			return;
 		}
-		fprintf(stderr, "Need also specify the variable '%s' tag \n" _C_ arg1.data());
+		fprintf(stderr, "Need also specify the variable '%s' tag \n", arg1.data());
 		Exit(1);
 		return;
 	}
 	const int index = UnitTypeVar.VariableNameLookup[arg1];// User variables
 	if (index == -1) {
-		fprintf(stderr, "Bad variable name '%s'\n" _C_ arg1.data());
+		fprintf(stderr, "Bad variable name '%s'\n", arg1.data());
 		Exit(1);
 		return;
 	}

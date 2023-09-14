@@ -51,7 +51,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex) /* 
 		int i = UnitTypeVar.VariableNameLookup[name];
 
 		if (i == -1) {
-			LuaError(l, "in adjust-variable : Bad variable index : '%s'" _C_ name.data());
+			LuaError(l, "in adjust-variable : Bad variable index : '%s'", name.data());
 		}
 		if (lua_isnumber(l, -1)) {
 			this->Var[i].Enable = (LuaToNumber(l, -1) != 0);
@@ -92,10 +92,10 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex) /* 
 					} else if (value == "target") {
 						this->Var[i].TargetIsCaster = 0;
 					} else { // Error
-						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable" _C_ value.data());
+						LuaError(l, "key '%s' not valid for TargetIsCaster in adjustvariable", value.data());
 					}
 				} else { // Error
-					LuaError(l, "key '%s' not valid for adjustvariable" _C_ key.data());
+					LuaError(l, "key '%s' not valid for adjustvariable", key.data());
 				}
 			}
 		} else {
