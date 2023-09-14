@@ -400,7 +400,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 #ifdef USE_MNG
 static bool DrawTypePortrait(const CUnitType &type)
 {
-	if (UI.SingleSelectedButton && type.Portrait.Num) {
+	if (UI.SingleSelectedButton && !type.Portrait.Mngs.empty()) {
 #ifdef DYNAMIC_LOAD
 		if (!type.Sprite) {
 			LoadUnitTypeSprite(const_cast<CUnitType &>(type));
@@ -411,9 +411,9 @@ static bool DrawTypePortrait(const CUnitType &type)
 		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
 			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
-			if (type.Portrait.CurrMng == 0 && type.Portrait.Num > 1) {
+			if (type.Portrait.CurrMng == 0 && type.Portrait.Mngs.size() > 1) {
 				// choose only from before the talking portraits (from all, if no talking portrait offset is defined)
-				type.Portrait.CurrMng = MyRand() % ((type.Portrait.Talking ? type.Portrait.Talking : type.Portrait.Num) - 1) + 1;
+				type.Portrait.CurrMng = MyRand() % ((type.Portrait.Talking ? type.Portrait.Talking : type.Portrait.Mngs.size()) - 1) + 1;
 				type.Portrait.NumIterations = 1;
 			} else {
 				type.Portrait.CurrMng = 0;
@@ -503,7 +503,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int lastOccupiedButton = j + uins->Type->BoardSize - 1;
 		const PixelPos pos = PixelPos(UI.TransportingButtons[lastOccupiedButton].X, UI.TransportingButtons[lastOccupiedButton].Y);
 		UiDrawLifeBar(*uins, pos.x, pos.y);
-		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+		if (!uins->Type->CanCastSpell.empty() && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);
 		}
 		if (ButtonAreaUnderCursor == ButtonArea::Transporting) {
@@ -1170,7 +1170,7 @@ static void InfoPanel_draw_multiple_selection()
 	DrawInfoPanelBackground(0);
 
 #ifdef USE_MNG
-	if (Selected[0]->Type->Portrait.Num) {
+	if (!Selected[0]->Type->Portrait.Mngs.empty()) {
 		DrawUnitInfo_portrait(*Selected[0]);
 	}
 #endif

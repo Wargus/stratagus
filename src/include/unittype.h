@@ -553,10 +553,9 @@ public:
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
 	struct _portrait_ {
-		std::string *Files = nullptr;
-		int Num = 0;
+		std::vector<std::string> Files;
+		std::vector<Mng *> Mngs;
 		int Talking = 0; /// offset into portraits for talking portraits
-		Mng **Mngs = nullptr;
 		mutable int CurrMng = 0;
 		mutable int NumIterations = 0;
 	} Portrait;
@@ -602,8 +601,8 @@ public:
 	int BurnDamageRate = 0;             /// HP burn rate per sec
 	int RepairRange = 0;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
-	char *CanCastSpell = nullptr;       /// Unit is able to use spells.
-	char *AutoCastActive = nullptr;     /// Default value for autocast.
+	std::vector<char> CanCastSpell;     /// Unit is able to use spells.
+	std::vector<char> AutoCastActive;   /// Default value for autocast.
 	int AutoBuildRate = 0;              /// The rate at which the building builds itself
 	int RandomMovementProbability = 0;  /// Probability to move randomly.
 	int RandomMovementDistance = 1;     /// Quantity of tiles to move randomly.

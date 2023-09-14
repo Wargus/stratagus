@@ -528,9 +528,6 @@ CUnitType::~CUnitType()
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
 
-	delete[] CanCastSpell;
-	delete[] AutoCastActive;
-
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res]) {
 			if (this->ResInfo[res]->SpriteWhenLoaded) {
@@ -547,14 +544,12 @@ CUnitType::~CUnitType()
 	CGraphic::Free(AltSprite);
 	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
-	if (this->Portrait.Num) {
+	if (!this->Portrait.Mngs.empty()) {
 		if (this->Portrait.Mngs[0]) {
-			for (int j = 0; j < this->Portrait.Num; ++j) {
-				Mng::Free(this->Portrait.Mngs[j]);
+			for (auto *mng : this->Portrait.Mngs) {
+				Mng::Free(mng);
 			}
 		}
-		delete[] this->Portrait.Mngs;
-		delete[] this->Portrait.Files;
 	}
 #endif
 }
@@ -993,8 +988,8 @@ void LoadUnitTypeSprite(CUnitType &type)
 	}
 
 #ifdef USE_MNG
-	if (type.Portrait.Num) {
-		for (int i = 0; i < type.Portrait.Num; ++i) {
+	if (!type.Portrait.Mngs.empty()) {
+		for (int i = 0; i < type.Portrait.Mngs.size(); ++i) {
 			type.Portrait.Mngs[i] = Mng::New(type.Portrait.Files[i]);
 			type.Portrait.Mngs[i]->Load();
 		}

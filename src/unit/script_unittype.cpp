@@ -557,11 +557,9 @@ static int CclDefineUnitType(lua_State *l)
 					number++;
 				}
 			}
-			type->Portrait.Num = number;
 			type->Portrait.Talking = 0;
-			type->Portrait.Files = new std::string[type->Portrait.Num];
-			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
-			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
+			type->Portrait.Files.resize(number);
+			type->Portrait.Mngs.resize(number);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view s = LuaToString(l, -1, k + 1);
 				if ("talking" == s) {
@@ -995,14 +993,11 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: can-cast-spell should only be used AFTER all spells
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
-			if (!type->CanCastSpell) {
-				type->CanCastSpell = new char[SpellTypeTable.size()];
-				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->CanCastSpell;
-				type->CanCastSpell = nullptr;
+				type->CanCastSpell.clear();
+			} else {
+				type->CanCastSpell.resize(SpellTypeTable.size());
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
@@ -1017,15 +1012,11 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: AutoCastActive should only be used AFTER all spells
 			// have been defined.
 			//
-			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[SpellTypeTable.size()];
-				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->AutoCastActive;
-				type->AutoCastActive = nullptr;
-
+				type->AutoCastActive.clear();
+			} else {
+				type->AutoCastActive.resize(SpellTypeTable.size());
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
@@ -1242,14 +1233,9 @@ static int CclCopyUnitType(lua_State *l)
 	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
 #ifdef USE_MNG
-	to->Portrait.Num = from.Portrait.Num;
 	to->Portrait.Talking = from.Portrait.Talking;
-	to->Portrait.Files = new std::string[to->Portrait.Num];
-	for (int i = 0; i < to->Portrait.Num; i++) {
-		to->Portrait.Files[i] = from.Portrait.Files[i];
-	}
-	to->Portrait.Mngs = new Mng *[to->Portrait.Num];
-	memset(to->Portrait.Mngs, 0, to->Portrait.Num * sizeof(Mng *));
+	to->Portrait.Files = from.Portrait.Files;
+	to->Portrait.Mngs.resize(to->Portrait.Files.size());
 #endif
 	memcpy(to->DefaultStat.Costs, from.DefaultStat.Costs, sizeof(from.DefaultStat.Costs));
 	memcpy(to->DefaultStat.Storing, from.DefaultStat.Storing, sizeof(from.DefaultStat.Storing));

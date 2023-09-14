@@ -657,12 +657,12 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	// Create AutoCastSpell and SpellCoolDownTimers arrays for casters
-	if (type.CanCastSpell) {
+	if (!type.CanCastSpell.empty()) {
 		AutoCastSpell = new char[SpellTypeTable.size()];
 		SpellCoolDownTimers = new int[SpellTypeTable.size()];
 		memset(SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
-		if (Type->AutoCastActive) {
-			memcpy(AutoCastSpell, Type->AutoCastActive, SpellTypeTable.size());
+		if (!Type->AutoCastActive.empty()) {
+			memcpy(AutoCastSpell, Type->AutoCastActive.data(), SpellTypeTable.size());
 		} else {
 			memset(AutoCastSpell, 0, SpellTypeTable.size());
 		}
