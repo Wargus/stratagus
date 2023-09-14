@@ -33,7 +33,7 @@
 //@{
 
 #if defined(DEBUG_ASTAR)
-#define AstarDebugPrint(format, ...) DebugPrint(format, __VA_ARGS__)
+#define AstarDebugPrint(format, ...) DebugPrint(format, ##__VA_ARGS__)
 #else
 #define AstarDebugPrint(format, ...)
 #endif

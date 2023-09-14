@@ -132,10 +132,18 @@ extern void PrintOnStdOut(const char *format, ...);
 **  Print debug information with function name.
 */
 #define DebugPrint(format, ...) \
-	do { if (EnableDebugPrint) { PrintFunction(); PrintOnStdOut(format, __VA_ARGS__); } } while (0)
+ do { \
+  if (EnableDebugPrint) { \
+   PrintFunction(); \
+   PrintOnStdOut(format, ##__VA_ARGS__); \
+  } \
+ } while (0)
 
 #define LogPrint(format, ...) \
-	do { PrintFunction(); PrintOnStdOut(format, __VA_ARGS__); } while (0)
+ do { \
+  PrintFunction(); \
+  PrintOnStdOut(format, ##__VA_ARGS__); \
+ } while (0)
 
 /*============================================================================
 ==  Definitions
