@@ -32,7 +32,8 @@
 
 //@{
 
-#include <stdint.h>
+#include <cstdint>
+#include <vector>
 
 using IntColor = uint32_t; // Uint32 in SDL
 
@@ -46,7 +47,7 @@ public:
 	CColor() : R(0), G(0), B(0), A(0) {}
 	CColor(unsigned char r, unsigned char g, unsigned char b,
 		   unsigned char a = 0) : R(r), G(g), B(b), A(a) {}
-	CColor(const CColor &color) : R(color.R), G(color.G), B(color.B), A(color.A) {}
+	CColor(const CColor &color) = default;
 
 	void Parse(lua_State *l, int index = -1);
 
@@ -64,16 +65,15 @@ public:
 };
 
 
-#include <vector>
 
 class CUnitColors
 {
 public:
-	CUnitColors() {}
+	CUnitColors() = default;
 
 	void Clear();
 
-	void Set(std::vector<CColor> &colors);
+	void Set(const std::vector<CColor> &colors);
 
 private:
 	std::vector<CColor> Colors;
@@ -93,10 +93,9 @@ private:
 class PaletteSwap
 {
 public:
-	PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, std::vector<CColor> &colors);
-	~PaletteSwap();
+	PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, const std::vector<CColor> &colors);
 
-	SDL_Color *GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt);
+	const SDL_Color *GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt) const;
 	
 	unsigned int GetUnitVariableIndex() { return UnitVariableIndex; }
 	unsigned int GetColorIndexStart() { return ColorIndexStart; }
@@ -108,7 +107,7 @@ private:
 	unsigned char ColorCount;
 	unsigned char Steps;
 	unsigned char AlternativesCount;
-	SDL_Color *Colors = nullptr;
+	std::vector<SDL_Color> Colors;
 };
 
 /**
