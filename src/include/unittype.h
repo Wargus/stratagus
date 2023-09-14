@@ -49,6 +49,7 @@
 #endif
 
 #include "color.h"
+#include "luacallback.h"
 #include "missileconfig.h"
 #include "vec2i.h"
 
@@ -86,27 +87,23 @@ enum GroupSelectionMode {
 class ResourceInfo
 {
 public:
-	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
-		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
-		SpriteWhenLoaded(nullptr), SpriteWhenEmpty(nullptr)
-	{}
+	ResourceInfo() = default;
 
 	std::string FileWhenLoaded;     /// Change the graphic when the unit is loaded.
 	std::string FileWhenEmpty;      /// Change the graphic when the unit is empty.
-	unsigned WaitAtResource;        /// Cycles the unit waits while mining.
-	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
-	int      ResourceCapacity;      /// Max amount of resources to carry.
-	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
-	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
-	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned char TerrainHarvester;    /// Unit will harvest terrain.
-	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
-	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
-	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.
+	unsigned WaitAtResource = 0;      /// Cycles the unit waits while mining.
+	unsigned ResourceStep = 0;        /// Resources the unit gains per mining cycle.
+	int ResourceCapacity = 0;         /// Max amount of resources to carry.
+	unsigned WaitAtDepot = 0;         /// Cycles the unit waits while returning.
+	unsigned ResourceId = 0;          /// Id of the resource harvested. Redundant.
+	unsigned FinalResource = 0;       /// Convert resource when delivered.
+	bool TerrainHarvester = false;    /// Unit will harvest terrain.
+	bool LoseResources = false;       /// The unit will lose it's resource when distracted.
+	bool HarvestFromOutside = false;  /// Unit harvests without entering the building.
+	bool RefineryHarvester = false;   /// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
+	CPlayerColorGraphic *SpriteWhenLoaded = nullptr; /// The graphic corresponding to FileWhenLoaded.
+	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;  /// The graphic corresponding to FileWhenEmpty
 };
 
 /**
@@ -118,7 +115,7 @@ public:
 class CVariable
 {
 public:
-	CVariable() : Max(0), Value(0), Increase(0), IncreaseFrequency(0), Enable(0) {}
+	CVariable() = default;
 
 	bool operator ==(const CVariable &rhs) const
 	{
@@ -131,11 +128,11 @@ public:
 	bool operator !=(const CVariable &rhs) const { return !(*this == rhs); }
 
 public:
-	int Max;        /// Maximum for the variable. (Assume min is 0.)
-	int Value;      /// Current (or initial) value of the variable (or initial value).
-	char Increase;  /// Number to increase(decrease) Value by second.
-	unsigned char IncreaseFrequency:7;    /// Every how many seconds we should apply the increase
-	unsigned char Enable:1;    /// True if the unit doesn't have this variable. (f.e shield)
+	int Max = 0;        /// Maximum for the variable. (Assume min is 0.)
+	int Value = 0;      /// Current (or initial) value of the variable (or initial value).
+	char Increase = 0;  /// Number to increase(decrease) Value by second.
+	unsigned char IncreaseFrequency = 0; /// Every how many seconds we should apply the increase
+	bool Enable = false; /// True if the unit doesn't have this variable. (f.e shield)
 };
 
 // Index for boolflag already defined
@@ -242,56 +239,55 @@ class CDecoVar
 {
 public:
 
-	CDecoVar() {};
-	virtual ~CDecoVar()
-	{
-	};
+	CDecoVar() = default;
+	virtual ~CDecoVar() = default;
 
 	/// function to draw the decorations.
 	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const = 0;
 
 	bool BoolFlagMatches(const CUnitType &type) const;
 
-	unsigned int Index;     /// Index of the variable. @see DefineVariables
+	unsigned int Index = -1;    /// Index of the variable. @see DefineVariables
 
-	int OffsetX;            /// Offset in X coord.
-	int OffsetY;            /// Offset in Y coord.
+	int OffsetX = 0;            /// Offset in X coord.
+	int OffsetY = 0;            /// Offset in Y coord.
 
-	int OffsetXPercent;     /// Percent offset (TileWidth) in X coord.
-	int OffsetYPercent;     /// Percent offset (TileHeight) in Y coord.
+	int OffsetXPercent = 0;     /// Percent offset (TileWidth) in X coord.
+	int OffsetYPercent = 0;     /// Percent offset (TileHeight) in Y coord.
 
-	bool IsCenteredInX;     /// if true, use center of deco instead of left border
-	bool IsCenteredInY;     /// if true, use center of deco instead of upper border
+	bool IsCenteredInX = false;     /// if true, use center of deco instead of left border
+	bool IsCenteredInY = false;     /// if true, use center of deco instead of upper border
 
-	bool ShowIfNotEnable;   /// if false, Show only if var is enable
-	bool ShowWhenNull;      /// if false, don't show if var is null (F.E poison)
-	bool HideHalf;          /// if true, don't show when 0 < var < max.
-	bool ShowWhenMax;       /// if false, don't show if var is to max. (Like mana)
-	bool ShowOnlySelected;  /// if true, show only for selected units.
+	bool ShowIfNotEnable = false;   /// if false, Show only if var is enable
+	bool ShowWhenNull = false;      /// if false, don't show if var is null (F.E poison)
+	bool HideHalf = false;          /// if true, don't show when 0 < var < max.
+	bool ShowWhenMax = false;       /// if false, don't show if var is to max. (Like mana)
+	bool ShowOnlySelected = false;  /// if true, show only for selected units.
 
-	bool HideNeutral;       /// if true, don't show for neutral unit.
-	bool HideAllied;        /// if true, don't show for allied unit. (but show own units)
-	bool ShowOpponent;      /// if true, show for opponent unit.
+	bool HideNeutral = false;       /// if true, don't show for neutral unit.
+	bool HideAllied = false;        /// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent = false;      /// if true, show for opponent unit.
 
-	bool BoolFlagInvert;    /// if 1, invert the bool flag check
-	int BoolFlag;           /// if !=-1, show only for units with this flag
+	bool BoolFlagInvert = false;    /// if 1, invert the bool flag check
+	int BoolFlag = -1;              /// if !=-1, show only for units with this flag
 };
 
 class CDecoVarBar : public CDecoVar
 {
 public:
-	CDecoVarBar() : MinValue(0), MaxValue(100), Invert(false) {};
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	CDecoVarBar() = default;
 
-	bool IsVertical;            /// if true, vertical bar, else horizontal.
-	bool SEToNW;                /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
-	int Height;                 /// Height of the bar.
-	int Width;                  /// Width of the bar.
-	bool ShowFullBackground;    /// if true, show background like value equal to max.
-	bool Invert;                /// if true, invert length
-	int MinValue;               /// show only above percent
-	int MaxValue;               /// show only below percent
-	char BorderSize;            /// Size of the border, 0 for no border.
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
+
+	bool IsVertical = false;         /// if true, vertical bar, else horizontal.
+	bool SEToNW = false;             /// (SouthEastToNorthWest), if false value 0 is on the left or up of the bar.
+	int Height = 0;                  /// Height of the bar.
+	int Width = 0;                   /// Width of the bar.
+	bool ShowFullBackground = false; /// if true, show background like value equal to max.
+	bool Invert = false;             /// if true, invert length
+	int MinValue = 0;                /// show only above percent
+	int MaxValue = 100;              /// show only below percent
+	char BorderSize = 0;             /// Size of the border, 0 for no border.
 	// FIXME color depend of percent (red, Orange, Yellow, Green...)
 	IntColor Color;             /// Color of bar.
 	IntColor BColor;            /// Color of background.
@@ -300,21 +296,23 @@ public:
 class CDecoVarFrame : public CDecoVar
 {
 public:
-	CDecoVarFrame() : Thickness(0), ColorIndex(-1) {};
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	CDecoVarFrame() = default;
 
-	int Thickness;
-	int ColorIndex;
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
+
+	int Thickness = 0;
+	int ColorIndex = -1;
 };
 
 class CDecoVarText : public CDecoVar
 {
 public:
-	CDecoVarText() : Font(nullptr) {};
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	CDecoVarText() = default;
 
-	CFont *Font;  /// Font to use to display value.
+	/// function to draw the decorations.
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
+
+	CFont *Font = nullptr;  /// Font to use to display value.
 	// FIXME : Add Color, format
 };
 
@@ -322,12 +320,12 @@ public:
 class CDecoVarSpriteBar : public CDecoVar
 {
 public:
-	CDecoVarSpriteBar() : NSprite(-1) {};
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y,
-					  const CUnitType &type, const CVariable &var) const;
+	CDecoVarSpriteBar() = default;
 
-	char NSprite; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
+	/// function to draw the decorations.
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
+
+	char NSprite = -1; /// Index of number. (@see DefineSprites and @see GetSpriteIndex)
 	// FIXME Sprite info. better way ?
 };
 
@@ -335,29 +333,31 @@ public:
 class CDecoVarStaticSprite : public CDecoVar
 {
 public:
-	CDecoVarStaticSprite() : NSprite(-1), n(0), FadeValue(0) {}
+	CDecoVarStaticSprite() = default;
+
 	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
 
 	// FIXME Sprite info. and Replace n with more appropriate var.
-	char NSprite;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-	int n;         /// identifiant in SpellSprite
-	int FadeValue; /// if variable's value is below than FadeValue, it drawn transparent.
+	char NSprite = -1;  /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	int n = 0;          /// identifiant in SpellSprite
+	int FadeValue = 0;  /// if variable's value is below than FadeValue, it drawn transparent.
 };
 
 /// use to show specific frame in a sprite.
 class CDecoVarAnimatedSprite : public CDecoVar
 {
 public:
-	CDecoVarAnimatedSprite() : NSprite(-1), n(0), WaitFrames(0) {}
-	/// function to draw the decorations.
-	virtual void Draw(int x, int y, const CUnitType &type, const CVariable &var) const;
+	CDecoVarAnimatedSprite() = default;
 
-	char NSprite;    /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
-	char WaitFrames; /// Frames to wait between each sprite animation step
+	/// function to draw the decorations.
+	void Draw(int x, int y, const CUnitType &type, const CVariable &var) const override;
+
+	char NSprite = -1;   /// Index of sprite. (@see DefineSprites and @see GetSpriteIndex)
+	char WaitFrames = 0; /// Frames to wait between each sprite animation step
 private:
-	char lastFrame; /// last update
-	int n;         /// identifiant in SpellSprite
+	char lastFrame = 0;  /// last update
+	int n = 0  ;         /// identifiant in SpellSprite
 };
 
 enum UnitTypeType {
@@ -378,32 +378,26 @@ enum DistanceTypeType {
 class CBuildRestriction
 {
 public:
-	virtual ~CBuildRestriction() {}
-	virtual void Init() {};
+	virtual ~CBuildRestriction() = default;
+
+	virtual void Init() {}
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
 };
 
 class CBuildRestrictionAnd : public CBuildRestriction
 {
 public:
-	virtual ~CBuildRestrictionAnd()
+	void Init() override
 	{
-		for (CBuildRestriction *p : _or_list) {
-			delete p;
-		}
-		_or_list.clear();
-	}
-	virtual void Init()
-	{
-		for (CBuildRestriction *restriction : _or_list) {
+		for (auto &restriction : _or_list) {
 			restriction->Init();
 		}
 	}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
-	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
+	void push_back(std::unique_ptr<CBuildRestriction>restriction) { _or_list.push_back(std::move(restriction)); }
 public:
-	std::vector<CBuildRestriction *> _or_list;
+	std::vector<std::unique_ptr<CBuildRestriction>> _or_list;
 };
 
 class CBuildRestrictionAddOn : public CBuildRestriction
@@ -418,14 +412,13 @@ class CBuildRestrictionAddOn : public CBuildRestriction
 		const Vec2i pos; //functor work position
 	};
 public:
-	CBuildRestrictionAddOn() : Offset(0, 0), Parent(nullptr) {}
-	virtual ~CBuildRestrictionAddOn() {}
-	virtual void Init() {this->Parent = &UnitTypeByIdent(this->ParentName);}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	CBuildRestrictionAddOn() = default;
+	void Init() override { this->Parent = &UnitTypeByIdent(this->ParentName); }
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
-	Vec2i Offset;           /// offset from the main building to place this
+	Vec2i Offset{0, 0}; /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
-	CUnitType *Parent;      /// building that is unit is an addon too.
+	CUnitType *Parent = nullptr;      /// building that is unit is an addon too.
 };
 
 class CBuildRestrictionOnTop : public CBuildRestriction
@@ -433,7 +426,7 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 	class functor
 	{
 	public:
-		functor(const CUnitType *type, const Vec2i &_pos): ontop(0), Parent(type), pos(_pos) {}
+		functor(const CUnitType *type, const Vec2i &_pos): ontop(nullptr), Parent(type), pos(_pos) {}
 		inline bool operator()(CUnit *const unit);
 		CUnit *ontop;   /// building that is unit is an addon too.
 	private:
@@ -441,78 +434,78 @@ class CBuildRestrictionOnTop : public CBuildRestriction
 		const Vec2i pos;  //functor work position
 	};
 public:
-	CBuildRestrictionOnTop() : Parent(nullptr), ReplaceOnDie(0), ReplaceOnBuild(0) {}
-	virtual ~CBuildRestrictionOnTop() {}
-	virtual void Init() {this->Parent = &UnitTypeByIdent(this->ParentName);}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	CBuildRestrictionOnTop() = default;
+	void Init() override { this->Parent = &UnitTypeByIdent(this->ParentName); }
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	std::string ParentName;  /// building that is unit is an addon too.
-	CUnitType *Parent;       /// building that is unit is an addon too.
-	int ReplaceOnDie: 1;     /// recreate the parent on destruction
-	int ReplaceOnBuild: 1;   /// remove the parent, or just build over it.
+	CUnitType *Parent = nullptr;   /// building that is unit is an addon too.
+	bool ReplaceOnDie = false;     /// recreate the parent on destruction
+	bool ReplaceOnBuild = false;   /// remove the parent, or just build over it.
 };
 
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(nullptr), Diagonal(true) {}
-	virtual ~CBuildRestrictionDistance() {}
-	virtual void Init() {this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName);}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	CBuildRestrictionDistance() = default;
 
-	int Distance;        /// distance to build (circle)
-	DistanceTypeType DistanceType;
+	void Init() override {this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName);}
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
+
+	int Distance = 0;        /// distance to build (circle)
+	DistanceTypeType DistanceType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
-	bool CheckBuilder;
-	bool Diagonal;
+	CUnitType *RestrictType = nullptr;
+	bool CheckBuilder = false;
+	bool Diagonal = true;
 };
 
 class CBuildRestrictionHasUnit : public CBuildRestriction
 {
 public:
-	CBuildRestrictionHasUnit() : Count(0), RestrictType(nullptr) {}
-	virtual ~CBuildRestrictionHasUnit() {}
-	virtual void Init() { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	CBuildRestrictionHasUnit() = default;
 
-	int Count;
-	DistanceTypeType CountType;
+	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
+
+	int Count = 0;
+	DistanceTypeType CountType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
-	CUnitType *RestrictType;
+	CUnitType *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
 };
 
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
 {
 public:
-	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(nullptr), CheckBuilder(false) {}
-	virtual ~CBuildRestrictionSurroundedBy() {}
-	virtual void Init() { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	CBuildRestrictionSurroundedBy() = default;
 
-	int Distance;
-	DistanceTypeType DistanceType;
-	int Count;
-	DistanceTypeType CountType;
+	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
+
+	int Distance = 0;
+	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	int Count = 0;
+	DistanceTypeType CountType = DistanceTypeType::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
-	CUnitType *RestrictType;
-	bool CheckBuilder;
+	CUnitType *RestrictType = nullptr;
+	bool CheckBuilder = false;
 };
 
 class CBuildRestrictionLuaCallback : public CBuildRestriction
 {
 public:
-	CBuildRestrictionLuaCallback(LuaCallback *callback) : Func(callback) {};
-	CBuildRestrictionLuaCallback() = delete;
-	virtual ~CBuildRestrictionLuaCallback();
-	virtual void Init() {};
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	explicit CBuildRestrictionLuaCallback(std::unique_ptr<LuaCallback> callback) :
+		Func(std::move(callback))
+	{}
+
+	void Init() override {}
+	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 private:
-	LuaCallback *Func;
+	std::unique_ptr<LuaCallback> Func;
 };
 
 /// Base structure of unit-type
@@ -520,7 +513,7 @@ private:
 class CUnitType
 {
 public:
-	CUnitType();
+	CUnitType() = default;
 	~CUnitType();
 
 	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
@@ -535,97 +528,97 @@ public:
 public:
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
-	int Slot;                       /// Type as number
+	int Slot = 0;                   /// Type as number
 	std::string File;               /// Sprite files
 	std::string AltFile;            /// Alternative sprite files
 	std::string ShadowFile;         /// Shadow file
 
-	int Width;                                            /// Sprite width
-	int Height;                                           /// Sprite height
-	int OffsetX;                                          /// Sprite horizontal offset
-	int OffsetY;                                          /// Sprite vertical offset
-	int DrawLevel;                                        /// Level to Draw UnitType at
-	int ShadowWidth;                                      /// Shadow sprite width
-	int ShadowHeight;                                     /// Shadow sprite height
-	int ShadowOffsetX;                                    /// Shadow horizontal offset
-	int ShadowOffsetY;                                    /// Shadow vertical offset
-	char ShadowScale;                                     /// Shadow scale-down factor
-	char ShadowSpriteFrame;                               /// If > 0, the shadow is a simple sprite without
+	int Width = 0;                                        /// Sprite width
+	int Height = 0;                                       /// Sprite height
+	int OffsetX = 0;                                      /// Sprite horizontal offset
+	int OffsetY = 0;                                      /// Sprite vertical offset
+	int DrawLevel = 0;                                    /// Level to Draw UnitType at
+	int ShadowWidth = 0;                                  /// Shadow sprite width
+	int ShadowHeight = 0;                                 /// Shadow sprite height
+	int ShadowOffsetX = 0;                                /// Shadow horizontal offset
+	int ShadowOffsetY = 0;                                /// Shadow vertical offset
+	char ShadowScale = 1;                                 /// Shadow scale-down factor
+	char ShadowSpriteFrame = 0;                           /// If > 0, the shadow is a simple sprite without
 	                                                      /// directions and this selects which frame to use
-	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
+	PixelPos MissileOffsets[UnitSides][MaxAttackPos]{};   /// Attack offsets for missiles
 
-	CAnimations *Animations;        /// Animation scripts
-	int StillFrame;                 /// Still frame
+	CAnimations *Animations = nullptr;  /// Animation scripts
+	int StillFrame = 0;                 /// Still frame
 
 	IconConfig Icon;                /// Icon to display for this unit
 #ifdef USE_MNG
 	struct _portrait_ {
-		std::string *Files;
-		int Num;
-		int Talking; /// offset into portraits for talking portraits
-		Mng **Mngs;
-		mutable int CurrMng;
-		mutable int NumIterations;
+		std::string *Files = nullptr;
+		int Num = 0;
+		int Talking = 0; /// offset into portraits for talking portraits
+		Mng **Mngs = nullptr;
+		mutable int CurrMng = 0;
+		mutable int NumIterations = 0;
 	} Portrait;
 #endif
 	MissileConfig Missile;                           /// Missile weapon
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *OnDeath;           /// lua function called when unit is about to die, receives x,y,unit
-	LuaCallback *OnHit;             /// lua function called when unit is hit
-	LuaCallback *OnEachCycle;       /// lua function called every cycle
-	LuaCallback *OnEachSecond;      /// lua function called every second
-	LuaCallback *OnInit;            /// lua function called on unit init
-	LuaCallback *OnReady;           /// lua function called when unit ready/built
+	LuaCallback *OnDeath = nullptr;           /// lua function called when unit is about to die, receives x,y,unit
+	LuaCallback *OnHit = nullptr;             /// lua function called when unit is hit
+	LuaCallback *OnEachCycle = nullptr;       /// lua function called every cycle
+	LuaCallback *OnEachSecond = nullptr;      /// lua function called every second
+	LuaCallback *OnInit = nullptr;            /// lua function called on unit init
+	LuaCallback *OnReady = nullptr;           /// lua function called when unit ready/built
 
-	int TeleportCost;               /// mana used for teleportation
-	LuaCallback *TeleportEffectIn;   /// lua function to create effects before teleportation
-	LuaCallback *TeleportEffectOut;  /// lua function to create effects after teleportation
+	int TeleportCost = 0;                     /// mana used for teleportation
+	LuaCallback *TeleportEffectIn = nullptr;  /// lua function to create effects before teleportation
+	LuaCallback *TeleportEffectOut = nullptr; /// lua function to create effects after teleportation
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 
 	std::string CorpseName;         /// Corpse type name
-	CUnitType *CorpseType;          /// Corpse unit-type
+	CUnitType *CorpseType = nullptr;/// Corpse unit-type
 
-	CConstruction *Construction;    /// What is shown in construction phase
+	CConstruction *Construction = nullptr;    /// What is shown in construction phase
 
-	int RepairHP;                   /// Amount of HP per repair
-	int RepairCosts[MaxCosts];      /// How much it costs to repair
+	int RepairHP = 0;                   /// Amount of HP per repair
+	int RepairCosts[MaxCosts]{};        /// How much it costs to repair
 
-	short TileWidth;                /// Tile size on map width
-	short TileHeight;               /// Tile size on map height
-	short PersonalSpaceWidth;       /// How much "personal space" the unit tries to leave in X direction
-	short PersonalSpaceHeight;      /// How much "personal space" the unit tries to leave in Y direction
-	int BoxWidth;                   /// Selected box size width
-	int BoxHeight;                  /// Selected box size height
-	int BoxOffsetX;                 /// Selected box size horizontal offset
-	int BoxOffsetY;                 /// Selected box size vertical offset
-	int NumDirections;              /// Number of directions unit can face
-	int MinAttackRange;             /// Minimal attack range
-	int ReactRangeComputer;         /// Reacts on enemy for computer
-	int ReactRangePerson;           /// Reacts on enemy for person player
-	int BurnPercent;                /// Burning percent.
-	int BurnDamageRate;             /// HP burn rate per sec
-	int RepairRange;                /// Units repair range.
+	short TileWidth = 0;                /// Tile size on map width
+	short TileHeight = 0;               /// Tile size on map height
+	short PersonalSpaceWidth = 0;       /// How much "personal space" the unit tries to leave in X direction
+	short PersonalSpaceHeight = 0;      /// How much "personal space" the unit tries to leave in Y direction
+	int BoxWidth = 0;                   /// Selected box size width
+	int BoxHeight = 0;                  /// Selected box size height
+	int BoxOffsetX = 0;                 /// Selected box size horizontal offset
+	int BoxOffsetY = 0;                 /// Selected box size vertical offset
+	int NumDirections = 0;              /// Number of directions unit can face
+	int MinAttackRange = 0;             /// Minimal attack range
+	int ReactRangeComputer = 0;         /// Reacts on enemy for computer
+	int ReactRangePerson = 0;           /// Reacts on enemy for person player
+	int BurnPercent = 0;                /// Burning percent.
+	int BurnDamageRate = 0;             /// HP burn rate per sec
+	int RepairRange = 0;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
-	char *CanCastSpell;             /// Unit is able to use spells.
-	char *AutoCastActive;           /// Default value for autocast.
-	int AutoBuildRate;              /// The rate at which the building builds itself
-	int RandomMovementProbability;  /// Probability to move randomly.
-	int RandomMovementDistance;     /// Quantity of tiles to move randomly.
-	int ClicksToExplode;            /// Number of consecutive clicks until unit suicides.
-	int MaxOnBoard;                 /// Number of Transporter slots.
-	int BoardSize;                  /// How much "cells" unit occupies inside transporter
-	int ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
-	int StartingResources;          /// Amount of Resources on build
+	char *CanCastSpell = nullptr;       /// Unit is able to use spells.
+	char *AutoCastActive = nullptr;     /// Default value for autocast.
+	int AutoBuildRate = 0;              /// The rate at which the building builds itself
+	int RandomMovementProbability = 0;  /// Probability to move randomly.
+	int RandomMovementDistance = 1;     /// Quantity of tiles to move randomly.
+	int ClicksToExplode = 0;            /// Number of consecutive clicks until unit suicides.
+	int MaxOnBoard = 0;                 /// Number of Transporter slots.
+	int BoardSize = 1;                  /// How many "cells" unit occupies inside transporter
+	int ButtonLevelForTransporter = 0;  /// On which button level game will show units inside transporter
+	int StartingResources = 0;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
-	UnitTypeType UnitType;          /// Land / fly / naval
-	int DecayRate;                  /// Decay rate in 1/6 seconds
+	UnitTypeType UnitType = UnitTypeLand; /// Land / fly / naval
+	int DecayRate = 0;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
-	int AnnoyComputerFactor;        /// How much this annoys the computer
-	int AiAdjacentRange;            /// Min radius for AI build surroundings checking
-	int MouseAction;                /// Right click action
+	int AnnoyComputerFactor = 0;        /// How much this annoys the computer
+	int AiAdjacentRange = -1;           /// Min radius for AI build surroundings checking
+	int MouseAction = 0;                /// Right click action
 	uint8_t RotationSpeed = 128;    /// Max unit.Direction change per frame. 128 is maximum
 #define MouseActionNone      0      /// Nothing
 #define MouseActionAttack    1      /// Attack
@@ -633,56 +626,58 @@ public:
 #define MouseActionHarvest   3      /// Harvest resources
 #define MouseActionSpellCast 5      /// Cast the first spell known
 #define MouseActionSail      6      /// Sail
-	int CanTarget;                  /// Which units can it attack
+	int CanTarget = 0;              /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units
 #define CanTargetSea  2             /// Can attack sea units
 #define CanTargetAir  4             /// Can attack air units
 
-	unsigned Flip : 1;              /// Flip image when facing left
-	unsigned LandUnit : 1;          /// Land animated
-	unsigned AirUnit : 1;           /// Air animated
-	unsigned SeaUnit : 1;           /// Sea animated
-	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
-	unsigned Building : 1;          /// Building
-	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
+	bool Flip = false;              /// Flip image when facing left
+	bool LandUnit = false;          /// Land animated
+	bool AirUnit = false;           /// Air animated
+	bool SeaUnit = false;           /// Sea animated
+	bool ExplodeWhenKilled = false; /// Death explosion animated
+	bool Building = false;          /// Building
+	bool CanAttack = false;         /// Unit can attack.
+	bool Neutral = false;           /// Unit is neutral, used by the editor
 
-	unsigned SideAttack : 1;            /// Unit turns for attack (used for ships)
-	unsigned Skirmisher : 1;            /// Unit will try to shoot from max range
+	bool SideAttack = false;        /// Unit turns for attack (used for ships)
+	bool Skirmisher = false;        /// Unit will try to shoot from max range
 
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
 	struct BoolFlags {
-		bool value;             /// User defined flag. Used for (dis)allow target.
-		char CanTransport;      /// Can transport units with this flag.
-		char CanTargetFlag;     /// Flag needed to target with missile.
-		char AiPriorityTarget;  /// Attack this units first.
+		bool value = false;             /// User defined flag. Used for (dis)allow target.
+		char CanTransport = 0;      /// Can transport units with this flag.
+		char CanTargetFlag = 0;     /// Flag needed to target with missile.
+		char AiPriorityTarget = 0;  /// Attack this units first.
 	};
 	std::vector<BoolFlags> BoolFlag;
 
-	int CanStore[MaxCosts];             /// Resources that we can store here.
-	int GivesResource;                  /// The resource this unit gives.
-	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
-	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
-	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
+	int CanStore[MaxCosts]{};           /// Resources that we can store here.
+	int GivesResource = 0;              /// The resource this unit gives.
+	ResourceInfo *ResInfo[MaxCosts]{};  /// Resource information.
+	std::vector<std::unique_ptr<CBuildRestriction>>
+		BuildingRules; /// Rules list for building a building.
+	std::vector<std::unique_ptr<CBuildRestriction>>
+		AiBuildingRules; /// Rules list for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;               /// Sounds for events
-	CUnitSound MapSound;			/// Sounds for events, map-specific
+	CUnitSound MapSound;            /// Sounds for events, map-specific
 
-	int PoisonDrain;                /// How much health is drained every second when poisoned
+	int PoisonDrain = 0;                /// How much health is drained every second when poisoned
 
 	// --- FILLED UP ---
 
-	unsigned FieldFlags;            /// Unit map field flags
-	unsigned MovementMask;          /// Unit check this map flags for move
+	unsigned FieldFlags = 0;            /// Unit map field flags
+	unsigned MovementMask = 0;          /// Unit check this map flags for move
 
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	CPlayerColorGraphic *Sprite;     /// Sprite images
-	CPlayerColorGraphic *AltSprite;  /// Alternative sprite images
-	CGraphic *ShadowSprite;          /// Shadow sprite image
+	CPlayerColorGraphic *Sprite = nullptr;     /// Sprite images
+	CPlayerColorGraphic *AltSprite = nullptr;  /// Alternative sprite images
+	CGraphic *ShadowSprite = nullptr;          /// Shadow sprite image
 };
 
 /*----------------------------------------------------------------------------
@@ -790,22 +785,15 @@ public:
 	void Init();
 	void Clear();
 
+	unsigned int GetNumberBoolFlag() const { return BoolFlagNameLookup.TotalKeys; }
+	unsigned int GetNumberVariable() const { return VariableNameLookup.TotalKeys; }
+
 	CBoolKeys BoolFlagNameLookup;      /// Container of name of user defined bool flag.
 	CVariableKeys VariableNameLookup;  /// Container of names of user defined variables.
 
 	//EventType *Event;                  /// Array of functions sets to call when en event occurs.
 	std::vector<CVariable> Variable;   /// Array of user defined variables (default value for unittype).
 	std::vector<CDecoVar *> DecoVar;   /// Array to describe how showing variable.
-
-	unsigned int GetNumberBoolFlag() const
-	{
-		return BoolFlagNameLookup.TotalKeys;
-	}
-
-	unsigned int GetNumberVariable() const
-	{
-		return VariableNameLookup.TotalKeys;
-	}
 };
 
 extern CUnitTypeVar UnitTypeVar;

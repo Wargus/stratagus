@@ -517,38 +517,6 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 	return res;
 }
 
-CUnitType::CUnitType() :
-	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
-	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
-	Animations(nullptr), StillFrame(0),
-	OnDeath(nullptr), OnHit(nullptr), OnEachCycle(nullptr), OnEachSecond(nullptr), OnInit(nullptr),
-	OnReady(nullptr), TeleportCost(0), TeleportEffectIn(nullptr), TeleportEffectOut(nullptr),
-	CorpseType(nullptr), Construction(nullptr), RepairHP(0), TileWidth(0), TileHeight(0),
-	PersonalSpaceWidth(0), PersonalSpaceHeight(0),
-	BoxWidth(0), BoxHeight(0), BoxOffsetX(0), BoxOffsetY(0), NumDirections(0),
-	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
-	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
-	CanCastSpell(nullptr), AutoCastActive(nullptr),
-	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
-	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
-	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
-	MouseAction(0), CanTarget(0),
-	Flip(0), LandUnit(0), AirUnit(0), SeaUnit(0),
-	ExplodeWhenKilled(0), Building(0),
-	CanAttack(0),
-	Neutral(0),
-	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	Sprite(nullptr), AltSprite(nullptr), ShadowSprite(nullptr), ShadowSpriteFrame(0), ShadowScale(1)
-{
-#ifdef USE_MNG
-	memset(&Portrait, 0, sizeof(Portrait));
-#endif
-	memset(RepairCosts, 0, sizeof(RepairCosts));
-	memset(CanStore, 0, sizeof(CanStore));
-	memset(ResInfo, 0, sizeof(ResInfo));
-	memset(MissileOffsets, 0, sizeof(MissileOffsets));
-}
-
 CUnitType::~CUnitType()
 {
 	delete OnDeath;
@@ -559,18 +527,6 @@ CUnitType::~CUnitType()
 	delete OnReady;
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
-
-	BoolFlag.clear();
-
-	// Free Building Restrictions if there are any
-	for (CBuildRestriction *b : BuildingRules) {
-		delete b;
-	}
-	BuildingRules.clear();
-	for (CBuildRestriction *b : AiBuildingRules) {
-		delete b;
-	}
-	AiBuildingRules.clear();
 
 	delete[] CanCastSpell;
 	delete[] AutoCastActive;
@@ -960,12 +916,12 @@ void InitUnitTypes(int reset_player_stats)
 		type.StillFrame = GetStillFrame(type);
 
 		// Lookup BuildingTypes
-		for (CBuildRestriction *b : type.BuildingRules) {
+		for (auto &&b : type.BuildingRules) {
 			b->Init();
 		}
 
 		// Lookup AiBuildingTypes
-		for (CBuildRestriction *b : type.AiBuildingRules) {
+		for (auto &&b : type.AiBuildingRules) {
 			b->Init();
 		}
 	}
