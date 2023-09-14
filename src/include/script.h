@@ -483,7 +483,7 @@ private:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern int CclInConfigFile;        /// True while config file parsing
+extern bool CclInConfigFile;        /// True while config file parsing
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -59,7 +59,7 @@
 
 lua_State *Lua;                       /// Structure to work with lua files.
 
-int CclInConfigFile;                  /// True while config file parsing
+bool CclInConfigFile;                  /// True while config file parsing
 
 std::unique_ptr<INumberDesc> Damage; /// Damage calculation for missile.
 
@@ -2332,7 +2332,7 @@ void SavePreferences()
 void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 {
 	//  Load and evaluate configuration file
-	CclInConfigFile = 1;
+	CclInConfigFile = true;
 	const fs::path name = LibraryFileName(filename.string());
 	if (!fs::exists(name)) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
@@ -2341,7 +2341,7 @@ void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 
 	ShowLoadProgress(_("Script %s\n"), name.u8string().c_str());
 	LuaLoadFile(name, luaArgStr);
-	CclInConfigFile = 0;
+	CclInConfigFile = false;
 	LuaGarbageCollect();
 }
 
