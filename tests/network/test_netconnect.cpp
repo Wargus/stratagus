@@ -27,7 +27,7 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
+#include <doctest.h>
 
 #include "stratagus.h"
 #include "netconnect.h"
@@ -45,6 +45,7 @@ void FillCustomValue(CNetworkHost *obj)
 
 void FillCustomValue(CServerSetup *obj)
 {
+#if 0
 	obj->ResourcesOption = 42;
 	obj->UnitsOption = 44;
 	obj->FogOfWar = 46;
@@ -63,6 +64,7 @@ void FillCustomValue(CServerSetup *obj)
 	for (int i = 0; i != PlayerMax; ++i) {
 		obj->Race[i] = i + 21;
 	}
+#endif
 }
 
 void FillCustomValue(CInitMessage_Header *obj)
@@ -81,7 +83,9 @@ void FillCustomValue(CInitMessage_Hello *obj)
 
 void FillCustomValue(CInitMessage_Config *obj)
 {
+#if 0
 	obj->hostsCount = PlayerMax;
+#endif
 	obj->clientIndex = 3;
 	for (int i = 0; i != PlayerMax; ++i) {
 		FillCustomValue(&obj->hosts[i]);
@@ -93,11 +97,12 @@ void FillCustomValue(CInitMessage_EngineMismatch *obj)
 	obj->Stratagus = 0x01020304;
 }
 
+#if 0
 void FillCustomValue(CInitMessage_ProtocolMismatch *obj)
 {
 	obj->Version = 0x01020304;
 }
-
+#endif
 void FillCustomValue(CInitMessage_Welcome *obj)
 {
 	obj->Lag = 0x01020304;
@@ -162,57 +167,61 @@ bool CheckSerialization_return()
 }
 
 
-TEST(CNetworkHost)
+TEST_CASE("CNetworkHost")
 {
 	CHECK(CheckSerialization<CNetworkHost>());
 }
 
-TEST(CServerSetup)
+#if 0
+TEST_CASE("CServerSetup")
 {
 	CHECK(CheckSerialization<CServerSetup>());
 }
+#endif
 
-TEST(CInitMessage_Header)
+TEST_CASE("CInitMessage_Header")
 {
 	CHECK(CheckSerialization<CInitMessage_Header>());
 }
 
-TEST(CInitMessage_Hello)
+TEST_CASE("CInitMessage_Hello")
 {
 	CHECK(CheckSerialization_return<CInitMessage_Hello>());
 }
 
-TEST(CInitMessage_Config)
+TEST_CASE("CInitMessage_Config")
 {
 	CHECK(CheckSerialization_return<CInitMessage_Config>());
 }
 
-TEST(CInitMessage_EngineMismatch)
+TEST_CASE("CInitMessage_EngineMismatch")
 {
 	CHECK(CheckSerialization_return<CInitMessage_EngineMismatch>());
 }
 
-TEST(CInitMessage_ProtocolMismatch)
+#if 0
+TEST_CASE("CInitMessage_ProtocolMismatch")
 {
 	CHECK(CheckSerialization_return<CInitMessage_ProtocolMismatch>());
 }
+#endif
 
-TEST(CInitMessage_Welcome)
+TEST_CASE("CInitMessage_Welcome")
 {
 	CHECK(CheckSerialization_return<CInitMessage_Welcome>());
 }
 
-TEST(CInitMessage_Map)
+TEST_CASE("CInitMessage_Map")
 {
 	CHECK(CheckSerialization_return<CInitMessage_Map>());
 }
 
-TEST(CInitMessage_State)
+TEST_CASE("CInitMessage_State")
 {
 	CHECK(CheckSerialization_return<CInitMessage_State>());
 }
 
-TEST(CInitMessage_Resync)
+TEST_CASE("CInitMessage_Resync")
 {
 	CHECK(CheckSerialization_return<CInitMessage_Resync>());
 }

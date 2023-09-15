@@ -27,23 +27,23 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
+#include <doctest.h>
 
 #include "stratagus.h"
 #include "translate.h"
 
-TEST(TRANSLATION)
+TEST_CASE("TRANSLATION")
 {
 	const char *originWord = "origin word";
 	const char *translatedWord = "translated word";
 	AddTranslation(originWord, translatedWord);
 
-	CHECK_EQUAL(translatedWord, Translate(originWord));
+	CHECK(std::string_view{translatedWord} == Translate(originWord));
 	const char *notFound = "not found";
 
-	CHECK_EQUAL(notFound, Translate(notFound));
+	CHECK(notFound == Translate(notFound));
 
-	CHECK_EQUAL(translatedWord, _(originWord));
-	CHECK_EQUAL(originWord, N_(originWord));
+	CHECK(std::string_view{translatedWord} == _(originWord));
+	CHECK(originWord == N_(originWord));
 	// TODO: Remove translation
 }

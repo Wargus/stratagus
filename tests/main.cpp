@@ -27,18 +27,6 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
-#include <TestReporterStdout.h>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include <doctest.h>
 
-#include <SDL.h>
-
-int main(int argc, char* argv[])
-{
-#if 0
-	UnitTest::TestReporterStdout reporter;
-
-	return UnitTest::RunAllTests(reporter, UnitTest::Test::GetTestList(), "TESTME");
-#else
-	return UnitTest::RunAllTests();
-#endif
-}

@@ -27,13 +27,12 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
+#include <doctest.h>
 
 #include "stratagus.h"
 #include "net_lowlevel.h"
 #include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
+#include <thread>
 
 class AutoNetwork
 {
@@ -42,34 +41,27 @@ public:
 	~AutoNetwork() { NetExit(); }
 };
 
-TEST_FIXTURE(AutoNetwork, NetResolveHost)
+TEST_CASE_FIXTURE(AutoNetwork, "NetResolveHost")
 {
 	const unsigned long localhost = htonl(0x7F000001); // 127.0.0.1
 
-	CHECK_EQUAL(localhost, NetResolveHost("127.0.0.1"));
-	CHECK_EQUAL(localhost, NetResolveHost("localhost"));
+	CHECK(localhost == NetResolveHost("127.0.0.1"));
+	CHECK(localhost == NetResolveHost("localhost"));
 }
 
 class Job
 {
 public:
-	virtual ~Job() {}
+	virtual ~Job() = default;
 
-	void Run() { pthread_create(&tid, nullptr, Job::ThreadRun, this); }
-	void Wait() { pthread_join(tid, nullptr); }
+	void Run() { t = std::thread(&Job::DoJob, this); }
+	void Wait() { t.join(); }
 
 private:
 	virtual void DoJob() = 0;
 
-	static void *ThreadRun(void *data)
-	{
-		Job *that = reinterpret_cast<Job*>(data);
-		that->DoJob();
-		return nullptr;
-	}
-
 private:
-	pthread_t tid;
+	std::thread t;
 };
 
 static unsigned long GetMyIP()
@@ -171,7 +163,7 @@ public:
 	bool Check() const { return check; }
 private:
 
-	virtual void DoJob()
+	void DoJob() override
 	{
 		Foo foo;
 
@@ -189,7 +181,7 @@ public:
 	explicit SenderTCPJob(ServerTCP& server) : server(&server) {}
 
 private:
-	virtual void DoJob()
+	void DoJob() override
 	{
 		server->Listen();
 		server->Accept();
@@ -203,7 +195,7 @@ private:
 	ServerTCP *server;
 };
 
-TEST_FIXTURE(AutoNetwork, ExchangeTCP)
+TEST_CASE_FIXTURE(AutoNetwork, "ExchangeTCP")
 {
 	const int serverPort = 6500;
 	const int clientPort = 6501;
@@ -220,11 +212,12 @@ TEST_FIXTURE(AutoNetwork, ExchangeTCP)
 	receiver.Wait();
 	sender.Wait();
 	CHECK(receiver.Check());
-	CHECK_EQUAL(clientPort, htons(server.GetClientPort()));
+	CHECK(clientPort == server.GetClientPort());
 	const unsigned long localhost = 0x7F000001; // 127.0.0.1
 
-	CHECK(GetMyIP() == ntohl(server.GetClientHost())
-		|| localhost == ntohl(server.GetClientHost()));
+	const auto host = server.GetClientHost();
+	const bool isLocalHost = GetMyIP() == host || localhost == host;
+	CHECK(isLocalHost);
 }
 
 template<typename T>
@@ -232,7 +225,6 @@ void UDPWrite(Socket socket, const char *hostname, int port, const T &obj)
 {
 	const long host = NetResolveHost(hostname);
 	const char *buf = reinterpret_cast<const char *>(&obj);
-	port = htons(port);
 	NetSendUDP(socket, host, port, buf, sizeof(T));
 }
 
@@ -249,7 +241,7 @@ void UDPRead(Socket socket, T *obj, unsigned long *hostFrom, int *portFrom)
 class ClientUDP
 {
 public:
-	explicit ClientUDP(int port) { socket = NetOpenUDP(htonl(0x7F000001), htons(port)); }
+	explicit ClientUDP(int port) { socket = NetOpenUDP(htonl(0x7F000001), port); }
 	~ClientUDP() { NetCloseUDP(socket); }
 
 	template <typename T>
@@ -275,7 +267,7 @@ public:
 	bool Check() const { return check; }
 private:
 
-	virtual void DoJob()
+	void DoJob() override
 	{
 		Foo foo;
 
@@ -297,7 +289,7 @@ public:
 	{}
 
 private:
-	virtual void DoJob()
+	void DoJob() override
 	{
 		Foo foo;
 
@@ -310,7 +302,7 @@ private:
 	long port;
 };
 
-TEST_FIXTURE(AutoNetwork, ExchangeUDP)
+TEST_CASE_FIXTURE(AutoNetwork, "ExchangeUDP")
 {
 	const int receiverPort = 6501;
 	const int senderPort = 6500;
@@ -326,9 +318,10 @@ TEST_FIXTURE(AutoNetwork, ExchangeUDP)
 	receiver.Wait();
 	sender.Wait();
 	CHECK(receiver.Check());
-	CHECK_EQUAL(senderPort, htons(client.GetPortFrom()));
+	CHECK(senderPort == client.GetPortFrom());
 	const unsigned long localhost = 0x7F000001; // 127.0.0.1
 
-	CHECK(GetMyIP() == ntohl(client.GetHostFrom())
-		|| localhost == ntohl(client.GetHostFrom()));
+	const auto host = client.GetHostFrom();
+	const bool isLocalHost = GetMyIP() == host || localhost == host;
+	CHECK(isLocalHost);
 }
