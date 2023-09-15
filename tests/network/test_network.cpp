@@ -27,7 +27,7 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
+#include <doctest.h>
 
 #include "stratagus.h"
 #include "network.h"
@@ -111,33 +111,33 @@ bool CheckSerialization()
 	return res;
 }
 
-TEST(CNetworkCommand)
+TEST_CASE("CNetworkCommand")
 {
 	CHECK(CheckSerialization<CNetworkCommand>());
 }
-TEST(CNetworkExtendedCommand)
+TEST_CASE("CNetworkExtendedCommand")
 {
 	CHECK(CheckSerialization<CNetworkExtendedCommand>());
 }
-TEST(CNetworkChat)
+TEST_CASE("CNetworkChat")
 {
 	CHECK(CheckSerialization<CNetworkChat>());
 }
-TEST(CNetworkCommandSync)
+TEST_CASE("CNetworkCommandSync")
 {
 	CHECK(CheckSerialization<CNetworkCommandSync>());
 }
-TEST(CNetworkCommandQuit)
+TEST_CASE("CNetworkCommandQuit")
 {
 	CHECK(CheckSerialization<CNetworkCommandQuit>());
 }
-TEST(CNetworkSelection)
+TEST_CASE("CNetworkSelection")
 {
 	CHECK(CheckSerialization<CNetworkSelection>());
 }
-TEST(CNetworkPacketHeader)
+TEST_CASE("CNetworkPacketHeader")
 {
 	CHECK(CheckSerialization<CNetworkPacketHeader>());
 }
-//TEST(CNetworkPacket)
+//TEST_CASE("CNetworkPacket")
 

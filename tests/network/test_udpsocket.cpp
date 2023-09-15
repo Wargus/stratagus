@@ -27,11 +27,11 @@
 //      02111-1307, USA.
 //
 
-#include <UnitTest++.h>
+#include <doctest.h>
 
 #include "stratagus.h"
 
-#include "network/udpsocket.h"
+#include "network/netsockets.h"
 
 #include "net_lowlevel.h"
 
@@ -43,13 +43,13 @@ public:
 	~AutoNetwork() { NetExit(); }
 };
 
-TEST_FIXTURE(AutoNetwork, CHost)
+TEST_CASE_FIXTURE(AutoNetwork, "CHost")
 {
 	const CHost host1("127.0.0.1", 6502);
-	const CHost host2(htonl(0x7F000001), htons(6502));
+	const CHost host2(htonl(0x7F000001), 6502);
 
 	CHECK(host1 == host2);
-	CHECK_EQUAL(std::string("127.0.0.1:6502"), host2.toString());
+	CHECK(std::string("127.0.0.1:6502") == host2.toString());
 }
 
 class Foo
@@ -77,7 +77,7 @@ public:
 	char data[42];
 };
 
-TEST_FIXTURE(AutoNetwork, CUDPSocket)
+TEST_CASE_FIXTURE(AutoNetwork, "CUDPSocket")
 {
 	const CHost host1("127.0.0.1", 6501);
 	const CHost host2("localhost", 6502);
@@ -101,7 +101,7 @@ TEST_FIXTURE(AutoNetwork, CUDPSocket)
 
 	CHost from;
 	CHECK(socket2.HasDataToRead(1000));
-	CHECK_EQUAL(int(sizeof(foo1)), socket2.Recv(&foo1, sizeof(foo1) + 4, &from));
+	CHECK(int(sizeof(foo1)) == socket2.Recv(&foo1, sizeof(foo1) + 4, &from));
 
 	CHECK(host1 == from);
 	CHECK(foo1.Check() == true);
