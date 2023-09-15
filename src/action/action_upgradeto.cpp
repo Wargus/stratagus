@@ -158,7 +158,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	unit.Type = const_cast<CUnitType *>(&newtype);
 	unit.Stats = &unit.Type->Stats[player.Index];
 
-	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
+	if (!newtype.CanCastSpell.empty() && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
 		unit.SpellCoolDownTimers = new int[SpellTypeTable.size()];
 		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));

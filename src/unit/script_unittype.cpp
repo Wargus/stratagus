@@ -220,15 +220,35 @@ int ExtraDeathIndex(std::string_view death)
 	return ANIMATIONS_DEATHTYPES;
 }
 
+static DistanceTypeType toDistanceTypeType(lua_State *l, std::string_view value)
+{
+	if (value == "==" || value == "=") {
+		return DistanceTypeType::Equal;
+	} else if (value == ">=") {
+		return DistanceTypeType::GreaterThanEqual;
+	} else if (value == ">") {
+		return DistanceTypeType::GreaterThan;
+	} else if (value == "<=") {
+		return DistanceTypeType::LessThanEqual;
+	} else if (value == "<") {
+		return DistanceTypeType::LessThan;
+	} else if (value == "!=") {
+		return DistanceTypeType::NotEqual;
+	} else {
+		LuaError(l, "Unknown op '%s'", value.data());
+		ExitFatal(1);
+	}
+}
+
 /**
 **  Parse BuildingRules
 **
 **  @param l      Lua state.
-**  @param blist  BuildingRestriction to fill in
+**  @return new BuildingRestrictionAdd
 */
-static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &blist)
+static std::unique_ptr<CBuildRestrictionAnd> ParseBuildingRules(lua_State *l)
 {
-	CBuildRestrictionAnd *andlist = new CBuildRestrictionAnd();
+	auto andlist = std::make_unique<CBuildRestrictionAnd>();
 
 	const int args = lua_rawlen(l, -1);
 	Assert(!(args & 1)); // must be even
@@ -238,35 +258,22 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 		++i;
 		lua_rawgeti(l, -1, i + 1);
 		if (value == "lua-callback") {
-			CBuildRestrictionLuaCallback *b = new CBuildRestrictionLuaCallback(new LuaCallback(l, -1));
+			auto b = std::make_unique<CBuildRestrictionLuaCallback>(std::make_unique<LuaCallback>(l, -1));
 			lua_pop(l, 1);
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 			continue;
 		} else if (!lua_istable(l, -1)) {
 			LuaError(l, "incorrect argument");
 		}
 		if (value == "distance") {
-			CBuildRestrictionDistance *b = new CBuildRestrictionDistance;
+			auto b = std::make_unique<CBuildRestrictionDistance>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
 				if (value == "Distance") {
 					b->Distance = LuaToNumber(l, -1);
 				} else if (value == "DistanceType") {
-					value = LuaToString(l, -1);
-					if (value == "==" || value == "=") {
-						b->DistanceType = Equal;
-					} else if (value == ">=") {
-						b->DistanceType = GreaterThanEqual;
-					} else if (value == ">") {
-						b->DistanceType = GreaterThan;
-					} else if (value == "<=") {
-						b->DistanceType = LessThanEqual;
-					} else if (value == "<") {
-						b->DistanceType = LessThan;
-					} else if (value == "!=") {
-						b->DistanceType = NotEqual;
-					}
+					b->DistanceType = toDistanceTypeType(l, LuaToString(l, -1));
 				} else if (value == "Type") {
 					b->RestrictTypeName = LuaToString(l, -1);
 				} else if (value == "Owner") {
@@ -279,9 +286,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules distance tag: %s", value.data());
 				}
 			}
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 		} else if (value == "addon") {
-			CBuildRestrictionAddOn *b = new CBuildRestrictionAddOn;
+			auto b = std::make_unique<CBuildRestrictionAddOn>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -295,9 +302,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules addon tag: %s", value.data());
 				}
 			}
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 		} else if (value == "ontop") {
-			CBuildRestrictionOnTop *b = new CBuildRestrictionOnTop;
+			auto b = std::make_unique<CBuildRestrictionOnTop>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -311,9 +318,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules ontop tag: %s", value.data());
 				}
 			}
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 		} else if (value == "has-unit") {
-			CBuildRestrictionHasUnit *b = new CBuildRestrictionHasUnit;
+			auto b = std::make_unique<CBuildRestrictionHasUnit>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -324,34 +331,15 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "Count") {
 					b->Count = LuaToNumber(l, -1);
 				} else if (value == "CountType") {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = NotEqual;
-					}
+					b->CountType = toDistanceTypeType(l, LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules has-unit tag: %s", value.data());
 				}
 			}
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 		}
 		else if (value == "surrounded-by") {
-			CBuildRestrictionSurroundedBy *b = new CBuildRestrictionSurroundedBy;
+			auto b = std::make_unique<CBuildRestrictionSurroundedBy>();
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				value = LuaToString(l, -2);
@@ -360,49 +348,11 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				} else if (value == "Count") {
 					b->Count = LuaToNumber(l, -1);
 				} else if (value == "CountType") {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->CountType = Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->CountType = LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->CountType = LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->CountType = NotEqual;
-					}
+					b->CountType = toDistanceTypeType(l, LuaToString(l, -1));
 				} else if (value == "Distance") {
 					b->Distance = LuaToNumber(l, -1);
 				} else if (value == "DistanceType") {
-					value = LuaToString(l, -1);
-					if (value[0] == '=') {
-						if ((value[1] == '=' && value[2] == '\0') || (value[1] == '\0')) {
-							b->DistanceType = Equal;
-						}
-					} else if (value[0] == '>') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = GreaterThanEqual;
-						} else if (value[1] == '\0') {
-							b->DistanceType = GreaterThan;
-						}
-					} else if (value[0] == '<') {
-						if (value[1] == '=' && value[2] == '\0') {
-							b->DistanceType = LessThanEqual;
-						} else if (value[1] == '\0') {
-							b->DistanceType = LessThan;
-						}
-					} else if (value[0] == '!' && value[1] == '=' && value[2] == '\0') {
-						b->DistanceType = NotEqual;
-					}
+					b->DistanceType = toDistanceTypeType(l, LuaToString(l, -1));
 				} else if (value == "Owner") {
 					b->RestrictTypeOwner = LuaToString(l, -1);
 				} else if (value == "CheckBuilder") {
@@ -411,13 +361,13 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 					LuaError(l, "Unsupported BuildingRules surrounded-by tag: %s", value.data());
 				}
 			}
-			andlist->push_back(b);
+			andlist->push_back(std::move(b));
 		} else {
 			LuaError(l, "Unsupported BuildingRules tag: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
-	blist.push_back(andlist);
+	return andlist;
 }
 
 static void UpdateDefaultBoolFlags(CUnitType &type)
@@ -607,11 +557,9 @@ static int CclDefineUnitType(lua_State *l)
 					number++;
 				}
 			}
-			type->Portrait.Num = number;
 			type->Portrait.Talking = 0;
-			type->Portrait.Files = new std::string[type->Portrait.Num];
-			type->Portrait.Mngs = new Mng *[type->Portrait.Num];
-			memset(type->Portrait.Mngs, 0, type->Portrait.Num * sizeof(Mng *));
+			type->Portrait.Files.resize(number);
+			type->Portrait.Mngs.resize(number);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view s = LuaToString(l, -1, k + 1);
 				if ("talking" == s) {
@@ -900,17 +848,14 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			// Free any old restrictions if they are redefined
-			for (CBuildRestriction *b : type->BuildingRules) {
-				delete b;
-			}
+			// Clear any old restrictions if they are redefined
 			type->BuildingRules.clear();
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				ParseBuildingRules(l, type->BuildingRules);
+				type->BuildingRules.push_back(ParseBuildingRules(l));
 				lua_pop(l, 1);
 			}
 		} else if (value == "AiBuildingRules") {
@@ -918,17 +863,14 @@ static int CclDefineUnitType(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			// Free any old restrictions if they are redefined
-			for (CBuildRestriction *b : type->AiBuildingRules) {
-				delete b;
-			}
+			// Clear any old restrictions if they are redefined
 			type->AiBuildingRules.clear();
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, -1, k + 1);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
-				ParseBuildingRules(l, type->AiBuildingRules);
+				type->AiBuildingRules.push_back(ParseBuildingRules(l));
 				lua_pop(l, 1);
 			}
 		} else if (value == "AutoBuildRate") {
@@ -1002,16 +944,16 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (value == "resource-capacity") {
 						res->ResourceCapacity = LuaToNumber(l, -1, k + 1);
 					} else if (value == "terrain-harvester") {
-						res->TerrainHarvester = 1;
+						res->TerrainHarvester = true;
 						--k;
 					} else if (value == "lose-resources") {
-						res->LoseResources = 1;
+						res->LoseResources = true;
 						--k;
 					} else if (value == "harvest-from-outside") {
-						res->HarvestFromOutside = 1;
+						res->HarvestFromOutside = true;
 						--k;
 					} else if (value == "refinery-harvester") {
-						res->RefineryHarvester = 1;
+						res->RefineryHarvester = true;
 						--k;
 					} else if (value == "file-when-empty") {
 						res->FileWhenEmpty = LuaToString(l, -1, k + 1);
@@ -1028,7 +970,7 @@ static int CclDefineUnitType(lua_State *l)
 				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
-			type->BoolFlag[HARVESTER_INDEX].value = 1;
+			type->BoolFlag[HARVESTER_INDEX].value = true;
 		} else if (value == "GivesResource") {
 			lua_pushvalue(l, -1);
 			type->GivesResource = CclGetResourceByName(l);
@@ -1051,14 +993,11 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: can-cast-spell should only be used AFTER all spells
 			// have been defined. FIXME: MaxSpellType=500 or something?
 			//
-			if (!type->CanCastSpell) {
-				type->CanCastSpell = new char[SpellTypeTable.size()];
-				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->CanCastSpell;
-				type->CanCastSpell = nullptr;
+				type->CanCastSpell.clear();
+			} else {
+				type->CanCastSpell.resize(SpellTypeTable.size());
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
@@ -1073,15 +1012,11 @@ static int CclDefineUnitType(lua_State *l)
 			// Warning: AutoCastActive should only be used AFTER all spells
 			// have been defined.
 			//
-			if (!type->AutoCastActive) {
-				type->AutoCastActive = new char[SpellTypeTable.size()];
-				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
-			}
 			const int subargs = lua_rawlen(l, -1);
 			if (subargs == 0) {
-				delete[] type->AutoCastActive;
-				type->AutoCastActive = nullptr;
-
+				type->AutoCastActive.clear();
+			} else {
+				type->AutoCastActive.resize(SpellTypeTable.size());
 			}
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, -1, k + 1);
@@ -1298,14 +1233,9 @@ static int CclCopyUnitType(lua_State *l)
 	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
 #ifdef USE_MNG
-	to->Portrait.Num = from.Portrait.Num;
 	to->Portrait.Talking = from.Portrait.Talking;
-	to->Portrait.Files = new std::string[to->Portrait.Num];
-	for (int i = 0; i < to->Portrait.Num; i++) {
-		to->Portrait.Files[i] = from.Portrait.Files[i];
-	}
-	to->Portrait.Mngs = new Mng *[to->Portrait.Num];
-	memset(to->Portrait.Mngs, 0, to->Portrait.Num * sizeof(Mng *));
+	to->Portrait.Files = from.Portrait.Files;
+	to->Portrait.Mngs.resize(to->Portrait.Files.size());
 #endif
 	memcpy(to->DefaultStat.Costs, from.DefaultStat.Costs, sizeof(from.DefaultStat.Costs));
 	memcpy(to->DefaultStat.Storing, from.DefaultStat.Storing, sizeof(from.DefaultStat.Storing));
@@ -1991,8 +1921,8 @@ static int CclDefineBoolFlags(lua_State *l)
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
 		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-			UnitTypes[i]->BoolFlag.resize(new_size);
+		for (CUnitType *unitType : UnitTypes) { // adjust array for unit already defined
+			unitType->BoolFlag.resize(new_size);
 		}
 	}
 	return 0;
@@ -2210,12 +2140,11 @@ static int CclDefineDecorations(lua_State *l)
 */
 static int CclDefineExtraDeathTypes(lua_State *l)
 {
-	unsigned int args;
-
 	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES; ++i) {
 		ExtraDeathTypes[i].clear();
 	}
-	args = lua_gettop(l);
+
+	unsigned int args = lua_gettop(l);
 	for (unsigned int i = 0; i < ANIMATIONS_DEATHTYPES && i < args; ++i) {
 		ExtraDeathTypes[i] = LuaToString(l, i + 1);
 	}
@@ -2326,7 +2255,7 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 		unit.Variable[i].Value = 0;
 		unit.Variable[i].Max = 0;
-		unit.Variable[i].Enable = 1;
+		unit.Variable[i].Enable = true;
 	}
 
 	// Shield permeability

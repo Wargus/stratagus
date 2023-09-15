@@ -346,7 +346,6 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		}
 		if (action == MouseActionSpellCast) {
 			// This is for demolition squads and such
-			Assert(unit.Type->CanCastSpell);
 			size_t spellnum;
 			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
 			}
@@ -1451,7 +1450,7 @@ static int SendSpellCast(const Vec2i &tilePos)
 	 */
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
-		if (!unit.Type->CanCastSpell) {
+		if (unit.Type->CanCastSpell.empty()) {
 			DebugPrint(
 				"but unit %d(%s) can't cast spells?\n", UnitNumber(unit), unit.Type->Name.c_str());
 			// this unit cannot cast spell

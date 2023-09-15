@@ -325,7 +325,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		unit.UnderAttack = 0;
 	}
 
-	if (unit.Type->CanCastSpell) {
+	if (!unit.Type->CanCastSpell.empty()) {
 		// decrease spell countdown timers
 		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.SpellCoolDownTimers[i] > 0) {

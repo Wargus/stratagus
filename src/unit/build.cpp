@@ -61,9 +61,8 @@
 */
 CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 {
-
-	for (CBuildRestriction *p : unit.Type->BuildingRules) {
-		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(p);
+	for (auto &&p : unit.Type->BuildingRules) {
+		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(p.get());
 
 		if (ontopb) {
 			if (!parent) {
@@ -75,11 +74,11 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 			}
 			continue;
 		}
-		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(p);
+		CBuildRestrictionAnd *andb = dynamic_cast<CBuildRestrictionAnd *>(p.get());
 
 		if (andb) {
-			for (CBuildRestriction *orRestriction : andb->_or_list) {
-				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(orRestriction);
+			for (auto &&orRestriction : andb->_or_list) {
+				CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(orRestriction.get());
 				if (ontopb) {
 					if (!parent) {
 						// Guess this is right
@@ -100,7 +99,7 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 */
 bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
 {
-	for (CBuildRestriction *restriction : _or_list) {
+	for (auto &&restriction : _or_list) {
 		if (!restriction->Check(builder, type, pos, ontoptarget)) {
 			return false;
 		}
@@ -352,11 +351,6 @@ bool CBuildRestrictionLuaCallback::Check(const CUnit *builder, const CUnitType &
 	return result;
 }
 
-CBuildRestrictionLuaCallback::~CBuildRestrictionLuaCallback()
-{
-	delete Func;
-}
-
 class AliveConstructedAndSameTypeAs
 {
 public:
@@ -453,9 +447,9 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		if (count > 0) {
 			CUnit *ontoptarget = nullptr;
 			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction *rule = type.AiBuildingRules[i];
+				CBuildRestriction &rule = *type.AiBuildingRules[i];
 				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget)) {
+				if (rule.Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset
 					aiChecked = true;
 					break;
@@ -473,10 +467,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 		size_t count = type.BuildingRules.size();
 		if (count > 0) {
 			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction *rule = type.BuildingRules[i];
+				CBuildRestriction &rule = *type.BuildingRules[i];
 				CUnit *ontoptarget = nullptr;
 				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget)) {
+				if (rule.Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset return
 					if (unit == nullptr) {
 						return ontoptarget ? ontoptarget : (CUnit *)1;
