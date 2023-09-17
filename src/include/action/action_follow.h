@@ -38,11 +38,7 @@ class COrder_Follow : public COrder
 {
 	friend COrder *COrder::NewActionFollow(CUnit &dest);
 public:
-	COrder_Follow() : COrder(UnitAction::Follow), State(0), Range(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Follow() : COrder(UnitAction::Follow) {}
 
 	COrder_Follow *Clone() const override { return new COrder_Follow(*this); }
 
@@ -58,9 +54,9 @@ public:
 	const Vec2i GetGoalPos() const override;
 
 private:
-	unsigned int State;
-	int Range;
-	Vec2i goalPos;
+	unsigned int State = 0;
+	int Range = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 //@}

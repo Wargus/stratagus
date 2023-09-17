@@ -38,11 +38,7 @@ class COrder_Patrol : public COrder
 {
 	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 public:
-	COrder_Patrol() : COrder(UnitAction::Patrol), WaitingCycle(0), Range(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Patrol() : COrder(UnitAction::Patrol) {}
 
 	COrder_Patrol *Clone() const override { return new COrder_Patrol(*this); }
 
@@ -59,10 +55,10 @@ public:
 
 	const Vec2i &GetWayPoint() const { return WayPoint; }
 private:
-	Vec2i WayPoint; /// position for patroling.
-	unsigned int WaitingCycle; /// number of cycle pathfinder wait.
-	int Range;
-	Vec2i goalPos;
+	Vec2i WayPoint{-1, -1}; /// position for patroling.
+	unsigned int WaitingCycle = 0; /// number of cycle pathfinder wait.
+	int Range = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 //@}

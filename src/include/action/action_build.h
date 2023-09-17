@@ -38,11 +38,7 @@ class COrder_Build : public COrder
 {
 	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
-	COrder_Build() : COrder(UnitAction::Build), Type(nullptr), State(0), Range(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Build() : COrder(UnitAction::Build) {}
 
 	COrder_Build *Clone() const override { return new COrder_Build(*this); }
 
@@ -73,11 +69,11 @@ private:
 	bool StartBuilding(CUnit &unit, CUnit &ontop);
 	bool BuildFromOutside(CUnit &unit) const;
 private:
-	CUnitType *Type;        /// build a unit of this unit-type
-	CUnitPtr BuildingUnit;  /// unit builded.
-	int State;
-	int Range;
-	Vec2i goalPos;
+	CUnitType *Type = nullptr;        /// build a unit of this unit-type
+	CUnitPtr BuildingUnit = nullptr;  /// unit builded.
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 //@}

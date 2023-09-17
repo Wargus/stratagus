@@ -37,7 +37,7 @@
 class COrder_Research : public COrder
 {
 public:
-	COrder_Research() : COrder(UnitAction::Research), Upgrade(nullptr) {}
+	COrder_Research() : COrder(UnitAction::Research) {}
 
 	COrder_Research *Clone() const override { return new COrder_Research(*this); }
 
@@ -60,7 +60,7 @@ public:
 	const CUpgrade &GetUpgrade() const { return *Upgrade; }
 	void SetUpgrade(CUpgrade &upgrade) { Upgrade = &upgrade; }
 private:
-	CUpgrade *Upgrade;
+	CUpgrade *Upgrade = nullptr;
 };
 
 //@}

@@ -38,7 +38,7 @@ class COrder_Train : public COrder
 {
 	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
 public:
-	COrder_Train() : COrder(UnitAction::Train), Type(nullptr), Ticks(0) {}
+	COrder_Train() : COrder(UnitAction::Train) {}
 
 	COrder_Train *Clone() const override { return new COrder_Train(*this); }
 
@@ -61,8 +61,8 @@ public:
 
 	const CUnitType &GetUnitType() const { return *Type; }
 private:
-	CUnitType *Type; /// train a unit of this unit-type
-	int Ticks;       /// Ticks to complete
+	CUnitType *Type = nullptr; /// train a unit of this unit-type
+	int Ticks = 0;             /// Ticks to complete
 };
 
 //@}

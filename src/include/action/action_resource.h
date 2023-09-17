@@ -41,12 +41,7 @@ class COrder_Resource : public COrder
 	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
-	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester),
-		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
-	{
-		Resource.Pos.x = Resource.Pos.y = -1;
-		goalPos.x = goalPos.y = -1;
-	}
+	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester) {}
 
 	~COrder_Resource();
 
@@ -85,20 +80,20 @@ private:
 	bool FindAnotherResource(CUnit &unit);
 	bool ActionResourceInit(CUnit &unit);
 private:
-	CUnitPtr worker; /// unit that own this order.
-	unsigned char CurrentResource;
+	CUnitPtr worker = nullptr; /// unit that own this order.
+	unsigned char CurrentResource = 0;
 	struct {
-		Vec2i Pos; /// position for terrain resource.
-		CUnitPtr Mine;
+		Vec2i Pos{-1, -1}; /// position for terrain resource.
+		CUnitPtr Mine = nullptr;
 	} Resource;
-	CUnitPtr Depot;
-	int State;
-	int TimeToHarvest;          /// how much time until we harvest some more.
-	bool DoneHarvesting;  /// Harvesting done, wait for action to break.
-	int Range;
+	CUnitPtr Depot = nullptr;
+	int State = 0;
+	int TimeToHarvest = 0;       /// how much time until we harvest some more.
+	bool DoneHarvesting = false; /// Harvesting done, wait for action to break.
+	int Range = 0;
 #if 1
 	// duplicate of Resource.Pos ?
-	Vec2i goalPos;
+	Vec2i goalPos{-1, -1};
 #endif
 };
 
