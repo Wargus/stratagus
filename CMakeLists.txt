@@ -54,9 +54,9 @@ cmake_minimum_required(VERSION 2.9)
 cmake_policy(VERSION 3.10..3.20.2)
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/third-party/CMakeLists.txt")
-  add_subdirectory(third-party)
+	add_subdirectory(third-party)
 else()
-  message(WARNING "Third-party directory not populated, cannot vendor any dependencies.")
+	message(WARNING "Third-party directory not populated, cannot vendor any dependencies.")
 endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -85,7 +85,7 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
-        src/third_party/
+	src/third_party/
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -258,8 +258,8 @@ set(network_SRCS
 	src/network/netconnect.cpp
 	src/network/network.cpp
 	src/network/netsockets.cpp
-        src/network/online_service.cpp
-        src/network/mdns.cpp
+	src/network/online_service.cpp
+	src/network/mdns.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -368,12 +368,12 @@ set(video_SRCS
 	src/video/font.cpp
 	src/video/graphic.cpp
 	src/video/linedraw.cpp
-        src/video/mng.cpp
+	src/video/mng.cpp
 	src/video/movie.cpp
 	src/video/png.cpp
 	src/video/sdl.cpp
 	src/video/video.cpp
-        src/video/shaders.cpp
+	src/video/shaders.cpp
 )
 source_group(video FILES ${video_SRCS})
 
@@ -425,8 +425,8 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
-        ${hqx_SRCS}
-        ${xbrz_SRCS}
+	${hqx_SRCS}
+	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -650,8 +650,8 @@ if(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
 endif()
 
 if(WIN32 AND MSVC AND NOT CMAKE_PREFIX_PATH)
-  # use a default
-  set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies)
+	# use a default
+	set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies)
 endif()
 
 # Find all libraries
@@ -701,39 +701,39 @@ if(NOT WIN32 OR NOT MSVC)
 endif()
 
 if(BUILD_VENDORED_LUA)
-  vendored_lua()
+	vendored_lua()
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
-  vendored_zlib()
-  vendored_png()
-  vendored_bzip2()
-  vendored_mng()
-  vendored_oggvorbis()
-  vendored_theora()
+	vendored_zlib()
+	vendored_png()
+	vendored_bzip2()
+	vendored_mng()
+	vendored_oggvorbis()
+	vendored_theora()
 else()
-  find_package(PNG REQUIRED)
-  find_package(ZLIB REQUIRED)
-  find_package(BZip2)
-  find_package(MNG)
-  find_package(OggVorbis)
-  find_package(Theora)
+	find_package(PNG REQUIRED)
+	find_package(ZLIB REQUIRED)
+	find_package(BZip2)
+	find_package(MNG)
+	find_package(OggVorbis)
+	find_package(Theora)
 endif()
 
 if (BUILD_VENDORED_SDL)
-  vendored_sdl()
-  vendored_sdl_mixer()
-  vendored_sdl_image()
+	vendored_sdl()
+	vendored_sdl_mixer()
+	vendored_sdl_image()
 
-  if(DOWNLOAD_FREEPATS)
-    vendored_freepats()
-    vendored_unsf()
-    add_dependencies(SDL2_mixer freepats unsf)
-  endif()
+	if(DOWNLOAD_FREEPATS)
+		vendored_freepats()
+		vendored_unsf()
+		add_dependencies(SDL2_mixer freepats unsf)
+	endif()
 else()
-  find_package(SDL2 REQUIRED)
-  find_package(SDL2_mixer REQUIRED)
-  find_package(SDL2_image REQUIRED)
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer REQUIRED)
+	find_package(SDL2_image REQUIRED)
 endif()
 
 find_package(OpenMP)
@@ -744,8 +744,8 @@ endif()
 
 if(ENABLE_DOC)
 find_package(Doxygen
-             REQUIRED dot
-             OPTIONAL_COMPONENTS mscgen dia)
+			 REQUIRED dot
+			 OPTIONAL_COMPONENTS mscgen dia)
 endif()
 
 find_package(StackTrace)
@@ -810,8 +810,8 @@ else()
 endif()
 
 if (WIN32)
-  	set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SDL2main_LIBRARY})
-  	message(${SDL2_LIBRARY})
+	set(SDL2_LIBRARY ${SDL2_LIBRARY} ${SDL2main_LIBRARY})
+	message(${SDL2_LIBRARY})
 endif()
 
 # Stratagus definitions
@@ -909,15 +909,15 @@ if(WIN32 AND MSVC)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Profile")
-        find_package(coz-profiler)
-        if(COZ-PROFILER_FOUND)
+	find_package(coz-profiler)
+	if(COZ-PROFILER_FOUND)
 		add_definitions(-DHAVE_COZ_PROFILER)
 		include_directories(${COZ_INCLUDE_DIRS})
 		set(stratagus_LIBS ${stratagus_LIBS} ${COZ_LIBRARIES} -ldl)
 	endif()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg -g -ggdb")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -g -ggdb")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 # TODO: Add support for other compilers
 
@@ -992,10 +992,10 @@ else()
 endif()
 
 if(ENABLE_MULTIBUILD)
-    if(WIN32 AND MSVC)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-      message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    endif()
+	if(WIN32 AND MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+		message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+	endif()
 endif()
 
 # Print compile info
@@ -1171,9 +1171,9 @@ add_custom_command(OUTPUT tolua.cpp
 )
 
 if (ENABLE_STDIO_REDIRECT)
-   add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+	add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 else ()
-   add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
+	add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
 endif ()
 target_link_libraries(stratagus ${stratagus_LIBS} ${CMAKE_DL_LIBS})
 
@@ -1197,49 +1197,49 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(WIN32)
-  if(MSVC)
-    target_compile_options(stratagus PRIVATE "$<$<CONFIG:Release>:/Zi>")
-    target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
-    target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
-    target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
-  endif()
-  set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
-  set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
+	if(MSVC)
+		target_compile_options(stratagus PRIVATE "$<$<CONFIG:Release>:/Zi>")
+		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
+		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
+		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
+	endif()
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
+	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
 endif()
 if(APPLE)
-  set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${SDL2main_LIBRARY}")
-  set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
+	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${SDL2main_LIBRARY}")
+	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
 endif()
 
 if(BUILD_VENDORED_LUA)
-  add_dependencies(stratagus lua)
+	add_dependencies(stratagus lua)
 else()
-  find_package(Lua51 REQUIRED)
-  find_package(Tolua++ REQUIRED)
+	find_package(Lua51 REQUIRED)
+	find_package(Tolua++ REQUIRED)
 endif()
 
 if(BUILD_VENDORED_SDL)
-  set(BUILD_VENDORED_MEDIA_LIBS ON)
-  if (MSVC)
-    add_definitions(-DBUILD_VENDORED_SDL)
-    set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
-  endif()
-  add_dependencies(stratagus SDL2)
-  add_dependencies(stratagus SDL2_image)
-  add_dependencies(stratagus SDL2_mixer)
-  if(APPLE)
-    set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -ObjC -framework AppKit -framework Carbon -framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreGraphics -framework CoreFoundation -framework CoreVideo -framework CoreHaptics -framework GameController -framework ForceFeedback -framework IOKit -framework Metal -liconv")
-  endif()
+	set(BUILD_VENDORED_MEDIA_LIBS ON)
+	if (MSVC)
+		add_definitions(-DBUILD_VENDORED_SDL)
+		set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+	endif()
+	add_dependencies(stratagus SDL2)
+	add_dependencies(stratagus SDL2_image)
+	add_dependencies(stratagus SDL2_mixer)
+	if(APPLE)
+		set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -ObjC -framework AppKit -framework Carbon -framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreGraphics -framework CoreFoundation -framework CoreVideo -framework CoreHaptics -framework GameController -framework ForceFeedback -framework IOKit -framework Metal -liconv")
+	endif()
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
-  add_dependencies(stratagus zlib)
-  add_dependencies(stratagus png)
-  add_dependencies(stratagus bzip2)
-  add_dependencies(stratagus mng)
-  add_dependencies(stratagus ogg)
-  add_dependencies(stratagus vorbis)
-  add_dependencies(stratagus theora)
+	add_dependencies(stratagus zlib)
+	add_dependencies(stratagus png)
+	add_dependencies(stratagus bzip2)
+	add_dependencies(stratagus mng)
+	add_dependencies(stratagus ogg)
+	add_dependencies(stratagus vorbis)
+	add_dependencies(stratagus theora)
 endif()
 
 ########### next target ###############
@@ -1260,8 +1260,8 @@ if(WIN32 AND MINGW AND ENABLE_STATIC)
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
-  add_dependencies(png2stratagus zlib)
-  add_dependencies(png2stratagus png)
+	add_dependencies(png2stratagus zlib)
+	add_dependencies(png2stratagus png)
 endif()
 
 ########### next target ###############
@@ -1321,7 +1321,7 @@ endif()
 ########### next target ###############
 
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	# ship our DLLs
 	file(GLOB WINDLLS ${CMAKE_PREFIX_PATH}/bin/*.dll)
@@ -1380,11 +1380,11 @@ set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${CLEAN_FILES}"
 
 # uninstall target
 if(NOT TARGET uninstall)
-    configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-        IMMEDIATE @ONLY)
+	configure_file(
+		"${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+		IMMEDIATE @ONLY)
 
-    add_custom_target(uninstall
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+	add_custom_target(uninstall
+		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
