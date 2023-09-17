@@ -38,11 +38,7 @@ class COrder_Unload : public COrder
 {
 	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitAction::Unload), State(0), Retries(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Unload() : COrder(UnitAction::Unload) {}
 
 	COrder_Unload *Clone() const override { return new COrder_Unload(*this); }
 
@@ -61,9 +57,9 @@ public:
 private:
 	bool LeaveTransporter(CUnit &transporter);
 private:
-	int State;
-	int Retries;
-	Vec2i goalPos;
+	int State = 0;
+	int Retries = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 //@}

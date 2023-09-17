@@ -125,25 +125,23 @@ enum class ButtonCmd;
 class CCursor
 {
 public:
-	CCursor() : HotPos(0, 0),
-		SpriteFrame(0), FrameRate(0), G(nullptr) {}
-
+	CCursor() = default;
 	~CCursor();
+
+	SDL_Cursor *GetSDLCursor();
+	void Reset(); // Clear all cursor surfaces
 
 	std::string Ident;  /// Identifier to reference it
 	std::string Race;   /// Race name
 
-	PixelPos HotPos;     /// Hot point
+	PixelPos HotPos{0, 0}; /// Hot point
 
-	unsigned int SpriteFrame;  /// Current displayed cursor frame
-	int FrameRate;    /// Rate of changing the frames
+	unsigned int SpriteFrame = 0;  /// Current displayed cursor frame
+	int FrameRate = 0;    /// Rate of changing the frames
 
 	// --- FILLED UP ---
 
-	CGraphic *G; /// Cursor sprite image
-
-	SDL_Cursor *GetSDLCursor();
-	void Reset(); // Clear all cursor surfaces
+	CGraphic *G = nullptr; /// Cursor sprite image
 
 private:
 	std::vector<SDL_Cursor*> SdlCursors;
@@ -154,12 +152,12 @@ private:
 class CursorConfig
 {
 public:
-	CursorConfig() : Cursor(nullptr) {}
+	CursorConfig() = default;
 
 	void Load();
 
 	std::string Name; /// Config cursor-type name
-	CCursor *Cursor;  /// Cursor-type pointer
+	CCursor *Cursor = nullptr;  /// Cursor-type pointer
 };
 
 /// Cursor state

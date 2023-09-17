@@ -39,11 +39,7 @@ class COrder_Repair : public COrder
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
 	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
 public:
-	COrder_Repair() : COrder(UnitAction::Repair), State(0), RepairCycle(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Repair() : COrder(UnitAction::Repair) {}
 
 	COrder_Repair *Clone() const override { return new COrder_Repair(*this); }
 
@@ -63,10 +59,10 @@ public:
 private:
 	bool RepairUnit(const CUnit &unit, CUnit &goal);
 private:
-	CUnitPtr ReparableTarget;
-	unsigned int State;
-	unsigned int RepairCycle;
-	Vec2i goalPos;
+	CUnitPtr ReparableTarget = nullptr;
+	unsigned int State = 0;
+	unsigned int RepairCycle = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 

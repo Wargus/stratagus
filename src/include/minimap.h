@@ -55,10 +55,7 @@ class CMinimap
 	void UpdateSeen(void *const pixels, const int pitch);
 
 public:
-	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
-		WithTerrain(false), ShowSelected(false),
-		Transparent(false), UpdateCache(false),
-		MinimapScaleX(0), MinimapScaleY(0) {}
+	CMinimap() = default;
 
 	void SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
@@ -76,32 +73,32 @@ public:
 
 	bool Contains(const PixelPos &screenPos) const;
 public:
-	int X;
-	int Y;
-	int W;
-	int H;
-	int XOffset;
-	int YOffset;
-	bool WithTerrain;
-	bool ShowSelected;
-	bool Transparent;
-	bool UpdateCache;
-	
+	int X = 0;
+	int Y = 0;
+	int W = 0;
+	int H = 0;
+	int XOffset = 0;
+	int YOffset = 0;
+	bool WithTerrain = false;
+	bool ShowSelected = false;
+	bool Transparent = false;
+	bool UpdateCache = false;
+
 private:
 	// MinimapScale:
 	// 32x32 64x64 96x96 128x128 256x256 512x512 ...
 	// *4 *2 *4/3   *1 *1/2 *1/4
-	int MinimapScaleX;                  /// Minimap scale to fit into window
-	int MinimapScaleY;                  /// Minimap scale to fit into window
+	int MinimapScaleX = 0;                  /// Minimap scale to fit into window
+	int MinimapScaleY = 0;                  /// Minimap scale to fit into window
 
 private:
 	struct MinimapSettings
 	{
 		/// used to draw fog in on the minimap
-		uint8_t FogVisibleOpacity	{0x00};
-		uint8_t FogExploredOpacity  {0x55};
-		uint8_t FogRevealedOpacity  {0xAA};
-		uint8_t FogUnseenOpacity 	{0xFF};		
+		uint8_t FogVisibleOpacity  {0x00};
+		uint8_t FogExploredOpacity {0x55};
+		uint8_t FogRevealedOpacity {0xAA};
+		uint8_t FogUnseenOpacity   {0xFF};
 	} Settings;
 };
 

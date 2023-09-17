@@ -38,11 +38,10 @@ class COrder_SpellCast : public COrder
 {
 	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
 public:
-	COrder_SpellCast(bool autocast = false) : COrder(UnitAction::SpellCast), Spell(nullptr), State(0), Range(0), isAutocast(autocast)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	explicit COrder_SpellCast(bool autocast = false) :
+		COrder(UnitAction::SpellCast),
+		isAutocast(autocast)
+	{}
 
 	COrder_SpellCast *Clone() const override { return new COrder_SpellCast(*this); }
 
@@ -64,11 +63,11 @@ private:
 	bool CheckForDeadGoal(CUnit &unit);
 	bool SpellMoveToTarget(CUnit &unit);
 private:
-	const SpellType *Spell;
-	int State;
-	int Range;
-	Vec2i goalPos;
-	bool isAutocast;
+	const SpellType *Spell = nullptr;
+	int State = 0;
+	int Range = 0;
+	Vec2i goalPos{-1, -1};
+	bool isAutocast = false;
 };
 
 //@}

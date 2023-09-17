@@ -37,7 +37,8 @@
 class COrder_Still : public COrder
 {
 public:
-	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still), State(0), Sleep(0) {}
+	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still)
+	{}
 
 	COrder_Still *Clone() const override { return new COrder_Still(*this); }
 
@@ -59,8 +60,8 @@ private:
 	bool AutoAttackStand(CUnit &unit);
 	bool AutoCastStand(CUnit &unit);
 
-	unsigned char State;
-	unsigned char Sleep;
+	unsigned char State = 0;
+	unsigned char Sleep = 0;
 };
 
 //@}

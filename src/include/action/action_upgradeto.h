@@ -38,7 +38,7 @@ class COrder_TransformInto : public COrder
 {
 	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
 public:
-	COrder_TransformInto() : COrder(UnitAction::TransformInto), Type(nullptr) {}
+	COrder_TransformInto() : COrder(UnitAction::TransformInto) {}
 
 	COrder_TransformInto *Clone() const override { return new COrder_TransformInto(*this); }
 
@@ -55,7 +55,7 @@ public:
 	}
 
 private:
-	CUnitType *Type; /// Transform unit into this unit-type
+	CUnitType *Type = nullptr; /// Transform unit into this unit-type
 };
 
 
@@ -63,7 +63,7 @@ class COrder_UpgradeTo : public COrder
 {
 	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant);
 public:
-	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo), Type(nullptr), Ticks(0) {}
+	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo) {}
 
 	COrder_UpgradeTo *Clone() const override { return new COrder_UpgradeTo(*this); }
 
@@ -84,8 +84,8 @@ public:
 
 	const CUnitType &GetUnitType() const { return *Type; }
 private:
-	CUnitType *Type; /// upgrade to this unit-type
-	int Ticks;       /// Ticks to complete
+	CUnitType *Type = nullptr; /// upgrade to this unit-type
+	int Ticks = 0;             /// Ticks to complete
 };
 
 #endif // !__ACTIONS_H__

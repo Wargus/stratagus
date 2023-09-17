@@ -38,7 +38,7 @@ class COrder_Built : public COrder
 {
 	friend COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit);
 public:
-	COrder_Built() : COrder(UnitAction::Built), ProgressCounter(0), IsCancelled(false), Frame(nullptr) {}
+	COrder_Built() : COrder(UnitAction::Built) {}
 	~COrder_Built();
 
 	COrder_Built *Clone() const override { return new COrder_Built(*this); }
@@ -73,10 +73,10 @@ private:
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:
-	CUnitPtr Worker;                  /// Worker building this unit
-	int ProgressCounter;              /// Progress counter, in 1/100 cycles.
-	bool IsCancelled;                  /// Cancel construction
-	const CConstructionFrame *Frame;  /// Construction frame
+	CUnitPtr Worker = nullptr;                 /// Worker building this unit
+	int ProgressCounter = 0;                   /// Progress counter, in 1/100 cycles.
+	bool IsCancelled = false;                  /// Cancel construction
+	const CConstructionFrame *Frame = nullptr; /// Construction frame
 };
 
 //@}

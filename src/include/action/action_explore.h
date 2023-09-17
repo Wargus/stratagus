@@ -38,11 +38,7 @@ class COrder_Explore : public COrder
 {
 	friend COrder *COrder::NewActionExplore(const CUnit &unit);
 public:
-	COrder_Explore() : COrder(UnitAction::Explore), WaitingCycle(0), Range(0)
-	{
-		goalPos.x = -1;
-		goalPos.y = -1;
-	}
+	COrder_Explore() : COrder(UnitAction::Explore) {}
 
 	COrder_Explore *Clone() const override { return new COrder_Explore(*this); }
 
@@ -58,9 +54,9 @@ public:
 	const Vec2i GetGoalPos() const override;
 
 private:
-	unsigned int WaitingCycle; /// number of cycle pathfinder wait.
-	int Range;
-	Vec2i goalPos;
+	unsigned int WaitingCycle = 0; /// number of cycle pathfinder wait.
+	int Range = 0;
+	Vec2i goalPos{-1, -1};
 };
 
 //@}

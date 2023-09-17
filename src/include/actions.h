@@ -94,9 +94,7 @@ struct lua_State;
 class COrder
 {
 public:
-	explicit COrder(UnitAction action) : Goal(), Action(action), Finished(false), Instant(false)
-	{
-	}
+	explicit COrder(UnitAction action) : Action(action) {}
 	virtual ~COrder();
 
 	virtual COrder *Clone() const = 0;
@@ -109,7 +107,6 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	virtual void Save(CFile &file, const CUnit &unit) const = 0;
-	bool ParseGenericData(lua_State *l, int &j, std::string_view value);
 	virtual bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) = 0;
 
 	virtual void UpdateUnitVariables(CUnit &unit) const {}
@@ -118,13 +115,15 @@ public:
 
 	virtual void UpdatePathFinderData(PathFinderInput &input) = 0;
 
+	virtual const Vec2i GetGoalPos() const;
+
+	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
+
+	bool ParseGenericData(lua_State *l, int &j, std::string_view value);
 	bool HasGoal() const { return Goal != nullptr; }
 	CUnit *GetGoal() const { return Goal; };
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
-	virtual const Vec2i GetGoalPos() const;
-
-	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	bool IsWaiting(CUnit &unit);
 	void StopWaiting(CUnit &unit);
@@ -159,11 +158,11 @@ protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
 
 private:
-	CUnitPtr Goal;
+	CUnitPtr Goal = nullptr;
 public:
 	const UnitAction Action;   /// global action
-	bool Finished; /// true when order is finish
-	bool Instant; /// true to ignore TimeCost
+	bool Finished = false; /// true when order is finish
+	bool Instant = false; /// true to ignore TimeCost
 };
 
 using COrderPtr = COrder *;
