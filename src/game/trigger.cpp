@@ -94,20 +94,21 @@ int TriggerGetPlayer(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  @return   The unit-type pointer.
+**  @return   The unit-type validator.
 */
-const CUnitType *TriggerGetUnitType(lua_State *l)
+std::function<bool(const CUnit &)> TriggerGetUnitType(lua_State *l)
 {
 	const std::string_view unit = LuaToString(l, -1);
 
 	if (unit == "any") {
-		return ANY_UNIT;
+		return [](const CUnit &) { return true; };
 	} else if (unit == "units") {
-		return ALL_FOODUNITS;
+		return [](const CUnit &unit) { return !unit.Type->Building; };
 	} else if (unit == "buildings") {
-		return ALL_BUILDINGS;
+		return [](const CUnit &unit) { return unit.Type->Building; };
 	}
-	return CclGetUnitType(l);
+	const CUnitType *expectedType = CclGetUnitType(l);
+	return [=](const CUnit &unit) { return expectedType == unit.Type && !unit.Constructed; };
 }
 
 /*--------------------------------------------------------------------------
@@ -164,7 +165,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 
 	Vec2i minPos;
@@ -186,10 +187,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 		const CUnit &unit = *units[i];
 		// Check unit type
 
-		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
-			|| (unittype == unit.Type && !unit.Constructed)) {
+		if (unitValidator(unit)) {
 
 			// Check the player
 			if (plynr == -1 || plynr == unit.Player->Index) {
@@ -226,10 +224,10 @@ static int CclIfNearUnit(lua_State *l)
 	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	const CUnitType *ut2 = CclGetUnitType(l);
-	if (!unittype || !ut2) {
+	if (!ut2) {
 		LuaError(l, "CclIfNearUnit: not a unit-type valid");
 	}
 	CompareFunction compare = GetCompareFunction(op);
@@ -252,10 +250,7 @@ static int CclIfNearUnit(lua_State *l)
 			const CUnit &unit = *around[j];
 
 			// Check unit type
-			if (unittype == ANY_UNIT
-				|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-				|| (unittype == ALL_BUILDINGS && unit.Type->Building)
-				|| (unittype == unit.Type)) {
+			if (unitValidator(unit)) {
 
 				// Check the player
 				if (plynr == -1 || plynr == unit.Player->Index) {
@@ -291,10 +286,10 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
 	lua_pushvalue(l, 4);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	const CUnitType *ut2 = CclGetUnitType(l);
-	if (!unittype || !ut2) {
+	if (!ut2) {
 		LuaError(l, "CclIfRescuedNearUnit: not a unit-type valid");
 	}
 
@@ -314,15 +309,8 @@ static int CclIfRescuedNearUnit(lua_State *l)
 			CUnit &unit = *around[j];
 
 			if (unit.RescuedFrom) { // only rescued units
-				// Check unit type
-
-				if (unittype == ANY_UNIT
-					|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-					|| (unittype == ALL_BUILDINGS && unit.Type->Building)
-					|| (unittype == unit.Type)) {
-
-					// Check the player
-					if (plynr == -1 || plynr == unit.Player->Index) {
+				if (unitValidator(unit)) {// Check unit type
+					if (plynr == -1 || plynr == unit.Player->Index) {// Check the player
 						++s;
 					}
 				}

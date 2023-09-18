@@ -836,7 +836,7 @@ static int CclTransformUnit(lua_State *l)
 	CUnit *targetUnit = CclGetUnit(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const CUnitType *unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
 	if (unittype && targetUnit) {
 		CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1, true);
@@ -951,7 +951,7 @@ static int CclOrderUnit(lua_State *l)
 	const int plynr = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	if (!lua_istable(l, 3)) {
 		LuaError(l, "incorrect argument");
@@ -985,10 +985,7 @@ static int CclOrderUnit(lua_State *l)
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
-			|| unittype == unit.Type) {
+		if (unitValidator(unit)) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (order == "move") {
 					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
@@ -1012,21 +1009,6 @@ static int CclOrderUnit(lua_State *l)
 	return 0;
 }
 
-class HasSameUnitTypeAs
-{
-public:
-	explicit HasSameUnitTypeAs(const CUnitType *_type) : type(_type) {}
-	bool operator()(const CUnit *unit) const
-	{
-		return (type == ANY_UNIT || type == unit->Type
-				|| (type == ALL_FOODUNITS && !unit->Type->Building)
-				|| (type == ALL_BUILDINGS && unit->Type->Building));
-	}
-private:
-	const CUnitType *type;
-};
-
-
 /**
 ** <b>Description</b>
 **
@@ -1046,11 +1028,13 @@ static int CclKillUnit(lua_State *l)
 	LuaCheckArgs(l, 2);
 
 	lua_pushvalue(l, 1);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		CUnitManager::Iterator it = std::find_if(UnitManager->begin(), UnitManager->end(), HasSameUnitTypeAs(unittype));
+		auto it = std::find_if(UnitManager->begin(), UnitManager->end(), [&](const CUnit *unit) {
+			return unitValidator(*unit);
+		});
 
 		if (it != UnitManager->end()) {
 			LetUnitDie(**it);
@@ -1059,7 +1043,9 @@ static int CclKillUnit(lua_State *l)
 		}
 	} else {
 		CPlayer &player = Players[plynr];
-		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), HasSameUnitTypeAs(unittype));
+		auto it = std::find_if(player.UnitBegin(), player.UnitEnd(), [&](const CUnit *unit) {
+			return unitValidator(*unit);
+		});
 
 		if (it != player.UnitEnd()) {
 			LetUnitDie(**it);
@@ -1090,7 +1076,7 @@ static int CclKillUnitAt(lua_State *l)
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	const CUnitType *unittype = TriggerGetUnitType(l);
+	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
 	int plynr = TriggerGetPlayer(l);
@@ -1117,10 +1103,7 @@ static int CclKillUnitAt(lua_State *l)
 	for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end() && s < q; ++it) {
 		CUnit &unit = **it;
 
-		if (unittype == ANY_UNIT
-			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
-			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
-			|| unittype == unit.Type) {
+		if (unitValidator(unit)) {
 			if ((plynr == -1 || plynr == unit.Player->Index) && unit.IsAlive()) {
 				LetUnitDie(unit);
 				++s;
