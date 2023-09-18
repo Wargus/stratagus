@@ -72,24 +72,19 @@ extern void StartMap(const std::string &filename, bool clean);
 class LogEntry
 {
 public:
-	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
-		Num(0), SyncRandSeed(0), Next(nullptr)
-	{
-		UnitNumber = 0;
-	}
+	LogEntry() = default;
 
-	unsigned long GameCycle;
-	int UnitNumber;
+	unsigned long GameCycle = 0;
+	int UnitNumber = 0;
 	std::string UnitIdent;
 	std::string Action;
-	int Flush;
-	int PosX;
-	int PosY;
-	int DestUnitNumber;
+	int Flush = 0;
+	int PosX = 0;
+	int PosY = 0;
+	int DestUnitNumber = 0;
 	std::string Value;
-	int Num;
-	unsigned SyncRandSeed;
-	LogEntry *Next;
+	int Num = 0;
+	unsigned SyncRandSeed = 0;
 };
 
 /**
@@ -98,28 +93,22 @@ public:
 class FullReplay
 {
 public:
-	FullReplay() :
-		MapId(0), LocalPlayer(0), Commands(nullptr)
-	{
-		ReplaySettings.Init();
-		memset(Engine, 0, sizeof(Engine));
-		memset(Network, 0, sizeof(Network));
-	}
+	FullReplay() { ReplaySettings.Init(); }
 	std::string Comment1;
 	std::string Comment2;
 	std::string Comment3;
 	std::string Date;
 	std::string Map;
 	std::string MapPath;
-	unsigned MapId;
+	unsigned MapId = 0;
 
-	int LocalPlayer;
+	int LocalPlayer = 0;
 	std::string PlayerNames[PlayerMax];
 
 	Settings ReplaySettings;
-	int Engine[3];
-	int Network[3];
-	LogEntry *Commands;
+	int Engine[3]{};
+	int Network[3]{};
+	std::vector<LogEntry> Commands;
 };
 
 //----------------------------------------------------------------------------
@@ -137,9 +126,9 @@ static bool DisabledLog;           /// Disabled log for replay
 static CFile *LogFile;             /// Replay log file
 static fs::path LastLogFileName;   /// Last log file name
 static unsigned long NextLogCycle; /// Next log cycle number
-static int InitReplay;             /// Initialize replay
-static FullReplay *CurrentReplay;
-static LogEntry *ReplayStep;
+static bool InitReplay;             /// Initialize replay
+static std::unique_ptr<FullReplay> CurrentReplay;
+static std::optional<std::size_t> ReplayIndex;
 
 //----------------------------------------------------------------------------
 // Log commands
@@ -150,9 +139,9 @@ static LogEntry *ReplayStep;
 **
 ** @return A new FullReplay structure
 */
-static FullReplay *StartReplay()
+static std::unique_ptr<FullReplay> StartReplay()
 {
-	FullReplay *replay = new FullReplay;
+	auto replay = std::make_unique<FullReplay>();
 
 	time_t now;
 	char dateStr[64];
@@ -234,23 +223,6 @@ static void ApplyReplaySettings()
 	// FIXME : check mapid
 }
 
-/**
-**  Free a replay from memory
-**
-**  @param replay  Pointer to the replay to be freed
-*/
-static void DeleteReplay(FullReplay *replay)
-{
-	LogEntry *log = replay->Commands;
-
-	while (log) {
-		LogEntry *next = log->Next;
-		delete log;
-		log = next;
-	}
-	delete replay;
-}
-
 static void PrintLogCommand(const LogEntry &log, CFile &file)
 {
 	file.printf("Log( { ");
@@ -314,10 +286,8 @@ static void SaveFullLog(CFile &file)
 	file.printf("  Network = { %d, %d, %d }\n",
 				CurrentReplay->Network[0], CurrentReplay->Network[1], CurrentReplay->Network[2]);
 	file.printf("} )\n");
-	const LogEntry *log = CurrentReplay->Commands;
-	while (log) {
-		PrintLogCommand(*log, file);
-		log = log->Next;
+	for (const auto &command : CurrentReplay->Commands) {
+		PrintLogCommand(command, file);
 	}
 }
 
@@ -327,21 +297,12 @@ static void SaveFullLog(CFile &file)
 **  @param log   Pointer the replay log entry to be added
 **  @param dest  The file to output to
 */
-static void AppendLog(LogEntry *log, CFile &file)
+static void AppendLog(LogEntry&& log, CFile &file)
 {
-	LogEntry **last;
-
-	// Append to linked list
-	last = &CurrentReplay->Commands;
-	while (*last) {
-		last = &(*last)->Next;
-	}
-
-	*last = log;
-	log->Next = 0;
-
-	PrintLogCommand(*log, file);
+	PrintLogCommand(log, file);
 	file.flush();
+
+	CurrentReplay->Commands.push_back(std::move(log));
 }
 
 /**
@@ -407,44 +368,44 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 		return;
 	}
 
-	LogEntry *log = new LogEntry;
+	LogEntry log;
 
 	//
 	// Frame, unit, (type-ident only to be better readable).
 	//
-	log->GameCycle = GameCycle;
+	log.GameCycle = GameCycle;
 
-	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);
-	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
+	log.UnitNumber = (unit ? UnitNumber(*unit) : -1);
+	log.UnitIdent = (unit ? unit->Type->Ident : "");
 
-	log->Action = action;
-	log->Flush = flush;
+	log.Action = action;
+	log.Flush = flush;
 
 	//
 	// Coordinates given.
 	//
-	log->PosX = x;
-	log->PosY = y;
+	log.PosX = x;
+	log.PosY = y;
 
 	//
 	// Destination given.
 	//
-	log->DestUnitNumber = (dest ? UnitNumber(*dest) : -1);
+	log.DestUnitNumber = (dest ? UnitNumber(*dest) : -1);
 
 	//
 	// Value given.
 	//
-	log->Value = (value ? value : "");
+	log.Value = (value ? value : "");
 
 	//
 	// Number given.
 	//
-	log->Num = num;
+	log.Num = num;
 
-	log->SyncRandSeed = SyncRandSeed;
+	log.SyncRandSeed = SyncRandSeed;
 
 	// Append it to ReplayLog list
-	AppendLog(log, *LogFile);
+	AppendLog(std::move(log), *LogFile);
 }
 
 /**
@@ -452,9 +413,6 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 */
 static int CclLog(lua_State *l)
 {
-	LogEntry *log;
-	LogEntry **last;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -462,52 +420,44 @@ static int CclLog(lua_State *l)
 
 	Assert(CurrentReplay);
 
-	log = new LogEntry;
-	log->UnitNumber = -1;
-	log->PosX = -1;
-	log->PosY = -1;
-	log->DestUnitNumber = -1;
-	log->Num = -1;
+	LogEntry log;
+	log.UnitNumber = -1;
+	log.PosX = -1;
+	log.PosY = -1;
+	log.DestUnitNumber = -1;
+	log.Num = -1;
 
 	lua_pushnil(l);
 	while (lua_next(l, 1)) {
 		const std::string_view value = LuaToString(l, -2);
 		if (value == "GameCycle") {
-			log->GameCycle = LuaToNumber(l, -1);
+			log.GameCycle = LuaToNumber(l, -1);
 		} else if (value == "UnitNumber") {
-			log->UnitNumber = LuaToNumber(l, -1);
+			log.UnitNumber = LuaToNumber(l, -1);
 		} else if (value == "UnitIdent") {
-			log->UnitIdent = LuaToString(l, -1);
+			log.UnitIdent = LuaToString(l, -1);
 		} else if (value == "Action") {
-			log->Action = LuaToString(l, -1);
+			log.Action = LuaToString(l, -1);
 		} else if (value == "Flush") {
-			log->Flush = LuaToNumber(l, -1);
+			log.Flush = LuaToNumber(l, -1);
 		} else if (value == "PosX") {
-			log->PosX = LuaToNumber(l, -1);
+			log.PosX = LuaToNumber(l, -1);
 		} else if (value == "PosY") {
-			log->PosY = LuaToNumber(l, -1);
+			log.PosY = LuaToNumber(l, -1);
 		} else if (value == "DestUnitNumber") {
-			log->DestUnitNumber = LuaToNumber(l, -1);
+			log.DestUnitNumber = LuaToNumber(l, -1);
 		} else if (value == "Value") {
-			log->Value = LuaToString(l, -1);
+			log.Value = LuaToString(l, -1);
 		} else if (value == "Num") {
-			log->Num = LuaToNumber(l, -1);
+			log.Num = LuaToNumber(l, -1);
 		} else if (value == "SyncRandSeed") {
-			log->SyncRandSeed = lua_tointeger(l, -1);
+			log.SyncRandSeed = lua_tointeger(l, -1);
 		} else {
 			LuaError(l, "Unsupported key: %s", value.data());
 		}
 		lua_pop(l, 1);
 	}
-
-	// Append to linked list
-	last = &CurrentReplay->Commands;
-	while (*last) {
-		last = &(*last)->Next;
-	}
-
-	*last = log;
-
+	CurrentReplay->Commands.push_back(std::move(log));
 	return 0;
 }
 
@@ -516,9 +466,6 @@ static int CclLog(lua_State *l)
 */
 static int CclReplayLog(lua_State *l)
 {
-	FullReplay *replay;
-	int j;
-
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -526,7 +473,7 @@ static int CclReplayLog(lua_State *l)
 
 	Assert(CurrentReplay == nullptr);
 
-	replay = new FullReplay;
+	std::unique_ptr<FullReplay> replay = std::make_unique<FullReplay>();
 
 	lua_pushnil(l);
 	while (lua_next(l, 1) != 0) {
@@ -551,7 +498,7 @@ static int CclReplayLog(lua_State *l)
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != PlayerMax) {
 				LuaError(l, "incorrect argument");
 			}
-			for (j = 0; j < PlayerMax; ++j) {
+			for (int j = 0; j < PlayerMax; ++j) {
 				int top;
 
 				lua_rawgeti(l, -1, j + 1);
@@ -603,7 +550,7 @@ static int CclReplayLog(lua_State *l)
 		lua_pop(l, 1);
 	}
 
-	CurrentReplay = replay;
+	CurrentReplay = std::move(replay);
 
 	// Apply CurrentReplay settings.
 	if (!SaveGameLoading) {
@@ -650,7 +597,7 @@ static void LoadReplay(const fs::path &name)
 		DisabledLog = true;
 	}
 	GameObserve = true;
-	InitReplay = 1;
+	InitReplay = true;
 }
 
 /**
@@ -663,11 +610,9 @@ void EndReplayLog()
 		delete LogFile;
 		LogFile = nullptr;
 	}
-	if (CurrentReplay) {
-		DeleteReplay(CurrentReplay);
-		CurrentReplay = nullptr;
-	}
-	ReplayStep = nullptr;
+	CurrentReplay = nullptr;
+
+	ReplayIndex = std::nullopt;
 }
 
 /**
@@ -675,11 +620,9 @@ void EndReplayLog()
 */
 void CleanReplayLog()
 {
-	if (CurrentReplay) {
-		DeleteReplay(CurrentReplay);
-		CurrentReplay = nullptr;
-	}
-	ReplayStep = nullptr;
+	CurrentReplay = nullptr;
+
+	ReplayIndex = std::nullopt;
 
 	// if (DisabledLog) {
 	CommandLogDisabled = false;
@@ -695,35 +638,36 @@ void CleanReplayLog()
 */
 static void DoNextReplay()
 {
-	Assert(ReplayStep != 0);
+	Assert(ReplayIndex);
 
-	NextLogCycle = ReplayStep->GameCycle;
+	const auto &ReplayStep = CurrentReplay->Commands[*ReplayIndex];
+	NextLogCycle = ReplayStep.GameCycle;
 
 	if (NextLogCycle != GameCycle) {
 		return;
 	}
 
-	const int unitSlot = ReplayStep->UnitNumber;
-	const auto& action = ReplayStep->Action;
-	const int flags = ReplayStep->Flush;
-	const Vec2i pos(ReplayStep->PosX, ReplayStep->PosY);
-	const int arg1 = ReplayStep->PosX;
-	const int arg2 = ReplayStep->PosY;
+	const int unitSlot = ReplayStep.UnitNumber;
+	const auto& action = ReplayStep.Action;
+	const int flags = ReplayStep.Flush;
+	const Vec2i pos(ReplayStep.PosX, ReplayStep.PosY);
+	const int arg1 = ReplayStep.PosX;
+	const int arg2 = ReplayStep.PosY;
 	CUnit *unit = unitSlot != -1 ? &UnitManager->GetSlotUnit(unitSlot) : nullptr;
-	CUnit *dunit = (ReplayStep->DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep->DestUnitNumber) : nullptr);
-	const auto& val = ReplayStep->Value;
-	const int num = ReplayStep->Num;
+	CUnit *dunit = (ReplayStep.DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep.DestUnitNumber) : nullptr);
+	const auto& val = ReplayStep.Value;
+	const int num = ReplayStep.Num;
 
-	Assert(unitSlot == -1 || ReplayStep->UnitIdent == unit->Type->Ident);
+	Assert(unitSlot == -1 || ReplayStep.UnitIdent == unit->Type->Ident);
 
-	if (SyncRandSeed != ReplayStep->SyncRandSeed) {
+	if (SyncRandSeed != ReplayStep.SyncRandSeed) {
 #ifdef DEBUG
-		if (!ReplayStep->SyncRandSeed) {
+		if (!ReplayStep.SyncRandSeed) {
 			// Replay without the 'sync info
 			ThisPlayer->Notify("%s", _("No sync info for this replay !"));
 		} else {
 			ThisPlayer->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
-			DebugPrint("OUT OF SYNC %u != %u\n", SyncRandSeed, ReplayStep->SyncRandSeed);
+			DebugPrint("OUT OF SYNC %u != %u\n", SyncRandSeed, ReplayStep.SyncRandSeed);
 			DebugPrint("OUT OF SYNC GameCycle %lu \n", GameCycle);
 			Assert(0);
 			// ReplayStep = 0;
@@ -732,7 +676,7 @@ static void DoNextReplay()
 		}
 #else
 		ThisPlayer->Notify("%s", _("Replay got out of sync !"));
-		ReplayStep = 0;
+		ReplayIndex = std::nullopt;
 		NextLogCycle = ~0UL;
 		return;
 #endif
@@ -823,8 +767,13 @@ static void DoNextReplay()
 		DebugPrint("Invalid action: %s", action.data());
 	}
 
-	ReplayStep = ReplayStep->Next;
-	NextLogCycle = ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL;
+	++*ReplayIndex;
+	if (*ReplayIndex == CurrentReplay->Commands.size()) {
+		ReplayIndex = std::nullopt;
+		NextLogCycle = ~0UL;
+	} else {
+		NextLogCycle = CurrentReplay->Commands[*ReplayIndex].GameCycle;
+	}
 }
 
 /**
@@ -841,12 +790,13 @@ static void ReplayEachCycle()
 				Players[i].SetName(CurrentReplay->PlayerNames[i]);
 			}
 		}
-		ReplayStep = CurrentReplay->Commands;
-		NextLogCycle = (ReplayStep ? (unsigned)ReplayStep->GameCycle : ~0UL);
-		InitReplay = 0;
+		ReplayIndex =
+			CurrentReplay->Commands.empty() ? std::nullopt : std::make_optional(std::size_t{0});
+		NextLogCycle = (ReplayIndex ? CurrentReplay->Commands[*ReplayIndex].GameCycle : ~0UL);
+		InitReplay = false;
 	}
 
-	if (!ReplayStep) {
+	if (!ReplayIndex) {
 		SetMessage("%s", _("End of replay"));
 		GameObserve = false;
 		return;
@@ -858,9 +808,9 @@ static void ReplayEachCycle()
 
 	do {
 		DoNextReplay();
-	} while (ReplayStep && (NextLogCycle == ~0UL || NextLogCycle == GameCycle));
+	} while (ReplayIndex && (NextLogCycle == ~0UL || NextLogCycle == GameCycle));
 
-	if (!ReplayStep) {
+	if (!ReplayIndex) {
 		SetMessage("%s", _("End of replay"));
 		GameObserve = false;
 	}
