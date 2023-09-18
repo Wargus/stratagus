@@ -51,10 +51,6 @@ CUnitManager *UnitManager;          /// Unit manager
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUnitManager::CUnitManager() : lastCreated(nullptr)
-{
-}
-
 /**
 **  Initial memory allocation for units.
 */

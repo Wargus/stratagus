@@ -633,7 +633,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->PoisonDrain = LuaToNumber(l, -1);
 		} else if (value == "ShieldPoints") {
 			if (lua_istable(l, -1)) {
-				DefineVariableField(l, type->DefaultStat.Variables + SHIELD_INDEX, -1);
+				DefineVariableField(l, &type->DefaultStat.Variables[SHIELD_INDEX], -1);
 			} else if (lua_isnumber(l, -1)) {
 				type->DefaultStat.Variables[SHIELD_INDEX].Max = LuaToNumber(l, -1);
 				type->DefaultStat.Variables[SHIELD_INDEX].Value = 0;
@@ -1127,7 +1127,7 @@ static int CclDefineUnitType(lua_State *l)
 				if (lua_isboolean(l, -1)) {
 					type->DefaultStat.Variables[index].Enable = LuaToBoolean(l, -1);
 				} else if (lua_istable(l, -1)) {
-					DefineVariableField(l, type->DefaultStat.Variables + index, -1);
+					DefineVariableField(l, &type->DefaultStat.Variables[index], -1);
 				} else if (lua_isnumber(l, -1)) {
 					type->DefaultStat.Variables[index].Enable = 1;
 					type->DefaultStat.Variables[index].Value = LuaToNumber(l, -1);
@@ -1460,7 +1460,7 @@ static int CclDefineUnitStats(lua_State *l)
 			if (i != -1) { // valid index
 				lua_rawgeti(l, 3, j + 1);
 				if (lua_istable(l, -1)) {
-					DefineVariableField(l, stats->Variables + i, -1);
+					DefineVariableField(l, &stats->Variables[i], -1);
 				} else if (lua_isnumber(l, -1)) {
 					stats->Variables[i].Enable = 1;
 					stats->Variables[i].Value = LuaToNumber(l, -1);

@@ -225,10 +225,10 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		|| ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
-	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (!condition->BoolFlags.empty() && !unit.Type->CheckUserBoolFlags(condition->BoolFlags.data())) {
 		return false;
 	}
-	if (condition->Variables) {
+	if (!condition->Variables.empty()) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			char v = condition->Variables[i];
 			if (v < 0) {
@@ -277,7 +277,7 @@ using UStrInt = std::variant<int, const char *>;
 */
 UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 {
-	CVariable *var;
+	const CVariable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 
@@ -319,7 +319,7 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 
 UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 {
-	CVariable *var;
+	const CVariable *var = nullptr;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
 

@@ -84,7 +84,7 @@ CUnitStats::~CUnitStats()
 	delete [] this->Variables;
 }
 
-const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
+CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->Costs[i] = rhs.Costs[i];
@@ -126,12 +126,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 }
 
 CUpgrade::CUpgrade(std::string ident) :
-	Ident(std::move(ident)), ID(0)
-{
-	memset(this->Costs, 0, sizeof(this->Costs));
-}
-
-CUpgrade::~CUpgrade()
+	Ident(std::move(ident))
 {
 }
 
@@ -254,8 +249,7 @@ static int CclDefineModifier(lua_State *l)
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
 	um->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-	um->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
-	memset(um->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
+	um->ModifyPercent.resize(UnitTypeVar.GetNumberVariable());
 
 	std::string_view upgrade_ident = LuaToString(l, 1);
 	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
@@ -339,7 +333,7 @@ static int CclDefineModifier(lua_State *l)
 				} else {
 					lua_rawgeti(l, j + 1, 2);
 					if (lua_istable(l, -1)) {
-						DefineVariableField(l, um->Modifier.Variables + index, -1);
+						DefineVariableField(l, &um->Modifier.Variables[index], -1);
 					} else if (lua_isnumber(l, -1)) {
 						um->Modifier.Variables[index].Enable = 1;
 						um->Modifier.Variables[index].Value = LuaToNumber(l, -1);

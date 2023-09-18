@@ -52,7 +52,7 @@ class CUnitManager
 public:
 	using Iterator = std::vector<CUnit *>::iterator;
 public:
-	CUnitManager();
+	CUnitManager() = default;
 	void Init();
 
 	CUnit *AllocUnit();
@@ -64,10 +64,7 @@ public:
 	void Add(CUnit *unit);
 	Iterator begin();
 	Iterator end();
-	const std::vector<CUnit *> &GetUnits() const
-	{
-		return units;
-	}
+	const std::vector<CUnit *> &GetUnits() const { return units; }
 
 	bool empty() const;
 
@@ -81,7 +78,7 @@ private:
 	std::vector<CUnit *> units;
 	std::vector<CUnit *> unitSlots;
 	std::list<CUnit *> releasedUnits;
-	CUnit *lastCreated;
+	CUnit *lastCreated = nullptr;
 };
 
 

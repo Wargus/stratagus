@@ -126,24 +126,8 @@ CUnitInfoPanel::~CUnitInfoPanel()
 }
 
 
-CUserInterface::CUserInterface() :
-	MouseScroll(false), KeyScroll(false), KeyScrollSpeed(1),
-	MouseScrollSpeed(1), MouseScrollSpeedDefault(0), MouseScrollSpeedControl(0),
-	NormalFontColor("yellow"), ReverseFontColor("white"),
-	SingleSelectedButton(nullptr),
-	MaxSelectedFont(nullptr), MaxSelectedTextX(0), MaxSelectedTextY(0),
-	SingleTrainingButton(nullptr),
-	SingleTrainingFont(nullptr), SingleTrainingTextX(0), SingleTrainingTextY(0),
-	TrainingFont(nullptr), TrainingTextX(0), TrainingTextY(0),
-	CompletedBarColor(0), CompletedBarShadow(0),
-	ViewportMode(VIEWPORT_SINGLE), MouseViewport(nullptr),
-	SelectedViewport(nullptr), NumViewports(0),
-	MessageFont(nullptr), MessageScrollSpeed(5),
-	ViewportCursorColor(0), Offset640X(0), Offset480Y(0),
-	VictoryBackgroundG(nullptr), DefeatBackgroundG(nullptr)
+CUserInterface::CUserInterface()
 {
-	MouseWarpPos.x = MouseWarpPos.y = -1;
-
 	Point.Name = "cursor-point";
 	Glass.Name = "cursor-glass";
 	Cross.Name = "cursor-cross";
@@ -161,22 +145,7 @@ CUserInterface::CUserInterface() :
 	ArrowS.Name = "cursor-arrow-s";
 	ArrowSE.Name = "cursor-arrow-se";
 
-	NormalFontColor = "light-blue";
-	ReverseFontColor = "yellow";
-
-	LifeBarColorNames.push_back("dark-green");
-	LifeBarColorNames.push_back("yellow");
-	LifeBarColorNames.push_back("orange");
-	LifeBarColorNames.push_back("red");
-
-    LifeBarPercents.push_back(75);
-	LifeBarPercents.push_back(50);
-	LifeBarPercents.push_back(25);
-	LifeBarPercents.push_back(0);
-
-	LifeBarBorder = true;
-	LifeBarYOffset = 0;
-	LifeBarPadding = 0;
+	LifeBarColorNames = {"dark-green", "yellow", "orange", "red"};
 }
 
 /**
