@@ -147,16 +147,16 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		if (resultPos) {
 			*resultPos = from;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -228,13 +228,13 @@ VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, co
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -275,18 +275,18 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
 		DebugPrint("Target found %d,%d\n", pos.x, pos.y);
 		*resultPos = pos;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 

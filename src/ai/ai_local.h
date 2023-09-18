@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <array>
 #include <vector>
 
 #include "upgrade_structs.h" // MaxCost
@@ -71,10 +72,10 @@ public:
 class AiRequestType
 {
 public:
-	AiRequestType() : Count(0), Type(nullptr) {}
+	AiRequestType() = default;
 
-	unsigned int Count;  /// elements in table
-	CUnitType *Type;     /// the type
+	unsigned int Count = 0;    /// elements in table
+	CUnitType *Type = nullptr; /// the type
 };
 
 /**
@@ -83,10 +84,10 @@ public:
 class AiUnitType
 {
 public:
-	AiUnitType() : Want(0), Type(nullptr) {}
+	AiUnitType() = default;
 
-	unsigned int Want; /// number of this unit-type wanted
-	CUnitType *Type;   /// unit-type self
+	unsigned int Want = 0;     /// number of this unit-type wanted
+	CUnitType *Type = nullptr; /// unit-type self
 };
 
 /**
@@ -118,13 +119,7 @@ class AiForce
 {
 	friend class AiForceManager;
 public:
-	AiForce() :
-		Completed(false), Defending(false), Attacking(false),
-		Role(AiForceRole::Default), FormerForce(-1), State(AiForceAttackingState::Free),
-		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
-	{
-		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
-	}
+	AiForce() = default;
 
 	void Remove(CUnit &unit)
 	{
@@ -153,9 +148,9 @@ public:
 		Units.clear();
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
 	}
-	inline size_t Size() const { return Units.size(); }
+	size_t Size() const { return Units.size(); }
 
-	inline bool IsAttacking() const { return (!Defending && Attacking); }
+	bool IsAttacking() const { return (!Defending && Attacking); }
 
 	void Attack(const Vec2i &pos);
 	void RemoveDeadUnit();
@@ -174,20 +169,20 @@ private:
 	static void InternalRemoveUnit(CUnit *unit);
 
 public:
-	bool Completed;    /// Flag saying force is complete build
-	bool Defending;    /// Flag saying force is defending
-	bool Attacking;    /// Flag saying force is attacking
-	AiForceRole Role;  /// Role of the force
+	bool Completed = false;    /// Flag saying force is complete build
+	bool Defending = false;    /// Flag saying force is defending
+	bool Attacking = false;    /// Flag saying force is attacking
+	AiForceRole Role = AiForceRole::Default;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type
 	CUnitCache Units;  /// Units in the force
 
 	// If attacking
-	int FormerForce;             /// Original force number
-	AiForceAttackingState State; /// Attack state
-	Vec2i GoalPos; /// Attack point tile map position
-	Vec2i HomePos; /// Return after attack tile map position
-	int WaitOnRallyPoint; /// Counter for waiting on rally point
+	int FormerForce = -1;             /// Original force number
+	AiForceAttackingState State = AiForceAttackingState::Free; /// Attack state
+	Vec2i GoalPos{-1, -1}; /// Attack point tile map position
+	Vec2i HomePos{-1, -1}; /// Return after attack tile map position
+	int WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT; /// Counter for waiting on rally point
 };
 
 // forces
@@ -204,7 +199,7 @@ class AiForceManager
 public:
 	AiForceManager();
 
-	inline size_t Size() const { return forces.size(); }
+	size_t Size() const { return forces.size(); }
 
 	const AiForce &operator[](unsigned int index) const { return forces[index]; }
 	AiForce &operator[](unsigned int index) { return forces[index]; }
@@ -232,7 +227,8 @@ public:
 	bool Assign(CUnit &unit, int force = -1);
 	void Update();
 	unsigned int FindFreeForce(AiForceRole role = AiForceRole::Default, int begin = 0);
-	void CheckUnits(int *counter);
+	void CheckUnits(std::array<int, UnitTypeMax> &counter);
+
 private:
 	std::vector<AiForce> forces;
 	char script[AI_MAX_FORCES];
@@ -246,17 +242,14 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(nullptr), Wait(0)
-	{
-		Pos.x = Pos.y = -1;
-	}
+	AiBuildQueue() = default;
 
 public:
-	unsigned int Want;  /// requested number
-	unsigned int Made;  /// built number
-	CUnitType *Type;    /// unit-type
-	unsigned long Wait; /// wait until this cycle
-	Vec2i Pos;          /// build near pos on map
+	unsigned int Want = 0;  /// requested number
+	unsigned int Made = 0;  /// built number
+	CUnitType *Type = nullptr; /// unit-type
+	unsigned long Wait = 0; /// wait until this cycle
+	Vec2i Pos{-1, -1}; /// build near pos on map
 };
 
 /**
@@ -278,44 +271,35 @@ public:
 class PlayerAi
 {
 public:
-	PlayerAi() : Player(nullptr), AiType(nullptr),
-		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
-		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
-	{
-		memset(Reserve, 0, sizeof(Reserve));
-		memset(Used, 0, sizeof(Used));
-		memset(Needed, 0, sizeof(Needed));
-		memset(Collect, 0, sizeof(Collect));
-	}
+	PlayerAi() = default;
 
 public:
-	CPlayer *Player;            /// Engine player structure
-	CAiType *AiType;            /// AI type of this player AI
+	CPlayer *Player = nullptr;  /// Engine player structure
+	CAiType *AiType = nullptr;  /// AI type of this player AI
 	// controller
 	std::string Script;         /// Script executed
-	unsigned long SleepCycles;  /// Cycles to sleep
+	unsigned long SleepCycles = 0; /// Cycles to sleep
 
 	AiForceManager Force;  /// Forces controlled by AI
 
 	// resource manager
-	int Reserve[MaxCosts]; /// Resources to keep in reserve
-	int Used[MaxCosts];    /// Used resources
-	int Needed[MaxCosts];  /// Needed resources
-	int Collect[MaxCosts]; /// Collect % of resources
-	int NeededMask;        /// Mask for needed resources
-	bool NeedSupply;       /// Flag need food
-	bool ScriptDebug;      /// Flag script debuging on/off
-	bool BuildDepots;      /// Build new depots if nessesary
+	int Reserve[MaxCosts]{}; /// Resources to keep in reserve
+	int Used[MaxCosts]{};    /// Used resources
+	int Needed[MaxCosts]{};  /// Needed resources
+	int Collect[MaxCosts]{}; /// Collect % of resources
+	int NeededMask = 0;      /// Mask for needed resources
+	bool NeedSupply = false; /// Flag need food
+	bool ScriptDebug = false;/// Flag script debuging on/off
+	bool BuildDepots = true; /// Build new depots if nessesary
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
-	unsigned long LastExplorationGameCycle;       /// When did the last explore occur?
-	unsigned long LastCanNotMoveGameCycle;        /// Last can not move cycle
+	unsigned long LastExplorationGameCycle = 0;   /// When did the last explore occur?
+	unsigned long LastCanNotMoveGameCycle = 0;    /// Last can not move cycle
 	std::vector<AiRequestType> UnitTypeRequests;  /// unit-types to build/train request,priority list
 	std::vector<CUnitType *> UpgradeToRequests;   /// Upgrade to unit-type requested and priority list
 	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
-	int LastRepairBuilding;                       /// Last building checked for repair in this turn
+	int LastRepairBuilding = 0;                   /// Last building checked for repair in this turn
 };
 
 /**
@@ -332,58 +316,58 @@ public:
 	** The index is the unit that should be trained, giving a table of all
 	** units/buildings which could train this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > &Train();
+	std::vector<std::vector<CUnitType *>> &Train();
 	/**
 	** The index is the unit that should be build, giving a table of all
 	** units/buildings which could build this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > &Build();
+	std::vector<std::vector<CUnitType *>> &Build();
 	/**
 	** The index is the upgrade that should be made, giving a table of all
 	** units/buildings which could do the upgrade.
 	*/
-	std::vector<std::vector<CUnitType *> > &Upgrade();
+	std::vector<std::vector<CUnitType *>> &Upgrade();
 	/**
 	** The index is the research that should be made, giving a table of all
 	** units/buildings which could research this upgrade. This table only
 	** includes those unit types which have the research defined as a button
 	** without the "check-single-research" restriction.
 	*/
-	std::vector<std::vector<CUnitType *> > &Research();
+	std::vector<std::vector<CUnitType *>> &Research();
 	/**
 	** The index is the research that should be made, giving a table of all
 	** units/buildings which could research this upgrade. This table only
 	** includes those unit types which have the research defined as a button
 	** with the "check-single-research" restriction.
 	*/
-	std::vector<std::vector<CUnitType *> > &SingleResearch();
+	std::vector<std::vector<CUnitType *>> &SingleResearch();
 	/**
 	** The index is the unit that should be repaired, giving a table of all
 	** units/buildings which could repair this unit.
 	*/
-	std::vector<std::vector<CUnitType *> > &Repair();
+	std::vector<std::vector<CUnitType *>> &Repair();
 	/**
 	** The index is the unit-limit that should be solved, giving a table of all
 	** units/buildings which could reduce this unit-limit.
 	*/
-	std::vector<std::vector<CUnitType *> > &UnitLimit();
+	std::vector<std::vector<CUnitType *>> &UnitLimit();
 	/**
 	** The index is the unit that should be made, giving a table of all
 	** units/buildings which are equivalent.
 	*/
-	std::vector<std::vector<CUnitType *> > &Equiv();
+	std::vector<std::vector<CUnitType *>> &Equiv();
 
 	/**
 	** The index is the resource id - 1 (we can't mine TIME), giving a table of all
 	** units/buildings/mines which can harvest this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > &Refinery();
+	std::vector<std::vector<CUnitType *>> &Refinery();
 
 	/**
 	** The index is the resource id - 1 (we can't store TIME), giving a table of all
 	** units/buildings/mines which can store this resource.
 	*/
-	std::vector<std::vector<CUnitType *> > &Depots();
+	std::vector<std::vector<CUnitType *>> &Depots();
 };
 
 /*----------------------------------------------------------------------------
@@ -421,7 +405,7 @@ extern void AiResetUnitTypeEquiv();
 extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
 /// Finds all available equivalents units to a given one, in the preferred order
 extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
-extern int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax]);
+extern std::array<int, UnitTypeMax> AiGetBuildRequestsCount(const PlayerAi &pai);
 
 extern void AiNewDepotRequest(CUnit &worker);
 extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);

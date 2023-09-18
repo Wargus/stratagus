@@ -130,11 +130,11 @@ public:
 //  Terrain traversal stuff.
 //
 
-enum VisitResult {
-	VisitResult_Finished,
-	VisitResult_DeadEnd,
-	VisitResult_Ok,
-	VisitResult_Cancel
+enum class VisitResult {
+	Finished,
+	DeadEnd,
+	Ok,
+	Cancel
 };
 
 class TerrainTraversal
@@ -182,10 +182,10 @@ bool TerrainTraversal::Run(T &context)
 		const PosNode &posNode = m_queue.front();
 
 		switch (context.Visit(*this, posNode.pos, posNode.from)) {
-			case VisitResult_Finished: return true;
-			case VisitResult_DeadEnd: Set(posNode.pos, -1); break;
-			case VisitResult_Ok: PushNeighboor(posNode.pos); break;
-			case VisitResult_Cancel: return false;
+			case VisitResult::Finished: return true;
+			case VisitResult::DeadEnd: Set(posNode.pos, -1); break;
+			case VisitResult::Ok: PushNeighboor(posNode.pos); break;
+			case VisitResult::Cancel: return false;
 		}
 		Assert(IsVisited(posNode.pos));
 	}

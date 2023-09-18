@@ -91,23 +91,23 @@ private:
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
 	if (CanMoveToMask(pos, movemask)) {
 		if (resPos) {
 			*resPos = from;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (Map.Field(pos)->CheckMask(resmask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 

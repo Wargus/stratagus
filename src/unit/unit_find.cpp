@@ -86,22 +86,22 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
 	CUnit *unit = FindUnitAtPos(pos);
 	if (unit) {
 		*unitP = unit;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -122,23 +122,23 @@ private:
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 	// Look if found what was required.
 	if (Map.Field(pos)->CheckMask(resmask)) {
 		if (resPos) {
 			*resPos = pos;
 		}
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		if (terrainTraversal.Get(pos) <= maxDist) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -378,7 +378,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
@@ -391,19 +391,19 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			*resultMine = mine;
 
 			if (cost.IsMin()) {
-				return VisitResult_Finished;
+				return VisitResult::Finished;
 			}
 			bestCost = cost;
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		if (terrainTraversal.Get(pos) < maxRange) {
-			return VisitResult_Ok;
+			return VisitResult::Ok;
 		} else {
-			return VisitResult_DeadEnd;
+			return VisitResult::DeadEnd;
 		}
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
