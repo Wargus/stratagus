@@ -66,11 +66,6 @@ public:
 	unsigned long LastUpdate;   /// GameCycle of last update
 };
 
-#define ANY_UNIT ((const CUnitType *)0)
-#define ALL_FOODUNITS ((const CUnitType *)-1)
-#define ALL_BUILDINGS ((const CUnitType *)-2)
-
-
 /**
 **  Data to referer game info when game running.
 */
@@ -95,7 +90,8 @@ extern TriggerDataType TriggerData;
 ----------------------------------------------------------------------------*/
 
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
-extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
+extern std::function<bool(const CUnit &)>
+TriggerGetUnitType(lua_State *l); /// get the unit-type validator
 extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features

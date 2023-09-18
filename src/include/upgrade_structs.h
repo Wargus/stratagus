@@ -129,23 +129,18 @@ extern int GetResourceIdByName(lua_State *l, std::string_view resourceName);
 class CUnitStats
 {
 public:
-	CUnitStats() : Variables(nullptr)
-	{
-		memset(Costs, 0, sizeof(Costs));
-		memset(Storing, 0, sizeof(Storing));
-		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
-	}
+	CUnitStats() = default;
 	~CUnitStats();
 
-	const CUnitStats &operator = (const CUnitStats &rhs);
+	CUnitStats &operator=(const CUnitStats &rhs);
 
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;
 public:
-	CVariable *Variables;           /// user defined variable.
-	int Costs[MaxCosts];            /// current costs of the unit
-	int Storing[MaxCosts];          /// storage increasing
-	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
+	CVariable *Variables = nullptr; /// user defined variable.
+	int Costs[MaxCosts]{};          /// current costs of the unit
+	int Storing[MaxCosts]{};        /// storage increasing
+	int ImproveIncomes[MaxCosts]{}; /// Gives player an improved income
 };
 
 /**
@@ -155,7 +150,6 @@ class CUpgrade
 {
 public:
 	explicit CUpgrade(std::string ident);
-	~CUpgrade();
 
 	static CUpgrade *New(std::string ident);
 	static CUpgrade *Get(std::string_view ident);
@@ -164,10 +158,10 @@ public:
 
 	std::string Ident;                /// identifier
 	std::string Name;                 /// upgrade label
-	int   ID;                         /// numerical id
-	int   Costs[MaxCosts];            /// costs for the upgrade
+	int ID = 0;            /// numerical id
+	int Costs[MaxCosts]{}; /// costs for the upgrade
 	// TODO: not used by buttons
-	CIcon *Icon;                      /// icon to display to the user
+	CIcon *Icon = nullptr; /// icon to display to the user
 };
 
 /*----------------------------------------------------------------------------
@@ -182,33 +176,24 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(nullptr), SpeedResearch(0), ConvertTo(nullptr)
-	{
-		memset(ChangeUnits, 0, sizeof(ChangeUnits));
-		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
-		memset(ApplyTo, 0, sizeof(ApplyTo));
-	}
-	~CUpgradeModifier()
-	{
-		delete [] this->ModifyPercent;
-	}
+	CUpgradeModifier() = default;
 
-	int UpgradeId;                      /// used to filter required modifier
+	int UpgradeId = 0;            /// used to filter required modifier
 
-	CUnitStats Modifier;                /// modifier of unit stats.
-	int *ModifyPercent;                 /// use for percent modifiers
-	int SpeedResearch;                  /// speed factor for researching
-	int ImproveIncomes[MaxCosts];		/// improve incomes
+	CUnitStats Modifier;          /// modifier of unit stats.
+	std::vector<int> ModifyPercent; /// use for percent modifiers
+	int SpeedResearch = 0;          /// speed factor for researching
+	int ImproveIncomes[MaxCosts]{}; /// improve incomes
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
 	// TODO: see below allow more semantics?
 	// TODO: pointers or ids would be faster and less memory use
-	int  ChangeUnits[UnitTypeMax];      /// add/remove allowed units
-	char ChangeUpgrades[UpgradeMax];    /// allow/forbid upgrades
-	char ApplyTo[UnitTypeMax];          /// which unit types are affected
+	int ChangeUnits[UnitTypeMax]{};    /// add/remove allowed units
+	char ChangeUpgrades[UpgradeMax]{}; /// allow/forbid upgrades
+	char ApplyTo[UnitTypeMax]{};       /// which unit types are affected
 
-	CUnitType *ConvertTo;               /// convert to this unit-type.
+	CUnitType *ConvertTo = nullptr;    /// convert to this unit-type.
 };
 
 /**
@@ -227,7 +212,7 @@ public:
 class CAllow
 {
 public:
-	CAllow() { this->Clear(); }
+	CAllow() = default;
 
 	void Clear()
 	{
@@ -235,8 +220,8 @@ public:
 		memset(Upgrades, 0, sizeof(Upgrades));
 	}
 
-	int  Units[UnitTypeMax];        /// maximum amount of units allowed
-	char Upgrades[UpgradeMax];      /// upgrades allowed/disallowed
+	int Units[UnitTypeMax]{}; /// maximum amount of units allowed
+	char Upgrades[UpgradeMax]{}; /// upgrades allowed/disallowed
 };
 
 /**
@@ -246,18 +231,15 @@ public:
 class CUpgradeTimers
 {
 public:
-	CUpgradeTimers() { this->Clear(); }
+	CUpgradeTimers() = default;
 
-	void Clear()
-	{
-		memset(Upgrades, 0, sizeof(Upgrades));
-	}
+	void Clear() { memset(Upgrades, 0, sizeof(Upgrades)); }
 
 	/**
 	**  all 0 at the beginning, all upgrade actions do increment values in
 	**  this struct.
 	*/
-	int Upgrades[UpgradeMax];       /// counter for each upgrade
+	int Upgrades[UpgradeMax]{}; /// counter for each upgrade
 };
 
 /*----------------------------------------------------------------------------

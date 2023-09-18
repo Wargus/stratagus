@@ -85,18 +85,15 @@ enum TextAlignment {
 class ButtonStyleProperties
 {
 public:
-	ButtonStyleProperties() : Sprite(nullptr), Frame(0), BorderColor(0),
-		BorderSize(0), TextAlign(TextAlignUndefined),
-		TextPos(0, 0)
-	{}
+	ButtonStyleProperties() = default;
 
-	CGraphic *Sprite;
-	int Frame;
+	CGraphic *Sprite = nullptr;
+	int Frame = 0;
 	CColor BorderColorRGB;
-	IntColor BorderColor;
-	int BorderSize;
-	TextAlignment TextAlign;        /// Text alignment
-	PixelPos TextPos;               /// Text location
+	IntColor BorderColor = 0;
+	int BorderSize = 0;
+	TextAlignment TextAlign = TextAlignUndefined; /// Text alignment
+	PixelPos TextPos{0, 0};         /// Text location
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
 };
@@ -104,17 +101,16 @@ public:
 class ButtonStyle
 {
 public:
-	ButtonStyle() : Width(0), Height(0), Font(0),
-		TextAlign(TextAlignUndefined), TextX(0), TextY(0) {}
+	ButtonStyle() = default;
 
-	int Width;                      /// Button width
-	int Height;                     /// Button height
-	CFont *Font;                    /// Font
+	int Width = 0;                  /// Button width
+	int Height = 0;                 /// Button height
+	CFont *Font = nullptr;          /// Font
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
-	TextAlignment TextAlign;        /// Text alignment
-	int TextX;                      /// Text X location
-	int TextY;                      /// Text Y location
+	TextAlignment TextAlign = TextAlignUndefined; /// Text alignment
+	int TextX = 0;                  /// Text X location
+	int TextY = 0;                  /// Text Y location
 	ButtonStyleProperties Default;  /// Default button properties
 	ButtonStyleProperties Hover;    /// Hover button properties
 	ButtonStyleProperties Clicked;  /// Clicked button properties
@@ -124,23 +120,21 @@ public:
 class CUIButton
 {
 public:
-	CUIButton() : X(0), Y(0), Style(nullptr), Callback(nullptr) {} //OLD BUTTON STYLE CODE
-	// NEW CODE BELOW, THANKS TO ANDRETTIN - MODIFIED BY DINKY
-	// CUIButton() : X(0), Y(0), Clicked(false), HotKeyPressed(false), Style(nullptr), Callback(nullptr) {}
-	~CUIButton() {}
+	CUIButton() = default;
 
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// x coordinate on the screen
-	int Y;                          /// y coordinate on the screen
+	int X = 0;                          /// x coordinate on the screen
+	int Y = 0;                          /// y coordinate on the screen
 	//NEW CODE START
-	//bool Clicked;			/// whether the button is currently clicked or not
-	//bool HotKeyPressed;		/// whether the buttons hotkey is currently pressed or not
+	// NEW CODE BELOW, THANKS TO ANDRETTIN - MODIFIED BY DINKY
+	//bool Clicked = false;       /// whether the button is currently clicked or not
+	//bool HotKeyPressed = false; /// whether the buttons hotkey is currently pressed or not
 	// NEW CODE END
 	std::string Text;               /// button text
-	ButtonStyle *Style;             /// button style
-	LuaActionListener *Callback;    /// callback function
+	ButtonStyle *Style = nullptr;          /// button style
+	LuaActionListener *Callback = nullptr; /// callback function
 };
 
 #define MAX_NUM_VIEWPORTS 8         /// Number of supported viewports
@@ -162,21 +156,19 @@ enum ViewportModeType {
 class CMapArea
 {
 public:
-	CMapArea() : X(0), Y(0), EndX(0), EndY(0),
-		ScrollPaddingLeft(0), ScrollPaddingRight(0),
-		ScrollPaddingTop(0), ScrollPaddingBottom(0) {}
+	CMapArea() = default;
 
 	bool Contains(const PixelPos &screenPos) const;
 
 public:
-	int X;                          /// Screen pixel left corner x coordinate adjusted for current map size
-	int Y;                          /// Screen pixel upper corner y coordinate adjusted for current map size 
-	int EndX;                       /// Screen pixel right x coordinate adjusted for current map size
-	int EndY;                       /// Screen pixel bottom y coordinate adjusted for current map size
-	int ScrollPaddingLeft;          /// Scrollable area past the left of map
-	int ScrollPaddingRight;         /// Scrollable area past the right of map
-	int ScrollPaddingTop;           /// Scrollable area past the top of map
-	int ScrollPaddingBottom;        /// Scrollable area past the bottom of map
+	int X = 0;                   /// Screen pixel left corner x coordinate adjusted for current map size
+	int Y = 0;                   /// Screen pixel upper corner y coordinate adjusted for current map size 
+	int EndX = 0;                /// Screen pixel right x coordinate adjusted for current map size
+	int EndY = 0;                /// Screen pixel bottom y coordinate adjusted for current map size
+	int ScrollPaddingLeft = 0;   /// Scrollable area past the left of map
+	int ScrollPaddingRight = 0;  /// Scrollable area past the right of map
+	int ScrollPaddingTop = 0;    /// Scrollable area past the top of map
+	int ScrollPaddingBottom = 0; /// Scrollable area past the bottom of map
 };
 
 /**
@@ -185,23 +177,16 @@ public:
 class ConditionPanel
 {
 public:
-	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
-		HideAllied(false), ShowOpponent(false), BoolFlags(nullptr),
-		Variables(nullptr) {}
-	~ConditionPanel()
-	{
-		delete[] BoolFlags;
-		delete[] Variables;
-	}
+	ConditionPanel() = default;
 
-	bool ShowOnlySelected;      /// if true, show only for selected unit.
+	bool ShowOnlySelected = false; /// if true, show only for selected unit.
 
-	bool HideNeutral;           /// if true, don't show for neutral unit.
-	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
-	bool ShowOpponent;          /// if true, show for opponent unit.
+	bool HideNeutral = false;      /// if true, don't show for neutral unit.
+	bool HideAllied = false;       /// if true, don't show for allied unit. (but show own units)
+	bool ShowOpponent = false;     /// if true, show for opponent unit.
 
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
+	std::vector<char> BoolFlags;   /// array of condition about user flags.
+	std::vector<char> Variables;   /// array of variable to verify (enable and max > 0)
 };
 
 /**
@@ -210,26 +195,25 @@ public:
 class CUnitInfoPanel
 {
 public:
-	CUnitInfoPanel() : PosX(0), PosY(0), DefaultFont(0),
-		Contents(), Condition(nullptr) {}
+	CUnitInfoPanel() = default;
 	~CUnitInfoPanel();
 
 public:
 	std::string Name;      /// Ident of the panel.
-	int PosX;              /// X coordinate of the panel.
-	int PosY;              /// Y coordinate of the panel.
-	CFont *DefaultFont;    /// Default font for content.
+	int PosX = 0;          /// X coordinate of the panel.
+	int PosY = 0;          /// Y coordinate of the panel.
+	CFont *DefaultFont = nullptr; /// Default font for content.
 
-	std::vector<CContentType *>Contents; /// Array of contents to display.
+	std::vector<CContentType *> Contents; /// Array of contents to display.
 
-	ConditionPanel *Condition; /// Condition to show the panel; if nullptr, no condition.
+	ConditionPanel *Condition = nullptr; /// Condition to show the panel; if nullptr, no condition.
 };
 
 
 class CFiller
 {
 	struct bits_map {
-		bits_map() : Width(0), Height(0), bstore(nullptr) {}
+		bits_map() = default;
 		~bits_map();
 
 		void Init(CGraphic *g);
@@ -246,14 +230,14 @@ class CFiller
 			return false;
 		};
 
-		int Width;
-		int Height;
-		unsigned int *bstore;
+		int Width = 0;
+		int Height = 0;
+		unsigned int *bstore = nullptr;
 	};
 
 	bits_map map;
 public:
-	CFiller() : G(nullptr), X(0), Y(0) {}
+	CFiller() = default;
 
 	void Load();
 
@@ -266,16 +250,15 @@ public:
 		}
 		return false;
 	}
-	CGraphic *G;         /// Graphic
-	int X;               /// X coordinate
-	int Y;               /// Y coordinate
+	CGraphic *G = nullptr;   /// Graphic
+	int X = 0;               /// X coordinate
+	int Y = 0;               /// Y coordinate
 };
 
 class CButtonPanel
 {
 public:
-	CButtonPanel() : G(nullptr), X(0), Y(0), ShowCommandKey(true)
-	{}
+	CButtonPanel() = default;
 
 	void Draw();
 	void Update();
@@ -304,27 +287,23 @@ private:
 
 
 public:
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 	std::vector<CUIButton> Buttons;
 	CColor AutoCastBorderColorRGB;
-	bool ShowCommandKey;
+	bool ShowCommandKey = true;
 };
 
 class CPieMenu
 {
 public:
-	CPieMenu() : G(nullptr), MouseButton(NoButton)
-	{
-		memset(this->X, 0, sizeof(this->X));
-		memset(this->Y, 0, sizeof(this->Y));
-	}
+	CPieMenu() = default;
 
-	CGraphic *G;         /// Optional background image
-	int MouseButton;     /// Which mouse button pops up the piemenu, deactivate with NoButton
-	int X[9];            /// X position of the pies
-	int Y[9];            /// Y position of the pies
+	CGraphic *G = nullptr;      /// Optional background image
+	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
+	int X[9]{}; /// X position of the pies
+	int Y[9]{}; /// Y position of the pies
 
 	void SetRadius(int radius)
 	{
@@ -340,16 +319,15 @@ public:
 class CResourceInfo
 {
 public:
-	CResourceInfo() : G(nullptr), IconFrame(0), IconX(0), IconY(0), IconWidth(-1),
-		TextX(-1), TextY(-1) {}
+	CResourceInfo() = default;
 
-	CGraphic *G;   /// icon graphic
-	int IconFrame; /// icon frame
-	int IconX;     /// icon X position
-	int IconY;     /// icon Y position
-	int IconWidth; /// icon W size
-	int TextX;     /// text X position
-	int TextY;     /// text Y position
+	CGraphic *G = nullptr;   /// icon graphic
+	int IconFrame = 0; /// icon frame
+	int IconX = 0;     /// icon X position
+	int IconY = 0;     /// icon Y position
+	int IconWidth = -1; /// icon W size
+	int TextX = -1;     /// text X position
+	int TextY = -1;     /// text Y position
 };
 #define MaxResourceInfo  MaxCosts + 4 /// +4 for food and score and mana and free workers count
 
@@ -360,17 +338,17 @@ public:
 
 	void Draw();
 
-	CGraphic *G;
-	int X;
-	int Y;
+	CGraphic *G = nullptr;
+	int X = 0;
+	int Y = 0;
 };
 
 class CUIUserButton
 {
 public:
-	CUIUserButton() : Clicked(false) {}
+	CUIUserButton() = default;
 
-	bool Clicked;            // true if button is clicked, false otherwise
+	bool Clicked = false;    // true if button is clicked, false otherwise
 	CUIButton Button;        // User button
 };
 
@@ -386,62 +364,62 @@ public:
 	void Load();
 
 
-	bool MouseScroll;                   /// Enable mouse scrolling
-	bool KeyScroll;                     /// Enable keyboard scrolling
+	bool MouseScroll = false;                   /// Enable mouse scrolling
+	bool KeyScroll = false;                     /// Enable keyboard scrolling
 	/// Key Scroll Speed
-	int KeyScrollSpeed;
+	int KeyScrollSpeed = 1;
 	/// Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeed;
+	int MouseScrollSpeed = 1;
 	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
-	int MouseScrollSpeedDefault;
+	int MouseScrollSpeedDefault = 0;
 	/// Middle-Mouse Scroll Speed with Control pressed
-	int MouseScrollSpeedControl;
+	int MouseScrollSpeedControl = 0;
 
-	PixelPos MouseWarpPos;              /// Cursor warp screen position
+	PixelPos MouseWarpPos{-1, -1}; /// Cursor warp screen position
 
-	std::string NormalFontColor;        /// Color for normal text displayed
-	std::string ReverseFontColor;       /// Color for reverse text displayed
+	std::string NormalFontColor = "light-blue"; /// Color for normal text displayed
+	std::string ReverseFontColor = "yellow"; /// Color for reverse text displayed
 
 	std::vector<CFiller> Fillers;       /// Filler graphics
 
-	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
+	CResourceInfo Resources[MaxResourceInfo]{}; /// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;               /// Info panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
 	std::string DefaultUnitPortrait;    /// Name of the unit portrait to show when there is no selection
 	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons
 
-	CUIButton *SingleSelectedButton;    /// Button for single selected unit
+	CUIButton *SingleSelectedButton = nullptr;    /// Button for single selected unit
 
 	std::vector<CUIButton> SelectedButtons;/// Selected buttons
-	CFont *MaxSelectedFont;             /// Font type to use
-	int MaxSelectedTextX;               /// position to place '+#' text
-	int MaxSelectedTextY;               /// if > maximum units selected
+	CFont *MaxSelectedFont = nullptr;             /// Font type to use
+	int MaxSelectedTextX = 0;               /// position to place '+#' text
+	int MaxSelectedTextY = 0;               /// if > maximum units selected
 
-	CUIButton *SingleTrainingButton;    /// Button for single training
+	CUIButton *SingleTrainingButton = nullptr;    /// Button for single training
 	std::string SingleTrainingText;     /// Text for single training
-	CFont *SingleTrainingFont;          /// Font for single traning
-	int SingleTrainingTextX;            /// X text position single training
-	int SingleTrainingTextY;            /// Y text position single training
+	CFont *SingleTrainingFont = 0;          /// Font for single traning
+	int SingleTrainingTextX = 0;            /// X text position single training
+	int SingleTrainingTextY = 0;            /// Y text position single training
 
 	std::vector<CUIButton> TrainingButtons;/// Training buttons
 	std::string TrainingText;           /// Multiple Training Text
-	CFont *TrainingFont;                /// Multiple Training Font
-	int TrainingTextX;                  /// Multiple Training X Text position
-	int TrainingTextY;                  /// Multiple Training Y Text position
+	CFont *TrainingFont = nullptr;      /// Multiple Training Font
+	int TrainingTextX = 0;              /// Multiple Training X Text position
+	int TrainingTextY = 0;              /// Multiple Training Y Text position
 
-	CUIButton *UpgradingButton;         /// Button info for upgrade
+	CUIButton *UpgradingButton = nullptr;         /// Button info for upgrade
 
-	CUIButton *ResearchingButton;       /// Button info for researching
+	CUIButton *ResearchingButton = nullptr;       /// Button info for researching
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
-        std::vector<std::string> LifeBarColorNames;
-        std::vector<int> LifeBarPercents;
-        std::vector<IntColor> LifeBarColorsInt;
-        int8_t LifeBarYOffset;
-		int8_t LifeBarPadding;
-        bool LifeBarBorder;
+	std::vector<std::string> LifeBarColorNames{};
+	std::vector<int> LifeBarPercents{75, 50, 25, 0};
+	std::vector<IntColor> LifeBarColorsInt;
+	int8_t LifeBarYOffset = 0;
+	int8_t LifeBarPadding = 0;
+	bool LifeBarBorder = true;
 
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
@@ -455,14 +433,14 @@ public:
 	CPieMenu PieMenu;
 
 	// Map area
-	ViewportModeType ViewportMode;      /// Current viewport mode
-	CViewport *MouseViewport;           /// Viewport containing mouse
-	CViewport *SelectedViewport;        /// Current selected active viewport
-	int NumViewports;                   /// # Viewports currently used
-	CViewport Viewports[MAX_NUM_VIEWPORTS]; /// Parameters of all viewports
+	ViewportModeType ViewportMode = VIEWPORT_SINGLE; /// Current viewport mode
+	CViewport *MouseViewport = nullptr;           /// Viewport containing mouse
+	CViewport *SelectedViewport = nullptr;        /// Current selected active viewport
+	int NumViewports = 0;                   /// # Viewports currently used
+	CViewport Viewports[MAX_NUM_VIEWPORTS]{}; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
-	CFont *MessageFont;                 /// Font used for messages
-	int MessageScrollSpeed;             /// Scroll speed in seconds for messages
+	CFont *MessageFont = nullptr;       /// Font used for messages
+	int MessageScrollSpeed = 5;         /// Scroll speed in seconds for messages
 
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button
@@ -474,7 +452,7 @@ public:
 
 	// The minimap
 	CMinimap Minimap;                   /// minimap
-	IntColor ViewportCursorColor;       /// minimap cursor color
+	IntColor ViewportCursorColor = 0;   /// minimap cursor color
 
 	// The status line
 	CStatusLine StatusLine;             /// status line
@@ -489,8 +467,8 @@ public:
 	Vec2i EditorButtonAreaBottomRight;
 
 	// Offsets for 640x480 center used by menus
-	int Offset640X;                     /// Offset for 640x480 X position
-	int Offset480Y;                     /// Offset for 640x480 Y position
+	int Offset640X = 0;                     /// Offset for 640x480 X position
+	int Offset480Y = 0;                     /// Offset for 640x480 Y position
 
 	//
 	//  Cursors used.
@@ -518,8 +496,8 @@ public:
 	/// SoundConfig PlacementSuccess;       /// played on placements success
 	/// SoundConfig Click;                  /// click noice used often
 
-	CGraphic *VictoryBackgroundG;       /// Victory background graphic
-	CGraphic *DefeatBackgroundG;        /// Defeat background graphic
+	CGraphic *VictoryBackgroundG = nullptr;       /// Victory background graphic
+	CGraphic *DefeatBackgroundG = nullptr;        /// Defeat background graphic
 };
 
 extern std::vector<ButtonAction> CurrentButtons;  /// Current Selected Buttons

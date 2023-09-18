@@ -194,7 +194,7 @@ public:
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
 
-	inline bool IsInvisibile(const CPlayer &player) const
+	bool IsInvisibile(const CPlayer &player) const
 	{
 		return (&player != Player && Variable[INVISIBLE_INDEX].Value > 0
 				&& !Player->HasSharedVisionWith(player));
@@ -214,10 +214,7 @@ public:
 	**
 	**  @return        True if alive, false otherwise.
 	*/
-	inline bool IsAliveOnMap() const
-	{
-		return !Removed && IsAlive();
-	}
+	bool IsAliveOnMap() const { return !Removed && IsAlive(); }
 
 	/**
 	**  Returns true, if unit is visible as an action goal for a player on the map.
@@ -226,7 +223,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleAsGoal(const CPlayer &player) const
+	bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
 		if (IsInvisibile(player)) {
@@ -254,7 +251,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	inline bool IsVisibleOnMap(const CPlayer &player) const
+	bool IsVisibleOnMap(const CPlayer &player) const
 	{
 		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
 	}
@@ -311,12 +308,12 @@ public:
 	{
 		friend class CUnitManager;
 	public:
-		CUnitManagerData() : slot(-1), unitSlot(-1) {}
+		CUnitManagerData() = default;
 
 		int GetUnitId() const { return slot; }
 	private:
-		int slot;           /// index in UnitManager::unitSlots
-		int unitSlot;       /// index in UnitManager::units
+		int slot = -1;     /// index in UnitManager::unitSlots
+		int unitSlot = -1; /// index in UnitManager::units
 	};
 public:
 	// @note int is faster than shorts
@@ -327,34 +324,34 @@ public:
 
 	int    InsideCount;   /// Number of units inside.
 	int    BoardCount;    /// Number of units transported inside.
-	CUnit *UnitInside;    /// Pointer to one of the units inside.
-	CUnit *Container;     /// Pointer to the unit containing it (or 0)
-	CUnit *NextContained; /// Next unit in the container.
-	CUnit *PrevContained; /// Previous unit in the container.
+	CUnit *UnitInside = nullptr;    /// Pointer to one of the units inside.
+	CUnit *Container = nullptr;     /// Pointer to the unit containing it (or 0)
+	CUnit *NextContained = nullptr; /// Next unit in the container.
+	CUnit *PrevContained = nullptr; /// Previous unit in the container.
 
-	CUnit *NextWorker; //pointer to next assigned worker to "Goal" resource.
+	CUnit *NextWorker = nullptr; //pointer to next assigned worker to "Goal" resource.
 	struct {
-		CUnit *Workers; /// pointer to first assigned worker to this resource.
+		CUnit *Workers = nullptr; /// pointer to first assigned worker to this resource.
 		int Assigned; /// how many units are assigned to harvesting from the resource.
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
-	Vec2i tilePos; /// Map position X
+	Vec2i tilePos; /// Map position
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
-	const CUnitType  *Type;        /// Pointer to unit-type (peon,...)
-	CPlayer    *Player;            /// Owner of this unit
-	const CUnitStats *Stats;       /// Current unit stats
+	const CUnitType *Type = nullptr; /// Pointer to unit-type (peon,...)
+	CPlayer    *Player = nullptr;            /// Owner of this unit
+	const CUnitStats *Stats = nullptr;       /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
-	PathFinderData *pathFinderData;
+	PathFinderData *pathFinderData = nullptr;
 
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
 	int  Colors;            /// custom colors
-	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
+	bool IndividualUpgrades[UpgradeMax]{}; /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
@@ -388,56 +385,56 @@ public:
 	unsigned JustMoved : 3;      /// The unit last moved of its own accord this amount of cycles of standing still ago
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
-	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.
+	CPlayer *RescuedFrom = nullptr;        /// The original owner of a rescued unit.
 	/// nullptr if the unit was not rescued.
 	/* Seen stuff. */
-	int VisCount[PlayerMax];     /// Unit visibility counts
+	int VisCount[PlayerMax]{}; /// Unit visibility counts
 	struct _seen_stuff_ {
-		_seen_stuff_() : CFrame(nullptr), Type(nullptr), tilePos(-1, -1) {}
-		const CConstructionFrame  *CFrame;  /// Seen construction frame
-		int         Frame;                  /// last seen frame/stage of buildings
-		const CUnitType  *Type;             /// Pointer to last seen unit-type
-		Vec2i       tilePos;                /// Last unit->tilePos Seen
-		signed char IX;                     /// Seen X image displacement to map position
-		signed char IY;                     /// seen Y image displacement to map position
+		_seen_stuff_() = default;
+		const CConstructionFrame *CFrame = nullptr;  /// Seen construction frame
+		int         Frame = 0;              /// last seen frame/stage of buildings
+		const CUnitType *Type = nullptr;    /// Pointer to last seen unit-type
+		Vec2i tilePos{-1, -1};              /// Last unit->tilePos Seen
+		signed char IX = 0;                 /// Seen X image displacement to map position
+		signed char IY = 0;                 /// seen Y image displacement to map position
 		unsigned    Constructed : 1;        /// Unit seen construction
 		unsigned    State : 3;              /// Unit seen build/upgrade state
-unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
-unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
+		unsigned    Destroyed : PlayerMax;  /// Unit seen destroyed or not
+		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
-	CVariable *Variable; /// array of User Defined variables.
+	CVariable *Variable = nullptr; /// array of User Defined variables.
 
-	unsigned long TTL;  /// time to live
+	unsigned long TTL = 0;  /// time to live
 
-	unsigned int GroupId;       /// unit belongs to this group id
-	unsigned int LastGroup;     /// unit belongs to this last group
+	unsigned int GroupId = 0;       /// unit belongs to this group id
+	unsigned int LastGroup = 0;     /// unit belongs to this last group
 
-	unsigned int Wait;          /// action counter
-	int Threshold;              /// The counter while ai unit couldn't change target.
-	int UnderAttack;			/// The counter while small ai can ignore non aggressive targets if searching attacker.
+	unsigned int Wait = 0;          /// action counter
+	int Threshold = 0;              /// The counter while ai unit couldn't change target.
+	int UnderAttack = 0;            /// The counter while small ai can ignore non aggressive targets if searching attacker.
 
 	struct _unit_anim_ {
-		const CAnimation *Anim;      /// Anim
-		const CAnimation *CurrAnim;  /// CurrAnim
-		short Wait;                  /// Wait time
-		signed char Rotate;          /// Rotation target and direction
-		unsigned char Unbreakable;   /// Unbreakable
+		const CAnimation *Anim = nullptr;      /// Anim
+		const CAnimation *CurrAnim = nullptr;  /// CurrAnim
+		short Wait = 0;                  /// Wait time
+		signed char Rotate = 0;          /// Rotation target and direction
+		unsigned char Unbreakable = 0;   /// Unbreakable
 	} Anim, WaitBackup;
 
 
 	std::vector<COrder *> Orders; /// orders to process
-	COrder *SavedOrder;         /// order to continue after current
-	COrder *NewOrder;           /// order for new trained units
-	COrder *CriticalOrder;      /// order to do as possible in breakable animation.
+	COrder *SavedOrder = nullptr;         /// order to continue after current
+	COrder *NewOrder = nullptr;           /// order for new trained units
+	COrder *CriticalOrder = nullptr;      /// order to do as possible in breakable animation.
 
-	char *AutoCastSpell;        /// spells to auto cast
-	int *SpellCoolDownTimers;   /// how much time unit need to wait before spell will be ready
+	char *AutoCastSpell = nullptr;        /// spells to auto cast
+	int *SpellCoolDownTimers = nullptr;   /// how much time unit need to wait before spell will be ready
 
-	CUnit *Goal; /// Generic/Teleporter goal pointer
+	CUnit *Goal = nullptr; /// Generic/Teleporter goal pointer
 };
 
-#define NoUnitP (CUnit *)0        /// return value: for no unit found
+#define NoUnitP (CUnit *)nullptr        /// return value: for no unit found
 
 /**
 **  Returns unit number (unique to this unit)
@@ -450,40 +447,33 @@ unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 class CPreference
 {
 public:
-	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), ShowNoSelectionStats(true), BigScreen(false),
-		PauseOnLeave(true), GrayscaleIcons(false),
-		IconsShift(false), StereoSound(true), MineNotifications(false),
-		DeselectInMine(false), NoStatusLineTooltips(false),
-		SelectionRectangleIndicatesDamage(false), FormationMovement(true),
-		IconFrameG(nullptr), PressedIconFrameG(nullptr), HardwareCursor(false),
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
+	CPreference() = default;
 
-	bool ShowSightRange;       /// Show sight range.
-	bool ShowReactionRange;    /// Show reaction range.
-	bool ShowAttackRange;      /// Show attack range.
-	bool ShowMessages;		   /// Show messages.
-	bool ShowNoSelectionStats; /// Show stats when no selection is active
-	bool BigScreen;			   /// If true, shows the big screen(without panels)
-	bool PauseOnLeave;         /// If true, game pauses when cursor is gone
-	bool GrayscaleIcons;       /// Use grayscaled icons for unavailable units, upgrades, etc
-	bool IconsShift;           /// Shift icons slightly when you press on them
-	bool StereoSound;          /// Enables/disables stereo sound effects
-	bool MineNotifications;    /// Show mine is running low/depleted messages
-	bool DeselectInMine;       /// Deselect peasants in mines
-	bool NoStatusLineTooltips; /// Don't show messages on status line
-	bool HardwareCursor;    /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
-	bool SelectionRectangleIndicatesDamage; /// If true, the selection rectangle interpolates color to indicate damage
-	bool FormationMovement; /// If true, player controlled units stay in formation
+	bool ShowSightRange = false;       /// Show sight range.
+	bool ShowReactionRange = false;    /// Show reaction range.
+	bool ShowAttackRange = false;      /// Show attack range.
+	bool ShowMessages = true;          /// Show messages.
+	bool ShowNoSelectionStats = true;  /// Show stats when no selection is active
+	bool BigScreen = false;            /// If true, shows the big screen(without panels)
+	bool PauseOnLeave = true;          /// If true, game pauses when cursor is gone
+	bool GrayscaleIcons = false;       /// Use grayscaled icons for unavailable units, upgrades, etc
+	bool IconsShift = false;           /// Shift icons slightly when you press on them
+	bool StereoSound = true;           /// Enables/disables stereo sound effects
+	bool MineNotifications = false;    /// Show mine is running low/depleted messages
+	bool DeselectInMine = false;       /// Deselect peasants in mines
+	bool NoStatusLineTooltips = false; /// Don't show messages on status line
+	bool HardwareCursor = false;       /// If true, uses the hardware to draw the cursor. Shaders do no longer apply to the cursor, but this way it's decoupled from the game refresh rate
+	bool SelectionRectangleIndicatesDamage = false; /// If true, the selection rectangle interpolates color to indicate damage
+	bool FormationMovement = true; /// If true, player controlled units stay in formation
 
-	int FrameSkip;          /// Mask used to skip rendering frames (useful for slow renderers that keep up with the game logic, but not the rendering to screen like e.g. original Raspberry Pi)
+	int FrameSkip = 0;          /// Mask used to skip rendering frames (useful for slow renderers that keep up with the game logic, but not the rendering to screen like e.g. original Raspberry Pi)
 
-	int ShowOrders;			/// How many second show orders of unit on map.
-	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
-	int ShowNameTime;		/// How many cycles need to show unit's name popup.
-	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
-	CGraphic *IconFrameG;
-	CGraphic *PressedIconFrameG;
+	int ShowOrders = 0;         /// How many second show orders of unit on map.
+	int ShowNameDelay = 0;      /// How many cycles need to wait until unit's name popup will appear.
+	int ShowNameTime = 0;       /// How many cycles need to show unit's name popup.
+	int AutosaveMinutes = 5;    /// Autosave the game every X minutes; autosave is disabled if the value is 0
+	CGraphic *IconFrameG = nullptr;
+	CGraphic *PressedIconFrameG = nullptr;
 
 	// these are "preferences" in the sense that the user wants to set these
 	// persistently across launches for single player games. However, they are

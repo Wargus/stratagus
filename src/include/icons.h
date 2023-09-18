@@ -172,13 +172,13 @@ private:
 class IconConfig
 {
 public:
-	IconConfig() : Icon(nullptr) {}
+	IconConfig() = default;
 
 	bool LoadNoLog();
 	bool Load();
 public:
 	std::string Name;    /// config icon name
-	CIcon *Icon;         /// icon pointer to use to run time
+	CIcon *Icon = nullptr; /// icon pointer to use to run time
 };
 
 /*----------------------------------------------------------------------------

@@ -501,21 +501,13 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
-				if (!condition->BoolFlags) {
-					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-					condition->BoolFlags = new char[new_bool_size];
-					memset(condition->BoolFlags, 0, new_bool_size * sizeof(char));
-				}
+				condition->BoolFlags.resize(UnitTypeVar.GetNumberBoolFlag());
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
 			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
-				if (!condition->Variables) {
-					size_t new_variables_size = UnitTypeVar.GetNumberVariable();
-					condition->Variables = new char[new_variables_size];
-					memset(condition->Variables, 0, new_variables_size * sizeof(char));
-				}
+				condition->Variables.resize(UnitTypeVar.GetNumberVariable());
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
