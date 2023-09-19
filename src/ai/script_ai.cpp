@@ -1007,12 +1007,11 @@ static int CclAiReleaseForce(lua_State *l)
 		LuaError(l, "Force out of range: %d", force);
 	}
 	for (int i = AI_MAX_FORCE_INTERNAL; i < AI_MAX_FORCES; ++i) {
-		if (AiPlayer->Force[i].FormerForce != -1 && AiPlayer->Force[i].FormerForce == force) {
-			while (AiPlayer->Force[i].Size()) {
-				CUnit &aiunit = *AiPlayer->Force[i].Units[AiPlayer->Force[i].Size() - 1];
-				aiunit.GroupId = 0;
-				AiPlayer->Force[i].Units.Remove(&aiunit);
+		if (AiPlayer->Force[i].FormerForce == force) {
+			for (CUnit *aiunit : AiPlayer->Force[i].Units) {
+				aiunit->GroupId = 0;
 			}
+			AiPlayer->Force[i].Units.clear();
 			AiPlayer->Force[i].Reset(false);
 		}
 	}
@@ -1729,7 +1728,7 @@ static int CclDefineAiPlayer(lua_State *l)
 #if 0
 						[[maybe_unused]]const std::string_view ident = LuaToString(l, -1, subk + 1);
 #endif
-						ai->Force[forceIdx].Units.Insert(&UnitManager->GetSlotUnit(num));
+						ai->Force[forceIdx].Units.push_back(&UnitManager->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (value == "state") {

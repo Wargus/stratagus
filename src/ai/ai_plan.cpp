@@ -353,9 +353,11 @@ int AiForce::PlanAttack()
 	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
 	transporterTerrainTraversal.Init();
 
-	CUnit *transporter = Units.find(IsAFreeTransporter());
+	CUnit *transporter = nullptr;
 
-	if (transporter != nullptr) {
+	if (auto transporterIt = ranges::find_if(Units, IsAFreeTransporter());
+	    transporterIt != Units.end()) {
+		transporter = *transporterIt;
 		DebugPrint("%d: Transporter #%d\n", player.Index, UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
@@ -371,10 +373,12 @@ int AiForce::PlanAttack()
 
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
-	CUnit *landUnit = Units.find(CUnitTypeFinder(UnitTypeLand));
-	if (landUnit == nullptr) {
+	CUnit *landUnit = nullptr;
+	if (auto it = ranges::find_if(Units, CUnitTypeFinder(UnitTypeLand)); it == Units.end()) {
 		DebugPrint("%d: No land unit in force\n", player.Index);
 		return 0;
+	} else {
+		landUnit = *it;
 	}
 
 	Vec2i pos = this->GoalPos;
