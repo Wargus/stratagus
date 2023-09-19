@@ -191,8 +191,7 @@ static void AiExecuteScript()
 static void AiCheckUnits()
 {
 	//  Count the already made build requests.
-	int counter[UnitTypeMax];
-	AiGetBuildRequestsCount(*AiPlayer, counter);
+	auto counter = AiGetBuildRequestsCount(*AiPlayer);
 
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 
@@ -538,7 +537,7 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
+static bool AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 {
 	auto it = ranges::find_if(pai->UnitTypeBuilt,
 	                          [&](const AiBuildQueue &q) { return q.Made && q.Type == &type; });
@@ -548,9 +547,9 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 		if (!--(*it).Want) {
 			pai->UnitTypeBuilt.erase(it);
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -980,7 +979,6 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 
 	unit.Player->Ai->Force.RemoveDeadUnit();
 	unit.Player->Ai->Force.Assign(what);
-
 }
 
 /**
@@ -1068,63 +1066,63 @@ void AiEachSecond(CPlayer &player)
 	}
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Train()
+std::vector<std::vector<CUnitType *>> &AiHelper::Train()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Build()
+std::vector<std::vector<CUnitType *>> &AiHelper::Build()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Upgrade()
+std::vector<std::vector<CUnitType *>> &AiHelper::Upgrade()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Research()
+std::vector<std::vector<CUnitType *>> &AiHelper::Research()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::SingleResearch()
+std::vector<std::vector<CUnitType *>> &AiHelper::SingleResearch()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Repair()
+std::vector<std::vector<CUnitType *>> &AiHelper::Repair()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::UnitLimit()
+std::vector<std::vector<CUnitType *>> &AiHelper::UnitLimit()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Equiv()
+std::vector<std::vector<CUnitType *>> &AiHelper::Equiv()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Refinery()
+std::vector<std::vector<CUnitType *>> &AiHelper::Refinery()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 
-std::vector<std::vector<CUnitType *> > &AiHelper::Depots()
+std::vector<std::vector<CUnitType *>> &AiHelper::Depots()
 {
-	static std::vector<std::vector<CUnitType *> > vec;
+	static std::vector<std::vector<CUnitType *>> vec;
 	return vec;
 }
 

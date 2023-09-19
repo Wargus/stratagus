@@ -58,8 +58,8 @@ void AiCheckMagic()
 
 		if (!unit.Type->CanCastSpell.empty()) {
 			// Check only idle magic units
-			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitAction::SpellCast) {
+			for (const auto *order : unit.Orders) {
+				if (order->Action == UnitAction::SpellCast) {
 					return;
 				}
 			}

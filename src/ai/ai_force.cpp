@@ -61,7 +61,7 @@ class EnemyUnitFinder
 {
 public:
 	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type) :
-	//Wyrmgus end
+		//Wyrmgus end
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		attackrange(unit.Stats->Variables[ATTACKRANGE_INDEX].Max),
@@ -82,7 +82,7 @@ private:
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	if (!CanMoveToMask(pos, movemask)) { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
@@ -92,10 +92,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		CUnit *dest = table[i];
 		const CUnitType &dtype = *dest->Type;
 
-		if (
-			!unit.IsEnemy(*dest) // a friend or neutral
-			|| !CanTarget(*unit.Type, dtype)
-		) {
+		if (!unit.IsEnemy(*dest) // a friend or neutral
+		    || !CanTarget(*unit.Type, dtype)) {
 			continue;
 		}
 
@@ -106,12 +104,12 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 
 		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
 			*result_unit = dest;
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		} else if (*result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
 			*result_unit = dest;
 		}
 	}
-	return VisitResult_Ok;
+	return VisitResult::Ok;
 }
 
 template <const int FIND_TYPE>
@@ -304,7 +302,7 @@ public:
 		memset(data, 0, len);
 		units.for_each(*this);
 	}
-	inline void operator()(const CUnit *const unit) const
+	void operator()(const CUnit *const unit) const
 	{
 		data[UnitTypeEquivs[unit->Type->Slot]]++;
 	}
@@ -406,12 +404,12 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist) == false
 		&& Distance(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
-		return VisitResult_Finished;
+		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -608,8 +606,8 @@ int AiForceManager::GetForce(const CUnit &unit)
 */
 void AiForceManager::RemoveDeadUnit()
 {
-	for (unsigned int i = 0; i < forces.size(); ++i) {
-		forces[i].RemoveDeadUnit();
+	for (auto &force : forces) {
+		force.RemoveDeadUnit();
 	}
 }
 
@@ -648,17 +646,13 @@ bool AiForceManager::Assign(CUnit &unit, int force)
 	return false;
 }
 
-void AiForceManager::CheckUnits(int *counter)
+void AiForceManager::CheckUnits(std::array<int, UnitTypeMax> &counter)
 {
-	int attacking[UnitTypeMax];
+	int attacking[UnitTypeMax]{};
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 
-	memset(attacking, 0, sizeof(attacking));
-
 	// Look through the forces what is missing.
-	for (unsigned int i = 0; i < forces.size(); ++i) {
-		const AiForce &force = forces[i];
-
+	for (const AiForce &force : forces) {
 		if (force.State > AiForceAttackingState::Free && force.IsAttacking()) {
 			for (unsigned int j = 0; j < force.Size(); ++j) {
 				const CUnit *unit = force.Units[j];
@@ -667,15 +661,12 @@ void AiForceManager::CheckUnits(int *counter)
 		}
 	}
 	// create missing units
-	for (unsigned int i = 0; i < forces.size(); ++i) {
-		AiForce &force = forces[i];
-
+	for (AiForce &force : forces) {
 		// No troops for attacking force
 		if (force.State == AiForceAttackingState::Free || force.IsAttacking()) {
 			continue;
 		}
-		for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
-			const AiUnitType &aiut = force.UnitTypes[j];
+		for (const AiUnitType &aiut : force.UnitTypes) {
 			const unsigned int t = aiut.Type->Slot;
 			const int wantedCount = aiut.Want;
 			int e = unit_types_count[t];
@@ -1141,14 +1132,12 @@ void AiForce::Update()
 
 void AiForceManager::Update()
 {
-	unsigned int fsize = forces.size();
 	int maxPathing = 2; // reduce load by stopping after issuing a few map searches
-	for (unsigned int f = 0; f < fsize; ++f) {
+	for (AiForce &force : forces) {
 		if (maxPathing < 0) {
 			return;
 		}
 
-		AiForce &force = forces[f];
 		//  Look if our defenders still have enemies in range.
 
 		if (force.Defending) {

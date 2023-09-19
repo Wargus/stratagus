@@ -88,11 +88,9 @@ static int AiCheckCosts(const int *costs)
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
-		for (size_t k = 0; k < unit.Orders.size(); ++k) {
-			const COrder &order = *unit.Orders[k];
-
-			if (order.Action == UnitAction::Build) {
-				const COrder_Build &orderBuild = static_cast<const COrder_Build &>(order);
+		for (const COrder *order : unit.Orders) {
+			if (order->Action == UnitAction::Build) {
+				const COrder_Build &orderBuild = *static_cast<const COrder_Build *>(order);
 				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
 
 				for (int j = 1; j < MaxCosts; ++j) {
@@ -131,8 +129,7 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 {
 	// Count food supplies under construction.
 	int remaining = 0;
-	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
-		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
+	for (const AiBuildQueue &queue : pai.UnitTypeBuilt) {
 		if (queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value) {
 			remaining += queue.Made * queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value;
 		}
@@ -144,9 +141,7 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 		return 0;
 	}
 	// Count what we train.
-	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
-		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
-
+	for (const AiBuildQueue &queue : pai.UnitTypeBuilt) {
 		remaining -= queue.Made * queue.Type->Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
 		if (remaining < 0) {
 			return 0;
@@ -242,16 +237,16 @@ bool AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 
 static bool IsAlreadyWorking(const CUnit &unit)
 {
-	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		const UnitAction action = unit.Orders[i]->Action;
+	for (auto *order : unit.Orders) {
+		const UnitAction action = order->Action;
 
 		if (action == UnitAction::Build || action == UnitAction::Repair) {
 			return true;
 		}
 		if (action == UnitAction::Resource) {
-			const COrder_Resource &order = *static_cast<const COrder_Resource *>(unit.Orders[i]);
+			const COrder_Resource &orderRes = *static_cast<const COrder_Resource *>(order);
 
-			if (order.IsGatheringStarted()) {
+			if (orderRes.IsGatheringStarted()) {
 				return true;
 			}
 		}
@@ -314,11 +309,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 
 static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 {
-	const size_t size = AiHelpers.Build()[type.Slot].size();
-	for (size_t i = 0; i != size; ++i) {
-		CUnitType &builder = *AiHelpers.Build()[type.Slot][i];
-
-		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
+	for (const CUnitType *builder : AiHelpers.Build()[type.Slot]) {
+		if (player.UnitTypesAiActiveCount[builder->Slot] > 0
 			&& CheckDependByType(player, type)) {
 			return true;
 		}
@@ -337,16 +329,14 @@ static bool cnode_cmp(const cnode &lhs, const cnode &rhs)
 	return lhs.unit_cost < rhs.unit_cost;
 }
 
-int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
+std::array<int, UnitTypeMax> AiGetBuildRequestsCount(const PlayerAi &pai)
 {
-	const int size = (int)pai.UnitTypeBuilt.size();
-	memset(counter, 0, sizeof(int) * UnitTypeMax);
-	for (int i = 0; i < size; ++i) {
-		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
+	std::array<int, UnitTypeMax> res{};
 
-		counter[queue.Type->Slot] += queue.Want;
+	for (const AiBuildQueue &queue : pai.UnitTypeBuilt) {
+		res[queue.Type->Slot] += queue.Want;
 	}
-	return size;
+	return res;
 }
 
 extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
@@ -378,9 +368,7 @@ void AiNewDepotRequest(CUnit &worker)
 	int best_cost = 0;
 	//int best_mask = 0;
 	// Count the already made build requests.
-	int counter[UnitTypeMax];
-
-	AiGetBuildRequestsCount(*worker.Player->Ai, counter);
+	const auto counter = AiGetBuildRequestsCount(*worker.Player->Ai);
 
 	const int n = AiHelpers.Depots()[resource - 1].size();
 
@@ -521,9 +509,7 @@ static bool AiRequestSupply()
 	}
 
 	// Count the already made build requests.
-	int counter[UnitTypeMax];
-
-	AiGetBuildRequestsCount(*AiPlayer, counter);
+	const auto counter = AiGetBuildRequestsCount(*AiPlayer);
 	struct cnode cache[16];
 
 	memset(cache, 0, sizeof(cache));

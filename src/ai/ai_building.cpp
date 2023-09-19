@@ -146,9 +146,11 @@ class BuildingPlaceFinder
 public:
 	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
 		worker(worker), type(type),
-			movemask(worker.Type->MovementMask 
-			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
+		movemask(
+			worker.Type->MovementMask
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value
+	                 ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)
+	                 : (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		checkSurround(checkSurround),
 		resultPos(resultPos)
 	{
@@ -168,7 +170,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	if (CanBuildUnitType(&worker, type, pos, 1)
@@ -176,16 +178,16 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		bool backupok;
 		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
 			*resultPos = pos;
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		} else if (backupok && resultPos->x == -1) {
 			*resultPos = pos;
 		}
 	}
 	if (CanMoveToMask(pos, movemask)
 		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -224,10 +226,13 @@ class HallPlaceFinder
 {
 public:
 	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
-		worker(worker), type(type),
-		movemask(worker.Type->MovementMask 
-			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
+		worker(worker),
+		type(type),
+		movemask(
+			worker.Type->MovementMask
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value
+	                 ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)
+	                 : (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		resource(resource),
 		resultPos(resultPos)
 	{}
@@ -279,19 +284,19 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	CUnit *mine = ResourceOnMap(pos, resource);
 	if (mine && IsAUsableMine(*mine)) {
 		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos)) {
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
@@ -342,12 +347,18 @@ static bool AiFindHallPlace(const CUnit &worker,
 class LumberMillPlaceFinder
 {
 public:
-	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
-		worker(worker), type(type),
-		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+	LumberMillPlaceFinder(const CUnit &worker,
+	                      const CUnitType &type,
+	                      int resource,
+	                      Vec2i *resultPos) :
+		worker(worker),
+		type(type),
+		movemask(worker.Type->MovementMask
+	             & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resource(resource),
 		resultPos(resultPos)
 	{}
+
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &worker;
@@ -361,18 +372,18 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 {
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 #endif
 	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
 		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
-			return VisitResult_Finished;
+			return VisitResult::Finished;
 		}
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
-		return VisitResult_Ok;
+		return VisitResult::Ok;
 	} else { // unreachable
-		return VisitResult_DeadEnd;
+		return VisitResult::DeadEnd;
 	}
 }
 
