@@ -204,6 +204,11 @@ namespace ranges
 		return std::find_if(begin(range), end(range), std::forward<Predicate>(predicate));
 	}
 
+	template <typename Range, typename Pred>
+	auto partition(Range &range, Pred pred)
+	{
+		return std::partition(begin(range), end(range), pred);
+	}
 
 	template<typename Range, typename Value>
 	bool contains(Range& range, const Value& value)
