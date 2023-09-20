@@ -689,6 +689,59 @@ void CMap::RegenerateForest()
 	}
 }
 
+/**
+**  Insert new unit into cache.
+**
+**  @param unit  Unit pointer to place in cache.
+*/
+void CMap::Insert(CUnit &unit)
+{
+	Assert(!unit.Removed);
+	unsigned int index = unit.Offset;
+	const int w = unit.Type->TileWidth;
+	const int h = unit.Type->TileHeight;
+	int j, i = h;
+
+	do {
+		CMapField *mf = Field(index);
+		j = w;
+		do {
+			mf->UnitCache.push_back(&unit);
+			++mf;
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
+		index += Info.MapWidth;
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+}
+
+/**
+**  Remove unit from cache.
+**
+**  @param unit  Unit pointer to remove from cache.
+*/
+void CMap::Remove(CUnit &unit)
+{
+	Assert(!unit.Removed);
+	unsigned int index = unit.Offset;
+	const int w = unit.Type->TileWidth;
+	const int h = unit.Type->TileHeight;
+	int j, i = h;
+
+	do {
+		CMapField *mf = Field(index);
+		j = w;
+		do {
+			ranges::erase(mf->UnitCache, &unit);
+			++mf;
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
+		index += Info.MapWidth;
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+}
+
+void CMap::Clamp(Vec2i &pos) const
+{
+	clamp<short int>(&pos.x, 0, this->Info.MapWidth - 1);
+	clamp<short int>(&pos.y, 0, this->Info.MapHeight - 1);
+}
 
 /**
 **  Load the map presentation

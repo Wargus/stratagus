@@ -46,15 +46,16 @@ struct LandMineTargetFinder {
 	int CanHitOwner;
 	LandMineTargetFinder(const CUnit *unit, int hit):
 		source(unit), CanHitOwner(hit) {}
-	inline bool operator()(const CUnit *const unit) const
+	bool operator()(const CUnit *const unit) const
 	{
 		return (!(unit == source && !CanHitOwner)
 				&& unit->Type->UnitType != UnitTypeFly
 				&& unit->CurrentAction() != UnitAction::Die);
 	}
-	inline CUnit *FindOnTile(const CMapField *const mf) const
+	CUnit *FindOnTile(const CMapField *const mf) const
 	{
-		return mf->UnitCache.find(*this);
+		auto it = ranges::find_if(mf->UnitCache, *this);
+		return it != mf->UnitCache.end() ? *it : nullptr;
 	}
 };
 

@@ -132,16 +132,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#ifndef __UNIT_CACHE_H__
-#include "unit_cache.h"
-#endif
+#include "tileset.h"
+#include "vec2i.h"
 
-#include <tileset.h>
-#include <vec2i.h>
+#include <vector>
 
 class CFile;
 class CPlayer;
 class CTileset;
+class CUnit;
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -151,13 +150,7 @@ struct lua_State;
 class CMapFieldPlayerInfo
 {
 public:
-	CMapFieldPlayerInfo() : SeenTile(0)
-	{
-		memset(Visible, 0, sizeof(Visible));
-		memset(VisCloak, 0, sizeof(VisCloak));
-		memset(Radar, 0, sizeof(Radar));
-		memset(RadarJammer, 0, sizeof(RadarJammer));
-	}
+	CMapFieldPlayerInfo() = default;
 
 	/// Check if a field for the user is explored.
 	bool IsExplored(const CPlayer &player) const;
@@ -176,11 +169,11 @@ public:
 	unsigned char TeamVisibilityState(const CPlayer &player) const;
 
 public:
-	unsigned short SeenTile;              /// last seen tile (FOW)
-	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
-	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
-	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
-	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
+	unsigned short SeenTile = 0;            /// last seen tile (FOW)
+	unsigned short Visible[PlayerMax]{};    /// Seen counter 0 unexplored
+	unsigned char VisCloak[PlayerMax]{};    /// Visiblity for cloaking.
+	unsigned char Radar[PlayerMax]{};       /// Visiblity for radar.
+	unsigned char RadarJammer[PlayerMax]{}; /// Jamming capabilities.
 };
 
 /// Describes a field of the map
@@ -255,7 +248,7 @@ private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:
 	unsigned int Value;        /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
-	CUnitCache UnitCache;      /// A unit on the map field.
+	std::vector<CUnit *> UnitCache; /// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 

@@ -350,7 +350,6 @@ set(unit_SRCS
 	src/unit/depend.cpp
 	src/unit/script_unit.cpp
 	src/unit/script_unittype.cpp
-	src/unit/unit_cache.cpp
 	src/unit/unit.cpp
 	src/unit/unit_draw.cpp
 	src/unit/unit_find.cpp
@@ -599,7 +598,6 @@ set(stratagus_generic_HDRS
 	src/include/ui/uitimer.h
 	src/include/ui.h
 	src/include/unit.h
-	src/include/unit_cache.h
 	src/include/unit_find.h
 	src/include/unit_manager.h
 	src/include/unitptr.h

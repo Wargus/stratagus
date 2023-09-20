@@ -71,12 +71,8 @@ std::vector<CUnit *> SelectAroundUnit(const CUnit &unit, int range)
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
-	CUnitCache &cache = Map.Field(pos)->UnitCache;
-
-	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
-		CUnit *unit = *it;
-
-		if (ranges::find(units, unit) != units.end()) {
+	for (CUnit *unit : Map.Field(pos)->UnitCache) {
+		if (ranges::contains(units, unit)) {
 			return unit;
 		}
 	}
@@ -248,11 +244,6 @@ public:
 		return best_depot;
 	}
 
-	CUnit *Find(CUnitCache &cache)
-	{
-		cache.for_each(*this);
-		return best_depot;
-	}
 private:
 	struct {
 		const CUnit *worker;
@@ -377,11 +368,12 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+	const auto &field = *Map.Field(pos);
+	if (!worker.Player->AiEnabled && !field.playerInfo.IsExplored(*worker.Player)) {
 		return VisitResult::DeadEnd;
 	}
-
-	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
+	auto it = ranges::find_if(field.UnitCache, res_finder);
+	CUnit *mine = it != field.UnitCache.end() ? *it : nullptr;
 
 	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -580,7 +572,9 @@ std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitTyp
 */
 CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 {
-	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
+	const auto &field = *Map.Field(index);
+	auto it = ranges::find_if(field.UnitCache, CUnitTypeFinder(static_cast<UnitTypeType>(type)));
+	return it != field.UnitCache.end() ? *it : nullptr;
 }
 
 /**
@@ -643,20 +637,10 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 */
 CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
 {
-	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	const auto &field = *Map.Field(pos);
+	auto it = ranges::find_if(field.UnitCache, CResourceFinder(resource, mine_on_top));
+	return it != field.UnitCache.end() ? *it : nullptr;
 }
-
-class IsADepositForResource
-{
-public:
-	explicit IsADepositForResource(const int r) : resource(r) {}
-	bool operator()(const CUnit *const unit) const
-	{
-		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
-	}
-private:
-	const int resource;
-};
 
 /**
 **  Resource deposit on map tile
@@ -668,7 +652,12 @@ private:
 */
 CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
 {
-	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
+	const auto isADeposit = [=](const CUnit *unit) {
+		return (unit->Type->CanStore[resource] && !unit->IsUnusable());
+	};
+	const auto &field = *Map.Field(pos);
+	auto it = ranges::find_if(field.UnitCache, isADeposit);
+	return it != field.UnitCache.end() ? *it : nullptr;
 }
 
 /*----------------------------------------------------------------------------
@@ -685,11 +674,6 @@ public:
 	CUnit *Find(const std::vector<CUnit *> &table) const
 	{
 		return Find(table.begin(), table.end());
-	}
-
-	CUnit *Find(CUnitCache &cache) const
-	{
-		return Find(cache.begin(), cache.end());
 	}
 
 private:
@@ -820,11 +804,6 @@ public:
 			attacker(&a), range(r), size(s),
 			enemy_count(0), good(g), bad(b)
 		{
-		}
-
-		int Fill(CUnitCache &cache)
-		{
-			return Fill(cache.begin(), cache.end());
 		}
 
 		template <typename Iterator>
@@ -989,12 +968,6 @@ public:
 		}
 		return Find(table.begin(), table.end());
 
-	}
-
-	CUnit *Find(CUnitCache &cache)
-	{
-		FillBadGood(*attacker, range, good, bad, size).Fill(cache);
-		return Find(cache.begin(), cache.end());
 	}
 
 private:

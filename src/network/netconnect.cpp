@@ -1240,7 +1240,7 @@ int CServer::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host
 				h = i;
 				break;
 			} else {
-				availableSlots.erase(std::remove(availableSlots.begin(), availableSlots.end(), Hosts[i].PlyNr));
+				ranges::erase(availableSlots, Hosts[i].PlyNr);
 			}
 		}
 		if (h != -1) {

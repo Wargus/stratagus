@@ -157,7 +157,7 @@ void StartMap(const std::string &filename, bool clean)
 	SetDefaultTextColors(nc, rc);
 
 	Gui->setTop(oldTop);
-	Containers.erase(ranges::find(Containers, container));
+	ranges::erase(Containers, container);
 	delete container;
 }
 

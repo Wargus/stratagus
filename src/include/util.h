@@ -179,6 +179,12 @@ struct identity
 namespace ranges
 {
 
+	template <typename Range, typename Predicate>
+	auto any_of(Range &range, Predicate &&predicate)
+	{
+		return std::any_of(begin(range), end(range), std::forward<Predicate>(predicate));
+	}
+
 	template<typename Range, typename Value>
 	void fill(Range& range, const Value& value)
 	{
@@ -216,10 +222,16 @@ namespace ranges
 		return std::find(begin(range), end(range), value) == end(range) ? false : true;
 	}
 
-    template<typename Range>
+	template<typename Range>
 	void reverse(Range& range)
 	{
 		std::reverse(begin(range), end(range));
+	}
+
+	template <typename T, typename A, typename U>
+	void erase(std::vector<T, A> &v, const U &value)
+	{
+		v.erase(std::remove(begin(v), end(v), value), end(v));
 	}
 
     template<typename Range>

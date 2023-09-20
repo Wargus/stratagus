@@ -243,18 +243,14 @@ std::vector<CUnit *> SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pr
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			const CMapField &mf = *Map.Field(posIt);
-			const CUnitCache &cache = mf.UnitCache;
 
-			for (size_t i = 0; i != cache.size(); ++i) {
-				CUnit &unit = *cache[i];
-
-				if ((selectMax == 1 || unit.CacheLock == 0) && pred(&unit)) {
-					if (selectMax == 1) {
-						units.push_back(&unit);
-						return units;
+			for (CUnit *unit : mf.UnitCache) {
+				if ((selectMax == 1 || unit->CacheLock == 0) && pred(unit)) {
+					if constexpr (selectMax == 1) {
+						return {unit};
 					} else {
-						unit.CacheLock = 1;
-						units.push_back(&unit);
+						unit->CacheLock = 1;
+						units.push_back(unit);
 						if (--max == 0) {
 							break;
 						}
@@ -263,8 +259,8 @@ std::vector<CUnit *> SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pr
 			}
 		}
 	}
-	for (size_t i = 0; i != units.size(); ++i) {
-		units[i]->CacheLock = 0;
+	for (auto* unit : units) {
+		unit->CacheLock = 0;
 	}
 	return units;
 }
@@ -299,10 +295,10 @@ CUnit *FindUnit_IfFixed(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
 			const CMapField &mf = *Map.Field(posIt);
-			const CUnitCache &cache = mf.UnitCache;
+			const auto &units = mf.UnitCache;
 
-			CUnitCache::const_iterator it = std::find_if(cache.begin(), cache.end(), pred);
-			if (it != cache.end()) {
+			const auto it = ranges::find_if(units, pred);
+			if (it != units.end()) {
 				return *it;
 			}
 		}

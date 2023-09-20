@@ -572,7 +572,8 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 #endif
 					return -1;
 				}
-				CUnit *goal = mf->UnitCache.find(unit_finder);
+				auto it = ranges::find_if(mf->UnitCache, unit_finder);
+				CUnit *goal = it != mf->UnitCache.end() ? *it : nullptr;
 				if (!goal) {
 					// Shouldn't happen, mask says there is something on this tile
 					Assert(0);

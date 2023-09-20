@@ -316,7 +316,8 @@ bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i
 		return false;
 	}
 	functor f(Parent, pos1);
-	return (Map.Field(pos1)->UnitCache.find(f) != nullptr);
+
+	return ranges::any_of(Map.Field(pos1)->UnitCache, f);
 }
 
 /**
@@ -369,22 +370,22 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	ontoptarget = nullptr;
-	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	auto &cache = Map.Field(pos)->UnitCache;
 
-	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
+	auto it = ranges::find_if(cache, AliveConstructedAndSameTypeAs(*this->Parent));
 
 	if (it != cache.end() && (*it)->tilePos == pos) {
 		CUnit &found = **it;
 		Vec2i endPos(found.tilePos.x + found.Type->TileWidth - 1, found.tilePos.y + found.Type->TileHeight - 1);
 		std::vector<CUnit *> table = Select(found.tilePos, endPos);
-		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
-			if (*it == *it2) {
+		for (auto* unit : table) {
+			if (*it == unit) {
 				continue;
 			}
-			if (builder == *it2) {
+			if (builder == unit) {
 				continue;
 			}
-			if (found.Type->UnitType == (*it2)->Type->UnitType) {
+			if (found.Type->UnitType == unit->Type->UnitType) {
 				return false;
 			}
 		}
