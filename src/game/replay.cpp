@@ -79,8 +79,7 @@ public:
 	std::string UnitIdent;
 	std::string Action;
 	int Flush = 0;
-	int PosX = 0;
-	int PosY = 0;
+	Vec2i Pos{0, 0};
 	int DestUnitNumber = 0;
 	std::string Value;
 	int Num = 0;
@@ -235,8 +234,8 @@ static void PrintLogCommand(const LogEntry &log, CFile &file)
 	}
 	file.printf("Action = \"%s\", ", log.Action.c_str());
 	file.printf("Flush = %d, ", log.Flush);
-	if (log.PosX != -1 || log.PosY != -1) {
-		file.printf("PosX = %d, PosY = %d, ", log.PosX, log.PosY);
+	if (log.Pos.x != -1 || log.Pos.y != -1) {
+		file.printf("PosX = %d, PosY = %d, ", log.Pos.x, log.Pos.y);
 	}
 	if (log.DestUnitNumber != -1) {
 		file.printf("DestUnitNumber = %d, ", log.DestUnitNumber);
@@ -319,8 +318,14 @@ static void AppendLog(LogEntry&& log, CFile &file)
 **  @param value   optional command argument (unit-type,...).
 **  @param num     optional number argument
 */
-void CommandLog(const char *action, const CUnit *unit, int flush,
-				int x, int y, const CUnit *dest, const char *value, int num)
+void CommandLog(const char *action,
+                const CUnit *unit,
+                int flush,
+                int x,
+                int y,
+                const CUnit *dest,
+                const char *value,
+                int num)
 {
 	if (CommandLogDisabled) { // No log wanted
 		return;
@@ -384,8 +389,8 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	//
 	// Coordinates given.
 	//
-	log.PosX = x;
-	log.PosY = y;
+	log.Pos.x = x;
+	log.Pos.y = y;
 
 	//
 	// Destination given.
@@ -422,8 +427,7 @@ static int CclLog(lua_State *l)
 
 	LogEntry log;
 	log.UnitNumber = -1;
-	log.PosX = -1;
-	log.PosY = -1;
+	log.Pos = {-1, -1};
 	log.DestUnitNumber = -1;
 	log.Num = -1;
 
@@ -441,9 +445,9 @@ static int CclLog(lua_State *l)
 		} else if (value == "Flush") {
 			log.Flush = LuaToNumber(l, -1);
 		} else if (value == "PosX") {
-			log.PosX = LuaToNumber(l, -1);
+			log.Pos.x = LuaToNumber(l, -1);
 		} else if (value == "PosY") {
-			log.PosY = LuaToNumber(l, -1);
+			log.Pos.y = LuaToNumber(l, -1);
 		} else if (value == "DestUnitNumber") {
 			log.DestUnitNumber = LuaToNumber(l, -1);
 		} else if (value == "Value") {
@@ -650,9 +654,9 @@ static void DoNextReplay()
 	const int unitSlot = ReplayStep.UnitNumber;
 	const auto& action = ReplayStep.Action;
 	const int flags = ReplayStep.Flush;
-	const Vec2i pos(ReplayStep.PosX, ReplayStep.PosY);
-	const int arg1 = ReplayStep.PosX;
-	const int arg2 = ReplayStep.PosY;
+	const Vec2i pos(ReplayStep.Pos);
+	const int arg1 = ReplayStep.Pos.x;
+	const int arg2 = ReplayStep.Pos.y;
 	CUnit *unit = unitSlot != -1 ? &UnitManager->GetSlotUnit(unitSlot) : nullptr;
 	CUnit *dunit = (ReplayStep.DestUnitNumber != -1 ? &UnitManager->GetSlotUnit(ReplayStep.DestUnitNumber) : nullptr);
 	const auto& val = ReplayStep.Value;
