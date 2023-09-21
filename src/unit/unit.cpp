@@ -1825,8 +1825,8 @@ bool CUnit::IsVisibleOnMinimap() const
 bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
-	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
-	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->Offset.x;
+	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->Offset.y;
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
@@ -2437,9 +2437,9 @@ CUnit *UnitOnScreen(int x, int y)
 		//
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
 		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffset.x;
 		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffset.y;
 		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
 			// Check if there are other units on this place

@@ -517,7 +517,7 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (value == "offset") {
 					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->ShadowOffsetX, &type->ShadowOffsetY);
+					CclGetPos(l, &type->ShadowOffset);
 					lua_pop(l, 1);
 				} else if (value == "sprite-frame") {
 					type->ShadowSpriteFrame = LuaToNumber(l, -1, k + 1);
@@ -533,7 +533,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->ShadowSprite = nullptr;
 			}
 		} else if (value == "Offset") {
-			CclGetPos(l, &type->OffsetX, &type->OffsetY);
+			CclGetPos(l, &type->Offset);
 		} else if (value == "Flip") {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (value == "Animations") {
@@ -651,7 +651,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (value == "BoxSize") {
 			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
 		} else if (value == "BoxOffset") {
-			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
+			CclGetPos(l, &type->BoxOffset);
 		} else if (value == "NumDirections") {
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (value == "ComputerReactionRange") {
@@ -1219,16 +1219,14 @@ static int CclCopyUnitType(lua_State *l)
 	to->ShadowFile = from.ShadowFile;
 	to->ShadowWidth = from.ShadowWidth;
 	to->ShadowHeight = from.ShadowHeight;
-	to->ShadowOffsetX = from.ShadowOffsetX;
-	to->ShadowOffsetY = from.ShadowOffsetY;
+	to->ShadowOffset = from.ShadowOffset;
 	to->ShadowSpriteFrame = from.ShadowSpriteFrame;
 	to->ShadowScale = from.ShadowScale;
 	if (to->ShadowSprite) {
 		CGraphic::Free(to->ShadowSprite);
 		to->ShadowSprite = nullptr;
 	}
-	to->OffsetX = from.OffsetX;
-	to->OffsetY = from.OffsetY;
+	to->Offset = from.Offset;
 	to->Animations = from.Animations;
 	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
@@ -1261,8 +1259,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->Neutral = from.Neutral;
 	to->BoxWidth = from.BoxWidth;
 	to->BoxHeight = from.BoxHeight;
-	to->BoxOffsetX = from.BoxOffsetX;
-	to->BoxOffsetY = from.BoxOffsetY;
+	to->BoxOffset = from.BoxOffset;
 	to->NumDirections = from.NumDirections;
 	to->ReactRangeComputer = from.ReactRangeComputer;
 	to->ReactRangePerson = from.ReactRangePerson;
@@ -1939,23 +1936,21 @@ static int CclDefineBoolFlags(lua_State *l)
 static int CclDefineDecorations(lua_State *l)
 {
 	struct {
-		int Index;
-		int OffsetX;
-		int OffsetY;
-		int OffsetXPercent;
-		int OffsetYPercent;
-		bool IsCenteredInX;
-		bool IsCenteredInY;
-		bool ShowIfNotEnable;
-		bool ShowWhenNull;
-		bool HideHalf;
-		bool ShowWhenMax;
-		bool ShowOnlySelected;
-		bool HideNeutral;
-		bool HideAllied;
-		bool ShowOpponent;
-		bool BoolFlagInvert;
-		int BoolFlag;
+		int Index = 0;
+		PixelPos Offset{0, 0};
+		Vec2i OffsetPercent{0, 0};
+		bool IsCenteredInX = false;
+		bool IsCenteredInY = false;
+		bool ShowIfNotEnable = false;
+		bool ShowWhenNull = false;
+		bool HideHalf = false;
+		bool ShowWhenMax = false;
+		bool ShowOnlySelected = false;
+		bool HideNeutral = false;
+		bool HideAllied = false;
+		bool ShowOpponent = false;
+		bool BoolFlagInvert = false;
+		int BoolFlag = 0;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -1971,9 +1966,9 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
 			} else if (key == "Offset") {
-				CclGetPos(l, &tmp.OffsetX, &tmp.OffsetY);
+				CclGetPos(l, &tmp.Offset);
 			} else if (key == "OffsetPercent") {
-				CclGetPos(l, &tmp.OffsetXPercent, &tmp.OffsetYPercent);
+				CclGetPos(l, &tmp.Offset);
 			} else if (key == "CenterX") {
 				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (key == "CenterY") {
@@ -2111,10 +2106,8 @@ static int CclDefineDecorations(lua_State *l)
 			lua_pop(l, 1); // Pop the value
 		}
 		decovar->Index = tmp.Index;
-		decovar->OffsetX = tmp.OffsetX;
-		decovar->OffsetY = tmp.OffsetY;
-		decovar->OffsetXPercent = tmp.OffsetXPercent;
-		decovar->OffsetYPercent = tmp.OffsetYPercent;
+		decovar->Offset = tmp.Offset;
+		decovar->OffsetPercent = tmp.OffsetPercent;
 		decovar->IsCenteredInX = tmp.IsCenteredInX;
 		decovar->IsCenteredInY = tmp.IsCenteredInY;
 		decovar->ShowIfNotEnable = tmp.ShowIfNotEnable;

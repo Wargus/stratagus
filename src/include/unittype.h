@@ -249,11 +249,8 @@ public:
 
 	unsigned int Index = -1;    /// Index of the variable. @see DefineVariables
 
-	int OffsetX = 0;            /// Offset in X coord.
-	int OffsetY = 0;            /// Offset in Y coord.
-
-	int OffsetXPercent = 0;     /// Percent offset (TileWidth) in X coord.
-	int OffsetYPercent = 0;     /// Percent offset (TileHeight) in Y coord.
+	PixelPos Offset{0, 0}; /// Offset
+	Vec2i OffsetPercent{0, 0}; /// Percent offset (Tile size).
 
 	bool IsCenteredInX = false;     /// if true, use center of deco instead of left border
 	bool IsCenteredInY = false;     /// if true, use center of deco instead of upper border
@@ -535,13 +532,11 @@ public:
 
 	int Width = 0;                                        /// Sprite width
 	int Height = 0;                                       /// Sprite height
-	int OffsetX = 0;                                      /// Sprite horizontal offset
-	int OffsetY = 0;                                      /// Sprite vertical offset
+	PixelPos Offset{0, 0};                                /// Sprite offset
 	int DrawLevel = 0;                                    /// Level to Draw UnitType at
 	int ShadowWidth = 0;                                  /// Shadow sprite width
 	int ShadowHeight = 0;                                 /// Shadow sprite height
-	int ShadowOffsetX = 0;                                /// Shadow horizontal offset
-	int ShadowOffsetY = 0;                                /// Shadow vertical offset
+	PixelPos ShadowOffset{0, 0};                          /// Shadow offset
 	char ShadowScale = 1;                                 /// Shadow scale-down factor
 	char ShadowSpriteFrame = 0;                           /// If > 0, the shadow is a simple sprite without
 	                                                      /// directions and this selects which frame to use
@@ -591,8 +586,7 @@ public:
 	short PersonalSpaceHeight = 0;      /// How much "personal space" the unit tries to leave in Y direction
 	int BoxWidth = 0;                   /// Selected box size width
 	int BoxHeight = 0;                  /// Selected box size height
-	int BoxOffsetX = 0;                 /// Selected box size horizontal offset
-	int BoxOffsetY = 0;                 /// Selected box size vertical offset
+	PixelPos BoxOffset{0, 0};           /// Selected box size offset
 	int NumDirections = 0;              /// Number of directions unit can face
 	int MinAttackRange = 0;             /// Minimal attack range
 	int ReactRangeComputer = 0;         /// Reacts on enemy for computer

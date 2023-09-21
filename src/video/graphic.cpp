@@ -1278,7 +1278,7 @@ static void shearSurface(SDL_Surface *surface, int xOffset, int yOffset, int num
 **
 **  @todo FIXME: 32bpp
 */
-void CGraphic::MakeShadow(int xOffset, int yOffset)
+void CGraphic::MakeShadow(PixelPos offset)
 {
 	VideoPaletteListRemove(Surface);
 	applyAlphaGrayscaleToSurface(&Surface, 80);
@@ -1287,10 +1287,11 @@ void CGraphic::MakeShadow(int xOffset, int yOffset)
 		applyAlphaGrayscaleToSurface(&SurfaceFlip, 80);
 	}
 
+	const int xOffset = offset.x;
 	// BEGIN HACK: XXX: FIXME: positive yOffset is used for fliers for now, these should not get shearing.
 	// We need to find a better way to communicate that. The rest of the code already supports shearing
 	// in both directions for y.
-	yOffset = std::min(0, yOffset);
+	const int yOffset = std::min(0, offset.y);
 	// END HACK
 
 	// Apply shearing effect. same angle for Surface and SurfaceFlip!

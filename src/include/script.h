@@ -50,6 +50,7 @@ extern "C" {
 
 #include "filesystem.h"
 #include "stratagus.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -520,13 +521,19 @@ CUnit *CclGetUnitFromRef(lua_State *l);
 **  @param y  pointer to output y position.
 */
 template <typename T>
-static void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
+void CclGetPos(lua_State *l, T *x , T *y, const int offset = -1)
 {
 	if (!lua_istable(l, offset) || lua_rawlen(l, offset) != 2) {
 		LuaError(l, "incorrect argument");
 	}
 	*x = LuaToNumber(l, offset, 1);
 	*y = LuaToNumber(l, offset, 2);
+}
+
+template <typename T>
+void CclGetPos(lua_State *l, Vec2T<T> *pos, const int offset = -1)
+{
+	CclGetPos(l, &pos->x, &pos->y, offset);
 }
 
 extern std::unique_ptr<INumberDesc> Damage;  /// Damage calculation for missile.

@@ -173,7 +173,11 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		color = InterpolateColor(color2, color, fraction);
 	}
 
-	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
+	DrawSelection(color,
+	              x + type.BoxOffset.x,
+	              y + type.BoxOffset.y,
+	              x + type.BoxOffset.x + type.BoxWidth,
+	              y + type.BoxOffset.y + type.BoxHeight);
 }
 
 /**
@@ -541,8 +545,8 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVar
 
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
-	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
-	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
+	x += decosprite.HotPos.x; // in addition of Offset.x... Useful ?
+	y += decosprite.HotPos.y; // in addition of Offset.y... Useful ?
 
 	int n = sprite.NumFrames - 1; // frame of the sprite to show.
 	n -= (n * var.Value) / var.Max;
@@ -570,8 +574,8 @@ void CDecoVarStaticSprite::Draw(int x, int y, const CUnitType &/*type*/, const C
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
 
-	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
-	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
+	x += decosprite.HotPos.x; // in addition of Offset.x... Useful ?
+	y += decosprite.HotPos.y; // in addition of Offset.y... Useful ?
 	if (this->IsCenteredInX) {
 		x -= sprite.Width / 2;
 	}
@@ -600,8 +604,8 @@ void CDecoVarAnimatedSprite::Draw(int x, int y, const CUnitType &/*type*/, const
 	Decoration &decosprite = DecoSprite.SpriteArray[(int)this->NSprite];
 	CGraphic &sprite = *decosprite.Sprite;
 
-	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
-	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
+	x += decosprite.HotPos.x; // in addition of Offset.x... Useful ?
+	y += decosprite.HotPos.y; // in addition of Offset.y... Useful ?
 	if (this->IsCenteredInX) {
 		x -= sprite.Width / 2;
 	}
@@ -651,8 +655,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || var.BoolFlagMatches(type)
 			  || max == 0)) {
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
+				x + var.Offset.x + var.OffsetPercent.x * unit.Type->TileWidth * PixelTileSize.x / 100,
+				y + var.Offset.y + var.OffsetPercent.y * unit.Type->TileHeight * PixelTileSize.y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}
@@ -697,8 +701,8 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos, cha
 	PixelPos pos = screenPos;
 	pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
 	pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX + type.ShadowOffsetX;
-	pos.y += type.OffsetY + type.ShadowOffsetY - (2 * zDisplacement);
+	pos += type.Offset + type.ShadowOffset;
+	pos.y -= 2 * zDisplacement;
 
 	if (!type.ShadowSpriteFrame) {
 		// the shadow is a full unit shadow
@@ -843,9 +847,8 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 	if (cframe->File == ConstructionFileType::Construction) {
 		if (type.Construction->ShadowSprite) {
 			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
-			pos.x += type.OffsetX;
 			pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
-			pos.y += type.OffsetY;
+			pos += type.Offset;
 			if (frame < 0) {
 				type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -855,9 +858,8 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 	} else {
 		if (type.ShadowSprite) {
 			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
-			pos.x += type.ShadowOffsetX + type.OffsetX;
 			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
-			pos.y += type.ShadowOffsetY + type.OffsetY;
+			pos += type.ShadowOffset + type.Offset;
 			if (frame < 0) {
 				type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			} else {
@@ -895,8 +897,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
 	} else {
-		pos.x += type.OffsetX - type.Width / 2;
-		pos.y += type.OffsetY - type.Height / 2;
+		pos += type.Offset;
+		pos.x -= type.Width / 2;
+		pos.y -= type.Height / 2;
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
