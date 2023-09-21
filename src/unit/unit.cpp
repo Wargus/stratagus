@@ -1074,7 +1074,9 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 			mf->Flags &= flags;//clean flags
 			_UnmarkUnitFieldFlags funct(unit, mf);
 
-			mf->UnitCache.for_each(funct);
+			for (auto *unit : mf->UnitCache) {
+				funct(unit);
+			}
 			++mf;
 		} while (--w);
 		index += Map.Info.MapWidth;
@@ -1583,17 +1585,15 @@ void CorrectWallDirections(CUnit &unit)
 	};
 	int flags = 0;
 
-	for (int i = 0; i != sizeof(configs) / sizeof(*configs); ++i) {
-		const Vec2i pos = unit.tilePos + configs[i].offset;
-		const int dirFlag = configs[i].dirFlag;
+	for (const auto &[offset, dirFlag] : configs) {
+		const Vec2i pos = unit.tilePos + offset;
 
 		if (Map.Info.IsPointOnMap(pos) == false) {
 			flags |= dirFlag;
 		} else {
-			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
-			const CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
+			const auto &unitCache = Map.Field(pos)->UnitCache;
 
-			if (neighboor != nullptr) {
+			if (ranges::any_of(unitCache, HasSamePlayerAndTypeAs(unit))) {
 				flags |= dirFlag;
 			}
 		}
@@ -1610,20 +1610,18 @@ void CorrectWallNeighBours(CUnit &unit)
 {
 	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
 
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
-
-	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		const Vec2i pos = unit.tilePos + offset[i];
+	for (const Vec2i offset : {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)}) {
+		const Vec2i pos = unit.tilePos + offset;
 
 		if (Map.Info.IsPointOnMap(pos) == false) {
 			continue;
 		}
-		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
-		CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
+		auto &unitCache = Map.Field(pos)->UnitCache;
+		auto it = ranges::find_if(unitCache, HasSamePlayerAndTypeAs(unit));
 
-		if (neighboor != nullptr) {
-			CorrectWallDirections(*neighboor);
-			UnitUpdateHeading(*neighboor);
+		if (it != unitCache.end() && *it != nullptr) {
+			CorrectWallDirections(**it);
+			UnitUpdateHeading(**it);
 		}
 	}
 }

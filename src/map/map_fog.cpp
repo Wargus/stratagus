@@ -100,7 +100,9 @@ int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
 	int fogMask = mask;
 
 	_filter_flags filter(player, &fogMask);
-	Map.Field(index)->UnitCache.for_each(filter);
+	for (auto* unit : Map.Field(index)->UnitCache) {
+		filter(unit);
+	}
 	return fogMask;
 }
 
@@ -125,7 +127,7 @@ public:
 			return ;
 		}
 		const uint8_t p = this->player->Index;
-		if (MARK) {
+		if constexpr (MARK) {
 			//  If the unit goes out of fog, this can happen for any player that
 			//  this player shares vision with, and can't YET see the unit.
 			//  It will be able to see the unit after the Unit->VisCount ++
@@ -134,7 +136,7 @@ public:
 				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
 					if (!unit->IsVisible(Players[pi])) {
 						UnitGoesOutOfFog(*unit, Players[pi]);
-					} 
+					}
 				}
 			}
 			unit->VisCount[p/*player->Index*/]++;
@@ -184,7 +186,9 @@ private:
 static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 {
 	_TileSeen<true> seen(player, cloak);
-	mf.UnitCache.for_each(seen);
+	for (auto *unit : mf.UnitCache) {
+		seen(unit);
+	}
 }
 
 /**
@@ -197,9 +201,10 @@ static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 {
 	_TileSeen<false> seen(player, cloak);
-	mf.UnitCache.for_each(seen);
+	for (auto* unit : mf.UnitCache) {
+		seen(unit);
+	}
 }
-
 
 /**
 **  Mark a tile's sight. (Explore and make visible.)

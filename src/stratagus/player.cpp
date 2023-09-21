@@ -436,8 +436,7 @@ void CPlayer::SetRevealed(const bool revealed)
 		revealedPlayers.push_back(this);
 	} else {
 		/// Remove element from vector;
-		revealedPlayers.erase(std::remove(revealedPlayers.begin(), revealedPlayers.end(), this), 
-							  revealedPlayers.end());
+		ranges::erase(revealedPlayers, this);
 	}
 }
 

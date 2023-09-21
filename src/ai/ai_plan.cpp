@@ -113,7 +113,9 @@ static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 	CUnit *enemy = nullptr;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
-	Map.Field(pos)->UnitCache.for_each(filter);
+	for (auto *unit : Map.Field(pos)->UnitCache) {
+		filter(unit);
+	}
 	return enemy;
 }
 

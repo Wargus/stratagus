@@ -260,7 +260,8 @@ public:
 	}
 	CUnit *Find(const CMapField *const mf) const
 	{
-		return mf->UnitCache.find(*this);
+		auto it = ranges::find_if(mf->UnitCache, *this);
+		return it != mf->UnitCache.end() ? *it : nullptr;
 	}
 private:
 	const CUnit *worker;

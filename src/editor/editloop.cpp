@@ -270,8 +270,8 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit, nullptr);
 	if (b && b->ReplaceOnBuild) {
-		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
-		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
+		auto &unitCache = Map.Field(pos)->UnitCache;
+		auto it = ranges::find_if(unitCache, HasSameTypeAs(*b->Parent));
 
 		if (it != unitCache.end()) {
 			CUnit &replacedUnit = **it;
