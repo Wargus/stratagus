@@ -651,8 +651,8 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || var.BoolFlagMatches(type)
 			  || max == 0)) {
 			var.Draw(
-				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
-				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,
+				x + var.Offset.x + var.OffsetPercent.x * unit.Type->TileWidth * PixelTileSize.x / 100,
+				y + var.Offset.y + var.OffsetPercent.y * unit.Type->TileHeight * PixelTileSize.y / 100,
 				type, unit.Variable[var.Index]);
 		}
 	}

@@ -249,11 +249,8 @@ public:
 
 	unsigned int Index = -1;    /// Index of the variable. @see DefineVariables
 
-	int OffsetX = 0;            /// Offset in X coord.
-	int OffsetY = 0;            /// Offset in Y coord.
-
-	int OffsetXPercent = 0;     /// Percent offset (TileWidth) in X coord.
-	int OffsetYPercent = 0;     /// Percent offset (TileHeight) in Y coord.
+	PixelPos Offset{0, 0}; /// Offset
+	Vec2i OffsetPercent{0, 0}; /// Percent offset (Tile size).
 
 	bool IsCenteredInX = false;     /// if true, use center of deco instead of left border
 	bool IsCenteredInY = false;     /// if true, use center of deco instead of upper border

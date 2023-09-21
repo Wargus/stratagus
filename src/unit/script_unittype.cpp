@@ -1939,23 +1939,21 @@ static int CclDefineBoolFlags(lua_State *l)
 static int CclDefineDecorations(lua_State *l)
 {
 	struct {
-		int Index;
-		int OffsetX;
-		int OffsetY;
-		int OffsetXPercent;
-		int OffsetYPercent;
-		bool IsCenteredInX;
-		bool IsCenteredInY;
-		bool ShowIfNotEnable;
-		bool ShowWhenNull;
-		bool HideHalf;
-		bool ShowWhenMax;
-		bool ShowOnlySelected;
-		bool HideNeutral;
-		bool HideAllied;
-		bool ShowOpponent;
-		bool BoolFlagInvert;
-		int BoolFlag;
+		int Index = 0;
+		PixelPos Offset{0, 0};
+		Vec2i OffsetPercent{0, 0};
+		bool IsCenteredInX = false;
+		bool IsCenteredInY = false;
+		bool ShowIfNotEnable = false;
+		bool ShowWhenNull = false;
+		bool HideHalf = false;
+		bool ShowWhenMax = false;
+		bool ShowOnlySelected = false;
+		bool HideNeutral = false;
+		bool HideAllied = false;
+		bool ShowOpponent = false;
+		bool BoolFlagInvert = false;
+		int BoolFlag = 0;
 	} tmp;
 
 	const int nargs = lua_gettop(l);
@@ -1971,9 +1969,9 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
 			} else if (key == "Offset") {
-				CclGetPos(l, &tmp.OffsetX, &tmp.OffsetY);
+				CclGetPos(l, &tmp.Offset);
 			} else if (key == "OffsetPercent") {
-				CclGetPos(l, &tmp.OffsetXPercent, &tmp.OffsetYPercent);
+				CclGetPos(l, &tmp.Offset);
 			} else if (key == "CenterX") {
 				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (key == "CenterY") {
@@ -2111,10 +2109,8 @@ static int CclDefineDecorations(lua_State *l)
 			lua_pop(l, 1); // Pop the value
 		}
 		decovar->Index = tmp.Index;
-		decovar->OffsetX = tmp.OffsetX;
-		decovar->OffsetY = tmp.OffsetY;
-		decovar->OffsetXPercent = tmp.OffsetXPercent;
-		decovar->OffsetYPercent = tmp.OffsetYPercent;
+		decovar->Offset = tmp.Offset;
+		decovar->OffsetPercent = tmp.OffsetPercent;
 		decovar->IsCenteredInX = tmp.IsCenteredInX;
 		decovar->IsCenteredInY = tmp.IsCenteredInY;
 		decovar->ShowIfNotEnable = tmp.ShowIfNotEnable;
