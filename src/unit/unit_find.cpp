@@ -259,15 +259,10 @@ public:
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 {
 	BestDepotFinder<true> finder(pos, resource, range);
-	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = p.UnitBegin(); it != p.UnitEnd(); ++it) {
-		table.push_back(*it);
-	}
+	std::vector<CUnit *> table = p.GetUnits();
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].IsAllied(p) && p.IsAllied(Players[i])) {
-			for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
-				table.push_back(*it);
-			}
+			table.insert(table.end(), Players[i].GetUnits().begin(), Players[i].GetUnits().end());
 		}
 	}
 	return finder.Find(table.begin(), table.end());
@@ -448,16 +443,12 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 {
 	BestDepotFinder<false> finder(unit, resource, range);
-	std::vector<CUnit *> table;
-	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
-		table.push_back(*it);
-	}
+	std::vector<CUnit *> table = unit.Player->GetUnits();
 	if (GameSettings.AllyDepositsAllowed) {
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].IsAllied(*unit.Player) && unit.Player->IsAllied(Players[i])) {
-				for (std::vector<CUnit *>::iterator it = Players[i].UnitBegin(); it != Players[i].UnitEnd(); ++it) {
-					table.push_back(*it);
-				}
+				table.insert(
+					table.end(), Players[i].GetUnits().begin(), Players[i].GetUnits().end());
 			}
 		}
 	}
@@ -476,21 +467,20 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 {
 	CUnit *FirstUnitFound = nullptr;
 	int SelectNextUnit = (last == nullptr) ? 1 : 0;
-	const int nunits = player.GetUnitCount();
 
-	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = player.GetUnit(i);
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-			if (unit.CurrentAction() == UnitAction::Still) {
-				if (SelectNextUnit && !IsOnlySelected(unit)) {
-					return &unit;
+	for (CUnit *unit : player.GetUnits()) {
+		
+		if (unit->Type->BoolFlag[HARVESTER_INDEX].value && !unit->Removed) {
+			if (unit->CurrentAction() == UnitAction::Still) {
+				if (SelectNextUnit && !IsOnlySelected(*unit)) {
+					return unit;
 				}
 				if (FirstUnitFound == nullptr) {
-					FirstUnitFound = &unit;
+					FirstUnitFound = unit;
 				}
 			}
 		}
-		if (&unit == last) {
+		if (unit == last) {
 			SelectNextUnit = 1;
 		}
 	}
@@ -529,8 +519,6 @@ std::vector<CUnit *> FindUnitsByType(const CUnitType &type, bool everybody)
 */
 std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, bool ai_active)
 {
-	std::vector<CUnit *> table;
-	const int nunits = player.GetUnitCount();
 	int typecount = player.UnitTypesCount[type.Slot];
 
 	if (ai_active) {
@@ -542,17 +530,17 @@ std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitTyp
 	}
 
 	if (typecount == 0) {
-		return table;
+		return {};
 	}
+	std::vector<CUnit *> table;
+	const int nunits = player.GetUnitCount();
 
-	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = player.GetUnit(i);
-
-		if (unit.Type != &type) {
+	for (CUnit *unit : player.GetUnits()) {
+		if (unit->Type != &type) {
 			continue;
 		}
-		if (!unit.IsUnusable()) {
-			table.push_back(&unit);
+		if (!unit->IsUnusable()) {
+			table.push_back(unit);
 		}
 		--typecount;
 		if (typecount == 0) {

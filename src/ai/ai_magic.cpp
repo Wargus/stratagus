@@ -51,23 +51,22 @@
 void AiCheckMagic()
 {
 	CPlayer &player = *AiPlayer->Player;
-	const int n = player.GetUnitCount();
 
-	for (int i = 0; i < n; ++i) {
-		CUnit &unit = player.GetUnit(i);
+	for (CUnit *unit : player.GetUnits()) {
+		
 
-		if (!unit.Type->CanCastSpell.empty()) {
+		if (!unit->Type->CanCastSpell.empty()) {
 			// Check only idle magic units
-			for (const auto *order : unit.Orders) {
+			for (const auto *order : unit->Orders) {
 				if (order->Action == UnitAction::SpellCast) {
 					return;
 				}
 			}
 			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
+				if (unit->Type->CanCastSpell[j] && SpellIsAvailable(player, j)
 					&& SpellTypeTable[j]->AICast) {
-					if (AutoCastSpell(unit, *SpellTypeTable[j])) {
+					if (AutoCastSpell(*unit, *SpellTypeTable[j])) {
 						break;
 					}
 				}

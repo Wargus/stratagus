@@ -85,6 +85,7 @@ enum _diplomacy_ {
 ///  Player structure
 class CPlayer
 {
+	friend void CleanPlayers();
 public:
 	static inline RevealTypes RevelationFor { RevealTypes::cNoRevelation }; /// type of revelation (when player lost their last main facility)
 
@@ -93,7 +94,7 @@ public:
 	static const bool IsRevelationEnabled()
 	{
 		// By default there is no revelation. Can be changed in lua-script
-		return CPlayer::RevelationFor != RevealTypes::cNoRevelation; 
+		return CPlayer::RevelationFor != RevealTypes::cNoRevelation;
 	}
 	/// Change revelation type
 	static void SetRevelationType(const RevealTypes type);
@@ -103,69 +104,7 @@ public:
 		return CPlayer::RevealedPlayers;
 	}
 
-private:
-	/// List of players revealed after losing their last Town Hall
-	static inline std::vector<const CPlayer *> RevealedPlayers;	
-	
 public:
-	int Index;          /// player as number
-	std::string Name;   /// name of non computer
-
-	PlayerTypes Type;   /// type of player (human,computer,...)
-	int   Race;         /// race of player (orc,human,...)
-	std::string AiName; /// AI for computer
-
-	// friend enemy detection
-	int      Team;          /// team of player
-
-	Vec2i StartPos;  /// map tile start position
-
-	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
-
-	int Resources[MaxCosts];      /// resources in overall store
-	int MaxResources[MaxCosts];   /// max resources can be stored
-	int StoredResources[MaxCosts];/// resources in store buildings (can't exceed MaxResources)
-	int LastResources[MaxCosts];  /// last values for revenue
-	int Incomes[MaxCosts];        /// income of the resources
-	int Revenue[MaxCosts];        /// income rate of the resources
-
-	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
-	int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
-	int SpeedBuild;                  /// speed factor for building
-	int SpeedTrain;                  /// speed factor for training
-	int SpeedUpgrade;                /// speed factor for upgrading
-	int SpeedResearch;               /// speed factor for researching
-
-	// FIXME: shouldn't use the constant
-	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
-	int UnitTypesAiActiveCount[UnitTypeMax];  /// total units of unit-type that have their AI set to active
-
-	bool AiEnabled;        /// handle AI on local computer
-	PlayerAi *Ai;          /// Ai structure pointer
-
-	int    NumBuildings;   /// # buildings
-	int    Supply;         /// supply available/produced
-	int    Demand;         /// demand of player
-
-	int    UnitLimit;       /// # food units allowed
-	int    BuildingLimit;   /// # buildings allowed
-	int    TotalUnitLimit;  /// # total unit number allowed
-
-	int    Score;           /// Points for killing ...
-	int    TotalUnits;
-	int    TotalBuildings;
-	int    TotalResources[MaxCosts];
-	int    TotalRazings;
-	int    TotalKills;      /// How many unit killed
-	
-	int 	LostMainFacilityTimer { 0 };/// The timer for when the player lost the last town hall 
-									/// (to make the player's units be revealed)
-	
-	IntColor Color;           /// color of units on minimap
-
-	// Upgrades/Allows:
-	CAllow Allow;                 /// Allowed for player
-	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 	/// Change player name
 	void SetName(const std::string &name);
@@ -173,14 +112,7 @@ public:
 	/// Clear turn related player data
 	void Clear();
 
-	std::vector<CUnit *>::const_iterator UnitBegin() const;
-	std::vector<CUnit *>::iterator UnitBegin();
-	std::vector<CUnit *>::const_iterator UnitEnd() const;
-	std::vector<CUnit *>::iterator UnitEnd();
-	
-	const std::vector<CUnit *> &GetUnits() const {
-		return this->Units;
-	}
+	const std::vector<CUnit *> &GetUnits() const { return this->Units; }
 	CUnit &GetUnit(int index) const;
 	int GetUnitCount() const;
 
@@ -241,14 +173,10 @@ public:
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
-
 	/**
 	**  Check if the player index is an enemy
 	*/
-	bool IsEnemy(const int index) const
-	{
-		return (Index != index && (Enemy & (1 << index)) != 0);
-	}
+	bool IsEnemy(const int index) const { return (Index != index && (Enemy & (1 << index)) != 0); }
 
 	/**
 	**  Check if the player index is an enemy
@@ -263,14 +191,8 @@ public:
 	bool IsAllied(const CPlayer &player) const;
 	bool IsAllied(const CUnit &unit) const;
 	bool IsVisionSharing() const;
-	const std::set<uint8_t> &GetSharedVision() const
-	{
-		return this->HasVisionFrom;
-	}
-	const std::set<uint8_t> &GetGaveVisionTo() const
-	{
-		return this->GaveVisionTo;
-	}
+	const std::set<uint8_t> &GetSharedVision() const { return this->HasVisionFrom; }
+	const std::set<uint8_t> &GetGaveVisionTo() const { return this->GaveVisionTo; }
 	bool HasSharedVisionWith(const CPlayer &player) const
 	{
 		return (this->GaveVisionTo.find(player.Index) != this->GaveVisionTo.end());
@@ -291,12 +213,69 @@ public:
 	void Init(PlayerTypes type);
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
-	
-	bool IsRevealed() const
-	{
-		return this->isRevealed;
-	}
+
+	bool IsRevealed() const { return this->isRevealed; }
 	void SetRevealed(const bool revealed);
+
+public:
+	int Index;          /// player as number
+	std::string Name;   /// name of non computer
+
+	PlayerTypes Type;   /// type of player (human,computer,...)
+	int   Race;         /// race of player (orc,human,...)
+	std::string AiName; /// AI for computer
+
+	// friend enemy detection
+	int      Team;          /// team of player
+
+	Vec2i StartPos;  /// map tile start position
+
+	void SetStartView(const Vec2i &pos) { StartPos = pos; }
+
+	int Resources[MaxCosts]{};       /// resources in overall store
+	int MaxResources[MaxCosts]{};    /// max resources can be stored
+	int StoredResources[MaxCosts]{}; /// resources in store buildings (can't exceed MaxResources)
+	int LastResources[MaxCosts]{};   /// last values for revenue
+	int Incomes[MaxCosts]{};         /// income of the resources
+	int Revenue[MaxCosts]{};         /// income rate of the resources
+
+	int SpeedResourcesHarvest[MaxCosts]{}; /// speed factor for harvesting resources
+	int SpeedResourcesReturn[MaxCosts]{};  /// speed factor for returning resources
+	int SpeedBuild;                  /// speed factor for building
+	int SpeedTrain;                  /// speed factor for training
+	int SpeedUpgrade;                /// speed factor for upgrading
+	int SpeedResearch;               /// speed factor for researching
+
+	// FIXME: shouldn't use the constant
+	int UnitTypesCount[UnitTypeMax]{}; /// total units of unit-type
+	int UnitTypesAiActiveCount [UnitTypeMax]{}; /// total units of unit-type that have their AI set to active
+
+	bool AiEnabled;        /// handle AI on local computer
+	PlayerAi *Ai;          /// Ai structure pointer
+
+	int    NumBuildings;   /// # buildings
+	int    Supply;         /// supply available/produced
+	int    Demand;         /// demand of player
+
+	int    UnitLimit;       /// # food units allowed
+	int    BuildingLimit;   /// # buildings allowed
+	int    TotalUnitLimit;  /// # total unit number allowed
+
+	int    Score;           /// Points for killing ...
+	int    TotalUnits;
+	int    TotalBuildings;
+	int TotalResources[MaxCosts]{};
+	int    TotalRazings;
+	int    TotalKills;      /// How many unit killed
+	
+	int LostMainFacilityTimer { 0 };/// The timer for when the player lost the last town hall
+									/// (to make the player's units be revealed)
+	
+	IntColor Color;           /// color of units on minimap
+
+	// Upgrades/Allows:
+	CAllow Allow;                 /// Allowed for player
+	CUpgradeTimers UpgradeTimers; /// Timer for the upgrades
 
 private:
 	CUnitColors UnitColors;            /// Unit colors for new units
@@ -309,7 +288,9 @@ private:
 
 	bool isRevealed { false }; 	/// whether the player has been revealed (i.e. after losing the last Town Hall)
 
-	friend void CleanPlayers();
+private:
+	/// List of players revealed after losing their last Town Hall
+	static inline std::vector<const CPlayer *> RevealedPlayers;
 };
 
 /**
@@ -319,26 +300,23 @@ private:
 class PlayerRace
 {
 public:
-	PlayerRace() : Count(0)
-	{
-		memset(Visible, 0, sizeof(Visible));
-	}
+	PlayerRace() = default;
 
 	void Clean();
 	int GetRaceIndexByName(std::string_view raceName) const;
 
 public:
-	bool Visible[MAX_RACES];        /// race should be visible in pulldown
+	bool Visible[MAX_RACES]{};      /// race should be visible in pulldown
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
-	unsigned int Count;             /// number of races
+	unsigned int Count = 0;         /// number of races
 };
 
 /**
 **  Notify types. Noties are send to the player.
 */
 enum NotifyType {
-	NotifyRed,     /// Red alram
+	NotifyRed,     /// Red alarm
 	NotifyYellow,  /// Yellow alarm
 	NotifyGreen    /// Green alarm
 };

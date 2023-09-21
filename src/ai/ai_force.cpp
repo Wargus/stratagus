@@ -701,14 +701,10 @@ bool AiAssignToForce(CUnit &unit)
 */
 void AiAssignFreeUnitsToForce(int force)
 {
-	const int n = AiPlayer->Player->GetUnitCount();
-
 	AiRemoveDeadUnitInForces();
-	for (int i = 0; i < n; ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
-
-		if (unit.Active && unit.GroupId == 0) {
-			AiPlayer->Force.Assign(unit, force);
+	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
+		if (unit->Active && unit->GroupId == 0) {
+			AiPlayer->Force.Assign(*unit, force);
 		}
 	}
 }

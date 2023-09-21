@@ -363,8 +363,8 @@ int AiForce::PlanAttack()
 		DebugPrint("%d: Transporter #%d\n", player.Index, UnitNumber(*transporter));
 		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 	} else {
-		std::vector<CUnit *>::iterator it = std::find_if(player.UnitBegin(), player.UnitEnd(), IsAFreeTransporter());
-		if (it != player.UnitEnd()) {
+		auto it = ranges::find_if(player.GetUnits(), IsAFreeTransporter());
+		if (it != player.GetUnits().end()) {
 			transporter = *it;
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 		} else {
@@ -412,14 +412,12 @@ int AiForce::PlanAttack()
 		if (totalBoardCapacity < 0) { // Not enough transporter.
 			IsAFreeTransporter isAFreeTransporter;
 			// Add all other idle transporter.
-			for (int i = 0; i < player.GetUnitCount(); ++i) {
-				CUnit &unit = player.GetUnit(i);
-
-				if (isAFreeTransporter(&unit) && unit.GroupId == 0 && unit.IsIdle()) {
-					DebugPrint("%d: Assign any transporter #%d\n", player.Index, UnitNumber(unit));
-					Insert(unit);
-					unit.GroupId = forceIndex;
-					totalBoardCapacity += unit.Type->MaxOnBoard - unit.BoardCount;
+			for (CUnit *unit : player.GetUnits()) {
+				if (isAFreeTransporter(unit) && unit->GroupId == 0 && unit->IsIdle()) {
+					DebugPrint("%d: Assign any transporter #%d\n", player.Index, UnitNumber(*unit));
+					Insert(*unit);
+					unit->GroupId = forceIndex;
+					totalBoardCapacity += unit->Type->MaxOnBoard - unit->BoardCount;
 					if (totalBoardCapacity >= 0) {
 						break;
 					}
@@ -466,19 +464,17 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	// Find an idle unit, responding to the mask
 	bool flyeronly = false;
 	int bestSquareDistance = -1;
-	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
-
-		if (!unit.IsIdle()) {
+	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
+		if (!unit->IsIdle()) {
 			continue;
 		}
-		if (Map.Info.IsPointOnMap(unit.tilePos) == false) {
+		if (Map.Info.IsPointOnMap(unit->tilePos) == false) {
 			continue;
 		}
-		if (unit.CanMove() == false) {
+		if (unit->CanMove() == false) {
 			continue;
 		}
-		const CUnitType &type = *unit.Type;
+		const CUnitType &type = *unit->Type;
 
 		if (type.UnitType != UnitTypeFly) {
 			if (flyeronly) {
@@ -494,11 +490,11 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 			flyeronly = true;
 		}
 
-		const int sqDistance = SquareDistance(unit.tilePos, *pos);
+		const int sqDistance = SquareDistance(unit->tilePos, *pos);
 		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
 			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)) {
 			bestSquareDistance = sqDistance;
-			bestunit = &unit;
+			bestunit = unit;
 		}
 	}
 	return bestunit;

@@ -403,12 +403,12 @@ static int CclChangeUnitsOwner(lua_State *l)
 ** Example:
 **
 ** <div class="example"><code>
-**   -- Give 2 peasants from player 4 to player 2
-**   GiveUnitsToPlayer(2, "unit-peasant", 4, 2)
-**   -- Give 4 knights from player 5 to player 1 inside the rectangle 2,2 - 14,14
-**   GiveUnitsToPlayer(2, "unit-peasant", {2,2}, {14,14}, 4, 2)
-**   -- Give any 4 units from player 5 to player 1 inside the rectangle 2,2 - 14,14
-**   GiveUnitsToPlayer(2, "any", 4, 2)
+**   -- Give 2 peasants from player 4 to player 1
+**   GiveUnitsToPlayer(2, "unit-peasant", 4, 1)
+**   -- Give 2 knights from player 4 to player 1 inside the rectangle 2,2 - 14,14
+**   GiveUnitsToPlayer(2, "unit-knight", {2,2}, {14,14}, 4, 1)
+**   -- Give any 4 units from player 4 to player 1
+**   GiveUnitsToPlayer(2, "any", 4, 1)
 ** </code></div>
 **
 */
@@ -423,7 +423,7 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 	if (lua_isnumber(l, 1)) {
 		cnt = LuaToNumber(l, 1);
 	} else {
-		std::string cntStr = std::string(LuaToString(l, 1));
+		std::string_view cntStr = LuaToString(l, 1);
 		if (cntStr != "all") {
 			LuaError(l, "incorrect 1st argument to GiveUnitsToPlayer. Must be number or 'all'");
 		}
@@ -433,7 +433,7 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 	const int oldp = LuaToNumber(l, args == 4 ? 3 : 5);
 	const int newp = LuaToNumber(l, args == 4 ? 4 : 6);
 
-	std::string typestr = std::string(LuaToString(l, 2));
+	std::string_view typestr = LuaToString(l, 2);
 	int assignedCnt = 0;
 
 	CUnitType *type = nullptr;
@@ -451,8 +451,8 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 		if (args == 6) {
 			Vec2i pos1;
 			Vec2i pos2;
-			CclGetPos(l, &pos1.x, &pos1.y, 3);
-			CclGetPos(l, &pos2.x, &pos2.y, 4);
+			CclGetPos(l, &pos1, 3);
+			CclGetPos(l, &pos2, 4);
 			if (pos1.x > pos2.x) {
 				std::swap(pos1.x, pos2.x);
 			}
@@ -476,13 +476,15 @@ static int CclGiveUnitsToPlayer(lua_State *l)
 			}
 		} else {
 			std::vector<CUnit *> table;
-			for (std::vector<CUnit *>::const_iterator it = Players[oldp].UnitBegin(); it != Players[oldp].UnitEnd() && cnt > 0; ++it) {
-				CUnit *unit = *it;
+			for (CUnit *unit : Players[oldp].GetUnits()) {
 				if (any || (onlyUnits && !unit->Type->Building) || (onlyBuildings && unit->Type->Building) || (type == unit->Type)) {
 					table.push_back(unit);
+					if (--cnt > 0) {
+						break;
+					}
 				}
 			}
-			for (auto unit : table) {
+			for (auto *unit : table) {
 				unit->ChangeOwner(Players[newp]);
 			}
 			assignedCnt = table.size();

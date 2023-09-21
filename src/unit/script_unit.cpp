@@ -1043,11 +1043,10 @@ static int CclKillUnit(lua_State *l)
 		}
 	} else {
 		CPlayer &player = Players[plynr];
-		auto it = std::find_if(player.UnitBegin(), player.UnitEnd(), [&](const CUnit *unit) {
-			return unitValidator(*unit);
-		});
+		auto it = ranges::find_if(player.GetUnits(),
+		                          [&](const CUnit *unit) { return unitValidator(*unit); });
 
-		if (it != player.UnitEnd()) {
+		if (it != player.GetUnits().end()) {
 			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;

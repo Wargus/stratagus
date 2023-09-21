@@ -385,8 +385,8 @@ void CleanPlayers()
 {
 	ThisPlayer = nullptr;
 	CPlayer::RevealedPlayers.clear();
-	for (unsigned int i = 0; i < PlayerMax; ++i) {
-		Players[i].Clear();
+	for (auto& player : Players) {
+		player.Clear();
 	}
 	NumPlayers = 0;
 	NoRescueCheck = false;
@@ -890,36 +890,13 @@ void CPlayer::UpdateFreeWorkers()
 		// it's safer to re-initialize.
 		std::vector<CUnit*>().swap(FreeWorkers);
 	}
-	const int nunits = this->GetUnitCount();
-
-	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = this->GetUnit(i);
-		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && !unit.Removed) {
-			if (unit.CurrentAction() == UnitAction::Still) {
-				FreeWorkers.push_back(&unit);
+	for (CUnit *unit : this->GetUnits()) {
+		if (unit->IsAlive() && unit->Type->BoolFlag[HARVESTER_INDEX].value && !unit->Removed) {
+			if (unit->CurrentAction() == UnitAction::Still) {
+				FreeWorkers.push_back(unit);
 			}
 		}
 	}
-}
-
-std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
-{
-	return Units.begin();
-}
-
-std::vector<CUnit *>::iterator CPlayer::UnitBegin()
-{
-	return Units.begin();
-}
-
-std::vector<CUnit *>::const_iterator CPlayer::UnitEnd() const
-{
-	return Units.end();
-}
-
-std::vector<CUnit *>::iterator CPlayer::UnitEnd()
-{
-	return Units.end();
 }
 
 CUnit &CPlayer::GetUnit(int index) const
@@ -1027,11 +1004,9 @@ bool CPlayer::CheckResource(const int resource, const int value)
 int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 {
 	int count = UnitTypesCount[type.Slot];
-	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
-		CUnit &unit = **it;
-
-		if (GameRunning && unit.CurrentAction() == UnitAction::UpgradeTo) {
-			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit.CurrentOrder());
+	for (CUnit *unit : this->Units) {
+		if (GameRunning && unit->CurrentAction() == UnitAction::UpgradeTo) {
+			COrder_UpgradeTo &order = dynamic_cast<COrder_UpgradeTo &>(*unit->CurrentOrder());
 			if (order.GetUnitType().Slot == type.Slot) {
 				++count;
 			}
