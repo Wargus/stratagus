@@ -672,11 +672,11 @@ static void SelectSpritesInsideRectangle(const PixelPos &corner_topleft, const P
 		const CUnitType &type = *unit.Type;
 		PixelPos spritePos = unit.GetMapPixelPosCenter();
 
-		spritePos.x += type.OffsetX - (type.BoxWidth + type.BoxOffsetX) / 2;
-		spritePos.y += type.OffsetY - (type.BoxHeight + type.BoxOffsetY) / 2;
-		if (spritePos.x + type.BoxWidth + type.BoxOffsetX < corner_topleft.x
+		spritePos.x += type.Offset.x - (type.BoxWidth + type.BoxOffset.x) / 2;
+		spritePos.y += type.Offset.y - (type.BoxHeight + type.BoxOffset.y) / 2;
+		if (spritePos.x + type.BoxWidth + type.BoxOffset.x < corner_topleft.x
 			|| spritePos.x > corner_bottomright.x
-			|| spritePos.y + type.BoxHeight + type.BoxOffsetY < corner_topleft.y
+			|| spritePos.y + type.BoxHeight + type.BoxOffset.y < corner_topleft.y
 			|| spritePos.y > corner_bottomright.y) {
 			continue;
 		}

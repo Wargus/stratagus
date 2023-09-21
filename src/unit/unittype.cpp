@@ -853,8 +853,7 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int colorI
 	// FIXME: move this calculation to high level.
 	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
 	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX;
-	pos.y += type.OffsetY;
+	pos += type.Offset;
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -942,7 +941,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			if (type.Flip) {
 				type.ShadowSprite->Flip();
 			}
-			type.ShadowSprite->MakeShadow(type.ShadowOffsetX, type.ShadowOffsetY);
+			type.ShadowSprite->MakeShadow(type.ShadowOffset);
 		}
 	}
 

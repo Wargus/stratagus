@@ -174,7 +174,7 @@ public:
 	void AppendFrames(const sequence_of_images &frames);
 	bool TransparentPixel(int x, int y);
 	void SetPaletteColor(int idx, int r, int g, int b);
-	void MakeShadow(int xOffset, int yOffset);
+	void MakeShadow(PixelPos offset);
 
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);

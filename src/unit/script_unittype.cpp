@@ -517,7 +517,7 @@ static int CclDefineUnitType(lua_State *l)
 					lua_pop(l, 1);
 				} else if (value == "offset") {
 					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->ShadowOffsetX, &type->ShadowOffsetY);
+					CclGetPos(l, &type->ShadowOffset);
 					lua_pop(l, 1);
 				} else if (value == "sprite-frame") {
 					type->ShadowSpriteFrame = LuaToNumber(l, -1, k + 1);
@@ -533,7 +533,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->ShadowSprite = nullptr;
 			}
 		} else if (value == "Offset") {
-			CclGetPos(l, &type->OffsetX, &type->OffsetY);
+			CclGetPos(l, &type->Offset);
 		} else if (value == "Flip") {
 			type->Flip = LuaToBoolean(l, -1);
 		} else if (value == "Animations") {
@@ -651,7 +651,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (value == "BoxSize") {
 			CclGetPos(l, &type->BoxWidth, &type->BoxHeight);
 		} else if (value == "BoxOffset") {
-			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
+			CclGetPos(l, &type->BoxOffset);
 		} else if (value == "NumDirections") {
 			type->NumDirections = LuaToNumber(l, -1);
 		} else if (value == "ComputerReactionRange") {
@@ -1219,16 +1219,14 @@ static int CclCopyUnitType(lua_State *l)
 	to->ShadowFile = from.ShadowFile;
 	to->ShadowWidth = from.ShadowWidth;
 	to->ShadowHeight = from.ShadowHeight;
-	to->ShadowOffsetX = from.ShadowOffsetX;
-	to->ShadowOffsetY = from.ShadowOffsetY;
+	to->ShadowOffset = from.ShadowOffset;
 	to->ShadowSpriteFrame = from.ShadowSpriteFrame;
 	to->ShadowScale = from.ShadowScale;
 	if (to->ShadowSprite) {
 		CGraphic::Free(to->ShadowSprite);
 		to->ShadowSprite = nullptr;
 	}
-	to->OffsetX = from.OffsetX;
-	to->OffsetY = from.OffsetY;
+	to->Offset = from.Offset;
 	to->Animations = from.Animations;
 	to->Icon.Name = from.Icon.Name;
 	to->Icon.Icon = nullptr;
@@ -1261,8 +1259,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->Neutral = from.Neutral;
 	to->BoxWidth = from.BoxWidth;
 	to->BoxHeight = from.BoxHeight;
-	to->BoxOffsetX = from.BoxOffsetX;
-	to->BoxOffsetY = from.BoxOffsetY;
+	to->BoxOffset = from.BoxOffset;
 	to->NumDirections = from.NumDirections;
 	to->ReactRangeComputer = from.ReactRangeComputer;
 	to->ReactRangePerson = from.ReactRangePerson;
