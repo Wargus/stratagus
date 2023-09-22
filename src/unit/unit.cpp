@@ -1427,8 +1427,8 @@ void UnitLost(CUnit &unit)
 			if (player.Incomes[i] && type.Stats[player.Index].ImproveIncomes[i] == player.Incomes[i]) {
 				int m = DefaultIncomes[i];
 
-				for (int j = 0; j < player.GetUnitCount(); ++j) {
-					m = std::max(m, player.GetUnit(j).Type->Stats[player.Index].ImproveIncomes[i]);
+				for (const CUnit* punit : player.GetUnits()) {
+					m = std::max(m, punit->Type->Stats[player.Index].ImproveIncomes[i]);
 				}
 				player.Incomes[i] = m;
 			}
@@ -1436,13 +1436,9 @@ void UnitLost(CUnit &unit)
 	}
 
 	if (type.BoolFlag[MAINFACILITY_INDEX].value && CPlayer::IsRevelationEnabled()) {
-		bool lost_town_hall = true;
-		for (int j = 0; j < player.GetUnitCount(); ++j) {
-			if (player.GetUnit(j).Type->BoolFlag[MAINFACILITY_INDEX].value) {
-				lost_town_hall = false;
-				break;
-			}
-		}
+		const bool lost_town_hall = ranges::none_of(player.GetUnits(), [](const CUnit *unit) {
+			return unit->Type->BoolFlag[MAINFACILITY_INDEX].value;
+		});
 		if (lost_town_hall) {
 			player.LostMainFacilityTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 			for (int j = 0; j < NumPlayers; ++j) {
@@ -2017,11 +2013,9 @@ static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 		return ;
 	}
 
-	for (int i = 0; i != oldplayer.GetUnitCount(); ++i) {
-		CUnit &unit = oldplayer.GetUnit(i);
-
-		unit.Blink = 5;
-		unit.RescuedFrom = &oldplayer;
+	for (CUnit *unit : oldplayer.GetUnits()) {
+		unit->Blink = 5;
+		unit->RescuedFrom = &oldplayer;
 	}
 	// ChangeOwner remove unit from the player: so change the array.
 	while (oldplayer.GetUnitCount() != 0) {
@@ -2048,35 +2042,33 @@ void RescueUnits()
 		if (p->Type != PlayerTypes::PlayerRescuePassive && p->Type != PlayerTypes::PlayerRescueActive) {
 			continue;
 		}
-		if (p->GetUnitCount() != 0) {
+		if (!p->GetUnits().empty()) {
 			NoRescueCheck = false;
 			// NOTE: table is changed.
-			std::vector<CUnit *> table;
-			table.insert(table.begin(), p->UnitBegin(), p->UnitEnd());
+			std::vector<CUnit *> table = p->GetUnits();
 
-			const size_t l = table.size();
-			for (size_t j = 0; j != l; ++j) {
-				CUnit &unit = *table[j];
+			for (CUnit *unit : table) {
+				
 				// Do not rescue removed units. Units inside something are
 				// rescued by ChangeUnitOwner
-				if (unit.Removed) {
+				if (unit->Removed) {
 					continue;
 				}
-				std::vector<CUnit *> around = SelectAroundUnit(unit, 1);
+				std::vector<CUnit *> around = SelectAroundUnit(*unit, 1);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
-					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerTypes::PlayerRescuePassive && around[i]->Player->Type != PlayerTypes::PlayerRescueActive) {
+					if (around[i]->Type->CanAttack && unit->IsAllied(*around[i]) && around[i]->Player->Type != PlayerTypes::PlayerRescuePassive && around[i]->Player->Type != PlayerTypes::PlayerRescueActive) {
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
-						if (unit.Type->CanStore[GoldCost]) {
+						if (unit->Type->CanStore[GoldCost]) {
 							ChangePlayerOwner(*p, *around[i]->Player);
 							break;
 						}
-						unit.RescuedFrom = unit.Player;
-						unit.ChangeOwner(*around[i]->Player);
-						unit.Blink = 5;
-						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound, MaxSampleVolume);
+						unit->RescuedFrom = unit->Player;
+						unit->ChangeOwner(*around[i]->Player);
+						unit->Blink = 5;
+						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound, MaxSampleVolume);
 						break;
 					}
 				}

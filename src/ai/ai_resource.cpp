@@ -84,11 +84,8 @@ static int AiCheckCosts(const int *costs)
 		used[i] = 0;
 	}
 
-	const int nunits = AiPlayer->Player->GetUnitCount();
-	for (int i = 0; i < nunits; ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
-
-		for (const COrder *order : unit.Orders) {
+	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
+		for (const COrder *order : unit->Orders) {
 			if (order->Action == UnitAction::Build) {
 				const COrder_Build &orderBuild = *static_cast<const COrder_Build *>(order);
 				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
@@ -458,11 +455,9 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	const int resource = order.GetCurrentResource();
 	std::vector<CUnit *> depots;
 
-	for (std::vector<CUnit *>::iterator it = worker.Player->UnitBegin(); it != worker.Player->UnitEnd(); ++it) {
-		CUnit &unit = **it;
-
-		if (unit.Type->CanStore[resource] && !unit.IsUnusable()) {
-			depots.push_back(&unit);
+	for (CUnit *unit : worker.Player->GetUnits()) {
+		if (unit->Type->CanStore[resource] && !unit->IsUnusable()) {
+			depots.push_back(unit);
 		}
 	}
 	// If there aren't any alternatives, exit
@@ -1035,57 +1030,47 @@ static void AiCollectResources()
 {
 	std::vector<CUnit *> units_assigned[MaxCosts]; // Worker assigned to resource
 	std::vector<CUnit *> units_unassigned[MaxCosts]; // Unassigned workers
-	int num_units_with_resource[MaxCosts];
-	int num_units_assigned[MaxCosts];
-	int num_units_unassigned[MaxCosts];
-	int percent[MaxCosts];
-	int priority_resource[MaxCosts];
-	int priority_needed[MaxCosts];
-	int wanted[MaxCosts];
+	int num_units_with_resource[MaxCosts]{};
+	int num_units_assigned[MaxCosts]{};
+	int num_units_unassigned[MaxCosts]{};
 	int total_harvester = 0;
 
-	memset(num_units_with_resource, 0, sizeof(num_units_with_resource));
-	memset(num_units_unassigned, 0, sizeof(num_units_unassigned));
-	memset(num_units_assigned, 0, sizeof(num_units_assigned));
-
 	// Collect statistics about the current assignment
-	const int n = AiPlayer->Player->GetUnitCount();
-	for (int i = 0; i < n; ++i) {
-		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
+		if (!unit->Type->BoolFlag[HARVESTER_INDEX].value) {
 			continue;
 		}
 
 		// See if it's assigned already
-		if (unit.Orders.size() == 1 &&
-			unit.CurrentAction() == UnitAction::Resource) {
-			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
+		if (unit->Orders.size() == 1 &&
+			unit->CurrentAction() == UnitAction::Resource) {
+			const COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
 			const int c = order.GetCurrentResource();
-			units_assigned[c].push_back(&unit);
+			units_assigned[c].push_back(unit);
 			num_units_assigned[c]++;
 			total_harvester++;
 			continue;
 		}
 
 		// Ignore busy units. ( building, fighting, ... )
-		if (!unit.IsIdle()) {
+		if (!unit->IsIdle()) {
 			continue;
 		}
 
 		// Send workers with resources back home.
-		if (unit.ResourcesHeld) {
-			const int c = unit.CurrentResource;
+		if (unit->ResourcesHeld) {
+			const int c = unit->CurrentResource;
 
 			num_units_with_resource[c]++;
-			CommandReturnGoods(unit, 0, FlushCommands);
+			CommandReturnGoods(*unit, 0, FlushCommands);
 			total_harvester++;
 			continue;
 		}
 
 		// Look what the unit can do
 		for (int c = 1; c < MaxCosts; ++c) {
-			if (unit.Type->ResInfo[c]) {
-				units_unassigned[c].push_back(&unit);
+			if (unit->Type->ResInfo[c]) {
+				units_unassigned[c].push_back(unit);
 				num_units_unassigned[c]++;
 			}
 		}
@@ -1096,7 +1081,10 @@ static void AiCollectResources()
 		return;
 	}
 
-	memset(wanted, 0, sizeof(wanted));
+	int wanted[MaxCosts]{};
+	int percent[MaxCosts]{};
+	int priority_resource[MaxCosts]{};
+	int priority_needed[MaxCosts]{};
 
 	int percent_total = 100;
 	for (int c = 1; c < MaxCosts; ++c) {
@@ -1142,7 +1130,7 @@ static void AiCollectResources()
 		}
 		unit = nullptr;
 
-		// Try to complete each ressource in the priority order
+		// Try to complete each resource in the priority order
 		for (int i = 0; i < MaxCosts; ++i) {
 			int c = priority_resource[i];
 
@@ -1400,18 +1388,17 @@ static void AiCheckRepair()
 		}
 		// Building under construction but no worker
 		if (unit.CurrentAction() == UnitAction::Built) {
-			int j;
-			for (j = 0; j < AiPlayer->Player->GetUnitCount(); ++j) {
-				COrder *order = AiPlayer->Player->GetUnit(j).CurrentOrder();
+			bool has_repairing_worker = ranges::any_of(AiPlayer->Player->GetUnits(), [&](const CUnit *punit) {
+				COrder *order = punit->CurrentOrder();
 				if (order->Action == UnitAction::Repair) {
 					COrder_Repair &orderRepair = *static_cast<COrder_Repair *>(order);
 
-					if (orderRepair.GetReparableTarget() == &unit) {
-						break;
-					}
+					return orderRepair.GetReparableTarget() == &unit;
 				}
-			}
-			if (j == AiPlayer->Player->GetUnitCount()) {
+				return false;
+			});
+			if (!has_repairing_worker) {
+				int j;
 				// Make sure we have enough resources first
 				for (j = 0; j < MaxCosts; ++j) {
 					// FIXME: the resources don't necessarily have to be in storage

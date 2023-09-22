@@ -180,10 +180,23 @@ namespace ranges
 {
 
 	template <typename Range, typename Predicate>
+	auto all_of(Range &range, Predicate &&predicate)
+	{
+		return std::all_of(begin(range), end(range), std::forward<Predicate>(predicate));
+	}
+
+	template <typename Range, typename Predicate>
 	auto any_of(Range &range, Predicate &&predicate)
 	{
 		return std::any_of(begin(range), end(range), std::forward<Predicate>(predicate));
 	}
+
+	template <typename Range, typename Predicate>
+	auto none_of(Range &range, Predicate &&predicate)
+	{
+		return std::none_of(begin(range), end(range), std::forward<Predicate>(predicate));
+	}
+
 
 	template<typename Range, typename Value>
 	void fill(Range& range, const Value& value)

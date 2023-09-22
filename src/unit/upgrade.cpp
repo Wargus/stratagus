@@ -473,21 +473,19 @@ int UpgradeIdByIdent(std::string_view ident)
 */
 static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &dst)
 {
-	for (int i = 0; i < player.GetUnitCount(); ++i) {
-		CUnit &unit = player.GetUnit(i);
-
+	for (CUnit *unit : player.GetUnits()) {
 		//  Convert already existing units to this type.
-		if (unit.Type == &src) {
-			CommandTransformIntoType(unit, dst);
+		if (unit->Type == &src) {
+			CommandTransformIntoType(*unit, dst);
 			//  Convert trained units to this type.
 			//  FIXME: what about buildings?
 		} else {
-			for (size_t j = 0; j < unit.Orders.size(); ++j) {
-				if (unit.Orders[j]->Action == UnitAction::Train) {
-					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
+			for (COrder* order : unit->Orders) {
+				if (order->Action == UnitAction::Train) {
+					COrder_Train &order_train = *static_cast<COrder_Train *>(order);
 
-					if (&order.GetUnitType() == &src) {
-						order.ConvertUnitType(unit, dst);
+					if (&order_train.GetUnitType() == &src) {
+						order_train.ConvertUnitType(*unit, dst);
 					}
 				}
 			}
@@ -725,27 +723,25 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
-			
+
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
-						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && unit->IsAlive()) {
+						unit->Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
 			}
-			
+
 			// if a unit type's demand is changed, we need to update the player's demand accordingly
 			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
-						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && unit->IsAlive()) {
+						unit->Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
 			}
@@ -759,8 +755,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
 					int m = DefaultIncomes[j];
 
-					for (int k = 0; k < player.GetUnitCount(); ++k) {
-						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+					for (const CUnit* unit : player.GetUnits()) {
+						m = std::max(m, unit->Type->Stats[player.Index].ImproveIncomes[j]);
 					}
 					player.Incomes[j] = m;
 				}
