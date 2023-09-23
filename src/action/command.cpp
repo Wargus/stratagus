@@ -894,19 +894,19 @@ void CommandAutoSpellCast(CUnit &unit, int spellid, int on)
 **  @param state     New diplomacy state.
 **  @param opponent  Opponent.
 */
-void CommandDiplomacy(int player, int state, int opponent)
+void CommandDiplomacy(int player, EDiplomacy state, int opponent)
 {
 	switch (state) {
-		case DiplomacyNeutral:
+		case EDiplomacy::Neutral:
 			Players[player].SetDiplomacyNeutralWith(Players[opponent]);
 			break;
-		case DiplomacyAllied:
+		case EDiplomacy::Allied:
 			Players[player].SetDiplomacyAlliedWith(Players[opponent]);
 			break;
-		case DiplomacyEnemy:
+		case EDiplomacy::Enemy:
 			Players[player].SetDiplomacyEnemyWith(Players[opponent]);
 			break;
-		case DiplomacyCrazy:
+		case EDiplomacy::Crazy:
 			Players[player].SetDiplomacyCrazyWith(Players[opponent]);
 			break;
 	}

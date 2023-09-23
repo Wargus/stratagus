@@ -1310,7 +1310,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	}
 
 	if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
-		ThisPlayer->Notify(NotifyYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
+		ThisPlayer->Notify(ColorYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
 	}
 	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
 		SendCommandTrainUnit(*Selected[best_training_place], type, !(KeyModifiers & ModifierShift));
@@ -1337,7 +1337,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	// FIXME: training queue full check is not correct for network.
 	// FIXME: this can be correct written, with a little more code.
 	if (Selected[0]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
-		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
+		Selected[0]->Player->Notify(ColorYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
 	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
 		//PlayerSubUnitType(player,type);
 		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));

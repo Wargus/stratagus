@@ -306,13 +306,13 @@ void COrder_UpgradeTo::Execute(CUnit &unit) /* override */
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+		player.Notify(ColorYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
 		// give resources back
 		player.AddCosts(newstats.Costs);
 		this->Finished = true;
 		return ;
 	}
-	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
+	player.Notify(ColorGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
 
 	//  Warn AI.
 	if (player.AiEnabled) {

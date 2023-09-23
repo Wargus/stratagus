@@ -206,7 +206,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 				return false;
 			}
 
-			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
+			unit.Player->Notify(ColorYellow, unit.tilePos, "%s", _("You cannot reach building place"));
 			if (unit.Player->AiEnabled) {
 				AiCanNotReach(unit, this->GetUnitType());
 			}
@@ -230,15 +230,14 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	// Check if enough resources for the building.
 	if (player.CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		player.Notify(NotifyYellow, unit.tilePos,
-					  _("Not enough resources to build %s"), type.Name.c_str());
+		player.Notify(
+			ColorYellow, unit.tilePos, _("Not enough resources to build %s"), type.Name.c_str());
 		isOk = false;
 	}
 
 	// Check if hiting any limits for the building.
 	if (player.CheckLimits(type) < 0) {
-		player.Notify(NotifyYellow, unit.tilePos,
-					  _("Can't build more units %s"), type.Name.c_str());
+		player.Notify(ColorYellow, unit.tilePos, _("Can't build more units %s"), type.Name.c_str());
 		isOk = false;
 	}
 	if (isOk == false && player.AiEnabled) {
@@ -324,8 +323,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	// If unable to make unit, stop, and report message
 	if (build == nullptr) {
 		// FIXME: Should we retry this?
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
-							_("Unable to create building %s"), type.Name.c_str());
+		unit.Player->Notify(
+			ColorYellow, unit.tilePos, _("Unable to create building %s"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -475,8 +474,8 @@ void COrder_Build::Execute(CUnit &unit) /* override */
 		}
 	}
 	if (this->State == State_StartBuilding_Failed) {
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
-							_("You cannot build %s here"), type.Name.c_str());
+		unit.Player->Notify(
+			ColorYellow, unit.tilePos, _("You cannot build %s here"), type.Name.c_str());
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}

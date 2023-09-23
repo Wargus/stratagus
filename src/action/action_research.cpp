@@ -49,6 +49,7 @@
 #include "unittype.h"
 #include "upgrade_structs.h"
 #include "upgrade.h"
+#include "video.h"
 
 /// How many resources the player gets back if canceling research
 #define CancelResearchCostsFactor  100
@@ -146,9 +147,10 @@ void COrder_Research::Execute(CUnit &unit) /* override */
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
+			player.Notify(ColorGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
+			player.Notify(
+				ColorGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
 		}
 		if (&player == ThisPlayer) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;

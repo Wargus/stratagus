@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -75,12 +76,15 @@ constexpr char DEFAULT_ACTIVE_AI[] = "ai-active";
 --  Player type
 ----------------------------------------------------------------------------*/
 
-enum _diplomacy_ {
-	DiplomacyAllied,   /// Ally with opponent
-	DiplomacyNeutral,  /// Don't attack be neutral
-	DiplomacyEnemy,    /// Attack opponent
-	DiplomacyCrazy     /// Ally and attack opponent
+enum class EDiplomacy {
+	Allied,   /// Ally with opponent
+	Neutral,  /// Don't attack be neutral
+	Enemy,    /// Attack opponent
+	Crazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
+
+std::optional<EDiplomacy> DiplomacyFromString(std::string_view);
+std::string_view ToString(EDiplomacy);
 
 ///  Player structure
 class CPlayer
@@ -119,13 +123,7 @@ public:
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
 
-	std::vector<CUnit *>::const_iterator FreeWorkersBegin() const;
-	std::vector<CUnit *>::const_iterator FreeWorkersEnd() const;
-	std::vector<CUnit *>::iterator FreeWorkersBegin();
-	std::vector<CUnit *>::iterator FreeWorkersEnd();
-
-	CUnit *GetFreeWorker(int index) const;
-	int GetFreeWorkersCount() const;
+	const std::vector<CUnit *> &GetFreeWorkers() const { return FreeWorkers; }
 	void UpdateFreeWorkers();
 
 	void ClearUnitColors();
@@ -169,7 +167,7 @@ public:
 	int HaveUnitTypeByIdent(std::string_view ident) const;
 
 	/// Notify player about a problem
-	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
+	void Notify(IntColor, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
@@ -310,15 +308,6 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	unsigned int Count = 0;         /// number of races
-};
-
-/**
-**  Notify types. Noties are send to the player.
-*/
-enum NotifyType {
-	NotifyRed,     /// Red alarm
-	NotifyYellow,  /// Yellow alarm
-	NotifyGreen    /// Green alarm
 };
 
 /*----------------------------------------------------------------------------

@@ -208,7 +208,7 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 	CUnit *newUnit = MakeUnit(nType, &player);
 
 	if (newUnit == nullptr) { // No more memory :/
-		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+		player.Notify(ColorYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
@@ -236,7 +236,7 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 	} */
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
-	player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+	player.Notify(ColorGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}

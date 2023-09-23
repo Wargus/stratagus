@@ -34,10 +34,7 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-
 #include "stratagus.h"
-
 #include "player.h"
 
 #include "action/action_upgradeto.h"
@@ -332,6 +329,30 @@ int PlayerColorIndexCount;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+std::optional<EDiplomacy> DiplomacyFromString(std::string_view name)
+{
+	if (name == "neutral") {
+		return EDiplomacy::Neutral;
+	} else if (name == "allied") {
+		return EDiplomacy::Allied;
+	} else if (name == "enemy") {
+		return EDiplomacy::Enemy;
+	} else if (name == "crazy") {
+		return EDiplomacy::Crazy;
+	} else {
+		DebugPrint("Invalid diplomacy command: %s", name.data());
+		return std::nullopt;
+	}
+}
+
+std::string_view ToString(EDiplomacy e)
+{
+	Assert(int(e) < 4);
+	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
+
+	return diplomacyNames[int(e)];
+}
 
 /**
 **  Change revelation type
@@ -851,36 +872,6 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
 }
 
-std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersBegin() const
-{
-	return FreeWorkers.begin();
-}
-
-std::vector<CUnit *>::iterator CPlayer::FreeWorkersBegin()
-{
-	return FreeWorkers.begin();
-}
-
-std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersEnd() const
-{
-	return FreeWorkers.end();
-}
-
-std::vector<CUnit *>::iterator CPlayer::FreeWorkersEnd()
-{
-	return FreeWorkers.end();
-}
-
-CUnit *CPlayer::GetFreeWorker(int index) const
-{
-	return FreeWorkers[index];
-}
-
-int CPlayer::GetFreeWorkersCount() const
-{
-	return static_cast<int>(FreeWorkers.size());
-}
-
 void CPlayer::UpdateFreeWorkers()
 {
 	FreeWorkers.clear();
@@ -1326,18 +1317,17 @@ void DebugPlayers()
 /**
 **  Notify player about a problem.
 **
-**  @param type    Problem type
+**  @param color   message color
 **  @param pos     Map tile position
 **  @param fmt     Message format
 **  @param ...     Message varargs
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
+void CPlayer::Notify(IntColor color, const Vec2i &pos, const char *fmt, ...) const
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	char temp[128];
-	Uint32 color;
 	va_list va;
 
 	// Notify me, and my TEAM members
@@ -1349,18 +1339,6 @@ void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 	temp[sizeof(temp) - 1] = '\0';
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
-	switch (type) {
-		case NotifyRed:
-			color = ColorRed;
-			break;
-		case NotifyYellow:
-			color = ColorYellow;
-			break;
-		case NotifyGreen:
-			color = ColorGreen;
-			break;
-		default: color = ColorWhite;
-	}
 	UI.Minimap.AddEvent(pos, color);
 	if (this == ThisPlayer) {
 		SetMessageEvent(pos, "%s", temp);

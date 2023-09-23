@@ -198,7 +198,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		unit.ResourcesHeld = type.StartingResources;
 	}
 
-	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
+	player.Notify(ColorGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	if (&player == ThisPlayer) {
 		if (type.MapSound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
