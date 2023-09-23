@@ -1968,7 +1968,7 @@ static int CclDefineDecorations(lua_State *l)
 			} else if (key == "Offset") {
 				CclGetPos(l, &tmp.Offset);
 			} else if (key == "OffsetPercent") {
-				CclGetPos(l, &tmp.Offset);
+				CclGetPos(l, &tmp.OffsetPercent);
 			} else if (key == "CenterX") {
 				tmp.IsCenteredInX = LuaToBoolean(l, -1);
 			} else if (key == "CenterY") {
