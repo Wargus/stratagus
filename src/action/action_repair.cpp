@@ -175,8 +175,10 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 	}
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (!player.CheckResource(i, RepairCosts[i])) {
-			player.Notify(NotifyYellow, unit.tilePos,
-						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
+			player.Notify(ColorYellow,
+			              unit.tilePos,
+			              _("We need more %s for repair!"),
+			              DefaultResourceNames[i].c_str());
 			return true;
 		}
 	}

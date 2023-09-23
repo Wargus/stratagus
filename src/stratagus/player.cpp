@@ -34,10 +34,7 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-
 #include "stratagus.h"
-
 #include "player.h"
 
 #include "action/action_upgradeto.h"
@@ -1320,18 +1317,17 @@ void DebugPlayers()
 /**
 **  Notify player about a problem.
 **
-**  @param type    Problem type
+**  @param color   message color
 **  @param pos     Map tile position
 **  @param fmt     Message format
 **  @param ...     Message varargs
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
+void CPlayer::Notify(IntColor color, const Vec2i &pos, const char *fmt, ...) const
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	char temp[128];
-	Uint32 color;
 	va_list va;
 
 	// Notify me, and my TEAM members
@@ -1343,18 +1339,6 @@ void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 	temp[sizeof(temp) - 1] = '\0';
 	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
 	va_end(va);
-	switch (type) {
-		case NotifyRed:
-			color = ColorRed;
-			break;
-		case NotifyYellow:
-			color = ColorYellow;
-			break;
-		case NotifyGreen:
-			color = ColorGreen;
-			break;
-		default: color = ColorWhite;
-	}
 	UI.Minimap.AddEvent(pos, color);
 	if (this == ThisPlayer) {
 		SetMessageEvent(pos, "%s", temp);

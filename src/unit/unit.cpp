@@ -2868,7 +2868,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 			}
 		}
 	}
-	target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
+	target.Player->Notify(ColorRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
 
 	if (attacker && !target.Type->Building) {
 		if (target.Player->AiEnabled) {

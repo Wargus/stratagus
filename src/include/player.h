@@ -86,7 +86,6 @@ enum class EDiplomacy {
 std::optional<EDiplomacy> DiplomacyFromString(std::string_view);
 std::string_view ToString(EDiplomacy);
 
-
 ///  Player structure
 class CPlayer
 {
@@ -168,7 +167,7 @@ public:
 	int HaveUnitTypeByIdent(std::string_view ident) const;
 
 	/// Notify player about a problem
-	void Notify(int type, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
+	void Notify(IntColor, const Vec2i &pos, const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(4, 5); // Don't forget to count this
 	/// Notify player about a problem
 	void Notify(const char *fmt, ...) const PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 
@@ -309,15 +308,6 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	unsigned int Count = 0;         /// number of races
-};
-
-/**
-**  Notify types. Noties are send to the player.
-*/
-enum NotifyType {
-	NotifyRed,     /// Red alarm
-	NotifyYellow,  /// Yellow alarm
-	NotifyGreen    /// Green alarm
 };
 
 /*----------------------------------------------------------------------------
