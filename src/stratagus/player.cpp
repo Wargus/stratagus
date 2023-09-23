@@ -851,36 +851,6 @@ void CPlayer::RemoveUnit(CUnit &unit)
 	Assert(last == &unit || this->Units[last->PlayerSlot] == last);
 }
 
-std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersBegin() const
-{
-	return FreeWorkers.begin();
-}
-
-std::vector<CUnit *>::iterator CPlayer::FreeWorkersBegin()
-{
-	return FreeWorkers.begin();
-}
-
-std::vector<CUnit *>::const_iterator CPlayer::FreeWorkersEnd() const
-{
-	return FreeWorkers.end();
-}
-
-std::vector<CUnit *>::iterator CPlayer::FreeWorkersEnd()
-{
-	return FreeWorkers.end();
-}
-
-CUnit *CPlayer::GetFreeWorker(int index) const
-{
-	return FreeWorkers[index];
-}
-
-int CPlayer::GetFreeWorkersCount() const
-{
-	return static_cast<int>(FreeWorkers.size());
-}
-
 void CPlayer::UpdateFreeWorkers()
 {
 	FreeWorkers.clear();

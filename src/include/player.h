@@ -119,13 +119,7 @@ public:
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
 
-	std::vector<CUnit *>::const_iterator FreeWorkersBegin() const;
-	std::vector<CUnit *>::const_iterator FreeWorkersEnd() const;
-	std::vector<CUnit *>::iterator FreeWorkersBegin();
-	std::vector<CUnit *>::iterator FreeWorkersEnd();
-
-	CUnit *GetFreeWorker(int index) const;
-	int GetFreeWorkersCount() const;
+	const std::vector<CUnit *> &GetFreeWorkers() const { return FreeWorkers; }
 	void UpdateFreeWorkers();
 
 	void ClearUnitColors();

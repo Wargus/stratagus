@@ -614,11 +614,10 @@ void DrawResources()
 		label.Draw(UI.Resources[ScoreCost].TextX, UI.Resources[ScoreCost].TextY + (score > 99999) * 3, score);
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
-		const int workers = ThisPlayer->GetFreeWorkersCount();
 		int textX = UI.Resources[FreeWorkersCount].TextX;
 		if (textX < 0) {
 			// XXX: this is hacky, but what use is that bit otherwise
-			if (workers == 0) {
+			if (ThisPlayer->GetFreeWorkers().empty()) {
 				return;
 			} else {
 				textX = -textX;
@@ -629,7 +628,8 @@ void DrawResources()
 											 UI.Resources[FreeWorkersCount].IconX, UI.Resources[FreeWorkersCount].IconY);
 		}
 		label.SetFont(GetGameFont());
-		label.Draw(textX, UI.Resources[FreeWorkersCount].TextY, workers);
+		label.Draw(
+			textX, UI.Resources[FreeWorkersCount].TextY, ThisPlayer->GetFreeWorkers().size());
 	}
 }
 

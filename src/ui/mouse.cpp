@@ -765,7 +765,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 		CGraphic* g = UI.Resources[FreeWorkersCount].G;
 		if (g && (x = UI.Resources[FreeWorkersCount].IconX) && (y = UI.Resources[FreeWorkersCount].IconY)) {
 			int textX = UI.Resources[FreeWorkersCount].TextX;
-			if (textX > 0 || ThisPlayer->GetFreeWorkersCount() > 0) {
+			if (textX > 0 || !ThisPlayer->GetFreeWorkers().empty()) {
 				if (screenPos > PixelPos(x, y) && screenPos < PixelPos(x + g->getWidth(), y + g->getHeight())) {
 					ButtonAreaUnderCursor = ButtonArea::Menu;
 					ButtonUnderCursor = ButtonUnderFreeWorkers;
