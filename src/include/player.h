@@ -36,6 +36,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -75,12 +76,16 @@ constexpr char DEFAULT_ACTIVE_AI[] = "ai-active";
 --  Player type
 ----------------------------------------------------------------------------*/
 
-enum _diplomacy_ {
-	DiplomacyAllied,   /// Ally with opponent
-	DiplomacyNeutral,  /// Don't attack be neutral
-	DiplomacyEnemy,    /// Attack opponent
-	DiplomacyCrazy     /// Ally and attack opponent
+enum class EDiplomacy {
+	Allied,   /// Ally with opponent
+	Neutral,  /// Don't attack be neutral
+	Enemy,    /// Attack opponent
+	Crazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
+
+std::optional<EDiplomacy> DiplomacyFromString(std::string_view);
+std::string_view ToString(EDiplomacy);
+
 
 ///  Player structure
 class CPlayer

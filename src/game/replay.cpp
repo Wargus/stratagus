@@ -739,20 +739,11 @@ static void DoNextReplay()
 	} else if (action == "auto-spell-cast") {
 		SendCommandAutoSpellCast(*unit, num, arg1);
 	} else if (action == "diplomacy") {
-		int state;
-		if (val == "neutral") {
-			state = DiplomacyNeutral;
-		} else if (val == "allied") {
-			state = DiplomacyAllied;
-		} else if (val == "enemy") {
-			state = DiplomacyEnemy;
-		} else if (val == "crazy") {
-			state = DiplomacyCrazy;
+		if (auto state = DiplomacyFromString(val)) {
+			SendCommandDiplomacy(arg1, *state, arg2);
 		} else {
 			DebugPrint("Invalid diplomacy command: %s", val.data());
-			state = -1;
 		}
-		SendCommandDiplomacy(arg1, state, arg2);
 	} else if (action == "shared-vision") {
 		const bool state = to_number(val) != 0;
 		SendCommandSharedVision(arg1, state, arg2);

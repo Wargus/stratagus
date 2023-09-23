@@ -333,6 +333,30 @@ int PlayerColorIndexCount;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+std::optional<EDiplomacy> DiplomacyFromString(std::string_view name)
+{
+	if (name == "neutral") {
+		return EDiplomacy::Neutral;
+	} else if (name == "allied") {
+		return EDiplomacy::Allied;
+	} else if (name == "enemy") {
+		return EDiplomacy::Enemy;
+	} else if (name == "crazy") {
+		return EDiplomacy::Crazy;
+	} else {
+		DebugPrint("Invalid diplomacy command: %s", name.data());
+		return std::nullopt;
+	}
+}
+
+std::string_view ToString(EDiplomacy e)
+{
+	Assert(int(e) < 4);
+	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
+
+	return diplomacyNames[int(e)];
+}
+
 /**
 **  Change revelation type
 */

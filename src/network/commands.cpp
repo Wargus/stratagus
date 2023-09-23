@@ -503,31 +503,14 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 ** @param state      New diplomacy state.
 ** @param opponent   Opponent.
 */
-void SendCommandDiplomacy(int player, int state, int opponent)
+void SendCommandDiplomacy(int player, EDiplomacy state, int opponent)
 {
 	if (IsReplayGame()) {
-		switch (state) {
-			case DiplomacyNeutral:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "neutral", -1);
-				break;
-			case DiplomacyAllied:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "allied", -1);
-				break;
-			case DiplomacyEnemy:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "enemy", -1);
-				break;
-			case DiplomacyCrazy:
-				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
-						   NoUnitP, "crazy", -1);
-				break;
-		}
+		CommandLog("diplomacy", NoUnitP, 0, player, opponent, NoUnitP, ToString(state).data(), -1);
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
-								   -1, player, state, opponent, 0);
+								   -1, player, int(state), opponent, 0);
 	}
 }
 
@@ -764,14 +747,6 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	}
 }
 
-static const char *GetDiplomacyName(enum _diplomacy_ e)
-{
-	Assert(int(e) < 4);
-	const char *diplomacyNames[] = {"allied", "neutral", "enemy", "crazy"};
-
-	return diplomacyNames[int(e)];
-}
-
 /**
 ** Execute an extended command (from network).
 **
@@ -790,9 +765,9 @@ void ExecExtendedCommand(unsigned char type, int status,
 
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
-			const char *diplomacyName = GetDiplomacyName(_diplomacy_(arg3));
-			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, diplomacyName, -1);
-			CommandDiplomacy(arg2, arg3, arg4);
+			const auto diplomacy = EDiplomacy(arg3);
+			CommandLog("diplomacy", NoUnitP, 0, arg2, arg4, NoUnitP, ToString(diplomacy).data(), -1);
+			CommandDiplomacy(arg2, diplomacy, arg4);
 			break;
 		}
 		case ExtendedMessageSharedVision:

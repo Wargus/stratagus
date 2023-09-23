@@ -648,15 +648,8 @@ static int CclSetDiplomacy(lua_State *l)
 	const int base = LuaToNumber(l, 1);
 	const int plynr = LuaToNumber(l, 3);
 	const std::string_view state = LuaToString(l, 2);
-
-	if (state == "allied") {
-		SendCommandDiplomacy(base, DiplomacyAllied, plynr);
-	} else if (state == "neutral") {
-		SendCommandDiplomacy(base, DiplomacyNeutral, plynr);
-	} else if (state == "crazy") {
-		SendCommandDiplomacy(base, DiplomacyCrazy, plynr);
-	} else if (state == "enemy") {
-		SendCommandDiplomacy(base, DiplomacyEnemy, plynr);
+	if (auto diplomacy = DiplomacyFromString(state)) {
+		SendCommandDiplomacy(base, *diplomacy, plynr);
 	}
 	return 0;
 }
@@ -674,8 +667,8 @@ static int CclDiplomacy(lua_State *l)
 }
 
 /**
-**  Get diplomacy from one player to another. Returns the strings "allied",
-**  "enemy", "neutral", or "crazy".
+**  Get diplomacy from one player to another.
+**  Returns one of "allied", "enemy", "neutral" or "crazy".
 */
 static int CclGetDiplomacy(lua_State *l)
 {
@@ -685,14 +678,14 @@ static int CclGetDiplomacy(lua_State *l)
 
 	if (Players[base].IsEnemy(plynr)) {
 		if (Players[base].IsAllied(plynr)) {
-			lua_pushstring(l, "crazy");
+			lua_pushstring(l, ToString(EDiplomacy::Crazy).data());
 		} else {
-			lua_pushstring(l, "enemy");
+			lua_pushstring(l, ToString(EDiplomacy::Enemy).data());
 		}
 	} else if (Players[base].IsAllied(plynr)) {
-		lua_pushstring(l, "allied");
+		lua_pushstring(l, ToString(EDiplomacy::Allied).data());
 	} else {
-		lua_pushstring(l, "neutral");
+		lua_pushstring(l, ToString(EDiplomacy::Neutral).data());
 	}
 	return 1;
 }

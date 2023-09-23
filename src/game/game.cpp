@@ -616,8 +616,8 @@ static void GameTypeFreeForAll()
 {
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		for (int j = i + 1; j < PlayerMax - 1; ++j) {
-			CommandDiplomacy(i, DiplomacyEnemy, j);
-			CommandDiplomacy(j, DiplomacyEnemy, i);
+			CommandDiplomacy(i, EDiplomacy::Enemy, j);
+			CommandDiplomacy(j, EDiplomacy::Enemy, i);
 		}
 	}
 }
@@ -636,13 +636,13 @@ static void GameTypeTopVsBottom()
 			const bool top_j = Players[j].StartPos.y <= middle;
 
 			if (top_i == top_j) {
-				CommandDiplomacy(i, DiplomacyAllied, j);
+				CommandDiplomacy(i, EDiplomacy::Allied, j);
 				Players[i].ShareVisionWith(Players[j]);
-				CommandDiplomacy(j, DiplomacyAllied, i);
+				CommandDiplomacy(j, EDiplomacy::Allied, i);
 				Players[j].ShareVisionWith(Players[i]);
 			} else {
-				CommandDiplomacy(i, DiplomacyEnemy, j);
-				CommandDiplomacy(j, DiplomacyEnemy, i);
+				CommandDiplomacy(i, EDiplomacy::Enemy, j);
+				CommandDiplomacy(j, EDiplomacy::Enemy, i);
 			}
 		}
 	}
@@ -662,13 +662,13 @@ static void GameTypeLeftVsRight()
 			const bool left_j = Players[j].StartPos.x <= middle;
 
 			if (left_i == left_j) {
-				CommandDiplomacy(i, DiplomacyAllied, j);
+				CommandDiplomacy(i, EDiplomacy::Allied, j);
 				Players[i].ShareVisionWith(Players[j]);
-				CommandDiplomacy(j, DiplomacyAllied, i);
+				CommandDiplomacy(j, EDiplomacy::Allied, i);
 				Players[j].ShareVisionWith(Players[i]);
 			} else {
-				CommandDiplomacy(i, DiplomacyEnemy, j);
-				CommandDiplomacy(j, DiplomacyEnemy, i);
+				CommandDiplomacy(i, EDiplomacy::Enemy, j);
+				CommandDiplomacy(j, EDiplomacy::Enemy, i);
 			}
 		}
 	}
@@ -688,13 +688,13 @@ static void GameTypeManVsMachine()
 				continue;
 			}
 			if (Players[i].Type == Players[j].Type) {
-				CommandDiplomacy(i, DiplomacyAllied, j);
+				CommandDiplomacy(i, EDiplomacy::Allied, j);
 				Players[i].ShareVisionWith(Players[j]);
-				CommandDiplomacy(j, DiplomacyAllied, i);
+				CommandDiplomacy(j, EDiplomacy::Allied, i);
 				Players[j].ShareVisionWith(Players[i]);
 			} else {
-				CommandDiplomacy(i, DiplomacyEnemy, j);
-				CommandDiplomacy(j, DiplomacyEnemy, i);
+				CommandDiplomacy(i, EDiplomacy::Enemy, j);
+				CommandDiplomacy(j, EDiplomacy::Enemy, i);
 			}
 		}
 	}
@@ -712,10 +712,10 @@ static void GameTypeManTeamVsMachine()
 		for (int j = 0; j < PlayerMax - 1; ++j) {
 			if (i != j) {
 				if (Players[i].Type == Players[j].Type) {
-					CommandDiplomacy(i, DiplomacyAllied, j);
+					CommandDiplomacy(i, EDiplomacy::Allied, j);
 					Players[i].ShareVisionWith(Players[j]);
 				} else {
-					CommandDiplomacy(i, DiplomacyEnemy, j);
+					CommandDiplomacy(i, EDiplomacy::Enemy, j);
 				}
 			}
 		}
@@ -737,11 +737,11 @@ static void GameTypeMachineVsMachine()
 		if (Players[i].Type == PlayerTypes::PlayerComputer) {
 			for (int j = i + 1; j < PlayerMax - 1; ++j) {
 				if (Players[j].Type == PlayerTypes::PlayerComputer) {
-					CommandDiplomacy(i, DiplomacyEnemy, j);
-					CommandDiplomacy(j, DiplomacyEnemy, i);
+					CommandDiplomacy(i, EDiplomacy::Enemy, j);
+					CommandDiplomacy(j, EDiplomacy::Enemy, i);
 				} else {
-					CommandDiplomacy(i, DiplomacyNeutral, j);
-					CommandDiplomacy(j, DiplomacyNeutral, i);
+					CommandDiplomacy(i, EDiplomacy::Neutral, j);
+					CommandDiplomacy(j, EDiplomacy::Neutral, i);
 				}
 			}
 		}
