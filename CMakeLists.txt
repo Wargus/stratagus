@@ -666,12 +666,27 @@ if(APPLE)
 	list(APPEND CMAKE_PREFIX_PATH /opt/homebrew/)
 endif()
 
-if(NOT WIN32 OR NOT MSVC)
-	include(CheckCXXSourceCompiles)
-	set(FS_SRC "
-	#include <experimental/filesystem> 
+include(CheckCXXSourceCompiles)
+
+set(FS_SRC "
+#include <filesystem>
+namespace fs = std::filesystem;
+int main() {
+	fs::path p = fs::path(\".\");
+	if (fs::absolute(p).is_absolute()) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+")
+check_cxx_source_compiles("${FS_SRC}" HAS_17_FS)
+
+if(NOT HAS_17_FS) # Tr
+	set(EXPERIMENTAL_FS_SRC "
+	#include <experimental/filesystem>
 	namespace fs = std::experimental::filesystem;
-	int main(int argc, char **argv) {
+	int main() {
 		fs::path p = fs::path(\".\");
 		if (fs::absolute(p).is_absolute()) {
 			return 0;
@@ -680,15 +695,15 @@ if(NOT WIN32 OR NOT MSVC)
 		}
 	}
 	")
-	check_cxx_source_compiles("${FS_SRC}" HAS_17_FS)
-	if(NOT HAS_17_FS)
+	check_cxx_source_compiles("${EXPERIMENTAL_FS_SRC}" HAS_17_EXPERIMENTAL_FS)
+	if(NOT HAS_17_EXPERIMENTAL_FS)
 		set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
-		check_cxx_source_compiles("${FS_SRC}" HAS_EXP_17_FS_WITH_STDC)
+		check_cxx_source_compiles("${EXPERIMENTAL_FS_SRC}" HAS_EXP_17_FS_WITH_STDC)
 		if(HAS_EXP_17_FS_WITH_STDC)
 			set(stratagus_LIBS ${stratagus_LIBS} stdc++fs)
 		else()
 			set(CMAKE_REQUIRED_LIBRARIES c++fs)
-			check_cxx_source_compiles("${FS_SRC}" HAS_EXP_17_FS_WITH_CLIB)
+			check_cxx_source_compiles("${EXPERIMENTAL_FS_SRC}" HAS_EXP_17_FS_WITH_CLIB)
 			if(HAS_EXP_17_FS_WITH_CLIB)
 				set(stratagus_LIBS ${stratagus_LIBS} c++fs)
 			else()
