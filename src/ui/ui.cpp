@@ -122,7 +122,6 @@ CUnitInfoPanel::~CUnitInfoPanel()
 	for (CContentType *content : Contents) {
 		delete content;
 	}
-	delete Condition;
 }
 
 

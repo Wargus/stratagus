@@ -298,14 +298,14 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	}
 
 	switch (e) {
-		case VariableValue: return var->Value;
-		case VariableMax: return var->Max;
-		case VariableIncrease: return var->Increase;
-		case VariableDiff: return var->Max - var->Value;
-		case VariablePercent:
+		case EnumVariable::Value: return var->Value;
+		case EnumVariable::Max: return var->Max;
+		case EnumVariable::Increase: return var->Increase;
+		case EnumVariable::Diff: return var->Max - var->Value;
+		case EnumVariable::Percent:
 			Assert(unit.Variable[index].Max != 0);
 			return 100 * var->Value / var->Max;
-		case VariableName:
+		case EnumVariable::Name:
 			if (index == GIVERESOURCE_INDEX) {
 				return DefaultResourceNames[unit.Type->GivesResource].c_str();
 			} else if (index == CARRYRESOURCE_INDEX) {
@@ -339,14 +339,14 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 			break;
 	}
 	switch (e) {
-		case VariableValue: return var->Value;
-		case VariableMax: return var->Max;
-		case VariableIncrease: return var->Increase;
-		case VariableDiff: return var->Max - var->Value;
-		case VariablePercent:
+		case EnumVariable::Value: return var->Value;
+		case EnumVariable::Max: return var->Max;
+		case EnumVariable::Increase: return var->Increase;
+		case EnumVariable::Diff: return var->Max - var->Value;
+		case EnumVariable::Percent:
 			Assert(type.Stats[ThisPlayer->Index].Variables[index].Max != 0);
 			return 100 * var->Value / var->Max;
-		case VariableName:
+		case EnumVariable::Name:
 			if (index == GIVERESOURCE_INDEX) {
 				return DefaultResourceNames[type.GivesResource].c_str();
 			} else {
@@ -526,9 +526,9 @@ static void DrawUnitInfo(CUnit &unit)
 {
 	UpdateUnitVariables(unit);
 	for (size_t i = 0; i != UI.InfoPanelContents.size(); ++i) {
-		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
+		if (CanShowContent(UI.InfoPanelContents[i]->Condition.get(), unit)) {
 			for (CContentType *content : UI.InfoPanelContents[i]->Contents) {
-				if (CanShowContent(content->Condition, unit)) {
+				if (CanShowContent(content->Condition.get(), unit)) {
 					content->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
 				}
 			}

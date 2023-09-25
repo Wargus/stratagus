@@ -328,7 +328,7 @@ struct EventCallback {
 class CVideo
 {
 public:
-	CVideo() : Width(0), Height(0), WindowWidth(0), WindowHeight(0), VerticalPixelSize(1), Depth(0), FullScreen(false) {}
+	CVideo() = default;
 
 	void LockScreen();
 	void UnlockScreen();
@@ -376,39 +376,36 @@ public:
 	void FillCircleClip(Uint32 color, const PixelPos &screenPos, int radius);
 	void FillTransCircleClip(Uint32 color, int x, int y, int radius, unsigned char alpha);
 
-	inline Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b)
-	{
-		return SDL_MapRGB(f, r, g, b);
-	}
-	inline Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
+	Uint32 MapRGB(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b) { return SDL_MapRGB(f, r, g, b); }
+	Uint32 MapRGB(SDL_PixelFormat *f, const CColor &color)
 	{
 		return MapRGB(f, color.R, color.G, color.B);
 	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+	Uint32 MapRGBA(SDL_PixelFormat *f, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 	{
 		return SDL_MapRGBA(f, r, g, b, a);
 	}
-	inline Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
+	Uint32 MapRGBA(SDL_PixelFormat *f, const CColor &color)
 	{
 		return MapRGBA(f, color.R, color.G, color.B, color.A);
 	}
-	inline void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
+	void GetRGB(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b)
 	{
 		SDL_GetRGB(c, f, r, g, b);
 	}
-	inline void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
+	void GetRGBA(Uint32 c, SDL_PixelFormat *f, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a)
 	{
 		SDL_GetRGBA(c, f, r, g, b, a);
 	}
 
-	int Width;
-	int Height;
-	int WindowWidth;
-	int WindowHeight;
-	double VerticalPixelSize;
-	SDL_Cursor *blankCursor;
-	int Depth;
-	bool FullScreen;
+	int Width = 0;
+	int Height = 0;
+	int WindowWidth = 0;
+	int WindowHeight = 0;
+	double VerticalPixelSize = 1.;
+	SDL_Cursor *blankCursor = nullptr;
+	int Depth = 0;
+	bool FullScreen = false;
 };
 
 extern CVideo Video;
@@ -541,14 +538,15 @@ static const char *ColorNames[] = {"red", "yellow", "green", "light-gray",
                                    "light-blue", "blue", "dark-green", "black", nullptr};
 
 inline int GetColorIndexByName(std::string_view colorName) {
-    int i = 0;
-    while (ColorNames[i] != nullptr) {
-        if (colorName == ColorNames[i]) {
-            return i;
-        }
-        i++;
-    }
-    return -1;
+	int i = 0;
+	while (ColorNames[i] != nullptr) {
+		if (colorName == ColorNames[i]) {
+			return i;
+		}
+		++i;
+	}
+	DebugPrint("Unknown color %s", colorName.data());
+	return -1;
 }
 
 extern void FreeGraphics();

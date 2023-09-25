@@ -127,13 +127,13 @@ enum class EBinOp {
 /**
 **  Enumeration to know which variable to be selected.
 */
-enum EnumVariable {
-	VariableValue = 0,  /// Value of the variable.
-	VariableMax,        /// Max of the variable.
-	VariableIncrease,   /// Increase value of the variable.
-	VariableDiff,       /// (Max - Value)
-	VariablePercent,    /// (100 * Value / Max)
-	VariableName        /// Name of the variable.
+enum class EnumVariable {
+	Value = 0,  /// Value of the variable.
+	Max,        /// Max of the variable.
+	Increase,   /// Increase value of the variable.
+	Diff,       /// (Max - Value)
+	Percent,    /// (100 * Value / Max)
+	Name        /// Name of the variable.
 };
 
 /**

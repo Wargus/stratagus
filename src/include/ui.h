@@ -206,7 +206,7 @@ public:
 
 	std::vector<CContentType *> Contents; /// Array of contents to display.
 
-	ConditionPanel *Condition = nullptr; /// Condition to show the panel; if nullptr, no condition.
+	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if nullptr, no condition.
 };
 
 
