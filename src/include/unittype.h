@@ -515,6 +515,39 @@ enum class EMouseAction
 	Sail = 6 /// Sail
 };
 
+enum class ECanTargetFlag
+{
+	None = 0,
+	Land = 1, /// Can attack land units
+	Sea = 2, /// Can attack sea units
+	Air = 4, /// Can attack air units
+};
+
+inline ECanTargetFlag operator~(ECanTargetFlag e)
+{
+	return ECanTargetFlag(~unsigned(e));
+}
+
+inline ECanTargetFlag operator|(ECanTargetFlag lhs, ECanTargetFlag rhs)
+{
+	return ECanTargetFlag(unsigned(lhs) | unsigned(rhs));
+}
+
+inline ECanTargetFlag operator&(ECanTargetFlag lhs, ECanTargetFlag rhs)
+{
+	return ECanTargetFlag(unsigned(lhs) & unsigned(rhs));
+}
+
+inline ECanTargetFlag& operator|=(ECanTargetFlag& lhs, ECanTargetFlag rhs)
+{
+	return lhs = ECanTargetFlag(unsigned(lhs) | unsigned(rhs));
+}
+
+inline ECanTargetFlag &operator&=(ECanTargetFlag &lhs, ECanTargetFlag rhs)
+{
+	return lhs = ECanTargetFlag(unsigned(lhs) & unsigned(rhs));
+}
+
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType
@@ -623,10 +656,7 @@ public:
 	int AiAdjacentRange = -1;           /// Min radius for AI build surroundings checking
 	EMouseAction MouseAction = EMouseAction::None; /// Right click action
 	uint8_t RotationSpeed = 128;    /// Max unit.Direction change per frame. 128 is maximum
-	int CanTarget = 0;              /// Which units can it attack
-#define CanTargetLand 1             /// Can attack land units
-#define CanTargetSea  2             /// Can attack sea units
-#define CanTargetAir  4             /// Can attack air units
+	ECanTargetFlag CanTarget = ECanTargetFlag::None; /// Which units can it attack
 
 	bool Flip = false;              /// Flip image when facing left
 	bool LandUnit = false;          /// Land animated

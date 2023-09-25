@@ -833,21 +833,21 @@ static int CclDefineUnitType(lua_State *l)
 			type->RotationSpeed = std::min(std::max(1, std::abs(LuaToNumber(l, -1))), 128);
 		} else if (value == "CanTargetLand") {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetLand;
+				type->CanTarget |= ECanTargetFlag::Land;
 			} else {
-				type->CanTarget &= ~CanTargetLand;
+				type->CanTarget &= ~ECanTargetFlag::Land;
 			}
 		} else if (value == "CanTargetSea") {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetSea;
+				type->CanTarget |= ECanTargetFlag::Sea;
 			} else {
-				type->CanTarget &= ~CanTargetSea;
+				type->CanTarget &= ~ECanTargetFlag::Sea;
 			}
 		} else if (value == "CanTargetAir") {
 			if (LuaToBoolean(l, -1)) {
-				type->CanTarget |= CanTargetAir;
+				type->CanTarget |= ECanTargetFlag::Air;
 			} else {
-				type->CanTarget &= ~CanTargetAir;
+				type->CanTarget &= ~ECanTargetFlag::Air;
 			}
 		} else if (value == "Building") {
 			type->Building = LuaToBoolean(l, -1);
