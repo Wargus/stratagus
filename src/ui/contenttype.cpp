@@ -50,12 +50,6 @@
 using UStrInt = std::variant<int, const char *>;
 
 extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t);
-extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
-
-/* virtual */ CContentType::~CContentType()
-{
-	delete Condition;
-}
 
 /**
 **  Draw text with variable.
@@ -63,20 +57,18 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 **  @param unit         unit with variable to show.
 **  @param defaultfont  default font if no specific font in extra data.
 */
-/* virtual */ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const
+void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const /* override */
 {
-	std::string text;       // Optional text to display.
 	int x = this->Pos.x;
 	int y = this->Pos.y;
+	Assert(this->Font || defaultfont);
 	CFont &font = this->Font ? *this->Font : *defaultfont;
-
-	Assert(&font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
 	CLabel label(font);
 
 	if (this->Text) {
-		text = EvalString(*this->Text);
+		std::string text = EvalString(*this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
 			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
@@ -135,13 +127,12 @@ auto tr(int n)
 **  @note text must have exactly 1 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const
+void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) const /* override */
 {
 	char buf[256]{};
 
+	Assert(this->Font || defaultfont);
 	CFont &font = this->Font ? *this->Font : *defaultfont;
-	Assert(&font);
-
 	CLabel label(font);
 
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
@@ -171,12 +162,12 @@ auto tr(int n)
 **  @note text must have exactly 2 %d.
 **  @bug if text format is incorrect.
 */
-/* virtual */ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const
+void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) const /* override */
 {
 	char buf[256]{};
 
+	Assert(this->Font || defaultfont);
 	CFont &font = this->Font ? *this->Font : *defaultfont;
-	Assert(&font);
 	CLabel label(font);
 
 	const auto usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
@@ -236,7 +227,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **  @param unit         unit with icon to show.
 **  @param defaultfont  unused.
 */
-/* virtual */ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const
+void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const /* override */
 {
 	const CUnit *unitToDraw = GetUnitRef(unit, this->UnitRef);
 
@@ -257,7 +248,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 /**
 **  Draw the graphic
 */
-/* virtual */ void CContentTypeGraphic::Draw(const CUnit &, CFont *) const
+void CContentTypeGraphic::Draw(const CUnit &, CFont *) const /* override */
 {
 	CGraphic *g = CGraphic::Get(this->graphic);
 	if (g) {
@@ -278,9 +269,8 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
+void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const /* override */
 {
-	Uint32 color;
 	int f;
 	if (this->Index != -1) {
 		Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
@@ -301,18 +291,17 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	while (static_cast<unsigned int>(f) < this->values[i]) {
 		i++;
 	}
-	color = IndexToColor(this->colors[i]);
+	const Uint32 color = IndexToColor(this->colors[i]);
 
-	if (this->hasBorder) {
+	if (this->borderColor) {
 		// Border. We have a simple heuristic to determine how big it is...
 		// TODO: make configurable?
-		if (this->Height <= 6) {
-			Video.FillRectangleClip(this->hasBorder, this->Pos.x - 2, this->Pos.y - 2,
-									this->Width + 2, this->Height + 2);
-		} else {
-			Video.FillRectangleClip(this->hasBorder, this->Pos.x - 2, this->Pos.y - 2,
-									this->Width + 3, this->Height + 3);
-		}
+		auto thickness = this->Height <= 6 ? 2 : 3;
+		Video.FillRectangleClip(*this->borderColor,
+		                        this->Pos.x - 2,
+		                        this->Pos.y - 2,
+		                        this->Width + thickness,
+		                        this->Height + thickness);
 	}
 
 	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
@@ -328,7 +317,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 **
 **  @todo Color and percent value Parametrisation.
 */
-/* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
+void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const /* override */
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
 	if (!unit.Variable[this->varIndex].Max) {
@@ -361,7 +350,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 }
 
-/* virtual */ void CContentTypeText::Parse(lua_State *l)
+void CContentTypeText::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1) || lua_isstring(l, -1));
 
@@ -397,7 +386,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 }
 
-/* virtual */ void CContentTypeFormattedText::Parse(lua_State *l)
+void CContentTypeFormattedText::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1));
 
@@ -423,7 +412,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 }
 
-/* virtual */ void CContentTypeFormattedText2::Parse(lua_State *l)
+void CContentTypeFormattedText2::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1));
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -497,10 +486,10 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 	return UnitRefItSelf;
 }
 
-/* virtual */ void CContentTypeIcon::Parse(lua_State *l)
+void CContentTypeIcon::Parse(lua_State *l) /* override */
 {
-	SingleSelectionIcon = GroupSelectionIcon = TransportIcon = 0;
-	ButtonIcon = 1;
+	SingleSelectionIcon = GroupSelectionIcon = TransportIcon = false;
+	ButtonIcon = true;
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);
 		if (key == "Unit") {
@@ -532,7 +521,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 	}
 }
 
-/* virtual */ void CContentTypeGraphic::Parse(lua_State *l)
+void CContentTypeGraphic::Parse(lua_State *l) /* override */
 {
 	if (lua_isstring(l, -1)) {
 		this->graphic = LuaToString(l, -1);
@@ -549,7 +538,7 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 	}
 }
 
-/* virtual */ void CContentTypeLifeBar::Parse(lua_State *l)
+void CContentTypeLifeBar::Parse(lua_State *l) /* override */
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);
@@ -591,12 +580,12 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument, need list");
 			}
-		    const int color_len = lua_rawlen(l, -1);
+			const int color_len = lua_rawlen(l, -1);
 			if (color_len == 0) {
 				LuaError(l, "need at least one {percentage, color} pair, got 0");
 			}
-			this->colors = new unsigned int[color_len];
-			this->values = new unsigned int[color_len];
+			this->colors.resize(color_len);
+			this->values.resize(color_len);
 			int i = 0;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 2) {
@@ -610,21 +599,18 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 				}
 				i++;
 			}
-			if (this->values[color_len - 1] != 0) {
+			if (this->values.back() != 0) {
 				LuaError(l, "the last {percentage, color} pair must be for 0%%");
 			}
 		} else if (key == "Border") {
 			if (lua_isboolean(l, -1)) {
 				if (LuaToBoolean(l, -1)) {
-					this->hasBorder = 1;
+					this->borderColor = 0;
 				} else {
-					this->hasBorder = 0;
+					this->borderColor = std::nullopt;
 				}
 			} else {
-				this->hasBorder = LuaToUnsignedNumber(l, -1);
-				if (this->hasBorder == 0) {
-					this->hasBorder = 1; // complete black is set to 1
-				}
+				this->borderColor = LuaToUnsignedNumber(l, -1);
 			}
 		} else {
 			LuaError(l, "'%s' invalid for method 'LifeBar' in DefinePanelContents", key.data());
@@ -640,23 +626,16 @@ static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 	if (this->Index == -1 && this->ValueFunc == nullptr) {
 		LuaError(l, "variable undefined for LifeBar");
 	}
-	if (this->colors == nullptr || this->values == nullptr) {
-		this->colors = new unsigned int[4];
-		this->values = new unsigned int[4];
-
-		this->values[0] = 75;
-		this->values[1] = 50;
-		this->values[2] = 25;
-		this->values[3] = 0;
-
-		this->colors[0] = GetColorIndexByName("dark-green");
-		this->colors[1] = GetColorIndexByName("yellow");
-		this->colors[2] = GetColorIndexByName("orange");;
-		this->colors[3] = GetColorIndexByName("red");
+	if (this->colors.empty() || this->values.empty()) {
+		this->values = {75, 50, 25, 0};
+		this->colors = {static_cast<unsigned>(GetColorIndexByName("dark-green")),
+		                static_cast<unsigned>(GetColorIndexByName("yellow")),
+		                static_cast<unsigned>(GetColorIndexByName("orange")),
+		                static_cast<unsigned>(GetColorIndexByName("red"))};
 	}
 }
 
-/* virtual */ void CContentTypeCompleteBar::Parse(lua_State *l)
+void CContentTypeCompleteBar::Parse(lua_State *l) /* override */
 {
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);

@@ -35,6 +35,8 @@
 #include "color.h"
 #include "script.h"
 #include "vec2i.h"
+
+#include <optional>
 #include <vector>
 
 class CUnit;
@@ -47,8 +49,8 @@ class ConditionPanel;
 class CContentType
 {
 public:
-	CContentType() : Pos(0, 0), Condition(nullptr) {}
-	virtual ~CContentType();
+	CContentType() = default;
+	virtual ~CContentType() = default;
 
 	/// Tell how show the variable Index.
 	virtual void Draw(const CUnit &unit, CFont *defaultfont) const = 0;
@@ -56,8 +58,8 @@ public:
 	virtual void Parse(lua_State *l) = 0;
 
 public:
-	PixelPos Pos;             /// Coordinate where to display.
-	ConditionPanel *Condition; /// Condition to show the content; if nullptr, no condition.
+	PixelPos Pos{0, 0}; /// Coordinate where to display.
+	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the content; if nullptr, no condition.
 };
 
 /**
@@ -68,15 +70,15 @@ class CContentTypeText : public CContentType
 public:
 	CContentTypeText() = default;
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
 	std::unique_ptr<IStringDesc> Text; /// Text to display.
 	CFont *Font = nullptr;            /// Font to use.
 	bool Centered = false;            /// if true, center the display.
 	int Index = -1;                   /// Index of the variable to show, -1 if not.
-	EnumVariable Component = VariableValue; /// Component of the variable.
+	EnumVariable Component = EnumVariable::Value; /// Component of the variable.
 	bool ShowName = false;            /// If true, Show name's unit.
 	bool Stat = false;                /// true to special display.(value or value + diff)
 };
@@ -87,19 +89,17 @@ private:
 class CContentTypeFormattedText : public CContentType
 {
 public:
-	CContentTypeFormattedText() : Font(nullptr), Centered(false),
-		Index(-1), Component(VariableValue) {}
-	virtual ~CContentTypeFormattedText() {}
+	CContentTypeFormattedText() = default;
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
-	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index;                   /// Index of the variable to show.
-	EnumVariable Component;      /// Component of the variable.
+	std::string Format;    /// Text to display
+	CFont *Font = nullptr; /// Font to use.
+	bool Centered = false; /// if true, center the display.
+	int Index = -1;        /// Index of the variable to show.
+	EnumVariable Component = EnumVariable::Value; /// Component of the variable.
 };
 
 /**
@@ -108,21 +108,19 @@ private:
 class CContentTypeFormattedText2 : public CContentType
 {
 public:
-	CContentTypeFormattedText2() : Font(nullptr), Centered(false),
-		Index1(-1), Component1(VariableValue), Index2(-1), Component2(VariableValue) {}
-	virtual ~CContentTypeFormattedText2() {}
+	CContentTypeFormattedText2() = default;
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
-	std::string Format;          /// Text to display
-	CFont *Font;                 /// Font to use.
-	bool Centered;               /// if true, center the display.
-	int Index1;                  /// Index of the variable1 to show.
-	EnumVariable Component1;     /// Component of the variable1.
-	int Index2;                  /// Index of the variable to show.
-	EnumVariable Component2;     /// Component of the variable.
+	std::string Format;    /// Text to display
+	CFont *Font = nullptr; /// Font to use.
+	bool Centered = false; /// if true, center the display.
+	int Index1 = -1;       /// Index of the variable1 to show.
+	EnumVariable Component1 = EnumVariable::Value; /// Component of the variable1.
+	int Index2 = -1;       /// Index of the variable to show.
+	EnumVariable Component2 = EnumVariable::Value; /// Component of the variable.
 };
 
 /**
@@ -131,15 +129,15 @@ private:
 class CContentTypeIcon : public CContentType
 {
 public:
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
-	EnumUnit UnitRef;           /// Which unit icon to display.(itself, container, ...)
-	unsigned ButtonIcon:1;
-	unsigned SingleSelectionIcon:1;
-	unsigned GroupSelectionIcon:1;
-	unsigned TransportIcon:1;
+	EnumUnit UnitRef = EnumUnit::UnitRefItSelf; /// Which unit icon to display.(itself, container, ...)
+	bool ButtonIcon = true;
+	bool SingleSelectionIcon = false;
+	bool GroupSelectionIcon = false;
+	bool TransportIcon = false;
 };
 
 /**
@@ -148,12 +146,12 @@ private:
 class CContentTypeGraphic : public CContentType
 {
 public:
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
 	std::string graphic;
-	int frame;
+	int frame = 0;
 };
 
 /**
@@ -162,25 +160,20 @@ private:
 class CContentTypeLifeBar : public CContentType
 {
 public:
-	CContentTypeLifeBar() : Index(-1), ValueMax(-1), Width(0), Height(0), hasBorder(1), colors(nullptr), values(nullptr) {}
-	virtual ~CContentTypeLifeBar()
-	{
-		delete[] colors;
-		delete[] values;
-	}
+	CContentTypeLifeBar() = default;
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
-	int Index;            /// Index of the variable to show, -1 if not.
+	int Index = -1;        /// Index of the variable to show, -1 if not.
 	std::unique_ptr<INumberDesc> ValueFunc;/// Handler of the value function
-	int ValueMax;         /// Max, when used with a value function
-	int Width;            /// Width of the bar.
-	int Height;           /// Height of the bar.
-	IntColor hasBorder;   /// True for additional border.
-	unsigned int *colors; /// array of color to show (depend of value)
-	unsigned int *values; /// list of percentage to change color.
+	int ValueMax = -1;     /// Max, when used with a value function
+	int Width = 0;         /// Width of the bar.
+	int Height = 0;        /// Height of the bar.
+	std::optional<IntColor> borderColor = 1; /// additional border color.
+	std::vector<unsigned int> colors; /// array of color to show (depend of value)
+	std::vector<unsigned int> values; /// list of percentage to change color.
 };
 
 /**
@@ -189,19 +182,18 @@ private:
 class CContentTypeCompleteBar : public CContentType
 {
 public:
-	CContentTypeCompleteBar() : varIndex(-1), width(0), height(0), hasBorder(false), colorIndex(-1) {}
+	CContentTypeCompleteBar() = default;
 
-	virtual void Draw(const CUnit &unit, CFont *defaultfont) const;
-	virtual void Parse(lua_State *l);
+	void Draw(const CUnit &unit, CFont *defaultfont) const override;
+	void Parse(lua_State *l) override;
 
 private:
-	int varIndex;    /// Index of the variable to show, -1 if not.
-	int width;       /// Width of the bar.
-	int height;      /// Height of the bar.
-	bool hasBorder;  /// True for additional border.
-	int colorIndex;  /// Index of Color to show.
+	int varIndex = 1;    /// Index of the variable to show, -1 if not.
+	int width = 0;       /// Width of the bar.
+	int height = 0;      /// Height of the bar.
+	bool hasBorder = false; /// True for additional border.
+	int colorIndex = -1;  /// Index of Color to show.
 };
-
 
 //@}
 
