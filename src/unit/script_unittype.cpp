@@ -382,6 +382,24 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 }
 
+static std::optional<EMouseAction> ToEMouseAction(std::string_view s)
+{
+	if (s == "none") {
+		return EMouseAction::None;
+	} else if (s == "attack") {
+		return EMouseAction::Attack;
+	} else if (s == "move") {
+		return EMouseAction::Move;
+	} else if (s == "harvest") {
+		return EMouseAction::Harvest;
+	} else if (s == "spell-cast") {
+		return EMouseAction::SpellCast;
+	} else if (s == "sail") {
+		return EMouseAction::Sail;
+	}
+	DebugPrint("Unknown mouse action '%s'", s.data());
+	return std::nullopt;
+}
 static const std::string shadowMarker = std::string("MARKER");
 /**
 ** <b>Description</b>
@@ -788,18 +806,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (value == "RightMouseAction") {
 			value = LuaToString(l, -1);
-			if (value == "none") {
-				type->MouseAction = MouseActionNone;
-			} else if (value == "attack") {
-				type->MouseAction = MouseActionAttack;
-			} else if (value == "move") {
-				type->MouseAction = MouseActionMove;
-			} else if (value == "harvest") {
-				type->MouseAction = MouseActionHarvest;
-			} else if (value == "spell-cast") {
-				type->MouseAction = MouseActionSpellCast;
-			} else if (value == "sail") {
-				type->MouseAction = MouseActionSail;
+			if (auto mouseAction = ToEMouseAction(value)) {
+				type->MouseAction = *mouseAction;
 			} else {
 				LuaError(l, "Unsupported RightMouseAction: %s", value.data());
 			}
@@ -1165,7 +1173,7 @@ static int CclDefineUnitType(lua_State *l)
 	}
 
 	// FIXME: try to simplify/combine the flags instead
-	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
+	if (type->MouseAction == EMouseAction::Attack && !type->CanAttack) {
 		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n", type->Name.c_str());
 	}
 	UpdateDefaultBoolFlags(*type);
