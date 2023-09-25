@@ -784,7 +784,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
-		CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
+		CommandLog(nullptr, nullptr, FlushCommands, -1, -1, nullptr, nullptr, -1);
 		return;
 	}
 
@@ -950,7 +950,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	LoadIcons();
 
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
-	UnitUnderCursor = NoUnitP;
+	UnitUnderCursor = nullptr;
 
 	InitMissileTypes();
 #ifndef DYNAMIC_LOAD
@@ -1035,7 +1035,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 
 	GameResult = GameNoResult;
 
-	CommandLog(nullptr, NoUnitP, FlushCommands, -1, -1, NoUnitP, nullptr, -1);
+	CommandLog(nullptr, nullptr, FlushCommands, -1, -1, nullptr, nullptr, -1);
 	Video.ClearScreen();
 }
 

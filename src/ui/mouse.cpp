@@ -354,7 +354,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			if (CanTarget(type, *dest.Type)) {
 				SendCommandAttack(unit, pos, &dest, flush);
 			} else { // No valid target
-				SendCommandAttack(unit, pos, NoUnitP, flush);
+				SendCommandAttack(unit, pos, nullptr, flush);
 			}
 		}
 		return true;
@@ -385,11 +385,11 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (Map.WallOnMap(pos)) {
 		// XXX: hardcoded for humans and orcs
 		if (PlayerRaces.Name[unit.Player->Race] == "human" && Map.OrcWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 			return;
 		}
 		if (PlayerRaces.Name[unit.Player->Race] == "orc" && Map.HumanWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 			return;
 		}
 	}
@@ -406,7 +406,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 		}
 	} else {
 		if (RightButtonAttacks) {
@@ -414,7 +414,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 		} else {
 			// Note: move is correct here, right default is move
 			if (!acknowledged) {
@@ -1421,7 +1421,7 @@ static int SendUnload(const Vec2i &tilePos)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
+		SendCommandUnload(*Selected[i], tilePos, nullptr, flush);
 	}
 	return Selected.empty() ? 0 : 1;
 }

@@ -434,8 +434,6 @@ public:
 	CUnit *Goal = nullptr; /// Generic/Teleporter goal pointer
 };
 
-#define NoUnitP (CUnit *)nullptr        /// return value: for no unit found
-
 /**
 **  Returns unit number (unique to this unit)
 */
