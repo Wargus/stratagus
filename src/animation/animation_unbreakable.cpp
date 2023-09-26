@@ -50,9 +50,9 @@
 void CAnimation_Unbreakable::Init(std::string_view s, lua_State *) /* override */
 {
 	if (s == "begin") {
-		this->state = 1;
+		this->state = true;
 	} else if (s == "end") {
-		this->state = 0;
+		this->state = false;
 	} else {
 		//LuaError(l, "Unbreakable must be 'begin' or 'end'.  Found: %s", s.data());
 	}

@@ -42,7 +42,7 @@ public:
 	void Init(std::string_view s, lua_State *l) override;
 
 private:
-	int state = 0;
+	bool state = false;
 };
 
 //@}
