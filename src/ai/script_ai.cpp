@@ -599,7 +599,7 @@ static int CclAiDebugPlayer(lua_State *l)
 				if (!Players[i].AiEnabled || !Players[i].Ai) {
 					continue;
 				}
-				Players[i].Ai->ScriptDebug = 0;
+				Players[i].Ai->ScriptDebug = false;
 			}
 		} else {
 			int playerid;
@@ -615,7 +615,7 @@ static int CclAiDebugPlayer(lua_State *l)
 			if (!Players[playerid].AiEnabled || !Players[playerid].Ai) {
 				continue;
 			}
-			Players[playerid].Ai->ScriptDebug = 1;
+			Players[playerid].Ai->ScriptDebug = true;
 		}
 	}
 	return 0;
