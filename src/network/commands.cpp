@@ -812,8 +812,8 @@ void ExecExtendedCommand(unsigned char type, int status,
 			break;
 		case ExtendedMessageFogOfWarDB:
 			/// arg1: enable/disable fog
-			Map.NoFogOfWar = arg1 == 0 ? true : false;
-			/// arg2: request for update 
+			Map.NoFogOfWar = arg1 == 0;
+			/// arg2: request for update
 			if (arg2 != 0) {
 				UpdateFogOfWarChange();
 			}

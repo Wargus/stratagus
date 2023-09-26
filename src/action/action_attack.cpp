@@ -231,7 +231,7 @@ PixelPos COrder_Attack::Show(const CViewport &vp,
 {
 	PixelPos targetPos;
 	PixelPos orderedPos;
-	bool isAttackMove = IsAutoTargeting() ? true : false;
+	bool isAttackMove = IsAutoTargeting();
 
 	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
 								: IsMovingToAttackPos() ? vp.TilePosToScreen_Center(this->attackMovePos) 
@@ -331,8 +331,8 @@ bool COrder_Attack::IsMovingToAttackPos() const
 }
 bool COrder_Attack::IsAttackGroundOrWall() const
 {
-	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)	
-	return (this->Action == UnitAction::AttackGround || Map.WallOnMap(this->goalPos) ? true : false);
+	/// FIXME: Check if need to add this: (goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
+	return this->Action == UnitAction::AttackGround || Map.WallOnMap(this->goalPos);
 }
 
 CUnit *COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const
@@ -358,7 +358,7 @@ void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
 	
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
-	const bool immobile = (this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	const bool immobile = this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove();
 	if (immobile && !InAttackRange(unit, *target)) {
 		return;
 	}
@@ -489,7 +489,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 	}
 
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
-	const bool immobile = (this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove()) ? true : false;
+	const bool immobile = this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove();
 	if (immobile) {
 		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range
 	} else {
@@ -504,8 +504,8 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		}
 		this->offeredTarget.Reset();
 	}
-	const bool attackedByGoal = (goal && goal->CurrentOrder()->GetGoal() == &unit) 
-								&& InAttackRange(*goal, unit) ? true : false;
+	const bool attackedByGoal =
+		goal && goal->CurrentOrder()->GetGoal() == &unit && InAttackRange(*goal, unit);
 	if (goal /// if goal is Valid
 		&& goal->IsVisibleAsGoal(*unit.Player)
 		&& CanTarget(*unit.Type, *goal->Type)
@@ -571,7 +571,7 @@ bool COrder_Attack::EndActionAttack(CUnit &unit, const bool canBeFinished = true
 			this->State 	= AUTO_TARGETING;
 			return false;
 		}
-		this->Finished 		= canBeFinished ? true : false;
+		this->Finished = canBeFinished;
 		return true;
 	}
 	return false;
@@ -648,7 +648,7 @@ bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
 	const int distance = this->HasGoal() ? unit.MapDistanceTo(*this->GetGoal())
 										: IsMovingToAttackPos() ? unit.MapDistanceTo(this->attackMovePos)
 																: unit.MapDistanceTo(this->goalPos);
-	const bool tooClose = (distance < unit.Type->MinAttackRange) ? true : false;
+	const bool tooClose = distance < unit.Type->MinAttackRange;
 	return tooClose;
 }
 
@@ -700,7 +700,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	bool needToSearchBetterPos = (IsTargetTooClose(unit) && !IsMovingToAttackPos()) ? true : false;
+	bool needToSearchBetterPos = IsTargetTooClose(unit) && !IsMovingToAttackPos();
 	if (needToSearchBetterPos && !unit.Anim.Unbreakable) {
 		MoveToBetterPos(unit);
 		needToSearchBetterPos = false;

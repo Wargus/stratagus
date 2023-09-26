@@ -2701,7 +2701,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
 	// For other targets we dramaticaly reduce priority and calc only attacked by/threat factor, distance and health
 	const int maxDistance = attackRange > 1 ? reactionRange : (reactionRange * 3) >> 1 /* x1.5 */;
-	const bool isFarAwayTarget = (!(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > maxDistance)) ? true : false;
+	const bool isFarAwayTarget = !(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > maxDistance);
 
 	if (isFarAwayTarget || distance < minAttackRange) {
 		priority >>= AT_FARAWAY_REDUCE_OFFSET; // save AT_THREAT_FACTOR if present

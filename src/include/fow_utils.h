@@ -55,7 +55,7 @@ public:
     void DrawRegion(uint8_t *target, const uint16_t trgWidth, const uint16_t x0, const uint16_t y0, const SDL_Rect &srcRect);
     uint8_t GetPixel(const uint16_t x, const uint16_t y);
 
-    bool isFullyEased() const { return CurrentStep == EasingStepsNum ? true : false; }
+    bool isFullyEased() const { return CurrentStep == EasingStepsNum; }
     void Ease()               { if (CurrentStep < EasingStepsNum) CurrentStep++; }
 
     uint8_t *GetCurrent()      { return Frames[Prev].data(); }

@@ -1038,7 +1038,7 @@ static int CclIsWallsEnabledForSP(lua_State *l)
 static int CclGetIsGameHoster(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	lua_pushboolean(l, (ThisPlayer->Index == Hosts[0].PlyNr) ? true : false);
+	lua_pushboolean(l, ThisPlayer->Index == Hosts[0].PlyNr);
 	return 1;
 }
 
