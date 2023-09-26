@@ -84,7 +84,7 @@ extern void CleanGame();
 ----------------------------------------------------------------------------*/
 
 Settings GameSettings;  /// Game Settings
-static int LcmPreventRecurse;   /// prevent recursion through LoadGameMap
+static bool LcmPreventRecurse;   /// prevent recursion through LoadGameMap
 GameResults GameResult;                      /// Outcome of the game
 
 std::string GameName;
@@ -200,12 +200,12 @@ static void LoadStratagusMap(const fs::path &smpdir, const fs::path &mapname)
 		ExitFatal(-1);
 	}
 	InitPlayers();
-	LcmPreventRecurse = 1;
+	LcmPreventRecurse = true;
 	if (LuaLoadFile(mapfull) == -1) {
 		fprintf(stderr, "Can't load lua file: %s\n", mapfull.u8string().c_str());
 		ExitFatal(-1);
 	}
-	LcmPreventRecurse = 0;
+	LcmPreventRecurse = false;
 
 #if 0
 	// Not true if multiplayer levels!
