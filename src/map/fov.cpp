@@ -222,12 +222,12 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 												} 
 												if (width > height) { return cWide; 	}
 												else                { return cTall; 	}
-											}();										  
+											}();
 
 	Vec2i origin = {0, 0};
 	uint16_t sightRange = range;
 
-	const bool isGeometrySymmetric = (geometry == cTall || geometry == cWide) ? false : true;
+	const bool isGeometrySymmetric = width == height;
 
 	if (isGeometrySymmetric) {
 		const int16_t half = width >> 1;

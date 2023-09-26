@@ -988,7 +988,7 @@ bool CPlayer::CheckResource(const int resource, const int value)
 	if (this->MaxResources[resource] != -1) {
 		result += this->StoredResources[resource];
 	}
-	return result < value ? false : true;
+	return result >= value;
 }
 
 
