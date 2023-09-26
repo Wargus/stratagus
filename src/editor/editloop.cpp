@@ -1920,7 +1920,7 @@ void CEditor::Init()
 		CreateGame(CurrentMapPath, &Map);
 	}
 
-	ReplayRevealMap = 1;
+	ReplayRevealMap = true;
 	FlagRevealMap = MapRevealModes::cHidden;
 	Editor.SelectedPlayer = PlayerNumNeutral;
 

@@ -1084,7 +1084,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			ShowNameTime = GameCycle + Preference.ShowNameDelay + Preference.ShowNameTime;
 		}
 
-		bool show = ReplayRevealMap ? true : false;
+		bool show = ReplayRevealMap;
 		if (show == false) {
 			CMapField &mf = *Map.Field(tilePos);
 			for (int i = 0; i < PlayerMax; ++i) {

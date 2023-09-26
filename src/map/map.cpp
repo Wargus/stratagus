@@ -54,7 +54,7 @@
 
 CMap Map;                   /// The current map
 MapRevealModes FlagRevealMap;          /// Flag must reveal the map
-int ReplayRevealMap;        /// Reveal Map is replay
+bool ReplayRevealMap;        /// Reveal Map is replay
 unsigned int ForestRegeneration;     /// Forest regeneration
 int ForestRegenerationFrequency;     /// Forest regeneration frequency (every how many seconds we apply 1 point of regeneration)
 char CurrentMapPath[1024];  /// Path of the current map
@@ -371,7 +371,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	this->TileGraphic = nullptr;
 
 	FlagRevealMap = MapRevealModes::cHidden;
-	ReplayRevealMap = 0;
+	ReplayRevealMap = false;
 
 	UI.Minimap.Destroy();
 
