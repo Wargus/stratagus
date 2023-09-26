@@ -336,15 +336,15 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
-	const int action = type.MouseAction;
+	const EMouseAction action = type.MouseAction;
 
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
+	if (action == EMouseAction::SpellCast || unit.IsEnemy(dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
 			acknowledged = 1;
 		}
-		if (action == MouseActionSpellCast) {
+		if (action == EMouseAction::SpellCast) {
 			// This is for demolition squads and such
 			size_t spellnum;
 			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
@@ -354,7 +354,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			if (CanTarget(type, *dest.Type)) {
 				SendCommandAttack(unit, pos, &dest, flush);
 			} else { // No valid target
-				SendCommandAttack(unit, pos, NoUnitP, flush);
+				SendCommandAttack(unit, pos, nullptr, flush);
 			}
 		}
 		return true;
@@ -385,11 +385,11 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (Map.WallOnMap(pos)) {
 		// XXX: hardcoded for humans and orcs
 		if (PlayerRaces.Name[unit.Player->Race] == "human" && Map.OrcWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 			return;
 		}
 		if (PlayerRaces.Name[unit.Player->Race] == "orc" && Map.HumanWallOnMap(pos)) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 			return;
 		}
 	}
@@ -406,7 +406,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 		}
 	} else {
 		if (RightButtonAttacks) {
@@ -414,7 +414,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, nullptr, flush);
 		} else {
 			// Note: move is correct here, right default is move
 			if (!acknowledged) {
@@ -511,7 +511,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		return;
 	}
 	const CUnitType &type = *unit.Type;
-	const int action = type.MouseAction;
+	const EMouseAction action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
 	const int flush = !(KeyModifiers & ModifierShift);
 
@@ -553,19 +553,19 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	//  Handle resource workers.
-	if (action == MouseActionHarvest) {
+	if (action == EMouseAction::Harvest) {
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
 	}
 
 	//  Fighters
-	if (action == MouseActionSpellCast || action == MouseActionAttack) {
+	if (action == EMouseAction::SpellCast || action == EMouseAction::Attack) {
 		DoRightButton_Attack(unit, dest, pos, flush, acknowledged);
 		return;
 	}
 
 	// FIXME: attack/follow/board ...
-	if (dest != nullptr && (action == MouseActionMove || action == MouseActionSail)) {
+	if (dest != nullptr && (action == EMouseAction::Move || action == EMouseAction::Sail)) {
 		if (DoRightButton_Follow(unit, *dest, flush, acknowledged)) {
 			return;
 		}
@@ -1421,7 +1421,7 @@ static int SendUnload(const Vec2i &tilePos)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
+		SendCommandUnload(*Selected[i], tilePos, nullptr, flush);
 	}
 	return Selected.empty() ? 0 : 1;
 }

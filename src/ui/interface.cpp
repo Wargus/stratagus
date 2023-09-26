@@ -852,7 +852,7 @@ static void InputKey(int key)
 #ifdef DEBUG
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused && !GameEstablishing) {
-					CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+					CommandLog("input", nullptr, FlushCommands, -1, -1, nullptr, Input, -1);
 					CclCommand(Input + 1, false);
 				}
 			} else
@@ -860,7 +860,7 @@ static void InputKey(int key)
 				if (!IsNetworkGame()) {
 					if (!GameObserve && !GameEstablishing) {
 						if (HandleCheats(Input)) {
-							CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, Input, -1);
+							CommandLog("input", nullptr, FlushCommands, -1, -1, nullptr, Input, -1);
 						}
 					}
 				}

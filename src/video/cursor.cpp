@@ -272,7 +272,7 @@ static void DrawBuildingCursor()
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != nullptr);
+		f = ((ontop = CanBuildHere(nullptr, *CursorBuilding, mpos)) != nullptr);
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = nullptr;
 		}

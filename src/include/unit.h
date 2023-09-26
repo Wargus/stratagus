@@ -434,8 +434,6 @@ public:
 	CUnit *Goal = nullptr; /// Generic/Teleporter goal pointer
 };
 
-#define NoUnitP (CUnit *)nullptr        /// return value: for no unit found
-
 /**
 **  Returns unit number (unique to this unit)
 */
@@ -632,9 +630,9 @@ extern int ViewPointDistance(const Vec2i &pos);
 extern int ViewPointDistanceToUnit(const CUnit &dest);
 
 /// Can this unit-type attack the other (destination)
-extern int CanTarget(const CUnitType &type, const CUnitType &dest);
+extern bool CanTarget(const CUnitType &type, const CUnitType &dest);
 /// Can transporter transport the other unit
-extern int CanTransport(const CUnit &transporter, const CUnit &unit);
+extern bool CanTransport(const CUnit &transporter, const CUnit &unit);
 
 /// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);

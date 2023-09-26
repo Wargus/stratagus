@@ -1128,7 +1128,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitAction::Still
 		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
-		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
+		SendCommandUnload(*Selected[0], Selected[0]->tilePos, nullptr, flush);
 		return ;
 	}
 	DoClicked_SelectTarget(button);
@@ -1206,7 +1206,7 @@ void CButtonPanel::DoClicked_Explore()
 void CButtonPanel::DoClicked_Return()
 {
 	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandReturnGoods(*Selected[i], NoUnitP, !(KeyModifiers & ModifierShift));
+		SendCommandReturnGoods(*Selected[i], nullptr, !(KeyModifiers & ModifierShift));
 	}
 }
 

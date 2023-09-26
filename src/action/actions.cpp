@@ -357,11 +357,11 @@ static bool HandleBurnAndPoison(CUnit &unit)
 	// Burn & poison
 	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
-		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+		HitUnit(nullptr, unit, unit.Type->BurnDamageRate);
 		return true;
 	}
 	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+		HitUnit(nullptr, unit, unit.Type->PoisonDrain);
 		return true;
 	}
 	return false;

@@ -3303,29 +3303,30 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 **  @param source  Unit type pointer of the attacker.
 **  @param dest    Unit type pointer of the target.
 **
-**  @return        0 if attacker can't target the unit, else a positive number.
+**  @return        false if attacker can't target the unit, else true.
 */
-int CanTarget(const CUnitType &source, const CUnitType &dest)
+bool CanTarget(const CUnitType &source, const CUnitType &dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
 			if ((source.BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
 				(dest.BoolFlag[i].value)) {
-				return 0;
+				return false;
 			}
 		}
 	}
 	if (dest.UnitType == UnitTypeLand) {
 		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
-			return source.CanTarget & (CanTargetLand | CanTargetSea);
+			return (source.CanTarget & (ECanTargetFlag::Land | ECanTargetFlag::Sea))
+			    != ECanTargetFlag::None;
 		}
-		return source.CanTarget & CanTargetLand;
+		return (source.CanTarget & ECanTargetFlag::Land) != ECanTargetFlag::None;
 	}
 	if (dest.UnitType == UnitTypeFly) {
-		return source.CanTarget & CanTargetAir;
+		return (source.CanTarget & ECanTargetFlag::Air) != ECanTargetFlag::None;
 	}
 	if (dest.UnitType == UnitTypeNaval) {
-		return source.CanTarget & CanTargetSea;
+		return (source.CanTarget & ECanTargetFlag::Sea) != ECanTargetFlag::None;
 	}
 	return 0;
 }
@@ -3336,40 +3337,39 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 **  @param transporter  Unit which is the transporter.
 **  @param unit         Unit which wants to go in the transporter.
 **
-**  @return             1 if transporter can transport unit, 0 else.
+**  @return             true if transporter can transport unit, false else.
 */
-int CanTransport(const CUnit &transporter, const CUnit &unit)
+bool CanTransport(const CUnit &transporter, const CUnit &unit)
 {
 	if (!transporter.Type->CanTransport()) {
-		return 0;
+		return false;
 	}
 	if (transporter.CurrentAction() == UnitAction::Built) { // Under construction
-		return 0;
+		return false;
 	}
 	if (&transporter == &unit) { // Cannot transporter itself.
-		return 0;
+		return false;
 	}
 	if (transporter.BoardCount >= transporter.Type->MaxOnBoard) { // full
-		return 0;
+		return false;
 	}
-
 	if (transporter.BoardCount + unit.Type->BoardSize > transporter.Type->MaxOnBoard) { // too big unit
-		return 0;
+		return false;
 	}
 
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
 	if (!transporter.IsTeamed(unit)) {
-		return 0;
+		return false;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 		if (transporter.Type->BoolFlag[i].CanTransport != CONDITION_TRUE) {
 			if ((transporter.Type->BoolFlag[i].CanTransport == CONDITION_ONLY) ^ unit.Type->BoolFlag[i].value) {
-				return 0;
+				return false;
 			}
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**

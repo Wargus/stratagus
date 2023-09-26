@@ -1000,7 +1000,7 @@ static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 
 	SetMessage("%s", nc.Text.c_str());
 	PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
-	CommandLog("chat", NoUnitP, FlushCommands, -1, -1, NoUnitP, nc.Text.c_str(), -1);
+	CommandLog("chat", nullptr, FlushCommands, -1, -1, nullptr, nc.Text.c_str(), -1);
 }
 
 static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
@@ -1010,7 +1010,7 @@ static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
 
 	nc.Deserialize(&ncq.Data[0]);
 	NetworkRemovePlayer(nc.player);
-	CommandLog("quit", NoUnitP, FlushCommands, nc.player, -1, NoUnitP, nullptr, -1);
+	CommandLog("quit", nullptr, FlushCommands, nc.player, -1, nullptr, nullptr, -1);
 	CommandQuit(nc.player);
 }
 
