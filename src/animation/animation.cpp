@@ -467,7 +467,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
 		} else if (value == "unbreakable") {
-			unit.Anim.Unbreakable = 1;
+			unit.Anim.Unbreakable = true;
 			--j;
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
@@ -495,7 +495,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
 			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
 		} else if (value == "unbreakable") {
-			unit.WaitBackup.Unbreakable = 1;
+			unit.WaitBackup.Unbreakable = true;
 			--j;
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
