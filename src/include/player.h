@@ -144,22 +144,22 @@ public:
 	int CheckLimits(const CUnitType &type) const;
 
 	/// Check if enough resources are available for costs
-	int CheckCosts(const int *costs, bool notify = true) const;
+	int CheckCosts(const int (&costs)[MaxCosts], bool notify = true) const;
 	/// Check if enough resources are available for a new unit-type
 	int CheckUnitType(const CUnitType &type) const;
 
 	/// Add costs to the resources
-	void AddCosts(const int *costs);
+	void AddCosts(const int (&costs)[MaxCosts]);
 	/// Add costs for an unit-type to the resources
 	void AddUnitType(const CUnitType &type);
 	/// Add a factor of costs to the resources
-	void AddCostsFactor(const int *costs, int factor);
+	void AddCostsFactor(const int (&costs)[MaxCosts], int factor);
 	/// Remove costs from the resources
-	void SubCosts(const int *costs);
+	void SubCosts(const int (&costs)[MaxCosts]);
 	/// Remove costs for an unit-type from the resources
 	void SubUnitType(const CUnitType &type);
 	/// Remove a factor of costs from the resources
-	void SubCostsFactor(const int *costs, int factor);
+	void SubCostsFactor(const int (&costs)[MaxCosts], int factor);
 
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType &type) const;

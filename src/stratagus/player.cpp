@@ -1050,7 +1050,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 **
 **  @note The return values of the PlayerCheck functions are inconsistent.
 */
-int CPlayer::CheckCosts(const int *costs, bool notify) const
+int CPlayer::CheckCosts(const int (&costs)[MaxCosts], bool notify) const
 {
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
@@ -1089,7 +1089,7 @@ int CPlayer::CheckUnitType(const CUnitType &type) const
 **
 **  @param costs   How many costs.
 */
-void CPlayer::AddCosts(const int *costs)
+void CPlayer::AddCosts(const int (&costs)[MaxCosts])
 {
 	for (int i = 1; i < MaxCosts; ++i) {
 		ChangeResource(i, costs[i], false);
@@ -1112,7 +1112,7 @@ void CPlayer::AddUnitType(const CUnitType &type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void CPlayer::AddCostsFactor(const int *costs, int factor)
+void CPlayer::AddCostsFactor(const int (&costs)[MaxCosts], int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
 		ChangeResource(i, costs[i] * factor / 100, true);
@@ -1124,7 +1124,7 @@ void CPlayer::AddCostsFactor(const int *costs, int factor)
 **
 **  @param costs   How many costs.
 */
-void CPlayer::SubCosts(const int *costs)
+void CPlayer::SubCosts(const int (&costs)[MaxCosts])
 {
 	for (int i = 1; i < MaxCosts; ++i) {
 		ChangeResource(i, -costs[i], true);
@@ -1147,7 +1147,7 @@ void CPlayer::SubUnitType(const CUnitType &type)
 **  @param costs   How many costs.
 **  @param factor  Factor of the costs to apply.
 */
-void CPlayer::SubCostsFactor(const int *costs, int factor)
+void CPlayer::SubCostsFactor(const int (&costs)[MaxCosts], int factor)
 {
 	for (int i = 1; i < MaxCosts; ++i) {
 		ChangeResource(i, -costs[i] * 100 / factor);

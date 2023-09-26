@@ -75,7 +75,7 @@ static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
 **
 **  @return       A bit field of the missing costs.
 */
-static int AiCheckCosts(const int *costs)
+static int AiCheckCosts(const int (&costs)[MaxCosts])
 {
 	// FIXME: the used costs shouldn't be calculated here
 	int *used = AiPlayer->Used;
