@@ -76,26 +76,6 @@ enum CostType {
 #define FreeWorkersCount (MaxCosts + 3)
 
 /**
-**  Default resources for a new player.
-*/
-extern int DefaultResources[MaxCosts];
-
-/**
-**  Default resources for a new player with low resources.
-*/
-extern int DefaultResourcesLow[MaxCosts];
-
-/**
-**  Default resources for a new player with mid resources.
-*/
-extern int DefaultResourcesMedium[MaxCosts];
-
-/**
-**  Default resources for a new player with high resources.
-*/
-extern int DefaultResourcesHigh[MaxCosts];
-
-/**
 **  Default incomes for a new player.
 */
 extern int DefaultIncomes[MaxCosts];
