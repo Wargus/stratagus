@@ -58,6 +58,9 @@
 #include <algorithm>
 #include <map>
 
+// Fix problems with defined None in X.h included though SDL.h
+#undef None
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
