@@ -359,7 +359,7 @@ static void DisplayLoop()
 		// program, as we now still have a game on the background and
 		// need to go through the game-menu or supply a map file
 
-		FogOfWar->Update(FastForwardCycle > GameCycle ? true : false);
+		FogOfWar->Update(FastForwardCycle > GameCycle);
 
 		UpdateDisplay();
 		RealizeVideoMemory();

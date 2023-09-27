@@ -1501,7 +1501,7 @@ void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 				lua_rawgeti(luaStack, -1, arg);
 			}
 
-			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, layersNum == 1 ? true : false);
+			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, layersNum == 1);
 
 			if (layersNum > 1) {
 				lua_pop(luaStack, 1);

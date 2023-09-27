@@ -291,7 +291,7 @@ extern int ForestRegenerationFrequency;
 /// Flag must reveal the map
 extern MapRevealModes FlagRevealMap;
 /// Flag must reveal map when in replay
-extern int ReplayRevealMap;
+extern bool ReplayRevealMap;
 
 /*----------------------------------------------------------------------------
 --  Functions

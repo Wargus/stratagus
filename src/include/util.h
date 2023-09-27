@@ -232,7 +232,7 @@ namespace ranges
 	template<typename Range, typename Value>
 	bool contains(Range& range, const Value& value)
 	{
-		return std::find(begin(range), end(range), value) == end(range) ? false : true;
+		return std::find(begin(range), end(range), value) != end(range);
 	}
 
 	template<typename Range>

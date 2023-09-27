@@ -419,7 +419,7 @@ public:
 		const CAnimation *CurrAnim = nullptr;  /// CurrAnim
 		short Wait = 0;                  /// Wait time
 		signed char Rotate = 0;          /// Rotation target and direction
-		unsigned char Unbreakable = 0;   /// Unbreakable
+		bool Unbreakable = false;        /// Unbreakable
 	} Anim, WaitBackup;
 
 
