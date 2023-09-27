@@ -127,7 +127,7 @@ bool COrder_Build::ParseSpecificData(lua_State *l,
 	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		CclGetPos(l, &this->goalPos);
 		lua_pop(l, 1);
 	} else if (value == "type") {
 		++j;

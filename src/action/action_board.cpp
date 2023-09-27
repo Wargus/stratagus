@@ -97,7 +97,7 @@ bool COrder_Board::ParseSpecificData(lua_State *l, int &j, std::string_view valu
 	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		CclGetPos(l, &this->goalPos);
 		lua_pop(l, 1);
 	} else {
 		return false;

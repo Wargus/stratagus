@@ -378,7 +378,7 @@ void CTileset::parse(lua_State *l)
 		} else if (value == "image") {
 			this->ImageFile = LuaToString(l, j);
 		} else if (value == "size") {
-			CclGetPos(l, &this->pixelTileSize.x, &this->pixelTileSize.y, j);
+			CclGetPos(l, &this->pixelTileSize, j);
 		} else if (value == "slots") {
 			// must be deferred to later, after the size is parsed
 		} else {

@@ -212,15 +212,15 @@ void PathFinderInput::Load(lua_State *l)
 		++i;
 		if (tag == "unit-size") {
 			lua_rawgeti(l, -1, i);
-			CclGetPos(l, &this->unitSize.x, &this->unitSize.y);
+			CclGetPos(l, &this->unitSize);
 			lua_pop(l, 1);
 		} else if (tag == "goalpos") {
 			lua_rawgeti(l, -1, i);
-			CclGetPos(l, &this->goalPos.x, &this->goalPos.y);
+			CclGetPos(l, &this->goalPos);
 			lua_pop(l, 1);
 		} else if (tag == "goal-size") {
 			lua_rawgeti(l, -1, i);
-			CclGetPos(l, &this->goalSize.x, &this->goalSize.y);
+			CclGetPos(l, &this->goalSize);
 			lua_pop(l, 1);
 		} else if (tag == "minrange") {
 			this->minRange = LuaToNumber(l, -1, i);
@@ -390,12 +390,12 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		} else if (value == "tile") {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
+			CclGetPos(l, &unit->tilePos, -1);
 			lua_pop(l, 1);
 			unit->Offset = Map.getIndex(unit->tilePos);
 		} else if (value == "seen-tile") {
 			lua_rawgeti(l, 2, j + 1);
-			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);
+			CclGetPos(l, &unit->Seen.tilePos, -1);
 			lua_pop(l, 1);
 		} else if (value == "stats") {
 			unit->Stats = &type->Stats[LuaToNumber(l, 2, j + 1)];
@@ -691,7 +691,7 @@ static int CclMoveUnit(lua_State *l)
 	lua_pop(l, 1);
 
 	Vec2i ipos;
-	CclGetPos(l, &ipos.x, &ipos.y, 2);
+	CclGetPos(l, &ipos, 2);
 
 	if (!unit->Removed) {
 		unit->Remove(unit->Container);
@@ -707,7 +707,7 @@ static int CclMoveUnit(lua_State *l)
 	}
 
 	if (nargs == 3) {
-		CclGetPos(l, &ipos.x, &ipos.y, 3);
+		CclGetPos(l, &ipos, 3);
 		unit->IX = ipos.x;
 		unit->IY = ipos.y;
 	}
@@ -774,7 +774,7 @@ static int CclCreateUnit(lua_State *l)
 	}
 	lua_pop(l, 1);
 	Vec2i ipos;
-	CclGetPos(l, &ipos.x, &ipos.y, 3);
+	CclGetPos(l, &ipos, 3);
 
 	lua_pushvalue(l, 2);
 	const int playerno = TriggerGetPlayer(l);
@@ -1087,8 +1087,8 @@ static int CclKillUnitAt(lua_State *l)
 	}
 	Vec2i pos1;
 	Vec2i pos2;
-	CclGetPos(l, &pos1.x, &pos1.y, 4);
-	CclGetPos(l, &pos2.x, &pos2.y, 5);
+	CclGetPos(l, &pos1, 4);
+	CclGetPos(l, &pos2, 5);
 	if (pos1.x > pos2.x) {
 		std::swap(pos1.x, pos2.x);
 	}
@@ -1608,7 +1608,7 @@ static int CclTurnTowardsLocation(lua_State *l)
 
 	Vec2i dir;
 	if (lua_istable(l, 2)) {
-		CclGetPos(l, &dir.x, &dir.y, 2);
+		CclGetPos(l, &dir, 2);
 		dir = dir - unit->tilePos;
 	} else {
 		lua_pushvalue(l, 2);

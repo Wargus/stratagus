@@ -760,7 +760,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				for (int m = 0; m < UnitSides; ++m) {
 					lua_rawgeti(l, -1, m + 1);
-					CclGetPos(l, &type->MissileOffsets[m][k].x, &type->MissileOffsets[m][k].y);
+					CclGetPos(l, &type->MissileOffsets[m][k]);
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);

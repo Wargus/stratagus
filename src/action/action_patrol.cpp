@@ -89,7 +89,7 @@ bool COrder_Patrol::ParseSpecificData(lua_State *l,
 	if (value == "patrol") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
+		CclGetPos(l, &this->WayPoint);
 		lua_pop(l, 1);
 	} else if (value == "waiting-cycle") {
 		++j;
@@ -100,7 +100,7 @@ bool COrder_Patrol::ParseSpecificData(lua_State *l,
 	} else if (value == "tile") {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
-		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
+		CclGetPos(l, &this->goalPos);
 		lua_pop(l, 1);
 	} else {
 		return false;
