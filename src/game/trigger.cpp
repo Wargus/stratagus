@@ -509,12 +509,12 @@ static int CclSetActiveTriggers(lua_State *l)
 **
 **  @param script  Script to execute
 **
-**  @return        1 if the trigger should be removed
+**  @return        true if the trigger should be removed
 */
-static int TriggerExecuteAction(int script)
+static bool TriggerExecuteAction(int script)
 {
 	const int base = lua_gettop(Lua);
-	int ret = 0;
+	bool ret = false;
 
 	lua_rawgeti(Lua, -1, script + 1);
 	const int args = lua_rawlen(Lua, -1);
@@ -522,9 +522,9 @@ static int TriggerExecuteAction(int script)
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			ret = 1;
+			ret = true;
 		} else {
-			ret = 0;
+			ret = false;
 		}
 		lua_settop(Lua, base + 1);
 	}
