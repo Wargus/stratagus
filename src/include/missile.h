@@ -295,11 +295,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "luacallback.h"
 #include "missileconfig.h"
 #include "script.h"
 #include "unitptr.h"
 #include "unitsound.h"
 #include "vec2i.h"
+
+#include <memory>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -322,21 +325,21 @@ enum class MissileClass
 {
 	None,                     /// Missile does nothing
 	PointToPoint,             /// Missile flies from x,y to x1,y1
-	PointToPointWithHit,      /// Missile flies from x,y to x1,y1 than shows hit animation.
+	PointToPointWithHit,      /// Missile flies from x,y to x1,y1 then shows hit animation.
 	PointToPointCycleOnce,    /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
 	PointToPointBounce,       /// Missile flies from x,y to x1,y1 than bounces three times.
-	Stay,                     /// Missile appears at x,y, does it's anim and vanishes.
+	Stay,                     /// Missile appears at x,y, does its anim and vanishes.
 	CycleOnce,                /// Missile appears at x,y, then cycle through the frames once.
-	Fire,                     /// Missile doesn't move, than checks the source unit for HP.
+	Fire,                     /// Missile doesn't move, then checks the source unit for HP.
 	Hit,                      /// Missile shows the hit points.
 	Parabolic,                /// Missile flies from x,y to x1,y1 using a parabolic path
-	LandMine,                 /// Missile wait on x,y until a non-air unit comes by, the explodes.
+	LandMine,                 /// Missile wait on x,y until a non-air unit comes by, then explodes.
 	Whirlwind,                /// Missile appears at x,y, is whirlwind
 	FlameShield,              /// Missile surround x,y
 	DeathCoil,                /// Missile is death coil.
 	Tracer,                   /// Missile seeks towards to target unit
-	ClipToTarget,             /// Missile remains clipped to target's current goal and plays his animation once
-	Continuous,               /// Missile stays and plays it's animation several times
+	ClipToTarget,             /// Missile remains clipped to target's current goal and plays its animation once
+	Continuous,               /// Missile stays and plays its animation several times
 	StraightFly               /// Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 };
 
@@ -344,7 +347,7 @@ enum class MissileClass
 class MissileType
 {
 public:
-	explicit MissileType(const std::string &ident);
+	explicit MissileType(const std::string &ident) : Ident(ident) {}
 	~MissileType();
 
 	/// load the graphics for a missile type
@@ -359,51 +362,51 @@ public:
 
 	//private:
 	std::string Ident;         /// missile name
-	int Transparency;          /// missile transparency
-	PixelSize size;            /// missile size in pixels
-	int DrawLevel;             /// Level to draw missile at
-	int SpriteFrames;          /// number of sprite frames in graphic
-	int NumDirections;         /// number of directions missile can face
-	int ChangeVariable;        /// variable to change
-	int ChangeAmount;          /// how many to change
-	bool ChangeMax;            /// modify the max, if value will exceed it
+	int Transparency = 0;      /// missile transparency
+	PixelSize size{0, 0};      /// missile size in pixels
+	int DrawLevel = 0;         /// Level to draw missile at
+	int SpriteFrames = 0;      /// number of sprite frames in graphic
+	int NumDirections = 0;     /// number of directions missile can face
+	int ChangeVariable = -1;   /// variable to change
+	int ChangeAmount = 0;      /// how many to change
+	bool ChangeMax = false;    /// modify the max, if value will exceed it
 
 	SoundConfig FiredSound;    /// fired sound
 	SoundConfig ImpactSound;   /// impact sound for this missile-type
 
-	bool CorrectSphashDamage;  /// restricts the radius damage depending on land, air, naval
-	bool Flip;                 /// flip image when facing left
-	bool CanHitOwner;          /// missile can hit the owner
-	bool FriendlyFire;         /// missile can't hit own units
-	bool AlwaysFire;           /// missile will always fire (even if target is dead)
-	bool Pierce;               /// missile will hit every unit on his way
-	bool PierceOnce;           /// pierce every target only once
-	bool IgnoreWalls;          /// missile ignores Wall units on it's way
-	bool KillFirstUnit;        /// missile kills first unit blocking it's way
+	bool CorrectSphashDamage = false; /// restricts the radius damage depending on land, air, naval
+	bool Flip = false;                /// flip image when facing left
+	bool CanHitOwner = false;         /// missile can hit the owner
+	bool FriendlyFire = false;        /// missile can't hit own units
+	bool AlwaysFire = false;          /// missile will always fire (even if target is dead)
+	bool Pierce = false;              /// missile will hit every unit on his way
+	bool PierceOnce = false;          /// pierce every target only once
+	bool IgnoreWalls = true;          /// missile ignores Wall units on it's way
+	bool KillFirstUnit = false;       /// missile kills first unit blocking it's way
 
-	MissileClass Class;        /// missile class
-	int NumBounces;            /// number of bounces
-	int ParabolCoefficient;    /// parabol coefficient in parabolic missile
-	int StartDelay;            /// missile start delay
-	int Sleep;                 /// missile sleep
-	int Speed;                 /// missile speed
-	int BlizzardSpeed;         /// speed for blizzard shards
-	int TTL;                   /// missile time-to-live
-	int ReduceFactor;          /// Multiplier for reduce or increase damage dealt to the next unit
-	int SmokePrecision;        /// How frequently the smoke missile will generate itself
-	int MissileStopFlags;      /// On which terrain types missile won't fly
+	MissileClass Class = MissileClass::None; /// missile class
+	int NumBounces = 0;            /// number of bounces
+	int ParabolCoefficient = 2048; /// parabol coefficient in parabolic missile
+	int StartDelay = 0;            /// missile start delay
+	int Sleep = 0;                 /// missile sleep
+	int Speed = 0;                 /// missile speed
+	int BlizzardSpeed = 0;         /// speed for blizzard shards
+	int TTL = -1;                  /// missile time-to-live
+	int ReduceFactor = 100;        /// Multiplier for reduce or increase damage dealt to the next unit
+	int SmokePrecision = 0;        /// How frequently the smoke missile will generate itself
+	int MissileStopFlags = 0;      /// On which terrain types missile won't fly
 	std::unique_ptr<INumberDesc> Damage;    /// missile damage (used for non-direct missiles, e.g. impacts)
 
-	int Range;                             /// missile damage range
-	int SplashFactor;                      /// missile splash divisor
-	std::vector <MissileConfig *> Impact;  /// missile produces an impact
+	int Range = 0;                         /// missile damage range
+	int SplashFactor = 0;                  /// missile splash divisor
+	std::vector<MissileConfig> Impact; /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
-	LuaCallback *ImpactParticle;           /// impact particle
-	LuaCallback *SmokeParticle;            /// smoke particle
-	LuaCallback *OnImpact;                 /// called when
+	std::unique_ptr<LuaCallback> ImpactParticle; /// impact particle
+	std::unique_ptr<LuaCallback> SmokeParticle;  /// smoke particle
+	std::unique_ptr<LuaCallback> OnImpact;       /// called when
 
 	// --- FILLED UP ---
-	CGraphic *G;         /// missile graphic
+	CGraphic *G = nullptr;         /// missile graphic
 };
 
 /*----------------------------------------------------------------------------
@@ -414,12 +417,13 @@ public:
 class Missile
 {
 protected:
-	Missile();
+	Missile() { this->Slot = Missile::Count++; }
 
 public:
-	virtual ~Missile();
+	virtual ~Missile() = default;
 
-	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+	static std::unique_ptr<Missile>
+	Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 	virtual void Action() = 0;
 
@@ -430,34 +434,33 @@ public:
 	void NextMissileFrameCycle();
 	void MissileNewHeadingFromXY(const PixelPos &delta);
 
-
 	//private:
-	PixelPos source; /// Missile source position
-	PixelPos position;   /// missile pixel position
-	PixelPos destination;  /// missile pixel destination
-	const MissileType *Type;  /// missile-type pointer
-	int SpriteFrame;  /// sprite frame counter
-	int State;        /// state
-	int AnimWait;     /// Animation wait.
-	int Wait;         /// delay between frames
-	int Delay;        /// delay to show up
+	PixelPos source{0, 0}; /// Missile source position
+	PixelPos position{0, 0}; /// missile pixel position
+	PixelPos destination{0, 0}; /// missile pixel destination
+	const MissileType *Type = nullptr;  /// missile-type pointer
+	int SpriteFrame = 0;  /// sprite frame counter
+	int State = 0;        /// state
+	int AnimWait = 0;     /// Animation wait.
+	int Wait = 0;         /// delay between frames
+	int Delay = 0;        /// delay to show up
 
 	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
 	CUnitPtr TargetUnit;  /// target unit, used for spells
 
-	std::vector<CUnit *> PiercedUnits;	/// Units which are already pierced by this missile
+	std::vector<CUnit *> PiercedUnits; /// Units which are already pierced by this missile
 
-	int Damage;  /// direct damage that missile applies
+	int Damage = 0;  /// direct damage that missile applies
 
-	int TTL;             /// time to live (ticks) used for spells
-	int Hidden;          /// If this is 1 then the missile is invisible
-	int DestroyMissile;  /// this tells missile-class-straight-fly, that it's time to die
+	int TTL = -1;            /// time to live (ticks) used for spells
+	int Hidden = 0;          /// If this is 1 then the missile is invisible
+	int DestroyMissile = 0;  /// this tells missile-class-straight-fly, that it's time to die
 
 	// Internal use:
-	int CurrentStep;  /// Current step (0 <= x < TotalStep).
-	int TotalStep;    /// Total step.
+	int CurrentStep = 0;  /// Current step (0 <= x < TotalStep).
+	int TotalStep = 0;    /// Total step.
 
-	unsigned  Local: 1;     /// missile is a local missile
+	bool Local = false;     /// missile is a local missile
 	unsigned int Slot;      /// unique number for draw level.
 
 	static unsigned int Count; /// slot number generator.
@@ -471,113 +474,113 @@ extern bool MissileHandleBlocking(Missile &missile, const PixelPos &position);
 class MissileNone : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissilePointToPoint : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissilePointToPointWithHit : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissilePointToPointCycleOnce : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissilePointToPointBounce : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileStay : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileCycleOnce : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileFire : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileHit : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileParabolic : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileLandMine : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileWhirlwind : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileFlameShield : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 class MissileDeathCoil : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 
 class MissileTracer : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 
 class MissileClipToTarget : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 
 class MissileContinious : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 
 class MissileStraightFly : public Missile
 {
 public:
-	virtual void Action();
+	void Action() override;
 };
 
 
 class BurningBuildingFrame
 {
 public:
-	BurningBuildingFrame() : Percent(0), Missile(nullptr) {};
+	BurningBuildingFrame() = default;
 
-	int          Percent;  /// HP percent
-	MissileType *Missile;  /// Missile to draw
+	int Percent = 0; /// HP percent
+	MissileType *Missile = nullptr; /// Missile to draw
 } ;
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<BurningBuildingFrame *> BurningBuildingFrames;  /// Burning building frames
+extern std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --  Functions

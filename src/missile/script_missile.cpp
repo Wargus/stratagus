@@ -161,25 +161,25 @@ void MissileType::Load(lua_State *l)
 			this->Range = LuaToNumber(l, -1);
 		} else if (value == "ImpactMissile") {
 			if (!lua_istable(l, -1)) {
-				MissileConfig *mc = new MissileConfig();
-				mc->Name = LuaToString(l, -1);
-				this->Impact.push_back(mc);
+				MissileConfig mc{};
+				mc.Name = LuaToString(l, -1);
+				this->Impact.push_back(std::move(mc));
 			} else {
 				const int impacts = lua_rawlen(l, -1);
 				for (int i = 0; i < impacts; ++i) {
-					MissileConfig *mc = new MissileConfig();
-					mc->Name = LuaToString(l, -1, i + 1);
-					this->Impact.push_back(mc);
+					MissileConfig mc{};
+					mc.Name = LuaToString(l, -1, i + 1);
+					this->Impact.push_back(std::move(mc));
 				}
 			}
 		} else if (value == "SmokeMissile") {
 			this->Smoke.Name = LuaToString(l, -1);
 		} else if (value == "ImpactParticle") {
-			this->ImpactParticle = new LuaCallback(l, -1);
+			this->ImpactParticle = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "SmokeParticle") {
-			this->SmokeParticle = new LuaCallback(l, -1);
+			this->SmokeParticle = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "OnImpact") {
-			this->OnImpact = new LuaCallback(l, -1);
+			this->OnImpact = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "CanHitOwner") {
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (value == "AlwaysFire") {
@@ -336,9 +336,6 @@ static int CclMissile(lua_State *l)
 */
 static int CclDefineBurningBuilding(lua_State *l)
 {
-	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
-		delete frame;
-	}
 	BurningBuildingFrames.clear();
 
 	const int args = lua_gettop(l);
@@ -346,7 +343,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		BurningBuildingFrame *ptr = new BurningBuildingFrame;
+		auto ptr = std::make_unique<BurningBuildingFrame>();
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
@@ -359,7 +356,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 				ptr->Missile = &MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
 		}
-		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), ptr);
+		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), std::move(ptr));
 	}
 	return 0;
 }

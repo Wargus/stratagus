@@ -40,7 +40,7 @@
 /**
 **  Missile don't move, than disappears
 */
-void MissileStay::Action()
+void MissileStay::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (this->NextMissileFrame(1, 0)) {

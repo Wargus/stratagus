@@ -64,7 +64,7 @@ struct LandMineTargetFinder {
 **  @todo start-finish-start cyclic animation.(anim scripts!)
 **  @todo missile should disappear for a while.
 */
-void MissileLandMine::Action()
+void MissileLandMine::Action() /* override */
 {
 	const Vec2i pos = Map.MapPixelPosToTilePos(this->position);
 

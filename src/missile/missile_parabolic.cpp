@@ -114,7 +114,7 @@ static bool ParabolicMissile(Missile &missile)
 /**
 **  Missile flies from x,y to x1,y1 using a parabolic path
 */
-void MissileParabolic::Action()
+void MissileParabolic::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (ParabolicMissile(*this)) {

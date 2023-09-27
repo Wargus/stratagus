@@ -44,9 +44,9 @@
 /**
 **  FlameShield controller
 */
-void MissileFlameShield::Action()
+void MissileFlameShield::Action() /* override */
 {
-	static int fs_dc[] = {
+	static const int fs_dc[] = {
 		0, 32, 5, 31, 10, 30, 16, 27, 20, 24, 24, 20, 27, 15, 30, 10, 31,
 		5, 32, 0, 31, -5, 30, -10, 27, -16, 24, -20, 20, -24, 15, -27, 10,
 		-30, 5, -31, 0, -32, -5, -31, -10, -30, -16, -27, -20, -24, -24, -20,

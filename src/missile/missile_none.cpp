@@ -40,7 +40,7 @@
 /**
 **  Missile does nothing
 */
-void MissileNone::Action()
+void MissileNone::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	// Busy doing nothing.

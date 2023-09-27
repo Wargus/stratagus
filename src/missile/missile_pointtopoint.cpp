@@ -40,7 +40,7 @@
 /**
 **  Missile flies from x,y to x1,y1 animation on the way
 */
-void MissilePointToPoint::Action()
+void MissilePointToPoint::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {

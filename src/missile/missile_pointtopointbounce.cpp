@@ -42,7 +42,7 @@
 /**
 **  Missile flies from x,y to x1,y1 than bounces NumBounces times
 */
-void MissilePointToPointBounce::Action()
+void MissilePointToPointBounce::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {

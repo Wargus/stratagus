@@ -40,7 +40,7 @@
 /**
 **  Missile flies from x,y to x1,y1 and stays there for a moment
 */
-void MissilePointToPointCycleOnce::Action()
+void MissilePointToPointCycleOnce::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {
