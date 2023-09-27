@@ -42,7 +42,7 @@
 /**
 **  Missile flies from x,y to x1,y1 then continues to fly, until incompatible terrain is detected
 */
-void MissileStraightFly::Action()
+void MissileStraightFly::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {

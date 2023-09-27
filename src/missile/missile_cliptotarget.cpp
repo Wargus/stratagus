@@ -43,7 +43,7 @@
 /**
 **  Missile remains clipped to target's current goal and plays his animation once
 */
-void MissileClipToTarget::Action()
+void MissileClipToTarget::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 

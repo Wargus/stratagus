@@ -63,14 +63,14 @@
 
 unsigned int Missile::Count = 0;
 
-static std::vector<Missile *> GlobalMissiles;    /// all global missiles on map
-static std::vector<Missile *> LocalMissiles;     /// all local missiles on map
+static std::vector<std::unique_ptr<Missile>> GlobalMissiles;    /// all global missiles on map
+static std::vector<std::unique_ptr<Missile>> LocalMissiles;     /// all local missiles on map
 
 /// lookup table for missile names
-using MissileTypeMap = std::map<std::string, MissileType *, std::less<>>;
+using MissileTypeMap = std::map<std::string, std::unique_ptr<MissileType>, std::less<>>;
 static MissileTypeMap MissileTypes;
 
-std::vector<BurningBuildingFrame *> BurningBuildingFrames; /// Burning building frames
+std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames; /// Burning building frames
 
 extern std::unique_ptr<INumberDesc> Damage;                   /// Damage calculation for missile.
 
@@ -137,30 +137,11 @@ MissileType *NewMissileTypeSlot(const std::string &ident)
 	auto &res = MissileTypes[ident];
 
 	if (res == nullptr) {
-		res = new MissileType(ident);
+		res = std::make_unique<MissileType>(ident);
 	} else {
 		DebugPrint("Redefining missile-type '%s'\n", ident.c_str());
 	}
-	return res;
-}
-
-/**
-**  Constructor
-*/
-Missile::Missile() :
-	Type(nullptr), SpriteFrame(0), State(0), AnimWait(0), Wait(0),
-	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
-	TTL(-1), Hidden(0), DestroyMissile(0),
-	CurrentStep(0), TotalStep(0),
-	Local(0)
-{
-	position.x = 0;
-	position.y = 0;
-	destination.x = 0;
-	destination.y = 0;
-	source.x = 0;
-	source.y = 0;
-	this->Slot = Missile::Count++;
+	return res.get();
 }
 
 /**
@@ -172,65 +153,30 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+/* static */ std::unique_ptr<Missile>
+Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
-	Missile *missile = nullptr;
+	std::unique_ptr<Missile> missile;
 
 	switch (mtype.Class) {
-		case MissileClass::None :
-			missile = new MissileNone;
-			break;
-		case MissileClass::PointToPoint :
-			missile = new MissilePointToPoint;
-			break;
-		case MissileClass::PointToPointWithHit :
-			missile = new MissilePointToPointWithHit;
-			break;
-		case MissileClass::PointToPointCycleOnce :
-			missile = new MissilePointToPointCycleOnce;
-			break;
-		case MissileClass::PointToPointBounce :
-			missile = new MissilePointToPointBounce;
-			break;
-		case MissileClass::Stay :
-			missile = new MissileStay;
-			break;
-		case MissileClass::CycleOnce :
-			missile = new MissileCycleOnce;
-			break;
-		case MissileClass::Fire :
-			missile = new MissileFire;
-			break;
-		case MissileClass::Hit :
-			missile = new ::MissileHit;
-			break;
-		case MissileClass::Parabolic :
-			missile = new MissileParabolic;
-			break;
-		case MissileClass::LandMine :
-			missile = new MissileLandMine;
-			break;
-		case MissileClass::Whirlwind :
-			missile = new MissileWhirlwind;
-			break;
-		case MissileClass::FlameShield :
-			missile = new MissileFlameShield;
-			break;
-		case MissileClass::DeathCoil :
-			missile = new MissileDeathCoil;
-			break;
-		case MissileClass::Tracer :
-			missile = new MissileTracer;
-			break;
-		case MissileClass::ClipToTarget :
-			missile = new MissileClipToTarget;
-			break;
-		case MissileClass::Continuous :
-			missile = new MissileContinious;
-			break;
-		case MissileClass::StraightFly :
-			missile = new MissileStraightFly;
-			break;
+		case MissileClass::None: missile = std::make_unique<MissileNone>(); break;
+		case MissileClass::PointToPoint: missile = std::make_unique<MissilePointToPoint>(); break;
+		case MissileClass::PointToPointWithHit: missile = std::make_unique<MissilePointToPointWithHit>(); break;
+		case MissileClass::PointToPointCycleOnce: missile = std::make_unique<MissilePointToPointCycleOnce>(); break;
+		case MissileClass::PointToPointBounce: missile = std::make_unique<MissilePointToPointBounce>(); break;
+		case MissileClass::Stay: missile = std::make_unique<MissileStay>(); break;
+		case MissileClass::CycleOnce: missile = std::make_unique<MissileCycleOnce>(); break;
+		case MissileClass::Fire: missile = std::make_unique<MissileFire>(); break;
+		case MissileClass::Hit: missile = std::make_unique<::MissileHit>(); break;
+		case MissileClass::Parabolic: missile = std::make_unique<MissileParabolic>(); break;
+		case MissileClass::LandMine: missile = std::make_unique<MissileLandMine>(); break;
+		case MissileClass::Whirlwind: missile = std::make_unique<MissileWhirlwind>(); break;
+		case MissileClass::FlameShield: missile = std::make_unique<MissileFlameShield>(); break;
+		case MissileClass::DeathCoil: missile = std::make_unique<MissileDeathCoil>(); break;
+		case MissileClass::Tracer: missile = std::make_unique<MissileTracer>(); break;
+		case MissileClass::ClipToTarget: missile = std::make_unique<MissileClipToTarget>(); break;
+		case MissileClass::Continuous: missile = std::make_unique<MissileContinious>(); break;
+		case MissileClass::StraightFly: missile = std::make_unique<MissileStraightFly>(); break;
 	}
 	const PixelPos halfSize = mtype.size / 2;
 	missile->position = startPos - halfSize;
@@ -258,10 +204,10 @@ Missile::Missile() :
 */
 Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	auto missile = Missile::Init(mtype, startPos, destPos);
 
-	GlobalMissiles.push_back(missile);
-	return missile;
+	GlobalMissiles.push_back(std::move(missile));
+	return GlobalMissiles.back().get();
 }
 
 /**
@@ -275,11 +221,11 @@ Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const P
 */
 Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	auto missile = Missile::Init(mtype, startPos, destPos);
 
 	missile->Local = 1;
-	LocalMissiles.push_back(missile);
-	return missile;
+	LocalMissiles.push_back(std::move(missile));
+	return LocalMissiles.back().get();
 }
 
 /**
@@ -581,7 +527,7 @@ std::vector<Missile *> FindAndSortMissiles(const CViewport &vp)
 {
 	std::vector<Missile *> table;
 	// Loop through global missiles, then through locals.
-	for (auto* missilePtr : GlobalMissiles) {
+	for (auto& missilePtr : GlobalMissiles) {
 		Missile &missile = *missilePtr;
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
@@ -592,7 +538,7 @@ std::vector<Missile *> FindAndSortMissiles(const CViewport &vp)
 		}
 	}
 
-	for (auto* missilePtr : LocalMissiles) {
+	for (auto& missilePtr : LocalMissiles) {
 		Missile &missile = *missilePtr;
 		if (missile.Delay || missile.Hidden) {
 			continue;  // delayed or hidden -> aren't shown
@@ -920,8 +866,8 @@ void Missile::MissileHit(CUnit *unit)
 	// The impact generates a new missile.
 	//
 	if (mtype.Impact.empty() == false) {
-		for (MissileConfig *mc : mtype.Impact) {
-			Missile *impact = MakeMissile(*mc->Missile, pixelPos, pixelPos);
+		for (const auto &mc : mtype.Impact) {
+			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
 			if (impact && impact->Type->Damage) {
 				impact->SourceUnit = this->SourceUnit;
 			}
@@ -1154,7 +1100,7 @@ void Missile::NextMissileFrameCycle()
 **
 **  @param missiles  Table of missiles.
 */
-static void MissilesActionLoop(std::vector<Missile *> &missiles)
+static void MissilesActionLoop(std::vector<std::unique_ptr<Missile>> &missiles)
 {
 	for (size_t i = 0; i != missiles.size(); /* empty */) {
 		Missile &missile = *missiles[i];
@@ -1168,7 +1114,6 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 			missile.TTL--;  // overall time to live if specified
 		}
 		if (missile.TTL == 0) {
-			delete &missile;
 			missiles.erase(missiles.begin() + i);
 			continue;
 		}
@@ -1179,7 +1124,6 @@ static void MissilesActionLoop(std::vector<Missile *> &missiles)
 		}
 		missile.Action(); // may create other missiles, and so modifies the array
 		if (missile.TTL == 0) {
-			delete &missile;
 			missiles.erase(missiles.begin() + i);
 			continue;
 		}
@@ -1220,7 +1164,7 @@ int ViewPointDistanceToMissile(const Missile &missile)
 */
 MissileType *MissileBurningBuilding(int percent)
 {
-	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
+	for (auto &frame : BurningBuildingFrames) {
 		if (percent > frame->Percent) {
 			return frame->Missile;
 		}
@@ -1281,10 +1225,10 @@ void SaveMissiles(CFile &file)
 	file.printf("\n--- -----------------------------------------\n");
 	file.printf("--- MODULE: missiles\n\n");
 
-	for (const Missile *missile : GlobalMissiles) {
+	for (const auto &missile : GlobalMissiles) {
 		missile->SaveMissile(file);
 	}
-	for (const Missile *missile : LocalMissiles) {
+	for (const auto &missile : LocalMissiles) {
 		missile->SaveMissile(file);
 	}
 }
@@ -1297,8 +1241,8 @@ void MissileType::Init()
 	// Resolve impact missiles and sounds.
 	this->FiredSound.MapSound();
 	this->ImpactSound.MapSound();
-	for (MissileConfig *mc : this->Impact) {
-		mc->MapMissile();
+	for (auto &mc : this->Impact) {
+		mc.MapMissile();
 	}
 	this->Smoke.MapMissile();
 }
@@ -1314,33 +1258,11 @@ void InitMissileTypes()
 }
 
 /**
-**  Constructor.
-*/
-MissileType::MissileType(const std::string &ident) :
-	Ident(ident), Transparency(0), DrawLevel(0),
-	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
-	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
-	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
-	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
-	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
-	MissileStopFlags(0), Range(0), SplashFactor(0),
-	ImpactParticle(nullptr), SmokeParticle(nullptr), OnImpact(nullptr),
-	G(nullptr)
-{
-	size.x = 0;
-	size.y = 0;
-}
-
-/**
 **  Destructor.
 */
 MissileType::~MissileType()
 {
 	CGraphic::Free(this->G);
-	Impact.clear();
-	delete ImpactParticle;
-	delete SmokeParticle;
-	delete OnImpact;
 }
 
 /**
@@ -1348,9 +1270,6 @@ MissileType::~MissileType()
 */
 void CleanMissileTypes()
 {
-	for (auto &[key, value] : MissileTypes) {
-		delete value;
-	}
 	MissileTypes.clear();
 }
 
@@ -1362,33 +1281,16 @@ void InitMissiles()
 }
 
 /**
-**  Missile destructior.
-*/
-Missile::~Missile()
-{
-	PiercedUnits.clear();
-}
-
-/**
 **  Clean up missiles.
 */
 void CleanMissiles()
 {
-	for (Missile *missile : GlobalMissiles) {
-		delete missile;
-	}
 	GlobalMissiles.clear();
-	for (Missile *missile : LocalMissiles) {
-		delete missile;
-	}
 	LocalMissiles.clear();
 }
 
 void FreeBurningBuildingFrames()
 {
-	for (BurningBuildingFrame *frame : BurningBuildingFrames) {
-		delete frame;
-	}
 	BurningBuildingFrames.clear();
 }
 

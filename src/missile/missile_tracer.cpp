@@ -115,7 +115,7 @@ static bool TracerMissile(Missile &missile)
 /**
 **  Missile flies from x,y to the target position, changing direction on the way
 */
-void MissileTracer::Action()
+void MissileTracer::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (TracerMissile(*this)) {

@@ -41,7 +41,7 @@
 **  Missile flies from x,y to x1,y1 showing the first frame
 **  and then shows a hit animation.
 */
-void MissilePointToPointWithHit::Action()
+void MissilePointToPointWithHit::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {

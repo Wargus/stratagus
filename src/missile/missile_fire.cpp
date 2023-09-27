@@ -43,7 +43,7 @@
 /**
 **  Missile don't move, than checks the source unit for HP.
 */
-void MissileFire::Action()
+void MissileFire::Action() /* override */
 {
 	CUnit &unit = *this->SourceUnit;
 

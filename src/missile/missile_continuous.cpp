@@ -40,7 +40,7 @@
 /**
 **  Missile don't move, than disappears when TTL is 0
 */
-void MissileContinious::Action()
+void MissileContinious::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	this->MissileHit();

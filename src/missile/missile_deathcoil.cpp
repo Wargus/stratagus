@@ -47,7 +47,7 @@
 **
 **  @todo  do it configurable.
 */
-void MissileDeathCoil::Action()
+void MissileDeathCoil::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this) == false) {

@@ -40,7 +40,7 @@
 /**
 **  Missile shows hit points?
 */
-void MissileHit::Action()
+void MissileHit::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	if (PointToPointMissile(*this)) {

@@ -44,7 +44,7 @@
 **
 **  @todo do it more configurable.
 */
-void MissileWhirlwind::Action()
+void MissileWhirlwind::Action() /* override */
 {
 	// Animate, move.
 	if (!this->AnimWait--) {

@@ -41,7 +41,7 @@
 **  Missile doesn't move, it will just cycle once and vanish.
 **  Used for ui missiles (cross shown when you give and order)
 */
-void MissileCycleOnce::Action()
+void MissileCycleOnce::Action() /* override */
 {
 	this->Wait = this->Type->Sleep;
 	switch (this->State) {
