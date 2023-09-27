@@ -476,7 +476,7 @@ static int CclDefineCursor(lua_State *l)
 		} else if (value == "File") {
 			file = LuaToString(l, -1);
 		} else if (value == "HotSpot") {
-			CclGetPos(l, &hotpos.x, &hotpos.y);
+			CclGetPos(l, &hotpos);
 		} else if (value == "Size") {
 			CclGetPos(l, &w, &h);
 		} else if (value == "Rate") {

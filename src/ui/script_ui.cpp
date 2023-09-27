@@ -527,7 +527,7 @@ static CContentType *CclParseContent(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		std::string_view key = LuaToString(l, -2);
 		if (key == "Pos") {
-			CclGetPos(l, &pos.x, &pos.y);
+			CclGetPos(l, &pos);
 		} else if (key == "More") {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
@@ -807,7 +807,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 				lua_pop(l, 1);
 			}
 		} else if (value == "TextPos") {
-			CclGetPos(l, &p->TextPos.x, &p->TextPos.y);
+			CclGetPos(l, &p->TextPos);
 		} else if (value == "TextAlign") {
 			value = LuaToString(l, -1);
 			if (value == "Center") {

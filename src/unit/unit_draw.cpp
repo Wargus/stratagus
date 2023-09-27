@@ -331,7 +331,7 @@ static int CclDefineSprites(lua_State *l)
 			} else if (key == "File") {
 				deco.File = LuaToString(l, -1);
 			} else if (key == "Offset") {
-				CclGetPos(l, &deco.HotPos.x, &deco.HotPos.y);
+				CclGetPos(l, &deco.HotPos);
 			} else if (key == "Size") {
 				CclGetPos(l, &deco.Width, &deco.Height);
 			} else { // Error.

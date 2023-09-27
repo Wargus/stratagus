@@ -99,7 +99,7 @@ void MissileType::Load(lua_State *l)
 		if (value == "File") {
 			file = LuaToString(l, -1);
 		} else if (value == "Size") {
-			CclGetPos(l, &this->size.x, &this->size.y);
+			CclGetPos(l, &this->size);
 		} else if (value == "Frames") {
 			this->SpriteFrames = LuaToNumber(l, -1);
 		} else if (value == "Flip") {
@@ -254,11 +254,11 @@ static int CclMissile(lua_State *l)
 		if (value == "type") {
 			type = &MissileTypeByIdent(LuaToString(l, j + 1));
 		} else if (value == "pos") {
-			CclGetPos(l, &position.x, &position.y, j + 1);
+			CclGetPos(l, &position, j + 1);
 		} else if (value == "origin-pos") {
-			CclGetPos(l, &source.x, &source.y, j + 1);
+			CclGetPos(l, &source, j + 1);
 		} else if (value == "goal") {
-			CclGetPos(l, &destination.x, &destination.y, j + 1);
+			CclGetPos(l, &destination, j + 1);
 		} else if (value == "local") {
 			Assert(type);
 			missile = MakeLocalMissile(*type, position, destination);
@@ -380,8 +380,8 @@ static int CclCreateMissile(lua_State *l)
 	const std::string_view name = LuaToString(l, 1);
 	const MissileType &mtype = MissileTypeByIdent(name);
 	PixelPos startpos, endpos;
-	CclGetPos(l, &startpos.x, &startpos.y, 2);
-	CclGetPos(l, &endpos.x, &endpos.y, 3);
+	CclGetPos(l, &startpos, 2);
+	CclGetPos(l, &endpos, 3);
 
 	const int sourceUnitId = LuaToNumber(l, 4);
 	const int destUnitId = LuaToNumber(l, 5);

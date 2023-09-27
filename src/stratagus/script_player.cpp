@@ -162,7 +162,7 @@ void CPlayer::Load(lua_State *l)
 				}
 			}
 		} else if (value == "start") {
-			CclGetPos(l, &this->StartPos.x, &this->StartPos.y, j + 1);
+			CclGetPos(l, &this->StartPos, j + 1);
 		} else if (value == "resources") {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -359,8 +359,8 @@ static int CclChangeUnitsOwner(lua_State *l)
 
     Vec2i pos1;
     Vec2i pos2;
-    CclGetPos(l, &pos1.x, &pos1.y, 1);
-    CclGetPos(l, &pos2.x, &pos2.y, 2);
+    CclGetPos(l, &pos1, 1);
+    CclGetPos(l, &pos2, 2);
 	if (pos1.x > pos2.x) {
 		std::swap(pos1.x, pos2.x);
 	}
