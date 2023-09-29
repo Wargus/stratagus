@@ -132,16 +132,6 @@ unsigned int CUnitManager::GetUsedSlotCount() const
 	return static_cast<unsigned int>(unitSlots.size());
 }
 
-CUnitManager::Iterator CUnitManager::begin()
-{
-	return units.begin();
-}
-
-CUnitManager::Iterator CUnitManager::end()
-{
-	return units.end();
-}
-
 bool CUnitManager::empty() const
 {
 	return units.empty();

@@ -452,11 +452,10 @@ static void HandleUnitAction(CUnit &unit)
 	unit.Orders[0]->Execute(unit);
 }
 
-template <typename UNITP_ITERATOR>
-static void UnitActionsEachSecond(UNITP_ITERATOR begin, UNITP_ITERATOR end)
+static void UnitActionsEachSecond(const std::vector<CUnit *> &units)
 {
-	for (UNITP_ITERATOR it = begin; it != end; ++it) {
-		CUnit &unit = **it;
+	for (CUnit *unitPtr : units) {
+		CUnit &unit = *unitPtr;
 
 		if (unit.Destroyed) {
 			continue;
@@ -505,7 +504,7 @@ static const char* toCStr(UnitAction action)
 	return "";
 }
 
-static void DumpUnitInfo(CUnit &unit)
+static void DumpUnitInfo(const CUnit &unit)
 {
 	// Dump the unit to find the network sync bugs.
 	static FILE *logf = nullptr;
@@ -548,11 +547,10 @@ static void DumpUnitInfo(CUnit &unit)
 	fflush(nullptr);
 }
 
-template <typename UNITP_ITERATOR>
-static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
+static void UnitActionsEachCycle(const std::vector<CUnit *> &units)
 {
-	for (UNITP_ITERATOR it = begin; it != end; ++it) {
-		CUnit &unit = **it;
+	for (auto *unitPtr : units) {
+		CUnit &unit = *unitPtr;
 
 		if (unit.Destroyed) {
 			continue;
@@ -618,14 +616,14 @@ void UnitActions()
 {
 	const bool isASecondCycle = !(GameCycle % CYCLES_PER_SECOND);
 	// Unit list may be modified during loop... so make a copy
-	std::vector<CUnit *> table(UnitManager->begin(), UnitManager->end());
+	std::vector<CUnit *> units(UnitManager->GetUnits());
 
 	// Check for things that only happen every second
 	if (isASecondCycle) {
-		UnitActionsEachSecond(table.begin(), table.end());
+		UnitActionsEachSecond(units);
 	}
 	// Do all actions
-	UnitActionsEachCycle(table.begin(), table.end());
+	UnitActionsEachCycle(units);
 }
 
 //@}

@@ -2414,8 +2414,8 @@ void DropOutAll(const CUnit &source)
 CUnit *UnitOnScreen(int x, int y)
 {
 	CUnit *candidate = nullptr;
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &unit = **it;
+	for (CUnit *unitPtr : UnitManager->GetUnits()) {
+		CUnit &unit = *unitPtr;
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
 			continue;
 		}
@@ -3493,7 +3493,7 @@ void InitUnits()
 void CleanUnits()
 {
 	//  Free memory for all units in unit table.
-	std::vector<CUnit *> units(UnitManager->begin(), UnitManager->end());
+	std::vector<CUnit *> units(UnitManager->GetUnits());
 
 	for (CUnit *unit : units) {
 		if (unit == nullptr) {

@@ -308,7 +308,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 /**
 **  Draw a unit on the minimap.
 */
-static void DrawUnitOn(CUnit &unit, int red_phase)
+static void DrawUnitOn(const CUnit &unit, int red_phase)
 {
 	const CUnitType *type;
 
@@ -414,10 +414,9 @@ void CMinimap::Update()
 	//
 	// Draw units on map
 	//
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.IsVisibleOnMinimap() && !unit.Removed && !unit.Type->BoolFlag[REVEALER_INDEX].value) {
-			DrawUnitOn(unit, red_phase);
+	for (const CUnit *unit : UnitManager->GetUnits()) {
+		if (unit->IsVisibleOnMinimap() && !unit->Removed && !unit->Type->BoolFlag[REVEALER_INDEX].value) {
+			DrawUnitOn(*unit, red_phase);
 		}
 	}
 }
