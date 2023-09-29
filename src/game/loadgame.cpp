@@ -177,11 +177,10 @@ void LoadModules()
 
 static void PlaceUnits()
 {
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Removed) {
-			unit.Removed = 1;
-			unit.Place(unit.tilePos);
+	for (CUnit *unit : UnitManager->GetUnits()) {
+		if (!unit->Removed) {
+			unit->Removed = 1;
+			unit->Place(unit->tilePos);
 		}
 	}
 }

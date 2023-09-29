@@ -50,8 +50,6 @@ struct lua_State;
 class CUnitManager
 {
 public:
-	using Iterator = std::vector<CUnit *>::iterator;
-public:
 	CUnitManager() = default;
 	void Init();
 
@@ -62,8 +60,6 @@ public:
 
 	// Following is for already allocated Unit (no specific order)
 	void Add(CUnit *unit);
-	Iterator begin();
-	Iterator end();
 	const std::vector<CUnit *> &GetUnits() const { return units; }
 
 	bool empty() const;

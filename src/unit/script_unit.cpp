@@ -1032,11 +1032,10 @@ static int CclKillUnit(lua_State *l)
 	lua_pop(l, 1);
 	const int plynr = TriggerGetPlayer(l);
 	if (plynr == -1) {
-		auto it = std::find_if(UnitManager->begin(), UnitManager->end(), [&](const CUnit *unit) {
-			return unitValidator(*unit);
-		});
+		auto it = ranges::find_if(UnitManager->GetUnits(),
+		                          [&](const CUnit *unit) { return unitValidator(*unit); });
 
-		if (it != UnitManager->end()) {
+		if (it != UnitManager->GetUnits().end()) {
 			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;
@@ -1139,10 +1138,10 @@ static int CclGetUnits(lua_State *l)
 	lua_newtable(l);
 	if (plynr == -1) {
 		int i = 0;
-		for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it, ++i) {
-			const CUnit &unit = **it;
-			lua_pushnumber(l, UnitNumber(unit));
+		for (const CUnit *unit : UnitManager->GetUnits()) {
+			lua_pushnumber(l, UnitNumber(*unit));
 			lua_rawseti(l, -2, i + 1);
+			++i;
 		}
 	} else {
 		for (int i = 0; i < Players[plynr].GetUnitCount(); ++i) {

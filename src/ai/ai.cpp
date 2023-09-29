@@ -850,8 +850,8 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	movablenb = 0;
 
 	// Try to make some unit moves around it
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &blocker = **it;
+	for (CUnit *blockerPtr : UnitManager->GetUnits()) {
+		CUnit &blocker = *blockerPtr;
 
 		if (blocker.IsUnusable()) {
 			continue;

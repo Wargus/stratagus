@@ -447,9 +447,9 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 		
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
-		std::vector<CUnit *> teleporters;
-		for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-			const CUnit &unit = **it;
+		std::vector<const CUnit *> teleporters;
+		for (const CUnit *unitPtr : UnitManager->GetUnits()) {
+			const CUnit &unit = *unitPtr;
 			const int x = unit.tilePos.x + offset.x;
 			const int y = unit.tilePos.y + offset.y;
 			if (x < newSize.x && y < newSize.y) {
@@ -464,7 +464,7 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 					f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 				}
 				if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-					teleporters.push_back(*it);
+					teleporters.push_back(&unit);
 				}
 			}
 		}
@@ -1026,10 +1026,10 @@ void CreateGame(const fs::path &filename, CMap *map)
 	// FIXME: The palette is loaded after the units are created.
 	// FIXME: This loops fixes the colors of the units.
 	//
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.Type->OnReady) {
-			unit.Type->OnReady->call(UnitNumber(unit));
+	for (CUnit *unit : UnitManager->GetUnits()) {
+		
+		if (unit->Type->OnReady) {
+			unit->Type->OnReady->call(UnitNumber(*unit));
 		}
 	}
 

@@ -371,9 +371,8 @@ void UpdateFogOfWarChange()
 		}
 	}
 	//  Global seen recount.
-	for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-		CUnit &unit = **it;
-		UnitCountSeen(unit);
+	for (CUnit *unit : UnitManager->GetUnits()) {
+		UnitCountSeen(*unit);
 	}
 }
 

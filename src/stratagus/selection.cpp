@@ -557,10 +557,9 @@ int AddGroupFromUnitToSelection(CUnit &unit)
     }
     //Wyrmgus end
 
-    for (CUnitManager::Iterator it = UnitManager->begin(); it != UnitManager->end(); ++it) {
-        CUnit &unit = **it;
-        if (unit.LastGroup == group && !unit.Removed) {
-            SelectUnit(unit);
+    for (CUnit *unit : UnitManager->GetUnits()) {
+        if (unit->LastGroup == group && !unit->Removed) {
+            SelectUnit(*unit);
             if (Selected.size() == MaxSelectable) {
                 return Selected.size();
             }
