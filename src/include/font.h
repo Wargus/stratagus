@@ -82,7 +82,7 @@ private:
 	{}
 
 public:
-	virtual ~CFont();
+	~CFont() override;
 
 	static CFont *New(const std::string &ident, CGraphic *g);
 	static CFont *Get(std::string_view ident);

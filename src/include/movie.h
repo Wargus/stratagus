@@ -88,28 +88,27 @@ struct OggData {
 class Movie : public gcn::Image
 {
 public:
-    Movie() : rect(nullptr), yuv_overlay(nullptr), surface(nullptr), need_data(true), start_time(0),
-              is_dirty(true), Width(0), Height(0), data(nullptr), f(nullptr) {};
-    ~Movie();
-    bool Load(const std::string &filename, int w, int h);
-    bool IsPlaying() const { return is_dirty; }
+	Movie() = default;
+	~Movie();
+	bool Load(const std::string &filename, int w, int h);
+	bool IsPlaying() const { return is_dirty; }
 
-    //guichan
-    virtual void *_getData() const;
-    virtual int getWidth() const { return Width; }
-    virtual int getHeight() const { return Height; }
-    virtual bool isDirty() const { return is_dirty; }
+	// guichan
+	void *_getData() const override;
+	int getWidth() const override { return Width; }
+	int getHeight() const override { return Height; }
+	bool isDirty() const override { return is_dirty; }
 
-    int Width;
-    int Height;
-    SDL_Surface *surface;
-    CFile *f;
-    mutable bool is_dirty;
-    mutable bool need_data;
-    mutable Uint32 start_time;
-    mutable OggData *data;
-    mutable SDL_Rect *rect;
-    mutable SDL_Texture *yuv_overlay;
+	int Width = 0;
+	int Height = 0;
+	SDL_Surface *surface = nullptr;
+	CFile *f = nullptr;
+	mutable bool is_dirty = true;
+	mutable bool need_data = true;
+	mutable Uint32 start_time = 0;
+	mutable OggData *data = nullptr;
+	mutable SDL_Rect *rect = nullptr;
+	mutable SDL_Texture *yuv_overlay = nullptr;
 };
 #endif
 
@@ -134,15 +133,16 @@ extern int VorbisProcessData(OggData *data, char *buffer);
 class Movie : public gcn::Image
 {
 public:
-    Movie() {};
-    ~Movie() {};
-    bool Load(const std::string &filename, int w, int h) { return false; };
-    bool IsPlaying() const { return false; };
-    //guichan
-    virtual void *_getData() const { return nullptr; };
-    virtual int getWidth() const { return 0; };
-    virtual int getHeight() const { return 0; };
-    virtual bool isDirty() const { return false; };
+	Movie() {}
+	~Movie() {}
+	bool Load(const std::string &filename, int w, int h) { return false; }
+	bool IsPlaying() const { return false; }
+
+	// guichan
+	void *_getData() const override { return nullptr; }
+	int getWidth() const override { return 0; }
+	int getHeight() const override { return 0; }
+	bool isDirty() const override { return false; }
 };
 #endif
 

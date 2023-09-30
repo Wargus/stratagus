@@ -100,12 +100,7 @@ public:
 	};
 
 protected:
-	CGraphic() : Surface(nullptr), SurfaceFlip(nullptr), frame_map(nullptr),
-		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1), Resized(false)
-	{
-		frameFlip_map = nullptr;
-	}
+	CGraphic() = default;
 	~CGraphic() {}
 
 public:
@@ -178,31 +173,31 @@ public:
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);
 
-	inline bool IsLoaded(bool flipped = false) const { return Surface != nullptr && (!flipped || SurfaceFlip != nullptr); }
+	bool IsLoaded(bool flipped = false) const { return Surface != nullptr && (!flipped || SurfaceFlip != nullptr); }
 
 	//guichan
-	virtual void *_getData() const { return Surface; }
-	virtual int getWidth() const { return Width; }
-	virtual int getHeight() const { return Height; }
+	void *_getData() const override { return Surface; }
+	int getWidth() const override { return Width; }
+	int getHeight() const override { return Height; }
 
 private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
 public:
-	fs::path File;             /// Filename
-	std::string HashFile;      /// Filename used in hash
-	SDL_Surface *Surface;      /// Surface
-	SDL_Surface *SurfaceFlip;  /// Flipped surface
-	frame_pos_t *frame_map;
-	frame_pos_t *frameFlip_map;
+	fs::path File;         /// Filename
+	std::string HashFile;  /// Filename used in hash
+	SDL_Surface *Surface = nullptr;     /// Surface
+	SDL_Surface *SurfaceFlip = nullptr; /// Flipped surface
+	frame_pos_t *frame_map = nullptr;
+	frame_pos_t *frameFlip_map = nullptr;
 	void GenFramesMap();
-	int Width;                 /// Width of a frame
-	int Height;                /// Height of a frame
-	int NumFrames;             /// Number of frames
-	int GraphicWidth;          /// Original graphic width
-	int GraphicHeight;         /// Original graphic height
-	int Refs;                  /// Uses of this graphic
-	bool Resized;              /// Image has been resized
+	int Width = 0;         /// Width of a frame
+	int Height = 0;        /// Height of a frame
+	int NumFrames = 1;     /// Number of frames
+	int GraphicWidth = 0;  /// Original graphic width
+	int GraphicHeight = 0; /// Original graphic height
+	int Refs = 1;          /// Uses of this graphic
+	bool Resized = false;  /// Image has been resized
 
 	friend class CFont;
 };
@@ -255,10 +250,10 @@ public:
 	void Draw(int x, int y);
 
 	//guichan
-	virtual void *_getData() const;
-	virtual int getWidth() const { return surface->w; }
-	virtual int getHeight() const { return surface->h; }
-	virtual bool isDirty() const { return true; }
+	void *_getData() const override;
+	int getWidth() const override { return surface->w; }
+	int getHeight() const override { return surface->h; }
+	bool isDirty() const override { return true; }
 
 	static uint32_t MaxFPS;
 
@@ -275,20 +270,20 @@ public:
 /// empty class for lua scripts
 class Mng : public gcn::Image
 {
-	Mng() {};
-	~Mng() {};
+	Mng() {}
+	~Mng() {}
 public:
 	static Mng *New(const std::string &name) { return nullptr; }
-	static void Free(Mng *mng) {};
-	bool Load() { return false; };
-	void Reset() {};
-	void Draw(int x, int y) {};
+	static void Free(Mng *mng) {}
+	bool Load() { return false; }
+	void Reset() {}
+	void Draw(int x, int y) {}
 
 	//guichan
-	virtual void *_getData() const { return nullptr; };
-	virtual int getWidth() const { return 0; };
-	virtual int getHeight() const { return 0; };
-	virtual bool isDirty() const { return false; };
+	void *_getData() const override { return nullptr; }
+	int getWidth() const override { return 0; }
+	int getHeight() const override { return 0; }
+	bool isDirty() const override { return false; }
 
 	static inline uint32_t MaxFPS = 15;
 };

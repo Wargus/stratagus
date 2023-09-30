@@ -50,35 +50,29 @@ class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, p
 	LuaCallback callback;
 public:
 	LuaActionListener(lua_State *lua, lua_Object function);
-	virtual void action(const std::string &eventId);
-	virtual bool keyPress(const gcn::Key&);
-	virtual bool keyRelease(const gcn::Key&);
-	virtual void hotKeyPress(const gcn::Key&);
-	virtual void hotKeyRelease(const gcn::Key&);
-	virtual void mouseIn();
-	virtual void mouseOut();
-	virtual void mousePress(int, int, int);
-	virtual void mouseRelease(int, int, int);
-	virtual void mouseClick(int, int, int, int);
-	virtual void mouseWheelUp(int, int);
-	virtual void mouseWheelDown(int, int);
-	virtual void mouseMotion(int, int);
-	virtual ~LuaActionListener();
+	~LuaActionListener() override;
+	void action(const std::string &eventId) override;
+	bool keyPress(const gcn::Key&) override;
+	bool keyRelease(const gcn::Key&) override;
+	void hotKeyPress(const gcn::Key&) override;
+	void hotKeyRelease(const gcn::Key&) override;
+	void mouseIn() override;
+	void mouseOut() override;
+	void mousePress(int, int, int) override;
+	void mouseRelease(int, int, int) override;
+	void mouseClick(int, int, int, int) override;
+	void mouseWheelUp(int, int) override;
+	void mouseWheelDown(int, int) override;
+	void mouseMotion(int, int) override;
 };
 
 class LambdaActionListener : public gcn::ActionListener
 {
 	std::function<void(const std::string &)> lambda;
 public:
-	LambdaActionListener(std::function<void(const std::string &)> l)
-	{
-		lambda = l;
-	}
+	explicit LambdaActionListener(std::function<void(const std::string &)> l) : lambda(l) {}
 
-	virtual void action(const std::string &eventId)
-	{
-		lambda(eventId);
-	}
+	void action(const std::string &eventId) override { lambda(eventId); }
 };
 
 class ImageWidget : public gcn::Icon
@@ -102,8 +96,8 @@ public:
 	ImageButton();
 	explicit ImageButton(const std::string &caption);
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void adjustSize();
+	void draw(gcn::Graphics *graphics) override;
+	void adjustSize() override;
 
 	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
 	void setPressedImage(gcn::Image *image) { pressedImage = image; }
@@ -121,13 +115,13 @@ public:
 	ImageRadioButton(const std::string &caption, const std::string &group,
 					 bool marked);
 
-	virtual void drawBox(gcn::Graphics *graphics);
-	virtual void draw(gcn::Graphics *graphics);
+	void drawBox(gcn::Graphics *graphics) override;
+	void draw(gcn::Graphics *graphics) override;
 
-	virtual void mousePress(int x, int y, int button);
-	virtual void mouseRelease(int x, int y, int button);
-	virtual void mouseClick(int x, int y, int button, int count);
-	virtual void adjustSize();
+	void mousePress(int x, int y, int button) override;
+	void mouseRelease(int x, int y, int button) override;
+	void mouseClick(int x, int y, int button, int count) override;
+	void adjustSize() override;
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
@@ -151,13 +145,13 @@ public:
 	ImageCheckBox();
 	ImageCheckBox(const std::string &caption, bool marked = false);
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBox(gcn::Graphics *graphics);
+	void draw(gcn::Graphics *graphics) override;
+	void drawBox(gcn::Graphics *graphics) override;
 
-	virtual void mousePress(int x, int y, int button);
-	virtual void mouseRelease(int x, int y, int button);
-	virtual void mouseClick(int x, int y, int button, int count);
-	virtual void adjustSize();
+	void mousePress(int x, int y, int button) override;
+	void mouseRelease(int x, int y, int button) override;
+	void mouseClick(int x, int y, int button, int count) override;
+	void adjustSize() override;
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
@@ -181,8 +175,8 @@ public:
 	explicit ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
 
-	virtual void drawMarker(gcn::Graphics *graphics);
-	virtual void draw(gcn::Graphics *graphics);
+	void drawMarker(gcn::Graphics *graphics) override;
+	void draw(gcn::Graphics *graphics) override;
 
 	void setMarkerImage(gcn::Image *image);
 	void setBackgroundImage(gcn::Image *image);
@@ -199,17 +193,17 @@ public:
 	MultiLineLabel();
 	explicit MultiLineLabel(const std::string &caption);
 
-	virtual void setCaption(const std::string &caption);
-	virtual const std::string &getCaption() const;
-	virtual void setAlignment(unsigned int alignment);
-	virtual unsigned int getAlignment();
-	virtual void setVerticalAlignment(unsigned int alignment);
-	virtual unsigned int getVerticalAlignment();
-	virtual void setLineWidth(int width);
-	virtual int getLineWidth();
-	virtual void adjustSize();
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	void setCaption(const std::string &caption);
+	const std::string &getCaption() const;
+	void setAlignment(unsigned int alignment);
+	unsigned int getAlignment();
+	void setVerticalAlignment(unsigned int alignment);
+	unsigned int getVerticalAlignment();
+	void setLineWidth(int width);
+	int getLineWidth();
+	void adjustSize();
+	void draw(gcn::Graphics *graphics) override;
+	void drawBorder(gcn::Graphics *graphics) override;
 
 	enum {
 		LEFT = 0,
@@ -252,9 +246,10 @@ public:
 	Windows(const std::string &text, int width, int height);
 	void add(gcn::Widget *widget, int x, int y);
 private:
-	virtual void mouseMotion(int x, int y);
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setBaseColor(const gcn::Color &color);
+	void mouseMotion(int x, int y) override;
+	void setBackgroundColor(const gcn::Color &color) override;
+	void setBaseColor(const gcn::Color &color) override;
+
 private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
 	gcn::Container container; /// data container.
@@ -264,12 +259,11 @@ private:
 
 class ImageTextField : public gcn::TextField
 {
-
 public:
 	ImageTextField() : TextField(), itemImage(nullptr) {}
 	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	void draw(gcn::Graphics *graphics) override;
+	void drawBorder(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
 	CGraphic *itemImage;
@@ -279,12 +273,10 @@ class StringListModel : public gcn::ListModel
 {
 	std::vector<std::string> list;
 public:
-	StringListModel(std::vector<std::string> l) {
-		list = l;
-	}
+	explicit StringListModel(std::vector<std::string> l) : list(l) {}
 
-	virtual int getNumberOfElements() { return list.size(); }
-	virtual std::string getElementAt(int i) { return list[i]; }
+	int getNumberOfElements() override { return list.size(); }
+	std::string getElementAt(int i) override { return list[i]; }
 };
 
 class LuaListModel : public gcn::ListModel
@@ -294,8 +286,8 @@ public:
 	LuaListModel() {}
 
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual int getNumberOfElements() {return list.size();}
-	virtual std::string getElementAt(int i) {return list[i];}
+	int getNumberOfElements() override { return list.size(); }
+	std::string getElementAt(int i) override { return list[i]; }
 };
 
 class ImageListBox : public gcn::ListBox
@@ -303,17 +295,15 @@ class ImageListBox : public gcn::ListBox
 public:
 	ImageListBox();
 	ImageListBox(gcn::ListModel *listModel);
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
+	void draw(gcn::Graphics *graphics) override;
+	void drawBorder(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 	void adjustSize();
 	void mousePress(int, int y, int button);
 	void setSelected(int selected);
 	void setListModel(gcn::ListModel *listModel);
-	void logic()
-	{
-		adjustSize();
-	}
+	void logic() { adjustSize(); }
+
 private:
 	CGraphic *itemImage;
 };
@@ -325,9 +315,10 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setFont(gcn::Font *font);
-	virtual void addActionListener(gcn::ActionListener *actionListener);
+	void setBackgroundColor(const gcn::Color &color) override;
+	void setFont(gcn::Font *font) override;
+	void addActionListener(gcn::ActionListener *actionListener) override;
+
 private:
 	void adjustSize();
 private:
@@ -342,9 +333,9 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	virtual void setBackgroundColor(const gcn::Color &color);
-	virtual void setFont(gcn::Font *font);
-	virtual void addActionListener(gcn::ActionListener *actionListener);
+	void setBackgroundColor(const gcn::Color &color) override;
+	void setFont(gcn::Font *font) override;
+	void addActionListener(gcn::ActionListener *actionListener) override;
 
 	void setItemImage(CGraphic *image) {
 		itemImage = image;
@@ -368,10 +359,11 @@ public:
 	}
 	void setMarkerImage(CGraphic *image) { markerImage = image; }
 
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
-	virtual gcn::Rectangle getVerticalMarkerDimension();
-	virtual gcn::Rectangle getHorizontalMarkerDimension();
+	void draw(gcn::Graphics *graphics) override;
+	void drawBorder(gcn::Graphics *graphics) override;
+	gcn::Rectangle getVerticalMarkerDimension() override;
+	gcn::Rectangle getHorizontalMarkerDimension() override;
+
 private:
 	void adjustSize();
 
@@ -411,7 +403,7 @@ class DropDownWidget : public gcn::DropDown
 public:
 	DropDownWidget() {}
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height) override;
 };
 
 class ImageDropDownWidget : public DropDownWidget
@@ -429,12 +421,12 @@ public:
 	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
 	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
 
-	virtual ImageListBox *getListBox() { return &mListBox; }
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void drawBorder(gcn::Graphics *graphics);
-	void drawButton(gcn::Graphics *graphics);
+	ImageListBox *getListBox() override { return &mListBox; }
+	void draw(gcn::Graphics *graphics) override;
+	void drawBorder(gcn::Graphics *graphics) override;
+	void drawButton(gcn::Graphics *graphics) override;
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height) override;
 	void setListModel(LuaListModel *listModel);
 	int getSelected();
 	void setSelected(int selected);
@@ -455,7 +447,7 @@ class StatBoxWidget : public gcn::Widget
 public:
 	StatBoxWidget(int width, int height);
 
-	virtual void draw(gcn::Graphics *graphics);
+	void draw(gcn::Graphics *graphics) override;
 	void setCaption(const std::string &s);
 	const std::string &getCaption() const;
 	void setPercent(const int percent);
@@ -475,8 +467,8 @@ public:
 	void stop(int result = 0, bool stopAll = false);
 	void stopAll(int result = 0) { stop(result, true); }
 	void addLogicCallback(LuaActionListener *listener);
-	virtual void draw(gcn::Graphics *graphics);
-	virtual void logic();
+	void draw(gcn::Graphics *graphics) override;
+	void logic() override;
 	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 
