@@ -71,7 +71,7 @@ enum {
 	LuaSoundType
 };
 
-/**	
+/**
 **	original lua_isstring() returns true for either a string or a number
 **	this do strict checking for strings only
 **/

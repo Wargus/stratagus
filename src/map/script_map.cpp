@@ -473,7 +473,7 @@ static int CclRemoveOpaqueFor(lua_State *l)
 static int CclSetFogOfWarType(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	
+
 	FogOfWarTypes new_type;
 	const std::string type_name {LuaToString(l, 1)};
 	if (type_name == "tiled" || type_name == "fast") {
@@ -483,7 +483,7 @@ static int CclSetFogOfWarType(lua_State *l)
 			if (!IsNetworkGame()) {
 				FieldOfView.SetType(FieldOfViewTypes::cSimpleRadial);
 			} else {
-				NetworkSendExtendedCommand(ExtendedMessageFieldOfViewDB, 
+				NetworkSendExtendedCommand(ExtendedMessageFieldOfViewDB,
 										   int(FieldOfViewTypes::cSimpleRadial), 0, 0, 0, 0);
 			}
 		}
@@ -539,7 +539,7 @@ static int CclSetFogOfWarOpacityLevels(lua_State *l)
 
 	FogOfWar->SetOpacityLevels(explored, revealed, unseen);
 
-	return 0;	
+	return 0;
 }
 
 /**
@@ -565,7 +565,7 @@ static int CclSetFogOfWarBlur(lua_State *l)
 		fprintf(stdout, "Radius should be a positive float number. Blur is disabled.\n");
 	}
 
-	const int iterations = LuaToNumber(l, 3);	
+	const int iterations = LuaToNumber(l, 3);
 	if (iterations <= 0 ) {
 		PrintFunction();
 		fprintf(stdout, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
@@ -729,7 +729,7 @@ static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
 
 	UI.Minimap.SetFogOpacityLevels(explored, revealed, unseen);
 
-	return 0;	
+	return 0;
 }
 
 /**
@@ -885,13 +885,13 @@ static int CclDefineTileset(lua_State *l)
 static int CclGenerateExtendedTileset(lua_State *luaStack)
 {
 	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic);
-	
+
 	if (!Map.Tileset->insertTiles(parser.getTiles())) {
 		LuaError(luaStack, "Tiles number limit exceeded.");
 	}
 	/// Add new graphic
 	Map.TileGraphic->AppendFrames(parser.getGraphic());
-	
+
 	return 0;
 }
 
@@ -927,7 +927,7 @@ static int CclSetTileFlags(lua_State *l)
 	int j = 0;
 	const tile_flags flags {Map.Tileset->parseTilesetTileFlags(l, &j)};
 	Map.Tileset->tiles[tilenumber].flag = flags;
-	
+
 	if (flags & MapFieldDecorative && !(flags & MapFieldNonMixing)) {
 		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = Map.Tileset->addDecoTerrainType();
 	}
@@ -1067,7 +1067,7 @@ void MapCclRegister()
 	lua_register(Lua, "SetOpaqueFor", CclSetOpaqueFor);
 	lua_register(Lua, "RemoveOpaqueFor", CclRemoveOpaqueFor);
 	lua_register(Lua, "GetIsOpaqueFor", CclGetIsOpaqueFor);
-	
+
 	lua_register(Lua, "SetFogOfWarType", CclSetFogOfWarType);
 	lua_register(Lua, "GetFogOfWarType", CclGetFogOfWarType);
 
@@ -1075,7 +1075,7 @@ void MapCclRegister()
 	lua_register(Lua, "SetFogOfWarBlur", CclSetFogOfWarBlur);
 	lua_register(Lua, "SetFogOfWarBilinear", CclSetFogOfWarBilinear);
 	lua_register(Lua, "GetIsFogOfWarBilinear", CclGetIsFogOfWarBilinear);
-	
+
 	lua_register(Lua, "SetFogOfWarGraphics", CclSetFogOfWarGraphics);
 	lua_register(Lua, "SetFogOfWarColor", CclSetFogOfWarColor);
 	lua_register(Lua, "SetFogOfWarEasingSteps", CclSetFogOfWarEasingSteps);

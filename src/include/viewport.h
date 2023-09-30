@@ -132,7 +132,7 @@ private:
 	 * work, so the caller should pass this as a compile-time flag to select the
 	 * specialized variant of the method.
 	 */
-	template<bool graphicalTileIsLogicalTile> 
+	template<bool graphicalTileIsLogicalTile>
 	void DrawMapBackgroundInViewport(const fieldHighlightChecker highlightChecker = nullptr) const;
 	/// Draw the map fog of war
 	void DrawMapFogOfWar();

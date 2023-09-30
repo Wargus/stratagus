@@ -258,7 +258,7 @@ namespace ranges
     {
         return std::min_element(begin(range), end(range), cmp);
     }
- 
+
     template<typename Range, typename Value>
     auto lower_bound(Range& range, const Value& value)
     {
@@ -282,7 +282,7 @@ namespace ranges
     {
         return std::copy_if(begin(range), end(range), copy_to, pred);
     }
-	
+
     template<typename Range>
 	void rotate_n(Range& range, const int shift)
 	{
@@ -290,7 +290,7 @@ namespace ranges
             for (int i = 0; i < shift; i++) {
                 std::rotate(rbegin(range), rbegin(range) + 1, rend(range));
             }
-        } else { 
+        } else {
             for (int i = 0; i > shift; i--) {
                 std::rotate(begin(range), begin(range) + 1, end(range));
             }

@@ -81,7 +81,6 @@ CEditor::CEditor() :
 	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
 	MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
 {
-	
 #define WATER_TILE  0x10
 #define COAST_TILE  0x30
 #define GRASS_TILE  0x50

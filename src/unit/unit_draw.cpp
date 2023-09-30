@@ -398,7 +398,7 @@ void CleanDecorations()
 
 /**
  * @brief Check if this decoration defines a condition on boolean flags and if so, if that condition matches.
- * 
+ *
  * @param type the unit type to check against
  * @return true if the decoration has a condition on a boolean variable and that condition matches, false otherwise
  */
@@ -423,7 +423,7 @@ void CDecoVarBar::Draw(int x, int y,
 					   const CUnitType &type, const CVariable &var) const
 {
 	Assert(var.Max);
-	
+
 	int percentage = var.Value * 100 / var.Max;
 	if (MinValue > percentage || MaxValue < percentage) {
 		return;
@@ -616,7 +616,7 @@ void CDecoVarAnimatedSprite::Draw(int x, int y, const CUnitType &/*type*/, const
 	if (this->lastFrame != (char)GameCycle) {
 		const_cast<CDecoVarAnimatedSprite*>(this)->lastFrame = (char)GameCycle;
 		const_cast<CDecoVarAnimatedSprite*>(this)->n = (this->n + 1) % (sprite.NumFrames * this->WaitFrames);
-	}	
+	}
 }
 
 /**

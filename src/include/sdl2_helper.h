@@ -35,7 +35,7 @@
 namespace sdl2 {
     struct SDL_Deleter
     {
-        void operator()(SDL_Surface*  ptr) { if (ptr) SDL_FreeSurface(ptr);     } 
+        void operator()(SDL_Surface*  ptr) { if (ptr) SDL_FreeSurface(ptr);     }
         void operator()(SDL_Texture*  ptr) { if (ptr) SDL_DestroyTexture(ptr);  }
         void operator()(SDL_Renderer* ptr) { if (ptr) SDL_DestroyRenderer(ptr); }
         void operator()(SDL_Window*   ptr) { if (ptr) SDL_DestroyWindow(ptr);   }
@@ -45,7 +45,7 @@ namespace sdl2 {
     struct _shared_ptr : public std::shared_ptr<T>
     {
         explicit _shared_ptr(T* t = nullptr) : std::shared_ptr<T>(t, SDL_Deleter()) {}
-        
+
         void reset(T* t = nullptr) { std::shared_ptr<T>::reset(t, SDL_Deleter()); }
     };
 

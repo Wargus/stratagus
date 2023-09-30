@@ -150,7 +150,7 @@ public:
 				return;
 			}
 
-			/// This could happen if shadow caster type of field of view is enabled, 
+			/// This could happen if shadow caster type of field of view is enabled,
 			/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
 			if(!unit->VisCount[p]) {
 				return;
@@ -166,7 +166,7 @@ public:
 				for (const uint8_t pi : this->player->GetGaveVisionTo()) {
 					if (!unit->IsVisible(Players[pi])) {
 						UnitGoesUnderFog(*unit, Players[pi]);
-					} 
+					}
 				}
 			}
 		}
@@ -323,11 +323,11 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 	CMapField &mf = *Map.Field(index);
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
 	///Assert(*v != 0);
-	/// This could happen if shadow caster type of field of view is enabled, 
+	/// This could happen if shadow caster type of field of view is enabled,
 	/// because of multiple calls for tiles in vertical/horizontal/diagonal lines
 	if(*v == 0) {
 		return;
-	}	
+	}
 	if (*v == 1) {
 		UnitsOnTileUnmarkSeen(player, mf, 1);
 	}
@@ -387,17 +387,17 @@ void CViewport::DrawMapFogOfWar()
 		return;
 	}
 
-	if (!this->FogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x) 
-									/ PixelTileSize.x + 2) 
-									* PixelTileSize.x != this->FogSurface->w 
-								|| ((this->BottomRightPos.y - this->TopLeftPos.y) 
-									/ PixelTileSize.y + 2) 
+	if (!this->FogSurface || ( ((this->BottomRightPos.x - this->TopLeftPos.x)
+									/ PixelTileSize.x + 2)
+									* PixelTileSize.x != this->FogSurface->w
+								|| ((this->BottomRightPos.y - this->TopLeftPos.y)
+									/ PixelTileSize.y + 2)
 									* PixelTileSize.y != this->FogSurface->h) ) {
 		this->AdjustFogSurface();
 	}
 
 	FogOfWar->Draw(*this);
-	
+
 	/// TODO: switch to hardware rendering
 	const bool isSoftwareRender {true}; // FIXME: remove this
 	if (isSoftwareRender && FogOfWar->GetType() != FogOfWarTypes::cTiledLegacy) {
@@ -412,8 +412,8 @@ void CViewport::DrawMapFogOfWar()
 		fogRect.y = this->Offset.y;
 		fogRect.w = screenRect.w;
 		fogRect.h = screenRect.h;
-		
-		/// Alpha blending of the fog texture into the screen	
+
+		/// Alpha blending of the fog texture into the screen
 		BlitSurfaceAlphaBlending_32bpp(this->FogSurface, &fogRect, TheScreen, &screenRect);
 	}
 }
@@ -427,18 +427,18 @@ void CViewport::AdjustFogSurface()
 {
 	this->CleanFog();
 
-    const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x) 
-									/ PixelTileSize.x + 2) 
+    const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x)
+									/ PixelTileSize.x + 2)
 									* PixelTileSize.x;  /// +2 because of Offset.x
-    const uint16_t surfaceHeight = ((this->BottomRightPos.y - this->TopLeftPos.y) 
-									/ PixelTileSize.y + 2) 
+    const uint16_t surfaceHeight = ((this->BottomRightPos.y - this->TopLeftPos.y)
+									/ PixelTileSize.y + 2)
 									* PixelTileSize.y; /// +2 because of Offset.y
-    
-    this->FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, 
+
+    this->FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth,
                                                      	   surfaceHeight,
                                                      	   32, RMASK, GMASK, BMASK, AMASK);
     SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
-	
+
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 	SDL_FillRect(this->FogSurface, nullptr, fogColorSolid);
 }

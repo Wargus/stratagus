@@ -555,7 +555,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
-			
+
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
@@ -567,7 +567,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
-			
+
 			// if a unit type's demand is changed, we need to update the player's demand accordingly
 			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
@@ -579,7 +579,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
-			
+
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] += um->Modifier.Costs[j];
@@ -745,7 +745,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
-			
+
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] -= um->Modifier.Costs[j];
@@ -853,7 +853,6 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
 	}
-	
 	if (um->ConvertTo) {
 		CommandTransformIntoType(unit, *um->ConvertTo);
 	}
@@ -921,7 +920,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 **
 **  @param player   Player researching the upgrade.
 **  @param id       Upgrade to be lost.
-**  
+**
 */
 void UpgradeLost(CPlayer &player, int id)
 {

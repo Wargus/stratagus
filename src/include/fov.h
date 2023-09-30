@@ -51,7 +51,7 @@ public:
 	}
 
 	/// Refresh field of view
-	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width, 
+	void Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width,
 				 const uint16_t height, const uint16_t range, MapMarkerFunc *marker);
 
 	bool SetType(const FieldOfViewTypes fov_type);
@@ -74,16 +74,16 @@ private:
 	};
 
 	/// Calc whole simple radial field of view
-	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int16_t w, const int16_t h, 
+	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int16_t w, const int16_t h,
 							 int16_t range, MapMarkerFunc *marker) const;
 	/// Calc whole chadow casting field of view
 	void ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range);
-	/// Calc field of view for set of lines along x or y. 
+	/// Calc field of view for set of lines along x or y.
 	/// Used for calc part of FoV for assymetric (widht != height) spectators.
 	void ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range);
 	/// Calc shadow casting field of view for single octant
 	void RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range);
-	/// Calc shadow casting for portion of column 
+	/// Calc shadow casting for portion of column
 	void CalcFoVForColumnPiece(const int16_t col, Vec2i &topVector, Vec2i &bottomVector,
 							   const uint16_t range, std::queue<SColumnPiece> &wrkQueue);
 	/// Recalculate top or bottom direction vectors
@@ -108,9 +108,9 @@ private:
 	void ProjectCurrentTile(const int16_t col, const int16_t row);
 
 private:
-	struct FieldOfViewSettings 
+	struct FieldOfViewSettings
 	{
-		uint16_t 		 OpaqueFields {MapFieldOpaque};    				/// Flags for opaque MapFields
+		uint16_t OpaqueFields {MapFieldOpaque}; /// Flags for opaque MapFields
 	} Settings;
 
 	Vec2i		currTilePos		{0, 0};	/// Current work tile pos in global (Map) system coordinates
@@ -118,13 +118,13 @@ private:
 	Vec2i		Origin			{0, 0};	/// Position of the spectator in the global (Map) coordinate system
 	uint8_t		Elevation		{0};	/// highground elevation level of origin
 	uint16_t	OpaqueFields	{0};	/// Flags for opaque MapTiles for current calculation
-	
-	const CPlayer   *Player 	  {nullptr};	/// Pointer to player to set FoV for
-	const CUnit     *Unit 		  {nullptr};	/// Pointer to unit to calculate FoV for
-	MapMarkerFunc	*map_setFoV   {nullptr};	/// Pointer to external function for setting tiles visibilty
+
+	const CPlayer   *Player 	  {nullptr}; /// Pointer to player to set FoV for
+	const CUnit     *Unit 		  {nullptr}; /// Pointer to unit to calculate FoV for
+	MapMarkerFunc	*map_setFoV   {nullptr}; /// Pointer to external function for setting tiles visibilty
 
 	std::vector<uint8_t> MarkedTilesCache;	/// To prevent multiple calls of map_setFoV for single tile (for tiles on the vertical,
-											/// horizontal and diagonal lines it calls twise) we use cache table to 
+											/// horizontal and diagonal lines it calls twise) we use cache table to
 											/// count already marked tiles
 };
 
@@ -165,7 +165,7 @@ inline void CFieldOfView::MarkTile()
 	if (!MarkedTilesCache[index]) {
 		map_setFoV(*Player, index);
 		MarkedTilesCache[index] = 1;
-	} 
+	}
 }
 
 inline void CFieldOfView::ProjectCurrentTile(const int16_t col, const int16_t row)

@@ -56,7 +56,7 @@ using graphic_index		= uint16_t;
 using tile_flags		= uint64_t;
 using terrain_typeIdx	= uint8_t;
 
-// Not used until now: 
+// Not used until now:
 constexpr tile_flags MapFieldSpeedMask		{0x0000'0000'0000'0003};	/// Move faster on this tile
 
 constexpr tile_flags MapFieldOpaque			{0x0000'0000'0000'0004};	/// Units can't see through this field (FoV/FoW)
@@ -166,8 +166,8 @@ public:
 
 	/**
 	 * Size of a graphical (not logical!) tile in pixels.
-	 * 
-	 * @return const PixelSize& 
+	 *
+	 * @return const PixelSize&
 	 */
 	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
 	const int getLogicalToGraphicalTileSizeMultiplier() const { return logicalTileToGraphicalTileMultiplier; }
@@ -191,7 +191,7 @@ public:
 	tile_index getOrcWallTileIndex_destroyed(int dirFlag) const;
 
 	terrain_typeIdx getSolidTerrainCount() const;
-	
+
 	const std::string &getTerrainName(terrain_typeIdx solidTerrainIndex) const;
 
 	int32_t findTileIndexByTile(graphic_index tile) const;
@@ -208,15 +208,15 @@ public:
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
 	tile_flags parseTilesetTileFlags(lua_State *l, int *j);
-	
+
 	terrain_typeIdx getOrAddSolidTileIndexByName(const std::string &name);
-	
+
 	/// FIXME: Check if it realy needed
-	terrain_typeIdx addDecoTerrainType() 
+	terrain_typeIdx addDecoTerrainType()
 	{
 		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
 	}
-	
+
 	int32_t findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain = 0) const;
 
 private:
@@ -247,7 +247,7 @@ private:
 	uint8_t logicalTileToGraphicalTileShift;      /// By what to shift logical tile coordinates to get graphical tile coordinates
 	uint8_t graphicalTileSizeShiftX; /// 1<<shift size for graphical tiles in X direction
 	uint8_t graphicalTileSizeShiftY; /// 1<<shift size for graphical tiles in Y direction
-	
+
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 #if 1
 	std::vector<int> mixedLookupTable;	/// Lookup for what part of tile used
@@ -278,28 +278,28 @@ GenerateExtendedTileset(
                         ...
               }
 )
-            
+
       where:
-      slot-type: 
+      slot-type:
         "solid" or "mixed"
-        Each slot consist of 16 tiles which represent one of terrain type ("solid") 
+        Each slot consist of 16 tiles which represent one of terrain type ("solid")
         or mix of two different solid terrains ("mixed" f.e. gras-coast, water-coast etc.)
         Second "terrain-name" in the slot definition is for mixed type.
 
-      list-of-flags-for-all-tiles-of-this-slot: 
+      list-of-flags-for-all-tiles-of-this-slot:
         comma separated list of flags wihich are common for all tiles in this slot
 
       dst:
         single agrgument (number or table) at position 1.
-        index of defined tile (or set of indexes). Each slot consist of 16 tiles only. 
+        index of defined tile (or set of indexes). Each slot consist of 16 tiles only.
         For extended tileset indexes must be greater than already defined.
         Each slot's indexes set starts from xxx0 and ended with xxxF (where discription of xxx see in PUD format explanation)
-        
+
         'dst' can take one of the following forms:
         tile                    -- single tile index
         {tile[, tile,] ...}     -- set of tile indexes
         {"range", from, to}     -- range of indexes [from, to]
-        {"slot", slot_num}      -- whole slot indexes f.e. {"slot", 0x1010} - put src continuously to slot 0x101[0..F] 
+        {"slot", slot_num}      -- whole slot indexes f.e. {"slot", 0x1010} - put src continuously to slot 0x101[0..F]
                                 -- until there is a src (up to 16, if less then fill slot with 0 for absent srcs)
 
       src:
@@ -316,15 +316,15 @@ GenerateExtendedTileset(
         }
 
         "layers" can be omitted if we have a single layer, then src takes this form:
-        { src_range [,{"do_something", parameter}...] } 
-        or even: 
+        { src_range [,{"do_something", parameter}...] }
+        or even:
         src_range                     -- then we just use images from src_range without any manipulations with them
 
         'src_range' can take one of the following forms:
         tile                          			-- tile index (within main tileset) to get graphic from
         {tile[, tile]...}}            			-- set of tiles indexes (within main tileset) to get graphics from
         {"img"|"img-base", image[, image]...}   -- set of numbers of frames from the extended (or base tileset) "image" file.
-		{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"), 
+		{["img"|"img-base",] "range", from, to} -- if "img" then from frame to frame (for "image"),
                                       			-- otherwise indexes from tile to tile (within main tileset) to get graphics from
         {"slot", slot_num}            			-- f.e. {"slot", 0x0430} - to take graphics continuously from tiles with indexes of slot 0x0430
 
@@ -350,7 +350,7 @@ public:
 	bool hasIndexesOnly() const { return !Result.Indexes.empty(); }
 	bool isEmpty() const { return Result.Indexes.empty() && Result.Images.empty(); }
 
-	graphic_index pullOutIndex() 
+	graphic_index pullOutIndex()
 	{
 		if (Result.Indexes.empty()) {
 			return 0;
@@ -361,7 +361,7 @@ public:
 		return index;
 	}
 
-	sdl2::SurfacePtr pullOutImage() 
+	sdl2::SurfacePtr pullOutImage()
 	{
 		if (Result.Images.empty()) {
 			return  nullptr;
@@ -392,7 +392,7 @@ private:
 	void parseModifier(lua_State *luaStack, const int argPos, sequence_of_images &images) const;
 	sdl2::SurfacePtr newBlankImage() const;
 	bool isModifierPresent(lua_State *luaStack) const;
-	
+
 	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght = 16) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Fair(std::vector<sequence_of_images> const &src) const;
@@ -419,9 +419,9 @@ class CTilesetParser
 {
 public:
 	enum slot_type {cSolid, cMixed, cUnsupported};
-	
+
 	/// Constructor for extended tileset generator
-	explicit CTilesetParser(lua_State *luaStack, CTileset *baseTileset, const CGraphic *baseGraphic) 
+	explicit CTilesetParser(lua_State *luaStack, CTileset *baseTileset, const CGraphic *baseGraphic)
 							: BaseTileset(baseTileset), BaseGraphic(baseGraphic)
 	{
 		parseExtended(luaStack);
@@ -449,7 +449,7 @@ private:
 	CTileset		*BaseTileset	{nullptr};
 	const CGraphic	*BaseGraphic	{nullptr};
 	CGraphic		*SrcImgGraphic	{nullptr};
-	
+
 	sequence_of_images			ExtGraphic;
 	std::map<tile_index, CTile>	ExtTiles;
 };

@@ -260,7 +260,7 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	UI.Minimap.UpdateXY(pos);
 	MapFixWallTile(pos);
 	MapFixWallNeighbors(pos);
-	
+
 	/// Refresh vision of nearby units in case is walls are set as opaque field
 	if (isOpaque) {
 		MapRefreshUnitsSight(pos);

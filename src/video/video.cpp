@@ -362,9 +362,9 @@ void VideoCclRegister()
 /*
 **
 **  Blit a surface into another with alpha blending
-**  
+**
 */
-void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect, 
+void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect,
 										  SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT/* = true*/)
 {
 	/// This implementation of blittind doesn't scale
@@ -392,17 +392,16 @@ void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rec
 	uint32_t *const dst = static_cast<uint32_t *>(dstSurface->pixels);
 
 	#pragma omp parallel if(enableMT)
-	{    
+	{
 		/// TODO: change numOfThreads for small rectangles to prevent False Sharing
 		const uint16_t thisThread   = omp_get_thread_num();
 		const uint16_t numOfThreads = omp_get_num_threads();
-		
-		const uint16_t lBound = (thisThread    ) * dstWrkRect.h / numOfThreads; 
-		const uint16_t uBound = (thisThread + 1) * dstWrkRect.h / numOfThreads; 
+		const uint16_t lBound = (thisThread    ) * dstWrkRect.h / numOfThreads;
+		const uint16_t uBound = (thisThread + 1) * dstWrkRect.h / numOfThreads;
 
 		size_t srcIndex = (srcWrkRect.y + lBound) * srcSurface->w + srcWrkRect.x;
 		size_t dstIndex = (dstWrkRect.y + lBound) * dstSurface->w + dstWrkRect.x;
-		
+
 		for (uint16_t y = lBound; y < uBound; y++) {
 			for (uint16_t x = 0; x < dstWrkRect.w; x++) {
 

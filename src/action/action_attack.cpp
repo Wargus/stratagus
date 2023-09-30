@@ -234,7 +234,7 @@ PixelPos COrder_Attack::Show(const CViewport &vp,
 	bool isAttackMove = IsAutoTargeting();
 
 	targetPos = this->HasGoal() ? vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter())
-								: IsMovingToAttackPos() ? vp.TilePosToScreen_Center(this->attackMovePos) 
+								: IsMovingToAttackPos() ? vp.TilePosToScreen_Center(this->attackMovePos)
 														: vp.TilePosToScreen_Center(this->goalPos);
 
 	orderedPos = isAttackMove ? vp.TilePosToScreen_Center(this->attackMovePos)
@@ -340,7 +340,7 @@ CUnit *COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit 
 	Assert(target1 != nullptr);
 	Assert(target2 != nullptr);
 
-	return (GameSettings.SimplifiedAutoTargeting 
+	return (GameSettings.SimplifiedAutoTargeting
 				? ((TargetPriorityCalculate(&unit, target1) > TargetPriorityCalculate(&unit, target2)) ? target1 : target2)
 				: ((ThreatCalculate(unit, *target1) < ThreatCalculate(unit, *target2)) ?  target1 : target2));
 }
@@ -356,7 +356,7 @@ void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit *const target)
 {
 	Assert(target != nullptr);
 	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
-	
+
 	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove();
 	if (immobile && !InAttackRange(unit, *target)) {
@@ -636,7 +636,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 
 /**
 **  Check if current target is closer to unit more than MinAttackRange
-**	
+**
 **  @param unit  Unit that is attacking and moving
 */
 bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
@@ -654,7 +654,7 @@ bool COrder_Attack::IsTargetTooClose(const CUnit &unit) const
 
 /**
 **  Controls moving a unit to position if its target is closer than MinAttackRange when attacking
-**	
+**
 **  @param unit  Unit that is attacking and moving
 **  @param pfReturn Current path finder status. Using to find new attack pos if current is unreachable.
 */
@@ -665,10 +665,10 @@ void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 	if (CheckForTargetInRange(unit)) {
 		return;
 	}
-	CUnit *goal 			 = this->GetGoal();
+	CUnit *goal = this->GetGoal();
 	/// When attack ground and moving to attack position, the target tile pos is stored in attackMovePos
-	const bool inAttackRange = goal ? InAttackRange(unit, *goal) 
-									: InAttackRange(unit, this->attackMovePos); 
+	const bool inAttackRange =
+		goal ? InAttackRange(unit, *goal) : InAttackRange(unit, this->attackMovePos);
 	if (!IsTargetTooClose(unit)) {
 		/// We have to restore original goalPos value
 		if (goal) {
@@ -690,7 +690,7 @@ void COrder_Attack::MoveToAttackPos(CUnit &unit, const int pfReturn)
 
 /**
 **  Controls moving a unit to its target when attacking
-**	
+**
 **  @param unit  Unit that is attacking and moving
 */
 void COrder_Attack::MoveToTarget(CUnit &unit)
@@ -710,7 +710,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 
 	if (needToSearchBetterPos) {
 		MoveToBetterPos(unit);
-		return;	
+		return;
 	}
 	/// Order may be set as finished by outside code while playing animation.
 	/// In this case we must not execute code of MoveToTarget
@@ -857,7 +857,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				return;
 			}
 			// Can we already attack ?
-			if ((this->HasGoal() && InAttackRange(unit, *this->GetGoal())) 
+			if ((this->HasGoal() && InAttackRange(unit, *this->GetGoal()))
 				|| (IsAttackGroundOrWall() && InAttackRange(unit, this->goalPos))) {
 
 				TurnToTarget(unit, this->GetGoal());
@@ -867,7 +867,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			}
 			this->State |= MOVE_TO_TARGET;
 		// FIXME: should use a reachable place to reduce pathfinder time.
-	
+
 		// FALL THROUGH
 		case MOVE_TO_TARGET:
 		case MOVE_TO_TARGET + AUTO_TARGETING:

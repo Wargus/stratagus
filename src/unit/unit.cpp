@@ -498,7 +498,7 @@ CUnit::~CUnit() {
 */
 void CUnit::Release(bool final)
 {
-	// If the unit has no more references remaining, 
+	// If the unit has no more references remaining,
 	// the unit manager will set the ReleaseCycle,
 	// which prevents any more calls to this function.
 	if (ReleaseCycle) {
@@ -919,7 +919,7 @@ void MapUnmarkUnitSight(CUnit &unit)
 }
 
 /**
-**  Mark/Unmark on vision table the Sight for the units 
+**  Mark/Unmark on vision table the Sight for the units
 **  around the tilePos
 **  (and units inside for transporter)
 **
@@ -937,7 +937,7 @@ void MapRefreshUnitsSight(const Vec2i &tilePos, const bool resetSight /*= false*
 		}
 		for (CUnit *const unit : player.GetUnits()) {
 			if (!unit->Destroyed) {
-				const auto dist = unit->Container ? unit->Container->MapDistanceTo(tilePos) 
+				const auto dist = unit->Container ? unit->Container->MapDistanceTo(tilePos)
 												  : unit->MapDistanceTo(tilePos);
 				if (dist <= unit->CurrentSightRange) {
 					if (resetSight) {
@@ -1798,8 +1798,8 @@ bool CUnit::IsVisibleOnMinimap() const
 	if (IsInvisibile(*ThisPlayer)) {
 		return false;
 	}
-	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer) 
-		|| (CPlayer::IsRevelationEnabled() && Player->IsRevealed() 
+	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)
+		|| (CPlayer::IsRevelationEnabled() && Player->IsRevealed()
 			&& (CPlayer::RevelationFor == RevealTypes::cAllUnits || this->Type->BoolFlag[BUILDING_INDEX].value))) {
 		return IsAliveOnMap();
 	} else {
@@ -2048,7 +2048,6 @@ void RescueUnits()
 			std::vector<CUnit *> table = p->GetUnits();
 
 			for (CUnit *unit : table) {
-				
 				// Do not rescue removed units. Units inside something are
 				// rescued by ChangeUnitOwner
 				if (unit->Removed) {
@@ -2687,11 +2686,10 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 
 	// is Threat?
 	/// Check if target attacks us (or has us as goal for any action)
-	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker 
+	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker
 		&& InAttackRange(*dest, *attacker)) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
-	
 	/// Unit can attack back.
 	if (CanTarget(dtype, type) || dtype.BoolFlag[ALWAYSTHREAT_INDEX].value) {
 		priority |= AT_THREAT_FACTOR;
@@ -2762,7 +2760,7 @@ bool InAttackRange(const CUnit &unit, const CUnit &target)
 	Assert(&target != nullptr);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
-	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target) 
+	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target)
 										 : unit.MapDistanceTo(target);
 
 	return (minRange <= distance && distance <= range)
@@ -2794,7 +2792,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 
 /**
 **  Returns end position of randomly generated vector form srcPos in direction to/from dirUnit
-**	
+**
 **  @param srcPos   Vector origin
 **  @param dirUnit  Position to determine vector direction
 **	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
@@ -2813,7 +2811,7 @@ Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool
 
 /**
 **  Returns end position of randomly generated vector form srcPos in direction to/from dirPos
-**	
+**
 **  @param srcPos   Vector origin
 **  @param dirPos   Position to determine vector direction
 **	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
@@ -2823,7 +2821,7 @@ Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool
 **
 **  @return       	Position
 */
-Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev) 
+Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
 	Vec2i pos = dirPos - srcPos;
 	pos *= dirFrom ? -1 : 1;
@@ -3002,8 +3000,8 @@ static void HitUnit_Burning(CUnit &target)
 static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 {
 	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
-	
-	if (target.IsAgressive()) { 
+
+	if (target.IsAgressive()) {
 		CommandAttack(target, pos, nullptr, 0); /// Attack-move to pos
 	} else {
 		CommandMove(target, pos, 0); /// Run away to pos
@@ -3016,7 +3014,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	if (&attacker != target.CurrentOrder()->GetGoal()
 		&& attacker.Player != target.Player && target.IsEnemy(attacker)
 		&& CanTarget(*target.Type, *attacker.Type))	{
-		
+
 		const UnitAction targetCurrAction = target.CurrentAction();
 		if (targetCurrAction == UnitAction::Attack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
@@ -3027,7 +3025,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 						order.OfferNewTarget(target, &attacker);
 					}
 					return;
-				} 
+				}
 				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
 					return;
 				}
@@ -3039,7 +3037,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		if (target.UnderAttack) {
 			return;
 		}
-	
+
 		switch (targetCurrAction)
 		{
 		case UnitAction::StandGround:
@@ -3053,8 +3051,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 		case UnitAction::Still:
 		case UnitAction::Defend:
 		case UnitAction::Patrol:
-			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player)) 
-									? attacker.tilePos 
+			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player))
+									? attacker.tilePos
 									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
 			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 				return;
@@ -3175,11 +3173,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (target.CanMove() 
+	if (target.CanMove()
 		&& target.CurrentAction() == UnitAction::Still
 		&& (!CanTarget(*target.Type, *attacker->Type)
-			|| !target.IsAgressive() 
-			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value 
+			|| !target.IsAgressive()
+			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value
 				&& !(attacker->IsVisible(*target.Player) || attacker->IsVisibleOnRadar(*target.Player))))
 		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
 
@@ -3189,7 +3187,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	if (GameSettings.SimplifiedAutoTargeting) {
 		target.Threshold = 0;
-	} else {		
+	} else {
 		const int threshold = 30;
 		if (target.Threshold && target.CurrentOrder()->HasGoal() && target.CurrentOrder()->GetGoal() == attacker) {
 			target.Threshold = threshold;

@@ -1288,7 +1288,7 @@ void CButtonPanel::DoClicked_Build(int button)
 }
 
 void CButtonPanel::DoClicked_Train(int button)
-{	
+{
 	// NEW CODE FOR CButtonPanel::DoClicked_Train(int button)
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	int best_training_place = 0;
@@ -1329,7 +1329,7 @@ void CButtonPanel::DoClicked_Train(int button)
 {
 	OLD CODE FOR CButtonPanel::DoClicked_Train(int button)
 	To use this code, uncomment it but make sure to comment the code above!
-	
+
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	// FIXME: Johns: I want to place commands in queue, even if not
@@ -1348,7 +1348,7 @@ void CButtonPanel::DoClicked_Train(int button)
 			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
 		}
 	}
-} 
+}
 */
 
 

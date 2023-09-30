@@ -47,7 +47,6 @@ void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /
 	} else {
 		unit.Frame = ParseAnimInt(&unit);
 	}
-	
 	UnitUpdateHeading(unit);
 }
 

@@ -123,7 +123,6 @@ static bool External_Play(const std::string &file) {
 	if (file.size() > midi.size() &&
 			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
 		// midi file, use external player, since windows vista+ does not allow midi volume control independent of process volume
-		
 		fs::path full_filename = LibraryFileName(file);
 
 		// try to communicate with the running midiplayer if we can
@@ -455,8 +454,8 @@ Mix_Chunk *LoadSample(const std::string &name)
 
 /**
  * Free a sample loaded with LoadSample.
- * 
- * @param sample 
+ *
+ * @param sample
  */
 void FreeSample(Mix_Chunk *sample)
 {

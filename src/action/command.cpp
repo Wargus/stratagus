@@ -924,8 +924,9 @@ void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 	CPlayer *player = &Players[playerIndex];
 	CPlayer *opponent = &Players[opponentIndex];
 
-	if (state == player->HasSharedVisionWith(*opponent) || opponent->Type == PlayerTypes::PlayerNobody 
-														|| player->Type == PlayerTypes::PlayerNobody) {
+	if (state == player->HasSharedVisionWith(*opponent)
+	    || opponent->Type == PlayerTypes::PlayerNobody
+	    || player->Type == PlayerTypes::PlayerNobody) {
 		return;
 	}
 
@@ -935,7 +936,7 @@ void CommandSharedVision(int playerIndex, bool state, int opponentIndex)
 			MapUnmarkUnitSight(*unit);
 		}
 	}
-	
+
 	if (state == false) {
 		player->UnshareVisionWith(*opponent);
 

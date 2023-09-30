@@ -65,7 +65,7 @@ void UnitRotate(CUnit &unit, int rotate)
 			target = order->GetGoal();
 			if (target->Destroyed) {
 				order->ClearGoal();
-				return;	
+				return;
 			}
 		} else if (unit.CurrentOrder()->Action == UnitAction::Build) {
 			target = static_cast<const COrder_Build *>(order)->GetBuildingUnit();

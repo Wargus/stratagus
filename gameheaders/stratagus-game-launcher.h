@@ -456,7 +456,7 @@ static void ExtractData(char* extractor_tool, const char *const extractor_args[]
 
 #ifndef WIN32
 	if (!fs::exists(sourcepath)) {
-		// deployment time path might be same as extractor 
+		// deployment time path might be same as extractor
 		strcpy(sourcepath, fs::path(extractor_tool).parent_path().string().c_str());
 	}
 #endif

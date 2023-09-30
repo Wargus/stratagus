@@ -369,7 +369,7 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 				NetworkFildes.Send(host, buf, size);
 			}
 		}
-	} else { // client		
+	} else { // client
 		const CHost host(Hosts[0].Host, Hosts[0].Port);
 		NetworkFildes.Send(host, buf, size);
 	}
@@ -704,7 +704,7 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 

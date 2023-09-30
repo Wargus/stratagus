@@ -239,8 +239,8 @@ void CPlayer::Load(lua_State *l)
 			this->AiEnabled = false;
 			--j;
 		} else if (value == "revealed") {
-			this->SetRevealed(true); 
-			--j;	
+			this->SetRevealed(true);
+			--j;
 		} else if (value == "supply") {
 			this->Supply = LuaToNumber(l, j + 1);
 		} else if (value == "demand") {
@@ -394,7 +394,7 @@ static int CclChangeUnitsOwner(lua_State *l)
 **  <code>fromPlayer</code> did not have enough units.<br/>
 **
 **  Instead of a number you can pass "all" as the first argument, to hand over all units.<br/>
-**  
+**
 **  Instead of a unit type name, you can pass "any", "unit", "building" as the second argument,
 **  to hand over anything, and unit, or any building.
 **
@@ -638,7 +638,7 @@ static int CclSetAllPlayersTotalUnitLimit(lua_State *l)
 **
 ** <div class="example"><code><strong>SetDiplomacy</strong>(0,"allied",1)
 **		<strong>SetDiplomacy</strong>(1,"allied",0)
-**		
+**
 **		<strong>SetDiplomacy</strong>(0,"enemy",2)
 **		<strong>SetDiplomacy</strong>(1,"enemy",2)</code></div>
 */
@@ -704,7 +704,7 @@ static int CclGetDiplomacy(lua_State *l)
 **
 ** <div class="example"><code><strong>SetSharedVision</strong>(0,true,1)
 **		<strong>SetSharedVision</strong>(1,true,0)
-**		
+**
 **		<strong>SetSharedVision</strong>(0,false,2)
 **		<strong>SetSharedVision</strong>(1,false,2)</code></div>
 */
@@ -904,7 +904,7 @@ static int CclDefinePlayerColors(lua_State *l)
 	}
 
 	return 0;
-} 
+}
 
 /**
 **  Make new player colors
@@ -1218,15 +1218,15 @@ static int CclSetPlayerData(lua_State *l)
 }
 
 /**
-** <b>Description</b> 
-** 
+** <b>Description</b>
+**
 **  Set ai player algo.
 **
 **  @param l  Lua state.
-** 
-** Example: 
-** 
-** <div class="example"> <code> -- Player 1 has a passive A.I 
+**
+** Example:
+**
+** <div class="example"> <code> -- Player 1 has a passive A.I
 **		  <strong>SetAiType</strong>(1, "Passive")</code></div>
 */
 static int CclSetAiType(lua_State *l)
@@ -1269,7 +1269,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "Diplomacy", CclDiplomacy);
 	lua_register(Lua, "SetSharedVision", CclSetSharedVision);
 	lua_register(Lua, "SharedVision", CclSharedVision);
-	
+
 	lua_register(Lua, "SetRevelationType", CclSetRevelationType);
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);

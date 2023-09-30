@@ -125,7 +125,7 @@ class CInfoPanel
 
 class CUIUserButton
 {
-	CUIUserButton(); 
+	CUIUserButton();
 
 	bool Clicked;
 	CUIButton Button;

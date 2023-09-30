@@ -52,10 +52,10 @@ struct SettingsPresets {
 	PlayerTypes Type;
 };
 
-enum RevealTypes { 
-	cNoRevelation, 
-	cAllUnits, 
-	cBuildingsOnly 
+enum RevealTypes {
+	cNoRevelation,
+	cAllUnits,
+	cBuildingsOnly
 };
 
 enum NetGameTypes {

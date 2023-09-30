@@ -451,7 +451,7 @@ void CPlayer::SetRevealed(const bool revealed)
 		return;
 	}
 	this->isRevealed = revealed;
-	
+
 	std::vector<const CPlayer *> &revealedPlayers = CPlayer::RevealedPlayers;
 	if (revealed) {
 		revealedPlayers.push_back(this);

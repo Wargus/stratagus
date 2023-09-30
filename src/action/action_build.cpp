@@ -292,9 +292,9 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
 	if (building != nullptr) {
 		if (unit.CurrentOrder() == this) {
-			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n", 
-					   unit.Player->Index, unit.Slot, 
-					   building->Type->Name.c_str(), 
+			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n",
+					   unit.Player->Index, unit.Slot,
+					   building->Type->Name.c_str(),
 					   building->Slot);
 
 			delete this; // Bad
@@ -350,10 +350,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			ontop.Release();
 		}
 	}
-	
-	if (type.BoolFlag[MAINFACILITY_INDEX].value 
-	&& CPlayer::IsRevelationEnabled() && unit.Player->LostMainFacilityTimer != 0 ) {
-		
+
+	if (type.BoolFlag[MAINFACILITY_INDEX].value && CPlayer::IsRevelationEnabled()
+	    && unit.Player->LostMainFacilityTimer != 0) {
+
 		unit.Player->LostMainFacilityTimer = 0;
 		unit.Player->SetRevealed(false);
 		for (int j = 0; j < NumPlayers; ++j) {

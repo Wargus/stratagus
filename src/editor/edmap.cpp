@@ -288,8 +288,8 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Map.FixSelectionArea(ipos, apos);
 
 	// change surroundings unless the fill covers the entire map
-	bool changeSurroundings = (ipos.x > 0 || ipos.y > 0 || 
-			Map.Info.MapWidth - 1 > apos.x || Map.Info.MapHeight - 1 > apos.y);
+	bool changeSurroundings = (ipos.x > 0 || ipos.y > 0 || Map.Info.MapWidth - 1 > apos.x
+	                           || Map.Info.MapHeight - 1 > apos.y);
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {

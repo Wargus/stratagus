@@ -160,10 +160,10 @@ struct SettingsPresets {
 	}
 };
 
-ENUM_CLASS RevealTypes : uint8_t { 
-	cNoRevelation, 
-	cAllUnits, 
-	cBuildingsOnly 
+ENUM_CLASS RevealTypes : uint8_t {
+	cNoRevelation,
+	cAllUnits,
+	cBuildingsOnly
 }; /// Revelation types
 
 /**

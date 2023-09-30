@@ -77,7 +77,7 @@ using pixelModifier = uint32_t(*)(const uint32_t, const uint32_t, const uint32_t
 class PixelModifier
 {
 public:
-	/// This one returns srcRGB+A(modulated) only if srcA is present. Otherwise returns dstRGBA. 
+	/// This one returns srcRGB+A(modulated) only if srcA is present. Otherwise returns dstRGBA.
 	/// Used to copy (without alpha modulating) those pixels which has alpha chanel values
 	static uint32_t CopyWithSrcAlphaKey(const uint32_t srcPixel, const uint32_t dstPixel, const uint32_t reqAlpha)
 	{
@@ -111,7 +111,7 @@ public:
 				 SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
-					      pixelModifier modifier, 
+					      pixelModifier modifier,
 						  const uint32_t param,
 						  SDL_Surface *surface = TheScreen) const;
 
@@ -121,11 +121,11 @@ public:
 					  unsigned char alpha,
 					  SDL_Surface *surface = TheScreen) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-						  unsigned char alpha, 
+						  unsigned char alpha,
 						  SDL_Surface *surface = TheScreen) const;
 
 	void DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-							  pixelModifier modifier, 
+							  pixelModifier modifier,
 							  const uint32_t param,
 							  SDL_Surface *surface = TheScreen) const;
 
@@ -136,11 +136,11 @@ public:
 					   SDL_Surface *surface = TheScreen) const;
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 						SDL_Surface *surface = TheScreen) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha,
 							SDL_Surface *surface = TheScreen) const;
 
-	void DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-								pixelModifier modifier, 
+	void DrawFrameClipCustomMod(unsigned frame, int x, int y,
+								pixelModifier modifier,
 								const uint32_t param,
 								SDL_Surface *surface = TheScreen) const;
 
@@ -561,7 +561,7 @@ extern void RestoreColorCyclingSurface();
 extern void ColorCycle();
 
 /// Blit a surface into another with alpha blending
-extern void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect, 
+extern void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect,
 												 SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT = true);
 
 //@}

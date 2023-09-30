@@ -1281,7 +1281,7 @@ void AStarDumpStats()
 				break;
 			case 6:
 				direction = ">";
-				break;	
+				break;
 			case 7:
 				direction = "⌟";
 				break;

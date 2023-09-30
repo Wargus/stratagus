@@ -77,7 +77,7 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, in
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-/**	
+/**
 **	original lua_isstring() returns true for either a string or a number
 **	this do strict checking for strings only
 **/
@@ -184,7 +184,7 @@ int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 #if 0
 	lua_getglobal(L, "debug");
 	lua_getfield(L, -1, "traceback");
-	lua_call(L, 0, 1); 
+	lua_call(L, 0, 1);
 	const char *str = lua_tostring(L, -1);
 	lua_pop(L, 2);
 	fprintf(stderr, "\n===============\n%s\n\n", str);
@@ -2374,7 +2374,7 @@ fs::path GetAVolumePath(__in PWCHAR VolumeName)
         Names = nullptr;
     }
 
-	for (NameIdx = Names; NameIdx[0] != L'\0'; NameIdx += wcslen(NameIdx) + 1) {	
+	for (NameIdx = Names; NameIdx[0] != L'\0'; NameIdx += wcslen(NameIdx) + 1) {
 		fs::path result(NameIdx);
 		delete [] Names;
 		Names = nullptr;
@@ -2424,7 +2424,7 @@ std::vector<fs::path> getVolumes()
         //  QueryDosDeviceW does not allow a trailing backslash,
         //  so temporarily remove it.
         VolumeName[Index] = L'\0';
-        CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName)); 
+        CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName));
         VolumeName[Index] = L'\\';
 
         if (CharCount == 0) {

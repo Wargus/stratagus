@@ -1,14 +1,14 @@
 R"(
 /*
    Hyllian's xBR-vertex code and texel mapping
-   
+
    Copyright (C) 2011/2016 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
    in the Software without restriction, including without limitation the rights
    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is 
+   copies of the Software, and to permit persons to whom the Software is
    furnished to do so, subject to the following conditions:
 
    The above copyright notice and this permission notice shall be included in
@@ -22,7 +22,7 @@ R"(
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
    THE SOFTWARE.
 
-*/ 
+*/
 
 // This shader also uses code and/or concepts from xBRZ as it appears
 // in the Desmume source code. The license for which is as follows:
@@ -49,8 +49,8 @@ R"(
 #define COMPAT_ATTRIBUTE in
 #define COMPAT_TEXTURE texture
 #else
-#define COMPAT_VARYING varying 
-#define COMPAT_ATTRIBUTE attribute 
+#define COMPAT_VARYING varying
+#define COMPAT_ATTRIBUTE attribute
 #define COMPAT_TEXTURE texture2D
 #endif
 
@@ -66,7 +66,7 @@ COMPAT_ATTRIBUTE vec4 TexCoord;
 COMPAT_VARYING vec4 COL0;
 COMPAT_VARYING vec4 TEX0;
 
-vec4 _oPosition1; 
+vec4 _oPosition1;
 uniform mat4 MVPMatrix;
 uniform COMPAT_PRECISION int FrameDirection;
 uniform COMPAT_PRECISION int FrameCount;
@@ -372,6 +372,6 @@ void main()
   }
 
  	FragColor = vec4(res, 1.0);
-} 
+}
 #endif
 )"

@@ -162,7 +162,7 @@ public:
 
 public:
 	int X = 0;                   /// Screen pixel left corner x coordinate adjusted for current map size
-	int Y = 0;                   /// Screen pixel upper corner y coordinate adjusted for current map size 
+	int Y = 0;                   /// Screen pixel upper corner y coordinate adjusted for current map size
 	int EndX = 0;                /// Screen pixel right x coordinate adjusted for current map size
 	int EndY = 0;                /// Screen pixel bottom y coordinate adjusted for current map size
 	int ScrollPaddingLeft = 0;   /// Scrollable area past the left of map

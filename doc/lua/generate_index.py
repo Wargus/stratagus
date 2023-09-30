@@ -132,7 +132,7 @@ def extract_docstring(filename, c_func):
 
 
 PLUGIN_PREAMBLE = r"""
--- Start copy from spec/lua.lua 
+-- Start copy from spec/lua.lua
 local unpack = table.unpack or unpack
 local funcdef = "([A-Za-z_][A-Za-z0-9_%.%:]*)%s*"
 local decindent = {

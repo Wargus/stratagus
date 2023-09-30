@@ -66,7 +66,6 @@ public:
     void SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen);
 
     FogOfWarTypes GetType()       const { return Settings.Type; }
-    
     CColor   GetFogColor()        const { return Settings.FogColor; }
     uint32_t GetFogColorSDL()     const { return Settings.FogColorSDL; }
     uint8_t  GetExploredOpacity() const { return Settings.ExploredOpacity; }
@@ -86,7 +85,7 @@ public:
 
     void Update(bool doAtOnce = false);
     void Draw(CViewport &viewport);
-    
+
     uint8_t GetVisibilityForTile(const Vec2i tilePos) const;
 
 private:
@@ -99,7 +98,7 @@ private:
     void FogUpscale4x4();
 
     uint8_t DeterminePattern(const size_t index, const uint8_t visFlag) const;
-    void FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
+    void FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index,
                          const uint8_t patternVisible, const uint8_t patternExplored) const;
 
     void UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRect, const int16_t srcWidth,
@@ -111,21 +110,19 @@ private:
     void InitTiled();
     void CleanTiled(const bool isHardClean = false);
 
-    void DrawFullShroudOfFog(const int16_t x, const int16_t y, const uint8_t alpha, 
+    void DrawFullShroudOfFog(const int16_t x, const int16_t y, const uint8_t alpha,
                              SDL_Surface *const vpFogSurface);
-    void GetFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+    void GetFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase,
                          int *fogTile, int *blackFogTile) const;
     bool IsMapFieldExplored(const size_t index) const { return (VisTable[index] != 0); }
     bool IsMapFieldVisible(const size_t index)  const { return (VisTable[index]  > 1); }
-    void DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+    void DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase,
                           const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface);
     void DrawTiled(CViewport &viewport);
     void DrawTiledLegacy(CViewport &viewport);
-    
-public:
 
 private:
-    struct FogOfWarSettings 
+    struct FogOfWarSettings
 	{
 		FogOfWarTypes Type             {FogOfWarTypes::cEnhanced}; /// Type of fog of war - tiled or enhanced(smooth)
         uint8_t       NumOfEasingSteps {8};                        /// Number of the texture easing steps
@@ -140,7 +137,7 @@ private:
 	} Settings;  /// Fog of war settings
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
-    
+
     std::set<uint8_t>   VisionFor;  /// Visibilty through the fog is generated for this players
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
@@ -148,7 +145,7 @@ private:
     static CGraphic *TiledFogSrc;           /// Graphic for tiled fog of war
     CGraphic *TiledAlphaFog {nullptr};      /// Working set of graphic for tiled fog of war with alpha channel
     SDL_Surface *TileOfFogOnly {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
-    
+
     /**
     **  Mapping for fog of war tiles.
     */
@@ -157,7 +154,7 @@ private:
     std::vector<uint8_t> VisTable;            /// vision table for whole map + 1 tile around (for simplification of upscale algorithm purposes)
     size_t               VisTable_Index0 {0}; /// index in the vision table for [0:0] map tile
     size_t               VisTableWidth   {0}; /// width of the vision table
-    CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map 
+    CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map
                                               /// + 1 tile to the left and up (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
     CBlurer              Blurer;              /// Blurer for fog of war texture
@@ -212,7 +209,7 @@ extern CFogOfWar *FogOfWar;
 /**
 **  Determine upscale patterns (index in the upscale table) for Visible and Explored layers
 **
-**  @param  index       tile in the vision table 
+**  @param  index       tile in the vision table
 **  @param  visFlag     layer to determine pattern for
 **
 */
@@ -228,13 +225,13 @@ inline uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t vis
     offset += VisTableWidth;
     n3 = (visFlag & VisTable[offset]);
     n4 = (visFlag & VisTable[offset + 1]);
-    
+
     n1 >>= n1 - VisionType::cExplored;
     n2 >>= n2 - VisionType::cExplored;
     n3 >>= n3 - VisionType::cExplored;
     n4 >>= n4 - VisionType::cExplored;
-    
-    return ( (n1 << 3) | (n2 << 2) | (n3 << 1) | n4 );
+
+	return ( (n1 << 3) | (n2 << 2) | (n3 << 1) | n4 );
 }
 
 /**
@@ -247,7 +244,7 @@ inline uint8_t CFogOfWar::DeterminePattern(const size_t index, const uint8_t vis
 **  @param  patternExplored index int the upscale table for Explored layer
 **
 */
-inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index, 
+inline void CFogOfWar::FillUpscaledRec(uint32_t *texture, const uint16_t textureWidth, size_t index,
                                         const uint8_t patternVisible, const uint8_t patternExplored) const
 {
     for (uint8_t scan_line = 0; scan_line < 4; scan_line++) {

@@ -324,9 +324,9 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
 
 	graphics->setFont(getFont());
-	
+
 	bool is_normal = true;
-	
+
 	if (hasMouse()) {
 		is_normal = false;
 	}
@@ -1451,7 +1451,7 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 **  @todo  Size should be parametrable, maybe remove default constructor?
 */
 ImageListBoxWidget::ImageListBoxWidget(unsigned int width, unsigned int height) : ListBoxWidget(width, height),
-	upButtonImage(nullptr), downButtonImage(nullptr), leftButtonImage(nullptr), rightButtonImage(nullptr), hBarButtonImage(nullptr), 
+	upButtonImage(nullptr), downButtonImage(nullptr), leftButtonImage(nullptr), rightButtonImage(nullptr), hBarButtonImage(nullptr),
 	vBarButtonImage(nullptr),	markerImage(nullptr)
 {
 	setDimension(gcn::Rectangle(0, 0, width, height));
@@ -1642,7 +1642,7 @@ void ImageListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 
 
 /**
-**  Draw the list box  
+**  Draw the list box
 **
 **  @param  graphics Graphics to use
 */
@@ -1723,7 +1723,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 }
 
 /**
-**  Draw the list box border 
+**  Draw the list box border
 **
 **  @param  graphics Graphics to use
 */
@@ -2080,7 +2080,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 	img->Resize(getWidth(), h);
 	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
 	img->SetOriginalSize();
-	
+
 	graphics->setFont(getFont());
 
 	if (mListBox.getListModel() && mListBox.getSelected() >= 0)

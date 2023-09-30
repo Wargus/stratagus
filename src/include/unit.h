@@ -98,7 +98,7 @@ using COrderPtr = COrder *;
 #define AT_ATTACKED_BY_FACTOR 0x40000000 /// A (attacker is under attack by target)
 #define AT_THREAT_FACTOR      0x20000000 /// T
 #define AT_PRIORITY_OFFSET    15         /// p (0..255)
-#define AT_DISTANCE_OFFSET    7          /// d (0..255) 
+#define AT_DISTANCE_OFFSET    7          /// d (0..255)
 #define AT_PRIORITY_MASK_HI   0xFFFF8000 /// Mask for checking only priority (without distance part)
 
 #define AT_FARAWAY_REDUCE_OFFSET 14      /// Priority reduce offset for far away targets (AT_THREAT_FACTOR must be preserved if present)
@@ -615,9 +615,9 @@ extern bool InReactRange(const CUnit &unit, const CUnit &target);
 extern bool InAttackRange(const CUnit &unit, const CUnit &target);
 /// Is tile within attack range of this unit?
 extern bool InAttackRange(const CUnit &unit, const Vec2i &tilePos);
-/// Return randomly selected position in direction (to/from) dirUnit from srcPos 
+/// Return randomly selected position in direction (to/from) dirUnit from srcPos
 extern Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3);
-/// Return randomly selected position in direction (to/from) dirPos from srcPos 
+/// Return randomly selected position in direction (to/from) dirPos from srcPos
 extern Vec2i GetRndPosInDirection(const Vec2i &srcPos, const Vec2i &dirPos, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev = 3);
 
 

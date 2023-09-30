@@ -251,12 +251,12 @@ void CMapField::parse(lua_State *l)
 
 /**
 ** Check if a field is opaque
-** We check not only MapFieldOpaque flag because some field types (f.e. forest/rock/wall) 
+** We check not only MapFieldOpaque flag because some field types (f.e. forest/rock/wall)
 ** may be set in the FieldOfView as opaque as well.
 */
 bool CMapField::isOpaque() const
 {
-	return (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting 
+	return (FieldOfView.GetType() == FieldOfViewTypes::cShadowCasting
 			&& FieldOfView.GetOpaqueFields() & this->Flags);
 }
 
@@ -350,7 +350,7 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 	if (this->IsExplored(player)) {
 		maxVision = 1;
 	}
-	
+
 	for (const uint8_t p : player.GetSharedVision()) {
 		maxVision = std::max<uint8_t>(maxVision, this->Visible[p]);
 		if (maxVision >= 2) {
