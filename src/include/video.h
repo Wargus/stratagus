@@ -33,15 +33,14 @@
 
 //@{
 
-#include "SDL.h"
 #include "sdl2_helper.h"
-
 #include "shaders.h"
 #include "guichan.h"
 
 #include "color.h"
 #include "vec2i.h"
 
+#include <SDL.h>
 #include <string_view>
 
 class CFont;

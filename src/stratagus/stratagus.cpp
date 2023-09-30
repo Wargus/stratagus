@@ -181,7 +181,7 @@ extern void beos_init(int argc, char **argv);
 #undef Button
 #endif
 
-#include "SDL.h"
+#include <SDL.h>
 
 #include "stratagus.h"
 

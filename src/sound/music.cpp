@@ -33,15 +33,13 @@
 -- Includes
 ----------------------------------------------------------------------------*/
 
-#include <atomic>
-
 #include "stratagus.h"
-
-
-#include "SDL.h"
 
 #include "sound_server.h"
 #include "script.h"
+
+#include <SDL.h>
+#include <atomic>
 
 /*----------------------------------------------------------------------------
 -- Declaration

@@ -27,8 +27,8 @@
 
 #pragma once
 
+#include <SDL.h>
 #include <memory>
-#include "SDL.h"
 
 //@{
 

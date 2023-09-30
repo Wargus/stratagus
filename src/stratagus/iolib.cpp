@@ -43,7 +43,7 @@
 #include "parameters.h"
 #include "util.h"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #include <map>
 #include <unordered_map>

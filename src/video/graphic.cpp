@@ -36,17 +36,16 @@
 
 #include "stratagus.h"
 
+#include "intern_video.h"
+#include "iolib.h"
+#include "player.h"
+#include "ui.h"
+#include "video.h"
+
+#include <SDL_image.h>
 #include <string>
 #include <map>
 #include <list>
-
-#include "SDL_image.h"
-
-#include "video.h"
-#include "player.h"
-#include "intern_video.h"
-#include "iolib.h"
-#include "ui.h"
 
 /*----------------------------------------------------------------------------
 --  Variables

@@ -35,19 +35,20 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-#include "SDL_image.h"
-#include "sdl2_helper.h"
 
-#include "util.h"
-#include "video.h"
-#include "vec2i.h"
 #include "script.h"
+#include "sdl2_helper.h"
+#include "util.h"
+#include "vec2i.h"
+#include "video.h"
+
 #include <string>
 #include <vector>
 #include <map>
 #include <queue>
 #include <set>
 
+#include <SDL_image.h>
 struct lua_State;
 
 using tile_index		= uint16_t;

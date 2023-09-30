@@ -51,8 +51,8 @@
 #include "sound_server.h"
 #include "video.h"
 
-#include "SDL.h"
-#include "SDL_endian.h"
+#include <SDL.h>
+#include <SDL_endian.h>
 
 /*----------------------------------------------------------------------------
 --  Defines

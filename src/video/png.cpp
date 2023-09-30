@@ -33,12 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "SDL_image.h"
-
 #include "stratagus.h"
 #include "map.h"
 #include "video.h"
 #include "iolib.h"
+
+#include <SDL_image.h>
 
 /*----------------------------------------------------------------------------
 --  Variables

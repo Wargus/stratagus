@@ -36,10 +36,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "filesystem.h"
+
+#include <SDL.h>
 #include <memory>
 #include <vector>
-#include "filesystem.h"
-#include "SDL.h"
 
 /*----------------------------------------------------------------------------
 --  Definitons
