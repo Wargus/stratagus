@@ -34,15 +34,15 @@
 
 class MDNS {
 public:
-    MDNS() : serviceSocket(-1), queryId(-1), numSockets(-1) { };
-    ~MDNS();
+	MDNS() = default;
+	~MDNS();
 
-    void AnswerServerQueries();
-    void QueryServers(std::function<void(char*)> callback);
+	void AnswerServerQueries();
+	void QueryServers(std::function<void(char *)> callback);
 
 private:
-    int serviceSocket;
-    int queryId;
-    int querySockets[20];
-    int numSockets;
+	int serviceSocket = -1;
+	int queryId = -1;
+	int querySockets[20]{};
+	int numSockets = -1;
 };

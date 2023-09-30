@@ -559,7 +559,7 @@ unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin)
 	unsigned int f = begin;
 	while (f < forces.size() && (forces[f].State > AiForceAttackingState::Free)) {
 		++f;
-	};
+	}
 	if (f == forces.size()) {
 		forces.resize(f + 1);
 	}

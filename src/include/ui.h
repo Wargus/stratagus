@@ -228,7 +228,7 @@ class CFiller
 				return ((bstore[y + x_index] & (1 << x)) == 0);
 			}
 			return false;
-		};
+		}
 
 		int Width = 0;
 		int Height = 0;

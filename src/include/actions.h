@@ -121,7 +121,7 @@ public:
 
 	bool ParseGenericData(lua_State *l, int &j, std::string_view value);
 	bool HasGoal() const { return Goal != nullptr; }
-	CUnit *GetGoal() const { return Goal; };
+	CUnit *GetGoal() const { return Goal; }
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 

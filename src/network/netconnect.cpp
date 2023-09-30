@@ -2055,7 +2055,7 @@ static int CclNetworkDiscoverServers(lua_State *l)
 	LuaCheckArgs(l, 1);
 	bool start = LuaToBoolean(l, 1);
 
-	auto callback= [l](char* ip) {
+	auto callback = [l](char* ip) {
 		auto i = lua_objlen(l, -1) + 1;
 		lua_pushnumber(l, i);
 		lua_pushstring(l, ip);
