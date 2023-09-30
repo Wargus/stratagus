@@ -30,16 +30,14 @@
 #ifndef __WIDGETS_H__
 #define __WIDGETS_H__
 
-#include <functional>
+#include "font.h"
+#include "luacallback.h"
 
+#include <functional>
 #include <guichan.h>
 #include <guichan/gsdl.h>
-#include "font.h"
-
-#include "keylistener.h"
-#include "luacallback.h"
-#include "mouselistener.h"
-
+#include <guichan/keylistener.h>
+#include <guichan/mouselistener.h>
 
 extern bool GuichanActive;
 

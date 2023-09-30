@@ -44,7 +44,6 @@
 #include "commands.h"
 #include "font.h"
 #include "game.h"
-#include "guichan.h"
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -65,6 +64,7 @@
 #include "video.h"
 #include "widgets.h"
 
+#include <guichan.h>
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();

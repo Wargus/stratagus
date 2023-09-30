@@ -41,7 +41,6 @@
 #include "tileset.h"
 #include "cursor.h"
 #include "font.h"
-#include "input.h"
 #include "stratagus.h"
 #include "ui.h"
 #include "video.h"
@@ -55,6 +54,8 @@
 #include "version.h"
 
 #include "./xsha1.h"
+
+#include <guichan/input.h>
 
 static void dump(uint8_t* buffer, int received_bytes) {
     std::cout << "Raw contents >>>" << std::endl;

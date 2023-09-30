@@ -42,8 +42,6 @@
 #include "commands.h"
 #include "depend.h"
 #include "font.h"
-#include "guichan/key.h"
-#include "guichan/sdl/sdlinput.h"
 #include "interface.h"
 #include "map.h"
 #include "player.h"
@@ -59,6 +57,8 @@
 #include "video.h"
 
 #include <ctype.h>
+#include <guichan/key.h>
+#include <guichan/sdl/sdlinput.h>
 #include <vector>
 #include <sstream>
 

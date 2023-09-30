@@ -60,9 +60,9 @@
 ----------------------------------------------------------------------------*/
 
 #include "color.h"
-#include "guichan/font.h"
 
 #include <array>
+#include <guichan/font.h>
 #include <string>
 #include <SDL.h>
 
