@@ -867,24 +867,27 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() == &transporter) {
 			CommandFollow(transporter, unit, 0);
 		}
-		if (CanTransport(transporter, unit) && (unit.IsIdle() 
-			|| (unit.CurrentAction() == UnitAction::Board && !unit.Moving 
-			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter)) && unit.Container == nullptr) {
-				CommandBoard(unit, transporter, FlushCommands);
-				CommandFollow(transporter, unit, 0);
-				if (--nbToTransport == 0) { // full : next transporter.
-					for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
-						const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
+		if (CanTransport(transporter, unit)
+		    && (unit.IsIdle()
+		        || (unit.CurrentAction() == UnitAction::Board && !unit.Moving
+		            && static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter))
+		    && unit.Container == nullptr) {
+			CommandBoard(unit, transporter, FlushCommands);
+			CommandFollow(transporter, unit, 0);
+			if (--nbToTransport == 0) { // full : next transporter.
+				for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
+					const CUnit &nextTransporter = *aiForce.Units[transporterIndex];
 
-						if (nextTransporter.Type->CanTransport()) {
-							nbToTransport = nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
-							break ;
-						}
-					}
-					if (transporterIndex == aiForce.Size()) { // No more transporter.
-						break ;
+					if (nextTransporter.Type->CanTransport()) {
+						nbToTransport =
+							nextTransporter.Type->MaxOnBoard - nextTransporter.BoardCount;
+						break;
 					}
 				}
+				if (transporterIndex == aiForce.Size()) { // No more transporter.
+					break;
+				}
+			}
 		}
 	}
 }

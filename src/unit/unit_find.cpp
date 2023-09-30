@@ -205,7 +205,7 @@ class BestDepotFinder
 				}
 
 				if (distance >= this->best_dist) {
-					//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance 
+					//if the depot's simple distance is greater or equal to the real travel distance of the currently-chosen depot, then it can never be closer than it, and we have no reason to actually calculate its real travel distance
 					return;
 				}
 
@@ -469,7 +469,6 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 	int SelectNextUnit = (last == nullptr) ? 1 : 0;
 
 	for (CUnit *unit : player.GetUnits()) {
-		
 		if (unit->Type->BoolFlag[HARVESTER_INDEX].value && !unit->Removed) {
 			if (unit->CurrentAction() == UnitAction::Still) {
 				if (SelectNextUnit && !IsOnlySelected(*unit)) {

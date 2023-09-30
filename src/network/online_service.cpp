@@ -1512,7 +1512,7 @@ void OnlineState::handleChatevent(Context *ctx) {
         ctx->addUser(username);
         break;
     case 0x02: // user joined channel
-        ctx->addUser(username); 
+        ctx->addUser(username);
         ctx->showInfo(username + " joined");
         break;
     case 0x03: // user left channel

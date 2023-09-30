@@ -83,7 +83,7 @@ private:
 	int MinRange = 0;
 	int Range = 0;
 	int SkirmishRange = 0;
-	CUnitPtr offeredTarget = nullptr; // Stores pointer to target offered from outside (f.e. by HitUnit_AttackBack() event). 
+	CUnitPtr offeredTarget = nullptr; // Stores pointer to target offered from outside (f.e. by HitUnit_AttackBack() event).
 	Vec2i goalPos{-1, -1}; // Current goal position
 	Vec2i attackMovePos{-1, -1}; // If attack-move was ordered
 	unsigned char Sleep = 0;

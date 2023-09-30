@@ -163,7 +163,7 @@ void CMap::Reveal(MapRevealModes mode /* = MapRevealModes::cKnown */ )
 		}
 		UnitCountSeen(*unit);
 	}
-	GameSettings.RevealMap = mode; 
+	GameSettings.RevealMap = mode;
 }
 
 /*----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	UI.Minimap.Destroy();
 
 	FieldOfView.Clean();
-	
+
 	FogOfWar->Clean(isHardClean);
 	for (CViewport *vp = UI.Viewports; vp < UI.Viewports + UI.NumViewports; ++vp) {
 		vp->Clean();
@@ -551,7 +551,7 @@ void CMap::FixNeighbors(tile_flags type, int seen, const Vec2i &pos)
 void CMap::ClearTile(const Vec2i &tilePos)
 {
 	Assert(Map.Info.IsPointOnMap(tilePos));
-	
+
 	CMapField &mapField = *this->Field(tilePos);
 
 	const bool isOpaque = Map.Field(tilePos)->isOpaque();
@@ -568,7 +568,7 @@ void CMap::ClearTile(const Vec2i &tilePos)
 	}
 	if (isOpaque) {
 		MapRefreshUnitsSight(tilePos);
-	} 	
+	}
 }
 /// Remove wood from the map.
 void CMap::ClearWoodTile(const Vec2i &pos)

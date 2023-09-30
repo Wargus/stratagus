@@ -406,7 +406,7 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j].data(), type.MapDefaultStat.Variables[j].Increase);
 				}
 			}
-			
+
 			if (type.MapSound.Selected.Name != type.Sound.Selected.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"selected\")\n", type.Ident.c_str(), type.MapSound.Selected.Name.c_str());
 			}
@@ -443,7 +443,7 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 				}
 			}
 		}
-		
+
 		f->printf("\n-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<const CUnit *> teleporters;
@@ -1026,7 +1026,6 @@ void CreateGame(const fs::path &filename, CMap *map)
 	// FIXME: This loops fixes the colors of the units.
 	//
 	for (CUnit *unit : UnitManager->GetUnits()) {
-		
 		if (unit->Type->OnReady) {
 			unit->Type->OnReady->call(UnitNumber(*unit));
 		}

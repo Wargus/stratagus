@@ -95,8 +95,8 @@ void CFogOfWar::GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaF
 }
 void CFogOfWar::Init()
 {
-    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes, 
-    /// Extra tiles will always be VisionType::cUnseen. 
+    /// +1 to the top & left and +1 to the bottom & right for 4x scale algorithm purposes,
+    /// Extra tiles will always be VisionType::cUnseen.
              this->VisTableWidth  = Map.Info.MapWidth  + 2;
     const uint16_t visTableHeight = Map.Info.MapHeight + 2;
     const size_t   tableSize      = VisTableWidth * visTableHeight;
@@ -146,7 +146,7 @@ void CFogOfWar::InitTiled()
         SDL_FillRect(TileOfFogOnly, nullptr, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
     }
 
-    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->Surface, 
+    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->Surface,
                                                                  SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
     TiledAlphaFog = CGraphic::New("");
     TiledAlphaFog->Surface = newFogSurface;
@@ -166,12 +166,12 @@ void CFogOfWar::InitTiled()
 void CFogOfWar::InitEnhanced()
 {
 
-    /// +1 to the top & left for 4x scale algorithm purposes, 
+    /// +1 to the top & left for 4x scale algorithm purposes,
     const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 1) * 4;
     const uint16_t fogTextureHeight = (Map.Info.MapHeight + 1) * 4;
 
     FogTexture.Init(fogTextureWidth, fogTextureHeight, Settings.NumOfEasingSteps);
-    
+
     RenderedFog.clear();
     RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
     ranges::fill(RenderedFog, 0xFF);
@@ -193,9 +193,9 @@ void CFogOfWar::SetFogColor(const CColor color)
 }
 
 void CFogOfWar::SetEasingSteps(const uint8_t num)
-{ 
+{
     Settings.NumOfEasingSteps = num;
-    FogTexture.SetNumOfSteps(num); 
+    FogTexture.SetNumOfSteps(num);
 }
 
 void CFogOfWar::Clean(const bool isHardClean /*= false*/)
@@ -212,11 +212,10 @@ void CFogOfWar::Clean(const bool isHardClean /*= false*/)
         case FogOfWarTypes::cTiled:
         case FogOfWarTypes::cTiledLegacy:
 
-            CleanTiled(isHardClean); 
+            CleanTiled(isHardClean);
             break;
 
         case FogOfWarTypes::cEnhanced:
-           
             if (isHardClean) {
                 CleanTiled(isHardClean);
             }
@@ -230,11 +229,11 @@ void CFogOfWar::Clean(const bool isHardClean /*= false*/)
     }
 }
 
-/** 
+/**
 ** Select which type of Fog of War to use
-** 
+**
 ** @param fowType	type to set
-** @return true if success, false for wrong fow_type 
+** @return true if success, false for wrong fow_type
 */
 bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 {
@@ -252,13 +251,13 @@ bool CFogOfWar::SetType(const FogOfWarTypes fowType)
 	}
 }
 
-/** 
+/**
 ** Set fog of war opacity (alpha chanel values) for different levels of visibility
-** 
+**
 ** @param explored  alpha channel value for explored tiles
 ** @param revealed  alpha channel value for revealed tiles (when the map revealed)
 ** @param unseen    alpha channel value for unseen tiles
-** 
+**
 */
 void CFogOfWar::SetOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen)
 {
@@ -270,13 +269,13 @@ void CFogOfWar::SetOpacityLevels(const uint8_t explored, const uint8_t revealed,
     GenerateUpscaleTables(UpscaleTableRevealed, explored, revealed);
 }
 
-/** 
+/**
 ** Enable or disable bilinear upscale for the final fog texture rendering
-** 
+**
 ** @param enable  cmd to enable/disable
-** 
+**
 */
-void CFogOfWar::EnableBilinearUpscale(const bool enable) 
+void CFogOfWar::EnableBilinearUpscale(const bool enable)
 {
     const uint8_t prev = Settings.UpscaleType;
     Settings.UpscaleType = enable ? UpscaleTypes::cBilinear : UpscaleTypes::cSimple;
@@ -293,10 +292,10 @@ void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint1
     Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
 }
 
-/** 
+/**
 ** Generate fog of war:
-** fill map-sized table with values of visiblty for current player/players 
-** 
+** fill map-sized table with values of visiblty for current player/players
+**
 */
 void CFogOfWar::GenerateFog()
 {
@@ -311,12 +310,11 @@ void CFogOfWar::GenerateFog()
     CurrUpscaleTableExplored = GameSettings.RevealMap != MapRevealModes::cHidden ? UpscaleTableRevealed : UpscaleTableExplored;
 
     const uint8_t visibleThreshold = Map.NoFogOfWar ? 1 : 2;
-    
+
     #pragma omp parallel
     {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
         const uint16_t lBound = (thisThread    ) * Map.Info.MapHeight / numOfThreads;
         const uint16_t uBound = (thisThread + 1) * Map.Info.MapHeight / numOfThreads;
 
@@ -370,7 +368,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
         }
         return;
     }
-    
+
     /// FogOfWarTypes::cEnhanced
     FogTexture.Ease();
 
@@ -442,28 +440,28 @@ void CFogOfWar::Draw(CViewport &viewport)
 void CFogOfWar::DrawEnhanced(CViewport &viewport)
 {
     SDL_Rect srcRect;
-    srcRect.x = (viewport.MapPos.x + 1) * 4 - 2;  /// '+1' because of 1 tile frame around the texture 
+    srcRect.x = (viewport.MapPos.x + 1) * 4 - 2;  /// '+1' because of 1 tile frame around the texture
     srcRect.y = (viewport.MapPos.y + 1) * 4 - 2;  /// '-2' is a half-tile compensation
     srcRect.w = viewport.MapWidth  * 4;
     srcRect.h = viewport.MapHeight * 4;
-    
+
     const uint16_t x0 = viewport.MapPos.x * 4;
     const uint16_t y0 = viewport.MapPos.y * 4;
 
     FogTexture.DrawRegion(RenderedFog.data(), Map.Info.MapWidth * 4, x0, y0, srcRect);
 
-    /// TODO: This part might be replaced by GPU shaders. 
+    /// TODO: This part might be replaced by GPU shaders.
     /// In that case vpFogSurface shall be filled up with FogTexture.DrawRegion()
 
     srcRect.x = x0;
     srcRect.y = y0;
-    
+
     SDL_Rect trgRect;
     trgRect.x = 0;
     trgRect.y = 0;
     trgRect.w = viewport.MapWidth  * PixelTileSize.x;
     trgRect.h = viewport.MapHeight * PixelTileSize.y;
-   
+
     switch (this->Settings.UpscaleType) {
         case cBilinear:
             UpscaleBilinear(RenderedFog.data(), srcRect, Map.Info.MapWidth * 4, viewport.GetFogSurface(), trgRect);
@@ -483,14 +481,14 @@ void CFogOfWar::FogUpscale4x4()
 {
     /*
     **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Exlored.
-    **  
+    **
     **  [1][2] checks neighbours (#2,#3,#4) for tile #1 to calculate upscale patterns.
-    **  [3][4] 
+    **  [3][4]
     **
     **  There is only 16 patterns.
-    **  According to these patterns fill the 4x4 sized alpha texture 
+    **  According to these patterns fill the 4x4 sized alpha texture
     **  with sum of UpscaleTable values (one for Visible and another for Explored)
-    ** 
+    **
     **  VisTable     FogTexture
     **              [x][*][0][0]   where X - 2 or 1 - Visible or Exlored
     **   [X][0] --\ [*][0][0][0]         x - 1/2 transparency
@@ -500,7 +498,7 @@ void CFogOfWar::FogUpscale4x4()
 
     /// Because we work with 4x4 scaled map tiles here, the textureIndex is in 32bits chunks (byte * 4)
     uint32_t *const fogTexture = (uint32_t*)FogTexture.GetNext();
-    
+
     /// Fog texture width and height in 32bit chunks
     const uint16_t textureWidth  = FogTexture.GetWidth()  / 4;
     const uint16_t textureHeight = FogTexture.GetHeight() / 4;
@@ -511,19 +509,19 @@ void CFogOfWar::FogUpscale4x4()
 
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
+
         const uint16_t lBound = (thisThread    ) * textureHeight / numOfThreads;
         const uint16_t uBound = (thisThread + 1) * textureHeight / numOfThreads;
 
         /// in fact it's viewport.MapPos.y -1 & viewport.MapPos.x -1 because of VisTable starts from [-1:-1]
         size_t visIndex      = lBound * VisTableWidth;
         size_t textureIndex  = lBound * nextRowOffset;
-        
+
         for (uint16_t row = lBound; row < uBound; row++) {
             for (uint16_t col = 0; col < textureWidth; col++) {
                 /// Fill the 4x4 scaled tile
-                FillUpscaledRec(fogTexture, textureWidth, textureIndex + col, 
-                                DeterminePattern(visIndex + col, VisionType::cVisible), 
+                FillUpscaledRec(fogTexture, textureWidth, textureIndex + col,
+                                DeterminePattern(visIndex + col, VisionType::cVisible),
                                 DeterminePattern(visIndex + col, VisionType::cVisible | VisionType::cExplored));
             }
             visIndex     += VisTableWidth;
@@ -534,7 +532,7 @@ void CFogOfWar::FogUpscale4x4()
 
 /**
 ** Bilinear zoom Fog Of War texture into SDL surface
-** 
+**
 **  @param src          Image src.
 **  @param srcRect      Rectangle in the src image to render
 **  @param srcWidth     Image width
@@ -549,19 +547,18 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 
     uint32_t *const target = (uint32_t*)trgSurface->pixels;
     const uint16_t AShift = trgSurface->format->Ashift;
-    
+
     /// FIXME: '-1' shouldn't be here, but without it the resulting fog has a shift to the left and upward
     const int32_t xRatio = (int32_t(srcRect.w - 1) << 16) / trgRect.w;
     const int32_t yRatio = (int32_t(srcRect.h - 1) << 16) / trgRect.h;
-    
+
     #pragma omp parallel
-    {    
+    {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
-        const uint16_t lBound = (thisThread    ) * trgRect.h / numOfThreads; 
-        const uint16_t uBound = (thisThread + 1) * trgRect.h / numOfThreads; 
 
+        const uint16_t lBound = (thisThread    ) * trgRect.h / numOfThreads;
+        const uint16_t uBound = (thisThread + 1) * trgRect.h / numOfThreads;
 
         size_t  trgIndex = size_t(trgRect.y + lBound) * trgSurface->w + trgRect.x;
         int64_t y        = ((int32_t)srcRect.y << 16) + lBound * yRatio;
@@ -602,7 +599,7 @@ void CFogOfWar::UpscaleBilinear(const uint8_t *const src, const SDL_Rect &srcRec
 
 /**
 ** Simple zoom Fog Of War texture into SDL surface
-** 
+**
 **  @param src          Image src.
 **  @param srcRect      Rectangle in the src image to render
 **  @param srcWidth     Image width
@@ -617,24 +614,24 @@ void CFogOfWar::UpscaleSimple(const uint8_t *src, const SDL_Rect &srcRect, const
 
     const uint8_t texelWidth  = PixelTileSize.x / 4;
     const uint8_t texelHeight = PixelTileSize.y / 4;
-    
+
     uint32_t *const target =(uint32_t*)trgSurface->pixels;
 
     #pragma omp parallel
-    {    
+    {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
-        const uint16_t lBound = (thisThread    ) * srcRect.h / numOfThreads; 
-        const uint16_t uBound = (thisThread + 1) * srcRect.h / numOfThreads; 
+
+        const uint16_t lBound = (thisThread    ) * srcRect.h / numOfThreads;
+        const uint16_t uBound = (thisThread + 1) * srcRect.h / numOfThreads;
 
         size_t srcIndex = size_t(srcRect.y + lBound) * srcWidth + srcRect.x;
         size_t trgIndex = size_t(trgRect.y + lBound * texelHeight) * trgSurface->w + trgRect.x;
 
         for (uint16_t ySrc = lBound; ySrc < uBound; ySrc++) {
             for (uint16_t xSrc = 0; xSrc < srcRect.w; xSrc++) {
-    
-                const uint32_t texelValue = (uint32_t(src[srcIndex + xSrc]) << surfaceAShift) 
+
+                const uint32_t texelValue = (uint32_t(src[srcIndex + xSrc]) << surfaceAShift)
                                             | Settings.FogColorSDL;
                 std::fill_n(&target[trgIndex + xSrc * texelWidth], texelWidth, texelValue);
             }
@@ -687,7 +684,7 @@ void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, S
     }
 }
 
-void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const size_t mapIndexBase, 
+void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const size_t mapIndexBase,
                            int *fogTile, int *blackFogTile) const
 {
 	int w = Map.Info.MapWidth;
@@ -800,7 +797,7 @@ void CFogOfWar::GetFogTile(const size_t visIndex, const  size_t mapIndex, const 
 **  @param dy  Y position into fog surface
 **  @param vpFogSurface surface to draw fog
 */
-void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase, 
+void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const size_t mapIndexBase,
                             const int16_t dx, const int16_t dy, SDL_Surface *const vpFogSurface)
 {
 	int fogTile = 0;
@@ -811,7 +808,7 @@ void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const 
     if (vpFogSurface != TheScreen) {
         if (IsMapFieldVisible(visIndex) || ReplayRevealMap) {
             if (fogTile && fogTile != blackFogTile) {
-                TiledAlphaFog->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
+                TiledAlphaFog->DrawFrameClipCustomMod(fogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey,
                                                                        GetExploredOpacity(),
                                                                        vpFogSurface);
             }
@@ -819,8 +816,8 @@ void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const 
             DrawFullShroudOfFog(dx, dy, FogOfWar->GetExploredOpacity(), vpFogSurface);
         }
         if (blackFogTile) {
-            TiledAlphaFog->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey, 
-                                                                        GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
+            TiledAlphaFog->DrawFrameClipCustomMod(blackFogTile, dx, dy, PixelModifier::CopyWithSrcAlphaKey,
+                                                                        GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity()
                                                                                                : GetUnseenOpacity(),
                                                                         vpFogSurface);
         }
@@ -830,7 +827,7 @@ void CFogOfWar::DrawFogTile(const size_t visIndex, const size_t mapIndex, const 
                 TiledAlphaFog->DrawFrameClipTrans(fogTile, dx, dy, GetExploredOpacity());
             }
         } else {
-            DrawFullShroudOfFog(dx, dy, GetExploredOpacity(), TheScreen);	
+            DrawFullShroudOfFog(dx, dy, GetExploredOpacity(), TheScreen);
         }
         if (blackFogTile) {
             TiledFogSrc->DrawFrameClip(blackFogTile, dx, dy);
@@ -846,14 +843,14 @@ void CFogOfWar::DrawTiled(CViewport &viewport)
 {
     /// Save current clipping
     PushClipping();
-	
+
     // Set clipping to FogSurface coordinates
-	SDL_Rect fogSurfaceClipRect {viewport.Offset.x, 
-							 	 viewport.Offset.y, 
+	SDL_Rect fogSurfaceClipRect {viewport.Offset.x,
+							 	 viewport.Offset.y,
 							 	 viewport.BottomRightPos.x - viewport.TopLeftPos.x + 1,
 							 	 viewport.BottomRightPos.y - viewport.TopLeftPos.y + 1};
-    SetClipping(fogSurfaceClipRect.x, 
-				fogSurfaceClipRect.y, 
+    SetClipping(fogSurfaceClipRect.x,
+				fogSurfaceClipRect.y,
 				fogSurfaceClipRect.x + fogSurfaceClipRect.w,
 				fogSurfaceClipRect.y + fogSurfaceClipRect.h);
 
@@ -861,10 +858,10 @@ void CFogOfWar::DrawTiled(CViewport &viewport)
 	const int ey = fogSurfaceClipRect.y + fogSurfaceClipRect.h;
 
     #pragma omp parallel
-    {    
+    {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-      
+
         uint16_t lBound = thisThread * fogSurfaceClipRect.h / numOfThreads;
         lBound -= lBound % PixelTileSize.y;
         uint16_t uBound = ey;
@@ -886,7 +883,7 @@ void CFogOfWar::DrawTiled(CViewport &viewport)
                 if (VisTable[visIndex]) {
                     DrawFogTile(visIndex, mapIndex, mapIndexBase, dx, dy, viewport.GetFogSurface());
                 } else {
-                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity() 
+                    DrawFullShroudOfFog(dx, dy, GameSettings.RevealMap != MapRevealModes::cHidden ? GetRevealedOpacity()
                                                                        : GetUnseenOpacity(),
                                                 viewport.GetFogSurface());
                 }
@@ -917,7 +914,7 @@ void CFogOfWar::DrawTiledLegacy(CViewport &viewport)
     size_t mapIndexBase = viewport.MapPos.y * Map.Info.MapWidth;
     size_t visIndexBase = viewport.MapPos.y * VisTableWidth + VisTable_Index0;
     int dy = viewport.TopLeftPos.y - viewport.Offset.y;
-     
+
     while (dy < ey) {
         size_t mapIndex = viewport.MapPos.x + mapIndexBase;
         size_t visIndex = viewport.MapPos.x + visIndexBase;

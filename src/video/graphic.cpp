@@ -95,7 +95,7 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y,
 
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	
+
 	SDL_BlitSurface(Surface, &srect, surface, &drect);
 }
 
@@ -153,7 +153,7 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 **  @param y   Y position on the target surface
 **  @param surface target surface
 */
-void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, 
+void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y,
 						   SDL_Surface *surface /*= TheScreen*/) const
 {
 	Assert(surface);
@@ -207,7 +207,7 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param surface target surface
 */
 void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-								unsigned char alpha, 
+								unsigned char alpha,
 								SDL_Surface *surface /*= TheScreen*/) const
 {
 	int oldx = x;
@@ -232,7 +232,7 @@ void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param surface  target surface
 */
 void CGraphic::DrawSubClipCustomMod(int gx, int gy, int w, int h, int x, int y,
-								    pixelModifier modifier, 
+								    pixelModifier modifier,
 									const uint32_t param,
 								    SDL_Surface *surface /*= TheScreen*/) const
 {
@@ -265,7 +265,7 @@ void CGraphic::DrawFrame(unsigned frame, int x, int y,
 **  @param y       y coordinate on the target surface
 **  @param surface target surface
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, 
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y,
 							 SDL_Surface *surface /*= TheScreen*/) const
 {
 	DrawSubClip(frame_map[frame].x, frame_map[frame].y,
@@ -279,15 +279,15 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha,
 				 Width, Height, x, y, alpha, surface);
 }
 
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, 
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha,
 								  SDL_Surface *surface /* = TheScreen*/) const
 {
 	DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 					 Width, Height, x, y, alpha, surface);
 }
 
-void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y, 
-									  pixelModifier modifier, 
+void CGraphic::DrawFrameClipCustomMod(unsigned frame, int x, int y,
+									  pixelModifier modifier,
 									  const uint32_t param,
 									  SDL_Surface *surface /* = TheScreen*/) const
 {
@@ -953,8 +953,6 @@ void CGraphic::SetOriginalSize()
 	if (!Resized) {
 		return;
 	}
-
-	
 	if (Surface) {
 		FreeSurface(&Surface);
 		Surface = nullptr;
@@ -979,7 +977,7 @@ void CGraphic::SetOriginalSize()
 **  Add additional frames to the end of this graphic set
 **
 **  @param frames  Vector of frame-sized SDL surfaces with frames to add
-**  
+**
 */
 void CGraphic::AppendFrames(const sequence_of_images &frames)
 {
@@ -987,7 +985,7 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 
 	uint16_t currFrame = this->NumFrames;
 	ExpandFor(frames.size());
-	
+
 	for (auto &frame : frames) {
 		SDL_Rect dstRect { frame_map[currFrame].x, frame_map[currFrame].y, Width, Height };
 		SDL_BlitSurface(frame.get(), nullptr, Surface, &dstRect);
@@ -999,7 +997,7 @@ void CGraphic::AppendFrames(const sequence_of_images &frames)
 **  Expand graphic set for certain number of frames
 **
 **  @param numOfFramesToAdd  Number of frames to add into the graphic set
-**  
+**
 */
 void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 {
@@ -1013,10 +1011,10 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 
 	const SDL_PixelFormat *pf = Surface->format;
 	const uint8_t bpp = Surface->format->BytesPerPixel;
-	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GraphicWidth, GraphicHeight, 
-													8 * bpp, 
-													pf->Rmask, 
-													pf->Gmask, 
+	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GraphicWidth, GraphicHeight,
+													8 * bpp,
+													pf->Rmask,
+													pf->Gmask,
 													pf->Bmask,
 													pf->Amask);
 	uint32_t ckey;
@@ -1046,7 +1044,7 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 	SDL_FreeSurface(Surface);
 	Surface = newSurface;
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
-	
+
 	GenFramesMap();
 }
 

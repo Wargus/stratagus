@@ -2352,7 +2352,7 @@ void UpdateUnitVariables(CUnit &unit)
 void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
 {
 	CUnitType &type = UnitTypeByIdent(ident);
-	
+
 	if (variable_key == "Costs") {
 		const int resId = GetResourceIdByName(variable_type);
 		type.MapDefaultStat.Costs[resId] = value;
@@ -2421,7 +2421,7 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 		return;
 	}
 	CUnitType &type = UnitTypeByIdent(ident);
-	
+
 	if (sound_type == "selected") {
 		type.MapSound.Selected.Name = sound;
 	} else if (sound_type == "acknowledge") {

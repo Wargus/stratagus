@@ -1502,7 +1502,7 @@ static int CclSlotUsage(lua_State *l)
 /**
 ** <b>Description</b>
 **
-**  Select a single unit 
+**  Select a single unit
 **
 **  @param l  Lua state.
 **
@@ -1566,7 +1566,7 @@ static int CclFindNextResource(lua_State *l)
 }
 
 /**
-**  Enable/disable simplified auto targeting 
+**  Enable/disable simplified auto targeting
 **
 **  @param l  Lua state.
 **
@@ -1579,7 +1579,7 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 	if (!IsNetworkGame()) {
 		GameSettings.SimplifiedAutoTargeting = isSimplified;
 	} else {
-		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB, 
+		NetworkSendExtendedCommand(ExtendedMessageAutoTargetingDB,
 								   int(isSimplified), 0, 0, 0, 0);
 	}
 	return 0;
@@ -1600,7 +1600,7 @@ static int CclEnableSimplifiedAutoTargeting(lua_State *l)
 static int CclTurnTowardsLocation(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
-	
+
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);

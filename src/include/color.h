@@ -82,11 +82,11 @@ private:
 
 /**
  * @brief A class to encode unit-variable dependent palette swaps.
- * 
+ *
  * This class encodes a range of colors that should be swapped based on
  * the current percentage of a unit variable, with a resolution of a
  * number of steps and a number of alternative colorings per step.
- * 
+ *
  * The colors most be laid out first by step, then alternative, then
  * color.
  */
@@ -96,7 +96,7 @@ public:
 	PaletteSwap(unsigned int variable, unsigned char colorStart, unsigned char colorCount, unsigned char steps, unsigned char alternatives, const std::vector<CColor> &colors);
 
 	const SDL_Color *GetColorsForPercentAndAlternative(unsigned int value, unsigned int max, unsigned int alt) const;
-	
+
 	unsigned int GetUnitVariableIndex() { return UnitVariableIndex; }
 	unsigned int GetColorIndexStart() { return ColorIndexStart; }
 	unsigned int GetColorCount() { return ColorCount; }

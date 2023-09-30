@@ -188,11 +188,11 @@ void InitUserInterface()
 		const uint16_t uiMapAreaHeight = UI.MapArea.EndY - UI.MapArea.Y;
 		uint16_t xAlign = 0;
 		uint16_t yAlign = 0;
-		
+
 		if (mapWidthInPixels < uiMapAreaWidth) {
 			xAlign = (uiMapAreaWidth - mapWidthInPixels) / 2;
 			UI.MapArea.X += xAlign;
-		}	
+		}
 		if (mapHeightInPixels < uiMapAreaHeight) {
 			yAlign = (uiMapAreaHeight - mapHeightInPixels) / 2;
 			UI.MapArea.Y += yAlign;

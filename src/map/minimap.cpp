@@ -54,7 +54,7 @@
 ----------------------------------------------------------------------------*/
 
 /// integer scale factor
-static constexpr int MINIMAP_FAC           {16 * 3};  
+static constexpr int MINIMAP_FAC           {16 * 3};
 /// unit attacked are shown red for at least this amount of cycles
 static constexpr int ATTACK_RED_DURATION   {1 * CYCLES_PER_SECOND};
 /// unit attacked are shown blinking for this amount of cycles
@@ -144,10 +144,10 @@ void CMinimap::Create()
 	MinimapFogSurface 	  = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, AMASK);
 
     SDL_SetSurfaceBlendMode(MinimapFogSurface, SDL_BLENDMODE_BLEND);
-	
+
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
 	SDL_FillRect(MinimapFogSurface, nullptr, fogColorSolid);
-	
+
 	UpdateTerrain();
 
 	NumMinimapEvents = 0;
@@ -217,13 +217,13 @@ void CMinimap::UpdateTerrain()
 }
 
 
-/** 
+/**
 ** Set fog of war opacity (alpha chanel values) for different levels of visibility
-** 
+**
 ** @param explored  alpha channel value for explored tiles
 ** @param revealed  alpha channel value for revealed tiles (when the map revealed)
 ** @param unseen    alpha channel value for unseen tiles
-** 
+**
 */
 void CMinimap::SetFogOpacityLevels(const uint8_t explored, const uint8_t revealed, const uint8_t unseen)
 {
@@ -397,10 +397,10 @@ void CMinimap::Update()
 			for (uint16_t mx = 0; mx < W; ++mx) {
 
 				const Vec2i tilePos(Minimap2MapX[mx], Minimap2MapY[my] / Map.Info.MapWidth);
-				const uint8_t vis = FogOfWar->GetVisibilityForTile(tilePos); 
+				const uint8_t vis = FogOfWar->GetVisibilityForTile(tilePos);
 
 				const uint32_t fogAlpha = vis == 0 ? (GameSettings.RevealMap != MapRevealModes::cHidden ? Settings.FogRevealedOpacity : Settings.FogUnseenOpacity)
-											   	   : vis == 1 ? Settings.FogExploredOpacity 
+											   	   : vis == 1 ? Settings.FogExploredOpacity
 										   		   			  : Settings.FogVisibleOpacity;
 
 				minimapFog[index++] = fogColorSDL | (fogAlpha << ASHIFT);

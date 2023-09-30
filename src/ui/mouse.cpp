@@ -673,7 +673,6 @@ void DoRightButton(const PixelPos &mapPixelPos)
 			for (auto i = 0; i < sz; ++i) {
 				auto unit = Selected[i];
 				auto unitTilePos = unit->tilePos;
-				
 				auto targetPosForUnit = pos + (unitTilePos - center);
 				Map.Clamp(targetPosForUnit);
 				if (targetPosForUnit != unitTilePos) {
@@ -1377,7 +1376,7 @@ static int SendResource(const Vec2i &pos)
 						&& unit.Type->ResInfo[res]->TerrainHarvester
 						&& mf.playerInfo.IsExplored(*unit.Player)
 						/// By disabling this, we allow the harvester to find the nearest tile with a resource by itself, in case mf is empty.
-						/*&& mf.IsTerrainResourceOnMap(res)*/ 
+						/*&& mf.IsTerrainResourceOnMap(res)*/
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
 						SendCommandResourceLoc(unit, pos, flush);

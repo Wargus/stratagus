@@ -68,7 +68,7 @@ private:
 
 private:
     uint8_t  CurrentStep    {0};
-    uint8_t  EasingStepsNum {0}; 
+    uint8_t  EasingStepsNum {0};
     uint16_t Width          {0};
     uint16_t Height         {0};
     size_t   TextureSize    {0}; // Width * Height
@@ -87,14 +87,14 @@ class CBlurer
 public:
     void Init(const uint16_t textureWidth, const uint16_t textureHeight, const float radius, const int numOfIterations);
     void PrecalcParameters(const float radius, const int numOfIterations);
-    
+
     void Clean();
     void Blur(uint8_t *const texture);
 private:
     void ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius);
 
 private:
-    float   Radius          {2}; /// From 1 to 3 is optimal. With 3 result is very smooth, 
+    float   Radius          {2}; /// From 1 to 3 is optimal. With 3 result is very smooth,
                                  /// but it opens about 1/2 extra tiles around SightRange circle
     uint8_t NumOfIterations {3}; /// 2-3 is optimal, with higher values result enhancing not so radicaly
 
@@ -108,19 +108,17 @@ private:
 inline uint8_t CEasedTexture::GetPixel(const uint16_t x, const uint16_t y)
 {
     const size_t textureIndex = y * Width + x;
-    
+
     if (CurrentStep == 0 || CurrentStep == EasingStepsNum) {
         const uint8_t currFrame = CurrentStep ? Curr : Prev;
         const uint8_t *curr     = Frames[currFrame].data();
-       
+
         return curr[textureIndex];
-    
     } else {
         const uint8_t *prev   = Frames[Prev].data();
         const int16_t *deltas = Deltas.data();
 
         return prev[textureIndex] + deltas[textureIndex] * CurrentStep;
-    
     }
 }
 

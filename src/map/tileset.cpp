@@ -225,10 +225,10 @@ void CTileset::clear()
 	memset(orcWallTable, 0, sizeof(orcWallTable));
 }
 
-bool CTileset::setTileCount(const size_t newCount) 
+bool CTileset::setTileCount(const size_t newCount)
 {
-	if (newCount < tiles.size() || newCount >= (1 << (sizeof(tile_index) * 8))) { 
-		return false; 
+	if (newCount < tiles.size() || newCount >= (1 << (sizeof(tile_index) * 8))) {
+		return false;
 	}
 	tiles.resize(newCount);
 	return true;
@@ -426,7 +426,7 @@ int32_t CTileset::findTilePath(int base, int goal, int length, std::vector<char>
 	// Find any mixed tile
 	int32_t l = TILE_PATH_MAX;
 	const size_t tilesCount = getTileCount();
-	
+
 	for (size_t i = 0; i != tilesCount && i <= 0x09D0;) { /// FIXME: 'i <= 0x09D0' is a temporary hack, so this loop works only for base tileset
 		int j = 0;
 		if (base == tiles[i].tileinfo.BaseTerrain) {

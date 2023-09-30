@@ -140,11 +140,11 @@ void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const u
 {
     size_t trgIndex     = y0 * trgWidth + x0;
     size_t textureIndex = srcRect.y * Width + srcRect.x;
-   
+
     if (CurrentStep == 0 || CurrentStep == EasingStepsNum) {
         const uint8_t currFrame = CurrentStep ? Curr : Prev;
         const uint8_t *curr     = Frames[currFrame].data();
-  
+
         for (uint16_t y = 0; y < srcRect.h; y++) {
             std::copy_n(&curr[textureIndex], srcRect.w, &target[trgIndex]);
             textureIndex += Width;
@@ -167,8 +167,8 @@ void CEasedTexture::DrawRegion(uint8_t *target, const uint16_t trgWidth, const u
 **  Calculate deltas between next and current frames
 **
 */
-void CEasedTexture::CalcDeltas() 
-{ 
+void CEasedTexture::CalcDeltas()
+{
     const uint8_t *curr   = Frames[Curr].data();
     const uint8_t *next   = Frames[Next].data();
 
@@ -176,7 +176,7 @@ void CEasedTexture::CalcDeltas()
     {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
+
         const size_t lBound = TextureSize * (thisThread    ) / numOfThreads;
         const size_t uBound = TextureSize * (thisThread + 1) / numOfThreads;
 
@@ -217,15 +217,15 @@ void CBlurer::PrecalcParameters(const float radius, const int numOfIterations)
     Radius          = radius;
     NumOfIterations = numOfIterations;
 
-    if (Radius * NumOfIterations == 0) { 
-        return; 
+    if (Radius * NumOfIterations == 0) {
+        return;
     }
 
     const float D = sqrt((12.0 * radius * radius  / numOfIterations) + 1);
-    uint8_t dL = floor(D);  
+    uint8_t dL = floor(D);
     if (dL % 2 == 0) { dL--; }
     const uint8_t dU = dL + 2;
-				
+
     const float M = (12.0 * radius * radius - numOfIterations * dL * dL - 4 * numOfIterations * dL - 3 * numOfIterations) / (-4 * dL - 4);
     const uint8_t m = round(M);
 
@@ -258,7 +258,7 @@ void CBlurer::Clean()
 void CBlurer::Blur(uint8_t *const texture)
 {
     if (Radius * NumOfIterations == 0) { return; }
-    
+
     uint8_t *source = texture;
     uint8_t *target = WorkingTexture.data();
 
@@ -268,7 +268,7 @@ void CBlurer::Blur(uint8_t *const texture)
             source = target;
             target = swap;
         }
-        ProceedIteration(source, target, HalfBoxes[i]); 
+        ProceedIteration(source, target, HalfBoxes[i]);
     }
     if (target != texture) {
         std::copy(WorkingTexture.begin(), WorkingTexture.end(), texture);
@@ -286,28 +286,28 @@ void CBlurer::Blur(uint8_t *const texture)
 void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
 {
     constexpr uint32_t fixedOneHalf = 32768; // 0.5
-    
+
     std::copy_n(&source[0], WorkingTexture.size(), target);
 
     uint8_t *swap = source;
     source = target;
-    target = swap; 
+    target = swap;
 
     /// *fixed point math
     const uint32_t iarr = (1 << 16) / (2 * radius + 1);
-    
+
     /// Horizontal blur pass
     #pragma omp parallel
     {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
+
         const uint16_t lBound = TextureHeight * (thisThread    ) / numOfThreads;
         const uint16_t uBound = TextureHeight * (thisThread + 1) / numOfThreads;
 
         for (uint16_t i = lBound; i < uBound; i++) {
 
-            size_t ti = size_t(i) * TextureWidth; 
+            size_t ti = size_t(i) * TextureWidth;
             size_t li = ti;
             size_t ri = ti + radius;
 
@@ -315,11 +315,11 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
             const uint8_t rightBorder = source[ti + TextureWidth - 1];
                   int16_t sum         = int16_t(radius + 1) * leftBorder;
 
-            for (uint16_t j = 0; j < radius; j++) { 
-                sum += source[ti + j]; 
+            for (uint16_t j = 0; j < radius; j++) {
+                sum += source[ti + j];
             }
             for (uint16_t j = 0; j <= radius; j++) {
-                sum += source[ri++] - leftBorder; 
+                sum += source[ri++] - leftBorder;
                 target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
             }
             for (uint16_t j = radius + 1; j < TextureWidth - radius; j++) {
@@ -327,7 +327,7 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
                 target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
             }
             for (uint16_t j = TextureWidth - radius; j < TextureWidth; j++) {
-                sum += rightBorder - source[li++];   
+                sum += rightBorder - source[li++];
                 target[ti++] = (iarr * sum + fixedOneHalf) >> 16;
             }
         }
@@ -335,14 +335,14 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
 
     swap = source;
     source = target;
-    target = swap;  
+    target = swap;
 
     /// Vertical blur pass
     #pragma omp parallel
     {
         const uint16_t thisThread   = omp_get_thread_num();
         const uint16_t numOfThreads = omp_get_num_threads();
-        
+
         const uint16_t lBound = TextureWidth * (thisThread    ) / numOfThreads;
         const uint16_t uBound = TextureWidth * (thisThread + 1) / numOfThreads;
 
@@ -359,20 +359,20 @@ void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t r
             for (uint16_t j = 0; j < radius; j++) {
                 sum += source[ti + j * TextureWidth];
             }
-            for (uint16_t j = 0; j <= radius ; j++) { 
+            for (uint16_t j = 0; j <= radius ; j++) {
                 sum += source[ri] - leftBorder;
                 target[ti] = (iarr * sum + fixedOneHalf) >> 16;
                 ri += TextureWidth;
                 ti += TextureWidth;
             }
-            for (uint16_t j = radius + 1; j < TextureHeight - radius; j++) { 
+            for (uint16_t j = radius + 1; j < TextureHeight - radius; j++) {
                 sum += source[ri] - source[li];
                 target[ti] = (iarr * sum + fixedOneHalf) >> 16;
                 li += TextureWidth;
                 ri += TextureWidth;
                 ti += TextureWidth;
             }
-            for (uint16_t j = TextureHeight - radius; j < TextureHeight; j++) { 
+            for (uint16_t j = TextureHeight - radius; j < TextureHeight; j++) {
                 sum += rightBorder - source[li];
                 target[ti] = (iarr * sum + fixedOneHalf) >> 16;
                 li += TextureWidth;

@@ -863,7 +863,7 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	mappath /= path;
 	delete[] path;
 
-	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary); 
+	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary);
 	if (!mapfile.is_open()) {
 		networkState.State = ccs_badmap;
 		fprintf(stderr, "Could not open %s for appending map data\n", mappath.u8string().c_str());
@@ -1319,7 +1319,7 @@ void CServer::Parse_Waiting(const int h)
 		/* Fall through */
 		case ccs_needmap: // client has finished receiving the map and wants the info again
 			networkStates[h].State = ccs_connected;
-			networkStates[h].MsgCnt = 0;		
+			networkStates[h].MsgCnt = 0;
 		/* Fall through */
 		case ccs_connected: {
 			// this code path happens until client acknowledges the map
@@ -1717,7 +1717,7 @@ void NetworkServerStartGame()
 	printf("INITIAL ServerSetupState:\n");
 	NetPlayers = 0;
 	int compPlayers = ServerSetupState.ServerGameSettings.Opponents;
-	
+
 	// most game settings are already fine, that is, they are on default. however, for human player slots, we need
 	// to adapt the game settings from their defaults to either set the type to person if a human player is assigned,
 	// computer if an AI player is assigned, or nobody if the slot will not be used in this game.

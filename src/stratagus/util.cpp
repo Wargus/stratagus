@@ -94,7 +94,7 @@ int SyncRand()
 	val = SyncRandSeed >> 16;
 
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
-	
+
 	if (EnableDebugPrint) {
 		fprintf(stderr, "GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
 		print_backtrace(8);

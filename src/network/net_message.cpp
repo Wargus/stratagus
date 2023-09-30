@@ -340,7 +340,6 @@ void CServerSetup::Save(const std::function <void (std::string)>& f) {
 					break;
 				}
 			}
-			
 		}
 		f("\n");
 	}

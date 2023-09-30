@@ -53,8 +53,6 @@ void AiCheckMagic()
 	CPlayer &player = *AiPlayer->Player;
 
 	for (CUnit *unit : player.GetUnits()) {
-		
-
 		if (!unit->Type->CanCastSpell.empty()) {
 			// Check only idle magic units
 			for (const auto *order : unit->Orders) {

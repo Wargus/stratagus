@@ -257,7 +257,7 @@ bool IsRestart;                  /// if true, the game skips some things like ti
 std::vector<std::string> OriginalArgv;
 
 #ifdef DEBUG
-bool IsDebugEnabled {true};      /// Is debug enabled? Flag to pass into lua code. 
+bool IsDebugEnabled {true};      /// Is debug enabled? Flag to pass into lua code.
 #else
 bool IsDebugEnabled {false};     /// Is debug enabled? Flag to pass into lua code.
 #endif

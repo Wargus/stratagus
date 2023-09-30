@@ -38,7 +38,7 @@
 #include "unit_manager.h"
 #include "unittype.h"
 #include "util.h"
- 
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -47,11 +47,11 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/** 
+/**
 ** Select which type of Field of View to use
-** 
+**
 ** @param fov_type	type to set
-** @return true if success, false for wrong fov_type 
+** @return true if success, false for wrong fov_type
 */
 bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 {
@@ -60,8 +60,8 @@ bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 		MapRefreshUnitsSight(true);
 
 		GameSettings.FoV = fov_type;
-		
-		/// Mark sight with new fov type for all units 
+
+		/// Mark sight with new fov type for all units
 		MapRefreshUnitsSight();
 		return true;
 	} else {
@@ -69,9 +69,9 @@ bool CFieldOfView::SetType(const FieldOfViewTypes fov_type)
 	}
 }
 
-/** 
-** Returns used type of Field of View 
-** 
+/**
+** Returns used type of Field of View
+**
 ** @return current Field of View type
 */
 FieldOfViewTypes CFieldOfView::GetType() const
@@ -79,9 +79,9 @@ FieldOfViewTypes CFieldOfView::GetType() const
 	return GameSettings.FoV;
 }
 
-/** 
+/**
 ** Set additional opaque map field flags (which terrains will be opaque)
-** 
+**
 ** @param flags	Terrain flags to set as opaque (MapField*)
 */
 void CFieldOfView::SetOpaqueFields(const uint16_t flags)
@@ -92,14 +92,14 @@ void CFieldOfView::SetOpaqueFields(const uint16_t flags)
 
 		this->Settings.OpaqueFields = flags;
 
-		/// Mark sight with new fov type for all units 
+		/// Mark sight with new fov type for all units
 		MapRefreshUnitsSight();
 	}
 }
 
-/** 
+/**
 ** Returns current set of opaque map field flags
-** 
+**
 ** @return Set of terrain flags
 */
 uint16_t CFieldOfView::GetOpaqueFields() const
@@ -107,9 +107,9 @@ uint16_t CFieldOfView::GetOpaqueFields() const
 	return this->Settings.OpaqueFields;
 }
 
-/** 
+/**
 ** Reset opaque map field flags to default (MapfieldOpaque)
-** 
+**
 */
 void CFieldOfView::ResetAdditionalOpaqueFields()
 {
@@ -127,7 +127,7 @@ void CFieldOfView::ResetAdditionalOpaqueFields()
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width, 
+void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i &pos, const uint16_t width,
 							const uint16_t height, const uint16_t range, MapMarkerFunc *marker)
 {
 	/// FIXME: sometimes when quit from game this assert is triggered
@@ -162,8 +162,8 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 **  @param range   Radius to mark (sight range)
 **  @param marker  Function to mark or unmark sight
 */
-void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, 
-									   const int16_t w, const int16_t h, const int16_t range, 
+void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos,
+									   const int16_t w, const int16_t h, const int16_t range,
 									   MapMarkerFunc *marker) const
 {
 	// Up hemi-cyle
@@ -219,7 +219,7 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 													if (width == 1) { return cOneTiled; }
 													if (width % 2)  { return cOdd; 		}
 													else            { return cEven; 	}
-												} 
+												}
 												if (width > height) { return cWide; 	}
 												else                { return cTall; 	}
 											}();
@@ -291,7 +291,7 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 }
 
 /**
-**  Calc field of view for set of lines along x or y. 
+**  Calc field of view for set of lines along x or y.
 **	Used for calc part of FoV for assymetric (widht != height) spectators.
 **
 **  @param octant	Current work octant
@@ -308,7 +308,7 @@ void CFieldOfView::ProceedRaysCast(const uint8_t octant, const Vec2i &origin, co
 			const bool isOnMap = SetCurrentTile(col, row);
 			if (isOnMap) {
 				MarkTile();
-			} 
+			}
 			if (!isOnMap || IsTileOpaque()) { break; }
 		}
 	}

@@ -150,12 +150,12 @@ static gcn::DropDown	*overlaysDropdown	{nullptr};
 */
 static void EditTile(const Vec2i &pos, int tile)
 {
- 	Assert(Map.Info.IsPointOnMap(pos));	
+ 	Assert(Map.Info.IsPointOnMap(pos));
 
 	const CTileset &tileset = *Map.Tileset;
 
 	CMapField &mf = *Map.Field(pos);
-	
+
 	int32_t baseTileIndex = tileset.findTileIndexByTile(tile);
 	if (baseTileIndex <= 0) {
 		// use the tile under the cursor and randomize *that* if it's
@@ -520,7 +520,7 @@ static std::vector<int> getButtonArea() {
 
 /**
  * Call the forEach callback with each player icon's <playerNum,x,y,w,h>. Return false to cancel iteration.
- * 
+ *
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
  * iteration was requested.
  */
@@ -528,7 +528,7 @@ static bool forEachPlayerSelectionBoxArea(std::function<bool(int, int, int, int,
 	int x = getSelectionArea()[0];
 	int y = getSelectionArea()[1];
 	int x2 = getSelectionArea()[2];
-	int y2 = getSelectionArea()[3];	
+	int y2 = getSelectionArea()[3];
 	int maxX = x2 - getPlayerButtonSize();
 	int maxY = y2 - getPlayerButtonSize();
 
@@ -564,9 +564,11 @@ static void DrawPlayers()
 
 		// if player exists, draw player color 2px inside highlight
 		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
-			Video.FillRectangle(
-				PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0], 
-				x + 2, y + 2, getPlayerButtonSize() - 2, getPlayerButtonSize() - 2);
+			Video.FillRectangle(PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0],
+			                    x + 2,
+			                    y + 2,
+			                    getPlayerButtonSize() - 2,
+			                    getPlayerButtonSize() - 2);
 		}
 
 		// Draw green rectangle around selected player
@@ -745,7 +747,7 @@ static void DrawTileOptions() {
 
 /**
  * Call the forEach callback with each tile's <EditorTileIndex,x,y,w,h>. Return false to cancel iteration.
- * 
+ *
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
  * iteration was requested.
  */
@@ -796,7 +798,7 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 **  Draw tile icons.
 */
 static void DrawTileIcons()
-{	
+{
 	forEachTileIconArea([](int i, int x, int y, int w, int h) {
 		const unsigned int tile = Editor.ShownTileTypes[i];
 
@@ -836,7 +838,7 @@ static void DrawIntoSelectionArea()
 static void DrawIntoButtonArea()
 {
 	switch (Editor.State) {
-		case EditorStateType::EditTile:			
+		case EditorStateType::EditTile:
 			DrawTileIcons();
 			break;
 		case EditorStateType::EditUnit:
@@ -850,8 +852,10 @@ static void DrawIntoButtonArea()
 static void DrawInfoHighlightedOverlay()
 {
 	if (overlaysDropdown->getSelected() == EditorOverlays::cElevation) {
-		CLabel(GetGameFont()).Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5, 2, 
-								   Editor.HighlightElevationLevel);
+		CLabel(GetGameFont())
+			.Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5,
+		          2,
+		          Editor.HighlightElevationLevel);
 	}
 }
 
@@ -1246,7 +1250,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				}
 			}
 		}
-		
+
 		if (MouseButtons & RightButton) {
 			Editor.SelectedTileIndex = -1;
 			return;
@@ -1541,16 +1545,14 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		case ']': /// Increace highlighted elevation level
-			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
-				&& Editor.HighlightElevationLevel < 255) {
-				
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation
+			    && Editor.HighlightElevationLevel < 255) {
 				Editor.HighlightElevationLevel++;
 			}
 			break;
 		case '[': /// Decreace highlighted elevation level
-			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation 
-				&& Editor.HighlightElevationLevel > 0) {
-				
+			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation
+			    && Editor.HighlightElevationLevel > 0) {
 				Editor.HighlightElevationLevel--;
 			}
 			break;
@@ -2114,7 +2116,7 @@ void EditorMainLoop()
 					std::string entry = Editor.UnitTypes[i];
 					if (startIndex == 0) {
 						if (entry.find(selectedString, 2) != std::string::npos) {
-							startIndex = i + 1;	
+							startIndex = i + 1;
 						}
 					} else {
 						if (entry.rfind("--", 0) != std::string::npos) {
@@ -2166,7 +2168,7 @@ void EditorMainLoop()
 				Editor.OverlayHighlighter = OverlayOpaque;
 				return;
 			default:
-				Editor.OverlayHighlighter = nullptr;			
+				Editor.OverlayHighlighter = nullptr;
 				break;
 		}
 
@@ -2181,7 +2183,7 @@ void EditorMainLoop()
 	overlaysDropdown->setWidth(overlaysWidth);
 	overlaysDropdown->getScrollArea()->setWidth(overlaysWidth);
 	overlaysDropdown->getListBox()->setWidth(overlaysWidth);
-	
+
 	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));
 	overlaysDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
@@ -2296,7 +2298,7 @@ void EditorMainLoop()
 	delete toolDropdown;
 	delete toolList;
 	delete toolDropdownListener;
-		
+
 	delete overlaysDropdown;
 	delete overlaysList;
 	delete overlaysDropdownListener;

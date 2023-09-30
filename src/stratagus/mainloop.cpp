@@ -58,12 +58,12 @@
 void DrawGuichanWidgets();
 
 
-enum CallPeriod { cEvery2nd   = 0b1, 
-				  cEvery4th   = 0b11, 
-				  cEvery8th   = 0b111, 
-				  cEvery16th  = 0b1111, 
-				  cEvery32nd  = 0b11111, 
-				  cEvery64th  = 0b111111, 
+enum CallPeriod { cEvery2nd   = 0b1,
+				  cEvery4th   = 0b11,
+				  cEvery8th   = 0b111,
+				  cEvery16th  = 0b1111,
+				  cEvery32nd  = 0b11111,
+				  cEvery64th  = 0b111111,
 				  cEvery128th = 0b1111111,
 				  cEvery256th = 0b11111111 };
 
@@ -309,7 +309,7 @@ static void GameLogicLoop()
 				}
 			}
 		}
-		
+
 		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && !IsReplayGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_SECOND * 60 * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes (default is 5), if the option is enabled
 		//Wyrmgus end
 			UI.StatusLine.Set(_("Autosave"));

@@ -751,7 +751,6 @@ static std::string FormatNumber(const int number)
 	if (number < 0) {
 		str.insert(0, 1, '-');
 	}
-	
 	return str;
 }
 

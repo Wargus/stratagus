@@ -32,7 +32,7 @@ def mustrebuild(srcfile, dstfile):
     if not os.path.isfile(dstfile):
         return 1
     return os.stat(srcfile).st_mtime > os.stat(dstfile).st_mtime
-    
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         print argv[0], 'works with the current directory, it takes no arguments.'

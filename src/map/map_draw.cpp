@@ -283,7 +283,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 		graphicTileOffset = 1;
 		canShortcut = (GameSettings.RevealMap == MapRevealModes::cHidden || FogOfWar->GetType() == FogOfWarTypes::cTiledLegacy)
 					  && FogOfWar->GetType() != FogOfWarTypes::cEnhanced
-					  && !ReplayRevealMap; 
+					  && !ReplayRevealMap;
 	}
 
 	while (sy < 0) {
@@ -515,7 +515,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 		}
 		ParticleManager.endDraw();
 	}
-	
+
 	/// Draw Fog of War
 	this->DrawMapFogOfWar();
 

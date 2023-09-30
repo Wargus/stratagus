@@ -836,7 +836,7 @@ static void InputKey(int key)
 	switch (key) {
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: { // RETURN
-			removeCursorFromInput();		
+			removeCursorFromInput();
 			// save to history
 			strncpy(InputHistory + (InputHistoryIdx * sizeof(Input)), Input, sizeof(Input));
 			if (InputHistorySize < MaxInputHistorySize - 1) {
