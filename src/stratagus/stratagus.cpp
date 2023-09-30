@@ -181,15 +181,12 @@ extern void beos_init(int argc, char **argv);
 #undef Button
 #endif
 
-#include "SDL.h"
-
 #include "stratagus.h"
 
 #include "ai.h"
 #include "editor.h"
 #include "filesystem.h"
 #include "game.h"
-#include "guichan.h"
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -211,6 +208,9 @@ extern void beos_init(int argc, char **argv);
 #include "util.h"
 
 #include "missile.h" //for FreeBurningBuildingFrames
+
+#include <SDL.h>
+#include <guichan.h>
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>

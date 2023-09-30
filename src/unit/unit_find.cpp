@@ -775,13 +775,13 @@ public:
 	{
 		good = new std::vector<int>(size * size, 0);
 		bad = new std::vector<int>(size * size, 0);
-	};
+	}
 
 	~BestRangeTargetFinder()
 	{
 		delete good;
 		delete bad;
-	};
+	}
 
 	class FillBadGood
 	{

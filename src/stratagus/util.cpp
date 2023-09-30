@@ -38,7 +38,7 @@
 
 #include "util.h"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #include <ctype.h>
 #include <errno.h>

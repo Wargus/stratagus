@@ -7,7 +7,7 @@
 
 class OnlineContext {
 public:
-    virtual ~OnlineContext() { };
+	virtual ~OnlineContext() = default;
 
     // called in the sdl event loop
     virtual bool handleUDP(const unsigned char *buffer, int len, CHost host) = 0;

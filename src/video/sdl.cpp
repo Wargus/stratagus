@@ -54,8 +54,8 @@
 #include <sys/stat.h>
 #endif
 
-#include "SDL.h"
-#include "SDL_syswm.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
 
 #ifdef USE_BEOS
 #include <sys/socket.h>

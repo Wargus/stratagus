@@ -41,7 +41,6 @@
 #include "tileset.h"
 #include "cursor.h"
 #include "font.h"
-#include "input.h"
 #include "stratagus.h"
 #include "ui.h"
 #include "video.h"
@@ -55,6 +54,8 @@
 #include "version.h"
 
 #include "./xsha1.h"
+
+#include <guichan/input.h>
 
 static void dump(uint8_t* buffer, int received_bytes) {
     std::cout << "Raw contents >>>" << std::endl;
@@ -87,11 +88,8 @@ static void dump(uint8_t* buffer, int received_bytes) {
 
 class BNCSInputStream {
 public:
-    BNCSInputStream(CTCPSocket *socket) {
-        this->sock = socket;
-        this->messageLength = -1;
-    };
-    ~BNCSInputStream() {};
+	explicit BNCSInputStream(CTCPSocket *socket) : sock(socket) {}
+	~BNCSInputStream() = default;
 
     std::string readString() {
         if (buffer.empty()) {
@@ -109,7 +107,7 @@ public:
             }
         }
         return strstr.str();
-    };
+    }
 
     std::vector<std::string> readStringlist() {
         std::vector<std::string> stringlist;
@@ -122,7 +120,7 @@ public:
             }
         }
         return stringlist;
-    };
+    }
 
     std::vector<std::string> readStringlist(int cnt) {
         std::vector<std::string> stringlist;
@@ -135,7 +133,7 @@ public:
             }
         }
         return stringlist;
-    };
+    }
 
     uint8_t read8() {
         if (buffer.empty()) {
@@ -213,17 +211,10 @@ public:
         }
     }
 
-    bool readBool8() {
-        return read8() != 0;
-    }
+    bool readBool8() { return read8() != 0; }
+	bool readBool32() { return read32() != 0; }
 
-    bool readBool32() {
-        return read32() != 0;
-    }
-
-    uint64_t readFiletime() {
-        return read64();
-    }
+    uint64_t readFiletime() { return read64(); }
 
     /**
      * For debugging and development: read the entire thing as a char
@@ -247,7 +238,7 @@ public:
         strncpy(dt, (const char*)&data, 4);
         dt[4] = '\0';
         return std::string(dt);
-    };
+    }
 
     /**
      * To be called at the start of a message, gets the entire data into memory or returns -1.
@@ -301,7 +292,7 @@ public:
             }
         }
         return messageId;
-    };
+    }
 
     void debugDump() {
         if (EnableDebugPrint) {
@@ -322,11 +313,10 @@ public:
     }
 
 private:
-
-    CTCPSocket *sock;
+    CTCPSocket *sock = nullptr;
     std::queue<uint8_t> buffer;
-    int32_t messageLength;
-    uint8_t messageId;
+    int32_t messageLength = -1;
+    uint8_t messageId = -1;
 };
 
 class BNCSOutputStream {
@@ -349,55 +339,52 @@ public:
             this->length_pos = pos;
         }
         serialize16((uint16_t)0);
-    };
+    }
 
-    ~BNCSOutputStream() {
-    };
+    ~BNCSOutputStream() = default;
 
     void serialize32(uint32_t data) {
         ensureSpace(sizeof(data));
         uint32_t val = htonl(data);
         memcpy(buf + pos, &val, sizeof(val));
         pos += sizeof(data);
-    };
+    }
     void serialize32NativeByteOrder(uint32_t data) {
         ensureSpace(sizeof(data));
         memcpy(buf + pos, &data, sizeof(data));
         pos += sizeof(data);
-    };
+    }
     void serialize16(uint16_t data) {
         ensureSpace(sizeof(data));
         uint16_t val = htons(data);
         memcpy(buf + pos, &val, sizeof(val));
         pos += sizeof(data);
-    };
+    }
     void serialize8(uint8_t data) {
         ensureSpace(sizeof(data));
         *(buf + pos) = data;
         pos++;
-    };
+    }
     void serializeC32(const char* str) {
         assert(strlen(str) == 4);
         uint32_t value;
         memcpy(&value, str, 4);
         serialize32(value);
-    };
+    }
     void serialize(const char* str) {
         int len = strlen(str) + 1; // include nullptr byte
         ensureSpace(len);
         memcpy(buf + pos, str, len);
         pos += len;
-    };
+    }
 
-    int flush(CTCPSocket *sock) {
-        return sock->Send(getBuffer(), pos);
-    };
+	int flush(CTCPSocket *sock) { return sock->Send(getBuffer(), pos); }
 
     void flush(CUDPSocket *sock, CHost *host) {
         if (sock->IsValid()) {
             sock->Send(*host, getBuffer(), pos);
         }
-    };
+    }
 
 private:
     uint8_t *getBuffer() {
@@ -407,7 +394,7 @@ private:
             memcpy(buf + length_pos, &val, sizeof(val));
         }
         return buf;
-    };
+    }
 
     void ensureSpace(size_t required) {
         assert(pos + required < MAX_MSG_SIZE);
@@ -509,9 +496,7 @@ public:
 
     CHost getHost() { return host; }
 
-    bool isSavedGame() {
-        return !gameStats[0].empty();
-    };
+	bool isSavedGame() { return !gameStats[0].empty(); }
 
     std::tuple<int, int> mapSize() {
         if (gameStats[1].empty()) {
@@ -520,7 +505,7 @@ public:
         char w = gameStats[1].at(0);
         char h = gameStats[1].at(1);
         return {w * 32, h * 32};
-    };
+    }
 
     int maxPlayers() {
         if (gameStats[2].empty()) {
@@ -528,11 +513,9 @@ public:
         } else {
             return to_number(gameStats[2]) - 10;
         }
-    };
-
-    int getSpeed() {
-        return to_number(gameStats[3]);
     }
+
+    int getSpeed() { return to_number(gameStats[3]); }
 
     std::string getApproval() {
         if (to_number(gameStats[4]) == 0) {
@@ -586,19 +569,12 @@ public:
             break;
         }
         return result;
-    };
-
-    std::string getCreator() {
-        return gameStats[9];
-    };
-
-    std::string getMap() {
-        return gameStats[10];
-    };
-
-    bool isValid() {
-        return gameStats.size() > 10 && !gameStats[10].empty();
     }
+
+	std::string getCreator() { return gameStats[9]; }
+	std::string getMap() { return gameStats[10]; }
+
+	bool isValid() { return gameStats.size() > 10 && !gameStats[10].empty(); }
 
     std::string getGameStatus() {
         switch (gameStatus) {
@@ -752,7 +728,7 @@ class Context;
 
 class OnlineState {
 public:
-    virtual ~OnlineState() {};
+    virtual ~OnlineState() {}
     virtual void doOneStep(Context *ctx) = 0;
 
 protected:
@@ -837,7 +813,6 @@ public:
         defaultUserKeys.push_back("record\\GAME\\0\\disconnects");
         defaultUserKeys.push_back("record\\GAME\\0\\last game");
         defaultUserKeys.push_back("record\\GAME\\0\\last game result");
-
     }
 
     ~Context() {
@@ -848,17 +823,13 @@ public:
         delete host;
     }
 
-    bool isConnected() {
-        return state != nullptr && !getCurrentChannel().empty();
-    }
+	bool isConnected() { return state != nullptr && !getCurrentChannel().empty(); }
 
     bool isConnecting() {
         return !isDisconnected() && !isConnected() && !username.empty() && hasPassword;
     }
 
-    bool isDisconnected() {
-        return state == nullptr;
-    }
+	bool isDisconnected() { return state == nullptr; }
 
     // User and UI actions
     void disconnect() {
@@ -1328,13 +1299,8 @@ public:
         }
     }
 
-    void setCreateAccount(bool flag) {
-        createAccount = flag;
-    }
-
-    bool shouldCreateAccount() {
-        return createAccount;
-    }
+	void setCreateAccount(bool flag) { createAccount = flag; }
+	bool shouldCreateAccount() { return createAccount; }
 
     // Protocol
     CHost *getHost() { return host; }
@@ -1423,9 +1389,7 @@ public:
     LuaCallback *ShowUserInfo = nullptr;
 
 private:
-    std::string gameNameFromUsername(std::string username) {
-        return username + "'s game";
-    }
+	std::string gameNameFromUsername(std::string username) { return username + "'s game"; }
 
     OnlineState *state;
     CHost *host;
@@ -1627,7 +1591,7 @@ public:
     DisconnectedState(std::string message) {
         DebugPrint("Disconnecting: %s", message.c_str());
         this->message = message;
-    };
+    }
 
     virtual void doOneStep(Context *ctx) {
         std::cout << message << std::endl;
@@ -1636,7 +1600,6 @@ public:
     }
 
 private:
-    bool hasPrinted;
     std::string message;
 };
 

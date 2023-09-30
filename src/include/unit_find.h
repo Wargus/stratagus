@@ -49,7 +49,7 @@
 class CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return true; };
+	bool operator()(const CUnit *) const { return true; }
 };
 
 class NoFilter : public CUnitFilter

@@ -34,14 +34,14 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
-#include "SDL_image.h"
 
+#include "map.h"
+#include "script.h"
 #include "tileset.h"
 #include "tile.h"
-#include "map.h"
 #include "video.h"
 
-#include "script.h"
+#include <SDL_image.h>
 #include <cstring>
 #include <math.h>
 #include <set>

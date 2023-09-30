@@ -179,7 +179,7 @@ static inline void DrawHLine(void *pixels, unsigned int index,
 		PutPixelQuatro<BPP>(pixels, index, color);
 		index += 4;
 		width -= 4;
-	};
+	}
 	switch (width & 3) {
 		case 3:
 			PutPixel<BPP>(pixels, index, color);
@@ -362,7 +362,7 @@ class CRenderer : public CPrimitives
 		} else {
 			assert(0);
 		}
-	};
+	}
 
 	static inline void PutTransPixel128Double(void *pixels, const unsigned int index,
 											  const Uint32 color)
@@ -451,7 +451,7 @@ class CRenderer : public CPrimitives
 			PutTransPixel128Double(pixels, index, color);
 			index += 2;
 			width -= 2;
-		};
+		}
 #ifdef __x86_64__
 		if (width) { PutTransPixel128(pixels, index, color); }
 #endif
@@ -475,7 +475,7 @@ class CRenderer : public CPrimitives
 			PutTransPixelDouble(pixels, index, color, alpha);
 			index += 2;
 			width -= 2;
-		};
+		}
 #ifdef __x86_64__
 		if (width) { PutTransPixel(pixels, index, color, alpha); }
 #endif
@@ -490,7 +490,7 @@ class CRenderer : public CPrimitives
 		} else {
 			DrawTransHLineNon128(pixels, index, width, color, alpha);
 		}
-	};
+	}
 
 	void DrawPixel(Uint32 color, int x, int y)
 	{
@@ -498,7 +498,7 @@ class CRenderer : public CPrimitives
 		index *= y;
 		index += x;
 		DRAW::PutPixel<BPP>(TheScreen->pixels, index, color);
-	};
+	}
 
 	void DrawTransPixel(Uint32 color, int x, int y,  unsigned char alpha)
 	{
@@ -510,7 +510,7 @@ class CRenderer : public CPrimitives
 		} else {
 			PutTransPixel(TheScreen->pixels, index, color, alpha);
 		}
-	};
+	}
 
 	void DrawLine(Uint32 color, int sx, int sy, int dx, int dy)
 	{
@@ -626,7 +626,7 @@ class CRenderer : public CPrimitives
 				index += pitch;
 			}
 		}
-	};
+	}
 
 	void DrawTransLine(Uint32 color, int sx, int sy,
 					   int dx, int dy, unsigned char alpha)
@@ -652,7 +652,7 @@ class CRenderer : public CPrimitives
 				  h - 2, color); //(x, y + 1, h - 2)
 		DrawVLine(TheScreen->pixels, pitch, x + index + w - 1 + pitch,
 				  h - 2, color);	//x + w - 1, y + 1, h - 2
-	};
+	}
 
 	void DrawTransRectangle(Uint32 color, int x, int y,
 							int w, int h, unsigned char alpha)
@@ -676,7 +676,7 @@ class CRenderer : public CPrimitives
 					   h - 2, color, alpha); //(x, y + 1, h - 2)
 		DrawTransVLine(TheScreen->pixels, pitch, x + index + w - 1 + pitch,
 					   h - 2, color, alpha); //x + w - 1, y + 1, h - 2
-	};
+	}
 
 	void FillTransRectangle(Uint32 color, int x, int y,
 							int w, int h, unsigned char alpha)
@@ -694,7 +694,7 @@ class CRenderer : public CPrimitives
 				index += pitch;
 			} while (--h);
 		}
-	};
+	}
 
 	void DrawCircle(Uint32 color, int x, int y, int r)
 	{
@@ -727,7 +727,7 @@ class CRenderer : public CPrimitives
 				py -= 1;
 			}
 		}
-	};
+	}
 
 	void DrawTransCircle(Uint32 color, int x, int y,
 						 int r, unsigned char alpha)
@@ -761,7 +761,7 @@ class CRenderer : public CPrimitives
 				py -= 1;
 			}
 		}
-	};
+	}
 
 	void FillCircle(Uint32 color, int x, int y, int r)
 	{
@@ -815,7 +815,7 @@ class CRenderer : public CPrimitives
 				}
 			}
 		}
-	};
+	}
 
 	void FillTransCircle(Uint32 color, int x, int y,
 						 int r, unsigned char alpha)
@@ -870,7 +870,7 @@ class CRenderer : public CPrimitives
 				}
 			}
 		}
-	};
+	}
 
 };
 

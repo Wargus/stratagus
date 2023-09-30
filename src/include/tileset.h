@@ -35,19 +35,20 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-#include "SDL_image.h"
-#include "sdl2_helper.h"
 
-#include "util.h"
-#include "video.h"
-#include "vec2i.h"
 #include "script.h"
+#include "sdl2_helper.h"
+#include "util.h"
+#include "vec2i.h"
+#include "video.h"
+
 #include <string>
 #include <vector>
 #include <map>
 #include <queue>
 #include <set>
 
+#include <SDL_image.h>
 struct lua_State;
 
 using tile_index		= uint16_t;
@@ -344,15 +345,15 @@ public:
 		lua_rawgeti(luaStack, tablePos, argPos);
 		parseExtended(luaStack);
 		lua_pop(luaStack, 1);
-	}	
-	
-	bool hasIndexesOnly() const { return !Result.Indexes.empty(); };
+	}
+
+	bool hasIndexesOnly() const { return !Result.Indexes.empty(); }
 	bool isEmpty() const { return Result.Indexes.empty() && Result.Images.empty(); }
-	
+
 	graphic_index pullOutIndex() 
 	{
 		if (Result.Indexes.empty()) {
-			return 0;	
+			return 0;
 		}
 		const graphic_index index {Result.Indexes.front()};
 		Result.Indexes.pop();
@@ -433,8 +434,8 @@ public:
 			CGraphic::Free(SrcImgGraphic);
 		}
 	}
-	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; };
-	const sequence_of_images& getGraphic() const { return ExtGraphic; };
+	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; }
+	const sequence_of_images& getGraphic() const { return ExtGraphic; }
 
 	static std::vector<tile_index> parseDstRange(lua_State *luaStack, const int tablePos, const int argPos);
 	static std::vector<tile_index> parseTilesRange(lua_State *luaStack, const int parseFromPos = 1);

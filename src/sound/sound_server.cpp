@@ -48,8 +48,8 @@
 #include "iolib.h"
 #include "unit.h"
 
-#include "SDL.h"
-#include "SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 
 /*----------------------------------------------------------------------------

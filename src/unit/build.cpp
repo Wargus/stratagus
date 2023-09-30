@@ -159,21 +159,21 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
 						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
 							return true;
-						};
+						}
 					}
 					break;
 				case Equal :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
 							return true;
-						};
+						}
 					}
 					break;
 				case NotEqual :
 					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
 						if (Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y) {
 							return false;
-						};
+						}
 					}
 					break;
 			}

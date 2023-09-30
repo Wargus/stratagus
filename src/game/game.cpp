@@ -34,8 +34,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "SDL_image.h"
-
 #include "stratagus.h"
 
 #include "game.h"
@@ -76,6 +74,7 @@
 #include "version.h"
 #include "video.h"
 
+#include <SDL_image.h>
 
 extern void CleanGame();
 

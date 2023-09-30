@@ -466,7 +466,7 @@ class CBuildRestrictionHasUnit : public CBuildRestriction
 public:
 	CBuildRestrictionHasUnit() = default;
 
-	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
+	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); }
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Count = 0;
@@ -481,7 +481,7 @@ class CBuildRestrictionSurroundedBy : public CBuildRestriction
 public:
 	CBuildRestrictionSurroundedBy() = default;
 
-	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); };
+	void Init() override { this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName); }
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;

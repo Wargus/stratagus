@@ -30,10 +30,9 @@
 #ifndef __FOW_UTILS_H__
 #define __FOW_UTILS_H__
 
+#include <SDL.h>
 #include <cstdint>
 #include <vector>
-#include "SDL.h"
-
 
 //@{
 
