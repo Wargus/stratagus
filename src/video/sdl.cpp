@@ -533,17 +533,6 @@ void InitVideoSdl()
 }
 
 /**
-**  Check if a resolution is valid
-**
-**  @param w  Width
-**  @param h  Height
-*/
-int VideoValidResolution(int w, int h)
-{
-	return 1;
-}
-
-/**
 **  Invalidate some area
 **
 **  @param x  screen pixel X position.

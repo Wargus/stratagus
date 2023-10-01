@@ -475,22 +475,6 @@ static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 }
 
 /**
-**  Find unit-type in upgrade-to table.
-**
-**  @param type  Unit-type to be found.
-*/
-static int FindInUpgradeToRequests(const CUnitType *type)
-{
-	const size_t n = AiPlayer->UpgradeToRequests.size();
-	for (size_t i = 0; i < n; ++i) {
-		if (AiPlayer->UpgradeToRequests[i] == type) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-/**
 **  Append unit-type to request table.
 **
 **  @param type  Unit-type to be appended.
@@ -764,7 +748,7 @@ static int CclAiWait(lua_State *l)
 			}
 		}
 		// Look if we have an upgrade-to request.
-		if (FindInUpgradeToRequests(type)) {
+		if (ranges::contains(AiPlayer->UpgradeToRequests, type)) {
 			lua_pushboolean(l, 1);
 			return 1;
 		}

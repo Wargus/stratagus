@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <array>
+#include <optional>
 #include <vector>
 
 #include "upgrade_structs.h" // MaxCost
@@ -157,7 +158,7 @@ public:
 
 	void Attack(const Vec2i &pos);
 	void RemoveDeadUnit();
-	int PlanAttack();
+	bool PlanAttack();
 
 	void ReturnToHome();
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
@@ -207,14 +208,14 @@ public:
 	const AiForce &operator[](unsigned int index) const { return forces[index]; }
 	AiForce &operator[](unsigned int index) { return forces[index]; }
 
-	int getIndex(AiForce *force) const
+	int getIndex(const AiForce &force) const
 	{
 		for (unsigned int i = 0; i < forces.size(); ++i) {
-			if (force == &forces[i]) {
+			if (&force == &forces[i]) {
 				return i;
 			}
 		}
-		return -1;
+		throw std::runtime_error("Invalid force");
 	}
 
 	unsigned int getScriptForce(unsigned int index)
@@ -225,7 +226,7 @@ public:
 		return script[index];
 	}
 
-	int GetForce(const CUnit &unit);
+	std::optional<int> GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
 	bool Assign(CUnit &unit, int force = -1);
 	void Update();
@@ -442,7 +443,7 @@ extern void AiForceManager();
 // Plans
 //
 /// Find a wall to attack
-extern int AiFindWall(AiForce *force);
+extern bool AiFindWall(AiForce *force);
 /// Plan the an attack
 /// Send explorers around the map
 extern void AiSendExplorers();

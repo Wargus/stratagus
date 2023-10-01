@@ -273,11 +273,11 @@ extern void InitButtons();
 /// Free memory for buttons
 extern void CleanButtons();
 /// Make a new button
-extern int AddButton(int pos, int level, const std::string &IconIdent,
-					 ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
-					 const std::string &arg, const int key, const std::string &hint, const std::string &descr,
-					 const std::string &sound, const std::string &cursor, const std::string &umask,
-					 const std::string &popup, bool alwaysShow);
+extern void AddButton(int pos, int level, const std::string &IconIdent,
+					  ButtonCmd action, const std::string &value, void* payload, const ButtonCheckFunc func,
+					  const std::string &arg, const int key, const std::string &hint, const std::string &descr,
+					  const std::string &sound, const std::string &cursor, const std::string &umask,
+					  const std::string &popup, bool alwaysShow);
 // Check if the button is allowed for the unit.
 extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction);
 
@@ -296,9 +296,9 @@ extern void HandleMouseMove(const PixelPos &pos);
 extern void HandleMouseExit();
 
 /// Update KeyModifiers if a key is pressed
-extern int HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
+extern bool HandleKeyModifiersDown(unsigned keycode, unsigned keychar);
 /// Update KeyModifiers if a key is released
-extern int HandleKeyModifiersUp(unsigned keycode, unsigned keychar);
+extern bool HandleKeyModifiersUp(unsigned keycode, unsigned keychar);
 
 /// Called if a key is pressed
 extern void HandleKeyDown(unsigned keycode, unsigned keychar);
@@ -352,7 +352,7 @@ extern void UiTrackUnit();
 extern void SetScrollMargins(unsigned int top, unsigned int right, unsigned int bottom, unsigned int left);
 
 /// Handle cheats
-extern int HandleCheats(const std::string &input);
+extern bool HandleCheats(const std::string &input);
 
 /// Call the lua function HandleCommandKey
 bool HandleCommandKey(int key);

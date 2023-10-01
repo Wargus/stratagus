@@ -70,9 +70,8 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 				target->Summoned = GameCycle + 1;
 			}
 			if ((flags & SU_JoinToAIForce) && unit.Player->AiEnabled) {
-				int force = unit.Player->Ai->Force.GetForce(unit);
-				if (force != -1) {
-					unit.Player->Ai->Force[force].Insert(*target);
+				if (auto force = unit.Player->Ai->Force.GetForce(unit)) {
+					unit.Player->Ai->Force[*force].Insert(*target);
 					target->GroupId = unit.GroupId;
 					CommandDefend(*target, unit, FlushCommands);
 				}

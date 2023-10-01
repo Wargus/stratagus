@@ -183,7 +183,7 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 **
 **  @return       True if wall found.
 */
-int AiFindWall(AiForce *force)
+bool AiFindWall(AiForce *force)
 {
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
@@ -210,9 +210,9 @@ int AiFindWall(AiForce *force)
 				CommandMove(aiunit, wallPos, FlushCommands);
 			}
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 class ReachableTerrainMarker
@@ -342,7 +342,7 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 **  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-int AiForce::PlanAttack()
+bool AiForce::PlanAttack()
 {
 	CPlayer &player = *AiPlayer->Player;
 	DebugPrint("%d: Planning for force #%lu of player #%d\n",
@@ -369,7 +369,7 @@ int AiForce::PlanAttack()
 			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
 		} else {
 			DebugPrint("%d: No transporter available\n", player.Index);
-			return 0;
+			return false;
 		}
 	}
 
@@ -378,7 +378,7 @@ int AiForce::PlanAttack()
 	CUnit *landUnit = nullptr;
 	if (auto it = ranges::find_if(Units, CUnitTypeFinder(UnitTypeLand)); it == Units.end()) {
 		DebugPrint("%d: No land unit in force\n", player.Index);
-		return 0;
+		return false;
 	} else {
 		landUnit = *it;
 	}
@@ -386,7 +386,7 @@ int AiForce::PlanAttack()
 	Vec2i pos = this->GoalPos;
 
 	if (AiFindTarget(*landUnit, transporterTerrainTraversal, &pos)) {
-		const unsigned int forceIndex = AiPlayer->Force.getIndex(this) + 1;
+		const unsigned int forceIndex = AiPlayer->Force.getIndex(*this) + 1;
 
 		if (transporter->GroupId != forceIndex) {
 			DebugPrint("%d: Assign any transporter #%d\n", player.Index, UnitNumber(*transporter));
@@ -427,9 +427,9 @@ int AiForce::PlanAttack()
 		DebugPrint("%d: Can attack\n", player.Index);
 		GoalPos = pos;
 		State = AiForceAttackingState::Boarding;
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)

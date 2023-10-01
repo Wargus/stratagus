@@ -833,24 +833,30 @@ private:
 /**
 **  MarkAStarGoal
 */
-static int AStarMarkGoal(const Vec2i &goal, int gw, int gh,
-						 int tilesizex, int tilesizey, int minrange, int maxrange, const CUnit &unit)
+static bool AStarMarkGoal(const Vec2i &goal,
+                          int gw,
+                          int gh,
+                          int tilesizex,
+                          int tilesizey,
+                          int minrange,
+                          int maxrange,
+                          const CUnit &unit)
 {
 	ProfileBegin("AStarMarkGoal");
 
 	if (minrange == 0 && maxrange == 0 && gw == 0 && gh == 0) {
 		if (goal.x + tilesizex > AStarMapWidth || goal.y + tilesizey > AStarMapHeight) {
 			ProfileEnd("AStarMarkGoal");
-			return 0;
+			return false;
 		}
 		unsigned int offset = GetIndex(goal.x, goal.y);
 		if (CostMoveTo(offset, unit) >= 0) {
 			AStarMatrix[offset].SetInGoal();
 			ProfileEnd("AStarMarkGoal");
-			return 1;
+			return true;
 		} else {
 			ProfileEnd("AStarMarkGoal");
-			return 0;
+			return false;
 		}
 	}
 

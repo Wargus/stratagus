@@ -1613,9 +1613,9 @@ void CServer::Parse(unsigned long frameCounter, const unsigned char *buf, const 
 **  @param size size of the received packet.
 **  @param host  host which send the message
 **
-**  @return 1 if packet is an InitConfig message, 0 otherwise
+**  @return true if packet is an InitConfig message, false otherwise
 */
-int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host)
+bool NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host)
 {
 	Assert(NetConnectRunning != 0);
 
@@ -1630,7 +1630,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 			// has been started by the server, so do the same for the client.
 			NetConnectRunning = 0; // End the menu..
 		}
-		return 0;
+		return false;
 	}
 #ifdef DEBUG
 	const unsigned char msgsubtype = header.GetSubType();
@@ -1647,7 +1647,7 @@ int NetworkParseSetupEvent(const unsigned char *buf, int size, const CHost &host
 	} else if (NetConnectRunning == 1) { // server
 		Server.Parse(FrameCounter, buf, host);
 	}
-	return 1;
+	return true;
 }
 
 /**

@@ -446,9 +446,6 @@ extern void InitVideo();
 /// deinitliaize the video part
 void DeInitVideo();
 
-/// Check if a resolution is valid
-extern int VideoValidResolution(int w, int h);
-
 /// Initializes video synchronization.
 extern void SetVideoSync();
 

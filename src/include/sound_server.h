@@ -106,7 +106,7 @@ extern bool IsMusicPlaying();
 /// Check if sound is enabled
 extern bool SoundEnabled();
 /// Initialize the sound card.
-extern int InitSound();
+extern bool InitSound();
 ///  Cleanup sound.
 extern void QuitSound();
 

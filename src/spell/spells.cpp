@@ -455,19 +455,19 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 **  @param caster    Unit who can cast the spell.
 **  @param spell     Spell-type pointer.
 **
-**  @return          1 if spell is casted, 0 if not.
+**  @return          true if spell is casted, false if not.
 */
-int AutoCastSpell(CUnit &caster, const SpellType &spell)
+bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
 	if (!SpellIsAvailable(*caster.Player, spell.Slot)
 		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
 		|| caster.SpellCoolDownTimers[spell.Slot]) {
-		return 0;
+		return false;
 	}
 	auto target = SelectTargetUnitsOfAutoCast(caster, spell);
 	if (target == nullptr) {
-		return 0;
+		return false;
 	} else {
 		// Save previous order
 		COrder *savedOrder = nullptr;
@@ -480,7 +480,7 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 			caster.SavedOrder = savedOrder;
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**
