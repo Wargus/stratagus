@@ -1987,7 +1987,7 @@ int EditorSaveMap(const std::string &file)
 {
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 
-	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
+	if (!SaveStratagusMap(fullName, Map, Editor.TerrainEditable)) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
@@ -1998,7 +1998,7 @@ int EditorSaveMapWithResize(std::string_view file, Vec2i newSize, Vec2i offset)
 {
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 
-	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable, newSize, offset) == -1) {
+	if (!SaveStratagusMap(fullName, Map, Editor.TerrainEditable, newSize, offset)) {
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}

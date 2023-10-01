@@ -258,7 +258,7 @@ extern int SpellCast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 
 /// auto cast the spell if possible
-extern int AutoCastSpell(CUnit &caster, const SpellType &spell);
+extern bool AutoCastSpell(CUnit &caster, const SpellType &spell);
 
 /// return spell type by ident string
 extern SpellType &SpellTypeByIdent(const std::string_view &ident);

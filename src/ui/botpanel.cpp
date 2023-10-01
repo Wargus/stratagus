@@ -102,11 +102,11 @@ void InitButtons()
 /**
 **  FIXME: docu
 */
-int AddButton(int pos, int level, const std::string &icon_ident,
-			  ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
-			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
-			  const std::string &sound, const std::string &cursor, const std::string &umask,
-			  const std::string &popup, bool alwaysShow)
+void AddButton(int pos, int level, const std::string &icon_ident,
+			   ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
+			   const std::string &allow, const int key, const std::string &hint, const std::string &descr,
+			   const std::string &sound, const std::string &cursor, const std::string &umask,
+			   const std::string &popup, bool alwaysShow)
 {
 	char buf[2048];
 	ButtonAction *ba = new ButtonAction;
@@ -178,7 +178,6 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
-	return 1;
 }
 
 
@@ -1447,7 +1446,7 @@ void CButtonPanel::DoClicked(int button)
 **
 **  @return     True, if button is handled (consumed).
 */
-int CButtonPanel::DoKey(int key)
+bool CButtonPanel::DoKey(int key)
 {
 	SDL_Keysym keysym;
 	memset(&keysym, 0, sizeof(keysym));
@@ -1464,11 +1463,11 @@ int CButtonPanel::DoKey(int key)
 		for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
 			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
 				UI.ButtonPanel.DoClicked(i);
-				return 1;
+				return true;
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 //@}

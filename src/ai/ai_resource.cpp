@@ -64,7 +64,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
+static bool AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
 
 /**
 **  Check if the costs are available for the AI.
@@ -122,7 +122,7 @@ static int AiCheckCosts(const int (&costs)[MaxCosts])
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
 */
-static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
+static bool AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 {
 	// Count food supplies under construction.
 	int remaining = 0;
@@ -135,16 +135,16 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 	// We are already out of food.
 	remaining += pai.Player->Supply - pai.Player->Demand - type.Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
 	if (remaining < 0) {
-		return 0;
+		return false;
 	}
 	// Count what we train.
 	for (const AiBuildQueue &queue : pai.UnitTypeBuilt) {
 		remaining -= queue.Made * queue.Type->Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
 		if (remaining < 0) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -209,13 +209,13 @@ bool AiEnemyUnitsInDistance(const CPlayer &player,
 
 	if (type == nullptr) {
 		std::vector<CUnit *> units = Select<1>(pos - offset, pos + offset, IsAEnemyUnitOf<true>(player));
-		return static_cast<int>(units.size());
+		return !units.empty();
 	} else {
 		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf<true> pred(player, *type);
 
 		std::vector<CUnit *> units = Select<1>(pos - offset, pos + typeSize + offset, pred);
-		return static_cast<int>(units.size());
+		return !units.empty();
 	}
 }
 
@@ -262,7 +262,7 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
+static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
 {
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
@@ -278,7 +278,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	}
 	if (num == 0) {
 		// No workers available to build
-		return 0;
+		return false;
 	}
 
 	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
@@ -287,7 +287,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	// Find a place to build.
 	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
 		CommandBuildBuilding(unit, pos, building, FlushCommands);
-		return 1;
+		return true;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
 		if (Map.Info.IsPointOnMap(nearPos)) {
@@ -296,12 +296,12 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 				// Find a place to build.
 				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
 					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
-					return 1;
+					return true;
 				}
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
@@ -631,7 +631,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
+static bool AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -674,17 +674,17 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			if (unit_count[table[i]->Slot]) {
 				if (type.Building) {
 					if (AiBuildBuilding(*table[i], type, nearPos)) {
-						return 1;
+						return true;
 					}
 				} else {
 					if (AiTrainUnit(*table[i], type)) {
-						return 1;
+						return true;
 					}
 				}
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -925,9 +925,9 @@ static void AiCheckingWork()
 **  @param unit      pointer to the unit.
 **  @param resource  resource identification.
 **
-**  @return          1 if the worker was assigned, 0 otherwise.
+**  @return          true if the worker was assigned, false otherwise.
 */
-static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
+static bool AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 {
 	// TODO : hardcoded forest
 	Vec2i forestPos;
@@ -935,13 +935,13 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 	// Code for terrain harvesters. Search for piece of terrain to mine.
 	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
 		CommandResourceLoc(unit, forestPos, FlushCommands);
-		return 1;
+		return true;
 	}
 	// Ask the AI to explore...
 	AiExplore(unit.tilePos, MapFieldLandUnit);
 
 	// Failed.
-	return 0;
+	return false;
 }
 
 /**
@@ -950,9 +950,9 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 **  @param unit      pointer to the unit.
 **  @param resource  resource identification.
 **
-**  @return          1 if the worker was assigned, 0 otherwise.
+**  @return          true if the worker was assigned, false otherwise.
 */
-static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
+static bool AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 {
 	// Try to find the nearest depot first.
 	CUnit *depot = FindDeposit(unit, 1000, resource);
@@ -961,7 +961,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);
-		return 1;
+		return true;
 	}
 
 	int exploremask = 0;
@@ -988,7 +988,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	// Ask the AI to explore
 	AiExplore(unit.tilePos, exploremask);
 	// Failed.
-	return 0;
+	return false;
 }
 /**
 **  Assign worker to gather a certain resource.
@@ -996,13 +996,13 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 **  @param unit      pointer to the unit.
 **  @param resource  resource identification.
 **
-**  @return          1 if the worker was assigned, 0 otherwise.
+**  @return          true if the worker was assigned, false otherwise.
 */
-static int AiAssignHarvester(CUnit &unit, int resource)
+static bool AiAssignHarvester(CUnit &unit, int resource)
 {
 	// It can't.
 	if (unit.Removed) {
-		return 0;
+		return false;
 	}
 
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
@@ -1296,7 +1296,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 **
 **  @return      True if made, false if can't be made.
 */
-static int AiRepairUnit(CUnit &unit)
+static bool AiRepairUnit(CUnit &unit)
 {
 	int n = AiHelpers.Repair().size();
 	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Repair();
@@ -1305,14 +1305,14 @@ static int AiRepairUnit(CUnit &unit)
 		DebugPrint("%d: AiRepairUnit I: Nothing known about '%s'\n",
 		           AiPlayer->Player->Index,
 		           type.Ident.c_str());
-		return 0;
+		return false;
 	}
 	std::vector<CUnitType *> &table = tablep[type.Slot];
 	if (table.empty()) { // Oops not known.
 		DebugPrint("%d: AiRepairUnit II: Nothing known about '%s'\n",
 		           AiPlayer->Player->Index,
 		           type.Ident.c_str());
-		return 0;
+		return false;
 	}
 
 	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
@@ -1322,11 +1322,11 @@ static int AiRepairUnit(CUnit &unit)
 		//
 		if (unit_count[table[i]->Slot]) {
 			if (AiRepairBuilding(*AiPlayer->Player, *table[i], unit)) {
-				return 1;
+				return true;
 			}
 		}
 	}
-	return 0;
+	return false;
 }
 
 /**

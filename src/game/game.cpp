@@ -258,7 +258,7 @@ std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 
 };
 
 // Write the map presentation file
-static int WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSize)
+static bool WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSize)
 {
 	int numplayers = 0;
 	int topplayer = PlayerMax - 2;
@@ -296,9 +296,9 @@ static int WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSiz
 		}
 	} catch (const FileException &) {
 		fprintf(stderr, "ERROR: cannot write the map presentation\n");
-		return -1;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 
@@ -309,7 +309,7 @@ static int WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSiz
 **  @param map           map to save
 **  @param writeTerrain  write the tiles map in the .sms
 */
-static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
+static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
 	try {
 		std::unique_ptr<FileWriter> f = CreateFileWriter(mapSetup);
@@ -483,9 +483,9 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 
 	} catch (const FileException &) {
 		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup.u8string().c_str());
-		return -1;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 
@@ -497,7 +497,7 @@ static int WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain, 
 **  @param map       map to save
 **  @param writeTerrain   write the tiles map in the .sms
 */
-int SaveStratagusMap(const fs::path &mapName, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
+bool SaveStratagusMap(const fs::path &mapName, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
 		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.u8string().c_str());
@@ -512,15 +512,15 @@ int SaveStratagusMap(const fs::path &mapName, CMap &map, int writeTerrain, Vec2i
 	}
 	if (mapSetup.extension() != ".smp") {
 		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.u8string().c_str());
-		return -1;
+		return false;
 	}
 
 	fs::path previewName = mapSetup;
 	previewName.replace_extension(".png");
 	WriteMapPreview(previewName, map);
 
-	if (WriteMapPresentation(mapName, map, newSize) == -1) {
-		return -1;
+	if (!WriteMapPresentation(mapName, map, newSize)) {
+		return false;
 	}
 
 	mapSetup.replace_extension(".sms" + extraExtension);

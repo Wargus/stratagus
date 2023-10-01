@@ -365,8 +365,11 @@ extern void MapCclRegister();
 // mixed sources
 //
 /// Save a stratagus map (smp format)
-extern int SaveStratagusMap(const fs::path &filename, CMap &map, int writeTerrain,
-							Vec2i newSize = {0, 0}, Vec2i offset = {0, 0});
+extern bool SaveStratagusMap(const fs::path &filename,
+                             CMap &map,
+                             int writeTerrain,
+                             Vec2i newSize = {0, 0},
+                             Vec2i offset = {0, 0});
 
 
 /// Load map presentation

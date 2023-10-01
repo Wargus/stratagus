@@ -675,7 +675,7 @@ bool SoundEnabled()
 **  @param freq  Sample frequency (44100,22050,11025 hz).
 **  @param size  Sample size (8bit, 16bit)
 **
-**  @return      True if failure, false if everything ok.
+**  @return      false if failure, true if everything ok.
 */
 static int InitSdlSound()
 {
@@ -699,7 +699,7 @@ static int InitSdlSound()
 	Mix_Init(std::numeric_limits<unsigned int>::max());
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024)) {
 		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-		return -1;
+		return false;
 	} else {
 		printf("Supported sound decoders:");
 		for (int i = 0; i < Mix_GetNumChunkDecoders(); i++) {
@@ -711,22 +711,22 @@ static int InitSdlSound()
 		}
 		printf("\n");
 	}
-	return 0;
+	return true;
 }
 
 /**
 **  Initialize sound card.
 **
-**  @return  True if failure, false if everything ok.
+**  @return  false if failure, true if everything ok.
 */
-int InitSound()
+bool InitSound()
 {
 	//
 	// Open sound device, 8bit samples, stereo.
 	//
-	if (InitSdlSound()) {
+	if (!InitSdlSound()) {
 		SoundInitialized = false;
-		return 1;
+		return false;
 	}
 	SDL_SOUND_FINISHED = SDL_RegisterEvents(1);
 	SoundInitialized = true;
@@ -736,7 +736,7 @@ int InitSound()
 	// Now we're ready for the callback to run
 	Mix_ResumeMusic();
 	Mix_Resume(-1);
-	return 0;
+	return true;
 }
 
 /**

@@ -263,7 +263,7 @@ public:
 	void Draw();
 	void Update();
 	void DoClicked(int button);
-	int DoKey(int key);
+	bool DoKey(int key);
 
 private:
 	void DoClicked_SelectTarget(int button);

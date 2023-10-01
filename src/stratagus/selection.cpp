@@ -207,28 +207,28 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 **               (if Selected.size() == MaxSelectable or
 **                unit is already selected or unselectable)
 */
-int SelectUnit(CUnit &unit)
+bool SelectUnit(CUnit &unit)
 {
 	if (unit.Type->BoolFlag[REVEALER_INDEX].value) { // Revealers cannot be selected
 		DebugPrint("Selecting revealer?\n");
-		return 0;
+		return false;
 	}
 
 	if (unit.Removed) { // Removed cannot be selected
 		DebugPrint("Selecting removed?\n");
-		return 0;
+		return false;
 	}
 
 	if (Selected.size() == MaxSelectable) {
-		return 0;
+		return false;
 	}
 
 	if (unit.Selected) {
-		return 0;
+		return false;
 	}
 
 	if (unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && GameRunning) {
-		return 0;
+		return false;
 	}
 
 	Selected.push_back(&unit);
@@ -236,7 +236,7 @@ int SelectUnit(CUnit &unit)
 	if (Selected.size() > 1) {
 		Selected[0]->LastGroup = unit.LastGroup = GroupId;
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -295,12 +295,6 @@ void UnSelectUnit(CUnit &unit)
 	UI.SelectedViewport->Unit = nullptr;
 }
 
-/**
-**  Toggle the selection of a unit in a group of selected units
-**
-**  @param unit  Pointer to unit to be toggled.
-**  @return      0 if unselected, 1 otherwise
-*/
 /**
 **  Toggle the selection of a unit in a group of selected units
 **

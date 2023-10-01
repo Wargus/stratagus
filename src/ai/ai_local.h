@@ -157,7 +157,7 @@ public:
 
 	void Attack(const Vec2i &pos);
 	void RemoveDeadUnit();
-	int PlanAttack();
+	bool PlanAttack();
 
 	void ReturnToHome();
 	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
@@ -442,7 +442,7 @@ extern void AiForceManager();
 // Plans
 //
 /// Find a wall to attack
-extern int AiFindWall(AiForce *force);
+extern bool AiFindWall(AiForce *force);
 /// Plan the an attack
 /// Send explorers around the map
 extern void AiSendExplorers();

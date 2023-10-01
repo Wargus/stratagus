@@ -751,9 +751,9 @@ static bool CommandKey(int key)
 /**
 **  Handle cheats
 **
-**  @return  1 if a cheat was handled, 0 otherwise
+**  @return  true if a cheat was handled, false otherwise
 */
-int HandleCheats(const std::string &input)
+bool HandleCheats(const std::string &input)
 {
 #if defined(DEBUG) || defined(PROF)
 	if (input == "ai me") {
@@ -776,24 +776,24 @@ int HandleCheats(const std::string &input)
 			}
 			SetMessage("I'm the BORG, resistance is futile!");
 		}
-		return 1;
+		return true;
 	}
 #endif
 	int base = lua_gettop(Lua);
 	lua_getglobal(Lua, "HandleCheats");
 	if (!lua_isfunction(Lua, -1)) {
 		DebugPrint("No HandleCheats function in lua.\n");
-		return 0;
+		return false;
 	}
 	lua_pushstring(Lua, input.c_str());
 	LuaCall(1, 0, false);
 	if (lua_gettop(Lua) - base == 1) {
-		int ret = LuaToBoolean(Lua, -1);
+		bool ret = LuaToBoolean(Lua, -1);
 		lua_pop(Lua, 1);
 		return ret;
 	} else {
 		DebugPrint("HandleCheats must return a boolean");
-		return 0;
+		return false;
 	}
 }
 
@@ -1032,19 +1032,19 @@ static void Screenshot()
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 **
-**  @return         1 if modifier found, 0 otherwise
+**  @return         true if modifier found, false otherwise
 */
-int HandleKeyModifiersDown(unsigned key, unsigned)
+bool HandleKeyModifiersDown(unsigned key, unsigned)
 {
 	switch (key) {
 		case SDLK_LSHIFT:
 		case SDLK_RSHIFT:
 			KeyModifiers |= ModifierShift;
-			return 1;
+			return true;
 		case SDLK_LCTRL:
 		case SDLK_RCTRL:
 			KeyModifiers |= ModifierControl;
-			return 1;
+			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
 			KeyModifiers |= ModifierAlt;
@@ -1052,22 +1052,22 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 			if (InterfaceState == IfaceState::Normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
-			return 1;
+			return true;
 		case SDLK_LGUI:
 		case SDLK_RGUI:
 			KeyModifiers |= ModifierSuper;
-			return 1;
+			return true;
 		case SDLK_SYSREQ:
 		case SDLK_PRINTSCREEN:
 			Screenshot();
 			if (GameRunning) {
 				SetMessage("%s", _("Screenshot made."));
 			}
-			return 1;
+			return true;
 		default:
 			break;
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -1076,19 +1076,19 @@ int HandleKeyModifiersDown(unsigned key, unsigned)
 **  @param key      Key scancode.
 **  @param keychar  Character code.
 **
-**  @return         1 if modifier found, 0 otherwise
+**  @return         true if modifier found, false otherwise
 */
-int HandleKeyModifiersUp(unsigned key, unsigned)
+bool HandleKeyModifiersUp(unsigned key, unsigned)
 {
 	switch (key) {
 		case SDLK_LSHIFT:
 		case SDLK_RSHIFT:
 			KeyModifiers &= ~ModifierShift;
-			return 1;
+			return true;
 		case SDLK_LCTRL:
 		case SDLK_RCTRL:
 			KeyModifiers &= ~ModifierControl;
-			return 1;
+			return true;
 		case SDLK_LALT:
 		case SDLK_RALT:
 			KeyModifiers &= ~ModifierAlt;
@@ -1096,13 +1096,13 @@ int HandleKeyModifiersUp(unsigned key, unsigned)
 			if (InterfaceState == IfaceState::Normal) {
 				SelectedUnitChanged(); // VLADI: to allow alt-buttons
 			}
-			return 1;
+			return true;
 		case SDLK_LGUI:
 		case SDLK_RGUI:
 			KeyModifiers &= ~ModifierSuper;
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 /**
