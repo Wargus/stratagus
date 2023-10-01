@@ -65,9 +65,24 @@ extern CUnit *CclGetUnitFromRef(lua_State *l);
 **
 **  @return   The player pointer
 */
-static CPlayer *CclGetPlayer(lua_State *l)
+CPlayer *CclGetPlayer(lua_State *l)
 {
-	return &Players[LuaToNumber(l, -1)];
+	if (lua_isnumber(l, -1)) {
+		const int plynr = LuaToNumber(l, -1);
+		if (plynr < 0 || plynr > PlayerMax) {
+			LuaError(l, "bad player: %d", plynr);
+		}
+		return &Players[plynr];
+	}
+	const std::string_view player = LuaToString(l, -1);
+	if (player == "any") {
+		return nullptr;
+	} else if (player == "this") {
+		Assert(ThisPlayer);
+		return ThisPlayer;
+	}
+	LuaError(l, "bad player: %s", player.data());
+	ExitFatal(0);
 }
 
 /**
@@ -956,6 +971,11 @@ static int CclGetPlayerData(lua_State *l)
 	lua_pushvalue(l, 1);
 	const CPlayer *p = CclGetPlayer(l);
 	lua_pop(l, 1);
+	if (p == nullptr) {
+		printf("GetPlayerData: You cannot use \"any\", specify a player\n");
+		LuaError(l, "bad player");
+		return 0;
+	}
 	const std::string_view data = LuaToString(l, 2);
 
 	if (data == "Name") {
@@ -1121,6 +1141,11 @@ static int CclSetPlayerData(lua_State *l)
 	}
 	lua_pushvalue(l, 1);
 	CPlayer *p = CclGetPlayer(l);
+	if (p == nullptr) {
+		printf("SetPlayerData: You cannot use \"any\", specify a player\n");
+		LuaError(l, "bad player");
+		return 0;
+	}
 	lua_pop(l, 1);
 	const std::string_view data = LuaToString(l, 2);
 
@@ -1231,13 +1256,11 @@ static int CclSetPlayerData(lua_State *l)
 */
 static int CclSetAiType(lua_State *l)
 {
-	CPlayer *p;
-
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
-	p = CclGetPlayer(l);
+	CPlayer *p = CclGetPlayer(l);
 	lua_pop(l, 1);
 
 	p->AiName = LuaToString(l, 2);

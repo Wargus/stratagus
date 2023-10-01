@@ -68,25 +68,26 @@ TriggerDataType TriggerData;
 **
 **  @param l  Lua state.
 **
-**  @return   The player number, -1 matches any.
+**  @return   The unit-player validator.
 */
-int TriggerGetPlayer(lua_State *l)
+std::function<bool(const CUnit &)> TriggerGetPlayer(lua_State *l)
 {
 	if (lua_isnumber(l, -1)) {
-		const int ret = LuaToNumber(l, -1);
-		if (ret < 0 || ret > PlayerMax) {
-			LuaError(l, "bad player: %d", ret);
+		const int plynr = LuaToNumber(l, -1);
+		if (plynr < 0 || plynr > PlayerMax) {
+			LuaError(l, "bad player: %d", plynr);
 		}
-		return ret;
+		return [plynr](const CUnit &unit) { return plynr == unit.Player->Index; };
 	}
 	const std::string_view player = LuaToString(l, -1);
 	if (player == "any") {
-		return -1;
+		return [](const CUnit &) { return true; };
 	} else if (player == "this") {
-		return ThisPlayer->Index;
+		Assert(ThisPlayer);
+		return [plynr = ThisPlayer->Index](const CUnit &unit) { return plynr == unit.Player->Index; };
 	}
 	LuaError(l, "bad player: %s", player.data());
-	return 0;
+	ExitFatal(0);
 }
 
 /**
@@ -219,7 +220,7 @@ static int CclIfNearUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
 	lua_pushvalue(l, 1);
-	const int plynr = TriggerGetPlayer(l);
+	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
@@ -240,24 +241,13 @@ static int CclIfNearUnit(lua_State *l)
 	//
 
 	std::vector<CUnit *> unitsOfType = FindUnitsByType(*ut2);
-	for (size_t i = 0; i != unitsOfType.size(); ++i) {
-		const CUnit &centerUnit = *unitsOfType[i];
-		std::vector<CUnit *> around = SelectAroundUnit(centerUnit, 1);
+	for (const CUnit *centerUnit : unitsOfType) {
+		std::vector<CUnit *> around = SelectAroundUnit(*centerUnit, 1);
 
 		// Count the requested units
-		int s = 0;
-		for (size_t j = 0; j < around.size(); ++j) {
-			const CUnit &unit = *around[j];
-
-			// Check unit type
-			if (unitValidator(unit)) {
-
-				// Check the player
-				if (plynr == -1 || plynr == unit.Player->Index) {
-					++s;
-				}
-			}
-		}
+		const int s = ranges::count_if(around, [&](const CUnit *unit) {
+			return unitValidator(*unit) && unitPlayerValidator(*unit);
+		});
 		if (compare(s, q)) {
 			lua_pushboolean(l, 1);
 			return 1;
@@ -281,7 +271,7 @@ static int CclIfRescuedNearUnit(lua_State *l)
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	const int plynr = TriggerGetPlayer(l);
+	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	const std::string_view op = LuaToString(l, 2);
 	const int q = LuaToNumber(l, 3);
@@ -300,22 +290,12 @@ static int CclIfRescuedNearUnit(lua_State *l)
 
 	// Get all unit types 'near'.
 	std::vector<CUnit *> table = FindUnitsByType(*ut2);
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &centerUnit = *table[i];
-		std::vector<CUnit *> around = SelectAroundUnit(centerUnit, 1);
+	for (CUnit *centerUnit : table) {
+		std::vector<CUnit *> around = SelectAroundUnit(*centerUnit, 1);
 		// Count the requested units
-		int s = 0;
-		for (size_t j = 0; j != around.size(); ++j) {
-			CUnit &unit = *around[j];
-
-			if (unit.RescuedFrom) { // only rescued units
-				if (unitValidator(unit)) {// Check unit type
-					if (plynr == -1 || plynr == unit.Player->Index) {// Check the player
-						++s;
-					}
-				}
-			}
-		}
+		const int s = ranges::count_if(around, [&](const CUnit *unit) {
+			return unit->RescuedFrom && unitValidator(*unit) && unitPlayerValidator(*unit);
+		});
 		if (compare(s, q)) {
 			lua_pushboolean(l, 1);
 			return 1;
