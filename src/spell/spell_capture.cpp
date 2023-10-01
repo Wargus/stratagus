@@ -112,9 +112,8 @@ int Spell_Capture::Cast(CUnit &caster,
 	target->ChangeOwner(*caster.Player);
 	UnitClearOrders(*target);
 	if (this->JoinToAIForce && caster.Player->AiEnabled) {
-		int force = caster.Player->Ai->Force.GetForce(caster);
-		if (force != -1) {
-			caster.Player->Ai->Force[force].Insert(*target);
+		if (auto force = caster.Player->Ai->Force.GetForce(caster)) {
+			caster.Player->Ai->Force[*force].Insert(*target);
 			target->GroupId = caster.GroupId;
 			CommandDefend(*target, caster, FlushCommands);
 		}

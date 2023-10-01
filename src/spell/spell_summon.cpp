@@ -134,9 +134,8 @@ int Spell_Summon::Cast(CUnit &caster,
 
 			// Insert summoned unit to AI force so it will help them in battle
 			if (this->JoinToAiForce && caster.Player->AiEnabled) {
-				int force = caster.Player->Ai->Force.GetForce(caster);
-				if (force != -1) {
-					caster.Player->Ai->Force[force].Insert(*target);
+				if (auto force = caster.Player->Ai->Force.GetForce(caster)) {
+					caster.Player->Ai->Force[*force].Insert(*target);
 					target->GroupId = caster.GroupId;
 					CommandDefend(*target, caster, FlushCommands);
 				}

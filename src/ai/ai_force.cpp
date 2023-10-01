@@ -573,23 +573,20 @@ unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin)
 **
 **  @param    unit  Unit to search for.
 **
-**  @return   Force number, or -1 if not found
+**  @return   Force number, or std::nullopt if not found
 */
-
-int AiForceManager::GetForce(const CUnit &unit)
+std::optional<int> AiForceManager::GetForce(const CUnit &unit)
 {
 	for (unsigned int i = 0; i < forces.size(); ++i) {
 		AiForce &force = forces[i];
 
-		for (unsigned int j = 0; j < force.Units.size(); ++j) {
-			CUnit &aiunit = *force.Units[j];
-
-			if (UnitNumber(unit) == UnitNumber(aiunit)) {
+		for (CUnit *aiunit : force.Units) {
+			if (UnitNumber(unit) == UnitNumber(*aiunit)) {
 				return i;
 			}
 		}
 	}
-	return -1;
+	return std::nullopt;
 }
 
 /**

@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <array>
+#include <optional>
 #include <vector>
 
 #include "upgrade_structs.h" // MaxCost
@@ -225,7 +226,7 @@ public:
 		return script[index];
 	}
 
-	int GetForce(const CUnit &unit);
+	std::optional<int> GetForce(const CUnit &unit);
 	void RemoveDeadUnit();
 	bool Assign(CUnit &unit, int force = -1);
 	void Update();
