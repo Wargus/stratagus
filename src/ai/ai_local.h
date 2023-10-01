@@ -208,14 +208,14 @@ public:
 	const AiForce &operator[](unsigned int index) const { return forces[index]; }
 	AiForce &operator[](unsigned int index) { return forces[index]; }
 
-	int getIndex(AiForce *force) const
+	int getIndex(const AiForce &force) const
 	{
 		for (unsigned int i = 0; i < forces.size(); ++i) {
-			if (force == &forces[i]) {
+			if (&force == &forces[i]) {
 				return i;
 			}
 		}
-		return -1;
+		throw std::runtime_error("Invalid force");
 	}
 
 	unsigned int getScriptForce(unsigned int index)
