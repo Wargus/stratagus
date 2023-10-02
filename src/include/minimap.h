@@ -65,7 +65,7 @@ public:
 	void Create();
 	void Destroy();
 	void Draw() const;
-	void DrawViewportArea(const CViewport &viewport) const;
+	void DrawViewportArea(const CViewport &viewport, int alpha) const;
 	void AddEvent(const Vec2i &pos, IntColor color);
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;

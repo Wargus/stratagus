@@ -1080,7 +1080,10 @@ void EditorUpdateDisplay()
 	// Minimap
 	if (UI.SelectedViewport) {
 		UI.Minimap.Draw();
-		UI.Minimap.DrawViewportArea(*UI.SelectedViewport);
+		for (std::size_t i = 0; i != UI.NumViewports; ++i) {
+			UI.Minimap.DrawViewportArea(UI.Viewports[i],
+			                            UI.SelectedViewport == &UI.Viewports[i] ? 255 : 128);
+		}
 	}
 	// Info panel
 	if (UI.InfoPanel.G) {
