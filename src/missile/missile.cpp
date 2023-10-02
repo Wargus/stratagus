@@ -938,22 +938,21 @@ void Missile::MissileHit(CUnit *unit)
 		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table = Select(pos - range, pos + range);
 		Assert(this->SourceUnit != nullptr);
-		for (size_t i = 0; i != table.size(); ++i) {
-			CUnit &goal = *table[i];
+		for (CUnit *goal : table) {
 			//
 			// Can the unit attack this unit-type?
 			// NOTE: perhaps this should be come a property of the missile.
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
-			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
-				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
+			if (CanTarget(*this->SourceUnit->Type, *goal->Type)
+				&& (mtype.FriendlyFire == false || goal->Player->Index != this->SourceUnit->Player->Index)) {
 				bool shouldHit = true;
 
 				if (mtype.Pierce && mtype.PierceOnce) {
-					if (IsPiercedUnit(*this, goal)) {
+					if (IsPiercedUnit(*this, *goal)) {
 						shouldHit = false;
 					} else {
-						PiercedUnits.insert(this->PiercedUnits.begin(), &goal);
+						PiercedUnits.insert(this->PiercedUnits.begin(), goal);
 					}
 				}
 
@@ -970,24 +969,24 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
-						if (goal.Type->UnitType != this->SourceUnit->Type->UnitType) {
+						if (goal->Type->UnitType != this->SourceUnit->Type->UnitType) {
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == nullptr || goal.Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->TargetUnit == nullptr || goal->Type->UnitType != this->TargetUnit->Type->UnitType) {
 							shouldHit = false;
 						}
 					}
 				}
 				if (shouldHit) {
-					int splash = goal.MapDistanceTo(pos);
+					int splash = goal->MapDistanceTo(pos);
 
 					if (splash) {
 						splash *= mtype.SplashFactor;
 					} else {
 						splash = 1;
 					}
-					MissileHitsGoal(*this, goal, splash);
+					MissileHitsGoal(*this, *goal, splash);
 				}
 			}
 		}

@@ -985,8 +985,8 @@ static void NetworkExecCommand_Selection(const CNetworkCommandQueue &ncq)
 	}
 	std::vector<CUnit *> units;
 
-	for (size_t i = 0; i != ns.Units.size(); ++i) {
-		units.push_back(&UnitManager->GetSlotUnit(ns.Units[i]));
+	for (auto unitId : ns.Units) {
+		units.push_back(&UnitManager->GetSlotUnit(unitId));
 	}
 	ChangeTeamSelectedUnits(Players[ns.player], units);
 }

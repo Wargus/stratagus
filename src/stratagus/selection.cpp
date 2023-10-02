@@ -90,13 +90,13 @@ void RestoreSelection()
 	UnSelectAll();
 	for (int i = 0; i < PlayerMax; ++i) {
 		TeamSelected[i] = _TeamSelected[i];
-		for (size_t j = 0; j != _TeamSelected[i].size(); ++j) {
-			TeamSelected[i][j]->TeamSelected |= (1 << i);
+		for (CUnit *unit : TeamSelected[i]) {
+			unit->TeamSelected |= (1 << i);
 		}
 	}
 	Selected = _Selected;
-	for (size_t i = 0; i != _Selected.size(); ++i) {
-		Selected[i]->Selected = 1;
+	for (CUnit *unit : Selected) {
+		unit->Selected = 1;
 	}
 }
 
@@ -108,8 +108,8 @@ void UnSelectAll()
 	while (!++GroupId) { // Advance group id, but keep non zero
 	}
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		Selected[i]->Selected = 0;
+	for (CUnit *unit : Selected) {
+		unit->Selected = 0;
 	}
 	Selected.clear();
 	UI.SelectedViewport->Unit = nullptr;
@@ -187,12 +187,11 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 		unit->TeamSelected &= ~(1 << player.Index);
 	}
 	// Add to selection
-	for (size_t i = 0; i != units.size(); ++i) {
-		CUnit &unit = *units[i];
-		Assert(!unit.Removed);
-		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
-			TeamSelected[player.Index].push_back(&unit);
-			unit.TeamSelected |= 1 << player.Index;
+	for (CUnit *unit : units) {
+		Assert(!unit->Removed);
+		if (!unit->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit->IsAlive()) {
+			TeamSelected[player.Index].push_back(unit);
+			unit->TeamSelected |= 1 << player.Index;
 		}
 	}
 	Assert(TeamSelected[player.Index].size() <= MaxSelectable);
@@ -285,8 +284,8 @@ void UnSelectUnit(CUnit &unit)
 	if (Selected.size() > 1) { // Assign new group to remaining units
 		while (!++GroupId) { // Advance group id, but keep non zero
 		}
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			Selected[i]->LastGroup = GroupId;
+		for (CUnit *unit : Selected) {
+			unit->LastGroup = GroupId;
 		}
 	}
 	unit.Selected = 0;
@@ -379,29 +378,28 @@ int SelectUnitsByType(CUnit &base)
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player)) {
+	for (CUnit *unit : table) {
+		if (!CanSelectMultipleUnits(*unit->Player)) {
 			continue;
 		}
-		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+		if (unit->IsUnusable()) {  // guess SelectUnits doesn't check this
 			continue;
 		}
-		if (&unit == &base) {  // no need to have the same unit twice :)
+		if (unit == &base) {  // no need to have the same unit twice :)
 			continue;
 		}
-		if (unit.TeamSelected) { // Somebody else onteam has this unit
+		if (unit->TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
-		Selected.push_back(&unit);
-		unit.Selected = 1;
+		Selected.push_back(unit);
+		unit->Selected = 1;
 		if (Selected.size() == MaxSelectable) {
 			break;
 		}
 	}
 	if (Selected.size() > 1) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			Selected[i]->LastGroup = GroupId;
+		for (CUnit *unit : Selected) {
+			unit->LastGroup = GroupId;
 		}
 	}
 	NetworkSendSelection(&Selected[0], Selected.size());
@@ -462,31 +460,29 @@ int ToggleUnitsByType(CUnit &base)
 
     // FIXME: peon/peasant with gold/wood & co are considered from
     // different type... idem for tankers
-    for (size_t i = 0; i < table.size(); ++i) {
-        CUnit &unit = *table[i];
-
-        if (!CanSelectMultipleUnits(*unit.Player)) {
+    for (CUnit *unit : table) {
+        if (!CanSelectMultipleUnits(*unit->Player)) {
             continue;
         }
-        if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
+        if (unit->IsUnusable()) { // guess SelectUnits doesn't check this
             continue;
         }
-        if (&unit == &base) { // no need to have the same unit twice
+        if (unit == &base) { // no need to have the same unit twice
             continue;
         }
-        if (unit.TeamSelected) { // Somebody else onteam has this unit
+        if (unit->TeamSelected) { // Somebody else onteam has this unit
             continue;
         }
         //Wyrmgus start
-        if (unit.Type->Building && Selected.size() && (!Selected[0]->Type->Building || unit.Type != Selected[0]->Type)) {
+        if (unit->Type->Building && Selected.size() && (!Selected[0]->Type->Building || unit->Type != Selected[0]->Type)) {
             continue;
         }
         //don't select units if a building is selected
-        if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
+        if (!unit->Type->Building && Selected.size() && Selected[0]->Type->Building) {
             continue;
         }
         //Wyrmgus end
-        if (!SelectUnit(unit)) { // add unit to selection
+        if (!SelectUnit(*unit)) { // add unit to selection
             return Selected.size();
         }
     }
@@ -516,10 +512,10 @@ int SelectGroup(int group_number, GroupSelectionMode mode)
 	}
 	std::vector<CUnit *> table;
 
-	for (size_t i = 0; i != units.size(); ++i) {
-		const CUnitType *type = units[i]->Type;
+	for (CUnit *unit : units) {
+		const CUnitType *type = unit->Type;
 		if (type && type->CanSelect(mode)) {
-			table.push_back(units[i]);
+			table.push_back(unit);
 		}
 	}
 	if (table.empty() == false) {
@@ -603,13 +599,8 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
     bool hasNonBuilding = false;
 
     if (added_table == false) {
-        for (size_t i = 0; i != table.size(); ++i) {
-            CUnit &unit = *table[i];
-
-            if (!unit.Type->Building) {
-                hasNonBuilding = true;
-            }
-        }
+		hasNonBuilding =
+			ranges::any_of(table, [](const CUnit *unit) { return !unit->Type->Building; });
     }
     //Wyrmgus end
 
@@ -711,50 +702,46 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
     }
 
     // 2) If no unit found, try a player's unit not selectable by rectangle
-    for (size_t i = 0; i != table.size(); ++i) {
-        CUnit &unit = *table[i];
-
-        if (!CanSelectMultipleUnits(*unit.Player)) {
+    for (CUnit *unit : table) {
+        if (!CanSelectMultipleUnits(*unit->Player)) {
             continue;
         }
         // FIXME: Can we get this?
-        if (!unit.Removed && unit.IsAlive()) {
-            SelectSingleUnit(unit);
+        if (!unit->Removed && unit->IsAlive()) {
+            SelectSingleUnit(*unit);
             return 1;
         }
     }
 
     // 3) If no unit found, try a resource or a neutral critter
-    for (size_t i = 0; i != table.size(); ++i) {
-        CUnit &unit = *table[i];
+    for (CUnit *unit : table) {
         // Unit visible FIXME: write function UnitSelectable
-        if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
+        if (!unit->IsVisibleInViewport(*UI.SelectedViewport)) {
             continue;
         }
-        const CUnitType &type = *unit.Type;
+        const CUnitType &type = *unit->Type;
         // Buildings are visible but not selectable
-        if (type.Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+        if (type.Building && !unit->IsVisibleOnMap(*ThisPlayer)) {
             continue;
         }
-        if ((type.GivesResource && !unit.Removed)) { // no built resources.
-            SelectSingleUnit(unit);
+        if ((type.GivesResource && !unit->Removed)) { // no built resources.
+            SelectSingleUnit(*unit);
             return 1;
         }
     }
 
     // 4) If no unit found, select an enemy unit (first found)
-    for (size_t i = 0; i != table.size(); ++i) {
-        CUnit &unit = *table[i];
+    for (CUnit *unit : table) {
         // Unit visible FIXME: write function UnitSelectable
-        if (!unit.IsVisibleInViewport(*UI.SelectedViewport)) {
+        if (!unit->IsVisibleInViewport(*UI.SelectedViewport)) {
             continue;
         }
         // Buildings are visible but not selectable
-        if (unit.Type->Building && !unit.IsVisibleOnMap(*ThisPlayer)) {
+        if (unit->Type->Building && !unit->IsVisibleOnMap(*ThisPlayer)) {
             continue;
         }
-        if (unit.IsAliveOnMap()) {
-            SelectSingleUnit(unit);
+        if (unit->IsAliveOnMap()) {
+            SelectSingleUnit(*unit);
             return 1;
         }
     }
@@ -1064,8 +1051,8 @@ void SaveSelections(CFile &file)
 
 	file.printf("SetGroupId(%d)\n", GroupId);
 	file.printf("Selection(%lu, {", (long unsigned int)Selected.size()); // TODO: remove
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		file.printf("\"%s\", ", UnitReference(*Selected[i]).c_str());
+	for (const CUnit *unit : Selected) {
+		file.printf("\"%s\", ", UnitReference(*unit).c_str());
 	}
 	file.printf("})\n");
 }

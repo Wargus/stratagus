@@ -198,11 +198,8 @@ void UpdateDisplay()
 		}
 
 		if (!BigMapMode) {
-			for (size_t i = 0; i < UI.Fillers.size(); ++i) {
-				UI.Fillers[i].G->DrawSubClip(0, 0,
-											 UI.Fillers[i].G->Width,
-											 UI.Fillers[i].G->Height,
-											 UI.Fillers[i].X, UI.Fillers[i].Y);
+			for (auto &filler : UI.Fillers) {
+				filler.G->DrawSubClip(0, 0, filler.G->Width, filler.G->Height, filler.X, filler.Y);
 			}
 			DrawMenuButtonArea();
 			DrawUserDefinedButtons();

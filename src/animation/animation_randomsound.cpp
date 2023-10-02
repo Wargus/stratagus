@@ -72,8 +72,8 @@ void CAnimation_RandomSound::Init(std::string_view s, lua_State *) /* override *
 
 void CAnimation_RandomSound::MapSound()
 {
-	for (size_t i = 0; i != this->sounds.size(); ++i) {
-		this->sounds[i].MapSound();
+	for (auto& sound : this->sounds) {
+		sound.MapSound();
 	}
 }
 

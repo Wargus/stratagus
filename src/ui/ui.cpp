@@ -324,8 +324,8 @@ CUserInterface::~CUserInterface()
 void CleanUserInterface()
 {
 	// Filler
-	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
-		CGraphic::Free(UI.Fillers[i].G);
+	for (auto& filler : UI.Fillers) {
+		CGraphic::Free(filler.G);
 	}
 	UI.Fillers.clear();
 

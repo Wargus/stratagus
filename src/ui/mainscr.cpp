@@ -525,11 +525,11 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 static void DrawUnitInfo(CUnit &unit)
 {
 	UpdateUnitVariables(unit);
-	for (size_t i = 0; i != UI.InfoPanelContents.size(); ++i) {
-		if (CanShowContent(UI.InfoPanelContents[i]->Condition.get(), unit)) {
-			for (CContentType *content : UI.InfoPanelContents[i]->Contents) {
+	for (auto *infoPanelContent : UI.InfoPanelContents) {
+		if (CanShowContent(infoPanelContent->Condition.get(), unit)) {
+			for (CContentType *content : infoPanelContent->Contents) {
 				if (CanShowContent(content->Condition.get(), unit)) {
-					content->Draw(unit, UI.InfoPanelContents[i]->DefaultFont);
+					content->Draw(unit, infoPanelContent->DefaultFont);
 				}
 			}
 		}

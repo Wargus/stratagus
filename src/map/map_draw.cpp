@@ -538,8 +538,8 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	if (!Preference.ShowOrders) {
 	} else if (Preference.ShowOrders < 0
 			   || (ShowOrdersCount >= GameCycle) || (KeyModifiers & ModifierShift)) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			ShowOrder(*Selected[i]);
+		for (const CUnit *unit : Selected) {
+			ShowOrder(*unit);
 		}
 	}
 

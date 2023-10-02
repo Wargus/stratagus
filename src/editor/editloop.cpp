@@ -418,9 +418,9 @@ static void CalculateMaxIconSize()
 {
 	IconWidth = 0;
 	IconHeight = 0;
-	for (unsigned int i = 0; i < Editor.UnitTypes.size(); ++i) {
-		if (!Editor.UnitTypes[i].empty()) {
-			const CUnitType &type = UnitTypeByIdent(Editor.UnitTypes[i]);
+	for (const auto &typeStr : Editor.UnitTypes) {
+		if (!typeStr.empty()) {
+			const CUnitType &type = UnitTypeByIdent(typeStr);
 			if (type.Icon.Icon) {
 				const CIcon &icon = *type.Icon.Icon;
 
@@ -1059,8 +1059,8 @@ void EditorUpdateDisplay()
 	DrawStartLocations();
 
 	// Fillers
-	for (size_t i = 0; i != UI.Fillers.size(); ++i) {
-		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+	for (auto& filler : UI.Fillers) {
+		filler.G->DrawClip(filler.X, filler.Y);
 	}
 
 	if (CursorOn == ECursorOn::Map && Gui->getTop() == editorContainer && !GamePaused) {

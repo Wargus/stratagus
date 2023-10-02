@@ -545,13 +545,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && !unit.Removed) {
-						MapUnmarkUnitSight(unit);
-						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max +
-												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-						MapMarkUnitSight(unit);
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && !unit->Removed) {
+						MapUnmarkUnitSight(*unit);
+						unit->CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max
+						                        + um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+						MapMarkUnitSight(*unit);
 					}
 				}
 			}
@@ -560,10 +559,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
-						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && unit->IsAlive()) {
+						unit->Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
 					}
 				}
 			}
@@ -572,10 +570,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && unit.IsAlive()) {
-						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && unit->IsAlive()) {
+						unit->Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
 					}
 				}
 			}
@@ -625,8 +622,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (varModified) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z], true);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
+				for (CUnit *unitPtr : unitupgrade) {
+					CUnit &unit = *unitPtr;
 
 					if (unit.Player->Index != player.Index) {
 						continue;
@@ -713,13 +710,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
-					if (unit.Player->Index == pn && !unit.Removed) {
-						MapUnmarkUnitSight(unit);
-						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
+				for (CUnit *unit : unitupgrade) {
+					if (unit->Player->Index == pn && !unit->Removed) {
+						MapUnmarkUnitSight(*unit);
+						unit->CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
 							um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-						MapMarkUnitSight(unit);
+						MapMarkUnitSight(*unit);
 					}
 				}
 			}
@@ -787,8 +783,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			if (varModified) {
 				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z], true);
 
-				for (size_t j = 0; j != unitupgrade.size(); ++j) {
-					CUnit &unit = *unitupgrade[j];
+				for (CUnit *unitPtr : unitupgrade) {
+					CUnit &unit = *unitPtr;
 
 					if (unit.Player->Index != player.Index) {
 						continue;

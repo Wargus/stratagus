@@ -982,23 +982,21 @@ static int CclOrderUnit(lua_State *l)
 	}
 	const std::string_view order = LuaToString(l, 5);
 	std::vector<CUnit *> table = Select(pos1, pos2);
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (unitValidator(unit) && unitPlayerValidator(unit)) {
+	for (CUnit *unit : table) {
+		if (unitValidator(*unit) && unitPlayerValidator(*unit)) {
 			if (order == "move") {
-				CommandMove(unit, (dpos1 + dpos2) / 2, 1);
+				CommandMove(*unit, (dpos1 + dpos2) / 2, 1);
 			} else if (order == "stop") {
-				CommandStopUnit(unit); //Stop the unit
+				CommandStopUnit(*unit); //Stop the unit
 			} else if (order == "stand-ground") {
-				CommandStandGround(unit,0); //Stand and flush every order
+				CommandStandGround(*unit, 0); //Stand and flush every order
 			} else if (order == "attack") {
-				CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
-				CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+				CUnit *attack = TargetOnMap(*unit, dpos1, dpos2);
+				CommandAttack(*unit, (dpos1 + dpos2) / 2, attack, 1);
 			} else if (order == "explore") {
-				CommandExplore(unit, 1);
+				CommandExplore(*unit, 1);
 			} else if (order == "patrol") {
-				CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
+				CommandPatrolUnit(*unit, (dpos1 + dpos2) / 2, 1);
 			} else {
 				LuaError(l, "Unsupported order: %s", order.data());
 			}
@@ -1182,9 +1180,9 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 				 : SelectAroundUnit(unit, range, HasSamePlayerAs(*unit.Player));
 
 	size_t n = 0;
-	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->IsAliveOnMap()) {
-			lua_pushnumber(l, UnitNumber(*table[i]));
+	for (CUnit *unit : table) {
+		if (unit->IsAliveOnMap()) {
+			lua_pushnumber(l, UnitNumber(*unit));
 			lua_rawseti(l, -2, ++n);
 		}
 	}

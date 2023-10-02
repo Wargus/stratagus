@@ -1480,8 +1480,8 @@ void UnitLost(CUnit &unit)
 */
 void UnitClearOrders(CUnit &unit)
 {
-	for (size_t i = 0; i != unit.Orders.size(); ++i) {
-		delete unit.Orders[i];
+	for (auto p : unit.Orders) {
+		delete p;
 	}
 	unit.Orders.clear();
 	unit.Orders.push_back(COrder::NewActionStill());

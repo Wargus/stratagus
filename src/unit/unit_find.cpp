@@ -589,19 +589,17 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 	std::vector<CUnit *> table = Select(pos1, pos2);
 
 	CUnit *best = nullptr;
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (!unit.IsVisibleAsGoal(*source.Player)) {
+	for (CUnit *unit : table) {
+		if (!unit->IsVisibleAsGoal(*source.Player)) {
 			continue;
 		}
-		if (!CanTarget(*source.Type, *unit.Type)) {
+		if (!CanTarget(*source.Type, *unit->Type)) {
 			continue;
 		}
 
 		// Choose the best target.
-		if (!best || best->Variable[PRIORITY_INDEX].Value < unit.Variable[PRIORITY_INDEX].Value) {
-			best = &unit;
+		if (!best || best->Variable[PRIORITY_INDEX].Value < unit->Variable[PRIORITY_INDEX].Value) {
+			best = unit;
 		}
 	}
 	return best;

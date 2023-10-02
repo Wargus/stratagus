@@ -164,7 +164,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 {
 	LuaCheckArgs(l, 4);
 
-	int plynr = LuaToNumber(l, 1);
+	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pushvalue(l, 2);
 	auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
@@ -183,21 +183,9 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	std::vector<CUnit *> units = Select(minPos, maxPos);
 
-	int s = 0;
-	for (size_t i = 0; i != units.size(); ++i) {
-		const CUnit &unit = *units[i];
-		// Check unit type
-
-		if (unitValidator(unit)) {
-
-			// Check the player
-			if (plynr == -1 || plynr == unit.Player->Index) {
-				if (unit.IsAlive()) {
-					++s;
-				}
-			}
-		}
-	}
+	const int s = ranges::count_if(units, [&](const CUnit *unit) {
+		return unitValidator(*unit) && unitPlayerValidator(*unit) && unit->IsAlive();
+	});
 	lua_pushnumber(l, s);
 	return 1;
 }
