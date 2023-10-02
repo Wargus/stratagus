@@ -509,7 +509,7 @@ void CMinimap::Destroy()
 /**
 **  Draw viewport area contour.
 */
-void CMinimap::DrawViewportArea(const CViewport &viewport) const
+void CMinimap::DrawViewportArea(const CViewport &viewport, int alpha) const
 {
 	// Determine and save region below minimap cursor
 	const PixelPos screenPos = TilePosToScreenPos(viewport.MapPos);
@@ -517,7 +517,7 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 	int h = (viewport.MapHeight * MinimapScaleY) / MINIMAP_FAC;
 
 	// Draw cursor as rectangle (Note: unclipped, as it is always visible)
-	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w, h, 128);
+	Video.DrawTransRectangle(UI.ViewportCursorColor, screenPos.x, screenPos.y, w, h, alpha);
 }
 
 /**
