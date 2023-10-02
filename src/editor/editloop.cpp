@@ -1,4 +1,4 @@
-//       _________ __                 __
+﻿//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -419,7 +419,7 @@ static void CalculateMaxIconSize()
 	IconWidth = 0;
 	IconHeight = 0;
 	for (const auto &typeStr : Editor.UnitTypes) {
-		if (!typeStr.empty()) {
+		if (starts_with(typeStr, "unit-")) {
 			const CUnitType &type = UnitTypeByIdent(typeStr);
 			if (type.Icon.Icon) {
 				const CIcon &icon = *type.Icon.Icon;
@@ -439,7 +439,7 @@ static void RecalculateShownUnits(size_t start = 0, size_t stop = INT_MAX)
 	Editor.ShownUnitTypes.clear();
 
 	for (size_t i = start; i < Editor.UnitTypes.size() && i < stop; i++) {
-		if (!Editor.UnitTypes[i].empty()) {
+		if (starts_with(Editor.UnitTypes[i], "unit-")) {
 			Editor.ShownUnitTypes.push_back(&UnitTypeByIdent(Editor.UnitTypes[i]));
 		} else {
 			Editor.ShownUnitTypes.push_back(nullptr);
