@@ -360,6 +360,9 @@ extern void DebugPlayers();
 
 void FreePlayerColors();
 
+
+CPlayer *CclGetPlayer(lua_State *l);
+
 /// register ccl features
 extern void PlayerCclRegister();
 

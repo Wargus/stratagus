@@ -232,11 +232,10 @@ static void InitAiHelper(AiHelper &aiHelper)
 		}
 	}
 
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		const ButtonAction &button = *UnitButtonTable[i];
-		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button.UnitMask);
+	for (const ButtonAction *button : UnitButtonTable) {
+		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button->UnitMask);
 
-		switch (button.Action) {
+		switch (button->Action) {
 			case ButtonCmd::Repair :
 				for (CUnitType *type : unitmask) {
 					for (CUnitType *reparableUnit : reparableUnits) {
@@ -245,7 +244,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			case ButtonCmd::Build: {
-				CUnitType &buildingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &buildingType = UnitTypeByIdent(button->ValueStr);
 
 				for (CUnitType *type : unitmask) {
 					AiHelperInsert(aiHelper.Build(), buildingType.Slot, *type);
@@ -253,7 +252,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Train : {
-				CUnitType &trainingType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &trainingType = UnitTypeByIdent(button->ValueStr);
 
 				for (CUnitType *type : unitmask) {
 					AiHelperInsert(aiHelper.Train(), trainingType.Slot, *type);
@@ -261,7 +260,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::UpgradeTo : {
-				CUnitType &upgradeToType = UnitTypeByIdent(button.ValueStr);
+				CUnitType &upgradeToType = UnitTypeByIdent(button->ValueStr);
 
 				for (CUnitType *type : unitmask) {
 					AiHelperInsert(aiHelper.Upgrade(), upgradeToType.Slot, *type);
@@ -269,9 +268,9 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			case ButtonCmd::Research : {
-				int researchId = UpgradeIdByIdent(button.ValueStr);
+				int researchId = UpgradeIdByIdent(button->ValueStr);
 
-				if (button.Allowed == ButtonCheckSingleResearch) {
+				if (button->Allowed == ButtonCheckSingleResearch) {
 					for (CUnitType *type : unitmask) {
 						AiHelperInsert(aiHelper.SingleResearch(), researchId, *type);
 					}
@@ -338,8 +337,7 @@ static int CclDefineAiHelper(lua_State *l)
 
 static CAiType *GetAiTypesByName(const std::string_view name)
 {
-	for (size_t i = 0; i < AiTypes.size(); ++i) {
-		CAiType *ait = AiTypes[i];
+	for (CAiType *ait : AiTypes) {
 		if (ait->Name == name) {
 			return ait;
 		}
@@ -1547,8 +1545,7 @@ static int CclAiDump(lua_State *l)
 
 			// Building queue
 			printf("Building queue:\n");
-			for (size_t i = 0; i < aip.Ai->UnitTypeBuilt.size(); ++i) {
-				const AiBuildQueue &queue = aip.Ai->UnitTypeBuilt[i];
+			for (const AiBuildQueue &queue : aip.Ai->UnitTypeBuilt) {
 				printf("%s(%d/%d) ", queue.Type->Ident.c_str(), queue.Made, queue.Want);
 			}
 			printf("\n");
@@ -1558,8 +1555,7 @@ static int CclAiDump(lua_State *l)
 				printf("Force(%u%s%s):\n", static_cast<unsigned int>(i),
 					   aip.Ai->Force[i].Completed ? ",complete" : ",recruit",
 					   aip.Ai->Force[i].Attacking ? ",attack" : "");
-				for (size_t j = 0; j < aip.Ai->Force[i].UnitTypes.size(); ++j) {
-					const AiUnitType &aut = aip.Ai->Force[i].UnitTypes[j];
+				for (const AiUnitType &aut : aip.Ai->Force[i].UnitTypes) {
 					printf("%s(%d) ", aut.Type->Ident.c_str(), aut.Want);
 				}
 				printf("\n");

@@ -497,25 +497,19 @@ static int CclDefineCursor(lua_State *l)
 	//  Look if this kind of cursor already exists.
 	//
 	CCursor *ct = nullptr;
-	for (size_t i = 0; i < AllCursors.size(); ++i) {
-		//  Race not same, not found.
-		if (AllCursors[i]->Race != race) {
-			continue;
-		}
-		if (AllCursors[i]->Ident == name) {
-			ct = AllCursors[i];
-			break;
-		}
-	}
-
+	auto it = ranges::find_if(AllCursors, [&](const CCursor *cursor) {
+		return cursor->Race == race && cursor->Ident == name;
+	});
 	//
 	//  Not found, make a new slot.
 	//
-	if (!ct) {
+	if (it == AllCursors.end()) {
 		ct = new CCursor();
 		AllCursors.push_back(ct);
 		ct->Ident = name;
 		ct->Race = race;
+	} else {
+		ct = *it;
 	}
 	ct->G = CGraphic::New(file, w, h);
 	ct->HotPos = hotpos;

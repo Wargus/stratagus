@@ -97,12 +97,9 @@ public:
 private:
 	void updateTainted()
 	{
-		tainted = false;
-		for (size_t i = 0; i != units.size(); ++i) {
-			if (units[i]->Type && !units[i]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
-				tainted = true;
-			}
-		}
+		tainted = ranges::any_of(units, [](const CUnit *unit) {
+			return unit->Type && !unit->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
+		});
 	}
 
 private:
@@ -128,8 +125,8 @@ void SaveGroups(CFile &file)
 
 	for (int g = 0; g < NUM_GROUPS; ++g) {
 		file.printf("Group(%d, %lu, {", g, (long unsigned int)Groups[g].getUnits().size());
-		for (size_t i = 0; i < Groups[g].getUnits().size(); ++i) {
-			file.printf("\"%s\", ", UnitReference(*Groups[g].getUnits()[i]).c_str());
+		for (const CUnit *unit : Groups[g].getUnits()) {
+			file.printf("\"%s\", ", UnitReference(*unit).c_str());
 		}
 		file.printf("})\n");
 	}
@@ -174,10 +171,9 @@ void ClearGroup(int num)
 	Assert(num < NUM_GROUPS);
 	CUnitGroup &group = Groups[num];
 
-	for (size_t i = 0; i != group.getUnits().size(); ++i) {
-		CUnit &unit = *group.getUnits()[i];
-		unit.GroupId &= ~(1 << num);
-		Assert(!unit.Destroyed);
+	for (CUnit *unit : group.getUnits()) {
+		unit->GroupId &= ~(1 << num);
+		Assert(!unit->Destroyed);
 	}
 	group.init();
 }

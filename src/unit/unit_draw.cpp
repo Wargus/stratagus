@@ -388,12 +388,11 @@ void LoadDecorations()
 */
 void CleanDecorations()
 {
-	for (unsigned int i = 0; i < DecoSprite.SpriteArray.size(); ++i) {
-		CGraphic::Free(DecoSprite.SpriteArray[i].Sprite);
+	for (Decoration &deco : DecoSprite.SpriteArray) {
+		CGraphic::Free(deco.Sprite);
 	}
-
-	DecoSprite.Name.clear();
 	DecoSprite.SpriteArray.clear();
+	DecoSprite.Name.clear();
 }
 
 /**

@@ -611,11 +611,9 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (unit.IsIdle()) {
-			CommandTrainUnit(unit, what, FlushCommands);
+	for (CUnit *unit : table) {
+		if (unit->IsIdle()) {
+			CommandTrainUnit(*unit, what, FlushCommands);
 			return true;
 		}
 	}
@@ -667,17 +665,17 @@ static bool AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 		}
 
 		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-		for (unsigned int i = 0; i < table.size(); ++i) {
+		for (CUnitType *unitType : table) {
 			//
 			// The type for builder/trainer is available
 			//
-			if (unit_count[table[i]->Slot]) {
+			if (unit_count[unitType->Slot]) {
 				if (type.Building) {
-					if (AiBuildBuilding(*table[i], type, nearPos)) {
+					if (AiBuildBuilding(*unitType, type, nearPos)) {
 						return true;
 					}
 				} else {
-					if (AiTrainUnit(*table[i], type)) {
+					if (AiTrainUnit(*unitType, type)) {
 						return true;
 					}
 				}
@@ -701,11 +699,9 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 {
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (unit.IsIdle()) {
-			CommandResearch(unit, what, FlushCommands);
+	for (CUnit *unit : table) {
+		if (unit->IsIdle()) {
+			CommandResearch(*unit, what, FlushCommands);
 			return true;
 		}
 	}
@@ -737,10 +733,10 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 			std::vector<CUnitType *> &table = tablep[upgrade->ID];
 			if (!table.empty()) { // not known as multi-researchable upgrade
 				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				for (unsigned int i = 0; i < table.size(); ++i) {
+				for (const CUnitType *type : table) {
 					// The type is available
-					if (unit_count[table[i]->Slot]
-						&& AiResearchUpgrade(*table[i], *upgrade)) {
+					if (unit_count[type->Slot]
+						&& AiResearchUpgrade(*type, *upgrade)) {
 						return;
 					}
 				}
@@ -761,10 +757,10 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 					return;
 				}
 				const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-				for (unsigned int i = 0; i < table.size(); ++i) {
+				for (const CUnitType *type : table) {
 					// The type is available
-					if (unit_count[table[i]->Slot]
-						&& AiResearchUpgrade(*table[i], *upgrade)) {
+					if (unit_count[type->Slot]
+						&& AiResearchUpgrade(*type, *upgrade)) {
 						return;
 					}
 				}
@@ -795,11 +791,9 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 
 	// Remove all units already doing something.
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (unit.IsIdle()) {
-			CommandUpgradeTo(unit, what, FlushCommands);
+	for (CUnit *unit : table) {
+		if (unit->IsIdle()) {
+			CommandUpgradeTo(*unit, what, FlushCommands);
 			return true;
 		}
 	}
@@ -843,12 +837,12 @@ void AiAddUpgradeToRequest(CUnitType &type)
 	}
 
 	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-	for (unsigned int i = 0; i < table.size(); ++i) {
+	for (const CUnitType *unitType : table) {
 		//
 		// The type is available
 		//
-		if (unit_count[table[i]->Slot]) {
-			if (AiUpgradeTo(*table[i], type)) {
+		if (unit_count[unitType->Slot]) {
+			if (AiUpgradeTo(*unitType, type)) {
 				return;
 			}
 		}
@@ -966,9 +960,7 @@ static bool AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 
 	int exploremask = 0;
 
-	for (size_t i = 0; i != UnitTypes.size(); ++i) {
-		const CUnitType *type = UnitTypes[i];
-
+	for (const CUnitType *type : UnitTypes) {
 		if (type && type->GivesResource == resource) {
 			switch (type->UnitType) {
 				case UnitTypeLand:
@@ -1316,12 +1308,12 @@ static bool AiRepairUnit(CUnit &unit)
 	}
 
 	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-	for (unsigned int i = 0; i < table.size(); ++i) {
+	for (const CUnitType *unitType : table) {
 		//
 		// The type is available
 		//
-		if (unit_count[table[i]->Slot]) {
-			if (AiRepairBuilding(*AiPlayer->Player, *table[i], unit)) {
+		if (unit_count[unitType->Slot]) {
+			if (AiRepairBuilding(*AiPlayer->Player, *unitType, unit)) {
 				return true;
 			}
 		}

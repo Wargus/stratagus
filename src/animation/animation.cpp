@@ -520,9 +520,9 @@ static void AddLabel(CAnimation *anim, const std::string &name)
 */
 static CAnimation *FindLabel(lua_State *l, const std::string &name)
 {
-	for (size_t i = 0; i < Labels.size(); ++i) {
-		if (Labels[i].Name == name) {
-			return Labels[i].Anim;
+	for (auto &label : Labels) {
+		if (label.Name == name) {
+			return label.Anim;
 		}
 	}
 	LuaError(l, "Label not found: %s", name.c_str());
@@ -546,8 +546,8 @@ void FindLabelLater(CAnimation **anim, std::string name)
 */
 static void FixLabels(lua_State *l)
 {
-	for (size_t i = 0; i < LabelsLater.size(); ++i) {
-		*LabelsLater[i].Anim = FindLabel(l, LabelsLater[i].Name);
+	for (auto &labelLater : LabelsLater) {
+		*labelLater.Anim = FindLabel(l, labelLater.Name);
 	}
 }
 

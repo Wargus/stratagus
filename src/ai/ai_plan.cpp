@@ -188,8 +188,7 @@ bool AiFindWall(AiForce *force)
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
 	CUnit *unit = force->Units[0];
-	for (unsigned int i = 0; i < force->Units.size(); ++i) {
-		CUnit *aiunit = force->Units[i];
+	for (CUnit *aiunit : force->Units) {
 		if (aiunit->Type->UnitType == UnitTypeLand) {
 			unit = aiunit;
 			if (aiunit->Type->Missile.Missile->Range == 1) {
@@ -202,12 +201,11 @@ bool AiFindWall(AiForce *force)
 
 	if (FindWall(*unit, maxRange, &wallPos)) {
 		force->State = AiForceAttackingState::Waiting;
-		for (unsigned int i = 0; i < force->Units.size(); ++i) {
-			CUnit &aiunit = *force->Units[i];
-			if (aiunit.Type->CanAttack) {
-				CommandAttack(aiunit, wallPos, nullptr, FlushCommands);
+		for (CUnit *aiunit : force->Units) {
+			if (aiunit->Type->CanAttack) {
+				CommandAttack(*aiunit, wallPos, nullptr, FlushCommands);
 			} else {
-				CommandMove(aiunit, wallPos, FlushCommands);
+				CommandMove(*aiunit, wallPos, FlushCommands);
 			}
 		}
 		return true;

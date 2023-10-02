@@ -489,13 +489,12 @@ static int CclCheckDependency(lua_State *l)
 	LuaCheckArgs(l, 2);
 	const std::string_view object = LuaToString(l, 2);
 	lua_pop(l, 1);
-	const int plynr = TriggerGetPlayer(l);
-	if (plynr == -1) {
-		LuaError(l, "bad player: %i", plynr);
+	const CPlayer *player = CclGetPlayer(l);
+	if (player == nullptr) {
+		LuaError(l, "bad player: %s", lua_tostring(l, 1));
 	}
-	CPlayer &player = Players[plynr];
 
-	lua_pushboolean(l, CheckDependByIdent(player, object));
+	lua_pushboolean(l, CheckDependByIdent(*player, object));
 	return 1;
 }
 

@@ -162,8 +162,8 @@ void StartMap(const std::string &filename, bool clean)
 
 void FreeAllContainers()
 {
-	for (size_t i = 0; i != Containers.size(); ++i) {
-		delete Containers[i];
+	for (auto *p : Containers) {
+		delete p;
 	}
 }
 
@@ -386,8 +386,8 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 		}
 
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			const CUnitType &type = *UnitTypes[i];
+		for (const CUnitType *typePtr : UnitTypes) {
+			const CUnitType &type = *typePtr;
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				if (type.MapDefaultStat.Costs[j] != type.DefaultStat.Costs[j]) {
 					f->printf("SetMapStat(\"%s\", \"Costs\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.Costs[j], DefaultResourceNames[j].c_str());

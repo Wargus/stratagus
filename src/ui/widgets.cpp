@@ -827,8 +827,8 @@ int MultiLineLabel::getLineWidth()
 void MultiLineLabel::adjustSize()
 {
 	int width = 0;
-	for (int i = 0; i < (int)this->mTextRows.size(); ++i) {
-		int w = this->getFont()->getWidth(this->mTextRows[i]);
+	for (const auto& s : this->mTextRows) {
+		int w = this->getFont()->getWidth(s);
 		if (width < w) {
 			width = std::min(w, this->mLineWidth);
 		}

@@ -505,9 +505,7 @@ void FreeAi()
 	CleanAi();
 
 	//  Free AiTypes.
-	for (unsigned int i = 0; i < AiTypes.size(); ++i) {
-		CAiType *aitype = AiTypes[i];
-
+	for (CAiType *aitype : AiTypes) {
 		delete aitype;
 	}
 	AiTypes.clear();
@@ -668,39 +666,37 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		AiForce &aiForce = pai.Force[defender.GroupId - 1];
 
 		//  Unit belongs to an force, check if brothers in arms can help
-		for (unsigned int i = 0; i < aiForce.Units.size(); ++i) {
-			CUnit &aiunit = *aiForce.Units[i];
-
-			if (&defender == &aiunit) {
+		for (CUnit *aiunit : aiForce.Units) {
+			if (&defender == aiunit) {
 				continue;
 			}
 
 			// if brother is idle or attack no-agressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
-			if (aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
-				&& aiunit.CurrentOrder()->GetGoal() != attacker) {
-				bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
+			if (aiunit->IsAgressive() && CanTarget(*aiunit->Type, *attacker->Type)
+				&& aiunit->CurrentOrder()->GetGoal() != attacker) {
+				bool shouldAttack = aiunit->IsIdle() && aiunit->Threshold == 0;
 
-				if (aiunit.CurrentAction() == UnitAction::Attack) {
-					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+				if (aiunit->CurrentAction() == UnitAction::Attack) {
+					const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit->CurrentOrder());
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
 					if (oldGoal == nullptr || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
-											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+											&& aiunit->MapDistanceTo(defender) <= aiunit->Stats->Variables[ATTACKRANGE_INDEX].Max)) {
 						shouldAttack = true;
 					}
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+					CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+					COrder *savedOrder = COrder::NewActionAttack(*aiunit, attacker->tilePos);
 
-					if (aiunit.CanStoreOrder(savedOrder) == false) {
+					if (aiunit->CanStoreOrder(savedOrder) == false) {
 						delete savedOrder;
 						savedOrder = nullptr;
 					} else {
-						aiunit.SavedOrder = savedOrder;
+						aiunit->SavedOrder = savedOrder;
 					}
 				}
 			}

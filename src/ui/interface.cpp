@@ -168,12 +168,12 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 	PixelPos pos(-1, -1);
 
 	// FIXME: what should we do with the removed units? ignore?
-	for (size_t i = 0; i != units.size(); ++i) {
-		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
+	for (CUnit *unit : units) {
+		if (unit->Type && unit->Type->CanSelect(mode)) {
 			if (pos.x != -1) {
-				pos += (units[i]->GetMapPixelPosCenter() - pos) / 2;
+				pos += (unit->GetMapPixelPosCenter() - pos) / 2;
 			} else {
-				pos = units[i]->GetMapPixelPosCenter();
+				pos = unit->GetMapPixelPosCenter();
 			}
 		}
 	}
@@ -211,9 +211,9 @@ static void UiAddGroupToSelection(unsigned group)
 		return;
 	}
 
-	for (size_t i = 0; i != units.size(); ++i) {
-		if (!(units[i]->Removed || units[i]->Type->Building)) {
-			SelectUnit(*units[i]);
+	for (CUnit *unit : units) {
+		if (!(unit->Removed || unit->Type->Building)) {
+			SelectUnit(*unit);
 		}
 	}
 	SelectionChanged();
@@ -226,9 +226,9 @@ static void UiAddGroupToSelection(unsigned group)
 */
 static void UiDefineGroup(unsigned group)
 {
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[i]->Player == ThisPlayer && Selected[i]->GroupId) {
-			RemoveUnitFromGroups(*Selected[i]);
+	for (CUnit *unit : Selected) {
+		if (unit->Player == ThisPlayer && unit->GroupId) {
+			RemoveUnitFromGroups(*unit);
 		}
 	}
 	SetGroup(&Selected[0], Selected.size(), group);
@@ -396,8 +396,8 @@ static void UiCenterOnSelected()
 
 	PixelPos pos;
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		pos += Selected[i]->GetMapPixelPosCenter();
+	for (const CUnit *unit : Selected) {
+		pos += unit->GetMapPixelPosCenter();
 	}
 	pos /= Selected.size();
 	UI.SelectedViewport->Center(pos);
@@ -996,8 +996,8 @@ static void InputKey(int key)
 					}
 				} else if (InputIndex < (int)(sizeof(Input) - kstr.size())) {
 					moveInputContent(InputIndex + kstr.size(), InputIndex);
-					for (size_t i = 0; i < kstr.size(); ++i) {
-						Input[InputIndex++] = kstr[i];
+					for (char c : kstr) {
+						Input[InputIndex++] = c;
 					}
 				}
 				addCursorToInput();

@@ -88,8 +88,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
 	Vec2i maxpos = pos + Vec2i(unit.Type->TileWidth - 1 + attackrange, unit.Type->TileHeight - 1 + attackrange);
 	std::vector<CUnit *> table = Select(minpos, maxpos, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit *dest = table[i];
+	for (CUnit *dest : table) {
 		const CUnitType &dtype = *dest->Type;
 
 		if (!unit.IsEnemy(*dest) // a friend or neutral
@@ -328,8 +327,7 @@ bool AiForce::IsBelongsTo(const CUnitType &type)
 
 	// Look what should be in the force.
 	Completed = true;
-	for (unsigned int i = 0; i < UnitTypes.size(); ++i) {
-		const AiUnitType &aitype = UnitTypes[i];
+	for (const AiUnitType &aitype : UnitTypes) {
 		const int slot = aitype.Type->Slot;
 
 		if (counter[slot] < aitype.Want) {
@@ -445,22 +443,12 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	Vec2i goalPos(pos);
 
-	bool isNaval = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
-			isNaval = true;
-			break;
-		}
-	}
-	bool isTransporter = false;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
-			isTransporter = true;
-			break;
-		}
-	}
+	const bool isNaval = ranges::any_of(this->Units, [](const CUnit *unit) {
+		return unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack;
+	});
+	const bool isTransporter = ranges::any_of(this->Units, [](const CUnit *unit) {
+		return unit->Type->CanTransport() && unit->IsAgressive() == false;
+	});
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;
@@ -502,9 +490,7 @@ void AiForce::Attack(const Vec2i &pos)
 	//  Send all units in the force to enemy.
 
 	CUnit *leader = nullptr;
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		CUnit *const unit = this->Units[i];
-
+	for (CUnit *unit : this->Units) {
 		if (unit->IsAgressive()) {
 			leader = unit;
 			break;
@@ -533,9 +519,8 @@ void AiForce::Attack(const Vec2i &pos)
 void AiForce::ReturnToHome()
 {
 	if (Map.Info.IsPointOnMap(this->HomePos)) {
-		for (size_t i = 0; i != this->Units.size(); ++i) {
-			CUnit &unit = *this->Units[i];
-			CommandMove(unit, this->HomePos, FlushCommands);
+		for (CUnit *unit : this->Units) {
+			CommandMove(*unit, this->HomePos, FlushCommands);
 		}
 	}
 	const Vec2i invalidPos(-1, -1);

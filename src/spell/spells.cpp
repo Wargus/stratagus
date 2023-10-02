@@ -420,7 +420,7 @@ SpellType &SpellTypeByIdent(const std::string_view &ident)
 **  @param player    player for who we want to know if he knows the spell.
 **  @param spellid   id of the spell to check.
 **
-**  @return          0 if spell is not available, else no null.
+**  @return          false if spell is not available, else true.
 */
 bool SpellIsAvailable(const CPlayer &player, int spellid)
 {
@@ -437,7 +437,7 @@ bool SpellIsAvailable(const CPlayer &player, int spellid)
 **  @param target    Target unit that spell is addressed to
 **  @param goalPos   coord of target spot when/if target does not exist
 **
-**  @return          =!0 if spell should/can casted, 0 if not
+**  @return          true if spell should/can casted, false if not
 **  @note caster must know the spell, and spell must be researched.
 */
 bool CanCastSpell(const CUnit &caster, const SpellType &spell,

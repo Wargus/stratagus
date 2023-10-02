@@ -777,19 +777,19 @@ static int CclCreateUnit(lua_State *l)
 	CclGetPos(l, &ipos, 3);
 
 	lua_pushvalue(l, 2);
-	const int playerno = TriggerGetPlayer(l);
+	CPlayer *player = CclGetPlayer(l);
 	lua_pop(l, 1);
-	if (playerno == -1) {
+	if (player == nullptr) {
 		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
 		LuaError(l, "bad player");
 		return 0;
 	}
-	if (Players[playerno].Type == PlayerTypes::PlayerNobody) {
-		printf("CreateUnit: player %d does not exist\n", playerno);
+	if (player->Type == PlayerTypes::PlayerNobody) {
+		printf("CreateUnit: player %s does not exist\n", lua_tostring(l, 2));
 		LuaError(l, "bad player");
 		return 0;
 	}
-	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	CUnit *unit = MakeUnit(*unittype, player);
 	if (unit == nullptr) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
@@ -948,7 +948,7 @@ static int CclOrderUnit(lua_State *l)
 	LuaCheckArgs(l, 5);
 
 	lua_pushvalue(l, 1);
-	const int plynr = TriggerGetPlayer(l);
+	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
 	const auto unitValidator = TriggerGetUnitType(l);
@@ -982,27 +982,23 @@ static int CclOrderUnit(lua_State *l)
 	}
 	const std::string_view order = LuaToString(l, 5);
 	std::vector<CUnit *> table = Select(pos1, pos2);
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (unitValidator(unit)) {
-			if (plynr == -1 || plynr == unit.Player->Index) {
-				if (order == "move") {
-					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
-				} else if (order == "stop") {
-					CommandStopUnit(unit); //Stop the unit
-				} else if (order == "stand-ground") {
-					CommandStandGround(unit,0); //Stand and flush every order
-				} else if (order == "attack") {
-					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
-					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
-				} else if (order == "explore") {
-					CommandExplore(unit, 1);
-				} else if (order == "patrol") {
-					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
-				} else {
-					LuaError(l, "Unsupported order: %s", order.data());
-				}
+	for (CUnit *unit : table) {
+		if (unitValidator(*unit) && unitPlayerValidator(*unit)) {
+			if (order == "move") {
+				CommandMove(*unit, (dpos1 + dpos2) / 2, 1);
+			} else if (order == "stop") {
+				CommandStopUnit(*unit); //Stop the unit
+			} else if (order == "stand-ground") {
+				CommandStandGround(*unit, 0); //Stand and flush every order
+			} else if (order == "attack") {
+				CUnit *attack = TargetOnMap(*unit, dpos1, dpos2);
+				CommandAttack(*unit, (dpos1 + dpos2) / 2, attack, 1);
+			} else if (order == "explore") {
+				CommandExplore(*unit, 1);
+			} else if (order == "patrol") {
+				CommandPatrolUnit(*unit, (dpos1 + dpos2) / 2, 1);
+			} else {
+				LuaError(l, "Unsupported order: %s", order.data());
 			}
 		}
 	}
@@ -1030,8 +1026,8 @@ static int CclKillUnit(lua_State *l)
 	lua_pushvalue(l, 1);
 	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
-	const int plynr = TriggerGetPlayer(l);
-	if (plynr == -1) {
+	CPlayer *player = CclGetPlayer(l);
+	if (player == nullptr) {
 		auto it = ranges::find_if(UnitManager->GetUnits(),
 		                          [&](const CUnit *unit) { return unitValidator(*unit); });
 
@@ -1041,11 +1037,10 @@ static int CclKillUnit(lua_State *l)
 			return 1;
 		}
 	} else {
-		CPlayer &player = Players[plynr];
-		auto it = ranges::find_if(player.GetUnits(),
+		auto it = ranges::find_if(player->GetUnits(),
 		                          [&](const CUnit *unit) { return unitValidator(*unit); });
 
-		if (it != player.GetUnits().end()) {
+		if (it != player->GetUnits().end()) {
 			LetUnitDie(**it);
 			lua_pushboolean(l, 1);
 			return 1;
@@ -1077,7 +1072,7 @@ static int CclKillUnitAt(lua_State *l)
 	const auto unitValidator = TriggerGetUnitType(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	int plynr = TriggerGetPlayer(l);
+	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pop(l, 1);
 	int q = LuaToNumber(l, 3);
 
@@ -1101,11 +1096,9 @@ static int CclKillUnitAt(lua_State *l)
 	for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end() && s < q; ++it) {
 		CUnit &unit = **it;
 
-		if (unitValidator(unit)) {
-			if ((plynr == -1 || plynr == unit.Player->Index) && unit.IsAlive()) {
-				LetUnitDie(unit);
-				++s;
-			}
+		if (unitValidator(unit) && unitPlayerValidator(unit) && unit.IsAlive()) {
+			LetUnitDie(unit);
+			++s;
 		}
 	}
 	lua_pushnumber(l, s);
@@ -1133,10 +1126,10 @@ static int CclGetUnits(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 
-	const int plynr = TriggerGetPlayer(l);
+	const CPlayer *player = CclGetPlayer(l);
 
 	lua_newtable(l);
-	if (plynr == -1) {
+	if (player == nullptr) {
 		int i = 0;
 		for (const CUnit *unit : UnitManager->GetUnits()) {
 			lua_pushnumber(l, UnitNumber(*unit));
@@ -1144,8 +1137,8 @@ static int CclGetUnits(lua_State *l)
 			++i;
 		}
 	} else {
-		for (int i = 0; i < Players[plynr].GetUnitCount(); ++i) {
-			lua_pushnumber(l, UnitNumber(Players[plynr].GetUnit(i)));
+		for (int i = 0; i < player->GetUnitCount(); ++i) {
+			lua_pushnumber(l, UnitNumber(player->GetUnit(i)));
 			lua_rawseti(l, -2, i + 1);
 		}
 	}
@@ -1187,9 +1180,9 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 				 : SelectAroundUnit(unit, range, HasSamePlayerAs(*unit.Player));
 
 	size_t n = 0;
-	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->IsAliveOnMap()) {
-			lua_pushnumber(l, UnitNumber(*table[i]));
+	for (CUnit *unit : table) {
+		if (unit->IsAliveOnMap()) {
+			lua_pushnumber(l, UnitNumber(*unit));
 			lua_rawseti(l, -2, ++n);
 		}
 	}

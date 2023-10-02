@@ -620,8 +620,8 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	if (dest != nullptr && dest->Type->CanTransport()) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (CanTransport(*dest, *Selected[i])) {
+		for (const CUnit *unit : Selected) {
+			if (CanTransport(*dest, *unit)) {
 				// We are clicking on a transporter. We have to:
 				// 1) Flush the transporters orders.
 				// 2) Tell the transporter to follow the units. We have to queue all
@@ -785,7 +785,6 @@ static void HandleMouseOn(const PixelPos screenPos)
 				return;
 			}
 		}
-
 	}
 	const size_t buttonCount = UI.ButtonPanel.Buttons.size();
 	for (unsigned int j = 0; j < buttonCount; ++j) {
@@ -1026,12 +1025,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
 		return;
 	} else {
-		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-			const CUIUserButton &button = UI.UserButtons[i];
-
-			if (button.Clicked) {
-				return;
-			}
+		if (ranges::any_of(UI.UserButtons,
+		                   [](const CUIUserButton &button) { return button.Clicked; })) {
+			return;
 		}
 	}
 
@@ -1067,8 +1063,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				// 0 Test build, don't really build
 				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
 					const int flush = !(KeyModifiers & ModifierShift);
-					for (size_t i = 0; i != Selected.size(); ++i) {
-						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+					for (CUnit *unit : Selected) {
+						SendCommandBuildBuilding(*unit, tilePos, *CursorBuilding, flush);
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
@@ -1183,9 +1179,7 @@ static int SendRepair(const Vec2i &tilePos)
 	if (dest && dest->Variable[HP_INDEX].Value < dest->Variable[HP_INDEX].Max
 		&& dest->Type->RepairHP
 		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			CUnit *unit = Selected[i];
-
+		for (CUnit *unit : Selected) {
 			if (unit->Type->RepairRange) {
 				const int flush = !(KeyModifiers & ModifierShift);
 
@@ -1215,9 +1209,7 @@ static int SendMove(const Vec2i &tilePos)
 
 	// Alt makes unit to defend goal
 	if (goal && (KeyModifiers & ModifierAlt)) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			CUnit *unit = Selected[i];
-
+		for (CUnit *unit : Selected) {
 			goal->Blink = 4;
 			SendCommandDefend(*unit, *goal, flush);
 			ret = 1;
@@ -1240,9 +1232,7 @@ static int SendMove(const Vec2i &tilePos)
 			goal = nullptr;
 		}
 
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			CUnit *unit = Selected[i];
-
+		for (CUnit *unit : Selected) {
 			if (goal && CanTransport(*goal, *unit)) {
 				goal->Blink = 4;
 				SendCommandFollow(*goal, *unit, 0);
@@ -1281,20 +1271,18 @@ static int SendAttack(const Vec2i &tilePos)
 	if (dest && dest->Type->BoolFlag[DECORATION_INDEX].value) {
 		dest = nullptr;
 	}
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		CUnit &unit = *Selected[i];
-
-		if (unit.Type->CanAttack) {
-			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
+	for (CUnit *unit : Selected) {
+		if (unit->Type->CanAttack) {
+			if (!dest || (dest != unit && CanTarget(*unit->Type, *dest->Type))) {
 				if (dest) {
 					dest->Blink = 4;
 				}
-				SendCommandAttack(unit, tilePos, dest, flush);
+				SendCommandAttack(*unit, tilePos, dest, flush);
 				ret = 1;
 			}
 		} else {
-			if (unit.CanMove()) {
-				SendCommandMove(unit, tilePos, flush);
+			if (unit->CanMove()) {
+				SendCommandMove(*unit, tilePos, flush);
 				ret = 1;
 			}
 		}
@@ -1312,13 +1300,12 @@ static int SendAttackGround(const Vec2i &tilePos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	int ret = 0;
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		CUnit &unit = *Selected[i];
-		if (unit.Type->CanAttack) {
-			SendCommandAttackGround(unit, tilePos, flush);
+	for (CUnit *unit : Selected) {
+		if (unit->Type->CanAttack) {
+			SendCommandAttackGround(*unit, tilePos, flush);
 			ret = 1;
 		} else {
-			SendCommandMove(unit, tilePos, flush);
+			SendCommandMove(*unit, tilePos, flush);
 			ret = 1;
 		}
 	}
@@ -1334,9 +1321,8 @@ static int SendPatrol(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		CUnit &unit = *Selected[i];
-		SendCommandPatrol(unit, tilePos, flush);
+	for (CUnit *unit : Selected) {
+		SendCommandPatrol(*unit, tilePos, flush);
 	}
 	return Selected.empty() ? 0 : 1;
 }
@@ -1356,30 +1342,28 @@ static int SendResource(const Vec2i &pos)
 	const int flush = !(KeyModifiers & ModifierShift);
 	const CMapField &mf = *Map.Field(pos);
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		CUnit &unit = *Selected[i];
-
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	for (CUnit *unit : Selected) {
+		if (unit->Type->BoolFlag[HARVESTER_INDEX].value) {
 			if (dest
 				&& (res = dest->Type->GivesResource) != 0
-				&& unit.Type->ResInfo[res]
-				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
+				&& unit->Type->ResInfo[res]
+				&& unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity
 				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
-				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
+				&& (dest->Player == unit->Player || dest->Player->Index == PlayerMax - 1)) {
 				dest->Blink = 4;
-				SendCommandResource(unit, *dest, flush);
+				SendCommandResource(*unit, *dest, flush);
 				ret = 1;
 				continue;
 			} else {
 				for (res = 0; res < MaxCosts; ++res) {
-					if (unit.Type->ResInfo[res]
-						&& unit.Type->ResInfo[res]->TerrainHarvester
-						&& mf.playerInfo.IsExplored(*unit.Player)
+					if (unit->Type->ResInfo[res]
+						&& unit->Type->ResInfo[res]->TerrainHarvester
+						&& mf.playerInfo.IsExplored(*unit->Player)
 						/// By disabling this, we allow the harvester to find the nearest tile with a resource by itself, in case mf is empty.
 						/*&& mf.IsTerrainResourceOnMap(res)*/
-						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
-						SendCommandResourceLoc(unit, pos, flush);
+						&& unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity
+						&& (unit->CurrentResource != res || unit->ResourcesHeld < unit->Type->ResInfo[res]->ResourceCapacity)) {
+						SendCommandResourceLoc(*unit, pos, flush);
 						ret = 1;
 						break;
 					}
@@ -1389,19 +1373,19 @@ static int SendResource(const Vec2i &pos)
 				}
 			}
 		}
-		if (!unit.CanMove()) {
+		if (!unit->CanMove()) {
 			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
 				dest->Blink = 4;
-				SendCommandResource(unit, *dest, flush);
+				SendCommandResource(*unit, *dest, flush);
 				ret = 1;
 				continue;
 			}
-			if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
-				SendCommandResourceLoc(unit, pos, flush);
+			if (mf.playerInfo.IsExplored(*unit->Player) && mf.IsTerrainResourceOnMap()) {
+				SendCommandResourceLoc(*unit, pos, flush);
 				ret = 1;
 				continue;
 			}
-			SendCommandMove(unit, pos, flush);
+			SendCommandMove(*unit, pos, flush);
 			ret = 1;
 			continue;
 		}
@@ -1418,9 +1402,9 @@ static int SendUnload(const Vec2i &tilePos)
 {
 	const int flush = !(KeyModifiers & ModifierShift);
 
-	for (size_t i = 0; i != Selected.size(); ++i) {
+	for (CUnit *unit : Selected) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(*Selected[i], tilePos, nullptr, flush);
+		SendCommandUnload(*unit, tilePos, nullptr, flush);
 	}
 	return Selected.empty() ? 0 : 1;
 }
@@ -1447,11 +1431,10 @@ static int SendSpellCast(const Vec2i &tilePos)
 	   (if exists). All checks are performed at spell cast handle
 	   function which will cancel function if cannot be executed
 	 */
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		CUnit &unit = *Selected[i];
-		if (unit.Type->CanCastSpell.empty()) {
+	for (CUnit *unit : Selected) {
+		if (unit->Type->CanCastSpell.empty()) {
 			DebugPrint(
-				"but unit %d(%s) can't cast spells?\n", UnitNumber(unit), unit.Type->Name.c_str());
+				"but unit %d(%s) can't cast spells?\n", UnitNumber(*unit), unit->Type->Name.c_str());
 			// this unit cannot cast spell
 			continue;
 		}
@@ -1461,11 +1444,11 @@ static int SendSpellCast(const Vec2i &tilePos)
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
-		if (dest && dest == &unit && (!spell->Condition || spell->Condition->TargetSelf == CONDITION_FALSE)) {
+		if (dest && dest == unit && (!spell->Condition || spell->Condition->TargetSelf == CONDITION_FALSE)) {
 			// Only spells with explicit 'self: true' allows self targetting
 			continue;
 		}
-		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush);
+		SendCommandSpellCast(*unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush);
 		ret = 1;
 	}
 	return ret;
@@ -1513,23 +1496,23 @@ static void SendCommand(const Vec2i &tilePos)
 	}
 	if (ret) {
 		// Acknowledge the command with first selected unit.
-		for (size_t i = 0; i != Selected.size(); ++i) {
+		for (CUnit *unit : Selected) {
 			if (CursorAction == ButtonCmd::Attack || CursorAction == ButtonCmd::AttackGround || CursorAction == ButtonCmd::SpellCast) {
-				if (Selected[i]->Type->MapSound.Attack.Sound) {
-					PlayUnitSound(*Selected[i], VoiceAttack);
+				if (unit->Type->MapSound.Attack.Sound) {
+					PlayUnitSound(*unit, VoiceAttack);
 					break;
-				} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
-					PlayUnitSound(*Selected[i], VoiceAcknowledging);
+				} else if (unit->Type->MapSound.Acknowledgement.Sound) {
+					PlayUnitSound(*unit, VoiceAcknowledging);
 					break;
 				}
-			} else if (CursorAction == ButtonCmd::Repair && Selected[i]->Type->MapSound.Repair.Sound) {
-				PlayUnitSound(*Selected[i], VoiceRepairing);
+			} else if (CursorAction == ButtonCmd::Repair && unit->Type->MapSound.Repair.Sound) {
+				PlayUnitSound(*unit, VoiceRepairing);
 				break;
-			} else if (CursorAction == ButtonCmd::Build && Selected[i]->Type->MapSound.Build.Sound) {
-				PlayUnitSound(*Selected[i], VoiceBuild);
+			} else if (CursorAction == ButtonCmd::Build && unit->Type->MapSound.Build.Sound) {
+				PlayUnitSound(*unit, VoiceBuild);
 				break;
-			} else if (Selected[i]->Type->MapSound.Acknowledgement.Sound) {
-				PlayUnitSound(*Selected[i], VoiceAcknowledging);
+			} else if (unit->Type->MapSound.Acknowledgement.Sound) {
+				PlayUnitSound(*unit, VoiceAcknowledging);
 				break;
 			}
 		}
@@ -1709,8 +1692,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
 				PlayUnitSound(*Selected[0], VoiceBuild);
-				for (size_t i = 0; i != Selected.size(); ++i) {
-					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+				for (CUnit *unit : Selected) {
+					SendCommandBuildBuilding(*unit, tilePos, *CursorBuilding, flush);
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 					CancelBuildingMode();
@@ -2045,9 +2028,7 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  User buttons
 		//
-		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
-			CUIUserButton &button = UI.UserButtons[i];
-
+		for (CUIUserButton &button : UI.UserButtons) {
 			if (button.Clicked) {
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonArea::User) {
@@ -2262,13 +2243,8 @@ void DrawPieMenu()
 			int y = CursorStartScreenPos.y - ICON_SIZE_Y / 2 + UI.PieMenu.Y[i];
 			const PixelPos pos(x, y);
 
-			bool gray = false;
-			for (size_t j = 0; j != Selected.size(); ++j) {
-				if (!IsButtonAllowed(*Selected[j], buttons[i])) {
-					gray = true;
-					break;
-				}
-			}
+			const bool gray = ranges::any_of(
+				Selected, [&](const CUnit *unit) { return !IsButtonAllowed(*unit, buttons[i]); });
 			// Draw icon
 			if (gray) {
 				buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);

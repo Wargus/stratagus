@@ -89,9 +89,8 @@ extern TriggerDataType TriggerData;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern int TriggerGetPlayer(lua_State *l);/// get player number.
-extern std::function<bool(const CUnit &)>
-TriggerGetUnitType(lua_State *l); /// get the unit-type validator
+extern std::function<bool(const CUnit &)> TriggerGetPlayer(lua_State *l); /// get the unit-player validator
+extern std::function<bool(const CUnit &)> TriggerGetUnitType(lua_State *l); /// get the unit-type validator
 extern void TriggersEachCycle();    /// test triggers
 
 extern void TriggerCclRegister();   /// Register ccl features

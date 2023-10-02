@@ -707,9 +707,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 void UpdateStats(int reset)
 {
 	// Update players stats
-	for (std::vector<CUnitType *>::size_type j = 0; j < UnitTypes.size(); ++j) {
-		CUnitType &type = *UnitTypes[j];
-		UpdateUnitStats(type, reset);
+	for (CUnitType *type : UnitTypes) {
+		UpdateUnitStats(*type, reset);
 	}
 }
 
@@ -774,13 +773,12 @@ void SaveUnitTypes(CFile &file)
 	file.printf("--- MODULE: unittypes\n\n");
 
 	// Save all stats
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		const CUnitType &type = *UnitTypes[i];
+	for (const CUnitType *type : UnitTypes) {
 		bool somethingSaved = false;
 
 		for (int j = 0; j < PlayerMax; ++j) {
 			if (Players[j].Type != PlayerTypes::PlayerNobody) {
-				somethingSaved |= SaveUnitStats(type.Stats[j], type, j, file);
+				somethingSaved |= SaveUnitStats(type->Stats[j], *type, j, file);
 			}
 		}
 		if (somethingSaved) {
@@ -1005,28 +1003,26 @@ void LoadUnitTypeSprite(CUnitType &type)
 void LoadUnitTypes()
 {
 	int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
-
+	for (CUnitType *type : UnitTypes) {
 		// Lookup icons.
-		type.Icon.Load();
+		type->Icon.Load();
 		// Lookup missiles.
-		type.Missile.MapMissile();
-		type.Explosion.MapMissile();
+		type->Missile.MapMissile();
+		type->Explosion.MapMissile();
 
 		// Lookup impacts
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
-			type.Impact[i].MapMissile();
+			type->Impact[i].MapMissile();
 		}
 		// Lookup corpse.
-		if (!type.CorpseName.empty()) {
-			type.CorpseType = &UnitTypeByIdent(type.CorpseName);
+		if (!type->CorpseName.empty()) {
+			type->CorpseType = &UnitTypeByIdent(type->CorpseName);
 		}
 #ifndef DYNAMIC_LOAD
 		// Load Sprite
-		if (!type.Sprite) {
-			ShowLoadProgress(_("Unit \"%s\""), type.Name.c_str());
-			LoadUnitTypeSprite(type);
+		if (!type->Sprite) {
+			ShowLoadProgress(_("Unit \"%s\""), type->Name.c_str());
+			LoadUnitTypeSprite(*type);
 		}
 #endif
 		// FIXME: should i copy the animations of same graphics?
@@ -1038,8 +1034,8 @@ void CUnitTypeVar::Init()
 	// Variables.
 	Variable.resize(GetNumberVariable());
 	size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-	for (unsigned int i = 0; i < UnitTypes.size(); ++i) { // adjust array for unit already defined
-		UnitTypes[i]->BoolFlag.resize(new_size);
+	for (CUnitType *type : UnitTypes) { // adjust array for unit already defined
+		type->BoolFlag.resize(new_size);
 	}
 }
 
@@ -1062,8 +1058,8 @@ void CleanUnitTypes()
 	FreeAnimations();
 
 	// Clean all unit-types
-	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		delete UnitTypes[i];
+	for (auto *p : UnitTypes) {
+		delete p;
 	}
 	UnitTypes.clear();
 	UnitTypeMap.clear();

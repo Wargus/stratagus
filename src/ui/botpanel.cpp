@@ -89,8 +89,8 @@ std::vector<ButtonAction> CurrentButtons;
 void InitButtons()
 {
 	// Resolve the icon names.
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		UnitButtonTable[i]->Icon.Load();
+	for (auto *buttonAction : UnitButtonTable) {
+		buttonAction->Icon.Load();
 	}
 	CurrentButtons.clear();
 }
@@ -187,8 +187,8 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 void CleanButtons()
 {
 	// Free the allocated buttons.
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		delete UnitButtonTable[i];
+	for (auto *buttonAction : UnitButtonTable) {
+		delete buttonAction;
 	}
 	UnitButtonTable.clear();
 
@@ -256,28 +256,19 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 	}
 	// Simple case.
 	if (action != UnitAction::None) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->CurrentAction() != action) {
-				return res;
-			}
+		if (ranges::all_of(Selected, [&](const CUnit *unit) { return unit->CurrentAction() == action; })) {
+			res |= IconSelected;
 		}
-		res |= IconSelected;
 		return res;
 	}
 	// other cases : manage AutoCast and different possible action.
-	size_t i;
 	switch (button.Action) {
 		case ButtonCmd::Move:
-			for (i = 0; i < Selected.size(); ++i) {
-				const UnitAction saction = Selected[i]->CurrentAction();
-				if (saction != UnitAction::Move &&
-					saction != UnitAction::Build &&
-					saction != UnitAction::Follow &&
-					saction != UnitAction::Defend) {
-					break;
-				}
-			}
-			if (i == Selected.size()) {
+			if (ranges::all_of(Selected, [](const CUnit *unit) {
+					const UnitAction action = unit->CurrentAction();
+					return action == UnitAction::Move || action == UnitAction::Build
+				        || action == UnitAction::Follow || action == UnitAction::Defend;
+				})) {
 				res |= IconSelected;
 			}
 			break;
@@ -285,32 +276,21 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			// FIXME : and IconSelected ?
 
 			// Autocast
-			for (i = 0; i < Selected.size(); ++i) {
-				Assert(Selected[i]->AutoCastSpell);
-				if (Selected[i]->AutoCastSpell[button.Value] != 1) {
-					break;
-				}
-			}
-			if (i == Selected.size()) {
+			if (ranges::all_of(Selected, [&](const CUnit *unit) {
+					Assert(unit->AutoCastSpell);
+					return unit->AutoCastSpell[button.Value] == 1;
+				})) {
 				res |= IconAutoCast;
 			}
 			break;
 		case ButtonCmd::Repair:
-			for (i = 0; i < Selected.size(); ++i) {
-				if (Selected[i]->CurrentAction() != UnitAction::Repair) {
-					break;
-				}
-			}
-			if (i == Selected.size()) {
+			if (ranges::all_of(Selected, [](const CUnit *unit) {
+					return unit->CurrentAction() == UnitAction::Repair;
+				})) {
 				res |= IconSelected;
 			}
 			// Auto repair
-			for (i = 0; i < Selected.size(); ++i) {
-				if (Selected[i]->AutoRepair != 1) {
-					break;
-				}
-			}
-			if (i == Selected.size()) {
+			if (ranges::all_of(Selected, [](const CUnit *unit) { return unit->AutoRepair; })) {
 				res |= IconAutoCast;
 			}
 			break;
@@ -752,15 +732,15 @@ void CButtonPanel::Draw()
 		bool gray = false;
 		bool cooldownSpell = false;
 		int maxCooldown = 0;
-		for (size_t j = 0; j != Selected.size(); ++j) {
-			if (!IsButtonAllowed(*Selected[j], buttons[i])) {
+		for (CUnit *unit : Selected) {
+			if (!IsButtonAllowed(*unit, buttons[i])) {
 				gray = true;
 				break;
 			} else if (buttons[i].Action == ButtonCmd::SpellCast
-					   && (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
+					   && unit->SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]) {
 				Assert(SpellTypeTable[buttons[i].Value]->CoolDown > 0);
 				cooldownSpell = true;
-				maxCooldown = std::max(maxCooldown, (*Selected[j]).SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
+				maxCooldown = std::max(maxCooldown, unit->SpellCoolDownTimers[SpellTypeTable[buttons[i].Value]->Slot]);
 			}
 		}
 		//
@@ -974,16 +954,10 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 			continue;
 		}
 
-		bool allow = true;
-		if (UnitButtonTable[z]->AlwaysShow == false) {
-			for (size_t i = 0; i != Selected.size(); ++i) {
-				if (!IsButtonAllowed(*Selected[i], *UnitButtonTable[z])) {
-					allow = false;
-					break;
-				}
-			}
-		}
-
+		const bool allow =
+			UnitButtonTable[z]->AlwaysShow || ranges::all_of(Selected, [&](const CUnit *unit) {
+				return IsButtonAllowed(*unit, *UnitButtonTable[z]);
+			});
 		Assert(1 <= UnitButtonTable[z]->Pos);
 		Assert(UnitButtonTable[z]->Pos <= (int)UI.ButtonPanel.Buttons.size());
 
@@ -1029,8 +1003,8 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	} else {
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 	}
-	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		ButtonAction &buttonaction = *UnitButtonTable[i];
+	for (ButtonAction *buttonactionPtr : UnitButtonTable) {
+		ButtonAction &buttonaction = *buttonactionPtr;
 		Assert(0 < buttonaction.Pos && buttonaction.Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// Same level
@@ -1137,25 +1111,19 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 {
 	const int spellId = CurrentButtons[button].Value;
 	if (KeyModifiers & ModifierControl) {
-		int autocast = 0;
-
 		if (!SpellTypeTable[spellId]->AutoCast) {
 			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 			return;
 		}
 
-		//autocast = 0;
 		// If any selected unit doesn't have autocast on turn it on
 		// for everyone
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] == 0) {
-				autocast = 1;
-				break;
-			}
-		}
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoCastSpell[spellId] != autocast) {
-				SendCommandAutoSpellCast(*Selected[i], spellId, autocast);
+
+		const bool autocast = ranges::any_of(
+			Selected, [&](const CUnit *unit) { return unit->AutoCastSpell[spellId] == 0; });
+		for (CUnit *unit : Selected) {
+			if (unit->AutoCastSpell[spellId] != autocast) {
+				SendCommandAutoSpellCast(*unit, spellId, autocast);
 			}
 		}
 		return;
@@ -1163,10 +1131,9 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	if (SpellTypeTable[spellId]->IsCasterOnly()) {
 		const int flush = !(KeyModifiers & ModifierShift);
 
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			CUnit &unit = *Selected[i];
+		for (CUnit *unit : Selected) {
 			// CursorValue here holds the spell type id
-			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
+			SendCommandSpellCast(*unit, unit->tilePos, unit, spellId, flush);
 		}
 		return;
 	}
@@ -1176,18 +1143,12 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 void CButtonPanel::DoClicked_Repair(int button)
 {
 	if (KeyModifiers & ModifierControl) {
-		unsigned autorepair = 0;
-		// If any selected unit doesn't have autocast on turn it on
-		// for everyone
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoRepair == 0) {
-				autorepair = 1;
-				break;
-			}
-		}
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (Selected[i]->AutoRepair != autorepair) {
-				SendCommandAutoRepair(*Selected[i], autorepair);
+		// If any selected unit doesn't have autorepair on turn it on for everyone
+		const bool autorepair =
+			ranges::any_of(Selected, [](const CUnit *unit) { return unit->AutoRepair == false; });
+		for (CUnit *unit : Selected) {
+			if (unit->AutoRepair != autorepair) {
+				SendCommandAutoRepair(*unit, autorepair);
 			}
 		}
 		return;
@@ -1197,29 +1158,29 @@ void CButtonPanel::DoClicked_Repair(int button)
 
 void CButtonPanel::DoClicked_Explore()
 {
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandExplore(*Selected[i], !(KeyModifiers & ModifierShift));
+	for (CUnit *unit : Selected) {
+		SendCommandExplore(*unit, !(KeyModifiers & ModifierShift));
 	}
 }
 
 void CButtonPanel::DoClicked_Return()
 {
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandReturnGoods(*Selected[i], nullptr, !(KeyModifiers & ModifierShift));
+	for (CUnit *unit : Selected) {
+		SendCommandReturnGoods(*unit, nullptr, !(KeyModifiers & ModifierShift));
 	}
 }
 
 void CButtonPanel::DoClicked_Stop()
 {
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandStopUnit(*Selected[i]);
+	for (CUnit *unit : Selected) {
+		SendCommandStopUnit(*unit);
 	}
 }
 
 void CButtonPanel::DoClicked_StandGround()
 {
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		SendCommandStandGround(*Selected[i], !(KeyModifiers & ModifierShift));
+	for (CUnit *unit : Selected) {
+		SendCommandStandGround(*unit, !(KeyModifiers & ModifierShift));
 	}
 }
 
@@ -1295,12 +1256,9 @@ void CButtonPanel::DoClicked_Train(int button)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Type == Selected[0]->Type) {
-			int selected_queue = 0;
-			for (size_t j = 0; j < Selected[i]->Orders.size(); ++j) {
-				if (Selected[i]->Orders[j]->Action == UnitAction::Train) {
-					selected_queue += 1;
-				}
-			}
+			const int selected_queue = ranges::count_if(Selected[i]->Orders, [](const COrder *order) {
+				return order->Action == UnitAction::Train;
+			});
 			if (selected_queue < lowest_queue) {
 				lowest_queue = selected_queue;
 				best_training_place = i;
@@ -1355,10 +1313,10 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-	for (size_t i = 0; i != Selected.size(); ++i) {
-		if (Selected[0]->Player->CheckLimits(type) != -6 && !Selected[i]->Player->CheckUnitType(type)) {
-			if (Selected[i]->CurrentAction() != UnitAction::UpgradeTo) {
-				SendCommandUpgradeTo(*Selected[i], type, !(KeyModifiers & ModifierShift));
+	for (CUnit *unit : Selected) {
+		if (Selected[0]->Player->CheckLimits(type) != -6 && !unit->Player->CheckUnitType(type)) {
+			if (unit->CurrentAction() != UnitAction::UpgradeTo) {
+				SendCommandUpgradeTo(*unit, type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
 			}

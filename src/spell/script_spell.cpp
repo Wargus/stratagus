@@ -314,12 +314,12 @@ static int CclDefineSpell(lua_State *l)
 		DebugPrint("Redefining spell-type '%s'\n", identname.data());
 	} else {
 		spell = new SpellType(SpellTypeTable.size(), std::string{identname});
-		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) { // adjust array for caster already defined
-			if (!UnitTypes[i]->CanCastSpell.empty()) {
-				UnitTypes[i]->CanCastSpell.resize(SpellTypeTable.size() + 1);
+		for (CUnitType *unitType : UnitTypes) { // adjust array for caster already defined
+			if (!unitType->CanCastSpell.empty()) {
+				unitType->CanCastSpell.resize(SpellTypeTable.size() + 1);
 			}
-			if (!UnitTypes[i]->AutoCastActive.empty()) {
-				UnitTypes[i]->AutoCastActive.resize(SpellTypeTable.size() + 1);
+			if (!unitType->AutoCastActive.empty()) {
+				unitType->AutoCastActive.resize(SpellTypeTable.size() + 1);
 			}
 		}
 		SpellTypeTable.push_back(spell);
