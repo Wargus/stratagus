@@ -276,19 +276,13 @@ void PathFinderOutput::Load(lua_State *l)
 */
 static void CclParseOrders(lua_State *l, CUnit &unit)
 {
-	for (COrderPtr order : unit.Orders) {
-		delete order;
-	}
 	unit.Orders.clear();
 	const int n = lua_rawlen(l, -1);
 
 	for (int j = 0; j < n; ++j) {
 		lua_rawgeti(l, -1, j + 1);
 
-		unit.Orders.push_back(nullptr);
-		COrderPtr *order = &unit.Orders.back();
-
-		CclParseOrder(l, unit, order);
+		unit.Orders.push_back(CclParseOrder(l, unit));
 		lua_pop(l, 1);
 	}
 }
@@ -588,17 +582,17 @@ static int CclUnit(lua_State *l)
 		} else if (value == "critical-order") {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);
-			CclParseOrder(l, *unit , &unit->CriticalOrder);
+			unit->CriticalOrder = CclParseOrder(l, *unit);
 			lua_pop(l, 1);
 		} else if (value == "saved-order") {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);
-			CclParseOrder(l, *unit, &unit->SavedOrder);
+			unit->SavedOrder = CclParseOrder(l, *unit);
 			lua_pop(l, 1);
 		} else if (value == "new-order") {
 			lua_rawgeti(l, 2, j + 1);
 			lua_pushvalue(l, -1);
-			CclParseOrder(l, *unit, &unit->NewOrder);
+			unit->NewOrder = CclParseOrder(l, *unit);
 			lua_pop(l, 1);
 		} else if (value == "goal") {
 			unit->Goal = &UnitManager->GetSlotUnit(LuaToNumber(l, 2, j + 1));

@@ -36,16 +36,16 @@
 
 class COrder_Resource : public COrder
 {
-	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
-	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
-	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine);
+	friend std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitAction::Resource), worker(&harvester) {}
 
 	~COrder_Resource();
 
-	COrder_Resource *Clone() const override { return new COrder_Resource(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Resource>(*this); }
 
 	bool IsValid() const override;
 

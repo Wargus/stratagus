@@ -36,11 +36,11 @@
 
 class COrder_TransformInto : public COrder
 {
-	friend COrder *COrder::NewActionTransformInto(CUnitType &type);
+	friend std::unique_ptr<COrder> COrder::NewActionTransformInto(CUnitType &type);
 public:
 	COrder_TransformInto() : COrder(UnitAction::TransformInto) {}
 
-	COrder_TransformInto *Clone() const override { return new COrder_TransformInto(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_TransformInto>(*this); }
 
 	bool IsValid() const override;
 
@@ -61,11 +61,11 @@ private:
 
 class COrder_UpgradeTo : public COrder
 {
-	friend COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant);
+	friend std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant);
 public:
 	COrder_UpgradeTo() : COrder(UnitAction::UpgradeTo) {}
 
-	COrder_UpgradeTo *Clone() const override { return new COrder_UpgradeTo(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_UpgradeTo>(*this); }
 
 	bool IsValid() const override;
 

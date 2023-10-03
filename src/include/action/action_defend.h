@@ -36,11 +36,11 @@
 
 class COrder_Defend : public COrder
 {
-	friend COrder *COrder::NewActionDefend(CUnit &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionDefend(CUnit &dest);
 public:
 	COrder_Defend() : COrder(UnitAction::Defend) {}
 
-	COrder_Defend *Clone() const override { return new COrder_Defend(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Defend>(*this); }
 
 	bool IsValid() const override;
 

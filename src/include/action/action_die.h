@@ -39,7 +39,7 @@ class COrder_Die : public COrder
 public:
 	COrder_Die() : COrder(UnitAction::Die) {}
 
-	COrder_Die *Clone() const override { return new COrder_Die(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Die>(*this); }
 
 	void Save(CFile &file, const CUnit &unit) const override;
 	bool ParseSpecificData(lua_State *l, int &j, std::string_view value, const CUnit &unit) override;

@@ -97,7 +97,7 @@ public:
 	explicit COrder(UnitAction action) : Action(action) {}
 	virtual ~COrder();
 
-	virtual COrder *Clone() const = 0;
+	virtual std::unique_ptr<COrder> Clone() const = 0;
 	virtual void Execute(CUnit &unit) = 0;
 	virtual void Cancel(CUnit &unit) {}
 	virtual bool IsValid() const = 0;
@@ -128,31 +128,31 @@ public:
 	bool IsWaiting(CUnit &unit);
 	void StopWaiting(CUnit &unit);
 
-	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
-	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
-	static COrder *NewActionBoard(CUnit &unit);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
-	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
-	static COrder *NewActionDefend(CUnit &dest);
-	static COrder *NewActionDie();
-	static COrder *NewActionExplore(const CUnit &unit);
-	static COrder *NewActionFollow(CUnit &dest);
-	static COrder *NewActionMove(const Vec2i &pos);
-	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
-	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
-	static COrder *NewActionRepair(const Vec2i &pos);
-	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
-	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
-	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
-	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
-	static COrder *NewActionStandGround();
-	static COrder *NewActionStill();
-	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
-	static COrder *NewActionTransformInto(CUnitType &type);
-	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
-	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant = false);
+	static std::unique_ptr<COrder> NewActionAttack(const CUnit &attacker, CUnit &target);
+	static std::unique_ptr<COrder> NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	static std::unique_ptr<COrder> NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	static std::unique_ptr<COrder> NewActionBoard(CUnit &unit);
+	static std::unique_ptr<COrder> NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	static std::unique_ptr<COrder> NewActionBuilt(CUnit &builder, CUnit &unit);
+	static std::unique_ptr<COrder> NewActionDefend(CUnit &dest);
+	static std::unique_ptr<COrder> NewActionDie();
+	static std::unique_ptr<COrder> NewActionExplore(const CUnit &unit);
+	static std::unique_ptr<COrder> NewActionFollow(CUnit &dest);
+	static std::unique_ptr<COrder> NewActionMove(const Vec2i &pos);
+	static std::unique_ptr<COrder> NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	static std::unique_ptr<COrder> NewActionRepair(CUnit &unit, CUnit &target);
+	static std::unique_ptr<COrder> NewActionRepair(const Vec2i &pos);
+	static std::unique_ptr<COrder> NewActionResearch(CUnit &unit, CUpgrade &upgrade);
+	static std::unique_ptr<COrder> NewActionResource(CUnit &harvester, const Vec2i &pos);
+	static std::unique_ptr<COrder> NewActionResource(CUnit &harvester, CUnit &mine);
+	static std::unique_ptr<COrder> NewActionReturnGoods(CUnit &harvester, CUnit *depot);
+	static std::unique_ptr<COrder> NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
+	static std::unique_ptr<COrder> NewActionStandGround();
+	static std::unique_ptr<COrder> NewActionStill();
+	static std::unique_ptr<COrder> NewActionTrain(CUnit &trainer, CUnitType &type);
+	static std::unique_ptr<COrder> NewActionTransformInto(CUnitType &type);
+	static std::unique_ptr<COrder> NewActionUnload(const Vec2i &pos, CUnit *what);
+	static std::unique_ptr<COrder> NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant = false);
 
 protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);
@@ -194,7 +194,7 @@ extern void AnimateActionAttack(CUnit &unit, COrder &order);
 ----------------------------------------------------------------------------*/
 
 /// Parse order
-extern void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *order);
+extern std::unique_ptr<COrder> CclParseOrder(lua_State *l, CUnit &unit);
 
 /// Handle the actions of all units each game cycle
 extern void UnitActions();

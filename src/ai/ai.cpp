@@ -690,13 +690,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 
 				if (shouldAttack) {
 					CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-					COrder *savedOrder = COrder::NewActionAttack(*aiunit, attacker->tilePos);
+					auto savedOrder = COrder::NewActionAttack(*aiunit, attacker->tilePos);
 
-					if (aiunit->CanStoreOrder(savedOrder) == false) {
-						delete savedOrder;
-						savedOrder = nullptr;
-					} else {
-						aiunit->SavedOrder = savedOrder;
+					if (aiunit->CanStoreOrder(savedOrder.get())) {
+						aiunit->SavedOrder = std::move(savedOrder);
 					}
 				}
 			}
@@ -910,7 +907,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	// Don't move more than 1 unit.
 	if (movablenb) {
 		const int index = SyncRand() % movablenb;
-		COrder *savedOrder = nullptr;
+		std::unique_ptr<COrder> savedOrder;
 		if (movableunits[index]->IsIdle() == false) {
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
 				savedOrder = unit.CurrentOrder()->Clone();
@@ -918,7 +915,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 		}
 		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
 		if (savedOrder != nullptr) {
-			unit.SavedOrder = savedOrder;
+			unit.SavedOrder = std::move(savedOrder);
 		}
 		AiPlayer->LastCanNotMoveGameCycle = GameCycle;
 	}

@@ -382,7 +382,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			for (size_t i = 0; i < unit.Orders.size()
 				 && i < UI.TrainingButtons.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitAction::Train) {
-					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
+					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i].get());
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
 					const int flag = (ButtonAreaUnderCursor == ButtonArea::Training
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?

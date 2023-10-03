@@ -480,9 +480,9 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 			//  Convert trained units to this type.
 			//  FIXME: what about buildings?
 		} else {
-			for (COrder* order : unit->Orders) {
+			for (auto &order : unit->Orders) {
 				if (order->Action == UnitAction::Train) {
-					COrder_Train &order_train = *static_cast<COrder_Train *>(order);
+					COrder_Train &order_train = static_cast<COrder_Train &>(*order);
 
 					if (&order_train.GetUnitType() == &src) {
 						order_train.ConvertUnitType(*unit, dst);

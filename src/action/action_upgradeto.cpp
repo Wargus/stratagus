@@ -56,17 +56,17 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-COrder *COrder::NewActionTransformInto(CUnitType &type) /* override */
+std::unique_ptr<COrder> COrder::NewActionTransformInto(CUnitType &type) /* override */
 {
-	COrder_TransformInto *order = new COrder_TransformInto;
+	auto order = std::make_unique<COrder_TransformInto>();
 
 	order->Type = &type;
 	return order;
 }
 
-COrder *COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant) /* override */
+std::unique_ptr<COrder> COrder::NewActionUpgradeTo(CUnit &unit, CUnitType &type, bool instant) /* override */
 {
-	COrder_UpgradeTo *order = new COrder_UpgradeTo;
+	auto order = std::make_unique<COrder_UpgradeTo>();
 
 	// FIXME: if you give quick an other order, the resources are lost!
 	unit.Player->SubUnitType(type);

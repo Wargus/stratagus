@@ -129,9 +129,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 
 
-/* static */ COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
+/* static */ std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 	Vec2i ressourceLoc;
 
 	int targetFlag;
@@ -159,9 +159,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine)
+/* static */ std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, CUnit &mine)
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 
 	order->SetGoal(&mine);
 	order->Resource.Mine = &mine;
@@ -170,9 +170,9 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
+/* static */ std::unique_ptr<COrder> COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot)
 {
-	COrder_Resource *order = new COrder_Resource(harvester);
+	auto order = std::make_unique<COrder_Resource>(harvester);
 
 	// Destination could be killed. NETWORK!
 	if (depot && depot->Destroyed) {

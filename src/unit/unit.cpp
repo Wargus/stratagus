@@ -469,11 +469,8 @@ void CUnit::Init()
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	Orders.clear();
-	delete SavedOrder;
 	SavedOrder = nullptr;
-	delete NewOrder;
 	NewOrder = nullptr;
-	delete CriticalOrder;
 	CriticalOrder = nullptr;
 	delete AutoCastSpell;
 	AutoCastSpell = nullptr;
@@ -551,28 +548,11 @@ void CUnit::Release(bool final)
 	// location, so we need access to the Type->TileSize; or when a unit is
 	// removed, but fog of war calculations are still underway, where we want to
 	// read a BoolFlag; there are more instances of this...)
-	for (std::vector<COrder *>::iterator order = Orders.begin(); order != Orders.end(); ++order) {
-		COrder *orderToDelete = *order;
-		*order = nullptr;
-		delete orderToDelete;
-	}
 	Orders.clear();
 
-	if (SavedOrder != nullptr) {
-		COrder *order = SavedOrder;
-		SavedOrder = nullptr;
-		delete order;
-	}
-	if (NewOrder != nullptr) {
-		COrder *order = NewOrder;
-		NewOrder = nullptr;
-		delete order;
-	}
-	if (CriticalOrder != nullptr) {
-		COrder *order = CriticalOrder;
-		CriticalOrder = nullptr;
-		delete order;
-	}
+	SavedOrder = nullptr;
+	NewOrder = nullptr;
+	CriticalOrder = nullptr;
 
 	// Remove the unit from the global units table.
 	UnitManager->ReleaseUnit(this);
@@ -692,14 +672,10 @@ void CUnit::Init(const CUnitType &type)
 */
 bool CUnit::RestoreOrder()
 {
-	COrder *savedOrder = this->SavedOrder;
-
-	if (savedOrder == nullptr) {
+	if (this->SavedOrder == nullptr) {
 		return false;
 	}
-
-	if (savedOrder->IsValid() == false) {
-		delete savedOrder;
+	if (this->SavedOrder->IsValid() == false) {
 		this->SavedOrder = nullptr;
 		return false;
 	}
@@ -709,9 +685,7 @@ bool CUnit::RestoreOrder()
 	this->Orders[0]->Finished = true;
 
 	//copy
-	this->Orders.insert(this->Orders.begin() + 1, savedOrder);
-
-	this->SavedOrder = nullptr;
+	this->Orders.insert(this->Orders.begin() + 1, std::move(this->SavedOrder));
 	return true;
 }
 
@@ -1480,9 +1454,6 @@ void UnitLost(CUnit &unit)
 */
 void UnitClearOrders(CUnit &unit)
 {
-	for (auto p : unit.Orders) {
-		delete p;
-	}
 	unit.Orders.clear();
 	unit.Orders.push_back(COrder::NewActionStill());
 }
@@ -2529,7 +2500,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// Unit has death animation.
 
 	// Not good: UnitUpdateHeading(unit);
-	delete unit.Orders[0];
 	unit.Orders[0] = COrder::NewActionDie();
 	if (type->CorpseType) {
 #ifdef DYNAMIC_LOAD
@@ -3057,7 +3027,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 				return;
 			}
-			COrder *savedOrder = nullptr;
+			std::unique_ptr<COrder> savedOrder;
 			if (targetCurrAction == UnitAction::Still || targetCurrAction == UnitAction::StandGround) {
 				savedOrder = COrder::NewActionAttack(target, target.tilePos);
 			} else if (target.CanStoreOrder(target.CurrentOrder())) {
@@ -3067,7 +3037,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			CommandAttack(target, posToAttack, nullptr, FlushCommands);
 
 			if (savedOrder != nullptr) {
-				target.SavedOrder = savedOrder;
+				target.SavedOrder = std::move(savedOrder);
 			}
 			break;
 		}

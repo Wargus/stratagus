@@ -1046,10 +1046,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 				// We now need to check if there are another build commands on this build spot
 				bool buildable = true;
-				for (COrderPtr orderPtr : unit.Orders) {
-					COrder &order = *orderPtr;
-					if (order.Action == UnitAction::Build) {
-						COrder_Build &build = dynamic_cast<COrder_Build &>(order);
+				for (auto& order : unit.Orders) {
+					if (order->Action == UnitAction::Build) {
+						COrder_Build &build = dynamic_cast<COrder_Build &>(*order);
 						if (tilePos.x >= build.GetGoalPos().x
 							&& tilePos.x < build.GetGoalPos().x + build.GetUnitType().TileWidth
 							&& tilePos.y >= build.GetGoalPos().y
@@ -1803,7 +1802,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitAction::Train) {
-					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
+					const COrder_Train &order = static_cast<COrder_Train &>(*Selected[0]->Orders[ButtonUnderCursor]);
 
 					DebugPrint("Cancel slot %d %s\n",
 					           ButtonUnderCursor,

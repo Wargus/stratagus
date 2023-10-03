@@ -52,9 +52,9 @@
 
 extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
-/* static */ COrder *COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
+/* static */ std::unique_ptr<COrder> COrder::NewActionBuilt(CUnit &builder, CUnit &unit)
 {
-	COrder_Built *order = new COrder_Built();
+	auto order = std::make_unique < COrder_Built>();
 
 	// Make sure the bulding doesn't cancel itself out right away.
 

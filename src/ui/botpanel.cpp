@@ -1256,7 +1256,7 @@ void CButtonPanel::DoClicked_Train(int button)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		if (Selected[i]->Type == Selected[0]->Type) {
-			const int selected_queue = ranges::count_if(Selected[i]->Orders, [](const COrder *order) {
+			const int selected_queue = ranges::count_if(Selected[i]->Orders, [](const auto &order) {
 				return order->Action == UnitAction::Train;
 			});
 			if (selected_queue < lowest_queue) {

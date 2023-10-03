@@ -36,15 +36,15 @@
 
 class COrder_Attack : public COrder
 {
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
+	friend std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+	friend std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
 public:
 	explicit COrder_Attack(bool ground) :
 		COrder(ground ? UnitAction::AttackGround : UnitAction::Attack)
 	{}
 
-	COrder_Attack *Clone() const override { return new COrder_Attack(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Attack>(*this); }
 
 	bool IsValid() const override;
 	void Save(CFile &file, const CUnit &unit) const override;
