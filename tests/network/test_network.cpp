@@ -101,13 +101,12 @@ bool CheckSerialization()
 	T obj1;
 
 	FillCustomValue(&obj1);
-	unsigned char *buffer = new unsigned char [obj1.Size()];
-	obj1.Serialize(buffer);
+	std::vector<unsigned char> buffer(obj1.Size());
+	obj1.Serialize(buffer.data());
 
 	T obj2;
-	obj2.Deserialize(buffer);
+	obj2.Deserialize(buffer.data());
 	bool res = Comp(obj1, obj2);
-	delete [] buffer;
 	return res;
 }
 

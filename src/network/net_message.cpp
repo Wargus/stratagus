@@ -384,10 +384,10 @@ CInitMessage_Hello::CInitMessage_Hello(const char *name) :
 	this->Version = FileChecksums;
 }
 
-const unsigned char *CInitMessage_Hello::Serialize() const
+std::vector<unsigned char> CInitMessage_Hello::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize(p, this->PlyName);
@@ -413,10 +413,10 @@ CInitMessage_Config::CInitMessage_Config() :
 {
 }
 
-const unsigned char *CInitMessage_Config::Serialize() const
+std::vector<unsigned char> CInitMessage_Config::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize8(p, clientIndex);
@@ -445,10 +445,10 @@ CInitMessage_EngineMismatch::CInitMessage_EngineMismatch() :
 	this->Stratagus = StratagusVersion;
 }
 
-const unsigned char *CInitMessage_EngineMismatch::Serialize() const
+std::vector<unsigned char> CInitMessage_EngineMismatch::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize32(p, this->Stratagus);
@@ -471,10 +471,10 @@ CInitMessage_LuaFilesMismatch::CInitMessage_LuaFilesMismatch() :
 	this->Version = FileChecksums;
 }
 
-const unsigned char *CInitMessage_LuaFilesMismatch::Serialize() const
+std::vector<unsigned char> CInitMessage_LuaFilesMismatch::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize32(p, this->Version);
@@ -498,10 +498,10 @@ CInitMessage_Welcome::CInitMessage_Welcome() :
 	this->gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 }
 
-const unsigned char *CInitMessage_Welcome::Serialize() const
+std::vector<unsigned char> CInitMessage_Welcome::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -535,10 +535,10 @@ CInitMessage_Map::CInitMessage_Map(const char *path, uint32_t mapUID) :
 	strncpy_s(MapPath, sizeof(MapPath), path, _TRUNCATE);
 }
 
-const unsigned char *CInitMessage_Map::Serialize() const
+std::vector<unsigned char> CInitMessage_Map::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize(p, MapPath);
@@ -578,10 +578,10 @@ CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, con
 	this->FragmentIndex = fragment;
 }
 
-const unsigned char *CInitMessage_MapFileFragment::Serialize() const
+std::vector<unsigned char> CInitMessage_MapFileFragment::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += serialize32(p, this->FragmentIndex);
@@ -610,10 +610,10 @@ CInitMessage_State::CInitMessage_State(int type, const CServerSetup &data) :
 {
 }
 
-const unsigned char *CInitMessage_State::Serialize() const
+std::vector<unsigned char> CInitMessage_State::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	p += this->State.Serialize(p);
@@ -635,10 +635,10 @@ CInitMessage_Resync::CInitMessage_Resync() :
 {
 }
 
-const unsigned char *CInitMessage_Resync::Serialize() const
+std::vector<unsigned char> CInitMessage_Resync::Serialize() const
 {
-	unsigned char *buf = new unsigned char[Size()];
-	unsigned char *p = buf;
+	std::vector<unsigned char> buf(Size());
+	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
 	for (int i = 0; i < PlayerMax; ++i) {

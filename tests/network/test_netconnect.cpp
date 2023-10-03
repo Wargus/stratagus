@@ -139,12 +139,11 @@ bool CheckSerialization()
 
 	FillCustomValue(&obj1);
 
-	unsigned char *buffer = new unsigned char [obj1.Size()];
-	unsigned char *end = buffer + obj1.Serialize(buffer);
-	bool res = size_t(end - buffer) == obj1.Size();
+	std::vector<unsigned char> buffer(obj1.Size());
+	unsigned char *end = buffer.data() + obj1.Serialize(buffer.data());
+	bool res = size_t(end - buffer.data()) == obj1.Size();
 	T obj2;
-	obj2.Deserialize(buffer);
-	delete [] buffer;
+	obj2.Deserialize(buffer.data());
 	res &= memcmp(&obj1, &obj2, sizeof(T)) == 0; // may fail with padding
 	return res;
 }
@@ -156,13 +155,12 @@ bool CheckSerialization_return()
 
 	memset(&obj1, 0, sizeof(T));
 	FillCustomValue(&obj1);
-	const unsigned char *buffer = obj1.Serialize();
+	std::vector<unsigned char> buffer = obj1.Serialize();
 
 	T obj2;
 	memset(&obj2, 0, sizeof(T));
-	obj2.Deserialize(buffer);
+	obj2.Deserialize(buffer.data());
 	bool res = memcmp(&obj1, &obj2, sizeof(T)) == 0; // may fail with padding
-	delete [] buffer;
 	return res;
 }
 
