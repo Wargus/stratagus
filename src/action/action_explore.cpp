@@ -70,13 +70,13 @@ static void GetExplorationTarget(const CUnit &unit, Vec2i &dest)
 	}
 }
 
-/* static */ COrder *COrder::NewActionExplore(const CUnit &unit)
+/* static */ std::unique_ptr<COrder> COrder::NewActionExplore(const CUnit &unit)
 {
 	Vec2i dest;
 	GetExplorationTarget(unit, dest);
 	Assert(Map.Info.IsPointOnMap(dest));
 
-	COrder_Explore *order = new COrder_Explore();
+	auto order = std::make_unique<COrder_Explore>();
 
 	order->goalPos = dest;
 	return order;

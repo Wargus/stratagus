@@ -36,11 +36,11 @@
 
 class COrder_Train : public COrder
 {
-	friend COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
+	friend std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, CUnitType &type);
 public:
 	COrder_Train() : COrder(UnitAction::Train) {}
 
-	COrder_Train *Clone() const override { return new COrder_Train(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Train>(*this); }
 
 	bool IsValid() const override;
 

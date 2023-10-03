@@ -39,7 +39,7 @@ class COrder_Research : public COrder
 public:
 	COrder_Research() : COrder(UnitAction::Research) {}
 
-	COrder_Research *Clone() const override { return new COrder_Research(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Research>(*this); }
 
 	bool IsValid() const override;
 

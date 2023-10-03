@@ -36,12 +36,12 @@
 
 class COrder_Repair : public COrder
 {
-	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
-	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
+	friend std::unique_ptr<COrder> COrder::NewActionRepair(CUnit &unit, CUnit &target);
+	friend std::unique_ptr<COrder> COrder::NewActionRepair(const Vec2i &pos);
 public:
 	COrder_Repair() : COrder(UnitAction::Repair) {}
 
-	COrder_Repair *Clone() const override { return new COrder_Repair(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Repair>(*this); }
 
 	bool IsValid() const override;
 

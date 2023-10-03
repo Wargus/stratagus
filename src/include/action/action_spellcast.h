@@ -36,14 +36,14 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
+	friend std::unique_ptr<COrder> COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
 public:
 	explicit COrder_SpellCast(bool autocast = false) :
 		COrder(UnitAction::SpellCast),
 		isAutocast(autocast)
 	{}
 
-	COrder_SpellCast *Clone() const override { return new COrder_SpellCast(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_SpellCast>(*this); }
 
 	bool IsValid() const override;
 

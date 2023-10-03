@@ -36,8 +36,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "actions.h"
 #include "settings.h"
-#include <vector>
 
 #ifndef __UNITTYPE_H__
 #include "unittype.h"
@@ -49,6 +49,7 @@
 
 #include "vec2i.h"
 
+#include <vector>
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -59,7 +60,6 @@ class CConstructionFrame;
 class CFile;
 class Missile;
 class CMapField;
-class COrder;
 class CPlayer;
 class CUnit;
 class CUnitColors;
@@ -142,7 +142,7 @@ public:
 
 	void Init();
 
-	COrder *CurrentOrder() const { return Orders[0]; }
+	COrder *CurrentOrder() const { return Orders[0].get(); }
 
 	UnitAction CurrentAction() const;
 
@@ -423,10 +423,10 @@ public:
 	} Anim, WaitBackup;
 
 
-	std::vector<COrder *> Orders; /// orders to process
-	COrder *SavedOrder = nullptr;         /// order to continue after current
-	COrder *NewOrder = nullptr;           /// order for new trained units
-	COrder *CriticalOrder = nullptr;      /// order to do as possible in breakable animation.
+	std::vector<std::unique_ptr<COrder>> Orders; /// orders to process
+	std::unique_ptr<COrder> SavedOrder;    /// order to continue after current
+	std::unique_ptr<COrder> NewOrder;      /// order for new trained units
+	std::unique_ptr<COrder> CriticalOrder; /// order to do as possible in breakable animation.
 
 	char *AutoCastSpell = nullptr;        /// spells to auto cast
 	int *SpellCoolDownTimers = nullptr;   /// how much time unit need to wait before spell will be ready

@@ -62,9 +62,9 @@ constexpr int UNLOAD_STATE = 2;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
+/* static */ std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what)
 {
-	COrder_Unload *order = new COrder_Unload;
+	auto order = std::make_unique<COrder_Unload>();
 
 	order->goalPos = pos;
 	if (what && !what->Destroyed) {

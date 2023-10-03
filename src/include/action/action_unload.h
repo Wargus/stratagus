@@ -36,11 +36,11 @@
 
 class COrder_Unload : public COrder
 {
-	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+	friend std::unique_ptr<COrder> COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
 	COrder_Unload() : COrder(UnitAction::Unload) {}
 
-	COrder_Unload *Clone() const override { return new COrder_Unload(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Unload>(*this); }
 
 	bool IsValid() const override;
 

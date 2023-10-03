@@ -57,14 +57,14 @@ enum {
 	SUB_STILL_ATTACK
 };
 
-/* static */ COrder *COrder::NewActionStandGround()
+/* static */ std::unique_ptr<COrder> COrder::NewActionStandGround()
 {
-	return new COrder_Still(true);
+	return std::make_unique<COrder_Still>(true);
 }
 
-/* static */ COrder *COrder::NewActionStill()
+/* static */ std::unique_ptr<COrder> COrder::NewActionStill()
 {
-	return new COrder_Still(false);
+	return std::make_unique<COrder_Still>(false);
 }
 
 
@@ -290,7 +290,7 @@ bool AutoRepair(CUnit &unit)
 		return false;
 	}
 	const Vec2i invalidPos(-1, -1);
-	COrder *savedOrder = nullptr;
+	std::unique_ptr<COrder> savedOrder;
 	if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
@@ -298,7 +298,7 @@ bool AutoRepair(CUnit &unit)
 	//Command* will clear unit.SavedOrder
 	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
 	if (savedOrder != nullptr) {
-		unit.SavedOrder = savedOrder;
+		unit.SavedOrder = std::move(savedOrder);
 	}
 	return true;
 }
@@ -366,7 +366,7 @@ bool AutoAttack(CUnit &unit)
 	if (goal == nullptr) {
 		return false;
 	}
-	COrder *savedOrder = nullptr;
+	std::unique_ptr<COrder> savedOrder;
 
 	if (unit.CurrentAction() == UnitAction::Still) {
 		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
@@ -377,7 +377,7 @@ bool AutoAttack(CUnit &unit)
 	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands);
 
 	if (savedOrder != nullptr) {
-		unit.SavedOrder = savedOrder;
+		unit.SavedOrder = std::move(savedOrder);
 	}
 	return true;
 }

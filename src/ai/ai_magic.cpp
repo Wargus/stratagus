@@ -55,7 +55,7 @@ void AiCheckMagic()
 	for (CUnit *unit : player.GetUnits()) {
 		if (!unit->Type->CanCastSpell.empty()) {
 			// Check only idle magic units
-			for (const auto *order : unit->Orders) {
+			for (const auto &order : unit->Orders) {
 				if (order->Action == UnitAction::SpellCast) {
 					return;
 				}

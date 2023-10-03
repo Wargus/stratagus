@@ -69,11 +69,11 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+/* static */ std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
-	COrder_Build *order = new COrder_Build;
+	auto order = std::make_unique<COrder_Build>();
 
 	order->goalPos = pos;
 	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {

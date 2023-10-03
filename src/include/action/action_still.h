@@ -40,7 +40,7 @@ public:
 	explicit COrder_Still(bool stand) : COrder(stand ? UnitAction::StandGround : UnitAction::Still)
 	{}
 
-	COrder_Still *Clone() const override { return new COrder_Still(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Still>(*this); }
 
 	bool IsValid() const override;
 

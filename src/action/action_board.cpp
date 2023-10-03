@@ -60,9 +60,9 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionBoard(CUnit &unit)
+/* static */ std::unique_ptr<COrder> COrder::NewActionBoard(CUnit &unit)
 {
-	COrder_Board *order = new COrder_Board;
+	auto order = std::make_unique<COrder_Board>();
 
 	order->SetGoal(&unit);
 	order->Range = 1;

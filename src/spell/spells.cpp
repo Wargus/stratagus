@@ -470,14 +470,14 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 		return false;
 	} else {
 		// Save previous order
-		COrder *savedOrder = nullptr;
+		std::unique_ptr<COrder> savedOrder;
 		if (caster.CurrentAction() != UnitAction::Still && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
-		// Must move before ?
+		// Must move before?
 		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
 		if (savedOrder != nullptr) {
-			caster.SavedOrder = savedOrder;
+			caster.SavedOrder = std::move(savedOrder);
 		}
 	}
 	return true;

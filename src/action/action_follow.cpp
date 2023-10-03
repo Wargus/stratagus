@@ -62,9 +62,9 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionFollow(CUnit &dest)
+/* static */ std::unique_ptr<COrder> COrder::NewActionFollow(CUnit &dest)
 {
-	COrder_Follow *order = new COrder_Follow;
+	auto order = std::make_unique<COrder_Follow>();
 
 	// Destination could be killed.
 	// Should be handled in action, but is not possible!
@@ -254,7 +254,6 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 				} else {
 					if (dest.NewOrder->HasGoal()) {
 						if (dest.NewOrder->GetGoal()->Destroyed) {
-							delete dest.NewOrder;
 							dest.NewOrder = nullptr;
 							this->Finished = true;
 							return ;
@@ -293,7 +292,7 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {
 			// Save current command to come back.
-			COrder *savedOrder = nullptr;
+			std::unique_ptr<COrder> savedOrder;
 			if (unit.CanStoreOrder(unit.CurrentOrder())) {
 				savedOrder = this->Clone();
 			}
@@ -302,7 +301,7 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
 
 			if (savedOrder != nullptr) {
-				unit.SavedOrder = savedOrder;
+				unit.SavedOrder = std::move(savedOrder);
 			}
 		}
 	}

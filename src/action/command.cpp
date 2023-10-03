@@ -69,18 +69,15 @@ static void ReleaseOrders(CUnit &unit)
 	// Order 0 must be stopped in the action loop.
 	for (size_t i = 0; i != unit.Orders.size(); ++i) {
 		if (unit.Orders[i]->Action == UnitAction::Built) {
-			(dynamic_cast<COrder_Built *>(unit.Orders[i]))->Cancel(unit);
+			(dynamic_cast<COrder_Built *>(unit.Orders[i].get()))->Cancel(unit);
 		} if (unit.Orders[i]->Action == UnitAction::Build) {
-			(dynamic_cast<COrder_Build *>(unit.Orders[i]))->Cancel(unit);
+			(dynamic_cast<COrder_Build *>(unit.Orders[i].get()))->Cancel(unit);
 		} else if (unit.Orders[i]->Action == UnitAction::Research) {
-			(dynamic_cast<COrder_Research *>(unit.Orders[i]))->Cancel(unit);
+			(dynamic_cast<COrder_Research *>(unit.Orders[i].get()))->Cancel(unit);
 		} else if (unit.Orders[i]->Action == UnitAction::Train) {
-			(dynamic_cast<COrder_Train *>(unit.Orders[i]))->Cancel(unit);
+			(dynamic_cast<COrder_Train *>(unit.Orders[i].get()))->Cancel(unit);
 		} else if (unit.Orders[i]->Action == UnitAction::UpgradeTo) {
-			(dynamic_cast<COrder_UpgradeTo *>(unit.Orders[i]))->Cancel(unit);
-		}
-		if (i > 0) {
-			delete unit.Orders[i];
+			(dynamic_cast<COrder_UpgradeTo *>(unit.Orders[i].get()))->Cancel(unit);
 		}
 	}
 	unit.Orders.resize(1);
@@ -95,7 +92,7 @@ static void ReleaseOrders(CUnit &unit)
 **
 **  @return       Pointer to next free order slot.
 */
-static COrderPtr *GetNextOrder(CUnit &unit, int flush)
+static std::unique_ptr<COrder> *GetNextOrder(CUnit &unit, int flush)
 {
 	if (flush) {
 		// empty command queue
@@ -121,7 +118,6 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 {
 	Assert(order < unit.Orders.size());
 
-	delete unit.Orders[order];
 	unit.Orders.erase(unit.Orders.begin() + order);
 	if (unit.Orders.empty()) {
 		unit.Orders.push_back(COrder::NewActionStill());
@@ -130,7 +126,6 @@ static void RemoveOrder(CUnit &unit, unsigned int order)
 
 static void ClearNewAction(CUnit &unit)
 {
-	delete unit.NewOrder;
 	unit.NewOrder = nullptr;
 }
 
@@ -144,7 +139,6 @@ static void ClearNewAction(CUnit &unit)
 */
 static void ClearSavedAction(CUnit &unit)
 {
-	delete unit.SavedOrder;
 	unit.SavedOrder = nullptr;
 }
 
@@ -166,9 +160,8 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 void CommandStopUnit(CUnit &unit)
 {
 	// Ignore that the unit could be removed.
-	COrderPtr *order = GetNextOrder(unit, FlushCommands); // Flush them.
+	auto *order = GetNextOrder(unit, FlushCommands); // Flush them.
 	Assert(order);
-	Assert(*order == nullptr);
 	*order = COrder::NewActionStill();
 
 	ClearSavedAction(unit);
@@ -183,7 +176,7 @@ void CommandStopUnit(CUnit &unit)
 */
 void CommandStandGround(CUnit &unit, int flush)
 {
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -210,7 +203,7 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -237,7 +230,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -266,7 +259,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -294,7 +287,7 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -342,7 +335,7 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 		return ;
 	}
 
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.Type->CanAttack) {
 		ClearNewAction(unit);
@@ -375,7 +368,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.Type->CanAttack) {
 		ClearNewAction(unit);
@@ -410,7 +403,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 	const Vec2i invalidPos(-1, -1);
 
 	Vec2i startPos = unit.tilePos;
-	COrderPtr *prevOrder = &unit.Orders.back();
+	auto *prevOrder = &unit.Orders.back();
 
 	if(*prevOrder != nullptr) {
 		Vec2i prevGoalPos = (*prevOrder)->GetGoalPos();
@@ -419,7 +412,7 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 		}
 	}
 
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -450,7 +443,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 	if (dest.Destroyed) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -478,7 +471,7 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order = GetNextOrder(unit, flush);
+	auto *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;
@@ -500,7 +493,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
 		ClearNewAction(unit);
@@ -526,7 +519,7 @@ void CommandExplore(CUnit &unit, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (!unit.CanMove()) {
 		ClearNewAction(unit);
@@ -575,7 +568,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 		ClearSavedAction(unit);
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -609,7 +602,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		ClearSavedAction(unit);
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -641,7 +634,7 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 		ClearSavedAction(unit);
 		return ;
 	}
-	COrderPtr *order;
+	std::unique_ptr<COrder> *order = nullptr;
 
 	if (unit.Type->Building) {
 		ClearNewAction(unit);
@@ -681,7 +674,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 	}
 
 	const int noFlushCommands = 0;
-	COrderPtr *order = GetNextOrder(unit, noFlushCommands);
+	auto *order = GetNextOrder(unit, noFlushCommands);
 
 	if (order == nullptr) {
 		return;
@@ -720,7 +713,7 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 		// Order has moved, we are not training
 		return;
 	} else if (unit.Orders[slot]->Action == UnitAction::Train) {
-		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot]);
+		COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[slot].get());
 		// Still training this order, same unit?
 		if (type && &order.GetUnitType() != type) {
 			// Different unit being trained
@@ -754,7 +747,7 @@ void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush, bool instant)
 		return;
 	}
 
-	COrderPtr *order = GetNextOrder(unit, flush);
+	auto *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;
@@ -813,7 +806,7 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 	if (unit.Player->CheckCosts(what.Costs)) {
 		return;
 	}
-	COrderPtr *order = GetNextOrder(unit, flush);
+	auto *order = GetNextOrder(unit, flush);
 	if (order == nullptr) {
 		return;
 	}
@@ -862,7 +855,7 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	COrderPtr *order = GetNextOrder(unit, flush);
+	auto *order = GetNextOrder(unit, flush);
 
 	if (order == nullptr) {
 		return;

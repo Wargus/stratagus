@@ -98,9 +98,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 }
 
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
+/* static */ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
 {
-	COrder_Attack *order = new COrder_Attack(false);
+	auto order = std::make_unique<COrder_Attack>(false);
 
 	order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
 	// Removed, Dying handled by action routine.
@@ -114,11 +114,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+/* static */ std::unique_ptr<COrder> COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
 {
 	Assert(Map.Info.IsPointOnMap(dest));
 
-	COrder_Attack *order = new COrder_Attack(false);
+	auto order = std::make_unique<COrder_Attack>(false);
 
 	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
 		// FIXME: look into action_attack.cpp about this ugly problem
@@ -137,9 +137,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+/* static */ std::unique_ptr<COrder> COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
 {
-	COrder_Attack *order = new COrder_Attack(true);
+	auto order = std::make_unique<COrder_Attack>(true);
 
 	order->goalPos = dest;
 	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;

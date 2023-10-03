@@ -46,9 +46,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionDie()
+/* static */ std::unique_ptr<COrder> COrder::NewActionDie()
 {
-	return new COrder_Die;
+	return std::make_unique<COrder_Die>();
 }
 
 void COrder_Die::Save(CFile &file, const CUnit &unit) const /* override */

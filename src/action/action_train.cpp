@@ -56,9 +56,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+/* static */ std::unique_ptr<COrder> COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
 {
-	COrder_Train *order = new COrder_Train;
+	auto order = std::make_unique<COrder_Train>();
 
 	order->Type = &type;
 	// FIXME: if you give quick an other order, the resources are lost!
@@ -247,14 +247,11 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 		newUnit->Type->OnReady->call(UnitNumber(*newUnit));
 	}
 
-	if (unit.NewOrder && unit.NewOrder->HasGoal()
-		&& unit.NewOrder->GetGoal()->Destroyed) {
-		delete unit.NewOrder;
+	if (unit.NewOrder && unit.NewOrder->HasGoal() && unit.NewOrder->GetGoal()->Destroyed) {
 		unit.NewOrder = nullptr;
 	}
 
-	if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
-		delete newUnit->Orders[0];
+	if (CanHandleOrder(*newUnit, unit.NewOrder.get()) == true) {
 		newUnit->Orders[0] = unit.NewOrder->Clone();
 	} else {
 #if 0

@@ -85,9 +85,9 @@ static int AiCheckCosts(const int (&costs)[MaxCosts])
 	}
 
 	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
-		for (const COrder *order : unit->Orders) {
+		for (const auto &order : unit->Orders) {
 			if (order->Action == UnitAction::Build) {
-				const COrder_Build &orderBuild = *static_cast<const COrder_Build *>(order);
+				const COrder_Build &orderBuild = *static_cast<const COrder_Build *>(order.get());
 				const int *building_costs = orderBuild.GetUnitType().Stats[AiPlayer->Player->Index].Costs;
 
 				for (int j = 1; j < MaxCosts; ++j) {
@@ -234,14 +234,14 @@ bool AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
 
 static bool IsAlreadyWorking(const CUnit &unit)
 {
-	for (auto *order : unit.Orders) {
+	for (const auto &order : unit.Orders) {
 		const UnitAction action = order->Action;
 
 		if (action == UnitAction::Build || action == UnitAction::Repair) {
 			return true;
 		}
 		if (action == UnitAction::Resource) {
-			const COrder_Resource &orderRes = *static_cast<const COrder_Resource *>(order);
+			const COrder_Resource &orderRes = *static_cast<const COrder_Resource *>(order.get());
 
 			if (orderRes.IsGatheringStarted()) {
 				return true;

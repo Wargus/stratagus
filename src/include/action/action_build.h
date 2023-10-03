@@ -36,11 +36,11 @@
 
 class COrder_Build : public COrder
 {
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	friend std::unique_ptr<COrder> COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 public:
 	COrder_Build() : COrder(UnitAction::Build) {}
 
-	COrder_Build *Clone() const override { return new COrder_Build(*this); }
+	std::unique_ptr<COrder> Clone() const override { return std::make_unique<COrder_Build>(*this); }
 
 	bool IsValid() const override;
 

@@ -61,9 +61,9 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
+/* static */ std::unique_ptr<COrder> COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
 {
-	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
+	auto order = std::make_unique<COrder_SpellCast>(isAutocast);
 
 	order->Range = spell.Range;
 	if (target) {
