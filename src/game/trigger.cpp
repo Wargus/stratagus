@@ -131,7 +131,7 @@ using CompareFunction = int (*)(int, int);
 */
 static CompareFunction GetCompareFunction(std::string_view op)
 {
-	if (op == "=" || op == "=") {
+	if (op == "==" || op == "=") {
 		return &CompareEq;
 	} else if (op == ">=") {
 		return &CompareGrEq;
