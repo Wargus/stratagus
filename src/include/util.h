@@ -182,110 +182,112 @@ namespace ranges
 	template <typename Range, typename Predicate>
 	auto all_of(const Range &range, Predicate &&predicate)
 	{
-		return std::all_of(begin(range), end(range), std::forward<Predicate>(predicate));
+		return std::all_of(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
 	}
 
 	template <typename Range, typename Predicate>
 	auto any_of(const Range &range, Predicate &&predicate)
 	{
-		return std::any_of(begin(range), end(range), std::forward<Predicate>(predicate));
+		return std::any_of(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
 	}
 
 	template <typename Range, typename Predicate>
 	auto none_of(const Range &range, Predicate &&predicate)
 	{
-		return std::none_of(begin(range), end(range), std::forward<Predicate>(predicate));
+		return std::none_of(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
 	}
 
 	template <typename Range, typename Predicate>
 	std::size_t count_if(const Range &range, Predicate &&predicate)
 	{
-		return std::count_if(begin(range), end(range), predicate);
+		return std::count_if(std::begin(range), std::end(range), predicate);
 	}
 
 	template <typename Range, typename Value>
 	void fill(Range &range, const Value &value)
 	{
-		std::fill(begin(range), end(range), value);
+		std::fill(std::begin(range), std::end(range), value);
 	}
 
 	template <typename Range, typename Value>
 	void iota(Range &range, const Value startValue)
 	{
-		std::iota(begin(range), end(range), startValue);
+		std::iota(std::begin(range), std::end(range), startValue);
 	}
 
 	template <typename Range, typename Value, typename Proj = identity>
 	auto find(Range &range, const Value &value, Proj proj = {})
 	{
-		return std::find_if(
-			begin(range), end(range), [&](const auto &elem) { return std::invoke(proj, elem) == value; });
+		return std::find_if(std::begin(range), std::end(range), [&](const auto &elem) {
+			return std::invoke(proj, elem) == value;
+		});
 	}
 
 	template <typename Range, typename Predicate>
 	auto find_if(Range &range, Predicate &&predicate)
 	{
-		return std::find_if(begin(range), end(range), std::forward<Predicate>(predicate));
+		return std::find_if(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
 	}
 
 	template <typename Range, typename Pred>
 	auto partition(Range &range, Pred pred)
 	{
-		return std::partition(begin(range), end(range), pred);
+		return std::partition(std::begin(range), std::end(range), pred);
 	}
 
 	template <typename Range, typename Value>
 	bool contains(const Range &range, const Value &value)
 	{
-		return std::find(begin(range), end(range), value) != end(range);
+		return std::find(std::begin(range), std::end(range), value) != std::end(range);
 	}
 
 	template <typename Range>
 	void reverse(Range &range)
 	{
-		std::reverse(begin(range), end(range));
+		std::reverse(std::begin(range), std::end(range));
 	}
 
 	template <typename T, typename A, typename U>
 	void erase(std::vector<T, A> &v, const U &value)
 	{
-		v.erase(std::remove(begin(v), end(v), value), end(v));
+		v.erase(std::remove(std::begin(v), std::end(v), value), std::end(v));
 	}
 
 	template <typename Range>
 	auto min_element(Range &range)
 	{
-		return std::min_element(begin(range), end(range));
+		return std::min_element(std::begin(range), std::end(range));
 	}
 
 	template <typename Range, typename CmpFunction>
 	auto min_element(Range &range, CmpFunction cmp)
 	{
-		return std::min_element(begin(range), end(range), cmp);
+		return std::min_element(std::begin(range), std::end(range), cmp);
 	}
 
 	template <typename Range, typename Value>
 	auto lower_bound(Range &range, const Value &value)
 	{
-		return std::lower_bound(begin(range), end(range), value);
+		return std::lower_bound(std::begin(range), std::end(range), value);
 	}
 
 	template <typename Range, typename Value, typename Comparer = std::less<>>
 	auto upper_bound(Range &range, const Value &value, Comparer &&comparer = {})
 	{
-		return std::upper_bound(begin(range), end(range), value, std::forward<Comparer>(comparer));
+		return std::upper_bound(
+			std::begin(range), std::end(range), value, std::forward<Comparer>(comparer));
 	}
 
 	template <typename Range, typename OutputIt>
 	auto copy(const Range &range, OutputIt copy_to)
 	{
-		return std::copy(begin(range), end(range), copy_to);
+		return std::copy(std::begin(range), std::end(range), copy_to);
 	}
 
 	template <typename Range, typename OutputIt, typename UnaryPredicate>
 	auto copy_if(const Range &range, OutputIt copy_to, UnaryPredicate pred)
 	{
-		return std::copy_if(begin(range), end(range), copy_to, pred);
+		return std::copy_if(std::begin(range), std::end(range), copy_to, pred);
 	}
 
 	template <typename Range>
@@ -293,11 +295,11 @@ namespace ranges
 	{
 		if (shift >= 0) {
 			for (int i = 0; i < shift; i++) {
-				std::rotate(rbegin(range), rbegin(range) + 1, rend(range));
+				std::rotate(std::rbegin(range), std::rbegin(range) + 1, std::rend(range));
 			}
 		} else {
 			for (int i = 0; i > shift; i--) {
-				std::rotate(begin(range), begin(range) + 1, end(range));
+				std::rotate(std::begin(range), std::begin(range) + 1, std::end(range));
 			}
 		}
 	}
@@ -305,7 +307,7 @@ namespace ranges
 	template <typename Range, typename Comparer = std::less<>>
 	void sort(Range &range, Comparer &&comparer = {})
 	{
-		std::sort(begin(range), end(range), std::forward<Comparer>(comparer));
+		std::sort(std::begin(range), std::end(range), std::forward<Comparer>(comparer));
 	}
 
 }

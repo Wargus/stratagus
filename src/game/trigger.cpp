@@ -47,13 +47,15 @@
 #include "unit_find.h"
 #include "unittype.h"
 
+#include <vector>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
 static int Trigger;
-static bool *ActiveTriggers;
+static std::vector<bool> ActiveTriggers;
 
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
@@ -300,22 +302,15 @@ static int CclIfRescuedNearUnit(lua_State *l)
 */
 int GetNumOpponents(int player)
 {
-	int n = 0;
-
-	// Check the player opponents
-	for (int i = 0; i < PlayerMax; ++i) {
+	return ranges::count_if(Players, [&](const CPlayer &p) {
+		// Check the player opponents
 		// This player is our enemy and has units left.
-		if ((Players[player].IsEnemy(Players[i])) || (Players[i].IsEnemy(Players[player]))) {
-			// Don't count walls
-			for (CUnit *unit : Players[i].GetUnits()) {
-				if (unit->Type->BoolFlag[WALL_INDEX].value == false) {
-					++n;
-					break;
-				}
-			}
-		}
-	}
-	return n;
+		// Don't count walls
+		return (p.IsEnemy(Players[player]) || Players[player].IsEnemy(p))
+		    && ranges::any_of(p.GetUnits(), [](const CUnit *unit) {
+				   return unit->Type->BoolFlag[WALL_INDEX].value == false;
+			   });
+	});
 }
 
 /**
@@ -432,7 +427,7 @@ static int CclAddTrigger(lua_State *l)
 	}
 
 	const int i = lua_rawlen(l, -1);
-	if (ActiveTriggers && !ActiveTriggers[i / 2]) {
+	if (!ActiveTriggers.empty() && !ActiveTriggers[i / 2]) {
 		lua_pushnil(l);
 		lua_rawseti(l, -2, i + 1);
 		lua_pushnil(l);
@@ -465,7 +460,7 @@ static int CclSetActiveTriggers(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	ActiveTriggers = new bool[args];
+	ActiveTriggers.resize(args);
 	for (int j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 	}
@@ -489,11 +484,7 @@ static bool TriggerExecuteAction(int script)
 	for (int j = 0; j < args; ++j) {
 		lua_rawgeti(Lua, -1, j + 1);
 		LuaCall(0, 0);
-		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			ret = true;
-		} else {
-			ret = false;
-		}
+		ret = lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1);
 		lua_settop(Lua, base + 1);
 	}
 	lua_pop(Lua, 1);
@@ -646,8 +637,7 @@ void CleanTriggers()
 
 	Trigger = 0;
 
-	delete[] ActiveTriggers;
-	ActiveTriggers = nullptr;
+	ActiveTriggers.clear();
 
 	GameTimer.Reset();
 }
