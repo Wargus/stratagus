@@ -2346,122 +2346,85 @@ void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 }
 
 #ifdef WIN32
-// copied from msdn
 fs::path GetAVolumePath(__in PWCHAR VolumeName)
 {
-    DWORD  CharCount = MAX_PATH + 1;
-    PWCHAR Names     = nullptr;
-    PWCHAR NameIdx   = nullptr;
-    BOOL   Success   = FALSE;
+	DWORD CharCount = MAX_PATH + 1;
+	std::vector<WCHAR> Names(CharCount);
 
-    for (;;) {
-        Names = (PWCHAR) new BYTE [CharCount * sizeof(WCHAR)];
-
-        if (!Names) {
-            ExitFatal(1);
-        }
-
-        Success = GetVolumePathNamesForVolumeNameW(VolumeName, Names, CharCount, &CharCount);
-        if (Success) {
-            break;
-        }
-
-        if (GetLastError() != ERROR_MORE_DATA) {
-            break;
-        }
-
-        delete [] Names;
-        Names = nullptr;
-    }
-
-	for (NameIdx = Names; NameIdx[0] != L'\0'; NameIdx += wcslen(NameIdx) + 1) {
-		fs::path result(NameIdx);
-		delete [] Names;
-		Names = nullptr;
-		return result;
+	for (;;) {
+		const BOOL Success =
+			GetVolumePathNamesForVolumeNameW(VolumeName, Names.data(), Names.size(), &CharCount);
+		Names.resize(CharCount);
+		if (Success || GetLastError() != ERROR_MORE_DATA) {
+			break;
+		}
 	}
-
-    return fs::path();
+	return Names.data();
 }
 
 std::vector<fs::path> getVolumes()
 {
-    DWORD  CharCount            = 0;
-    WCHAR  DeviceName[MAX_PATH] = L"";
-    DWORD  Error                = ERROR_SUCCESS;
-    HANDLE FindHandle           = INVALID_HANDLE_VALUE;
-    BOOL   Found                = FALSE;
-    size_t Index                = 0;
-    BOOL   Success              = FALSE;
-    WCHAR  VolumeName[MAX_PATH] = L"";
+	WCHAR VolumeName[MAX_PATH] = L"";
 
-	int curIndex = 0;
+	//  Enumerate all volumes in the system.
+	HANDLE FindHandle = FindFirstVolumeW(VolumeName, std::size(VolumeName));
+
+	if (FindHandle == INVALID_HANDLE_VALUE) {
+		const DWORD Error = GetLastError();
+		wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
+		ExitFatal(1);
+	}
+
 	std::vector<fs::path> result;
+	for (;;) {
+		size_t Index = wcslen(VolumeName) - 1;
 
-    //  Enumerate all volumes in the system.
-    FindHandle = FindFirstVolumeW(VolumeName, ARRAYSIZE(VolumeName));
+		wprintf(L"Volume name: %s\n", VolumeName);
+		if (!starts_with(VolumeName, LR"(\\?\)") || VolumeName[Index] != L'\\') {
+			wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", VolumeName);
+			ExitFatal(1);
+		}
 
-    if (FindHandle == INVALID_HANDLE_VALUE) {
-        Error = GetLastError();
-        wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
-        ExitFatal(1);
-    }
+		//  Skip the \\?\ prefix and remove the trailing backslash.
+		//  QueryDosDeviceW does not allow a trailing backslash,
+		//  so temporarily remove it.
+		VolumeName[Index] = L'\0';
+		WCHAR DeviceName[MAX_PATH] = L"";
+		DWORD CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, std::size(DeviceName));
+		VolumeName[Index] = L'\\';
 
-    for (;;) {
-        //  Skip the \\?\ prefix and remove the trailing backslash.
-        Index = wcslen(VolumeName) - 1;
+		if (CharCount == 0) {
+			const DWORD Error = GetLastError();
+			wprintf(L"QueryDosDeviceW failed with error code %d\n", Error);
+			ExitFatal(1);
+		}
 
-        if (VolumeName[0]     != L'\\' ||
-            VolumeName[1]     != L'\\' ||
-            VolumeName[2]     != L'?'  ||
-            VolumeName[3]     != L'\\' ||
-            VolumeName[Index] != L'\\') {
-            Error = ERROR_BAD_PATHNAME;
-            wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", VolumeName);
-            ExitFatal(1);
-        }
-
-        //  QueryDosDeviceW does not allow a trailing backslash,
-        //  so temporarily remove it.
-        VolumeName[Index] = L'\0';
-        CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName));
-        VolumeName[Index] = L'\\';
-
-        if (CharCount == 0) {
-            Error = GetLastError();
-            wprintf(L"QueryDosDeviceW failed with error code %d\n", Error);
-            ExitFatal(1);
-        }
-
-        wprintf(L"\nFound a device:\n %s", DeviceName);
-        wprintf(L"\nVolume name: %s", VolumeName);
+		wprintf(L" Found a device: %s\n", DeviceName);
 		fs::path r = GetAVolumePath(VolumeName);
 		if (!r.empty()) {
 			result.push_back(r);
- 	       	wprintf(L"\nPath: %s", r.wstring().c_str());
+ 			wprintf(L"  Path: %s\n", r.wstring().c_str());
 		}
 
-        //  Move on to the next volume.
-        Success = FindNextVolumeW(FindHandle, VolumeName, ARRAYSIZE(VolumeName));
+		//  Move on to the next volume.
+		const BOOL Success = FindNextVolumeW(FindHandle, VolumeName, std::size(VolumeName));
 
-        if (!Success) {
-            Error = GetLastError();
+		if (!Success) {
+			const DWORD Error = GetLastError();
 
-            if (Error != ERROR_NO_MORE_FILES) {
-                wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
-                ExitFatal(1);
-            }
+			if (Error != ERROR_NO_MORE_FILES) {
+				wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
+				ExitFatal(1);
+			}
 
-            //  Finished iterating through all the volumes.
-            Error = ERROR_SUCCESS;
-            break;
-        }
-    }
+			//  Finished iterating through all the volumes.
+			break;
+		}
+	}
 
-    FindVolumeClose(FindHandle);
-    FindHandle = INVALID_HANDLE_VALUE;
+	FindVolumeClose(FindHandle);
 
-    return result;
+	return result;
 }
 #endif
 

@@ -157,6 +157,11 @@ inline bool starts_with(std::string_view s, std::string_view prefix)
 	return s.substr(0, prefix.size()) == prefix;
 }
 
+inline bool starts_with(std::wstring_view s, std::wstring_view prefix)
+{
+	return s.substr(0, prefix.size()) == prefix;
+}
+
 /*----------------------------------------------------------------------------
 --  General
 ----------------------------------------------------------------------------*/
