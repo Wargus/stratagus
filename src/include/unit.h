@@ -342,7 +342,7 @@ public:
 
 	const CUnitType *Type = nullptr; /// Pointer to unit-type (peon,...)
 	CPlayer    *Player = nullptr;            /// Owner of this unit
-	const CUnitStats *Stats = nullptr;       /// Current unit stats
+	CUnitStats *Stats = nullptr;       /// Current unit stats
 	int         CurrentSightRange; /// Unit's Current Sight Range
 
 	// Pathfinding stuff:

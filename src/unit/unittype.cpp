@@ -824,10 +824,8 @@ std::pair<CUnitType *, bool> NewUnitTypeSlot(std::string_view ident)
 	type->Ident = ident;
 	type->BoolFlag.resize(new_bool_size);
 
-	type->DefaultStat.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
-	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		type->DefaultStat.Variables[i] = UnitTypeVar.Variable[i];
-	}
+	type->DefaultStat.Variables = UnitTypeVar.Variable;
+
 	UnitTypes.push_back(type);
 	UnitTypeMap[type->Ident] = type;
 	return {type, false};

@@ -110,14 +110,14 @@ class CUnitStats
 {
 public:
 	CUnitStats() = default;
-	~CUnitStats();
+	~CUnitStats() = default;
 
 	CUnitStats &operator=(const CUnitStats &rhs);
 
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;
 public:
-	CVariable *Variables = nullptr; /// user defined variable.
+	std::vector<CVariable> Variables; /// user defined variable.
 	int Costs[MaxCosts]{};          /// current costs of the unit
 	int Storing[MaxCosts]{};        /// storage increasing
 	int ImproveIncomes[MaxCosts]{}; /// Gives player an improved income

@@ -156,7 +156,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	unit.Type = const_cast<CUnitType *>(&newtype);
-	unit.Stats = &unit.Type->Stats[player.Index];
+	unit.Stats = const_cast<CUnitStats *>(&unit.Type->Stats[player.Index]);
 
 	if (!newtype.CanCastSpell.empty() && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];

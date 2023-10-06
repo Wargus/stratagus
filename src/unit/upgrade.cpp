@@ -78,12 +78,6 @@ static std::map<std::string, CUpgrade *, std::less<>> Upgrades;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-
-CUnitStats::~CUnitStats()
-{
-	delete [] this->Variables;
-}
-
 CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 {
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
@@ -91,11 +85,7 @@ CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 		this->Storing[i] = rhs.Storing[i];
 		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
 	}
-	delete [] this->Variables;
-	const unsigned int size = UnitTypeVar.GetNumberVariable();
-	this->Variables = new CVariable[size];
-
-	std::copy(rhs.Variables, rhs.Variables + size, this->Variables);
+	this->Variables = rhs.Variables;
 	return *this;
 }
 
@@ -248,7 +238,7 @@ static int CclDefineModifier(lua_State *l)
 
 	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
 	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
-	um->Modifier.Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	um->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
 	um->ModifyPercent.resize(UnitTypeVar.GetNumberVariable());
 
 	std::string_view upgrade_ident = LuaToString(l, 1);
