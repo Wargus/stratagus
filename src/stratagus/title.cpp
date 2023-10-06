@@ -38,88 +38,28 @@
 #include "editor.h"
 
 
-TitleScreen **TitleScreens;          /// Title screens to show at startup
+std::vector<std::unique_ptr<TitleScreen>> TitleScreens; /// Title screens to show at startup
 static bool WaitNoEvent;             /// Flag got an event
 extern std::string CliMapName;
 
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonPressed(unsigned)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackButtonReleased(unsigned)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyPressed(unsigned, unsigned)
-{
-	WaitNoEvent = false;
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyReleased(unsigned, unsigned)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackKeyRepeated(unsigned, unsigned)
-{
-}
-
-/**
-**  Callback for input.
-*/
-static void WaitCallbackMouse(const PixelPos &)
-{
-}
-
-/**
-**  Callback for exit.
-*/
-static void WaitCallbackExit()
-{
-}
-
-
 void TitleScreen::ShowLabels()
 {
-	TitleScreenLabel **labels = this->Labels;
-
-	if (!labels) {
-		return ;
-	}
-
-	for (int i = 0; labels[i]; ++i) {
-		if (!labels[i]->Font) {
+	for (auto &titleScreenlabel : this->Labels) {
+		if (!titleScreenlabel->Font) {
 			continue;
 		}
 		// offsets are for 640x480, scale up to actual resolution
-		const int x = labels[i]->Xofs * Video.Width / 640;
-		const int y = labels[i]->Yofs * Video.Height / 480;
-		CLabel label(*labels[i]->Font);
+		const int x = titleScreenlabel->Xofs * Video.Width / 640;
+		const int y = titleScreenlabel->Yofs * Video.Height / 480;
+		CLabel label(*titleScreenlabel->Font);
 
-		if (labels[i]->Flags & TitleFlagCenter) {
-			label.DrawCentered(x, y, labels[i]->Text);
+		if (titleScreenlabel->Flags & TitleFlagCenter) {
+			label.DrawCentered(x, y, titleScreenlabel->Text);
 		} else {
-			label.Draw(x, y, labels[i]->Text);
+			label.Draw(x, y, titleScreenlabel->Text);
 		}
 	}
 }
-
 
 /**
 **  Show a title image
@@ -131,13 +71,13 @@ void TitleScreen::ShowTitleImage()
 
 	WaitNoEvent = true;
 
-	callbacks.ButtonPressed = WaitCallbackButtonPressed;
-	callbacks.ButtonReleased = WaitCallbackButtonReleased;
-	callbacks.MouseMoved = WaitCallbackMouse;
-	callbacks.MouseExit = WaitCallbackExit;
-	callbacks.KeyPressed = WaitCallbackKeyPressed;
-	callbacks.KeyReleased = WaitCallbackKeyReleased;
-	callbacks.KeyRepeated = WaitCallbackKeyRepeated;
+	callbacks.ButtonPressed = +[](unsigned) { WaitNoEvent = false; };
+	callbacks.ButtonReleased = +[](unsigned) {};
+	callbacks.MouseMoved = +[](const PixelPos &) {};
+	callbacks.MouseExit = +[]() {};
+	callbacks.KeyPressed = +[](unsigned, unsigned) { WaitNoEvent = false; };
+	callbacks.KeyReleased = +[](unsigned, unsigned) {};
+	callbacks.KeyRepeated = +[](unsigned, unsigned) {};
 	//callbacks.NetworkEvent = NetworkEvent;
 	callbacks.NetworkEvent = nullptr;
 
@@ -169,25 +109,25 @@ void TitleScreen::ShowTitleImage()
 */
 void ShowTitleScreens()
 {
-	if (!TitleScreens || !CliMapName.empty()) {
+	if (TitleScreens.empty() || !CliMapName.empty()) {
 		return;
 	}
 
 	SetVideoSync();
 
-	for (int i = 0; TitleScreens[i]; ++i) {
-		if ((Editor.Running && !TitleScreens[i]->Editor) || (!Editor.Running && TitleScreens[i]->Editor)) {
+	for (const auto& titleScreen : TitleScreens) {
+		if ((Editor.Running && !titleScreen->Editor) || (!Editor.Running && titleScreen->Editor)) {
 			continue;
 		}
 
-		if (!TitleScreens[i]->Music.empty()) {
-			if (TitleScreens[i]->Music == "none" || PlayMusic(TitleScreens[i]->Music) == -1) {
+		if (!titleScreen->Music.empty()) {
+			if (titleScreen->Music == "none" || PlayMusic(titleScreen->Music) == -1) {
 				StopMusic();
 			}
 		}
 
-		if (!TitleScreens[i]->File.empty() && PlayMovie(TitleScreens[i]->File.string())) {
-			TitleScreens[i]->ShowTitleImage();
+		if (!titleScreen->File.empty() && PlayMovie(titleScreen->File.string())) {
+			titleScreen->ShowTitleImage();
 		}
 
 		Video.ClearScreen();

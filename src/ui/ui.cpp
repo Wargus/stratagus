@@ -378,13 +378,7 @@ void CleanUserInterface()
 	CGraphic::Free(UI.DefeatBackgroundG);
 
 	// Title Screens
-	if (TitleScreens) {
-		for (int i = 0; TitleScreens[i]; ++i) {
-			delete TitleScreens[i];
-		}
-		delete[] TitleScreens;
-		TitleScreens = nullptr;
-	}
+	TitleScreens.clear();
 }
 
 void FreeButtonStyles()

@@ -362,23 +362,16 @@ static int CclShowTitleScreens(lua_State *l)
 */
 static int CclSetTitleScreens(lua_State *l)
 {
-	if (TitleScreens) {
-		for (int i = 0; TitleScreens[i]; ++i) {
-			delete TitleScreens[i];
-		}
-		delete[] TitleScreens;
-		TitleScreens = nullptr;
-	}
+	TitleScreens.clear();
 
 	const int args = lua_gettop(l);
-	TitleScreens = new TitleScreen *[args + 1];
-	memset(TitleScreens, 0, (args + 1) * sizeof(TitleScreen *));
+	TitleScreens.resize(args);
 
 	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		TitleScreens[j] = new TitleScreen;
+		TitleScreens[j] = std::make_unique<TitleScreen>();
 		TitleScreens[j]->Iterations = 1;
 		lua_pushnil(l);
 		while (lua_next(l, j + 1)) {
@@ -398,14 +391,13 @@ static int CclSetTitleScreens(lua_State *l)
 					LuaError(l, "incorrect argument");
 				}
 				const int subargs = lua_rawlen(l, -1);
-				TitleScreens[j]->Labels = new TitleScreenLabel *[subargs + 1];
-				memset(TitleScreens[j]->Labels, 0, (subargs + 1) * sizeof(TitleScreenLabel *));
+				TitleScreens[j]->Labels.resize(subargs);
 				for (int k = 0; k < subargs; ++k) {
 					lua_rawgeti(l, -1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
 					}
-					TitleScreens[j]->Labels[k] = new TitleScreenLabel;
+					TitleScreens[j]->Labels[k] = std::make_unique<TitleScreenLabel>();
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
 						const std::string_view value = LuaToString(l, -2);
