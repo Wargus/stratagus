@@ -125,7 +125,7 @@ void COrder_Die::Execute(CUnit &unit) /* override */
 
 	unit.Remove(nullptr);
 	unit.Type = &corpseType;
-	unit.Stats = &corpseType.Stats[unit.Player->Index];
+	unit.Stats = const_cast<CUnitStats *>(&corpseType.Stats[unit.Player->Index]);
 	UpdateUnitSightRange(unit);
 	unit.Place(unit.tilePos);
 

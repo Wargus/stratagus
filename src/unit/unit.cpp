@@ -621,7 +621,7 @@ void CUnit::Init(const CUnitType &type)
 		Assert(!Variable);
 		const unsigned int size = UnitTypeVar.GetNumberVariable();
 		Variable = new CVariable[size];
-		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
+		std::copy(type.MapDefaultStat.Variables.begin(), type.MapDefaultStat.Variables.end(), Variable);
 	} else {
 		Variable = nullptr;
 	}
@@ -746,12 +746,12 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		}
 	}
 	Player = &player;
-	Stats = &type.Stats[Player->Index];
+	Stats = const_cast<CUnitStats *>(&type.Stats[Player->Index]);
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
 			Assert(Variable);
-			Assert(Stats->Variables);
-			memcpy(Variable, Stats->Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+			Assert(Stats->Variables.size() == UnitTypeVar.GetNumberVariable());
+			std::copy(Stats->Variables.begin(), Stats->Variables.end(), Variable);
 		}
 	}
 }
@@ -1870,7 +1870,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 
 	MapUnmarkUnitSight(*this);
 	newplayer.AddUnit(*this);
-	Stats = &Type->Stats[newplayer.Index];
+	Stats = const_cast<CUnitStats *>(&Type->Stats[newplayer.Index]);
 	UpdateUnitSightRange(*this);
 	MapMarkUnitSight(*this);
 
