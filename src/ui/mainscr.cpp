@@ -225,7 +225,7 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		|| ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
-	if (!condition->BoolFlags.empty() && !unit.Type->CheckUserBoolFlags(condition->BoolFlags.data())) {
+	if (!unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
 	if (!condition->Variables.empty()) {

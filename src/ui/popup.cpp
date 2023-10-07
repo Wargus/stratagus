@@ -330,11 +330,6 @@
 	}
 }
 
-CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), Height(1)
-{
-
-}
-
 /* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
 {
 	return this->Width;
@@ -456,11 +451,11 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 **
 **  @param l   Lua State.
 */
-static PopupConditionPanel *ParsePopupConditions(lua_State *l)
+static std::unique_ptr<PopupConditionPanel> ParsePopupConditions(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
-	PopupConditionPanel *condition = new PopupConditionPanel;
+	std::unique_ptr<PopupConditionPanel> condition = std::make_unique<PopupConditionPanel>();
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);
 
@@ -522,20 +517,18 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
-				if (!condition->BoolFlags) {
+				if (condition->BoolFlags.empty()) {
 					size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-					condition->BoolFlags = new char[new_bool_size];
-					memset(condition->BoolFlags, 0, new_bool_size * sizeof(char));
+					condition->BoolFlags.resize(new_bool_size);
 				}
 				condition->BoolFlags[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
 			}
 			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
-				if (!condition->Variables) {
+				if (condition->Variables.empty()) {
 					size_t new_variables_size = UnitTypeVar.GetNumberVariable();
-					condition->Variables = new char[new_variables_size];
-					memset(condition->Variables, 0, new_variables_size * sizeof(char));
+					condition->Variables.resize(new_variables_size);
 				}
 				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
 				continue;
@@ -546,7 +539,7 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	return condition;
 }
 
-/* static */ CPopupContentType *CPopupContentType::ParsePopupContent(lua_State *l)
+/* static */ std::unique_ptr<CPopupContentType> CPopupContentType::ParsePopupContent(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
@@ -557,8 +550,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	int minHeight = 0;
 	std::string textColor("white");
 	std::string highColor("red");
-	CPopupContentType *content = nullptr;
-	PopupConditionPanel *condition = nullptr;
+	std::unique_ptr<CPopupContentType> content;
+	std::unique_ptr<PopupConditionPanel> condition;
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		std::string_view key = LuaToString(l, -2);
@@ -580,15 +573,15 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			key = LuaToString(l, -1, 1); // Method name
 			lua_rawgeti(l, -1, 2); // Method data
 			if (key == "ButtonInfo") {
-				content = new CPopupContentTypeButtonInfo;
+				content = std::make_unique<CPopupContentTypeButtonInfo>();
 			} else if (key == "Text") {
-				content = new CPopupContentTypeText;
+				content = std::make_unique<CPopupContentTypeText>();
 			} else if (key == "Costs") {
-				content = new CPopupContentTypeCosts;
+				content = std::make_unique<CPopupContentTypeCosts>();
 			} else if (key == "Line") {
-				content = new CPopupContentTypeLine;
+				content = std::make_unique<CPopupContentTypeLine>();
 			} else if (key == "Variable") {
-				content = new CPopupContentTypeVariable;
+				content = std::make_unique<CPopupContentTypeVariable>();
 			} else {
 				LuaError(l, "Invalid drawing method '%s' in DefinePopups", key.data());
 			}
@@ -605,22 +598,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 	content->MarginY = marginY;
 	content->minSize.x = minWidth;
 	content->minSize.y = minHeight;
-	content->Condition = condition;
+	content->Condition = std::move(condition);
 	content->TextColor = textColor;
 	content->HighlightColor = highColor;
 	return content;
-}
-
-CPopup::CPopup() :
-	Contents(), MarginX(MARGIN_X), MarginY(MARGIN_Y), MinWidth(0), MinHeight(0),
-	DefaultFont(nullptr), BackgroundColor(ColorBlue), BorderColor(ColorWhite)
-{}
-
-CPopup::~CPopup()
-{
-	for (CPopupContentType *content : Contents) {
-		delete content;
-	}
 }
 
 //@}
