@@ -338,11 +338,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (type && condition->BoolFlags && !type->CheckUserBoolFlags(condition->BoolFlags)) {
+	if (type && !type->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
 
-	if (condition->Variables && type) {
+	if (!condition->Variables.empty() && type) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[ThisPlayer->Index].Variables[i].Enable) {
@@ -364,10 +364,10 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 	popupWidth = popup.MarginX;
 	popupHeight = popup.MarginY;
 
-	for (CPopupContentType *contentPtr : popup.Contents) {
+	for (auto &contentPtr : popup.Contents) {
 		CPopupContentType &content = *contentPtr;
 
-		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		if (CanShowPopupContent(content.Condition.get(), button, UnitTypes[button.Value])) {
 			// Automatically write the calculated coordinates.
 			content.pos.x = contentWidth + content.MarginX;
 			content.pos.y = popupHeight + content.MarginY;
@@ -576,10 +576,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 	Video.DrawRectangle(popup.BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents
-	for (CPopupContentType *contentPtr : popup.Contents) {
+	for (auto &contentPtr : popup.Contents) {
 		const CPopupContentType &content = *contentPtr;
 
-		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		if (CanShowPopupContent(content.Condition.get(), button, UnitTypes[button.Value])) {
 			content.Draw(x + content.pos.x, y + content.pos.y, popup, popupWidth, button, Costs);
 		}
 	}

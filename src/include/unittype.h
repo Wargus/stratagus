@@ -562,7 +562,7 @@ public:
 	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
 	PixelSize GetPixelSize() const;
 
-	bool CheckUserBoolFlags(const char *BoolFlags) const;
+	bool CheckUserBoolFlags(const std::vector<char> &BoolFlags) const;
 	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 

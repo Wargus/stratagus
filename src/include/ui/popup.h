@@ -35,6 +35,7 @@
 #include "color.h"
 #include "script.h"
 #include "vec2i.h"
+#include "video.h"
 
 #include <optional>
 #include <string>
@@ -55,31 +56,24 @@ enum class ButtonCmd;
 class PopupConditionPanel
 {
 public:
-	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
-		ButtonAction(std::nullopt), BoolFlags(nullptr), Variables(nullptr) {}
-	~PopupConditionPanel()
-	{
-		delete[] BoolFlags;
-		delete[] Variables;
-	}
+	PopupConditionPanel() = default;
+	~PopupConditionPanel() = default;
 
-	bool HasHint;               /// check if button has hint.
-	bool HasDescription;        /// check if button has description.
-	bool HasDependencies;       /// check if button has dependencies or restrictions.
-	std::optional<ButtonCmd> ButtonAction;     /// action type of button
+	bool HasHint = false;         /// check if button has hint.
+	bool HasDescription = false;  /// check if button has description.
+	bool HasDependencies = false; /// check if button has dependencies or restrictions.
+	std::optional<ButtonCmd> ButtonAction; /// action type of button
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
-	char *BoolFlags;            /// array of condition about user flags.
-	char *Variables;            /// array of variable to verify (enable and max > 0)
+	std::vector<char> BoolFlags; /// array of condition about user flags.
+	std::vector<char> Variables; /// array of variable to verify (enable and max > 0)
 };
 
 class CPopupContentType
 {
 public:
-	CPopupContentType() : pos(0, 0),
-		MarginX(MARGIN_X), MarginY(MARGIN_Y), minSize(0, 0),
-		Wrap(true), Condition(nullptr) {}
-	virtual ~CPopupContentType() { delete Condition; }
+	CPopupContentType() = default;
+	virtual ~CPopupContentType() = default;
 
 	/// Tell how show the variable Index.
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const = 0;
@@ -90,20 +84,20 @@ public:
 
 	virtual void Parse(lua_State *l) = 0;
 
-	static CPopupContentType *ParsePopupContent(lua_State *l);
+	static std::unique_ptr<CPopupContentType> ParsePopupContent(lua_State *l);
 
 public:
-	PixelPos pos;               /// position to draw.
+	PixelPos pos{0, 0}; /// position to draw.
 
-	int MarginX;                /// Left and right margin width.
-	int MarginY;                /// Upper and lower margin height.
-	PixelSize minSize;          /// Minimal size covered by content type.
-	bool Wrap;                  /// If true, the next content will be placed on the next "line".
+	int MarginX = MARGIN_X;  /// Left and right margin width.
+	int MarginY = MARGIN_Y;  /// Upper and lower margin height.
+	PixelSize minSize{0, 0}; /// Minimal size covered by content type.
+	bool Wrap = true;        /// If true, the next content will be placed on the next "line".
 protected:
 	std::string TextColor;      /// Color used for plain text in content.
 	std::string HighlightColor; /// Color used for highlighted letters.
 public:
-	PopupConditionPanel *Condition; /// Condition to show the content; if nullptr, no condition.
+	std::unique_ptr<PopupConditionPanel> Condition; /// Condition to show the content; if nullptr, no condition.
 };
 
 enum PopupButtonInfo_Types {
@@ -115,8 +109,8 @@ enum PopupButtonInfo_Types {
 class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
-	CPopupContentTypeButtonInfo() : InfoType(0), MaxWidth(0), Font(nullptr) {}
-	virtual ~CPopupContentTypeButtonInfo() {}
+	CPopupContentTypeButtonInfo() = default;
+	virtual ~CPopupContentTypeButtonInfo() = default;
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -126,16 +120,16 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	int InfoType;                /// Type of information to show.
-	unsigned int MaxWidth;       /// Maximum width of multilined information.
-	CFont *Font;                 /// Font to use.
+	int InfoType = 0;          /// Type of information to show.
+	unsigned int MaxWidth = 0; /// Maximum width of multilined information.
+	CFont *Font = nullptr;     /// Font to use.
 };
 
 class CPopupContentTypeText : public CPopupContentType
 {
 public:
-	CPopupContentTypeText() : MaxWidth(0), Font(nullptr) {}
-	virtual ~CPopupContentTypeText() {}
+	CPopupContentTypeText() = default;
+	virtual ~CPopupContentTypeText() = default;
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -145,16 +139,16 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	std::string Text;            /// Text to display
-	unsigned int MaxWidth;       /// Maximum width of multilined text.
-	CFont *Font;                 /// Font to use.
+	std::string Text;          /// Text to display
+	unsigned int MaxWidth = 0; /// Maximum width of multilined text.
+	CFont *Font = nullptr;     /// Font to use.
 };
 
 class CPopupContentTypeCosts : public CPopupContentType
 {
 public:
-	CPopupContentTypeCosts() : Font(nullptr), Centered(0) {}
-	virtual ~CPopupContentTypeCosts() {}
+	CPopupContentTypeCosts() = default;
+	virtual ~CPopupContentTypeCosts() = default;
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -164,15 +158,15 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	CFont *Font;                 /// Font to use.
-	char Centered;               /// if true, center the display.
+	CFont *Font = nullptr; /// Font to use.
+	bool Centered = false;     /// if true, center the display.
 };
 
 class CPopupContentTypeLine : public CPopupContentType
 {
 public:
-	CPopupContentTypeLine();
-	virtual ~CPopupContentTypeLine() {}
+	CPopupContentTypeLine() = default;
+	virtual ~CPopupContentTypeLine() = default;
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -182,9 +176,9 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	IntColor Color;  /// Color used for line.
-	unsigned int Width;     /// line height
-	unsigned int Height;    /// line height
+	IntColor Color = ColorWhite; /// Color used for line.
+	unsigned int Width = 0;      /// line height
+	unsigned int Height = 1;     /// line height
 };
 
 class CPopupContentTypeVariable : public CPopupContentType
@@ -209,18 +203,18 @@ private:
 class CPopup
 {
 public:
-	CPopup();
-	~CPopup();
+	CPopup() = default;
+	~CPopup() = default;
 
-	std::vector<CPopupContentType *> Contents; /// Array of contents to display.
+	std::vector<std::unique_ptr<CPopupContentType>> Contents; /// Array of contents to display.
 	std::string Ident;                         /// Ident of the popup.
-	int MarginX;                               /// Left and right margin width.
-	int MarginY;                               /// Upper and lower margin height.
-	int MinWidth;                              /// Minimal width covered by popup.
-	int MinHeight;                             /// Minimal height covered by popup.
-	CFont *DefaultFont;                        /// Default font for content.
-	IntColor BackgroundColor;                  /// Color used for popup's background.
-	IntColor BorderColor;                      /// Color used for popup's borders.
+	int MarginX = MARGIN_X;                    /// Left and right margin width.
+	int MarginY = MARGIN_Y;                    /// Upper and lower margin height.
+	int MinWidth = 0;                          /// Minimal width covered by popup.
+	int MinHeight = 0;                         /// Minimal height covered by popup.
+	CFont *DefaultFont = nullptr;              /// Default font for content.
+	IntColor BackgroundColor = ColorBlue;      /// Color used for popup's background.
+	IntColor BorderColor = ColorWhite;         /// Color used for popup's borders.
 };
 
 

@@ -170,7 +170,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			return false;
 		}
 	}
-	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag.data())) {
+	if (target && !target->Type->CheckUserBoolFlags(condition->BoolFlag)) {
 		return false;
 	}
 

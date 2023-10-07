@@ -559,11 +559,14 @@ PixelSize CUnitType::GetPixelSize() const
 	return PixelSize(TileWidth * PixelTileSize.x, TileHeight * PixelTileSize.y);
 }
 
-bool CUnitType::CheckUserBoolFlags(const char *BoolFlags) const
+bool CUnitType::CheckUserBoolFlags(const std::vector<char> &BoolFlags) const
 {
+	if (BoolFlags.empty()) {
+		return true;
+	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) { // User defined flags
 		if (BoolFlags[i] != CONDITION_TRUE &&
-			((BoolFlags[i] == CONDITION_ONLY) ^ (BoolFlag[i].value))) {
+			((BoolFlags[i] == CONDITION_ONLY) ^ (this->BoolFlag[i].value))) {
 			return false;
 		}
 	}
