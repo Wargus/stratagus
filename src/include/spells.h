@@ -41,6 +41,9 @@
 #include "unitsound.h"
 #include "vec2i.h"
 
+#include <string_view>
+#include <variant>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -83,6 +86,13 @@ enum TargetType {
 	TargetUnit
 };
 
+enum class ECondition
+{
+	Ignore,
+	ShouldBeFalse,
+	ShouldBeTrue
+};
+
 /*
 ** *******************
 ** Target definition.
@@ -111,7 +121,7 @@ class ConditionInfoVariable
 public:
 	ConditionInfoVariable() = default;
 
-	char Enable = 0;                /// Target is 'user defined variable'.
+	ECondition Enable = ECondition::Ignore; /// Target is 'user defined variable'.
 	bool Check = false;             /// True if need to check that variable.
 
 	int ExactValue = 0;             /// Target must have exactly ExactValue of it's value.
@@ -138,14 +148,11 @@ public:
 	//
 	//  Conditions that check specific flags. Possible values are the defines below.
 	//
-#define CONDITION_FALSE 1
-#define CONDITION_TRUE  0
-#define CONDITION_ONLY  2
-	char Alliance = 0;          /// Target is allied. (neutral is neither allied, nor opponent)
-	char Opponent = 0;          /// Target is opponent. (neutral is neither allied, nor opponent)
-	char TargetSelf = 1;        /// Target is the same as the caster.
+	ECondition Alliance = ECondition::Ignore; /// Target is allied. (neutral is neither allied, nor opponent)
+	ECondition Opponent = ECondition::Ignore; /// Target is opponent. (neutral is neither allied, nor opponent)
+	ECondition TargetSelf = ECondition::ShouldBeFalse; /// Target is the same as the caster.
 
-	std::vector<char> BoolFlag;         /// User defined boolean flag.
+	std::vector<ECondition> BoolFlag; /// User defined boolean flag.
 
 	std::vector<ConditionInfoVariable> Variable;
 	std::unique_ptr<LuaCallback> CheckFunc;
@@ -176,9 +183,9 @@ public:
 
 	/// Detailed generic conditions (not per-target, where Condition is evaluated.)
 	/// Combat mode is when there are hostile non-coward units around
-	int Combat = 0;                  /// If it should be casted in combat
-	int Attacker = 0;                /// If it should be casted on unit which attacks
-	int Corpse = CONDITION_FALSE;    /// If it should be casted on corpses
+	ECondition Combat = ECondition::Ignore; /// If it should be casted in combat
+	ECondition Attacker = ECondition::Ignore; /// If it should be casted on unit which attacks
+	ECondition Corpse = ECondition::ShouldBeFalse; /// If it should be casted on corpses
 
 	// Position autocast callback
 	std::unique_ptr<LuaCallback> PositionAutoCast;
@@ -263,8 +270,11 @@ extern bool AutoCastSpell(CUnit &caster, const SpellType &spell);
 /// return spell type by ident string
 extern SpellType &SpellTypeByIdent(const std::string_view &ident);
 
-/// return 0, 1, 2 for true, only, false.
-extern char Ccl2Condition(lua_State *l, std::string_view value);
+/// return ECondition.
+extern ECondition Ccl2Condition(lua_State *l, std::string_view value);
+
+std::variant<ECondition, int> Ccl2ConditionOrNumber(lua_State *l, std::string_view value);
+
 
 //@}
 

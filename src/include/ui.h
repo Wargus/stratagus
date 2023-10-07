@@ -70,6 +70,7 @@ class CFile;
 class CFont;
 class LuaActionListener;
 class CPopup;
+enum class ECondition;
 
 /*----------------------------------------------------------------------------
 --  Definitions
@@ -185,8 +186,8 @@ public:
 	bool HideAllied = false;       /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent = false;     /// if true, show for opponent unit.
 
-	std::vector<char> BoolFlags;   /// array of condition about user flags.
-	std::vector<char> Variables;   /// array of variable to verify (enable and max > 0)
+	std::vector<ECondition> BoolFlags; /// array of condition about user flags.
+	std::vector<std::variant<ECondition, int>> Variables;   /// array of variable to verify (enable and max > 0)
 };
 
 /**

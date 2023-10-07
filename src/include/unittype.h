@@ -51,6 +51,7 @@
 #include "color.h"
 #include "luacallback.h"
 #include "missileconfig.h"
+#include "spells.h"
 #include "vec2i.h"
 
 #include <climits>
@@ -562,7 +563,7 @@ public:
 	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
 	PixelSize GetPixelSize() const;
 
-	bool CheckUserBoolFlags(const std::vector<char> &BoolFlags) const;
+	bool CheckUserBoolFlags(const std::vector<ECondition> &BoolFlags) const;
 	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 
@@ -677,9 +678,9 @@ public:
 	CUnitStats MapDefaultStat;
 	struct BoolFlags {
 		bool value = false;             /// User defined flag. Used for (dis)allow target.
-		char CanTransport = 0;      /// Can transport units with this flag.
-		char CanTargetFlag = 0;     /// Flag needed to target with missile.
-		char AiPriorityTarget = 0;  /// Attack this units first.
+		ECondition CanTransport = ECondition::Ignore; /// Can transport units with this flag.
+		ECondition CanTargetFlag = ECondition::Ignore; /// Flag needed to target with missile.
+		ECondition AiPriorityTarget = ECondition::Ignore; /// Attack this units first.
 	};
 	std::vector<BoolFlags> BoolFlag;
 

@@ -1443,7 +1443,8 @@ static int SendSpellCast(const Vec2i &tilePos)
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
-		if (dest && dest == unit && (!spell->Condition || spell->Condition->TargetSelf == CONDITION_FALSE)) {
+		if (dest && dest == unit
+		    && (!spell->Condition || spell->Condition->TargetSelf == ECondition::ShouldBeFalse)) {
 			// Only spells with explicit 'self: true' allows self targetting
 			continue;
 		}

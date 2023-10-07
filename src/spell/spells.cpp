@@ -131,8 +131,9 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		if (unit == nullptr) {
 			continue;
 		}
-		if (condition->Variable[i].Enable != CONDITION_TRUE) {
-			if ((condition->Variable[i].Enable == CONDITION_ONLY) ^ (unit->Variable[i].Enable)) {
+		if (condition->Variable[i].Enable != ECondition::Ignore) {
+			if ((condition->Variable[i].Enable == ECondition::ShouldBeTrue)
+			    ^ (unit->Variable[i].Enable)) {
 				return false;
 			}
 		}
@@ -184,21 +185,20 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		return true;
 	}
 
-	if (condition->Alliance != CONDITION_TRUE) {
-		if ((condition->Alliance == CONDITION_ONLY) ^
-			// own units could be not allied ?
-			(caster.IsAllied(*target) || target->Player == caster.Player)) {
+	if (condition->Alliance != ECondition::Ignore) {
+		// own units could be not allied ?
+		if ((condition->Alliance == ECondition::ShouldBeTrue)
+		    ^ (caster.IsAllied(*target) || target->Player == caster.Player)) {
 			return false;
 		}
 	}
-	if (condition->Opponent != CONDITION_TRUE) {
-		if ((condition->Opponent == CONDITION_ONLY) ^
-			(caster.IsEnemy(*target) && 1)) {
+	if (condition->Opponent != ECondition::Ignore) {
+		if ((condition->Opponent == ECondition::ShouldBeTrue) ^ caster.IsEnemy(*target)) {
 			return false;
 		}
 	}
-	if (condition->TargetSelf != CONDITION_TRUE) {
-		if ((condition->TargetSelf == CONDITION_ONLY) ^ (&caster == target)) {
+	if (condition->TargetSelf != ECondition::Ignore) {
+		if ((condition->TargetSelf == ECondition::ShouldBeTrue) ^ (&caster == target)) {
 			return false;
 		}
 	}
@@ -263,7 +263,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 		table.push_back(&caster); // Allow self as target (we check conditions later)
 
 	// Check generic conditions. FIXME: a better way to do this?
-	if (autocast->Combat != CONDITION_TRUE) {
+	if (autocast->Combat != ECondition::Ignore) {
 		// Check each unit if it is hostile.
 		const bool inCombat =
 			ranges::find_if(table,
@@ -275,7 +275,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			                            || CanTarget(*target->Type, *caster.Type));
 							})
 			!= table.end();
-		if ((autocast->Combat == CONDITION_ONLY) ^ (inCombat)) {
+		if ((autocast->Combat == ECondition::ShouldBeTrue) ^ (inCombat)) {
 			return nullptr;
 		}
 	}
@@ -292,11 +292,11 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 				size_t count = 0;
 				for (size_t i = 0; i != table.size(); ++i) {
 					// Check for corpse
-					if (autocast->Corpse == CONDITION_ONLY) {
+					if (autocast->Corpse == ECondition::ShouldBeTrue) {
 						if (table[i]->CurrentAction() != UnitAction::Die) {
 							continue;
 						}
-					} else if (autocast->Corpse == CONDITION_FALSE) {
+					} else if (autocast->Corpse == ECondition::ShouldBeFalse) {
 						if (table[i]->CurrentAction() == UnitAction::Die || table[i]->IsAlive() == false) {
 							continue;
 						}
@@ -332,7 +332,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			int n = 0;
 			for (size_t i = 0; i != table.size(); ++i) {
 				// Check if unit in battle
-				if (autocast->Attacker == CONDITION_ONLY) {
+				if (autocast->Attacker == ECondition::ShouldBeTrue) {
 					const int range = table[i]->Player->Type == PlayerTypes::PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
 					if ((table[i]->CurrentAction() != UnitAction::Attack
 						 && table[i]->CurrentAction() != UnitAction::AttackGround
@@ -343,11 +343,11 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 					}
 				}
 				// Check for corpse
-				if (autocast->Corpse == CONDITION_ONLY) {
+				if (autocast->Corpse == ECondition::ShouldBeTrue) {
 					if (table[i]->CurrentAction() != UnitAction::Die) {
 						continue;
 					}
-				} else if (autocast->Corpse == CONDITION_FALSE) {
+				} else if (autocast->Corpse == ECondition::ShouldBeFalse) {
 					if (table[i]->CurrentAction() == UnitAction::Die) {
 						continue;
 					}

@@ -212,7 +212,7 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 **  @param condition   condition to verify.
 **  @param unit        unit that certain condition can refer.
 **
-**  @return            0 if we can't show the content, else 1.
+**  @return            false if we can't show the content, else true.
 */
 static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 {
@@ -220,9 +220,9 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 		return true;
 	}
 	if ((condition->ShowOnlySelected && !unit.Selected)
-		|| (unit.Player->Type == PlayerTypes::PlayerNeutral && condition->HideNeutral)
-		|| (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
-		|| ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
+	    || (unit.Player->Type == PlayerTypes::PlayerNeutral && condition->HideNeutral)
+	    || (ThisPlayer->IsEnemy(unit) && !condition->ShowOpponent)
+	    || ((ThisPlayer->IsAllied(unit) || unit.Player == ThisPlayer) && condition->HideAllied)) {
 		return false;
 	}
 	if (!unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
@@ -230,33 +230,42 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	}
 	if (!condition->Variables.empty()) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-			char v = condition->Variables[i];
-			if (v < 0) {
-				// only show for less than -v%
-				if (unit.Variable[i].Enable) {
-					const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
-					if (f >= -v) {
-						return false;
-					}
-				} else if (v != -1) {
-					// special case: the condition "<1" should apply
-					// to units that do not have the variable at all
-					return false;
-				}
-			} else if (v > CONDITION_ONLY) {
-				// only show for more than (v-CONDITION_ONLY)%
-				if (unit.Variable[i].Enable) {
-					const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
-					if (f <= v - CONDITION_ONLY) {
-						return false;
+			const auto is_variable_compatible = [&](auto v) {
+				if constexpr (std::is_same_v<ECondition, decltype(v)>) {
+					if (v != ECondition::Ignore) {
+						if ((v == ECondition::ShouldBeTrue) ^ unit.Variable[i].Enable) {
+							return false;
+						}
 					}
 				} else {
-					return false;
+					if (v < 0) {
+						// only show for less than -v%
+						if (unit.Variable[i].Enable) {
+							const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
+							if (f >= -v) {
+								return false;
+							}
+						} else if (v != -1) {
+							// special case: the condition "<1" should apply
+							// to units that do not have the variable at all
+							return false;
+						}
+					} else if (v > 0) {
+						// only show for more than v%
+						if (unit.Variable[i].Enable) {
+							const int f = (100 * unit.Variable[i].Value) / unit.Variable[i].Max;
+							if (f <= v) {
+								return false;
+							}
+						} else {
+							return false;
+						}
+					}
 				}
-			} else if (v != CONDITION_TRUE) {
-				if ((v == CONDITION_ONLY) ^ unit.Variable[i].Enable) {
-					return false;
-				}
+				return true;
+			};
+			if (!std::visit(is_variable_compatible, condition->Variables[i])) {
+				return false;
 			}
 		}
 	}

@@ -2594,11 +2594,13 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	}
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) & (dtype.BoolFlag[i].value)) {
+		if (type.BoolFlag[i].AiPriorityTarget != ECondition::Ignore) {
+			if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeTrue)
+			    & (dtype.BoolFlag[i].value)) {
 				cost -= AIPRIORITY_BONUS;
 			}
-			if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) & (dtype.BoolFlag[i].value)) {
+			if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeFalse)
+			    & (dtype.BoolFlag[i].value)) {
 				cost += AIPRIORITY_BONUS;
 			}
 		}
@@ -2680,11 +2682,13 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 
 		// AI Priority
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-				if (((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) & !dtype.BoolFlag[i].value)
-					|| ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) & dtype.BoolFlag[i].value)) {
-						return INT_MIN;
-					}
+			if (type.BoolFlag[i].AiPriorityTarget != ECondition::Ignore) {
+				if (((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeTrue)
+				     & !dtype.BoolFlag[i].value)
+				    || ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeFalse)
+				        & dtype.BoolFlag[i].value)) {
+					return INT_MIN;
+				}
 			}
 		}
 	}
@@ -3276,9 +3280,9 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 bool CanTarget(const CUnitType &source, const CUnitType &dest)
 {
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (source.BoolFlag[i].CanTargetFlag != CONDITION_TRUE) {
-			if ((source.BoolFlag[i].CanTargetFlag == CONDITION_ONLY) ^
-				(dest.BoolFlag[i].value)) {
+		if (source.BoolFlag[i].CanTargetFlag != ECondition::Ignore) {
+			if ((source.BoolFlag[i].CanTargetFlag == ECondition::ShouldBeTrue)
+			    ^ (dest.BoolFlag[i].value)) {
 				return false;
 			}
 		}
@@ -3331,8 +3335,9 @@ bool CanTransport(const CUnit &transporter, const CUnit &unit)
 		return false;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-		if (transporter.Type->BoolFlag[i].CanTransport != CONDITION_TRUE) {
-			if ((transporter.Type->BoolFlag[i].CanTransport == CONDITION_ONLY) ^ unit.Type->BoolFlag[i].value) {
+		if (transporter.Type->BoolFlag[i].CanTransport != ECondition::Ignore) {
+			if ((transporter.Type->BoolFlag[i].CanTransport == ECondition::ShouldBeTrue)
+			    ^ unit.Type->BoolFlag[i].value) {
 				return false;
 			}
 		}

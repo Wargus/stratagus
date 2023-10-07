@@ -499,7 +499,7 @@ static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 			index = UnitTypeVar.VariableNameLookup[key];
 			if (index != -1) {
 				condition->Variables.resize(UnitTypeVar.GetNumberVariable());
-				condition->Variables[index] = Ccl2Condition(l, LuaToString(l, -1));
+				condition->Variables[index] = Ccl2ConditionOrNumber(l, LuaToString(l, -1));
 				continue;
 			}
 			LuaError(l, "'%s' invalid for Condition in DefinePanelContents", key.data());
