@@ -366,7 +366,6 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	}
 
 	// Must set action before placing, otherwise it will incorrectly mark radar
-	delete build->CurrentOrder();
 	build->Orders[0] = COrder::NewActionBuilt(unit, *build);
 
 	UpdateUnitSightRange(*build);
