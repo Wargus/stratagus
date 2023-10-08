@@ -726,13 +726,13 @@ private:
 		}
 
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-			if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
-					(dtype.BoolFlag[i].value)) {
+			if (type.BoolFlag[i].AiPriorityTarget != ECondition::Ignore) {
+				if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeTrue)
+				    & (dtype.BoolFlag[i].value)) {
 					cost -= AIPRIORITY_BONUS;
 				}
-				if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-					(dtype.BoolFlag[i].value)) {
+				if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeFalse)
+				    & (dtype.BoolFlag[i].value)) {
 					cost += AIPRIORITY_BONUS;
 				}
 			}
@@ -851,12 +851,12 @@ public:
 				cost += dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 
 				for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
-					if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
-						if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_ONLY) &
-							(dtype.BoolFlag[i].value)) {
+					if (type.BoolFlag[i].AiPriorityTarget != ECondition::Ignore) {
+						if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeTrue)
+						    & (dtype.BoolFlag[i].value)) {
 							cost -= AIPRIORITY_BONUS;
-						} else if ((type.BoolFlag[i].AiPriorityTarget == CONDITION_FALSE) &
-								   (dtype.BoolFlag[i].value)) {
+						} else if ((type.BoolFlag[i].AiPriorityTarget == ECondition::ShouldBeFalse)
+						           & (dtype.BoolFlag[i].value)) {
 							cost += AIPRIORITY_BONUS;
 						}
 					}

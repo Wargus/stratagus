@@ -49,6 +49,7 @@ class ButtonAction;
 class CFont;
 class CPopup;
 enum class ButtonCmd;
+enum class ECondition;
 
 #define MARGIN_X 4
 #define MARGIN_Y 2
@@ -65,8 +66,8 @@ public:
 	std::optional<ButtonCmd> ButtonAction; /// action type of button
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
-	std::vector<char> BoolFlags; /// array of condition about user flags.
-	std::vector<char> Variables; /// array of variable to verify (enable and max > 0)
+	std::vector<ECondition> BoolFlags; /// array of condition about user flags.
+	std::vector<ECondition> Variables; /// array of variable to verify (enable and max > 0)
 };
 
 class CPopupContentType

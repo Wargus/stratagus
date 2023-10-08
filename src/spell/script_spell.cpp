@@ -111,19 +111,33 @@ static std::unique_ptr<SpellActionType> CclSpellAction(lua_State *l)
 **  @param l      Lua state.
 **  @param value  scm value to convert.
 **
-**  @return CONDITION_TRUE, CONDITION_FALSE, CONDITION_ONLY or -1 on error.
-**  @note This is a helper function to make CclSpellCondition shorter
-**        and easier to understand.
+**  @return ECondition.
 */
-char Ccl2Condition(lua_State *l, std::string_view value)
+ECondition Ccl2Condition(lua_State *l, std::string_view value)
 {
 	if (value == "true") {
-		return CONDITION_TRUE;
+		return ECondition::Ignore;
 	} else if (value == "false") {
-		return CONDITION_FALSE;
+		return ECondition::ShouldBeFalse;
 	} else if (value == "only") {
-		return CONDITION_ONLY;
-	} else if (value[0] == '<') {
+		return ECondition::ShouldBeTrue;
+	} else {
+		LuaError(l, "Bad condition result: %s", value.data());
+		ExitFatal(-1);
+	}
+}
+
+/**
+**  Get a condition value from a scm object.
+**
+**  @param l      Lua state.
+**  @param value  scm value to convert.
+**
+**  @return ECondition.
+*/
+std::variant<ECondition, int> Ccl2ConditionOrNumber(lua_State *l, std::string_view value)
+{
+	if (value[0] == '<') {
 		int v = to_number(value.substr(1));
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d", v);
@@ -134,12 +148,12 @@ char Ccl2Condition(lua_State *l, std::string_view value)
 		if (v > 100) {
 			LuaError(l, "Can only encode condition '<' up to 100%%, got %d", v);
 		}
-		return v + CONDITION_ONLY;
+		return v;
 	} else {
-		LuaError(l, "Bad condition result: %s", value.data());
-		return -1;
+		return Ccl2Condition(l, value);
 	}
 }
+
 
 /**
 **  Parse the Condition for spell.
@@ -151,11 +165,11 @@ char Ccl2Condition(lua_State *l, std::string_view value)
 */
 static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 {
-	// Flags are defaulted to 0(CONDITION_TRUE)
+	// Flags are defaulted to ECondition::Ignore
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
 
 	condition->BoolFlag.resize(new_bool_size);
-	std::fill(std::begin(condition->BoolFlag), std::end(condition->BoolFlag), 0);
+	std::fill(std::begin(condition->BoolFlag), std::end(condition->BoolFlag), ECondition::Ignore);
 
 	condition->Variable.resize(UnitTypeVar.GetNumberVariable());
 	// Initialize min/max stuff to values with no effect.
