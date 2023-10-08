@@ -565,16 +565,16 @@ CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(uint32_t fragment) :
 	this->FragmentIndex = fragment;
 }
 
-CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t fragment) :
+CInitMessage_MapFileFragment::CInitMessage_MapFileFragment(const char *path, const std::vector<char> &data, uint32_t fragment) :
 	header(MessageInit_FromServer, ICMMapNeeded)
 {
 	int pathSize = strlen(path);
 	Assert(pathSize <= 256);
-	Assert(sizeof(this->Data) >= pathSize + dataSize);
+	Assert(sizeof(this->Data) >= pathSize + data.size());
 	this->PathSize = pathSize;
-	this->DataSize = dataSize;
+	this->DataSize = data.size();
 	memcpy(this->Data, path, pathSize);
-	memcpy(this->Data + pathSize, data, dataSize);
+	memcpy(this->Data + pathSize, data.data(), data.size());
 	this->FragmentIndex = fragment;
 }
 
