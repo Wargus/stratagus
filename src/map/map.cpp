@@ -81,7 +81,7 @@ void CMap::MarkSeenTile(CMapField &mf)
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
-	const unsigned int index = &mf - Map.Fields;
+	const unsigned int index = &mf - Map.Fields.data();
 	const int y = index / Info.MapWidth;
 	const int x = index - (y * Info.MapWidth);
 	const Vec2i pos = {x, y}
@@ -90,7 +90,7 @@ void CMap::MarkSeenTile(CMapField &mf)
 	if (this->Tileset->TileTypeTable.empty() == false) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
-		const unsigned int index = &mf - Map.Fields;
+		const unsigned int index = &mf - Map.Fields.data();
 		const int y = index / Info.MapWidth;
 		const int x = index - (y * Info.MapWidth);
 		const Vec2i pos(x, y);
@@ -318,10 +318,6 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : Fields(nullptr), NoFogOfWar(false), TileGraphic(nullptr), Tileset(nullptr)
-{
-}
-
 CMap::~CMap()
 {
 	delete Tileset;
@@ -338,9 +334,7 @@ void CMap::AllocateTileset()
 */
 void CMap::Create()
 {
-	Assert(!this->Fields);
-
-	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	this->Fields.resize(this->Info.MapWidth * this->Info.MapHeight);
 }
 
 /**
@@ -358,12 +352,11 @@ void CMap::Init()
 */
 void CMap::Clean(const bool isHardClean /* = false*/)
 {
-	delete[] this->Fields;
+	this->Fields.clear();
 
 	// Tileset freed by Tileset?
 
 	this->Info.Clear();
-	this->Fields = nullptr;
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
@@ -532,12 +525,17 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 */
 void CMap::FixNeighbors(tile_flags type, int seen, const Vec2i &pos)
 {
-	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1),
-							Vec2i(-1, -1), Vec2i(-1, 1), Vec2i(1, -1), Vec2i(1, 1)
-						   };
+	const Vec2i offsets[] = {Vec2i(1, 0),
+	                         Vec2i(-1, 0),
+	                         Vec2i(0, 1),
+	                         Vec2i(0, -1),
+	                         Vec2i(-1, -1),
+	                         Vec2i(-1, 1),
+	                         Vec2i(1, -1),
+	                         Vec2i(1, 1)};
 
-	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
-		FixTile(type, seen, pos + offset[i]);
+	for (const auto &offset : offsets) {
+		FixTile(type, seen, pos + offset);
 	}
 }
 
@@ -588,6 +586,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 		MarkSeenTile(mf);
 	}
 }
+
 /// Remove rock from the map.
 void CMap::ClearRockTile(const Vec2i &pos)
 {
@@ -606,8 +605,6 @@ void CMap::ClearRockTile(const Vec2i &pos)
 		MarkSeenTile(mf);
 	}
 }
-
-
 
 /**
 **  Regenerate forest.
@@ -700,11 +697,11 @@ void CMap::Insert(CUnit &unit)
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->TileWidth;
 	const int h = unit.Type->TileHeight;
-	int j, i = h;
+	int i = h;
 
 	do {
 		CMapField *mf = Field(index);
-		j = w;
+		int j = w;
 		do {
 			mf->UnitCache.push_back(&unit);
 			++mf;
@@ -724,11 +721,11 @@ void CMap::Remove(CUnit &unit)
 	unsigned int index = unit.Offset;
 	const int w = unit.Type->TileWidth;
 	const int h = unit.Type->TileHeight;
-	int j, i = h;
+	int i = h;
 
 	do {
 		CMapField *mf = Field(index);
-		j = w;
+		int j = w;
 		do {
 			ranges::erase(mf->UnitCache, &unit);
 			++mf;

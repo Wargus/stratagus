@@ -127,10 +127,7 @@ public:
 		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
 	}
 
-	bool IsPointOnMap(const Vec2i &pos) const
-	{
-		return IsPointOnMap(pos.x, pos.y);
-	}
+	bool IsPointOnMap(const Vec2i &pos) const { return IsPointOnMap(pos.x, pos.y); }
 
 	void Clear();
 
@@ -154,38 +151,25 @@ public:
 class CMap
 {
 public:
-	CMap();
+	CMap() = default;
 	~CMap();
 
 	void AllocateTileset();
 
-	unsigned int getIndex(int x, int y) const
-	{
-		return x + y * this->Info.MapWidth;
-	}
-	unsigned int getIndex(const Vec2i &pos) const
-	{
-		return getIndex(pos.x, pos.y);
-	}
+	unsigned int getIndex(int x, int y) const { return x + y * this->Info.MapWidth; }
+	unsigned int getIndex(const Vec2i &pos) const { return getIndex(pos.x, pos.y); }
 
-	CMapField *Field(unsigned int index) const
-	{
-		return &this->Fields[index];
-	}
+	const CMapField *Field(unsigned int index) const { return &this->Fields[index]; }
 	/// Get the MapField at location x,y
-	CMapField *Field(int x, int y) const
-	{
-		return &this->Fields[x + y * this->Info.MapWidth];
-	}
-	CMapField *Field(const Vec2i &pos) const
-	{
-		return Field(pos.x, pos.y);
-	}
+	const CMapField *Field(int x, int y) const { return &this->Fields[getIndex(x, y)]; }
+	const CMapField *Field(const Vec2i &pos) const { return Field(getIndex(pos)); }
 
-	bool isInitialized() const
-	{
-		return this->isMapInitialized;
-	}
+	CMapField *Field(unsigned int index) { return &this->Fields[index]; }
+	/// Get the MapField at location x,y
+	CMapField *Field(int x, int y) { return &this->Fields[getIndex(x, y)]; }
+	CMapField *Field(const Vec2i &pos) { return Field(getIndex(pos)); }
+
+	bool isInitialized() const { return this->isMapInitialized; }
 
 	/// Alocate and initialise map table.
 	void Create();
@@ -265,15 +249,15 @@ private:
 	void RegenerateForestTile(const Vec2i &pos);
 
 public:
-	CMapField *Fields;              	/// fields on map
-	bool NoFogOfWar;           			/// fog of war disabled
+	std::vector<CMapField> Fields; /// fields on map
+	bool NoFogOfWar = false;     /// fog of war disabled
 
-	CTileset *Tileset;          		/// tileset data
-	fs::path TileModelsFileName; 	/// lua filename that loads all tilemodels
-	CGraphic *TileGraphic;     			/// graphic for all the tiles
-	bool isMapInitialized { false };
+	CTileset *Tileset = nullptr; /// tileset data
+	fs::path TileModelsFileName; /// lua filename that loads all tilemodels
+	CGraphic *TileGraphic = nullptr; /// graphic for all the tiles
+	bool isMapInitialized = false ;
 
-	CMapInfo Info;             			/// descriptive information
+	CMapInfo Info;             /// descriptive information
 };
 
 

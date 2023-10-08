@@ -92,8 +92,7 @@ static int CclStratagusMap(lua_State *l)
 					CclGetPos(l, &Map.Info.MapWidth, &Map.Info.MapHeight);
 					lua_pop(l, 1);
 
-					delete[] Map.Fields;
-					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+					Map.Fields.resize(Map.Info.MapWidth * Map.Info.MapHeight);
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (value == "fog-of-war") {
 					Map.NoFogOfWar = false;
@@ -155,7 +154,7 @@ static int CclRevealMap(lua_State *l)
 		return 1;
 	}
 
-	if (CclInConfigFile || !Map.Fields) {
+	if (CclInConfigFile || Map.Fields.empty()) {
 		FlagRevealMap = newMode;
 	} else if (!IsNetworkGame()) {
 		Map.Reveal(newMode);
@@ -254,7 +253,7 @@ static int CclSetFogOfWar(lua_State *l)
 
 	LuaCheckArgs(l, 1);
 	Map.NoFogOfWar = !LuaToBoolean(l, 1);
-	if (!CclInConfigFile && Map.Fields) {
+	if (!CclInConfigFile && !Map.Fields.empty()) {
 		UpdateFogOfWarChange();
 		// FIXME: save setting in replay log
 		//CommandLog("input", nullptr, FlushCommands, -1, -1, nullptr, "fow off", -1);
@@ -781,7 +780,7 @@ void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, co
 		return;
 	}
 
-	if (Map.Fields) {
+	if (!Map.Fields.empty()) {
 		int multiplier = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 		if (multiplier > 1) {
 			// fill subtile fields

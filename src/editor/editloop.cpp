@@ -1912,7 +1912,7 @@ void CEditor::Init()
 			}
 		}
 
-		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		Map.Fields.resize(Map.Info.MapWidth * Map.Info.MapHeight);
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
 
