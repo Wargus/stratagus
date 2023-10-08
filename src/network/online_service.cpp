@@ -212,23 +212,23 @@ public:
     }
 
     bool readBool8() { return read8() != 0; }
-	bool readBool32() { return read32() != 0; }
+    bool readBool32() { return read32() != 0; }
 
     uint64_t readFiletime() { return read64(); }
 
     /**
-     * For debugging and development: read the entire thing as a char
-     * array. Caller must "delete[]" the out-char
+     * For debugging and development:
+     * read the entire thing as a char array.
      */
-    int readAll(char** out) {
+    std::vector<char> readAll() {
         std::queue<uint8_t> outQueue = std::queue(buffer);
         int sz = outQueue.size();
-        *out = new char[sz];
-        for (int i = 0; i < sz; i++) {
-            (*out)[i] = outQueue.front();
+        std::vector<char> res(sz);
+        for (auto& c : res) {
+            c = outQueue.front();
             outQueue.pop();
         }
-        return sz;
+        return res;
     }
 
     std::string string32() {
@@ -279,12 +279,11 @@ public:
         }
         uint32_t needed = messageLength - buffer.size();
         if (needed > 0) {
-            uint8_t *temp = new uint8_t[needed];
-            int count = this->sock->Recv(temp, needed);
+            std::vector<uint8_t> temp(needed);
+            int count = this->sock->Recv(temp.data(), temp.size());
             for (int i = 0; i < count; i++) {
                 buffer.push(temp[i]);
             }
-            delete[] temp;
             if (buffer.size() < needed) {
                 // Didn't receive full message on the socket, yet.
                 // This method can be used to try again
@@ -297,10 +296,8 @@ public:
     void debugDump() {
         if (EnableDebugPrint) {
             std::cout << "Input stream state: messageLength(" << messageLength << ")" << std::endl;
-            char *temp;
-            int sz = readAll(&temp);
-            dump((uint8_t*)temp, sz);
-            delete[] temp;
+            auto temp = readAll();
+            dump((uint8_t*)temp.data(), temp.size());
         }
     }
 
@@ -1643,11 +1640,9 @@ public:
             if (!handleGenericMessages(ctx, msg)) {
                 std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
                 std::cout << "Raw contents >>>" << std::endl;
-                char* out;
-                int len = ctx->getMsgIStream()->readAll(&out);
-                std::cout.write(out, len);
+                auto out = ctx->getMsgIStream()->readAll();
+                std::cout.write(out.data(), out.size());
                 std::cout << "<<<" << std::endl;
-                delete[] out;
                 ctx->getMsgIStream()->finishMessage();
             }
         }
