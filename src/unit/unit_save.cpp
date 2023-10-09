@@ -324,20 +324,20 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Goal) {
 		file.printf(",\n  \"goal\", %d", UnitNumber(*unit.Goal));
 	}
-	if (unit.AutoCastSpell) {
+	if (!unit.AutoCastSpell.empty()) {
 		for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.AutoCastSpell[i]) {
 				file.printf(",\n  \"auto-cast\", \"%s\"", SpellTypeTable[i]->Ident.c_str());
 			}
 		}
 	}
-	if (unit.SpellCoolDownTimers) {
+	if (!unit.SpellCoolDownTimers.empty()) {
 		file.printf(",\n  \"spell-cooldown\", {");
-		for (size_t i = 0; i < SpellTypeTable.size(); ++i) {
-			if (i) {
-				file.printf(" ,");
-			}
-			file.printf("%d", unit.SpellCoolDownTimers[i]);
+		const char *sep = "";
+		for (int timer : unit.SpellCoolDownTimers) {
+			file.printf(sep);
+			sep = " ,";
+			file.printf("%d", timer);
 		}
 		file.printf("}");
 	}

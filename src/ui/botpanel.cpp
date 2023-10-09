@@ -277,8 +277,8 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 
 			// Autocast
 			if (ranges::all_of(Selected, [&](const CUnit *unit) {
-					Assert(unit->AutoCastSpell);
-					return unit->AutoCastSpell[button.Value] == 1;
+					Assert(!unit->AutoCastSpell.empty());
+					return unit->AutoCastSpell[button.Value];
 				})) {
 				res |= IconAutoCast;
 			}
@@ -1121,7 +1121,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		// for everyone
 
 		const bool autocast = ranges::any_of(
-			Selected, [&](const CUnit *unit) { return unit->AutoCastSpell[spellId] == 0; });
+			Selected, [&](const CUnit *unit) { return !unit->AutoCastSpell[spellId]; });
 		for (CUnit *unit : Selected) {
 			if (unit->AutoCastSpell[spellId] != autocast) {
 				SendCommandAutoSpellCast(*unit, spellId, autocast);

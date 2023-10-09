@@ -158,11 +158,9 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	unit.Type = const_cast<CUnitType *>(&newtype);
 	unit.Stats = const_cast<CUnitStats *>(&unit.Type->Stats[player.Index]);
 
-	if (!newtype.CanCastSpell.empty() && !unit.AutoCastSpell) {
-		unit.AutoCastSpell = new char[SpellTypeTable.size()];
-		unit.SpellCoolDownTimers = new int[SpellTypeTable.size()];
-		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-		memset(unit.SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+	if (!newtype.CanCastSpell.empty() && unit.AutoCastSpell.empty()) {
+		unit.AutoCastSpell.resize(SpellTypeTable.size());
+		unit.SpellCoolDownTimers.resize(SpellTypeTable.size());
 	}
 
 	UpdateForNewUnit(unit, 1);

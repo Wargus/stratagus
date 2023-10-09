@@ -227,7 +227,7 @@ static bool MoveRandomly(CUnit &unit)
 */
 bool AutoCast(CUnit &unit)
 {
-	if (unit.AutoCastSpell && !unit.Removed) { // Removed units can't cast any spells, from bunker)
+	if (!unit.AutoCastSpell.empty() && !unit.Removed) { // Removed units can't cast any spells, from bunker)
 		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
 			if (unit.AutoCastSpell[i]
 				&& (SpellTypeTable[i]->AutoCast || SpellTypeTable[i]->AICast)
@@ -414,7 +414,7 @@ void COrder_Still::Execute(CUnit &unit) /* override */
 	this->Sleep = CYCLES_PER_SECOND / 2;
 
 	if (this->Action == UnitAction::StandGround || unit.Removed || unit.CanMove() == false) {
-		if (unit.AutoCastSpell) {
+		if (!unit.AutoCastSpell.empty()) {
 			this->AutoCastStand(unit);
 		}
 		if (unit.IsAgressive()) {

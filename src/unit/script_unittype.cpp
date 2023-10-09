@@ -1032,7 +1032,7 @@ static int CclDefineUnitType(lua_State *l)
 				if (!spell.AutoCast) {
 					LuaError(l, "AutoCastActive: Define autocast method for %s.", value.data());
 				}
-				type->AutoCastActive[spell.Slot] = 1;
+				type->AutoCastActive[spell.Slot] = true;
 			}
 		} else if (value == "CanTargetFlag") {
 			//
