@@ -458,8 +458,7 @@ void CUnit::Init()
 	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
 	memset(&Seen, 0, sizeof(Seen));
-	delete Variable;
-	Variable = nullptr;
+	Variable.clear();
 	TTL = 0;
 	GroupId = 0;
 	LastGroup = 0;
@@ -481,7 +480,6 @@ CUnit::~CUnit() {
 	Type = nullptr;
 
 	delete pathFinderData;
-	delete[] Variable;
 }
 
 /**
@@ -614,15 +612,12 @@ void CUnit::Init(const CUnitType &type)
 	Frame = type.StillFrame;
 
 	if (UnitTypeVar.GetNumberVariable()) {
-		Assert(!Variable);
-		const unsigned int size = UnitTypeVar.GetNumberVariable();
-		Variable = new CVariable[size];
-		std::copy(type.MapDefaultStat.Variables.begin(), type.MapDefaultStat.Variables.end(), Variable);
+		Assert(Variable.empty());
+		Variable = type.MapDefaultStat.Variables;
 	} else {
-		Variable = nullptr;
+		Variable.clear();
 	}
-
-	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
+	ranges::fill(IndividualUpgrades, false);
 
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
@@ -742,9 +737,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	Stats = const_cast<CUnitStats *>(&type.Stats[Player->Index]);
 	if (!SaveGameLoading) {
 		if (UnitTypeVar.GetNumberVariable()) {
-			Assert(Variable);
-			Assert(Stats->Variables.size() == UnitTypeVar.GetNumberVariable());
-			std::copy(Stats->Variables.begin(), Stats->Variables.end(), Variable);
+			Variable = Stats->Variables;
 		}
 	}
 }

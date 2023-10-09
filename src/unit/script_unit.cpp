@@ -618,7 +618,7 @@ static int CclUnit(lua_State *l)
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index
 				lua_rawgeti(l, 2, j + 1);
-				DefineVariableField(l, unit->Variable + index, -1);
+				DefineVariableField(l, &unit->Variable[index], -1);
 				lua_pop(l, 1);
 				continue;
 			}
