@@ -643,7 +643,7 @@ public:
 	int RepairRange = 0;                /// Units repair range.
 #define InfiniteRepairRange INT_MAX
 	std::vector<char> CanCastSpell;     /// Unit is able to use spells.
-	std::vector<char> AutoCastActive;   /// Default value for autocast.
+	std::vector<bool> AutoCastActive;   /// Default value for autocast.
 	int AutoBuildRate = 0;              /// The rate at which the building builds itself
 	int RandomMovementProbability = 0;  /// Probability to move randomly.
 	int RandomMovementDistance = 1;     /// Quantity of tiles to move randomly.

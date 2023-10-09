@@ -316,7 +316,7 @@ class CInitMessage_MapFileFragment
 {
 public:
 	CInitMessage_MapFileFragment() {}
-	CInitMessage_MapFileFragment(const char *path, const char *data, uint32_t dataSize, uint32_t Fragment);
+	CInitMessage_MapFileFragment(const char *path, const std::vector<char> &data, uint32_t Fragment);
 	CInitMessage_MapFileFragment(uint32_t Fragment);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;

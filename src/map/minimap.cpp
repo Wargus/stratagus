@@ -33,8 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-
 #include "stratagus.h"
 
 #include "minimap.h"
@@ -49,6 +47,8 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <vector>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -62,19 +62,16 @@ static constexpr int ATTACK_BLINK_DURATION {7 * CYCLES_PER_SECOND};
 
 static constexpr int SCALE_PRECISION       {100};
 
-
-
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-SDL_Surface 	   *MinimapSurface{nullptr};        /// generated minimap
+SDL_Surface        *MinimapSurface{nullptr};        /// generated minimap
 static SDL_Surface *MinimapTerrainSurface{nullptr}; /// generated minimap terrain
-static SDL_Surface *MinimapFogSurface{nullptr};		/// generated minimap fog of war
+static SDL_Surface *MinimapFogSurface{nullptr};     /// generated minimap fog of war
 
-static int *Minimap2MapX;                  /// fast conversion table
-static int *Minimap2MapY;                  /// fast conversion table
+static std::vector<int> Minimap2MapX;      /// fast conversion table
+static std::vector<int> Minimap2MapY;      /// fast conversion table
 static int Map2MinimapX[MaxMapWidth];      /// fast conversion table
 static int Map2MinimapY[MaxMapHeight];     /// fast conversion table
 
@@ -120,10 +117,8 @@ void CMinimap::Create()
 	//
 	// Calculate minimap fast lookup tables.
 	//
-	Minimap2MapX = new int[W * H];
-	memset(Minimap2MapX, 0, W * H * sizeof(int));
-	Minimap2MapY = new int[W * H];
-	memset(Minimap2MapY, 0, W * H * sizeof(int));
+	Minimap2MapX.resize(W * H);
+	Minimap2MapY.resize(W * H);
 	for (int i = XOffset; i < W - XOffset; ++i) {
 		Minimap2MapX[i] = ((i - XOffset) * MINIMAP_FAC) / MinimapScaleX;
 	}
@@ -500,10 +495,8 @@ void CMinimap::Destroy()
 		SDL_FreeSurface(MinimapFogSurface);
 		MinimapFogSurface = nullptr;
 	}
-	delete[] Minimap2MapX;
-	Minimap2MapX = nullptr;
-	delete[] Minimap2MapY;
-	Minimap2MapY = nullptr;
+	Minimap2MapX.clear();
+	Minimap2MapY.clear();
 }
 
 /**

@@ -136,8 +136,7 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : tilePos(-1, -1), pathFinderData(nullptr), SavedOrder(nullptr), NewOrder(nullptr), CriticalOrder(nullptr), Colors(-1),
-				AutoCastSpell(nullptr), SpellCoolDownTimers(nullptr), Variable(nullptr) { Init(); }
+	CUnit() { Init(); }
 	~CUnit();
 
 	void Init();
@@ -336,7 +335,7 @@ public:
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
-	Vec2i tilePos; /// Map position
+	Vec2i tilePos{-1, -1}; /// Map position
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
@@ -349,8 +348,8 @@ public:
 	PathFinderData *pathFinderData = nullptr;
 
 	// DISPLAY:
-	int         Frame;      /// Image frame: <0 is mirrored
-	int  Colors;            /// custom colors
+	int Frame;             /// Image frame: <0 is mirrored
+	int Colors = -1;       /// custom colors
 	bool IndividualUpgrades[UpgradeMax]{}; /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
@@ -428,8 +427,8 @@ public:
 	std::unique_ptr<COrder> NewOrder;      /// order for new trained units
 	std::unique_ptr<COrder> CriticalOrder; /// order to do as possible in breakable animation.
 
-	char *AutoCastSpell = nullptr;        /// spells to auto cast
-	int *SpellCoolDownTimers = nullptr;   /// how much time unit need to wait before spell will be ready
+	std::vector<bool> AutoCastSpell;      /// spells to auto cast
+	std::vector<int> SpellCoolDownTimers; /// how much time unit need to wait before spell will be ready
 
 	CUnit *Goal = nullptr; /// Generic/Teleporter goal pointer
 };

@@ -598,19 +598,17 @@ static int CclUnit(lua_State *l)
 			unit->Goal = &UnitManager->GetSlotUnit(LuaToNumber(l, 2, j + 1));
 		} else if (value == "auto-cast") {
 			const std::string_view s = LuaToString(l, 2, j + 1);
-			if (!unit->AutoCastSpell) {
-				unit->AutoCastSpell = new char[SpellTypeTable.size()];
-				memset(unit->AutoCastSpell, 0, SpellTypeTable.size());
+			if (unit->AutoCastSpell.empty()) {
+				unit->AutoCastSpell.resize(SpellTypeTable.size());
 			}
-			unit->AutoCastSpell[SpellTypeByIdent(s).Slot] = 1;
+			unit->AutoCastSpell[SpellTypeByIdent(s).Slot] = true;
 		} else if (value == "spell-cooldown") {
 			lua_rawgeti(l, 2, j + 1);
 			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != SpellTypeTable.size()) {
 				LuaError(l, "incorrect argument");
 			}
-			if (!unit->SpellCoolDownTimers) {
-				unit->SpellCoolDownTimers = new int[SpellTypeTable.size()];
-				memset(unit->SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
+			if (unit->SpellCoolDownTimers.empty()) {
+				unit->SpellCoolDownTimers.resize(SpellTypeTable.size());
 			}
 			for (size_t k = 0; k < SpellTypeTable.size(); ++k) {
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);

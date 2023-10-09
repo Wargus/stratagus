@@ -847,19 +847,15 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	// FIXME: what if the file exists before even the first fragment creates it?
 
 	fs::path mappath(StratagusLibPath);
-	char *path = new char[msg.PathSize + 1];
 	// msg.PathSize is 8bits, so smaller than msg.Data by construction
-	memcpy(path, msg.Data, msg.PathSize);
-	path[msg.PathSize] = '\0';
-	NetworkMapFragmentName = std::string(path);
+	NetworkMapFragmentName = std::string(msg.Data, msg.PathSize);
 	if (NetworkMapFragmentName.find("..") != std::string::npos) {
 		// bad path
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Bad network filename %s\n", path);
+		fprintf(stderr, "Bad network filename %s\n", NetworkMapFragmentName.c_str());
 		return;
 	}
-	mappath /= path;
-	delete[] path;
+	mappath /= NetworkMapFragmentName;
 
 	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary);
 	if (!mapfile.is_open()) {
@@ -1148,18 +1144,17 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 			uint32_t offset = (fragmentIdx - fragmentIdxStartForFile) * fragmentDataSize;
 			file.seekg(offset);
 			fragmentDataSize = std::min<uint32_t>(fragmentDataSize, fileSize - offset);
-			char *data = new char[fragmentDataSize];
-			file.read(data, fragmentDataSize);
+			std::vector<char> data(fragmentDataSize);
+			file.read(data.data(), data.size());
 			file.close();
 
 			DebugPrint("Sending map fragment %d for %s (size %d, offset %d)\n",
 			           fragmentIdx,
 			           networkName.c_str(),
-			           fragmentDataSize,
+			           data.size(),
 			           offset);
-			const CInitMessage_MapFileFragment message(networkName.c_str(), data, fragmentDataSize, fragmentIdx);
+			const CInitMessage_MapFileFragment message(networkName.c_str(), data, fragmentIdx);
 			NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
-			delete[] data;
 			return;
 		} else {
 			// FIXME: ouch! we cannot read this map file. very strange, and very bad
@@ -1169,7 +1164,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 
 	// no file content found for this fragment index, we're done
 	DebugPrint("Sending end fragment %d for %s\n", fragmentIdx, NetworkMapName.c_str());
-	const CInitMessage_MapFileFragment message("", nullptr, 0, fragmentIdx);
+	const CInitMessage_MapFileFragment message("", {}, fragmentIdx);
 	NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 }
 

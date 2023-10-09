@@ -1954,25 +1954,19 @@ static int CclDebugPrint(lua_State *l)
 static int CclRestartStratagus(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
-	fs::path executable_path = GetExecutablePath();
-	bool insertRestartArgument = true;
-	for (auto arg : OriginalArgv) {
-		if (arg == "-r") {
-			insertRestartArgument = false;
-			break;
-		}
-	}
-	std::vector<std::string> quotedArgs = QuoteArguments(OriginalArgv);
+	const fs::path executable_path = GetExecutablePath();
+	const bool insertRestartArgument = !ranges::contains(OriginalArgv, "-r");
+	const std::vector<std::string> quotedArgs = QuoteArguments(OriginalArgv);
 
-	int newArgc = quotedArgs.size() + (insertRestartArgument ? 2 : 1);
+	const int newArgc = quotedArgs.size() + (insertRestartArgument ? 2 : 1);
 	char **argv = new char*[newArgc];
-	for (unsigned int i = 0; i < quotedArgs.size(); i++) {
-		argv[i] = const_cast<char*>(quotedArgs[i].c_str());
+	for (std::size_t i = 0; i < quotedArgs.size(); ++i) {
+		argv[i] = const_cast<char *>(quotedArgs[i].c_str());
 	}
 	if (insertRestartArgument) {
-		argv[newArgc - 2] = (char*)"-r";
+		argv[newArgc - 2] = const_cast<char *>("-r");
 	}
-	argv[newArgc - 1] = (char *)0;
+	argv[newArgc - 1] = nullptr;
 #ifdef WIN32
 	_execv(executable_path.string().c_str(), argv);
 #else
@@ -2132,9 +2126,8 @@ static bool ShouldGlobalTableBeSaved(const std::string &key)
 		"coroutine", "Icons", "Upgrades", "Fonts", "FontColors", "expansion",
 		"CMap", "CPlayer", "Graphics", "Vec2i", "_triggers_"
 	}; // other string to protected ?
-	const int size = sizeof(forbiddenNames) / sizeof(*forbiddenNames);
 
-	return std::find(forbiddenNames, forbiddenNames + size, key) == forbiddenNames + size;
+	return !ranges::contains(forbiddenNames, key);
 }
 
 static bool ShouldLocalTableBeSaved(const std::string &key)
@@ -2143,9 +2136,8 @@ static bool ShouldLocalTableBeSaved(const std::string &key)
 		return false;
 	}
 	const std::string forbiddenNames[] = { "tolua_ubox" }; // other string to protected ?
-	const int size = sizeof(forbiddenNames) / sizeof(*forbiddenNames);
 
-	return std::find(forbiddenNames, forbiddenNames + size, key) == forbiddenNames + size;
+	return !ranges::contains(forbiddenNames, key);
 }
 
 static bool LuaValueToString(lua_State *l, std::string &value)

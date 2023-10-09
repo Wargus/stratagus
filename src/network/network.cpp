@@ -355,8 +355,8 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
 {
 	const unsigned int size = packet.Size(numcommands);
-	unsigned char *buf = new unsigned char[size];
-	packet.Serialize(buf, numcommands);
+	std::vector<unsigned char> buf(size);
+	packet.Serialize(buf.data(), numcommands);
 
 	// Send to all clients.
 	if (NetConnectType == 1) { // server
@@ -366,14 +366,13 @@ static void NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int 
 				if (Hosts[i].PlyNr == player) {
 					continue;
 				}
-				NetworkFildes.Send(host, buf, size);
+				NetworkFildes.Send(host, buf.data(), buf.size());
 			}
 		}
 	} else { // client
 		const CHost host(Hosts[0].Host, Hosts[0].Port);
-		NetworkFildes.Send(host, buf, size);
+		NetworkFildes.Send(host, buf.data(), buf.size());
 	}
-	delete[] buf;
 }
 
 /**
