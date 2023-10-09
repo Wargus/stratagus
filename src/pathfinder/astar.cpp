@@ -1197,44 +1197,6 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 	return ret;
 }
 
-struct StatsNode {
-	StatsNode() : Direction(0), InGoal(0), CostFromStart(0), Costs(0), CostToGoal(0) {}
-
-	int8_t Direction;
-	int8_t InGoal;
-	uint64_t CostFromStart;
-	uint64_t Costs;
-	uint64_t CostToGoal;
-};
-
-StatsNode *AStarGetStats()
-{
-	StatsNode *stats = new StatsNode[AStarMapWidth * AStarMapHeight];
-	StatsNode *s = stats;
-	Node *m = AStarMatrix;
-
-	for (int j = 0; j < AStarMapHeight; ++j) {
-		for (int i = 0; i < AStarMapWidth; ++i) {
-			s->Direction = m->GetDirection();
-			s->InGoal = m->IsInGoal();
-			s->CostFromStart = m->GetCostFromStart();
-			s->CostToGoal = m->GetCostToGoal();
-			++s;
-			++m;
-		}
-	}
-
-	for (int i = 0; i < OpenSetSize; ++i) {
-		stats[OpenSet[i].GetOffset()].Costs = OpenSet[i].GetCosts();
-	}
-	return stats;
-}
-
-void AStarFreeStats(StatsNode *stats)
-{
-	delete[] stats;
-}
-
 void AStarDumpStats()
 {
 	int32_t maxCostFromHome = 0;
