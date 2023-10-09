@@ -45,18 +45,18 @@ StaticParticle::~StaticParticle()
 	delete animation;
 }
 
-bool StaticParticle::isVisible(const CViewport &vp) const
+bool StaticParticle::isVisible(const CViewport &vp) const /* override */
 {
 	return animation && animation->isVisible(vp, pos);
 }
 
-void StaticParticle::draw()
+void StaticParticle::draw() /* override */
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
-void StaticParticle::update(int ticks)
+void StaticParticle::update(int ticks) /* override */
 {
 	animation->update(ticks);
 	if (animation->isFinished()) {
@@ -64,7 +64,7 @@ void StaticParticle::update(int ticks)
 	}
 }
 
-CParticle *StaticParticle::clone()
+CParticle *StaticParticle::clone() /* override */
 {
 	CParticle *p = new StaticParticle(pos, animation, drawLevel);
 	return p;

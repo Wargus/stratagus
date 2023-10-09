@@ -51,18 +51,18 @@ CSmokeParticle::~CSmokeParticle()
 	delete puff;
 }
 
-bool CSmokeParticle::isVisible(const CViewport &vp) const
+bool CSmokeParticle::isVisible(const CViewport &vp) const /* override */
 {
 	return puff && puff->isVisible(vp, pos);
 }
 
-void CSmokeParticle::draw()
+void CSmokeParticle::draw() /* override */
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	puff->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
-void CSmokeParticle::update(int ticks)
+void CSmokeParticle::update(int ticks) /* override */
 {
 	puff->update(ticks);
 	if (puff->isFinished()) {
@@ -75,7 +75,7 @@ void CSmokeParticle::update(int ticks)
 	pos.y += ticks / 1000.f * speedVector.y;
 }
 
-CParticle *CSmokeParticle::clone()
+CParticle *CSmokeParticle::clone() /* override */
 {
 	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
 }

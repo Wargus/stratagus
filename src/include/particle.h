@@ -32,6 +32,7 @@
 //@{
 
 #include <vector>
+#include <memory>
 
 class CGraphic;
 class CViewport;
@@ -82,14 +83,13 @@ public:
 	{}
 	virtual ~CParticle() {}
 
-	virtual bool isVisible(const CViewport &vp) const = 0;
+	virtual CParticle *clone() = 0;
 	virtual void draw() = 0;
+	virtual bool isVisible(const CViewport &vp) const = 0;
 	virtual void update(int) = 0;
 
-	inline void destroy() { destroyed = true; }
-	inline bool isDestroyed() { return destroyed; }
-
-	virtual CParticle *clone() = 0;
+	void destroy() { destroyed = true; }
+	bool isDestroyed() { return destroyed; }
 
 	int getDrawLevel() const { return drawLevel; }
 	void setDrawLevel(int value) { drawLevel = value; }
@@ -105,12 +105,12 @@ class StaticParticle : public CParticle
 {
 public:
 	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
-	virtual ~StaticParticle();
+	~StaticParticle() override;
 
-	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
-	virtual void update(int ticks);
-	virtual CParticle *clone();
+	CParticle *clone() override;
+	void draw() override;
+	bool isVisible(const CViewport &vp) const override;
+	void update(int ticks) override;
 
 protected:
 	GraphicAnimation *animation;
@@ -125,12 +125,13 @@ public:
 				   GraphicAnimation *destroyAnimation,
 				   int minVelocity = 0, int maxVelocity = 400,
 				   int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
-	virtual ~CChunkParticle();
+	~CChunkParticle() override;
 
-	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
-	virtual void update(int ticks);
-	virtual CParticle *clone();
+	CParticle *clone() override;
+	void draw() override;
+	bool isVisible(const CViewport &vp) const override;
+	void update(int ticks) override;
+
 	int getSmokeDrawLevel() const { return smokeDrawLevel; }
 	int getDestroyDrawLevel() const { return destroyDrawLevel; }
 	void setSmokeDrawLevel(int value) { smokeDrawLevel = value; }
@@ -166,12 +167,12 @@ class CSmokeParticle : public CParticle
 {
 public:
 	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
-	virtual ~CSmokeParticle();
+	~CSmokeParticle() override;
 
-	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
-	virtual void update(int ticks);
-	virtual CParticle *clone();
+	CParticle *clone() override;
+	void draw() override;
+	bool isVisible(const CViewport &vp) const override;
+	void update(int ticks) override;
 
 protected:
 	GraphicAnimation *puff;
@@ -185,12 +186,12 @@ class CRadialParticle : public CParticle
 {
 public:
 	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
-	virtual ~CRadialParticle();
+	~CRadialParticle() override;
 
-	virtual bool isVisible(const CViewport &vp) const;
-	virtual void draw();
-	virtual void update(int ticks);
-	virtual CParticle *clone();
+	CParticle *clone() override;
+	void draw() override;
+	bool isVisible(const CViewport &vp) const override;
+	void update(int ticks) override;
 
 protected:
 	GraphicAnimation *animation;
@@ -203,8 +204,10 @@ protected:
 class CParticleManager
 {
 public:
-	CParticleManager();
-	~CParticleManager();
+	CParticleManager() = default;
+	~CParticleManager() = default;
+
+	CParticleManager(const CParticleManager &) = delete;
 
 	static void init();
 	static void exit();
@@ -214,20 +217,22 @@ public:
 
 	void update();
 
-	void add(CParticle *particle);
+	void add(CParticle* particle); // For tolua++
+
+	void add(std::unique_ptr<CParticle> particle);
 	void clear();
 
 	CPosition getScreenPos(const CPosition &pos) const;
 
-	inline void setLowDetail(bool detail) { lowDetail = detail; }
-	inline bool getLowDetail() const { return lowDetail; }
+	void setLowDetail(bool detail) { lowDetail = detail; }
+	bool getLowDetail() const { return lowDetail; }
 
 private:
-	std::vector<CParticle *> particles;
-	std::vector<CParticle *> new_particles;
-	const CViewport *vp;
-	unsigned long lastTicks;
-	bool lowDetail;
+	std::vector<std::unique_ptr<CParticle>> particles;
+	std::vector<std::unique_ptr<CParticle>> new_particles;
+	const CViewport *vp = nullptr;
+	unsigned long lastTicks = 0;
+	bool lowDetail = false;
 };
 
 extern CParticleManager ParticleManager;
