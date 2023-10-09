@@ -169,36 +169,26 @@ long CFile::tell()
 */
 int CFile::printf(const char *format, ...)
 {
-	int size = 500;
-	char *p = new char[size];
-	if (p == nullptr) {
-		return -1;
-	}
-	while (1) {
+	std::vector<char> p(500);
+
+	while (true) {
 		// Try to print in the allocated space.
 		va_list ap;
 		va_start(ap, format);
-		const int n = vsnprintf(p, size, format, ap);
+		const int n = vsnprintf(p.data(), p.size(), format, ap);
 		va_end(ap);
 		// If that worked, string was processed.
-		if (n > -1 && n < size) {
+		if (n > -1 && n < p.size()) {
 			break;
 		}
 		// Else try again with more space.
 		if (n > -1) { // glibc 2.1
-			size = n + 1; // precisely what is needed
+			p.resize(n + 1); // precisely what is needed
 		} else {    /* glibc 2.0, vc++ */
-			size *= 2;  // twice the old size
-		}
-		delete[] p;
-		p = new char[size];
-		if (p == nullptr) {
-			return -1;
+			p.resize(p.size() * 2);  // twice the old size
 		}
 	}
-	size = strlen(p);
-	int ret = pimpl->write(p, size);
-	delete[] p;
+	int ret = pimpl->write(p.data(), p.size());
 	return ret;
 }
 
