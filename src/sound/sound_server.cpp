@@ -237,7 +237,7 @@ static bool External_Volume(int volume, int oldVolume) {
 
 /// Channels for sound effects and unit speech
 struct SoundChannel {
-	Origin *Unit = nullptr;          /// pointer to unit, who plays the sound, if any
+	std::unique_ptr<Origin> Unit;          /// pointer to unit, who plays the sound, if any
 	void (*FinishedCallback)(int channel) = nullptr; /// Callback for when a sample finishes playing
 };
 
@@ -288,7 +288,6 @@ static void ChannelFinished(int channel)
 		event.user.data1 = (void*) Channels[channel].FinishedCallback;
 		SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
-	delete Channels[channel].Unit;
 	Channels[channel].Unit = nullptr;
 }
 
@@ -498,10 +497,10 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 		if (channel >= 0 && channel < MaxChannels) {
 			Channels[channel].FinishedCallback = callback;
 			if (origin && origin->Base) {
-				Origin *source = new Origin;
+				auto source = std::make_unique<Origin>();
 				source->Base = origin->Base;
 				source->Id = origin->Id;
-				Channels[channel].Unit = source;
+				Channels[channel].Unit = std::move(source);
 			}
 		}
 	}
@@ -677,7 +676,7 @@ bool SoundEnabled()
 **
 **  @return      false if failure, true if everything ok.
 */
-static int InitSdlSound()
+static bool InitSdlSound()
 {
 	fs::path timidityCfg(StratagusLibPath);
 	timidityCfg = timidityCfg / "timidity" / "timidity.cfg";
