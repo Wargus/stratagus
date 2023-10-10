@@ -111,12 +111,17 @@ class CPopupContentTypeButtonInfo : public CPopupContentType
 {
 public:
 	CPopupContentTypeButtonInfo() = default;
-	virtual ~CPopupContentTypeButtonInfo() = default;
+	~CPopupContentTypeButtonInfo() override = default;
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	void Draw(int x,
+	          int y,
+	          const CPopup &popup,
+	          const unsigned int popupWidth,
+	          const ButtonAction &button,
+	          int *Costs) const override;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	int GetWidth(const ButtonAction &button, int *Costs) const override;
+	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
 	virtual void Parse(lua_State *l);
 
@@ -130,14 +135,19 @@ class CPopupContentTypeText : public CPopupContentType
 {
 public:
 	CPopupContentTypeText() = default;
-	virtual ~CPopupContentTypeText() = default;
+	~CPopupContentTypeText() override = default;
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	void Draw(int x,
+	          int y,
+	          const CPopup &popup,
+	          const unsigned int popupWidth,
+	          const ButtonAction &button,
+	          int *Costs) const override;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	int GetWidth(const ButtonAction &button, int *Costs) const override;
+	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
-	virtual void Parse(lua_State *l);
+	void Parse(lua_State *l) override;
 
 private:
 	std::string Text;          /// Text to display
@@ -149,14 +159,19 @@ class CPopupContentTypeCosts : public CPopupContentType
 {
 public:
 	CPopupContentTypeCosts() = default;
-	virtual ~CPopupContentTypeCosts() = default;
+	~CPopupContentTypeCosts() override = default;
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	void Draw(int x,
+	          int y,
+	          const CPopup &popup,
+	          const unsigned int popupWidth,
+	          const ButtonAction &button,
+	          int *Costs) const override;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	int GetWidth(const ButtonAction &button, int *Costs) const override;
+	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
-	virtual void Parse(lua_State *l);
+	void Parse(lua_State *l) override;
 
 private:
 	CFont *Font = nullptr; /// Font to use.
@@ -167,14 +182,19 @@ class CPopupContentTypeLine : public CPopupContentType
 {
 public:
 	CPopupContentTypeLine() = default;
-	virtual ~CPopupContentTypeLine() = default;
+	~CPopupContentTypeLine() override = default;
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	void Draw(int x,
+	          int y,
+	          const CPopup &popup,
+	          const unsigned int popupWidth,
+	          const ButtonAction &button,
+	          int *Costs) const override;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	int GetWidth(const ButtonAction &button, int *Costs) const override;
+	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
-	virtual void Parse(lua_State *l);
+	void Parse(lua_State *l) override;
 
 private:
 	IntColor Color = ColorWhite; /// Color used for line.
@@ -187,12 +207,17 @@ class CPopupContentTypeVariable : public CPopupContentType
 public:
 	CPopupContentTypeVariable() = default;
 
-	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
+	void Draw(int x,
+	          int y,
+	          const CPopup &popup,
+	          const unsigned int popupWidth,
+	          const ButtonAction &button,
+	          int *Costs) const override;
 
-	virtual int GetWidth(const ButtonAction &button, int *Costs) const;
-	virtual int GetHeight(const ButtonAction &button, int *Costs) const;
+	int GetWidth(const ButtonAction &button, int *Costs) const override;
+	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
-	virtual void Parse(lua_State *l);
+	void Parse(lua_State *l) override;
 
 private:
 	std::unique_ptr<IStringDesc> Text; /// Text to display.

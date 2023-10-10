@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <sstream>
 
-/* virtual */ void CAnimation_SetVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SetVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 

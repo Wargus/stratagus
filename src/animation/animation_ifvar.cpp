@@ -67,7 +67,7 @@ static bool binOpXor(int lhs, int rhs) { return (bool)(lhs ^ rhs); }
 static bool binOpNot(int lhs, int rhs = 0) { return (bool)(!lhs); }
 static bool returnFalse(int, int) { return false; }
 
-/* virtual */ void CAnimation_IfVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_IfVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 

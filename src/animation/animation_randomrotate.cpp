@@ -40,7 +40,9 @@
 #include "animation/animation_rotate.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_RandomRotate::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomRotate::Action(CUnit &unit,
+                                     int & /*move*/,
+                                     int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 

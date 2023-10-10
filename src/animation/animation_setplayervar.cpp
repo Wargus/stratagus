@@ -178,8 +178,9 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	}
 }
 
-
-/* virtual */ void CAnimation_SetPlayerVar::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_SetPlayerVar::Action(CUnit &unit,
+                                     int & /*move*/,
+                                     int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 

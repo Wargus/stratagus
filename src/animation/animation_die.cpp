@@ -41,7 +41,7 @@
 
 #include <stdio.h>
 
-/* virtual */ void CAnimation_Die::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Die::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
