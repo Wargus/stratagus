@@ -114,7 +114,7 @@ public:
 	int read(void *buf, size_t len);
 	int seek(long offset, int whence);
 	long tell();
-	SDL_RWops * as_SDL_RWops();
+	static SDL_RWops *to_SDL_RWops(std::unique_ptr<CFile> file);
 
 	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 private:
