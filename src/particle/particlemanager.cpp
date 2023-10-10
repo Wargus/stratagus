@@ -40,40 +40,19 @@
 CParticleManager ParticleManager;
 
 
-CParticleManager::CParticleManager() :
-	vp(nullptr), lastTicks(0)
+/* static */ void CParticleManager::init()
 {
 }
 
-CParticleManager::~CParticleManager()
-{
-}
-
-void CParticleManager::init()
-{
-}
-
-void CParticleManager::exit()
+/* static */ void CParticleManager::exit()
 {
 	ParticleManager.clear();
 }
 
 void CParticleManager::clear()
 {
-	for (auto *p : particles) {
-		delete p;
-	}
 	particles.clear();
-
-	for (auto *p : new_particles) {
-		delete p;
-	}
 	new_particles.clear();
-}
-
-static inline bool DrawLevelCompare(const CParticle *lhs, const CParticle *rhs)
-{
-	return lhs->getDrawLevel() < rhs->getDrawLevel();
 }
 
 std::vector<CParticle *> CParticleManager::prepareToDraw(const CViewport &vp)
@@ -81,14 +60,15 @@ std::vector<CParticle *> CParticleManager::prepareToDraw(const CViewport &vp)
 	this->vp = &vp;
 	std::vector<CParticle *> table;
 
-	for (CParticle *p : particles) {
-		CParticle &particle = *p;
-		if (particle.isVisible(vp)) {
-			table.push_back(&particle);
+	for (auto &particle : particles) {
+		if (particle->isVisible(vp)) {
+			table.push_back(particle.get());
 		}
 	}
 
-	ranges::sort(table, DrawLevelCompare);
+	ranges::sort(table, [](const CParticle *lhs, const CParticle *rhs) {
+		return lhs->getDrawLevel() < rhs->getDrawLevel();
+	});
 	return table;
 }
 
@@ -100,28 +80,26 @@ void CParticleManager::endDraw()
 void CParticleManager::update()
 {
 	unsigned long ticks = GameCycle - lastTicks;
-	std::vector<CParticle *>::iterator i;
 
-	particles.insert(particles.end(), new_particles.begin(), new_particles.end());
+	std::move(new_particles.begin(), new_particles.end(), std::back_inserter(particles));
 	new_particles.clear();
 
-	i = particles.begin();
-	while (i != particles.end()) {
-		(*i)->update(1000.0f / CYCLES_PER_SECOND * ticks);
-		if ((*i)->isDestroyed()) {
-			delete *i;
-			i = particles.erase(i);
-		} else {
-			++i;
-		}
+	for (auto &particle : particles) {
+		particle->update(1000.0f / CYCLES_PER_SECOND * ticks);
 	}
+	ranges::erase_if(particles, [](const auto &particle) { return particle->isDestroyed(); });
 
 	lastTicks += ticks;
 }
 
-void CParticleManager::add(CParticle *particle)
+void CParticleManager::add(CParticle* particle)
 {
-	new_particles.push_back(particle);
+	add(std::unique_ptr<CParticle>(particle));
+}
+
+void CParticleManager::add(std::unique_ptr<CParticle> particle)
+{
+	new_particles.push_back(std::move(particle));
 }
 
 CPosition CParticleManager::getScreenPos(const CPosition &pos) const

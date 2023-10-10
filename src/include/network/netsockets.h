@@ -29,6 +29,7 @@
 #ifndef NETSOCKETS_H
 #define NETSOCKETS_H
 
+#include <memory>
 #include <string>
 
 //@{
@@ -75,27 +76,26 @@ public:
 	{
 		friend class CUDPSocket;
 	public:
-		CStatistic();
-		void clear();
+		CStatistic() = default;
 	public:
-		unsigned int sentPacketsCount;
-		unsigned int receivedPacketsCount;
-		unsigned int sentBytesCount;
-		unsigned int receivedBytesCount;
-		unsigned int receivedErrorCount;
-		unsigned int receivedBytesExpectedCount;
-		unsigned int biggestSentPacketSize;
-		unsigned int biggestReceivedPacketSize;
+		unsigned int sentPacketsCount = 0;
+		unsigned int receivedPacketsCount = 0;
+		unsigned int sentBytesCount = 0;
+		unsigned int receivedBytesCount = 0;
+		unsigned int receivedErrorCount = 0;
+		unsigned int receivedBytesExpectedCount = 0;
+		unsigned int biggestSentPacketSize = 0;
+		unsigned int biggestReceivedPacketSize = 0;
 	};
 
-	void clearStatistic() { m_statistic.clear(); }
+	void clearStatistic() { m_statistic = {}; }
 	const CStatistic &getStatistic() const { return m_statistic; }
 private:
 	CStatistic m_statistic;
 #endif
 
 private:
-	CUDPSocket_Impl *m_impl;
+	std::unique_ptr<CUDPSocket_Impl> m_impl;
 };
 
 // Class representing TCP socket used in communication
@@ -114,7 +114,7 @@ public:
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
 private:
-	CTCPSocket_Impl *m_impl;
+	std::unique_ptr<CTCPSocket_Impl> m_impl;
 };
 
 //@}

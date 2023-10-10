@@ -402,7 +402,7 @@ public:
 		unsigned    ByPlayer : PlayerMax;   /// Track unit seen by player
 	} Seen;
 
-	CVariable *Variable = nullptr; /// array of User Defined variables.
+	std::vector<CVariable> Variable; /// array of User Defined variables.
 
 	unsigned long TTL = 0;  /// time to live
 

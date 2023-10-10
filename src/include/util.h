@@ -253,6 +253,12 @@ namespace ranges
 		v.erase(std::remove(std::begin(v), std::end(v), value), std::end(v));
 	}
 
+	template <typename T, typename A, typename Pred>
+	void erase_if(std::vector<T, A> &v, Pred pred)
+	{
+		v.erase(std::remove_if(std::begin(v), std::end(v), pred), std::end(v));
+	}
+
 	template <typename Range>
 	auto min_element(Range &range)
 	{

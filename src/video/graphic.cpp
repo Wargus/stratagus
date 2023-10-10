@@ -486,11 +486,7 @@ CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 {
 	CGraphic *g = new CGraphic;
 	g->File = file;
-	int bufSize = file.size() + 32;
-	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
-	g->HashFile = hashfile;
-	delete[] hashfile;
+	g->HashFile = file + std::to_string(HashCount++);
 	g->Width = w;
 	g->Height = h;
 	GraphicHash[g->HashFile] = g;
@@ -566,11 +562,7 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 {
 	CPlayerColorGraphic *g = new CPlayerColorGraphic;
 	g->File = file;
-	size_t bufSize = file.size() + 32;
-	char *hashfile = new char[bufSize];
-	snprintf(hashfile, bufSize, "%s%d", file.c_str(), HashCount++);
-	g->HashFile = hashfile;
-	delete[] hashfile;
+	g->HashFile = file + std::to_string(HashCount++);
 	g->Width = w;
 	g->Height = h;
 	GraphicHash[g->HashFile] = g;

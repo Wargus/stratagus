@@ -82,12 +82,12 @@ static float calculateScreenPos(float posy, float height)
 }
 
 
-bool CChunkParticle::isVisible(const CViewport &vp) const
+bool CChunkParticle::isVisible(const CViewport &vp) const /* override */
 {
 	return debrisAnimation && debrisAnimation->isVisible(vp, pos);
 }
 
-void CChunkParticle::draw()
+void CChunkParticle::draw() /* override */
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	screenPos.y = calculateScreenPos(screenPos.y, height);
@@ -105,15 +105,15 @@ static float getVerticalPosition(int initialVelocity, float trajectoryAngle, flo
 		   (gravity / 2.0f) * (time * time);
 }
 
-void CChunkParticle::update(int ticks)
+void CChunkParticle::update(int ticks) /* override */
 {
 	age += ticks;
 	if (age >= lifetime) {
 		if (destroyAnimation) {
 			CPosition p(pos.x, calculateScreenPos(pos.y, height));
 			GraphicAnimation *destroyanimation = destroyAnimation->clone();
-			StaticParticle *destroy = new StaticParticle(p, destroyanimation, destroyDrawLevel);
-			ParticleManager.add(destroy);
+			auto destroy = std::make_unique<StaticParticle>(p, destroyanimation, destroyDrawLevel);
+			ParticleManager.add(std::move(destroy));
 		}
 
 		destroy();
@@ -126,8 +126,8 @@ void CChunkParticle::update(int ticks)
 	if (age > nextSmokeTicks) {
 		CPosition p(pos.x, calculateScreenPos(pos.y, height));
 		GraphicAnimation *smokeanimation = smokeAnimation->clone();
-		CSmokeParticle *smoke = new CSmokeParticle(p, smokeanimation, 0, -22.0f, smokeDrawLevel);
-		ParticleManager.add(smoke);
+		auto smoke = std::make_unique<CSmokeParticle>(p, smokeanimation, 0, -22.0f, smokeDrawLevel);
+		ParticleManager.add(std::move(smoke));
 
 		nextSmokeTicks += MyRand() % randSmokeTicks + minSmokeTicks;
 	}
@@ -149,7 +149,7 @@ void CChunkParticle::update(int ticks)
 }
 
 
-CParticle *CChunkParticle::clone()
+CParticle *CChunkParticle::clone() /* override */
 {
 	CChunkParticle *particle = new CChunkParticle(pos, smokeAnimation, debrisAnimation, destroyAnimation, minVelocity, maxVelocity, minTrajectoryAngle, maxTTL, drawLevel);
 	particle->smokeDrawLevel = smokeDrawLevel;

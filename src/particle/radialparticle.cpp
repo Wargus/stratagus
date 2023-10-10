@@ -52,18 +52,18 @@ CRadialParticle::~CRadialParticle()
 	delete animation;
 }
 
-bool CRadialParticle::isVisible(const CViewport &vp) const
+bool CRadialParticle::isVisible(const CViewport &vp) const /* override */
 {
 	return animation && animation->isVisible(vp, pos);
 }
 
-void CRadialParticle::draw()
+void CRadialParticle::draw() /* override */
 {
 	CPosition screenPos = ParticleManager.getScreenPos(pos);
 	animation->draw(static_cast<int>(screenPos.x), static_cast<int>(screenPos.y));
 }
 
-void CRadialParticle::update(int ticks)
+void CRadialParticle::update(int ticks) /* override */
 {
 	this->pos.x += this->speed * sin(this->direction);
 	this->pos.y += this->speed * cos(this->direction);
@@ -74,7 +74,7 @@ void CRadialParticle::update(int ticks)
 	}
 }
 
-CParticle *CRadialParticle::clone()
+CParticle *CRadialParticle::clone() /* override */
 {
 	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
 	return p;

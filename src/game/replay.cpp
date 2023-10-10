@@ -122,7 +122,7 @@ public:
 bool CommandLogDisabled;           /// True if command log is off
 ReplayType ReplayGameType;         /// Replay game type
 static bool DisabledLog;           /// Disabled log for replay
-static CFile *LogFile;             /// Replay log file
+static std::unique_ptr<CFile> LogFile; /// Replay log file
 static fs::path LastLogFileName;   /// Last log file name
 static unsigned long NextLogCycle; /// Next log cycle number
 static bool InitReplay;             /// Initialize replay
@@ -349,11 +349,10 @@ void CommandLog(const char *action,
 		path /= "log_of_stratagus_" + std::to_string(ThisPlayer->Index) + "_"
 		      + std::to_string((intmax_t) now) + ".log";
 
-		LogFile = new CFile;
+		LogFile = std::make_unique<CFile>();
 		if (LogFile->open(path.string().c_str(), CL_OPEN_WRITE) == -1) {
 			// don't retry for each command
 			CommandLogDisabled = false;
-			delete LogFile;
 			LogFile = nullptr;
 			return;
 		}
@@ -611,7 +610,6 @@ void EndReplayLog()
 {
 	if (LogFile) {
 		LogFile->close();
-		delete LogFile;
 		LogFile = nullptr;
 	}
 	CurrentReplay = nullptr;

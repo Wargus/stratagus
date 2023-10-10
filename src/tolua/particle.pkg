@@ -56,5 +56,5 @@ public:
 	void add(CParticle *particle);
 };
 
-extern CParticleManager ParticleManager;
+extern tolua_readonly CParticleManager ParticleManager;
 
