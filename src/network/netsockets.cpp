@@ -44,11 +44,10 @@
 // CHost
 //
 
-CHost::CHost(const std::string& name, int port)
-{
-	this->ip = !name.empty() ? NetResolveHost(name) : INADDR_ANY;
-	this->port = port;
-}
+CHost::CHost(const std::string &name, int port) :
+	ip{!name.empty() ? NetResolveHost(name) : INADDR_ANY},
+	port{port}
+{}
 
 std::string CHost::toString() const
 {
@@ -69,15 +68,17 @@ bool CHost::isValid() const
 class CUDPSocket_Impl
 {
 public:
-	CUDPSocket_Impl() : socket(Socket(-1)) {}
+	CUDPSocket_Impl() = default;
+	CUDPSocket_Impl(const CUDPSocket_Impl &) = delete;
+	CUDPSocket_Impl &operator=(const CUDPSocket_Impl &) = delete;
 	~CUDPSocket_Impl() { if (IsValid()) { Close(); } }
 	bool Open(const CHost &host) { socket = NetOpenUDP(host.getIp(), host.getPort()); return socket != INVALID_SOCKET; }
 	void Close() { NetCloseUDP(socket); socket = Socket(-1); }
 	void Send(const CHost &host, const void *buf, unsigned int len) { NetSendUDP(socket, host.getIp(), host.getPort(), buf, len); }
 	int Recv(void *buf, int len, CHost *hostFrom)
 	{
-		unsigned long ip;
-		int port;
+		unsigned long ip = 0;
+		int port = 0;
 		int res = NetRecvUDP(socket, buf, len, &ip, &port);
 		*hostFrom = CHost(ip, port);
 		return res;
@@ -87,43 +88,17 @@ public:
 	bool IsValid() const { return socket != Socket(-1); }
 	int GetSocketAddresses(unsigned long *ips, int maxAddr) { return NetSocketAddr(ips, maxAddr); }
 private:
-	Socket socket;
+	Socket socket = -1;
 };
 
 //
 // CUDPSocket
 //
 
-#ifdef DEBUG
+CUDPSocket::CUDPSocket() : m_impl{std::make_unique<CUDPSocket_Impl>()}
+{}
 
-CUDPSocket::CStatistic::CStatistic()
-{
-	clear();
-}
-
-void CUDPSocket::CStatistic::clear()
-{
-	receivedBytesCount = 0;
-	receivedBytesExpectedCount = 0;
-	receivedErrorCount = 0;
-	receivedPacketsCount = 0;
-	sentBytesCount = 0;
-	sentPacketsCount = 0;
-	biggestReceivedPacketSize = 0;
-	biggestSentPacketSize = 0;
-}
-
-#endif
-
-CUDPSocket::CUDPSocket()
-{
-	m_impl = new CUDPSocket_Impl();
-}
-
-CUDPSocket::~CUDPSocket()
-{
-	delete m_impl;
-}
+CUDPSocket::~CUDPSocket() = default;
 
 bool CUDPSocket::Open(const CHost &host)
 {
@@ -187,7 +162,9 @@ int CUDPSocket::GetSocketAddresses(unsigned long *ips, int maxAddr) {
 class CTCPSocket_Impl
 {
 public:
-	CTCPSocket_Impl() : socket(Socket(-1)) {}
+	CTCPSocket_Impl() = default;
+	CTCPSocket_Impl(const CTCPSocket_Impl &) = delete;
+	CTCPSocket_Impl &operator=(const CTCPSocket_Impl &) = delete;
 	~CTCPSocket_Impl() { if (IsValid()) { Close(); } }
 	bool Open(const CHost &host);
 	void Close() { NetCloseTCP(socket); socket = Socket(-1); }
@@ -202,7 +179,7 @@ public:
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
 	bool IsValid() const { return socket != Socket(-1); }
 private:
-	Socket socket;
+	Socket socket = -1;
 };
 
 bool CTCPSocket_Impl::Open(const CHost &host)
@@ -218,15 +195,10 @@ bool CTCPSocket_Impl::Open(const CHost &host)
 // CTCPSocket
 //
 
-CTCPSocket::CTCPSocket()
-{
-	m_impl = new CTCPSocket_Impl();
-}
+CTCPSocket::CTCPSocket() : m_impl{std::make_unique<CTCPSocket_Impl>()}
+{}
 
-CTCPSocket::~CTCPSocket()
-{
-	delete m_impl;
-}
+CTCPSocket::~CTCPSocket() = default;
 
 bool CTCPSocket::Open(const CHost &host)
 {
