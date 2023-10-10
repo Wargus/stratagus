@@ -395,12 +395,12 @@ public:
 		pos += len;
 	}
 
-	int flush(CTCPSocket *sock) { return sock->Send(getBuffer(), pos); }
+	int flush(CTCPSocket &sock) { return sock.Send(getBuffer(), pos); }
 
-	void flush(CUDPSocket *sock, CHost *host)
+	void flush(CUDPSocket &sock, const CHost &host)
 	{
-		if (sock->IsValid()) {
-			sock->Send(*host, getBuffer(), pos);
+		if (sock.IsValid()) {
+			sock.Send(host, getBuffer(), pos);
 		}
 	}
 
@@ -443,16 +443,15 @@ public:
 	       uint8_t status,
 	       uint8_t location,
 	       uint32_t product,
-	       std::string locationName)
-	{
-		this->name = name;
-		this->status = status;
-		this->location = location;
-		this->product = product;
-		this->locationName = locationName;
-	}
+	       std::string locationName) :
+		name{std::move(name)},
+		status{status},
+		location{location},
+		product{product},
+		locationName{std::move(locationName)}
+	{}
 
-	std::string getStatus()
+	std::string getStatus() const
 	{
 		switch (location) {
 			case 0: return "offline";
@@ -465,9 +464,9 @@ public:
 		}
 	}
 
-	std::string getName() { return name; }
+	const std::string &getName() const { return name; }
 
-	std::string getProduct()
+	std::string getProduct() const
 	{
 		switch (product) {
 			case 0x1:
@@ -504,23 +503,21 @@ public:
 	     uint32_t time,
 	     std::string name,
 	     std::string pw,
-	     std::string stats)
-	{
-		this->gameSettings = settings;
-		this->host = CHost(host, port);
-		this->gameStatus = status;
-		this->elapsedTime = time;
-		this->gameName = name;
-		this->gamePassword = pw;
-		this->gameStatstring = stats;
-		splitStatstring();
-	}
+	     std::string stats) :
+		gameSettings{settings},
+		host{CHost(host, port)},
+		gameStatus{status},
+		elapsedTime{time},
+		gameName{std::move(name)},
+		gamePassword{std::move(pw)},
+		gameStats{splitStatstring(stats)}
+	{}
 
-	CHost getHost() { return host; }
+	CHost getHost() const { return host; }
 
-	bool isSavedGame() { return !gameStats[0].empty(); }
+	bool isSavedGame() const { return !gameStats[0].empty(); }
 
-	std::tuple<int, int> mapSize()
+	std::tuple<int, int> mapSize() const
 	{
 		if (gameStats[1].empty()) {
 			return {128, 128};
@@ -530,27 +527,15 @@ public:
 		return {w * 32, h * 32};
 	}
 
-	int maxPlayers()
+	int maxPlayers() const { return gameStats[2].empty() ? 8 : (to_number(gameStats[2]) - 10); }
+	int getSpeed() const { return to_number(gameStats[3]); }
+
+	std::string getApproval() const
 	{
-		if (gameStats[2].empty()) {
-			return 8;
-		} else {
-			return to_number(gameStats[2]) - 10;
-		}
+		return to_number(gameStats[4]) == 0 ? "Not approved" : "Approved";
 	}
 
-	int getSpeed() { return to_number(gameStats[3]); }
-
-	std::string getApproval()
-	{
-		if (to_number(gameStats[4]) == 0) {
-			return "Not approved";
-		} else {
-			return "Approved";
-		}
-	}
-
-	std::string getGameSettings()
+	std::string getGameSettings() const
 	{
 		if (gameStats[8].empty()) {
 			return "Map default";
@@ -579,12 +564,12 @@ public:
 		return result;
 	}
 
-	std::string getCreator() { return gameStats[9]; }
-	std::string getMap() { return gameStats[10]; }
+	const std::string &getCreator() const { return gameStats[9]; }
+	const std::string &getMap() const { return gameStats[10]; }
 
-	bool isValid() { return gameStats.size() > 10 && !gameStats[10].empty(); }
+	bool isValid() const { return gameStats.size() > 10 && !gameStats[10].empty(); }
 
-	std::string getGameStatus()
+	std::string getGameStatus() const
 	{
 		switch (gameStatus) {
 			case 0x0: return "OK";
@@ -598,9 +583,8 @@ public:
 		return "Unknown status";
 	}
 
-	std::string getGameType()
+	std::string getGameType() const
 	{
-		std::string sub("");
 		switch (gameSettings & 0xff) {
 			case 0x02: return "Melee";
 			case 0x03: return "Free 4 All";
@@ -633,6 +617,8 @@ public:
 			case 0x0B:
 			case 0x0C:
 			case 0x0D:
+			{
+				std::string sub("");
 				switch (gameSettings & 0xffff0000) {
 					case 0x00010000: sub += " (2 teams)"; break;
 					case 0x00020000: sub += " (3 teams)"; break;
@@ -643,6 +629,7 @@ public:
 					case 0x0C: return "Team Free 4 All" + sub;
 					case 0x0D: return "Team CTF" + sub;
 				}
+			}
 			case 0x0F:
 				switch (gameSettings & 0xffff0000) {
 					case 0x00010000: return "Top vs Bottom (1v7)";
@@ -660,8 +647,9 @@ public:
 	}
 
 private:
-	void splitStatstring()
+	static std::vector<std::string> splitStatstring(const std::string &gameStatstring)
 	{
+		std::vector<std::string> res;
 		// statstring is a comma-delimited list of values
 		int pos = 0;
 		int newpos = 0;
@@ -674,13 +662,14 @@ private:
 			} else if (newpos < pos) {
 				break;
 			} else {
-				gameStats.push_back(gameStatstring.substr(pos, newpos - pos));
+				res.push_back(gameStatstring.substr(pos, newpos - pos));
 			}
 			pos = newpos + 1;
 		}
-		while (gameStats.size() < 10) {
-			gameStats.push_back("");
+		while (res.size() < 10) {
+			res.push_back("");
 		}
+		return res;
 	}
 
 	uint32_t gameSettings;
@@ -690,7 +679,6 @@ private:
 	uint32_t elapsedTime;
 	std::string gameName;
 	std::string gamePassword;
-	std::string gameStatstring;
 	std::vector<std::string> gameStats;
 };
 
@@ -699,23 +687,23 @@ class Context;
 class OnlineState
 {
 public:
-	virtual ~OnlineState() {}
-	virtual void doOneStep(Context *ctx) = 0;
+	virtual ~OnlineState() = default;
+	virtual void doOneStep(Context &ctx) = 0;
 
 protected:
-	int send(Context *ctx, BNCSOutputStream *buf);
+	int send(Context &ctx, BNCSOutputStream &buf);
 
-	void handleNull(Context *);
-	void handlePing(Context *);
-	void handleChannelList(Context *);
-	void handleChatevent(Context *);
-	void handleGamelist(Context *);
-	void handleStartAdvertising(Context *);
-	void handleFriendlist(Context *);
-	void handleUserdata(Context *);
-	void finishMessage(Context *);
+	void handleNull(Context &);
+	void handlePing(Context &);
+	void handleChannelList(Context &);
+	void handleChatevent(Context &);
+	void handleGamelist(Context &);
+	void handleStartAdvertising(Context &);
+	void handleFriendlist(Context &);
+	void handleUserdata(Context &);
+	void finishMessage(Context &);
 
-	bool handleGenericMessages(Context *ctx, uint8_t msg)
+	bool handleGenericMessages(Context &ctx, uint8_t msg)
 	{
 		switch (msg) {
 			case 0x00: // SID_NULL
@@ -765,47 +753,23 @@ protected:
 		return true;
 	}
 
-	uint32_t pingValue;
+	uint32_t pingValue = 0;
 };
 
 class Context : public OnlineContext
 {
 public:
-	Context()
-	{
-		this->tcpSocket = new CTCPSocket();
-		this->istream = new BNCSInputStream(tcpSocket);
-		this->state = nullptr;
-		this->host = new CHost("127.0.0.1", 6112);
-		this->clientToken = MyRand();
-		this->username = "";
-		setPassword("");
-		defaultUserKeys.push_back("profile\\location");
-		defaultUserKeys.push_back("profile\\description");
-		defaultUserKeys.push_back("record\\GAME\\0\\wins");
-		defaultUserKeys.push_back("record\\GAME\\0\\losses");
-		defaultUserKeys.push_back("record\\GAME\\0\\disconnects");
-		defaultUserKeys.push_back("record\\GAME\\0\\last game");
-		defaultUserKeys.push_back("record\\GAME\\0\\last game result");
-	}
+	Context() : clientToken(MyRand()) {}
+	~Context() override = default;
 
-	~Context()
-	{
-		if (state != nullptr) {
-			delete state;
-		}
-		delete tcpSocket;
-		delete host;
-	}
+	bool isConnected() const { return state != nullptr && !getCurrentChannel().empty(); }
 
-	bool isConnected() { return state != nullptr && !getCurrentChannel().empty(); }
-
-	bool isConnecting()
+	bool isConnecting() const
 	{
 		return !isDisconnected() && !isConnected() && !username.empty() && hasPassword;
 	}
 
-	bool isDisconnected() { return state == nullptr; }
+	bool isDisconnected() const { return state == nullptr; }
 
 	// User and UI actions
 	void disconnect()
@@ -822,7 +786,7 @@ public:
 		if (canDoUdp == 1) {
 			ExitNetwork1();
 		}
-		tcpSocket->Close();
+		tcpSocket.Close();
 		state = nullptr;
 		clientToken = MyRand();
 		username = "";
@@ -926,7 +890,7 @@ public:
 		DebugPrint("TCP Sent: 0x65 FRIENDSLIST\n");
 	}
 
-	virtual void joinGame(std::string username, std::string pw)
+	void joinGame(std::string username, std::string pw) override
 	{
 		if (!isConnected()) {
 			return;
@@ -941,12 +905,12 @@ public:
 		DebugPrint("TCP Sent: 0x09 NOTIFYJOIN\n");
 	}
 
-	virtual void leaveGame()
+	void leaveGame() override
 	{
 		// TODO: ?
 	}
 
-	virtual void startAdvertising(bool isStarted = false)
+	void startAdvertising(bool isStarted = false) override
 	{
 		if (!isConnected()) {
 			return;
@@ -1046,7 +1010,7 @@ public:
 		DebugPrint("TCP Sent: 0x1c STARTADVEX\n");
 	}
 
-	virtual void stopAdvertising()
+	void stopAdvertising() override
 	{
 		if (!isConnected()) {
 			return;
@@ -1056,7 +1020,7 @@ public:
 		DebugPrint("TCP Sent: 0x02 STOPADVEX\n");
 	}
 
-	virtual void reportGameResult()
+	void reportGameResult() override
 	{
 		BNCSOutputStream msg(0x2c);
 		msg.serialize32(0); // Normal game
@@ -1126,18 +1090,15 @@ public:
 		}
 	}
 
-	std::string getCurrentChannel() { return currentChannel; }
+	const std::string &getCurrentChannel() const { return currentChannel; }
 
-	void setGamelist(std::vector<Game *> games)
+	void setGamelist(std::vector<std::unique_ptr<Game>> games)
 	{
 		// before we are able to join any game, we should try to get our own
 		// external address to help NAT traversal
-		for (const auto value : this->games) {
-			delete value;
-		}
 		if (requestedAddress && !externalAddress.isValid()) {
 			for (unsigned int i = 0; i < games.size(); i++) {
-				const auto game = games[i];
+				const auto &game = games[i];
 				if (game->isValid() && game->getCreator() == getUsername()
 				    && game->getMap() == "udp") {
 					// our fake game, remove and break;
@@ -1150,10 +1111,10 @@ public:
 				}
 			}
 		}
-		this->games = games;
+		this->games = std::move(games);
 		if (SetGames != nullptr) {
 			SetGames->pushPreamble();
-			for (const auto value : games) {
+			for (const auto &value : games) {
 				if (value->isValid()) {
 					SetGames->pushTable({{"Creator", value->getCreator()},
 					                     {"Host", value->getHost().toString()},
@@ -1171,17 +1132,17 @@ public:
 		}
 	}
 
-	std::vector<Game *> getGames() { return games; }
-
-	void setFriendslist(std::vector<Friend *> friends)
+	void setFriendslist(std::vector<std::unique_ptr<Friend>> friends)
 	{
-		for (const auto value : this->friends) {
-			delete value;
-		}
-		this->friends = friends;
+		this->friends = std::move(friends);
+		NotifyFriendsListHasChanged();
+	}
+
+	void NotifyFriendsListHasChanged()
+	{
 		if (SetFriends != nullptr) {
 			SetFriends->pushPreamble();
-			for (const auto value : friends) {
+			for (const auto &value : friends) {
 				SetFriends->pushTable({{"Name", value->getName()},
 				                       {"Status", value->getStatus()},
 				                       {"Product", value->getProduct()}});
@@ -1189,8 +1150,6 @@ public:
 			SetFriends->run();
 		}
 	}
-
-	std::vector<Friend *> getFriends() { return friends; }
 
 	void reportUserdata(uint32_t id, std::vector<std::string> values)
 	{
@@ -1204,7 +1163,7 @@ public:
 		}
 	}
 
-	std::queue<std::string> *getInfo() { return &info; }
+	std::queue<std::string> &getInfo() { return info; }
 
 	void showInfo(std::string arg)
 	{
@@ -1247,7 +1206,7 @@ public:
 		}
 	}
 
-	std::set<std::string> getUsers() { return userList; }
+	const std::set<std::string> &getUsers() const { return userList; }
 
 	void setChannels(std::vector<std::string> channels)
 	{
@@ -1261,12 +1220,12 @@ public:
 		}
 	}
 
-	std::vector<std::string> getChannels() { return channelList; }
+	const std::vector<std::string> &getChannels() const { return channelList; }
 
 	// State
-	std::string getUsername() { return username; }
+	const std::string &getUsername() const { return username; }
 
-	void setUsername(std::string arg) { username = arg; }
+	void setUsername(std::string arg) { username = std::move(arg); }
 
 	uint32_t *getPassword1()
 	{
@@ -1282,7 +1241,7 @@ public:
 	void setPassword(std::string pw)
 	{
 		if (pw.empty()) {
-			memset(password, 0, sizeof(password));
+			ranges::fill(password, 0);
 			hasPassword = false;
 		} else {
 			pvpgn::sha1_hash(&password, pw.length(), pw.c_str());
@@ -1291,20 +1250,13 @@ public:
 	}
 
 	void setCreateAccount(bool flag) { createAccount = flag; }
-	bool shouldCreateAccount() { return createAccount; }
+	bool shouldCreateAccount() const { return createAccount; }
 
 	// Protocol
-	CHost *getHost() { return host; }
+	const CHost &getHost() const { return host; }
+	void setHost(const CHost &arg) { host = arg; }
 
-	void setHost(CHost *arg)
-	{
-		if (host != nullptr) {
-			delete host;
-		}
-		host = arg;
-	}
-
-	CUDPSocket *getUDPSocket()
+	CUDPSocket &getUDPSocket()
 	{
 		if (!NetworkFildes.IsValid()) {
 			if (canDoUdp == -1) {
@@ -1318,21 +1270,21 @@ public:
 				}
 			}
 		}
-		return &NetworkFildes;
+		return NetworkFildes;
 	}
 
-	CTCPSocket *getTCPSocket() { return tcpSocket; }
+	CTCPSocket &getTCPSocket() { return tcpSocket; }
 
-	BNCSInputStream *getMsgIStream() { return istream; }
+	BNCSInputStream &getMsgIStream() { return istream; }
 
-	virtual void doOneStep()
+	void doOneStep() override
 	{
-		if (this->state != nullptr) this->state->doOneStep(this);
+		if (this->state != nullptr) this->state->doOneStep(*this);
 	}
 
-	virtual bool handleUDP(const unsigned char *buffer, int len, CHost host)
+	bool handleUDP(const unsigned char *buffer, int len, CHost host) override
 	{
-		if (host.getIp() != getHost()->getIp() || host.getPort() != getHost()->getPort()) {
+		if (host != getHost()) {
 			return false;
 		}
 
@@ -1363,43 +1315,36 @@ public:
 		return true;
 	}
 
-	void setState(OnlineState *newState)
-	{
-		assert(newState != this->state);
-		if (this->state != nullptr) {
-			delete this->state;
-		}
-		this->state = newState;
-	}
+	void setState(std::unique_ptr<OnlineState> newState) { this->state = std::move(newState); }
 
-	uint32_t clientToken;
-	uint32_t serverToken;
-	uint32_t udpToken;
+	uint32_t clientToken = 0;
+	uint32_t serverToken = 0;
+	uint32_t udpToken = 0;
 
-	LuaCallback *AddUser = nullptr;
-	LuaCallback *RemoveUser = nullptr;
-	LuaCallback *SetFriends = nullptr;
-	LuaCallback *SetGames = nullptr;
-	LuaCallback *SetChannels = nullptr;
-	LuaCallback *SetActiveChannel = nullptr;
-	LuaCallback *ShowError = nullptr;
-	LuaCallback *ShowInfo = nullptr;
-	LuaCallback *ShowChat = nullptr;
-	LuaCallback *ShowUserInfo = nullptr;
+	std::unique_ptr<LuaCallback> AddUser;
+	std::unique_ptr<LuaCallback> RemoveUser;
+	std::unique_ptr<LuaCallback> SetFriends;
+	std::unique_ptr<LuaCallback> SetGames;
+	std::unique_ptr<LuaCallback> SetChannels;
+	std::unique_ptr<LuaCallback> SetActiveChannel;
+	std::unique_ptr<LuaCallback> ShowError;
+	std::unique_ptr<LuaCallback> ShowInfo;
+	std::unique_ptr<LuaCallback> ShowChat;
+	std::unique_ptr<LuaCallback> ShowUserInfo;
 
 private:
-	std::string gameNameFromUsername(std::string username) { return username + "'s game"; }
+	static std::string gameNameFromUsername(std::string username) { return username + "'s game"; }
 
-	OnlineState *state;
-	CHost *host;
+	std::unique_ptr<OnlineState> state;
+	CHost host{"127.0.0.1", 6112};
 	int8_t canDoUdp = -1; // -1,0,1 --- not tried, doesn't work, I created it
-	CTCPSocket *tcpSocket;
-	BNCSInputStream *istream;
+	CTCPSocket tcpSocket;
+	BNCSInputStream istream{&tcpSocket};
 
 	std::string username;
-	uint32_t password[5]; // xsha1 hash of password
-	bool hasPassword;
-	bool createAccount;
+	uint32_t password[5]{}; // xsha1 hash of password
+	bool hasPassword = false;
+	bool createAccount = false;
 
 	bool requestedAddress = false;
 	CHost externalAddress;
@@ -1410,120 +1355,127 @@ private:
 	std::set<std::string> userList;
 	std::vector<std::string> channelList;
 	std::queue<std::string> info;
-	std::vector<Game *> games;
-	std::vector<Friend *> friends;
+	std::vector<std::unique_ptr<Game>> games;
+	std::vector<std::unique_ptr<Friend>> friends;
 	std::vector<std::string> extendedInfoNames;
-	std::vector<std::string> defaultUserKeys;
+	static inline const std::vector<std::string> defaultUserKeys{
+		"profile\\location",
+		"profile\\description",
+		"record\\GAME\\0\\wins",
+		"record\\GAME\\0\\losses",
+		"record\\GAME\\0\\disconnects",
+		"record\\GAME\\0\\last game",
+		"record\\GAME\\0\\last game result"};
 };
 
-int OnlineState::send(Context *ctx, BNCSOutputStream *buf)
+int OnlineState::send(Context &ctx, BNCSOutputStream &buf)
 {
-	return buf->flush(ctx->getTCPSocket());
+	return buf.flush(ctx.getTCPSocket());
 }
 
-void OnlineState::handleNull(Context *ctx)
+void OnlineState::handleNull(Context &ctx)
 {
 	BNCSOutputStream buffer(0x00);
-	send(ctx, &buffer);
+	send(ctx, buffer);
 	DebugPrint("TCP Sent: 0x00 nullptr\n");
 }
 
-void OnlineState::handleChannelList(Context *ctx)
+void OnlineState::handleChannelList(Context &ctx)
 {
-	ctx->setChannels(ctx->getMsgIStream()->readStringlist());
+	ctx.setChannels(ctx.getMsgIStream().readStringlist());
 }
 
-void OnlineState::handlePing(Context *ctx)
+void OnlineState::handlePing(Context &ctx)
 {
 	DebugPrint("TCP Recv: 0x25 PING\n");
-	pingValue = ctx->getMsgIStream()->read32();
-	ctx->getMsgIStream()->finishMessage();
+	pingValue = ctx.getMsgIStream().read32();
+	ctx.getMsgIStream().finishMessage();
 	// immediately respond with C2S_SID_PING
 	BNCSOutputStream buffer(0x25);
 	buffer.serialize32(htonl(pingValue));
-	send(ctx, &buffer);
+	send(ctx, buffer);
 	DebugPrint("TCP Sent: 0x25 PING\n");
 }
 
-void OnlineState::handleGamelist(Context *ctx)
+void OnlineState::handleGamelist(Context &ctx)
 {
-	uint32_t cnt = ctx->getMsgIStream()->read32();
+	uint32_t cnt = ctx.getMsgIStream().read32();
 	if (cnt > 255) {
 		return;
 	}
 	if (cnt > 100) {
 		cnt = 100;
 	}
-	std::vector<Game *> games;
+	std::vector<std::unique_ptr<Game>> games;
 	while (cnt--) {
-		uint32_t settings = ctx->getMsgIStream()->read32();
-		uint32_t lang = ctx->getMsgIStream()->read32();
-		uint16_t addr_fam = ctx->getMsgIStream()->read16();
+		uint32_t settings = ctx.getMsgIStream().read32();
+		uint32_t lang = ctx.getMsgIStream().read32();
+		uint16_t addr_fam = ctx.getMsgIStream().read16();
 		// the port is not in network byte order, since it's sent to
 		// directly go into a sockaddr_in struct
-		uint16_t port = (ctx->getMsgIStream()->read8() << 8) | ctx->getMsgIStream()->read8();
-		uint32_t ip = ctx->getMsgIStream()->read32();
-		uint32_t sinzero1 = ctx->getMsgIStream()->read32();
-		uint32_t sinzero2 = ctx->getMsgIStream()->read32();
-		uint32_t status = ctx->getMsgIStream()->read32();
-		uint32_t time = ctx->getMsgIStream()->read32();
-		std::string name = ctx->getMsgIStream()->readString();
-		std::string pw = ctx->getMsgIStream()->readString();
-		std::string stat = ctx->getMsgIStream()->readString();
-		games.push_back(new Game(settings, port, ip, status, time, name, pw, stat));
+		uint16_t port = (ctx.getMsgIStream().read8() << 8) | ctx.getMsgIStream().read8();
+		uint32_t ip = ctx.getMsgIStream().read32();
+		uint32_t sinzero1 = ctx.getMsgIStream().read32();
+		uint32_t sinzero2 = ctx.getMsgIStream().read32();
+		uint32_t status = ctx.getMsgIStream().read32();
+		uint32_t time = ctx.getMsgIStream().read32();
+		std::string name = ctx.getMsgIStream().readString();
+		std::string pw = ctx.getMsgIStream().readString();
+		std::string stat = ctx.getMsgIStream().readString();
+		games.push_back(std::make_unique<Game>(settings, port, ip, status, time, name, pw, stat));
 	}
-	ctx->setGamelist(games);
+	ctx.setGamelist(std::move(games));
 }
 
-void OnlineState::handleFriendlist(Context *ctx)
+void OnlineState::handleFriendlist(Context &ctx)
 {
-	uint8_t cnt = ctx->getMsgIStream()->read8();
+	uint8_t cnt = ctx.getMsgIStream().read8();
 	if (cnt > 100) {
 		cnt = 100;
 	}
-	std::vector<Friend *> friends;
+	std::vector<std::unique_ptr<Friend>> friends;
 	while (cnt--) {
-		std::string user = ctx->getMsgIStream()->readString();
-		uint8_t status = ctx->getMsgIStream()->read8();
-		uint8_t location = ctx->getMsgIStream()->read8();
-		uint32_t product = ctx->getMsgIStream()->read32();
-		std::string locname = ctx->getMsgIStream()->readString();
-		friends.push_back(new Friend(user, status, location, product, locname));
+		std::string user = ctx.getMsgIStream().readString();
+		uint8_t status = ctx.getMsgIStream().read8();
+		uint8_t location = ctx.getMsgIStream().read8();
+		uint32_t product = ctx.getMsgIStream().read32();
+		std::string locname = ctx.getMsgIStream().readString();
+		friends.push_back(std::make_unique<Friend>(user, status, location, product, locname));
 	}
-	ctx->setFriendslist(friends);
+	ctx.setFriendslist(std::move(friends));
 }
 
-void OnlineState::handleUserdata(Context *ctx)
+void OnlineState::handleUserdata(Context &ctx)
 {
-	uint32_t cnt = ctx->getMsgIStream()->read32();
+	uint32_t cnt = ctx.getMsgIStream().read32();
 	assert(cnt == 1);
-	uint32_t keys = ctx->getMsgIStream()->read32();
-	uint32_t reqId = ctx->getMsgIStream()->read32();
-	std::vector<std::string> values = ctx->getMsgIStream()->readStringlist(keys);
-	ctx->reportUserdata(reqId, values);
+	uint32_t keys = ctx.getMsgIStream().read32();
+	uint32_t reqId = ctx.getMsgIStream().read32();
+	std::vector<std::string> values = ctx.getMsgIStream().readStringlist(keys);
+	ctx.reportUserdata(reqId, values);
 }
 
-void OnlineState::handleChatevent(Context *ctx)
+void OnlineState::handleChatevent(Context &ctx)
 {
-	uint32_t eventId = ctx->getMsgIStream()->read32();
-	uint32_t userFlags = ctx->getMsgIStream()->read32();
-	uint32_t ping = ctx->getMsgIStream()->read32();
-	uint32_t ip = ctx->getMsgIStream()->read32();
-	uint32_t acn = ctx->getMsgIStream()->read32();
-	uint32_t reg = ctx->getMsgIStream()->read32();
-	std::string username = ctx->getMsgIStream()->readString();
-	std::string text = ctx->getMsgIStream()->readString();
+	uint32_t eventId = ctx.getMsgIStream().read32();
+	uint32_t userFlags = ctx.getMsgIStream().read32();
+	uint32_t ping = ctx.getMsgIStream().read32();
+	uint32_t ip = ctx.getMsgIStream().read32();
+	uint32_t acn = ctx.getMsgIStream().read32();
+	uint32_t reg = ctx.getMsgIStream().read32();
+	std::string username = ctx.getMsgIStream().readString();
+	std::string text = ctx.getMsgIStream().readString();
 	switch (eventId) {
 		case 0x01: // sent for user that is already in channel
-			ctx->addUser(username);
+			ctx.addUser(username);
 			break;
 		case 0x02: // user joined channel
-			ctx->addUser(username);
-			ctx->showInfo(username + " joined");
+			ctx.addUser(username);
+			ctx.showInfo(username + " joined");
 			break;
 		case 0x03: // user left channel
-			ctx->removeUser(username);
-			ctx->showInfo(username + " left");
+			ctx.removeUser(username);
+			ctx.showInfo(username + " left");
 		case 0x04: // recv whisper
 			if (!text.empty()) {
 				std::string prefix = "/udppunch ";
@@ -1541,7 +1493,7 @@ void OnlineState::handleChatevent(Context *ctx)
 						if (NetConnectType == 1
 						    && !GameRunning) { // the server, waiting for clients
 							const CInitMessage_Header message(MessageInit_FromServer, ICMAYT);
-							NetworkSendICMessage(*(ctx->getUDPSocket()), CHost(ip, port), message);
+							NetworkSendICMessage(ctx.getUDPSocket(), CHost(ip, port), message);
 							DebugPrint("UDP Sent: UDP punch\n");
 						} else {
 							// the client will connect now and send packages, anyway.
@@ -1553,52 +1505,52 @@ void OnlineState::handleChatevent(Context *ctx)
 					}
 				}
 			}
-			ctx->showChat(username + " whispers " + text);
+			ctx.showChat(username + " whispers " + text);
 			break;
 		case 0x05: // recv chat
-			ctx->showChat(username + ": " + text);
+			ctx.showChat(username + ": " + text);
 			break;
 		case 0x06: // recv broadcast
-			ctx->showInfo("[BROADCAST]: " + text);
+			ctx.showInfo("[BROADCAST]: " + text);
 			break;
 		case 0x07: // channel info
-			ctx->setCurrentChannel(text);
-			ctx->showInfo("Joined channel " + text);
+			ctx.setCurrentChannel(text);
+			ctx.showInfo("Joined channel " + text);
 			break;
 		case 0x09: // user flags update
 			break;
 		case 0x0a: // sent whisper
 			break;
 		case 0x0d: // channel full
-			ctx->showInfo("Channel full");
+			ctx.showInfo("Channel full");
 			break;
 		case 0x0e: // channel does not exist
-			ctx->showInfo("Channel does not exist");
+			ctx.showInfo("Channel does not exist");
 			break;
 		case 0x0f: // channel is restricted
-			ctx->showInfo("Channel restricted");
+			ctx.showInfo("Channel restricted");
 			break;
 		case 0x12: // general info text
-			ctx->showInfo(text);
+			ctx.showInfo(text);
 			break;
 		case 0x13: // error message
-			ctx->showError(text);
+			ctx.showError(text);
 			break;
 		case 0x17: // emote
 			break;
 	}
 }
 
-void OnlineState::handleStartAdvertising(Context *ctx)
+void OnlineState::handleStartAdvertising(Context &ctx)
 {
-	if (ctx->getMsgIStream()->read32()) {
-		ctx->showError("Online game creation failed");
+	if (ctx.getMsgIStream().read32()) {
+		ctx.showError("Online game creation failed");
 	}
 }
 
-void OnlineState::finishMessage(Context *ctx)
+void OnlineState::finishMessage(Context &ctx)
 {
-	ctx->getMsgIStream()->finishMessage();
+	ctx.getMsgIStream().finishMessage();
 }
 
 class DisconnectedState : public OnlineState
@@ -1610,11 +1562,11 @@ public:
 		this->message = message;
 	}
 
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
 		std::cout << message << std::endl;
-		ctx->disconnect();
-		ctx->showError(message);
+		ctx.disconnect();
+		ctx.showError(message);
 	}
 
 private:
@@ -1624,34 +1576,34 @@ private:
 class S2C_CHATEVENT : public OnlineState
 {
 public:
-	S2C_CHATEVENT() { this->ticks = 0; }
+	S2C_CHATEVENT() = default;
 
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
 		if ((ticks % 1000) == 0) {
 			// C>S 0x07 PKT_KEEPALIVE
 			// ~1000 frames @ ~50fps ~= 20 seconds
 			BNCSOutputStream keepalive(0x07, true);
 			keepalive.serialize32(ticks);
-			keepalive.flush(ctx->getUDPSocket(), ctx->getHost());
+			keepalive.flush(ctx.getUDPSocket(), ctx.getHost());
 			DebugPrint("UDP Sent: 0x07 PKT_KEEPALIVE\n");
 		}
 
 		if ((ticks % 10000) == 0) {
 			// ~10000 frames @ ~50fps ~= 200 seconds
-			ctx->refreshFriends();
-			ctx->refreshChannels();
+			ctx.refreshFriends();
+			ctx.refreshChannels();
 		}
 
 		if ((ticks % 500) == 0) {
 			// ~1000 frames @ ~50fps ~= 10 seconds
-			ctx->refreshGames();
+			ctx.refreshGames();
 		}
 
 		ticks++;
 
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1661,24 +1613,24 @@ public:
 			if (!handleGenericMessages(ctx, msg)) {
 				std::cout << "Unhandled message ID: 0x" << std::hex << msg << std::endl;
 				std::cout << "Raw contents >>>" << std::endl;
-				auto out = ctx->getMsgIStream()->readAll();
+				auto out = ctx.getMsgIStream().readAll();
 				std::cout.write(out.data(), out.size());
 				std::cout << "<<<" << std::endl;
-				ctx->getMsgIStream()->finishMessage();
+				ctx.getMsgIStream().finishMessage();
 			}
 		}
 	}
 
 private:
-	uint64_t ticks;
+	uint64_t ticks = 0;
 };
 
 class S2C_ENTERCHAT : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1689,66 +1641,66 @@ class S2C_ENTERCHAT : public OnlineState
 				}
 				std::string error = std::string("Expected SID_ENTERCHAT, got msg id ");
 				error += std::to_string(msg);
-				ctx->setState(new DisconnectedState(error));
+				ctx.setState(std::make_unique<DisconnectedState>(error));
 				return;
 			}
 			DebugPrint("TCP Recv: 0x0a ENTERCHAT\n");
 
-			std::string uniqueName = ctx->getMsgIStream()->readString();
-			std::string statString = ctx->getMsgIStream()->readString();
-			std::string accountName = ctx->getMsgIStream()->readString();
-			ctx->getMsgIStream()->finishMessage();
+			std::string uniqueName = ctx.getMsgIStream().readString();
+			std::string statString = ctx.getMsgIStream().readString();
+			std::string accountName = ctx.getMsgIStream().readString();
+			ctx.getMsgIStream().finishMessage();
 
-			ctx->setUsername(uniqueName);
+			ctx.setUsername(uniqueName);
 			if (!statString.empty()) {
-				ctx->showInfo("Statstring after logon: " + statString);
+				ctx.showInfo("Statstring after logon: " + statString);
 			}
 
-			ctx->requestExtraUserInfo(ctx->getUsername());
-			ctx->requestExternalAddress();
+			ctx.requestExtraUserInfo(ctx.getUsername());
+			ctx.requestExternalAddress();
 
-			ctx->setState(new S2C_CHATEVENT());
+			ctx.setState(std::make_unique<S2C_CHATEVENT>());
 		}
 	}
 };
 
 class C2S_ENTERCHAT : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
 		// does all of enterchar, getchannellist, and first-join joinchannel
 		BNCSOutputStream enterchat(0x0a);
-		enterchat.serialize(ctx->getUsername().c_str());
+		enterchat.serialize(ctx.getUsername().c_str());
 		enterchat.serialize("");
-		enterchat.flush(ctx->getTCPSocket());
+		enterchat.flush(ctx.getTCPSocket());
 		DebugPrint("TCP Sent: 0x0a ENTERCHAT\n");
 
-		ctx->refreshChannels();
+		ctx.refreshChannels();
 
 		BNCSOutputStream join(0x0c);
 		join.serialize32(0x01); // first-join
 		join.serialize(gameName().c_str());
-		join.flush(ctx->getTCPSocket());
+		join.flush(ctx.getTCPSocket());
 		DebugPrint("TCP Sent: 0x0c JOINCHANNEL\n");
 
 		// TODO: maybe send 0x45 SID_NETGAMEPORT to report our gameport on pvpgn
 		// to whatever the user specified on the cmdline?
 
-		ctx->setState(new S2C_ENTERCHAT());
+		ctx.setState(std::make_unique<S2C_ENTERCHAT>());
 	}
 };
 
 class C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT : public OnlineState
 {
-	virtual void doOneStep(Context *ctx);
+	void doOneStep(Context &ctx) override;
 };
 
 class S2C_CREATEACCOUNT2 : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1759,14 +1711,14 @@ class S2C_CREATEACCOUNT2 : public OnlineState
 				}
 				std::string error = std::string("Expected SID_CREATEACCOUNT2, got msg id ");
 				error += std::to_string(msg);
-				ctx->setState(new DisconnectedState(error));
+				ctx.setState(std::make_unique<DisconnectedState>(error));
 				return;
 			}
 			DebugPrint("TCP Recv: 0x3d CREATEACCOUNT\n");
 
-			uint32_t status = ctx->getMsgIStream()->read32();
-			std::string nameSugg = ctx->getMsgIStream()->readString();
-			ctx->getMsgIStream()->finishMessage();
+			uint32_t status = ctx.getMsgIStream().read32();
+			std::string nameSugg = ctx.getMsgIStream().readString();
+			ctx.getMsgIStream().finishMessage();
 
 			if (!nameSugg.empty()) {
 				nameSugg = " (try username: " + nameSugg + ")";
@@ -1777,7 +1729,7 @@ class S2C_CREATEACCOUNT2 : public OnlineState
 			switch (status) {
 				case 0x00:
 					// login into created account
-					ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
+					ctx.setState(std::make_unique<C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT>());
 					return;
 				case 0x01: errMsg = "Name too short"; break;
 				case 0x02: errMsg = "Name contains invalid character(s)"; break;
@@ -1789,7 +1741,7 @@ class S2C_CREATEACCOUNT2 : public OnlineState
 				case 0x08: errMsg = "Name contained too many punctuation characters"; break;
 				default: errMsg = "Unknown error creating account";
 			}
-			ctx->setState(new DisconnectedState(errMsg + nameSugg));
+			ctx.setState(std::make_unique<DisconnectedState>(errMsg + nameSugg));
 			return;
 		}
 	}
@@ -1797,10 +1749,10 @@ class S2C_CREATEACCOUNT2 : public OnlineState
 
 class S2C_LOGONRESPONSE2 : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1811,21 +1763,21 @@ class S2C_LOGONRESPONSE2 : public OnlineState
 				}
 				std::string error = std::string("Expected SID_LOGONRESPONSE2, got msg id ");
 				error += std::to_string(msg);
-				ctx->showError(error);
-				ctx->getMsgIStream()->debugDump();
-				ctx->getMsgIStream()->finishMessage();
+				ctx.showError(error);
+				ctx.getMsgIStream().debugDump();
+				ctx.getMsgIStream().finishMessage();
 				return;
 			}
 			DebugPrint("TCP Sent: 0x3a LOGONRESPONSE\n");
 
-			uint32_t status = ctx->getMsgIStream()->read32();
-			ctx->getMsgIStream()->finishMessage();
+			uint32_t status = ctx.getMsgIStream().read32();
+			ctx.getMsgIStream().finishMessage();
 			std::string errMsg;
 
 			switch (status) {
 				case 0x00:
 					// success. we will send SID_UDPPINGRESPONSE before entering chat
-					ctx->setState(new C2S_ENTERCHAT());
+					ctx.setState(std::make_unique<C2S_ENTERCHAT>());
 					return;
 				case 0x01:
 				case 0x010000: errMsg = "Account does not exist"; break;
@@ -1833,37 +1785,37 @@ class S2C_LOGONRESPONSE2 : public OnlineState
 				case 0x020000: errMsg = "Incorrect password"; break;
 				case 0x06:
 				case 0x060000:
-					errMsg = "Account closed: " + ctx->getMsgIStream()->readString();
+					errMsg = "Account closed: " + ctx.getMsgIStream().readString();
 					break;
 				default: errMsg = "unknown logon response"; break;
 			}
-			ctx->setState(new DisconnectedState(errMsg));
+			ctx.setState(std::make_unique<DisconnectedState>(errMsg));
 		}
 	}
 };
 
-void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx)
+void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context &ctx) /* override */
 {
-	std::string user = ctx->getUsername();
-	uint32_t *pw = ctx->getPassword1(); // single-hashed for SID_LOGONRESPONSE2
+	std::string user = ctx.getUsername();
+	uint32_t *pw = ctx.getPassword1(); // single-hashed for SID_LOGONRESPONSE2
 	if (!user.empty() && pw) {
-		if (ctx->shouldCreateAccount()) {
-			ctx->setCreateAccount(false);
+		if (ctx.shouldCreateAccount()) {
+			ctx.setCreateAccount(false);
 			BNCSOutputStream msg(0x3d);
-			uint32_t *pw = ctx->getPassword1();
+			uint32_t *pw = ctx.getPassword1();
 			for (int i = 0; i < 20; i++) {
 				msg.serialize8(reinterpret_cast<uint8_t *>(pw)[i]);
 			}
-			msg.serialize(ctx->getUsername().c_str());
-			msg.flush(ctx->getTCPSocket());
+			msg.serialize(ctx.getUsername().c_str());
+			msg.flush(ctx.getTCPSocket());
 			DebugPrint("TCP Sent: 0x3d CREATEACOUNT\n");
-			ctx->setState(new S2C_CREATEACCOUNT2());
+			ctx.setState(std::make_unique<S2C_CREATEACCOUNT2>());
 			return;
 		}
 
 		BNCSOutputStream logon(0x3a);
-		logon.serialize32(ctx->clientToken);
-		logon.serialize32(ctx->serverToken);
+		logon.serialize32(ctx.clientToken);
+		logon.serialize32(ctx.serverToken);
 
 		// Battle.net password hashes are hashed twice using XSHA-1. First, the
 		// password is hashed by itself, then the following data is hashed again
@@ -1880,8 +1832,8 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx)
 		} temp;
 		uint32_t passhash2[5];
 
-		pvpgn::bn_int_set(&temp.ticks, ntohl(ctx->clientToken));
-		pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx->serverToken));
+		pvpgn::bn_int_set(&temp.ticks, ntohl(ctx.clientToken));
+		pvpgn::bn_int_set(&temp.sessionkey, ntohl(ctx.serverToken));
 		pvpgn::hash_to_bnhash((pvpgn::t_hash const *) pw, temp.passhash1);
 		pvpgn::bnet_hash(&passhash2, sizeof(temp), &temp); /* do the double hash */
 
@@ -1889,19 +1841,19 @@ void C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT::doOneStep(Context *ctx)
 			logon.serialize8(reinterpret_cast<uint8_t *>(passhash2)[i]);
 		}
 		logon.serialize(user.c_str());
-		logon.flush(ctx->getTCPSocket());
+		logon.flush(ctx.getTCPSocket());
 		DebugPrint("TCP Sent: 0x3a LOGIN\n");
 
-		ctx->setState(new S2C_LOGONRESPONSE2());
+		ctx.setState(std::make_unique<S2C_LOGONRESPONSE2>());
 	}
 };
 
 class S2C_SID_AUTH_CHECK : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1912,19 +1864,19 @@ class S2C_SID_AUTH_CHECK : public OnlineState
 				}
 				std::string error = std::string("Expected SID_AUTH_CHECK, got msg id ");
 				error += std::to_string(msg);
-				ctx->setState(new DisconnectedState(error));
+				ctx.setState(std::make_unique<DisconnectedState>(error));
 				return;
 			}
 			DebugPrint("TCP Recv: 0x51 AUTH_CHECK\n");
 
-			uint32_t result = ctx->getMsgIStream()->read32();
-			std::string info = ctx->getMsgIStream()->readString();
-			ctx->getMsgIStream()->finishMessage();
+			uint32_t result = ctx.getMsgIStream().read32();
+			std::string info = ctx.getMsgIStream().readString();
+			ctx.getMsgIStream().finishMessage();
 
 			switch (result) {
 				case 0x000:
 					// Passed challenge
-					ctx->setState(new C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT());
+					ctx.setState(std::make_unique<C2S_LOGONRESPONSE2_OR_C2S_CREATEACCOUNT>());
 					return;
 				case 0x100:
 					// Old game version
@@ -1958,17 +1910,17 @@ class S2C_SID_AUTH_CHECK : public OnlineState
 					// Invalid version code
 					info = "Invalid version code: " + info;
 			}
-			ctx->setState(new DisconnectedState(info));
+			ctx.setState(std::make_unique<DisconnectedState>(info));
 		}
 	}
 };
 
 class S2C_SID_AUTH_INFO : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
-		if (ctx->getTCPSocket()->HasDataToRead(0)) {
-			uint8_t msg = ctx->getMsgIStream()->readMessageId();
+		if (ctx.getTCPSocket().HasDataToRead(0)) {
+			uint8_t msg = ctx.getMsgIStream().readMessageId();
 			if (msg == 0xff) {
 				// try again next time
 				return;
@@ -1979,29 +1931,29 @@ class S2C_SID_AUTH_INFO : public OnlineState
 				}
 				std::string error = std::string("Expected SID_AUTH_INFO, got msg id ");
 				error += std::to_string(msg);
-				ctx->setState(new DisconnectedState(error));
+				ctx.setState(std::make_unique<DisconnectedState>(error));
 				return;
 			}
 			DebugPrint("TCP Recv: 0x50 AUTH_INFO\n");
 
-			uint32_t logonType = ctx->getMsgIStream()->read32();
+			uint32_t logonType = ctx.getMsgIStream().read32();
 			// assert(logonType == 0x00); // only support Broken SHA-1 logon for now
 			DebugPrint("logonType: 0x%x\n", logonType);
-			uint32_t serverToken = ctx->getMsgIStream()->read32();
-			ctx->serverToken = htonl(serverToken); // keep in network order
-			uint32_t udpToken = ctx->getMsgIStream()->read32();
-			ctx->udpToken = htonl(udpToken);
-			uint64_t mpqFiletime = ctx->getMsgIStream()->readFiletime();
-			std::string mpqFilename = ctx->getMsgIStream()->readString();
-			std::string formula = ctx->getMsgIStream()->readString();
-			ctx->getMsgIStream()->finishMessage();
+			uint32_t serverToken = ctx.getMsgIStream().read32();
+			ctx.serverToken = htonl(serverToken); // keep in network order
+			uint32_t udpToken = ctx.getMsgIStream().read32();
+			ctx.udpToken = htonl(udpToken);
+			uint64_t mpqFiletime = ctx.getMsgIStream().readFiletime();
+			std::string mpqFilename = ctx.getMsgIStream().readString();
+			std::string formula = ctx.getMsgIStream().readString();
+			ctx.getMsgIStream().finishMessage();
 
 			// immediately respond with pkt_conntest2 udp msg
-			ctx->sendUdpConnectionInfo();
+			ctx.sendUdpConnectionInfo();
 
 			// immediately respond with SID_AUTH_CHECK
 			BNCSOutputStream check(0x51);
-			check.serialize32(ctx->clientToken);
+			check.serialize32(ctx.clientToken);
 			// EXE version (one UINT32 value, serialized in network byte order here)
 			check.serialize8(StratagusPatchLevel2);
 			check.serialize8(StratagusPatchLevel);
@@ -2024,17 +1976,17 @@ class S2C_SID_AUTH_INFO : public OnlineState
 			check.serialize(exeInfo.c_str());
 			// Key owner name
 			check.serialize(DESCRIPTION);
-			check.flush(ctx->getTCPSocket());
+			check.flush(ctx.getTCPSocket());
 			DebugPrint("TCP Sent: 0x51 AUTH_CHECK\n");
 
-			ctx->setState(new S2C_SID_AUTH_CHECK());
+			ctx.setState(std::make_unique<S2C_SID_AUTH_CHECK>());
 		}
 	}
 };
 
 class C2S_SID_AUTH_INFO : public OnlineState
 {
-	virtual void doOneStep(Context *ctx)
+	void doOneStep(Context &ctx) override
 	{
 		// Connect
 
@@ -2042,30 +1994,29 @@ class C2S_SID_AUTH_INFO : public OnlineState
 		if (!localHost.compare("127.0.0.1")) {
 			localHost = "0.0.0.0";
 		}
-		if (!ctx->getTCPSocket()->IsValid()) {
-			if (!ctx->getTCPSocket()->Open(
-					CHost(localHost, CNetworkParameter::Instance.localPort))) {
-				ctx->setState(new DisconnectedState("TCP open failed"));
+		if (!ctx.getTCPSocket().IsValid()) {
+			if (!ctx.getTCPSocket().Open(CHost(localHost, CNetworkParameter::Instance.localPort))) {
+				ctx.setState(std::make_unique<DisconnectedState>("TCP open failed"));
 				return;
 			}
-			if (!ctx->getTCPSocket()->IsValid()) {
-				ctx->setState(new DisconnectedState("TCP not valid"));
+			if (!ctx.getTCPSocket().IsValid()) {
+				ctx.setState(std::make_unique<DisconnectedState>("TCP not valid"));
 				return;
 			}
 		}
-		if (!ctx->getTCPSocket()->Connect(*ctx->getHost())) {
+		if (!ctx.getTCPSocket().Connect(ctx.getHost())) {
 			retries--;
 			if (retries == 15) {
-				ctx->getTCPSocket()->Close();
+				ctx.getTCPSocket().Close();
 			} else if (retries < 0) {
-				ctx->setState(new DisconnectedState("TCP connect failed for server "
-				                                    + ctx->getHost()->toString()));
+				ctx.setState(std::make_unique<DisconnectedState>("TCP connect failed for server "
+				                                                 + ctx.getHost().toString()));
 			}
 			return;
 		}
 
 		// Send proto byte
-		ctx->getTCPSocket()->Send("\x1", 1);
+		ctx.getTCPSocket().Send("\x1", 1);
 
 		// C>S SID_AUTH_INFO
 		BNCSOutputStream buffer(0x50);
@@ -2137,9 +2088,9 @@ class C2S_SID_AUTH_INFO : public OnlineState
 		// (STRING) Country
 		buffer.serialize("United States");
 
-		send(ctx, &buffer);
+		send(ctx, buffer);
 		DebugPrint("TCP Sent: 0x50 AUTH_INFO\n");
-		ctx->setState(new S2C_SID_AUTH_INFO());
+		ctx.setState(std::make_unique<S2C_SID_AUTH_INFO>());
 	}
 
 private:
@@ -2181,64 +2132,34 @@ static int CclSetup(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
 		const std::string_view value = LuaToString(l, -2);
 		if (value == "AddUser") {
-			if (_ctx.AddUser) {
-				delete _ctx.AddUser;
-			}
-			_ctx.AddUser = new LuaCallback(l, -1);
+			_ctx.AddUser = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "RemoveUser") {
-			if (_ctx.RemoveUser) {
-				delete _ctx.RemoveUser;
-			}
-			_ctx.RemoveUser = new LuaCallback(l, -1);
+			_ctx.RemoveUser = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "SetFriends") {
-			if (_ctx.SetFriends) {
-				delete _ctx.SetFriends;
-			}
-			_ctx.SetFriends = new LuaCallback(l, -1);
+			_ctx.SetFriends = std::make_unique<LuaCallback>(l, -1);
 			if (_ctx.isConnected()) {
-				_ctx.setFriendslist(_ctx.getFriends());
+				_ctx.NotifyFriendsListHasChanged();
 			}
 		} else if (value == "SetGames") {
-			if (_ctx.SetGames) {
-				delete _ctx.SetGames;
-			}
-			_ctx.SetGames = new LuaCallback(l, -1);
+			_ctx.SetGames = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "SetChannels") {
-			if (_ctx.SetChannels) {
-				delete _ctx.SetChannels;
-			}
+			_ctx.SetChannels = std::make_unique<LuaCallback>(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setChannels(_ctx.getChannels());
 			}
-			_ctx.SetChannels = new LuaCallback(l, -1);
 		} else if (value == "SetActiveChannel") {
-			if (_ctx.SetActiveChannel) {
-				delete _ctx.SetActiveChannel;
-			}
-			_ctx.SetActiveChannel = new LuaCallback(l, -1);
+			_ctx.SetActiveChannel = std::make_unique<LuaCallback>(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setCurrentChannel(_ctx.getCurrentChannel());
 			}
 		} else if (value == "ShowChat") {
-			if (_ctx.ShowChat) {
-				delete _ctx.ShowChat;
-			}
-			_ctx.ShowChat = new LuaCallback(l, -1);
+			_ctx.ShowChat = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "ShowInfo") {
-			if (_ctx.ShowInfo) {
-				delete _ctx.ShowInfo;
-			}
-			_ctx.ShowInfo = new LuaCallback(l, -1);
+			_ctx.ShowInfo = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "ShowError") {
-			if (_ctx.ShowError) {
-				delete _ctx.ShowError;
-			}
-			_ctx.ShowError = new LuaCallback(l, -1);
+			_ctx.ShowError = std::make_unique<LuaCallback>(l, -1);
 		} else if (value == "ShowUserInfo") {
-			if (_ctx.ShowUserInfo) {
-				delete _ctx.ShowUserInfo;
-			}
-			_ctx.ShowUserInfo = new LuaCallback(l, -1);
+			_ctx.ShowUserInfo = std::make_unique<LuaCallback>(l, -1);
 		} else {
 			LuaError(l, "Unsupported callback: %s", value.data());
 		}
@@ -2260,8 +2181,8 @@ static int CclConnect(lua_State *l)
 	const std::string host = std::string{LuaToString(l, 1)};
 	int port = LuaToNumber(l, 2);
 
-	_ctx.setHost(new CHost(host, port));
-	_ctx.setState(new C2S_SID_AUTH_INFO());
+	_ctx.setHost(CHost(host, port));
+	_ctx.setState(std::make_unique<C2S_SID_AUTH_INFO>());
 	return 0;
 }
 
@@ -2341,8 +2262,8 @@ static int CclStatus(lua_State *l)
 	} else if (_ctx.isDisconnected()) {
 		lua_pushstring(l, "disconnected");
 	} else {
-		if (!_ctx.getInfo()->empty()) {
-			lua_pushstring(l, _ctx.getInfo()->back().c_str());
+		if (!_ctx.getInfo().empty()) {
+			lua_pushstring(l, _ctx.getInfo().back().c_str());
 		} else {
 			lua_pushstring(l, "unknown error");
 		}
