@@ -835,7 +835,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 **
 **  @param unit  Unit, for that the attack is handled.
 */
-/* virtual */ void COrder_Attack::Execute(CUnit &unit)
+void COrder_Attack::Execute(CUnit &unit) /* override */
 {
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 

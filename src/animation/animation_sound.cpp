@@ -41,7 +41,7 @@
 #include "sound.h"
 #include "unit.h"
 
-/* virtual */ void CAnimation_Sound::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Sound::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {

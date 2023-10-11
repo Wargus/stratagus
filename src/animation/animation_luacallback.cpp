@@ -43,7 +43,7 @@
 #include <iterator>
 #include <sstream>
 
-/* virtual */ void CAnimation_LuaCallback::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_LuaCallback::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(cb);
@@ -59,13 +59,13 @@
 /*
 ** s = "cbName cbArg1 [cbArgN ...]"
 */
-/* virtual */ void CAnimation_LuaCallback::Init(std::string_view s, lua_State *l)
+void CAnimation_LuaCallback::Init(std::string_view s, lua_State *l) /* override */
 {
 	const auto space_pos = s.find(' ');
 	this->cbName = s.substr(0, space_pos);
 
 	lua_getglobal(l, cbName.c_str());
-	cb = new LuaCallback(l, -1);
+	cb = std::make_unique<LuaCallback>(l, -1);
 	lua_pop(l, 1);
 
 	if (space_pos == std::string_view::npos) {

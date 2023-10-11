@@ -41,7 +41,7 @@
 
 #include <sstream>
 
-/* virtual */ void CAnimation_RandomGoto::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_RandomGoto::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 

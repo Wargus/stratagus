@@ -40,13 +40,13 @@
 class CAnimation_LuaCallback : public CAnimation
 {
 public:
-	~CAnimation_LuaCallback() { delete cb; }
+	~CAnimation_LuaCallback() = default;
 
 	void Action(CUnit &unit, int &move, int scale) const override;
 	void Init(std::string_view s, lua_State *l) override;
 
 private:
-	LuaCallback *cb = nullptr;
+	std::unique_ptr<LuaCallback> cb;
 	std::string cbName;
 	std::vector<std::string> cbArgs;
 };

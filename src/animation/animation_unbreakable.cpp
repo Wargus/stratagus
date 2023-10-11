@@ -39,7 +39,7 @@
 
 #include "unit.h"
 
-/* virtual */ void CAnimation_Unbreakable::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Unbreakable::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 	Assert(unit.Anim.Unbreakable ^ this->state);

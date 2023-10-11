@@ -46,7 +46,7 @@
 #include "unittype.h"
 #include "video.h"
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
+int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw("");
@@ -75,7 +75,7 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const
+int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	std::string draw;
@@ -101,7 +101,12 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+void CPopupContentTypeButtonInfo::Draw(int x,
+                                       int y,
+                                       const CPopup &popup,
+                                       const unsigned int popupWidth,
+                                       const ButtonAction &button,
+                                       int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -132,7 +137,7 @@
 	}
 }
 
-/* virtual */ void CPopupContentTypeButtonInfo::Parse(lua_State *l)
+void CPopupContentTypeButtonInfo::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1));
 
@@ -157,7 +162,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const
+int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 
@@ -173,7 +178,7 @@
 	return width;
 }
 
-/* virtual */ int CPopupContentTypeText::GetHeight(const ButtonAction &button, int *) const
+int CPopupContentTypeText::GetHeight(const ButtonAction &button, int *) const /* override */
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	int height = 0;
@@ -184,7 +189,12 @@
 	return height;
 }
 
-/* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
+void CPopupContentTypeText::Draw(int x,
+                                 int y,
+                                 const CPopup &popup,
+                                 const unsigned int popupWidth,
+                                 const ButtonAction &button,
+                                 int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -200,7 +210,7 @@
 	}
 }
 
-/* virtual */ void CPopupContentTypeText::Parse(lua_State *l)
+void CPopupContentTypeText::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1));
 
@@ -218,7 +228,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) const
+int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) const /* override */
 {
 	int popupWidth = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -259,7 +269,7 @@
 	return popupWidth;
 }
 
-/* virtual */ int CPopupContentTypeCosts::GetHeight(const ButtonAction &button, int *Costs) const
+int CPopupContentTypeCosts::GetHeight(const ButtonAction &button, int *Costs) const /* override */
 {
 	int popupHeight = 0;
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
@@ -272,7 +282,12 @@
 	return std::max(popupHeight, font.Height());
 }
 
-/* virtual */ void CPopupContentTypeCosts::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *Costs) const
+void CPopupContentTypeCosts::Draw(int x,
+                                  int y,
+                                  const CPopup &,
+                                  const unsigned int,
+                                  const ButtonAction &button,
+                                  int *Costs) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
@@ -312,7 +327,7 @@
 	}
 }
 
-/* virtual */ void CPopupContentTypeCosts::Parse(lua_State *l)
+void CPopupContentTypeCosts::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
 
@@ -330,23 +345,28 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const
+int CPopupContentTypeLine::GetWidth(const ButtonAction &button, int *Costs) const /* override */
 {
 	return this->Width;
 }
 
-/* virtual */ int CPopupContentTypeLine::GetHeight(const ButtonAction &button, int *Costs) const
+int CPopupContentTypeLine::GetHeight(const ButtonAction &button, int *Costs) const /* override */
 {
 	return this->Height;
 }
 
-/* virtual */ void CPopupContentTypeLine::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const
+void CPopupContentTypeLine::Draw(int x,
+                                 int y,
+                                 const CPopup &popup,
+                                 const unsigned int popupWidth,
+                                 const ButtonAction &button,
+                                 int *Costs) const /* override */
 {
 	Video.FillRectangle(this->Color, x - popup.MarginX - this->MarginX + 1,
 						y, this->Width && Width < popupWidth ? Width : popupWidth - 2, Height);
 }
 
-/* virtual */ void CPopupContentTypeLine::Parse(lua_State *l)
+void CPopupContentTypeLine::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1) || lua_isnil(l, -1));
 
@@ -366,7 +386,7 @@
 	}
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const
+int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const /* override */
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	TriggerData.Type = UnitTypes[button.Value];
@@ -375,13 +395,18 @@
 	return font.getWidth(text);
 }
 
-/* virtual */ int CPopupContentTypeVariable::GetHeight(const ButtonAction &, int *) const
+int CPopupContentTypeVariable::GetHeight(const ButtonAction &, int *) const /* override */
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	return font.Height();
 }
 
-/* virtual */ void CPopupContentTypeVariable::Draw(int x, int y, const CPopup &, const unsigned int, const ButtonAction &button, int *) const
+void CPopupContentTypeVariable::Draw(int x,
+                                     int y,
+                                     const CPopup &,
+                                     const unsigned int,
+                                     const ButtonAction &button,
+                                     int *) const /* override */
 {
 	std::string text;										// Optional text to display.
 	CFont &font = this->Font ? *this->Font : GetSmallFont(); // Font to use.
@@ -416,7 +441,7 @@
 	}
 }
 
-/* virtual */ void CPopupContentTypeVariable::Parse(lua_State *l)
+void CPopupContentTypeVariable::Parse(lua_State *l) /* override */
 {
 	Assert(lua_istable(l, -1) || lua_isstring(l, -1) || lua_isfunction(l, -1));
 

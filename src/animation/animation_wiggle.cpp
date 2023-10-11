@@ -43,7 +43,7 @@
 
 #include <sstream>
 
-/* virtual */ void CAnimation_Wiggle::Action(CUnit &unit, int &/*move*/, int /*scale*/) const
+void CAnimation_Wiggle::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	int x = ParseAnimInt(unit, this->x);
 	int y = ParseAnimInt(unit, this->y);
