@@ -33,6 +33,8 @@
 
 //@{
 
+#include <memory>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -50,7 +52,7 @@ class CUpgradeModifier;
 /// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 
-extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+extern std::unique_ptr<CUpgradeModifier> UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 
 extern int NumUpgradeModifiers;
 
@@ -88,7 +90,7 @@ extern void UpgradeLost(CPlayer &player, int id);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 
-extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um); /// Apply upgrade modifier of an individual upgrade
+extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier &um); /// Apply upgrade modifier of an individual upgrade
 extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade); /// Make a unit acquire in individual upgrade
 extern void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade); /// Make a unit lose in individual upgrade
 
