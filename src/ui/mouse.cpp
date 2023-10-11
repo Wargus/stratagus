@@ -1438,7 +1438,7 @@ static int SendSpellCast(const Vec2i &tilePos)
 			continue;
 		}
 		// CursorValue here holds the spell type id
-		const SpellType *spell = SpellTypeTable[CursorValue];
+		const SpellType *spell = SpellTypeTable.at(CursorValue).get();
 		if (!spell) {
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);

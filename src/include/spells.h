@@ -41,6 +41,7 @@
 #include "unitsound.h"
 #include "vec2i.h"
 
+#include <memory>
 #include <string_view>
 #include <variant>
 
@@ -237,7 +238,7 @@ public:
 /**
 **  Define the names and effects of all available spells.
 */
-extern std::vector<SpellType *> SpellTypeTable;
+extern std::vector<std::unique_ptr<SpellType>> SpellTypeTable;
 
 
 /*----------------------------------------------------------------------------

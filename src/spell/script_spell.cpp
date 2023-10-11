@@ -324,19 +324,19 @@ static int CclDefineSpell(lua_State *l)
 	const auto it = ranges::find(SpellTypeTable, identname, &SpellType::Ident);
 	SpellType *spell = nullptr;
 	if (it != SpellTypeTable.end()) {
-		spell = *it;
+		spell = it->get();
 		DebugPrint("Redefining spell-type '%s'\n", identname.data());
 	} else {
-		spell = new SpellType(SpellTypeTable.size(), std::string{identname});
+		SpellTypeTable.push_back(std::make_unique<SpellType>(SpellTypeTable.size(), std::string{identname}));
+		spell = SpellTypeTable.back().get();
 		for (CUnitType *unitType : UnitTypes) { // adjust array for caster already defined
 			if (!unitType->CanCastSpell.empty()) {
-				unitType->CanCastSpell.resize(SpellTypeTable.size() + 1);
+				unitType->CanCastSpell.resize(SpellTypeTable.size());
 			}
 			if (!unitType->AutoCastActive.empty()) {
-				unitType->AutoCastActive.resize(SpellTypeTable.size() + 1);
+				unitType->AutoCastActive.resize(SpellTypeTable.size());
 			}
 		}
-		SpellTypeTable.push_back(spell);
 	}
 	for (int i = 1; i < args; ++i) {
 		std::string_view value = LuaToString(l, i + 1);
