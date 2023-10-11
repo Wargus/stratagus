@@ -71,6 +71,8 @@ class CFile::PImpl
 public:
 	PImpl();
 	~PImpl();
+	PImpl(const PImpl &) = delete;
+	const PImpl &operator=(const PImpl &) = delete;
 
 	int open(const char *name, long flags);
 	int close();
@@ -79,10 +81,6 @@ public:
 	int seek(long offset, int whence);
 	long tell();
 	int write(const void *buf, size_t len);
-
-private:
-	PImpl(const PImpl &rhs); // No implementation
-	const PImpl &operator = (const PImpl &rhs); // No implementation
 
 private:
 	ClfType cl_type; /// type of CFile

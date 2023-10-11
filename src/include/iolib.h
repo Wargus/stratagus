@@ -107,6 +107,8 @@ class CFile
 public:
 	CFile();
 	~CFile();
+	CFile(const CFile &) = delete;
+	const CFile &operator = (const CFile &) = delete;
 
 	int open(const char *name, long flags);
 	int close();
@@ -117,9 +119,6 @@ public:
 	static SDL_RWops *to_SDL_RWops(std::unique_ptr<CFile> file);
 
 	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
-private:
-	CFile(const CFile &rhs); // No implementation
-	const CFile &operator = (const CFile &rhs); // No implementation
 private:
 	class PImpl;
 	PImpl *pimpl;

@@ -78,17 +78,6 @@ static std::map<std::string, CUpgrade *, std::less<>> Upgrades;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
-{
-	for (unsigned int i = 0; i < MaxCosts; ++i) {
-		this->Costs[i] = rhs.Costs[i];
-		this->Storing[i] = rhs.Storing[i];
-		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
-	}
-	this->Variables = rhs.Variables;
-	return *this;
-}
-
 bool CUnitStats::operator == (const CUnitStats &rhs) const
 {
 	for (int i = 0; i != MaxCosts; ++i) {
@@ -102,10 +91,8 @@ bool CUnitStats::operator == (const CUnitStats &rhs) const
 			return false;
 		}
 	}
-	for (unsigned int i = 0; i != UnitTypeVar.GetNumberVariable(); ++i) {
-		if (this->Variables[i] != rhs.Variables[i]) {
-			return false;
-		}
+	if (this->Variables != rhs.Variables) {
+		return false;
 	}
 	return true;
 }
