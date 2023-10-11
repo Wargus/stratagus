@@ -178,28 +178,25 @@ long isqrt(long num)
 // ascii chars to hopefully avoid issues with filesystem encodings
 uint32_t fletcher32(const std::string &content)
 {
-	std::vector<uint16_t> alphas(content.size() / 2);
-	size_t shorts = 0;
+	std::vector<uint16_t> alphas;
 	size_t consideredChars = 0;
 	for (size_t i = 0; i < content.size(); i++) {
 		uint16_t c = content[i];
 		if (c >= 'A' && c <= 'z') {
-			consideredChars++;
-			if ((consideredChars % 2) == 0) {
-				alphas[shorts] = c << 8;
+			if ((consideredChars++ % 2) == 0) {
+				alphas.push_back(c);
 			} else {
-				alphas[shorts] = alphas[shorts] || c;
-				shorts++;
+				alphas.back() |= c << 8;
 			}
 		}
 	}
 
 	const uint16_t *data = alphas.data();
 	uint32_t sum1 = 0xffff, sum2 = 0xffff;
-	size_t tlen;
 
+	auto shorts = alphas.size();
 	while (shorts) {
-		tlen = ((shorts >= 359) ? 359 : shorts);
+		size_t tlen = ((shorts >= 359) ? 359 : shorts);
 		shorts -= tlen;
 		do {
 			sum2 += sum1 += *data++;

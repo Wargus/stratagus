@@ -116,6 +116,13 @@ TEST_CASE("strnlen")
 	CHECK(5u == strnlen("hello", 10));
 }
 
+TEST_CASE("fletcher32")
+{
+	CHECK(4031760169 == fletcher32("abcde"));    // 0xF04FC729
+	CHECK(1448095018 == fletcher32("abcdef"));   // 0x56502D2A
+	CHECK(3957429649 == fletcher32("abcdefgh")); // 0xEBE19591
+}
+
 // TODO: int getopt(int argc, char *const argv[], const char *optstring);
 // TODO: int GetClipboard(std::string &str);
 // TODO: int UTF8GetNext(const std::string &text, int curpos);
