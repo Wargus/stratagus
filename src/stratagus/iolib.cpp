@@ -192,7 +192,8 @@ int CFile::printf(const char *format, ...)
 	return ret;
 }
 
-static Sint64 sdl_size(SDL_RWops * context) {
+static Sint64 sdl_size(SDL_RWops *context)
+{
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
 	long currentPosition = self->tell();
 	self->seek(0, SEEK_END);
@@ -201,31 +202,38 @@ static Sint64 sdl_size(SDL_RWops * context) {
 	return size;
 }
 
-static Sint64 sdl_seek(SDL_RWops * context, Sint64 offset, int whence) {
+static Sint64 sdl_seek(SDL_RWops *context, Sint64 offset, int whence)
+{
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
 	return self->seek(offset, whence);
 }
 
-static size_t sdl_read(SDL_RWops * context, void *ptr, size_t size, size_t maxnum) {
+static size_t sdl_read(SDL_RWops *context, void *ptr, size_t size, size_t maxnum)
+{
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
 	return self->read(ptr, size * maxnum) / size;
 }
 
-static size_t sdl_write(SDL_RWops * context, const void *ptr, size_t size, size_t num) {
+static size_t sdl_write(SDL_RWops *context, const void *ptr, size_t size, size_t num)
+{
+	// Should not be called.
 	return 0;
 }
 
-static int sdl_close(SDL_RWops * context) {
+static int sdl_close(SDL_RWops *context)
+{
 	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
-	free(context);
-	return self->close();
+	const int res = self->close();
+	SDL_FreeRW(context);
+	delete self;
+	return res;
 }
 
-SDL_RWops * CFile::as_SDL_RWops()
+SDL_RWops *CFile::to_SDL_RWops(std::unique_ptr<CFile> file)
 {
-	SDL_RWops *ops = (SDL_RWops *) calloc(1, sizeof(SDL_RWops));
+	SDL_RWops *ops = SDL_AllocRW();
 	ops->type = SDL_RWOPS_UNKNOWN;
-	ops->hidden.unknown.data1 = this;
+	ops->hidden.unknown.data1 = file.release();
 	ops->size = sdl_size;
 	ops->seek = sdl_seek;
 	ops->read = sdl_read;

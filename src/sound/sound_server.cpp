@@ -377,13 +377,12 @@ static Mix_Music *LoadMusic(const char *name)
 		return currentMusic;
 	}
 
-	CFile *f = new CFile;
+	auto f = std::make_unique<CFile>();
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file '%s'\n", name);
-		delete f;
 		return nullptr;
 	}
-	currentMusic = Mix_LoadMUS_RW(f->as_SDL_RWops(), 1);
+	currentMusic = Mix_LoadMUS_RW(CFile::to_SDL_RWops(std::move(f)), 1);
 	return currentMusic;
 }
 
@@ -393,13 +392,12 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 	if (r) {
 		return r;
 	}
-	CFile *f = new CFile;
+	auto f = std::make_unique<CFile>();
 	if (f->open(name, CL_OPEN_READ) == -1) {
 		printf("Can't open file '%s'\n", name);
-		delete f;
 		return nullptr;
 	}
-	return Mix_LoadWAV_RW(f->as_SDL_RWops(), 1);
+	return Mix_LoadWAV_RW(CFile::to_SDL_RWops(std::move(f)), 1);
 }
 
 static Mix_Chunk *LoadSample(const char *name)

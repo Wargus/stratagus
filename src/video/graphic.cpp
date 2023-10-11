@@ -636,25 +636,27 @@ void CGraphic::Load(bool grayscale)
 		return;
 	}
 
-	CFile fp;
+	auto fp = std::make_unique<CFile>();
 	const fs::path name = LibraryFileName(File.string());
 	if (name.empty()) {
 		perror("Cannot find file");
-		goto error;
+		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ExitFatal(-1);
 	}
-	if (fp.open(name.string().c_str(), CL_OPEN_READ) == -1) {
+	if (fp->open(name.string().c_str(), CL_OPEN_READ) == -1) {
 		perror("Can't open file");
-		goto error;
+		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ExitFatal(-1);
 	}
-	Surface = IMG_Load_RW(fp.as_SDL_RWops(), 0);
+	Surface = IMG_Load_RW(CFile::to_SDL_RWops(std::move(fp)), 1);
 	if (Surface == nullptr) {
 		fprintf(stderr, "Couldn't load file %s: %s", name.u8string().c_str(), IMG_GetError());
-		goto error;
+		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ExitFatal(-1);
 	}
 
 	GraphicWidth = Surface->w;
 	GraphicHeight = Surface->h;
-	fp.close();
 
 	if (Surface->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(Surface);
@@ -684,11 +686,6 @@ void CGraphic::Load(bool grayscale)
 	}
 
 	GenFramesMap();
-	return;
-
- error:
-	fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
-	ExitFatal(-1);
 }
 
 /**
