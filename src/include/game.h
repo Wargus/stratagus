@@ -45,8 +45,6 @@ extern void LuaRegisterModules();       /// Register lua script of each modules
 extern void LoadModules();              /// Load all modules
 extern void CleanModules();             /// Cleanup all modules
 
-extern void FreeAllContainers();
-
 extern void SaveGameSettings(CFile &file);             /// Save game settings
 
 extern std::string GameName;                /// Name of the game
