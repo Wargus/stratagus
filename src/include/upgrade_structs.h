@@ -112,7 +112,7 @@ public:
 	CUnitStats() = default;
 	~CUnitStats() = default;
 
-	CUnitStats &operator=(const CUnitStats &rhs);
+	CUnitStats &operator=(const CUnitStats &) = default;
 
 	bool operator == (const CUnitStats &rhs) const;
 	bool operator != (const CUnitStats &rhs) const;

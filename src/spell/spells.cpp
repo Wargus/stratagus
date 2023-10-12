@@ -61,7 +61,7 @@
 /**
 ** Define the names and effects of all im play available spells.
 */
-std::vector<SpellType *> SpellTypeTable;
+std::vector<std::unique_ptr<SpellType>> SpellTypeTable;
 
 
 /*----------------------------------------------------------------------------
@@ -561,9 +561,6 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 void CleanSpells()
 {
 	DebugPrint("Cleaning spells.\n");
-	for (SpellType *spell : SpellTypeTable) {
-		delete spell;
-	}
 	SpellTypeTable.clear();
 }
 

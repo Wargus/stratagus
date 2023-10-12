@@ -1883,7 +1883,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	//apply the upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && newplayer.Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
-			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]); //apply the upgrade to this unit only
+			ApplyIndividualUpgradeModifier(*this, *UpgradeModifiers[z]); //apply the upgrade to this unit only
 		}
 	}
 

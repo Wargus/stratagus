@@ -74,6 +74,7 @@
 #include "version.h"
 #include "video.h"
 
+#include <memory>
 #include <SDL_image.h>
 
 extern void CleanGame();
@@ -99,7 +100,6 @@ bool UseHPForXp = false;              /// true if gain XP by dealing damage, fal
 ----------------------------------------------------------------------------*/
 
 extern gcn::Gui *Gui;
-static std::vector<gcn::Container *> Containers;
 
 /**
 **  Save game settings.
@@ -120,14 +120,11 @@ void CreateGame(const fs::path &filename, CMap *map);
 
 void StartMap(const std::string &filename, bool clean)
 {
-	std::string nc, rc;
-
 	gcn::Widget *oldTop = Gui->getTop();
-	gcn::Container *container = new gcn::Container();
-	Containers.push_back(container);
+	auto container = std::make_unique<gcn::Container>();
 	container->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	container->setOpaque(false);
-	Gui->setTop(container);
+	Gui->setTop(container.get());
 
 	NetConnectRunning = 0;
 	InterfaceState = IfaceState::Normal;
@@ -137,6 +134,7 @@ void StartMap(const std::string &filename, bool clean)
 	if (clean) {
 		CleanPlayers();
 	}
+	std::string nc, rc;
 	GetDefaultTextColors(nc, rc);
 
 	CreateGame(filename, &Map);
@@ -156,15 +154,6 @@ void StartMap(const std::string &filename, bool clean)
 	SetDefaultTextColors(nc, rc);
 
 	Gui->setTop(oldTop);
-	ranges::erase(Containers, container);
-	delete container;
-}
-
-void FreeAllContainers()
-{
-	for (auto *p : Containers) {
-		delete p;
-	}
 }
 
 /*----------------------------------------------------------------------------

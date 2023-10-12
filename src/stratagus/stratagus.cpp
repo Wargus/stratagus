@@ -409,7 +409,6 @@ void Exit(int err)
 	FreeGraphics();
 	FreePlayerColors();
 	FreeButtonStyles();
-	FreeAllContainers();
 	freeGuichan();
 	fprintf(stdout, "Frames %lu, Slow frames %ld = %ld%%\n",
 			   FrameCounter, SlowFrameCounter,

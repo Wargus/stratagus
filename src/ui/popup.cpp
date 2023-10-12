@@ -248,9 +248,9 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) con
 	}
 	if (Costs[ManaResCost]) {
 		const CGraphic *G = UI.Resources[ManaResCost].G;
-		const SpellType *spell = SpellTypeTable[button.Value];
+		const SpellType &spell = *SpellTypeTable.at(button.Value);
 
-		if (spell->ManaCost) {
+		if (spell.ManaCost) {
 			popupWidth = 10;
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
 				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5);
@@ -259,8 +259,8 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) con
 					popupWidth += (G->Width + 5);
 				}
 			}
-			popupWidth += font.Width(spell->ManaCost);
-			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10);
+			popupWidth += font.Width(spell.ManaCost);
+			popupWidth = std::max<int>(popupWidth, font.Width(spell.Name) + 10);
 		} else {
 			popupWidth = font.Width(button.Hint) + 10;
 		}
