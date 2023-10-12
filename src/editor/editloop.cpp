@@ -130,10 +130,10 @@ static void EditorRedoAction();
 static void EditorAddUndoAction(EditorAction action);
 
 extern gcn::Gui *Gui;
-static gcn::Container	*editorContainer	{nullptr};
-static gcn::Slider		*editorSlider		{nullptr};
-static gcn::DropDown	*toolDropdown		{nullptr};
-static gcn::DropDown	*overlaysDropdown	{nullptr};
+static std::unique_ptr<gcn::Container> editorContainer;
+static std::unique_ptr<gcn::Slider> editorSlider;
+static std::unique_ptr<gcn::DropDown> toolDropdown;
+static std::unique_ptr<gcn::DropDown> overlaysDropdown;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1063,7 +1063,7 @@ void EditorUpdateDisplay()
 		filler.G->DrawClip(filler.X, filler.Y);
 	}
 
-	if (CursorOn == ECursorOn::Map && Gui->getTop() == editorContainer && !GamePaused) {
+	if (CursorOn == ECursorOn::Map && Gui->getTop() == editorContainer.get() && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
@@ -2026,13 +2026,13 @@ void EditorMainLoop()
 
 	gcn::Widget *oldTop = Gui->getTop();
 
-	editorContainer = new gcn::Container();
+	editorContainer = std::make_unique<gcn::Container>();
 	editorContainer->setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	editorContainer->setOpaque(false);
-	Gui->setTop(editorContainer);
+	Gui->setTop(editorContainer.get());
 
 	// The slider is positioned in the bottom of the button area
-	editorSlider = new gcn::Slider();
+	editorSlider = std::make_unique<gcn::Slider>();
 	editorSlider->setStepLength(1.0 / 50);
 	editorSlider->setWidth(getButtonArea()[2] - getButtonArea()[0]);
 	editorSlider->setHeight(GetSmallFont().getHeight());
@@ -2040,7 +2040,7 @@ void EditorMainLoop()
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setBackgroundColor(gcn::Color(200, 200, 120));
 	editorSlider->setVisible(false);
-	LambdaActionListener *editorSliderListener = new LambdaActionListener([](const std::string&) {
+	auto editorSliderListener = std::make_unique<LambdaActionListener>([](const std::string&) {
 		switch (Editor.State) {
 			case EditorStateType::EditTile:
 				{
@@ -2072,14 +2072,14 @@ void EditorMainLoop()
 				break;
 		}
 	});
-	editorSlider->addActionListener(editorSliderListener);
-	editorContainer->add(editorSlider, getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
+	editorSlider->addActionListener(editorSliderListener.get());
+	editorContainer->add(editorSlider.get(), getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
 	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units", "Elevation" };
-	gcn::ListModel *toolList = new StringListModel(toolListStrings);
-	toolDropdown = new gcn::DropDown(toolList);
-	LambdaActionListener *toolDropdownListener = new LambdaActionListener([&toolListStrings](const std::string&) {
+	auto toolList = std::make_unique<StringListModel>(toolListStrings);
+	toolDropdown = std::make_unique<gcn::DropDown>(toolList.get());
+	auto toolDropdownListener = std::make_unique<LambdaActionListener>([&toolListStrings](const std::string&) {
 		int selected = toolDropdown->getSelected();
 		// Click on mode area
 		Editor.CursorUnitIndex = Editor.CursorTileIndex = Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
@@ -2139,19 +2139,19 @@ void EditorMainLoop()
 	toolDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	toolDropdown->setForegroundColor(gcn::Color(200, 200, 120));
 	toolDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
-	toolDropdown->addActionListener(toolDropdownListener);
+	toolDropdown->addActionListener(toolDropdownListener.get());
 	// toolDropdown->setFont(GetSmallFont());
 	if (UI.MenuButton.Y < toolDropdown->getHeight()) {
 		// menu button is up top, move the selection tool right
-		editorContainer->add(toolDropdown, UI.MenuButton.X + UI.MenuButton.Style->Width + 10, 0);
+		editorContainer->add(toolDropdown.get(), UI.MenuButton.X + UI.MenuButton.Style->Width + 10, 0);
 	} else {
-		editorContainer->add(toolDropdown, 0, 0);
+		editorContainer->add(toolDropdown.get(), 0, 0);
 	}
 
 	std::vector<std::string> overlaysListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
-	gcn::ListModel *overlaysList = new StringListModel(overlaysListStrings);
-	overlaysDropdown = new gcn::DropDown(overlaysList);
-	LambdaActionListener *overlaysDropdownListener = new LambdaActionListener([&overlaysListStrings](const std::string&) {
+	auto overlaysList = std::make_unique<StringListModel>(overlaysListStrings);
+	overlaysDropdown = std::make_unique<gcn::DropDown>(overlaysList.get());
+	auto overlaysDropdownListener = std::make_unique<LambdaActionListener>([&overlaysListStrings](const std::string&) {
 		const int selected = overlaysDropdown->getSelected();
 		switch (selected) {
 			case EditorOverlays::cNone:
@@ -2190,8 +2190,8 @@ void EditorMainLoop()
 	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));
 	overlaysDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
-	overlaysDropdown->addActionListener(overlaysDropdownListener);
-	editorContainer->add(overlaysDropdown, toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
+	overlaysDropdown->addActionListener(overlaysDropdownListener.get());
+	editorContainer->add(overlaysDropdown.get(), toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
 
 	UpdateMinimap = true;
 
@@ -2298,17 +2298,10 @@ void EditorMainLoop()
 	SetCallbacks(old_callbacks);
 	Gui->setTop(oldTop);
 
-	delete toolDropdown;
-	delete toolList;
-	delete toolDropdownListener;
-
-	delete overlaysDropdown;
-	delete overlaysList;
-	delete overlaysDropdownListener;
-
-	delete editorContainer;
-	delete editorSliderListener;
-	delete editorSlider;
+	toolDropdown.reset();
+	overlaysDropdown.reset();
+	editorContainer.reset();
+	editorSlider.reset();
 }
 
 /**
