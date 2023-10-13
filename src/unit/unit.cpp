@@ -549,7 +549,7 @@ void CUnit::Release(bool final)
 	CriticalOrder = nullptr;
 
 	// Remove the unit from the global units table.
-	UnitManager->ReleaseUnit(this);
+	UnitManager->ReleaseUnit(*this);
 }
 
 UnitAction CUnit::CurrentAction() const
@@ -786,9 +786,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param f2      Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
-								MapMarkerFunc *f, MapMarkerFunc *f2)
+								MapMarkerFunc &f, MapMarkerFunc *f2)
 {
-	Assert(f);
 	MapSight(*unit.Player, unit, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
@@ -1329,9 +1328,8 @@ void CUnit::Remove(CUnit *host)
 */
 void UnitLost(CUnit &unit)
 {
+	Assert(unit.Player);  // Next code didn't support no player!
 	CPlayer &player = *unit.Player;
-
-	Assert(&player);  // Next code didn't support no player!
 
 	//  Call back to AI, for killed or lost units.
 	if (Editor.Running == EditorNotRunning) {
@@ -2695,7 +2693,6 @@ int TargetPriorityCalculate(const CUnit &attacker, const CUnit &dest)
 */
 bool InReactRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != nullptr);
 	const int distance 	= unit.MapDistanceTo(target);
 	const int range 	= (unit.Player->Type == PlayerTypes::PlayerPerson)
 						  ? unit.Type->ReactRangePerson
@@ -2713,7 +2710,6 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 */
 bool InAttackRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != nullptr);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
 	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target)
@@ -2760,7 +2756,6 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 */
 Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
-	Assert(&dirUnit != nullptr);
 	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
 	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
 }

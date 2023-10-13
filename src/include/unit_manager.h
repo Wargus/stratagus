@@ -54,7 +54,7 @@ public:
 	void Init();
 
 	CUnit *AllocUnit();
-	void ReleaseUnit(CUnit *unit);
+	void ReleaseUnit(CUnit &unit);
 	void Save(CFile &file) const;
 	void Load(lua_State *Lua);
 

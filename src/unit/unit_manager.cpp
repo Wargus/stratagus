@@ -100,25 +100,23 @@ CUnit *CUnitManager::AllocUnit()
 **
 **  @param unit  Unit to release
 */
-void CUnitManager::ReleaseUnit(CUnit *unit)
+void CUnitManager::ReleaseUnit(CUnit &unit)
 {
-	Assert(unit);
-
-	if (lastCreated == unit) {
+	if (lastCreated == &unit) {
 		lastCreated = nullptr;
 	}
-	if (unit->UnitManagerData.unitSlot != -1) { // == -1 when loading.
-		Assert(units[unit->UnitManagerData.unitSlot] == unit);
+	if (unit.UnitManagerData.unitSlot != -1) { // == -1 when loading.
+		Assert(units[unit.UnitManagerData.unitSlot] == &unit);
 
 		CUnit *temp = units.back();
-		temp->UnitManagerData.unitSlot = unit->UnitManagerData.unitSlot;
-		units[unit->UnitManagerData.unitSlot] = temp;
-		unit->UnitManagerData.unitSlot = -1;
+		temp->UnitManagerData.unitSlot = unit.UnitManagerData.unitSlot;
+		units[unit.UnitManagerData.unitSlot] = temp;
+		unit.UnitManagerData.unitSlot = -1;
 		units.pop_back();
 	}
-	Assert(unit->PlayerSlot == -1);
-	releasedUnits.push_back(unit);
-	unit->ReleaseCycle = GameCycle + 500; // can be reused after this time
+	Assert(unit.PlayerSlot == -1);
+	releasedUnits.push_back(&unit);
+	unit.ReleaseCycle = GameCycle + 500; // can be reused after this time
 	//Refs = GameCycle + (NetworkMaxLag << 1); // could be reuse after this time
 }
 
@@ -201,7 +199,7 @@ void CUnitManager::Load(lua_State *l)
 			}
 		}
 		Assert(unit_index != -1 && cycle != static_cast<unsigned long>(-1));
-		ReleaseUnit(unitSlots[unit_index]);
+		ReleaseUnit(*unitSlots[unit_index]);
 		unitSlots[unit_index]->ReleaseCycle = cycle;
 		lua_pop(l, 1);
 	}

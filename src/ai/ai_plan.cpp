@@ -430,31 +430,31 @@ bool AiForce::PlanAttack()
 	return false;
 }
 
-static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
+static std::optional<Vec2i> ChooseRandomUnexploredPositionNear(const Vec2i &center)
 {
-	Assert(pos != nullptr);
-
 	int ray = 3;
 	const int maxTryCount = 8;
 	for (int i = 0; i != maxTryCount; ++i) {
-		pos->x = center.x + SyncRand() % (2 * ray + 1) - ray;
-		pos->y = center.y + SyncRand() % (2 * ray + 1) - ray;
+		Vec2i pos;
+		pos.x = center.x + SyncRand() % (2 * ray + 1) - ray;
+		pos.y = center.y + SyncRand() % (2 * ray + 1) - ray;
 
-		if (Map.Info.IsPointOnMap(*pos)
-			&& Map.Field(*pos)->playerInfo.IsExplored(*AiPlayer->Player) == false) {
-			return true;
+		if (Map.Info.IsPointOnMap(pos)
+			&& Map.Field(pos)->playerInfo.IsExplored(*AiPlayer->Player) == false) {
+			return pos;
 		}
 		ray = 3 * ray / 2;
 	}
-	return false;
+	return std::nullopt;
 }
 
-static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
+static std::pair<CUnit *, Vec2i> GetBestExplorer(const AiExplorationRequest &request)
 {
 	// Choose a target, "near"
 	const Vec2i &center = request.pos;
-	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
-		return nullptr;
+	auto pos = ChooseRandomUnexploredPositionNear(center);
+	if (!pos) {
+		return {nullptr, {-1, -1}};
 	}
 	// We have an unexplored tile in sight (pos)
 
@@ -495,7 +495,7 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 			bestunit = unit;
 		}
 	}
-	return bestunit;
+	return {bestunit, *pos};
 }
 
 
@@ -517,8 +517,7 @@ void AiSendExplorers()
 		const int requestid = SyncRand() % requestcount;
 		const AiExplorationRequest &request = AiPlayer->FirstExplorationRequest[requestid];
 
-		Vec2i pos;
-		CUnit *bestunit = GetBestExplorer(request, &pos);
+		const auto& [bestunit, pos] = GetBestExplorer(request);
 		if (bestunit != nullptr) {
 			CommandMove(*bestunit, pos, FlushCommands);
 			AiPlayer->LastExplorationGameCycle = GameCycle;

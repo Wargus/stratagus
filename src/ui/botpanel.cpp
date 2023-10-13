@@ -110,7 +110,6 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 {
 	char buf[2048];
 	ButtonAction *ba = new ButtonAction;
-	Assert(ba);
 
 	ba->Pos = pos;
 	ba->Level = level;

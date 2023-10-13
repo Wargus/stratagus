@@ -617,7 +617,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest->Type);
 			}
 			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandRepair(unit, pos, dest, status);
@@ -631,7 +631,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest->Type);
 			}
 			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandAttack(unit, pos, dest, status);
@@ -658,7 +658,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CUnit *dest = nullptr;
 			if (dstnr != (unsigned short)0xFFFF) {
 				dest = &UnitManager->GetSlotUnit(dstnr);
-				Assert(dest && dest->Type);
+				Assert(dest->Type);
 			}
 			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
 			CommandUnload(unit, pos, dest, status);
@@ -734,7 +734,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CUnit *dest = nullptr;
 				if (dstnr != (unsigned short)0xFFFF) {
 					dest = &UnitManager->GetSlotUnit(dstnr);
-					Assert(dest && dest->Type);
+					Assert(dest->Type);
 				}
 				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
 				CommandSpellCast(unit, pos, dest, *SpellTypeTable[id], status);
