@@ -2978,7 +2978,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
 					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-						order.OfferNewTarget(target, &attacker);
+						order.OfferNewTarget(target, attacker);
 					}
 					return;
 				}
