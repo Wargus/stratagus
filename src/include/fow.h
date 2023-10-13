@@ -30,14 +30,16 @@
 #ifndef __FOW_H__
 #define __FOW_H__
 
-#include <cstdint>
-#include <vector>
 #include "filesystem.h"
 #include "fow_utils.h"
 #include "map.h"
 #include "player.h"
 #include "settings.h"
 #include "video.h"
+
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 //@{
 
@@ -203,7 +205,7 @@ private:
     const uint32_t (*CurrUpscaleTableExplored)[4] = UpscaleTableVisible;
 };
 
-extern CFogOfWar *FogOfWar;
+extern std::unique_ptr<CFogOfWar> FogOfWar;
 
 
 /**

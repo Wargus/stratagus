@@ -55,7 +55,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 /// FIXME: Maybe move it into CMap
-CFogOfWar *FogOfWar; /// Fog of war itself
+std::unique_ptr<CFogOfWar> FogOfWar; /// Fog of war itself
 CGraphic *CFogOfWar::TiledFogSrc {nullptr}; // Graphic tiles set for tiled fog
 
 /*----------------------------------------------------------------------------
