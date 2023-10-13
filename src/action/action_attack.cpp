@@ -341,7 +341,7 @@ CUnit *COrder_Attack::BestTarget(const CUnit &unit, CUnit *const target1, CUnit 
 	Assert(target2 != nullptr);
 
 	return (GameSettings.SimplifiedAutoTargeting
-				? ((TargetPriorityCalculate(&unit, target1) > TargetPriorityCalculate(&unit, target2)) ? target1 : target2)
+				? ((TargetPriorityCalculate(unit, *target1) > TargetPriorityCalculate(unit, *target2)) ? target1 : target2)
 				: ((ThreatCalculate(unit, *target1) < ThreatCalculate(unit, *target2)) ?  target1 : target2));
 }
 
@@ -518,8 +518,8 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 				return true;
 			}
 			if (GameSettings.SimplifiedAutoTargeting) {
-				const int goal_priority			= TargetPriorityCalculate(&unit, goal);
-				const int newTarget_priority 	= TargetPriorityCalculate(&unit, newTarget);
+				const int goal_priority			= TargetPriorityCalculate(unit, *goal);
+				const int newTarget_priority 	= TargetPriorityCalculate(unit, *newTarget);
 
 				if ((newTarget_priority & AT_PRIORITY_MASK_HI) > (goal_priority & AT_PRIORITY_MASK_HI)) {
 					if (goal_priority & AT_ATTACKED_BY_FACTOR) { /// if unit under attack by current goal

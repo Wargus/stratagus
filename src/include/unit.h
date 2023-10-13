@@ -606,7 +606,7 @@ extern void LetUnitDie(CUnit &unit, bool suicide = false);
 extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI
 extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
-extern int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest);
+extern int TargetPriorityCalculate(const CUnit &attacker, const CUnit &dest);
 
 /// Is target within reaction range of this unit?
 extern bool InReactRange(const CUnit &unit, const CUnit &target);

@@ -2548,7 +2548,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	if (GameSettings.SimplifiedAutoTargeting) {
 		// Original algorithm return smaler values for better targets
-		return -TargetPriorityCalculate(&unit, &dest);
+		return -TargetPriorityCalculate(unit, dest);
 	}
 
 	const CUnitType &type = *unit.Type;
@@ -2599,36 +2599,32 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	return cost;
 }
 
-int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest)
+int TargetPriorityCalculate(const CUnit &attacker, const CUnit &dest)
 {
-	Assert(attacker != nullptr);
-	Assert(dest != nullptr);
+	const CPlayer &player = *attacker.Player;
+	const CUnitType &type = *attacker.Type;
+	const CUnitType &dtype = *dest.Type;
 
-	const CPlayer &player 	= *attacker->Player;
-	const CUnitType &type 	= *attacker->Type;
-	const CUnitType &dtype 	= *dest->Type;
-
-	if (!player.IsEnemy(*dest) // a friend or neutral
-		|| !dest->IsVisibleAsGoal(player)
+	if (!player.IsEnemy(dest) // a friend or neutral
+		|| !dest.IsVisibleAsGoal(player)
 		|| !CanTarget(type, dtype)) {
 		return INT_MIN;
 	}
 	// Don't attack invulnerable units
-	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest.Variable[UNHOLYARMOR_INDEX].Value) {
 		return INT_MIN;
 	}
 
-	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
-	const int minAttackRange = attacker->Type->MinAttackRange;
-	const int pathLength 	 = CalcPathLengthToUnit(*attacker, *dest, minAttackRange, attackRange);
-	int distance		 	 = attacker->MapDistanceTo(*dest);
+	const int attackRange 	 = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minAttackRange = attacker.Type->MinAttackRange;
+	const int pathLength 	 = CalcPathLengthToUnit(attacker, dest, minAttackRange, attackRange);
+	int distance		 	 = attacker.MapDistanceTo(dest);
 
 	const int reactionRange  = (player.Type == PlayerTypes::PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 
 
-	if (!InAttackRange(*attacker, *dest)
-		&& ((distance > minAttackRange && pathLength < 0)
-			|| attacker->CanMove() == false)) {
+	if (!InAttackRange(attacker, dest)
+	    && ((distance > minAttackRange && pathLength < 0) || attacker.CanMove() == false)) {
 		return INT_MIN;
 	}
 
@@ -2644,8 +2640,8 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 
 	// is Threat?
 	/// Check if target attacks us (or has us as goal for any action)
-	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker
-		&& InAttackRange(*dest, *attacker)) {
+	if (dest.CurrentOrder()->HasGoal() && dest.CurrentOrder()->GetGoal() == &attacker
+	    && InAttackRange(dest, attacker)) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
 	/// Unit can attack back.
@@ -2683,7 +2679,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	priority |= (255 - (pathLength > 255 || pathLength < 0 ? 255 : pathLength)) << AT_DISTANCE_OFFSET;
 
 	// Remaining HP (Health) (0..100)%
-	priority |= 100 - dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max;
+	priority |= 100 - dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max;
 
 	return priority;
 }
