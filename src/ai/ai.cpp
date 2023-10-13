@@ -161,7 +161,7 @@
 
 int AiSleepCycles;              /// Ai sleeps # cycles
 
-std::vector<CAiType *> AiTypes; /// List of all AI types.
+std::vector<std::unique_ptr<CAiType>> AiTypes; /// List of all AI types.
 AiHelper AiHelpers;             /// AI helper variables
 
 PlayerAi *AiPlayer;             /// Current AI player
@@ -439,22 +439,17 @@ void AiInit(CPlayer &player)
 		LogPrint("AI: Look at the DefineAi() documentation.\n");
 		Exit(0);
 	}
-	size_t i;
-	CAiType *ait = nullptr;
 
-	for (i = 0; i < AiTypes.size(); ++i) {
-		ait = AiTypes[i];
-		if (!ait->Race.empty() && ait->Race != PlayerRaces.Name[player.Race]) {
-			continue;
-		}
-		if (!player.AiName.empty() && ait->Name != player.AiName) {
-			continue;
-		}
-		break;
-	}
-	if (i == AiTypes.size()) {
+	auto it = ranges::find_if(AiTypes, [&](const auto& ait){
+		return (ait->Race.empty() || ait->Race == PlayerRaces.Name[player.Race])
+		    && (player.AiName.empty() || ait->Name == player.AiName);
+		});
+	CAiType *ait = nullptr;
+	if (it == AiTypes.end()) {
 		LogPrint("AI: Found no matching ai scripts at all, defaulting to the first AI!\n");
-		ait = AiTypes[0];
+		ait = AiTypes[0].get();
+	} else {
+		ait = it->get();
 	}
 	if (player.AiName.empty()) {
 		LogPrint("AI: not found!!!!!!!!!!\n");
@@ -505,9 +500,6 @@ void FreeAi()
 	CleanAi();
 
 	//  Free AiTypes.
-	for (CAiType *aitype : AiTypes) {
-		delete aitype;
-	}
 	AiTypes.clear();
 
 	//  Free AiHelpers.
