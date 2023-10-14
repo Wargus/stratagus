@@ -45,12 +45,13 @@
 #include "video.h"
 
 #include <map>
+#include <memory>
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-using IconMap = std::map<std::string, CIcon *, std::less<>>;
+using IconMap = std::map<std::string, std::unique_ptr<CIcon>, std::less<>>;
 static IconMap Icons;   /// Map of ident to icon.
 
 
@@ -85,12 +86,12 @@ CIcon::~CIcon()
 */
 /* static */ CIcon *CIcon::New(const std::string &ident)
 {
-	CIcon *&icon = Icons[ident];
+	auto &icon = Icons[ident];
 
 	if (icon == nullptr) {
-		icon = new CIcon(ident);
+		icon = std::make_unique<CIcon>(ident);
 	}
-	return icon;
+	return icon.get();
 }
 
 /**
@@ -106,7 +107,7 @@ CIcon::~CIcon()
 	if (it == Icons.end()) {
 		DebugPrint("icon not found: %s\n", ident.data());
 	}
-	return it->second;
+	return it->second.get();
 }
 
 void CIcon::Load()
@@ -400,9 +401,6 @@ void LoadIcons()
 */
 void CleanIcons()
 {
-	for (auto &[key, icon] : Icons) {
-		delete icon;
-	}
 	Icons.clear();
 }
 
