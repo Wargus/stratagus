@@ -59,7 +59,7 @@
 
 std::string ClickMissile;        /// FIXME:docu
 std::string DamageMissile;       /// FIXME:docu
-std::map<std::string, ButtonStyle *> ButtonStyleHash;
+std::map<std::string, std::unique_ptr<ButtonStyle>> ButtonStyleHash;
 
 static int HandleCount = 1;     /// Lua handler count
 
@@ -746,7 +746,7 @@ static int CclSetFancyBuildings(lua_State *l)
 */
 ButtonStyle *FindButtonStyle(const std::string &style)
 {
-	return ButtonStyleHash[style];
+	return ButtonStyleHash[style].get();
 }
 
 /**
@@ -832,9 +832,9 @@ static int CclDefineButtonStyle(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const std::string style = std::string{LuaToString(l, 1)};
-	ButtonStyle *&b = ButtonStyleHash[style];
+	auto &b = ButtonStyleHash[style];
 	if (!b) {
-		b = new ButtonStyle;
+		b = std::make_unique<ButtonStyle>();
 		// Set to bogus value to see if it was set later
 		b->Default.TextPos.x = b->Hover.TextPos.x = b->Clicked.TextPos.x = 0xFFFFFF;
 	}

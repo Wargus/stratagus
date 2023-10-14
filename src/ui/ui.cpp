@@ -377,9 +377,6 @@ void CleanUserInterface()
 
 void FreeButtonStyles()
 {
-	for (auto &[key, value] : ButtonStyleHash) {
-		delete value;
-	}
 	ButtonStyleHash.clear();
 }
 
