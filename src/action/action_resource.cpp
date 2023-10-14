@@ -989,9 +989,9 @@ int COrder_Resource::StopGathering(CUnit &unit)
 int COrder_Resource::MoveToDepot(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
+	Assert(this->GetGoal());
 	CUnit &goal = *this->GetGoal();
 	CPlayer &player = *unit.Player;
-	Assert(&goal);
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:

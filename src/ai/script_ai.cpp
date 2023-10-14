@@ -337,9 +337,9 @@ static int CclDefineAiHelper(lua_State *l)
 
 static CAiType *GetAiTypesByName(const std::string_view name)
 {
-	for (CAiType *ait : AiTypes) {
+	for (auto &ait : AiTypes) {
 		if (ait->Name == name) {
-			return ait;
+			return ait.get();
 		}
 	}
 	return nullptr;
@@ -394,18 +394,17 @@ static int CclDefineAi(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 
-	CAiType *aitype = new CAiType;
-
 	// AI Name
 	const std::string_view aiName = LuaToString(l, 1);
-	aitype->Name = aiName;
 
 #ifdef DEBUG
 	if (GetAiTypesByName(aiName)) {
 		DebugPrint("Warning two or more AI's with the same name '%s'\n", aiName.data());
 	}
 #endif
-	AiTypes.insert(AiTypes.begin(), aitype);
+	AiTypes.insert(AiTypes.begin(), std::make_unique<CAiType>());
+	CAiType *aitype = AiTypes.front().get();
+	aitype->Name = aiName;
 
 	// AI Race
 	const std::string_view value = LuaToString(l, 2);

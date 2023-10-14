@@ -56,17 +56,16 @@ public:
 	PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const override;
 	void UpdatePathFinderData(PathFinderInput &input) override;
 	bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/) override;
-
 	const Vec2i GetGoalPos() const override { return goalPos; }
-	bool IsWeakTargetSelected() const;
+
 	bool IsAutoTargeting() const;
+	void OfferNewTarget(const CUnit &unit, CUnit &target);
+
+private:
 	bool IsMovingToAttackPos() const;
 	bool IsAttackGroundOrWall() const;
 	bool IsTargetTooClose(const CUnit &unit) const;
-	CUnit *BestTarget(const CUnit &unit, CUnit *const target1, CUnit *const target2) const;
-	void OfferNewTarget(const CUnit &unit, CUnit *const target);
-
-private:
+	CUnit &BestTarget(const CUnit &unit, CUnit &target1, CUnit &target2) const;
 	bool CheckIfGoalValid(CUnit &unit);
 	void TurnToTarget(CUnit &unit, const CUnit *target);
 	void SetAutoTarget(CUnit &unit, CUnit *target);

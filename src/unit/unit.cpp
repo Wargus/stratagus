@@ -549,7 +549,7 @@ void CUnit::Release(bool final)
 	CriticalOrder = nullptr;
 
 	// Remove the unit from the global units table.
-	UnitManager->ReleaseUnit(this);
+	UnitManager->ReleaseUnit(*this);
 }
 
 UnitAction CUnit::CurrentAction() const
@@ -786,9 +786,8 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param f2      Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
-								MapMarkerFunc *f, MapMarkerFunc *f2)
+								MapMarkerFunc &f, MapMarkerFunc *f2)
 {
-	Assert(f);
 	MapSight(*unit.Player, unit, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
@@ -1329,9 +1328,8 @@ void CUnit::Remove(CUnit *host)
 */
 void UnitLost(CUnit &unit)
 {
+	Assert(unit.Player);  // Next code didn't support no player!
 	CPlayer &player = *unit.Player;
-
-	Assert(&player);  // Next code didn't support no player!
 
 	//  Call back to AI, for killed or lost units.
 	if (Editor.Running == EditorNotRunning) {
@@ -2548,7 +2546,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	if (GameSettings.SimplifiedAutoTargeting) {
 		// Original algorithm return smaler values for better targets
-		return -TargetPriorityCalculate(&unit, &dest);
+		return -TargetPriorityCalculate(unit, dest);
 	}
 
 	const CUnitType &type = *unit.Type;
@@ -2599,36 +2597,32 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	return cost;
 }
 
-int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest)
+int TargetPriorityCalculate(const CUnit &attacker, const CUnit &dest)
 {
-	Assert(attacker != nullptr);
-	Assert(dest != nullptr);
+	const CPlayer &player = *attacker.Player;
+	const CUnitType &type = *attacker.Type;
+	const CUnitType &dtype = *dest.Type;
 
-	const CPlayer &player 	= *attacker->Player;
-	const CUnitType &type 	= *attacker->Type;
-	const CUnitType &dtype 	= *dest->Type;
-
-	if (!player.IsEnemy(*dest) // a friend or neutral
-		|| !dest->IsVisibleAsGoal(player)
+	if (!player.IsEnemy(dest) // a friend or neutral
+		|| !dest.IsVisibleAsGoal(player)
 		|| !CanTarget(type, dtype)) {
 		return INT_MIN;
 	}
 	// Don't attack invulnerable units
-	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+	if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest.Variable[UNHOLYARMOR_INDEX].Value) {
 		return INT_MIN;
 	}
 
-	const int attackRange 	 = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
-	const int minAttackRange = attacker->Type->MinAttackRange;
-	const int pathLength 	 = CalcPathLengthToUnit(*attacker, *dest, minAttackRange, attackRange);
-	int distance		 	 = attacker->MapDistanceTo(*dest);
+	const int attackRange 	 = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
+	const int minAttackRange = attacker.Type->MinAttackRange;
+	const int pathLength 	 = CalcPathLengthToUnit(attacker, dest, minAttackRange, attackRange);
+	int distance		 	 = attacker.MapDistanceTo(dest);
 
 	const int reactionRange  = (player.Type == PlayerTypes::PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
 
 
-	if (!InAttackRange(*attacker, *dest)
-		&& ((distance > minAttackRange && pathLength < 0)
-			|| attacker->CanMove() == false)) {
+	if (!InAttackRange(attacker, dest)
+	    && ((distance > minAttackRange && pathLength < 0) || attacker.CanMove() == false)) {
 		return INT_MIN;
 	}
 
@@ -2644,8 +2638,8 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 
 	// is Threat?
 	/// Check if target attacks us (or has us as goal for any action)
-	if (dest->CurrentOrder()->HasGoal() && dest->CurrentOrder()->GetGoal() == attacker
-		&& InAttackRange(*dest, *attacker)) {
+	if (dest.CurrentOrder()->HasGoal() && dest.CurrentOrder()->GetGoal() == &attacker
+	    && InAttackRange(dest, attacker)) {
 		priority |= AT_ATTACKED_BY_FACTOR;
 	}
 	/// Unit can attack back.
@@ -2683,7 +2677,7 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 	priority |= (255 - (pathLength > 255 || pathLength < 0 ? 255 : pathLength)) << AT_DISTANCE_OFFSET;
 
 	// Remaining HP (Health) (0..100)%
-	priority |= 100 - dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max;
+	priority |= 100 - dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max;
 
 	return priority;
 }
@@ -2699,7 +2693,6 @@ int TargetPriorityCalculate(const CUnit *const attacker, const CUnit *const dest
 */
 bool InReactRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != nullptr);
 	const int distance 	= unit.MapDistanceTo(target);
 	const int range 	= (unit.Player->Type == PlayerTypes::PlayerPerson)
 						  ? unit.Type->ReactRangePerson
@@ -2717,7 +2710,6 @@ bool InReactRange(const CUnit &unit, const CUnit &target)
 */
 bool InAttackRange(const CUnit &unit, const CUnit &target)
 {
-	Assert(&target != nullptr);
 	const int range 	= unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	const int minRange 	= unit.Type->MinAttackRange;
 	const int distance 	= unit.Container ? unit.Container->MapDistanceTo(target)
@@ -2764,7 +2756,6 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 */
 Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool dirFrom, const int minRange, const int devRadius, const int rangeDev)
 {
-	Assert(&dirUnit != nullptr);
 	const Vec2i dirPos = dirUnit.tilePos + dirUnit.Type->GetHalfTileSize();
 	return GetRndPosInDirection(srcPos, dirPos, dirFrom, minRange, devRadius, rangeDev);
 }
@@ -2982,7 +2973,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				if (attacker.IsVisibleAsGoal(*target.Player)) {
 					if (UnitReachable(target, attacker, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
 						target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-						order.OfferNewTarget(target, &attacker);
+						order.OfferNewTarget(target, attacker);
 					}
 					return;
 				}

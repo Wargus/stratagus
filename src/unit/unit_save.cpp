@@ -72,11 +72,7 @@ std::string UnitReference(const CUnit &unit)
 std::string UnitReference(const CUnitPtr &unit)
 {
 	Assert(unit != nullptr);
-
-	std::ostringstream ss;
-	ss << "U" << std::setfill('0') << std::setw(4) << std::uppercase
-	   << std::hex << UnitNumber(*unit);
-	return ss.str();
+	return UnitReference(*unit);
 }
 
 void PathFinderInput::Save(CFile &file) const

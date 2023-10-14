@@ -997,8 +997,8 @@ static bool AiAssignHarvester(CUnit &unit, int resource)
 		return false;
 	}
 
+	Assert(unit.Type->ResInfo[resource]);
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
-	Assert(&resinfo);
 
 	if (resinfo.TerrainHarvester) {
 		return AiAssignHarvesterFromTerrain(unit, resource);

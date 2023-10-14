@@ -421,9 +421,6 @@ void Exit(int err)
 	if (UnitManager) {
 		delete UnitManager;
 	}
-	if (FogOfWar) {
-		delete FogOfWar;
-	}
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
@@ -759,7 +756,7 @@ int stratagusMain(int argc, char **argv)
 		// init globals
 		Map.AllocateTileset();
 		UnitManager = new CUnitManager();
-		FogOfWar = new CFogOfWar();
+		FogOfWar = std::make_unique<CFogOfWar>();
 
 		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 

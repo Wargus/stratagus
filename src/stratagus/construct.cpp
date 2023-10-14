@@ -51,7 +51,7 @@
 /**
 **  Constructions.
 */
-static std::vector<CConstruction *> Constructions;
+static std::vector<std::unique_ptr<CConstruction>> Constructions;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -133,7 +133,7 @@ void InitConstructions()
 */
 void LoadConstructions()
 {
-	for (CConstruction *c :Constructions) {
+	for (auto &c : Constructions) {
 		c->Load();
 	}
 }
@@ -144,9 +144,6 @@ void LoadConstructions()
 void CleanConstructions()
 {
 	//  Free the construction table.
-	for (CConstruction *c : Constructions) {
-		delete c;
-	}
 	Constructions.clear();
 }
 
@@ -187,10 +184,10 @@ static int CclDefineConstruction(lua_State *l)
 	CConstruction *construction = nullptr;
 
 	if (it == Constructions.end()) {
-		construction = new CConstruction;
-		Constructions.push_back(construction);
+		Constructions.push_back(std::make_unique<CConstruction>());
+		construction = Constructions.back().get();
 	} else { // redefine completely.
-		construction = *it;
+		construction = it->get();
 		construction->Clean();
 	}
 	construction->Ident = str;

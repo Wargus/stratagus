@@ -59,7 +59,7 @@ std::vector<CUnit *> Select(const Vec2i &ltPos, const Vec2i &rbPos)
 	return Select(ltPos, rbPos, NoFilter());
 }
 
-std::vector<CUnit *>  SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos)
+std::vector<CUnit *> SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos)
 {
 	return Select(ltPos, rbPos, NoFilter());
 }
@@ -667,7 +667,7 @@ private:
 		int best_cost = GameSettings.SimplifiedAutoTargeting ? INT_MIN : INT_MAX;
 
 		for (Iterator it = begin; it != end; ++it) {
-			int cost = GameSettings.SimplifiedAutoTargeting ? TargetPriorityCalculate(attacker, *it) : ComputeCost(*it);
+			int cost = GameSettings.SimplifiedAutoTargeting ? TargetPriorityCalculate(*attacker, **it) : ComputeCost(*it);
 
 			if (GameSettings.SimplifiedAutoTargeting ? (cost > best_cost) : (cost < best_cost)) {
 				enemy = *it;
@@ -767,17 +767,13 @@ public:
 	**  @param range  Distance range to look.
 	**
 	*/
-	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-		best_unit(0), best_cost(INT_MIN), size((a.Type->Missile.Missile->Range + r) * 2)
+	BestRangeTargetFinder(const CUnit &a, const int r) :
+		attacker(&a),
+		range(r),
+		size((a.Type->Missile.Missile->Range + r) * 2),
+		good(size * size, 0),
+		bad(size * size, 0)
 	{
-		good = new std::vector<int>(size * size, 0);
-		bad = new std::vector<int>(size * size, 0);
-	}
-
-	~BestRangeTargetFinder()
-	{
-		delete good;
-		delete bad;
 	}
 
 	class FillBadGood
@@ -789,35 +785,35 @@ public:
 		{
 		}
 
-		template <typename Iterator>
-		int Fill(Iterator begin, Iterator end)
+		template <typename Container>
+		int Fill(Container &&container)
 		{
-			for (Iterator it = begin; it != end; ++it) {
-				Compute(*it);
+			for (auto *elem : container) {
+				Compute(*elem);
 			}
 			return enemy_count;
 		}
 	private:
 
-		void Compute(CUnit *const dest)
+		void Compute(CUnit &dest)
 		{
 			const CPlayer &player = *attacker->Player;
 
-			if (!dest->IsVisibleAsGoal(player)) {
-				dest->CacheLock = 1;
+			if (!dest.IsVisibleAsGoal(player)) {
+				dest.CacheLock = 1;
 				return;
 			}
 
-			const CUnitType &type =  *attacker->Type;
-			const CUnitType &dtype = *dest->Type;
+			const CUnitType &type = *attacker->Type;
+			const CUnitType &dtype = *dest.Type;
 			// won't be a target...
 			if (!CanTarget(type, dtype)) { // can't be attacked.
-				dest->CacheLock = 1;
+				dest.CacheLock = 1;
 				return;
 			}
 			// Don't attack invulnerable units
-			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
-				dest->CacheLock = 1;
+			if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest.Variable[UNHOLYARMOR_INDEX].Value) {
+				dest.CacheLock = 1;
 				return;
 			}
 
@@ -827,13 +823,13 @@ public:
 			int cost = 0;
 			int hp_damage_evaluate;
 			if (Damage) {
-				hp_damage_evaluate = CalculateDamage(*attacker, *dest, Damage.get());
+				hp_damage_evaluate = CalculateDamage(*attacker, dest, Damage.get());
 			} else {
 				hp_damage_evaluate = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 			}
-			if (!player.IsEnemy(*dest)) { // a friend or neutral
-				dest->CacheLock = 1;
+			if (!player.IsEnemy(dest)) { // a friend or neutral
+				dest.CacheLock = 1;
 
 				// Calc a negative cost
 				// The gost is more important when the unit would be killed
@@ -841,9 +837,8 @@ public:
 
 				// It costs (is positive) if hp_damage_evaluate>dest->HP ...)
 				// FIXME : assume that PRIORITY_FACTOR>HEALTH_FACTOR
-				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate -
-										dest->Variable[HP_INDEX].Value) /
-					   (dtype.TileWidth * dtype.TileWidth);
+				cost = HEALTH_FACTOR * (2 * hp_damage_evaluate - dest.Variable[HP_INDEX].Value)
+				     / (dtype.TileWidth * dtype.TileWidth);
 				cost = std::max(cost, 1);
 				cost = -cost;
 			} else {
@@ -866,7 +861,7 @@ public:
 				// Give a boost to unit we can kill in one shoot only
 
 				// calculate HP which will remain in the enemy unit, after hit
-				int effective_hp = (dest->Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
+				int effective_hp = (dest.Variable[HP_INDEX].Value - 2 * hp_damage_evaluate);
 
 				// Unit we won't kill are evaluated the same
 				// Unit we are sure to kill are all evaluated the same (except PRIORITY)
@@ -888,27 +883,27 @@ public:
 				// Removed Unit's are in bunkers
 				int d;
 				if (attacker->Removed) {
-					d = attacker->Container->MapDistanceTo(*dest);
+					d = attacker->Container->MapDistanceTo(dest);
 				} else {
-					d = attacker->MapDistanceTo(*dest);
+					d = attacker->MapDistanceTo(dest);
 				}
 
 				int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 				if (d <= attackrange ||
-					(d <= range && UnitReachable(*attacker, *dest, attackrange, false))) {
+					(d <= range && UnitReachable(*attacker, dest, attackrange, false))) {
 					++enemy_count;
 				} else {
-					dest->CacheLock = 1;
+					dest.CacheLock = 1;
 				}
 				// Attack walls only if we are stuck in them
 				if (dtype.BoolFlag[WALL_INDEX].value && d > 1) {
-					dest->CacheLock = 1;
+					dest.CacheLock = 1;
 				}
 			}
 
 			// cost map is relative to attacker position
-			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+			const int x = dest.tilePos.x - attacker->tilePos.x + (size / 2);
+			const int y = dest.tilePos.y - attacker->tilePos.y + (size / 2);
 
 			// Mark the good/bad array...
 			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
@@ -934,7 +929,6 @@ public:
 			}
 		}
 
-
 	private:
 		const CUnit *attacker;
 		const int range;
@@ -947,54 +941,48 @@ public:
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
 		if (!GameSettings.SimplifiedAutoTargeting) {
-			FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
+			FillBadGood(*attacker, range, &good, &bad, size).Fill(table);
 		}
-		return Find(table.begin(), table.end());
-
-	}
-
-private:
-	template <typename Iterator>
-	CUnit *Find(Iterator begin, Iterator end)
-	{
-		for (Iterator it = begin; it != end; ++it) {
-			Compute(*it);
+		for (auto* unit : table) {
+			Compute(*unit);
 		}
 		return best_unit;
 	}
 
-	void Compute(CUnit *const dest)
+private:
+
+	void Compute(CUnit &dest)
 	{
-		if (dest->CacheLock) {
-			dest->CacheLock = 0;
+		if (dest.CacheLock) {
+			dest.CacheLock = 0;
 			return;
 		}
 
 		if (GameSettings.SimplifiedAutoTargeting) {
-			const int cost = TargetPriorityCalculate(attacker, dest);
+			const int cost = TargetPriorityCalculate(*attacker, dest);
 			if (cost > best_cost) {
-				best_unit = dest;
+				best_unit = &dest;
 				best_cost = cost;
 			}
 			return;
 		}
 
 		const CUnitType &type = *attacker->Type;
-		const CUnitType &dtype = *dest->Type;
+		const CUnitType &dtype = *dest.Type;
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;
 
 		// put in x-y the real point which will be hit...
 		// (only meaningful when dtype->TileWidth > 1)
-		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileWidth - 1);
-		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
+		clamp<int>(&x, dest.tilePos.x, dest.tilePos.x + dtype.TileWidth - 1);
+		clamp<int>(&y, dest.tilePos.y, dest.tilePos.y + dtype.TileHeight - 1);
 
 		int sbad = 0;
 		int sgood = 0;
 
 		// cost map is relative to attacker position
-		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+		x = dest.tilePos.x - attacker->tilePos.x + (size / 2);
+		y = dest.tilePos.y - attacker->tilePos.y + (size / 2);
 
 		// calculate the costs:
 		// costs are the full costs at the target and the splash-factor
@@ -1004,7 +992,7 @@ private:
 			for (int xx = -1; xx <= 1; ++xx) {
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
-				if (pos < 0 || static_cast<unsigned int>(pos) >= good->size()) {
+				if (pos < 0 || static_cast<unsigned int>(pos) >= good.size()) {
 					DebugPrint("BUG: RangeTargetFinder.Compute out of range. "
 					           "size: %d, pos: %d, x: %d, xx: %d, y: %d, yy: %d \n",
 					           size,
@@ -1015,8 +1003,8 @@ private:
 					           yy);
 					break;
 				}
-				sbad += bad->at(pos) / localFactor;
-				sgood += good->at(pos) / localFactor;
+				sbad += bad.at(pos) / localFactor;
+				sgood += good.at(pos) / localFactor;
 			}
 		}
 
@@ -1029,18 +1017,18 @@ private:
 		int cost = sbad / sgood;
 		if (cost > best_cost) {
 			best_cost = cost;
-			best_unit = dest;
+			best_unit = &dest;
 		}
 	}
 
 private:
 	const CUnit *attacker;
 	const int range;
-	CUnit *best_unit;
-	int best_cost;
-	std::vector<int> *good;
-	std::vector<int> *bad;
+	CUnit *best_unit = nullptr;
+	int best_cost = INT_MIN;
 	const int size;
+	std::vector<int> good;
+	std::vector<int> bad;
 };
 
 struct CompareUnitDistance {
@@ -1144,9 +1132,8 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		                     range,
 		                     MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
 
-		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {
-			std::sort(table.begin(), table.begin() + n, CompareUnitDistance(unit));
+			ranges::sort(table, CompareUnitDistance(unit));
 		}
 
 		// Find the best unit to attack
