@@ -492,7 +492,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		if (this->offeredTarget->IsVisibleAsGoal(*unit.Player)
 		    && (!immobile || InAttackRange(unit, *this->offeredTarget))) {
 			newTarget = newTarget ? &BestTarget(unit, *this->offeredTarget, *newTarget)
-			                      : this->offeredTarget;
+			                      : static_cast<CUnit*>(this->offeredTarget);
 		}
 		this->offeredTarget.Reset();
 	}
