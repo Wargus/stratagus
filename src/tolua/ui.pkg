@@ -173,11 +173,11 @@ class CUserInterface
 	CUIButton *ResearchingButton;
 	vector<CUIButton> TransportingButtons;
 
-        vector<string> LifeBarColorNames;
-        vector<int> LifeBarPercents;
-        int LifeBarYOffset;
-		int LifeBarPadding;
-        bool LifeBarBorder;
+	vector<string> LifeBarColorNames;
+	vector<int> LifeBarPercents;
+	int LifeBarYOffset;
+	int LifeBarPadding;
+	bool LifeBarBorder;
 
 	CColor CompletedBarColorRGB;
 	bool CompletedBarShadow;
@@ -210,7 +210,7 @@ class CUserInterface
 	void Load();
 };
 
-extern CUserInterface UI;
+extern tolua_readonly CUserInterface UI;
 
 class CIcon
 {
@@ -310,11 +310,11 @@ class Widget
 	virtual void setHotKey(const int key);
 	virtual void setHotKey(const char *key);
 
-        virtual void requestFocus();
+	virtual void requestFocus();
 
 	virtual void addActionListener(LuaActionListener *actionListener);
-        virtual void addMouseListener(LuaActionListener *actionListener);
-        virtual void addKeyListener(LuaActionListener *actionListener);
+	virtual void addMouseListener(LuaActionListener *actionListener);
+	virtual void addKeyListener(LuaActionListener *actionListener);
 };
 
 $[
@@ -357,15 +357,15 @@ class ScrollArea : public BasicContainer
 	virtual Widget *getContent();
 	virtual void setScrollbarWidth(int width);
 	virtual int getScrollbarWidth();
-        virtual void scrollToBottom();
-        virtual void scrollToTop();
+	virtual void scrollToBottom();
+	virtual void scrollToTop();
 };
 
 class ImageWidget : public Widget
 {
 	ImageWidget(CGraphic *image);
-        ImageWidget(Mng *image);
-        ImageWidget(Movie *image);
+	ImageWidget(Mng *image);
+	ImageWidget(Movie *image);
 };
 
 class Button : public Widget
@@ -510,8 +510,8 @@ class MultiLineLabel : public Widget
 class TextBox : public Widget
 {
 	TextBox(const std::string text);
-        virtual void setEditable(bool editable);
-        virtual std::string getText();
+	virtual void setEditable(bool editable);
+	virtual std::string getText();
 };
 
 class TextField : public Widget

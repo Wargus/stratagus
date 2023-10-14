@@ -569,7 +569,7 @@ static int CclDefinePanelContents(lua_State *l)
 
 	for (int i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		CUnitInfoPanel *infopanel = new CUnitInfoPanel;
+		auto infopanel = std::make_unique<CUnitInfoPanel>();
 
 		for (lua_pushnil(l); lua_next(l, i + 1); lua_pop(l, 1)) {
 			const std::string_view key = LuaToString(l, -2);
@@ -596,17 +596,12 @@ static int CclDefinePanelContents(lua_State *l)
 			content->Pos.x += infopanel->PosX;
 			content->Pos.y += infopanel->PosY;
 		}
-		size_t j;
-		for (j = 0; j < UI.InfoPanelContents.size(); ++j) {
-			if (infopanel->Name == UI.InfoPanelContents[j]->Name) {
-				DebugPrint("Redefinition of Panel '%s'\n", infopanel->Name.c_str());
-				delete UI.InfoPanelContents[j];
-				UI.InfoPanelContents[j] = infopanel;
-				break;
-			}
-		}
-		if (j == UI.InfoPanelContents.size()) {
-			UI.InfoPanelContents.push_back(infopanel);
+		const auto it = ranges::find(UI.InfoPanelContents, infopanel->Name, &CUnitInfoPanel::Name);
+		if (it == UI.InfoPanelContents.end()) {
+			UI.InfoPanelContents.push_back(std::move(infopanel));
+		} else {
+			DebugPrint("Redefinition of Panel '%s'\n", infopanel->Name.c_str());
+			*it = std::move(infopanel);
 		}
 	}
 	return 0;
@@ -623,7 +618,7 @@ static int CclDefinePopup(lua_State *l)
 {
 	Assert(lua_istable(l, 1));
 
-	CPopup *popup = new CPopup;
+	auto popup = std::make_unique<CPopup>();
 
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);
@@ -652,15 +647,14 @@ static int CclDefinePopup(lua_State *l)
 			LuaError(l, "'%s' invalid for DefinePopups", key.data());
 		}
 	}
-	for (size_t j = 0; j < UI.ButtonPopups.size(); ++j) {
-		if (popup->Ident == UI.ButtonPopups[j]->Ident) {
-			DebugPrint("Redefinition of Popup '%s'\n", popup->Ident.c_str());
-			delete UI.ButtonPopups[j];
-			UI.ButtonPopups[j] = popup;
-			return 0;
-		}
+
+	const auto it = ranges::find(UI.ButtonPopups, popup->Ident, &CPopup::Ident);
+	if (it != UI.ButtonPopups.end()) {
+		DebugPrint("Redefinition of Popup '%s'\n", popup->Ident.c_str());
+		*it = std::move(popup);
+	} else {
+		UI.ButtonPopups.push_back(std::move(popup));
 	}
-	UI.ButtonPopups.push_back(popup);
 	return 0;
 }
 

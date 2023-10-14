@@ -338,9 +338,6 @@ void CleanUserInterface()
 
 	// Info Panel
 	CGraphic::Free(UI.InfoPanel.G);
-	for (CUnitInfoPanel *panel : UI.InfoPanelContents) {
-		delete panel;
-	}
 	UI.InfoPanelContents.clear();
 
 	if (Preference.IconFrameG) {
@@ -351,9 +348,6 @@ void CleanUserInterface()
 	}
 
 	// Button Popups
-	for (CPopup *popup : UI.ButtonPopups) {
-		delete popup;
-	}
 	UI.ButtonPopups.clear();
 
 	delete UI.SingleSelectedButton;
