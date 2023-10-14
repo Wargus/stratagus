@@ -49,8 +49,8 @@
 ----------------------------------------------------------------------------*/
 
 // Guichan stuff we need
-gcn::Gui *Gui;         /// A Gui object - binds it all together
-gcn::SDLInput *Input;  /// Input driver
+std::unique_ptr<gcn::Gui> Gui; /// A Gui object - binds it all together
+static std::unique_ptr<gcn::SDLInput> Input; /// Input driver
 
 static EventCallback GuichanCallbacks;
 
@@ -61,12 +61,6 @@ static std::stack<MenuScreen *> MenuStack;
 ----------------------------------------------------------------------------*/
 
 
-static void MenuHandleButtonDown(unsigned)
-{
-}
-static void MenuHandleButtonUp(unsigned)
-{
-}
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
 	PixelPos pos(screenPos);
@@ -92,26 +86,24 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 */
 void initGuichan()
 {
-	gcn::Graphics *graphics;
-
-	graphics = new gcn::SDLGraphics();
+	auto *graphics = new gcn::SDLGraphics();
 
 	// Set the target for the graphics object to be the screen.
 	// In other words, we will draw to the screen.
 	// Note, any surface will do, it doesn't have to be the screen.
-	((gcn::SDLGraphics *)graphics)->setTarget(&TheScreen);
+	graphics->setTarget(&TheScreen);
 
-	Input = new gcn::SDLInput();
+	Input = std::make_unique<gcn::SDLInput>();
 
-	Gui = new gcn::Gui();
+	Gui = std::make_unique<gcn::Gui>();
 	Gui->setGraphics(graphics);
-	Gui->setInput(Input);
+	Gui->setInput(Input.get());
 	Gui->setTop(nullptr);
 
 	Gui->setUseDirtyDrawing(1);
 
-	GuichanCallbacks.ButtonPressed = &MenuHandleButtonDown;
-	GuichanCallbacks.ButtonReleased = &MenuHandleButtonUp;
+	GuichanCallbacks.ButtonPressed = [](unsigned) {};
+	GuichanCallbacks.ButtonReleased = [](unsigned) {};
 	GuichanCallbacks.MouseMoved = &MenuHandleMouseMove;
 	GuichanCallbacks.MouseExit = &HandleMouseExit;
 	GuichanCallbacks.KeyPressed = &MenuHandleKeyDown;
@@ -127,11 +119,9 @@ void freeGuichan()
 {
 	if (Gui) {
 		delete Gui->getGraphics();
-		delete Gui;
 		Gui = nullptr;
 	}
 
-	delete Input;
 	Input = nullptr;
 }
 

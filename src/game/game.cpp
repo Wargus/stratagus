@@ -99,7 +99,7 @@ bool UseHPForXp = false;              /// true if gain XP by dealing damage, fal
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern gcn::Gui *Gui;
+extern std::unique_ptr<gcn::Gui> Gui;
 
 /**
 **  Save game settings.
