@@ -313,7 +313,6 @@ set(stratagusmain_SRCS
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
-	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/player.cpp
@@ -616,6 +615,15 @@ set(stratagus_generic_HDRS
 	src/include/SetupConsole_win32.h
 )
 
+set(stratagus_tests_SRCS
+	tests/main.cpp
+	tests/stratagus/test_translate.cpp
+	tests/stratagus/test_util.cpp
+	tests/network/test_net_lowlevel.cpp
+	tests/network/test_netconnect.cpp
+	tests/network/test_network.cpp
+	tests/network/test_udpsocket.cpp
+)
 
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
@@ -1183,19 +1191,24 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
+add_library(stratagus_lib ${stratagus_SRCS} ${stratagus_HDRS})
 if (ENABLE_STDIO_REDIRECT)
-	add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
+	add_executable(stratagus WIN32 src/stratagus/main.cpp)
 else ()
-	add_executable(stratagus ${stratagus_SRCS} ${stratagus_HDRS})
+	add_executable(stratagus src/stratagus/main.cpp)
 endif ()
-target_link_libraries(stratagus ${stratagus_LIBS} ${CMAKE_DL_LIBS})
+target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS})
+target_link_libraries(stratagus PUBLIC stratagus_lib)
 
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)
-	target_compile_options(stratagus PRIVATE ${OpenMP_CXX_FLAGS})
-	target_link_libraries(stratagus OpenMP::OpenMP_CXX)
+	target_compile_options(stratagus_lib PUBLIC ${OpenMP_CXX_FLAGS})
+	target_link_libraries(stratagus_lib PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
+add_executable(stratagus_tests ${stratagus_tests_SRCS})
+target_include_directories(stratagus_tests PUBLIC third-party/doctest/doctest)
+target_link_libraries(stratagus_tests PUBLIC stratagus_lib)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
@@ -1211,10 +1224,10 @@ endif()
 
 if(WIN32)
 	if(MSVC)
-		target_compile_options(stratagus PRIVATE "$<$<CONFIG:Release>:/Zi>")
-		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
-		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
-		target_link_options(stratagus PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
+		target_compile_options(stratagus_lib PUBLIC "$<$<CONFIG:Release>:/Zi>")
+		target_link_options(stratagus_lib PUBLIC "$<$<CONFIG:Release>:/DEBUG>")
+		target_link_options(stratagus_lib PUBLIC "$<$<CONFIG:Release>:/OPT:REF>")
+		target_link_options(stratagus_lib PUBLIC "$<$<CONFIG:Release>:/OPT:ICF>")
 	endif()
 	set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -lSDL2main")
 	set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS}")
@@ -1225,7 +1238,7 @@ if(APPLE)
 endif()
 
 if(BUILD_VENDORED_LUA)
-	add_dependencies(stratagus lua)
+	add_dependencies(stratagus_lib lua)
 else()
 	find_package(Lua51 REQUIRED)
 	find_package(Tolua++ REQUIRED)
@@ -1235,24 +1248,24 @@ if(BUILD_VENDORED_SDL)
 	set(BUILD_VENDORED_MEDIA_LIBS ON)
 	if (MSVC)
 		add_definitions(-DBUILD_VENDORED_SDL)
-		set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+		set_target_properties(stratagus_lib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 	endif()
-	add_dependencies(stratagus SDL2)
-	add_dependencies(stratagus SDL2_image)
-	add_dependencies(stratagus SDL2_mixer)
+	add_dependencies(stratagus_lib SDL2)
+	add_dependencies(stratagus_lib SDL2_image)
+	add_dependencies(stratagus_lib SDL2_mixer)
 	if(APPLE)
 		set_target_properties(stratagus PROPERTIES LINK_FLAGS "${LINK_FLAGS} -ObjC -framework AppKit -framework Carbon -framework AudioToolbox -framework Cocoa -framework CoreAudio -framework CoreGraphics -framework CoreFoundation -framework CoreVideo -framework CoreHaptics -framework GameController -framework ForceFeedback -framework IOKit -framework Metal -liconv")
 	endif()
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
-	add_dependencies(stratagus zlib)
-	add_dependencies(stratagus png)
-	add_dependencies(stratagus bzip2)
-	add_dependencies(stratagus mng)
-	add_dependencies(stratagus ogg)
-	add_dependencies(stratagus vorbis)
-	add_dependencies(stratagus theora)
+	add_dependencies(stratagus_lib zlib)
+	add_dependencies(stratagus_lib png)
+	add_dependencies(stratagus_lib bzip2)
+	add_dependencies(stratagus_lib mng)
+	add_dependencies(stratagus_lib ogg)
+	add_dependencies(stratagus_lib vorbis)
+	add_dependencies(stratagus_lib theora)
 endif()
 
 ########### next target ###############
