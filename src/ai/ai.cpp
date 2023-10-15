@@ -426,7 +426,7 @@ void SaveAi(CFile &file)
 */
 void AiInit(CPlayer &player)
 {
-	PlayerAi *pai = new PlayerAi;
+	auto pai = std::make_unique<PlayerAi>();
 
 	pai->Player = &player;
 
@@ -468,7 +468,7 @@ void AiInit(CPlayer &player)
 	pai->Collect[WoodCost] = 50;
 	pai->Collect[OilCost] = 0;
 
-	player.Ai = pai;
+	player.Ai = std::move(pai);
 }
 
 /**
@@ -486,7 +486,6 @@ void InitAiModule()
 void CleanAi()
 {
 	for (int p = 0; p < PlayerMax; ++p) {
-		delete Players[p].Ai;
 		Players[p].Ai = nullptr;
 	}
 }
@@ -527,15 +526,15 @@ void FreeAi()
 **  @param type  Unit-type which is now available.
 **  @return      True, if unit-type was found in list.
 */
-static bool AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
+static bool AiRemoveFromBuilt2(PlayerAi &pai, const CUnitType &type)
 {
-	auto it = ranges::find_if(pai->UnitTypeBuilt,
+	auto it = ranges::find_if(pai.UnitTypeBuilt,
 	                          [&](const AiBuildQueue &q) { return q.Made && q.Type == &type; });
-	if (it != pai->UnitTypeBuilt.end())
+	if (it != pai.UnitTypeBuilt.end())
 	{
 		--(*it).Made;
 		if (!--(*it).Want) {
-			pai->UnitTypeBuilt.erase(it);
+			pai.UnitTypeBuilt.erase(it);
 		}
 		return true;
 	}
@@ -548,7 +547,7 @@ static bool AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 **  @param pai   Computer AI player.
 **  @param type  Unit-type which is now available.
 */
-static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
+static void AiRemoveFromBuilt(PlayerAi &pai, const CUnitType &type)
 {
 	if (AiRemoveFromBuilt2(pai, type)) {
 		return;
@@ -562,7 +561,7 @@ static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 			return;
 		}
 	}
-	if (pai->Player == ThisPlayer) {
+	if (pai.Player == ThisPlayer) {
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
@@ -776,7 +775,8 @@ void AiWorkComplete(CUnit *unit, CUnit &what)
 	}
 
 	Assert(what.Player->Type != PlayerTypes::PlayerPerson);
-	AiRemoveFromBuilt(what.Player->Ai, *what.Type);
+	Assert(what.Player->Ai);
+	AiRemoveFromBuilt(*what.Player->Ai, *what.Type);
 }
 
 /**
@@ -821,7 +821,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	Vec2i movablepos[16];
 	int movablenb;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.Player->Ai.get();
 
 	// No more than 1 move per 10 cycle ( avoid stressing the pathfinder )
 	if (GameCycle <= AiPlayer->LastCanNotMoveGameCycle + 10) {
@@ -924,7 +924,7 @@ void AiCanNotMove(CUnit &unit)
 	const int gw = unit.pathFinderData->input.GetGoalSize().x;
 	const int gh = unit.pathFinderData->input.GetGoalSize().y;
 
-	AiPlayer = unit.Player->Ai;
+	AiPlayer = unit.Player->Ai.get();
 	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255, false)) {
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
@@ -959,8 +959,8 @@ void AiTrainingComplete(CUnit &unit, CUnit &what)
 	           unit.tilePos.y);
 
 	Assert(unit.Player->Type != PlayerTypes::PlayerPerson);
-
-	AiRemoveFromBuilt(unit.Player->Ai, *what.Type);
+	Assert(unit.Player->Ai);
+	AiRemoveFromBuilt(*unit.Player->Ai, *what.Type);
 
 	unit.Player->Ai->Force.RemoveDeadUnit();
 	unit.Player->Ai->Force.Assign(what);
@@ -1013,7 +1013,7 @@ void AiResearchComplete(CUnit &unit, const CUpgrade *what)
 */
 void AiEachCycle(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 }
 
 /**
@@ -1023,7 +1023,7 @@ void AiEachCycle(CPlayer &player)
 */
 void AiEachSecond(CPlayer &player)
 {
-	AiPlayer = player.Ai;
+	AiPlayer = player.Ai.get();
 #ifdef DEBUG
 	if (!AiPlayer) {
 		return;

@@ -810,7 +810,7 @@ void CPlayer::Clear()
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
 	AiEnabled = false;
-	Ai = 0;
+	Ai = nullptr;
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
 	NumBuildings = 0;

@@ -41,12 +41,12 @@
 #include <string>
 #include <vector>
 
+#include "../ai/ai_local.h"
 #include "color.h"
+#include "settings.h"
 #include "upgrade_structs.h"
-
 #include "vec2i.h"
 
-#include "settings.h"
 
 class CGraphic;
 
@@ -249,7 +249,7 @@ public:
 	int UnitTypesAiActiveCount [UnitTypeMax]{}; /// total units of unit-type that have their AI set to active
 
 	bool AiEnabled;        /// handle AI on local computer
-	PlayerAi *Ai;          /// Ai structure pointer
+	std::unique_ptr<PlayerAi> Ai; /// Ai structure pointer
 
 	int    NumBuildings;   /// # buildings
 	int    Supply;         /// supply available/produced
