@@ -749,6 +749,20 @@ ButtonStyle *FindButtonStyle(const std::string &style)
 	return ButtonStyleHash[style].get();
 }
 
+static ETextAlignment ToTextAlignment(std::string_view value)
+{
+	if (value == "Center") {
+		return ETextAlignment::Center;
+	} else if (value == "Right") {
+		return ETextAlignment::Right;
+	} else if (value == "Left") {
+		return ETextAlignment::Left;
+	} else {
+		fprintf(stderr, "Invalid text alignment: %s", value.data());
+		ExitFatal(-1);
+	}
+}
+
 /**
 **  Parse button style properties
 **
@@ -795,16 +809,7 @@ static void ParseButtonStyleProperties(lua_State *l, ButtonStyleProperties *p)
 		} else if (value == "TextPos") {
 			CclGetPos(l, &p->TextPos);
 		} else if (value == "TextAlign") {
-			value = LuaToString(l, -1);
-			if (value == "Center") {
-				p->TextAlign = TextAlignCenter;
-			} else if (value == "Right") {
-				p->TextAlign = TextAlignRight;
-			} else if (value == "Left") {
-				p->TextAlign = TextAlignLeft;
-			} else {
-				LuaError(l, "Invalid text alignment: %s", value.data());
-			}
+			p->TextAlign = ToTextAlignment(LuaToString(l, -1));
 		} else if (value == "TextNormalColor") {
 			p->TextNormalColor = LuaToString(l, -1);
 		} else if (value == "TextReverseColor") {
@@ -854,16 +859,7 @@ static int CclDefineButtonStyle(lua_State *l)
 		} else if (value == "TextPos") {
 			CclGetPos(l, &b->TextX, &b->TextY);
 		} else if (value == "TextAlign") {
-			value = LuaToString(l, -1);
-			if (value == "Center") {
-				b->TextAlign = TextAlignCenter;
-			} else if (value == "Right") {
-				b->TextAlign = TextAlignRight;
-			} else if (value == "Left") {
-				b->TextAlign = TextAlignLeft;
-			} else {
-				LuaError(l, "Invalid text alignment: %s", value.data());
-			}
+			b->TextAlign = ToTextAlignment(LuaToString(l, -1));
 		} else if (value == "Default") {
 			ParseButtonStyleProperties(l, &b->Default);
 		} else if (value == "Hover") {
@@ -889,13 +885,13 @@ static int CclDefineButtonStyle(lua_State *l)
 		b->Clicked.TextPos.y = b->TextY;
 	}
 
-	if (b->Default.TextAlign == TextAlignUndefined) {
+	if (b->Default.TextAlign == ETextAlignment::Undefined) {
 		b->Default.TextAlign = b->TextAlign;
 	}
-	if (b->Hover.TextAlign == TextAlignUndefined) {
+	if (b->Hover.TextAlign == ETextAlignment::Undefined) {
 		b->Hover.TextAlign = b->TextAlign;
 	}
-	if (b->Clicked.TextAlign == TextAlignUndefined) {
+	if (b->Clicked.TextAlign == ETextAlignment::Undefined) {
 		b->Clicked.TextAlign = b->TextAlign;
 	}
 	return 0;

@@ -78,11 +78,11 @@ enum class ECondition;
 --  Definitions
 ----------------------------------------------------------------------------*/
 
-enum TextAlignment {
-	TextAlignUndefined,
-	TextAlignCenter,
-	TextAlignLeft,
-	TextAlignRight
+enum class ETextAlignment {
+	Undefined,
+	Center,
+	Left,
+	Right
 };
 
 class ButtonStyleProperties
@@ -95,7 +95,7 @@ public:
 	CColor BorderColorRGB;
 	IntColor BorderColor = 0;
 	int BorderSize = 0;
-	TextAlignment TextAlign = TextAlignUndefined; /// Text alignment
+	ETextAlignment TextAlign = ETextAlignment::Undefined; /// Text alignment
 	PixelPos TextPos{0, 0};         /// Text location
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
@@ -111,7 +111,7 @@ public:
 	CFont *Font = nullptr;          /// Font
 	std::string TextNormalColor;    /// Normal text color
 	std::string TextReverseColor;   /// Reverse text color
-	TextAlignment TextAlign = TextAlignUndefined; /// Text alignment
+	ETextAlignment TextAlign = ETextAlignment::Undefined; /// Text alignment
 	int TextX = 0;                  /// Text X location
 	int TextY = 0;                  /// Text Y location
 	ButtonStyleProperties Default;  /// Default button properties
