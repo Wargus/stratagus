@@ -1005,17 +1005,12 @@ void ReloadFonts()
 	return it->second.get();
 }
 
-void CFont::Clean()
-{
-}
-
 /**
 **  Clean up the font module.
 */
 void CleanFonts()
 {
 	for (auto &[key, font] : Fonts) {
-		font->Clean();
 		delete font;
 	}
 	Fonts.clear();
