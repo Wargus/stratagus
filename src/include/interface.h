@@ -201,7 +201,7 @@ constexpr unsigned int ScrollRightDown = ScrollRight | ScrollLeft; /// scroll ri
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
-extern std::vector<ButtonAction *> UnitButtonTable;
+extern std::vector<std::unique_ptr<ButtonAction>> UnitButtonTable;
 
 /// Flag telling if the game is running
 extern bool GameRunning;
