@@ -41,11 +41,11 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-enum ReplayType {
-	ReplayNone,          /// No replay
-	ReplaySinglePlayer,  /// Single player replay
-	ReplayMultiPlayer    /// Multi player replay
-};                       /// Replay types
+enum class EReplayType {
+	None,          /// No replay
+	SinglePlayer,  /// Single player replay
+	MultiPlayer    /// Multi player replay
+};                 /// Replay types
 
 class CFile;
 class CUnit;
@@ -55,7 +55,7 @@ class CUnit;
 ----------------------------------------------------------------------------*/
 
 extern bool CommandLogDisabled;    /// True, if command log is off
-extern ReplayType ReplayGameType;  /// Replay game type
+extern EReplayType ReplayGameType;  /// Replay game type
 
 /*----------------------------------------------------------------------------
 --  Functions

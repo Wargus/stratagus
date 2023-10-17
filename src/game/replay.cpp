@@ -120,7 +120,7 @@ public:
 //----------------------------------------------------------------------------
 
 bool CommandLogDisabled;           /// True if command log is off
-ReplayType ReplayGameType;         /// Replay game type
+EReplayType ReplayGameType;        /// Replay game type
 static bool DisabledLog;           /// Disabled log for replay
 static std::unique_ptr<CFile> LogFile; /// Replay log file
 static fs::path LastLogFileName;   /// Last log file name
@@ -200,9 +200,9 @@ static void ApplyReplaySettings()
 		ExitNetwork1();
 		NetPlayers = 2;
 		NetLocalPlayerNumber = CurrentReplay->LocalPlayer;
-		ReplayGameType = ReplayMultiPlayer;
+		ReplayGameType = EReplayType::MultiPlayer;
 	} else {
-		ReplayGameType = ReplaySinglePlayer;
+		ReplayGameType = EReplayType::SinglePlayer;
 	}
 	GameSettings = CurrentReplay->ReplaySettings;
 
@@ -570,7 +570,7 @@ static int CclReplayLog(lua_State *l)
 */
 bool IsReplayGame()
 {
-	return ReplayGameType != ReplayNone;
+	return ReplayGameType != EReplayType::None;
 }
 
 /**
@@ -591,7 +591,7 @@ void SaveReplayList(CFile &file)
 static void LoadReplay(const fs::path &name)
 {
 	CleanReplayLog();
-	ReplayGameType = ReplaySinglePlayer;
+	ReplayGameType = EReplayType::SinglePlayer;
 	LuaLoadFile(name);
 
 	NextLogCycle = ~0UL;
@@ -632,7 +632,7 @@ void CleanReplayLog()
 	// }
 	GameObserve = false;
 	NetPlayers = 0;
-	ReplayGameType = ReplayNone;
+	ReplayGameType = EReplayType::None;
 }
 
 /**
@@ -814,7 +814,7 @@ static void ReplayEachCycle()
 */
 void SinglePlayerReplayEachCycle()
 {
-	if (ReplayGameType == ReplaySinglePlayer) {
+	if (ReplayGameType == EReplayType::SinglePlayer) {
 		ReplayEachCycle();
 	}
 }
@@ -824,7 +824,7 @@ void SinglePlayerReplayEachCycle()
 */
 void MultiPlayerReplayEachCycle()
 {
-	if (ReplayGameType == ReplayMultiPlayer) {
+	if (ReplayGameType == EReplayType::MultiPlayer) {
 		ReplayEachCycle();
 	}
 }
