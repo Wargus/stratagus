@@ -56,9 +56,11 @@
 #include "viewport.h"
 #include "ui/statusline.h"
 #include "ui/uitimer.h"
-#include <vector>
-#include <string>
+
 #include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -386,9 +388,9 @@ public:
 	CResourceInfo Resources[MaxResourceInfo]{}; /// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;               /// Info panel
-	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
+	std::vector<std::unique_ptr<CUnitInfoPanel>> InfoPanelContents;/// Info panel contents
 	std::string DefaultUnitPortrait;    /// Name of the unit portrait to show when there is no selection
-	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons
+	std::vector<std::unique_ptr<CPopup>> ButtonPopups; /// Popup windows for buttons
 
 	CUIButton *SingleSelectedButton = nullptr;    /// Button for single selected unit
 
@@ -514,7 +516,7 @@ extern std::string DamageMissile;           /// Missile to show damage caused
 
 
 /// Hash table of all the button styles
-extern std::map<std::string, ButtonStyle *> ButtonStyleHash;
+extern std::map<std::string, std::unique_ptr<ButtonStyle>> ButtonStyleHash;
 
 extern bool RightButtonAttacks;         /// right button attacks
 

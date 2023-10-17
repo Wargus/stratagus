@@ -1572,7 +1572,7 @@ static int CclAiDump(lua_State *l)
 **  @param l     Lua state.
 **  @param ai  PlayerAi pointer which should be filled with the data.
 */
-static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
+static void CclParseBuildQueue(lua_State *l, PlayerAi &ai, int offset)
 {
 	if (!lua_istable(l, offset)) {
 		LuaError(l, "incorrect argument");
@@ -1602,7 +1602,7 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			queue.Made = made;
 			queue.Pos = pos;
 
-			ai->UnitTypeBuilt.push_back(queue);
+			ai.UnitTypeBuilt.push_back(queue);
 			pos.x = -1;
 			pos.y = -1;
 		}
@@ -1619,12 +1619,13 @@ static int CclDefineAiPlayer(lua_State *l)
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
 	Assert(playerIdx <= PlayerMax);
-	DebugPrint("%p %d\n", (void *)Players[playerIdx].Ai, Players[playerIdx].AiEnabled);
+	DebugPrint("%p %d\n", (void *)Players[playerIdx].Ai.get(), Players[playerIdx].AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 
-	PlayerAi *ai = Players[playerIdx].Ai = new PlayerAi;
-	ai->Player = &Players[playerIdx];
+	Players[playerIdx].Ai = std::unique_ptr<PlayerAi>();
+	PlayerAi &ai = *Players[playerIdx].Ai;
+	ai.Player = &Players[playerIdx];
 
 	// Parse the list: (still everything could be changed!)
 	const int args = lua_gettop(l);
@@ -1638,43 +1639,43 @@ static int CclDefineAiPlayer(lua_State *l)
 			if (ait == nullptr) {
 				LuaError(l, "ai-type not found: %s", aiName.data());
 			}
-			ai->AiType = ait;
-			ai->Script = ait->Script;
+			ai.AiType = ait;
+			ai.Script = ait->Script;
 		} else if (value == "script") {
-			ai->Script = LuaToString(l, j + 1);
+			ai.Script = LuaToString(l, j + 1);
 		} else if (value == "script-debug") {
-			ai->ScriptDebug = LuaToBoolean(l, j + 1);
+			ai.ScriptDebug = LuaToBoolean(l, j + 1);
 		} else if (value == "sleep-cycles") {
-			ai->SleepCycles = LuaToNumber(l, j + 1);
+			ai.SleepCycles = LuaToNumber(l, j + 1);
 		} else if (value == "force") {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
 			[[maybe_unused]]const int cclforceIdx = LuaToNumber(l, j + 1, 1);
-			const int forceIdx = ai->Force.FindFreeForce(AiForceRole::Default);
+			const int forceIdx = ai.Force.FindFreeForce(AiForceRole::Default);
 
 			for (int k = 1; k < subargs; ++k) {
 				std::string_view value = LuaToString(l, j + 1, k + 1);
 				++k;
 				if (value == "complete") {
-					ai->Force[forceIdx].Completed = true;
+					ai.Force[forceIdx].Completed = true;
 					--k;
 				} else if (value == "recruit") {
-					ai->Force[forceIdx].Completed = false;
+					ai.Force[forceIdx].Completed = false;
 					--k;
 				} else if (value == "attack") {
-					ai->Force[forceIdx].Attacking = true;
+					ai.Force[forceIdx].Attacking = true;
 					--k;
 				} else if (value == "defend") {
-					ai->Force[forceIdx].Defending = true;
+					ai.Force[forceIdx].Defending = true;
 					--k;
 				} else if (value == "role") {
 					value = LuaToString(l, j + 1, k + 1);
 					if (value == "attack") {
-						ai->Force[forceIdx].Role = AiForceRole::Attack;
+						ai.Force[forceIdx].Role = AiForceRole::Attack;
 					} else if (value == "defend") {
-						ai->Force[forceIdx].Role = AiForceRole::Defend;
+						ai.Force[forceIdx].Role = AiForceRole::Defend;
 					} else {
 						LuaError(l, "Unsupported force tag: %s", value.data());
 					}
@@ -1692,7 +1693,7 @@ static int CclDefineAiPlayer(lua_State *l)
 
 						queue.Want = num;
 						queue.Type = &UnitTypeByIdent(ident);
-						ai->Force[forceIdx].UnitTypes.push_back(queue);
+						ai.Force[forceIdx].UnitTypes.push_back(queue);
 					}
 					lua_pop(l, 1);
 				} else if (value == "units") {
@@ -1707,15 +1708,15 @@ static int CclDefineAiPlayer(lua_State *l)
 #if 0
 						[[maybe_unused]]const std::string_view ident = LuaToString(l, -1, subk + 1);
 #endif
-						ai->Force[forceIdx].Units.push_back(&UnitManager->GetSlotUnit(num));
+						ai.Force[forceIdx].Units.push_back(&UnitManager->GetSlotUnit(num));
 					}
 					lua_pop(l, 1);
 				} else if (value == "state") {
-					ai->Force[forceIdx].State = AiForceAttackingState(LuaToNumber(l, j + 1, k + 1));
+					ai.Force[forceIdx].State = AiForceAttackingState(LuaToNumber(l, j + 1, k + 1));
 				} else if (value == "goalx") {
-					ai->Force[forceIdx].GoalPos.x = LuaToNumber(l, j + 1, k + 1);
+					ai.Force[forceIdx].GoalPos.x = LuaToNumber(l, j + 1, k + 1);
 				} else if (value == "goaly") {
-					ai->Force[forceIdx].GoalPos.y = LuaToNumber(l, j + 1, k + 1);
+					ai.Force[forceIdx].GoalPos.y = LuaToNumber(l, j + 1, k + 1);
 				} else if (value == "must-transport") {
 					// Keep for backward compatibility
 				} else {
@@ -1732,7 +1733,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->Reserve[resId] = num;
+				ai.Reserve[resId] = num;
 			}
 		} else if (value == "used") {
 			if (!lua_istable(l, j + 1)) {
@@ -1744,7 +1745,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->Used[resId] = num;
+				ai.Used[resId] = num;
 			}
 		} else if (value == "needed") {
 			if (!lua_istable(l, j + 1)) {
@@ -1756,7 +1757,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->Needed[resId] = num;
+				ai.Needed[resId] = num;
 			}
 		} else if (value == "collect") {
 			if (!lua_istable(l, j + 1)) {
@@ -1768,7 +1769,7 @@ static int CclDefineAiPlayer(lua_State *l)
 				++k;
 				const int num = LuaToNumber(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->Collect[resId] = num;
+				ai.Collect[resId] = num;
 			}
 		} else if (value == "need-mask") {
 			if (!lua_istable(l, j + 1)) {
@@ -1778,10 +1779,10 @@ static int CclDefineAiPlayer(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view type = LuaToString(l, j + 1, k + 1);
 				const int resId = GetResourceIdByName(l, type);
-				ai->NeededMask |= (1 << resId);
+				ai.NeededMask |= (1 << resId);
 			}
 		} else if (value == "need-supply") {
-			ai->NeedSupply = true;
+			ai.NeedSupply = true;
 			--j;
 		} else if (value == "exploration") {
 			if (!lua_istable(l, j + 1)) {
@@ -1800,12 +1801,12 @@ static int CclDefineAiPlayer(lua_State *l)
 				const int mask = LuaToNumber(l, -1, 3);
 				lua_pop(l, 1);
 				AiExplorationRequest queue(pos, mask);
-				ai->FirstExplorationRequest.push_back(queue);
+				ai.FirstExplorationRequest.push_back(queue);
 			}
 		} else if (value == "last-exploration-cycle") {
-			ai->LastExplorationGameCycle = LuaToNumber(l, j + 1);
+			ai.LastExplorationGameCycle = LuaToNumber(l, j + 1);
 		} else if (value == "last-can-not-move-cycle") {
-			ai->LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
+			ai.LastCanNotMoveGameCycle = LuaToNumber(l, j + 1);
 		} else if (value == "unit-type") {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1813,14 +1814,14 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			int i = 0;
 			if (subargs) {
-				ai->UnitTypeRequests.resize(subargs / 2);
+				ai.UnitTypeRequests.resize(subargs / 2);
 			}
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view ident = LuaToString(l, j + 1, k + 1);
 				++k;
 				const int count = LuaToNumber(l, j + 1, k + 1);
-				ai->UnitTypeRequests[i].Type = &UnitTypeByIdent(ident);
-				ai->UnitTypeRequests[i].Count = count;
+				ai.UnitTypeRequests[i].Type = &UnitTypeByIdent(ident);
+				ai.UnitTypeRequests[i].Count = count;
 				++i;
 			}
 		} else if (value == "upgrade") {
@@ -1830,7 +1831,7 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view ident = LuaToString(l, j + 1, k + 1);
-				ai->UpgradeToRequests.push_back(&UnitTypeByIdent(ident));
+				ai.UpgradeToRequests.push_back(&UnitTypeByIdent(ident));
 			}
 		} else if (value == "research") {
 			if (!lua_istable(l, j + 1)) {
@@ -1839,12 +1840,12 @@ static int CclDefineAiPlayer(lua_State *l)
 			const int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				const std::string_view ident = LuaToString(l, j + 1, k + 1);
-				ai->ResearchRequests.push_back(CUpgrade::Get(ident));
+				ai.ResearchRequests.push_back(CUpgrade::Get(ident));
 			}
 		} else if (value == "building") {
 			CclParseBuildQueue(l, ai, j + 1);
 		} else if (value == "repair-building") {
-			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
+			ai.LastRepairBuilding = LuaToNumber(l, j + 1);
 		} else {
 			LuaError(l, "Unsupported tag: %s", value.data());
 		}

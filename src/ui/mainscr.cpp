@@ -534,7 +534,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 static void DrawUnitInfo(CUnit &unit)
 {
 	UpdateUnitVariables(unit);
-	for (auto *infoPanelContent : UI.InfoPanelContents) {
+	for (auto &infoPanelContent : UI.InfoPanelContents) {
 		if (CanShowContent(infoPanelContent->Condition.get(), unit)) {
 			for (CContentType *content : infoPanelContent->Contents) {
 				if (CanShowContent(content->Condition.get(), unit)) {
