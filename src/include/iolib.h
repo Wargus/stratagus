@@ -121,7 +121,7 @@ public:
 	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
 private:
 	class PImpl;
-	PImpl *pimpl;
+	std::unique_ptr<PImpl> pimpl;
 };
 
 #define CL_OPEN_READ 0x1
