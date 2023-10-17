@@ -47,7 +47,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-using FontMap = std::map<std::string, CFont *, std::less<>>;
+using FontMap = std::map<std::string, std::unique_ptr<CFont>, std::less<>>;
 static FontMap Fonts;  /// Font mappings
 
 using FontColorMap = std::map<std::string, std::unique_ptr<CFontColor>, std::less<>>;
@@ -938,16 +938,16 @@ void ReloadFonts()
 */
 /* static */ CFont *CFont::New(const std::string &ident, CGraphic *g)
 {
-	CFont *&font = Fonts[ident];
+	auto &font = Fonts[ident];
 	if (font) {
 		if (font->G != g) {
 			CGraphic::Free(font->G);
 		}
 	} else {
-		font = new CFont(ident);
+		font.reset(new CFont(ident));
 	}
 	font->G = g;
-	return font;
+	return font.get();
 }
 
 /**
@@ -964,12 +964,12 @@ void ReloadFonts()
 		DebugPrint("font not found: %s\n", ident.data());
 		return nullptr;
 	}
-	CFont *font = it->second;
+	auto &font = it->second;
 	if (font == nullptr) {
 		DebugPrint("font not found: %s\n", ident.data());
 		return nullptr;
 	}
-	return font;
+	return font.get();
 }
 
 /**
@@ -1010,9 +1010,6 @@ void ReloadFonts()
 */
 void CleanFonts()
 {
-	for (auto &[key, font] : Fonts) {
-		delete font;
-	}
 	Fonts.clear();
 
 	FontColors.clear();
