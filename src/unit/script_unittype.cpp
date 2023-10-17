@@ -1964,7 +1964,7 @@ static int CclDefineDecorations(lua_State *l)
 	const int nargs = lua_gettop(l);
 	for (int i = 0; i < nargs; i++) {
 		Assert(lua_istable(l, i + 1));
-		CDecoVar *decovar = nullptr;
+		std::unique_ptr<CDecoVar> decovar;
 		memset(&tmp, 0, sizeof(tmp));
 		lua_pushnil(l);
 		while (lua_next(l, i + 1)) {
@@ -2004,7 +2004,7 @@ static int CclDefineDecorations(lua_State *l)
 				Assert(lua_istable(l, -1));
 				key = LuaToString(l, -2);
 				if (key == "bar") {
-					CDecoVarBar *decovarbar = new CDecoVarBar;
+					auto decovarbar = std::make_unique<CDecoVarBar>();
 					lua_pushnil(l);
 					while (lua_next(l, -2)) {
 						key = LuaToString(l, -2);
@@ -2044,9 +2044,9 @@ static int CclDefineDecorations(lua_State *l)
 						}
 						lua_pop(l, 1); // Pop value
 					}
-					decovar = decovarbar;
+					decovar = std::move(decovarbar);
 				} else if (key == "frame") {
-					CDecoVarFrame *frame = new CDecoVarFrame;
+					auto frame = std::make_unique<CDecoVarFrame>();
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument, need table with Thickness= and Color=");
 					}
@@ -2061,23 +2061,23 @@ static int CclDefineDecorations(lua_State *l)
 							LuaError(l, "'%s' invalid for Method frame", innerkey.data());
 						}
 					}
-					decovar = frame;
+					decovar = std::move(frame);
 				} else if (key == "text") {
-					CDecoVarText *decovartext = new CDecoVarText;
+					auto decovartext = std::make_unique<CDecoVarText>();
 
 					decovartext->Font = CFont::Get(LuaToString(l, -1, 1));
 					// FIXME : More arguments ? color...
-					decovar = decovartext;
+					decovar = std::move(decovartext);
 				} else if (key == "sprite") {
-					CDecoVarSpriteBar *decovarspritebar = new CDecoVarSpriteBar;
+					auto decovarspritebar = std::make_unique<CDecoVarSpriteBar>();
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
 						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations", LuaToString(l, -1, 1).data());
 					}
 					// FIXME : More arguments ?
-					decovar = decovarspritebar;
+					decovar = std::move(decovarspritebar);
 				} else if (key == "static-sprite") {
-					CDecoVarStaticSprite *decovarstaticsprite = new CDecoVarStaticSprite;
+					auto decovarstaticsprite = std::make_unique<CDecoVarStaticSprite>();
 					if (lua_rawlen(l, -1) == 2) {
 						decovarstaticsprite->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 						decovarstaticsprite->n = LuaToNumber(l, -1, 2);
@@ -2086,9 +2086,9 @@ static int CclDefineDecorations(lua_State *l)
 						decovarstaticsprite->n = LuaToNumber(l, -1, 2);
 						decovarstaticsprite->FadeValue = LuaToNumber(l, -1, 3);
 					}
-					decovar = decovarstaticsprite;
+					decovar = std::move(decovarstaticsprite);
 				} else if (key == "animated-sprite") {
-					CDecoVarAnimatedSprite *decovarspritebar = new CDecoVarAnimatedSprite;
+					auto decovarspritebar = std::make_unique<CDecoVarAnimatedSprite>();
 					decovarspritebar->NSprite = GetSpriteIndex(LuaToString(l, -1, 1));
 					if (decovarspritebar->NSprite == -1) {
 						LuaError(l, "invalid sprite-name '%s' for Method in DefineDecorations", LuaToString(l, -1, 1).data());
@@ -2097,7 +2097,7 @@ static int CclDefineDecorations(lua_State *l)
 					if (decovarspritebar->WaitFrames <= 0) {
 						LuaError(l, "invalid wait-frames, must be > 0");
 					}
-					decovar = decovarspritebar;
+					decovar = std::move(decovarspritebar);
 				} else { // Error
 					LuaError(l, "invalid method '%s' for Method in DefineDecorations", key.data());
 				}
@@ -2128,7 +2128,7 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->ShowOpponent = tmp.ShowOpponent;
 		decovar->BoolFlag = tmp.BoolFlag;
 		decovar->BoolFlagInvert = tmp.BoolFlagInvert;
-		UnitTypeVar.DecoVar.push_back(decovar);
+		UnitTypeVar.DecoVar.push_back(std::move(decovar));
 	}
 	Assert(lua_gettop(l));
 	return 0;

@@ -638,7 +638,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 
 	UpdateUnitVariables(const_cast<CUnit &>(unit));
 	// Now show decoration for each variable.
-	for (const CDecoVar *decoVarPtr : UnitTypeVar.DecoVar) {
+	for (const auto &decoVarPtr : UnitTypeVar.DecoVar) {
 		const CDecoVar &var = *decoVarPtr;
 		const int value = unit.Variable[var.Index].Value;
 		const int max = unit.Variable[var.Index].Max;

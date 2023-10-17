@@ -1043,10 +1043,6 @@ void CUnitTypeVar::Init()
 void CUnitTypeVar::Clear()
 {
 	Variable.clear();
-
-	for (CDecoVar *deco : DecoVar) {
-		delete deco;
-	}
 	DecoVar.clear();
 }
 
