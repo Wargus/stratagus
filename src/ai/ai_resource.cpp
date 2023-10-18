@@ -266,36 +266,31 @@ static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Ve
 {
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 
-	int num = 0;
-
 	// Remove all workers on the way building something
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (IsAlreadyWorking(unit) == false) {
-			table[num++] = &unit;
-		}
-	}
-	if (num == 0) {
+	ranges::erase_if(table, [](const CUnit *unit) { return IsAlreadyWorking(*unit); });
+	if (table.empty()) {
 		// No workers available to build
 		return false;
 	}
 
-	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
+	CUnit &candidate = (table.size() == 1) ? *table[0] : *table[SyncRand() % table.size()];
 
 	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
-		CommandBuildBuilding(unit, pos, building, FlushCommands);
+	if (AiFindBuildingPlace(candidate, building, nearPos, &pos)) {
+		CommandBuildBuilding(candidate, pos, building, FlushCommands);
 		return true;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
 		if (Map.Info.IsPointOnMap(nearPos)) {
 			//Crush CPU !!!!!
-			for (int i = 0; i < num && table[i] != &unit; ++i) {
+			for (auto *unit : table) {
+				if (unit == &candidate) { // already checked.
+					continue;
+				}
 				// Find a place to build.
-				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
-					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
+				if (AiFindBuildingPlace(*unit, building, nearPos, &pos)) {
+					CommandBuildBuilding(*unit, pos, building, FlushCommands);
 					return true;
 				}
 			}
@@ -1248,16 +1243,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
-	int num = 0;
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-
-		if (IsReadyToRepair(unit)) {
-			table[num++] = &unit;
-		}
-	}
-	table.resize(num);
-
+	ranges::erase_if(table, [](const CUnit *unit) { return !IsReadyToRepair(*unit); });
 	if (table.empty()) {
 		return false;
 	}

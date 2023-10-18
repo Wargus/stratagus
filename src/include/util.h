@@ -226,7 +226,9 @@ namespace ranges
 	template <typename Range, typename Predicate>
 	auto find_if(Range &range, Predicate &&predicate)
 	{
-		return std::find_if(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
+		return std::find_if(std::begin(range), std::end(range), [&](const auto &elem) {
+			return std::invoke(std::forward<Predicate>(predicate), elem);
+		});
 	}
 
 	template <typename Range, typename Pred>
