@@ -327,18 +327,18 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 	if (!unit.Type->CanCastSpell.empty()) {
 		// decrease spell countdown timers
-		for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
-			if (unit.SpellCoolDownTimers[i] > 0) {
-				--unit.SpellCoolDownTimers[i];
+		for (auto &timer : unit.SpellCoolDownTimers) {
+			if (timer > 0) {
+				--timer;
 			}
 		}
 	}
 
 	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
 	//  decrease spells effects time.
-	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
-		unit.Variable[SpellEffects[i]].Increase = -1;
-		IncreaseVariable(unit, SpellEffects[i]);
+	for (int index : SpellEffects) {
+		unit.Variable[index].Increase = -1;
+		IncreaseVariable(unit, index);
 	}
 }
 

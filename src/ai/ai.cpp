@@ -193,24 +193,23 @@ static void AiCheckUnits()
 	//  Count the already made build requests.
 	auto counter = AiGetBuildRequestsCount(*AiPlayer);
 
-	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	const int(&unit_types_count)[UnitTypeMax] = AiPlayer->Player->UnitTypesAiActiveCount;
 
 	//  Look if some unit-types are missing.
-	int n = AiPlayer->UnitTypeRequests.size();
-	for (int i = 0; i < n; ++i) {
-		const unsigned int t = AiPlayer->UnitTypeRequests[i].Type->Slot;
-		const int x = AiPlayer->UnitTypeRequests[i].Count;
+	for (AiRequestType &requestType : AiPlayer->UnitTypeRequests) {
+		const unsigned int t = requestType.Type->Slot;
+		const int x = requestType.Count;
 
 		// Add equivalent units
 		int e = unit_types_count[t];
 		if (t < AiHelpers.Equiv().size()) {
-			for (unsigned int j = 0; j < AiHelpers.Equiv()[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv()[t][j]->Slot];
+			for (const auto *equivType : AiHelpers.Equiv()[t]) {
+				e += unit_types_count[equivType->Slot];
 			}
 		}
 		const int requested = x - e - counter[t];
 		if (requested > 0) {  // Request it.
-			AiAddUnitTypeRequest(*AiPlayer->UnitTypeRequests[i].Type, requested);
+			AiAddUnitTypeRequest(*requestType.Type, requested);
 			counter[t] += requested;
 		}
 		counter[t] -= x;
@@ -219,32 +218,30 @@ static void AiCheckUnits()
 	AiPlayer->Force.CheckUnits(counter);
 
 	//  Look if some upgrade-to are missing.
-	n = AiPlayer->UpgradeToRequests.size();
-	for (int i = 0; i < n; ++i) {
-		const unsigned int t = AiPlayer->UpgradeToRequests[i]->Slot;
+	for (CUnitType *unitType : AiPlayer->UpgradeToRequests) {
+		const unsigned int t = unitType->Slot;
 		const int x = 1;
 
 		//  Add equivalent units
 		int e = unit_types_count[t];
 		if (t < AiHelpers.Equiv().size()) {
-			for (unsigned int j = 0; j < AiHelpers.Equiv()[t].size(); ++j) {
-				e += unit_types_count[AiHelpers.Equiv()[t][j]->Slot];
+			for (const auto *equivType : AiHelpers.Equiv()[t]) {
+				e += unit_types_count[equivType->Slot];
 			}
 		}
 
 		const int requested = x - e - counter[t];
 		if (requested > 0) {  // Request it.
-			AiAddUpgradeToRequest(*AiPlayer->UpgradeToRequests[i]);
+			AiAddUpgradeToRequest(*unitType);
 			counter[t] += requested;
 		}
 		counter[t] -= x;
 	}
 
 	//  Look if some researches are missing.
-	n = (int)AiPlayer->ResearchRequests.size();
-	for (int i = 0; i < n; ++i) {
-		if (UpgradeIdAllowed(*AiPlayer->Player, AiPlayer->ResearchRequests[i]->ID) == 'A') {
-			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
+	for (CUpgrade *upgrade : AiPlayer->ResearchRequests) {
+		if (UpgradeIdAllowed(*AiPlayer->Player, upgrade->ID) == 'A') {
+			AiAddResearchRequest(upgrade);
 		}
 	}
 }
@@ -290,17 +287,12 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		}
 
 		file.printf("\n    \"types\", { ");
-		const size_t unitTypesCounst = ai.Force[i].UnitTypes.size();
-		for (size_t j = 0; j != unitTypesCounst; ++j) {
-			const AiUnitType &aut = ai.Force[i].UnitTypes[j];
+		for (const AiUnitType &aut : ai.Force[i].UnitTypes) {
 			file.printf("%d, \"%s\", ", aut.Want, aut.Type->Ident.c_str());
 		}
 		file.printf("},\n    \"units\", {");
-		const size_t unitsCount = ai.Force[i].Units.size();
-		for (size_t j = 0; j != unitsCount; ++j) {
-			const CUnit &aiunit = *ai.Force[i].Units[j];
-			file.printf(" %d, \"%s\",", UnitNumber(aiunit),
-						aiunit.Type->Ident.c_str());
+		for (const CUnit *aiunit : ai.Force[i].Units) {
+			file.printf(" %d, \"%s\",", UnitNumber(*aiunit), aiunit->Type->Ident.c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
 					ai.Force[i].State, ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
@@ -345,9 +337,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	//  Requests
 	if (!ai.FirstExplorationRequest.empty()) {
 		file.printf("  \"exploration\", {");
-		const size_t FirstExplorationRequestCount = ai.FirstExplorationRequest.size();
-		for (size_t i = 0; i != FirstExplorationRequestCount; ++i) {
-			const AiExplorationRequest &ptr = ai.FirstExplorationRequest[i];
+		for (const AiExplorationRequest &ptr : ai.FirstExplorationRequest) {
 			file.printf("{%d, %d, %d}, ", ptr.pos.x, ptr.pos.y, ptr.Mask);
 		}
 		file.printf("},\n");
@@ -355,24 +345,20 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("  \"last-exploration-cycle\", %lu,\n", ai.LastExplorationGameCycle);
 	file.printf("  \"last-can-not-move-cycle\", %lu,\n", ai.LastCanNotMoveGameCycle);
 	file.printf("  \"unit-type\", {");
-	const size_t unitTypeRequestsCount = ai.UnitTypeRequests.size();
-	for (size_t i = 0; i != unitTypeRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.UnitTypeRequests[i].Type->Ident.c_str());
-		file.printf("%d, ", ai.UnitTypeRequests[i].Count);
+	for (const auto& requestType : ai.UnitTypeRequests) {
+		file.printf("\"%s\", %d, ", requestType.Type->Ident.c_str(), requestType.Count);
 	}
 	file.printf("},\n");
 
 	file.printf("  \"upgrade\", {");
-	const size_t upgradeToRequestsCount = ai.UpgradeToRequests.size();
-	for (size_t i = 0; i != upgradeToRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.UpgradeToRequests[i]->Ident.c_str());
+	for (const CUnitType *unitType : ai.UpgradeToRequests) {
+		file.printf("\"%s\", ", unitType->Ident.c_str());
 	}
 	file.printf("},\n");
 
 	file.printf("  \"research\", {");
-	const size_t researchRequestsCount = ai.ResearchRequests.size();
-	for (size_t i = 0; i != researchRequestsCount; ++i) {
-		file.printf("\"%s\", ", ai.ResearchRequests[i]->Ident.c_str());
+	for (const CUpgrade *upgrade : ai.ResearchRequests) {
+		file.printf("\"%s\", ", upgrade->Ident.c_str());
 	}
 	file.printf("},\n");
 
