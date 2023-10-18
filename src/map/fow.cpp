@@ -70,7 +70,7 @@ void CFogOfWar::SetTiledFogGraphic(const fs::path &fogGraphicFile)
 }
 
 /// Calculate values of upscale table for explored/unexplored tiles
-void CFogOfWar::GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo)
+void CFogOfWar::GenerateUpscaleTables(uint32_t (&table)[16][4], const uint8_t alphaFrom, const uint8_t alphaTo)
 {
     for (auto i = 0; i < 16; i++) {
         for (auto j = 0; j < 4; j++) {

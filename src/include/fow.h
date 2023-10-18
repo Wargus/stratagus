@@ -94,7 +94,9 @@ private:
     void InitEnhanced();
     void DrawEnhanced(CViewport &viewport);
 
-    void GenerateUpscaleTables(uint32_t (*table)[4], const uint8_t alphaFrom, const uint8_t alphaTo);
+	void GenerateUpscaleTables(uint32_t (&table)[16][4],
+	                           const uint8_t alphaFrom,
+	                           const uint8_t alphaTo);
 
     void GenerateFog();
     void FogUpscale4x4();
