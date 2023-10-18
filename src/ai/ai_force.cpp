@@ -209,9 +209,7 @@ int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 */
 void AiResetUnitTypeEquiv()
 {
-	for (int i = 0; i <= UnitTypeMax; ++i) {
-		UnitTypeEquivs[i] = i;
-	}
+	ranges::iota(UnitTypeEquivs, 0);
 }
 
 /**
