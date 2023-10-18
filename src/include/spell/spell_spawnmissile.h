@@ -41,9 +41,9 @@
 /**
 **  Different targets.
 */
-enum LocBaseType {
-	LocBaseCaster,
-	LocBaseTarget
+enum class ELocBaseType {
+	Caster,
+	Target
 };
 
 /**
@@ -55,9 +55,9 @@ enum LocBaseType {
 class SpellActionMissileLocation
 {
 public:
-	explicit SpellActionMissileLocation(LocBaseType base) : Base(base) {}
+	explicit SpellActionMissileLocation(ELocBaseType base) : Base(base) {}
 
-	LocBaseType Base;   /// The base for the location (caster/target)
+	ELocBaseType Base;  /// The base for the location (caster/target)
 	int AddX = 0;       /// Add to the X coordinate
 	int AddY = 0;       /// Add to the X coordinate
 	int AddRandX = 0;   /// Random add to the X coordinate
@@ -76,8 +76,8 @@ private:
 	int TTL = -1;                   /// Missile TTL.
 	int Delay = 0;                  /// Missile original delay.
 	bool UseUnitVar = false;        /// Use the caster's damage parameters
-	SpellActionMissileLocation StartPoint{LocBaseCaster}; /// Start point description.
-	SpellActionMissileLocation EndPoint{LocBaseTarget};   /// Start point description.
+	SpellActionMissileLocation StartPoint{ELocBaseType::Caster}; /// Start point description.
+	SpellActionMissileLocation EndPoint{ELocBaseType::Target}; /// Start point description.
 	MissileType *Missile = nullptr; /// Missile fired on cast
 };
 

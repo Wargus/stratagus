@@ -57,6 +57,18 @@ struct CompareUnitDistance {
 	}
 };
 
+ELocBaseType toELocBaseType(std::string_view s)
+{
+	if (s == "caster") {
+		return ELocBaseType::Caster;
+	} else if (s == "target") {
+		return ELocBaseType::Target;
+	} else {
+		fprintf(stderr, "Unsupported location base flag: %s", s.data());
+		ExitFatal(-1);
+	}
+}
+
 /**
 **  Parse the missile location description for a spell action.
 **
@@ -78,14 +90,7 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
 		if (value == "base") {
-			value = LuaToString(l, -1, j + 1);
-			if (value == "caster") {
-				location->Base = LocBaseCaster;
-			} else if (value == "target") {
-				location->Base = LocBaseTarget;
-			} else {
-				LuaError(l, "Unsupported missile location base flag: %s", value.data());
-			}
+			location->Base = toELocBaseType(LuaToString(l, -1, j + 1));
 		} else if (value == "add-x") {
 			location->AddX = LuaToNumber(l, -1, j + 1);
 		} else if (value == "add-y") {
@@ -151,14 +156,14 @@ static PixelPos EvaluateMissileLocation(const SpellActionMissileLocation &locati
 {
 	PixelPos res;
 
-	if (location.Base == LocBaseCaster) {
-		res = caster.GetMapPixelPosCenter();
-	} else {
-		if (target) {
-			res = target->GetMapPixelPosCenter();
-		} else {
-			res = Map.TilePosToMapPixelPos_Center(goalPos);
-		}
+	switch (location.Base) {
+		case ELocBaseType::Caster:
+			res = caster.GetMapPixelPosCenter();
+			break;
+		default:
+		case ELocBaseType::Target:
+			res = target ? target->GetMapPixelPosCenter() : Map.TilePosToMapPixelPos_Center(goalPos);
+			break;
 	}
 	res.x += location.AddX;
 	if (location.AddRandX) {
