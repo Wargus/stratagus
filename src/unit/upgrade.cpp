@@ -65,7 +65,7 @@ static void AllowUnitId(CPlayer &player, int id, int units);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
+std::vector<std::unique_ptr<CUpgrade>> AllUpgrades;           /// The main user useable upgrades
 
 /// Upgrades modifiers
 std::unique_ptr<CUpgradeModifier> UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
@@ -114,14 +114,14 @@ CUpgrade::CUpgrade(std::string ident) :
 */
 /* static */ CUpgrade *CUpgrade::New(std::string ident)
 {
-	CUpgrade *upgrade = Upgrades[ident];
+	CUpgrade *&upgrade = Upgrades[ident];
 	if (upgrade) {
 		return upgrade;
 	} else {
-		upgrade = new CUpgrade(ident);
-		Upgrades[ident] = upgrade;
+		auto ptr = std::make_unique<CUpgrade>(ident);
+		upgrade = ptr.get();
 		upgrade->ID = AllUpgrades.size();
-		AllUpgrades.push_back(upgrade);
+		AllUpgrades.push_back(std::move(ptr));
 		return upgrade;
 	}
 }
@@ -154,12 +154,6 @@ void InitUpgrades()
 */
 void CleanUpgrades()
 {
-	//  Free the upgrades.
-	while (AllUpgrades.empty() == false) {
-		CUpgrade *upgrade = AllUpgrades.back();
-		AllUpgrades.pop_back();
-		delete upgrade;
-	}
 	Upgrades.clear();
 
 	//
@@ -913,7 +907,7 @@ void UpgradeLost(CPlayer &player, int id)
 void ApplyUpgrades()
 {
 	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
-		CUpgrade *upgrade = AllUpgrades[j];
+		auto &upgrade = AllUpgrades[j];
 		if (upgrade) {
 			for (int p = 0; p < PlayerMax; ++p) {
 				if (Players[p].Allow.Upgrades[j] == 'R') {

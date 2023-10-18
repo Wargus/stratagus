@@ -98,7 +98,6 @@ public:
 
 	void Load();
 	void Reload() const;
-	void Clean();
 
 	CGraphic *GetFontColorGraphic(const CFontColor &fontColor) const;
 

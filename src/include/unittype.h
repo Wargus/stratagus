@@ -824,7 +824,7 @@ public:
 
 	//EventType *Event;                  /// Array of functions sets to call when en event occurs.
 	std::vector<CVariable> Variable;   /// Array of user defined variables (default value for unittype).
-	std::vector<CDecoVar *> DecoVar;   /// Array to describe how showing variable.
+	std::vector<std::unique_ptr<CDecoVar>> DecoVar;   /// Array to describe how showing variable.
 };
 
 extern CUnitTypeVar UnitTypeVar;

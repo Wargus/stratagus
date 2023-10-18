@@ -37,6 +37,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <memory>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -226,7 +227,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CUpgrade *> AllUpgrades;  /// the main user usable upgrades
+extern std::vector<std::unique_ptr<CUpgrade>> AllUpgrades;  /// the main user usable upgrades
 
 //@}
 

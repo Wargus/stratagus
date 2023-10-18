@@ -207,8 +207,6 @@ static std::vector<CUnitType *> getRefineryUnits()
 */
 static void InitAiHelper(AiHelper &aiHelper)
 {
-	extern std::vector<ButtonAction *> UnitButtonTable;
-
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
 	std::vector<CUnitType *> supplyUnits = getSupplyUnits();
 	std::vector<CUnitType *> mineUnits = getRefineryUnits();
@@ -232,7 +230,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 		}
 	}
 
-	for (const ButtonAction *button : UnitButtonTable) {
+	for (const auto &button : UnitButtonTable) {
 		const std::vector<CUnitType *> &unitmask = getUnitTypeFromString(button->UnitMask);
 
 		switch (button->Action) {

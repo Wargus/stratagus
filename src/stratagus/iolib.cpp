@@ -93,15 +93,11 @@ private:
 #endif // !USE_BZ2LIB
 };
 
-CFile::CFile() : pimpl(new CFile::PImpl)
+CFile::CFile() : pimpl(std::make_unique<CFile::PImpl>())
 {
 }
 
-CFile::~CFile()
-{
-	delete pimpl;
-}
-
+CFile::~CFile() = default;
 
 /**
 **  CLopen Library file open
@@ -220,10 +216,9 @@ static size_t sdl_write(SDL_RWops *context, const void *ptr, size_t size, size_t
 
 static int sdl_close(SDL_RWops *context)
 {
-	CFile *self = reinterpret_cast<CFile*>(context->hidden.unknown.data1);
+	std::unique_ptr<CFile> self{reinterpret_cast<CFile *>(context->hidden.unknown.data1)};
 	const int res = self->close();
 	SDL_FreeRW(context);
-	delete self;
 	return res;
 }
 

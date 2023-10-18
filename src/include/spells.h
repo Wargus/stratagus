@@ -96,23 +96,6 @@ enum class ECondition
 
 /*
 ** *******************
-** Target definition.
-** *******************
-*/
-
-class Target
-{
-public:
-	Target(TargetType type, CUnit *unit, const Vec2i &pos) :
-		Type(type), Unit(unit), targetPos(pos) {}
-
-	TargetType Type;                  /// type of target.
-	CUnit *Unit;                      /// Unit target.
-	Vec2i targetPos;
-};
-
-/*
-** *******************
 ** Conditions definition.
 ** *******************
 */

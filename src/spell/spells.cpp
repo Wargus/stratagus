@@ -69,22 +69,6 @@ std::vector<std::unique_ptr<SpellType>> SpellTypeTable;
 ----------------------------------------------------------------------------*/
 
 // ****************************************************************************
-// Target constructor
-// ****************************************************************************
-
-/**
-**  Target constructor for unit.
-**
-**  @param unit  Target unit.
-**
-**  @return the new target.
-*/
-static std::unique_ptr<Target> NewTargetUnit(CUnit &unit)
-{
-	return std::make_unique<Target>(TargetUnit, &unit, unit.tilePos);
-}
-
-// ****************************************************************************
 // Main local functions
 // ****************************************************************************
 
@@ -238,11 +222,11 @@ private:
 **  @param caster    Unit who would cast the spell.
 **  @param spell     Spell-type pointer.
 **
-**  @return          Target* chosen target or Null if spell can't be cast.
+**  @return          chosen target or nullopt if spell can't be casted.
 **  @todo FIXME: should be global (for AI) ???
 **  @todo FIXME: write for position target.
 */
-static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
+static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell)
 {
 	AutoCastInfo *autocast;
 
@@ -276,7 +260,7 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 							})
 			!= table.end();
 		if ((autocast->Combat == ECondition::ShouldBeTrue) ^ (inCombat)) {
-			return nullptr;
+			return std::nullopt;
 		}
 	}
 
@@ -284,9 +268,9 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 		case TargetSelf :
 			if (PassCondition(caster, spell, &caster, pos, spell.Condition.get())
 				&& PassCondition(caster, spell, &caster, pos, autocast->Condition.get())) {
-				return NewTargetUnit(caster);
+				return std::pair{&caster, caster.tilePos};
 			}
-			return nullptr;
+			return std::nullopt;
 		case TargetPosition: {
 			if (autocast->PositionAutoCast && table.empty() == false) {
 				size_t count = 0;
@@ -319,11 +303,11 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 					const auto [x, y] = autocast->PositionAutoCast->call<int, int>(array);
 					Vec2i resPos(x, y);
 					if (Map.Info.IsPointOnMap(resPos)) {
-						return std::make_unique<Target>(TargetPosition, nullptr, resPos);
+						return std::pair{nullptr, resPos};
 					}
 				}
 			}
-			return nullptr;
+			return std::nullopt;
 		}
 		case TargetUnit: {
 			// The units are already selected.
@@ -360,13 +344,15 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			// Now select the best unit to target.
 			if (n != 0) {
 				// For the best target???
+				CUnit *unit;
 				if (autocast->PriorytyVar != ACP_NOVALUE) {
 					std::sort(table.begin(), table.begin() + n,
 							  AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
-					return NewTargetUnit(*table[0]);
+					unit = table[0];
 				} else { // Use the old behavior
-					return NewTargetUnit(*table[SyncRand() % n]);
+					unit = table[SyncRand() % n];
 				}
+				return std::pair{unit, unit->tilePos};
 			}
 			break;
 		}
@@ -374,9 +360,9 @@ static std::unique_ptr<Target> SelectTargetUnitsOfAutoCast(CUnit &caster, const 
 			// Something is wrong
 			DebugPrint("Spell is screwed up, unknown target type\n");
 			Assert(0);
-			return nullptr;
+			return std::nullopt;
 	}
-	return nullptr; // Can't spell the auto-cast.
+	return std::nullopt; // Can't spell the auto-cast.
 }
 
 // ****************************************************************************
@@ -466,7 +452,7 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 		return false;
 	}
 	auto target = SelectTargetUnitsOfAutoCast(caster, spell);
-	if (target == nullptr) {
+	if (target == std::nullopt) {
 		return false;
 	} else {
 		// Save previous order
@@ -474,8 +460,9 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 		if (caster.CurrentAction() != UnitAction::Still && caster.CanStoreOrder(caster.CurrentOrder())) {
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
+		auto [targetUnit, targetPos] = *target;
 		// Must move before?
-		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
+		CommandSpellCast(caster, targetPos, targetUnit, spell, FlushCommands, true);
 		if (savedOrder != nullptr) {
 			caster.SavedOrder = std::move(savedOrder);
 		}

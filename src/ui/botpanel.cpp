@@ -75,7 +75,7 @@ ButtonAction *LastDrawnButtonPopup;
 /// for unit buttons sub-menus etc.
 int CurrentButtonLevel;
 /// All buttons for units
-std::vector<ButtonAction *> UnitButtonTable;
+std::vector<std::unique_ptr<ButtonAction>> UnitButtonTable;
 /// Pointer to current buttons
 std::vector<ButtonAction> CurrentButtons;
 
@@ -89,7 +89,7 @@ std::vector<ButtonAction> CurrentButtons;
 void InitButtons()
 {
 	// Resolve the icon names.
-	for (auto *buttonAction : UnitButtonTable) {
+	for (auto &buttonAction : UnitButtonTable) {
 		buttonAction->Icon.Load();
 	}
 	CurrentButtons.clear();
@@ -109,7 +109,7 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 			   const std::string &popup, bool alwaysShow)
 {
 	char buf[2048];
-	ButtonAction *ba = new ButtonAction;
+	auto ba = std::make_unique<ButtonAction>();
 
 	ba->Pos = pos;
 	ba->Level = level;
@@ -174,7 +174,7 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 		sprintf(buf, ",%s,", umask.c_str());
 	}
 	ba->UnitMask = buf;
-	UnitButtonTable.push_back(ba);
+	UnitButtonTable.push_back(std::move(ba));
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
 }
@@ -185,10 +185,6 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 */
 void CleanButtons()
 {
-	// Free the allocated buttons.
-	for (auto *buttonAction : UnitButtonTable) {
-		delete buttonAction;
-	}
 	UnitButtonTable.clear();
 
 	CurrentButtonLevel = 0;
@@ -936,35 +932,35 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActions)
 {
 	buttonActions->resize(UI.ButtonPanel.Buttons.size());
-	for (size_t z = 0; z < UI.ButtonPanel.Buttons.size(); ++z) {
-		(*buttonActions)[z].Pos = -1;
+	for (auto &buttonAction : *buttonActions) {
+		buttonAction.Pos = -1;
 	}
 	char unit_ident[128];
 
 	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());
 
-	for (size_t z = 0; z < UnitButtonTable.size(); ++z) {
-		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
+	for (auto &buttonAction : UnitButtonTable) {
+		if (buttonAction->Level != CurrentButtonLevel) {
 			continue;
 		}
 
 		// any unit or unit in list
-		if (UnitButtonTable[z]->UnitMask[0] != '*'
-			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
+		if (buttonAction->UnitMask[0] != '*'
+			&& !strstr(buttonAction->UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
 
 		const bool allow =
-			UnitButtonTable[z]->AlwaysShow || ranges::all_of(Selected, [&](const CUnit *unit) {
-				return IsButtonAllowed(*unit, *UnitButtonTable[z]);
+			buttonAction->AlwaysShow || ranges::all_of(Selected, [&](const CUnit *unit) {
+				return IsButtonAllowed(*unit, *buttonAction);
 			});
-		Assert(1 <= UnitButtonTable[z]->Pos);
-		Assert(UnitButtonTable[z]->Pos <= (int)UI.ButtonPanel.Buttons.size());
+		Assert(1 <= buttonAction->Pos);
+		Assert(buttonAction->Pos <= (int)UI.ButtonPanel.Buttons.size());
 
 		// is button allowed after all?
 		if (allow) {
 			// OverWrite, So take last valid button.
-			(*buttonActions)[UnitButtonTable[z]->Pos - 1] = *UnitButtonTable[z];
+			(*buttonActions)[buttonAction->Pos - 1] = *buttonAction;
 		}
 	}
 }
@@ -1003,7 +999,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	} else {
 		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
 	}
-	for (ButtonAction *buttonactionPtr : UnitButtonTable) {
+	for (auto &buttonactionPtr : UnitButtonTable) {
 		ButtonAction &buttonaction = *buttonactionPtr;
 		Assert(0 < buttonaction.Pos && buttonaction.Pos <= (int)UI.ButtonPanel.Buttons.size());
 

@@ -38,20 +38,18 @@
 #include "unit.h"
 
 #include "action/action_attack.h"
-
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
 #include "commands.h"
 #include "construct.h"
-#include "game.h"
 #include "editor.h"
+#include "game.h"
 #include "interface.h"
 #include "luacallback.h"
 #include "map.h"
 #include "missile.h"
 #include "network.h"
-#include "pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "settings.h"
@@ -424,8 +422,7 @@ void CUnit::Init()
 	Stats = nullptr;
 	CurrentSightRange = 0;
 
-	delete pathFinderData;
-	pathFinderData = new PathFinderData;
+	pathFinderData = std::make_unique<PathFinderData>();
 	pathFinderData->input.SetUnit(*this);
 
 	Frame = 0;
@@ -474,12 +471,6 @@ void CUnit::Init()
 	AutoCastSpell.clear();
 	SpellCoolDownTimers.clear();
 	Goal = nullptr;
-}
-
-CUnit::~CUnit() {
-	Type = nullptr;
-
-	delete pathFinderData;
 }
 
 /**

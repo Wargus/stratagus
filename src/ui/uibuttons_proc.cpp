@@ -108,12 +108,16 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 					 (!p->TextReverseColor.empty() ? p->TextReverseColor :
 					  !style->TextReverseColor.empty() ? style->TextReverseColor : oldrc));
 
-		if (p->TextAlign == TextAlignCenter || p->TextAlign == TextAlignUndefined) {
-			label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text);
-		} else if (p->TextAlign == TextAlignLeft) {
-			label.Draw(x + p->TextPos.x, y + p->TextPos.y, text);
-		} else {
-			label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text);
+		switch (p->TextAlign)
+		{
+			default:
+			case ETextAlignment::Center:
+				label.DrawCentered(x + p->TextPos.x, y + p->TextPos.y, text);
+				break;
+			case ETextAlignment::Left: label.Draw(x + p->TextPos.x, y + p->TextPos.y, text); break;
+			case ETextAlignment::Right:
+				label.Draw(x + p->TextPos.x - style->Font->Width(text), y + p->TextPos.y, text);
+				break;
 		}
 	}
 

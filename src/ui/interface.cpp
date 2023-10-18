@@ -869,7 +869,7 @@ static void InputKey(int key)
 #ifdef DEBUG
 			if (starts_with(Input, "ffw ")) {
 #else
-			if (starts_with(Input, "ffw ") && ReplayGameType != ReplayNone) {
+			if (starts_with(Input, "ffw ") && ReplayGameType != EReplayType::None) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
