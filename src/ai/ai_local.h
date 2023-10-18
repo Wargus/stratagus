@@ -406,10 +406,10 @@ extern void AiExplore(const Vec2i &pos, int exploreMask);
 extern void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b);
 /// Remove any equivalence between unittypes
 extern void AiResetUnitTypeEquiv();
-/// Finds all equivalents units to a given one
-extern int AiFindUnitTypeEquiv(const CUnitType &type, int *result);
+/// Finds all equivalents unittypes to a given one
+extern std::vector<int> AiFindUnitTypeEquiv(const CUnitType &type);
 /// Finds all available equivalents units to a given one, in the preferred order
-extern int AiFindAvailableUnitTypeEquiv(const CUnitType &type, int *result);
+extern std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &type);
 extern std::array<int, UnitTypeMax> AiGetBuildRequestsCount(const PlayerAi &pai);
 
 extern void AiNewDepotRequest(CUnit &worker);

@@ -540,10 +540,9 @@ static void AiRemoveFromBuilt(PlayerAi &pai, const CUnitType &type)
 	}
 
 	//  This could happen if an upgrade is ready, look for equivalent units.
-	int equivalents[UnitTypeMax + 1];
-	const int equivalentsCount = AiFindUnitTypeEquiv(type, equivalents);
-	for (int i = 0; i < equivalentsCount; ++i) {
-		if (AiRemoveFromBuilt2(pai, *UnitTypes[equivalents[i]])) {
+	const auto equivalents = AiFindUnitTypeEquiv(type);
+	for (int typeIndex : equivalents) {
+		if (AiRemoveFromBuilt2(pai, *UnitTypes[typeIndex])) {
 			return;
 		}
 	}
@@ -586,11 +585,10 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 		return;
 	}
 	//  This could happen if an upgrade is ready, look for equivalent units.
-	int equivs[UnitTypeMax + 1];
-	const unsigned int equivnb = AiFindUnitTypeEquiv(type, equivs);
+	const auto equivs = AiFindUnitTypeEquiv(type);
 
-	for (unsigned int i = 0; i < equivnb; ++i) {
-		if (AiReduceMadeInBuilt2(pai, *UnitTypes[equivs[i]])) {
+	for (int typeIndex : equivs) {
+		if (AiReduceMadeInBuilt2(pai, *UnitTypes[typeIndex])) {
 			return;
 		}
 	}

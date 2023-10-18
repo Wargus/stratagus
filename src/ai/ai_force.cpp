@@ -241,23 +241,21 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 **  Find All unittypes equivalent to a given one
 **
 **  @param unittype  the unittype to find equivalence for
-**  @param result    int array which will hold the result. (Size UnitTypeMax+1)
 **
-**  @return          the number of unittype found
+**  @return          the unittypes found
 */
-int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
+std::vector<int> AiFindUnitTypeEquiv(const CUnitType &unittype)
 {
 	const int search = UnitTypeEquivs[unittype.Slot];
-	int count = 0;
+	std::vector<int> result;
 
 	for (int i = 0; i < UnitTypeMax + 1; ++i) {
 		if (UnitTypeEquivs[i] == search) {
 			// Found one
-			result[count] = i;
-			++count;
+			result.push_back(i);
 		}
 	}
-	return count;
+	return result;
 }
 
 class UnitTypePrioritySorter_Decreasing
@@ -271,30 +269,23 @@ public:
 
 /**
 **  Find All unittypes equivalent to a given one, and which are available
-**  UnitType are returned in the preferred order (ie palladin >> knight...)
+**  UnitType are returned in the preferred order (ie paladin >> knight...)
 **
 **  @param unittype     The unittype to find equivalence for
-**  @param usableTypes  int array which will hold the result. (Size UnitTypeMax+1)
 **
-**  @return             the number of unittype found
+**  @return             the unittypes found
 */
-int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
+std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &unittype)
 {
 	// 1 - Find equivalents
-	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
+	auto usableTypes = AiFindUnitTypeEquiv(unittype);
 	// 2 - Remove unavailable unittypes
-	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependByIdent(*AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
-			// Not available, remove it
-			usableTypes[i] = usableTypes[usableTypesCount - 1];
-			--usableTypesCount;
-		} else {
-			++i;
-		}
-	}
+	ranges::erase_if(usableTypes, [&](int typeIndex) {
+		return !CheckDependByIdent(*AiPlayer->Player, UnitTypes[typeIndex]->Ident);
+	});
 	// 3 - Sort by level
-	std::sort(usableTypes, usableTypes + usableTypesCount, UnitTypePrioritySorter_Decreasing());
-	return usableTypesCount;
+	ranges::sort(usableTypes, UnitTypePrioritySorter_Decreasing());
+	return usableTypes;
 }
 
 /* =========================== FORCES ========================== */

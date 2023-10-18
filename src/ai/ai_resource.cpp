@@ -627,31 +627,22 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 static bool AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 {
 	// Find equivalents unittypes.
-	int usableTypes[UnitTypeMax + 1];
-	const int usableTypesCount = AiFindAvailableUnitTypeEquiv(typeToMake, usableTypes);
+	const auto usableTypes = AiFindAvailableUnitTypeEquiv(typeToMake);
 
 	// Iterate them
-	for (int currentType = 0; currentType < usableTypesCount; ++currentType) {
-		CUnitType &type = *UnitTypes[usableTypes[currentType]];
-		int n;
-		std::vector<std::vector<CUnitType *> > *tablep;
+	for (int typeIndex : usableTypes) {
+		CUnitType &type = *UnitTypes[typeIndex];
 		//
 		// Check if we have a place for building or a unit to build.
 		//
-		if (type.Building) {
-			n = AiHelpers.Build().size();
-			tablep = &AiHelpers.Build();
-		} else {
-			n = AiHelpers.Train().size();
-			tablep = &AiHelpers.Train();
-		}
-		if (type.Slot > n) { // Oops not known.
+		const std::vector<std::vector<CUnitType *> > &tablep = type.Building ? AiHelpers.Build() : AiHelpers.Train();
+		if (type.Slot > tablep.size()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit I: Nothing known about '%s'\n",
 			           AiPlayer->Player->Index,
 			           type.Ident.c_str());
 			continue;
 		}
-		std::vector<CUnitType *> &table = (*tablep)[type.Slot];
+		const std::vector<CUnitType *> &table = tablep[type.Slot];
 		if (table.empty()) { // Oops not known.
 			DebugPrint("%d: AiMakeUnit II: Nothing known about '%s'\n",
 			           AiPlayer->Player->Index,
@@ -660,7 +651,7 @@ static bool AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 		}
 
 		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
-		for (CUnitType *unitType : table) {
+		for (const CUnitType *unitType : table) {
 			//
 			// The type for builder/trainer is available
 			//
