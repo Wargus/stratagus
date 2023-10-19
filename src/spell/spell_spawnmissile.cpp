@@ -197,18 +197,15 @@ int Spell_SpawnMissile::Cast(CUnit &caster,
 	if (this->Missile->Class == MissileClass::DeathCoil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table = Select(goalPos - offset, goalPos + offset);
-		int count = 0;
-		for (CUnit *unitPtr : table) {
-			CUnit &unit = *unitPtr;
-
-			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.IsEnemy(caster)) {
-				table[count++] = &unit;
-			}
-		}
-		if (count > 0) {
-			std::sort(table.begin(), table.begin() + count, CompareUnitDistance(caster));
+		ranges::erase_if(table, [&](const CUnit *unit) {
+			return !unit->Type->BoolFlag[ORGANIC_INDEX].value || !unit->IsEnemy(caster);
+		});
+		if (!table.empty()) {
+			ranges::sort(table, CompareUnitDistance(caster));
 			int damageLeft = this->Damage;
-			for (std::vector<CUnit *>::iterator it = table.begin(); it != table.begin() + count && damageLeft > 0; ++it) {
+			for (std::vector<CUnit *>::iterator it = table.begin();
+			     it != table.end() && damageLeft > 0;
+			     ++it) {
 				CUnit &unit = **it;
 				if (unit.IsAliveOnMap()) {
 					const PixelPos startPos = EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos);
@@ -216,7 +213,7 @@ int Spell_SpawnMissile::Cast(CUnit &caster,
 					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
 					missile->TTL = this->TTL;
 					missile->Delay = this->Delay;
-					if (it + 1 == table.begin() + count) {
+					if (it + 1 == table.end()) {
 						missile->Damage = damageLeft;
 						damageLeft = 0;
 					} else {
