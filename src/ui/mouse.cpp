@@ -1216,15 +1216,11 @@ static int SendMove(const Vec2i &tilePos)
 	} else {
 		// Move to a transporter.
 		if (goal && goal->Type->CanTransport()) {
-			size_t i;
-			for (i = 0; i != Selected.size(); ++i) {
-				if (CanTransport(*goal, *Selected[i])) {
-					SendCommandStopUnit(*goal);
-					ret = 1;
-					break;
-				}
-			}
-			if (i == Selected.size()) {
+			if (ranges::any_of(Selected,
+			                   [&](const CUnit *unit) { return CanTransport(*goal, *unit); })) {
+				SendCommandStopUnit(*goal);
+				ret = 1;
+			} else {
 				goal = nullptr;
 			}
 		} else {
