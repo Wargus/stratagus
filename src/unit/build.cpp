@@ -405,16 +405,16 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 **  @param type  unit-type to be checked.
 **  @param pos   Map position.
 **
-**  @return      OnTop, parent unit, builder on true or 1 if unit==nullptr, nullptr false.
+**  @return      OnTop, parent unit, builder, else std::nullopt.
 */
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
+std::optional<CUnit *> CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 {
 	//  Can't build outside the map
 	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
-		return nullptr;
+		return std::nullopt;
 	}
 	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
-		return nullptr;
+		return std::nullopt;
 	}
 
 	// Must be checked before oil!
@@ -437,7 +437,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			index += Map.Info.MapWidth;
 		} while (!success && --h);
 		if (!success) {
-			return nullptr;
+			return std::nullopt;
 		}
 	}
 
@@ -458,30 +458,24 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 			}
 		}
 		if (aiChecked == false) {
-			return nullptr;
+			return std::nullopt;
 		}
 	}
 
 	if (GameCycle != 0) {
 		if (!type.BuildingRules.empty()) {
 			for (auto &rule : type.BuildingRules) {
-				
 				CUnit *ontoptarget = nullptr;
 				// All checks processed, did we really have success
 				if (rule->Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset return
-					if (unit == nullptr) {
-						return ontoptarget ? ontoptarget : (CUnit *)1;
-					} else {
-						return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
-					}
+					return ontoptarget ? ontoptarget : const_cast<CUnit *>(unit);
 				}
 			}
-			return nullptr;
+			return std::nullopt;
 		}
 	}
-
-	return (unit == nullptr) ? (CUnit *)1 : const_cast<CUnit *>(unit);
+	return const_cast<CUnit *>(unit);
 }
 
 /**
@@ -511,12 +505,12 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
 {
 	// Terrain Flags don't matter if building on top of a unit.
-	CUnit *ontop = CanBuildHere(unit, type, pos);
-	if (ontop == nullptr) {
+	std::optional<CUnit *> ontop = CanBuildHere(unit, type, pos);
+	if (ontop == std::nullopt) {
 		return nullptr;
 	}
-	if (ontop != (CUnit *)1 && ontop != unit) {
-		return ontop;
+	if (*ontop != nullptr && *ontop != unit) {
+		return *ontop;
 	}
 
 	//  Remove unit that is building!
@@ -536,7 +530,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
 				h = type.TileHeight;
-				ontop = nullptr;
+				*ontop = nullptr;
 				break;
 			}
 			if (player && !real) {
@@ -550,12 +544,12 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			const CMapField &mf = *Map.Field(index + pos.x + w);
 			if (mf.CheckMask(testmask)) {
 				h = type.TileHeight;
-				ontop = nullptr;
+				*ontop = nullptr;
 				break;
 			}
 			if (player && !mf.playerInfo.IsExplored(*player)) {
 				h = type.TileHeight;
-				ontop = nullptr;
+				*ontop = nullptr;
 				break;
 			}
 		}
@@ -565,7 +559,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 		MarkUnitFieldFlags(*unit);
 	}
 	// We can build here: check distance to gold mine/oil patch!
-	return ontop;
+	return *ontop;
 }
 
 //@}

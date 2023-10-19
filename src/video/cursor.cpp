@@ -263,17 +263,17 @@ static void DrawBuildingCursor()
 	//
 	//  Draw the allow overlay
 	//
-	int f;
+	bool f;
 	if (!Selected.empty()) {
-		f = 1;
+		f = true;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != nullptr);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos).value_or(nullptr)) != nullptr);
 			// Assign ontop or nullptr
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(nullptr, *CursorBuilding, mpos)) != nullptr);
-		if (!Editor.Running || ontop == (CUnit *)1) {
+		f = ((ontop = CanBuildHere(nullptr, *CursorBuilding, mpos).value_or(nullptr)) != nullptr);
+		if (!Editor.Running) {
 			ontop = nullptr;
 		}
 	}
