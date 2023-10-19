@@ -78,12 +78,9 @@ static bool AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
 static int AiCheckCosts(const int (&costs)[MaxCosts])
 {
 	// FIXME: the used costs shouldn't be calculated here
-	int *used = AiPlayer->Used;
+	int(&used)[MaxCosts] = AiPlayer->Used;
 
-	for (int i = 1; i < MaxCosts; ++i) {
-		used[i] = 0;
-	}
-
+	ranges::fill(used, 0);
 	for (CUnit *unit : AiPlayer->Player->GetUnits()) {
 		for (const auto &order : unit->Orders) {
 			if (order->Action == UnitAction::Build) {
@@ -362,15 +359,11 @@ void AiNewDepotRequest(CUnit &worker)
 	// Count the already made build requests.
 	const auto counter = AiGetBuildRequestsCount(*worker.Player->Ai);
 
-	const int n = AiHelpers.Depots()[resource - 1].size();
-
-	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.Depots()[resource - 1][i];
-
-		if (counter[type.Slot]) { // Already ordered.
+	for (CUnitType *type : AiHelpers.Depots()[resource - 1]) {
+		if (counter[type->Slot]) { // Already ordered.
 			return;
 		}
-		if (!AiRequestedTypeAllowed(*worker.Player, type)) {
+		if (!AiRequestedTypeAllowed(*worker.Player, *type)) {
 			continue;
 		}
 
@@ -378,11 +371,11 @@ void AiNewDepotRequest(CUnit &worker)
 		//int needmask = AiCheckUnitTypeCosts(type);
 		int cost = 0;
 		for (int c = 1; c < MaxCosts; ++c) {
-			cost += type.Stats[worker.Player->Index].Costs[c];
+			cost += type->Stats[worker.Player->Index].Costs[c];
 		}
 
 		if (best_type == nullptr || (cost < best_cost)) {
-			best_type = &type;
+			best_type = type;
 			best_cost = cost;
 			//best_mask = needmask;
 		}
@@ -510,9 +503,8 @@ static bool AiRequestSupply()
 	int j = 0;
 	const int n = AiHelpers.UnitLimit()[0].size();
 
-	for (int i = 0; i < n; ++i) {
-		CUnitType &type = *AiHelpers.UnitLimit()[0][i];
-		if (counter[type.Slot]) { // Already ordered.
+	for (CUnitType *type : AiHelpers.UnitLimit()[0]) {
+		if (counter[type->Slot]) { // Already ordered.
 #if defined(DEBUG) && defined(DebugRequestSupply)
 			DebugPrint("%d: AiRequestSupply: Supply already build in %s\n",
 					   AiPlayer->Player->Index, type->Name.c_str());
@@ -520,21 +512,21 @@ static bool AiRequestSupply()
 			return false;
 		}
 
-		if (!AiRequestedTypeAllowed(*AiPlayer->Player, type)) {
+		if (!AiRequestedTypeAllowed(*AiPlayer->Player, *type)) {
 			continue;
 		}
 
 		//
 		// Check if resources available.
 		//
-		cache[j].needmask = AiCheckUnitTypeCosts(type);
+		cache[j].needmask = AiCheckUnitTypeCosts(*type);
 
 		for (int c = 1; c < MaxCosts; ++c) {
-			cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Costs[c];
+			cache[j].unit_cost += type->Stats[AiPlayer->Player->Index].Costs[c];
 		}
-		cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
-		cache[j].unit_cost /= type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
-		cache[j++].type = &type;
+		cache[j].unit_cost += type->Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
+		cache[j].unit_cost /= type->Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
+		cache[j++].type = type;
 		Assert(j < 16);
 	}
 
