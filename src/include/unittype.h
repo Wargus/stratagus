@@ -52,6 +52,7 @@
 #include "luacallback.h"
 #include "missileconfig.h"
 #include "spells.h"
+#include "util.h"
 #include "vec2i.h"
 
 #include <climits>
@@ -748,7 +749,7 @@ public:
 
 		void Init()
 		{
-			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
+			ranges::sort(buildin, DataKey::key_pred);
 		}
 
 		std::string_view operator[](int index)
