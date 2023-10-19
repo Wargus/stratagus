@@ -77,9 +77,9 @@ bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const int
 		{"non-mixing", MapFieldNonMixing}
 	};
 
-	for (unsigned int i = 0; i != sizeof(flags) / sizeof(*flags); ++i) {
-		if (flagName == flags[i].name) {
-			*flag |= flags[i].flag;
+	for (const auto& [name, tileFlag] : flags) {
+		if (flagName == name) {
+			*flag |= tileFlag;
 			return true;
 		}
 	}
@@ -93,9 +93,9 @@ bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const int
 		{"slow", 2},
 		{"slower", 3}
 	};
-	for (unsigned int i = 0; i != sizeof(speeds) / sizeof(*speeds); ++i) {
-		if (flagName == speeds[i].name) {
-			*flag = (*flag & ~MapFieldSpeedMask) | speeds[i].speed;
+	for (const auto& [name, speed] : speeds) {
+		if (flagName == name) {
+			*flag = (*flag & ~MapFieldSpeedMask) | speed;
 			return true;
 		}
 	}
