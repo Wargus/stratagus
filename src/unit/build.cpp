@@ -444,13 +444,11 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	// Check special rules for AI players
 	if (unit && unit->Player->AiEnabled) {
 		bool aiChecked = true;
-		size_t count = type.AiBuildingRules.size();
-		if (count > 0) {
+		if (!type.AiBuildingRules.empty()) {
 			CUnit *ontoptarget = nullptr;
-			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction &rule = *type.AiBuildingRules[i];
+			for (auto &rule : type.AiBuildingRules) {
 				// All checks processed, did we really have success
-				if (rule.Check(unit, type, pos, ontoptarget)) {
+				if (rule->Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset
 					aiChecked = true;
 					break;
@@ -465,13 +463,12 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	}
 
 	if (GameCycle != 0) {
-		size_t count = type.BuildingRules.size();
-		if (count > 0) {
-			for (unsigned int i = 0; i < count; ++i) {
-				CBuildRestriction &rule = *type.BuildingRules[i];
+		if (!type.BuildingRules.empty()) {
+			for (auto &rule : type.BuildingRules) {
+				
 				CUnit *ontoptarget = nullptr;
 				// All checks processed, did we really have success
-				if (rule.Check(unit, type, pos, ontoptarget)) {
+				if (rule->Check(unit, type, pos, ontoptarget)) {
 					// We passed a full ruleset return
 					if (unit == nullptr) {
 						return ontoptarget ? ontoptarget : (CUnit *)1;

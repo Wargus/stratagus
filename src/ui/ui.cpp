@@ -229,9 +229,8 @@ void CursorConfig::Load()
 void CUserInterface::Load()
 {
 	//  Load graphics
-	const int size = (int)Fillers.size();
-	for (int i = 0; i < size; ++i) {
-		Fillers[i].Load();
+	for (auto &filler : Fillers) {
+		filler.Load();
 	}
 
 	for (int i = 0; i <= FreeWorkersCount; ++i) {

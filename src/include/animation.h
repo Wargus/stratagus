@@ -99,11 +99,11 @@ public:
 		delete Attack;
 		delete RangedAttack;
 		delete Build;
-		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
-			delete Death[i];
+		for (auto *p : Death) {
+			delete p;
 		}
-		for (int i = 0; i < MaxCosts; ++i) {
-			delete Harvest[i];
+		for (auto *p : Harvest) {
+			delete p;
 		}
 		delete Move;
 		delete Repair;
