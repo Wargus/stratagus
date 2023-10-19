@@ -52,6 +52,7 @@
 #include "luacallback.h"
 #include "missileconfig.h"
 #include "spells.h"
+#include "util.h"
 #include "vec2i.h"
 
 #include <climits>
@@ -748,20 +749,16 @@ public:
 
 		void Init()
 		{
-			std::sort(buildin, buildin + SIZE, DataKey::key_pred);
+			ranges::sort(buildin, DataKey::key_pred);
 		}
 
 		std::string_view operator[](int index)
 		{
-			for (unsigned int i = 0; i < SIZE; ++i) {
-				if (buildin[i].offset == index) {
-					return buildin[i].key;
-				}
+			if (auto it = ranges::find(buildin, index, &DataKey::offset); it != std::end(buildin)) {
+				return it->key;
 			}
-			for (const auto &[key, value] : user) {
-				if (value == index) {
-					return key;
-				}
+			if (auto it = ranges::find(user, index, &std::pair<const std::string, int>::second); it != user.end()) {
+				return it->first;
 			}
 			return ""; // Not found
 		}

@@ -459,14 +459,8 @@ static void InsertUnitTypeRequests(CUnitType *type, int count)
 */
 static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 {
-	const size_t n = AiPlayer->UnitTypeRequests.size();
-
-	for (size_t i = 0; i < n; ++i) {
-		if (AiPlayer->UnitTypeRequests[i].Type == type) {
-			return &AiPlayer->UnitTypeRequests[i];
-		}
-	}
-	return nullptr;
+	const auto it = ranges::find(AiPlayer->UnitTypeRequests, type, &AiRequestType::Type);
+	return it != AiPlayer->UnitTypeRequests.end() ? &*it : nullptr;
 }
 
 /**
@@ -1521,22 +1515,19 @@ static int CclAiDump(lua_State *l)
 			//
 			// Requests
 			//
-			size_t n = aip.Ai->UnitTypeRequests.size();
-			printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(n));
-			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->UnitTypeRequests[i].Type->Ident.c_str());
+			printf("UnitTypeRequests(%u):\n", static_cast<unsigned int>(aip.Ai->UnitTypeRequests.size()));
+			for (const auto &requestType : aip.Ai->UnitTypeRequests) {
+				printf("%s ", requestType.Type->Ident.c_str());
 			}
 			printf("\n");
-			n = aip.Ai->UpgradeToRequests.size();
-			printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(n));
-			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->UpgradeToRequests[i]->Ident.c_str());
+			printf("UpgradeToRequests(%u):\n", static_cast<unsigned int>(aip.Ai->UpgradeToRequests.size()));
+			for (const auto *unittype : aip.Ai->UpgradeToRequests) {
+				printf("%s ", unittype->Ident.c_str());
 			}
 			printf("\n");
-			n = aip.Ai->ResearchRequests.size();
-			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(n));
-			for (size_t i = 0; i < n; ++i) {
-				printf("%s ", aip.Ai->ResearchRequests[i]->Ident.c_str());
+			printf("ResearchRequests(%u):\n", static_cast<unsigned int>(aip.Ai->ResearchRequests.size()));
+			for (const auto *upgrade : aip.Ai->ResearchRequests) {
+				printf("%s ", upgrade->Ident.c_str());
 			}
 			printf("\n");
 

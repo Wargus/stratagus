@@ -226,7 +226,9 @@ namespace ranges
 	template <typename Range, typename Predicate>
 	auto find_if(Range &range, Predicate &&predicate)
 	{
-		return std::find_if(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
+		return std::find_if(std::begin(range), std::end(range), [&](const auto &elem) {
+			return std::invoke(std::forward<Predicate>(predicate), elem);
+		});
 	}
 
 	template <typename Range, typename Pred>
@@ -293,7 +295,9 @@ namespace ranges
 	template <typename Range, typename OutputIt, typename UnaryPredicate>
 	auto copy_if(const Range &range, OutputIt copy_to, UnaryPredicate pred)
 	{
-		return std::copy_if(std::begin(range), std::end(range), copy_to, pred);
+		return std::copy_if(std::begin(range), std::end(range), copy_to, [&](const auto &elem) {
+			return std::invoke(std::forward<UnaryPredicate>(pred), elem);
+		});
 	}
 
 	template <typename Range>

@@ -209,9 +209,7 @@ int UnitTypeEquivs[UnitTypeMax + 1]; /// equivalence between unittypes
 */
 void AiResetUnitTypeEquiv()
 {
-	for (int i = 0; i <= UnitTypeMax; ++i) {
-		UnitTypeEquivs[i] = i;
-	}
+	ranges::iota(UnitTypeEquivs, 0);
 }
 
 /**
@@ -243,23 +241,21 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 **  Find All unittypes equivalent to a given one
 **
 **  @param unittype  the unittype to find equivalence for
-**  @param result    int array which will hold the result. (Size UnitTypeMax+1)
 **
-**  @return          the number of unittype found
+**  @return          the unittypes found
 */
-int AiFindUnitTypeEquiv(const CUnitType &unittype, int *result)
+std::vector<int> AiFindUnitTypeEquiv(const CUnitType &unittype)
 {
 	const int search = UnitTypeEquivs[unittype.Slot];
-	int count = 0;
+	std::vector<int> result;
 
 	for (int i = 0; i < UnitTypeMax + 1; ++i) {
 		if (UnitTypeEquivs[i] == search) {
 			// Found one
-			result[count] = i;
-			++count;
+			result.push_back(i);
 		}
 	}
-	return count;
+	return result;
 }
 
 class UnitTypePrioritySorter_Decreasing
@@ -273,30 +269,23 @@ public:
 
 /**
 **  Find All unittypes equivalent to a given one, and which are available
-**  UnitType are returned in the preferred order (ie palladin >> knight...)
+**  UnitType are returned in the preferred order (ie paladin >> knight...)
 **
 **  @param unittype     The unittype to find equivalence for
-**  @param usableTypes  int array which will hold the result. (Size UnitTypeMax+1)
 **
-**  @return             the number of unittype found
+**  @return             the unittypes found
 */
-int AiFindAvailableUnitTypeEquiv(const CUnitType &unittype, int *usableTypes)
+std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &unittype)
 {
 	// 1 - Find equivalents
-	int usableTypesCount = AiFindUnitTypeEquiv(unittype, usableTypes);
+	auto usableTypes = AiFindUnitTypeEquiv(unittype);
 	// 2 - Remove unavailable unittypes
-	for (int i = 0; i < usableTypesCount;) {
-		if (!CheckDependByIdent(*AiPlayer->Player, UnitTypes[usableTypes[i]]->Ident)) {
-			// Not available, remove it
-			usableTypes[i] = usableTypes[usableTypesCount - 1];
-			--usableTypesCount;
-		} else {
-			++i;
-		}
-	}
+	ranges::erase_if(usableTypes, [&](int typeIndex) {
+		return !CheckDependByIdent(*AiPlayer->Player, UnitTypes[typeIndex]->Ident);
+	});
 	// 3 - Sort by level
-	std::sort(usableTypes, usableTypes + usableTypesCount, UnitTypePrioritySorter_Decreasing());
-	return usableTypesCount;
+	ranges::sort(usableTypes, UnitTypePrioritySorter_Decreasing());
+	return usableTypes;
 }
 
 /* =========================== FORCES ========================== */
@@ -565,10 +554,10 @@ std::optional<int> AiForceManager::GetForce(const CUnit &unit)
 	for (unsigned int i = 0; i < forces.size(); ++i) {
 		AiForce &force = forces[i];
 
-		for (CUnit *aiunit : force.Units) {
-			if (UnitNumber(unit) == UnitNumber(*aiunit)) {
-				return i;
-			}
+		if (ranges::any_of(force.Units, [&](const CUnit *aiunit) {
+				return UnitNumber(unit) == UnitNumber(*aiunit);
+			})) {
+			return i;
 		}
 	}
 	return std::nullopt;
@@ -814,7 +803,6 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 
 	unsigned int nbToTransport = 0;
 	unsigned int transporterIndex = 0;
-	bool forceIsReady = true;
 
 	for (; transporterIndex < aiForce.Size(); ++transporterIndex) {
 		const CUnit &unit = *aiForce.Units[transporterIndex];
@@ -828,21 +816,17 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
 		return ;
 	}
-	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
-		const CUnit &unit = *aiForce.Units[i];
+	const bool forceIsReady = ranges::none_of(aiForce.Units, [&](const CUnit *unit) {
 		const CUnit &transporter = *aiForce.Units[transporterIndex];
 
-		if (CanTransport(transporter, unit) && unit.Container == nullptr) {
-			forceIsReady = false;
-			break;
-		}
-	}
+		return CanTransport(transporter, *unit) && unit->Container == nullptr;
+	});
 	if (forceIsReady == true) {
 		aiForce.State = AiForceAttackingState::AttackingWithTransporter;
 		return ;
 	}
-	for (unsigned int i = 0; i < aiForce.Size(); ++i) {
-		CUnit &unit = *aiForce.Units[i];
+	for (CUnit *unitPtr : aiForce.Units) {
+		CUnit &unit = *unitPtr;
 		CUnit &transporter = *aiForce.Units[transporterIndex];
 
 		if (unit.CurrentAction() == UnitAction::Board
@@ -892,15 +876,7 @@ void AiForce::Update()
 		}
 		return;
 	}
-	Attacking = false;
-	for (unsigned int i = 0; i < Size(); ++i) {
-		CUnit *aiunit = Units[i];
-
-		if (aiunit->Type->CanAttack) {
-			Attacking = true;
-			break;
-		}
-	}
+	Attacking = ranges::any_of(Units, [](const CUnit *aiunit) { return aiunit->Type->CanAttack; });
 	if (Attacking == false) {
 		if (!Defending && State > AiForceAttackingState::Waiting) {
 			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n",
@@ -930,12 +906,10 @@ void AiForce::Update()
 		// Move transporters to goalpos
 		std::vector<CUnit *> transporters;
 		bool emptyTrans = true;
-		for (unsigned int i = 0; i != Size(); ++i) {
-			CUnit &aiunit = *Units[i];
-
-			if (aiunit.CanMove() && aiunit.Type->MaxOnBoard) {
-				transporters.push_back(&aiunit);
-				if (aiunit.BoardCount > 0) {
+		for (CUnit *aiunit : Units) {
+			if (aiunit->CanMove() && aiunit->Type->MaxOnBoard) {
+				transporters.push_back(aiunit);
+				if (aiunit->BoardCount > 0) {
 					emptyTrans = false;
 				}
 			}
@@ -961,13 +935,8 @@ void AiForce::Update()
 		return;
 	}
 	CUnit *leader = nullptr;
-	for (unsigned int i = 0; i != Size(); ++i) {
-		CUnit &aiunit = *Units[i];
-
-		if (aiunit.IsAgressive()) {
-			leader = &aiunit;
-			break;
-		}
+	if (auto it = ranges::find_if(Units, &CUnit::IsAgressive); it != Units.end()) {
+		leader = *it;
 	}
 
 	const int thresholdDist = 5; // Hard coded value
@@ -977,8 +946,8 @@ void AiForce::Update()
 		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
 		int maxDist = minDist;
 
-		for (size_t i = 0; i != Size(); ++i) {
-			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
+		for (const CUnit *unit : Units) {
+			const int distance = unit->MapDistanceTo(this->GoalPos);
 			minDist = std::min(minDist, distance);
 			maxDist = std::max(maxDist, distance);
 		}
@@ -1024,13 +993,7 @@ void AiForce::Update()
 	}
 
 	std::vector<CUnit *> idleUnits;
-	for (unsigned int i = 0; i != Size(); ++i) {
-		CUnit &aiunit = *Units[i];
-
-		if (aiunit.IsIdle()) {
-			idleUnits.push_back(&aiunit);
-		}
-	}
+	ranges::copy_if(Units, std::back_inserter(idleUnits), &CUnit::IsIdle);
 
 	if (idleUnits.empty()) {
 		return;
@@ -1120,8 +1083,8 @@ void AiForceManager::Update()
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point
-				for (unsigned int i = 0; i != force.Size(); ++i) {
-					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
+				for (const CUnit *aiunit : force.Units) {
+					if (aiunit->MapDistanceTo(force.GoalPos) <= nearDist) {
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = nullptr;
 						maxPathing--;
@@ -1147,13 +1110,10 @@ void AiForceManager::Update()
 					force.ReturnToHome();
 				} else {
 					std::vector<CUnit *> idleUnits;
-					for (unsigned int i = 0; i != force.Size(); ++i) {
-						CUnit &aiunit = *force.Units[i];
-
-						if (aiunit.IsIdle() && aiunit.IsAliveOnMap()) {
-							idleUnits.push_back(&aiunit);
-						}
-					}
+					ranges::copy_if(
+						force.Units, std::back_inserter(idleUnits), [](const CUnit *aiunit) {
+							return aiunit->IsIdle() && aiunit->IsAliveOnMap();
+						});
 					for (unsigned int i = 0; i != idleUnits.size(); ++i) {
 						CUnit *const unit = idleUnits[i];
 

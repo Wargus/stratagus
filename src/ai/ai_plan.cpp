@@ -400,11 +400,9 @@ bool AiForce::PlanAttack()
 
 		// Verify we have enough transporter.
 		// @note: Minimal check for unitType (flyers...)
-		for (unsigned int i = 0; i < Size(); ++i) {
-			CUnit &unit = *Units[i];
-
-			if (CanTransport(*transporter, unit)) {
-				totalBoardCapacity -= unit.Type->BoardSize;
+		for (const CUnit *unit : Units) {
+			if (CanTransport(*transporter, *unit)) {
+				totalBoardCapacity -= unit->Type->BoardSize;
 			}
 		}
 		if (totalBoardCapacity < 0) { // Not enough transporter.

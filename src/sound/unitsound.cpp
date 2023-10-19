@@ -109,16 +109,16 @@ static void MapAnimSounds(CUnitType &type)
 	MapAnimSounds2(type.Animations->Attack);
 	MapAnimSounds2(type.Animations->RangedAttack);
 	MapAnimSounds2(type.Animations->SpellCast);
-	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-		MapAnimSounds2(type.Animations->Death[i]);
+	for (auto& soundConfig : type.Animations->Death) {
+		MapAnimSounds2(soundConfig);
 	}
 	MapAnimSounds2(type.Animations->Repair);
 	MapAnimSounds2(type.Animations->Train);
 	MapAnimSounds2(type.Animations->Research);
 	MapAnimSounds2(type.Animations->Upgrade);
 	MapAnimSounds2(type.Animations->Build);
-	for (int i = 0; i < MaxCosts; ++i) {
-		MapAnimSounds2(type.Animations->Harvest[i]);
+	for (auto& soundConfig : type.Animations->Harvest) {
+		MapAnimSounds2(soundConfig);
 	}
 }
 
@@ -133,8 +133,8 @@ void MapUnitSounds()
 		return;
 	}
 	// Parse all units sounds.
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		CUnitType &type = *UnitTypes[i];
+	for (CUnitType *typePtr : UnitTypes) {
+		CUnitType &type = *typePtr;
 
 		MapAnimSounds(type);
 
@@ -146,15 +146,15 @@ void MapUnitSounds()
 		type.MapSound.Ready.MapSound();
 		type.MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.MapSound.Repair.MapSound();
-		for (int i = 0; i < MaxCosts; ++i) {
-			type.MapSound.Harvest[i].MapSound();
+		for (auto &soundConfig : type.MapSound.Harvest) {
+			soundConfig.MapSound();
 		}
 		type.MapSound.Help.MapSound();
 		type.MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.MapSound.WorkComplete.MapSound();
 
-		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
-			type.MapSound.Dead[i].MapSound();
+		for (auto &soundConfig : type.MapSound.Dead) {
+			soundConfig.MapSound();
 		}
 	}
 }

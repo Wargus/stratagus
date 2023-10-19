@@ -273,33 +273,26 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 			return std::nullopt;
 		case TargetPosition: {
 			if (autocast->PositionAutoCast && table.empty() == false) {
-				size_t count = 0;
-				for (size_t i = 0; i != table.size(); ++i) {
-					// Check for corpse
-					if (autocast->Corpse == ECondition::ShouldBeTrue) {
-						if (table[i]->CurrentAction() != UnitAction::Die) {
-							continue;
-						}
-					} else if (autocast->Corpse == ECondition::ShouldBeFalse) {
-						if (table[i]->CurrentAction() == UnitAction::Die || table[i]->IsAlive() == false) {
-							continue;
-						}
-					}
-					if (PassCondition(caster, spell, table[i], pos, spell.Condition.get())
-						&& PassCondition(caster, spell, table[i], pos, autocast->Condition.get())) {
-							table[count++] = table[i];
-					}
-				}
-				if (count > 0) {
+				ranges::erase_if(table, [&](const CUnit *unit) {
+					return (autocast->Corpse == ECondition::ShouldBeTrue
+					        && unit->CurrentAction() != UnitAction::Die)
+					    || (autocast->Corpse == ECondition::ShouldBeFalse
+					        && (unit->CurrentAction() == UnitAction::Die
+					            || unit->IsAlive() == false))
+					    || !PassCondition(caster, spell, unit, pos, spell.Condition.get())
+					    || !PassCondition(caster, spell, unit, pos, autocast->Condition.get());
+				});
+				if (!table.empty()) {
 					if (autocast->PriorytyVar != ACP_NOVALUE) {
-						std::sort(table.begin(), table.begin() + count,
-							AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+						ranges::sort(table,
+						             AutoCastPrioritySort(
+										 caster, autocast->PriorytyVar, autocast->ReverseSort));
 					}
-					std::vector<int> array(count + 1);
-					for (size_t i = 1; i != count + 1; ++i) {
-						array[i] = UnitNumber(*table[i - 1]);
+					std::vector<int> array{UnitNumber(caster)};
+					array.reserve(table.size() + 1);
+					for (const auto *unit : table) {
+						array.push_back(UnitNumber(*unit));
 					}
-					array[0] = UnitNumber(caster);
 					const auto [x, y] = autocast->PositionAutoCast->call<int, int>(array);
 					Vec2i resPos(x, y);
 					if (Map.Info.IsPointOnMap(resPos)) {
@@ -313,44 +306,42 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 			// The units are already selected.
 			//  Check every unit if it is a possible target
 
-			int n = 0;
-			for (size_t i = 0; i != table.size(); ++i) {
+			ranges::erase_if(table, [&](const auto* unit) {
 				// Check if unit in battle
 				if (autocast->Attacker == ECondition::ShouldBeTrue) {
-					const int range = table[i]->Player->Type == PlayerTypes::PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
-					if ((table[i]->CurrentAction() != UnitAction::Attack
-						 && table[i]->CurrentAction() != UnitAction::AttackGround
-						 && table[i]->CurrentAction() != UnitAction::SpellCast)
-						|| table[i]->CurrentOrder()->HasGoal() == false
-						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
-						continue;
+					const int range = unit->Player->Type == PlayerTypes::PlayerPerson ? unit->Type->ReactRangePerson : unit->Type->ReactRangeComputer;
+					if ((unit->CurrentAction() != UnitAction::Attack
+						 && unit->CurrentAction() != UnitAction::AttackGround
+						 && unit->CurrentAction() != UnitAction::SpellCast)
+						|| unit->CurrentOrder()->HasGoal() == false
+						|| unit->MapDistanceTo(unit->CurrentOrder()->GetGoalPos()) > range) {
+						return true;
 					}
 				}
 				// Check for corpse
 				if (autocast->Corpse == ECondition::ShouldBeTrue) {
-					if (table[i]->CurrentAction() != UnitAction::Die) {
-						continue;
+					if (unit->CurrentAction() != UnitAction::Die) {
+						return true;
 					}
 				} else if (autocast->Corpse == ECondition::ShouldBeFalse) {
-					if (table[i]->CurrentAction() == UnitAction::Die) {
-						continue;
+					if (unit->CurrentAction() == UnitAction::Die) {
+						return true;
 					}
 				}
-				if (PassCondition(caster, spell, table[i], pos, spell.Condition.get())
-					&& PassCondition(caster, spell, table[i], pos, autocast->Condition.get())) {
-					table[n++] = table[i];
-				}
-			}
+				return !PassCondition(caster, spell, unit, pos, spell.Condition.get())
+				    || !PassCondition(caster, spell, unit, pos, autocast->Condition.get());
+			});
 			// Now select the best unit to target.
-			if (n != 0) {
+			if (!table.empty()) {
 				// For the best target???
 				CUnit *unit;
 				if (autocast->PriorytyVar != ACP_NOVALUE) {
-					std::sort(table.begin(), table.begin() + n,
-							  AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
+					ranges::sort(
+						table,
+						AutoCastPrioritySort(caster, autocast->PriorytyVar, autocast->ReverseSort));
 					unit = table[0];
 				} else { // Use the old behavior
-					unit = table[SyncRand() % n];
+					unit = table[SyncRand() % table.size()];
 				}
 				return std::pair{unit, unit->tilePos};
 			}
