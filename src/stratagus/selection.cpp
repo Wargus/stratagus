@@ -623,7 +623,7 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		//Wyrmgus end
 		return false;
 	});
-	table.resize(std::min(table.size(), MaxSelectable));
+	table.resize(std::min<std::size_t>(table.size(), MaxSelectable));
 	return !table.empty();
 }
 
@@ -819,7 +819,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		//Wyrmgus end
 		return false;
 	});
-	table.resize(std::min(table.size(), MaxSelectable));
+	table.resize(std::min<std::size_t>(table.size(), MaxSelectable));
 	if (!table.empty()) {
 		ChangeSelectedUnits(&table[0], table.size());
 	}
@@ -865,7 +865,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		//Wyrmgus end
 		return false;
 		});
-	table.resize(std::min(table.size(), MaxSelectable));
+	table.resize(std::min<std::size_t>(table.size(), MaxSelectable));
 	if (!table.empty()) {
 		ChangeSelectedUnits(&table[0], table.size());
 	}
@@ -931,7 +931,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		return false;
 	});
 
-	table.resize(std::min(table.size(), MaxSelectable));
+	table.resize(std::min<std::size_t>(table.size(), MaxSelectable));
 
 	// Add the units to selected.
 	for (unsigned int i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
@@ -996,7 +996,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		//Wyrmgus end
 		return false;
 	});
-	table.resize(std::min(table.size(), MaxSelectable));
+	table.resize(std::min<std::size_t>(table.size(), MaxSelectable));
 
 	// Add the units to selected.
 	for (unsigned int i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
