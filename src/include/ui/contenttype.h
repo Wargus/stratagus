@@ -124,6 +124,18 @@ private:
 };
 
 /**
+**  Enumeration of unit
+*/
+enum class EnumUnit
+{
+	UnitRefItSelf = 0, /// unit.
+	UnitRefInside, /// unit->Inside.
+	UnitRefContainer, /// Unit->Container.
+	UnitRefWorker, /// unit->Data.Built.Worker
+	UnitRefGoal /// unit->Goal
+};
+
+/**
 **  Show icon of the unit
 */
 class CContentTypeIcon : public CContentType
