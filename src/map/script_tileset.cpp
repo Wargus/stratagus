@@ -790,7 +790,7 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 		LuaError(luaStack, "incorrect argument");
 	}
 
-	return { CTilesetParser::parseTilesRange(luaStack, isImg ? 2 : 1) };
+	return { CTilesetParser::parseTilesRange(luaStack, isImg != SrcImageOption::cNone ? 2 : 1) };
 }
 
 /**
@@ -839,12 +839,13 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 	sequence_of_images parsedImages;
 
 	for (auto const srcIndex : srcIndexes) {
-		if (!isImg && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
+		if (isImg == SrcImageOption::cNone
+		    && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
 			parsedIndexes.push_back(0);
 			continue;
 		}
-		const graphic_index frameIdx = isImg ? srcIndex
-										  	 : SrcTileset->tiles[srcIndex].tile;
+		const graphic_index frameIdx =
+			isImg != SrcImageOption::cNone ? srcIndex : SrcTileset->tiles[srcIndex].tile;
 		if (isUntouchedSrcGraphicsOnly) {
 			parsedIndexes.push_back(frameIdx);
 

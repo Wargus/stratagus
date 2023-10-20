@@ -372,7 +372,7 @@ public:
 		return image;
 	}
 private:
-	enum SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
+	enum class SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
 
 private:
 	uint16_t checkForLayers(lua_State *luaStack) const;
