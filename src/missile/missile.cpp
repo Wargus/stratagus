@@ -961,7 +961,7 @@ void Missile::MissileHit(CUnit *unit)
 					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-							if (order.GetSpell().Target == TargetPosition) {
+							if (order.GetSpell().Target == ETarget::Position) {
 								isPosition = true;
 							}
 						} else {

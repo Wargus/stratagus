@@ -1445,7 +1445,11 @@ static int SendSpellCast(const Vec2i &tilePos)
 			// Only spells with explicit 'self: true' allows self targetting
 			continue;
 		}
-		SendCommandSpellCast(*unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush);
+		SendCommandSpellCast(*unit,
+		                     tilePos,
+		                     spell->Target == ETarget::Position ? nullptr : dest,
+		                     CursorValue,
+		                     flush);
 		ret = 1;
 	}
 	return ret;

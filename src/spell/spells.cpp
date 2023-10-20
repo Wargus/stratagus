@@ -97,7 +97,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	if (caster.Player->CheckCosts(spell.Costs, false)) {
 		return false;
 	}
-	if (spell.Target == TargetUnit) { // Casting a unit spell without a target.
+	if (spell.Target == ETarget::Unit) { // Casting a unit spell without a target.
 		if ((!target) || target->IsAlive() == false) {
 			return false;
 		}
@@ -265,13 +265,14 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 	}
 
 	switch (spell.Target) {
-		case TargetSelf :
+		case ETarget::Self:
 			if (PassCondition(caster, spell, &caster, pos, spell.Condition.get())
 				&& PassCondition(caster, spell, &caster, pos, autocast->Condition.get())) {
 				return std::pair{&caster, caster.tilePos};
 			}
 			return std::nullopt;
-		case TargetPosition: {
+		case ETarget::Position:
+		{
 			if (autocast->PositionAutoCast && table.empty() == false) {
 				ranges::erase_if(table, [&](const CUnit *unit) {
 					return (autocast->Corpse == ECondition::ShouldBeTrue
@@ -302,7 +303,8 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 			}
 			return std::nullopt;
 		}
-		case TargetUnit: {
+		case ETarget::Unit:
+		{
 			// The units are already selected.
 			//  Check every unit if it is a possible target
 
@@ -420,7 +422,7 @@ bool SpellIsAvailable(const CPlayer &player, int spellid)
 bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 				  const CUnit *target, const Vec2i &goalPos)
 {
-	if (spell.Target == TargetUnit && target == nullptr) {
+	if (spell.Target == ETarget::Unit && target == nullptr) {
 		return false;
 	}
 	return PassCondition(caster, spell, target, goalPos, spell.Condition.get());
@@ -482,7 +484,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
-	if (spell.Target == TargetSelf) {
+	if (spell.Target == ETarget::Self) {
 		pos = caster.tilePos;
 		target = &caster;
 	}
@@ -499,7 +501,7 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 		//  Ugly hack, CastAdjustVitals makes it's own mana calculation.
 		//
 		if (spell.SoundWhenCast.Sound) {
-			if (spell.Target == TargetSelf) {
+			if (spell.Target == ETarget::Self) {
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
 				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));

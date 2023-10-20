@@ -81,10 +81,10 @@ public:
 /**
 **  Different targets.
 */
-enum TargetType {
-	TargetSelf,
-	TargetPosition,
-	TargetUnit
+enum class ETarget {
+	Self,
+	Position,
+	Unit
 };
 
 enum class ECondition
@@ -183,7 +183,7 @@ class SpellType
 public:
 	SpellType(int slot, const std::string &ident) : Ident(ident), Slot(slot) {}
 
-	bool IsCasterOnly() const { return !Range && Target == TargetSelf; }
+	bool IsCasterOnly() const { return !Range && Target == ETarget::Self; }
 
 	// Identification stuff
 	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
@@ -191,7 +191,7 @@ public:
 	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications
-	TargetType Target;          /// Targeting information. See TargetType.
+	ETarget Target;          /// Targeting information. See TargetType.
 	std::vector<std::unique_ptr<SpellActionType>> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
 	int Range = 0;                  /// Max range of the target.
