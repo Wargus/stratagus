@@ -162,7 +162,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	if (order->Action == UnitAction::Attack && !unit.Type->CanAttack) {
 		return false;
 	}
-	if (order->Action == UnitAction::Board && unit.Type->UnitType != EMovement::Land) {
+	if (order->Action == UnitAction::Board && unit.Type->MoveType != EMovement::Land) {
 		return false;
 	}
 	return true;

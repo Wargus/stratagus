@@ -705,7 +705,7 @@ private:
 			return INT_MAX;
 		}
 
-		if (dtype.UnitType == EMovement::Fly && dest->IsAgressive() == false) {
+		if (dtype.MoveType == EMovement::Fly && dest->IsAgressive() == false) {
 			return INT_MAX / 2;
 		}
 

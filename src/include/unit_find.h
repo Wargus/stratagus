@@ -202,7 +202,7 @@ public:
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
-		if (type.BoolFlag[VANISHES_INDEX].value || (moveType != std::nullopt && type.UnitType != moveType)) {
+		if (type.BoolFlag[VANISHES_INDEX].value || (moveType != std::nullopt && type.MoveType != moveType)) {
 			return false;
 		}
 		return true;

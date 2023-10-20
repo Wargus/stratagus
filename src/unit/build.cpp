@@ -406,7 +406,7 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 			if (builder == unit) {
 				continue;
 			}
-			if (found.Type->UnitType == unit->Type->UnitType) {
+			if (found.Type->MoveType == unit->Type->MoveType) {
 				return false;
 			}
 		}

@@ -654,7 +654,7 @@ public:
 	int ButtonLevelForTransporter = 0;  /// On which button level game will show units inside transporter
 	int StartingResources = 0;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
-	EMovement UnitType = EMovement::Land; /// Land / fly / naval
+	EMovement MoveType = EMovement::Land; /// Land / fly / naval
 	int DecayRate = 0;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor = 0;        /// How much this annoys the computer

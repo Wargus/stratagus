@@ -81,7 +81,7 @@ enum {
 	} else {
 		// If building inside, but be next to stop
 		if (building.BoolFlag[SHOREBUILDING_INDEX].value
-		    && builder.Type->UnitType == EMovement::Land) {
+		    && builder.Type->MoveType == EMovement::Land) {
 			// Peon won't dive :-)
 			order->Range = 1;
 		}

@@ -3255,7 +3255,7 @@ bool CanTarget(const CUnitType &source, const CUnitType &dest)
 			}
 		}
 	}
-	switch (dest.UnitType) {
+	switch (dest.MoveType) {
 		case EMovement::Land:
 		{
 			if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
@@ -3402,9 +3402,9 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 
 	if (goal && goal->IsAliveOnMap()
 	    && (this->MapDistanceTo(*goal) > 1
-	        || (this->Type->UnitType != EMovement::Fly && goal->Type->UnitType == EMovement::Fly)
-	        || (this->Type->UnitType == EMovement::Fly
-	            && goal->Type->UnitType != EMovement::Fly))) {
+	        || (this->Type->MoveType != EMovement::Fly && goal->Type->MoveType == EMovement::Fly)
+	        || (this->Type->MoveType == EMovement::Fly
+	            && goal->Type->MoveType != EMovement::Fly))) {
 		return true;
 	}
 

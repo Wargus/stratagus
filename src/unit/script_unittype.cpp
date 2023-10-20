@@ -764,7 +764,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (value == "OnReady") {
 			type->OnReady = new LuaCallback(l, -1);
 		} else if (value == "Type") {
-			type->UnitType = toEMovement(LuaToString(l, -1));
+			type->MoveType = toEMovement(LuaToString(l, -1));
 		} else if (value == "MissileOffsets") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1316,7 +1316,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->OnEachSecond = from.OnEachSecond;
 	to->OnInit = from.OnInit;
 	to->OnReady = from.OnReady;
-	to->UnitType = from.UnitType;
+	to->MoveType = from.MoveType;
 	for (int k = 0; k < MaxAttackPos; ++k) {
 		for (int m = 0; m < UnitSides; ++m) {
 			to->MissileOffsets[m][k].x = from.MissileOffsets[m][k].x;
@@ -1717,7 +1717,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (data == "Type") {
-		lua_pushstring(l, toString(type->UnitType).data());
+		lua_pushstring(l, toString(type->MoveType).data());
 		return 1;
 	} else if (data == "Corpse") {
 		lua_pushstring(l, type->CorpseName.c_str());

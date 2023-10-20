@@ -634,7 +634,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 	const MissileType &mtype = *missile.Type;
 	if (missile.SourceUnit) {
 		bool shouldHit = false;
-		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
+		if (missile.TargetUnit
+		    && missile.SourceUnit->Type->MoveType == missile.TargetUnit->Type->MoveType) {
 			shouldHit = true;
 		}
 		if (mtype.Range && mtype.CorrectSphashDamage) {
@@ -648,9 +649,9 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 				CUnit &unit = *unitPtr;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
 				if (!missile.Type->IgnoreWalls
-				    && missile.SourceUnit->Type->UnitType == EMovement::Land) {
+				    && missile.SourceUnit->Type->MoveType == EMovement::Land) {
 					if (!missile.TargetUnit
-					    || missile.TargetUnit->Type->UnitType == EMovement::Land) {
+					    || missile.TargetUnit->Type->MoveType == EMovement::Land) {
 						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
 						    && unit.Player != missile.SourceUnit->Player
 						    && unit.IsAllied(*missile.SourceUnit) == false) {
@@ -973,11 +974,12 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
-						if (goal->Type->UnitType != this->SourceUnit->Type->UnitType) {
+						if (goal->Type->MoveType != this->SourceUnit->Type->MoveType) {
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == nullptr || goal->Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->TargetUnit == nullptr
+						    || goal->Type->MoveType != this->TargetUnit->Type->MoveType) {
 							shouldHit = false;
 						}
 					}

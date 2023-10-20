@@ -1095,7 +1095,7 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitAction::Still
-	     && Selected[0]->Type->UnitType == EMovement::Naval
+	     && Selected[0]->Type->MoveType == EMovement::Naval
 	     && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 	    || !Selected[0]->CanMove()) {
 		SendCommandUnload(*Selected[0], Selected[0]->tilePos, nullptr, flush);

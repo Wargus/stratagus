@@ -75,7 +75,7 @@ public:
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
-		if (unit->Type->UnitType == EMovement::Fly && unit->IsAgressive() == false) {
+		if (unit->Type->MoveType == EMovement::Fly && unit->IsAgressive() == false) {
 			return;
 		}
 		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
@@ -189,7 +189,7 @@ bool AiFindWall(AiForce *force)
 	// Next best choice is any land unit.  Otherwise just use the first.
 	CUnit *unit = force->Units[0];
 	for (CUnit *aiunit : force->Units) {
-		if (aiunit->Type->UnitType == EMovement::Land) {
+		if (aiunit->Type->MoveType == EMovement::Land) {
 			unit = aiunit;
 			if (aiunit->Type->Missile.Missile->Range == 1) {
 				break;
@@ -472,14 +472,14 @@ static std::pair<CUnit *, Vec2i> GetBestExplorer(const AiExplorationRequest &req
 		}
 		const CUnitType &type = *unit->Type;
 
-		if (type.UnitType != EMovement::Fly) {
+		if (type.MoveType != EMovement::Fly) {
 			if (flyeronly) {
 				continue;
 			}
-			if ((request.Mask & MapFieldLandUnit) && type.UnitType != EMovement::Land) {
+			if ((request.Mask & MapFieldLandUnit) && type.MoveType != EMovement::Land) {
 				continue;
 			}
-			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != EMovement::Naval) {
+			if ((request.Mask & MapFieldSeaUnit) && type.MoveType != EMovement::Naval) {
 				continue;
 			}
 		} else {
@@ -488,7 +488,7 @@ static std::pair<CUnit *, Vec2i> GetBestExplorer(const AiExplorationRequest &req
 
 		const int sqDistance = SquareDistance(unit->tilePos, *pos);
 		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
-		    || (bestunit->Type->UnitType != EMovement::Fly && type.UnitType == EMovement::Fly)) {
+		    || (bestunit->Type->MoveType != EMovement::Fly && type.MoveType == EMovement::Fly)) {
 			bestSquareDistance = sqDistance;
 			bestunit = unit;
 		}

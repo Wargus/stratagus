@@ -629,7 +629,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	}
 
 	//  As side effect we calculate the movement flags/mask here.
-	switch (type.UnitType) {
+	switch (type.MoveType) {
 		case EMovement::Land: // on land
 			type.MovementMask =
 				MapFieldLandUnit |
@@ -685,7 +685,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.FieldFlags = MapFieldNoBuilding;
 		}
 	} else {
-		switch (type.UnitType) {
+		switch (type.MoveType) {
 			case EMovement::Land: type.FieldFlags = MapFieldLandUnit; break;
 			case EMovement::Fly: type.FieldFlags = MapFieldAirUnit; break;
 			case EMovement::Naval: type.FieldFlags = MapFieldSeaUnit; break;
