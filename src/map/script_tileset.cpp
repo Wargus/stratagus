@@ -466,7 +466,7 @@ void CTileset::buildTable(lua_State *l)
 	mixedLookupTable.clear();
 	mixedLookupTable.resize(n, 0);
 	//  Build the TileTypeTable
-	TileTypeTable.resize(n, 0);
+	TileTypeTable.resize(n, ETileType::Unknown);
 
 	for (auto &currTile : tiles) {
 		const graphic_index tile = currTile.tile;
@@ -475,39 +475,39 @@ void CTileset::buildTable(lua_State *l)
 		}
 		const tile_flags flag = currTile.flag;
 		if (flag & MapFieldWaterAllowed) {
-			TileTypeTable[tile] = TileTypeWater;
+			TileTypeTable[tile] = ETileType::Water;
 		} else if (flag & MapFieldCoastAllowed) {
-			TileTypeTable[tile] = TileTypeCoast;
+			TileTypeTable[tile] = ETileType::Coast;
 		} else if (flag & MapFieldWall) {
 			if (flag & MapFieldHuman) {
-				TileTypeTable[tile] = TileTypeHumanWall;
+				TileTypeTable[tile] = ETileType::HumanWall;
 			} else {
-				TileTypeTable[tile] = TileTypeOrcWall;
+				TileTypeTable[tile] = ETileType::OrcWall;
 			}
 		} else if (flag & MapFieldRocks) {
-			TileTypeTable[tile] = TileTypeRock;
+			TileTypeTable[tile] = ETileType::Rock;
 		} else if (flag & MapFieldForest) {
-			TileTypeTable[tile] = TileTypeWood;
+			TileTypeTable[tile] = ETileType::Wood;
 		}
 	}
 	//  mark the special tiles
 	if (topOneTreeTile) {
-		TileTypeTable[topOneTreeTile] = TileTypeWood;
+		TileTypeTable[topOneTreeTile] = ETileType::Wood;
 	}
 	if (midOneTreeTile) {
-		TileTypeTable[midOneTreeTile] = TileTypeWood;
+		TileTypeTable[midOneTreeTile] = ETileType::Wood;
 	}
 	if (botOneTreeTile) {
-		TileTypeTable[botOneTreeTile] = TileTypeWood;
+		TileTypeTable[botOneTreeTile] = ETileType::Wood;
 	}
 	if (topOneRockTile) {
-		TileTypeTable[topOneRockTile] = TileTypeRock;
+		TileTypeTable[topOneRockTile] = ETileType::Rock;
 	}
 	if (midOneRockTile) {
-		TileTypeTable[midOneRockTile] = TileTypeRock;
+		TileTypeTable[midOneRockTile] = ETileType::Rock;
 	}
 	if (botOneRockTile) {
-		TileTypeTable[botOneRockTile] = TileTypeRock;
+		TileTypeTable[botOneRockTile] = ETileType::Rock;
 	}
 
 	//  Build wood removement table.
@@ -727,7 +727,7 @@ void CTileset::buildWallReplacementTable()
 			++n;
 		}
 		while (n < 16 && tiles[tileIndex].tile) {
-			TileTypeTable[tiles[tileIndex].tile] = TileTypeUnknown;
+			TileTypeTable[tiles[tileIndex].tile] = ETileType::Unknown;
 			++tileIndex;
 			++n;
 		}
