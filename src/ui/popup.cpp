@@ -46,21 +46,21 @@
 #include "unittype.h"
 #include "video.h"
 
+static std::string GetDraw(EPopupButtonInfo infoType, const ButtonAction &button)
+{
+	switch (infoType) {
+		default:
+		case EPopupButtonInfo::Hint: return button.Hint;
+		case EPopupButtonInfo::Description: return button.Description;
+		case EPopupButtonInfo::Dependencies: return PrintDependencies(*ThisPlayer, button);
+	}
+}
+
 int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
-	std::string draw("");
-	switch (this->InfoType) {
-		case PopupButtonInfo_Hint:
-			draw = button.Hint;
-			break;
-		case PopupButtonInfo_Description:
-			draw = button.Description;
-			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
-			break;
-	}
+	const std::string draw = GetDraw(this->InfoType, button);
+
 	int width = 0;
 	std::string sub;
 	if (draw.length()) {
@@ -78,19 +78,8 @@ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) con
 int CPopupContentTypeButtonInfo::GetHeight(const ButtonAction &button, int *) const /* override */
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
-	std::string draw;
+	const std::string draw = GetDraw(this->InfoType, button);
 
-	switch (this->InfoType) {
-		case PopupButtonInfo_Hint:
-			draw = button.Hint;
-			break;
-		case PopupButtonInfo_Description:
-			draw = button.Description;
-			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
-			break;
-	}
 	int height = 0;
 	if (draw.length()) {
 		int i = 1;
@@ -110,30 +99,32 @@ void CPopupContentTypeButtonInfo::Draw(int x,
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
-	std::string draw("");
-	switch (this->InfoType) {
-		case PopupButtonInfo_Hint:
-			draw = button.Hint;
-			break;
-		case PopupButtonInfo_Description:
-			draw = button.Description;
-			break;
-		case PopupButtonInfo_Dependencies:
-			draw = PrintDependencies(*ThisPlayer, button);
-			break;
-	}
-	std::string sub(draw);
+	const std::string draw = GetDraw(this->InfoType, button);
 	if (draw.length()) {
 		int i = 0;
 		int y_off = y;
 		unsigned int width = this->MaxWidth
 							 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 							 : 0;
+		std::string sub;
 		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
 			y_off += font.Height() + 2;
 		}
-		return;
+	}
+}
+
+static EPopupButtonInfo toEPopupButtonInfo(std::string_view s)
+{
+	if (s == "Hint") {
+		return EPopupButtonInfo::Hint;
+	} else if (s == "Description") {
+		return EPopupButtonInfo::Description;
+	} else if (s == "Dependencies") {
+		return EPopupButtonInfo::Dependencies;
+	} else {
+		fprintf(stderr, "Invalid infotype '%s'\n", s.data());
+		ExitFatal(-1);
 	}
 }
 
@@ -144,14 +135,7 @@ void CPopupContentTypeButtonInfo::Parse(lua_State *l) /* override */
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const std::string_view key = LuaToString(l, -2);
 		if (key == "InfoType") {
-			std::string temp(LuaToString(l, -1));
-			if (temp == "Hint") {
-				this->InfoType = PopupButtonInfo_Hint;
-			} else if (temp == "Description") {
-				this->InfoType = PopupButtonInfo_Description;
-			} else if (temp == "Dependencies") {
-				this->InfoType = PopupButtonInfo_Dependencies;
-			}
+			this->InfoType = toEPopupButtonInfo(LuaToString(l, -1));
 		} else if (key == "MaxWidth") {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (key == "Font") {

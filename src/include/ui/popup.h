@@ -101,10 +101,10 @@ public:
 	std::unique_ptr<PopupConditionPanel> Condition; /// Condition to show the content; if nullptr, no condition.
 };
 
-enum PopupButtonInfo_Types {
-	PopupButtonInfo_Hint,
-	PopupButtonInfo_Description,
-	PopupButtonInfo_Dependencies
+enum class EPopupButtonInfo {
+	Hint,
+	Description,
+	Dependencies
 };
 
 class CPopupContentTypeButtonInfo : public CPopupContentType
@@ -126,7 +126,7 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	int InfoType = 0;          /// Type of information to show.
+	EPopupButtonInfo InfoType = EPopupButtonInfo::Hint; /// Type of information to show.
 	unsigned int MaxWidth = 0; /// Maximum width of multilined information.
 	CFont *Font = nullptr;     /// Font to use.
 };
