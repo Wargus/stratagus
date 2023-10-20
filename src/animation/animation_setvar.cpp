@@ -92,63 +92,15 @@ void CAnimation_SetVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const
 	}
 
 	const int rop = ParseAnimInt(unit, this->valueStr);
-	auto next = std::string_view{this->varStr.c_str() + dot_pos + 1};
+	const auto next = std::string_view{this->varStr.c_str() + dot_pos + 1};
 	int value = 0;
 	if (next == "Value") {
 		value = goal->Variable[index].Value;
-	} else if (next == "Max") {
-		value = goal->Variable[index].Max;
-	} else if (next == "Increase") {
-		value = goal->Variable[index].Increase;
-	} else if (next == "Enable") {
-		value = goal->Variable[index].Enable;
-	} else if (next == "Percent") {
-		value = goal->Variable[index].Value * 100 / goal->Variable[index].Max;
-	}
-	switch (this->mod) {
-		case modAdd:
-			value += rop;
-			break;
-		case modSub:
-			value -= rop;
-			break;
-		case modMul:
-			value *= rop;
-			break;
-		case modDiv:
-			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationType::SetVar\n");
-				Exit(1);
-				return;
-			}
-			value /= rop;
-			break;
-		case modMod:
-			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationType::SetVar\n");
-				Exit(1);
-				return;
-			}
-			value %= rop;
-			break;
-		case modAnd:
-			value &= rop;
-			break;
-		case modOr:
-			value |= rop;
-			break;
-		case modXor:
-			value ^= rop;
-			break;
-		case modNot:
-			value = !value;
-			break;
-		default:
-			value = rop;
-	}
-	if (next == "Value") {
+		modifyValue(this->mod, value, rop);
 		goal->Variable[index].Value = value;
 	} else if (next == "Max") {
+		value = goal->Variable[index].Max;
+		modifyValue(this->mod, value, rop);
 		goal->Variable[index].Max = value;
 		// Special case: when adjusting the sight range, we need to update the visibility
 		if (index == SIGHTRANGE_INDEX) {
@@ -157,10 +109,16 @@ void CAnimation_SetVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const
 			MapMarkUnitSight(unit);
 		}
 	} else if (next == "Increase") {
+		value = goal->Variable[index].Increase;
+		modifyValue(this->mod, value, rop);
 		goal->Variable[index].Increase = value;
 	} else if (next == "Enable") {
+		value = goal->Variable[index].Enable;
+		modifyValue(this->mod, value, rop);
 		goal->Variable[index].Enable = value;
 	} else if (next == "Percent") {
+		value = goal->Variable[index].Value * 100 / goal->Variable[index].Max;
+		modifyValue(this->mod, value, rop);
 		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
 	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
@@ -175,30 +133,7 @@ void CAnimation_SetVar::Init(std::string_view s, lua_State *) /* override */
 
 	std::string modStr;
 	is >> this->varStr >> modStr >> this->valueStr >> this->unitSlotStr;
-
-	if (modStr == "=") {
-		this->mod = modSet;
-	} else if (modStr == "+=") {
-		this->mod = modAdd;
-	} else if (modStr == "-=") {
-		this->mod = modSub;
-	} else if (modStr == "*=") {
-		this->mod = modMul;
-	} else if (modStr == "/=") {
-		this->mod = modDiv;
-	} else if (modStr == "%=") {
-		this->mod = modMod;
-	} else if (modStr == "&=") {
-		this->mod = modAnd;
-	} else if (modStr == "|=") {
-		this->mod = modOr;
-	} else if (modStr == "^=") {
-		this->mod = modXor;
-	} else if (modStr == "!") {
-		this->mod = modNot;
-	} else {
-		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
-	}
+	this->mod = toSetVar_ModifyTypes(modStr);
 }
 
 //@}

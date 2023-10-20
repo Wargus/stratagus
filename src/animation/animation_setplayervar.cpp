@@ -185,50 +185,11 @@ void CAnimation_SetPlayerVar::Action(CUnit &unit,
 	Assert(unit.Anim.Anim == this);
 
 	const int playerId = ParseAnimInt(unit, this->playerStr);
-	int rop = ParseAnimInt(unit, this->valueStr);
+	const int rop = ParseAnimInt(unit, this->valueStr);
 	int data = GetPlayerData(playerId, this->varStr, this->argStr);
 
-	switch (this->mod) {
-		case modAdd:
-			data += rop;
-			break;
-		case modSub:
-			data -= rop;
-			break;
-		case modMul:
-			data *= rop;
-			break;
-		case modDiv:
-			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationType::SetPlayerVar\n");
-				Exit(1);
-			}
-			data /= rop;
-			break;
-		case modMod:
-			if (!rop) {
-				fprintf(stderr, "Division by zero in AnimationType::SetPlayerVar\n");
-				Exit(1);
-			}
-			data %= rop;
-			break;
-		case modAnd:
-			data &= rop;
-			break;
-		case modOr:
-			data |= rop;
-			break;
-		case modXor:
-			data ^= rop;
-			break;
-		case modNot:
-			data = !data;
-			break;
-		default:
-			data = rop;
-	}
-	rop = data;
-	SetPlayerData(playerId, this->varStr, this->argStr, rop);
+	modifyValue(this->mod, data, rop);
+	SetPlayerData(playerId, this->varStr, this->argStr, data);
 }
 
 /*
@@ -240,30 +201,7 @@ void CAnimation_SetPlayerVar::Init(std::string_view s, lua_State *) /* override 
 
 	std::string modStr;
 	is >> this->playerStr >> this->varStr >> modStr >> this->valueStr >> this->argStr;
-
-	if (modStr == "=") {
-		this->mod = modSet;
-	} else if (modStr == "+=") {
-		this->mod = modAdd;
-	} else if (modStr == "-=") {
-		this->mod = modSub;
-	} else if (modStr == "*=") {
-		this->mod = modMul;
-	} else if (modStr == "/=") {
-		this->mod = modDiv;
-	} else if (modStr == "%=") {
-		this->mod = modMod;
-	} else if (modStr == "&=") {
-		this->mod = modAnd;
-	} else if (modStr == "|=") {
-		this->mod = modOr;
-	} else if (modStr == "^=") {
-		this->mod = modXor;
-	} else if (modStr == "!") {
-		this->mod = modNot;
-	} else {
-		this->mod = static_cast<SetVar_ModifyTypes>(to_number(modStr));
-	}
+	this->mod = toSetVar_ModifyTypes(modStr);
 }
 
 //@}

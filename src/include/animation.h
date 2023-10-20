@@ -55,7 +55,7 @@ struct lua_State;
 extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Modify types
-enum SetVar_ModifyTypes {
+enum class SetVar_ModifyTypes {
 	modSet = 0,      /// Set value to this
 	modAdd,          /// Addition
 	modSub,          /// Subtraction
@@ -67,6 +67,9 @@ enum SetVar_ModifyTypes {
 	modXor,          /// Bitwise XOR
 	modNot,          /// Bitwise NOT
 };
+
+SetVar_ModifyTypes toSetVar_ModifyTypes(std::string_view s);
+void modifyValue(SetVar_ModifyTypes mod, int &value, int rop);
 
 class CAnimation
 {
