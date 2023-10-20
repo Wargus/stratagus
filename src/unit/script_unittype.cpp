@@ -220,20 +220,20 @@ int ExtraDeathIndex(std::string_view death)
 	return ANIMATIONS_DEATHTYPES;
 }
 
-static DistanceTypeType toDistanceTypeType(lua_State *l, std::string_view value)
+static EComparison toEComparison(lua_State *l, std::string_view value)
 {
 	if (value == "==" || value == "=") {
-		return DistanceTypeType::Equal;
+		return EComparison::Equal;
 	} else if (value == ">=") {
-		return DistanceTypeType::GreaterThanEqual;
+		return EComparison::GreaterThanEqual;
 	} else if (value == ">") {
-		return DistanceTypeType::GreaterThan;
+		return EComparison::GreaterThan;
 	} else if (value == "<=") {
-		return DistanceTypeType::LessThanEqual;
+		return EComparison::LessThanEqual;
 	} else if (value == "<") {
-		return DistanceTypeType::LessThan;
+		return EComparison::LessThan;
 	} else if (value == "!=") {
-		return DistanceTypeType::NotEqual;
+		return EComparison::NotEqual;
 	} else {
 		LuaError(l, "Unknown op '%s'", value.data());
 		ExitFatal(1);
@@ -273,7 +273,7 @@ static std::unique_ptr<CBuildRestrictionAnd> ParseBuildingRules(lua_State *l)
 				if (value == "Distance") {
 					b->Distance = LuaToNumber(l, -1);
 				} else if (value == "DistanceType") {
-					b->DistanceType = toDistanceTypeType(l, LuaToString(l, -1));
+					b->DistanceType = toEComparison(l, LuaToString(l, -1));
 				} else if (value == "Type") {
 					b->RestrictTypeName = LuaToString(l, -1);
 				} else if (value == "Owner") {
@@ -331,7 +331,7 @@ static std::unique_ptr<CBuildRestrictionAnd> ParseBuildingRules(lua_State *l)
 				} else if (value == "Count") {
 					b->Count = LuaToNumber(l, -1);
 				} else if (value == "CountType") {
-					b->CountType = toDistanceTypeType(l, LuaToString(l, -1));
+					b->CountType = toEComparison(l, LuaToString(l, -1));
 				} else {
 					LuaError(l, "Unsupported BuildingRules has-unit tag: %s", value.data());
 				}
@@ -348,11 +348,11 @@ static std::unique_ptr<CBuildRestrictionAnd> ParseBuildingRules(lua_State *l)
 				} else if (value == "Count") {
 					b->Count = LuaToNumber(l, -1);
 				} else if (value == "CountType") {
-					b->CountType = toDistanceTypeType(l, LuaToString(l, -1));
+					b->CountType = toEComparison(l, LuaToString(l, -1));
 				} else if (value == "Distance") {
 					b->Distance = LuaToNumber(l, -1);
 				} else if (value == "DistanceType") {
-					b->DistanceType = toDistanceTypeType(l, LuaToString(l, -1));
+					b->DistanceType = toEComparison(l, LuaToString(l, -1));
 				} else if (value == "Owner") {
 					b->RestrictTypeOwner = LuaToString(l, -1);
 				} else if (value == "CheckBuilder") {

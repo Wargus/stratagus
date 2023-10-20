@@ -117,21 +117,30 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	int distance = 0;
 	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 
-	if (this->DistanceType == LessThanEqual
-		|| this->DistanceType == GreaterThan
-		|| this->DistanceType == Equal
-		|| this->DistanceType == NotEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
-		distance = this->Distance;
-	} else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
-		distance = this->Distance - 1;
+	switch (this->DistanceType) {
+		case EComparison::LessThanEqual:
+		case EComparison::GreaterThan:
+		case EComparison::Equal:
+		case EComparison::NotEqual:
+		{
+			pos1.x = std::max<int>(pos.x - this->Distance, 0);
+			pos1.y = std::max<int>(pos.y - this->Distance, 0);
+			pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+			pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+			distance = this->Distance;
+			break;
+		}
+		case EComparison::LessThan:
+		case EComparison::GreaterThanEqual:
+		{
+			pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
+			pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
+			pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+			pos2.y =
+				std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+			distance = this->Distance - 1;
+			break;
+		}
 	}
 	std::vector<CUnit *> table = Select(pos1, pos2);
 
@@ -146,30 +155,30 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*unit->Player)))) {
 
 			switch (this->DistanceType) {
-				case GreaterThan:
-				case GreaterThanEqual:
+				case EComparison::GreaterThan:
+				case EComparison::GreaterThanEqual:
 					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) <= distance) {
 						if (Diagonal || pos.x == unit->tilePos.x || pos.y == unit->tilePos.y) {
 							return false;
 						}
 					}
 					break;
-				case LessThan:
-				case LessThanEqual:
+				case EComparison::LessThan:
+				case EComparison::LessThanEqual:
 					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) <= distance) {
 						if (Diagonal || pos.x == unit->tilePos.x || pos.y == unit->tilePos.y) {
 							return true;
 						}
 					}
 					break;
-				case Equal:
+				case EComparison::Equal:
 					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) == distance) {
 						if (Diagonal || pos.x == unit->tilePos.x || pos.y == unit->tilePos.y) {
 							return true;
 						}
 					}
 					break;
-				case NotEqual :
+				case EComparison::NotEqual:
 					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) == distance) {
 						if (Diagonal || pos.x == unit->tilePos.x || pos.y == unit->tilePos.y) {
 							return false;
@@ -179,9 +188,9 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			}
 		}
 	}
-	return (this->DistanceType == GreaterThan ||
-			this->DistanceType == GreaterThanEqual ||
-			this->DistanceType == NotEqual);
+	return (this->DistanceType == EComparison::GreaterThan
+	        || this->DistanceType == EComparison::GreaterThanEqual
+	        || this->DistanceType == EComparison::NotEqual);
 }
 
 /**
@@ -213,15 +222,14 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 			count += Players[i].GetUnitTotalCount(*this->RestrictType);
 		}
 	}
-	switch (this->CountType)
-	{
-	case LessThan: return count < this->Count;
-	case LessThanEqual: return count <= this->Count;
-	case Equal: return count == this->Count;
-	case NotEqual: return count != this->Count;
-	case GreaterThanEqual: return count >= this->Count;
-	case GreaterThan: return count > this->Count;
-	default: return false;
+	switch (this->CountType) {
+		case EComparison::LessThan: return count < this->Count;
+		case EComparison::LessThanEqual: return count <= this->Count;
+		case EComparison::Equal: return count == this->Count;
+		case EComparison::NotEqual: return count != this->Count;
+		case EComparison::GreaterThanEqual: return count >= this->Count;
+		case EComparison::GreaterThan: return count > this->Count;
+		default: return false;
 	}
 }
 
@@ -235,22 +243,32 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 	int distance = 0;
 	int count = 0;
 
-	if (this->DistanceType == LessThanEqual
-		|| this->DistanceType == GreaterThan
-		|| this->DistanceType == Equal
-		|| this->DistanceType == NotEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
-		distance = this->Distance;
-	}
-	else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
-		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
-		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
-		distance = this->Distance - 1;
+	switch (this->DistanceType)
+	{
+		case EComparison::LessThanEqual:
+		case EComparison::GreaterThan:
+		case EComparison::Equal:
+		case EComparison::NotEqual:
+		{
+			pos1.x = std::max<int>(pos.x - this->Distance, 0);
+			pos1.y = std::max<int>(pos.y - this->Distance, 0);
+			pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+			pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+			distance = this->Distance;
+			break;
+		}
+		default:
+		case EComparison::LessThan:
+		case EComparison::GreaterThanEqual:
+		{
+			pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
+			pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
+			pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+			pos2.y =
+				std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+			distance = this->Distance - 1;
+			break;
+		}
 	}
 	std::vector<CUnit *> table = Select(pos1, pos2);
 
@@ -265,38 +283,41 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*unit->Player)))) {
 
 			switch (this->DistanceType) {
-			case GreaterThan:
-			case GreaterThanEqual:
-				break;
-			case LessThan:
-			case LessThanEqual:
-				if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) <= distance) {
-					count++;
+				case EComparison::GreaterThan:
+				case EComparison::GreaterThanEqual: break;
+				case EComparison::LessThan:
+				case EComparison::LessThanEqual:
+					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos)
+					    <= distance) {
+						count++;
+					}
+					break;
+				case EComparison::Equal:
+					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos)
+					    == distance) {
+						count++;
+					}
+					break;
+				case EComparison::NotEqual:
+				{
+					if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos)
+					    == distance) {
+						count++;
+					}
+					break;
 				}
-				break;
-			case Equal:
-				if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) == distance) {
-					count++;
-				}
-				break;
-			case NotEqual:
-				if (MapDistanceBetweenTypes(type, pos, *unit->Type, unit->tilePos) == distance) {
-					count++;
-				}
-				break;
 			}
 		}
 	}
 
-	switch (this->CountType)
-	{
-	case LessThan: return count < this->Count;
-	case LessThanEqual: return count <= this->Count;
-	case Equal: return count == this->Count;
-	case NotEqual: return count != this->Count;
-	case GreaterThanEqual: return count >= this->Count;
-	case GreaterThan: return count > this->Count;
-	default: return false;
+	switch (this->CountType) {
+		case EComparison::LessThan: return count < this->Count;
+		case EComparison::LessThanEqual: return count <= this->Count;
+		case EComparison::Equal: return count == this->Count;
+		case EComparison::NotEqual: return count != this->Count;
+		case EComparison::GreaterThanEqual: return count >= this->Count;
+		case EComparison::GreaterThan: return count > this->Count;
+		default: return false;
 	}
 }
 

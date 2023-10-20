@@ -368,7 +368,7 @@ enum UnitTypeType {
 	UnitTypeNaval  /// Unit lives on water
 };
 
-enum DistanceTypeType {
+enum class EComparison {
 	Equal,
 	NotEqual,
 	LessThan,
@@ -455,7 +455,7 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;        /// distance to build (circle)
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	EComparison DistanceType = EComparison::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType = nullptr;
@@ -472,7 +472,7 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
+	EComparison CountType = EComparison::Equal;
 	std::string RestrictTypeName;
 	CUnitType *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
@@ -487,9 +487,9 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	EComparison DistanceType = EComparison::Equal;
 	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
+	EComparison CountType = EComparison::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType = nullptr;
