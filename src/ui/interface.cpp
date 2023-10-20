@@ -459,7 +459,7 @@ void UiFindIdleWorker()
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 		CurrentButtonLevel = 0;
-		PlayUnitSound(*Selected[0], VoiceSelected);
+		PlayUnitSound(*Selected[0], EUnitVoice::Selected);
 		SelectionChanged();
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}

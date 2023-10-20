@@ -220,7 +220,7 @@ int DoActionMove(CUnit &unit)
 			}
 			if (foundCoast) {
 				// Should play, even if unit already speaking
-				PlayUnitSound(unit, VoiceDocking, true);
+				PlayUnitSound(unit, EUnitVoice::Docking, true);
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;

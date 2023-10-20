@@ -238,7 +238,7 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 	DropOutOnSide(*newUnit, LookingW, &unit);
 	player.Notify(ColorGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
 	if (&player == ThisPlayer) {
-		PlayUnitSound(*newUnit, VoiceReady);
+		PlayUnitSound(*newUnit, EUnitVoice::Ready);
 	}
 	if (unit.Player->AiEnabled) {
 		AiTrainingComplete(unit, *newUnit);

@@ -2431,7 +2431,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		return;
 	}
 
-	PlayUnitSound(unit, VoiceDying);
+	PlayUnitSound(unit, EUnitVoice::Dying);
 
 	//
 	// Catapults,... explodes.
@@ -2804,7 +2804,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastCycle = GameCycle + CYCLES_PER_SECOND * 2;
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
-				PlayUnitSound(target, VoiceHelpMe);
+				PlayUnitSound(target, EUnitVoice::HelpMe);
 			}
 		}
 	}
