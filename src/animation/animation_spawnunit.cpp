@@ -45,6 +45,17 @@
 
 #include <sstream>
 
+namespace
+{
+enum SpawnUnit_Flags
+{
+	SU_None = 0, /// Clears all flags
+	SU_Summoned = 1, /// Unit is marked as "summoned"
+	SU_JoinToAIForce = 2 /// Unit is included into spawner's AI force, if available
+};
+}
+
+
 void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
