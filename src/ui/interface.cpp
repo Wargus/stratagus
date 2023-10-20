@@ -162,7 +162,9 @@ static void UiUnselectAll()
 **  @todo Improve this function, try to show all selected units
 **        or the most possible units.
 */
-static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY)
+static void
+UiCenterOnGroup(unsigned group,
+                EGroupSelectionMode mode = EGroupSelectionMode::SelectableByRectangleOnly)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
 	PixelPos pos(-1, -1);
@@ -187,7 +189,7 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 **
 **  @param group  Group number to select.
 */
-static void UiSelectGroup(unsigned group, GroupSelectionMode mode = SELECT_ALL)
+static void UiSelectGroup(unsigned group, EGroupSelectionMode mode = EGroupSelectionMode::SelectAll)
 {
 	SelectGroup(group, mode);
 	SelectionChanged();
@@ -528,9 +530,9 @@ static void CommandKey_Group(int group)
 	if (KeyModifiers & ModifierShift) {
 		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 			if (KeyModifiers & ModifierDoublePress) {
-				UiCenterOnGroup(group, SELECT_ALL);
+				UiCenterOnGroup(group, EGroupSelectionMode::SelectAll);
 			} else {
-				UiSelectGroup(group, SELECT_ALL);
+				UiSelectGroup(group, EGroupSelectionMode::SelectAll);
 			}
 		} else if (KeyModifiers & ModifierControl) {
 			UiAddToGroup(group);
@@ -541,9 +543,9 @@ static void CommandKey_Group(int group)
 		if (KeyModifiers & (ModifierAlt | ModifierDoublePress)) {
 			if (KeyModifiers & ModifierAlt) {
 				if (KeyModifiers & ModifierDoublePress) {
-					UiCenterOnGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+					UiCenterOnGroup(group, EGroupSelectionMode::NonSelectableByRectangleOnly);
 				} else {
-					UiSelectGroup(group, NON_SELECTABLE_BY_RECTANGLE_ONLY);
+					UiSelectGroup(group, EGroupSelectionMode::NonSelectableByRectangleOnly);
 				}
 			} else {
 				UiCenterOnGroup(group);

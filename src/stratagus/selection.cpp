@@ -499,14 +499,14 @@ int ToggleUnitsByType(CUnit &base)
 **
 **  @return              number of units in the group.
 */
-int SelectGroup(int group_number, GroupSelectionMode mode)
+int SelectGroup(int group_number, EGroupSelectionMode mode)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group_number);
 
 	if (units.empty()) {
 		return 0;
 	}
-	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
+	if (mode == EGroupSelectionMode::SelectAll || !IsGroupTainted(group_number)) {
 		ChangeSelectedUnits(const_cast<CUnit **>(&units[0]), units.size());
 		return Selected.size();
 	}

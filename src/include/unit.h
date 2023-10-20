@@ -729,7 +729,8 @@ extern int SelectUnitsByType(CUnit &base);
 /// Toggle units from the same type (if selectable by rectangle)
 extern int ToggleUnitsByType(CUnit &base);
 /// Select the units belonging to a particular group
-extern int SelectGroup(int group_number, GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY);
+extern int SelectGroup(int group_number,
+                       EGroupSelectionMode mode = EGroupSelectionMode::SelectableByRectangleOnly);
 /// Add the units from the same group as the one in parameter
 extern int AddGroupFromUnitToSelection(CUnit &unit);
 /// Select the units from the same group as the one in parameter

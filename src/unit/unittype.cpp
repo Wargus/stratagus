@@ -578,15 +578,16 @@ bool CUnitType::CanMove() const
 	return Animations && Animations->Move;
 }
 
-bool CUnitType::CanSelect(GroupSelectionMode mode) const
+bool CUnitType::CanSelect(EGroupSelectionMode mode) const
 {
 	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		switch (mode) {
-			case SELECTABLE_BY_RECTANGLE_ONLY:
+			case EGroupSelectionMode::SelectableByRectangleOnly:
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
-			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
+			case EGroupSelectionMode::NonSelectableByRectangleOnly:
 				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
 			default:
+			case EGroupSelectionMode::SelectAll:
 				return true;
 		}
 	}

@@ -83,10 +83,10 @@ class LuaCallback;
 
 CUnitType &UnitTypeByIdent(std::string_view ident); /// Get unit-type by ident
 
-enum GroupSelectionMode {
-	SELECTABLE_BY_RECTANGLE_ONLY = 0,
-	NON_SELECTABLE_BY_RECTANGLE_ONLY,
-	SELECT_ALL
+enum class EGroupSelectionMode {
+	SelectableByRectangleOnly = 0,
+	NonSelectableByRectangleOnly,
+	SelectAll
 };
 
 class ResourceInfo
@@ -568,7 +568,7 @@ public:
 	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 
-	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
+	bool CanSelect(EGroupSelectionMode mode = EGroupSelectionMode::SelectableByRectangleOnly) const;
 
 public:
 	std::string Ident;              /// Identifier
