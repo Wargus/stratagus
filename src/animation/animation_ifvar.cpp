@@ -42,7 +42,7 @@
 #include <sstream>
 
 //IfVar compare types
-enum EIfVarBinOp {
+enum class EIfVarBinOp {
 	IF_GREATER_EQUAL = 1,
 	IF_GREATER,
 	IF_LESS_EQUAL,
@@ -115,16 +115,16 @@ void CAnimation_IfVar::Init(std::string_view s, lua_State *) /* override */
 		EIfVarBinOp type = static_cast<EIfVarBinOp>(to_number(op));
 
 		switch (type) {
-			case IF_GREATER_EQUAL: this->binOpFunc = binOpGreaterEqual; break;
-			case IF_GREATER: this->binOpFunc = binOpGreater; break;
-			case IF_LESS_EQUAL: this->binOpFunc = binOpLessEqual; break;
-			case IF_LESS: this->binOpFunc = binOpLess; break;
-			case IF_EQUAL: this->binOpFunc = binOpEqual; break;
-			case IF_NOT_EQUAL: this->binOpFunc = binOpNotEqual; break;
-			case IF_AND: this->binOpFunc = binOpAnd; break;
-			case IF_OR: this->binOpFunc = binOpOr; break;
-			case IF_XOR: this->binOpFunc = binOpXor; break;
-			case IF_NOT: this->binOpFunc = binOpNot; break;
+			case EIfVarBinOp::IF_GREATER_EQUAL: this->binOpFunc = binOpGreaterEqual; break;
+			case EIfVarBinOp::IF_GREATER: this->binOpFunc = binOpGreater; break;
+			case EIfVarBinOp::IF_LESS_EQUAL: this->binOpFunc = binOpLessEqual; break;
+			case EIfVarBinOp::IF_LESS: this->binOpFunc = binOpLess; break;
+			case EIfVarBinOp::IF_EQUAL: this->binOpFunc = binOpEqual; break;
+			case EIfVarBinOp::IF_NOT_EQUAL: this->binOpFunc = binOpNotEqual; break;
+			case EIfVarBinOp::IF_AND: this->binOpFunc = binOpAnd; break;
+			case EIfVarBinOp::IF_OR: this->binOpFunc = binOpOr; break;
+			case EIfVarBinOp::IF_XOR: this->binOpFunc = binOpXor; break;
+			case EIfVarBinOp::IF_NOT: this->binOpFunc = binOpNot; break;
 			default: this->binOpFunc = returnFalse; break;
 		}
 	}
