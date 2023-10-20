@@ -806,7 +806,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -852,7 +852,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -917,7 +917,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->UnitType == EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -983,7 +983,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->UnitType != EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit

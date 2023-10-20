@@ -551,14 +551,14 @@ std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitTyp
 **  Unit on map tile.
 **
 **  @param index flat index position on map, tile-based.
-**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**  @param type  moveType, std::nullopt for any moveType.
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
+static CUnit *UnitOnMapTile(const unsigned int index, std::optional<EMovement> moveType)
 {
 	const auto &field = *Map.Field(index);
-	auto it = ranges::find_if(field.UnitCache, CUnitTypeFinder(static_cast<UnitTypeType>(type)));
+	auto it = ranges::find_if(field.UnitCache, CUnitTypeFinder(moveType));
 	return it != field.UnitCache.end() ? *it : nullptr;
 }
 
@@ -566,13 +566,13 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 **  Unit on map tile.
 **
 **  @param pos   position on map, tile-based.
-**  @param type  UnitTypeType, (unsigned)-1 for any type.
+**  @param type  moveType, std::nullopt for any type.
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
+CUnit *UnitOnMapTile(const Vec2i &pos, std::optional<EMovement> moveType)
 {
-	return UnitOnMapTile(Map.getIndex(pos), type);
+	return UnitOnMapTile(Map.getIndex(pos), moveType);
 }
 
 /**
@@ -705,7 +705,7 @@ private:
 			return INT_MAX;
 		}
 
-		if (dtype.UnitType == UnitTypeFly && dest->IsAgressive() == false) {
+		if (dtype.UnitType == EMovement::Fly && dest->IsAgressive() == false) {
 			return INT_MAX / 2;
 		}
 

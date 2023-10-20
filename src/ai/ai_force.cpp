@@ -433,7 +433,7 @@ void AiForce::Attack(const Vec2i &pos)
 	Vec2i goalPos(pos);
 
 	const bool isNaval = ranges::any_of(this->Units, [](const CUnit *unit) {
-		return unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack;
+		return unit->Type->UnitType == EMovement::Naval && unit->Type->CanAttack;
 	});
 	const bool isTransporter = ranges::any_of(this->Units, [](const CUnit *unit) {
 		return unit->Type->CanTransport() && unit->IsAgressive() == false;
@@ -1000,12 +1000,9 @@ void AiForce::Update()
 	}
 
 	if (State == AiForceAttackingState::Attacking && idleUnits.size() == this->Size()) {
-		const bool isNaval = ranges::find_if(this->Units,
-		                                     [](const CUnit *unit) {
-												 return unit->Type->UnitType == UnitTypeNaval
-			                                         && unit->Type->CanAttack;
-											 })
-		                  != this->Units.end();
+		const bool isNaval = ranges::any_of(this->Units, [](const CUnit *unit) {
+			return unit->Type->UnitType == EMovement::Naval && unit->Type->CanAttack;
+		});
 		const CUnit *unit = nullptr;
 		if (isNaval) {
 			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);

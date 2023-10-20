@@ -625,7 +625,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 	           defender.tilePos.y);
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
-	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
+	if (!defender.Type->CanAttack && defender.Type->UnitType == EMovement::Fly) {
 		return;
 	}
 	// Summoned unit, don't help

@@ -362,10 +362,10 @@ private:
 	int n = 0  ;         /// identifiant in SpellSprite
 };
 
-enum UnitTypeType {
-	UnitTypeLand,  /// Unit lives on land
-	UnitTypeFly,   /// Unit lives in air
-	UnitTypeNaval  /// Unit lives on water
+enum class EMovement {
+	Land,  /// Unit lives on land
+	Fly,   /// Unit lives in air
+	Naval  /// Unit lives on water
 };
 
 enum class EComparison {
@@ -654,7 +654,7 @@ public:
 	int ButtonLevelForTransporter = 0;  /// On which button level game will show units inside transporter
 	int StartingResources = 0;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
-	UnitTypeType UnitType = UnitTypeLand; /// Land / fly / naval
+	EMovement UnitType = EMovement::Land; /// Land / fly / naval
 	int DecayRate = 0;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor = 0;        /// How much this annoys the computer

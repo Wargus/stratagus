@@ -400,6 +400,32 @@ static std::optional<EMouseAction> ToEMouseAction(std::string_view s)
 	DebugPrint("Unknown mouse action '%s'", s.data());
 	return std::nullopt;
 }
+
+EMovement toEMovement(std::string_view s)
+{
+	if (s == "land") {
+		return EMovement::Land;
+	} else if (s == "fly") {
+		return EMovement::Fly;
+	} else if (s == "naval") {
+		return EMovement::Naval;
+	} else {
+		fprintf(stderr, "Unsupported move type: %s", s.data());
+		ExitFatal(-1);
+	}
+}
+
+std::string_view toString(EMovement move)
+{
+	switch (move) {
+		case EMovement::Land: return "land";
+		case EMovement::Fly: return "fly";
+		case EMovement::Naval: return "naval";
+	}
+	fprintf(stderr, "Unsupported move type");
+	ExitFatal(-1);
+}
+
 static const std::string shadowMarker = std::string("MARKER");
 /**
 ** <b>Description</b>
@@ -738,16 +764,7 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (value == "OnReady") {
 			type->OnReady = new LuaCallback(l, -1);
 		} else if (value == "Type") {
-			value = LuaToString(l, -1);
-			if (value == "land") {
-				type->UnitType = UnitTypeLand;
-			} else if (value == "fly") {
-				type->UnitType = UnitTypeFly;
-			} else if (value == "naval") {
-				type->UnitType = UnitTypeNaval;
-			} else {
-				LuaError(l, "Unsupported Type: %s", value.data());
-			}
+			type->UnitType = toEMovement(LuaToString(l, -1));
 		} else if (value == "MissileOffsets") {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1700,16 +1717,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (data == "Type") {
-		if (type->UnitType == UnitTypeLand) {
-			lua_pushstring(l, "land");
-			return 1;
-		} else if (type->UnitType == UnitTypeFly) {
-			lua_pushstring(l, "fly");
-			return 1;
-		} else if (type->UnitType == UnitTypeNaval) {
-			lua_pushstring(l, "naval");
-			return 1;
-		}
+		lua_pushstring(l, toString(type->UnitType).data());
+		return 1;
 	} else if (data == "Corpse") {
 		lua_pushstring(l, type->CorpseName.c_str());
 		return 1;

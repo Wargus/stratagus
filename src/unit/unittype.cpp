@@ -630,7 +630,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 
 	//  As side effect we calculate the movement flags/mask here.
 	switch (type.UnitType) {
-		case UnitTypeLand:                              // on land
+		case EMovement::Land: // on land
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
@@ -639,10 +639,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldWaterAllowed | // can't move on this
 				MapFieldUnpassable;
 			break;
-		case UnitTypeFly:                               // in air
+		case EMovement::Fly: // in air
 			type.MovementMask = MapFieldAirUnit; // already occuppied
 			break;
-		case UnitTypeNaval:                             // on water
+		case EMovement::Naval: // on water
 			if (type.CanTransport()) {
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -686,15 +686,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		}
 	} else {
 		switch (type.UnitType) {
-			case UnitTypeLand: // on land
-				type.FieldFlags = MapFieldLandUnit;
-				break;
-			case UnitTypeFly: // in air
-				type.FieldFlags = MapFieldAirUnit;
-				break;
-			case UnitTypeNaval: // on water
-				type.FieldFlags = MapFieldSeaUnit;
-				break;
+			case EMovement::Land: type.FieldFlags = MapFieldLandUnit; break;
+			case EMovement::Fly: type.FieldFlags = MapFieldAirUnit; break;
+			case EMovement::Naval: type.FieldFlags = MapFieldSeaUnit; break;
 			default:
 				DebugPrint("Where moves this unit?\n");
 				type.FieldFlags = 0;

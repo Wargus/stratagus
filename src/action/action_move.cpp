@@ -204,7 +204,7 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 
-		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+		if (unit.Type->UnitType == EMovement::Naval) { // Boat (un)docking?
 			bool foundCoast = false;
 
 			for (int i = 0; i < unit.Type->TileWidth && !foundCoast; i++) {

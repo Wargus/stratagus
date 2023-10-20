@@ -647,14 +647,18 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			for (CUnit *unitPtr : blockingUnits) {
 				CUnit &unit = *unitPtr;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
-				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
-					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeLand) {
+				if (!missile.Type->IgnoreWalls
+				    && missile.SourceUnit->Type->UnitType == EMovement::Land) {
+					if (!missile.TargetUnit
+					    || missile.TargetUnit->Type->UnitType == EMovement::Land) {
 						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
-							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
+						    && unit.Player != missile.SourceUnit->Player
+						    && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
-									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
+									missile.position =
+										Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 								}
 							} else {
 								missile.position = position;

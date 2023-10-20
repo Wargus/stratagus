@@ -1099,7 +1099,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
 		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
+			UnitUnderCursor = UnitOnMapTile(tilePos, std::nullopt);
 		}
 	}
 
@@ -1722,7 +1722,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, std::nullopt))
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross

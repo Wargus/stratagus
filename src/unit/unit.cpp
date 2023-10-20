@@ -3255,20 +3255,25 @@ bool CanTarget(const CUnitType &source, const CUnitType &dest)
 			}
 		}
 	}
-	if (dest.UnitType == UnitTypeLand) {
-		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
-			return (source.CanTarget & (ECanTargetFlag::Land | ECanTargetFlag::Sea))
-			    != ECanTargetFlag::None;
+	switch (dest.UnitType) {
+		case EMovement::Land:
+		{
+			if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
+				return (source.CanTarget & (ECanTargetFlag::Land | ECanTargetFlag::Sea))
+				    != ECanTargetFlag::None;
+			}
+			return (source.CanTarget & ECanTargetFlag::Land) != ECanTargetFlag::None;
 		}
-		return (source.CanTarget & ECanTargetFlag::Land) != ECanTargetFlag::None;
+		case EMovement::Fly:
+		{
+			return (source.CanTarget & ECanTargetFlag::Air) != ECanTargetFlag::None;
+		}
+		case EMovement::Naval:
+		{
+			return (source.CanTarget & ECanTargetFlag::Sea) != ECanTargetFlag::None;
+		}
+		default: return 0;
 	}
-	if (dest.UnitType == UnitTypeFly) {
-		return (source.CanTarget & ECanTargetFlag::Air) != ECanTargetFlag::None;
-	}
-	if (dest.UnitType == UnitTypeNaval) {
-		return (source.CanTarget & ECanTargetFlag::Sea) != ECanTargetFlag::None;
-	}
-	return 0;
 }
 
 /**
@@ -3395,15 +3400,11 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 		return true;
 	}
 
-	if (
-		goal
-		&& goal->IsAliveOnMap()
-		&& (
-			this->MapDistanceTo(*goal) > 1
-			|| (this->Type->UnitType != UnitTypeFly && goal->Type->UnitType == UnitTypeFly)
-			|| (this->Type->UnitType == UnitTypeFly && goal->Type->UnitType != UnitTypeFly)
-		)
-	) {
+	if (goal && goal->IsAliveOnMap()
+	    && (this->MapDistanceTo(*goal) > 1
+	        || (this->Type->UnitType != EMovement::Fly && goal->Type->UnitType == EMovement::Fly)
+	        || (this->Type->UnitType == EMovement::Fly
+	            && goal->Type->UnitType != EMovement::Fly))) {
 		return true;
 	}
 
