@@ -97,6 +97,60 @@ static std::map<std::string, CAnimations *, std::less<>> AnimationMap;/// Animat
 --  Animation
 ----------------------------------------------------------------------------*/
 
+SetVar_ModifyTypes toSetVar_ModifyTypes(std::string_view s)
+{
+	if (s == "=") {
+		return SetVar_ModifyTypes::modSet;
+	} else if (s == "+=") {
+		return SetVar_ModifyTypes::modAdd;
+	} else if (s == "-=") {
+		return SetVar_ModifyTypes::modSub;
+	} else if (s == "*=") {
+		return SetVar_ModifyTypes::modMul;
+	} else if (s == "/=") {
+		return SetVar_ModifyTypes::modDiv;
+	} else if (s == "%=") {
+		return SetVar_ModifyTypes::modMod;
+	} else if (s == "&=") {
+		return SetVar_ModifyTypes::modAnd;
+	} else if (s == "|=") {
+		return SetVar_ModifyTypes::modOr;
+	} else if (s == "^=") {
+		return SetVar_ModifyTypes::modXor;
+	} else if (s == "!") {
+		return SetVar_ModifyTypes::modNot;
+	} else {
+		return static_cast<SetVar_ModifyTypes>(to_number(s));
+	}
+}
+
+void modifyValue(SetVar_ModifyTypes mod, int &value, int rop)
+{
+	switch (mod) {
+		case SetVar_ModifyTypes::modAdd: value += rop; break;
+		case SetVar_ModifyTypes::modSub: value -= rop; break;
+		case SetVar_ModifyTypes::modMul: value *= rop; break;
+		case SetVar_ModifyTypes::modDiv:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in Animation\n");
+				ExitFatal(1);
+			}
+			value /= rop;
+			break;
+		case SetVar_ModifyTypes::modMod:
+			if (!rop) {
+				fprintf(stderr, "Division by zero in Animation\n");
+				ExitFatal(1);
+			}
+			value %= rop;
+			break;
+		case SetVar_ModifyTypes::modAnd: value &= rop; break;
+		case SetVar_ModifyTypes::modOr: value |= rop; break;
+		case SetVar_ModifyTypes::modXor: value ^= rop; break;
+		case SetVar_ModifyTypes::modNot: value = !value; break;
+		default: value = rop;
+	}
+}
 
 /**
 **  Show unit animation.

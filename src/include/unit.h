@@ -50,7 +50,9 @@
 
 #include "vec2i.h"
 
+#include <optional>
 #include <vector>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -590,7 +592,8 @@ extern void DropOutAll(const CUnit &unit);
 /// Return the rule used to build this building.
 extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent);
 /// @todo more docu
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
+extern std::optional<CUnit *>
+CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
 /// @todo more docu
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 /// FIXME: more docu

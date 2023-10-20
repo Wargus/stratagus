@@ -263,17 +263,17 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
 	p += serialize32(p, this->ServerGameSettings._Bitfield);
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Race));
-		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].PlayerColor));
-		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Team));
-		p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Presets[i].Type));
+	for (const auto &preset : this->ServerGameSettings.Presets) {
+		p += serialize8(p, static_cast<int8_t>(preset.Race));
+		p += serialize8(p, static_cast<int8_t>(preset.PlayerColor));
+		p += serialize8(p, static_cast<int8_t>(preset.Team));
+		p += serialize8(p, static_cast<int8_t>(preset.Type));
 	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, static_cast<int8_t>(this->CompOpt[i]));
+	for (const auto &compOpt : this->CompOpt) {
+		p += serialize8(p, static_cast<int8_t>(compOpt));
 	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += serialize8(p, this->Ready[i]);
+	for (const auto &ready : this->Ready) {
+		p += serialize8(p, ready);
 	}
 	return p - buf;
 }
@@ -295,17 +295,17 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
 	p += deserialize32(p, &this->ServerGameSettings._Bitfield);
 
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Race));
-		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].PlayerColor));
-		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Team));
-		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Presets[i].Type));
+	for (auto &preset : this->ServerGameSettings.Presets) {
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Race));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.PlayerColor));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Team));
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Type));
 	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, reinterpret_cast<int8_t*>(&this->CompOpt[i]));
+	for (auto &compOpt : this->CompOpt) {
+		p += deserialize8(p, reinterpret_cast<int8_t*>(&compOpt));
 	}
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += deserialize8(p, &this->Ready[i]);
+	for (auto &ready : this->Ready) {
+		p += deserialize8(p, &ready);
 	}
 	return p - buf;
 }
@@ -313,8 +313,8 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 void CServerSetup::Clear()
 {
 	ServerGameSettings.Init();
-	memset(CompOpt, 0, sizeof(CompOpt));
-	memset(Ready, 0, sizeof(Ready));
+	ranges::fill(CompOpt, SlotOption::Available);
+	ranges::fill(Ready, 0);
 }
 
 void CServerSetup::Save(const std::function <void (std::string)>& f) {
@@ -420,8 +420,8 @@ std::vector<unsigned char> CInitMessage_Config::Serialize() const
 
 	p += header.Serialize(p);
 	p += serialize8(p, clientIndex);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Serialize(p);
+	for (const auto &host : this->hosts) {
+		p += host.Serialize(p);
 	}
 	return buf;
 }
@@ -430,8 +430,8 @@ void CInitMessage_Config::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
 	p += deserialize8(p, &clientIndex);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Deserialize(p);
+	for (auto &host : this->hosts) {
+		p += host.Deserialize(p);
 	}
 }
 
@@ -504,8 +504,8 @@ std::vector<unsigned char> CInitMessage_Welcome::Serialize() const
 	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Serialize(p);
+	for (const auto &host : this->hosts) {
+		p += host.Serialize(p);
 	}
 	p += serialize16(p, this->NetHostSlot);
 	p += serialize32(p, this->Lag);
@@ -516,8 +516,8 @@ std::vector<unsigned char> CInitMessage_Welcome::Serialize() const
 void CInitMessage_Welcome::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Deserialize(p);
+	for (auto &host : this->hosts) {
+		p += host.Deserialize(p);
 	}
 	p += deserialize16(p, &this->NetHostSlot);
 	p += deserialize32(p, &this->Lag);
@@ -641,8 +641,8 @@ std::vector<unsigned char> CInitMessage_Resync::Serialize() const
 	unsigned char *p = buf.data();
 
 	p += header.Serialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Serialize(p);
+	for (const auto &host : this->hosts) {
+		p += host.Serialize(p);
 	}
 	return buf;
 }
@@ -650,8 +650,8 @@ std::vector<unsigned char> CInitMessage_Resync::Serialize() const
 void CInitMessage_Resync::Deserialize(const unsigned char *p)
 {
 	p += header.Deserialize(p);
-	for (int i = 0; i < PlayerMax; ++i) {
-		p += this->hosts[i].Deserialize(p);
+	for (auto &host : this->hosts) {
+		p += host.Deserialize(p);
 	}
 }
 
@@ -784,8 +784,8 @@ size_t CNetworkSelection::Serialize(unsigned char *buf) const
 
 	p += serialize16(p, this->player);
 	p += serialize16(p, uint16_t(this->Units.size()));
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		p += serialize16(p, Units[i]);
+	for (auto unitId : this->Units) {
+		p += serialize16(p, unitId);
 	}
 	return p - buf;
 }
@@ -798,8 +798,8 @@ size_t CNetworkSelection::Deserialize(const unsigned char *buf)
 	p += deserialize16(p, &this->player);
 	p += deserialize16(p, &size);
 	this->Units.resize(size);
-	for (size_t i = 0; i != this->Units.size(); ++i) {
-		p += deserialize16(p, &Units[i]);
+	for (auto &unitId : this->Units) {
+		p += deserialize16(p, &unitId);
 	}
 	return p - buf;
 }
@@ -816,8 +816,8 @@ size_t CNetworkSelection::Size() const
 size_t CNetworkPacketHeader::Serialize(unsigned char *p) const
 {
 	if (p != nullptr) {
-		for (int i = 0; i != MaxNetworkCommands; ++i) {
-			p += serialize8(p, this->Type[i]);
+		for (const auto &type : this->Type) {
+			p += serialize8(p, type);
 		}
 		p += serialize8(p, this->Cycle);
 		p += serialize8(p, this->OrigPlayer);
@@ -829,8 +829,8 @@ size_t CNetworkPacketHeader::Deserialize(const unsigned char *buf)
 {
 	const unsigned char *p = buf;
 
-	for (int i = 0; i != MaxNetworkCommands; ++i) {
-		p += deserialize8(p, &this->Type[i]);
+	for (auto &type : this->Type) {
+		p += deserialize8(p, &type);
 	}
 	p += deserialize8(p, &this->Cycle);
 	p += deserialize8(p, &this->OrigPlayer);

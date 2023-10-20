@@ -229,9 +229,9 @@ void AiNewUnitTypeEquiv(const CUnitType &a, const CUnitType &b)
 	}
 
 	// Then just find & replace in UnitTypeEquivs...
-	for (unsigned int i = 0; i <= UnitTypeMax; ++i) {
-		if (UnitTypeEquivs[i] == find) {
-			UnitTypeEquivs[i] = replace;
+	for (auto &equiv : UnitTypeEquivs) {
+		if (equiv == find) {
+			equiv = replace;
 		}
 	}
 }

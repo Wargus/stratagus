@@ -415,8 +415,8 @@ void CleanPlayers()
 
 void FreePlayerColors()
 {
-	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].ClearUnitColors();
+	for (auto &player : Players) {
+		player.ClearUnitColors();
 	}
 	PlayerColorsRGB.clear();
 	PlayerColorsSDL.clear();

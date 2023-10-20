@@ -55,7 +55,7 @@ struct lua_State;
 extern std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Modify types
-enum SetVar_ModifyTypes {
+enum class SetVar_ModifyTypes {
 	modSet = 0,      /// Set value to this
 	modAdd,          /// Addition
 	modSub,          /// Subtraction
@@ -67,6 +67,9 @@ enum SetVar_ModifyTypes {
 	modXor,          /// Bitwise XOR
 	modNot,          /// Bitwise NOT
 };
+
+SetVar_ModifyTypes toSetVar_ModifyTypes(std::string_view s);
+void modifyValue(SetVar_ModifyTypes mod, int &value, int rop);
 
 class CAnimation
 {
@@ -99,11 +102,11 @@ public:
 		delete Attack;
 		delete RangedAttack;
 		delete Build;
-		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
-			delete Death[i];
+		for (auto *p : Death) {
+			delete p;
 		}
-		for (int i = 0; i < MaxCosts; ++i) {
-			delete Harvest[i];
+		for (auto *p : Harvest) {
+			delete p;
 		}
 		delete Move;
 		delete Repair;
