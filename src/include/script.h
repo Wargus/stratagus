@@ -137,17 +137,6 @@ enum class EnumVariable {
 };
 
 /**
-**  Enumeration of unit
-*/
-enum EnumUnit {
-	UnitRefItSelf = 0,      /// unit.
-	UnitRefInside,          /// unit->Inside.
-	UnitRefContainer,       /// Unit->Container.
-	UnitRefWorker,          /// unit->Data.Built.Worker
-	UnitRefGoal             /// unit->Goal
-};
-
-/**
 **  Number description.
 **  Use to describe complex number in script to use when game running.
 ** [Deprecated]: give access to lua.

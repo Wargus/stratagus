@@ -80,7 +80,8 @@ enum {
 		order->Range = builder.Type->RepairRange;
 	} else {
 		// If building inside, but be next to stop
-		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->UnitType == UnitTypeLand) {
+		if (building.BoolFlag[SHOREBUILDING_INDEX].value
+		    && builder.Type->MoveType == EMovement::Land) {
 			// Peon won't dive :-)
 			order->Range = 1;
 		}

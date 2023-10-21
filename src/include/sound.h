@@ -59,19 +59,19 @@ class LuaActionListener;
 /**
 **  Voice groups for a unit
 */
-enum UnitVoiceGroup {
-	VoiceSelected,          /// If selected
-	VoiceAcknowledging,     /// Acknowledge command
-	VoiceReady,             /// Command completed
-	VoiceHelpMe,            /// If attacked
-	VoiceDying,             /// If killed
-	VoiceWorkCompleted,     /// only worker, work completed
-	VoiceBuilding,          /// only for building under construction
-	VoiceDocking,           /// only for transport reaching coast
-	VoiceRepairing,         /// repairing
-	VoiceHarvesting,        /// harvesting
-	VoiceAttack,            /// Attack command
-	VoiceBuild              /// worker goes to build a building
+enum class EUnitVoice {
+	Selected,      /// If selected
+	Acknowledging, /// Acknowledge command
+	Ready,         /// Command completed
+	HelpMe,        /// If attacked
+	Dying,         /// If killed
+	WorkCompleted, /// only worker, work completed
+	Building,      /// only for building under construction
+	Docking,       /// only for transport reaching coast
+	Repairing,     /// repairing
+	Harvesting,    /// harvesting
+	Attack,        /// Attack command
+	Build          /// worker goes to build a building
 };
 
 
@@ -166,7 +166,7 @@ extern int DistanceSilent;
 /// Calculates volume level
 extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
 /// Play a unit sound
-extern void PlayUnitSound(const CUnit &unit, UnitVoiceGroup unit_voice_group, bool sampleUnique = false);
+extern void PlayUnitSound(const CUnit &, EUnitVoice, bool sampleUnique = false);
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &unit, CSound *sound);
 /// Play a missile sound

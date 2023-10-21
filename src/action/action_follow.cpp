@@ -246,9 +246,11 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 				}
 
 				if (dest.NewOrder == nullptr
-					|| (dest.NewOrder->Action == UnitAction::Resource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
-					|| (dest.NewOrder->Action == UnitAction::Attack && !unit.Type->CanAttack)
-					|| (dest.NewOrder->Action == UnitAction::Board && unit.Type->UnitType != UnitTypeLand)) {
+				    || (dest.NewOrder->Action == UnitAction::Resource
+				        && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
+				    || (dest.NewOrder->Action == UnitAction::Attack && !unit.Type->CanAttack)
+				    || (dest.NewOrder->Action == UnitAction::Board
+				        && unit.Type->MoveType != EMovement::Land)) {
 					this->Finished = true;
 					return ;
 				} else {

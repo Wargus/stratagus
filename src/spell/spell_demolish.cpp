@@ -97,7 +97,7 @@ int Spell_Demolish::Cast(CUnit &caster,
 	if (this->Damage) {
 		std::vector<CUnit *> table = SelectFixed(minpos, maxpos);
 		for (CUnit *unit : table) {
-			if (unit->Type->UnitType != UnitTypeFly && unit->IsAlive()
+			if (unit->Type->MoveType != EMovement::Fly && unit->IsAlive()
 			    && unit->MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!
 				HitUnit(&caster, *unit, this->Damage);

@@ -38,6 +38,8 @@
 #include "unit.h"
 #include "unittype.h"
 
+#include <optional>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -196,17 +198,17 @@ AndPredicate<Pred1, Pred2> MakeAndPredicate(Pred1 pred1, Pred2 pred2) { return A
 class CUnitTypeFinder
 {
 public:
-	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
+	explicit CUnitTypeFinder(const std::optional<EMovement> t) : moveType(t) {}
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
-		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		if (type.BoolFlag[VANISHES_INDEX].value || (moveType != std::nullopt && type.MoveType != moveType)) {
 			return false;
 		}
 		return true;
 	}
 private:
-	const UnitTypeType unitTypeType;
+	const std::optional<EMovement> moveType;
 };
 
 
@@ -334,7 +336,7 @@ extern std::vector<CUnit *> FindUnitsByType(const CUnitType &type, bool everybod
 /// Find all units of this type of the player
 extern std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, bool ai_active = false);
 /// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
+extern CUnit *UnitOnMapTile(const Vec2i &pos, std::optional<EMovement> type);
 /// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2);
 

@@ -75,7 +75,7 @@ public:
 			|| unit->CurrentAction() == UnitAction::Die) {
 			return;
 		}
-		if (unit->Type->UnitType == UnitTypeFly && unit->IsAgressive() == false) {
+		if (unit->Type->MoveType == EMovement::Fly && unit->IsAgressive() == false) {
 			return;
 		}
 		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
@@ -189,7 +189,7 @@ bool AiFindWall(AiForce *force)
 	// Next best choice is any land unit.  Otherwise just use the first.
 	CUnit *unit = force->Units[0];
 	for (CUnit *aiunit : force->Units) {
-		if (aiunit->Type->UnitType == UnitTypeLand) {
+		if (aiunit->Type->MoveType == EMovement::Land) {
 			unit = aiunit;
 			if (aiunit->Type->Missile.Missile->Range == 1) {
 				break;
@@ -374,7 +374,7 @@ bool AiForce::PlanAttack()
 	// Find a land unit of the force.
 	// FIXME: if force is split over different places -> broken
 	CUnit *landUnit = nullptr;
-	if (auto it = ranges::find_if(Units, CUnitTypeFinder(UnitTypeLand)); it == Units.end()) {
+	if (auto it = ranges::find_if(Units, CUnitTypeFinder(EMovement::Land)); it == Units.end()) {
 		DebugPrint("%d: No land unit in force\n", player.Index);
 		return false;
 	} else {
@@ -472,14 +472,14 @@ static std::pair<CUnit *, Vec2i> GetBestExplorer(const AiExplorationRequest &req
 		}
 		const CUnitType &type = *unit->Type;
 
-		if (type.UnitType != UnitTypeFly) {
+		if (type.MoveType != EMovement::Fly) {
 			if (flyeronly) {
 				continue;
 			}
-			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand) {
+			if ((request.Mask & MapFieldLandUnit) && type.MoveType != EMovement::Land) {
 				continue;
 			}
-			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval) {
+			if ((request.Mask & MapFieldSeaUnit) && type.MoveType != EMovement::Naval) {
 				continue;
 			}
 		} else {
@@ -488,7 +488,7 @@ static std::pair<CUnit *, Vec2i> GetBestExplorer(const AiExplorationRequest &req
 
 		const int sqDistance = SquareDistance(unit->tilePos, *pos);
 		if (bestSquareDistance == -1 || sqDistance <= bestSquareDistance
-			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)) {
+		    || (bestunit->Type->MoveType != EMovement::Fly && type.MoveType == EMovement::Fly)) {
 			bestSquareDistance = sqDistance;
 			bestunit = unit;
 		}

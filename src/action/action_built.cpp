@@ -201,11 +201,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	player.Notify(ColorGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	if (&player == ThisPlayer) {
 		if (type.MapSound.Ready.Sound) {
-			PlayUnitSound(unit, VoiceReady);
+			PlayUnitSound(unit, EUnitVoice::Ready);
 		} else if (worker) {
-			PlayUnitSound(*worker, VoiceWorkCompleted);
+			PlayUnitSound(*worker, EUnitVoice::WorkCompleted);
 		} else {
-			PlayUnitSound(unit, VoiceBuilding);
+			PlayUnitSound(unit, EUnitVoice::Building);
 		}
 	}
 
@@ -285,7 +285,7 @@ void COrder_Built::Execute(CUnit &unit) /* override */
 	// Check if we should make some random noise
 	// IMPORTANT: this is local randomization, do not use the SyncRand function!
 	if (unit.Frame == 0 && unit.Player == ThisPlayer && GameCycle % 150 == 0 && (MyRand() % 3) == 0) {
-		PlayUnitSound(unit, VoiceBuilding, true);
+		PlayUnitSound(unit, EUnitVoice::Building, true);
 	}
 
 	// Check if building ready. Note we can both build and repair.

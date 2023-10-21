@@ -366,7 +366,7 @@ static void EditorUndoAction()
 
 	switch (action.Type) {
 		case EditorActionType::PlaceUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->MoveType);
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
@@ -392,7 +392,7 @@ static void EditorRedoAction()
 			break;
 
 		case EditorActionType::RemoveUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->MoveType);
 			EditorActionRemoveUnit(*unit);
 			break;
 		}

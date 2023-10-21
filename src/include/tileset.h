@@ -98,14 +98,14 @@ constexpr tile_flags MapFieldSubtilesUnpassableMask	{tile_flags(0xFFFF) << MapFi
 **  @todo I think this can be removed, we can use the flags?
 **  I'm not sure, if we have seen and real time to considere.
 */
-enum TileType {
-	TileTypeUnknown,    /// Unknown tile type
-	TileTypeWood,       /// Any wood tile
-	TileTypeRock,       /// Any rock tile
-	TileTypeCoast,      /// Any coast tile
-	TileTypeHumanWall,  /// Any human wall tile
-	TileTypeOrcWall,    /// Any orc wall tile
-	TileTypeWater       /// Any water tile
+enum class ETileType : unsigned char {
+	Unknown,    /// Unknown tile type
+	Wood,       /// Any wood tile
+	Rock,       /// Any rock tile
+	Coast,      /// Any coast tile
+	HumanWall,  /// Any human wall tile
+	OrcWall,    /// Any orc wall tile
+	Water       /// Any water tile
 };
 
 /// Single tile definition
@@ -237,7 +237,7 @@ public:
 	std::vector<CTile> tiles;
 
 	// TODO: currently hardcoded
-	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
+	std::vector<ETileType> TileTypeTable; /// For fast lookup of tile type
 
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
@@ -372,7 +372,7 @@ public:
 		return image;
 	}
 private:
-	enum SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
+	enum class SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
 
 private:
 	uint16_t checkForLayers(lua_State *luaStack) const;

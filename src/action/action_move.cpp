@@ -204,7 +204,7 @@ int DoActionMove(CUnit &unit)
 				break;
 		}
 
-		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
+		if (unit.Type->MoveType == EMovement::Naval) { // Boat (un)docking?
 			bool foundCoast = false;
 
 			for (int i = 0; i < unit.Type->TileWidth && !foundCoast; i++) {
@@ -220,7 +220,7 @@ int DoActionMove(CUnit &unit)
 			}
 			if (foundCoast) {
 				// Should play, even if unit already speaking
-				PlayUnitSound(unit, VoiceDocking, true);
+				PlayUnitSound(unit, EUnitVoice::Docking, true);
 			}
 		}
 		Vec2i pos = unit.tilePos + posd;
@@ -295,7 +295,7 @@ void COrder_Move::Execute(CUnit &unit) /* override */
 
 		case PF_WAIT:
 		{
-			const CUnit *blocker = UnitOnMapTile(this->goalPos, unit.Type->UnitType);
+			const CUnit *blocker = UnitOnMapTile(this->goalPos, unit.Type->MoveType);
 			if (blocker) {
 				const int distToBlocker = MapDistanceBetweenTypes(*(unit.Type), unit.tilePos, *(blocker->Type), blocker->tilePos);
 				if (distToBlocker == 1 && (unit.IsEnemy(*blocker) || blocker->Moving == 0)) {

@@ -156,7 +156,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandFollow(*dest, unit, 0);
@@ -166,7 +166,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			dest->Blink = 4;
 			DebugPrint("Board transporter\n");
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandBoard(unit, *dest, flush);
@@ -181,7 +181,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 			DebugPrint("Send command follow\n");
 			// is flush value correct ?
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandFollow(unit, *dest, 0);
@@ -192,7 +192,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 		dest->Blink = 4;
 		DebugPrint("Board transporter\n");
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandBoard(*dest, unit, flush);
@@ -211,7 +211,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandReturnGoods(unit, &dest, flush);
@@ -221,27 +221,28 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
-		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+	    && (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+		if (unit.CurrentResource != res
+		    || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			dest.Blink = 4;
+			SendCommandResource(unit, dest, flush);
+			if (!acknowledged) {
+				PlayUnitSound(unit, EUnitVoice::Harvesting);
+				acknowledged = 1;
+			}
+			return true;
+		} else {
+			CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+			if (depot) {
 				dest.Blink = 4;
-				SendCommandResource(unit, dest, flush);
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceHarvesting);
+					PlayUnitSound(unit, EUnitVoice::Acknowledging);
 					acknowledged = 1;
 				}
+				SendCommandReturnGoods(unit, depot, flush);
 				return true;
-			} else {
-				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
-				if (depot) {
-					dest.Blink = 4;
-					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
-						acknowledged = 1;
-					}
-					SendCommandReturnGoods(unit, depot, flush);
-					return true;
-				}
 			}
+		}
 	}
 	return false;
 }
@@ -260,7 +261,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				SendCommandResourceLoc(unit, pos, flush);
 				if (!acknowledged) {
-					PlayUnitSound(unit, VoiceHarvesting);
+					PlayUnitSound(unit, EUnitVoice::Harvesting);
 					acknowledged = 1;
 				}
 				return true;
@@ -268,7 +269,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
 				if (depot) {
 					if (!acknowledged) {
-						PlayUnitSound(unit, VoiceAcknowledging);
+						PlayUnitSound(unit, EUnitVoice::Acknowledging);
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
@@ -291,7 +292,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest))) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceRepairing);
+			PlayUnitSound(unit, EUnitVoice::Repairing);
 			acknowledged = 1;
 		}
 		SendCommandRepair(unit, pos, dest, flush);
@@ -314,7 +315,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
@@ -326,7 +327,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	// Move
 	if (!acknowledged) {
-		PlayUnitSound(unit, VoiceAcknowledging);
+		PlayUnitSound(unit, EUnitVoice::Acknowledging);
 		acknowledged = 1;
 	}
 	SendCommandMove(unit, pos, flush);
@@ -341,7 +342,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	if (action == EMouseAction::SpellCast || unit.IsEnemy(dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAttack);
+			PlayUnitSound(unit, EUnitVoice::Attack);
 			acknowledged = 1;
 		}
 		if (action == EMouseAction::SpellCast) {
@@ -362,7 +363,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
@@ -398,12 +399,12 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		if (RightButtonAttacks) {
 			SendCommandMove(unit, pos, flush);
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
 		} else {
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAttack);
+				PlayUnitSound(unit, EUnitVoice::Attack);
 				acknowledged = 1;
 			}
 			SendCommandAttack(unit, pos, nullptr, flush);
@@ -411,14 +412,14 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	} else {
 		if (RightButtonAttacks) {
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAttack);
+				PlayUnitSound(unit, EUnitVoice::Attack);
 				acknowledged = 1;
 			}
 			SendCommandAttack(unit, pos, nullptr, flush);
 		} else {
 			// Note: move is correct here, right default is move
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAcknowledging);
+				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
 			SendCommandMove(unit, pos, flush);
@@ -432,7 +433,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
@@ -456,7 +457,7 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 		dest.Blink = 4;
 		SendCommandReturnGoods(dest, &unit, flush);
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		return true;
@@ -482,7 +483,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandResource(unit, *dest, flush);
@@ -492,7 +493,7 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 	const CMapField &mf = *Map.Field(pos);
 	if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandResourceLoc(unit, pos, flush);
@@ -519,7 +520,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
 		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
 			if (!acknowledged) {
-				PlayUnitSound(unit, VoiceAttack);
+				PlayUnitSound(unit, EUnitVoice::Attack);
 				acknowledged = 1;
 			}
 			SendCommandAttackGround(unit, pos, flush);
@@ -530,7 +531,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((KeyModifiers & ModifierControl) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandFollow(unit, *dest, flush);
@@ -541,7 +542,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	if ((KeyModifiers & ModifierAlt) && dest) {
 		dest->Blink = 4;
 		if (!acknowledged) {
-			PlayUnitSound(unit, VoiceAcknowledging);
+			PlayUnitSound(unit, EUnitVoice::Acknowledging);
 			acknowledged = 1;
 		}
 		SendCommandDefend(unit, *dest, flush);
@@ -585,7 +586,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		}
 	}
 	if (!acknowledged) {
-		PlayUnitSound(unit, VoiceAcknowledging);
+		PlayUnitSound(unit, EUnitVoice::Acknowledging);
 		acknowledged = 1;
 	}
 	SendCommandMove(unit, pos, flush);
@@ -1098,7 +1099,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
 		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
-			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
+			UnitUnderCursor = UnitOnMapTile(tilePos, std::nullopt);
 		}
 	}
 
@@ -1444,7 +1445,11 @@ static int SendSpellCast(const Vec2i &tilePos)
 			// Only spells with explicit 'self: true' allows self targetting
 			continue;
 		}
-		SendCommandSpellCast(*unit, tilePos, spell->Target == TargetPosition ? nullptr : dest , CursorValue, flush);
+		SendCommandSpellCast(*unit,
+		                     tilePos,
+		                     spell->Target == ETarget::Position ? nullptr : dest,
+		                     CursorValue,
+		                     flush);
 		ret = 1;
 	}
 	return ret;
@@ -1495,20 +1500,20 @@ static void SendCommand(const Vec2i &tilePos)
 		for (CUnit *unit : Selected) {
 			if (CursorAction == ButtonCmd::Attack || CursorAction == ButtonCmd::AttackGround || CursorAction == ButtonCmd::SpellCast) {
 				if (unit->Type->MapSound.Attack.Sound) {
-					PlayUnitSound(*unit, VoiceAttack);
+					PlayUnitSound(*unit, EUnitVoice::Attack);
 					break;
 				} else if (unit->Type->MapSound.Acknowledgement.Sound) {
-					PlayUnitSound(*unit, VoiceAcknowledging);
+					PlayUnitSound(*unit, EUnitVoice::Acknowledging);
 					break;
 				}
 			} else if (CursorAction == ButtonCmd::Repair && unit->Type->MapSound.Repair.Sound) {
-				PlayUnitSound(*unit, VoiceRepairing);
+				PlayUnitSound(*unit, EUnitVoice::Repairing);
 				break;
 			} else if (CursorAction == ButtonCmd::Build && unit->Type->MapSound.Build.Sound) {
-				PlayUnitSound(*unit, VoiceBuild);
+				PlayUnitSound(*unit, EUnitVoice::Build);
 				break;
 			} else if (unit->Type->MapSound.Acknowledgement.Sound) {
-				PlayUnitSound(*unit, VoiceAcknowledging);
+				PlayUnitSound(*unit, EUnitVoice::Acknowledging);
 				break;
 			}
 		}
@@ -1687,7 +1692,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
-				PlayUnitSound(*Selected[0], VoiceBuild);
+				PlayUnitSound(*Selected[0], EUnitVoice::Build);
 				for (CUnit *unit : Selected) {
 					SendCommandBuildBuilding(*unit, tilePos, *CursorBuilding, flush);
 				}
@@ -1717,7 +1722,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, -1))
+			if (UnitUnderCursor != nullptr && (unit = UnitOnMapTile(tilePos, std::nullopt))
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
@@ -2155,13 +2160,13 @@ void UIHandleButtonUp(unsigned button)
 			//
 			if (Selected.size() == 1) {
 				if (Selected[0]->CurrentAction() == UnitAction::Built && Selected[0]->Player->Index == ThisPlayer->Index) {
-					PlayUnitSound(*Selected[0], VoiceBuilding);
+					PlayUnitSound(*Selected[0], EUnitVoice::Building);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0])
 						   || Selected[0]->Player->Type == PlayerTypes::PlayerNeutral) {
-					PlayUnitSound(*Selected[0], VoiceSelected);
+					PlayUnitSound(*Selected[0], EUnitVoice::Selected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				}

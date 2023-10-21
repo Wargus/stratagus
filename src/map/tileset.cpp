@@ -293,39 +293,25 @@ tile_index CTileset::getDefaultWoodTileIndex() const
 
 bool CTileset::isAWallTile(tile_index tile) const
 {
-	if (TileTypeTable.empty() == false) {
-		return (TileTypeTable[tile] == TileTypeHumanWall
-				|| TileTypeTable[tile] == TileTypeOrcWall);
-	}
-	return false;
+	return !TileTypeTable.empty()
+	    && (TileTypeTable[tile] == ETileType::HumanWall
+	        || TileTypeTable[tile] == ETileType::OrcWall);
 }
 
 bool CTileset::isARaceWallTile(tile_index tile, bool human) const
 {
-	if (TileTypeTable.empty() == false) {
-		if (human) {
-			return TileTypeTable[tile] == TileTypeHumanWall;
-		} else {
-			return TileTypeTable[tile] == TileTypeOrcWall;
-		}
-	}
-	return false;
+	return !TileTypeTable.empty()
+	    && TileTypeTable[tile] == (human ? ETileType::HumanWall : ETileType::OrcWall);
 }
-
 
 bool CTileset::isAWoodTile(tile_index tile) const
 {
-	if (TileTypeTable.empty() == false) {
-		return TileTypeTable[tile] == TileTypeWood;
-	}
-	return false;
+	return !TileTypeTable.empty() && TileTypeTable[tile] == ETileType::Wood;
 }
+
 bool CTileset::isARockTile(tile_index tile) const
 {
-	if (TileTypeTable.empty() == false) {
-		return TileTypeTable[tile] == TileTypeRock;
-	}
-	return false;
+	return !TileTypeTable.empty() && TileTypeTable[tile] == ETileType::Rock;
 }
 
 terrain_typeIdx CTileset::getOrAddSolidTileIndexByName(const std::string &name)

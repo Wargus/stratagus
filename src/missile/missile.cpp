@@ -634,7 +634,8 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 	const MissileType &mtype = *missile.Type;
 	if (missile.SourceUnit) {
 		bool shouldHit = false;
-		if (missile.TargetUnit && missile.SourceUnit->Type->UnitType == missile.TargetUnit->Type->UnitType) {
+		if (missile.TargetUnit
+		    && missile.SourceUnit->Type->MoveType == missile.TargetUnit->Type->MoveType) {
 			shouldHit = true;
 		}
 		if (mtype.Range && mtype.CorrectSphashDamage) {
@@ -647,14 +648,18 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			for (CUnit *unitPtr : blockingUnits) {
 				CUnit &unit = *unitPtr;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
-				if (!missile.Type->IgnoreWalls && missile.SourceUnit->Type->UnitType == UnitTypeLand) {
-					if (!missile.TargetUnit || missile.TargetUnit->Type->UnitType == UnitTypeLand) {
+				if (!missile.Type->IgnoreWalls
+				    && missile.SourceUnit->Type->MoveType == EMovement::Land) {
+					if (!missile.TargetUnit
+					    || missile.TargetUnit->Type->MoveType == EMovement::Land) {
 						if (&unit != missile.SourceUnit && unit.Type->BoolFlag[WALL_INDEX].value
-							&& unit.Player != missile.SourceUnit->Player && unit.IsAllied(*missile.SourceUnit) == false) {
+						    && unit.Player != missile.SourceUnit->Player
+						    && unit.IsAllied(*missile.SourceUnit) == false) {
 							if (missile.TargetUnit) {
 								missile.TargetUnit = &unit;
 								if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
-									missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
+									missile.position =
+										Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
 								}
 							} else {
 								missile.position = position;
@@ -961,7 +966,7 @@ void Missile::MissileHit(CUnit *unit)
 					if (this->TargetUnit == nullptr) {
 						if (this->SourceUnit->CurrentAction() == UnitAction::SpellCast) {
 							const COrder_SpellCast &order = *static_cast<COrder_SpellCast *>(this->SourceUnit->CurrentOrder());
-							if (order.GetSpell().Target == TargetPosition) {
+							if (order.GetSpell().Target == ETarget::Position) {
 								isPosition = true;
 							}
 						} else {
@@ -969,11 +974,12 @@ void Missile::MissileHit(CUnit *unit)
 						}
 					}
 					if (isPosition || this->SourceUnit->CurrentAction() == UnitAction::AttackGround) {
-						if (goal->Type->UnitType != this->SourceUnit->Type->UnitType) {
+						if (goal->Type->MoveType != this->SourceUnit->Type->MoveType) {
 							shouldHit = false;
 						}
 					} else {
-						if (this->TargetUnit == nullptr || goal->Type->UnitType != this->TargetUnit->Type->UnitType) {
+						if (this->TargetUnit == nullptr
+						    || goal->Type->MoveType != this->TargetUnit->Type->MoveType) {
 							shouldHit = false;
 						}
 					}

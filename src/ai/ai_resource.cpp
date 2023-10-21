@@ -940,18 +940,11 @@ static bool AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 
 	for (const CUnitType *type : UnitTypes) {
 		if (type && type->GivesResource == resource) {
-			switch (type->UnitType) {
-				case UnitTypeLand:
-					exploremask |= MapFieldLandUnit;
-					break;
-				case UnitTypeFly:
-					exploremask |= MapFieldAirUnit;
-					break;
-				case UnitTypeNaval:
-					exploremask |= MapFieldSeaUnit;
-					break;
-				default:
-					Assert(0);
+			switch (type->MoveType) {
+				case EMovement::Land: exploremask |= MapFieldLandUnit; break;
+				case EMovement::Fly: exploremask |= MapFieldAirUnit; break;
+				case EMovement::Naval: exploremask |= MapFieldSeaUnit; break;
+				default: Assert(0);
 			}
 		}
 	}

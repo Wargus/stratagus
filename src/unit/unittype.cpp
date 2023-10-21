@@ -578,15 +578,16 @@ bool CUnitType::CanMove() const
 	return Animations && Animations->Move;
 }
 
-bool CUnitType::CanSelect(GroupSelectionMode mode) const
+bool CUnitType::CanSelect(EGroupSelectionMode mode) const
 {
 	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 		switch (mode) {
-			case SELECTABLE_BY_RECTANGLE_ONLY:
+			case EGroupSelectionMode::SelectableByRectangleOnly:
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
-			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
+			case EGroupSelectionMode::NonSelectableByRectangleOnly:
 				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
 			default:
+			case EGroupSelectionMode::SelectAll:
 				return true;
 		}
 	}
@@ -628,8 +629,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	}
 
 	//  As side effect we calculate the movement flags/mask here.
-	switch (type.UnitType) {
-		case UnitTypeLand:                              // on land
+	switch (type.MoveType) {
+		case EMovement::Land: // on land
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
@@ -638,10 +639,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldWaterAllowed | // can't move on this
 				MapFieldUnpassable;
 			break;
-		case UnitTypeFly:                               // in air
+		case EMovement::Fly: // in air
 			type.MovementMask = MapFieldAirUnit; // already occuppied
 			break;
-		case UnitTypeNaval:                             // on water
+		case EMovement::Naval: // on water
 			if (type.CanTransport()) {
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -684,16 +685,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.FieldFlags = MapFieldNoBuilding;
 		}
 	} else {
-		switch (type.UnitType) {
-			case UnitTypeLand: // on land
-				type.FieldFlags = MapFieldLandUnit;
-				break;
-			case UnitTypeFly: // in air
-				type.FieldFlags = MapFieldAirUnit;
-				break;
-			case UnitTypeNaval: // on water
-				type.FieldFlags = MapFieldSeaUnit;
-				break;
+		switch (type.MoveType) {
+			case EMovement::Land: type.FieldFlags = MapFieldLandUnit; break;
+			case EMovement::Fly: type.FieldFlags = MapFieldAirUnit; break;
+			case EMovement::Naval: type.FieldFlags = MapFieldSeaUnit; break;
 			default:
 				DebugPrint("Where moves this unit?\n");
 				type.FieldFlags = 0;

@@ -199,13 +199,13 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) con
 static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 {
 	switch (e) {
-		case UnitRefItSelf:
+		case EnumUnit::UnitRefItSelf:
 			return &unit;
-		case UnitRefInside:
+		case EnumUnit::UnitRefInside:
 			return unit.UnitInside;
-		case UnitRefContainer:
+		case EnumUnit::UnitRefContainer:
 			return unit.Container;
-		case UnitRefWorker :
+		case EnumUnit::UnitRefWorker:
 			if (unit.CurrentAction() == UnitAction::Built) {
 				COrder_Built &order = *static_cast<COrder_Built *>(unit.CurrentOrder());
 
@@ -213,7 +213,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 			} else {
 				return nullptr;
 			}
-		case UnitRefGoal:
+		case EnumUnit::UnitRefGoal:
 			return unit.Goal;
 		default:
 			Assert(0);
@@ -466,24 +466,21 @@ void CContentTypeFormattedText2::Parse(lua_State *l) /* override */
 */
 static EnumUnit Str2EnumUnit(lua_State *l, std::string_view s)
 {
-	static struct {
+	static const struct mapping
+	{
 		const char *s;
-		EnumUnit e;
-	} list[] = {
-		{"ItSelf", UnitRefItSelf},
-		{"Inside", UnitRefInside},
-		{"Container", UnitRefContainer},
-		{"Worker", UnitRefWorker},
-		{"Goal", UnitRefGoal}
-	}; // List of possible values.
+		EnumUnit value;
+	} list[] = {{"ItSelf", EnumUnit::UnitRefItSelf},
+	            {"Inside", EnumUnit::UnitRefInside},
+	            {"Container", EnumUnit::UnitRefContainer},
+	            {"Worker", EnumUnit::UnitRefWorker},
+	            {"Goal", EnumUnit::UnitRefGoal}}; // List of possible values.
 
-	for (int i = 0; list[i].s; ++i) {
-		if (s == list[i].s) {
-			return list[i].e;
-		}
+	if (const auto it = ranges::find(list, s, &mapping::s); it != std::end(list)) {
+		return it->value;
 	}
 	LuaError(l, "'%s' is a invalid Unit reference", s.data());
-	return UnitRefItSelf;
+	ExitFatal(-1);
 }
 
 void CContentTypeIcon::Parse(lua_State *l) /* override */

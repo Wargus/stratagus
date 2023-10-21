@@ -83,10 +83,10 @@ class LuaCallback;
 
 CUnitType &UnitTypeByIdent(std::string_view ident); /// Get unit-type by ident
 
-enum GroupSelectionMode {
-	SELECTABLE_BY_RECTANGLE_ONLY = 0,
-	NON_SELECTABLE_BY_RECTANGLE_ONLY,
-	SELECT_ALL
+enum class EGroupSelectionMode {
+	SelectableByRectangleOnly = 0,
+	NonSelectableByRectangleOnly,
+	SelectAll
 };
 
 class ResourceInfo
@@ -362,13 +362,13 @@ private:
 	int n = 0  ;         /// identifiant in SpellSprite
 };
 
-enum UnitTypeType {
-	UnitTypeLand,  /// Unit lives on land
-	UnitTypeFly,   /// Unit lives in air
-	UnitTypeNaval  /// Unit lives on water
+enum class EMovement {
+	Land,  /// Unit lives on land
+	Fly,   /// Unit lives in air
+	Naval  /// Unit lives on water
 };
 
-enum DistanceTypeType {
+enum class EComparison {
 	Equal,
 	NotEqual,
 	LessThan,
@@ -455,7 +455,7 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;        /// distance to build (circle)
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	EComparison DistanceType = EComparison::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType = nullptr;
@@ -472,7 +472,7 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
+	EComparison CountType = EComparison::Equal;
 	std::string RestrictTypeName;
 	CUnitType *RestrictType = nullptr;
 	std::string RestrictTypeOwner;
@@ -487,9 +487,9 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;
-	DistanceTypeType DistanceType = DistanceTypeType::Equal;
+	EComparison DistanceType = EComparison::Equal;
 	int Count = 0;
-	DistanceTypeType CountType = DistanceTypeType::Equal;
+	EComparison CountType = EComparison::Equal;
 	std::string RestrictTypeName;
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType = nullptr;
@@ -568,7 +568,7 @@ public:
 	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
 	bool CanMove() const;
 
-	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
+	bool CanSelect(EGroupSelectionMode mode = EGroupSelectionMode::SelectableByRectangleOnly) const;
 
 public:
 	std::string Ident;              /// Identifier
@@ -654,7 +654,7 @@ public:
 	int ButtonLevelForTransporter = 0;  /// On which button level game will show units inside transporter
 	int StartingResources = 0;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
-	UnitTypeType UnitType = UnitTypeLand; /// Land / fly / naval
+	EMovement MoveType = EMovement::Land; /// Land / fly / naval
 	int DecayRate = 0;                  /// Decay rate in 1/6 seconds
 	// TODO: not used
 	int AnnoyComputerFactor = 0;        /// How much this annoys the computer

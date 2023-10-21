@@ -311,6 +311,21 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	}
 }
 
+static ETarget toETarget(std::string_view s)
+{
+	if (s == "self") {
+		return  ETarget::Self;
+	} else if (s == "unit") {
+		return ETarget::Unit;
+	} else if (s == "position") {
+		return ETarget::Position;
+	} else {
+		fprintf(stderr, "Unsupported spell target type tag: %s", s.data());
+		ExitFatal(-1);
+	}
+}
+
+
 /**
 **  Parse Spell.
 **
@@ -378,16 +393,7 @@ static int CclDefineSpell(lua_State *l)
 			spell->ForceUseAnimation = true;
 			--i;
 		} else if (value == "target") {
-			value = LuaToString(l, i + 1);
-			if (value == "self") {
-				spell->Target = TargetSelf;
-			} else if (value == "unit") {
-				spell->Target = TargetUnit;
-			} else if (value == "position") {
-				spell->Target = TargetPosition;
-			} else {
-				LuaError(l, "Unsupported spell target type tag: %s", value.data());
-			}
+			spell->Target = toETarget(LuaToString(l, i + 1));
 		} else if (value == "action") {
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");

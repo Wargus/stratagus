@@ -499,14 +499,14 @@ int ToggleUnitsByType(CUnit &base)
 **
 **  @return              number of units in the group.
 */
-int SelectGroup(int group_number, GroupSelectionMode mode)
+int SelectGroup(int group_number, EGroupSelectionMode mode)
 {
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group_number);
 
 	if (units.empty()) {
 		return 0;
 	}
-	if (mode == SELECT_ALL || !IsGroupTainted(group_number)) {
+	if (mode == EGroupSelectionMode::SelectAll || !IsGroupTainted(group_number)) {
 		ChangeSelectedUnits(const_cast<CUnit **>(&units[0]), units.size());
 		return Selected.size();
 	}
@@ -806,7 +806,7 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->MoveType == EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -852,7 +852,7 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->MoveType != EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -917,7 +917,7 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType == UnitTypeFly) {
+		if (unit.Type->MoveType == EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
@@ -983,7 +983,7 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
 			return true;
 		}
-		if (unit.Type->UnitType != UnitTypeFly) {
+		if (unit.Type->MoveType != EMovement::Fly) {
 			return true;
 		}
 		if (unit.TeamSelected) { // Somebody else onteam has this unit

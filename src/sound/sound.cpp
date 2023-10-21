@@ -148,70 +148,51 @@ static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 }
 
 /**
-**  Maps a UnitVoiceGroup to a CSound*.
+**  Maps a EUnitVoice to a CSound*.
 **
 **  @param unit    Sound initiator
 **  @param voice   Type of sound wanted
 **
 **  @return        Sound identifier
 */
-static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
+static CSound *ChooseUnitVoiceSound(const CUnit &unit, EUnitVoice voice)
 {
 	switch (voice) {
-		case VoiceAcknowledging:
-			return unit.Type->MapSound.Acknowledgement.Sound;
-		case VoiceAttack:
-			if (unit.Type->MapSound.Attack.Sound) {
-				return unit.Type->MapSound.Attack.Sound;
+		case EUnitVoice::Acknowledging: return unit.Type->MapSound.Acknowledgement.Sound;
+		case EUnitVoice::Attack:
+			return unit.Type->MapSound.Attack.Sound ? unit.Type->MapSound.Attack.Sound
+			                                        : unit.Type->MapSound.Acknowledgement.Sound;
+		case EUnitVoice::Build: return unit.Type->MapSound.Build.Sound;
+		case EUnitVoice::Ready: return unit.Type->MapSound.Ready.Sound;
+		case EUnitVoice::Selected: return unit.Type->MapSound.Selected.Sound;
+		case EUnitVoice::HelpMe: return unit.Type->MapSound.Help.Sound;
+		case EUnitVoice::Dying:
+			return unit.Type->MapSound.Dead[unit.DamagedType].Sound
+			         ? unit.Type->MapSound.Dead[unit.DamagedType].Sound
+			         : unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
+		case EUnitVoice::WorkCompleted:
+			return unit.Type->MapSound.WorkComplete.Sound
+			         ? unit.Type->MapSound.WorkComplete.Sound
+			         : GameSounds.WorkComplete[ThisPlayer->Race].Sound;
+		case EUnitVoice::Building: return GameSounds.BuildingConstruction[ThisPlayer->Race].Sound;
+		case EUnitVoice::Docking: return GameSounds.Docking.Sound;
+		case EUnitVoice::Repairing:
+			return unit.Type->MapSound.Repair.Sound ? unit.Type->MapSound.Repair.Sound
+			                                        : unit.Type->MapSound.Acknowledgement.Sound;
+		case EUnitVoice::Harvesting:
+			if (auto it = ranges::find(unit.Orders, UnitAction::Resource, &COrder::Action);
+				it != unit.Orders.end()) {
+				const COrder_Resource &order = dynamic_cast<COrder_Resource &>(**it);
+				const auto resIndex = order.GetCurrentResource();
+
+				return unit.Type->MapSound.Harvest[resIndex].Sound
+				         ? unit.Type->MapSound.Harvest[resIndex].Sound
+				         : unit.Type->MapSound.Acknowledgement.Sound;
 			} else {
-				return unit.Type->MapSound.Acknowledgement.Sound;
-			}
-		case VoiceBuild:
-			return unit.Type->MapSound.Build.Sound;
-		case VoiceReady:
-			return unit.Type->MapSound.Ready.Sound;
-		case VoiceSelected:
-			return unit.Type->MapSound.Selected.Sound;
-		case VoiceHelpMe:
-			return unit.Type->MapSound.Help.Sound;
-		case VoiceDying:
-			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
-				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
-			} else {
-				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
-			}
-		case VoiceWorkCompleted:
-			{
-				CSound *workCompleteSound = unit.Type->MapSound.WorkComplete.Sound;
-				if (workCompleteSound == nullptr) {
-					workCompleteSound = GameSounds.WorkComplete[ThisPlayer->Race].Sound;
-				}
-				return workCompleteSound;
-			}
-		case VoiceBuilding:
-			return GameSounds.BuildingConstruction[ThisPlayer->Race].Sound;
-		case VoiceDocking:
-			return GameSounds.Docking.Sound;
-		case VoiceRepairing:
-			if (unit.Type->MapSound.Repair.Sound) {
-				return unit.Type->MapSound.Repair.Sound;
-			} else {
-				return unit.Type->MapSound.Acknowledgement.Sound;
-			}
-		case VoiceHarvesting:
-			for (size_t i = 0; i != unit.Orders.size(); ++i) {
-				if (unit.Orders[i]->Action == UnitAction::Resource) {
-					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
-					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
-						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
-					} else {
-						return unit.Type->MapSound.Acknowledgement.Sound;
-					}
-				}
+				return nullptr;
 			}
 	}
-
-	return NO_SOUND;
+	return nullptr;
 }
 
 /**
@@ -278,14 +259,14 @@ static char CalculateStereo(const CUnit &unit)
 **  @param unit   Sound initiator, unit speaking
 **  @param voice  Type of sound wanted (Ready,Die,Yes,...)
 */
-void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice, bool sampleUnique)
+void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 {
 	CSound *sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
 		return;
 	}
 
-	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
+	const bool selection = (voice == EUnitVoice::Selected || voice == EUnitVoice::Building);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
 	if (!sampleUnique && UnitSoundIsPlaying(&source)) {
