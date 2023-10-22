@@ -166,6 +166,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 {
 	LuaCheckArgs(l, 4);
 
+	lua_pushvalue(l, 1);
 	const auto unitPlayerValidator = TriggerGetPlayer(l);
 	lua_pushvalue(l, 2);
 	auto unitValidator = TriggerGetUnitType(l);
