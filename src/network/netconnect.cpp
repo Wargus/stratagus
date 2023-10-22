@@ -52,6 +52,7 @@
 
 #include "interface.h"
 #include "map.h"
+#include "mdns_wrapper.h"
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
@@ -59,7 +60,6 @@
 #include "settings.h"
 #include "version.h"
 #include "video.h"
-#include "mdns.h"
 
 //----------------------------------------------------------------------------
 // Declaration
