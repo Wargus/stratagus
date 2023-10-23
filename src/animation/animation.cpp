@@ -73,8 +73,6 @@
 #include "unittype.h"
 #include "pathfinder.h"
 
-#define ANIMATIONS_MAXANIM 4096
-
 struct LabelsStruct {
 	CAnimation *Anim;
 	std::string Name;
@@ -87,10 +85,9 @@ struct LabelsLaterStruct {
 };
 static std::vector<LabelsLaterStruct> LabelsLater;
 
-CAnimation *AnimationsArray[ANIMATIONS_MAXANIM];
-int NumAnimations;
+static std::vector<CAnimation *> AnimationsArray;
 
-static std::map<std::string, CAnimations *, std::less<>> AnimationMap;/// Animation map
+static std::map<std::string, std::unique_ptr<CAnimations>, std::less<>> AnimationMap;/// Animation map
 
 
 /*----------------------------------------------------------------------------
@@ -437,11 +434,8 @@ CAnimations &AnimationsByIdent(std::string_view ident)
 
 void FreeAnimations()
 {
-	for (auto &[key, anims] : AnimationMap) {
-		delete anims;
-	}
 	AnimationMap.clear();
-	NumAnimations = 0;
+	AnimationsArray.clear();
 }
 
 static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
@@ -464,12 +458,9 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 {
 	file.printf("\"anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	for (int i = 0; i < NumAnimations; ++i) {
-		if (AnimationsArray[i] == unit.Anim.CurrAnim) {
-			file.printf("\"curr-anim\", %d,", i);
-			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
-			break;
-		}
+	if (auto it = ranges::find(AnimationsArray, unit.Anim.CurrAnim); it != AnimationsArray.end()) {
+		file.printf("\"curr-anim\", %d,", std::distance(AnimationsArray.begin(), it));
+		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
 	}
 	if (unit.Anim.Unbreakable) {
 		file.printf(" \"unbreakable\",");
@@ -478,12 +469,9 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	// Wait backup info
 	file.printf("\"wait-anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
-	for (int i = 0; i < NumAnimations; ++i) {
-		if (AnimationsArray[i] == unit.WaitBackup.CurrAnim) {
-			file.printf("\"curr-anim\", %d,", i);
-			file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
-			break;
-		}
+	if (auto it = ranges::find(AnimationsArray, unit.WaitBackup.CurrAnim); it != AnimationsArray.end()) {
+		file.printf("\"curr-anim\", %d,", std::distance(AnimationsArray.begin(), it));
+		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
 	}
 	if (unit.WaitBackup.Unbreakable) {
 		file.printf(" \"unbreakable\",");
@@ -712,8 +700,7 @@ static void AddAnimationToArray(CAnimation *anim)
 	if (!anim) {
 		return;
 	}
-	AnimationsArray[NumAnimations++] = anim;
-	Assert(NumAnimations != ANIMATIONS_MAXANIM);
+	AnimationsArray.push_back(anim);
 }
 
 /**
@@ -729,9 +716,9 @@ static int CclDefineAnimations(lua_State *l)
 	}
 
 	const std::string name = std::string{LuaToString(l, 1)};
-	CAnimations *&anims = AnimationMap[name];
+	auto &anims = AnimationMap[name];
 	if (!anims) {
-		anims = new CAnimations;
+		anims = std::make_unique<CAnimations>();
 	}
 
 	lua_pushnil(l);
