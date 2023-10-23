@@ -259,7 +259,7 @@ set(network_SRCS
 	src/network/network.cpp
 	src/network/netsockets.cpp
 	src/network/online_service.cpp
-	src/network/mdns.cpp
+	src/network/mdns_wrapper.cpp
 )
 source_group(network FILES ${network_SRCS})
 
@@ -560,6 +560,7 @@ set(stratagus_generic_HDRS
 	src/include/iolib.h
 	src/include/luacallback.h
 	src/include/map.h
+	src/include/mdns_wrapper.h
 	src/include/menus.h
 	src/include/minimap.h
 	src/include/missile.h
@@ -1199,6 +1200,8 @@ else ()
 endif ()
 target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS})
 target_link_libraries(stratagus PUBLIC stratagus_lib)
+
+target_include_directories(stratagus_lib PRIVATE third-party/mdns)
 
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)

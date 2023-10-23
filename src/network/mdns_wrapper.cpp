@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mdns.cpp - LAN server discovery. */
+/**@name mdns_wrapper.cpp - LAN server discovery. */
 //
 //      (c) Copyright 2020 by Tim Felgentreff
 //
@@ -28,7 +28,8 @@
 //      02111-1307, USA.
 //
 
-#include "mdns.h"
+#include "mdns_wrapper.h"
+
 #include "game.h"
 #include "net_lowlevel.h"
 #include "network.h"

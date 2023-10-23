@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name mdns.h - LAN server discovery. */
+/**@name mdns_wrapper.h - LAN server discovery. */
 //
 //      (c) Copyright 2020 by Tim Felgentreff
 //
@@ -28,11 +28,14 @@
 //      02111-1307, USA.
 //
 
+#ifndef MDNS_WRAPPER_H
+#define MDNS_WRAPPER_H
+
 #include <functional>
+#include <mdns.h>
 
-#include "network/mdns.h"
-
-class MDNS {
+class MDNS
+{
 public:
 	MDNS() = default;
 	~MDNS();
@@ -46,3 +49,5 @@ private:
 	int querySockets[20]{};
 	int numSockets = -1;
 };
+
+#endif // MDNS_WRAPPER_H
