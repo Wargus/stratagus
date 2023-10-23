@@ -42,265 +42,125 @@
 #include "player.h"
 #include "script.h"
 #include "translate.h"
-#include "trigger.h"
 #include "unit.h"
 #include "unittype.h"
-#include "upgrade_structs.h"
 #include "upgrade.h"
 
-/*----------------------------------------------------------------------------
---  Documentation
-----------------------------------------------------------------------------*/
-
-/**
-**  @struct DependRule depend.h
-**
-**  \#include "depend.h"
-**
-**  This structure is used define the requirements of upgrades or
-**  unit-types. The structure is used to define the base (the wanted)
-**  upgrade or unit-type and the requirements upgrades or unit-types.
-**  The requirements could be combination of and-rules and or-rules.
-**
-**  This structure is very complex because nearly everything has two
-**  meanings.
-**
-**  The depend-rule structure members:
-**
-**  DependRule::Next
-**
-**    Next rule in hash chain for the base upgrade/unit-type.
-**    Next and-rule for the requirements.
-**
-**  DependRule::Count
-**
-**    If DependRule::Type is DependRuleUnitType, the counter is
-**    how many units of the unit-type are required, if zero no unit
-**    of this unit-type is allowed. if DependRule::Type is
-**    DependRuleUpgrade, for a non-zero counter the upgrade must be
-**    researched, for a zero counter the upgrade must be unresearched.
-**
-**  DependRule::Type
-**
-**    Type of the rule, DependRuleUnitType for an unit-type,
-**    DependRuleUpgrade for an upgrade.
-**
-**  DependRule::Kind
-**
-**    Contains the element of rule. Depending on DependRule::Type.
-**
-**  DependRule::Kind::UnitType
-**
-**    An unit-type pointer.
-**
-**  DependRule::Kind::Upgrade
-**
-**    An upgrade pointer.
-**
-**  DependRule::Rule
-**
-**    For the base upgrade/unit-type the rules which must be meet.
-**    For the requirements alternative or-rules.
-**
-*/
-
-enum
+namespace
 {
-	DependRuleUnitType, /// Kind is an unit-type
-	DependRuleUpgrade /// Kind is an upgrade
-};
-
-/// Dependency rule
 class DependRule
 {
 public:
-	DependRule *Next; /// next hash chain, or rules
-	unsigned char Count; /// how many required
-	char Type; /// an unit-type or upgrade
-	union
+	DependRule(std::string_view name, std::size_t count) :
+		typeVar([&]() -> std::variant<const CUnitType *, const CUpgrade *> {
+			if (starts_with(name, "unit-")) {
+				return &UnitTypeByIdent(name);
+			} else if (starts_with(name, "upgrade-")) {
+				const auto *upgrade = CUpgrade::Get(name);
+				if (!upgrade) {
+					fprintf(stderr, "upgrade not found: %s\n", name.data());
+					ExitFatal(-1);
+				}
+				return upgrade;
+			} else {
+				fprintf(
+					stderr, "dependency target '%s' should be unit-type or upgrade\n", name.data());
+				ExitFatal(-1);
+			}
+		}()),
+		expected(count)
+	{}
+
+	bool isValid(const CPlayer &player) const
 	{
-		const CUnitType *UnitType; /// unit-type pointer
-		const CUpgrade *Upgrade; /// upgrade pointer
-	} Kind; /// required object
-	DependRule *Rule; /// requirements, and rule
+		return std::visit([&](const auto *type) { return isValid(player, *type, expected); },
+		                  typeVar);
+	}
+
+	const std::string &getDisplayName() const
+	{
+		return std::visit(
+			[](const auto *type) -> const std::string & { return DependRule::getName(*type); },
+			typeVar);
+	}
+
+private:
+	static bool isValid(const CPlayer &player, const CUnitType &unitType, std::size_t expected)
+	{
+		const std::size_t count = player.HaveUnitTypeByType(unitType);
+		return (expected != 0 ? count >= expected : (count != 0));
+	}
+
+	static bool isValid(const CPlayer &player, const CUpgrade &upgrade, std::size_t expected)
+	{
+		const bool allowed = UpgradeIdAllowed(player, upgrade.ID) == 'R';
+		return expected ? allowed : !allowed;
+	}
+
+	static const std::string &getName(const CUnitType &unitType) { return unitType.Name; }
+	static const std::string &getName(const CUpgrade &upgrade) { return upgrade.Name; }
+
+public:
+	std::variant<const CUnitType *, const CUpgrade *> typeVar;
+	std::size_t expected = 0;
 };
 
+class DependAndRule
+{
+public:
+	bool isValid(const CPlayer &player) const
+	{
+		return ranges::all_of(rules, [&](const auto &rule) { return rule.isValid(player); });
+	}
+
+	std::string getRequirementString(const CPlayer &player) const
+	{
+		std::string res;
+		for (const auto &rule : rules) {
+			if (!rule.isValid(player)) {
+				res += "-";
+				res += rule.getDisplayName();
+				res += "\n";
+			}
+		}
+		return res;
+	}
+
+public:
+	std::vector<DependRule> rules;
+};
+
+class DependOrRule
+{
+public:
+	bool isValid(const CPlayer &player) const
+	{
+		return ranges::any_of(rules, [&](const auto &rule) { return rule.isValid(player); });
+	}
+
+	std::string getRequirementString(const CPlayer &player) const
+	{
+		if (isValid(player)) {
+			return "";
+		}
+		auto it = ranges::find_if(rules, [&](const auto &rule) { return !rule.isValid(player); });
+		return it != rules.end() ? _("Requirements:\n") + it->getRequirementString(player) : "";
+	}
+
+public:
+	std::vector<DependAndRule> rules;
+};
+} // namespace
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
 /// All dependencies hash
-static DependRule *DependHash[101];
+static std::map<std::string, DependOrRule, std::less<>> Depends;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Add a new dependency. If already exits append to and rule.
-**
-**  @param target    Target of the dependency.
-**  @param required  Requirement of the dependency.
-**  @param count     Amount of the required needed.
-**  @param or_flag   Start of or rule.
-*/
-static void AddDependency(std::string_view target, std::string_view required, int count, int or_flag)
-{
-	DependRule rule;
-
-	//  Setup structure.
-	if (starts_with(target, "unit-")) {
-		// target string refers to unit-xxx
-		rule.Type = DependRuleUnitType;
-		rule.Kind.UnitType = &UnitTypeByIdent(target);
-	} else if (starts_with(target, "upgrade-")) {
-		// target string refers to upgrade-XXX
-		rule.Type = DependRuleUpgrade;
-		rule.Kind.Upgrade = CUpgrade::Get(target);
-	} else {
-		DebugPrint("dependency target '%s' should be unit-type or upgrade\n", target.data());
-		return;
-	}
-
-	int hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-
-	//  Find correct hash slot.
-	DependRule *node = DependHash[hash];
-
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				DependRule *temp = new DependRule;
-				temp->Next = nullptr;
-				temp->Rule = nullptr;
-				temp->Type = rule.Type;
-				temp->Kind = rule.Kind;
-				node->Next = temp;
-				node = temp;
-				break;
-			}
-			node = node->Next;
-		}
-	} else {  // create new slow
-		node = new DependRule;
-		node->Next = nullptr;
-		node->Rule = nullptr;
-		node->Type = rule.Type;
-		node->Kind = rule.Kind;
-		DependHash[hash] = node;
-	}
-
-	//  Adjust count.
-	if (count < 0 || count > 255) {
-		DebugPrint("wrong count `%d' range 0 .. 255\n", count);
-		count = 255;
-	}
-
-	DependRule *temp = new DependRule;
-	temp->Rule = nullptr;
-	temp->Next = nullptr;
-	temp->Count = count;
-
-	//  Setup structure.
-	if (starts_with(required, "unit-")) {
-		// required string refers to unit-xxx
-		temp->Type = DependRuleUnitType;
-		temp->Kind.UnitType = &UnitTypeByIdent(required);
-	} else if (starts_with(required, "upgrade-")) {
-		// required string refers to upgrade-XXX
-		temp->Type = DependRuleUpgrade;
-		temp->Kind.Upgrade = CUpgrade::Get(required);
-	} else {
-		DebugPrint("dependency required '%s' should be unit-type or upgrade\n", required.data());
-		delete temp;
-		return;
-	}
-
-	if (or_flag) {
-		// move rule to temp->next
-		temp->Next = node->Rule;  // insert rule
-		node->Rule = temp;
-	} else {
-		// move rule to temp->rule
-		temp->Rule = node->Rule;  // insert rule
-
-		// also Link temp to old "or" list
-		if (node->Rule) {
-			temp->Next = node->Rule->Next;
-		}
-		node->Rule = temp;
-	}
-
-#ifdef neverDEBUG
-	fprintf(stdout, "New rules are :");
-	node = node->Rule;
-	while (node) {
-		temp = node;
-		while (temp) {
-			fprintf(stdout, "temp->Kind.UnitType=%s ", temp->Kind.UnitType->Ident.c_str());
-			temp = temp->Rule;
-		}
-		node = node->Next;
-		fprintf(stdout, "\n or ... ");
-	}
-	fprintf(stdout, "\n");
-#endif
-}
-
-/**
-**  Check if this upgrade or unit is available.
-**
-**  @param player  For this player available.
-**  @param rule  .
-**
-**  @return        True if available, false otherwise.
-*/
-static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
-{
-	//  Find rule
-	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	const DependRule *node = DependHash[i];
-
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				return true;
-			}
-			node = node->Next;
-		}
-	} else {
-		return true;
-	}
-
-	//  Prove the rules
-	node = node->Rule;
-
-	while (node) {
-		const DependRule *temp = node;
-		while (temp) {
-			switch (temp->Type) {
-				case DependRuleUnitType:
-					i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
-					if (temp->Count ? i < temp->Count : i) {
-						goto try_or;
-					}
-					break;
-				case DependRuleUpgrade:
-					i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
-					if (temp->Count ? i : !i) {
-						goto try_or;
-					}
-					break;
-			}
-			temp = temp->Rule;
-		}
-		return true;  // all rules matches.
-
-try_or:
-		node = node->Next;
-	}
-	return false;  // no rule matches
-}
 
 /**
 **  Check if this upgrade or unit is available.
@@ -312,22 +172,9 @@ try_or:
 */
 std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 {
-	DependRule rule;
-	std::string rules("");
-
-	//
-	//  first have to check, if target is allowed itself
-	//
-	if (starts_with(button.ValueStr, "unit-")) {
-		// target string refers to unit-XXX
-		rule.Kind.UnitType = &UnitTypeByIdent(button.ValueStr);
-		rule.Type = DependRuleUnitType;
-	} else if (starts_with(button.ValueStr, "upgrade-")) {
-		// target string refers to upgrade-XXX
-		rule.Kind.Upgrade = CUpgrade::Get(button.ValueStr);
-		rule.Type = DependRuleUpgrade;
-	} else if (starts_with(button.ValueStr, "spell-")) {
-		// Special case for spells
+	// Special case for spells
+	if (starts_with(button.ValueStr, "spell-")) {
+		std::string rules("");
 		if (button.Allowed && IsButtonAllowed(*Selected[0], button) == false) {
 			if (starts_with(button.AllowStr, "upgrade-")) {
 				rules.insert(0, _("Requirements:\n"));
@@ -337,59 +184,16 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 			}
 		}
 		return rules;
-	} else {
+	}
+	if (!starts_with(button.ValueStr, "unit-") && !starts_with(button.ValueStr, "upgrade-")) {
 		DebugPrint("target '%s' should be unit-type or upgrade\n", button.ValueStr.c_str());
-		return rules;
+		return "";
 	}
-
-	//  Find rule
-	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	const DependRule *node = DependHash[i];
-
-	if (node) {  // find correct entry
-		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
-			if (!node->Next) {  // end of list
-				return rules;
-			}
-			node = node->Next;
-		}
-	} else {
-		return rules;
+	auto it = Depends.find(button.ValueStr);
+	if (it == Depends.end()) { // No rules
+		return "";
 	}
-
-	//  Prove the rules
-	node = node->Rule;
-
-	while (node) {
-		const DependRule *temp = node;
-		std::string subrules("");
-		while (temp) {
-			if (temp->Type == DependRuleUnitType) {
-				i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
-				if (temp->Count ? i < temp->Count : i) {
-					subrules.append("-");
-					subrules.append(temp->Kind.UnitType->Name);
-					subrules.append("\n");
-				}
-			} else if (temp->Type == DependRuleUpgrade) {
-				i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
-				if (temp->Count ? i : !i) {
-					subrules.append("-");
-					subrules.append(temp->Kind.Upgrade->Name);
-					subrules.append("\n");
-				}
-			}
-			temp = temp->Rule;
-		}
-		if (subrules.empty()) {
-			return subrules;
-		}
-		rules.clear();
-		rules.append(subrules);
-		node = node->Next;
-	}
-	rules.insert(0, _("Requirements:\n"));
-	return rules;
+	return it->second.getRequirementString(player);
 }
 
 /**
@@ -402,50 +206,37 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 */
 bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 {
-	DependRule rule;
-
-	//
-	//  first have to check, if target is allowed itself
-	//
+	// first have to check, if target is allowed itself
 	if (starts_with(target, "unit-")) {
-		// target string refers to unit-XXX
-		rule.Kind.UnitType = &UnitTypeByIdent(target);
-		if (UnitIdAllowed(player, rule.Kind.UnitType->Slot) == 0) {
+		if (UnitIdAllowed(player, UnitTypeByIdent(target).Slot) == 0) {
 			return false;
 		}
-		rule.Type = DependRuleUnitType;
 	} else if (starts_with(target, "upgrade-")) {
-		// target string refers to upgrade-XXX
-		rule.Kind.Upgrade = CUpgrade::Get(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
+		if (UpgradeIdAllowed(player, CUpgrade::Get(target)->ID) != 'A') {
 			return false;
 		}
-		rule.Type = DependRuleUpgrade;
 	} else {
 		DebugPrint("target '%s' should be unit-type or upgrade\n", target.data());
 		return false;
 	}
-	return CheckDependByRule(player, rule);
+	auto it = Depends.find(target);
+	if (it == Depends.end()) { // No rules
+		return true;
+	}
+	return it->second.isValid(player);
 }
 
 /**
-**  Check if this upgrade or unit is available.
+**  Check if this unit is available.
 **
 **  @param player  For this player available.
-**  @param target  Unit or Upgrade.
+**  @param type    Unit.
 **
 **  @return        True if available, false otherwise.
 */
 bool CheckDependByType(const CPlayer &player, const CUnitType &type)
 {
-	if (UnitIdAllowed(player, type.Slot) == 0) {
-		return false;
-	}
-	DependRule rule;
-
-	rule.Kind.UnitType = &type;
-	rule.Type = DependRuleUnitType;
-	return CheckDependByRule(player, rule);
+	return CheckDependByIdent(player, type.Ident);
 }
 
 /**
@@ -460,33 +251,7 @@ void InitDependencies()
 */
 void CleanDependencies()
 {
-	// Free all dependencies
-
-	for (unsigned int u = 0; u < sizeof(DependHash) / sizeof(*DependHash); ++u) {
-		DependRule *node = DependHash[u];
-		while (node) {  // all hash links
-			// All or cases
-
-			DependRule *rule = node->Rule;
-			while (rule) {
-				if (rule) {
-					DependRule *temp = rule->Rule;
-					while (temp) {
-						DependRule *next = temp;
-						temp = temp->Rule;
-						delete next;
-					}
-				}
-				DependRule *temp = rule;
-				rule = rule->Next;
-				delete temp;
-			}
-			DependRule *temp = node;
-			node = node->Next;
-			delete temp;
-		}
-		DependHash[u] = nullptr;
-	}
+	Depends.clear();
 }
 
 /*----------------------------------------------------------------------------
@@ -503,14 +268,31 @@ static int CclDefineDependency(lua_State *l)
 	const int args = lua_gettop(l);
 	const std::string_view target = LuaToString(l, 1);
 
-	//  All or rules.
-	int or_flag = 0;
+	if (starts_with(target, "unit-")) {
+		// Check unit exists
+		UnitTypeByIdent(target);
+	} else if (starts_with(target, "upgrade-")) {
+		// Check upgrade exists
+		if (auto* upgrade = CUpgrade::Get(target); !upgrade) {
+			fprintf(stderr, "upgrade not found: %s\n", target.data());
+			ExitFatal(-1);
+		}
+	} else {
+		fprintf(stderr, "dependency target '%s' should be unit-type or upgrade\n", target.data());
+		ExitFatal(-1);
+	}
+
+	auto &or_rule = Depends[std::string(target)];
+	//  All or-rules.
 	for (int j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
+		or_rule.rules.emplace_back();
+		auto &and_rule = or_rule.rules.back();
 		const int subargs = lua_rawlen(l, j + 1);
 
+		//  All and-rules.
 		for (int k = 0; k < subargs; ++k) {
 			const std::string_view required = LuaToString(l, j + 1, k + 1);
 			int count = 1;
@@ -522,8 +304,7 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			AddDependency(target, required, count, or_flag);
-			or_flag = 0;
+			and_rule.rules.emplace_back(required, count);
 		}
 		if (j + 1 < args) {
 			++j;
@@ -532,23 +313,8 @@ static int CclDefineDependency(lua_State *l)
 				LuaError(l, "not 'or' symbol: %s", value.data());
 				return 0;
 			}
-			or_flag = 1;
 		}
 	}
-	return 0;
-}
-
-/**
-**  Get the dependency.
-**
-**  @todo not written.
-**
-**  @param l  Lua state.
-*/
-static int CclGetDependency(lua_State *l)
-{
-	DebugPrint("FIXME: write this %p\n", (void *)l);
-
 	return 0;
 }
 
@@ -581,7 +347,6 @@ static int CclCheckDependency(lua_State *l)
 void DependenciesCclRegister()
 {
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
-	lua_register(Lua, "GetDependency", CclGetDependency);
 	lua_register(Lua, "CheckDependency", CclCheckDependency);
 }
 
