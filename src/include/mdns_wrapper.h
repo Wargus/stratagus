@@ -31,9 +31,8 @@
 #ifndef MDNS_WRAPPER_H
 #define MDNS_WRAPPER_H
 
-#include "network/mdns.h"
-
 #include <functional>
+#include <mdns.h>
 
 class MDNS
 {

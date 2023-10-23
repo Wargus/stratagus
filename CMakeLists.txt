@@ -1201,6 +1201,8 @@ endif ()
 target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS})
 target_link_libraries(stratagus PUBLIC stratagus_lib)
 
+target_include_directories(stratagus_lib PRIVATE third-party/mdns)
+
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)
 	target_compile_options(stratagus_lib PUBLIC ${OpenMP_CXX_FLAGS})
