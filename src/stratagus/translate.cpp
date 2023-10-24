@@ -38,16 +38,15 @@
 #include "translate.h"
 
 #include "iolib.h"
-#include <cstdio>
-#include <map>
-#include <string>
+
+#include <fstream>
+#include <spiritless_po.h>
 
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
-using EntriesType = std::map<std::string, std::string>;
-static EntriesType Entries;
+static spiritless_po::Catalog catalog;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -56,135 +55,30 @@ static EntriesType Entries;
 /**
 **  Translate a string
 */
-const char *Translate(const char *str)
+const std::string &Translate(const std::string &str)
 {
-	EntriesType::iterator i = Entries.find(str);
-	if (i != Entries.end() && !i->second.empty()) {
-		return i->second.c_str();
-	} else {
-		return str;
-	}
-}
-
-/**
-**  Add a translation
-*/
-void AddTranslation(const char *str1, const char *str2)
-{
-	Entries[str1] = str2;
+	return catalog.gettext(str);
 }
 
 /**
 **  Load a .po file
 */
-void LoadPO(const char *file)
+void LoadPO(const fs::path& filename)
 {
-	if (!file || !*file) {
-		return;
-	}
-
-	const fs::path fullfile = LibraryFileName(file);
-	FILE *fd = fopen(fullfile.string().c_str(), "rb");
-	if (!fd) {
-		fprintf(stderr, "Could not open file: %s\n", file);
-		return;
-	}
-	enum { MSGNONE, MSGID, MSGSTR } state = MSGNONE;
-	char msgid[16 * 1024];
-	char msgstr[16 * 1024];
-	char *currmsg = nullptr;
-
-	msgid[0] = msgstr[0] = '\0';
-
-	// skip 0xEF utf8 intro if found
-	char c = fgetc(fd);
-	if (c == (char)0xEF) {
-		fgetc(fd);
-		fgetc(fd);
-	} else {
-		rewind(fd);
-	}
-
-	char buf[4096];
-	while (fgets(buf, sizeof(buf), fd)) {
-		// Comment
-		if (buf[0] == '#') {
-			continue;
-		}
-		char *s = buf;
-
-		// msgid or msgstr
-		if (!strncmp(s, "msgid ", 6)) {
-			if (state == MSGSTR) {
-				*currmsg = '\0';
-				if (*msgid != '\0') {
-					AddTranslation(msgid, msgstr);
-				}
-			}
-			state = MSGID;
-			currmsg = msgid;
-			*currmsg = '\0';
-			s += 6;
-			while (*s == ' ') { ++s; }
-		} else if (!strncmp(s, "msgstr ", 7)) {
-			if (state == MSGID) {
-				*currmsg = '\0';
-			}
-			state = MSGSTR;
-			currmsg = msgstr;
-			*currmsg = '\0';
-			s += 7;
-			while (*s == ' ') { ++s; }
-		}
-
-		// String
-		if (*s == '"') {
-			++s;
-			while (*s && *s != '"') {
-				if (*s == '\\') {
-					++s;
-					if (*s) {
-						if (*s == 'n') {
-							*currmsg++ = '\n';
-						} else if (*s == 't') {
-							*currmsg++ = '\t';
-						} else if (*s == 'r') {
-							*currmsg++ = '\r';
-						} else if (*s == '"') {
-							*currmsg++ = '"';
-						} else if (*s == '\\') {
-							*currmsg++ = '\\';
-						} else {
-							fprintf(stderr, "Invalid escape character: %c\n", *s);
-						}
-						++s;
-					} else {
-						fprintf(stderr, "Unterminated string\n");
-					}
-				} else {
-					*currmsg++ = *s++;
-				}
-			}
-			continue;
-		}
-	}
-	if (state == MSGSTR) {
-		*currmsg = '\0';
-		AddTranslation(msgid, msgstr);
-	}
-
-	fclose(fd);
+	const fs::path fullfilename = LibraryFileName(filename.string());
+	std::ifstream poFile(fullfilename);
+	catalog.Add(poFile);
 }
 
-/** Set the stratagus and game translations
-**
-** Those filenames will be saved in the preferences when SavePreferences will be called.
+/**
+**  Set the stratagus and game translations
 **/
-void SetTranslationsFiles(const char *stratagusfile, const char *gamefile)
+void SetTranslationsFiles(const fs::path &stratagusfile, const fs::path &gamefile)
 {
-	Entries.clear();
+	catalog.Clear();
+
 	LoadPO(stratagusfile);
 	LoadPO(gamefile);
 }
-//@}
 
+//@}

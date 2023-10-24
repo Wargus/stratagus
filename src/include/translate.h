@@ -32,20 +32,22 @@
 
 //@{
 
+#include "filesystem.h"
+
+#include <string>
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /// Translate a string
-extern const char *Translate(const char *str);
-/// Add a translation
-extern void AddTranslation(const char *str1, const char *str2);
+extern const std::string &Translate(const std::string &str);
 /// Load a .po file
-extern void LoadPO(const char *file);
+extern void LoadPO(const fs::path &file);
 /// Set the stratagus and game translations
-extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
+extern void SetTranslationsFiles(const fs::path &stratagusfile, const fs::path &gamefile);
 
-#define _(str) Translate(str)
+#define _(str) Translate(str).c_str()
 #define N_(str) str
 
 //@}

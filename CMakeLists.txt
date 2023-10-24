@@ -618,7 +618,6 @@ set(stratagus_generic_HDRS
 
 set(stratagus_tests_SRCS
 	tests/main.cpp
-	tests/stratagus/test_translate.cpp
 	tests/stratagus/test_util.cpp
 	tests/network/test_net_lowlevel.cpp
 	tests/network/test_netconnect.cpp
@@ -1201,7 +1200,7 @@ endif ()
 target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS})
 target_link_libraries(stratagus PUBLIC stratagus_lib)
 
-target_include_directories(stratagus_lib PRIVATE third-party/mdns)
+target_include_directories(stratagus_lib PRIVATE third-party/mdns third-party/spiritless_po/include)
 
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)
