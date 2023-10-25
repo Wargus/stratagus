@@ -61,6 +61,15 @@ const std::string &Translate(const std::string &str)
 }
 
 /**
+** Translate a string handling plural (according to PO rules)
+** str might have %n which would be replaced by count.
+*/
+const std::string& Plural(const std::string& str, std::size_t count)
+{
+	return catalog.ngettext(str, str, count);
+}
+
+/**
 **  Load a .po file
 */
 void LoadPO(const fs::path& filename)

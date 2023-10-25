@@ -42,6 +42,13 @@
 
 /// Translate a string
 extern const std::string &Translate(const std::string &str);
+
+/**
+** Translate a string handling plural (according to PO rules)
+** str might have %n which would be replaced by count.
+*/
+extern const std::string &Plural(const std::string &str, std::size_t count);
+
 /// Load a .po file
 extern void LoadPO(const fs::path &file);
 /// Set the stratagus and game translations
