@@ -166,7 +166,7 @@ public:
 	void Insert(CUnit &unit);
 
 private:
-	void CountTypes(unsigned int *counter, const size_t len);
+	std::vector<std::size_t> CountTypes() const;
 	bool IsBelongsTo(const CUnitType &type);
 
 	void Update();

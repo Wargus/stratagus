@@ -290,13 +290,14 @@ std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &unittype)
 
 /* =========================== FORCES ========================== */
 
-void AiForce::CountTypes(unsigned int *counter, const size_t len)
+std::vector<std::size_t> AiForce::CountTypes() const
 {
-	memset(counter, 0, len);
+	std::vector<std::size_t> res(UnitTypeMax + 1);
 	for (CUnit* unit : Units)
 	{
-		counter[UnitTypeEquivs[unit->Type->Slot]]++;
+		res[UnitTypeEquivs[unit->Type->Slot]]++;
 	}
+	return res;
 }
 
 /**
@@ -309,10 +310,7 @@ void AiForce::CountTypes(unsigned int *counter, const size_t len)
 bool AiForce::IsBelongsTo(const CUnitType &type)
 {
 	bool flag = false;
-	unsigned int counter[UnitTypeMax + 1];
-
-	// Count units in force.
-	CountTypes(counter, sizeof(counter));
+	auto counter = CountTypes();
 
 	// Look what should be in the force.
 	Completed = true;
