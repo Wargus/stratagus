@@ -103,7 +103,7 @@ pushd ${GAME_ID}
             -DCMAKE_INSTALL_PREFIX=/usr                                 \
             -DDATA_PATH=../../share/games/stratagus/${GAME_ID}/         \
             -DGAMEDIR=/usr/bin                                          \
-            -DICONDIR=/usr/share/icons/default/64x64/                   \
+            -DICONDIR=/usr/share/icons/hicolor/64x64/                   \
             -DGAMEDIRABS=""
         make -j$(nproc) install DESTDIR=../../AppDir
         popd
