@@ -222,7 +222,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		}
 	}
 
-	UnitAction action = UnitAction::None;
+	UnitAction action = UnitAction::NoAction;
 	switch (button.Action) {
 		case ButtonCmd::Stop:
 			action = UnitAction::Still;
@@ -250,7 +250,7 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 			break;
 	}
 	// Simple case.
-	if (action != UnitAction::None) {
+	if (action != UnitAction::NoAction) {
 		if (ranges::all_of(Selected, [&](const CUnit *unit) { return unit->CurrentAction() == action; })) {
 			res |= IconSelected;
 		}

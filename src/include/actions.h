@@ -47,7 +47,7 @@
 **  @see HandleActionTable
 */
 enum class UnitAction : char {
-	None,         /// No valid action
+	NoAction,     /// No valid action
 
 	Still,        /// unit stand still, does nothing
 	StandGround,  /// unit stands ground
