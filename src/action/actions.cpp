@@ -475,7 +475,7 @@ static void UnitActionsEachSecond(const std::vector<CUnit *> &units)
 static const char* toCStr(UnitAction action)
 {
 	switch (action) {
-		case UnitAction::None: return "None";
+		case UnitAction::NoAction: return "None";
 		case UnitAction::Still: return "Still";
 		case UnitAction::StandGround: return "StandGround";
 		case UnitAction::Follow: return "Follow";
