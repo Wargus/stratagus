@@ -32,20 +32,29 @@
 
 //@{
 
+#include "filesystem.h"
+
+#include <string>
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 /// Translate a string
-extern const char *Translate(const char *str);
-/// Add a translation
-extern void AddTranslation(const char *str1, const char *str2);
-/// Load a .po file
-extern void LoadPO(const char *file);
-/// Set the stratagus and game translations
-extern void SetTranslationsFiles(const char *stratagusfile, const char *gamefile);
+extern const std::string &Translate(const std::string &str);
 
-#define _(str) Translate(str)
+/**
+** Translate a string handling plural (according to PO rules)
+** str might have %n which would be replaced by count.
+*/
+extern const std::string &Plural(const std::string &str, std::size_t count);
+
+/// Load a .po file
+extern void LoadPO(const fs::path &file);
+/// Set the stratagus and game translations
+extern void SetTranslationsFiles(const fs::path &stratagusfile, const fs::path &gamefile);
+
+#define _(str) Translate(str).c_str()
 #define N_(str) str
 
 //@}

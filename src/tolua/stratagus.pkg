@@ -90,7 +90,7 @@ $pfile "video.pkg"
 extern int SaveGame(const std::string filename);
 extern void DeleteSaveGame(const std::string filename);
 
-extern const char *Translate @ _(const char *str);
+extern std::string Translate @ _(const std::string str);
 
 extern int SyncRand(void);
 extern int SyncRand(int max);
