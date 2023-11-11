@@ -518,7 +518,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 #ifdef DEBUG
-	fprintf(stderr, "optind(%d), argc(%d) at startup\n", optind, argc);
+	ErrorPrint("optind(%d), argc(%d) at startup\n", optind, argc);
 	for (int i = 0; i < argc; i++) {
 		fprintf(stderr, "%s ", argv[i]);
 	}
@@ -603,7 +603,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 			case 'v': {
 				sep = strchr(optarg, 'x');
 				if (!sep || !*(sep + 1)) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
+					ErrorPrint(
+						"%s: incorrect format of video mode resolution -- '%s'\n", argv[0], optarg);
 					Usage();
 					exit(-1);
 				}
@@ -611,7 +612,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				*sep = 0;
 				Video.Width = to_number(optarg);
 				if (!Video.Height || !Video.Width) {
-					fprintf(stderr, "%s: incorrect format of video mode resolution -- '%sx%s'\n", argv[0], optarg, sep + 1);
+					ErrorPrint("%s: incorrect format of video mode resolution -- '%sx%s'\n",
+					           argv[0],
+					           optarg,
+					           sep + 1);
 					Usage();
 					exit(-1);
 				}
@@ -623,7 +627,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					optarg = argv[optind];
 					sep = strchr(optarg, 'x');
 					if (!sep || !*(sep + 1)) {
-						fprintf(stderr, "%s: incorrect window size -- '%s'\n", argv[0], optarg);
+						ErrorPrint("%s: incorrect window size -- '%s'\n", argv[0], optarg);
 						Usage();
 						exit(-1);
 					}
@@ -631,7 +635,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 					*sep = 0;
 					Video.WindowWidth = to_number(optarg);
 					if (!Video.WindowHeight || !Video.WindowWidth) {
-						fprintf(stderr, "%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
+						ErrorPrint(
+							"%s: incorrect window size -- '%sx%s'\n", argv[0], optarg, sep + 1);
 						Usage();
 						exit(-1);
 					}
@@ -652,7 +657,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 	}
 
 	if (argc - optind > 1) {
-		fprintf(stderr, "too many map files. if you meant to pass game arguments, these go after '--'\n");
+		ErrorPrint(
+			"too many map files. if you meant to pass game arguments, these go after '--'\n");
 		Usage();
 		ExitFatal(-1);
 	}
@@ -676,10 +682,10 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	mei.ClientPointers = TRUE;
 	mei.ExceptionPointers = ExceptionInfo;
 	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, nullptr, nullptr);
-	fprintf(stderr, "Stratagus crashed!\n");
-	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
-	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
-	fprintf(stderr, "and tell us what caused this bug to occur.\n");
+	ErrorPrint("Stratagus crashed!\n"
+	           "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n"
+	           "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n"
+	           "and tell us what caused this bug to occur.\n");
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 #endif
@@ -792,11 +798,12 @@ int stratagusMain(int argc, char **argv)
 
 		Exit(0);
 	} catch (const std::exception &e) {
-		fprintf(stderr, "Stratagus crashed!\n");
-		fprintf(stderr, "Please send this call stack to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
-		fprintf(stderr, "and tell us what caused this bug to occur.\n");
-		fprintf(stderr, " === exception state traceback === \n");
-		fprintf(stderr, "%s", e.what());
+		ErrorPrint("Stratagus crashed!\n"
+		           "Please send this call stack to our bug tracker: "
+		           "https://github.com/Wargus/stratagus/issues\n"
+		           "and tell us what caused this bug to occur.\n"
+		           " === exception state traceback === \n");
+		ErrorPrint("%s", e.what());
 		exit(1);
 	}
 	return 0;

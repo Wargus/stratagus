@@ -75,6 +75,9 @@ const std::string& Plural(const std::string& str, std::size_t count)
 void LoadPO(const fs::path& filename)
 {
 	const fs::path fullfilename = LibraryFileName(filename.string());
+	DebugPrint(
+		"LoadPO(\"%s\") -> \"%s\"\n", filename.u8string().c_str(), fullfilename.u8string().c_str());
+	
 	std::ifstream poFile(fullfilename);
 	catalog.Add(poFile);
 }
@@ -84,6 +87,9 @@ void LoadPO(const fs::path& filename)
 **/
 void SetTranslationsFiles(const fs::path &stratagusfile, const fs::path &gamefile)
 {
+	DebugPrint("SetTranslationsFiles(\"%s\", \"%s\")\n",
+	           stratagusfile.u8string().c_str(),
+	           gamefile.u8string().c_str());
 	catalog.Clear();
 
 	LoadPO(stratagusfile);

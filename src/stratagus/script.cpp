@@ -122,7 +122,7 @@ static int report(int status, bool exitOnError)
 		if (msg == nullptr) {
 			msg = "(error with no message)";
 		}
-		fprintf(stderr, "%s\n", msg);
+		ErrorPrint("%s\n", msg);
 		if (exitOnError) {
 			::exit(1);
 		} else {
@@ -187,7 +187,7 @@ int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 	lua_call(L, 0, 1);
 	const char *str = lua_tostring(L, -1);
 	lua_pop(L, 2);
-	fprintf(stderr, "\n===============\n%s\n\n", str);
+	ErrorPrint("\n===============\n%s\n\n", str);
 #endif
 
 	lua_pushcfunction(L, luatraceback);  // push traceback function
@@ -209,8 +209,8 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 
 	content.clear();
 	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
-		DebugPrint("Can't open file '%s\n", file.u8string().c_str());
-		fprintf(stderr, "Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
+		DebugPrint("Can't open file '%s'\n", file.u8string().c_str());
+		ErrorPrint("Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
 		return false;
 	}
 
@@ -302,7 +302,7 @@ static int CclLoad(lua_State *l)
 	const fs::path filename = LibraryFileName(std::string{LuaToString(l, 1)});
 	bool exitOnError = arg == 2 ? LuaToBoolean(l, 2) : true;
 	if (LuaLoadFile(filename, "", exitOnError) == -1) {
-		DebugPrint("Load failed: %s\n", filename.u8string().c_str());
+		ErrorPrint("Load failed: '%s'\n", filename.u8string().c_str());
 	}
 	return 0;
 }
@@ -707,14 +707,14 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					varIndex = UnitTypeVar.VariableNameLookup[name];
 					if (varIndex == -1) {
-						LuaError(l, "Bad variable name :'%s'", name.data());
+						LuaError(l, "Bad variable name: '%s'", name.data());
 					}
 				} else if (key == "Component") {
 					component = Str2EnumVariable(l, LuaToString(l, -1));
 				} else if (key == "Loc") {
 					loc = LuaToNumber(l, -1);
 					if (loc < 0 || 2 < loc) {
-						LuaError(l, "Bad Loc number :'%d'", LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number: '%d'", LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit", key.data());
@@ -740,12 +740,12 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 					const std::string_view name = LuaToString(l, -1);
 					varIndex = UnitTypeVar.VariableNameLookup[name];
 					if (varIndex == -1) {
-						LuaError(l, "Bad variable name :'%s'", name.data());
+						LuaError(l, "Bad variable name: '%s'", name.data());
 					}
 				} else if (key == "Loc") {
 					loc = LuaToNumber(l, -1);
 					if (loc < 0 || 2 < loc) {
-						LuaError(l, "Bad Loc number :'%d'", LuaToNumber(l, -1));
+						LuaError(l, "Bad Loc number: '%d'", LuaToNumber(l, -1));
 					}
 				} else {
 					LuaError(l, "Bad param %s for Unit", key.data());
@@ -766,7 +766,7 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 				} else if (key == "Font") {
 					font = CFont::Get(LuaToString(l, -1));
 					if (!font) {
-						LuaError(l, "Bad Font name :'%s'", LuaToString(l, -1).data());
+						LuaError(l, "Bad Font name: '%s'", LuaToString(l, -1).data());
 					}
 				} else {
 					LuaError(l, "Bad param %s for VideoTextLength", key.data());
@@ -921,7 +921,7 @@ std::unique_ptr<IStringDesc> CclParseStringDesc(lua_State *l)
 				lua_rawgeti(l, -1, 4); // Font.
 				Font = CFont::Get(LuaToString(l, -1));
 				if (!Font) {
-					LuaError(l, "Bad Font name :'%s'", LuaToString(l, -1).data());
+					LuaError(l, "Bad Font name: '%s'", LuaToString(l, -1).data());
 				}
 				lua_pop(l, 1); // font name.
 			}
@@ -1228,7 +1228,7 @@ static int AliasTypeVar(lua_State *l, const char *s)
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'", key.data());
+			LuaError(l, "Bad loc: '%s'", key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);
@@ -1289,7 +1289,7 @@ static int AliasUnitVar(lua_State *l, const char *s)
 			}
 		}
 		if (sloc[i] == nullptr) {
-			LuaError(l, "Bad loc :'%s'", key.data());
+			LuaError(l, "Bad loc: '%s'", key.data());
 		}
 	} else {
 		lua_pushnumber(l, 0);
@@ -2044,7 +2044,7 @@ void InitLua()
 	if (!status) {
 		status = LuaCall(0, 0, false);
 		if (!status) {
-			fprintf(stderr, "mobdebug loaded and available via mobdebug.start()\n");
+			ErrorPrint("mobdebug loaded and available via mobdebug.start()\n");
 			lua_setglobal(Lua, "mobdebug");
 		}
 	}
@@ -2305,7 +2305,7 @@ void SavePreferences()
 
 		FILE *fd = fopen(path.string().c_str(), "w");
 		if (!fd) {
-			DebugPrint("Cannot open file %s for writing\n", path.u8string().c_str());
+			ErrorPrint("Cannot open file '%s' for writing\n", path.u8string().c_str());
 			return;
 		}
 
@@ -2327,7 +2327,7 @@ void LoadCcl(const fs::path &filename, const std::string &luaArgStr)
 	CclInConfigFile = true;
 	const fs::path name = LibraryFileName(filename.string());
 	if (!fs::exists(name)) {
-		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
+		ErrorPrint("Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
 

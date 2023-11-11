@@ -121,7 +121,7 @@ MissileType &MissileTypeByIdent(std::string_view ident)
 	if (it != MissileTypes.end()) {
 		return *it->second;
 	}
-	DebugPrint("Unknown missiletype '%s'\n", ident.data());
+	ErrorPrint("Unknown missiletype '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

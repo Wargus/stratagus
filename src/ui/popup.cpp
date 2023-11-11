@@ -123,7 +123,7 @@ static EPopupButtonInfo toEPopupButtonInfo(std::string_view s)
 	} else if (s == "Dependencies") {
 		return EPopupButtonInfo::Dependencies;
 	} else {
-		fprintf(stderr, "Invalid infotype '%s'\n", s.data());
+		ErrorPrint("Invalid infotype '%s'\n", s.data());
 		ExitFatal(-1);
 	}
 }

@@ -291,7 +291,11 @@ static unsigned char codepoint_to_codepage_index(int codepoint, const char **sub
 	}
 
 	if (cpChar < 0x32) {
-		fprintf(stderr, "Can't convert codepoint to codepage %d: '%c' d=%d (0x%04x)\r\n", FontCodePage, codepoint, codepoint, codepoint);
+		ErrorPrint("Can't convert codepoint to codepage %d: '%c' d=%d (0x%04x)\r\n",
+		           FontCodePage,
+		           codepoint,
+		           codepoint,
+		           codepoint);
 		cpChar = '?';
 	}
 
@@ -344,7 +348,7 @@ static int CodepageIndexFromUTF8(const char text[], const size_t len, size_t &po
 		codepoint = (c & 0x01);
 		count = 5;
 	} else {
-		DebugPrint("Invalid utf8\n");
+		ErrorPrint("Invalid utf8\n");
 		pos = postUtf8CharPos;
 		return 0;
 	}
@@ -352,7 +356,7 @@ static int CodepageIndexFromUTF8(const char text[], const size_t len, size_t &po
 	while (count--) {
 		c = text[postUtf8CharPos++];
 		if ((c & 0xC0) != 0x80) {
-			DebugPrint("Invalid utf8\n");
+			ErrorPrint("Invalid utf8\n");
 			pos = postUtf8CharPos;
 			return 0;
 		}
@@ -572,7 +576,7 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 		} else if (utf8 == '~' && !subpos) {
 			switch (text[pos]) {
 				case '\0':  // wrong formatted string.
-					DebugPrint("oops, format your ~\n");
+					ErrorPrint("oops, format your ~: for \"%s\"\n", text.data());
 					return widths;
 				case '~':
 					++pos;
@@ -608,7 +612,7 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 				default: {
 					auto end = text.find('~', pos);
 					if (end == std::string_view::npos) {
-						DebugPrint("oops, format your ~\n");
+						ErrorPrint("oops, format your ~ for \"%s\"\n", text.data());
 						return widths;
 					}
 					std::string_view color = text.substr(pos, end - pos);
@@ -961,12 +965,12 @@ void ReloadFonts()
 {
 	auto it = Fonts.find(ident);
 	if (it == Fonts.end()) {
-		DebugPrint("font not found: %s\n", ident.data());
+		ErrorPrint("font not found: '%s'\n", ident.data());
 		return nullptr;
 	}
 	auto &font = it->second;
 	if (font == nullptr) {
-		DebugPrint("font not found: %s\n", ident.data());
+		ErrorPrint("font not found: '%s'\n", ident.data());
 		return nullptr;
 	}
 	return font.get();
@@ -1000,7 +1004,8 @@ void ReloadFonts()
 {
 	auto it = FontColors.find(ident);
 	if (it == FontColors.end()) {
-		DebugPrint("font color not found: %s\n", ident.data());
+		ErrorPrint("font color not found: '%s'\n", ident.data());
+		ExitFatal(-1);
 	}
 	return it->second.get();
 }

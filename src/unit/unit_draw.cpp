@@ -967,7 +967,7 @@ void CUnit::Draw(const CViewport &vp) const
 #endif
 
 	if (!IsVisible && frame == UnitNotSeen) {
-		DebugPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n",
+		ErrorPrint("FIXME: Something is wrong, unit %d not seen but drawn time %lu?.\n",
 		           UnitNumber(*this),
 		           GameCycle);
 		return;

@@ -82,7 +82,7 @@ int NetInit()
 
 	// Start up the windows networking
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		fprintf(stderr, "Couldn't initialize Winsock 2\n");
+		ErrorPrint("Couldn't initialize Winsock 2\n");
 		return -1;
 	}
 	return 0;
@@ -323,7 +323,7 @@ Socket NetOpenUDP(unsigned long ip, int port)
 		sock_addr.sin_port = htons(port);
 		// Bind the socket for listening
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
-			fprintf(stderr, "Couldn't bind to local port\n");
+			ErrorPrint("Couldn't bind to local port\n");
 			NetCloseUDP(sockfd);
 			return static_cast<Socket>(-1);
 		}
@@ -366,7 +366,7 @@ Socket NetOpenTCP(const char *addr, int port)
 #endif
 
 		if (bind(sockfd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
-			fprintf(stderr, "Couldn't bind to local port\n");
+			ErrorPrint("Couldn't bind to local port\n");
 			NetCloseTCP(sockfd);
 			return static_cast<Socket>(-1);
 		}
@@ -403,8 +403,7 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 	sa.sin_port = htons(port);
 
 	if (connect(sockfd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
-		fprintf(stderr, "connect to %d.%d.%d.%d:%d failed\n",
-				NIPQUAD(ntohl(addr)), port);
+		ErrorPrint("connect to %d.%d.%d.%d:%d failed\n", NIPQUAD(ntohl(addr)), port);
 		return -1;
 	}
 	return sockfd;
@@ -521,8 +520,7 @@ int NetRecvUDP(Socket sockfd, void *buf, int len, unsigned long *hostFrom, int *
 	const int l = recvfrom(sockfd, (recvfrombuftype)buf, len, 0, (struct sockaddr *)&sock_addr, &n);
 
 	if (l < 0) {
-		PrintFunction();
-		fprintf(stdout, "Could not read from UDP socket\n");
+		ErrorPrint("Could not read from UDP socket\n");
 		return -1;
 	}
 

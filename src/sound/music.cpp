@@ -67,7 +67,7 @@ static void CheckMusicFinished()
 	if (SoundEnabled() && IsMusicEnabled()) {
 		lua_getglobal(Lua, "MusicStopped");
 		if (!lua_isfunction(Lua, -1)) {
-			fprintf(stderr, "No MusicStopped function in Lua\n");
+			ErrorPrint("No MusicStopped function in Lua\n");
 		} else {
 			DebugPrint("Calling MusicStopped callback at %ul\n", SDL_GetTicks());
 			LuaCall(0, 1);

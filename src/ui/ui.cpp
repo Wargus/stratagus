@@ -160,7 +160,7 @@ CPopup &PopupByIdent(std::string_view ident)
 	if (it != UI.ButtonPopups.end()) {
 		return **it;
 	}
-	DebugPrint("Unknown popup '%s'\n", ident.data());
+	ErrorPrint("Unknown popup '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

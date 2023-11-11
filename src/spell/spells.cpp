@@ -351,7 +351,7 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 		}
 		default:
 			// Something is wrong
-			DebugPrint("Spell is screwed up, unknown target type\n");
+			ErrorPrint("Spell is screwed up, unknown target type\n");
 			Assert(0);
 			return std::nullopt;
 	}
@@ -386,7 +386,7 @@ SpellType &SpellTypeByIdent(const std::string_view &ident)
 	if (it != SpellTypeTable.end()) {
 		return **it;
 	}
-	DebugPrint("Unknown spellType '%s'\n", ident.data());
+	ErrorPrint("Unknown spellType '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

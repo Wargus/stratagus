@@ -1879,10 +1879,9 @@ void CEditor::Init()
 	// Load and evaluate the editor configuration file
 	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.string());
 	if (!fs::exists(filename)) {
-		fprintf(stderr,
-		        "Editor configuration file '%s' was not found\n"
-		        "Specify another with '-E file.lua'\n",
-		        Parameters::Instance.luaEditorStartFilename.u8string().c_str());
+		ErrorPrint("Editor configuration file '%s' was not found\n"
+		           "Specify another with '-E file.lua'\n",
+		           Parameters::Instance.luaEditorStartFilename.u8string().c_str());
 		ExitFatal(-1);
 	}
 
@@ -1991,7 +1990,7 @@ int EditorSaveMap(const std::string &file)
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 
 	if (!SaveStratagusMap(fullName, Map, Editor.TerrainEditable)) {
-		fprintf(stderr, "Cannot save map\n");
+		ErrorPrint("Cannot save map\n");
 		return -1;
 	}
 	return 0;
@@ -2002,7 +2001,7 @@ int EditorSaveMapWithResize(std::string_view file, Vec2i newSize, Vec2i offset)
 	const fs::path fullName = fs::path(StratagusLibPath) / file;
 
 	if (!SaveStratagusMap(fullName, Map, Editor.TerrainEditable, newSize, offset)) {
-		fprintf(stderr, "Cannot save map\n");
+		ErrorPrint("Cannot save map\n");
 		return -1;
 	}
 	return 0;

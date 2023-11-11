@@ -316,7 +316,7 @@ int PlayMovie(const std::string &name)
 
 	CFile f;
 	if (f.open(filename.c_str(), CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file '%s'\n", name.c_str());
+		ErrorPrint("Can't open file '%s'\n", name.c_str());
 		return 0;
 	}
 
@@ -352,8 +352,9 @@ int PlayMovie(const std::string &name)
 	                                             data.tinfo.frame_height);
 
 	if (yuv_overlay == nullptr) {
-		fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
-		fprintf(stderr, "SDL_CreateYUVOverlay: %dx%d\n", data.tinfo.frame_width, data.tinfo.frame_height);
+		ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
+		ErrorPrint(
+			"SDL_CreateYUVOverlay: %dx%d\n", data.tinfo.frame_width, data.tinfo.frame_height);
 		OggFree(&data);
 		f.close();
 		return 0;
@@ -473,7 +474,7 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	read_rect.y = (wh - (rh * scale)) / 2;
 	SDL_RenderCopy(TheRenderer, yuv_overlay, nullptr, &render_rect);
 	if (SDL_RenderReadPixels(TheRenderer, &read_rect, surface->format->format, surface->pixels, surface->pitch)) {
-		fprintf(stderr, "Reading from renderer not supported\n");
+		ErrorPrint("Reading from renderer not supported\n");
 		SDL_FillRect(surface, nullptr, 0); // completely transparent
 	}
 	free(yuv);
@@ -487,7 +488,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 
 	f = new CFile();
 	if (f->open(filename.c_str(), CL_OPEN_READ) == -1) {
-		fprintf(stderr, "Can't open file '%s'\n", name.c_str());
+		ErrorPrint("Can't open file '%s'\n", name.c_str());
 		return false;
 	}
 
@@ -504,7 +505,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 								   0xff000000);
 
 	if (surface == nullptr) {
-		fprintf(stderr, "SDL_CreateRGBSurface: %s\n", SDL_GetError());
+		ErrorPrint("SDL_CreateRGBSurface: %s\n", SDL_GetError());
 		f->close();
 		return false;
 	}
@@ -519,7 +520,7 @@ void *Movie::_getData() const
 		if (OggInit(f, data) || !data->video) {
 			OggFree(data);
 			f->close();
-			fprintf(stderr, "Could not init OggData or not a video\n");
+			ErrorPrint("Could not init OggData or not a video\n");
 			return surface;
 		}
 
@@ -531,8 +532,9 @@ void *Movie::_getData() const
 										data->tinfo.frame_height);
 
 		if (yuv_overlay == nullptr) {
-			fprintf(stderr, "SDL_CreateYUVOverlay: %s\n", SDL_GetError());
-			fprintf(stderr, "SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
+			ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
+			ErrorPrint(
+				"SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
 			OggFree(data);
 			f->close();
 			return surface;
@@ -568,6 +570,8 @@ void *Movie::_getData() const
 #include <string.h>
 #include <stdio.h>
 
+#include "stratagus.h"
+
 /**
 **  Play a video file.
 **
@@ -578,7 +582,9 @@ void *Movie::_getData() const
 int PlayMovie(const std::string &name)
 {
 	if (strstr(name.c_str(), ".ogg") || strstr(name.c_str(), ".ogv")) {
-		fprintf(stderr, "PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n", name.c_str());
+		ErrorPrint(
+			"PlayMovie() '%s' is not supported, please recompile stratagus with theora support\n",
+			name.c_str());
 		return 0;
 	}
 	return -1;

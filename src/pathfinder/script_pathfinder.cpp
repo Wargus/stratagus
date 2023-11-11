@@ -65,8 +65,7 @@ static int CclAStar(lua_State *l)
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
-				PrintFunction();
-				fprintf(stdout, "Fixed unit crossing cost must be strictly > 3\n");
+				ErrorPrint("Fixed unit crossing cost must be strictly > 3\n");
 			} else {
 				AStarFixedUnitCrossingCost = i;
 			}
@@ -74,8 +73,7 @@ static int CclAStar(lua_State *l)
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 3) {
-				PrintFunction();
-				fprintf(stdout, "Moving unit crossing cost must be strictly > 3\n");
+				ErrorPrint("Moving unit crossing cost must be strictly > 3\n");
 			} else {
 				AStarMovingUnitCrossingCost = i;
 			}
@@ -87,8 +85,7 @@ static int CclAStar(lua_State *l)
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i < 0) {
-				PrintFunction();
-				fprintf(stdout, "Unseen Terrain Cost must be non-negative\n");
+				ErrorPrint("Unseen Terrain Cost must be non-negative\n");
 			} else {
 				AStarUnknownTerrainCost = i;
 			}
@@ -96,8 +93,7 @@ static int CclAStar(lua_State *l)
 			++j;
 			i = LuaToNumber(l, j + 1);
 			if (i <= 0) {
-				PrintFunction();
-				fprintf(stdout, "Max A* search iterations must be strictly > 0\n");
+				ErrorPrint("Max A* search iterations must be strictly > 0\n");
 			} else {
 				AStarMaxSearchIterations = i;
 			}

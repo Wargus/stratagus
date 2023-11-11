@@ -232,15 +232,14 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 	}
 #if 0
 	if (EnableDebugPrint) {
-		fprintf(stderr, "Mapsight: GameCycle: %lud, SyncHash before: %x", GameCycle, SyncHash);
+		ErrorPrint("Mapsight: GameCycle: %lud, SyncHash before: %x", GameCycle, SyncHash);
 	}
 	// Calculate some hash.
 	SyncHash = (SyncHash << 5) | (SyncHash >> 27);
 	SyncHash ^= (*v << 16) | *v;
 
 	if (EnableDebugPrint) {
-		fprintf(stderr, ", after: %x (mapfield: %d, player: %d, sight: %d)\n", SyncHash,
-							index, player.Index, *v);
+		ErrorPrint(", after: %x (mapfield: %d, player: %d, sight: %d)\n", SyncHash, index, player.Index, *v);
 		print_backtrace(8);
 		fflush(stderr);
 	}

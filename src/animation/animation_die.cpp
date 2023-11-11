@@ -45,7 +45,7 @@ void CAnimation_Die::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /*
 {
 	Assert(unit.Anim.Anim == this);
 	if (unit.Anim.Unbreakable) {
-		fprintf(stderr, "Can't call \"die\" action in unbreakable section\n");
+		ErrorPrint("Can't call \"die\" action in unbreakable section\n");
 		Exit(1);
 	}
 	if (this->DeathType.empty() == false) {

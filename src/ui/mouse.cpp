@@ -1437,7 +1437,7 @@ static int SendSpellCast(const Vec2i &tilePos)
 		// CursorValue here holds the spell type id
 		const SpellType *spell = SpellTypeTable.at(CursorValue).get();
 		if (!spell) {
-			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
+			ErrorPrint("unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
 		if (dest && dest == unit
@@ -1492,7 +1492,7 @@ static void SendCommand(const Vec2i &tilePos)
 			ret = SendSpellCast(tilePos);
 			break;
 		default:
-			DebugPrint("Unsupported send action %d\n", CursorAction);
+			ErrorPrint("Unsupported send action %d\n", CursorAction);
 			break;
 	}
 	if (ret) {

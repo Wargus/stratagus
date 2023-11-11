@@ -58,13 +58,12 @@ public:
 			} else if (starts_with(name, "upgrade-")) {
 				const auto *upgrade = CUpgrade::Get(name);
 				if (!upgrade) {
-					fprintf(stderr, "upgrade not found: %s\n", name.data());
+					ErrorPrint("upgrade not found: '%s'\n", name.data());
 					ExitFatal(-1);
 				}
 				return upgrade;
 			} else {
-				fprintf(
-					stderr, "dependency target '%s' should be unit-type or upgrade\n", name.data());
+				ErrorPrint("dependency target '%s' should be unit-type or upgrade\n", name.data());
 				ExitFatal(-1);
 			}
 		}()),
@@ -186,7 +185,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 		return rules;
 	}
 	if (!starts_with(button.ValueStr, "unit-") && !starts_with(button.ValueStr, "upgrade-")) {
-		DebugPrint("target '%s' should be unit-type or upgrade\n", button.ValueStr.c_str());
+		ErrorPrint("target '%s' should be unit-type or upgrade\n", button.ValueStr.c_str());
 		return "";
 	}
 	auto it = Depends.find(button.ValueStr);
@@ -216,7 +215,7 @@ bool CheckDependByIdent(const CPlayer &player, std::string_view target)
 			return false;
 		}
 	} else {
-		DebugPrint("target '%s' should be unit-type or upgrade\n", target.data());
+		ErrorPrint("target '%s' should be unit-type or upgrade\n", target.data());
 		return false;
 	}
 	auto it = Depends.find(target);
@@ -274,11 +273,11 @@ static int CclDefineDependency(lua_State *l)
 	} else if (starts_with(target, "upgrade-")) {
 		// Check upgrade exists
 		if (auto* upgrade = CUpgrade::Get(target); !upgrade) {
-			fprintf(stderr, "upgrade not found: %s\n", target.data());
+			ErrorPrint("upgrade not found: '%s'\n", target.data());
 			ExitFatal(-1);
 		}
 	} else {
-		fprintf(stderr, "dependency target '%s' should be unit-type or upgrade\n", target.data());
+		ErrorPrint("dependency target '%s' should be unit-type or upgrade\n", target.data());
 		ExitFatal(-1);
 	}
 

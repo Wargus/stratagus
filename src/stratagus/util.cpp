@@ -75,9 +75,9 @@ void InitSyncRand()
 {
 	SyncRandSeed = 0x87654321;
 	if (EnableDebugPrint) {
-		fprintf(stderr, "GameCycle: %lud, init seed: %x\n", GameCycle, SyncRandSeed);
-		print_backtrace();
-		fflush(stderr);
+		DebugPrint("GameCycle: %lud, init seed: %x\n", GameCycle, SyncRandSeed);
+		//print_backtrace();
+		//fflush(stderr);
 	}
 }
 
@@ -96,9 +96,9 @@ int SyncRand()
 	SyncRandSeed = SyncRandSeed * (0x12345678 * 4 + 1) + 1;
 
 	if (EnableDebugPrint) {
-		fprintf(stderr, "GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
-		print_backtrace(8);
-		fflush(stderr);
+		DebugPrint("GameCycle: %lud, seed: %x, Sync rand: %d\n", GameCycle, SyncRandSeed, val);
+		//print_backtrace(8);
+		//fflush(stderr);
 	}
 	return val;
 }
@@ -336,13 +336,13 @@ int to_number(std::string_view s, int base)
 	auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.size(), res, base);
 	if (ec != std::errc()) {
 		if (ec == std::errc::invalid_argument) {
-			DebugPrint("That isn't a number %s.", s.data());
+			ErrorPrint("That isn't a number '%s'.\n", s.data());
 		} else if (ec == std::errc::result_out_of_range) {
-			DebugPrint("This number %s is larger than an int.", s.data());
+			ErrorPrint("This number '%s' is larger than an int.\n", s.data());
 		}
 		Exit(1);
 	} else if (ptr != s.data() + s.size()) {
-		DebugPrint("That isn't a number %s.", s.data());
+		ErrorPrint("That isn't a number '%s'.\n", s.data());
 		Exit(1);
 	}
 	return res;
@@ -352,7 +352,7 @@ int to_number(std::string_view s, int base)
 
 	int res = std::strtol(buf.data(), &end, base);
 	if (end != buf.data() + buf.size()) {
-		DebugPrint("That isn't a number %s.", buf.c_str());
+		ErrorPrint("That isn't a number '%s'.\n", buf.c_str());
 		Exit(1);
 	}
 	return res;
@@ -391,7 +391,7 @@ static void getopt_err(const char *argv0, const char *str, char opt)
 			argv0 = x + 1;
 		}
 
-		fprintf(stderr, "%s%s%c\n", argv0, str, opt);
+		ErrorPrint("%s%s%c\n", argv0, str, opt);
 	}
 }
 
@@ -477,7 +477,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 		--curpos;
 	}
 	if (curpos < 0) {
-		fprintf(stderr, "Invalid UTF8.\n");
+		ErrorPrint("Invalid UTF8.\n");
 	}
 	return 0;
 }
@@ -497,7 +497,7 @@ int UTF8GetNext(const std::string &text, int curpos)
 	if ((c & 0xF0) == 0xE0) {
 		return curpos + 3;
 	}
-	fprintf(stderr, "Invalid UTF8.\n");
+	ErrorPrint("Invalid UTF8.\n");
 	return text.size();
 }
 

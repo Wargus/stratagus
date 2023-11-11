@@ -791,7 +791,7 @@ void CClient::Parse_Map(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	if (!IsSafeMapName(msg.MapPath)) {
-		fprintf(stderr, "Unsecure map name!\n");
+		ErrorPrint("Unsecure map name!\n");
 		networkState.State = ccs_badmap;
 		return;
 	}
@@ -803,8 +803,9 @@ void CClient::Parse_Map(const unsigned char *buf)
 		return;
 	} else if (msg.MapUID != Map.Info.MapUID) {
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
-				Map.Info.MapUID, static_cast<unsigned int>(msg.MapUID));
+		ErrorPrint("Stratagus maps do not match (0x%08x) <-> (0x%08x)\n",
+		           Map.Info.MapUID,
+		           static_cast<unsigned int>(msg.MapUID));
 		return;
 	}
 	networkState.State = ccs_mapinfo;
@@ -829,7 +830,8 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	if (msg.FragmentIndex > networkState.StateArg) {
 		// we got a fragment that is newer, too new, that is bad
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Missed map fragment %d, already got %d\n", networkState.StateArg, msg.FragmentIndex);
+		ErrorPrint(
+			"Missed map fragment %d, already got %d\n", networkState.StateArg, msg.FragmentIndex);
 		return;
 	}
 
@@ -852,7 +854,7 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	if (NetworkMapFragmentName.find("..") != std::string::npos) {
 		// bad path
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Bad network filename %s\n", NetworkMapFragmentName.c_str());
+		ErrorPrint("Bad network filename '%s'\n", NetworkMapFragmentName.c_str());
 		return;
 	}
 	mappath /= NetworkMapFragmentName;
@@ -860,7 +862,7 @@ void CClient::Parse_MapFragment(const unsigned char *buf)
 	std::ofstream mapfile(mappath.c_str(), std::ios::out | std::ios::app | std::ios::binary);
 	if (!mapfile.is_open()) {
 		networkState.State = ccs_badmap;
-		fprintf(stderr, "Could not open %s for appending map data\n", mappath.u8string().c_str());
+		ErrorPrint("Could not open '%s' for appending map data\n", mappath.u8string().c_str());
 		return;
 	} else {
 		Assert(msg.DataSize + msg.PathSize <= sizeof(msg.Data));
@@ -967,7 +969,7 @@ void CClient::Parse_GameFull()
 		return;
 	}
 	const std::string serverHostStr = serverHost.toString();
-	fprintf(stderr, "Server at %s is full!\n", serverHostStr.c_str());
+	ErrorPrint("Server at '%s' is full!\n", serverHostStr.c_str());
 	networkState.State = ccs_nofreeslots;
 }
 
@@ -980,9 +982,10 @@ void CClient::Parse_LuaMismatch(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	const std::string serverHostStr = serverHost.toString();
-	fprintf(stderr, "Incompatible Lua files version %d <-> %d \nfrom %s\n",
-			FileChecksums, msg.Version,
-			serverHostStr.c_str());
+	ErrorPrint("Incompatible Lua files version %d <-> %d \nfrom '%s'\n",
+	           FileChecksums,
+	           msg.Version,
+	           serverHostStr.c_str());
 	networkState.State = ccs_incompatibleluafiles;
 }
 
@@ -995,8 +998,10 @@ void CClient::Parse_EngineMismatch(const unsigned char *buf)
 
 	msg.Deserialize(buf);
 	const std::string serverHostStr = serverHost.toString();
-	fprintf(stderr, "Incompatible Stratagus version %d <-> %d\nfrom %s\n",
-			StratagusVersion, msg.Stratagus, serverHostStr.c_str());
+	ErrorPrint("Incompatible Stratagus version %d <-> %d\nfrom '%s'\n",
+	           StratagusVersion,
+	           msg.Stratagus,
+	           serverHostStr.c_str());
 	networkState.State = ccs_incompatibleengine;
 }
 
@@ -1516,8 +1521,10 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
-		fprintf(stderr, "Incompatible Stratagus version %d <-> %d from %s\n",
-				StratagusVersion, msg.Stratagus, hostStr.c_str());
+		ErrorPrint("Incompatible Stratagus version %d <-> %d from '%s'\n",
+		           StratagusVersion,
+		           msg.Stratagus,
+		           hostStr.c_str());
 
 		const CInitMessage_EngineMismatch message;
 		NetworkSendICMessage_Log(socket, host, message);
@@ -1526,10 +1533,10 @@ static int CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, cons
 
 	if (msg.Version != FileChecksums) {
 		const std::string hostStr = host.toString();
-		fprintf(stderr, "Incompatible lua files %d <-> %d\nfrom %s\n",
-				FileChecksums,
-				msg.Version,
-				hostStr.c_str());
+		ErrorPrint("Incompatible lua files %d <-> %d\nfrom '%s'\n",
+		           FileChecksums,
+		           msg.Version,
+		           hostStr.c_str());
 
 		const CInitMessage_LuaFilesMismatch message;
 		NetworkSendICMessage_Log(socket, host, message);

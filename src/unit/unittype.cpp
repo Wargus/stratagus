@@ -798,7 +798,7 @@ CUnitType &UnitTypeByIdent(std::string_view ident)
 	if (ret != UnitTypeMap.end()) {
 		return *(*ret).second;
 	}
-	DebugPrint("Unknown unitType '%s'\n", ident.data());
+	ErrorPrint("Unknown unitType '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

@@ -550,7 +550,7 @@ static void AiRemoveFromBuilt(PlayerAi &pai, const CUnitType &type)
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't reduce %s from build list.\n", type.Ident.c_str());
+	DebugPrint("Can't reduce %s from build list.\n", type.Ident.c_str());
 }
 
 /**
@@ -596,7 +596,7 @@ void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 		DebugPrint("My guess is that you built something under ai me. naughty boy!\n");
 		return;
 	}
-	fprintf(stderr, "Can't reduce %s from build list.\n", type.Ident.c_str());
+	DebugPrint("Can't reduce %s from build list.\n", type.Ident.c_str());
 }
 
 /*----------------------------------------------------------------------------

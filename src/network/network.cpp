@@ -421,7 +421,7 @@ void InitNetwork1()
 	const CHost host("", port);
 	NetworkFildes.Open(host);
 	if (NetworkFildes.IsValid() == false) {
-		fprintf(stderr, "NETWORK: No free port %d available, aborting\n", port);
+		ErrorPrint("NETWORK: No free port %d available, aborting\n", port);
 		NetExit(); // machine dependent network exit
 		return;
 	}
@@ -438,7 +438,7 @@ void InitNetwork1()
 			DebugPrint("IP: %d.%d.%d.%d\n", NIPQUAD(ntohl(ips[i])));
 		}
 	} else {
-		fprintf(stderr, "WARNING: Not connected to any external IPV4-network!\n");
+		ErrorPrint("WARNING: Not connected to any external IPV4-network!\n");
 		return;
 	}
 }
@@ -961,7 +961,7 @@ static void NetworkExecCommand_Sync(const CNetworkCommandQueue &ncq)
 			savefile += ".sav";
 			SaveGame(savefile);
 		}
-		DebugPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n",
+		ErrorPrint("\nNetwork out of sync seed: %X!=%X , hash: %X!=%X Cycle %lu\n\n",
 		           syncSeed,
 		           NetworkSyncSeeds[gameNetCycle & 0xFF],
 		           syncHash,
@@ -1079,7 +1079,7 @@ static void NetworkSendCommands(unsigned long gameNetCycle)
 				nc.Deserialize(&incommand.Data[0]);
 
 				const CUnit &unit = UnitManager->GetSlotUnit(nc.Unit);
-				// FIXME: we can send destoyed units over network :(
+				// FIXME: we can send destroyed units over network :(
 				if (unit.Destroyed) {
 					DebugPrint("Sending destroyed unit %d over network!!!!!!\n", nc.Unit);
 				}

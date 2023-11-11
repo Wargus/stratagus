@@ -207,7 +207,7 @@ static void ApplyReplaySettings()
 	GameSettings = CurrentReplay->ReplaySettings;
 
 	if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), CurrentReplay->MapPath.c_str()) != 0) {
-		fprintf(stderr, "Replay map path is too long\n");
+		ErrorPrint("Replay map path is too long\n");
 		// FIXME: need to handle errors better
 		Exit(1);
 	}
@@ -669,8 +669,8 @@ static void DoNextReplay()
 			ThisPlayer->Notify("%s", _("No sync info for this replay !"));
 		} else {
 			ThisPlayer->Notify(_("Replay got out of sync (%lu) !"), GameCycle);
-			DebugPrint("OUT OF SYNC %u != %u\n", SyncRandSeed, ReplayStep.SyncRandSeed);
-			DebugPrint("OUT OF SYNC GameCycle %lu \n", GameCycle);
+			ErrorPrint("OUT OF SYNC %u != %u\n", SyncRandSeed, ReplayStep.SyncRandSeed);
+			ErrorPrint("OUT OF SYNC GameCycle %lu \n", GameCycle);
 			Assert(0);
 			// ReplayStep = 0;
 			// NextLogCycle = ~0UL;
@@ -839,13 +839,13 @@ void MultiPlayerReplayEachCycle()
 int SaveReplay(const std::string &filename)
 {
 	if (filename.find_first_of("\\/") != std::string::npos) {
-		fprintf(stderr, "\\ or / not allowed in SaveReplay filename\n");
+		ErrorPrint("\\ or / not allowed in SaveReplay filename\n");
 		return -1;
 	}
 	const auto destination = Parameters::Instance.GetUserDirectory() / GameName / "logs" / filename;
 
 	if (!fs::copy_file(LastLogFileName, destination, fs::copy_options::overwrite_existing)) {
-		fprintf(stderr, "Can't save to '%s'\n", destination.u8string().c_str());
+		ErrorPrint("Can't save to '%s'\n", destination.u8string().c_str());
 		return -1;
 	}
 

@@ -109,7 +109,7 @@ int SaveGame(const std::string &filename)
 
 	fullpath /= filename;
 	if (file.open(fullpath.string().c_str(), CL_WRITE_GZ | CL_OPEN_WRITE) == -1) {
-		fprintf(stderr, "Can't save to '%s'\n", filename.c_str());
+		ErrorPrint("Can't save to '%s'\n", filename.c_str());
 		return -1;
 	}
 
@@ -190,7 +190,7 @@ void DeleteSaveGame(const std::string &filename)
 
 	fs::path fullpath = GetSaveDir() / filename;
 	if (unlink(fullpath.string().c_str()) == -1) {
-		fprintf(stderr, "delete failed for %s", fullpath.u8string().c_str());
+		ErrorPrint("delete failed for '%s'", fullpath.u8string().c_str());
 	}
 }
 

@@ -523,7 +523,10 @@ std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitTyp
 	}
 
 	if (typecount < 0) { // if unit type count is negative, something wrong happened
-		fprintf(stderr, "Player %d has a negative %s unit type count of %d.\n", player.Index, type.Ident.c_str(), typecount);
+		ErrorPrint("Player %d has a negative '%s' unit type count of %d.\n",
+		           player.Index,
+		           type.Ident.c_str(),
+		           typecount);
 	}
 
 	if (typecount == 0) {
@@ -910,7 +913,7 @@ public:
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos < 0 || static_cast<unsigned int>(pos) >= good->size()) {
-						DebugPrint("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "
+						ErrorPrint("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "
 						           "size: %d, pos: %d, x: %d, xx: %d, y: %d, yy: %d\n",
 						           size,
 						           pos,
@@ -993,7 +996,7 @@ private:
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
 				if (pos < 0 || static_cast<unsigned int>(pos) >= good.size()) {
-					DebugPrint("BUG: RangeTargetFinder.Compute out of range. "
+					ErrorPrint("BUG: RangeTargetFinder.Compute out of range. "
 					           "size: %d, pos: %d, x: %d, xx: %d, y: %d, yy: %d \n",
 					           size,
 					           pos,

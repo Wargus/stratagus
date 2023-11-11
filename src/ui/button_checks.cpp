@@ -131,7 +131,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 
 		const int index = UnitTypeVar.VariableNameLookup[var];// User variables
 		if (index == -1) {
-			fprintf(stderr, "Bad variable name '%s'\n", var.data());
+			ErrorPrint("Bad variable name '%s'\n", var.data());
 			Exit(1);
 			return false;
 		}
@@ -147,7 +147,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 		} else if (type == "Percent") {
 			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
 		} else {
-			fprintf(stderr, "Bad variable type '%s'\n", type.data());
+			ErrorPrint("Bad variable type '%s'\n", type.data());
 			Exit(1);
 			return false;
 		}
@@ -166,7 +166,7 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 		} else if (binop == "!=") {
 			cmpResult = varValue != cmpValue;
 		} else {
-			fprintf(stderr, "Bad compare type '%s'\n", binop.data());
+			ErrorPrint("Bad compare type '%s'\n", binop.data());
 			Exit(1);
 			return false;
 		}

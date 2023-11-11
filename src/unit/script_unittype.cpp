@@ -397,7 +397,7 @@ static std::optional<EMouseAction> ToEMouseAction(std::string_view s)
 	} else if (s == "sail") {
 		return EMouseAction::Sail;
 	}
-	DebugPrint("Unknown mouse action '%s'", s.data());
+	ErrorPrint("Unknown mouse action '%s'", s.data());
 	return std::nullopt;
 }
 
@@ -410,7 +410,7 @@ EMovement toEMovement(std::string_view s)
 	} else if (s == "naval") {
 		return EMovement::Naval;
 	} else {
-		fprintf(stderr, "Unsupported move type: %s", s.data());
+		ErrorPrint("Unsupported move type: '%s'", s.data());
 		ExitFatal(-1);
 	}
 }
@@ -422,7 +422,7 @@ std::string_view toString(EMovement move)
 		case EMovement::Fly: return "fly";
 		case EMovement::Naval: return "naval";
 	}
-	fprintf(stderr, "Unsupported move type");
+	ErrorPrint("Unsupported move type");
 	ExitFatal(-1);
 }
 
@@ -2407,11 +2407,11 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 					type.Stats[player].Variables[variable_index].Enable = type.MapDefaultStat.Variables[variable_index].Enable;
 				}
 			} else {
-				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
+				ErrorPrint("Invalid type: '%s'\n", variable_type.c_str());
 				return;
 			}
 		} else {
-			fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
+			ErrorPrint("Invalid variable: '%s'\n", variable_key.c_str());
 			return;
 		}
 	}

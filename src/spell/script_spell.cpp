@@ -289,7 +289,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 				if (var == "Distance") {
 					index = ACP_DISTANCE;
 				} else {
-					fprintf(stderr, "Bad variable name '%s'\n", var.data());
+					ErrorPrint("Bad variable name '%s'\n", var.data());
 					Exit(1);
 				}
 			}
@@ -320,7 +320,7 @@ static ETarget toETarget(std::string_view s)
 	} else if (s == "position") {
 		return ETarget::Position;
 	} else {
-		fprintf(stderr, "Unsupported spell target type tag: %s", s.data());
+		ErrorPrint("Unsupported spell target type tag: '%s'", s.data());
 		ExitFatal(-1);
 	}
 }
