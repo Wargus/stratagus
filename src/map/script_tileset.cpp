@@ -769,28 +769,29 @@ uint16_t CTilesetGraphicGenerator::checkForLayers(lua_State *luaStack) const
 **	@param isImg		if 'img' tag is exist then it will be setted by this function to true, false otherwise
 **	@return 			vector of parsed indexes
 **/
-std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const
+std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaStack, ESrcImageOption &isImg) const
 {
-	isImg = SrcImageOption::cNone;
+	isImg = ESrcImageOption::NoGraphics;
 
 	if (lua_istable(luaStack, -1)) {
-
-		lua_rawgeti(luaStack, -1, 1);	/// #1<
+		lua_rawgeti(luaStack, -1, 1); /// #1<
 		/// check if "img"/"img-base" tag is present
 		if (lua_isstring_strict(luaStack, -1)) {
-			const std::string parsingValue { LuaToString(luaStack, -1) };
+			const auto parsingValue = LuaToString(luaStack, -1);
 			if (parsingValue == "img") {
-				isImg = SrcImageOption::cNewGraphics;
+				isImg = ESrcImageOption::NewGraphics;
 			} else if (parsingValue == "img-base") {
-				isImg = SrcImageOption::cBaseGraphics;
+				isImg = ESrcImageOption::BaseGraphics;
+			} else {
+				ErrorPrint("Unknown tag '%s'", parsingValue.data());
 			}
 		}
-		lua_pop(luaStack, 1);	/// #1>
+		lua_pop(luaStack, 1); /// #1>
 	} else if (!lua_isnumber(luaStack, -1)) {
 		LuaError(luaStack, "incorrect argument");
 	}
 
-	return { CTilesetParser::parseTilesRange(luaStack, isImg != SrcImageOption::cNone ? 2 : 1) };
+	return { CTilesetParser::parseTilesRange(luaStack, isImg != ESrcImageOption::NoGraphics ? 2 : 1) };
 }
 
 /**
@@ -822,36 +823,32 @@ auto CTilesetGraphicGenerator::parseLayer(lua_State *luaStack, const bool isSing
 		}
 	}
 
-	SrcImageOption isImg = SrcImageOption::cNone;
+	ESrcImageOption isImg = ESrcImageOption::NoGraphics;
 	std::vector<tile_index> srcIndexes { parseSrcRange(luaStack, isImg) };
 
 	if (needToPopSrcBack) {
 		lua_pop(luaStack, 1);	/// #1>
 	}
 
-	const bool isUntouchedSrcGraphicsOnly = (isSingleLayer								/* there is an only layer */
-											 && isImg != SrcImageOption::cNewGraphics	/* this leyer consist of indexes of base graphics */
-											 && !withModifier)							/* there are no any modifiers */
-											 					? true
-																: false;
+	const bool isUntouchedSrcGraphicsOnly =
+		isSingleLayer && isImg != ESrcImageOption::NewGraphics && !withModifier;
 
 	std::vector<graphic_index> parsedIndexes;
 	sequence_of_images parsedImages;
 
 	for (auto const srcIndex : srcIndexes) {
-		if (isImg == SrcImageOption::cNone
+		if (isImg == ESrcImageOption::NoGraphics
 		    && (srcIndex == 0 || SrcTileset->tiles[srcIndex].tile == 0)) { /// empty frame|separator
 			parsedIndexes.push_back(0);
 			continue;
 		}
 		const graphic_index frameIdx =
-			isImg != SrcImageOption::cNone ? srcIndex : SrcTileset->tiles[srcIndex].tile;
+			isImg != ESrcImageOption::NoGraphics ? srcIndex : SrcTileset->tiles[srcIndex].tile;
 		if (isUntouchedSrcGraphicsOnly) {
 			parsedIndexes.push_back(frameIdx);
-
 		} else {
-			const CGraphic *srcGraphic = isImg == SrcImageOption::cNewGraphics	? SrcImgGraphic
-															   					: SrcTilesetGraphic;
+			const CGraphic *srcGraphic =
+				isImg == ESrcImageOption::NewGraphics ? SrcImgGraphic : SrcTilesetGraphic;
 			auto image { newBlankImage() };
 			srcGraphic->DrawFrame(frameIdx, 0, 0, image.get());
 			parsedImages.push_back(std::move(image));

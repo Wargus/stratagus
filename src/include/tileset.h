@@ -372,11 +372,11 @@ public:
 		return image;
 	}
 private:
-	enum class SrcImageOption { cNone = 0, cBaseGraphics = 1, cNewGraphics = 2 };
+	enum class ESrcImageOption { NoGraphics = 0, BaseGraphics = 1, NewGraphics = 2 };
 
 private:
 	uint16_t checkForLayers(lua_State *luaStack) const;
-	std::vector<tile_index> parseSrcRange(lua_State *luaStack, SrcImageOption &isImg) const;
+	std::vector<tile_index> parseSrcRange(lua_State *luaStack, ESrcImageOption &isImg) const;
 	auto parseLayer(lua_State *luaStack, const bool isSingleLayer = false) const;
 	std::set<uint32_t> parseArgsAsColors(lua_State *luaStack, const int firstArgPos = 2) const;
 	uint32_t getPixel(const void *const pixel, const uint8_t bpp) const;
