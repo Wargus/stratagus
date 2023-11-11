@@ -132,7 +132,9 @@ void CAnimation_Wiggle::Init(std::string_view s, lua_State *) /* override */
 	} else if (zarg == "z-displacement") {
 		this->isZDisplacement = true;
 	} else {
-		fprintf(stderr, "Bad flag, only 'z-displacement' expected at the end of wiggle animation, found '%s'\n", zarg.c_str());
+		ErrorPrint(
+			"Bad flag, only 'z-displacement' expected at the end of wiggle animation, found '%s'\n",
+			zarg.c_str());
 		ExitFatal(1);
 	}
 }

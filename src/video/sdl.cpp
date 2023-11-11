@@ -325,7 +325,7 @@ static void setDpiAware() {
 		// In any case, on these old Windows versions we have to do a bit of
 		// compatibility hacking. Windows 7 and below don't play well with
 		// opengl rendering and (for some odd reason) fullscreen.
-		fprintf(stdout, "\n!!! Detected old Windows version - forcing software renderer and windowed mode !!!\n\n");
+		fprintf(stdout, "\n!!! Detected old Windows version - forcing software renderer and windowed mode!!!\n\n");
 		SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "software", SDL_HINT_OVERRIDE);
 		VideoForceFullScreen = 1;
 		Video.FullScreen = 0;
@@ -351,7 +351,7 @@ void InitVideoSdl()
 					  SDL_INIT_AUDIO | SDL_INIT_VIDEO |
 					  SDL_INIT_EVENTS | SDL_INIT_TIMER);
 		if (res < 0) {
-			fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
+			ErrorPrint("Couldn't initialize SDL: %s\n", SDL_GetError());
 			exit(1);
 		}
 
@@ -406,8 +406,11 @@ void InitVideoSdl()
 	TheWindow = SDL_CreateWindow(win_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                             Video.WindowWidth, Video.WindowHeight, flags);
 	if (TheWindow == nullptr) {
-		fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n",
-				Video.Width, Video.Height, Video.Depth, SDL_GetError());
+		ErrorPrint("Couldn't set %dx%dx%d video mode: %s\n",
+		           Video.Width,
+		           Video.Height,
+		           Video.Depth,
+		           SDL_GetError());
 		exit(1);
 	}
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");

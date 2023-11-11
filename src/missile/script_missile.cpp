@@ -115,7 +115,7 @@ void MissileType::Load(lua_State *l)
 		} else if (value == "ChangeVariable") {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
-				fprintf(stderr, "Bad variable name '%s'\n", LuaToString(l, -1).data());
+				ErrorPrint("Bad variable name '%s'\n", LuaToString(l, -1).data());
 				Exit(1);
 				return;
 			}

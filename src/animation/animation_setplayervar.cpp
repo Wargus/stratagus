@@ -59,28 +59,28 @@ int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 	} else if (prop == "Resources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].Resources[resId] + Players[player].StoredResources[resId];
 	} else if (prop == "StoredResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].StoredResources[resId];
 	} else if (prop == "MaxResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].MaxResources[resId];
 	} else if (prop == "Incomes") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].Incomes[resId];
@@ -113,7 +113,7 @@ int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 	} else if (prop == "TotalResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		return Players[player].TotalResources[resId];
@@ -122,7 +122,7 @@ int GetPlayerData(int player, std::string_view prop, std::string_view arg)
 	} else if (prop == "TotalKills") {
 		return Players[player].TotalKills;
 	} else {
-		fprintf(stderr, "Invalid field: %s", prop.data());
+		ErrorPrint("Invalid field: %s", prop.data());
 		Exit(1);
 	}
 	return 0;
@@ -138,14 +138,14 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else if (prop == "Resources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].SetResource(resId, value, STORE_BOTH);
 	} else if (prop == "StoredResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].SetResource(resId, value, STORE_BUILDING);
@@ -164,7 +164,7 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else if (prop == "TotalResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
-			fprintf(stderr, "Invalid resource \"%s\"", arg.data());
+			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
 		Players[player].TotalResources[resId] = value;
@@ -173,7 +173,7 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 	} else if (prop == "TotalKills") {
 		Players[player].TotalKills = value;
 	} else {
-		fprintf(stderr, "Invalid field: %s", prop.data());
+		ErrorPrint("Invalid field: %s", prop.data());
 		Exit(1);
 	}
 }

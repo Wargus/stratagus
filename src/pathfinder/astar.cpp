@@ -448,8 +448,8 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int64_t costs)
 	const Open *open;
 
 	if (OpenSetSize + 1 >= OpenSetMaxSize) {
-		fprintf(stderr, "A* internal error: raise Open Set Max Size "
-				"(current value %d)\n", OpenSetMaxSize);
+		ErrorPrint("A* internal error: raise Open Set Max Size (current value %d)\n",
+		           OpenSetMaxSize);
 		ProfileEnd("AStarAddNode");
 		return PF_FAILED;
 	}
@@ -1277,7 +1277,7 @@ void AStarDumpStats()
 void SetAStarFixedUnitCrossingCost(int cost)
 {
 	if (cost <= 3) {
-		fprintf(stderr, "AStarFixedUnitCrossingCost must be greater than 3\n");
+		ErrorPrint("AStarFixedUnitCrossingCost must be greater than 3\n");
 	}
 }
 int GetAStarFixedUnitCrossingCost()
@@ -1289,7 +1289,7 @@ int GetAStarFixedUnitCrossingCost()
 void SetAStarMovingUnitCrossingCost(int cost)
 {
 	if (cost <= 3) {
-		fprintf(stderr, "AStarMovingUnitCrossingCost must be greater than 3\n");
+		ErrorPrint("AStarMovingUnitCrossingCost must be greater than 3\n");
 	}
 }
 int GetAStarMovingUnitCrossingCost()
@@ -1301,7 +1301,7 @@ int GetAStarMovingUnitCrossingCost()
 void SetAStarUnknownTerrainCost(int cost)
 {
 	if (cost < 0) {
-		fprintf(stderr, "AStarUnknownTerrainCost must be non-negative\n");
+		ErrorPrint("AStarUnknownTerrainCost must be non-negative\n");
 		return;
 	}
 	AStarUnknownTerrainCost = cost;

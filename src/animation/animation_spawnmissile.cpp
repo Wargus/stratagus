@@ -199,7 +199,7 @@ CAnimation_SpawnMissile::ParseAnimFlags(const std::string_view &parseflag) const
 		} else if (cur == "setdirection") {
 			flags |= SM_SetDirection;
 		} else {
-			fprintf(stderr, "Unknown animation flag: %s\n", cur.data());
+			ErrorPrint("Unknown animation flag: %s\n", cur.data());
 			ExitFatal(1);
 		}
 	}

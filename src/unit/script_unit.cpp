@@ -1414,7 +1414,10 @@ static int CclSetUnitVariable(lua_State *l)
 			} else {
 				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
 				if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
-					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
+					ErrorPrint("Player %d has a negative '%s' AI active count of %d.\n",
+					           unit->Player->Index,
+					           unit->Type->Ident.c_str(),
+					           unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
 				}
 			}
 		}

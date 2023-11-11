@@ -51,7 +51,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex) /* 
 		int i = UnitTypeVar.VariableNameLookup[name];
 
 		if (i == -1) {
-			LuaError(l, "in adjust-variable : Bad variable index : '%s'", name.data());
+			LuaError(l, "in adjust-variable: Bad variable index: '%s'", name.data());
 		}
 		if (lua_isnumber(l, -1)) {
 			this->Var[i].Enable = (LuaToNumber(l, -1) != 0);
@@ -99,7 +99,7 @@ void Spell_AdjustVariable::Parse(lua_State *l, int startIndex, int endIndex) /* 
 				}
 			}
 		} else {
-			LuaError(l, "in adjust-variable : Bad variable value");
+			LuaError(l, "in adjust-variable: Bad variable value");
 		}
 	}
 	lua_pop(l, 1); // pop table

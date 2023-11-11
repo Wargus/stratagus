@@ -187,7 +187,7 @@ void LuaCallback::run(int results)
 LuaCallback::~LuaCallback()
 {
 	if (rescount) {
-		fprintf(stderr, "There are still some results that weren't popped from stack\n");
+		ErrorPrint("There are still some results that weren't popped from stack\n");
 	}
 	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }

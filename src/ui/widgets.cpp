@@ -1198,7 +1198,7 @@ void ImageTextField::draw(gcn::Graphics *graphics)
 	}
 	CGraphic *img = this->itemImage;
 	if (!img) {
-		fprintf(stderr, "Not all graphics for ImageTextField were set\n");
+		ErrorPrint("Not all graphics for ImageTextField were set\n");
 		ExitFatal(1);
 	}
 	img->Resize(getWidth(), img->getHeight());
@@ -1644,8 +1644,8 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics)
 	if (!this->upButtonImage || !this->downButtonImage || !this->leftButtonImage || !this->rightButtonImage
 		|| !this->upPressedButtonImage || !this->downPressedButtonImage || !this->leftPressedButtonImage || !this->rightPressedButtonImage
 		|| !this->markerImage || !this->hBarButtonImage || !this->vBarButtonImage) {
-			fprintf(stderr, "Not all graphics for ImageListBoxWidget were set\n");
-			ExitFatal(1);
+		ErrorPrint("Not all graphics for ImageListBoxWidget were set\n");
+		ExitFatal(1);
 	}
 
 	gcn::Rectangle rect = getContentDimension();
@@ -2054,7 +2054,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 
 	CGraphic *img = this->itemImage;
 	if (!this->itemImage || !this->DownNormalImage || !this->DownPressedImage) {
-		fprintf(stderr, "Not all graphics for ImageDropDownWidget were set\n");
+		ErrorPrint("Not all graphics for ImageDropDownWidget were set\n");
 		ExitFatal(1);
 	}
 

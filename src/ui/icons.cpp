@@ -105,7 +105,8 @@ CIcon::~CIcon()
 {
 	IconMap::iterator it = Icons.find(ident);
 	if (it == Icons.end()) {
-		DebugPrint("icon not found: %s\n", ident.data());
+		ErrorPrint("icon not found: '%s'\n", ident.data());
+		ExitFatal(-1);
 	}
 	return it->second.get();
 }
@@ -380,7 +381,7 @@ bool IconConfig::Load()
 		ShowLoadProgress(_("Icon %s"), this->Name.c_str());
 		return true;
 	} else {
-		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
+		ErrorPrint("Can't find icon '%s'\n", this->Name.c_str());
 		return false;
 	}
 }

@@ -123,7 +123,7 @@ CAnimation_SpawnUnit::ParseAnimFlags(const std::string_view &parseflag) const /*
 		} else if (cur == "jointoai") {
 			flags |= SU_JoinToAIForce;
 		} else {
-			fprintf(stderr, "Unknown animation flag: %s\n", cur.data());
+			ErrorPrint("Unknown animation flag: %s\n", cur.data());
 			ExitFatal(1);
 		}
 	}

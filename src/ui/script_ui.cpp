@@ -758,7 +758,7 @@ static ETextAlignment ToTextAlignment(std::string_view value)
 	} else if (value == "Left") {
 		return ETextAlignment::Left;
 	} else {
-		fprintf(stderr, "Invalid text alignment: %s", value.data());
+		ErrorPrint("Invalid text alignment: '%s'", value.data());
 		ExitFatal(-1);
 	}
 }

@@ -129,14 +129,14 @@ void modifyValue(SetVar_ModifyTypes mod, int &value, int rop)
 		case SetVar_ModifyTypes::modMul: value *= rop; break;
 		case SetVar_ModifyTypes::modDiv:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in Animation\n");
+				ErrorPrint("Division by zero in Animation\n");
 				ExitFatal(1);
 			}
 			value /= rop;
 			break;
 		case SetVar_ModifyTypes::modMod:
 			if (!rop) {
-				fprintf(stderr, "Division by zero in Animation\n");
+				ErrorPrint("Division by zero in Animation\n");
 				ExitFatal(1);
 			}
 			value %= rop;
@@ -226,7 +226,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 		}
 		auto dot_pos = s.find('.', 2);
 		if (dot_pos == std::string_view::npos) {
-			fprintf(stderr, "Need also specify the variable '%s' tag \n", s.substr(2).data());
+			ErrorPrint("Need also specify the variable '%s' tag \n", s.substr(2).data());
 			ExitFatal(1);
 		}
 		auto cur = s.substr(2, dot_pos - 2);
@@ -240,7 +240,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 			} else if (cur == "_Distance") {
 				return unit.MapDistanceTo(*goal);
 			}
-			fprintf(stderr, "Bad variable name '%s'\n", cur.data());
+			ErrorPrint("Bad variable name '%s'\n", cur.data());
 			ExitFatal(1);
 		}
 		if (next == "Value") {
@@ -266,7 +266,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 		auto cur = s.substr(2);
 		const int index = UnitTypeVar.BoolFlagNameLookup[cur]; // User bool flags
 		if (index == -1) {
-			fprintf(stderr, "Bad bool-flag name '%s'\n", cur.data());
+			ErrorPrint("Bad bool-flag name '%s'\n", cur.data());
 			ExitFatal(1);
 		}
 		return goal->Type->BoolFlag[index].value;
@@ -292,7 +292,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 			cur = cur.substr(1);
 			auto parent_pos = cur.find(')');
 			if (parent_pos == std::string_view::npos) {
-				fprintf(stderr, "ParseAnimInt: expected ')'\n");
+				ErrorPrint("ParseAnimInt: expected ')'\n");
 				ExitFatal(1);
 			}
 			next = cur.substr(parent_pos + 1);
@@ -301,7 +301,7 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 			auto dot_pos = cur.find('.');
 
 			if (dot_pos == std::string_view::npos) {
-				fprintf(stderr, "Need also specify the %s player's property\n", cur.data());
+				ErrorPrint("Need also specify the %s player's property\n", cur.data());
 				ExitFatal(1);
 			} else {
 				next = cur.substr(dot_pos + 1);
@@ -428,7 +428,7 @@ CAnimations &AnimationsByIdent(std::string_view ident)
 	if (it != AnimationMap.end()) {
 		return *it->second;
 	}
-	DebugPrint("Unknown animation '%s'\n", ident.data());
+	ErrorPrint("Unknown animation '%s'\n", ident.data());
 	ExitFatal(1);
 }
 

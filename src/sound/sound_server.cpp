@@ -118,7 +118,7 @@ static bool External_Play(const std::string &file) {
 	if (!useNativeMidi) {
 		return false;
 	}
- 	static std::string midi = ".mid";
+	static std::string midi = ".mid";
 	auto it = midi.begin();
 	if (file.size() > midi.size() &&
 			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
@@ -181,9 +181,9 @@ static bool External_Play(const std::string &file) {
 		ZeroMemory(&si, sizeof(si));
 		si.cb = sizeof(si);
 		si.hStdError = hChildStd_ERR_Wr;
-   		si.hStdOutput = hChildStd_OUT_Wr;
-   		si.hStdInput = hChildStd_IN_Rd;
-   		si.dwFlags |= STARTF_USESTDHANDLES;
+		si.hStdOutput = hChildStd_OUT_Wr;
+		si.hStdInput = hChildStd_IN_Rd;
+		si.dwFlags |= STARTF_USESTDHANDLES;
 		ZeroMemory(&pi, sizeof(pi));
 		bool result = true;
 		TCHAR cmdline[4096]{};
@@ -191,13 +191,13 @@ static bool External_Play(const std::string &file) {
 		if (CreateProcess(nullptr, cmdline, nullptr, nullptr, TRUE, /* Handles are inherited */ CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
 			CloseHandle(hChildStd_OUT_Wr);
 			CloseHandle(hChildStd_ERR_Wr);
-      		CloseHandle(hChildStd_IN_Rd);
+			CloseHandle(hChildStd_IN_Rd);
 			externalPlayerIsPlaying = true;
 			g_hStatusThread = CreateThread(nullptr, 0, StatusThreadFunction, hChildStd_OUT_Rd, 0, nullptr);
 			g_hDebugThread = CreateThread(nullptr, 0, DebugThreadFunction, hChildStd_ERR_Rd, 0, nullptr);
 		} else {
 			result = false;
-			DebugPrint("CreateProcess failed (%d).\n", GetLastError());
+			ErrorPrint("CreateProcess failed (%d).\n", GetLastError());
 		}
 		return result;
 	}
@@ -277,7 +277,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 static void ChannelFinished(int channel)
 {
 	if (channel < 0 || channel >= MaxChannels) {
-		fprintf(stderr, "ERROR: Out of bounds channel (how?)\n");
+		ErrorPrint("ERROR: Out of bounds channel (how?)\n");
 		return;
 	}
 	if (Channels[channel].FinishedCallback != nullptr) {
@@ -424,7 +424,7 @@ Mix_Music *LoadMusic(const std::string &name)
 	Mix_Music *music = LoadMusic(filename.string().c_str());
 
 	if (music == nullptr) {
-		fprintf(stderr, "Can't load the music '%s'\n", name.c_str());
+		ErrorPrint("Can't load the music '%s'\n", name.c_str());
 	}
 	return music;
 }
@@ -444,7 +444,7 @@ Mix_Chunk *LoadSample(const std::string &name)
 	Mix_Chunk *sample = LoadSample(filename.string().c_str());
 
 	if (sample == nullptr) {
-		fprintf(stderr, "Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());
+		ErrorPrint("Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());
 	}
 	return sample;
 }
@@ -585,7 +585,7 @@ int PlayMusic(const std::string &file)
 		Mix_PlayMusic(music, 0);
 		return 0;
 	} else {
-		DebugPrint("Could not play %s\n", file.c_str());
+		ErrorPrint("Could not play '%s'\n", file.c_str());
 		return -1;
 	}
 }
@@ -695,7 +695,7 @@ static bool InitSdlSound()
 	// just activate everything we can by setting all bits
 	Mix_Init(std::numeric_limits<unsigned int>::max());
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024)) {
-		fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+		ErrorPrint("Couldn't open audio: %s\n", SDL_GetError());
 		return false;
 	} else {
 		printf("Supported sound decoders:");

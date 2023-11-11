@@ -126,7 +126,7 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 				ba->Value = SpellTypeByIdent(value).Slot;
 #ifdef DEBUG
 				if (ba->Value < 0) {
-					DebugPrint("Spell %s does not exist?\n", value.c_str());
+					ErrorPrint("Spell '%s' does not exist\n", value.c_str());
 					Assert(ba->Value >= 0);
 				}
 #endif

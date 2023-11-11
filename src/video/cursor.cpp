@@ -199,7 +199,7 @@ CCursor *CursorByIdent(std::string_view ident)
 			return &cursor;
 		}
 	}
-	DebugPrint("Cursor '%s' not found, please check your code.\n", ident.data());
+	ErrorPrint("Cursor '%s' not found, please check your code.\n", ident.data());
 	return nullptr;
 }
 

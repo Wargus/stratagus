@@ -137,7 +137,8 @@ CUpgrade::CUpgrade(std::string ident) :
 {
 	auto it = Upgrades.find(ident);
 	if (it == Upgrades.end()) {
-		DebugPrint("upgrade not found: %s\n", ident.data());
+		ErrorPrint("upgrade not found: '%s'\n", ident.data());
+		ExitFatal(-1);
 	}
 	return it->second;
 }
@@ -372,7 +373,7 @@ static int CclDefineAllow(lua_State *l)
 
 		int n = ids.size();
 		if (n > PlayerMax) {
-			fprintf(stderr, "%s: Allow string too long %d\n", ident.data(), n);
+			ErrorPrint("'%s': Allow string too long %d\n", ident.data(), n);
 			n = PlayerMax;
 		}
 
@@ -391,7 +392,7 @@ static int CclDefineAllow(lua_State *l)
 				AllowUpgradeId(Players[i], id, ids[i]);
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n", ident.data());
+			LuaError(l, " wrong ident %s\n", ident.data());
 		}
 	}
 	return 0;

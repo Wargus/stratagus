@@ -64,7 +64,7 @@ ELocBaseType toELocBaseType(std::string_view s)
 	} else if (s == "target") {
 		return ELocBaseType::Target;
 	} else {
-		fprintf(stderr, "Unsupported location base flag: %s", s.data());
+		ErrorPrint("Unsupported location base flag: '%s'", s.data());
 		ExitFatal(-1);
 	}
 }

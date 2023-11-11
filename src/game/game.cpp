@@ -184,13 +184,13 @@ static void LoadStratagusMap(const fs::path &smpdir, const fs::path &mapname)
 	}
 
 	if (LcmPreventRecurse) {
-		fprintf(stderr, "recursive use of load map!\n");
+		ErrorPrint("recursive use of load map!\n");
 		ExitFatal(-1);
 	}
 	InitPlayers();
 	LcmPreventRecurse = true;
 	if (LuaLoadFile(mapfull) == -1) {
-		fprintf(stderr, "Can't load lua file: %s\n", mapfull.u8string().c_str());
+		ErrorPrint("Can't load lua file: '%s'\n", mapfull.u8string().c_str());
 		ExitFatal(-1);
 	}
 	LcmPreventRecurse = false;
@@ -198,12 +198,12 @@ static void LoadStratagusMap(const fs::path &smpdir, const fs::path &mapname)
 #if 0
 	// Not true if multiplayer levels!
 	if (!ThisPlayer) { /// ARI: bomb if nothing was loaded!
-		fprintf(stderr, "%s: invalid map\n", mapname.u8string().c_str());
+		ErrorPrint("'%s': invalid map\n", mapname.u8string().c_str());
 		ExitFatal(-1);
 	}
 #endif
 	if (!Map.Info.MapWidth || !Map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid map\n", mapname.u8string().c_str());
+		ErrorPrint("'%s': invalid map\n", mapname.u8string().c_str());
 		ExitFatal(-1);
 	}
 	Map.Info.Filename = mapname.string();
@@ -284,7 +284,7 @@ static bool WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSi
 			f->printf("DefineMapSetup(\"%s\")\n", map.Info.Filename.c_str());
 		}
 	} catch (const FileException &) {
-		fprintf(stderr, "ERROR: cannot write the map presentation\n");
+		ErrorPrint("ERROR: cannot write the map presentation\n");
 		return false;
 	}
 	return true;
@@ -471,7 +471,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 		}
 
 	} catch (const FileException &) {
-		fprintf(stderr, "Can't save map setup : '%s' \n", mapSetup.u8string().c_str());
+		ErrorPrint("Can't save map setup: '%s'\n", mapSetup.u8string().c_str());
 		return false;
 	}
 	return true;
@@ -489,7 +489,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 bool SaveStratagusMap(const fs::path &mapName, CMap &map, int writeTerrain, Vec2i newSize, Vec2i offset)
 {
 	if (!map.Info.MapWidth || !map.Info.MapHeight) {
-		fprintf(stderr, "%s: invalid Stratagus map\n", mapName.u8string().c_str());
+		ErrorPrint("'%s': invalid Stratagus map\n", mapName.u8string().c_str());
 		ExitFatal(-1);
 	}
 
@@ -500,7 +500,7 @@ bool SaveStratagusMap(const fs::path &mapName, CMap &map, int writeTerrain, Vec2
 		mapSetup.replace_extension();
 	}
 	if (mapSetup.extension() != ".smp") {
-		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.u8string().c_str());
+		ErrorPrint("'%s': invalid Stratagus map filename\n", mapName.u8string().c_str());
 		return false;
 	}
 
@@ -546,7 +546,7 @@ static void LoadMap(const fs::path &filename, CMap &map)
 		return;
 	}
 
-	fprintf(stderr, "Unrecognized map format\n");
+	ErrorPrint("Unrecognized map format\n");
 	ExitFatal(-1);
 }
 
@@ -832,13 +832,14 @@ void CreateGame(const fs::path &filename, CMap *map)
 			}
 		} else {
 			// this is bad - we are starting a network game, but ThisPlayer is not assigned!!
-			fprintf(stderr, "FATAL ENGINE BUG! We are starting a network game, but ThisPlayer is not assigned!\n"
-				"\tNetPlayers: %d\n"
-				"\tNumPlayers: %d\n"
-				"\tNetLocalPlayerNumber: %d\n",
-				NetPlayers,
-				NumPlayers,
-				NetLocalPlayerNumber);
+			ErrorPrint("FATAL ENGINE BUG! "
+			           "We are starting a network game, but ThisPlayer is not assigned!\n"
+			           "\tNetPlayers: %d\n"
+			           "\tNumPlayers: %d\n"
+			           "\tNetLocalPlayerNumber: %d\n",
+			           NetPlayers,
+			           NumPlayers,
+			           NetLocalPlayerNumber);
 			EnableDebugPrint = true;
 			DebugPlayers();
 			printf("ServerSetupState\n");
@@ -1502,7 +1503,7 @@ static int CclSavedGameInfo(lua_State *l)
 			}
 			ranges::copy(filename, CurrentMapPath);
 			if (LuaLoadFile(fs::path(StratagusLibPath) / filename) == -1) {
-				DebugPrint("Load failed: %s\n", value.data());
+				ErrorPrint("Load failed: '%s'\n", filename.data());
 			}
 		} else if (value == "SyncHash") {
 			SyncHash = LuaToNumber(l, -1);

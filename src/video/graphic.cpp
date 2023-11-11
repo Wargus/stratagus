@@ -640,18 +640,18 @@ void CGraphic::Load(bool grayscale)
 	const fs::path name = LibraryFileName(File.string());
 	if (name.empty()) {
 		perror("Cannot find file");
-		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ErrorPrint("Can't load the graphic '%s'\n", File.u8string().c_str());
 		ExitFatal(-1);
 	}
 	if (fp->open(name.string().c_str(), CL_OPEN_READ) == -1) {
 		perror("Can't open file");
-		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ErrorPrint("Can't load the graphic '%s'\n", File.u8string().c_str());
 		ExitFatal(-1);
 	}
 	Surface = IMG_Load_RW(CFile::to_SDL_RWops(std::move(fp)), 1);
 	if (Surface == nullptr) {
-		fprintf(stderr, "Couldn't load file %s: %s", name.u8string().c_str(), IMG_GetError());
-		fprintf(stderr, "Can't load the graphic '%s'\n", File.u8string().c_str());
+		ErrorPrint("Couldn't load file '%s': %s", name.u8string().c_str(), IMG_GetError());
+		ErrorPrint("Can't load the graphic '%s'\n", File.u8string().c_str());
 		ExitFatal(-1);
 	}
 
@@ -673,9 +673,13 @@ void CGraphic::Load(bool grayscale)
 
 	if ((GraphicWidth / Width) * Width != GraphicWidth ||
 		(GraphicHeight / Height) * Height != GraphicHeight) {
-		fprintf(stderr, "Invalid graphic (width, height) %s\n", File.u8string().c_str());
-		fprintf(stderr, "Expected: (%d,%d)  Found: (%d,%d)\n",
-				Width, Height, GraphicWidth, GraphicHeight);
+		ErrorPrint("Invalid graphic (width, height) '%s'\n"
+		           "Expected: (%d,%d)  Found: (%d,%d)\n",
+		           File.u8string().c_str(),
+		           Width,
+		           Height,
+		           GraphicWidth,
+		           GraphicHeight);
 		ExitFatal(-1);
 	}
 
@@ -1205,8 +1209,8 @@ static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
 {
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
 	if (!alphaSurface) {
-		DebugPrint("%s\n", SDL_GetError());
-		Assert(false);
+		ErrorPrint("Cannot create surface: %s\n", SDL_GetError());
+		ExitFatal(-1);
 	}
 	SDL_BlitSurface(*src, nullptr, alphaSurface, nullptr);
 	SDL_SetSurfaceAlphaMod(alphaSurface, alpha);
@@ -1220,8 +1224,8 @@ static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames,
 	shrink = std::abs(shrink);
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
 	if (!alphaSurface) {
-		DebugPrint("%s\n", SDL_GetError());
-		Assert(false);
+		ErrorPrint("Cannot create surface: %s\n", SDL_GetError());
+		ExitFatal(-1);
 	}
 	for (int f = 0; f < numFrames; f++) {
 		int frameX = frameMap[f].x;

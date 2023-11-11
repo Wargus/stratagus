@@ -311,7 +311,7 @@ int CFile::PImpl::open(const char *name, long openflags)
 	} else if (openflags & CL_OPEN_WRITE) {
 		openstring = "wb";
 	} else {
-		DebugPrint("Bad CLopen flags");
+		ErrorPrint("Bad CLopen flags when opening \"%s\"\n", name);
 		Assert(0);
 		return -1;
 	}
@@ -386,7 +386,7 @@ int CFile::PImpl::open(const char *name, long openflags)
 	}
 
 	if (cl_type == ClfType::Invalid) {
-		//fprintf(stderr, "%s in ", buf);
+		//ErrorPrint("%s in ", buf);
 		return -1;
 	}
 	return 0;
@@ -734,7 +734,7 @@ public:
 	{
 		file = fopen(filename.string().c_str(), "wb");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.u8string().c_str());
+			ErrorPrint("Can't open file '%s' for writing\n", filename.u8string().c_str());
 			throw FileException();
 		}
 	}
@@ -759,7 +759,7 @@ public:
 	{
 		file = gzopen(filename.string().c_str(), "wb9");
 		if (!file) {
-			fprintf(stderr, "Can't open file '%s' for writing\n", filename.u8string().c_str());
+			ErrorPrint("Can't open file '%s' for writing\n", filename.u8string().c_str());
 			throw FileException();
 		}
 	}
