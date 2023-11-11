@@ -177,7 +177,20 @@ static void LoadStratagusMap(const fs::path &smpdir, const fs::path &mapname)
 	                       fs::path(StratagusLibPath) / smpdir / mapname,
 	                       fs::path(StratagusLibPath) / mapname,
 	                       fs::path(mapname)}) {
-		if (fs::exists(candidate)) {
+		const std::string_view extra_extensions[] = {
+			"",
+#ifdef USE_ZLIB
+			".gz",
+#endif
+#ifdef USE_BZ2LIB
+			".bz2",
+#endif
+		};
+		if (ranges::any_of(extra_extensions, [&](const auto extension) {
+				auto extra_candidate = candidate;
+				extra_candidate.replace_extension(candidate.extension().string() + extension.data());
+				return fs::exists(extra_candidate);
+			})) {
 			mapfull = candidate;
 			break;
 		}
