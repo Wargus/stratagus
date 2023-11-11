@@ -570,7 +570,7 @@ static int CclReplayLog(lua_State *l)
 */
 bool IsReplayGame()
 {
-	return ReplayGameType != EReplayType::None;
+	return ReplayGameType != EReplayType::NoReplay;
 }
 
 /**
@@ -632,7 +632,7 @@ void CleanReplayLog()
 	// }
 	GameObserve = false;
 	NetPlayers = 0;
-	ReplayGameType = EReplayType::None;
+	ReplayGameType = EReplayType::NoReplay;
 }
 
 /**

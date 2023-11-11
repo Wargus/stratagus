@@ -60,9 +60,6 @@
 #include <algorithm>
 #include <map>
 
-// Fix problems with defined None in X.h included though SDL.h
-#undef None
-
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -512,7 +509,7 @@ private:
 
 enum class EMouseAction
 {
-	None = 0, /// Nothing
+	NoAction = 0, /// Nothing
 	Attack = 1, /// Attack
 	Move = 2, /// Move
 	Harvest = 3, /// Harvest resources
@@ -522,7 +519,7 @@ enum class EMouseAction
 
 enum class ECanTargetFlag
 {
-	None = 0,
+	NulFlag = 0,
 	Land = 1, /// Can attack land units
 	Sea = 2, /// Can attack sea units
 	Air = 4, /// Can attack air units
@@ -659,9 +656,9 @@ public:
 	// TODO: not used
 	int AnnoyComputerFactor = 0;        /// How much this annoys the computer
 	int AiAdjacentRange = -1;           /// Min radius for AI build surroundings checking
-	EMouseAction MouseAction = EMouseAction::None; /// Right click action
+	EMouseAction MouseAction = EMouseAction::NoAction; /// Right click action
 	uint8_t RotationSpeed = 128;    /// Max unit.Direction change per frame. 128 is maximum
-	ECanTargetFlag CanTarget = ECanTargetFlag::None; /// Which units can it attack
+	ECanTargetFlag CanTarget = ECanTargetFlag::NulFlag; /// Which units can it attack
 
 	bool Flip = false;              /// Flip image when facing left
 	bool LandUnit = false;          /// Land animated

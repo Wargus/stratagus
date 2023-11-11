@@ -385,7 +385,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 static std::optional<EMouseAction> ToEMouseAction(std::string_view s)
 {
 	if (s == "none") {
-		return EMouseAction::None;
+		return EMouseAction::NoAction;
 	} else if (s == "attack") {
 		return EMouseAction::Attack;
 	} else if (s == "move") {
