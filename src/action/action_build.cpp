@@ -280,7 +280,7 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 
 	// Check if the building could be built there.
 
-	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
+	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1).value_or(nullptr);
 
 	if (ontop != nullptr) {
 		return ontop;
