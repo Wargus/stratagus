@@ -102,7 +102,7 @@
 **
 **    Class of the missile-type, defines the basic effects of the
 **    missile. Look at the different class identifiers for more
-**    information (::MissileClass::None, ...).
+**    information (::MissileClass::Nothing, ...).
 **
 **  MissileType::NumBounces
 **
@@ -323,7 +323,7 @@ class LuaCallback;
 */
 enum class MissileClass
 {
-	None,                     /// Missile does nothing
+	Nothing,                  /// Missile does nothing
 	PointToPoint,             /// Missile flies from x,y to x1,y1
 	PointToPointWithHit,      /// Missile flies from x,y to x1,y1 then shows hit animation.
 	PointToPointCycleOnce,    /// Missile flies from x,y to x1,y1 and animates ONCE from start to finish and back
@@ -384,7 +384,7 @@ public:
 	bool IgnoreWalls = true;          /// missile ignores Wall units on it's way
 	bool KillFirstUnit = false;       /// missile kills first unit blocking it's way
 
-	MissileClass Class = MissileClass::None; /// missile class
+	MissileClass Class = MissileClass::Nothing; /// missile class
 	int NumBounces = 0;            /// number of bounces
 	int ParabolCoefficient = 2048; /// parabol coefficient in parabolic missile
 	int StartDelay = 0;            /// missile start delay

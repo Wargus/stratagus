@@ -159,7 +159,7 @@ Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos
 	std::unique_ptr<Missile> missile;
 
 	switch (mtype.Class) {
-		case MissileClass::None: missile = std::make_unique<MissileNone>(); break;
+		case MissileClass::Nothing: missile = std::make_unique<MissileNone>(); break;
 		case MissileClass::PointToPoint: missile = std::make_unique<MissilePointToPoint>(); break;
 		case MissileClass::PointToPointWithHit: missile = std::make_unique<MissilePointToPointWithHit>(); break;
 		case MissileClass::PointToPointCycleOnce: missile = std::make_unique<MissilePointToPointCycleOnce>(); break;
@@ -318,7 +318,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// No missile hits immediately!
 	if (
-		unit.Type->Missile.Missile->Class == MissileClass::None
+		unit.Type->Missile.Missile->Class == MissileClass::Nothing
 		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 	) {
 		// No goal, take target coordinates

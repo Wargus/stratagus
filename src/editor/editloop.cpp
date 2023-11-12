@@ -109,11 +109,11 @@ enum class EditorActionType {
 };
 
 enum EditorOverlays {
-	cNone,
-	cUnpassable,
-	cNoBuildingAllowed,
-	cElevation,
-	cOpaque
+	NoOverlays,
+	Unpassable,
+	NoBuildingAllowed,
+	Elevation,
+	Opaque
 };
 struct EditorAction {
 	EditorActionType Type;
@@ -851,7 +851,7 @@ static void DrawIntoButtonArea()
 
 static void DrawInfoHighlightedOverlay()
 {
-	if (overlaysDropdown->getSelected() == EditorOverlays::cElevation) {
+	if (overlaysDropdown->getSelected() == EditorOverlays::Elevation) {
 		CLabel(GetGameFont())
 			.Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5,
 		          2,
@@ -1548,13 +1548,13 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			}
 			break;
 		case ']': /// Increace highlighted elevation level
-			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation
+			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 			    && Editor.HighlightElevationLevel < 255) {
 				Editor.HighlightElevationLevel++;
 			}
 			break;
 		case '[': /// Decreace highlighted elevation level
-			if (overlaysDropdown->getSelected() == EditorOverlays::cElevation
+			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 			    && Editor.HighlightElevationLevel > 0) {
 				Editor.HighlightElevationLevel--;
 			}
@@ -2153,20 +2153,20 @@ void EditorMainLoop()
 	auto overlaysDropdownListener = std::make_unique<LambdaActionListener>([&overlaysListStrings](const std::string&) {
 		const int selected = overlaysDropdown->getSelected();
 		switch (selected) {
-			case EditorOverlays::cNone:
+			case EditorOverlays::NoOverlays:
 				Editor.OverlayHighlighter = nullptr;
 				return;
-			case EditorOverlays::cUnpassable:
+			case EditorOverlays::Unpassable:
 				Editor.OverlayHighlighter = OverlayUnpassable;
 				return;
-			case EditorOverlays::cNoBuildingAllowed:
+			case EditorOverlays::NoBuildingAllowed:
 				Editor.OverlayHighlighter = OverlayNoBuildingAllowed;
 				return;
-			case EditorOverlays::cElevation:
+			case EditorOverlays::Elevation:
 				Editor.HighlightElevationLevel = 1;
 				Editor.OverlayHighlighter = OverlayElevation;
 				return;
-			case EditorOverlays::cOpaque:
+			case EditorOverlays::Opaque:
 				Editor.OverlayHighlighter = OverlayOpaque;
 				return;
 			default:

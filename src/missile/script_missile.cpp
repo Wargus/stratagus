@@ -63,7 +63,7 @@ static const std::map<std::string_view, MissileClass> MissileClassNames = {
 	{"missile-class-flame-shield", MissileClass::FlameShield},
 	{"missile-class-hit", MissileClass::Hit},
 	{"missile-class-land-mine", MissileClass::LandMine},
-	{"missile-class-none", MissileClass::None},
+	{"missile-class-none", MissileClass::Nothing},
 	{"missile-class-parabolic", MissileClass::Parabolic},
 	{"missile-class-point-to-point", MissileClass::PointToPoint},
 	{"missile-class-point-to-point-bounce", MissileClass::PointToPointBounce},

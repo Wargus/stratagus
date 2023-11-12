@@ -42,7 +42,7 @@
 ----------------------------------------------------------------------------*/
 
 enum class EReplayType {
-	None,          /// No replay
+	NoReplay,      /// No replay
 	SinglePlayer,  /// Single player replay
 	MultiPlayer    /// Multi player replay
 };                 /// Replay types

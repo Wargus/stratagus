@@ -3260,17 +3260,17 @@ bool CanTarget(const CUnitType &source, const CUnitType &dest)
 		{
 			if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
 				return (source.CanTarget & (ECanTargetFlag::Land | ECanTargetFlag::Sea))
-				    != ECanTargetFlag::None;
+				    != ECanTargetFlag::NulFlag;
 			}
-			return (source.CanTarget & ECanTargetFlag::Land) != ECanTargetFlag::None;
+			return (source.CanTarget & ECanTargetFlag::Land) != ECanTargetFlag::NulFlag;
 		}
 		case EMovement::Fly:
 		{
-			return (source.CanTarget & ECanTargetFlag::Air) != ECanTargetFlag::None;
+			return (source.CanTarget & ECanTargetFlag::Air) != ECanTargetFlag::NulFlag;
 		}
 		case EMovement::Naval:
 		{
-			return (source.CanTarget & ECanTargetFlag::Sea) != ECanTargetFlag::None;
+			return (source.CanTarget & ECanTargetFlag::Sea) != ECanTargetFlag::NulFlag;
 		}
 		default: return 0;
 	}
