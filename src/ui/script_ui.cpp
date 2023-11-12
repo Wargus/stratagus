@@ -1248,49 +1248,6 @@ static int CclSetGroupKeys(lua_State *l)
 /**
 ** <b>Description</b>
 **
-** Set basic map caracteristics.
-**
-**  @param l  Lua state.
-**
-** Example:
-**
-** <div class="example"><code><strong>PresentMap</strong>("Map description", 1, 128, 128, 17)</code></div>
-*/
-static int CclPresentMap(lua_State *l)
-{
-	LuaCheckArgs(l, 5);
-
-	Map.Info.Description = LuaToString(l, 1);
-	// Number of players in LuaToNumber(l, 3); // Not used yet.
-	Map.Info.MapWidth = LuaToNumber(l, 3);
-	Map.Info.MapHeight = LuaToNumber(l, 4);
-	Map.Info.MapUID = LuaToNumber(l, 5);
-
-	return 0;
-}
-
-/**
-** <b>Description</b>
-**
-** Define the lua file that will build the map
-**
-**  @param l  Lua state.
-**
-** Example:
-**
-** <div class="example"><code>-- Load map setup from file
-**		<strong>DefineMapSetup</strong>("Setup.sms")</code></div>
-*/
-static int CclDefineMapSetup(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	Map.Info.Filename = LuaToString(l, 1);
-
-	return 0;
-}
-/**
-** <b>Description</b>
-**
 ** Declare which codepage the font files are in. Text is handled internally
 ** as UTF-8 everywhere, but the font rendering system uses graphics with 256
 ** symbols. Commonly, DOS and early Windows games used codepage 437 or 1252 for
@@ -1356,9 +1313,6 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "CopyButtonsForUnitType", CclCopyButtonsForUnitType);
 
 	lua_register(Lua, "DefineButtonStyle", CclDefineButtonStyle);
-
-	lua_register(Lua, "PresentMap", CclPresentMap);
-	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 
 	//
 	// Look and feel of units
