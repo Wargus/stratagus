@@ -74,11 +74,18 @@ const std::string& Plural(const std::string& str, std::size_t count)
 */
 void LoadPO(const fs::path& filename)
 {
+	if (filename.empty()) { // Typically English
+		return;
+	}
 	const fs::path fullfilename = LibraryFileName(filename.string());
 	DebugPrint(
 		"LoadPO(\"%s\") -> \"%s\"\n", filename.u8string().c_str(), fullfilename.u8string().c_str());
 	
 	std::ifstream poFile(fullfilename);
+	if (!poFile) {
+		ErrorPrint("Cannot open '%s'\n", fullfilename.u8string().c_str());
+		return;
+	}
 	catalog.Add(poFile);
 }
 
