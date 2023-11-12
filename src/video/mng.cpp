@@ -51,8 +51,7 @@ uint32_t Mng::MaxFPS = 15;
 
 static mng_ptr MNG_DECL my_alloc(mng_size_t len)
 {
-	char *ptr = new char[len];
-	memset(ptr, 0, len);
+	char *ptr = new char[len]{};
 	return (mng_ptr)ptr;
 }
 
@@ -63,9 +62,8 @@ static void MNG_DECL my_free(mng_ptr ptr, mng_size_t)
 
 static mng_bool MNG_DECL my_openstream(mng_handle handle)
 {
-	Mng *mng;
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 
-	mng = (Mng *)mng_get_userdata(handle);
 	mng->fd = fopen(mng->name.c_str(), "rb");
 	if (!mng->fd) {
 		return MNG_FALSE;
@@ -75,9 +73,8 @@ static mng_bool MNG_DECL my_openstream(mng_handle handle)
 
 static mng_bool MNG_DECL my_closestream(mng_handle handle)
 {
-	Mng *mng;
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 
-	mng = (Mng *)mng_get_userdata(handle);
 	if (mng->fd) {
 		fclose(mng->fd);
 	}
@@ -87,9 +84,8 @@ static mng_bool MNG_DECL my_closestream(mng_handle handle)
 static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 buflen,
 									 mng_uint32p read)
 {
-	Mng *mng;
+	Mng *mng = (Mng *)mng_get_userdata(handle);
 
-	mng = (Mng *)mng_get_userdata(handle);
 	*read = fread(buf, 1, buflen, mng->fd);
 	return MNG_TRUE;
 }
@@ -110,43 +106,42 @@ static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
 	const Uint32 Gmask = 0x0000FF00;
 	const Uint32 Bmask = 0x00FF0000;
 #else
-	const Uint32 Rmask = 0xFF000000 >> 8;
-	const Uint32 Gmask = 0x00FF0000 >> 8;
-	const Uint32 Bmask = 0x0000FF00 >> 8;
+	const Uint32 Rmask = 0x00FF0000;
+	const Uint32 Gmask = 0x0000FF00;
+	const Uint32 Bmask = 0x000000FF;
 #endif
 
-	mng->buffer = new unsigned char[width * height * 3];
-	memset(mng->buffer, width * height * 3, sizeof(unsigned char));
+	mng->buffer.resize(width * height * 3);
+	memset(mng->buffer.data(), width * height * 3, sizeof(unsigned char));
 
-	mng->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height,
-										8 * 3, Rmask, Gmask, Bmask, 0);
+	mng->surface.reset(
+		SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8 * 3, Rmask, Gmask, Bmask, 0));
 	if (mng->surface == nullptr) {
 		ErrorPrint("Out of memory");
 		exit(1);
 	}
-	SDL_SetColorKey(mng->surface, 1, 0);
+	SDL_SetColorKey(mng->surface.get(), 1, 0);
 
 	return MNG_TRUE;
 }
 
 static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
 {
-	Mng *mng;
-
-	mng = (Mng *)mng_get_userdata(handle);
-	return mng->buffer + linenr * mng->surface->w * 3;
+	Mng *mng = (Mng *)mng_get_userdata(handle);
+	return &mng->buffer[linenr * mng->surface->w * 3];
 }
 
 static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
 									mng_uint32, mng_uint32)
 {
 	Mng *mng = (Mng *)mng_get_userdata(handle);
-	SDL_LockSurface(mng->surface);
+	SDL_LockSurface(mng->surface.get());
 	for (int i = 0; i < mng->surface->h; ++i) {
 		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
-			   mng->buffer + i * mng->surface->w * 3, mng->surface->w * 3);
+		       &mng->buffer[i * mng->surface->w * 3],
+		       mng->surface->w * 3);
 	}
-	SDL_UnlockSurface(mng->surface);
+	SDL_UnlockSurface(mng->surface.get());
 
 	return MNG_TRUE;
 }
@@ -186,23 +181,11 @@ static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
 	return MNG_TRUE;
 }
 
-
-Mng::Mng() :
-	name(""), fd(nullptr), handle(nullptr), surface(nullptr), buffer(nullptr),
-	ticks(0), iteration(0), is_dirty(false)
-{
-}
-
-
 Mng::~Mng()
 {
 	if (handle) {
 		mng_cleanup(&handle);
 	}
-	if (surface) {
-		SDL_FreeSurface(surface);
-	}
-	delete[] buffer;
 }
 
 /**
@@ -218,7 +201,7 @@ void Mng::Draw(int x, int y)
 	}
 
 	SDL_Rect rect = {(short int)x, (short int)y, (short unsigned int)(surface->w), (short unsigned int)(surface->h)};
-	SDL_BlitSurface(surface, nullptr, TheScreen, &rect);
+	SDL_BlitSurface(surface.get(), nullptr, TheScreen, &rect);
 }
 
 static std::map<std::string, Mng *> MngCache;
@@ -256,7 +239,7 @@ void Mng::Free(Mng *mng)
 bool Mng::Load()
 {
 	if (handle) {
-		return handle != MNG_NULL && surface && iteration != 0x7fffffff;
+		return surface && iteration != 0x7fffffff;
 	}
 	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
 	if (handle == MNG_NULL) {
@@ -305,7 +288,7 @@ void* Mng::_getData() const
 	} else {
 		is_dirty = false;
 	}
-	return surface;
+	return surface.get();
 }
 
 #endif // USE_MNG
