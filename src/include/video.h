@@ -42,6 +42,7 @@
 #include <SDL.h>
 #include <guichan.h>
 #include <string_view>
+#include <vector>
 
 class CFont;
 
@@ -237,7 +238,7 @@ public:
 
 class Mng : public gcn::Image
 {
-	Mng();
+	Mng() = default;
 	~Mng();
 
 	uint32_t refcnt = 0;
@@ -257,14 +258,14 @@ public:
 
 	static uint32_t MaxFPS;
 
-	mutable bool is_dirty;
+	mutable bool is_dirty = false;
 	std::string name;
-	FILE *fd;
-	mng_handle handle;
-	SDL_Surface *surface;
-	unsigned char *buffer;
-	unsigned long ticks;
-	int iteration;
+	FILE *fd = nullptr;
+	mng_handle handle = nullptr;
+	sdl2::SurfacePtr surface;
+	std::vector<unsigned char> buffer;
+	unsigned long ticks = 0;
+	int iteration = 0;
 };
 #else
 /// empty class for lua scripts
