@@ -239,8 +239,6 @@ static void DrawBuildingCursor()
 	const Vec2i mpos = vp.ScreenToTilePos(CursorScreenPos);
 	const PixelPos screenPos = vp.TilePosToScreen_TopLeft(mpos);
 
-	CUnit *ontop = nullptr;
-
 	//
 	//  Draw building
 	//
@@ -263,16 +261,17 @@ static void DrawBuildingCursor()
 	//
 	//  Draw the allow overlay
 	//
-	bool f;
+	std::optional<CUnit *> ontop = std::nullopt;
+
 	if (!Selected.empty()) {
-		f = true;
+		bool f = true;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
 			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos).value_or(nullptr)) != nullptr);
 			// Assign ontop or nullptr
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(nullptr, *CursorBuilding, mpos).value_or(nullptr)) != nullptr);
+		ontop = CanBuildHere(nullptr, *CursorBuilding, mpos);
 		if (!Editor.Running) {
 			ontop = nullptr;
 		}
@@ -291,7 +290,7 @@ static void DrawBuildingCursor()
 			const Vec2i posIt(mpos.x + w, mpos.y + h);
 			Uint32 color;
 
-			if (f && (ontop ||
+			if (ontop && (*ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))

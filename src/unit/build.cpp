@@ -416,11 +416,30 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 	return false;
 }
 
+static bool HasAtLeastOneCoastTile(const Vec2i &pos, const CUnitType &type)
+{
+	const int width = std::min<int>(type.TileWidth, Map.Info.MapWidth - pos.x);
+	const int height = std::min<int>(type.TileHeight, Map.Info.MapHeight - pos.y);
+	unsigned int index = Map.getIndex(pos);
+
+	for (int h = 0; h != height; ++h) {
+		const CMapField *mf = Map.Field(index);
+		for (int w = 0; w != width; ++w) {
+			if (mf->CoastOnMap()) {
+				return true;
+			}
+			++mf;
+		}
+		index += Map.Info.MapWidth;
+	}
+	return false;
+}
 
 /**
 **  Can build unit here.
 **  Hall too near to goldmine.
 **  Refinery or shipyard too near to oil patch.
+**  Does NOT check terrain flag (allow to test later valid/invalid tile)
 **
 **  @param unit  Unit doing the building
 **  @param type  unit-type to be checked.
@@ -431,54 +450,24 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 std::optional<CUnit *> CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 {
 	//  Can't build outside the map
-	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
-		return std::nullopt;
-	}
-	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
+	if (pos.x + type.TileWidth > Map.Info.MapWidth
+	    || pos.y + type.TileHeight > Map.Info.MapHeight) {
 		return std::nullopt;
 	}
 
 	// Must be checked before oil!
 	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
-		const int width = type.TileWidth;
-		int h = type.TileHeight;
-		bool success = false;
-
-		// Need at least one coast tile
-		unsigned int index = Map.getIndex(pos);
-		do {
-			const CMapField *mf = Map.Field(index);
-			int w = width;
-			do {
-				if (mf->CoastOnMap()) {
-					success = true;
-				}
-				++mf;
-			} while (!success && --w);
-			index += Map.Info.MapWidth;
-		} while (!success && --h);
-		if (!success) {
+		if (!HasAtLeastOneCoastTile(pos, type)) {
 			return std::nullopt;
 		}
 	}
 
 	// Check special rules for AI players
 	if (unit && unit->Player->AiEnabled) {
-		bool aiChecked = true;
-		if (!type.AiBuildingRules.empty()) {
-			CUnit *ontoptarget = nullptr;
-			for (auto &rule : type.AiBuildingRules) {
-				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget)) {
-					// We passed a full ruleset
-					aiChecked = true;
-					break;
-				} else {
-					aiChecked = false;
-				}
-			}
-		}
-		if (aiChecked == false) {
+		if (ranges::none_of(type.AiBuildingRules, [&](const auto &rule) {
+				CUnit *ontoptarget = nullptr;
+				return rule->Check(unit, type, pos, ontoptarget);
+			})) {
 			return std::nullopt;
 		}
 	}
@@ -520,15 +509,15 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 **  @param pos   tile map position.
 **  @param real  Really build, or just placement
 **
-**  @return      OnTop, parent unit, builder on true, nullptr false.
-**
+**  @return      OnTop, parent unit, builder on true, nullopt false.
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
+std::optional<CUnit *>
+CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
 {
 	// Terrain Flags don't matter if building on top of a unit.
 	std::optional<CUnit *> ontop = CanBuildHere(unit, type, pos);
 	if (ontop == std::nullopt) {
-		return nullptr;
+		return std::nullopt;
 	}
 	if (*ontop != nullptr && *ontop != unit) {
 		return *ontop;
@@ -548,12 +537,6 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 	unsigned int index = pos.y * Map.Info.MapWidth;
 	for (int h = 0; h < type.TileHeight; ++h) {
 		for (int w = type.TileWidth; w--;) {
-			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
-				h = type.TileHeight;
-				*ontop = nullptr;
-				break;
-			}
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(*player,
@@ -561,16 +544,16 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			} else {
 				testmask = type.MovementMask;
 			}
-			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
+			/*second part of if (!CanBuildOn(x + w, y + h, testmask)) */
 			const CMapField &mf = *Map.Field(index + pos.x + w);
 			if (mf.CheckMask(testmask)) {
 				h = type.TileHeight;
-				*ontop = nullptr;
+				ontop = std::nullopt;
 				break;
 			}
 			if (player && !mf.playerInfo.IsExplored(*player)) {
 				h = type.TileHeight;
-				*ontop = nullptr;
+				ontop = std::nullopt;
 				break;
 			}
 		}
@@ -579,8 +562,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 	if (unit) {
 		MarkUnitFieldFlags(*unit);
 	}
-	// We can build here: check distance to gold mine/oil patch!
-	return *ontop;
+	return ontop;
 }
 
 //@}

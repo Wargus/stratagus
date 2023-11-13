@@ -597,7 +597,8 @@ CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
 /// @todo more docu
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 /// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
+extern std::optional<CUnit *>
+CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(std::string_view death);
 
