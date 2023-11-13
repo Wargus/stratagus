@@ -1078,8 +1078,17 @@ static int CclPresentMap(lua_State *l)
 	Map.Info.MapUID = LuaToNumber(l, 5);
 	
 	if(LuaGetArgsNum(l) >= 6) {
-		Map.Info.EnableHighgrounds(LuaToNumber(l, 6));
+		Map.Info.EnableHighgrounds(LuaToBoolean(l, 6));
 	}
+
+	return 0;
+}
+
+static int CclMapEnableHighgrounds(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	Map.Info.EnableHighgrounds(LuaToBoolean(l, 1));
 
 	return 0;
 }
@@ -1087,7 +1096,7 @@ static int CclPresentMap(lua_State *l)
 static int CclIsHighgroundsEnabled(lua_State *l)
 {
 	lua_pushboolean(l, Map.Info.IsHighgroundsEnabled());
-	return 0;
+	return 1;
 }
 
 /**
@@ -1168,7 +1177,9 @@ void MapCclRegister()
 	lua_register(Lua, "GetIsGameHoster", CclGetIsGameHoster);
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
+	lua_register(Lua, "MapEnableHighgrounds", CclMapEnableHighgrounds);
 	lua_register(Lua, "isHighgroundsEnabled", CclIsHighgroundsEnabled);
+
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 }
 
