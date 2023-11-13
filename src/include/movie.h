@@ -33,7 +33,7 @@
 //@{
 
 #include <SDL.h>
-#include <guichan.h>
+#include <guichan.hpp>
 
 #ifdef USE_VORBIS
 

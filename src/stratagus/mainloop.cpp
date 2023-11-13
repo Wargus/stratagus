@@ -58,7 +58,7 @@
 # include <coz.h>
 #endif
 
-#include <guichan.h>
+#include <guichan.hpp>
 void DrawGuichanWidgets();
 
 

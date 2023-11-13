@@ -64,7 +64,7 @@
 #include "video.h"
 #include "widgets.h"
 
-#include <guichan.h>
+#include <guichan.hpp>
 
 extern void DoScrollArea(int state, bool fast, bool isKeyboard);
 extern void DrawGuichanWidgets();
