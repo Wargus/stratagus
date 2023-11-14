@@ -64,7 +64,6 @@
 #include "guichan/widgets/scrollarea.h"
 #include "guichan/widgets/textbox.h"
 #include "guichan/exception.h"
-#include "util.h"
 
 namespace gcn
 {
@@ -191,28 +190,7 @@ namespace gcn
 
             mCaretColumn = getFont()->getStringIndexAt(mTextRows[mCaretRow], x);
         }
-        else if (hasMouse() && button == MouseInput::MIDDLE)
-        {
-            std::string str;
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-            }
-        }
     }
-
-	static int FindNext(const std::string &text, int curpos)
-	{
-		if (curpos < 0) return 0;
-		while (curpos < (int)text.size()) {
-			if ((text[curpos] & 0xC0) != 0x80) {
-				return curpos;
-			}
-			++curpos;
-		}
-		return text.size();
-	}
 
     bool TextBox::keyPress(const Key& key)
     {
@@ -220,7 +198,7 @@ namespace gcn
 
         if (key.getValue() == Key::K_LEFT)
         {
-            mCaretColumn = UTF8GetPrev(mTextRows[mCaretRow], mCaretColumn);
+            --mCaretColumn;
             if (mCaretColumn < 0)
             {
                 --mCaretRow;
@@ -240,7 +218,7 @@ namespace gcn
 
         else if (key.getValue() == Key::K_RIGHT)
         {
-            mCaretColumn = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
+            ++mCaretColumn;
             if (mCaretColumn > (int)mTextRows[mCaretRow].size())
             {
                 ++mCaretRow;
@@ -301,9 +279,8 @@ namespace gcn
                  && mCaretColumn != 0
                  && mEditable)
         {
-			int newpos = UTF8GetPrev(mTextRows[mCaretRow], mCaretColumn);
-            mTextRows[mCaretRow].erase(newpos, mCaretColumn - newpos);
-            mCaretColumn = newpos;
+            mTextRows[mCaretRow].erase(mCaretColumn - 1, 1);
+            --mCaretColumn;
             ret = true;
         }
 
@@ -323,8 +300,7 @@ namespace gcn
                  && mCaretColumn < (int)mTextRows[mCaretRow].size()
                  && mEditable)
         {
-			int newpos = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
-            mTextRows[mCaretRow].erase(mCaretColumn, newpos - mCaretColumn);
+            mTextRows[mCaretRow].erase(mCaretColumn, 1);
             ret = true;
         }
 
@@ -374,22 +350,11 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.isControlPressed() && key.getValue() == 'v' && mEditable) // ctrl-v
-        {
-            std::string str;
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-                ret = true;
-            }
-        }
-
         else if (key.isCharacter()
                  && mEditable)
         {
-            mTextRows[mCaretRow].insert(mCaretColumn,key.toString());
-            mCaretColumn = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
+            mTextRows[mCaretRow].insert(mCaretColumn,std::string(1,(char)key.getValue()));
+            ++mCaretColumn;
             ret = true;
         }
 
@@ -469,8 +434,6 @@ namespace gcn
         {
             mCaretRow = 0;
         }
-
-        setCaretColumn(mCaretColumn);
     }
 
     unsigned int TextBox::getCaretRow() const
@@ -491,8 +454,6 @@ namespace gcn
         {
             mCaretColumn = 0;
         }
-
-		mCaretColumn = FindNext(mTextRows[mCaretRow], mCaretColumn);
     }
 
     unsigned int TextBox::getCaretColumn() const

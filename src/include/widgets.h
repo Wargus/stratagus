@@ -257,11 +257,50 @@ private:
 	/// @todo Method to set this variable. Maybe set the variable static.
 };
 
-class ImageTextField : public gcn::TextField
+// Similar to gcn::TextBox but
+// - handles clipboard
+// - handles UTF-8
+// - handles more shortcuts
+class CTextBox : public gcn::TextBox
 {
 public:
-	ImageTextField() : TextField(), itemImage(nullptr) {}
-	ImageTextField(const std::string& text) : gcn::TextField(text), itemImage(nullptr) {}
+	using gcn::TextBox::TextBox;
+	void mousePress(int x, int y, int button) override;
+	bool keyPress(const gcn::Key &key) override;
+
+	void setCaretColumn(int column) override;
+};
+
+// Similar to gcn::TextField but
+// - handles selection
+// - have password mode
+// - handles clipboard
+// - handles UTF-8
+// - handles more shortcuts
+class CTextField : public gcn::TextField
+{
+public:
+	CTextField() = default;
+	explicit CTextField(const std::string &text) : TextField(text) {}
+
+	void draw(gcn::Graphics *graphics) override;
+	void mousePress(int x, int y, int button) override;
+	void mouseMotion(int x, int y) override;
+	bool keyPress(const gcn::Key &key) override;
+
+	void setPassword(bool flag) { isPassword = flag; }
+	void getTextSelectionPositions(unsigned int *first, unsigned int *len) const;
+protected:
+	int mSelectStart = 0;
+	int mSelectEndOffset = 0;
+	bool isPassword = false;
+};
+
+class ImageTextField : public CTextField
+{
+public:
+	ImageTextField() : CTextField(), itemImage(nullptr) {}
+	ImageTextField(const std::string &text) : CTextField(text), itemImage(nullptr) {}
 	void draw(gcn::Graphics *graphics) override;
 	void drawBorder(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }

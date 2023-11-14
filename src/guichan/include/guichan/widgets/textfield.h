@@ -135,14 +135,6 @@ namespace gcn
          */
         virtual unsigned int getCaretPosition() const;
 
-        /**
-         * @brief Set's the flag to make this a password field.
-         */
-        virtual void setPassword(bool flag);
-
-		/// Gets the currently selected text
-		virtual void getTextSelectionPositions(unsigned int* first, unsigned int* len);
-
         // Inherited from Widget
 
         virtual void fontChanged();
@@ -169,11 +161,8 @@ namespace gcn
         void fixScroll();
 
         std::string mText;
-        int mCaretPosition;
+        unsigned int mCaretPosition;
         int mXScroll;
-		int mSelectStart;
-		int mSelectEndOffset;
-        bool isPassword;
     };
 }
 

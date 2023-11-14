@@ -55,12 +55,10 @@
 /*
  * For comments regarding functions please see the header file.
  */
-#include <assert.h>
+
 #include "guichan/keyinput.h"
 #include "guichan/mouseinput.h"
 #include "guichan/widgets/textfield.h"
-#include "guichan/exception.h"
-#include "util.h"
 
 namespace gcn
 {
@@ -68,9 +66,6 @@ namespace gcn
     {
         mCaretPosition = 0;
         mXScroll = 0;
-		mSelectStart = 0;
-		mSelectEndOffset = 0;
-        isPassword = false;
 
         setFocusable(true);
 
@@ -84,9 +79,6 @@ namespace gcn
     {
         mCaretPosition = 0;
         mXScroll = 0;
-		mSelectStart = 0;
-		mSelectEndOffset = 0;
-        isPassword = false;
 
         mText = text;
         adjustSize();
@@ -100,7 +92,7 @@ namespace gcn
 
     void TextField::setText(const std::string& text)
     {
-        if ((int)text.size() < mCaretPosition )
+        if(text.size() < mCaretPosition )
         {
             mCaretPosition = text.size();
         }
@@ -110,51 +102,18 @@ namespace gcn
 
     void TextField::draw(Graphics* graphics)
     {
-		Font *font;
-		int x, y;
-        std::string drawText;
-        if (isPassword) {
-            drawText = std::string(mText.size(), '*');
-        } else {
-            drawText = mText;
-        }
         Color faceColor = getBackgroundColor();
         graphics->setColor(faceColor);
         graphics->fillRectangle(Rectangle(0, 0, getWidth(), getHeight()));
 
         if (hasFocus())
         {
-            drawCaret(graphics, getFont()->getWidth(drawText.substr(0, mCaretPosition)) - mXScroll);
+            drawCaret(graphics, getFont()->getWidth(mText.substr(0, mCaretPosition)) - mXScroll);
         }
 
         graphics->setColor(getForegroundColor());
-		font = getFont();
-        graphics->setFont(font);
-
-		x = 1 - mXScroll;
-		y = 1;
-
-		if (mSelectEndOffset != 0)
-		{
-			unsigned int first;
-			unsigned int len;
-			int selX;
-			int selW;
-			std::string tmpStr;
-
-			getTextSelectionPositions(&first, &len);
-
-			tmpStr = std::string(drawText.substr(0, first));
-			selX = font->getWidth(tmpStr);
-
-			tmpStr = std::string(drawText.substr(first, len));
-			selW = font->getWidth(tmpStr);
-
-			graphics->setColor(Color(127, 127, 127));
-			graphics->fillRectangle(Rectangle(x + selX, y, selW, font->getHeight()));
-		}
-
-        graphics->drawText(drawText, x, y);
+        graphics->setFont(getFont());
+        graphics->drawText(mText, 1 - mXScroll, 1);
     }
 
     void TextField::drawBorder(Graphics* graphics)
@@ -192,18 +151,7 @@ namespace gcn
         if (hasMouse() && button == MouseInput::LEFT)
         {
             mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
-			mSelectStart = mCaretPosition;
-			mSelectEndOffset = 0;
             fixScroll();
-        }
-        else if (hasMouse() && button == MouseInput::MIDDLE)
-        {
-            std::string str;
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-            }
         }
     }
 
@@ -212,7 +160,6 @@ namespace gcn
 		if (isDragged() && mClickButton == MouseInput::LEFT)
 		{
 			mCaretPosition = getFont()->getStringIndexAt(mText, x + mXScroll);
-			mSelectEndOffset = mCaretPosition - mSelectStart;
 			setDirty(true);
 		}
 	}
@@ -220,91 +167,30 @@ namespace gcn
     bool TextField::keyPress(const Key& key)
     {
         bool ret = false;
-        unsigned int selFirst;
-        unsigned int selLen;
 
-        getTextSelectionPositions(&selFirst, &selLen);
-
-        if (key.getValue() == Key::K_LEFT)
+        if (key.getValue() == Key::K_LEFT && mCaretPosition > 0)
         {
-            if (mCaretPosition > 0) {
-                mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
-                if (mCaretPosition < 0) {
-                    //throw GCN_EXCEPTION("Invalid UTF8.");
-                    assert(!"Invalid UTF8.");
-                }
-
-                if (key.isShiftPressed()) {
-                    --mSelectEndOffset;
-                } else {
-                    mSelectStart = mCaretPosition;
-                    mSelectEndOffset = 0;
-                }
-            } else if (!key.isShiftPressed()) {
-                mSelectStart = mCaretPosition;
-                mSelectEndOffset = 0;
-            }
+            --mCaretPosition;
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_RIGHT)
+        else if (key.getValue() == Key::K_RIGHT && mCaretPosition < mText.size())
         {
-            if (mCaretPosition < (int)mText.size()) {
-                mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-                if (mCaretPosition > (int)mText.size()) {
-                    //throw GCN_EXCEPTION("Invalid UTF8.");
-                    assert(!"Invalid UTF8.");
-                }
-
-                if (key.isShiftPressed()) {
-                    ++mSelectEndOffset;
-                } else {
-                    mSelectStart = mCaretPosition;
-                    mSelectEndOffset = 0;
-                }
-            } else if (!key.isShiftPressed()) {
-                mSelectStart = mCaretPosition;
-                mSelectEndOffset = 0;
-            }
-
+            ++mCaretPosition;
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_DELETE )
+        else if (key.getValue() == Key::K_DELETE && mCaretPosition < mText.size())
         {
-			if (selLen > 0) {
-				mText.erase(selFirst, selLen);
-				mCaretPosition = selFirst;
-				mSelectStart = selFirst;
-				mSelectEndOffset = 0;
-			} else if (mCaretPosition < (int)mText.size()) {
-				int newpos = UTF8GetNext(mText, mCaretPosition);
-				if (mCaretPosition > (int)mText.size()) {
-					//throw GCN_EXCEPTION("Invalid UTF8.");
-					assert(!"Invalid UTF8.");
-				}
-				mText.erase(mCaretPosition, newpos - mCaretPosition);
-				ret = true;
-			}
+			mText.erase(mCaretPosition, 1);
+			ret = true;
         }
 
-        else if (key.getValue() == Key::K_BACKSPACE || (key.isControlPressed() && key.getValue() == 'h'))
+        else if (key.getValue() == Key::K_BACKSPACE && mCaretPosition > 0)
         {
-			if (selLen > 0) {
-				mText.erase(selFirst, selLen);
-				mCaretPosition = selFirst;
-				mSelectStart = selFirst;
-				mSelectEndOffset = 0;
-			} else if (mCaretPosition > 0) {
-				int newpos = UTF8GetPrev(mText, mCaretPosition);
-				if (mCaretPosition < 0) {
-					//throw GCN_EXCEPTION("Invalid UTF8.");
-					assert(!"Invalid UTF8.");
-				}
-				mText.erase(newpos, mCaretPosition - newpos);
-				mCaretPosition = newpos;
-				ret = true;
-			}
+			mText.erase(mCaretPosition - 1, 1);
+			--mCaretPosition;
+			ret = true;
         }
 
         else if (key.getValue() == Key::K_ENTER)
@@ -313,83 +199,23 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_HOME || (key.isControlPressed() && key.getValue() == 'a')) // ctrl-a
+        else if (key.getValue() == Key::K_HOME)
         {
-			if (key.isShiftPressed()) {
-				mSelectEndOffset -= mCaretPosition;
-			} else {
-				mSelectStart = 0;
-				mSelectEndOffset = 0;
-			}
             mCaretPosition = 0;
 			ret = true;
         }
 
-        else if (key.getValue() == Key::K_END || (key.isControlPressed() && key.getValue() == 'e'))  //ctrl-e
+        else if (key.getValue() == Key::K_END)
         {
-			if (key.isShiftPressed()) {
-				mSelectEndOffset += mText.size() - mCaretPosition;
-			} else {
-				mSelectStart = mText.size();
-				mSelectEndOffset = 0;
-			}
 			mCaretPosition = mText.size();
-
 			ret = true;
-        }
-
-        else if (key.isControlPressed() && key.getValue() == 'u') // ctrl-u
-        {
-            setText("");
-            ret = true;
-        }
-
-        else if (key.isControlPressed() && key.getValue() == 'c')
-        {
-            unsigned int f,l;
-            getTextSelectionPositions(&f, &l);
-			std::string s = std::string(mText.substr(f, l));
-            SetClipboard(s);
-            ret = true;
-        }
-
-        else if (key.isControlPressed() && key.getValue() == 'v') // ctrl-v
-        {
-            std::string str;
-			if (selLen > 0) {
-				mText.erase(selFirst, selLen);
-				mCaretPosition = selFirst;
-				mSelectStart = selFirst;
-				mSelectEndOffset = 0;
-			}
-
-            if (GetClipboard(str) >= 0) {
-                for (size_t i = 0; i < str.size(); ++i) {
-                    keyPress(Key(str[i]));
-                }
-                ret = true;
-            }
         }
 
         else if (key.isCharacter())
         {
-            if (selLen > 0) {
-                mText.erase(selFirst, selLen);
-                mCaretPosition = selFirst;
-                mSelectStart = selFirst;
-                mSelectEndOffset = 0;
-            }
-
-            mText.insert(mCaretPosition,key.toString());
-            mCaretPosition = UTF8GetNext(mText, mCaretPosition);
-            if (mCaretPosition > (int)mText.size()) {
-                //throw GCN_EXCEPTION("Invalid UTF8.");
-                assert(!"Invalid UTF8.");
-            }
-			mSelectStart = mCaretPosition;
-			mSelectEndOffset = 0;
-            ret = true;
-        }
+            mText.insert(mCaretPosition, std::string(1,(char)key.getValue()));
+            ++mCaretPosition;
+			ret = true;        }
 
         fixScroll();
         setDirty(true);
@@ -449,25 +275,6 @@ namespace gcn
     {
         return mCaretPosition;
     }
-
-    void TextField::setPassword(bool flag)
-    {
-        isPassword = flag;
-    }
-
-	void TextField::getTextSelectionPositions(unsigned int* first, unsigned int* len)
-	{
-		if (mSelectEndOffset < 0)
-		{
-			*first = mSelectStart + mSelectEndOffset;
-			*len = -mSelectEndOffset;
-		}
-		else
-		{
-			*first = mSelectStart;
-			*len = mSelectEndOffset;
-		}
-	}
 
     const std::string& TextField::getText() const
     {
