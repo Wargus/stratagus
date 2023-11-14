@@ -1178,7 +1178,7 @@ void MapCclRegister()
 
 	lua_register(Lua, "PresentMap", CclPresentMap);
 	lua_register(Lua, "MapEnableHighgrounds", CclMapEnableHighgrounds);
-	lua_register(Lua, "isHighgroundsEnabled", CclIsHighgroundsEnabled);
+	lua_register(Lua, "IsHighgroundsEnabled", CclIsHighgroundsEnabled);
 
 	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 }
