@@ -292,7 +292,7 @@ static bool WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSi
 		f->printf("PresentMap(\"%s\", %d, %d, %d, %d%s)\n",
 				  map.Info.Description.c_str(), numplayers, newSize.x, newSize.y,
 				  map.Info.MapUID + 1,
-				  Map.Info.IsHighgroundsEnabled()? ", true" : "");
+				  Map.Info.IsHighgroundsEnabled()? ", \"highgrounds-enabled\"" : "");
 
 		if (map.Info.Filename.find(".sms") == std::string::npos && !map.Info.Filename.empty()) {
 			f->printf("DefineMapSetup(\"%s\")\n", map.Info.Filename.c_str());

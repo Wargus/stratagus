@@ -903,8 +903,14 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 	if (!Map.Tileset->insertTiles(parser.getTiles())) {
 		LuaError(luaStack, "Tiles number limit exceeded.");
 	}
+	
+	/// FIXME: Save resulted tileset graphic into png-file. Debug purposes.	
+	IMG_SavePNG(Map.TileGraphic->Surface, "originalTilesetGraphics.png");
 	/// Add new graphic
 	Map.TileGraphic->AppendFrames(parser.getGraphic());
+
+	/// FIXME: Save resulted tileset graphic into png-file. Debug purposes.
+	IMG_SavePNG(Map.TileGraphic->Surface, "extendedTilesetGraphics.png");
 
 	return 0;
 }
@@ -1078,7 +1084,10 @@ static int CclPresentMap(lua_State *l)
 	Map.Info.MapUID = LuaToNumber(l, 5);
 	
 	if(LuaGetArgsNum(l) >= 6) {
-		Map.Info.EnableHighgrounds(LuaToBoolean(l, 6));
+		const std::string_view highgrounds = LuaToString(l, 6);
+		if (highgrounds == "highgrounds-enabled") {
+			Map.Info.EnableHighgrounds(true);
+		}
 	}
 
 	return 0;
