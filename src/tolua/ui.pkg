@@ -507,20 +507,24 @@ class MultiLineLabel : public Widget
 	};
 };
 
-class TextBox : public Widget
+class CTextBox : public Widget
 {
-	TextBox(const std::string text);
+	CTextBox(const std::string text);
 	virtual void setEditable(bool editable);
 	virtual std::string getText();
 };
 
-class TextField : public Widget
+$renaming CTextBox @ TextBox
+
+class CTextField : public Widget
 {
-	TextField(const std::string text);
+	CTextField(const std::string text);
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
 	virtual void setPassword(bool flag);
 };
+
+$renaming CTextField @ TextField
 
 class ImageTextField : public Widget
 {
