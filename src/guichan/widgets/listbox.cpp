@@ -195,12 +195,12 @@ namespace gcn
     {
         bool ret = false;
 
-        if (key.getValue() == Key::K_ENTER || key.getValue() == Key::K_SPACE)
+        if (key.getValue() == Key::ENTER || key.getValue() == Key::SPACE)
         {
             generateAction();
             ret = true;
         }
-        else if (key.getValue() == Key::K_UP)
+        else if (key.getValue() == Key::UP)
         {
             setSelected(mSelected - 1);
 
@@ -210,7 +210,7 @@ namespace gcn
             }
             ret = true;
         }
-        else if (key.getValue() == Key::K_DOWN)
+        else if (key.getValue() == Key::DOWN)
         {
             setSelected(mSelected + 1);
 			ret = true;

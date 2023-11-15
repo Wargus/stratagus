@@ -168,13 +168,13 @@ namespace gcn
     {
         bool ret = false;
 
-        if (key.getValue() == Key::K_LEFT && mCaretPosition > 0)
+        if (key.getValue() == Key::LEFT && mCaretPosition > 0)
         {
             --mCaretPosition;
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_RIGHT && mCaretPosition < mText.size())
+        else if (key.getValue() == Key::RIGHT && mCaretPosition < mText.size())
         {
             ++mCaretPosition;
             ret = true;
@@ -186,26 +186,26 @@ namespace gcn
 			ret = true;
         }
 
-        else if (key.getValue() == Key::K_BACKSPACE && mCaretPosition > 0)
+        else if (key.getValue() == Key::BACKSPACE && mCaretPosition > 0)
         {
 			mText.erase(mCaretPosition - 1, 1);
 			--mCaretPosition;
 			ret = true;
         }
 
-        else if (key.getValue() == Key::K_ENTER)
+        else if (key.getValue() == Key::ENTER)
         {
             generateAction();
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_HOME)
+        else if (key.getValue() == Key::HOME)
         {
             mCaretPosition = 0;
 			ret = true;
         }
 
-        else if (key.getValue() == Key::K_END)
+        else if (key.getValue() == Key::END)
         {
 			mCaretPosition = mText.size();
 			ret = true;

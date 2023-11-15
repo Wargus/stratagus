@@ -1205,7 +1205,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 	using gcn::Key;
 	bool ret = false;
 
-	if (key.getValue() == Key::K_LEFT) {
+	if (key.getValue() == Key::LEFT) {
 		mCaretColumn = UTF8GetPrev(mTextRows[mCaretRow], mCaretColumn);
 		if (mCaretColumn < 0) {
 			--mCaretRow;
@@ -1220,7 +1220,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_RIGHT) {
+	else if (key.getValue() == Key::RIGHT) {
 		mCaretColumn = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
 		if (mCaretColumn > (int) mTextRows[mCaretRow].size()) {
 			++mCaretRow;
@@ -1239,27 +1239,27 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_DOWN) {
+	else if (key.getValue() == Key::DOWN) {
 		setCaretRow(mCaretRow + 1);
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_UP) {
+	else if (key.getValue() == Key::UP) {
 		setCaretRow(mCaretRow - 1);
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_HOME) {
+	else if (key.getValue() == Key::HOME) {
 		mCaretColumn = 0;
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_END) {
+	else if (key.getValue() == Key::END) {
 		mCaretColumn = mTextRows[mCaretRow].size();
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_ENTER && mEditable) {
+	else if (key.getValue() == Key::ENTER && mEditable) {
 		mTextRows.insert(
 			mTextRows.begin() + mCaretRow + 1,
 			mTextRows[mCaretRow].substr(mCaretColumn, mTextRows[mCaretRow].size() - mCaretColumn));
@@ -1269,14 +1269,14 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_BACKSPACE && mCaretColumn != 0 && mEditable) {
+	else if (key.getValue() == Key::BACKSPACE && mCaretColumn != 0 && mEditable) {
 		int newpos = UTF8GetPrev(mTextRows[mCaretRow], mCaretColumn);
 		mTextRows[mCaretRow].erase(newpos, mCaretColumn - newpos);
 		mCaretColumn = newpos;
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_BACKSPACE && mCaretColumn == 0 && mCaretRow != 0
+	else if (key.getValue() == Key::BACKSPACE && mCaretColumn == 0 && mCaretRow != 0
 	         && mEditable) {
 		mCaretColumn = mTextRows[mCaretRow - 1].size();
 		mTextRows[mCaretRow - 1] += mTextRows[mCaretRow];
@@ -1299,7 +1299,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_PAGE_UP) {
+	else if (key.getValue() == Key::PAGE_UP) {
 		int w, h, rowsPerPage;
 		getParent()->getDrawSize(w, h, this);
 		rowsPerPage = h / getFont()->getHeight();
@@ -1311,7 +1311,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_PAGE_DOWN) {
+	else if (key.getValue() == Key::PAGE_DOWN) {
 		int w, h, rowsPerPage;
 		getParent()->getDrawSize(w, h, this);
 		rowsPerPage = h / getFont()->getHeight();
@@ -1323,7 +1323,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_TAB && mEditable) {
+	else if (key.getValue() == Key::TAB && mEditable) {
 		mTextRows[mCaretRow].insert(mCaretColumn, std::string("    "));
 		mCaretColumn += 4;
 		ret = true;
@@ -1442,7 +1442,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 
 	getTextSelectionPositions(&selFirst, &selLen);
 
-	if (key.getValue() == Key::K_LEFT) {
+	if (key.getValue() == Key::LEFT) {
 		if (mCaretPosition > 0) {
 			mCaretPosition = UTF8GetPrev(mText, mCaretPosition);
 			if (mCaretPosition < 0) {
@@ -1462,7 +1462,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 		ret = true;
 	}
 
-	else if (key.getValue() == gcn::Key::K_RIGHT) {
+	else if (key.getValue() == gcn::Key::RIGHT) {
 		if (mCaretPosition < (int) mText.size()) {
 			mCaretPosition = UTF8GetNext(mText, mCaretPosition);
 			if (mCaretPosition > (int) mText.size()) {
@@ -1499,7 +1499,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 		}
 	}
 
-	else if (key.getValue() == gcn::Key::K_BACKSPACE
+	else if (key.getValue() == gcn::Key::BACKSPACE
 	         || (key.isControlPressed() && key.getValue() == 'h')) {
 		if (selLen > 0) {
 			mText.erase(selFirst, selLen);
@@ -1517,12 +1517,12 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 		}
 	}
 
-	else if (key.getValue() == gcn::Key::K_ENTER) {
+	else if (key.getValue() == gcn::Key::ENTER) {
 		generateAction();
 		ret = true;
 	}
 
-	else if (key.getValue() == gcn::Key::K_HOME
+	else if (key.getValue() == gcn::Key::HOME
 	         || (key.isControlPressed() && key.getValue() == 'a')) // ctrl-a
 	{
 		if (key.isShiftPressed()) {
@@ -1535,7 +1535,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 		ret = true;
 	}
 
-	else if (key.getValue() == gcn::Key::K_END
+	else if (key.getValue() == gcn::Key::END
 	         || (key.isControlPressed() && key.getValue() == 'e')) //ctrl-e
 	{
 		if (key.isShiftPressed()) {

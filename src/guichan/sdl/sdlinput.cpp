@@ -296,139 +296,139 @@ namespace gcn
         switch (keysym.sym)
         {
           case SDLK_TAB:
-              value = Key::K_TAB;
+              value = Key::TAB;
               break;
           case SDLK_LALT:
-              value = Key::K_LEFT_ALT;
+              value = Key::LEFT_ALT;
               break;
           case SDLK_RALT:
-              value = Key::K_RIGHT_ALT;
+              value = Key::RIGHT_ALT;
               break;
           case SDLK_LSHIFT:
-              value = Key::K_LEFT_SHIFT;
+              value = Key::LEFT_SHIFT;
               break;
           case SDLK_RSHIFT:
-              value = Key::K_RIGHT_SHIFT;
+              value = Key::RIGHT_SHIFT;
               break;
           case SDLK_LCTRL:
-              value = Key::K_LEFT_CONTROL;
+              value = Key::LEFT_CONTROL;
               break;
           case SDLK_RCTRL:
-              value = Key::K_RIGHT_CONTROL;
+              value = Key::RIGHT_CONTROL;
               break;
           case SDLK_BACKSPACE:
-              value = Key::K_BACKSPACE;
+              value = Key::BACKSPACE;
               break;
           case SDLK_PAUSE:
-              value = Key::K_PAUSE;
+              value = Key::PAUSE;
               break;
           case SDLK_SPACE:
-              value = Key::K_SPACE;
+              value = Key::SPACE;
               break;
           case SDLK_ESCAPE:
-              value = Key::K_ESCAPE;
+              value = Key::ESCAPE;
               break;
           case SDLK_DELETE:
               value = Key::K_DELETE;
               break;
           case SDLK_INSERT:
-              value = Key::K_INSERT;
+              value = Key::INSERT;
               break;
           case SDLK_HOME:
-              value = Key::K_HOME;
+              value = Key::HOME;
               break;
           case SDLK_END:
-              value = Key::K_END;
+              value = Key::END;
               break;
           case SDLK_PAGEUP:
-              value = Key::K_PAGE_UP;
+              value = Key::PAGE_UP;
               break;
           case SDLK_PRINTSCREEN:
-              value = Key::K_PRINT_SCREEN;
+              value = Key::PRINT_SCREEN;
               break;
           case SDLK_PAGEDOWN:
-              value = Key::K_PAGE_DOWN;
+              value = Key::PAGE_DOWN;
               break;
           case SDLK_F1:
-              value = Key::K_F1;
+              value = Key::F1;
               break;
           case SDLK_F2:
-              value = Key::K_F2;
+              value = Key::F2;
               break;
           case SDLK_F3:
-              value = Key::K_F3;
+              value = Key::F3;
               break;
           case SDLK_F4:
-              value = Key::K_F4;
+              value = Key::F4;
               break;
           case SDLK_F5:
-              value = Key::K_F5;
+              value = Key::F5;
               break;
           case SDLK_F6:
-              value = Key::K_F6;
+              value = Key::F6;
               break;
           case SDLK_F7:
-              value = Key::K_F7;
+              value = Key::F7;
               break;
           case SDLK_F8:
-              value = Key::K_F8;
+              value = Key::F8;
               break;
           case SDLK_F9:
-              value = Key::K_F9;
+              value = Key::F9;
               break;
           case SDLK_F10:
-              value = Key::K_F10;
+              value = Key::F10;
               break;
           case SDLK_F11:
-              value = Key::K_F11;
+              value = Key::F11;
               break;
           case SDLK_F12:
-              value = Key::K_F12;
+              value = Key::F12;
               break;
           case SDLK_F13:
-              value = Key::K_F13;
+              value = Key::F13;
               break;
           case SDLK_F14:
-              value = Key::K_F14;
+              value = Key::F14;
               break;
           case SDLK_F15:
-              value = Key::K_F15;
+              value = Key::F15;
               break;
           case SDLK_NUMLOCKCLEAR:
-              value = Key::K_NUM_LOCK;
+              value = Key::NUM_LOCK;
               break;
           case SDLK_CAPSLOCK:
-              value = Key::K_CAPS_LOCK;
+              value = Key::CAPS_LOCK;
               break;
           case SDLK_SCROLLLOCK:
-              value = Key::K_SCROLL_LOCK;
+              value = Key::SCROLL_LOCK;
               break;
           case SDLK_LGUI:
-              value = Key::K_LEFT_SUPER;
+              value = Key::LEFT_SUPER;
               break;
           case SDLK_RGUI:
-              value = Key::K_RIGHT_SUPER;
+              value = Key::RIGHT_SUPER;
               break;
           case SDLK_MODE:
-              value = Key::K_ALT_GR;
+              value = Key::ALT_GR;
               break;
           case SDLK_UP:
-              value = Key::K_UP;
+              value = Key::UP;
               break;
           case SDLK_DOWN:
-              value = Key::K_DOWN;
+              value = Key::DOWN;
               break;
           case SDLK_LEFT:
-              value = Key::K_LEFT;
+              value = Key::LEFT;
               break;
           case SDLK_RIGHT:
-              value = Key::K_RIGHT;
+              value = Key::RIGHT;
               break;
           case SDLK_RETURN:
-              value = Key::K_ENTER;
+              value = Key::ENTER;
               break;
           case SDLK_KP_ENTER:
-              value = Key::K_ENTER;
+              value = Key::ENTER;
               break;
 
           default:
@@ -441,34 +441,34 @@ namespace gcn
             switch (keysym.sym)
             {
               case SDLK_KP_0:
-                  value = Key::K_INSERT;
+                  value = Key::INSERT;
                   break;
               case SDLK_KP_1:
-                  value = Key::K_END;
+                  value = Key::END;
                   break;
               case SDLK_KP_2:
-                  value = Key::K_DOWN;
+                  value = Key::DOWN;
                   break;
               case SDLK_KP_3:
-                  value = Key::K_PAGE_DOWN;
+                  value = Key::PAGE_DOWN;
                   break;
               case SDLK_KP_4:
-                  value = Key::K_LEFT;
+                  value = Key::LEFT;
                   break;
               case SDLK_KP_5:
                   value = 0;
                   break;
               case SDLK_KP_6:
-                  value = Key::K_RIGHT;
+                  value = Key::RIGHT;
                   break;
               case SDLK_KP_7:
-                  value = Key::K_HOME;
+                  value = Key::HOME;
                   break;
               case SDLK_KP_8:
-                  value = Key::K_UP;
+                  value = Key::UP;
                   break;
               case SDLK_KP_9:
-                  value = Key::K_PAGE_UP;
+                  value = Key::PAGE_UP;
                   break;
               default:
                   break;

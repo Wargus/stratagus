@@ -1405,7 +1405,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_PAGEUP:
 			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
 				if (editorSlider->isVisible()) {
-					editorSlider->keyPress(gcn::Key::K_LEFT);
+					editorSlider->keyPress(gcn::Key::LEFT);
 				}
 			}
 			break;
@@ -1413,7 +1413,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_PAGEDOWN:
 			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
 				if (editorSlider->isVisible()) {
-					editorSlider->keyPress(gcn::Key::K_RIGHT);
+					editorSlider->keyPress(gcn::Key::RIGHT);
 				}
 			}
 			break;
