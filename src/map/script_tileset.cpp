@@ -782,8 +782,6 @@ std::vector<tile_index> CTilesetGraphicGenerator::parseSrcRange(lua_State *luaSt
 				isImg = ESrcImageOption::NewGraphics;
 			} else if (parsingValue == "img-base") {
 				isImg = ESrcImageOption::BaseGraphics;
-			} else {
-				ErrorPrint("Unknown tag '%s'", parsingValue.data());
 			}
 		}
 		lua_pop(luaStack, 1); /// #1>
