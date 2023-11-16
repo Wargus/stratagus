@@ -62,21 +62,7 @@
 #include "guichan/widget.h"
 
 #include <iostream>
-#include <cstring>
 #include <assert.h>
-
-#include "guichan/sdl/sdlinput.h"
-#include "SDL.h"
-extern int Str2SdlKey(const char *str);
-
-int convertKey(const char *key)
-{
-	SDL_Keysym keysym;
-	memset(&keysym, 0, sizeof(keysym));
-	keysym.sym = (SDL_Keycode)Str2SdlKey(key);
-	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
-	return k.getValue();
-}
 
 namespace gcn
 {
@@ -645,19 +631,6 @@ namespace gcn
         else
         {
             mHotKey = key;
-        }
-    }
-
-    void Widget::setHotKey(const char *key)
-    {
-        if (key)
-        {
-			mHotKey = ::convertKey(key);
-            if (mHotKey == 0)
-            {
-                //throw GCN_EXCEPTION("Could not parse hot key");
-                assert(!"Could not parse hot key");
-            }
         }
     }
 

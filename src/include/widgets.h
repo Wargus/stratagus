@@ -44,6 +44,7 @@ extern bool GuichanActive;
 void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
+void setHotKey(gcn::Widget *widget, const char *key);
 
 class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, public gcn::MouseListener
 {

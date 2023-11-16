@@ -40,8 +40,9 @@
 #include "intern_video.h"
 #include "video.h"
 
-#include <vector>
+#include <guichan/sdl/sdlinput.h>
 #include <map>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -468,7 +469,16 @@ int CFont::Width(const std::string &text) const
 	return width;
 }
 
-extern int convertKey(const char *key);
+extern int Str2SdlKey(const char *str);
+
+static int convertKey(const char *key)
+{
+	SDL_Keysym keysym;
+	memset(&keysym, 0, sizeof(keysym));
+	keysym.sym = (SDL_Keycode) Str2SdlKey(key);
+	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
+	return k.getValue();
+}
 
 /**
 **  Get the hot key from a string

@@ -155,6 +155,12 @@ void DrawGuichanWidgets()
 	}
 }
 
+void setHotKey(gcn::Widget* widget, const char *key)
+{
+	if (widget && key) {
+		widget->setHotKey(GetHotKey(key));
+	}
+}
 
 /*----------------------------------------------------------------------------
 --  LuaActionListener
