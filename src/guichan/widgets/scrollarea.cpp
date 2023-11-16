@@ -181,16 +181,6 @@ namespace gcn
         checkPolicies();
     }
 
-    void ScrollArea::scrollToBottom()
-    {
-        setVerticalScrollAmount(getVerticalMaxScroll());
-    }
-
-    void ScrollArea::scrollToTop()
-    {
-        setVerticalScrollAmount(0);
-    }
-
     void ScrollArea::setVerticalScrollAmount(int vScroll)
     {
         int max = getVerticalMaxScroll();

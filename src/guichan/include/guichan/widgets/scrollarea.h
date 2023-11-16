@@ -162,10 +162,6 @@ namespace gcn
          */
         virtual void setScrollPolicy(unsigned int hPolicy, unsigned int vPolicy);
 
-        virtual void scrollToBottom();
-
-        virtual void scrollToTop();
-
         /**
          * Sets the amount to scroll verticaly.
          *

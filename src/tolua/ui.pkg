@@ -357,8 +357,8 @@ class ScrollArea : public BasicContainer
 	virtual Widget *getContent();
 	virtual void setScrollbarWidth(int width);
 	virtual int getScrollbarWidth();
-	virtual void scrollToBottom();
-	virtual void scrollToTop();
+	tolua_outside virtual void scrollToBottom @ scrollToBottom();
+	tolua_outside virtual void scrollToTop @ scrollToTop();
 };
 
 class ImageWidget : public Widget

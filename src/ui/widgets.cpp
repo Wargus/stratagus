@@ -162,6 +162,18 @@ void setHotKey(gcn::Widget* widget, const char *key)
 	}
 }
 
+void scrollToBottom(gcn::ScrollArea *scrollArea)
+{
+	Assert(scrollArea);
+	scrollArea->setVerticalScrollAmount(scrollArea->getVerticalMaxScroll());
+}
+
+void scrollToTop(gcn::ScrollArea *scrollArea)
+{
+	Assert(scrollArea);
+	scrollArea->setVerticalScrollAmount(0);
+}
+
 /*----------------------------------------------------------------------------
 --  LuaActionListener
 ----------------------------------------------------------------------------*/
