@@ -247,7 +247,7 @@ namespace gcn
          * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
          * @throws Exception when no Font is set.
          */
-        virtual void drawText(const std::string& text, int x, int y, unsigned int alignment = LEFT, bool is_normal = true);
+        virtual void drawText(const std::string& text, int x, int y, unsigned int alignment = LEFT);
         /**
          * Alignments for text drawing.
          */

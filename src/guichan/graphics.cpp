@@ -129,7 +129,7 @@ namespace gcn
         mFont = font;
     }
 
-    void Graphics::drawText(const std::string& text, int x, int y, unsigned int alignment, bool is_normal)
+    void Graphics::drawText(const std::string& text, int x, int y, unsigned int alignment)
     {
         if (mFont == NULL)
         {
@@ -140,13 +140,13 @@ namespace gcn
         switch (alignment)
         {
           case LEFT:
-              mFont->drawString(this, text, x, y, is_normal);
+              mFont->drawString(this, text, x, y);
               break;
           case CENTER:
-              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y);
               break;
           case RIGHT:
-              mFont->drawString(this, text, x - mFont->getWidth(text), y, is_normal);
+              mFont->drawString(this, text, x - mFont->getWidth(text), y);
               break;
           default:
           	assert(!"Unknown alignment.");

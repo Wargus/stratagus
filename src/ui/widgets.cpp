@@ -321,16 +321,18 @@ void ImageButton::draw(gcn::Graphics *graphics)
 
 	graphics->setFont(getFont());
 
-	bool is_normal = true;
-
-	if (hasMouse()) {
-		is_normal = false;
+	const bool is_normal = !hasMouse();
+	if (auto* font = dynamic_cast<CFont*>(getFont())) {
+		font->setIsNormal(is_normal);
 	}
 
 	if (isPressed()) {
-		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment(), is_normal);
+		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment());
 	} else {
-		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal);
+		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
+	}
+	if (auto* font = dynamic_cast<CFont*>(getFont())) {
+		font->setIsNormal(true);
 	}
 
 	if (hasFocus()) {
