@@ -43,6 +43,7 @@
 # define USE_WINSOCK
 
 # include <winsock2.h>
+# undef DELETE
 
 #else // UNIX
 # include <sys/time.h>

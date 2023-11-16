@@ -1,11 +1,11 @@
 #ifndef ST_BACKTRACE_H
 #define ST_BACKTRACE_H 1
 
-#include "stdio.h"
+#include <stdio.h>
 
 #ifdef __GLIBC__
 
-#include "execinfo.h"
+#include <execinfo.h>
 inline void print_backtrace(int sz = 100) {
     int j, nptrs;
     void *buffer[sz];
@@ -16,10 +16,12 @@ inline void print_backtrace(int sz = 100) {
 
 #elif defined(USE_WIN32)
 
-#include "windows.h"
-#include "winbase.h"
-#include "dbghelp.h"
-#include "process.h"
+#include <windows.h>
+#include <winbase.h>
+#include <dbghelp.h>
+#include <process.h>
+
+#undef DELETE
 
 inline void print_backtrace(int sz = 100) {
     unsigned int i;

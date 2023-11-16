@@ -224,17 +224,14 @@ extern void beos_init(int argc, char **argv);
 #include <stdio.h>
 
 #ifdef USE_WIN32
-#include <windows.h>
-#include <dbghelp.h>
-#endif
-
-#if defined(USE_WIN32) && ! defined(NO_STDIO_REDIRECT)
-#include "windows.h"
-#define REDIRECT_OUTPUT
-#endif
-
-#if defined(USE_WIN32) && ! defined(REDIRECT_OUTPUT)
-#include "SetupConsole_win32.h"
+# include <dbghelp.h>
+# include <windows.h>
+# ifndef NO_STDIO_REDIRECT
+#  define REDIRECT_OUTPUT
+# endif
+# ifndef REDIRECT_OUTPUT
+#  include "SetupConsole_win32.h"
+# endif
 #endif
 
 /*----------------------------------------------------------------------------

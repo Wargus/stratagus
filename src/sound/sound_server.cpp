@@ -51,6 +51,9 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
+#ifdef _MSC_VER
+# include <Shlobj.h>
+#endif
 
 /*----------------------------------------------------------------------------
 --  Variables
