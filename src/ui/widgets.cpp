@@ -1285,14 +1285,14 @@ bool CTextBox::keyPress(const gcn::Key &key)
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_DELETE && mCaretColumn < (int) mTextRows[mCaretRow].size()
+	else if (key.getValue() == Key::DELETE && mCaretColumn < (int) mTextRows[mCaretRow].size()
 	         && mEditable) {
 		int newpos = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
 		mTextRows[mCaretRow].erase(mCaretColumn, newpos - mCaretColumn);
 		ret = true;
 	}
 
-	else if (key.getValue() == Key::K_DELETE && mCaretColumn == (int) mTextRows[mCaretRow].size()
+	else if (key.getValue() == Key::DELETE && mCaretColumn == (int) mTextRows[mCaretRow].size()
 	         && mCaretRow < ((int) mTextRows.size() - 1) && mEditable) {
 		mTextRows[mCaretRow] += mTextRows[mCaretRow + 1];
 		mTextRows.erase(mTextRows.begin() + mCaretRow + 1);
@@ -1483,7 +1483,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 		ret = true;
 	}
 
-	else if (key.getValue() == gcn::Key::K_DELETE) {
+	else if (key.getValue() == gcn::Key::DELETE) {
 		if (selLen > 0) {
 			mText.erase(selFirst, selLen);
 			mCaretPosition = selFirst;

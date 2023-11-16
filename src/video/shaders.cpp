@@ -24,25 +24,25 @@
  */
 
 #include "shaders.h"
-#include <stdint.h>
 
 #ifndef __APPLE__
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
 
-#include <stdlib.h>
-#include <regex>
-#include <iostream>
-#include <fstream>
+#include "stratagus.h"
 
 #include "filesystem.h"
-#include "stratagus.h"
-#include "parameters.h"
-#include "video.h"
 #include "game.h"
 #include "iolib.h"
+#include "parameters.h"
 #include "script.h"
+#include "video.h"
+
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
+#include <cstdint>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <regex>
 
 // Avoiding the use of GLEW or some extensions handler
 PFNGLCREATESHADERPROC glCreateShader;

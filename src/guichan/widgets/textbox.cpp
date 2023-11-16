@@ -296,7 +296,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_DELETE
+        else if (key.getValue() == Key::DELETE
                  && mCaretColumn < (int)mTextRows[mCaretRow].size()
                  && mEditable)
         {
@@ -304,7 +304,7 @@ namespace gcn
             ret = true;
         }
 
-        else if (key.getValue() == Key::K_DELETE
+        else if (key.getValue() == Key::DELETE
                  && mCaretColumn == (int)mTextRows[mCaretRow].size()
                  && mCaretRow < ((int)mTextRows.size() - 1)
                  && mEditable)
