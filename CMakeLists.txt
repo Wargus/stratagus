@@ -566,7 +566,6 @@ set(stratagus_generic_HDRS
 	src/include/missile.h
 	src/include/missileconfig.h
 	src/include/movie.h
-	src/include/myendian.h
 	src/include/net_lowlevel.h
 	src/include/net_serialization.h
 	src/include/net_message.h

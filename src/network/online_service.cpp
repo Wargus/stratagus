@@ -2,6 +2,26 @@
 
 #include "results.h"
 
+#include "./xsha1.h"
+#include "assert.h"
+#include "cursor.h"
+#include "font.h"
+#include "game.h"
+#include "map.h"
+#include "netconnect.h"
+#include "network.h"
+#include "network/netsockets.h"
+#include "parameters.h"
+#include "script.h"
+#include "settings.h"
+#include "stratagus.h"
+#include "tileset.h"
+#include "ui.h"
+#include "util.h"
+#include "version.h"
+#include "video.h"
+#include "widgets.h"
+
 #ifdef USE_WIN32
 # include <winsock2.h>
 #else
@@ -32,28 +52,6 @@
 #else
 # include <netinet/in.h>
 #endif
-
-#include "./xsha1.h"
-#include "assert.h"
-#include "cursor.h"
-#include "font.h"
-#include "game.h"
-#include "map.h"
-#include "netconnect.h"
-#include "network.h"
-#include "network/netsockets.h"
-#include "parameters.h"
-#include "script.h"
-#include "settings.h"
-#include "stratagus.h"
-#include "tileset.h"
-#include "ui.h"
-#include "util.h"
-#include "version.h"
-#include "video.h"
-#include "widgets.h"
-
-#include <guichan/input.h>
 
 static void dump(uint8_t *buffer, int received_bytes)
 {

@@ -30,10 +30,6 @@
 #ifndef __STRATAGUS_H__
 #define __STRATAGUS_H__
 
-#ifdef HAVE_COZ_PROFILER
-#include <coz.h>
-#endif
-
 #include <string>
 #include <vector>
 
@@ -61,13 +57,6 @@
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
-
-#include <Shlobj.h>
-
-#if _MSC_VER >= 1800
-// From VS2013 onwards, std::min/max are only defined if algorithm is included
-#include <algorithm>
 #endif
 
 #pragma warning(disable:4244)               /// Conversion from double to uchar

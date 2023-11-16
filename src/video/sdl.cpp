@@ -35,24 +35,23 @@
 ----------------------------------------------------------------------------*/
 
 #include "stratagus.h"
+
+#include "game.h"
+#include "network.h"
 #include "online_service.h"
+#include "parameters.h"
+#include "sound_server.h"
+#include "translate.h"
+#include "ui.h"
+#include "unit.h"
+#include "video.h"
+#include "widgets.h"
 
-#ifdef DEBUG
-#include <signal.h>
-#endif
-
+#include <climits>
+#include <cmath>
 #include <map>
 #include <string>
 #include <vector>
-
-
-#include <limits.h>
-#include <math.h>
-
-#ifndef USE_WIN32
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif
 
 #include <SDL.h>
 #include <SDL_syswm.h>
@@ -62,23 +61,14 @@
 #endif
 
 #ifdef USE_WIN32
-#include <shellapi.h>
+# include <shellapi.h>
+#else
+# ifdef DEBUG
+#  include <signal.h>
+# endif
+# include <sys/stat.h>
+# include <sys/types.h>
 #endif
-
-#include "editor.h"
-#include "font.h"
-#include "game.h"
-#include "interface.h"
-#include "minimap.h"
-#include "network.h"
-#include "parameters.h"
-#include "sound.h"
-#include "sound_server.h"
-#include "translate.h"
-#include "ui.h"
-#include "unit.h"
-#include "video.h"
-#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations

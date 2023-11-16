@@ -1,4 +1,4 @@
-//       _________ __                 __
+﻿//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -53,6 +53,10 @@
 #include "unit.h"
 #include "video.h"
 #include "parameters.h"
+
+#ifdef HAVE_COZ_PROFILER
+# include <coz.h>
+#endif
 
 #include <guichan.h>
 void DrawGuichanWidgets();

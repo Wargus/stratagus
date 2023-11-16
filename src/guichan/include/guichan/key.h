@@ -210,7 +210,7 @@ namespace gcn
             INSERT,
             HOME,
             PAGE_UP,
-            K_DELETE, // MACRO DELETE in <winnt.h>
+            DELETE,
             END,
             PAGE_DOWN,
             ESCAPE,
