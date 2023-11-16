@@ -586,7 +586,6 @@ namespace gcn
          * Set the hot key
          */
         virtual void setHotKey(const int key);
-        virtual void setHotKey(const char *key);
 
         /**
          * Checks whether a Widget exists or not, that is if it still exists

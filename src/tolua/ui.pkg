@@ -308,7 +308,7 @@ class Widget
 
 	virtual int getHotKey() const;
 	virtual void setHotKey(const int key);
-	virtual void setHotKey(const char *key);
+	tolua_outside virtual void setHotKey @ setHotKey(const char *key);
 
 	virtual void requestFocus();
 
