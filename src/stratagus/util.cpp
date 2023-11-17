@@ -501,6 +501,32 @@ int UTF8GetNext(const std::string &text, int curpos)
 	return text.size();
 }
 
+void append_unicode(std::string &s, std::uint32_t unicode)
+{
+	if (unicode < 0x80) {
+		s.push_back(unicode & 0x7F);
+	} else if (unicode < 0x08'00) {
+		s.push_back(((unicode >> 6) & 0x1F) | 0xC0);
+		s.push_back((unicode & 0x3F) | 0x80);
+	} else if (unicode < 0x00'01'00'00) {
+		s.push_back(((unicode >> 12) & 0x0F) | 0xE0);
+		s.push_back(((unicode >> 6) & 0x3F) | 0x80);
+		s.push_back((unicode & 0x3F) | 0x80);
+	} else {
+		s.push_back(((unicode >> 18) & 0x07) | 0xF0);
+		s.push_back(((unicode >> 12) & 0x3F) | 0x80);
+		s.push_back(((unicode >> 6) & 0x3F) | 0x80);
+		s.push_back((unicode & 0x3F) | 0x80);
+	}
+}
+
+//--------------------------------------------------------------------------
+std::string to_utf8(std::uint32_t unicode)
+{
+	std::string res;
+	append_unicode(res, unicode);
+	return res;
+}
 
 /*----------------------------------------------------------------------------
 --  others

@@ -988,8 +988,7 @@ static void InputKey(int key)
 			if (key >= ' ') {
 				InputHistoryPos = InputHistoryIdx;
 				removeCursorFromInput();
-				gcn::Key k(key);
-				std::string kstr = k.toString();
+				std::string kstr = to_utf8(key);
 				if (key == '~') {
 					if (InputIndex < (int)sizeof(Input) - 2) {
 						moveInputContent(InputIndex + 2, InputIndex);
