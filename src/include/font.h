@@ -76,10 +76,7 @@ class CFontColor;
 class CFont : public gcn::Font
 {
 private:
-	explicit CFont(std::string ident) :
-		Ident(std::move(ident)),
-		G(nullptr)
-	{}
+	explicit CFont(std::string ident) : Ident(std::move(ident)) {}
 
 public:
 	~CFont() override;
@@ -94,7 +91,10 @@ public:
 
 	int getHeight() const override { return Height(); }
 	int getWidth(const std::string &text) const override { return Width(text); }
-	void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true) override;
+	void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y) override;
+
+	// Set to false to reverse color when drawing string
+	void setIsNormal(bool value) { is_normal = value; }
 
 	void Load();
 	void Reload() const;
@@ -112,7 +112,8 @@ private:
 private:
 	std::string Ident;    /// Ident of the font.
 	std::vector<char> CharWidth; /// Real font width (starting with ' ')
-	CGraphic *G;          /// Graphic object used to draw
+	CGraphic *G = nullptr;       /// Graphic object used to draw
+	bool is_normal = true;
 };
 
 #define MaxFontColors 9

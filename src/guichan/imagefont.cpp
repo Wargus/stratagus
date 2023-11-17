@@ -208,7 +208,7 @@ namespace gcn
         return mGlyph[glyph].width + mGlyphSpacing;
     }
 
-    void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal)
+    void ImageFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
     {
         unsigned int i;
 

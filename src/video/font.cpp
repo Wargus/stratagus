@@ -104,7 +104,7 @@ CFont &GetGameFont()
 ----------------------------------------------------------------------------*/
 
 void CFont::drawString(
-	gcn::Graphics *graphics, const std::string &txt, int x, int y, bool is_normal) /* override */
+	gcn::Graphics *graphics, const std::string &txt, int x, int y) /* override */
 {
 	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
