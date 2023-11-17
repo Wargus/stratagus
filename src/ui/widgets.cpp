@@ -2889,7 +2889,10 @@ void MenuScreen::draw(gcn::Graphics *graphics)
 	if (this->drawUnder) {
 		gcn::Rectangle r = Gui->getGraphics()->getCurrentClipArea();
 		Gui->getGraphics()->popClipArea();
-		Gui->draw(oldtop);
+		auto top = Gui->getTop();
+		Gui->setTop(oldtop);
+		Gui->draw();
+		Gui->setTop(top);
 		Gui->getGraphics()->pushClipArea(r);
 	}
 	gcn::Container::draw(graphics);
