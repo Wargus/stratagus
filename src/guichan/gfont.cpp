@@ -55,46 +55,24 @@
 /*
  * For comments regarding functions please see the header file.
  */
-#include <assert.h>
 #include "guichan/font.h"
-#include "guichan/exception.h"
 
 namespace gcn
 {
-	static int GetNext(const std::string &text, int curpos)
-	{
-		char c = text[curpos];
-		if (!(c & 0x80)) {
-			return curpos + 1;
-		}
-		if ((c & 0xE0) == 0xC0) {
-			return curpos + 2;
-		}
-		if ((c & 0xF0) == 0xE0) {
-			return curpos + 3;
-		}
-		assert(!"Invalid UTF8.");
-		//throw GCN_EXCEPTION("Invalid UTF8.");
-		return 0;
-	}
 
     int Font::getStringIndexAt(const std::string& text, int x)
     {
         unsigned int i;
-        unsigned int nexti;
         int size = 0;
 
-        i = 0;
-        while (i < text.size())
+        for (i = 0; i < text.size(); ++i)
         {
-            nexti = GetNext(text, i);
-            size = getWidth(text.substr(0, nexti));
+            size = getWidth(text.substr(0,i));
 
             if (size > x)
             {
                 return i;
             }
-            i = nexti;
         }
 
         return text.size();

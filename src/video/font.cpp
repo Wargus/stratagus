@@ -103,6 +103,22 @@ CFont &GetGameFont()
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
+int CFont::getStringIndexAt(const std::string &text, int x) /* override */
+{
+	unsigned int i = 0;
+
+	while (i < text.size()) {
+		const unsigned int nexti = UTF8GetNext(text, i);
+		const int size = getWidth(text.substr(0, nexti));
+
+		if (size > x) {
+			return i;
+		}
+		i = nexti;
+	}
+	return text.size();
+}
+
 void CFont::drawString(
 	gcn::Graphics *graphics, const std::string &txt, int x, int y) /* override */
 {

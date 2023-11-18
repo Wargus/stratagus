@@ -92,6 +92,7 @@ public:
 	int getHeight() const override { return Height(); }
 	int getWidth(const std::string &text) const override { return Width(text); }
 	void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y) override;
+	int getStringIndexAt(const std::string &text, int x) override;
 
 	// Set to false to reverse color when drawing string
 	void setIsNormal(bool value) { is_normal = value; }
