@@ -82,8 +82,6 @@
 
 #include "stratagus.h"
 
-#include <vector>
-
 #include "video.h"
 #include "intern_video.h"
 
@@ -92,9 +90,15 @@
 #include "iolib.h"
 #include "map.h"
 #include "ui.h"
+#include "widgets.h"
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <memory>
+#include <vector>
+
+extern std::unique_ptr<gcn::Gui> Gui;
+
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -293,6 +297,12 @@ bool CVideo::ResizeScreen(int w, int h)
 									 BMASK,
 									 0); // AMASK);
 	Assert(SDL_MUSTLOCK(TheScreen) == 0);
+
+	if (Gui) {
+		if (auto graphics = dynamic_cast<gcn::SDLGraphics *>(Gui->getGraphics())) {
+			graphics->setTarget(TheScreen);
+		}
+	}
 
 	// new texture
 	if (TheTexture) {

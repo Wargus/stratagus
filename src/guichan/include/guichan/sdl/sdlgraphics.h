@@ -83,13 +83,20 @@ namespace gcn
         SDLGraphics();
 
         /**
-         * Pointer to the target surface to render into. The target can be any
+         * Sets the target SDL_Surface to draw to. The target can be any
          * SDL_Surface. This funtion also pushes a clip areas corresponding to
          * the dimension of the target.
          *
          * @param target the target to draw to.
          */
-        virtual void setTarget(SDL_Surface** surface);
+        virtual void setTarget(SDL_Surface* surface);
+
+        /**
+         * Gets the target SDL_Surface.
+         *
+         * @return the target SDL_Surface.
+         */
+        virtual SDL_Surface* getTarget() const;
 
         /**
          * Draws an SDL_Surface on the target surface. Normaly you'll
@@ -147,7 +154,7 @@ namespace gcn
          */
         virtual void drawVLine(int x, int y1, int y2);
 
-        SDL_Surface** mTarget;
+        SDL_Surface* mTarget;
         Color mColor;
         bool mAlpha;
     };
