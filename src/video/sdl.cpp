@@ -160,18 +160,6 @@ void SetVideoSync()
 --  Video
 ----------------------------------------------------------------------------*/
 
-#if defined(DEBUG) && !defined(USE_WIN32)
-static void CleanExit(int)
-{
-	// Clean SDL
-	SDL_Quit();
-	// Reestablish normal behaviour for next abort call
-	signal(SIGABRT, SIG_DFL);
-	// Generates a core dump
-	abort();
-}
-#endif
-
 /**
 **  Initialize SDLKey to string map
 */
@@ -182,9 +170,6 @@ static void InitKey2Str()
 	if (!Key2Str.empty()) {
 		return;
 	}
-
-	int i;
-	char str[20];
 
 	Key2Str[SDLK_BACKSPACE] = "backspace";
 	Key2Str[SDLK_TAB] = "tab";
@@ -208,10 +193,8 @@ static void InitKey2Str()
 	Key2Str[SDLK_PERIOD] = ".";
 	Key2Str[SDLK_SLASH] = "/";
 
-	str[1] = '\0';
-	for (i = SDLK_0; i <= SDLK_9; ++i) {
-		str[0] = i;
-		Key2Str[i] = str;
+	for (int i = SDLK_0; i <= SDLK_9; ++i) {
+		Key2Str[i] = std::string(1, static_cast<char>(i));
 	}
 
 	Key2Str[SDLK_COLON] = ":";
@@ -226,17 +209,14 @@ static void InitKey2Str()
 	Key2Str[SDLK_RIGHTBRACKET] = "]";
 	Key2Str[SDLK_BACKQUOTE] = "`";
 
-	str[1] = '\0';
-	for (i = SDLK_a; i <= SDLK_z; ++i) {
-		str[0] = i;
-		Key2Str[i] = str;
+	for (int i = SDLK_a; i <= SDLK_z; ++i) {
+		Key2Str[i] = std::string(1, static_cast<char>(i));
 	}
 
 	Key2Str[SDLK_DELETE] = "delete";
 
-	for (i = SDLK_KP_0; i <= SDLK_KP_9; ++i) {
-		snprintf(str, sizeof(str), "kp_%d", i - SDLK_KP_0);
-		Key2Str[i] = str;
+	for (int i = SDLK_KP_0; i <= SDLK_KP_9; ++i) {
+		Key2Str[i] = "kp_" + std::to_string(i - SDLK_KP_0);
 	}
 
 	Key2Str[SDLK_KP_PERIOD] = "kp_period";
@@ -256,11 +236,9 @@ static void InitKey2Str()
 	Key2Str[SDLK_PAGEUP] = "pageup";
 	Key2Str[SDLK_PAGEDOWN] = "pagedown";
 
-	for (i = SDLK_F1; i <= SDLK_F15; ++i) {
-		snprintf(str, sizeof(str), "f%d", i - SDLK_F1 + 1);
-		Key2Str[i] = str;
-		snprintf(str, sizeof(str), "F%d", i - SDLK_F1 + 1);
-		Str2Key[str] = i;
+	for (int i = SDLK_F1; i <= SDLK_F15; ++i) {
+		Key2Str[i] = "f" + std::to_string(i - SDLK_F1 + 1);
+		Str2Key["F" + std::to_string(i - SDLK_F1 + 1)] = i;
 	}
 
 	Key2Str[SDLK_HELP] = "help";
@@ -281,36 +259,28 @@ enum PROCESS_DPI_AWARENESS {
 };
 
 static void setDpiAware() {
-	void* userDLL;
-	BOOL(WINAPI *SetProcessDPIAware)(void); // Vista and later
-	void* shcoreDLL;
 	HRESULT(WINAPI *SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS dpiAwareness); // Windows 8.1 and later
 
-	userDLL = SDL_LoadObject("USER32.DLL");
-	if (userDLL) {
-		SetProcessDPIAware = (BOOL(WINAPI *)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
-	} else {
-		SetProcessDPIAware = nullptr;
-	}
-
-	shcoreDLL = SDL_LoadObject("SHCORE.DLL");
-	if (shcoreDLL) {
+	if (void* shcoreDLL = SDL_LoadObject("SHCORE.DLL")) {
 		SetProcessDpiAwareness = (HRESULT(WINAPI *)(PROCESS_DPI_AWARENESS)) SDL_LoadFunction(shcoreDLL, "SetProcessDpiAwareness");
 	} else {
 		SetProcessDpiAwareness = nullptr;
 	}
-
 	if (SetProcessDpiAwareness) {
 		/* Try Windows 8.1+ version */
 		HRESULT result = SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 		DebugPrint("called SetProcessDpiAwareness: %d", (result == S_OK) ? 1 : 0);
 	} else {
-		if (SetProcessDPIAware) {
-			/* Try Vista - Windows 8 version.
-			   This has a constant scale factor for all monitors.
-			*/
-			BOOL success = SetProcessDPIAware();
-			DebugPrint("called SetProcessDPIAware: %d", (int)success);
+		if (void* userDLL = SDL_LoadObject("USER32.DLL")) {
+			BOOL(WINAPI *SetProcessDPIAware)(void); // Vista and later
+			SetProcessDPIAware = (BOOL(WINAPI *)(void)) SDL_LoadFunction(userDLL, "SetProcessDPIAware");
+			if (SetProcessDPIAware) {
+				/* Try Vista - Windows 8 version.
+				   This has a constant scale factor for all monitors.
+				*/
+				BOOL success = SetProcessDPIAware();
+				DebugPrint("called SetProcessDPIAware: %d", (int)success);
+			}
 		}
 		// In any case, on these old Windows versions we have to do a bit of
 		// compatibility hacking. Windows 7 and below don't play well with
@@ -354,8 +324,16 @@ void InitVideoSdl()
 		// If debug is enabled, Stratagus disable SDL Parachute.
 		// So we need gracefully handle segfaults and aborts.
 #if defined(DEBUG) && !defined(USE_WIN32)
-		signal(SIGSEGV, CleanExit);
-		signal(SIGABRT, CleanExit);
+		const auto cleanExit = [](int) {
+			// Clean SDL
+			SDL_Quit();
+			// Reestablish normal behaviour for next abort call
+			signal(SIGABRT, SIG_DFL);
+			// Generates a core dump
+			abort();
+		};
+		signal(SIGSEGV, +cleanExit);
+		signal(SIGABRT, +cleanExit);
 #endif
 	}
 
@@ -375,12 +353,10 @@ void InitVideoSdl()
 		Video.Width = 640;
 		Video.Height = 480;
 	}
-
 	if (!Video.WindowWidth || !Video.WindowHeight) {
 		Video.WindowWidth = Video.Width;
 		Video.WindowHeight = Video.Height;
 	}
-
 	if (!Video.Depth) {
 		Video.Depth = 32;
 	}
@@ -445,12 +421,7 @@ void InitVideoSdl()
 // 	}
 // #endif
 
-#if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
-
-		SDL_Surface *icon = nullptr;
-		CGraphic *g = nullptr;
-		struct stat st;
-
+#if !defined(USE_WIN32) && !defined(USE_MAEMO)
 		std::string FullGameNameL = FullGameName;
 		for (size_t i = 0; i < FullGameNameL.size(); ++i) {
 			FullGameNameL[i] = tolower(FullGameNameL[i]);
@@ -458,11 +429,11 @@ void InitVideoSdl()
 
 		std::string ApplicationName = Parameters::Instance.applicationName;
 		std::string ApplicationNameL = ApplicationName;
-		for (size_t i = 0; i < ApplicationNameL.size(); ++i) {
-			ApplicationNameL[i] = tolower(ApplicationNameL[i]);
+		for (auto& c : ApplicationNameL) {
+			c = tolower(c);
 		}
 
-		std::vector<std::string> pixmaps
+		std::vector<fs::path> pixmaps
 		{
 			fs::path(PIXMAPS) / (FullGameName + ".png"),
 			fs::path(PIXMAPS) / (FullGameNameL + ".png"),
@@ -478,26 +449,26 @@ void InitVideoSdl()
 			fs::path("/usr/share/pixmaps/stratagus.png")
 		};
 
-		for (size_t i = 0; i < pixmaps.size(); ++i) {
-			if (stat(pixmaps[i].c_str(), &st) == 0) {
+		CGraphic *g = nullptr;
+		SDL_Surface *icon = nullptr;
+
+		for (const auto &p : pixmaps) {
+			if (fs::exists(p)) {
 				if (g) { CGraphic::Free(g); }
-				g = CGraphic::New(pixmaps[i]);
+				g = CGraphic::New(p.u8string());
 				g->Load();
 				icon = g->Surface;
 				if (icon) { break; }
 			}
 		}
-
 		if (icon) {
 			SDL_SetWindowIcon(TheWindow, icon);
 		}
-
 		if (g) {
 			CGraphic::Free(g);
 		}
-
 #endif
-	Video.FullScreen = (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 1 : 0;
+	Video.FullScreen = (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
 	Video.Depth = TheScreen->format->BitsPerPixel;
 
 	// Must not allow SDL to switch to relative mouse coordinates when going
@@ -661,21 +632,21 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_TEXTINPUT:
-			{
-				char* text = event.text.text;
-				if (isTextInput((uint8_t)text[0])) {
-					// we only accept US-ascii chars for now
-					char lastKey = text[0];
-					InputKeyButtonPress(callbacks, SDL_GetTicks(), lastKey, lastKey);
-					// fabricate a keyup event for later
-					SDL_Event event;
-					SDL_zero(event);
-					event.type = SDL_CUSTOM_KEY_UP;
-					event.user.code = lastKey;
-					SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-				}
+		{
+			char *text = event.text.text;
+			if (isTextInput((uint8_t) text[0])) {
+				// we only accept US-ascii chars for now
+				char lastKey = text[0];
+				InputKeyButtonPress(callbacks, SDL_GetTicks(), lastKey, lastKey);
+				// fabricate a keyup event for later
+				SDL_Event event;
+				SDL_zero(event);
+				event.type = SDL_CUSTOM_KEY_UP;
+				event.user.code = lastKey;
+				SDL_PeepEvents(&event, 1, SDL_ADDEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 			}
 			break;
+		}
 
 		case SDL_KEYDOWN:
 			keysym = event.key.keysym.sym;
@@ -935,22 +906,16 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen()
 {
-	Uint32 flags;
-	flags = SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
-
-#ifdef USE_WIN32
-
 	if (!TheWindow) { // don't bother if there's no surface.
 		return;
 	}
+	const Uint32 flags = SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP;
 	SDL_SetWindowFullscreen(TheWindow, flags ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
 
+#ifdef USE_WIN32
 	Invalidate(); // Update display
-#else // !USE_WIN32
-	SDL_SetWindowFullscreen(TheWindow, flags ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
 #endif
-
-	Video.FullScreen = (flags ^ SDL_WINDOW_FULLSCREEN_DESKTOP) ? 1 : 0;
+	Video.FullScreen = (flags ^ SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
 }
 
 //@}
