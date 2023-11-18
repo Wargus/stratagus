@@ -243,9 +243,9 @@ namespace gcn
         mTop->logic();
     }
 
-    void Gui::draw(Widget* top)
+    void Gui::draw()
     {
-        if (!top)
+        if (!mTop)
         {
         	assert(!"No top widget set");
             //throw GCN_EXCEPTION("No top widget set");
@@ -256,36 +256,31 @@ namespace gcn
             //throw GCN_EXCEPTION("No graphics set");
         }
 
-        if (!mUseDirtyDrawing || top->getDirty())
+        if (!mUseDirtyDrawing || mTop->getDirty())
         {
             mGraphics->_beginDraw();
 
             // If top has a border,
             // draw it before drawing top
-            if (top->getBorderSize() > 0)
+            if (mTop->getBorderSize() > 0)
             {
-                Rectangle rec = top->getDimension();
-                rec.x -= top->getBorderSize();
-                rec.y -= top->getBorderSize();
-                rec.width += 2 * top->getBorderSize();
-                rec.height += 2 * top->getBorderSize();
+                Rectangle rec = mTop->getDimension();
+                rec.x -= mTop->getBorderSize();
+                rec.y -= mTop->getBorderSize();
+                rec.width += 2 * mTop->getBorderSize();
+                rec.height += 2 * mTop->getBorderSize();
                 mGraphics->pushClipArea(rec);
-                top->drawBorder(mGraphics);
+                mTop->drawBorder(mGraphics);
                 mGraphics->popClipArea();
             }
 
-            mGraphics->pushClipArea(top->getDimension());
-            top->draw(mGraphics);
-            top->setDirty(false);
+            mGraphics->pushClipArea(mTop->getDimension());
+            mTop->draw(mGraphics);
+            mTop->setDirty(false);
             mGraphics->popClipArea();
 
             mGraphics->_endDraw();
         }
-    }
-
-    void Gui::draw()
-    {
-        draw(mTop);
     }
 
     void Gui::focusNone()
