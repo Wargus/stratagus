@@ -147,6 +147,9 @@ void SetClipboard(std::string &str);
 int UTF8GetNext(const std::string &text, int curpos);
 int UTF8GetPrev(const std::string &text, int curpos);
 
+void append_unicode(std::string &s, std::uint32_t unicode);
+std::string to_utf8(std::uint32_t unicode);
+
 /*----------------------------------------------------------------------------
 --  SIMD support
 ----------------------------------------------------------------------------*/

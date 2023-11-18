@@ -203,19 +203,19 @@ void LuaActionListener::action(const std::string &eventId)
 }
 
 bool LuaActionListener::keyPress(const gcn::Key& key) {
-	return callback.call<bool>("keyPress", key.toString());
+	return callback.call<bool>("keyPress", to_utf8(key.getValue()));
 }
 
 bool LuaActionListener::keyRelease(const gcn::Key& key) {
-	return callback.call<bool>("keyRelease", key.toString());
+	return callback.call<bool>("keyRelease", to_utf8(key.getValue()));
 }
 
 void LuaActionListener::hotKeyPress(const gcn::Key& key) {
-	callback.call("hotKeyPress", key.toString());
+	callback.call("hotKeyPress", to_utf8(key.getValue()));
 }
 
 void LuaActionListener::hotKeyRelease(const gcn::Key& key) {
-	callback.call("hotKeyRelease", key.toString());
+	callback.call("hotKeyRelease", to_utf8(key.getValue()));
 }
 
 void LuaActionListener::mouseIn() {
@@ -1361,7 +1361,7 @@ bool CTextBox::keyPress(const gcn::Key &key)
 	}
 
 	else if (key.isCharacter() && mEditable) {
-		mTextRows[mCaretRow].insert(mCaretColumn, key.toString());
+		mTextRows[mCaretRow].insert(mCaretColumn, to_utf8(key.getValue()));
 		mCaretColumn = UTF8GetNext(mTextRows[mCaretRow], mCaretColumn);
 		ret = true;
 	}
@@ -1609,7 +1609,7 @@ bool CTextField::keyPress(const gcn::Key &key) /* override */
 			mSelectEndOffset = 0;
 		}
 
-		mText.insert(mCaretPosition, key.toString());
+		mText.insert(mCaretPosition, to_utf8(key.getValue()));
 		mCaretPosition = UTF8GetNext(mText, mCaretPosition);
 		if (mCaretPosition > (int) mText.size()) {
 			throw GCN_EXCEPTION("Invalid UTF8.");
