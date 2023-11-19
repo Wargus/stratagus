@@ -261,10 +261,10 @@ class Color
 
 class Graphics
 {
-	enum {
-		LEFT = 0,
-		CENTER,
-		RIGHT
+	enum Alignment{
+		Left @ LEFT = 0,
+		Center @ CENTER,
+		Right @ RIGHT
 	};
 };
 
@@ -274,37 +274,31 @@ class Widget
 	virtual int getWidth() const;
 	virtual void setHeight(int height);
 	virtual int getHeight() const;
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height);
 	virtual void setX(int x);
 	virtual int getX() const;
 	virtual void setY(int y);
 	virtual int getY() const;
 	virtual void setPosition(int x, int y);
-	virtual void setBorderSize(int width);
-	virtual unsigned int getBorderSize() const;
+	virtual void setFrameSize@ setBorderSize(int width);
+	virtual unsigned int getFrameSize @ getBorderSize() const;
 	virtual void setEnabled(bool enabled);
 	virtual bool isEnabled() const;
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
-	virtual void setDirty(bool isDirty);
+	tolua_outside virtual void setDirty @ setDirty(bool isDirty);
 
-	virtual void setBaseColor(const Color color);
+	tolua_outside virtual void setBaseColor @ setBaseColor(const Color color);
 	virtual const Color &getBaseColor() const;
 	virtual void setForegroundColor(const Color color);
 	virtual const Color &getForegroundColor() const;
-	virtual void setBackgroundColor(const Color color);
+	tolua_outside virtual void setBackgroundColor @ setBackgroundColor(const Color color);
 	virtual const Color &getBackgroundColor() const;
-	virtual void setDisabledColor(const Color color);
-	virtual const Color &getDisabledColor() const;
+	tolua_outside virtual void setDisabledColor @ setDisabledColor(const Color color);
 
 	static void setGlobalFont(CFont *font);
-	virtual void setForegroundColor(const Color color);
-	virtual void setBackgroundColor(const Color color);
-	virtual void setBaseColor(const Color color);
-	virtual void setSize(int width, int height);
-	virtual void setBorderSize(int width);
-	virtual void setFont(CFont *font);
+	void setFont(CFont *font);
 
 	virtual int getHotKey() const;
 	virtual void setHotKey(const int key);
@@ -380,23 +374,25 @@ class ButtonWidget : public Button
 	ButtonWidget(const std::string caption);
 };
 
-class ImageButton : public Button
+class CImageButton : public Button
 {
-	ImageButton();
-	ImageButton(const std::string caption);
+	CImageButton();
+	CImageButton(const std::string caption);
 
 	void setNormalImage(CGraphic *image);
 	void setPressedImage(CGraphic *image);
 	void setDisabledImage(CGraphic *image);
 };
 
+$renaming CImageButton @ ImageButton
+
 class RadioButton : public Widget
 {
 	RadioButton();
 	RadioButton(const std::string caption, const std::string group, bool marked = false);
 
-	virtual bool isMarked();
-	virtual void setMarked(bool marked);
+	virtual bool isSelected @ isMarked();
+	virtual void setSelected @ setMarked(bool marked);
 	virtual const std::string &getCaption() const;
 	virtual void setCaption(const std::string caption);
 	virtual void setGroup(const std::string group);
@@ -422,8 +418,8 @@ class CheckBox : public Widget
 	CheckBox();
 	CheckBox(const std::string caption, bool marked = false);
 
-	virtual bool isMarked() const;
-	virtual void setMarked(bool marked);
+	virtual bool isSelected @ isMarked() const;
+	virtual void setSelected @ setMarked(bool marked);
 	virtual const std::string &getCaption() const;
 	virtual void setCaption(const std::string caption);
 	virtual void adjustSize();
@@ -455,12 +451,15 @@ class Slider : public Widget
 	virtual void setValue(double value);
 	virtual void setMarkerLength(int length);
 	virtual int getMarkerLength() const;
-	virtual void setOrientation(unsigned int orientation);
+	virtual void setOrientation(Orientation orientation);
 	virtual unsigned int getOrientation() const;
 	virtual void setStepLength(double length);
 	virtual double getStepLength() const;
 
-	enum { HORIZONTAL = 0, VERTICAL };
+	enum Orientation {
+		Horizontal @ HORIZONTAL = 0,
+		Vertical @ VERTICAL
+	};
 };
 
 class ImageSlider : public Slider
@@ -477,7 +476,7 @@ class Label : public Widget
 	Label(const std::string caption);
 	const std::string &getCaption() const;
 	void setCaption(const std::string caption);
-	virtual void setAlignment(unsigned int alignment);
+	virtual void setAlignment(Graphics::Alignment alignment);
 	virtual unsigned int getAlignment();
 	virtual void adjustSize();
 };
@@ -490,7 +489,7 @@ class MultiLineLabel : public Widget
 	virtual void setCaption(const std::string caption);
 	virtual const std::string &getCaption() const;
 	virtual void setAlignment(unsigned int alignment);
-	virtual unsigned int getAlignment();
+	virtual gcn::Graphics::Alignment getAlignment();
 	virtual void setVerticalAlignment(unsigned int alignment);
 	virtual unsigned int getVerticalAlignment();
 	virtual void setLineWidth(int width);
@@ -575,14 +574,11 @@ class Window : public BasicContainer
 {
 	Window();
 	Window(const std::string caption);
-	Window(Widget *content, const std::string caption = "");
 
 	virtual void setCaption(const std::string caption);
 	virtual const std::string &getCaption() const;
-	virtual void setAlignment(unsigned int alignment);
+	virtual void setAlignment(Graphics::Alignment alignment);
 	virtual unsigned int getAlignment() const;
-	virtual void setContent(Widget* widget);
-	virtual Widget* getContent() const;
 	virtual void setPadding(unsigned int padding);
 	virtual unsigned int getPadding() const;
 	virtual void setTitleBarHeight(unsigned int height);
@@ -613,18 +609,13 @@ class DropDown : public BasicContainer
 {
 	virtual int getSelected();
 	virtual void setSelected(int selected);
-	virtual void setScrollArea(ScrollArea* scrollArea);
-	virtual ScrollArea *getScrollArea();
-	virtual void setListBox(ListBox* listBox);
-	virtual ListBox *getListBox();
 };
 
 class DropDownWidget : public DropDown
 {
 	DropDownWidget();
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual ListBox *getListBox();
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height);
 };
 
 class ImageDropDownWidget : public DropDown
@@ -633,8 +624,7 @@ class ImageDropDownWidget : public DropDown
 	std::string getSelectedItem();
 	int setSelectedItem(lua_State *lua, lua_Object *lo);
 	void setList(lua_State *lua, lua_Object *lo);
-	virtual ListBox *getListBox();
-	virtual void setSize(int width, int height);
+	void setSize(int width, int height);
 	void setItemImage(CGraphic *image);
 	void setDownNormalImage(CGraphic *image);
 	void setDownPressedImage(CGraphic *image);

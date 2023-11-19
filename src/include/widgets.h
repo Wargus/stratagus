@@ -1,4 +1,4 @@
-//       _________ __                 __
+﻿//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -44,9 +44,16 @@ extern bool GuichanActive;
 void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
-void setHotKey(gcn::Widget *widget, const char *key);
-void scrollToBottom(gcn::ScrollArea *scrollArea);
-void scrollToTop(gcn::ScrollArea *scrollArea);
+
+#if 1 // ToLua++
+void setBackgroundColor(gcn::Widget *, const gcn::Color &);
+void setBaseColor(gcn::Widget *, const gcn::Color &color);
+void setDirty(gcn::Widget *, bool isDirty);
+void setDisabledColor(gcn::Widget *, const gcn::Color &);
+void setHotKey(gcn::Widget *, const char *key);
+void scrollToBottom(gcn::ScrollArea *);
+void scrollToTop(gcn::ScrollArea *);
+#endif
 
 class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, public gcn::MouseListener
 {
@@ -54,19 +61,19 @@ class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, p
 public:
 	LuaActionListener(lua_State *lua, lua_Object function);
 	~LuaActionListener() override;
-	void action(const std::string &eventId) override;
-	bool keyPress(const gcn::Key&) override;
-	bool keyRelease(const gcn::Key&) override;
-	void hotKeyPress(const gcn::Key&) override;
-	void hotKeyRelease(const gcn::Key&) override;
-	void mouseIn() override;
-	void mouseOut() override;
-	void mousePress(int, int, int) override;
-	void mouseRelease(int, int, int) override;
-	void mouseClick(int, int, int, int) override;
-	void mouseWheelUp(int, int) override;
-	void mouseWheelDown(int, int) override;
-	void mouseMotion(int, int) override;
+	void action(const gcn::ActionEvent &actionEvent) override;
+	void keyPressed(gcn::KeyEvent&) override;
+	void keyReleased(gcn::KeyEvent&) override;
+	void hotKeyPressed(const gcn::Key&) override;
+	void hotKeyReleased(const gcn::Key&) override;
+	void mouseEntered(gcn::MouseEvent&) override;
+	void mouseExited(gcn::MouseEvent&) override;
+	void mousePressed(gcn::MouseEvent&) override;
+	void mouseReleased(gcn::MouseEvent&) override;
+	void mouseClicked(gcn::MouseEvent&) override;
+	void mouseWheelMovedUp(gcn::MouseEvent&) override;
+	void mouseWheelMovedDown(gcn::MouseEvent&) override;
+	void mouseMoved(gcn::MouseEvent&) override;
 };
 
 class LambdaActionListener : public gcn::ActionListener
@@ -75,7 +82,7 @@ class LambdaActionListener : public gcn::ActionListener
 public:
 	explicit LambdaActionListener(std::function<void(const std::string &)> l) : lambda(l) {}
 
-	void action(const std::string &eventId) override { lambda(eventId); }
+	void action(const gcn::ActionEvent &actionEvent) override { lambda(actionEvent.getId()); }
 };
 
 class ImageWidget : public gcn::Icon
@@ -89,18 +96,18 @@ class ButtonWidget : public gcn::Button
 public:
 	explicit ButtonWidget(const std::string &caption) : Button(caption)
 	{
-		this->setHotKey(GetHotKey(caption));
+		::setHotKey(this, caption.c_str());
 	}
 };
 
-class ImageButton : public gcn::Button
+class CImageButton : public gcn::Button
 {
 public:
-	ImageButton();
-	explicit ImageButton(const std::string &caption);
+	CImageButton();
+	explicit CImageButton(const std::string &caption);
 
 	void draw(gcn::Graphics *graphics) override;
-	void adjustSize() override;
+	void adjustSize();
 
 	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
 	void setPressedImage(gcn::Image *image) { pressedImage = image; }
@@ -121,10 +128,10 @@ public:
 	void drawBox(gcn::Graphics *graphics) override;
 	void draw(gcn::Graphics *graphics) override;
 
-	void mousePress(int x, int y, int button) override;
-	void mouseRelease(int x, int y, int button) override;
-	void mouseClick(int x, int y, int button, int count) override;
-	void adjustSize() override;
+	void mousePressed(gcn::MouseEvent&) override;
+	void mouseReleased(gcn::MouseEvent&) override;
+	void mouseClicked(gcn::MouseEvent&) override;
+	void adjustSize();
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
@@ -151,10 +158,10 @@ public:
 	void draw(gcn::Graphics *graphics) override;
 	void drawBox(gcn::Graphics *graphics) override;
 
-	void mousePress(int x, int y, int button) override;
-	void mouseRelease(int x, int y, int button) override;
-	void mouseClick(int x, int y, int button, int count) override;
-	void adjustSize() override;
+	void mousePressed(gcn::MouseEvent&) override;
+	void mouseReleased(gcn::MouseEvent &) override;
+	void mouseClicked(gcn::MouseEvent &) override;
+	void adjustSize();
 
 	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
@@ -198,15 +205,16 @@ public:
 
 	void setCaption(const std::string &caption);
 	const std::string &getCaption() const;
-	void setAlignment(unsigned int alignment);
-	unsigned int getAlignment();
+	void setAlignment(gcn::Graphics::Alignment alignment);
+	void setAlignment(unsigned int alignment) { setAlignment(static_cast<gcn::Graphics::Alignment>(alignment)); } // TOLUA
+	gcn::Graphics::Alignment getAlignment();
 	void setVerticalAlignment(unsigned int alignment);
 	unsigned int getVerticalAlignment();
 	void setLineWidth(int width);
 	int getLineWidth();
 	void adjustSize();
 	void draw(gcn::Graphics *graphics) override;
-	void drawBorder(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
 
 	enum {
 		LEFT = 0,
@@ -221,7 +229,7 @@ private:
 
 	std::string mCaption;
 	std::vector<std::string> mTextRows;
-	unsigned int mAlignment;
+	gcn::Graphics::Alignment mAlignment;
 	unsigned int mVerticalAlignment;
 	int mLineWidth;
 };
@@ -235,7 +243,7 @@ public:
 	void setSpeed(float speed) { this->speedY = speed; }
 	float getSpeed() const { return this->speedY; }
 private:
-	virtual void logic();
+	void logic() override;
 private:
 	gcn::Container container; /// Data container
 	float speedY;             /// vertical speed of the container (positive number: go up).
@@ -248,10 +256,11 @@ class Windows : public gcn::Window
 public:
 	Windows(const std::string &text, int width, int height);
 	void add(gcn::Widget *widget, int x, int y);
+
+	void setBackgroundColor(const gcn::Color &color);
+	void setBaseColor(const gcn::Color &color);
 private:
-	void mouseMotion(int x, int y) override;
-	void setBackgroundColor(const gcn::Color &color) override;
-	void setBaseColor(const gcn::Color &color) override;
+	void mouseDragged(gcn::MouseEvent &) override;
 
 private:
 	gcn::ScrollArea scroll;   /// To use scroll bar.
@@ -268,10 +277,8 @@ class CTextBox : public gcn::TextBox
 {
 public:
 	using gcn::TextBox::TextBox;
-	void mousePress(int x, int y, int button) override;
-	bool keyPress(const gcn::Key &key) override;
-
-	void setCaretColumn(int column) override;
+	void mousePressed(gcn::MouseEvent &) override;
+	void keyPressed(gcn::KeyEvent &) override;
 };
 
 // Similar to gcn::TextField but
@@ -287,9 +294,9 @@ public:
 	explicit CTextField(const std::string &text) : TextField(text) {}
 
 	void draw(gcn::Graphics *graphics) override;
-	void mousePress(int x, int y, int button) override;
-	void mouseMotion(int x, int y) override;
-	bool keyPress(const gcn::Key &key) override;
+	void mousePressed(gcn::MouseEvent &) override;
+	void mouseDragged(gcn::MouseEvent &) override;
+	void keyPressed(gcn::KeyEvent &) override;
 
 	void setPassword(bool flag) { isPassword = flag; }
 	void getTextSelectionPositions(unsigned int *first, unsigned int *len) const;
@@ -305,7 +312,7 @@ public:
 	ImageTextField() : CTextField(), itemImage(nullptr) {}
 	ImageTextField(const std::string &text) : CTextField(text), itemImage(nullptr) {}
 	void draw(gcn::Graphics *graphics) override;
-	void drawBorder(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
 	CGraphic *itemImage;
@@ -338,18 +345,17 @@ class ImageListBox : public gcn::ListBox
 {
 public:
 	ImageListBox();
-	ImageListBox(gcn::ListModel *listModel);
+	explicit ImageListBox(gcn::ListModel *listModel);
 	void draw(gcn::Graphics *graphics) override;
-	void drawBorder(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
+	void mousePressed(gcn::MouseEvent &) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 	void adjustSize();
-	void mousePress(int, int y, int button);
 	void setSelected(int selected);
-	void setListModel(gcn::ListModel *listModel);
 	void logic() { adjustSize(); }
 
 private:
-	CGraphic *itemImage;
+	CGraphic *itemImage = nullptr;
 };
 
 class ListBoxWidget : public gcn::ScrollArea
@@ -359,9 +365,9 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	void setBackgroundColor(const gcn::Color &color) override;
-	void setFont(gcn::Font *font) override;
-	void addActionListener(gcn::ActionListener *actionListener) override;
+	void setBackgroundColor(const gcn::Color &color);
+	void fontChanged() override;
+	void addActionListener(gcn::ActionListener *actionListener);
 
 private:
 	void adjustSize();
@@ -377,9 +383,9 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
-	void setBackgroundColor(const gcn::Color &color) override;
-	void setFont(gcn::Font *font) override;
-	void addActionListener(gcn::ActionListener *actionListener) override;
+	void setBackgroundColor(const gcn::Color &color);
+	void fontChanged() override;
+	void addActionListener(gcn::ActionListener *actionListener);
 
 	void setItemImage(CGraphic *image) {
 		itemImage = image;
@@ -404,9 +410,9 @@ public:
 	void setMarkerImage(CGraphic *image) { markerImage = image; }
 
 	void draw(gcn::Graphics *graphics) override;
-	void drawBorder(gcn::Graphics *graphics) override;
-	gcn::Rectangle getVerticalMarkerDimension() override;
-	gcn::Rectangle getHorizontalMarkerDimension() override;
+	void drawFrame(gcn::Graphics *graphics) override;
+	gcn::Rectangle getVerticalMarkerDimension();
+	gcn::Rectangle getHorizontalMarkerDimension();
 
 private:
 	void adjustSize();
@@ -424,18 +430,18 @@ private:
 	void drawHBar(gcn::Graphics *graphics);
 	void drawVBar(gcn::Graphics *graphics);
 private:
-	CGraphic *itemImage;
-	CGraphic *upButtonImage;
-	CGraphic *upPressedButtonImage;
-	CGraphic *downButtonImage;
-	CGraphic *downPressedButtonImage;
-	CGraphic *leftButtonImage;
-	CGraphic *leftPressedButtonImage;
-	CGraphic *rightButtonImage;
-	CGraphic *rightPressedButtonImage;
-	CGraphic *hBarButtonImage;
-	CGraphic *vBarButtonImage;
-	CGraphic *markerImage;
+	CGraphic *itemImage = nullptr;
+	CGraphic *upButtonImage = nullptr;
+	CGraphic *upPressedButtonImage = nullptr;
+	CGraphic *downButtonImage = nullptr;
+	CGraphic *downPressedButtonImage = nullptr;
+	CGraphic *leftButtonImage = nullptr;
+	CGraphic *leftPressedButtonImage = nullptr;
+	CGraphic *rightButtonImage = nullptr;
+	CGraphic *rightPressedButtonImage = nullptr;
+	CGraphic *hBarButtonImage = nullptr;
+	CGraphic *vBarButtonImage = nullptr;
+	CGraphic *markerImage = nullptr;
 
 	LuaListModel lualistmodel;
 	ImageListBox listbox;
@@ -443,49 +449,56 @@ private:
 
 class DropDownWidget : public gcn::DropDown
 {
-	LuaListModel listmodel;
+	DropDownWidget(std::unique_ptr<LuaListModel> listmodel, gcn::ListBox *listBox) :
+		gcn::DropDown(listmodel.get(), nullptr, listBox),
+		mListModel(std::move(listmodel))
+	{}
+
 public:
-	DropDownWidget() {}
+	explicit DropDownWidget(gcn::ListBox *listBox = nullptr) :
+		DropDownWidget(std::make_unique<LuaListModel>(), listBox)
+	{}
+
 	void setList(lua_State *lua, lua_Object *lo);
-	void setSize(int width, int height) override;
+	void setSize(int width, int height);
+protected:
+	std::unique_ptr<LuaListModel> mListModel;
 };
 
 class ImageDropDownWidget : public DropDownWidget
 {
-public:
-	ImageDropDownWidget() : itemImage(nullptr) {
-		mListBox.addActionListener(this);
-		setListModel(&listmodel);
-		mScrollArea->setContent(&mListBox);
+private:
+	ImageDropDownWidget(std::unique_ptr<ImageListBox> imageListBox) :
+		DropDownWidget(imageListBox.get()),
+		mImageListBox(std::move(imageListBox))
+	{
+		this->mListBox->addActionListener(this);
 	}
+
+public:
+	ImageDropDownWidget() : ImageDropDownWidget(std::make_unique<ImageListBox>()) {}
 	void setItemImage(CGraphic *image) {
-		itemImage = image;
-		mListBox.setItemImage(image);
+		this->itemImage = image;
+		this->mImageListBox->setItemImage(image);
 	}
 	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
 	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
 
-	ImageListBox *getListBox() override { return &mListBox; }
 	void draw(gcn::Graphics *graphics) override;
-	void drawBorder(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
 	void drawButton(gcn::Graphics *graphics) override;
 	void setList(lua_State *lua, lua_Object *lo);
-	void setSize(int width, int height) override;
-	void setListModel(LuaListModel *listModel);
-	int getSelected();
+	void setSize(int width, int height);
 	std::string getSelectedItem();
-	void setSelected(int selected);
 	int setSelectedItem(lua_State *lua, lua_Object *lo);
 	void adjustHeight();
-	void setListBox(ImageListBox *listBox);
 	void setFont(gcn::Font *font);
-	void _mouseInputMessage(const gcn::MouseInput &mouseInput);
+
 private:
-	CGraphic *itemImage;
-	CGraphic *DownNormalImage;
-	CGraphic *DownPressedImage;
-	ImageListBox mListBox;
-	LuaListModel listmodel;
+	CGraphic *itemImage = nullptr;
+	CGraphic *DownNormalImage = nullptr;
+	CGraphic *DownPressedImage = nullptr;
+	std::unique_ptr<ImageListBox> mImageListBox;
 };
 
 class StatBoxWidget : public gcn::Widget

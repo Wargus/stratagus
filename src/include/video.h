@@ -41,6 +41,8 @@
 
 #include <SDL.h>
 #include <guichan.hpp>
+#include <guichan/sdl/sdlimage.hpp>
+
 #include <string_view>
 #include <vector>
 
@@ -92,7 +94,7 @@ public:
 	/// Add more modifiers here
 };
 
-class CGraphic : public gcn::Image
+class CGraphic : public gcn::SDLImage
 {
 public:
 	struct frame_pos_t {
@@ -101,7 +103,7 @@ public:
 	};
 
 protected:
-	CGraphic() = default;
+	CGraphic() : gcn::SDLImage(nullptr, false) {}
 	~CGraphic() {}
 
 public:
@@ -177,17 +179,14 @@ public:
 	bool IsLoaded(bool flipped = false) const { return mSurface != nullptr && (!flipped || SurfaceFlip != nullptr); }
 
 	//guichan
-	void *_getData() const override { return mSurface; }
 	int getWidth() const override { return Width; }
 	int getHeight() const override { return Height; }
 
-	SDL_Surface *getSurface() const { return mSurface; }
 	void setSurface(SDL_Surface *surface) { mSurface = surface; }
 
 private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
-	SDL_Surface *mSurface = nullptr;     /// Surface
 public:
 	fs::path File;         /// Filename
 	std::string HashFile;  /// Filename used in hash
@@ -239,9 +238,9 @@ public:
 #endif
 #endif
 
-class Mng : public gcn::Image
+class Mng : public gcn::SDLImage
 {
-	Mng() = default;
+	Mng() : gcn::SDLImage(nullptr, true) {}
 	~Mng();
 
 	Mng(const Mng &) = delete;
@@ -259,10 +258,7 @@ public:
 	int getIteration() const { return iteration; }
 
 	//guichan
-	void *_getData() const override;
-	int getWidth() const override { return mSurface->w; }
-	int getHeight() const override { return mSurface->h; }
-	bool isDirty() const override { return true; }
+	SDL_Surface* getSurface() const override;
 
 	friend struct MngWrapper;
 
@@ -270,11 +266,9 @@ public:
 	static uint32_t MaxFPS;
 
 private:
-	mutable bool is_dirty = false;
 	std::string name;
 	FILE *fd = nullptr;
 	mng_handle handle = nullptr;
-	sdl2::SurfacePtr mSurface;
 	std::vector<unsigned char> buffer;
 	unsigned long ticks = 0;
 	int iteration = 0;
@@ -293,10 +287,12 @@ public:
 	void Draw(int x, int y) {}
 
 	//guichan
-	void *_getData() const override { return nullptr; }
 	int getWidth() const override { return 0; }
 	int getHeight() const override { return 0; }
-	bool isDirty() const override { return false; }
+	void free() override { throw "unimplemented"; }
+	gcn::Color getPixel(int x, int y) override { throw "unimplemented"; }
+	void putPixel(int x, int y, const gcn::Color &color) override { throw "unimplemented"; }
+	void convertToDisplayFormat() override { throw "unimplemented"; }
 
 	static inline uint32_t MaxFPS = 15;
 };

@@ -743,7 +743,7 @@ void CButtonPanel::Draw()
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (buttons[i].Key == gcn::Key::ESCAPE || buttons[i].Key == 27) {
+			if (buttons[i].Key == gcn::Key::Escape || buttons[i].Key == 27) {
 				strcpy_s(buf, sizeof(buf), "ESC");
 			} else {
 				buf[0] = toupper(buttons[i].Key);
@@ -1403,11 +1403,8 @@ void CButtonPanel::DoClicked(int button)
 */
 bool CButtonPanel::DoKey(int key)
 {
-	SDL_Keysym keysym;
-	memset(&keysym, 0, sizeof(keysym));
-	keysym.sym = (SDL_Keycode)key;
-	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
-	key = k.getValue();
+	int convertSDLKeyCharacterToGuichanKey(int);
+	key = convertSDLKeyCharacterToGuichanKey(key);
 
 	if (!CurrentButtons.empty()) {
 		// This is required for action queues SHIFT+M should be `m'

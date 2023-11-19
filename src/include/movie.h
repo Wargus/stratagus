@@ -34,6 +34,7 @@
 
 #include <SDL.h>
 #include <guichan.hpp>
+#include <guichan/sdl/sdlimage.hpp>
 
 #ifdef USE_VORBIS
 
@@ -85,25 +86,16 @@ struct OggData {
 };
 
 #ifdef USE_THEORA
-class Movie : public gcn::Image
+class Movie : public gcn::SDLImage
 {
 public:
-	Movie() = default;
+	Movie() : gcn::SDLImage(nullptr, false) {}
 	~Movie();
 	bool Load(const std::string &filename, int w, int h);
-	bool IsPlaying() const { return is_dirty; }
+	bool IsPlaying() const { return true; }
 
-	// guichan
-	void *_getData() const override;
-	int getWidth() const override { return Width; }
-	int getHeight() const override { return Height; }
-	bool isDirty() const override { return is_dirty; }
-
-	int Width = 0;
-	int Height = 0;
-	SDL_Surface *surface = nullptr;
+public:
 	CFile *f = nullptr;
-	mutable bool is_dirty = true;
 	mutable bool need_data = true;
 	mutable Uint32 start_time = 0;
 	mutable OggData *data = nullptr;
@@ -139,10 +131,12 @@ public:
 	bool IsPlaying() const { return false; }
 
 	// guichan
-	void *_getData() const override { return nullptr; }
 	int getWidth() const override { return 0; }
 	int getHeight() const override { return 0; }
-	bool isDirty() const override { return false; }
+	void free() override { throw "unimplemented"; };
+	gcn::Color getPixel(int, int) override { throw "unimplemented"; };
+	void putPixel(int, int, const gcn::Color &) override { throw "unimplemented"; };
+	void convertToDisplayFormat() override { throw "unimplemented"; };
 };
 #endif
 

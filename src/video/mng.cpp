@@ -111,13 +111,14 @@ struct MngWrapper
 		mng->buffer.resize(width * height * 3);
 		memset(mng->buffer.data(), width * height * 3, sizeof(unsigned char));
 
-		mng->mSurface.reset(
-			SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8 * 3, Rmask, Gmask, Bmask, 0));
+		mng->free();
+		mng->mSurface =
+			SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8 * 3, Rmask, Gmask, Bmask, 0);
 		if (mng->mSurface == nullptr) {
 			ErrorPrint("Out of memory");
 			exit(1);
 		}
-		SDL_SetColorKey(mng->mSurface.get(), 1, 0);
+		SDL_SetColorKey(mng->mSurface, 1, 0);
 
 		return MNG_TRUE;
 	}
@@ -131,13 +132,13 @@ struct MngWrapper
 	static mng_bool refresh(mng_handle handle, mng_uint32, mng_uint32, mng_uint32, mng_uint32)
 	{
 		Mng *mng = (Mng *) mng_get_userdata(handle);
-		SDL_LockSurface(mng->mSurface.get());
+		SDL_LockSurface(mng->mSurface);
 		for (int i = 0; i < mng->mSurface->h; ++i) {
 			memcpy((char *) mng->mSurface->pixels + i * mng->mSurface->pitch,
 			       &mng->buffer[i * mng->mSurface->w * 3],
 			       mng->mSurface->w * 3);
 		}
-		SDL_UnlockSurface(mng->mSurface.get());
+		SDL_UnlockSurface(mng->mSurface);
 
 		return MNG_TRUE;
 	}
@@ -201,7 +202,7 @@ void Mng::Draw(int x, int y)
 	}
 
 	SDL_Rect rect = {(short int)x, (short int)y, (short unsigned int)(mSurface->w), (short unsigned int)(mSurface->h)};
-	SDL_BlitSurface(mSurface.get(), nullptr, TheScreen, &rect);
+	SDL_BlitSurface(mSurface, nullptr, TheScreen, &rect);
 }
 
 static std::map<std::string, Mng *> MngCache;
@@ -280,15 +281,12 @@ void Mng::Reset()
 	mng_display(handle);
 }
 
-void* Mng::_getData() const
+SDL_Surface *Mng::getSurface() const
 {
 	if (ticks <= GetTicks()) {
-		is_dirty = true;
 		mng_display_resume(handle);
-	} else {
-		is_dirty = false;
 	}
-	return mSurface.get();
+	return mSurface;
 }
 
 #endif // USE_MNG
