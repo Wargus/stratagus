@@ -694,7 +694,7 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 **  @param argv  Vector of arguments.
 */
 int stratagusMain(int argc, char **argv)
-{
+try {
 	for (int i = 0; i < argc; i++) {
 		OriginalArgv.push_back(std::string(argv[i]));
 	}
@@ -723,7 +723,6 @@ int stratagusMain(int argc, char **argv)
 	Assert(pathPtr);
 	StratagusLibPath = pathPtr;
 #endif
-	try {
 		Parameters &parameters = Parameters::Instance;
 		parameters.SetDefaultValues();
 		parameters.SetLocalPlayerNameFromEnv();
@@ -732,78 +731,97 @@ int stratagusMain(int argc, char **argv)
 		RedirectOutput();
 #endif
 
-		if (argc > 0) {
-			parameters.applicationName = argv[0];
-		}
+	if (argc > 0) {
+		parameters.applicationName = argv[0];
+	}
 
-		// FIXME: Parse options before or after scripts?
-		ParseCommandLine(argc, argv, parameters);
-		// Init the random number generator.
-		InitSyncRand();
+	// FIXME: Parse options before or after scripts?
+	ParseCommandLine(argc, argv, parameters);
+	// Init the random number generator.
+	InitSyncRand();
 
-		fs::create_directories(parameters.GetUserDirectory());
+	fs::create_directories(parameters.GetUserDirectory());
 
-		// Init Lua and register lua functions!
-		InitLua();
-		LuaRegisterModules();
+	// Init Lua and register lua functions!
+	InitLua();
+	LuaRegisterModules();
 
-		// Initialise AI module
-		InitAiModule();
+	// Initialise AI module
+	InitAiModule();
 
-		// Setup sound card, must be done before loading sounds, so that
-		// SDL_mixer can auto-convert to the target format
-		if (InitSound()) {
-			InitMusic();
-		}
+	// Setup sound card, must be done before loading sounds, so that
+	// SDL_mixer can auto-convert to the target format
+	if (InitSound()) {
+		InitMusic();
+	}
 
-		// init globals
-		Map.AllocateTileset();
-		UnitManager = new CUnitManager();
-		FogOfWar = std::make_unique<CFogOfWar>();
+	// init globals
+	Map.AllocateTileset();
+	UnitManager = new CUnitManager();
+	FogOfWar = std::make_unique<CFogOfWar>();
 
-		LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
+	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
-		// Setup video display
-		InitVideo();
+	// Setup video display
+	InitVideo();
 
-		PrintHeader();
-		PrintLicense();
+	PrintHeader();
+	PrintLicense();
 
 #ifndef DEBUG           // For debug it's better not to have:
-		srand(time(nullptr));  // Random counter = random each start
+	srand(time(nullptr));  // Random counter = random each start
 #endif
 
-		//  Show title screens.
-		SetDefaultTextColors(FontYellow, FontWhite);
-		LoadFonts();
-		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
-		Video.ClearScreen();
-		if (!IsRestart) {
-			ShowTitleScreens();
-		}
-
-		// Init player data
-		ThisPlayer = nullptr;
-		//Don't clear the Players structure as it would erase the allowed units.
-		// memset(Players, 0, sizeof(Players));
-		NumPlayers = 0;
-
-		UnitManager->Init(); // Units memory management
-		PreMenuSetup();     // Load everything needed for menus
-
-		MenuLoop();
-
-		Exit(0);
-	} catch (const std::exception &e) {
-		ErrorPrint("Stratagus crashed!\n"
-		           "Please send this call stack to our bug tracker: "
-		           "https://github.com/Wargus/stratagus/issues\n"
-		           "and tell us what caused this bug to occur.\n"
-		           " === exception state traceback === \n");
-		ErrorPrint("%s", e.what());
-		exit(1);
+	//  Show title screens.
+	SetDefaultTextColors(FontYellow, FontWhite);
+	LoadFonts();
+	SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
+	Video.ClearScreen();
+	if (!IsRestart) {
+		ShowTitleScreens();
 	}
-	return 0;
-}
 
+	// Init player data
+	ThisPlayer = nullptr;
+	//Don't clear the Players structure as it would erase the allowed units.
+	// memset(Players, 0, sizeof(Players));
+	NumPlayers = 0;
+
+	UnitManager->Init(); // Units memory management
+	PreMenuSetup();     // Load everything needed for menus
+
+	MenuLoop();
+
+	Exit(0);
+	return 0;
+} catch (const std::exception &e) {
+	ErrorPrint("Stratagus crashed!\n"
+		        "Please send this call stack to our bug tracker: "
+		        "https://github.com/Wargus/stratagus/issues\n"
+		        "and tell us what caused this bug to occur.\n"
+		        " === exception state traceback === \n");
+	ErrorPrint("%s", e.what());
+	exit(1);
+}
+catch (const gcn::Exception &ex) {
+	ErrorPrint("Stratagus crashed in Guichan!\n"
+	           "Please send this call stack to our bug tracker: "
+	           "https://github.com/Wargus/stratagus/issues\n"
+	           "and tell us what caused this bug to occur.\n"
+	           " === exception state traceback === \n");
+	ErrorPrint("%s:%d (%s): %s",
+	           ex.getFilename().c_str(),
+	           ex.getLine(),
+	           ex.getFunction().c_str(),
+	           ex.getMessage().c_str());
+	exit(1);
+}
+catch (...) {
+	ErrorPrint("Stratagus crashed!\n"
+	           "Please send this call stack to our bug tracker: "
+	           "https://github.com/Wargus/stratagus/issues\n"
+	           "and tell us what caused this bug to occur.\n"
+	           " === exception state traceback === \n");
+	exit(1);
+}
 //@}

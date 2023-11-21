@@ -285,21 +285,17 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			replacedUnit.Release();
 		}
 	}
-	if (unit != nullptr) {
-		if (type.GivesResource) {
-			if (type.StartingResources != 0) {
-				unit->ResourcesHeld = type.StartingResources;
-				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
-				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
-			} else {
-				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
-				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
-				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
-			}
-			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+	if (type.GivesResource) {
+		if (type.StartingResources != 0) {
+			unit->ResourcesHeld = type.StartingResources;
+			unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
+			unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
+		} else {
+			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
+			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
 		}
-	} else {
-		DebugPrint("Unable to allocate Unit");
+		unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 	}
 	UpdateMinimap = true;
 }
@@ -687,7 +683,7 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,i
 	int labelX = x1;
 	int labelY = y1;
 
-	std::vector<std::pair<bool, std::string>> compactOptions = {
+	const std::vector<std::pair<bool, std::string>> compactOptions = {
 		{ TileCursorSize == 1, "1x1" },
 		{ TileCursorSize == 2, "2x2" },
 		{ TileCursorSize == 3, "3x3" },
@@ -696,7 +692,7 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,i
 		{ TileCursorSize == 10, "10x10" }
 	};
 
-	std::vector<std::pair<bool, std::string>> options = {
+	const std::vector<std::pair<bool, std::string>> options = {
 		{ TileToolRandom != 0, "Random" },
 		{ TileToolDecoration != 0, "Filler" },
 		{ TileToolNoFixup != 0, "Manual" }
@@ -983,11 +979,8 @@ static void DrawStartLocations()
 static void DrawEditorInfo()
 {
 #if 1
-	Vec2i pos(0, 0);
-
-	if (UI.MouseViewport) {
-		pos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
-	}
+	const Vec2i pos =
+		UI.MouseViewport ? UI.MouseViewport->ScreenToTilePos(CursorScreenPos) : Vec2i(0, 0);
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
@@ -1114,22 +1107,22 @@ void EditorUpdateDisplay()
 /*----------------------------------------------------------------------------
 --  Highlight layers
 ----------------------------------------------------------------------------*/
-static inline bool OverlayElevation(const CMapField &mapField)
+static bool OverlayElevation(const CMapField &mapField)
 {
 	return mapField.getElevation() == Editor.HighlightElevationLevel;
 }
 
-static inline bool OverlayUnpassable(const CMapField &mapField)
+static bool OverlayUnpassable(const CMapField &mapField)
 {
 	return mapField.getFlag() & MapFieldUnpassable;
 }
 
-static inline bool OverlayNoBuildingAllowed(const CMapField &mapField)
+static bool OverlayNoBuildingAllowed(const CMapField &mapField)
 {
 	return mapField.getFlag() & MapFieldNoBuilding;
 }
 
-static inline bool OverlayOpaque(const CMapField &mapField)
+static bool OverlayOpaque(const CMapField &mapField)
 {
 	return mapField.isOpaque();
 }
@@ -1470,6 +1463,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				break;
 			}
 			Exit(0);
+			break;
 
 		case 'z':
 			if (KeyModifiers & ModifierControl) {
@@ -1513,7 +1507,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				}
 				break;
 			} else {
-				// fallthrough
+				[[fallthrough]];
 			}
 		case '1': case '2':
 		case '3': case '4': case '5':
@@ -1659,9 +1653,6 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	int bx = UI.InfoPanel.X + 4;
-	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
-
 	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string &label, int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 			ButtonUnderCursor = i + 300;
@@ -2018,7 +2009,6 @@ void EditorMainLoop()
 {
 	bool OldCommandLogDisabled = CommandLogDisabled;
 	const EventCallback *old_callbacks = GetCallbacks();
-	bool first_init = true;
 
 	CommandLogDisabled = true;
 	SetCallbacks(&EditorCallbacks);
