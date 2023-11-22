@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2004, 2005 darkbits                        Js_./
  * Per Larsson a.k.a finalman                          _RqZ{a<^_aa
- * Olof Naessén a.k.a jansem/yakslem                _asww7!uY`>  )\a//
+ * Olof Naessï¿½n a.k.a jansem/yakslem                _asww7!uY`>  )\a//
  *                                                 _Qhm`] _f "'c  1!5m
  * Visit: http://guichan.darkbits.org             )Qk<P ` _: :+' .'  "{[
  *                                               .)j(] .d_/ '-(  P .   S
@@ -85,6 +85,15 @@ namespace gcn
          * @return an element as a string.
          */
         virtual std::string getElementAt(int i) = 0;
+
+        /**
+         * Gets an index of a given element's value (if present)
+         *
+         * @param element a value of elements to find
+         * @return an index of element if present, -1 otherwise.
+         */
+
+        virtual int getIdxOfElement(std::string_view element) = 0;
 
         virtual ~ListModel() {}
     };
