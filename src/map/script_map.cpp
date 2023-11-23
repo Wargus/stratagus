@@ -903,14 +903,8 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 	if (!Map.Tileset->insertTiles(parser.getTiles())) {
 		LuaError(luaStack, "Tiles number limit exceeded.");
 	}
-	
-	/// FIXME: Save resulted tileset graphic into png-file. Debug purposes.	
-	IMG_SavePNG(Map.TileGraphic->Surface, "originalTilesetGraphics.png");
 	/// Add new graphic
 	Map.TileGraphic->AppendFrames(parser.getGraphic());
-
-	/// FIXME: Save resulted tileset graphic into png-file. Debug purposes.
-	IMG_SavePNG(Map.TileGraphic->Surface, "extendedTilesetGraphics.png");
 
 	return 0;
 }
