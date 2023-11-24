@@ -1612,7 +1612,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 
-	Players[playerIdx].Ai = std::unique_ptr<PlayerAi>();
+	Players[playerIdx].Ai = std::make_unique<PlayerAi>();
 	PlayerAi &ai = *Players[playerIdx].Ai;
 	ai.Player = &Players[playerIdx];
 

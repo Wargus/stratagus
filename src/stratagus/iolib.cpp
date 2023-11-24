@@ -173,6 +173,7 @@ int CFile::printf(const char *format, ...)
 		va_end(ap);
 		// If that worked, string was processed.
 		if (n > -1 && n < p.size()) {
+			p.resize(n);
 			break;
 		}
 		// Else try again with more space.
