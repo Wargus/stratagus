@@ -1080,7 +1080,7 @@ static int CclPresentMap(lua_State *l)
 	if(LuaGetArgsNum(l) >= 6) {
 		const std::string_view highgrounds = LuaToString(l, 6);
 		if (highgrounds == "highgrounds-enabled") {
-			Map.Info.EnableHighgrounds(true);
+			Map.Info.EnableHighgrounds();
 		}
 	}
 
@@ -1089,10 +1089,8 @@ static int CclPresentMap(lua_State *l)
 
 static int CclMapEnableHighgrounds(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-
-	Map.Info.EnableHighgrounds(LuaToBoolean(l, 1));
-
+	Map.Info.EnableHighgrounds(LuaGetArgsNum(l) >= 1 ? LuaToBoolean(l, 1) : true);
+	
 	return 0;
 }
 
