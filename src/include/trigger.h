@@ -36,10 +36,10 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CFile;
 class CUnit;
 class CUnitType;
 struct lua_State;
-class CFile;
 
 /**
 **  Timer structure
@@ -47,33 +47,25 @@ class CFile;
 class CTimer
 {
 public:
-	CTimer() : Init(false), Running(false), Increasing(false), Cycles(0),
-		LastUpdate(0) {}
+	CTimer() = default;
 
-	void Reset()
-	{
-		Init = false;
-		Running = false;
-		Increasing = false;
-		Cycles = 0;
-		LastUpdate = 0;
-	}
+	void Reset() { *this = {}; }
 
-	bool Init;                  /// timer is initialized
-	bool Running;               /// timer is running
-	bool Increasing;            /// increasing or decreasing
-	long Cycles;                /// current value in game cycles
-	unsigned long LastUpdate;   /// GameCycle of last update
+	bool Init = false;            /// timer is initialized
+	bool Running = false;         /// timer is running
+	bool Increasing = false;      /// increasing or decreasing
+	long Cycles = 0;              /// current value in game cycles
+	unsigned long LastUpdate = 0; /// GameCycle of last update
 };
 
 /**
 **  Data to referer game info when game running.
 */
 struct TriggerDataType {
-	CUnit *Attacker;  /// Unit which send the missile.
-	CUnit *Defender;  /// Unit which is hit by missile.
-	CUnit *Active;    /// Unit which is selected or else under cursor unit.
-	CUnitType *Type;  /// Type used in trigger;
+	CUnit *Attacker = nullptr; /// Unit which send the missile.
+	CUnit *Defender = nullptr; /// Unit which is hit by missile.
+	CUnit *Active = nullptr;   /// Unit which is selected or else under cursor unit.
+	CUnitType *Type = nullptr; /// Type used in trigger;
 };
 
 /*----------------------------------------------------------------------------
@@ -89,14 +81,14 @@ extern TriggerDataType TriggerData;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern std::function<bool(const CUnit &)> TriggerGetPlayer(lua_State *l); /// get the unit-player validator
-extern std::function<bool(const CUnit &)> TriggerGetUnitType(lua_State *l); /// get the unit-type validator
-extern void TriggersEachCycle();    /// test triggers
+std::function<bool(const CUnit &)> TriggerGetPlayer(lua_State *l); /// get the unit-player validator
+std::function<bool(const CUnit &)> TriggerGetUnitType(lua_State *l); /// get the unit-type validator
+void TriggersEachCycle();    /// test triggers
 
-extern void TriggerCclRegister();   /// Register ccl features
-extern void SaveTriggers(CFile &file); /// Save the trigger module
-extern void InitTriggers();         /// Setup triggers
-extern void CleanTriggers();        /// Cleanup the trigger module
+void TriggerCclRegister();   /// Register ccl features
+void SaveTriggers(CFile &file); /// Save the trigger module
+void InitTriggers();         /// Setup triggers
+void CleanTriggers();        /// Cleanup the trigger module
 
 //@}
 
