@@ -1065,14 +1065,14 @@ static int CclGetIsGameHoster(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code><strong>PresentMap</strong>("Map description", 1, 128, 128, 17)</code></div>
+** <div class="example"><code><strong>PresentMap</strong>("Map description", PlayerCount, Width, Height, uid_number [, "highgrounds-enabled"])</code></div>
 */
 static int CclPresentMap(lua_State *l)
 {
 	LuaCheckArgs_min(l, 5);
 
 	Map.Info.Description = LuaToString(l, 1);
-	// Number of players in LuaToNumber(l, 3); // Not used yet.
+	// Number of players in LuaToNumber(l, 2); // Not used yet.
 	Map.Info.MapWidth = LuaToNumber(l, 3);
 	Map.Info.MapHeight = LuaToNumber(l, 4);
 	Map.Info.MapUID = LuaToNumber(l, 5);
@@ -1081,6 +1081,8 @@ static int CclPresentMap(lua_State *l)
 		const std::string_view highgrounds = LuaToString(l, 6);
 		if (highgrounds == "highgrounds-enabled") {
 			Map.Info.EnableHighgrounds();
+		} else {
+			LuaError(l, "Unknown value %s\n", highgrounds.data());
 		}
 	}
 
