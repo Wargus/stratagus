@@ -1229,7 +1229,7 @@ static int CclSetSelectionStyle(lua_State *l)
 static int CclAddMessage(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	SetMessage("%s", LuaToString(l, 1));
+	SetMessage("%s", LuaToString(l, 1).data());
 	return 0;
 }
 
