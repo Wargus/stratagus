@@ -86,15 +86,6 @@ namespace gcn
          */
         virtual std::string getElementAt(int i) = 0;
 
-        /**
-         * Gets an index of a given element's value (if present)
-         *
-         * @param element a value of elements to find
-         * @return an index of element if present, -1 otherwise.
-         */
-
-        virtual int getIdxOfElement(std::string_view element) = 0;
-
         virtual ~ListModel() {}
     };
 }
