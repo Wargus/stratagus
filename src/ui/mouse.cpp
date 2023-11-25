@@ -1492,7 +1492,7 @@ static void SendCommand(const Vec2i &tilePos)
 			ret = SendSpellCast(tilePos);
 			break;
 		default:
-			ErrorPrint("Unsupported send action %d\n", CursorAction);
+			ErrorPrint("Unsupported send action %d\n", static_cast<int>(CursorAction));
 			break;
 	}
 	if (ret) {

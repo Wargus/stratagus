@@ -331,9 +331,8 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(",\n  \"spell-cooldown\", {");
 		const char *sep = "";
 		for (int timer : unit.SpellCoolDownTimers) {
-			file.printf(sep);
-			sep = " ,";
-			file.printf("%d", timer);
+			file.printf("%s%d", sep, timer);
+			sep = ", ";
 		}
 		file.printf("}");
 	}
