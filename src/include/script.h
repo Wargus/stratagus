@@ -92,7 +92,7 @@ extern int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnEr
   lua_error(l); \
  } while (0)
 
-static void LuaCheckArgs(lua_State *l, const int args)
+inline void LuaCheckArgs(lua_State *l, const int args)
 {
 	if (lua_gettop(l) != args) {
 		LuaError(l, "incorrect argument");
