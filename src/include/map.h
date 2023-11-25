@@ -146,7 +146,7 @@ public:
 	unsigned int MapUID;        /// Unique Map ID (hash)
 
 private:
-	bool Highgrounds = false;	/// Map has highgrounds
+	bool HighgroundsEnabled = false;	/// Map has highgrounds
 };
 
 /*----------------------------------------------------------------------------
