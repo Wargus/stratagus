@@ -1119,7 +1119,7 @@ static int CclDefineMapSetup(lua_State *l)
 	LuaCheckArgs(l, 1);
 	Map.Info.Filename = LuaToString(l, 1);
 
-	return 1;
+	return 0;
 }
 /**
 **  Register CCL features for map.
