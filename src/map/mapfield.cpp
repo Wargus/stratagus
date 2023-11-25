@@ -84,7 +84,7 @@ bool CMapField::IsTerrainResourceOnMap() const
 
 void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile /* = -1 */)
 {
-	uint8_t compShift = 0; // [0..F] in case then current tileset slot length is shorter then map's original
+	uint8_t compShift = 0; // [0..F] in case that current tileset slot length is shorter than map's original
 
 	if (tileIndex >= ExtendedTilesetBeginIdx) { // tile from extended tileset
 		while(tileset.tiles[tileIndex - compShift].tile == 0 && ((tileIndex & 0xF) - compShift) > 0) {
