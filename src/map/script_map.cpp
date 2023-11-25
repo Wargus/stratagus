@@ -1065,7 +1065,7 @@ static int CclGetIsGameHoster(lua_State *l)
 **
 ** Example:
 **
-** <div class="example"><code><strong>PresentMap</strong>("Map description", 1, 128, 128, 17)</code></div>
+** <div class="example"><code><strong>PresentMap</strong>("Map description", PlayerCount, Width, Height, uid_number [, "highgrounds-enabled"])</code></div>
 */
 static int CclPresentMap(lua_State *l)
 {
