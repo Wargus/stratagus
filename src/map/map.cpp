@@ -317,7 +317,7 @@ void CMapInfo::Clear()
 	memset(this->PlayerType, 0, sizeof(this->PlayerType));
 	this->MapUID = 0;
 
-	this->Highgrounds = false;
+	this->HighgroundsEnabled = false;
 }
 
 CMap::~CMap()
