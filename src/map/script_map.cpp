@@ -1072,7 +1072,7 @@ static int CclPresentMap(lua_State *l)
 	LuaCheckArgs_min(l, 5);
 
 	Map.Info.Description = LuaToString(l, 1);
-	// Number of players in LuaToNumber(l, 3); // Not used yet.
+	// Number of players in LuaToNumber(l, 2); // Not used yet.
 	Map.Info.MapWidth = LuaToNumber(l, 3);
 	Map.Info.MapHeight = LuaToNumber(l, 4);
 	Map.Info.MapUID = LuaToNumber(l, 5);
