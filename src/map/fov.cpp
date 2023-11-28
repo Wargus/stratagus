@@ -138,7 +138,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 		return;
 	}
 	if (GameSettings.FoV == FieldOfViewTypes::cShadowCasting && !unit.Type->AirUnit) {
-		/// FIXME: add high-/lowground
+
 		OpaqueFields = unit.Type->BoolFlag[ELEVATED_INDEX].value ? 0 : this->Settings.OpaqueFields;
 		if (GameSettings.Inside) {
 			OpaqueFields &= ~(MapFieldRocks); /// because of rocks-flag is used as an obstacle for ranged attackers
