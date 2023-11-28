@@ -129,6 +129,9 @@ public:
 
 	bool IsPointOnMap(const Vec2i &pos) const { return IsPointOnMap(pos.x, pos.y); }
 
+	bool IsHighgroundsEnabled() const { return HighgroundsEnabled; }
+	void EnableHighgrounds(bool enable = true) { HighgroundsEnabled = enable; }
+
 	void Clear();
 
 public:
@@ -141,6 +144,9 @@ public:
 	PlayerTypes PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
+
+private:
+	bool HighgroundsEnabled = false;	/// Map has highgrounds
 };
 
 /*----------------------------------------------------------------------------

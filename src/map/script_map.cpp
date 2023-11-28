@@ -1057,6 +1057,71 @@ static int CclGetIsGameHoster(lua_State *l)
 }
 
 /**
+** <b>Description</b>
+**
+** Set basic map caracteristics.
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code><strong>PresentMap</strong>("Map description", PlayerCount, Width, Height, uid_number [, "highgrounds-enabled"])</code></div>
+*/
+static int CclPresentMap(lua_State *l)
+{
+	LuaCheckArgs_min(l, 5);
+
+	Map.Info.Description = LuaToString(l, 1);
+	// Number of players in LuaToNumber(l, 2); // Not used yet.
+	Map.Info.MapWidth = LuaToNumber(l, 3);
+	Map.Info.MapHeight = LuaToNumber(l, 4);
+	Map.Info.MapUID = LuaToNumber(l, 5);
+	
+	if(LuaGetArgsNum(l) >= 6) {
+		const std::string_view value = LuaToString(l, 6);
+		if (value == "highgrounds-enabled") {
+			Map.Info.EnableHighgrounds();
+		} else {
+			LuaError(l, "Unknown value %s\n", value.data());
+		}
+	}
+
+	return 0;
+}
+
+static int CclMapEnableHighgrounds(lua_State *l)
+{
+	Map.Info.EnableHighgrounds(LuaGetArgsNum(l) >= 1 ? LuaToBoolean(l, 1) : true);
+	
+	return 0;
+}
+
+static int CclIsHighgroundsEnabled(lua_State *l)
+{
+	lua_pushboolean(l, Map.Info.IsHighgroundsEnabled());
+	return 1;
+}
+
+/**
+** <b>Description</b>
+**
+** Define the lua file that will build the map
+**
+**  @param l  Lua state.
+**
+** Example:
+**
+** <div class="example"><code>-- Load map setup from file
+**		<strong>DefineMapSetup</strong>("Setup.sms")</code></div>
+*/
+static int CclDefineMapSetup(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	Map.Info.Filename = LuaToString(l, 1);
+
+	return 0;
+}
+/**
 **  Register CCL features for map.
 */
 void MapCclRegister()
@@ -1114,6 +1179,11 @@ void MapCclRegister()
 
 	lua_register(Lua, "GetIsGameHoster", CclGetIsGameHoster);
 
+	lua_register(Lua, "PresentMap", CclPresentMap);
+	lua_register(Lua, "MapEnableHighgrounds", CclMapEnableHighgrounds);
+	lua_register(Lua, "IsHighgroundsEnabled", CclIsHighgroundsEnabled);
+
+	lua_register(Lua, "DefineMapSetup", CclDefineMapSetup);
 }
 
 //@}

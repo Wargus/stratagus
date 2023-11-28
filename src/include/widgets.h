@@ -319,6 +319,7 @@ public:
 
 	int getNumberOfElements() override { return list.size(); }
 	std::string getElementAt(int i) override { return list[i]; }
+	int getIdxOfElement(std::string_view element);
 };
 
 class LuaListModel : public gcn::ListModel
@@ -330,6 +331,7 @@ public:
 	void setList(lua_State *lua, lua_Object *lo);
 	int getNumberOfElements() override { return list.size(); }
 	std::string getElementAt(int i) override { return list[i]; }
+	int getIdxOfElement(std::string_view element);
 };
 
 class ImageListBox : public gcn::ListBox
@@ -471,7 +473,9 @@ public:
 	void setSize(int width, int height) override;
 	void setListModel(LuaListModel *listModel);
 	int getSelected();
+	std::string getSelectedItem();
 	void setSelected(int selected);
+	int setSelectedItem(lua_State *lua, lua_Object *lo);
 	void adjustHeight();
 	void setListBox(ImageListBox *listBox);
 	void setFont(gcn::Font *font);

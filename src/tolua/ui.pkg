@@ -630,6 +630,8 @@ class DropDownWidget : public DropDown
 class ImageDropDownWidget : public DropDown
 {
 	ImageDropDownWidget();
+	std::string getSelectedItem();
+	int setSelectedItem(lua_State *lua, lua_Object *lo);
 	void setList(lua_State *lua, lua_Object *lo);
 	virtual ListBox *getListBox();
 	virtual void setSize(int width, int height);

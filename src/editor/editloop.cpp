@@ -2137,7 +2137,7 @@ void EditorMainLoop()
 		editorContainer->add(toolDropdown.get(), 0, 0);
 	}
 
-	std::vector<std::string> overlaysListStrings = { "Layers: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
+	std::vector<std::string> overlaysListStrings = { "Overlays: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
 	auto overlaysList = std::make_unique<StringListModel>(overlaysListStrings);
 	overlaysDropdown = std::make_unique<gcn::DropDown>(overlaysList.get());
 	auto overlaysDropdownListener = std::make_unique<LambdaActionListener>([&overlaysListStrings](const std::string&) {

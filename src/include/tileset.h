@@ -90,6 +90,7 @@ constexpr uint8_t MapFieldSubtilesMax				{16};
 constexpr uint8_t MapFieldSubtilesUnpassableShift	{48};
 constexpr tile_flags MapFieldSubtilesUnpassableMask	{tile_flags(0xFFFF) << MapFieldSubtilesUnpassableShift}; /// Up to 16 unpassable subtiles, never used in MapField, only in CTile
 
+constexpr tile_index ExtendedTilesetBeginIdx	{0x1010};	/// the extended tiles indexes start form here
 
 /**
 **  These are used for lookup tiles types

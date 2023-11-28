@@ -43,6 +43,7 @@
 #include "netconnect.h"
 #include "editor.h"
 #include "sound.h"
+#include "util.h"
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -1718,9 +1719,23 @@ void ImageTextField::drawBorder(gcn::Graphics *graphics)
 }
 
 /*----------------------------------------------------------------------------
---  LuaListModel
+--  StringListModel
 ----------------------------------------------------------------------------*/
 
+int StringListModel::getIdxOfElement(std::string_view element)
+{
+	auto result = ranges::find(this->list, element);
+	if (result != this->list.end()) {
+		return result - this->list.begin();
+	} else {
+		return -1;
+	}
+
+}
+
+/*----------------------------------------------------------------------------
+--  LuaListModel
+----------------------------------------------------------------------------*/
 
 /**
 **  Set the list
@@ -1732,6 +1747,16 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 	const int args = lua_rawlen(lua, *lo);
 	for (int j = 0; j < args; ++j) {
 		list.push_back(std::string(LuaToString(lua, *lo, j + 1)));
+	}
+}
+
+int LuaListModel::getIdxOfElement(std::string_view element)
+{
+	auto result = ranges::find(this->list, element);
+	if (result != this->list.end()) {
+		return result - this->list.begin();
+	} else {
+		return -1;
 	}
 }
 
@@ -2610,6 +2635,13 @@ int ImageDropDownWidget::getSelected()
 	return mListBox.getSelected();
 }
 
+std::string ImageDropDownWidget::getSelectedItem()
+{
+	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+
+	return listmodel.getElementAt(mListBox.getSelected());
+}
+
 void ImageDropDownWidget::setSelected(int selected)
 {
 	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
@@ -2618,6 +2650,19 @@ void ImageDropDownWidget::setSelected(int selected)
 	{
 		mListBox.setSelected(selected);
 	}
+}
+
+int ImageDropDownWidget::setSelectedItem(lua_State *lua, lua_Object *lo)
+{
+	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
+
+	auto item = LuaToString(lua, *lo);
+	int idx = this->listmodel.getIdxOfElement(item);
+	if (idx >= 0)
+	{
+		this->setSelected(idx);
+	}
+	return idx;
 }
 
 void ImageDropDownWidget::adjustHeight()

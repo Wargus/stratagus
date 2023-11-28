@@ -92,12 +92,24 @@ extern int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnEr
   lua_error(l); \
  } while (0)
 
-#define LuaCheckArgs(l, args) \
-	do { \
-		if (lua_gettop(l) != args) { \
-			LuaError(l, "incorrect argument"); \
-		} \
-	} while (0)
+inline void LuaCheckArgs(lua_State *l, int args)
+{
+	if (lua_gettop(l) != args) {
+		LuaError(l, "incorrect argument");
+	}
+}
+
+inline void LuaCheckArgs_min(lua_State *l, int args)
+{
+	if (lua_gettop(l) < args) {
+		LuaError(l, "incorrect argument");
+	}
+}
+
+inline int LuaGetArgsNum(lua_State *l)
+{
+	return lua_gettop(l);
+}
 
 #if LUA_VERSION_NUM <= 501
 
