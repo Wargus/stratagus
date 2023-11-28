@@ -1078,11 +1078,11 @@ static int CclPresentMap(lua_State *l)
 	Map.Info.MapUID = LuaToNumber(l, 5);
 	
 	if(LuaGetArgsNum(l) >= 6) {
-		const std::string_view highgrounds = LuaToString(l, 6);
-		if (highgrounds == "highgrounds-enabled") {
+		const std::string_view value = LuaToString(l, 6);
+		if (value == "highgrounds-enabled") {
 			Map.Info.EnableHighgrounds();
 		} else {
-			LuaError(l, "Unknown value %s\n", highgrounds.data());
+			LuaError(l, "Unknown value %s\n", value.data());
 		}
 	}
 
