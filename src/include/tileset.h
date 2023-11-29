@@ -291,10 +291,10 @@ GenerateExtendedTileset(
         comma separated list of flags wihich are common for all tiles in this slot
 
       dst:
-        single agrgument (number or table) at position 1.
+        single argument (number or table) at position 1.
         index of defined tile (or set of indexes). Each slot consist of 16 tiles only.
         For extended tileset indexes must be greater than already defined.
-        Each slot's indexes set starts from xxx0 and ended with xxxF (where discription of xxx see in PUD format explanation)
+        Each slot's indexes set starts from xxx0 and ended with xxxF (where description of xxx see in PUD format explanation)
 
         'dst' can take one of the following forms:
         tile                    -- single tile index
@@ -304,7 +304,7 @@ GenerateExtendedTileset(
                                 -- until there is a src (up to 16, if less then fill slot with 0 for absent srcs)
 
       src:
-        single agrgument (number or table) at position 2.
+        single argument (number or table) at position 2.
         Describes where to get graphics for dst. It can be graphics from a tile defined in main tileset,
         or frame from image file defined by "image" field (see above), or it can be generated from
         several graphic frames by composing them as layers (with simple per-pixel manipulations)
