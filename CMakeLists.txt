@@ -171,41 +171,6 @@ set(game_SRCS
 )
 source_group(game FILES ${game_SRCS})
 
-set(guichan_SRCS
-	third-party/guichan/src/cliprectangle.cpp
-	third-party/guichan/src/color.cpp
-	third-party/guichan/src/defaultfont.cpp
-	third-party/guichan/src/exception.cpp
-	third-party/guichan/src/focushandler.cpp
-	third-party/guichan/src/font.cpp
-	third-party/guichan/src/graphics.cpp
-	third-party/guichan/src/gui.cpp
-	third-party/guichan/src/guichan.cpp
-	third-party/guichan/src/image.cpp
-	third-party/guichan/src/imagefont.cpp
-	third-party/guichan/src/key.cpp
-	third-party/guichan/src/keyinput.cpp
-	third-party/guichan/src/mouseinput.cpp
-	third-party/guichan/src/rectangle.cpp
-	third-party/guichan/src/sdl/sdl.cpp
-	third-party/guichan/src/sdl/sdlgraphics.cpp
-	third-party/guichan/src/sdl/sdlinput.cpp
-	third-party/guichan/src/widget.cpp
-	third-party/guichan/src/widgets/button.cpp
-	third-party/guichan/src/widgets/container.cpp
-	third-party/guichan/src/widgets/dropdown.cpp
-	third-party/guichan/src/widgets/checkbox.cpp
-	third-party/guichan/src/widgets/icon.cpp
-	third-party/guichan/src/widgets/label.cpp
-	third-party/guichan/src/widgets/listbox.cpp
-	third-party/guichan/src/widgets/radiobutton.cpp
-	third-party/guichan/src/widgets/scrollarea.cpp
-	third-party/guichan/src/widgets/slider.cpp
-	third-party/guichan/src/widgets/textbox.cpp
-	third-party/guichan/src/widgets/textfield.cpp
-	third-party/guichan/src/widgets/window.cpp
-)
-
 set(map_SRCS
 	src/map/fov.cpp
 	src/map/fow.cpp
@@ -422,53 +387,6 @@ set(stratagus_SRCS
 	${hqx_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
-)
-
-set(guichan_HDRS
-	third-party/guichan/include/guichan/actionlistener.hpp
-	third-party/guichan/include/guichan/allegro.hpp
-	third-party/guichan/include/guichan/basiccontainer.hpp
-	third-party/guichan/include/guichan/cliprectangle.hpp
-	third-party/guichan/include/guichan/color.hpp
-	third-party/guichan/include/guichan/defaultfont.hpp
-	third-party/guichan/include/guichan/exception.hpp
-	third-party/guichan/include/guichan/focushandler.hpp
-	third-party/guichan/include/guichan/font.hpp
-	third-party/guichan/include/guichan/graphics.hpp
-	third-party/guichan/include/guichan/sdl.hpp
-	third-party/guichan/include/guichan/gui.hpp
-	third-party/guichan/include/guichan.hpp
-	third-party/guichan/include/guichan/imagefont.hpp
-	third-party/guichan/include/guichan/image.hpp
-	third-party/guichan/include/guichan/imageloader.hpp
-	third-party/guichan/include/guichan/input.hpp
-	third-party/guichan/include/guichan/key.hpp
-	third-party/guichan/include/guichan/keyinput.hpp
-	third-party/guichan/include/guichan/keylistener.hpp
-	third-party/guichan/include/guichan/listmodel.hpp
-	third-party/guichan/include/guichan/mouseinput.hpp
-	third-party/guichan/include/guichan/mouselistener.hpp
-	third-party/guichan/include/guichan/platform.hpp
-	third-party/guichan/include/guichan/rectangle.hpp
-	third-party/guichan/include/guichan/sdl/sdlgraphics.hpp
-	third-party/guichan/include/guichan/sdl/sdlimageloader.hpp
-	third-party/guichan/include/guichan/sdl/sdlinput.hpp
-	third-party/guichan/include/guichan/sdl/sdlpixel.hpp
-	third-party/guichan/include/guichan/widget.hpp
-	third-party/guichan/include/guichan/widgets/button.hpp
-	third-party/guichan/include/guichan/widgets/container.hpp
-	third-party/guichan/include/guichan/widgets/dropdown.hpp
-	third-party/guichan/include/guichan/widgets/checkbox.hpp
-	third-party/guichan/include/guichan/widgets/icon.hpp
-	third-party/guichan/include/guichan/widgets/label.hpp
-	third-party/guichan/include/guichan/widgets/listbox.hpp
-	third-party/guichan/include/guichan/widgets/radiobutton.hpp
-	third-party/guichan/include/guichan/widgets/scrollarea.hpp
-	third-party/guichan/include/guichan/widgets/slider.hpp
-	third-party/guichan/include/guichan/widgets/textbox.hpp
-	third-party/guichan/include/guichan/widgets/textfield.hpp
-	third-party/guichan/include/guichan/widgets/window.hpp
-	third-party/guichan/include/guichan/x.hpp
 )
 
 set(stratagus_action_HDRS
@@ -771,12 +689,7 @@ include(CheckTypeSize)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 
-add_library(guichan_lib ${guichan_SRCS} ${guichan_HDRS})
-target_include_directories(guichan_lib PUBLIC third-party/guichan/include)
-if(BUILD_VENDORED_SDL)
-	add_dependencies(guichan_lib SDL2)
-endif()
-
+vendored_guichan()
 
 # Windows RC compiler definitions
 
