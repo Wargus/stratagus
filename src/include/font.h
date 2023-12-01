@@ -62,7 +62,7 @@
 #include "color.h"
 
 #include <array>
-#include <guichan/font.h>
+#include <guichan/font.hpp>
 #include <string>
 #include <SDL.h>
 

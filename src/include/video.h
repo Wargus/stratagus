@@ -40,7 +40,7 @@
 #include "vec2i.h"
 
 #include <SDL.h>
-#include <guichan.h>
+#include <guichan.hpp>
 #include <string_view>
 #include <vector>
 

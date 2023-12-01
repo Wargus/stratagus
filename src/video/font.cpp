@@ -40,7 +40,7 @@
 #include "intern_video.h"
 #include "video.h"
 
-#include <guichan/sdl/sdlinput.h>
+#include <guichan/sdl/sdlinput.hpp>
 #include <map>
 #include <vector>
 

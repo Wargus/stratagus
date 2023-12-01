@@ -34,10 +34,10 @@
 #include "luacallback.h"
 
 #include <functional>
-#include <guichan.h>
-#include <guichan/gsdl.h>
-#include <guichan/keylistener.h>
-#include <guichan/mouselistener.h>
+#include <guichan.hpp>
+#include <guichan/sdl.hpp>
+#include <guichan/keylistener.hpp>
+#include <guichan/mouselistener.hpp>
 
 extern bool GuichanActive;
 

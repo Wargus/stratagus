@@ -210,7 +210,7 @@ extern void beos_init(int argc, char **argv);
 #include "missile.h" //for FreeBurningBuildingFrames
 
 #include <SDL.h>
-#include <guichan.h>
+#include <guichan.hpp>
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>

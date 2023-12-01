@@ -83,8 +83,6 @@ endif()
 
 include_directories(
 	src/include
-	src/guichan/include
-	src/guichan/include/guichan
 	src/third_party/
 	${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -172,42 +170,6 @@ set(game_SRCS
 	src/game/trigger.cpp
 )
 source_group(game FILES ${game_SRCS})
-
-set(guichan_SRCS
-	src/guichan/cliprectangle.cpp
-	src/guichan/color.cpp
-	src/guichan/defaultfont.cpp
-	src/guichan/exception.cpp
-	src/guichan/focushandler.cpp
-	src/guichan/gfont.cpp
-	src/guichan/graphics.cpp
-	src/guichan/gui.cpp
-	src/guichan/guichan.cpp
-	src/guichan/image.cpp
-	src/guichan/imagefont.cpp
-	src/guichan/key.cpp
-	src/guichan/keyinput.cpp
-	src/guichan/mouseinput.cpp
-	src/guichan/rectangle.cpp
-	src/guichan/sdl/gsdl.cpp
-	src/guichan/sdl/sdlgraphics.cpp
-	src/guichan/sdl/sdlinput.cpp
-	src/guichan/widget.cpp
-	src/guichan/widgets/button.cpp
-	src/guichan/widgets/container.cpp
-	src/guichan/widgets/dropdown.cpp
-	src/guichan/widgets/checkbox.cpp
-	src/guichan/widgets/icon.cpp
-	src/guichan/widgets/label.cpp
-	src/guichan/widgets/listbox.cpp
-	src/guichan/widgets/radiobutton.cpp
-	src/guichan/widgets/scrollarea.cpp
-	src/guichan/widgets/slider.cpp
-	src/guichan/widgets/textbox.cpp
-	src/guichan/widgets/textfield.cpp
-	src/guichan/widgets/window.cpp
-)
-source_group(guichan FILES ${guichan_SRCS})
 
 set(map_SRCS
 	src/map/fov.cpp
@@ -411,7 +373,6 @@ set(stratagus_SRCS
 	${ai_SRCS}
 	${editor_SRCS}
 	${game_SRCS}
-	${guichan_SRCS}
 	${map_SRCS}
 	${missile_SRCS}
 	${network_SRCS}
@@ -426,53 +387,6 @@ set(stratagus_SRCS
 	${hqx_SRCS}
 	${xbrz_SRCS}
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
-)
-
-set(stratagus_guichan_HDRS
-	src/guichan/include/guichan/actionlistener.h
-	src/guichan/include/guichan/allegro.h
-	src/guichan/include/guichan/basiccontainer.h
-	src/guichan/include/guichan/cliprectangle.h
-	src/guichan/include/guichan/color.h
-	src/guichan/include/guichan/defaultfont.h
-	src/guichan/include/guichan/exception.h
-	src/guichan/include/guichan/focushandler.h
-	src/guichan/include/guichan/font.h
-	src/guichan/include/guichan/graphics.h
-	src/guichan/include/guichan/gsdl.h
-	src/guichan/include/guichan/gui.h
-	src/guichan/include/guichan.h
-	src/guichan/include/guichan/imagefont.h
-	src/guichan/include/guichan/image.h
-	src/guichan/include/guichan/imageloader.h
-	src/guichan/include/guichan/input.h
-	src/guichan/include/guichan/key.h
-	src/guichan/include/guichan/keyinput.h
-	src/guichan/include/guichan/keylistener.h
-	src/guichan/include/guichan/listmodel.h
-	src/guichan/include/guichan/mouseinput.h
-	src/guichan/include/guichan/mouselistener.h
-	src/guichan/include/guichan/platform.h
-	src/guichan/include/guichan/rectangle.h
-	src/guichan/include/guichan/sdl/sdlgraphics.h
-	src/guichan/include/guichan/sdl/sdlimageloader.h
-	src/guichan/include/guichan/sdl/sdlinput.h
-	src/guichan/include/guichan/sdl/sdlpixel.h
-	src/guichan/include/guichan/widget.h
-	src/guichan/include/guichan/widgets/button.h
-	src/guichan/include/guichan/widgets/container.h
-	src/guichan/include/guichan/widgets/dropdown.h
-	src/guichan/include/guichan/widgets/checkbox.h
-	src/guichan/include/guichan/widgets/icon.h
-	src/guichan/include/guichan/widgets/label.h
-	src/guichan/include/guichan/widgets/listbox.h
-	src/guichan/include/guichan/widgets/radiobutton.h
-	src/guichan/include/guichan/widgets/scrollarea.h
-	src/guichan/include/guichan/widgets/slider.h
-	src/guichan/include/guichan/widgets/textbox.h
-	src/guichan/include/guichan/widgets/textfield.h
-	src/guichan/include/guichan/widgets/window.h
-	src/guichan/include/guichan/x.h
 )
 
 set(stratagus_action_HDRS
@@ -627,7 +541,6 @@ set(stratagus_tests_SRCS
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
-source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
 
 
@@ -635,7 +548,6 @@ set(stratagus_HDRS
 	${stratagus_generic_HDRS}
 	${stratagus_action_HDRS}
 	${stratagus_animation_HDRS}
-	${stratagus_guichan_HDRS}
 	${stratagus_spell_HDRS}
 	${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
 	version-generated.h # This line is needed for CMake when generating Doxygen documentation
@@ -776,6 +688,8 @@ find_package(SelfPackers)
 include(CheckTypeSize)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
+
+vendored_guichan()
 
 # Windows RC compiler definitions
 
@@ -1196,7 +1110,7 @@ if (ENABLE_STDIO_REDIRECT)
 else ()
 	add_executable(stratagus src/stratagus/main.cpp)
 endif ()
-target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS})
+target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS} guichan_lib)
 target_link_libraries(stratagus PUBLIC stratagus_lib)
 
 target_include_directories(stratagus_lib PRIVATE third-party/mdns third-party/spiritless_po/include)
