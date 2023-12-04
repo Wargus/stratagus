@@ -57,9 +57,10 @@ enum EditorRunningType {
 enum class EditorStateType {
 	Selecting,         /// Select
 	EditTile,          /// Edit tiles
-	EditUnit,          /// Edit units
+	ElevationLevel,    /// Edit elevation levels
+	EditRamps,         /// Place and edit ramps
 	SetStartLocation,  /// Set the start location
-	ElevationLevel     /// Edit elevation levels
+	EditUnit           /// Edit units
 };
 
 class CEditor

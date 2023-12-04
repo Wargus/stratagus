@@ -2070,63 +2070,75 @@ void EditorMainLoop()
 	editorContainer->add(editorSlider.get(), getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
-	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units", "Elevation" };
+	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
+
+	if (Map.Info.IsHighgroundsEnabled()) {
+		std::vector<std::string> highgroundsTools = { "Elevation", "Ramps" };
+
+		toolListStrings.insert(ranges::find(toolListStrings, "Start Locations"),
+							   highgroundsTools.begin(),
+							   highgroundsTools.end());
+	}
 	auto toolList = std::make_unique<StringListModel>(toolListStrings);
 	toolDropdown = std::make_unique<gcn::DropDown>(toolList.get());
 	auto toolDropdownListener = std::make_unique<LambdaActionListener>([&toolListStrings](const std::string&) {
-		int selected = toolDropdown->getSelected();
+
+		const std::string_view selectedItem = toolListStrings[toolDropdown->getSelected()];
+
 		// Click on mode area
 		Editor.CursorUnitIndex = Editor.CursorTileIndex = Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
 		CursorBuilding = nullptr;
 		Editor.UnitIndex = Editor.TileIndex = 0;
-		switch (selected) {
-			case 0:
-				Editor.State = EditorStateType::Selecting;
-				editorSlider->setVisible(false);
-				return;
-			case 1:
-				Editor.State = EditorStateType::EditTile;
-				editorSlider->setVisible(true);
-				editorSlider->setValue(0);
-				return;
-			case 2:
-				Editor.State = EditorStateType::SetStartLocation;
-				editorSlider->setVisible(false);
-				return;
-			case 3:
-				Editor.State = EditorStateType::EditUnit;
-				RecalculateShownUnits();
-				editorSlider->setVisible(true);
-				editorSlider->setValue(0);
-				return;
-			case 4:
-				Editor.State = EditorStateType::ElevationLevel;
-				editorSlider->setVisible(false);
-				Editor.SelectedElevationLevel = 0;
-				return;
-			default: {
-				std::string selectedString = toolListStrings[selected];
-				Editor.State = EditorStateType::EditUnit;
-				size_t startIndex = 0;
-				size_t endIndex = INT_MAX;
-				for (size_t i = 0; i < Editor.UnitTypes.size(); i++) {
-					std::string entry = Editor.UnitTypes[i];
-					if (startIndex == 0) {
-						if (entry.find(selectedString, 2) != std::string::npos) {
-							startIndex = i + 1;
-						}
-					} else {
-						if (entry.rfind("--", 0) != std::string::npos) {
-							endIndex = i;
-							break;
-						}
+
+		if (selectedItem == "Select") {
+			Editor.State = EditorStateType::Selecting;
+			editorSlider->setVisible(false);
+
+		} else if (selectedItem == "Tiles") {
+			Editor.State = EditorStateType::EditTile;
+			editorSlider->setVisible(true);
+			editorSlider->setValue(0);
+
+		} else if (selectedItem == "Start Locations") {
+			Editor.State = EditorStateType::SetStartLocation;
+			editorSlider->setVisible(false);
+
+		} else if (selectedItem == "Elevation") {
+			Editor.State = EditorStateType::ElevationLevel;
+			editorSlider->setVisible(false);
+			Editor.SelectedElevationLevel = 0;
+
+		} else if (selectedItem == "Ramps") {
+			Editor.State = EditorStateType::EditRamps;
+			editorSlider->setVisible(false);
+			Editor.SelectedElevationLevel = 0;
+
+		} else if (selectedItem == "Units") {
+			Editor.State = EditorStateType::EditUnit;
+			RecalculateShownUnits();
+			editorSlider->setVisible(true);
+			editorSlider->setValue(0);
+
+		} else { // Units by categories
+			Editor.State = EditorStateType::EditUnit;
+			size_t startIndex = 0;
+			size_t endIndex = INT_MAX;
+			for (size_t i = 0; i < Editor.UnitTypes.size(); i++) {
+				std::string_view entry = Editor.UnitTypes[i];
+				if (startIndex == 0) {
+					if (entry.find(selectedItem, 2) != std::string::npos) {
+						startIndex = i + 1;
+					}
+				} else {
+					if (entry.rfind("--", 0) != std::string::npos) {
+						endIndex = i;
+						break;
 					}
 				}
-				RecalculateShownUnits(startIndex, endIndex);
-				editorSlider->setVisible(true);
-				editorSlider->setValue(0);
-				break;
 			}
+			RecalculateShownUnits(startIndex, endIndex);
+			editorSlider->setVisible(true);
+			editorSlider->setValue(0);
 		}
 	});
 	toolDropdown->setWidth(100);
