@@ -417,7 +417,8 @@ static bool DrawTypePortrait(const CUnitType &type)
 #endif
 		type.Portrait.Mngs[type.Portrait.CurrMng]->Draw(
 			UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		if (type.Portrait.Mngs[type.Portrait.CurrMng]->iteration == type.Portrait.NumIterations) {
+		if (type.Portrait.Mngs[type.Portrait.CurrMng]->getIteration()
+		    == type.Portrait.NumIterations) {
 			type.Portrait.Mngs[type.Portrait.CurrMng]->Reset();
 			// FIXME: should be configurable
 			if (type.Portrait.CurrMng == 0 && type.Portrait.Mngs.size() > 1) {

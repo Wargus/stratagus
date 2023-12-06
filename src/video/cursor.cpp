@@ -120,7 +120,7 @@ SDL_Cursor *CCursor::GetSDLCursor()
 			SDL_Rect srect = {G->frame_map[i].x, G->frame_map[i].y, G->getWidth(), G->getHeight()};
 
 			SDL_Surface *intermediate = SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitSurface(G->Surface, &srect, intermediate, nullptr);
+			SDL_BlitSurface(G->getSurface(), &srect, intermediate, nullptr);
 
 			SDL_Surface *cursorFrame = SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK);
 			SDL_BlitScaled(intermediate, nullptr, cursorFrame, nullptr);

@@ -49,137 +49,137 @@ uint32_t Mng::MaxFPS = 15;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static mng_ptr MNG_DECL my_alloc(mng_size_t len)
+struct MngWrapper
 {
-	char *ptr = new char[len]{};
-	return (mng_ptr)ptr;
-}
-
-static void MNG_DECL my_free(mng_ptr ptr, mng_size_t)
-{
-	delete[] static_cast<char *>(ptr);
-}
-
-static mng_bool MNG_DECL my_openstream(mng_handle handle)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-
-	mng->fd = fopen(mng->name.c_str(), "rb");
-	if (!mng->fd) {
-		return MNG_FALSE;
+	static mng_ptr alloc(mng_size_t len)
+	{
+		char *ptr = new char[len]{};
+		return (mng_ptr) ptr;
 	}
-	return MNG_TRUE;
-}
 
-static mng_bool MNG_DECL my_closestream(mng_handle handle)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
+	static void free(mng_ptr ptr, mng_size_t) { delete[] static_cast<char *>(ptr); }
 
-	if (mng->fd) {
-		fclose(mng->fd);
-	}
-	return MNG_TRUE;
-}
+	static mng_bool openstream(mng_handle handle)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
 
-static mng_bool MNG_DECL my_readdata(mng_handle handle, mng_ptr buf, mng_uint32 buflen,
-									 mng_uint32p read)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-
-	*read = fread(buf, 1, buflen, mng->fd);
-	return MNG_TRUE;
-}
-
-static mng_bool MNG_DECL my_processheader(mng_handle handle, mng_uint32 width,
-										  mng_uint32 height)
-{
-	mng_imgtype type = mng_get_sigtype(handle);
-	if (type != mng_it_mng) {
+		mng->fd = fopen(mng->name.c_str(), "rb");
+		if (!mng->fd) {
+			return MNG_FALSE;
+		}
 		return MNG_TRUE;
 	}
 
-	Mng *mng = (Mng *)mng_get_userdata(handle);
+	static mng_bool closestream(mng_handle handle)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
 
-	// Allocate the SDL surface to hold the image
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	const Uint32 Rmask = 0x000000FF;
-	const Uint32 Gmask = 0x0000FF00;
-	const Uint32 Bmask = 0x00FF0000;
-#else
-	const Uint32 Rmask = 0x00FF0000;
-	const Uint32 Gmask = 0x0000FF00;
-	const Uint32 Bmask = 0x000000FF;
-#endif
-
-	mng->buffer.resize(width * height * 3);
-	memset(mng->buffer.data(), width * height * 3, sizeof(unsigned char));
-
-	mng->surface.reset(
-		SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8 * 3, Rmask, Gmask, Bmask, 0));
-	if (mng->surface == nullptr) {
-		ErrorPrint("Out of memory");
-		exit(1);
+		if (mng->fd) {
+			fclose(mng->fd);
+		}
+		return MNG_TRUE;
 	}
-	SDL_SetColorKey(mng->surface.get(), 1, 0);
 
-	return MNG_TRUE;
-}
+	static mng_bool readdata(mng_handle handle, mng_ptr buf, mng_uint32 buflen, mng_uint32p read)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
 
-static mng_ptr MNG_DECL my_getcanvasline(mng_handle handle, mng_uint32 linenr)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-	return &mng->buffer[linenr * mng->surface->w * 3];
-}
-
-static mng_bool MNG_DECL my_refresh(mng_handle handle, mng_uint32, mng_uint32,
-									mng_uint32, mng_uint32)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-	SDL_LockSurface(mng->surface.get());
-	for (int i = 0; i < mng->surface->h; ++i) {
-		memcpy((char *)mng->surface->pixels + i * mng->surface->pitch,
-		       &mng->buffer[i * mng->surface->w * 3],
-		       mng->surface->w * 3);
+		*read = fread(buf, 1, buflen, mng->fd);
+		return MNG_TRUE;
 	}
-	SDL_UnlockSurface(mng->surface.get());
 
-	return MNG_TRUE;
-}
+	static mng_bool processheader(mng_handle handle, mng_uint32 width, mng_uint32 height)
+	{
+		mng_imgtype type = mng_get_sigtype(handle);
+		if (type != mng_it_mng) {
+			return MNG_TRUE;
+		}
 
-static mng_uint32 MNG_DECL my_gettickcount(mng_handle)
-{
-	return GetTicks();
-}
+		Mng *mng = (Mng *) mng_get_userdata(handle);
 
-static mng_bool MNG_DECL my_settimer(mng_handle handle, mng_uint32 msecs)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-	unsigned long ticks = GetTicks();
-	uint32_t offset = std::max(static_cast<uint32_t>(msecs), static_cast<uint32_t>(1000 / mng->MaxFPS));
-	mng->ticks = std::max(ticks + offset, mng->ticks + offset);
+		// Allocate the SDL surface to hold the image
+# if SDL_BYTEORDER == SDL_LIL_ENDIAN
+		const Uint32 Rmask = 0x000000FF;
+		const Uint32 Gmask = 0x0000FF00;
+		const Uint32 Bmask = 0x00FF0000;
+# else
+		const Uint32 Rmask = 0x00FF0000;
+		const Uint32 Gmask = 0x0000FF00;
+		const Uint32 Bmask = 0x000000FF;
+# endif
 
-	return MNG_TRUE;
-}
+		mng->buffer.resize(width * height * 3);
+		memset(mng->buffer.data(), width * height * 3, sizeof(unsigned char));
 
-static mng_bool MNG_DECL my_processmend(mng_handle handle, mng_uint32 iterationsdone,
-										mng_uint32)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-	mng->iteration = iterationsdone;
+		mng->mSurface.reset(
+			SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8 * 3, Rmask, Gmask, Bmask, 0));
+		if (mng->mSurface == nullptr) {
+			ErrorPrint("Out of memory");
+			exit(1);
+		}
+		SDL_SetColorKey(mng->mSurface.get(), 1, 0);
 
-	return MNG_TRUE;
-}
-
-static mng_bool MNG_DECL my_errorproc(mng_handle handle, mng_int32,
-									  mng_int8, mng_chunkid, mng_uint32, mng_int32, mng_int32, mng_pchar errortext)
-{
-	Mng *mng = (Mng *)mng_get_userdata(handle);
-	mng->iteration = 0x7fffffff;
-	if (errortext) {
-		DebugPrint("MNG error: %s\n", errortext);
+		return MNG_TRUE;
 	}
-	return MNG_TRUE;
-}
+
+	static mng_ptr getcanvasline(mng_handle handle, mng_uint32 linenr)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
+		return &mng->buffer[linenr * mng->mSurface->w * 3];
+	}
+
+	static mng_bool refresh(mng_handle handle, mng_uint32, mng_uint32, mng_uint32, mng_uint32)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
+		SDL_LockSurface(mng->mSurface.get());
+		for (int i = 0; i < mng->mSurface->h; ++i) {
+			memcpy((char *) mng->mSurface->pixels + i * mng->mSurface->pitch,
+			       &mng->buffer[i * mng->mSurface->w * 3],
+			       mng->mSurface->w * 3);
+		}
+		SDL_UnlockSurface(mng->mSurface.get());
+
+		return MNG_TRUE;
+	}
+
+	static mng_uint32 gettickcount(mng_handle) { return GetTicks(); }
+
+	static mng_bool settimer(mng_handle handle, mng_uint32 msecs)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
+		unsigned long ticks = GetTicks();
+		uint32_t offset =
+			std::max(static_cast<uint32_t>(msecs), static_cast<uint32_t>(1000 / mng->MaxFPS));
+		mng->ticks = std::max(ticks + offset, mng->ticks + offset);
+
+		return MNG_TRUE;
+	}
+
+	static mng_bool processmend(mng_handle handle, mng_uint32 iterationsdone, mng_uint32)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
+		mng->iteration = iterationsdone;
+
+		return MNG_TRUE;
+	}
+
+	static mng_bool errorproc(mng_handle handle,
+	                          mng_int32,
+	                          mng_int8,
+	                          mng_chunkid,
+	                          mng_uint32,
+	                          mng_int32,
+	                          mng_int32,
+	                          mng_pchar errortext)
+	{
+		Mng *mng = (Mng *) mng_get_userdata(handle);
+		mng->iteration = 0x7fffffff;
+		if (errortext) {
+			DebugPrint("MNG error: %s\n", errortext);
+		}
+		return MNG_TRUE;
+	}
+};
 
 Mng::~Mng()
 {
@@ -200,8 +200,8 @@ void Mng::Draw(int x, int y)
 		mng_display_resume(handle);
 	}
 
-	SDL_Rect rect = {(short int)x, (short int)y, (short unsigned int)(surface->w), (short unsigned int)(surface->h)};
-	SDL_BlitSurface(surface.get(), nullptr, TheScreen, &rect);
+	SDL_Rect rect = {(short int)x, (short int)y, (short unsigned int)(mSurface->w), (short unsigned int)(mSurface->h)};
+	SDL_BlitSurface(mSurface.get(), nullptr, TheScreen, &rect);
 }
 
 static std::map<std::string, Mng *> MngCache;
@@ -239,29 +239,29 @@ void Mng::Free(Mng *mng)
 bool Mng::Load()
 {
 	if (handle) {
-		return surface && iteration != 0x7fffffff;
+		return mSurface && iteration != 0x7fffffff;
 	}
-	handle = mng_initialize(this, my_alloc, my_free, MNG_NULL);
+	handle = mng_initialize(this, &MngWrapper::alloc, &MngWrapper::free, MNG_NULL);
 	if (handle == MNG_NULL) {
 		return false;
 	}
-	mng_setcb_openstream(handle, my_openstream);
-	mng_setcb_closestream(handle, my_closestream);
-	mng_setcb_readdata(handle, my_readdata);
-	mng_setcb_processheader(handle, my_processheader);
-	mng_setcb_processmend(handle, my_processmend);
-	mng_setcb_getcanvasline(handle, my_getcanvasline);
-	mng_setcb_refresh(handle, my_refresh);
-	mng_setcb_gettickcount(handle, my_gettickcount);
-	mng_setcb_settimer(handle, my_settimer);
-	mng_setcb_errorproc(handle, my_errorproc);
+	mng_setcb_openstream(handle, &MngWrapper::openstream);
+	mng_setcb_closestream(handle, &MngWrapper::closestream);
+	mng_setcb_readdata(handle, &MngWrapper::readdata);
+	mng_setcb_processheader(handle, &MngWrapper::processheader);
+	mng_setcb_processmend(handle, &MngWrapper::processmend);
+	mng_setcb_getcanvasline(handle, &MngWrapper::getcanvasline);
+	mng_setcb_refresh(handle, &MngWrapper::refresh);
+	mng_setcb_gettickcount(handle, &MngWrapper::gettickcount);
+	mng_setcb_settimer(handle, &MngWrapper::settimer);
+	mng_setcb_errorproc(handle, &MngWrapper::errorproc);
 
 	mng_read(handle);
-	if (surface && iteration != 0x7fffffff) {
+	if (mSurface && iteration != 0x7fffffff) {
 		mng_display(handle);
 	}
 
-	if (!surface || iteration == 0x7fffffff) {
+	if (!mSurface || iteration == 0x7fffffff) {
 		return false;
 	}
 	return true;
@@ -288,7 +288,7 @@ void* Mng::_getData() const
 	} else {
 		is_dirty = false;
 	}
-	return surface.get();
+	return mSurface.get();
 }
 
 #endif // USE_MNG

@@ -88,7 +88,7 @@ void SaveMapPNG(const char *name)
 			dstRect.y = j * PixelTileSize.y;
 			srcRect.w = dstRect.w = PixelTileSize.x;
 			srcRect.h = dstRect.h = PixelTileSize.y;
-			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
+			SDL_BlitSurface(Map.TileGraphic->getSurface(), &srcRect, mapImage, &dstRect);
 		}
 	}
 

@@ -174,20 +174,23 @@ public:
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);
 
-	bool IsLoaded(bool flipped = false) const { return Surface != nullptr && (!flipped || SurfaceFlip != nullptr); }
+	bool IsLoaded(bool flipped = false) const { return mSurface != nullptr && (!flipped || SurfaceFlip != nullptr); }
 
 	//guichan
-	void *_getData() const override { return Surface; }
+	void *_getData() const override { return mSurface; }
 	int getWidth() const override { return Width; }
 	int getHeight() const override { return Height; }
+
+	SDL_Surface *getSurface() const { return mSurface; }
+	void setSurface(SDL_Surface *surface) { mSurface = surface; }
 
 private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
+	SDL_Surface *mSurface = nullptr;     /// Surface
 public:
 	fs::path File;         /// Filename
 	std::string HashFile;  /// Filename used in hash
-	SDL_Surface *Surface = nullptr;     /// Surface
 	SDL_Surface *SurfaceFlip = nullptr; /// Flipped surface
 	frame_pos_t *frame_map = nullptr;
 	frame_pos_t *frameFlip_map = nullptr;
@@ -241,6 +244,9 @@ class Mng : public gcn::Image
 	Mng() = default;
 	~Mng();
 
+	Mng(const Mng &) = delete;
+	Mng &operator=(const Mng &) = delete;
+
 	uint32_t refcnt = 0;
 
 public:
@@ -250,19 +256,25 @@ public:
 	void Reset();
 	void Draw(int x, int y);
 
+	int getIteration() const { return iteration; }
+
 	//guichan
 	void *_getData() const override;
-	int getWidth() const override { return surface->w; }
-	int getHeight() const override { return surface->h; }
+	int getWidth() const override { return mSurface->w; }
+	int getHeight() const override { return mSurface->h; }
 	bool isDirty() const override { return true; }
 
+	friend struct MngWrapper;
+
+public:
 	static uint32_t MaxFPS;
 
+private:
 	mutable bool is_dirty = false;
 	std::string name;
 	FILE *fd = nullptr;
 	mng_handle handle = nullptr;
-	sdl2::SurfacePtr surface;
+	sdl2::SurfacePtr mSurface;
 	std::vector<unsigned char> buffer;
 	unsigned long ticks = 0;
 	int iteration = 0;

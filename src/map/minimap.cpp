@@ -133,7 +133,7 @@ void CMinimap::Create()
 	}
 
 	// Palette updated from UpdateMinimapTerrain()
-	SDL_PixelFormat *f 	  = Map.TileGraphic->Surface->format;
+	SDL_PixelFormat *f    = Map.TileGraphic->getSurface()->format;
 	MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 	MinimapSurface 		  = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, 0);
 	MinimapFogSurface 	  = SDL_CreateRGBSurface(SDL_SWSURFACE, W, H, 32, RMASK, GMASK, BMASK, AMASK);
@@ -153,10 +153,10 @@ void CMinimap::Create()
 */
 static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
 {
-	Uint8 *pixels = (Uint8 *)Map.TileGraphic->Surface->pixels;
+	Uint8 *pixels = (Uint8 *) Map.TileGraphic->getSurface()->pixels;
 	int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-	return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
+	return &pixels[x * bpp + y * Map.TileGraphic->getSurface()->pitch];
 }
 
 /**
@@ -172,17 +172,19 @@ void CMinimap::UpdateTerrain()
 	if (!scaley) {
 		scaley = 1;
 	}
-	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
+	const int bpp = Map.TileGraphic->getSurface()->format->BytesPerPixel;
 
 	if (bpp == 1) {
 		SDL_SetPaletteColors(MinimapTerrainSurface->format->palette,
-							 Map.TileGraphic->Surface->format->palette->colors, 0, 256);
+		                     Map.TileGraphic->getSurface()->format->palette->colors,
+		                     0,
+		                     256);
 	}
 
-	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	const int tilepitch = Map.TileGraphic->getSurface()->w / PixelTileSize.x;
 
 	Assert(SDL_MUSTLOCK(MinimapTerrainSurface) == 0);
-	Assert(SDL_MUSTLOCK(Map.TileGraphic->Surface) == 0);
+	Assert(SDL_MUSTLOCK(Map.TileGraphic->getSurface()) == 0);
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -247,8 +249,8 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 		scaley = 1;
 	}
 
-	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
-	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
+	const int tilepitch = Map.TileGraphic->getSurface()->w / PixelTileSize.x;
+	const int bpp = Map.TileGraphic->getSurface()->format->BytesPerPixel;
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.

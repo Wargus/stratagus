@@ -1291,23 +1291,23 @@ void CTilesetGraphicGenerator::parseModifier(lua_State *luaStack, const int argP
 **/
 sdl2::SurfacePtr CTilesetGraphicGenerator::newBlankImage() const
 {
-		const SDL_PixelFormat *format = SrcTilesetGraphic->Surface->format;
+	const SDL_PixelFormat *format = SrcTilesetGraphic->getSurface()->format;
 
-		sdl2::SurfacePtr blankImg {SDL_CreateRGBSurface(SrcTilesetGraphic->Surface->flags,
-														SrcTileset->getPixelTileSize().x,
-														SrcTileset->getPixelTileSize().y,
-														format->BitsPerPixel,
-														format->Rmask,
-														format->Gmask,
-														format->Bmask,
-														format->Amask)};
-		uint32_t colorKey = 0;
-		if (!SDL_GetColorKey(SrcTilesetGraphic->Surface, &colorKey)) {
-			SDL_SetColorKey(blankImg.get(), SDL_TRUE, colorKey);
-		}
-		if (format->palette) {
-			SDL_SetSurfacePalette(blankImg.get(), format->palette);
-		}
+	sdl2::SurfacePtr blankImg{SDL_CreateRGBSurface(SrcTilesetGraphic->getSurface()->flags,
+	                                               SrcTileset->getPixelTileSize().x,
+	                                               SrcTileset->getPixelTileSize().y,
+	                                               format->BitsPerPixel,
+	                                               format->Rmask,
+	                                               format->Gmask,
+	                                               format->Bmask,
+	                                               format->Amask)};
+	uint32_t colorKey = 0;
+	if (!SDL_GetColorKey(SrcTilesetGraphic->getSurface(), &colorKey)) {
+		SDL_SetColorKey(blankImg.get(), SDL_TRUE, colorKey);
+	}
+	if (format->palette) {
+		SDL_SetSurfacePalette(blankImg.get(), format->palette);
+	}
 	return blankImg;
 }
 

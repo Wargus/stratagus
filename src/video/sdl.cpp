@@ -457,7 +457,7 @@ void InitVideoSdl()
 				if (g) { CGraphic::Free(g); }
 				g = CGraphic::New(p.u8string());
 				g->Load();
-				icon = g->Surface;
+				icon = g->getSurface();
 				if (icon) { break; }
 			}
 		}
