@@ -241,6 +241,9 @@ class Mng : public gcn::Image
 	Mng() = default;
 	~Mng();
 
+	Mng(const Mng &) = delete;
+	Mng &operator=(const Mng &) = delete;
+
 	uint32_t refcnt = 0;
 
 public:
@@ -250,19 +253,25 @@ public:
 	void Reset();
 	void Draw(int x, int y);
 
+	int getIteration() const { return iteration; }
+
 	//guichan
 	void *_getData() const override;
-	int getWidth() const override { return surface->w; }
-	int getHeight() const override { return surface->h; }
+	int getWidth() const override { return mSurface->w; }
+	int getHeight() const override { return mSurface->h; }
 	bool isDirty() const override { return true; }
 
+	friend struct MngWrapper;
+
+public:
 	static uint32_t MaxFPS;
 
+private:
 	mutable bool is_dirty = false;
 	std::string name;
 	FILE *fd = nullptr;
 	mng_handle handle = nullptr;
-	sdl2::SurfacePtr surface;
+	sdl2::SurfacePtr mSurface;
 	std::vector<unsigned char> buffer;
 	unsigned long ticks = 0;
 	int iteration = 0;
