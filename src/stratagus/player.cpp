@@ -1252,13 +1252,14 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 {
 	Assert(PlayerColorIndexCount);
 
-	Assert(SDL_MUSTLOCK(sprite.Surface) == 0);
+	Assert(SDL_MUSTLOCK(sprite.getSurface()) == 0);
 	// TODO: This vector allocation is costly in profiles
 	std::vector<SDL_Color> sdlColors = PlayerColorsSDL[colorIndex];
-	Assert(!sprite.Surface->format->palette || sprite.Surface->format->palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
-	SDL_SetPaletteColors(sprite.Surface->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+	const auto palette = sprite.getSurface()->format->palette;
+	Assert(!palette || palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
+	SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
-		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+		SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	}
 }
 

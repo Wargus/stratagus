@@ -174,20 +174,23 @@ public:
 	// minor programmatic editing features
 	void OverlayGraphic(CGraphic *other, bool mask = false);
 
-	bool IsLoaded(bool flipped = false) const { return Surface != nullptr && (!flipped || SurfaceFlip != nullptr); }
+	bool IsLoaded(bool flipped = false) const { return mSurface != nullptr && (!flipped || SurfaceFlip != nullptr); }
 
 	//guichan
-	void *_getData() const override { return Surface; }
+	void *_getData() const override { return mSurface; }
 	int getWidth() const override { return Width; }
 	int getHeight() const override { return Height; }
+
+	SDL_Surface *getSurface() const { return mSurface; }
+	void setSurface(SDL_Surface *surface) { mSurface = surface; }
 
 private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
+	SDL_Surface *mSurface = nullptr;     /// Surface
 public:
 	fs::path File;         /// Filename
 	std::string HashFile;  /// Filename used in hash
-	SDL_Surface *Surface = nullptr;     /// Surface
 	SDL_Surface *SurfaceFlip = nullptr; /// Flipped surface
 	frame_pos_t *frame_map = nullptr;
 	frame_pos_t *frameFlip_map = nullptr;

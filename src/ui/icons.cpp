@@ -200,7 +200,10 @@ static void ApplyPaletteSwaps(const std::vector<PaletteSwap> &swaps, const CUnit
 		if (unit.Variable[varIdx].Enable) {
 			int value = def ? unit.Variable[varIdx].Max : unit.Variable[varIdx].Value;
 			const SDL_Color *colors = swap.GetColorsForPercentAndAlternative(value, unit.Variable[varIdx].Max, UnitNumber(unit));
-			SDL_SetPaletteColors(graphic->Surface->format->palette, colors, swap.GetColorIndexStart(), swap.GetColorCount());
+			SDL_SetPaletteColors(graphic->getSurface()->format->palette,
+			                     colors,
+			                     swap.GetColorIndexStart(),
+			                     swap.GetColorCount());
 		}
 	}
 }

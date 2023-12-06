@@ -146,17 +146,17 @@ void CFogOfWar::InitTiled()
         SDL_FillRect(TileOfFogOnly, nullptr, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
     }
 
-    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->Surface,
+    SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->getSurface(),
                                                                  SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
     TiledAlphaFog = CGraphic::New("");
-    TiledAlphaFog->Surface = newFogSurface;
+    TiledAlphaFog->setSurface(newFogSurface);
     TiledAlphaFog->Width = PixelTileSize.x;
     TiledAlphaFog->Height = PixelTileSize.y;
     TiledAlphaFog->GraphicWidth = newFogSurface->w;
     TiledAlphaFog->GraphicHeight = newFogSurface->h;
     TiledAlphaFog->NumFrames = 16;
     TiledAlphaFog->GenFramesMap();
-    SDL_SetSurfaceBlendMode(TiledAlphaFog->Surface, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceBlendMode(TiledAlphaFog->getSurface(), SDL_BLENDMODE_BLEND);
 }
 
 /**

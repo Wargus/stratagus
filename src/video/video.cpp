@@ -559,9 +559,9 @@ void ColorCycle()
 		for (SDL_Surface *surface : colorCycling.PaletteList) {
 			ColorCycleSurface(*surface);
 		}
-	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
+	} else if (Map.TileGraphic->getSurface()->format->BytesPerPixel == 1) {
 		++colorCycling.cycleCount;
-		ColorCycleSurface(*Map.TileGraphic->Surface);
+		ColorCycleSurface(*Map.TileGraphic->getSurface());
 	}
 }
 
@@ -572,8 +572,8 @@ void RestoreColorCyclingSurface()
 		for (SDL_Surface *surface : colorCycling.PaletteList) {
 			ColorCycleSurface_Reverse(*surface, colorCycling.cycleCount);
 		}
-	} else if (Map.TileGraphic->Surface->format->BytesPerPixel == 1) {
-		ColorCycleSurface_Reverse(*Map.TileGraphic->Surface, colorCycling.cycleCount);
+	} else if (Map.TileGraphic->getSurface()->format->BytesPerPixel == 1) {
+		ColorCycleSurface_Reverse(*Map.TileGraphic->getSurface(), colorCycling.cycleCount);
 	}
 	colorCycling.cycleCount = 0;
 }
