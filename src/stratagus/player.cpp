@@ -1259,7 +1259,7 @@ void GraphicPlayerPixels(int colorIndex, const CGraphic &sprite)
 	Assert(!palette || palette->ncolors > PlayerColorIndexStart + PlayerColorIndexCount);
 	SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
-		SDL_SetPaletteColors(palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+		SDL_SetPaletteColors(sprite.SurfaceFlip->format->palette, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	}
 }
 
