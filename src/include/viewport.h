@@ -112,11 +112,20 @@ public:
 		return CViewport::ShowGrid;
 	}
 
-	static void EnableGrid(const bool value)
+	static void EnableGrid(bool value)
 	{
 		CViewport::ShowGrid = value;
 	}
 
+	static bool isPassabilityHighlighted()
+	{
+		return CViewport::ShowAStarPassability;
+	}
+
+	static void HighlightPassability(bool value)
+	{
+		CViewport::ShowAStarPassability = value;
+	}
 
 	PixelSize GetPixelSize() const;
 	const PixelPos &GetTopLeftPos() const { return TopLeftPos;}
@@ -155,10 +164,10 @@ public:
 	CUnit *Unit;              /// Bound to this unit
 private:
 	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
+
 	static bool ShowGrid;
-
+	static bool ShowAStarPassability;
 };
-
 
 //@}
 

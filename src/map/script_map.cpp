@@ -304,7 +304,7 @@ static int CclSetMinimapTerrain(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  @return   0 for success, 1 for wrong type;
+**  @return   0 for success
 */
 static int CclSetEnableMapGrid(lua_State *l)
 {
@@ -320,6 +320,30 @@ static int CclGetIsMapGridEnabled(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 	lua_pushboolean(l, CViewport::isGridEnabled());
+	return 1;
+}
+
+/**
+**  Highlight tiles passability  (true|false)
+**
+**  @param l  Lua state.
+**
+**  @return   0 for success
+*/
+static int CclSetHighlightPassability(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	CViewport::HighlightPassability(LuaToBoolean(l, 1));
+	return 0;
+}
+
+/**
+**  Check if tiles passability higlighted
+*/
+static int CclGetIsPassabilityHighlighted(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	lua_pushboolean(l, CViewport::isPassabilityHighlighted());
 	return 1;
 }
 
@@ -1140,6 +1164,9 @@ void MapCclRegister()
 
 	lua_register(Lua, "SetEnableMapGrid", CclSetEnableMapGrid);
 	lua_register(Lua, "GetIsMapGridEnabled", CclGetIsMapGridEnabled);
+
+	lua_register(Lua, "SetHighlightPassability", CclSetHighlightPassability);
+	lua_register(Lua, "GetIsPassabilityHighlighted", CclGetIsPassabilityHighlighted);
 
 	lua_register(Lua, "SetFieldOfViewType", CclSetFieldOfViewType);
 	lua_register(Lua, "GetFieldOfViewType", CclGetFieldOfViewType);

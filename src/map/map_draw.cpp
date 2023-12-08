@@ -45,10 +45,12 @@
 #include "unittype.h"
 #include "ui.h"
 #include "video.h"
+#include "editor.h"
 
 #include <cstdlib>
 
 bool CViewport::ShowGrid = false;
+bool CViewport::ShowAStarPassability = false;
 
 
 CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
@@ -329,7 +331,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 #ifdef DEBUG
 			// AStar passability overlay
-			if (CViewport::isGridEnabled()) {
+			if (CViewport::isPassabilityHighlighted() && Editor.Running == EditorNotRunning) {
 				for (int i = 0; i < graphicTileOffset; i++) {
 					for (int j = 0; j < graphicTileOffset; j++) {
 						if (Map.Fields[sx + j + (mapW * i)].getFlag() & MapFieldUnpassable) {
@@ -347,7 +349,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 #endif
 			/// Highlight layer if needed (editor stuff)
 			if (highlightChecker && highlightChecker(mf)) {
-				Video.FillTransRectangleClip(ColorRed, dx, dy, PixelTileSize.x, PixelTileSize.y, 128);
+				Video.FillTransRectangleClip(ColorRed, dx, dy, PixelTileSize.x, PixelTileSize.y, 64);
 			}
 			if constexpr(graphicalTileIsLogicalTile) {
 				++sx;
@@ -363,11 +365,9 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 		}
 		dy += graphicTileSize.y;
 	}
-#ifdef DEBUG
 	if (CViewport::isGridEnabled()) {
 		DrawMapGridInViewport();
 	}
-#endif
 }
 
 /**
