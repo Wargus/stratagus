@@ -354,6 +354,10 @@ CImageButton::CImageButton(const std::string &caption) :
 void CImageButton::draw(gcn::Graphics *graphics) /* override */
 {
 	if (!normalImage) {
+		if (this->getBackgroundColor().a == 0) {
+			return;
+		}
+
 		Button::draw(graphics);
 		return;
 	}
