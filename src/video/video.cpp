@@ -300,7 +300,9 @@ bool CVideo::ResizeScreen(int w, int h)
 
 	if (Gui) {
 		if (auto graphics = dynamic_cast<gcn::SDLGraphics *>(Gui->getGraphics())) {
-			graphics->setTarget(TheScreen);
+			extern sdl2::RendererPtr guichanRenderer;
+			guichanRenderer.reset(SDL_CreateSoftwareRenderer(TheScreen));
+			graphics->setTarget(guichanRenderer.get(), w, h);
 		}
 	}
 

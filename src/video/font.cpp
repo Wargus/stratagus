@@ -103,7 +103,7 @@ CFont &GetGameFont()
 --  Guichan Functions
 ----------------------------------------------------------------------------*/
 
-int CFont::getStringIndexAt(const std::string &text, int x) /* override */
+int CFont::getStringIndexAt(const std::string &text, int x) const /* override */
 {
 	unsigned int i = 0;
 
@@ -487,13 +487,17 @@ int CFont::Width(const std::string &text) const
 
 extern int Str2SdlKey(const char *str);
 
-static int convertKey(const char *key)
+int convertSDLKeyCharacterToGuichanKey(int key)
 {
-	SDL_Keysym keysym;
-	memset(&keysym, 0, sizeof(keysym));
-	keysym.sym = (SDL_Keycode) Str2SdlKey(key);
-	gcn::Key k = gcn::SDLInput::convertKeyCharacter(keysym);
-	return k.getValue();
+	struct : gcn::SDLInput
+	{
+		using gcn::SDLInput::convertSDLEventToGuichanKeyValue; // Might be static public
+	} input;
+	SDL_Event event{};
+	event.type = SDL_KEYDOWN;
+	event.key.keysym.sym = (SDL_Keycode) key;
+	auto ret = input.convertSDLEventToGuichanKeyValue(event);
+	return ret == -1 ? key : ret;
 }
 
 /**
@@ -502,7 +506,7 @@ static int convertKey(const char *key)
 int GetHotKey(const std::string &text)
 {
 	if (text.length() > 1) {
-		return convertKey(text.c_str());
+		return convertSDLKeyCharacterToGuichanKey(Str2SdlKey(text.c_str()));
 	} else if (text.length() == 1) {
 		size_t pos = 0;
 		return CodepageIndexFromUTF8(text, pos, pos);

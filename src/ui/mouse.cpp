@@ -67,6 +67,8 @@
 
 #include "tileset.h"
 
+#include <guichan/actionevent.hpp>
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -2001,11 +2003,11 @@ void UIHandleButtonUp(unsigned button)
 					}
 					if (ButtonUnderCursor == ButtonUnderMenu) {
 						if (UI.MenuButton.Callback) {
-							UI.MenuButton.Callback->action("");
+							UI.MenuButton.Callback->action(gcn::ActionEvent{nullptr, ""});
 						}
 					} else {
 						if (UI.NetworkMenuButton.Callback) {
-							UI.NetworkMenuButton.Callback->action("");
+							UI.NetworkMenuButton.Callback->action(gcn::ActionEvent{nullptr, ""});
 						}
 					}
 					return;
@@ -2020,7 +2022,7 @@ void UIHandleButtonUp(unsigned button)
 			GameDiplomacyButtonClicked = false;
 			if (ButtonAreaUnderCursor == ButtonArea::Menu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
 				if (UI.NetworkDiplomacyButton.Callback) {
-					UI.NetworkDiplomacyButton.Callback->action("");
+					UI.NetworkDiplomacyButton.Callback->action(gcn::ActionEvent{nullptr, ""});
 				}
 				return;
 			}
@@ -2034,7 +2036,7 @@ void UIHandleButtonUp(unsigned button)
 				button.Clicked = false;
 				if (ButtonAreaUnderCursor == ButtonArea::User) {
 					if (button.Button.Callback) {
-						button.Button.Callback->action("");
+						button.Button.Callback->action(gcn::ActionEvent{nullptr, ""});
 					}
 					return;
 				}

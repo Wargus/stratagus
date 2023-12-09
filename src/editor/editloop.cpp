@@ -1146,7 +1146,7 @@ static void EditorCallbackButtonUp(unsigned button)
 		GameMenuButtonClicked = false;
 		if (ButtonUnderCursor == ButtonUnderMenu) {
 			if (UI.MenuButton.Callback) {
-				UI.MenuButton.Callback->action("");
+				UI.MenuButton.Callback->action(gcn::ActionEvent{nullptr, ""});
 			}
 		}
 	}
@@ -1398,7 +1398,9 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_PAGEUP:
 			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
 				if (editorSlider->isVisible()) {
-					editorSlider->keyPress(gcn::Key::LEFT);
+					gcn::KeyEvent keyEvent{
+						nullptr, nullptr, false, false, false, false, 0, false, gcn::Key::Left};
+					editorSlider->keyPressed(keyEvent);
 				}
 			}
 			break;
@@ -1406,14 +1408,16 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case SDLK_PAGEDOWN:
 			if ((KeyModifiers & ModifierAlt) && KeyModifiers & ModifierControl) {
 				if (editorSlider->isVisible()) {
-					editorSlider->keyPress(gcn::Key::RIGHT);
+					gcn::KeyEvent keyEvent{
+						nullptr, nullptr, false, false, false, false, 0, false, gcn::Key::Right};
+					editorSlider->keyPressed(keyEvent);
 				}
 			}
 			break;
 
 		case 't':
 			toolDropdown->setSelected((toolDropdown->getSelected() + 1) % (toolDropdown->getListModel()->getNumberOfElements()));
-			toolDropdown->action("");
+			toolDropdown->action(gcn::ActionEvent{nullptr, ""});
 			break;
 
 		case 'f': // ALT+F, CTRL+F toggle fullscreen
@@ -2173,9 +2177,6 @@ void EditorMainLoop()
 	}
 
 	overlaysDropdown->setWidth(overlaysWidth);
-	overlaysDropdown->getScrollArea()->setWidth(overlaysWidth);
-	overlaysDropdown->getListBox()->setWidth(overlaysWidth);
-
 	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));
 	overlaysDropdown->setBackgroundColor(gcn::Color(200, 200, 120));
@@ -2205,8 +2206,6 @@ void EditorMainLoop()
 		}
 		toolDropdown->setListModel(new StringListModel(toolListStrings));
 		toolDropdown->setWidth(newW);
-		toolDropdown->getScrollArea()->setWidth(newW);
-		toolDropdown->getListBox()->setWidth(newW);
 
 		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
 
@@ -2241,7 +2240,7 @@ void EditorMainLoop()
 				toolDropdown->getAbsolutePosition(tbX, tbY);
 				tbX += CursorScreenPos.x;
 				tbY += CursorScreenPos.y;
-				if (!(toolDropdown->getDimension().isPointInRect(tbX, tbY))) {
+				if (!(toolDropdown->getDimension().isContaining(tbX, tbY))) {
 					DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
 				}
 			}
@@ -2259,7 +2258,7 @@ void EditorMainLoop()
 			if (start) {
 				start = false;
 				if (UI.MenuButton.Callback) {
-					UI.MenuButton.Callback->action("");
+					UI.MenuButton.Callback->action(gcn::ActionEvent(nullptr, ""));
 				}
 			}
 

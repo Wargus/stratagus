@@ -138,7 +138,6 @@ void CGraphic::DrawSubCustomMod(int gx, int gy, int w, int h, int x, int y,
 		dstOffset += surface->w;
 		srcOffset += mSurface->w;
 	}
-
 }
 
 

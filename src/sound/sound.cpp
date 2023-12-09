@@ -394,7 +394,7 @@ static void PlaySoundFileCallback(int channel)
 		SampleMap[channel] = nullptr;
 	}
 	if (listener != nullptr) {
-		listener->action("");
+		listener->action(gcn::ActionEvent{nullptr, ""});
 	}
 }
 

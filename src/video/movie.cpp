@@ -431,10 +431,10 @@ int PlayMovie(const std::string &name)
 Movie::~Movie()
 {
 	if (rect != nullptr) {
-		free(rect);
+		::free(rect);
 	}
-	if (surface != nullptr) {
-		SDL_FreeSurface(surface);
+	if (mSurface != nullptr) {
+		SDL_FreeSurface(mSurface);
 	}
 	if (yuv_overlay != nullptr) {
 		SDL_DestroyTexture(yuv_overlay);
@@ -482,8 +482,6 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 
 bool Movie::Load(const std::string &name, int w, int h)
 {
-	Width = w;
-	Height = h;
 	const std::string filename = LibraryFileName(name);
 
 	f = new CFile();
@@ -498,70 +496,16 @@ bool Movie::Load(const std::string &name, int w, int h)
 	rect->w = w;
 	rect->h = h;
 
-	surface = SDL_CreateRGBSurface(0, w, h, TheScreen->format->BitsPerPixel,
-								   0x00ff0000,
-								   0x0000ff00,
-								   0x000000ff,
-								   0xff000000);
+	mSurface = SDL_CreateRGBSurface(
+		0, w, h, TheScreen->format->BitsPerPixel, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 
-	if (surface == nullptr) {
+	if (mSurface == nullptr) {
 		ErrorPrint("SDL_CreateRGBSurface: %s\n", SDL_GetError());
 		f->close();
 		return false;
 	}
 
 	return true;
-}
-
-void *Movie::_getData() const
-{
-	if (data == nullptr) {
-		data = (OggData*)calloc(sizeof(OggData), 1);
-		if (OggInit(f, data) || !data->video) {
-			OggFree(data);
-			f->close();
-			ErrorPrint("Could not init OggData or not a video\n");
-			return surface;
-		}
-
-		data->File = f;
-		yuv_overlay = SDL_CreateTexture(TheRenderer,
-										SDL_PIXELFORMAT_YV12,
-										SDL_TEXTUREACCESS_STREAMING,
-										data->tinfo.frame_width,
-										data->tinfo.frame_height);
-
-		if (yuv_overlay == nullptr) {
-			ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
-			ErrorPrint(
-				"SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
-			OggFree(data);
-			f->close();
-			return surface;
-		}
-
-		start_time = SDL_GetTicks();
-		need_data = true;
-		TheoraProcessData(data);
-		RenderToSurface(surface, yuv_overlay, rect, data);
-	}
-	if (need_data) {
-		if (TheoraProcessData(data)) {
-			is_dirty = false;
-			return surface;
-		}
-		need_data = false;
-	}
-
-	const int diff = SDL_GetTicks() - start_time
-		- static_cast<int>(theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000);
-
-	if (diff > 0) {
-		RenderToSurface(surface, yuv_overlay, rect, data);
-		need_data = true;
-	}
-
-	return surface;
 }
 
 #else
