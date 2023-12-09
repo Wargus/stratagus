@@ -94,6 +94,9 @@ public:
 	bool Load(const std::string &filename, int w, int h);
 	bool IsPlaying() const { return true; }
 
+	// guichan
+	SDL_Surface *getSurface() const override;
+
 public:
 	CFile *f = nullptr;
 	mutable bool need_data = true;

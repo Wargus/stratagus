@@ -508,6 +508,56 @@ bool Movie::Load(const std::string &name, int w, int h)
 	return true;
 }
 
+SDL_Surface *Movie::getSurface() const /* override */
+{
+	if (data == nullptr) {
+		data = (OggData *) calloc(sizeof(OggData), 1);
+		if (OggInit(f, data) || !data->video) {
+			OggFree(data);
+			f->close();
+			ErrorPrint("Could not init OggData or not a video\n");
+			return mSurface;
+		}
+
+		data->File = f;
+		yuv_overlay = SDL_CreateTexture(TheRenderer,
+		                                SDL_PIXELFORMAT_YV12,
+		                                SDL_TEXTUREACCESS_STREAMING,
+		                                data->tinfo.frame_width,
+		                                data->tinfo.frame_height);
+
+		if (yuv_overlay == nullptr) {
+			ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
+			ErrorPrint(
+				"SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
+			OggFree(data);
+			f->close();
+			return mSurface;
+		}
+
+		start_time = SDL_GetTicks();
+		need_data = true;
+		TheoraProcessData(data);
+		RenderToSurface(mSurface, yuv_overlay, rect, data);
+	}
+	if (need_data) {
+		if (TheoraProcessData(data)) {
+			return mSurface;
+		}
+		need_data = false;
+	}
+
+	const int diff =
+		SDL_GetTicks() - start_time
+		- static_cast<int>(theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000);
+
+	if (diff > 0) {
+		RenderToSurface(mSurface, yuv_overlay, rect, data);
+		need_data = true;
+	}
+	return mSurface;
+}
+
 #else
 
 #include <string>
