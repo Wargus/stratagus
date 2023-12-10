@@ -448,7 +448,11 @@ class CBuildRestrictionDistance : public CBuildRestriction
 public:
 	CBuildRestrictionDistance() = default;
 
-	void Init() override {this->RestrictType = &UnitTypeByIdent(this->RestrictTypeName);}
+	void Init() override
+	{
+		this->RestrictType =
+			this->RestrictTypeName.empty() ? nullptr : &UnitTypeByIdent(this->RestrictTypeName);
+	}
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 	int Distance = 0;        /// distance to build (circle)

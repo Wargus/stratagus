@@ -380,6 +380,9 @@ bool IconConfig::LoadNoLog()
 */
 bool IconConfig::Load()
 {
+	if (this->Name.empty()) {
+		return false;
+	}
 	if (LoadNoLog() == true) {
 		ShowLoadProgress(_("Icon %s"), this->Name.c_str());
 		return true;
