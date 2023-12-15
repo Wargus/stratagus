@@ -95,8 +95,8 @@ static DWORD WINAPI StatusThreadFunction(LPVOID lpParam) {
 static DWORD WINAPI DebugThreadFunction(LPVOID lpParam) {
 	DWORD dwRead = 1;
 	while (1) {
-		char *chStatus[1024] = {'\0'};
-		if (!ReadFile((HANDLE)lpParam, &chStatus, 1024, &dwRead, nullptr) || dwRead == 0) {
+		char chStatus[1024] = {'\0'};
+		if (!ReadFile((HANDLE)lpParam, chStatus, 1024, &dwRead, nullptr) || dwRead == 0) {
 			CloseHandle((HANDLE)lpParam);
 			break;
 		}
@@ -121,10 +121,7 @@ static bool External_Play(const std::string &file) {
 	if (!useNativeMidi) {
 		return false;
 	}
-	static std::string midi = ".mid";
-	auto it = midi.begin();
-	if (file.size() > midi.size() &&
-			std::all_of(std::next(file.begin(), file.size() - midi.size()), file.end(), [&it](const char & c) { return c == ::tolower(*(it++)); })) {
+	if (fs::path(file).extension() == ".mid") {
 		// midi file, use external player, since windows vista+ does not allow midi volume control independent of process volume
 		fs::path full_filename = LibraryFileName(file);
 
