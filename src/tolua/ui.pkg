@@ -306,7 +306,7 @@ class Widget
 
 	virtual void requestFocus();
 
-	virtual void addActionListener(LuaActionListener *actionListener);
+	tolua_outside virtual void addActionListener @ addActionListener(LuaActionListener *actionListener);
 	virtual void addMouseListener(LuaActionListener *actionListener);
 	virtual void addKeyListener(LuaActionListener *actionListener);
 };

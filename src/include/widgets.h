@@ -46,6 +46,7 @@ void freeGuichan();
 void handleInput(const SDL_Event *event);
 
 #if 1 // ToLua++
+void addActionListener(gcn::Widget *, gcn::ActionListener *);
 void setBackgroundColor(gcn::Widget *, const gcn::Color &);
 void setBaseColor(gcn::Widget *, const gcn::Color &color);
 void setDirty(gcn::Widget *, bool isDirty);

@@ -63,6 +63,20 @@ static std::stack<MenuScreen *> MenuStack;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void addActionListener(gcn::Widget *widget, gcn::ActionListener *actionListener)
+{
+	// gcn::Widget::addActionListener is no longer virtual
+	// so dispatch manually :-/
+
+	if (auto w = dynamic_cast<ImageListBoxWidget *>(widget)) {
+		w->addActionListener(actionListener);
+	} else if (auto w = dynamic_cast<ListBoxWidget *>(widget)) {
+		w->addActionListener(actionListener);
+	} else {
+		widget->addActionListener(actionListener);
+	}
+}
+
 void setDirty(gcn::Widget *, bool isDirty)
 {
 	LuaError(Lua, "setDirty is no longer implemented\n");
