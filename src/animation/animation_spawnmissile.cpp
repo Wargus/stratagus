@@ -76,6 +76,9 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(::ParseAnimFlags(unit, this->flagsStr));
 	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr);
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
+	if (!goal || goal->Destroyed) {
+		return;
+	}
 	const int dir = ((goal->Direction + NextDirection / 2) & 0xFF) / NextDirection;
 	const PixelPos moff = goal->Type->MissileOffsets[dir][!offsetnum ? 0 : offsetnum - 1];
 	PixelPos start;
@@ -84,10 +87,6 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 		return;
 	}
 	MissileType &mtype = MissileTypeByIdent(this->missileTypeStr);
-
-	if (!goal || goal->Destroyed) {
-		return;
-	}
 	if ((flags & SM_Pixel)) {
 		start.x = goal->tilePos.x * PixelTileSize.x + goal->IX + moff.x + startx;
 		start.y = goal->tilePos.y * PixelTileSize.y + goal->IY + moff.y + starty;
