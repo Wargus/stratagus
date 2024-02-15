@@ -634,6 +634,9 @@ endif()
 
 if(BUILD_VENDORED_LUA)
 	vendored_lua()
+else()
+	find_package(Lua51 REQUIRED)
+	find_package(Tolua++ REQUIRED)
 endif()
 
 if(BUILD_VENDORED_MEDIA_LIBS)
@@ -1154,9 +1157,6 @@ endif()
 
 if(BUILD_VENDORED_LUA)
 	add_dependencies(stratagus_lib lua)
-else()
-	find_package(Lua51 REQUIRED)
-	find_package(Tolua++ REQUIRED)
 endif()
 
 if(BUILD_VENDORED_SDL)
