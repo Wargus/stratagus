@@ -1104,7 +1104,7 @@ add_custom_command(OUTPUT tolua.cpp
 	VERBATIM
 )
 
-add_library(stratagus_lib ${stratagus_SRCS} ${stratagus_HDRS})
+add_library(stratagus_lib STATIC ${stratagus_SRCS} ${stratagus_HDRS})
 if (ENABLE_STDIO_REDIRECT)
 	add_executable(stratagus WIN32 src/stratagus/main.cpp)
 else ()
