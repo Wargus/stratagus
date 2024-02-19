@@ -1,0 +1,47 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# Declares that this is the top-level configuration
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+# The settings are the same in .clang-format. Keep them in sync.
+[*.{c,cpp,h}]
+indent_style = tab
+indent_size = 4
+
+[*.{nsi,rc}]
+indent_style = tab
+indent_size = 4
+
+[*.pkg]
+indent_style = tab
+indent_size = 4
+
+[CMakeLists.txt]
+indent_style = tab
+indent_size = 4
+
+[*.glsl]
+indent_style = space
+indent_size = 4
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.lua*]
+indent_style = space
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+[*.sh]
+indent_style = space
+indent_size = 4

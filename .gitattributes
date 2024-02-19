@@ -1,0 +1,18 @@
+# All text files will be normalized to LF in repository
+# and checked out as LF on all platforms.
+# See https://git-scm.com/docs/gitattributes
+*      text=auto eol=lf
+
+*.c    text eol=lf diff=cpp
+*.cpp  text eol=lf diff=cpp
+*.h    text eol=lf diff=cpp
+*.py   text eol=lf diff=python
+*.glsl text eol=lf
+*.html text eol=lf
+*.sh   text eol=lf
+*.rc   text eol=lf
+*.nsi  text eol=lf
+
+# binaries
+*.png  binary
+*.ico  binary
