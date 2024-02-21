@@ -73,7 +73,37 @@ static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 static CFont *SmallFont;  /// Small font used in stats
 static CFont *GameFont;   /// Normal font used in game
 
-static std::string FormatNumber(const int number);
+/**
+**	@brief	Format a number using commas
+**
+**  This is closely tied to CFont::Width(int number).
+**
+**	@param	number	Number to be formatted
+**
+**	@return	The formatted number as a string
+*/
+static std::string FormatNumber(const int number)
+{
+	std::string str;
+	const char sep = ',';
+	int n = abs(number);
+
+	int loop = 0;
+	while (n > 0 || loop == 0) {
+		if (loop > 0 && loop % 3 == 0) {
+			str.insert(0, 1, sep);
+		}
+		const char c = n % 10 + '0';
+		str.insert(0, 1, c);
+		n /= 10;
+		loop++;
+	}
+
+	if (number < 0) {
+		str.insert(0, 1, '-');
+	}
+	return str;
+}
 
 CFont &GetSmallFont()
 {
@@ -266,6 +296,7 @@ static unsigned char codepoint_to_codepage_index(int codepoint, const char **sub
 			break;
 		case 0x2502:
 			cpChar = 0xb3;
+			break;
 		case 0x2591:
 			cpChar = 0xb0;
 			break;
@@ -417,8 +448,8 @@ bool CFont::IsLoaded() const
 }
 
 /**
-**  Returns the pixel width of text. This is intimately
-**  tied to FormatNumber
+**  Returns the pixel width of text.
+**  This is intimately tied to FormatNumber
 **
 **  @param number  number to calculate the width of.
 **
@@ -426,16 +457,13 @@ bool CFont::IsLoaded() const
 */
 int CFont::Width(const int number) const
 {
-	static_assert(sizeof(int) <= 8); // 64bit numbers need at most 20 decimal places
-	auto s = std::to_string(number);
-	int commas = (s.size() - (number < 0 ? 1 : 0) - 1) / 3;
-
 	DynamicLoad();
+
+	const auto s = FormatNumber(number);
 	int width = 0;
 	for (auto c : s) {
 		width += this->CharWidth[c - 32] + 1;
 	}
-	width += (this->CharWidth[',' - 32] + 1) * commas;
 	return width;
 }
 
@@ -754,38 +782,6 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 	int dx = font->Width(text);
 	DoDrawText<false>(x - dx / 2, y, text, reverse);
 	return dx / 2;
-}
-
-/**
-**	@brief	Format a number using commas
-**
-**  This is closely tied to CFont::Width(int number).
-**
-**	@param	number	Number to be formatted
-**
-**	@return	The formatted number as a string
-*/
-static std::string FormatNumber(const int number)
-{
-	std::string str;
-	const char sep = ',';
-	int n = abs(number);
-
-	int loop = 0;
-	while (n > 0 || loop == 0) {
-		if (loop > 0 && loop % 3 == 0) {
-			str.insert(0, 1, sep);
-		}
-		const char c = n % 10 + 48;
-		str.insert(0, 1, c);
-		n /= 10;
-		loop++;
-	}
-
-	if (number < 0) {
-		str.insert(0, 1, '-');
-	}
-	return str;
 }
 
 /**
