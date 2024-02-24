@@ -730,7 +730,7 @@ static void DrawTileOptions() {
 		}
 
 		if (ButtonUnderCursor == i + 300) {
-			Video.DrawRectangle(ColorGray, x - 1, y - 1, w + 2, h + 2);
+			Video.DrawRectangle(ColorGray, x, y - 1, w, h);
 		}
 
 		return true;
