@@ -451,6 +451,7 @@ void CUnit::Init()
 	Waiting = 0;
 	MineLow = 0;
 	ZDisplaced = 0;
+	JustMoved = 0;
 	TeamSelected = 0;
 	RescuedFrom = nullptr;
 	memset(VisCount, 0, sizeof(VisCount));
