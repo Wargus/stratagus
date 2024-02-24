@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -734,7 +734,7 @@ static void DrawTileOptions() {
 		}
 
 		if (ButtonUnderCursor == i + 300) {
-			Video.DrawRectangle(ColorGray, x - 1, y - 1, w + 2, h + 2);
+			Video.DrawRectangle(ColorGray, x, y - 1, w, h);
 		}
 
 		return true;
