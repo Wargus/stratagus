@@ -982,6 +982,16 @@ void ReloadFonts()
 }
 
 /**
+* Constructor
+*/
+/* explicit */ CFontColor::CFontColor(std::string ident) : Ident(std::move(ident))
+{
+	for (auto& color : Colors) {
+		color.a = SDL_ALPHA_OPAQUE;
+	}
+}
+
+/**
 **  Get a font
 **
 **  @param ident  Font identifier
