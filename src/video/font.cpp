@@ -187,7 +187,11 @@ static void VideoDrawChar(const CGraphic &g,
 {
 	SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 	SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-	SDL_SetPaletteColors(g.getSurface()->format->palette, fc.Colors.data(), 0, fc.Colors.size());
+	if (auto* palette = g.getSurface()->format->palette) {
+		if (SDL_SetPaletteColors(palette, fc.Colors.data(), 0, fc.Colors.size())) {
+			ErrorPrint("Cannot set palette colors: %s\n", SDL_GetError());
+		}
+	}
 	SDL_BlitSurface(g.getSurface(), &srect, TheScreen, &drect);
 }
 
