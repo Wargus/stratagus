@@ -123,7 +123,7 @@ private:
 class CFontColor
 {
 public:
-	explicit CFontColor(std::string ident) : Ident(std::move(ident)) {}
+	explicit CFontColor(std::string ident);
 
 	static CFontColor *New(const std::string &ident);
 	static CFontColor *Get(std::string_view ident);
