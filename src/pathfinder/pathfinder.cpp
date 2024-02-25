@@ -368,7 +368,7 @@ void PathFinderInput::SetMaxRange(int range)
 	}
 }
 
-void PathFinderInput::PathRacalculated()
+void PathFinderInput::PathRecalculated()
 {
 	unitSize.x = unit->Type->TileWidth;
 	unitSize.y = unit->Type->TileHeight;
@@ -405,7 +405,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 						  input.GetMinRange(), input.GetMaxRange(),
 						  path, PathFinderOutput::MAX_PATH_LENGTH,
 						  *input.GetUnit());
-	input.PathRacalculated();
+	input.PathRecalculated();
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;
 	}
