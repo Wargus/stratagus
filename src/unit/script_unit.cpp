@@ -257,10 +257,13 @@ void PathFinderOutput::Load(lua_State *l)
 				LuaError(l, "incorrect argument _");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				this->Path[k] = LuaToNumber(l, -1, k + 1);
+			if (subargs <= PathFinderOutput::MAX_PATH_LENGTH)
+			{
+				for (int k = 0; k < subargs; ++k) {
+					this->Path[k] = LuaToNumber(l, -1, k + 1);
+				}
+				this->Length = subargs;
 			}
-			this->Length = subargs;
 			lua_pop(l, 1);
 		} else {
 			LuaError(l, "PathFinderOutput::Load: Unsupported tag: %s", tag.data());

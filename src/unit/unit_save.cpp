@@ -101,7 +101,7 @@ void PathFinderOutput::Save(CFile &file) const
 	if (this->OverflowLength) {
 		file.printf("\"overflow-length\", %d, ", this->OverflowLength);
 	}
-	if (this->Length > 0) {
+	if (this->Length > 0 && this->Length <= PathFinderOutput::MAX_PATH_LENGTH) {
 		file.printf("\"path\", {");
 		for (int i = 0; i < this->Length; ++i) {
 			file.printf("%d, ", this->Path[i]);
