@@ -413,10 +413,15 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 	// Update path if it was requested. Otherwise we may only want
 	// to know if there exists a path.
 	if (path != nullptr) {
-		output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
-		output.OverflowLength = std::min<int>(i - output.Length, PathFinderOutput::MAX_OVERFLOW);
-		if (output.Length == 0) {
-			++output.Length;
+		if (i >= 0) {
+			output.Length = std::min<int>(i, PathFinderOutput::MAX_PATH_LENGTH);
+			output.OverflowLength = std::min<int>(i - output.Length, PathFinderOutput::MAX_OVERFLOW);
+			if (output.Length == 0) {
+				++output.Length;
+			}
+		} else {
+			output.Length = 0;
+			output.OverflowLength = 0;
 		}
 	}
 	return i;
