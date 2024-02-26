@@ -83,7 +83,7 @@ public:
 	void SetMinRange(int range);
 	void SetMaxRange(int range);
 
-	void PathRacalculated();
+	void PathRecalculated();
 
 	void Save(CFile &file) const;
 	void Load(lua_State *l);
