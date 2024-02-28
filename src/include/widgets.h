@@ -51,6 +51,7 @@ void setBackgroundColor(gcn::Widget *, const gcn::Color &);
 void setBaseColor(gcn::Widget *, const gcn::Color &color);
 void setDirty(gcn::Widget *, bool isDirty);
 void setDisabledColor(gcn::Widget *, const gcn::Color &);
+void setFont(gcn::Widget *widget, gcn::Font *font);
 void setHotKey(gcn::Widget *, const char *key);
 void scrollToBottom(gcn::ScrollArea *);
 void scrollToTop(gcn::ScrollArea *);
