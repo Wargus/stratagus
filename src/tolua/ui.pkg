@@ -298,7 +298,7 @@ class Widget
 	tolua_outside virtual void setDisabledColor @ setDisabledColor(const Color color);
 
 	static void setGlobalFont(CFont *font);
-	void setFont(CFont *font);
+	tolua_outside virtual void setFont @ setFont(CFont *font);
 
 	virtual int getHotKey() const;
 	virtual void setHotKey(const int key);

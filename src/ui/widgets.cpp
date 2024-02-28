@@ -115,6 +115,19 @@ void setBackgroundColor(gcn::Widget *widget, const gcn::Color &color)
 	}
 }
 
+void setFont(gcn::Widget *widget, gcn::Font *font)
+{
+	// gcn::Widget::setFont is no longer virtual
+	// so dispatch manually :-/
+
+	if (auto w = dynamic_cast<ImageDropDownWidget *>(widget)) {
+		w->setFont(font);
+	} else if (auto w = dynamic_cast<gcn::DropDown *>(widget)) {
+		w->setFont(font);
+	} else {
+		widget->setFont(font);
+	}
+}
 
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
