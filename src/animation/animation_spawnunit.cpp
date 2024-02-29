@@ -53,10 +53,35 @@ enum SpawnUnit_Flags
 	SU_Summoned = 1, /// Unit is marked as "summoned"
 	SU_JoinToAIForce = 2 /// Unit is included into spawner's AI force, if available
 };
+
+SpawnUnit_Flags ParseAnimFlags(const std::string_view &parseflag)
+{
+	std::uint32_t flags = 0;
+	auto cur = parseflag;
+	auto beg = 0;
+
+	while (beg < parseflag.size()) {
+		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
+		cur = parseflag.substr(beg, end - beg);
+		beg = end + 1;
+
+		if (cur == "none") {
+			return SU_None;
+		} else if (cur == "summoned") {
+			flags |= SU_Summoned;
+		} else if (cur == "jointoai") {
+			flags |= SU_JoinToAIForce;
+		} else {
+			ErrorPrint("Unknown animation flag: %s\n", cur.data());
+			ExitFatal(1);
+		}
+	}
+	return static_cast<SpawnUnit_Flags>(flags);
 }
 
+} // namespace
 
-void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
+void CAnimation_SpawnUnit::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
 	Assert(unit.Anim.Anim == this);
 
@@ -64,7 +89,7 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int &/*move*/, int /*scale*/) con
 	const int offY = ParseAnimInt(unit, this->offYStr);
 	const int range = ParseAnimInt(unit, this->rangeStr);
 	const int playerId = ParseAnimInt(unit, this->playerStr);
-	const SpawnUnit_Flags flags = (SpawnUnit_Flags)(::ParseAnimFlags(unit, this->flagsStr));
+	const SpawnUnit_Flags flags = ParseAnimFlags(this->flagsStr);
 
 	CPlayer &player = Players[playerId];
 	const Vec2i pos(unit.tilePos.x + offX, unit.tilePos.y + offY);
@@ -102,32 +127,6 @@ void CAnimation_SpawnUnit::Init(std::string_view s, lua_State *) /* override */
 	std::istringstream is{std::string(s)};
 	is >> this->unitTypeStr >> this->offXStr >> this->offYStr >> this->rangeStr >> this->playerStr
 		>> this->flagsStr;
-}
-
-std::uint32_t
-CAnimation_SpawnUnit::ParseAnimFlags(const std::string_view &parseflag) const /* override */
-{
-	std::uint32_t flags = 0;
-	auto cur = parseflag;
-	auto beg = 0;
-
-	while (beg < parseflag.size()) {
-		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
-		cur = parseflag.substr(beg, end - beg);
-		beg = end + 1;
-
-		if (cur == "none") {
-			return SU_None;
-		} else if (cur == "summoned") {
-			flags |= SU_Summoned;
-		} else if (cur == "jointoai") {
-			flags |= SU_JoinToAIForce;
-		} else {
-			ErrorPrint("Unknown animation flag: %s\n", cur.data());
-			ExitFatal(1);
-		}
-	}
-	return flags;
 }
 
 //@}

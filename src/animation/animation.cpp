@@ -344,19 +344,6 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 }
 
 /**
-**  Parse flags list in animation frame.
-**
-**  @param unit       Unit of the animation.
-**  @param parseflag  Flag list to parse.
-**
-**  @return The parsed value.
-*/
-int ParseAnimFlags(const CUnit &unit, std::string_view parseflag)
-{
-	return unit.Anim.Anim->ParseAnimFlags(parseflag);
-}
-
-/**
 **  Show unit animation.
 **
 **  @param unit   Unit of the animation.
