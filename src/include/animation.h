@@ -81,7 +81,6 @@ public:
 	virtual void Init(std::string_view s, lua_State *l = nullptr) {}
 	virtual void MapSound() {}
 	virtual std::optional<int> GetStillFrame(const CUnitType &type) { return std::nullopt; }
-	virtual std::uint32_t ParseAnimFlags(const std::string_view& parseflag) const { return 0; }
 
 	CAnimation *Next = nullptr;
 };
@@ -156,7 +155,6 @@ extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
 
 
 extern int ParseAnimInt(const CUnit &unit, std::string_view parseint);
-extern int ParseAnimFlags(const CUnit &unit, std::string_view parseflag);
 
 extern void FindLabelLater(CAnimation **anim, std::string name);
 

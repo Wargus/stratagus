@@ -62,8 +62,41 @@ enum SpawnMissile_Flags
 	/// is bigger than unit's attack range
 	SM_SetDirection = 32 /// Missile takes the same direction as spawner
 };
+
+SpawnMissile_Flags ParseAnimFlags(const std::string_view &parseflag)
+{
+	std::uint32_t flags = 0;
+	auto cur = parseflag;
+	auto beg = 0;
+
+	while (beg < parseflag.size()) {
+		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
+		cur = parseflag.substr(beg, end - beg);
+		beg = end + 1;
+
+		if (cur == "none") {
+			return SM_None;
+		} else if (cur == "damage") {
+			flags |= SM_Damage;
+		} else if (cur == "totarget") {
+			flags |= SM_ToTarget;
+		} else if (cur == "pixel") {
+			flags |= SM_Pixel;
+		} else if (cur == "reltarget") {
+			flags |= SM_RelTarget;
+		} else if (cur == "ranged") {
+			flags |= SM_Ranged;
+		} else if (cur == "setdirection") {
+			flags |= SM_SetDirection;
+		} else {
+			ErrorPrint("Unknown animation flag: %s\n", cur.data());
+			ExitFatal(1);
+		}
+	}
+	return static_cast<SpawnMissile_Flags>(flags);
 }
 
+} // namespace
 
 void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
@@ -73,7 +106,7 @@ void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) 
 	const int starty = ParseAnimInt(unit, this->startYStr);
 	const int destx = ParseAnimInt(unit, this->destXStr);
 	const int desty = ParseAnimInt(unit, this->destYStr);
-	const SpawnMissile_Flags flags = (SpawnMissile_Flags)(::ParseAnimFlags(unit, this->flagsStr));
+	const SpawnMissile_Flags flags = ParseAnimFlags(this->flagsStr);
 	const int offsetnum = ParseAnimInt(unit, this->offsetNumStr);
 	const CUnit *goal = flags & SM_RelTarget ? unit.CurrentOrder()->GetGoal() : &unit;
 	if (!goal || goal->Destroyed) {
@@ -169,40 +202,6 @@ void CAnimation_SpawnMissile::Init(std::string_view s, lua_State *) /* override 
 
 	is >> this->missileTypeStr >> this->startXStr >> this->startYStr >> this->destXStr
 		>> this->destYStr >> this->flagsStr >> this->offsetNumStr;
-}
-
-std::uint32_t
-CAnimation_SpawnMissile::ParseAnimFlags(const std::string_view &parseflag) const /* override */
-{
-	std::uint32_t flags = 0;
-	auto cur = parseflag;
-	auto beg = 0;
-
-	while (beg < parseflag.size()) {
-		const auto end = std::min(parseflag.find('.', beg), parseflag.size());
-		cur = parseflag.substr(beg, end - beg);
-		beg = end + 1;
-
-		if (cur == "none") {
-			return SM_None;
-		} else if (cur == "damage") {
-			flags |= SM_Damage;
-		} else if (cur == "totarget") {
-			flags |= SM_ToTarget;
-		} else if (cur == "pixel") {
-			flags |= SM_Pixel;
-		} else if (cur == "reltarget") {
-			flags |= SM_RelTarget;
-		} else if (cur == "ranged") {
-			flags |= SM_Ranged;
-		} else if (cur == "setdirection") {
-			flags |= SM_SetDirection;
-		} else {
-			ErrorPrint("Unknown animation flag: %s\n", cur.data());
-			ExitFatal(1);
-		}
-	}
-	return flags;
 }
 
 //@}
