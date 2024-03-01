@@ -231,7 +231,7 @@ static bool External_Volume(int volume, int oldVolume) {
 	return false;
 }
 #else
-static bool External_Play(const std::string &file) {
+static bool External_Play(const std::string & /*file*/) {
 	return false;
 }
 static bool External_IsPlaying() {
@@ -240,7 +240,7 @@ static bool External_IsPlaying() {
 static bool External_Stop() {
 	return false;
 }
-static bool External_Volume(int volume, int oldVolume) {
+static bool External_Volume(int /*volume*/, int /*oldVolume*/) {
 	return false;
 }
 #endif

@@ -1140,6 +1140,10 @@ static int CclCopyButtonsForUnitType(lua_State *l)
 	const std::string_view fromName = LuaToString(l, 1);
 	const std::string_view toName = LuaToString(l, 2);
 
+	// Check types exist
+	UnitTypeByIdent(fromName);
+	UnitTypeByIdent(toName);
+
 	for (auto &btn : UnitButtonTable) {
 		if (btn->UnitMask.find(fromName) != std::string::npos) {
 			btn->UnitMask += toName;
