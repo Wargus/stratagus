@@ -59,6 +59,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static const int NotYetLoadedMagic = static_cast<int>(0xcafebeef);
+
 uint32_t SDL_SOUND_FINISHED;
 
 static bool SoundInitialized;    /// is sound initialized
@@ -229,10 +231,18 @@ static bool External_Volume(int volume, int oldVolume) {
 	return false;
 }
 #else
-#define External_Play(file) false
-#define External_IsPlaying() false
-#define External_Stop() false
-#define External_Volume(volume, oldVolume) false
+static bool External_Play(const std::string & /*file*/) {
+	return false;
+}
+static bool External_IsPlaying() {
+	return false;
+}
+static bool External_Stop() {
+	return false;
+}
+static bool External_Volume(int /*volume*/, int /*oldVolume*/) {
+	return false;
+}
 #endif
 
 /// Channels for sound effects and unit speech
@@ -403,7 +413,7 @@ static Mix_Chunk *LoadSample(const char *name)
 {
 #ifdef DYNAMIC_LOAD
 	Mix_Chunk *r = (Mix_Chunk *)SDL_calloc(sizeof(Mix_Chunk), 1);
-	r->allocated = 0xcafebeef;
+	r->allocated = NotYetLoadedMagic;
 	r->abuf = (Uint8 *)(strdup(name));
 	return r;
 #else
@@ -457,7 +467,7 @@ Mix_Chunk *LoadSample(const std::string &name)
 void FreeSample(Mix_Chunk *sample)
 {
 #ifdef DYNAMIC_LOAD
-	if (sample->allocated == 0xcafebeef) {
+	if (sample->allocated == NotYetLoadedMagic) {
 		return;
 	}
 #endif
@@ -479,7 +489,7 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 	if (SoundEnabled() && EffectsEnabled && sample) {
 		DebugPrint("play sample %d\n", sample->volume);
 #ifdef DYNAMIC_LOAD
-		if (sample->allocated == 0xcafebeef) {
+		if (sample->allocated == NotYetLoadedMagic) {
 			char *name = (char*)(sample->abuf);
 			Mix_Chunk *loadedSample = ForceLoadSample(name);
 			if (loadedSample) {

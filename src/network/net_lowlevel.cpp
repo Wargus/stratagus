@@ -271,7 +271,6 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 {
 	struct ifaddrs *ifAddrStruct = nullptr;
 	struct ifaddrs *ifa = nullptr;
-	void *tmpAddrPtr = nullptr;
 	int idx = 0;
 	getifaddrs(&ifAddrStruct);
 	for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {

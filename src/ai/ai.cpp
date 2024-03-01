@@ -282,7 +282,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 				file.printf("\"defend\",");
 				break;
 			default:
-				file.printf("\"unknown-%d\",", ai.Force[i].Role);
+				file.printf("\"unknown-%d\",", static_cast<int>(ai.Force[i].Role));
 				break;
 		}
 
@@ -295,7 +295,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 			file.printf(" %d, \"%s\",", UnitNumber(*aiunit), aiunit->Type->Ident.c_str());
 		}
 		file.printf("},\n    \"state\", %d, \"goalx\", %d, \"goaly\", %d,",
-					ai.Force[i].State, ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
+					static_cast<int>(ai.Force[i].State), ai.Force[i].GoalPos.x, ai.Force[i].GoalPos.y);
 		file.printf("},\n");
 	}
 

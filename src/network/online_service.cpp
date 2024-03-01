@@ -795,7 +795,6 @@ public:
 	void sendText(std::string txt, bool silent = false)
 	{
 		// C>S 0x0E SID_CHATCOMMAND
-		int pos = 0;
 		for (unsigned int pos = 0; pos < txt.size(); pos += 220) {
 			std::string text = txt.substr(pos, pos + 220);
 			if (pos + 220 < txt.size()) {

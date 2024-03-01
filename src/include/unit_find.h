@@ -146,7 +146,7 @@ public:
 	explicit IsSameMovementType(const CUnit &unit) : Mask(unit.Type->MovementMask) {}
 	bool operator()(const CUnit *unit) const { return unit->Type->MovementMask == Mask; }
 private:
-	const int Mask;
+	const unsigned Mask;
 };
 
 class IsAggresiveUnit : public CUnitFilter

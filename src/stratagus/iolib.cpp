@@ -172,7 +172,7 @@ int CFile::printf(const char *format, ...)
 		const int n = vsnprintf(p.data(), p.size(), format, ap);
 		va_end(ap);
 		// If that worked, string was processed.
-		if (n > -1 && n < p.size()) {
+		if (n > -1 && n < static_cast<int>(p.size())) {
 			p.resize(n);
 			break;
 		}

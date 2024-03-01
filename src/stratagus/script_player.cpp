@@ -148,7 +148,7 @@ void CPlayer::Load(lua_State *l)
 			this->Team = LuaToNumber(l, j + 1);
 		} else if (value == "enemy") {
 			value = LuaToString(l, j + 1);
-			for (int i = 0; i < PlayerMax && i < value.size(); ++i) {
+			for (unsigned int i = 0; i < PlayerMax && i < value.size(); ++i) {
 				if (value[i] == '-' || value[i] == '_' || value[i] == ' ') {
 					this->Enemy &= ~(1 << i);
 				} else {
@@ -157,7 +157,7 @@ void CPlayer::Load(lua_State *l)
 			}
 		} else if (value == "allied") {
 			value = LuaToString(l, j + 1);
-			for (int i = 0; i < PlayerMax && i < value.size(); ++i) {
+			for (unsigned int i = 0; i < PlayerMax && i < value.size(); ++i) {
 				if (value[i] == '-' || value[i] == '_' || value[i] == ' ') {
 					this->Allied &= ~(1 << i);
 				} else {
@@ -166,8 +166,8 @@ void CPlayer::Load(lua_State *l)
 			}
 		} else if (value == "shared-vision") {
 			value = LuaToString(l, j + 1);
-			for (int i = 0; i < PlayerMax && i < value.size(); ++i) {
-				if (i == this->Index) {
+			for (unsigned int i = 0; i < PlayerMax && i < value.size(); ++i) {
+				if (i == static_cast<unsigned int>(this->Index)) {
 					continue;
 				}
 				if (value[i] == '-' || value[i] == '_' || value[i] == ' ') {

@@ -1406,18 +1406,6 @@ void CTextBox::keyPressed(gcn::KeyEvent &event) /* override */
 	event.consume();
 }
 
-static int FindNext(const std::string &text, int curpos)
-{
-	if (curpos < 0) return 0;
-	while (curpos < (int) text.size()) {
-		if ((text[curpos] & 0xC0) != 0x80) {
-			return curpos;
-		}
-		++curpos;
-	}
-	return text.size();
-}
-
 /*----------------------------------------------------------------------------
 --  CTextField
 ----------------------------------------------------------------------------*/

@@ -257,7 +257,6 @@ static GLint FrameCount;
 static GLint OutputSize;
 static GLint TextureSize;
 static GLint InputSize;
-static GLint VertexCoord;
 static GLint TexCoord;
 // caches that don't change for a window size
 static int RecacheCount = 0; // rechache multiple times - races!

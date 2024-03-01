@@ -50,7 +50,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const int subtileCount)
+bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const unsigned int subtileCount)
 {
 	const struct {
 		std::string_view name;
@@ -105,7 +105,7 @@ bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const int
 			return false;
 		}
 		tile_flags subtileFlags = 0;
-		for (int i = 0; i < subtileCount; i++) {
+		for (unsigned int i = 0; i < subtileCount; i++) {
 			if (flagName[i] == 'u') {
 				subtileFlags |= (1 << i);
 			} else if (flagName[i] != 'p') {
@@ -559,10 +559,10 @@ void CTileset::buildTable(lua_State *l)
 	//8 Top Left
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
-	for (size_t i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16U; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (size_t i = mixed; i < mixed + 256; ++i) {
+	for (size_t i = mixed; i < mixed + 256U; ++i) {
 		int check = int((i - mixed) / 16);
 
 		switch (check) {
@@ -617,10 +617,10 @@ void CTileset::buildTable(lua_State *l)
 	//2 Bottom Right
 	//4 Top Right
 	//8 Top Left
-	for (size_t i = solid; i < solid + 16; ++i) {
+	for (size_t i = solid; i < solid + 16U; ++i) {
 		mixedLookupTable[tiles[i].tile] = 15;
 	}
-	for (size_t i = mixed; i < mixed + 256; ++i) {
+	for (size_t i = mixed; i < mixed + 256U; ++i) {
 		int check = int((i - mixed) / 16);
 		switch (check) {
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;

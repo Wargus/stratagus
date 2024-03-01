@@ -571,7 +571,7 @@ void PrintOnStdOut(const char *format, ...)
 
 #ifdef __GNUC__
 
-static void __cpuid(int* cpuinfo, int info)
+static void __cpuid(unsigned int* cpuinfo, int info)
 {
 	__asm__ __volatile__(
 		"xchg %%ebx, %%edi;"
@@ -614,7 +614,7 @@ struct SIMDSupport {
 static struct SIMDSupport checkSIMDSupport() {
 	struct SIMDSupport s;
 
-	int cpuinfo[4];
+	unsigned int cpuinfo[4];
 	__cpuid(cpuinfo, 1);
 
 	// Check SSE, SSE2, SSE3, SSSE3, SSE4.1, and SSE4.2 support
@@ -647,7 +647,7 @@ static struct SIMDSupport checkSIMDSupport() {
 
 	// Get the number of valid extended IDs
 	__cpuid(cpuinfo, 0x80000000);
-	int numExtendedIds = cpuinfo[0];
+	unsigned int numExtendedIds = cpuinfo[0];
 	if (numExtendedIds >= 0x80000001)
 	{
 		__cpuid(cpuinfo, 0x80000001);

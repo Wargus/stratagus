@@ -495,13 +495,25 @@ private:
 #if USING_TOLUAPP
 public:
 	bool get_AiExplores() { return AiExplores; }
-	void set_AiExplores(bool v) { AiExplores = GameSettings.AiExplores = v; }
+	void set_AiExplores(bool v) {
+		AiExplores = v;
+		GameSettings.AiExplores = v;
+	}
 	bool get_SimplifiedAutoTargeting() { return SimplifiedAutoTargeting; }
-	void set_SimplifiedAutoTargeting(bool v) { SimplifiedAutoTargeting = GameSettings.SimplifiedAutoTargeting = v; }
+	void set_SimplifiedAutoTargeting(bool v) {
+		SimplifiedAutoTargeting = v;
+		GameSettings.SimplifiedAutoTargeting = v;
+	}
 	bool get_AiChecksDependencies() { return AiChecksDependencies; }
-	void set_AiChecksDependencies(bool v) { AiChecksDependencies = GameSettings.AiChecksDependencies = v; }
+	void set_AiChecksDependencies(bool v) {
+		AiChecksDependencies = v;
+		GameSettings.AiChecksDependencies = v;
+	}
 	bool get_AllyDepositsAllowed() { return AllyDepositsAllowed; }
-	void set_AllyDepositsAllowed(bool v) { AllyDepositsAllowed = GameSettings.AllyDepositsAllowed = v; }
+	void set_AllyDepositsAllowed(bool v) {
+		AllyDepositsAllowed = v;
+		GameSettings.AllyDepositsAllowed = v;
+	}
 #endif
 };
 

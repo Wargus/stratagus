@@ -171,7 +171,6 @@ static bool MoveRandomly(CUnit &unit)
 		if (!shift) {
 			return false;
 		}
-		int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 		auto pos = unit.tilePos;
 		auto w = unit.Type->PersonalSpaceWidth;
 		auto h = unit.Type->PersonalSpaceHeight;

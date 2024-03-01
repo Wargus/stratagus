@@ -533,7 +533,6 @@ std::vector<CUnit *> FindPlayerUnitsByType(const CPlayer &player, const CUnitTyp
 		return {};
 	}
 	std::vector<CUnit *> table;
-	const int nunits = player.GetUnitCount();
 
 	for (CUnit *unit : player.GetUnits()) {
 		if (unit->Type != &type) {
@@ -935,10 +934,10 @@ public:
 	private:
 		const CUnit *attacker;
 		const int range;
+		const int size;
 		int enemy_count;
 		std::vector<int> *good;
 		std::vector<int> *bad;
-		const int size;
 	};
 
 	CUnit *Find(std::vector<CUnit *> &table)
