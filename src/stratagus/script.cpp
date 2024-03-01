@@ -252,7 +252,7 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 	if (GetFileContent(file, content) == false) {
 		return -1;
 	}
-	if (file.string().rfind("stratagus.lua") != -1) {
+	if (file.string().rfind("stratagus.lua") != std::string::npos) {
 		FileChecksums ^= fletcher32(content);
 		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
@@ -701,7 +701,7 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 			std::unique_ptr<IUnitDesc> unitDesc;
 			int varIndex = -1;
 			int loc = -1;
-			EnumVariable component;
+			EnumVariable component = EnumVariable::Value;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 				key = LuaToString(l, -2);
 				if (key == "Unit") {
@@ -730,7 +730,7 @@ std::unique_ptr<INumberDesc> CclParseNumberDesc(lua_State *l)
 			Assert(lua_istable(l, -1));
 
 			CUnitType **type = nullptr;
-			EnumVariable component;
+			EnumVariable component = EnumVariable::Value;
 			int varIndex = -1;
 			int loc = -1;
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {

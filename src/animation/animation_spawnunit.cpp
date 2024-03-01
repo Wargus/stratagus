@@ -58,7 +58,7 @@ SpawnUnit_Flags ParseAnimFlags(const std::string_view &parseflag)
 {
 	std::uint32_t flags = 0;
 	auto cur = parseflag;
-	auto beg = 0;
+	size_t beg = 0;
 
 	while (beg < parseflag.size()) {
 		const auto end = std::min(parseflag.find('.', beg), parseflag.size());

@@ -439,7 +439,7 @@ public:
 	ViewportModeType ViewportMode = VIEWPORT_SINGLE; /// Current viewport mode
 	CViewport *MouseViewport = nullptr;           /// Viewport containing mouse
 	CViewport *SelectedViewport = nullptr;        /// Current selected active viewport
-	int NumViewports = 0;                   /// # Viewports currently used
+	unsigned int NumViewports = 0;                   /// # Viewports currently used
 	CViewport Viewports[MAX_NUM_VIEWPORTS]{}; /// Parameters of all viewports
 	CMapArea MapArea;                   /// geometry of the whole map area
 	CFont *MessageFont = nullptr;       /// Font used for messages

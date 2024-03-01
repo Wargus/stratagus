@@ -319,7 +319,6 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 		if (dot_pos == std::string_view::npos) {
 			return SyncRand(to_number(cur) + 1);
 		} else {
-			auto next = cur.substr(0, dot_pos);
 			const int min = to_number(cur);
 			return min + SyncRand(to_number(cur.substr(dot_pos + 1)) - min + 1);
 		}
@@ -446,7 +445,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	file.printf("\"anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
 	if (auto it = ranges::find(AnimationsArray, unit.Anim.CurrAnim); it != AnimationsArray.end()) {
-		file.printf("\"curr-anim\", %d,", std::distance(AnimationsArray.begin(), it));
+		file.printf("\"curr-anim\", %d,", static_cast<int>(std::distance(AnimationsArray.begin(), it)));
 		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
 	}
 	if (unit.Anim.Unbreakable) {
@@ -457,7 +456,7 @@ static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
 	file.printf("\"wait-anim-data\", {");
 	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
 	if (auto it = ranges::find(AnimationsArray, unit.WaitBackup.CurrAnim); it != AnimationsArray.end()) {
-		file.printf("\"curr-anim\", %d,", std::distance(AnimationsArray.begin(), it));
+		file.printf("\"curr-anim\", %d,", static_cast<int>(std::distance(AnimationsArray.begin(), it)));
 		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
 	}
 	if (unit.WaitBackup.Unbreakable) {

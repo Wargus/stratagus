@@ -69,6 +69,8 @@ void CAnimation_Rotate::Action(CUnit &unit, int & /*move*/, int /*scale*/) const
 			}
 		} else if (unit.CurrentOrder()->Action == UnitAction::Build) {
 			target = static_cast<const COrder_Build *>(order)->GetBuildingUnit();
+		} else {
+			return;
 		}
 		Vec2i dpos = target->tilePos + target->Type->GetHalfTileSize() - unit.tilePos;
 		Vec2i doff = Vec2i(target->IX / 2, target->IY / 2) - Vec2i(unit.IX, unit.IY);

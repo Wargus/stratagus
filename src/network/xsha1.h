@@ -91,7 +91,7 @@ namespace pvpgn
 	};
 
 	static void hash_init(t_hash * hash);
-	static void do_hash(t_hash * hash, std::uint32_t * tmp);
+	static void do_hash(t_hash * hash, std::uint32_t * tmp, t_hash_variant hash_variant);
 	static void hash_set_16(std::uint32_t * dst, unsigned char const * src, unsigned int count, t_hash_variant hash_variant);
 
 

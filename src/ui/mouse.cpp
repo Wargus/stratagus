@@ -210,7 +210,6 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 		&& dest.Type->CanStore[unit.CurrentResource]
 		&& (dest.Player == unit.Player
 			|| (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)))) {
-		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, EUnitVoice::Acknowledging);

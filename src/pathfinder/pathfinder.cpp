@@ -201,6 +201,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 		int containerW = first_container->Type->TileWidth;
 		int containerH = first_container->Type->TileHeight;
 		Vec2i containerTilePos = first_container->tilePos;
+		i = PF_UNREACHABLE;
 		// check top and bottom rows and left and right columns around the container
 		for (int x = -1; x <= containerW; x++) {
 			for (int y = -1; y <= containerH; y++) {

@@ -88,9 +88,10 @@ public:
 class CAnimations
 {
 public:
-	CAnimations() : Attack(nullptr), RangedAttack(nullptr), Build(nullptr), Move(nullptr), Repair(nullptr),
+	CAnimations() : Attack(nullptr), RangedAttack(nullptr), Build(nullptr), hasDeathAnimation(false),
+		Move(nullptr), Repair(nullptr),
 		Research(nullptr), SpellCast(nullptr), Start(nullptr), Still(nullptr),
-		Train(nullptr), Upgrade(nullptr), hasDeathAnimation(false)
+		Train(nullptr), Upgrade(nullptr)
 	{
 		memset(Death, 0, sizeof(Death));
 		memset(Harvest, 0, sizeof(Harvest));

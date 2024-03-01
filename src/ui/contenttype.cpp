@@ -590,10 +590,11 @@ void CContentTypeLifeBar::Parse(lua_State *l) /* override */
 				}
 				this->values[i] = LuaToNumber(l, -1, 1);
 				const std::string_view colorName = LuaToString(l, -1, 2);
-				this->colors[i] = GetColorIndexByName(colorName);
-				if (this->colors[i] == -1) {
+				const int color = GetColorIndexByName(colorName);
+				if (color == -1) {
 					LuaError(l, "incorrect color: '%s' ", colorName.data());
 				}
+				this->colors[i] = color;
 				i++;
 			}
 			if (this->values.back() != 0) {

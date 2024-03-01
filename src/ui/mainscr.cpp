@@ -518,7 +518,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		}
 		if (ButtonAreaUnderCursor == ButtonArea::Transporting) {
 			for (int sub_j = j; sub_j <= lastOccupiedButton; sub_j++) {
-				if (static_cast<size_t>(ButtonUnderCursor) == sub_j) {
+				if (ButtonUnderCursor == sub_j) {
 					UI.StatusLine.Set(uins->Type->Name);
 				}
 			}

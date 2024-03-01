@@ -1134,13 +1134,13 @@ void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
 
 	switch (bpp) {
 		case 1: {
-			uint8_t *dst = (uint8_t *)mSurface->pixels;
-			uint8_t *src = (uint8_t *)other->mSurface->pixels;
+			uint8_t *src_base = (uint8_t *)other->mSurface->pixels;
+			uint8_t *dst_base = (uint8_t *)mSurface->pixels;
 
 			for (int x = 0; x < mSurface->w; x++) {
 				for (int y = 0; y < mSurface->h; y++) {
-					uint8_t* src = ((uint8_t*)(other->mSurface->pixels)) + x + y * other->mSurface->pitch;
-					uint8_t* dst = ((uint8_t*)(mSurface->pixels)) + x + y * mSurface->pitch;
+					uint8_t* src = src_base + x + y * other->mSurface->pitch;
+					uint8_t* dst = dst_base + x + y * mSurface->pitch;
 					if (*src != srcColorKey) {
 						if (!mask) {
 							*dst = *src;
@@ -1153,13 +1153,13 @@ void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
 			break;
 		}
 		case 4: {
-			uint32_t *dst = (uint32_t *)mSurface->pixels;
-			uint32_t *src = (uint32_t *)other->mSurface->pixels;
+			uint32_t *src_base = (uint32_t *)other->mSurface->pixels;
+			uint32_t *dst_base = (uint32_t *)mSurface->pixels;
 
 			for (int x = 0; x < mSurface->w; x++) {
 				for (int y = 0; y < mSurface->h; y++) {
-					uint32_t* src = ((uint32_t*)(other->mSurface->pixels)) + x + y * other->mSurface->pitch;
-					uint32_t* dst = ((uint32_t*)(mSurface->pixels)) + x + y * mSurface->pitch;
+					uint32_t* src = src_base + x + y * other->mSurface->pitch;
+					uint32_t* dst = dst_base + x + y * mSurface->pitch;
 					double alphaSrc = (*src & other->mSurface->format->Amask) / 255.0;
 					if (mask) {
 						alphaSrc = 1 - alphaSrc;

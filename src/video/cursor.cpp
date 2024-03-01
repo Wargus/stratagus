@@ -85,7 +85,7 @@ CUnitType *CursorBuilding;           /// building cursor
 CCursor *GameCursor;                 /// current shown cursor-type
 
 static CCursor *ActuallyVisibleGameCursor;
-static int VisibleGameCursorFrame;
+static unsigned int VisibleGameCursorFrame;
 
 
 static SDL_Surface *HiddenSurface;

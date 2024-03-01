@@ -501,7 +501,6 @@ static bool AiRequestSupply()
 	// Check if we can build this?
 	//
 	int j = 0;
-	const int n = AiHelpers.UnitLimit()[0].size();
 
 	for (CUnitType *type : AiHelpers.UnitLimit()[0]) {
 		if (counter[type->Slot]) { // Already ordered.

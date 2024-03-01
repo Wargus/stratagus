@@ -7,7 +7,7 @@
 
 #include <execinfo.h>
 inline void print_backtrace(int sz = 100) {
-    int j, nptrs;
+    int nptrs;
     void *buffer[sz];
     nptrs = backtrace(buffer, sz);
     fprintf(stderr, "backtrace() returned %d addresses\n", nptrs);

@@ -982,7 +982,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 
 #ifdef USE_MNG
 	if (!type.Portrait.Mngs.empty()) {
-		for (int i = 0; i < type.Portrait.Mngs.size(); ++i) {
+		for (size_t i = 0; i < type.Portrait.Mngs.size(); ++i) {
 			type.Portrait.Mngs[i] = Mng::New(type.Portrait.Files[i]);
 			type.Portrait.Mngs[i]->Load();
 		}
@@ -998,7 +998,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 */
 void LoadUnitTypes()
 {
-	int mult = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
 	for (CUnitType *type : UnitTypes) {
 		// Lookup icons.
 		type->Icon.Load();

@@ -938,7 +938,6 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	// There's a bug in the traversal that leads to workers "sometimes" not finding their way to the old depot.
 	// timfel: of course, maybe it's actually nice that workers drop out towards their last depot...
 	if (!depot && (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) && Depot && Depot->IsAlive()) {
-		CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
 		Assert(unit.Container);
 		DropOutNearest(unit, Depot->tilePos + Depot->Type->GetHalfTileSize(), source);
 	}
@@ -1111,7 +1110,6 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		const unsigned int tooManyWorkers = 15;
 
 		CUnit *mine = this->Resource.Mine;
-		const int range = 15;
 		CUnit *newdepot = nullptr;
 		CUnit *goal = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
@@ -1163,15 +1161,14 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		} else {
 #ifdef DEBUG
 			const Vec2i &pos = mine ? mine->tilePos : unit.tilePos;
-			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d] in range %d. Sit "
+			DebugPrint("%d: Worker %d report: [%d,%d] Resource gone near [%d,%d]. Sit "
 			           "and play dumb.\n",
 			           unit.Player->Index,
 			           UnitNumber(unit),
 			           unit.tilePos.x,
 			           unit.tilePos.y,
 			           pos.x,
-			           pos.y,
-			           range);
+			           pos.y);
 #endif // DEBUG
 			if (depot) {
 				DropOutOnSide(unit, LookingW, depot);

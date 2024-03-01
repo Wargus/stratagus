@@ -1114,8 +1114,8 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 
 	fs::path currentPath;
 	std::string networkName;
-	uint32_t fragmentDataSize;
-	uint32_t fileSize;
+	uint32_t fragmentDataSize = 0;
+	uint32_t fileSize = 0;
 	uint32_t fragmentIdxStartForFile = 0;
 	fs::path libPath(StratagusLibPath);
 

@@ -292,7 +292,7 @@ static void SaveViewports(CFile &file, const CUserInterface &ui)
 {
 	// FIXME: don't save the number
 	file.printf("DefineViewports(\"mode\", %d", ui.ViewportMode);
-	for (int i = 0; i < ui.NumViewports; ++i) {
+	for (size_t i = 0; i < ui.NumViewports; ++i) {
 		const CViewport &vp = ui.Viewports[i];
 		file.printf(",\n  \"viewport\", {%d, %d, %d}", vp.MapPos.x, vp.MapPos.y,
 					vp.Unit ? UnitNumber(*vp.Unit) : -1);
@@ -412,10 +412,10 @@ CViewport *GetViewport(const PixelPos &screenPos)
 **  @param new_vps  The array of the new viewports
 **  @param num_vps  The number of elements in the new_vps[] array.
 */
-static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
+static void FinishViewportModeConfiguration(CViewport new_vps[], unsigned int num_vps)
 {
 	//  Compute location of the viewport using oldviewport
-	for (int i = 0; i < num_vps; ++i) {
+	for (unsigned int i = 0; i < num_vps; ++i) {
 		new_vps[i].MapPos.x = 0;
 		new_vps[i].MapPos.y = 0;
 		const CViewport *vp = GetViewport(new_vps[i].GetTopLeftPos());
@@ -430,7 +430,7 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 	}
 
 	// Affect the old viewport.
-	for (int i = 0; i < num_vps; ++i) {
+	for (unsigned int i = 0; i < num_vps; ++i) {
 		CViewport &vp = UI.Viewports[i];
 
 		vp.TopLeftPos = new_vps[i].TopLeftPos;

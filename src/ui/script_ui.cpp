@@ -665,7 +665,7 @@ static int CclDefinePopup(lua_State *l)
 */
 static int CclDefineViewports(lua_State *l)
 {
-	int i = 0;
+	unsigned int i = 0;
 	const int args = lua_gettop(l);
 
 	for (int j = 0; j < args; ++j) {
@@ -1138,9 +1138,7 @@ static int CclCopyButtonsForUnitType(lua_State *l)
 
 	// Slot identifier
 	const std::string_view fromName = LuaToString(l, 1);
-	CUnitType &from = UnitTypeByIdent(fromName);
 	const std::string_view toName = LuaToString(l, 2);
-	CUnitType &to = UnitTypeByIdent(toName);
 
 	for (auto &btn : UnitButtonTable) {
 		if (btn->UnitMask.find(fromName) != std::string::npos) {
