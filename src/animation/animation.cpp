@@ -528,7 +528,7 @@ static void FixLabels(lua_State *l, const std::vector<std::unique_ptr<CAnimation
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static CAnimation *
+static std::unique_ptr<CAnimation>
 ParseAnimationFrame(lua_State *l, std::string_view str)
 {
 	const std::string all(str);
@@ -538,51 +538,51 @@ ParseAnimationFrame(lua_State *l, std::string_view str)
 	size_t begin = std::min(len, all.find_first_not_of(' ', end));
 	const std::string extraArg(all, begin);
 
-	CAnimation *anim = nullptr;
+	std::unique_ptr<CAnimation> anim;
 	if (op1 == "frame") {
-		anim = new CAnimation_Frame;
+		anim = std::make_unique<CAnimation_Frame>();
 	} else if (op1 == "exact-frame") {
-		anim = new CAnimation_ExactFrame;
+		anim = std::make_unique<CAnimation_ExactFrame>();
 	} else if (op1 == "wait") {
-		anim = new CAnimation_Wait;
+		anim = std::make_unique<CAnimation_Wait>();
 	} else if (op1 == "random-wait") {
-		anim = new CAnimation_RandomWait;
+		anim = std::make_unique<CAnimation_RandomWait>();
 	} else if (op1 == "sound") {
-		anim = new CAnimation_Sound;
+		anim = std::make_unique<CAnimation_Sound>();
 	} else if (op1 == "random-sound") {
-		anim = new CAnimation_RandomSound;
+		anim = std::make_unique<CAnimation_RandomSound>();
 	} else if (op1 == "attack") {
-		anim = new CAnimation_Attack;
+		anim = std::make_unique<CAnimation_Attack>();
 	} else if (op1 == "spawn-missile") {
-		anim = new CAnimation_SpawnMissile;
+		anim = std::make_unique<CAnimation_SpawnMissile>();
 	} else if (op1 == "spawn-unit") {
-		anim = new CAnimation_SpawnUnit;
+		anim = std::make_unique<CAnimation_SpawnUnit>();
 	} else if (op1 == "if-var") {
-		anim = new CAnimation_IfVar;
+		anim = std::make_unique<CAnimation_IfVar>();
 	} else if (op1 == "set-var") {
-		anim = new CAnimation_SetVar;
+		anim = std::make_unique<CAnimation_SetVar>();
 	} else if (op1 == "set-player-var") {
-		anim = new CAnimation_SetPlayerVar;
+		anim = std::make_unique<CAnimation_SetPlayerVar>();
 	} else if (op1 == "die") {
-		anim = new CAnimation_Die();
+		anim = std::make_unique<CAnimation_Die>();
 	} else if (op1 == "rotate") {
-		anim = new CAnimation_Rotate;
+		anim = std::make_unique<CAnimation_Rotate>();
 	} else if (op1 == "random-rotate") {
-		anim = new CAnimation_RandomRotate;
+		anim = std::make_unique<CAnimation_RandomRotate>();
 	} else if (op1 == "move") {
-		anim = new CAnimation_Move;
+		anim = std::make_unique<CAnimation_Move>();
 	} else if (op1 == "unbreakable") {
-		anim = new CAnimation_Unbreakable;
+		anim = std::make_unique<CAnimation_Unbreakable>();
 	} else if (op1 == "label") {
-		anim = new CAnimation_Label;
+		anim = std::make_unique<CAnimation_Label>();
 	} else if (op1 == "goto") {
-		anim = new CAnimation_Goto;
+		anim = std::make_unique<CAnimation_Goto>();
 	} else if (op1 == "random-goto") {
-		anim = new CAnimation_RandomGoto;
+		anim = std::make_unique<CAnimation_RandomGoto>();
 	} else if (op1 == "lua-callback") {
-		anim = new CAnimation_LuaCallback;
+		anim = std::make_unique<CAnimation_LuaCallback>();
 	} else if (op1 == "wiggle") {
-		anim = new CAnimation_Wiggle;
+		anim = std::make_unique<CAnimation_Wiggle>();
 	} else {
 		LuaError(l, "Unknown animation: %s", op1.c_str());
 	}
@@ -608,8 +608,7 @@ static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int
 	std::vector<std::unique_ptr<CAnimation>> animations;
 	for (int i = 0; i != args; ++i) {
 		const std::string_view str = LuaToString(l, idx, 1 + i);
-		std::unique_ptr<CAnimation> anim{ParseAnimationFrame(l, str)};
-		animations.emplace_back(std::move(anim));
+		animations.emplace_back(ParseAnimationFrame(l, str));
 	}
 
 	FixLabels(l, animations);
