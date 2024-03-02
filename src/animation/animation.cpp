@@ -474,8 +474,7 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	return anim;
 }
 
-
-/* static */ void CAnimations::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
+static void LoadUnitUnitAnim(lua_State *l, int luaIndex, CUnit::_unit_anim_ &anim)
 {
 	if (!lua_istable(l, luaIndex)) {
 		LuaError(l, "incorrect argument");
@@ -487,15 +486,15 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 		++j;
 
 		if (value == "anim-wait") {
-			unit.Anim.Wait = LuaToNumber(l, luaIndex, j + 1);
+			anim.Wait = LuaToNumber(l, luaIndex, j + 1);
 		} else if (value == "curr-anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.Anim.CurrAnim = AnimationsArray[animIndex];
+			anim.CurrAnim = AnimationsArray[animIndex];
 		} else if (value == "anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.Anim.Anim = Advance(unit.Anim.CurrAnim, animIndex);
+			anim.Anim = Advance(anim.CurrAnim, animIndex);
 		} else if (value == "unbreakable") {
-			unit.Anim.Unbreakable = true;
+			anim.Unbreakable = true;
 			--j;
 		} else {
 			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
@@ -503,32 +502,15 @@ static const CAnimation *Advance(const CAnimation *anim, int n)
 	}
 }
 
+
+/* static */ void CAnimations::LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
+{
+	LoadUnitUnitAnim(l, luaIndex, unit.Anim);
+}
+
 /* static */ void CAnimations::LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex)
 {
-	if (!lua_istable(l, luaIndex)) {
-		LuaError(l, "incorrect argument");
-	}
-	const int nargs = lua_rawlen(l, luaIndex);
-
-	for (int j = 0; j != nargs; ++j) {
-		const std::string_view value = LuaToString(l, luaIndex, j + 1);
-		++j;
-
-		if (value == "anim-wait") {
-			unit.WaitBackup.Wait = LuaToNumber(l, luaIndex, j + 1);
-		} else if (value == "curr-anim") {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.CurrAnim = AnimationsArray[animIndex];
-		} else if (value == "anim") {
-			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			unit.WaitBackup.Anim = Advance(unit.WaitBackup.CurrAnim, animIndex);
-		} else if (value == "unbreakable") {
-			unit.WaitBackup.Unbreakable = true;
-			--j;
-		} else {
-			LuaError(l, "Unit anim-data: Unsupported tag: %s", value.data());
-		}
-	}
+	LoadUnitUnitAnim(l, luaIndex, unit.WaitBackup);
 }
 
 /**
