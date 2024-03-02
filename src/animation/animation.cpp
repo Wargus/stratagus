@@ -77,7 +77,6 @@ struct LabelsStruct {
 	CAnimation *Anim;
 	std::string Name;
 };
-static std::vector<LabelsStruct> Labels;
 
 struct LabelsLaterStruct {
 	CAnimation **Anim;
@@ -514,23 +513,11 @@ static void LoadUnitUnitAnim(lua_State *l, int luaIndex, CUnit::_unit_anim_ &ani
 }
 
 /**
-**  Add a label
-*/
-static void AddLabel(CAnimation *anim, const std::string &name)
-{
-	LabelsStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	Labels.push_back(label);
-}
-
-/**
 **  Find a label
 */
-static CAnimation *FindLabel(lua_State *l, const std::string &name)
+static CAnimation *FindLabel(lua_State *l, const std::vector<LabelsStruct>& labels, const std::string &name)
 {
-	for (auto &label : Labels) {
+	for (auto &label : labels) {
 		if (label.Name == name) {
 			return label.Anim;
 		}
@@ -554,10 +541,10 @@ void FindLabelLater(CAnimation **anim, std::string name)
 /**
 **  Fix labels
 */
-static void FixLabels(lua_State *l)
+static void FixLabels(lua_State *l, const std::vector<LabelsStruct>& labels)
 {
 	for (auto &labelLater : LabelsLater) {
-		*labelLater.Anim = FindLabel(l, labelLater.Name);
+		*labelLater.Anim = FindLabel(l, labels, labelLater.Name);
 	}
 }
 
@@ -567,7 +554,8 @@ static void FixLabels(lua_State *l)
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
+static CAnimation *
+ParseAnimationFrame(lua_State *l, std::vector<LabelsStruct> &labels, std::string_view str)
 {
 	const std::string all(str);
 	const size_t len = all.size();
@@ -613,7 +601,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 		anim = new CAnimation_Unbreakable;
 	} else if (op1 == "label") {
 		anim = new CAnimation_Label;
-		AddLabel(anim, extraArg);
+		labels.push_back(LabelsStruct{anim, extraArg});
 	} else if (op1 == "goto") {
 		anim = new CAnimation_Goto;
 	} else if (op1 == "random-goto") {
@@ -642,21 +630,21 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	if (args == 0) {
 		return nullptr;
 	}
-	Labels.clear();
+	std::vector<LabelsStruct> labels;
 	LabelsLater.clear();
 
 	const std::string_view str = LuaToString(l, idx, 1);
 
-	CAnimation *firstAnim = ParseAnimationFrame(l, str);
+	CAnimation *firstAnim = ParseAnimationFrame(l, labels, str);
 	CAnimation *prev = firstAnim;
 	for (int j = 1; j < args; ++j) {
 		const std::string_view str = LuaToString(l, idx, j + 1);
-		CAnimation *anim = ParseAnimationFrame(l, str);
+		CAnimation *anim = ParseAnimationFrame(l, labels, str);
 		prev->Next = anim;
 		prev = anim;
 	}
 	prev->Next = firstAnim;
-	FixLabels(l);
+	FixLabels(l, labels);
 	return firstAnim;
 }
 
