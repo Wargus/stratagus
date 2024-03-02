@@ -87,14 +87,14 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
-	if (unit.Type->Animations && unit.Type->Animations->RangedAttack && unit.IsAttackRanged(order.GetGoal(), order.GetGoalPos())) {
-		UnitShowAnimation(unit, unit.Type->Animations->RangedAttack);
+	if (unit.Type->Animations && !unit.Type->Animations->RangedAttack.empty() && unit.IsAttackRanged(order.GetGoal(), order.GetGoalPos())) {
+		UnitShowAnimation(unit, &unit.Type->Animations->RangedAttack);
 	} else {
-		if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
+		if (!unit.Type->Animations || unit.Type->Animations->Attack.empty()) {
 			order.OnAnimationAttack(unit);
 			return;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Attack);
+		UnitShowAnimation(unit, &unit.Type->Animations->Attack);
 	}
 }
 

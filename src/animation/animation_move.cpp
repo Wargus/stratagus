@@ -41,7 +41,8 @@
 
 void CAnimation_Move::Action(CUnit &unit, int &move, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	Assert(!move);
 
 	move = ParseAnimInt(unit, this->moveStr);

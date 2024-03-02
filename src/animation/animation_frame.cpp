@@ -42,7 +42,8 @@
 
 void CAnimation_Frame::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	if (unit.Type->Building && unit.Type->NumDirections == 1 && FancyBuildings && unit.Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && unit.Frame < 0) {
 	} else {
 		unit.Frame = ParseAnimInt(&unit);

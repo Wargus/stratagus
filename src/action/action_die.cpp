@@ -86,11 +86,11 @@ static bool AnimateActionDie(CUnit &unit)
 	if (animations == nullptr) {
 		return false;
 	}
-	if (animations->Death[unit.DamagedType]) {
-		UnitShowAnimation(unit, animations->Death[unit.DamagedType]);
+	if (!animations->Death[unit.DamagedType].empty()) {
+		UnitShowAnimation(unit, &animations->Death[unit.DamagedType]);
 		return true;
-	} else if (animations->Death[ANIMATIONS_DEATHTYPES]) {
-		UnitShowAnimation(unit, animations->Death[ANIMATIONS_DEATHTYPES]);
+	} else if (!animations->Death[ANIMATIONS_DEATHTYPES].empty()) {
+		UnitShowAnimation(unit, &animations->Death[ANIMATIONS_DEATHTYPES]);
 		return true;
 	}
 	return false;

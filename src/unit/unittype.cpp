@@ -575,7 +575,7 @@ bool CUnitType::CheckUserBoolFlags(const std::vector<ECondition> &BoolFlags) con
 
 bool CUnitType::CanMove() const
 {
-	return Animations && Animations->Move;
+	return Animations && !Animations->Move.empty();
 }
 
 bool CUnitType::CanSelect(EGroupSelectionMode mode) const
@@ -872,14 +872,11 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int colorI
 */
 static int GetStillFrame(const CUnitType &type)
 {
-	CAnimation *anim = type.Animations->Still;
-
-	while (anim) {
+	for (auto& anim : type.Animations->Still) {
 		auto frame = anim->GetStillFrame(type);
 		if (frame) {
 			return *frame;
 		}
-		anim = anim->Next;
 	}
 	return type.NumDirections / 2;
 }

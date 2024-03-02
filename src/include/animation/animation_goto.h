@@ -42,7 +42,7 @@ public:
 	void Init(std::string_view s, lua_State *l) override;
 
 private:
-	CAnimation *gotoLabel = nullptr;
+	std::size_t gotoLabel = 0;
 };
 
 //@}

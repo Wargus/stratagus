@@ -43,7 +43,8 @@
 
 void CAnimation_Die::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	if (unit.Anim.Unbreakable) {
 		ErrorPrint("Can't call \"die\" action in unbreakable section\n");
 		Exit(1);

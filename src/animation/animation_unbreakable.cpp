@@ -41,7 +41,8 @@
 
 void CAnimation_Unbreakable::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	Assert(unit.Anim.Unbreakable ^ this->state);
 
 	unit.Anim.Unbreakable = this->state;

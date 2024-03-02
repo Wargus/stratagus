@@ -117,7 +117,7 @@ bool COrder::IsWaiting(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, &unit.Type->Animations->Still);
 		unit.Wait--;
 		return true;
 	}

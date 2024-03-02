@@ -44,7 +44,8 @@ void CAnimation_RandomRotate::Action(CUnit &unit,
                                      int & /*move*/,
                                      int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	if ((SyncRand() >> 8) & 1) {
 		UnitRotate(unit, -ParseAnimInt(unit, this->rotateStr));

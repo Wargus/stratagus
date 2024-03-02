@@ -41,11 +41,13 @@
 
 void CAnimation_Label::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 }
 
 void CAnimation_Label::Init(std::string_view s, lua_State *) /* override */
 {
+	name = s;
 }
 
 //@}

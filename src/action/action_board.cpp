@@ -256,7 +256,7 @@ void COrder_Board::Execute(CUnit &unit) /* override */
 			if (this->WaitForTransporter(unit)) {
 				this->State = State_EnterTransporter;
 			} else {
-				UnitShowAnimation(unit, unit.Type->Animations->Still);
+				UnitShowAnimation(unit, &unit.Type->Animations->Still);
 			}
 			break;
 
