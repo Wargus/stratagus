@@ -883,7 +883,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitAction::Train) {
 				break;
 			}
-		// FALL THROUGH
+			[[fallthrough]];
 		case ButtonCmd::UpgradeTo:
 		case ButtonCmd::Research:
 		case ButtonCmd::Build:

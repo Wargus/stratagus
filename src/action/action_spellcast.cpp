@@ -351,7 +351,7 @@ void COrder_SpellCast::Execute(CUnit &unit) /* override */
 			// FIXME FIXME FIXME: Check if already in range and skip straight to 2(casting)
 			unit.ReCast = 0; // repeat spell on next pass? (defaults to `no')
 			this->State = 1;
-		// FALL THROUGH
+			[[fallthrough]];
 		case 1:                         // Move to the target.
 			if (spell.Range != INFINITE_RANGE) {
 				if (SpellMoveToTarget(unit) == true) {
@@ -364,7 +364,7 @@ void COrder_SpellCast::Execute(CUnit &unit) /* override */
 			} else {
 				this->State = 2;
 			}
-		// FALL THROUGH
+			[[fallthrough]];
 		case 2:                         // Cast spell on the target.
 			if (!spell.IsCasterOnly() || spell.ForceUseAnimation) {
 				AnimateActionSpellCast(unit, *this);
