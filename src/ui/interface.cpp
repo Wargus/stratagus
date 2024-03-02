@@ -660,7 +660,7 @@ static bool CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-		// FALL THROUGH
+			[[fallthrough]];
 		case SDLK_PERIOD: // ., ALT+I, CTRL+I: Find idle worker
 			UiFindIdleWorker();
 			break;
@@ -677,7 +677,7 @@ static bool CommandKey(int key)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
-		// FALL THROUGH (CTRL+P, ALT+P)
+			[[fallthrough]]; // (CTRL+P, ALT+P)
 		case SDLK_PAUSE:
 			UiTogglePause();
 			break;
@@ -887,7 +887,7 @@ static void InputKey(int key)
 				NetworkSendChatMessage(chatMessage);
 			}
 		}
-	// FALL THROUGH
+			[[fallthrough]];
 		case SDLK_ESCAPE:
 			KeyState = EKeyState::Command;
 			UI.StatusLine.Clear();

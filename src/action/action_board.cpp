@@ -271,7 +271,7 @@ void COrder_Board::Execute(CUnit &unit) /* override */
 				return;
 			}
 			this->State = 1;
-		// FALL THROUGH
+			[[fallthrough]];
 		default: { // Move to transporter
 			if (this->State <= State_MoveToTransporterMax) {
 				const int pathRet = MoveToTransporter(unit);

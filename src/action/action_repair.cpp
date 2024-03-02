@@ -243,9 +243,7 @@ void COrder_Repair::Execute(CUnit &unit) /* override */
 	Assert(this->ReparableTarget == this->GetGoal());
 
 	switch (this->State) {
-		case 0:
-			this->State = 1;
-		// FALL THROUGH
+		case 0: this->State = 1; [[fallthrough]];
 		case 1: { // Move near to target.
 			// FIXME: RESET FIRST!! Why? We move first and than check if
 			// something is in sight.

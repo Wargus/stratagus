@@ -269,7 +269,7 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 			this->goalPos = goal->tilePos;
 			this->State = State_TargetReached;
 		}
-		// FALL THROUGH
+			[[fallthrough]];
 		default:
 			break;
 	}
