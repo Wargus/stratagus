@@ -98,9 +98,8 @@ public:
 	void setIsNormal(bool value) { is_normal = value; }
 
 	void Load();
-	void Reload() const;
 
-	CGraphic *GetFontColorGraphic(const CFontColor &fontColor) const;
+	CGraphic *GetGraphic() const;
 
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const;
