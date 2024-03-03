@@ -54,20 +54,11 @@ static FontMap Fonts;  /// Font mappings
 using FontColorMap = std::map<std::string, std::unique_ptr<CFontColor>, std::less<>>;
 static FontColorMap FontColors;  /// Map of ident to font color.
 
-static CFontColor *FontColor;                /// Current font color
-
 static const CFontColor *LastTextColor;      /// Last text color
 static CFontColor *DefaultTextColor;         /// Default text color
 static CFontColor *ReverseTextColor;         /// Reverse text color
 static std::string DefaultNormalColorIndex;  /// Default normal color index
 static std::string DefaultReverseColorIndex; /// Default reverse color index
-
-/**
-**  Font color graphics
-**  Usage: FontColorGraphics[CFont *font][CFontColor *color]
-*/
-using FontColorGraphicMap = std::map<const CFontColor *, CGraphic *>;
-static std::map<const CFont *, FontColorGraphicMap> FontColorGraphics;
 
 // FIXME: remove these
 static CFont *SmallFont;  /// Small font used in stats
@@ -201,7 +192,7 @@ void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
 {
 	DefaultNormalColorIndex = normal;
 	DefaultReverseColorIndex = reverse;
-	LastTextColor = DefaultTextColor = FontColor = CFontColor::Get(normal);
+	LastTextColor = DefaultTextColor = CFontColor::Get(normal);
 	ReverseTextColor = CFontColor::Get(reverse);
 }
 
@@ -593,7 +584,7 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 	return w + 1;
 }
 
-CGraphic *CFont::GetFontColorGraphic(const CFontColor &fontColor) const
+CGraphic *CFont::GetGraphic() const
 {
 	return this->G;
 }
@@ -625,7 +616,7 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 	const CFontColor *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
-	CGraphic *g = font->GetFontColorGraphic(*FontColor);
+	CGraphic *g = font->GetGraphic();
 
 	while (int utf8 = CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos)) {
 		bool tab = false;
@@ -643,10 +634,7 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 					++pos;
 					continue;
 				case '!':
-					if (fc != reverse) {
-						fc = reverse;
-						g = font->GetFontColorGraphic(*fc);
-					}
+					fc = reverse;
 					++pos;
 					continue;
 				case '<':
@@ -654,7 +642,6 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 					if (fc != reverse) {
 						isColor = true;
 						fc = reverse;
-						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
 					continue;
@@ -662,7 +649,6 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 					if (fc != LastTextColor) {
 						std::swap(fc, LastTextColor);
 						isColor = false;
-						g = font->GetFontColorGraphic(*fc);
 					}
 					++pos;
 					continue;
@@ -680,7 +666,6 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 					if (fc_tmp) {
 						isColor = true;
 						fc = fc_tmp;
-						g = font->GetFontColorGraphic(*fc);
 					}
 					continue;
 				}
@@ -696,7 +681,6 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 
 		if (isColor == false && fc != backup) {
 			fc = backup;
-			g = font->GetFontColorGraphic(*fc);
 		}
 	}
 	return widths;
@@ -935,28 +919,6 @@ void LoadFonts()
 	// TODO: remove this
 	SmallFont = CFont::Get("small");
 	GameFont = CFont::Get("game");
-}
-
-void CFont::Reload() const
-{
-	if (this->G) {
-		FontColorGraphicMap &fontColorGraphicMap = FontColorGraphics[this];
-		for (auto &[key, g] : fontColorGraphicMap) {
-			delete g;
-		}
-		fontColorGraphicMap.clear();
-	}
-}
-
-
-/**
-**  Reload fonts
-*/
-void ReloadFonts()
-{
-	for (auto &[key, font] : Fonts) {
-		font->Reload();
-	}
 }
 
 /**
