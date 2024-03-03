@@ -84,14 +84,10 @@ void LoadUnitSounds()
 /**
 **  Map animation sounds
 */
-static void MapAnimSounds2(CAnimation *anim)
+static void MapAnimSounds2(std::vector<std::unique_ptr<CAnimation>>& anims)
 {
-	if (anim == nullptr) {
-		return ;
-	}
-	anim->MapSound();
-	for (CAnimation *it = anim->Next; it != anim; it = it->Next) {
-		it->MapSound();
+	for (auto &anim : anims) {
+		anim->MapSound();
 	}
 }
 

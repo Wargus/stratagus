@@ -213,15 +213,15 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
 	const CAnimations *animations = unit.Type->Animations;
 
-	if (!animations || (!animations->Attack && !animations->SpellCast)) {
+	if (!animations || (animations->Attack.empty() && animations->SpellCast.empty())) {
 		// if don't have animations just cast spell
 		order.OnAnimationAttack(unit);
 		return;
 	}
-	if (animations->SpellCast) {
-		UnitShowAnimation(unit, animations->SpellCast);
+	if (!animations->SpellCast.empty()) {
+		UnitShowAnimation(unit, &animations->SpellCast);
 	} else {
-		UnitShowAnimation(unit, animations->Attack);
+		UnitShowAnimation(unit, &animations->Attack);
 	}
 }
 

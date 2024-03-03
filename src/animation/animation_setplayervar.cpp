@@ -182,7 +182,8 @@ void CAnimation_SetPlayerVar::Action(CUnit &unit,
                                      int & /*move*/,
                                      int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	const int playerId = ParseAnimInt(unit, this->playerStr);
 	const int rop = ParseAnimInt(unit, this->valueStr);

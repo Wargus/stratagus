@@ -47,7 +47,7 @@ private:
 	bool isHeading = false;
 	bool isZDisplacement = false;
 	std::string speed;
-	CAnimation *ifNotReached = nullptr;
+	std::size_t ifNotReached = 0;
 };
 
 //@}

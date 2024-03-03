@@ -156,10 +156,10 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd; // movement in tile.
 	int d;
 
-	if (unit.Moving != 1 && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (unit.Moving != 1 && (&unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		if (unit.Anim.Unbreakable && unit.Moving > 1) {
 			// subtile movement, we're finished, but inside an unbreakable animation that we have to finish
-			int m = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, 1) >> 1;
+			int m = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, 1) >> 1;
 			applyResidualDisplacementCorrection(&unit.IX, m);
 			applyResidualDisplacementCorrection(&unit.IY, m);
 			if (unit.Anim.Unbreakable) {
@@ -248,7 +248,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
-	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+	int move = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
 
 	bool reached_next_tile = false;
 	if (posd.x) {

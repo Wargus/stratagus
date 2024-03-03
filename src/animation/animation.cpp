@@ -73,22 +73,14 @@
 #include "unittype.h"
 #include "pathfinder.h"
 
-struct LabelsStruct {
-	CAnimation *Anim;
-	std::string Name;
-};
-static std::vector<LabelsStruct> Labels;
-
 struct LabelsLaterStruct {
-	CAnimation **Anim;
+	std::size_t *Index;
 	std::string Name;
 };
 static std::vector<LabelsLaterStruct> LabelsLater;
 
-static std::vector<CAnimation *> AnimationsArray;
-
+static std::vector<std::vector<std::unique_ptr<CAnimation>>*> AnimationsArray;
 static std::map<std::string, std::unique_ptr<CAnimations>, std::less<>> AnimationMap;/// Animation map
-
 
 /*----------------------------------------------------------------------------
 --  Animation
@@ -157,7 +149,7 @@ void modifyValue(SetVar_ModifyTypes mod, int &value, int rop)
 **
 **  @return      The flags of the current script step.
 */
-int UnitShowAnimation(CUnit &unit, const CAnimation *anim)
+int UnitShowAnimation(CUnit &unit, const std::vector<std::unique_ptr<CAnimation>> *anim)
 {
 	return UnitShowAnimationScaled(unit, anim, 8);
 }
@@ -351,13 +343,14 @@ int ParseAnimInt(const CUnit &unit, const std::string_view s)
 **
 **  @return       The flags of the current script step.
 */
-int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
+int UnitShowAnimationScaled(CUnit &unit, const std::vector<std::unique_ptr<CAnimation>> *anim, int scale)
 {
 	// Changing animations
-	if (anim && unit.Anim.CurrAnim != anim) {
+	if (anim && !anim->empty() && unit.Anim.CurrAnim != anim) {
 		// Assert fails when transforming unit (upgrade-to).
 		Assert(!unit.Anim.Unbreakable || unit.Waiting);
-		unit.Anim.Anim = unit.Anim.CurrAnim = anim;
+		unit.Anim.CurrAnim = anim;
+		unit.Anim.Anim = 0;
 		unit.Anim.Wait = 0;
 	}
 
@@ -379,23 +372,23 @@ int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale)
 		--unit.Anim.Wait;
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
-			unit.Anim.Anim = unit.Anim.Anim->Next;
+			unit.Anim.Anim = (unit.Anim.Anim + 1) % unit.Anim.CurrAnim->size();
 		}
 		return 0;
 	}
 	int move = 0;
 	while (!unit.Anim.Wait) {
-		unit.Anim.Anim->Action(unit, move, scale);
+		(*unit.Anim.CurrAnim)[unit.Anim.Anim]->Action(unit, move, scale);
 		if (!unit.Anim.Wait) {
 			// Advance to next frame
-			unit.Anim.Anim = unit.Anim.Anim->Next;
+			unit.Anim.Anim = (unit.Anim.Anim + 1) % unit.Anim.CurrAnim->size();
 		}
 	}
 
 	--unit.Anim.Wait;
 	if (!unit.Anim.Wait) {
 		// Advance to next frame
-		unit.Anim.Anim = unit.Anim.Anim->Next;
+		unit.Anim.Anim = (unit.Anim.Anim + 1) % unit.Anim.CurrAnim->size();
 	}
 	return move;
 }
@@ -424,54 +417,30 @@ void FreeAnimations()
 	AnimationsArray.clear();
 }
 
-static int GetAdvanceIndex(const CAnimation *base, const CAnimation *anim)
+namespace
 {
-	if (base == anim) {
-		return 0;
+void SaveUnitUnitAnim(CFile &file, std::string_view name, const CUnit::_unit_anim_ &anim)
+{
+	file.printf("\"%s\", {", name.data());
+	file.printf("\"anim-wait\", %d,", anim.Wait);
+	if (auto it = ranges::find(AnimationsArray, anim.CurrAnim); it != AnimationsArray.end()) {
+		file.printf("\"curr-anim\", %d,",
+		            static_cast<int>(std::distance(AnimationsArray.begin(), it)));
+		file.printf("\"anim\", %d,", static_cast<int>(anim.Anim));
 	}
-	int i = 1;
-	for (const CAnimation *it = base->Next; it != base; it = it->Next) {
-		if (it == anim) {
-			return i;
-		}
-		++i;
+	if (anim.Unbreakable) {
+		file.printf(" \"unbreakable\",");
 	}
-	return -1;
+	file.printf("}");
+}
 }
 
 
 /* static */ void CAnimations::SaveUnitAnim(CFile &file, const CUnit &unit)
 {
-	file.printf("\"anim-data\", {");
-	file.printf("\"anim-wait\", %d,", unit.Anim.Wait);
-	if (auto it = ranges::find(AnimationsArray, unit.Anim.CurrAnim); it != AnimationsArray.end()) {
-		file.printf("\"curr-anim\", %d,", static_cast<int>(std::distance(AnimationsArray.begin(), it)));
-		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.Anim.CurrAnim, unit.Anim.Anim));
-	}
-	if (unit.Anim.Unbreakable) {
-		file.printf(" \"unbreakable\",");
-	}
-	file.printf("}, ");
-	// Wait backup info
-	file.printf("\"wait-anim-data\", {");
-	file.printf("\"anim-wait\", %d,", unit.WaitBackup.Wait);
-	if (auto it = ranges::find(AnimationsArray, unit.WaitBackup.CurrAnim); it != AnimationsArray.end()) {
-		file.printf("\"curr-anim\", %d,", static_cast<int>(std::distance(AnimationsArray.begin(), it)));
-		file.printf("\"anim\", %d,", GetAdvanceIndex(unit.WaitBackup.CurrAnim, unit.WaitBackup.Anim));
-	}
-	if (unit.WaitBackup.Unbreakable) {
-		file.printf(" \"unbreakable\",");
-	}
-	file.printf("}");
-}
-
-
-static const CAnimation *Advance(const CAnimation *anim, int n)
-{
-	for (int i = 0; i < n; ++i) {
-		anim = anim->Next;
-	}
-	return anim;
+	SaveUnitUnitAnim(file, "anim-data", unit.Anim);
+	file.printf(", ");
+	SaveUnitUnitAnim(file, "wait-anim-data", unit.WaitBackup);
 }
 
 static void LoadUnitUnitAnim(lua_State *l, int luaIndex, CUnit::_unit_anim_ &anim)
@@ -492,7 +461,7 @@ static void LoadUnitUnitAnim(lua_State *l, int luaIndex, CUnit::_unit_anim_ &ani
 			anim.CurrAnim = AnimationsArray[animIndex];
 		} else if (value == "anim") {
 			const int animIndex = LuaToNumber(l, luaIndex, j + 1);
-			anim.Anim = Advance(anim.CurrAnim, animIndex);
+			anim.Anim = animIndex;
 		} else if (value == "unbreakable") {
 			anim.Unbreakable = true;
 			--j;
@@ -514,39 +483,31 @@ static void LoadUnitUnitAnim(lua_State *l, int luaIndex, CUnit::_unit_anim_ &ani
 }
 
 /**
-**  Add a label
-*/
-static void AddLabel(CAnimation *anim, const std::string &name)
-{
-	LabelsStruct label;
-
-	label.Anim = anim;
-	label.Name = name;
-	Labels.push_back(label);
-}
-
-/**
 **  Find a label
 */
-static CAnimation *FindLabel(lua_State *l, const std::string &name)
+static std::size_t FindLabel(lua_State *l, const std::vector<std::unique_ptr<CAnimation>>& anims, const std::string &name)
 {
-	for (auto &label : Labels) {
-		if (label.Name == name) {
-			return label.Anim;
+	const auto is_wanted_label = [&](const auto& anim) {
+		if (const auto* p = dynamic_cast<const CAnimation_Label*>(anim.get())) {
+			return p->name == name;
 		}
+		return false;
+	};
+	auto it = ranges::find_if(anims, is_wanted_label);
+	if (it == anims.end()) {
+		LuaError(l, "Label not found: %s", name.c_str());
 	}
-	LuaError(l, "Label not found: %s", name.c_str());
-	return nullptr;
+	return std::distance(anims.begin(), it);
 }
 
 /**
 **  Find a label later
 */
-void FindLabelLater(CAnimation **anim, std::string name)
+void FindLabelLater(std::size_t *index, std::string name)
 {
 	LabelsLaterStruct label;
 
-	label.Anim = anim;
+	label.Index = index;
 	label.Name = std::move(name);
 	LabelsLater.push_back(std::move(label));
 }
@@ -554,10 +515,10 @@ void FindLabelLater(CAnimation **anim, std::string name)
 /**
 **  Fix labels
 */
-static void FixLabels(lua_State *l)
+static void FixLabels(lua_State *l, const std::vector<std::unique_ptr<CAnimation>>& anims)
 {
 	for (auto &labelLater : LabelsLater) {
-		*labelLater.Anim = FindLabel(l, labelLater.Name);
+		*labelLater.Index = FindLabel(l, anims, labelLater.Name);
 	}
 }
 
@@ -567,7 +528,8 @@ static void FixLabels(lua_State *l)
 **
 **  @param str  string formated as "animationType extraArgs"
 */
-static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
+static std::unique_ptr<CAnimation>
+ParseAnimationFrame(lua_State *l, std::string_view str)
 {
 	const std::string all(str);
 	const size_t len = all.size();
@@ -576,52 +538,51 @@ static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 	size_t begin = std::min(len, all.find_first_not_of(' ', end));
 	const std::string extraArg(all, begin);
 
-	CAnimation *anim = nullptr;
+	std::unique_ptr<CAnimation> anim;
 	if (op1 == "frame") {
-		anim = new CAnimation_Frame;
+		anim = std::make_unique<CAnimation_Frame>();
 	} else if (op1 == "exact-frame") {
-		anim = new CAnimation_ExactFrame;
+		anim = std::make_unique<CAnimation_ExactFrame>();
 	} else if (op1 == "wait") {
-		anim = new CAnimation_Wait;
+		anim = std::make_unique<CAnimation_Wait>();
 	} else if (op1 == "random-wait") {
-		anim = new CAnimation_RandomWait;
+		anim = std::make_unique<CAnimation_RandomWait>();
 	} else if (op1 == "sound") {
-		anim = new CAnimation_Sound;
+		anim = std::make_unique<CAnimation_Sound>();
 	} else if (op1 == "random-sound") {
-		anim = new CAnimation_RandomSound;
+		anim = std::make_unique<CAnimation_RandomSound>();
 	} else if (op1 == "attack") {
-		anim = new CAnimation_Attack;
+		anim = std::make_unique<CAnimation_Attack>();
 	} else if (op1 == "spawn-missile") {
-		anim = new CAnimation_SpawnMissile;
+		anim = std::make_unique<CAnimation_SpawnMissile>();
 	} else if (op1 == "spawn-unit") {
-		anim = new CAnimation_SpawnUnit;
+		anim = std::make_unique<CAnimation_SpawnUnit>();
 	} else if (op1 == "if-var") {
-		anim = new CAnimation_IfVar;
+		anim = std::make_unique<CAnimation_IfVar>();
 	} else if (op1 == "set-var") {
-		anim = new CAnimation_SetVar;
+		anim = std::make_unique<CAnimation_SetVar>();
 	} else if (op1 == "set-player-var") {
-		anim = new CAnimation_SetPlayerVar;
+		anim = std::make_unique<CAnimation_SetPlayerVar>();
 	} else if (op1 == "die") {
-		anim = new CAnimation_Die();
+		anim = std::make_unique<CAnimation_Die>();
 	} else if (op1 == "rotate") {
-		anim = new CAnimation_Rotate;
+		anim = std::make_unique<CAnimation_Rotate>();
 	} else if (op1 == "random-rotate") {
-		anim = new CAnimation_RandomRotate;
+		anim = std::make_unique<CAnimation_RandomRotate>();
 	} else if (op1 == "move") {
-		anim = new CAnimation_Move;
+		anim = std::make_unique<CAnimation_Move>();
 	} else if (op1 == "unbreakable") {
-		anim = new CAnimation_Unbreakable;
+		anim = std::make_unique<CAnimation_Unbreakable>();
 	} else if (op1 == "label") {
-		anim = new CAnimation_Label;
-		AddLabel(anim, extraArg);
+		anim = std::make_unique<CAnimation_Label>();
 	} else if (op1 == "goto") {
-		anim = new CAnimation_Goto;
+		anim = std::make_unique<CAnimation_Goto>();
 	} else if (op1 == "random-goto") {
-		anim = new CAnimation_RandomGoto;
+		anim = std::make_unique<CAnimation_RandomGoto>();
 	} else if (op1 == "lua-callback") {
-		anim = new CAnimation_LuaCallback;
+		anim = std::make_unique<CAnimation_LuaCallback>();
 	} else if (op1 == "wiggle") {
-		anim = new CAnimation_Wiggle;
+		anim = std::make_unique<CAnimation_Wiggle>();
 	} else {
 		LuaError(l, "Unknown animation: %s", op1.c_str());
 	}
@@ -632,7 +593,7 @@ static CAnimation *ParseAnimationFrame(lua_State *l, std::string_view str)
 /**
 **  Parse an animation
 */
-static CAnimation *ParseAnimation(lua_State *l, int idx)
+static std::vector<std::unique_ptr<CAnimation>> ParseAnimation(lua_State *l, int idx)
 {
 	if (!lua_istable(l, idx)) {
 		LuaError(l, "incorrect argument");
@@ -640,35 +601,29 @@ static CAnimation *ParseAnimation(lua_State *l, int idx)
 	const int args = lua_rawlen(l, idx);
 
 	if (args == 0) {
-		return nullptr;
+		return {};
 	}
-	Labels.clear();
 	LabelsLater.clear();
 
-	const std::string_view str = LuaToString(l, idx, 1);
-
-	CAnimation *firstAnim = ParseAnimationFrame(l, str);
-	CAnimation *prev = firstAnim;
-	for (int j = 1; j < args; ++j) {
-		const std::string_view str = LuaToString(l, idx, j + 1);
-		CAnimation *anim = ParseAnimationFrame(l, str);
-		prev->Next = anim;
-		prev = anim;
+	std::vector<std::unique_ptr<CAnimation>> animations;
+	for (int i = 0; i != args; ++i) {
+		const std::string_view str = LuaToString(l, idx, 1 + i);
+		animations.emplace_back(ParseAnimationFrame(l, str));
 	}
-	prev->Next = firstAnim;
-	FixLabels(l);
-	return firstAnim;
+
+	FixLabels(l, animations);
+	return animations;
 }
 
 /**
 **  Add animation to AnimationsArray
 */
-static void AddAnimationToArray(CAnimation *anim)
+static void AddAnimationToArray(std::vector<std::unique_ptr<CAnimation>> *anims)
 {
-	if (!anim) {
+	if (!anims) {
 		return;
 	}
-	AnimationsArray.push_back(anim);
+	AnimationsArray.push_back(anims);
 }
 
 /**
@@ -736,19 +691,19 @@ static int CclDefineAnimations(lua_State *l)
 		lua_pop(l, 1);
 	}
 	// Must add to array in a fixed order for save games
-	AddAnimationToArray(anims->Start);
-	AddAnimationToArray(anims->Still);
+	AddAnimationToArray(&anims->Start);
+	AddAnimationToArray(&anims->Still);
 	for (int i = 0; i != ANIMATIONS_DEATHTYPES + 1; ++i) {
-		AddAnimationToArray(anims->Death[i]);
+		AddAnimationToArray(&anims->Death[i]);
 	}
-	AddAnimationToArray(anims->Attack);
-	AddAnimationToArray(anims->RangedAttack);
-	AddAnimationToArray(anims->SpellCast);
-	AddAnimationToArray(anims->Move);
-	AddAnimationToArray(anims->Repair);
-	AddAnimationToArray(anims->Train);
+	AddAnimationToArray(&anims->Attack);
+	AddAnimationToArray(&anims->RangedAttack);
+	AddAnimationToArray(&anims->SpellCast);
+	AddAnimationToArray(&anims->Move);
+	AddAnimationToArray(&anims->Repair);
+	AddAnimationToArray(&anims->Train);
 	for (int i = 0; i != MaxCosts; ++i) {
-		AddAnimationToArray(anims->Harvest[i]);
+		AddAnimationToArray(&anims->Harvest[i]);
 	}
 	return 0;
 }

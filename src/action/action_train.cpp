@@ -170,10 +170,10 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 
 static void AnimateActionTrain(CUnit &unit)
 {
-	if (unit.Type->Animations->Train) {
-		UnitShowAnimation(unit, unit.Type->Animations->Train);
+	if (!unit.Type->Animations->Train.empty()) {
+		UnitShowAnimation(unit, &unit.Type->Animations->Train);
 	} else {
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		UnitShowAnimation(unit, &unit.Type->Animations->Still);
 	}
 }
 

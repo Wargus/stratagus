@@ -69,7 +69,8 @@ static bool returnFalse(int, int) { return false; }
 
 void CAnimation_IfVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	const int lop = ParseAnimInt(unit, this->leftVar);
 	const int rop = ParseAnimInt(unit, this->rightVar);

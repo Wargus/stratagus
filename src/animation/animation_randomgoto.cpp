@@ -43,7 +43,8 @@
 
 void CAnimation_RandomGoto::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	if (SyncRand() % 100 < ParseAnimInt(unit, this->randomStr)) {
 		unit.Anim.Anim = this->gotoLabel;

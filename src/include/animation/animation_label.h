@@ -39,6 +39,9 @@ class CAnimation_Label : public CAnimation
 public:
 	void Action(CUnit &unit, int &move, int scale) const override;
 	void Init(std::string_view s, lua_State *l) override;
+
+public:
+	std::string name;
 };
 
 //@}

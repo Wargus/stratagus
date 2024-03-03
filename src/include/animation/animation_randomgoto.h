@@ -43,7 +43,7 @@ public:
 
 private:
 	std::string randomStr;
-	CAnimation *gotoLabel = nullptr;
+	std::size_t gotoLabel = 0;
 };
 
 //@}

@@ -45,7 +45,8 @@
 
 void CAnimation_LuaCallback::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	Assert(cb);
 
 	cb->pushPreamble();

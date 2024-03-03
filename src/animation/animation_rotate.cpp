@@ -56,7 +56,8 @@ void UnitRotate(CUnit &unit, int rotate)
 
 void CAnimation_Rotate::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	if (this->rotateStr == "target") {
 		COrder *order = unit.CurrentOrder();

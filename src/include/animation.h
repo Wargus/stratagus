@@ -81,64 +81,34 @@ public:
 	virtual void Init(std::string_view s, lua_State *l = nullptr) {}
 	virtual void MapSound() {}
 	virtual std::optional<int> GetStillFrame(const CUnitType &type) { return std::nullopt; }
-
-	CAnimation *Next = nullptr;
 };
 
 class CAnimations
 {
 public:
-	CAnimations() : Attack(nullptr), RangedAttack(nullptr), Build(nullptr), hasDeathAnimation(false),
-		Move(nullptr), Repair(nullptr),
-		Research(nullptr), SpellCast(nullptr), Start(nullptr), Still(nullptr),
-		Train(nullptr), Upgrade(nullptr)
-	{
-		memset(Death, 0, sizeof(Death));
-		memset(Harvest, 0, sizeof(Harvest));
-	}
-
-	~CAnimations()
-	{
-		delete Attack;
-		delete RangedAttack;
-		delete Build;
-		for (auto *p : Death) {
-			delete p;
-		}
-		for (auto *p : Harvest) {
-			delete p;
-		}
-		delete Move;
-		delete Repair;
-		delete Research;
-		delete SpellCast;
-		delete Start;
-		delete Still;
-		delete Train;
-		delete Upgrade;
-	}
+	CAnimations() = default;
+	~CAnimations() = default;
 
 	static void SaveUnitAnim(CFile &file, const CUnit &unit);
 	static void LoadUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
 public:
-	CAnimation *Attack;
-	CAnimation *RangedAttack;
-	CAnimation *Build;
-	bool hasDeathAnimation;
-	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
-	CAnimation *Harvest[MaxCosts];
-	CAnimation *Move;
-	CAnimation *Repair;
-	CAnimation *Research;
-	CAnimation *SpellCast;
-	CAnimation *Start;
-	CAnimation *Still;
-	CAnimation *Train;
-	CAnimation *Upgrade;
+	std::vector<std::unique_ptr<CAnimation>> Attack;
+	std::vector<std::unique_ptr<CAnimation>> RangedAttack;
+	std::vector<std::unique_ptr<CAnimation>> Build;
+	bool hasDeathAnimation = false;
+	std::vector<std::unique_ptr<CAnimation>> Death[ANIMATIONS_DEATHTYPES + 1];
+	std::vector<std::unique_ptr<CAnimation>> Harvest[MaxCosts];
+	std::vector<std::unique_ptr<CAnimation>> Move;
+	std::vector<std::unique_ptr<CAnimation>> Repair;
+	std::vector<std::unique_ptr<CAnimation>> Research;
+	std::vector<std::unique_ptr<CAnimation>> SpellCast;
+	std::vector<std::unique_ptr<CAnimation>> Start;
+	std::vector<std::unique_ptr<CAnimation>> Still;
+	std::vector<std::unique_ptr<CAnimation>> Train;
+	std::vector<std::unique_ptr<CAnimation>> Upgrade;
 };
-
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -150,14 +120,16 @@ extern CAnimations &AnimationsByIdent(std::string_view ident);
 extern void AnimationCclRegister();
 
 /// Handle the animation of a unit
-extern int UnitShowAnimationScaled(CUnit &unit, const CAnimation *anim, int scale);
+extern int UnitShowAnimationScaled(CUnit &unit,
+                                   const std::vector<std::unique_ptr<CAnimation>> *anims,
+                                   int scale);
 /// Handle the animation of a unit
-extern int UnitShowAnimation(CUnit &unit, const CAnimation *anim);
+extern int UnitShowAnimation(CUnit &unit, const std::vector<std::unique_ptr<CAnimation>> *anims);
 
 
 extern int ParseAnimInt(const CUnit &unit, std::string_view parseint);
 
-extern void FindLabelLater(CAnimation **anim, std::string name);
+extern void FindLabelLater(std::size_t *labelIndex, std::string name);
 
 extern void FreeAnimations();
 

@@ -386,14 +386,15 @@ void COrder_Still::Execute(CUnit &unit) /* override */
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
-		&& (unit.Container == nullptr || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
-		return ;
+	    && (unit.Container == nullptr
+	        || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
+		return;
 	}
 	this->Finished = false;
 
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
-			UnitShowAnimation(unit, unit.Type->Animations->Still);
+			UnitShowAnimation(unit, &unit.Type->Animations->Still);
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);

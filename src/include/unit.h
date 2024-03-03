@@ -417,8 +417,8 @@ public:
 	int UnderAttack = 0;            /// The counter while small ai can ignore non aggressive targets if searching attacker.
 
 	struct _unit_anim_ {
-		const CAnimation *Anim = nullptr;      /// Anim
-		const CAnimation *CurrAnim = nullptr;  /// CurrAnim
+		const std::vector<std::unique_ptr<CAnimation>>* CurrAnim = nullptr;  /// CurrAnim
+		std::size_t Anim = 0; /// Anim
 		short Wait = 0;                  /// Wait time
 		signed char Rotate = 0;          /// Rotation target and direction
 		bool Unbreakable = false;        /// Unbreakable

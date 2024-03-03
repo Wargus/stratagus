@@ -278,7 +278,7 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 {
 	CAnimations &animations = *unit.Type->Animations;
 
-	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
+	UnitShowAnimation(unit, !animations.Upgrade.empty() ? &animations.Upgrade : &animations.Still);
 }
 
 void COrder_UpgradeTo::Execute(CUnit &unit) /* override */

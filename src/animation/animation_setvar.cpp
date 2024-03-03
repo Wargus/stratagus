@@ -47,7 +47,8 @@
 
 void CAnimation_SetVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	CUnit *goal = &unit;
 	if (this->unitSlotStr.empty() == false) {

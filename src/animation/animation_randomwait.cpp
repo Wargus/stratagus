@@ -43,7 +43,8 @@
 
 void CAnimation_RandomWait::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	const int arg1 = ParseAnimInt(unit, this->minWait);
 	const int arg2 = ParseAnimInt(unit, this->maxWait);

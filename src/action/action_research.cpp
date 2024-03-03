@@ -125,7 +125,7 @@ void COrder_Research::Execute(CUnit &unit) /* override */
 	const CUnitType &type = *unit.Type;
 
 
-	UnitShowAnimation(unit, type.Animations->Research ? type.Animations->Research : type.Animations->Still);
+	UnitShowAnimation(unit, !type.Animations->Research.empty() ? &type.Animations->Research : &type.Animations->Still);
 	if (unit.Wait) {
 		unit.Wait--;
 		return ;

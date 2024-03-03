@@ -41,7 +41,8 @@
 
 void CAnimation_Wait::Action(CUnit &unit, int & /*move*/, int scale) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 	unit.Anim.Wait = ParseAnimInt(unit, this->wait) << scale >> 8;
 	if (unit.Variable[SLOW_INDEX].Value) { // unit is slowed down
 		unit.Anim.Wait <<= 1;

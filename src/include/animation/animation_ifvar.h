@@ -48,7 +48,7 @@ private:
 	std::string leftVar;
 	std::string rightVar;
 	BinOpFunc *binOpFunc = nullptr;
-	CAnimation *gotoLabel = nullptr;
+	std::size_t gotoLabel = 0;
 };
 
 //@}

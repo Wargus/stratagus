@@ -100,7 +100,8 @@ SpawnMissile_Flags ParseAnimFlags(const std::string_view &parseflag)
 
 void CAnimation_SpawnMissile::Action(CUnit &unit, int &/*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	const int startx = ParseAnimInt(unit, this->startXStr);
 	const int starty = ParseAnimInt(unit, this->startYStr);

@@ -83,7 +83,8 @@ SpawnUnit_Flags ParseAnimFlags(const std::string_view &parseflag)
 
 void CAnimation_SpawnUnit::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {
-	Assert(unit.Anim.Anim == this);
+	Assert(unit.Anim.CurrAnim);
+	Assert((*unit.Anim.CurrAnim)[unit.Anim.Anim].get() == this);
 
 	const int offX = ParseAnimInt(unit, this->offXStr);
 	const int offY = ParseAnimInt(unit, this->offYStr);
