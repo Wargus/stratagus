@@ -1963,7 +1963,7 @@ static int CclRestartStratagus(lua_State *l)
 	const std::vector<std::string> quotedArgs = QuoteArguments(OriginalArgv);
 
 	const int newArgc = quotedArgs.size() + (insertRestartArgument ? 2 : 1);
-	char **argv = new char*[newArgc];
+	std::vector<char *> argv(newArgc);
 	for (std::size_t i = 0; i < quotedArgs.size(); ++i) {
 		argv[i] = const_cast<char *>(quotedArgs[i].c_str());
 	}
@@ -1972,11 +1972,10 @@ static int CclRestartStratagus(lua_State *l)
 	}
 	argv[newArgc - 1] = nullptr;
 #ifdef WIN32
-	_execv(executable_path.string().c_str(), argv);
+	_execv(executable_path.string().c_str(), argv.data());
 #else
-	execvp(executable_path.c_str(), argv);
+	execvp(executable_path.c_str(), argv.data());
 #endif
-	delete[] argv;
 
 	return 0;
 }
