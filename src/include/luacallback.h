@@ -41,11 +41,31 @@
 using lua_Object = int; // from tolua++.h
 struct lua_State;
 
+namespace details
+{
+template <typename TUPLE, std::size_t... Is>
+auto reverse_tuple(TUPLE &&tuple, std::index_sequence<Is...>)
+{
+	return std::tuple{std::get<sizeof...(Is) - Is - 1>(std::forward<TUPLE>(tuple))...};
+}
+
+template <typename TUPLE, std::size_t... Is>
+auto reverse_tuple(TUPLE &&tuple)
+{
+	return reverse_tuple(std::forward<TUPLE>(tuple),
+	                     std::make_index_sequence<std::tuple_size_v<std::decay_t<TUPLE>>>());
+}
+}
+
+
 class LuaCallback
 {
 public:
 	LuaCallback(lua_State *lua, lua_Object luaref);
+	LuaCallback(const LuaCallback &) = default;
+	LuaCallback &operator=(const LuaCallback &) = default;
 	~LuaCallback();
+
 	void pushPreamble();
 	void pushInteger(int value);
 	void pushIntegers(const std::vector<int> &values);
@@ -90,11 +110,23 @@ public:
 		if constexpr (sizeof...(Res) <= 1) {
 			return (popT<Res>(), ...);
 		} else {
-			return std::tuple<Res...>{popT<Res>()...};
+			return popTs<Res...>(std::make_index_sequence<sizeof...(Res)>());
 		}
 	}
 
+	explicit operator bool() const { return luastate != nullptr; }
+
 private:
+	template <typename... Res, std::size_t... Is>
+	auto popTs(std::index_sequence<Is...>)
+	{
+		using RevTuple =
+			std::tuple<std::tuple_element_t<sizeof...(Is) - 1 - Is, std::tuple<Res...>>...>;
+		return details::reverse_tuple(std::tuple{popT<std::tuple_element_t<Is, RevTuple>>()...});
+	}
+
+private:
+	std::shared_ptr<void> refcounter;
 	lua_State *luastate;
 	int luaref;
 	int arguments;

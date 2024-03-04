@@ -50,6 +50,8 @@ LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
 	}
 	lua_pushvalue(l, f);
 	luaref = luaL_ref(l, LUA_REGISTRYINDEX);
+	refcounter =
+		std::shared_ptr<void>(nullptr, [this](void*) { luaL_unref(luastate, LUA_REGISTRYINDEX, luaref); });
 }
 
 /**
@@ -189,7 +191,6 @@ LuaCallback::~LuaCallback()
 	if (rescount) {
 		ErrorPrint("There are still some results that weren't popped from stack\n");
 	}
-	luaL_unref(luastate, LUA_REGISTRYINDEX, luaref);
 }
 
 //@}
