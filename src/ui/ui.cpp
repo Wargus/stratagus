@@ -117,14 +117,6 @@ bool IsDemoMode()
 	return GameRunning && ThisPlayer->Type == PlayerTypes::PlayerNobody;
 }
 
-CUnitInfoPanel::~CUnitInfoPanel()
-{
-	for (CContentType *content : Contents) {
-		delete content;
-	}
-}
-
-
 CUserInterface::CUserInterface()
 {
 	Point.Name = "cursor-point";

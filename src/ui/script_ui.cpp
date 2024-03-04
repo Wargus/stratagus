@@ -508,11 +508,11 @@ static std::unique_ptr<ConditionPanel> ParseConditionPanel(lua_State *l)
 	return condition;
 }
 
-static CContentType *CclParseContent(lua_State *l)
+static std::unique_ptr<CContentType> CclParseContent(lua_State *l)
 {
 	Assert(lua_istable(l, -1));
 
-	CContentType *content = nullptr;
+	std::unique_ptr<CContentType> content;
 	std::unique_ptr<ConditionPanel> condition;
 	PixelPos pos(0, 0);
 
@@ -526,19 +526,19 @@ static CContentType *CclParseContent(lua_State *l)
 			lua_rawgeti(l, -2, 2); // Method data
 			key = LuaToString(l, -2);
 			if (key == "Text") {
-				content = new CContentTypeText;
+				content = std::make_unique<CContentTypeText>();
 			} else if (key == "FormattedText") {
-				content = new CContentTypeFormattedText;
+				content = std::make_unique<CContentTypeFormattedText>();
 			} else if (key == "FormattedText2") {
-				content = new CContentTypeFormattedText2;
+				content = std::make_unique<CContentTypeFormattedText2>();
 			} else if (key == "Icon") {
-				content = new CContentTypeIcon;
+				content = std::make_unique<CContentTypeIcon>();
 			} else if (key == "Graphic") {
-				content = new CContentTypeGraphic;
+				content = std::make_unique<CContentTypeGraphic>();
 			} else if (key == "LifeBar") {
-				content = new CContentTypeLifeBar;
+				content = std::make_unique<CContentTypeLifeBar>();
 			} else if (key == "CompleteBar") {
-				content = new CContentTypeCompleteBar;
+				content = std::make_unique<CContentTypeCompleteBar>();
 			} else {
 				LuaError(l, "Invalid drawing method '%s' in DefinePanelContents", key.data());
 			}
@@ -592,7 +592,7 @@ static int CclDefinePanelContents(lua_State *l)
 				LuaError(l, "'%s' invalid for DefinePanelContents", key.data());
 			}
 		}
-		for (CContentType *content : infopanel->Contents) { // Default value for invalid value.
+		for (auto &content : infopanel->Contents) { // Default value for invalid value.
 			content->Pos.x += infopanel->PosX;
 			content->Pos.y += infopanel->PosY;
 		}
