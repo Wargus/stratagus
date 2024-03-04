@@ -199,7 +199,7 @@ class CUnitInfoPanel
 {
 public:
 	CUnitInfoPanel() = default;
-	~CUnitInfoPanel();
+	~CUnitInfoPanel() = default;
 
 public:
 	std::string Name;      /// Ident of the panel.
@@ -207,8 +207,7 @@ public:
 	int PosY = 0;          /// Y coordinate of the panel.
 	CFont *DefaultFont = nullptr; /// Default font for content.
 
-	std::vector<CContentType *> Contents; /// Array of contents to display.
-
+	std::vector<std::unique_ptr<CContentType>> Contents; /// Array of contents to display.
 	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if nullptr, no condition.
 };
 
