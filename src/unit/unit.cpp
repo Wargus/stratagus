@@ -755,7 +755,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 
 	if (unit->Type->OnInit) {
-		unit->Type->OnInit.call(UnitNumber(*unit));
+		unit->Type->OnInit(UnitNumber(*unit));
 	}
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
@@ -2445,7 +2445,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	if (type->OnDeath) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 
-		type->OnDeath.call(UnitNumber(unit), pixelPos.x, pixelPos.y);
+		type->OnDeath(UnitNumber(unit), pixelPos.x, pixelPos.y);
 	}
 	if (suicide) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
@@ -3067,7 +3067,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		const int tarSlot = UnitNumber(target);
 		const int atSlot = attacker && attacker->IsAlive() ? UnitNumber(*attacker) : -1;
 
-		type->OnHit.call(tarSlot, atSlot, damage);
+		type->OnHit(tarSlot, atSlot, damage);
 	}
 
 	// Increase variables and call OnImpact
@@ -3078,7 +3078,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		if (missile->Type->OnImpact) {
 			const int attackerSlot = attacker ? UnitNumber(*attacker) : -1;
 			const int targetSlot = UnitNumber(target);
-			missile->Type->OnImpact.call(attackerSlot, targetSlot, damage);
+			missile->Type->OnImpact(attackerSlot, targetSlot, damage);
 		}
 	}
 

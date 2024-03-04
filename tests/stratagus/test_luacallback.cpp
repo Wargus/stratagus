@@ -78,36 +78,36 @@ namespace
 }
 } // namespace
 
-TEST_CASE("LuaCallback_simplecall")
+TEST_CASE("LuaCallbackImpl_simplecall")
 {
 	const auto raii = InitLuaCallback(R"(function f(x) return x end)");
 
 	lua_getglobal(Lua, "f");
-	LuaCallback f(Lua, -1);
+	LuaCallbackImpl f(Lua, -1);
 
 	REQUIRE(f.call<int>(42) == 42);
 }
 
-TEST_CASE("LuaCallback_complexcall")
+TEST_CASE("LuaCallbackImpl_complexcall")
 {
 	const auto raii = InitLuaCallback(R"(function f(x, s, v) return #s, x == 42, v[3], v[4] end)");
 
 	lua_getglobal(Lua, "f");
-	LuaCallback f(Lua, -1);
+	LuaCallbackImpl f(Lua, -1);
 
 	auto t = f.call<int, bool, int, int>(42, "toto", std::vector{11, 12, 13, 14});
 	REQUIRE(t == std::tuple{4, true, 13, 14});
 }
 
-TEST_CASE("LuaCallback_copy")
+TEST_CASE("LuaCallbackImpl_copy")
 {
 	const auto raii = InitLuaCallback(R"(function f(x) return x end)");
 
 	lua_getglobal(Lua, "f");
-	LuaCallback f(Lua, -1);
+	LuaCallbackImpl f(Lua, -1);
 
 	{
-		LuaCallback g(f);
+		LuaCallbackImpl g(f);
 		REQUIRE(f.call<int>(42) == 42);
 		REQUIRE(g.call<int>(42) == 42);
 	} // g destructor
@@ -115,16 +115,16 @@ TEST_CASE("LuaCallback_copy")
 	REQUIRE(f.call<int>(42) == 42);
 }
 
-TEST_CASE("LuaCallback_assign")
+TEST_CASE("LuaCallbackImpl_assign")
 {
 	const auto raii = InitLuaCallback(R"(function f(x) return x end function g(x) return x + 1 end)");
 
 	lua_getglobal(Lua, "f");
-	LuaCallback f(Lua, -1);
+	LuaCallbackImpl f(Lua, -1);
 
 	{
 		lua_getglobal(Lua, "g");
-		LuaCallback g(Lua, -1);
+		LuaCallbackImpl g(Lua, -1);
 		REQUIRE(f.call<int>(42) == 42);
 		REQUIRE(g.call<int>(41) == 42);
 		f = g;
@@ -133,4 +133,39 @@ TEST_CASE("LuaCallback_assign")
 	} // g destructor
 
 	REQUIRE(f.call<int>(41) == 42);
+}
+
+TEST_CASE("LuaCallbackImpl_assign_mixed")
+{
+	const auto raii =
+		InitLuaCallback(R"(function f(x) return x end function g(x, y) return x, y end)");
+
+	lua_getglobal(Lua, "f");
+	LuaCallbackImpl f(Lua, -1);
+
+	{
+		lua_getglobal(Lua, "g");
+		LuaCallbackImpl g(Lua, -1);
+		REQUIRE(f.call<int>(42) == 42);
+		REQUIRE(g.call<int, int>(4, 2) == std::tuple{4, 2});
+		f = g;
+		REQUIRE(f.call<int, int>(4, 1) == std::tuple{4, 1});
+		REQUIRE(g.call<int, int>(4, 1) == std::tuple{4, 1});
+	} // g destructor
+
+	REQUIRE(f.call<int, int>(4, 1) == std::tuple{4, 1});
+}
+
+TEST_CASE("LuaCallback")
+{
+	const auto raii =
+		InitLuaCallback(R"(function f(x) return x end function g(x, s) return x, s == "Hi" end)");
+
+	lua_getglobal(Lua, "f");
+	LuaCallback<int(int)> f_int(Lua, -1);
+	lua_getglobal(Lua, "g");
+	LuaCallback<std::tuple<int, bool>(int, std::string_view)> g(Lua, -1);
+
+	REQUIRE(f_int(42) == 42);
+	REQUIRE(g(42, "Hi") == std::tuple{42, true});
 }

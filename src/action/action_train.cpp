@@ -244,7 +244,7 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 		AiTrainingComplete(unit, *newUnit);
 	}
 	if (newUnit->Type->OnReady) {
-		newUnit->Type->OnReady.call(UnitNumber(*newUnit));
+		newUnit->Type->OnReady(UnitNumber(*newUnit));
 	}
 
 	if (unit.NewOrder && unit.NewOrder->HasGoal() && unit.NewOrder->GetGoal()->Destroyed) {

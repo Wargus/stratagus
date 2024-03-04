@@ -400,9 +400,9 @@ public:
 	int SplashFactor = 0;                  /// missile splash divisor
 	std::vector<MissileConfig> Impact; /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
-	mutable LuaCallback ImpactParticle; /// impact particle
-	mutable LuaCallback SmokeParticle;  /// smoke particle
-	mutable LuaCallback OnImpact;       /// called when
+	mutable LuaCallback<void(int pixelPosx, int pixelPosy)> ImpactParticle; /// impact particle
+	mutable LuaCallback<void(int pixelPosx, int pixelPosy)> SmokeParticle; /// smoke particle
+	mutable LuaCallback<void(int attackerSlot, int targetSlot, int damage)> OnImpact; /// called when
 
 	// --- FILLED UP ---
 	CGraphic *G = nullptr;         /// missile graphic

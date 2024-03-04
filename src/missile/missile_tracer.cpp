@@ -84,7 +84,7 @@ static bool TracerMissile(Missile &missile)
 		}
 
 		if (missile.Type->SmokeParticle && missile.CurrentStep) {
-			missile.Type->SmokeParticle.call(position.x, position.y);
+			missile.Type->SmokeParticle(position.x, position.y);
 		}
 
 		if (missile.Type->Pierce) {

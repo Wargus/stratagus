@@ -46,7 +46,7 @@ public:
 	void Init(std::string_view s, lua_State *l) override;
 
 private:
-	mutable LuaCallback cb;
+	mutable LuaCallbackImpl cb;
 	std::string cbName;
 	std::vector<std::string> cbArgs;
 };

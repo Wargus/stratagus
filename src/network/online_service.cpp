@@ -1083,7 +1083,7 @@ public:
 			setChannels(channelList);
 		}
 		if (SetActiveChannel) {
-			SetActiveChannel.call(name);
+			SetActiveChannel(name);
 		}
 	}
 
@@ -1156,7 +1156,7 @@ public:
 			for (unsigned int i = 0; i < values.size(); i++) {
 				m[defaultUserKeys.at(i)] = values.at(i);
 			}
-			ShowUserInfo.call(m);
+			ShowUserInfo(m);
 		}
 	}
 
@@ -1167,7 +1167,7 @@ public:
 		std::string infoStr = arg;
 		info.push(infoStr);
 		if (ShowInfo) {
-			ShowInfo.call(infoStr);
+			ShowInfo(infoStr);
 		}
 	}
 
@@ -1175,7 +1175,7 @@ public:
 	{
 		info.push("!!! " + arg + " !!!");
 		if (ShowError) {
-			ShowError.call(arg);
+			ShowError(arg);
 		}
 	}
 
@@ -1183,7 +1183,7 @@ public:
 	{
 		info.push(arg);
 		if (ShowChat) {
-			ShowChat.call(arg);
+			ShowChat(arg);
 		}
 	}
 
@@ -1191,7 +1191,7 @@ public:
 	{
 		userList.insert(name);
 		if (AddUser) {
-			AddUser.call(name);
+			AddUser(name);
 		}
 	}
 
@@ -1199,7 +1199,7 @@ public:
 	{
 		userList.erase(name);
 		if (RemoveUser) {
-			RemoveUser.call(name);
+			RemoveUser(name);
 		}
 	}
 
@@ -1318,16 +1318,16 @@ public:
 	uint32_t serverToken = 0;
 	uint32_t udpToken = 0;
 
-	LuaCallback AddUser;
-	LuaCallback RemoveUser;
-	LuaCallback SetFriends;
-	LuaCallback SetGames;
-	LuaCallback SetChannels;
-	LuaCallback SetActiveChannel;
-	LuaCallback ShowError;
-	LuaCallback ShowInfo;
-	LuaCallback ShowChat;
-	LuaCallback ShowUserInfo;
+	LuaCallback<void(std::string_view)> AddUser;
+	LuaCallback<void(std::string_view)> RemoveUser;
+	LuaCallbackImpl SetFriends;
+	LuaCallbackImpl SetGames;
+	LuaCallbackImpl SetChannels;
+	LuaCallback<void(std::string_view)> SetActiveChannel;
+	LuaCallback<void(std::string_view)> ShowError;
+	LuaCallback<void(std::string_view)> ShowInfo;
+	LuaCallback<void(std::string_view)> ShowChat;
+	LuaCallback<void(const std::map<std::string, std::variant<std::string, int>>&)> ShowUserInfo;
 
 private:
 	static std::string gameNameFromUsername(std::string username) { return username + "'s game"; }
@@ -2129,34 +2129,34 @@ static int CclSetup(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
 		const std::string_view value = LuaToString(l, -2);
 		if (value == "AddUser") {
-			_ctx.AddUser = LuaCallback(l, -1);
+			_ctx.AddUser.init(l, -1);
 		} else if (value == "RemoveUser") {
-			_ctx.RemoveUser = LuaCallback(l, -1);
+			_ctx.RemoveUser.init(l, -1);
 		} else if (value == "SetFriends") {
-			_ctx.SetFriends = LuaCallback(l, -1);
+			_ctx.SetFriends.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.NotifyFriendsListHasChanged();
 			}
 		} else if (value == "SetGames") {
-			_ctx.SetGames = LuaCallback(l, -1);
+			_ctx.SetGames.init(l, -1);
 		} else if (value == "SetChannels") {
-			_ctx.SetChannels = LuaCallback(l, -1);
+			_ctx.SetChannels.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setChannels(_ctx.getChannels());
 			}
 		} else if (value == "SetActiveChannel") {
-			_ctx.SetActiveChannel = LuaCallback(l, -1);
+			_ctx.SetActiveChannel.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setCurrentChannel(_ctx.getCurrentChannel());
 			}
 		} else if (value == "ShowChat") {
-			_ctx.ShowChat = LuaCallback(l, -1);
+			_ctx.ShowChat.init(l, -1);
 		} else if (value == "ShowInfo") {
-			_ctx.ShowInfo = LuaCallback(l, -1);
+			_ctx.ShowInfo.init(l, -1);
 		} else if (value == "ShowError") {
-			_ctx.ShowError = LuaCallback(l, -1);
+			_ctx.ShowError.init(l, -1);
 		} else if (value == "ShowUserInfo") {
-			_ctx.ShowUserInfo = LuaCallback(l, -1);
+			_ctx.ShowUserInfo.init(l, -1);
 		} else {
 			LuaError(l, "Unsupported callback: %s", value.data());
 		}

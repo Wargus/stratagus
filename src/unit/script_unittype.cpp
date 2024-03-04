@@ -258,7 +258,8 @@ static std::unique_ptr<CBuildRestrictionAnd> ParseBuildingRules(lua_State *l)
 		++i;
 		lua_rawgeti(l, -1, i + 1);
 		if (value == "lua-callback") {
-			auto b = std::make_unique<CBuildRestrictionLuaCallback>(LuaCallback(l, -1));
+			auto b = std::make_unique<CBuildRestrictionLuaCallback>(
+				LuaCallback<bool(int, std::string_view, int, int, int)>(l, -1));
 			lua_pop(l, 1);
 			andlist->push_back(std::move(b));
 			continue;
@@ -748,21 +749,21 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (value == "TeleportCost") {
 			type->TeleportCost = LuaToNumber(l, -1);
 		} else if (value == "TeleportEffectIn") {
-			type->TeleportEffectIn = LuaCallback(l, -1);
+			type->TeleportEffectIn.init(l, -1);
 		} else if (value == "TeleportEffectOut") {
-			type->TeleportEffectOut = LuaCallback(l, -1);
+			type->TeleportEffectOut.init(l, -1);
 		} else if (value == "OnDeath") {
-			type->OnDeath = LuaCallback(l, -1);
+			type->OnDeath.init(l, -1);
 		} else if (value == "OnHit") {
-			type->OnHit = LuaCallback(l, -1);
+			type->OnHit.init(l, -1);
 		} else if (value == "OnEachCycle") {
-			type->OnEachCycle = LuaCallback(l, -1);
+			type->OnEachCycle.init(l, -1);
 		} else if (value == "OnEachSecond") {
-			type->OnEachSecond = LuaCallback(l, -1);
+			type->OnEachSecond.init(l, -1);
 		} else if (value == "OnInit") {
-			type->OnInit = LuaCallback(l, -1);
+			type->OnInit.init(l, -1);
 		} else if (value == "OnReady") {
-			type->OnReady = LuaCallback(l, -1);
+			type->OnReady.init(l, -1);
 		} else if (value == "Type") {
 			type->MoveType = toEMovement(LuaToString(l, -1));
 		} else if (value == "MissileOffsets") {

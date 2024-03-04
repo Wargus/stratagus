@@ -228,10 +228,10 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 				// Everything is OK, now teleport the unit
 				unit.Remove(nullptr);
 				if (goal->Type->TeleportEffectIn) {
-					goal->Type->TeleportEffectIn.call(UnitNumber(unit),
-					                                  UnitNumber(*goal),
-					                                  unit.GetMapPixelPosCenter().x,
-					                                  unit.GetMapPixelPosCenter().y);
+					goal->Type->TeleportEffectIn(UnitNumber(unit),
+					                             UnitNumber(*goal),
+					                             unit.GetMapPixelPosCenter().x,
+					                             unit.GetMapPixelPosCenter().y);
 				}
 				unit.tilePos = goal->Goal->tilePos;
 				DropOutOnSide(unit, unit.Direction, nullptr);
@@ -239,10 +239,10 @@ void COrder_Follow::Execute(CUnit &unit) /* override */
 				// FIXME: we must check if the units supports the new order.
 				CUnit &dest = *goal->Goal;
 				if (dest.Type->TeleportEffectOut) {
-					dest.Type->TeleportEffectOut.call(UnitNumber(unit),
-					                                  UnitNumber(dest),
-					                                  unit.GetMapPixelPosCenter().x,
-					                                  unit.GetMapPixelPosCenter().y);
+					dest.Type->TeleportEffectOut(UnitNumber(unit),
+					                             UnitNumber(dest),
+					                             unit.GetMapPixelPosCenter().x,
+					                             unit.GetMapPixelPosCenter().y);
 				}
 
 				if (dest.NewOrder == nullptr

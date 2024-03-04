@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -59,7 +59,7 @@ void scrollToTop(gcn::ScrollArea *);
 
 class LuaActionListener : public gcn::ActionListener, public gcn::KeyListener, public gcn::MouseListener
 {
-	LuaCallback callback;
+	LuaCallbackImpl callback;
 public:
 	LuaActionListener(lua_State *lua, lua_Object function);
 	~LuaActionListener() override;
