@@ -199,7 +199,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->TargetSelf = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (value == "callback") {
 			lua_rawgeti(l, -1, j + 1);
-			condition->CheckFunc = std::make_unique<LuaCallback>(l, -1);
+			condition->CheckFunc = LuaCallback(l, -1);
 			lua_pop(l, 1);
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];
@@ -269,7 +269,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 			autocast->MinRange = LuaToNumber(l, -1, j + 1);
 		} else if (value == "position-autocast") {
 			lua_rawgeti(l, -1, j + 1);
-			autocast->PositionAutoCast = std::make_unique<LuaCallback>(l, -1);
+			autocast->PositionAutoCast = LuaCallback(l, -1);
 			lua_pop(l, 1);
 		} else if (value == "combat") {
 			autocast->Combat = Ccl2Condition(l, LuaToString(l, -1, j + 1));

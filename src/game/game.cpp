@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -1031,7 +1031,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	//
 	for (CUnit *unit : UnitManager->GetUnits()) {
 		if (unit->Type->OnReady) {
-			unit->Type->OnReady->call(UnitNumber(*unit));
+			unit->Type->OnReady.call(UnitNumber(*unit));
 		}
 	}
 

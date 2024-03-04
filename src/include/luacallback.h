@@ -61,6 +61,7 @@ auto reverse_tuple(TUPLE &&tuple)
 class LuaCallback
 {
 public:
+	LuaCallback() = default;
 	LuaCallback(lua_State *lua, lua_Object luaref);
 	LuaCallback(const LuaCallback &) = default;
 	LuaCallback &operator=(const LuaCallback &) = default;
@@ -127,11 +128,11 @@ private:
 
 private:
 	std::shared_ptr<void> refcounter;
-	lua_State *luastate;
-	int luaref;
-	int arguments;
-	int rescount;
-	int base;
+	lua_State *luastate = nullptr;
+	int luaref = 0;
+	int arguments = 0;
+	int rescount = 0;
+	int base = 0;
 };
 
 #endif

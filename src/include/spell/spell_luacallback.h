@@ -48,7 +48,7 @@ public:
 	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	std::unique_ptr<LuaCallback> Func;
+	LuaCallback Func;
 };
 
 //@}

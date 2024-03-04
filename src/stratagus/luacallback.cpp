@@ -41,8 +41,7 @@
 **  @param l  Lua state
 **  @param f  Listener function
 */
-LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
-	luastate(l), arguments(0), rescount(0)
+LuaCallback::LuaCallback(lua_State *l, lua_Object f) : luastate(l)
 {
 	if (!lua_isfunction(l, f)) {
 		LuaError(l, "Argument isn't a function");

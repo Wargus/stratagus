@@ -801,7 +801,7 @@ static int CclCreateUnit(lua_State *l)
 		UpdateForNewUnit(*unit, 0);
 
 		if (unit->Type->OnReady) {
-			unit->Type->OnReady->call(UnitNumber(*unit));
+			unit->Type->OnReady.call(UnitNumber(*unit));
 		}
 
 		lua_pushnumber(l, UnitNumber(*unit));

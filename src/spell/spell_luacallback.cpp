@@ -41,7 +41,7 @@ void Spell_LuaCallback::Parse(lua_State *l, int startIndex, int endIndex) /* ove
 {
 	int j = startIndex;
 	lua_rawgeti(l, -1, j + 1);
-	this->Func = std::make_unique<LuaCallback>(l, -1);
+	this->Func = LuaCallback(l, -1);
 	lua_pop(l, 1); // pop table
 }
 
@@ -62,15 +62,14 @@ int Spell_LuaCallback::Cast(CUnit &caster,
 {
 	if (this->Func) {
 		bool result =
-			this->Func->call<bool>(spell.Ident,
-		                           UnitNumber(caster),
-		                           goalPos.x,
-		                           goalPos.y,
-		                           (target && target->IsAlive()) ? UnitNumber(*target) : -1);
+			this->Func.call<bool>(spell.Ident,
+		                          UnitNumber(caster),
+		                          goalPos.x,
+		                          goalPos.y,
+		                          (target && target->IsAlive()) ? UnitNumber(*target) : -1);
 		return result;
 	}
 	return 0;
 }
-
 
 //@}

@@ -312,7 +312,6 @@ class CGraphic;
 class CUnit;
 class CViewport;
 class CFile;
-class LuaCallback;
 
 /*----------------------------------------------------------------------------
 --  Missile-type
@@ -401,9 +400,9 @@ public:
 	int SplashFactor = 0;                  /// missile splash divisor
 	std::vector<MissileConfig> Impact; /// missile produces an impact
 	MissileConfig Smoke;                   /// trailing missile
-	std::unique_ptr<LuaCallback> ImpactParticle; /// impact particle
-	std::unique_ptr<LuaCallback> SmokeParticle;  /// smoke particle
-	std::unique_ptr<LuaCallback> OnImpact;       /// called when
+	mutable LuaCallback ImpactParticle; /// impact particle
+	mutable LuaCallback SmokeParticle;  /// smoke particle
+	mutable LuaCallback OnImpact;       /// called when
 
 	// --- FILLED UP ---
 	CGraphic *G = nullptr;         /// missile graphic

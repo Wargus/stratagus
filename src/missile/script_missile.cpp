@@ -175,11 +175,11 @@ void MissileType::Load(lua_State *l)
 		} else if (value == "SmokeMissile") {
 			this->Smoke.Name = LuaToString(l, -1);
 		} else if (value == "ImpactParticle") {
-			this->ImpactParticle = std::make_unique<LuaCallback>(l, -1);
+			this->ImpactParticle = LuaCallback(l, -1);
 		} else if (value == "SmokeParticle") {
-			this->SmokeParticle = std::make_unique<LuaCallback>(l, -1);
+			this->SmokeParticle = LuaCallback(l, -1);
 		} else if (value == "OnImpact") {
-			this->OnImpact = std::make_unique<LuaCallback>(l, -1);
+			this->OnImpact = LuaCallback(l, -1);
 		} else if (value == "CanHitOwner") {
 			this->CanHitOwner = LuaToBoolean(l, -1);
 		} else if (value == "AlwaysFire") {

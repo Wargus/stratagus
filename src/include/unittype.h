@@ -73,7 +73,6 @@ struct lua_State;
 #ifdef USE_MNG
 class Mng;
 #endif
-class LuaCallback;
 
 #define UnitSides 8
 #define MaxAttackPos 5
@@ -500,7 +499,7 @@ public:
 class CBuildRestrictionLuaCallback : public CBuildRestriction
 {
 public:
-	explicit CBuildRestrictionLuaCallback(std::unique_ptr<LuaCallback> callback) :
+	explicit CBuildRestrictionLuaCallback(LuaCallback callback) :
 		Func(std::move(callback))
 	{}
 
@@ -508,7 +507,7 @@ public:
 	bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const override;
 
 private:
-	std::unique_ptr<LuaCallback> Func;
+	mutable LuaCallback Func;
 };
 
 enum class EMouseAction
@@ -608,16 +607,16 @@ public:
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 
-	LuaCallback *OnDeath = nullptr;           /// lua function called when unit is about to die, receives x,y,unit
-	LuaCallback *OnHit = nullptr;             /// lua function called when unit is hit
-	LuaCallback *OnEachCycle = nullptr;       /// lua function called every cycle
-	LuaCallback *OnEachSecond = nullptr;      /// lua function called every second
-	LuaCallback *OnInit = nullptr;            /// lua function called on unit init
-	LuaCallback *OnReady = nullptr;           /// lua function called when unit ready/built
+	mutable LuaCallback OnDeath;      /// lua function called when unit is about to die, receives x,y,unit
+	mutable LuaCallback OnHit;        /// lua function called when unit is hit
+	mutable LuaCallback OnEachCycle;  /// lua function called every cycle
+	mutable LuaCallback OnEachSecond; /// lua function called every second
+	mutable LuaCallback OnInit;       /// lua function called on unit init
+	mutable LuaCallback OnReady;      /// lua function called when unit ready/built
 
 	int TeleportCost = 0;                     /// mana used for teleportation
-	LuaCallback *TeleportEffectIn = nullptr;  /// lua function to create effects before teleportation
-	LuaCallback *TeleportEffectOut = nullptr; /// lua function to create effects after teleportation
+	mutable LuaCallback TeleportEffectIn;  /// lua function to create effects before teleportation
+	mutable LuaCallback TeleportEffectOut; /// lua function to create effects after teleportation
 
 	mutable std::string DamageType; /// DamageType (used for extra death animations and impacts)
 
