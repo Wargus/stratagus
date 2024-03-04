@@ -576,9 +576,7 @@ void CGraphic::GenFramesMap()
 	Assert(Width != 0);
 	Assert(Height != 0);
 
-	delete[] frame_map;
-
-	frame_map = new frame_pos_t[NumFrames];
+	frame_map.resize(NumFrames);
 
 	for (int frame = 0; frame < NumFrames; ++frame) {
 		frame_map[frame].x = (frame % (mSurface->w / Width)) * Width;
@@ -730,12 +728,10 @@ void CGraphic::Free(CGraphic *g)
 	--g->Refs;
 	if (!g->Refs) {
 		FreeSurface(&g->mSurface);
-		delete[] g->frame_map;
-		g->frame_map = nullptr;
+		g->frame_map.clear();
 
 		FreeSurface(&g->SurfaceFlip);
-		delete[] g->frameFlip_map;
-		g->frameFlip_map = nullptr;
+		g->frameFlip_map.clear();
 
 		if (!g->HashFile.empty()) {
 			GraphicHash.erase(g->HashFile);
@@ -794,10 +790,7 @@ void CGraphic::Flip()
 	SDL_UnlockSurface(mSurface);
 	SDL_UnlockSurface(s);
 
-	delete[] frameFlip_map;
-
-	frameFlip_map = new frame_pos_t[NumFrames];
-
+	frameFlip_map.resize(NumFrames);
 	for (int frame = 0; frame < NumFrames; ++frame) {
 		frameFlip_map[frame].x = ((NumFrames - frame - 1) % (SurfaceFlip->w / Width)) * Width;
 		frameFlip_map[frame].y = (frame / (SurfaceFlip->w / Width)) * Height;
@@ -949,14 +942,12 @@ void CGraphic::SetOriginalSize()
 		FreeSurface(&mSurface);
 		mSurface = nullptr;
 	}
-	delete[] frame_map;
-	frame_map = nullptr;
+	frame_map.clear();
 	if (SurfaceFlip) {
 		FreeSurface(&SurfaceFlip);
 		SurfaceFlip = nullptr;
 	}
-	delete[] frameFlip_map;
-	frameFlip_map = nullptr;
+	frameFlip_map.clear();
 
 	this->Width = this->Height = 0;
 	this->mSurface = nullptr;
@@ -1218,7 +1209,7 @@ static void applyAlphaGrayscaleToSurface(SDL_Surface **src, int alpha)
 	*src = alphaSurface;
 }
 
-static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames, CGraphic::frame_pos_t *frameMap, int frameW, int frameH)
+static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, const std::vector<CGraphic::frame_pos_t> &frameMap, int frameW, int frameH)
 {
 	shrink = std::abs(shrink);
 	SDL_Surface *alphaSurface = SDL_CreateRGBSurface(0, (*src)->w, (*src)->h, 32, RMASK, GMASK, BMASK, AMASK);
@@ -1226,34 +1217,30 @@ static void shrinkSurfaceFramesInY(SDL_Surface **src, int shrink, int numFrames,
 		ErrorPrint("Cannot create surface: %s\n", SDL_GetError());
 		ExitFatal(-1);
 	}
-	for (int f = 0; f < numFrames; f++) {
-		int frameX = frameMap[f].x;
-		int frameY = frameMap[f].y;
-		const SDL_Rect srcRect = { frameX, frameY, frameW, frameH };
-		SDL_Rect dstRect = { frameX, frameY + shrink / 2, frameW, frameH - (shrink - shrink / 2) };
+	for (const auto& frame : frameMap) {
+		const SDL_Rect srcRect = { frame.x, frame.y, frameW, frameH };
+		SDL_Rect dstRect = { frame.x, frame.y + shrink / 2, frameW, frameH - (shrink - shrink / 2) };
 		SDL_BlitScaled(*src, &srcRect, alphaSurface, &dstRect);
 	}
 	SDL_FreeSurface(*src);
 	*src = alphaSurface;
 }
 
-static void shearSurface(SDL_Surface *surface, int xOffset, int yOffset, int numFrames, CGraphic::frame_pos_t *frameMap, int frameW, int frameH)
+static void shearSurface(SDL_Surface *surface, int xOffset, int yOffset, const std::vector<CGraphic::frame_pos_t> &frameMap, int frameW, int frameH)
 {
 	if (yOffset || xOffset) {
 		SDL_LockSurface(surface);
 		uint32_t* pixels = (uint32_t *)surface->pixels;
 		int pitch = surface->pitch / sizeof(uint32_t);
-		for (int f = 0; f < numFrames; f++) {
-			int frameX = frameMap[f].x;
-			int frameY = frameMap[f].y;
+		for (const auto& frame : frameMap) {
 			for (int x = xOffset > 0 ? 0 : frameW - 1; xOffset > 0 ? x < frameW : x >= 0; xOffset > 0 ? x++ : x--) {
 				for (int y = yOffset > 0 ? 0 : frameH - 1; yOffset > 0 ? y < frameH : y >= 0; yOffset > 0 ? y++ : y--) {
 					int xNew = x + xOffset * y / frameH;
 					int yNew = y + yOffset * x / frameW;
 					if (xNew < 0 || yNew < 0 || xNew >= frameW || yNew >= frameH) {
-						pixels[x + frameX + (y + frameY) * pitch] = 0;
+						pixels[x + frame.x + (y + frame.y) * pitch] = 0;
 					} else {
-						pixels[x + frameX + (y + frameY) * pitch] = pixels[xNew + frameX + (yNew + frameY) * pitch];
+						pixels[x + frame.x + (y + frame.y) * pitch] = pixels[xNew + frame.x + (yNew + frame.y) * pitch];
 					}
 				}
 			}
@@ -1287,15 +1274,15 @@ void CGraphic::MakeShadow(PixelPos offset)
 	// The sun shines from the same angle on to both normal and flipped sprites :)
 
 	// 1. Shrink each frame in y-direction based on the x offset
-	shrinkSurfaceFramesInY(&mSurface, xOffset, NumFrames, frame_map, Width, Height);
+	shrinkSurfaceFramesInY(&mSurface, xOffset, frame_map, Width, Height);
 	if (SurfaceFlip) {
-		shrinkSurfaceFramesInY(&SurfaceFlip, xOffset, NumFrames, frameFlip_map, Width, Height);
+		shrinkSurfaceFramesInY(&SurfaceFlip, xOffset, frameFlip_map, Width, Height);
 	}
 
 	// 2. Apply shearing
-	shearSurface(mSurface, xOffset, yOffset, NumFrames, frame_map, Width, Height);
+	shearSurface(mSurface, xOffset, yOffset, frame_map, Width, Height);
 	if (SurfaceFlip) {
-		shearSurface(SurfaceFlip, xOffset, yOffset, NumFrames, frameFlip_map, Width, Height);
+		shearSurface(SurfaceFlip, xOffset, yOffset, frameFlip_map, Width, Height);
 	}
 }
 
