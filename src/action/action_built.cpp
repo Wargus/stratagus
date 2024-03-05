@@ -215,7 +215,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 
 	if (unit.Type->OnReady) {
-		unit.Type->OnReady->call(UnitNumber(unit));
+		unit.Type->OnReady(UnitNumber(unit));
 	}
 
 	// FIXME: Vladi: this is just a hack to test wall fixing,

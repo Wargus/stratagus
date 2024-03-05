@@ -1082,8 +1082,8 @@ public:
 			channelList.push_back(name);
 			setChannels(channelList);
 		}
-		if (SetActiveChannel != nullptr) {
-			SetActiveChannel->call(name);
+		if (SetActiveChannel) {
+			SetActiveChannel(name);
 		}
 	}
 
@@ -1109,23 +1109,23 @@ public:
 			}
 		}
 		this->games = std::move(games);
-		if (SetGames != nullptr) {
-			SetGames->pushPreamble();
+		if (SetGames) {
+			SetGames.pushPreamble();
 			for (const auto &value : games) {
 				if (value->isValid()) {
-					SetGames->pushTable({{"Creator", value->getCreator()},
-					                     {"Host", value->getHost().toString()},
-					                     {"IsSavedGame", value->isSavedGame()},
-					                     {"Map", value->getMap()},
-					                     {"MaxPlayers", value->maxPlayers()},
-					                     {"Speed", value->getSpeed()},
-					                     {"Approval", value->getApproval()},
-					                     {"Settings", value->getGameSettings()},
-					                     {"Status", value->getGameStatus()},
-					                     {"Type", value->getGameType()}});
+					SetGames.pushTable({{"Creator", value->getCreator()},
+					                    {"Host", value->getHost().toString()},
+					                    {"IsSavedGame", value->isSavedGame()},
+					                    {"Map", value->getMap()},
+					                    {"MaxPlayers", value->maxPlayers()},
+					                    {"Speed", value->getSpeed()},
+					                    {"Approval", value->getApproval()},
+					                    {"Settings", value->getGameSettings()},
+					                    {"Status", value->getGameStatus()},
+					                    {"Type", value->getGameType()}});
 				}
 			}
-			SetGames->run();
+			SetGames.run();
 		}
 	}
 
@@ -1137,26 +1137,26 @@ public:
 
 	void NotifyFriendsListHasChanged()
 	{
-		if (SetFriends != nullptr) {
-			SetFriends->pushPreamble();
+		if (SetFriends) {
+			SetFriends.pushPreamble();
 			for (const auto &value : friends) {
-				SetFriends->pushTable({{"Name", value->getName()},
-				                       {"Status", value->getStatus()},
-				                       {"Product", value->getProduct()}});
+				SetFriends.pushTable({{"Name", value->getName()},
+				                      {"Status", value->getStatus()},
+				                      {"Product", value->getProduct()}});
 			}
-			SetFriends->run();
+			SetFriends.run();
 		}
 	}
 
 	void reportUserdata(uint32_t id, std::vector<std::string> values)
 	{
-		if (ShowUserInfo != nullptr) {
+		if (ShowUserInfo) {
 			std::map<std::string, std::variant<std::string, int>> m;
 			m["User"] = extendedInfoNames.at(id);
 			for (unsigned int i = 0; i < values.size(); i++) {
 				m[defaultUserKeys.at(i)] = values.at(i);
 			}
-			ShowUserInfo->call(m);
+			ShowUserInfo(m);
 		}
 	}
 
@@ -1166,40 +1166,40 @@ public:
 	{
 		std::string infoStr = arg;
 		info.push(infoStr);
-		if (ShowInfo != nullptr) {
-			ShowInfo->call(infoStr);
+		if (ShowInfo) {
+			ShowInfo(infoStr);
 		}
 	}
 
 	void showError(std::string arg)
 	{
 		info.push("!!! " + arg + " !!!");
-		if (ShowError != nullptr) {
-			ShowError->call(arg);
+		if (ShowError) {
+			ShowError(arg);
 		}
 	}
 
 	void showChat(std::string arg)
 	{
 		info.push(arg);
-		if (ShowChat != nullptr) {
-			ShowChat->call(arg);
+		if (ShowChat) {
+			ShowChat(arg);
 		}
 	}
 
 	void addUser(std::string name)
 	{
 		userList.insert(name);
-		if (AddUser != nullptr) {
-			AddUser->call(name);
+		if (AddUser) {
+			AddUser(name);
 		}
 	}
 
 	void removeUser(std::string name)
 	{
 		userList.erase(name);
-		if (RemoveUser != nullptr) {
-			RemoveUser->call(name);
+		if (RemoveUser) {
+			RemoveUser(name);
 		}
 	}
 
@@ -1208,12 +1208,12 @@ public:
 	void setChannels(std::vector<std::string> channels)
 	{
 		this->channelList = channels;
-		if (SetChannels != nullptr) {
-			SetChannels->pushPreamble();
+		if (SetChannels) {
+			SetChannels.pushPreamble();
 			for (const auto &value : channels) {
-				SetChannels->pushString(value);
+				SetChannels.pushString(value);
 			}
-			SetChannels->run();
+			SetChannels.run();
 		}
 	}
 
@@ -1318,16 +1318,16 @@ public:
 	uint32_t serverToken = 0;
 	uint32_t udpToken = 0;
 
-	std::unique_ptr<LuaCallback> AddUser;
-	std::unique_ptr<LuaCallback> RemoveUser;
-	std::unique_ptr<LuaCallback> SetFriends;
-	std::unique_ptr<LuaCallback> SetGames;
-	std::unique_ptr<LuaCallback> SetChannels;
-	std::unique_ptr<LuaCallback> SetActiveChannel;
-	std::unique_ptr<LuaCallback> ShowError;
-	std::unique_ptr<LuaCallback> ShowInfo;
-	std::unique_ptr<LuaCallback> ShowChat;
-	std::unique_ptr<LuaCallback> ShowUserInfo;
+	LuaCallback<void(std::string_view)> AddUser;
+	LuaCallback<void(std::string_view)> RemoveUser;
+	LuaCallbackImpl SetFriends;
+	LuaCallbackImpl SetGames;
+	LuaCallbackImpl SetChannels;
+	LuaCallback<void(std::string_view)> SetActiveChannel;
+	LuaCallback<void(std::string_view)> ShowError;
+	LuaCallback<void(std::string_view)> ShowInfo;
+	LuaCallback<void(std::string_view)> ShowChat;
+	LuaCallback<void(const std::map<std::string, std::variant<std::string, int>>&)> ShowUserInfo;
 
 private:
 	static std::string gameNameFromUsername(std::string username) { return username + "'s game"; }
@@ -2129,34 +2129,34 @@ static int CclSetup(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
 		const std::string_view value = LuaToString(l, -2);
 		if (value == "AddUser") {
-			_ctx.AddUser = std::make_unique<LuaCallback>(l, -1);
+			_ctx.AddUser.init(l, -1);
 		} else if (value == "RemoveUser") {
-			_ctx.RemoveUser = std::make_unique<LuaCallback>(l, -1);
+			_ctx.RemoveUser.init(l, -1);
 		} else if (value == "SetFriends") {
-			_ctx.SetFriends = std::make_unique<LuaCallback>(l, -1);
+			_ctx.SetFriends.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.NotifyFriendsListHasChanged();
 			}
 		} else if (value == "SetGames") {
-			_ctx.SetGames = std::make_unique<LuaCallback>(l, -1);
+			_ctx.SetGames.init(l, -1);
 		} else if (value == "SetChannels") {
-			_ctx.SetChannels = std::make_unique<LuaCallback>(l, -1);
+			_ctx.SetChannels.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setChannels(_ctx.getChannels());
 			}
 		} else if (value == "SetActiveChannel") {
-			_ctx.SetActiveChannel = std::make_unique<LuaCallback>(l, -1);
+			_ctx.SetActiveChannel.init(l, -1);
 			if (_ctx.isConnected()) {
 				_ctx.setCurrentChannel(_ctx.getCurrentChannel());
 			}
 		} else if (value == "ShowChat") {
-			_ctx.ShowChat = std::make_unique<LuaCallback>(l, -1);
+			_ctx.ShowChat.init(l, -1);
 		} else if (value == "ShowInfo") {
-			_ctx.ShowInfo = std::make_unique<LuaCallback>(l, -1);
+			_ctx.ShowInfo.init(l, -1);
 		} else if (value == "ShowError") {
-			_ctx.ShowError = std::make_unique<LuaCallback>(l, -1);
+			_ctx.ShowError.init(l, -1);
 		} else if (value == "ShowUserInfo") {
-			_ctx.ShowUserInfo = std::make_unique<LuaCallback>(l, -1);
+			_ctx.ShowUserInfo.init(l, -1);
 		} else {
 			LuaError(l, "Unsupported callback: %s", value.data());
 		}

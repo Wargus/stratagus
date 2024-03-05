@@ -1023,7 +1023,7 @@ static int CclDefineButton(lua_State *l)
 			}
 
 			if (lua_isfunction(l, -1)) {
-				ba.Payload = new LuaCallback(l, -1);
+				ba.Payload = new LuaCallback<void(int, int)>(l, -1);
 			} else {
 				char buf[64];
 				const char *s2;

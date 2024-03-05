@@ -160,7 +160,11 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 	}
 
 	if (condition->CheckFunc) {
-		auto res = condition->CheckFunc->call<bool>(spell.Ident, UnitNumber(caster), goalPos.x, goalPos.y, (target && target->IsAlive()) ? UnitNumber(*target) : -1);
+		auto res = condition->CheckFunc(spell.Ident,
+		                                UnitNumber(caster),
+		                                goalPos.x,
+		                                goalPos.y,
+		                                (target && target->IsAlive()) ? UnitNumber(*target) : -1);
 		if (res == false) {
 			return false;
 		}
@@ -294,7 +298,7 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 					for (const auto *unit : table) {
 						array.push_back(UnitNumber(*unit));
 					}
-					const auto [x, y] = autocast->PositionAutoCast->call<int, int>(array);
+					const auto [x, y] = autocast->PositionAutoCast(array);
 					Vec2i resPos(x, y);
 					if (Map.Info.IsPointOnMap(resPos)) {
 						return std::pair{nullptr, resPos};

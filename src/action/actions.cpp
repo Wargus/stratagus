@@ -459,8 +459,8 @@ static void UnitActionsEachSecond(const std::vector<CUnit *> &units)
 		}
 
 		// OnEachSecond callback
-		if (unit.Type->OnEachSecond  && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachSecond->call(UnitNumber(unit));
+		if (unit.Type->OnEachSecond && unit.IsUnusable(false) == false) {
+			unit.Type->OnEachSecond(UnitNumber(unit));
 		}
 
 		// 1) Blink flag.
@@ -560,7 +560,7 @@ static void UnitActionsEachCycle(const std::vector<CUnit *> &units)
 
 		// OnEachCycle callback
 		if (unit.Type->OnEachCycle && unit.IsUnusable(false) == false) {
-			unit.Type->OnEachCycle->call(UnitNumber(unit));
+			unit.Type->OnEachCycle(UnitNumber(unit));
 		}
 
 		// Handle each cycle buffs

@@ -519,15 +519,6 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 
 CUnitType::~CUnitType()
 {
-	delete OnDeath;
-	delete OnHit;
-	delete OnEachCycle;
-	delete OnEachSecond;
-	delete OnInit;
-	delete OnReady;
-	delete TeleportEffectIn;
-	delete TeleportEffectOut;
-
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->ResInfo[res]) {
 			if (this->ResInfo[res]->SpriteWhenLoaded) {

@@ -48,7 +48,7 @@ public:
 	void Parse(lua_State *l, int startIndex, int endIndex) override;
 
 private:
-	std::unique_ptr<LuaCallback> Func;
+	LuaCallback<bool(std::string_view spellName, int casterId, int goalX, int goalY, int targetId)> Func;
 };
 
 //@}

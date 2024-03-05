@@ -139,7 +139,7 @@ public:
 	std::vector<ECondition> BoolFlag; /// User defined boolean flag.
 
 	std::vector<ConditionInfoVariable> Variable;
-	std::unique_ptr<LuaCallback> CheckFunc;
+	mutable LuaCallback<bool(std::string_view spellName, int casterId, int goalX, int goalY, int targetId)> CheckFunc;
 	//
 	//  @todo more? feel free to add, here and to
 	//  @todo PassCondition, CclSpellParseCondition, SaveSpells
@@ -172,7 +172,7 @@ public:
 	ECondition Corpse = ECondition::ShouldBeFalse; /// If it should be casted on corpses
 
 	// Position autocast callback
-	std::unique_ptr<LuaCallback> PositionAutoCast;
+	LuaCallback<std::tuple<int, int>(const std::vector<int>& unitIds)> PositionAutoCast;
 };
 
 /**

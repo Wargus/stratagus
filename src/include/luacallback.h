@@ -57,14 +57,16 @@ auto reverse_tuple(TUPLE &&tuple)
 }
 }
 
-
-class LuaCallback
+class LuaCallbackImpl
 {
 public:
-	LuaCallback(lua_State *lua, lua_Object luaref);
-	LuaCallback(const LuaCallback &) = default;
-	LuaCallback &operator=(const LuaCallback &) = default;
-	~LuaCallback();
+	LuaCallbackImpl() = default;
+	LuaCallbackImpl(lua_State *lua, lua_Object luaref);
+	LuaCallbackImpl(const LuaCallbackImpl &) = default;
+	LuaCallbackImpl &operator=(const LuaCallbackImpl &) = default;
+	~LuaCallbackImpl();
+
+	void init(lua_State *luastate, lua_Object index) { *this = LuaCallbackImpl(luastate, index); }
 
 	void pushPreamble();
 	void pushInteger(int value);
@@ -127,11 +129,45 @@ private:
 
 private:
 	std::shared_ptr<void> refcounter;
-	lua_State *luastate;
-	int luaref;
-	int arguments;
-	int rescount;
-	int base;
+	lua_State *luastate = nullptr;
+	int luaref = 0;
+	int arguments = 0;
+	int rescount = 0;
+	int base = 0;
+};
+
+template <typename Sig>
+class LuaCallback;
+
+template <typename Ret, typename... Ts>
+class LuaCallback<Ret(Ts...)> : private LuaCallbackImpl
+{
+public:
+	using LuaCallbackImpl::LuaCallbackImpl;
+	using LuaCallbackImpl::init;
+	using LuaCallbackImpl::operator bool;
+
+	Ret operator()(Ts... args) {
+		if constexpr (std::is_same_v<void, Ret>) {
+			return call(args...);
+		} else {
+			return call<Ret>(args...);
+		}
+	}
+};
+
+template <typename... Rs, typename... Ts>
+class LuaCallback<std::tuple<Rs...>(Ts...)> : private LuaCallbackImpl
+{
+public:
+	using LuaCallbackImpl::LuaCallbackImpl;
+	using LuaCallbackImpl::init;
+	using LuaCallbackImpl::operator bool;
+
+	std::tuple<Rs...> operator()(Ts... args)
+	{
+		return call<Rs...>(args...);
+	}
 };
 
 #endif

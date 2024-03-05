@@ -41,8 +41,7 @@
 **  @param l  Lua state
 **  @param f  Listener function
 */
-LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
-	luastate(l), arguments(0), rescount(0)
+LuaCallbackImpl::LuaCallbackImpl(lua_State *l, lua_Object f) : luastate(l)
 {
 	if (!lua_isfunction(l, f)) {
 		LuaError(l, "Argument isn't a function");
@@ -58,7 +57,7 @@ LuaCallback::LuaCallback(lua_State *l, lua_Object f) :
 **  Push the preamble on the stack to call the callback.
 **  Call this function before pushing the arguments on the lua stack.
 */
-void LuaCallback::pushPreamble()
+void LuaCallbackImpl::pushPreamble()
 {
 	base = lua_gettop(luastate);
 	lua_getglobal(luastate, "_TRACEBACK");
@@ -71,7 +70,7 @@ void LuaCallback::pushPreamble()
 **
 **  @param value  the integer to push on the stack
 */
-void LuaCallback::pushInteger(int value)
+void LuaCallbackImpl::pushInteger(int value)
 {
 	lua_pushnumber(luastate, value);
 	arguments++;
@@ -82,7 +81,7 @@ void LuaCallback::pushInteger(int value)
 **
 **  @param value  the integer to push on the stack
 */
-void LuaCallback::pushIntegers(const std::vector<int> &values)
+void LuaCallbackImpl::pushIntegers(const std::vector<int> &values)
 {
 	lua_newtable(luastate);
 	for (size_t i = 0; i < values.size(); ++i) {
@@ -98,7 +97,7 @@ void LuaCallback::pushIntegers(const std::vector<int> &values)
 **
 **  @param s  the string to push on the stack
 */
-void LuaCallback::pushString(std::string_view s)
+void LuaCallbackImpl::pushString(std::string_view s)
 {
 	lua_pushlstring(luastate, s.data(), s.size());
 	arguments++;
@@ -107,7 +106,7 @@ void LuaCallback::pushString(std::string_view s)
 /**
  ** Push a table with string keys and string or integer values.
  */
-void LuaCallback::pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list) {
+void LuaCallbackImpl::pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list) {
 	lua_createtable(Lua, 0, list.size());
 	for (const auto& entry : list) {
 		if (std::holds_alternative<std::string>(entry.second)) {
@@ -123,7 +122,7 @@ void LuaCallback::pushTable(std::initializer_list<std::pair<std::string, std::va
 /**
  ** Push a table with string keys and string or integer values.
  */
-void LuaCallback::pushTable(std::map<std::string, std::variant<std::string, int>> map) {
+void LuaCallbackImpl::pushTable(std::map<std::string, std::variant<std::string, int>> map) {
 	lua_createtable(Lua, 0, map.size());
 	for (const auto& entry : map) {
 		if (std::holds_alternative<std::string>(entry.second)) {
@@ -140,7 +139,7 @@ void LuaCallback::pushTable(std::map<std::string, std::variant<std::string, int>
 **  Pops a boolean value for the callback on the stack.
 **
 */
-bool LuaCallback::popBoolean()
+bool LuaCallbackImpl::popBoolean()
 {
 	if (rescount) {
 		--rescount;
@@ -157,7 +156,7 @@ bool LuaCallback::popBoolean()
 **  Pops an integer value for the callback on the stack.
 **
 */
-int LuaCallback::popInteger()
+int LuaCallbackImpl::popInteger()
 {
 	if (rescount) {
 		--rescount;
@@ -177,7 +176,7 @@ int LuaCallback::popInteger()
 **
 **  @param results  the number of results to be expected in call
 */
-void LuaCallback::run(int results)
+void LuaCallbackImpl::run(int results)
 {
 	LuaCall(luastate, arguments, results, base, false);
 	rescount = results;
@@ -186,7 +185,7 @@ void LuaCallback::run(int results)
 /**
 **  LuaActionListener destructor
 */
-LuaCallback::~LuaCallback()
+LuaCallbackImpl::~LuaCallbackImpl()
 {
 	if (rescount) {
 		ErrorPrint("There are still some results that weren't popped from stack\n");

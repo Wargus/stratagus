@@ -365,11 +365,11 @@ inline bool CBuildRestrictionOnTop::functor::operator()(CUnit *const unit)
 */
 bool CBuildRestrictionLuaCallback::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontop) const
 {
-	bool result = this->Func->call<bool>(UnitNumber(*builder),
-	                                     type.Ident,
-	                                     pos.x,
-	                                     pos.y,
-	                                     (ontop && ontop->IsAlive()) ? UnitNumber(*ontop) : -1);
+	bool result = this->Func(UnitNumber(*builder),
+	                         type.Ident,
+	                         pos.x,
+	                         pos.y,
+	                         (ontop && ontop->IsAlive()) ? UnitNumber(*ontop) : -1);
 	return result;
 }
 
