@@ -474,10 +474,20 @@ static int CclSetActiveTriggers(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
+	lua_getglobal(Lua, "_triggers_");
+	const int triggerCount = lua_rawlen(l, -1) / 2;
+
 	ActiveTriggers.resize(args);
 	for (int j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
+		if (j < triggerCount && !ActiveTriggers[j])
+		{
+			TriggerRemoveTrigger(j * 2);
+		}
 	}
+
+	lua_pop(Lua, 1);
+
 	return 0;
 }
 
