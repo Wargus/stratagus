@@ -392,6 +392,19 @@ void ActionStopTimer()
 }
 
 /**
+**  Remove a trigger
+**
+**  @param trig  Current trigger
+*/
+static void TriggerRemoveTrigger(int trig)
+{
+	lua_pushnumber(Lua, -1);
+	lua_rawseti(Lua, -2, trig + 1);
+	lua_pushnumber(Lua, -1);
+	lua_rawseti(Lua, -2, trig + 2);
+}
+
+/**
 ** <b>Description</b>
 **
 **  Add a trigger. A trigger is a set of two functions. The first is run every
@@ -492,19 +505,6 @@ static bool TriggerExecuteAction(int script)
 
 	// If action returns false remove it
 	return !ret;
-}
-
-/**
-**  Remove a trigger
-**
-**  @param trig  Current trigger
-*/
-static void TriggerRemoveTrigger(int trig)
-{
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 1);
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 2);
 }
 
 /**
