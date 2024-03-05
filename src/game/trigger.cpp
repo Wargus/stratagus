@@ -394,14 +394,16 @@ void ActionStopTimer()
 /**
 **  Remove a trigger
 **
-**  @param trig  Current trigger
+**  @param l     Lua state, top of stack is trigger table
+**
+**  @param trig  Index of trigger to be removed
 */
-static void TriggerRemoveTrigger(int trig)
+static void TriggerRemoveTrigger(lua_State *l, int trig)
 {
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 1);
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 2);
+	lua_pushnumber(l, -1);
+	lua_rawseti(l, -2, trig + 1);
+	lua_pushnumber(l, -1);
+	lua_rawseti(l, -2, trig + 2);
 }
 
 /**
@@ -474,7 +476,7 @@ static int CclSetActiveTriggers(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
-	lua_getglobal(Lua, "_triggers_");
+	lua_getglobal(l, "_triggers_");
 	const int triggerCount = lua_rawlen(l, -1) / 2;
 
 	ActiveTriggers.resize(args);
@@ -482,11 +484,11 @@ static int CclSetActiveTriggers(lua_State *l)
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 		if (j < triggerCount && !ActiveTriggers[j])
 		{
-			TriggerRemoveTrigger(j * 2);
+			TriggerRemoveTrigger(l, j * 2);
 		}
 	}
 
-	lua_pop(Lua, 1);
+	lua_pop(l, 1);
 
 	return 0;
 }
@@ -553,7 +555,7 @@ void TriggersEachCycle()
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 			lua_settop(Lua, base + 1);
 			if (TriggerExecuteAction(currentTrigger + 1)) {
-				TriggerRemoveTrigger(currentTrigger);
+				TriggerRemoveTrigger(Lua, currentTrigger);
 			}
 		}
 		lua_settop(Lua, base + 1);
