@@ -444,9 +444,9 @@ static int CclAddTrigger(lua_State *l)
 
 	const int i = lua_rawlen(l, -1);
 	if (i / 2 < ActiveTriggers.size() && !ActiveTriggers[i / 2]) {
-		lua_pushnil(l);
+		lua_pushnumber(l, -1);
 		lua_rawseti(l, -2, i + 1);
-		lua_pushnil(l);
+		lua_pushnumber(l, -1);
 		lua_rawseti(l, -2, i + 2);
 	} else {
 		lua_pushvalue(l, 1);
@@ -596,7 +596,7 @@ void SaveTriggers(CFile &file)
 		if (i) {
 			file.printf(", ");
 		}
-		if (!lua_isnil(Lua, -1)) {
+		if (!lua_isnumber(Lua, -1)) {
 			file.printf("true");
 		} else {
 			file.printf("false");
