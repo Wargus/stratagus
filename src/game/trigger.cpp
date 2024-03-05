@@ -614,8 +614,6 @@ void SaveTriggers(CFile &file)
 	}
 
 	file.printf("\n");
-	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
-	file.printf("\n");
 }
 
 /**
