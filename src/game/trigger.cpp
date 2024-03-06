@@ -495,24 +495,26 @@ static int CclSetActiveTriggers(lua_State *l)
 /**
 **  Execute a trigger action
 **
+**  @param l       Lua state, top of stack is trigger table
+**
 **  @param script  Script to execute
 **
 **  @return        true if the trigger should be removed
 */
-static bool TriggerExecuteAction(int script)
+static bool TriggerExecuteAction(lua_State *l, int script)
 {
-	const int base = lua_gettop(Lua);
+	const int base = lua_gettop(l);
 	bool ret = false;
 
-	lua_rawgeti(Lua, -1, script + 1);
-	const int args = lua_rawlen(Lua, -1);
+	lua_rawgeti(l, -1, script + 1);
+	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(Lua, -1, j + 1);
+		lua_rawgeti(l, -1, j + 1);
 		LuaCall(0, 0);
-		ret = lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1);
-		lua_settop(Lua, base + 1);
+		ret = lua_gettop(l) > base + 1 && lua_toboolean(l, -1);
+		lua_settop(l, base + 1);
 	}
-	lua_pop(Lua, 1);
+	lua_pop(l, 1);
 
 	// If action returns false remove it
 	return !ret;
@@ -539,7 +541,7 @@ void TriggersEachCycle()
 			// If condition is true execute action
 			if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 				lua_settop(Lua, base + 1);
-				if (TriggerExecuteAction(trigger * 2 + 1)) {
+				if (TriggerExecuteAction(Lua, trigger * 2 + 1)) {
 					TriggerRemoveTrigger(Lua, trigger * 2);
 				}
 			}
