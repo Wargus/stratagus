@@ -392,6 +392,21 @@ void ActionStopTimer()
 }
 
 /**
+**  Remove a trigger
+**
+**  @param l     Lua state, top of stack is trigger table
+**
+**  @param trig  Index of trigger to be removed
+*/
+static void TriggerRemoveTrigger(lua_State *l, int trig)
+{
+	lua_pushnumber(l, -1);
+	lua_rawseti(l, -2, trig + 1);
+	lua_pushnumber(l, -1);
+	lua_rawseti(l, -2, trig + 2);
+}
+
+/**
 ** <b>Description</b>
 **
 **  Add a trigger. A trigger is a set of two functions. The first is run every
@@ -428,10 +443,10 @@ static int CclAddTrigger(lua_State *l)
 	}
 
 	const int i = lua_rawlen(l, -1);
-	if (!ActiveTriggers.empty() && !ActiveTriggers[i / 2]) {
-		lua_pushnil(l);
+	if (i / 2 < ActiveTriggers.size() && !ActiveTriggers[i / 2]) {
+		lua_pushnumber(l, -1);
 		lua_rawseti(l, -2, i + 1);
-		lua_pushnil(l);
+		lua_pushnumber(l, -1);
 		lua_rawseti(l, -2, i + 2);
 	} else {
 		lua_pushvalue(l, 1);
@@ -461,10 +476,20 @@ static int CclSetActiveTriggers(lua_State *l)
 {
 	const int args = lua_gettop(l);
 
+	lua_getglobal(l, "_triggers_");
+	const int triggerCount = lua_rawlen(l, -1) / 2;
+
 	ActiveTriggers.resize(args);
 	for (int j = 0; j < args; ++j) {
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
+		if (j < triggerCount && !ActiveTriggers[j])
+		{
+			TriggerRemoveTrigger(l, j * 2);
+		}
 	}
+
+	lua_pop(l, 1);
+
 	return 0;
 }
 
@@ -492,19 +517,6 @@ static bool TriggerExecuteAction(int script)
 
 	// If action returns false remove it
 	return !ret;
-}
-
-/**
-**  Remove a trigger
-**
-**  @param trig  Current trigger
-*/
-static void TriggerRemoveTrigger(int trig)
-{
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 1);
-	lua_pushnumber(Lua, -1);
-	lua_rawseti(Lua, -2, trig + 2);
 }
 
 /**
@@ -543,7 +555,7 @@ void TriggersEachCycle()
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 			lua_settop(Lua, base + 1);
 			if (TriggerExecuteAction(currentTrigger + 1)) {
-				TriggerRemoveTrigger(currentTrigger);
+				TriggerRemoveTrigger(Lua, currentTrigger);
 			}
 		}
 		lua_settop(Lua, base + 1);
@@ -584,7 +596,7 @@ void SaveTriggers(CFile &file)
 		if (i) {
 			file.printf(", ");
 		}
-		if (!lua_isnil(Lua, -1)) {
+		if (!lua_isnumber(Lua, -1)) {
 			file.printf("true");
 		} else {
 			file.printf("false");
@@ -603,8 +615,6 @@ void SaveTriggers(CFile &file)
 		}
 	}
 
-	file.printf("\n");
-	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
 }
 
