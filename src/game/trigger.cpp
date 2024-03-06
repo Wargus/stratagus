@@ -400,9 +400,9 @@ void ActionStopTimer()
 static void TriggerRemoveTrigger(lua_State *l, int trig)
 {
 	lua_pushnumber(l, -1);
-	lua_rawseti(l, -2, trig + 1);
+	lua_rawseti(l, -2, trig * 2 + 1);
 	lua_pushnumber(l, -1);
-	lua_rawseti(l, -2, trig + 2);
+	lua_rawseti(l, -2, trig * 2 + 2);
 }
 
 /**
@@ -483,7 +483,7 @@ static int CclSetActiveTriggers(lua_State *l)
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 		if (j < triggerCount && !ActiveTriggers[j])
 		{
-			TriggerRemoveTrigger(l, j * 2);
+			TriggerRemoveTrigger(l, j);
 		}
 	}
 
@@ -542,7 +542,7 @@ void TriggersEachCycle()
 			if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
 				lua_settop(Lua, base + 1);
 				if (TriggerExecuteAction(Lua, trigger * 2 + 1)) {
-					TriggerRemoveTrigger(Lua, trigger * 2);
+					TriggerRemoveTrigger(Lua, trigger);
 				}
 			}
 		}
