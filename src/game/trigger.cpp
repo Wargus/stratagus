@@ -54,7 +54,6 @@
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
-static int Trigger;
 static std::vector<bool> ActiveTriggers;
 
 /// Some data accessible for script during the game.
@@ -464,9 +463,9 @@ static int CclAddTrigger(lua_State *l)
 /**
 **  Set the trigger values
 */
-void SetTrigger(int trigger)
+void SetTrigger(int /*trigger*/)
 {
-	Trigger = trigger;
+	// legacy function
 }
 
 /**
@@ -527,35 +526,22 @@ void TriggersEachCycle()
 	const int base = lua_gettop(Lua);
 
 	lua_getglobal(Lua, "_triggers_");
-	int triggers = lua_rawlen(Lua, -1);
+	const int triggerSize = lua_rawlen(Lua, -1) / 2;
 
-	if (Trigger >= triggers) {
-		Trigger = 0;
-	}
-
-	if (GamePaused) {
-		lua_pop(Lua, 1);
-		return;
-	}
-
-	// Skip to the next trigger
-	while (Trigger < triggers) {
-		lua_rawgeti(Lua, -1, Trigger + 1);
-		if (!lua_isnumber(Lua, -1)) {
+	for (int trigger = 0; trigger < triggerSize; ++trigger) {
+		if (GamePaused) {
 			break;
 		}
-		lua_pop(Lua, 1);
-		Trigger += 2;
-	}
-	if (Trigger < triggers) {
-		int currentTrigger = Trigger;
-		Trigger += 2;
-		LuaCall(0, 0);
-		// If condition is true execute action
-		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			lua_settop(Lua, base + 1);
-			if (TriggerExecuteAction(currentTrigger + 1)) {
-				TriggerRemoveTrigger(Lua, currentTrigger);
+
+		lua_rawgeti(Lua, -1, trigger * 2 + 1);
+		if (!lua_isnumber(Lua, -1)) {
+			LuaCall(0, 0);
+			// If condition is true execute action
+			if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
+				lua_settop(Lua, base + 1);
+				if (TriggerExecuteAction(trigger * 2 + 1)) {
+					TriggerRemoveTrigger(Lua, trigger * 2);
+				}
 			}
 		}
 		lua_settop(Lua, base + 1);
@@ -605,8 +591,6 @@ void SaveTriggers(CFile &file)
 	}
 	file.printf(")\n");
 
-	file.printf("SetTrigger(%d)\n", Trigger);
-
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",
 					GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
@@ -645,8 +629,6 @@ void CleanTriggers()
 
 	lua_pushnil(Lua);
 	lua_setglobal(Lua, "Triggers");
-
-	Trigger = 0;
 
 	ActiveTriggers.clear();
 
