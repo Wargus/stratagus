@@ -533,6 +533,7 @@ set(stratagus_tests_SRCS
 	tests/main.cpp
 	tests/stratagus/test_depend.cpp
 	tests/stratagus/test_luacallback.cpp
+	tests/stratagus/test_trigger.cpp
 	tests/stratagus/test_util.cpp
 	tests/network/test_net_lowlevel.cpp
 	tests/network/test_netconnect.cpp

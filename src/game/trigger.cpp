@@ -54,7 +54,6 @@
 ----------------------------------------------------------------------------*/
 
 CTimer GameTimer;               /// The game timer
-static int Trigger;
 static std::vector<bool> ActiveTriggers;
 
 /// Some data accessible for script during the game.
@@ -401,9 +400,9 @@ void ActionStopTimer()
 static void TriggerRemoveTrigger(lua_State *l, int trig)
 {
 	lua_pushnumber(l, -1);
-	lua_rawseti(l, -2, trig + 1);
+	lua_rawseti(l, -2, trig * 2 + 1);
 	lua_pushnumber(l, -1);
-	lua_rawseti(l, -2, trig + 2);
+	lua_rawseti(l, -2, trig * 2 + 2);
 }
 
 /**
@@ -464,9 +463,9 @@ static int CclAddTrigger(lua_State *l)
 /**
 **  Set the trigger values
 */
-void SetTrigger(int trigger)
+void SetTrigger(int /*trigger*/)
 {
-	Trigger = trigger;
+	// legacy function
 }
 
 /**
@@ -484,7 +483,7 @@ static int CclSetActiveTriggers(lua_State *l)
 		ActiveTriggers[j] = LuaToBoolean(l, j + 1);
 		if (j < triggerCount && !ActiveTriggers[j])
 		{
-			TriggerRemoveTrigger(l, j * 2);
+			TriggerRemoveTrigger(l, j);
 		}
 	}
 
@@ -496,24 +495,26 @@ static int CclSetActiveTriggers(lua_State *l)
 /**
 **  Execute a trigger action
 **
-**  @param script  Script to execute
+**  @param l       Lua state, top of stack is trigger table
+**
+**  @param trig    Index of trigger to execute action from
 **
 **  @return        true if the trigger should be removed
 */
-static bool TriggerExecuteAction(int script)
+static bool TriggerExecuteAction(lua_State *l, int trig)
 {
-	const int base = lua_gettop(Lua);
+	const int base = lua_gettop(l);
 	bool ret = false;
 
-	lua_rawgeti(Lua, -1, script + 1);
-	const int args = lua_rawlen(Lua, -1);
+	lua_rawgeti(l, -1, trig * 2 + 2);
+	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		lua_rawgeti(Lua, -1, j + 1);
+		lua_rawgeti(l, -1, j + 1);
 		LuaCall(0, 0);
-		ret = lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1);
-		lua_settop(Lua, base + 1);
+		ret = lua_gettop(l) > base + 1 && lua_toboolean(l, -1);
+		lua_settop(l, base + 1);
 	}
-	lua_pop(Lua, 1);
+	lua_pop(l, 1);
 
 	// If action returns false remove it
 	return !ret;
@@ -527,35 +528,22 @@ void TriggersEachCycle()
 	const int base = lua_gettop(Lua);
 
 	lua_getglobal(Lua, "_triggers_");
-	int triggers = lua_rawlen(Lua, -1);
+	const int triggerSize = lua_rawlen(Lua, -1) / 2;
 
-	if (Trigger >= triggers) {
-		Trigger = 0;
-	}
-
-	if (GamePaused) {
-		lua_pop(Lua, 1);
-		return;
-	}
-
-	// Skip to the next trigger
-	while (Trigger < triggers) {
-		lua_rawgeti(Lua, -1, Trigger + 1);
-		if (!lua_isnumber(Lua, -1)) {
+	for (int trigger = 0; trigger < triggerSize; ++trigger) {
+		if (GamePaused) {
 			break;
 		}
-		lua_pop(Lua, 1);
-		Trigger += 2;
-	}
-	if (Trigger < triggers) {
-		int currentTrigger = Trigger;
-		Trigger += 2;
-		LuaCall(0, 0);
-		// If condition is true execute action
-		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
-			lua_settop(Lua, base + 1);
-			if (TriggerExecuteAction(currentTrigger + 1)) {
-				TriggerRemoveTrigger(Lua, currentTrigger);
+
+		lua_rawgeti(Lua, -1, trigger * 2 + 1);
+		if (!lua_isnumber(Lua, -1)) {
+			LuaCall(0, 0);
+			// If condition is true execute action
+			if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
+				lua_settop(Lua, base + 1);
+				if (TriggerExecuteAction(Lua, trigger)) {
+					TriggerRemoveTrigger(Lua, trigger);
+				}
 			}
 		}
 		lua_settop(Lua, base + 1);
@@ -605,8 +593,6 @@ void SaveTriggers(CFile &file)
 	}
 	file.printf(")\n");
 
-	file.printf("SetTrigger(%d)\n", Trigger);
-
 	if (GameTimer.Init) {
 		file.printf("ActionSetTimer(%ld, %s)\n",
 					GameTimer.Cycles, (GameTimer.Increasing ? "true" : "false"));
@@ -645,8 +631,6 @@ void CleanTriggers()
 
 	lua_pushnil(Lua);
 	lua_setglobal(Lua, "Triggers");
-
-	Trigger = 0;
 
 	ActiveTriggers.clear();
 
