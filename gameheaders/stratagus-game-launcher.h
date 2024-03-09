@@ -190,16 +190,15 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 
 #include "stratagus-gameutils.h"
 
+#include <algorithm>
+
 const char *argv0;
 
 static void SetUserDataPath(char *data_path)
 {
 #if defined(WIN32)
-	char marker[MAX_PATH] = {'\0'};
-	if (PathCombineA(marker, data_path, "portable-install")) {
-		if (PathFileExistsA(marker)) {
-			return;
-		}
+	if (fs::exists(fs::path(data_path) / "portable-install")) {
+		return;
 	}
 	SHGetFolderPathA(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, data_path);
 	if (!data_path[0]) {
@@ -228,7 +227,7 @@ static void SetUserDataPath(char *data_path)
 		if (dataDir) {
 			strcpy(data_path, dataDir);
 # ifdef USE_MAC
-			strcat(data_path, "/Library/Application\ Support/Stratagus/");
+			strcat(data_path, "/Library/Application Support/Stratagus/");
 # else
 			strcat(data_path, "/.local/share/stratagus/");
 # endif
@@ -238,14 +237,10 @@ static void SetUserDataPath(char *data_path)
 	strcat(data_path, "data." GAME_NAME);
 }
 
-int check_version(char *tool_path, char *data_path)
+static int check_version(char *tool_path, const fs::path &data_path)
 {
-	char buf[4096] = {'\0'};
-	sprintf(buf, "%s/extracted", data_path);
-	FILE *f = fopen(buf, "r");
 	char dataversion[20] = {'\0'};
-	char toolversion[20] = {'\0'};
-	if (f) {
+	if (FILE *f = fopen((data_path / "extracted").string().c_str(), "r")) {
 		fgets(dataversion, 20, f);
 		fclose(f);
 	} else {
@@ -255,15 +250,15 @@ int check_version(char *tool_path, char *data_path)
 		return 1; // No file means we don't care
 #endif
 	}
+	char toolversion[20] = {'\0'};
+	char buf[4096] = {'\0'};
+	sprintf(buf, "%s -V", tool_path); // tool_path is already quoted
 #ifndef WIN32
-	sprintf(buf, "%s -V", tool_path);
-	FILE *pipe = popen(buf, "r");
-	if (f) {
+	if (FILE *pipe = popen(buf, "r")) {
 		fgets(toolversion, 20, pipe);
 		pclose(pipe);
 	}
 #else
-	sprintf(buf, "%s -V", tool_path); // tool_path is already quoted
 	HANDLE g_hChildStd_OUT_Rd = nullptr;
 	HANDLE g_hChildStd_OUT_Wr = nullptr;
 	DWORD nbByteRead;
@@ -306,25 +301,16 @@ static void ExtractData(char *extractor_tool,
                         int force = 0,
                         char *datafileCstr = nullptr)
 {
-	int canJustReextract;
+	bool canJustReextract = false;
 #ifdef EXTRACTION_FILES
 	if (force == 0) {
-		canJustReextract = 1;
-		char *extraction_files[] = {EXTRACTION_FILES, nullptr};
-		char *efile = extraction_files[0];
-		for (int i = 0; efile != nullptr; i++) {
-			fs::path efile_path = fs::path(destination) / efile;
-			if (!fs::exists(efile_path)) {
-				// file to extract not found
-				canJustReextract = 0;
-			}
-			efile = extraction_files[i + 1];
-		}
-	} else {
-		canJustReextract = 0;
+		const char *extraction_files[] = {EXTRACTION_FILES};
+
+		canJustReextract =
+			std::all_of(std::begin(extraction_files),
+		                std::end(extraction_files),
+		                [&](const auto *file) { return fs::exists(fs::path(destination) / file); });
 	}
-#else
-	canJustReextract = 0;
 #endif
 	if (canJustReextract) {
 		tinyfd_messageBox("",
@@ -376,43 +362,25 @@ static void ExtractData(char *extractor_tool,
 #endif
 			if (runCommand(file, argv) == 0) {
 				// innoextract exists and this exe file is an innosetup file
-				bool success = false;
-				fs::path tmpp = fs::temp_directory_path() / GAME;
+				const fs::path tmpp = fs::temp_directory_path() / GAME;
 				fs::create_directories(tmpp);
+				const fs::path curdir = fs::current_path();
+				fs::current_path(tmpp);
 #ifdef WIN32
-				wchar_t *curdir = _wgetcwd(nullptr, 0);
+				argv[0] = L"-m";
 #else
-				char *curdir = getcwd(nullptr, 0);
+				argv[0] = "-m";
+				argv[1] = "-d";
+				argv[2] = (char *) tmpp.string().c_str();
+				argv[3] = (char *) datafile.c_str();
 #endif
-				if (curdir != nullptr) {
-#ifdef WIN32
-					if (_wchdir(tmpp.wstring().c_str()) == 0) {
-#else
-					if (chdir(tmpp.string().c_str()) == 0) {
-#endif
-#ifdef WIN32
-						argv[0] = L"-m";
-#else
-						argv[0] = "-m";
-						argv[1] = "-d";
-						argv[2] = (char *) tmpp.string().c_str();
-						argv[3] = (char *) datafile.c_str();
-#endif
-						success = runCommand(file, argv) == 0;
-#ifdef WIN32
-						_wchdir(curdir);
-#else
-						chdir(curdir);
-#endif
-					}
-					free(curdir);
-				}
-				if (!success) {
+				if (runCommand(file, argv) != 0) {
 					error("Problem with installer",
 					      "You selected an innosetup installer, and we could not extract it. "
 					      "Please extract it manually and point the extraction tool there.");
 				} else {
 					srcfolder = tmpp;
+					fs::current_path(curdir);
 				}
 			} else {
 				// we cannot test if this is an innoextract installer, assume not but maybe warn
@@ -441,17 +409,15 @@ static void ExtractData(char *extractor_tool,
 	}
 
 #ifdef WIN32
-	char *sourcepath = _strdup(scripts_path);
-	if (sourcepath[0] == '"') {
-		// if scripts_path is quoted, remove the quotes, i.e.,
-		// copy all but the first until all but the last char.
-		// sourcepath is already large enough because it used to contain the
-		// entire scripts_path
-		strncpy(sourcepath, scripts_path + 1, strlen(scripts_path) - 2);
-		sourcepath[strlen(scripts_path) - 2] = '\0';
+	fs::path sourcepath;
+	if (scripts_path[0] == '"') {
+		// if scripts_path is quoted, remove the quotes
+		sourcepath = std::string(scripts_path).substr(1, strlen(scripts_path) - 2);
+	} else {
+		sourcepath = scripts_path;
 	}
 #else
-	char *sourcepath;
+	fs::path sourcepath;
 	if (scripts_path[0] != '/') {
 		fs::path normalized_path(argv0);
 		fs::path relative_path(scripts_path);
@@ -462,9 +428,9 @@ static void ExtractData(char *extractor_tool,
 				normalized_path = normalized_path / *it;
 			}
 		}
-		sourcepath = strdup(normalized_path.string().c_str());
+		sourcepath = normalized_path;
 	} else {
-		sourcepath = strdup(scripts_path);
+		sourcepath = scripts_path;
 	}
 #endif
 
@@ -472,26 +438,25 @@ static void ExtractData(char *extractor_tool,
 
 	if (!fs::exists(sourcepath)) {
 		// deployment time path not found, try compile time path
-		strcpy(sourcepath, fs::path(SRC_PATH()).parent_path().string().c_str());
+		sourcepath = fs::path(SRC_PATH()).parent_path();
 	}
 
 #ifndef WIN32
 	if (!fs::exists(sourcepath)) {
 		// deployment time path might be same as extractor
-		strcpy(sourcepath, fs::path(extractor_tool).parent_path().string().c_str());
+		sourcepath = fs::path(extractor_tool).parent_path();
 	}
 #endif
 
 	if (!fs::exists(sourcepath)) {
 		// scripts not found, abort!
 		std::string msg("There was an error copying the data, could not discover scripts path: ");
-		msg += sourcepath;
+		msg += sourcepath.u8string();
 		tinyfd_messageBox("Error", msg.c_str(), "ok", "error", 1);
 		return;
 	}
 
 	if (force != 2) {
-		fs::path contrib_src_path;
 		fs::path contrib_dest_path(destination);
 		int i = 0;
 		int optional = 0;
@@ -501,13 +466,7 @@ static void ExtractData(char *extractor_tool,
 				i += 1;
 				optional = 1;
 			} else {
-				if (contrib_directories[i][0] != '/') {
-					// absolute Unix paths are not appended to the source path
-					contrib_src_path = fs::path(sourcepath);
-					contrib_src_path /= contrib_directories[i];
-				} else {
-					contrib_src_path = fs::path(contrib_directories[i]);
-				}
+				fs::path contrib_src_path = sourcepath / contrib_directories[i];
 
 				if (!fs::exists(contrib_src_path)) {
 					// contrib dir not found, abort!
@@ -530,10 +489,9 @@ static void ExtractData(char *extractor_tool,
 
 	char cmdbuf[4096] = {'\0'};
 #ifdef WIN32
-	std::wstring file;
 	std::vector<std::wstring> args;
+	std::wstring file = fs::path(extractor_tool).wstring();
 
-	file = fs::path(extractor_tool).wstring();
 	for (int i = 0;; i++) {
 		const char *earg = extractor_args[i];
 		if (earg == nullptr) {
@@ -556,7 +514,7 @@ static void ExtractData(char *extractor_tool,
 	       "osascript -e \"tell application \\\"Terminal\\\"\n"
 	       "    set w to do script \\\"");
 # else
-	int hasXterm = 0;
+	bool hasXterm = false;
 	if (!isatty(1)) {
 		hasXterm = detectPresence("xterm");
 		if (hasXterm) {
@@ -656,7 +614,6 @@ int main(int argc, char *argv[])
 	char scripts_path[BUFF_SIZE];
 	char stratagus_bin[BUFF_SIZE];
 	char title_path[BUFF_SIZE];
-	char extractor_path[BUFF_SIZE] = {'\0'};
 
 	// set global variable to this executable
 #ifndef WIN32
@@ -677,6 +634,7 @@ int main(int argc, char *argv[])
 	argv0 = argv[0];
 
 	// Try the extractor from the same dir as we are
+	char extractor_path[BUFF_SIZE] = {'\0'};
 	if (strchr(argv0, SLASH[0])) {
 		strcpy(extractor_path, argv0);
 		parentdir(extractor_path);
@@ -705,27 +663,21 @@ int main(int argc, char *argv[])
 		// Use extractor from PATH
 		strcpy(extractor_path, EXTRACTOR_TOOL);
 		if (!detectPresence(extractor_path)) {
-			char msg[BUFF_SIZE * 2] = {'\0'};
-			strcpy(msg, EXTRACTOR_NOT_FOUND);
-			strcat(msg, " (expected at ");
-			strcat(msg, extractor_path);
-			strcat(msg, ")");
-			error(TITLE, msg);
+			error(TITLE,
+			      (std::string(EXTRACTOR_NOT_FOUND) + " (expected at " + extractor_path + ")")
+			          .c_str());
 		}
 	}
 
 #ifdef WIN32
-	char executable_path[BUFF_SIZE];
-	memset(executable_path, 0, sizeof(executable_path));
+	char executable_path[BUFF_SIZE]{};
 	GetModuleFileNameA(nullptr, executable_path, sizeof(executable_path) - 1);
 
-	char executable_drive[_MAX_DRIVE];
-	char executable_dir[_MAX_DIR];
-	memset(executable_drive, 0, sizeof(executable_drive));
-	memset(executable_dir, 0, sizeof(executable_dir));
+	char executable_drive[_MAX_DRIVE]{};
+	char executable_dir[_MAX_DIR]{};
 	_splitpath(executable_path, executable_drive, executable_dir, nullptr, nullptr);
 
-	size_t data_path_size = sizeof(data_path);
+	const size_t data_path_size = sizeof(data_path);
 	memset(data_path, 0, data_path_size);
 
 	if (executable_path[0] && executable_drive[0] && executable_dir[0]) {
@@ -736,7 +688,7 @@ int main(int argc, char *argv[])
 	PathRemoveBackslashA(data_path);
 	sprintf(scripts_path, "\"%s\"", data_path);
 
-	char stratagus_path[BUFF_SIZE];
+	char stratagus_path[BUFF_SIZE]{};
 
 	// Try to use stratagus.exe from data (install) directory first
 	sprintf(stratagus_bin, "%s\\stratagus.exe", data_path);
@@ -746,7 +698,6 @@ int main(int argc, char *argv[])
 		    && !SearchPathA(nullptr, "stratagus-dbg", ".exe", MAX_PATH, stratagus_bin, nullptr)) {
 			// If no local or PATH stratagus.exe is present, look for a globally installed version
 			DWORD stratagus_path_size = sizeof(stratagus_path);
-			memset(stratagus_path, 0, stratagus_path_size);
 			HKEY key;
 
 			if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, REGKEY, 0, KEY_QUERY_VALUE, &key)
@@ -759,24 +710,20 @@ int main(int argc, char *argv[])
 				                     &stratagus_path_size)
 				    == ERROR_SUCCESS) {
 					if (stratagus_path_size == 0 || strlen(stratagus_path) == 0) {
-						char msg[BUFF_SIZE * 2] = {'\0'};
-						strcat(msg, STRATAGUS_NOT_FOUND);
-						strcat(msg, " (expected globally installed or in ");
-						strcat(msg, stratagus_bin);
-						strcat(msg, ")");
-						error(TITLE, msg);
+						error(TITLE,
+						      (std::string(STRATAGUS_NOT_FOUND)
+						       + " (expected globally installed or in " + stratagus_bin + ")")
+						          .c_str());
 					}
 				}
 				RegCloseKey(key);
 			}
 
 			if (_chdir(stratagus_path) != 0) {
-				char msg[BUFF_SIZE * 2] = {'\0'};
-				strcat(msg, STRATAGUS_NOT_FOUND);
-				strcat(msg, " (registry key found, but directory ");
-				strcat(msg, stratagus_path);
-				strcat(msg, " cannot be opened)");
-				error(TITLE, msg);
+				error(TITLE,
+				      (std::string(STRATAGUS_NOT_FOUND) + " (registry key found, but directory "
+				       + stratagus_path + " cannot be opened)")
+				          .c_str());
 			}
 			sprintf(stratagus_bin, "%s\\stratagus.exe", stratagus_path);
 		}
@@ -829,12 +776,9 @@ int main(int argc, char *argv[])
 		PathRemoveFileSpecA(stratagus_bin);
 		strcat(extractor_path, "\\stratagus.exe");
 		if (stat(stratagus_bin, &st) != 0) {
-			char msg[BUFF_SIZE * 2] = {'\0'};
-			strcat(msg, STRATAGUS_NOT_FOUND);
-			strcat(msg, " (expected in ");
-			strcat(msg, stratagus_bin);
-			strcat(msg, ")");
-			error(TITLE, msg);
+			error(TITLE,
+			      (std::string(STRATAGUS_NOT_FOUND) + " (expected in " + stratagus_bin + ")")
+			          .c_str());
 		}
 #else
 		if (!detectPresence(stratagus_bin)) {
@@ -846,12 +790,9 @@ int main(int argc, char *argv[])
 				strcat(stratagus_bin, "./stratagus");
 			}
 			if (stat(stratagus_bin, &st) != 0) {
-				char msg[BUFF_SIZE * 2] = {'\0'};
-				strcat(msg, STRATAGUS_NOT_FOUND);
-				strcat(msg, " (expected in ");
-				strcat(msg, stratagus_bin);
-				strcat(msg, ")");
-				error(TITLE, msg);
+				error(TITLE,
+				      (std::string(STRATAGUS_NOT_FOUND) + " (expected in " + stratagus_bin + ")")
+				          .c_str());
 			}
 		}
 #endif
@@ -877,14 +818,14 @@ int main(int argc, char *argv[])
 
 #ifdef WIN32
 	int data_path_len = strlen(data_path);
-	_chdir(data_path);
+	fs::current_path(data_path);
 
 	for (int i = data_path_len - 1; i >= 0; --i) {
 		data_path[i + 1] = data_path[i];
 	}
 	data_path[0] = '"';
 	data_path[data_path_len + 1] = '"';
-	data_path[data_path_len + 2] = 0;
+	data_path[data_path_len + 2] = '\0';
 #endif
 
 #ifdef _MSC_VER
@@ -914,7 +855,7 @@ int main(int argc, char *argv[])
 	}
 	stratagus_argv[argc + 2] = nullptr;
 
-	// Needed to reduce CPU load while idle threads are wating for havn't finished yet ones
+	// Needed to reduce CPU load while idle threads are waiting for not finished yet ones
 	extern char **environ;
 	int i = 0;
 	while (environ[i]) {
@@ -943,18 +884,14 @@ int main(int argc, char *argv[])
 	}
 #endif
 	if (ret == ENOENT) {
-		char msg[BUFF_SIZE * 8];
-		strcpy(msg, "Execution failed for: ");
-		strcat(msg, stratagus_bin);
-		strcat(msg, " ");
+		std::string msg = "Execution failed for: ";
+		msg += stratagus_bin;
+		msg += " ";
 		for (int i = 1; stratagus_argv[i] != nullptr; i++) {
-			if (strlen(msg) + strlen(stratagus_argv[i]) > BUFF_SIZE * 8) {
-				break;
-			}
-			strcat(msg, stratagus_argv[i]);
-			strcat(msg, " ");
+			msg += stratagus_argv[i];
+			msg += " ";
 		}
-		error(TITLE, msg);
+		error(TITLE, msg.c_str());
 	} else if (ret != 0) {
 		char message[8096 * 2] = {'\0'};
 		snprintf(
@@ -985,13 +922,8 @@ int main(int argc, char *argv[])
 		    "stderr.txt, and an extraction.log in the folder.\n");
 #endif
 		error(TITLE, message);
-#ifdef WIN32
-		_unlink(title_path);
-		_unlink(data_path);
-#else
-		unlink(title_path);
-		unlink(data_path);
-#endif
+		fs::remove(title_path);
+		fs::remove(data_path);
 	}
 	exit(ret);
 }

@@ -29,10 +29,6 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #ifndef STRATAGUS_GAMEUTILS_H
 #define STRATAGUS_GAMEUTILS_H
 
-void error(const char *title, const char *text);
-void mkdir_p(const char *path);
-void copy_dir(const char *source_folder, const char *target_folder);
-
 #if __APPLE__
 # define USE_MAC
 #endif
@@ -119,22 +115,18 @@ error "Missing the <filesystem> header."
 # define BUFF_SIZE 4096
 #endif
 
-void error(const char *title, const char *text)
+[[noreturn]] inline void error(const char *title, const char *text)
 {
 	tinyfd_messageBox(title, text, "ok", "error", 1);
 	exit(-1);
 }
 
-void mkdir_p(const char *path)
-{
-	fs::create_directories(path);
-}
-void mkdir_p(const wchar_t *path)
+inline void mkdir_p(const fs::path& path)
 {
 	fs::create_directories(path);
 }
 
-void copy_dir(fs::path source_folder, fs::path target_folder)
+inline void copy_dir(fs::path source_folder, fs::path target_folder)
 {
 	if (fs::exists(target_folder)) {
 		if (fs::equivalent(source_folder, target_folder)) {
