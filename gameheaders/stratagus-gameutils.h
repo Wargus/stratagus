@@ -29,82 +29,79 @@ stratagus-game-launcher.h - Stratagus Game Launcher
 #ifndef STRATAGUS_GAMEUTILS_H
 #define STRATAGUS_GAMEUTILS_H
 
-void error(const char *title, const char *text);
-void mkdir_p(const char *path);
-void copy_dir(const char *source_folder, const char *target_folder);
-
 #if __APPLE__
-#define USE_MAC
+# define USE_MAC
 #endif
 
-#if ( defined (_MSC_VER) || defined (_WIN32) || defined (_WIN64) ) && ! defined (WIN32)
-#define WIN32 1
+#if (defined(_MSC_VER) || defined(_WIN32) || defined(_WIN64)) && !defined(WIN32)
+# define WIN32 1
 #endif
 
 #ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
+# define _CRT_SECURE_NO_DEPRECATE
 #endif
 #ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
+# define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #ifdef WIN32
 
 // set everything to winxp sp2 compatiblity
-#define NTDDI_VERSION 0x05010200
-#define _WIN32_WINNT 0x0501
-#define WINVER 0x0501
+# define NTDDI_VERSION 0x05010200
+# define _WIN32_WINNT 0x0501
+# define WINVER 0x0501
 
-#ifndef PATH_MAX
-#define PATH_MAX MAX_PATH
-#endif
-#include <Shlwapi.h>
-#include <Shlobj.h>
-#pragma comment(lib, "comdlg32.lib")
-#pragma comment(lib, "ole32.lib")
-#pragma comment(lib, "Shlwapi.lib")
-#include <direct.h>
-#define mkdir(f, m) _mkdir(f)
+# ifndef PATH_MAX
+#  define PATH_MAX MAX_PATH
+# endif
+# include <Shlobj.h>
+# include <Shlwapi.h>
+# pragma comment(lib, "comdlg32.lib")
+# pragma comment(lib, "ole32.lib")
+# pragma comment(lib, "Shlwapi.lib")
+# include <direct.h>
+# define mkdir(f, m) _mkdir(f)
 // PathRemoveFileSpec on a drive (e.g. when extracting from CD) will leave the trailing \... remove that
-#define parentdir(x) PathRemoveFileSpecA(x); if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
+# define parentdir(x) \
+	 PathRemoveFileSpecA(x); \
+	 if (x[strlen(x) - 1] == '\\') x[strlen(x) - 1] = '\0'
 #else
-#if defined(USE_MAC)
-#define parentdir(x) strcpy(x, dirname(x))
-#else
-#define parentdir(x) dirname(x)
-#endif
+# if defined(USE_MAC)
+#  define parentdir(x) strcpy(x, dirname(x))
+# else
+#  define parentdir(x) dirname(x)
+# endif
 #endif
 
 #ifdef WIN32
-#include <windows.h>
-#include <wincon.h>
-#include <process.h>
-#define QUOTE "\""
+# include <process.h>
+# include <wincon.h>
+# include <windows.h>
+# define QUOTE "\""
 #else
-#include <ftw.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <sys/wait.h>
-#define QUOTE "'"
+# include <ftw.h>
+# include <libgen.h>
+# include <sys/wait.h>
+# include <unistd.h>
+# define QUOTE "'"
 #endif
 
 #include <errno.h>
+#include <iostream>
+#include <istream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#include <string>
 #include <vector>
-#include <iostream>
-#include <sstream>
-#include <istream>
 #if __has_include(<filesystem>)
-#include <filesystem>
+# include <filesystem>
 namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
+# include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #else
 error "Missing the <filesystem> header."
@@ -113,27 +110,23 @@ error "Missing the <filesystem> header."
 #include "stratagus-tinyfiledialogs.h"
 
 #ifdef WIN32
-#define BUFF_SIZE MAX_PATH
+# define BUFF_SIZE MAX_PATH
 #else
-#define BUFF_SIZE 4096
+# define BUFF_SIZE 4096
 #endif
 
-void error(const char *title, const char *text)
+[[noreturn]] inline void error(const char *title, const char *text)
 {
 	tinyfd_messageBox(title, text, "ok", "error", 1);
 	exit(-1);
 }
 
-void mkdir_p(const char *path)
+inline void mkdir_p(const fs::path& path)
 {
 	fs::create_directories(path);
 }
-void mkdir_p(const wchar_t *path)
-{
-    fs::create_directories(path);
-}
 
-void copy_dir(fs::path source_folder, fs::path target_folder)
+inline void copy_dir(fs::path source_folder, fs::path target_folder)
 {
 	if (fs::exists(target_folder)) {
 		if (fs::equivalent(source_folder, target_folder)) {
@@ -146,52 +139,54 @@ void copy_dir(fs::path source_folder, fs::path target_folder)
 		fs::create_directories(target_folder.parent_path());
 	}
 	// now copy the new folder in its place
-	fs::copy(source_folder, target_folder, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
+	fs::copy(source_folder,
+	         target_folder,
+	         fs::copy_options::recursive | fs::copy_options::overwrite_existing);
 }
 
 #ifdef WIN32
 char *GetExtractionLogPath(const char *game_name, char *data_path)
 {
-    static char *marker = (char *)calloc(MAX_PATH, sizeof(char));
-    if (marker[0] != '\0') {
-        return marker;
-    }
-    char logname[MAX_PATH];
-    strcpy(logname, game_name);
-    strcat(logname, "-extraction.log");
-    if (PathCombineA(marker, data_path, "portable-install")) {
-        if (PathFileExistsA(marker)) {
-            PathCombineA(marker, data_path, logname);
-            return marker;
-        }
-    }
-    SHGetFolderPathA(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
-    PathAppendA(marker, "Stratagus");
-    mkdir_p(marker);
-    PathAppendA(marker, logname);
-    return marker;
+	static char *marker = (char *) calloc(MAX_PATH, sizeof(char));
+	if (marker[0] != '\0') {
+		return marker;
+	}
+	char logname[MAX_PATH];
+	strcpy(logname, game_name);
+	strcat(logname, "-extraction.log");
+	if (PathCombineA(marker, data_path, "portable-install")) {
+		if (PathFileExistsA(marker)) {
+			PathCombineA(marker, data_path, logname);
+			return marker;
+		}
+	}
+	SHGetFolderPathA(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
+	PathAppendA(marker, "Stratagus");
+	mkdir_p(marker);
+	PathAppendA(marker, logname);
+	return marker;
 }
 
 wchar_t *GetExtractionLogPath(const wchar_t *game_name, const wchar_t *data_path)
 {
-    static wchar_t *marker = (wchar_t *)calloc(MAX_PATH, sizeof(wchar_t));
-    if (marker[0] != '\0') {
-        return marker;
-    }
-    wchar_t logname[MAX_PATH];
-    wcscpy(logname, game_name);
-    wcscat(logname, L"-extraction.log");
-    if (PathCombineW(marker, data_path, L"portable-install")) {
-        if (PathFileExistsW(marker)) {
-            PathCombineW(marker, data_path, logname);
-            return marker;
-        }
-    }
-    SHGetFolderPathW(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
-    PathAppendW(marker, L"Stratagus");
-    mkdir_p(marker);
-    PathAppendW(marker, logname);
-    return marker;
+	static wchar_t *marker = (wchar_t *) calloc(MAX_PATH, sizeof(wchar_t));
+	if (marker[0] != '\0') {
+		return marker;
+	}
+	wchar_t logname[MAX_PATH];
+	wcscpy(logname, game_name);
+	wcscat(logname, L"-extraction.log");
+	if (PathCombineW(marker, data_path, L"portable-install")) {
+		if (PathFileExistsW(marker)) {
+			PathCombineW(marker, data_path, logname);
+			return marker;
+		}
+	}
+	SHGetFolderPathW(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, 0, marker);
+	PathAppendW(marker, L"Stratagus");
+	mkdir_p(marker);
+	PathAppendW(marker, logname);
+	return marker;
 }
 #endif
 
@@ -227,52 +222,56 @@ Environment:
 --*/
 void ArgvQuote(const std::wstring &Argument, std::wstring &CommandLine, bool Force)
 {
-    //
-    // Unless we're told otherwise, don't quote unless we actually
-    // need to do so --- hopefully avoid problems if programs won't
-    // parse quotes properly
-    //
-    if (Force == false && Argument.empty() == false && Argument.find_first_of(L" \t\n\v\"") == Argument.npos) {
-        CommandLine.append(Argument);
-    } else {
-        CommandLine.push_back(L'"');
+	//
+	// Unless we're told otherwise, don't quote unless we actually
+	// need to do so --- hopefully avoid problems if programs won't
+	// parse quotes properly
+	//
+	if (Force == false && Argument.empty() == false
+	    && Argument.find_first_of(L" \t\n\v\"") == Argument.npos) {
+		CommandLine.append(Argument);
+	} else {
+		CommandLine.push_back(L'"');
 
-        for (auto It = Argument.begin(); ; ++It) {
-            unsigned NumberBackslashes = 0;
+		for (auto It = Argument.begin();; ++It) {
+			unsigned NumberBackslashes = 0;
 
-            while (It != Argument.end() && *It == L'\\') {
-                ++It;
-                ++NumberBackslashes;
-            }
+			while (It != Argument.end() && *It == L'\\') {
+				++It;
+				++NumberBackslashes;
+			}
 
-            if (It == Argument.end()) {
-                //
-                // Escape all backslashes, but let the terminating
-                // double quotation mark we add below be interpreted
-                // as a metacharacter.
-                //
-                CommandLine.append(NumberBackslashes * 2, L'\\');
-                break;
-            } else if (*It == L'"') {
-                //
-                // Escape all backslashes and the following
-                // double quotation mark.
-                //
-                CommandLine.append(NumberBackslashes * 2 + 1, L'\\');
-                CommandLine.push_back(*It);
-            } else {
-                //
-                // Backslashes aren't special here.
-                //
-                CommandLine.append(NumberBackslashes, L'\\');
-                CommandLine.push_back(*It);
-            }
-        }
-        CommandLine.push_back(L'"');
-    }
+			if (It == Argument.end()) {
+				//
+				// Escape all backslashes, but let the terminating
+				// double quotation mark we add below be interpreted
+				// as a metacharacter.
+				//
+				CommandLine.append(NumberBackslashes * 2, L'\\');
+				break;
+			} else if (*It == L'"') {
+				//
+				// Escape all backslashes and the following
+				// double quotation mark.
+				//
+				CommandLine.append(NumberBackslashes * 2 + 1, L'\\');
+				CommandLine.push_back(*It);
+			} else {
+				//
+				// Backslashes aren't special here.
+				//
+				CommandLine.append(NumberBackslashes, L'\\');
+				CommandLine.push_back(*It);
+			}
+		}
+		CommandLine.push_back(L'"');
+	}
 }
 
-int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = false, std::wstring *outputCommandline = nullptr)
+int runCommand(std::wstring &file,
+               std::vector<std::wstring> argv,
+               bool echo = false,
+               std::wstring *outputCommandline = nullptr)
 {
 	std::wstring cmdline;
 	std::wstring executable;
@@ -288,7 +287,8 @@ int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = f
 	}
 	std::wstring cmdcmdline;
 	for (auto c : cmdline) {
-		if (c == L'(' || c == L')' || c == L'%' || c == L'!' || c == L'^' || c == L'"' || c == L'<' || c == L'>' || c == L'&' || c == L'|') {
+		if (c == L'(' || c == L')' || c == L'%' || c == L'!' || c == L'^' || c == L'"' || c == L'<'
+		    || c == L'>' || c == L'&' || c == L'|') {
 			cmdcmdline.push_back(L'^');
 		}
 		cmdcmdline.push_back(c);
@@ -315,17 +315,20 @@ int runCommand(std::wstring &file, std::vector<std::wstring> argv, bool echo = f
 	return code;
 }
 #else
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/wait.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <unistd.h>
 
-int runCommand(const char *file, char *const argv[], bool echo = false, std::string *outputCommandline = nullptr)
+int runCommand(const char *file,
+               char *const argv[],
+               bool echo = false,
+               std::string *outputCommandline = nullptr)
 {
 	pid_t pid = fork();
 
 	if (echo || outputCommandline) {
 		std::string commandline = file;
-		for (int i = 0; ; i++) {
+		for (int i = 0;; i++) {
 			if (argv[i] == nullptr) {
 				break;
 			}
