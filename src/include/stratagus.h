@@ -72,7 +72,6 @@
 #if !(_MSC_VER >= 1500 && _MSC_VER < 1600)
 #define vsnprintf _vsnprintf
 #endif
-#define unlink _unlink
 #define strdup _strdup
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
