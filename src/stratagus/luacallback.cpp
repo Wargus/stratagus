@@ -49,8 +49,9 @@ LuaCallbackImpl::LuaCallbackImpl(lua_State *l, lua_Object f) : luastate(l)
 	}
 	lua_pushvalue(l, f);
 	luaref = luaL_ref(l, LUA_REGISTRYINDEX);
-	refcounter =
-		std::shared_ptr<void>(nullptr, [this](void*) { luaL_unref(luastate, LUA_REGISTRYINDEX, luaref); });
+	refcounter = std::shared_ptr<void>(nullptr, [lua = luastate, ref = luaref](void *) {
+		luaL_unref(lua, LUA_REGISTRYINDEX, ref);
+	});
 }
 
 /**
