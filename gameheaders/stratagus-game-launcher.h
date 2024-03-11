@@ -608,7 +608,6 @@ static void ExtractData(char *extractor_tool,
 
 int main(int argc, char *argv[])
 {
-	struct stat st;
 	int argccpy = argc;
 	char data_path[BUFF_SIZE];
 	char scripts_path[BUFF_SIZE];
@@ -644,7 +643,7 @@ int main(int argc, char *argv[])
 			strcat(extractor_path, ".exe");
 		}
 #endif
-		if (stat(extractor_path, &st) == 0) {
+		if (fs::exists(extractor_path)) {
 #ifndef WIN32
 			// Once we have the path, we quote it by moving the memory one byte to the
 			// right, and surrounding it with the quote character and finishing null
@@ -692,7 +691,7 @@ int main(int argc, char *argv[])
 
 	// Try to use stratagus.exe from data (install) directory first
 	sprintf(stratagus_bin, "%s\\stratagus.exe", data_path);
-	if (stat(stratagus_bin, &st) != 0) {
+	if (!fs::exists(stratagus_bin)) {
 		// If no local stratagus.exe is present, search PATH
 		if (!SearchPathA(nullptr, "stratagus", ".exe", MAX_PATH, stratagus_bin, nullptr)
 		    && !SearchPathA(nullptr, "stratagus-dbg", ".exe", MAX_PATH, stratagus_bin, nullptr)) {
@@ -742,7 +741,7 @@ int main(int argc, char *argv[])
 	const char *const extractor_args[] = EXTRACTOR_ARGS;
 
 	if (argc == 2) {
-		if (stat(argv[1], &st) == 0) {
+		if (fs::exists(argv[1])) {
 			// extraction file given as argument and it is accessible => force extraction and exit
 			tinyfd_forceConsole = 1;
 			SetUserDataPath(data_path);
@@ -770,12 +769,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (stat(stratagus_bin, &st) != 0) {
+	if (!fs::exists(stratagus_bin)) {
 #ifdef WIN32
 		_fullpath(stratagus_bin, argv0, BUFF_SIZE);
 		PathRemoveFileSpecA(stratagus_bin);
-		strcat(extractor_path, "\\stratagus.exe");
-		if (stat(stratagus_bin, &st) != 0) {
+		strcat(stratagus_bin, "\\stratagus.exe");
+		if (!fs::exists(stratagus_bin)) {
 			error(TITLE,
 			      (std::string(STRATAGUS_NOT_FOUND) + " (expected in " + stratagus_bin + ")")
 			          .c_str());
@@ -789,7 +788,7 @@ int main(int argc, char *argv[])
 			} else {
 				strcat(stratagus_bin, "./stratagus");
 			}
-			if (stat(stratagus_bin, &st) != 0) {
+			if (!fs::exists(stratagus_bin)) {
 				error(TITLE,
 				      (std::string(STRATAGUS_NOT_FOUND) + " (expected in " + stratagus_bin + ")")
 				          .c_str());
@@ -799,13 +798,13 @@ int main(int argc, char *argv[])
 	}
 
 	sprintf(title_path, TITLE_PNG, data_path);
-	if (stat(title_path, &st) != 0) {
+	if (!fs::exists(title_path)) {
 		SetUserDataPath(data_path);
 		sprintf(title_path, TITLE_PNG, data_path);
-		if (stat(title_path, &st) != 0) {
+		if (!fs::exists(title_path)) {
 			ExtractData(extractor_path, extractor_args, data_path, scripts_path);
 		}
-		if (stat(title_path, &st) != 0) {
+		if (!fs::exists(title_path)) {
 			std::string msg(DATA_NOT_EXTRACTED);
 			msg += " (extraction was attempted, but it seems an error occurred)";
 			error(TITLE, msg.c_str());
