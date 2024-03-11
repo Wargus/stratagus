@@ -484,12 +484,11 @@ static void CleanupOutput()
 	fclose(stdout);
 	fclose(stderr);
 
-	struct stat st;
-	if (stat(stdoutFile.string().c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stdoutFile.string().c_str());
+	if (fs::file_size(stdoutFile) == 0) {
+		fs::remove(stdoutFile);
 	}
-	if (stat(stderrFile.string().c_str(), &st) == 0 && st.st_size == 0) {
-		unlink(stderrFile.string().c_str());
+	if (fs::file_size(stderrFile) == 0) {
+		fs::remove(stderrFile);
 	}
 }
 
