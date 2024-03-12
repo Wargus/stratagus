@@ -31,6 +31,8 @@
 
 #include "stratagus.h"
 
+#include "interface.h"
+#include "results.h"
 #include "trigger.h"
 #include "script.h"
 
@@ -38,6 +40,9 @@ namespace
 {
 [[nodiscard]] auto InitLuaTrigger(std::string content)
 {
+	GameRunning = true;
+	GamePaused = false;
+	GameResult = GameNoResult;
 	InitLua();
 	CHECK(Lua);
 	CleanTriggers();
@@ -64,6 +69,9 @@ namespace
 				lua_close(Lua);
 				Lua = nullptr;
 			}
+			GameRunning = true;
+			GamePaused = false;
+			GameResult = GameNoResult;
 		}
 	};
 	return S(); // copy-elision
@@ -166,4 +174,7 @@ TEST_CASE("Trigger Pause")
 	TriggersEachCycle();
 	// do not run check C3
 	CHECK(test_getLuaGlobalStr("log") == "C1 C2 A2 ");
+	CHECK_FALSE(GameRunning);
+	CHECK(GamePaused);
+	CHECK(GameResult == GameVictory);
 }
