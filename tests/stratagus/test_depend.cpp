@@ -344,6 +344,7 @@ TEST_CASE("upgrade depends")
 
 TEST_CASE("spell button depend")
 {
+	InitLua_Depend(R"()");
 	const auto requirements = std::string(_("Requirements:\n"));
 	CPlayer player{};
 	ButtonAction button;
