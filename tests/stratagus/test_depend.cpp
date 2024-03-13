@@ -202,6 +202,7 @@ TEST_CASE("Unit depends")
 
 
 	CleanDependencies();
+	CleanUnitTypes();
 }
 
 TEST_CASE("upgrade depends")
@@ -340,10 +341,12 @@ TEST_CASE("upgrade depends")
 	}
 
 	CleanDependencies();
+	CleanUnitTypes();
 }
 
 TEST_CASE("spell button depend")
 {
+	InitLua_Depend(R"()");
 	const auto requirements = std::string(_("Requirements:\n"));
 	CPlayer player{};
 	ButtonAction button;
@@ -357,4 +360,6 @@ TEST_CASE("spell button depend")
 	CHECK(PrintDependencies(player, button) == requirements + "-upgradeMain\n");
 
 	Selected.clear();
+	CleanDependencies();
+	CleanUnitTypes();
 }
