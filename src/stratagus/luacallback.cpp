@@ -108,14 +108,14 @@ void LuaCallbackImpl::pushString(std::string_view s)
  ** Push a table with string keys and string or integer values.
  */
 void LuaCallbackImpl::pushTable(std::initializer_list<std::pair<std::string, std::variant<std::string, int>>> list) {
-	lua_createtable(Lua, 0, list.size());
+	lua_createtable(luastate, 0, list.size());
 	for (const auto& entry : list) {
 		if (std::holds_alternative<std::string>(entry.second)) {
-			lua_pushstring(Lua, std::get<std::string>(entry.second).c_str());
+			lua_pushstring(luastate, std::get<std::string>(entry.second).c_str());
 		} else {
-			lua_pushinteger(Lua, std::get<int>(entry.second));
+			lua_pushinteger(luastate, std::get<int>(entry.second));
 		}
-		lua_setfield(Lua, -2, entry.first.c_str());
+		lua_setfield(luastate, -2, entry.first.c_str());
 	}
 	arguments++;
 }
@@ -124,14 +124,14 @@ void LuaCallbackImpl::pushTable(std::initializer_list<std::pair<std::string, std
  ** Push a table with string keys and string or integer values.
  */
 void LuaCallbackImpl::pushTable(std::map<std::string, std::variant<std::string, int>> map) {
-	lua_createtable(Lua, 0, map.size());
+	lua_createtable(luastate, 0, map.size());
 	for (const auto& entry : map) {
 		if (std::holds_alternative<std::string>(entry.second)) {
-			lua_pushstring(Lua, std::get<std::string>(entry.second).c_str());
+			lua_pushstring(luastate, std::get<std::string>(entry.second).c_str());
 		} else {
-			lua_pushinteger(Lua, std::get<int>(entry.second));
+			lua_pushinteger(luastate, std::get<int>(entry.second));
 		}
-		lua_setfield(Lua, -2, entry.first.c_str());
+		lua_setfield(luastate, -2, entry.first.c_str());
 	}
 	arguments++;
 }
