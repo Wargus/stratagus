@@ -360,5 +360,6 @@ TEST_CASE("spell button depend")
 	CHECK(PrintDependencies(player, button) == requirements + "-upgradeMain\n");
 
 	Selected.clear();
+	CleanDependencies();
 	CleanUnitTypes();
 }
