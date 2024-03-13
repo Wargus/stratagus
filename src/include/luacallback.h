@@ -103,7 +103,7 @@ public:
 	}
 
 	template <typename... Res, typename... Args>
-	auto call(const Args &...args)
+	[[nodiscard]] auto call(const Args &...args)
 	{
 		pushPreamble();
 		(pushT(args), ...);
@@ -147,7 +147,8 @@ public:
 	using LuaCallbackImpl::init;
 	using LuaCallbackImpl::operator bool;
 
-	Ret operator()(Ts... args) {
+	[[nodiscard]] Ret operator()(Ts... args)
+	{
 		if constexpr (std::is_same_v<void, Ret>) {
 			return call(args...);
 		} else {

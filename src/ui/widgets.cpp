@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -274,13 +274,13 @@ void LuaActionListener::action(const gcn::ActionEvent &event) /* override */
 
 void LuaActionListener::keyPressed(gcn::KeyEvent &event) /* override */
 {
-	callback.call<bool>("keyPress", to_utf8(event.getKey().getValue()));
+	callback.call("keyPress", to_utf8(event.getKey().getValue()));
 	event.consume();
 }
 
 void LuaActionListener::keyReleased(gcn::KeyEvent &event) /* override */
 {
-	callback.call<bool>("keyRelease", to_utf8(event.getKey().getValue()));
+	callback.call("keyRelease", to_utf8(event.getKey().getValue()));
 	event.consume();
 }
 
