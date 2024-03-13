@@ -1562,8 +1562,8 @@ public:
 	void doOneStep(Context &ctx) override
 	{
 		std::cout << message << std::endl;
-		ctx.disconnect();
 		ctx.showError(message);
+		ctx.disconnect();
 	}
 
 private:
