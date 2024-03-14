@@ -2094,7 +2094,7 @@ private:
 	int retries = 30;
 };
 
-OnlineContext *OnlineContextHandler;
+std::unique_ptr<OnlineContext> OnlineContextHandler;
 
 static int CclStopAdvertisingOnlineGame(lua_State *l)
 {
@@ -2328,12 +2328,11 @@ static int CclPunchNAT(lua_State *l)
 
 void InitOnlineService()
 {
-	OnlineContextHandler = new Context();
+	OnlineContextHandler = std::make_unique<Context>();
 }
 
 void DeInitOnlineService()
 {
-	delete OnlineContextHandler;
 	OnlineContextHandler = nullptr;
 }
 
