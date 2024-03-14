@@ -2094,11 +2094,13 @@ private:
 	int retries = 30;
 };
 
-static Context _ctx;
-OnlineContext *OnlineContextHandler = &_ctx;
+std::unique_ptr<OnlineContext> OnlineContextHandler;
 
 static int CclStopAdvertisingOnlineGame(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	if (_ctx.isConnected()) {
 		_ctx.stopAdvertising();
 		lua_pushboolean(l, true);
@@ -2110,6 +2112,9 @@ static int CclStopAdvertisingOnlineGame(lua_State *l)
 
 static int CclStartAdvertisingOnlineGame(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	if (_ctx.isConnected()) {
 		_ctx.startAdvertising();
 		lua_pushboolean(l, true);
@@ -2121,6 +2126,9 @@ static int CclStartAdvertisingOnlineGame(lua_State *l)
 
 static int CclSetup(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -2166,6 +2174,9 @@ static int CclSetup(lua_State *l)
 
 static int CclDisconnect(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 0);
 	_ctx.disconnect();
 	return 0;
@@ -2173,6 +2184,9 @@ static int CclDisconnect(lua_State *l)
 
 static int CclConnect(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	_ctx.disconnect();
 	LuaCheckArgs(l, 2);
 	const std::string host = std::string{LuaToString(l, 1)};
@@ -2185,6 +2199,9 @@ static int CclConnect(lua_State *l)
 
 static int CclLogin(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 2);
 	_ctx.setCreateAccount(false);
 	_ctx.setUsername(std::string{LuaToString(l, 1)});
@@ -2194,6 +2211,9 @@ static int CclLogin(lua_State *l)
 
 static int CclSignUp(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 2);
 	_ctx.setCreateAccount(true);
 	_ctx.setUsername(std::string{LuaToString(l, 1)});
@@ -2203,6 +2223,9 @@ static int CclSignUp(lua_State *l)
 
 static int CclStep(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 0);
 	if (_ctx.isDisconnected()) {
 		LuaError(l, "disconnected service cannot step");
@@ -2221,6 +2244,9 @@ static int CclStep(lua_State *l)
 
 static int CclSendMessage(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 1);
 	if (!_ctx.isConnected()) {
 		LuaError(l, "connect first");
@@ -2231,6 +2257,9 @@ static int CclSendMessage(lua_State *l)
 
 static int CclJoinChannel(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 1);
 	if (!_ctx.isConnected()) {
 		LuaError(l, "connect first");
@@ -2241,6 +2270,9 @@ static int CclJoinChannel(lua_State *l)
 
 static int CclJoinGame(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 2);
 	if (!_ctx.isConnected()) {
 		LuaError(l, "connect first");
@@ -2251,6 +2283,9 @@ static int CclJoinGame(lua_State *l)
 
 static int CclStatus(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 0);
 	if (_ctx.isConnected()) {
 		lua_pushstring(l, "connected");
@@ -2270,6 +2305,9 @@ static int CclStatus(lua_State *l)
 
 static int CclRequestUserInfo(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 1);
 	if (!_ctx.isConnected()) {
 		LuaError(l, "not connected");
@@ -2280,9 +2318,22 @@ static int CclRequestUserInfo(lua_State *l)
 
 static int CclPunchNAT(lua_State *l)
 {
+	Assert(OnlineContextHandler);
+	Context &_ctx = dynamic_cast<Context &>(*OnlineContextHandler);
+
 	LuaCheckArgs(l, 1);
 	_ctx.punchNAT(std::string{LuaToString(l, 1)});
 	return 0;
+}
+
+void InitOnlineService()
+{
+	OnlineContextHandler = std::make_unique<Context>();
+}
+
+void DeInitOnlineService()
+{
+	OnlineContextHandler = nullptr;
 }
 
 void OnlineServiceCclRegister()

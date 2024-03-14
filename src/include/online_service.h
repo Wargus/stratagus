@@ -3,6 +3,7 @@
 
 #include "network/netsockets.h"
 
+#include <memory>
 #include <string>
 
 class OnlineContext
@@ -32,7 +33,10 @@ public:
 	virtual void reportGameResult() = 0;
 };
 
-extern OnlineContext *OnlineContextHandler;
+extern std::unique_ptr<OnlineContext> OnlineContextHandler;
+
+void InitOnlineService();
+void DeInitOnlineService();
 
 extern void OnlineServiceCclRegister();
 
