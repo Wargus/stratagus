@@ -34,6 +34,9 @@ public:
 
 extern OnlineContext *OnlineContextHandler;
 
+void InitOnlineService();
+void DeInitOnlineService();
+
 extern void OnlineServiceCclRegister();
 
 #endif

@@ -192,6 +192,7 @@ extern void beos_init(int argc, char **argv);
 #include "map.h"
 #include "netconnect.h"
 #include "network.h"
+#include "online_service.h"
 #include "parameters.h"
 #include "player.h"
 #include "replay.h"
@@ -406,6 +407,7 @@ void Exit(int err)
 	FreeGraphics();
 	FreePlayerColors();
 	FreeButtonStyles();
+	DeInitOnlineService();
 	freeGuichan();
 	fprintf(stdout, "Frames %lu, Slow frames %ld = %ld%%\n",
 			   FrameCounter, SlowFrameCounter,
@@ -758,6 +760,7 @@ try {
 	Map.AllocateTileset();
 	UnitManager = new CUnitManager();
 	FogOfWar = std::make_unique<CFogOfWar>();
+	InitOnlineService();
 
 	LoadCcl(parameters.luaStartFilename, parameters.luaScriptArguments);
 
