@@ -2040,23 +2040,15 @@ class C2S_SID_AUTH_INFO : public OnlineState
 			buffer.serialize32(addr.s_addr);
 #endif
 		} else {
-			unsigned long ips[20];
-			int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 20);
-			bool found_one = false;
-			if (networkNumInterfaces) {
-				// we can only advertise one, so take the first that fits in 32-bit and is thus presumably ipv4
-				for (int i = 0; i < networkNumInterfaces; i++) {
-					uint32_t ip = ips[i];
-					if (ip == ips[i]) {
-						found_one = true;
-						buffer.serialize32(ip);
-						break;
-					}
-				}
-			}
-			if (!found_one) {
+			const auto ips = NetworkFildes.GetSocketAddresses();
+			// we can only advertise one, so take the first that fits in 32-bit and is thus presumably ipv4
+			const auto it = ranges::find_if(
+				ips, [](unsigned long ip) { return static_cast<std::uint32_t>(ip) == ip; });
+			if (it == ips.end()) {
 				// use default
 				buffer.serialize32(0x00);
+			} else {
+				buffer.serialize32(*it);
 			}
 		}
 		// (UINT32) Time zone bias

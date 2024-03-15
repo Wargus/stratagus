@@ -229,18 +229,15 @@ std::string NetGetHostname()
 /**
 **  Get IP-addrs of local interfaces from Network file descriptor
 **
-**  @param sock     local socket.
-**  @param ips      where to stock ip addrs.
-**  @param maxAddr  size of ips.
-**
-**  @return number of IP-addrs found.
+**  @return IP-addrs found.
 */
 #ifdef USE_WINSOCK // {
 #ifndef MIB_IF_TYPE_IEEE80211
 #define MIB_IF_TYPE_IEEE80211 71
 #endif
-int NetSocketAddr(unsigned long *ips, int maxAddr)
+std::vector<unsigned long> NetSocketAddr()
 {
+	std::vector<unsigned long> ips;
 	int idx = 0;
 	PIP_ADAPTER_ADDRESSES pFirstAddresses, pAddresses = nullptr;
 	ULONG outBufLen = 0;
@@ -253,46 +250,42 @@ int NetSocketAddr(unsigned long *ips, int maxAddr)
 							 nullptr, pAddresses, &outBufLen) == NO_ERROR) {
 		pFirstAddresses = pAddresses;
 		for (pAddresses; pAddresses; pAddresses = pAddresses->Next) {
-			if (idx == maxAddr) break;
 			if (pAddresses->Flags & IP_ADAPTER_RECEIVE_ONLY) continue;
 			if ((pAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == 0) continue;
 			if (pAddresses->IfType != IF_TYPE_ETHERNET_CSMACD && pAddresses->IfType != IF_TYPE_IEEE80211) continue;
 			if (pAddresses->OperStatus != IfOperStatusUp) continue;
 			if (pAddresses->PhysicalAddressLength == 0) continue;
-			ips[idx++] = ((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr;
+			ips.push_back(((struct sockaddr_in*)pAddresses->FirstUnicastAddress->Address.lpSockaddr)->sin_addr.s_addr);
 		}
 	}
 	free(pFirstAddresses);
 
-	return idx;
+	return ips;
 }
 #elif defined(USE_LINUX) || defined(USE_MAC)
-int NetSocketAddr(unsigned long *ips, int maxAddr)
+std::vector<unsigned long> NetSocketAddr()
 {
+	std::vector<unsigned long> ips;
 	struct ifaddrs *ifAddrStruct = nullptr;
-	struct ifaddrs *ifa = nullptr;
-	int idx = 0;
 	getifaddrs(&ifAddrStruct);
-	for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
-		if (idx == maxAddr) break;
+	for (struct ifaddrs *ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
 		if (!ifa->ifa_addr) continue;
 		if (ifa->ifa_addr->sa_family != AF_INET) continue;
 		if (ifa->ifa_flags & IFF_LOOPBACK) continue;
 		if (ifa->ifa_flags & IFF_POINTOPOINT) continue;
 		if ((ifa->ifa_flags & IFF_UP) == 0) continue;
-		ips[idx++] = ((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr;
+		ips.push_back(((struct sockaddr_in *)ifa->ifa_addr)->sin_addr.s_addr);
 	}
 	if (ifAddrStruct != nullptr) {
 		freeifaddrs(ifAddrStruct);
 	}
-	return idx;
+	return ips;
 }
 #else // } {
 // more??
-int NetSocketAddr(unsigned long *ips, int maxAddr)
+std::vector<unsigned long> NetSocketAddr()
 {
-	ips[0] = htonl(0x7f000001);
-	return 1;
+	return {htonl(0x7f000001)};
 }
 #endif // }
 

@@ -86,7 +86,7 @@ public:
 	void SetNonBlocking() { NetSetNonBlocking(socket); }
 	int HasDataToRead(int timeout) { return NetSocketReady(socket, timeout); }
 	bool IsValid() const { return socket != Socket(-1); }
-	int GetSocketAddresses(unsigned long *ips, int maxAddr) { return NetSocketAddr(ips, maxAddr); }
+	std::vector<unsigned long> GetSocketAddresses() { return NetSocketAddr(); }
 private:
 	Socket socket = -1;
 };
@@ -151,8 +151,8 @@ bool CUDPSocket::IsValid() const
 	return m_impl->IsValid();
 }
 
-int CUDPSocket::GetSocketAddresses(unsigned long *ips, int maxAddr) {
-	return m_impl->GetSocketAddresses(ips, maxAddr);
+std::vector<unsigned long> CUDPSocket::GetSocketAddresses() {
+	return m_impl->GetSocketAddresses();
 }
 
 //
