@@ -49,13 +49,12 @@ static int service_callback(int sock, const struct sockaddr* from, size_t addrle
                 addrlen = 0;
             }
             char buffer[256];
-            unsigned long ips[20];
-            int numIps = NetSocketAddr(ips, 20);
-            for (int i = 0; i < numIps; i++) {
+            const auto ips = NetSocketAddr();
+            for (auto ip : ips) {
                 mdns_query_answer(sock, from, addrlen, buffer, sizeof(buffer), query_id,
                                   offeredService.c_str(), offeredService.size(),
                                   hostname.c_str(), hostname.size(),
-                                  ips[i], nullptr, CNetworkParameter::Instance.localPort,
+                                  ip, nullptr, CNetworkParameter::Instance.localPort,
                                   nullptr, 0);
             }
         }
@@ -105,8 +104,8 @@ void MDNS::QueryServers(std::function<void(char*)> callback) {
     if (numSockets == -1) {
         // When sending, each socket can only send to one network interface
         // Thus we need to open one socket for each interface
-        unsigned long ips[20];
-        numSockets = NetSocketAddr(ips, 20);
+        const auto ips = NetSocketAddr();
+        numSockets = ips.size();
         struct sockaddr_in sock_addr;
         for (int i = 0; i < numSockets; i++) {
             memset(&sock_addr, 0, sizeof(struct sockaddr_in));

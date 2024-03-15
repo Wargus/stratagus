@@ -430,12 +430,11 @@ void InitNetwork1()
 	DebugPrint("My host:port %s\n", hostStr.c_str());
 #endif
 
-	unsigned long ips[10];
-	int networkNumInterfaces = NetworkFildes.GetSocketAddresses(ips, 10);
-	if (networkNumInterfaces) {
-		DebugPrint("Num IP: %d\n", networkNumInterfaces);
-		for (int i = 0; i < networkNumInterfaces; ++i) {
-			DebugPrint("IP: %d.%d.%d.%d\n", NIPQUAD(ntohl(ips[i])));
+	const auto ips = NetworkFildes.GetSocketAddresses();
+	if (!ips.empty()) {
+		DebugPrint("Num IP: %d\n", static_cast<int>(ips.size()));
+		for (auto ip : ips) {
+			DebugPrint("IP: %d.%d.%d.%d\n", NIPQUAD(ntohl(ip)));
 		}
 	} else {
 		ErrorPrint("WARNING: Not connected to any external IPV4-network!\n");

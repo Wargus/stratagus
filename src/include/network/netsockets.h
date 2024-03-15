@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 //@{
 
@@ -68,7 +69,7 @@ public:
 	//
 	int HasDataToRead(int timeout);
 	bool IsValid() const;
-	int GetSocketAddresses(unsigned long *ips, int maxAddr);
+	std::vector<unsigned long> GetSocketAddresses();
 
 #ifdef DEBUG
 

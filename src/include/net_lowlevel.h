@@ -114,7 +114,7 @@ extern void NetExit();
 /// Resolve host in name or or colon dot notation.
 extern unsigned long NetResolveHost(const std::string &host);
 /// Get local IPs
-extern int NetSocketAddr(unsigned long *ips, int maxAddr);
+extern std::vector<unsigned long> NetSocketAddr();
 /// Get local hostname
 extern std::string NetGetHostname();
 
