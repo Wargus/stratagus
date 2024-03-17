@@ -77,15 +77,10 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const /* override */
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	CConstructionFrame *cframe = unit.Type->Construction->Frames;
-	int frame = 0;
-	while (cframe != this->Frame) {
-		cframe = cframe->Next;
-		++frame;
-	}
 	if (this->Worker != nullptr) {
 		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
 	}
+	const int frame = this->Frame;
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);
 	if (this->IsCancelled) {
 		file.printf(", \"cancel\"");
@@ -110,12 +105,7 @@ bool COrder_Built::ParseSpecificData(lua_State *l,
 		this->IsCancelled = true;
 	} else if (value == "frame") {
 		++j;
-		int frame = LuaToNumber(l, -1, j + 1);
-		CConstructionFrame *cframe = unit.Type->Construction->Frames;
-		while (frame-- && cframe->Next != nullptr) {
-			cframe = cframe->Next;
-		}
-		this->Frame = cframe;
+		this->Frame = LuaToNumber(l, -1, j + 1);
 	} else {
 		return false;
 	}
@@ -331,17 +321,12 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 }
 
 
-static const CConstructionFrame *FindCFramePercent(const CConstructionFrame &cframe, int percent)
+static std::size_t FindCFramePercent(const std::vector<CConstructionFrame> &cframes, int percent)
 {
-	const CConstructionFrame *prev = &cframe;
+	const auto it =
+		ranges::find_if(cframes, [&](const auto &frame) { return percent < frame.Percent; });
 
-	for (const CConstructionFrame *it = cframe.Next; it; it = it->Next) {
-		if (percent < it->Percent) {
-			return prev;
-		}
-		prev = it;
-	}
-	return prev;
+	return std::distance(cframes.begin(), std::min(it, std::prev(cframes.end())));
 }
 
 /**
@@ -353,17 +338,12 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
-	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+	const auto index = FindCFramePercent(type.Construction->Frames, percent);
 
-	Assert(cframe != nullptr);
-
-	if (cframe != this->Frame) {
-		this->Frame = cframe;
-		if (unit.Frame < 0) {
-			unit.Frame = -cframe->Frame - 1;
-		} else {
-			unit.Frame = cframe->Frame;
-		}
+	if (index != this->Frame) {
+		this->Frame = index;
+		const CConstructionFrame &cframe = type.Construction->Frames[index];
+		unit.Frame = (unit.Frame < 0) ? -cframe.Frame - 1 : cframe.Frame;
 	}
 }
 

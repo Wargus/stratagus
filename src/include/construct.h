@@ -117,7 +117,6 @@ public:
 	int Percent = 0;                    /// Percent complete
 	ConstructionFileType File;          /// Graphic to use
 	int Frame = 0;                      /// Frame number
-	CConstructionFrame *Next = nullptr; /// Next pointer
 };
 
 /// Construction shown during construction of a building
@@ -136,7 +135,7 @@ public:
 		int Width = 0;       /// sprite width
 		int Height = 0;      /// sprite height
 	} File, ShadowFile;
-	CConstructionFrame *Frames = nullptr;  /// construction frames
+	std::vector<CConstructionFrame> Frames;  /// construction frames
 
 	// --- FILLED UP ---
 
