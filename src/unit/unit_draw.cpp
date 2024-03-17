@@ -834,11 +834,11 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
+static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame &cframe,
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	if (cframe->File == ConstructionFileType::Construction) {
+	if (cframe.File == ConstructionFileType::Construction) {
 		if (type.Construction->ShadowSprite) {
 			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
 			pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
@@ -872,11 +872,11 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 **  @param frame   Frame number.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstruction(const int player, const CConstructionFrame *cframe,
+static void DrawConstruction(const int player, const CConstructionFrame &cframe,
 							 const CUnitType &type, int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
-	if (cframe->File == ConstructionFileType::Construction) {
+	if (cframe.File == ConstructionFileType::Construction) {
 		CConstruction &construction = *type.Construction;
 		pos.x -= construction.Width / 2;
 		pos.y -= construction.Height / 2;
@@ -944,7 +944,7 @@ void CUnit::Draw(const CViewport &vp) const
 		if (this->CurrentAction() == UnitAction::Built) {
 			COrder_Built &order = *static_cast<COrder_Built *>(this->CurrentOrder());
 
-			cframe = &order.GetFrame();
+			cframe = &type->Construction->Frames[order.GetFrameIndex()];
 		} else {
 			cframe = nullptr;
 		}
@@ -957,7 +957,7 @@ void CUnit::Draw(const CViewport &vp) const
 		type = this->Seen.Type;
 		constructed = this->Seen.Constructed;
 		state = this->Seen.State;
-		cframe = this->Seen.CFrame;
+		cframe = this->Seen.CFrame != -1 ? &type->Construction->Frames[this->Seen.CFrame] : nullptr;
 	}
 
 #ifdef DYNAMIC_LOAD
@@ -975,7 +975,7 @@ void CUnit::Draw(const CViewport &vp) const
 
 
 	if (state == 1 && constructed && cframe) {
-		DrawConstructionShadow(*type, cframe, frame, screenPos);
+		DrawConstructionShadow(*type, *cframe, frame, screenPos);
 	} else {
 		if (action != UnitAction::Die) {
 			if (this->ZDisplaced) {
@@ -1018,7 +1018,7 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1) {
 		if (constructed && cframe) {
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
-			DrawConstruction(GameSettings.Presets[player].PlayerColor, cframe, *type, frame, pos);
+			DrawConstruction(GameSettings.Presets[player].PlayerColor, *cframe, *type, frame, pos);
 		} else {
 			DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
 		}

@@ -68,13 +68,7 @@ void CConstruction::Clean()
 	this->Sprite = nullptr;
 	CGraphic::Free(this->ShadowSprite);
 	this->ShadowSprite = nullptr;
-	CConstructionFrame *cframe = this->Frames;
-	this->Frames = nullptr;
-	while (cframe) {
-		CConstructionFrame *next = cframe->Next;
-		delete cframe;
-		cframe = next;
-	}
+	this->Frames.clear();
 	this->Width = 0;
 	this->Height = 0;
 	this->ShadowWidth = 0;
@@ -264,15 +258,10 @@ static int CclDefineConstruction(lua_State *l)
 					lua_pop(l, 1);
 				}
 				lua_pop(l, 1);
-				CConstructionFrame **cframe = &construction->Frames;
-				while (*cframe) {
-					cframe = &((*cframe)->Next);
-				}
-				(*cframe) = new CConstructionFrame;
-				(*cframe)->Percent = percent;
-				(*cframe)->File = file;
-				(*cframe)->Frame = frame;
-				(*cframe)->Next = nullptr;
+				auto& cframe = construction->Frames.emplace_back();
+				cframe.Percent = percent;
+				cframe.File = file;
+				cframe.Frame = frame;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s", value.data());

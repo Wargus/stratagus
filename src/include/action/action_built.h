@@ -64,7 +64,7 @@ public:
 	void Progress(CUnit &unit, int amount);
 	void ProgressHp(CUnit &unit, int amount);
 
-	const CConstructionFrame &GetFrame() const { return *Frame; }
+	std::size_t GetFrameIndex() const { return Frame; }
 	const CUnitPtr &GetWorker() const { return Worker; }
 	CUnit *GetWorkerPtr() { return Worker; }
 
@@ -73,10 +73,10 @@ private:
 	void UpdateConstructionFrame(CUnit &unit);
 
 private:
-	CUnitPtr Worker = nullptr;                 /// Worker building this unit
-	int ProgressCounter = 0;                   /// Progress counter, in 1/100 cycles.
-	bool IsCancelled = false;                  /// Cancel construction
-	const CConstructionFrame *Frame = nullptr; /// Construction frame
+	CUnitPtr Worker = nullptr; /// Worker building this unit
+	int ProgressCounter = 0;   /// Progress counter, in 1/100 cycles.
+	bool IsCancelled = false;  /// Cancel construction
+	std::size_t Frame = -1;    /// Construction frame
 };
 
 //@}

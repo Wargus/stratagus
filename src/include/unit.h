@@ -393,7 +393,7 @@ public:
 	int VisCount[PlayerMax]{}; /// Unit visibility counts
 	struct _seen_stuff_ {
 		_seen_stuff_() = default;
-		const CConstructionFrame *CFrame = nullptr;  /// Seen construction frame
+		std::size_t CFrame = -1;            /// Seen construction frame
 		int         Frame = 0;              /// last seen frame/stage of buildings
 		const CUnitType *Type = nullptr;    /// Pointer to last seen unit-type
 		Vec2i tilePos{-1, -1};              /// Last unit->tilePos Seen
