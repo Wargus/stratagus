@@ -69,75 +69,67 @@ static bool MovieStop;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f)
+static bool OggGetNextPage(ogg_page &page, ogg_sync_state &sync, CFile *f)
 {
-	char *buf;
-	int bytes;
-
-	while (ogg_sync_pageout(sync, page) != 1) {
+	while (ogg_sync_pageout(&sync, &page) != 1) {
 		// need more bytes
-		buf = ogg_sync_buffer(sync, 4096);
-		bytes = f->read(buf, 4096);
-		if (!bytes || ogg_sync_wrote(sync, bytes)) {
-			return -1;
+		char *buf = ogg_sync_buffer(&sync, 4096);
+		const int bytes = f->read(buf, 4096);
+		if (!bytes || ogg_sync_wrote(&sync, bytes)) {
+			return false;
 		}
 	}
-
-	return 0;
+	return true;
 }
 
-int OggInit(CFile *f, OggData *data)
+static bool OggInit(CFile &f, OggData &data)
 {
-	ogg_packet packet;
-	int num_vorbis;
-	int num_theora;
-	int ret;
-
 	unsigned magic;
-	f->read(&magic, sizeof(magic));
+	f.read(&magic, sizeof(magic));
 	if (SDL_SwapLE32(magic) != 0x5367674F) { // "OggS" in ASCII
-		return -1;
+		return false;
 	}
-	f->seek(0, SEEK_SET);
+	f.seek(0, SEEK_SET);
 
-	ogg_sync_init(&data->sync);
+	ogg_sync_init(&data.sync);
 
-	vorbis_info_init(&data->vinfo);
-	vorbis_comment_init(&data->vcomment);
+	vorbis_info_init(&data.vinfo);
+	vorbis_comment_init(&data.vcomment);
 
-	theora_info_init(&data->tinfo);
-	theora_comment_init(&data->tcomment);
+	theora_info_init(&data.tinfo);
+	theora_comment_init(&data.tcomment);
 
-	num_theora = 0;
-	num_vorbis = 0;
-	while (1) {
+	ogg_packet packet;
+	int num_theora = 0;
+	int num_vorbis = 0;
+	while (true) {
 		ogg_stream_state test;
 
-		if (OggGetNextPage(&data->page, &data->sync, f)) {
-			return -1;
+		if (!OggGetNextPage(data.page, data.sync, &f)) {
+			return false;
 		}
 
-		if (!ogg_page_bos(&data->page)) {
+		if (!ogg_page_bos(&data.page)) {
 			if (num_vorbis) {
-				ogg_stream_pagein(&data->astream, &data->page);
+				ogg_stream_pagein(&data.astream, &data.page);
 			}
 			if (num_theora) {
-				ogg_stream_pagein(&data->vstream, &data->page);
+				ogg_stream_pagein(&data.vstream, &data.page);
 			}
 			break;
 		}
 
-		ogg_stream_init(&test, ogg_page_serialno(&data->page));
-		ogg_stream_pagein(&test, &data->page);
+		ogg_stream_init(&test, ogg_page_serialno(&data.page));
+		ogg_stream_pagein(&test, &data.page);
 
 		// initial codec headers
 		while (ogg_stream_packetout(&test, &packet) == 1) {
-			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet) >= 0) {
-				memcpy(&data->vstream, &test, sizeof(test));
+			if (theora_decode_header(&data.tinfo, &data.tcomment, &packet) >= 0) {
+				memcpy(&data.vstream, &test, sizeof(test));
 				++num_theora;
 			} else
-				if (!vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
-					memcpy(&data->astream, &test, sizeof(test));
+				if (!vorbis_synthesis_headerin(&data.vinfo, &data.vcomment, &packet)) {
+					memcpy(&data.astream, &test, sizeof(test));
 					++num_vorbis;
 				} else {
 					ogg_stream_clear(&test);
@@ -145,70 +137,73 @@ int OggInit(CFile *f, OggData *data)
 		}
 	}
 
-	data->audio = num_vorbis;
-	data->video = num_theora;
+	data.audio = num_vorbis;
+	data.video = num_theora;
 
 	// remainint codec headers
 	while ((num_vorbis && num_vorbis < 3)
 		   || (num_theora && num_theora < 3)) {
+		int ret = 0;
 		// are we in the theora page ?
 		while (num_theora && num_theora < 3 &&
-			   (ret = ogg_stream_packetout(&data->vstream, &packet))) {
+			   (ret = ogg_stream_packetout(&data.vstream, &packet))) {
 			if (ret < 0) {
-				return -1;
+				return false;
 			}
-			if (theora_decode_header(&data->tinfo, &data->tcomment, &packet)) {
-				return -1;
+			if (theora_decode_header(&data.tinfo, &data.tcomment, &packet)) {
+				return false;
 			}
 			++num_theora;
 		}
 
 		// are we in the vorbis page ?
 		while (num_vorbis && num_vorbis < 3 &&
-			   (ret = ogg_stream_packetout(&data->astream, &packet))) {
+			   (ret = ogg_stream_packetout(&data.astream, &packet))) {
 			if (ret < 0) {
-				return -1;
+				return false;
 			}
-			if (vorbis_synthesis_headerin(&data->vinfo, &data->vcomment, &packet)) {
-				return -1;
-
+			if (vorbis_synthesis_headerin(&data.vinfo, &data.vcomment, &packet)) {
+				return false;
 			}
 			++num_vorbis;
 		}
 
-		if (OggGetNextPage(&data->page, &data->sync, f)) {
+		if (!OggGetNextPage(data.page, data.sync, &f)) {
 			break;
 		}
 
 		if (num_vorbis) {
-			ogg_stream_pagein(&data->astream, &data->page);
+			ogg_stream_pagein(&data.astream, &data.page);
 		}
 		if (num_theora) {
-			ogg_stream_pagein(&data->vstream, &data->page);
+			ogg_stream_pagein(&data.vstream, &data.page);
 		}
 	}
 
 	if (num_vorbis) {
-		vorbis_synthesis_init(&data->vdsp, &data->vinfo);
-		vorbis_block_init(&data->vdsp, &data->vblock);
+		vorbis_synthesis_init(&data.vdsp, &data.vinfo);
+		vorbis_block_init(&data.vdsp, &data.vblock);
 	} else {
-		vorbis_info_clear(&data->vinfo);
-		vorbis_comment_clear(&data->vcomment);
+		vorbis_info_clear(&data.vinfo);
+		vorbis_comment_clear(&data.vcomment);
 	}
 
 	if (num_theora) {
-		theora_decode_init(&data->tstate, &data->tinfo);
-		data->tstate.internal_encode = nullptr;  // needed for a bug in libtheora (fixed in next release)
+		theora_decode_init(&data.tstate, &data.tinfo);
+		data.tstate.internal_encode = nullptr;  // needed for a bug in libtheora (fixed in next release)
 	} else {
-		theora_info_clear(&data->tinfo);
-		theora_comment_clear(&data->tcomment);
+		theora_info_clear(&data.tinfo);
+		theora_comment_clear(&data.tcomment);
 	}
 
-	return !(num_vorbis || num_theora);
+	return num_vorbis || num_theora;
 }
 
-void OggFree(OggData *data)
+static void OggFree(OggData *data)
 {
+	if (data == nullptr) {
+		return;
+	}
 	if (data->audio) {
 		ogg_stream_clear(&data->astream);
 		vorbis_block_clear(&data->vblock);
@@ -226,74 +221,37 @@ void OggFree(OggData *data)
 }
 
 /**
-**  Callbacks for movie input.
-*/
-
-static void MovieCallbackButtonPressed(unsigned)
-{
-	MovieStop = true;
-}
-
-static void MovieCallbackButtonReleased(unsigned)
-{
-}
-
-static void MovieCallbackKeyPressed(unsigned, unsigned)
-{
-	MovieStop = true;
-}
-
-
-static void MovieCallbackKeyReleased(unsigned, unsigned)
-{
-}
-
-static void MovieCallbackKeyRepeated(unsigned, unsigned)
-{
-}
-
-static void MovieCallbackMouseMove(const PixelPos &)
-{
-}
-
-static void MovieCallbackMouseExit()
-{
-}
-
-/**
 **  Draw Ogg data to the overlay
 */
-static int OutputTheora(OggData *data, SDL_Texture *yuv_overlay, SDL_Rect *rect)
+static void OutputTheora(OggData &data, SDL_Texture &yuv_overlay, SDL_Rect &rect)
 {
 	yuv_buffer yuv;
 
-	theora_decode_YUVout(&data->tstate, &yuv);
+	theora_decode_YUVout(&data.tstate, &yuv);
 
-	SDL_UpdateYUVTexture(yuv_overlay, nullptr, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
+	SDL_UpdateYUVTexture(&yuv_overlay, nullptr, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
 	SDL_RenderClear(TheRenderer);
-	SDL_RenderCopy(TheRenderer, yuv_overlay, nullptr, rect);
+	SDL_RenderCopy(TheRenderer, &yuv_overlay, nullptr, &rect);
 	SDL_RenderPresent(TheRenderer);
-
-	return 0;
 }
 
 /**
 **  Process Ogg data
 */
-static int TheoraProcessData(OggData *data)
+static bool TheoraProcessData(OggData &data)
 {
 	ogg_packet packet;
 
-	while (1) {
-		if (ogg_stream_packetout(&data->vstream, &packet) != 1) {
-			if (OggGetNextPage(&data->page, &data->sync, data->File)) {
+	while (true) {
+		if (ogg_stream_packetout(&data.vstream, &packet) != 1) {
+			if (!OggGetNextPage(data.page, data.sync, data.File)) {
 				// EOF
-				return -1;
+				return false;
 			}
-			ogg_stream_pagein(&data->vstream, &data->page);
+			ogg_stream_pagein(&data.vstream, &data.page);
 		} else {
-			theora_decode_packetin(&data->tstate, &packet);
-			return 0;
+			theora_decode_packetin(&data.tstate, &packet);
+			return true;
 		}
 	}
 }
@@ -308,10 +266,8 @@ static int TheoraProcessData(OggData *data)
 */
 int PlayMovie(const std::string &name)
 {
-	int videoWidth, videoHeight;
-	videoWidth  = Video.Width;
-	videoHeight = Video.Height;
-
+	const int videoWidth  = Video.Width;
+	const int videoHeight = Video.Height;
 	const std::string filename = LibraryFileName(name);
 
 	CFile f;
@@ -320,9 +276,8 @@ int PlayMovie(const std::string &name)
 		return 0;
 	}
 
-	OggData data;
-	memset(&data, 0, sizeof(data));
-	if (OggInit(&f, &data) || !data.video) {
+	OggData data{};
+	if (!OggInit(f, data) || !data.video) {
 		OggFree(&data);
 		f.close();
 		return -1;
@@ -345,11 +300,11 @@ int PlayMovie(const std::string &name)
 
 	SDL_RenderClear(TheRenderer);
 	Video.ClearScreen();
-	SDL_Texture *yuv_overlay = SDL_CreateTexture(TheRenderer,
-	                                             SDL_PIXELFORMAT_YV12,
-	                                             SDL_TEXTUREACCESS_STREAMING,
-	                                             data.tinfo.frame_width,
-	                                             data.tinfo.frame_height);
+	sdl2::TexturePtr yuv_overlay{SDL_CreateTexture(TheRenderer,
+	                                               SDL_PIXELFORMAT_YV12,
+	                                               SDL_TEXTUREACCESS_STREAMING,
+	                                               data.tinfo.frame_width,
+	                                               data.tinfo.frame_height)};
 
 	if (yuv_overlay == nullptr) {
 		ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
@@ -370,13 +325,13 @@ int PlayMovie(const std::string &name)
 
 	EventCallback callbacks;
 
-	callbacks.ButtonPressed = MovieCallbackButtonPressed;
-	callbacks.ButtonReleased = MovieCallbackButtonReleased;
-	callbacks.MouseMoved = MovieCallbackMouseMove;
-	callbacks.MouseExit = MovieCallbackMouseExit;
-	callbacks.KeyPressed = MovieCallbackKeyPressed;
-	callbacks.KeyReleased = MovieCallbackKeyReleased;
-	callbacks.KeyRepeated = MovieCallbackKeyRepeated;
+	callbacks.ButtonPressed = [](unsigned) { MovieStop = true; };
+	callbacks.ButtonReleased = [](unsigned) {};
+	callbacks.MouseMoved = [](const PixelPos &) {};
+	callbacks.MouseExit = []() {};
+	callbacks.KeyPressed = [](unsigned, unsigned) { MovieStop = true; };
+	callbacks.KeyReleased = [](unsigned, unsigned) {};
+	callbacks.KeyRepeated = [](unsigned, unsigned) {};
 	callbacks.NetworkEvent = NetworkEvent;
 
 	const EventCallback *old_callbacks = GetCallbacks();
@@ -393,7 +348,7 @@ int PlayMovie(const std::string &name)
 	bool need_data = true;
 	while (!MovieStop) {
 		if (need_data) {
-			if (TheoraProcessData(&data)) {
+			if (!TheoraProcessData(data)) {
 				break;
 			}
 			need_data = false;
@@ -408,7 +363,7 @@ int PlayMovie(const std::string &name)
 			continue;
 		}
 		if (diff > 0) {
-			OutputTheora(&data, yuv_overlay, &rect);
+			OutputTheora(data, *yuv_overlay, rect);
 			need_data = true;
 		}
 
@@ -417,7 +372,7 @@ int PlayMovie(const std::string &name)
 
 	StopMusic();
 	SetMusicVolume(prevMusicVolume);
-	SDL_DestroyTexture(yuv_overlay);
+	yuv_overlay.reset();
 	CallbackMusicEnable();
 
 	OggFree(&data);
@@ -430,27 +385,21 @@ int PlayMovie(const std::string &name)
 
 Movie::~Movie()
 {
-	if (rect != nullptr) {
-		::free(rect);
-	}
 	if (mSurface != nullptr) {
 		SDL_FreeSurface(mSurface);
 	}
-	if (yuv_overlay != nullptr) {
-		SDL_DestroyTexture(yuv_overlay);
-	}
 	if (data != nullptr) {
-		OggFree(data);
+		OggFree(data.get());
 	}
 	if (f != nullptr) {
 		delete f;
 	}
 }
 
-static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_Rect *rect, OggData *data) {
-	yuv_buffer *yuv = (yuv_buffer*)calloc(sizeof(yuv_buffer), 1);
-	theora_decode_YUVout(&data->tstate, yuv);
-	SDL_UpdateYUVTexture(yuv_overlay, nullptr, yuv->y, yuv->y_stride, yuv->u, yuv->uv_stride, yuv->v, yuv->uv_stride);
+static void RenderToSurface(SDL_Surface &surface, SDL_Texture *yuv_overlay, SDL_Rect &rect, OggData &data) {
+	yuv_buffer yuv{};
+	theora_decode_YUVout(&data.tstate, &yuv);
+	SDL_UpdateYUVTexture(yuv_overlay, nullptr, yuv.y, yuv.y_stride, yuv.u, yuv.uv_stride, yuv.v, yuv.uv_stride);
 	SDL_RenderClear(TheRenderer);
 
 	// since SDL will render us at logical size, and SDL_RenderReadPixels will read the at
@@ -464,20 +413,19 @@ static void RenderToSurface(SDL_Surface *surface, SDL_Texture *yuv_overlay, SDL_
 	double scaleX = (double)ww / rw;
 	double scaleY = (double)wh / rh;
 	double scale = std::min(scaleX, scaleY);
-	render_rect.w = rect->w / scale;
-	render_rect.h = rect->h / scale;
+	render_rect.w = rect.w / scale;
+	render_rect.h = rect.h / scale;
 
 	SDL_Rect read_rect;
-	read_rect.w = rect->w;
-	read_rect.h = rect->h;
+	read_rect.w = rect.w;
+	read_rect.h = rect.h;
 	read_rect.x = (ww - (rw * scale)) / 2;
 	read_rect.y = (wh - (rh * scale)) / 2;
 	SDL_RenderCopy(TheRenderer, yuv_overlay, nullptr, &render_rect);
-	if (SDL_RenderReadPixels(TheRenderer, &read_rect, surface->format->format, surface->pixels, surface->pitch)) {
+	if (SDL_RenderReadPixels(TheRenderer, &read_rect, surface.format->format, surface.pixels, surface.pitch)) {
 		ErrorPrint("Reading from renderer not supported\n");
-		SDL_FillRect(surface, nullptr, 0); // completely transparent
+		SDL_FillRect(&surface, nullptr, 0); // completely transparent
 	}
-	free(yuv);
 }
 
 bool Movie::Load(const std::string &name, int w, int h)
@@ -490,11 +438,10 @@ bool Movie::Load(const std::string &name, int w, int h)
 		return false;
 	}
 
-	rect = (SDL_Rect*)calloc(sizeof(SDL_Rect), 1);
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = w;
-	rect->h = h;
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = w;
+	rect.h = h;
 
 	mSurface = SDL_CreateRGBSurface(
 		0, w, h, TheScreen->format->BitsPerPixel, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -511,37 +458,39 @@ bool Movie::Load(const std::string &name, int w, int h)
 SDL_Surface *Movie::getSurface() const /* override */
 {
 	if (data == nullptr) {
-		data = (OggData *) calloc(sizeof(OggData), 1);
-		if (OggInit(f, data) || !data->video) {
-			OggFree(data);
+		data = std::make_unique<OggData>();
+		if (!OggInit(*f, *data) || !data->video) {
+			OggFree(data.get());
+			data.reset();
 			f->close();
 			ErrorPrint("Could not init OggData or not a video\n");
 			return mSurface;
 		}
 
 		data->File = f;
-		yuv_overlay = SDL_CreateTexture(TheRenderer,
-		                                SDL_PIXELFORMAT_YV12,
-		                                SDL_TEXTUREACCESS_STREAMING,
-		                                data->tinfo.frame_width,
-		                                data->tinfo.frame_height);
+		yuv_overlay.reset(SDL_CreateTexture(TheRenderer,
+		                                    SDL_PIXELFORMAT_YV12,
+		                                    SDL_TEXTUREACCESS_STREAMING,
+		                                    data->tinfo.frame_width,
+		                                    data->tinfo.frame_height));
 
 		if (yuv_overlay == nullptr) {
 			ErrorPrint("SDL_CreateYUVOverlay: %s\n", SDL_GetError());
 			ErrorPrint(
 				"SDL_CreateYUVOverlay: %dx%d\n", data->tinfo.frame_width, data->tinfo.frame_height);
-			OggFree(data);
+			OggFree(data.get());
+			data.reset();
 			f->close();
 			return mSurface;
 		}
 
 		start_time = SDL_GetTicks();
 		need_data = true;
-		TheoraProcessData(data);
-		RenderToSurface(mSurface, yuv_overlay, rect, data);
+		TheoraProcessData(*data);
+		RenderToSurface(*mSurface, yuv_overlay.get(), rect, *data);
 	}
 	if (need_data) {
-		if (TheoraProcessData(data)) {
+		if (!TheoraProcessData(*data)) {
 			return mSurface;
 		}
 		need_data = false;
@@ -552,7 +501,7 @@ SDL_Surface *Movie::getSurface() const /* override */
 		- static_cast<int>(theora_granule_time(&data->tstate, data->tstate.granulepos) * 1000);
 
 	if (diff > 0) {
-		RenderToSurface(mSurface, yuv_overlay, rect, data);
+		RenderToSurface(*mSurface, yuv_overlay.get(), rect, *data);
 		need_data = true;
 	}
 	return mSurface;
