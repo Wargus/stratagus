@@ -46,11 +46,15 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "ogg/ogg.h"
-#include "vorbis/codec.h"
-#ifdef USE_THEORA
-#include "theora/theora.h"
-#endif
+# include <ogg/ogg.h>
+# include <vorbis/codec.h>
+
+# ifdef USE_THEORA
+#  include "sdl2_helper.h"
+
+#  include <memory>
+#  include <theora/theora.h>
+# endif
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -62,26 +66,26 @@ class CFile;
 **  Ogg data structure to handle vorbis/theora streaming.
 */
 struct OggData {
-	CFile *File;      /// Ogg file handle
-	ogg_sync_state sync;
-	ogg_page page;
+	CFile *File = nullptr;      /// Ogg file handle
+	ogg_sync_state sync{};
+	ogg_page page{};
 
-	ogg_stream_state astream;
-	vorbis_info vinfo;
-	vorbis_comment vcomment;
-	vorbis_block vblock;
-	vorbis_dsp_state vdsp;
+	ogg_stream_state astream{};
+	vorbis_info vinfo{};
+	vorbis_comment vcomment{};
+	vorbis_block vblock{};
+	vorbis_dsp_state vdsp{};
 
 #ifdef USE_THEORA
-	ogg_stream_state vstream;
-	theora_info tinfo;
-	theora_comment tcomment;
-	theora_state tstate;
+	ogg_stream_state vstream{};
+	theora_info tinfo{};
+	theora_comment tcomment{};
+	theora_state tstate{};
 #endif
 
-	int audio : 1;
+	bool audio = false;
 #ifdef USE_THEORA
-	int video : 1;
+	bool video = false;
 #endif
 };
 
@@ -97,29 +101,15 @@ public:
 	// guichan
 	SDL_Surface *getSurface() const override;
 
-public:
+private:
 	CFile *f = nullptr;
 	mutable bool need_data = true;
 	mutable Uint32 start_time = 0;
-	mutable OggData *data = nullptr;
-	mutable SDL_Rect *rect = nullptr;
-	mutable SDL_Texture *yuv_overlay = nullptr;
+	mutable std::unique_ptr<OggData> data;
+	mutable SDL_Rect rect{};
+	mutable sdl2::TexturePtr yuv_overlay;
 };
 #endif
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
-
-extern int OggInit(CFile *f, OggData *data);
-extern void OggFree(OggData *data);
-extern int OggGetNextPage(ogg_page *page, ogg_sync_state *sync, CFile *f);
-
-extern int VorbisProcessData(OggData *data, char *buffer);
 
 #endif // USE_VORBIS
 
