@@ -224,6 +224,7 @@ static int CclDefineConstruction(lua_State *l)
 			}
 		} else if (value == "Constructions") {
 			const unsigned int subargs = lua_rawlen(l, -1);
+			construction->Frames.reserve(subargs);
 
 			for (unsigned int k = 0; k < subargs; ++k) {
 				int percent = 0;
