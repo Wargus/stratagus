@@ -106,6 +106,7 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "sdl2_helper.h"
 #include "vec2i.h"
 
 #include <SDL.h>
@@ -146,8 +147,8 @@ public:
 	CGraphic *G = nullptr; /// Cursor sprite image
 
 private:
-	std::vector<SDL_Cursor*> SdlCursors;
-	std::vector<SDL_Surface*> SdlCursorSurfaces;
+	std::vector<sdl2::CursorPtr> SdlCursors;
+	std::vector<sdl2::SurfacePtr> SdlCursorSurfaces;
 };
 
 /// Cursor config reference

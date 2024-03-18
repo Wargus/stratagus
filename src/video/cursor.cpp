@@ -88,7 +88,7 @@ static CCursor *ActuallyVisibleGameCursor;
 static unsigned int VisibleGameCursorFrame;
 
 
-static SDL_Surface *HiddenSurface;
+static sdl2::SurfacePtr HiddenSurface;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -119,39 +119,32 @@ SDL_Cursor *CCursor::GetSDLCursor()
 
 			SDL_Rect srect = {G->frame_map[i].x, G->frame_map[i].y, G->getWidth(), G->getHeight()};
 
-			SDL_Surface *intermediate = SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitSurface(G->getSurface(), &srect, intermediate, nullptr);
+			sdl2::SurfacePtr intermediate{
+				SDL_CreateRGBSurface(0, srect.w, srect.h, 32, RMASK, GMASK, BMASK, AMASK)};
+			SDL_BlitSurface(G->getSurface(), &srect, intermediate.get(), nullptr);
 
-			SDL_Surface *cursorFrame = SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK);
-			SDL_BlitScaled(intermediate, nullptr, cursorFrame, nullptr);
+			sdl2::SurfacePtr cursorFrame{
+				SDL_CreateRGBSurface(0, w, h, 32, RMASK, GMASK, BMASK, AMASK)};
+			SDL_BlitScaled(intermediate.get(), nullptr, cursorFrame.get(), nullptr);
 
-			SDL_FreeSurface(intermediate);
+			intermediate.reset();
 
-			SdlCursorSurfaces.push_back(cursorFrame);
-			SDL_Cursor *cur = SDL_CreateColorCursor(cursorFrame, floor(HotPos.x * xScale), floor(HotPos.y * yScale));
-			SdlCursors.push_back(cur);
+			SdlCursorSurfaces.push_back(std::move(cursorFrame));
+			sdl2::CursorPtr cur{SDL_CreateColorCursor(SdlCursorSurfaces.back().get(),
+			                                          floor(HotPos.x * xScale),
+			                                          floor(HotPos.y * yScale))};
+			SdlCursors.push_back(std::move(cur));
 		}
 	}
-	return SdlCursors[SpriteFrame];
+	return SdlCursors[SpriteFrame].get();
 }
 
 CCursor::~CCursor()
 {
-	for (auto sdlCur : SdlCursors) {
-		SDL_FreeCursor(sdlCur);
-	}
-	for (auto sdlSurface : SdlCursorSurfaces) {
-		SDL_FreeSurface(sdlSurface);
-	}
 }
 
-void CCursor::Reset() {
-	for (auto sdlCur : SdlCursors) {
-		SDL_FreeCursor(sdlCur);
-	}
-	for (auto sdlSurface : SdlCursorSurfaces) {
-		SDL_FreeSurface(sdlSurface);
-	}
+void CCursor::Reset()
+{
 	SdlCursors.clear();
 	SdlCursorSurfaces.clear();
 }
@@ -354,20 +347,20 @@ void DrawCursor()
             		|| HiddenSurface->w != GameCursor->G->getWidth()
                     || HiddenSurface->h != GameCursor->G->getHeight()) {
                     if (HiddenSurface) {
-						VideoPaletteListRemove(HiddenSurface);
-						SDL_FreeSurface(HiddenSurface);
+						VideoPaletteListRemove(HiddenSurface.get());
+						SDL_FreeSurface(HiddenSurface.get());
 					}
-					HiddenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
-														GameCursor->G->getWidth(),
-														GameCursor->G->getHeight(),
-														TheScreen->format->BitsPerPixel,
-														TheScreen->format->Rmask,
-														TheScreen->format->Gmask,
-														TheScreen->format->Bmask,
-														TheScreen->format->Amask);
+					HiddenSurface.reset(SDL_CreateRGBSurface(SDL_SWSURFACE,
+				                                             GameCursor->G->getWidth(),
+				                                             GameCursor->G->getHeight(),
+				                                             TheScreen->format->BitsPerPixel,
+				                                             TheScreen->format->Rmask,
+				                                             TheScreen->format->Gmask,
+				                                             TheScreen->format->Bmask,
+				                                             TheScreen->format->Amask));
 			}
 			SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
-			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface, nullptr);
+			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface.get(), nullptr);
 		}
 
 		if (!GameCursor->G->IsLoaded()) {
@@ -395,7 +388,7 @@ void HideCursor()
 	if (!Preference.HardwareCursor && !GameRunning && !Editor.Running && GameCursor) {
 		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 		SDL_Rect dstRect = {Sint16(pos.x), Sint16(pos.y), 0, 0 };
-		SDL_BlitSurface(HiddenSurface, nullptr, TheScreen, &dstRect);
+		SDL_BlitSurface(HiddenSurface.get(), nullptr, TheScreen, &dstRect);
 	} else {
 		SDL_SetCursor(Video.blankCursor);
 		ActuallyVisibleGameCursor = nullptr;
