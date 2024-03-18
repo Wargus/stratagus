@@ -35,10 +35,26 @@
 namespace sdl2 {
     struct SDL_Deleter
     {
-        void operator()(SDL_Surface*  ptr) { if (ptr) SDL_FreeSurface(ptr);     }
-        void operator()(SDL_Texture*  ptr) { if (ptr) SDL_DestroyTexture(ptr);  }
-        void operator()(SDL_Renderer* ptr) { if (ptr) SDL_DestroyRenderer(ptr); }
-        void operator()(SDL_Window*   ptr) { if (ptr) SDL_DestroyWindow(ptr);   }
+		void operator()(SDL_Cursor *ptr) const
+		{
+			if (ptr) SDL_FreeCursor(ptr);
+		}
+		void operator()(SDL_Surface *ptr) const
+		{
+			if (ptr) SDL_FreeSurface(ptr);
+		}
+		void operator()(SDL_Texture *ptr) const
+		{
+			if (ptr) SDL_DestroyTexture(ptr);
+		}
+		void operator()(SDL_Renderer *ptr) const
+		{
+			if (ptr) SDL_DestroyRenderer(ptr);
+		}
+		void operator()(SDL_Window *ptr) const
+		{
+			if (ptr) SDL_DestroyWindow(ptr);
+		}
     };
 
     template<typename T>
@@ -50,6 +66,7 @@ namespace sdl2 {
     };
 
 
+    using CursorPtr    = std::unique_ptr<SDL_Cursor,  SDL_Deleter>;
     using SurfacePtr    = std::unique_ptr<SDL_Surface,  SDL_Deleter>;
     using TexturePtr    = std::unique_ptr<SDL_Texture,  SDL_Deleter>;
     using RendererPtr   = std::unique_ptr<SDL_Renderer, SDL_Deleter>;
