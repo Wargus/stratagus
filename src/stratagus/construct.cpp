@@ -37,6 +37,7 @@
 
 #include "construct.h"
 
+#include <algorithm>
 #include <vector>
 
 #include "script.h"
@@ -263,6 +264,17 @@ static int CclDefineConstruction(lua_State *l)
 				cframe.Percent = percent;
 				cframe.File = file;
 				cframe.Frame = frame;
+			}
+			if (!construction->Frames.empty() && construction->Frames.front().Percent != 0) {
+				LuaError(
+					l, "First percent of Construction '%s' is not 0", construction->Ident.c_str());
+			}
+			if (!std::is_sorted(
+					construction->Frames.begin(),
+					construction->Frames.end(),
+					[](const auto &lhs, const auto &rhs) { return lhs.Percent < rhs.Percent; })) {
+				LuaError(
+					l, "Percents of Construction '%s' not sorted", construction->Ident.c_str());
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s", value.data());
