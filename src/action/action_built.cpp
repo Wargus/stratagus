@@ -325,8 +325,8 @@ static std::size_t FindCFramePercent(const std::vector<CConstructionFrame> &cfra
 {
 	const auto it =
 		ranges::find_if(cframes, [&](const auto &frame) { return percent < frame.Percent; });
-	Assert(it != cframes.begin());
-	return std::distance(cframes.begin(), std::prev(it));
+	const std::size_t index = std::distance(cframes.begin(), it);
+	return index > 0 ? index - 1 : 0;
 }
 
 /**
