@@ -1014,7 +1014,7 @@ static void DrawEditorInfo()
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
 	const terrain_typeIdx mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
-	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
+	snprintf(buf, sizeof(buf), "[0x%04X] %s %s", index, baseTerrainStr, mixTerrainStr);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight(), buf);
 #endif
 }
