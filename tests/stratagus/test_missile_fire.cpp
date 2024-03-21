@@ -57,6 +57,7 @@ TEST_CASE("missile_fire")
 
 	SUBCASE("size=0") {
 		setFrames({});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding(  0) == nullptr);
 	}
@@ -65,6 +66,7 @@ TEST_CASE("missile_fire")
 		setFrames({
 			{  0, M(10)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding(  0) == M(10));
 		CHECK(MissileBurningBuilding(  1) == M(10));
@@ -76,6 +78,7 @@ TEST_CASE("missile_fire")
 			{  0, M(10)},
 			{ 50, M(11)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		SUBCASE("normal") {
 			CHECK(MissileBurningBuilding(  0) == M(10));
@@ -104,6 +107,7 @@ TEST_CASE("missile_fire")
 			{ 99, M(16)},
 			{100, M(17)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding(  0) == M(10));
 		CHECK(MissileBurningBuilding(  1) == M(11));
@@ -130,6 +134,7 @@ TEST_CASE("missile_fire")
 			{ 80, nullptr},
 			{ 90, M(10)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding( 79) == M(10));
 		CHECK(MissileBurningBuilding( 80) == nullptr);
@@ -141,6 +146,7 @@ TEST_CASE("missile_fire")
 		setFrames({
 			{ 10, M(1000)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding( 9) == nullptr);
 		CHECK(MissileBurningBuilding(10) == M(1000));
@@ -154,6 +160,7 @@ TEST_CASE("missile_fire")
 			{ 20, M(12)},
 			{ 60, M(13)},
 		});
+		CHECK(is_BurningBuildingFramesSorted());
 
 		CHECK(MissileBurningBuilding(19) == M(10));
 		CHECK(MissileBurningBuilding(20) == M(12));
@@ -162,17 +169,11 @@ TEST_CASE("missile_fire")
 
 	SUBCASE("wrong key order") {
 		setFrames({
-			{ 75, M(12)},
 			{ 50, M(11)},
 			{  0, M(10)},
 		});
 
-		CHECK(MissileBurningBuilding(  0) == M(10));
-		CHECK(MissileBurningBuilding( 20) == M(10));
-		CHECK(MissileBurningBuilding( 50) == M(10));
-		CHECK(MissileBurningBuilding( 60) == M(10));
-		CHECK(MissileBurningBuilding( 75) == M(10));
-		CHECK(MissileBurningBuilding( 90) == M(10));
+		CHECK_FALSE(is_BurningBuildingFramesSorted());
 	}
 
 	BurningBuildingFrames.clear();

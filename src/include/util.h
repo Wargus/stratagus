@@ -323,6 +323,12 @@ namespace ranges
 		std::sort(std::begin(range), std::end(range), std::forward<Comparer>(comparer));
 	}
 
+	template <typename Range, typename Comparer = std::less<>>
+	bool is_sorted(Range &range, Comparer &&comparer = {})
+	{
+		return std::is_sorted(std::begin(range), std::end(range), std::forward<Comparer>(comparer));
+	}
+
 }
 
 //@}

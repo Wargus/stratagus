@@ -359,6 +359,10 @@ static int CclDefineBurningBuilding(lua_State *l)
 			}
 		}
 	}
+	if (!is_BurningBuildingFramesSorted())
+	{
+		LuaError(l, "Percents of BurningBuilding not sorted");
+	}
 	return 0;
 }
 

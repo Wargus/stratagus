@@ -1297,6 +1297,19 @@ void CleanMissiles()
 	LocalMissiles.clear();
 }
 
+template <typename Range>
+bool is_PercentSortedDecreasing(Range &range)
+{
+	return ranges::is_sorted(
+		range,
+		[](const auto &lhs, const auto &rhs) { return lhs.Percent > rhs.Percent; });
+}
+
+bool is_BurningBuildingFramesSorted()
+{
+	return is_PercentSortedDecreasing(BurningBuildingFrames);
+}
+
 void FreeBurningBuildingFrames()
 {
 	BurningBuildingFrames.clear();

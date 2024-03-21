@@ -630,6 +630,8 @@ extern void InitMissiles();
 /// Clean missiles
 extern void CleanMissiles();
 
+extern bool is_BurningBuildingFramesSorted();
+
 extern void FreeBurningBuildingFrames();
 
 //@}
