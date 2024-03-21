@@ -195,9 +195,14 @@ public:
 
 	const std::string &getTerrainName(terrain_typeIdx solidTerrainIndex) const;
 
+	graphic_index getGraphicTileFor(tile_index idx) const 
+	{
+		return idx < tiles.size() ? tiles[idx].tile : 0; 
+	};
+	
 	int32_t findTileIndexByTile(graphic_index tile) const;
 	tile_index getTileNumber(tile_index basic, bool random, bool filler) const;
-	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
+	void fillSolidTiles(std::vector<tile_index> *solidTiles) const;
 
 	uint32_t getQuadFromTile(graphic_index tile) const;
 	int getTileBySurrounding(tile_flags type,

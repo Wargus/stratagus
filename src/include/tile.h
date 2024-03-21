@@ -185,7 +185,13 @@ public:
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
-	void setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile = -1);
+	void setTileIndex(const CTileset &tileset,
+					  tile_index tileIndex,
+					  int value,
+					  uint8_t elevation,
+					  int subtile = -1);
+
+	tile_index getTileIndex() const { return tilesetTile; }
 
 	graphic_index getGraphicTile() const { return tile; }
 
@@ -237,15 +243,9 @@ public:
 	uint8_t getElevation() const { return this->ElevationLevel; }
 	void 	setElevation(const uint8_t newLevel) { this->ElevationLevel = newLevel; }
 
-private:
-#ifdef DEBUG
-	tile_index tilesetTile;  /// tileset tile number
-#endif
-	graphic_index tile;       /// graphic tile number
 public:
 	tile_flags Flags;        /// field flags
-private:
-	unsigned char cost;        /// unit cost to move in this tile
+
 public:
 	unsigned int Value;        /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
 	std::vector<CUnit *> UnitCache; /// A unit on the map field.
@@ -253,7 +253,10 @@ public:
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 
 private:
+	tile_index tilesetTile;			/// tileset tile number
+	graphic_index tile;				/// graphic tile number
 	uint8_t ElevationLevel {0};		/// highground elevation level
+	unsigned char cost;				/// unit cost to move in this tile
 
 };
 

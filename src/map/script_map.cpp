@@ -987,8 +987,8 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int32_t index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	Assert(index != -1);
+	const tile_index index = mf.getTileIndex();
+	
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());

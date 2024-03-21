@@ -80,7 +80,7 @@ public:
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
-	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
+	std::vector<tile_index> ShownTileTypes;			/// Shown editor tile-type table.
 
 	bool TerrainEditable;        /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
