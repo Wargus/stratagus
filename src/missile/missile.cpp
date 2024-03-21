@@ -1309,7 +1309,7 @@ bool IsPercentDecreasingValid(const Range &range)
 
 	return ret && ranges::is_sorted(
 		range,
-		std::greater(),
+		std::greater<>{},
 		[](const auto& e) { return e.Percent; });
 }
 
