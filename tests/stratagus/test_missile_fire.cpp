@@ -68,7 +68,7 @@ TEST_CASE("missile_fire")
 
 	SUBCASE("size=0") {
 		setFrames({});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding(  0) == nullptr);
 	}
@@ -77,7 +77,7 @@ TEST_CASE("missile_fire")
 		setFrames({
 			{  0, m0},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding(  0) == m0);
 		CHECK(MissileBurningBuilding(  1) == m0);
@@ -89,7 +89,7 @@ TEST_CASE("missile_fire")
 			{  0, m0},
 			{ 50, m1},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		SUBCASE("normal") {
 			CHECK(MissileBurningBuilding(  0) == m0);
@@ -118,7 +118,7 @@ TEST_CASE("missile_fire")
 			{ 99, m6},
 			{100, m7},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding(  0) == m0);
 		CHECK(MissileBurningBuilding(  1) == m1);
@@ -145,7 +145,7 @@ TEST_CASE("missile_fire")
 			{ 80, nullptr},
 			{ 90, m8},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding( 79) == m8);
 		CHECK(MissileBurningBuilding( 80) == nullptr);
@@ -157,7 +157,7 @@ TEST_CASE("missile_fire")
 		setFrames({
 			{ 10, m5},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding( 9) == nullptr);
 		CHECK(MissileBurningBuilding(10) == m5);
@@ -171,7 +171,7 @@ TEST_CASE("missile_fire")
 			{ 20, m2},
 			{ 60, m3},
 		});
-		CHECK(is_BurningBuildingFramesSorted());
+		CHECK(IsBurningBuildingFramesValid());
 
 		CHECK(MissileBurningBuilding(19) == m0);
 		CHECK(MissileBurningBuilding(20) == m2);
@@ -185,7 +185,25 @@ TEST_CASE("missile_fire")
 			{  0, m7},
 		});
 
-		CHECK_FALSE(is_BurningBuildingFramesSorted());
+		CHECK_FALSE(IsBurningBuildingFramesValid());
+	}
+
+	SUBCASE("too small key value") {
+		setFrames({
+			{ -1, m7},
+			{100, m8},
+		});
+
+		CHECK_FALSE(IsBurningBuildingFramesValid());
+	}
+
+	SUBCASE("too large key value") {
+		setFrames({
+			{  0, m7},
+			{101, m8},
+		});
+
+		CHECK_FALSE(IsBurningBuildingFramesValid());
 	}
 
 	BurningBuildingFrames.clear();

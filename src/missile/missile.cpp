@@ -1298,17 +1298,24 @@ void CleanMissiles()
 }
 
 template <typename Range>
-bool is_PercentSortedDecreasing(const Range &range)
+bool IsPercentDecreasingValid(const Range &range)
 {
-	return ranges::is_sorted(
+	bool ret = true;
+	if (!range.empty())
+	{
+		ret = range.front().Percent <= 100
+			&& range.back().Percent >= 0;
+	}
+
+	return ret && ranges::is_sorted(
 		range,
 		std::greater(),
 		[](const auto& e) { return e.Percent; });
 }
 
-bool is_BurningBuildingFramesSorted()
+bool IsBurningBuildingFramesValid()
 {
-	return is_PercentSortedDecreasing(BurningBuildingFrames);
+	return IsPercentDecreasingValid(BurningBuildingFrames);
 }
 
 void FreeBurningBuildingFrames()
