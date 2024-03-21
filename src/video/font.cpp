@@ -48,10 +48,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-using FontMap = std::map<std::string, std::unique_ptr<CFont>, std::less<>>;
+using FontMap = std::map<std::string, CFont, std::less<>>;
 static FontMap Fonts;  /// Font mappings
 
-using FontColorMap = std::map<std::string, std::unique_ptr<CFontColor>, std::less<>>;
+using FontColorMap = std::map<std::string, CFontColor, std::less<>>;
 static FontColorMap FontColors;  /// Map of ident to font color.
 
 static const CFontColor *LastTextColor;      /// Last text color
@@ -913,7 +913,7 @@ void CFont::DynamicLoad() const
 void LoadFonts()
 {
 	for (auto &[key, font] : Fonts) {
-		font->Load();
+		font.Load();
 	}
 
 	// TODO: remove this
@@ -931,16 +931,15 @@ void LoadFonts()
 */
 /* static */ CFont *CFont::New(const std::string &ident, CGraphic *g)
 {
-	auto &font = Fonts[ident];
-	if (font) {
-		if (font->G != g) {
-			CGraphic::Free(font->G);
+	auto &[it, inserted] = Fonts.insert({ident, CFont(ident)});
+	auto &[key, font] = *it;
+	if (!inserted) {
+		if (font.G != g) {
+			CGraphic::Free(font.G);
 		}
-	} else {
-		font.reset(new CFont(ident));
 	}
-	font->G = g;
-	return font.get();
+	font.G = g;
+	return &font;
 }
 
 /**
@@ -967,12 +966,7 @@ void LoadFonts()
 		ErrorPrint("font not found: '%s'\n", ident.data());
 		return nullptr;
 	}
-	auto &font = it->second;
-	if (font == nullptr) {
-		ErrorPrint("font not found: '%s'\n", ident.data());
-		return nullptr;
-	}
-	return font.get();
+	return &it->second;
 }
 
 /**
@@ -984,12 +978,8 @@ void LoadFonts()
 */
 /* static */ CFontColor *CFontColor::New(const std::string &ident)
 {
-	auto &fc = FontColors[ident];
-
-	if (fc == nullptr) {
-		fc = std::make_unique<CFontColor>(ident);
-	}
-	return fc.get();
+	auto [it, inserted] = FontColors.emplace(ident, ident);
+	return &it->second;
 }
 
 /**
@@ -1006,7 +996,7 @@ void LoadFonts()
 		ErrorPrint("font color not found: '%s'\n", ident.data());
 		ExitFatal(-1);
 	}
-	return it->second.get();
+	return &it->second;
 }
 
 /**
