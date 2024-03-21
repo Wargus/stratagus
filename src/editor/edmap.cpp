@@ -86,9 +86,8 @@ void ChangeTile(const Vec2i &pos, int tile)
 */
 static uint32_t QuadFromTile(const Vec2i &pos)
 {
-	// find the abstract tile number
-	const graphic_index tile = Map.Field(pos)->getGraphicTile();
-	return Map.Tileset.getQuadFromTile(tile);
+	const tile_index idx = Map.Field(pos)->getTileIndex();
+	return Map.Tileset->getQuadFromTile(idx);
 }
 
 /**
@@ -98,17 +97,17 @@ static uint32_t QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param lock_pos   map tile coordinate, that should not be changed in callback.
 */
-static void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
+static void EditorChangeTile(const Vec2i &pos, tile_index tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	int tile = tileIndex;
+	tile_index tileIdx = tileIndex;
 	if (TileToolRandom) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset.tiles[tile + i].tile) {
+			if (!Map.Tileset->tiles[tileIdx + i].tile) {
 				break;
 			} else {
 				++n;
@@ -117,14 +116,14 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset.tiles[tile + i].tile) {
+			while (++i < 16 && !Map.Tileset->tiles[tileIdx + i].tile) {
 			}
 		} while (i < 16 && n--);
 		if (i < 16) {
-			tile += i;
+			tileIdx += i;
 		}
 	}
-	mf.setTileIndex(Map.Tileset, tile, 0, mf.getElevation());
+	mf.setTileIndex(*Map.Tileset, tileIdx, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -409,13 +408,13 @@ static void EditorDestroyAllUnits()
 static void RandomizeTransition(int x, int y)
 {
 	CMapField &mf = *Map.Field(x, y);
-	const CTileset &tileset = Map.Tileset;
-	int baseTileIndex = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.BaseTerrain;
-	int mixTerrainIdx = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.MixTerrain;
+	const CTileset &tileset = *Map.Tileset;
+	terrain_typeIdx baseTileIndex = tileset.tiles[mf.getTileIndex()].tileinfo.BaseTerrain;
+	terrain_typeIdx mixTerrainIdx = tileset.tiles[mf.getTileIndex()].tileinfo.MixTerrain;
 	if (mixTerrainIdx != 0) {
 		if (rng() % 8 == 0) {
 			// change only in ~12% of cases
-			const int tileIdx = tileset.findTileIndex(rng() % 2 ? baseTileIndex : mixTerrainIdx, 0);
+			const tile_index tileIdx = tileset.findTileIndex(rng() % 2 ? baseTileIndex : mixTerrainIdx, 0);
 			EditorChangeTile(Vec2i(x, y), tileIdx, Vec2i(x, y), true);
 		}
 	}

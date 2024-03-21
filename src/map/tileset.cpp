@@ -667,10 +667,8 @@ tile_index CTileset::getTileNumber(tile_index basic, bool random, bool filler) c
 **  If the tile is 3/4 light grass and dark grass(0x06) in upper left corner
 **    the value is 0x06050505.
 */
-uint32_t CTileset::getQuadFromTile(graphic_index tile) const
+uint32_t CTileset::getQuadFromTile(tile_index tileIndex) const
 {
-	const int32_t tileIndex = findTileIndexByTile(tile);
-	Assert(tileIndex != -1);
 
 	const uint32_t base = tiles[tileIndex].tileinfo.BaseTerrain;
 	const uint32_t mix = tiles[tileIndex].tileinfo.MixTerrain;
@@ -699,7 +697,7 @@ uint32_t CTileset::getQuadFromTile(graphic_index tile) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
+void CTileset::fillSolidTiles(std::vector<tile_index> *solidTiles) const
 {
 	std::vector<int> seen_types;
 	seen_types.resize(solidTerrainTypes.size(), 0);
@@ -709,7 +707,7 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 		if (info.BaseTerrain && info.MixTerrain == 0) {
 			if (seen_types[info.BaseTerrain] == 0) {
 				seen_types[info.BaseTerrain] = 1;
-				solidTiles->push_back(tiles[i].tile);
+				solidTiles->push_back(static_cast<tile_index>(i));
 			}
 		}
 	}

@@ -71,15 +71,18 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile /* = -1 */)
+void CMapField::setTileIndex(const CTileset &tileset, 
+							 tile_index tileIndex, 
+							 int value, 
+							 uint8_t elevation, 
+							 int subtile /* = -1 */)
 {
-	uint8_t compShift = 0; // [0..F] in case that current tileset slot length is shorter than map's original
-
-	if (tileIndex >= ExtendedTilesetBeginIdx) { // tile from extended tileset
-		while(tileset.tiles[tileIndex - compShift].tile == 0 && ((tileIndex & 0xF) - compShift) > 0) {
-			compShift++;
-		}
+	uint8_t compShift = 0; // [0..F] in case then current tileset slot length is shorter 
+						   // than map's original tileset. *To prevent display of black tiles.
+	while(tileset.tiles[tileIndex - compShift].tile == 0 && ((tileIndex & 0xF) - compShift) > 0) {
+		compShift++;
 	}
+
 	const CTile &tile = tileset.tiles[tileIndex - compShift];
 	this->tile = tile.tile;
 	this->Value = value;
@@ -111,9 +114,8 @@ void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex
 	}
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
-#ifdef DEBUG
+	
 	this->tilesetTile = tileIndex - compShift;
-#endif
 }
 
 void CMapField::Save(CFile &file) const
