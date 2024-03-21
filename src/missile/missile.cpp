@@ -1173,7 +1173,7 @@ int ViewPointDistanceToMissile(const Missile &missile)
 MissileType *MissileBurningBuilding(int percent)
 {
 	for (auto &frame : BurningBuildingFrames) {
-		if (percent > frame.Percent) {
+		if (percent >= frame.Percent) {
 			return frame.Missile;
 		}
 	}
