@@ -1,4 +1,4 @@
-//       _________ __                 __
+﻿//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -148,7 +148,7 @@ static std::unique_ptr<gcn::DropDown> overlaysDropdown;
 **  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit or -1, to edit the tile under the brush according to the modifiers
 */
-static void EditTile(const Vec2i &pos, int tile)
+static void EditTile(const Vec2i &pos, int32_t tileIdx)
 {
  	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -156,11 +156,11 @@ static void EditTile(const Vec2i &pos, int tile)
 
 	CMapField &mf = *Map.Field(pos);
 
-	int32_t baseTileIndex = tileset.findTileIndexByTile(tile);
+	int32_t baseTileIndex = tileIdx;
 	if (baseTileIndex <= 0) {
 		// use the tile under the cursor and randomize *that* if it's
 		// not a mix tile
-		baseTileIndex = tileset.findTileIndexByTile(mf.getGraphicTile());
+		baseTileIndex = mf.getTileIndex();
 		const int32_t mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
 		if (mixTerrainIdx > 0) {
 			return;
@@ -792,7 +792,10 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 static void DrawTileIcons()
 {
 	forEachTileIconArea([](int i, int x, int y, int w, int h) {
-		const unsigned int tile = Editor.ShownTileTypes[i];
+		
+		if (i >= Editor.ShownTileTypes.size()) return false;
+
+		const graphic_index tile = Map.Tileset->getGraphicTileFor(Editor.ShownTileTypes[i]);
 
 		Map.TileGraphic->DrawFrameClip(tile, x, y);
 		Video.DrawRectangleClip(ColorGray, x, y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
@@ -892,7 +895,7 @@ static void DrawMapCursor()
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
-			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
+			const graphic_index tile = Map.Tileset->getGraphicTileFor(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 
@@ -1007,9 +1010,9 @@ static void DrawEditorInfo()
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 2, buf);
 
 	// Tile info
-	const CTileset &tileset = Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	Assert(index != -1);
+	const CTileset &tileset = *Map.Tileset;
+	const tile_index index = mf.getTileIndex();
+
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
 	const terrain_typeIdx mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
@@ -1234,7 +1237,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						tile_index index = 0;
 						for (auto &currTile : Map.Tileset.tiles) {
 							if (currTile.tile) {
-								Editor.ShownTileTypes.push_back(currTile.tile);
+								Editor.ShownTileTypes.push_back(index);
 							}
 							index++;
 						}
@@ -1340,8 +1343,13 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
-				EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
+			if (Editor.State == EditorStateType::EditTile 
+				&& (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+
+				EditTiles(tilePos, 
+						  Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1,
+						  TileCursorSize);
+
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
@@ -1669,11 +1677,14 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 
 	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
-			const int tile = Editor.ShownTileTypes[i];
-			const int32_t tileindex = Map.Tileset.findTileIndexByTile(tile);
-			Assert(tileindex != -1);
-			const terrain_typeIdx base = Map.Tileset.tiles[tileindex].tileinfo.BaseTerrain;
-			UI.StatusLine.Set(Map.Tileset.getTerrainName(base));
+
+			if (i >= Editor.ShownTileTypes.size()) return true;
+
+			const tile_index tileindex = Editor.ShownTileTypes[i];
+			const graphic_index tile = Map.Tileset->getGraphicTileFor(tileindex);
+
+			const terrain_typeIdx base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
+			UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 			Editor.CursorTileIndex = i;
 			return false;
 		}
