@@ -579,7 +579,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames;  /// Burning building frames
+extern std::vector<BurningBuildingFrame> BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --  Functions

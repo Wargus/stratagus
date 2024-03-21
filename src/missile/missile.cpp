@@ -70,7 +70,7 @@ static std::vector<std::unique_ptr<Missile>> LocalMissiles;     /// all local mi
 using MissileTypeMap = std::map<std::string, std::unique_ptr<MissileType>, std::less<>>;
 static MissileTypeMap MissileTypes;
 
-std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames; /// Burning building frames
+std::vector<BurningBuildingFrame> BurningBuildingFrames; /// Burning building frames
 
 extern std::unique_ptr<INumberDesc> Damage;                   /// Damage calculation for missile.
 
@@ -1173,8 +1173,8 @@ int ViewPointDistanceToMissile(const Missile &missile)
 MissileType *MissileBurningBuilding(int percent)
 {
 	for (auto &frame : BurningBuildingFrames) {
-		if (percent > frame->Percent) {
-			return frame->Missile;
+		if (percent > frame.Percent) {
+			return frame.Missile;
 		}
 	}
 	return nullptr;

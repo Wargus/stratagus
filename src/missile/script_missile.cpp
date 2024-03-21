@@ -339,11 +339,13 @@ static int CclDefineBurningBuilding(lua_State *l)
 	BurningBuildingFrames.clear();
 
 	const int args = lua_gettop(l);
+	BurningBuildingFrames.resize(args);
 	for (int j = 0; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		auto ptr = std::make_unique<BurningBuildingFrame>();
+		const int frameidx = args - 1 - j; // reverse order
+		auto &frame = BurningBuildingFrames[frameidx];
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {
@@ -351,12 +353,11 @@ static int CclDefineBurningBuilding(lua_State *l)
 			++k;
 
 			if (value == "percent") {
-				ptr->Percent = LuaToNumber(l, j + 1, k + 1);
+				frame.Percent = LuaToNumber(l, j + 1, k + 1);
 			} else if (value == "missile") {
-				ptr->Missile = &MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
+				frame.Missile = &MissileTypeByIdent(LuaToString(l, j + 1, k + 1));
 			}
 		}
-		BurningBuildingFrames.insert(BurningBuildingFrames.begin(), std::move(ptr));
 	}
 	return 0;
 }
