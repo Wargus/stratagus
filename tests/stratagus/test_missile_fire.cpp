@@ -169,4 +169,5 @@ TEST_CASE("missile_fire")
 		CHECK(MissileBurningBuilding( 90) == M(10));
 	}
 
+	BurningBuildingFrames.clear();
 }
