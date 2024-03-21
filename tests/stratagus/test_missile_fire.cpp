@@ -55,6 +55,12 @@ TEST_CASE("missile_fire")
 {
 	BurningBuildingFrames.clear();
 
+	SUBCASE("size=0") {
+		setFrames({});
+
+		CHECK(MissileBurningBuilding(  0) == nullptr);
+	}
+
 	SUBCASE("size=1") {
 		setFrames({
 			{  0, M(10)},
