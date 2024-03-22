@@ -34,6 +34,7 @@
 #include "fow_utils.h"
 #include "map.h"
 #include "player.h"
+#include "sdl2_helper.h"
 #include "settings.h"
 #include "video.h"
 
@@ -148,7 +149,7 @@ private:
 
     static CGraphic *TiledFogSrc;           /// Graphic for tiled fog of war
     CGraphic *TiledAlphaFog {nullptr};      /// Working set of graphic for tiled fog of war with alpha channel
-    SDL_Surface *TileOfFogOnly {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
+    sdl2::SurfacePtr TileOfFogOnly; /// Tile contains only fog. Used for legacy rendering of tiled fog
 
     /**
     **  Mapping for fog of war tiles.

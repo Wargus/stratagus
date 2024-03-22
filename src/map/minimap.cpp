@@ -406,7 +406,7 @@ void CMinimap::Update()
 		/// Alpha blending the fog of war texture to minimap
 		/// TODO: switch to hardware rendering
 		const SDL_Rect fogRect {0, 0, W, H};
-		BlitSurfaceAlphaBlending_32bpp(MinimapFogSurface, &fogRect, MinimapSurface, &fogRect);
+		BlitSurfaceAlphaBlending_32bpp(*MinimapFogSurface, fogRect, *MinimapSurface, fogRect);
 	}
 	//
 	// Draw units on map

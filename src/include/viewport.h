@@ -32,6 +32,7 @@
 
 //@{
 #include "fow.h"
+#include "sdl2_helper.h"
 #include "vec2i.h"
 class CUnit;
 class CMapField;
@@ -70,6 +71,9 @@ public:
 	CViewport();
 	~CViewport();
 
+	CViewport(const CViewport &) = delete;
+	CViewport &operator=(const CViewport &) = delete;
+
 	/// Check if pos pixels are within map area
 	bool IsInsideMapArea(const PixelPos &screenPixelPos) const;
 
@@ -86,7 +90,7 @@ public:
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 
 	SDL_Surface* GetFogSurface() {
-		return this->FogSurface;
+		return this->FogSurface.get();
 	}
 
 	/// Set the current map view to x,y(upper,left corner)
@@ -147,8 +151,6 @@ private:
 	void DrawMapFogOfWar();
 	/// Adjust fog of war surface to viewport
 	void AdjustFogSurface();
-	/// Clean fog of war texture
-	void CleanFog();
 
 public:
 	//private:
@@ -163,7 +165,7 @@ public:
 
 	CUnit *Unit;              /// Bound to this unit
 private:
-	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
+	sdl2::SurfacePtr FogSurface; /// Texture for fog of war. Viewport sized.
 
 	static bool ShowGrid;
 	static bool ShowAStarPassability;

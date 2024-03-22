@@ -227,25 +227,23 @@ static void WriteMapPreview(const fs::path &mapname, CMap &map)
 {
 	const int rectSize = 5; // size of rectange used for player start spots
 	const SDL_PixelFormat *fmt = MinimapSurface->format;
-	SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
-												UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
-	SDL_BlitSurface(MinimapSurface, nullptr, preview, nullptr);
+	sdl2::SurfacePtr preview{SDL_CreateRGBSurface(
+		SDL_SWSURFACE, UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0)};
+	SDL_BlitSurface(MinimapSurface, nullptr, preview.get(), nullptr);
 
-	SDL_LockSurface(preview);
-
-	SDL_Rect rect;
+	SDL_LockSurface(preview.get());
 	for (int i = 0; i < PlayerMax - 1; ++i) {
 		if (Players[i].Type != PlayerTypes::PlayerNobody) {
+			SDL_Rect rect;
 			rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
 			rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
 			rect.w = rect.h = rectSize;
-			SDL_FillRect(preview, &rect, Players[i].Color);
+			SDL_FillRect(preview.get(), &rect, Players[i].Color);
 		}
 	}
+	SDL_UnlockSurface(preview.get());
 
-	SDL_UnlockSurface(preview);
-	IMG_SavePNG(preview, mapname.string().c_str());
-	SDL_FreeSurface(preview);
+	IMG_SavePNG(preview.get(), mapname.string().c_str());
 }
 
 std::string PlayerTypeNames[static_cast<int>(PlayerTypes::PlayerRescueActive) + 1] = {

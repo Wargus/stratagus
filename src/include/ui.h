@@ -363,6 +363,9 @@ public:
 	CUserInterface();
 	~CUserInterface();
 
+	CUserInterface(const CUserInterface &) = delete;
+	CUserInterface &operator=(const CUserInterface &) = delete;
+
 	void Load();
 
 

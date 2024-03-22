@@ -413,7 +413,7 @@ void CViewport::DrawMapFogOfWar()
 		fogRect.h = screenRect.h;
 
 		/// Alpha blending of the fog texture into the screen
-		BlitSurfaceAlphaBlending_32bpp(this->FogSurface, &fogRect, TheScreen, &screenRect);
+		BlitSurfaceAlphaBlending_32bpp(*this->FogSurface, fogRect, *TheScreen, screenRect);
 	}
 }
 
@@ -424,8 +424,6 @@ void CViewport::DrawMapFogOfWar()
 */
 void CViewport::AdjustFogSurface()
 {
-	this->CleanFog();
-
     const uint16_t surfaceWidth  = ((this->BottomRightPos.x - this->TopLeftPos.x)
 									/ PixelTileSize.x + 2)
 									* PixelTileSize.x;  /// +2 because of Offset.x
@@ -433,27 +431,17 @@ void CViewport::AdjustFogSurface()
 									/ PixelTileSize.y + 2)
 									* PixelTileSize.y; /// +2 because of Offset.y
 
-    this->FogSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth,
-                                                     	   surfaceHeight,
-                                                     	   32, RMASK, GMASK, BMASK, AMASK);
-    SDL_SetSurfaceBlendMode(this->FogSurface, SDL_BLENDMODE_NONE);
+	this->FogSurface.reset(SDL_CreateRGBSurface(
+		SDL_SWSURFACE, surfaceWidth, surfaceHeight, 32, RMASK, GMASK, BMASK, AMASK));
+	SDL_SetSurfaceBlendMode(this->FogSurface.get(), SDL_BLENDMODE_NONE);
 
 	const uint32_t fogColorSolid = FogOfWar->GetFogColorSDL() | (uint32_t(0xFF) << ASHIFT);
-	SDL_FillRect(this->FogSurface, nullptr, fogColorSolid);
+	SDL_FillRect(this->FogSurface.get(), nullptr, fogColorSolid);
 }
 
 void CViewport::Clean()
 {
-	if (this->FogSurface) {
-		CleanFog();
-	}
-}
-
-void CViewport::CleanFog()
-{
-	SDL_FreeSurface(this->FogSurface);
 	this->FogSurface = nullptr;
 }
-
 
 //@}

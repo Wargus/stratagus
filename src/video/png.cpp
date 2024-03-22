@@ -73,8 +73,8 @@ void SaveMapPNG(const char *name)
 	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
 	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
 
-	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
-		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
+	sdl2::SurfacePtr mapImage{
+		SDL_CreateRGBSurface(SDL_SWSURFACE, imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0)};
 
 	for (int i = 0; i < Map.Info.MapHeight; ++i) {
 		for (int j = 0; j < Map.Info.MapWidth; ++j) {
@@ -88,12 +88,11 @@ void SaveMapPNG(const char *name)
 			dstRect.y = j * PixelTileSize.y;
 			srcRect.w = dstRect.w = PixelTileSize.x;
 			srcRect.h = dstRect.h = PixelTileSize.y;
-			SDL_BlitSurface(Map.TileGraphic->getSurface(), &srcRect, mapImage, &dstRect);
+			SDL_BlitSurface(Map.TileGraphic->getSurface(), &srcRect, mapImage.get(), &dstRect);
 		}
 	}
 
-	IMG_SavePNG(mapImage, name);
-	SDL_FreeSurface(mapImage);
+	IMG_SavePNG(mapImage.get(), name);
 	fclose(fp);
 }
 
