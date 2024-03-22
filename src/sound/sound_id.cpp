@@ -155,9 +155,7 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 
 void FreeSounds()
 {
-	std::map<std::string, CSound *>::iterator i;
-	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
-		CSound *sound = (*i).second;
+	for (auto& [_, sound] : SoundMap) {
 		Assert(sound && sound->Mapref != 0);
 		if (sound && !--sound->Mapref) {
 			delete sound;

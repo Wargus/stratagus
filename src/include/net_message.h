@@ -62,7 +62,7 @@ public:
 
 	void SetName(const char *name);
 
-	bool IsValid() { return (PlyNr != 0) || (PlyName[0] != '\0'); }
+	bool IsValid() const { return (PlyNr != 0) || (PlyName[0] != '\0'); }
 
 	uint32_t Host;         /// Host address
 	uint16_t Port;         /// Port on host

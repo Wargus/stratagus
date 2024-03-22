@@ -475,14 +475,8 @@ void AiForce::Attack(const Vec2i &pos)
 		this->State = AiForceAttackingState::Attacking;
 	}
 	//  Send all units in the force to enemy.
-
-	CUnit *leader = nullptr;
-	for (CUnit *unit : this->Units) {
-		if (unit->IsAgressive()) {
-			leader = unit;
-			break;
-		}
-	}
+	const auto leaderIt = ranges::find_if(this->Units, [](const CUnit *unit) { return unit->IsAgressive(); });
+	CUnit *leader = leaderIt != this->Units.end() ? *leaderIt : nullptr;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 

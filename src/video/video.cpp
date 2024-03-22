@@ -455,12 +455,10 @@ void VideoPaletteListAdd(SDL_Surface *surface)
 	if (surface == nullptr || surface->format == nullptr || surface->format->BytesPerPixel != 1) {
 		return;
 	}
-
 	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface *>::iterator it = ranges::find(colorCycling.PaletteList, surface);
 
-	if (it != colorCycling.PaletteList.end()) {
-		return ;
+	if (ranges::contains(colorCycling.PaletteList, surface)) {
+		return;
 	}
 	colorCycling.PaletteList.push_back(surface);
 }
@@ -472,12 +470,7 @@ void VideoPaletteListAdd(SDL_Surface *surface)
 */
 void VideoPaletteListRemove(SDL_Surface *surface)
 {
-	CColorCycling &colorCycling = CColorCycling::GetInstance();
-	std::vector<SDL_Surface *>::iterator it = ranges::find(colorCycling.PaletteList, surface);
-
-	if (it != colorCycling.PaletteList.end()) {
-		colorCycling.PaletteList.erase(it);
-	}
+	ranges::erase(CColorCycling::GetInstance().PaletteList, surface);
 }
 
 void ClearAllColorCyclingRange()

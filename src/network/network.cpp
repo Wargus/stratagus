@@ -612,16 +612,10 @@ void NetworkSendExtendedCommand(int command, int arg1, int arg2, int arg3,
 void NetworkSendSelection(CUnit **units, int count)
 {
 	// Check if we have any teammates to send to
-	bool hasteammates = false;
-	for (int i = 0; i < NetPlayers; ++i) {
-		if (ThisPlayer->Index == Hosts[i].PlyNr) {
-			continue; // skip self
-		}
-		if (Hosts[i].IsValid() && Players[Hosts[i].PlyNr].Team == ThisPlayer->Team) {
-			hasteammates = true;
-			break;
-		}
-	}
+	const bool hasteammates = std::any_of(Hosts, Hosts + NetPlayers, [](const CNetworkHost &host) {
+		return ThisPlayer->Index != host.PlyNr && host.IsValid()
+		    && Players[host.PlyNr].Team == ThisPlayer->Team;
+	});
 	if (!hasteammates) {
 		return;
 	}
@@ -667,11 +661,12 @@ void NetworkSendChatMessage(const std::string &msg)
 static void NetworkRemovePlayer(int player)
 {
 	// Remove player from Hosts and clear NetworkIn
-	for (int i = 0; i < NetPlayers; ++i) {
-		if (Hosts[i].IsValid() && Hosts[i].PlyNr == player) {
-			Hosts[i].Clear();
-			break;
-		}
+	if (auto it =
+	        std::find_if(Hosts,
+	                     Hosts + NetPlayers,
+	                     [&](const auto &host) { return host.IsValid() && host.PlyNr == player; });
+	    it != Hosts + NetPlayers) {
+		it->Clear();
 	}
 	for (int i = 0; i < 256; ++i) {
 		for (int c = 0; c < MaxNetworkCommands; ++c) {

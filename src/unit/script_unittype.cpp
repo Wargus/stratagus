@@ -805,12 +805,7 @@ static int CclDefineUnitType(lua_State *l)
 						type->Impact[ANIMATIONS_DEATHTYPES + 1].MapMissile();
 					}
 				} else {
-					int num = 0;
-					for (; num < ANIMATIONS_DEATHTYPES; ++num) {
-						if (dtype == ExtraDeathTypes[num]) {
-							break;
-						}
-					}
+					const int num = std::distance(ExtraDeathTypes, ranges::find(ExtraDeathTypes, dtype));
 					if (num == ANIMATIONS_DEATHTYPES) {
 						LuaError(l, "Death type not found: %s", dtype.data());
 					} else {
@@ -1129,18 +1124,13 @@ static int CclDefineUnitType(lua_State *l)
 				} else if (value == "work-complete") {
 					type->Sound.WorkComplete.Name = LuaToString(l, -1, k + 1);
 				} else if (value == "dead") {
-					int death;
-
 					const std::string_view name = LuaToString(l, -1, k + 1);
-					for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-						if (name == ExtraDeathTypes[death]) {
-							++k;
-							break;
-						}
-					}
+					const int death = std::distance(ExtraDeathTypes, ranges::find(ExtraDeathTypes, name));
+
 					if (death == ANIMATIONS_DEATHTYPES) {
 						type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name = name;
 					} else {
+						++k;
 						type->Sound.Dead[death].Name = LuaToString(l, -1, k + 1);
 					}
 				} else {
@@ -1802,14 +1792,9 @@ static int CclGetUnitTypeData(lua_State *l)
 					lua_pushstring(l, type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
 				}
 			} else {
-				int death;
 				const std::string_view sound_subtype = LuaToString(l, 4);
+				const int death = std::distance(ExtraDeathTypes, ranges::find(ExtraDeathTypes, sound_subtype));
 
-				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-					if (sound_subtype == ExtraDeathTypes[death]) {
-						break;
-					}
-				}
 				if (death == ANIMATIONS_DEATHTYPES) {
 					if (!GameRunning && Editor.Running != EditorEditing) {
 						lua_pushstring(l, type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
@@ -2450,13 +2435,8 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 	} else if (sound_type == "help") {
 		type.MapSound.Help.Name = sound;
 	} else if (sound_type == "dead") {
-		int death;
+		const int death = std::distance(ExtraDeathTypes, ranges::find(ExtraDeathTypes, sound_subtype));
 
-		for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-			if (sound_subtype == ExtraDeathTypes[death]) {
-				break;
-			}
-		}
 		if (death == ANIMATIONS_DEATHTYPES) {
 			type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
 		} else {
