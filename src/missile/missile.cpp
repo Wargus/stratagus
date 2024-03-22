@@ -1172,11 +1172,15 @@ int ViewPointDistanceToMissile(const Missile &missile)
 */
 MissileType *MissileBurningBuilding(int percent)
 {
-	for (int i = BurningBuildingFrames.size() - 1; i >= 0; --i) {
-		const auto &frame = BurningBuildingFrames[i];
-		if (percent >= frame.Percent) {
-			return frame.Missile;
-		}
+	const auto it = ranges::upper_bound(
+		std::begin(BurningBuildingFrames),
+		std::end(BurningBuildingFrames),
+		percent,
+		std::less<>{},
+		&BurningBuildingFrame::Percent
+	);
+	if (it != std::begin(BurningBuildingFrames)) {
+		return std::prev(it)->Missile;
 	}
 	return nullptr;
 }
