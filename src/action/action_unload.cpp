@@ -409,7 +409,7 @@ void COrder_Unload::Execute(CUnit &unit) /* override */
 			}
 			this->Retries = 0;
 			this->State = MOVE_TO_DROPZONE_STATE;
-			// fall through and move immediately
+			[[fallthrough]]; // fallthrough and move immediately
 		case MOVE_TO_DROPZONE_STATE:
 			switch (DoActionMove(unit)) {
 				case PF_UNREACHABLE:
@@ -424,7 +424,7 @@ void COrder_Unload::Execute(CUnit &unit) /* override */
 					// still moving or waiting to move
 					return;
 			}
-			// fall through
+			[[fallthrough]];
 		case UNLOAD_STATE:
 			// Leave the transporter
 			// FIXME: show still animations ?
