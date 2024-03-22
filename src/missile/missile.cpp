@@ -70,7 +70,7 @@ static std::vector<std::unique_ptr<Missile>> LocalMissiles;     /// all local mi
 using MissileTypeMap = std::map<std::string, std::unique_ptr<MissileType>, std::less<>>;
 static MissileTypeMap MissileTypes;
 
-std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames; /// Burning building frames
+std::vector<BurningBuildingFrame> BurningBuildingFrames; /// Burning building frames
 
 extern std::unique_ptr<INumberDesc> Damage;                   /// Damage calculation for missile.
 
@@ -1172,10 +1172,15 @@ int ViewPointDistanceToMissile(const Missile &missile)
 */
 MissileType *MissileBurningBuilding(int percent)
 {
-	for (auto &frame : BurningBuildingFrames) {
-		if (percent > frame->Percent) {
-			return frame->Missile;
-		}
+	const auto it = ranges::upper_bound(
+		std::begin(BurningBuildingFrames),
+		std::end(BurningBuildingFrames),
+		percent,
+		std::less<>{},
+		&BurningBuildingFrame::Percent
+	);
+	if (it != std::begin(BurningBuildingFrames)) {
+		return std::prev(it)->Missile;
 	}
 	return nullptr;
 }
@@ -1295,6 +1300,27 @@ void CleanMissiles()
 {
 	GlobalMissiles.clear();
 	LocalMissiles.clear();
+}
+
+template <typename Range>
+bool IsPercentIncreasingValid(const Range &range)
+{
+	bool ret = true;
+	if (!range.empty())
+	{
+		ret = range.front().Percent >= 0
+			&& range.back().Percent <= 100;
+	}
+
+	return ret && ranges::is_sorted(
+		range,
+		std::less<>{},
+		[](const auto& e) { return e.Percent; });
+}
+
+bool IsBurningBuildingFramesValid()
+{
+	return IsPercentIncreasingValid(BurningBuildingFrames);
 }
 
 void FreeBurningBuildingFrames()

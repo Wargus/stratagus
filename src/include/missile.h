@@ -579,7 +579,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<std::unique_ptr<BurningBuildingFrame>> BurningBuildingFrames;  /// Burning building frames
+extern std::vector<BurningBuildingFrame> BurningBuildingFrames;  /// Burning building frames
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -629,6 +629,8 @@ extern void CleanMissileTypes();
 extern void InitMissiles();
 /// Clean missiles
 extern void CleanMissiles();
+
+extern bool IsBurningBuildingFramesValid();
 
 extern void FreeBurningBuildingFrames();
 
