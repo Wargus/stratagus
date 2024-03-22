@@ -276,10 +276,37 @@ namespace ranges
 		return std::min_element(std::begin(range), std::end(range), cmp);
 	}
 
+	template <typename I, typename S, typename Pred, typename Proj = identity>
+	auto partition_point(I first, S last, Pred pred, Proj &&proj = {})
+	{
+		return std::partition_point(first, last,
+			[&](const auto &elem) {
+				return std::invoke(pred, std::invoke(proj, elem));
+			});
+	}
+
+	template <typename I, typename S, typename Value, typename Comparer = std::less<>, typename Proj = identity>
+	auto lower_bound(I first, S last, const Value &value, Comparer &&comparer = {}, Proj &&proj = {})
+	{
+		return std::lower_bound(first, last, value,
+			[&](const auto &lhs, const auto &rhs) {
+				return std::invoke(comparer, std::invoke(proj, lhs), rhs);
+			});
+	}
+
 	template <typename Range, typename Value>
 	auto lower_bound(Range &range, const Value &value)
 	{
 		return std::lower_bound(std::begin(range), std::end(range), value);
+	}
+
+	template <typename I, typename S, typename Value, typename Comparer = std::less<>, typename Proj = identity>
+	auto upper_bound(I first, S last, const Value &value, Comparer &&comparer = {}, Proj &&proj = {})
+	{
+		return std::upper_bound(first, last, value,
+			[&](const auto &lhs, const auto &rhs) {
+				return std::invoke(comparer, lhs, std::invoke(proj, rhs));
+			});
 	}
 
 	template <typename Range, typename Value, typename Comparer = std::less<>>
