@@ -360,7 +360,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
 
                 case States::cGenerateFog:
                     GenerateFog();
-                    /// pass through
+					[[fallthrough]];
                 default:
                     this->State++;
                     break;
