@@ -344,8 +344,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 		if (!lua_istable(l, j + 1)) {
 			LuaError(l, "incorrect argument");
 		}
-		const int frameidx = args - 1 - j; // reverse order
-		auto &frame = BurningBuildingFrames[frameidx];
+		auto &frame = BurningBuildingFrames[j];
 		const int subargs = lua_rawlen(l, j + 1);
 
 		for (int k = 0; k < subargs; ++k) {

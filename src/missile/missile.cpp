@@ -1172,7 +1172,8 @@ int ViewPointDistanceToMissile(const Missile &missile)
 */
 MissileType *MissileBurningBuilding(int percent)
 {
-	for (auto &frame : BurningBuildingFrames) {
+	for (int i = BurningBuildingFrames.size() - 1; i >= 0; --i) {
+		const auto &frame = BurningBuildingFrames[i];
 		if (percent >= frame.Percent) {
 			return frame.Missile;
 		}
@@ -1298,24 +1299,24 @@ void CleanMissiles()
 }
 
 template <typename Range>
-bool IsPercentDecreasingValid(const Range &range)
+bool IsPercentIncreasingValid(const Range &range)
 {
 	bool ret = true;
 	if (!range.empty())
 	{
-		ret = range.front().Percent <= 100
-			&& range.back().Percent >= 0;
+		ret = range.front().Percent >= 0
+			&& range.back().Percent <= 100;
 	}
 
 	return ret && ranges::is_sorted(
 		range,
-		std::greater<>{},
+		std::less<>{},
 		[](const auto& e) { return e.Percent; });
 }
 
 bool IsBurningBuildingFramesValid()
 {
-	return IsPercentDecreasingValid(BurningBuildingFrames);
+	return IsPercentIncreasingValid(BurningBuildingFrames);
 }
 
 void FreeBurningBuildingFrames()

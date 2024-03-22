@@ -43,9 +43,8 @@ namespace {
 		const std::size_t size = frames.size();
 		BurningBuildingFrames.resize(size);
 		for (int i = 0; i < size; ++i) {
-			// reverse order as in CclDefineBurningBuilding
-			BurningBuildingFrames[size - 1 - i].Percent = frames[i].first;
-			BurningBuildingFrames[size - 1 - i].Missile = frames[i].second;
+			BurningBuildingFrames[i].Percent = frames[i].first;
+			BurningBuildingFrames[i].Missile = frames[i].second;
 		}
 	}
 
