@@ -592,6 +592,51 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
 }
 
+/**
+**  Get the indices of all tiles that belong to the same subslot as the tile with the given index.
+**  Each subslot contains tiles with identical type.
+**
+**  @param tileIndex	tile to find subslot neighbors for
+**
+**  @return				vector of tile indices of tiles in the same subslot
+**
+*/
+std::vector<tile_index> CTileset::getAllTilesOfTheSameKindAs(tile_index tileIndex) const
+{
+	auto calcRangeBoundary = [tileIndex, this](int dir) -> tile_index 
+	{
+		dir = dir < 0 ? -1 : 1;  // if dir < 0 then left boundary, right otherwise 
+		tile_index result = tileIndex;
+		if (getGraphicTileFor(tileIndex)) {
+			const int scopeWidth = dir < 0 ? tileIndex & 0xF
+										   : 0xF - (tileIndex & 0xF);
+			tile_index scope = 1;
+			while(scope <= scopeWidth) {
+				if (getGraphicTileFor(tileIndex + scope * dir)) result += dir;
+				else break;
+				scope++;
+			}
+		}
+		return result;
+	};
+	const tile_index rangeFrom = calcRangeBoundary(-1);
+	const tile_index rangeTo = calcRangeBoundary(1);
+
+	std::vector<tile_index> result(rangeTo - rangeFrom + 1);
+	ranges::iota(result, rangeFrom);
+
+	return result;
+}
+
+tile_index CTileset::getRandomTileOfTheSameKindAs(tile_index tileIndex) const
+{
+	auto tiles = getAllTilesOfTheSameKindAs(tileIndex);
+	if (tiles.empty()) {
+		return tileIndex;
+	}
+	return tiles[MyRand() % tiles.size()];	
+}
+
 int32_t CTileset::findTileIndexByTile(graphic_index tile) const
 {
 	tile_index index = 0;

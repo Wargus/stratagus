@@ -209,6 +209,8 @@ public:
 							 int bottom, int left) const;
 	tile_index tileFromQuad(uint32_t fixed, uint32_t quad) const;
 	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
+	std::vector<tile_index> getAllTilesOfTheSameKindAs(tile_index tileIndex) const;
+	tile_index getRandomTileOfTheSameKindAs(tile_index tileIndex) const;
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
