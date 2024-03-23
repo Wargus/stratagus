@@ -1079,7 +1079,7 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set(genversion_SRCS tools/genversion.cpp)
 	source_group(genversion FILES ${genversion_SRCS})
 	add_executable(genversion ${genversion_SRCS})
-	add_custom_target(version-generated.h ALL
+	add_custom_target(version-generated ALL
 		genversion ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h "${STRATAGUS_VERSION}"
 		DEPENDS genversion
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
