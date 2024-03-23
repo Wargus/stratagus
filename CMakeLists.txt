@@ -1086,9 +1086,7 @@ if(NOT CMAKE_CROSSCOMPILING)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
-	set_source_files_properties(version-generated.h PROPERTIES GENERATED true)
 	set_source_files_properties(src/include/version.h PROPERTIES OBJECT_DEPENDS version-generated.h) # This is needed for old CMake which does not generate correct dependences
-	list(APPEND CLEAN_FILES version-generated.h)
 else()
 	# Generate header file version-generated.h without git revision
 	# When cross compiling we cannot build host binary, so create file at cmake time
