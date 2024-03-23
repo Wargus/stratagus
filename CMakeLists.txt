@@ -26,6 +26,9 @@
 #
 #
 
+cmake_minimum_required(VERSION 2.9)
+cmake_policy(VERSION 3.10..3.20.2)
+
 #########################
 # Version configuration #
 #########################
@@ -50,8 +53,6 @@ option(DOWNLOAD_FREEPATS OFF)
 ###############################
 
 project(stratagus)
-cmake_minimum_required(VERSION 2.9)
-cmake_policy(VERSION 3.10..3.20.2)
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/third-party/CMakeLists.txt")
 	add_subdirectory(third-party)
