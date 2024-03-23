@@ -26,6 +26,9 @@
 #
 #
 
+cmake_minimum_required(VERSION 3.5)
+cmake_policy(VERSION 3.10..3.20.2)
+
 #########################
 # Version configuration #
 #########################
@@ -50,8 +53,6 @@ option(DOWNLOAD_FREEPATS OFF)
 ###############################
 
 project(stratagus)
-cmake_minimum_required(VERSION 2.9)
-cmake_policy(VERSION 3.10..3.20.2)
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/third-party/CMakeLists.txt")
 	add_subdirectory(third-party)
@@ -1078,15 +1079,14 @@ if(NOT CMAKE_CROSSCOMPILING)
 	set(genversion_SRCS tools/genversion.cpp)
 	source_group(genversion FILES ${genversion_SRCS})
 	add_executable(genversion ${genversion_SRCS})
-	add_custom_target(version-generated.h ALL
+	add_custom_target(version-generated ALL
 		genversion ${CMAKE_CURRENT_BINARY_DIR}/version-generated.h "${STRATAGUS_VERSION}"
+		BYPRODUCTS version-generated.h
 		DEPENDS genversion
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM
 	)
-	set_source_files_properties(version-generated.h PROPERTIES GENERATED true)
 	set_source_files_properties(src/include/version.h PROPERTIES OBJECT_DEPENDS version-generated.h) # This is needed for old CMake which does not generate correct dependences
-	list(APPEND CLEAN_FILES version-generated.h)
 else()
 	# Generate header file version-generated.h without git revision
 	# When cross compiling we cannot build host binary, so create file at cmake time
