@@ -642,21 +642,12 @@ void SocketSet::AddSocket(Socket socket)
 */
 void SocketSet::DelSocket(Socket socket)
 {
-	std::vector<Socket>::iterator i;
-	std::vector<int>::iterator j;
-
-	for (i = Sockets.begin(), j = SocketReady.begin(); i != Sockets.end(); ++i, ++j) {
-		if (*i == socket) {
-			Sockets.erase(i);
-			SocketReady.erase(j);
-			break;
-		}
+	if (const auto it = ranges::find(Sockets, socket); it != Sockets.end()) {
+		SocketReady.erase(SocketReady.begin() + std::distance(Sockets.begin(), it));
+		Sockets.erase(it);
 	}
 	if (socket == MaxSockFD) {
-		MaxSockFD = 0;
-		for (auto &socketFd : Sockets) {
-			MaxSockFD = std::max(this->MaxSockFD, socketFd);
-		}
+		MaxSockFD = Sockets.empty() ? 0 : *ranges::max_element(Sockets);
 	}
 }
 

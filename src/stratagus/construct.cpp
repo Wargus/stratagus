@@ -269,10 +269,8 @@ static int CclDefineConstruction(lua_State *l)
 				LuaError(
 					l, "First percent of Construction '%s' is not 0", construction->Ident.c_str());
 			}
-			if (!std::is_sorted(
-					construction->Frames.begin(),
-					construction->Frames.end(),
-					[](const auto &lhs, const auto &rhs) { return lhs.Percent < rhs.Percent; })) {
+			if (!ranges::is_sorted(
+					construction->Frames, std::less<>{}, &CConstructionFrame::Percent)) {
 				LuaError(
 					l, "Percents of Construction '%s' not sorted", construction->Ident.c_str());
 			}

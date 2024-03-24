@@ -265,6 +265,12 @@ namespace ranges
 	}
 
 	template <typename Range>
+	auto max_element(Range &range)
+	{
+		return std::max_element(std::begin(range), std::end(range));
+	}
+
+	template <typename Range>
 	auto min_element(Range &range)
 	{
 		return std::min_element(std::begin(range), std::end(range));

@@ -296,7 +296,6 @@ int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange,
 		case PF_UNREACHABLE:
 		case PF_WAIT:
 			return -1;
-			break;
 		case PF_REACHED:
 			return 0;
 	}

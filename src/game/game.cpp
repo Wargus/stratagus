@@ -838,11 +838,10 @@ void CreateGame(const fs::path &filename, CMap *map)
 	if (!ThisPlayer) {
 		if (!IsNetworkGame()) {
 			// In demo or kiosk mode, pick first empty slot
-			for (int i = 0; i < PlayerMax; ++i) {
-				if (Players[i].Type == PlayerTypes::PlayerNobody) {
-					ThisPlayer = &Players[i];
-					break;
-				}
+			if (auto it = ranges::find_if(
+					Players, [](const CPlayer &p) { return p.Type == PlayerTypes::PlayerNobody; });
+			    it != std::end(Players)) {
+				ThisPlayer = &*it;
 			}
 		} else {
 			// this is bad - we are starting a network game, but ThisPlayer is not assigned!!

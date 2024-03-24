@@ -1071,14 +1071,7 @@ public:
 	void setCurrentChannel(std::string name)
 	{
 		this->currentChannel = name;
-		bool unlisted = true;
-		for (const auto &c : channelList) {
-			if (c == name) {
-				unlisted = false;
-				break;
-			}
-		}
-		if (unlisted) {
+		if (!ranges::contains(channelList, name)) {
 			channelList.push_back(name);
 			setChannels(channelList);
 		}
