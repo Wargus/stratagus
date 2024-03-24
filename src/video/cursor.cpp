@@ -340,24 +340,22 @@ void DrawCursor()
 
 	//  Last, Normal cursor.
 	if (!Preference.HardwareCursor) {
-    	const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
+		const PixelPos pos = CursorScreenPos - GameCursor->HotPos;
 
-    	if (!GameRunning && !Editor.Running) {
-    		if (!HiddenSurface
-            		|| HiddenSurface->w != GameCursor->G->getWidth()
-                    || HiddenSurface->h != GameCursor->G->getHeight()) {
-                    if (HiddenSurface) {
-						VideoPaletteListRemove(HiddenSurface.get());
-						SDL_FreeSurface(HiddenSurface.get());
-					}
-					HiddenSurface.reset(SDL_CreateRGBSurface(SDL_SWSURFACE,
-				                                             GameCursor->G->getWidth(),
-				                                             GameCursor->G->getHeight(),
-				                                             TheScreen->format->BitsPerPixel,
-				                                             TheScreen->format->Rmask,
-				                                             TheScreen->format->Gmask,
-				                                             TheScreen->format->Bmask,
-				                                             TheScreen->format->Amask));
+		if (!GameRunning && !Editor.Running) {
+			if (!HiddenSurface || HiddenSurface->w != GameCursor->G->getWidth()
+			    || HiddenSurface->h != GameCursor->G->getHeight()) {
+				if (HiddenSurface) {
+					VideoPaletteListRemove(HiddenSurface.get());
+				}
+				HiddenSurface.reset(SDL_CreateRGBSurface(SDL_SWSURFACE,
+				                                         GameCursor->G->getWidth(),
+				                                         GameCursor->G->getHeight(),
+				                                         TheScreen->format->BitsPerPixel,
+				                                         TheScreen->format->Rmask,
+				                                         TheScreen->format->Gmask,
+				                                         TheScreen->format->Bmask,
+				                                         TheScreen->format->Amask));
 			}
 			SDL_Rect srcRect = { Sint16(pos.x), Sint16(pos.y), Uint16(GameCursor->G->getWidth()), Uint16(GameCursor->G->getHeight())};
 			SDL_BlitSurface(TheScreen, &srcRect, HiddenSurface.get(), nullptr);
