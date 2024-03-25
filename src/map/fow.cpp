@@ -138,13 +138,15 @@ void CFogOfWar::InitTiled()
 	if (TiledAlphaFog || TileOfFogOnly) {
 		this->Clean();
 	}
-    CFogOfWar::TiledFogSrc->Load();
+	CFogOfWar::TiledFogSrc->Load();
 
-    if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
-        TileOfFogOnly = SDL_CreateRGBSurface(SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y,
-                                             32, RMASK, GMASK, BMASK, AMASK);
-        SDL_FillRect(TileOfFogOnly, nullptr, Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
-    }
+	if (Settings.Type == FogOfWarTypes::cTiledLegacy) {
+		TileOfFogOnly.reset(SDL_CreateRGBSurface(
+			SDL_SWSURFACE, PixelTileSize.x, PixelTileSize.y, 32, RMASK, GMASK, BMASK, AMASK));
+		SDL_FillRect(TileOfFogOnly.get(),
+		             nullptr,
+		             Settings.FogColorSDL | uint32_t(Settings.ExploredOpacity) << ASHIFT);
+	}
 
     SDL_Surface * const newFogSurface = SDL_ConvertSurfaceFormat(CFogOfWar::TiledFogSrc->getSurface(),
                                                                  SDL_MasksToPixelFormatEnum(32, RMASK, GMASK, BMASK, AMASK), 0);
@@ -165,7 +167,6 @@ void CFogOfWar::InitTiled()
 */
 void CFogOfWar::InitEnhanced()
 {
-
     /// +1 to the top & left for 4x scale algorithm purposes,
     const uint16_t fogTextureWidth  = (Map.Info.MapWidth  + 1) * 4;
     const uint16_t fogTextureHeight = (Map.Info.MapHeight + 1) * 4;
@@ -672,7 +673,7 @@ void CFogOfWar::DrawFullShroudOfFog(int16_t x, int16_t y, const uint8_t alpha, S
 	drect.y = y;
 
     if (vpFogSurface == TheScreen) { /// FogOfWarTypes::cTiledLegacy
-        SDL_BlitSurface(TileOfFogOnly, &srect, TheScreen, &drect);
+        SDL_BlitSurface(TileOfFogOnly.get(), &srect, TheScreen, &drect);
     } else {
         const uint32_t fogColor = GetFogColorSDL() | (uint32_t(alpha) << ASHIFT);
         size_t index = drect.y * vpFogSurface->w + drect.x;
@@ -946,10 +947,7 @@ void CFogOfWar::CleanTiled(const bool isHardClean /*= false*/)
 		CGraphic::Free(CFogOfWar::TiledFogSrc);
 		CFogOfWar::TiledFogSrc = nullptr;
 	}
-    if (TileOfFogOnly) {
-		SDL_FreeSurface(TileOfFogOnly);
-		TileOfFogOnly = nullptr;
-	}
+	TileOfFogOnly = nullptr;
     if (TiledAlphaFog) {
         CGraphic::Free(TiledAlphaFog);
         TiledAlphaFog = nullptr;

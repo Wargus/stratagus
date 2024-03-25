@@ -376,23 +376,23 @@ void VideoCclRegister()
 **  Blit a surface into another with alpha blending
 **
 */
-void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect,
-										  SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT/* = true*/)
+void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface &srcSurface, const SDL_Rect &srcRect,
+										  SDL_Surface &dstSurface, const SDL_Rect &dstRect, const bool enableMT/* = true*/)
 {
 	/// This implementation of blittind doesn't scale
-	Assert(srcRect->w == dstRect->w);
-	Assert(srcRect->h == dstRect->h);
-	Assert(srcRect->x >= 0 && srcRect->y >= 0 && dstRect->x >= 0 && dstRect->y >= 0);
+	Assert(srcRect.w == dstRect.w);
+	Assert(srcRect.h == dstRect.h);
+	Assert(srcRect.x >= 0 && srcRect.y >= 0 && dstRect.x >= 0 && dstRect.y >= 0);
 
 	/// Crop rectangles if necessary
-	SDL_Rect dstWrkRect = { dstRect->x, dstRect->y, dstRect->w, dstRect->h };
-	SDL_Rect srcWrkRect = { srcRect->x, srcRect->y, srcRect->w, srcRect->h };
-	const int16_t xDiff = dstRect->w - (dstSurface->w - dstRect->x);
+	SDL_Rect dstWrkRect = { dstRect.x, dstRect.y, dstRect.w, dstRect.h };
+	SDL_Rect srcWrkRect = { srcRect.x, srcRect.y, srcRect.w, srcRect.h };
+	const int16_t xDiff = dstRect.w - (dstSurface.w - dstRect.x);
 	if (xDiff > 0) {
 		dstWrkRect.w -= xDiff;
 		srcWrkRect.w -= xDiff;
 	}
-	const int16_t yDiff = dstRect->h - (dstSurface->h - dstRect->y);
+	const int16_t yDiff = dstRect.h - (dstSurface.h - dstRect.y);
 	if (yDiff > 0) {
 		dstWrkRect.h -= yDiff;
 		srcWrkRect.h -= yDiff;
@@ -400,8 +400,8 @@ void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rec
 
 
 	/// Alpha blending of the src texture into the dst
-	const uint32_t *const src = static_cast<uint32_t *>(srcSurface->pixels);
-	uint32_t *const dst = static_cast<uint32_t *>(dstSurface->pixels);
+	const uint32_t *const src = static_cast<uint32_t *>(srcSurface.pixels);
+	uint32_t *const dst = static_cast<uint32_t *>(dstSurface.pixels);
 
 	#pragma omp parallel if(enableMT)
 	{
@@ -411,8 +411,8 @@ void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rec
 		const uint16_t lBound = (thisThread    ) * dstWrkRect.h / numOfThreads;
 		const uint16_t uBound = (thisThread + 1) * dstWrkRect.h / numOfThreads;
 
-		size_t srcIndex = (srcWrkRect.y + lBound) * srcSurface->w + srcWrkRect.x;
-		size_t dstIndex = (dstWrkRect.y + lBound) * dstSurface->w + dstWrkRect.x;
+		size_t srcIndex = (srcWrkRect.y + lBound) * srcSurface.w + srcWrkRect.x;
+		size_t dstIndex = (dstWrkRect.y + lBound) * dstSurface.w + dstWrkRect.x;
 
 		for (uint16_t y = lBound; y < uBound; y++) {
 			for (uint16_t x = 0; x < dstWrkRect.w; x++) {
@@ -436,14 +436,13 @@ void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rec
 
 				dstPixel = (resR << RSHIFT) | (resG << GSHIFT) | (resB << BSHIFT);
 			}
-			srcIndex += srcSurface->w;
-			dstIndex += dstSurface->w;
+			srcIndex += srcSurface.w;
+			dstIndex += dstSurface.w;
 		}
 	} /// pragma omp parallel
 }
 
 #if 1 // color cycling
-
 
 /**
 **  Add a surface to the palette list, used for color cycling
