@@ -323,6 +323,10 @@ void COrder_Built::AiUnitKilled(CUnit &unit)
 
 static std::size_t FindCFramePercent(const std::vector<CConstructionFrame> &cframes, int percent)
 {
+	if (cframes.empty())
+	{
+		return -1;
+	}
 	const auto it =
 		ranges::find_if(cframes, [&](const auto &frame) { return percent < frame.Percent; });
 	const std::size_t index = std::distance(cframes.begin(), it);
@@ -340,7 +344,7 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	const auto index = FindCFramePercent(type.Construction->Frames, percent);
 
-	if (index != this->Frame) {
+	if (index != -1 && index != this->Frame) {
 		this->Frame = index;
 		const CConstructionFrame &cframe = type.Construction->Frames[index];
 		unit.Frame = (unit.Frame < 0) ? -cframe.Frame - 1 : cframe.Frame;

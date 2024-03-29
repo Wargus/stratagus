@@ -68,11 +68,11 @@ public:
 	const CUnitPtr &GetWorker() const { return Worker; }
 	CUnit *GetWorkerPtr() { return Worker; }
 
-private:
+protected:
 	void Boost(CUnit &building, int amount, int varIndex) const;
 	void UpdateConstructionFrame(CUnit &unit);
 
-private:
+protected:
 	CUnitPtr Worker = nullptr; /// Worker building this unit
 	int ProgressCounter = 0;   /// Progress counter, in 1/100 cycles.
 	bool IsCancelled = false;  /// Cancel construction
