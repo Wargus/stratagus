@@ -43,7 +43,7 @@ public:
 	{
 		const int progressOnePercent = unit.Type->Stats[0].Costs[TimeCost] * 6;
 		return testUpdateConstrFrame_Progress(unit, percent * progressOnePercent, initialFrame);
-		}
+	}
 
 	int testUpdateConstrFrame_Progress(CUnit &unit, int progress, int initialFrame = 9999)
 	{
@@ -56,15 +56,17 @@ public:
 };
 
 namespace {
-	void setFrames(std::vector<CConstructionFrame> &cframes,
-				   const std::vector<std::pair<int, int>>& vec)
+	std::vector<CConstructionFrame> makeFrames(
+		const std::vector<std::pair<int, int>>& vec)
 	{
+		std::vector<CConstructionFrame> cframes;
 		const std::size_t size = vec.size();
 		cframes.resize(size);
 		for (int i = 0; i < size; ++i) {
 			cframes[i].Percent = vec[i].first;
 			cframes[i].Frame = vec[i].second;
 		}
+		return cframes;
 	}
 };
 
@@ -88,14 +90,14 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("size=0") {
-		setFrames(frames, {});
+		frames = makeFrames({});
 
 		// check unit.Frame is not modified
 		CHECK(order.testUpdateConstrFrame_Percent(unit, 0, 123) == 123);
 	}
 
 	SUBCASE("size=1") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{0, 0},
 		});
 
@@ -105,7 +107,7 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("large steps") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{ 0, 100},
 			{50, 110},
 		});
@@ -133,7 +135,7 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("partially dense")
 	{
-		setFrames(frames, {
+		frames = makeFrames({
 			{  0, 0},
 			{  1, 1},
 			{  2, 2},
@@ -174,7 +176,7 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("repeated values")
 	{
-		setFrames(frames, {
+		frames = makeFrames({
 			{  0, 8},
 			{ 80, 1},
 			{ 90, 8},
@@ -187,7 +189,7 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("first key larger") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{ 10, 5},
 		});
 
@@ -197,7 +199,7 @@ TEST_CASE("COrder_Built Frame")
 
 	SUBCASE("duplicate keys")
 	{
-		setFrames(frames, {
+		frames = makeFrames({
 			{  0, 0},
 			{ 20, 1},
 			{ 20, 2},
@@ -210,7 +212,7 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("wrong key order") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{ 75, 9},
 			{ 50, 8},
 			{  0, 7},
@@ -228,7 +230,7 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("too small key value") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{ -1, 7},
 			{100, 8},
 		});
@@ -240,7 +242,7 @@ TEST_CASE("COrder_Built Frame")
 	}
 
 	SUBCASE("too large key value") {
-		setFrames(frames, {
+		frames = makeFrames({
 			{  0, 7},
 			{101, 8},
 		});
