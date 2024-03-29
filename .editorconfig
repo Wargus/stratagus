@@ -11,15 +11,7 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 # The settings are the same in .clang-format. Keep them in sync.
-[*.{c,cpp,h}]
-indent_style = tab
-indent_size = 4
-
-[*.{nsi,rc}]
-indent_style = tab
-indent_size = 4
-
-[*.pkg]
+[*.{c,cpp,h,nsi,rc,pkg}]
 indent_style = tab
 indent_size = 4
 
@@ -27,22 +19,10 @@ indent_size = 4
 indent_style = tab
 indent_size = 4
 
-[*.glsl]
+[*.{glsl,py,sh}]
 indent_style = space
 indent_size = 4
 
-[*.py]
-indent_style = space
-indent_size = 4
-
-[*.lua*]
+[*.{lua*,yml,yaml}]
 indent_style = space
 indent_size = 2
-
-[*.{yml,yaml}]
-indent_style = space
-indent_size = 2
-
-[*.sh]
-indent_style = space
-indent_size = 4
