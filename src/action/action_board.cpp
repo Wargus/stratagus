@@ -79,7 +79,7 @@ enum {
 	}
 	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+		file.printf(" \"goal\", \"%s\",", UnitReference(*this->GetGoal()).c_str());
 	}
 	file.printf(" \"state\", %d", this->State);
 

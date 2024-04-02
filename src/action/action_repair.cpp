@@ -86,12 +86,12 @@ void COrder_Repair::Save(CFile &file, const CUnit &unit) const /* override */
 		file.printf(" \"finished\", ");
 	}
 	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+		file.printf(" \"goal\", \"%s\",", UnitReference(*this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	if (this->ReparableTarget != nullptr) {
-		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
+		file.printf(" \"repair-target\", \"%s\",", UnitReference(*this->GetReparableTarget()).c_str());
 	}
 
 	file.printf(" \"repaircycle\", %d,", this->RepairCycle);

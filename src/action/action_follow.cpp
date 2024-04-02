@@ -87,7 +87,7 @@ void COrder_Follow::Save(CFile &file, const CUnit &unit) const /* override */
 	}
 	file.printf(" \"range\", %d,", this->Range);
 	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+		file.printf(" \"goal\", \"%s\",", UnitReference(*this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 

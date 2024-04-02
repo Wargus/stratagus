@@ -251,20 +251,20 @@ void COrder_Resource::Save(CFile &file, const CUnit &unit) const /* override */
 		file.printf(" \"finished\",");
 	}
 	if (this->HasGoal()) {
-		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
+		file.printf(" \"goal\", \"%s\",", UnitReference(*this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	Assert(this->worker != nullptr && worker->IsAlive());
-	file.printf(" \"worker\", \"%s\",", UnitReference(worker).c_str());
+	file.printf(" \"worker\", \"%s\",", UnitReference(*worker).c_str());
 	file.printf(" \"current-res\", %d,", this->CurrentResource);
 
 	file.printf(" \"res-pos\", {%d, %d},", this->Resource.Pos.x, this->Resource.Pos.y);
 	if (this->Resource.Mine != nullptr) {
-		file.printf(" \"res-mine\", \"%s\",", UnitReference(this->Resource.Mine).c_str());
+		file.printf(" \"res-mine\", \"%s\",", UnitReference(*this->Resource.Mine).c_str());
 	}
 	if (this->Depot != nullptr) {
-		file.printf(" \"res-depot\", \"%s\",", UnitReference(this->Depot).c_str());
+		file.printf(" \"res-depot\", \"%s\",", UnitReference(*this->Depot).c_str());
 	}
 	if (this->DoneHarvesting) {
 		file.printf(" \"done-harvesting\",");

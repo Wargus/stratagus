@@ -652,8 +652,6 @@ extern bool CanTransport(const CUnit &transporter, const CUnit &unit);
 
 /// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);
-/// Generate a unit reference, a printable unique string for unit
-extern std::string UnitReference(const CUnitPtr &unit);
 
 /// save unit-structure
 extern void SaveUnit(const CUnit &unit, CFile &file);
