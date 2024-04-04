@@ -102,7 +102,7 @@ void COrder_Build::Save(CFile &file, const CUnit &unit) const /* override */
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
 
 	if (this->BuildingUnit != nullptr) {
-		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
+		file.printf(" \"building\", \"%s\",", UnitReference(*this->BuildingUnit).c_str());
 	}
 	file.printf(" \"type\", \"%s\",", this->Type->Ident.c_str());
 	file.printf(" \"state\", %d", this->State);

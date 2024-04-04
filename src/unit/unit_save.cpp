@@ -66,15 +66,6 @@ std::string UnitReference(const CUnit &unit)
 	return ss.str();
 }
 
-/**
-**  Generate a unit reference, a printable unique string for unit.
-*/
-std::string UnitReference(const CUnitPtr &unit)
-{
-	Assert(unit != nullptr);
-	return UnitReference(*unit);
-}
-
 void PathFinderInput::Save(CFile &file) const
 {
 	file.printf("\"pathfinder-input\", {");

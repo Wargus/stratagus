@@ -1212,10 +1212,10 @@ void Missile::SaveMissile(CFile &file) const
 	file.printf(",\n  \"frame\", %d, \"state\", %d, \"anim-wait\", %d, \"wait\", %d, \"delay\", %d,\n ",
 				this->SpriteFrame, this->State, this->AnimWait, this->Wait, this->Delay);
 	if (this->SourceUnit != nullptr) {
-		file.printf(" \"source\", \"%s\",", UnitReference(this->SourceUnit).c_str());
+		file.printf(" \"source\", \"%s\",", UnitReference(*this->SourceUnit).c_str());
 	}
 	if (this->TargetUnit != nullptr) {
-		file.printf(" \"target\", \"%s\",", UnitReference(this->TargetUnit).c_str());
+		file.printf(" \"target\", \"%s\",", UnitReference(*this->TargetUnit).c_str());
 	}
 	file.printf(" \"damage\", %d,", this->Damage);
 	file.printf(" \"ttl\", %d,", this->TTL);

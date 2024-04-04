@@ -78,7 +78,7 @@ void COrder_Built::Save(CFile &file, const CUnit &unit) const /* override */
 		file.printf(" \"finished\", ");
 	}
 	if (this->Worker != nullptr) {
-		file.printf("\"worker\", \"%s\", ", UnitReference(this->Worker).c_str());
+		file.printf("\"worker\", \"%s\", ", UnitReference(*this->Worker).c_str());
 	}
 	const int frame = this->Frame;
 	file.printf("\"progress\", %d, \"frame\", %d", this->ProgressCounter, frame);

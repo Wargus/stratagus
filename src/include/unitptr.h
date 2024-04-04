@@ -42,7 +42,8 @@ class CUnitPtr
 {
 public:
 	CUnitPtr() : unit(nullptr) {}
-	CUnitPtr(CUnit *u);
+	CUnitPtr(std::nullptr_t) : unit(nullptr) {}
+	explicit CUnitPtr(CUnit *u);
 	CUnitPtr(const CUnitPtr &u);
 	~CUnitPtr() { Reset(); }
 
