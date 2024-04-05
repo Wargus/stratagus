@@ -68,15 +68,20 @@ struct Node {
 	void SetCostFromStart(uint64_t cost);
 	int32_t GetCostToGoal() const;
 	void SetCostToGoal(uint64_t cost);
-	bool IsInGoal();
+	bool IsInGoal() const;
 	void SetInGoal();
-	uint8_t GetDirection();
+	uint8_t GetDirection() const;
 	void SetDirection(uint8_t dir);
 private:
-	int32_t CostFromStart;  /// Real costs to reach this point
-	uint16_t CostToGoal;    /// Estimated cost to goal
-	int8_t InGoal;          /// is this point in the goal
-	int8_t Direction;       /// Direction for trace back
+	// align the matrix, the open set, and the cost to move cache
+	// on 64-byte boundary, in case the memset/memmove operations
+	// of the libc we're using has a 128/256/512bit SIMD vector
+	// instruction branch, since we might be clearing 8M of
+	// memory for a 2048x2048 map
+	alignas(64) int32_t CostFromStart = 0; /// Real costs to reach this point
+	uint16_t CostToGoal = 0;    /// Estimated cost to goal
+	int8_t InGoal = 0;          /// is this point in the goal
+	int8_t Direction = 0;       /// Direction for trace back
 };
 
 struct Open {
@@ -112,11 +117,9 @@ int Heading2O[9];//heading to offset
 const int XY2Heading[3][3] = { {7, 6, 5}, {0, 0, 4}, {1, 2, 3}};
 
 /// cost matrix
-static Node *AStarMatrix;
+static std::vector<Node> AStarMatrix;
 
 /// a list of close nodes, helps to speed up the matrix cleaning
-static int OpenSetMaxSize;
-static int AStarMatrixSize;
 #define MAX_CLOSE_SET_RATIO 4
 #define MAX_OPEN_SET_RATIO 8 // 10,16 to small
 
@@ -131,7 +134,6 @@ static bool AStarFixedEnemyUnitsUnpassable = false;
 
 static int AStarMapWidth;
 static int AStarMapHeight;
-static int AStarMapMax;
 
 static int AStarGoalX;
 static int AStarGoalY;
@@ -142,12 +144,11 @@ static int AStarGoalY;
 */
 
 /// The set of Open nodes
-static Open *OpenSet;
+static std::vector<Open> OpenSet;
 /// The size of the open node set
 static int OpenSetSize;
 
-static int32_t *CostMoveToCache;
-static int CostMoveToCacheSize;
+static std::vector<int32_t> CostMoveToCache;
 static constexpr int CacheNotSet = -1;
 
 /*----------------------------------------------------------------------------
@@ -292,7 +293,7 @@ void Node::SetCostToGoal(uint64_t cost) {
 	}
 }
 
-bool Node::IsInGoal() {
+bool Node::IsInGoal() const {
 	return this->InGoal;
 }
 
@@ -300,7 +301,7 @@ void Node::SetInGoal() {
 	this->InGoal = 1;
 }
 
-uint8_t Node::GetDirection() {
+uint8_t Node::GetDirection() const {
 	return this->Direction;
 }
 
@@ -334,32 +335,19 @@ uint32_t Open::GetOffset() const {
 void InitAStar(int mapWidth, int mapHeight)
 {
 	// Should only be called once
-	Assert(!AStarMatrix);
+	Assert(AStarMatrix.empty());
 
 	AStarMapWidth = mapWidth;
 	AStarMapHeight = mapHeight;
-	AStarMapMax =  AStarMapWidth * AStarMapHeight;
 
-	// align the matrix, the open set, and the cost to move cache
-	// on 64-byte boundary, in case the memset/memmove operations
-	// of the libc we're using has a 128/256/512bit SIMD vector
-	// instruction branch, since we might be clearing 8M of
-	// memory for a 2048x2048 map
-	AStarMatrixSize = sizeof(Node) * AStarMapMax;
-	AStarMatrix = (Node *)aligned_malloc(64, AStarMatrixSize);
-	memset(AStarMatrix, 0, AStarMatrixSize);
+	AStarMatrix.resize(AStarMapWidth * AStarMapHeight);
 #ifdef DEBUG
-	for (int i = 0; i < AStarMapMax; i++) {
-		AStarMatrix[i].SetDirection(-1);
+	for (auto& node : AStarMatrix) {
+		node.SetDirection(-1);
 	}
 #endif
-
-	OpenSetMaxSize = AStarMapMax / MAX_OPEN_SET_RATIO;
-	OpenSet = (Open *)aligned_malloc(64, OpenSetMaxSize * sizeof(Open));
-
-	CostMoveToCacheSize = sizeof(int32_t) * AStarMapMax;
-	CostMoveToCache = (int32_t*)aligned_malloc(64, CostMoveToCacheSize);
-	memset(CostMoveToCache, CacheNotSet, CostMoveToCacheSize);
+	OpenSet.resize(AStarMapWidth * AStarMapHeight / MAX_OPEN_SET_RATIO);
+	CostMoveToCache.resize(AStarMapWidth * AStarMapHeight, CacheNotSet);
 
 	for (int i = 0; i < 9; ++i) {
 		Heading2O[i] = Heading2Y[i] * AStarMapWidth;
@@ -373,13 +361,10 @@ void InitAStar(int mapWidth, int mapHeight)
 */
 void FreeAStar()
 {
-	aligned_free(AStarMatrix);
-	AStarMatrix = nullptr;
-	aligned_free(OpenSet);
-	OpenSet = nullptr;
+	AStarMatrix.clear();
+	OpenSet.clear();
 	OpenSetSize = 0;
-	aligned_free(CostMoveToCache);
-	CostMoveToCache = nullptr;
+	CostMoveToCache.clear();
 
 	ProfilePrint();
 }
@@ -389,10 +374,10 @@ void FreeAStar()
 */
 static void AStarPrepare()
 {
-	memset(AStarMatrix, 0, AStarMatrixSize);
+	ranges::fill(AStarMatrix, Node{});
 #ifdef DEBUG
-	for (int i = 0; i < AStarMapMax; i++) {
-		AStarMatrix[i].SetDirection(-1);
+	for (auto& node : AStarMatrix) {
+		node.SetDirection(-1);
 	}
 #endif
 }
@@ -411,7 +396,7 @@ static void AStarCleanUp()
 
 static void CostMoveToCacheCleanUp()
 {
-	memset(CostMoveToCache, CacheNotSet, CostMoveToCacheSize);
+	ranges::fill(CostMoveToCache, CacheNotSet);
 }
 
 /**
@@ -447,9 +432,9 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int64_t costs)
 	int32_t midDist;
 	const Open *open;
 
-	if (OpenSetSize + 1 >= OpenSetMaxSize) {
+	if (OpenSetSize + 1 >= OpenSet.size()) {
 		ErrorPrint("A* internal error: raise Open Set Max Size (current value %d)\n",
-		           OpenSetMaxSize);
+		           (int)OpenSet.size());
 		ProfileEnd("AStarAddNode");
 		return PF_FAILED;
 	}
@@ -1125,7 +1110,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 			//eo = GetIndex(ex, ey);
 			eo = o + Heading2X[i] + Heading2O[i];
 
-			if (eo < 0 || eo >= CostMoveToCacheSize) {
+			if (eo < 0 || eo >= CostMoveToCache.size()) {
 				// unaccessible tile
 				continue;
 			}
@@ -1204,31 +1189,31 @@ void AStarDumpStats()
 	int32_t maxCostToGoal = 0;
 	int32_t minCostToGoal = INT_MAX;
 
-	for (int i = 0; i < AStarMapMax; i++) {
-		Node *m = &AStarMatrix[i];
-		maxCostFromHome = std::max(maxCostFromHome, m->GetCostFromStart());
-		maxCostToGoal = std::max(maxCostToGoal, m->GetCostToGoal());
-		minCostFromHome = m->GetCostFromStart() ? std::min(minCostFromHome, m->GetCostFromStart()) : minCostFromHome;
-		minCostToGoal = m->GetCostToGoal() ? std::min(minCostToGoal, m->GetCostToGoal()) : minCostToGoal;
+	for (const Node &m : AStarMatrix) {
+		
+		maxCostFromHome = std::max(maxCostFromHome, m.GetCostFromStart());
+		maxCostToGoal = std::max(maxCostToGoal, m.GetCostToGoal());
+		minCostFromHome = m.GetCostFromStart() ? std::min(minCostFromHome, m.GetCostFromStart()) : minCostFromHome;
+		minCostToGoal = m.GetCostToGoal() ? std::min(minCostToGoal, m.GetCostToGoal()) : minCostToGoal;
 	}
 	if (minCostToGoal) minCostToGoal--;
 	maxCostToGoal++;
 	maxCostFromHome++;
 	if (minCostFromHome) minCostFromHome--;
 
-	for (int i = 0; i < AStarMapMax; i++) {
-		Node *m = &AStarMatrix[i];
+	int i = 0;
+	for (const Node &m : AStarMatrix) {
 		int r = 0;
 		int g = 0;
-		if (m->GetCostFromStart() && maxCostFromHome - minCostFromHome) {
-			g = (1.0 - ((double)(m->GetCostFromStart() - minCostFromHome) / (maxCostFromHome - minCostFromHome))) * 255;
+		if (m.GetCostFromStart() && maxCostFromHome - minCostFromHome) {
+			g = (1.0 - ((double)(m.GetCostFromStart() - minCostFromHome) / (maxCostFromHome - minCostFromHome))) * 255;
 		}
-		if (m->GetCostToGoal() && maxCostToGoal - minCostToGoal) {
-			r = (1.0 - ((double)(m->GetCostToGoal() - minCostToGoal) / (maxCostToGoal - minCostToGoal))) * 255;
+		if (m.GetCostToGoal() && maxCostToGoal - minCostToGoal) {
+			r = (1.0 - ((double)(m.GetCostToGoal() - minCostToGoal) / (maxCostToGoal - minCostToGoal))) * 255;
 		}
 		const char *direction;
 		//  N NE  E SE  S SW  W NW
-		switch (m->GetDirection()) {
+		switch (m.GetDirection()) {
 			case 0:
 				direction = "v";
 				break;
@@ -1259,11 +1244,11 @@ void AStarDumpStats()
 			default:
 				direction = " ";
 		}
-		if (m->IsInGoal()) {
+		if (m.IsInGoal()) {
 			direction = "X";
 		}
 		fprintf(stdout, "\33[48;2;%d;%d;0m%s\33[49m", r, g, direction);
-		if (!(i % AStarMapWidth)) {
+		if (!(i++ % AStarMapWidth)) {
 			fprintf(stdout, "\n");
 		}
 	}
