@@ -346,6 +346,7 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 					}
 				}
 			}
+			DrawLastAStar(*this);
 #endif
 			/// Highlight layer if needed (editor stuff)
 			if (highlightChecker && highlightChecker(mf)) {

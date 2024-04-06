@@ -46,17 +46,6 @@
 #include "unit.h"
 #include "unit_manager.h"
 
-CMapField::CMapField() :
-#ifdef DEBUG
-	tilesetTile(0),
-#endif
-	tile(0),
-	Flags(0),
-	cost(0),
-	Value(0),
-	UnitCache()
-{}
-
 bool CMapField::IsTerrainResourceOnMap(int resource) const
 {
 	switch (resource) {

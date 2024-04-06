@@ -431,13 +431,12 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 **  Returns the next element of a path.
 **
 **  @param unit  Unit that wants the path element.
-**  @param pxd   Pointer for the x direction.
-**  @param pyd   Pointer for the y direction.
+**  @param dir   Pointer for the direction.
 **
 **  @return >0 remaining path length, 0 wait for path, -1
 **  reached goal, -2 can't reach the goal.
 */
-int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
+int NextPathElement(CUnit &unit, Vec2i *dir)
 {
 	PathFinderInput &input = unit.pathFinderData->input;
 	PathFinderOutput &output = unit.pathFinderData->output;
@@ -445,8 +444,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	unit.CurrentOrder()->UpdatePathFinderData(input);
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
-	*pxd = 0;
-	*pyd = 0;
+	*dir = {0, 0};
 
 	// Goal has moved, need to recalculate path or no cached path
 	if (output.Length <= 0 || input.IsRecalculateNeeded()) {
@@ -461,12 +459,11 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		}
 	}
 
-	*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
-	*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-	const Vec2i dir(*pxd, *pyd);
+	dir->x = Heading2X[(int)output.Path[(int)output.Length - 1]];
+	dir->y = Heading2Y[(int)output.Path[(int)output.Length - 1]];
 	int result = output.Length;
 	output.Length--;
-	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+	if (!UnitCanBeAt(unit, unit.tilePos + *dir)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -481,13 +478,12 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			AstarDebugPrint("WAIT expired\n");
 			result = NewPath(input, output);
 			if (result > 0) {
-				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
-				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+				dir->x = Heading2X[(int)output.Path[(int)output.Length - 1]];
+				dir->y = Heading2Y[(int)output.Path[(int)output.Length - 1]];
+				if (!UnitCanBeAt(unit, unit.tilePos + *dir)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
-					*pxd = 0;
-					*pyd = 0;
+					*dir = {0, 0};
 				} else {
 					result = output.Length;
 					output.Length--;
