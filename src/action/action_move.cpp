@@ -173,7 +173,7 @@ int DoActionMove(CUnit &unit)
 		}
 
 		UnmarkUnitFieldFlags(unit);
-		d = NextPathElement(unit, &posd.x, &posd.y);
+		d = NextPathElement(unit, &posd);
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop

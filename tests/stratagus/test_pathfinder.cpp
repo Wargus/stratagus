@@ -94,13 +94,13 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos;
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i next;
-		const auto d = NextPathElement(unit, &next.x, &next.y);
+		Vec2i dir;
+		const auto d = NextPathElement(unit, &dir);
 
 		CHECK(d == PF_REACHED);
 		CHECK(unit.pathFinderData->output.Length == 0);
-		CHECK(next == Vec2i(0, 0));
-		CHECK(dest == FollowedPath(unit.tilePos + next, unit.pathFinderData->output));
+		CHECK(dir == Vec2i(0, 0));
+		CHECK(dest == FollowedPath(unit.tilePos + dir, unit.pathFinderData->output));
 
 		unit.Orders.clear();
 	}
@@ -112,13 +112,13 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos + Vec2i{0, dist};
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i next;
-		const auto d = NextPathElement(unit, &next.x, &next.y);
+		Vec2i dir;
+		const auto d = NextPathElement(unit, &dir);
 
 		CHECK(d == dist);
 
 		CHECK(unit.pathFinderData->output.Length == dist - 1);
-		CHECK(dest == FollowedPath(unit.tilePos + next, unit.pathFinderData->output));
+		CHECK(dest == FollowedPath(unit.tilePos + dir, unit.pathFinderData->output));
 
 		unit.Orders.clear();
 	}
@@ -130,15 +130,15 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos + Vec2i{0, dist};
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i next;
-		const auto d = NextPathElement(unit, &next.x, &next.y);
+		Vec2i dir;
+		const auto d = NextPathElement(unit, &dir);
 
 		CHECK(0 < d);
 		CHECK(d <= std::size(unit.pathFinderData->output.Path));
 		CHECK(unit.pathFinderData->output.Length + unit.pathFinderData->output.OverflowLength == dist - 1);
 
 		CHECK(unit.pathFinderData->output.Length == d - 1);
-		CHECK(unit.tilePos + Vec2i(0, d) == FollowedPath(unit.tilePos + next, unit.pathFinderData->output));
+		CHECK(unit.tilePos + Vec2i(0, d) == FollowedPath(unit.tilePos + dir, unit.pathFinderData->output));
 
 		unit.Orders.clear();
 	}

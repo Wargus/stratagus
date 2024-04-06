@@ -226,7 +226,7 @@ extern void InitPathfinder();
 extern void FreePathfinder();
 
 /// Returns the next element of the path
-extern int NextPathElement(CUnit &unit, short int *xdp, short int *ydp);
+extern int NextPathElement(CUnit &unit, Vec2i *dir);
 /// Return path length to unit 'dst'.
 extern int UnitReachable(const CUnit &src, const CUnit &dst, int range, bool from_outside_container);
 /// Return path length to unit 'dst' or error code.
