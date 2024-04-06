@@ -180,7 +180,7 @@ public:
 class CMapField
 {
 public:
-	CMapField();
+	CMapField() = default;
 
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
@@ -231,30 +231,29 @@ public:
 	unsigned int getFlag() const { return Flags; }
 	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 #ifdef DEBUG
-	int64_t lastAStarCost;    /// debugging pathfinder
+	int64_t lastAStarCost = 0;    /// debugging pathfinder
 #endif
 
 	uint8_t getElevation() const { return this->ElevationLevel; }
-	void 	setElevation(const uint8_t newLevel) { this->ElevationLevel = newLevel; }
+	void setElevation(const uint8_t newLevel) { this->ElevationLevel = newLevel; }
 
 private:
 #ifdef DEBUG
-	tile_index tilesetTile;  /// tileset tile number
+	tile_index tilesetTile = 0;  /// tileset tile number
 #endif
-	graphic_index tile;       /// graphic tile number
+	graphic_index tile = 0;      /// graphic tile number
 public:
-	tile_flags Flags;        /// field flags
+	tile_flags Flags = 0;        /// field flags
 private:
-	unsigned char cost;        /// unit cost to move in this tile
+	unsigned char cost = 0;      /// unit cost to move in this tile
 public:
-	unsigned int Value;        /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
+	unsigned int Value = 0;         /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
 	std::vector<CUnit *> UnitCache; /// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 
 private:
-	uint8_t ElevationLevel {0};		/// highground elevation level
-
+	uint8_t ElevationLevel {0}; /// highground elevation level
 };
 
 extern PixelSize PixelTileSize; /// Size of a tile in pixels
