@@ -32,6 +32,7 @@
 
 //@{
 
+void DrawLastAStar(const class CViewport &vp);
 #if defined(DEBUG_ASTAR)
 #define AstarDebugPrint(format, ...) DebugPrint(format, ##__VA_ARGS__)
 #else

@@ -47,15 +47,18 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
 #include "map.h"
+#include "pathfinder.h"
 #include "settings.h"
+#include "stratagus.h"
 #include "tileset.h"
 #include "unit.h"
 #include "unit_find.h"
 
-#include "pathfinder.h"
+#if defined(DEBUG_ASTAR)
+# include "font.h"
+# include "viewport.h"
+#endif
 
 #include <stdio.h>
 
@@ -1252,6 +1255,31 @@ void AStarDumpStats()
 			fprintf(stdout, "\n");
 		}
 	}
+}
+
+void DrawLastAStar(const CViewport& vp)
+{
+#if defined(DEBUG_ASTAR)
+	for (auto y = vp.MapPos.y; y != vp.MapPos.y + vp.MapHeight; ++y) {
+		for (auto x = vp.MapPos.x; x != vp.MapPos.x + vp.MapWidth; ++x) {
+			const auto &node = AStarMatrix[GetIndex(x, y)];
+			const auto direction = node.GetDirection();
+			if (direction == 255) {
+				continue;
+			}
+			const auto nextX = x - Heading2X[direction];
+			const auto nextY = y - Heading2Y[direction];
+			const auto pixel1 = vp.TilePosToScreen_Center(Vec2i(x, y));
+			const auto pixel2 = vp.TilePosToScreen_Center(Vec2i(nextX, nextY));
+
+			if (0 <= pixel2.x && pixel2.x < Video.Width && 0 <= pixel2.y
+			    && pixel2.y < Video.Height) {
+				Video.DrawLine(ColorLightGray, pixel1.x, pixel1.y, pixel2.x, pixel2.y);
+				CLabel(GetSmallFont()).Draw(pixel1.x - 10, pixel1.y - 10, node.GetCostFromStart() + node.GetCostToGoal());
+			}
+		}
+	}
+#endif
 }
 
 /*----------------------------------------------------------------------------
