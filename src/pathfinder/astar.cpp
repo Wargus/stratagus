@@ -129,7 +129,7 @@ static std::vector<Node> AStarMatrix;
 /// see pathfinder.h
 int AStarFixedUnitCrossingCost;// = MaxMapWidth * MaxMapHeight;
 int AStarMovingUnitCrossingCost = 5;
-int AStarMaxSearchIterations = 1024;
+int AStarMaxSearchIterations = 1024 * 5;
 bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
 /// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
@@ -284,11 +284,10 @@ void Node::SetCostFromStart(uint64_t cost) {
 }
 
 int32_t Node::GetCostToGoal() const {
-	return this->CostToGoal << 4;
+	return this->CostToGoal;
 }
 
 void Node::SetCostToGoal(uint64_t cost) {
-	cost >>= 4;
 	if (cost > UINT16_MAX) {
 		this->CostToGoal = UINT16_MAX;
 	} else {
@@ -424,7 +423,7 @@ static void AStarRemoveMinimum(int pos)
 **
 **  @return  0 or PF_FAILED
 */
-static inline int AStarAddNode(const Vec2i &pos, int o, int64_t costs)
+static inline int AStarAddNode(const Vec2i &pos, int64_t costs)
 {
 	ProfileBegin("AStarAddNode");
 
@@ -442,7 +441,7 @@ static inline int AStarAddNode(const Vec2i &pos, int o, int64_t costs)
 		return PF_FAILED;
 	}
 
-	const int costToGoal = AStarMatrix[o].GetCostToGoal();
+	const int costToGoal = costs;
 	const int dist = std::abs(pos.x - AStarGoalX) + std::abs(pos.y - AStarGoalY);
 
 	// find where we should insert this node.
@@ -503,7 +502,7 @@ static void AStarReplaceNode(int pos)
 	memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
 
 	// Re-add the node with the new cost
-	AStarAddNode(node.pos, node.GetOffset(), node.GetCosts());
+	AStarAddNode(node.pos, node.GetCosts());
 	ProfileEnd("AStarReplaceNode");
 }
 
@@ -610,7 +609,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 		} while (--i);
 		index += AStarMapWidth;
 	} while (--h);
-	return cost;
+	return cost / (unit.Type->TileWidth * unit.Type->TileHeight);
 }
 
 
@@ -1037,7 +1036,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 	// place start point in open, it that failed, try another pathfinder
 	int costToGoal = AStarCosts(startPos, goalPos);
 	AStarMatrix[eo].SetCostToGoal(costToGoal);
-	if (AStarAddNode(startPos, eo, 1 + costToGoal) == PF_FAILED) {
+	if (AStarAddNode(startPos, 1 + costToGoal) == PF_FAILED) {
 		ret = PF_FAILED;
 		ProfileEnd("AStarFindPath");
 		return ret;
@@ -1137,7 +1136,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 				AStarMatrix[eo].SetDirection(i);
 				costToGoal = AStarCosts(endPos, goalPos);
 				AStarMatrix[eo].SetCostToGoal(costToGoal);
-				if (AStarAddNode(endPos, eo, new_cost + costToGoal) == PF_FAILED) {
+				if (AStarAddNode(endPos, new_cost + costToGoal) == PF_FAILED) {
 					ret = PF_FAILED;
 					ProfileEnd("AStarFindPath");
 					return ret;
@@ -1153,7 +1152,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 				if (j == -1) {
 					costToGoal = AStarCosts(endPos, goalPos);
 					AStarMatrix[eo].SetCostToGoal(costToGoal);
-					if (AStarAddNode(endPos, eo, new_cost + costToGoal) == PF_FAILED) {
+					if (AStarAddNode(endPos, new_cost + costToGoal) == PF_FAILED) {
 						ret = PF_FAILED;
 						ProfileEnd("AStarFindPath");
 						return ret;
