@@ -76,15 +76,10 @@ struct Node {
 	uint8_t GetDirection() const;
 	void SetDirection(uint8_t dir);
 private:
-	// align the matrix, the open set, and the cost to move cache
-	// on 64-byte boundary, in case the memset/memmove operations
-	// of the libc we're using has a 128/256/512bit SIMD vector
-	// instruction branch, since we might be clearing 8M of
-	// memory for a 2048x2048 map
-	alignas(64) int32_t CostFromStart = 0; /// Real costs to reach this point
-	uint16_t CostToGoal = 0;    /// Estimated cost to goal
-	int8_t InGoal = 0;          /// is this point in the goal
-	int8_t Direction = 0;       /// Direction for trace back
+	int32_t CostFromStart = 0; /// Real costs to reach this point
+	uint16_t CostToGoal = 0;   /// Estimated cost to goal
+	int8_t InGoal = 0;         /// is this point in the goal
+	int8_t Direction = 0;      /// Direction for trace back
 };
 
 struct Open {
