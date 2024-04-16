@@ -51,6 +51,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static constexpr unsigned char MaxVolume = 255;
+
 /**
 **  Various sounds used in game.
 */
@@ -226,20 +228,6 @@ unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 }
 
 /**
-**  Calculate the volume associated with a request, either by clipping the
-**  range parameter of this request, or by mapping this range to a volume.
-*/
-unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
-{
-	if (isVolume) {
-		return std::min(MaxVolume, power);
-	} else {
-		// map distance to volume
-		return VolumeForDistance(power, range);
-	}
-}
-
-/**
 **  Calculate the stereo value for a unit
 */
 static char CalculateStereo(const CUnit &unit)
@@ -283,7 +271,7 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelVolume(channel, VolumeForDistance(ViewPointDistanceToUnit(unit), sound->Range));
 	SetChannelStereo(channel, CalculateStereo(unit));
 #ifdef USE_MNG
 	const CUnitType &type = *unit.Type;
@@ -309,7 +297,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
+	const unsigned char volume = VolumeForDistance(ViewPointDistanceToUnit(unit), sound->Range);
 	if (volume == 0) {
 		return;
 	}
@@ -339,7 +327,8 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
+	const unsigned char volume =
+		VolumeForDistance(ViewPointDistanceToMissile(missile), sound->Range);
 	if (volume == 0) {
 		return;
 	}
@@ -375,7 +364,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
+	SetChannelVolume(channel, std::min(MaxVolume, volume));
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;

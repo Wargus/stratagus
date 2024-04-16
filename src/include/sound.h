@@ -163,8 +163,17 @@ extern int DistanceSilent;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Calculates volume level
-extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
+/**
+**  Compute a suitable volume for something taking place at a given
+**  distance from the current view point.
+**
+**  @param d      distance
+**  @param range  range
+**
+**  @return       volume for given distance (0..??)
+*/
+unsigned char VolumeForDistance(unsigned short d, unsigned char range);
+
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &, EUnitVoice, bool sampleUnique = false);
 /// Play a unit sound

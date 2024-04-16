@@ -508,7 +508,10 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			if (spell.Target == ETarget::Self) {
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
-				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
+				PlayGameSound(
+					spell.SoundWhenCast.Sound,
+					VolumeForDistance(ViewPointDistance(target ? target->tilePos : goalPos),
+				                      spell.SoundWhenCast.Sound->Range));
 			}
 		}
 		for (auto& act : spell.Action) {
