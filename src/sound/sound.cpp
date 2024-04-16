@@ -51,6 +51,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+static constexpr unsigned char MaxVolume = 255;
+
 /**
 **  Various sounds used in game.
 */
@@ -64,9 +66,6 @@ struct SelectionHandling {
 	CSound *Sound;         /// last sound played by this unit
 	unsigned char HowMany; /// number of sound played in this group
 };
-
-/// FIXME: docu
-SelectionHandling SelectionHandler;
 
 static int ViewPointOffset;      /// Distance to Volume Mapping
 int DistanceSilent;              /// silent distance
@@ -92,23 +91,24 @@ static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 /**
 **  Choose the sample to play
 */
-static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
+static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 {
-	Mix_Chunk *result = nullptr;
-
-	if (!sound || !SoundEnabled()) {
+	if (!SoundEnabled()) {
 		return nullptr;
 	}
 
-	if (sound->Number == TWO_GROUPS) {
+	Mix_Chunk *result = nullptr;
+	static SelectionHandling SelectionHandler{};
+
+	if (sound.Number == TWO_GROUPS) {
 		// handle a special sound (selection)
 		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
-			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
+			if (SelectionHandler.Sound == sound.Sound.TwoGroups.First) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.Second;
+					SelectionHandler.Sound = sound.Sound.TwoGroups.Second;
 				}
 			} else {
 				//FIXME: checks for error
@@ -118,23 +118,23 @@ static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+						SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 					}
 				} else {
 					result = SelectionHandler.Sound->Sound.OneSound;
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+					SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+			SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 			result = SimpleChooseSample(*SelectionHandler.Sound);
 			SelectionHandler.HowMany = 1;
 		}
 	} else {
 		// normal sound/sound group handling
-		result = SimpleChooseSample(*sound);
+		result = SimpleChooseSample(sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
 			SelectionHandler.HowMany = 0;
 			SelectionHandler.Sound = nullptr;
@@ -226,20 +226,6 @@ unsigned char VolumeForDistance(unsigned short d, unsigned char range)
 }
 
 /**
-**  Calculate the volume associated with a request, either by clipping the
-**  range parameter of this request, or by mapping this range to a volume.
-*/
-unsigned char CalculateVolume(bool isVolume, int power, unsigned char range)
-{
-	if (isVolume) {
-		return std::min(MaxVolume, power);
-	} else {
-		// map distance to volume
-		return VolumeForDistance(power, range);
-	}
-}
-
-/**
 **  Calculate the stereo value for a unit
 */
 static char CalculateStereo(const CUnit &unit)
@@ -273,7 +259,7 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 		return;
 	}
 
-	Mix_Chunk *sample = ChooseSample(sound, selection, source);
+	Mix_Chunk *sample = ChooseSample(*sound, selection, source);
 
 	if (sampleUnique && SampleIsPlaying(sample)) {
 		return;
@@ -283,7 +269,7 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelVolume(channel, VolumeForDistance(ViewPointDistanceToUnit(unit), sound->Range));
 	SetChannelStereo(channel, CalculateStereo(unit));
 #ifdef USE_MNG
 	const CUnitType &type = *unit.Type;
@@ -309,12 +295,12 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
+	const unsigned char volume = VolumeForDistance(ViewPointDistanceToUnit(unit), sound->Range);
 	if (volume == 0) {
 		return;
 	}
 
-	int channel = PlaySample(ChooseSample(sound, false, source));
+	int channel = PlaySample(ChooseSample(*sound, false, source));
 	if (channel == -1) {
 		return;
 	}
@@ -339,12 +325,13 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {nullptr, 0};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
+	const unsigned char volume =
+		VolumeForDistance(ViewPointDistanceToMissile(missile), sound->Range);
 	if (volume == 0) {
 		return;
 	}
 
-	int channel = PlaySample(ChooseSample(sound, false, source));
+	int channel = PlaySample(ChooseSample(*sound, false, source));
 	if (channel == -1) {
 		return;
 	}
@@ -365,7 +352,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	}
 	Origin source = {nullptr, 0};
 
-	Mix_Chunk *sample = ChooseSample(sound, false, source);
+	Mix_Chunk *sample = ChooseSample(*sound, false, source);
 
 	if (!sample || (!always && SampleIsPlaying(sample))) {
 		return;
@@ -375,7 +362,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
+	SetChannelVolume(channel, std::min(MaxVolume, volume));
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;
@@ -426,19 +413,6 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 }
 
 /**
-**  Ask the sound server to change the range of a sound.
-**
-**  @param sound  the id of the sound to modify.
-**  @param range  the new range for this sound.
-*/
-void SetSoundRange(CSound *sound, unsigned char range)
-{
-	if (sound != NO_SOUND) {
-		sound->Range = range;
-	}
-}
-
-/**
 **  Ask the sound server to register a sound (and currently to load it)
 **  and to return an unique identifier for it. The unique identifier is
 **  memory pointer of the server.
@@ -464,14 +438,14 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 			if (!id->Sound.OneGroup[i]) {
 				//delete[] id->Sound.OneGroup;
 				delete id;
-				return NO_SOUND;
+				return nullptr;
 			}
 		}
 	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			delete id;
-			return NO_SOUND;
+			return nullptr;
 		}
 		id->Number = ONE_SOUND;
 	}
@@ -489,8 +463,8 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 */
 CSound *RegisterTwoGroups(CSound *first, CSound *second)
 {
-	if (first == NO_SOUND || second == NO_SOUND) {
-		return NO_SOUND;
+	if (first == nullptr || second == nullptr) {
+		return nullptr;
 	}
 	CSound *id = new CSound;
 	id->Number = TWO_GROUPS;

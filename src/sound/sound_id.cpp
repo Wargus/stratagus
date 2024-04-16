@@ -46,13 +46,13 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::map<std::string, CSound *> SoundMap;
+static std::map<std::string, CSound *, std::less<>> SoundMap;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-static CSound *FindSound(const std::string &name)
+static CSound *FindSound(const std::string_view &name)
 {
 	std::map<std::string, CSound *>::iterator ret = SoundMap.find(name);
 	if (ret != SoundMap.end()) {
@@ -65,7 +65,7 @@ static CSound *FindSound(const std::string &name)
 **  Add a new mapping (sound name to sound id) in the hash table
 **  Create a new mapping between a name and an already valid sound id.
 **
-**  @param name  Name of the sound (now freed by caller!).
+**  @param name  Name of the sound.
 **  @param id    Sound identifier.
 */
 void MapSound(const std::string &name, CSound *id)
@@ -85,14 +85,14 @@ void MapSound(const std::string &name, CSound *id)
 **
 **  @return      Sound identifier for this name.
 */
-CSound *SoundForName(const std::string &name)
+CSound *SoundForName(const std::string_view &name)
 {
 	Assert(!name.empty());
 	CSound *sound = FindSound(name);
 	if (sound) {
 		return sound;
 	}
-	DebugPrint("Can't find sound '%s' in sound table\n", name.c_str());
+	DebugPrint("Can't find sound '%s' in sound table\n", name.data());
 	return nullptr;
 }
 
@@ -118,7 +118,7 @@ CSound *MakeSound(const std::string &name, const std::vector<std::string> &files
 	}
 
 	sound = RegisterSound(files);
-	if (sound != NO_SOUND) {
+	if (sound != nullptr) {
 		MapSound(name, sound);
 	}
 	return sound;
@@ -147,7 +147,7 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	}
 
 	sound = RegisterTwoGroups(first, second);
-	if (sound != NO_SOUND) {
+	if (sound != nullptr) {
 		MapSound(name, sound);
 	}
 	return sound;

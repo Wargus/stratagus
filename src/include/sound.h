@@ -54,7 +54,6 @@ class LuaActionListener;
 ----------------------------------------------------------------------------*/
 
 #define MaxSampleVolume 255  /// Maximum sample volume
-#define NO_SOUND 0           /// No valid sound ID
 
 /**
 **  Voice groups for a unit
@@ -163,8 +162,17 @@ extern int DistanceSilent;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Calculates volume level
-extern unsigned char CalculateVolume(bool isVolume, int power, unsigned char range);
+/**
+**  Compute a suitable volume for something taking place at a given
+**  distance from the current view point.
+**
+**  @param d      distance
+**  @param range  range
+**
+**  @return       volume for given distance (0..??)
+*/
+unsigned char VolumeForDistance(unsigned short d, unsigned char range);
+
 /// Play a unit sound
 extern void PlayUnitSound(const CUnit &, EUnitVoice, bool sampleUnique = false);
 /// Play a unit sound
@@ -176,9 +184,6 @@ extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = fal
 
 /// Play a sound file
 extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
-
-/// Modify the range of a given sound.
-extern void SetSoundRange(CSound *sound, unsigned char range);
 
 /// Register a sound (can be a simple sound or a group)
 extern CSound *RegisterSound(const std::vector<std::string> &files);
@@ -209,7 +214,7 @@ extern void CallbackMusicTrigger();
 /// Map sound to identifier
 extern void MapSound(const std::string &sound_name, CSound *id);
 /// Get the sound id bound to an identifier
-extern CSound *SoundForName(const std::string &sound_name);
+extern CSound *SoundForName(const std::string_view &sound_name);
 /// Make a sound bound to identifier
 extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier

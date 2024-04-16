@@ -76,16 +76,13 @@ static int CclSoundForName(lua_State *l)
 */
 static CSound *CclGetSound(lua_State *l)
 {
-	LuaUserData *data;
-	int pop;
-
-	pop = 0;
+	bool pop = false;
 	if (lua_isstring(l, -1)) {
 		CclSoundForName(l);
-		pop = 1;
+		pop = true;
 	}
 	if (lua_isuserdata(l, -1)) {
-		data = (LuaUserData *)lua_touserdata(l, -1);
+		LuaUserData *data = (LuaUserData *)lua_touserdata(l, -1);
 		if (data->Type == LuaSoundType) {
 			if (pop) {
 				lua_pop(l, 1);
@@ -114,7 +111,7 @@ static int CclMakeSound(lua_State *l)
 
 	std::string c_name = std::string{LuaToString(l, 1)};
 	std::vector<std::string> files;
-	CSound *id;
+	CSound *id = nullptr;
 	if (lua_isstring(l, 2)) {
 		// only one file
 		files.push_back(std::string{LuaToString(l, 2)});
@@ -147,22 +144,16 @@ static int CclMakeSound(lua_State *l)
 */
 static int CclMakeSoundGroup(lua_State *l)
 {
-	CSound *id;
-	std::string c_name;
-	CSound *first;
-	CSound *second;
-	LuaUserData *data;
-
 	LuaCheckArgs(l, 3);
 
-	c_name = LuaToString(l, 1);
+	std::string c_name{LuaToString(l, 1)};
 
 	lua_pushvalue(l, 2);
-	first = CclGetSound(l);
+	CSound *first = CclGetSound(l);
 	lua_pop(l, 1);
-	second = CclGetSound(l);
-	id = MakeSoundGroup(c_name, first, second);
-	data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
+	CSound *second = CclGetSound(l);
+	CSound *id = MakeSoundGroup(c_name, first, second);
+	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
 	data->Data = id;
 	return 1;
@@ -206,10 +197,7 @@ static int CclPlaySound(lua_State *l)
 	lua_pushvalue(l, 1);
 	CSound *id = CclGetSound(l);
 	lua_pop(l, 1);
-	bool always = false;
-	if (args == 2) {
-		always = LuaToBoolean(l, 2);
-	}
+	const bool always = args == 2 && LuaToBoolean(l, 2);
 	PlayGameSound(id, MaxSampleVolume, always);
 	return 0;
 }
@@ -339,17 +327,17 @@ static int CclSetGlobalSoundRange(lua_State *l)
 */
 static int CclSetSoundRange(lua_State *l)
 {
-
 	LuaCheckArgs(l, 2);
 
-	int tmp = LuaToNumber(l, 2);
-	clamp(&tmp, 0, 255);
-	const unsigned char theRange = static_cast<unsigned char>(tmp);
+	int range = LuaToNumber(l, 2);
+	clamp(&range, 0, 255);
+	const unsigned char theRange = static_cast<unsigned char>(range);
 
 	lua_pushvalue(l, 1);
-	CSound *id = CclGetSound(l);
-	SetSoundRange(id, theRange);
-	return 1;
+	if (CSound* id = CclGetSound(l)) {
+		id->Range = theRange;
+	}
+	return 0;
 }
 
 /**
