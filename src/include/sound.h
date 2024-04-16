@@ -54,7 +54,6 @@ class LuaActionListener;
 ----------------------------------------------------------------------------*/
 
 #define MaxSampleVolume 255  /// Maximum sample volume
-#define NO_SOUND 0           /// No valid sound ID
 
 /**
 **  Voice groups for a unit
@@ -186,9 +185,6 @@ extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = fal
 /// Play a sound file
 extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
 
-/// Modify the range of a given sound.
-extern void SetSoundRange(CSound *sound, unsigned char range);
-
 /// Register a sound (can be a simple sound or a group)
 extern CSound *RegisterSound(const std::vector<std::string> &files);
 
@@ -218,7 +214,7 @@ extern void CallbackMusicTrigger();
 /// Map sound to identifier
 extern void MapSound(const std::string &sound_name, CSound *id);
 /// Get the sound id bound to an identifier
-extern CSound *SoundForName(const std::string &sound_name);
+extern CSound *SoundForName(const std::string_view &sound_name);
 /// Make a sound bound to identifier
 extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier

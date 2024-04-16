@@ -413,19 +413,6 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 }
 
 /**
-**  Ask the sound server to change the range of a sound.
-**
-**  @param sound  the id of the sound to modify.
-**  @param range  the new range for this sound.
-*/
-void SetSoundRange(CSound *sound, unsigned char range)
-{
-	if (sound != NO_SOUND) {
-		sound->Range = range;
-	}
-}
-
-/**
 **  Ask the sound server to register a sound (and currently to load it)
 **  and to return an unique identifier for it. The unique identifier is
 **  memory pointer of the server.
@@ -451,14 +438,14 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 			if (!id->Sound.OneGroup[i]) {
 				//delete[] id->Sound.OneGroup;
 				delete id;
-				return NO_SOUND;
+				return nullptr;
 			}
 		}
 	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
 			delete id;
-			return NO_SOUND;
+			return nullptr;
 		}
 		id->Number = ONE_SOUND;
 	}
@@ -476,8 +463,8 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 */
 CSound *RegisterTwoGroups(CSound *first, CSound *second)
 {
-	if (first == NO_SOUND || second == NO_SOUND) {
-		return NO_SOUND;
+	if (first == nullptr || second == nullptr) {
+		return nullptr;
 	}
 	CSound *id = new CSound;
 	id->Number = TWO_GROUPS;

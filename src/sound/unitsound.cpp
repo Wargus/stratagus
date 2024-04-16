@@ -70,7 +70,7 @@ bool SoundConfig::MapSound()
 void SoundConfig::SetSoundRange(unsigned char range)
 {
 	if (this->Sound) {
-		::SetSoundRange(this->Sound, range);
+		this->Sound->Range = range;
 	}
 }
 
