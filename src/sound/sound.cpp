@@ -67,9 +67,6 @@ struct SelectionHandling {
 	unsigned char HowMany; /// number of sound played in this group
 };
 
-/// FIXME: docu
-SelectionHandling SelectionHandler;
-
 static int ViewPointOffset;      /// Distance to Volume Mapping
 int DistanceSilent;              /// silent distance
 
@@ -94,23 +91,24 @@ static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 /**
 **  Choose the sample to play
 */
-static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
+static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 {
-	Mix_Chunk *result = nullptr;
-
-	if (!sound || !SoundEnabled()) {
+	if (!SoundEnabled()) {
 		return nullptr;
 	}
 
-	if (sound->Number == TWO_GROUPS) {
+	Mix_Chunk *result = nullptr;
+	static SelectionHandling SelectionHandler{};
+
+	if (sound.Number == TWO_GROUPS) {
 		// handle a special sound (selection)
 		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
-			if (SelectionHandler.Sound == sound->Sound.TwoGroups.First) {
+			if (SelectionHandler.Sound == sound.Sound.TwoGroups.First) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.Second;
+					SelectionHandler.Sound = sound.Sound.TwoGroups.Second;
 				}
 			} else {
 				//FIXME: checks for error
@@ -120,23 +118,23 @@ static Mix_Chunk *ChooseSample(CSound *sound, bool selection, Origin &source)
 					SelectionHandler.HowMany++;
 					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
 						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+						SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 					}
 				} else {
 					result = SelectionHandler.Sound->Sound.OneSound;
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+					SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.Sound = sound->Sound.TwoGroups.First;
+			SelectionHandler.Sound = sound.Sound.TwoGroups.First;
 			result = SimpleChooseSample(*SelectionHandler.Sound);
 			SelectionHandler.HowMany = 1;
 		}
 	} else {
 		// normal sound/sound group handling
-		result = SimpleChooseSample(*sound);
+		result = SimpleChooseSample(sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
 			SelectionHandler.HowMany = 0;
 			SelectionHandler.Sound = nullptr;
@@ -261,7 +259,7 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 		return;
 	}
 
-	Mix_Chunk *sample = ChooseSample(sound, selection, source);
+	Mix_Chunk *sample = ChooseSample(*sound, selection, source);
 
 	if (sampleUnique && SampleIsPlaying(sample)) {
 		return;
@@ -302,7 +300,7 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 
-	int channel = PlaySample(ChooseSample(sound, false, source));
+	int channel = PlaySample(ChooseSample(*sound, false, source));
 	if (channel == -1) {
 		return;
 	}
@@ -333,7 +331,7 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 		return;
 	}
 
-	int channel = PlaySample(ChooseSample(sound, false, source));
+	int channel = PlaySample(ChooseSample(*sound, false, source));
 	if (channel == -1) {
 		return;
 	}
@@ -354,7 +352,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	}
 	Origin source = {nullptr, 0};
 
-	Mix_Chunk *sample = ChooseSample(sound, false, source);
+	Mix_Chunk *sample = ChooseSample(*sound, false, source);
 
 	if (!sample || (!always && SampleIsPlaying(sample))) {
 		return;
