@@ -59,11 +59,11 @@
 static int CclSoundForName(lua_State *l)
 {
 	const std::string sound_name = std::string{LuaToString(l, -1)};
-	CSound *id = SoundForName(sound_name);
+	auto id = SoundForName(sound_name);
 
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
-	data->Data = id;
+	data->Data = id.get();
 	return 1;
 }
 
@@ -111,7 +111,7 @@ static int CclMakeSound(lua_State *l)
 
 	std::string c_name = std::string{LuaToString(l, 1)};
 	std::vector<std::string> files;
-	CSound *id = nullptr;
+	std::shared_ptr<CSound> id;
 	if (lua_isstring(l, 2)) {
 		// only one file
 		files.push_back(std::string{LuaToString(l, 2)});
@@ -130,7 +130,7 @@ static int CclMakeSound(lua_State *l)
 	}
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
-	data->Data = id;
+	data->Data = id.get();
 	return 1;
 }
 
@@ -152,10 +152,10 @@ static int CclMakeSoundGroup(lua_State *l)
 	CSound *first = CclGetSound(l);
 	lua_pop(l, 1);
 	CSound *second = CclGetSound(l);
-	CSound *id = MakeSoundGroup(c_name, first, second);
+	auto id = MakeSoundGroup(c_name, first, second);
 	LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 	data->Type = LuaSoundType;
-	data->Data = id;
+	data->Data = id.get();
 	return 1;
 }
 
@@ -171,7 +171,8 @@ static int CclMapSound(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	std::string sound_name = std::string{LuaToString(l, 1)};
-	MapSound(sound_name, CclGetSound(l));
+	auto sound = CclGetSound(l);
+	MapSound(sound_name, sound ? sound->shared_from_this() : nullptr);
 	lua_pushvalue(l, 2);
 	return 1;
 }
@@ -219,7 +220,7 @@ static void SetSoundConfigRace(lua_State *l, int j, SoundConfig soundConfigs[])
 		LuaError(l, "Sound id expected");
 	}
 	lua_pop(l, 1);
-	soundConfigs[raceIndex].Sound = (CSound *)data->Data;
+	soundConfigs[raceIndex].Sound = reinterpret_cast<CSound *>(data->Data)->shared_from_this();
 }
 
 /**
@@ -245,13 +246,13 @@ static int CclDefineGameSounds(lua_State *l)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.Click.Sound = (CSound *)data->Data;
+			GameSounds.Click.Sound = reinterpret_cast<CSound *>(data->Data)->shared_from_this();
 		} else if (value == "transport-docking") {
 			if (!lua_isuserdata(l, j + 1)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.Docking.Sound = (CSound *)data->Data;
+			GameSounds.Docking.Sound = reinterpret_cast<CSound *>(data->Data)->shared_from_this();
 		} else if (value == "placement-error") {
 			SetSoundConfigRace(l, j, GameSounds.PlacementError);
 		} else if (value == "placement-success") {
@@ -277,7 +278,7 @@ static int CclDefineGameSounds(lua_State *l)
 				LuaError(l, "Sound id expected");
 			}
 			lua_pop(l, 1);
-			GameSounds.NotEnoughRes[raceIndex][resId].Sound = (CSound *)data->Data;
+			GameSounds.NotEnoughRes[raceIndex][resId].Sound = reinterpret_cast<CSound *>(data->Data)->shared_from_this();
 		} else if (value == "not-enough-food") {
 			SetSoundConfigRace(l, j, GameSounds.NotEnoughFood);
 		} else if (value == "rescue") {
@@ -289,7 +290,7 @@ static int CclDefineGameSounds(lua_State *l)
 				|| (data = (LuaUserData *)lua_touserdata(l, j + 1))->Type != LuaSoundType) {
 				LuaError(l, "Sound id expected");
 			}
-			GameSounds.ChatMessage.Sound = (CSound *)data->Data;
+			GameSounds.ChatMessage.Sound = reinterpret_cast<CSound *>(data->Data)->shared_from_this();
 		} else {
 			LuaError(l, "Unsupported tag: %s", value.data());
 		}

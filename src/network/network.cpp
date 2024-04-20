@@ -992,7 +992,7 @@ static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 	nc.Deserialize(&ncq.Data[0]);
 
 	SetMessage("%s", nc.Text.c_str());
-	PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
+	PlayGameSound(GameSounds.ChatMessage.Sound.get(), MaxSampleVolume);
 	CommandLog("chat", nullptr, FlushCommands, -1, -1, nullptr, nc.Text.c_str(), -1);
 }
 

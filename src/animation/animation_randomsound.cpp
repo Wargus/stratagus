@@ -51,7 +51,7 @@ void CAnimation_RandomSound::Action(CUnit &unit, int & /*move*/, int /*scale*/) 
 
 	if (unit.IsVisible(*ThisPlayer) || ReplayRevealMap) {
 		const size_t index = MyRand() % this->sounds.size();
-		PlayUnitSound(unit, this->sounds[index].Sound);
+		PlayUnitSound(unit, this->sounds[index].Sound.get());
 	}
 }
 

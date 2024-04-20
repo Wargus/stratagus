@@ -41,6 +41,8 @@
 #include "upgrade_structs.h"
 #endif
 
+#include <memory>
+
 #define ANIMATIONS_DEATHTYPES 40
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -62,7 +64,7 @@ public:
 
 public:
 	std::string Name;     /// config sound name
-	CSound *Sound = nullptr; /// identifier send to sound server
+	std::shared_ptr<CSound> Sound; /// identifier send to sound server
 };
 
 /**

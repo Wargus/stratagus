@@ -46,17 +46,16 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::map<std::string, CSound *, std::less<>> SoundMap;
+static std::map<std::string, std::shared_ptr<CSound>, std::less<>> SoundMap;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-static CSound *FindSound(const std::string_view &name)
+static std::shared_ptr<CSound> FindSound(const std::string_view &name)
 {
-	std::map<std::string, CSound *>::iterator ret = SoundMap.find(name);
-	if (ret != SoundMap.end()) {
-		return (*ret).second;
+	if (auto it = SoundMap.find(name); it != SoundMap.end()) {
+		return (*it).second;
 	}
 	return nullptr;
 }
@@ -68,14 +67,13 @@ static CSound *FindSound(const std::string_view &name)
 **  @param name  Name of the sound.
 **  @param id    Sound identifier.
 */
-void MapSound(const std::string &name, CSound *id)
+void MapSound(const std::string &name, std::shared_ptr<CSound> id)
 {
 	if (!id) {
 		DebugPrint("Null Sound for %s is not acceptable by sound table\n", name.c_str());
 		return;
 	}
-	id->Mapref++;
-	SoundMap[name] = id;
+	SoundMap[name] = std::move(id);
 }
 
 /**
@@ -85,11 +83,10 @@ void MapSound(const std::string &name, CSound *id)
 **
 **  @return      Sound identifier for this name.
 */
-CSound *SoundForName(const std::string_view &name)
+std::shared_ptr<CSound> SoundForName(const std::string_view &name)
 {
 	Assert(!name.empty());
-	CSound *sound = FindSound(name);
-	if (sound) {
+	if (std::shared_ptr<CSound> sound = FindSound(name)) {
 		return sound;
 	}
 	DebugPrint("Can't find sound '%s' in sound table\n", name.data());
@@ -108,20 +105,18 @@ CSound *SoundForName(const std::string_view &name)
 **
 **  @return      the sound id of the created group
 */
-CSound *MakeSound(const std::string &name, const std::vector<std::string> &files)
+std::shared_ptr<CSound> MakeSound(const std::string &name, const std::vector<std::string> &files)
 {
-	CSound *sound = FindSound(name);
-
-	if (sound) {
+	if (auto sound = FindSound(name)) {
 		DebugPrint("re-register sound '%s'\n", name.c_str());
 		return sound;
 	}
 
-	sound = RegisterSound(files);
-	if (sound != nullptr) {
+	if (auto sound = RegisterSound(files)) {
 		MapSound(name, sound);
+		return sound;
 	}
-	return sound;
+	return nullptr;
 }
 
 /**
@@ -137,30 +132,22 @@ CSound *MakeSound(const std::string &name, const std::vector<std::string> &files
 **
 **  @return        Registered sound identifier.
 */
-CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
+std::shared_ptr<CSound> MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 {
-	CSound *sound = FindSound(name);
-
-	if (sound) {
+	if (auto sound = FindSound(name)) {
 		DebugPrint("re-register sound '%s'\n", name.c_str());
 		return sound;
 	}
-
-	sound = RegisterTwoGroups(first, second);
-	if (sound != nullptr) {
+	if (auto sound = RegisterTwoGroups(first, second)) {
 		MapSound(name, sound);
+		return sound;
 	}
-	return sound;
+	return nullptr;
 }
 
 void FreeSounds()
 {
-	for (auto& [_, sound] : SoundMap) {
-		Assert(sound && sound->Mapref != 0);
-		if (sound && !--sound->Mapref) {
-			delete sound;
-		}
-	}
+	SoundMap.clear();
 }
 
 //@}

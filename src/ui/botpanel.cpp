@@ -1109,7 +1109,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 	const int spellId = CurrentButtons[button].Value;
 	if (KeyModifiers & ModifierControl) {
 		if (!SpellTypeTable[spellId]->AutoCast) {
-			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+			PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound.get(), MaxSampleVolume);
 			return;
 		}
 
@@ -1273,7 +1273,7 @@ void CButtonPanel::DoClicked_Train(int button)
 	}
 	else if (ThisPlayer->CheckLimits(type) == -3) {
 		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
+			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound.get(), MaxSampleVolume);
 		}
 	}
 }
@@ -1299,7 +1299,7 @@ void CButtonPanel::DoClicked_Train(int button)
 		UI.StatusLine.ClearCosts();
 	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
 		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound.get(), MaxSampleVolume);
 		}
 	}
 }
@@ -1362,9 +1362,9 @@ void CButtonPanel::DoClicked(int button)
 	if (CurrentButtons[button].Pos == -1 || !(ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Index == PlayerMax - 1)) {
 		return;
 	}
-	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+	PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 	if (CurrentButtons[button].CommentSound.Sound) {
-		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
+		PlayGameSound(CurrentButtons[button].CommentSound.Sound.get(), MaxSampleVolume);
 	}
 
 	//  Handle action on button.
