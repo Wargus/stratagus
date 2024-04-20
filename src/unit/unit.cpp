@@ -2014,7 +2014,7 @@ void RescueUnits()
 						unit->RescuedFrom = unit->Player;
 						unit->ChangeOwner(*around[i]->Player);
 						unit->Blink = 5;
-						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound, MaxSampleVolume);
+						PlayGameSound(GameSounds.Rescue[unit->Player->Race].Sound.get(), MaxSampleVolume);
 						break;
 					}
 				}

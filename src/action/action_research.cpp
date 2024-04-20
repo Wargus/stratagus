@@ -153,10 +153,10 @@ void COrder_Research::Execute(CUnit &unit) /* override */
 				ColorGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
 		}
 		if (&player == ThisPlayer) {
-			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;
+			auto sound = GameSounds.ResearchComplete[player.Race].Sound;
 
 			if (sound) {
-				PlayGameSound(sound, MaxSampleVolume);
+				PlayGameSound(sound.get(), MaxSampleVolume);
 			}
 		}
 		if (player.AiEnabled) {

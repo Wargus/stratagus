@@ -1064,7 +1064,7 @@ int CPlayer::CheckCosts(const int (&costs)[MaxCosts], bool notify) const
 			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));
 
 			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
-				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound.get(), MaxSampleVolume);
 			}
 		}
 		err |= 1 << i;

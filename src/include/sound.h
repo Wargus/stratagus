@@ -96,21 +96,25 @@ public:
 /**
 **  Sound definition.
 */
-class CSound
+class CSound : public std::enable_shared_from_this<CSound>
 {
-public:
-	CSound() : Mapref(0), Range(0), Number(0)
+	class Key
 	{
-		memset(&Sound, 0, sizeof(Sound));
-	}
+		friend CSound;
+		Key(){};
+	};
+public:
+	explicit CSound(Key){}
 	~CSound();
-	unsigned int Mapref;
+
+	static std::shared_ptr<CSound> make() { return std::make_shared<CSound>(Key{}); }
+
 	/**
 	**  Range is a multiplier for ::DistanceSilent.
 	**  255 means infinite range of the sound.
 	*/
-	unsigned char Range;        /// Range is a multiplier for DistanceSilent
-	unsigned char Number;       /// single, group, or table of sounds.
+	unsigned char Range = 0;       /// Range is a multiplier for DistanceSilent
+	unsigned char Number = 0;      /// single, group, or table of sounds.
 	union {
 		Mix_Chunk *OneSound;       /// if it's only a simple sound
 		Mix_Chunk **OneGroup;      /// when it's a simple group
@@ -118,7 +122,7 @@ public:
 			CSound *First;       /// first group: selected sound
 			CSound *Second;      /// second group: annoyed sound
 		} TwoGroups;             /// when it's a double group
-	} Sound;
+	} Sound{};
 };
 
 /**
@@ -186,10 +190,10 @@ extern void PlayGameSound(CSound *sound, unsigned char volume, bool always = fal
 extern int PlayFile(const std::string &name, LuaActionListener *listener = nullptr);
 
 /// Register a sound (can be a simple sound or a group)
-extern CSound *RegisterSound(const std::vector<std::string> &files);
+extern std::shared_ptr<CSound> RegisterSound(const std::vector<std::string> &files);
 
 ///  Create a special sound group with two sounds
-extern CSound *RegisterTwoGroups(CSound *first, CSound *second);
+extern std::shared_ptr<CSound> RegisterTwoGroups(CSound *first, CSound *second);
 
 /// Initialize client side of the sound layer.
 extern void InitSoundClient();
@@ -212,13 +216,13 @@ extern void CallbackMusicTrigger();
 // sound_id.cpp
 
 /// Map sound to identifier
-extern void MapSound(const std::string &sound_name, CSound *id);
+extern void MapSound(const std::string &sound_name, std::shared_ptr<CSound>);
 /// Get the sound id bound to an identifier
-extern CSound *SoundForName(const std::string_view &sound_name);
+extern std::shared_ptr<CSound> SoundForName(const std::string_view &sound_name);
 /// Make a sound bound to identifier
-extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
+extern std::shared_ptr<CSound> MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier
-extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
+extern std::shared_ptr<CSound> MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
 
 extern void FreeSounds();
 

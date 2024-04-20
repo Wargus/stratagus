@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -753,7 +753,7 @@ static void DoNextReplay()
 		}
 	} else if (action == "chat") {
 		SetMessage("%s", val.data());
-		PlayGameSound(GameSounds.ChatMessage.Sound, MaxSampleVolume);
+		PlayGameSound(GameSounds.ChatMessage.Sound.get(), MaxSampleVolume);
 	} else if (action == "quit") {
 		CommandQuit(arg1);
 	} else {

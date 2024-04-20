@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -1199,7 +1199,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on menu button
 	if (CursorOn == ECursorOn::Button && ButtonAreaUnderCursor == ButtonArea::Menu &&
 		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
-		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+		PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 		GameMenuButtonClicked = true;
 		return;
 	}
@@ -1344,14 +1344,14 @@ static void EditorCallbackButtonDown(unsigned button)
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
-						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
+						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound.get(),
 									  MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
-						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
+						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound.get(),
 									  MaxSampleVolume);
 					}
 				}

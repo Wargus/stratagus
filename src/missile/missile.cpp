@@ -187,7 +187,7 @@ Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos
 	missile->Delay = mtype.StartDelay;
 	missile->TTL = mtype.TTL;
 	if (mtype.FiredSound.Sound) {
-		PlayMissileSound(*missile, mtype.FiredSound.Sound);
+		PlayMissileSound(*missile, mtype.FiredSound.Sound.get());
 	}
 
 	return missile;
@@ -866,7 +866,7 @@ void Missile::MissileHit(CUnit *unit)
 	const MissileType &mtype = *this->Type;
 
 	if (mtype.ImpactSound.Sound) {
-		PlayMissileSound(*this, mtype.ImpactSound.Sound);
+		PlayMissileSound(*this, mtype.ImpactSound.Sound.get());
 	}
 	const PixelPos pixelPos = this->position + this->Type->size / 2;
 

@@ -155,7 +155,7 @@ static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 **
 **  @return        Sound identifier
 */
-static CSound *ChooseUnitVoiceSound(const CUnit &unit, EUnitVoice voice)
+static std::shared_ptr<CSound> ChooseUnitVoiceSound(const CUnit &unit, EUnitVoice voice)
 {
 	switch (voice) {
 		case EUnitVoice::Acknowledging: return unit.Type->MapSound.Acknowledgement.Sound;
@@ -247,7 +247,7 @@ static char CalculateStereo(const CUnit &unit)
 */
 void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 {
-	CSound *sound = ChooseUnitVoiceSound(unit, voice);
+	auto sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
 		return;
 	}
@@ -424,27 +424,24 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 **
 **  @todo FIXME: Must handle the errors better.
 */
-CSound *RegisterSound(const std::vector<std::string> &files)
+std::shared_ptr<CSound> RegisterSound(const std::vector<std::string> &files)
 {
-	CSound *id = new CSound;
+	auto id = CSound::make();
 	size_t number = files.size();
 
 	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new Mix_Chunk *[number];
-		memset(id->Sound.OneGroup, 0, sizeof(Mix_Chunk *) * number);
+		id->Sound.OneGroup = new Mix_Chunk *[number] {};
 		id->Number = static_cast<unsigned char>(number);
 		for (unsigned int i = 0; i < number; ++i) {
 			id->Sound.OneGroup[i] = LoadSample(files[i]);
 			if (!id->Sound.OneGroup[i]) {
 				//delete[] id->Sound.OneGroup;
-				delete id;
 				return nullptr;
 			}
 		}
 	} else { // load a unique sound
 		id->Sound.OneSound = LoadSample(files[0]);
 		if (!id->Sound.OneSound) {
-			delete id;
 			return nullptr;
 		}
 		id->Number = ONE_SOUND;
@@ -461,12 +458,12 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 **
 **  @return        the special sound unique identifier
 */
-CSound *RegisterTwoGroups(CSound *first, CSound *second)
+std::shared_ptr<CSound> RegisterTwoGroups(CSound *first, CSound *second)
 {
 	if (first == nullptr || second == nullptr) {
 		return nullptr;
 	}
-	CSound *id = new CSound;
+	auto id = CSound::make();
 	id->Number = TWO_GROUPS;
 	id->Sound.TwoGroups.First = first;
 	id->Sound.TwoGroups.Second = second;

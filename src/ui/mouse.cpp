@@ -1692,7 +1692,7 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
 				const int flush = !(KeyModifiers & ModifierShift);
-				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound.get(), MaxSampleVolume);
 				PlayUnitSound(*Selected[0], EUnitVoice::Build);
 				for (CUnit *unit : Selected) {
 					SendCommandBuildBuilding(*unit, tilePos, *CursorBuilding, flush);
@@ -1701,7 +1701,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 					CancelBuildingMode();
 				}
 			} else {
-				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound.get(),
+				              MaxSampleVolume);
 			}
 		} else {
 			CancelBuildingMode();
@@ -1768,17 +1769,17 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 {
 	// clicked on info panel - selection shown
 	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonArea::Selected) {
-		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+		PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 		DoSelectionButtons(ButtonUnderCursor, button);
 	} else if ((MouseButtons & LeftButton)) {
 		//  clicked on menu button
 		if (ButtonAreaUnderCursor == ButtonArea::Menu) {
 			if ((ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu)
 				&& !GameMenuButtonClicked) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 				GameMenuButtonClicked = true;
 			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 				GameDiplomacyButtonClicked = true;
 			} else if (ButtonUnderCursor == ButtonUnderFreeWorkers) {
 				UiFindIdleWorker();
@@ -1789,7 +1790,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				CUIUserButton &button = UI.UserButtons[i];
 
 				if (i == size_t(ButtonUnderCursor) && !button.Clicked) {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 					button.Clicked = true;
 				}
 			}
@@ -1797,7 +1798,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonArea::Selected) {
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 			}
 			//  clicked on training button
@@ -1810,7 +1811,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					DebugPrint("Cancel slot %d %s\n",
 					           ButtonUnderCursor,
 					           order.GetUnitType().Ident.c_str());
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 					SendCommandCancelTraining(*Selected[0], ButtonUnderCursor, &order.GetUnitType());
 				}
 			}
@@ -1819,7 +1820,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel upgrade %s\n", Selected[0]->Type->Ident.c_str());
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 					SendCommandCancelUpgradeTo(*Selected[0]);
 				}
 			}
@@ -1828,7 +1829,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 					DebugPrint("Cancel research %s\n", Selected[0]->Type->Ident.c_str());
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 					SendCommandCancelResearch(*Selected[0]);
 				}
 			}
@@ -1851,7 +1852,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 									Assert(uins->Boarded);
 									const int flush = !(KeyModifiers & ModifierShift);
 									if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-										PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+										PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 									}
 								}
@@ -1863,14 +1864,14 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 		} else if (ButtonAreaUnderCursor == ButtonArea::Button) {
 			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Index == PlayerMax - 1)) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
 		}
 	} else if ((MouseButtons & MiddleButton)) {
 		//  clicked on info panel - single unit shown
 		if (ButtonAreaUnderCursor == ButtonArea::Selected && ButtonUnderCursor == 0 && Selected.size() == 1) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+			PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 			if (UI.SelectedViewport->Unit == Selected[0]) {
 				UI.SelectedViewport->Unit = nullptr;
 			} else {
@@ -2164,12 +2165,12 @@ void UIHandleButtonUp(unsigned button)
 					PlayUnitSound(*Selected[0], EUnitVoice::Building);
 				} else if (Selected[0]->Burning) {
 					// FIXME: use GameSounds.Burning
-					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
+					PlayGameSound(SoundForName("burning").get(), MaxSampleVolume);
 				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0])
 						   || Selected[0]->Player->Type == PlayerTypes::PlayerNeutral) {
 					PlayUnitSound(*Selected[0], EUnitVoice::Selected);
 				} else {
-					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+					PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 				}
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
