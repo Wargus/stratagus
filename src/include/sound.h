@@ -107,6 +107,9 @@ public:
 	explicit CSound(Key){}
 	~CSound();
 
+	CSound(const CSound &) = delete;
+	CSound &operator=(const CSound &) = delete;
+
 	static std::shared_ptr<CSound> make() { return std::make_shared<CSound>(Key{}); }
 
 	/**
@@ -114,26 +117,8 @@ public:
 	**  255 means infinite range of the sound.
 	*/
 	unsigned char Range = 0;       /// Range is a multiplier for DistanceSilent
-	unsigned char Number = 0;      /// single, group, or table of sounds.
-	union {
-		Mix_Chunk *OneSound;       /// if it's only a simple sound
-		Mix_Chunk **OneGroup;      /// when it's a simple group
-		struct {
-			CSound *First;       /// first group: selected sound
-			CSound *Second;      /// second group: annoyed sound
-		} TwoGroups;             /// when it's a double group
-	} Sound{};
+	std::variant<std::vector<Mix_Chunk *>, std::pair<CSound *, CSound *>> Sound{};
 };
-
-/**
-** A possible value for Number in the Sound struct: means a simple sound
-*/
-#define ONE_SOUND 0
-/**
-** A possible value for Number in the Sound struct: means a double group (for
-** selection/annoyed sounds)
-*/
-#define TWO_GROUPS 1
 
 /**
 ** the range value that makes a sound volume distance independent
