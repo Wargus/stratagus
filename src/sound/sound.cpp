@@ -79,12 +79,11 @@ int DistanceSilent;              /// silent distance
 */
 static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 {
-	if (sound.Number == ONE_SOUND) {
-		return sound.Sound.OneSound;
+	if (auto* chunks = std::get_if<std::vector<Mix_Chunk *>>(&sound.Sound)) {
+		Assert(!chunks->empty());
+		return (*chunks)[FrameCounter % chunks->size()];
 	} else {
-		//FIXME: check for errors
-		//FIXME: valid only in shared memory context (FrameCounter)
-		return sound.Sound.OneGroup[FrameCounter % sound.Number];
+		return nullptr;
 	}
 }
 
@@ -100,39 +99,37 @@ static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 	Mix_Chunk *result = nullptr;
 	static SelectionHandling SelectionHandler{};
 
-	if (sound.Number == TWO_GROUPS) {
+	if (auto* p = std::get_if<std::pair<CSound *, CSound*>>(&sound.Sound)) {
 		// handle a special sound (selection)
 		if (SelectionHandler.Sound != nullptr && (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id)) {
-			if (SelectionHandler.Sound == sound.Sound.TwoGroups.First) {
+			if (SelectionHandler.Sound == p->first) {
 				result = SimpleChooseSample(*SelectionHandler.Sound);
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= 3) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound.Sound.TwoGroups.Second;
+					SelectionHandler.Sound = p->second;
 				}
 			} else {
 				//FIXME: checks for error
 				// check whether the second group is really a group
-				if (SelectionHandler.Sound->Number > 1) {
-					result = SelectionHandler.Sound->Sound.OneGroup[SelectionHandler.HowMany];
-					SelectionHandler.HowMany++;
-					if (SelectionHandler.HowMany >= SelectionHandler.Sound->Number) {
-						SelectionHandler.HowMany = 0;
-						SelectionHandler.Sound = sound.Sound.TwoGroups.First;
-					}
-				} else {
-					result = SelectionHandler.Sound->Sound.OneSound;
+				auto *chunks =
+					std::get_if<std::vector<Mix_Chunk *>>(&SelectionHandler.Sound->Sound);
+				Assert(SelectionHandler.HowMany < chunks->size());
+				result = (*chunks)[SelectionHandler.HowMany];
+				SelectionHandler.HowMany++;
+				if (SelectionHandler.HowMany >= chunks->size()) {
 					SelectionHandler.HowMany = 0;
-					SelectionHandler.Sound = sound.Sound.TwoGroups.First;
+					SelectionHandler.Sound = p->first;
 				}
 			}
 		} else {
 			SelectionHandler.Source = source;
-			SelectionHandler.Sound = sound.Sound.TwoGroups.First;
+			SelectionHandler.Sound = p->first;
 			result = SimpleChooseSample(*SelectionHandler.Sound);
 			SelectionHandler.HowMany = 1;
 		}
 	} else {
+		Assert(std::holds_alternative<std::vector<Mix_Chunk *>>(sound.Sound));
 		// normal sound/sound group handling
 		result = SimpleChooseSample(sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
@@ -429,23 +426,15 @@ std::shared_ptr<CSound> RegisterSound(const std::vector<std::string> &files)
 	auto id = CSound::make();
 	size_t number = files.size();
 
-	if (number > 1) { // load a sound group
-		id->Sound.OneGroup = new Mix_Chunk *[number] {};
-		id->Number = static_cast<unsigned char>(number);
-		for (unsigned int i = 0; i < number; ++i) {
-			id->Sound.OneGroup[i] = LoadSample(files[i]);
-			if (!id->Sound.OneGroup[i]) {
-				//delete[] id->Sound.OneGroup;
-				return nullptr;
-			}
-		}
-	} else { // load a unique sound
-		id->Sound.OneSound = LoadSample(files[0]);
-		if (!id->Sound.OneSound) {
+	std::vector<Mix_Chunk *> chunks(number);
+	for (unsigned int i = 0; i < number; ++i) {
+		chunks[i] = LoadSample(files[i]);
+		if (chunks[i] == nullptr) {
+			//delete[] id->Sound.OneGroup;
 			return nullptr;
 		}
-		id->Number = ONE_SOUND;
 	}
+	id->Sound = std::move(chunks);
 	id->Range = MAX_SOUND_RANGE;
 	return id;
 }
@@ -464,9 +453,7 @@ std::shared_ptr<CSound> RegisterTwoGroups(CSound *first, CSound *second)
 		return nullptr;
 	}
 	auto id = CSound::make();
-	id->Number = TWO_GROUPS;
-	id->Sound.TwoGroups.First = first;
-	id->Sound.TwoGroups.Second = second;
+	id->Sound = std::make_pair(first, second);
 	id->Range = MAX_SOUND_RANGE;
 
 	return id;
@@ -545,19 +532,12 @@ void InitSoundClient()
 
 CSound::~CSound()
 {
-	if (this->Number == ONE_SOUND) {
-		if (Sound.OneSound) {
-			FreeSample(Sound.OneSound);
-		}
-	} else if (this->Number == TWO_GROUPS) {
-	} else {
-		for (int i = 0; i < this->Number; ++i) {
-			if (this->Sound.OneGroup[i]) {
-				FreeSample(this->Sound.OneGroup[i]);
+	if (auto *chunks = std::get_if<std::vector<Mix_Chunk *>>(&this->Sound)) {
+		for (auto* chunk : *chunks) {
+			if (chunk) {
+				FreeSample(chunk);
 			}
-			this->Sound.OneGroup[i] = nullptr;
 		}
-		delete[] this->Sound.OneGroup;
 	}
 }
 
