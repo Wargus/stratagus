@@ -81,7 +81,6 @@ class Settings {
 	bool Inside;
 	bool AiExplores;
 	bool SimplifiedAutoTargeting;
-	int _Bitfield @ Flags;
 
 	bool GetUserGameSetting(int i);
 	void SetUserGameSetting(int i, bool v);
