@@ -241,18 +241,14 @@ struct Settings {
 	FieldOfViewTypes FoV;      /// Which field of view is used - important to be shared for unit sight
 	MapRevealModes RevealMap;  /// Reveal map kind
 	RevealTypes DefeatReveal;
-	union {
-		struct {
-			unsigned NoFogOfWar:1;        /// if dynamic fog of war is disabled
-			unsigned Inside:1;            /// if game uses interior tileset or is generally "inside" for the purpose of obstacles
-			unsigned AiExplores:1;        /// If true, AI sends explorers to search for resources (almost useless thing)
-			unsigned SimplifiedAutoTargeting:1; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
-			unsigned AiChecksDependencies:1; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
-			unsigned AllyDepositsAllowed:1; /// If false, the AI does not consider allied player's townhalls as deposits, so it will prefer harvesting gold closer to their own base
-			unsigned UserGameSettings:26; /// A bitfield for use by games and their settings
-		};
-		uint32_t _Bitfield;
-	};
+
+	unsigned NoFogOfWar:1;        /// if dynamic fog of war is disabled
+	unsigned Inside:1;            /// if game uses interior tileset or is generally "inside" for the purpose of obstacles
+	unsigned AiExplores:1;        /// If true, AI sends explorers to search for resources (almost useless thing)
+	unsigned SimplifiedAutoTargeting:1; /// Use alternate target choosing algorithm for auto attack mode (idle, attack-move, patrol, etc.)
+	unsigned AiChecksDependencies:1; /// If false, the AI can do upgrades even if the dependencies are not met. This can be desirable to simplify AI scripting.
+	unsigned AllyDepositsAllowed:1; /// If false, the AI does not consider allied player's townhalls as deposits, so it will prefer harvesting gold closer to their own base
+	unsigned UserGameSettings:26; /// A bitfield for use by games and their settings
 
 	bool GetUserGameSetting(int i) {
 		return std::bitset<26>(UserGameSettings).test(i);
@@ -262,6 +258,22 @@ struct Settings {
 		std::bitset<26> bs(UserGameSettings);
 		bs.set(i, v);
 		UserGameSettings = bs.to_ulong();
+	}
+
+	std::uint32_t getBitfield() const
+	{
+		return NoFogOfWar | (Inside << 1) | (AiExplores << 2) | (SimplifiedAutoTargeting << 3)
+		     | (AiChecksDependencies << 4) | (AllyDepositsAllowed << 5) | (UserGameSettings << 6);
+	}
+	void setBitfield(std::uint32_t bitfield)
+	{
+		NoFogOfWar = bitfield & 1;
+		Inside = (bitfield >> 1) & 0x1;
+		AiExplores = (bitfield >> 2) & 0x1;
+		SimplifiedAutoTargeting = (bitfield >> 3) & 0x1;
+		AiChecksDependencies = (bitfield >> 4) & 0x1;
+		AllyDepositsAllowed = (bitfield >> 5) & 0x1;
+		UserGameSettings = bitfield >> 6;
 	}
 
 	bool operator==(const Settings &other) const {
@@ -281,7 +293,7 @@ struct Settings {
 			FoV == other.FoV &&
 			RevealMap == other.RevealMap &&
 			DefeatReveal == other.DefeatReveal &&
-			_Bitfield == other._Bitfield;
+			getBitfield() == other.getBitfield();
 	}
 
 	void Save(const std::function <void (std::string)>& f, bool withPlayers = true) {
@@ -301,7 +313,7 @@ struct Settings {
 		f(std::string("FoV = ") + std::to_string(static_cast<int>(FoV)));
 		f(std::string("RevealMap = ") + std::to_string(static_cast<int>(RevealMap)));
 		f(std::string("DefeatReveal = ") + std::to_string(static_cast<int>(DefeatReveal)));
-		f(std::string("Flags = ") + std::to_string(_Bitfield));
+		f(std::string("Flags = ") + std::to_string(getBitfield()));
 	}
 
 	bool SetField(std::string field, int value) {
@@ -324,7 +336,7 @@ struct Settings {
 		} else if (field == "DefeatReveal") {
 			DefeatReveal = static_cast<RevealTypes>(value);
 		} else if (field == "Flags") {
-			_Bitfield = value;
+			setBitfield(value);
 		} else {
 			return false;
 		}

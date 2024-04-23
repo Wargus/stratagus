@@ -261,7 +261,7 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.Resources));
 	p += serialize8(p, static_cast<int8_t>(this->ServerGameSettings.RevealMap));
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
-	p += serialize32(p, this->ServerGameSettings._Bitfield);
+	p += serialize32(p, this->ServerGameSettings.getBitfield());
 
 	for (const auto &preset : this->ServerGameSettings.Presets) {
 		p += serialize8(p, static_cast<int8_t>(preset.Race));
@@ -293,8 +293,9 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.Resources));
 	p += deserialize8(p, reinterpret_cast<int8_t*>(&this->ServerGameSettings.RevealMap));
 	// The bitfield contains Inside and NoFogOfWar, as well as game-defined settings
-	p += deserialize32(p, &this->ServerGameSettings._Bitfield);
-
+	std::uint32_t bitfield = 0;
+	p += deserialize32(p, &bitfield);
+	this->ServerGameSettings.setBitfield(bitfield);
 	for (auto &preset : this->ServerGameSettings.Presets) {
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.Race));
 		p += deserialize8(p, reinterpret_cast<int8_t*>(&preset.PlayerColor));
