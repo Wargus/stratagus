@@ -98,7 +98,7 @@ static uint32_t QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param lock_pos   map tile coordinate, that should not be changed in callback.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
+static void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 

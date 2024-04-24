@@ -658,8 +658,6 @@ static void DrawUnitIcons()
 		if (i == Editor.CursorUnitIndex) {
 			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 									w + 2, h + 2);
-			Editor.PopUpX = x;
-			Editor.PopUpY = y;
 		}
 		return true;
 	});
@@ -808,8 +806,6 @@ static void DrawTileIcons()
 		if (i == Editor.CursorTileIndex) {
 			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
 									Map.Tileset->getPixelTileSize().x + 2, Map.Tileset->getPixelTileSize().y + 2);
-			Editor.PopUpX = x;
-			Editor.PopUpY = y;
 		}
 
 		return true;
@@ -2185,102 +2181,84 @@ void EditorMainLoop()
 
 	UpdateMinimap = true;
 
-	while (1) {
-		Editor.MapLoaded = false;
-		Editor.Running = EditorEditing;
+	Editor.Running = EditorEditing;
 
-		Editor.Init();
+	Editor.Init();
 
-		// Unit Types is now valid, update the tools
-		// TODO (timfel): This is very ugly/hacky, but the entire editor is, unfortunately...
-		int newW = toolDropdown->getWidth();
-		for (std::string entry : Editor.UnitTypes) {
-			if (entry.rfind("--", 0) != std::string::npos) {
-				std::string e = entry.substr(2);
-				toolListStrings.push_back(e);
-				int strW = toolDropdown->getFont()->getWidth(e) + 20;
-				if (newW < strW) {
-					newW = strW;
-				}
+	// Unit Types is now valid, update the tools
+	// TODO (timfel): This is very ugly/hacky, but the entire editor is, unfortunately...
+	int newW = toolDropdown->getWidth();
+	for (std::string entry : Editor.UnitTypes) {
+		if (entry.rfind("--", 0) != std::string::npos) {
+			std::string e = entry.substr(2);
+			toolListStrings.push_back(e);
+			int strW = toolDropdown->getFont()->getWidth(e) + 20;
+			if (newW < strW) {
+				newW = strW;
 			}
 		}
-		toolDropdown->setListModel(new StringListModel(toolListStrings));
-		toolDropdown->setWidth(newW);
-
-		overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
-
-		//ProcessMenu("menu-editor-tips", 1);
-		InterfaceState = IfaceState::Normal;
-
-		SetVideoSync();
-
-		GameCursor = UI.Point.Cursor;
-		InterfaceState = IfaceState::Normal;
-		Editor.State = EditorStateType::Selecting;
-		UI.SelectedViewport = UI.Viewports;
-		TileCursorSize = 1;
-
-		bool start = true;
-
-		while (Editor.Running) {
-			if (FrameCounter % CYCLES_PER_SECOND == 0) {
-				if (UpdateMinimap) {
-					UI.Minimap.Update();
-					UpdateMinimap = false;
-				}
-			}
-
-			EditorUpdateDisplay();
-
-			//
-			// Map scrolling
-			//
-			if (UI.MouseScroll) {
-				int tbX, tbY;
-				toolDropdown->getAbsolutePosition(tbX, tbY);
-				tbX += CursorScreenPos.x;
-				tbY += CursorScreenPos.y;
-				if (!(toolDropdown->getDimension().isContaining(tbX, tbY))) {
-					DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
-				}
-			}
-			if (UI.KeyScroll) {
-				if (CursorOn == ECursorOn::Map) {
-					DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
-				}
-				if (CursorOn == ECursorOn::Map && (MouseButtons & LeftButton) &&
-					(Editor.State == EditorStateType::EditTile ||
-					 Editor.State == EditorStateType::EditUnit)) {
-					EditorCallbackButtonDown(0);
-				}
-			}
-
-			if (start) {
-				start = false;
-				if (UI.MenuButton.Callback) {
-					UI.MenuButton.Callback->action(gcn::ActionEvent(nullptr, ""));
-				}
-			}
-
-			WaitEventsOneFrame();
-		}
-		CursorBuilding = nullptr;
-		if (!Editor.MapLoaded) {
-			break;
-		}
-
-		CleanModules();
-
-		LoadCcl(Parameters::Instance.luaStartFilename); // Reload the main config file
-
-		PreMenuSetup();
-
-		InterfaceState = IfaceState::Menu;
-		GameCursor = UI.Point.Cursor;
-
-		Video.ClearScreen();
-		Invalidate();
 	}
+	toolDropdown->setListModel(new StringListModel(toolListStrings));
+	toolDropdown->setWidth(newW);
+
+	overlaysDropdown->setX(toolDropdown->getX() + toolDropdown->getWidth() + 10);
+
+	//ProcessMenu("menu-editor-tips", 1);
+	InterfaceState = IfaceState::Normal;
+
+	SetVideoSync();
+
+	GameCursor = UI.Point.Cursor;
+	InterfaceState = IfaceState::Normal;
+	Editor.State = EditorStateType::Selecting;
+	UI.SelectedViewport = UI.Viewports;
+	TileCursorSize = 1;
+
+	bool start = true;
+
+	while (Editor.Running) {
+		if (FrameCounter % CYCLES_PER_SECOND == 0) {
+			if (UpdateMinimap) {
+				UI.Minimap.Update();
+				UpdateMinimap = false;
+			}
+		}
+
+		EditorUpdateDisplay();
+
+		//
+		// Map scrolling
+		//
+		if (UI.MouseScroll) {
+			int tbX, tbY;
+			toolDropdown->getAbsolutePosition(tbX, tbY);
+			tbX += CursorScreenPos.x;
+			tbY += CursorScreenPos.y;
+			if (!(toolDropdown->getDimension().isContaining(tbX, tbY))) {
+				DoScrollArea(MouseScrollState, 0, MouseScrollState == 0 && KeyScrollState > 0);
+			}
+		}
+		if (UI.KeyScroll) {
+			if (CursorOn == ECursorOn::Map) {
+				DoScrollArea(KeyScrollState, (KeyModifiers & ModifierControl) != 0, MouseScrollState == 0 && KeyScrollState > 0);
+			}
+			if (CursorOn == ECursorOn::Map && (MouseButtons & LeftButton) &&
+				(Editor.State == EditorStateType::EditTile ||
+					Editor.State == EditorStateType::EditUnit)) {
+				EditorCallbackButtonDown(0);
+			}
+		}
+
+		if (start) {
+			start = false;
+			if (UI.MenuButton.Callback) {
+				UI.MenuButton.Callback->action(gcn::ActionEvent(nullptr, ""));
+			}
+		}
+
+		WaitEventsOneFrame();
+	}
+	CursorBuilding = nullptr;
 
 	CommandLogDisabled = OldCommandLogDisabled;
 	SetCallbacks(old_callbacks);

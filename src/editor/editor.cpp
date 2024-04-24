@@ -59,27 +59,11 @@
 
 #include "editor.h"
 
-#include "player.h"
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------
---  Variables
-----------------------------------------------------------------------------*/
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CEditor::CEditor() :
-	TerrainEditable(true),
-	StartUnit(nullptr),
-	UnitIndex(0), CursorUnitIndex(-1), SelectedUnitIndex(-1),
-	TileIndex(0), CursorTileIndex(-1), SelectedTileIndex(-1),
-	CursorPlayer(-1), SelectedPlayer(PlayerNumNeutral),
-	MapLoaded(false), WriteCompressedMaps(true), PopUpX(-1), PopUpY(-1)
+CEditor::CEditor()
 {
 #define WATER_TILE  0x10
 #define COAST_TILE  0x30

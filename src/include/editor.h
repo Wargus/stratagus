@@ -72,6 +72,8 @@ public:
 
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false) const;
+
+public:
 	/// Variables for random map creation
 	int BaseTileIndex; /// Tile to fill the map with initially;
 	std::vector<std::tuple<int, int, int>> RandomTiles; /// other tiles to fill randomly. (tile, count, area size)
@@ -81,35 +83,28 @@ public:
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
 	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
 
-	bool TerrainEditable;        /// Is the terrain editable ?
+	bool TerrainEditable = true; /// Is the terrain editable?
 	IconConfig Select;           /// Editor's select icon.
 	IconConfig Units;            /// Editor's units icon.
 	std::string StartUnitName;   /// name of the Unit used to display the start location.
-	const CUnitType *StartUnit;  /// Unit used to display the start location.
+	const CUnitType *StartUnit = nullptr;  /// Unit used to display the start location.
 
-	int UnitIndex;               /// Unit icon draw index.
-	int CursorUnitIndex;         /// Unit icon under cursor.
-	int SelectedUnitIndex;       /// Unit type to draw.
+	int UnitIndex = 0;               /// Unit icon draw index.
+	int CursorUnitIndex = -1;        /// Unit icon under cursor.
+	int SelectedUnitIndex = -1;      /// Unit type to draw.
 
-	int TileIndex;              /// tile icon draw index.
-	int CursorTileIndex;		/// tile icon under cursor.
-	int SelectedTileIndex;       /// tile type to draw.
+	int TileIndex = 0;              /// tile icon draw index.
+	int CursorTileIndex = -1;       /// tile icon under cursor.
+	int SelectedTileIndex = -1;     /// tile type to draw.
 
 	uint8_t	HighlightElevationLevel {0};
 	uint8_t	SelectedElevationLevel {0};
 
-	int CursorPlayer;            /// Player under the cursor.
-	int SelectedPlayer;          /// Player selected for draw.
+	int CursorPlayer = -1;            /// Player under the cursor.
+	int SelectedPlayer = PlayerNumNeutral; /// Player selected for draw.
 
-	bool MapLoaded;              /// Map loaded in editor
-	bool WriteCompressedMaps;    /// Use compression when saving
-
-	EditorRunningType Running;   /// Editor is running
-
-	EditorStateType State;       /// Current editor state
-
-	int PopUpX;
-	int PopUpY;
+	EditorRunningType Running = EditorNotRunning; /// Editor is running
+	EditorStateType State = EditorStateType::Selecting; /// Current editor state
 
 	fieldHighlightChecker OverlayHighlighter {nullptr};
 };
@@ -144,8 +139,6 @@ extern void EditorCclRegister();
 
 /// Update surroundings for tile changes
 extern void EditorTileChanged(const Vec2i &pos);
-
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d, bool changeSurroundings);
 
 //@}
 
