@@ -12,7 +12,6 @@ class CEditor
 	vector<string> UnitTypes;
 	bool TerrainEditable;
 	const CUnitType *StartUnit;
-	bool WriteCompressedMaps;
 	EditorRunningType Running;
 	void CreateRandomMap(bool shuffleTranslitions) const;
 };
