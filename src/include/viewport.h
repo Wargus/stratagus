@@ -67,7 +67,7 @@ using fieldHighlightChecker = bool(*)(const CMapField&); // type alias
 class CViewport
 {
 public:
-	CViewport();
+	CViewport() = default;
 	~CViewport();
 
 	/// Check if pos pixels are within map area
@@ -158,10 +158,10 @@ public:
 public:
 	Vec2i MapPos;             /// Map tile left-upper corner
 	PixelDiff Offset;         /// Offset within MapX, MapY
-	int MapWidth;             /// Width in map tiles
-	int MapHeight;            /// Height in map tiles
+	int MapWidth = 0;             /// Width in map tiles
+	int MapHeight = 0;            /// Height in map tiles
 
-	CUnit *Unit;              /// Bound to this unit
+	CUnit *Unit = nullptr;        /// Bound to this unit
 private:
 	SDL_Surface *FogSurface { nullptr }; /// Texture for fog of war. Viewport sized.
 

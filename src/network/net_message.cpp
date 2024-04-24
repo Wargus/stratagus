@@ -467,9 +467,9 @@ void CInitMessage_EngineMismatch::Deserialize(const unsigned char *p)
 //
 
 CInitMessage_LuaFilesMismatch::CInitMessage_LuaFilesMismatch() :
-	header(MessageInit_FromServer, ICMLuaFilesMismatch)
+	header(MessageInit_FromServer, ICMLuaFilesMismatch),
+	Version(FileChecksums)
 {
-	this->Version = FileChecksums;
 }
 
 std::vector<unsigned char> CInitMessage_LuaFilesMismatch::Serialize() const
@@ -493,10 +493,10 @@ void CInitMessage_LuaFilesMismatch::Deserialize(const unsigned char *p)
 //
 
 CInitMessage_Welcome::CInitMessage_Welcome() :
-	header(MessageInit_FromServer, ICMWelcome)
+	header(MessageInit_FromServer, ICMWelcome),
+	Lag(CNetworkParameter::Instance.NetworkLag),
+	gameCyclesPerUpdate(CNetworkParameter::Instance.gameCyclesPerUpdate)
 {
-	this->Lag = CNetworkParameter::Instance.NetworkLag;
-	this->gameCyclesPerUpdate = CNetworkParameter::Instance.gameCyclesPerUpdate;
 }
 
 std::vector<unsigned char> CInitMessage_Welcome::Serialize() const

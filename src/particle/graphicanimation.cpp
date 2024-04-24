@@ -39,7 +39,7 @@
 #include "video.h"
 
 GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
-	g(g), ticksPerFrame(ticksPerFrame), currentFrame(0), currTicks(0)
+	g(g), ticksPerFrame(ticksPerFrame)
 {
 	Assert(g);
 }

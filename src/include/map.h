@@ -139,14 +139,14 @@ public:
 	std::string Filename;       /// Map filename
 	std::string Preamble;       /// Map preamble script
 	std::string Postamble;      /// Map postamble script
-	int MapWidth;               /// Map width
-	int MapHeight;              /// Map height
-	PlayerTypes PlayerType[PlayerMax];  /// Same player->Type
-	int PlayerSide[PlayerMax];  /// Same player->Side
-	unsigned int MapUID;        /// Unique Map ID (hash)
+	int MapWidth = 0;           /// Map width
+	int MapHeight = 0;          /// Map height
+	PlayerTypes PlayerType[PlayerMax]{}; /// Same player->Type
+	int PlayerSide[PlayerMax]{}; /// Same player->Side
+	unsigned int MapUID = 0;     /// Unique Map ID (hash)
 
 private:
-	bool HighgroundsEnabled = false;	/// Map has highgrounds
+	bool HighgroundsEnabled = false; /// Map has highgrounds
 };
 
 /*----------------------------------------------------------------------------

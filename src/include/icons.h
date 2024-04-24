@@ -109,7 +109,7 @@ class ButtonStyle;
 class CIcon
 {
 public:
-	CIcon(const std::string &ident);
+	explicit CIcon(const std::string &ident);
 	~CIcon();
 
 	static CIcon *New(const std::string &ident);
@@ -144,9 +144,9 @@ public:
 	void SetPaletteSwaps(std::vector<PaletteSwap> &newSwaps);
 
 public:
-	CPlayerColorGraphic *G;              /// Graphic data
-	CPlayerColorGraphic *GScale;         /// Icon when drawn grayscaled
-	int Frame;                /// Frame number in graphic
+	CPlayerColorGraphic *G = nullptr;      /// Graphic data
+	CPlayerColorGraphic *GScale = nullptr; /// Icon when drawn grayscaled
+	int Frame = 0;            /// Frame number in graphic
 private:
 	std::string Ident;        /// Icon identifier
 

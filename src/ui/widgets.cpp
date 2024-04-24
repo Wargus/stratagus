@@ -354,9 +354,7 @@ LuaActionListener::~LuaActionListener()
 /**
 **  ImageButton constructor
 */
-CImageButton::CImageButton() :
-	Button(), normalImage(nullptr), pressedImage(nullptr),
-	disabledImage(nullptr)
+CImageButton::CImageButton() : Button()
 {
 	setForegroundColor(0xffffff);
 }
@@ -366,9 +364,7 @@ CImageButton::CImageButton() :
 **
 **  @param caption  Caption text
 */
-CImageButton::CImageButton(const std::string &caption) :
-	Button(caption), normalImage(nullptr), pressedImage(nullptr),
-	disabledImage(nullptr)
+CImageButton::CImageButton(const std::string &caption) : Button(caption)
 {
 	setForegroundColor(0xffffff);
 }
@@ -465,26 +461,12 @@ void CImageButton::adjustSize()
 --  ImageRadioButton
 ----------------------------------------------------------------------------*/
 
-
-/**
-**  ImageRadioButton constructor
-*/
-ImageRadioButton::ImageRadioButton() : gcn::RadioButton(),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
-{
-}
-
 /**
 **  ImageRadioButton constructor
 */
 ImageRadioButton::ImageRadioButton(const std::string &caption,
 								   const std::string &group, bool marked) :
-	gcn::RadioButton(caption, group, marked),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
+	gcn::RadioButton(caption, group, marked)
 {
 }
 
@@ -607,27 +589,12 @@ void ImageRadioButton::adjustSize()
 --  ImageCheckbox
 ----------------------------------------------------------------------------*/
 
-
-/**
-**  Image checkbox constructor
-*/
-ImageCheckBox::ImageCheckBox() : gcn::CheckBox(),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
-{
-}
-
 /**
 **  Image checkbox constructor
 */
 ImageCheckBox::ImageCheckBox(const std::string &caption, bool marked) :
-	gcn::CheckBox(caption, marked),
-	uncheckedNormalImage(nullptr), uncheckedPressedImage(nullptr), uncheckedDisabledImage(nullptr),
-	checkedNormalImage(nullptr), checkedPressedImage(nullptr), checkedDisabledImage(nullptr),
-	mMouseDown(false)
-{
-}
+	gcn::CheckBox(caption, marked)
+{}
 
 /**
 **  Draw the image checkbox
@@ -750,18 +717,14 @@ void ImageCheckBox::adjustSize()
 /**
 **  Image slider constructor
 */
-ImageSlider::ImageSlider(double scaleEnd) :
-	Slider(scaleEnd), markerImage(nullptr), backgroundImage(nullptr), disabledBackgroundImage(nullptr)
-{
-}
+ImageSlider::ImageSlider(double scaleEnd) : Slider(scaleEnd)
+{}
 
 /**
 **  Image slider constructor
 */
-ImageSlider::ImageSlider(double scaleStart, double scaleEnd) :
-	Slider(scaleStart, scaleEnd), markerImage(nullptr), backgroundImage(nullptr), disabledBackgroundImage(nullptr)
-{
-}
+ImageSlider::ImageSlider(double scaleStart, double scaleEnd) : Slider(scaleStart, scaleEnd)
+{}
 
 /**
 **  Draw the image slider marker
@@ -840,25 +803,12 @@ void ImageSlider::setDisabledBackgroundImage(gcn::Image *image)
 --  MultiLineLabel
 ----------------------------------------------------------------------------*/
 
-
-/**
-**  MultiLineLabel constructor
-*/
-MultiLineLabel::MultiLineLabel()
-{
-	this->mAlignment = gcn::Graphics::Alignment::Left;
-	this->mVerticalAlignment = TOP;
-	this->mLineWidth = 0;
-}
-
 /**
 **  MultiLineLabel constructor
 */
 MultiLineLabel::MultiLineLabel(const std::string &caption)
 {
 	this->mCaption = caption;
-	this->mAlignment = gcn::Graphics::Alignment::Left;
-	this->mVerticalAlignment = TOP;
 
 	this->mLineWidth = 999999;
 	this->wordWrap();
@@ -893,7 +843,7 @@ void MultiLineLabel::setAlignment(gcn::Graphics::Alignment alignment)
 /**
 **  Get the horizontal alignment
 */
-gcn::Graphics::Alignment MultiLineLabel::getAlignment()
+gcn::Graphics::Alignment MultiLineLabel::getAlignment() const
 {
 	return this->mAlignment;
 }
@@ -909,7 +859,7 @@ void MultiLineLabel::setVerticalAlignment(unsigned int alignment)
 /**
 **  Get the vertical alignment
 */
-unsigned int MultiLineLabel::getVerticalAlignment()
+unsigned int MultiLineLabel::getVerticalAlignment() const
 {
 	return this->mVerticalAlignment;
 }
@@ -926,7 +876,7 @@ void MultiLineLabel::setLineWidth(int width)
 /**
 **  Get the line width
 */
-int MultiLineLabel::getLineWidth()
+int MultiLineLabel::getLineWidth() const
 {
 	return this->mLineWidth;
 }
@@ -1117,7 +1067,7 @@ void MultiLineLabel::wordWrap()
 */
 ScrollingWidget::ScrollingWidget(int width, int height) :
 	gcn::ScrollArea(nullptr, gcn::ScrollArea::ScrollPolicy::ShowNever, gcn::ScrollArea::ScrollPolicy::ShowNever),
-	speedY(1.f), containerY(0.f), finished(false)
+	speedY(1.f)
 {
 	container.setDimension(gcn::Rectangle(0, 0, width, height));
 	container.setOpaque(false);
@@ -1727,11 +1677,7 @@ int LuaListModel::getIdxOfElement(std::string_view element)
 --  ImageListBox
 ----------------------------------------------------------------------------*/
 
-ImageListBox::ImageListBox() : gcn::ListBox(), itemImage(nullptr)
-{
-}
-
-ImageListBox::ImageListBox(gcn::ListModel *listModel) : gcn::ListBox(listModel), itemImage(nullptr)
+ImageListBox::ImageListBox(gcn::ListModel *listModel) : gcn::ListBox(listModel)
 {
 }
 
@@ -1887,9 +1833,7 @@ ListBoxWidget::ListBoxWidget(unsigned int width, unsigned int height)
 **
 **  @todo  Size should be parametrable, maybe remove default constructor?
 */
-ImageListBoxWidget::ImageListBoxWidget(unsigned int width, unsigned int height) : ListBoxWidget(width, height),
-	upButtonImage(nullptr), downButtonImage(nullptr), leftButtonImage(nullptr), rightButtonImage(nullptr), hBarButtonImage(nullptr),
-	vBarButtonImage(nullptr), markerImage(nullptr)
+ImageListBoxWidget::ImageListBoxWidget(unsigned int width, unsigned int height) : ListBoxWidget(width, height)
 {
 	setDimension(gcn::Rectangle(0, 0, width, height));
 	setContent(&listbox);
@@ -2699,8 +2643,7 @@ int StatBoxWidget::getPercent() const
 /**
 **  MenuScreen constructor
 */
-MenuScreen::MenuScreen() :
-	Container(), runLoop(true), logiclistener(nullptr), drawUnder(false)
+MenuScreen::MenuScreen() : Container(), runLoop(true)
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);

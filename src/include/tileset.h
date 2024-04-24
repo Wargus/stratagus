@@ -112,8 +112,7 @@ enum class ETileType : unsigned char {
 /// Single tile definition
 struct CTileInfo {
 public:
-	CTileInfo() : BaseTerrain(0), MixTerrain(0)
-	{}
+	CTileInfo() = default;
 	CTileInfo(terrain_typeIdx base, terrain_typeIdx mix) : BaseTerrain(base), MixTerrain(mix)
 	{}
 
@@ -124,8 +123,8 @@ public:
 	bool operator !=(const CTileInfo &rhs) const { return !(*this == rhs); }
 
 public:
-	terrain_typeIdx BaseTerrain; /// Basic terrain of the tile
-	terrain_typeIdx MixTerrain;  /// Terrain mixed with this
+	terrain_typeIdx BaseTerrain = 0; /// Basic terrain of the tile
+	terrain_typeIdx MixTerrain = 0;  /// Terrain mixed with this
 };
 
 /// Definition for a terrain type
@@ -137,12 +136,12 @@ struct SolidTerrainInfo {
 class CTile
 {
 public:
-	CTile() : tile(0), flag(0) {}
+	CTile() = default;
 
 public:
-	graphic_index	tile;		/// graphical pos
-	tile_flags		flag;		/// Flag
-	CTileInfo		tileinfo;	/// Tile descriptions
+	graphic_index tile = 0; /// graphical pos
+	tile_flags flag = 0; /// Flag
+	CTileInfo tileinfo;  /// Tile descriptions
 };
 
 /// Tileset definition
@@ -244,26 +243,26 @@ private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
 
 	// some cached values based on pixelTileSize and the logical tile size in the game
-	uint8_t logicalTileToGraphicalTileMultiplier; /// By what to multiply logical tile coordinates to get graphical tile coordinates
-	uint8_t logicalTileToGraphicalTileShift;      /// By what to shift logical tile coordinates to get graphical tile coordinates
-	uint8_t graphicalTileSizeShiftX; /// 1<<shift size for graphical tiles in X direction
-	uint8_t graphicalTileSizeShiftY; /// 1<<shift size for graphical tiles in Y direction
+	uint8_t logicalTileToGraphicalTileMultiplier = 0; /// By what to multiply logical tile coordinates to get graphical tile coordinates
+	uint8_t logicalTileToGraphicalTileShift = 0;      /// By what to shift logical tile coordinates to get graphical tile coordinates
+	uint8_t graphicalTileSizeShiftX = 0; /// 1<<shift size for graphical tiles in X direction
+	uint8_t graphicalTileSizeShiftY = 0; /// 1<<shift size for graphical tiles in Y direction
 
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 #if 1
-	std::vector<int> mixedLookupTable;	/// Lookup for what part of tile used
-	graphic_index topOneTreeTile;		/// Tile for one tree top
-	graphic_index midOneTreeTile;		/// Tile for one tree middle
-	graphic_index botOneTreeTile;		/// Tile for one tree bottom
-	graphic_index removedTreeTile;		/// Tile placed where trees are gone
-	int woodTable[20];					/// Table for tree removable
-	graphic_index topOneRockTile;		/// Tile for one rock top
-	graphic_index midOneRockTile;		/// Tile for one rock middle
-	graphic_index botOneRockTile;		/// Tile for one rock bottom
-	graphic_index removedRockTile;		/// Tile placed where rocks are gone
-	int rockTable[20];					/// Removed rock placement table
-	tile_index humanWallTable[16];		/// Human wall placement table
-	tile_index orcWallTable[16];		/// Orc wall placement table
+	std::vector<int> mixedLookupTable; /// Lookup for what part of tile used
+	graphic_index topOneTreeTile = 0;  /// Tile for one tree top
+	graphic_index midOneTreeTile = 0;  /// Tile for one tree middle
+	graphic_index botOneTreeTile = 0;  /// Tile for one tree bottom
+	graphic_index removedTreeTile = 0; /// Tile placed where trees are gone
+	int woodTable[20]{}; /// Table for tree removable
+	graphic_index topOneRockTile = 0;   /// Tile for one rock top
+	graphic_index midOneRockTile = 0;   /// Tile for one rock middle
+	graphic_index botOneRockTile = 0;   /// Tile for one rock bottom
+	graphic_index removedRockTile = 0;  /// Tile placed where rocks are gone
+	int rockTable[20]{};                /// Removed rock placement table
+	tile_index humanWallTable[16]{};    /// Human wall placement table
+	tile_index orcWallTable[16]{};      /// Orc wall placement table
 #endif
 };
 
@@ -403,13 +402,13 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	const CTileset *SrcTileset			{nullptr};
-	const CGraphic *SrcTilesetGraphic	{nullptr};
-	const CGraphic *SrcImgGraphic		{nullptr};
+	const CTileset *SrcTileset{nullptr};
+	const CGraphic *SrcTilesetGraphic{nullptr};
+	const CGraphic *SrcImgGraphic{nullptr};
 
 	struct TilesGraphics
 	{
-		std::queue<graphic_index> 	 Indexes;
+		std::queue<graphic_index> Indexes;
 		std::queue<sdl2::SurfacePtr> Images;
 	};
 	TilesGraphics Result;
@@ -447,16 +446,14 @@ private:
 	void parseExtended(lua_State *luaStack);
 
 private:
-	CTileset		*BaseTileset	{nullptr};
-	const CGraphic	*BaseGraphic	{nullptr};
-	CGraphic		*SrcImgGraphic	{nullptr};
+	CTileset *BaseTileset{nullptr};
+	const CGraphic *BaseGraphic{nullptr};
+	CGraphic *SrcImgGraphic{nullptr};
 
-	sequence_of_images			ExtGraphic;
-	std::map<tile_index, CTile>	ExtTiles;
+	sequence_of_images ExtGraphic;
+	std::map<tile_index, CTile> ExtTiles;
 };
-/*----------------------------------------------------------------------------
---  Functions
-----------------------------------------------------------------------------*/
+
 //@}
 
 #endif // !TILESET_H

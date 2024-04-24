@@ -52,15 +52,6 @@
 bool CViewport::ShowGrid = false;
 bool CViewport::ShowAStarPassability = false;
 
-
-CViewport::CViewport() : MapWidth(0), MapHeight(0), Unit(nullptr)
-{
-	this->TopLeftPos.x = this->TopLeftPos.y = 0;
-	this->BottomRightPos.x = this->BottomRightPos.y = 0;
-	this->MapPos.x = this->MapPos.y = 0;
-	this->Offset.x = this->Offset.y = 0;
-}
-
 CViewport::~CViewport()
 {
 	this->Clean();

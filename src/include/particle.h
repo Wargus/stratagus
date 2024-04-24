@@ -48,8 +48,8 @@ class GraphicAnimation
 {
 	CGraphic *g;
 	int ticksPerFrame;
-	int currentFrame;
-	int currTicks;
+	int currentFrame = 0;
+	int currTicks = 0;
 public:
 	GraphicAnimation(CGraphic *g, int ticksPerFrame);
 	~GraphicAnimation() {}
@@ -78,9 +78,7 @@ public:
 class CParticle
 {
 public:
-	CParticle(CPosition position, int drawlevel = 0) :
-		pos(position), destroyed(false), drawLevel(drawlevel)
-	{}
+	CParticle(CPosition position, int drawlevel = 0) : pos(position), drawLevel(drawlevel) {}
 	virtual ~CParticle() {}
 
 	virtual CParticle *clone() = 0;
@@ -89,15 +87,15 @@ public:
 	virtual void update(int) = 0;
 
 	void destroy() { destroyed = true; }
-	bool isDestroyed() { return destroyed; }
+	bool isDestroyed() const { return destroyed; }
 
 	int getDrawLevel() const { return drawLevel; }
 	void setDrawLevel(int value) { drawLevel = value; }
 
 protected:
 	CPosition pos;
-	bool destroyed;
-	int drawLevel;
+	bool destroyed = false;
+	int drawLevel = 0;
 };
 
 

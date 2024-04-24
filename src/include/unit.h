@@ -319,13 +319,13 @@ public:
 	};
 public:
 	// @note int is faster than shorts
-	unsigned int     Refs;         /// Reference counter
-	unsigned int     ReleaseCycle; /// When this unit could be recycled
+	unsigned int     Refs = 0;         /// Reference counter
+	unsigned int     ReleaseCycle = 0; /// When this unit could be recycled
 	CUnitManagerData UnitManagerData;
-	size_t PlayerSlot;  /// index in Player->Units
+	size_t PlayerSlot = 0;  /// index in Player->Units
 
-	int    InsideCount;   /// Number of units inside.
-	int    BoardCount;    /// Number of units transported inside.
+	int    InsideCount = 0;   /// Number of units inside.
+	int    BoardCount = 0;    /// Number of units transported inside.
 	CUnit *UnitInside = nullptr;    /// Pointer to one of the units inside.
 	CUnit *Container = nullptr;     /// Pointer to the unit containing it (or 0)
 	CUnit *NextContained = nullptr; /// Next unit in the container.
@@ -334,36 +334,36 @@ public:
 	CUnit *NextWorker = nullptr; //pointer to next assigned worker to "Goal" resource.
 	struct {
 		CUnit *Workers = nullptr; /// pointer to first assigned worker to this resource.
-		int Assigned; /// how many units are assigned to harvesting from the resource.
-		int Active; /// how many units are harvesting from the resource.
+		int Assigned = 0; /// how many units are assigned to harvesting from the resource.
+		int Active = 0; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
 	Vec2i tilePos{-1, -1}; /// Map position
 
-	unsigned int Offset;/// Map position as flat index offset (x + y * w)
+	unsigned int Offset = -1;/// Map position as flat index offset (x + y * w)
 
 	const CUnitType *Type = nullptr; /// Pointer to unit-type (peon,...)
-	CPlayer    *Player = nullptr;            /// Owner of this unit
-	CUnitStats *Stats = nullptr;       /// Current unit stats
-	int         CurrentSightRange; /// Unit's Current Sight Range
+	CPlayer    *Player = nullptr; /// Owner of this unit
+	CUnitStats *Stats = nullptr;  /// Current unit stats
+	int CurrentSightRange = 0;    /// Unit's Current Sight Range
 
 	// Pathfinding stuff:
 	std::unique_ptr<PathFinderData> pathFinderData;
 
 	// DISPLAY:
-	int Frame;             /// Image frame: <0 is mirrored
+	int Frame = 0;             /// Image frame: <0 is mirrored
 	int Colors = -1;       /// custom colors
 	bool IndividualUpgrades[UpgradeMax]{}; /// individual upgrades which the unit has
 
-	signed char IX;         /// X image displacement to map position
-	signed char IY;         /// Y image displacement to map position
-	unsigned char Direction; //: 8; /// angle (0-255) unit looking
-	unsigned char CurrentResource;
-	int ResourcesHeld;      /// Resources Held by a unit
+	signed char IX = 0;         /// X image displacement to map position
+	signed char IY = 0;         /// Y image displacement to map position
+	unsigned char Direction = 0; //: 8; /// angle (0-255) unit looking
+	unsigned char CurrentResource = 0;
+	int ResourcesHeld = 0;      /// Resources Held by a unit
 
-	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
-	unsigned long Attacked;      /// gamecycle unit was last attacked
-	unsigned long Summoned;      /// GameCycle unit was summoned using spells
+	unsigned char DamagedType = 0; /// Index of damage type of unit which damaged this unit
+	unsigned long Attacked = 0;    /// gamecycle unit was last attacked
+	unsigned long Summoned = 0;    /// GameCycle unit was summoned using spells
 	unsigned Blink : 3;          /// Let selection rectangle blink
 	unsigned Moving : 2;         /// The unit is moving
 	unsigned ReCast : 1;         /// Recast again next cycle
@@ -386,7 +386,7 @@ public:
 
 	unsigned JustMoved : 3;      /// The unit last moved of its own accord this amount of cycles of standing still ago
 
-	unsigned TeamSelected;  /// unit is selected by a team member.
+	unsigned TeamSelected = 0;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom = nullptr;        /// The original owner of a rescued unit.
 	/// nullptr if the unit was not rescued.
 	/* Seen stuff. */
@@ -494,22 +494,22 @@ private:
 
 #if USING_TOLUAPP
 public:
-	bool get_AiExplores() { return AiExplores; }
+	bool get_AiExplores() const { return AiExplores; }
 	void set_AiExplores(bool v) {
 		AiExplores = v;
 		GameSettings.AiExplores = v;
 	}
-	bool get_SimplifiedAutoTargeting() { return SimplifiedAutoTargeting; }
+	bool get_SimplifiedAutoTargeting() const { return SimplifiedAutoTargeting; }
 	void set_SimplifiedAutoTargeting(bool v) {
 		SimplifiedAutoTargeting = v;
 		GameSettings.SimplifiedAutoTargeting = v;
 	}
-	bool get_AiChecksDependencies() { return AiChecksDependencies; }
+	bool get_AiChecksDependencies() const { return AiChecksDependencies; }
 	void set_AiChecksDependencies(bool v) {
 		AiChecksDependencies = v;
 		GameSettings.AiChecksDependencies = v;
 	}
-	bool get_AllyDepositsAllowed() { return AllyDepositsAllowed; }
+	bool get_AllyDepositsAllowed() const { return AllyDepositsAllowed; }
 	void set_AllyDepositsAllowed(bool v) {
 		AllyDepositsAllowed = v;
 		GameSettings.AllyDepositsAllowed = v;

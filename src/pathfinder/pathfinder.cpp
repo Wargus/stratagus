@@ -306,17 +306,6 @@ int CalcPathLengthToUnit(const CUnit &src, const CUnit &dst, const int minrange,
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-PathFinderInput::PathFinderInput() : unit(nullptr), minRange(0), maxRange(0),
-	isRecalculatePathNeeded(true)
-{
-	unitSize.x = 0;
-	unitSize.y = 0;
-	goalPos.x = -1;
-	goalPos.y = -1;
-	goalSize.x = 0;
-	goalSize.y = 0;
-}
-
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
 Vec2i PathFinderInput::GetUnitSize() const
 {
