@@ -741,7 +741,7 @@ public:
 				return lhs.key < rhs.key;
 			}
 			std::string_view key;
-			int offset;
+			int offset = 0;
 		};
 
 		CKeys(): TotalKeys(SIZE) {}
@@ -773,7 +773,7 @@ public:
 		**
 		**  @return Index of the variable, -1 if not found.
 		*/
-		int operator[](std::string_view key)
+		int operator[](std::string_view key) const
 		{
 			DataKey k;
 			k.key = key;
@@ -811,7 +811,7 @@ public:
 		CVariableKeys();
 	};
 
-	CUnitTypeVar() {}
+	CUnitTypeVar() = default;
 
 	void Init();
 	void Clear();

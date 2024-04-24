@@ -135,8 +135,6 @@ public:
 	static CUpgrade *New(std::string ident);
 	static CUpgrade *Get(std::string_view ident);
 
-	void SetIcon(CIcon *icon);
-
 	std::string Ident;                /// identifier
 	std::string Name;                 /// upgrade label
 	int ID = 0;            /// numerical id

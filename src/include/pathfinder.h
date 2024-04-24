@@ -69,7 +69,7 @@ enum _move_return_ {
 class PathFinderInput
 {
 public:
-	PathFinderInput();
+	PathFinderInput() = default;
 	CUnit *GetUnit() const { return unit; }
 	const Vec2i &GetUnitPos() const;
 	Vec2i GetUnitSize() const;
@@ -90,13 +90,13 @@ public:
 	void Load(lua_State *l);
 
 private:
-	CUnit *unit;
-	Vec2i unitSize;
-	Vec2i goalPos;
-	Vec2i goalSize;
-	int minRange;
-	int maxRange;
-	bool isRecalculatePathNeeded;
+	CUnit *unit = nullptr;
+	Vec2i unitSize{0, 0};
+	Vec2i goalPos{-1, -1};
+	Vec2i goalSize{0, 0};
+	int minRange = 0;
+	int maxRange = 0;
+	bool isRecalculatePathNeeded = true;
 };
 
 class PathFinderOutput
@@ -113,7 +113,7 @@ public:
 	void Load(lua_State *l);
 public:
 	uint16_t Cycles;               /// how much Cycles we move.
-	unsigned Fast:4;                /// Flag fast move (one step). Fits at most MAX_FAST
+	unsigned Fast:4; /// Flag fast move (one step). Fits at most MAX_FAST
 	unsigned OverflowLength:4;      /// overflow length not stored in Path (may be more). Fits at most MAX_OVERFLOW
 	uint8_t Length;                /// stored path length
 	char Path[MAX_PATH_LENGTH];     /// directions of stored path
@@ -172,8 +172,8 @@ private:
 private:
 	std::vector<dataType> m_values;
 	std::queue<PosNode> m_queue;
-	unsigned int m_extented_width;
-	unsigned int m_height;
+	unsigned int m_extented_width = 0;
+	unsigned int m_height = 0;
 };
 
 template <typename T>

@@ -336,7 +336,7 @@ public:
 class CInfoPanel
 {
 public:
-	CInfoPanel() : G(nullptr), X(0), Y(0) {}
+	CInfoPanel() = default;
 
 	void Draw();
 
@@ -364,7 +364,6 @@ public:
 	~CUserInterface();
 
 	void Load();
-
 
 	bool MouseScroll = false;                   /// Enable mouse scrolling
 	bool KeyScroll = false;                     /// Enable keyboard scrolling
@@ -426,7 +425,7 @@ public:
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
 	IntColor CompletedBarColor;      /// color for completed bar
-	bool CompletedBarShadow;         /// should complete bar have shadow
+	bool CompletedBarShadow = false; /// should complete bar have shadow
 
 	// Button panel
 	CButtonPanel ButtonPanel;

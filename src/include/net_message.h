@@ -54,7 +54,7 @@
 class CNetworkHost
 {
 public:
-	CNetworkHost() { Clear(); }
+	CNetworkHost() = default;
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	void Clear();
@@ -64,10 +64,10 @@ public:
 
 	bool IsValid() const { return (PlyNr != 0) || (PlyName[0] != '\0'); }
 
-	uint32_t Host;         /// Host address
-	uint16_t Port;         /// Port on host
-	uint16_t PlyNr;        /// Player number
-	char PlyName[NetPlayerNameSize];  /// Name of player
+	uint32_t Host = 0;         /// Host address
+	uint16_t Port = 0;         /// Port on host
+	uint16_t PlyNr = 0;        /// Player number
+	char PlyName[NetPlayerNameSize]{}; /// Name of player
 };
 
 ENUM_CLASS SlotOption : uint8_t {
@@ -79,10 +79,10 @@ ENUM_CLASS SlotOption : uint8_t {
 #if USING_TOLUAPP
 class ServerSetupStateRacesArray {
 public:
-	ServerSetupStateRacesArray() : p(nullptr) {}
+	ServerSetupStateRacesArray() = default;
 	int8_t& operator[](int idx) { return p[idx].Race; }
 	int8_t& operator[](int idx) const { return p[idx].Race; }
-	SettingsPresets *p;
+	SettingsPresets *p = nullptr;
 };
 #endif
 
@@ -134,31 +134,31 @@ public:
 	bool operator != (const CServerSetup &rhs) const { return !(*this == rhs); }
 public:
 	Settings ServerGameSettings;
-	SlotOption CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
-	uint8_t Ready[PlayerMax];         /// Client ready state
+	SlotOption CompOpt[PlayerMax]{}; /// Free slot option selection  {"Available", "Computer", "Closed" }
+	uint8_t Ready[PlayerMax]{}; /// Client ready state
 	// Fill in here...
 
 #if USING_TOLUAPP
 	// TODO: can be removed once tolua++ is gone
-	inline char get_ResourcesOption() { return (char)ServerGameSettings.Resources; }
-	inline char get_UnitsOption() { return (char)ServerGameSettings.NumUnits; }
-	inline char get_FogOfWar() { return (char)!ServerGameSettings.NoFogOfWar; }
-	inline char get_Inside() { return (char)ServerGameSettings.Inside; }
-	inline char get_RevealMap() { return (char)ServerGameSettings.RevealMap; }
-	inline char get_GameTypeOption() { return (char)ServerGameSettings.GameType; }
-	inline char get_Difficulty() { return (char)ServerGameSettings.Difficulty; }
-	inline char get_Opponents() { return (char)ServerGameSettings.Opponents; }
-	inline char set_ResourcesOption(char v) { return ServerGameSettings.Resources = v; }
-	inline char set_UnitsOption(char v) { return ServerGameSettings.NumUnits = v; }
-	inline char set_FogOfWar(char v) { return ServerGameSettings.NoFogOfWar = !v; }
-	inline char set_Inside(char v) { return ServerGameSettings.Inside = v; }
-	inline char set_RevealMap(char v) { return ServerGameSettings.RevealMap = (MapRevealModes)v; }
-	inline char set_GameTypeOption(char v) { return ServerGameSettings.GameType = (GameTypes)v; }
-	inline char set_Difficulty(char v) { return ServerGameSettings.Difficulty = v; }
-	inline char set_Opponents(char v) { return ServerGameSettings.Opponents = v; }
+	char get_ResourcesOption() const { return (char)ServerGameSettings.Resources; }
+	char get_UnitsOption() const { return (char)ServerGameSettings.NumUnits; }
+	char get_FogOfWar() const { return (char)!ServerGameSettings.NoFogOfWar; }
+	char get_Inside() const { return (char)ServerGameSettings.Inside; }
+	char get_RevealMap() const { return (char)ServerGameSettings.RevealMap; }
+	char get_GameTypeOption() const { return (char)ServerGameSettings.GameType; }
+	char get_Difficulty() const { return (char)ServerGameSettings.Difficulty; }
+	char get_Opponents() const { return (char)ServerGameSettings.Opponents; }
+	char set_ResourcesOption(char v) { return ServerGameSettings.Resources = v; }
+	char set_UnitsOption(char v) { return ServerGameSettings.NumUnits = v; }
+	char set_FogOfWar(char v) { return ServerGameSettings.NoFogOfWar = !v; }
+	char set_Inside(char v) { return ServerGameSettings.Inside = v; }
+	char set_RevealMap(char v) { return ServerGameSettings.RevealMap = (MapRevealModes)v; }
+	char set_GameTypeOption(char v) { return ServerGameSettings.GameType = (GameTypes)v; }
+	char set_Difficulty(char v) { return ServerGameSettings.Difficulty = v; }
+	char set_Opponents(char v) { return ServerGameSettings.Opponents = v; }
 
 	ServerSetupStateRacesArray racesArray;
-	inline ServerSetupStateRacesArray *get_Race() {
+	ServerSetupStateRacesArray *get_Race() {
 		if (racesArray.p == nullptr) {
 			racesArray.p = ((SettingsPresets*)ServerGameSettings.Presets);
 		}
@@ -202,7 +202,7 @@ enum _ic_message_subtype_ {
 class CInitMessage_Header
 {
 public:
-	CInitMessage_Header() {}
+	CInitMessage_Header() = default;
 	CInitMessage_Header(unsigned char type, unsigned char subtype) :
 		type(type),
 		subtype(subtype)
@@ -215,14 +215,14 @@ public:
 	size_t Deserialize(const unsigned char *p);
 	static size_t Size() { return 2; }
 private:
-	unsigned char type;
-	unsigned char subtype;
+	unsigned char type = 0;
+	unsigned char subtype = 0;
 };
 
 class CInitMessage_Hello
 {
 public:
-	CInitMessage_Hello() {}
+	CInitMessage_Hello() = default;
 	explicit CInitMessage_Hello(const char *name);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;
@@ -231,9 +231,9 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	char PlyName[NetPlayerNameSize];  /// Name of player
-	int32_t Stratagus;  /// Stratagus engine version
-	uint32_t Version;   /// Lua files version
+	char PlyName[NetPlayerNameSize]{}; /// Name of player
+	int32_t Stratagus = 0;  /// Stratagus engine version
+	uint32_t Version = 0;   /// Lua files version
 };
 
 class CInitMessage_Config
@@ -247,7 +247,7 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	uint8_t clientIndex; /// index of the receiving client in the compacted host array
+	uint8_t clientIndex = 0; /// index of the receiving client in the compacted host array
 	CNetworkHost hosts[PlayerMax]; /// Participant information
 };
 
@@ -262,7 +262,7 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	int32_t Stratagus;  /// Stratagus engine version
+	int32_t Stratagus = 0;  /// Stratagus engine version
 };
 
 class CInitMessage_LuaFilesMismatch
@@ -290,16 +290,16 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	CNetworkHost hosts[PlayerMax]; /// Participants information
-	uint16_t NetHostSlot;          /// slot for the receiving host in the server host array
-	int32_t Lag;                   /// Lag time
-	int32_t gameCyclesPerUpdate;   /// Update frequency
+	CNetworkHost hosts[PlayerMax]{}; /// Participants information
+	uint16_t NetHostSlot = 0;        /// slot for the receiving host in the server host array
+	int32_t Lag = 0;                 /// Lag time
+	int32_t gameCyclesPerUpdate = 0; /// Update frequency
 };
 
 class CInitMessage_Map
 {
 public:
-	CInitMessage_Map() {}
+	CInitMessage_Map() = default;
 	CInitMessage_Map(const char *path, uint32_t mapUID);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;
@@ -308,16 +308,16 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	char MapPath[256];
-	uint32_t MapUID;  /// UID of map to play.
+	char MapPath[256]{};
+	uint32_t MapUID = 0;  /// UID of map to play.
 };
 
 class CInitMessage_MapFileFragment
 {
 public:
-	CInitMessage_MapFileFragment() {}
+	CInitMessage_MapFileFragment() = default;
 	CInitMessage_MapFileFragment(const char *path, const std::vector<char> &data, uint32_t Fragment);
-	CInitMessage_MapFileFragment(uint32_t Fragment);
+	explicit CInitMessage_MapFileFragment(uint32_t Fragment);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;
 	void Deserialize(const unsigned char *p);
@@ -325,16 +325,16 @@ public:
 private:
 	CInitMessage_Header header;
 public:
-	char Data[384]; // path directly followed by data fragment
-	uint8_t PathSize;
-	uint16_t DataSize;
-	uint32_t FragmentIndex;
+	char Data[384]{}; // path directly followed by data fragment
+	uint8_t PathSize = 0;
+	uint16_t DataSize = 0;
+	uint32_t FragmentIndex = 0;
 };
 
 class CInitMessage_State
 {
 public:
-	CInitMessage_State() {}
+	CInitMessage_State() = default;
 	CInitMessage_State(int type, const CServerSetup &data);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;
@@ -427,7 +427,7 @@ enum _extended_message_type_ {
 class CNetworkCommand
 {
 public:
-	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
+	CNetworkCommand() = default;
 	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
 	size_t Serialize(unsigned char *buf) const;
@@ -435,10 +435,10 @@ public:
 	static size_t Size() { return 2 + 2 + 2 + 2; }
 
 public:
-	uint16_t Unit;         /// Command for unit
-	uint16_t X;            /// Map position X
-	uint16_t Y;            /// Map position Y
-	uint16_t Dest;         /// Destination unit
+	uint16_t Unit = 0; /// Command for unit
+	uint16_t X = 0;    /// Map position X
+	uint16_t Y = 0;    /// Map position Y
+	uint16_t Dest = 0; /// Destination unit
 };
 
 /**
@@ -447,17 +447,17 @@ public:
 class CNetworkExtendedCommand
 {
 public:
-	CNetworkExtendedCommand() : ExtendedType(0), Arg1(0), Arg2(0), Arg3(0), Arg4(0) {}
+	CNetworkExtendedCommand() = default;
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 + 2 + 2 + 2; }
 
-	uint8_t  ExtendedType;  /// Extended network command type
-	uint8_t  Arg1;          /// Argument 1
-	uint16_t Arg2;          /// Argument 2
-	uint16_t Arg3;          /// Argument 3
-	uint16_t Arg4;          /// Argument 4
+	uint8_t  ExtendedType = 0;  /// Extended network command type
+	uint8_t  Arg1 = 0;          /// Argument 1
+	uint16_t Arg2 = 0;          /// Argument 2
+	uint16_t Arg3 = 0;          /// Argument 3
+	uint16_t Arg4 = 0;          /// Argument 4
 };
 
 /**
@@ -480,14 +480,14 @@ public:
 class CNetworkCommandSync
 {
 public:
-	CNetworkCommandSync() : syncSeed(0), syncHash(0) {}
+	CNetworkCommandSync() = default;
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 4 + 4; };
 
 public:
-	uint32_t syncSeed;
-	uint32_t syncHash;
+	uint32_t syncSeed = 0;
+	uint32_t syncHash = 0;
 };
 
 /**
@@ -496,13 +496,13 @@ public:
 class CNetworkCommandQuit
 {
 public:
-	CNetworkCommandQuit() : player(0) {}
+	CNetworkCommandQuit() = default;
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 2; };
 
 public:
-	uint16_t player;
+	uint16_t player = 0;
 };
 
 /**
@@ -511,14 +511,14 @@ public:
 class CNetworkSelection
 {
 public:
-	CNetworkSelection() : player(0) {}
+	CNetworkSelection() = default;
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	size_t Size() const;
 
 public:
-	uint16_t player;
+	uint16_t player = 0;
 	std::vector<uint16_t> Units;  /// Selection Units
 };
 
@@ -530,20 +530,15 @@ public:
 class CNetworkPacketHeader
 {
 public:
-	CNetworkPacketHeader()
-	{
-		Cycle = 0;
-		memset(Type, 0, sizeof(Type));
-		OrigPlayer = 255;
-	}
+	CNetworkPacketHeader() = default;
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
 	static size_t Size() { return 1 + 1 + 1 * MaxNetworkCommands; }
 
-	uint8_t Type[MaxNetworkCommands];  /// Commands in packet
-	uint8_t Cycle;                     /// Destination game cycle
-	uint8_t OrigPlayer;                /// Host address
+	uint8_t Type[MaxNetworkCommands]{}; /// Commands in packet
+	uint8_t Cycle = 0;                  /// Destination game cycle
+	uint8_t OrigPlayer = 255;           /// Host address
 };
 
 /**

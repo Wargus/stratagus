@@ -41,7 +41,7 @@ class CUnit;
 class CUnitPtr
 {
 public:
-	CUnitPtr() : unit(nullptr) {}
+	CUnitPtr() = default;
 	CUnitPtr(std::nullptr_t) : unit(nullptr) {}
 	explicit CUnitPtr(CUnit *u);
 	CUnitPtr(const CUnitPtr &u);
@@ -61,7 +61,7 @@ public:
 	bool operator!= (CUnit *u) const { return this->unit != u; }
 
 private:
-	CUnit *unit;
+	CUnit *unit = nullptr;
 };
 
 //@}

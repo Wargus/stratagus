@@ -129,11 +129,11 @@ static_assert(MAX_RACES < 256, "Race selection needs to fit into 8 bits");
 static_assert(PlayerMax < 256, "Team number must fit into 8 bits");
 
 struct SettingsPresets {
-	int8_t PlayerColor;       /// Color of a player
+	int8_t PlayerColor = 0;   /// Color of a player
 	std::string AIScript;     /// AI script for computer to use
-	int8_t Race;              /// Race of the player
-	int8_t Team;              /// Team of player
-	PlayerTypes Type;         /// Type of player (for network games)
+	int8_t Race = 0;          /// Race of the player
+	int8_t Team = 0;          /// Team of player
+	PlayerTypes Type = PlayerTypes::PlayerUnset; /// Type of player (for network games)
 
 	void Save(const std::function <void (std::string)>& f) {
 		f(std::string("PlayerColor = ") + std::to_string(PlayerColor));
@@ -226,21 +226,21 @@ ENUM_CLASS FieldOfViewTypes : uint8_t {
 **
 */
 struct Settings {
-	NetGameTypes NetGameType;   /// Multiplayer or single player
+	NetGameTypes NetGameType = NetGameTypes::Unset;   /// Multiplayer or single player
 
 	//  Individual presets:
 	//  For single-player game only Presets[0] will be used..
-	SettingsPresets Presets[PlayerMax];
+	SettingsPresets Presets[PlayerMax]{};
 
 	//  Common settings:
-	int8_t Resources;          /// Preset resource factor
-	int8_t NumUnits;           /// Preset # of units
-	int8_t Opponents;          /// Preset # of ai-opponents
-	int8_t Difficulty;         /// Terrain type (summer,winter,...)
-	GameTypes GameType;        /// Game type (melee, free for all,...)
-	FieldOfViewTypes FoV;      /// Which field of view is used - important to be shared for unit sight
-	MapRevealModes RevealMap;  /// Reveal map kind
-	RevealTypes DefeatReveal;
+	int8_t Resources = 0;          /// Preset resource factor
+	int8_t NumUnits = 0;           /// Preset # of units
+	int8_t Opponents = 0;          /// Preset # of ai-opponents
+	int8_t Difficulty = 0;         /// Terrain type (summer,winter,...)
+	GameTypes GameType = GameTypes::SettingsGameTypeMapDefault; /// Game type (melee, free for all,...)
+	FieldOfViewTypes FoV = FieldOfViewTypes::cShadowCasting;      /// Which field of view is used - important to be shared for unit sight
+	MapRevealModes RevealMap = MapRevealModes::cHidden;  /// Reveal map kind
+	RevealTypes DefeatReveal = RevealTypes::cNoRevelation;
 
 	unsigned NoFogOfWar:1;        /// if dynamic fog of war is disabled
 	unsigned Inside:1;            /// if game uses interior tileset or is generally "inside" for the purpose of obstacles

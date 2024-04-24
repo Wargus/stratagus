@@ -101,10 +101,10 @@ class CSound : public std::enable_shared_from_this<CSound>
 	class Key
 	{
 		friend CSound;
-		Key(){};
+		Key(){}
 	};
 public:
-	explicit CSound(Key){}
+	explicit CSound(Key) {}
 	~CSound();
 
 	CSound(const CSound &) = delete;
@@ -133,8 +133,8 @@ public:
 **  Origin of a sound
 */
 struct Origin {
-	const void *Base;   /// pointer on a Unit
-	unsigned Id;        /// unique identifier (if the pointer has been shared)
+	const void *Base = nullptr;   /// pointer on a Unit
+	unsigned Id = 0;        /// unique identifier (if the pointer has been shared)
 };
 
 

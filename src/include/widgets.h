@@ -115,15 +115,15 @@ public:
 	void setPressedImage(gcn::Image *image) { pressedImage = image; }
 	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
 
-	gcn::Image *normalImage;
-	gcn::Image *pressedImage;
-	gcn::Image *disabledImage;
+	gcn::Image *normalImage = nullptr;
+	gcn::Image *pressedImage = nullptr;
+	gcn::Image *disabledImage = nullptr;
 };
 
 class ImageRadioButton : public gcn::RadioButton
 {
 public:
-	ImageRadioButton();
+	ImageRadioButton() = default;
 	ImageRadioButton(const std::string &caption, const std::string &group,
 					 bool marked);
 
@@ -142,19 +142,19 @@ public:
 	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
 	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
 
-	gcn::Image *uncheckedNormalImage;
-	gcn::Image *uncheckedPressedImage;
-	gcn::Image *uncheckedDisabledImage;
-	gcn::Image *checkedNormalImage;
-	gcn::Image *checkedPressedImage;
-	gcn::Image *checkedDisabledImage;
-	bool mMouseDown;
+	gcn::Image *uncheckedNormalImage = nullptr;
+	gcn::Image *uncheckedPressedImage = nullptr;
+	gcn::Image *uncheckedDisabledImage = nullptr;
+	gcn::Image *checkedNormalImage = nullptr;
+	gcn::Image *checkedPressedImage = nullptr;
+	gcn::Image *checkedDisabledImage = nullptr;
+	bool mMouseDown = false;
 };
 
 class ImageCheckBox : public gcn::CheckBox
 {
 public:
-	ImageCheckBox();
+	ImageCheckBox() = default;
 	ImageCheckBox(const std::string &caption, bool marked = false);
 
 	void draw(gcn::Graphics *graphics) override;
@@ -172,13 +172,13 @@ public:
 	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
 	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
 
-	gcn::Image *uncheckedNormalImage;
-	gcn::Image *uncheckedPressedImage;
-	gcn::Image *uncheckedDisabledImage;
-	gcn::Image *checkedNormalImage;
-	gcn::Image *checkedPressedImage;
-	gcn::Image *checkedDisabledImage;
-	bool mMouseDown;
+	gcn::Image *uncheckedNormalImage = nullptr;
+	gcn::Image *uncheckedPressedImage = nullptr;
+	gcn::Image *uncheckedDisabledImage = nullptr;
+	gcn::Image *checkedNormalImage = nullptr;
+	gcn::Image *checkedPressedImage = nullptr;
+	gcn::Image *checkedDisabledImage = nullptr;
+	bool mMouseDown = false;
 };
 
 class ImageSlider : public gcn::Slider
@@ -194,26 +194,26 @@ public:
 	void setBackgroundImage(gcn::Image *image);
 	void setDisabledBackgroundImage(gcn::Image *image);
 
-	gcn::Image *markerImage;
-	gcn::Image *backgroundImage;
-	gcn::Image *disabledBackgroundImage;
+	gcn::Image *markerImage = nullptr;
+	gcn::Image *backgroundImage = nullptr;
+	gcn::Image *disabledBackgroundImage = nullptr;
 };
 
 class MultiLineLabel : public gcn::Widget
 {
 public:
-	MultiLineLabel();
+	MultiLineLabel() = default;
 	explicit MultiLineLabel(const std::string &caption);
 
 	void setCaption(const std::string &caption);
 	const std::string &getCaption() const;
 	void setAlignment(gcn::Graphics::Alignment alignment);
 	void setAlignment(unsigned int alignment) { setAlignment(static_cast<gcn::Graphics::Alignment>(alignment)); } // TOLUA
-	gcn::Graphics::Alignment getAlignment();
+	gcn::Graphics::Alignment getAlignment() const;
 	void setVerticalAlignment(unsigned int alignment);
-	unsigned int getVerticalAlignment();
+	unsigned int getVerticalAlignment() const;
 	void setLineWidth(int width);
-	int getLineWidth();
+	int getLineWidth() const;
 	void adjustSize();
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
@@ -231,9 +231,9 @@ private:
 
 	std::string mCaption;
 	std::vector<std::string> mTextRows;
-	gcn::Graphics::Alignment mAlignment;
-	unsigned int mVerticalAlignment;
-	int mLineWidth;
+	gcn::Graphics::Alignment mAlignment = gcn::Graphics::Alignment::Left;
+	unsigned int mVerticalAlignment = TOP;
+	int mLineWidth = 0;
 };
 
 class ScrollingWidget : public gcn::ScrollArea
@@ -249,8 +249,8 @@ private:
 private:
 	gcn::Container container; /// Data container
 	float speedY;             /// vertical speed of the container (positive number: go up).
-	float containerY;         /// Y position of the container
-	bool finished;            /// True while scrolling ends.
+	float containerY = 0;     /// Y position of the container
+	bool finished = false;    /// True while scrolling ends.
 };
 
 class Windows : public gcn::Window
@@ -311,13 +311,13 @@ protected:
 class ImageTextField : public CTextField
 {
 public:
-	ImageTextField() : CTextField(), itemImage(nullptr) {}
-	ImageTextField(const std::string &text) : CTextField(text), itemImage(nullptr) {}
+	ImageTextField() = default;
+	ImageTextField(const std::string &text) : CTextField(text) {}
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
 	void setItemImage(CGraphic *image) { itemImage = image; }
 private:
-	CGraphic *itemImage;
+	CGraphic *itemImage = nullptr;
 };
 
 class StringListModel : public gcn::ListModel
@@ -335,7 +335,7 @@ class LuaListModel : public gcn::ListModel
 {
 	std::vector<std::string> list;
 public:
-	LuaListModel() {}
+	LuaListModel() = default;
 
 	void setList(lua_State *lua, lua_Object *lo);
 	int getNumberOfElements() override { return list.size(); }
@@ -346,7 +346,7 @@ public:
 class ImageListBox : public gcn::ListBox
 {
 public:
-	ImageListBox();
+	ImageListBox() = default;
 	explicit ImageListBox(gcn::ListModel *listModel);
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
@@ -534,11 +534,11 @@ public:
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 
 private:
-	bool runLoop;
-	int loopResult;
-	gcn::Widget *oldtop;
-	LuaActionListener *logiclistener;
-	bool drawUnder;
+	bool runLoop = true;
+	int loopResult = 0;
+	gcn::Widget *oldtop = nullptr;
+	LuaActionListener *logiclistener = nullptr;
+	bool drawUnder = false;
 };
 
 #endif

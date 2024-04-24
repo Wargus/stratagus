@@ -82,7 +82,7 @@ std::unique_ptr<FileWriter> CreateFileWriter(const fs::path &filename);
 class FileList
 {
 public:
-	FileList() : type(0) {}
+	FileList() = default;
 
 	bool operator < (const FileList &rhs) const
 	{
@@ -93,7 +93,7 @@ public:
 	}
 public:
 	fs::path name; /// Name of the file
-	int type;      /// Type of the file
+	int type = 0;  /// Type of the file
 };
 
 

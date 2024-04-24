@@ -68,29 +68,29 @@
 **  General chunk found in the WAV file
 */
 struct WavHeader {
-	unsigned int MagicRiff;
-	unsigned int Length;
-	unsigned int MagicWave;
+	unsigned int MagicRiff = 0;
+	unsigned int Length = 0;
+	unsigned int MagicWave = 0;
 };
 
 /**
 **  Wav format
 */
 struct WavFMT {
-	unsigned short Encoding;       /// 1 = PCM
-	unsigned short Channels;       /// 1 = mono, 2 = stereo
-	unsigned int   Frequency;      /// One of 11025, 22050, or 44100 Hz
-	unsigned int   ByteRate;       /// Average bytes per second
-	unsigned short SampleSize;     /// Bytes per sample block
-	unsigned short BitsPerSample;  /// One of 8, 12, 16
+	unsigned short Encoding = 0;       /// 1 = PCM
+	unsigned short Channels = 0;       /// 1 = mono, 2 = stereo
+	unsigned int   Frequency = 0;      /// One of 11025, 22050, or 44100 Hz
+	unsigned int   ByteRate = 0;       /// Average bytes per second
+	unsigned short SampleSize = 0;     /// Bytes per sample block
+	unsigned short BitsPerSample = 0;  /// One of 8, 12, 16
 };
 
 /**
 **  General chunk found in the WAV file
 */
 struct WavChunk {
-	unsigned int Magic;
-	unsigned int Length;
+	unsigned int Magic = 0;
+	unsigned int Length = 0;
 };
 //@}
 

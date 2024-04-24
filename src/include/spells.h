@@ -191,7 +191,7 @@ public:
 	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications
-	ETarget Target;          /// Targeting information. See TargetType.
+	ETarget Target = ETarget::Self;          /// Targeting information. See TargetType.
 	std::vector<std::unique_ptr<SpellActionType>> Action; /// More arguments for spell (damage, delay, additional sounds...).
 
 	int Range = 0;                  /// Max range of the target.

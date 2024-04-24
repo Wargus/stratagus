@@ -216,17 +216,17 @@ public:
 	void SetRevealed(const bool revealed);
 
 public:
-	int Index;          /// player as number
+	int Index = 0;      /// player as number
 	std::string Name;   /// name of non computer
 
 	PlayerTypes Type;   /// type of player (human,computer,...)
-	int   Race;         /// race of player (orc,human,...)
+	int Race = 0;         /// race of player (orc,human,...)
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
-	int      Team;          /// team of player
+	int Team = 0;          /// team of player
 
-	Vec2i StartPos;  /// map tile start position
+	Vec2i StartPos{-1, -1}; /// map tile start position
 
 	void SetStartView(const Vec2i &pos) { StartPos = pos; }
 
@@ -239,32 +239,32 @@ public:
 
 	int SpeedResourcesHarvest[MaxCosts]{}; /// speed factor for harvesting resources
 	int SpeedResourcesReturn[MaxCosts]{};  /// speed factor for returning resources
-	int SpeedBuild;                  /// speed factor for building
-	int SpeedTrain;                  /// speed factor for training
-	int SpeedUpgrade;                /// speed factor for upgrading
-	int SpeedResearch;               /// speed factor for researching
+	int SpeedBuild = 0;                  /// speed factor for building
+	int SpeedTrain = 0;                  /// speed factor for training
+	int SpeedUpgrade = 0;                /// speed factor for upgrading
+	int SpeedResearch = 0;               /// speed factor for researching
 
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax]{}; /// total units of unit-type
 	int UnitTypesAiActiveCount [UnitTypeMax]{}; /// total units of unit-type that have their AI set to active
 
-	bool AiEnabled;        /// handle AI on local computer
+	bool AiEnabled = false;        /// handle AI on local computer
 	std::unique_ptr<PlayerAi> Ai; /// Ai structure pointer
 
-	int    NumBuildings;   /// # buildings
-	int    Supply;         /// supply available/produced
-	int    Demand;         /// demand of player
+	int NumBuildings = 0;   /// # buildings
+	int Supply = 0;         /// supply available/produced
+	int Demand = 0;         /// demand of player
 
-	int    UnitLimit;       /// # food units allowed
-	int    BuildingLimit;   /// # buildings allowed
-	int    TotalUnitLimit;  /// # total unit number allowed
+	int UnitLimit = 0;       /// # food units allowed
+	int BuildingLimit = 0;   /// # buildings allowed
+	int TotalUnitLimit = 0;  /// # total unit number allowed
 
-	int    Score;           /// Points for killing ...
-	int    TotalUnits;
-	int    TotalBuildings;
+	int Score = 0;           /// Points for killing ...
+	int TotalUnits = 0;
+	int TotalBuildings = 0;
 	int TotalResources[MaxCosts]{};
-	int    TotalRazings;
-	int    TotalKills;      /// How many unit killed
+	int TotalRazings = 0;
+	int TotalKills = 0;      /// How many unit killed
 
 	int LostMainFacilityTimer { 0 };/// The timer for when the player lost the last town hall
 									/// (to make the player's units be revealed)
@@ -279,8 +279,8 @@ private:
 	CUnitColors UnitColors;            /// Unit colors for new units
 	std::vector<CUnit *> Units;        /// units of this player
 	std::vector<CUnit *> FreeWorkers;  /// Container for free workers
-	unsigned int Enemy;                /// enemy bit field for this player
-	unsigned int Allied;               /// allied bit field for this player
+	unsigned int Enemy = 0;            /// enemy bit field for this player
+	unsigned int Allied = 0;           /// allied bit field for this player
 	std::set<uint8_t> HasVisionFrom;   /// set of player indexes that have shared their vision with this player
 	std::set<uint8_t> GaveVisionTo;    /// set of player indexes that this player has shared vision with
 

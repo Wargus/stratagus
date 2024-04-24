@@ -32,50 +32,50 @@
 
 //@{
 
-namespace sdl2 {
-    struct SDL_Deleter
-    {
-		void operator()(SDL_Cursor *ptr) const
-		{
-			if (ptr) SDL_FreeCursor(ptr);
-		}
-		void operator()(SDL_Surface *ptr) const
-		{
-			if (ptr) SDL_FreeSurface(ptr);
-		}
-		void operator()(SDL_Texture *ptr) const
-		{
-			if (ptr) SDL_DestroyTexture(ptr);
-		}
-		void operator()(SDL_Renderer *ptr) const
-		{
-			if (ptr) SDL_DestroyRenderer(ptr);
-		}
-		void operator()(SDL_Window *ptr) const
-		{
-			if (ptr) SDL_DestroyWindow(ptr);
-		}
-    };
+namespace sdl2
+{
+struct SDL_Deleter
+{
+	void operator()(SDL_Cursor *ptr) const
+	{
+		if (ptr) SDL_FreeCursor(ptr);
+	}
+	void operator()(SDL_Surface *ptr) const
+	{
+		if (ptr) SDL_FreeSurface(ptr);
+	}
+	void operator()(SDL_Texture *ptr) const
+	{
+		if (ptr) SDL_DestroyTexture(ptr);
+	}
+	void operator()(SDL_Renderer *ptr) const
+	{
+		if (ptr) SDL_DestroyRenderer(ptr);
+	}
+	void operator()(SDL_Window *ptr) const
+	{
+		if (ptr) SDL_DestroyWindow(ptr);
+	}
+};
 
-    template<typename T>
-    struct _shared_ptr : public std::shared_ptr<T>
-    {
-        explicit _shared_ptr(T* t = nullptr) : std::shared_ptr<T>(t, SDL_Deleter()) {}
+template <typename T>
+struct _shared_ptr : public std::shared_ptr<T>
+{
+	explicit _shared_ptr(T *t = nullptr) : std::shared_ptr<T>(t, SDL_Deleter()) {}
 
-        void reset(T* t = nullptr) { std::shared_ptr<T>::reset(t, SDL_Deleter()); }
-    };
+	void reset(T *t = nullptr) { std::shared_ptr<T>::reset(t, SDL_Deleter()); }
+};
 
-
-    using CursorPtr    = std::unique_ptr<SDL_Cursor,  SDL_Deleter>;
-    using SurfacePtr    = std::unique_ptr<SDL_Surface,  SDL_Deleter>;
-    using TexturePtr    = std::unique_ptr<SDL_Texture,  SDL_Deleter>;
-    using RendererPtr   = std::unique_ptr<SDL_Renderer, SDL_Deleter>;
-    using WindowPtr     = std::unique_ptr<SDL_Window,   SDL_Deleter>;
-    using SurfaceShPtr  = _shared_ptr<SDL_Surface>;
-    using TextureShPtr  = _shared_ptr<SDL_Texture>;
-    using RendererShPtr = _shared_ptr<SDL_Renderer>;
-    using WindowShPtr   = _shared_ptr<SDL_Window>;
-}
-using sequence_of_imagesPtrs    = std::vector<SDL_Surface*>;
-using sequence_of_images        = std::vector<sdl2::SurfacePtr>;
+using CursorPtr = std::unique_ptr<SDL_Cursor, SDL_Deleter>;
+using SurfacePtr = std::unique_ptr<SDL_Surface, SDL_Deleter>;
+using TexturePtr = std::unique_ptr<SDL_Texture, SDL_Deleter>;
+using RendererPtr = std::unique_ptr<SDL_Renderer, SDL_Deleter>;
+using WindowPtr = std::unique_ptr<SDL_Window, SDL_Deleter>;
+using SurfaceShPtr = _shared_ptr<SDL_Surface>;
+using TextureShPtr = _shared_ptr<SDL_Texture>;
+using RendererShPtr = _shared_ptr<SDL_Renderer>;
+using WindowShPtr = _shared_ptr<SDL_Window>;
+} // namespace sdl2
+using sequence_of_imagesPtrs = std::vector<SDL_Surface *>;
+using sequence_of_images = std::vector<sdl2::SurfacePtr>;
 //@}

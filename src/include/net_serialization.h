@@ -29,6 +29,9 @@
 #ifndef NET_SERIALIZATION_H
 #define NET_SERIALIZATION_H
 
+#include <string>
+#include <vector>
+
 extern size_t serialize32(unsigned char *buf, uint32_t data);
 extern size_t serialize32(unsigned char *buf, int32_t data);
 extern size_t serialize16(unsigned char *buf, uint16_t data);
