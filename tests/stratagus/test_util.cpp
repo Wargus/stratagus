@@ -99,16 +99,6 @@ TEST_CASE("strcat_s")
 	CHECK(std::string_view{"hello world"} == buffer);
 }
 
-TEST_CASE("strcasestr")
-{
-	const char *text = "HELLO world";
-
-	CHECK(nullptr == strcasestr(text, "not found"));
-	CHECK(text == strcasestr(text, "HelLo"));
-	CHECK(text + 6 == strcasestr(text, "WoRlD"));
-	CHECK(text + 4 == strcasestr(text, "o"));
-}
-
 TEST_CASE("strnlen")
 {
 	CHECK(2u == strnlen("hello", 2));

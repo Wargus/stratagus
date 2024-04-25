@@ -104,11 +104,6 @@ extern errno_t strncpy_s(char *dst, size_t dstsize, const char *src, size_t coun
 extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 #endif
 
-#ifndef HAVE_STRCASESTR
-/// case insensitive strstr
-extern const char *strcasestr(const char *str, const char *substr) noexcept;
-#endif // !HAVE_STRCASESTR
-
 #if defined(WIN32) && defined(UNICODE)
 #define L(LITERAL) L"" LITERAL
 #else
