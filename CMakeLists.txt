@@ -867,7 +867,6 @@ endif()
 check_type_size(errno_t ERRNOT)
 check_function_exists("strcpy_s" HAVE_STRCPYS)
 check_function_exists("strncpy_s" HAVE_STRNCPYS)
-check_function_exists("strcasestr" HAVE_STRCASESTR)
 check_function_exists("strnlen" HAVE_STRNLEN)
 check_function_exists("getopt" HAVE_GETOPT)
 
@@ -889,10 +888,6 @@ endif()
 
 if(HAVE_STRCATS)
 	add_definitions(-DHAVE_STRCATS)
-endif()
-
-if(HAVE_STRCASESTR)
-	add_definitions(-DHAVE_STRCASESTR)
 endif()
 
 if(HAVE_STRNLEN)

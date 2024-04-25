@@ -296,39 +296,6 @@ errno_t strcat_s(char *dst, size_t dstsize, const char *src)
 }
 #endif
 
-#if !defined(HAVE_STRCASESTR)
-/**
-**  Case insensitive version of strstr
-**
-**  @param a  String to search in
-**  @param b  Substring to search for
-**
-**  @return   Pointer to first occurrence of b or nullptr if not found.
-*/
-const char *strcasestr(const char *a, const char *b) noexcept
-{
-	int x;
-
-	if (!a || !*a || !b || !*b || strlen(a) < strlen(b)) {
-		return nullptr;
-	}
-
-	x = 0;
-	while (*a) {
-		if (a[x] && (tolower(a[x]) == tolower(b[x]))) {
-			++x;
-		} else if (b[x]) {
-			++a;
-			x = 0;
-		} else {
-			return (char *)a;
-		}
-	}
-
-	return nullptr;
-}
-#endif // !HAVE_STRCASESTR
-
 int to_number(std::string_view s, int base)
 {
 #if __has_include(<charconv>)

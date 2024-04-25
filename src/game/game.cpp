@@ -771,6 +771,17 @@ static void GameTypeMachineVsMachineTraining()
 --  Game creation
 ----------------------------------------------------------------------------*/
 
+static bool has_any_extension(fs::path filename, std::initializer_list<fs::path> extensions)
+{
+	while (filename.has_extension()) {
+		if (ranges::contains(extensions, filename.extension())) {
+			return true;
+		}
+		filename.replace_extension();
+	}
+	return false;
+}
+
 /**
 **  CreateGame.
 **
@@ -800,12 +811,9 @@ void CreateGame(const fs::path &filename, CMap *map)
 		InitSyncRand();
 	}
 
-	if (Map.Info.Filename.empty() && !filename.empty()) {
+	if (Map.Info.Filename.empty() && has_any_extension(filename, {".smp", ".SMP"})) {
 		const std::string path = LibraryFileName(filename.string());
-
-		if (strcasestr(filename.string().c_str(), ".smp")) {
-			LuaLoadFile(path);
-		}
+		LuaLoadFile(path);
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
