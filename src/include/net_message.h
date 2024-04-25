@@ -31,7 +31,7 @@
 
 //@{
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "settings.h"

@@ -34,8 +34,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <cstdint>
 #include <deque>
-#include <stdint.h>
 
 #include "stratagus.h"
 

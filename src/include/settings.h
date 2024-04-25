@@ -38,7 +38,7 @@
 //@{
 
 #include <bitset>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <functional>
