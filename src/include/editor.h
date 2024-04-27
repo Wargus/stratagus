@@ -37,6 +37,7 @@
 #include <tuple>
 #include "icons.h"
 #include "viewport.h"
+#include "editor_brush.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
 #endif
@@ -70,6 +71,9 @@ public:
 	~CEditor() {}
 
 	void Init();
+
+	void LoadBrushes();
+	CBrush &getCurrentBrush() { return curentBrush == -1 ? defaultBrush : brushes[curentBrush]; };
 
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false) const;
@@ -108,6 +112,12 @@ public:
 	EditorStateType State = EditorStateType::Selecting; /// Current editor state
 
 	fieldHighlightChecker OverlayHighlighter {nullptr};
+
+private:
+	CBrush defaultBrush{CBrush::BrushTypes::SingleTile, 1, 1};
+	std::vector<CBrush> brushes;
+	int16_t curentBrush = -1;
+	std::string BrushesSrc = "scripts/editor/brushes.lua";
 };
 
 /*----------------------------------------------------------------------------

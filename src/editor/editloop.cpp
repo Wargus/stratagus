@@ -1,4 +1,4 @@
-﻿//       _________ __                 __
+//       _________ __                 __
 //      /   _____//  |_____________ _/  |______     ____  __ __  ______
 //      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
 //      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ |
@@ -157,7 +157,7 @@ static void EditTile(const Vec2i &pos, int32_t tileIdx)
 	CMapField &mf = *Map.Field(pos);
 
 	int32_t baseTileIndex = tileIdx;
-	if (baseTileIndex <= 0) {
+	if (baseTileIndex <= 0) { /// FIXME: Not sure if this condition could ever be true. To check.
 		// use the tile under the cursor and randomize *that* if it's
 		// not a mix tile
 		baseTileIndex = mf.getTileIndex();
@@ -182,52 +182,57 @@ static void EditTile(const Vec2i &pos, int32_t tileIdx)
 **  Edit tiles (internal, used by EditTiles()).
 **
 **  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit.
-**  @param size  Size of rectangle
+**  @param brush tiles brush to edit with.
 **
-**  @bug  This function does not support mirror editing!
 */
-static void EditTilesInternal(const Vec2i &pos, int tile, int size)
+static void EditTilesInternal(const Vec2i &pos, const CBrush &brush)
 {
-	Vec2i minPos = pos;
-	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
-
-	Map.FixSelectionArea(minPos, maxPos);
-
-	Vec2i itPos;
-	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
-		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
-			EditTile(itPos, tile);
+	
+	auto editTile = [&pos](const TilePos &tileOffset, tile_index tileIdx) -> void {
+		const TilePos tilePos(pos + tileOffset);
+		if (tilePos.x < 0
+			|| tilePos.x >= Map.Info.MapWidth
+			|| tilePos.y < 0
+			|| tilePos.y >= Map.Info.MapHeight) {
+			return;
 		}
-	}
+		EditTile(tilePos, tileIdx);
+	};
+
+	brush.applyBrushAt(pos, editTile);
 }
 
 /**
 **  Edit tiles
 **
 **  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit.
-**  @param size  Size of rectangle
+**  @param brush  tiles brush to edit with
 */
-static void EditTiles(const Vec2i &pos, int tile, int size)
+static void EditTiles(const Vec2i &pos, const CBrush &brush)
 {
-	EditTilesInternal(pos, tile, size);
+	EditTilesInternal(pos, brush);
 
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
-	const Vec2i mirror = mpos - pos;
-	const Vec2i mirrorv(mirror.x, pos.y);
 
-	EditTilesInternal(mirrorv, tile, size);
+	TilePos maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
+
+	if (brush.getAllign() == CBrush::BrushAllign::UpperLeft) {
+		maxPos.x -= brush.getWidth() - 1;
+		maxPos.y -= brush.getHeight() - 1;
+	}
+	const TilePos mirror = maxPos - pos;
+	const TilePos mirrorv(mirror.x, pos.y);
+
+	EditTilesInternal(mirrorv, brush);
 	if (MirrorEdit == 1) {
 		return;
 	}
-	const Vec2i mirrorh(pos.x, mirror.y);
+	const TilePos mirrorh(pos.x, mirror.y);
 
-	EditTilesInternal(mirrorh, tile, size);
-	EditTilesInternal(mirror, tile, size);
+	EditTilesInternal(mirrorh, brush);
+	EditTilesInternal(mirror, brush);
 }
 
 /**
@@ -862,12 +867,52 @@ static void DrawEditorPanel()
 	DrawInfoHighlightedOverlay();
 }
 
+
+static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &brush)
+{
+
+	PushClipping();
+	UI.MouseViewport->SetClipping();
+	const PixelSize tileSize(Map.Tileset->getPixelTileSize().x,
+	                         Map.Tileset->getPixelTileSize().y);
+
+	auto drawBrushTile = [&screenPos, &tileSize](const TilePos &tileOffset,
+	                                             tile_index tileIdx) -> void
+	{
+		const PixelPos screenPosIt(screenPos.x + tileOffset.x * tileSize.x,
+		                           screenPos.y + tileOffset.y * tileSize.y);
+
+		if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x 
+			|| screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y
+			|| screenPosIt.x + tileSize.x <  UI.MouseViewport->GetTopLeftPos().x
+			|| screenPosIt.y + tileSize.y <  UI.MouseViewport->GetTopLeftPos().y) {
+
+			return;
+		}
+		Map.TileGraphic->DrawFrameClip(Map.Tileset->getGraphicTileFor(tileIdx),
+									   screenPosIt.x,
+									   screenPosIt.y);
+	};
+	brush.applyBrushAt(tilePos, drawBrushTile);
+
+	PixelPos screenPosIt;
+	const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
+						  tileSize.y * brush.getAllignOffset().y};
+
+	Video.DrawRectangleClip(ColorWhite,
+							screenPos.x + offset.x,
+							screenPos.y + offset.y,
+							tileSize.x * brush.getWidth(),
+							tileSize.y * brush.getHeight());
+	PopClipping();
+}
+
 /**
 **  Draw special cursor on map.
 **
 **  @todo support for bigger cursors (2x2, 3x3 ...)
 */
-static void DrawMapCursor()
+static void UpdateMapCursor()
 {
 	//  Affect CursorBuilding if necessary.
 	//  (Menu reset CursorBuilding)
@@ -891,30 +936,24 @@ static void DrawMapCursor()
 
 	// Draw map cursor
 	if (UI.MouseViewport && !CursorBuilding) {
-		const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
+		const TilePos tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
-			const graphic_index tile = Map.Tileset->getGraphicTileFor(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
-			PushClipping();
-			UI.MouseViewport->SetClipping();
+			DrawMapCursor(tilePos,
+						  screenPos,
+						  Editor.getCurrentBrush());
 
-			PixelPos screenPosIt;
-			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * Map.Tileset.getPixelTileSize().y;
-				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
-					break;
-				}
-				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * Map.Tileset.getPixelTileSize().x;
-					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
-						break;
-					}
-					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
-				}
-			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset.getPixelTileSize().x * TileCursorSize, Map.Tileset.getPixelTileSize().y * TileCursorSize);
-			PopClipping();
+		} else if (Editor.State == EditorStateType::EditRamps) {
+/*
+			DrawMapCursor(screenPos,
+						  TileCursorSize, // ramp width
+						  TileCursorSize, // ramp height
+						  [](uint8_t col, uint8_t row) -> graphic_index {
+							  return Map.Tileset->getGraphicTileFor(ramp.get(col, row));
+						  });
+*/						  
+
 		} else {
 			PushClipping();
 			UI.MouseViewport->SetClipping();
@@ -1061,7 +1100,7 @@ void EditorUpdateDisplay()
 	}
 
 	if (CursorOn == ECursorOn::Map && Gui->getTop() == editorContainer.get() && !GamePaused) {
-		DrawMapCursor(); // cursor on map
+		UpdateMapCursor(); // cursor on map
 	}
 
 	// Menu button
@@ -1257,6 +1296,10 @@ static void EditorCallbackButtonDown(unsigned button)
 		} else {
 			if (Editor.CursorTileIndex != -1) {
 				Editor.SelectedTileIndex = Editor.CursorTileIndex;
+
+				if (Editor.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
+					Editor.getCurrentBrush().setTile(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
+				}
 				return;
 			}
 		}
@@ -1346,9 +1389,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.State == EditorStateType::EditTile 
 				&& (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
 
-				EditTiles(tilePos, 
-						  Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1,
-						  TileCursorSize);
+				EditTiles(tilePos, Editor.getCurrentBrush());
 
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
@@ -1776,7 +1817,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
-			EditTiles(tilePos, Editor.SelectedTileIndex != -1 ? Editor.ShownTileTypes[Editor.SelectedTileIndex] : -1, TileCursorSize);
+			EditTiles(tilePos, Editor.getCurrentBrush());
 		} else if (Editor.State == EditorStateType::EditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
@@ -1979,6 +2020,17 @@ void CEditor::Init()
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
 	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
 	EditorCallbacks.NetworkEvent = NetworkEvent;
+
+	LoadBrushes();
+}
+
+void CEditor::LoadBrushes()
+{
+	brushes.clear();
+
+	if (fs::exists(LibraryFileName(BrushesSrc))) {
+		LoadCcl(fs::path(BrushesSrc));
+	}
 }
 
 /**
