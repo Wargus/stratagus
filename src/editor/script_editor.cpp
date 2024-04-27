@@ -93,6 +93,11 @@ static int CclEditorResizeMap(lua_State *l)
 	return 1;
 }
 
+static int CclEditorAddBrush(lua_State *l)
+{
+	return 0;
+}
+
 /**
 **  Configure the randomize map feature of the editor.
 **
@@ -158,6 +163,8 @@ void EditorCclRegister()
 	lua_register(Lua, "SetEditorUnitsIcon", CclSetEditorUnitsIcon);
 	lua_register(Lua, "SetEditorStartUnit", CclSetEditorStartUnit);
 	lua_register(Lua, "EditorResizeMap", CclEditorResizeMap);
+
+	lua_register(Lua, "EditorAddBrush", CclEditorAddBrush);
 
 	lua_register(Lua, "SetEditorRandomizeProperties", CclEditorRandomizeProperties);
 }
