@@ -83,7 +83,7 @@ tile_index CBrush::getTile(uint8_t col, uint8_t row) const
 
 void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 */)
 {
-	switch (type)
+	switch (properties.type)
 	{
 		case BrushTypes::SingleTile:
 			fillWith(tile, isInit ? false : true);
@@ -97,7 +97,7 @@ void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 
 
 void CBrush::fillWith(tile_index tile, bool init /* = false */)
 {
-	if (init && shape == BrushShapes::Round) {
+	if (init && properties.shape == BrushShapes::Round) {
 		ranges::fill(tiles, 0);
 		if (width == height) {
 			drawCircle(width / 2, height / 2, width, tile, this->tiles);
@@ -138,7 +138,7 @@ void CBrush::setSize(uint8_t newWidth, uint8_t newHeight)
 	width = newWidth;
 	height = newHeight;
 
-	if(shape == BrushShapes::Round) {
+	if(properties.shape == BrushShapes::Round) {
 		if (newWidth && newWidth % 2 == 0) {
 			width = newWidth - 1;
 		}
