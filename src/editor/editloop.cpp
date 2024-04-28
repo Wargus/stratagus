@@ -895,7 +895,7 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 									   screenPosIt.x,
 									   screenPosIt.y);
 	};
-	brush.applyBrushAt(tilePos, drawBrushTile);
+	brush.applyBrushAt(tilePos, drawBrushTile, true);
 
 	PixelPos screenPosIt;
 	const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
