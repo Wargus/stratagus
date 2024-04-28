@@ -50,7 +50,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn) const
+void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization /* = false*/) const
 {
 	TilePos brushOffset{};
 	if (isCentered()) {
@@ -62,10 +62,19 @@ void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn) const
 			const tile_index tileIdx = getTile(col, row);
 			if (tileIdx) {
 				const TilePos tileOffset(col - brushOffset.x, row - brushOffset.y);
-				applyFn(tileOffset, tileIdx);
+				const tile_index applyTile = properties.randomizeAllowed 
+											 && this->autoRndEnabled && !forbidRandomization 
+											 ? randomizeTile(tileIdx) 
+											 : tileIdx;
+				applyFn(tileOffset, applyTile);
 			}
 		}
 	}
+}
+
+tile_index CBrush::randomizeTile(tile_index tileIdx) const
+{
+	return Map.Tileset->getRandomTileOfTheSameKindAs(tileIdx);
 }
 
 graphic_index CBrush::getGraphicTile(uint8_t col, uint8_t row) const
@@ -120,6 +129,17 @@ void CBrush::fillWith(const std::vector<tile_index> &tilesSrc)
 		return;
 	}
 	ranges::copy(tilesSrc, tiles.begin());
+}
+
+/// Manual activated randomization of brush's tiles.
+void CBrush::randomize()
+{
+	if (!properties.randomizeAllowed) {
+		return;
+	}
+	for (auto &tile: tiles){
+		tile = randomizeTile(tile);
+	}
 }
 
 TilePos CBrush::getAllignOffset() const

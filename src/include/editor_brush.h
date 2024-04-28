@@ -103,8 +103,8 @@ public:
 
 	~CBrush() = default;
 
-	void applyBrushAt(const TilePos &pos, brushApplyFn applyFn) const;
-
+	void applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
+	
 	uint8_t getWidth() const { return width; }
 	uint8_t getHeight() const { return height; }
 
@@ -117,6 +117,7 @@ public:
 	void setTile(tile_index tile, uint8_t col = 0, uint8_t row = 0);
 	void fillWith(tile_index tile, bool init = false);
 	void fillWith(const std::vector<tile_index> &tilesSrc);
+	void randomize();
 
 	void setAllign(BrushAllign allignTo) { properties.allign = allignTo; }
 	TilePos getAllignOffset() const;
@@ -130,11 +131,14 @@ public:
 
 protected:
 	bool withinBounds(uint8_t col, uint8_t row) const { return col < width && row < height; }
+
 	void drawCircle(int16_t xCenter,
 	                int16_t yCenter,
 	                int16_t diameter,
 	                tile_index tile,
 	                std::vector<tile_index> &canvas);
+
+	tile_index randomizeTile(tile_index tileIdx) const;
 
 protected:
 	struct {
