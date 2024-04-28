@@ -69,8 +69,8 @@ public:
 					BrushShapes shape = BrushShapes::Rectangular,
 					BrushAllign allignTo = BrushAllign::UpperLeft)
 	{
-		this->type = type;
-		this->shape = shape;
+		properties.type = type;
+		properties.shape = shape;
 		setAllign(allignTo);
 		setSize(w, h);
 	}
@@ -81,8 +81,8 @@ public:
 					BrushShapes shape = BrushShapes::Rectangular,
 					BrushAllign allignTo = BrushAllign::UpperLeft)
 	{
-		this->type = type;
-		this->shape = shape;
+		properties.type = type;
+		properties.shape = shape;
 		setAllign(allignTo);
 		setSize(w, h);
 		fillWith(tile, true);
@@ -94,8 +94,8 @@ public:
 					BrushShapes shape = BrushShapes::Rectangular,
 					BrushAllign allignTo = BrushAllign::UpperLeft)
 	{
-		this->type = type;
-		this->shape = shape;
+		properties.type = type;
+		properties.shape = shape;
 		setAllign(allignTo);
 		setSize(w, h);
 		fillWith(tilesSrc);
@@ -108,7 +108,7 @@ public:
 	uint8_t getWidth() const { return width; }
 	uint8_t getHeight() const { return height; }
 
-	BrushTypes getType() const { return type; }
+	BrushTypes getType() const { return properties.type; }
 
 	graphic_index getGraphicTile(uint8_t col, uint8_t row) const;
 
@@ -118,14 +118,15 @@ public:
 	void fillWith(tile_index tile, bool init = false);
 	void fillWith(const std::vector<tile_index> &tilesSrc);
 
-	void setAllign(BrushAllign allignTo) { allign = allignTo; }
+	void setAllign(BrushAllign allignTo) { properties.allign = allignTo; }
 	TilePos getAllignOffset() const;
-	BrushAllign getAllign() const { return allign; }
+	BrushAllign getAllign() const { return properties.allign; }
 
-	bool isCentered() const { return allign == BrushAllign::Center; }
+	bool isCentered() const { return properties.allign == BrushAllign::Center; }
 
 	void setSize(uint8_t newWidth, uint8_t newHeight);
 
+	void setAutoRandomization(bool enable = true) { autoRndEnabled = enable; }
 
 protected:
 	bool withinBounds(uint8_t col, uint8_t row) const { return col < width && row < height; }
@@ -136,9 +137,19 @@ protected:
 	                std::vector<tile_index> &canvas);
 
 protected:
-	BrushTypes type = BrushTypes::SingleTile;
-	BrushShapes shape = BrushShapes::Rectangular;
-	BrushAllign allign = BrushAllign::UpperLeft;
+	struct {
+		BrushTypes type = BrushTypes::SingleTile;
+		BrushShapes shape = BrushShapes::Rectangular;
+		BrushAllign allign = BrushAllign::UpperLeft;
+		bool resizable = true;
+		struct {
+			uint8_t width = 1;
+			uint8_t height = 1;
+		} resizeSteps;
+		bool randomizeAllowed = true;
+	} properties;
+
+	bool autoRndEnabled = true;
 
 	bool isInit = false;
 
