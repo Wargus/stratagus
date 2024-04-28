@@ -2091,7 +2091,7 @@ void EditorMainLoop()
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
 	editorSlider->setStepLength(1.0 / 50);
-	editorSlider->setWidth(getButtonArea()[2] - getButtonArea()[0]);
+	editorSlider->setWidth(getButtonArea()[2] - getButtonArea()[0] - 1);
 	editorSlider->setHeight(GetSmallFont().getHeight());
 	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
