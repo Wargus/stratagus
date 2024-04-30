@@ -565,14 +565,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 				}
 			}
 
-			int varModified = 0;
+			bool varModified = false;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-				varModified |= um.Modifier.Variables[j].Value
-							   | um.Modifier.Variables[j].Max
-							   | um.Modifier.Variables[j].Increase
-							   | um.Modifier.Variables[j].IncreaseFrequency
+				varModified |= (um.Modifier.Variables[j].Value != 0)
+							   | (um.Modifier.Variables[j].Max != 0)
+							   | (um.Modifier.Variables[j].Increase != 0)
+							   | (um.Modifier.Variables[j].IncreaseFrequency != 0)
 							   | um.Modifier.Variables[j].Enable
-							   | um.ModifyPercent[j];
+							   | (um.ModifyPercent[j] != 0);
 				stat.Variables[j].Enable |= um.Modifier.Variables[j].Enable;
 				if (um.ModifyPercent[j]) {
 					stat.Variables[j].Value += stat.Variables[j].Value * um.ModifyPercent[j] / 100;
@@ -726,13 +726,13 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 				}
 			}
 
-			int varModified = 0;
+			bool varModified = false;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
-				varModified |= um.Modifier.Variables[j].Value
-					| um.Modifier.Variables[j].Max
-					| um.Modifier.Variables[j].Increase
+				varModified |= (um.Modifier.Variables[j].Value != 0)
+					| (um.Modifier.Variables[j].Max != 0)
+					| (um.Modifier.Variables[j].Increase != 0)
 					| um.Modifier.Variables[j].Enable
-					| um.ModifyPercent[j];
+					| (um.ModifyPercent[j] != 0);
 				stat.Variables[j].Enable |= um.Modifier.Variables[j].Enable;
 				if (um.ModifyPercent[j]) {
 					stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um.ModifyPercent[j]);
