@@ -42,8 +42,8 @@
 #include "video.h"
 
 #include <SDL_image.h>
+#include <cmath>
 #include <cstring>
-#include <math.h>
 #include <set>
 
 /*----------------------------------------------------------------------------

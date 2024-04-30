@@ -33,8 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
 #include "unittype.h"
 
 #include "animation.h"
@@ -56,11 +54,10 @@
 #include "util.h"
 #include "video.h"
 
+#include <cctype>
 #include <cmath>
-#include <ctype.h>
-
-#include <string>
 #include <map>
+#include <string>
 
 /*----------------------------------------------------------------------------
 -- Documentation

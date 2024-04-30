@@ -66,8 +66,7 @@
 #include "upgrade.h"
 #include "video.h"
 
-#include <math.h>
-
+#include <cmath>
 
 /*----------------------------------------------------------------------------
 -- Documentation

@@ -52,6 +52,7 @@
 #include "luacallback.h"
 #include "missileconfig.h"
 #include "spells.h"
+#include "stratagus.h"
 #include "util.h"
 #include "vec2i.h"
 

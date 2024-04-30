@@ -32,6 +32,8 @@
 
 //@{
 
+#include <cstddef>
+
 class CUnit;
 
 

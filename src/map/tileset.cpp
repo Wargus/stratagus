@@ -185,7 +185,7 @@
 
 #include "tileset.h"
 
-#include <limits.h>
+#include <climits>
 
 /*----------------------------------------------------------------------------
 -- Variables

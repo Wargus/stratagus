@@ -33,12 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-#include <algorithm>
-
-#include "stratagus.h"
 #include "fow_utils.h"
 
+#include "stratagus.h"
+
+#include <algorithm>
+#include <cstring>
 
 /*----------------------------------------------------------------------------
 --  Defines

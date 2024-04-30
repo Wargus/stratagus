@@ -31,7 +31,8 @@
 
 #include "stratagus.h"
 #include "net_lowlevel.h"
-#include <stdio.h>
+
+#include <cstdio>
 #include <thread>
 
 class AutoNetwork

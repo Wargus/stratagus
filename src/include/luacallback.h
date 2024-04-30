@@ -30,6 +30,7 @@
 #define LUA_CALLBACK_HEADER_FILE
 
 #include <map>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <tuple>

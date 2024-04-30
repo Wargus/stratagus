@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "filesystem.h"
+#include "stratagus.h"
 
 #include <SDL.h>
 #include <memory>

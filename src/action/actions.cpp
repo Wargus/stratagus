@@ -33,11 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <time.h>
-
-#include "stratagus.h"
-#include "version.h"
-
 #include "actions.h"
 
 #include "action/action_attack.h"
@@ -58,7 +53,6 @@
 #include "action/action_train.h"
 #include "action/action_unload.h"
 #include "action/action_upgradeto.h"
-
 #include "animation/animation_die.h"
 #include "commands.h"
 #include "game.h"
@@ -71,18 +65,22 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+#include "stratagus.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"
+#include "version.h"
 
 #ifdef USE_STACKTRACE
-#include <stdexcept>
-#include <stacktrace/call_stack.hpp>
-#include <stacktrace/stack_exception.hpp>
+# include <stacktrace/call_stack.hpp>
+# include <stacktrace/stack_exception.hpp>
+# include <stdexcept>
 #else
-#include "st_backtrace.h"
+# include "st_backtrace.h"
 #endif
+
+#include <ctime>
 
 /*----------------------------------------------------------------------------
 --  Variables

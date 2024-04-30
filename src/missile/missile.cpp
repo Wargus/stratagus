@@ -33,10 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <math.h>
-
-#include "stratagus.h"
-
 #include "missile.h"
 
 #include "action/action_spellcast.h"
@@ -56,6 +52,8 @@
 #include "unitsound.h"
 #include "unittype.h"
 #include "video.h"
+
+#include <cmath>
 
 /*----------------------------------------------------------------------------
 --  Declarations

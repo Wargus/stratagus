@@ -45,10 +45,10 @@
 
 #include <SDL.h>
 
+#include <cstdarg>
+#include <cstdio>
 #include <map>
 #include <unordered_map>
-#include <stdarg.h>
-#include <stdio.h>
 
 #ifdef USE_ZLIB
 #include <zlib.h>

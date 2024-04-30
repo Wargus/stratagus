@@ -38,7 +38,7 @@
 #include "network/netsockets.h"
 #include "net_lowlevel.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 //
 // CHost

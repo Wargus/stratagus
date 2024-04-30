@@ -164,7 +164,7 @@
 #pragma comment(lib, "Imm32.lib")
 #endif
 
-#include <ctype.h>
+#include <cctype>
 
 #ifdef USE_BEOS
 #include <fcntl.h>
@@ -221,8 +221,8 @@ extern void beos_init(int argc, char **argv);
 #include "st_backtrace.h"
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 #ifdef USE_WIN32
 # include <dbghelp.h>

@@ -33,16 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
 #include "animation/animation_setvar.h"
 
 #include "actions.h"
+#include "map.h"
 #include "unit.h"
 #include "unit_manager.h"
-#include "map.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <sstream>
 
 void CAnimation_SetVar::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */

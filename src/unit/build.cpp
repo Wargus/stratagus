@@ -150,9 +150,9 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			(this->RestrictType == unit->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
 			(this->RestrictTypeOwner.empty() ||
-			 (!this->RestrictTypeOwner.compare("self") && player == unit->Player) ||
-			 (!this->RestrictTypeOwner.compare("allied") && (player == unit->Player || player->IsAllied(*unit->Player))) ||
-			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*unit->Player)))) {
+			 (this->RestrictTypeOwner == "self" && player == unit->Player) ||
+			 (this->RestrictTypeOwner == "allied" && (player == unit->Player || player->IsAllied(*unit->Player))) ||
+			 (this->RestrictTypeOwner == "enemy" && player->IsEnemy(*unit->Player)))) {
 
 			switch (this->DistanceType) {
 				case EComparison::GreaterThan:
@@ -202,22 +202,22 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 	Vec2i pos2(0, 0);
 	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 	int count = 0;
-	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
+	if (this->RestrictTypeOwner.empty() || this->RestrictTypeOwner == "self") {
 		count = player->GetUnitTotalCount(*this->RestrictType);
-	} else if (!this->RestrictTypeOwner.compare("allied")) {
+	} else if (this->RestrictTypeOwner == "allied") {
 		count = player->GetUnitTotalCount(*this->RestrictType);
 		for (int i = 0; i < NumPlayers; i++) {
 			if (player->IsAllied(Players[i])) {
 				count += Players[i].GetUnitTotalCount(*this->RestrictType);
 			}
 		}
-	} else if (!this->RestrictTypeOwner.compare("enemy")) {
+	} else if (this->RestrictTypeOwner == "enemy") {
 		for (int i = 0; i < NumPlayers; i++) {
 			if (player->IsEnemy(Players[i])) {
 				count += Players[i].GetUnitTotalCount(*this->RestrictType);
 			}
 		}
-	} else if (!this->RestrictTypeOwner.compare("any")) {
+	} else if (this->RestrictTypeOwner == "any") {
 		for (int i = 0; i < NumPlayers; i++) {
 			count += Players[i].GetUnitTotalCount(*this->RestrictType);
 		}
@@ -277,10 +277,10 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
 			(this->RestrictType == unit->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
-			(this->RestrictTypeOwner.size() == 0 ||
-				(!this->RestrictTypeOwner.compare("self") && builder->Player == unit->Player) ||
-				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == unit->Player || builder->Player->IsAllied(*unit->Player))) ||
-				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*unit->Player)))) {
+			(this->RestrictTypeOwner.empty() ||
+				(this->RestrictTypeOwner == "self" && builder->Player == unit->Player) ||
+				(this->RestrictTypeOwner == "allied" && (builder->Player == unit->Player || builder->Player->IsAllied(*unit->Player))) ||
+				(this->RestrictTypeOwner == "enemy" && builder->Player->IsEnemy(*unit->Player)))) {
 
 			switch (this->DistanceType) {
 				case EComparison::GreaterThan:

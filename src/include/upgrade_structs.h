@@ -37,6 +37,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include "settings.h"
+
+#include <cstring>
 #include <memory>
 #include <vector>
 

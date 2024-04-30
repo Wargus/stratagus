@@ -33,10 +33,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <limits.h>
-
-#include "stratagus.h"
-
 #include "unit_find.h"
 
 #include "actions.h"
@@ -49,6 +45,8 @@
 #include "unit.h"
 #include "unit_manager.h"
 #include "unittype.h"
+
+#include <climits>
 
 /*----------------------------------------------------------------------------
   -- Finding units

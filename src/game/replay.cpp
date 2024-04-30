@@ -32,8 +32,6 @@
 // Includes
 //----------------------------------------------------------------------------
 
-#include "stratagus.h"
-
 #include "replay.h"
 
 #include "actions.h"
@@ -56,8 +54,8 @@
 #include "unittype.h"
 #include "version.h"
 
+#include <ctime>
 #include <sstream>
-#include <time.h>
 
 extern fs::path ExpandPath(const std::string &path);
 extern void StartMap(const std::string &filename, bool clean);
