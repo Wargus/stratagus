@@ -412,10 +412,9 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 
 void AiForce::Attack(const Vec2i &pos)
 {
-	bool isDefenceForce = false;
 	RemoveDeadUnit();
 
-	if (Units.size() == 0) {
+	if (Units.empty()) {
 		this->Attacking = false;
 		this->State = AiForceAttackingState::Waiting;
 		return;
@@ -424,7 +423,7 @@ void AiForce::Attack(const Vec2i &pos)
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRole::Defend
 			|| (this->Role == AiForceRole::Attack && this->State == AiForceAttackingState::Waiting)) {
-			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
+			this->HomePos = this->Units.back()->tilePos;
 		}
 		this->Attacking = true;
 	}
@@ -436,6 +435,7 @@ void AiForce::Attack(const Vec2i &pos)
 	const bool isTransporter = ranges::any_of(this->Units, [](const CUnit *unit) {
 		return unit->Type->CanTransport() && unit->IsAgressive() == false;
 	});
+	bool isDefenceForce = false;
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
 		const CUnit *enemy = nullptr;

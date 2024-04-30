@@ -202,7 +202,7 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 	Vec2i pos2(0, 0);
 	CPlayer* player = builder != nullptr ? builder->Player : ThisPlayer;
 	int count = 0;
-	if (this->RestrictTypeOwner.size() == 0 || !this->RestrictTypeOwner.compare("self")) {
+	if (this->RestrictTypeOwner.empty() || !this->RestrictTypeOwner.compare("self")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
 	} else if (!this->RestrictTypeOwner.compare("allied")) {
 		count = player->GetUnitTotalCount(*this->RestrictType);
@@ -277,7 +277,7 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 			// unit has RestrictType or no RestrictType was set, but a RestrictTypeOwner
 			(this->RestrictType == unit->Type || (!this->RestrictType && this->RestrictTypeOwner.size() > 0)) &&
 			// RestrictTypeOwner is not set or unit belongs to a suitable player
-			(this->RestrictTypeOwner.size() == 0 ||
+			(this->RestrictTypeOwner.empty() ||
 				(!this->RestrictTypeOwner.compare("self") && builder->Player == unit->Player) ||
 				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == unit->Player || builder->Player->IsAllied(*unit->Player))) ||
 				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*unit->Player)))) {
