@@ -399,7 +399,7 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckDebug(const CUnit &, const ButtonAction &button)
 {
-	if(!button.AllowStr.compare("single-player-walls")) { /// Check if enabled walls for singleplayer games
+	if (button.AllowStr == "single-player-walls") { /// Check if enabled walls for singleplayer games
 		return !IsNetworkGame() && EnableWallsInSinglePlayer;
 	}
 	return false;

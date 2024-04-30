@@ -1981,7 +1981,7 @@ class C2S_SID_AUTH_INFO : public OnlineState
 		// Connect
 
 		std::string localHost = CNetworkParameter::Instance.localHost;
-		if (!localHost.compare("127.0.0.1")) {
+		if (localHost == "127.0.0.1") {
 			localHost = "0.0.0.0";
 		}
 		if (!ctx.getTCPSocket().IsValid()) {
@@ -2022,7 +2022,7 @@ class C2S_SID_AUTH_INFO : public OnlineState
 		// (UINT32) Language code
 		buffer.serialize32(0x00);
 		// (UINT32) Local IP
-		if (CNetworkParameter::Instance.localHost.compare("127.0.0.1")) {
+		if (CNetworkParameter::Instance.localHost != "127.0.0.1") {
 			// user set a custom local ip, use that
 #ifdef USE_WIN32
 			uint32_t addr = inet_addr(CNetworkParameter::Instance.localHost.c_str());

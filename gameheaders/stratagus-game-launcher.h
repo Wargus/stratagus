@@ -384,9 +384,9 @@ static void ExtractData(char *extractor_tool,
 				}
 			} else {
 				// we cannot test if this is an innoextract installer, assume not but maybe warn
-				if (datafile.compare("INSTALL.EXE") == 0 || datafile.compare("install.exe") == 0
-				    || datafile.compare("INSTALL.exe") == 0 || datafile.compare("SETUP.EXE") == 0
-				    || datafile.compare("setup.exe") == 0 || datafile.compare("SETUP.exe") == 0) {
+				if (datafile == "INSTALL.EXE" || datafile == "install.exe"
+				    || datafile == "INSTALL.exe" || datafile == "SETUP.EXE"
+				    || datafile == "setup.exe" || datafile == "SETUP.exe") {
 					// probably not a packaged installer
 				} else {
 					// warn
