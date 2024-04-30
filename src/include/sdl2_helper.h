@@ -29,6 +29,7 @@
 
 #include <SDL.h>
 #include <memory>
+#include <vector>
 
 //@{
 

@@ -49,7 +49,7 @@
 #include "spells.h"
 #include "unittype.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 /*----------------------------------------------------------------------------
 --  Functions

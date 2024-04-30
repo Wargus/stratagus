@@ -29,10 +29,10 @@
 
 //@{
 
-#include <math.h>
-
-#include "stratagus.h"
 #include "particle.h"
+#include "stratagus.h"
+
+#include <cmath>
 
 CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
 	CParticle(position, drawlevel)

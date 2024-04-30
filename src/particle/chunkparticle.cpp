@@ -29,12 +29,11 @@
 
 //@{
 
-#include <math.h>
-
-#include "stratagus.h"
 #include "particle.h"
+#include "stratagus.h"
 #include "video.h"
 
+#include <cmath>
 
 static const int gravity = 32 * 12;
 

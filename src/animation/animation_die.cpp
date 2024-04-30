@@ -33,13 +33,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
 #include "animation/animation_die.h"
 
+#include "stratagus.h"
 #include "unit.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 void CAnimation_Die::Action(CUnit &unit, int & /*move*/, int /*scale*/) const /* override */
 {

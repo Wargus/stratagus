@@ -16,17 +16,22 @@
 
 */
 
+#include "SetupConsole_win32.h"
+
 #include <windows.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 #include <io.h>
-#include <errno.h>
 #include <fcntl.h>
 
 #ifdef __cplusplus
-#include <iostream>
+# include <cerrno>
+# include <cstdio>
+# include <iostream>
+#else
+# include <errno.h>
+# include <stdio.h>
 #endif
-
-#include "SetupConsole_win32.h"
 
 /*
  * Microsoft systems were and always are one big mess where even standard output does not work :-(

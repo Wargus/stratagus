@@ -56,7 +56,7 @@
 #include "upgrade.h"
 #include "video.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <guichan/key.hpp>
 #include <guichan/sdl/sdlinput.hpp>
 #include <vector>

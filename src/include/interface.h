@@ -39,8 +39,10 @@
 #include "icons.h"
 #endif
 
+#include "stratagus.h"
 #include "unitsound.h"
 #include "vec2i.h"
+
 #include <optional>
 #include <vector>
 

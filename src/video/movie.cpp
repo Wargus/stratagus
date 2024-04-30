@@ -509,11 +509,11 @@ SDL_Surface *Movie::getSurface() const /* override */
 
 #else
 
-#include <string>
-#include <string.h>
-#include <stdio.h>
-
 #include "stratagus.h"
+
+#include <string>
+#include <cstring>
+#include <cstdio>
 
 /**
 **  Play a video file.

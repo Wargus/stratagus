@@ -60,7 +60,7 @@
 # include "viewport.h"
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 
 /*----------------------------------------------------------------------------
 --  Declarations

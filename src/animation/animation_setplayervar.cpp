@@ -33,15 +33,14 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
-
 #include "animation/animation_setplayervar.h"
 
 #include "animation.h"
+#include "stratagus.h"
 #include "unit.h"
 
+#include <cstdio>
 #include <sstream>
-#include <stdio.h>
 
 /**
 **  Gets the player data.

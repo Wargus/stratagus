@@ -49,7 +49,7 @@
 #include "unit.h"
 #include "video.h"
 
-#include <stdarg.h>
+#include <cstdarg>
 
 /*----------------------------------------------------------------------------
 -- Variables

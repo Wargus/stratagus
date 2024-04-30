@@ -34,7 +34,7 @@
 #include "filesystem.h"
 #include "parameters.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef USE_WIN32
 #include <Shlobj.h>

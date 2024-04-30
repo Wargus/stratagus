@@ -27,24 +27,18 @@
 //      02111-1307, USA.
 //
 
-#if __has_include(<charconv>)
-#include <charconv> // from_chars
-#endif
-
-#include <cstdint>
-#include <random>
+#include "util.h"
 
 #include "stratagus.h"
 
-#include "util.h"
-
 #include <SDL.h>
-
-#include <ctype.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cctype>
+#include <cerrno>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <random>
 #ifndef __APPLE__
 #include <malloc.h>
 #endif
@@ -59,6 +53,10 @@
 #include <stacktrace/stack_exception.hpp>
 #else
 #include "st_backtrace.h"
+#endif
+
+#if __has_include(<charconv>)
+#include <charconv> // from_chars
 #endif
 
 /*----------------------------------------------------------------------------
@@ -342,7 +340,7 @@ int to_number(std::string_view s, int base)
 **  an 'argument required' error.
 */
 
-#include <string.h>
+#include <cstring>
 
 int opterr = 1;
 int optind = 1;

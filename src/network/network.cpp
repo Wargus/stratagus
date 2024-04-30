@@ -222,9 +222,6 @@
 #include "online_service.h"
 #include "stratagus.h"
 
-#include <stddef.h>
-#include <list>
-
 #include "network.h"
 
 #include "actions.h"
@@ -244,7 +241,9 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <cstddef>
 #include <deque>
+#include <list>
 
 //----------------------------------------------------------------------------
 //  Declaration

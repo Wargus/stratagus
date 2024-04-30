@@ -34,18 +34,17 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <string.h>
-#include <algorithm>
-
-#include "stratagus.h"
-
 #include "fow.h"
+
+#include "../video/intern_video.h"
 #include "map.h"
 #include "player.h"
+#include "stratagus.h"
 #include "tile.h"
 #include "ui.h"
 #include "viewport.h"
-#include "../video/intern_video.h"
+
+#include <algorithm>
 
 /*----------------------------------------------------------------------------
 --  Defines

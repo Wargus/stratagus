@@ -36,12 +36,6 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <ctype.h>
-#include <stdexcept>
-
-#include "stratagus.h"
-#include "ui.h"
-
 #include "action/action_build.h"
 #include "action/action_train.h"
 #include "actions.h"
@@ -57,7 +51,10 @@
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
+#include "stratagus.h"
+#include "tileset.h"
 #include "translate.h"
+#include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
 #include "unitsound.h"
@@ -65,9 +62,9 @@
 #include "video.h"
 #include "widgets.h"
 
-#include "tileset.h"
-
+#include <cctype>
 #include <guichan/actionevent.hpp>
+#include <stdexcept>
 
 /*----------------------------------------------------------------------------
 --  Variables

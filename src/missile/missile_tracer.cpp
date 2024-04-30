@@ -33,16 +33,13 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include <stdio.h>
-
-#include "stratagus.h"
-
-#include "missile.h"
-
 #include "luacallback.h"
 #include "map.h"
+#include "missile.h"
 #include "unit.h"
 #include "unit_find.h"
+
+#include <cstdio>
 
 /**
 **  Handle tracer missile.
