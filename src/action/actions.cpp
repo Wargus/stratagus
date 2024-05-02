@@ -212,7 +212,7 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 **  Parse order
 **
 **  @param l      Lua state.
-**  @param order  OUT: resulting order.
+**  @return resulting order.
 */
 std::unique_ptr<COrder> CclParseOrder(lua_State *l, CUnit &unit)
 {

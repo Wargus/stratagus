@@ -272,10 +272,9 @@ static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Ve
 
 	CUnit &candidate = (table.size() == 1) ? *table[0] : *table[SyncRand() % table.size()];
 
-	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(candidate, building, nearPos, &pos)) {
-		CommandBuildBuilding(candidate, pos, building, FlushCommands);
+	if (auto pos = AiFindBuildingPlace(candidate, building, nearPos)) {
+		CommandBuildBuilding(candidate, *pos, building, FlushCommands);
 		return true;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
@@ -286,8 +285,8 @@ static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Ve
 					continue;
 				}
 				// Find a place to build.
-				if (AiFindBuildingPlace(*unit, building, nearPos, &pos)) {
-					CommandBuildBuilding(*unit, pos, building, FlushCommands);
+				if (auto pos = AiFindBuildingPlace(*unit, building, nearPos)) {
+					CommandBuildBuilding(*unit, *pos, building, FlushCommands);
 					return true;
 				}
 			}
@@ -901,11 +900,9 @@ static void AiCheckingWork()
 static bool AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 {
 	// TODO : hardcoded forest
-	Vec2i forestPos;
-
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-		CommandResourceLoc(unit, forestPos, FlushCommands);
+	if (auto forestPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos)) {
+		CommandResourceLoc(unit, *forestPos, FlushCommands);
 		return true;
 	}
 	// Ask the AI to explore...

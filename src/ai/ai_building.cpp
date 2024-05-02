@@ -143,18 +143,74 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 class BuildingPlaceFinder
 {
 public:
-	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
+	friend TerrainTraversal;
+	/**
+	**  Find free building place. (flood fill version)
+	**
+	**  @param worker   Worker to build building.
+	**  @param type     Type of building.
+	**  @param startPos Original position to try building
+	**  @param checkSurround Check if the perimeter of the building is free
+	**
+	**  @return place found, std::nullopt if no found.
+	*/
+	static std::optional<Vec2i>
+	find(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, bool checkSurround)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		Assert(Map.Info.IsPointOnMap(startPos));
+		terrainTraversal.PushPos(startPos);
+
+		BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround);
+
+		return terrainTraversal.Run(buildingPlaceFinder)
+		         ? std::make_optional(buildingPlaceFinder.resultPos)
+		         : std::nullopt;
+	}
+
+	/**
+	**  Find free building place. (flood fill version)
+	**
+	**  @param worker   Worker to build building.
+	**  @param type     Type of building.
+	**  @param startUnit Original position to try building
+	**  @param checkSurround Check if the perimeter of the building is free
+	**
+	**  @return place found, std::nullopt if no found.
+	*/
+	static std::optional<Vec2i> find(const CUnit &worker,
+	                                 const CUnitType &type,
+	                                 const CUnit &startUnit,
+	                                 bool checkSurround)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+		terrainTraversal.PushUnitPosAndNeighboor(startUnit);
+
+		BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround);
+
+		return terrainTraversal.Run(buildingPlaceFinder)
+		         ? std::make_optional(buildingPlaceFinder.resultPos)
+		         : std::nullopt;
+	}
+
+
+private:
+	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround) :
 		worker(worker), type(type),
 		movemask(
 			worker.Type->MovementMask
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value
 	                 ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)
 	                 : (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
-		checkSurround(checkSurround),
-		resultPos(resultPos)
+		checkSurround(checkSurround)
 	{
-		resultPos->x = -1;
-		resultPos->y = -1;
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -162,7 +218,7 @@ private:
 	const CUnitType &type;
 	unsigned int movemask;
 	bool checkSurround;
-	Vec2i *resultPos;
+	Vec2i resultPos{-1, -1};
 };
 
 VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -176,10 +232,10 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		&& !AiEnemyUnitsInDistance(*worker.Player, nullptr, pos, 8)) {
 		bool backupok;
 		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
-			*resultPos = pos;
+			resultPos = pos;
 			return VisitResult::Finished;
-		} else if (backupok && resultPos->x == -1) {
-			*resultPos = pos;
+		} else if (backupok && resultPos.x == -1) {
+			resultPos = pos;
 		}
 	}
 	if (CanMoveToMask(pos, movemask)
@@ -190,41 +246,53 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 }
 
-/**
-**  Find free building place. (flood fill version)
-**
-**  @param worker   Worker to build building.
-**  @param type     Type of building.
-**  @param startPos Original position to try building
-**  @param checkSurround Check if the perimeter of the building is free
-**  @param resultPos     OUT: Pointer for position returned.
-**
-**  @return  True if place found, false if no found.
-*/
-static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	if (startUnit != nullptr) {
-		terrainTraversal.PushUnitPosAndNeighboor(*startUnit);
-	} else {
-		Assert(Map.Info.IsPointOnMap(startPos));
-		terrainTraversal.PushPos(startPos);
-	}
-
-	BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround, resultPos);
-
-	terrainTraversal.Run(buildingPlaceFinder);
-	return Map.Info.IsPointOnMap(*resultPos);
-}
-
 class HallPlaceFinder
 {
 public:
-	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
+	friend TerrainTraversal;
+
+	/**
+	**  Find building place for hall. (flood fill version)
+	**
+	**  The best place:
+	**  1) near to resource.
+	**  !2) near to wood.
+	**  !3) near to worker and must be reachable.
+	**  4) no enemy near it.
+	**  5) no hall already near
+	**  !6) enough gold in mine
+	**
+	**  @param worker    Worker to build building.
+	**  @param type      Type of building.
+	**  @param startPos  Start search position (if == -1 then unit X pos used).
+	**  @param resource  resource to be near.
+	**
+	**  @return        place found, std::nullopt if not found.
+	**
+	**  @todo          FIXME: This is slow really slow, using
+	**                 two flood fills, is not a perfect solution.
+	*/
+	static std::optional<Vec2i>
+	find(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		Assert(Map.Info.IsPointOnMap(startPos));
+		terrainTraversal.PushPos(startPos);
+
+		HallPlaceFinder hallPlaceFinder(worker, type, resource);
+
+		if (terrainTraversal.Run(hallPlaceFinder)) {
+			return hallPlaceFinder.resultPos;
+		}
+		return BuildingPlaceFinder::find(worker, type, startPos, true);
+	}
+
+private:
+	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource) :
 		worker(worker),
 		type(type),
 		movemask(
@@ -232,8 +300,7 @@ public:
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value
 	                 ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)
 	                 : (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
-		resource(resource),
-		resultPos(resultPos)
+		resource(resource)
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -243,7 +310,7 @@ private:
 	const CUnitType &type;
 	const unsigned int movemask;
 	const int resource;
-	Vec2i *resultPos;
+	Vec2i resultPos{-1, -1};
 };
 
 bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
@@ -288,7 +355,8 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 #endif
 	CUnit *mine = ResourceOnMap(pos, resource);
 	if (mine && IsAUsableMine(*mine)) {
-		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos)) {
+		if (auto place = BuildingPlaceFinder::find(worker, type, *mine, true)) {
+			resultPos = *place;
 			return VisitResult::Finished;
 		}
 	}
@@ -299,63 +367,49 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 }
 
-/**
-**  Find building place for hall. (flood fill version)
-**
-**  The best place:
-**  1) near to resource.
-**  !2) near to wood.
-**  !3) near to worker and must be reachable.
-**  4) no enemy near it.
-**  5) no hall already near
-**  !6) enough gold in mine
-**
-**  @param worker    Worker to build building.
-**  @param type      Type of building.
-**  @param startPos  Start search position (if == -1 then unit X pos used).
-**  @param resource  resource to be near.
-**  @param resultPos OUT: Pointer for position returned.
-**
-**  @return        True if place found, false if not found.
-**
-**  @todo          FIXME: This is slow really slow, using
-**                 two flood fills, is not a perfect solution.
-*/
-static bool AiFindHallPlace(const CUnit &worker,
-							const CUnitType &type,
-							const Vec2i &startPos,
-							int resource,
-							Vec2i *resultPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	Assert(Map.Info.IsPointOnMap(startPos));
-	terrainTraversal.PushPos(startPos);
-
-	HallPlaceFinder hallPlaceFinder(worker, type, resource, resultPos);
-
-	if (terrainTraversal.Run(hallPlaceFinder)) {
-		return true;
-	}
-	return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
-}
-
 class LumberMillPlaceFinder
 {
 public:
+	friend TerrainTraversal;
+	/**
+	**  Find free building place for lumber mill. (flood fill version)
+	**
+	**  @param worker    Worker to build building.
+	**  @param type      Type of building.
+	**  @param resource  resource terrain to be near.
+	**  @param startPos  Start search X position (if == -1 then unit X pos used).
+	**
+	**  @return        place found, std::nullopt if not found.
+	**
+	**  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
+	*/
+	static std::optional<Vec2i>
+	find(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		Assert(Map.Info.IsPointOnMap(startPos));
+		terrainTraversal.PushPos(startPos);
+
+		LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource);
+
+		return terrainTraversal.Run(lumberMillPlaceFinder)
+		         ? std::make_optional(lumberMillPlaceFinder.resultPos)
+		         : std::nullopt;
+	}
+
+private:
 	LumberMillPlaceFinder(const CUnit &worker,
 	                      const CUnitType &type,
-	                      int resource,
-	                      Vec2i *resultPos) :
+	                      int resource) :
 		worker(worker),
 		type(type),
 		movemask(worker.Type->MovementMask
 	             & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		resource(resource),
-		resultPos(resultPos)
+		resource(resource)
 	{}
 
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -364,7 +418,7 @@ private:
 	const CUnitType &type;
 	unsigned int movemask;
 	int resource;
-	Vec2i *resultPos;
+	Vec2i resultPos{-1, -1};
 };
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -375,7 +429,8 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
-		if (AiFindBuildingPlace2(worker, type, from, nullptr, true, resultPos)) {
+		if (auto place = BuildingPlaceFinder::find(worker, type, from, true)) {
+			resultPos = *place;
 			return VisitResult::Finished;
 		}
 	}
@@ -386,42 +441,11 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 }
 
-/**
-**  Find free building place for lumber mill. (flood fill version)
-**
-**  @param worker    Worker to build building.
-**  @param type      Type of building.
-**  @param resource  resource terrain to be near.
-**  @param startPos  Start search X position (if == -1 then unit X pos used).
-**  @param resultPos OUT: Pointer for position returned.
-**
-**  @return        True if place found, false if not found.
-**
-**  @todo          FIXME: This is slow really slow, using two flood fills, is not a perfect solution.
-*/
-static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource, Vec2i *resultPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	Assert(Map.Info.IsPointOnMap(startPos));
-	terrainTraversal.PushPos(startPos);
-
-	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos);
-
-	return terrainTraversal.Run(lumberMillPlaceFinder);
-}
-
-static bool AiFindMiningPlace(const CUnit &worker,
-							  const CUnitType &type,
-							  const Vec2i &startPos,
-							  int resource,
-							  Vec2i *resultPos)
+static std::optional<Vec2i>
+AiFindMiningPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource)
 {
 	// look near (mine = ResourceOnMap(pos, resource, false) ?
-	return AiFindBuildingPlace2(worker, type, startPos, nullptr, false, resultPos);
+	return BuildingPlaceFinder::find(worker, type, startPos, false);
 }
 
 /**
@@ -430,14 +454,13 @@ static bool AiFindMiningPlace(const CUnit &worker,
 **  @param worker     Worker to build building.
 **  @param type       Type of building.
 **  @param nearPos    Start search near nearPos position (or worker->X if nearPos is invalid).
-**  @param resultPos  Pointer for position returned.
 **
-**  @return        True if place found, false if no found.
+**  @return        place found, std::nullopt if no found.
 **
 **  @todo          Better and faster way to find building place of oil
 **                 platforms Special routines for special buildings.
 */
-bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos)
+std::optional<Vec2i> AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos)
 {
 	// Find a good place for a new hall
 	DebugPrint("%d: Want to build a %s(%s)\n",
@@ -453,24 +476,24 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 		//Depots
 		if (type.CanStore[i]) {
 			if (resinfo && resinfo->TerrainHarvester) {
-				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
+				return LumberMillPlaceFinder::find(worker, type, startPos, i);
 			} else {
-				return AiFindHallPlace(worker, type, startPos, i, resultPos);
+				return HallPlaceFinder::find(worker, type, startPos, i);
 			}
 		} else {
 			//mines
 			if (type.GivesResource == i) {
 				if (resinfo && resinfo->RefineryHarvester) {
 					//Mine have to be build ONTOP resources
-					return AiFindMiningPlace(worker, type, startPos, i, resultPos);
+					return AiFindMiningPlace(worker, type, startPos, i);
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
-					return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
+					return BuildingPlaceFinder::find(worker, type, startPos, true);
 				}
 			}
 		}
 	}
-	return AiFindBuildingPlace2(worker, type, startPos, nullptr, true, resultPos);
+	return BuildingPlaceFinder::find(worker, type, startPos, true);
 }
 
 //@}

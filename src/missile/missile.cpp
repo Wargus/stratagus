@@ -393,19 +393,18 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 **  Get area of tiles covered by missile
 **
 **  @param missile  Missile to be checked and set.
-**  @param boxMin       OUT: Pointer to top left corner in map tiles.
-**  @param boxMax       OUT: Pointer to bottom right corner in map tiles.
 **
-**  @return         sx,sy,ex,ey defining area in Map
+**  @return         tiles area in Map
 */
-static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxMax)
+static std::pair<Vec2i, Vec2i> GetMissileMapArea(const Missile &missile)
 {
 	PixelSize missileSize(missile.Type->Width(), missile.Type->Height());
 	PixelDiff margin(PixelTileSize.x - 1, PixelTileSize.y - 1);
-	boxMin = Map.MapPixelPosToTilePos(missile.position);
-	boxMax = Map.MapPixelPosToTilePos(missile.position + missileSize + margin);
+	Vec2i boxMin = Map.MapPixelPosToTilePos(missile.position);
+	Vec2i boxMax = Map.MapPixelPosToTilePos(missile.position + missileSize + margin);
 	Map.Clamp(boxMin);
 	Map.Clamp(boxMax);
+	return {boxMin, boxMax};
 }
 
 /**
@@ -418,10 +417,7 @@ static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxM
 */
 static bool MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 {
-	Vec2i boxmin;
-	Vec2i boxmax;
-
-	GetMissileMapArea(missile, boxmin, boxmax);
+	const auto [boxmin, boxmax] = GetMissileMapArea(missile);
 	if (!vp.AnyMapAreaVisibleInViewport(boxmin, boxmax)) {
 		return false;
 	}
