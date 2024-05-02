@@ -900,11 +900,9 @@ static void AiCheckingWork()
 static bool AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 {
 	// TODO : hardcoded forest
-	Vec2i forestPos;
-
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-		CommandResourceLoc(unit, forestPos, FlushCommands);
+	if (auto forestPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos)) {
+		CommandResourceLoc(unit, *forestPos, FlushCommands);
 		return true;
 	}
 	// Ask the AI to explore...

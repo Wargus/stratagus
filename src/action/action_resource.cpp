@@ -389,16 +389,15 @@ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
 */
 int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 {
-	Vec2i pos = this->goalPos;
-
 	// Wood gone, look somewhere else.
-	if ((Map.Info.IsPointOnMap(pos) == false || Map.Field(pos)->IsTerrainResourceOnMap(CurrentResource) == false)
+	if ((Map.Info.IsPointOnMap(this->goalPos) == false
+	     || Map.Field(this->goalPos)->IsTerrainResourceOnMap(CurrentResource) == false)
 		&& (!unit.IX) && (!unit.IY)) {
-		if (!FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos, &pos)) {
+		if (auto pos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 16, *unit.Player, this->goalPos)) {
+			this->goalPos = *pos;
+		} else {
 			// no wood in range
 			return -1;
-		} else {
-			this->goalPos = pos;
 		}
 	}
 	switch (DoActionMove(unit)) {
@@ -411,12 +410,14 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 					AiCanNotMove(unit);
 				}
 			}
-			if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos, &pos)) {
-				this->goalPos = pos;
-				DebugPrint("Found a better place to harvest %d,%d\n", pos.x, pos.y);
-				// FIXME: can't this overflow? It really shouldn't, since
-				// x and y are really supossed to be reachable, checked thorugh a flood fill.
-				// I don't know, sometimes stuff happens.
+			if (auto pos = FindTerrainType(
+					unit.Type->MovementMask, MapFieldForest, 9999, *unit.Player, unit.tilePos)) {
+				this->goalPos = *pos;
+				DebugPrint("Found a better place to harvest %d,%d\n", pos->x, pos->y);
+				// FIXME: can't this overflow? It really shouldn't,
+				// since x and y are really supposed to be reachable,
+				// checked through a flood fill.
+				// I don't know, sometime stuff happens.
 				return 0;
 			}
 			return -1;
@@ -1091,13 +1092,11 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 	// Range hardcoded. don't stray too far though
 	if (resinfo.TerrainHarvester) {
-		Vec2i pos = this->Resource.Pos;
-
-		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
+		if (auto pos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, this->Resource.Pos)) {
 			if (depot) {
-				DropOutNearest(unit, pos, depot);
+				DropOutNearest(unit, *pos, depot);
 			}
-			this->goalPos = pos;
+			this->goalPos = *pos;
 		} else {
 			if (depot) {
 				DropOutOnSide(unit, LookingW, depot);
@@ -1140,8 +1139,6 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource,
 										unit.Player->AiEnabled, (newdepot ? newdepot : depot));
 			}
-
-
 		}
 
 		if (goal) {
@@ -1247,11 +1244,10 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 					return true;
 				}
 			} else {
-				Vec2i resPos;
-				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos, &resPos)) {
-					this->goalPos = resPos;
+				if (auto resPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos)) {
+					this->goalPos = *resPos;
 					this->State = SUB_MOVE_TO_RESOURCE;
-					DebugPrint("Found a better place to harvest %d,%d\n", resPos.x, resPos.y);
+					DebugPrint("Found a better place to harvest %d,%d\n", resPos->x, resPos->y);
 					return true;
 				}
 			}

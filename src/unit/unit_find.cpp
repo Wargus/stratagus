@@ -101,16 +101,20 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 
 class TerrainFinder
 {
+	friend std::optional<Vec2i>
+	FindTerrainType(int movemask, int resmask, int range, const CPlayer &, const Vec2i &startPos);
+
 public:
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
+
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
 	int movemask;
 	int resmask;
-	Vec2i *resPos;
+	Vec2i resPos;
 };
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -120,9 +124,7 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 	}
 	// Look if found what was required.
 	if (Map.Field(pos)->CheckMask(resmask)) {
-		if (resPos) {
-			*resPos = pos;
-		}
+		resPos = pos;
 		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
@@ -145,16 +147,14 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **  @param player      Only search fields explored by player
 **  @param startPos    Map start position for the search.
 **
-**  @param terrainPos  OUT: Map position of tile.
-**
 **  @note Movement mask can be 0xFFFFFFFF to have no effect
 **  Range is not circular, but square.
 **  Player is ignored if nil(search the entire map)
 **
-**  @return            True if wood was found.
+**  @return            wood position if found, else std::nullopt.
 */
-bool FindTerrainType(int movemask, int resmask, int range,
-					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+std::optional<Vec2i>
+FindTerrainType(int movemask, int resmask, int range, const CPlayer &player, const Vec2i &startPos)
 {
 	TerrainTraversal terrainTraversal;
 
@@ -163,11 +163,10 @@ bool FindTerrainType(int movemask, int resmask, int range,
 
 	terrainTraversal.PushPos(startPos);
 
-	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
+	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask);
 
-	return terrainTraversal.Run(terrainFinder);
+	return terrainTraversal.Run(terrainFinder) ? std::make_optional(terrainFinder.resPos) : std::nullopt;
 }
-
 
 template <const bool NEARLOCATION>
 class BestDepotFinder
