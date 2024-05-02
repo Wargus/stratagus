@@ -345,10 +345,12 @@ namespace ranges
 		}
 	}
 
-	template <typename Range, typename Comparer = std::less<>>
-	void sort(Range &range, Comparer &&comparer = {})
+	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>
+	void sort(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
 	{
-		std::sort(std::begin(range), std::end(range), std::forward<Comparer>(comparer));
+		std::sort(std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
+			return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
+		});
 	}
 
 	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>

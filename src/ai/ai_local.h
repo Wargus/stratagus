@@ -162,7 +162,7 @@ public:
 	bool PlanAttack();
 
 	void ReturnToHome();
-	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
+	std::optional<Vec2i> NewRallyPoint(const Vec2i &startPos);
 	void Insert(CUnit &unit);
 
 private:
@@ -419,7 +419,7 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 // Buildings
 //
 /// Find nice building place
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
+extern std::optional<Vec2i> AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos);
 
 //
 // Forces

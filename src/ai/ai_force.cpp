@@ -60,15 +60,26 @@
 class EnemyUnitFinder
 {
 public:
-	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type) :
-		//Wyrmgus end
+	friend TerrainTraversal;
+
+	static CUnit *find(const CUnit& unit, int find_type) {
+		// Terrain traversal by Andrettin
+		TerrainTraversal terrainTraversal;
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+		terrainTraversal.PushUnitPosAndNeighboor(unit);
+		EnemyUnitFinder enemyUnitFinder(unit, find_type);
+		terrainTraversal.Run(enemyUnitFinder);
+		return enemyUnitFinder.result_unit;
+	}
+
+private:
+	EnemyUnitFinder(const CUnit &unit, int find_type) :
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		attackrange(unit.Stats->Variables[ATTACKRANGE_INDEX].Max),
-		find_type(find_type),
-		result_unit(result_unit)
+		find_type(find_type)
 	{
-		*result_unit = nullptr;
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -76,7 +87,7 @@ private:
 	unsigned int movemask;
 	const int attackrange;
 	const int find_type;
-	CUnit **result_unit;
+	CUnit *result_unit = nullptr;
 };
 
 VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -102,10 +113,10 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		}
 
 		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
-			*result_unit = dest;
+			result_unit = dest;
 			return VisitResult::Finished;
-		} else if (*result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
-			*result_unit = dest;
+		} else if (result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
+			result_unit = dest;
 		}
 	}
 	return VisitResult::Ok;
@@ -115,21 +126,16 @@ template <int FIND_TYPE>
 class AiForceEnemyFinder
 {
 public:
-	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
-	{
-		Assert(enemy != nullptr);
-		*enemy = nullptr;
-		for (const CUnit *unit : AiPlayer->Force[force].Units) {
-			if (!(*this)(unit)) {
-				break;
-			}
-		}
+	static const CUnit* find(AiForce& force) {
+		return AiForceEnemyFinder(force).enemy;
 	}
 
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
+	static const CUnit *find(int force) { return find(AiPlayer->Force[force]); }
+
+private:
+
+	AiForceEnemyFinder(AiForce &force)
 	{
-		Assert(enemy != nullptr);
-		*enemy = nullptr;
 		for (const CUnit* unit : force.Units) {
 			if (!(*this)(unit)) {
 				break;
@@ -137,48 +143,20 @@ public:
 		}
 	}
 
-	bool found() const { return *enemy != nullptr; }
-
-	bool operator()(const CUnit *const unit) const
+	bool operator()(const CUnit *const unit)
 	{
 		if (unit->Type->CanAttack == false) {
-			return *enemy == nullptr;
+			return enemy == nullptr;
 		}
 		if constexpr (FIND_TYPE == AIATTACK_RANGE) {
-			*enemy = AttackUnitsInReactRange(*unit);
+			enemy = AttackUnitsInReactRange(*unit);
 		} else {
-			// Terrain traversal by Andrettin
-			TerrainTraversal terrainTraversal;
-			terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-			terrainTraversal.Init();
-			terrainTraversal.PushUnitPosAndNeighboor(*unit);
-			CUnit *result_unit = nullptr;
-			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE);
-			terrainTraversal.Run(enemyUnitFinder);
-			*enemy = result_unit;
+			enemy = EnemyUnitFinder::find(*unit, FIND_TYPE);
 		}
-		// Previous attack finding code before we added TerrainTraversal for all
-		// of these. Here for prosperity
-
-		// } else if (FIND_TYPE == AIATTACK_ALLMAP) {
-		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-		// } else if (FIND_TYPE == AIATTACK_BUILDING) {
-		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-		// 	Assert(!*enemy);
-		// 	if (*enemy == nullptr || !(*enemy)->Type->Building) {
-		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-		// 	}
-		// } else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
-		// 	*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-		// 	Assert(!*enemy || (*enemy)->IsAgressive());
-		// 	if (*enemy == nullptr) {
-		// 		*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
-		// 	}
-		// }
-		return *enemy == nullptr;
+		return enemy == nullptr;
 	}
 private:
-	const CUnit **enemy;
+	const CUnit *enemy = nullptr;
 };
 
 class IsAnAlliedUnitOf
@@ -258,15 +236,6 @@ std::vector<int> AiFindUnitTypeEquiv(const CUnitType &unittype)
 	return result;
 }
 
-class UnitTypePrioritySorter_Decreasing
-{
-public:
-	bool operator()(int lhs, int rhs) const
-	{
-		return UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
-	}
-};
-
 /**
 **  Find All unittypes equivalent to a given one, and which are available
 **  UnitType are returned in the preferred order (ie paladin >> knight...)
@@ -284,7 +253,9 @@ std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &unittype)
 		return !CheckDependByIdent(*AiPlayer->Player, UnitTypes[typeIndex]->Ident);
 	});
 	// 3 - Sort by level
-	ranges::sort(usableTypes, UnitTypePrioritySorter_Decreasing());
+	ranges::sort(usableTypes, std::greater<>(), [](int index) {
+		return UnitTypes[index]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+	});
 	return usableTypes;
 }
 
@@ -310,7 +281,7 @@ std::vector<std::size_t> AiForce::CountTypes() const
 bool AiForce::IsBelongsTo(const CUnitType &type)
 {
 	bool flag = false;
-	auto counter = CountTypes();
+	const auto counter = CountTypes();
 
 	// Look what should be in the force.
 	Completed = true;
@@ -389,7 +360,7 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	}
 }
 
-bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
+std::optional<Vec2i> AiForce::NewRallyPoint(const Vec2i &startPos)
 {
 	Assert(this->Units.size() > 0);
 	const CUnit &leader = *(this->Units[0]);
@@ -405,9 +376,11 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 	Assert(Map.Info.IsPointOnMap(startPos));
 	terrainTraversal.PushPos(startPos);
 
-	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
+	Vec2i resultPos;
+	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, &resultPos);
 
-	return terrainTraversal.Run(aiForceRallyPointFinder);
+	const bool found = terrainTraversal.Run(aiForceRallyPointFinder);
+	return found ? std::make_optional(resultPos) : std::nullopt;
 }
 
 void AiForce::Attack(const Vec2i &pos)
@@ -438,14 +411,9 @@ void AiForce::Attack(const Vec2i &pos)
 	bool isDefenceForce = false;
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
-		const CUnit *enemy = nullptr;
-		if (isTransporter) {
-			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
-		} else if (isNaval) {
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
-		} else {
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
-		}
+		const CUnit *enemy = isTransporter ? AiForceEnemyFinder<AIATTACK_AGRESSIVE>::find(*this)
+		                   : isNaval       ? AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this)
+		                                   : AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
 		if (enemy) {
 			goalPos = enemy->tilePos;
 		}
@@ -461,10 +429,9 @@ void AiForce::Attack(const Vec2i &pos)
 		return;
 	}
 	if (this->State == AiForceAttackingState::Waiting && isDefenceForce == false) {
-		Vec2i resultPos {-1, -1};
-		NewRallyPoint(goalPos, &resultPos);
-		if (resultPos.x != -1 && resultPos.y != -1) {
-			this->GoalPos = resultPos;
+		const auto rallyPoint = NewRallyPoint(goalPos);
+		if (rallyPoint) {
+			this->GoalPos = *rallyPoint;
 			this->State = AiForceAttackingState::GoingToRallyPoint;
 		} else {
 			this->GoalPos = goalPos;
@@ -516,7 +483,7 @@ void AiForce::ReturnToHome()
 AiForceManager::AiForceManager()
 {
 	forces.resize(AI_MAX_FORCES);
-	memset(script, -1, AI_MAX_FORCES * sizeof(char));
+	ranges::fill(script, -1);
 }
 
 unsigned int AiForceManager::FindFreeForce(AiForceRole role, int begin)
@@ -861,9 +828,9 @@ void AiForce::Update()
 	if (Size() == 0) {
 		Attacking = false;
 		if (!Defending && State > AiForceAttackingState::Waiting) {
-				DebugPrint("%d: Attack force #%lu was destroyed, giving up\n",
-			               AiPlayer->Player->Index,
-			               (long unsigned int) (this - &(AiPlayer->Force[0])));
+			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n",
+			           AiPlayer->Player->Index,
+			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
 		}
 		return;
@@ -948,12 +915,10 @@ void AiForce::Update()
 			--WaitOnRallyPoint;
 		}
 		if (maxDist <= thresholdDist || !WaitOnRallyPoint) {
-			const CUnit *unit = nullptr;
-
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-			if (!unit) {
-				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-				if (!unit) {
+			const CUnit *unit = AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
+			if (unit == nullptr) {
+				unit = AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this);
+				if (unit == nullptr) {
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n",
@@ -995,12 +960,8 @@ void AiForce::Update()
 		const bool isNaval = ranges::any_of(this->Units, [](const CUnit *unit) {
 			return unit->Type->MoveType == EMovement::Naval && unit->Type->CanAttack;
 		});
-		const CUnit *unit = nullptr;
-		if (isNaval) {
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
-		} else {
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
-		}
+		const CUnit *unit = isNaval ? AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this)
+		                            : AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
 		if (!unit) {
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
@@ -1011,10 +972,9 @@ void AiForce::Update()
 			State = AiForceAttackingState::Waiting;
 			return;
 		} else {
-			Vec2i resultPos {-1, -1};
-			NewRallyPoint(unit->tilePos, &resultPos);
-			if (resultPos.x != -1 && resultPos.y != -1) {
-				this->GoalPos = resultPos;
+			const auto rallyPoint = NewRallyPoint(unit->tilePos);
+			if (rallyPoint) {
+				this->GoalPos = *rallyPoint;
 				this->State = AiForceAttackingState::GoingToRallyPoint;
 			} else {
 				this->GoalPos = unit->tilePos;
@@ -1075,9 +1035,8 @@ void AiForceManager::Update()
 				for (const CUnit *aiunit : force.Units) {
 					if (aiunit->MapDistanceTo(force.GoalPos) <= nearDist) {
 						//  Look if still enemies in attack range.
-						const CUnit *dummy = nullptr;
 						maxPathing--;
-						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
+						if (AiForceEnemyFinder<AIATTACK_RANGE>::find(force) == nullptr) {
 							force.ReturnToHome();
 						}
 					}
