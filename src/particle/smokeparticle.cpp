@@ -32,23 +32,12 @@
 #include "particle.h"
 #include "video.h"
 
-
-
-
-CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,
-							   float speedx, float speedy, int drawlevel) :
-	CParticle(position, drawlevel)
+CSmokeParticle::CSmokeParticle(
+	CPosition position, const GraphicAnimation &smoke, float speedx, float speedy, int drawlevel) :
+	CParticle(position, drawlevel),
+	puff(smoke.clone()),
+	speedVector{speedx, speedy}
 {
-	Assert(smoke);
-	this->puff = smoke->clone();
-
-	speedVector.x = speedx;
-	speedVector.y = speedy;
-}
-
-CSmokeParticle::~CSmokeParticle()
-{
-	delete puff;
 }
 
 bool CSmokeParticle::isVisible(const CViewport &vp) const /* override */
@@ -75,9 +64,9 @@ void CSmokeParticle::update(int ticks) /* override */
 	pos.y += ticks / 1000.f * speedVector.y;
 }
 
-CParticle *CSmokeParticle::clone() /* override */
+CParticle *CSmokeParticle::clone() const /* override */
 {
-	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
+	return new CSmokeParticle(pos, *puff, speedVector.x, speedVector.y, drawLevel);
 }
 
 //@}

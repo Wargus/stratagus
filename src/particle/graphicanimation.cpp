@@ -38,14 +38,12 @@
 #include "ui.h"
 #include "video.h"
 
-GraphicAnimation::GraphicAnimation(CGraphic *g, int ticksPerFrame) :
-	g(g), ticksPerFrame(ticksPerFrame)
+GraphicAnimation::GraphicAnimation(const CGraphic &g, int ticksPerFrame) :
+	g(&g), ticksPerFrame(ticksPerFrame)
 {
-	Assert(g);
 }
 
-
-void GraphicAnimation::draw(int x, int y)
+void GraphicAnimation::draw(int x, int y) const
 {
 	if (!isFinished()) {
 		g->DrawFrameClip(currentFrame, x - g->Width / 2, y - g->Height / 2);
@@ -61,12 +59,12 @@ void GraphicAnimation::update(int ticks)
 	}
 }
 
-bool GraphicAnimation::isFinished()
+bool GraphicAnimation::isFinished() const
 {
 	return currentFrame >= g->NumFrames;
 }
 
-bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
+bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos) const
 {
 	// invisible graphics always invisible
 	if (!g) {
@@ -96,9 +94,9 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
 	return false;
 }
 
-GraphicAnimation *GraphicAnimation::clone()
+GraphicAnimation *GraphicAnimation::clone() const
 {
-	return new GraphicAnimation(g, ticksPerFrame);
+	return new GraphicAnimation(*g, ticksPerFrame);
 }
 
 //@}

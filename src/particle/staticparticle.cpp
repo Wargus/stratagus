@@ -33,16 +33,10 @@
 #include "particle.h"
 
 
-StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
-	CParticle(position, drawlevel)
+StaticParticle::StaticParticle(CPosition position, const GraphicAnimation &animation, int drawlevel) :
+	CParticle(position, drawlevel),
+	animation(animation.clone())
 {
-	Assert(animation);
-	this->animation = animation->clone();
-}
-
-StaticParticle::~StaticParticle()
-{
-	delete animation;
 }
 
 bool StaticParticle::isVisible(const CViewport &vp) const /* override */
@@ -64,9 +58,9 @@ void StaticParticle::update(int ticks) /* override */
 	}
 }
 
-CParticle *StaticParticle::clone() /* override */
+CParticle *StaticParticle::clone() const /* override */
 {
-	CParticle *p = new StaticParticle(pos, animation, drawLevel);
+	CParticle *p = new StaticParticle(pos, *animation, drawLevel);
 	return p;
 }
 

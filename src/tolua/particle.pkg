@@ -9,26 +9,26 @@ struct CPosition
 
 class GraphicAnimation
 {
-	GraphicAnimation(CGraphic *g, int ticksPerFrame);
-	virtual GraphicAnimation * clone();
+	GraphicAnimation(const CGraphic &g, int ticksPerFrame);
+	virtual GraphicAnimation *clone() const;
 };
 
 class CParticle
 {
-	virtual CParticle* clone();
+	virtual CParticle* clone() const;
 	void setDrawLevel(int value);
 };
 
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel = 0);
+	StaticParticle(CPosition position, const GraphicAnimation &animation, int drawlevel = 0);
 };
 
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation, GraphicAnimation *destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
+	CChunkParticle(CPosition position, const GraphicAnimation &smokeAnimation, const GraphicAnimation &debrisAnimation, const GraphicAnimation &destroyAnimation, int minVelocity = 0, int maxVelocity = 400, int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
 	int getSmokeDrawLevel() const;
 	int getDestroyDrawLevel() const;
 	void setSmokeDrawLevel(int value);
@@ -38,13 +38,13 @@ public:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0, int drawlevel = 0);
+	CSmokeParticle(CPosition position, const GraphicAnimation &animation, float speedx = 0, float speedy = -22.0, int drawlevel = 0);
 };
 
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, GraphicAnimation *smokeAnimation, int maxSpeed, int drawlevel = 0);
+	CRadialParticle(CPosition position, const GraphicAnimation &smokeAnimation, int maxSpeed, int drawlevel = 0);
 };
 
 class CParticleManager
