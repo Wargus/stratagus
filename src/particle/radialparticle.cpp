@@ -34,22 +34,13 @@
 
 #include <cmath>
 
-CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
-	CParticle(position, drawlevel)
+CRadialParticle::CRadialParticle(CPosition position, const GraphicAnimation &animation, int maxSpeed, int drawlevel) :
+	CParticle(position, drawlevel),
+	animation(animation.clone()),
+	direction(MyRand() % 360),
+	speed((MyRand() % maxSpeed) / 10),
+	maxSpeed(maxSpeed)
 {
-	Assert(animation);
-	this->animation = animation->clone();
-
-	const int speedReduction = 10;
-
-	this->direction = (float)(MyRand() % 360);
-	this->speed = (MyRand() % maxSpeed) / speedReduction;
-	this->maxSpeed = maxSpeed;
-}
-
-CRadialParticle::~CRadialParticle()
-{
-	delete animation;
 }
 
 bool CRadialParticle::isVisible(const CViewport &vp) const /* override */
@@ -74,9 +65,9 @@ void CRadialParticle::update(int ticks) /* override */
 	}
 }
 
-CParticle *CRadialParticle::clone() /* override */
+CParticle *CRadialParticle::clone() const /* override */
 {
-	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
+	CParticle *p = new CRadialParticle(pos, *animation, maxSpeed, drawLevel);
 	return p;
 }
 

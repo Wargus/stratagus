@@ -46,20 +46,20 @@ struct CPosition {
 
 class GraphicAnimation
 {
-	CGraphic *g;
+	const CGraphic *g;
 	int ticksPerFrame;
 	int currentFrame = 0;
 	int currTicks = 0;
 public:
-	GraphicAnimation(CGraphic *g, int ticksPerFrame);
-	~GraphicAnimation() {}
+	GraphicAnimation(const CGraphic &g, int ticksPerFrame);
+	~GraphicAnimation() = default;
 
 	/**
 	**  Draw the current frame of the animation.
 	**  @param x x screen coordinate where to draw the animation.
 	**  @param y y screen coordinate where to draw the animation.
 	*/
-	void draw(int x, int y);
+	void draw(int x, int y) const;
 
 	/**
 	**  Update the animation.
@@ -67,9 +67,9 @@ public:
 	*/
 	void update(int ticks);
 
-	bool isFinished();
-	bool isVisible(const CViewport &vp, const CPosition &pos);
-	GraphicAnimation *clone();
+	bool isFinished() const;
+	bool isVisible(const CViewport &vp, const CPosition &pos) const;
+	GraphicAnimation *clone() const;
 };
 
 
@@ -81,7 +81,7 @@ public:
 	CParticle(CPosition position, int drawlevel = 0) : pos(position), drawLevel(drawlevel) {}
 	virtual ~CParticle() {}
 
-	virtual CParticle *clone() = 0;
+	virtual CParticle *clone() const = 0;
 	virtual void draw() = 0;
 	virtual bool isVisible(const CViewport &vp) const = 0;
 	virtual void update(int) = 0;
@@ -102,16 +102,16 @@ protected:
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
-	~StaticParticle() override;
+	StaticParticle(CPosition position, const GraphicAnimation &flame, int drawlevel = 0);
+	~StaticParticle() override = default;
 
-	CParticle *clone() override;
+	CParticle *clone() const override;
 	void draw() override;
 	bool isVisible(const CViewport &vp) const override;
 	void update(int ticks) override;
 
 protected:
-	GraphicAnimation *animation;
+	std::unique_ptr<GraphicAnimation> animation;
 };
 
 
@@ -119,13 +119,18 @@ protected:
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
-				   GraphicAnimation *destroyAnimation,
-				   int minVelocity = 0, int maxVelocity = 400,
-				   int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
-	~CChunkParticle() override;
+	CChunkParticle(CPosition position,
+	               const GraphicAnimation &smokeAnimation,
+	               const GraphicAnimation &debrisAnimation,
+	               const GraphicAnimation &destroyAnimation,
+	               int minVelocity = 0,
+	               int maxVelocity = 400,
+	               int minTrajectoryAngle = 77,
+	               int maxTTL = 0,
+	               int drawlevel = 0);
+	~CChunkParticle() override = default;
 
-	CParticle *clone() override;
+	CParticle *clone() const override;
 	void draw() override;
 	bool isVisible(const CViewport &vp) const override;
 	void update(int ticks) override;
@@ -137,21 +142,21 @@ public:
 
 protected:
 	CPosition initialPos;
-	int initialVelocity;
-	float trajectoryAngle;
-	int maxTTL;
-	int nextSmokeTicks;
-	int lifetime;
-	int age;
-	int minVelocity;
-	int maxVelocity;
-	int minTrajectoryAngle;
-	float height;
-	int smokeDrawLevel;
-	int destroyDrawLevel;
-	GraphicAnimation *debrisAnimation;
-	GraphicAnimation *smokeAnimation;
-	GraphicAnimation *destroyAnimation;
+	int initialVelocity = 0;
+	float trajectoryAngle = 0;
+	int maxTTL = 0;
+	int nextSmokeTicks = 0;
+	int lifetime = 0;
+	int age = 0;
+	int minVelocity = 0;
+	int maxVelocity = 0;
+	int minTrajectoryAngle = 0;
+	float height = 0;
+	int smokeDrawLevel = 0;
+	int destroyDrawLevel = 0;
+	std::unique_ptr<GraphicAnimation> debrisAnimation;
+	std::unique_ptr<GraphicAnimation> smokeAnimation;
+	std::unique_ptr<GraphicAnimation> destroyAnimation;
 
 	struct {
 		float x;
@@ -164,16 +169,16 @@ protected:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
-	~CSmokeParticle() override;
+	CSmokeParticle(CPosition position, const GraphicAnimation &animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
+	~CSmokeParticle() override = default;
 
-	CParticle *clone() override;
+	CParticle *clone() const override;
 	void draw() override;
 	bool isVisible(const CViewport &vp) const override;
 	void update(int ticks) override;
 
 protected:
-	GraphicAnimation *puff;
+	std::unique_ptr<GraphicAnimation> puff;
 	struct {
 		float x;
 		float y;
@@ -183,16 +188,16 @@ protected:
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
-	~CRadialParticle() override;
+	CRadialParticle(CPosition position, const GraphicAnimation &animation, int maxSpeed, int drawlevel = 0);
+	~CRadialParticle() override = default;
 
-	CParticle *clone() override;
+	CParticle *clone() const override;
 	void draw() override;
 	bool isVisible(const CViewport &vp) const override;
 	void update(int ticks) override;
 
 protected:
-	GraphicAnimation *animation;
+	std::unique_ptr<GraphicAnimation> animation;
 	float direction;
 	int speed;
 	int maxSpeed;
