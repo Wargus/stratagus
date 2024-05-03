@@ -78,10 +78,8 @@ ELocBaseType toELocBaseType(std::string_view s)
 **  @note This is only here to avoid code duplication. You don't have
 **        any reason to USE this:)
 */
-static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *location)
+static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation &location)
 {
-	Assert(location != nullptr);
-
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
@@ -90,15 +88,15 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		std::string_view value = LuaToString(l, -1, j + 1);
 		++j;
 		if (value == "base") {
-			location->Base = toELocBaseType(LuaToString(l, -1, j + 1));
+			location.Base = toELocBaseType(LuaToString(l, -1, j + 1));
 		} else if (value == "add-x") {
-			location->AddX = LuaToNumber(l, -1, j + 1);
+			location.AddX = LuaToNumber(l, -1, j + 1);
 		} else if (value == "add-y") {
-			location->AddY = LuaToNumber(l, -1, j + 1);
+			location.AddY = LuaToNumber(l, -1, j + 1);
 		} else if (value == "add-rand-x") {
-			location->AddRandX = LuaToNumber(l, -1, j + 1);
+			location.AddRandX = LuaToNumber(l, -1, j + 1);
 		} else if (value == "add-rand-y") {
-			location->AddRandY = LuaToNumber(l, -1, j + 1);
+			location.AddRandY = LuaToNumber(l, -1, j + 1);
 		} else {
 			LuaError(l, "Unsupported missile location description flag: %s", value.data());
 		}
@@ -121,11 +119,11 @@ void Spell_SpawnMissile::Parse(lua_State *l, int startIndex, int endIndex) /* ov
 			this->TTL = LuaToNumber(l, -1, j + 1);
 		} else if (value == "start-point") {
 			lua_rawgeti(l, -1, j + 1);
-			CclSpellMissileLocation(l, &this->StartPoint);
+			CclSpellMissileLocation(l, this->StartPoint);
 			lua_pop(l, 1);
 		} else if (value == "end-point") {
 			lua_rawgeti(l, -1, j + 1);
-			CclSpellMissileLocation(l, &this->EndPoint);
+			CclSpellMissileLocation(l, this->EndPoint);
 			lua_pop(l, 1);
 		} else if (value == "missile") {
 			value = LuaToString(l, -1, j + 1);
