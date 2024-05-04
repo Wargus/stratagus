@@ -331,18 +331,36 @@ void AiForce::RemoveDeadUnit()
 class AiForceRallyPointFinder
 {
 public:
-	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
+	friend TerrainTraversal;
+
+	static std::optional<Vec2i> find(const CUnit &leader, const Vec2i &startPos, int distance)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		Assert(Map.Info.IsPointOnMap(startPos));
+		terrainTraversal.PushPos(startPos);
+
+		AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos);
+
+		const bool found = terrainTraversal.Run(aiForceRallyPointFinder);
+		return found ? std::make_optional(aiForceRallyPointFinder.resultPos) : std::nullopt;
+	}
+
+private:
+	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos) :
 		startUnit(startUnit), distance(distance), startPos(startPos),
-		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
-		resultPos(resultPos)
+		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CUnit &startUnit;
 	const int distance;
 	const Vec2i startPos;
-	const int movemask;
-	Vec2i *resultPos;
+	const unsigned int movemask;
+	Vec2i resultPos{-1, -1};
 };
 
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -350,7 +368,7 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	const int minDist = 15;
 	if (AiEnemyUnitsInDistance(*startUnit.Player, nullptr, pos, minDist) == false
 		&& Distance(pos, startPos) <= abs(distance - minDist)) {
-		*resultPos = pos;
+		resultPos = pos;
 		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
@@ -368,19 +386,7 @@ std::optional<Vec2i> AiForce::NewRallyPoint(const Vec2i &startPos)
 
 	WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	Assert(Map.Info.IsPointOnMap(startPos));
-	terrainTraversal.PushPos(startPos);
-
-	Vec2i resultPos;
-	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, &resultPos);
-
-	const bool found = terrainTraversal.Run(aiForceRallyPointFinder);
-	return found ? std::make_optional(resultPos) : std::nullopt;
+	return AiForceRallyPointFinder::find(leader, leader.tilePos, distance);
 }
 
 void AiForce::Attack(const Vec2i &pos)
