@@ -33,12 +33,12 @@ msgstr "Pas assez de ressources pour construire %s"
 #: src/action/action_build.cpp:215
 #, c-format
 msgid "Can't build more units %s"
-msgstr "Ne peut créer plus d'unités %s"
+msgstr "Ne peut pas créer plus d'unités %s"
 
 #: src/action/action_build.cpp:255
 #, c-format
 msgid "Unable to create building %s"
-msgstr "Impossible de construire le batiment %s"
+msgstr "Impossible de construire le bâtiment %s"
 
 #: src/action/action_build.cpp:515
 #, c-format
@@ -53,16 +53,16 @@ msgstr "Nous avons besoin de plus de %s pour réparer"
 #: src/action/action_research.cpp:103
 #, c-format
 msgid "%s: complete"
-msgstr "%s: completé"
+msgstr "%s : complété"
 
 #: src/action/action_returngoods.cpp:68
 msgid "No Resources to Return."
-msgstr "Pas de ressouces à ramener."
+msgstr "Pas de ressources à ramener."
 
 #: src/action/action_spellcast.cpp:181
 #, c-format
 msgid "%s: not enough mana for spell: %s"
-msgstr "%s: Pas assez de mana pour ce sort : %s"
+msgstr "%s : Pas assez de mana pour ce sort : %s"
 
 #: src/action/action_spellcast.cpp:185
 #, c-format
@@ -82,12 +82,12 @@ msgstr "Impossible d'entrainer %s"
 #: src/action/action_upgradeto.cpp:199
 #, c-format
 msgid "Upgrade to %s canceled"
-msgstr "Optimisation de %s annulé"
+msgstr "Optimisation de %s annulée"
 
 #: src/action/action_upgradeto.cpp:207
 #, c-format
 msgid "Upgrade to %s complete"
-msgstr "Optimisation de %s completé"
+msgstr "Optimisation de %s completée"
 
 #: src/action/command.cpp:1319
 #, c-format
@@ -113,7 +113,7 @@ msgstr "Intelligence Artificielle"
 
 #: src/editor/editloop.cpp:1376
 msgid "Unit can't be placed here."
-msgstr "L'unité ne peut pas être placé ici."
+msgstr "L'unité ne peut pas être placée ici."
 
 #: src/editor/editloop.cpp:1448
 msgid "Mirror editing enabled: 2-side"
@@ -125,7 +125,7 @@ msgstr "Edition miroir activée: 4-côtés"
 
 #: src/editor/editloop.cpp:1454
 msgid "Mirror editing disabled"
-msgstr "Edition Miroir désactivée"
+msgstr "Edition miroir désactivée"
 
 #: src/editor/editloop.cpp:1474
 msgid "Unit deleted"
@@ -137,7 +137,7 @@ msgstr "Propriétaire de l'unité modifié"
 
 #: src/editor/editloop.cpp:1831
 msgid "Select mode"
-msgstr "Selectionnez un mode"
+msgstr "Sélectionnez un mode"
 
 #: src/editor/editloop.cpp:1841
 msgid "Unit mode"
@@ -149,7 +149,7 @@ msgstr "Mode titre"
 
 #: src/editor/editloop.cpp:1863
 msgid "Set start location mode"
-msgstr "Mode destination de départ"
+msgstr "Mode position de départ"
 
 #: src/network/commands.cpp:824
 msgid "No sync info for this replay !"
@@ -196,7 +196,7 @@ msgstr "Nombre limite d'unités atteint"
 
 #: src/stratagus/player.cpp:561
 msgid "Insufficient Supply, increase Supply."
-msgstr "Appovisionnement insuffisant."
+msgstr "Approvisionnement insuffisant."
 
 #: src/stratagus/player.cpp:565
 msgid "Total Unit Limit Reached"
@@ -210,7 +210,7 @@ msgstr "Limite de %d atteinte pour ce type d'unité"
 #: src/stratagus/player.cpp:575
 #, fuzzy
 msgid "Cannot create more units."
-msgstr "Ne peut créer plus d'unités %s"
+msgstr "Ne peut pas créer plus d'unités %s"
 
 #: src/stratagus/stratagus.cpp:548 src/stratagus/stratagus.cpp:681
 msgid "Do it! Do it now!"
@@ -223,11 +223,11 @@ msgstr "Merci d'avoir joué à Stratagus.\n"
 
 #: src/ui/botpanel.cpp:724 src/ui/botpanel.cpp:789
 msgid "Select Target"
-msgstr "Selectionnez une cible"
+msgstr "Sélectionnez une cible"
 
 #: src/ui/botpanel.cpp:852
 msgid "Select Location"
-msgstr "Selectionnez un emplacement"
+msgstr "Sélectionnez un emplacement"
 
 #: src/ui/botpanel.cpp:871
 msgid "Unit training queue is full"
@@ -236,7 +236,7 @@ msgstr "La file d'attente est pleine."
 #: src/ui/interface.cpp:95
 #, c-format
 msgid "MESSAGE:%s~!_"
-msgstr "MESSAGE:%s~!_"
+msgstr "MESSAGE : %s~!_"
 
 #: src/ui/interface.cpp:247
 msgid "Sound is on."
