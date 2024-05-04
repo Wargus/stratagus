@@ -1462,23 +1462,6 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 }
 
 /**
-**  Find nearest point of unit.
-**
-**  @param unit  Pointer to unit.
-**  @param pos   tile map position.
-**  @param dpos  Out: nearest point tile map position to (tx,ty).
-*/
-void NearestOfUnit(const CUnit &unit, const Vec2i &pos, Vec2i *dpos)
-{
-	const int x = unit.tilePos.x;
-	const int y = unit.tilePos.y;
-
-	*dpos = pos;
-	clamp<short int>(&dpos->x, x, x + unit.Type->TileWidth - 1);
-	clamp<short int>(&dpos->y, y, y + unit.Type->TileHeight - 1);
-}
-
-/**
 **  Copy the unit look in Seen variables. This should be called when
 **  buildings go under fog of war for ThisPlayer.
 **

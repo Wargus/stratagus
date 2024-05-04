@@ -259,22 +259,22 @@ namespace ranges
 		v.erase(std::remove_if(std::begin(v), std::end(v), pred), std::end(v));
 	}
 
-	template <typename Range>
-	auto max_element(Range &range)
+	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>
+	auto max_element(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
 	{
-		return std::max_element(std::begin(range), std::end(range));
+		return std::max_element(
+			std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
+				return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
+			});
 	}
 
-	template <typename Range>
-	auto min_element(Range &range)
+	template <typename Range, typename Comparer = std::less<>, typename Proj = identity>
+	auto min_element(Range &range, Comparer &&comparer = {}, Proj &&proj = {})
 	{
-		return std::min_element(std::begin(range), std::end(range));
-	}
-
-	template <typename Range, typename CmpFunction>
-	auto min_element(Range &range, CmpFunction cmp)
-	{
-		return std::min_element(std::begin(range), std::end(range), cmp);
+		return std::min_element(
+			std::begin(range), std::end(range), [&](const auto &lhs, const auto &rhs) {
+				return std::invoke(comparer, std::invoke(proj, lhs), std::invoke(proj, rhs));
+			});
 	}
 
 	template <typename I, typename S, typename Pred, typename Proj = identity>

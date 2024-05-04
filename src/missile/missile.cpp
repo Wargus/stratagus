@@ -76,6 +76,28 @@ extern std::unique_ptr<INumberDesc> Damage;                   /// Damage calcula
 --  Functions
 ----------------------------------------------------------------------------*/
 
+namespace
+{
+/**
+**  Find nearest point of unit.
+**
+**  @param unit  Pointer to unit.
+**  @param pos   tile map position.
+**  @return nearest point tile map position to (tx,ty).
+*/
+Vec2i NearestOfUnit(const CUnit &unit, const Vec2i &pos)
+{
+	const int x = unit.tilePos.x;
+	const int y = unit.tilePos.y;
+
+	Vec2i res = pos;
+	clamp<short int>(&res.x, x, x + unit.Type->TileWidth - 1);
+	clamp<short int>(&res.y, y, y + unit.Type->TileHeight - 1);
+	return res;
+}
+
+} // namespace
+
 /**
 **  Load the graphics for a missile type
 */
@@ -365,7 +387,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		// Fire to nearest point of the unit!
 		// If Firing from inside a Bunker
 		if (unit.Container) {
-			NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
+			dpos = NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos);
 		} else {
 			if (goal->Type->TileWidth % 2 == 0)
 				divisionOffset = true;

@@ -849,7 +849,7 @@ void AiForce::Update()
 	if (State == AiForceAttackingState::Waiting) {
 		if (!this->PlanAttack()) {
 			DebugPrint("Can't transport, look for walls\n");
-			if (!AiFindWall(this)) {
+			if (!AiFindWall(*this)) {
 				Attacking = false;
 				return ;
 			}
