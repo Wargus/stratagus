@@ -77,15 +77,39 @@
 class NearReachableTerrainFinder
 {
 public:
-	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
+	friend TerrainTraversal;
+
+	static std::optional<Vec2i> find(
+		int movemask, int resmask, int range, const CPlayer &player, const Vec2i &startPos)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		terrainTraversal.PushPos(startPos);
+
+		NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask);
+
+		return terrainTraversal.Run(nearReachableTerrainFinder)
+		         ? std::make_optional(nearReachableTerrainFinder.resPos)
+		         : std::nullopt;
+	}
+
+private:
+	NearReachableTerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask) :
+		player(player),
+		maxDist(maxDist),
+		movemask(movemask),
+		resmask(resmask)
+	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
-	int movemask;
-	int resmask;
-	Vec2i *resPos;
+	unsigned int movemask;
+	unsigned int resmask;
+	Vec2i resPos{-1, -1};
 };
 
 VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -95,9 +119,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 	// Look if found what was required.
 	if (CanMoveToMask(pos, movemask)) {
-		if (resPos) {
-			*resPos = from;
-		}
+		resPos = from;
 		return VisitResult::Finished;
 	}
 	if (Map.Field(pos)->CheckMask(resmask)) { // reachable
@@ -111,28 +133,9 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 	}
 }
 
-static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
-											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushPos(startPos);
-
-	NearReachableTerrainFinder nearReachableTerrainFinder(player, range, movemask, resmask, terrainPos);
-
-	return terrainTraversal.Run(nearReachableTerrainFinder);
-}
-
-
-
-
 /* static */ std::unique_ptr<COrder> COrder::NewActionResource(CUnit &harvester, const Vec2i &pos)
 {
 	auto order = std::make_unique<COrder_Resource>(harvester);
-	Vec2i ressourceLoc;
 
 	int targetFlag;
 	CMapField *mf = Map.Field(pos);
@@ -151,11 +154,13 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 	}
 
 	//  Find the closest piece of wood next to a tile where the unit can move
-	if (!FindNearestReachableTerrainType(harvester.Type->MovementMask, targetFlag, 20, *harvester.Player, pos, &ressourceLoc)) {
+	if (auto resourceLoc = NearReachableTerrainFinder::find(
+			harvester.Type->MovementMask, targetFlag, 20, *harvester.Player, pos)) {
+		order->goalPos = *resourceLoc;
+	} else {
 		DebugPrint("FIXME: Give up???\n");
-		ressourceLoc = pos;
+		order->goalPos = pos;
 	}
-	order->goalPos = ressourceLoc;
 	return order;
 }
 
