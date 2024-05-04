@@ -45,6 +45,7 @@ void DrawLastAStar(const class CViewport &vp);
 
 #include <queue>
 #include <sys/types.h>
+#include <utility>
 #include "vec2i.h"
 
 class CUnit;
@@ -226,7 +227,7 @@ extern void InitPathfinder();
 extern void FreePathfinder();
 
 /// Returns the next element of the path
-extern int NextPathElement(CUnit &unit, Vec2i *dir);
+extern std::pair<int, Vec2i> NextPathElement(CUnit &unit);
 /// Return path length to unit 'dst'.
 extern int UnitReachable(const CUnit &src, const CUnit &dst, int range, bool from_outside_container);
 /// Return path length to unit 'dst' or error code.

@@ -94,8 +94,7 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos;
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i dir;
-		const auto d = NextPathElement(unit, &dir);
+		const auto [d, dir] = NextPathElement(unit);
 
 		CHECK(d == PF_REACHED);
 		CHECK(unit.pathFinderData->output.Length == 0);
@@ -112,8 +111,7 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos + Vec2i{0, dist};
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i dir;
-		const auto d = NextPathElement(unit, &dir);
+		const auto [d, dir] = NextPathElement(unit);
 
 		CHECK(d == dist);
 
@@ -130,8 +128,7 @@ TEST_CASE("PathFinding on clear map 128x128")
 		const auto dest = unit.tilePos + Vec2i{0, dist};
 		unit.Orders.push_back(COrder::NewActionMove(dest));
 
-		Vec2i dir;
-		const auto d = NextPathElement(unit, &dir);
+		const auto [d, dir] = NextPathElement(unit);
 
 		CHECK(0 < d);
 		CHECK(d <= std::size(unit.pathFinderData->output.Path));

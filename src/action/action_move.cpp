@@ -153,8 +153,8 @@ static inline void resetDisplacement(CUnit &unit) {
 */
 int DoActionMove(CUnit &unit)
 {
-	Vec2i posd; // movement in tile.
-	int d;
+	Vec2i posd{}; // movement in tile.
+	int d{};
 
 	if (unit.Moving != 1 && (&unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
 		if (unit.Anim.Unbreakable && unit.Moving > 1) {
@@ -173,7 +173,7 @@ int DoActionMove(CUnit &unit)
 		}
 
 		UnmarkUnitFieldFlags(unit);
-		d = NextPathElement(unit, &posd);
+		std::tie(d, posd) = NextPathElement(unit);
 		MarkUnitFieldFlags(unit);
 		switch (d) {
 			case PF_UNREACHABLE: // Can't reach, stop
