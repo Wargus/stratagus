@@ -1108,7 +1108,7 @@ static void AiCollectResources()
 					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
 					units_unassigned[c].pop_back();
 
-					// remove it from other ressources
+					// remove it from other resources
 					for (int j = 0; j < MaxCosts; ++j) {
 						if (j == c || !unit->Type->ResInfo[j]) {
 							continue;
@@ -1175,7 +1175,7 @@ static void AiCollectResources()
 		}
 	} while (unit);
 
-	// Unassigned units there can't be assigned ( ie : they can't move to ressource )
+	// Unassigned units there can't be assigned ( ie : they can't move to resource )
 	// IDEA : use transporter here.
 }
 
