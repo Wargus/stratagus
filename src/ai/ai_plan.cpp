@@ -55,50 +55,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-class _EnemyOnMapTile
-{
-public:
-	_EnemyOnMapTile(const CUnit &unit, const Vec2i _pos, CUnit **enemy) :
-		source(&unit) , pos(_pos), best(enemy)
-	{
-	}
-
-	void operator()(CUnit *const unit) const
-	{
-		const CUnitType &type = *unit->Type;
-		// unusable unit ?
-		// if (unit->IsUnusable()) can't attack constructions
-		// FIXME: did SelectUnitsOnTile already filter this?
-		// Invisible and not Visible
-		if (unit->Removed || unit->Variable[INVISIBLE_INDEX].Value
-			// || (!UnitVisible(unit, source->Player))
-			|| unit->CurrentAction() == UnitAction::Die) {
-			return;
-		}
-		if (unit->Type->MoveType == EMovement::Fly && unit->IsAgressive() == false) {
-			return;
-		}
-		if (pos.x < unit->tilePos.x || pos.x >= unit->tilePos.x + type.TileWidth
-			|| pos.y < unit->tilePos.y || pos.y >= unit->tilePos.y + type.TileHeight) {
-			return;
-		}
-		if (!CanTarget(*source->Type, type)) {
-			return;
-		}
-		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
-			return;
-		}
-		// Choose the best target.
-		if (!*best || (*best)->Variable[PRIORITY_INDEX].Value < unit->Variable[PRIORITY_INDEX].Value) {
-			*best = unit;
-		}
-	}
-
-private:
-	const CUnit *const source;
-	const Vec2i pos;
-	CUnit **best;
-};
+namespace {
 
 /**
 **  Choose enemy on map tile.
@@ -108,32 +65,60 @@ private:
 **
 **  @return        Returns ideal target on map tile.
 */
-static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
+CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 {
-	CUnit *enemy = nullptr;
-
-	_EnemyOnMapTile filter(source, pos, &enemy);
-	for (auto *unit : Map.Field(pos)->UnitCache) {
-		filter(unit);
-	}
-	return enemy;
+	auto units = Map.Field(pos)->UnitCache;
+	ranges::erase_if(units, [&](const CUnit *unit) {
+		const CUnitType &type = *unit->Type;
+		// unusable unit ?
+		// if (unit->IsUnusable()) can't attack constructions
+		// FIXME: did SelectUnitsOnTile already filter this?
+		// Invisible and not Visible
+		return (unit->Removed
+		        || unit->Variable[INVISIBLE_INDEX].Value
+		        // || (!UnitVisible(unit, source->Player))
+		        || unit->CurrentAction() == UnitAction::Die
+		        || (unit->Type->MoveType == EMovement::Fly && unit->IsAgressive() == false)
+		        || unit->MapDistanceTo(pos) != 0 || !CanTarget(*source.Type, type)
+		        || !source.Player->IsEnemy(*unit) // a friend or neutral
+		);
+	});
+	auto it = ranges::max_element(units, std::less<>{}, [](const CUnit *unit) {
+		return unit->Variable[PRIORITY_INDEX].Value;
+	});
+	return it != units.end() ? *it : nullptr;
 }
 
 class WallFinder
 {
 public:
-	WallFinder(const CUnit &unit, int maxDist, Vec2i *resultPos) :
-		//unit(unit),
+	friend TerrainTraversal;
+
+	static std::optional<Vec2i> find(const CUnit &unit, int range)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		terrainTraversal.PushUnitPosAndNeighboor(unit);
+
+		WallFinder wallFinder(unit, range);
+
+		return terrainTraversal.Run(wallFinder) ? std::make_optional(wallFinder.resultPos)
+		                                        : std::nullopt;
+	}
+
+private:
+	WallFinder(const CUnit &unit, int maxDist) :
 		maxDist(maxDist),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		resultPos(resultPos)
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
-	//const CUnit &unit;
 	int maxDist;
-	int movemask;
-	Vec2i *resultPos;
+	unsigned int movemask;
+	Vec2i resultPos{-1, -1};
 };
 
 VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
@@ -146,9 +131,7 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	// Look if found what was required.
 	if (Map.WallOnMap(pos)) {
 		DebugPrint("Wall found %d, %d\n", pos.x, pos.y);
-		if (resultPos) {
-			*resultPos = from;
-		}
+		resultPos = from;
 		return VisitResult::Finished;
 	}
 	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
@@ -162,18 +145,6 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 }
 
-static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushUnitPosAndNeighboor(unit);
-
-	WallFinder wallFinder(unit, range, wallPos);
-
-	return terrainTraversal.Run(wallFinder);
 }
 
 /**
@@ -183,12 +154,12 @@ static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 **
 **  @return       True if wall found.
 */
-bool AiFindWall(AiForce *force)
+bool AiFindWall(AiForce &force)
 {
 	// Find a unit to use.  Best choice is a land unit with range 1.
 	// Next best choice is any land unit.  Otherwise just use the first.
-	CUnit *unit = force->Units[0];
-	for (CUnit *aiunit : force->Units) {
+	CUnit *unit = force.Units[0];
+	for (CUnit *aiunit : force.Units) {
 		if (aiunit->Type->MoveType == EMovement::Land) {
 			unit = aiunit;
 			if (aiunit->Type->Missile.Missile->Range == 1) {
@@ -197,21 +168,22 @@ bool AiFindWall(AiForce *force)
 		}
 	}
 	const int maxRange = 1000;
-	Vec2i wallPos;
-
-	if (FindWall(*unit, maxRange, &wallPos)) {
-		force->State = AiForceAttackingState::Waiting;
-		for (CUnit *aiunit : force->Units) {
+	if (auto wallPos = WallFinder::find(*unit, maxRange)) {
+		force.State = AiForceAttackingState::Waiting;
+		for (CUnit *aiunit : force.Units) {
 			if (aiunit->Type->CanAttack) {
-				CommandAttack(*aiunit, wallPos, nullptr, FlushCommands);
+				CommandAttack(*aiunit, *wallPos, nullptr, FlushCommands);
 			} else {
-				CommandMove(*aiunit, wallPos, FlushCommands);
+				CommandMove(*aiunit, *wallPos, FlushCommands);
 			}
 		}
 		return true;
 	}
 	return false;
 }
+
+namespace
+{
 
 class ReachableTerrainMarker
 {
@@ -220,9 +192,11 @@ public:
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+
 private:
-	int movemask;
+	unsigned int movemask;
 };
+
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
@@ -238,38 +212,54 @@ VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, co
 	}
 }
 
-static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal *terrainTraversal)
+} // namespace
+
+static void MarkReacheableTerrainType(const CUnit &unit, TerrainTraversal &terrainTraversal)
 {
-	terrainTraversal->PushUnitPosAndNeighboor(unit);
+	terrainTraversal.PushUnitPosAndNeighboor(unit);
 
 	ReachableTerrainMarker reachableTerrainMarker(unit);
 
-	terrainTraversal->Run(reachableTerrainMarker);
+	terrainTraversal.Run(reachableTerrainMarker);
 }
 
 class EnemyFinderWithTransporter
 {
 public:
-	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos) :
+	friend TerrainTraversal;
+
+	static std::optional<Vec2i> find(const CUnit &unit, const TerrainTraversal &terrainTransporter)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		terrainTraversal.PushUnitPosAndNeighboor(unit);
+
+		EnemyFinderWithTransporter enemyFinderWithTransporter(unit, terrainTransporter);
+
+		return terrainTraversal.Run(enemyFinderWithTransporter)
+		         ? std::make_optional(enemyFinderWithTransporter.resultPos)
+		         : std::nullopt;
+	}
+
+private:
+	EnemyFinderWithTransporter(const CUnit &unit, const TerrainTraversal &terrainTransporter) :
 		unit(unit),
 		terrainTransporter(terrainTransporter),
-		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
-		resultPos(resultPos)
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
-	bool IsAccessibleForTransporter(const Vec2i &pos) const;
+	bool IsAccessibleForTransporter(const Vec2i &pos) const {return terrainTransporter.IsReached(pos);}
+
 private:
 	const CUnit &unit;
 	const TerrainTraversal &terrainTransporter;
-	int movemask;
-	Vec2i *resultPos;
+	unsigned int movemask;
+	Vec2i resultPos{-1, -1};
 };
-
-bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) const
-{
-	return terrainTransporter.IsReached(pos);
-}
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
@@ -280,7 +270,7 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 #endif
 	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
 		DebugPrint("Target found %d,%d\n", pos.x, pos.y);
-		*resultPos = pos;
+		resultPos = pos;
 		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
@@ -288,20 +278,6 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 	} else { // unreachable
 		return VisitResult::DeadEnd;
 	}
-}
-
-static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
-{
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushUnitPosAndNeighboor(unit);
-
-	EnemyFinderWithTransporter enemyFinderWithTransporter(unit, terrainTransporter, resultPos);
-
-	return terrainTraversal.Run(enemyFinderWithTransporter);
 }
 
 class IsAFreeTransporter
@@ -359,12 +335,12 @@ bool AiForce::PlanAttack()
 	    transporterIt != Units.end()) {
 		transporter = *transporterIt;
 		DebugPrint("%d: Transporter #%d\n", player.Index, UnitNumber(*transporter));
-		MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
+		MarkReacheableTerrainType(*transporter, transporterTerrainTraversal);
 	} else {
 		auto it = ranges::find_if(player.GetUnits(), IsAFreeTransporter());
 		if (it != player.GetUnits().end()) {
 			transporter = *it;
-			MarkReacheableTerrainType(*transporter, &transporterTerrainTraversal);
+			MarkReacheableTerrainType(*transporter, transporterTerrainTraversal);
 		} else {
 			DebugPrint("%d: No transporter available\n", player.Index);
 			return false;
@@ -381,9 +357,7 @@ bool AiForce::PlanAttack()
 		landUnit = *it;
 	}
 
-	Vec2i pos = this->GoalPos;
-
-	if (AiFindTarget(*landUnit, transporterTerrainTraversal, &pos)) {
+	if (auto pos = EnemyFinderWithTransporter::find(*landUnit, transporterTerrainTraversal)) {
 		const unsigned int forceIndex = AiPlayer->Force.getIndex(*this) + 1;
 
 		if (transporter->GroupId != forceIndex) {
@@ -421,7 +395,7 @@ bool AiForce::PlanAttack()
 			}
 		}
 		DebugPrint("%d: Can attack\n", player.Index);
-		GoalPos = pos;
+		GoalPos = *pos;
 		State = AiForceAttackingState::Boarding;
 		return true;
 	}

@@ -444,7 +444,7 @@ extern void AiForceManager();
 // Plans
 //
 /// Find a wall to attack
-extern bool AiFindWall(AiForce *force);
+extern bool AiFindWall(AiForce &force);
 /// Plan the an attack
 /// Send explorers around the map
 extern void AiSendExplorers();
