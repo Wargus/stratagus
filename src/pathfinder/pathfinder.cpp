@@ -425,7 +425,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 **  @return >0 remaining path length, 0 wait for path, -1
 **  reached goal, -2 can't reach the goal.
 */
-int NextPathElement(CUnit &unit, Vec2i *dir)
+std::pair<int, Vec2i> NextPathElement(CUnit &unit)
 {
 	PathFinderInput &input = unit.pathFinderData->input;
 	PathFinderOutput &output = unit.pathFinderData->output;
@@ -433,7 +433,6 @@ int NextPathElement(CUnit &unit, Vec2i *dir)
 	unit.CurrentOrder()->UpdatePathFinderData(input);
 	// Attempt to use path cache
 	// FIXME: If there is a goal, it may have moved, ruining the cache
-	*dir = {0, 0};
 
 	// Goal has moved, need to recalculate path or no cached path
 	if (output.Length <= 0 || input.IsRecalculateNeeded()) {
@@ -441,18 +440,18 @@ int NextPathElement(CUnit &unit, Vec2i *dir)
 
 		if (result == PF_UNREACHABLE) {
 			output.OverflowLength = output.Length = 0;
-			return result;
+			return {result, {}};
 		}
 		if (result == PF_REACHED) {
-			return result;
+			return {result, {}};
 		}
 	}
 
-	dir->x = Heading2X[(int)output.Path[(int)output.Length - 1]];
-	dir->y = Heading2Y[(int)output.Path[(int)output.Length - 1]];
+	Vec2i dir(Heading2X[(int) output.Path[output.Length - 1]],
+	          Heading2Y[(int) output.Path[output.Length - 1]]);
 	int result = output.Length;
 	output.Length--;
-	if (!UnitCanBeAt(unit, unit.tilePos + *dir)) {
+	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -467,12 +466,12 @@ int NextPathElement(CUnit &unit, Vec2i *dir)
 			AstarDebugPrint("WAIT expired\n");
 			result = NewPath(input, output);
 			if (result > 0) {
-				dir->x = Heading2X[(int)output.Path[(int)output.Length - 1]];
-				dir->y = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				if (!UnitCanBeAt(unit, unit.tilePos + *dir)) {
+				dir.x = Heading2X[(int)output.Path[output.Length - 1]];
+				dir.y = Heading2Y[(int)output.Path[output.Length - 1]];
+				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
-					*dir = {0, 0};
+					dir = {0, 0};
 				} else {
 					result = output.Length;
 					output.Length--;
@@ -483,7 +482,7 @@ int NextPathElement(CUnit &unit, Vec2i *dir)
 	if (result != PF_WAIT) {
 		output.Fast = 0;
 	}
-	return result;
+	return {result, dir};
 }
 
 //@}

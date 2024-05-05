@@ -143,12 +143,12 @@ void COrder_Unload::UpdatePathFinderData(PathFinderInput &input) /* override */
 **  @param maxrange     maximum range to unload.
 **  @param res          Unload position.
 **
-**  @return      True if a position was found, False otherwise.
-**  @note        res is undefined if a position is not found.
+**  @return      found position, std::nullopt otherwise.
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange, Vec2i *res)
+static std::optional<Vec2i>
+FindUnloadPosition(const CUnit &transporter, const CUnit &unit, const Vec2i startPos, int maxRange)
 {
 	Vec2i pos = startPos;
 
@@ -161,37 +161,33 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 	for (int range = 0; range < maxRange; ++range) {
 		for (int i = addy; i--; ++pos.y) {
 			if (UnitCanBeAt(unit, pos)) {
-				*res = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addx;
 
 		for (int i = addx; i--; ++pos.x) {
 			if (UnitCanBeAt(unit, pos)) {
-				*res = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addy;
 
 		for (int i = addy; i--; --pos.y) {
 			if (UnitCanBeAt(unit, pos)) {
-				*res = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addx;
 
 		for (int i = addx; i--; --pos.x) {
 			if (UnitCanBeAt(unit, pos)) {
-				*res = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addy;
 	}
-	return false;
+	return std::nullopt;
 }
 
 /**
@@ -203,19 +199,18 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 **
 **  @bug         FIXME: Place unit only on fields reachable from the transporter
 */
-static int UnloadUnit(CUnit &transporter, CUnit &unit)
+static bool UnloadUnit(CUnit &transporter, CUnit &unit)
 {
 	const int maxRange = 1;
-	Vec2i pos;
 
 	Assert(unit.Removed);
-	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
-		return false;
+	if (auto pos = FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange)) {
+		unit.Boarded = 0;
+		unit.Place(*pos);
+		transporter.BoardCount -= unit.Type->BoardSize;
+		return true;
 	}
-	unit.Boarded = 0;
-	unit.Place(pos);
-	transporter.BoardCount -= unit.Type->BoardSize;
-	return true;
+	return false;
 }
 
 /**
@@ -231,10 +226,9 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 	if (!UnitCanBeAt(transporter, pos)) {
 		return false;
 	}
-	Vec2i dummyPos;
 	CUnit *unit = transporter.UnitInside;
 	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
-		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange, &dummyPos)) {
+		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange)) {
 			return true;
 		}
 	}
@@ -249,13 +243,13 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 **
 **  @param  transporter  the transporter
 **  @param  startPos     start location for the search
-**	@param  maxRange     The maximum distance from initial position to search...
-**  @param  resPos       drop zone position
+**  @param  maxRange     The maximum distance from initial position to search...
 **
-**  @return              true if a location was found, false otherwise
+**  @return              drop zone position if a location was found, std::nullopt otherwise
 **  @note to be called only from ClosestFreeDropZone.
 */
-static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
+static std::optional<Vec2i>
+ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &startPos, int maxRange)
 {
 	int addx = 0;
 	int addy = 1;
@@ -264,35 +258,31 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 	for (int range = 0; range < maxRange; ++range) {
 		for (int i = addy; i--; ++pos.y) {
 			if (IsDropZonePossible(transporter, pos)) {
-				*resPos = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addx;
 		for (int i = addx; i--; ++pos.x) {
 			if (IsDropZonePossible(transporter, pos)) {
-				*resPos = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addy;
 		for (int i = addy; i--; --pos.y) {
 			if (IsDropZonePossible(transporter, pos)) {
-				*resPos = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addx;
 		for (int i = addx; i--; --pos.x) {
 			if (IsDropZonePossible(transporter, pos)) {
-				*resPos = pos;
-				return true;
+				return pos;
 			}
 		}
 		++addy;
 	}
 	DebugPrint("Try clicking closer to an actual coast.\n");
-	return false;
+	return std::nullopt;
 }
 
 /**
@@ -301,16 +291,16 @@ static bool ClosestFreeDropZone_internal(const CUnit &transporter, const Vec2i &
 **
 **  @param  transporter  the transporter
 **  @param  startPos     start location for the search
-**	@param  maxRange     The maximum distance from initial position to search...
-**  @param  resPos       drop zone position
+**  @param  maxRange     The maximum distance from initial position to search...
 **
-**  @return              1 if a location was found, 0 otherwise
+**  @return              Drop zone position if a location was found, std::nullopt otherwise
 */
-static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange, Vec2i *resPos)
+static std::optional<Vec2i>
+ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange)
 {
 	// Check there are units onboard
 	if (!transporter.UnitInside) {
-		return 0;
+		return std::nullopt;
 	}
 	const bool isTransporterRemoved = transporter.Removed;
 	const bool selected = transporter.Selected;
@@ -319,7 +309,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 		// Remove transporter to avoid "collision" with itself.
 		transporter.Remove(nullptr);
 	}
-	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
+	const auto resPos = ClosestFreeDropZone_internal(transporter, startPos, maxRange);
 	if (!isTransporterRemoved) {
 		transporter.Place(transporter.tilePos);
 		if (selected) {
@@ -327,7 +317,7 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 			SelectionChanged();
 		}
 	}
-	return res;
+	return resPos;
 }
 
 /**
@@ -381,7 +371,6 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 
 void COrder_Unload::Execute(CUnit &unit) /* override */
 {
-
 	if (!unit.CanMove()) {
 		this->State = UNLOAD_STATE;
 	}
@@ -399,16 +388,16 @@ void COrder_Unload::Execute(CUnit &unit) /* override */
 
 	switch (this->State) {
 		case FIND_DROPZONE_STATE:
-			{
-				Vec2i pos;
-				if (!ClosestFreeDropZone(unit, this->goalPos, MAX_SEARCH_RANGE, &pos)) {
-					this->Retries = MAX_RETRIES;
-					return;
-				}
-				this->goalPos = pos;
+		{
+			if (auto pos = ClosestFreeDropZone(unit, this->goalPos, MAX_SEARCH_RANGE)) {
+				this->goalPos = *pos;
+				this->Retries = 0;
+				this->State = MOVE_TO_DROPZONE_STATE;
+			} else {
+				this->Retries = MAX_RETRIES;
+				return;
 			}
-			this->Retries = 0;
-			this->State = MOVE_TO_DROPZONE_STATE;
+		}
 			[[fallthrough]]; // fallthrough and move immediately
 		case MOVE_TO_DROPZONE_STATE:
 			switch (DoActionMove(unit)) {
