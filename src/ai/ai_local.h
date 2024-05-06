@@ -100,6 +100,9 @@ enum class AiForceRole {
 	Defend      /// Force should defend
 };
 
+std::optional<AiForceRole> AiForceRoleFromString(std::string_view);
+std::string_view ToString(AiForceRole);
+
 enum class AiForceAttackingState {
 	Free = -1,
 	Waiting = 0,

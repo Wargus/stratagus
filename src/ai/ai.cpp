@@ -250,6 +250,27 @@ static void AiCheckUnits()
 -- Functions
 ----------------------------------------------------------------------------*/
 
+std::optional<AiForceRole> AiForceRoleFromString(std::string_view s)
+{
+	if (s == "attack") {
+		return AiForceRole::Attack;
+	} else if (s == "defend") {
+		return AiForceRole::Defend;
+	} else {
+		return std::nullopt;
+	}
+}
+
+std::string_view ToString(AiForceRole role)
+{
+	switch (role) {
+		case AiForceRole::Attack: return "attack";
+		case AiForceRole::Defend: return "defend";
+	}
+	Assert(false);
+	return "";
+}
+
 /**
 **  Save state of player AI.
 **
@@ -273,18 +294,7 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 					ai.Force[i].Attacking ? " \"attack\"," : "",
 					ai.Force[i].Defending ? " \"defend\"," : "");
 
-		file.printf(" \"role\", ");
-		switch (ai.Force[i].Role) {
-			case AiForceRole::Attack:
-				file.printf("\"attack\",");
-				break;
-			case AiForceRole::Defend:
-				file.printf("\"defend\",");
-				break;
-			default:
-				file.printf("\"unknown-%d\",", static_cast<int>(ai.Force[i].Role));
-				break;
-		}
+		file.printf(R"( "role", "%s",)", ToString(ai.Force[i].Role).data());
 
 		file.printf("\n    \"types\", { ");
 		for (const AiUnitType &aut : ai.Force[i].UnitTypes) {
