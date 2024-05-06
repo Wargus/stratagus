@@ -1093,8 +1093,6 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId);
 
-	//Assert(depot);
-
 	// Range hardcoded. don't stray too far though
 	if (resinfo.TerrainHarvester) {
 		if (auto pos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, this->Resource.Pos)) {
@@ -1102,6 +1100,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				DropOutNearest(unit, *pos, depot);
 			}
 			this->goalPos = *pos;
+			return true;
 		} else {
 			if (depot) {
 				DropOutOnSide(unit, LookingW, depot);
@@ -1115,14 +1114,14 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		CUnit *mine = this->Resource.Mine;
 		CUnit *newdepot = nullptr;
-		CUnit *goal = nullptr;
+		CUnit *newMine = nullptr;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
 		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
-				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
+				std::tie(newdepot, newMine) = AiGetSuitableDepot(unit, *depot);
 				if (newdepot == nullptr && longWay) {
 					// We need a new depot
 					AiNewDepotRequest(unit);
@@ -1130,10 +1129,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			}
 		}
 
-		// If goal is not nullptr, then we got it in AiGetSuitableDepot
-		if (!goal) {
+		// If newMine is not nullptr, then we got it in AiGetSuitableDepot
+		if (!newMine) {
 			if (mine != nullptr && mine->IsAlive()) {
-			goal = mine;
+				newMine = mine;
 			} else {
 				const CUnit *start_unit = nullptr;
 				if (newdepot != nullptr) {
@@ -1141,24 +1140,28 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				} else if (depot != nullptr) {
 					start_unit = depot;
 				}
-				goal = UnitFindResource(unit, (start_unit ? *start_unit : unit), 1000, this->CurrentResource,
-										unit.Player->AiEnabled, (newdepot ? newdepot : depot));
+				newMine = UnitFindResource(unit,
+				                           (start_unit ? *start_unit : unit),
+				                           1000,
+				                           this->CurrentResource,
+				                           unit.Player->AiEnabled,
+				                           (newdepot ? newdepot : depot));
 			}
 		}
 
-		if (goal) {
+		if (newMine) {
 			if (depot) {
-				DropOutNearest(unit, goal->tilePos + goal->Type->GetHalfTileSize(), depot);
+				DropOutNearest(unit, newMine->tilePos + newMine->Type->GetHalfTileSize(), depot);
 			}
 
-			if (goal != mine) {
+			if (newMine != mine) {
 				if (mine) {
 					unit.DeAssignWorkerFromMine(*mine);
 				}
-				unit.AssignWorkerToMine(*goal);
-				this->Resource.Mine = goal;
+				unit.AssignWorkerToMine(*newMine);
+				this->Resource.Mine = newMine;
 			}
-			this->SetGoal(goal);
+			this->SetGoal(newMine);
 			this->goalPos.x = this->goalPos.y = -1;
 		} else {
 #ifdef DEBUG

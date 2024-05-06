@@ -431,11 +431,10 @@ private:
 **
 **  @param worker    Worker itself.
 **  @param oldDepot  Old assigned depot.
-**  @param resUnit   Resource to harvest from, if succeed
 **
-**  @return          new depot if found, nullptr otherwise.
+**  @return          new depot, resourceUnit if found, {nullptr, nullptr} otherwise.
 */
-CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
+std::pair<CUnit *, CUnit *> AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot)
 {
 	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -449,7 +448,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	// If there aren't any alternatives, exit
 	if (depots.size() < 2) {
-		return nullptr;
+		return {nullptr, nullptr};
 	}
 	ranges::sort(depots, CompareDepotsByDistance(worker));
 
@@ -470,11 +469,10 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		}
 		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
 		if (res) {
-			*resUnit = res;
-			return &unit;
+			return {&unit, res};
 		}
 	}
-	return nullptr;
+	return {nullptr, nullptr};
 }
 
 /**

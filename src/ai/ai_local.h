@@ -416,7 +416,7 @@ extern std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &type);
 extern std::array<int, UnitTypeMax> AiGetBuildRequestsCount(const PlayerAi &pai);
 
 extern void AiNewDepotRequest(CUnit &worker);
-extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);
+extern std::pair<CUnit *, CUnit *> AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot);
 
 //
 // Buildings
