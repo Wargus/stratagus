@@ -431,11 +431,10 @@ private:
 **
 **  @param worker    Worker itself.
 **  @param oldDepot  Old assigned depot.
-**  @param resUnit   Resource to harvest from, if succeed
 **
-**  @return          new depot if found, nullptr otherwise.
+**  @return          new depot, resourceUnit if found, {nullptr, nullptr} otherwise.
 */
-CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit)
+std::pair<CUnit *, CUnit *> AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot)
 {
 	Assert(worker.CurrentAction() == UnitAction::Resource);
 	COrder_Resource &order = *static_cast<COrder_Resource *>(worker.CurrentOrder());
@@ -449,7 +448,7 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 	}
 	// If there aren't any alternatives, exit
 	if (depots.size() < 2) {
-		return nullptr;
+		return {nullptr, nullptr};
 	}
 	ranges::sort(depots, CompareDepotsByDistance(worker));
 
@@ -470,11 +469,10 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		}
 		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
 		if (res) {
-			*resUnit = res;
-			return &unit;
+			return {&unit, res};
 		}
 	}
-	return nullptr;
+	return {nullptr, nullptr};
 }
 
 /**
@@ -1214,24 +1212,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	// We need to send all nearby free workers to repair that building
 	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
-	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
-	ranges::erase_if(table, [](const CUnit *unit) { return !IsReadyToRepair(*unit); });
-	if (table.empty()) {
-		return false;
-	}
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushUnitPosAndNeighboor(building);
-
+	std::vector<CUnit *> candidates = FindPlayerUnitsByType(player, type, true);
+	ranges::erase_if(candidates, [](const CUnit *unit) { return !IsReadyToRepair(*unit); });
 	const int maxRange = 15;
-	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-	CUnit *unit = nullptr;
-	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
-
-	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
+	if (CUnit *unit = UnitFinder::find(candidates, maxRange, building)) {
 		const Vec2i invalidPos(-1, -1);
 		CommandRepair(*unit, invalidPos, &building, FlushCommands);
 		return true;

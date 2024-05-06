@@ -2277,9 +2277,7 @@ void EditorMainLoop()
 */
 void StartEditor(const char *filename)
 {
-	std::string nc, rc;
-
-	GetDefaultTextColors(nc, rc);
+	const auto [nc, rc] = GetDefaultTextColors();
 	if (filename) {
 		if (strcpy_s(CurrentMapPath, sizeof(CurrentMapPath), filename) != 0) {
 			filename = nullptr;

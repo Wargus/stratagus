@@ -99,9 +99,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	//  Text
 	//
 	if (!text.empty()) {
-		std::string oldnc;
-		std::string oldrc;
-		GetDefaultTextColors(oldnc, oldrc);
+		const auto [oldnc, oldrc] = GetDefaultTextColors();
 		CLabel label(*style->Font,
 					 (!p->TextNormalColor.empty() ? p->TextNormalColor :
 					  !style->TextNormalColor.empty() ? style->TextNormalColor : oldnc),

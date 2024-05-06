@@ -130,10 +130,11 @@ int getopt(int argc, char *const *argv, const char *optstring) noexcept;
 --  Clipboard
 ----------------------------------------------------------------------------*/
 
+#include <optional>
 #include <string>
 
-int GetClipboard(std::string &str);
-void SetClipboard(std::string &str);
+std::optional<std::string> GetClipboard();
+void SetClipboard(const std::string &str);
 
 /*----------------------------------------------------------------------------
 --  UTF8

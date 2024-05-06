@@ -100,6 +100,9 @@ enum class AiForceRole {
 	Defend      /// Force should defend
 };
 
+std::optional<AiForceRole> AiForceRoleFromString(std::string_view);
+std::string_view ToString(AiForceRole);
+
 enum class AiForceAttackingState {
 	Free = -1,
 	Waiting = 0,
@@ -413,7 +416,7 @@ extern std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &type);
 extern std::array<int, UnitTypeMax> AiGetBuildRequestsCount(const PlayerAi &pai);
 
 extern void AiNewDepotRequest(CUnit &worker);
-extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **resUnit);
+extern std::pair<CUnit *, CUnit *> AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot);
 
 //
 // Buildings

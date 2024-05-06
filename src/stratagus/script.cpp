@@ -35,10 +35,6 @@
 
 #include "script.h"
 
-#include <signal.h>
-
-#include "stratagus.h"
-
 #include "animation/animation_setplayervar.h"
 #include "filesystem.h"
 #include "font.h"
@@ -46,11 +42,14 @@
 #include "iolib.h"
 #include "map.h"
 #include "parameters.h"
+#include "stratagus.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
 
+#include <optional>
+#include <signal.h>
 #include <variant>
 
 #ifdef _MSC_VER
@@ -207,15 +206,14 @@ int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 /**
 **  Get the (uncompressed) content of the file into a string
 */
-static bool GetFileContent(const fs::path& file, std::string &content)
+static std::optional<std::string> GetFileContent(const fs::path& file)
 {
 	CFile fp;
 
-	content.clear();
 	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
 		DebugPrint("Can't open file '%s'\n", file.u8string().c_str());
 		ErrorPrint("Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
-		return false;
+		return std::nullopt;
 	}
 
 	const int size = 10000;
@@ -232,8 +230,7 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 		buf.resize(buf.size() + size);
 	}
 	fp.close();
-	content.assign(&buf[0], location);
-	return true;
+	return std::string(&buf[0], location);
 }
 
 /**
@@ -248,18 +245,18 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 {
 	DebugPrint("Loading '%s'\n", file.u8string().c_str());
 
-	std::string content;
-	if (GetFileContent(file, content) == false) {
+	const auto content = GetFileContent(file);
+	if (!content) {
 		return -1;
 	}
 	if (file.string().rfind("stratagus.lua") != std::string::npos) {
-		FileChecksums ^= fletcher32(content);
+		FileChecksums ^= fletcher32(*content);
 		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
 	// save the current __file__
 	lua_getglobal(Lua, "__file__");
 
-	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.string().c_str());
+	const int status = luaL_loadbuffer(Lua, content->c_str(), content->size(), file.string().c_str());
 
 	if (!status) {
 		lua_pushstring(Lua, fs::absolute(fs::path(file)).generic_u8string().c_str());
@@ -323,12 +320,12 @@ static int CclLoadBuffer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const fs::path file = LibraryFileName(std::string{LuaToString(l, 1)});
 	DebugPrint("Loading '%s'\n", file.u8string().c_str());
-	std::string content;
-	if (GetFileContent(file, content) == false) {
-		return 0;
+
+	if (auto content = GetFileContent(file)) {
+		lua_pushstring(l, content->c_str());
+		return 1;
 	}
-	lua_pushstring(l, content.c_str());
-	return 1;
+	return 0;
 }
 
 /**
@@ -2143,55 +2140,49 @@ static bool ShouldLocalTableBeSaved(const std::string &key)
 	return !ranges::contains(forbiddenNames, key);
 }
 
-static bool LuaValueToString(lua_State *l, std::string &value)
+static std::optional<std::string> LuaValueToString(lua_State *l)
 {
 	const int type_value = lua_type(l, -1);
 
 	switch (type_value) {
 		case LUA_TNIL:
-			value = "nil";
-			return true;
+			return "nil";
 		case LUA_TNUMBER:
-			value = lua_tostring(l, -1); // let lua do the conversion
-			return true;
+			return lua_tostring(l, -1); // let lua do the conversion
 		case LUA_TBOOLEAN: {
 			const bool b = lua_toboolean(l, -1);
-			value = b ? "true" : "false";
-			return true;
+			return b ? "true" : "false";
 		}
 		case LUA_TSTRING: {
 			const std::string s = lua_tostring(l, -1);
-			value = "";
 
 			if ((s.find('\n') != std::string::npos)) {
-				value = std::string("[[") + s + "]]";
+				return std::string("[[") + s + "]]";
 			} else {
+				std::string res;
 				for (char c : s) {
 					if (c == '\"') {
-						value.push_back('\\');
+						res.push_back('\\');
 					}
-					value.push_back(c);
+					res.push_back(c);
 				}
-				value = std::string("\"") + value + "\"";
+				res = "\"" + res + "\"";
+				return res;
 			}
-			return true;
 		}
 		case LUA_TTABLE:
-			value = "";
-			return false;
+			return std::nullopt;
 		case LUA_TFUNCTION:
 			// Could be done with string.dump(function)
 			// and debug.getinfo(function).name (could be nil for anonymous function)
 			// But not useful yet.
-			value = "";
-			return false;
+			return std::nullopt;
 		case LUA_TUSERDATA:
 		case LUA_TTHREAD:
 		case LUA_TLIGHTUSERDATA:
 		case LUA_TNONE:
 		default : // no other cases
-			value = "";
-			return false;
+			return std::nullopt;
 	}
 }
 
@@ -2242,10 +2233,8 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 			lhsLine = key;
 		}
 
-		std::string value;
-		const bool b = LuaValueToString(l, value);
-		if (b) {
-			res += lhsLine + " = " + value + "\n";
+		if (auto value = LuaValueToString(l)) {
+			res += lhsLine + " = " + *value + "\n";
 		} else {
 			const int type_value = lua_type(l, -1);
 			if (type_value == LUA_TTABLE) {

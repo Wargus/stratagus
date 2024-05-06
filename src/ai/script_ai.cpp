@@ -955,13 +955,11 @@ static int CclAiForceRole(lua_State *l)
 
 	AiForce &aiforce = AiPlayer->Force[AiPlayer->Force.getScriptForce(force)];
 
-	const std::string_view flag = LuaToString(l, 2);
-	if (flag == "attack") {
-		aiforce.Role = AiForceRole::Attack;
-	} else if (flag == "defend") {
-		aiforce.Role = AiForceRole::Defend;
+	const std::string_view roleString = LuaToString(l, 2);
+	if (auto role = AiForceRoleFromString(roleString)) {
+		aiforce.Role = *role;
 	} else {
-		LuaError(l, "Unknown force role '%s'", flag.data());
+		LuaError(l, "Unknown force role '%s'", roleString.data());
 	}
 	lua_pushboolean(l, 0);
 	return 1;
@@ -1661,10 +1659,8 @@ static int CclDefineAiPlayer(lua_State *l)
 					--k;
 				} else if (value == "role") {
 					value = LuaToString(l, j + 1, k + 1);
-					if (value == "attack") {
-						ai.Force[forceIdx].Role = AiForceRole::Attack;
-					} else if (value == "defend") {
-						ai.Force[forceIdx].Role = AiForceRole::Defend;
+					if (auto role = AiForceRoleFromString(value)) {
+						ai.Force[forceIdx].Role = *role;
 					} else {
 						LuaError(l, "Unsupported force tag: %s", value.data());
 					}

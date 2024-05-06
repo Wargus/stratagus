@@ -1117,10 +1117,7 @@ static void InfoPanel_draw_no_selection()
 			label.Draw(x + 110, y, CyclesPerSecond);
 			y += 20;
 
-			std::string nc;
-			std::string rc;
-
-			GetDefaultTextColors(nc, rc);
+			const auto [nc, rc] = GetDefaultTextColors();
 			for (int i = 0; i < PlayerMax - 1; ++i) {
 				if (Players[i].Type != PlayerTypes::PlayerNobody) {
 					if (ThisPlayer->IsAllied(Players[i])) {
