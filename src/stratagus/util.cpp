@@ -409,19 +409,19 @@ int getopt(int argc, char *const *argv, const char *opts) noexcept
 /**
 ** Paste text from the clipboard
 */
-int GetClipboard(std::string &str)
+std::optional<std::string> GetClipboard()
 {
 	char* txt = SDL_GetClipboardText();
 	if (txt) {
-		str = txt;
+		std::string str = txt;
 		SDL_free(txt);
-		return 0;
+		return str;
 	} else {
-		return -1;
+		return std::nullopt;
 	}
 }
 
-void SetClipboard(std::string &str) {
+void SetClipboard(const std::string &str) {
 	SDL_SetClipboardText(str.c_str());
 }
 

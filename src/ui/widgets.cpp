@@ -1258,9 +1258,8 @@ void CTextBox::mousePressed(gcn::MouseEvent &event) /* override */
 	TextBox::mousePressed(event);
 
 	if (event.getButton() == gcn::MouseInput::Middle) {
-		std::string str;
-		if (GetClipboard(str) >= 0) {
-			for (auto c : str) {
+		if (auto str = GetClipboard()) {
+			for (auto c : *str) {
 				mText->insert(c);
 			}
 		}
@@ -1338,9 +1337,8 @@ void CTextBox::keyPressed(gcn::KeyEvent &event) /* override */
 		mText->insert(' ');
 		mText->insert(' ');
 	} else if (event.isControlPressed() && key.getValue() == 'v' && mEditable) { // ctrl-v
-		std::string str;
-		if (GetClipboard(str) >= 0) {
-			for (auto c : str) {
+		if (auto str = GetClipboard()) {
+			for (auto c : *str) {
 				mText->insert(c);
 			}
 		}
@@ -1402,9 +1400,8 @@ void CTextField::mousePressed(gcn::MouseEvent &event) /* override */
 		mSelectStart = mText->getCaretPosition();
 		mSelectEndOffset = 0;
 	} else if (event.getButton() == gcn::MouseInput::Middle) {
-		std::string str;
-		if (GetClipboard(str) >= 0) {
-			for (auto c : str) {
+		if (auto str = GetClipboard()) {
+			for (auto c : *str) {
 				mText->insert(c);
 			}
 		}
@@ -1511,15 +1508,13 @@ void CTextField::keyPressed(gcn::KeyEvent &event) /* override */
 		mText->insert(' ');
 		mSelectStart = mText->getCaretPosition();
 	} else if (event.isControlPressed() && key.getValue() == 'c') {
-		std::string s = std::string(mText->getContent().substr(selFirst, selLen));
-		SetClipboard(s);
+		SetClipboard(mText->getContent().substr(selFirst, selLen));
 	} else if (event.isControlPressed() && key.getValue() == 'v' && mEditable) { // ctrl-v
 		if (selLen > 0) {
 			deleteSelection();
 		}
-		std::string str;
-		if (GetClipboard(str) >= 0) {
-			for (auto c : str) {
+		if (auto str = GetClipboard()) {
+			for (auto c : *str) {
 				mText->insert(c);
 			}
 		}
