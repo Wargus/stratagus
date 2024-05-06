@@ -206,15 +206,14 @@ int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError)
 /**
 **  Get the (uncompressed) content of the file into a string
 */
-static bool GetFileContent(const fs::path& file, std::string &content)
+static std::optional<std::string> GetFileContent(const fs::path& file)
 {
 	CFile fp;
 
-	content.clear();
 	if (fp.open(file.string().c_str(), CL_OPEN_READ) == -1) {
 		DebugPrint("Can't open file '%s'\n", file.u8string().c_str());
 		ErrorPrint("Can't open file '%s': %s\n", file.u8string().c_str(), strerror(errno));
-		return false;
+		return std::nullopt;
 	}
 
 	const int size = 10000;
@@ -231,8 +230,7 @@ static bool GetFileContent(const fs::path& file, std::string &content)
 		buf.resize(buf.size() + size);
 	}
 	fp.close();
-	content.assign(&buf[0], location);
-	return true;
+	return std::string(&buf[0], location);
 }
 
 /**
@@ -247,18 +245,18 @@ int LuaLoadFile(const fs::path &file, const std::string &strArg, bool exitOnErro
 {
 	DebugPrint("Loading '%s'\n", file.u8string().c_str());
 
-	std::string content;
-	if (GetFileContent(file, content) == false) {
+	const auto content = GetFileContent(file);
+	if (!content) {
 		return -1;
 	}
 	if (file.string().rfind("stratagus.lua") != std::string::npos) {
-		FileChecksums ^= fletcher32(content);
+		FileChecksums ^= fletcher32(*content);
 		DebugPrint("FileChecksums after loading %s: %x\n", file.u8string().c_str(), FileChecksums);
 	}
 	// save the current __file__
 	lua_getglobal(Lua, "__file__");
 
-	const int status = luaL_loadbuffer(Lua, content.c_str(), content.size(), file.string().c_str());
+	const int status = luaL_loadbuffer(Lua, content->c_str(), content->size(), file.string().c_str());
 
 	if (!status) {
 		lua_pushstring(Lua, fs::absolute(fs::path(file)).generic_u8string().c_str());
@@ -322,12 +320,12 @@ static int CclLoadBuffer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	const fs::path file = LibraryFileName(std::string{LuaToString(l, 1)});
 	DebugPrint("Loading '%s'\n", file.u8string().c_str());
-	std::string content;
-	if (GetFileContent(file, content) == false) {
-		return 0;
+
+	if (auto content = GetFileContent(file)) {
+		lua_pushstring(l, content->c_str());
+		return 1;
 	}
-	lua_pushstring(l, content.c_str());
-	return 1;
+	return 0;
 }
 
 /**
