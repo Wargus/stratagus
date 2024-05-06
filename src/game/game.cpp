@@ -134,8 +134,7 @@ void StartMap(const std::string &filename, bool clean)
 	if (clean) {
 		CleanPlayers();
 	}
-	std::string nc, rc;
-	GetDefaultTextColors(nc, rc);
+	const auto [nc, rc] = GetDefaultTextColors();
 
 	CreateGame(filename, &Map);
 

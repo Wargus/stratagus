@@ -61,10 +61,11 @@
 
 #include "color.h"
 
+#include <SDL.h>
 #include <array>
 #include <guichan/font.hpp>
 #include <string>
-#include <SDL.h>
+#include <utility>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -161,7 +162,7 @@ extern int FontCodePage;
 /// Set the default text colors for normal and reverse text
 extern void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
 /// Get the default text colors for normal and reverse text
-extern void GetDefaultTextColors(std::string &normalp, std::string &reversep);
+extern std::pair<std::string, std::string> GetDefaultTextColors();
 ///  Return the 'line' line of the string 's'.
 extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font);
 

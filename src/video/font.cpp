@@ -199,13 +199,11 @@ void SetDefaultTextColors(const std::string &normal, const std::string &reverse)
 /**
 **  Get the default text colors.
 **
-**  @param normalp   Normal text color pointer.
-**  @param reversep  Reverse text color pointer.
+**  @return Normal text color, reverse text color.
 */
-void GetDefaultTextColors(std::string &normalp, std::string &reversep)
+std::pair<std::string, std::string> GetDefaultTextColors()
 {
-	normalp = DefaultNormalColorIndex;
-	reversep = DefaultReverseColorIndex;
+	return {DefaultNormalColorIndex, DefaultReverseColorIndex};
 }
 
 static const unsigned char codepoint_to_cp437[] = {
