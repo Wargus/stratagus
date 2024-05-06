@@ -308,18 +308,39 @@ private:
 class ResourceUnitFinder
 {
 public:
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
+	friend TerrainTraversal;
+
+	static CUnit *find(const CUnit &unit,
+	                   const CUnit &worker,
+	                   const CUnit *deposit,
+	                   int resource,
+	                   int maxRange,
+	                   bool check_usage)
+	{
+		TerrainTraversal terrainTraversal;
+
+		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+		terrainTraversal.Init();
+
+		terrainTraversal.PushUnitPosAndNeighboor(worker);
+
+		ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, maxRange, check_usage);
+
+		terrainTraversal.Run(resourceUnitFinder);
+		return resourceUnitFinder.resultMine;
+	}
+
+private:
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage) :
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		maxRange(maxRange),
 		check_usage(check_usage),
-		res_finder(resource, 1),
-		resultMine(resultMine)
+		res_finder(resource, 1)
 	{
 		bestCost.SetToMax();
-		*resultMine = nullptr;
 	}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -330,13 +351,8 @@ private:
 		void SetFrom(const CUnit &mine, const CUnit *deposit, bool check_usage);
 		bool operator < (const ResourceUnitFinder_Cost &rhs) const
 		{
-			if (waiting != rhs.waiting) {
-				return waiting < rhs.waiting;
-			} else if (distance != rhs.distance) {
-				return distance < rhs.distance;
-			} else {
-				return assigned < rhs.assigned;
-			}
+			return std::tie(waiting, distance, assigned)
+			     < std::tie(rhs.waiting, rhs.distance, rhs.assigned);
 		}
 		void SetToMax() { assigned = waiting = distance = UINT_MAX; }
 		bool IsMin() const { return assigned == 0 && waiting == 0 && distance == 0; }
@@ -356,7 +372,7 @@ private:
 	bool check_usage;
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
-	CUnit **resultMine;
+	CUnit *resultMine = nullptr;
 };
 
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
@@ -389,12 +405,12 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 	auto it = ranges::find_if(field.UnitCache, res_finder);
 	CUnit *mine = it != field.UnitCache.end() ? *it : nullptr;
 
-	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
+	if (mine && mine != resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
 
 		cost.SetFrom(*mine, deposit, check_usage);
 		if (cost < bestCost) {
-			*resultMine = mine;
+			resultMine = mine;
 
 			if (cost.IsMin()) {
 				return VisitResult::Finished;
@@ -433,19 +449,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
 	}
 
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushUnitPosAndNeighboor(startUnit);
-
-	CUnit *resultMine = nullptr;
-
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-
-	terrainTraversal.Run(resourceUnitFinder);
-	return resultMine;
+	return ResourceUnitFinder::find(unit, startUnit, deposit, resource, range, check_usage);
 }
 
 /**
