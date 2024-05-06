@@ -215,8 +215,13 @@ private:
 class UnitFinder
 {
 public:
-	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask, CUnit **unitP) :
-		player(player), units(units), maxDist(maxDist), movemask(movemask), unitP(unitP) {}
+	friend TerrainTraversal;
+
+	static CUnit *find(const std::vector<CUnit *> &candidates, int maxDist, CUnit& target);
+
+private:
+	UnitFinder(const CPlayer &player, const std::vector<CUnit *> &units, int maxDist, int movemask) :
+		player(player), units(units), maxDist(maxDist), movemask(movemask) {}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	CUnit *FindUnitAtPos(const Vec2i &pos) const;
@@ -225,7 +230,7 @@ private:
 	const std::vector<CUnit *> &units;
 	int maxDist;
 	int movemask;
-	CUnit **unitP;
+	CUnit *resUnit = nullptr;
 };
 
 std::vector<CUnit *> Select(const Vec2i &ltPos, const Vec2i &rbPos);

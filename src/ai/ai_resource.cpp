@@ -1214,24 +1214,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	// We need to send all nearby free workers to repair that building
 	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
-	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
-	ranges::erase_if(table, [](const CUnit *unit) { return !IsReadyToRepair(*unit); });
-	if (table.empty()) {
-		return false;
-	}
-	TerrainTraversal terrainTraversal;
-
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.Init();
-
-	terrainTraversal.PushUnitPosAndNeighboor(building);
-
+	std::vector<CUnit *> candidates = FindPlayerUnitsByType(player, type, true);
+	ranges::erase_if(candidates, [](const CUnit *unit) { return !IsReadyToRepair(*unit); });
 	const int maxRange = 15;
-	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
-	CUnit *unit = nullptr;
-	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
-
-	if (terrainTraversal.Run(unitFinder) && unit != nullptr) {
+	if (CUnit *unit = UnitFinder::find(candidates, maxRange, building)) {
 		const Vec2i invalidPos(-1, -1);
 		CommandRepair(*unit, invalidPos, &building, FlushCommands);
 		return true;

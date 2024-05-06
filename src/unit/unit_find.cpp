@@ -67,6 +67,28 @@ std::vector<CUnit *> SelectAroundUnit(const CUnit &unit, int range)
 	return SelectAroundUnit(unit, range, NoFilter());
 }
 
+/* static */ CUnit *UnitFinder::find(const std::vector<CUnit *> &candidates,
+                                     int maxDist,
+                                     CUnit &target)
+{
+	if (candidates.empty()) {
+		return nullptr;
+	}
+	const auto& type = *candidates.front()->Type;
+	const CPlayer &player = *candidates.front()->Player;
+	TerrainTraversal terrainTraversal;
+
+	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.Init();
+
+	terrainTraversal.PushUnitPosAndNeighboor(target);
+
+	const int movemask =
+		type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+	UnitFinder unitFinder(player, candidates, maxDist, movemask);
+	return terrainTraversal.Run(unitFinder) ? unitFinder.resUnit : nullptr;
+}
+
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
 	for (CUnit *unit : Map.Field(pos)->UnitCache) {
@@ -85,7 +107,7 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	// Look if found what was required.
 	CUnit *unit = FindUnitAtPos(pos);
 	if (unit) {
-		*unitP = unit;
+		resUnit = unit;
 		return VisitResult::Finished;
 	}
 	if (CanMoveToMask(pos, movemask)) { // reachable
