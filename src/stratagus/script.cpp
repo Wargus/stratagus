@@ -35,10 +35,6 @@
 
 #include "script.h"
 
-#include <signal.h>
-
-#include "stratagus.h"
-
 #include "animation/animation_setplayervar.h"
 #include "filesystem.h"
 #include "font.h"
@@ -46,11 +42,14 @@
 #include "iolib.h"
 #include "map.h"
 #include "parameters.h"
+#include "stratagus.h"
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
 
+#include <optional>
+#include <signal.h>
 #include <variant>
 
 #ifdef _MSC_VER
@@ -2143,55 +2142,49 @@ static bool ShouldLocalTableBeSaved(const std::string &key)
 	return !ranges::contains(forbiddenNames, key);
 }
 
-static bool LuaValueToString(lua_State *l, std::string &value)
+static std::optional<std::string> LuaValueToString(lua_State *l)
 {
 	const int type_value = lua_type(l, -1);
 
 	switch (type_value) {
 		case LUA_TNIL:
-			value = "nil";
-			return true;
+			return "nil";
 		case LUA_TNUMBER:
-			value = lua_tostring(l, -1); // let lua do the conversion
-			return true;
+			return lua_tostring(l, -1); // let lua do the conversion
 		case LUA_TBOOLEAN: {
 			const bool b = lua_toboolean(l, -1);
-			value = b ? "true" : "false";
-			return true;
+			return b ? "true" : "false";
 		}
 		case LUA_TSTRING: {
 			const std::string s = lua_tostring(l, -1);
-			value = "";
 
 			if ((s.find('\n') != std::string::npos)) {
-				value = std::string("[[") + s + "]]";
+				return std::string("[[") + s + "]]";
 			} else {
+				std::string res;
 				for (char c : s) {
 					if (c == '\"') {
-						value.push_back('\\');
+						res.push_back('\\');
 					}
-					value.push_back(c);
+					res.push_back(c);
 				}
-				value = std::string("\"") + value + "\"";
+				res = "\"" + res + "\"";
+				return res;
 			}
-			return true;
 		}
 		case LUA_TTABLE:
-			value = "";
-			return false;
+			return std::nullopt;
 		case LUA_TFUNCTION:
 			// Could be done with string.dump(function)
 			// and debug.getinfo(function).name (could be nil for anonymous function)
 			// But not useful yet.
-			value = "";
-			return false;
+			return std::nullopt;
 		case LUA_TUSERDATA:
 		case LUA_TTHREAD:
 		case LUA_TLIGHTUSERDATA:
 		case LUA_TNONE:
 		default : // no other cases
-			value = "";
-			return false;
+			return std::nullopt;
 	}
 }
 
@@ -2242,10 +2235,8 @@ static std::string SaveGlobal(lua_State *l, bool is_root, std::vector<std::strin
 			lhsLine = key;
 		}
 
-		std::string value;
-		const bool b = LuaValueToString(l, value);
-		if (b) {
-			res += lhsLine + " = " + value + "\n";
+		if (auto value = LuaValueToString(l)) {
+			res += lhsLine + " = " + *value + "\n";
 		} else {
 			const int type_value = lua_type(l, -1);
 			if (type_value == LUA_TTABLE) {
