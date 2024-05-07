@@ -53,7 +53,7 @@
 
 /// flag is set when a MusicFinishedCallback was enqueued in the event loop and should be handled, and unset when the handler has run.
 static std::atomic_flag MusicFinishedEventQueued = ATOMIC_FLAG_INIT;
-static volatile bool IsCallbackEnabled = false;
+static std::atomic<bool> IsCallbackEnabled = false;
 
 /*----------------------------------------------------------------------------
 -- Functions
