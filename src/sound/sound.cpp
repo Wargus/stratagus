@@ -252,7 +252,7 @@ void PlayUnitSound(const CUnit &unit, EUnitVoice voice, bool sampleUnique)
 	const bool selection = (voice == EUnitVoice::Selected || voice == EUnitVoice::Building);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
-	if (!sampleUnique && UnitSoundIsPlaying(&source)) {
+	if (!sampleUnique && UnitSoundIsPlaying(source)) {
 		return;
 	}
 

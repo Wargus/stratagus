@@ -55,6 +55,8 @@
 #include "video.h"
 #include "widgets.h"
 
+#include <optional>
+
 /*----------------------------------------------------------------------------
 --  Defines
 ----------------------------------------------------------------------------*/
@@ -1107,33 +1109,35 @@ bool HandleKeyModifiersUp(unsigned key, unsigned)
 }
 
 /**
-**  Check if a key is from the keypad and convert to ascii
+**  Get ascii from keypad key
 */
-static bool IsKeyPad(unsigned key, unsigned *kp)
+static std::optional<unsigned> getKeyPad(unsigned key)
 {
-	if (key >= SDLK_KP_0 && key <= SDLK_KP_9) {
-		*kp = SDLK_0 + (key - SDLK_KP_0);
-	} else if (key == SDLK_KP_PERIOD) {
-		*kp = SDLK_PERIOD;
-	} else if (key == SDLK_KP_DIVIDE) {
-		*kp = SDLK_SLASH;
-	} else if (key == SDLK_KP_MULTIPLY) {
-		*kp = SDLK_ASTERISK;
-	} else if (key == SDLK_KP_MINUS) {
-		*kp = SDLK_MINUS;
-	} else if (key == SDLK_KP_PLUS) {
-		*kp = SDLK_PLUS;
-	} else if (key == SDLK_KP_ENTER) {
-		*kp = SDLK_RETURN;
-	} else if (key == SDLK_KP_EQUALS) {
-		*kp = SDLK_EQUALS;
-	} else if (key == SDLK_UP || key == SDLK_DOWN || key == SDLK_LEFT || key == SDLK_RIGHT) {
-		*kp = key;
-	} else  {
-		*kp = SDLK_UNKNOWN;
-		return false;
+	switch (key)
+	{
+		case SDLK_RIGHT: return key;
+		case SDLK_LEFT: return key;
+		case SDLK_DOWN: return key;
+		case SDLK_UP: return key;
+		case SDLK_KP_DIVIDE: return SDLK_SLASH;
+		case SDLK_KP_MULTIPLY: return SDLK_ASTERISK;
+		case SDLK_KP_MINUS: return SDLK_MINUS;
+		case SDLK_KP_PLUS: return SDLK_PLUS;
+		case SDLK_KP_ENTER: return SDLK_RETURN;
+		case SDLK_KP_1: return SDLK_1;
+		case SDLK_KP_2: return SDLK_2;
+		case SDLK_KP_3: return SDLK_3;
+		case SDLK_KP_4: return SDLK_4;
+		case SDLK_KP_5: return SDLK_5;
+		case SDLK_KP_6: return SDLK_6;
+		case SDLK_KP_7: return SDLK_7;
+		case SDLK_KP_8: return SDLK_8;
+		case SDLK_KP_9: return SDLK_9;
+		case SDLK_KP_0: return SDLK_0;
+		case SDLK_KP_PERIOD: return SDLK_PERIOD;
+		case SDLK_KP_EQUALS: return SDLK_EQUALS;
+		default: return std::nullopt;
 	}
-	return true;
 }
 
 /**
@@ -1158,20 +1162,21 @@ void HandleKeyDown(unsigned key, unsigned keychar)
 	// Handle All other keys
 
 	// Command line input: for message or cheat
-	unsigned kp = 0;
-	if (KeyState == EKeyState::Input && (keychar || IsKeyPad(key, &kp))) {
-		InputKey(kp ? kp : keychar);
-	} else {
-		// If no modifier look if button bound
-		if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper))) {
-			if (!GameObserve && !GamePaused && !GameEstablishing) {
-				if (UI.ButtonPanel.DoKey(key)) {
-					return;
-				}
+	if (KeyState == EKeyState::Input) {
+		if (auto kp = getKeyPad(key).value_or(keychar)) {
+			InputKey(kp);
+			return;
+		}
+	}
+	// If no modifier look if button bound
+	if (!(KeyModifiers & (ModifierControl | ModifierAlt | ModifierSuper))) {
+		if (!GameObserve && !GamePaused && !GameEstablishing) {
+			if (UI.ButtonPanel.DoKey(key)) {
+				return;
 			}
 		}
-		CommandKey(key);
 	}
+	CommandKey(key);
 }
 
 /**

@@ -270,11 +270,13 @@ bool SampleIsPlaying(Mix_Chunk *sample)
 	return false;
 }
 
-bool UnitSoundIsPlaying(Origin *origin)
+bool UnitSoundIsPlaying(const Origin &origin)
 {
+	if (origin.Id == 0) {
+		return false;
+	}
 	for (int i = 0; i < MaxChannels; ++i) {
-		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
-			&& origin->Id == Channels[i].Unit->Id && Mix_Playing(i)) {
+		if (Channels[i].Unit && origin.Id == Channels[i].Unit->Id && Mix_Playing(i)) {
 			return true;
 		}
 	}

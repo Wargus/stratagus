@@ -61,7 +61,7 @@ extern void StopChannel(int channel);
 extern void StopAllChannels();
 
 /// Check if this unit plays some sound
-extern bool UnitSoundIsPlaying(Origin *origin);
+extern bool UnitSoundIsPlaying(const Origin &origin);
 /// Check, if this sample is already playing
 extern bool SampleIsPlaying(Mix_Chunk *sample);
 /// Load music
