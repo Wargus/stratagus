@@ -639,20 +639,21 @@ static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 class AStarGoalMarker
 {
 public:
-	AStarGoalMarker(const CUnit &unit, bool *goal_reachable) :
-		unit(unit), goal_reachable(goal_reachable)
-	{}
+	AStarGoalMarker(const CUnit &unit) : unit(unit) {}
 
-	void operator()(int offset) const
+	void operator()(int offset)
 	{
 		if (CostMoveTo(offset, unit) >= 0) {
 			AStarMatrix[offset].SetInGoal();
-			*goal_reachable = true;
+			goal_reachable = true;
 		}
 	}
+
+	bool isGoalReachable() const { return goal_reachable; }
+
 private:
 	const CUnit &unit;
-	bool *goal_reachable;
+	bool goal_reachable = false;
 };
 
 
@@ -660,7 +661,7 @@ template <typename T>
 class MinMaxRangeVisitor
 {
 public:
-	explicit MinMaxRangeVisitor(const T &func) : func(func), minrange(0), maxrange(0) {}
+	explicit MinMaxRangeVisitor(T &func) : func(func) {}
 
 	void SetGoal(Vec2i goalTopLeft, Vec2i goalBottomRight)
 	{
@@ -680,7 +681,7 @@ public:
 		this->unitExtraTileSize.y = tileSize.y - 1;
 	}
 
-	void Visit() const
+	void Visit()
 	{
 		TopHemicycle();
 		TopHemicycleNoMinRange();
@@ -696,7 +697,7 @@ private:
 	}
 
 	// Distance are computed between bottom of unit and top of goal
-	void TopHemicycle() const
+	void TopHemicycle()
 	{
 		const int miny = std::max(0, goalTopLeft.y - maxrange - unitExtraTileSize.y);
 		const int maxy = std::min(goalTopLeft.y - minrange - unitExtraTileSize.y, goalTopLeft.y - 1 - unitExtraTileSize.y);
@@ -713,7 +714,7 @@ private:
 		}
 	}
 
-	void HemiCycleRing(int y, int offsetminx, int offsetmaxx) const
+	void HemiCycleRing(int y, int offsetminx, int offsetmaxx)
 	{
 		const int minx = std::max(0, goalTopLeft.x - offsetmaxx - unitExtraTileSize.x);
 		const int maxx = std::min(Map.Info.MapWidth - 1 - unitExtraTileSize.x, goalBottomRight.x + offsetmaxx);
@@ -728,7 +729,7 @@ private:
 		}
 	}
 
-	void TopHemicycleNoMinRange() const
+	void TopHemicycleNoMinRange()
 	{
 		const int miny = std::max(0, goalTopLeft.y - (minrange - 1) - unitExtraTileSize.y);
 		const int maxy = goalTopLeft.y - 1 - unitExtraTileSize.y;
@@ -740,7 +741,7 @@ private:
 		}
 	}
 
-	void Center() const
+	void Center()
 	{
 		const int miny = std::max(0, goalTopLeft.y - unitExtraTileSize.y);
 		const int maxy = std::min<int>(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y);
@@ -771,7 +772,7 @@ private:
 		}
 	}
 
-	void BottomHemicycleNoMinRange() const
+	void BottomHemicycleNoMinRange()
 	{
 		const int miny = goalBottomRight.y + 1;
 		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + (minrange - 1));
@@ -784,7 +785,7 @@ private:
 		}
 	}
 
-	void BottomHemicycle() const
+	void BottomHemicycle()
 	{
 		const int miny = std::max(goalBottomRight.y + minrange, goalBottomRight.y + 1);
 		const int maxy = std::min(Map.Info.MapHeight - 1 - unitExtraTileSize.y, goalBottomRight.y + maxrange);
@@ -802,15 +803,13 @@ private:
 	}
 
 private:
-	T func;
+	T& func;
 	Vec2i goalTopLeft;
 	Vec2i goalBottomRight;
 	Vec2i unitExtraTileSize;
-	int minrange;
-	int maxrange;
+	int minrange = 0;
+	int maxrange = 0;
 };
-
-
 
 /**
 **  MarkAStarGoal
@@ -842,12 +841,10 @@ static bool AStarMarkGoal(const Vec2i &goal,
 		}
 	}
 
-	bool goal_reachable = false;
-
 	gw = std::max(gw, 1);
 	gh = std::max(gh, 1);
 
-	AStarGoalMarker aStarGoalMarker(unit, &goal_reachable);
+	AStarGoalMarker aStarGoalMarker(unit);
 	MinMaxRangeVisitor<AStarGoalMarker> visitor(aStarGoalMarker);
 
 	const Vec2i goalBottomRigth(goal.x + gw - 1, goal.y + gh - 1);
@@ -861,7 +858,7 @@ static bool AStarMarkGoal(const Vec2i &goal,
 	visitor.Visit();
 
 	ProfileEnd("AStarMarkGoal");
-	return goal_reachable;
+	return aStarGoalMarker.isGoalReachable();
 }
 
 /**
