@@ -32,6 +32,7 @@
 //@{
 
 #include <cstdint>
+#include <string_view>
 #include <vector>
 
 #include "settings.h"
@@ -316,7 +317,7 @@ class CInitMessage_MapFileFragment
 {
 public:
 	CInitMessage_MapFileFragment() = default;
-	CInitMessage_MapFileFragment(const char *path, const std::vector<char> &data, uint32_t Fragment);
+	CInitMessage_MapFileFragment(const std::string_view path, const std::vector<char> &data, uint32_t Fragment);
 	explicit CInitMessage_MapFileFragment(uint32_t Fragment);
 	const CInitMessage_Header &GetHeader() const { return header; }
 	std::vector<unsigned char> Serialize() const;

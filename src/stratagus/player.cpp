@@ -1058,8 +1058,8 @@ int CPlayer::CheckCosts(const int (&costs)[MaxCosts], bool notify) const
 			continue;
 		}
 		if (notify) {
-			const char *name = DefaultResourceNames[i].c_str();
-			const char *actionName = DefaultActions[i].c_str();
+			const auto &name = DefaultResourceNames[i];
+			const auto &actionName = DefaultActions[i];
 
 			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));
 

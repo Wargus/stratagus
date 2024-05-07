@@ -1025,16 +1025,11 @@ static int CclDefineButton(lua_State *l)
 			if (lua_isfunction(l, -1)) {
 				ba.Payload = new LuaCallback<void(int, int)>(l, -1);
 			} else {
-				char buf[64];
-				const char *s2;
-
 				if (lua_isnumber(l, -1)) {
-					snprintf(buf, sizeof(buf), "%ld", (long int)lua_tonumber(l, -1));
-					s2 = buf;
+					ba.ValueStr = std::to_string((long int) lua_tonumber(l, -1));
 				} else {
-					s2 = lua_tostring(l, -1);
+					ba.ValueStr = lua_tostring(l, -1);
 				}
-				ba.ValueStr = s2;
 			}
 		} else if (value == "Allowed") {
 			value = LuaToString(l, -1);
