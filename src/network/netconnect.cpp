@@ -1158,7 +1158,7 @@ void CServer::Send_MapFragment(const CNetworkHost &host, uint32_t fragmentIdx)
 			           networkName.c_str(),
 			           data.size(),
 			           offset);
-			const CInitMessage_MapFileFragment message(networkName.c_str(), data, fragmentIdx);
+			const CInitMessage_MapFileFragment message(networkName, data, fragmentIdx);
 			NetworkSendICMessage_Log(*socket, CHost(host.Host, host.Port), message);
 			return;
 		} else {

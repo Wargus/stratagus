@@ -2260,7 +2260,7 @@ void DrawPieMenu()
 					text = "ESC";
 				} else {
 					buf[0] = toupper(buttons[i].Key);
-					text = (const char *)buf;
+					text = buf;
 				}
 				label.DrawClip(x + 4, y + 4, text);
 			}

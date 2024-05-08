@@ -336,7 +336,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 **  @param count      the number of times to add the unit
 **  @param value      resources to be stored in that unit
 */
-static void EditorRandomizeUnit(const char *unit_type, int count, int value, int tileIndexUnderUnit)
+static void EditorRandomizeUnit(const std::string_view unit_type, int count, int value, int tileIndexUnderUnit)
 {
 	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
 	CUnitType &type = UnitTypeByIdent(unit_type);
@@ -468,7 +468,7 @@ void CEditor::CreateRandomMap(bool shuffleTranslitions) const
 	TileToolRandom = oldRandom;
 
 	for (std::tuple<std::string, int, int, int> t : RandomUnits) {
-		EditorRandomizeUnit(std::get<0>(t).c_str(), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
+		EditorRandomizeUnit(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
 		UI.Minimap.Update();
 		EditorUpdateDisplay();
 	}
