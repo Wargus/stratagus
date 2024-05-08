@@ -259,7 +259,7 @@ static void DrawBuildingCursor()
 	if (!Selected.empty()) {
 		bool f = true;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos).value_or(nullptr)) != nullptr);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)).value_or(nullptr) != nullptr);
 			// Assign ontop or nullptr
 			ontop = (ontop == Selected[i] ? nullptr : ontop);
 		}
