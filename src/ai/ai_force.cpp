@@ -52,17 +52,22 @@
 /*----------------------------------------------------------------------------
 --  Types
 ----------------------------------------------------------------------------*/
-#define AIATTACK_RANGE 0
-#define AIATTACK_ALLMAP 1
-#define AIATTACK_BUILDING 2
-#define AIATTACK_AGRESSIVE 3
+
+enum class EAttackFindType
+{
+	Range,
+	AllMap,
+	Building,
+	Aggressive
+};
 
 class EnemyUnitFinder
 {
 public:
 	friend TerrainTraversal;
 
-	static CUnit *find(const CUnit& unit, int find_type) {
+	static CUnit *find(const CUnit &unit, EAttackFindType find_type)
+	{
 		// Terrain traversal by Andrettin
 		TerrainTraversal terrainTraversal;
 		terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
@@ -74,7 +79,7 @@ public:
 	}
 
 private:
-	EnemyUnitFinder(const CUnit &unit, int find_type) :
+	EnemyUnitFinder(const CUnit &unit, EAttackFindType find_type) :
 		unit(unit),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		attackrange(unit.Stats->Variables[ATTACKRANGE_INDEX].Max),
@@ -86,7 +91,7 @@ private:
 	const CUnit &unit;
 	unsigned int movemask;
 	const int attackrange;
-	const int find_type;
+	const EAttackFindType find_type;
 	CUnit *result_unit = nullptr;
 };
 
@@ -112,7 +117,8 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			continue;
 		}
 
-		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
+		if ((find_type != EAttackFindType::Building || dtype.BoolFlag[BUILDING_INDEX].value)
+		    && (find_type != EAttackFindType::Aggressive || dest->IsAgressive())) {
 			result_unit = dest;
 			return VisitResult::Finished;
 		} else if (result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
@@ -122,7 +128,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	return VisitResult::Ok;
 }
 
-template <int FIND_TYPE>
+template <EAttackFindType FIND_TYPE>
 class AiForceEnemyFinder
 {
 public:
@@ -148,7 +154,7 @@ private:
 		if (unit->Type->CanAttack == false) {
 			return enemy == nullptr;
 		}
-		if constexpr (FIND_TYPE == AIATTACK_RANGE) {
+		if constexpr (FIND_TYPE == EAttackFindType::Range) {
 			enemy = AttackUnitsInReactRange(*unit);
 		} else {
 			enemy = EnemyUnitFinder::find(*unit, FIND_TYPE);
@@ -417,9 +423,9 @@ void AiForce::Attack(const Vec2i &pos)
 	bool isDefenceForce = false;
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
 		/* Search in entire map */
-		const CUnit *enemy = isTransporter ? AiForceEnemyFinder<AIATTACK_AGRESSIVE>::find(*this)
-		                   : isNaval       ? AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this)
-		                                   : AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
+		const CUnit *enemy = isTransporter ? AiForceEnemyFinder<EAttackFindType::Aggressive>::find(*this)
+		                   : isNaval       ? AiForceEnemyFinder<EAttackFindType::AllMap>::find(*this)
+		                                   : AiForceEnemyFinder<EAttackFindType::Building>::find(*this);
 		if (enemy) {
 			goalPos = enemy->tilePos;
 		}
@@ -921,9 +927,9 @@ void AiForce::Update()
 			--WaitOnRallyPoint;
 		}
 		if (maxDist <= thresholdDist || !WaitOnRallyPoint) {
-			const CUnit *unit = AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
+			const CUnit *unit = AiForceEnemyFinder<EAttackFindType::Building>::find(*this);
 			if (unit == nullptr) {
-				unit = AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this);
+				unit = AiForceEnemyFinder<EAttackFindType::AllMap>::find(*this);
 				if (unit == nullptr) {
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
@@ -966,8 +972,8 @@ void AiForce::Update()
 		const bool isNaval = ranges::any_of(this->Units, [](const CUnit *unit) {
 			return unit->Type->MoveType == EMovement::Naval && unit->Type->CanAttack;
 		});
-		const CUnit *unit = isNaval ? AiForceEnemyFinder<AIATTACK_ALLMAP>::find(*this)
-		                            : AiForceEnemyFinder<AIATTACK_BUILDING>::find(*this);
+		const CUnit *unit = isNaval ? AiForceEnemyFinder<EAttackFindType::AllMap>::find(*this)
+		                            : AiForceEnemyFinder<EAttackFindType::Building>::find(*this);
 		if (!unit) {
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
@@ -1042,7 +1048,7 @@ void AiForceManager::Update()
 					if (aiunit->MapDistanceTo(force.GoalPos) <= nearDist) {
 						//  Look if still enemies in attack range.
 						maxPathing--;
-						if (AiForceEnemyFinder<AIATTACK_RANGE>::find(force) == nullptr) {
+						if (AiForceEnemyFinder<EAttackFindType::Range>::find(force) == nullptr) {
 							force.ReturnToHome();
 						}
 					}
