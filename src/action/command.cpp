@@ -160,7 +160,7 @@ static bool IsUnitValidForNetwork(const CUnit &unit)
 void CommandStopUnit(CUnit &unit)
 {
 	// Ignore that the unit could be removed.
-	auto *order = GetNextOrder(unit, FlushCommands); // Flush them.
+	auto *order = GetNextOrder(unit, EFlushMode::On); // Flush them.
 	Assert(order);
 	*order = COrder::NewActionStill();
 

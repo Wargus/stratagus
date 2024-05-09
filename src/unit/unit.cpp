@@ -2989,7 +2989,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				savedOrder = target.CurrentOrder()->Clone();
 			}
 			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-			CommandAttack(target, posToAttack, nullptr, FlushCommands);
+			CommandAttack(target, posToAttack, nullptr, EFlushMode::On);
 
 			if (savedOrder != nullptr) {
 				target.SavedOrder = std::move(savedOrder);

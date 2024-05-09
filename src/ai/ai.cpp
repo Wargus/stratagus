@@ -674,7 +674,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+					CommandAttack(*aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), EFlushMode::On);
 					auto savedOrder = COrder::NewActionAttack(*aiunit, attacker->tilePos);
 
 					if (aiunit->CanStoreOrder(savedOrder.get())) {
@@ -899,7 +899,7 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 				savedOrder = unit.CurrentOrder()->Clone();
 			}
 		}
-		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
+		CommandMove(*movableunits[index], movablepos[index], EFlushMode::On);
 		if (savedOrder != nullptr) {
 			unit.SavedOrder = std::move(savedOrder);
 		}

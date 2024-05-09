@@ -186,7 +186,7 @@ static bool MoveRandomly(CUnit &unit)
 				auto newPos = pos + Vec2i(std::clamp(vec.x, (short)-1, (short)1), std::clamp(vec.y, (short)-1, (short)1));
 				Map.Clamp(newPos);
 				if (newPos.x || newPos.y) {
-					CommandMove(unit, newPos, FlushCommands);
+					CommandMove(unit, newPos, EFlushMode::On);
 					return true;
 				}
 			}
@@ -211,7 +211,7 @@ static bool MoveRandomly(CUnit &unit)
 		UnmarkUnitFieldFlags(unit);
 		if (UnitCanBeAt(unit, pos)) {
 			MarkUnitFieldFlags(unit);
-			CommandMove(unit, pos, FlushCommands);
+			CommandMove(unit, pos, EFlushMode::On);
 			return true;
 		}
 		MarkUnitFieldFlags(unit);
@@ -295,7 +295,7 @@ bool AutoRepair(CUnit &unit)
 	}
 
 	//Command* will clear unit.SavedOrder
-	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
+	CommandRepair(unit, invalidPos, repairedUnit, EFlushMode::On);
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = std::move(savedOrder);
 	}
@@ -373,7 +373,7 @@ bool AutoAttack(CUnit &unit)
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->tilePos, nullptr, FlushCommands);
+	CommandAttack(unit, goal->tilePos, nullptr, EFlushMode::On);
 
 	if (savedOrder != nullptr) {
 		unit.SavedOrder = std::move(savedOrder);

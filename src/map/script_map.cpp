@@ -257,7 +257,7 @@ static int CclSetFogOfWar(lua_State *l)
 	if (!CclInConfigFile && !Map.Fields.empty()) {
 		UpdateFogOfWarChange();
 		// FIXME: save setting in replay log
-		//CommandLog("input", nullptr, FlushCommands, -1, -1, nullptr, "fow off", -1);
+		//CommandLog("input", nullptr, EFlushMode::On, -1, -1, nullptr, "fow off", -1);
 	}
 	return 0;
 }

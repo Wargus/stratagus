@@ -115,7 +115,7 @@ int Spell_Capture::Cast(CUnit &caster,
 		if (auto force = caster.Player->Ai->Force.GetForce(caster)) {
 			caster.Player->Ai->Force[*force].Insert(*target);
 			target->GroupId = caster.GroupId;
-			CommandDefend(*target, caster, FlushCommands);
+			CommandDefend(*target, caster, EFlushMode::On);
 		}
 	}
 	if (this->SacrificeEnable) {

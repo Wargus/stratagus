@@ -464,12 +464,12 @@ void AiForce::Attack(const Vec2i &pos)
 
 			unit->Wait = delay;
 			if (unit->IsAgressive()) {
-				CommandAttack(*unit, this->GoalPos,  nullptr, FlushCommands);
+				CommandAttack(*unit, this->GoalPos,  nullptr, EFlushMode::On);
 			} else {
 				if (leader) {
-					CommandDefend(*unit, *leader, FlushCommands);
+					CommandDefend(*unit, *leader, EFlushMode::On);
 				} else {
-					CommandMove(*unit, this->GoalPos, FlushCommands);
+					CommandMove(*unit, this->GoalPos, EFlushMode::On);
 				}
 			}
 		}
@@ -480,7 +480,7 @@ void AiForce::ReturnToHome()
 {
 	if (Map.Info.IsPointOnMap(this->HomePos)) {
 		for (CUnit *unit : this->Units) {
-			CommandMove(*unit, this->HomePos, FlushCommands);
+			CommandMove(*unit, this->HomePos, EFlushMode::On);
 		}
 	}
 	const Vec2i invalidPos(-1, -1);
@@ -809,7 +809,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		        || (unit.CurrentAction() == UnitAction::Board && !unit.Moving
 		            && static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter))
 		    && unit.Container == nullptr) {
-			CommandBoard(unit, transporter, FlushCommands);
+			CommandBoard(unit, transporter, EFlushMode::On);
 			CommandFollow(transporter, unit, EFlushMode::Off);
 			if (--nbToTransport == 0) { // full : next transporter.
 				for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
@@ -900,7 +900,7 @@ void AiForce::Update()
 				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 				trans.Wait = delay;
-				CommandUnload(trans, this->GoalPos, nullptr, FlushCommands);
+				CommandUnload(trans, this->GoalPos, nullptr, EFlushMode::On);
 			}
 		}
 		return;
@@ -949,12 +949,12 @@ void AiForce::Update()
 
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
-					CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, nullptr, EFlushMode::On);
 				} else {
 					if (leader) {
-						CommandDefend(aiunit, *leader, FlushCommands);
+						CommandDefend(aiunit, *leader, EFlushMode::On);
 					} else {
-						CommandMove(aiunit, this->GoalPos, FlushCommands);
+						CommandMove(aiunit, this->GoalPos, EFlushMode::On);
 					}
 				}
 			}
@@ -1002,18 +1002,18 @@ void AiForce::Update()
 		if (leader) {
 			if (aiunit.IsAgressive()) {
 				if (State == AiForceAttackingState::Attacking) {
-					CommandAttack(aiunit, leader->tilePos, nullptr, FlushCommands);
+					CommandAttack(aiunit, leader->tilePos, nullptr, EFlushMode::On);
 				} else {
-					CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, nullptr, EFlushMode::On);
 				}
 			} else {
-				CommandDefend(aiunit, *leader, FlushCommands);
+				CommandDefend(aiunit, *leader, EFlushMode::On);
 			}
 		} else {
 			if (aiunit.IsAgressive()) {
-				CommandAttack(aiunit, this->GoalPos, nullptr, FlushCommands);
+				CommandAttack(aiunit, this->GoalPos, nullptr, EFlushMode::On);
 			} else {
-				CommandMove(aiunit, this->GoalPos, FlushCommands);
+				CommandMove(aiunit, this->GoalPos, EFlushMode::On);
 			}
 		}
 	}
@@ -1082,9 +1082,9 @@ void AiForceManager::Update()
 
 							unit->Wait = delay;
 							if (unit->Type->CanAttack) {
-								CommandAttack(*unit, force.GoalPos, nullptr, FlushCommands);
+								CommandAttack(*unit, force.GoalPos, nullptr, EFlushMode::On);
 							} else {
-								CommandMove(*unit, force.GoalPos, FlushCommands);
+								CommandMove(*unit, force.GoalPos, EFlushMode::On);
 							}
 						}
 					}

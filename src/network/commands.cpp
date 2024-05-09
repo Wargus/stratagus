@@ -59,10 +59,10 @@
 void SendCommandStopUnit(CUnit &unit)
 {
 	if (IsReplayGame()) {
-		CommandLog("stop", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+		CommandLog("stop", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 		CommandStopUnit(unit);
 	} else {
-		NetworkSendCommand(MessageCommandStop, unit, 0, 0, nullptr, 0, FlushCommands);
+		NetworkSendCommand(MessageCommandStop, unit, 0, 0, nullptr, 0, EFlushMode::On);
 	}
 }
 
@@ -160,10 +160,10 @@ void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode fl
 void SendCommandAutoRepair(CUnit &unit, int on)
 {
 	if (IsReplayGame()) {
-		CommandLog("auto-repair", &unit, FlushCommands, on, -1, nullptr, nullptr, 0);
+		CommandLog("auto-repair", &unit, EFlushMode::On, on, -1, nullptr, nullptr, 0);
 		CommandAutoRepair(unit, on);
 	} else {
-		NetworkSendCommand(MessageCommandAutoRepair, unit, on, -1, nullptr, nullptr, FlushCommands);
+		NetworkSendCommand(MessageCommandAutoRepair, unit, on, -1, nullptr, nullptr, EFlushMode::On);
 	}
 }
 
@@ -297,10 +297,10 @@ void SendCommandDismiss(CUnit &unit)
 {
 	// FIXME: currently unit and worker are same?
 	if (IsReplayGame()) {
-		CommandLog("dismiss", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+		CommandLog("dismiss", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 		CommandDismiss(unit);
 	} else {
-		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, nullptr, 0, FlushCommands);
+		NetworkSendCommand(MessageCommandDismiss, unit, 0, 0, nullptr, 0, EFlushMode::On);
 	}
 }
 
@@ -382,12 +382,12 @@ void SendCommandTrainUnit(CUnit &unit, CUnitType &what, EFlushMode flush)
 void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 {
 	if (IsReplayGame()) {
-		CommandLog("cancel-train", &unit, FlushCommands, -1, -1, nullptr,
+		CommandLog("cancel-train", &unit, EFlushMode::On, -1, -1, nullptr,
 				   type ? type->Ident.c_str() : nullptr, slot);
 		CommandCancelTraining(unit, slot, type);
 	} else {
 		NetworkSendCommand(MessageCommandCancelTrain, unit, slot, 0, nullptr,
-						   type, FlushCommands);
+						   type, EFlushMode::On);
 	}
 }
 
@@ -416,11 +416,11 @@ void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, EFlushMode flush)
 void SendCommandCancelUpgradeTo(CUnit &unit)
 {
 	if (IsReplayGame()) {
-		CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+		CommandLog("cancel-upgrade-to", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 		CommandCancelUpgradeTo(unit);
 	} else {
 		NetworkSendCommand(MessageCommandCancelUpgrade, unit,
-						   0, 0, nullptr, nullptr, FlushCommands);
+						   0, 0, nullptr, nullptr, EFlushMode::On);
 	}
 }
 
@@ -450,11 +450,11 @@ void SendCommandResearch(CUnit &unit, CUpgrade &what, EFlushMode flush)
 void SendCommandCancelResearch(CUnit &unit)
 {
 	if (IsReplayGame()) {
-		CommandLog("cancel-research", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+		CommandLog("cancel-research", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 		CommandCancelResearch(unit);
 	} else {
 		NetworkSendCommand(MessageCommandCancelResearch, unit,
-						   0, 0, nullptr, nullptr, FlushCommands);
+						   0, 0, nullptr, nullptr, EFlushMode::On);
 	}
 }
 
@@ -488,11 +488,11 @@ void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spelli
 void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 {
 	if (IsReplayGame()) {
-		CommandLog("auto-spell-cast", &unit, FlushCommands, on, -1, nullptr, nullptr, spellid);
+		CommandLog("auto-spell-cast", &unit, EFlushMode::On, on, -1, nullptr, nullptr, spellid);
 		CommandAutoSpellCast(unit, spellid, on);
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
-						   unit, on, -1, nullptr, nullptr, FlushCommands);
+						   unit, on, -1, nullptr, nullptr, EFlushMode::On);
 	}
 }
 
@@ -591,7 +591,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			return;
 
 		case MessageCommandStop:
-			CommandLog("stop", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+			CommandLog("stop", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 			CommandStopUnit(unit);
 			break;
 		case MessageCommandStand:
@@ -680,7 +680,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandExplore(unit, flush);
 			break;
 		case MessageCommandDismiss:
-			CommandLog("dismiss", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+			CommandLog("dismiss", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 			CommandDismiss(unit);
 			break;
 		case MessageCommandResourceLoc:
@@ -709,11 +709,11 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
-				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, nullptr,
+				CommandLog("cancel-train", &unit, EFlushMode::On, -1, -1, nullptr,
 						   UnitTypes[dstnr]->Ident.c_str(), (short)x);
 				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
 			} else {
-				CommandLog("cancel-train", &unit, FlushCommands, -1, -1, nullptr, nullptr, (short)x);
+				CommandLog("cancel-train", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
 			}
 			break;
@@ -723,7 +723,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandUpgradeTo(unit, *UnitTypes[dstnr], flush);
 			break;
 		case MessageCommandCancelUpgrade:
-			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+			CommandLog("cancel-upgrade-to", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 			CommandCancelUpgradeTo(unit);
 			break;
 		case MessageCommandResearch:
@@ -732,7 +732,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandResearch(unit, *AllUpgrades[arg1], flush);
 			break;
 		case MessageCommandCancelResearch:
-			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
+			CommandLog("cancel-research", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 			CommandCancelResearch(unit);
 			break;
 		default: {

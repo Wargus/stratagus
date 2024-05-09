@@ -207,8 +207,6 @@ extern void ExecExtendedCommand(unsigned char type, int status, unsigned char ar
 								unsigned short arg2, unsigned short arg3,
 								unsigned short arg4);
 
-#define FlushCommands EFlushMode::On /// Flush commands in queue
-
 //@}
 
 #endif // !__COMMANDS_H__

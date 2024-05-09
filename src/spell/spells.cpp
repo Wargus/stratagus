@@ -458,7 +458,7 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 		}
 		auto [targetUnit, targetPos] = *target;
 		// Must move before?
-		CommandSpellCast(caster, targetPos, targetUnit, spell, FlushCommands, true);
+		CommandSpellCast(caster, targetPos, targetUnit, spell, EFlushMode::On, true);
 		if (savedOrder != nullptr) {
 			caster.SavedOrder = std::move(savedOrder);
 		}
