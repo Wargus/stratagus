@@ -298,8 +298,7 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 					for (const auto *unit : table) {
 						array.push_back(UnitNumber(*unit));
 					}
-					const auto [x, y] = autocast->PositionAutoCast(array);
-					Vec2i resPos(x, y);
+					Vec2i resPos(autocast->PositionAutoCast(array));
 					if (Map.Info.IsPointOnMap(resPos)) {
 						return std::pair{nullptr, resPos};
 					}

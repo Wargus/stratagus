@@ -30,6 +30,8 @@
 #ifndef VEC2I_H
 #define VEC2I_H
 
+#include <tuple>
+
 //@{
 
 template <typename T>
@@ -38,6 +40,8 @@ class Vec2T
 public:
 	Vec2T() = default;
 	Vec2T(T x, T y) : x(x), y(y) {}
+	explicit Vec2T(std::tuple<T, T> t) : x(std::get<0>(t)), y(std::get<1>(t)) {}
+
 public:
 	T x{};
 	T y{};
