@@ -393,7 +393,7 @@ private:
 	sdl2::SurfacePtr newBlankImage() const;
 	bool isModifierPresent(lua_State *luaStack) const;
 
-	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght = 16) const;
+	std::vector<uint8_t> buildIndexesRow16(const uint8_t upperBound, const uint16_t length = 16) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Cicadas(std::vector<sequence_of_images> const &src) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences_Fair(std::vector<sequence_of_images> const &src) const;
 	std::vector<sequence_of_imagesPtrs> buildSequences(std::vector<sequence_of_images> const &src, const bool isFairMethod = true) const;

@@ -292,7 +292,7 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 
 /**
 **  Calc field of view for set of lines along x or y.
-**	Used for calc part of FoV for assymetric (widht != height) spectators.
+**	Used for calc part of FoV for assymetric (width != height) spectators.
 **
 **  @param octant	Current work octant
 **	@param origin	Tile position of the spectrator

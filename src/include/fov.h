@@ -79,7 +79,7 @@ private:
 	/// Calc whole chadow casting field of view
 	void ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range);
 	/// Calc field of view for set of lines along x or y.
-	/// Used for calc part of FoV for assymetric (widht != height) spectators.
+	/// Used for calc part of FoV for assymetric (width != height) spectators.
 	void ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range);
 	/// Calc shadow casting field of view for single octant
 	void RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range);
