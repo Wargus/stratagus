@@ -298,8 +298,7 @@ static std::optional<std::pair<CUnit*, Vec2i>> SelectTargetUnitsOfAutoCast(CUnit
 					for (const auto *unit : table) {
 						array.push_back(UnitNumber(*unit));
 					}
-					const auto [x, y] = autocast->PositionAutoCast(array);
-					Vec2i resPos(x, y);
+					Vec2i resPos(autocast->PositionAutoCast(array));
 					if (Map.Info.IsPointOnMap(resPos)) {
 						return std::pair{nullptr, resPos};
 					}
@@ -459,7 +458,7 @@ bool AutoCastSpell(CUnit &caster, const SpellType &spell)
 		}
 		auto [targetUnit, targetPos] = *target;
 		// Must move before?
-		CommandSpellCast(caster, targetPos, targetUnit, spell, FlushCommands, true);
+		CommandSpellCast(caster, targetPos, targetUnit, spell, EFlushMode::On, true);
 		if (savedOrder != nullptr) {
 			caster.SavedOrder = std::move(savedOrder);
 		}

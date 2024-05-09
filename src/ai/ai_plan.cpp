@@ -172,9 +172,9 @@ bool AiFindWall(AiForce &force)
 		force.State = AiForceAttackingState::Waiting;
 		for (CUnit *aiunit : force.Units) {
 			if (aiunit->Type->CanAttack) {
-				CommandAttack(*aiunit, *wallPos, nullptr, FlushCommands);
+				CommandAttack(*aiunit, *wallPos, nullptr, EFlushMode::On);
 			} else {
-				CommandMove(*aiunit, *wallPos, FlushCommands);
+				CommandMove(*aiunit, *wallPos, EFlushMode::On);
 			}
 		}
 		return true;
@@ -491,7 +491,7 @@ void AiSendExplorers()
 
 		const auto& [bestunit, pos] = GetBestExplorer(request);
 		if (bestunit != nullptr) {
-			CommandMove(*bestunit, pos, FlushCommands);
+			CommandMove(*bestunit, pos, EFlushMode::On);
 			AiPlayer->LastExplorationGameCycle = GameCycle;
 			break;
 		}

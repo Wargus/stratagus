@@ -534,18 +534,23 @@ void NetworkOnStartGame()
 **  @param y        optional y map position.
 **  @param dest     optional destination unit.
 **  @param type     optional unit-type argument.
-**  @param status   Append command or flush old commands.
+**  @param flush    Append command or flush old commands.
 **
 **  @warning  Destination and unit-type shares the same network slot.
 */
-void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const CUnitType *type, int status)
+void NetworkSendCommand(int command,
+                        const CUnit &unit,
+                        int x,
+                        int y,
+                        const CUnit *dest,
+                        const CUnitType *type,
+                        EFlushMode flush)
 {
 	CNetworkCommandQueue ncq;
 
 	ncq.Time = GameCycle;
 	ncq.Type = command;
-	if (status) {
+	if (flush == EFlushMode::On) {
 		ncq.Type |= 0x80;
 	}
 	CNetworkCommand nc;
@@ -992,7 +997,7 @@ static void NetworkExecCommand_Chat(const CNetworkCommandQueue &ncq)
 
 	SetMessage("%s", nc.Text.c_str());
 	PlayGameSound(GameSounds.ChatMessage.Sound.get(), MaxSampleVolume);
-	CommandLog("chat", nullptr, FlushCommands, -1, -1, nullptr, nc.Text.c_str(), -1);
+	CommandLog("chat", nullptr, EFlushMode::On, -1, -1, nullptr, nc.Text.c_str(), -1);
 }
 
 static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
@@ -1002,7 +1007,7 @@ static void NetworkExecCommand_Quit(const CNetworkCommandQueue &ncq)
 
 	nc.Deserialize(&ncq.Data[0]);
 	NetworkRemovePlayer(nc.player);
-	CommandLog("quit", nullptr, FlushCommands, nc.player, -1, nullptr, nullptr, -1);
+	CommandLog("quit", nullptr, EFlushMode::On, nc.player, -1, nullptr, nullptr, -1);
 	CommandQuit(nc.player);
 }
 

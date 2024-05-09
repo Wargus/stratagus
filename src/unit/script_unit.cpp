@@ -831,10 +831,10 @@ static int CclTransformUnit(lua_State *l)
 	CUnit *targetUnit = CclGetUnit(l);
 	lua_pop(l, 1);
 	lua_pushvalue(l, 2);
-	const CUnitType *unittype = CclGetUnitType(l);
+	CUnitType *unittype = CclGetUnitType(l);
 	lua_pop(l, 1);
 	if (unittype && targetUnit) {
-		CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1, true);
+		CommandUpgradeTo(*targetUnit, *unittype, EFlushMode::On, true);
 	}
 	lua_pushvalue(l, 1);
 	return 1;
@@ -980,18 +980,18 @@ static int CclOrderUnit(lua_State *l)
 	for (CUnit *unit : table) {
 		if (unitValidator(*unit) && unitPlayerValidator(*unit)) {
 			if (order == "move") {
-				CommandMove(*unit, (dpos1 + dpos2) / 2, 1);
+				CommandMove(*unit, (dpos1 + dpos2) / 2, EFlushMode::On);
 			} else if (order == "stop") {
 				CommandStopUnit(*unit); //Stop the unit
 			} else if (order == "stand-ground") {
-				CommandStandGround(*unit, 0); //Stand and flush every order
+				CommandStandGround(*unit, EFlushMode::Off); //Stand and flush every order
 			} else if (order == "attack") {
 				CUnit *attack = TargetOnMap(*unit, dpos1, dpos2);
-				CommandAttack(*unit, (dpos1 + dpos2) / 2, attack, 1);
+				CommandAttack(*unit, (dpos1 + dpos2) / 2, attack, EFlushMode::On);
 			} else if (order == "explore") {
-				CommandExplore(*unit, 1);
+				CommandExplore(*unit, EFlushMode::On);
 			} else if (order == "patrol") {
-				CommandPatrolUnit(*unit, (dpos1 + dpos2) / 2, 1);
+				CommandPatrolUnit(*unit, (dpos1 + dpos2) / 2, EFlushMode::On);
 			} else {
 				LuaError(l, "Unsupported order: %s", order.data());
 			}

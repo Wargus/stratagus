@@ -76,7 +76,7 @@ public:
 	int UnitNumber = 0;
 	std::string UnitIdent;
 	std::string Action;
-	int Flush = 0;
+	EFlushMode Flush = EFlushMode::Off;
 	Vec2i Pos{0, 0};
 	int DestUnitNumber = 0;
 	std::string Value;
@@ -318,7 +318,7 @@ static void AppendLog(LogEntry&& log, CFile &file)
 */
 void CommandLog(const char *action,
                 const CUnit *unit,
-                int flush,
+                EFlushMode flush,
                 int x,
                 int y,
                 const CUnit *dest,
@@ -440,7 +440,7 @@ static int CclLog(lua_State *l)
 		} else if (value == "Action") {
 			log.Action = LuaToString(l, -1);
 		} else if (value == "Flush") {
-			log.Flush = LuaToNumber(l, -1);
+			log.Flush = LuaToNumber(l, -1) ? EFlushMode::On : EFlushMode::Off;
 		} else if (value == "PosX") {
 			log.Pos.x = LuaToNumber(l, -1);
 		} else if (value == "PosY") {
@@ -649,7 +649,7 @@ static void DoNextReplay()
 
 	const int unitSlot = ReplayStep.UnitNumber;
 	const auto& action = ReplayStep.Action;
-	const int flags = ReplayStep.Flush;
+	const EFlushMode flush = ReplayStep.Flush;
 	const Vec2i pos(ReplayStep.Pos);
 	const int arg1 = ReplayStep.Pos.x;
 	const int arg2 = ReplayStep.Pos.y;
@@ -685,53 +685,53 @@ static void DoNextReplay()
 	if (action == "stop") {
 		SendCommandStopUnit(*unit);
 	} else if (action == "stand-ground") {
-		SendCommandStandGround(*unit, flags);
+		SendCommandStandGround(*unit, flush);
 	} else if (action == "defend") {
-		SendCommandDefend(*unit, *dunit, flags);
+		SendCommandDefend(*unit, *dunit, flush);
 	} else if (action == "follow") {
-		SendCommandFollow(*unit, *dunit, flags);
+		SendCommandFollow(*unit, *dunit, flush);
 	} else if (action == "move") {
-		SendCommandMove(*unit, pos, flags);
+		SendCommandMove(*unit, pos, flush);
 	} else if (action == "repair") {
-		SendCommandRepair(*unit, pos, dunit, flags);
+		SendCommandRepair(*unit, pos, dunit, flush);
 	} else if (action == "auto-repair") {
 		SendCommandAutoRepair(*unit, arg1);
 	} else if (action == "attack") {
-		SendCommandAttack(*unit, pos, dunit, flags);
+		SendCommandAttack(*unit, pos, dunit, flush);
 	} else if (action == "attack-ground") {
-		SendCommandAttackGround(*unit, pos, flags);
+		SendCommandAttackGround(*unit, pos, flush);
 	} else if (action == "patrol") {
-		SendCommandPatrol(*unit, pos, flags);
+		SendCommandPatrol(*unit, pos, flush);
 	} else if (action == "board") {
-		SendCommandBoard(*unit, *dunit, flags);
+		SendCommandBoard(*unit, *dunit, flush);
 	} else if (action == "unload") {
-		SendCommandUnload(*unit, pos, dunit, flags);
+		SendCommandUnload(*unit, pos, dunit, flush);
 	} else if (action == "build") {
-		SendCommandBuildBuilding(*unit, pos, UnitTypeByIdent(val), flags);
+		SendCommandBuildBuilding(*unit, pos, UnitTypeByIdent(val), flush);
 	} else if (action == "explore") {
-		SendCommandExplore(*unit, flags);
+		SendCommandExplore(*unit, flush);
 	} else if (action == "dismiss") {
 		SendCommandDismiss(*unit);
 	} else if (action == "resource-loc") {
-		SendCommandResourceLoc(*unit, pos, flags);
+		SendCommandResourceLoc(*unit, pos, flush);
 	} else if (action == "resource") {
-		SendCommandResource(*unit, *dunit, flags);
+		SendCommandResource(*unit, *dunit, flush);
 	} else if (action == "return") {
-		SendCommandReturnGoods(*unit, dunit, flags);
+		SendCommandReturnGoods(*unit, dunit, flush);
 	} else if (action == "train") {
-		SendCommandTrainUnit(*unit, UnitTypeByIdent(val), flags);
+		SendCommandTrainUnit(*unit, UnitTypeByIdent(val), flush);
 	} else if (action == "cancel-train") {
 		SendCommandCancelTraining(*unit, num, !val.empty() ? &UnitTypeByIdent(val) : nullptr);
 	} else if (action == "upgrade-to") {
-		SendCommandUpgradeTo(*unit, UnitTypeByIdent(val), flags);
+		SendCommandUpgradeTo(*unit, UnitTypeByIdent(val), flush);
 	} else if (action == "cancel-upgrade-to") {
 		SendCommandCancelUpgradeTo(*unit);
 	} else if (action == "research") {
-		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
+		SendCommandResearch(*unit, *CUpgrade::Get(val), flush);
 	} else if (action == "cancel-research") {
 		SendCommandCancelResearch(*unit);
 	} else if (action == "spell-cast") {
-		SendCommandSpellCast(*unit, pos, dunit, num, flags);
+		SendCommandSpellCast(*unit, pos, dunit, num, flush);
 	} else if (action == "auto-spell-cast") {
 		SendCommandAutoSpellCast(*unit, num, arg1);
 	} else if (action == "diplomacy") {

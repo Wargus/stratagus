@@ -911,22 +911,16 @@ int CPlayer::GetUnitCount() const
 **
 **  @param resource  Resource to get.
 **  @param type      Storing type
-**
-**  @note Storing types: 0 - overall store, 1 - store buildings, 2 - both
 */
-int CPlayer::GetResource(const int resource, const int type)
+int CPlayer::GetResource(const int resource, const EStoreType type)
 {
 	switch (type) {
-		case STORE_OVERALL:
-			return this->Resources[resource];
-		case STORE_BUILDING:
-			return this->StoredResources[resource];
-		case STORE_BOTH:
-			return this->Resources[resource] + this->StoredResources[resource];
-		default:
-			DebugPrint("Wrong resource type\n");
-			return -1;
+		case EStoreType::Overall: return this->Resources[resource];
+		case EStoreType::Building: return this->StoredResources[resource];
+		case EStoreType::Both: return this->Resources[resource] + this->StoredResources[resource];
 	}
+	DebugPrint("Wrong resource type\n");
+	return -1;
 }
 
 /**
@@ -957,22 +951,33 @@ void CPlayer::ChangeResource(const int resource, const int value, const bool sto
 **
 **  @param resource  Resource to change.
 **  @param value     How many of this resource.
-**  @param type      Resource types: 0 - overall store, 1 - store buildings, 2 - both
+**  @param type      Resource types.
 */
-void CPlayer::SetResource(const int resource, const int value, const int type)
+void CPlayer::SetResource(const int resource, const int value, const EStoreType type)
 {
-	if (type == STORE_BOTH) {
-		if (this->MaxResources[resource] != -1) {
-			const int toRes = std::max(0, value - this->StoredResources[resource]);
-			this->Resources[resource] = std::max(0, toRes);
-			this->StoredResources[resource] = std::min(value - toRes, this->MaxResources[resource]);
-		} else {
-			this->Resources[resource] = value;
+	switch (type) {
+		case EStoreType::Both:
+		{
+			if (this->MaxResources[resource] != -1) {
+				const int toRes = std::max(0, value - this->StoredResources[resource]);
+				this->Resources[resource] = std::max(0, toRes);
+				this->StoredResources[resource] =
+					std::min(value - toRes, this->MaxResources[resource]);
+			} else {
+				this->Resources[resource] = value;
+			}
+			break;
 		}
-	} else if (type == STORE_BUILDING && this->MaxResources[resource] != -1) {
-		this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
-	} else if (type == STORE_OVERALL) {
-		this->Resources[resource] = value;
+		case EStoreType::Building:
+			if (this->MaxResources[resource] != -1) {
+				this->StoredResources[resource] = std::min(value, this->MaxResources[resource]);
+			}
+			break;
+		case EStoreType::Overall:
+		{
+			this->Resources[resource] = value;
+			break;
+		}
 	}
 }
 
@@ -1011,34 +1016,33 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 **
 **  @param type    Type of unit.
 **
-**  @return        True if enough, negative on problem.
-**
-**  @note The return values of the PlayerCheck functions are inconsistent.
+**  @return        checkLimit
 */
-int CPlayer::CheckLimits(const CUnitType &type) const
+ECheckLimit CPlayer::CheckLimits(const CUnitType &type) const
 {
 	//  Check game limits.
 	if (type.Building && NumBuildings >= BuildingLimit) {
 		Notify("%s", _("Building Limit Reached"));
-		return -1;
+		return ECheckLimit::BuildingLimitReached;
 	}
 	if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
 		Notify("%s", _("Unit Limit Reached"));
-		return -2;
+		return ECheckLimit::UnitLimitReached;
 	}
-	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
+	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply
+	    && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 		Notify("%s", _("Insufficient Supply, increase Supply."));
-		return -3;
+		return ECheckLimit::InsufficientSupply;
 	}
 	if (this->GetUnitCount() >= TotalUnitLimit) {
 		Notify("%s", _("Total Unit Limit Reached"));
-		return -4;
+		return ECheckLimit::TotalUnitLimitReached;
 	}
 	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
 		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
-		return -6;
+		return ECheckLimit::SpecificUnitLimitReached;
 	}
-	return 1;
+	return ECheckLimit::Ok;
 }
 
 /**

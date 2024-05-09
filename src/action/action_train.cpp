@@ -196,9 +196,9 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 	this->Ticks = std::min(this->Ticks, cost);
 
 	// Check if enough supply available.
-	const int food = player.CheckLimits(nType);
-	if (food < 0) {
-		if (food == -3 && unit.Player->AiEnabled) {
+	const ECheckLimit food = player.CheckLimits(nType);
+	if (food != ECheckLimit::Ok) {
+		if (food == ECheckLimit::InsufficientSupply && unit.Player->AiEnabled) {
 			AiNeedMoreSupply(*unit.Player);
 		}
 		unit.Wait = CYCLES_PER_SECOND / 6;

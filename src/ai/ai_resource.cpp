@@ -274,7 +274,7 @@ static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Ve
 
 	// Find a place to build.
 	if (auto pos = AiFindBuildingPlace(candidate, building, nearPos)) {
-		CommandBuildBuilding(candidate, *pos, building, FlushCommands);
+		CommandBuildBuilding(candidate, *pos, building, EFlushMode::On);
 		return true;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
@@ -286,7 +286,7 @@ static bool AiBuildBuilding(const CUnitType &type, CUnitType &building, const Ve
 				}
 				// Find a place to build.
 				if (auto pos = AiFindBuildingPlace(*unit, building, nearPos)) {
-					CommandBuildBuilding(*unit, *pos, building, FlushCommands);
+					CommandBuildBuilding(*unit, *pos, building, EFlushMode::On);
 					return true;
 				}
 			}
@@ -596,7 +596,7 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 
 	for (CUnit *unit : table) {
 		if (unit->IsIdle()) {
-			CommandTrainUnit(*unit, what, FlushCommands);
+			CommandTrainUnit(*unit, what, EFlushMode::On);
 			return true;
 		}
 	}
@@ -675,7 +675,7 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 
 	for (CUnit *unit : table) {
 		if (unit->IsIdle()) {
-			CommandResearch(*unit, what, FlushCommands);
+			CommandResearch(*unit, what, EFlushMode::On);
 			return true;
 		}
 	}
@@ -767,7 +767,7 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 	std::vector<CUnit *> table = FindPlayerUnitsByType(*AiPlayer->Player, type, true);
 	for (CUnit *unit : table) {
 		if (unit->IsIdle()) {
-			CommandUpgradeTo(*unit, what, FlushCommands);
+			CommandUpgradeTo(*unit, what, EFlushMode::On);
 			return true;
 		}
 	}
@@ -787,7 +787,7 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
-	if (AiPlayer->Player->CheckLimits(type) < 0) {
+	if (AiPlayer->Player->CheckLimits(type) != ECheckLimit::Ok) {
 		return;
 	}
 	//
@@ -851,7 +851,7 @@ static void AiCheckingWork()
 			new_supply = true;
 		}
 		// Check limits, AI should be broken if reached.
-		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) != ECheckLimit::Ok) {
 			continue;
 		}
 		// Check if resources available.
@@ -900,7 +900,7 @@ static bool AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 	// TODO : hardcoded forest
 	// Code for terrain harvesters. Search for piece of terrain to mine.
 	if (auto forestPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos)) {
-		CommandResourceLoc(unit, *forestPos, FlushCommands);
+		CommandResourceLoc(unit, *forestPos, EFlushMode::On);
 		return true;
 	}
 	// Ask the AI to explore...
@@ -926,7 +926,7 @@ static bool AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
 
 	if (mine) {
-		CommandResource(unit, *mine, FlushCommands);
+		CommandResource(unit, *mine, EFlushMode::On);
 		return true;
 	}
 
@@ -1019,7 +1019,7 @@ static void AiCollectResources()
 			const int c = unit->CurrentResource;
 
 			num_units_with_resource[c]++;
-			CommandReturnGoods(*unit, 0, FlushCommands);
+			CommandReturnGoods(*unit, 0, EFlushMode::On);
 			total_harvester++;
 			continue;
 		}
@@ -1217,7 +1217,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	const int maxRange = 15;
 	if (CUnit *unit = UnitFinder::find(candidates, maxRange, building)) {
 		const Vec2i invalidPos(-1, -1);
-		CommandRepair(*unit, invalidPos, &building, FlushCommands);
+		CommandRepair(*unit, invalidPos, &building, EFlushMode::On);
 		return true;
 	}
 	return false;

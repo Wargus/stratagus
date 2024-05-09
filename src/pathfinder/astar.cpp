@@ -127,7 +127,7 @@ int AStarMovingUnitCrossingCost = 5;
 int AStarMaxSearchIterations = 1024 * 5;
 bool AStarKnowUnseenTerrain = false;
 int AStarUnknownTerrainCost = 2;
-/// Used to temporary make enemy units unpassable (needs for correct path lenght calculating for automatic targeting alorithm)
+/// Used to temporary make enemy units unpassable (needs for correct path length calculating for automatic targeting algorithm)
 static bool AStarFixedEnemyUnitsUnpassable = false;
 
 static int AStarMapWidth;

@@ -796,7 +796,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 	if (SaveGameLoading) {
 		SaveGameLoading = false;
 		// Load game, already created game with Init/LoadModules
-		CommandLog(nullptr, nullptr, FlushCommands, -1, -1, nullptr, nullptr, -1);
+		CommandLog(nullptr, nullptr, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 		return;
 	}
 
@@ -1043,7 +1043,7 @@ void CreateGame(const fs::path &filename, CMap *map)
 
 	GameResult = GameNoResult;
 
-	CommandLog(nullptr, nullptr, FlushCommands, -1, -1, nullptr, nullptr, -1);
+	CommandLog(nullptr, nullptr, EFlushMode::On, -1, -1, nullptr, nullptr, -1);
 	Video.ClearScreen();
 }
 

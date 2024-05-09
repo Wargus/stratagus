@@ -1335,7 +1335,7 @@ bool CTilesetGraphicGenerator::isModifierPresent(lua_State *luaStack) const
 **	@param	length		length of the sequence to generate
 **	@return				generated sequence
 **/
-std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t upperBound, const uint16_t lenght/* = 16*/) const
+std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t upperBound, const uint16_t length/* = 16*/) const
 {
     const std::vector<std::vector<uint8_t>> masks {{1},                                                                 // 1
                                                    {0,  2},                                                             // 2
@@ -1344,7 +1344,7 @@ std::vector<uint8_t> CTilesetGraphicGenerator::buildIndexesRow16(const uint8_t u
                                                    {7,  0,  0,  6,  0,  0,  8,  0,  8,  0,  0},                         // 11
                                                    {0,  0,  0, 11, 12,  0,  9,  0,  0,  0,  0,  0, 10},                 // 13
                                                    {0, 13,  0,  0,  0,  0,  0, 14,  0,  0,  0, 15,  0, 16,  0,  0, 0}}; // 17
-    std::vector<uint8_t> indexes (lenght, 0);
+    std::vector<uint8_t> indexes (length, 0);
 
     for (auto &curr : indexes) {
         const size_t currIdx = std::distance(indexes.data(), &curr);

@@ -54,9 +54,12 @@ class CGraphic;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define STORE_OVERALL 0
-#define STORE_BUILDING 1
-#define STORE_BOTH 2
+enum class EStoreType
+{
+	Overall = 0,
+	Building = 1,
+	Both = 2,
+};
 
 #define SPEEDUP_FACTOR 100
 /*----------------------------------------------------------------------------
@@ -85,6 +88,17 @@ enum class EDiplomacy {
 
 std::optional<EDiplomacy> DiplomacyFromString(std::string_view);
 std::string_view ToString(EDiplomacy);
+
+enum class ECheckLimit
+{
+	BuildingLimitReached = -1,
+	UnitLimitReached = -2,
+	InsufficientSupply = -3,
+	TotalUnitLimitReached = -4,
+	SpecificUnitLimitReached = -6,
+	Ok = 1
+};
+
 
 ///  Player structure
 class CPlayer
@@ -130,18 +144,18 @@ public:
 	void SetUnitColors(std::vector<CColor> &colors);
 
 	/// Get a resource of the player
-	int GetResource(const int resource, const int type);
+	int GetResource(const int resource, const EStoreType type);
 	/// Adds/subtracts some resources to/from the player store
 	void ChangeResource(const int resource, const int value, const bool store = false);
 	/// Set a resource of the player
-	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
+	void SetResource(int resource, int value, EStoreType type = EStoreType::Overall);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const CUnitType &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const CUnitType &type) const;
+	ECheckLimit CheckLimits(const CUnitType &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int (&costs)[MaxCosts], bool notify = true) const;

@@ -1366,7 +1366,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+				player.SetResource(i, player.StoredResources[i], EStoreType::Building);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building
@@ -2927,9 +2927,9 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
 
 	if (target.IsAgressive()) {
-		CommandAttack(target, pos, nullptr, 0); /// Attack-move to pos
+		CommandAttack(target, pos, nullptr, EFlushMode::Off); /// Attack-move to pos
 	} else {
-		CommandMove(target, pos, 0); /// Run away to pos
+		CommandMove(target, pos, EFlushMode::Off); /// Run away to pos
 	}
 }
 
@@ -2989,7 +2989,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 				savedOrder = target.CurrentOrder()->Clone();
 			}
 			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-			CommandAttack(target, posToAttack, nullptr, FlushCommands);
+			CommandAttack(target, posToAttack, nullptr, EFlushMode::On);
 
 			if (savedOrder != nullptr) {
 				target.SavedOrder = std::move(savedOrder);

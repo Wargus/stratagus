@@ -140,14 +140,14 @@ static void SetPlayerData(const int player, std::string_view prop, std::string_v
 			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value, STORE_BOTH);
+		Players[player].SetResource(resId, value, EStoreType::Both);
 	} else if (prop == "StoredResources") {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {
 			ErrorPrint("Invalid resource \"%s\"", arg.data());
 			Exit(1);
 		}
-		Players[player].SetResource(resId, value, STORE_BUILDING);
+		Players[player].SetResource(resId, value, EStoreType::Building);
 	} else if (prop == "UnitLimit") {
 		Players[player].UnitLimit = value;
 	} else if (prop == "BuildingLimit") {

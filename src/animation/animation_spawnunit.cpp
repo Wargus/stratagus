@@ -110,7 +110,7 @@ void CAnimation_SpawnUnit::Action(CUnit &unit, int & /*move*/, int /*scale*/) co
 				if (auto force = unit.Player->Ai->Force.GetForce(unit)) {
 					unit.Player->Ai->Force[*force].Insert(*target);
 					target->GroupId = unit.GroupId;
-					CommandDefend(*target, unit, FlushCommands);
+					CommandDefend(*target, unit, EFlushMode::On);
 				}
 			}
 			//DropOutOnSide(*target, LookingW, nullptr);
