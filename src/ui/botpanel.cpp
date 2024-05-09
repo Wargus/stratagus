@@ -1269,46 +1269,18 @@ void CButtonPanel::DoClicked_Train(int button)
 	if (Selected[best_training_place]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
 		ThisPlayer->Notify(ColorYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
 	}
-	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
+	else if (ThisPlayer->CheckLimits(type) == ECheckLimit::Ok && !ThisPlayer->CheckUnitType(type)) {
 		const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 		SendCommandTrainUnit(*Selected[best_training_place], type, flush);
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 	}
-	else if (ThisPlayer->CheckLimits(type) == -3) {
+	else if (ThisPlayer->CheckLimits(type) == ECheckLimit::InsufficientSupply) {
 		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
 			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound.get(), MaxSampleVolume);
 		}
 	}
 }
-
-/*
-void CButtonPanel::DoClicked_Train(int button)
-{
-	OLD CODE FOR CButtonPanel::DoClicked_Train(int button)
-	To use this code, uncomment it but make sure to comment the code above!
-
-	// FIXME: store pointer in button table!
-	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
-	// FIXME: Johns: I want to place commands in queue, even if not
-	// FIXME:        enough resources are available.
-	// FIXME: training queue full check is not correct for network.
-	// FIXME: this can be correct written, with a little more code.
-	if (Selected[0]->CurrentAction() == UnitAction::Train && !EnableTrainingQueue) {
-		Selected[0]->Player->Notify(ColorYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
-		//PlayerSubUnitType(player,type);
-		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
-		UI.StatusLine.Clear();
-		UI.StatusLine.ClearCosts();
-	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
-		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound.get(), MaxSampleVolume);
-		}
-	}
-}
-*/
-
 
 void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
@@ -1316,7 +1288,8 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
 	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
-		if (Selected[0]->Player->CheckLimits(type) != -6 && !unit->Player->CheckUnitType(type)) {
+		if (Selected[0]->Player->CheckLimits(type) != ECheckLimit::SpecificUnitLimitReached
+		    && !unit->Player->CheckUnitType(type)) {
 			if (unit->CurrentAction() != UnitAction::UpgradeTo) {
 				SendCommandUpgradeTo(*unit, type, flush);
 				UI.StatusLine.Clear();

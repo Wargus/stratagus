@@ -1016,34 +1016,33 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 **
 **  @param type    Type of unit.
 **
-**  @return        True if enough, negative on problem.
-**
-**  @note The return values of the PlayerCheck functions are inconsistent.
+**  @return        checkLimit
 */
-int CPlayer::CheckLimits(const CUnitType &type) const
+ECheckLimit CPlayer::CheckLimits(const CUnitType &type) const
 {
 	//  Check game limits.
 	if (type.Building && NumBuildings >= BuildingLimit) {
 		Notify("%s", _("Building Limit Reached"));
-		return -1;
+		return ECheckLimit::BuildingLimitReached;
 	}
 	if (!type.Building && (this->GetUnitCount() - NumBuildings) >= UnitLimit) {
 		Notify("%s", _("Unit Limit Reached"));
-		return -2;
+		return ECheckLimit::UnitLimitReached;
 	}
-	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
+	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply
+	    && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 		Notify("%s", _("Insufficient Supply, increase Supply."));
-		return -3;
+		return ECheckLimit::InsufficientSupply;
 	}
 	if (this->GetUnitCount() >= TotalUnitLimit) {
 		Notify("%s", _("Total Unit Limit Reached"));
-		return -4;
+		return ECheckLimit::TotalUnitLimitReached;
 	}
 	if (GetUnitTotalCount(type) >= Allow.Units[type.Slot]) {
 		Notify(_("Limit of %d reached for this unit type"), Allow.Units[type.Slot]);
-		return -6;
+		return ECheckLimit::SpecificUnitLimitReached;
 	}
-	return 1;
+	return ECheckLimit::Ok;
 }
 
 /**

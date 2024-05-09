@@ -89,6 +89,17 @@ enum class EDiplomacy {
 std::optional<EDiplomacy> DiplomacyFromString(std::string_view);
 std::string_view ToString(EDiplomacy);
 
+enum class ECheckLimit
+{
+	BuildingLimitReached = -1,
+	UnitLimitReached = -2,
+	InsufficientSupply = -3,
+	TotalUnitLimitReached = -4,
+	SpecificUnitLimitReached = -6,
+	Ok = 1
+};
+
+
 ///  Player structure
 class CPlayer
 {
@@ -144,7 +155,7 @@ public:
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const CUnitType &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand
-	int CheckLimits(const CUnitType &type) const;
+	ECheckLimit CheckLimits(const CUnitType &type) const;
 
 	/// Check if enough resources are available for costs
 	int CheckCosts(const int (&costs)[MaxCosts], bool notify = true) const;

@@ -663,7 +663,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, EFlushMode)
 	}
 	// Check if enough resources remains? (NETWORK!)
 	// FIXME: wrong if append to message queue!!!
-	if (unit.Player->CheckLimits(type) < 0
+	if (unit.Player->CheckLimits(type) != ECheckLimit::Ok
 		|| unit.Player->CheckUnitType(type)) {
 		return;
 	}

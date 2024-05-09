@@ -237,7 +237,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	}
 
 	// Check if hiting any limits for the building.
-	if (player.CheckLimits(type) < 0) {
+	if (player.CheckLimits(type) != ECheckLimit::Ok) {
 		player.Notify(ColorYellow, unit.tilePos, _("Can't build more units %s"), type.Name.c_str());
 		isOk = false;
 	}

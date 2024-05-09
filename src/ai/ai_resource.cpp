@@ -787,7 +787,7 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		AiPlayer->NeededMask |= resourceNeeded;
 		return;
 	}
-	if (AiPlayer->Player->CheckLimits(type) < 0) {
+	if (AiPlayer->Player->CheckLimits(type) != ECheckLimit::Ok) {
 		return;
 	}
 	//
@@ -851,7 +851,7 @@ static void AiCheckingWork()
 			new_supply = true;
 		}
 		// Check limits, AI should be broken if reached.
-		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) != ECheckLimit::Ok) {
 			continue;
 		}
 		// Check if resources available.
