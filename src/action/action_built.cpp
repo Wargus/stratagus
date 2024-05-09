@@ -174,11 +174,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 			// If we can harvest from the new building, do it.
 			if (worker->Type->ResInfo[type.GivesResource]) {
-				CommandResource(*worker, unit, 0);
+				CommandResource(*worker, unit, EFlushMode::Off);
 			}
 			// If we can reurn goods to a new depot, do it.
 			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
-				CommandReturnGoods(*worker, &unit, 0);
+				CommandReturnGoods(*worker, &unit, EFlushMode::Off);
 			}
 		}
 	}

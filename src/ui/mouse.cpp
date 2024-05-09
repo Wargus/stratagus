@@ -137,12 +137,12 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
 		unit.Blink = 4;
 		//  Right mouse with SHIFT appends command to old commands.
-		const int flush = !(KeyModifiers & ModifierShift);
+		const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 		SendCommandResource(*dest, unit, flush);
 	}
 }
 
-static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &acknowledged)
+static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, EFlushMode flush, int &acknowledged)
 {
 	//  Enter transporters ?
 	if (dest == nullptr) {
@@ -158,7 +158,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
-			SendCommandFollow(*dest, unit, 0);
+			SendCommandFollow(*dest, unit, EFlushMode::Off);
 		}
 		// FIXME : manage correctly production units.
 		if (!unit.CanMove() || CanTransport(*dest, unit)) {
@@ -183,7 +183,7 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 				PlayUnitSound(unit, EUnitVoice::Acknowledging);
 				acknowledged = 1;
 			}
-			SendCommandFollow(unit, *dest, 0);
+			SendCommandFollow(unit, *dest, EFlushMode::Off);
 		} else if (!dest->CanMove()) {
 			DebugPrint("Want to transport but no unit can move\n");
 			return true;
@@ -200,7 +200,8 @@ static bool DoRightButton_Transporter(CUnit &unit, CUnit *dest, int flush, int &
 	return false;
 }
 
-static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+static bool
+DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, EFlushMode flush, int &acknowledged)
 {
 	// Return a loaded harvester to deposit
 	if (unit.ResourcesHeld > 0
@@ -245,7 +246,8 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	return false;
 }
 
-static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, int &acknowledged)
+static bool
+DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, EFlushMode flush, int &acknowledged)
 {
 	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
 		return false;
@@ -279,7 +281,8 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	return false;
 }
 
-static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_Worker(
+	CUnit &unit, CUnit *dest, const Vec2i &pos, EFlushMode flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
 
@@ -332,7 +335,8 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	return true;
 }
 
-static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_AttackUnit(
+	CUnit &unit, CUnit &dest, const Vec2i &pos, EFlushMode flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
 	const EMouseAction action = type.MouseAction;
@@ -374,7 +378,8 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	return false;
 }
 
-static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static void DoRightButton_Attack(
+	CUnit &unit, CUnit *dest, const Vec2i &pos, EFlushMode flush, int &acknowledged)
 {
 	if (dest != nullptr && unit.CurrentAction() != UnitAction::Built) {
 		if (DoRightButton_AttackUnit(unit, *dest, pos, flush, acknowledged)) {
@@ -426,7 +431,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
 }
 
-static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, EFlushMode flush, int &acknowledged)
 {
 	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) {
 		dest.Blink = 4;
@@ -444,7 +449,8 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 	return false;
 }
 
-static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+static bool
+DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, EFlushMode flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
 
@@ -474,7 +480,8 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	return false;
 }
 
-static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
+static bool DoRightButton_NewOrder(
+	CUnit &unit, CUnit *dest, const Vec2i &pos, EFlushMode flush, int &acknowledged)
 {
 	// Go and harvest from a unit
 	if (dest != nullptr && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
@@ -512,7 +519,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	const CUnitType &type = *unit.Type;
 	const EMouseAction action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
@@ -1060,7 +1067,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 				// 0 Test build, don't really build
 				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
-					const int flush = !(KeyModifiers & ModifierShift);
+					const EFlushMode flush =
+						!(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 					for (CUnit *unit : Selected) {
 						SendCommandBuildBuilding(*unit, tilePos, *CursorBuilding, flush);
 					}
@@ -1179,7 +1187,8 @@ static int SendRepair(const Vec2i &tilePos)
 		&& (dest->Player == ThisPlayer || ThisPlayer->IsAllied(*dest))) {
 		for (CUnit *unit : Selected) {
 			if (unit->Type->RepairRange) {
-				const int flush = !(KeyModifiers & ModifierShift);
+				const EFlushMode flush =
+					!(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 				SendCommandRepair(*unit, tilePos, dest, flush);
 				ret = 1;
@@ -1203,7 +1212,7 @@ static int SendMove(const Vec2i &tilePos)
 {
 	CUnit *goal = UnitUnderCursor;
 	int ret = 0;
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 	// Alt makes unit to defend goal
 	if (goal && (KeyModifiers & ModifierAlt)) {
@@ -1229,7 +1238,7 @@ static int SendMove(const Vec2i &tilePos)
 		for (CUnit *unit : Selected) {
 			if (goal && CanTransport(*goal, *unit)) {
 				goal->Blink = 4;
-				SendCommandFollow(*goal, *unit, 0);
+				SendCommandFollow(*goal, *unit, EFlushMode::Off);
 				SendCommandBoard(*unit, *goal, flush);
 				ret = 1;
 			} else {
@@ -1258,7 +1267,7 @@ static int SendMove(const Vec2i &tilePos)
 */
 static int SendAttack(const Vec2i &tilePos)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -1291,7 +1300,7 @@ static int SendAttack(const Vec2i &tilePos)
 */
 static int SendAttackGround(const Vec2i &tilePos)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	int ret = 0;
 
 	for (CUnit *unit : Selected) {
@@ -1313,7 +1322,7 @@ static int SendAttackGround(const Vec2i &tilePos)
 */
 static int SendPatrol(const Vec2i &tilePos)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 	for (CUnit *unit : Selected) {
 		SendCommandPatrol(*unit, tilePos, flush);
@@ -1333,7 +1342,7 @@ static int SendResource(const Vec2i &pos)
 	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	const CMapField &mf = *Map.Field(pos);
 
 	for (CUnit *unit : Selected) {
@@ -1394,7 +1403,7 @@ static int SendResource(const Vec2i &pos)
 */
 static int SendUnload(const Vec2i &tilePos)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 	for (CUnit *unit : Selected) {
 		// FIXME: not only transporter selected?
@@ -1416,7 +1425,7 @@ static int SendUnload(const Vec2i &tilePos)
 */
 static int SendSpellCast(const Vec2i &tilePos)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -1688,7 +1697,8 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 
 			// 0 Test build, don't really build
 			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
-				const int flush = !(KeyModifiers & ModifierShift);
+				const EFlushMode flush =
+					!(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound.get(), MaxSampleVolume);
 				PlayUnitSound(*Selected[0], EUnitVoice::Build);
 				for (CUnit *unit : Selected) {
@@ -1844,10 +1854,11 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 						}
 						int lastOccupiedButton = j + uins->Type->BoardSize - 1;
 						if (ButtonAreaUnderCursor == ButtonArea::Transporting) {
+							const EFlushMode flush =
+								!(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 							for (int sub_j = j; sub_j <= lastOccupiedButton; sub_j++) {
 								if (static_cast<size_t>(ButtonUnderCursor) == sub_j) {
 									Assert(uins->Boarded);
-									const int flush = !(KeyModifiers & ModifierShift);
 									if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 										PlayGameSound(GameSounds.Click.Sound.get(), MaxSampleVolume);
 										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);

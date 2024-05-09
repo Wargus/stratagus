@@ -50,6 +50,8 @@ enum class EReplayType {
 class CFile;
 class CUnit;
 
+enum class EFlushMode;
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -62,8 +64,14 @@ extern EReplayType ReplayGameType;  /// Replay game type
 ----------------------------------------------------------------------------*/
 
 /// Log commands into file
-extern void CommandLog(const char *action, const CUnit *unit, int flush,
-					   int x, int y, const CUnit *dest, const char *value, int num);
+extern void CommandLog(const char *action,
+                       const CUnit *unit,
+                       EFlushMode flush,
+                       int x,
+                       int y,
+                       const CUnit *dest,
+                       const char *value,
+                       int num);
 /// Replay user commands from log each cycle, single player games
 extern void SinglePlayerReplayEachCycle();
 /// Replay user commands from log each cycle, multiplayer games

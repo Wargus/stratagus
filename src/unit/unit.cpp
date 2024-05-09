@@ -2927,9 +2927,9 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
 
 	if (target.IsAgressive()) {
-		CommandAttack(target, pos, nullptr, 0); /// Attack-move to pos
+		CommandAttack(target, pos, nullptr, EFlushMode::Off); /// Attack-move to pos
 	} else {
-		CommandMove(target, pos, 0); /// Run away to pos
+		CommandMove(target, pos, EFlushMode::Off); /// Run away to pos
 	}
 }
 

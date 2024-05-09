@@ -1088,7 +1088,7 @@ void CButtonPanel::DoClicked_SelectTarget(int button)
 
 void CButtonPanel::DoClicked_Unload(int button)
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	//
 	//  Unload on coast, transporter standing, unload all units right now.
 	//  That or a bunker.
@@ -1126,7 +1126,7 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		return;
 	}
 	if (SpellTypeTable[spellId]->IsCasterOnly()) {
-		const int flush = !(KeyModifiers & ModifierShift);
+		const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 
 		for (CUnit *unit : Selected) {
 			// CursorValue here holds the spell type id
@@ -1155,15 +1155,17 @@ void CButtonPanel::DoClicked_Repair(int button)
 
 void CButtonPanel::DoClicked_Explore()
 {
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
-		SendCommandExplore(*unit, !(KeyModifiers & ModifierShift));
+		SendCommandExplore(*unit, flush);
 	}
 }
 
 void CButtonPanel::DoClicked_Return()
 {
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
-		SendCommandReturnGoods(*unit, nullptr, !(KeyModifiers & ModifierShift));
+		SendCommandReturnGoods(*unit, nullptr, flush);
 	}
 }
 
@@ -1176,8 +1178,9 @@ void CButtonPanel::DoClicked_Stop()
 
 void CButtonPanel::DoClicked_StandGround()
 {
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
-		SendCommandStandGround(*unit, !(KeyModifiers & ModifierShift));
+		SendCommandStandGround(*unit, flush);
 	}
 }
 
@@ -1267,7 +1270,8 @@ void CButtonPanel::DoClicked_Train(int button)
 		ThisPlayer->Notify(ColorYellow, Selected[best_training_place]->tilePos, "%s", _("Unit training queue is full"));
 	}
 	else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
-		SendCommandTrainUnit(*Selected[best_training_place], type, !(KeyModifiers & ModifierShift));
+		const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
+		SendCommandTrainUnit(*Selected[best_training_place], type, flush);
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 	}
@@ -1310,10 +1314,11 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
 	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
 		if (Selected[0]->Player->CheckLimits(type) != -6 && !unit->Player->CheckUnitType(type)) {
 			if (unit->CurrentAction() != UnitAction::UpgradeTo) {
-				SendCommandUpgradeTo(*unit, type, !(KeyModifiers & ModifierShift));
+				SendCommandUpgradeTo(*unit, type, flush);
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
 			}
@@ -1328,7 +1333,9 @@ void CButtonPanel::DoClicked_Research(int button)
 	const int index = CurrentButtons[button].Value;
 	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
 		//PlayerSubCosts(player,Upgrades[i].Costs);
-		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
+		const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
+
+		SendCommandResearch(*Selected[0], *AllUpgrades[index], flush);
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
 	}

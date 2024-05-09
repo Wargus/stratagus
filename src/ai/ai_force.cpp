@@ -802,7 +802,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 
 		if (unit.CurrentAction() == UnitAction::Board
 			&& static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() == &transporter) {
-			CommandFollow(transporter, unit, 0);
+			CommandFollow(transporter, unit, EFlushMode::Off);
 		}
 		if (CanTransport(transporter, unit)
 		    && (unit.IsIdle()
@@ -810,7 +810,7 @@ static void AiGroupAttackerForTransport(AiForce &aiForce)
 		            && static_cast<COrder_Board *>(unit.CurrentOrder())->GetGoal() != &transporter))
 		    && unit.Container == nullptr) {
 			CommandBoard(unit, transporter, FlushCommands);
-			CommandFollow(transporter, unit, 0);
+			CommandFollow(transporter, unit, EFlushMode::Off);
 			if (--nbToTransport == 0) { // full : next transporter.
 				for (++transporterIndex; transporterIndex < aiForce.Size(); ++transporterIndex) {
 					const CUnit &nextTransporter = *aiForce.Units[transporterIndex];

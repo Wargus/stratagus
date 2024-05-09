@@ -45,6 +45,12 @@ class CUnitType;
 class CUpgrade;
 enum class EDiplomacy;
 
+enum class EFlushMode
+{
+	Off = 0,
+	On = 1
+};
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -62,55 +68,60 @@ extern void CommandQuit(int player);
 /// Prepare command stop
 extern void CommandStopUnit(CUnit &unit);
 /// Prepare command stand ground
-extern void CommandStandGround(CUnit &unit, int flush);
+extern void CommandStandGround(CUnit &unit, EFlushMode flush);
 /// Prepare command defend
-extern void CommandDefend(CUnit &unit, CUnit &dest, int flush);
+extern void CommandDefend(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Prepare command follow
-extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
+extern void CommandFollow(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Prepare command move
-extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandMove(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Prepare command repair
-extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush);
 /// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
 /// Prepare command attack
-extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush);
 /// Prepare command attack ground
-extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Prepare command patrol
-extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Prepare command board
-extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
+extern void CommandBoard(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Prepare command unload
-extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, EFlushMode flush);
 /// Prepare command build
-extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
+extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, EFlushMode flush);
 /// Prepare command explore
-extern void CommandExplore(CUnit &unit, int flush);
+extern void CommandExplore(CUnit &unit, EFlushMode flush);
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
 /// Prepare command resource location
-extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Prepare command resource
-extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
+extern void CommandResource(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Prepare command return
-extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
+extern void CommandReturnGoods(CUnit &unit, CUnit *depot, EFlushMode flush);
 /// Prepare command train
-extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+extern void CommandTrainUnit(CUnit &unit, CUnitType &what, EFlushMode flush);
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Prepare command upgrade to
-extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, int flush, bool instant = false);
+extern void CommandUpgradeTo(CUnit &unit, CUnitType &what, EFlushMode flush, bool instant = false);
 /// immediate transforming into type.
 extern void CommandTransformIntoType(CUnit &unit, CUnitType &type);
 /// Prepare command cancel upgrade to
 extern void CommandCancelUpgradeTo(CUnit &unit);
 /// Prepare command research
-extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
+extern void CommandResearch(CUnit &unit, CUpgrade &what, EFlushMode flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit,
+                             const Vec2i &pos,
+                             CUnit *dest,
+                             const SpellType &spell,
+                             EFlushMode flush,
+                             bool isAutocast = false);
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
@@ -132,53 +143,55 @@ using UnitRef = unsigned short;
 /// Send stop command
 extern void SendCommandStopUnit(CUnit &unit);
 /// Send stand ground command
-extern void SendCommandStandGround(CUnit &unit, int flush);
+extern void SendCommandStandGround(CUnit &unit, EFlushMode flush);
 /// Send defend command
-extern void SendCommandDefend(CUnit &unit, CUnit &dest, int flush);
+extern void SendCommandDefend(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Send follow command
-extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
+extern void SendCommandFollow(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Send move command
-extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandMove(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Send repair command
-extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush);
 /// Send auto repair command
 extern void SendCommandAutoRepair(CUnit &unit, int on);
 /// Send attack command
-extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush);
 /// Send attack ground command
-extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Send patrol command
-extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Send board command
-extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
+extern void SendCommandBoard(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Send unload command
-extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, EFlushMode flush);
 /// Send build building command
-extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);
+extern void
+SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, EFlushMode flush);
 /// Send explore command
-extern void SendCommandExplore(CUnit &unit, int flush);
+extern void SendCommandExplore(CUnit &unit, EFlushMode flush);
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit);
 /// Send harvest location command
-extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, EFlushMode flush);
 /// Send harvest command
-extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
+extern void SendCommandResource(CUnit &unit, CUnit &dest, EFlushMode flush);
 /// Send return goods command
-extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
+extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, EFlushMode flush);
 /// Send train command
-extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, EFlushMode flush);
 /// Send cancel training command
 extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Send upgrade to command
-extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, EFlushMode flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
 /// Send research command
-extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
+extern void SendCommandResearch(CUnit &unit, CUpgrade &what, EFlushMode flush);
 /// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);
 /// Send spell cast command
-extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
+extern void
+SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, EFlushMode flush);
 /// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Send diplomacy command
@@ -194,7 +207,7 @@ extern void ExecExtendedCommand(unsigned char type, int status, unsigned char ar
 								unsigned short arg2, unsigned short arg3,
 								unsigned short arg4);
 
-#define FlushCommands 1          /// Flush commands in queue
+#define FlushCommands EFlushMode::On /// Flush commands in queue
 
 //@}
 

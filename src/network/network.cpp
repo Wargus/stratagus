@@ -534,18 +534,23 @@ void NetworkOnStartGame()
 **  @param y        optional y map position.
 **  @param dest     optional destination unit.
 **  @param type     optional unit-type argument.
-**  @param status   Append command or flush old commands.
+**  @param flush    Append command or flush old commands.
 **
 **  @warning  Destination and unit-type shares the same network slot.
 */
-void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const CUnitType *type, int status)
+void NetworkSendCommand(int command,
+                        const CUnit &unit,
+                        int x,
+                        int y,
+                        const CUnit *dest,
+                        const CUnitType *type,
+                        EFlushMode flush)
 {
 	CNetworkCommandQueue ncq;
 
 	ncq.Time = GameCycle;
 	ncq.Type = command;
-	if (status) {
+	if (flush == EFlushMode::On) {
 		ncq.Type |= 0x80;
 	}
 	CNetworkCommand nc;

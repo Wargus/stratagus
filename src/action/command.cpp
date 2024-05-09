@@ -88,13 +88,13 @@ static void ReleaseOrders(CUnit &unit)
 **  Get next free order slot.
 **
 **  @param unit   pointer to unit.
-**  @param flush  if true, flush order queue.
+**  @param flush  if On, flush order queue.
 **
 **  @return       Pointer to next free order slot.
 */
-static std::unique_ptr<COrder> *GetNextOrder(CUnit &unit, int flush)
+static std::unique_ptr<COrder> *GetNextOrder(CUnit &unit, EFlushMode flush)
 {
-	if (flush) {
+	if (flush == EFlushMode::On) {
 		// empty command queue
 		ReleaseOrders(unit);
 	}
@@ -172,9 +172,9 @@ void CommandStopUnit(CUnit &unit)
 **  Stand ground.
 **
 **  @param unit   pointer to unit.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandStandGround(CUnit &unit, int flush)
+void CommandStandGround(CUnit &unit, EFlushMode flush)
 {
 	std::unique_ptr<COrder> *order = nullptr;
 
@@ -196,9 +196,9 @@ void CommandStandGround(CUnit &unit, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param dest   unit to follow
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandDefend(CUnit &unit, CUnit &dest, int flush)
+void CommandDefend(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -223,9 +223,9 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param dest   unit to be followed
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandFollow(CUnit &unit, CUnit &dest, int flush)
+void CommandFollow(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -250,9 +250,9 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to move to.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
+void CommandMove(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -280,9 +280,9 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 **  @param unit   pointer to unit.
 **  @param pos    map position to repair.
 **  @param dest   or unit to be repaired. FIXME: not supported
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -326,9 +326,9 @@ void CommandAutoRepair(CUnit &unit, int on)
 **  @param unit    pointer to unit.
 **  @param pos     map position to attack.
 **  @param target  or unit to be attacked.
-**  @param flush   if true, flush command queue.
+**  @param flush   If On, flush command queue.
 */
-void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
+void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, EFlushMode flush)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	if (IsUnitValidForNetwork(unit) == false) {
@@ -359,9 +359,9 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to fire on.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+void CommandAttackGround(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -390,9 +390,9 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to patrol between.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
+void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -433,9 +433,9 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param dest   unit to be boarded.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandBoard(CUnit &unit, CUnit &dest, int flush)
+void CommandBoard(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -464,9 +464,9 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **  @param unit   pointer to unit.
 **  @param pos    map position to unload.
 **  @param what   unit to be unloaded, nullptr for all.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -486,9 +486,9 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 **  @param unit   pointer to unit.
 **  @param pos    map position to build.
 **  @param what   Unit type to build.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -512,9 +512,9 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 **  Send a unit exploring
 **
 **  @param unit   pointer to unit.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandExplore(CUnit &unit, int flush)
+void CommandExplore(CUnit &unit, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -557,9 +557,9 @@ void CommandDismiss(CUnit &unit)
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position for harvest.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+void CommandResourceLoc(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -588,9 +588,9 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param dest   destination unit.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandResource(CUnit &unit, CUnit &dest, int flush)
+void CommandResource(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -622,9 +622,9 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param depot  bring goods to this depot.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
+void CommandReturnGoods(CUnit &unit, CUnit *depot, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -654,9 +654,9 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **
 **  @param unit   pointer to unit.
 **  @param type   unit type to train.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
+void CommandTrainUnit(CUnit &unit, CUnitType &type, EFlushMode)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -673,8 +673,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 		return;
 	}
 
-	const int noFlushCommands = 0;
-	auto *order = GetNextOrder(unit, noFlushCommands);
+	auto *order = GetNextOrder(unit, EFlushMode::Off);
 
 	if (order == nullptr) {
 		return;
@@ -734,9 +733,9 @@ void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 **
 **  @param unit   pointer to unit.
 **  @param type   upgrade to type
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandUpgradeTo(CUnit &unit, CUnitType &type, int flush, bool instant)
+void CommandUpgradeTo(CUnit &unit, CUnitType &type, EFlushMode flush, bool instant)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -795,9 +794,9 @@ void CommandCancelUpgradeTo(CUnit &unit)
 **
 **  @param unit   pointer to unit.
 **  @param what   what to research.
-**  @param flush  if true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
+void CommandResearch(CUnit &unit, CUpgrade &what, EFlushMode flush)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -839,9 +838,9 @@ void CommandCancelResearch(CUnit &unit)
 **  @param pos    map position to spell cast on.
 **  @param dest   Spell cast on unit (if exist).
 **  @param spell  Spell type pointer.
-**  @param flush  If true, flush command queue.
+**  @param flush  If On, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast)
+void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, EFlushMode flush, bool isAutocast)
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n",
 	           UnitNumber(unit),

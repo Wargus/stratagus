@@ -72,7 +72,7 @@ void SendCommandStopUnit(CUnit &unit)
 ** @param unit     pointer to unit.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandStandGround(CUnit &unit, int flush)
+void SendCommandStandGround(CUnit &unit, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("stand-ground", &unit, flush, -1, -1, nullptr, nullptr, -1);
@@ -89,7 +89,7 @@ void SendCommandStandGround(CUnit &unit, int flush)
 ** @param dest    defend this unit.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandDefend(CUnit &unit, CUnit &dest, int flush)
+void SendCommandDefend(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("defend", &unit, flush, -1, -1, &dest, nullptr, -1);
@@ -106,7 +106,7 @@ void SendCommandDefend(CUnit &unit, CUnit &dest, int flush)
 ** @param dest    follow this unit.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
+void SendCommandFollow(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("follow", &unit, flush, -1, -1, &dest, nullptr, -1);
@@ -123,7 +123,7 @@ void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 ** @param pos     map tile position to move to.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandMove(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("move", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
@@ -141,7 +141,7 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 ** @param dest    Unit to be repaired.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("repair", &unit, flush, pos.x, pos.y, dest, nullptr, -1);
@@ -175,7 +175,7 @@ void SendCommandAutoRepair(CUnit &unit, int on)
 ** @param attack   or !=nullptr unit to be attacked.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
+void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("attack", &unit, flush, pos.x, pos.y, attack, nullptr, -1);
@@ -192,7 +192,7 @@ void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 ** @param pos      map tile position to fire on.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("attack-ground", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
@@ -209,7 +209,7 @@ void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 ** @param pos      map tile position to patrol between.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandPatrol(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("patrol", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
@@ -226,7 +226,7 @@ void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
 ** @param dest     Destination to be boarded.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
+void SendCommandBoard(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("board", &unit, flush, -1, -1, &dest, nullptr, -1);
@@ -244,7 +244,7 @@ void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 ** @param what    Passagier to be unloaded.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("unload", &unit, flush, pos.x, pos.y, what, nullptr, -1);
@@ -262,7 +262,7 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, nullptr, what.Ident.c_str(), -1);
@@ -278,7 +278,7 @@ void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, in
 ** @param unit     pointer to unit.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandExplore(CUnit &unit, int flush)
+void SendCommandExplore(CUnit &unit, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("explore", &unit, flush, -1, -1, nullptr, nullptr, -1);
@@ -311,7 +311,7 @@ void SendCommandDismiss(CUnit &unit)
 ** @param pos      map tile position where to harvest.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("resource-loc", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
@@ -328,7 +328,7 @@ void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 ** @param dest    pointer to destination (oil-platform,gold mine).
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandResource(CUnit &unit, CUnit &dest, int flush)
+void SendCommandResource(CUnit &unit, CUnit &dest, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("resource", &unit, flush, -1, -1, &dest, nullptr, -1);
@@ -345,7 +345,7 @@ void SendCommandResource(CUnit &unit, CUnit &dest, int flush)
 ** @param goal    pointer to destination of the goods. (nullptr=search best)
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
+void SendCommandReturnGoods(CUnit &unit, CUnit *goal, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("return", &unit, flush, -1, -1, goal, nullptr, -1);
@@ -362,7 +362,7 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
+void SendCommandTrainUnit(CUnit &unit, CUnitType &what, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("train", &unit, flush, -1, -1, nullptr, what.Ident.c_str(), -1);
@@ -398,7 +398,7 @@ void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type)
 ** @param what     pointer to unit-type of the unit upgrade.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush)
+void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("upgrade-to", &unit, flush, -1, -1, nullptr, what.Ident.c_str(), -1);
@@ -431,7 +431,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 ** @param what     research-type of the research.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush)
+void SendCommandResearch(CUnit &unit, CUpgrade &what, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("research", &unit, flush, -1, -1, nullptr, what.Ident.c_str(), -1);
@@ -467,7 +467,7 @@ void SendCommandCancelResearch(CUnit &unit)
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
+void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, EFlushMode flush)
 {
 	if (IsReplayGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, nullptr, spellid);
@@ -506,7 +506,14 @@ void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on)
 void SendCommandDiplomacy(int player, EDiplomacy state, int opponent)
 {
 	if (IsReplayGame()) {
-		CommandLog("diplomacy", nullptr, 0, player, opponent, nullptr, ToString(state).data(), -1);
+		CommandLog("diplomacy",
+		           nullptr,
+		           EFlushMode::Off,
+		           player,
+		           opponent,
+		           nullptr,
+		           ToString(state).data(),
+		           -1);
 		CommandDiplomacy(player, state, opponent);
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageDiplomacy,
@@ -525,10 +532,10 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 {
 	if (IsReplayGame()) {
 		if (state == false) {
-			CommandLog("shared-vision", nullptr, 0, player, opponent,
+			CommandLog("shared-vision", nullptr, EFlushMode::Off, player, opponent,
 					   nullptr, "0", -1);
 		} else {
-			CommandLog("shared-vision", nullptr, 0, player, opponent,
+			CommandLog("shared-vision", nullptr, EFlushMode::Off, player, opponent,
 					   nullptr, "1", -1);
 		}
 		CommandSharedVision(player, state, opponent);
@@ -572,7 +579,7 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 	}
 	Assert(unit.Type);
 
-	const int status = (msgnr & 0x80) >> 7;
+	const EFlushMode flush = (msgnr & 0x80) ? EFlushMode::On : EFlushMode::Off;
 	// Note: destroyed destination unit is handled by the action routines.
 
 	switch (msgnr & 0x7F) {
@@ -588,15 +595,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandStopUnit(unit);
 			break;
 		case MessageCommandStand:
-			CommandLog("stand-ground", &unit, status, -1, -1, nullptr, nullptr, -1);
-			CommandStandGround(unit, status);
+			CommandLog("stand-ground", &unit, flush, -1, -1, nullptr, nullptr, -1);
+			CommandStandGround(unit, flush);
 			break;
 		case MessageCommandDefend: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
-				CommandLog("defend", &unit, status, -1, -1, &dest, nullptr, -1);
-				CommandDefend(unit, dest, status);
+				CommandLog("defend", &unit, flush, -1, -1, &dest, nullptr, -1);
+				CommandDefend(unit, dest, flush);
 			}
 			break;
 		}
@@ -604,14 +611,14 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
-				CommandLog("follow", &unit, status, -1, -1, &dest, nullptr, -1);
-				CommandFollow(unit, dest, status);
+				CommandLog("follow", &unit, flush, -1, -1, &dest, nullptr, -1);
+				CommandFollow(unit, dest, flush);
 			}
 			break;
 		}
 		case MessageCommandMove:
-			CommandLog("move", &unit, status, pos.x, pos.y, nullptr, nullptr, -1);
-			CommandMove(unit, pos, status);
+			CommandLog("move", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
+			CommandMove(unit, pos, flush);
 			break;
 		case MessageCommandRepair: {
 			CUnit *dest = nullptr;
@@ -619,12 +626,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest->Type);
 			}
-			CommandLog("repair", &unit, status, pos.x, pos.y, dest, nullptr, -1);
-			CommandRepair(unit, pos, dest, status);
+			CommandLog("repair", &unit, flush, pos.x, pos.y, dest, nullptr, -1);
+			CommandRepair(unit, pos, dest, flush);
 			break;
 		}
 		case MessageCommandAutoRepair:
-			CommandLog("auto-repair", &unit, status, arg1, arg2, nullptr, nullptr, 0);
+			CommandLog("auto-repair", &unit, flush, arg1, arg2, nullptr, nullptr, 0);
 			CommandAutoRepair(unit, arg1);
 			break;
 		case MessageCommandAttack: {
@@ -633,24 +640,24 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest->Type);
 			}
-			CommandLog("attack", &unit, status, pos.x, pos.y, dest, nullptr, -1);
-			CommandAttack(unit, pos, dest, status);
+			CommandLog("attack", &unit, flush, pos.x, pos.y, dest, nullptr, -1);
+			CommandAttack(unit, pos, dest, flush);
 			break;
 		}
 		case MessageCommandGround:
-			CommandLog("attack-ground", &unit, status, pos.x, pos.y, nullptr, nullptr, -1);
-			CommandAttackGround(unit, pos, status);
+			CommandLog("attack-ground", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
+			CommandAttackGround(unit, pos, flush);
 			break;
 		case MessageCommandPatrol:
-			CommandLog("patrol", &unit, status, pos.x, pos.y, nullptr, nullptr, -1);
-			CommandPatrolUnit(unit, pos, status);
+			CommandLog("patrol", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
+			CommandPatrolUnit(unit, pos, flush);
 			break;
 		case MessageCommandBoard: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
-				CommandLog("board", &unit, status, arg1, arg2, &dest, nullptr, -1);
-				CommandBoard(unit, dest, status);
+				CommandLog("board", &unit, flush, arg1, arg2, &dest, nullptr, -1);
+				CommandBoard(unit, dest, flush);
 			}
 			break;
 		}
@@ -660,44 +667,44 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				dest = &UnitManager->GetSlotUnit(dstnr);
 				Assert(dest->Type);
 			}
-			CommandLog("unload", &unit, status, pos.x, pos.y, dest, nullptr, -1);
-			CommandUnload(unit, pos, dest, status);
+			CommandLog("unload", &unit, flush, pos.x, pos.y, dest, nullptr, -1);
+			CommandUnload(unit, pos, dest, flush);
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, status, pos.x, pos.y, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], status);
+			CommandLog("build", &unit, flush, pos.x, pos.y, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
+			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], flush);
 			break;
 		case MessageCommandExplore:
-			CommandLog("explore", &unit, status, -1, -1, nullptr, nullptr, -1);
-			CommandExplore(unit, status);
+			CommandLog("explore", &unit, flush, -1, -1, nullptr, nullptr, -1);
+			CommandExplore(unit, flush);
 			break;
 		case MessageCommandDismiss:
 			CommandLog("dismiss", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
 			CommandDismiss(unit);
 			break;
 		case MessageCommandResourceLoc:
-			CommandLog("resource-loc", &unit, status, pos.x, pos.y, nullptr, nullptr, -1);
-			CommandResourceLoc(unit, pos, status);
+			CommandLog("resource-loc", &unit, flush, pos.x, pos.y, nullptr, nullptr, -1);
+			CommandResourceLoc(unit, pos, flush);
 			break;
 		case MessageCommandResource: {
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager->GetSlotUnit(dstnr);
 				Assert(dest.Type);
-				CommandLog("resource", &unit, status, -1, -1, &dest, nullptr, -1);
-				CommandResource(unit, dest, status);
+				CommandLog("resource", &unit, flush, -1, -1, &dest, nullptr, -1);
+				CommandResource(unit, dest, flush);
 			}
 			break;
 		}
 		case MessageCommandReturn: {
 			CUnit *dest = (dstnr != (unsigned short)0xFFFF) ? &UnitManager->GetSlotUnit(dstnr) : nullptr;
-			CommandLog("return", &unit, status, -1, -1, dest, nullptr, -1);
-			CommandReturnGoods(unit, dest, status);
+			CommandLog("return", &unit, flush, -1, -1, dest, nullptr, -1);
+			CommandReturnGoods(unit, dest, flush);
 			break;
 		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, status, -1, -1, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
+			CommandLog("train", &unit, flush, -1, -1, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
+			CommandTrainUnit(unit, *UnitTypes[dstnr], flush);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
@@ -711,18 +718,18 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			}
 			break;
 		case MessageCommandUpgrade:
-			CommandLog("upgrade-to", &unit, status, -1, -1, nullptr,
+			CommandLog("upgrade-to", &unit, flush, -1, -1, nullptr,
 					   UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
+			CommandUpgradeTo(unit, *UnitTypes[dstnr], flush);
 			break;
 		case MessageCommandCancelUpgrade:
 			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
 			CommandCancelUpgradeTo(unit);
 			break;
 		case MessageCommandResearch:
-			CommandLog("research", &unit, status, -1, -1, nullptr,
+			CommandLog("research", &unit, flush, -1, -1, nullptr,
 					   AllUpgrades[arg1]->Ident.c_str(), -1);
-			CommandResearch(unit, *AllUpgrades[arg1], status);
+			CommandResearch(unit, *AllUpgrades[arg1], flush);
 			break;
 		case MessageCommandCancelResearch:
 			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, nullptr, nullptr, -1);
@@ -736,10 +743,10 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 					dest = &UnitManager->GetSlotUnit(dstnr);
 					Assert(dest->Type);
 				}
-				CommandLog("spell-cast", &unit, status, pos.x, pos.y, dest, nullptr, id);
-				CommandSpellCast(unit, pos, dest, *SpellTypeTable[id], status);
+				CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, nullptr, id);
+				CommandSpellCast(unit, pos, dest, *SpellTypeTable[id], flush);
 			} else {
-				CommandLog("auto-spell-cast", &unit, status, arg1, -1, nullptr, nullptr, id);
+				CommandLog("auto-spell-cast", &unit, flush, arg1, -1, nullptr, nullptr, id);
 				CommandAutoSpellCast(unit, id, arg1);
 			}
 			break;
@@ -766,15 +773,22 @@ void ExecExtendedCommand(unsigned char type, int status,
 	switch (type) {
 		case ExtendedMessageDiplomacy: {
 			const auto diplomacy = EDiplomacy(arg3);
-			CommandLog("diplomacy", nullptr, 0, arg2, arg4, nullptr, ToString(diplomacy).data(), -1);
+			CommandLog("diplomacy",
+			           nullptr,
+			           EFlushMode::Off,
+			           arg2,
+			           arg4,
+			           nullptr,
+			           ToString(diplomacy).data(),
+			           -1);
 			CommandDiplomacy(arg2, diplomacy, arg4);
 			break;
 		}
 		case ExtendedMessageSharedVision:
 			if (arg3 == 0) {
-				CommandLog("shared-vision", nullptr, 0, arg2, arg4, nullptr, "0", -1);
+				CommandLog("shared-vision", nullptr, EFlushMode::Off, arg2, arg4, nullptr, "0", -1);
 			} else {
-				CommandLog("shared-vision", nullptr, 0, arg2, arg4, nullptr, "1", -1);
+				CommandLog("shared-vision", nullptr, EFlushMode::Off, arg2, arg4, nullptr, "1", -1);
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;
