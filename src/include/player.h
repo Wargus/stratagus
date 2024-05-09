@@ -54,9 +54,12 @@ class CGraphic;
 --  Definitons
 ----------------------------------------------------------------------------*/
 
-#define STORE_OVERALL 0
-#define STORE_BUILDING 1
-#define STORE_BOTH 2
+enum class EStoreType
+{
+	Overall = 0,
+	Building = 1,
+	Both = 2,
+};
 
 #define SPEEDUP_FACTOR 100
 /*----------------------------------------------------------------------------
@@ -130,11 +133,11 @@ public:
 	void SetUnitColors(std::vector<CColor> &colors);
 
 	/// Get a resource of the player
-	int GetResource(const int resource, const int type);
+	int GetResource(const int resource, const EStoreType type);
 	/// Adds/subtracts some resources to/from the player store
 	void ChangeResource(const int resource, const int value, const bool store = false);
 	/// Set a resource of the player
-	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
+	void SetResource(int resource, int value, EStoreType type = EStoreType::Overall);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
 

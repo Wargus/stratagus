@@ -1366,7 +1366,7 @@ void UnitLost(CUnit &unit)
 				const int newMaxValue = player.MaxResources[i] - type.Stats[player.Index].Storing[i];
 
 				player.MaxResources[i] = std::max(0, newMaxValue);
-				player.SetResource(i, player.StoredResources[i], STORE_BUILDING);
+				player.SetResource(i, player.StoredResources[i], EStoreType::Building);
 			}
 		}
 		//  Handle income improvements, look if a player loses a building
