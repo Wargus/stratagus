@@ -33,16 +33,16 @@
 
 //@{
 
+#include "color.h"
+#include "filesystem.h"
 #include "sdl2_helper.h"
 #include "shaders.h"
-
-#include "color.h"
+#include "stratagus.h"
 #include "vec2i.h"
 
 #include <SDL.h>
 #include <guichan.hpp>
 #include <guichan/sdl/sdlimage.hpp>
-
 #include <string_view>
 #include <vector>
 

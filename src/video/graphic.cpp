@@ -33,19 +33,17 @@
 /*----------------------------------------------------------------------------
 --  Includes
 ----------------------------------------------------------------------------*/
-
-#include "stratagus.h"
+#include "video.h"
 
 #include "intern_video.h"
 #include "iolib.h"
 #include "player.h"
+#include "stratagus.h"
 #include "ui.h"
-#include "video.h"
 
 #include <SDL_image.h>
-#include <string>
 #include <map>
-#include <list>
+#include <string>
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -53,7 +51,6 @@
 
 static int HashCount;
 static std::map<fs::path, CGraphic *> GraphicHash;
-static std::list<CGraphic *> Graphics;
 
 /*----------------------------------------------------------------------------
 --  Functions
