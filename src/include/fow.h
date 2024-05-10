@@ -146,8 +146,8 @@ private:
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
 
-    static CGraphic *TiledFogSrc;           /// Graphic for tiled fog of war
-    CGraphic *TiledAlphaFog {nullptr};      /// Working set of graphic for tiled fog of war with alpha channel
+    static std::shared_ptr<CGraphic> TiledFogSrc; /// Graphic for tiled fog of war
+    std::shared_ptr<CGraphic> TiledAlphaFog;      /// Working set of graphic for tiled fog of war with alpha channel
     SDL_Surface *TileOfFogOnly {nullptr};   /// Tile contains only fog. Used for legacy rendering of tiled fog
 
     /**

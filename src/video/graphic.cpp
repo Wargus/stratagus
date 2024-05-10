@@ -50,7 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 static int HashCount;
-static std::map<fs::path, CGraphic *> GraphicHash;
+static std::map<fs::path, std::weak_ptr<CGraphic>> GraphicHash;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -412,28 +412,29 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int colorIndex, unsigned fra
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
+std::shared_ptr<CGraphic> CGraphic::New(const std::string &filename, const int w, const int h)
 {
 	if (filename.empty()) {
-		return new CGraphic;
+		return std::make_shared<CGraphic>();
 	}
 
 	const fs::path file = LibraryFileName(filename);
-	CGraphic *&g = GraphicHash[file];
-	if (g == nullptr) {
-		g = new CGraphic;
+	auto &cache = GraphicHash[file];
+	auto res = cache.lock();
+	if (res == nullptr) {
+		res = std::make_shared<CGraphic>();
 		// FIXME: use a constructor for this
-		g->File = file;
-		g->HashFile = g->File.string();
-		g->Width = w;
-		g->Height = h;
+		res->File = file;
+		res->HashFile = res->File.string();
+		res->Width = w;
+		res->Height = h;
+		cache = res;
 	} else {
-		++g->Refs;
-		DebugPrint("f:%s,w%d,W%d,H%d,h%d\n", filename.c_str(), w, g->Width, g->Height, h);
-		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+		DebugPrint("f:%s,w%d,W%d,H%d,h%d\n", filename.c_str(), w, res->Width, res->Height, h);
+		Assert((w == 0 || res->Width == w) && (res->Height == h || h == 0));
 	}
 
-	return g;
+	return res;
 }
 
 /**
@@ -445,28 +446,28 @@ CGraphic *CGraphic::New(const std::string &filename, const int w, const int h)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w, int h)
+std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::New(const std::string &filename, int w, int h)
 {
 	if (filename.empty()) {
-		return new CPlayerColorGraphic;
+		return std::make_unique<CPlayerColorGraphic>();
 	}
 
 	const fs::path file = LibraryFileName(filename);
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
-	if (g == nullptr) {
-		g = new CPlayerColorGraphic;
+	auto& cache = GraphicHash[file];
+	auto res = std::dynamic_pointer_cast<CPlayerColorGraphic>(cache.lock());
+	if (res == nullptr) {
+		res = std::make_shared<CPlayerColorGraphic>();
 		// FIXME: use a constructor for this
-		g->File = file;
-		g->HashFile = g->File.string();
-		g->Width = w;
-		g->Height = h;
-		GraphicHash[g->HashFile] = g;
+		res->File = file;
+		res->HashFile = res->File.string();
+		res->Width = w;
+		res->Height = h;
+		cache = res;
 	} else {
-		++g->Refs;
-		Assert((w == 0 || g->Width == w) && (g->Height == h || h == 0));
+		Assert((w == 0 || res->Width == w) && (res->Height == h || h == 0));
 	}
 
-	return g;
+	return res;
 }
 
 /**
@@ -478,9 +479,9 @@ CPlayerColorGraphic *CPlayerColorGraphic::New(const std::string &filename, int w
 **
 **  @return      New graphic object
 */
-CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
+std::shared_ptr<CGraphic> CGraphic::ForceNew(const std::string &file, const int w, const int h)
 {
-	CGraphic *g = new CGraphic;
+	auto g = std::make_shared<CGraphic>();
 	g->File = file;
 	g->HashFile = file + std::to_string(HashCount++);
 	g->Width = w;
@@ -495,14 +496,13 @@ CGraphic *CGraphic::ForceNew(const std::string &file, const int w, const int h)
 **
 **  @param grayscale  Make grayscale texture
 */
-CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
+std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::Clone(bool grayscale) const
 {
-	CPlayerColorGraphic *g = CPlayerColorGraphic::ForceNew(this->File.string(), this->Width, this->Height);
+	auto g = CPlayerColorGraphic::ForceNew(this->File.string(), this->Width, this->Height);
 
 	if (this->IsLoaded()) {
 		g->Load(grayscale);
 	}
-
 	return g;
 }
 
@@ -513,16 +513,16 @@ CPlayerColorGraphic *CPlayerColorGraphic::Clone(bool grayscale) const
 **
 **  @return      Graphic object
 */
-CGraphic *CGraphic::Get(const std::string &filename)
+std::shared_ptr<CGraphic> CGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
 		return nullptr;
 	}
 
 	const fs::path file = LibraryFileName(filename);
-	CGraphic *&g = GraphicHash[file];
+	auto &cache = GraphicHash[file];
 
-	return g;
+	return cache.lock();
 }
 
 /**
@@ -532,16 +532,16 @@ CGraphic *CGraphic::Get(const std::string &filename)
 **
 **  @return      Graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
+std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::Get(const std::string &filename)
 {
 	if (filename.empty()) {
 		return nullptr;
 	}
 
 	const fs::path file = LibraryFileName(filename);
-	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
+	auto cache = GraphicHash[file];
 
-	return g;
+	return std::dynamic_pointer_cast<CPlayerColorGraphic>(cache.lock());
 }
 
 /**
@@ -554,9 +554,9 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 **
 **  @return      New graphic object
 */
-CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
+std::shared_ptr<CPlayerColorGraphic> CPlayerColorGraphic::ForceNew(const std::string &file, int w, int h)
 {
-	CPlayerColorGraphic *g = new CPlayerColorGraphic;
+	auto g = std::make_shared<CPlayerColorGraphic>();
 	g->File = file;
 	g->HashFile = file + std::to_string(HashCount++);
 	g->Width = w;
@@ -711,30 +711,11 @@ static void FreeSurface(SDL_Surface **surface)
 
 /**
 **  Free a graphic
-**
-**  @param g  Pointer to the graphic
 */
-void CGraphic::Free(CGraphic *g)
+CGraphic::~CGraphic()
 {
-	if (!g) {
-		return;
-	}
-
-	Assert(g->Refs);
-
-	--g->Refs;
-	if (!g->Refs) {
-		FreeSurface(&g->mSurface);
-		g->frame_map.clear();
-
-		FreeSurface(&g->SurfaceFlip);
-		g->frameFlip_map.clear();
-
-		if (!g->HashFile.empty()) {
-			GraphicHash.erase(g->HashFile);
-		}
-		delete g;
-	}
+	FreeSurface(&mSurface);
+	FreeSurface(&SurfaceFlip);
 }
 
 /**
@@ -1285,10 +1266,7 @@ void CGraphic::MakeShadow(PixelPos offset)
 
 void FreeGraphics()
 {
-	while (!GraphicHash.empty()) {
-		auto it = GraphicHash.begin();
-		CGraphic::Free((*it).second);
-	}
+	GraphicHash.clear();
 }
 
 CFiller::bits_map::~bits_map()
@@ -1398,7 +1376,7 @@ void CFiller::Load()
 {
 	if (G) {
 		G->Load();
-		map.Init(G);
+		map.Init(G.get());
 	}
 }
 

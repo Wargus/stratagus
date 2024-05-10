@@ -54,7 +54,7 @@ class CFiller
 {
 	CFiller();
 
-	CGraphic *G;
+	CGraphicPtr G;
 	int X;
 	int Y;
 };
@@ -97,7 +97,7 @@ class CButtonPanel
 
 class CPieMenu
 {
-	CGraphic *G;
+	CGraphicPtr G;
 	int MouseButton;
 	int X[8];
 	int Y[8];
@@ -107,7 +107,7 @@ class CPieMenu
 
 class CResourceInfo
 {
-	CGraphic *G;
+	CGraphicPtr G;
 	int IconFrame;
 	int IconX;
 	int IconY;
@@ -118,7 +118,7 @@ class CResourceInfo
 
 class CInfoPanel
 {
-	CGraphic *G;
+	CGraphicPtr G;
 	int X;
 	int Y;
 };
@@ -218,13 +218,13 @@ class CIcon
 	static CIcon *Get(const std::string ident);
 
 	tolua_readonly tolua_property__s std::string Ident;
-	CPlayerColorGraphic *G;
+	CPlayerColorGraphicPtr G;
 	int Frame;
 
 	void ClearExtraGraphics();
-	void AddSingleSelectionGraphic(CPlayerColorGraphic *g);
-	void AddGroupSelectionGraphic(CPlayerColorGraphic *g);
-	void AddContainedGraphic(CPlayerColorGraphic *g);
+	void AddSingleSelectionGraphic(CPlayerColorGraphicPtr g);
+	void AddGroupSelectionGraphic(CPlayerColorGraphicPtr g);
+	void AddContainedGraphic(CPlayerColorGraphicPtr g);
 };
 
 extern ButtonStyle *FindButtonStyle(const std::string style);
@@ -357,7 +357,7 @@ class ScrollArea : public BasicContainer
 
 class ImageWidget : public Widget
 {
-	ImageWidget(CGraphic *image);
+	ImageWidget(CGraphicPtr image);
 	ImageWidget(Mng *image);
 	ImageWidget(Movie *image);
 };
@@ -379,9 +379,9 @@ class CImageButton : public Button
 	CImageButton();
 	CImageButton(const std::string caption);
 
-	void setNormalImage(CGraphic *image);
-	void setPressedImage(CGraphic *image);
-	void setDisabledImage(CGraphic *image);
+	void setNormalImage(CGraphicPtr image);
+	void setPressedImage(CGraphicPtr image);
+	void setDisabledImage(CGraphicPtr image);
 };
 
 $renaming CImageButton @ ImageButton
@@ -405,12 +405,12 @@ class ImageRadioButton : public RadioButton
 	ImageRadioButton();
 	ImageRadioButton(const std::string caption, const std::string group, bool marked = false);
 
-	void setUncheckedNormalImage(CGraphic *image);
-	void setUncheckedPressedImage(CGraphic *image);
-	void setUncheckedDisabledImage(CGraphic *image);
-	void setCheckedNormalImage(CGraphic *image);
-	void setCheckedPressedImage(CGraphic *image);
-	void setCheckedDisabledImage(CGraphic *image);
+	void setUncheckedNormalImage(CGraphicPtr image);
+	void setUncheckedPressedImage(CGraphicPtr image);
+	void setUncheckedDisabledImage(CGraphicPtr image);
+	void setCheckedNormalImage(CGraphicPtr image);
+	void setCheckedPressedImage(CGraphicPtr image);
+	void setCheckedDisabledImage(CGraphicPtr image);
 };
 
 class CheckBox : public Widget
@@ -430,12 +430,12 @@ class ImageCheckBox : public CheckBox
 	ImageCheckBox();
 	ImageCheckBox(const std::string caption, bool marked = false);
 
-	void setUncheckedNormalImage(CGraphic *image);
-	void setUncheckedPressedImage(CGraphic *image);
-	void setUncheckedDisabledImage(CGraphic *image);
-	void setCheckedNormalImage(CGraphic *image);
-	void setCheckedPressedImage(CGraphic *image);
-	void setCheckedDisabledImage(CGraphic *image);
+	void setUncheckedNormalImage(CGraphicPtr image);
+	void setUncheckedPressedImage(CGraphicPtr image);
+	void setUncheckedDisabledImage(CGraphicPtr image);
+	void setCheckedNormalImage(CGraphicPtr image);
+	void setCheckedPressedImage(CGraphicPtr image);
+	void setCheckedDisabledImage(CGraphicPtr image);
 };
 
 class Slider : public Widget
@@ -466,9 +466,9 @@ class ImageSlider : public Slider
 {
 	ImageSlider(double scaleEnd = 1.0);
 	ImageSlider(double scaleStart, double scaleEnd);
-	void setMarkerImage(CGraphic *image);
-	void setBackgroundImage(CGraphic *image);
-	void setDisabledBackgroundImage(CGraphic *image);
+	void setMarkerImage(CGraphicPtr image);
+	void setBackgroundImage(CGraphicPtr image);
+	void setDisabledBackgroundImage(CGraphicPtr image);
 };
 
 class Label : public Widget
@@ -495,7 +495,6 @@ class MultiLineLabel : public Widget
 	virtual void setLineWidth(int width);
 	virtual int getLineWidth();
 	virtual void adjustSize();
-	virtual void draw(gcn::Graphics *graphics);
 
 	enum {
 		LEFT = 0,
@@ -530,7 +529,7 @@ class ImageTextField : public Widget
 	ImageTextField(const std::string text);
 	virtual void setText(const std::string text);
 	virtual std::string &getText();
-	void setItemImage(CGraphic *image);
+	void setItemImage(CGraphicPtr image);
 	virtual void setPassword(bool flag);
 };
 
@@ -556,18 +555,18 @@ class ImageListBoxWidget : public ListBoxWidget
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected (int selected);
 	int getSelected();
-	void setItemImage(CGraphic *image);
-	void setUpButtonImage(CGraphic *image);
-	void setUpPressedButtonImage(CGraphic *image);
-	void setDownButtonImage(CGraphic *image);
-	void setDownPressedButtonImage(CGraphic *image);
-	void setLeftButtonImage(CGraphic *image);
-	void setLeftPressedButtonImage(CGraphic *image);
-	void setRightButtonImage(CGraphic *image);
-	void setRightPressedButtonImage(CGraphic *image);
-	void setHBarImage(CGraphic *image);
-	void setVBarImage(CGraphic *image);
-	void setMarkerImage(CGraphic *image);
+	void setItemImage(CGraphicPtr image);
+	void setUpButtonImage(CGraphicPtr image);
+	void setUpPressedButtonImage(CGraphicPtr image);
+	void setDownButtonImage(CGraphicPtr image);
+	void setDownPressedButtonImage(CGraphicPtr image);
+	void setLeftButtonImage(CGraphicPtr image);
+	void setLeftPressedButtonImage(CGraphicPtr image);
+	void setRightButtonImage(CGraphicPtr image);
+	void setRightPressedButtonImage(CGraphicPtr image);
+	void setHBarImage(CGraphicPtr image);
+	void setVBarImage(CGraphicPtr image);
+	void setMarkerImage(CGraphicPtr image);
 };
 
 class Window : public BasicContainer
@@ -625,9 +624,9 @@ class ImageDropDownWidget : public DropDown
 	int setSelectedItem(lua_State *lua, lua_Object *lo);
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSize(int width, int height);
-	void setItemImage(CGraphic *image);
-	void setDownNormalImage(CGraphic *image);
-	void setDownPressedImage(CGraphic *image);
+	void setItemImage(CGraphicPtr image);
+	void setDownNormalImage(CGraphicPtr image);
+	void setDownPressedImage(CGraphicPtr image);
 };
 
 class StatBoxWidget : public Widget

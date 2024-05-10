@@ -90,7 +90,11 @@ public:
 class ImageWidget : public gcn::Icon
 {
 public:
-	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {} // TODO: Remove (used for Mng/Movie in ToLua++)
+	explicit ImageWidget(std::shared_ptr<gcn::Image> img) : gcn::Icon(img.get()), img(img) {}
+
+private:
+	std::shared_ptr<gcn::Image> img;
 };
 
 class ButtonWidget : public gcn::Button
@@ -111,13 +115,13 @@ public:
 	void draw(gcn::Graphics *graphics) override;
 	void adjustSize();
 
-	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
-	void setPressedImage(gcn::Image *image) { pressedImage = image; }
-	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
+	void setNormalImage(std::shared_ptr<gcn::Image> image) { normalImage = image; adjustSize(); }
+	void setPressedImage(std::shared_ptr<gcn::Image> image) { pressedImage = image; }
+	void setDisabledImage(std::shared_ptr<gcn::Image> image) { disabledImage = image; }
 
-	gcn::Image *normalImage = nullptr;
-	gcn::Image *pressedImage = nullptr;
-	gcn::Image *disabledImage = nullptr;
+	std::shared_ptr<gcn::Image> normalImage;
+	std::shared_ptr<gcn::Image> pressedImage;
+	std::shared_ptr<gcn::Image> disabledImage;
 };
 
 class ImageRadioButton : public gcn::RadioButton
@@ -135,19 +139,19 @@ public:
 	void mouseClicked(gcn::MouseEvent&) override;
 	void adjustSize();
 
-	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
-	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
-	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
-	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
-	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
-	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
+	void setUncheckedNormalImage(std::shared_ptr<gcn::Image> image) { uncheckedNormalImage = image; }
+	void setUncheckedPressedImage(std::shared_ptr<gcn::Image> image) { uncheckedPressedImage = image; }
+	void setUncheckedDisabledImage(std::shared_ptr<gcn::Image> image) { uncheckedDisabledImage = image; }
+	void setCheckedNormalImage(std::shared_ptr<gcn::Image> image) { checkedNormalImage = image; }
+	void setCheckedPressedImage(std::shared_ptr<gcn::Image> image) { checkedPressedImage = image; }
+	void setCheckedDisabledImage(std::shared_ptr<gcn::Image> image) { checkedDisabledImage = image; }
 
-	gcn::Image *uncheckedNormalImage = nullptr;
-	gcn::Image *uncheckedPressedImage = nullptr;
-	gcn::Image *uncheckedDisabledImage = nullptr;
-	gcn::Image *checkedNormalImage = nullptr;
-	gcn::Image *checkedPressedImage = nullptr;
-	gcn::Image *checkedDisabledImage = nullptr;
+	std::shared_ptr<gcn::Image> uncheckedNormalImage;
+	std::shared_ptr<gcn::Image> uncheckedPressedImage;
+	std::shared_ptr<gcn::Image> uncheckedDisabledImage;
+	std::shared_ptr<gcn::Image> checkedNormalImage;
+	std::shared_ptr<gcn::Image> checkedPressedImage;
+	std::shared_ptr<gcn::Image> checkedDisabledImage;
 	bool mMouseDown = false;
 };
 
@@ -165,19 +169,19 @@ public:
 	void mouseClicked(gcn::MouseEvent &) override;
 	void adjustSize();
 
-	void setUncheckedNormalImage(gcn::Image *image) { uncheckedNormalImage = image; }
-	void setUncheckedPressedImage(gcn::Image *image) { uncheckedPressedImage = image; }
-	void setUncheckedDisabledImage(gcn::Image *image) { uncheckedDisabledImage = image; }
-	void setCheckedNormalImage(gcn::Image *image) { checkedNormalImage = image; }
-	void setCheckedPressedImage(gcn::Image *image) { checkedPressedImage = image; }
-	void setCheckedDisabledImage(gcn::Image *image) { checkedDisabledImage = image; }
+	void setUncheckedNormalImage(std::shared_ptr<gcn::Image> image) { uncheckedNormalImage = image; }
+	void setUncheckedPressedImage(std::shared_ptr<gcn::Image> image) { uncheckedPressedImage = image; }
+	void setUncheckedDisabledImage(std::shared_ptr<gcn::Image> image) { uncheckedDisabledImage = image; }
+	void setCheckedNormalImage(std::shared_ptr<gcn::Image> image) { checkedNormalImage = image; }
+	void setCheckedPressedImage(std::shared_ptr<gcn::Image> image) { checkedPressedImage = image; }
+	void setCheckedDisabledImage(std::shared_ptr<gcn::Image> image) { checkedDisabledImage = image; }
 
-	gcn::Image *uncheckedNormalImage = nullptr;
-	gcn::Image *uncheckedPressedImage = nullptr;
-	gcn::Image *uncheckedDisabledImage = nullptr;
-	gcn::Image *checkedNormalImage = nullptr;
-	gcn::Image *checkedPressedImage = nullptr;
-	gcn::Image *checkedDisabledImage = nullptr;
+	std::shared_ptr<gcn::Image> uncheckedNormalImage;
+	std::shared_ptr<gcn::Image> uncheckedPressedImage;
+	std::shared_ptr<gcn::Image> uncheckedDisabledImage;
+	std::shared_ptr<gcn::Image> checkedNormalImage;
+	std::shared_ptr<gcn::Image> checkedPressedImage;
+	std::shared_ptr<gcn::Image> checkedDisabledImage;
 	bool mMouseDown = false;
 };
 
@@ -190,13 +194,13 @@ public:
 	void drawMarker(gcn::Graphics *graphics) override;
 	void draw(gcn::Graphics *graphics) override;
 
-	void setMarkerImage(gcn::Image *image);
-	void setBackgroundImage(gcn::Image *image);
-	void setDisabledBackgroundImage(gcn::Image *image);
+	void setMarkerImage(std::shared_ptr<gcn::Image> image);
+	void setBackgroundImage(std::shared_ptr<gcn::Image> image);
+	void setDisabledBackgroundImage(std::shared_ptr<gcn::Image> image);
 
-	gcn::Image *markerImage = nullptr;
-	gcn::Image *backgroundImage = nullptr;
-	gcn::Image *disabledBackgroundImage = nullptr;
+	std::shared_ptr<gcn::Image> markerImage;
+	std::shared_ptr<gcn::Image> backgroundImage;
+	std::shared_ptr<gcn::Image> disabledBackgroundImage;
 };
 
 class MultiLineLabel : public gcn::Widget
@@ -315,9 +319,9 @@ public:
 	ImageTextField(const std::string &text) : CTextField(text) {}
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
-	void setItemImage(CGraphic *image) { itemImage = image; }
+	void setItemImage(std::shared_ptr<CGraphic> image) { itemImage = image; }
 private:
-	CGraphic *itemImage = nullptr;
+	std::shared_ptr<CGraphic> itemImage;
 };
 
 class StringListModel : public gcn::ListModel
@@ -351,13 +355,13 @@ public:
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
 	void mousePressed(gcn::MouseEvent &) override;
-	void setItemImage(CGraphic *image) { itemImage = image; }
+	void setItemImage(std::shared_ptr<CGraphic> image) { itemImage = image; }
 	void adjustSize();
 	void setSelected(int selected);
 	void logic() { adjustSize(); }
 
 private:
-	CGraphic *itemImage = nullptr;
+	std::shared_ptr<CGraphic> itemImage = nullptr;
 };
 
 class ListBoxWidget : public gcn::ScrollArea
@@ -389,27 +393,39 @@ public:
 	void fontChanged() override;
 	void addActionListener(gcn::ActionListener *actionListener);
 
-	void setItemImage(CGraphic *image) {
+	void setItemImage(std::shared_ptr<CGraphic> image)
+	{
 		itemImage = image;
 		listbox.setItemImage(image);
 	}
-	void setUpButtonImage(CGraphic *image) { upButtonImage = image; }
-	void setUpPressedButtonImage(CGraphic *image) { upPressedButtonImage = image; }
-	void setDownButtonImage(CGraphic *image) { downButtonImage = image; }
-	void setDownPressedButtonImage(CGraphic *image) { downPressedButtonImage = image; }
-	void setLeftButtonImage(CGraphic *image) { leftButtonImage = image; }
-	void setLeftPressedButtonImage(CGraphic *image) { leftPressedButtonImage = image; }
-	void setRightButtonImage(CGraphic *image) { rightButtonImage = image; }
-	void setRightPressedButtonImage(CGraphic *image) { rightPressedButtonImage = image; }
-	void setHBarImage(CGraphic *image) {
+	void setUpButtonImage(std::shared_ptr<CGraphic> image) { upButtonImage = image; }
+	void setUpPressedButtonImage(std::shared_ptr<CGraphic> image) { upPressedButtonImage = image; }
+	void setDownButtonImage(std::shared_ptr<CGraphic> image) { downButtonImage = image; }
+	void setDownPressedButtonImage(std::shared_ptr<CGraphic> image)
+	{
+		downPressedButtonImage = image;
+	}
+	void setLeftButtonImage(std::shared_ptr<CGraphic> image) { leftButtonImage = image; }
+	void setLeftPressedButtonImage(std::shared_ptr<CGraphic> image)
+	{
+		leftPressedButtonImage = image;
+	}
+	void setRightButtonImage(std::shared_ptr<CGraphic> image) { rightButtonImage = image; }
+	void setRightPressedButtonImage(std::shared_ptr<CGraphic> image)
+	{
+		rightPressedButtonImage = image;
+	}
+	void setHBarImage(std::shared_ptr<CGraphic> image)
+	{
 		hBarButtonImage = image;
 		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
 	}
-	void setVBarImage(CGraphic *image) {
+	void setVBarImage(std::shared_ptr<CGraphic> image)
+	{
 		vBarButtonImage = image;
 		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
 	}
-	void setMarkerImage(CGraphic *image) { markerImage = image; }
+	void setMarkerImage(std::shared_ptr<CGraphic> image) { markerImage = image; }
 
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
@@ -432,18 +448,18 @@ private:
 	void drawHBar(gcn::Graphics *graphics);
 	void drawVBar(gcn::Graphics *graphics);
 private:
-	CGraphic *itemImage = nullptr;
-	CGraphic *upButtonImage = nullptr;
-	CGraphic *upPressedButtonImage = nullptr;
-	CGraphic *downButtonImage = nullptr;
-	CGraphic *downPressedButtonImage = nullptr;
-	CGraphic *leftButtonImage = nullptr;
-	CGraphic *leftPressedButtonImage = nullptr;
-	CGraphic *rightButtonImage = nullptr;
-	CGraphic *rightPressedButtonImage = nullptr;
-	CGraphic *hBarButtonImage = nullptr;
-	CGraphic *vBarButtonImage = nullptr;
-	CGraphic *markerImage = nullptr;
+	std::shared_ptr<CGraphic> itemImage;
+	std::shared_ptr<CGraphic> upButtonImage;
+	std::shared_ptr<CGraphic> upPressedButtonImage;
+	std::shared_ptr<CGraphic> downButtonImage;
+	std::shared_ptr<CGraphic> downPressedButtonImage;
+	std::shared_ptr<CGraphic> leftButtonImage;
+	std::shared_ptr<CGraphic> leftPressedButtonImage;
+	std::shared_ptr<CGraphic> rightButtonImage;
+	std::shared_ptr<CGraphic> rightPressedButtonImage;
+	std::shared_ptr<CGraphic> hBarButtonImage;
+	std::shared_ptr<CGraphic> vBarButtonImage;
+	std::shared_ptr<CGraphic> markerImage;
 
 	LuaListModel lualistmodel;
 	ImageListBox listbox;
@@ -479,12 +495,13 @@ private:
 
 public:
 	ImageDropDownWidget() : ImageDropDownWidget(std::make_unique<ImageListBox>()) {}
-	void setItemImage(CGraphic *image) {
+	void setItemImage(std::shared_ptr<CGraphic> image)
+	{
 		this->itemImage = image;
 		this->mImageListBox->setItemImage(image);
 	}
-	void setDownNormalImage(CGraphic *image) { DownNormalImage = image; }
-	void setDownPressedImage(CGraphic *image) { DownPressedImage = image; }
+	void setDownNormalImage(std::shared_ptr<CGraphic> image) { DownNormalImage = image; }
+	void setDownPressedImage(std::shared_ptr<CGraphic> image) { DownPressedImage = image; }
 
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
@@ -497,9 +514,9 @@ public:
 	void setFont(gcn::Font *font);
 
 private:
-	CGraphic *itemImage = nullptr;
-	CGraphic *DownNormalImage = nullptr;
-	CGraphic *DownPressedImage = nullptr;
+	std::shared_ptr<CGraphic> itemImage;
+	std::shared_ptr<CGraphic> DownNormalImage;
+	std::shared_ptr<CGraphic> DownPressedImage;
 	std::unique_ptr<ImageListBox> mImageListBox;
 };
 

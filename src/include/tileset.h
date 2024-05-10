@@ -337,10 +337,15 @@ GenerateExtendedTileset(
 class CTilesetGraphicGenerator
 {
 public:
-	CTilesetGraphicGenerator(lua_State *luaStack, int tablePos, int argPos, const CTileset *srcTileset,
-															  				const CGraphic *srcGraphic,
-															  				const CGraphic *srcImgGraphic)
-							: SrcTileset(srcTileset), SrcTilesetGraphic(srcGraphic), SrcImgGraphic (srcImgGraphic)
+	CTilesetGraphicGenerator(lua_State *luaStack,
+	                         int tablePos,
+	                         int argPos,
+	                         const CTileset *srcTileset,
+	                         const CGraphic *srcGraphic,
+	                         const CGraphic *srcImgGraphic) :
+		SrcTileset(srcTileset),
+		SrcTilesetGraphic(srcGraphic),
+		SrcImgGraphic(srcImgGraphic)
 	{
 		lua_rawgeti(luaStack, tablePos, argPos);
 		parseExtended(luaStack);
@@ -428,12 +433,7 @@ public:
 	}
 	/// TODO: add constructor to parse base tileset (if we decide to move base tileset parser here)
 
-	~CTilesetParser()
-	{
-		if (SrcImgGraphic) {
-			CGraphic::Free(SrcImgGraphic);
-		}
-	}
+	~CTilesetParser() = default;
 	const std::map<tile_index, CTile> &getTiles() const { return ExtTiles; }
 	const sequence_of_images& getGraphic() const { return ExtGraphic; }
 
@@ -448,7 +448,7 @@ private:
 private:
 	CTileset *BaseTileset{nullptr};
 	const CGraphic *BaseGraphic{nullptr};
-	CGraphic *SrcImgGraphic{nullptr};
+	std::shared_ptr<CGraphic> SrcImgGraphic;
 
 	sequence_of_images ExtGraphic;
 	std::map<tile_index, CTile> ExtTiles;

@@ -531,13 +531,6 @@ int GetHotKey(const std::string &text)
 	return 0;
 }
 
-CFont::~CFont()
-{
-	if (G) {
-		CGraphic::Free(G);
-	}
-}
-
 /**
 **  Draw character with current color clipped into 8 bit framebuffer.
 **
@@ -582,7 +575,7 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 	return w + 1;
 }
 
-CGraphic *CFont::GetGraphic() const
+std::shared_ptr<CGraphic> CFont::GetGraphic() const
 {
 	return this->G;
 }
@@ -614,7 +607,7 @@ int CLabel::DoDrawText(int x, int y, std::string_view text, const CFontColor *fc
 	const CFontColor *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
-	CGraphic *g = font->GetGraphic();
+	auto g = font->GetGraphic();
 
 	while (int utf8 = CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos)) {
 		bool tab = false;
@@ -927,14 +920,10 @@ void LoadFonts()
 **
 **  @return       New font
 */
-/* static */ CFont *CFont::New(const std::string &ident, CGraphic *g)
+/* static */ CFont *CFont::New(const std::string &ident, std::shared_ptr<CGraphic> g)
 {
 	auto &font = Fonts[ident];
-	if (font) {
-		if (font->G != g) {
-			CGraphic::Free(font->G);
-		}
-	} else {
+	if (!font) {
 		font.reset(new CFont(ident));
 	}
 	font->G = g;

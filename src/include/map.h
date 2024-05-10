@@ -260,7 +260,7 @@ public:
 
 	CTileset *Tileset = nullptr; /// tileset data
 	fs::path TileModelsFileName; /// lua filename that loads all tilemodels
-	CGraphic *TileGraphic = nullptr; /// graphic for all the tiles
+	std::shared_ptr<CGraphic> TileGraphic; /// graphic for all the tiles
 	bool isMapInitialized = false ;
 
 	CMapInfo Info;             /// descriptive information

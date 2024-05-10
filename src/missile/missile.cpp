@@ -1287,14 +1287,6 @@ void InitMissileTypes()
 }
 
 /**
-**  Destructor.
-*/
-MissileType::~MissileType()
-{
-	CGraphic::Free(this->G);
-}
-
-/**
 **  Clean up missile-types.
 */
 void CleanMissileTypes()

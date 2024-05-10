@@ -922,7 +922,7 @@ static int CclDefineTileset(lua_State *l)
 */
 static int CclGenerateExtendedTileset(lua_State *luaStack)
 {
-	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic);
+	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic.get());
 
 	if (!Map.Tileset->insertTiles(parser.getTiles())) {
 		LuaError(luaStack, "Tiles number limit exceeded.");

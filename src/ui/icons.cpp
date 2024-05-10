@@ -67,16 +67,6 @@ CIcon::CIcon(const std::string &ident) : Ident(ident)
 }
 
 /**
-**  CIcon destructor
-*/
-CIcon::~CIcon()
-{
-	CPlayerColorGraphic::Free(this->G);
-	CPlayerColorGraphic::Free(this->GScale);
-	ClearExtraGraphics();
-}
-
-/**
 **  Create a new icon
 **
 **  @param ident  Icon identifier
@@ -207,18 +197,24 @@ static void ApplyPaletteSwaps(const std::vector<PaletteSwap> &swaps, const CUnit
 	}
 }
 
-static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGraphic *> &graphics,
-						const ButtonStyle &style, unsigned flags,
-						const PixelPos &pos, const std::string &text, const CUnit &unit, const std::vector<PaletteSwap> &swaps) {
+static void DrawByHealthIcon(const CIcon *icon,
+                             const std::vector<std::shared_ptr<CPlayerColorGraphic>> &graphics,
+                             const ButtonStyle &style,
+                             unsigned flags,
+                             const PixelPos &pos,
+                             const std::string &text,
+                             const CUnit &unit,
+                             const std::vector<PaletteSwap> &swaps)
+{
 	int playerColor = unit.RescuedFrom
 				? GameSettings.Presets[unit.RescuedFrom->Index].PlayerColor
 				: GameSettings.Presets[unit.Player->Index].PlayerColor;
 	int sz = graphics.size();
 	if (!sz) {
-		ApplyPaletteSwaps(swaps, unit, dynamic_cast<CGraphic *>(icon->G));
+		ApplyPaletteSwaps(swaps, unit, icon->G.get());
 		icon->DrawUnitIcon(style, flags, pos, text, playerColor);
 		// the normal icons are used outside this code path as well, so undo the swap immediately
-		ApplyPaletteSwaps(swaps, unit, dynamic_cast<CGraphic *>(icon->G), true);
+		ApplyPaletteSwaps(swaps, unit, icon->G.get(), true);
 	} else {
 		// TODO: we could have this more configurable?
 		int graphicIdx = 0;
@@ -226,8 +222,8 @@ static void DrawByHealthIcon(const CIcon *icon, const std::vector<CPlayerColorGr
 			graphicIdx = ((sz - 1) * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 		}
 		ButtonStyle s(style);
-		CGraphic *g = graphics[graphicIdx];
-		ApplyPaletteSwaps(swaps, unit, g);
+		auto g = graphics[graphicIdx];
+		ApplyPaletteSwaps(swaps, unit, g.get());
 		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = g;
 		s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = icon->Frame;
 		DrawUIButton(&s, flags, pos.x, pos.y, text, playerColor);
@@ -259,17 +255,17 @@ void CIcon::ClearExtraGraphics()
 	this->ContainedG.clear();
 }
 
-void CIcon::AddSingleSelectionGraphic(CPlayerColorGraphic *g)
+void CIcon::AddSingleSelectionGraphic(std::shared_ptr<CPlayerColorGraphic> g)
 {
 	this->SingleSelectionG.push_back(g);
 }
 
-void CIcon::AddGroupSelectionGraphic(CPlayerColorGraphic *g)
+void CIcon::AddGroupSelectionGraphic(std::shared_ptr<CPlayerColorGraphic> g)
 {
 	this->GroupSelectionG.push_back(g);
 }
 
-void CIcon::AddContainedGraphic(CPlayerColorGraphic *g)
+void CIcon::AddContainedGraphic(std::shared_ptr<CPlayerColorGraphic> g)
 {
 	this->ContainedG.push_back(g);
 }

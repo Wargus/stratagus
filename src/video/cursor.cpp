@@ -243,8 +243,11 @@ static void DrawBuildingCursor()
 	PushClipping();
 	vp.SetClipping();
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
-	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, GameSettings.Presets[ThisPlayer->Index].PlayerColor,
-				 CursorBuilding->StillFrame, screenPos);
+	DrawUnitType(*CursorBuilding,
+	             CursorBuilding->Sprite.get(),
+	             GameSettings.Presets[ThisPlayer->Index].PlayerColor,
+	             CursorBuilding->StillFrame,
+	             screenPos);
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
@@ -427,7 +430,6 @@ void InitVideoCursors()
 void CleanCursors()
 {
 	for (CCursor *cursor : AllCursors) {
-		CGraphic::Free(cursor->G);
 		delete cursor;
 	}
 	AllCursors.clear();

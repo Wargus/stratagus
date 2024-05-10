@@ -46,8 +46,8 @@ class CPreference
 	unsigned int ShowNameTime;
 	unsigned int AutosaveMinutes;
 
-	CGraphic *IconFrameG;
-	CGraphic *PressedIconFrameG;
+	CGraphicPtr IconFrameG;
+	CGraphicPtr PressedIconFrameG;
 };
 
 class CUnitManager

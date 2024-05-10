@@ -362,7 +362,6 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 	this->NoFogOfWar = false;
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
-	CGraphic::Free(this->TileGraphic);
 	this->TileGraphic = nullptr;
 
 	FlagRevealMap = MapRevealModes::cHidden;

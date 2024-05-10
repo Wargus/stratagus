@@ -388,16 +388,16 @@ void CImageButton::draw(gcn::Graphics *graphics) /* override */
 	gcn::Image *img;
 
 	if (!isEnabled()) {
-		img = disabledImage ? disabledImage : normalImage;
+		img = disabledImage ? disabledImage.get() : normalImage.get();
 	} else if (isPressed()) {
-		img = pressedImage ? pressedImage : normalImage;
+		img = pressedImage ? pressedImage.get() : normalImage.get();
 #if 0
 	} else if (0 && hasMouse()) {
 		// FIXME: add mouse-over image
 		img = nullptr;
 #endif
 	} else {
-		img = normalImage;
+		img = normalImage.get();
 	}
 	graphics->drawImage(img, 0, 0, 0, 0,
 						img->getWidth(), img->getHeight());
@@ -475,23 +475,23 @@ ImageRadioButton::ImageRadioButton(const std::string &caption,
 */
 void ImageRadioButton::drawBox(gcn::Graphics *graphics) /* override */
 {
-	gcn::Image *img = nullptr;
+	const gcn::Image *img = nullptr;
 
 	if (isSelected()) {
 		if (isEnabled() == false) {
-			img = checkedDisabledImage;
+			img = checkedDisabledImage.get();
 		} else if (mMouseDown) {
-			img = checkedPressedImage;
+			img = checkedPressedImage.get();
 		} else {
-			img = checkedNormalImage;
+			img = checkedNormalImage.get();
 		}
 	} else {
 		if (isEnabled() == false) {
-			img = uncheckedDisabledImage;
+			img = uncheckedDisabledImage.get();
 		} else if (mMouseDown) {
-			img = uncheckedPressedImage;
+			img = uncheckedPressedImage.get();
 		} else {
-			img = uncheckedNormalImage;
+			img = uncheckedNormalImage.get();
 		}
 	}
 
@@ -627,23 +627,23 @@ void ImageCheckBox::draw(gcn::Graphics *graphics) /* override */
 */
 void ImageCheckBox::drawBox(gcn::Graphics *graphics) /* override */
 {
-	gcn::Image *img = nullptr;
+	const gcn::Image *img = nullptr;
 
 	if (isSelected()) {
 		if (isEnabled() == false) {
-			img = checkedDisabledImage;
+			img = checkedDisabledImage.get();
 		} else if (mMouseDown) {
-			img = checkedPressedImage;
+			img = checkedPressedImage.get();
 		} else {
-			img = checkedNormalImage;
+			img = checkedNormalImage.get();
 		}
 	} else {
 		if (isEnabled() == false) {
-			img = uncheckedDisabledImage;
+			img = uncheckedDisabledImage.get();
 		} else if (mMouseDown) {
-			img = uncheckedPressedImage;
+			img = uncheckedPressedImage.get();
 		} else {
-			img = uncheckedNormalImage;
+			img = uncheckedNormalImage.get();
 		}
 	}
 
@@ -731,10 +731,8 @@ ImageSlider::ImageSlider(double scaleStart, double scaleEnd) : Slider(scaleStart
 */
 void ImageSlider::drawMarker(gcn::Graphics *graphics) /* override */
 {
-	gcn::Image *img = markerImage;
-
 	if (isEnabled()) {
-		if (img) {
+		if (const gcn::Image *img = markerImage.get()) {
 			if (getOrientation() == Orientation::Horizontal) {
 				int v = getMarkerPosition();
 				graphics->drawImage(img, 0, 0, v, 0,
@@ -755,13 +753,7 @@ void ImageSlider::drawMarker(gcn::Graphics *graphics) /* override */
 */
 void ImageSlider::draw(gcn::Graphics *graphics) /* override */
 {
-	gcn::Image *img = nullptr;
-
-	if (isEnabled()) {
-		img = backgroundImage;
-	} else {
-		img = disabledBackgroundImage;
-	}
+	const gcn::Image *img = isEnabled() ? backgroundImage.get() : disabledBackgroundImage.get();
 
 	if (img) {
 		graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
@@ -776,7 +768,7 @@ void ImageSlider::draw(gcn::Graphics *graphics) /* override */
 /**
 **  Set the marker image
 */
-void ImageSlider::setMarkerImage(gcn::Image *image)
+void ImageSlider::setMarkerImage(std::shared_ptr<gcn::Image> image)
 {
 	markerImage = image;
 	setMarkerLength(image->getWidth());
@@ -785,7 +777,7 @@ void ImageSlider::setMarkerImage(gcn::Image *image)
 /**
 **  Set the background image
 */
-void ImageSlider::setBackgroundImage(gcn::Image *image)
+void ImageSlider::setBackgroundImage(std::shared_ptr<gcn::Image> image)
 {
 	backgroundImage = image;
 }
@@ -793,7 +785,7 @@ void ImageSlider::setBackgroundImage(gcn::Image *image)
 /**
 **  Set the disabled background image
 */
-void ImageSlider::setDisabledBackgroundImage(gcn::Image *image)
+void ImageSlider::setDisabledBackgroundImage(std::shared_ptr<gcn::Image> image)
 {
 	disabledBackgroundImage = image;
 }
@@ -1558,7 +1550,7 @@ void ImageTextField::draw(gcn::Graphics *graphics) /* override */
 	int x, y;
 	std::string drawText =
 		isPassword ? std::string(mText->getContent().size(), '*') : mText->getContent();
-	CGraphic *img = this->itemImage;
+	CGraphic *img = this->itemImage.get();
 	if (!img) {
 		ErrorPrint("Not all graphics for ImageTextField were set\n");
 		ExitFatal(1);
@@ -1687,7 +1679,7 @@ void ImageListBox::draw(gcn::Graphics *graphics) /* override */
 
 	int i, fontHeight;
 	int y = 0;
-	CGraphic *img = itemImage;
+	CGraphic *img = itemImage.get();
 	img->Resize(getWidth(), img->getHeight());
 
 	fontHeight = std::max<int>(getFont()->getHeight(), img->getHeight());
@@ -2019,8 +2011,6 @@ void ImageListBoxWidget::addActionListener(gcn::ActionListener *actionListener)
 */
 void ImageListBoxWidget::draw(gcn::Graphics *graphics) /* override */
 {
-	CGraphic *img = nullptr;
-
 	// Check if we have all required graphics
 	if (!this->upButtonImage || !this->downButtonImage || !this->leftButtonImage || !this->rightButtonImage
 		|| !this->upPressedButtonImage || !this->downPressedButtonImage || !this->leftPressedButtonImage || !this->rightPressedButtonImage
@@ -2029,7 +2019,7 @@ void ImageListBoxWidget::draw(gcn::Graphics *graphics) /* override */
 		ExitFatal(1);
 	}
 	gcn::Rectangle rect = getChildrenArea();
-	img = itemImage;
+	CGraphic *img = itemImage.get();
 	img->Resize(rect.width, img->getHeight());
 	int y = 0;
 	while (y + img->getHeight() <= rect.height) {
@@ -2125,9 +2115,7 @@ void ImageListBoxWidget::drawUpButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getUpButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = upButtonImage;
+	const CGraphic *img = upButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2137,9 +2125,7 @@ void ImageListBoxWidget::drawDownButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getDownButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = downButtonImage;
+	const CGraphic *img = downButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2149,9 +2135,7 @@ void ImageListBoxWidget::drawLeftButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getLeftButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = leftButtonImage;
+	const CGraphic *img = leftButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2161,9 +2145,7 @@ void ImageListBoxWidget::drawRightButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getRightButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = rightButtonImage;
+	const CGraphic *img = rightButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2173,9 +2155,7 @@ void ImageListBoxWidget::drawUpPressedButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getUpButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = upPressedButtonImage;
+	const CGraphic *img = upPressedButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2185,9 +2165,7 @@ void ImageListBoxWidget::drawDownPressedButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getDownButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = downPressedButtonImage;
+	const CGraphic *img = downPressedButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2197,9 +2175,7 @@ void ImageListBoxWidget::drawLeftPressedButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getLeftButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = leftPressedButtonImage;
+	const CGraphic *img = leftPressedButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2209,9 +2185,7 @@ void ImageListBoxWidget::drawRightPressedButton(gcn::Graphics* graphics)
 	gcn::Rectangle dim = getRightButtonDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = rightPressedButtonImage;
+	const CGraphic *img = rightPressedButtonImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	graphics->popClipArea();
 }
@@ -2221,9 +2195,7 @@ void ImageListBoxWidget::drawHBar(gcn::Graphics *graphics)
 	gcn::Rectangle dim = getHorizontalBarDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = hBarButtonImage;
+	CGraphic *img = hBarButtonImage.get();
 	img->Resize(dim.width, dim.height);
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	img->SetOriginalSize();
@@ -2236,9 +2208,7 @@ void ImageListBoxWidget::drawVBar(gcn::Graphics *graphics)
 	gcn::Rectangle dim = getVerticalBarDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = vBarButtonImage;
+	CGraphic *img = vBarButtonImage.get();
 	img->Resize(dim.width, dim.height);
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	img->SetOriginalSize();
@@ -2251,9 +2221,7 @@ void ImageListBoxWidget::drawHMarker(gcn::Graphics *graphics)
 	gcn::Rectangle dim = getHorizontalMarkerDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = markerImage;
+	const CGraphic *img = markerImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 
 	graphics->popClipArea();
@@ -2264,9 +2232,7 @@ void ImageListBoxWidget::drawVMarker(gcn::Graphics *graphics)
 	gcn::Rectangle dim = getVerticalMarkerDimension();
 	graphics->pushClipArea(dim);
 
-	CGraphic *img = nullptr;
-
-	img = markerImage;
+	const CGraphic *img = markerImage.get();
 	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 
 	graphics->popClipArea();
@@ -2404,7 +2370,6 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics) /* override */
 	Assert(mScrollArea && mScrollArea->getContent() != nullptr);
 	const int h = mDroppedDown ? mFoldedUpHeight : getHeight();
 
-	CGraphic *img = this->itemImage;
 	if (!this->itemImage || !this->DownNormalImage || !this->DownPressedImage) {
 		ErrorPrint("Not all graphics for ImageDropDownWidget were set\n");
 		ExitFatal(1);
@@ -2418,6 +2383,7 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics) /* override */
 	gcn::Color shadowColor = faceColor - 0x303030;
 	shadowColor.a = alpha;
 
+	CGraphic *img = this->itemImage.get();
 	img->Resize(getWidth(), h);
 	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
 	img->SetOriginalSize();
@@ -2476,7 +2442,7 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	const int h = mDroppedDown ? mFoldedUpHeight : getHeight();
 	const int x = getWidth() - h;
 	const int y = 0;
-	CGraphic *img = mDroppedDown ? this->DownPressedImage : this->DownNormalImage;
+	CGraphic *img = mDroppedDown ? this->DownPressedImage.get() : this->DownNormalImage.get();
 
 	img->Resize(h, h);
 	graphics->drawImage(img, 0, 0, x, y, h, h);

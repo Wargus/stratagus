@@ -80,9 +80,9 @@ private:
 	explicit CFont(std::string ident) : Ident(std::move(ident)) {}
 
 public:
-	~CFont() override;
+	~CFont() override = default;
 
-	static CFont *New(const std::string &ident, CGraphic *g);
+	static CFont *New(const std::string &ident, std::shared_ptr<CGraphic> g);
 	static CFont *Get(std::string_view ident);
 
 	int Height() const;
@@ -100,7 +100,7 @@ public:
 
 	void Load();
 
-	CGraphic *GetGraphic() const;
+	std::shared_ptr<CGraphic> GetGraphic() const;
 
 	template<bool CLIP>
 	unsigned int DrawChar(CGraphic &g, int utf8, int x, int y, const CFontColor &fc) const;
@@ -113,7 +113,7 @@ private:
 private:
 	std::string Ident;    /// Ident of the font.
 	std::vector<char> CharWidth; /// Real font width (starting with ' ')
-	CGraphic *G = nullptr;       /// Graphic object used to draw
+	std::shared_ptr<CGraphic> G; /// Graphic object used to draw
 	bool is_normal = true;
 };
 
