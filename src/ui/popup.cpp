@@ -222,7 +222,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) con
 			if (UI.Resources[i].IconWidth != -1)	{
 				popupWidth += (UI.Resources[i].IconWidth + 5);
 			} else {
-				const CGraphic *G = UI.Resources[i].G;
+				const CGraphic *G = UI.Resources[i].G.get();
 				if (G) {
 					popupWidth += (G->Width + 5);
 				}
@@ -231,7 +231,6 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) con
 		}
 	}
 	if (Costs[ManaResCost]) {
-		const CGraphic *G = UI.Resources[ManaResCost].G;
 		const SpellType &spell = *SpellTypeTable.at(button.Value);
 
 		if (spell.ManaCost) {
@@ -239,6 +238,7 @@ int CPopupContentTypeCosts::GetWidth(const ButtonAction &button, int *Costs) con
 			if (UI.Resources[ManaResCost].IconWidth != -1) {
 				popupWidth += (UI.Resources[ManaResCost].IconWidth + 5);
 			} else {
+				const CGraphic *G = UI.Resources[ManaResCost].G.get();
 				if (G) {
 					popupWidth += (G->Width + 5);
 				}
@@ -279,8 +279,7 @@ void CPopupContentTypeCosts::Draw(int x,
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
-			const CGraphic *G = UI.Resources[i].G;
-			if (G) {
+			if (const CGraphic *G = UI.Resources[i].G.get()) {
 				int x_offset = UI.Resources[i].IconWidth;
 				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
 				x += ((x_offset != -1 ? x_offset : G->Width) + 5);
@@ -294,10 +293,9 @@ void CPopupContentTypeCosts::Draw(int x,
 	}
 	if (Costs[ManaResCost]) {
 		const SpellType &spell = *SpellTypeTable[button.Value];
-		const CGraphic *G = UI.Resources[ManaResCost].G;
 		if (spell.ManaCost) {
 			int y_offset = 0;
-			if (G) {
+			if (const CGraphic *G = UI.Resources[ManaResCost].G.get()) {
 				int x_offset =  UI.Resources[ManaResCost].IconWidth;
 				x += 5;
 				G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, y);

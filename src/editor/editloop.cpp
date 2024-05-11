@@ -957,7 +957,7 @@ static void DrawStartLocations()
 						LoadUnitTypeSprite(*const_cast<CUnitType *>(type));
 					}
 #endif
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
+					DrawUnitType(*type, type->Sprite.get(), i, 0, startScreenPos);
 				} else { // Draw a cross
 					DrawCross(startScreenPos, Map.Tileset->getPixelTileSize(), Players[i].Color);
 				}

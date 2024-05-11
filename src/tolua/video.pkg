@@ -19,25 +19,48 @@ public:
 CVideo Video;
 void ToggleFullScreen(void);
 
+$using CGraphicPtr = std::shared_ptr<CGraphic>;
+$void Load(CGraphicPtr* p, bool grayscale) { (*p)->Load(grayscale); }
+$void Resize(CGraphicPtr* p, int w, int h) { (*p)->Resize(w, h); }
+$void SetPaletteColor(CGraphicPtr* p, int idx, int r, int g, int b) { (*p)->SetPaletteColor(idx, r, g, b); }
+$void OverlayGraphic(CGraphicPtr* p, CGraphicPtr g, bool mask) { (*p)->OverlayGraphic(g.get(), mask); }
+
+$using CPlayerColorGraphicPtr = std::shared_ptr<CPlayerColorGraphic>;
+$void Load(CPlayerColorGraphicPtr* p, bool grayscale) { (*p)->Load(grayscale); }
+$void Resize(CPlayerColorGraphicPtr* p, int w, int h) { (*p)->Resize(w, h); }
+$void SetPaletteColor(CPlayerColorGraphicPtr* p, int idx, int r, int g, int b) { (*p)->SetPaletteColor(idx, r, g, b); }
+$void OverlayGraphic(CPlayerColorGraphicPtr* p, CGraphicPtr g, bool mask) { (*p)->OverlayGraphic(g.get(), mask); }
+
+struct CGraphicPtr // std::shared_ptr<CGraphic>
+{
+	tolua_outside void Load @ Load(bool grayscale = false);
+	tolua_outside void Resize @ Resize(int w, int h);
+	tolua_outside void SetPaletteColor @ SetPaletteColor(int idx, int r, int g, int b);
+	tolua_outside void OverlayGraphic @ OverlayGraphic(CGraphicPtr g, bool mask = false);
+};
+
+struct CPlayerColorGraphicPtr // std::shared_ptr<CPlayerColorGraphic>
+{
+	tolua_outside void Load @ Load(bool grayscale = false);
+	tolua_outside void Resize @ Resize(int w, int h);
+	tolua_outside void SetPaletteColor @ SetPaletteColor(int idx, int r, int g, int b);
+	tolua_outside void OverlayGraphic @ OverlayGraphic(CGraphicPtr g, bool mask = false);
+};
+
 class CGraphic
 {
 public:
-	static CGraphic *New(const std::string file, int w = 0, int h = 0);
-	static CGraphic *ForceNew(const std::string file, int w = 0, int h = 0);
-	static CGraphic *Get(const std::string file);
-	static void Free(CGraphic *);
-	void Load(bool grayscale = false);
-	void Resize(int w, int h);
-	void SetPaletteColor(int idx, int r, int g, int b);
-	void OverlayGraphic(CGraphic *g, bool mask = false);
+	static CGraphicPtr New(const std::string file, int w = 0, int h = 0);
+	static CGraphicPtr ForceNew(const std::string file, int w = 0, int h = 0);
+	static CGraphicPtr Get(const std::string file);
 };
 
 class CPlayerColorGraphic : public CGraphic
 {
 public:
-	static CPlayerColorGraphic *New(const std::string file, int w = 0, int h = 0);
-	static CPlayerColorGraphic *ForceNew(const std::string file, int w = 0, int h = 0);
-	static CPlayerColorGraphic *Get(const std::string file);
+	static CPlayerColorGraphicPtr New(const std::string file, int w = 0, int h = 0);
+	static CPlayerColorGraphicPtr ForceNew(const std::string file, int w = 0, int h = 0);
+	static CPlayerColorGraphicPtr Get(const std::string file);
 };
 
 class CColor {

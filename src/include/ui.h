@@ -90,7 +90,7 @@ class ButtonStyleProperties
 public:
 	ButtonStyleProperties() = default;
 
-	CGraphic *Sprite = nullptr;
+	std::shared_ptr<CGraphic> Sprite;
 	int Frame = 0;
 	CColor BorderColorRGB;
 	IntColor BorderColor = 0;
@@ -252,7 +252,7 @@ public:
 		}
 		return false;
 	}
-	CGraphic *G = nullptr;   /// Graphic
+	std::shared_ptr<CGraphic> G; /// Graphic
 	int X = 0;               /// X coordinate
 	int Y = 0;               /// Y coordinate
 };
@@ -289,7 +289,7 @@ private:
 
 
 public:
-	CGraphic *G = nullptr;
+	std::shared_ptr<CGraphic> G;
 	int X = 0;
 	int Y = 0;
 	std::vector<CUIButton> Buttons;
@@ -302,7 +302,7 @@ class CPieMenu
 public:
 	CPieMenu() = default;
 
-	CGraphic *G = nullptr;      /// Optional background image
+	std::shared_ptr<CGraphic> G; /// Optional background image
 	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
 	int X[9]{}; /// X position of the pies
 	int Y[9]{}; /// Y position of the pies
@@ -323,7 +323,7 @@ class CResourceInfo
 public:
 	CResourceInfo() = default;
 
-	CGraphic *G = nullptr;   /// icon graphic
+	std::shared_ptr<CGraphic> G; /// icon graphic
 	int IconFrame = 0; /// icon frame
 	int IconX = 0;     /// icon X position
 	int IconY = 0;     /// icon Y position
@@ -340,7 +340,7 @@ public:
 
 	void Draw();
 
-	CGraphic *G = nullptr;
+	std::shared_ptr<CGraphic> G;
 	int X = 0;
 	int Y = 0;
 };
@@ -497,8 +497,8 @@ public:
 	/// SoundConfig PlacementSuccess;       /// played on placements success
 	/// SoundConfig Click;                  /// click noice used often
 
-	CGraphic *VictoryBackgroundG = nullptr;       /// Victory background graphic
-	CGraphic *DefeatBackgroundG = nullptr;        /// Defeat background graphic
+	std::shared_ptr<CGraphic> VictoryBackgroundG; /// Victory background graphic
+	std::shared_ptr<CGraphic> DefeatBackgroundG;  /// Defeat background graphic
 };
 
 extern std::vector<ButtonAction> CurrentButtons;  /// Current Selected Buttons

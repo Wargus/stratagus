@@ -472,8 +472,8 @@ public:
 	int ShowNameDelay = 0;      /// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime = 0;       /// How many cycles need to show unit's name popup.
 	int AutosaveMinutes = 5;    /// Autosave the game every X minutes; autosave is disabled if the value is 0
-	CGraphic *IconFrameG = nullptr;
-	CGraphic *PressedIconFrameG = nullptr;
+	std::shared_ptr<CGraphic> IconFrameG;
+	std::shared_ptr<CGraphic> PressedIconFrameG;
 
 	// these are "preferences" in the sense that the user wants to set these
 	// persistently across launches for single player games. However, they are

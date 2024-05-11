@@ -32,8 +32,10 @@
 
 //@{
 
-#include "vec2i.h"
 #include "color.h"
+#include "vec2i.h"
+
+#include <memory>
 #include <string>
 
 /*----------------------------------------------------------------------------
@@ -110,7 +112,7 @@ class CIcon
 {
 public:
 	explicit CIcon(const std::string &ident);
-	~CIcon();
+	~CIcon() = default;
 
 	static CIcon *New(const std::string &ident);
 	static CIcon *Get(std::string_view ident);
@@ -137,15 +139,15 @@ public:
 
 	/// Modify the extra icon graphics
 	void ClearExtraGraphics();
-	void AddSingleSelectionGraphic(CPlayerColorGraphic *g);
-	void AddGroupSelectionGraphic(CPlayerColorGraphic *g);
-	void AddContainedGraphic(CPlayerColorGraphic *g);
+	void AddSingleSelectionGraphic(std::shared_ptr<CPlayerColorGraphic> g);
+	void AddGroupSelectionGraphic(std::shared_ptr<CPlayerColorGraphic> g);
+	void AddContainedGraphic(std::shared_ptr<CPlayerColorGraphic> g);
 
 	void SetPaletteSwaps(std::vector<PaletteSwap> &newSwaps);
 
 public:
-	CPlayerColorGraphic *G = nullptr;      /// Graphic data
-	CPlayerColorGraphic *GScale = nullptr; /// Icon when drawn grayscaled
+	std::shared_ptr<CPlayerColorGraphic> G;      /// Graphic data
+	std::shared_ptr<CPlayerColorGraphic> GScale; /// Icon when drawn grayscaled
 	int Frame = 0;            /// Frame number in graphic
 private:
 	std::string Ident;        /// Icon identifier
@@ -157,9 +159,9 @@ private:
 	 * way, units can have different (damaged) icons. all of these are optional, the default is to just use
 	 * the graphic stored in the *G field above.
 	 */
-	std::vector<CPlayerColorGraphic *> SingleSelectionG; /// graphics by health status for single-selection
-	std::vector<CPlayerColorGraphic *> GroupSelectionG;  /// graphics by health status for multi-selection
-	std::vector<CPlayerColorGraphic *> ContainedG;       /// graphics by health status when in a container
+	std::vector<std::shared_ptr<CPlayerColorGraphic>> SingleSelectionG; /// graphics by health status for single-selection
+	std::vector<std::shared_ptr<CPlayerColorGraphic>> GroupSelectionG;  /// graphics by health status for multi-selection
+	std::vector<std::shared_ptr<CPlayerColorGraphic>> ContainedG;       /// graphics by health status when in a container
 
 	/*
 	 * These following lists are used to map percentages of arbitrary unit variables (e.g. health, shield,

@@ -33,16 +33,17 @@
 
 //@{
 
+#include "color.h"
+#include "filesystem.h"
 #include "sdl2_helper.h"
 #include "shaders.h"
-
-#include "color.h"
+#include "stratagus.h"
 #include "vec2i.h"
 
 #include <SDL.h>
 #include <guichan.hpp>
 #include <guichan/sdl/sdlimage.hpp>
-
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -102,11 +103,9 @@ public:
 		short int y = 0;
 	};
 
-protected:
-	CGraphic() : gcn::SDLImage(nullptr, false) {}
-	~CGraphic() {}
-
 public:
+	CGraphic() : gcn::SDLImage(nullptr, false) {}
+	~CGraphic();
 	// Draw
 	void DrawClip(int x, int y,
 				  SDL_Surface *surface = TheScreen) const;
@@ -157,12 +156,9 @@ public:
 	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha,
 							 SDL_Surface *surface = TheScreen) const;
 
-
-	static CGraphic *New(const std::string &file, const int w = 0, const int h = 0);
-	static CGraphic *ForceNew(const std::string &file, const int w = 0, const int h = 0);
-	static CGraphic *Get(const std::string &file);
-
-	static void Free(CGraphic *g);
+	static std::shared_ptr<CGraphic> New(const std::string &file, const int w = 0, const int h = 0);
+	static std::shared_ptr<CGraphic> ForceNew(const std::string &file, const int w = 0, const int h = 0);
+	static std::shared_ptr<CGraphic> Get(const std::string &file);
 
 	void Load(bool grayscale = false);
 	void Flip();
@@ -199,7 +195,7 @@ public:
 	int NumFrames = 1;     /// Number of frames
 	int GraphicWidth = 0;  /// Original graphic width
 	int GraphicHeight = 0; /// Original graphic height
-	int Refs = 1;          /// Uses of this graphic
+//	int Refs = 1;          /// Uses of this graphic
 	bool Resized = false;  /// Image has been resized
 
 	friend class CFont;
@@ -207,20 +203,19 @@ public:
 
 class CPlayerColorGraphic : public CGraphic
 {
-protected:
+public:
 	CPlayerColorGraphic() = default;
 
-public:
 	void DrawPlayerColorFrameClipX(int colorIndex, unsigned frame, int x, int y,
 								   SDL_Surface *surface = TheScreen);
 	void DrawPlayerColorFrameClip(int colorIndex, unsigned frame, int x, int y,
 								  SDL_Surface *surface = TheScreen);
 
-	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
-	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
-	static CPlayerColorGraphic *Get(const std::string &file);
+	static std::shared_ptr<CPlayerColorGraphic> New(const std::string &file, int w = 0, int h = 0);
+	static std::shared_ptr<CPlayerColorGraphic> ForceNew(const std::string &file, int w = 0, int h = 0);
+	static std::shared_ptr<CPlayerColorGraphic> Get(const std::string &file);
 
-	CPlayerColorGraphic *Clone(bool grayscale = false) const;
+	std::shared_ptr<CPlayerColorGraphic> Clone(bool grayscale = false) const;
 };
 
 #ifdef USE_MNG

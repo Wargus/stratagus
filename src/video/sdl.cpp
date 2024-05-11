@@ -449,12 +449,11 @@ void InitVideoSdl()
 			fs::path("/usr/share/pixmaps/stratagus.png")
 		};
 
-		CGraphic *g = nullptr;
+		std::shared_ptr<CGraphic> g;
 		SDL_Surface *icon = nullptr;
 
 		for (const auto &p : pixmaps) {
 			if (fs::exists(p)) {
-				if (g) { CGraphic::Free(g); }
 				g = CGraphic::New(p.u8string());
 				g->Load();
 				icon = g->getSurface();
@@ -463,9 +462,6 @@ void InitVideoSdl()
 		}
 		if (icon) {
 			SDL_SetWindowIcon(TheWindow, icon);
-		}
-		if (g) {
-			CGraphic::Free(g);
 		}
 #endif
 	Video.FullScreen = (SDL_GetWindowFlags(TheWindow) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;

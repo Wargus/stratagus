@@ -104,8 +104,8 @@ public:
 	bool HarvestFromOutside = false;  /// Unit harvests without entering the building.
 	bool RefineryHarvester = false;   /// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
-	CPlayerColorGraphic *SpriteWhenLoaded = nullptr; /// The graphic corresponding to FileWhenLoaded.
-	CPlayerColorGraphic *SpriteWhenEmpty = nullptr;  /// The graphic corresponding to FileWhenEmpty
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
+	std::shared_ptr<CPlayerColorGraphic> SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 };
 
 /**
@@ -711,9 +711,9 @@ public:
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player
 
-	CPlayerColorGraphic *Sprite = nullptr;     /// Sprite images
-	CPlayerColorGraphic *AltSprite = nullptr;  /// Alternative sprite images
-	CGraphic *ShadowSprite = nullptr;          /// Shadow sprite image
+	std::shared_ptr<CPlayerColorGraphic> Sprite;     /// Sprite images
+	std::shared_ptr<CPlayerColorGraphic> AltSprite;  /// Alternative sprite images
+	std::shared_ptr<CGraphic> ShadowSprite;          /// Shadow sprite image
 };
 
 /*----------------------------------------------------------------------------

@@ -347,7 +347,7 @@ class MissileType
 {
 public:
 	explicit MissileType(const std::string &ident) : Ident(ident) {}
-	~MissileType();
+	~MissileType() = default;
 
 	/// load the graphics for a missile type
 	void LoadMissileSprite();
@@ -405,7 +405,7 @@ public:
 	mutable LuaCallback<void(int attackerSlot, int targetSlot, int damage)> OnImpact; /// called when
 
 	// --- FILLED UP ---
-	CGraphic *G = nullptr;         /// missile graphic
+	std::shared_ptr<CGraphic> G; /// missile graphic
 };
 
 /*----------------------------------------------------------------------------

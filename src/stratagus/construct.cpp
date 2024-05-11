@@ -58,16 +58,9 @@ static std::vector<std::unique_ptr<CConstruction>> Constructions;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-CConstruction::~CConstruction()
-{
-	Clean();
-}
-
 void CConstruction::Clean()
 {
-	CGraphic::Free(this->Sprite);
 	this->Sprite = nullptr;
-	CGraphic::Free(this->ShadowSprite);
 	this->ShadowSprite = nullptr;
 	this->Frames.clear();
 	this->Width = 0;

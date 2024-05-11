@@ -767,7 +767,7 @@ static void HandleMouseOn(const PixelPos screenPos)
 	}
 	if (UI.Resources[FreeWorkersCount].TextX != -1) {
 		int x, y;
-		CGraphic* g = UI.Resources[FreeWorkersCount].G;
+		CGraphic* g = UI.Resources[FreeWorkersCount].G.get();
 		if (g && (x = UI.Resources[FreeWorkersCount].IconX) && (y = UI.Resources[FreeWorkersCount].IconY)) {
 			int textX = UI.Resources[FreeWorkersCount].TextX;
 			if (textX > 0 || !ThisPlayer->GetFreeWorkers().empty()) {

@@ -144,7 +144,7 @@ public:
 
 	// --- FILLED UP ---
 
-	CGraphic *G = nullptr; /// Cursor sprite image
+	std::shared_ptr<CGraphic> G; /// Cursor sprite image
 
 private:
 	std::vector<sdl2::CursorPtr> SdlCursors;

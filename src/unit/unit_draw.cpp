@@ -70,15 +70,15 @@
 class Decoration
 {
 public:
-	Decoration() : HotPos(0, 0), Width(0), Height(0), Sprite(nullptr) {}
+	Decoration() = default;
 
 	std::string File; /// File containing the graphics data
-	PixelPos HotPos;  /// drawing position (relative)
-	int Width;        /// width of the decoration
-	int Height;       /// height of the decoration
+	PixelPos HotPos{}; /// drawing position (relative)
+	int Width = 0;    /// width of the decoration
+	int Height = 0;   /// height of the decoration
 
 	// --- FILLED UP ---
-	CGraphic *Sprite;  /// loaded sprite images
+	std::shared_ptr<CGraphic> Sprite;  /// loaded sprite images
 };
 
 
@@ -388,9 +388,6 @@ void LoadDecorations()
 */
 void CleanDecorations()
 {
-	for (Decoration &deco : DecoSprite.SpriteArray) {
-		CGraphic::Free(deco.Sprite);
-	}
 	DecoSprite.SpriteArray.clear();
 	DecoSprite.Name.clear();
 }
@@ -994,7 +991,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	// Adjust sprite for Harvesters.
 	//
-	CPlayerColorGraphic *sprite = type->Sprite;
+	auto sprite = type->Sprite;
 	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
 		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {
@@ -1020,13 +1017,13 @@ void CUnit::Draw(const CViewport &vp) const
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			DrawConstruction(GameSettings.Presets[player].PlayerColor, *cframe, *type, frame, pos);
 		} else {
-			DrawUnitType(*type, sprite, GameSettings.Presets[player].PlayerColor, frame, screenPos);
+			DrawUnitType(*type, sprite.get(), GameSettings.Presets[player].PlayerColor, frame, screenPos);
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, Colors < 0 ? GameSettings.Presets[player].PlayerColor : Colors, frame, screenPos);
+		DrawUnitType(*type, sprite.get(), Colors < 0 ? GameSettings.Presets[player].PlayerColor : Colors, frame, screenPos);
 	}
 
 	// Unit's extras not fully supported.. need to be decorations themselves.

@@ -86,7 +86,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		pimage->Sprite->Load();
 	}
 	if (pimage->Sprite) {
-		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
+		auto colorGraphic = std::dynamic_pointer_cast<CPlayerColorGraphic>(pimage->Sprite);
 
 		if (colorGraphic && player != -1) {
 			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);

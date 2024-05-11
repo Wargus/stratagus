@@ -1675,7 +1675,7 @@ void CTilesetParser::parseExtendedSlot(lua_State *luaStack, const slot_type slot
 		std::vector<tile_index> dstTileIndexes { parseDstRange(luaStack, -1, cDst) };
 
 		/// load src-graphic-generator
-		CTilesetGraphicGenerator srcGraphic(luaStack, -1, cSrc, BaseTileset, BaseGraphic, SrcImgGraphic);
+		CTilesetGraphicGenerator srcGraphic(luaStack, -1, cSrc, BaseTileset, BaseGraphic, SrcImgGraphic.get());
 
 		tile_flags flagsAdditional = 0;
 		terrain_typeIdx baseTerrain = terrainNameIdx[cBase];

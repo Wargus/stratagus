@@ -516,17 +516,14 @@ static int CclDefineUnitType(lua_State *l)
 			if (redefine) {
 				if (type->Sprite && type->Sprite->File != type->File) {
 					redefine |= redefineSprite;
-					CGraphic::Free(type->Sprite);
 					type->Sprite = nullptr;
 				}
 				if (type->AltSprite && type->AltSprite->File != type->AltFile) {
 					redefine |= redefineSprite;
-					CGraphic::Free(type->AltSprite);
 					type->AltSprite = nullptr;
 				}
 				if (redefine && type->ShadowSprite) {
 					redefine |= redefineSprite;
-					CGraphic::Free(type->ShadowSprite);
 					type->ShadowSprite = nullptr;
 				}
 			}
@@ -574,7 +571,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (redefine && type->ShadowSprite) {
 				redefine |= redefineSprite;
-				CGraphic::Free(type->ShadowSprite);
 				type->ShadowSprite = nullptr;
 			}
 		} else if (value == "Offset") {
@@ -1224,24 +1220,15 @@ static int CclCopyUnitType(lua_State *l)
 	to->AltFile = from.AltFile;
 	to->Width = from.Width;
 	to->Height = from.Height;
-	if (to->Sprite) {
-		CGraphic::Free(to->Sprite);
-		to->Sprite = nullptr;
-	}
-	if (to->AltSprite) {
-		CGraphic::Free(to->AltSprite);
-		to->AltSprite = nullptr;
-	}
+	to->Sprite = nullptr;
+	to->AltSprite = nullptr;
 	to->ShadowFile = from.ShadowFile;
 	to->ShadowWidth = from.ShadowWidth;
 	to->ShadowHeight = from.ShadowHeight;
 	to->ShadowOffset = from.ShadowOffset;
 	to->ShadowSpriteFrame = from.ShadowSpriteFrame;
 	to->ShadowScale = from.ShadowScale;
-	if (to->ShadowSprite) {
-		CGraphic::Free(to->ShadowSprite);
-		to->ShadowSprite = nullptr;
-	}
+	to->ShadowSprite = nullptr;
 	to->Offset = from.Offset;
 	to->Animations = from.Animations;
 	to->Icon.Name = from.Icon.Name;

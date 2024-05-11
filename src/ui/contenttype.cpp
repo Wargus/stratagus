@@ -250,7 +250,7 @@ void CContentTypeIcon::Draw(const CUnit &unit, CFont *) const /* override */
 */
 void CContentTypeGraphic::Draw(const CUnit &, CFont *) const /* override */
 {
-	CGraphic *g = CGraphic::Get(this->graphic);
+	auto g = CGraphic::Get(this->graphic);
 	if (g) {
 		if (this->frame) {
 			g->DrawFrameClip(this->frame, this->Pos.x, this->Pos.y);

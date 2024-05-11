@@ -517,20 +517,9 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 CUnitType::~CUnitType()
 {
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (this->ResInfo[res]) {
-			if (this->ResInfo[res]->SpriteWhenLoaded) {
-				CGraphic::Free(this->ResInfo[res]->SpriteWhenLoaded);
-			}
-			if (this->ResInfo[res]->SpriteWhenEmpty) {
-				CGraphic::Free(this->ResInfo[res]->SpriteWhenEmpty);
-			}
-			delete this->ResInfo[res];
-		}
+		delete this->ResInfo[res];
 	}
 
-	CGraphic::Free(Sprite);
-	CGraphic::Free(AltSprite);
-	CGraphic::Free(ShadowSprite);
 #ifdef USE_MNG
 	if (!this->Portrait.Mngs.empty()) {
 		if (this->Portrait.Mngs[0]) {

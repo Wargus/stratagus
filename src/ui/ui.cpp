@@ -314,29 +314,19 @@ CUserInterface::~CUserInterface()
 */
 void CleanUserInterface()
 {
-	// Filler
-	for (auto& filler : UI.Fillers) {
-		CGraphic::Free(filler.G);
-	}
 	UI.Fillers.clear();
 
 	// Resource Icons
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
-		if (UI.Resources[i].G) {
-			CGraphic::Free(UI.Resources[i].G);
-		}
+		UI.Resources[i].G = nullptr;
 	}
 
 	// Info Panel
-	CGraphic::Free(UI.InfoPanel.G);
+	UI.InfoPanel.G = nullptr;
 	UI.InfoPanelContents.clear();
 
-	if (Preference.IconFrameG) {
-		CGraphic::Free(Preference.IconFrameG);
-	}
-	if (Preference.PressedIconFrameG) {
-		CGraphic::Free(Preference.PressedIconFrameG);
-	}
+	Preference.IconFrameG = nullptr;
+	Preference.PressedIconFrameG = nullptr;
 
 	// Button Popups
 	UI.ButtonPopups.clear();
@@ -353,14 +343,14 @@ void CleanUserInterface()
 	UI.UserButtons.clear();
 
 	// Button Panel
-	CGraphic::Free(UI.ButtonPanel.G);
+	UI.ButtonPanel.G = nullptr;
 
 	// Pie Menu
-	CGraphic::Free(UI.PieMenu.G);
+	UI.PieMenu.G = nullptr;
 
 	// Backgrounds
-	CGraphic::Free(UI.VictoryBackgroundG);
-	CGraphic::Free(UI.DefeatBackgroundG);
+	UI.VictoryBackgroundG = nullptr;
+	UI.DefeatBackgroundG = nullptr;
 
 	// Title Screens
 	TitleScreens.clear();

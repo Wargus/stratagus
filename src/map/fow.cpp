@@ -55,16 +55,13 @@
 ----------------------------------------------------------------------------*/
 /// FIXME: Maybe move it into CMap
 std::unique_ptr<CFogOfWar> FogOfWar; /// Fog of war itself
-CGraphic *CFogOfWar::TiledFogSrc {nullptr}; // Graphic tiles set for tiled fog
+std::shared_ptr<CGraphic> CFogOfWar::TiledFogSrc; // Graphic tiles set for tiled fog
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 void CFogOfWar::SetTiledFogGraphic(const fs::path &fogGraphicFile)
 {
-	if (CFogOfWar::TiledFogSrc) {
-		CGraphic::Free(CFogOfWar::TiledFogSrc);
-	}
 	CFogOfWar::TiledFogSrc = CGraphic::New(fogGraphicFile.string(), PixelTileSize.x, PixelTileSize.y);
 }
 
@@ -940,18 +937,13 @@ void CFogOfWar::DrawTiledLegacy(CViewport &viewport)
 */
 void CFogOfWar::CleanTiled(const bool isHardClean /*= false*/)
 {
-
-	if (isHardClean && CFogOfWar::TiledFogSrc) {
-		CGraphic::Free(CFogOfWar::TiledFogSrc);
+	if (isHardClean) {
 		CFogOfWar::TiledFogSrc = nullptr;
 	}
-    if (TileOfFogOnly) {
+	if (TileOfFogOnly) {
 		SDL_FreeSurface(TileOfFogOnly);
 		TileOfFogOnly = nullptr;
 	}
-    if (TiledAlphaFog) {
-        CGraphic::Free(TiledAlphaFog);
-        TiledAlphaFog = nullptr;
-    }
+	TiledAlphaFog = nullptr;
 }
 //@}

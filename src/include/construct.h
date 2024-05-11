@@ -99,6 +99,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#include <memory>
+
 class CGraphic;
 class CPlayerColorGraphic;
 
@@ -124,7 +126,7 @@ class CConstruction
 {
 public:
 	CConstruction() = default;
-	~CConstruction();
+	~CConstruction() = default;
 	void Clean();
 	void Load(bool force = false);
 
@@ -139,10 +141,10 @@ public:
 
 	// --- FILLED UP ---
 
-	CPlayerColorGraphic *Sprite = nullptr;/// construction sprite image
+	std::shared_ptr<CPlayerColorGraphic> Sprite;/// construction sprite image
 	int      Width = 0;         /// sprite width
 	int      Height = 0;        /// sprite height
-	CGraphic *ShadowSprite = nullptr; /// construction shadow sprite image
+	std::shared_ptr<CGraphic> ShadowSprite; /// construction shadow sprite image
 	int      ShadowWidth = 0;   /// shadow sprite width
 	int      ShadowHeight = 0;  /// shadow sprite height
 };
