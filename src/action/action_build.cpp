@@ -247,27 +247,6 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	return isOk;
 }
 
-
-class AlreadyBuildingFinder
-{
-public:
-	AlreadyBuildingFinder(const CUnit &unit, const CUnitType &t) :
-		worker(&unit), type(&t) {}
-	bool operator()(const CUnit *const unit) const
-	{
-		return (!unit->Destroyed && unit->Type == type
-				&& (worker->Player == unit->Player || worker->IsAllied(*unit)));
-	}
-	CUnit *Find(const CMapField *const mf) const
-	{
-		auto it = ranges::find_if(mf->UnitCache, *this);
-		return it != mf->UnitCache.end() ? *it : nullptr;
-	}
-private:
-	const CUnit *worker;
-	const CUnitType *type;
-};
-
 /**
 **  Check if the unit can build
 **
@@ -285,25 +264,6 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	if (ontop != nullptr) {
 		return ontop;
 	}
-#if 0
-	/*
-	 * FIXME: rb - CheckAlreadyBuilding should be somehow
-	 * enabled/disable via game lua scripting
-	 */
-	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
-	if (building != nullptr) {
-		if (unit.CurrentOrder() == this) {
-			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n",
-					   unit.Player->Index, unit.Slot,
-					   building->Type->Name.c_str(),
-					   building->Slot);
-
-			delete this; // Bad
-			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
-			return nullptr;
-		}
-	}
-#endif
 	// Some tries to build the building.
 	this->State++;
 	// To keep the load low, retry each 10 cycles
