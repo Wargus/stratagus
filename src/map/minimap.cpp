@@ -98,7 +98,7 @@ int NumMinimapEvents;
 void CMinimap::Create()
 {
 	// Scale to biggest value.
-	const int n = std::max(std::max(Map.Info.MapWidth, Map.Info.MapHeight), 32);
+	const int n = std::max({Map.Info.MapWidth, Map.Info.MapHeight, 32});
 
 	MinimapScaleX = (W * MINIMAP_FAC + n - 1) / n;
 	MinimapScaleY = (H * MINIMAP_FAC + n - 1) / n;
