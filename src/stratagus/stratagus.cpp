@@ -417,9 +417,7 @@ void Exit(int err)
 	DeInitVideo();
 	DeInitImageLoaders();
 
-	if (UnitManager) {
-		delete UnitManager;
-	}
+	delete UnitManager;
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);
