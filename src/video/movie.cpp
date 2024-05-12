@@ -391,9 +391,7 @@ Movie::~Movie()
 	if (data != nullptr) {
 		OggFree(data.get());
 	}
-	if (f != nullptr) {
-		delete f;
-	}
+	delete f;
 }
 
 static void RenderToSurface(SDL_Surface &surface, SDL_Texture *yuv_overlay, SDL_Rect &rect, OggData &data) {
