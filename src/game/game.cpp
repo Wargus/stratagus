@@ -357,7 +357,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 			if (newSize.x != 0 && newSize.y != 0) {
 				f->printf("for x=0,%d,1 do\n", newSize.x - 1);
 				f->printf("    for y=0,%d,1 do\n", newSize.y - 1);
-				f->printf("        SetTile(%d, x, y, 0)\n", Map.Tileset->getDefaultTileIndex());
+				f->printf("        SetTile(%d, x, y, 0)\n", Map.Tileset.getDefaultTileIndex());
 				f->printf("    end\n");
 				f->printf("end\n");
 			} else {
@@ -370,7 +370,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
 					const int tile = mf.getGraphicTile();
-					const int32_t n = map.Tileset->findTileIndexByTile(tile);
+					const int32_t n = map.Tileset.findTileIndexByTile(tile);
 					const int value = mf.Value;
 					const int elevation = mf.getElevation();
 					const int x = j + offset.x;

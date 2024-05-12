@@ -152,7 +152,7 @@ static void EditTile(const Vec2i &pos, int tile)
 {
  	Assert(Map.Info.IsPointOnMap(pos));
 
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 
 	CMapField &mf = *Map.Field(pos);
 
@@ -751,8 +751,8 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 	int x2 = getButtonArea()[2];
 	int y2 = getButtonArea()[3];
 
-	int tileW = Map.Tileset->getPixelTileSize().x + 1;
-	int tileH = Map.Tileset->getPixelTileSize().y + 1;
+	int tileW = Map.Tileset.getPixelTileSize().x + 1;
+	int tileH = Map.Tileset.getPixelTileSize().y + 1;
 	int maxX = x2 - tileW;
 	int maxY = y2 - tileH;
 
@@ -797,15 +797,15 @@ static void DrawTileIcons()
 		const unsigned int tile = Editor.ShownTileTypes[i];
 
 		Map.TileGraphic->DrawFrameClip(tile, x, y);
-		Video.DrawRectangleClip(ColorGray, x, y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+		Video.DrawRectangleClip(ColorGray, x, y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
 
 		if (i == Editor.SelectedTileIndex) {
 			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-									Map.Tileset->getPixelTileSize().x - 2, Map.Tileset->getPixelTileSize().y - 2);
+									Map.Tileset.getPixelTileSize().x - 2, Map.Tileset.getPixelTileSize().y - 2);
 		}
 		if (i == Editor.CursorTileIndex) {
 			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-									Map.Tileset->getPixelTileSize().x + 2, Map.Tileset->getPixelTileSize().y + 2);
+									Map.Tileset.getPixelTileSize().x + 2, Map.Tileset.getPixelTileSize().y + 2);
 		}
 
 		return true;
@@ -900,24 +900,24 @@ static void DrawMapCursor()
 
 			PixelPos screenPosIt;
 			for (int j = 0; j < TileCursorSize; ++j) {
-				screenPosIt.y = screenPos.y + j * Map.Tileset->getPixelTileSize().y;
+				screenPosIt.y = screenPos.y + j * Map.Tileset.getPixelTileSize().y;
 				if (screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y) {
 					break;
 				}
 				for (int i = 0; i < TileCursorSize; ++i) {
-					screenPosIt.x = screenPos.x + i * Map.Tileset->getPixelTileSize().x;
+					screenPosIt.x = screenPos.x + i * Map.Tileset.getPixelTileSize().x;
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
 					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
 				}
 			}
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x * TileCursorSize, Map.Tileset->getPixelTileSize().y * TileCursorSize);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset.getPixelTileSize().x * TileCursorSize, Map.Tileset.getPixelTileSize().y * TileCursorSize);
 			PopClipping();
 		} else {
 			PushClipping();
 			UI.MouseViewport->SetClipping();
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
 			if (Editor.State == EditorStateType::ElevationLevel) {
 				CLabel(GetGameFont()).DrawClip(screenPos.x + 2, screenPos.y + 1, Editor.SelectedElevationLevel);
 			}
@@ -959,7 +959,7 @@ static void DrawStartLocations()
 #endif
 					DrawUnitType(*type, type->Sprite.get(), i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, Map.Tileset->getPixelTileSize(), Players[i].Color);
+					DrawCross(startScreenPos, Map.Tileset.getPixelTileSize(), Players[i].Color);
 				}
 			}
 		}
@@ -1006,7 +1006,7 @@ static void DrawEditorInfo()
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 2, buf);
 
 	// Tile info
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
@@ -1227,7 +1227,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						Editor.SelectedTileIndex = -1;
 
 						tile_index index = 0;
-						for (auto &currTile : Map.Tileset->tiles) {
+						for (auto &currTile : Map.Tileset.tiles) {
 							if (currTile.tile) {
 								Editor.ShownTileTypes.push_back(currTile.tile);
 							}
@@ -1236,7 +1236,7 @@ static void EditorCallbackButtonDown(unsigned button)
 					} else {
 						Editor.ShownTileTypes.clear();
 						Editor.SelectedTileIndex = -1;
-						Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
+						Map.Tileset.fillSolidTiles(&Editor.ShownTileTypes);
 					}
 					return;
 				}
@@ -1665,10 +1665,10 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
 			const int tile = Editor.ShownTileTypes[i];
-			const int32_t tileindex = Map.Tileset->findTileIndexByTile(tile);
+			const int32_t tileindex = Map.Tileset.findTileIndexByTile(tile);
 			Assert(tileindex != -1);
-			const terrain_typeIdx base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
-			UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
+			const terrain_typeIdx base = Map.Tileset.tiles[tileindex].tileinfo.BaseTerrain;
+			UI.StatusLine.Set(Map.Tileset.getTerrainName(base));
 			Editor.CursorTileIndex = i;
 			return false;
 		}
@@ -1722,7 +1722,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			}
 		}
 		UI.MouseWarpPos = CursorStartScreenPos;
-		UI.MouseViewport->Set(tilePos, Map.Tileset->getPixelTileSize() / 2);
+		UI.MouseViewport->Set(tilePos, Map.Tileset.getPixelTileSize() / 2);
 		return;
 	}
 
@@ -1741,18 +1741,18 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		// Scroll the map
 		if (CursorScreenPos.x <= UI.SelectedViewport->GetTopLeftPos().x) {
 			vpTilePos.x--;
-			UI.SelectedViewport->Set(vpTilePos, Map.Tileset->getPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.Tileset.getPixelTileSize() / 2);
 		} else if (CursorScreenPos.x >= UI.SelectedViewport->GetBottomRightPos().x) {
 			vpTilePos.x++;
-			UI.SelectedViewport->Set(vpTilePos, Map.Tileset->getPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.Tileset.getPixelTileSize() / 2);
 		}
 
 		if (CursorScreenPos.y <= UI.SelectedViewport->GetTopLeftPos().y) {
 			vpTilePos.y--;
-			UI.SelectedViewport->Set(vpTilePos, Map.Tileset->getPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.Tileset.getPixelTileSize() / 2);
 		} else if (CursorScreenPos.y >= UI.SelectedViewport->GetBottomRightPos().y) {
 			vpTilePos.y++;
-			UI.SelectedViewport->Set(vpTilePos, Map.Tileset->getPixelTileSize() / 2);
+			UI.SelectedViewport->Set(vpTilePos, Map.Tileset.getPixelTileSize() / 2);
 		}
 
 		// Scroll the map, if cursor moves outside the viewport.
@@ -1904,10 +1904,10 @@ void CEditor::Init()
 
 		Map.Fields.resize(Map.Info.MapWidth * Map.Info.MapHeight);
 
-		const int defaultTile = Map.Tileset->getDefaultTileIndex();
+		const int defaultTile = Map.Tileset.getDefaultTileIndex();
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0, 0);
+			Map.Fields[i].setTileIndex(Map.Tileset, defaultTile, 0, 0);
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
@@ -1948,7 +1948,7 @@ void CEditor::Init()
 	Units.Icon = nullptr;
 	Units.Load();
 
-	Map.Tileset->fillSolidTiles(&Editor.ShownTileTypes);
+	Map.Tileset.fillSolidTiles(&Editor.ShownTileTypes);
 
 	RecalculateShownUnits();
 

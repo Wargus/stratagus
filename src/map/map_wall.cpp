@@ -109,7 +109,7 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 			const CMapField &mf = *Map.Field(newpos);
 			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
 
-			if (Map.Tileset->isARaceWallTile(tile, human)) {
+			if (Map.Tileset.isARaceWallTile(tile, human)) {
 				dirFlag |= 1 << i;
 			}
 		}
@@ -129,7 +129,7 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	const unsigned tile = mf.playerInfo.SeenTile;
 	if (!tileset.isAWallTile(tile)) {
 		return;
@@ -173,7 +173,7 @@ void MapFixWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	const int tile = mf.getGraphicTile();
 	if (!tileset.isAWallTile(tile)) {
 		return;
@@ -249,10 +249,10 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 
 	if (humanwall) {
 		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value, mf.getElevation());
+		mf.setTileIndex(Tileset, Tileset.getHumanWallTileIndex(0), value, mf.getElevation());
 	} else {
 		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
-		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value, mf.getElevation());
+		mf.setTileIndex(Tileset, Tileset.getOrcWallTileIndex(0), value, mf.getElevation());
 	}
 
 	UI.Minimap.UpdateXY(pos);

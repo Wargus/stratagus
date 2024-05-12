@@ -757,7 +757,6 @@ try {
 	}
 
 	// init globals
-	Map.AllocateTileset();
 	UnitManager = new CUnitManager();
 	FogOfWar = std::make_unique<CFogOfWar>();
 	InitOnlineService();

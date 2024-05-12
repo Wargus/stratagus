@@ -978,13 +978,13 @@ public:
 			case 3: game_settings |= 0x3000; break;
 			default: game_settings |= 0x20000; break;
 		}
-		if (Map.Tileset->Name == "Forest") {
+		if (Map.Tileset.Name == "Forest") {
 			game_settings |= 0x4000;
-		} else if (Map.Tileset->Name == "Winter") {
+		} else if (Map.Tileset.Name == "Winter") {
 			game_settings |= 0x8000;
-		} else if (Map.Tileset->Name == "Wasteland") {
+		} else if (Map.Tileset.Name == "Wasteland") {
 			game_settings |= 0xC000;
-		} else if (Map.Tileset->Name == "Orc Swamp") {
+		} else if (Map.Tileset.Name == "Orc Swamp") {
 			game_settings |= 0x1C000;
 		} else {
 			game_settings |= 0x4000; // default to forest

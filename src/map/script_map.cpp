@@ -806,7 +806,7 @@ void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, co
 		ErrorPrint("Invalid map coordinates: (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
-	if (Map.Tileset->getTileCount() <= tileIndex) {
+	if (Map.Tileset.getTileCount() <= tileIndex) {
 		ErrorPrint("Invalid tile number: %u\n", tileIndex);
 		return;
 	}
@@ -820,19 +820,19 @@ void SetTile(const unsigned int tileIndex, const Vec2i &pos, const int value, co
 	}
 
 	if (!Map.Fields.empty()) {
-		int multiplier = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		int multiplier = Map.Tileset.getLogicalToGraphicalTileSizeMultiplier();
 		if (multiplier > 1) {
 			// fill subtile fields
 			int subtile = 0;
 			for (int i = 0; i < multiplier; i++) {
 				for (int j = 0; j < multiplier; j++) {
 					CMapField &mf = *Map.Field(Vec2i(pos.x + j, pos.y + i));
-					mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation), subtile++);
+					mf.setTileIndex(Map.Tileset, tileIndex, value, uint8_t(elevation), subtile++);
 				}
 			}
 		} else {
 			CMapField &mf = *Map.Field(pos);
-			mf.setTileIndex(*Map.Tileset, tileIndex, value, uint8_t(elevation));
+			mf.setTileIndex(Map.Tileset, tileIndex, value, uint8_t(elevation));
 		}
 	}
 }
@@ -905,12 +905,12 @@ static int CclLoadTileModels(lua_State *l)
 */
 static int CclDefineTileset(lua_State *l)
 {
-	Map.Tileset->parse(l);
+	Map.Tileset.parse(l);
 
 	//  Load and prepare the tileset
 
-	ShowLoadProgress(_("Tileset '%s'"), Map.Tileset->ImageFile.c_str());
-	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, Map.Tileset->getPixelTileSize().x, Map.Tileset->getPixelTileSize().y);
+	ShowLoadProgress(_("Tileset '%s'"), Map.Tileset.ImageFile.c_str());
+	Map.TileGraphic = CGraphic::New(Map.Tileset.ImageFile, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
 	Map.TileGraphic->Load();
 	return 0;
 }
@@ -922,9 +922,9 @@ static int CclDefineTileset(lua_State *l)
 */
 static int CclGenerateExtendedTileset(lua_State *luaStack)
 {
-	const CTilesetParser parser(luaStack, Map.Tileset, Map.TileGraphic.get());
+	const CTilesetParser parser(luaStack, &Map.Tileset, Map.TileGraphic.get());
 
-	if (!Map.Tileset->insertTiles(parser.getTiles())) {
+	if (!Map.Tileset.insertTiles(parser.getTiles())) {
 		LuaError(luaStack, "Tiles number limit exceeded.");
 	}
 	/// Add new graphic
@@ -944,7 +944,7 @@ static int CclBuildTilesetTables(lua_State *l)
 {
 	LuaCheckArgs(l, 0);
 
-	Map.Tileset->buildTable(l);
+	Map.Tileset.buildTable(l);
 	return 0;
 }
 /**
@@ -959,15 +959,15 @@ static int CclSetTileFlags(lua_State *l)
 	}
 	const tile_index tilenumber = LuaToNumber(l, 1);
 
-	if (tilenumber >= Map.Tileset->getTileCount()) {
+	if (tilenumber >= Map.Tileset.getTileCount()) {
 		LuaError(l, "Accessed a tile that's not defined");
 	}
 	int j = 0;
-	const tile_flags flags {Map.Tileset->parseTilesetTileFlags(l, &j)};
-	Map.Tileset->tiles[tilenumber].flag = flags;
+	const tile_flags flags {Map.Tileset.parseTilesetTileFlags(l, &j)};
+	Map.Tileset.tiles[tilenumber].flag = flags;
 
 	if (flags & MapFieldDecorative && !(flags & MapFieldNonMixing)) {
-		Map.Tileset->tiles[tilenumber].tileinfo.BaseTerrain = Map.Tileset->addDecoTerrainType();
+		Map.Tileset.tiles[tilenumber].tileinfo.BaseTerrain = Map.Tileset.addDecoTerrainType();
 	}
 	return 0;
 }
@@ -986,7 +986,7 @@ static int CclGetTileTerrainName(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	const CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	const int32_t index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;

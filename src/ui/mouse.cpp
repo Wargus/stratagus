@@ -645,7 +645,7 @@ void DoRightButton(const PixelPos &mapPixelPos)
 
 	auto sz = Selected.size();
 	if (dest == nullptr && sz < 12 && Preference.FormationMovement) {
-		const short magicBoxSize = 7 << Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		const short magicBoxSize = 7 << Map.Tileset.getLogicalToGraphicalTileSizeShift();
 		std::vector<Vec2i> targetPositions(sz);
 		Vec2i max, min, center;
 		max = min = center = Selected[0]->tilePos;
