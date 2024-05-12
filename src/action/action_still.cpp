@@ -167,7 +167,7 @@ static bool MoveRandomly(CUnit &unit)
 		if (!unit.JustMoved) {
 			return false;
 		}
-		int shift = Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		int shift = Map.Tileset.getLogicalToGraphicalTileSizeShift();
 		if (!shift) {
 			return false;
 		}

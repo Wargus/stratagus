@@ -88,7 +88,7 @@ static uint32_t QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
 	const graphic_index tile = Map.Field(pos)->getGraphicTile();
-	return Map.Tileset->getQuadFromTile(tile);
+	return Map.Tileset.getQuadFromTile(tile);
 }
 
 /**
@@ -108,7 +108,7 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_
 	if (TileToolRandom) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset->tiles[tile + i].tile) {
+			if (!Map.Tileset.tiles[tile + i].tile) {
 				break;
 			} else {
 				++n;
@@ -117,14 +117,14 @@ static void EditorChangeTile(const Vec2i &pos, int tileIndex, const Vec2i &lock_
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset->tiles[tile + i].tile) {
+			while (++i < 16 && !Map.Tileset.tiles[tile + i].tile) {
 			}
 		} while (i < 16 && n--);
 		if (i < 16) {
 			tile += i;
 		}
 	}
-	mf.setTileIndex(*Map.Tileset, tile, 0, mf.getElevation());
+	mf.setTileIndex(Map.Tileset, tile, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -186,7 +186,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				int tile = Map.Tileset->tileFromQuad(u & BH_QUAD_M, u);
+				int tile = Map.Tileset.tileFromQuad(u & BH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
 					EditorChangeTile(pos + offset, tile, lock_pos, true);
@@ -204,7 +204,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				int tile = Map.Tileset->tileFromQuad(u & TH_QUAD_M, u);
+				int tile = Map.Tileset.tileFromQuad(u & TH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
 					EditorChangeTile(pos + offset, tile, lock_pos, true);
@@ -222,7 +222,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				int tile = Map.Tileset->tileFromQuad(u & RH_QUAD_M, u);
+				int tile = Map.Tileset.tileFromQuad(u & RH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
 					EditorChangeTile(pos + offset, tile, lock_pos, true);
@@ -240,7 +240,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
-				int tile = Map.Tileset->tileFromQuad(u & LH_QUAD_M, u);
+				int tile = Map.Tileset.tileFromQuad(u & LH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
 					EditorChangeTile(pos + offset, tile, lock_pos, true);
@@ -409,7 +409,7 @@ static void EditorDestroyAllUnits()
 static void RandomizeTransition(int x, int y)
 {
 	CMapField &mf = *Map.Field(x, y);
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	int baseTileIndex = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.BaseTerrain;
 	int mixTerrainIdx = tileset.tiles[tileset.findTileIndexByTile(mf.getGraphicTile())].tileinfo.MixTerrain;
 	if (mixTerrainIdx != 0) {

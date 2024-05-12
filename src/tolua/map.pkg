@@ -19,8 +19,8 @@ class CTileset
 
 class CMap
 {
-	CMapInfo Info;
-	CTileset *Tileset;
+	tolua_readonly CMapInfo Info;
+	tolua_readonly CTileset Tileset;
 };
 
 extern CMap Map;

@@ -87,7 +87,7 @@ void CMap::MarkSeenTile(CMapField &mf)
 	const Vec2i pos = {x, y}
 #endif
 
-	if (this->Tileset->TileTypeTable.empty() == false) {
+	if (this->Tileset.TileTypeTable.empty() == false) {
 #ifndef MINIMAP_UPDATE
 		//rb - GRRRRRRRRRRRR
 		const unsigned int index = &mf - Map.Fields.data();
@@ -97,26 +97,26 @@ void CMap::MarkSeenTile(CMapField &mf)
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (tile == this->Tileset->getRemovedTreeTile()) {
+		if (tile == this->Tileset.getRemovedTreeTile()) {
 			FixNeighbors(MapFieldForest, 1, pos);
-		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
+		} else if (seentile == this->Tileset.getRemovedTreeTile()) {
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
 			// Handle rock changes.
-		} else if (tile == Tileset->getRemovedRockTile()) {
+		} else if (tile == Tileset.getRemovedRockTile()) {
 			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == Tileset->getRemovedRockTile()) {
+		} else if (seentile == Tileset.getRemovedRockTile()) {
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
 			FixNeighbors(MapFieldRocks, 1, pos);
 
 			//  Handle Walls changes.
-		} else if (this->Tileset->isAWallTile(tile)
-				   || this->Tileset->isAWallTile(seentile)) {
+		} else if (this->Tileset.isAWallTile(tile)
+				   || this->Tileset.isAWallTile(seentile)) {
 			MapFixSeenWallTile(pos);
 			MapFixSeenWallNeighbors(pos);
 		}
@@ -294,7 +294,7 @@ void PreprocessMap()
 		}
 	}
 	// it is required for fixing the wood that all tiles are marked as seen!
-	if (Map.Tileset->TileTypeTable.empty() == false) {
+	if (Map.Tileset.TileTypeTable.empty() == false) {
 		Vec2i pos;
 		for (pos.x = 0; pos.x < Map.Info.MapWidth; ++pos.x) {
 			for (pos.y = 0; pos.y < Map.Info.MapHeight; ++pos.y) {
@@ -318,17 +318,6 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 
 	this->HighgroundsEnabled = false;
-}
-
-CMap::~CMap()
-{
-	delete Tileset;
-}
-
-void CMap::AllocateTileset()
-{
-	Assert(!Tileset);
-	Tileset = new CTileset();
 }
 
 /**
@@ -360,7 +349,7 @@ void CMap::Clean(const bool isHardClean /* = false*/)
 
 	this->Info.Clear();
 	this->NoFogOfWar = false;
-	this->Tileset->clear();
+	this->Tileset.clear();
 	this->TileModelsFileName.clear();
 	this->TileGraphic = nullptr;
 
@@ -435,8 +424,8 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	CMapField &mf = *this->Field(index);
 
-	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
-		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
+	if (!((type == MapFieldForest && Tileset.isAWoodTile(mf.playerInfo.SeenTile))
+		  || (type == MapFieldRocks && Tileset.isARockTile(mf.playerInfo.SeenTile)))) {
 		if (seen) {
 			return;
 		}
@@ -449,10 +438,10 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 	int removedtile;
 	int flags;
 	if (type == MapFieldForest) {
-		removedtile = this->Tileset->getRemovedTreeTile();
+		removedtile = this->Tileset.getRemovedTreeTile();
 		flags = (MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
 	} else { // (type == MapFieldRocks)
-		removedtile = this->Tileset->getRemovedRockTile();
+		removedtile = this->Tileset.getRemovedRockTile();
 		flags = (MapFieldRocks | MapFieldUnpassable);
 	}
 	//  Find out what each tile has with respect to wood, or grass.
@@ -485,7 +474,7 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 		const CMapField &new_mf = *(&mf - 1);
 		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
 	}
-	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
+	int tile = this->Tileset.getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
 
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
@@ -498,7 +487,7 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
+	} else if (seen && this->Tileset.isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
 		return;
 	} else {
 		if (seen) {
@@ -574,7 +563,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 {
 	CMapField &mf = *this->Field(pos);
 
-	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
+	mf.setGraphicTile(this->Tileset.getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
 	mf.Value = 0;
 
@@ -593,7 +582,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 {
 	CMapField &mf = *this->Field(pos);
 
-	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
+	mf.setGraphicTile(this->Tileset.getRemovedRockTile());
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 	mf.Value = 0;
 
@@ -617,7 +606,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	Assert(Map.Info.IsPointOnMap(pos));
 	CMapField &mf = *this->Field(pos);
 
-	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
+	if (mf.getGraphicTile() != this->Tileset.getRemovedTreeTile()) {
 		return;
 	}
 
@@ -637,12 +626,12 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	}
 	const Vec2i offset(0, -1);
 	CMapField &topMf = *(&mf - this->Info.MapWidth);
-	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
+	if (topMf.getGraphicTile() == this->Tileset.getRemovedTreeTile()
 		&& topMf.Value >= ForestRegeneration
 		&& !(topMf.Flags & occupedFlag)) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0, mf.getElevation());
-		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
+		topMf.setTileIndex(Map.Tileset, Map.Tileset.getDefaultWoodTileIndex(), 0, mf.getElevation());
+		topMf.setGraphicTile(Map.Tileset.getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
@@ -650,8 +639,8 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		UI.Minimap.UpdateXY(pos + offset);
 
 
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0, mf.getElevation());
-		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
+		mf.setTileIndex(Map.Tileset, Map.Tileset.getDefaultWoodTileIndex(), 0, mf.getElevation());
+		mf.setGraphicTile(Map.Tileset.getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;

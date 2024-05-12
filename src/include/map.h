@@ -85,14 +85,13 @@
 #include <string>
 
 #ifndef __MAP_TILE_H__
-#include "tile.h"
+# include "tile.h"
 #endif
 
 #include "color.h"
 #include "filesystem.h"
-#include "vec2i.h"
-
 #include "settings.h"
+#include "vec2i.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -158,9 +157,7 @@ class CMap
 {
 public:
 	CMap() = default;
-	~CMap();
-
-	void AllocateTileset();
+	~CMap() = default;
 
 	unsigned int getIndex(int x, int y) const { return x + y * this->Info.MapWidth; }
 	unsigned int getIndex(const Vec2i &pos) const { return getIndex(pos.x, pos.y); }
@@ -258,7 +255,7 @@ public:
 	std::vector<CMapField> Fields; /// fields on map
 	bool NoFogOfWar = false;     /// fog of war disabled
 
-	CTileset *Tileset = nullptr; /// tileset data
+	CTileset Tileset; /// tileset data
 	fs::path TileModelsFileName; /// lua filename that loads all tilemodels
 	std::shared_ptr<CGraphic> TileGraphic; /// graphic for all the tiles
 	bool isMapInitialized = false ;

@@ -262,15 +262,15 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 	/// uninitialized when graphicalTileIsLogicalTile
 	int logicalMapW;
 	if constexpr(!graphicalTileIsLogicalTile) {
-		logicalMapW = mapW << Map.Tileset->getLogicalToGraphicalTileSizeShift();
+		logicalMapW = mapW << Map.Tileset.getLogicalToGraphicalTileSizeShift();
 	}
 	const int map_max = mapW * mapH;
-	PixelSize graphicTileSize = Map.Tileset->getPixelTileSize();
+	PixelSize graphicTileSize = Map.Tileset.getPixelTileSize();
 	/// uninitialized when graphicalTileIsLogicalTile
 	int graphicTileOffset;
 	bool canShortcut;
 	if constexpr(!graphicalTileIsLogicalTile) {
-		graphicTileOffset = Map.Tileset->getLogicalToGraphicalTileSizeMultiplier();
+		graphicTileOffset = Map.Tileset.getLogicalToGraphicalTileSizeMultiplier();
 		canShortcut = false;
 	} else {
 		graphicTileOffset = 1;
@@ -415,7 +415,7 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	this->SetClipping();
 
 	/* this may take while */
-	if (Map.Tileset->getLogicalToGraphicalTileSizeShift() > 0) {
+	if (Map.Tileset.getLogicalToGraphicalTileSizeShift() > 0) {
 		this->DrawMapBackgroundInViewport<false>(highlightChecker);
 	} else {
 		this->DrawMapBackgroundInViewport<true>(highlightChecker);
