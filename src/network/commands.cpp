@@ -672,8 +672,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandBuild:
-			CommandLog("build", &unit, flush, pos.x, pos.y, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandBuildBuilding(unit, pos, *UnitTypes[dstnr], flush);
+			CommandLog("build",
+			           &unit,
+			           flush,
+			           pos.x,
+			           pos.y,
+			           nullptr,
+			           getUnitTypes()[dstnr]->Ident.c_str(),
+			           -1);
+			CommandBuildBuilding(unit, pos, *getUnitTypes()[dstnr], flush);
 			break;
 		case MessageCommandExplore:
 			CommandLog("explore", &unit, flush, -1, -1, nullptr, nullptr, -1);
@@ -703,15 +710,17 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, flush, -1, -1, nullptr, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTrainUnit(unit, *UnitTypes[dstnr], flush);
+			CommandLog(
+				"train", &unit, flush, -1, -1, nullptr, getUnitTypes()[dstnr]->Ident.c_str(), -1);
+			CommandTrainUnit(unit, *getUnitTypes()[dstnr], flush);
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1
 			if (dstnr != (unsigned short)0xFFFF) {
 				CommandLog("cancel-train", &unit, EFlushMode::On, -1, -1, nullptr,
-						   UnitTypes[dstnr]->Ident.c_str(), (short)x);
-				CommandCancelTraining(unit, (short)x, UnitTypes[dstnr]);
+				           getUnitTypes()[dstnr]->Ident.c_str(),
+				           (short) x);
+				CommandCancelTraining(unit, (short) x, getUnitTypes()[dstnr]);
 			} else {
 				CommandLog("cancel-train", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, (short)x);
 				CommandCancelTraining(unit, (short)x, nullptr);
@@ -719,8 +728,9 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		case MessageCommandUpgrade:
 			CommandLog("upgrade-to", &unit, flush, -1, -1, nullptr,
-					   UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandUpgradeTo(unit, *UnitTypes[dstnr], flush);
+			           getUnitTypes()[dstnr]->Ident.c_str(),
+			           -1);
+			CommandUpgradeTo(unit, *getUnitTypes()[dstnr], flush);
 			break;
 		case MessageCommandCancelUpgrade:
 			CommandLog("cancel-upgrade-to", &unit, EFlushMode::On, -1, -1, nullptr, nullptr, -1);

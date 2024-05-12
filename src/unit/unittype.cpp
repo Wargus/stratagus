@@ -450,8 +450,13 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUnitType *> UnitTypes;   /// unit-types definition
-static std::map<std::string, CUnitType *, std::less<>> UnitTypeMap;
+static std::vector<CUnitType *> UnitTypes;   /// unit-types definition
+static std::map<std::string, std::unique_ptr<CUnitType>, std::less<>> UnitTypeMap;
+
+const std::vector<CUnitType *> &getUnitTypes()
+{
+	return UnitTypes;
+}
 
 /**
 **  Next unit type are used hardcoded in the source.
@@ -782,18 +787,18 @@ CUnitType &UnitTypeByIdent(std::string_view ident)
 /**
 **  Allocate an empty unit-type slot or return existing one.
 **
-**  @param ident  Identifier to identify the slot (malloced by caller!).
+**  @param ident  Identifier to identify the slot.
 **
 **  @return       New allocated (zeroed) unit-type pointer and redefined flag.
 */
 std::pair<CUnitType *, bool> NewUnitTypeSlot(std::string_view ident)
 {
 	if (auto ret = UnitTypeMap.find(ident); ret != UnitTypeMap.end()) {
-		return {(*ret).second, true};
+		return {(*ret).second.get(), true};
 	}
 
 	size_t new_bool_size = UnitTypeVar.GetNumberBoolFlag();
-	CUnitType *type = new CUnitType;
+	std::unique_ptr<CUnitType> type = std::make_unique<CUnitType>();
 
 	type->Slot = UnitTypes.size();
 	type->Ident = ident;
@@ -801,9 +806,10 @@ std::pair<CUnitType *, bool> NewUnitTypeSlot(std::string_view ident)
 
 	type->DefaultStat.Variables = UnitTypeVar.Variable;
 
-	UnitTypes.push_back(type);
-	UnitTypeMap[type->Ident] = type;
-	return {type, false};
+	UnitTypes.push_back(type.get());
+
+	UnitTypeMap[std::string(ident)] = std::move(type);
+	return {UnitTypes.back(), false};
 }
 
 /**
@@ -871,9 +877,6 @@ void InitUnitTypes(int reset_player_stats)
 			DebugPrint(_("unit-type '%s' without animations, ignored.\n"), type.Ident.c_str());
 			continue;
 		}
-		//  Add idents to hash.
-		UnitTypeMap[type.Ident] = UnitTypes[i];
-
 		// Determine still frame
 		type.StillFrame = GetStillFrame(type);
 
@@ -1023,9 +1026,6 @@ void CleanUnitTypes()
 	FreeAnimations();
 
 	// Clean all unit-types
-	for (auto *p : UnitTypes) {
-		delete p;
-	}
 	UnitTypes.clear();
 	UnitTypeMap.clear();
 	UnitTypeVar.Clear();

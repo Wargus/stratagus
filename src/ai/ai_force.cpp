@@ -256,11 +256,11 @@ std::vector<int> AiFindAvailableUnitTypeEquiv(const CUnitType &unittype)
 	auto usableTypes = AiFindUnitTypeEquiv(unittype);
 	// 2 - Remove unavailable unittypes
 	ranges::erase_if(usableTypes, [&](int typeIndex) {
-		return !CheckDependByIdent(*AiPlayer->Player, UnitTypes[typeIndex]->Ident);
+		return !CheckDependByIdent(*AiPlayer->Player, getUnitTypes()[typeIndex]->Ident);
 	});
 	// 3 - Sort by level
 	ranges::sort(usableTypes, std::greater<>(), [](int index) {
-		return UnitTypes[index]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		return getUnitTypes()[index]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
 	});
 	return usableTypes;
 }

@@ -344,7 +344,7 @@ static int CclDefineSpell(lua_State *l)
 	} else {
 		SpellTypeTable.push_back(std::make_unique<SpellType>(SpellTypeTable.size(), std::string{identname}));
 		spell = SpellTypeTable.back().get();
-		for (CUnitType *unitType : UnitTypes) { // adjust array for caster already defined
+		for (CUnitType *unitType : getUnitTypes()) { // adjust array for caster already defined
 			if (!unitType->CanCastSpell.empty()) {
 				unitType->CanCastSpell.resize(SpellTypeTable.size());
 			}

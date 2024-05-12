@@ -129,7 +129,7 @@ void MapUnitSounds()
 		return;
 	}
 	// Parse all units sounds.
-	for (CUnitType *typePtr : UnitTypes) {
+	for (CUnitType *typePtr : getUnitTypes()) {
 		CUnitType &type = *typePtr;
 
 		MapAnimSounds(type);

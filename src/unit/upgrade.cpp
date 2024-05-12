@@ -179,8 +179,8 @@ void SaveUpgrades(CFile &file)
 	//
 	//  Save the allow
 	//
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-		file.printf("DefineUnitAllow(\"%s\", ", UnitTypes[i]->Ident.c_str());
+	for (std::vector<CUnitType *>::size_type i = 0; i < getUnitTypes().size(); ++i) {
+		file.printf("DefineUnitAllow(\"%s\", ", getUnitTypes()[i]->Ident.c_str());
 		for (int p = 0; p < PlayerMax; ++p) {
 			if (p) {
 				file.printf(", ");
@@ -497,8 +497,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 		}
 	}
 
-	for (size_t z = 0; z < UnitTypes.size(); ++z) {
-		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+	for (size_t z = 0; z < getUnitTypes().size(); ++z) {
+		CUnitStats &stat = getUnitTypes()[z]->Stats[pn];
 		// add/remove allowed units
 
 		// FIXME: check if modify is allowed
@@ -513,7 +513,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um.Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && !unit->Removed) {
@@ -527,7 +527,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um.Modifier.Variables[SUPPLY_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && unit->IsAlive()) {
@@ -538,7 +538,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// if a unit type's demand is changed, we need to update the player's demand accordingly
 			if (um.Modifier.Variables[DEMAND_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && unit->IsAlive()) {
@@ -558,7 +558,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 						stat.ImproveIncomes[j] += um.Modifier.ImproveIncomes[j];
 					}
 					//update player's income
-					std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+					std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 					if (unitupgrade.size() > 0) {
 						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
 					}
@@ -590,7 +590,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// And now modify ingame units
 			if (varModified) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z], true);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z], true);
 
 				for (CUnit *unitPtr : unitupgrade) {
 					CUnit &unit = *unitPtr;
@@ -618,7 +618,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 				}
 			}
 			if (um.ConvertTo) {
-				ConvertUnitTypeTo(player, *UnitTypes[z], *um.ConvertTo);
+				ConvertUnitTypeTo(player, *getUnitTypes()[z], *um.ConvertTo);
 			}
 		}
 	}
@@ -660,8 +660,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 		}
 	}
 
-	for (size_t z = 0; z < UnitTypes.size(); ++z) {
-		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+	for (size_t z = 0; z < getUnitTypes().size(); ++z) {
+		CUnitStats &stat = getUnitTypes()[z]->Stats[pn];
 		// add/remove allowed units
 
 		// FIXME: check if modify is allowed
@@ -676,7 +676,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 			// If Sight range is upgraded, we need to change EVERY unit
 			// to the new range, otherwise the counters get confused.
 			if (um.Modifier.Variables[SIGHTRANGE_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && !unit->Removed) {
@@ -690,7 +690,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// if a unit type's supply is changed, we need to update the player's supply accordingly
 			if (um.Modifier.Variables[SUPPLY_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && unit->IsAlive()) {
@@ -701,7 +701,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// if a unit type's demand is changed, we need to update the player's demand accordingly
 			if (um.Modifier.Variables[DEMAND_INDEX].Value) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z]);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z]);
 
 				for (CUnit *unit : unitupgrade) {
 					if (unit->Player->Index == pn && unit->IsAlive()) {
@@ -749,7 +749,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 
 			// And now modify ingame units
 			if (varModified) {
-				std::vector<CUnit *> unitupgrade = FindUnitsByType(*UnitTypes[z], true);
+				std::vector<CUnit *> unitupgrade = FindUnitsByType(*getUnitTypes()[z], true);
 
 				for (CUnit *unitPtr : unitupgrade) {
 					CUnit &unit = *unitPtr;
@@ -775,7 +775,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier &um)
 				}
 			}
 			if (um.ConvertTo) {
-				ConvertUnitTypeTo(player, *um.ConvertTo, *UnitTypes[z]);
+				ConvertUnitTypeTo(player, *um.ConvertTo, *getUnitTypes()[z]);
 			}
 		}
 	}

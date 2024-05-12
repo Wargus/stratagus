@@ -619,7 +619,7 @@ static bool AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 
 	// Iterate them
 	for (int typeIndex : usableTypes) {
-		CUnitType &type = *UnitTypes[typeIndex];
+		CUnitType &type = *getUnitTypes()[typeIndex];
 		//
 		// Check if we have a place for building or a unit to build.
 		//
@@ -932,7 +932,7 @@ static bool AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 
 	int exploremask = 0;
 
-	for (const CUnitType *type : UnitTypes) {
+	for (const CUnitType *type : getUnitTypes()) {
 		if (type && type->GivesResource == resource) {
 			switch (type->MoveType) {
 				case EMovement::Land: exploremask |= MapFieldLandUnit; break;

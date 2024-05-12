@@ -56,10 +56,11 @@
 #include "util.h"
 #include "vec2i.h"
 
-#include <climits>
-#include <vector>
 #include <algorithm>
+#include <climits>
 #include <map>
+#include <memory>
+#include <vector>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -720,7 +721,7 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
+const std::vector<CUnitType *> &getUnitTypes(); /// All unit-types
 
 /// @todo this hardcoded unit-types must be removed!!
 extern CUnitType *UnitTypeHumanWall;  /// Human wall

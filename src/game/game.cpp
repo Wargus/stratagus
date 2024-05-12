@@ -388,7 +388,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 		}
 
 		f->printf("\n-- set map default stat and map sound for unit types\n");
-		for (const CUnitType *typePtr : UnitTypes) {
+		for (const CUnitType *typePtr : getUnitTypes()) {
 			const CUnitType &type = *typePtr;
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				if (type.MapDefaultStat.Costs[j] != type.DefaultStat.Costs[j]) {
