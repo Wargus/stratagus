@@ -371,7 +371,7 @@ void CPopupContentTypeLine::Parse(lua_State *l) /* override */
 int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const /* override */
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	TriggerData.Type = UnitTypes[button.Value];
+	TriggerData.Type = getUnitTypes()[button.Value];
 	std::string text = EvalString(*this->Text);
 	TriggerData.Type = nullptr;
 	return font.getWidth(text);
@@ -398,7 +398,7 @@ void CPopupContentTypeVariable::Draw(int x,
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	if (this->Text) {
-		TriggerData.Type = UnitTypes[button.Value];
+		TriggerData.Type = getUnitTypes()[button.Value];
 		text = EvalString(*this->Text);
 		TriggerData.Type = nullptr;
 		if (this->Centered) {
@@ -409,7 +409,7 @@ void CPopupContentTypeVariable::Draw(int x,
 	}
 
 	if (this->Index != -1) {
-		CUnitType &type = *UnitTypes[button.Value];
+		CUnitType &type = *getUnitTypes()[button.Value];
 		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 

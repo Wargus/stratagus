@@ -79,7 +79,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 	std::vector<CUnitType *> res;
 
 	if (list == "*") {
-		return UnitTypes;
+		return getUnitTypes();
 	}
 	size_t begin = 1;
 	size_t end = list.find(",", begin);
@@ -101,7 +101,7 @@ static std::vector<CUnitType *> getReparableUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (CUnitType *type : UnitTypes) {
+	for (CUnitType *type : getUnitTypes()) {
 		if (type->RepairHP > 0) {
 			res.push_back(type);
 		}
@@ -119,7 +119,7 @@ static std::vector<CUnitType *> getSupplyUnits()
 	std::vector<CUnitType *> res;
 	std::vector<CUnitType *> sorted_res;
 
-	for (CUnitType *type : UnitTypes) {
+	for (CUnitType *type : getUnitTypes()) {
 		if (type->DefaultStat.Variables[SUPPLY_INDEX].Value > 0) { //supply units are identified as being those with a default stat supply of 1 or more; so if a unit has a supply default stat of 0, but through an upgrade ends up having 1 or more supply, it won't be included here
 			res.push_back(type);
 		}
@@ -159,7 +159,7 @@ static std::vector<CUnitType *> getRefineryUnits()
 {
 	std::vector<CUnitType *> res;
 
-	for (CUnitType *type : UnitTypes) {
+	for (CUnitType *type : getUnitTypes()) {
 		if (type->GivesResource > 0 && type->BoolFlag[CANHARVEST_INDEX].value) {
 			res.push_back(type);
 		}
@@ -222,7 +222,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				AiHelperInsert(aiHelper.Refinery(), i - 1, *type);
 			}
 		}
-		for (CUnitType *type : UnitTypes) {
+		for (CUnitType *type : getUnitTypes()) {
 			if (type->CanStore[i] > 0) {
 				/* HACK : we can't store TIME then use 0 as 1 */
 				AiHelperInsert(aiHelper.Depots(), i - 1, *type);
@@ -872,7 +872,7 @@ static int CclAiForce(lua_State *l)
 		}
 
 		// Use the equivalent unittype.
-		type = UnitTypes[UnitTypeEquivs[type->Slot]];
+		type = getUnitTypes()[UnitTypeEquivs[type->Slot]];
 
 		if (resetForce) {
 			// Append it.

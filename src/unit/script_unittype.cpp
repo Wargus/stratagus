@@ -1532,11 +1532,12 @@ static int CclUnitTypeArray(lua_State *l)
 
 	lua_newtable(l);
 
-	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+	std::size_t i = 1;
+	for (auto type : getUnitTypes()) {
 		LuaUserData *data = (LuaUserData *)lua_newuserdata(l, sizeof(LuaUserData));
 		data->Type = LuaUnitType;
-		data->Data = UnitTypes[i];
-		lua_rawseti(l, 1, i + 1);
+		data->Data = type;
+		lua_rawseti(l, 1, i++);
 	}
 	return 1;
 }
@@ -1908,7 +1909,7 @@ static int CclDefineBoolFlags(lua_State *l)
 
 	if (0 < old && old != UnitTypeVar.GetNumberBoolFlag()) {
 		size_t new_size = UnitTypeVar.GetNumberBoolFlag();
-		for (CUnitType *unitType : UnitTypes) { // adjust array for unit already defined
+		for (CUnitType *unitType : getUnitTypes()) { // adjust array for unit already defined
 			unitType->BoolFlag.resize(new_size);
 		}
 	}

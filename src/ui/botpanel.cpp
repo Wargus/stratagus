@@ -363,7 +363,7 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 	for (auto &contentPtr : popup.Contents) {
 		CPopupContentType &content = *contentPtr;
 
-		if (CanShowPopupContent(content.Condition.get(), button, UnitTypes[button.Value])) {
+		if (CanShowPopupContent(content.Condition.get(), button, getUnitTypes()[button.Value])) {
 			// Automatically write the calculated coordinates.
 			content.pos.x = contentWidth + content.MarginX;
 			content.pos.y = popupHeight + content.MarginY;
@@ -543,9 +543,13 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonCmd::Build:
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo:
-			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
-				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
-			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			memcpy(Costs,
+			       getUnitTypes()[button.Value]->Stats[ThisPlayer->Index].Costs,
+			       sizeof(getUnitTypes()[button.Value]->Stats[ThisPlayer->Index].Costs));
+			Costs[FoodCost] = getUnitTypes()[button.Value]
+			                      ->Stats[ThisPlayer->Index]
+			                      .Variables[DEMAND_INDEX]
+			                      .Value;
 			break;
 		default:
 			break;
@@ -575,7 +579,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 	for (auto &contentPtr : popup.Contents) {
 		const CPopupContentType &content = *contentPtr;
 
-		if (CanShowPopupContent(content.Condition.get(), button, UnitTypes[button.Value])) {
+		if (CanShowPopupContent(content.Condition.get(), button, getUnitTypes()[button.Value])) {
 			content.Draw(x + content.pos.x, y + content.pos.y, popup, popupWidth, button, Costs);
 		}
 	}
@@ -801,7 +805,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo: {
 			// FIXME: store pointer in button table!
-			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
+			const CUnitStats &stats = getUnitTypes()[button.Value]->Stats[ThisPlayer->Index];
 			UI.StatusLine.SetCosts(0, stats.Variables[DEMAND_INDEX].Value, stats.Costs);
 			break;
 		}
@@ -1236,7 +1240,7 @@ void CButtonPanel::DoClicked_CancelBuild()
 void CButtonPanel::DoClicked_Build(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	CUnitType &type = *getUnitTypes()[CurrentButtons[button].Value];
 	if (!Selected[0]->Player->CheckUnitType(type)) {
 		UI.StatusLine.Set(_("Select Location"));
 		UI.StatusLine.ClearCosts();
@@ -1250,7 +1254,7 @@ void CButtonPanel::DoClicked_Build(int button)
 void CButtonPanel::DoClicked_Train(int button)
 {
 	// NEW CODE FOR CButtonPanel::DoClicked_Train(int button)
-	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	CUnitType &type = *getUnitTypes()[CurrentButtons[button].Value];
 	int best_training_place = 0;
 	int lowest_queue = Selected[0]->Orders.size();
 
@@ -1285,7 +1289,7 @@ void CButtonPanel::DoClicked_Train(int button)
 void CButtonPanel::DoClicked_UpgradeTo(int button)
 {
 	// FIXME: store pointer in button table!
-	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	CUnitType &type = *getUnitTypes()[CurrentButtons[button].Value];
 	const EFlushMode flush = !(KeyModifiers & ModifierShift) ? EFlushMode::On : EFlushMode::Off;
 	for (CUnit *unit : Selected) {
 		if (Selected[0]->Player->CheckLimits(type) != ECheckLimit::SpecificUnitLimitReached
