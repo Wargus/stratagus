@@ -355,7 +355,7 @@ class ScrollArea : public BasicContainer
 class ImageWidget : public Widget
 {
 	ImageWidget(CGraphicPtr image);
-	ImageWidget(Mng *image);
+	ImageWidget(MngPtr image);
 	ImageWidget(Movie *image);
 };
 

@@ -563,7 +563,7 @@ class CUnitType
 {
 public:
 	CUnitType() = default;
-	~CUnitType();
+	~CUnitType() = default;
 
 	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
 	PixelSize GetPixelSize() const;
@@ -601,7 +601,7 @@ public:
 #ifdef USE_MNG
 	struct _portrait_ {
 		std::vector<std::string> Files;
-		std::vector<Mng *> Mngs;
+		std::vector<std::shared_ptr<Mng>> Mngs;
 		int Talking = 0; /// offset into portraits for talking portraits
 		mutable int CurrMng = 0;
 		mutable int NumIterations = 0;

@@ -233,17 +233,14 @@ public:
 
 class Mng : public gcn::SDLImage
 {
+public:
 	Mng() : gcn::SDLImage(nullptr, true) {}
 	~Mng();
-
 	Mng(const Mng &) = delete;
 	Mng &operator=(const Mng &) = delete;
 
-	uint32_t refcnt = 0;
+	static std::shared_ptr<Mng> New(const std::string &name);
 
-public:
-	static Mng *New(const std::string &name);
-	static void Free(Mng *mng);
 	bool Load();
 	void Reset();
 	void Draw(int x, int y);
@@ -270,11 +267,12 @@ private:
 /// empty class for lua scripts
 class Mng : public gcn::Image
 {
+public:
 	Mng() {}
 	~Mng() {}
-public:
-	static Mng *New(const std::string &name) { return nullptr; }
-	static void Free(Mng *mng) {}
+
+	static std::shared_ptr<Mng> New(const std::string &name) { return nullptr; }
+
 	bool Load() { return false; }
 	void Reset() {}
 	void Draw(int x, int y) {}
