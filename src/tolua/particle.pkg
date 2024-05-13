@@ -50,11 +50,7 @@ public:
 class CParticleManager
 {
 public:
-	CParticleManager();
-	~CParticleManager();
-
 	void add(CParticle *particle);
 };
 
 extern tolua_readonly CParticleManager ParticleManager;
-
