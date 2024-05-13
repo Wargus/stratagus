@@ -46,6 +46,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+# include "iolib.h"
+
 # include <ogg/ogg.h>
 # include <vorbis/codec.h>
 
@@ -59,8 +61,6 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
-class CFile;
 
 /**
 **  Ogg data structure to handle vorbis/theora streaming.
@@ -102,7 +102,7 @@ public:
 	SDL_Surface *getSurface() const override;
 
 private:
-	CFile *f = nullptr;
+	std::unique_ptr<CFile> f;
 	mutable bool need_data = true;
 	mutable Uint32 start_time = 0;
 	mutable std::unique_ptr<OggData> data;

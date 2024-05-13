@@ -69,12 +69,12 @@ static bool MovieStop;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static bool OggGetNextPage(ogg_page &page, ogg_sync_state &sync, CFile *f)
+static bool OggGetNextPage(ogg_page &page, ogg_sync_state &sync, CFile &f)
 {
 	while (ogg_sync_pageout(&sync, &page) != 1) {
 		// need more bytes
 		char *buf = ogg_sync_buffer(&sync, 4096);
-		const int bytes = f->read(buf, 4096);
+		const int bytes = f.read(buf, 4096);
 		if (!bytes || ogg_sync_wrote(&sync, bytes)) {
 			return false;
 		}
@@ -105,7 +105,7 @@ static bool OggInit(CFile &f, OggData &data)
 	while (true) {
 		ogg_stream_state test;
 
-		if (!OggGetNextPage(data.page, data.sync, &f)) {
+		if (!OggGetNextPage(data.page, data.sync, f)) {
 			return false;
 		}
 
@@ -168,7 +168,7 @@ static bool OggInit(CFile &f, OggData &data)
 			++num_vorbis;
 		}
 
-		if (!OggGetNextPage(data.page, data.sync, &f)) {
+		if (!OggGetNextPage(data.page, data.sync, f)) {
 			break;
 		}
 
@@ -244,7 +244,7 @@ static bool TheoraProcessData(OggData &data)
 
 	while (true) {
 		if (ogg_stream_packetout(&data.vstream, &packet) != 1) {
-			if (!OggGetNextPage(data.page, data.sync, data.File)) {
+			if (!OggGetNextPage(data.page, data.sync, *data.File)) {
 				// EOF
 				return false;
 			}
@@ -391,7 +391,6 @@ Movie::~Movie()
 	if (data != nullptr) {
 		OggFree(data.get());
 	}
-	delete f;
 }
 
 static void RenderToSurface(SDL_Surface &surface, SDL_Texture *yuv_overlay, SDL_Rect &rect, OggData &data) {
@@ -430,7 +429,7 @@ bool Movie::Load(const std::string &name, int w, int h)
 {
 	const std::string filename = LibraryFileName(name);
 
-	f = new CFile();
+	f = std::make_unique<CFile>();
 	if (f->open(filename.c_str(), CL_OPEN_READ) == -1) {
 		ErrorPrint("Can't open file '%s'\n", name.c_str());
 		return false;
@@ -465,7 +464,7 @@ SDL_Surface *Movie::getSurface() const /* override */
 			return mSurface;
 		}
 
-		data->File = f;
+		data->File = f.get();
 		yuv_overlay.reset(SDL_CreateTexture(TheRenderer,
 		                                    SDL_PIXELFORMAT_YV12,
 		                                    SDL_TEXTUREACCESS_STREAMING,
