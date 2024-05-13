@@ -38,6 +38,7 @@
 ----------------------------------------------------------------------------*/
 
 #include "settings.h"
+#include "util.h"
 
 #include <cstring>
 #include <memory>
@@ -198,8 +199,8 @@ public:
 
 	void Clear()
 	{
-		memset(Units, 0, sizeof(Units));
-		memset(Upgrades, 0, sizeof(Upgrades));
+		ranges::fill(Units, 0);
+		ranges::fill(Upgrades, '\0');
 	}
 
 	int Units[UnitTypeMax]{}; /// maximum amount of units allowed
@@ -215,7 +216,7 @@ class CUpgradeTimers
 public:
 	CUpgradeTimers() = default;
 
-	void Clear() { memset(Upgrades, 0, sizeof(Upgrades)); }
+	void Clear() { ranges::fill(Upgrades, 0); }
 
 	/**
 	**  all 0 at the beginning, all upgrade actions do increment values in

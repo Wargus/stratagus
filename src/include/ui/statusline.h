@@ -41,9 +41,7 @@ class CFont;
 class CStatusLine
 {
 public:
-	CStatusLine() : Width(0), TextX(0), TextY(0), Font(0) {
-		memset(Costs, 0, (ManaResCost + 1) * sizeof(int));
-	}
+	CStatusLine() = default;
 
 	void Draw();
 	void DrawCosts();
@@ -54,11 +52,11 @@ public:
 	void ClearCosts();
 
 public:
-	int Width;
-	int TextX;
-	int TextY;
-	CFont *Font;
-	int Costs[ManaResCost + 1];
+	int Width = 0;
+	int TextX = 0;
+	int TextY = 0;
+	CFont *Font = nullptr;
+	int Costs[ManaResCost + 1]{};
 
 private:
 	std::string StatusLine;

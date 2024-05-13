@@ -135,7 +135,7 @@ static void ShowInput()
 static void UiBeginInput()
 {
 	KeyState = EKeyState::Input;
-	memset(Input, 0, sizeof(Input));
+	ranges::fill(Input, '\0');
 	InputIndex = 0;
 	addCursorToInput();
 	UI.StatusLine.ClearCosts();

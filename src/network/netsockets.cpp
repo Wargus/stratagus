@@ -184,8 +184,7 @@ private:
 
 bool CTCPSocket_Impl::Open(const CHost &host)
 {
-	char ip[24]; // 127.255.255.255:65555
-	memset(&ip, 0, sizeof(ip));
+	char ip[24]{}; // 127.255.255.255:65555
 	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
 	this->socket = NetOpenTCP(ip, host.getPort());
 	return this->socket != INVALID_SOCKET;
