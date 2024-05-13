@@ -472,7 +472,7 @@ std::optional<Vec2i> AiFindBuildingPlace(const CUnit &worker, const CUnitType &t
 
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
-		ResourceInfo *resinfo = worker.Type->ResInfo[i];
+		const auto &resinfo = worker.Type->ResInfo[i];
 		//Depots
 		if (type.CanStore[i]) {
 			if (resinfo && resinfo->TerrainHarvester) {

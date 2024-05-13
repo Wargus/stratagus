@@ -993,7 +993,7 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 	auto sprite = type->Sprite;
 	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
+		const auto &resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
 				sprite = resinfo->SpriteWhenLoaded;

@@ -521,10 +521,6 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 
 CUnitType::~CUnitType()
 {
-	for (int res = 0; res < MaxCosts; ++res) {
-		delete this->ResInfo[res];
-	}
-
 #ifdef USE_MNG
 	if (!this->Portrait.Mngs.empty()) {
 		if (this->Portrait.Mngs[0]) {
@@ -918,7 +914,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			ResourceInfo *resinfo = type.ResInfo[i];
+			auto &resinfo = type.ResInfo[i];
 			if (!resinfo) {
 				continue;
 			}
