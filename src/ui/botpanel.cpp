@@ -528,24 +528,20 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		LastDrawnButtonPopup = const_cast<ButtonAction *>(&button);
 	}
 
-	int popupWidth, popupHeight;
-	int Costs[ManaResCost + 1];
-	memset(Costs, 0, sizeof(Costs));
-
+	int Costs[ManaResCost + 1]{};
 	switch (button.Action) {
 		case ButtonCmd::Research:
-			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
+			ranges::copy(AllUpgrades[button.Value]->Costs, std::begin(Costs));
 			break;
 		case ButtonCmd::SpellCast:
-			memcpy(Costs, SpellTypeTable[button.Value]->Costs, sizeof(SpellTypeTable[button.Value]->Costs));
+			ranges::copy(SpellTypeTable[button.Value]->Costs, std::begin(Costs));
 			Costs[ManaResCost] = SpellTypeTable[button.Value]->ManaCost;
 			break;
 		case ButtonCmd::Build:
 		case ButtonCmd::Train:
 		case ButtonCmd::UpgradeTo:
-			memcpy(Costs,
-			       getUnitTypes()[button.Value]->Stats[ThisPlayer->Index].Costs,
-			       sizeof(getUnitTypes()[button.Value]->Stats[ThisPlayer->Index].Costs));
+			ranges::copy(getUnitTypes()[button.Value]->Stats[ThisPlayer->Index].Costs,
+			             std::begin(Costs));
 			Costs[FoodCost] = getUnitTypes()[button.Value]
 			                      ->Stats[ThisPlayer->Index]
 			                      .Variables[DEMAND_INDEX]
@@ -555,6 +551,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			break;
 	}
 
+	int popupWidth, popupHeight;
 	if (useCache) {
 		popupWidth = popupCache.popupWidth;
 		popupHeight = popupCache.popupHeight;

@@ -1239,9 +1239,9 @@ static int CclCopyUnitType(lua_State *l)
 	to->Portrait.Files = from.Portrait.Files;
 	to->Portrait.Mngs.resize(to->Portrait.Files.size());
 #endif
-	memcpy(to->DefaultStat.Costs, from.DefaultStat.Costs, sizeof(from.DefaultStat.Costs));
-	memcpy(to->DefaultStat.Storing, from.DefaultStat.Storing, sizeof(from.DefaultStat.Storing));
-	memcpy(to->DefaultStat.ImproveIncomes, from.DefaultStat.ImproveIncomes, sizeof(from.DefaultStat.ImproveIncomes));
+	ranges::copy(from.DefaultStat.Costs, std::begin(to->DefaultStat.Costs));
+	ranges::copy(from.DefaultStat.Storing, std::begin(to->DefaultStat.Storing));
+	ranges::copy(from.DefaultStat.ImproveIncomes, std::begin(to->DefaultStat.ImproveIncomes));
 	to->Construction = from.Construction;
 	to->DrawLevel = from.DrawLevel;
 	to->MaxOnBoard = from.MaxOnBoard;
@@ -1310,7 +1310,7 @@ static int CclCopyUnitType(lua_State *l)
 	to->CanAttack = from.CanAttack;
 	to->RepairRange = from.RepairRange;
 	to->RepairHP = from.RepairHP;
-	memcpy(to->RepairCosts, from.RepairCosts, sizeof(from.RepairCosts));
+	ranges::copy(from.RepairCosts, std::begin(to->RepairCosts));
 	to->CanTarget = from.CanTarget;
 	to->Building = from.Building;
 	to->BuildingRules.clear();
@@ -1343,9 +1343,11 @@ static int CclCopyUnitType(lua_State *l)
 		to->BoolFlag[i].CanTargetFlag = from.BoolFlag[i].CanTargetFlag;
 		to->BoolFlag[i].AiPriorityTarget = from.BoolFlag[i].AiPriorityTarget;
 	}
-	memcpy(to->ResInfo, from.ResInfo, sizeof(from.ResInfo));
+	for (std::size_t i = 0; i != std::size(to->ResInfo); ++i) {
+		from.ResInfo[i] = to->ResInfo[i] ? std::make_unique<ResourceInfo>(*to->ResInfo[i]) : nullptr;
+	}
 	to->GivesResource = from.GivesResource;
-	memcpy(to->CanStore, from.CanStore, sizeof(from.CanStore));
+	ranges::copy(from.CanStore, std::begin(to->CanStore));
 	to->CanCastSpell = from.CanCastSpell;
 	to->AutoCastActive = from.AutoCastActive;
 	to->Sound.Selected.Name = from.Sound.Selected.Name;
