@@ -20,31 +20,31 @@ CVideo Video;
 void ToggleFullScreen(void);
 
 $using CGraphicPtr = std::shared_ptr<CGraphic>;
-$void Load(CGraphicPtr* p, bool grayscale) { (*p)->Load(grayscale); }
-$void Resize(CGraphicPtr* p, int w, int h) { (*p)->Resize(w, h); }
-$void SetPaletteColor(CGraphicPtr* p, int idx, int r, int g, int b) { (*p)->SetPaletteColor(idx, r, g, b); }
-$void OverlayGraphic(CGraphicPtr* p, CGraphicPtr g, bool mask) { (*p)->OverlayGraphic(g.get(), mask); }
+$void Load(CGraphicPtr* self, bool grayscale) { (*self)->Load(grayscale); }
+$void Resize(CGraphicPtr* self, int w, int h) { (*self)->Resize(w, h); }
+$void SetPaletteColor(CGraphicPtr* self, int idx, int r, int g, int b) { (*self)->SetPaletteColor(idx, r, g, b); }
+$void OverlayGraphic(CGraphicPtr* self, CGraphicPtr g, bool mask) { (*self)->OverlayGraphic(g.get(), mask); }
 
 $using CPlayerColorGraphicPtr = std::shared_ptr<CPlayerColorGraphic>;
-$void Load(CPlayerColorGraphicPtr* p, bool grayscale) { (*p)->Load(grayscale); }
-$void Resize(CPlayerColorGraphicPtr* p, int w, int h) { (*p)->Resize(w, h); }
-$void SetPaletteColor(CPlayerColorGraphicPtr* p, int idx, int r, int g, int b) { (*p)->SetPaletteColor(idx, r, g, b); }
-$void OverlayGraphic(CPlayerColorGraphicPtr* p, CGraphicPtr g, bool mask) { (*p)->OverlayGraphic(g.get(), mask); }
+$void Load(CPlayerColorGraphicPtr* self, bool grayscale) { (*self)->Load(grayscale); }
+$void Resize(CPlayerColorGraphicPtr* self, int w, int h) { (*self)->Resize(w, h); }
+$void SetPaletteColor(CPlayerColorGraphicPtr* self, int idx, int r, int g, int b) { (*self)->SetPaletteColor(idx, r, g, b); }
+$void OverlayGraphic(CPlayerColorGraphicPtr* self, CGraphicPtr g, bool mask) { (*self)->OverlayGraphic(g.get(), mask); }
 
 struct CGraphicPtr // std::shared_ptr<CGraphic>
 {
-	tolua_outside void Load @ Load(bool grayscale = false);
-	tolua_outside void Resize @ Resize(int w, int h);
-	tolua_outside void SetPaletteColor @ SetPaletteColor(int idx, int r, int g, int b);
-	tolua_outside void OverlayGraphic @ OverlayGraphic(CGraphicPtr g, bool mask = false);
+	tolua_outside void Load(bool grayscale = false);
+	tolua_outside void Resize(int w, int h);
+	tolua_outside void SetPaletteColor(int idx, int r, int g, int b);
+	tolua_outside void OverlayGraphic(CGraphicPtr g, bool mask = false);
 };
 
 struct CPlayerColorGraphicPtr // std::shared_ptr<CPlayerColorGraphic>
 {
-	tolua_outside void Load @ Load(bool grayscale = false);
-	tolua_outside void Resize @ Resize(int w, int h);
-	tolua_outside void SetPaletteColor @ SetPaletteColor(int idx, int r, int g, int b);
-	tolua_outside void OverlayGraphic @ OverlayGraphic(CGraphicPtr g, bool mask = false);
+	tolua_outside void Load(bool grayscale = false);
+	tolua_outside void Resize(int w, int h);
+	tolua_outside void SetPaletteColor(int idx, int r, int g, int b);
+	tolua_outside void OverlayGraphic(CGraphicPtr g, bool mask = false);
 };
 
 class CGraphic
@@ -78,16 +78,24 @@ void ClearAllColorCyclingRange();
 void AddColorCyclingRange(unsigned int startColorIndex, unsigned int endColorIndex);
 unsigned int SetColorCycleSpeed(unsigned int speed);
 
+$using MngPtr = std::shared_ptr<Mng>;
+$void Load(MngPtr* self) { (*self)->Load(); }
+$void Draw(MngPtr* self, int w, int h) { (*self)->Draw(w, h); }
+$void Reset(MngPtr* self) { (*self)->Reset(); }
+
+struct MngPtr // std::shared_ptr<Mng>
+{
+	tolua_outside void Load();
+	tolua_outside void Draw(int w, int h);
+	tolua_outside void Reset();
+};
+
 class Mng
 {
 public:
-		static Mng *New(const std::string name);
-		static void Free(Mng *mng);
-        bool Load();
-        void Draw(int x, int y);
-        void Reset();
+	static MngPtr New(const std::string name);
 
-		static int MaxFPS;
+	static int MaxFPS;
 }
 
 class Movie

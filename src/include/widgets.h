@@ -90,7 +90,7 @@ public:
 class ImageWidget : public gcn::Icon
 {
 public:
-	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {} // TODO: Remove (used for Mng/Movie in ToLua++)
+	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {} // TODO: Remove (used for Movie in ToLua++)
 	explicit ImageWidget(std::shared_ptr<gcn::Image> img) : gcn::Icon(img.get()), img(img) {}
 
 private:

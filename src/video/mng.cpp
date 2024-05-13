@@ -205,31 +205,19 @@ void Mng::Draw(int x, int y)
 	SDL_BlitSurface(mSurface, nullptr, TheScreen, &rect);
 }
 
-static std::map<std::string, Mng *> MngCache;
+static std::map<std::string, std::weak_ptr<Mng>> MngCache;
 
-Mng *Mng::New(const std::string &name)
+std::shared_ptr<Mng> Mng::New(const std::string &name)
 {
 	const std::string file = LibraryFileName(name);
-	Mng *&mng = MngCache[file];
+	auto& cache = MngCache[file];
+	auto mng = cache.lock();
 	if (mng == nullptr) {
-		mng = new Mng();
+		mng = std::make_shared<Mng>();
 		mng->name = LibraryFileName(name);
+		cache = mng;
 	}
-	mng->refcnt++;
 	return mng;
-}
-
-void Mng::Free(Mng *mng)
-{
-	// XXX: Weird free bug that I don't understand, just skip it if already nullptr
-	if ((intptr_t)mng < 40) {
-		return;
-	}
-	mng->refcnt--;
-	if (mng->refcnt == 0) {
-		MngCache.erase(mng->name);
-		delete mng;
-	}
 }
 
 /**

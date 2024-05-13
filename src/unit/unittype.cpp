@@ -519,19 +519,6 @@ int GetResourceIdByName(lua_State *l, std::string_view resourceName)
 	return res;
 }
 
-CUnitType::~CUnitType()
-{
-#ifdef USE_MNG
-	if (!this->Portrait.Mngs.empty()) {
-		if (this->Portrait.Mngs[0]) {
-			for (auto *mng : this->Portrait.Mngs) {
-				Mng::Free(mng);
-			}
-		}
-	}
-#endif
-}
-
 PixelSize CUnitType::GetPixelSize() const
 {
 	return PixelSize(TileWidth * PixelTileSize.x, TileHeight * PixelTileSize.y);
