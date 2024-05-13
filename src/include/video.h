@@ -442,9 +442,6 @@ extern void DeInitImageLoaders();
 /// initialize the video part
 extern void InitVideo();
 
-/// deinitliaize the video part
-void DeInitVideo();
-
 /// Initializes video synchronization.
 extern void SetVideoSync();
 

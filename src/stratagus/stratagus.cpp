@@ -414,7 +414,7 @@ void Exit(int err)
 			   (SlowFrameCounter * 100) / (FrameCounter ? FrameCounter : 1));
 	lua_settop(Lua, 0);
 	lua_close(Lua);
-	DeInitVideo();
+
 	DeInitImageLoaders();
 
 	delete UnitManager;
