@@ -80,7 +80,7 @@ void CStatusLine::SetCosts(int mana, int food, const int *costs)
 	if (costs) {
 		memcpy(Costs, costs, MaxCosts * sizeof(*costs));
 	} else {
-		memset(Costs, 0, sizeof(Costs));
+		ranges::fill(Costs, 0);
 	}
 	Costs[ManaResCost] = mana;
 	Costs[FoodCost] = food;

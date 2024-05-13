@@ -358,7 +358,7 @@ static bool RenderWithShaderInternal(SDL_Renderer *renderer, SDL_Window* win, SD
 
 		lazyGlGetFloatv(GL_MODELVIEW_MATRIX, modelview);
 		lazyGlGetFloatv(GL_PROJECTION_MATRIX, projection);
-		memset(matrix, 0, sizeof(matrix));
+		ranges::fill(matrix, 0);
 		for (int i = 0; i < 4; i++) {
 			for(int j = 0; j < 4; j++) {
 				for (int k = 0; k < 4; k++) {

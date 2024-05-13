@@ -426,7 +426,7 @@ void CUnit::Init()
 
 	Frame = 0;
 	Colors = -1;
-	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
+	ranges::fill(IndividualUpgrades, false);
 	IX = 0;
 	IY = 0;
 	Direction = 0;
@@ -453,7 +453,7 @@ void CUnit::Init()
 	JustMoved = 0;
 	TeamSelected = 0;
 	RescuedFrom = nullptr;
-	memset(VisCount, 0, sizeof(VisCount));
+	ranges::fill(VisCount, 0);
 	memset(&Seen, 0, sizeof(Seen));
 	Variable.clear();
 	TTL = 0;

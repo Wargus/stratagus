@@ -33,6 +33,7 @@
 //@{
 
 #include "filesystem.h"
+#include "stratagus.h"
 
 #include <cstdlib>
 #include <cstdint>

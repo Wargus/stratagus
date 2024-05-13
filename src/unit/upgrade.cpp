@@ -218,8 +218,8 @@ static int CclDefineModifier(lua_State *l)
 
 	auto um = std::make_unique<CUpgradeModifier>();
 
-	memset(um->ChangeUpgrades, '?', sizeof(um->ChangeUpgrades));
-	memset(um->ApplyTo, '?', sizeof(um->ApplyTo));
+	ranges::fill(um->ChangeUpgrades, '?');
+	ranges::fill(um->ApplyTo, '?');
 	um->Modifier.Variables.resize(UnitTypeVar.GetNumberVariable());
 	um->ModifyPercent.resize(UnitTypeVar.GetNumberVariable());
 

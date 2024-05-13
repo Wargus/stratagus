@@ -512,11 +512,11 @@ void NetworkOnStartGame()
 			ncqs[1].Type = MessageNone;
 		}
 	}
-	memset(NetworkSyncSeeds, 0, sizeof(NetworkSyncSeeds));
-	memset(NetworkSyncHashs, 0, sizeof(NetworkSyncHashs));
-	memset(PlayerQuit, 0, sizeof(PlayerQuit));
-	memset(NetworkLastFrame, 0, sizeof(NetworkLastFrame));
-	memset(NetworkLastCycle, 0, sizeof(NetworkLastCycle));
+	ranges::fill(NetworkSyncSeeds, 0);
+	ranges::fill(NetworkSyncHashs, 0);
+	ranges::fill(PlayerQuit, 0);
+	ranges::fill(NetworkLastFrame, 0);
+	ranges::fill(NetworkLastCycle, 0);
 }
 
 //----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ TEST_CASE_FIXTURE(AutoNetwork, "CHost")
 class Foo
 {
 public:
-	Foo() { memset(&data, 0, sizeof(data)); }
+	Foo() = default;
 
 	void Fill()
 	{
@@ -74,7 +74,7 @@ public:
 		return true;
 	}
 public:
-	char data[42];
+	char data[42]{};
 };
 
 TEST_CASE_FIXTURE(AutoNetwork, "CUDPSocket")

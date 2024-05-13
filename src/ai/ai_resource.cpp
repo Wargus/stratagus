@@ -490,9 +490,7 @@ static bool AiRequestSupply()
 
 	// Count the already made build requests.
 	const auto counter = AiGetBuildRequestsCount(*AiPlayer);
-	struct cnode cache[16];
-
-	memset(cache, 0, sizeof(cache));
+	struct cnode cache[16]{};
 
 	//
 	// Check if we can build this?

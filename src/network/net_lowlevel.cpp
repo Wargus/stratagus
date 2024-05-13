@@ -307,9 +307,8 @@ Socket NetOpenUDP(unsigned long ip, int port)
 	}
 	// bind local port
 	if (port) {
-		struct sockaddr_in sock_addr;
+		struct sockaddr_in sock_addr{};
 
-		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
 		sock_addr.sin_addr.s_addr = ip;
 		sock_addr.sin_port = htons(port);
@@ -339,9 +338,8 @@ Socket NetOpenTCP(const char *addr, int port)
 	}
 	// bind local port
 	if (port) {
-		struct sockaddr_in sock_addr;
+		struct sockaddr_in sock_addr{};
 
-		memset(&sock_addr, 0, sizeof(sock_addr));
 		sock_addr.sin_family = AF_INET;
 		if (addr) {
 			sock_addr.sin_addr.s_addr = inet_addr(addr);
@@ -377,7 +375,6 @@ Socket NetOpenTCP(const char *addr, int port)
 */
 int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 {
-	struct sockaddr_in sa;
 #ifndef __BEOS__
 	int opt = 1;
 	setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (setsockopttype)&opt, sizeof(opt));
@@ -389,7 +386,7 @@ int NetConnectTCP(Socket sockfd, unsigned long addr, int port)
 		return -1;
 	}
 
-	memset(&sa, 0, sizeof(sa));
+	struct sockaddr_in sa{};
 	memcpy(&sa.sin_addr, &addr, sizeof(addr));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);

@@ -751,8 +751,8 @@ void CPlayer::Init(PlayerTypes type)
 		this->MaxResources[i] = DefaultResourceMaxAmounts[i];
 	}
 
-	memset(this->UnitTypesCount, 0, sizeof(this->UnitTypesCount));
-	memset(this->UnitTypesAiActiveCount, 0, sizeof(this->UnitTypesAiActiveCount));
+	ranges::fill(this->UnitTypesCount, 0);
+	ranges::fill(this->UnitTypesAiActiveCount, 0);
 
 	this->Supply = 0;
 	this->Demand = 0;
@@ -801,14 +801,14 @@ void CPlayer::Clear()
 	GaveVisionTo.clear();
 	StartPos.x = 0;
 	StartPos.y = 0;
-	memset(Resources, 0, sizeof(Resources));
-	memset(StoredResources, 0, sizeof(StoredResources));
-	memset(MaxResources, 0, sizeof(MaxResources));
-	memset(LastResources, 0, sizeof(LastResources));
-	memset(Incomes, 0, sizeof(Incomes));
-	memset(Revenue, 0, sizeof(Revenue));
-	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
-	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
+	ranges::fill(Resources, 0);
+	ranges::fill(StoredResources, 0);
+	ranges::fill(MaxResources, 0);
+	ranges::fill(LastResources, 0);
+	ranges::fill(Incomes, 0);
+	ranges::fill(Revenue, 0);
+	ranges::fill(UnitTypesCount, 0);
+	ranges::fill(UnitTypesAiActiveCount, 0);
 	AiEnabled = false;
 	Ai = nullptr;
 	this->Units.resize(0);
@@ -823,7 +823,7 @@ void CPlayer::Clear()
 	Score = 0;
 	TotalUnits = 0;
 	TotalBuildings = 0;
-	memset(TotalResources, 0, sizeof(TotalResources));
+	ranges::fill(TotalResources, 0);
 	TotalRazings = 0;
 	TotalKills = 0;
 	this->LostMainFacilityTimer = 0;

@@ -676,8 +676,7 @@ void aligned_free(void *block)
 fs::path GetExecutablePath()
 {
 #ifdef WIN32
-	TCHAR executable_path[MAX_PATH];
-	memset(executable_path, 0, sizeof(executable_path));
+	TCHAR executable_path[MAX_PATH]{};
 	GetModuleFileName(nullptr, executable_path, sizeof(executable_path)-1);
 #else
 	const auto& executable_path = OriginalArgv[0];

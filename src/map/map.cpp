@@ -313,8 +313,8 @@ void CMapInfo::Clear()
 	this->Description.clear();
 	this->Filename.clear();
 	this->MapWidth = this->MapHeight = 0;
-	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
-	memset(this->PlayerType, 0, sizeof(this->PlayerType));
+	ranges::fill(this->PlayerSide, 0);
+	ranges::fill(this->PlayerType, PlayerTypes::PlayerUnset);
 	this->MapUID = 0;
 
 	this->HighgroundsEnabled = false;

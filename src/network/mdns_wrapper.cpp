@@ -64,9 +64,8 @@ static int service_callback(int sock, const struct sockaddr* from, size_t addrle
 
 void MDNS::AnswerServerQueries() {
     if (serviceSocket == -1) {
-        // When recieving, a socket can recieve data from all network interfaces
-        struct sockaddr_in sock_addr;
-        memset(&sock_addr, 0, sizeof(struct sockaddr_in));
+        // When receiving, a socket can receive data from all network interfaces
+        struct sockaddr_in sock_addr{};
         sock_addr.sin_family = AF_INET;
 #ifdef _WIN32
         sock_addr.sin_addr = in4addr_any;

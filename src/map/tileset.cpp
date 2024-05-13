@@ -214,15 +214,15 @@ void CTileset::clear()
 	midOneTreeTile = 0;
 	botOneTreeTile = 0;
 	removedTreeTile = 0;
-	memset(woodTable, 0, sizeof(woodTable));
+	ranges::fill(woodTable, 0);
 	mixedLookupTable.clear();
 	topOneRockTile = 0;
 	midOneRockTile = 0;
 	botOneRockTile = 0;
 	removedRockTile = 0;
-	memset(rockTable, 0, sizeof(rockTable));
-	memset(humanWallTable, 0, sizeof(humanWallTable));
-	memset(orcWallTable, 0, sizeof(orcWallTable));
+	ranges::fill(rockTable, 0);
+	ranges::fill(humanWallTable, 0);
+	ranges::fill(orcWallTable, 0);
 }
 
 bool CTileset::setTileCount(const size_t newCount)
