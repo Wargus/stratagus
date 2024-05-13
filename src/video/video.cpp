@@ -117,31 +117,21 @@ struct Clip {
 class CColorCycling
 {
 private:
-	CColorCycling() : ColorCycleAll(false), cycleCount(0)
-	{}
+	CColorCycling() {}
 
-	static void CreateInstanceIfNeeded()
+public:
+	static CColorCycling &GetInstance()
 	{
-		if (s_instance == nullptr) {
-			s_instance = new CColorCycling;
-		}
+		static CColorCycling s_instance;
+		return s_instance;
 	}
 
 public:
-	static CColorCycling &GetInstance() { CreateInstanceIfNeeded(); return *s_instance; }
-
-	static void ReleaseInstance() { delete s_instance; s_instance = nullptr; }
-public:
 	std::vector<SDL_Surface *> PaletteList;        /// List of all used palettes.
 	std::vector<ColorIndexRange> ColorIndexRanges; /// List of range of color index for cycling.
-	bool ColorCycleAll;                            /// Flag Color Cycle with all palettes
-	unsigned int cycleCount;
-private:
-	static CColorCycling *s_instance;
+	bool ColorCycleAll = false;                    /// Flag Color Cycle with all palettes
+	unsigned int cycleCount = 0;
 };
-
-
-
 
 /*----------------------------------------------------------------------------
 --  Externals
@@ -157,7 +147,6 @@ extern void SdlUnlockScreen();      /// Do SDL hardware unlock
 ----------------------------------------------------------------------------*/
 
 CVideo Video;
-/*static*/ CColorCycling *CColorCycling::s_instance = nullptr;
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
 
@@ -346,11 +335,6 @@ void InitVideo()
 {
 	InitVideoSdl();
 	InitLineDraw();
-}
-
-void DeInitVideo()
-{
-	CColorCycling::ReleaseInstance();
 }
 
 /**
