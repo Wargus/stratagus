@@ -692,7 +692,7 @@ public:
 
 	int CanStore[MaxCosts]{};           /// Resources that we can store here.
 	int GivesResource = 0;              /// The resource this unit gives.
-	ResourceInfo *ResInfo[MaxCosts]{};  /// Resource information.
+	std::unique_ptr<ResourceInfo> ResInfo[MaxCosts]; /// Resource information.
 	std::vector<std::unique_ptr<CBuildRestriction>>
 		BuildingRules; /// Rules list for building a building.
 	std::vector<std::unique_ptr<CBuildRestriction>>

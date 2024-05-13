@@ -935,10 +935,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				ResourceInfo *res = new ResourceInfo;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
+				auto res = std::make_unique<ResourceInfo>();
 				const int subargs = lua_rawlen(l, -1);
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);
@@ -947,7 +947,6 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->ResourceId = CclGetResourceByName(l);
 						lua_pop(l, 1);
-						type->ResInfo[res->ResourceId] = res;
 					} else if (value == "resource-step") {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
 					} else if (value == "final-resource") {
@@ -985,6 +984,8 @@ static int CclDefineUnitType(lua_State *l)
 					res->FinalResource = res->ResourceId;
 				}
 				Assert(res->ResourceId);
+				const auto resourceId = res->ResourceId;
+				type->ResInfo[resourceId] = std::move(res);
 				lua_pop(l, 1);
 			}
 			type->BoolFlag[HARVESTER_INDEX].value = true;

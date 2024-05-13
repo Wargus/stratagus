@@ -1232,33 +1232,36 @@ void COrder_Resource::ResourceGiveUp(CUnit &unit)
 
 bool COrder_Resource::FindAnotherResource(CUnit &unit)
 {
-	if (this->CurrentResource) {
-		const ResourceInfo *resinfo = unit.Type->ResInfo[this->CurrentResource];
-		if (resinfo) {
-			if (!resinfo->TerrainHarvester) {
-				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
+	if (!this->CurrentResource) {
+		return false;
+	}
+	const auto &resinfo = unit.Type->ResInfo[this->CurrentResource];
+	if (!resinfo) {
+		return false;
+	}
+	if (resinfo->TerrainHarvester) {
+		if (auto resPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos)) {
+			this->goalPos = *resPos;
+			this->State = SUB_MOVE_TO_RESOURCE;
+			DebugPrint("Found a better place to harvest %d,%d\n", resPos->x, resPos->y);
+			return true;
+		}
+		return false;
+	} else {
+		CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
 
-				if (newGoal) {
-					CUnit *mine = this->Resource.Mine;
-					if (mine) {
-						unit.DeAssignWorkerFromMine(*mine);
-					}
-					unit.AssignWorkerToMine(*newGoal);
-					this->Resource.Mine = newGoal;
-					this->goalPos.x = -1;
-					this->goalPos.y = -1;
-					this->State = SUB_MOVE_TO_RESOURCE;
-					this->SetGoal(newGoal);
-					return true;
-				}
-			} else {
-				if (auto resPos = FindTerrainType(unit.Type->MovementMask, MapFieldForest, 8, *unit.Player, unit.tilePos)) {
-					this->goalPos = *resPos;
-					this->State = SUB_MOVE_TO_RESOURCE;
-					DebugPrint("Found a better place to harvest %d,%d\n", resPos->x, resPos->y);
-					return true;
-				}
+		if (newGoal) {
+			CUnit *mine = this->Resource.Mine;
+			if (mine) {
+				unit.DeAssignWorkerFromMine(*mine);
 			}
+			unit.AssignWorkerToMine(*newGoal);
+			this->Resource.Mine = newGoal;
+			this->goalPos.x = -1;
+			this->goalPos.y = -1;
+			this->State = SUB_MOVE_TO_RESOURCE;
+			this->SetGoal(newGoal);
+			return true;
 		}
 	}
 	return false;
