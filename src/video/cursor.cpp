@@ -50,6 +50,7 @@
 #include "unittype.h"
 #include "video.h"
 
+#include <memory>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -61,7 +62,7 @@
 **
 **  @todo FIXME: Should this be move to ui part?
 */
-static std::vector<CCursor *> AllCursors;
+static std::vector<std::unique_ptr<CCursor>> AllCursors;
 
 extern uint8_t SizeChangeCounter; // from sdl.cpp
 static uint8_t LastSizeVersion;
@@ -156,7 +157,7 @@ void CCursor::Reset()
 */
 void LoadCursors(const std::string &race)
 {
-	for (CCursor *cursorPtr : AllCursors) {
+	for (auto &cursorPtr : AllCursors) {
 		CCursor &cursor = *cursorPtr;
 
 		//  Only load cursors of this race or universal cursors.
@@ -182,7 +183,7 @@ void LoadCursors(const std::string &race)
 */
 CCursor *CursorByIdent(std::string_view ident)
 {
-	for (CCursor *cursorPtr : AllCursors) {
+	for (auto &cursorPtr : AllCursors) {
 		CCursor &cursor = *cursorPtr;
 
 		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
@@ -311,7 +312,7 @@ void DrawCursor()
 	if (Preference.HardwareCursor) {
 		if (LastSizeVersion != SizeChangeCounter) {
 			HideCursor();
-			for (auto cur : AllCursors) {
+			for (auto &cur : AllCursors) {
 				cur->Reset();
 			}
 			LastSizeVersion = SizeChangeCounter;
@@ -429,9 +430,6 @@ void InitVideoCursors()
 */
 void CleanCursors()
 {
-	for (CCursor *cursor : AllCursors) {
-		delete cursor;
-	}
 	AllCursors.clear();
 
 	CursorBuilding = nullptr;
@@ -489,19 +487,18 @@ static int CclDefineCursor(lua_State *l)
 	//  Look if this kind of cursor already exists.
 	//
 	CCursor *ct = nullptr;
-	auto it = ranges::find_if(AllCursors, [&](const CCursor *cursor) {
+	auto it = ranges::find_if(AllCursors, [&](const auto &cursor) {
 		return cursor->Race == race && cursor->Ident == name;
 	});
 	//
 	//  Not found, make a new slot.
 	//
 	if (it == AllCursors.end()) {
-		ct = new CCursor();
-		AllCursors.push_back(ct);
+		ct = AllCursors.emplace_back(std::make_unique<CCursor>()).get();
 		ct->Ident = name;
 		ct->Race = race;
 	} else {
-		ct = *it;
+		ct = it->get();
 	}
 	ct->G = CGraphic::New(file, w, h);
 	ct->HotPos = hotpos;
