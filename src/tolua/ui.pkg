@@ -277,33 +277,33 @@ class Widget
 	virtual void setY(int y);
 	virtual int getY() const;
 	virtual void setPosition(int x, int y);
-	virtual void setFrameSize@ setBorderSize(int width);
+	virtual void setFrameSize @ setBorderSize(int width);
 	virtual unsigned int getFrameSize @ getBorderSize() const;
 	virtual void setEnabled(bool enabled);
 	virtual bool isEnabled() const;
 	virtual void setVisible(bool visible);
 	virtual bool isVisible() const;
 
-	tolua_outside virtual void setDirty @ setDirty(bool isDirty);
+	tolua_outside virtual void setDirty(bool isDirty);
 
-	tolua_outside virtual void setBaseColor @ setBaseColor(const Color color);
+	tolua_outside virtual void setBaseColor(const Color color);
 	virtual const Color &getBaseColor() const;
 	virtual void setForegroundColor(const Color color);
 	virtual const Color &getForegroundColor() const;
-	tolua_outside virtual void setBackgroundColor @ setBackgroundColor(const Color color);
+	tolua_outside virtual void setBackgroundColor(const Color color);
 	virtual const Color &getBackgroundColor() const;
-	tolua_outside virtual void setDisabledColor @ setDisabledColor(const Color color);
+	tolua_outside virtual void setDisabledColor(const Color color);
 
 	static void setGlobalFont(CFont *font);
-	tolua_outside virtual void setFont @ setFont(CFont *font);
+	tolua_outside virtual void setFont(CFont *font);
 
 	virtual int getHotKey() const;
 	virtual void setHotKey(const int key);
-	tolua_outside virtual void setHotKey @ setHotKey(const char *key);
+	tolua_outside virtual void setHotKey(const char *key);
 
 	virtual void requestFocus();
 
-	tolua_outside virtual void addActionListener @ addActionListener(LuaActionListener *actionListener);
+	tolua_outside virtual void addActionListener(LuaActionListener *actionListener);
 	virtual void addMouseListener(LuaActionListener *actionListener);
 	virtual void addKeyListener(LuaActionListener *actionListener);
 };
@@ -348,8 +348,8 @@ class ScrollArea : public BasicContainer
 	virtual Widget *getContent();
 	virtual void setScrollbarWidth(int width);
 	virtual int getScrollbarWidth();
-	tolua_outside virtual void scrollToBottom @ scrollToBottom();
-	tolua_outside virtual void scrollToTop @ scrollToTop();
+	tolua_outside virtual void scrollToBottom();
+	tolua_outside virtual void scrollToTop();
 };
 
 class ImageWidget : public Widget
