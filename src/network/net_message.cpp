@@ -348,9 +348,8 @@ void CServerSetup::Save(const std::function <void (std::string)>& f) {
 
 bool CServerSetup::operator == (const CServerSetup &rhs) const
 {
-	return (ServerGameSettings == rhs.ServerGameSettings
-			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
-			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0);
+	return (ServerGameSettings == rhs.ServerGameSettings && ranges::equal(CompOpt, rhs.CompOpt)
+	        && ranges::equal(Ready, rhs.Ready));
 }
 
 //

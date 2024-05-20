@@ -197,6 +197,13 @@ namespace ranges
 		return std::none_of(std::begin(range), std::end(range), std::forward<Predicate>(predicate));
 	}
 
+	template <typename Range>
+	bool equal(const Range &range1, const Range &range2)
+	{
+		return std::equal(std::begin(range1), std::end(range1), std::begin(range2), std::end(range2));
+	}
+
+
 	template <typename Range, typename Predicate>
 	std::size_t count_if(const Range &range, Predicate &&predicate)
 	{
