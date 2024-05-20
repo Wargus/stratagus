@@ -45,7 +45,7 @@ void initGuichan();
 void freeGuichan();
 void handleInput(const SDL_Event *event);
 
-#if 1 // ToLua++
+#if USING_TOLUAPP
 void addActionListener(gcn::Widget *, gcn::ActionListener *);
 void setBackgroundColor(gcn::Widget *, const gcn::Color &);
 void setBaseColor(gcn::Widget *, const gcn::Color &color);
@@ -102,7 +102,8 @@ class ButtonWidget : public gcn::Button
 public:
 	explicit ButtonWidget(const std::string &caption) : Button(caption)
 	{
-		::setHotKey(this, caption.c_str());
+		gcn::Key key = GetHotKey(caption);
+		setHotKey(key.getValue());
 	}
 };
 

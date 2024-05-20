@@ -63,6 +63,8 @@ static std::stack<MenuScreen *> MenuStack;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+#if USING_TOLUAPP
+
 void addActionListener(gcn::Widget *widget, gcn::ActionListener *actionListener)
 {
 	// gcn::Widget::addActionListener is no longer virtual
@@ -128,6 +130,28 @@ void setFont(gcn::Widget *widget, gcn::Font *font)
 		widget->setFont(font);
 	}
 }
+
+void setHotKey(gcn::Widget* widget, const char *keyStr)
+{
+	if (widget && keyStr) {
+		gcn::Key key = GetHotKey(keyStr);
+		widget->setHotKey(key.getValue());
+	}
+}
+
+void scrollToBottom(gcn::ScrollArea *scrollArea)
+{
+	Assert(scrollArea);
+	scrollArea->setVerticalScrollAmount(scrollArea->getVerticalMaxScroll());
+}
+
+void scrollToTop(gcn::ScrollArea *scrollArea)
+{
+	Assert(scrollArea);
+	scrollArea->setVerticalScrollAmount(0);
+}
+
+#endif
 
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
@@ -222,26 +246,6 @@ void DrawGuichanWidgets()
 		Gui->draw();
 		TheScreen = oldScreen;
 	}
-}
-
-void setHotKey(gcn::Widget* widget, const char *keyStr)
-{
-	if (widget && keyStr) {
-		gcn::Key key = GetHotKey(keyStr);
-		widget->setHotKey(key.getValue());
-	}
-}
-
-void scrollToBottom(gcn::ScrollArea *scrollArea)
-{
-	Assert(scrollArea);
-	scrollArea->setVerticalScrollAmount(scrollArea->getVerticalMaxScroll());
-}
-
-void scrollToTop(gcn::ScrollArea *scrollArea)
-{
-	Assert(scrollArea);
-	scrollArea->setVerticalScrollAmount(0);
 }
 
 /*----------------------------------------------------------------------------
