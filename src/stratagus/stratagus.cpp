@@ -212,6 +212,7 @@ extern void beos_init(int argc, char **argv);
 
 #include <SDL.h>
 #include <guichan.hpp>
+#include <string_view>
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>
@@ -590,11 +591,8 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				RefreshRate = to_number(optarg);
 				continue;
 			case 'u':
-				if (!strcmp(optarg, "userhome")) {
-					Parameters::Instance.SetUserDirectory("");
-				} else {
-					Parameters::Instance.SetUserDirectory(optarg);
-				}
+				Parameters::Instance.SetUserDirectory(
+					optarg == std::string_view("userhome") ? "" : optarg);
 				continue;
 			case 'v': {
 				sep = strchr(optarg, 'x');

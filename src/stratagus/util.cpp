@@ -341,6 +341,7 @@ int to_number(std::string_view s, int base)
 */
 
 #include <cstring>
+#include <string_view>
 
 int opterr = 1;
 int optind = 1;
@@ -371,7 +372,7 @@ int getopt(int argc, char *const *argv, const char *opts) noexcept
 	if (sp == 1) {
 		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
 			return EOF;
-		} else if (!strcmp(argv[optind], "--")) {
+		} else if (argv[optind] == std::string_view("--")) {
 			optind++;
 			return EOF;
 		}
