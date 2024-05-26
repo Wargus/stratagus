@@ -108,7 +108,6 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 			   const std::string &sound, const std::string &cursor, const std::string &umask,
 			   const std::string &popup, bool alwaysShow)
 {
-	char buf[2048];
 	auto ba = std::make_unique<ButtonAction>();
 
 	ba->Pos = pos;
@@ -169,11 +168,10 @@ void AddButton(int pos, int level, const std::string &icon_ident,
 	// FIXME: here should be added costs to the hint
 	// FIXME: johns: show should be nice done?
 	if (umask[0] == '*') {
-		strcpy_s(buf, sizeof(buf), umask.c_str());
+		ba->UnitMask = umask;
 	} else {
-		sprintf(buf, ",%s,", umask.c_str());
+		ba->UnitMask = "," + umask + ",";
 	}
-	ba->UnitMask = buf;
 	UnitButtonTable.push_back(std::move(ba));
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != nullptr);// just checks, that's why at the end
@@ -718,7 +716,6 @@ void CButtonPanel::Draw()
 	std::vector<ButtonAction> &buttons(CurrentButtons);
 
 	Assert(!Selected.empty());
-	char buf[8];
 
 	//  Draw all buttons.
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
@@ -743,15 +740,13 @@ void CButtonPanel::Draw()
 		//
 		//  Tutorial show command key in icons
 		//
+		std::string text;
 		if (ShowCommandKey) {
 			if (buttons[i].Key == gcn::Key::Escape || buttons[i].Key == 27) {
-				strcpy_s(buf, sizeof(buf), "ESC");
+				text = "ESC";
 			} else {
-				buf[0] = toupper(buttons[i].Key);
-				buf[1] = '\0';
+				text += toupper(buttons[i].Key);
 			}
-		} else {
-			buf[0] = '\0';
 		}
 
 		//
@@ -771,7 +766,7 @@ void CButtonPanel::Draw()
 			}
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf, GameSettings.Presets[player].PlayerColor);
+											   pos, text, GameSettings.Presets[player].PlayerColor);
 		}
 	}
 	//
@@ -983,22 +978,23 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 	for (size_t i = 0; i != UI.ButtonPanel.Buttons.size(); ++i) {
 		(*buttonActions)[i].Pos = -1;
 	}
-	char unit_ident[128];
 
+	std::string unit_ident;
 	//
 	//  FIXME: johns: some hacks for cancel buttons
 	//
-	if (unit.CurrentAction() == UnitAction::Built) {
+	switch (unit.CurrentAction()) {
+	case UnitAction::Built:
 		// Trick 17 to get the cancel-build button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-build,");
-	} else if (unit.CurrentAction() == UnitAction::UpgradeTo) {
+		unit_ident = ",cancel-build,";
+		break;
+	case UnitAction::UpgradeTo:
+	case UnitAction::Research:
 		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else if (unit.CurrentAction() == UnitAction::Research) {
-		// Trick 17 to get the cancel-upgrade button
-		strcpy_s(unit_ident, sizeof(unit_ident), ",cancel-upgrade,");
-	} else {
-		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		unit_ident = ",cancel-upgrade,";
+		break;
+	default:
+		unit_ident = "," + unit.Type->Ident + ","; break;
 	}
 	for (auto &buttonactionPtr : UnitButtonTable) {
 		ButtonAction &buttonaction = *buttonactionPtr;
@@ -1011,7 +1007,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 
 		// any unit or unit in list
 		if (buttonaction.UnitMask[0] != '*'
-			&& !strstr(buttonaction.UnitMask.c_str(), unit_ident)) {
+			&& !strstr(buttonaction.UnitMask.c_str(), unit_ident.c_str())) {
 			continue;
 		}
 		int allow = IsButtonAllowed(unit, buttonaction);
