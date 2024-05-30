@@ -55,28 +55,23 @@
 #include "video.h"
 #include "widgets.h"
 
+#include <array>
 #include <optional>
-
-/*----------------------------------------------------------------------------
---  Defines
-----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-int ScrollMarginTop = 15;
-int ScrollMarginBottom = 16;
-int ScrollMarginLeft = 15;
-int ScrollMarginRight = 16;
+static int ScrollMarginTop = 15;
+static int ScrollMarginBottom = 16;
+static int ScrollMarginLeft = 15;
+static int ScrollMarginRight = 16;
 
-const char Cursor[] = "~!_";         /// Input cursor
+static const char Cursor[] = "~!_";  /// Input cursor
 static Vec2i SavedMapPosition[3];    /// Saved map position
-static char Input[80];               /// line input for messages/long commands
+static std::array<char, 80> Input{}; /// line input for messages/long commands
 static int InputIndex;               /// current index into input
-static char InputStatusLine[99];     /// Last input status line
-constexpr int MaxInputHistorySize = 16;  /// Max history of inputs
-static char InputHistory[MaxInputHistorySize * sizeof(Input)] = { '\0' }; /// History of inputs
+static std::array<decltype(Input), 16> InputHistory = {}; /// History of inputs
 static int InputHistoryIdx = 0;      /// Next history idx
 static int InputHistoryPos = 0;      /// Current position in history
 static int InputHistorySize = 0;     /// History fill size
@@ -87,18 +82,23 @@ bool GamePaused;                     /// Current pause state
 bool GameObserve;                    /// Observe mode
 bool GameEstablishing;               /// Game establishing mode
 double SkipGameCycle;                /// Skip the next n game cycles
-char BigMapMode;                     /// Show only the map
+bool BigMapMode;                     /// Show only the map
 IfaceState InterfaceState;           /// Current interface state
 bool GodMode;                        /// Invincibility cheat
 EKeyState KeyState;                  /// current key state
-CUnit *LastIdleWorker;               /// Last called idle worker
+static CUnit *LastIdleWorker;        /// Last called idle worker
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static void moveInputContent(int targetPos, int srcPos) {
-	memmove(Input + targetPos, Input + srcPos, sizeof(Input) - std::max(targetPos, srcPos));
+static void moveInputContent(int targetPos, int srcPos)
+{
+	if (targetPos < srcPos) {
+		std::move(Input.begin() + srcPos, Input.end(), Input.begin() + targetPos);
+	} else {
+		std::move_backward(Input.begin() + srcPos, Input.end() + (srcPos - targetPos) - 1, Input.end() - 1);
+	}
 }
 
 static void removeCursorFromInput() {
@@ -109,7 +109,7 @@ static void removeCursorFromInput() {
 static void addCursorToInput() {
 	// insert cursor at pos
 	moveInputContent(InputIndex + strlen(Cursor), InputIndex);
-	strncpy(Input + InputIndex, Cursor, strlen(Cursor));
+	strncpy(Input.data() + InputIndex, Cursor, strlen(Cursor));
 }
 
 /**
@@ -117,8 +117,9 @@ static void addCursorToInput() {
 */
 static void ShowInput()
 {
-	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s"), Input);
-	char *input = InputStatusLine;
+	char InputStatusLine[99];
+	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s"), Input.data());
+	const char *input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
 		++input;
@@ -842,49 +843,49 @@ static void InputKey(int key)
 		case SDLK_KP_ENTER: { // RETURN
 			removeCursorFromInput();
 			// save to history
-			strncpy(InputHistory + (InputHistoryIdx * sizeof(Input)), Input, sizeof(Input));
-			if (InputHistorySize < MaxInputHistorySize - 1) {
+			InputHistory[InputHistoryIdx] = Input;
+			if (InputHistorySize < InputHistory.size() - 1) {
 				InputHistorySize++;
 				InputHistoryIdx = InputHistorySize;
 			} else {
-				InputHistoryIdx = ((InputHistoryIdx + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
+				InputHistoryIdx = (InputHistoryIdx + 1 + InputHistorySize) % InputHistory.size();
 			}
 			InputHistoryPos = InputHistoryIdx;
 
 			// Replace ~~ with ~
-			Replace2TildeByTilde(Input);
+			Replace2TildeByTilde(Input.data());
 #ifdef DEBUG
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused && !GameEstablishing) {
-					CommandLog("input", nullptr, EFlushMode::On, -1, -1, nullptr, Input, -1);
-					CclCommand(Input + 1, false);
+					CommandLog("input", nullptr, EFlushMode::On, -1, -1, nullptr, Input.data(), -1);
+					CclCommand(Input.data() + 1, false);
 				}
 			} else
 #endif
 				if (!IsNetworkGame()) {
 					if (!GameObserve && !GameEstablishing) {
-						if (HandleCheats(Input)) {
-							CommandLog("input", nullptr, EFlushMode::On, -1, -1, nullptr, Input, -1);
+						if (HandleCheats(Input.data())) {
+							CommandLog("input", nullptr, EFlushMode::On, -1, -1, nullptr, Input.data(), -1);
 						}
 					}
 				}
 
 			// Check for Replay and ffw x
 #ifdef DEBUG
-			if (starts_with(Input, "ffw ")) {
+			if (starts_with(Input.data(), "ffw ")) {
 #else
-			if (starts_with(Input, "ffw ") && ReplayGameType != EReplayType::NoReplay) {
+			if (starts_with(Input.data(), "ffw ") && ReplayGameType != EReplayType::NoReplay) {
 #endif
 				FastForwardCycle = atoi(&Input[4]);
 			}
 
 			if (Input[0]) {
 				// Replace ~ with ~~
-				ReplaceTildeBy2Tilde(Input);
-				char chatMessage[sizeof(Input) + 40];
+				ReplaceTildeBy2Tilde(Input.data());
+				char chatMessage[Input.size() + 40];
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 						 PlayerColorNames[ThisPlayer->Index].c_str(),
-						 ThisPlayer->Name.c_str(), Input);
+						 ThisPlayer->Name.c_str(), Input.data());
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);
 			}
@@ -906,7 +907,7 @@ static void InputKey(int key)
 					moveInputContent(InputIndex - 1, InputIndex);
 					InputIndex--;
 				}
-				int prevIndex = UTF8GetPrev(Input, InputIndex);
+				int prevIndex = UTF8GetPrev(Input.data(), InputIndex);
 				if (prevIndex >= 0) {
 					moveInputContent(prevIndex, InputIndex);
 					InputIndex = prevIndex;
@@ -918,26 +919,26 @@ static void InputKey(int key)
 		}
 		case SDLK_UP:
 			removeCursorFromInput();
-			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			InputHistory[InputHistoryPos] = Input;
 			if (InputHistorySize == 0) {
 				break;
 			}
 			InputHistoryPos = ((InputHistoryPos - 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
-			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
-			InputIndex = strlen(Input);
+			Input = InputHistory[InputHistoryPos];
+			InputIndex = strlen(Input.data());
 			addCursorToInput();
 			ShowInput();
 			break;
 
 		case SDLK_DOWN:
 			removeCursorFromInput();
-			strncpy(InputHistory + (InputHistoryPos * sizeof(Input)), Input, sizeof(Input));
+			InputHistory[InputHistoryPos] = Input;
 			if (InputHistorySize == 0) {
 				break;
 			}
 			InputHistoryPos = ((InputHistoryPos + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
-			strncpy(Input, InputHistory + (InputHistoryPos * sizeof(Input)), sizeof(Input));
-			InputIndex = strlen(Input);
+			Input = InputHistory[InputHistoryPos];
+			InputIndex = strlen(Input.data());
 			addCursorToInput();
 			ShowInput();
 			break;
@@ -945,7 +946,7 @@ static void InputKey(int key)
 		case SDLK_LEFT:
 			if (InputIndex) {
 				removeCursorFromInput();
-				InputIndex = UTF8GetPrev(Input, InputIndex);
+				InputIndex = UTF8GetPrev(Input.data(), InputIndex);
 				addCursorToInput();
 				ShowInput();
 			}
@@ -953,7 +954,7 @@ static void InputKey(int key)
 
 		case SDLK_RIGHT:
 			removeCursorFromInput();
-			InputIndex = UTF8GetNext(Input, InputIndex);
+			InputIndex = UTF8GetNext(Input.data(), InputIndex);
 			addCursorToInput();
 			ShowInput();
 			break;
@@ -961,11 +962,11 @@ static void InputKey(int key)
 		case SDLK_TAB: {
 			InputHistoryPos = InputHistoryIdx;
 			removeCursorFromInput();
-			char *namestart = strrchr(Input, ' ');
+			char *namestart = strrchr(Input.data(), ' ');
 			if (namestart) {
 				++namestart;
 			} else {
-				namestart = Input;
+				namestart = Input.data();
 			}
 			if (strlen(namestart)) {
 				for (int i = 0; i < PlayerMax; ++i) {
@@ -974,10 +975,10 @@ static void InputKey(int key)
 					}
 					if (!strncasecmp(namestart, Players[i].Name.c_str(), strlen(namestart))) {
 						InputIndex += Players[i].Name.size() - strlen(namestart);
-						strcpy_s(namestart, sizeof(Input) - (namestart - Input), Players[i].Name.c_str());
-						if (namestart == Input) {
+						strcpy_s(namestart, sizeof(Input) - (namestart - Input.data()), Players[i].Name.c_str());
+						if (namestart == Input.data()) {
 							InputIndex += 2;
-							strcat_s(namestart, sizeof(Input) - (namestart - Input), ": ");
+							strcat_s(namestart, Input.size() - (namestart - Input.data()), ": ");
 						}
 					}
 				}
@@ -992,12 +993,12 @@ static void InputKey(int key)
 				removeCursorFromInput();
 				std::string kstr = to_utf8(key);
 				if (key == '~') {
-					if (InputIndex < (int)sizeof(Input) - 2) {
+					if (InputIndex < (int) Input.size() - 2) {
 						moveInputContent(InputIndex + 2, InputIndex);
 						Input[InputIndex++] = key;
 						Input[InputIndex++] = key;
 					}
-				} else if (InputIndex < (int)(sizeof(Input) - kstr.size())) {
+				} else if (InputIndex < (int)(Input.size() - kstr.size())) {
 					moveInputContent(InputIndex + kstr.size(), InputIndex);
 					for (char c : kstr) {
 						Input[InputIndex++] = c;

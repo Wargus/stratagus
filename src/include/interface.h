@@ -218,7 +218,7 @@ extern double SkipGameCycle;
 /// Invincibility cheat
 extern bool GodMode;
 /// Whether the map is the only thing displayed or not
-extern char BigMapMode;
+extern bool BigMapMode;
 /// Flag telling if the SDL window is visible
 extern bool IsSDLWindowVisible;
 
