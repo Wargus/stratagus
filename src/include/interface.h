@@ -195,10 +195,10 @@ constexpr unsigned int ScrollUp = 1;          /// scroll up only
 constexpr unsigned int ScrollDown = 2;        /// scroll down only
 constexpr unsigned int ScrollLeft = 4;        /// scroll left only
 constexpr unsigned int ScrollRight = 8;       /// scroll right only
-constexpr unsigned int ScrollLeftUp = ScrollUp | ScrollLeft;      /// scroll left + up
-constexpr unsigned int ScrollLeftDown = ScrollDown | ScrollLeft;  /// scroll left + down
-constexpr unsigned int ScrollRightUp = ScrollUp | ScrollRight;    /// scroll right + up
-constexpr unsigned int ScrollRightDown = ScrollDown | ScrollLeft; /// scroll right + down
+constexpr unsigned int ScrollLeftUp = ScrollLeft | ScrollUp;       /// scroll left + up
+constexpr unsigned int ScrollLeftDown = ScrollLeft | ScrollDown;   /// scroll left + down
+constexpr unsigned int ScrollRightUp = ScrollRight | ScrollUp;     /// scroll right + up
+constexpr unsigned int ScrollRightDown = ScrollRight | ScrollDown ; /// scroll right + down
 
 /*----------------------------------------------------------------------------
 --  Variables
