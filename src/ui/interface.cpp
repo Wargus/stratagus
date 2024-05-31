@@ -101,15 +101,38 @@ static void moveInputContent(int targetPos, int srcPos)
 	}
 }
 
-static void removeCursorFromInput() {
-	// remove cursor, which is at InputIndex. there might be other chars behind it, if we're in the middle
-	moveInputContent(InputIndex, InputIndex + strlen(Cursor));
+// Replace ~ with ~~
+static std::string ReplaceTildeBy2Tilde(std::string_view s)
+{
+	std::string res;
+	for (char c : s) {
+		if (c == '~') {
+			res += '~';
+		}
+		res += c;
+	}
+	return res;
 }
 
-static void addCursorToInput() {
-	// insert cursor at pos
-	moveInputContent(InputIndex + strlen(Cursor), InputIndex);
-	strncpy(Input.data() + InputIndex, Cursor, strlen(Cursor));
+static std::string prepareInputToDisplay(std::string_view input, std::size_t index)
+{
+	std::string res;
+	index = std::min(index, input.size());
+
+	for (std::size_t i = 0; i != index; ++i) {
+		if (input[i] == '~') {
+			res.push_back('~');
+		}
+		res.push_back(input[i]);
+	}
+	res += Cursor;
+	for (std::size_t i = index; i != input.size(); ++i) {
+		if (input[i] == '~') {
+			res.push_back('~');
+		}
+		res.push_back(input[i]);
+	}
+	return res;
 }
 
 /**
@@ -117,16 +140,20 @@ static void addCursorToInput() {
 */
 static void ShowInput()
 {
-	char InputStatusLine[99];
-	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s"), Input.data());
-	const char *input = InputStatusLine;
+	const std::string message = Translate("MESSAGE:%s");
+	const std::string escaped_input = prepareInputToDisplay(Input.data(), InputIndex);
+	std::string InputStatusLine(escaped_input.size() + message.size(), '\0');
+
+	const auto len = snprintf(InputStatusLine.data(), InputStatusLine.size(), message.c_str(), escaped_input.c_str());
+	std::string_view sv(InputStatusLine.c_str(), len);
 	// FIXME: This is slow!
-	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {
-		++input;
+	while (UI.StatusLine.Font->Width(sv) > UI.StatusLine.Width) {
+		if (sv[0] == '~') sv = sv.substr(1);
+		sv = sv.substr(UTF8GetNext(sv, 0));
 	}
 	KeyState = EKeyState::Command;
 	UI.StatusLine.Clear();
-	UI.StatusLine.Set(input);
+	UI.StatusLine.Set(std::string(sv));
 	KeyState = EKeyState::Input;
 }
 
@@ -138,7 +165,6 @@ static void UiBeginInput()
 	KeyState = EKeyState::Input;
 	ranges::fill(Input, '\0');
 	InputIndex = 0;
-	addCursorToInput();
 	UI.StatusLine.ClearCosts();
 	ShowInput();
 }
@@ -802,35 +828,6 @@ bool HandleCheats(const std::string &input)
 	}
 }
 
-// Replace ~~ with ~
-static void Replace2TildeByTilde(char *s)
-{
-	for (char *p = s; *p; ++p) {
-		if (*p == '~') {
-			++p;
-		}
-		*s++ = *p;
-	}
-	*s = '\0';
-}
-
-// Replace ~ with ~~
-static void ReplaceTildeBy2Tilde(char *s)
-{
-	for (char *p = s; *p; ++p) {
-		if (*p != '~') {
-			continue;
-		}
-		char *q = p + strlen(p);
-		q[1] = '\0';
-		while (q > p) {
-			*q = *(q - 1);
-			--q;
-		}
-		++p;
-	}
-}
-
 /**
 **  Handle keys in input mode.
 **
@@ -841,7 +838,6 @@ static void InputKey(int key)
 	switch (key) {
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER: { // RETURN
-			removeCursorFromInput();
 			// save to history
 			InputHistory[InputHistoryIdx] = Input;
 			if (InputHistorySize < InputHistory.size() - 1) {
@@ -853,7 +849,6 @@ static void InputKey(int key)
 			InputHistoryPos = InputHistoryIdx;
 
 			// Replace ~~ with ~
-			Replace2TildeByTilde(Input.data());
 #ifdef DEBUG
 			if (Input[0] == '-') {
 				if (!GameObserve && !GamePaused && !GameEstablishing) {
@@ -880,13 +875,9 @@ static void InputKey(int key)
 			}
 
 			if (Input[0]) {
-				// Replace ~ with ~~
-				ReplaceTildeBy2Tilde(Input.data());
-				char chatMessage[Input.size() + 40];
-				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
-						 PlayerColorNames[ThisPlayer->Index].c_str(),
-						 ThisPlayer->Name.c_str(), Input.data());
-				// FIXME: only to selected players ...
+				auto escapedInput = ReplaceTildeBy2Tilde(Input.data());
+				std::string chatMessage = "~" + PlayerColorNames[ThisPlayer->Index] + "~<"
+				                        + ThisPlayer->Name + ">~> " + escapedInput;
 				NetworkSendChatMessage(chatMessage);
 			}
 		}
@@ -902,23 +893,16 @@ static void InputKey(int key)
 		case SDLK_BACKSPACE: {
 			if (InputIndex) {
 				InputHistoryPos = InputHistoryIdx;
-				removeCursorFromInput();
-				if (Input[InputIndex - 1] == '~') {
-					moveInputContent(InputIndex - 1, InputIndex);
-					InputIndex--;
-				}
 				int prevIndex = UTF8GetPrev(Input.data(), InputIndex);
 				if (prevIndex >= 0) {
 					moveInputContent(prevIndex, InputIndex);
 					InputIndex = prevIndex;
 				}
-				addCursorToInput();
 				ShowInput();
 			}
 			break;
 		}
 		case SDLK_UP:
-			removeCursorFromInput();
 			InputHistory[InputHistoryPos] = Input;
 			if (InputHistorySize == 0) {
 				break;
@@ -926,12 +910,10 @@ static void InputKey(int key)
 			InputHistoryPos = ((InputHistoryPos - 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
 			Input = InputHistory[InputHistoryPos];
 			InputIndex = strlen(Input.data());
-			addCursorToInput();
 			ShowInput();
 			break;
 
 		case SDLK_DOWN:
-			removeCursorFromInput();
 			InputHistory[InputHistoryPos] = Input;
 			if (InputHistorySize == 0) {
 				break;
@@ -939,29 +921,23 @@ static void InputKey(int key)
 			InputHistoryPos = ((InputHistoryPos + 1) % InputHistorySize + InputHistorySize) % InputHistorySize;
 			Input = InputHistory[InputHistoryPos];
 			InputIndex = strlen(Input.data());
-			addCursorToInput();
 			ShowInput();
 			break;
 
 		case SDLK_LEFT:
 			if (InputIndex) {
-				removeCursorFromInput();
 				InputIndex = UTF8GetPrev(Input.data(), InputIndex);
-				addCursorToInput();
 				ShowInput();
 			}
 			break;
 
 		case SDLK_RIGHT:
-			removeCursorFromInput();
-			InputIndex = UTF8GetNext(Input.data(), InputIndex);
-			addCursorToInput();
+			InputIndex = std::min<int>(strlen(Input.data()), UTF8GetNext(Input.data(), InputIndex));
 			ShowInput();
 			break;
 
 		case SDLK_TAB: {
 			InputHistoryPos = InputHistoryIdx;
-			removeCursorFromInput();
 			char *namestart = strrchr(Input.data(), ' ');
 			if (namestart) {
 				++namestart;
@@ -983,28 +959,19 @@ static void InputKey(int key)
 					}
 				}
 			}
-			addCursorToInput();
 			ShowInput();
 			break;
 		}
 		default:
 			if (key >= ' ') {
 				InputHistoryPos = InputHistoryIdx;
-				removeCursorFromInput();
 				std::string kstr = to_utf8(key);
-				if (key == '~') {
-					if (InputIndex < (int) Input.size() - 2) {
-						moveInputContent(InputIndex + 2, InputIndex);
-						Input[InputIndex++] = key;
-						Input[InputIndex++] = key;
-					}
-				} else if (InputIndex < (int)(Input.size() - kstr.size())) {
+				if (InputIndex < (int)(Input.size() - kstr.size())) {
 					moveInputContent(InputIndex + kstr.size(), InputIndex);
 					for (char c : kstr) {
 						Input[InputIndex++] = c;
 					}
 				}
-				addCursorToInput();
 				ShowInput();
 			}
 			break;
