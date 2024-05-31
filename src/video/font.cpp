@@ -494,6 +494,7 @@ int CFont::Width(std::string_view text) const
 				isformat = !isformat;
 				continue;
 			}
+			++pos;
 		}
 		if (!isformat) {
 			width += this->CharWidth[utf8 - 32] + 1;
