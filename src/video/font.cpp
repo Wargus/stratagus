@@ -420,9 +420,9 @@ static int CodepageIndexFromUTF8(const char text[], const size_t len, size_t &po
 /**
 **  Get the next codepage index to render from a utf8 encoded string
 */
-static int CodepageIndexFromUTF8(const std::string &text, size_t &pos, size_t &subpos)
+static int CodepageIndexFromUTF8(std::string_view text, size_t &pos, size_t &subpos)
 {
-	return CodepageIndexFromUTF8(text.c_str(), text.size(), pos, subpos);
+	return CodepageIndexFromUTF8(text.data(), text.size(), pos, subpos);
 }
 
 int CFont::Height() const
@@ -463,7 +463,7 @@ int CFont::Width(const int number) const
 **
 **  @return      The width in pixels of the text.
 */
-int CFont::Width(const std::string &text) const
+int CFont::Width(std::string_view text) const
 {
 	int width = 0;
 	bool isformat = false;
@@ -745,14 +745,14 @@ int CLabel::DrawReverseClip(int x, int y, int number) const
 	return DoDrawText<true>(x, y, text, reverse);
 }
 
-int CLabel::DrawCentered(int x, int y, const std::string &text) const
+int CLabel::DrawCentered(int x, int y, std::string_view text) const
 {
 	int dx = font->Width(text);
 	DoDrawText<false>(x - dx / 2, y, text, normal);
 	return dx / 2;
 }
 
-int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
+int CLabel::DrawReverseCentered(int x, int y, std::string_view text) const
 {
 	int dx = font->Width(text);
 	DoDrawText<false>(x - dx / 2, y, text, reverse);
@@ -769,7 +769,7 @@ int CLabel::DrawReverseCentered(int x, int y, const std::string &text) const
 **
 **  @return computed value.
 */
-static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CFont *font)
+static int strchrlen(std::string_view s, char c, unsigned int maxlen, const CFont *font)
 {
 	if (s.empty()) {
 		return 0;
@@ -813,22 +813,21 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CF
 **
 **  @return computed value.
 */
-std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font)
+std::string_view GetLineFont(unsigned int line, std::string_view s, unsigned int maxlen, const CFont *font)
 {
 	unsigned int res;
-	std::string s1 = s;
 
 	Assert(0 < line);
 
 	for (unsigned int i = 1; i < line; ++i) {
-		res = strchrlen(s1, '\n', maxlen, font);
-		if (!res || res >= s1.size()) {
+		res = strchrlen(s, '\n', maxlen, font);
+		if (!res || res >= s.size()) {
 			return "";
 		}
-		s1 = s1.substr(res + 1);
+		s = s.substr(res + 1);
 	}
-	res = strchrlen(s1, '\n', maxlen, font);
-	return s1.substr(0, res);
+	res = strchrlen(s, '\n', maxlen, font);
+	return s.substr(0, res);
 }
 
 

@@ -174,7 +174,7 @@ long isqrt(long num)
 
 // from wikipedia, simple checksumming of our lua files. only considers a subset of 7-bit
 // ascii chars to hopefully avoid issues with filesystem encodings
-uint32_t fletcher32(const std::string &content)
+uint32_t fletcher32(std::string_view content)
 {
 	std::vector<uint16_t> alphas;
 	size_t consideredChars = 0;
@@ -430,7 +430,7 @@ void SetClipboard(const std::string &str) {
 --  UTF8
 ----------------------------------------------------------------------------*/
 
-int UTF8GetPrev(const std::string &text, int curpos)
+int UTF8GetPrev(std::string_view text, int curpos)
 {
 	--curpos;
 	if (curpos < 0) {
@@ -448,7 +448,7 @@ int UTF8GetPrev(const std::string &text, int curpos)
 	return 0;
 }
 
-int UTF8GetNext(const std::string &text, int curpos)
+int UTF8GetNext(std::string_view text, int curpos)
 {
 	if (curpos >= (int)text.size()) {
 		return curpos + 1;

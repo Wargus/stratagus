@@ -62,14 +62,14 @@ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) con
 	const std::string draw = GetDraw(this->InfoType, button);
 
 	int width = 0;
-	std::string sub;
+	std::string_view sub;
 	if (draw.length()) {
 		if (this->MaxWidth) {
 			return std::min((unsigned int)font.getWidth(draw), this->MaxWidth);
 		}
 		int i = 1;
 		while (!(sub = GetLineFont(i++, draw, 0, &font)).empty()) {
-			width = std::max(width, font.getWidth(sub));
+			width = std::max(width, font.Width(sub));
 		}
 	}
 	return width;
@@ -106,7 +106,7 @@ void CPopupContentTypeButtonInfo::Draw(int x,
 		unsigned int width = this->MaxWidth
 							 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 							 : 0;
-		std::string sub;
+		std::string_view sub;
 		while ((sub = GetLineFont(++i, draw, width, &font)).length()) {
 			label.Draw(x, y_off, sub);
 			y_off += font.Height() + 2;
@@ -154,10 +154,10 @@ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const /* 
 		return std::min((unsigned int)font.getWidth(this->Text), this->MaxWidth);
 	}
 	int width = 0;
-	std::string sub;
+	std::string_view sub;
 	int i = 1;
 	while (!(sub = GetLineFont(i++, this->Text, 0, &font)).empty()) {
-		width = std::max(width, font.getWidth(sub));
+		width = std::max(width, font.Width(sub));
 	}
 	return width;
 }
@@ -182,7 +182,7 @@ void CPopupContentTypeText::Draw(int x,
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	CLabel label(font, this->TextColor, this->HighlightColor);
-	std::string sub;
+	std::string_view sub;
 	int i = 0;
 	int y_off = y;
 	unsigned int width = this->MaxWidth

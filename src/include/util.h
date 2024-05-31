@@ -35,11 +35,12 @@
 #include "filesystem.h"
 #include "stratagus.h"
 
-#include <cstdlib>
-#include <cstdint>
-#include <string>
 #include <algorithm>
+#include <cstdint>
+#include <cstdlib>
 #include <numeric>
+#include <string>
+#include <string_view>
 
 /*----------------------------------------------------------------------------
 --  Random
@@ -77,7 +78,7 @@ void clamp(T *value, T minValue, T maxValue)
 	*value = std::clamp(*value, minValue, maxValue);
 }
 
-extern uint32_t fletcher32(const std::string &content);
+extern uint32_t fletcher32(std::string_view content);
 
 /*----------------------------------------------------------------------------
 --  Strings
@@ -141,8 +142,8 @@ void SetClipboard(const std::string &str);
 --  UTF8
 ----------------------------------------------------------------------------*/
 
-int UTF8GetNext(const std::string &text, int curpos);
-int UTF8GetPrev(const std::string &text, int curpos);
+int UTF8GetNext(std::string_view text, int curpos);
+int UTF8GetPrev(std::string_view text, int curpos);
 
 void append_unicode(std::string &s, std::uint32_t unicode);
 std::string to_utf8(std::uint32_t unicode);

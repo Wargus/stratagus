@@ -115,5 +115,5 @@ TEST_CASE("fletcher32")
 
 // TODO: int getopt(int argc, char *const argv[], const char *optstring);
 // TODO: std::optional<std::string> GetClipboard();
-// TODO: int UTF8GetNext(const std::string &text, int curpos);
-// TODO: int UTF8GetPrev(const std::string &text, int curpos);
+// TODO: int UTF8GetNext(std::string_view text, int curpos);
+// TODO: int UTF8GetPrev(std::string_view text, int curpos);

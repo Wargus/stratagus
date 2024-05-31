@@ -1157,7 +1157,7 @@ std::string StringDescLine::eval() const
 	if (line <= 0) {
 		return std::string("");
 	}
-	return GetLineFont(line, s, maxlen, font);
+	return std::string(GetLineFont(line, s, maxlen, font));
 }
 
 std::string StringDescPlayerName::eval() const
