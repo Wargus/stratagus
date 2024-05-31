@@ -86,7 +86,7 @@ public:
 	static CFont *Get(std::string_view ident);
 
 	int Height() const;
-	int Width(const std::string &text) const;
+	int Width(std::string_view text) const;
 	int Width(const int number) const;
 	bool IsLoaded() const;
 
@@ -164,7 +164,7 @@ extern void SetDefaultTextColors(const std::string &normal, const std::string &r
 /// Get the default text colors for normal and reverse text
 extern std::pair<std::string, std::string> GetDefaultTextColors();
 ///  Return the 'line' line of the string 's'.
-extern std::string GetLineFont(unsigned int line, const std::string &s, unsigned int maxlen, const CFont *font);
+extern std::string_view GetLineFont(unsigned int line, std::string_view s, unsigned int maxlen, const CFont *font);
 
 /// Get the hot key from a string
 extern int GetHotKey(const std::string &text);
@@ -204,8 +204,8 @@ public:
 	int DrawReverseClip(int x, int y, std::string_view text) const;
 	int DrawReverseClip(int x, int y, int number) const;
 
-	int DrawCentered(int x, int y, const std::string &text) const;
-	int DrawReverseCentered(int x, int y, const std::string &text) const;
+	int DrawCentered(int x, int y, std::string_view text) const;
+	int DrawReverseCentered(int x, int y, std::string_view text) const;
 private:
 	template <const bool CLIP>
 	int DoDrawText(int x, int y, std::string_view text, const CFontColor *fc) const;

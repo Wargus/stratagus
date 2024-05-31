@@ -58,7 +58,7 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, int player)
+				  std::string_view text, int player)
 {
 	ButtonStyleProperties *p;
 
