@@ -105,12 +105,22 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const /* over
 
 namespace
 {
-auto tr(const char *s)
+std::string tr(const char *s)
 {
-	return _(s);
+	return Translate(s);
 }
 
 auto tr(int n)
+{
+	return n;
+}
+
+auto printfArg(const std::string& s)
+{
+	return s.c_str();
+}
+
+auto printfArg(int n)
 {
 	return n;
 }
@@ -137,9 +147,8 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	const auto usi1 = GetComponent(unit, this->Index, this->Component, 0);
-	std::visit(
-		[&](auto v) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v)); },
-		usi1);
+	std::visit([&](auto v) { snprintf(buf, sizeof(buf), this->Format.c_str(), printfArg(tr(v))); },
+	           usi1);
 
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
@@ -173,7 +182,9 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) con
 	const auto usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
 	const auto usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	std::visit(
-		[&](auto v1, auto v2) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v1), tr(v2)); },
+		[&](auto v1, auto v2) {
+			snprintf(buf, sizeof(buf), this->Format.c_str(), printfArg(tr(v1)), printfArg(tr(v2)));
+		},
 		usi1,
 		usi2);
 	char *pos;
