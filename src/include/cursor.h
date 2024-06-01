@@ -106,6 +106,8 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <string>
+
 #include "sdl2_helper.h"
 #include "vec2i.h"
 
