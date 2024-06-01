@@ -71,7 +71,8 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const /* over
 		std::string text = EvalString(*this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
-			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
+			const int offsetx = font.Width(std::string_view(text).substr(0, pos));
+			x += label.Draw(x - offsetx, y, text) - offsetx;
 		} else if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
@@ -152,8 +153,8 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
-		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		const int offsetx = font.Width(std::string_view(buf, pos - buf));
+		label.Draw(this->Pos.x - offsetx, this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
@@ -189,8 +190,8 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) con
 		usi2);
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
-		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		const int offsetx = font.Width(std::string_view(buf, pos - buf));
+		label.Draw(this->Pos.x - offsetx, this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
