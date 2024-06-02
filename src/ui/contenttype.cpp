@@ -71,7 +71,8 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const /* over
 		std::string text = EvalString(*this->Text);
 		std::string::size_type pos;
 		if ((pos = text.find("~|")) != std::string::npos) {
-			x += (label.Draw(x - font.getWidth(text.substr(0, pos)), y, text) - font.getWidth(text.substr(0, pos)));
+			const int offsetx = font.Width(std::string_view(text).substr(0, pos));
+			x += label.Draw(x - offsetx, y, text) - offsetx;
 		} else if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
@@ -105,12 +106,22 @@ void CContentTypeText::Draw(const CUnit &unit, CFont *defaultfont) const /* over
 
 namespace
 {
-auto tr(const char *s)
+std::string tr(const char *s)
 {
-	return _(s);
+	return Translate(s);
 }
 
 auto tr(int n)
+{
+	return n;
+}
+
+auto printfArg(const std::string& s)
+{
+	return s.c_str();
+}
+
+auto printfArg(int n)
 {
 	return n;
 }
@@ -137,14 +148,13 @@ void CContentTypeFormattedText::Draw(const CUnit &unit, CFont *defaultfont) cons
 
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	const auto usi1 = GetComponent(unit, this->Index, this->Component, 0);
-	std::visit(
-		[&](auto v) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v)); },
-		usi1);
+	std::visit([&](auto v) { snprintf(buf, sizeof(buf), this->Format.c_str(), printfArg(tr(v))); },
+	           usi1);
 
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
-		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		const int offsetx = font.Width(std::string_view(buf, pos - buf));
+		label.Draw(this->Pos.x - offsetx, this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
@@ -173,13 +183,15 @@ void CContentTypeFormattedText2::Draw(const CUnit &unit, CFont *defaultfont) con
 	const auto usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
 	const auto usi2 = GetComponent(unit, this->Index2, this->Component2, 0);
 	std::visit(
-		[&](auto v1, auto v2) { snprintf(buf, sizeof(buf), this->Format.c_str(), tr(v1), tr(v2)); },
+		[&](auto v1, auto v2) {
+			snprintf(buf, sizeof(buf), this->Format.c_str(), printfArg(tr(v1)), printfArg(tr(v2)));
+		},
 		usi1,
 		usi2);
 	char *pos;
 	if ((pos = strstr(buf, "~|")) != nullptr) {
-		std::string buf2(buf);
-		label.Draw(this->Pos.x - font.getWidth(buf2.substr(0, pos - buf)), this->Pos.y, buf);
+		const int offsetx = font.Width(std::string_view(buf, pos - buf));
+		label.Draw(this->Pos.x - offsetx, this->Pos.y, buf);
 	} else if (this->Centered) {
 		label.DrawCentered(this->Pos.x, this->Pos.y, buf);
 	} else {
