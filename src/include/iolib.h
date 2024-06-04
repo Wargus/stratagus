@@ -41,6 +41,7 @@
 
 #include <SDL.h>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 /*----------------------------------------------------------------------------
@@ -61,11 +62,15 @@ class FileException
 class FileWriter
 {
 public:
-	virtual ~FileWriter() {}
+	virtual ~FileWriter() = default;
 
-	void printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
+	template <typename... Ts>
+	void printf(const char *format, Ts... args)
+	{
+		write(Format(format, args...));
+	}
 
-	virtual int write(const char *data, unsigned int size) = 0;
+	virtual int write(std::string_view data) = 0;
 };
 
 
@@ -119,7 +124,13 @@ public:
 	long tell();
 	static SDL_RWops *to_SDL_RWops(std::unique_ptr<CFile> file);
 
-	int printf(const char *format, ...) PRINTF_VAARG_ATTRIBUTE(2, 3); // Don't forget to count this
+	void write(std::string_view);
+
+	template <typename... Ts>
+	void printf(const char* format, Ts... args)
+	{
+		write(Format(format, args...));
+	}
 private:
 	class PImpl;
 	std::unique_ptr<PImpl> pimpl;
