@@ -69,7 +69,7 @@ enum class ClfType
 class CFile::PImpl
 {
 public:
-	PImpl();
+	PImpl() = default;
 	~PImpl();
 	PImpl(const PImpl &) = delete;
 	const PImpl &operator=(const PImpl &) = delete;
@@ -83,13 +83,13 @@ public:
 	int write(const void *buf, size_t len);
 
 private:
-	ClfType cl_type; /// type of CFile
-	FILE *cl_plain;  /// standard file pointer
+	ClfType cl_type = ClfType::Invalid; /// type of CFile
+	FILE *cl_plain = nullptr;  /// standard file pointer
 #ifdef USE_ZLIB
 	gzFile cl_gz;    /// gzip file pointer
 #endif // !USE_ZLIB
 #ifdef USE_BZ2LIB
-	BZFILE *cl_bz;   /// bzip2 file pointer
+	BZFILE *cl_bz = nullptr; /// bzip2 file pointer
 #endif // !USE_BZ2LIB
 };
 
@@ -158,33 +158,11 @@ long CFile::tell()
 /**
 **  CLprintf Library file write
 **
-**  @param format  String Format.
-**  @param ...     Parameter List.
+**  @param data  String to write.
 */
-int CFile::printf(const char *format, ...)
+void CFile::write(std::string_view data)
 {
-	std::vector<char> p(500);
-
-	while (true) {
-		// Try to print in the allocated space.
-		va_list ap;
-		va_start(ap, format);
-		const int n = vsnprintf(p.data(), p.size(), format, ap);
-		va_end(ap);
-		// If that worked, string was processed.
-		if (n > -1 && n < static_cast<int>(p.size())) {
-			p.resize(n);
-			break;
-		}
-		// Else try again with more space.
-		if (n > -1) { // glibc 2.1
-			p.resize(n + 1); // precisely what is needed
-		} else {    /* glibc 2.0, vc++ */
-			p.resize(p.size() * 2);  // twice the old size
-		}
-	}
-	int ret = pimpl->write(p.data(), p.size());
-	return ret;
+	pimpl->write(data.data(), data.size());
 }
 
 static Sint64 sdl_size(SDL_RWops *context)
@@ -239,11 +217,6 @@ SDL_RWops *CFile::to_SDL_RWops(std::unique_ptr<CFile> file)
 //
 //  Implementation.
 //
-
-CFile::PImpl::PImpl()
-{
-	cl_type = ClfType::Invalid;
-}
 
 CFile::PImpl::~PImpl()
 {
@@ -712,20 +685,6 @@ std::vector<FileList> ReadDataDirectory(const fs::path& directory)
 	return files;
 }
 
-void FileWriter::printf(const char *format, ...)
-{
-	// FIXME: hardcoded size
-	char buf[1024];
-
-	va_list ap;
-	va_start(ap, format);
-	buf[sizeof(buf) - 1] = '\0';
-	vsnprintf(buf, sizeof(buf) - 1, format, ap);
-	va_end(ap);
-	write(buf, strlen(buf));
-}
-
-
 class RawFileWriter : public FileWriter
 {
 	FILE *file;
@@ -745,10 +704,7 @@ public:
 		if (file) { fclose(file); }
 	}
 
-	int write(const char *data, unsigned int size) override
-	{
-		return fwrite(data, size, 1, file);
-	}
+	int write(std::string_view data) override { return fwrite(data.data(), data.size(), 1, file); }
 };
 
 class GzFileWriter : public FileWriter
@@ -770,9 +726,9 @@ public:
 		if (file) { gzclose(file); }
 	}
 
-	int write(const char *data, unsigned int size) override
+	int write(std::string_view data) override
 	{
-		return gzwrite(file, data, size);
+		return gzwrite(file, data.data(), data.size());
 	}
 };
 

@@ -518,15 +518,6 @@ void AbortAt(const char *file, int line, const char *funcName, const char *condi
 	abort();
 }
 
-void PrintOnStdOut(const char *format, ...)
-{
-	va_list valist;
-	va_start(valist, format);
-	vprintf(format, valist);
-	va_end(valist);
-	fflush(stdout);
-}
-
 /*----------------------------------------------------------------------------
 	Check SSE/AVX support.
 	This can detect the instruction support of

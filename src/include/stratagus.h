@@ -108,7 +108,27 @@ extern bool EnableWallsInSinglePlayer;
 extern std::vector<std::string> OriginalArgv;
 
 extern void AbortAt(const char *file, int line, const char *funcName, const char *conditionStr);
-extern void PrintOnStdOut(const char *format, ...);
+
+template <typename... Ts>
+std::string Format(const char *format, Ts... args)
+{
+	const auto len = snprintf(nullptr, 0, format, args...);
+	std::string res(len, '\0');
+	snprintf(res.data(), res.size(), format, args...);
+	return res;
+}
+
+inline void PrintOnStderr(std::string_view s)
+{
+	fwrite(s.data(), 1, s.size(), stderr);
+	fflush(stderr);
+}
+
+inline void PrintOnStdOut(std::string_view s)
+{
+	fwrite(s.data(), 1, s.size(), stdout);
+	fflush(stdout);
+}
 
 /**
 **  Assert a condition. If cond is not true abort with file,line.
@@ -119,24 +139,24 @@ extern void PrintOnStdOut(const char *format, ...);
 /**
 **  Print debug information with function name.
 */
-#define DebugPrint(format, ...) \
- do { \
-  if (EnableDebugPrint) { \
-   PrintFunction(); \
-   PrintOnStdOut(format, ##__VA_ARGS__); \
-  } \
- } while (0)
-
 #define LogPrint(format, ...) \
  do { \
   PrintFunction(); \
-  PrintOnStdOut(format, ##__VA_ARGS__); \
+  PrintOnStdOut(Format(format, ##__VA_ARGS__)); \
  } while (0)
+
+#define DebugPrint(format, ...) \
+ do { \
+  if (EnableDebugPrint) { \
+   LogPrint(format, ##__VA_ARGS__); \
+  } \
+ } while (0)
+
 
 #define ErrorPrint(format, ...) \
 	do { \
 		fprintf(stderr, "%s:%d: %s: ", __FILE__, __LINE__, __func__); \
-		fprintf(stderr, format, ##__VA_ARGS__); \
+		PrintOnStderr(Format(format, ##__VA_ARGS__)); \
 	} while (0)
 
 /*============================================================================

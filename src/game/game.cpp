@@ -325,7 +325,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 		f->printf("if CanAccessFile(__file__ .. \".preamble\") then Load(__file__ .. \".preamble\", Editor.Running == 0) end\n\n");
 		if (!Map.Info.Preamble.empty()) {
 			std::unique_ptr<FileWriter> preamble = CreateFileWriter(mapSetup.string() + ".preamble");
-			preamble->write(Map.Info.Preamble.c_str(), Map.Info.Preamble.size());
+			preamble->write(Map.Info.Preamble);
 		}
 
 		f->printf("-- player configuration\n");
@@ -480,7 +480,7 @@ static bool WriteMapSetup(const fs::path &mapSetup, CMap &map, int writeTerrain,
 		f->printf("if CanAccessFile(__file__ .. \".postamble\") then Load(__file__ .. \".postamble\", Editor.Running == 0) end\n\n");
 		if (!Map.Info.Postamble.empty()) {
 			std::unique_ptr<FileWriter> postamble = CreateFileWriter(mapSetup.string() + ".postamble");
-			postamble->write(Map.Info.Postamble.c_str(), Map.Info.Postamble.size());
+			postamble->write(Map.Info.Postamble);
 		}
 
 	} catch (const FileException &) {

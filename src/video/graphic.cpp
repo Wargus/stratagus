@@ -1065,18 +1065,19 @@ void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
 	this->Load();
 	other->Load();
 	if (!mSurface) {
-		PrintOnStdOut("ERROR: Graphic %s not loaded in call to OverlayGraphic", this->File.c_str());
+		PrintOnStdOut(
+			Format("ERROR: Graphic %s not loaded in call to OverlayGraphic", this->File.c_str()));
 		return;
 	}
 	if (!other->mSurface) {
-		PrintOnStdOut("ERROR: Graphic %s not loaded in call to OverlayGraphic",
-		              other->File.c_str());
+		PrintOnStdOut(
+			Format("ERROR: Graphic %s not loaded in call to OverlayGraphic", other->File.c_str()));
 		return;
 	}
 	if (mSurface->w != other->mSurface->w || mSurface->h != other->mSurface->h) {
-		PrintOnStdOut("ERROR: Graphic %s has different size than %s OverlayGraphic",
-		              File.c_str(),
-		              other->File.c_str());
+		PrintOnStdOut(Format("ERROR: Graphic %s has different size than %s OverlayGraphic",
+		                     File.c_str(),
+		                     other->File.c_str()));
 		return;
 	}
 
@@ -1085,16 +1086,16 @@ void CGraphic::OverlayGraphic(CGraphic *other, bool mask)
 	unsigned int dstColorKey;
 
 	if (!((bpp == 1 && SDL_GetColorKey(other->mSurface, &srcColorKey) == 0 && SDL_GetColorKey(mSurface, &dstColorKey) == 0) || bpp == 4)) {
-		PrintOnStdOut("ERROR: OverlayGraphic only supported for 8-bit graphics with transparency "
-		              "or RGBA graphics (%s)",
-		              File.c_str());
+		PrintOnStdOut(Format("ERROR: OverlayGraphic only supported for 8-bit graphics with "
+		                     "transparency or RGBA graphics (%s)",
+		                     File.c_str()));
 		return;
 	}
 	if ((bpp != other->mSurface->format->BytesPerPixel)) {
-		PrintOnStdOut(
+		PrintOnStdOut(Format(
 			"ERROR: OverlayGraphic only supported graphics with same depth (%s depth != %s depth)",
 			File.c_str(),
-			other->File.c_str());
+			other->File.c_str()));
 		return;
 	}
 
