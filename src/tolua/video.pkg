@@ -11,6 +11,8 @@ class CVideo
 public:
 	int Width;
 	int Height;
+	int FourThreeWidth;
+	int FourThreeHeight;
 	int Depth;
 	bool FullScreen;
 	bool ResizeScreen(int width, int height);

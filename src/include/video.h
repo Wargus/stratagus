@@ -328,6 +328,7 @@ public:
 
 	void ClearScreen();
 	bool ResizeScreen(int width, int height);
+	void CalculateAspectRatioCorrectDimensions();
 
 	void DrawPixelClip(Uint32 color, int x, int y);
 	void DrawTransPixelClip(Uint32 color, int x, int y, unsigned char alpha);
@@ -393,6 +394,8 @@ public:
 
 	int Width = 0;
 	int Height = 0;
+	int FourThreeWidth = 0;
+	int FourThreeHeight = 0;
 	int WindowWidth = 0;
 	int WindowHeight = 0;
 	double VerticalPixelSize = 1.;

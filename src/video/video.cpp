@@ -273,6 +273,7 @@ bool CVideo::ResizeScreen(int w, int h)
 	}
 	Width = w;
 	Height = h;
+	CalculateAspectRatioCorrectDimensions();
 
 	SDL_RenderSetLogicalSize(TheRenderer, w, h * VerticalPixelSize);
 
@@ -307,6 +308,28 @@ bool CVideo::ResizeScreen(int w, int h)
 	SetClipping(0, 0, w - 1, h - 1);
 
 	return true;
+}
+
+/**
+**  Calculate dimensions for the background/title to be displayed at the original 4:3 aspect ratio.
+**
+*/
+void CVideo::CalculateAspectRatioCorrectDimensions() {
+	float ratio = 1.0*Width/Height;
+	float origRatio = 640.0/480.0;
+	if (ratio > origRatio) {
+		FourThreeHeight = Height;
+		FourThreeWidth = (int)(Width / ratio * origRatio);
+	}
+	else if (ratio < origRatio) {
+		// tall screen?
+		FourThreeWidth = Width;
+		FourThreeHeight = (int)(Height / origRatio * ratio);
+	}
+	else {
+		FourThreeWidth = Width;
+		FourThreeHeight = Height;
+	}
 }
 
 /**
