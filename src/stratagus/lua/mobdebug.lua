@@ -1,4 +1,3 @@
-R"LUACODE(
 -- Copied from pkulchenko/MobDebug src/mobdebug.lua at commit 11d8f83baecac9c39d7868d8fbc74297ca2efbea
 --
 -- MobDebug -- Lua remote debugger
@@ -1659,4 +1658,3 @@ mobdebug.onscratch = nil -- callback
 mobdebug.basedir = function(b) if b then basedir = b end return basedir end
 
 return mobdebug
-)LUACODE"
