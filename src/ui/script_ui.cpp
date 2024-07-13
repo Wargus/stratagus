@@ -377,6 +377,13 @@ static int CclSetTitleScreens(lua_State *l)
 			const std::string_view value = LuaToString(l, -2);
 			if (value == "Image") {
 				TitleScreens[j]->File = LuaToString(l, -1);
+			} else if (value == "StretchMode") {
+				const std::string_view value = LuaToString(l, -1);
+				if (auto stretchMode = StretchModeFromString(value)) {
+					TitleScreens[j]->StretchMode = *stretchMode;
+				} else {
+					LuaError(l, "Unknown StretchMode %s", value.data());
+				}
 			} else if (value == "Music") {
 				TitleScreens[j]->Music = LuaToString(l, -1);
 			} else if (value == "Timeout") {

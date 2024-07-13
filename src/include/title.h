@@ -55,6 +55,15 @@ public:
 	int Flags = 0;
 };
 
+enum class EStretchMode
+{
+	None,
+	KeepRatio,
+	Stretch
+};
+
+std::optional<EStretchMode> StretchModeFromString(std::string_view);
+
 class TitleScreen
 {
 public:
@@ -64,11 +73,11 @@ public:
 	void ShowTitleImage();
 
 private:
-	void ShowLabels();
+	void ShowLabels() const;
 public:
 	fs::path File;
 	std::string Music;
-	bool StretchImage = true;
+	EStretchMode StretchMode = EStretchMode::Stretch;
 	int Timeout = 0;
 	int Editor = 0;
 	std::vector<std::unique_ptr<TitleScreenLabel>> Labels;
