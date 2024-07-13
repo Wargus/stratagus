@@ -70,7 +70,6 @@ public:
 	std::string Music;
 	bool StretchImage = true;
 	int Timeout = 0;
-	int Iterations = 0;
 	int Editor = 0;
 	std::vector<std::unique_ptr<TitleScreenLabel>> Labels;
 };
