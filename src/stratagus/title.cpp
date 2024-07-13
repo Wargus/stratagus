@@ -42,7 +42,37 @@ std::vector<std::unique_ptr<TitleScreen>> TitleScreens; /// Title screens to sho
 static bool WaitNoEvent;             /// Flag got an event
 extern std::string CliMapName;
 
-void TitleScreen::ShowLabels()
+static void ApplyStretchMode(CGraphic &g, EStretchMode mode, int width, int height)
+{
+	switch (mode) {
+		case EStretchMode::None: break;
+		case EStretchMode::KeepRatio:
+		{
+			if (g.Width * height < width * g.Height) {
+				g.Resize(g.Width * height / g.Height, height);
+			} else {
+				g.Resize(width, g.Height * width / g.Width);
+			}
+			break;
+		}
+		case EStretchMode::Stretch: g.Resize(width, height); break;
+	}
+}
+
+std::optional<EStretchMode> StretchModeFromString(std::string_view s)
+{
+	if (s == "none") {
+		return EStretchMode::None;
+	} else if (s == "keep-ratio") {
+		return EStretchMode::KeepRatio;
+	} else if (s == "stretch") {
+		return EStretchMode::Stretch;
+	} else {
+		return std::nullopt;
+	}
+}
+
+void TitleScreen::ShowLabels() const
 {
 	for (auto &titleScreenlabel : this->Labels) {
 		if (!titleScreenlabel->Font) {
@@ -85,9 +115,7 @@ void TitleScreen::ShowTitleImage()
 
 	auto g = CGraphic::New(this->File.string());
 	g->Load();
-	if (this->StretchImage) {
-		g->Resize(Video.Width, Video.Height);
-	}
+	ApplyStretchMode(*g, this->StretchMode, Video.Width, Video.Height);
 
 	int timeout = this->Timeout ? this->Timeout * CYCLES_PER_SECOND : -1;
 
