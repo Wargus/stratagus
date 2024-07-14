@@ -14,7 +14,7 @@ jobs:
         game: [{id: wargus, name: Wargus}, {id: war1gus, name: War1gus}]
     name: Linux x64_64 (Continuous)
     runs-on: ubuntu-20.04
-    container: centos:7
+#   container: centos:7
 
     steps:
       - uses: actions/checkout@v3
