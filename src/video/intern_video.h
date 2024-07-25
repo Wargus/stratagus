@@ -55,7 +55,6 @@
 ----------------------------------------------------------------------------*/
 
 #include <SDL.h>
-#include <vector>
 
 /*----------------------------------------------------------------------------
 -- Declarations
@@ -76,9 +75,6 @@ public:
 
 // Do one cycle
 extern void ColorCycleSurface(SDL_Surface &surface);
-/// Make OpenGL textures for color cycling
-extern void LazilyMakeColorCyclingTextures(CGraphic *g, std::vector<ColorIndexRange> ranges);
-extern void MakeColorCyclingTextures(CGraphic *g, int count);
 
 /*----------------------------------------------------------------------------
 -- Variables
