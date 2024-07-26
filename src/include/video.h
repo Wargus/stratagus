@@ -163,6 +163,7 @@ public:
 	void Load(bool grayscale = false);
 	void Flip();
 	void Resize(int w, int h);
+	void ResizeKeepRatio(int w, int h);
 	void SetOriginalSize();
 	void AppendFrames(const sequence_of_images &frames);
 	bool TransparentPixel(int x, int y);
@@ -198,6 +199,8 @@ public:
 	int Width = 0;         /// Width of a frame
 	int Height = 0;        /// Height of a frame
 	int NumFrames = 1;     /// Number of frames
+	int OriginWidth = 0;   /// Origin graphic width
+	int OriginHeight = 0;  /// Origin graphic height
 	bool Resized = false;  /// Image has been resized
 
 	friend class CFont;

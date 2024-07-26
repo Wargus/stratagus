@@ -649,6 +649,9 @@ void CGraphic::Load(bool grayscale)
 		ExitFatal(-1);
 	}
 
+	OriginWidth = mSurface->w;
+	OriginHeight = mSurface->h;
+
 	if (mSurface->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(mSurface);
 	}
@@ -900,6 +903,15 @@ void CGraphic::Resize(int w, int h)
 	Assert(GetGraphicWidth() / Width * GetGraphicHeight() / Height == NumFrames);
 
 	GenFramesMap();
+}
+
+void CGraphic::ResizeKeepRatio(int width, int height)
+{
+	if (this->OriginWidth * height < width * this->OriginHeight) {
+		this->Resize(this->OriginWidth * height / this->OriginHeight, height);
+	} else {
+		this->Resize(width, this->OriginHeight * width / this->OriginWidth);
+	}
 }
 
 /**
