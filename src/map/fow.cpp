@@ -148,8 +148,6 @@ void CFogOfWar::InitTiled()
     TiledAlphaFog->setSurface(newFogSurface);
     TiledAlphaFog->Width = PixelTileSize.x;
     TiledAlphaFog->Height = PixelTileSize.y;
-    TiledAlphaFog->GraphicWidth = newFogSurface->w;
-    TiledAlphaFog->GraphicHeight = newFogSurface->h;
     TiledAlphaFog->NumFrames = 16;
     TiledAlphaFog->GenFramesMap();
     SDL_SetSurfaceBlendMode(TiledAlphaFog->getSurface(), SDL_BLENDMODE_BLEND);
