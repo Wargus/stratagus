@@ -889,7 +889,8 @@ void LoadUnitTypeSprite(CUnitType &type)
 		type.ShadowSprite = CGraphic::ForceNew(type.ShadowFile, type.ShadowWidth, type.ShadowHeight);
 		type.ShadowSprite->Load();
 		if (type.ShadowScale != 1) {
-			type.ShadowSprite->Resize(type.ShadowSprite->GraphicWidth / type.ShadowScale, type.ShadowSprite->GraphicHeight / type.ShadowScale);
+			type.ShadowSprite->Resize(type.ShadowSprite->GetGraphicWidth() / type.ShadowScale,
+			                          type.ShadowSprite->GetGraphicHeight() / type.ShadowScale);
 		}
 		if (!type.ShadowSpriteFrame) {
 			if (type.Flip) {

@@ -649,35 +649,31 @@ void CGraphic::Load(bool grayscale)
 		ExitFatal(-1);
 	}
 
-	GraphicWidth = mSurface->w;
-	GraphicHeight = mSurface->h;
-
 	if (mSurface->format->BytesPerPixel == 1) {
 		VideoPaletteListAdd(mSurface);
 	}
 
 	if (!Width) {
-		Width = GraphicWidth;
+		Width = GetGraphicWidth();
 	}
 	if (!Height) {
-		Height = GraphicHeight;
+		Height = GetGraphicHeight();
 	}
 
-	Assert(Width <= GraphicWidth && Height <= GraphicHeight);
+	Assert(Width <= GetGraphicWidth() && Height <= GetGraphicHeight());
 
-	if ((GraphicWidth / Width) * Width != GraphicWidth ||
-		(GraphicHeight / Height) * Height != GraphicHeight) {
+	if (GetGraphicWidth() % Width != 0 || GetGraphicHeight() % Height != 0) {
 		ErrorPrint("Invalid graphic (width, height) '%s'\n"
 		           "Expected: (%d,%d)  Found: (%d,%d)\n",
 		           File.u8string().c_str(),
 		           Width,
 		           Height,
-		           GraphicWidth,
-		           GraphicHeight);
+		           GetGraphicWidth(),
+		           GetGraphicHeight());
 		ExitFatal(-1);
 	}
 
-	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
+	NumFrames = GetGraphicWidth() / Width * GetGraphicHeight() / Height;
 
 	if (grayscale) {
 		ApplyGrayScale(mSurface, Width, Height);
@@ -785,7 +781,7 @@ void CGraphic::Resize(int w, int h)
 {
 	Assert(mSurface); // can't resize before it's been loaded
 
-	if (GraphicWidth == w && GraphicHeight == h) {
+	if (GetGraphicWidth() == w && GetGraphicHeight() == h) {
 		return;
 	}
 
@@ -793,10 +789,13 @@ void CGraphic::Resize(int w, int h)
 	// If the image has already been resized then get a clean copy first
 	if (Resized) {
 		this->SetOriginalSize();
-		if (GraphicWidth == w && GraphicHeight == h) {
+		if (GetGraphicWidth() == w && GetGraphicHeight() == h) {
 			return;
 		}
 	}
+
+	const int originWidth = GetGraphicWidth();
+	const int originHeight = GetGraphicHeight();
 
 	Resized = true;
 	Uint32 ckey;
@@ -814,7 +813,7 @@ void CGraphic::Resize(int w, int h)
 
 		for (int i = 0; i < h; ++i) {
 			for (int j = 0; j < w; ++j) {
-				data[x] = pixels[(i * GraphicHeight / h) * mSurface->pitch + j * GraphicWidth / w];
+				data[x] = pixels[(i * GetGraphicHeight() / h) * mSurface->pitch + j * GetGraphicWidth() / w];
 				++x;
 			}
 		}
@@ -838,11 +837,11 @@ void CGraphic::Resize(int w, int h)
 		int x = 0;
 
 		for (int i = 0; i < h; ++i) {
-			float fy = (float)i * GraphicHeight / h;
+			float fy = (float)i * GetGraphicHeight() / h;
 			int iy = (int)fy;
 			fy -= iy;
 			for (int j = 0; j < w; ++j) {
-				float fx = (float)j * GraphicWidth / w;
+				float fx = (float)j * GetGraphicWidth() / w;
 				int ix = (int)fx;
 				fx -= ix;
 				float fz = (fx + fy) / 2;
@@ -896,11 +895,9 @@ void CGraphic::Resize(int w, int h)
 		SDL_SetColorKey(mSurface, SDL_TRUE, ckey);
 	}
 
-	Height = h / (GraphicHeight / Height);
-	Width = w / (GraphicWidth / Width);
-	GraphicWidth = w;
-	GraphicHeight = h;
-	Assert(GraphicWidth / Width * GraphicHeight / Height == NumFrames);
+	Height = h / (originHeight / Height);
+	Width = w / (originWidth / Width);
+	Assert(GetGraphicWidth() / Width * GetGraphicHeight() / Height == NumFrames);
 
 	GenFramesMap();
 }
@@ -967,17 +964,19 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 	if (numOfFramesToAdd == 0) {
 		return;
 	}
-	const uint16_t cols = GraphicWidth / Width;
-	GraphicHeight += Height * ((numOfFramesToAdd - 1) / cols + 1);
+	const uint16_t cols = GetFrameCountPerRow();
+	const int newGraphicHeight = GetGraphicHeight() + Height * ((numOfFramesToAdd - 1) / cols + 1);
 
 	const SDL_PixelFormat *pf = mSurface->format;
 	const uint8_t bpp = mSurface->format->BytesPerPixel;
-	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GraphicWidth, GraphicHeight,
-													8 * bpp,
-													pf->Rmask,
-													pf->Gmask,
-													pf->Bmask,
-													pf->Amask);
+	SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,
+	                                               GetGraphicWidth(),
+	                                               newGraphicHeight,
+	                                               8 * bpp,
+	                                               pf->Rmask,
+	                                               pf->Gmask,
+	                                               pf->Bmask,
+	                                               pf->Amask);
 	uint32_t ckey;
 	const bool useckey = !SDL_GetColorKey(mSurface, &ckey);
 	if (useckey) {
@@ -1004,7 +1003,7 @@ void CGraphic::ExpandFor(const uint16_t numOfFramesToAdd)
 
 	SDL_FreeSurface(mSurface);
 	mSurface = newSurface;
-	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
+	NumFrames = GetGraphicWidth() / Width * GetGraphicHeight() / Height;
 
 	GenFramesMap();
 }

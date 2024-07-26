@@ -559,9 +559,9 @@ unsigned int CFont::DrawChar(CGraphic &g, int utf8, int x, int y, const CFontCol
 {
 	int c = utf8 - 32;
 	Assert(c >= 0);
-	const int ipr = this->G->GraphicWidth / this->G->Width;
+	const int ipr = this->G->GetFrameCountPerRow();
 
-	if (c < 0 || ipr * this->G->GraphicHeight / this->G->Height <= c) {
+	if (c < 0 || this->G->NumFrames <= c) {
 		c = 0;
 	}
 	const int w = this->CharWidth[c];
@@ -837,7 +837,7 @@ std::string_view GetLineFont(unsigned int line, std::string_view s, unsigned int
 */
 void CFont::MeasureWidths()
 {
-	const int maxy = G->GraphicWidth / G->Width * G->GraphicHeight / G->Height;
+	const int maxy = G->NumFrames;
 
 	CharWidth.resize(maxy);
 	std::fill(std::begin(CharWidth), std::end(CharWidth), 0);
@@ -845,7 +845,7 @@ void CFont::MeasureWidths()
 	Uint32 ckey = 0;
 	const int ipr = G->getSurface()->w / G->Width; // images per row
 	const unsigned char *lsp = (const unsigned char *) G->getSurface()->pixels
-	                         + G->getSurface()->pitch * G->GraphicHeight; // last surface pointer + 1
+	                         + G->getSurface()->pitch * G->GetGraphicHeight(); // last surface pointer + 1
 
 	SDL_LockSurface(G->getSurface());
 	SDL_GetColorKey(G->getSurface(), &ckey);

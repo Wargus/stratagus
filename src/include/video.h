@@ -180,6 +180,11 @@ public:
 
 	void setSurface(SDL_Surface *surface) { mSurface = surface; }
 
+	int GetGraphicWidth() const { return mSurface ? mSurface->w : 0; }
+	int GetGraphicHeight() const { return mSurface ? mSurface->h : 0; }
+
+	int GetFrameCountPerRow() const { return mSurface ? mSurface->w / Width : 0; }
+
 private:
 	void ExpandFor(const uint16_t numOfFramesToAdd);
 
@@ -193,9 +198,6 @@ public:
 	int Width = 0;         /// Width of a frame
 	int Height = 0;        /// Height of a frame
 	int NumFrames = 1;     /// Number of frames
-	int GraphicWidth = 0;  /// Original graphic width
-	int GraphicHeight = 0; /// Original graphic height
-//	int Refs = 1;          /// Uses of this graphic
 	bool Resized = false;  /// Image has been resized
 
 	friend class CFont;
