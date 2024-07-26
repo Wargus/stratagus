@@ -22,6 +22,7 @@ void ToggleFullScreen(void);
 $using CGraphicPtr = std::shared_ptr<CGraphic>;
 $void Load(CGraphicPtr* self, bool grayscale) { (*self)->Load(grayscale); }
 $void Resize(CGraphicPtr* self, int w, int h) { (*self)->Resize(w, h); }
+$void ResizeKeepRatio(CGraphicPtr* self, int w, int h) { (*self)->ResizeKeepRatio(w, h); }
 $void SetPaletteColor(CGraphicPtr* self, int idx, int r, int g, int b) { (*self)->SetPaletteColor(idx, r, g, b); }
 $void OverlayGraphic(CGraphicPtr* self, CGraphicPtr g, bool mask) { (*self)->OverlayGraphic(g.get(), mask); }
 
@@ -35,6 +36,7 @@ struct CGraphicPtr // std::shared_ptr<CGraphic>
 {
 	tolua_outside void Load(bool grayscale = false);
 	tolua_outside void Resize(int w, int h);
+	tolua_outside void ResizeKeepRatio(int w, int h);
 	tolua_outside void SetPaletteColor(int idx, int r, int g, int b);
 	tolua_outside void OverlayGraphic(CGraphicPtr g, bool mask = false);
 };
