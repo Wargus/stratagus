@@ -46,15 +46,7 @@ static void ApplyStretchMode(CGraphic &g, EStretchMode mode, int width, int heig
 {
 	switch (mode) {
 		case EStretchMode::None: break;
-		case EStretchMode::KeepRatio:
-		{
-			if (g.Width * height < width * g.Height) {
-				g.Resize(g.Width * height / g.Height, height);
-			} else {
-				g.Resize(width, g.Height * width / g.Width);
-			}
-			break;
-		}
+		case EStretchMode::KeepRatio: g.ResizeKeepRatio(width, height); break;
 		case EStretchMode::Stretch: g.Resize(width, height); break;
 	}
 }
