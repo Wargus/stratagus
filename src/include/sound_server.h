@@ -67,14 +67,11 @@ extern bool SampleIsPlaying(Mix_Chunk *sample);
 /// Load music
 extern Mix_Music *LoadMusic(const std::string &name);
 /// Load a sample
-extern Mix_Chunk *LoadSample(const std::string &name);
-extern void FreeSample(Mix_Chunk *sample);
+extern sdl2::ChunkPtr LoadSample(const std::string &name);
 /// Play a sample
 extern int PlaySample(Mix_Chunk *sample, Origin *origin = nullptr);
 /// Play a sample, registering a "finished" callback
 extern int PlaySample(Mix_Chunk *sample, void (*callback)(int channel));
-/// Play a sound file
-extern int PlaySoundFile(const std::string &name);
 
 /// Set effects volume
 extern void SetEffectsVolume(int volume);

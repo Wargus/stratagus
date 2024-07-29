@@ -79,9 +79,9 @@ int DistanceSilent;              /// silent distance
 */
 static Mix_Chunk *SimpleChooseSample(const CSound &sound)
 {
-	if (auto* chunks = std::get_if<std::vector<Mix_Chunk *>>(&sound.Sound)) {
+	if (auto *chunks = std::get_if<std::vector<sdl2::ChunkPtr>>(&sound.Sound)) {
 		Assert(!chunks->empty());
-		return (*chunks)[FrameCounter % chunks->size()];
+		return (*chunks)[FrameCounter % chunks->size()].get();
 	} else {
 		return nullptr;
 	}
@@ -113,9 +113,9 @@ static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 				//FIXME: checks for error
 				// check whether the second group is really a group
 				auto *chunks =
-					std::get_if<std::vector<Mix_Chunk *>>(&SelectionHandler.Sound->Sound);
+					std::get_if<std::vector<sdl2::ChunkPtr>>(&SelectionHandler.Sound->Sound);
 				Assert(SelectionHandler.HowMany < chunks->size());
-				result = (*chunks)[SelectionHandler.HowMany];
+				result = (*chunks)[SelectionHandler.HowMany].get();
 				SelectionHandler.HowMany++;
 				if (SelectionHandler.HowMany >= chunks->size()) {
 					SelectionHandler.HowMany = 0;
@@ -129,7 +129,7 @@ static Mix_Chunk *ChooseSample(CSound &sound, bool selection, Origin &source)
 			SelectionHandler.HowMany = 1;
 		}
 	} else {
-		Assert(std::holds_alternative<std::vector<Mix_Chunk *>>(sound.Sound));
+		Assert(std::holds_alternative<std::vector<sdl2::ChunkPtr>>(sound.Sound));
 		// normal sound/sound group handling
 		result = SimpleChooseSample(sound);
 		if (SelectionHandler.Source.Base == source.Base && SelectionHandler.Source.Id == source.Id) {
@@ -363,7 +363,7 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;
-static std::map<int, Mix_Chunk *> SampleMap;
+static std::map<int, sdl2::ChunkPtr> SampleMap;
 
 /**
 **  Callback for PlaySoundFile
@@ -373,10 +373,7 @@ static void PlaySoundFileCallback(int channel)
 	LuaActionListener *listener = ChannelMap[channel];
 	ChannelMap[channel] = nullptr;
 	// free any previously loaded sample that was playing on this channel before
-	if (SampleMap[channel]) {
-		FreeSample(SampleMap[channel]);
-		SampleMap[channel] = nullptr;
-	}
+	SampleMap[channel] = nullptr;
 	if (listener != nullptr) {
 		listener->action(gcn::ActionEvent{nullptr, ""});
 	}
@@ -394,16 +391,14 @@ static void PlaySoundFileCallback(int channel)
 int PlayFile(const std::string &name, LuaActionListener *listener)
 {
 	int channel = -1;
-	Mix_Chunk *sample = LoadSample(name);
+	auto sample = LoadSample(name);
 
 	if (sample) {
-		channel = PlaySample(sample, PlaySoundFileCallback);
+		channel = PlaySample(sample.get(), PlaySoundFileCallback);
 		if (channel != -1) {
-			SampleMap[channel] = sample;
+			SampleMap[channel] = std::move(sample);
 			SetChannelVolume(channel, MaxVolume);
 			ChannelMap[channel] = listener;
-		} else {
-			FreeSample(sample);
 		}
 	}
 	return channel;
@@ -423,17 +418,14 @@ int PlayFile(const std::string &name, LuaActionListener *listener)
 */
 std::shared_ptr<CSound> RegisterSound(const std::vector<std::string> &files)
 {
-	auto id = CSound::make();
-	size_t number = files.size();
-
-	std::vector<Mix_Chunk *> chunks(number);
-	for (unsigned int i = 0; i < number; ++i) {
-		chunks[i] = LoadSample(files[i]);
-		if (chunks[i] == nullptr) {
-			//delete[] id->Sound.OneGroup;
+	std::vector<sdl2::ChunkPtr> chunks;
+	for (const auto &file : files) {
+		chunks.push_back(LoadSample(file));
+		if (chunks.back() == nullptr) {
 			return nullptr;
 		}
 	}
+	auto id = CSound::make();
 	id->Sound = std::move(chunks);
 	id->Range = MAX_SOUND_RANGE;
 	return id;
@@ -528,17 +520,6 @@ void InitSoundClient()
 	int MapHeight = (UI.MapArea.EndY - UI.MapArea.Y + PixelTileSize.y) / PixelTileSize.y;
 	DistanceSilent = 3 * std::max<int>(MapWidth, MapHeight);
 	ViewPointOffset = std::max<int>(MapWidth / 2, MapHeight / 2);
-}
-
-CSound::~CSound()
-{
-	if (auto *chunks = std::get_if<std::vector<Mix_Chunk *>>(&this->Sound)) {
-		for (auto* chunk : *chunks) {
-			if (chunk) {
-				FreeSample(chunk);
-			}
-		}
-	}
 }
 
 //@}

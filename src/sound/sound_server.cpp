@@ -397,9 +397,9 @@ static Mix_Music *LoadMusic(const char *name)
 	return currentMusic;
 }
 
-static Mix_Chunk *ForceLoadSample(const char *name)
+static sdl2::ChunkPtr ForceLoadSample(const char *name)
 {
-	Mix_Chunk *r = Mix_LoadWAV(name);
+	sdl2::ChunkPtr r{Mix_LoadWAV(name)};
 	if (r) {
 		return r;
 	}
@@ -408,13 +408,13 @@ static Mix_Chunk *ForceLoadSample(const char *name)
 		printf("Can't open file '%s'\n", name);
 		return nullptr;
 	}
-	return Mix_LoadWAV_RW(CFile::to_SDL_RWops(std::move(f)), 1);
+	return sdl2::ChunkPtr{Mix_LoadWAV_RW(CFile::to_SDL_RWops(std::move(f)), 1)};
 }
 
-static Mix_Chunk *LoadSample(const char *name)
+static sdl2::ChunkPtr LoadSample(const char *name)
 {
 #ifdef DYNAMIC_LOAD
-	Mix_Chunk *r = (Mix_Chunk *)SDL_calloc(sizeof(Mix_Chunk), 1);
+	sdl2::ChunkPtr r{(Mix_Chunk *) SDL_calloc(sizeof(Mix_Chunk), 1)};
 	r->allocated = NotYetLoadedMagic;
 	r->abuf = (Uint8 *)(strdup(name));
 	return r;
@@ -450,10 +450,10 @@ Mix_Music *LoadMusic(const std::string &name)
 **
 **  @todo  Add streaming, caching support.
 */
-Mix_Chunk *LoadSample(const std::string &name)
+sdl2::ChunkPtr LoadSample(const std::string &name)
 {
 	const fs::path filename = LibraryFileName(name);
-	Mix_Chunk *sample = LoadSample(filename.string().c_str());
+	auto sample = LoadSample(filename.string().c_str());
 
 	if (sample == nullptr) {
 		ErrorPrint("Can't load the sound '%s': %s\n", name.c_str(), Mix_GetError());
@@ -493,11 +493,9 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 #ifdef DYNAMIC_LOAD
 		if (sample->allocated == NotYetLoadedMagic) {
 			char *name = (char*)(sample->abuf);
-			Mix_Chunk *loadedSample = ForceLoadSample(name);
-			if (loadedSample) {
-				memcpy(sample, loadedSample, sizeof(Mix_Chunk));
+			if (auto loadedSample = ForceLoadSample(name)) {
+				memcpy(sample, loadedSample.get(), sizeof(Mix_Chunk));
 				free(name);
-				SDL_free(loadedSample);
 			} else {
 				return -1;
 			}

@@ -55,6 +55,19 @@ class LuaActionListener;
 
 #define MaxSampleVolume 255  /// Maximum sample volume
 
+extern void FreeSample(Mix_Chunk *sample);
+
+namespace sdl2
+{
+	struct ChunkDeleter
+	{
+		void operator()(Mix_Chunk *sample) const { FreeSample(sample); }
+	};
+
+	using ChunkPtr = std::unique_ptr<Mix_Chunk, ChunkDeleter>;
+
+}
+
 /**
 **  Voice groups for a unit
 */
@@ -105,7 +118,7 @@ class CSound : public std::enable_shared_from_this<CSound>
 	};
 public:
 	explicit CSound(Key) {}
-	~CSound();
+	~CSound() = default;
 
 	CSound(const CSound &) = delete;
 	CSound &operator=(const CSound &) = delete;
@@ -117,7 +130,7 @@ public:
 	**  255 means infinite range of the sound.
 	*/
 	unsigned char Range = 0;       /// Range is a multiplier for DistanceSilent
-	std::variant<std::vector<Mix_Chunk *>, std::pair<CSound *, CSound *>> Sound{};
+	std::variant<std::vector<sdl2::ChunkPtr>, std::pair<CSound *, CSound *>> Sound{};
 };
 
 /**
