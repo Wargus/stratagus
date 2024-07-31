@@ -468,8 +468,13 @@ sdl2::ChunkPtr LoadSample(const std::string &name)
  */
 void FreeSample(Mix_Chunk *sample)
 {
+	if (sample == nullptr) {
+		return;
+	}
 #ifdef DYNAMIC_LOAD
 	if (sample->allocated == NotYetLoadedMagic) {
+		free(sample->abuf);
+		SDL_free(sample);
 		return;
 	}
 #endif
@@ -494,8 +499,7 @@ static int PlaySample(Mix_Chunk *sample, Origin *origin, void (*callback)(int ch
 		if (sample->allocated == NotYetLoadedMagic) {
 			char *name = (char*)(sample->abuf);
 			if (auto loadedSample = ForceLoadSample(name)) {
-				memcpy(sample, loadedSample.get(), sizeof(Mix_Chunk));
-				free(name);
+				std::swap(*sample, *loadedSample);
 			} else {
 				return -1;
 			}
