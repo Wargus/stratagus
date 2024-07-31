@@ -1124,9 +1124,18 @@ if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	target_link_libraries(stratagus_lib PUBLIC OpenMP::OpenMP_CXX)
 endif()
 
-add_executable(stratagus_tests ${stratagus_tests_SRCS})
-target_include_directories(stratagus_tests PUBLIC third-party/doctest/doctest)
-target_link_libraries(stratagus_tests PUBLIC stratagus_lib)
+include(CTest)
+if(BUILD_TESTING)
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/third-party/doctest/scripts/cmake")
+	include(doctest)
+
+	add_library(doctest INTERFACE IMPORTED)
+	target_include_directories(doctest SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/third-party/doctest/doctest")
+
+	add_executable(stratagus_tests ${stratagus_tests_SRCS})
+	target_link_libraries(stratagus_tests PUBLIC stratagus_lib doctest)
+	doctest_discover_tests(stratagus_tests)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set_target_properties(stratagus PROPERTIES OUTPUT_NAME stratagus-dbg)
