@@ -1,0 +1,52 @@
+name: macos
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**'
+      - '!.github/**'
+      - '!**.yml'
+      - '.github/workflows/macos.yml'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+      - '!doc/**'
+
+  pull_request:
+    paths:
+      - '**'
+      - '!.github/**'
+      - '!**.yml'
+      - '.github/workflows/macos.yml'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+      - '!doc/**'
+
+jobs:
+  macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: install dependencies
+      run: brew install dylibbundler sdl2 sdl2_mixer sdl2_image lua libpng ffmpeg meson
+
+    - name: cmake --version
+      run: cmake --version
+
+    - name: Build stratagus
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=OFF -DBUILD_VENDORED_MEDIA_LIBS=OFF -DBUILD_TESTING=1
+        cmake --build . --config Release
+
+    - name: run tests
+      run: |
+        cd build
+        ctest
