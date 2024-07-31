@@ -1,0 +1,52 @@
+name: ubuntu
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**'
+      - '!.github/**'
+      - '!**.yml'
+      - '.github/workflows/ubuntu.yml'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+      - '!doc/**'
+
+  pull_request:
+    paths:
+      - '**'
+      - '!.github/**'
+      - '!**.yml'
+      - '.github/workflows/ubuntu.yml'
+      - '!**.md'
+      - '!.vscode/**'
+      - '!doc/**'
+      - '!doc/**'
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+#    - name: install dependencies
+#      run: brew install sdl2 sdl2_image sdl2_mixer sdl2_net libogg libvorbis
+
+    - name: cmake --version
+      run: cmake --version
+
+    - name: build stratagus
+      run: |
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DBUILD_TESTING=1
+        cmake --build . --config Release
+        
+    - name: run tests
+      run: |
+        cd build
+        ctest
