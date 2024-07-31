@@ -214,7 +214,7 @@ TEST_CASE_FIXTURE(AutoNetwork, "ExchangeTCP")
 	sender.Wait();
 	CHECK(receiver.Check());
 	CHECK(clientPort == server.GetClientPort());
-	const unsigned long localhost = 0x7F000001; // 127.0.0.1
+	const unsigned long localhost = 0x01'00'00'7F; // 127.0.0.1
 
 	const auto host = server.GetClientHost();
 	const bool isLocalHost = GetMyIP() == host || localhost == host;
@@ -320,7 +320,7 @@ TEST_CASE_FIXTURE(AutoNetwork, "ExchangeUDP")
 	sender.Wait();
 	CHECK(receiver.Check());
 	CHECK(senderPort == client.GetPortFrom());
-	const unsigned long localhost = 0x7F000001; // 127.0.0.1
+	const unsigned long localhost = 0x01'00'00'7F; // 127.0.0.1
 
 	const auto host = client.GetHostFrom();
 	const bool isLocalHost = GetMyIP() == host || localhost == host;
