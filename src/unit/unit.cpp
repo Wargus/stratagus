@@ -2963,38 +2963,71 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			return;
 		}
 
-		switch (targetCurrAction)
-		{
-		case UnitAction::StandGround:
-		case UnitAction::Follow:
-		case UnitAction::AttackGround:
-		case UnitAction::Explore:
-			if (target.Player->AiEnabled == false) {
-				return;
+		switch (targetCurrAction) {
+			case UnitAction::StandGround:
+			case UnitAction::Follow:
+			case UnitAction::AttackGround:
+			case UnitAction::Explore:
+			{
+				if (target.Player->AiEnabled == false) {
+					return;
+				}
+				[[fallthrough]];
 			}
-		case UnitAction::Attack:
-		case UnitAction::Still:
-		case UnitAction::Defend:
-		case UnitAction::Patrol:
-			const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player))
-									? attacker.tilePos
-									: GetRndPosInDirection(target.tilePos, attacker.tilePos, false, target.Type->ReactRangeComputer, 2);
-			if (!PlaceReachable(target, posToAttack, 1, 1, 0, target.Stats->Variables[ATTACKRANGE_INDEX].Max, false)) {
-				return;
-			}
-			std::unique_ptr<COrder> savedOrder;
-			if (targetCurrAction == UnitAction::Still || targetCurrAction == UnitAction::StandGround) {
-				savedOrder = COrder::NewActionAttack(target, target.tilePos);
-			} else if (target.CanStoreOrder(target.CurrentOrder())) {
-				savedOrder = target.CurrentOrder()->Clone();
-			}
-			target.UnderAttack = underAttack; /// allow target to ignore non aggressive targets while searching attacker
-			CommandAttack(target, posToAttack, nullptr, EFlushMode::On);
+			case UnitAction::Attack:
+			case UnitAction::Still:
+			case UnitAction::Defend:
+			case UnitAction::Patrol:
+			{
+				const Vec2i posToAttack = (attacker.IsVisibleAsGoal(*target.Player))
+				                            ? attacker.tilePos
+				                            : GetRndPosInDirection(target.tilePos,
+				                                                   attacker.tilePos,
+				                                                   false,
+				                                                   target.Type->ReactRangeComputer,
+				                                                   2);
+				if (!PlaceReachable(target,
+				                    posToAttack,
+				                    1,
+				                    1,
+				                    0,
+				                    target.Stats->Variables[ATTACKRANGE_INDEX].Max,
+				                    false)) {
+					return;
+				}
+				std::unique_ptr<COrder> savedOrder;
+				if (targetCurrAction == UnitAction::Still
+				    || targetCurrAction == UnitAction::StandGround) {
+					savedOrder = COrder::NewActionAttack(target, target.tilePos);
+				} else if (target.CanStoreOrder(target.CurrentOrder())) {
+					savedOrder = target.CurrentOrder()->Clone();
+				}
+				target.UnderAttack =
+					underAttack; /// allow target to ignore non aggressive targets while searching attacker
+				CommandAttack(target, posToAttack, nullptr, EFlushMode::On);
 
-			if (savedOrder != nullptr) {
-				target.SavedOrder = std::move(savedOrder);
+				if (savedOrder != nullptr) {
+					target.SavedOrder = std::move(savedOrder);
+				}
+				break;
 			}
-			break;
+			case UnitAction::NoAction:
+			case UnitAction::Move:
+			case UnitAction::Die:
+			case UnitAction::SpellCast:
+			case UnitAction::Train:
+			case UnitAction::UpgradeTo:
+			case UnitAction::Research:
+			case UnitAction::Built:
+			case UnitAction::Board:
+			case UnitAction::Unload:
+			case UnitAction::Build:
+			case UnitAction::Repair:
+			case UnitAction::Resource:
+			case UnitAction::TransformInto:
+			{
+				break;
+			}
 		}
 	}
 }
