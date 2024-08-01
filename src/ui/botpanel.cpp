@@ -933,7 +933,8 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 	}
 	char unit_ident[128];
 
-	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());
+	snprintf(
+		unit_ident, sizeof(unit_ident), ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());
 
 	for (auto &buttonAction : UnitButtonTable) {
 		if (buttonAction->Level != CurrentButtonLevel) {

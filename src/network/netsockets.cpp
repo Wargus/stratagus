@@ -52,7 +52,7 @@ CHost::CHost(const std::string &name, int port) :
 std::string CHost::toString() const
 {
 	char buf[24]; // 127.255.255.255:65555
-	sprintf(buf, "%d.%d.%d.%d:%d", NIPQUAD(ntohl(ip)), port);
+	snprintf(buf, sizeof(buf), "%d.%d.%d.%d:%d", NIPQUAD(ntohl(ip)), port);
 	return buf;
 }
 
@@ -185,7 +185,7 @@ private:
 bool CTCPSocket_Impl::Open(const CHost &host)
 {
 	char ip[24]{}; // 127.255.255.255:65555
-	sprintf(ip, "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
+	snprintf(ip, sizeof(ip), "%d.%d.%d.%d", NIPQUAD(ntohl(host.getIp())));
 	this->socket = NetOpenTCP(ip, host.getPort());
 	return this->socket != INVALID_SOCKET;
 }

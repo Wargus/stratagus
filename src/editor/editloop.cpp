@@ -572,10 +572,8 @@ static void DrawPlayers()
 			Video.DrawRectangle(ColorGreen, x + 1, y + 1, getPlayerButtonSize() - 1, getPlayerButtonSize() - 1);
 		}
 
-		char buf[256];
-		sprintf(buf, "%d", i + 1);
 		CLabel label(GetGameFont());
-		label.DrawCentered(x + getPlayerButtonSize() / 2, y + 3, buf);
+		label.DrawCentered(x + getPlayerButtonSize() / 2, y + 3, std::to_string(i + 1));
 
 		return true;
 	});
@@ -986,23 +984,26 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.getFlag();
-	sprintf(buf, "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
-			mf.getElevation(),
-			mf.Value, flag,
-			flag & MapFieldOpaque       ? 'o' : '-',
-			flag & MapFieldUnpassable   ? 'u' : '-',
-			flag & MapFieldNoBuilding   ? 'n' : '-',
-			flag & MapFieldHuman        ? 'h' : '-',
-			flag & MapFieldWall         ? 'w' : '-',
-			flag & MapFieldRocks        ? 'r' : '-',
-			flag & MapFieldForest       ? 'f' : '-',
-			flag & MapFieldLandAllowed  ? 'L' : '-',
-			flag & MapFieldCoastAllowed ? 'C' : '-',
-			flag & MapFieldWaterAllowed ? 'W' : '-',
-			flag & MapFieldLandUnit     ? 'l' : '-',
-			flag & MapFieldAirUnit      ? 'a' : '-',
-			flag & MapFieldSeaUnit      ? 's' : '-',
-			flag & MapFieldBuilding     ? 'b' : '-');
+	snprintf(buf,
+	         sizeof(buf),
+	         "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
+	         mf.getElevation(),
+	         mf.Value,
+	         flag,
+	         flag & MapFieldOpaque ? 'o' : '-',
+	         flag & MapFieldUnpassable ? 'u' : '-',
+	         flag & MapFieldNoBuilding ? 'n' : '-',
+	         flag & MapFieldHuman ? 'h' : '-',
+	         flag & MapFieldWall ? 'w' : '-',
+	         flag & MapFieldRocks ? 'r' : '-',
+	         flag & MapFieldForest ? 'f' : '-',
+	         flag & MapFieldLandAllowed ? 'L' : '-',
+	         flag & MapFieldCoastAllowed ? 'C' : '-',
+	         flag & MapFieldWaterAllowed ? 'W' : '-',
+	         flag & MapFieldLandUnit ? 'l' : '-',
+	         flag & MapFieldAirUnit ? 'a' : '-',
+	         flag & MapFieldSeaUnit ? 's' : '-',
+	         flag & MapFieldBuilding ? 'b' : '-');
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 2, buf);
 
 	// Tile info
@@ -1027,11 +1028,15 @@ static void ShowUnitInfo(const CUnit &unit)
 {
 	char buf[256];
 
-	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
-					unit.Type->Name.c_str(), unit.Player->Index + 1,
-					unit.Active ? "active" : "passive");
+	int n = snprintf(buf,
+	                 sizeof(buf),
+	                 _("#%d '%s' Player:#%d %s"),
+	                 UnitNumber(unit),
+	                 unit.Type->Name.c_str(),
+	                 unit.Player->Index + 1,
+	                 unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
-		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
+		snprintf(buf + n, sizeof(buf) - n, _(" Amount %d"), unit.ResourcesHeld);
 	}
 	UI.StatusLine.Set(buf);
 }

@@ -114,6 +114,7 @@ public:
 	explicit CImageButton(const std::string &caption);
 
 	void draw(gcn::Graphics *graphics) override;
+
 	void adjustSize();
 
 	void setNormalImage(std::shared_ptr<gcn::Image> image) { normalImage = image; adjustSize(); }
@@ -134,12 +135,11 @@ public:
 
 	void drawBox(gcn::Graphics *graphics) override;
 	void draw(gcn::Graphics *graphics) override;
-
 	void mousePressed(gcn::MouseEvent&) override;
 	void mouseReleased(gcn::MouseEvent&) override;
 	void mouseClicked(gcn::MouseEvent&) override;
-	void adjustSize();
 
+	void adjustSize();
 	void setUncheckedNormalImage(std::shared_ptr<gcn::Image> image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(std::shared_ptr<gcn::Image> image) { uncheckedPressedImage = image; }
 	void setUncheckedDisabledImage(std::shared_ptr<gcn::Image> image) { uncheckedDisabledImage = image; }
@@ -164,12 +164,11 @@ public:
 
 	void draw(gcn::Graphics *graphics) override;
 	void drawBox(gcn::Graphics *graphics) override;
-
 	void mousePressed(gcn::MouseEvent&) override;
 	void mouseReleased(gcn::MouseEvent &) override;
 	void mouseClicked(gcn::MouseEvent &) override;
-	void adjustSize();
 
+	void adjustSize();
 	void setUncheckedNormalImage(std::shared_ptr<gcn::Image> image) { uncheckedNormalImage = image; }
 	void setUncheckedPressedImage(std::shared_ptr<gcn::Image> image) { uncheckedPressedImage = image; }
 	void setUncheckedDisabledImage(std::shared_ptr<gcn::Image> image) { uncheckedDisabledImage = image; }
@@ -210,6 +209,9 @@ public:
 	MultiLineLabel() = default;
 	explicit MultiLineLabel(const std::string &caption);
 
+	void draw(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
+
 	void setCaption(const std::string &caption);
 	const std::string &getCaption() const;
 	void setAlignment(gcn::Graphics::Alignment alignment);
@@ -220,8 +222,6 @@ public:
 	void setLineWidth(int width);
 	int getLineWidth() const;
 	void adjustSize();
-	void draw(gcn::Graphics *graphics) override;
-	void drawFrame(gcn::Graphics *graphics) override;
 
 	enum {
 		LEFT = 0,
@@ -249,30 +249,33 @@ public:
 	void restart();
 	void setSpeed(float speed) { this->speedY = speed; }
 	float getSpeed() const { return this->speedY; }
+
 private:
 	void logic() override;
+
 private:
 	gcn::Container container; /// Data container
-	float speedY;             /// vertical speed of the container (positive number: go up).
-	float containerY = 0;     /// Y position of the container
-	bool finished = false;    /// True while scrolling ends.
+	float speedY; /// vertical speed of the container (positive number: go up).
+	float containerY = 0; /// Y position of the container
+	bool finished = false; /// True while scrolling ends.
 };
 
 class Windows : public gcn::Window
 {
 public:
 	Windows(const std::string &text, int width, int height);
-	void add(gcn::Widget *widget, int x, int y);
+	void add(gcn::Widget *widget, int x, int y) override;
 
 	void setBackgroundColor(const gcn::Color &color);
 	void setBaseColor(const gcn::Color &color);
+
 private:
 	void mouseDragged(gcn::MouseEvent &) override;
 
 private:
-	gcn::ScrollArea scroll;   /// To use scroll bar.
+	gcn::ScrollArea scroll; /// To use scroll bar.
 	gcn::Container container; /// data container.
-	bool blockwholewindow;    /// Manage condition limit of moveable windows. @see mouseMotion.
+	bool blockwholewindow; /// Manage condition limit of moveable windows. @see mouseMotion.
 	/// @todo Method to set this variable. Maybe set the variable static.
 };
 
@@ -307,6 +310,7 @@ public:
 
 	void setPassword(bool flag) { isPassword = flag; }
 	void getTextSelectionPositions(unsigned int *first, unsigned int *len) const;
+
 protected:
 	int mSelectStart = 0;
 	int mSelectEndOffset = 0;
@@ -317,10 +321,13 @@ class ImageTextField : public CTextField
 {
 public:
 	ImageTextField() = default;
-	ImageTextField(const std::string &text) : CTextField(text) {}
+	explicit ImageTextField(const std::string &text) : CTextField(text) {}
+
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
+
 	void setItemImage(std::shared_ptr<CGraphic> image) { itemImage = image; }
+
 private:
 	std::shared_ptr<CGraphic> itemImage;
 };
@@ -333,6 +340,7 @@ public:
 
 	int getNumberOfElements() override { return list.size(); }
 	std::string getElementAt(int i) override { return list[i]; }
+
 	int getIdxOfElement(std::string_view element);
 };
 
@@ -342,9 +350,10 @@ class LuaListModel : public gcn::ListModel
 public:
 	LuaListModel() = default;
 
-	void setList(lua_State *lua, lua_Object *lo);
 	int getNumberOfElements() override { return list.size(); }
 	std::string getElementAt(int i) override { return list[i]; }
+
+	void setList(lua_State *lua, lua_Object *lo);
 	int getIdxOfElement(std::string_view element);
 };
 
@@ -353,13 +362,15 @@ class ImageListBox : public gcn::ListBox
 public:
 	ImageListBox() = default;
 	explicit ImageListBox(gcn::ListModel *listModel);
+
 	void draw(gcn::Graphics *graphics) override;
 	void drawFrame(gcn::Graphics *graphics) override;
 	void mousePressed(gcn::MouseEvent &) override;
+	void logic() override { adjustSize(); }
+
 	void setItemImage(std::shared_ptr<CGraphic> image) { itemImage = image; }
 	void adjustSize();
 	void setSelected(int selected);
-	void logic() { adjustSize(); }
 
 private:
 	std::shared_ptr<CGraphic> itemImage = nullptr;
@@ -369,15 +380,18 @@ class ListBoxWidget : public gcn::ScrollArea
 {
 public:
 	ListBoxWidget(unsigned int width, unsigned int height);
+
+	void fontChanged() override;
+
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
 	void setBackgroundColor(const gcn::Color &color);
-	void fontChanged() override;
 	void addActionListener(gcn::ActionListener *actionListener);
 
 private:
 	void adjustSize();
+
 private:
 	LuaListModel lualistmodel;
 	gcn::ListBox listbox;
@@ -387,13 +401,12 @@ class ImageListBoxWidget : public ListBoxWidget
 {
 public:
 	ImageListBoxWidget(unsigned int width, unsigned int height);
+
 	void setList(lua_State *lua, lua_Object *lo);
 	void setSelected(int i);
 	int getSelected() const;
 	void setBackgroundColor(const gcn::Color &color);
-	void fontChanged() override;
 	void addActionListener(gcn::ActionListener *actionListener);
-
 	void setItemImage(std::shared_ptr<CGraphic> image)
 	{
 		itemImage = image;
@@ -427,27 +440,28 @@ public:
 		mScrollbarWidth = std::min<int>(image->getWidth(), image->getHeight());
 	}
 	void setMarkerImage(std::shared_ptr<CGraphic> image) { markerImage = image; }
-
-	void draw(gcn::Graphics *graphics) override;
-	void drawFrame(gcn::Graphics *graphics) override;
 	gcn::Rectangle getVerticalMarkerDimension();
 	gcn::Rectangle getHorizontalMarkerDimension();
 
-private:
-	void adjustSize();
+	void draw(gcn::Graphics *graphics) override;
+	void drawFrame(gcn::Graphics *graphics) override;
+	void fontChanged() override;
 
-	void drawUpButton(gcn::Graphics *graphics);
-	void drawDownButton(gcn::Graphics *graphics);
-	void drawLeftButton(gcn::Graphics *graphics);
-	void drawRightButton(gcn::Graphics *graphics);
+private:
+	void drawUpButton(gcn::Graphics *graphics) override;
+	void drawDownButton(gcn::Graphics *graphics) override;
+	void drawLeftButton(gcn::Graphics *graphics) override;
+	void drawRightButton(gcn::Graphics *graphics) override;
+	void drawHMarker(gcn::Graphics *graphics) override;
+	void drawVMarker(gcn::Graphics *graphics) override;
+	void drawHBar(gcn::Graphics *graphics) override;
+	void drawVBar(gcn::Graphics *graphics) override;
+
 	void drawUpPressedButton(gcn::Graphics *graphics);
 	void drawDownPressedButton(gcn::Graphics *graphics);
 	void drawLeftPressedButton(gcn::Graphics *graphics);
 	void drawRightPressedButton(gcn::Graphics *graphics);
-	void drawHMarker(gcn::Graphics *graphics);
-	void drawVMarker(gcn::Graphics *graphics);
-	void drawHBar(gcn::Graphics *graphics);
-	void drawVBar(gcn::Graphics *graphics);
+	void adjustSize();
 private:
 	std::shared_ptr<CGraphic> itemImage;
 	std::shared_ptr<CGraphic> upButtonImage;
@@ -487,7 +501,7 @@ protected:
 class ImageDropDownWidget : public DropDownWidget
 {
 private:
-	ImageDropDownWidget(std::unique_ptr<ImageListBox> imageListBox) :
+	explicit ImageDropDownWidget(std::unique_ptr<ImageListBox> imageListBox) :
 		DropDownWidget(imageListBox.get()),
 		mImageListBox(std::move(imageListBox))
 	{
@@ -527,6 +541,7 @@ public:
 	StatBoxWidget(int width, int height);
 
 	void draw(gcn::Graphics *graphics) override;
+
 	void setCaption(const std::string &s);
 	const std::string &getCaption() const;
 	void setPercent(const int percent);
@@ -542,12 +557,13 @@ class MenuScreen : public gcn::Container
 public:
 	MenuScreen();
 
+	void draw(gcn::Graphics *graphics) override;
+	void logic() override;
+
 	int run(bool loop = true);
 	void stop(int result = 0, bool stopAll = false);
 	void stopAll(int result = 0) { stop(result, true); }
 	void addLogicCallback(LuaActionListener *listener);
-	void draw(gcn::Graphics *graphics) override;
-	void logic() override;
 	void setDrawMenusUnder(bool drawUnder) { this->drawUnder = drawUnder; }
 	bool getDrawMenusUnder() const { return this->drawUnder; }
 

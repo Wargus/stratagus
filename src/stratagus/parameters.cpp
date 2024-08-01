@@ -79,7 +79,7 @@ void Parameters::SetDefaultUserDirectory(bool noPortable)
 		configDir = getenv("HOME");
 		if (configDir) {
 #ifdef USE_MAC
-			userDirectory = fs::path(configDir) / "Library" / "Application\ Support" / "Stratagus";
+			userDirectory = fs::path(configDir) / "Library" / "Application Support" / "Stratagus";
 #else
 			userDirectory = fs::path(configDir) / ".config" / "stratagus";
 #endif // USE_MAC
