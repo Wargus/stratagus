@@ -112,9 +112,16 @@ extern void AbortAt(const char *file, int line, const char *funcName, const char
 template <typename... Ts>
 std::string Format(const char *format, Ts... args)
 {
+#ifndef _MSC_VER
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wformat-security"
+#endif
 	const auto len = snprintf(nullptr, 0, format, args...);
 	std::string res(len, '\0');
 	snprintf(res.data(), res.size(), format, args...);
+#ifndef _MSC_VER
+# pragma GCC diagnostic pop
+#endif
 	return res;
 }
 
