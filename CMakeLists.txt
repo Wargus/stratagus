@@ -26,8 +26,7 @@
 #
 #
 
-cmake_minimum_required(VERSION 3.5)
-cmake_policy(VERSION 3.10..3.20.2)
+cmake_minimum_required(VERSION 3.25)
 
 #########################
 # Version configuration #
@@ -55,7 +54,7 @@ option(DOWNLOAD_FREEPATS OFF)
 project(stratagus)
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/third-party/CMakeLists.txt")
-	add_subdirectory(third-party)
+	add_subdirectory(third-party EXCLUDE_FROM_ALL SYSTEM)
 else()
 	message(WARNING "Third-party directory not populated, cannot vendor any dependencies.")
 endif()
@@ -84,9 +83,10 @@ endif()
 
 include_directories(
 	src/include
-	src/third_party/
 	${CMAKE_CURRENT_BINARY_DIR}
 )
+
+include_directories(SYSTEM src/third_party/)
 
 set(action_SRCS
 	src/action/action_attack.cpp
@@ -794,7 +794,7 @@ endif()
 
 if(WITH_STACKTRACE AND STACKTRACE_FOUND)
 	add_definitions(-DUSE_STACKTRACE ${STACKTRACE_DEFINITIONS})
-	include_directories(${STACKTRACE_PROJECT_DIR})
+	include_directories(SYSTEM ${STACKTRACE_PROJECT_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${STACKTRACE_LIBRARY})
 endif()
 
@@ -855,7 +855,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Profile")
 	find_package(coz-profiler)
 	if(COZ-PROFILER_FOUND)
 		add_definitions(-DHAVE_COZ_PROFILER)
-		include_directories(${COZ_INCLUDE_DIRS})
+		include_directories(SYSTEM ${COZ_INCLUDE_DIRS})
 		set(stratagus_LIBS ${stratagus_LIBS} ${COZ_LIBRARIES} -ldl)
 	endif()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg -g -ggdb")
@@ -1116,7 +1116,7 @@ endif ()
 target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS} guichan_lib)
 target_link_libraries(stratagus PUBLIC stratagus_lib)
 
-target_include_directories(stratagus_lib PRIVATE third-party/mdns third-party/spiritless_po/include)
+target_include_directories(stratagus_lib SYSTEM PRIVATE third-party/mdns third-party/spiritless_po/include)
 
 if(WITH_OPENMP AND OpenMP_CXX_FOUND)
 	add_definitions(-DUSE_OPENMP)
