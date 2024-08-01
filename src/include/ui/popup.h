@@ -123,7 +123,7 @@ public:
 	int GetWidth(const ButtonAction &button, int *Costs) const override;
 	int GetHeight(const ButtonAction &button, int *Costs) const override;
 
-	virtual void Parse(lua_State *l);
+	void Parse(lua_State *l) override;
 
 private:
 	EPopupButtonInfo InfoType = EPopupButtonInfo::Hint; /// Type of information to show.
