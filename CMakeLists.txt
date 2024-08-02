@@ -27,6 +27,7 @@
 #
 
 cmake_minimum_required(VERSION 3.25)
+cmake_policy(VERSION 3.10..3.20.2)
 
 #########################
 # Version configuration #
