@@ -33,35 +33,48 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+        path: stratagus
+
+    - name: Checkout win32-stratagus-dependencies
+      uses: actions/checkout@v4
+      with:
+        repository: Wargus/win32-stratagus-dependencies
+        submodules: recursive
+        path: win32-stratagus-dependencies
+
+    - uses: ilammy/msvc-dev-cmd@v1
+
+    - name: build dependencies
+      shell: bash
+      run: |
+        cd win32-stratagus-dependencies
+        ./build.bat
+        mv build ../dependencies
 
     - name: cmake --version
       run: cmake --version
 
     - name: build stratagus
-      run: | # -DENABLE_NSIS=ON
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DENABLE_STDIO_REDIRECT=ON -DBUILD_TESTING=1
+      run: |
+        mkdir stratagus/build && cd stratagus/build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=OFF -DBUILD_VENDORED_SDL=OFF -DBUILD_VENDORED_MEDIA_LIBS=OFF -DENABLE_STDIO_REDIRECT=ON -DENABLE_NSIS=ON -DBUILD_TESTING=1
         cmake --build . --config Release
-        
+
     - name: run tests
       run: |
-        cd build
+        cd stratagus/build
         ctest --output-on-failure
 
     - name: Upload installer
       uses: actions/upload-artifact@v4
       with:
-        name: stratagus
-        path: build/Release/**.*
+        name: stratagus-binaries
+        path: |
+          stratagus/build/**.exe
+          stratagus/build/**.dll
 
-#    - name: Upload installer
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: stratagus-installer.exe
-#        path: build/**.exe
-#
-#    - name: Upload pdb files
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: stratagus_pdbs
-#        path: "**.pdb"
+    - name: Upload pdb files
+      uses: actions/upload-artifact@v4
+      with:
+        name: stratagus_pdbs
+        path: stratagus/build/Release/*.pdb
