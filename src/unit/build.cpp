@@ -464,10 +464,11 @@ std::optional<CUnit *> CanBuildHere(const CUnit *unit, const CUnitType &type, co
 
 	// Check special rules for AI players
 	if (unit && unit->Player->AiEnabled) {
-		if (!ranges::any_of(type.AiBuildingRules, [&](const auto &rule) {
-				CUnit *ontoptarget = nullptr;
-				return rule->Check(unit, type, pos, ontoptarget);
-			})) {
+		if (!type.AiBuildingRules.empty()
+		    && ranges::none_of(type.AiBuildingRules, [&](const auto &rule) {
+				   CUnit *ontoptarget = nullptr;
+				   return rule->Check(unit, type, pos, ontoptarget);
+			   })) {
 			return std::nullopt;
 		}
 	}
