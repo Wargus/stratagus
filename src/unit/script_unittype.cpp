@@ -486,9 +486,10 @@ static int CclDefineUnitType(lua_State *l)
 		type->Flip = 1;
 	}
 	std::uint32_t redefine = 0;
-
+	bool forward_declaration = true;
 	//  Parse the list: (still everything could be changed!)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		forward_declaration = false;
 		std::string_view value = LuaToString(l, -2);
 		if (value == "Name") {
 			type->Name = LuaToString(l, -1);
@@ -1169,12 +1170,13 @@ static int CclDefineUnitType(lua_State *l)
 		}
 	}
 
-	// If number of directions is not specified, make a guess
-	// Building have 1 direction and units 8
-	if (type->Building && type->NumDirections == 0) {
-		type->NumDirections = 1;
-	} else if (type->NumDirections == 0) {
-		type->NumDirections = 8;
+	// If number of directions is not specified,
+	// specify it but not for forward-declaration
+	if (type->NumDirections == 0 && !forward_declaration)
+	{
+		// make a guess Building have 1 direction and units 8
+		type->NumDirections = type->Building ? 1 : 8;
+		DebugPrint("Defaulting 'NumDirections' of %s to %d\n", str.data(), type->NumDirections);
 	}
 
 	// FIXME: try to simplify/combine the flags instead
