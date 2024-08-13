@@ -109,7 +109,7 @@ static int CclStratagusMap(lua_State *l)
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					if (subsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
-						ErrorPrint("Wrong tile table length: %d\n", subsubargs);
+						LuaError(l, "Wrong tile table length: %d\n", subsubargs);
 					}
 					for (int i = 0; i < subsubargs; ++i) {
 						lua_rawgeti(l, -1, i + 1);
@@ -149,9 +149,10 @@ static int CclRevealMap(lua_State *l)
 	} else if (revealMode == "explored") {
 		newMode = MapRevealModes::cExplored;
 	} else {
-		ErrorPrint("Unknown reveal mode: '%s'\n"
-		           "Accessible reveal modes: \"hidden\", \"known\", \"explored\".\n",
-		           revealMode.data());
+		LuaError(l,
+		         "Unknown reveal mode: '%s'\n"
+		         "Accessible reveal modes: \"hidden\", \"known\", \"explored\".\n",
+		         revealMode.data());
 		return 1;
 	}
 
@@ -233,7 +234,7 @@ static int CclShowMapLocation(lua_State *l)
 		target->CurrentSightRange = LuaToNumber(l, 3);
 		MapMarkUnitSight(*target);
 	} else {
-		DebugPrint("Unable to allocate Unit");
+		LuaDebugPrint(l, "Unable to allocate Unit");
 	}
 	return 0;
 }
@@ -369,9 +370,10 @@ static int CclSetFieldOfViewType(lua_State *l)
 	} else if (type_name == "simple-radial") {
 		new_type = FieldOfViewTypes::cSimpleRadial;
 	} else {
-		ErrorPrint("Unknown field of view types '%s'\n"
-		           "Accessible field of view types: \"shadow-casting\", \"simple-radial\".\n",
-		           type_name.data());
+		LuaError(l,
+		         "Unknown field of view types '%s'\n"
+		         "Accessible field of view types: \"shadow-casting\", \"simple-radial\".\n",
+		         type_name.data());
 		return 1;
 	}
 	if (!IsNetworkGame()) {
@@ -416,9 +418,10 @@ static int CclSetOpaqueFor(lua_State *l)
 		} else if (flag_name == "forest") {
 			new_flag |= MapFieldForest;
 		} else {
-			ErrorPrint("Opaque can only be set for \"wall\", \"rock\" or \"forest\".\n"
-			           "You use '%s'\n",
-			           flag_name.data());
+			LuaError(l,
+			         "Opaque can only be set for \"wall\", \"rock\" or \"forest\".\n"
+			         "You use '%s'\n",
+			         flag_name.data());
 			return 1;
 		}
 	}
@@ -449,9 +452,10 @@ static int CclGetIsOpaqueFor(lua_State *l)
 	} else if (flag_name == "forest") {
 		flagToCheck = MapFieldForest;
 	} else {
-		ErrorPrint("Opaque can only be checked for \"wall\", \"rock\" or \"forest\".\n"
-		           "You use '%s'\n",
-		           flag_name.data());
+		LuaError(l,
+		         "Opaque can only be checked for \"wall\", \"rock\" or \"forest\".\n"
+		         "You use '%s'\n",
+		         flag_name.data());
 	}
 
 	lua_pushboolean(l, FieldOfView.GetOpaqueFields() & flagToCheck);
@@ -475,9 +479,10 @@ static int CclRemoveOpaqueFor(lua_State *l)
 		} else if (flag_name == "forest") {
 			new_flag |= MapFieldForest;
 		} else {
-			ErrorPrint("Opaque can only be removed for \"wall\", \"rock\" or \"forest\".\n"
-			           "You use '%s'\n",
-			           flag_name.data());
+			LuaError(l,
+			         "Opaque can only be removed for \"wall\", \"rock\" or \"forest\".\n"
+			         "You use '%s'\n",
+			         flag_name.data());
 			return 1;
 		}
 	}
@@ -518,9 +523,10 @@ static int CclSetFogOfWarType(lua_State *l)
 	} else if (type_name == "enhanced") {
 		new_type = FogOfWarTypes::cEnhanced;
 	} else {
-		ErrorPrint("Unknown fog of war type '%s'\n"
-		           "Accessible Fog of War types: \"tiled\", \"enhanced\" and \"fast\".\n",
-		           type_name.data());
+		LuaError(l,
+		         "Unknown fog of war type '%s'\n"
+		         "Accessible Fog of War types: \"tiled\", \"enhanced\" and \"fast\".\n",
+		         type_name.data());
 		return 1;
 	}
 	FogOfWar->SetType(new_type);
@@ -542,34 +548,34 @@ static int CclGetFogOfWarType(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  @return   0 for success, 1 for wrong type;
+**  @return 0
 */
 static int CclSetFogOfWarOpacityLevels(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 	const int explored = LuaToNumber(l, 1);
 	if (explored <= 0 || explored > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Explored tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           explored);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Explored tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         explored);
+		return 0;
 	}
 	const int revealed = LuaToNumber(l, 2);
 	if (revealed <= explored || revealed > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Revealed tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           revealed);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Revealed tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         revealed);
+		return 0;
 	}
 	const int unseen = LuaToNumber(l, 3);
 	if (unseen < revealed || unseen > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Unseen tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           unseen);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Unseen tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         unseen);
+		return 0;
 	}
 
 	FogOfWar->SetOpacityLevels(explored, revealed, unseen);
@@ -590,17 +596,17 @@ static int CclSetFogOfWarBlur(lua_State *l)
 
 	const float radiusSimple = LuaToFloat(l, 1);
 	if (radiusSimple <= 0 ) {
-		ErrorPrint("Radius should be a positive float number. Blur is disabled.\n");
+		LuaError(l, "Radius should be a positive float number. Blur is disabled.\n");
 	}
 
 	const float radiusBilinear = LuaToFloat(l, 2);
 	if (radiusBilinear <= 0 ) {
-		ErrorPrint("Radius should be a positive float number. Blur is disabled.\n");
+		LuaError(l, "Radius should be a positive float number. Blur is disabled.\n");
 	}
 
 	const int iterations = LuaToNumber(l, 3);
 	if (iterations <= 0 ) {
-		ErrorPrint("Number of box blur iterations should be greater than 0. Blur is disabled.\n");
+		LuaError(l, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
 	}
 	FogOfWar->InitBlurer(radiusSimple, radiusBilinear, iterations);
 	return 0;
@@ -735,34 +741,34 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **
 **  @param l  Lua state.
 **
-**  @return   0 for success, 1 for wrong type;
+**  @return 0
 */
 static int CclSetMMFogOfWarOpacityLevels(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 	const int explored = LuaToNumber(l, 1);
 	if (explored <= 0 || explored > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Minimap's Explored tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           explored);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Minimap's Explored tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         explored);
+		return 0;
 	}
 	const int revealed = LuaToNumber(l, 2);
 	if (revealed <= explored || revealed > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Minimap's Revealed tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           revealed);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Minimap's Revealed tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         revealed);
+		return 0;
 	}
 	const int unseen = LuaToNumber(l, 3);
 	if (unseen < revealed || unseen > 255) {
-		PrintFunction();
-		ErrorPrint("Invalid value (%d) of opacity for Minimap's Unseen tiles. "
-		           "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
-		           unseen);
-		return 1;
+		LuaError(l,
+		         "Invalid value (%d) of opacity for Minimap's Unseen tiles. "
+		         "Acceptable range is [0 <= Explored <= Known <= Hidden <= 255].\n",
+		         unseen);
+		return 0;
 	}
 
 	UI.Minimap.SetFogOpacityLevels(explored, revealed, unseen);
@@ -893,7 +899,7 @@ static int CclLoadTileModels(lua_State *l)
 	Map.TileModelsFileName = LuaToString(l, 1);
 	const fs::path filename = LibraryFileName(Map.TileModelsFileName.string());
 	if (LuaLoadFile(filename) == -1) {
-		ErrorPrint("Load failed: \"%s\"\n", filename.u8string().c_str());
+		LuaError(l, "Load failed: \"%s\"\n", filename.u8string().c_str());
 	}
 	return 0;
 }

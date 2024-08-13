@@ -604,7 +604,7 @@ static int CclDefinePanelContents(lua_State *l)
 		if (it == UI.InfoPanelContents.end()) {
 			UI.InfoPanelContents.push_back(std::move(infopanel));
 		} else {
-			DebugPrint("Redefinition of Panel '%s'\n", infopanel->Name.c_str());
+			LuaDebugPrint(l, "Redefinition of Panel '%s'\n", infopanel->Name.c_str());
 			*it = std::move(infopanel);
 		}
 	}
@@ -654,7 +654,7 @@ static int CclDefinePopup(lua_State *l)
 
 	const auto it = ranges::find(UI.ButtonPopups, popup->Ident, &CPopup::Ident);
 	if (it != UI.ButtonPopups.end()) {
-		DebugPrint("Redefinition of Popup '%s'\n", popup->Ident.c_str());
+		LuaDebugPrint(l, "Redefinition of Popup '%s'\n", popup->Ident.c_str());
 		*it = std::move(popup);
 	} else {
 		UI.ButtonPopups.push_back(std::move(popup));

@@ -1928,6 +1928,15 @@ static int CclSetDamageFormula(lua_State *l)
 	return 0;
 }
 
+std::string getLuaLocation(lua_State* l)
+{
+	lua_Debug ar;
+	lua_getstack(l, 1, &ar);
+	lua_getinfo(l, "nSl", &ar);
+
+	return std::string(ar.source) + ":" + std::to_string(ar.currentline) + ": ";
+}
+
 /**
 **  Print debug message with info about current script name, line number and function.
 **
@@ -1940,13 +1949,10 @@ static int CclDebugPrint(lua_State *l)
 	LuaCheckArgs(l, 1);
 
 #ifdef DEBUG
-	lua_Debug ar;
-	lua_getstack(l, 1, &ar);
-	lua_getinfo(l, "nSl", &ar);
-	fprintf(stdout, "%s:%d: %s: %s\n", ar.source, ar.currentline, ar.what, LuaToString(l, 1).data());
+	fprintf(stdout, "%s%s\n", getLuaLocation(l).c_str(), LuaToString(l, 1).data());
 #endif
 
-	return 1;
+	return 0;
 }
 
 /**

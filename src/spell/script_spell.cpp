@@ -289,8 +289,7 @@ static void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 				if (var == "Distance") {
 					index = ACP_DISTANCE;
 				} else {
-					ErrorPrint("Bad variable name '%s'\n", var.data());
-					Exit(1);
+					LuaError(l, "Bad variable name '%s'\n", var.data());
 				}
 			}
 			autocast->PriorytyVar = index;
@@ -340,7 +339,7 @@ static int CclDefineSpell(lua_State *l)
 	SpellType *spell = nullptr;
 	if (it != SpellTypeTable.end()) {
 		spell = it->get();
-		DebugPrint("Redefining spell-type '%s'\n", identname.data());
+		LuaDebugPrint(l, "Redefining spell-type '%s'\n", identname.data());
 	} else {
 		SpellTypeTable.push_back(std::make_unique<SpellType>(SpellTypeTable.size(), std::string{identname}));
 		spell = SpellTypeTable.back().get();

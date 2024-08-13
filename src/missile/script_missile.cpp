@@ -115,9 +115,7 @@ void MissileType::Load(lua_State *l)
 		} else if (value == "ChangeVariable") {
 			const int index = UnitTypeVar.VariableNameLookup[LuaToString(l, -1)];// User variables
 			if (index == -1) {
-				ErrorPrint("Bad variable name '%s'\n", LuaToString(l, -1).data());
-				Exit(1);
-				return;
+				LuaError(l, "Bad variable name '%s'\n", LuaToString(l, -1).data());
 			}
 			this->ChangeVariable = index;
 		} else if (value == "ChangeAmount") {
@@ -244,7 +242,7 @@ static int CclMissile(lua_State *l)
 	PixelPos source(-1, -1);
 	Missile *missile = nullptr;
 
-	DebugPrint("FIXME: not finished\n");
+	LuaDebugPrint(l, "FIXME: not finished\n");
 
 	const int args = lua_gettop(l);
 	for (int j = 0; j < args; ++j) {

@@ -309,9 +309,10 @@ static int CclDefineAiHelper(lua_State *l)
 			|| value == "research"
 			|| value == "unit-limit"
 			|| value == "repair") {
-			DebugPrint("DefineAiHelper: Relation is computed from buttons, "
-			           "you may remove safely the block beginning with '\"%s\"'\n",
-			           value.data());
+			LuaDebugPrint(l,
+			              "DefineAiHelper: Relation is computed from buttons, "
+			              "you may remove safely the block beginning with '\"%s\"'\n",
+			              value.data());
 			continue;
 		} else if (value == "unit-equiv") {
 		} else {
@@ -397,7 +398,7 @@ static int CclDefineAi(lua_State *l)
 
 #ifdef DEBUG
 	if (GetAiTypesByName(aiName)) {
-		DebugPrint("Warning two or more AI's with the same name '%s'\n", aiName.data());
+		LuaDebugPrint(l, "Warning two or more AI's with the same name '%s'\n", aiName.data());
 	}
 #endif
 	AiTypes.insert(AiTypes.begin(), std::make_unique<CAiType>());
@@ -741,7 +742,7 @@ static int CclAiWait(lua_State *l)
 			lua_pushboolean(l, 1);
 			return 1;
 		}
-		DebugPrint("Broken? waiting on %s which wasn't requested.\n", type->Ident.c_str());
+		LuaDebugPrint(l, "Broken? waiting on %s which wasn't requested.\n", type->Ident.c_str());
 		lua_pushboolean(l, 0);
 		return 1;
 	}
@@ -1606,7 +1607,7 @@ static int CclDefineAiPlayer(lua_State *l)
 	const unsigned int playerIdx = LuaToNumber(l, 0 + 1);
 
 	Assert(playerIdx <= PlayerMax);
-	DebugPrint("%p %d\n", (void *)Players[playerIdx].Ai.get(), Players[playerIdx].AiEnabled);
+	LuaDebugPrint(l, "%p %d\n", (void *)Players[playerIdx].Ai.get(), Players[playerIdx].AiEnabled);
 	// FIXME: lose this:
 	// Assert(!Players[playerIdx].Ai && Players[playerIdx].AiEnabled);
 

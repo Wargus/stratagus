@@ -774,10 +774,11 @@ static int CclSetRevelationType(lua_State *l)
 	} else if (revel_type == "buildings-only") {
 		CPlayer::SetRevelationType(RevealTypes::cBuildingsOnly);
 	} else {
-		ErrorPrint("Unknown revelation type '%s'\n"
-		           "Accessible types of revelation "
-		           "\"no-revelation\", \"all-units\" and \"buildings-only\".\n",
-		           revel_type.data());
+		LuaError(l,
+		         "Unknown revelation type '%s'\n"
+		         "Accessible types of revelation "
+		         "\"no-revelation\", \"all-units\" and \"buildings-only\".\n",
+		         revel_type.data());
 		return 1;
 	}
 	return 0;

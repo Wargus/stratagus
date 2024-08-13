@@ -83,6 +83,16 @@ extern int LuaLoadFile(const fs::path &file, const std::string &strArg = "", boo
 extern int LuaCall(int narg, int clear, bool exitOnError = true);
 extern int LuaCall(lua_State *L, int narg, int nresults, int base, bool exitOnError = true);
 
+std::string getLuaLocation(lua_State *l);
+
+#define LuaDebugPrint(l, format, ...) \
+	do { \
+		if (EnableDebugPrint) { \
+			PrintOnStdOut(getLuaLocation(l)); \
+			PrintOnStdOut(Format(format, ##__VA_ARGS__)); \
+		} \
+	} while (0)
+
 #define LuaError(l, format, ...) \
  do { \
   PrintFunction(); \

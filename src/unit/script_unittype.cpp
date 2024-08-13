@@ -480,7 +480,7 @@ static int CclDefineUnitType(lua_State *l)
 
 	auto [type, redefined] = NewUnitTypeSlot(str);
 	if (redefined) {
-		DebugPrint("Redefining unit-type '%s'\n", str.data());
+		LuaDebugPrint(l, "Redefining unit-type '%s'\n", str.data());
 	} else {
 		type->NumDirections = 0;
 		type->Flip = 1;
@@ -1176,7 +1176,7 @@ static int CclDefineUnitType(lua_State *l)
 	{
 		// make a guess Building have 1 direction and units 8
 		type->NumDirections = type->Building ? 1 : 8;
-		DebugPrint("Defaulting 'NumDirections' of %s to %d\n", str.data(), type->NumDirections);
+		LuaDebugPrint(l, "Defaulting 'NumDirections' of %s to %d\n", str.data(), type->NumDirections);
 	}
 
 	// FIXME: try to simplify/combine the flags instead
@@ -1214,7 +1214,7 @@ static int CclCopyUnitType(lua_State *l)
 	const std::string_view toName = LuaToString(l, 2);
 	auto [to, redefined] = NewUnitTypeSlot(toName);
 	if (redefined) {
-		DebugPrint("Redefining unit-type '%s'\n", toName.data());
+		LuaDebugPrint(l, "Redefining unit-type '%s'\n", toName.data());
 	}
 
 	to->Flip = from.Flip;
@@ -1317,7 +1317,10 @@ static int CclCopyUnitType(lua_State *l)
 	to->Building = from.Building;
 	to->BuildingRules.clear();
 	if (!from.BuildingRules.empty()) {
-		printf("WARNING: unit type copy %s of %s does not inherit BuildingRules\n", fromName.data(), toName.data());
+		printf("%sWARNING: unit type copy %s of %s does not inherit BuildingRules\n",
+		       getLuaLocation(l).c_str(),
+		       fromName.data(),
+		       toName.data());
 	}
 	// XXX: should copy, not share, this will crash
 	// for (auto rule : from.BuildingRules) {
@@ -1325,7 +1328,10 @@ static int CclCopyUnitType(lua_State *l)
 	// }
 	to->AiBuildingRules.clear();
 	if (!from.AiBuildingRules.empty()) {
-		printf("WARNING: unit type copy %s of %s does not inherit AiBuildingRules\n", fromName.data(), toName.data());
+		printf("%sWARNING: unit type copy %s of %s does not inherit AiBuildingRules\n",
+		       getLuaLocation(l).c_str(),
+		       fromName.data(),
+		       toName.data());
 	}
 	// XXX: should copy, not share, this would crash
 	// for (auto rule : from.AiBuildingRules) {
@@ -1886,7 +1892,7 @@ static int CclDefineVariables(lua_State *l)
 			old++;
 			UnitTypeVar.Variable.resize(old);
 		} else {
-			DebugPrint("Warning, User Variable \"%s\" redefined\n", str.c_str());
+			LuaDebugPrint(l, "Warning, User Variable \"%s\" redefined\n", str.c_str());
 		}
 		if (!lua_istable(l, j + 2)) { // No change => default value.
 			continue;

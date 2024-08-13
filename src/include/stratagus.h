@@ -148,7 +148,6 @@ inline void PrintOnStdOut(std::string_view s)
 */
 #define LogPrint(format, ...) \
  do { \
-  PrintFunction(); \
   PrintOnStdOut(Format(format, ##__VA_ARGS__)); \
  } while (0)
 
