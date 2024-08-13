@@ -434,7 +434,7 @@ static int CclAddTrigger(lua_State *l)
 	lua_getglobal(l, "_triggers_");
 
 	if (lua_isnil(l, -1)) {
-		DebugPrint("Trigger not set, defining trigger\n");
+		LuaDebugPrint(l, "Trigger not set, defining trigger\n");
 		lua_pop(l, 1);
 		lua_newtable(l);
 		lua_setglobal(l, "_triggers_");

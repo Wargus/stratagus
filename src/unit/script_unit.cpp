@@ -575,7 +575,7 @@ static int CclUnit(lua_State *l)
 			Assert(player != nullptr);
 			unit->AssignToPlayer(*player);
 			if (unit->CurrentAction() == UnitAction::Built) {
-				DebugPrint("HACK: the building is not ready yet\n");
+				LuaDebugPrint(l, "HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
 				if (unit->Active) {
@@ -786,7 +786,7 @@ static int CclCreateUnit(lua_State *l)
 	}
 	CUnit *unit = MakeUnit(*unittype, player);
 	if (unit == nullptr) {
-		DebugPrint("Unable to allocate unit");
+		LuaDebugPrint(l, "Unable to allocate unit");
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos)
@@ -1417,10 +1417,11 @@ static int CclSetUnitVariable(lua_State *l)
 			} else {
 				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
 				if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
-					ErrorPrint("Player %d has a negative '%s' AI active count of %d.\n",
-					           unit->Player->Index,
-					           unit->Type->Ident.c_str(),
-					           unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
+					LuaError(l,
+					         "Player %d has a negative '%s' AI active count of %d.\n",
+					         unit->Player->Index,
+					         unit->Type->Ident.c_str(),
+					         unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
 				}
 			}
 		}

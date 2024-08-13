@@ -273,12 +273,10 @@ static int CclDefineDependency(lua_State *l)
 	} else if (starts_with(target, "upgrade-")) {
 		// Check upgrade exists
 		if (auto* upgrade = CUpgrade::Get(target); !upgrade) {
-			ErrorPrint("upgrade not found: '%s'\n", target.data());
-			ExitFatal(-1);
+			LuaError(l, "upgrade not found: '%s'\n", target.data());
 		}
 	} else {
-		ErrorPrint("dependency target '%s' should be unit-type or upgrade\n", target.data());
-		ExitFatal(-1);
+		LuaError(l, "dependency target '%s' should be unit-type or upgrade\n", target.data());
 	}
 
 	auto &or_rule = Depends[std::string(target)];

@@ -336,7 +336,7 @@ static int CclDefineUnitAllow(lua_State *l)
 	const std::string_view ident = LuaToString(l, 0 + 1);
 
 	if (!starts_with(ident, "unit-")) {
-		DebugPrint(" wrong ident %s\n", ident.data());
+		LuaDebugPrint(l, "wrong ident %s\n", ident.data());
 		return 0;
 	}
 	int id = UnitTypeByIdent(ident).Slot;
@@ -373,7 +373,7 @@ static int CclDefineAllow(lua_State *l)
 
 		int n = ids.size();
 		if (n > PlayerMax) {
-			ErrorPrint("'%s': Allow string too long %d\n", ident.data(), n);
+			LuaError(l, "'%s': Allow string too long %d\n", ident.data(), n);
 			n = PlayerMax;
 		}
 
