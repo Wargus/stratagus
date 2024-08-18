@@ -156,7 +156,9 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd{}; // movement in tile.
 	int d{};
 
-	if (unit.Moving != 1 && (&unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (unit.Moving != 1
+	    && (&unit.Type->Animations->Move != unit.Anim.CurrAnim
+	        || (unit.Anim.Wait == 0 && unit.Anim.Anim == 0))) {
 		if (unit.Anim.Unbreakable && unit.Moving > 1) {
 			// subtile movement, we're finished, but inside an unbreakable animation that we have to finish
 			int m = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, 1) >> 1;
