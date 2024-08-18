@@ -156,7 +156,9 @@ int DoActionMove(CUnit &unit)
 	Vec2i posd{}; // movement in tile.
 	int d{};
 
-	if (unit.Moving != 1 && (&unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (unit.Moving != 1
+	    && (&unit.Type->Animations->Move != unit.Anim.CurrAnim
+	        || (unit.Anim.Wait == 0 && unit.Anim.Anim == 0))) {
 		if (unit.Anim.Unbreakable && unit.Moving > 1) {
 			// subtile movement, we're finished, but inside an unbreakable animation that we have to finish
 			int m = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, 1) >> 1;
@@ -242,9 +244,11 @@ int DoActionMove(CUnit &unit)
 		unit.Frame = unit.Type->StillFrame;
 		UnitHeadingFromDeltaXY(unit, posd);
 	} else {
-		posd.x = Heading2X[unit.Direction / NextDirection];
-		posd.y = Heading2Y[unit.Direction / NextDirection];
-		d = unit.pathFinderData->output.Length + 1;
+		const auto direction =
+			unit.pathFinderData->output.Path[unit.pathFinderData->output.Length - 1];
+		posd.x = Heading2X[direction];
+		posd.y = Heading2Y[direction];
+		d = unit.pathFinderData->output.Length;
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
@@ -266,7 +270,7 @@ int DoActionMove(CUnit &unit)
 
 	// Finished move to next tile, set Moving to 0 so we recalculate the path
 	// next frame
-	if ((!unit.Anim.Unbreakable && !unit.IX && !unit.IY) || reached_next_tile	) {
+	if ((!unit.Anim.Unbreakable && !unit.IX && !unit.IY) || reached_next_tile) {
 		unit.Moving = 0;
 	}
 	return d;

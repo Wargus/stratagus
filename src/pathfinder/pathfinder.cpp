@@ -445,12 +445,13 @@ std::pair<int, Vec2i> NextPathElement(CUnit &unit)
 		if (result == PF_REACHED) {
 			return {result, {}};
 		}
+	} else {
+		output.Length--;
 	}
 
 	Vec2i dir(Heading2X[(int) output.Path[output.Length - 1]],
 	          Heading2Y[(int) output.Path[output.Length - 1]]);
 	int result = output.Length;
-	output.Length--;
 	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
@@ -474,7 +475,6 @@ std::pair<int, Vec2i> NextPathElement(CUnit &unit)
 					dir = {0, 0};
 				} else {
 					result = output.Length;
-					output.Length--;
 				}
 			}
 		}

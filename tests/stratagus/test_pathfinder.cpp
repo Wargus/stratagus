@@ -115,8 +115,8 @@ TEST_CASE("PathFinding on clear map 128x128")
 
 		CHECK(d == dist);
 
-		CHECK(unit.pathFinderData->output.Length == dist - 1);
-		CHECK(dest == FollowedPath(unit.tilePos + dir, unit.pathFinderData->output));
+		CHECK(unit.pathFinderData->output.Length == dist);
+		CHECK(dest == FollowedPath(unit.tilePos, unit.pathFinderData->output));
 
 		unit.Orders.clear();
 	}
@@ -132,10 +132,10 @@ TEST_CASE("PathFinding on clear map 128x128")
 
 		CHECK(0 < d);
 		CHECK(d <= std::size(unit.pathFinderData->output.Path));
-		CHECK(unit.pathFinderData->output.Length + unit.pathFinderData->output.OverflowLength == dist - 1);
+		CHECK(unit.pathFinderData->output.Length + unit.pathFinderData->output.OverflowLength == dist);
 
-		CHECK(unit.pathFinderData->output.Length == d - 1);
-		CHECK(unit.tilePos + Vec2i(0, d) == FollowedPath(unit.tilePos + dir, unit.pathFinderData->output));
+		CHECK(unit.pathFinderData->output.Length == d);
+		CHECK(unit.tilePos + Vec2i(0, d) == FollowedPath(unit.tilePos, unit.pathFinderData->output));
 
 		unit.Orders.clear();
 	}
