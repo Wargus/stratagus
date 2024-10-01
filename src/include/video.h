@@ -41,8 +41,8 @@
 #include "vec2i.h"
 
 #include <SDL.h>
-#include <guichan.hpp>
-#include <guichan/sdl/sdlimage.hpp>
+#include <guisan.hpp>
+#include <guisan/sdl/sdlimage.hpp>
 #include <memory>
 #include <string_view>
 #include <vector>

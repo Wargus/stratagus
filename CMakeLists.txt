@@ -699,7 +699,7 @@ include(CheckTypeSize)
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 
-vendored_guichan()
+vendored_guisan()
 
 # Windows RC compiler definitions
 
@@ -1114,7 +1114,7 @@ if (ENABLE_STDIO_REDIRECT)
 else ()
 	add_executable(stratagus src/stratagus/main.cpp)
 endif ()
-target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS} guichan_lib)
+target_link_libraries(stratagus_lib PUBLIC ${stratagus_LIBS} ${CMAKE_DL_LIBS} guisan_lib)
 target_link_libraries(stratagus PUBLIC stratagus_lib)
 
 target_include_directories(stratagus_lib SYSTEM PRIVATE third-party/mdns third-party/spiritless_po/include)

@@ -33,8 +33,8 @@
 //@{
 
 #include <SDL.h>
-#include <guichan.hpp>
-#include <guichan/sdl/sdlimage.hpp>
+#include <guisan.hpp>
+#include <guisan/sdl/sdlimage.hpp>
 
 #ifdef USE_VORBIS
 

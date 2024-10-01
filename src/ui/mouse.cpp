@@ -63,7 +63,7 @@
 #include "widgets.h"
 
 #include <cctype>
-#include <guichan/actionevent.hpp>
+#include <guisan/actionevent.hpp>
 #include <stdexcept>
 
 /*----------------------------------------------------------------------------

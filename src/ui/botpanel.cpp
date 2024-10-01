@@ -57,8 +57,8 @@
 #include "video.h"
 
 #include <cctype>
-#include <guichan/key.hpp>
-#include <guichan/sdl/sdlinput.hpp>
+#include <guisan/key.hpp>
+#include <guisan/sdl/sdlinput.hpp>
 #include <vector>
 #include <sstream>
 
