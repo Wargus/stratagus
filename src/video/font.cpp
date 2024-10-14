@@ -40,7 +40,7 @@
 #include "intern_video.h"
 #include "video.h"
 
-#include <guichan/sdl/sdlinput.hpp>
+#include <guisan/sdl/sdlinput.hpp>
 #include <map>
 #include <vector>
 
@@ -141,7 +141,7 @@ int CFont::getStringIndexAt(const std::string &text, int x) const /* override */
 }
 
 void CFont::drawString(
-	gcn::Graphics *graphics, const std::string &txt, int x, int y) /* override */
+	gcn::Graphics *graphics, const std::string &txt, int x, int y, bool /*enabled*/) /* override */
 {
 	DynamicLoad();
 	const gcn::ClipRectangle &r = graphics->getCurrentClipArea();
@@ -515,7 +515,7 @@ int convertSDLKeyCharacterToGuichanKey(int key)
 	event.type = SDL_KEYDOWN;
 	event.key.keysym.sym = (SDL_Keycode) key;
 	auto ret = input.convertSDLEventToGuichanKeyValue(event);
-	return ret == -1 ? key : ret;
+	return ret.getValue() == -1 ? key : ret.getValue();
 }
 
 /**

@@ -45,7 +45,7 @@
 #include "sound.h"
 #include "util.h"
 
-#include <guichan/text.hpp>
+#include <guisan/text.hpp>
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -171,8 +171,6 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 	HandleKeyModifiersDown(key, keychar);
 }
 
-sdl2::RendererPtr guichanRenderer;
-
 /**
 **  Initializes the GUI stuff
 */
@@ -183,8 +181,7 @@ void initGuichan()
 	// Set the target for the graphics object to be the screen.
 	// In other words, we will draw to the screen.
 	// Note, any surface will do, it doesn't have to be the screen.
-	guichanRenderer.reset(SDL_CreateSoftwareRenderer(TheScreen));
-	graphics->setTarget(guichanRenderer.get(), Video.Width, Video.Height);
+	graphics->setTarget(TheScreen);
 
 	Input = std::make_unique<gcn::SDLInput>();
 
