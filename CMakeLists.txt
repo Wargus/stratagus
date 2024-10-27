@@ -535,6 +535,7 @@ set(stratagus_tests_SRCS
 	tests/main.cpp
 	tests/stratagus/test_action_built.cpp
 	tests/stratagus/test_depend.cpp
+	tests/stratagus/test_format.cpp
 	tests/stratagus/test_luacallback.cpp
 	tests/stratagus/test_missile_fire.cpp
 	tests/stratagus/test_trigger.cpp
