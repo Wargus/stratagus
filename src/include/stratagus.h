@@ -118,7 +118,8 @@ std::string Format(const char *format, Ts... args)
 #endif
 	const auto len = snprintf(nullptr, 0, format, args...);
 	std::string res(len, '\0');
-	snprintf(res.data(), res.size(), format, args...);
+	// len+1: writing a '\0' over the existing '\0' should be fine
+	snprintf(res.data(), len + 1, format, args...);
 #ifndef _MSC_VER
 # pragma GCC diagnostic pop
 #endif
