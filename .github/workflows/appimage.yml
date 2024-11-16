@@ -17,11 +17,11 @@ jobs:
 #   container: centos:7
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build game ${{ matrix.game.id }}
         run: bash -x ./tools/build_appimage.sh ${{ matrix.game.id }} ${{ matrix.game.name }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.game.id }}
           retention-days: 90
