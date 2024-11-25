@@ -142,6 +142,9 @@ static std::unique_ptr<gcn::Container> editorContainer;
 static std::unique_ptr<gcn::Slider> editorSlider;
 static std::unique_ptr<gcn::DropDown> toolDropdown;
 static std::unique_ptr<gcn::DropDown> overlaysDropdown;
+
+static std::unique_ptr<CBrushControlsUI> brushesCtrlUI;
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -733,6 +736,7 @@ static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,i
 	return true;
 }
 
+/*
 static void DrawTileOptions() {
 	forEachTileOptionArea([](bool active, std::string str, int i, int x, int y, int w, int h) {
 		CLabel label(GetGameFont());
@@ -749,6 +753,7 @@ static void DrawTileOptions() {
 		return true;
 	});
 }
+*/
 
 /**
  * Call the forEach callback with each tile's <EditorTileIndex,x,y,w,h>. Return false to cancel iteration.
@@ -834,7 +839,7 @@ static void DrawIntoSelectionArea()
 			DrawPlayers();
 			break;
 		case EditorStateType::EditTile:
-			DrawTileOptions();
+//			DrawTileOptions();
 			break;
 		default:
 			break;
@@ -2091,6 +2096,8 @@ void EditorMainLoop()
 										  getSelectionArea()[cBottomRightY] - getSelectionArea()[cUpperLeftY]);
 
 	Editor.brushes.loadBrushes("scripts/editor/brushes.lua");
+	brushesCtrlUI = std::make_unique<CBrushControlsUI>(editorContainer.get(), rectangle);
+	brushesCtrlUI->hide();
 
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
@@ -2158,6 +2165,7 @@ void EditorMainLoop()
 		Editor.CursorUnitIndex = Editor.CursorTileIndex = Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
 		CursorBuilding = nullptr;
 		Editor.UnitIndex = Editor.TileIndex = 0;
+		brushesCtrlUI->hide();
 
 		if (selectedItem == "Select") {
 			Editor.State = EditorStateType::Selecting;
@@ -2167,6 +2175,7 @@ void EditorMainLoop()
 			Editor.State = EditorStateType::EditTile;
 			editorSlider->setVisible(true);
 			editorSlider->setValue(0);
+			brushesCtrlUI->show();
 
 		} else if (selectedItem == "Start Locations") {
 			Editor.State = EditorStateType::SetStartLocation;
@@ -2226,7 +2235,7 @@ void EditorMainLoop()
 	std::vector<std::string> overlaysListStrings = { "Overlays: None", "Unpassable", "No building allowed", "Elevation", "Opaque" };
 	auto overlaysList = std::make_unique<StringListModel>(overlaysListStrings);
 	overlaysDropdown = std::make_unique<gcn::DropDown>(overlaysList.get());
-	auto overlaysDropdownListener = std::make_unique<LambdaActionListener>([&overlaysListStrings](const std::string&) {
+	auto overlaysDropdownListener = std::make_unique<LambdaActionListener>([](const std::string&) {
 		const int selected = overlaysDropdown->getSelected();
 		switch (selected) {
 			case EditorOverlays::NoOverlays:
@@ -2249,7 +2258,6 @@ void EditorMainLoop()
 				Editor.OverlayHighlighter = nullptr;
 				break;
 		}
-
 	});
 
 	int overlaysWidth = 0;
