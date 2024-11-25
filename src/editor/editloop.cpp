@@ -115,6 +115,14 @@ enum EditorOverlays {
 	Elevation,
 	Opaque
 };
+
+enum Positions {
+	cUpperLeftX = 0,
+	cUpperLeftY,
+	cBottomRightX,
+	cBottomRightY
+};
+
 struct EditorAction {
 	EditorActionType Type;
 	Vec2i tilePos;
@@ -526,16 +534,16 @@ static std::vector<int> getButtonArea() {
  * iteration was requested.
  */
 static bool forEachPlayerSelectionBoxArea(std::function<bool(int, int, int, int, int)> forEach) {
-	int x = getSelectionArea()[0];
-	int y = getSelectionArea()[1];
-	int x2 = getSelectionArea()[2];
-	int y2 = getSelectionArea()[3];
+	int x = getSelectionArea()[cUpperLeftX];
+	int y = getSelectionArea()[cUpperLeftY];
+	int x2 = getSelectionArea()[cBottomRightX];
+	int y2 = getSelectionArea()[cBottomRightY];
 	int maxX = x2 - getPlayerButtonSize();
 	int maxY = y2 - getPlayerButtonSize();
 
 	for (int i = 0; i < PlayerMax; i++, x += getPlayerButtonSize()) {
 		if (x > maxX) {
-			x = getSelectionArea()[0];
+			x = getSelectionArea()[cUpperLeftX];
 			y += getPlayerButtonSize();
 		}
 		if (y > maxY) { /* FIXME: nothing we can do? */ }
@@ -591,10 +599,10 @@ static void DrawPlayers()
  * iteration was requested.
  */
 static bool forEachUnitIconArea(std::function<bool(int,ButtonStyle*,int,int,int,int)> forEach) {
-	int x1 = getButtonArea()[0];
-	int y1 = getButtonArea()[1];
-	int x2 = getButtonArea()[2];
-	int y2 = getButtonArea()[3];
+	int x1 = getButtonArea()[cUpperLeftX];
+	int y1 = getButtonArea()[cUpperLeftY];
+	int x2 = getButtonArea()[cBottomRightX];
+	int y2 = getButtonArea()[cBottomRightY];
 
 	int iconW = UI.ButtonPanel.Buttons[0].Style->Width + 2;
 	int iconH = UI.ButtonPanel.Buttons[0].Style->Height + 2;
@@ -674,10 +682,10 @@ static void DrawUnitIcons()
  * iteration was requested.
  */
 static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,int,int,int)> forEach) {
-	int x1 = getSelectionArea()[0];
-	int y1 = getSelectionArea()[1];
-	int x2 = getSelectionArea()[2];
-	int y2 = getSelectionArea()[3];
+	int x1 = getSelectionArea()[cUpperLeftX];
+	int y1 = getSelectionArea()[cUpperLeftY];
+	int x2 = getSelectionArea()[cBottomRightX];
+	int y2 = getSelectionArea()[cBottomRightY];
 
 	int labelHeight = GetGameFont().getHeight() + 1;
 	int labelMaxW = x2 - x1;
@@ -749,10 +757,10 @@ static void DrawTileOptions() {
  * iteration was requested.
  */
 static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach) {
-	int x1 = getButtonArea()[0];
-	int y1 = getButtonArea()[1];
-	int x2 = getButtonArea()[2];
-	int y2 = getButtonArea()[3];
+	int x1 = getButtonArea()[cUpperLeftX];
+	int y1 = getButtonArea()[cUpperLeftY];
+	int x2 = getButtonArea()[cBottomRightX];
+	int y2 = getButtonArea()[cBottomRightY];
 
 	int tileW = Map.Tileset.getPixelTileSize().x + 1;
 	int tileH = Map.Tileset.getPixelTileSize().y + 1;
@@ -2088,10 +2096,15 @@ void EditorMainLoop()
 	editorContainer->setOpaque(false);
 	Gui->setTop(editorContainer.get());
 
+	const auto rectangle = gcn::Rectangle(getSelectionArea()[cUpperLeftX],
+										  getSelectionArea()[cUpperLeftY],
+										  getSelectionArea()[cBottomRightX] - getSelectionArea()[cUpperLeftX],
+										  getSelectionArea()[cBottomRightY] - getSelectionArea()[cUpperLeftY]);
+	
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
 	editorSlider->setStepLength(1.0 / 50);
-	editorSlider->setWidth(getButtonArea()[2] - getButtonArea()[0] - 1);
+	editorSlider->setWidth(getButtonArea()[cBottomRightX] - getButtonArea()[cUpperLeftX] - 1);
 	editorSlider->setHeight(GetSmallFont().getHeight());
 	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
 	editorSlider->setForegroundColor(gcn::Color(200, 200, 120));
@@ -2130,7 +2143,9 @@ void EditorMainLoop()
 		}
 	});
 	editorSlider->addActionListener(editorSliderListener.get());
-	editorContainer->add(editorSlider.get(), getSelectionArea()[0], getSelectionArea()[3] - editorSlider->getHeight());
+	editorContainer->add(editorSlider.get(),
+						 getSelectionArea()[cUpperLeftX],
+						 getSelectionArea()[cBottomRightY] - editorSlider->getHeight());
 
 	// Mode selection is put into the status line
 	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
