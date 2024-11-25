@@ -38,6 +38,7 @@
 #include "icons.h"
 #include "viewport.h"
 #include "editor_brush.h"
+#include "editor_brush_ui.h"
 #ifndef __VEC2I_H__
 #include "vec2i.h"
 #endif

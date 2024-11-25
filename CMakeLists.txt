@@ -162,6 +162,7 @@ set(editor_SRCS
 	src/editor/edmap.cpp
 	src/editor/script_editor.cpp
 	src/editor/editor_brush.cpp
+	src/editor/editor_brush_ui.cpp
 )
 source_group(editor FILES ${editor_SRCS})
 
@@ -466,6 +467,7 @@ set(stratagus_generic_HDRS
 	src/include/depend.h
 	src/include/editor.h
 	src/include/editor_brush.h
+	src/include/editor_brush_ui.h
 	src/include/online_service.h
 	src/include/filesystem.h
 	src/include/font.h
