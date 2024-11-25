@@ -33,10 +33,9 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "stratagus.h"
 #include "editor.h"
 #include "script.h"
-
+#include "stratagus.h"
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -93,8 +92,113 @@ static int CclEditorResizeMap(lua_State *l)
 	return 1;
 }
 
+/*
+  Name = "Default",
+  Type = "SingleTile", -- MultiTile, Ramp 
+  Shape = "Rectangular", -- Round
+  Symmetric = false,
+  Allign = "UpperLeft",  -- Center
+  Resizable = true,
+  ResizeSteps = {1, 1},
+  MinSize = {1, 1},
+  MaxSize = {20, 20},
+  RandomizeAllowed = true,
+  FixNeighborsAllowed = true
+*/
+
 static int CclEditorAddBrush(lua_State *l)
 {
+
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	CBrush::Properties properties;
+	std::string name("Default");
+
+	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+		const std::string_view value = LuaToString(l, -2);
+		if (value == "Name") {
+			name = std::string(LuaToString(l, -1));
+
+		} else if (value == "Type") {
+			const std::string_view type = LuaToString(l, -1);
+			if (type == "SingleTile") {
+				properties.type = CBrush::BrushTypes::SingleTile;
+			} else if (type == "MultiTile") {
+				properties.type = CBrush::BrushTypes::MultiTile;
+			} else if (type == "Ramp") {
+				properties.type = CBrush::BrushTypes::Ramp;
+			} else {
+				ErrorPrint("Incorrect brush type '%s'\n", LuaToString(l, -1).data());
+			}
+
+		} else if (value == "Shape") {
+			const std::string_view shape = LuaToString(l, -1);
+			if (shape == "Rectangular") {
+				properties.shape = CBrush::BrushShapes::Rectangular;
+			} else if (shape == "Round") {
+				properties.shape = CBrush::BrushShapes::Round;
+			} else {
+				ErrorPrint("Incorrect brush shape '%s'\n", LuaToString(l, -1).data());
+			}
+
+		} else if (value == "Allign") {
+			const std::string_view allign = LuaToString(l, -1);
+			if (allign == "UpperLeft") {
+				properties.allign = CBrush::BrushAllign::UpperLeft;
+			} else if (allign == "Center") {
+				properties.allign = CBrush::BrushAllign::Center;
+			} else {
+				ErrorPrint("Incorrect brush allign '%s'\n", LuaToString(l, -1).data());
+			}
+
+		} else if (value == "Resizable") {
+			properties.resizable = LuaToBoolean(l, -1);
+
+		} else if (value == "ResizeSteps") {
+			if (!lua_istable(l, -1)) {
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			const int args = lua_rawlen(l, -1);
+			if (args != 2) {
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			properties.resizeSteps.width = LuaToUnsignedNumber(l, -1, 1);
+			properties.resizeSteps.height = LuaToUnsignedNumber(l, -1, 2);
+
+		} else if (value == "MinSize") {
+			if (!lua_istable(l, -1)) {
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			const int args = lua_rawlen(l, -1);
+			if (args != 2) {
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			properties.minSize.width = LuaToUnsignedNumber(l, -1, 1);
+			properties.minSize.height = LuaToUnsignedNumber(l, -1, 2);
+
+		} else if (value == "MaxSize") {
+			if (!lua_istable(l, -1)) {
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			const int args = lua_rawlen(l, -1);
+			if (args != 2) {
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+			}
+			properties.maxSize.width = LuaToUnsignedNumber(l, -1, 1);
+			properties.maxSize.height = LuaToUnsignedNumber(l, -1, 2);
+
+		} else if (value == "RandomizeAllowed") {
+			properties.randomizeAllowed = LuaToBoolean(l, -1);
+
+		} else if (value == "FixNeighborsAllowed") {
+			properties.fixNeighborsAllowed = LuaToBoolean(l, -1);
+		}
+	}
+	Editor.brushes.addBrush(CBrush(name, properties));
+
 	return 0;
 }
 

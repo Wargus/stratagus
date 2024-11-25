@@ -72,9 +72,6 @@ public:
 
 	void Init();
 
-	void LoadBrushes();
-	CBrush &getCurrentBrush() { return curentBrush == -1 ? defaultBrush : brushes[curentBrush]; };
-
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false) const;
 
@@ -113,11 +110,7 @@ public:
 
 	fieldHighlightChecker OverlayHighlighter {nullptr};
 
-private:
-	CBrush defaultBrush{CBrush::BrushTypes::SingleTile, 1, 1};
-	std::vector<CBrush> brushes;
-	int16_t curentBrush = -1;
-	std::string BrushesSrc = "scripts/editor/brushes.lua";
+	CBrushesSet brushes;
 };
 
 /*----------------------------------------------------------------------------

@@ -950,7 +950,7 @@ static void UpdateMapCursor()
 		if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
 			DrawMapCursor(tilePos,
 						  screenPos,
-						  Editor.getCurrentBrush());
+						  Editor.brushes.getCurrentBrush());
 
 		} else if (Editor.State == EditorStateType::EditRamps) {
 /*
@@ -1305,8 +1305,8 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.CursorTileIndex != -1) {
 				Editor.SelectedTileIndex = Editor.CursorTileIndex;
 
-				if (Editor.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
-					Editor.getCurrentBrush().setTile(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
+				if (Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
+					Editor.brushes.getCurrentBrush().setTile(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
 				}
 				return;
 			}
@@ -1397,7 +1397,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.State == EditorStateType::EditTile 
 				&& (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
 
-				EditTiles(tilePos, Editor.getCurrentBrush());
+				EditTiles(tilePos, Editor.brushes.getCurrentBrush());
 
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
@@ -1825,7 +1825,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
-			EditTiles(tilePos, Editor.getCurrentBrush());
+			EditTiles(tilePos, Editor.brushes.getCurrentBrush());
 		} else if (Editor.State == EditorStateType::EditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
@@ -2028,17 +2028,6 @@ void CEditor::Init()
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
 	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
 	EditorCallbacks.NetworkEvent = NetworkEvent;
-
-	LoadBrushes();
-}
-
-void CEditor::LoadBrushes()
-{
-	brushes.clear();
-
-	if (fs::exists(LibraryFileName(BrushesSrc))) {
-		LoadCcl(fs::path(BrushesSrc));
-	}
 }
 
 /**
@@ -2100,7 +2089,9 @@ void EditorMainLoop()
 										  getSelectionArea()[cUpperLeftY],
 										  getSelectionArea()[cBottomRightX] - getSelectionArea()[cUpperLeftX],
 										  getSelectionArea()[cBottomRightY] - getSelectionArea()[cUpperLeftY]);
-	
+
+	Editor.brushes.loadBrushes("scripts/editor/brushes.lua");
+
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
 	editorSlider->setStepLength(1.0 / 50);
