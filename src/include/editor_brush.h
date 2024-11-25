@@ -33,6 +33,7 @@
 #include <cstdint>
 #include "tileset.h"
 #include "vec2i.h"
+#include "widgets.h"
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -62,42 +63,23 @@ public:
 
 	using brushApplyFn = std::function<void(const TilePos&, tile_index)>; // type alias
 
+	struct Properties;
+
 public:
-	explicit CBrush(BrushTypes type,
-					uint8_t w,
-					uint8_t h,
-					BrushShapes shape = BrushShapes::Rectangular,
-					BrushAllign allignTo = BrushAllign::UpperLeft)
+	explicit CBrush(std::string name,
+					CBrush::Properties properties)
 	{
-		properties.type = type;
-		properties.shape = shape;
-		setAllign(allignTo);
-		setSize(w, h);
+		this->name = std::move(name);
+		this->properties = std::move(properties);
+		setSize(this->properties.minSize.width, this->properties.minSize.height);
 	}
-	explicit CBrush(BrushTypes type,
-					uint8_t w,
-					uint8_t h,
-					tile_index tile,
-					BrushShapes shape = BrushShapes::Rectangular,
-					BrushAllign allignTo = BrushAllign::UpperLeft)
+	explicit CBrush(std::string name,
+					CBrush::Properties properties,
+					const std::vector<tile_index> &tilesSrc)
 	{
-		properties.type = type;
-		properties.shape = shape;
-		setAllign(allignTo);
-		setSize(w, h);
-		fillWith(tile, true);
-	}
-	explicit CBrush(BrushTypes type,
-					uint8_t w,
-					uint8_t h,
-					const std::vector<tile_index> &tilesSrc,
-					BrushShapes shape = BrushShapes::Rectangular,
-					BrushAllign allignTo = BrushAllign::UpperLeft)
-	{
-		properties.type = type;
-		properties.shape = shape;
-		setAllign(allignTo);
-		setSize(w, h);
+		this->name = std::move(name);
+		this->properties = std::move(properties);
+		setSize(this->properties.minSize.width, this->properties.minSize.height);
 		fillWith(tilesSrc);
 	}
 
@@ -125,11 +107,37 @@ public:
 
 	bool isCentered() const { return properties.allign == BrushAllign::Center; }
 
-	void setSize(uint8_t newWidth, uint8_t newHeight);
+	void resizeW(uint8_t newWidth);
+	void resizeH(uint8_t newHeight);
+	void resize(uint8_t newWidth, uint8_t newHeight);
 
-	void setAutoRandomization(bool enable = true) { autoRndEnabled = enable; }
+	uint8_t getWidth() { return width; }
+	uint8_t getHeight() { return height; }
+
+	Vec2i getResizeSteps() const { return { properties.resizeSteps.width, properties.resizeSteps.height}; }
+	Vec2i getMaxSize() const { return { properties.maxSize.width, properties.maxSize.height}; }
+	Vec2i getMinSize() const { return { properties.minSize.width, properties.minSize.height}; }
+
+	bool isResizeble() const { return properties.resizable; }
+	bool isRandomizeAllowed() const { return properties.randomizeAllowed; }
+	bool isNeighborsFixAllowed() const { return properties.fixNeighborsAllowed; }
+
+	void setAutoRandomizable(bool enable = true)
+	{
+		autoRndEnabled = properties.randomizeAllowed ? enable : false;
+	}
+	bool getAutoRandomizable() const { return autoRndEnabled; }
+	void setFixNeighbors(bool enable = true)
+	{ 
+		fixNeighborsEnabled = properties.fixNeighborsAllowed ? enable : false;
+	}
+	bool getFixNeighbors() const { return fixNeighborsEnabled; }
+	
+	std::string getName() const { return name; }
+	void setName(const std::string &name) { this->name = name; }
 
 protected:
+	void setSize(uint8_t newWidth, uint8_t newHeight);
 	bool withinBounds(uint8_t col, uint8_t row) const { return col < width && row < height; }
 
 	void drawCircle(int16_t xCenter,
@@ -139,25 +147,68 @@ protected:
 	                std::vector<tile_index> &canvas);
 
 	tile_index randomizeTile(tile_index tileIdx) const;
-
-protected:
-	struct {
+	tile_index getCurrentTile() const;
+	
+public:
+	struct Properties { // with default settings
 		BrushTypes type = BrushTypes::SingleTile;
 		BrushShapes shape = BrushShapes::Rectangular;
 		BrushAllign allign = BrushAllign::UpperLeft;
 		bool resizable = true;
 		struct {
-			uint8_t width = 1;
-			uint8_t height = 1;
-		} resizeSteps;
-		bool randomizeAllowed = true;
-	} properties;
+			uint8_t width;
+			uint8_t height;
+		} 
+		resizeSteps{1, 1}, 
+		minSize{1, 1},
+		maxSize{20, 20};
 
-	bool autoRndEnabled = true;
+		bool randomizeAllowed = true;
+		bool fixNeighborsAllowed = true;
+	};
+
+protected:
+	Properties properties;
+
+	std::string name;
+	bool autoRndEnabled = false;
+	bool fixNeighborsEnabled = false;
 
 	bool isInit = false;
 
-	uint8_t width = 0;
-	uint8_t height = 0;
+	uint8_t width = 1;
+	uint8_t height = 1;
 	std::vector<tile_index> tiles;
+};
+
+class CBrushesSet
+{
+public:
+	CBrushesSet()
+	{
+		loadBrushes();
+	}
+
+	CBrushesSet(std::string_view brushesSrc)
+	{ 
+		loadBrushes(brushesSrc);
+	}
+	~CBrushesSet() { brushes.clear(); }
+
+public:
+	void loadBrushes(std::string_view brushesSrc = {});
+	bool isLoaded() const { return !brushes.empty(); }
+
+	CBrush &getCurrentBrush() { return *currentBrush; }
+	
+	bool setCurrentBrush(std::string_view name);
+	void addBrush(CBrush brush) { brushes.push_back(std::move(brush)); }
+
+	std::vector<std::string> getBrushesNames() const;
+
+private:
+	std::string brushesSrc;
+	std::list<CBrush> brushes;
+	CBrush defaultBrush {std::string("Default"), CBrush::Properties()};
+	CBrush *currentBrush = nullptr;
 };
