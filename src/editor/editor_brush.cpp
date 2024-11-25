@@ -33,10 +33,11 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
-#include "editor_brush.h"
-#include "util.h"
-#include "map.h"
 
+#include "editor_brush.h"
+
+#include "editor.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -154,6 +155,35 @@ TilePos CBrush::getAllignOffset() const
 
 void CBrush::setSize(uint8_t newWidth, uint8_t newHeight)
 {
+	width = newWidth;
+	height = newHeight;
+	tiles.resize(width * height, 0);
+}
+
+void CBrush::resizeW(uint8_t newWidth)
+{
+	resize(newWidth, this->height);
+}
+
+void CBrush::resizeH(uint8_t newHeight)
+{
+	resize(this->width, newHeight);
+}
+
+void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
+{
+	if (!properties.resizable) {
+		return;
+	}
+	if (newWidth != this->width && properties.resizeSteps.width == 0) {
+		return;
+	}
+	if (newHeight != this->height && properties.resizeSteps.height == 0) {
+		return;
+	}
+
+	const auto currentTile = properties.type == BrushTypes::SingleTile ? getCurrentTile() : 0;
+	
 	tiles.clear();
 	width = newWidth;
 	height = newHeight;
@@ -165,9 +195,23 @@ void CBrush::setSize(uint8_t newWidth, uint8_t newHeight)
 		height = width;
 	}
 	tiles.resize(width * height, 0);
+	
+	if (properties.type == BrushTypes::SingleTile) {
+		fillWith(currentTile, true);
+	}
 	/// FIXME: Init|fill
 }
 
+
+tile_index CBrush::getCurrentTile() const
+{
+	for (const auto &tile : tiles) {
+		if (tile) {
+			return tile;
+		}
+	}
+	return 0;
+}
 
 // Bresenham algorithm 
 void CBrush::drawCircle(int16_t xCenter, int16_t yCenter, int16_t diameter, tile_index tile, std::vector<tile_index> &canvas)
@@ -207,4 +251,47 @@ void CBrush::drawCircle(int16_t xCenter, int16_t yCenter, int16_t diameter, tile
 	}
 }
 
+void CBrushesSet::loadBrushes(std::string_view brushesSrc /* = {} */)
+{
+	brushes.clear();
+	if (!brushesSrc.empty()) {
+		this->brushesSrc = brushesSrc;
+		const fs::path filename = LibraryFileName(this->brushesSrc);
+		if (LuaLoadFile(filename) == -1) {
+			ErrorPrint("Load failed: \"%s\"\n", filename.u8string().c_str());
+			this->brushesSrc = {};
+		}
+	}
+	if (brushes.empty()) {
+		brushes.push_back(defaultBrush);
+	}
+	setCurrentBrush(brushes.begin()->getName());
+}
+
+bool CBrushesSet::setCurrentBrush(std::string_view name)
+{
+	Assert(!brushes.empty());
+
+	const CBrush *prev = currentBrush;
+	for (auto &brush : brushes) {
+		if (brush.getName() == name ) {
+			currentBrush = &brush;
+			break;
+		}
+	}
+	if (prev == currentBrush) {
+		return false;
+	}
+	return true;
+};
+
+std::vector<std::string> CBrushesSet::getBrushesNames() const
+{
+	std::vector<std::string> result;
+
+	for (const auto &brush : brushes) {
+		result.push_back(brush.getName());
+	}
+	return result;
+}
 //@}
