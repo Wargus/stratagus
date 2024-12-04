@@ -69,6 +69,7 @@ void CBrushControlsUI::reloadBrushes()
 void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &rectangle)
 {
 	UIRectangle = rectangle;
+	this->container = parrent;
 
 	brushesList = std::make_unique<StringListModel>(Editor.brushes.getBrushesNames());
 	brushSelect = std::make_unique<gcn::DropDown>(brushesList.get());
@@ -84,13 +85,12 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	brushesDropdownListener = 
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
 		const int selected = brushSelect->getSelected();
+		const auto prevBrush = Editor.brushes.getCurrentBrush();
 		if (Editor.brushes.setCurrentBrush(brushesList->getElementAt(selected))) {
 			reloadCtrlSettings();
 		}
-		DebugPrint("Current brush is: %s\n", brushesList->getElementAt(selected).c_str());
 	});
 	brushSelect->addActionListener(brushesDropdownListener.get());
-
 
 	sizeSlider = std::make_unique<gcn::Slider>();
 	sizeSlider->setWidth(UIRectangle.width - 32);
@@ -103,7 +103,6 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	parrent->add(sizeSlider.get(),
 				 16,
 				 brushSelect->getY() + brushSelect->getHeight() + verticalGap);
-
 
 	allowResize.insert({"Both",
 						 std::make_unique<gcn::RadioButton>("Size", "BrushSize", true)});
@@ -148,11 +147,9 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 		} else {
 			Editor.brushes.getCurrentBrush().resizeH(size);
 		}
-
 	});
 	sizeSlider->addActionListener(brushSizeSliderListener.get());
 
-	
 	enableRnd = std::make_unique<gcn::CheckBox>("Random");
 	enableRnd->setHeight(14);
 	enableRnd->setFont(&GetGameFont());
@@ -179,51 +176,58 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 void CBrushControlsUI::reloadCtrlSettings()
 {
 	const auto brush = Editor.brushes.getCurrentBrush();
-	enableRnd->setSelected(brush.getAutoRandomizable());
 	enableRnd->setVisible(brush.isRandomizeAllowed());
+	enableRnd->setSelected(brush.getAutoRandomizable());
 
-	fixNeighbors->setSelected(brush.getFixNeighbors());
 	fixNeighbors->setVisible(brush.isNeighborsFixAllowed());
+	fixNeighbors->setSelected(brush.getFixNeighbors());
 
 	updateSizeCtrls();
 }
 
 void CBrushControlsUI::updateSizeCtrls()
 {
-	const auto brush = Editor.brushes.getCurrentBrush();
+	const auto &brush = Editor.brushes.getCurrentBrush();
 
-	sizeSlider->setVisible(brush.isResizeble());
-	for (auto &[name, radioButton] : allowResize) {
-		radioButton->setVisible(brush.isResizeble());
-	}
-	if (!brush.isResizeble()) {
+	if (!brush.isResizable()) {
+		sizeSlider->setVisible(false);
+		for (auto &[name, radioButton] : allowResize) {
+			radioButton->setVisible(false);
+		}
 		return;
 	}
-
 	const auto resizeSteps = brush.getResizeSteps();
-
 	const auto allowed = resizeSteps.x && resizeSteps.y ? ResizeAllowed::cBoth
 					   : resizeSteps.x					? ResizeAllowed::cWidthOnly
 														: ResizeAllowed::cHeightOnly;
+	if (brush.isSymmetric()) {
 
-	const auto selected = allowed == ResizeAllowed::cBoth      ? "Both"
-						: allowed == ResizeAllowed::cWidthOnly ? "WidthOnly"
-															   : "HeightOnly";
-	allowResize[selected]->setSelected(true);
+		allowResize["Both"]->setVisible(brush.isResizable());
+		allowResize["Both"]->setSelected(true);
+		allowResize["WidthOnly"]->setVisible(false);
+		allowResize["HeightOnly"]->setVisible(false);
 
-	allowResize["Both"]->setEnabled(allowed == cBoth);
-	allowResize["WidthOnly"]->setEnabled(allowed == cBoth || allowed == cWidthOnly);
-	allowResize["HeightOnly"]->setEnabled(allowed == cBoth || allowed == cHeightOnly);
+	} else {
 
-	const auto maxSizes = brush.getMaxSize();
+		allowResize["Both"]->setVisible(allowed == cBoth);
+		allowResize["WidthOnly"]->setVisible(allowed == cBoth || allowed == cWidthOnly);
+		allowResize["HeightOnly"]->setVisible(allowed == cBoth || allowed == cHeightOnly);
+
+		const auto selected = allowed == ResizeAllowed::cBoth      ? "Both"
+							: allowed == ResizeAllowed::cWidthOnly ? "WidthOnly"
+																   : "HeightOnly";
+		allowResize[selected]->setSelected(true);
+	}
+	
+	sizeSlider->setVisible(true);
 
 	if (allowed == ResizeAllowed::cBoth || allowed == ResizeAllowed::cWidthOnly) {
-		sizeSlider->setScale(brush.getMinSize().x, maxSizes.x);
-		sizeSlider->setStepLength(brush.getResizeSteps().x);
+		sizeSlider->setScale(brush.getMinSize().x, brush.getMaxSize().x);
+		sizeSlider->setStepLength(resizeSteps.x);
 		sizeSlider->setValue(brush.getWidth());
 	} else {
-		sizeSlider->setScale(brush.getMinSize().y, maxSizes.y);
-		sizeSlider->setStepLength(brush.getResizeSteps().y);
+		sizeSlider->setScale(brush.getMinSize().y, brush.getMaxSize().y);
+		sizeSlider->setStepLength(resizeSteps.y);
 		sizeSlider->setValue(brush.getHeight());
 	}
 }
