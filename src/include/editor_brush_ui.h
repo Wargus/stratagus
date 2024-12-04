@@ -64,7 +64,8 @@ private:
 	void updateSizeCtrls();
 
 private:
-	std::list<gcn::Widget*> controls;
+	gcn::Container *container = nullptr;
+	std::list<gcn::Widget *> controls;
 
 	std::unique_ptr<gcn::DropDown> brushSelect;
 	std::unique_ptr<StringListModel> brushesList;
@@ -79,7 +80,7 @@ private:
 	std::unique_ptr<gcn::CheckBox> enableRnd;
 	std::unique_ptr<gcn::CheckBox> fixNeighbors;
 
-	gcn::Rectangle UIRectangle{};
+	gcn::Rectangle UIRectangle {};
 	int16_t verticalGap = 10;
 
 	gcn::Color baseColor {38, 38, 78};
