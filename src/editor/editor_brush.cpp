@@ -263,7 +263,7 @@ void CBrushesSet::loadBrushes(std::string_view brushesSrc /* = {} */)
 		}
 	}
 	if (brushes.empty()) {
-		brushes.push_back(defaultBrush);
+		brushes.push_back(CBrush(std::string("Default"), CBrush::Properties()));
 	}
 	setCurrentBrush(brushes.begin()->getName());
 }
@@ -272,14 +272,19 @@ bool CBrushesSet::setCurrentBrush(std::string_view name)
 {
 	Assert(!brushes.empty());
 
-	const CBrush *prev = currentBrush;
+	const auto prev = currentBrush.getName();
 	for (auto &brush : brushes) {
-		if (brush.getName() == name ) {
-			currentBrush = &brush;
+		if (brush.getName() == name) {
+			currentBrush = brush;
+			const auto selectedTile = Editor.getSelectedTile();
+			if (selectedTile && currentBrush.getType() == CBrush::BrushTypes::SingleTile) {
+				currentBrush.setTile(*selectedTile);
+			}
 			break;
 		}
 	}
-	if (prev == currentBrush) {
+
+	if (prev == currentBrush.getName()) {
 		return false;
 	}
 	return true;
