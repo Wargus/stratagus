@@ -73,6 +73,14 @@ public:
 
 	void Init();
 
+	std::optional<tile_index> getSelectedTile()
+	{
+		if (SelectedTileIndex != -1 && SelectedTileIndex < ShownTileTypes.size()) {
+			return ShownTileTypes[SelectedTileIndex];
+		}
+		return std::nullopt;
+	}
+
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false) const;
 

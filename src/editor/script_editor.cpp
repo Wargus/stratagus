@@ -143,6 +143,8 @@ static int CclEditorAddBrush(lua_State *l)
 			} else {
 				ErrorPrint("Incorrect brush shape '%s'\n", LuaToString(l, -1).data());
 			}
+		} else if (value == "Symmetric") {
+					properties.symmetric = LuaToBoolean(l, -1);
 
 		} else if (value == "Allign") {
 			const std::string_view allign = LuaToString(l, -1);
