@@ -143,7 +143,7 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 
 		if (allowResize["Both"]->isSelected()) {
 			Editor.brushes.getCurrentBrush().resize(size, size);
-		} else if (allowResize["Width"]->isSelected()) {
+		} else if (allowResize["WidthOnly"]->isSelected()) {
 			Editor.brushes.getCurrentBrush().resizeW(size);
 		} else {
 			Editor.brushes.getCurrentBrush().resizeH(size);
