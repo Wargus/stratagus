@@ -118,7 +118,8 @@ public:
 	Vec2i getMaxSize() const { return { properties.maxSize.width, properties.maxSize.height}; }
 	Vec2i getMinSize() const { return { properties.minSize.width, properties.minSize.height}; }
 
-	bool isResizeble() const { return properties.resizable; }
+	bool isSymmetric() const { return properties.symmetric; }
+	bool isResizable() const { return properties.resizable; }
 	bool isRandomizeAllowed() const { return properties.randomizeAllowed; }
 	bool isNeighborsFixAllowed() const { return properties.fixNeighborsAllowed; }
 
@@ -154,6 +155,7 @@ public:
 		BrushTypes type = BrushTypes::SingleTile;
 		BrushShapes shape = BrushShapes::Rectangular;
 		BrushAllign allign = BrushAllign::UpperLeft;
+		bool symmetric = false;
 		bool resizable = true;
 		struct {
 			uint8_t width;
@@ -199,7 +201,7 @@ public:
 	void loadBrushes(std::string_view brushesSrc = {});
 	bool isLoaded() const { return !brushes.empty(); }
 
-	CBrush &getCurrentBrush() { return *currentBrush; }
+	CBrush &getCurrentBrush() { return currentBrush; }
 	
 	bool setCurrentBrush(std::string_view name);
 	void addBrush(CBrush brush) { brushes.push_back(std::move(brush)); }
@@ -209,6 +211,5 @@ public:
 private:
 	std::string brushesSrc;
 	std::list<CBrush> brushes;
-	CBrush defaultBrush {std::string("Default"), CBrush::Properties()};
-	CBrush *currentBrush = nullptr;
+	CBrush currentBrush {std::string("Default"), CBrush::Properties()};
 };

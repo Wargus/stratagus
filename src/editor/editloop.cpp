@@ -1309,9 +1309,10 @@ static void EditorCallbackButtonDown(unsigned button)
 		} else {
 			if (Editor.CursorTileIndex != -1) {
 				Editor.SelectedTileIndex = Editor.CursorTileIndex;
-
-				if (Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
-					Editor.brushes.getCurrentBrush().setTile(Editor.ShownTileTypes[Editor.SelectedTileIndex]);
+				const auto selectedTile = Editor.getSelectedTile();
+				if (selectedTile
+					&& Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
+					Editor.brushes.getCurrentBrush().setTile(*selectedTile);
 				}
 				return;
 			}
