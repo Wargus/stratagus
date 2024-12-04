@@ -690,84 +690,6 @@ static void DrawUnitIcons()
 }
 
 /**
- * Call the forEach callback with each tile option buttons' <is-active boolean,label string,i,x,y,w,h>.
- * Return false to cancel iteration.
- *
- * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
- * iteration was requested.
- */
-static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,int,int,int)> forEach) {
-	int x1 = getSelectionArea()[cUpperLeftX];
-	int y1 = getSelectionArea()[cUpperLeftY];
-	int x2 = getSelectionArea()[cBottomRightX];
-	int y2 = getSelectionArea()[cBottomRightY];
-
-	int labelHeight = GetGameFont().getHeight() + 1;
-	int labelMaxW = x2 - x1;
-	int labelX = x1;
-	int labelY = y1;
-
-	const std::vector<std::pair<bool, std::string>> compactOptions = {
-		{ TileCursorSize == 1, "1x1" },
-		{ TileCursorSize == 2, "2x2" },
-		{ TileCursorSize == 3, "3x3" },
-		{ TileCursorSize == 4, "4x4" },
-		{ TileCursorSize == 5, "5x5" },
-		{ TileCursorSize == 10, "10x10" }
-	};
-
-	const std::vector<std::pair<bool, std::string>> options = {
-		{ TileToolRandom != 0, "Random" },
-		{ TileToolDecoration != 0, "Filler" },
-		{ TileToolNoFixup != 0, "Manual" }
-	};
-
-	int i = 0;
-	int compactX = labelX;
-	while ((size_t)i < compactOptions.size()) {
-		auto opt = compactOptions[i];
-		if (!forEach(opt.first, opt.second, i, compactX, labelY, labelMaxW / 2, labelHeight)) {
-			return false;
-		}
-		if (i % 2 == 0) {
-			compactX = labelX + labelMaxW / 2;
-		} else {
-			compactX = labelX;
-			labelY += labelHeight;
-		}
-		i++;
-	}
-	for (auto opt : options) {
-		if (!forEach(opt.first, opt.second, i, labelX, labelY, labelMaxW, labelHeight)) {
-			return false;
-		}
-		labelY += labelHeight;
-		i++;
-	}
-
-	return true;
-}
-
-/*
-static void DrawTileOptions() {
-	forEachTileOptionArea([](bool active, std::string str, int i, int x, int y, int w, int h) {
-		CLabel label(GetGameFont());
-		if (active) {
-			label.DrawReverseCentered(x + w / 2, y, str);
-		} else {
-			label.DrawCentered(x + w / 2, y, str);
-		}
-
-		if (ButtonUnderCursor == i + 300) {
-			Video.DrawRectangle(ColorGray, x, y - 1, w, h);
-		}
-
-		return true;
-	});
-}
-*/
-
-/**
  * Call the forEach callback with each tile's <EditorTileIndex,x,y,w,h>. Return false to cancel iteration.
  *
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
@@ -1734,6 +1656,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
+/*
 	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string &label, int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 			ButtonUnderCursor = i + 300;
@@ -1742,8 +1665,8 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 		}
 		return true;
 	});
-
-	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
+*/
+	bool noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
 
 			if (i >= Editor.ShownTileTypes.size()) return true;
