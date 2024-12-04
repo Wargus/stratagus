@@ -148,6 +148,18 @@ static std::unique_ptr<CBrushControlsUI> brushesCtrlUI;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+/**
+**  Release the memory allocated to the editor's controls
+**  in the correct order
+*/
+static void EditorClearControls()
+{
+	brushesCtrlUI.reset();
+	toolDropdown.reset();
+	overlaysDropdown.reset();
+	editorContainer.reset();
+	editorSlider.reset();
+}
 
 /*----------------------------------------------------------------------------
 --  Edit
@@ -1530,6 +1542,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				break;
 			}
+			EditorClearControls();
 			Exit(0);
 			break;
 
@@ -2359,10 +2372,7 @@ void EditorMainLoop()
 	SetCallbacks(old_callbacks);
 	Gui->setTop(oldTop);
 
-	toolDropdown.reset();
-	overlaysDropdown.reset();
-	editorContainer.reset();
-	editorSlider.reset();
+	EditorClearControls();
 }
 
 /**
