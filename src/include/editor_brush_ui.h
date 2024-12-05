@@ -78,7 +78,9 @@ private:
 	std::map<std::string, std::unique_ptr<gcn::RadioButton>> allowResize;
 
 	std::unique_ptr<gcn::CheckBox> enableRnd;
+	std::unique_ptr<LambdaActionListener> enableRndListener;
 	std::unique_ptr<gcn::CheckBox> fixNeighbors;
+	std::unique_ptr<LambdaActionListener> fixNeighborsListener;
 
 	gcn::Rectangle UIRectangle {};
 	int16_t verticalGap = 10;

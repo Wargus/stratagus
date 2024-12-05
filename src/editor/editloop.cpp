@@ -197,7 +197,9 @@ static void EditTile(const Vec2i &pos, int32_t tileIdx)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorTileChanged(pos);
+	if (Editor.brushes.getCurrentBrush().isFixNeighborsEnabled()) {
+		EditorTileChanged(pos);
+	}
 	UpdateMinimap = true;
 }
 
