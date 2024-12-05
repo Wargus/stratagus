@@ -71,6 +71,8 @@ public:
 	{
 		this->name = std::move(name);
 		this->properties = std::move(properties);
+		autoRndEnabled = this->properties.randomizeAllowed;
+		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
 		setSize(this->properties.minSize.width, this->properties.minSize.height);
 	}
 	explicit CBrush(std::string name,
@@ -79,6 +81,8 @@ public:
 	{
 		this->name = std::move(name);
 		this->properties = std::move(properties);
+		autoRndEnabled = this->properties.randomizeAllowed;
+		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
 		setSize(this->properties.minSize.width, this->properties.minSize.height);
 		fillWith(tilesSrc);
 	}
@@ -123,16 +127,16 @@ public:
 	bool isRandomizeAllowed() const { return properties.randomizeAllowed; }
 	bool isNeighborsFixAllowed() const { return properties.fixNeighborsAllowed; }
 
-	void setAutoRandomizable(bool enable = true)
+	void enableAutoRandomization(bool enable = true)
 	{
 		autoRndEnabled = properties.randomizeAllowed ? enable : false;
 	}
-	bool getAutoRandomizable() const { return autoRndEnabled; }
-	void setFixNeighbors(bool enable = true)
+	bool isAutoRandomizationEnabled() const { return autoRndEnabled; }
+	void enableFixNeighbors(bool enable = true)
 	{ 
 		fixNeighborsEnabled = properties.fixNeighborsAllowed ? enable : false;
 	}
-	bool getFixNeighbors() const { return fixNeighborsEnabled; }
+	bool isFixNeighborsEnabled() const { return fixNeighborsEnabled; }
 	
 	std::string getName() const { return name; }
 	void setName(const std::string &name) { this->name = name; }

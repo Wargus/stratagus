@@ -161,6 +161,12 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 				 + allowResize["HeightOnly"]->getHeight()
 				 + verticalGap);
 
+	enableRndListener = 
+	std::make_unique<LambdaActionListener>([this](const std::string&) {
+		Editor.brushes.getCurrentBrush().enableAutoRandomization(enableRnd->isSelected());
+	});
+	enableRnd->addActionListener(enableRndListener.get());
+
 	fixNeighbors = std::make_unique<gcn::CheckBox>("Fix neighbors");
 	fixNeighbors->setHeight(14);
 	fixNeighbors->setFont(&GetGameFont());
@@ -170,6 +176,12 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 				 enableRnd->getX(),
 				 enableRnd->getY() + enableRnd->getHeight() + verticalGap);
 
+	fixNeighborsListener = 
+	std::make_unique<LambdaActionListener>([this](const std::string&) {
+		Editor.brushes.getCurrentBrush().enableFixNeighbors(fixNeighbors->isSelected());
+	});
+	fixNeighbors->addActionListener(fixNeighborsListener.get());
+
 	reloadCtrlSettings();
 }
 
@@ -177,10 +189,10 @@ void CBrushControlsUI::reloadCtrlSettings()
 {
 	const auto brush = Editor.brushes.getCurrentBrush();
 	enableRnd->setVisible(brush.isRandomizeAllowed());
-	enableRnd->setSelected(brush.getAutoRandomizable());
+	enableRnd->setSelected(brush.isAutoRandomizationEnabled());
 
 	fixNeighbors->setVisible(brush.isNeighborsFixAllowed());
-	fixNeighbors->setSelected(brush.getFixNeighbors());
+	fixNeighbors->setSelected(brush.isFixNeighborsEnabled());
 
 	updateSizeCtrls();
 }
