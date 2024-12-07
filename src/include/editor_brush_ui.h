@@ -47,14 +47,8 @@ public:
 	}
 	~CBrushControlsUI() = default;
 
-	void setVisibe(const bool value)
-	{ 
-		for(auto &ctrl : controls) {
-			ctrl->setVisible(value);
-		}
-	}
-	void show() { setVisibe(true);  }
-	void hide() { setVisibe(false);  }
+	void show();
+	void hide();
 	void reloadBrushes();
 
 private:
@@ -65,7 +59,17 @@ private:
 
 private:
 	gcn::Container *container = nullptr;
-	std::list<gcn::Widget *> controls;
+	
+	std::list<gcn::Widget *> controls;  // List of all controls (both enabled and disabled for 
+										// current brush). In order to improve readability, instead
+										// of disabling controls, we just hide them.
+
+	std::list<gcn::Widget *> hiddenControls; // List of temporarily hidden controls that are
+											 // _enabled_ for current brush. If we need to hide
+											 // the entire BrushControlsUI we save all currently 
+											 // enabled controls into this list and then hide them.
+											 // We use this list to avoid unhiding the disabled
+											 // ones later.
 
 	std::unique_ptr<gcn::DropDown> brushSelect;
 	std::unique_ptr<StringListModel> brushesList;
