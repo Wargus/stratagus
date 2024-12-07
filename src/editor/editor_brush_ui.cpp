@@ -187,6 +187,9 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 
 void CBrushControlsUI::reloadCtrlSettings()
 {
+	if (!hiddenControls.empty()) {
+		hiddenControls.clear();
+	}
 	const auto brush = Editor.brushes.getCurrentBrush();
 	enableRnd->setVisible(brush.isRandomizeAllowed());
 	enableRnd->setSelected(brush.isAutoRandomizationEnabled());
@@ -241,6 +244,27 @@ void CBrushControlsUI::updateSizeCtrls()
 		sizeSlider->setScale(brush.getMinSize().y, brush.getMaxSize().y);
 		sizeSlider->setStepLength(resizeSteps.y);
 		sizeSlider->setValue(brush.getHeight());
+	}
+}
+
+void CBrushControlsUI::show()
+{
+	for(auto &ctrl : hiddenControls) {
+		ctrl->setVisible(true);
+	}
+	hiddenControls.clear();
+}
+
+void CBrushControlsUI::hide()
+{
+	if (!hiddenControls.empty()) {
+		return;
+	}
+	for(auto &ctrl : controls) {
+		if (ctrl->isVisible()) {
+			ctrl->setVisible(false);
+			hiddenControls.push_back(ctrl);
+		}
 	}
 }
 //@}
