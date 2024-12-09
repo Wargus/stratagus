@@ -80,6 +80,7 @@ private:
 
 	enum ResizeAllowed { cBoth = 0, cWidthOnly, cHeightOnly };
 	std::map<std::string, std::unique_ptr<gcn::RadioButton>> allowResize;
+	std::unique_ptr<LambdaActionListener> allowResizeRadioListener;
 
 	std::unique_ptr<gcn::CheckBox> enableRnd;
 	std::unique_ptr<LambdaActionListener> enableRndListener;
