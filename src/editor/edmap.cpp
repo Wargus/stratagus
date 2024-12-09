@@ -87,7 +87,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 static uint32_t QuadFromTile(const Vec2i &pos)
 {
 	const tile_index idx = Map.Field(pos)->getTileIndex();
-	return Map.Tileset->getQuadFromTile(idx);
+	return Map.Tileset.getQuadFromTile(idx);
 }
 
 /**
@@ -107,7 +107,7 @@ static void EditorChangeTile(const Vec2i &pos, tile_index tileIndex, const Vec2i
 	if (TileToolRandom) {
 		int n = 0;
 		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset->tiles[tileIdx + i].tile) {
+			if (!Map.Tileset.tiles[tileIdx + i].tile) {
 				break;
 			} else {
 				++n;
@@ -116,14 +116,14 @@ static void EditorChangeTile(const Vec2i &pos, tile_index tileIndex, const Vec2i
 		n = MyRand() % n;
 		int i = -1;
 		do {
-			while (++i < 16 && !Map.Tileset->tiles[tileIdx + i].tile) {
+			while (++i < 16 && !Map.Tileset.tiles[tileIdx + i].tile) {
 			}
 		} while (i < 16 && n--);
 		if (i < 16) {
 			tileIdx += i;
 		}
 	}
-	mf.setTileIndex(*Map.Tileset, tileIdx, 0, mf.getElevation());
+	mf.setTileIndex(Map.Tileset, tileIdx, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -408,7 +408,7 @@ static void EditorDestroyAllUnits()
 static void RandomizeTransition(int x, int y)
 {
 	CMapField &mf = *Map.Field(x, y);
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	terrain_typeIdx baseTileIndex = tileset.tiles[mf.getTileIndex()].tileinfo.BaseTerrain;
 	terrain_typeIdx mixTerrainIdx = tileset.tiles[mf.getTileIndex()].tileinfo.MixTerrain;
 	if (mixTerrainIdx != 0) {

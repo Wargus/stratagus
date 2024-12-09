@@ -75,12 +75,12 @@ void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidR
 
 tile_index CBrush::randomizeTile(tile_index tileIdx) const
 {
-	return Map.Tileset->getRandomTileOfTheSameKindAs(tileIdx);
+	return Map.Tileset.getRandomTileOfTheSameKindAs(tileIdx);
 }
 
 graphic_index CBrush::getGraphicTile(uint8_t col, uint8_t row) const
 {
-	return getTile(col, row) ? Map.Tileset->getGraphicTileFor(getTile(col, row)) : 0;
+	return getTile(col, row) ? Map.Tileset.getGraphicTileFor(getTile(col, row)) : 0;
 }
 
 tile_index CBrush::getTile(uint8_t col, uint8_t row) const

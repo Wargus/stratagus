@@ -749,7 +749,7 @@ static void DrawTileIcons()
 		
 		if (i >= Editor.ShownTileTypes.size()) return false;
 
-		const graphic_index tile = Map.Tileset->getGraphicTileFor(Editor.ShownTileTypes[i]);
+		const graphic_index tile = Map.Tileset.getGraphicTileFor(Editor.ShownTileTypes[i]);
 
 		Map.TileGraphic->DrawFrameClip(tile, x, y);
 		Video.DrawRectangleClip(ColorGray, x, y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
@@ -822,8 +822,8 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 
 	PushClipping();
 	UI.MouseViewport->SetClipping();
-	const PixelSize tileSize(Map.Tileset->getPixelTileSize().x,
-	                         Map.Tileset->getPixelTileSize().y);
+	const PixelSize tileSize(Map.Tileset.getPixelTileSize().x,
+	                         Map.Tileset.getPixelTileSize().y);
 
 	auto drawBrushTile = [&screenPos, &tileSize](const TilePos &tileOffset,
 	                                             tile_index tileIdx) -> void
@@ -838,7 +838,7 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 
 			return;
 		}
-		Map.TileGraphic->DrawFrameClip(Map.Tileset->getGraphicTileFor(tileIdx),
+		Map.TileGraphic->DrawFrameClip(Map.Tileset.getGraphicTileFor(tileIdx),
 									   screenPosIt.x,
 									   screenPosIt.y);
 	};
@@ -899,7 +899,7 @@ static void UpdateMapCursor()
 						  TileCursorSize, // ramp width
 						  TileCursorSize, // ramp height
 						  [](uint8_t col, uint8_t row) -> graphic_index {
-							  return Map.Tileset->getGraphicTileFor(ramp.get(col, row));
+							  return Map.Tileset.getGraphicTileFor(ramp.get(col, row));
 						  });
 */						  
 
@@ -998,7 +998,7 @@ static void DrawEditorInfo()
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 2, buf);
 
 	// Tile info
-	const CTileset &tileset = *Map.Tileset;
+	const CTileset &tileset = Map.Tileset;
 	const tile_index index = mf.getTileIndex();
 
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
@@ -1674,10 +1674,10 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 			if (i >= Editor.ShownTileTypes.size()) return true;
 
 			const tile_index tileindex = Editor.ShownTileTypes[i];
-			const graphic_index tile = Map.Tileset->getGraphicTileFor(tileindex);
+			const graphic_index tile = Map.Tileset.getGraphicTileFor(tileindex);
 
-			const terrain_typeIdx base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
-			UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
+			const terrain_typeIdx base = Map.Tileset.tiles[tileindex].tileinfo.BaseTerrain;
+			UI.StatusLine.Set(Map.Tileset.getTerrainName(base));
 			Editor.CursorTileIndex = i;
 			return false;
 		}
