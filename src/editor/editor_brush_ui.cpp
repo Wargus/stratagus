@@ -134,11 +134,29 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 				 + verticalGap / 2);
 	updateSizeCtrls();
 
+	allowResizeRadioListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
+		const auto brush = Editor.brushes.getCurrentBrush();
+
+		if (allowResize["Both"]->isSelected() || allowResize["WidthOnly"]->isSelected()) {
+			sizeSlider->setScale(brush.getMinSize().x, brush.getMaxSize().x);
+			sizeSlider->setStepLength(brush.getResizeSteps().x);
+			sizeSlider->setValue(brush.getWidth());
+		} else {
+			sizeSlider->setScale(brush.getMinSize().y, brush.getMaxSize().y);
+			sizeSlider->setStepLength(brush.getResizeSteps().y);
+			sizeSlider->setValue(brush.getHeight());
+		}
+
+	});
+
+	allowResize["Both"]->addActionListener(allowResizeRadioListener.get());
+	allowResize["WidthOnly"]->addActionListener(allowResizeRadioListener.get());
+	allowResize["HeightOnly"]->addActionListener(allowResizeRadioListener.get());
+
 	brushSizeSliderListener =
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
 
 		const uint8_t size = sizeSlider->getValue();
-		DebugPrint("Brush size: %d\n", int(size));
 
 		if (allowResize["Both"]->isSelected()) {
 			Editor.brushes.getCurrentBrush().resize(size, size);
