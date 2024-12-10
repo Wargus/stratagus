@@ -1101,7 +1101,7 @@ void EditorUpdateDisplay()
 ----------------------------------------------------------------------------*/
 static bool OverlayElevation(const CMapField &mapField)
 {
-	return mapField.getElevation() == Editor.HighlightElevationLevel;
+	return mapField.getElevation() != Editor.HighlightElevationLevel;
 }
 
 static bool OverlayUnpassable(const CMapField &mapField)
