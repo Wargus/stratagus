@@ -544,6 +544,28 @@ static std::vector<int> getButtonArea() {
 	return buttonArea;
 }
 
+static std::string getTileInfo(const tile_index index)
+{
+	// Tile info
+	const CTileset &tileset = Map.Tileset;
+
+	const auto baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
+	const auto baseTerrain = tileset.getTerrainName(baseTerrainIdx).c_str();
+	const auto mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
+	const auto mixTerrain = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
+
+	constexpr size_t buffSize = 256;
+	char buf[buffSize]{};
+	std::snprintf(buf,
+				  buffSize,
+				  "[0x%04X] %s%s%s",
+				  index,
+				  baseTerrain, 
+				  mixTerrainIdx ? " <> " : "",
+				  mixTerrain);
+	return std::string(buf);
+}
+
 /**
  * Call the forEach callback with each player icon's <playerNum,x,y,w,h>. Return false to cancel iteration.
  *
@@ -1047,7 +1069,9 @@ static void DrawEditorInfo()
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 3, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
+							   UI.StatusLine.TextY - GetGameFont().getHeight() * 3,
+							   buf);
 	const CMapField &mf = *Map.Field(pos);
 	//
 	// Flags info
@@ -1073,18 +1097,15 @@ static void DrawEditorInfo()
 	         flag & MapFieldAirUnit ? 'a' : '-',
 	         flag & MapFieldSeaUnit ? 's' : '-',
 	         flag & MapFieldBuilding ? 'b' : '-');
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight() * 2, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
+							   UI.StatusLine.TextY - GetGameFont().getHeight() * 2,
+							   buf);
 
-	// Tile info
-	const CTileset &tileset = Map.Tileset;
+	// Display tile info 
 	const tile_index index = mf.getTileIndex();
-
-	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
-	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
-	const terrain_typeIdx mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
-	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
-	snprintf(buf, sizeof(buf), "[0x%04X] %s %s", index, baseTerrainStr, mixTerrainStr);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY - GetGameFont().getHeight(), buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
+							   UI.StatusLine.TextY - GetGameFont().getHeight(),
+							   getTileInfo(index).c_str());
 #endif
 }
 
@@ -1746,15 +1767,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 	});
 
 	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
-		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + w) {
+		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 
 			if (i >= Editor.ShownTileTypes.size()) return true;
 
 			const tile_index tileindex = Editor.ShownTileTypes[i];
-			const graphic_index tile = Map.Tileset.getGraphicTileFor(tileindex);
-
-			const terrain_typeIdx base = Map.Tileset.tiles[tileindex].tileinfo.BaseTerrain;
-			UI.StatusLine.Set(Map.Tileset.getTerrainName(base));
+			UI.StatusLine.Set(getTileInfo(tileindex));
 			Editor.CursorTileIndex = i;
 			return false;
 		}
@@ -1777,6 +1795,9 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	PixelPos restrictPos = pos;
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
 	const PixelPos screenPos = pos;
+
+	// Clean status line
+	UI.StatusLine.Clear();
 
 	// Move map.
 	if (GameCursor == UI.Scroll.Cursor) {
@@ -1935,10 +1956,6 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	if (HandleMouseScrollArea(screenPos)) {
 		return;
 	}
-
-	// Not reached if cursor is inside the scroll area
-
-	UI.StatusLine.Clear();
 }
 
 /**
