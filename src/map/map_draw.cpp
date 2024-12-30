@@ -325,13 +325,13 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 			if (CViewport::isPassabilityHighlighted() && Editor.Running == EditorNotRunning) {
 				for (int i = 0; i < graphicTileOffset; i++) {
 					for (int j = 0; j < graphicTileOffset; j++) {
-						if (Map.Fields[sx + j + (mapW * i)].getFlag() & MapFieldUnpassable) {
+						if (Map.Fields[sx + j + (mapW * i)].isFlag(MapFieldUnpassable)) {
 							Video.FillTransRectangleClip(ColorRed, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						} else {
 							Video.FillTransRectangleClip(ColorGreen, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						}
 
-						if (Map.Fields[sx + j + (mapW * i)].getFlag() & (MapFieldLandUnit | MapFieldBuilding | MapFieldSeaUnit)) {
+						if (Map.Fields[sx + j + (mapW * i)].isFlag(MapFieldLandUnit | MapFieldBuilding | MapFieldSeaUnit)) {
 							Video.FillTransRectangleClip(ColorOrange, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						}
 					}

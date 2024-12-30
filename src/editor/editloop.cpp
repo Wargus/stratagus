@@ -1076,7 +1076,7 @@ static void DrawEditorInfo()
 	//
 	// Flags info
 	//
-	const unsigned flag = mf.getFlag();
+	const unsigned flag = mf.getFlags();
 	snprintf(buf,
 	         sizeof(buf),
 	         "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
@@ -1205,12 +1205,12 @@ static bool OverlayElevation(const CMapField &mapField)
 
 static bool OverlayUnpassable(const CMapField &mapField)
 {
-	return mapField.getFlag() & MapFieldUnpassable;
+	return mapField.isFlag(MapFieldUnpassable);
 }
 
 static bool OverlayNoBuildingAllowed(const CMapField &mapField)
 {
-	return mapField.getFlag() & MapFieldNoBuilding;
+	return mapField.isFlag(MapFieldNoBuilding);
 }
 
 static bool OverlayOpaque(const CMapField &mapField)

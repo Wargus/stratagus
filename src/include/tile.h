@@ -233,9 +233,13 @@ public:
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
 
-	unsigned char getCost() const { return cost; }
-	unsigned int getFlag() const { return Flags; }
-	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+	unsigned char getMoveCost() const { return moveCost; }
+	tile_flags getFlags() const { return Flags; }
+	bool isFlag(tile_flags checkFlags) const { return CheckMask(checkFlags); }
+	void setFlag(tile_flags flag) { Flags |= flag; }
+	void resetFlag(tile_flags flag) { Flags &= ~flag; }
+
+	void setGraphicTile(graphic_index tile) { this->tile = tile; }
 #ifdef DEBUG
 	int64_t lastAStarCost = 0;    /// debugging pathfinder
 #endif
@@ -256,7 +260,7 @@ private:
 	tile_index tilesetTile = 0;	/// tileset tile number
 	graphic_index tile = 0;		/// graphic tile number
 	uint8_t ElevationLevel = 0;	/// highground elevation level
-	unsigned char cost = 0;		/// unit cost to move in this tile
+	unsigned char moveCost = 0;	/// unit cost to move in this tile
 
 };
 

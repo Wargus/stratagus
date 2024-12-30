@@ -1055,7 +1055,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 
-	if (mf.getFlag() & flag) {
+	if (mf.isFlag(flag)) {
 		lua_pushboolean(l, 1);
 	} else {
 		lua_pushboolean(l, 0);
