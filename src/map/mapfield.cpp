@@ -112,15 +112,15 @@ void CMapField::setTileIndex(const CTileset &tileset,
 			this->Value = 100; // TODO: should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		}
 	}
-#endif
-	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
+
+	this->moveCost = 1 << (tile.flag & MapFieldSpeedMask);
 	
 	this->tilesetTile = tileIndex - compShift;
 }
 
 void CMapField::Save(CFile &file) const
 {
-	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
+	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, moveCost);
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
@@ -199,7 +199,7 @@ void CMapField::parse(lua_State *l)
 	this->tile = LuaToNumber(l, -1, 1);
 	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
 	this->Value = LuaToNumber(l, -1, 3);
-	this->cost = LuaToNumber(l, -1, 4);
+	this->moveCost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
