@@ -74,7 +74,8 @@ bool CTileset::ModifyFlag(std::string_view flagName, tile_flags *flag, const uns
 		{"building", MapFieldBuilding},
 		{"human", MapFieldHuman},
 		{"decorative", MapFieldDecorative},
-		{"non-mixing", MapFieldNonMixing}
+		{"non-mixing", MapFieldNonMixing},
+		{"unseparated-slot", MapFieldFromUnseparatedSlot}
 	};
 
 	for (const auto& [name, tileFlag] : flags) {

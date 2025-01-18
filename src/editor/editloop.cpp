@@ -93,15 +93,8 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-bool TileToolNoFixup = false;     /// Allow setting every tile, no fixups
-char TileToolRandom;      /// Tile tool draws random
-static char TileToolDecoration;  /// Tile tool draws with decorations
-static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
-static bool UpdateMinimap = false;        /// Update units on the minimap
-static int MirrorEdit = 0;                /// Mirror editing enabled
 static int VisibleUnitIcons = 0;              /// Number of icons that are visible at a time
-static int VisibleTileIcons = 0;
 
 enum class EditorActionType {
 	PlaceUnit,
@@ -139,7 +132,11 @@ static void EditorAddUndoAction(EditorAction action);
 
 extern std::unique_ptr<gcn::Gui> Gui;
 static std::unique_ptr<gcn::Container> editorContainer;
+
 static std::unique_ptr<gcn::Slider> editorSlider;
+static constexpr double sliderDefaultScale = 1.0;
+static constexpr double sliderDefaultStepLength = 1.0 / 50;
+
 static std::unique_ptr<gcn::DropDown> toolDropdown;
 static std::unique_ptr<gcn::DropDown> overlaysDropdown;
 
@@ -158,107 +155,13 @@ static void EditorClearControls()
 	toolDropdown.reset();
 	overlaysDropdown.reset();
 	editorContainer.reset();
+	Editor.tileIcons.resetSliderCtrl();
 	editorSlider.reset();
 }
 
 /*----------------------------------------------------------------------------
 --  Edit
 ----------------------------------------------------------------------------*/
-
-/**
-**  Edit tile.
-**
-**  @param pos   map tile coordinate.
-**  @param tile  Tile type to edit or -1, to edit the tile under the brush according to the modifiers
-*/
-static void EditTile(const Vec2i &pos, int32_t tileIdx)
-{
- 	Assert(Map.Info.IsPointOnMap(pos));
-
-	const CTileset &tileset = Map.Tileset;
-
-	CMapField &mf = *Map.Field(pos);
-
-	int32_t baseTileIndex = tileIdx;
-	if (baseTileIndex <= 0) { /// FIXME: Not sure if this condition could ever be true. To check.
-		// use the tile under the cursor and randomize *that* if it's
-		// not a mix tile
-		baseTileIndex = mf.getTileIndex();
-		const int32_t mixTerrainIdx = tileset.tiles[baseTileIndex].tileinfo.MixTerrain;
-		if (mixTerrainIdx > 0) {
-			return;
-		}
-		baseTileIndex = baseTileIndex / 16 * 16;
-	}
-	const tile_index tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
-	mf.setTileIndex(tileset, tileIndex, 0, mf.getElevation());
-	mf.playerInfo.SeenTile = mf.getGraphicTile();
-
-	UI.Minimap.UpdateSeenXY(pos);
-	UI.Minimap.UpdateXY(pos);
-
-	if (Editor.brushes.getCurrentBrush().isFixNeighborsEnabled()) {
-		EditorTileChanged(pos);
-	}
-	UpdateMinimap = true;
-}
-
-/**
-**  Edit tiles (internal, used by EditTiles()).
-**
-**  @param pos   map tile coordinate.
-**  @param brush tiles brush to edit with.
-**
-*/
-static void EditTilesInternal(const Vec2i &pos, const CBrush &brush)
-{
-	
-	auto editTile = [&pos](const TilePos &tileOffset, tile_index tileIdx) -> void {
-		const TilePos tilePos(pos + tileOffset);
-		if (tilePos.x < 0
-			|| tilePos.x >= Map.Info.MapWidth
-			|| tilePos.y < 0
-			|| tilePos.y >= Map.Info.MapHeight) {
-			return;
-		}
-		EditTile(tilePos, tileIdx);
-	};
-
-	brush.applyBrushAt(pos, editTile);
-}
-
-/**
-**  Edit tiles
-**
-**  @param pos   map tile coordinate.
-**  @param brush  tiles brush to edit with
-*/
-static void EditTiles(const Vec2i &pos, const CBrush &brush)
-{
-	EditTilesInternal(pos, brush);
-
-	if (!MirrorEdit) {
-		return;
-	}
-
-	TilePos maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
-
-	if (brush.getAllign() == CBrush::BrushAllign::UpperLeft) {
-		maxPos.x -= brush.getWidth() - 1;
-		maxPos.y -= brush.getHeight() - 1;
-	}
-	const TilePos mirror = maxPos - pos;
-	const TilePos mirrorv(mirror.x, pos.y);
-
-	EditTilesInternal(mirrorv, brush);
-	if (MirrorEdit == 1) {
-		return;
-	}
-	const TilePos mirrorh(pos.x, mirror.y);
-
-	EditTilesInternal(mirrorh, brush);
-	EditTilesInternal(mirror, brush);
-}
 
 /**
 **  Set map tile's elevation level
@@ -327,7 +230,7 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 		}
 		unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 	}
-	UpdateMinimap = true;
+	Editor.UpdateMinimap = true;
 }
 
 /**
@@ -359,7 +262,7 @@ static void EditorActionRemoveUnit(CUnit &unit)
 	UnitClearOrders(unit);
 	unit.Release();
 	UI.StatusLine.Set(_("Unit deleted"));
-	UpdateMinimap = true;
+	Editor.UpdateMinimap = true;
 }
 
 /**
@@ -713,83 +616,6 @@ static void DrawUnitIcons()
 	});
 }
 
-/**
- * Call the forEach callback with each tile option buttons's <is-active boolean,label string,i,x,y,w,h>.
- * Return false to cancel iteration.
- *
- * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
- * iteration was requested.
- */
-static bool forEachTileOptionArea(std::function<bool(bool,std::string&,int,int,int,int,int)> forEach) {
-	int x1 = getSelectionArea()[cUpperLeftX];
-	int y1 = getSelectionArea()[cUpperLeftY];
-	int x2 = getSelectionArea()[cBottomRightX];
-	int y2 = getSelectionArea()[cBottomRightY];
-
-	int labelHeight = GetGameFont().getHeight() + 1;
-	int labelMaxW = x2 - x1;
-	int labelX = x1;
-	int labelY = y1;
-
-	const std::vector<std::pair<bool, std::string>> compactOptions = {
-		{ TileCursorSize == 1, "1x1" },
-		{ TileCursorSize == 2, "2x2" },
-		{ TileCursorSize == 3, "3x3" },
-		{ TileCursorSize == 4, "4x4" },
-		{ TileCursorSize == 5, "5x5" },
-		{ TileCursorSize == 10, "10x10" }
-	};
-
-	const std::vector<std::pair<bool, std::string>> options = {
-		{ TileToolRandom != 0, "Random" },
-		{ TileToolDecoration != 0, "Filler" },
-		{ TileToolNoFixup != 0, "Manual" }
-	};
-
-	int i = 0;
-	int compactX = labelX;
-	while ((size_t)i < compactOptions.size()) {
-		auto opt = compactOptions[i];
-		if (!forEach(opt.first, opt.second, i, compactX, labelY, labelMaxW / 2, labelHeight)) {
-			return false;
-		}
-		if (i % 2 == 0) {
-			compactX = labelX + labelMaxW / 2;
-		} else {
-			compactX = labelX;
-			labelY += labelHeight;
-		}
-		i++;
-	}
-	for (auto opt : options) {
-		if (!forEach(opt.first, opt.second, i, labelX, labelY, labelMaxW, labelHeight)) {
-			return false;
-		}
-		labelY += labelHeight;
-		i++;
-	}
-
-	return true;
-}
-
-/*
-static void DrawTileOptions() {
-	forEachTileOptionArea([](bool active, std::string str, int i, int x, int y, int w, int h) {
-		CLabel label(GetGameFont());
-		if (active) {
-			label.DrawReverseCentered(x + w / 2, y, str);
-		} else {
-			label.DrawCentered(x + w / 2, y, str);
-		}
-
-		if (ButtonUnderCursor == i + 300) {
-			Video.DrawRectangle(ColorGray, x, y - 1, w, h);
-		}
-
-		return true;
-	});
-}
-*/
 
 /**
  * Call the forEach callback with each tile's <EditorTileIndex,x,y,w,h>. Return false to cancel iteration.
@@ -797,9 +623,10 @@ static void DrawTileOptions() {
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
  * iteration was requested.
  */
-static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach) {
-	int x1 = getButtonArea()[cUpperLeftX];
-	int y1 = getButtonArea()[cUpperLeftY];
+static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach)
+{
+	int x1 = getButtonArea()[cUpperLeftX] + 1;
+	int y1 = getButtonArea()[cUpperLeftY] + 2;
 	int x2 = getButtonArea()[cBottomRightX];
 	int y2 = getButtonArea()[cBottomRightY];
 
@@ -808,24 +635,23 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 	int maxX = x2 - tileW;
 	int maxY = y2 - tileH;
 
-	int i = Editor.TileIndex;
-	Assert(Editor.TileIndex != -1);
+	int i = Editor.tileIcons.getDisplayedFirst();
 
-	if (VisibleTileIcons == 0) {
+	if (Editor.tileIcons.getDisplayedNum() == 0) {
 		// initialize on the first draw how many tile icons we can actually draw
 		int horizCnt = (x2 - x1) / tileW;
 		int vertCnt = (y2 - y1) / tileH;
-		VisibleTileIcons = horizCnt * vertCnt;
+		Editor.tileIcons.setDisplayedNum(horizCnt * vertCnt);
 	}
 
 	int y = y1;
 	while (y < maxY) {
-		if (i >= (int)Editor.ShownTileTypes.size()) {
+		if (i >= Editor.tileIcons.numberOf()) {
 			break;
 		}
 		int x = x1;
 		while (x < maxX) {
-			if (i >= (int) Editor.ShownTileTypes.size()) {
+			if (i >= Editor.tileIcons.numberOf()) {
 				break;
 			}
 			if (!forEach(i, x, y, tileW, tileH)) {
@@ -847,23 +673,23 @@ static void DrawTileIcons()
 {
 	forEachTileIconArea([](int i, int x, int y, int w, int h) {
 		
-		if (i >= Editor.ShownTileTypes.size()) return false;
+		if (const auto tile = Editor.tileIcons.getTile(i)) {
 
-		const graphic_index tile = Map.Tileset.getGraphicTileFor(Editor.ShownTileTypes[i]);
+			const auto iconWidth = Map.Tileset.getPixelTileSize().x;
+			const auto iconHeight = Map.Tileset.getPixelTileSize().y;
 
-		Map.TileGraphic->DrawFrameClip(tile, x, y);
-		Video.DrawRectangleClip(ColorGray, x, y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
+			Map.TileGraphic->DrawFrameClip(Map.Tileset.getGraphicTileFor(*tile), x, y);
+			Video.DrawRectangleClip(ColorGray, x, y, iconWidth, iconHeight);
 
-		if (i == Editor.SelectedTileIndex) {
-			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-									Map.Tileset.getPixelTileSize().x - 2, Map.Tileset.getPixelTileSize().y - 2);
+			if (Editor.tileIcons.isSelected() && i == Editor.tileIcons.getSelectedIcon()) {
+				Video.DrawRectangleClip(ColorGreen, x + 1, y + 1, iconWidth - 2, iconHeight - 2);
+			}
+			if (i == Editor.tileIcons.getIconUnderCursor()) {
+				Video.DrawRectangleClip(ColorWhite, x - 1, y - 1, iconWidth + 2, iconHeight + 2);
+			}
+			return true;
 		}
-		if (i == Editor.CursorTileIndex) {
-			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-									Map.Tileset.getPixelTileSize().x + 2, Map.Tileset.getPixelTileSize().y + 2);
-		}
-
-		return true;
+		return false;
 	});
 }
 
@@ -873,9 +699,6 @@ static void DrawIntoSelectionArea()
 		case EditorStateType::SetStartLocation:
 		case EditorStateType::EditUnit:
 			DrawPlayers();
-			break;
-		case EditorStateType::EditTile:
-//			DrawTileOptions();
 			break;
 		default:
 			break;
@@ -926,7 +749,9 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 	                         Map.Tileset.getPixelTileSize().y);
 
 	auto drawBrushTile = [&screenPos, &tileSize](const TilePos &tileOffset,
-	                                             tile_index tileIdx) -> void
+	                                             tile_index tileIdx,
+												 bool,
+												 bool) -> void
 	{
 		const PixelPos screenPosIt(screenPos.x + tileOffset.x * tileSize.x,
 		                           screenPos.y + tileOffset.y * tileSize.y);
@@ -942,7 +767,7 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 									   screenPosIt.x,
 									   screenPosIt.y);
 	};
-	brush.applyBrushAt(tilePos, drawBrushTile, true);
+	brush.applyAt(tilePos, drawBrushTile, true);
 
 	PixelPos screenPosIt;
 	const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
@@ -988,7 +813,7 @@ static void UpdateMapCursor()
 		const TilePos tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
-		if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
+		if (Editor.State == EditorStateType::EditTile && Editor.tileIcons.isSelected()) {
 			DrawMapCursor(tilePos,
 						  screenPos,
 						  Editor.brushes.getCurrentBrush());
@@ -1304,50 +1129,17 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 	// Click on tile area
 	if (Editor.State == EditorStateType::EditTile) {
-		if (CursorOn == ECursorOn::Button && ButtonUnderCursor >= 100) {
-			switch (ButtonUnderCursor) {
-				case 300: TileCursorSize = 1; return;
-				case 301: TileCursorSize = 2; return;
-				case 302: TileCursorSize = 3; return;
-				case 303: TileCursorSize = 4; return;
-				case 304: TileCursorSize = 5; return;
-				case 305: TileCursorSize = 10; return;
-				case 306: TileToolRandom ^= 1; return;
-				case 307: TileToolDecoration ^= 1; return;
-			    case 308: {
-					TileToolNoFixup = !TileToolNoFixup;
-					// switch the selected tiles
-					if (TileToolNoFixup) {
-						Editor.ShownTileTypes.clear();
-						Editor.SelectedTileIndex = -1;
-
-						tile_index index = 0;
-						for (auto &currTile : Map.Tileset.tiles) {
-							if (currTile.tile) {
-								Editor.ShownTileTypes.push_back(index);
-							}
-							index++;
-						}
-					} else {
-						Editor.ShownTileTypes.clear();
-						Editor.SelectedTileIndex = -1;
-						Map.Tileset.fillSolidTiles(&Editor.ShownTileTypes);
-					}
-					return;
-				}
-			}
-		}
 
 		if (MouseButtons & RightButton) {
-			Editor.SelectedTileIndex = -1;
+			Editor.tileIcons.resetSelected();
 			return;
 		} else {
-			if (Editor.CursorTileIndex != -1) {
-				Editor.SelectedTileIndex = Editor.CursorTileIndex;
-				const auto selectedTile = Editor.getSelectedTile();
-				if (selectedTile
-					&& Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
-					Editor.brushes.getCurrentBrush().setTile(*selectedTile);
+			if (Editor.tileIcons.getIconUnderCursor() != -1) {
+				Editor.tileIcons.select(Editor.tileIcons.getIconUnderCursor());
+				if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
+					if (Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
+						Editor.brushes.getCurrentBrush().setTile(*selectedTile);
+					}
 				}
 				return;
 			}
@@ -1419,8 +1211,10 @@ static void EditorCallbackButtonDown(unsigned button)
 				Editor.SelectedUnitIndex = -1;
 				CursorBuilding = nullptr;
 				return;
-			} else if (Editor.State == EditorStateType::EditTile && Editor.SelectedTileIndex != -1) {
-				Editor.SelectedTileIndex = -1;
+			} else if (Editor.State == EditorStateType::EditTile 
+					   && Editor.tileIcons.isSelected()) {
+
+				Editor.tileIcons.resetSelected();
 				CursorBuilding = nullptr;
 				return;
 			}
@@ -1436,9 +1230,9 @@ static void EditorCallbackButtonDown(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Editor.State == EditorStateType::EditTile 
-				&& (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
+				&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
 
-				EditTiles(tilePos, Editor.brushes.getCurrentBrush());
+				Editor.applyCurentBrush(tilePos);
 
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
@@ -1544,11 +1338,11 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		// FIXME: move to lua
 		case 'm': // CTRL+M Mirror edit
 			if (KeyModifiers & ModifierControl)  {
-				++MirrorEdit;
-				if (MirrorEdit == 3) {
-					MirrorEdit = 0;
+				++Editor.MirrorEdit;
+				if (Editor.MirrorEdit >= 3) {
+					Editor.MirrorEdit = 0;
 				}
-				switch (MirrorEdit) {
+				switch (Editor.MirrorEdit) {
 					case 1:
 						UI.StatusLine.Set(_("Mirror editing enabled: 2-side"));
 						break;
@@ -1627,7 +1421,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			if (UnitUnderCursor != nullptr && Map.Info.PlayerType[pnum] != PlayerTypes::PlayerNobody) {
 				UnitUnderCursor->ChangeOwner(Players[pnum]);
 				UI.StatusLine.Set(_("Unit owner modified"));
-				UpdateMinimap = true;
+				Editor.UpdateMinimap = true;
 			}
 			break;
 		}
@@ -1757,23 +1551,16 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	bool noHit = forEachTileOptionArea([screenPos](bool active, std::string &label, int i, int x, int y, int w, int h) {
-		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
-			ButtonUnderCursor = i + 300;
-			CursorOn = ECursorOn::Button;
-			return false;
-		}
-		return true;
-	});
-
-	noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
+	bool noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 
-			if (i >= Editor.ShownTileTypes.size()) return true;
-
-			const tile_index tileindex = Editor.ShownTileTypes[i];
-			UI.StatusLine.Set(getTileInfo(tileindex));
-			Editor.CursorTileIndex = i;
+			if (i >= Editor.tileIcons.numberOf()) {
+				return true;
+			}
+			if (const auto tileIndex = Editor.tileIcons.getTile(i)) {
+				UI.StatusLine.Set(getTileInfo(*tileIndex));
+				Editor.tileIcons.setIconUnderCursor(i);
+			}
 			return false;
 		}
 		return true;
@@ -1866,8 +1653,11 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorStateType::EditTile && (Editor.SelectedTileIndex != -1 || (KeyModifiers & ModifierAlt))) {
-			EditTiles(tilePos, Editor.brushes.getCurrentBrush());
+		if (Editor.State == EditorStateType::EditTile 
+			&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
+
+			Editor.applyCurentBrush(tilePos);
+
 		} else if (Editor.State == EditorStateType::EditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
@@ -1894,7 +1684,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	CursorOn = ECursorOn::Unknown;
 	Editor.CursorPlayer = -1;
 	Editor.CursorUnitIndex = -1;
-	Editor.CursorTileIndex = -1;
+	Editor.tileIcons.resetIconUnderCursor();
 	ButtonUnderCursor = -1;
 	OldButtonUnderCursor = -1;
 
@@ -2051,7 +1841,7 @@ void CEditor::Init()
 	Units.Icon = nullptr;
 	Units.Load();
 
-	Map.Tileset.fillSolidTiles(&Editor.ShownTileTypes);
+	Editor.tileIcons.rebuild();
 
 	RecalculateShownUnits();
 
@@ -2134,7 +1924,8 @@ void EditorMainLoop()
 
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
-	editorSlider->setStepLength(1.0 / 50);
+	editorSlider->setScale(0, sliderDefaultScale);
+	editorSlider->setStepLength(sliderDefaultStepLength);
 	editorSlider->setWidth(getButtonArea()[cBottomRightX] - getButtonArea()[cUpperLeftX] - 1);
 	editorSlider->setHeight(GetSmallFont().getHeight());
 	editorSlider->setBaseColor(gcn::Color(38, 38, 78));
@@ -2145,17 +1936,8 @@ void EditorMainLoop()
 		switch (Editor.State) {
 			case EditorStateType::EditTile:
 				{
-					const int iconsPerStep = VisibleTileIcons;
-					const int steps = (Editor.ShownTileTypes.size() + iconsPerStep - 1) / iconsPerStep;
-					const double value = editorSlider->getValue();
-					for (int i = 1; i <= steps; ++i) {
-						if (value <= (double)i / steps) {
-							Editor.TileIndex = iconsPerStep * (i - 1);
-							break;
-						}
-					}
-				}
-				break;
+					Editor.tileIcons.recalcDisplayed();
+				} break;
 			case EditorStateType::EditUnit:
 				{
 					const int iconsPerStep = VisibleUnitIcons;
@@ -2175,8 +1957,9 @@ void EditorMainLoop()
 	});
 	editorSlider->addActionListener(editorSliderListener.get());
 	editorContainer->add(editorSlider.get(),
-						 getSelectionArea()[cUpperLeftX],
-						 getSelectionArea()[cBottomRightY] - editorSlider->getHeight());
+	                     getSelectionArea()[cUpperLeftX],
+	                     getSelectionArea()[cBottomRightY] - editorSlider->getHeight());
+	Editor.tileIcons.attachSliderCtrl(editorSlider.get());
 
 	// Mode selection is put into the status line
 	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
@@ -2195,9 +1978,16 @@ void EditorMainLoop()
 		const std::string_view selectedItem = toolListStrings[toolDropdown->getSelected()];
 
 		// Click on mode area
-		Editor.CursorUnitIndex = Editor.CursorTileIndex = Editor.SelectedUnitIndex = Editor.SelectedTileIndex = -1;
+		Editor.CursorUnitIndex = Editor.SelectedUnitIndex = -1;
+		Editor.tileIcons.resetSelected();
+		Editor.tileIcons.resetIconUnderCursor();
+		Editor.tileIcons.displayFrom(0);
+		editorSlider->setScale(0, sliderDefaultScale);
+		editorSlider->setStepLength(sliderDefaultStepLength);
+
 		CursorBuilding = nullptr;
-		Editor.UnitIndex = Editor.TileIndex = 0;
+		Editor.UnitIndex = 0;
+
 		brushesCtrlUI->hide();
 
 		if (selectedItem == "Select") {
@@ -2208,6 +1998,7 @@ void EditorMainLoop()
 			Editor.State = EditorStateType::EditTile;
 			editorSlider->setVisible(true);
 			editorSlider->setValue(0);
+			Editor.tileIcons.updateSliderCtrl();
 			brushesCtrlUI->show();
 
 		} else if (selectedItem == "Start Locations") {
@@ -2306,7 +2097,7 @@ void EditorMainLoop()
 	overlaysDropdown->addActionListener(overlaysDropdownListener.get());
 	editorContainer->add(overlaysDropdown.get(), toolDropdown->getX() + toolDropdown->getWidth() + 10, 0);
 
-	UpdateMinimap = true;
+	Editor.UpdateMinimap = true;
 
 	Editor.Running = EditorEditing;
 
@@ -2339,15 +2130,14 @@ void EditorMainLoop()
 	InterfaceState = IfaceState::Normal;
 	Editor.State = EditorStateType::Selecting;
 	UI.SelectedViewport = UI.Viewports;
-	TileCursorSize = 1;
 
 	bool start = true;
 
 	while (Editor.Running) {
 		if (FrameCounter % CYCLES_PER_SECOND == 0) {
-			if (UpdateMinimap) {
+			if (Editor.UpdateMinimap) {
 				UI.Minimap.Update();
-				UpdateMinimap = false;
+				Editor.UpdateMinimap = false;
 			}
 		}
 
@@ -2424,7 +2214,7 @@ void StartEditor(const char *filename)
 
 	Editor.TerrainEditable = true;
 
-	Editor.ShownTileTypes.clear();
+	Editor.tileIcons.clear();
 	CleanGame();
 	CleanPlayers();
 

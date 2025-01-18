@@ -51,7 +51,7 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization /* = false*/) const
+void CBrush::applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization /* = false*/) const
 {
 	TilePos brushOffset{};
 	if (isCentered()) {
@@ -63,11 +63,10 @@ void CBrush::applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidR
 			const tile_index tileIdx = getTile(col, row);
 			if (tileIdx) {
 				const TilePos tileOffset(col - brushOffset.x, row - brushOffset.y);
-				const tile_index applyTile = properties.randomizeAllowed 
-											 && this->autoRndEnabled && !forbidRandomization 
-											 ? randomizeTile(tileIdx) 
-											 : tileIdx;
-				applyFn(tileOffset, applyTile);
+				const tile_index applyTile = forbidRandomization || !this->rndEnabled
+											 ? tileIdx 
+											 : randomizeTile(tileIdx);
+				applyFn(tileOffset, applyTile, isFixNeighborsEnabled(), isDecorative());
 			}
 		}
 	}
@@ -276,7 +275,7 @@ bool CBrushesSet::setCurrentBrush(std::string_view name)
 	for (auto &brush : brushes) {
 		if (brush.getName() == name) {
 			currentBrush = brush;
-			const auto selectedTile = Editor.getSelectedTile();
+			const auto selectedTile = Editor.tileIcons.getSelectedTile();
 			if (selectedTile && currentBrush.getType() == CBrush::BrushTypes::SingleTile) {
 				currentBrush.setTile(*selectedTile);
 			}

@@ -61,7 +61,7 @@ public:
 		Center
 	};
 
-	using brushApplyFn = std::function<void(const TilePos&, tile_index)>; // type alias
+	using brushApplyFn = std::function<void(const TilePos&, tile_index, bool, bool)>; // type alias
 
 	struct Properties;
 
@@ -71,7 +71,7 @@ public:
 	{
 		this->name = std::move(name);
 		this->properties = std::move(properties);
-		autoRndEnabled = this->properties.randomizeAllowed;
+		rndEnabled = this->properties.randomizeAllowed;
 		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
 		setSize(this->properties.minSize.width, this->properties.minSize.height);
 	}
@@ -81,7 +81,7 @@ public:
 	{
 		this->name = std::move(name);
 		this->properties = std::move(properties);
-		autoRndEnabled = this->properties.randomizeAllowed;
+		rndEnabled = this->properties.randomizeAllowed;
 		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
 		setSize(this->properties.minSize.width, this->properties.minSize.height);
 		fillWith(tilesSrc);
@@ -89,7 +89,7 @@ public:
 
 	~CBrush() = default;
 
-	void applyBrushAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
+	void applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
 	
 	uint8_t getWidth() const { return width; }
 	uint8_t getHeight() const { return height; }
@@ -127,17 +127,21 @@ public:
 	bool isRandomizeAllowed() const { return properties.randomizeAllowed; }
 	bool isNeighborsFixAllowed() const { return properties.fixNeighborsAllowed; }
 
-	void enableAutoRandomization(bool enable = true)
+	void enableRandomization(bool enable = true)
 	{
-		autoRndEnabled = properties.randomizeAllowed ? enable : false;
+		rndEnabled = properties.randomizeAllowed ? enable : false;
 	}
-	bool isAutoRandomizationEnabled() const { return autoRndEnabled; }
+	bool isRandomizationEnabled() const { return rndEnabled; }
 	void enableFixNeighbors(bool enable = true)
 	{ 
 		fixNeighborsEnabled = properties.fixNeighborsAllowed ? enable : false;
 	}
 	bool isFixNeighborsEnabled() const { return fixNeighborsEnabled; }
-	
+	bool isDecorative() const { return decorative; }
+	void setDecorative(bool value) {
+		decorative = properties.fixNeighborsAllowed ? value : true;
+	}
+
 	std::string getName() const { return name; }
 	void setName(const std::string &name) { this->name = name; }
 
@@ -161,13 +165,11 @@ public:
 		BrushAllign allign = BrushAllign::UpperLeft;
 		bool symmetric = false;
 		bool resizable = true;
-		struct {
+		struct
+		{
 			uint8_t width;
 			uint8_t height;
-		} 
-		resizeSteps{1, 1}, 
-		minSize{1, 1},
-		maxSize{20, 20};
+		} resizeSteps{1, 1}, minSize{1, 1}, maxSize{20, 20};
 
 		bool randomizeAllowed = true;
 		bool fixNeighborsAllowed = true;
@@ -177,8 +179,10 @@ protected:
 	Properties properties;
 
 	std::string name;
-	bool autoRndEnabled = false;
-	bool fixNeighborsEnabled = false;
+	
+	bool rndEnabled = false; /// Edit mode: place an the selected tile or a random tile of the same type
+	bool fixNeighborsEnabled = false; /// Edit mode: enabled fix up for neighbors with tile to be placed
+	bool decorative = false;
 
 	bool isInit = false;
 

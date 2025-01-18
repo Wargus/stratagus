@@ -225,6 +225,15 @@ void CTileset::clear()
 	ranges::fill(orcWallTable, 0);
 }
 
+const CTile& CTileset::getTile(tile_index tileIndex) const
+{
+	if (tileIndex >= getTileCount()) {
+		ErrorPrint("Invalid tile index %d\n", tileIndex);
+		Exit(1);
+	}
+	return tiles[tileIndex];
+}
+
 bool CTileset::setTileCount(const size_t newCount)
 {
 	if (newCount < tiles.size() || newCount >= (1 << (sizeof(tile_index) * 8))) {
@@ -365,6 +374,11 @@ int32_t CTileset::findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mix
 		}
 	}
 	return -1;
+}
+
+bool CTileset::CheckForUnseparatedSlot(const CTile &tile) const 
+{ 
+	return tile.flag & MapFieldFromUnseparatedSlot;
 }
 
 int32_t CTileset::getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const
@@ -632,8 +646,16 @@ std::vector<tile_index> CTileset::getAllTilesOfTheSameKindAs(tile_index tileInde
 	return result;
 }
 
+bool CTileset::isTileRandomizable(tile_index tileIndex) const
+{
+	return CheckForUnseparatedSlot(getTile(tileIndex)) == false;
+}
+
 tile_index CTileset::getRandomTileOfTheSameKindAs(tile_index tileIndex) const
 {
+	if (!isTileRandomizable(tileIndex)) {
+		return tileIndex;
+	}
 	auto tiles = getAllTilesOfTheSameKindAs(tileIndex);
 	if (tiles.empty()) {
 		return tileIndex;
@@ -651,54 +673,6 @@ int32_t CTileset::findTileIndexByTile(graphic_index tile) const
 		index++;
 	}
 	return -1;
-}
-
-/**
-**  Get tile number.
-**
-**  @param basic   Basic tile number
-**  @param random  Return random tile
-**  @param filler  Get a decorated tile.
-**
-**  @return        Tile index number.
-**
-**  @todo  FIXME: Solid tiles are here still hardcoded.
-*/
-tile_index CTileset::getTileNumber(tile_index basic, bool random, bool filler) const
-{
-	tile_index tile = basic;
-	if (random) {
-		int n = 0;
-		for (int i = 0; i < 16; ++i) {
-			if (!tiles[tile + i].tile) {
-				if (!filler) {
-					break;
-				}
-			} else {
-				++n;
-			}
-		}
-		n = MyRand() % n;
-		int i = -1;
-		do {
-			while (++i < 16 && !tiles[tile + i].tile) {
-			}
-		} while (i < 16 && n--);
-		if (i != 16) {
-			return tile + i;
-		}
-	}
-	if (filler) {
-		int i = 0;
-		for (; i < 16 && tiles[tile + i].tile; ++i) {
-		}
-		for (; i < 16 && !tiles[tile + i].tile; ++i) {
-		}
-		if (i != 16) {
-			return tile + i;
-		}
-	}
-	return tile;
 }
 
 /**
@@ -746,20 +720,66 @@ uint32_t CTileset::getQuadFromTile(tile_index tileIndex) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-void CTileset::fillSolidTiles(std::vector<tile_index> *solidTiles) const
+std::vector<tile_index> CTileset::getAllTiles() const
 {
-	std::vector<int> seen_types;
-	seen_types.resize(solidTerrainTypes.size(), 0);
-	const size_t tilesCount = getTileCount();
-	for (size_t i = 16; i < tilesCount; i++) {
-		const CTileInfo &info = tiles[i].tileinfo;
-		if (info.BaseTerrain && info.MixTerrain == 0) {
-			if (seen_types[info.BaseTerrain] == 0) {
-				seen_types[info.BaseTerrain] = 1;
-				solidTiles->push_back(static_cast<tile_index>(i));
+	std::vector<tile_index> result;
+
+	tile_index tileIdx = 0;
+	for (auto &tile : tiles) {
+		if (tileIdx >= 0x10) { /// First 16 tiles for fog of war.
+			if (tile.tile != 0) { /// Ccheck for separator between tiles
+				result.push_back(static_cast<tile_index>(tileIdx));
 			}
 		}
+		tileIdx++;
 	}
+	return result;
+}
+
+std::vector<tile_index> CTileset::getSolidTiles() const
+{
+	std::vector<tile_index> result;
+
+	std::set<terrain_typeIdx> addedTerrains;
+	tile_index tileIdx = 0;
+	for (const auto &tile : tiles) {
+		if (tileIdx >= 0x10) { // First 16 tiles for fog of war
+			const CTileInfo &info = tile.tileinfo;
+			if (info.BaseTerrain && info.MixTerrain == 0
+				&& addedTerrains.count(info.BaseTerrain) == 0) {
+
+				addedTerrains.insert(info.BaseTerrain);
+				result.push_back(static_cast<tile_index>(tileIdx));
+			}
+		}
+		tileIdx++;
+	}
+	return result;
+}
+
+std::vector<tile_index> CTileset::getFirstOfItsKindTiles() const
+{
+	std::vector<tile_index> result;
+
+	bool foundFirstOfAKind = false;
+	tile_index tileIdx = 0;
+	for (auto &tile : tiles) {
+		if (tileIdx > 0xF) { // First 16 tiles for fog of war
+			if (tile.tile == 0 
+				|| tileIdx % 0x10 == 0) { // the begining of a new subslot
+
+				foundFirstOfAKind = false;
+			}
+			if (!foundFirstOfAKind && tile.tile != 0) {
+				if (CheckForUnseparatedSlot(tile) == false) {
+					foundFirstOfAKind = true;
+				}
+				result.push_back(static_cast<tile_index>(tileIdx));
+			}
+		}
+		tileIdx++;
+	}
+	return result;
 }
 
 unsigned CTileset::getWallDirection(tile_index tileIndex, bool human) const

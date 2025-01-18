@@ -48,29 +48,9 @@
 #include "unittype.h"
 
 
-/// Callback for changed tile (with locked position)
-static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos);
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-/**
-**  Change tile from abstract tile-type.
-**
-**  @param pos   map tile coordinate.
-**  @param tile  tile type to edit.
-**
-**  @note  this is a rather dumb function, doesn't do any tile fixing.
-*/
-void ChangeTile(const Vec2i &pos, int tile)
-{
-	Assert(Map.Info.IsPointOnMap(pos));
-
-	CMapField &mf = *Map.Field(pos);
-	mf.setGraphicTile(tile);
-	mf.playerInfo.SeenTile = tile;
-}
 
 
 /**
@@ -90,51 +70,168 @@ static uint32_t QuadFromTile(const Vec2i &pos)
 	return Map.Tileset.getQuadFromTile(idx);
 }
 
+std::optional<tile_index> CTileIconsSet::getTile(size_t iconNo) const
+{
+	if (iconNo < icons.size()) {
+		return icons[iconNo];
+	}
+	return std::nullopt;
+}
+
+std::optional<tile_index> CTileIconsSet::getSelectedTile() const
+{
+	if (isSelected()) {
+		return getTile(selected);
+	}
+	return std::nullopt;
+}
+
+void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly /* = true */)
+{
+	resetSelected();
+	if (manualMode) {
+		icons = firstOfKindOnly ? Map.Tileset.getFirstOfItsKindTiles()
+								: Map.Tileset.getAllTiles();
+	} else {
+		icons = Map.Tileset.getSolidTiles();
+	}
+	updateSliderCtrl();
+	recalcDisplayed();
+}
+
+void CTileIconsSet::updateSliderCtrl()
+{
+	if (!sliderCtrl) {
+		return;
+	}
+	/// TODO: Add page|line scrolling for horizontal|vertical slider
+	sliderCtrl->setScale(0, icons.size() - displayedNum + 1);
+	sliderCtrl->setStepLength(displayedNum);
+	sliderCtrl->setValue(0);
+}
+
+void CTileIconsSet::recalcDisplayed()
+{
+	if (!sliderCtrl || !displayedNum) {
+		displayFrom(0);
+		return;
+	}
+	/// TODO: Add page|line scrolling for horizontal|vertical slider
+	displayFrom(sliderCtrl->getValue());
+};
+
+void CTileIconsSet::setDisplayedNum(const uint16_t number)
+{ 
+	displayedNum = number;
+	updateSliderCtrl();
+	recalcDisplayed();
+}
+
 /**
-**  Editor change tile.
+**  Set tile.
 **
 **  @param pos   map tile coordinate.
-**  @param tileIndex  Tile type to edit.
-**  @param lock_pos   map tile coordinate, that should not be changed in callback.
+**  @param tileIdx  Tile type to edit
 */
-static void EditorChangeTile(const Vec2i &pos, tile_index tileIndex, const Vec2i &lock_pos, bool changeSurroundings)
+void CEditor::SetTile(const Vec2i &pos, tile_index tileIdx)
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+ 	Assert(Map.Info.IsPointOnMap(pos));
 
-	// Change the flags
 	CMapField &mf = *Map.Field(pos);
-	tile_index tileIdx = tileIndex;
-	if (TileToolRandom) {
-		int n = 0;
-		for (int i = 0; i < 16; ++i) {
-			if (!Map.Tileset.tiles[tileIdx + i].tile) {
-				break;
-			} else {
-				++n;
-			}
-		}
-		n = MyRand() % n;
-		int i = -1;
-		do {
-			while (++i < 16 && !Map.Tileset.tiles[tileIdx + i].tile) {
-			}
-		} while (i < 16 && n--);
-		if (i < 16) {
-			tileIdx += i;
-		}
-	}
+
 	mf.setTileIndex(Map.Tileset, tileIdx, 0, mf.getElevation());
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	if (!mf.isDecorative() && changeSurroundings) {
-		if (TileToolNoFixup) {
-			mf.Flags |= MapFieldDecorative;
-		} else {
-			EditorChangeSurrounding(pos, lock_pos);
+	UpdateMinimap = true;
+}
+
+/**
+**  Apply brush
+**
+**  @param pos   map tile coordinate.
+*/
+void CEditor::applyCurentBrush(const Vec2i &pos)
+{
+	auto editTile = [this, &pos](const TilePos &tileOffset,
+								 tile_index tileIdx,
+								 bool fixNeighbors, 
+								 bool decorative) -> void {
+		const TilePos tilePos(pos + tileOffset);
+		if (tilePos.x < 0
+			|| tilePos.x >= Map.Info.MapWidth
+			|| tilePos.y < 0
+			|| tilePos.y >= Map.Info.MapHeight) {
+			return;
 		}
+		SetTile(tilePos, tileIdx);
+
+		CMapField &mapField = *Map.Field(tilePos);
+		if (decorative) {
+			mapField.setFlag(MapFieldNonMixing);
+		} else {
+			if (mapField.isFlag(MapFieldNonMixing)) {
+				mapField.resetFlag(MapFieldNonMixing);
+			}
+			if (fixNeighbors) {
+				ChangeSurrounding(tilePos, tilePos);
+			}
+		}	
+	};
+
+	const auto &brush = brushes.getCurrentBrush();
+	brush.applyAt(pos, editTile);
+
+	if (!MirrorEdit) {
+		return;
+	}
+
+	TilePos maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
+
+	if (brush.getAllign() == CBrush::BrushAllign::UpperLeft) {
+		maxPos.x -= brush.getWidth() - 1;
+		maxPos.y -= brush.getHeight() - 1;
+	}
+	const TilePos mirror = maxPos - pos;
+	const TilePos mirrorv(mirror.x, pos.y);
+
+	brush.applyAt(mirrorv, editTile);
+
+	if (MirrorEdit == 1) {
+		return;
+	}
+	const TilePos mirrorh(pos.x, mirror.y);
+
+	brush.applyAt(mirrorh, editTile);
+	brush.applyAt(mirror, editTile);
+}
+
+/**
+**  Change tile.
+**
+**  @param pos   map tile coordinate.
+**  @param tileIndex  Tile type to edit.
+**  @param lock_pos   map tile coordinate, that should not be changed in callback.
+**  @param changeSurroundings   fix the neighbors tiles.
+**  @param randomizeTile   do the tile randomization (get random tile of the same kind).
+*/
+void CEditor::ChangeTile(const Vec2i &pos,
+						 tile_index tileIndex,
+						 const Vec2i &lock_pos,
+						 bool changeSurroundings,
+						 bool randomizeTile)
+{
+	const tile_index tileIdx = randomizeTile ? Map.Tileset.getRandomTileOfTheSameKindAs(tileIndex)
+											 : tileIndex;
+	SetTile(pos, tileIdx);
+
+	// Change the flags
+	if (changeSurroundings
+		&& !Map.Field(pos)->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
+
+		ChangeSurrounding(pos, lock_pos);
 	}
 }
 
@@ -144,22 +241,17 @@ static void EditorChangeTile(const Vec2i &pos, tile_index tileIndex, const Vec2i
 **  @param pos  Map tile position of change.
 **  @param lock_pos  Original change position, that should not be altered.
 */
-static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
+void CEditor::ChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 {
-	if (TileToolNoFixup) {
-		CMapField &mf = *Map.Field(pos);
-		mf.Flags |= MapFieldDecorative;
+	CMapField &mf = *Map.Field(pos);
+
+	if (mf.isFlag(MapFieldDecorative | MapFieldNonMixing)) {
 		return;
 	}
 
 	// Special case 1) Walls.
-	CMapField &mf = *Map.Field(pos);
 	if (mf.isAWall()) {
 		Map.SetWall(pos, mf.isHuman());
-		return;
-	}
-
-	if (mf.isDecorative()) {
 		return;
 	}
 
@@ -174,21 +266,21 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 	// How this works:
 	//  first get the quad of the neighbouring tile,
 	//  then check if the margin matches.
-	//  Otherwise, call EditorChangeTile again.
+	//  Otherwise, call ChangeTile again.
 	if (pos.y) {
 		const Vec2i offset(0, -1);
 		// Insert into the bottom the new tile.
 		CMapField *f = Map.Field(pos + offset);
 		if (f->isAWall()) {
-			EditorChangeSurrounding(pos + offset, pos);
-		} else if (!f->isDecorative()) {
+			ChangeSurrounding(pos + offset, pos);
+		} else if (!f->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & TH_QUAD_M) | ((quad >> 16) & BH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
 				int tile = Map.Tileset.tileFromQuad(u & BH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos, true);
+					ChangeTile(pos + offset, tile, lock_pos, true, true);
 				}
 			}
 		}
@@ -198,15 +290,15 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 		// Insert into the top the new tile.
 		CMapField *f = Map.Field(pos + offset);
 		if (f->isAWall()) {
-			EditorChangeSurrounding(pos + offset, pos);
-		} else if (!f->isDecorative()) {
+			ChangeSurrounding(pos + offset, pos);
+		} else if (!f->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & BH_QUAD_M) | ((quad << 16) & TH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
 				int tile = Map.Tileset.tileFromQuad(u & TH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos, true);
+					ChangeTile(pos + offset, tile, lock_pos, true, true);
 				}
 			}
 		}
@@ -216,15 +308,15 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 		// Insert into the left the new tile.
 		CMapField *f = Map.Field(pos + offset);
 		if (f->isAWall()) {
-			EditorChangeSurrounding(pos + offset, pos);
-		} else if (!f->isDecorative()) {
+			ChangeSurrounding(pos + offset, pos);
+		} else if (!f->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & LH_QUAD_M) | ((quad >> 8) & RH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
 				int tile = Map.Tileset.tileFromQuad(u & RH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos, true);
+					ChangeTile(pos + offset, tile, lock_pos, true, true);
 				}
 			}
 		}
@@ -234,33 +326,23 @@ static void EditorChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos)
 		// Insert into the right the new tile.
 		CMapField *f = Map.Field(pos + offset);
 		if (f->isAWall()) {
-			EditorChangeSurrounding(pos + offset, pos);
-		} else if (!f->isDecorative()) {
+			ChangeSurrounding(pos + offset, pos);
+		} else if (!f->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
 			unsigned q2 = QuadFromTile(pos + offset);
 			unsigned u = (q2 & RH_QUAD_M) | ((quad << 8) & LH_QUAD_M);
 			if (u != q2 && (pos + offset) != lock_pos) {
 				int tile = Map.Tileset.tileFromQuad(u & LH_QUAD_M, u);
 				if (tile) {
 					did_change = true;
-					EditorChangeTile(pos + offset, tile, lock_pos, true);
+					ChangeTile(pos + offset, tile, lock_pos, true, true);
 				}
 			}
 		}
 	}
 
 	if (did_change) {
-		EditorChangeSurrounding(pos, lock_pos);
+		ChangeSurrounding(pos, lock_pos);
 	}
-}
-
-/**
-**  Update surroundings for tile changes.
-**
-**  @param pos  Map tile position of change.
-*/
-void EditorTileChanged(const Vec2i &pos)
-{
-	EditorChangeSurrounding(pos, pos);
 }
 
 /**
@@ -278,7 +360,7 @@ void EditorTileChanged(const Vec2i &pos)
 **  TileFill(centerx, centery, tile_type_water, map_width)
 **  will fill map with water...
 */
-static void TileFill(const Vec2i &pos, int tile, int size)
+void CEditor::TileFill(const Vec2i &pos, int tile, int size)
 {
 	const Vec2i diag(size / 2, size / 2);
 	Vec2i ipos = pos - diag;
@@ -293,7 +375,7 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
-			EditorChangeTile(itPos, tile, itPos, changeSurroundings);
+			ChangeTile(itPos, tile, itPos, changeSurroundings, true);
 		}
 	}
 }
@@ -310,7 +392,7 @@ static int rng() {
 **  @param count     number of times to apply randomization
 **  @param max_size  maximum size of the fill rectangle
 */
-static void EditorRandomizeTile(int tile, int count, int max_size)
+void CEditor::RandomizeTile(int tile, int count, int max_size)
 {
 	const Vec2i mpos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
 
@@ -335,7 +417,7 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 **  @param count      the number of times to add the unit
 **  @param value      resources to be stored in that unit
 */
-static void EditorRandomizeUnit(const std::string_view unit_type, int count, int value, int tileIndexUnderUnit)
+void CEditor::RandomizeUnit(const std::string_view unit_type, int count, int value, int tileIndexUnderUnit)
 {
 	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
 	CUnitType &type = UnitTypeByIdent(unit_type);
@@ -405,7 +487,7 @@ static void EditorDestroyAllUnits()
 	}
 }
 
-static void RandomizeTransition(int x, int y)
+void CEditor::RandomizeTransition(int x, int y)
 {
 	CMapField &mf = *Map.Field(x, y);
 	const CTileset &tileset = Map.Tileset;
@@ -415,7 +497,7 @@ static void RandomizeTransition(int x, int y)
 		if (rng() % 8 == 0) {
 			// change only in ~12% of cases
 			const tile_index tileIdx = tileset.findTileIndex(rng() % 2 ? baseTileIndex : mixTerrainIdx, 0);
-			EditorChangeTile(Vec2i(x, y), tileIdx, Vec2i(x, y), true);
+			ChangeTile(Vec2i(x, y), tileIdx, Vec2i(x, y), true, true);
 		}
 	}
 }
@@ -423,7 +505,7 @@ static void RandomizeTransition(int x, int y)
 /**
 **  Create a random map
 */
-void CEditor::CreateRandomMap(bool shuffleTranslitions) const
+void CEditor::CreateRandomMap(bool shuffleTranslitions)
 {
 	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
 
@@ -436,10 +518,9 @@ void CEditor::CreateRandomMap(bool shuffleTranslitions) const
 	EditorUpdateDisplay();
 
 
-	const char oldRandom = TileToolRandom;
-	TileToolRandom = 1;
+	Editor.BuildingRandomMap = true;
 	for (std::tuple<int, int, int> t : RandomTiles) {
-		EditorRandomizeTile(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t));
+		RandomizeTile(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t));
 		UI.Minimap.Update();
 		EditorUpdateDisplay();
 	}
@@ -464,10 +545,10 @@ void CEditor::CreateRandomMap(bool shuffleTranslitions) const
 		EditorUpdateDisplay();
 	}
 
-	TileToolRandom = oldRandom;
+	Editor.BuildingRandomMap = false;
 
 	for (std::tuple<std::string, int, int, int> t : RandomUnits) {
-		EditorRandomizeUnit(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
+		RandomizeUnit(std::get<0>(t), mz / 64 * std::get<1>(t), std::get<2>(t), std::get<3>(t));
 		UI.Minimap.Update();
 		EditorUpdateDisplay();
 	}

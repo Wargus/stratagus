@@ -65,6 +65,58 @@ enum class EditorStateType {
 	EditUnit           /// Edit units
 };
 
+class CTileIconsSet
+{
+public:
+	CTileIconsSet() = default;
+	~CTileIconsSet() = default;
+
+	bool isSelected() const { return selected != -1; }
+
+	std::optional<tile_index> getTile(size_t iconNo) const;
+
+	void setIconUnderCursor(size_t iconNo) { iconUnderCursor = iconNo; }
+	int getIconUnderCursor() const { return iconUnderCursor; }
+	void resetIconUnderCursor() { iconUnderCursor = -1; }
+
+	std::optional<tile_index> getSelectedTile() const;
+	int getSelectedIcon() const { return selected; }
+	void select(const uint16_t iconNo)
+	{
+		selected = iconNo < icons.size() ? iconNo : selected;
+	}
+	void resetSelected() { selected = -1; }
+
+	size_t numberOf() const { return icons.size(); }
+
+	void rebuild(bool manualMode = false, bool firstOfKindOnly = true);
+
+	void clear() { icons.clear(); }
+
+	void updateSliderCtrl();
+	void recalcDisplayed();
+	void displayFrom(const uint16_t shift)
+	{
+		shiftToFirstDisplayed = shift < icons.size() ? shift : shiftToFirstDisplayed;
+	}
+	int getDisplayedFirst() { return shiftToFirstDisplayed; }
+	void setDisplayedNum(const uint16_t number);
+	uint16_t getDisplayedNum() const { return displayedNum; }
+
+	void attachSliderCtrl(gcn::Slider *slider) { sliderCtrl = slider; }
+	void resetSliderCtrl() { sliderCtrl = nullptr; }
+
+private:
+	int selected = -1;	/// Selected tile icon
+	int iconUnderCursor = -1;
+	
+	gcn::Slider* sliderCtrl = nullptr;
+	uint16_t shiftToFirstDisplayed = 0;	/// Shift to the first icon displayed
+	uint16_t displayedNum = 0;	/// The number of icons that can be displayed in the area
+
+	std::vector<tile_index> icons; /// Set of tile icons (palette)
+};
+
 class CEditor
 {
 public:
@@ -72,17 +124,28 @@ public:
 	~CEditor() {}
 
 	void Init();
-
-	std::optional<tile_index> getSelectedTile()
-	{
-		if (SelectedTileIndex != -1 && SelectedTileIndex < ShownTileTypes.size()) {
-			return ShownTileTypes[SelectedTileIndex];
-		}
-		return std::nullopt;
-	}
-
+	
+	void applyCurentBrush(const Vec2i &pos); 
+	
 	/// Make random map
-	void CreateRandomMap(bool shuffleTransitions = false) const;
+	void CreateRandomMap(bool shuffleTransitions = false);
+
+private:
+	void SetTile(const Vec2i &pos, tile_index tileIdx);
+	void ChangeTile(const Vec2i &pos,
+					tile_index tileIndex,
+					const Vec2i &lock_pos,
+					bool changeSurroundings,
+					bool randomizeTile);
+	/// Callback for changed tile (with locked position)
+	void ChangeSurrounding(const Vec2i &pos, const Vec2i &lock_pos);
+	void RandomizeTile(int tile, int count, int max_size);
+	void TileFill(const Vec2i &pos, int tile, int size);
+	void RandomizeTransition(int x, int y);
+	void RandomizeUnit(const std::string_view unit_type,
+					   int count,
+					   int value,
+					   int tileIndexUnderUnit);
 
 public:
 	/// Variables for random map creation
@@ -92,21 +155,21 @@ public:
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
-	std::vector<tile_index> ShownTileTypes;			/// Shown editor tile-type table.
 
-	bool TerrainEditable = true; /// Is the terrain editable?
-	IconConfig Select;           /// Editor's select icon.
-	IconConfig Units;            /// Editor's units icon.
-	std::string StartUnitName;   /// name of the Unit used to display the start location.
-	const CUnitType *StartUnit = nullptr;  /// Unit used to display the start location.
+	bool TerrainEditable = true;	/// Is the terrain editable?
+	IconConfig Select;				/// Editor's select icon.
+	IconConfig Units;				/// Editor's units icon.
+	std::string StartUnitName;		/// name of the Unit used to display the start location.
+	const CUnitType *StartUnit = nullptr;	/// Unit used to display the start location.
 
-	int UnitIndex = 0;               /// Unit icon draw index.
-	int CursorUnitIndex = -1;        /// Unit icon under cursor.
-	int SelectedUnitIndex = -1;      /// Unit type to draw.
+	int UnitIndex = 0;				/// Unit icon draw index.
+	int CursorUnitIndex = -1;		/// Unit icon under cursor.
+	int SelectedUnitIndex = -1;		/// Unit type to draw.
 
-	int TileIndex = 0;              /// tile icon draw index.
-	int CursorTileIndex = -1;       /// tile icon under cursor.
-	int SelectedTileIndex = -1;     /// tile type to draw.
+	bool BuildingRandomMap = false;	/// Is random map generation in progress
+
+	bool UpdateMinimap = false;		/// Update units on the minimap
+	int MirrorEdit = 0;				/// Mirror editing enabled
 
 	uint8_t	HighlightElevationLevel {0};
 	uint8_t	SelectedElevationLevel {0};
@@ -120,6 +183,7 @@ public:
 	fieldHighlightChecker OverlayHighlighter {nullptr};
 
 	CBrushesSet brushes;
+	CTileIconsSet tileIcons;
 };
 
 /*----------------------------------------------------------------------------
@@ -127,9 +191,6 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern CEditor Editor;
-
-extern bool TileToolNoFixup;
-extern char TileToolRandom;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -149,9 +210,6 @@ extern int EditorSaveMapWithResize(std::string_view file, Vec2i sz = {0, 0}, Vec
 
 /// Register ccl features
 extern void EditorCclRegister();
-
-/// Update surroundings for tile changes
-extern void EditorTileChanged(const Vec2i &pos);
 
 //@}
 

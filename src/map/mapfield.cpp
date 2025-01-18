@@ -87,13 +87,15 @@ void CMapField::setTileIndex(const CTileset &tileset,
 	this->tile = tile.tile;
 	this->Value = value;
 	this->ElevationLevel = elevation;
-#if 0
-	this->Flags = tile.flag;
-#else
-	this->Flags &= ~(MapFieldOpaque | MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-					 MapFieldWall | MapFieldRocks | MapFieldForest);
-	this->Flags |= tile.flag;
+
+	const tile_flags preserved = this->Flags & (MapFieldLandUnit
+												| MapFieldAirUnit
+												| MapFieldSeaUnit
+												| MapFieldBuilding
+												| MapFieldNonMixing);
+
+	this->Flags = tile.flag | preserved;
+
 	if (subtile >= 0) {
 		uint32_t subtileUnpassabilityFlags = tile.flag >> MapFieldSubtilesUnpassableShift;
 		bool subtileUnpassable = (subtileUnpassabilityFlags >> subtile) & 1;
@@ -259,7 +261,7 @@ bool CMapField::isOpaque() const
 }
 
 /// Check if a field flags.
-bool CMapField::CheckMask(int mask) const
+bool CMapField::CheckMask(tile_flags mask) const
 {
 	return (this->Flags & mask) != 0;
 }
