@@ -13,7 +13,7 @@ class CEditor
 	bool TerrainEditable;
 	const CUnitType *StartUnit;
 	EditorRunningType Running;
-	void CreateRandomMap(bool shuffleTranslitions) const;
+	void CreateRandomMap(bool shuffleTranslitions);
 };
 
 extern CEditor Editor;

@@ -84,6 +84,11 @@ constexpr tile_flags MapFieldCost4			{0x0000'0000'0002'0000 | MapFieldForest};	/
 constexpr tile_flags MapFieldCost5			{0x0000'0000'0004'0000 | MapFieldForest};	/// This field is terrain harvestable, but gives Cost5 instead of wood
 constexpr tile_flags MapFieldCost6			{0x0000'0000'0008'0000 | MapFieldForest};	/// This field is terrain harvestable, but gives Cost6 instead of wood
 
+constexpr tile_flags MapFieldFromUnseparatedSlot
+											{0x0000'0000'1000'0000};	/// If non-interchangeable tiles are located in the same subslot with 
+																		/// no separators (0) between them, such tiles must be flagged with this flag.
+																		/// Otherwise, some of the editor's algorithms will be broken (e.g. the randomization 
+																		/// will pick any tile from a given subslot).
 constexpr tile_flags MapFieldNonMixing		{0x0000'0000'8000'0000};	/// special flag - this isn't it's own name, but it doesn't mix
 
 constexpr uint8_t MapFieldSubtilesMax				{16};
@@ -130,7 +135,6 @@ public:
 /// Definition for a terrain type
 struct SolidTerrainInfo {
 	std::string TerrainName;  /// Name of the terrain
-	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 };
 
 class CTile
@@ -149,6 +153,8 @@ class CTileset
 {
 public:
 	void clear();
+
+	const CTile &getTile(tile_index tileIndex) const;
 
 	size_t getTileCount() const { return tiles.size(); }
 	bool setTileCount(const size_t newCount);
@@ -200,8 +206,10 @@ public:
 	};
 	
 	int32_t findTileIndexByTile(graphic_index tile) const;
-	tile_index getTileNumber(tile_index basic, bool random, bool filler) const;
-	void fillSolidTiles(std::vector<tile_index> *solidTiles) const;
+
+	std::vector<tile_index> getAllTiles() const;
+	std::vector<tile_index> getSolidTiles() const;
+	std::vector<tile_index> getFirstOfItsKindTiles() const;
 
 	uint32_t getQuadFromTile(tile_index tileIndex) const;
 	int getTileBySurrounding(tile_flags type,
@@ -210,6 +218,8 @@ public:
 	tile_index tileFromQuad(uint32_t fixed, uint32_t quad) const;
 	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
 	std::vector<tile_index> getAllTilesOfTheSameKindAs(tile_index tileIndex) const;
+	
+	bool isTileRandomizable(tile_index tileIndex) const;
 	tile_index getRandomTileOfTheSameKindAs(tile_index tileIndex) const;
 
 	void parse(lua_State *l);
@@ -228,6 +238,7 @@ public:
 
 private:
 	bool ModifyFlag(std::string_view flagName, tile_flags *flag, const unsigned int subtileCount);
+	bool CheckForUnseparatedSlot(const CTile &tile) const;
 	int32_t getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const;
 	void buildWallReplacementTable();
 	void parseSlots(lua_State *l, int t);
@@ -248,6 +259,8 @@ public:
 
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
+
+	bool canRandomize = true;	/// Does the tileset structure allow for randomize tiles?
 
 	// some cached values based on pixelTileSize and the logical tile size in the game
 	uint8_t logicalTileToGraphicalTileMultiplier = 0; /// By what to multiply logical tile coordinates to get graphical tile coordinates

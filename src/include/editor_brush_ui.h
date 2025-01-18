@@ -33,7 +33,7 @@
 #include <cstdint>
 #include "tileset.h"
 #include "vec2i.h"
-#include "widgets.h"
+#include <widgets.h>
 
 /*----------------------------------------------------------------------------
 --  Declarations
@@ -82,10 +82,13 @@ private:
 	std::map<std::string, std::unique_ptr<gcn::RadioButton>> allowResize;
 	std::unique_ptr<LambdaActionListener> allowResizeRadioListener;
 
+	std::unique_ptr<gcn::CheckBox> manualEditMode;
+	std::unique_ptr<LambdaActionListener> manualEditModeListener;
 	std::unique_ptr<gcn::CheckBox> enableRnd;
 	std::unique_ptr<LambdaActionListener> enableRndListener;
-	std::unique_ptr<gcn::CheckBox> fixNeighbors;
-	std::unique_ptr<LambdaActionListener> fixNeighborsListener;
+	std::unique_ptr<gcn::CheckBox> decorative;
+	std::unique_ptr<LambdaActionListener> decorativeListener;
+	
 
 	gcn::Rectangle UIRectangle {};
 	int16_t verticalGap = 10;

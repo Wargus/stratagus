@@ -199,7 +199,7 @@ public:
 	bool isOpaque() const;
 
 	/// Check if a field flags.
-	bool CheckMask(int mask) const;
+	bool CheckMask(tile_flags mask) const;
 
 	/// Returns true, if water on the map tile field
 	bool WaterOnMap() const;

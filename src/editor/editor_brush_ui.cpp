@@ -168,37 +168,67 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	});
 	sizeSlider->addActionListener(brushSizeSliderListener.get());
 
+	decorative = std::make_unique<gcn::CheckBox>("Decorative");
+	decorative->setHeight(14);
+	decorative->setFont(&GetGameFont());
+
+	controls.push_back(dynamic_cast<gcn::Widget*>(decorative.get()));
+	parrent->add(decorative.get(),
+				 UIRectangle.x + 5,
+				 allowResize["HeightOnly"]->getY()
+				 + allowResize["HeightOnly"]->getHeight()
+				 + verticalGap);
+
+	decorativeListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
+		auto &brush = Editor.brushes.getCurrentBrush();
+		brush.setDecorative(decorative->isSelected());
+	});
+	decorative->addActionListener(decorativeListener.get());
+
+	manualEditMode = std::make_unique<gcn::CheckBox>("Manual mode");
+	manualEditMode->setHeight(14);
+	manualEditMode->setFont(&GetGameFont());
+
+	controls.push_back(dynamic_cast<gcn::Widget*>(manualEditMode.get()));
+	parrent->add(manualEditMode.get(),
+				 UIRectangle.x + 5,
+				 decorative->getY() + decorative->getHeight() + verticalGap);
+
+	manualEditModeListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
+
+		auto &brush = Editor.brushes.getCurrentBrush();
+		brush.enableFixNeighbors(manualEditMode->isSelected() == false);
+		enableRnd->setVisible(brush.isRandomizeAllowed() && manualEditMode->isSelected());
+
+		if (manualEditMode->isSelected() == false) {
+			brush.setDecorative(false);
+		}
+		decorative->setVisible(!brush.isFixNeighborsEnabled());
+		decorative->setSelected(brush.isDecorative());
+
+		Editor.tileIcons.rebuild(brush.isFixNeighborsEnabled() == false,
+								 brush.isRandomizationEnabled());
+	});
+	manualEditMode->addActionListener(manualEditModeListener.get());
+
 	enableRnd = std::make_unique<gcn::CheckBox>("Random");
 	enableRnd->setHeight(14);
 	enableRnd->setFont(&GetGameFont());
 
 	controls.push_back(dynamic_cast<gcn::Widget*>(enableRnd.get()));
 	parrent->add(enableRnd.get(),
-				 UIRectangle.x + 5,
-				 allowResize["HeightOnly"]->getY()
-				 + allowResize["HeightOnly"]->getHeight()
-				 + verticalGap);
+				 manualEditMode->getX(),
+				 manualEditMode->getY() + manualEditMode->getHeight() + verticalGap);
 
 	enableRndListener = 
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
-		Editor.brushes.getCurrentBrush().enableAutoRandomization(enableRnd->isSelected());
+		
+		auto &brush = Editor.brushes.getCurrentBrush();
+		brush.enableRandomization(enableRnd->isSelected());
+		Editor.tileIcons.rebuild(brush.isFixNeighborsEnabled() == false,
+								 brush.isRandomizationEnabled());
 	});
 	enableRnd->addActionListener(enableRndListener.get());
-
-	fixNeighbors = std::make_unique<gcn::CheckBox>("Fix neighbors");
-	fixNeighbors->setHeight(14);
-	fixNeighbors->setFont(&GetGameFont());
-
-	controls.push_back(dynamic_cast<gcn::Widget*>(fixNeighbors.get()));
-	parrent->add(fixNeighbors.get(),
-				 enableRnd->getX(),
-				 enableRnd->getY() + enableRnd->getHeight() + verticalGap);
-
-	fixNeighborsListener = 
-	std::make_unique<LambdaActionListener>([this](const std::string&) {
-		Editor.brushes.getCurrentBrush().enableFixNeighbors(fixNeighbors->isSelected());
-	});
-	fixNeighbors->addActionListener(fixNeighborsListener.get());
 
 	reloadCtrlSettings();
 }
@@ -209,11 +239,16 @@ void CBrushControlsUI::reloadCtrlSettings()
 		hiddenControls.clear();
 	}
 	const auto brush = Editor.brushes.getCurrentBrush();
-	enableRnd->setVisible(brush.isRandomizeAllowed());
-	enableRnd->setSelected(brush.isAutoRandomizationEnabled());
 
-	fixNeighbors->setVisible(brush.isNeighborsFixAllowed());
-	fixNeighbors->setSelected(brush.isFixNeighborsEnabled());
+	manualEditMode->setVisible(brush.isNeighborsFixAllowed());
+	manualEditMode->setSelected(!brush.isFixNeighborsEnabled());
+
+	enableRnd->setVisible(brush.isRandomizeAllowed() && manualEditMode->isSelected());
+	enableRnd->setSelected(brush.isRandomizationEnabled());
+
+	decorative->setVisible(!brush.isFixNeighborsEnabled());
+	decorative->setSelected(brush.isDecorative());
+
 
 	updateSizeCtrls();
 }
