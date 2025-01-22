@@ -904,7 +904,7 @@ static void DrawEditorInfo()
 	const unsigned flag = mf.getFlags();
 	snprintf(buf,
 	         sizeof(buf),
-	         "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
+	         "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
 	         mf.getElevation(),
 	         mf.Value,
 	         flag,
@@ -921,7 +921,9 @@ static void DrawEditorInfo()
 	         flag & MapFieldLandUnit ? 'l' : '-',
 	         flag & MapFieldAirUnit ? 'a' : '-',
 	         flag & MapFieldSeaUnit ? 's' : '-',
-	         flag & MapFieldBuilding ? 'b' : '-');
+	         flag & MapFieldBuilding ? 'b' : '-',
+	         flag & MapFieldDecorative ? 'd' : '-',
+	         flag & MapFieldNonMixing  ? 'X' : '-');
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
 							   UI.StatusLine.TextY - GetGameFont().getHeight() * 2,
 							   buf);
