@@ -579,7 +579,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 
 	// Place unit inside the resource
 	if (!resinfo.HarvestFromOutside) {
-		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
+		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideUnits.size()) {
 			this->ClearGoal();
 			int selected = unit.Selected;
 			unit.Remove(goal);
@@ -589,7 +589,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 				SelectionChanged();
 				unit.Removed = 1;
 			}
-		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideCount) {
+		} else if (goal->Variable[MAXHARVESTERS_INDEX].Value <= goal->InsideUnits.size()) {
 			//Resource is full, wait
 			unit.Wait = 10;
 			return 0;

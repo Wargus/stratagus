@@ -120,21 +120,10 @@
 **  free. This points to the transporter for units on board, or to
 **  the building for peasants inside(when they are mining).
 **
-**  CUnit::UnitInside
+**  CUnit::InsideUnits
 **
-**  Pointer to the last unit added inside. Order doesn't really
-**  matter. All units inside are kept in a circular linked list.
-**  This is nullptr if there are no units inside. Multiple levels
-**  of inclusion are allowed, though not very useful right now
-**
-**  CUnit::NextContained, CUnit::PrevContained
-**
-**  The next and previous element in the curent container. Bogus
-**  values allowed for units not contained.
-**
-**  CUnit::InsideCount
-**
-**  The number of units inside the container.
+**  List of unit added inside. Order doesn't really matter.
+**  Multiple levels of inclusion are allowed, though not very useful right now.
 **
 **  CUnit::BoardCount
 **
@@ -401,12 +390,9 @@ void CUnit::Init()
 	Refs = 0;
 	ReleaseCycle = 0;
 	PlayerSlot = static_cast<size_t>(-1);
-	InsideCount = 0;
+	InsideUnits.clear();
 	BoardCount = 0;
-	UnitInside = nullptr;
 	Container = nullptr;
-	NextContained = nullptr;
-	PrevContained = nullptr;
 	NextWorker = nullptr;
 
 	Resource.Workers = nullptr;
@@ -787,8 +773,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 				 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
 
-	CUnit *unit_inside = unit.UnitInside;
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (const CUnit *unit_inside : unit.InsideUnits) {
 		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
 	}
 }
@@ -796,7 +781,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 /**
 **  Return the unit not transported, by viewing the container recursively.
 **
-**  @param unit  unit from where look the first conatiner.
+**  @param unit  unit from where look the first container.
 **
 **  @return      Container of container of ... of unit. It is not null.
 */
@@ -951,8 +936,7 @@ void UpdateUnitSightRange(CUnit &unit)
 		unit.CurrentSightRange = unit.Container->CurrentSightRange;
 	}
 
-	CUnit *unit_inside = unit.UnitInside;
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (CUnit *unit_inside : unit.InsideUnits) {
 		UpdateUnitSightRange(*unit_inside);
 	}
 }
@@ -1048,29 +1032,9 @@ void CUnit::AddInContainer(CUnit &host)
 		// loaded via CclUnit
 		return;
 	}
-	if (host.InsideCount == 0) {
-		NextContained = PrevContained = this;
-		host.UnitInside = this;
-	} else {
-		// keep sorted by size.
-		int mySize = Type->BoardSize;
-		NextContained = host.UnitInside;
-		bool becomeFirst = true;
-		while (NextContained->Type->BoardSize > mySize) {
-			becomeFirst = false;
-			NextContained = NextContained->NextContained;
-			if (NextContained == host.UnitInside) {
-				break;
-			}
-		}
-		PrevContained = NextContained->PrevContained;
-		NextContained->PrevContained->NextContained = this;
-		NextContained->PrevContained = this;
-		if (becomeFirst) {
-			host.UnitInside = this;
-		}
-	}
-	host.InsideCount++;
+	auto it = ranges::find_if(host.InsideUnits,
+	                          [=](const CUnit *unit) { return unit->Type->BoardSize <= Type->BoardSize; });
+	host.InsideUnits.insert(it, this);
 }
 
 /**
@@ -1082,17 +1046,10 @@ static void RemoveUnitFromContainer(CUnit &unit)
 {
 	CUnit *host = unit.Container; // transporter which contain unit.
 	Assert(unit.Container);
-	Assert(unit.Container->InsideCount > 0);
 
-	host->InsideCount--;
-	unit.NextContained->PrevContained = unit.PrevContained;
-	unit.PrevContained->NextContained = unit.NextContained;
-	if (host->InsideCount == 0) {
-		host->UnitInside = nullptr;
-	} else {
-		if (host->UnitInside == &unit) {
-			host->UnitInside = unit.NextContained;
-		}
+	auto it = ranges::find(host->InsideUnits, &unit);
+	if (it != host->InsideUnits.end()) {
+		host->InsideUnits.erase(it);
 	}
 	unit.Container = nullptr;
 }
@@ -1110,12 +1067,10 @@ static void RemoveUnitFromContainer(CUnit &unit)
 */
 static void UnitInXY(CUnit &unit, const Vec2i &pos)
 {
-	CUnit *unit_inside = unit.UnitInside;
-
 	unit.tilePos = pos;
 	unit.Offset = Map.getIndex(pos);
 
-	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
+	for (CUnit *unit_inside : unit.InsideUnits) {
 		UnitInXY(*unit_inside, pos);
 	}
 }
@@ -1808,9 +1763,8 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 
 	// Rescue all units in buildings/transporters.
-	CUnit *uins = UnitInside;
-	for (int i = InsideCount; i; --i, uins = uins->NextContained) {
-		uins->ChangeOwner(newplayer);
+	for (CUnit *unit_inside : InsideUnits) {
+		unit_inside->ChangeOwner(newplayer);
 	}
 
 	//  Must change food/gold and other.
@@ -2313,9 +2267,9 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 */
 void DropOutAll(const CUnit &source)
 {
-	CUnit *unit = source.UnitInside;
+	auto insideUnits = source.InsideUnits; // source.InsideUnits is modified inside the loop
 
-	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
+	for (CUnit *unit : insideUnits) {
 		DropOutOnSide(*unit, LookingW, &source);
 	}
 }
@@ -2444,9 +2398,9 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 
 	// Transporters lose or save their units and building their workers
-	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
+	if (unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
 		DropOutAll(unit);
-	} else if (unit.UnitInside) {
+	} else {
 		DestroyAllInside(unit);
 	}
 
@@ -2496,14 +2450,13 @@ void LetUnitDie(CUnit &unit, bool suicide)
 */
 void DestroyAllInside(CUnit &source)
 {
-	CUnit *unit = source.UnitInside;
-
 	// No Corpses, we are inside something, and we can't be seen
-	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
+	while (!source.InsideUnits.empty()) {
+		CUnit *unit = source.InsideUnits.back();
+
 		// Transporter inside a transporter?
-		if (unit->UnitInside) {
-			DestroyAllInside(*unit);
-		}
+		DestroyAllInside(*unit);
+
 		UnitLost(*unit);
 		UnitClearOrders(*unit);
 		unit->Release();

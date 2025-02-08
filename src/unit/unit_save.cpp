@@ -276,14 +276,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
-	if (unit.UnitInside) {
+	if (!unit.InsideUnits.empty()) {
 		file.printf("\n  \"units-contained\", {");
-		CUnit *uins = unit.UnitInside->PrevContained;
-		for (int i = unit.InsideCount; i; --i, uins = uins->PrevContained) {
-			file.printf("\"%s\"", UnitReference(*uins).c_str());
-			if (i > 1) {
-				file.printf(", ");
-			}
+		const char *sep = "";
+		for (const CUnit *unit_inside : unit.InsideUnits) {
+			file.printf(sep);
+			file.printf("\"%s\"", UnitReference(*unit_inside).c_str());
+			sep = ", ";
 		}
 		file.printf("},\n  ");
 	}

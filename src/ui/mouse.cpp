@@ -1845,10 +1845,9 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  for transporter
 			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
-					CUnit *uins = Selected[0]->UnitInside;
 					size_t j = 0;
 
-					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+					for (CUnit *uins : Selected[0]->InsideUnits) {
 						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
 							continue;
 						}
