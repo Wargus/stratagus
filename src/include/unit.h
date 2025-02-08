@@ -324,12 +324,9 @@ public:
 	CUnitManagerData UnitManagerData;
 	size_t PlayerSlot = 0;  /// index in Player->Units
 
-	int    InsideCount = 0;   /// Number of units inside.
-	int    BoardCount = 0;    /// Number of units transported inside.
-	CUnit *UnitInside = nullptr;    /// Pointer to one of the units inside.
+	std::vector<CUnit *> InsideUnits; /// Units inside.
 	CUnit *Container = nullptr;     /// Pointer to the unit containing it (or 0)
-	CUnit *NextContained = nullptr; /// Next unit in the container.
-	CUnit *PrevContained = nullptr; /// Previous unit in the container.
+	int    BoardCount = 0;    /// Number of units transported inside.
 
 	CUnit *NextWorker = nullptr; //pointer to next assigned worker to "Goal" resource.
 	struct {

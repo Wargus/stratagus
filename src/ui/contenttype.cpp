@@ -214,7 +214,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		case EnumUnit::UnitRefItSelf:
 			return &unit;
 		case EnumUnit::UnitRefInside:
-			return unit.UnitInside;
+			return unit.InsideUnits.empty() ? nullptr: unit.InsideUnits[0];
 		case EnumUnit::UnitRefContainer:
 			return unit.Container;
 		case EnumUnit::UnitRefWorker:

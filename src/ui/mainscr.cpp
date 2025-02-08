@@ -496,12 +496,11 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 	}
 }
 
-static void DrawUnitInfo_transporter(CUnit &unit)
+static void DrawUnitInfo_transporter(const CUnit &unit)
 {
-	CUnit *uins = unit.UnitInside;
 	size_t j = 0;
 
-	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+	for (const CUnit *uins : unit.InsideUnits) {
 		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
 			continue;
 		}

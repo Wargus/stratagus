@@ -226,14 +226,9 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 	if (!UnitCanBeAt(transporter, pos)) {
 		return false;
 	}
-	CUnit *unit = transporter.UnitInside;
-	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
-		if (FindUnloadPosition(transporter, *unit, pos, maxUnloadRange)) {
-			return true;
-		}
-	}
-	// Check unit can be droped from here.
-	return false;
+	return ranges::any_of(transporter.InsideUnits, [&](CUnit *unit) {
+		return FindUnloadPosition(transporter, *unit, pos, maxUnloadRange);
+	});
 }
 
 
@@ -299,7 +294,7 @@ static std::optional<Vec2i>
 ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int maxRange)
 {
 	// Check there are units onboard
-	if (!transporter.UnitInside) {
+	if (transporter.InsideUnits.empty()) {
 		return std::nullopt;
 	}
 	const bool isTransporterRemoved = transporter.Removed;
@@ -348,8 +343,9 @@ bool COrder_Unload::LeaveTransporter(CUnit &transporter)
 		}
 	} else {
 		// Unload all units.
-		CUnit *goal = transporter.UnitInside;
-		for (int i = transporter.InsideCount; i; --i, goal = goal->NextContained) {
+		auto insideUnits = transporter.InsideUnits; // UnloadUnit modifies transporter.InsideUnits;
+
+		for (CUnit *goal : insideUnits) {
 			if (goal->Boarded) {
 				if (!UnloadUnit(transporter, *goal)) {
 					++stillonboard;
