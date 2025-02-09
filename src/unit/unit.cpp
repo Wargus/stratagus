@@ -393,10 +393,8 @@ void CUnit::Init()
 	InsideUnits.clear();
 	BoardCount = 0;
 	Container = nullptr;
-	NextWorker = nullptr;
 
-	Resource.Workers = nullptr;
-	Resource.Assigned = 0;
+	Resource.AssignedWorkers.clear();
 	Resource.Active = 0;
 
 	tilePos.x = 0;
@@ -495,8 +493,8 @@ void CUnit::Release(bool final)
 			RemoveUnitFromContainer(*this);
 		}
 
-		while (Resource.Workers) {
-			Resource.Workers->DeAssignWorkerFromMine(*this);
+		while (!Resource.AssignedWorkers.empty()) {
+			Resource.AssignedWorkers.back()->DeAssignWorkerFromMine(*this);
 		}
 
 		if (--Refs > 0) {
@@ -1816,25 +1814,14 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	UpdateForNewUnit(*this, 1);
 }
 
-static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
-{
-	for (CUnit *it = mine.Resource.Workers; it; it = it->NextWorker) {
-		if (it == &worker) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
 void CUnit::AssignWorkerToMine(CUnit &mine)
 {
-	if (IsMineAssignedBy(mine, *this) == true) {
+	if (ranges::contains(mine.Resource.AssignedWorkers, this)) {
 		return;
 	}
-	Assert(this->NextWorker == nullptr);
+	mine.Resource.AssignedWorkers.push_back(this);
+	this->RefsIncrease();
 
-	CUnit *head = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is adding into %s [%d] on %d pos\n",
 	           this->Player->Index,
@@ -1843,18 +1830,10 @@ void CUnit::AssignWorkerToMine(CUnit &mine)
 	           mine.Slot,
 	           mine.Data.Resource.Assigned);
 #endif
-	this->RefsIncrease();
-	this->NextWorker = head;
-	mine.Resource.Workers = this;
-	mine.Resource.Assigned++;
 }
 
 void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 {
-	if (IsMineAssignedBy(mine, *this) == false) {
-		return ;
-	}
-	CUnit *prev = nullptr, *worker = mine.Resource.Workers;
 #if 0
 	DebugPrint("%d: Worker [%d] is removing from %s [%d] left %d units assigned\n",
 	           this->Player->Index,
@@ -1863,26 +1842,13 @@ void CUnit::DeAssignWorkerFromMine(CUnit &mine)
 	           mine.Slot,
 	           mine.CurrentOrder()->Data.Resource.Assigned);
 #endif
-	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
-		if (worker == this) {
-			CUnit *next = worker->NextWorker;
-			worker->NextWorker = nullptr;
-			if (prev) {
-				prev->NextWorker = next;
-			}
-			if (worker == mine.Resource.Workers) {
-				mine.Resource.Workers = next;
-			}
-			worker->RefsDecrease();
-			break;
-		}
-		prev = worker;
-		Assert(i <= mine.Resource.Assigned);
+	auto it = ranges::find(mine.Resource.AssignedWorkers, this);
+	if (it == mine.Resource.AssignedWorkers.end()) {
+		return;
 	}
-	mine.Resource.Assigned--;
-	Assert(mine.Resource.Assigned >= 0);
+	RefsDecrease();
+	mine.Resource.AssignedWorkers.erase(it);
 }
-
 
 /**
 **  Change the owner of all units of a player.
@@ -2355,8 +2321,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	const CUnitType *type = unit.Type;
 
-	while (unit.Resource.Workers) {
-		unit.Resource.Workers->DeAssignWorkerFromMine(unit);
+	while (!unit.Resource.AssignedWorkers.empty()) {
+		unit.Resource.AssignedWorkers.back()->DeAssignWorkerFromMine(unit);
 	}
 
 	// removed units,  just remove.

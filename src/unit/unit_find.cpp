@@ -388,7 +388,7 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 {
 	distance = deposit ? mine.MapDistanceTo(*deposit) : 0;
 	if (check_usage) {
-		assigned = mine.Resource.Assigned - mine.Type->MaxOnBoard;
+		assigned = mine.Resource.AssignedWorkers.size() - mine.Type->MaxOnBoard;
 		waiting = GetNumWaitingWorkers(mine);
 	} else {
 		assigned = 0;

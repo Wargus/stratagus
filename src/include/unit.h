@@ -328,10 +328,8 @@ public:
 	CUnit *Container = nullptr;     /// Pointer to the unit containing it (or 0)
 	int    BoardCount = 0;    /// Number of units transported inside.
 
-	CUnit *NextWorker = nullptr; //pointer to next assigned worker to "Goal" resource.
 	struct {
-		CUnit *Workers = nullptr; /// pointer to first assigned worker to this resource.
-		int Assigned = 0; /// how many units are assigned to harvesting from the resource.
+		std::vector<CUnit *> AssignedWorkers; /// assigned workers to this resource.
 		int Active = 0; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
