@@ -257,22 +257,17 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf(" \"auto-repair\",");
 	}
 
-	if (unit.NextWorker) {
-		if (unit.NextWorker->Destroyed) {
-			/* this unit is destroyed so it's not in the global unit
-			 * array - this means it won't be saved!!! */
-			printf("FIXME: storing destroyed Worker - loading will fail.\n");
-		}
-		file.printf(" \"next-worker\", \"%s\",", UnitReference(*unit.NextWorker).c_str());
-	}
-
-	if (unit.Resource.Workers != nullptr) {
+	if (!unit.Resource.AssignedWorkers.empty()) {
 		file.printf(" \"resource-active\", %d,", unit.Resource.Active);
-		file.printf(" \"resource-assigned\", %d,", unit.Resource.Assigned);
-		file.printf(" \"resource-workers\", \"%s\",", UnitReference(*unit.Resource.Workers).c_str());
+		file.printf(R"( "resource-workers", {)");
+		const auto *sep = "";
+		for (const auto* worker : unit.Resource.AssignedWorkers) {
+			file.printf(R"( %s"%s")", sep, UnitReference(*worker).c_str());
+			sep = ", ";
+		}
+		file.printf("},");
 	} else {
 		Assert(unit.Resource.Active == 0);
-		Assert(unit.Resource.Assigned == 0);
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 

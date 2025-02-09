@@ -801,8 +801,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 				// Improved version of DropOutAll that makes workers go to the depot.
 				LoseResource(unit, *source);
-				for (CUnit *uins = source->Resource.Workers;
-					 uins; uins = uins->NextWorker) {
+				for (CUnit *uins : source->Resource.AssignedWorkers) {
 					if (uins != &unit && uins->CurrentOrder()->Action == UnitAction::Resource) {
 						COrder_Resource &order = *static_cast<COrder_Resource *>(uins->CurrentOrder());
 						if (!uins->Anim.Unbreakable && order.State == SUB_GATHER_RESOURCE) {
@@ -842,25 +841,18 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 int GetNumWaitingWorkers(const CUnit &mine)
 {
-	int ret = 0;
-	CUnit *worker = mine.Resource.Workers;
-
-	for (int i = 0; nullptr != worker; worker = worker->NextWorker, ++i) {
+	return ranges::count_if(mine.Resource.AssignedWorkers, [](const auto *worker) {
 		Assert(worker->CurrentAction() == UnitAction::Resource);
 		COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 
-		if (order.IsGatheringWaiting()) {
-			ret++;
-		}
-		Assert(i <= mine.Resource.Assigned);
-	}
-	return ret;
+		return order.IsGatheringWaiting();
+	});
 }
 
 /**
 **  Stop gathering from the resource, go home.
 **
-**  @param unit  Poiner to unit.
+**  @param unit  Unit.
 **
 **  @return      TRUE if ready, otherwise FALSE.
 */
@@ -893,9 +885,8 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 		if (source->Type->MaxOnBoard) {
 			int count = 0;
-			CUnit *worker = source->Resource.Workers;
 			CUnit *next = nullptr;
-			for (; nullptr != worker; worker = worker->NextWorker) {
+			for (auto* worker : source->Resource.AssignedWorkers) {
 				Assert(worker->CurrentAction() == UnitAction::Resource);
 				COrder_Resource &order = *static_cast<COrder_Resource *>(worker->CurrentOrder());
 				if (worker != &unit && order.IsGatheringWaiting()) {
@@ -918,7 +909,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 					           UnitNumber(*next),
 					           next->Wait,
 					           UnitNumber(*source),
-					           source->Resource.Assigned,
+					           source->Resource.AssignedWorkers.size(),
 					           count);
 				}
 				next->Wait = 0;
