@@ -50,8 +50,7 @@ struct lua_State;
 class CUnitManager
 {
 public:
-	CUnitManager();
-	~CUnitManager();
+	CUnitManager() = default;
 	void Init();
 
 	CUnit *AllocUnit();
@@ -73,7 +72,7 @@ public:
 
 private:
 	std::vector<CUnit *> units;
-	std::vector<std::unique_ptr<CUnit>> unitSlots;
+	std::vector<CUnit *> unitSlots;
 	std::list<CUnit *> releasedUnits;
 	CUnit *lastCreated = nullptr;
 };
