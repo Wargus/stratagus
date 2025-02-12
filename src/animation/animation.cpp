@@ -526,7 +526,7 @@ static void FixLabels(lua_State *l, const std::vector<std::unique_ptr<CAnimation
 /**
 **  Parse an animation frame
 **
-**  @param str  string formated as "animationType extraArgs"
+**  @param str  string formatted as "animationType extraArgs"
 */
 static std::unique_ptr<CAnimation>
 ParseAnimationFrame(lua_State *l, std::string_view str)

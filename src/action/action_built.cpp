@@ -56,7 +56,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 {
 	auto order = std::make_unique < COrder_Built>();
 
-	// Make sure the bulding doesn't cancel itself out right away.
+	// Make sure the building doesn't cancel itself out right away.
 
 	unit.Variable[HP_INDEX].Value = 1;
 	if (unit.Variable[SHIELD_INDEX].Max) {
@@ -176,7 +176,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			if (worker->Type->ResInfo[type.GivesResource]) {
 				CommandResource(*worker, unit, EFlushMode::Off);
 			}
-			// If we can reurn goods to a new depot, do it.
+			// If we can return goods to a new depot, do it.
 			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
 				CommandReturnGoods(*worker, &unit, EFlushMode::Off);
 			}

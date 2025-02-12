@@ -305,7 +305,7 @@ class CRenderer : public CPrimitives
 			Uint32 * p = (((Uint32 *)pixels) + index);
 			/*
 			 *	FIXME:
-			 *	Two Pixels Blend for litle endian and
+			 *	Two Pixels Blend for little endian and
 			 *	big endian may be broken.
 			 */
 			unsigned int d1, s1 = color & 0xff00ff;
@@ -348,7 +348,7 @@ class CRenderer : public CPrimitives
 
 			Uint16 *p = (((Uint16 *)pixels) + index);
 			Uint16 d = *p;
-			Uint16 s = color & 0xFFFF; // I hope that caler secure it;
+			Uint16 s = color & 0xFFFF; // I hope that caller secure it;
 
 			*p = BLEND16_50(d, s, MASK);
 
@@ -376,7 +376,7 @@ class CRenderer : public CPrimitives
 
 			Uint32 *p = (Uint32 *)(((Uint16 *)pixels) + index);
 			Uint32 d = *p;
-			const Uint32 s = (color & 0xFFFF) | color << 16; // I hope that caler secure it;
+			const Uint32 s = (color & 0xFFFF) | color << 16; // I hope that caller secure it;
 
 			*p = BLEND2x16_50(d, s, MASK);
 

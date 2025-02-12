@@ -348,7 +348,7 @@ void COrder_Attack::OfferNewTarget(const CUnit &unit, CUnit &target)
 {
 	Assert(this->IsAutoTargeting() || unit.Player->AiEnabled);
 
-	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
+	/// if attacker can't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove();
 	if (immobile && !InAttackRange(unit, target)) {
 		return;
@@ -480,7 +480,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		DebugPrint("UnderAttack counter: %d \n", unit.UnderAttack);
 	}
 
-	/// if attacker cant't move (stand_ground, building, in a bunker or transport)
+	/// if attacker can't move (stand_ground, building, in a bunker or transport)
 	const bool immobile = this->Action == UnitAction::StandGround || unit.Removed || !unit.CanMove();
 	if (immobile) {
 		newTarget = AttackUnitsInRange(unit); // search for enemies only in attack range
@@ -505,7 +505,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		&& !(unit.UnderAttack && !goal->IsAgressive())) {
 
 		if (newTarget && newTarget != goal) {
-			/// Do not switch to non aggresive targets while UnderAttack counter is active
+			/// Do not switch to non aggressive targets while UnderAttack counter is active
 			if (unit.UnderAttack && !newTarget->IsAgressive()) {
 				return true;
 			}

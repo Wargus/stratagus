@@ -1026,7 +1026,7 @@ char UpgradeIdAllowed(const CPlayer &player, int id)
 	return player.Allow.Upgrades[id];
 }
 
-// ***************by string identifiers's
+// ***************by string identifiers
 
 /**
 **  Return the allow state of an upgrade.

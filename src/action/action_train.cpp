@@ -255,7 +255,7 @@ void COrder_Train::Execute(CUnit &unit) /* override */
 		newUnit->Orders[0] = unit.NewOrder->Clone();
 	} else {
 #if 0
-		// Tell the unit to rigth-click ?
+		// Tell the unit to right-click ?
 #endif
 	}
 	this->Finished = true;

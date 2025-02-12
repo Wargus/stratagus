@@ -72,7 +72,7 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 }
 
 /**
-**  Transform list of unit separed with coma to a true list.
+**  Transform list of unit separated with coma to a true list.
 */
 static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 {
@@ -95,7 +95,7 @@ static std::vector<CUnitType *> getUnitTypeFromString(std::string_view list)
 }
 
 /**
-**  Get list of unittype which can be repared.
+**  Get list of unittype which can be repaired.
 */
 static std::vector<CUnitType *> getReparableUnits()
 {
@@ -1054,7 +1054,7 @@ static int CclAiWaitForce(lua_State *l)
 		return 1;
 	}
 #if 0
-	// Debuging
+	// Debugging
 	AiRemoveDeadUnitInForces();
 	Assert(!AiPlayer->Force.getScriptForce(f).Completed);
 #endif
@@ -1555,7 +1555,7 @@ static int CclAiDump(lua_State *l)
 }
 
 /**
-**  Parse AiBuildQueue builing list
+**  Parse AiBuildQueue building list
 **
 **  @param l     Lua state.
 **  @param ai  PlayerAi pointer which should be filled with the data.

@@ -158,7 +158,7 @@ static std::unique_ptr<FullReplay> StartReplay()
 		// Some settings are determined during CreateGame and then stored on the
 		// Players array. For replay, we want to store these,
 		// generally. However, this is not true for teams, since there is
-		// automatic handling of alliance flags for rescueable players.
+		// automatic handling of alliance flags for rescuable players.
 		// Additionally, teams are automatically created in CPlayer::Init.
 		// The presets team is actually not used verbatim, but instead used
 		// as the basis of further calculation for the actual player's team

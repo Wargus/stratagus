@@ -80,7 +80,7 @@ extern void ColorCycleSurface(SDL_Surface &surface);
 -- Variables
 ----------------------------------------------------------------------------*/
 
-// Direct acces to clipping rectangle for macro CLIP_RECTANGLE
+// Direct access to clipping rectangle for macro CLIP_RECTANGLE
 extern int ClipX1; /// current clipping top left
 extern int ClipY1; /// current clipping top left
 extern int ClipX2; /// current clipping bottom right

@@ -857,7 +857,7 @@ public:
 				dest.CacheLock = 1;
 
 				// Calc a negative cost
-				// The gost is more important when the unit would be killed
+				// The cost is more important when the unit would be killed
 				// by our fire.
 
 				// It costs (is positive) if hp_damage_evaluate>dest->HP ...)

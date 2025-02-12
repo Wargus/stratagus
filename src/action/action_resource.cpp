@@ -390,7 +390,7 @@ bool COrder_Resource::OnAiHitUnit(CUnit &unit, CUnit *attacker, int /* damage*/)
 /**
 **  Move unit to terrain.
 **
-**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
+**  @return      1 if reached, -1 if unreachable, 0 if on the way.
 */
 int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 {
@@ -444,7 +444,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 /**
 **  Move unit to unit resource.
 **
-**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
+**  @return      1 if reached, -1 if unreachable, 0 if on the way.
 */
 int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 {
@@ -479,7 +479,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 **
 **  @param unit  Pointer to unit.
 **
-**  @return      1 if reached, -1 if unreacheable, 0 if on the way.
+**  @return      1 if reached, -1 if unreachable, 0 if on the way.
 */
 int COrder_Resource::MoveToResource(CUnit &unit)
 {
@@ -1406,9 +1406,9 @@ void COrder_Resource::Execute(CUnit &unit)
 		if (WaitInDepot(unit)) {
 			this->State = SUB_START_RESOURCE;
 
-			// It's posible, though very rare that the unit's goal blows up
+			// It's possible, though very rare that the unit's goal blows up
 			// this cycle, but after this unit. Thus, next frame the unit
-			// will start mining a destroyed site. If, on the otherhand we
+			// will start mining a destroyed site. If, on the other hand we
 			// are already in SUB_MOVE_TO_RESOURCE then we can handle it.
 			// So, we pass through SUB_START_RESOURCE the very instant it
 			// goes out of the depot.

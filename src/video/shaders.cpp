@@ -259,7 +259,7 @@ static GLint TextureSize;
 static GLint InputSize;
 static GLint TexCoord;
 // caches that don't change for a window size
-static int RecacheCount = 0; // rechache multiple times - races!
+static int RecacheCount = 0; // recache multiple times - races!
 extern uint8_t SizeChangeCounter; // from sdl.cpp
 static uint16_t LastSizeVersion = -1;
 static int LastVideoWidth = -1;

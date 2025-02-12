@@ -358,7 +358,7 @@ static int CclDefineBurningBuilding(lua_State *l)
 	}
 	if (!IsBurningBuildingFramesValid())
 	{
-		LuaError(l, "Percents of BurningBuilding not valid (percents out of range or not sorted)");
+		LuaError(l, "Percent of BurningBuilding not valid (percent out of range or not sorted)");
 	}
 	return 0;
 }

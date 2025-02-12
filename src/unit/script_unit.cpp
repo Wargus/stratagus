@@ -902,7 +902,7 @@ static int CclSetResourcesHeld(lua_State *l)
 }
 
 /**
-**  Set teleport deastination for teleporter unit
+**  Set teleport destination for teleporter unit
 **
 **  @param l  Lua state.
 */

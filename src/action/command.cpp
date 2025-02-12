@@ -386,7 +386,7 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, EFlushMode flush)
 /**
 **  Let a unit patrol from current to new position
 **
-**  FIXME: want to support patroling between units.
+**  FIXME: want to support patrolling between units.
 **
 **  @param unit   pointer to unit.
 **  @param pos    map position to patrol between.
