@@ -662,7 +662,7 @@ static void DrawUnitIcons()
 }
 
 /**
- * Call the forEach callback with each tile option buttons's <is-active boolean,label string,i,x,y,w,h>.
+ * Call the forEach callback with each tile option buttons' <is-active boolean,label string,i,x,y,w,h>.
  * Return false to cancel iteration.
  *
  * Returns the last value returned by forEach. This can be used to detect if an early cancellation of the
@@ -1535,24 +1535,24 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 		case 'g': // Toggle map grid
 			CViewport::EnableGrid(!CViewport::isGridEnabled());
 			break;
-		case '+': /// Increace brush's elevation level
+		case '+': /// Increase brush's elevation level
 		case '=':
 			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel < 255) {
 				Editor.SelectedElevationLevel++;
 			}
 			break;
-		case '-': /// Decreace brush's elevation level
+		case '-': /// Decrease brush's elevation level
 			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel > 0) {
 				Editor.SelectedElevationLevel--;
 			}
 			break;
-		case ']': /// Increace highlighted elevation level
+		case ']': /// Increase highlighted elevation level
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 			    && Editor.HighlightElevationLevel < 255) {
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case '[': /// Decreace highlighted elevation level
+		case '[': /// Decrease highlighted elevation level
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 			    && Editor.HighlightElevationLevel > 0) {
 				Editor.HighlightElevationLevel--;
@@ -1893,7 +1893,7 @@ void CEditor::Init()
 	if (!*CurrentMapPath) { // new map!
 		InitUnitTypes(1);
 		//
-		// Inititialize Map / Players.
+		// Initialize Map / Players.
 		//
 		InitPlayers();
 		for (int i = 0; i < PlayerMax; ++i) {
@@ -1978,7 +1978,7 @@ void CEditor::Init()
 **  @return      0 for success, -1 for error
 **
 **  @todo  FIXME: Check if the map is valid, contains no failures.
-**         At least two players, one human slot, every player a startpoint
+**         At least two players, one human slot, every player have a start point
 **         ...
 */
 int EditorSaveMap(const std::string &file)

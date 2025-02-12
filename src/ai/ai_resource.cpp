@@ -114,7 +114,7 @@ static int AiCheckCosts(const int (&costs)[MaxCosts])
 **  @param pai   AI player.
 **  @param type  Unit-type that should be build.
 **
-**  @return      True if enought, false otherwise.
+**  @return      True if enough, false otherwise.
 **
 **  @todo  The number of food currently trained can be stored global
 **         for faster use.
@@ -348,7 +348,7 @@ void AiNewDepotRequest(CUnit &worker)
 	if (pos.x != -1 && nullptr != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
 		/*
 		 * New Depot has just be finished and worker just return to old depot
-		 * (far away) from new Deopt.
+		 * (far away) from new Depot.
 		 */
 		return;
 	}

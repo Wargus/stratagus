@@ -94,7 +94,7 @@ static int CclEditorResizeMap(lua_State *l)
 }
 
 /**
-**  Confgure the randomize map feature of the editor.
+**  Configure the randomize map feature of the editor.
 **
 **  @param l  Lua state.
 */

@@ -86,7 +86,7 @@ void ChangeTile(const Vec2i &pos, int tile)
 */
 static uint32_t QuadFromTile(const Vec2i &pos)
 {
-	// find the abstact tile number
+	// find the abstract tile number
 	const graphic_index tile = Map.Field(pos)->getGraphicTile();
 	return Map.Tileset.getQuadFromTile(tile);
 }

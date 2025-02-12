@@ -140,8 +140,7 @@ void COrder_Unload::UpdatePathFinderData(PathFinderInput &input) /* override */
 **  @param transporter
 **  @param unit         Unit to unload.
 **  @param startPos     Original search position
-**  @param maxrange     maximum range to unload.
-**  @param res          Unload position.
+**  @param maxRange     maximum range to unload.
 **
 **  @return      found position, std::nullopt otherwise.
 **

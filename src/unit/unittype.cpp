@@ -216,7 +216,7 @@
 **
 **  CUnitType::BurnPercent
 **
-**    The burning limit in percents. If the unit has lees than
+**    The burning limit in percent. If the unit has lees than
 **    this it will start to burn.
 **
 **  CUnitType::BurnDamageRate
@@ -270,7 +270,7 @@
 **  CUnitType::RandomMovementProbability
 **
 **    When the unit is idle this is the probability that it will
-**    take a step in a random direction, in percents.
+**    take a step in a random direction, in percent.
 **
 **  CUnitType::ClicksToExplode
 **
@@ -324,7 +324,7 @@
 **
 **  CUnitType::RepairRange
 **
-**    Unit can repair buildings. It will use the actack animation.
+**    Unit can repair buildings. It will use the attack animation.
 **    It will heal 4 points for every repair cycle, and cost 1 of
 **    each resource, alternatively(1 cycle wood, 1 cycle gold)
 **  @todo The above should be more configurable.
@@ -414,7 +414,7 @@
 **
 **  ResourceInfo::ResourceStep
 **
-**    The unit makes so-caled mining cycles. Each mining cycle
+**    The unit makes so-called mining cycles. Each mining cycle
 **    it does some sort of animation and gains ResourceStep
 **    resources. You can stop after any number of steps.
 **    when the quantity in the harvester reaches the maximum
@@ -599,27 +599,27 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
-				MapFieldBuilding | // already occuppied
+				MapFieldBuilding | // already occupied
 				MapFieldCoastAllowed |
 				MapFieldWaterAllowed | // can't move on this
 				MapFieldUnpassable;
 			break;
 		case EMovement::Fly: // in air
-			type.MovementMask = MapFieldAirUnit; // already occuppied
+			type.MovementMask = MapFieldAirUnit; // already occupied
 			break;
 		case EMovement::Naval: // on water
 			if (type.CanTransport()) {
 				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
+					MapFieldBuilding | // already occupied
 					MapFieldLandAllowed; // can't move on this
 				// Johns: MapFieldUnpassable only for land units?
 			} else {
 				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
-					MapFieldBuilding | // already occuppied
+					MapFieldBuilding | // already occupied
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
 					MapFieldUnpassable;
@@ -636,7 +636,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
-				MapFieldBuilding | // already occuppied
+				MapFieldBuilding | // already occupied
 				MapFieldLandAllowed; // can't build on this
 		}
 		type.MovementMask |= MapFieldNoBuilding;
@@ -804,7 +804,7 @@ std::pair<CUnitType *, bool> NewUnitTypeSlot(std::string_view ident)
 **  @param frame   Animation frame of unit-type.
 **  @param screenPos  Screen pixel (top left) position to draw unit-type.
 **
-**  @todo  Do screen position caculation in high level.
+**  @todo  Do screen position calculation in high level.
 **         Better way to handle in x mirrored sprites.
 */
 void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int colorIndex, int frame, const PixelPos &screenPos)

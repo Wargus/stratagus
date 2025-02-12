@@ -55,7 +55,7 @@
 **   @section VideoModuleHigh High Level - video dependent functions
 **
 ** These are the video platforms that are supported, any platform
-** dependent settings/functionailty are located within each
+** dependent settings/functionality are located within each
 ** separate files:
 **
 ** SDL : Simple Direct Media for Linux,
@@ -361,7 +361,7 @@ void VideoCclRegister()
 void BlitSurfaceAlphaBlending_32bpp(const SDL_Surface *srcSurface, const SDL_Rect *srcRect,
 										  SDL_Surface *dstSurface, const SDL_Rect *dstRect, const bool enableMT/* = true*/)
 {
-	/// This implementation of blittind doesn't scale
+	/// This implementation of blitting doesn't scale
 	Assert(srcRect->w == dstRect->w);
 	Assert(srcRect->h == dstRect->h);
 	Assert(srcRect->x >= 0 && srcRect->y >= 0 && dstRect->x >= 0 && dstRect->y >= 0);

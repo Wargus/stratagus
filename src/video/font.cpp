@@ -313,7 +313,7 @@ static unsigned char codepoint_to_codepage_index(int codepoint, const char **sub
 			} else {
 				codepoint -= (0x400 - 0xa0);
 				if (codepoint >= 0 && codepoint < sizeof(codepoint_to_cp866)) {
-					// cyrillic
+					// Cyrillic
 					switch (FontCodePage) {
 						case 866:
 							cpChar = codepoint_to_cp866[codepoint];
@@ -860,7 +860,7 @@ void CFont::MeasureWidths()
 			break;
 		}
 		while (sp < gp) {
-			// Some accented glyphes are not perfectly aligned on the glyph grid
+			// Some accented glyphs are not perfectly aligned on the glyph grid
 			// (like ï or î ).  So we could do -1 to not compute width on the
 			// next glyph, but that breaks other fonts like the one used in
 			// war1gus. TODO: figure out what to do

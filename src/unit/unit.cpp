@@ -2438,7 +2438,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 {
 
 	if (GameSettings.SimplifiedAutoTargeting) {
-		// Original algorithm return smaler values for better targets
+		// Original algorithm return smaller values for better targets
 		return -TargetPriorityCalculate(unit, dest);
 	}
 
@@ -2642,7 +2642,7 @@ bool InAttackRange(const CUnit &unit, const Vec2i &tilePos)
 **  @param dirUnit  Position to determine vector direction
 **	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
 **  @param minRange Minimal range to new position
-**	@param devRadius Diviation radius
+**	@param devRadius Deviation radius
 **	@param rangeDev Range deviation
 **
 **  @return       	Position
@@ -2660,7 +2660,7 @@ Vec2i GetRndPosInDirection(const Vec2i &srcPos, const CUnit &dirUnit, const bool
 **  @param dirPos   Position to determine vector direction
 **	@param dirFrom	Direction of src-dir. True if "from" dirPos, false if "to" dirPos
 **  @param minRange Minimal range to new position
-**	@param devRadius Diviation radius
+**	@param devRadius Deviation radius
 **	@param rangeDev Range deviation
 **
 **  @return       	Position
@@ -3116,7 +3116,7 @@ int CUnit::MapDistanceTo(const Vec2i &pos) const
 **  Returns the map distance between two points with unit type.
 **
 **  @param src  src unittype
-**  @param pos1 map tile position of src (upperleft).
+**  @param pos1 map tile position of src (upper-left).
 **  @param dst  Unit type to take into account.
 **  @param pos2 map tile position of dst.
 **
@@ -3238,7 +3238,7 @@ bool CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 
 	// Can transport only allied unit.
-	// FIXME : should be parametrable.
+	// FIXME : should be configurable.
 	if (!transporter.IsTeamed(unit)) {
 		return false;
 	}

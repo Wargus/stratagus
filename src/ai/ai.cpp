@@ -53,17 +53,17 @@
 **
 ** @subsection aimanage Management calls
 **
-** Manage the inititialse and cleanup of the AI players.
+** Manage the initialisation and cleanup of the AI players.
 **
 ** ::InitAiModule()
 **
-** Initialise all global varaibles and structures.
+** Initialise all global variables and structures.
 ** Called before AiInit, or before game loading.
 **
 ** ::AiInit(::Player)
 **
 ** Called for each player, to setup the AI structures
-** Player::Aiin the player structure. It can use Player::AiName to
+** Player::Ai in the player structure. It can use Player::AiName to
 ** select different AI's.
 **
 ** ::CleanAi()
@@ -167,7 +167,7 @@ AiHelper AiHelpers;             /// AI helper variables
 PlayerAi *AiPlayer;             /// Current AI player
 
 /*----------------------------------------------------------------------------
--- Lowlevel functions
+-- Low level functions
 ----------------------------------------------------------------------------*/
 
 /**
@@ -656,7 +656,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				continue;
 			}
 
-			// if brother is idle or attack no-agressive target and
+			// if brother is idle or attack no-aggressive target and
 			// can attack our attacker then ask for help
 			// FIXME ad support for help from Coward type units
 			if (aiunit->IsAgressive() && CanTarget(*aiunit->Type, *attacker->Type)
@@ -696,7 +696,7 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		}
 	}
 
-	// Send defending forces, also send attacking forces if they are home/traning.
+	// Send defending forces, also send attacking forces if they are home/training.
 	// This is still basic model where we suspect only one base ;(
 	const Vec2i &pos = attacker->tilePos;
 
@@ -980,7 +980,7 @@ void AiUpgradeToComplete(CUnit &unit, const CUnitType &what)
 }
 
 /**
-**  Called if reseaching of an unit is completed.
+**  Called if researching of an unit is completed.
 **
 **  @param unit  Pointer to unit working.
 **  @param what  Pointer to the new upgrade.

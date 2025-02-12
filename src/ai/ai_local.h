@@ -297,8 +297,8 @@ public:
 	int Collect[MaxCosts]{}; /// Collect % of resources
 	int NeededMask = 0;      /// Mask for needed resources
 	bool NeedSupply = false; /// Flag need food
-	bool ScriptDebug = false;/// Flag script debuging on/off
-	bool BuildDepots = true; /// Build new depots if nessesary
+	bool ScriptDebug = false;/// Flag script debugging on/off
+	bool BuildDepots = true; /// Build new depots if necessary
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle = 0;   /// When did the last explore occur?

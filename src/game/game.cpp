@@ -91,7 +91,7 @@ std::string GameName;
 std::string FullGameName;
 
 unsigned long GameCycle;             /// Game simulation cycle counter
-unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
+unsigned long FastForwardCycle;      /// Cycle to fast forward to in a replay
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
@@ -307,7 +307,7 @@ static bool WriteMapPresentation(const fs::path &mapname, CMap &map, Vec2i newSi
 /**
 **  Write the map setup file.
 **
-**  @param mapsetup      map filename
+**  @param mapSetup      map filename
 **  @param map           map to save
 **  @param writeTerrain  write the tiles map in the .sms
 */

@@ -460,7 +460,7 @@ void AiForce::Attack(const Vec2i &pos)
 		CUnit *const unit = this->Units[i];
 
 		if (unit->Container == nullptr) {
-			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+			const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 			unit->Wait = delay;
 			if (unit->IsAgressive()) {
@@ -850,7 +850,7 @@ void AiForce::Update()
 	Attacking = ranges::any_of(Units, [](const CUnit *aiunit) { return aiunit->Type->CanAttack; });
 	if (Attacking == false) {
 		if (!Defending && State > AiForceAttackingState::Waiting) {
-			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n",
+			DebugPrint("%d: Attack force #%lu has lost all aggressive units, giving up\n",
 			           AiPlayer->Player->Index,
 			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
@@ -887,7 +887,7 @@ void AiForce::Update()
 		}
 		if (transporters.empty()) {
 			// Our transporters have been destroyed
-			DebugPrint("%d: Attack force #%lu has lost all agresive units, giving up\n",
+			DebugPrint("%d: Attack force #%lu has lost all aggressive units, giving up\n",
 			           AiPlayer->Player->Index,
 			           (long unsigned int) (this - &(AiPlayer->Force[0])));
 			Reset(true);
@@ -897,7 +897,7 @@ void AiForce::Update()
 		} else {
 			for (size_t i = 0; i != transporters.size(); ++i) {
 				CUnit &trans = *transporters[i];
-				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+				const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 				trans.Wait = delay;
 				CommandUnload(trans, this->GoalPos, nullptr, EFlushMode::On);
@@ -945,7 +945,7 @@ void AiForce::Update()
 			State = AiForceAttackingState::Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
 				CUnit &aiunit = *this->Units[i];
-				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+				const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
@@ -996,7 +996,7 @@ void AiForce::Update()
 	}
 	for (size_t i = 0; i != idleUnits.size(); ++i) {
 		CUnit &aiunit = *idleUnits[i];
-		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+		const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 		aiunit.Wait = delay;
 		if (leader) {
@@ -1078,7 +1078,7 @@ void AiForceManager::Update()
 						CUnit *const unit = idleUnits[i];
 
 						if (unit->Container == nullptr) {
-							const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
+							const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 							unit->Wait = delay;
 							if (unit->Type->CanAttack) {
