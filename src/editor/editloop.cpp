@@ -459,13 +459,13 @@ static std::string getTileInfo(const tile_index index)
 
 	constexpr size_t buffSize = 256;
 	char buf[buffSize]{};
-	std::snprintf(buf,
-				  buffSize,
-				  "[0x%04X] %s%s%s",
-				  index,
-				  baseTerrain, 
-				  mixTerrainIdx ? " <> " : "",
-				  mixTerrain);
+	snprintf(buf,
+			 buffSize,
+			 "[0x%04X] %s%s%s",
+			 index,
+			 baseTerrain, 
+			 mixTerrainIdx ? " <> " : "",
+			 mixTerrain);
 	return std::string(buf);
 }
 
