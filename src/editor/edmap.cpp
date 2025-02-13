@@ -93,7 +93,13 @@ void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly 
 		icons = firstOfKindOnly ? Map.Tileset.getFirstOfItsKindTiles()
 								: Map.Tileset.getAllTiles();
 	} else {
-		icons = Map.Tileset.getSolidTiles();
+		/// FIXME: The extended tailset can be edited only in manual mode _yet_,
+		/// so only the icons of the basic tailset should be left in the icon palette.
+		for (auto icon : Map.Tileset.getSolidTiles()) {
+			if (icon < ExtendedTilesetBeginIdx) {
+				icons.push_back(icon);
+			}
+		}
 	}
 	updateSliderCtrl();
 	recalcDisplayed();
