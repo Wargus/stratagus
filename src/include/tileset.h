@@ -97,7 +97,7 @@ constexpr tile_index ExtendedTilesetBeginIdx	{0x1010};	/// the extended tiles in
 **  mainly used for the FOW implementation of the seen woods/rocks
 **
 **  @todo I think this can be removed, we can use the flags?
-**  I'm not sure, if we have seen and real time to considere.
+**  I'm not sure, if we have seen and real time to consider.
 */
 enum class ETileType : unsigned char {
 	Unknown,    /// Unknown tile type
@@ -211,7 +211,7 @@ public:
 
 	terrain_typeIdx getOrAddSolidTileIndexByName(const std::string &name);
 
-	/// FIXME: Check if it realy needed
+	/// FIXME: Check if it really needed
 	terrain_typeIdx addDecoTerrainType()
 	{
 		return getOrAddSolidTileIndexByName(std::to_string(solidTerrainTypes.size()));
@@ -287,7 +287,7 @@ GenerateExtendedTileset(
         Second "terrain-name" in the slot definition is for mixed type.
 
       list-of-flags-for-all-tiles-of-this-slot:
-        comma separated list of flags wihich are common for all tiles in this slot
+        comma separated list of flags which are common for all tiles in this slot
 
       dst:
         single argument (number or table) at position 1.

@@ -214,7 +214,7 @@
 **              Used to keep track of visible units on the map, it counts the
 **              Number of seen tiles for each player. This is only modified
 **              in UnitsMarkSeen and UnitsUnmarkSeen, from fow.
-**              We keep track of visilibty for each player, and combine with
+**              We keep track of visibility for each player, and combine with
 **              Shared vision ONLY when querying and such.
 **
 **  CUnit::SeenByPlayer
@@ -1566,7 +1566,7 @@ void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 }
 
 /**
-**  Recalculates a units visiblity count. This happens really often,
+**  Recalculates a units visibility count. This happens really often,
 **  Like every time a unit moves. It's really fast though, since we
 **  have per-tile counts.
 **
@@ -1677,7 +1677,7 @@ bool CUnit::IsVisible(const CPlayer &player) const
 bool CUnit::IsVisibleOnMinimap() const
 {
 	// Invisible units.
-	if (IsInvisibile(*ThisPlayer)) {
+	if (IsInvisible(*ThisPlayer)) {
 		return false;
 	}
 	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)
@@ -1723,7 +1723,7 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 	}
 
 	// Those are never ever visible.
-	if (IsInvisibile(*ThisPlayer)) {
+	if (IsInvisible(*ThisPlayer)) {
 		return false;
 	}
 
@@ -1877,7 +1877,7 @@ static void ChangePlayerOwner(CPlayer &oldplayer, CPlayer &newplayer)
 /**
 **  Rescue units.
 **
-**  Look through all rescueable players, if they could be rescued.
+**  Look through all rescuable players, if they could be rescued.
 */
 void RescueUnits()
 {
@@ -2447,7 +2447,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	int cost = 0;
 
 	// Buildings, non-aggressive (except workers) and invincible units have the lowest priority
-	if ((dest.IsAgressive() == false && !dest.Type->BoolFlag[HARVESTER_INDEX].value) || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
+	if ((dest.IsAggressive() == false && !dest.Type->BoolFlag[HARVESTER_INDEX].value) || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
 		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
@@ -2542,7 +2542,7 @@ int TargetPriorityCalculate(const CUnit &attacker, const CUnit &dest)
 
 	// To reduce melee units roaming when a lot of them fight in small areas
 	// we do full priority calculations only for easy reachable targets, or for targets which attacks this unit.
-	// For other targets we dramaticaly reduce priority and calc only attacked by/threat factor, distance and health
+	// For other targets we dramatically reduce priority and calc only attacked by/threat factor, distance and health
 	const int maxDistance = attackRange > 1 ? reactionRange : (reactionRange * 3) >> 1 /* x1.5 */;
 	const bool isFarAwayTarget = !(priority & AT_ATTACKED_BY_FACTOR) && (pathLength + 1 > maxDistance);
 
@@ -2845,7 +2845,7 @@ static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 {
 	const Vec2i pos = GetRndPosInDirection(target.tilePos, attacker, true, 5, 3);
 
-	if (target.IsAgressive()) {
+	if (target.IsAggressive()) {
 		CommandAttack(target, pos, nullptr, EFlushMode::Off); /// Attack-move to pos
 	} else {
 		CommandMove(target, pos, EFlushMode::Off); /// Run away to pos
@@ -2870,7 +2870,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 					}
 					return;
 				}
-				if (order.HasGoal() && order.GetGoal()->IsAgressive()) {
+				if (order.HasGoal() && order.GetGoal()->IsAggressive()) {
 					return;
 				}
 			} else {
@@ -3053,7 +3053,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	if (target.CanMove()
 		&& target.CurrentAction() == UnitAction::Still
 		&& (!CanTarget(*target.Type, *attacker->Type)
-			|| !target.IsAgressive()
+			|| !target.IsAggressive()
 			|| (attacker->Type->BoolFlag[PERMANENTCLOAK_INDEX].value
 				&& !(attacker->IsVisible(*target.Player) || attacker->IsVisibleOnRadar(*target.Player))))
 		&& !(target.BoardCount && target.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == true)) {
@@ -3072,7 +3072,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		}
 	}
 
-	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
+	if (target.Threshold == 0 && target.IsAggressive() && target.CanMove() && !target.ReCast) {
 		// Attack units in range (which or the attacker?)
 		// Don't bother unit if it casting repeatable spell
 		HitUnit_AttackBack(*attacker, target);

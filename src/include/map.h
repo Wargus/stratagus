@@ -183,11 +183,11 @@ public:
 	/// Remove wood, rock or wall from the map and update nearby unit's vision if needed
 	void ClearTile(const Vec2i &tilePos);
 
-	/// convert map pixelpos coordonates into tilepos
+	/// convert map pixelpos coordinates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
-	/// convert tilepos coordonates into map pixel pos (take the top left of the tile)
+	/// convert tilepos coordinates into map pixel pos (take the top left of the tile)
 	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
-	/// convert tilepos coordonates into map pixel pos (take the center of the tile)
+	/// convert tilepos coordinates into map pixel pos (take the center of the tile)
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
 
 	/// Mark a tile as seen by the player.
@@ -311,13 +311,13 @@ extern void UpdateFogOfWarChange();
 // in map_radar.c
 //
 
-/// Mark a tile as radar visible, or incrase radar vision
+/// Mark a tile as radar visible, or increase radar vision
 extern MapMarkerFunc MapMarkTileRadar;
 
 /// Unmark a tile as radar visible, decrease is visible by other radar
 extern MapMarkerFunc MapUnmarkTileRadar;
 
-/// Mark a tile as radar jammed, or incrase radar jamming'ness
+/// Mark a tile as radar jammed, or increase radar jamming'ness
 extern MapMarkerFunc MapMarkTileRadarJammer;
 
 /// Unmark a tile as jammed, decrease is jamming'ness

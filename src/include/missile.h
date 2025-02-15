@@ -146,7 +146,7 @@
 **    field where the missile hits.  A value of 2  would mean that
 **    the damage for that particular missile would be dealt for a range
 **    of 1 around the impact spot. All fields that aren't the center
-**    get only 1/SpashFactor of the damage. Fields 2 away get
+**    get only 1/SplashFactor of the damage. Fields 2 away get
 **    1/(SplashFactor*2), and following...
 **
 **  MissileType::SplashFactor
@@ -385,7 +385,7 @@ public:
 
 	MissileClass Class = MissileClass::Nothing; /// missile class
 	int NumBounces = 0;            /// number of bounces
-	int ParabolCoefficient = 2048; /// parabol coefficient in parabolic missile
+	int ParabolaCoefficient = 2048; /// parabola coefficient in parabolic missile
 	int StartDelay = 0;            /// missile start delay
 	int Sleep = 0;                 /// missile sleep
 	int Speed = 0;                 /// missile speed

@@ -106,9 +106,9 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// Hardware dependend network init.
+/// Hardware dependent network init.
 extern int NetInit();
-/// Hardware dependend network exit.
+/// Hardware dependent network exit.
 extern void NetExit();
 
 /// Resolve host in name or or colon dot notation.

@@ -108,7 +108,7 @@ public:
 	static inline RevealTypes RevelationFor { RevealTypes::cNoRevelation }; /// type of revelation (when player lost their last main facility)
 
 public:
-	/// Check if relevation enabled
+	/// Check if revelation enabled
 	static const bool IsRevelationEnabled()
 	{
 		// By default there is no revelation. Can be changed in lua-script

@@ -55,11 +55,11 @@
 **
 **  CMapFieldPlayerInfo::VisCloak[]
 **
-**    Visiblity for cloaking.
+**    Visibility for cloaking.
 **
 **  CMapFieldPlayerInfo::Radar[]
 **
-**    Visiblity for radar.
+**    Visibility for radar.
 **
 **  CMapFieldPlayerInfo::RadarJammer[]
 **

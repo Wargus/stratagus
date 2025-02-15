@@ -78,7 +78,7 @@ CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
 		        || unit->Variable[INVISIBLE_INDEX].Value
 		        // || (!UnitVisible(unit, source->Player))
 		        || unit->CurrentAction() == UnitAction::Die
-		        || (unit->Type->MoveType == EMovement::Fly && unit->IsAgressive() == false)
+		        || (unit->Type->MoveType == EMovement::Fly && unit->IsAggressive() == false)
 		        || unit->MapDistanceTo(pos) != 0 || !CanTarget(*source.Type, type)
 		        || !source.Player->IsEnemy(*unit) // a friend or neutral
 		);

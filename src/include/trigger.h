@@ -59,7 +59,7 @@ public:
 };
 
 /**
-**  Data to referer game info when game running.
+**  Data to refer game info when game running.
 */
 struct TriggerDataType {
 	CUnit *Attacker = nullptr; /// Unit which send the missile.

@@ -150,7 +150,7 @@ public:
 enum ViewportModeType {
 	VIEWPORT_SINGLE = 0,                /// Old single viewport
 	VIEWPORT_SPLIT_HORIZ,           /// Two viewports split horizontal
-	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horiontal
+	VIEWPORT_SPLIT_HORIZ3,          /// Three viewports split horizontal
 	VIEWPORT_SPLIT_VERT,            /// Two viewports split vertical
 	VIEWPORT_QUAD,                  /// Four viewports split symmetric
 	NUM_VIEWPORT_MODES             /// Number of different viewports.
@@ -303,7 +303,7 @@ public:
 	CPieMenu() = default;
 
 	std::shared_ptr<CGraphic> G; /// Optional background image
-	int MouseButton = NoButton; /// Which mouse button pops up the piemenu, deactivate with NoButton
+	int MouseButton = NoButton; /// Which mouse button pops up the pie-menu, deactivate with NoButton
 	int X[9]{}; /// X position of the pies
 	int Y[9]{}; /// Y position of the pies
 
@@ -369,9 +369,9 @@ public:
 	bool KeyScroll = false;                     /// Enable keyboard scrolling
 	/// Key Scroll Speed
 	int KeyScrollSpeed = 1;
-	/// Mouse Scroll Speed (screenpixels per mousepixel)
+	/// Mouse Scroll Speed (screen-pixels per mouse-pixel)
 	int MouseScrollSpeed = 1;
-	/// Middle-Mouse Scroll Speed (screenpixels per mousepixel)
+	/// Middle-Mouse Scroll Speed (screen-pixels per mouse-pixel)
 	int MouseScrollSpeedDefault = 0;
 	/// Middle-Mouse Scroll Speed with Control pressed
 	int MouseScrollSpeedControl = 0;
@@ -399,7 +399,7 @@ public:
 
 	CUIButton *SingleTrainingButton = nullptr;    /// Button for single training
 	std::string SingleTrainingText;     /// Text for single training
-	CFont *SingleTrainingFont = 0;          /// Font for single traning
+	CFont *SingleTrainingFont = 0;          /// Font for single training
 	int SingleTrainingTextX = 0;            /// X text position single training
 	int SingleTrainingTextY = 0;            /// Y text position single training
 
@@ -495,7 +495,7 @@ public:
 	/// Is in gamesounds?
 	/// SoundConfig PlacementError;         /// played on placements errors
 	/// SoundConfig PlacementSuccess;       /// played on placements success
-	/// SoundConfig Click;                  /// click noice used often
+	/// SoundConfig Click;                  /// click noise used often
 
 	std::shared_ptr<CGraphic> VictoryBackgroundG; /// Victory background graphic
 	std::shared_ptr<CGraphic> DefeatBackgroundG;  /// Defeat background graphic

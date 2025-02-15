@@ -104,7 +104,7 @@ extern std::string NetworkMapFragmentName; /// Name of the map currently loading
 extern CServerSetup ServerSetupState;      /// Network menu: Multiplayer Server Menu selections state
 extern CServerSetup LocalSetupState;       /// Network menu: Multiplayer Client Menu selections local state
 
-extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of players in muliplayer mode
+extern bool NoRandomPlacementMultiplayer; /// Disable the random placement of players in multiplayer mode
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -122,7 +122,7 @@ extern bool NetworkParseSetupEvent(const unsigned char *buf, int size, const CHo
 extern int NetworkSetupServerAddress(const std::string &serveraddr, int port);  /// Menu: Setup the server IP
 extern void NetworkProcessClientRequest();  /// Menu Loop: Send out client request messages
 extern void NetworkProcessServerRequest();  /// Menu Loop: Send out server request messages
-extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send stateinfo message
+extern void NetworkServerResyncClients();   /// Menu Loop: Server: Mark clients state to send state info message
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach
 
 extern void NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);

@@ -92,7 +92,7 @@ constexpr int8_t SettingsPresetMapDefault = -1;  /// Special: Use map supplied
 **
 **  #PlayerPerson
 **
-**    This player is contolled by a person. This can be the player
+**    This player is controlled by a person. This can be the player
 **    sitting on the local computer or player playing over the
 **    network.
 **

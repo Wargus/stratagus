@@ -74,7 +74,7 @@ using sendbuftype = const void *;
 #ifdef USE_WINSOCK // {
 
 /**
-**  Hardware dependend network init.
+**  Hardware dependent network init.
 */
 int NetInit()
 {
@@ -89,7 +89,7 @@ int NetInit()
 }
 
 /**
-**  Hardware dependend network exit.
+**  Hardware dependent network exit.
 */
 void NetExit()
 {
@@ -127,7 +127,7 @@ void NetCloseTCP(Socket sockfd)
 #if !defined(USE_WINSOCK) // {
 
 /**
-**  Hardware dependend network init.
+**  Hardware dependent network init.
 */
 int NetInit()
 {
@@ -135,7 +135,7 @@ int NetInit()
 }
 
 /**
-**  Hardware dependend network exit.
+**  Hardware dependent network exit.
 */
 void NetExit()
 {
