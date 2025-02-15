@@ -76,10 +76,10 @@ private:
 	/// Calc whole simple radial field of view
 	void ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos, const int16_t w, const int16_t h,
 							 int16_t range, MapMarkerFunc *marker) const;
-	/// Calc whole chadow casting field of view
+	/// Calc whole shadow casting field of view
 	void ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range);
 	/// Calc field of view for set of lines along x or y.
-	/// Used for calc part of FoV for assymetric (width != height) spectators.
+	/// Used for calc part of FoV for asymmetric (width != height) spectators.
 	void ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range);
 	/// Calc shadow casting field of view for single octant
 	void RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range);
@@ -123,9 +123,9 @@ private:
 	const CUnit     *Unit 		  {nullptr}; /// Pointer to unit to calculate FoV for
 	MapMarkerFunc	*map_setFoV   {nullptr}; /// Pointer to external function for setting tiles visibilty
 
-	std::vector<uint8_t> MarkedTilesCache;	/// To prevent multiple calls of map_setFoV for single tile (for tiles on the vertical,
-											/// horizontal and diagonal lines it calls twise) we use cache table to
-											/// count already marked tiles
+	std::vector<uint8_t> MarkedTilesCache;	/// To prevent multiple calls of map_setFoV for single tile
+											/// (for tiles on the vertical, horizontal and diagonal lines it calls twice)
+											/// we use cache table to count already marked tiles
 };
 
 /*----------------------------------------------------------------------------

@@ -142,7 +142,7 @@ private:
 
     uint8_t State { States::cFirstEntry };    /// State of the fog of war calculation process
 
-    std::set<uint8_t>   VisionFor;  /// Visibilty through the fog is generated for this players
+    std::set<uint8_t>   VisionFor;  /// Visibility through the fog is generated for this players
                                     /// ThisPlayer and his allies in normal games
                                     /// Any set of players for observers and in the replays
 

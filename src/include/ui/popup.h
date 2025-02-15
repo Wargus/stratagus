@@ -127,7 +127,7 @@ public:
 
 private:
 	EPopupButtonInfo InfoType = EPopupButtonInfo::Hint; /// Type of information to show.
-	unsigned int MaxWidth = 0; /// Maximum width of multilined information.
+	unsigned int MaxWidth = 0; /// Maximum width of multi-lined information.
 	CFont *Font = nullptr;     /// Font to use.
 };
 
@@ -151,7 +151,7 @@ public:
 
 private:
 	std::string Text;          /// Text to display
-	unsigned int MaxWidth = 0; /// Maximum width of multilined text.
+	unsigned int MaxWidth = 0; /// Maximum width of multi-lined text.
 	CFont *Font = nullptr;     /// Font to use.
 };
 

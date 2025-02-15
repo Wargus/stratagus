@@ -149,10 +149,10 @@ private:
 	const unsigned Mask;
 };
 
-class IsAggresiveUnit : public CUnitFilter
+class IsAggressiveUnit : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->IsAgressive(); }
+	bool operator()(const CUnit *unit) const { return unit->IsAggressive(); }
 };
 
 class OutOfMinRange : public CUnitFilter
@@ -332,7 +332,7 @@ extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
 /// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
-/// Find the neareast piece of terrain with specific flags.
+/// Find the nearest piece of terrain with specific flags.
 extern std::optional<Vec2i>
 FindTerrainType(int movemask, int resmask, int range, const CPlayer &player, const Vec2i &startPos);
 

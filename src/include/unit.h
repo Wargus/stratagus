@@ -187,7 +187,7 @@ public:
 	bool CanStoreOrder(COrder *order);
 
 	// Cowards and invisible units don't attack unless ordered.
-	bool IsAgressive() const
+	bool IsAggressive() const
 	{
 		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
 				&& Variable[INVISIBLE_INDEX].Value == 0);
@@ -196,7 +196,7 @@ public:
 	/// Returns true, if unit is directly seen by an allied unit.
 	bool IsVisible(const CPlayer &player) const;
 
-	bool IsInvisibile(const CPlayer &player) const
+	bool IsInvisible(const CPlayer &player) const
 	{
 		return (&player != Player && Variable[INVISIBLE_INDEX].Value > 0
 				&& !Player->HasSharedVisionWith(player));
@@ -228,7 +228,7 @@ public:
 	bool IsVisibleAsGoal(const CPlayer &player) const
 	{
 		// Invisibility
-		if (IsInvisibile(player)) {
+		if (IsInvisible(player)) {
 			return false;
 		}
 		// Don't attack revealers
@@ -255,7 +255,7 @@ public:
 	*/
 	bool IsVisibleOnMap(const CPlayer &player) const
 	{
-		return IsAliveOnMap() && !IsInvisibile(player) && IsVisible(player);
+		return IsAliveOnMap() && !IsInvisible(player) && IsVisible(player);
 	}
 
 	/// Returns true if unit is visible on minimap. Only for ThisPlayer.

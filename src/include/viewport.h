@@ -80,9 +80,9 @@ public:
 
 	/// convert screen coordinate into tilepos
 	Vec2i ScreenToTilePos(const PixelPos &screenPixelPos) const;
-	/// convert tilepos coordonates into screen (take the top left of the tile)
+	/// convert tilepos coordinates into screen (take the top left of the tile)
 	PixelPos TilePosToScreen_TopLeft(const Vec2i &tilePos) const;
-	/// convert tilepos coordonates into screen (take the center of the tile)
+	/// convert tilepos coordinates into screen (take the center of the tile)
 	PixelPos TilePosToScreen_Center(const Vec2i &tilePos) const;
 
 	SDL_Surface* GetFogSurface() {
@@ -133,7 +133,7 @@ public:
 private:
 	/// Set the current map view to x,y(upper,left corner)
 	void Set(const PixelPos &mapPixelPos);
-	/// Draw the map grid for dubug purposes
+	/// Draw the map grid for debug purposes
 	void DrawMapGridInViewport() const;
 	/** Draw the map background.
 	 * The template parameter graphicalTileIsLogicalTile selects the specialization.

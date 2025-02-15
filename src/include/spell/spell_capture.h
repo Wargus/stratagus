@@ -48,7 +48,7 @@ public:
 private:
 	bool SacrificeEnable = false; /// true if the caster dies after casting.
 	bool JoinToAIForce = false;   /// if true, captured unit is joined into caster's AI force, if available
-	int Damage = 0;               /// damage the spell does if unable to caputre
+	int Damage = 0;               /// damage the spell does if unable to capture
 	int DamagePercent = 0;        /// percent the target must be damaged for a capture to succeed.
 };
 

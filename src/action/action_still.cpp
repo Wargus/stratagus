@@ -417,12 +417,12 @@ void COrder_Still::Execute(CUnit &unit) /* override */
 		if (!unit.AutoCastSpell.empty()) {
 			this->AutoCastStand(unit);
 		}
-		if (unit.IsAgressive()) {
+		if (unit.IsAggressive()) {
 			this->AutoAttackStand(unit);
 		}
 	} else {
 		if (unit.JustMoved) --unit.JustMoved;
-		if (AutoCast(unit) || (unit.IsAgressive() && AutoAttack(unit))
+		if (AutoCast(unit) || (unit.IsAggressive() && AutoAttack(unit))
 			|| AutoRepair(unit)
 			|| MoveRandomly(unit)) {
 		}

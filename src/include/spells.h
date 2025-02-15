@@ -228,7 +228,7 @@ extern std::vector<std::unique_ptr<SpellType>> SpellTypeTable;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/// register fonction.
+/// register functions.
 extern void SpellCclRegister();
 
 /// init spell tables

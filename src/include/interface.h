@@ -75,7 +75,7 @@ enum class ButtonCmd {
 	Train,          /// order train
 	StandGround,    /// order stand ground
 	Return,         /// order return goods
-	Research,       /// order reseach
+	Research,       /// order research
 	UpgradeTo,      /// order upgrade
 	Cancel,         /// cancel
 	CancelUpgrade,  /// cancel upgrade

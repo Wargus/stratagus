@@ -82,7 +82,7 @@ class PixelModifier
 {
 public:
 	/// This one returns srcRGB+A(modulated) only if srcA is present. Otherwise returns dstRGBA.
-	/// Used to copy (without alpha modulating) those pixels which has alpha chanel values
+	/// Used to copy (without alpha modulating) those pixels which has alpha channel values
 	static uint32_t CopyWithSrcAlphaKey(const uint32_t srcPixel, const uint32_t dstPixel, const uint32_t reqAlpha)
 	{
 		uint32_t srcAlpha = (srcPixel >> ASHIFT) & 0xFF;
@@ -441,7 +441,7 @@ extern void VideoCclRegister();
 /// initialize the image loaders part
 extern void InitImageLoaders();
 
-/// deinitialize the image loaders
+/// de-initialize the image loaders
 extern void DeInitImageLoaders();
 
 /// initialize the video part

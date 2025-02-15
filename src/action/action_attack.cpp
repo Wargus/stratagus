@@ -445,7 +445,7 @@ void COrder_Attack::SetAutoTarget(CUnit &unit, CUnit *target)
 		this->SkirmishRange = this->Range;
 	}
 	// Set threshold value only for aggressive units (Prevent to change target)
-	if (!GameSettings.SimplifiedAutoTargeting && target->IsAgressive())
+	if (!GameSettings.SimplifiedAutoTargeting && target->IsAggressive())
 	{
 		unit.Threshold = 30;
 	}
@@ -502,11 +502,11 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		&& goal->IsVisibleAsGoal(*unit.Player)
 		&& CanTarget(*unit.Type, *goal->Type)
 		&& (immobile ? InAttackRange(unit, *goal) : (attackedByGoal ? true : InReactRange(unit, *goal)))
-		&& !(unit.UnderAttack && !goal->IsAgressive())) {
+		&& !(unit.UnderAttack && !goal->IsAggressive())) {
 
 		if (newTarget && newTarget != goal) {
 			/// Do not switch to non aggressive targets while UnderAttack counter is active
-			if (unit.UnderAttack && !newTarget->IsAgressive()) {
+			if (unit.UnderAttack && !newTarget->IsAggressive()) {
 				return true;
 			}
 			if (GameSettings.SimplifiedAutoTargeting) {
@@ -535,7 +535,7 @@ bool COrder_Attack::AutoSelectTarget(CUnit &unit)
 		if (goal) {
 			this->ClearGoal();
 		}
-		if (newTarget && !(unit.UnderAttack && !newTarget->IsAgressive())) {
+		if (newTarget && !(unit.UnderAttack && !newTarget->IsAggressive())) {
 			SetAutoTarget(unit, newTarget);
 		} else {
 			return false;

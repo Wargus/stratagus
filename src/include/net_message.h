@@ -405,7 +405,7 @@ enum _message_type_ {
 
 	MessageExtendedCommand,        /// Command is the next byte
 
-	// ATTN: __MUST__ be last due to spellid encoding!!!
+	// ATTN: __MUST__ be last due to spell id encoding!!!
 	MessageCommandSpellCast        /// Unit command spell cast
 };
 
@@ -415,7 +415,7 @@ enum _message_type_ {
 enum _extended_message_type_ {
 	ExtendedMessageDiplomacy,			/// Change diplomacy
 	ExtendedMessageSharedVision,		/// Change shared vision
-	ExtendedMessageAutoTargetingDB,		/// Change Auto targetting algorithm. Used for debug purposes
+	ExtendedMessageAutoTargetingDB,		/// Change Auto targeting algorithm. Used for debug purposes
 	ExtendedMessageFieldOfViewDB,		/// Change field of view type (shadow casting or radial). Used for debug purposes
 	ExtendedMessageMapFieldsOpacityDB,	/// Change opaque flag for forest, rocks or walls. Used for debug purposes
 	ExtendedMessageRevealMapDB,			/// Change map reveal mode. Used for debug purposes

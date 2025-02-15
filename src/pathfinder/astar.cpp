@@ -482,7 +482,7 @@ static inline int AStarAddNode(const Vec2i &pos, int64_t costs)
 
 /**
 **  Change the cost associated to an open node.
-**  Can be further optimised knowing that the new cost MUST BE LOWER
+**  Can be further optimized knowing that the new cost MUST BE LOWER
 **  than the old one.
 */
 static void AStarReplaceNode(int pos)
@@ -576,7 +576,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 #endif
 							return -1;
 						}
-						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
+						if (goal->Player->IsEnemy(unit) && unit.IsAggressive() && CanTarget(*unit.Type, *goal->Type)
 							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
 								cost += 2 * AStarMovingUnitCrossingCost;
 						} else {
@@ -1105,7 +1105,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPosIn, int gw, int gh,
 			eo = o + Heading2X[i] + Heading2O[i];
 
 			if (eo < 0 || eo >= CostMoveToCache.size()) {
-				// unaccessible tile
+				// inaccessible tile
 				continue;
 			}
 

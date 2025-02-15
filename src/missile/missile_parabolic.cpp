@@ -53,7 +53,7 @@
 static bool ParabolicMissile(Missile &missile)
 {
 	// Should be initialised by an other method (computed with distance...)
-	const double k = -missile.Type->ParabolCoefficient; // Coefficient of the parabol.
+	const double k = -missile.Type->ParabolaCoefficient; // Coefficient of the parabola.
 	const double zprojToX = 4.0;    // Projection of Z axis on axis X.
 	const double zprojToY = 1024.0; // Projection of Z axis on axis Y.
 	double z;        // should be missile.Z later.

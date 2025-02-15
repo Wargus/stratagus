@@ -118,7 +118,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		}
 
 		if ((find_type != EAttackFindType::Building || dtype.BoolFlag[BUILDING_INDEX].value)
-		    && (find_type != EAttackFindType::Aggressive || dest->IsAgressive())) {
+		    && (find_type != EAttackFindType::Aggressive || dest->IsAggressive())) {
 			result_unit = dest;
 			return VisitResult::Finished;
 		} else if (result_unit == nullptr) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
@@ -418,7 +418,7 @@ void AiForce::Attack(const Vec2i &pos)
 		return unit->Type->MoveType == EMovement::Naval && unit->Type->CanAttack;
 	});
 	const bool isTransporter = ranges::any_of(this->Units, [](const CUnit *unit) {
-		return unit->Type->CanTransport() && unit->IsAgressive() == false;
+		return unit->Type->CanTransport() && unit->IsAggressive() == false;
 	});
 	bool isDefenceForce = false;
 	if (Map.Info.IsPointOnMap(goalPos) == false) {
@@ -454,7 +454,7 @@ void AiForce::Attack(const Vec2i &pos)
 		this->State = AiForceAttackingState::Attacking;
 	}
 	//  Send all units in the force to enemy.
-	const auto leaderIt = ranges::find_if(this->Units, [](const CUnit *unit) { return unit->IsAgressive(); });
+	const auto leaderIt = ranges::find_if(this->Units, [](const CUnit *unit) { return unit->IsAggressive(); });
 	CUnit *leader = leaderIt != this->Units.end() ? *leaderIt : nullptr;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
@@ -463,7 +463,7 @@ void AiForce::Attack(const Vec2i &pos)
 			const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 			unit->Wait = delay;
-			if (unit->IsAgressive()) {
+			if (unit->IsAggressive()) {
 				CommandAttack(*unit, this->GoalPos,  nullptr, EFlushMode::On);
 			} else {
 				if (leader) {
@@ -906,7 +906,7 @@ void AiForce::Update()
 		return;
 	}
 	CUnit *leader = nullptr;
-	if (auto it = ranges::find_if(Units, &CUnit::IsAgressive); it != Units.end()) {
+	if (auto it = ranges::find_if(Units, &CUnit::IsAggressive); it != Units.end()) {
 		leader = *it;
 	}
 
@@ -948,7 +948,7 @@ void AiForce::Update()
 				const int delay = i / 5; // To avoid lot of CPU consumption, send them with a small time difference.
 
 				aiunit.Wait = delay;
-				if (aiunit.IsAgressive()) {
+				if (aiunit.IsAggressive()) {
 					CommandAttack(aiunit, this->GoalPos, nullptr, EFlushMode::On);
 				} else {
 					if (leader) {
@@ -1000,7 +1000,7 @@ void AiForce::Update()
 
 		aiunit.Wait = delay;
 		if (leader) {
-			if (aiunit.IsAgressive()) {
+			if (aiunit.IsAggressive()) {
 				if (State == AiForceAttackingState::Attacking) {
 					CommandAttack(aiunit, leader->tilePos, nullptr, EFlushMode::On);
 				} else {
@@ -1010,7 +1010,7 @@ void AiForce::Update()
 				CommandDefend(aiunit, *leader, EFlushMode::On);
 			}
 		} else {
-			if (aiunit.IsAgressive()) {
+			if (aiunit.IsAggressive()) {
 				CommandAttack(aiunit, this->GoalPos, nullptr, EFlushMode::On);
 			} else {
 				CommandMove(aiunit, this->GoalPos, EFlushMode::On);
