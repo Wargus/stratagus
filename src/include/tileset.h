@@ -154,6 +154,9 @@ class CTileset
 public:
 	void clear();
 
+	void setExtended(bool value) { extended = value; }
+	bool isExtended() { return extended; }
+
 	const CTile &getTile(tile_index tileIndex) const;
 
 	size_t getTileCount() const { return tiles.size(); }
@@ -258,7 +261,9 @@ public:
 	std::vector<ETileType> TileTypeTable; /// For fast lookup of tile type
 
 private:
-	PixelSize pixelTileSize;    /// Size of a tile in pixel
+	bool extended = false;	/// is tileset extended
+
+	PixelSize pixelTileSize; /// Size of a tile in pixel
 
 	bool canRandomize = true;	/// Does the tileset structure allow for randomize tiles?
 

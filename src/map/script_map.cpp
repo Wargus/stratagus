@@ -935,6 +935,7 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 	}
 	/// Add new graphic
 	Map.TileGraphic->AppendFrames(parser.getGraphic());
+	Map.Tileset.setExtended(true);
 
 	return 0;
 }

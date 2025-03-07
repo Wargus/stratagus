@@ -204,9 +204,10 @@ static int CclEditorAddBrush(lua_State *l)
 			properties.fixNeighborsAllowed = LuaToBoolean(l, -1);
 		} else if (key == "TileIconsPaletteRequired") {
 			properties.tileIconsPaletteRequired = LuaToBoolean(l, -1);
-		} else if (key == "ExtendedTilesetRequiried") {
-			if (LuaToBoolean(l, -1) && !Map.Tileset.isExtended()) {
-				ErrorPrint("This brush requires extended tileset, but basic is loaded. Unable to load brush.");
+		} else if (key == "ExtendedTilesetRequired") {
+			const bool extendedReq = LuaToBoolean(l, -1);
+			if (extendedReq && !Map.Tileset.isExtended()) {
+				ErrorPrint("This brush requires extended tileset, but basic is loaded. Unable to load brush.\n");
 				return 0;
 			}
 		} else if (key == "Generator") {
