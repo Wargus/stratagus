@@ -671,6 +671,9 @@ static bool forEachTileIconArea(std::function<bool(int,int,int,int,int)> forEach
 */
 static void DrawTileIcons()
 {
+	if (Editor.tileIcons.isEnabled() == false) {
+		return;
+	}
 	forEachTileIconArea([](int i, int x, int y, int w, int h) {
 		
 		if (const auto tile = Editor.tileIcons.getTile(i)) {
@@ -818,16 +821,11 @@ static void UpdateMapCursor()
 						  screenPos,
 						  Editor.brushes.getCurrentBrush());
 
-		} else if (Editor.State == EditorStateType::EditRamps) {
-/*
-			DrawMapCursor(screenPos,
-						  TileCursorSize, // ramp width
-						  TileCursorSize, // ramp height
-						  [](uint8_t col, uint8_t row) -> graphic_index {
-							  return Map.Tileset.getGraphicTileFor(ramp.get(col, row));
-						  });
-*/						  
-
+		} else if (Editor.State == EditorStateType::EditTile 
+					&& Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::Decoration) {
+			DrawMapCursor(tilePos,
+						  screenPos,
+						  Editor.brushes.getCurrentBrush());
 		} else {
 			PushClipping();
 			UI.MouseViewport->SetClipping();
@@ -1136,7 +1134,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			Editor.tileIcons.resetSelected();
 			return;
 		} else {
-			if (Editor.tileIcons.getIconUnderCursor() != -1) {
+			if (Editor.tileIcons.isEnabled() && Editor.tileIcons.getIconUnderCursor() != -1) {
 				Editor.tileIcons.select(Editor.tileIcons.getIconUnderCursor());
 				if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
 					if (Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::SingleTile) {
@@ -1232,7 +1230,8 @@ static void EditorCallbackButtonDown(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Editor.State == EditorStateType::EditTile 
-				&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
+				&& (Editor.tileIcons.isSelected()
+					|| Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::Decoration)) {
 
 				Editor.applyCurentBrush(tilePos);
 
@@ -1553,6 +1552,9 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
+	if (Editor.tileIcons.isEnabled() == false) {
+		return false;
+	}
 	bool noHit = forEachTileIconArea([screenPos](int i, int x, int y, int w, int h) {
 		if (x < screenPos.x && screenPos.x < x + w && y < screenPos.y && screenPos.y < y + h) {
 

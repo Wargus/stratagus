@@ -95,6 +95,7 @@ void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly 
 	} else {
 		/// FIXME: The extended tailset can be edited only in manual mode _yet_,
 		/// so only the icons of the basic tailset should be left in the icon palette.
+		icons.clear();
 		for (auto icon : Map.Tileset.getSolidTiles()) {
 			if (icon < ExtendedTilesetBeginIdx) {
 				icons.push_back(icon);
