@@ -11,7 +11,6 @@ on:
       - '!**.md'
       - '!.vscode/**'
       - '!doc/**'
-      - '!doc/**'
 
   pull_request:
     paths:
@@ -21,7 +20,6 @@ on:
       - '.github/workflows/macos.yml'
       - '!**.md'
       - '!.vscode/**'
-      - '!doc/**'
       - '!doc/**'
 
 jobs:
@@ -35,7 +33,7 @@ jobs:
         submodules: recursive
 
     - name: install dependencies
-      run: brew install dylibbundler sdl2 sdl2_mixer sdl2_image lua libpng ffmpeg meson
+      run: brew install sdl2 sdl2_mixer sdl2_image lua libpng ffmpeg
 
     - name: cmake --version
       run: cmake --version
