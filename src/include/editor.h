@@ -71,6 +71,15 @@ public:
 	CTileIconsSet() = default;
 	~CTileIconsSet() = default;
 
+	void enable(bool value = true)
+	{ 
+		enabled = value;
+		if (!enabled) {
+			resetSelected();
+		}
+	}
+	bool isEnabled() { return enabled; }
+
 	bool isSelected() const { return selected != -1; }
 
 	std::optional<tile_index> getTile(size_t iconNo) const;
@@ -107,7 +116,8 @@ public:
 	void resetSliderCtrl() { sliderCtrl = nullptr; }
 
 private:
-	int selected = -1;	/// Selected tile icon
+	bool enabled = true;
+	int selected = -1; /// Selected tile icon
 	int iconUnderCursor = -1;
 	
 	gcn::Slider* sliderCtrl = nullptr;
