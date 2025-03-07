@@ -50,6 +50,39 @@
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void CSetOfCtrls::show()
+{
+	for(auto &ctrl : hiddenControls) {
+		ctrl->setVisible(true);
+	}
+	hiddenControls.clear();
+}
+
+void CSetOfCtrls::hide()
+{
+	if (!hiddenControls.empty()) {
+		return;
+	}
+	for(auto &ctrl : controls) {
+		if (ctrl->isVisible()) {
+			ctrl->setVisible(false);
+			hiddenControls.push_back(ctrl);
+		}
+	}
+}
+
+Vec2i CSetOfCtrls::bottomRight() const
+{
+	int x = 0;
+	int y = 0;
+	for (const auto ctrl : controls) {
+		x = std::max(x, ctrl->getX() + ctrl->getWidth());
+		y = std::max(y, ctrl->getY() + ctrl->getHeight());
+	}
+	return Vec2i(x, y);
+}
+
 void CBrushControlsUI::reloadBrushes()
 {
 	const auto prevSelectedItem = brushesList->getElementAt(brushSelect->getSelected());
@@ -66,11 +99,8 @@ void CBrushControlsUI::reloadBrushes()
 	reloadCtrlSettings();
 }
 
-void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &rectangle)
+void CBrushControlsUI::Init()
 {
-	UIRectangle = rectangle;
-	this->container = parrent;
-
 	brushesList = std::make_unique<StringListModel>(Editor.brushes.getBrushesNames());
 	brushSelect = std::make_unique<gcn::DropDown>(brushesList.get());
 	brushSelect->setFont(&GetGameFont());
@@ -78,14 +108,14 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	brushSelect->setBaseColor(baseColor);
 	brushSelect->setForegroundColor(foregroundColor);
 	brushSelect->setBackgroundColor(backgroundColor);
+	parrent->add(brushSelect.get());	
+	brushSelect->setPosition(UIRectangle.x + 5, UIRectangle.y + 5);
 
-	controls.push_back(dynamic_cast<gcn::Widget*>(brushSelect.get()));
-	parrent->add(brushSelect.get(), UIRectangle.x + 5, UIRectangle.y + 5);
+	controlSets[ECtrlSets::cSelectBrush].add(dynamic_cast<gcn::Widget *>(brushSelect.get()));
 
 	brushesDropdownListener = 
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
 		const int selected = brushSelect->getSelected();
-		const auto prevBrush = Editor.brushes.getCurrentBrush();
 		if (Editor.brushes.setCurrentBrush(brushesList->getElementAt(selected))) {
 			reloadCtrlSettings();
 		}
@@ -98,11 +128,11 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	sizeSlider->setBaseColor(baseColor);
 	sizeSlider->setForegroundColor(foregroundColor);
 	sizeSlider->setBackgroundColor(backgroundColor);
+	parrent->add(sizeSlider.get());
+	sizeSlider->setPosition(16,
+				 			controlSets[ECtrlSets::cSelectBrush].bottomRight().y + verticalGap);
 
-	controls.push_back(dynamic_cast<gcn::Widget*>(sizeSlider.get()));
-	parrent->add(sizeSlider.get(),
-				 16,
-				 brushSelect->getY() + brushSelect->getHeight() + verticalGap);
+	controlSets[ECtrlSets::cSize].add(dynamic_cast<gcn::Widget *>(sizeSlider.get()));
 
 	allowResize.insert({"Both",
 						 std::make_unique<gcn::RadioButton>("Size", "BrushSize", true)});
@@ -115,23 +145,21 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 		radioButton->setHeight(14);
 		radioButton->setFont(&GetGameFont());
 	}
-
-	controls.push_back(dynamic_cast<gcn::Widget*>(allowResize["Both"].get()));
 	parrent->add(allowResize["Both"].get(),
 				 UIRectangle.x + UIRectangle.width / 2 - allowResize["Both"]->getWidth () - 5,
-				 sizeSlider->getY() + sizeSlider->getHeight() + verticalGap / 2);
+				 controlSets[ECtrlSets::cSize].bottomRight().y + verticalGap / 2);
+	controlSets[ECtrlSets::cSize].add(dynamic_cast<gcn::Widget *>(allowResize["Both"].get()));
 
-	controls.push_back(dynamic_cast<gcn::Widget*>(allowResize["WidthOnly"].get()));
 	parrent->add(allowResize["WidthOnly"].get(),
 				 UIRectangle.x + UIRectangle.width / 2 + 5,
 				 allowResize["Both"]->getY());
+	controlSets[ECtrlSets::cSize].add(dynamic_cast<gcn::Widget *>(allowResize["WidthOnly"].get()));
 
-	controls.push_back(dynamic_cast<gcn::Widget*>(allowResize["HeightOnly"].get()));
 	parrent->add(allowResize["HeightOnly"].get(),
 				 UIRectangle.x + UIRectangle.width / 2 + 5,
-				 allowResize["WidthOnly"]->getY() 
-				 + allowResize["WidthOnly"]->getHeight()
-				 + verticalGap / 2);
+				 controlSets[ECtrlSets::cSize].bottomRight().y + verticalGap / 2);
+	controlSets[ECtrlSets::cSize].add(dynamic_cast<gcn::Widget *>(allowResize["HeightOnly"].get()));
+
 	updateSizeCtrls();
 
 	allowResizeRadioListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
@@ -146,7 +174,6 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 			sizeSlider->setStepLength(brush.getResizeSteps().y);
 			sizeSlider->setValue(brush.getHeight());
 		}
-
 	});
 
 	allowResize["Both"]->addActionListener(allowResizeRadioListener.get());
@@ -168,31 +195,14 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	});
 	sizeSlider->addActionListener(brushSizeSliderListener.get());
 
-	decorative = std::make_unique<gcn::CheckBox>("Decorative");
-	decorative->setHeight(14);
-	decorative->setFont(&GetGameFont());
-
-	controls.push_back(dynamic_cast<gcn::Widget*>(decorative.get()));
-	parrent->add(decorative.get(),
-				 UIRectangle.x + 5,
-				 allowResize["HeightOnly"]->getY()
-				 + allowResize["HeightOnly"]->getHeight()
-				 + verticalGap);
-
-	decorativeListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
-		auto &brush = Editor.brushes.getCurrentBrush();
-		brush.setDecorative(decorative->isSelected());
-	});
-	decorative->addActionListener(decorativeListener.get());
-
 	manualEditMode = std::make_unique<gcn::CheckBox>("Manual mode");
 	manualEditMode->setHeight(14);
 	manualEditMode->setFont(&GetGameFont());
+	parrent->add(manualEditMode.get());
+	manualEditMode->setPosition(UIRectangle.x + 5,
+				 				controlSets[ECtrlSets::cSize].bottomRight().y + verticalGap);
 
-	controls.push_back(dynamic_cast<gcn::Widget*>(manualEditMode.get()));
-	parrent->add(manualEditMode.get(),
-				 UIRectangle.x + 5,
-				 decorative->getY() + decorative->getHeight() + verticalGap);
+	controlSets[ECtrlSets::cSingleTile].add(dynamic_cast<gcn::Widget*>(manualEditMode.get()));
 
 	manualEditModeListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
 
@@ -214,11 +224,10 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	enableRnd = std::make_unique<gcn::CheckBox>("Random");
 	enableRnd->setHeight(14);
 	enableRnd->setFont(&GetGameFont());
-
-	controls.push_back(dynamic_cast<gcn::Widget*>(enableRnd.get()));
-	parrent->add(enableRnd.get(),
-				 manualEditMode->getX(),
-				 manualEditMode->getY() + manualEditMode->getHeight() + verticalGap);
+	parrent->add(enableRnd.get());
+	enableRnd->setPosition(manualEditMode->getX(),
+				 			controlSets[ECtrlSets::cSingleTile].bottomRight().y + verticalGap);
+	controlSets[ECtrlSets::cSingleTile].add(dynamic_cast<gcn::Widget*>(enableRnd.get()));
 
 	enableRndListener = 
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
@@ -230,27 +239,57 @@ void CBrushControlsUI::Init(gcn::Container* parrent, const gcn::Rectangle &recta
 	});
 	enableRnd->addActionListener(enableRndListener.get());
 
+	decorative = std::make_unique<gcn::CheckBox>("Decorative");
+	decorative->setHeight(14);
+	decorative->setFont(&GetGameFont());
+
+	parrent->add(decorative.get());
+	decorative->setPosition(manualEditMode->getX(),
+				 			controlSets[ECtrlSets::cSingleTile].bottomRight().y + verticalGap);
+	controlSets[ECtrlSets::cSingleTile].add(dynamic_cast<gcn::Widget*>(decorative.get()));
+
+	decorativeListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
+		auto &brush = Editor.brushes.getCurrentBrush();
+		brush.setDecorative(decorative->isSelected());
+	});
+	decorative->addActionListener(decorativeListener.get());
+
 	reloadCtrlSettings();
 }
 
 void CBrushControlsUI::reloadCtrlSettings()
 {
-	if (!hiddenControls.empty()) {
-		hiddenControls.clear();
+	for (auto &[key, ctrl] : controlSets) {
+		ctrl.resetHidden();
 	}
 	const auto brush = Editor.brushes.getCurrentBrush();
-
-	manualEditMode->setVisible(brush.isNeighborsFixAllowed());
-	manualEditMode->setSelected(!brush.isFixNeighborsEnabled());
-
-	enableRnd->setVisible(brush.isRandomizeAllowed() && manualEditMode->isSelected());
-	enableRnd->setSelected(brush.isRandomizationEnabled());
-
-	decorative->setVisible(!brush.isFixNeighborsEnabled());
-	decorative->setSelected(brush.isDecorative());
-
-
+	Editor.tileIcons.enable(brush.isTileIconsPaletteRequired());
+	updateSingleTileCtrls();
 	updateSizeCtrls();
+	updateGeneratorOptionsCtrls();
+}
+
+void CBrushControlsUI::updateSingleTileCtrls()
+{
+	const auto brush = Editor.brushes.getCurrentBrush();
+	CBrush &_brush = Editor.brushes.getCurrentBrush();
+
+	if (brush.getType() == CBrush::EBrushTypes::SingleTile) {
+		manualEditMode->setVisible(brush.isNeighborsFixAllowed());
+		manualEditMode->setSelected(!brush.isFixNeighborsEnabled());
+	
+		enableRnd->setVisible(brush.isRandomizeAllowed() && manualEditMode->isSelected());
+		enableRnd->setSelected(brush.isRandomizationEnabled());
+	
+		decorative->setVisible(!brush.isFixNeighborsEnabled());
+		decorative->setSelected(brush.isDecorative());
+
+		Editor.tileIcons.enable();
+		Editor.tileIcons.rebuild(brush.isFixNeighborsEnabled() == false,
+		                         brush.isRandomizationEnabled());
+	} else {
+		controlSets[ECtrlSets::cSingleTile].hide();
+	}
 }
 
 void CBrushControlsUI::updateSizeCtrls()
@@ -258,12 +297,11 @@ void CBrushControlsUI::updateSizeCtrls()
 	const auto &brush = Editor.brushes.getCurrentBrush();
 
 	if (!brush.isResizable()) {
-		sizeSlider->setVisible(false);
-		for (auto &[name, radioButton] : allowResize) {
-			radioButton->setVisible(false);
-		}
+		controlSets[ECtrlSets::cSize].hide();
 		return;
 	}
+	controlSets[ECtrlSets::cSize].show();
+
 	const auto resizeSteps = brush.getResizeSteps();
 	const auto allowed = resizeSteps.x && resizeSteps.y ? ResizeAllowed::cBoth
 					   : resizeSteps.x					? ResizeAllowed::cWidthOnly
@@ -276,7 +314,6 @@ void CBrushControlsUI::updateSizeCtrls()
 		allowResize["HeightOnly"]->setVisible(false);
 
 	} else {
-
 		allowResize["Both"]->setVisible(allowed == cBoth);
 		allowResize["WidthOnly"]->setVisible(allowed == cBoth || allowed == cWidthOnly);
 		allowResize["HeightOnly"]->setVisible(allowed == cBoth || allowed == cHeightOnly);
@@ -300,24 +337,79 @@ void CBrushControlsUI::updateSizeCtrls()
 	}
 }
 
+void CBrushControlsUI::clearGeneratorOptionsCtrls()
+{
+	if (!generatorOptionsCtrls.empty()) {
+		if (parrent) {
+			for (auto &[option, ctrlsSet] : generatorOptionsCtrls) {
+				if (ctrlsSet.actionListener) {
+					ctrlsSet.dropDown->removeActionListener(ctrlsSet.actionListener.get());
+				}
+				parrent->remove(dynamic_cast<gcn::Widget *>(ctrlsSet.dropDown.get()));
+			}
+		}
+		generatorOptionsCtrls.clear();
+	}
+	controlSets.erase(ECtrlSets::cGenerator);
+}
+
+void CBrushControlsUI::updateGeneratorOptionsCtrls()
+{
+	clearGeneratorOptionsCtrls();
+
+	const auto &brush = Editor.brushes.getCurrentBrush();
+	const auto &options = brush.getGeneratorOptions();
+
+	if (!options.empty()) {
+		for (auto &[option, values] : options) {
+			if (values.empty()) {
+				continue;
+			}
+			auto &ctrls = generatorOptionsCtrls[option];
+			ctrls.valuesList = std::make_unique<StringListModel>(values);
+			ctrls.dropDown = std::make_unique<gcn::DropDown>(ctrls.valuesList.get());
+			auto &dropDown = ctrls.dropDown;
+			dropDown->setFont(&GetGameFont());
+			dropDown->setWidth(UIRectangle.width - 10);
+			dropDown->setBaseColor(baseColor);
+			dropDown->setForegroundColor(foregroundColor);
+			dropDown->setBackgroundColor(backgroundColor);
+
+			parrent->add(dropDown.get());
+			const int y = controlSets.count(ECtrlSets::cGenerator)
+			                ? controlSets[ECtrlSets::cGenerator].bottomRight().y
+			                : controlSets[ECtrlSets::cSelectBrush].bottomRight().y + verticalGap;
+			dropDown->setPosition(UIRectangle.x + 5, y + verticalGap / 2);
+
+			controlSets[ECtrlSets::cGenerator].add(dynamic_cast<gcn::Widget *>(dropDown.get()));
+		
+			ctrls.actionListener = 
+			std::make_unique<LambdaActionListener>([this, option](const std::string&) {
+				auto &brush = Editor.brushes.getCurrentBrush();
+				const auto &optionCtrl = generatorOptionsCtrls[option];
+				const int selectedIdx = optionCtrl.dropDown->getSelected();
+				brush.updateDecorationOption(option,
+										 optionCtrl.valuesList->getElementAt(selectedIdx));
+			});
+			dropDown->addActionListener(generatorOptionsCtrls[option].actionListener.get());
+			dropDown->setSelected(0);
+		}
+	}
+	if (brush.getType() == CBrush::EBrushTypes::Decoration) {
+		controlSets[ECtrlSets::cGenerator].show();
+	}
+}
 void CBrushControlsUI::show()
 {
-	for(auto &ctrl : hiddenControls) {
-		ctrl->setVisible(true);
+	for (auto &[key, ctrl] : controlSets) {
+		ctrl.show();
 	}
-	hiddenControls.clear();
 }
 
 void CBrushControlsUI::hide()
 {
-	if (!hiddenControls.empty()) {
-		return;
-	}
-	for(auto &ctrl : controls) {
-		if (ctrl->isVisible()) {
-			ctrl->setVisible(false);
-			hiddenControls.push_back(ctrl);
-		}
+	for (auto &[key, ctrl] : controlSets) {
+		ctrl.hide();
 	}
 }
 //@}
