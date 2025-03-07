@@ -196,7 +196,7 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 
 	TilePos maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
 
-	if (brush.getAllign() == CBrush::BrushAllign::UpperLeft) {
+	if (brush.getAllign() == CBrush::EBrushAllign::UpperLeft) {
 		maxPos.x -= brush.getWidth() - 1;
 		maxPos.y -= brush.getHeight() - 1;
 	}
