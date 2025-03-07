@@ -1139,7 +1139,7 @@ static void EditorCallbackButtonDown(unsigned button)
 			if (Editor.tileIcons.getIconUnderCursor() != -1) {
 				Editor.tileIcons.select(Editor.tileIcons.getIconUnderCursor());
 				if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
-					if (Editor.brushes.getCurrentBrush().getType() == CBrush::BrushTypes::SingleTile) {
+					if (Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::SingleTile) {
 						Editor.brushes.getCurrentBrush().setTile(*selectedTile);
 					}
 				}
