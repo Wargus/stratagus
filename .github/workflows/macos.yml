@@ -33,7 +33,7 @@ jobs:
         submodules: recursive
 
     - name: install dependencies
-      run: brew install sdl2 sdl2_mixer sdl2_image lua libpng ffmpeg
+      run: brew install sdl2 sdl2_mixer sdl2_image lua ffmpeg
 
     - name: cmake --version
       run: cmake --version
