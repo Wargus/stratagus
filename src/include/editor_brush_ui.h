@@ -38,14 +38,42 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
+class CSetOfCtrls
+{
+public:
+	void show();
+	void hide();
+	void resetHidden() { hiddenControls.clear(); }
+
+	void add(gcn::Widget *ctrl) { controls.push_back(ctrl); }
+
+	Vec2i bottomRight() const;
+
+private:
+	std::list<gcn::Widget *> controls; // List of all controls (both enabled and disabled for
+		// current set). In order to improve readability, instead
+		// of disabling controls, we just hide them.
+
+	std::list<gcn::Widget *> hiddenControls; 	// List of temporarily hidden controls that are
+												// _enabled_ for current brush. If we need to hide
+												// the entire BrushControlsUI we save all currently 
+												// enabled controls into this list and then hide them.
+												// We use this list to avoid unhiding the disabled
+												// ones later.
+	
+};
+
 class CBrushControlsUI
 {
 public:
 	explicit CBrushControlsUI(gcn::Container* parrent, const gcn::Rectangle &rectangle)
+	: parrent(parrent), UIRectangle(rectangle)
 	{ 
-		Init(parrent, rectangle);
+		Init();
 	}
 	~CBrushControlsUI() = default;
+
+	enum class ECtrlSets {cSelectBrush, cSize, cSingleTile, cGenerator};
 
 	void show();
 	void hide();
@@ -53,16 +81,25 @@ public:
 
 private:
 
-	void Init(gcn::Container* container, const gcn::Rectangle &rectangle);
+	void Init();
 	void reloadCtrlSettings();
+	void updateSingleTileCtrls();
 	void updateSizeCtrls();
+	void clearGeneratorOptionsCtrls();
+	void updateGeneratorOptionsCtrls();
 
 private:
-	gcn::Container *container = nullptr;
-	
-	std::list<gcn::Widget *> controls;  // List of all controls (both enabled and disabled for 
-										// current brush). In order to improve readability, instead
-										// of disabling controls, we just hide them.
+	using CtrlName = std::string;
+
+	gcn::Container *parrent = nullptr;
+	gcn::Rectangle UIRectangle;
+
+	std::map<ECtrlSets, CSetOfCtrls> controlSets;
+
+/*
+	std::list<gcn::Widget *> controls; // List of all controls (both enabled and disabled for
+		// current brush). In order to improve readability, instead
+		// of disabling controls, we just hide them.
 
 	std::list<gcn::Widget *> hiddenControls; // List of temporarily hidden controls that are
 											 // _enabled_ for current brush. If we need to hide
@@ -70,18 +107,20 @@ private:
 											 // enabled controls into this list and then hide them.
 											 // We use this list to avoid unhiding the disabled
 											 // ones later.
-
+*/
 	std::unique_ptr<gcn::DropDown> brushSelect;
 	std::unique_ptr<StringListModel> brushesList;
 	std::unique_ptr<LambdaActionListener> brushesDropdownListener;
 
+	/// Size Controls
 	std::unique_ptr<gcn::Slider> sizeSlider;
 	std::unique_ptr<LambdaActionListener> brushSizeSliderListener;
 
 	enum ResizeAllowed { cBoth = 0, cWidthOnly, cHeightOnly };
-	std::map<std::string, std::unique_ptr<gcn::RadioButton>> allowResize;
+	std::map<CtrlName, std::unique_ptr<gcn::RadioButton>> allowResize;
 	std::unique_ptr<LambdaActionListener> allowResizeRadioListener;
 
+	/// Single tile brushes controls
 	std::unique_ptr<gcn::CheckBox> manualEditMode;
 	std::unique_ptr<LambdaActionListener> manualEditModeListener;
 	std::unique_ptr<gcn::CheckBox> enableRnd;
@@ -89,8 +128,15 @@ private:
 	std::unique_ptr<gcn::CheckBox> decorative;
 	std::unique_ptr<LambdaActionListener> decorativeListener;
 	
+	/// Generator options controls
+	struct GeneratorOptionCtrl
+	{
+		std::unique_ptr<StringListModel> valuesList;
+		std::unique_ptr<gcn::DropDown> dropDown;
+		std::unique_ptr<LambdaActionListener> actionListener;
+	};
+	std::map<CtrlName, GeneratorOptionCtrl> generatorOptionsCtrls;
 
-	gcn::Rectangle UIRectangle {};
 	int16_t verticalGap = 10;
 
 	gcn::Color baseColor {38, 38, 78};
