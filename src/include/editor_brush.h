@@ -38,55 +38,98 @@
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
-
 class CBrush
 {
 public:
-	enum class BrushTypes
+	enum class EBrushTypes
 	{
 		SingleTile,
-		MultiTile,
-		Ramp
+		Decoration
 	};
 
-	enum class BrushShapes
+	enum class EBrushShapes
 	{
 		Round,
 		Rectangular
 	};
 
-	enum class BrushAllign
+	enum class EBrushAllign
 	{
 		UpperLeft,
 		Center
 	};
 
 	using brushApplyFn = std::function<void(const TilePos&, tile_index, bool, bool)>; // type alias
+	using TDecorationOptionName = std::string;
+	using TDecorationOptionValue = std::string;
+	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue>;
+	
+	struct Properties { // with default settings
+		EBrushTypes type = EBrushTypes::SingleTile;
+		EBrushShapes shape = EBrushShapes::Rectangular;
+		EBrushAllign allign = EBrushAllign::UpperLeft;
+		bool symmetric = false;
+		bool resizable = true;
+		struct
+		{
+			uint8_t width;
+			uint8_t height;
+		} resizeSteps{1, 1}, minSize{1, 1}, maxSize{20, 20};
 
-	struct Properties;
+		bool randomizeAllowed = true;
+		bool fixNeighborsAllowed = true;
+		bool tileIconsPaletteRequired = true;
+		
+		struct
+		{
+			std::string source;
+
+			using TPossibleValues = std::vector<TDecorationOptionValue>;
+			using TOptions = std::map<TDecorationOptionName, TPossibleValues>;
+			TOptions options;
+		} decorationGenerator;
+	};
 
 public:
-	explicit CBrush(std::string name,
-					CBrush::Properties properties)
+	explicit CBrush(std::string name, CBrush::Properties properties)
+		: name(std::move(name)), properties(std::move(properties))
 	{
-		this->name = std::move(name);
-		this->properties = std::move(properties);
 		rndEnabled = this->properties.randomizeAllowed;
 		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
-		setSize(this->properties.minSize.width, this->properties.minSize.height);
+
+		// init generator's options
+		if (!this->properties.decorationGenerator.options.empty()) {
+			for (auto &[option, values] : this->properties.decorationGenerator.options) {
+				if (values.empty()) {
+					continue;
+				}
+				decorationOptions[option] = values[0];
+			}
+		} else {
+			setSize(this->properties.minSize.width, this->properties.minSize.height);
+		}
 	}
 	explicit CBrush(std::string name,
 					CBrush::Properties properties,
 					const std::vector<tile_index> &tilesSrc)
+					: name(std::move(name)), properties(std::move(properties))
 	{
-		this->name = std::move(name);
-		this->properties = std::move(properties);
 		rndEnabled = this->properties.randomizeAllowed;
 		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
-		setSize(this->properties.minSize.width, this->properties.minSize.height);
-		fillWith(tilesSrc);
-	}
 
+		// init generator's options
+		if (!this->properties.decorationGenerator.options.empty()) {
+			for (auto &[option, values] : this->properties.decorationGenerator.options) {
+				if (values.empty()) {
+					continue;
+				}
+				decorationOptions[option] = values[0];
+			}
+		} else {
+			setSize(this->properties.minSize.width, this->properties.minSize.height);
+			fillWith(tilesSrc);
+		}
+	}
 	~CBrush() = default;
 
 	void applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
@@ -94,22 +137,24 @@ public:
 	uint8_t getWidth() const { return width; }
 	uint8_t getHeight() const { return height; }
 
-	BrushTypes getType() const { return properties.type; }
+	EBrushTypes getType() const { return properties.type; }
 
 	graphic_index getGraphicTile(uint8_t col, uint8_t row) const;
 
 	tile_index getTile(uint8_t col, uint8_t row) const;
 
 	void setTile(tile_index tile, uint8_t col = 0, uint8_t row = 0);
+	void setTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles);
+
 	void fillWith(tile_index tile, bool init = false);
 	void fillWith(const std::vector<tile_index> &tilesSrc);
 	void randomize();
 
-	void setAllign(BrushAllign allignTo) { properties.allign = allignTo; }
+	void setAllign(EBrushAllign allignTo) { properties.allign = allignTo; }
 	TilePos getAllignOffset() const;
-	BrushAllign getAllign() const { return properties.allign; }
+	EBrushAllign getAllign() const { return properties.allign; }
 
-	bool isCentered() const { return properties.allign == BrushAllign::Center; }
+	bool isCentered() const { return properties.allign == EBrushAllign::Center; }
 
 	void resizeW(uint8_t newWidth);
 	void resizeH(uint8_t newHeight);
@@ -137,11 +182,20 @@ public:
 		fixNeighborsEnabled = properties.fixNeighborsAllowed ? enable : false;
 	}
 	bool isFixNeighborsEnabled() const { return fixNeighborsEnabled; }
+	bool isTileIconsPaletteRequired() const { return properties.tileIconsPaletteRequired; };
+
+	const auto& getGeneratorOptions() const { return properties.decorationGenerator.options; }
+
+	void updateDecorationOption(const TDecorationOptionName &option, const TDecorationOptionValue &value);
+	const TDecorationOptionValue& getDecorationOption(const TDecorationOptionName &option);
+
+	void pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles);
+	void loadDecoration();
+
 	bool isDecorative() const { return decorative; }
 	void setDecorative(bool value) {
 		decorative = properties.fixNeighborsAllowed ? value : true;
 	}
-
 	std::string getName() const { return name; }
 	void setName(const std::string &name) { this->name = name; }
 
@@ -157,29 +211,16 @@ protected:
 
 	tile_index randomizeTile(tile_index tileIdx) const;
 	tile_index getCurrentTile() const;
+
+	/// Move to protected
+	auto& getDecoration(const TDecorationOptions &options);
+	void generateDecoration();
 	
-public:
-	struct Properties { // with default settings
-		BrushTypes type = BrushTypes::SingleTile;
-		BrushShapes shape = BrushShapes::Rectangular;
-		BrushAllign allign = BrushAllign::UpperLeft;
-		bool symmetric = false;
-		bool resizable = true;
-		struct
-		{
-			uint8_t width;
-			uint8_t height;
-		} resizeSteps{1, 1}, minSize{1, 1}, maxSize{20, 20};
-
-		bool randomizeAllowed = true;
-		bool fixNeighborsAllowed = true;
-	};
-
 protected:
 	Properties properties;
 
-	std::string name;
-	
+	std::string name; /// brush name
+
 	bool rndEnabled = false; /// Edit mode: place an the selected tile or a random tile of the same type
 	bool fixNeighborsEnabled = false; /// Edit mode: enabled fix up for neighbors with tile to be placed
 	bool decorative = false;
@@ -189,6 +230,17 @@ protected:
 	uint8_t width = 1;
 	uint8_t height = 1;
 	std::vector<tile_index> tiles;
+
+	/// for EBrushTypes::Decoration type
+	TDecorationOptions decorationOptions;
+	
+	struct SDecoration
+	{
+		uint8_t width = 0;
+		uint8_t height = 0;
+		std::vector<tile_index> tiles;
+	};
+	std::map<TDecorationOptions, SDecoration> decorationsPalette;
 };
 
 class CBrushesSet
