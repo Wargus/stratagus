@@ -94,7 +94,7 @@ void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 
 {
 	switch (properties.type)
 	{
-		case BrushTypes::SingleTile:
+		case EBrushTypes::SingleTile:
 			fillWith(tile, isInit ? false : true);
 			break;
 		default:
@@ -103,10 +103,15 @@ void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 
 			}
 	}
 }
+void  CBrush::setTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles)
+{
+	setSize(srcWidth, srcHeight);
+	fillWith(srcTiles);
+}
 
 void CBrush::fillWith(tile_index tile, bool init /* = false */)
 {
-	if (init && properties.shape == BrushShapes::Round) {
+	if (init && properties.shape == EBrushShapes::Round) {
 		ranges::fill(tiles, 0);
 		if (width == height) {
 			drawCircle(width / 2, height / 2, width, tile, this->tiles);
@@ -181,13 +186,13 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 		return;
 	}
 
-	const auto currentTile = properties.type == BrushTypes::SingleTile ? getCurrentTile() : 0;
+	const auto currentTile = properties.type == EBrushTypes::SingleTile ? getCurrentTile() : 0;
 	
 	tiles.clear();
 	width = newWidth;
 	height = newHeight;
 
-	if(properties.shape == BrushShapes::Round) {
+	if(properties.shape == EBrushShapes::Round) {
 		if (newWidth && newWidth % 2 == 0) {
 			width = newWidth - 1;
 		}
@@ -195,12 +200,68 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 	}
 	tiles.resize(width * height, 0);
 	
-	if (properties.type == BrushTypes::SingleTile) {
+	if (properties.type == EBrushTypes::SingleTile) {
 		fillWith(currentTile, true);
 	}
 	/// FIXME: Init|fill
 }
 
+void CBrush::updateDecorationOption(const TDecorationOptionName &option, const TDecorationOptionValue &value)
+{
+	if (properties.decorationGenerator.options.count(option)
+		&& ranges::contains(properties.decorationGenerator.options[option], value)) {
+
+		decorationOptions[option] = value;
+		loadDecoration();
+	}
+}
+
+const CBrush::TDecorationOptionValue& CBrush::getDecorationOption(const TDecorationOptionName &option)
+{
+	static const TDecorationOptionValue emptyValue{"no value"};
+	if (!decorationOptions.count(option)) {
+		return emptyValue;
+	}
+	return decorationOptions[option];	
+}
+
+auto& CBrush::getDecoration(const TDecorationOptions &options) {
+	static SDecoration emptyValue{};
+	if (!decorationsPalette.count(options)) {
+		const auto prevSize = decorationsPalette.size();
+		generateDecoration();
+		if (decorationsPalette.size() == prevSize) {
+			ErrorPrint("Unable to generate decoration with current set of options\n");
+			return emptyValue;
+		}
+	}
+	return decorationsPalette[options];
+}
+
+void CBrush::pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles)
+{
+	if (srcWidth * srcHeight != srcTiles.size()) {
+		return;
+	}
+	decorationsPalette[decorationOptions] = {srcWidth, srcHeight, srcTiles};
+}
+
+void CBrush::loadDecoration()
+{
+	const auto &[srcWidth, srcHeight, srcTiles] = getDecoration(decorationOptions);
+	setTiles(srcWidth, srcHeight, srcTiles);
+}
+
+void CBrush::generateDecoration()
+{
+	const fs::path filename = LibraryFileName(properties.decorationGenerator.source);
+	
+	if (LuaLoadFile(filename) == -1) {
+		ErrorPrint("%s's brush generator file '%s' not found\n",
+					name.c_str(),
+					properties.decorationGenerator.source.c_str());
+	}
+}
 
 tile_index CBrush::getCurrentTile() const
 {
@@ -276,8 +337,10 @@ bool CBrushesSet::setCurrentBrush(std::string_view name)
 		if (brush.getName() == name) {
 			currentBrush = brush;
 			const auto selectedTile = Editor.tileIcons.getSelectedTile();
-			if (selectedTile && currentBrush.getType() == CBrush::BrushTypes::SingleTile) {
+			if (selectedTile && currentBrush.getType() == CBrush::EBrushTypes::SingleTile) {
 				currentBrush.setTile(*selectedTile);
+			} else if (currentBrush.getType() == CBrush::EBrushTypes::Decoration) {
+				currentBrush.loadDecoration();
 			}
 			break;
 		}

@@ -118,85 +118,123 @@ static int CclEditorAddBrush(lua_State *l)
 	std::string name("Default");
 
 	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
-		const std::string_view value = LuaToString(l, -2);
-		if (value == "Name") {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "Name") {
 			name = std::string(LuaToString(l, -1));
 
-		} else if (value == "Type") {
+		} else if (key == "Type") {
 			const std::string_view type = LuaToString(l, -1);
 			if (type == "SingleTile") {
-				properties.type = CBrush::BrushTypes::SingleTile;
-			} else if (type == "MultiTile") {
-				properties.type = CBrush::BrushTypes::MultiTile;
-			} else if (type == "Ramp") {
-				properties.type = CBrush::BrushTypes::Ramp;
+				properties.type = CBrush::EBrushTypes::SingleTile;
+			} else if (type == "Decoration") {
+				properties.type = CBrush::EBrushTypes::Decoration;
 			} else {
 				ErrorPrint("Incorrect brush type '%s'\n", LuaToString(l, -1).data());
+				return 0;
 			}
-
-		} else if (value == "Shape") {
+		} else if (key == "Shape") {
 			const std::string_view shape = LuaToString(l, -1);
 			if (shape == "Rectangular") {
-				properties.shape = CBrush::BrushShapes::Rectangular;
+				properties.shape = CBrush::EBrushShapes::Rectangular;
 			} else if (shape == "Round") {
-				properties.shape = CBrush::BrushShapes::Round;
+				properties.shape = CBrush::EBrushShapes::Round;
 			} else {
 				ErrorPrint("Incorrect brush shape '%s'\n", LuaToString(l, -1).data());
+				return 0;
 			}
-		} else if (value == "Symmetric") {
+		} else if (key == "Symmetric") {
 					properties.symmetric = LuaToBoolean(l, -1);
 
-		} else if (value == "Allign") {
+		} else if (key == "Allign") {
 			const std::string_view allign = LuaToString(l, -1);
 			if (allign == "UpperLeft") {
-				properties.allign = CBrush::BrushAllign::UpperLeft;
+				properties.allign = CBrush::EBrushAllign::UpperLeft;
 			} else if (allign == "Center") {
-				properties.allign = CBrush::BrushAllign::Center;
+				properties.allign = CBrush::EBrushAllign::Center;
 			} else {
 				ErrorPrint("Incorrect brush allign '%s'\n", LuaToString(l, -1).data());
+				return 0;
 			}
-
-		} else if (value == "Resizable") {
+		} else if (key == "Resizable") {
 			properties.resizable = LuaToBoolean(l, -1);
 
-		} else if (value == "ResizeSteps") {
+		} else if (key == "ResizeSteps") {
 			if (!lua_istable(l, -1)) {
 				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
 				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			properties.resizeSteps.width = LuaToUnsignedNumber(l, -1, 1);
 			properties.resizeSteps.height = LuaToUnsignedNumber(l, -1, 2);
 
-		} else if (value == "MinSize") {
+		} else if (key == "MinSize") {
 			if (!lua_istable(l, -1)) {
 				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
 				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			properties.minSize.width = LuaToUnsignedNumber(l, -1, 1);
 			properties.minSize.height = LuaToUnsignedNumber(l, -1, 2);
 
-		} else if (value == "MaxSize") {
+		} else if (key == "MaxSize") {
 			if (!lua_istable(l, -1)) {
 				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
 				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
 			}
 			properties.maxSize.width = LuaToUnsignedNumber(l, -1, 1);
 			properties.maxSize.height = LuaToUnsignedNumber(l, -1, 2);
 
-		} else if (value == "RandomizeAllowed") {
+		} else if (key == "RandomizeAllowed") {
 			properties.randomizeAllowed = LuaToBoolean(l, -1);
 
-		} else if (value == "FixNeighborsAllowed") {
+		} else if (key == "FixNeighborsAllowed") {
 			properties.fixNeighborsAllowed = LuaToBoolean(l, -1);
+		} else if (key == "TileIconsPaletteRequired") {
+			properties.tileIconsPaletteRequired = LuaToBoolean(l, -1);
+		} else if (key == "ExtendedTilesetRequiried") {
+			if (LuaToBoolean(l, -1) && !Map.Tileset.isExtended()) {
+				ErrorPrint("This brush requires extended tileset, but basic is loaded. Unable to load brush.");
+				return 0;
+			}
+		} else if (key == "Generator") {
+			if (!lua_istable(l, -1)) {
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				return 0;
+			}
+			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
+
+				const std::string_view option = LuaToString(l, -2);
+
+				if (option == "source") {
+					properties.decorationGenerator.source = LuaToString(l, -1);
+				} else {
+					auto &values = properties.decorationGenerator.options[std::string(option)];
+
+					if (lua_istable(l, -1)) {
+						const int valuesCount = lua_rawlen(l, -1);
+						for (int i = 1; i <= valuesCount; i++) {
+							const std::string_view val = LuaToString(l, -1, i);
+							values.emplace_back(val);
+						}
+					} else {
+						const std::string_view val = LuaToString(l, -1);
+						values.emplace_back(val);
+					}
+				}
+			}
 		}
 	}
 	Editor.brushes.addBrush(CBrush(name, properties));
@@ -204,6 +242,67 @@ static int CclEditorAddBrush(lua_State *l)
 	return 0;
 }
 
+int CclEditorBrush_GetGeneratorOption(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	const std::string option {LuaToString(l, 1)};
+	lua_pushstring(l, Editor.brushes.getCurrentBrush().getDecorationOption(option).c_str());
+	return 1;
+}
+
+int CclEditorBrush_LoadDecorationTiles(lua_State *l)
+{
+	auto parseTiles = [&l]() { // at (l, -1) should be a table 
+		std::vector<tile_index> result;
+
+		const int rows = lua_rawlen(l, -1);
+		for (int i = 1; i <= rows; i++) {
+			lua_rawgeti(l, -1, i);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "Incorrect argument type: table expected.");
+				break;
+			}
+			const int cols = lua_rawlen(l, -1);
+			for (int col = 1; col <= cols; col++) {
+				const tile_index tile = LuaToUnsignedNumber(l, -1, col);
+				result.push_back(tile);
+			}
+			lua_pop(l, 1);
+		}
+		return result;
+	};
+
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	uint16_t width = 0;
+	uint16_t height = 0;
+	std::vector<tile_index> tiles;
+
+	for (lua_pushnil(l); lua_next(l, 1); lua_pop(l, 1)) {
+		const std::string_view key = LuaToString(l, -2);
+		if (key == "width") {
+			width = LuaToNumber(l, -1);
+		} else if (key == "height") {
+			height = LuaToNumber(l, -1);
+		} else if (key == "tiles") {
+			if (lua_istable(l, -1)) {
+				tiles = parseTiles();
+			} else {
+				LuaError(l, "Incorrect argument type for ['%s']: table expected.", key.data());
+			}
+		}  else {
+			LuaError(l, "Unsupported tag: %s", key.data());
+		}
+	}
+	if (tiles.size() == width * height) {
+		Editor.brushes.getCurrentBrush().pushDecorationTiles(width, height, tiles);
+	}
+
+	return 0;
+}
 /**
 **  Configure the randomize map feature of the editor.
 **
@@ -271,6 +370,8 @@ void EditorCclRegister()
 	lua_register(Lua, "EditorResizeMap", CclEditorResizeMap);
 
 	lua_register(Lua, "EditorAddBrush", CclEditorAddBrush);
+	lua_register(Lua, "EditorBrush_GetGeneratorOption", CclEditorBrush_GetGeneratorOption);
+	lua_register(Lua, "EditorBrush_LoadDecorationTiles", CclEditorBrush_LoadDecorationTiles);
 
 	lua_register(Lua, "SetEditorRandomizeProperties", CclEditorRandomizeProperties);
 }
