@@ -1179,11 +1179,11 @@ void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_
 	enum { cSrcRange2 = 2, cColors = 3 };
 
 	lua_rawgeti(luaStack, -1, cSrcRange2);	/// #1<
-	auto [parcedSrcIndexes, parcedSrcImages] = parseLayer(luaStack, true);
+	auto [parsedSrcIndexes, parsedSrcImages] = parseLayer(luaStack, true);
 	lua_pop(luaStack, 1);					/// #1>
 
 
-	if (!parcedSrcImages.size() && !parcedSrcIndexes.size()) { /// nothing to do
+	if (!parsedSrcImages.size() && !parsedSrcIndexes.size()) { /// nothing to do
 		return;
 	}
 
@@ -1194,10 +1194,10 @@ void CTilesetGraphicGenerator::composeByChromaKey(lua_State *luaStack, sequence_
 	size_t srcImgIdx = 0;
 	for (auto &image : dstImages) {
 		SDL_Surface *const dstImgSurface { image.get() };
-		SDL_Surface *const srcImgSurface = parcedSrcImages.size() ? parcedSrcImages[srcImgIdx % parcedSrcImages.size()].get()
+		SDL_Surface *const srcImgSurface = parsedSrcImages.size() ? parsedSrcImages[srcImgIdx % parsedSrcImages.size()].get()
 																  : srcImage.get();
-		if (parcedSrcIndexes.size()) {
- 			const graphic_index frameIdx = parcedSrcIndexes[srcImgIdx % parcedSrcIndexes.size()];
+		if (parsedSrcIndexes.size()) {
+ 			const graphic_index frameIdx = parsedSrcIndexes[srcImgIdx % parsedSrcIndexes.size()];
 			SrcTilesetGraphic->DrawFrame(frameIdx, 0, 0, srcImage.get());
 		}
 
@@ -1498,18 +1498,18 @@ void CTilesetGraphicGenerator::parseExtended(lua_State *luaStack)
 				lua_rawgeti(luaStack, -1, arg);
 			}
 
-			auto [parcedIndexes, parcedImages] = parseLayer(luaStack, layersNum == 1);
+			auto [parsedIndexes, parsedImages] = parseLayer(luaStack, layersNum == 1);
 
 			if (layersNum > 1) {
 				lua_pop(luaStack, 1);
 			}
 
-			if (layersNum == 1 && parcedImages.empty()) { // If the only layer has no new graphics
-				for (auto index : parcedIndexes) {
+			if (layersNum == 1 && parsedImages.empty()) { // If the only layer has no new graphics
+				for (auto index : parsedIndexes) {
 					Result.Indexes.push(index);
 				}
 			} else {
-				srcImgLayers.push_back(std::move(parcedImages));
+				srcImgLayers.push_back(std::move(parsedImages));
 			}
 			arg++;
 		}
