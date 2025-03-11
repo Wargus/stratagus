@@ -1928,6 +1928,7 @@ void EditorMainLoop()
 
 	// The slider is positioned in the bottom of the button area
 	editorSlider = std::make_unique<gcn::Slider>();
+	editorSlider->setFocusable(false);
 	editorSlider->setScale(0, sliderDefaultScale);
 	editorSlider->setStepLength(sliderDefaultStepLength);
 	editorSlider->setWidth(getButtonArea()[cBottomRightX] - getButtonArea()[cUpperLeftX] - 1);
@@ -2047,6 +2048,7 @@ void EditorMainLoop()
 			editorSlider->setValue(0);
 		}
 	});
+	toolDropdown->setFocusable(false);
 	toolDropdown->setWidth(100);
 	toolDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	toolDropdown->setForegroundColor(gcn::Color(200, 200, 120));
@@ -2093,7 +2095,7 @@ void EditorMainLoop()
 		toolDropdown->getFont()->getWidth(entry);
 		overlaysWidth = std::max(overlaysWidth, toolDropdown->getFont()->getWidth(entry) + 20);
 	}
-
+	overlaysDropdown->setFocusable(false);
 	overlaysDropdown->setWidth(overlaysWidth);
 	overlaysDropdown->setBaseColor(gcn::Color(38, 38, 78));
 	overlaysDropdown->setForegroundColor(gcn::Color(200, 200, 120));

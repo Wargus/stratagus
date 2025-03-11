@@ -103,6 +103,7 @@ void CBrushControlsUI::Init()
 {
 	brushesList = std::make_unique<StringListModel>(Editor.brushes.getBrushesNames());
 	brushSelect = std::make_unique<gcn::DropDown>(brushesList.get());
+	brushSelect->setFocusable(false);
 	brushSelect->setFont(&GetGameFont());
 	brushSelect->setWidth(UIRectangle.width - 10);
 	brushSelect->setBaseColor(baseColor);
@@ -123,6 +124,7 @@ void CBrushControlsUI::Init()
 	brushSelect->addActionListener(brushesDropdownListener.get());
 
 	sizeSlider = std::make_unique<gcn::Slider>();
+	sizeSlider->setFocusable(false);
 	sizeSlider->setWidth(UIRectangle.width - 32);
 	sizeSlider->setHeight(GetSmallFont().getHeight());
 	sizeSlider->setBaseColor(baseColor);
@@ -369,6 +371,7 @@ void CBrushControlsUI::updateGeneratorOptionsCtrls()
 			ctrls.valuesList = std::make_unique<StringListModel>(values);
 			ctrls.dropDown = std::make_unique<gcn::DropDown>(ctrls.valuesList.get());
 			auto &dropDown = ctrls.dropDown;
+			dropDown->setFocusable(false);
 			dropDown->setFont(&GetGameFont());
 			dropDown->setWidth(UIRectangle.width - 10);
 			dropDown->setBaseColor(baseColor);
