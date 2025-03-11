@@ -192,7 +192,7 @@ public:
 	void pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles);
 	void loadDecoration();
 
-	bool isDecorative() const { return decorative; }
+	bool isDecorative() const { return decorative || getType() == EBrushTypes::Decoration; }
 	void setDecorative(bool value) {
 		decorative = properties.fixNeighborsAllowed ? value : true;
 	}
