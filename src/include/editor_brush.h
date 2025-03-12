@@ -139,6 +139,7 @@ public:
 	uint8_t getHeight() const { return height; }
 
 	EBrushTypes getType() const { return properties.type; }
+	bool isRound() const { return properties.shape == EBrushShapes::Round; }
 
 	graphic_index getGraphicTile(uint8_t col, uint8_t row) const;
 

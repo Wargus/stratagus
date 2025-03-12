@@ -742,6 +742,30 @@ static void DrawEditorPanel()
 	DrawInfoHighlightedOverlay();
 }
 
+static void DrawCursorBorder(TilePos tilePos, PixelPos screenPos)
+{
+	const PixelSize tileSize(Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
+	const auto &brush = Editor.brushes.getCurrentBrush();
+
+	if (Editor.State == EditorStateType::EditTile) {
+		if (brush.isRound() && brush.getWidth() > 1) {
+			Video.DrawCircleClip(ColorWhite, 
+				screenPos.x + tileSize.x / 2,
+				screenPos.y + tileSize.y / 2,
+				tileSize.x * brush.getWidth() / 2 - 1);
+		} else {
+			const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
+								  tileSize.y * brush.getAllignOffset().y};
+			Video.DrawRectangleClip(ColorWhite,
+									screenPos.x + offset.x,
+									screenPos.y + offset.y,
+									tileSize.x * brush.getWidth(),
+									tileSize.y * brush.getHeight());
+		}	
+	} else {
+		Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, tileSize.x, tileSize.y);
+	}
+}
 
 static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &brush)
 {
@@ -772,15 +796,8 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 	};
 	brush.applyAt(tilePos, drawBrushTile, true);
 
-	PixelPos screenPosIt;
-	const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
-						  tileSize.y * brush.getAllignOffset().y};
+	DrawCursorBorder(tilePos, screenPos);
 
-	Video.DrawRectangleClip(ColorWhite,
-							screenPos.x + offset.x,
-							screenPos.y + offset.y,
-							tileSize.x * brush.getWidth(),
-							tileSize.y * brush.getHeight());
 	PopClipping();
 }
 
@@ -829,7 +846,9 @@ static void UpdateMapCursor()
 		} else {
 			PushClipping();
 			UI.MouseViewport->SetClipping();
-			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, Map.Tileset.getPixelTileSize().x, Map.Tileset.getPixelTileSize().y);
+
+			DrawCursorBorder(tilePos, screenPos);
+
 			if (Editor.State == EditorStateType::ElevationLevel) {
 				CLabel(GetGameFont()).DrawClip(screenPos.x + 2, screenPos.y + 1, Editor.SelectedElevationLevel);
 			}
