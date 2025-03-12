@@ -67,7 +67,7 @@ public:
 	struct Properties { // with default settings
 		EBrushTypes type = EBrushTypes::SingleTile;
 		EBrushShapes shape = EBrushShapes::Rectangular;
-		EBrushAllign allign = EBrushAllign::UpperLeft;
+		EBrushAllign allign = EBrushAllign::Center;
 		bool symmetric = false;
 		bool resizable = true;
 		struct
