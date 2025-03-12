@@ -79,6 +79,17 @@ public:
 	void hide();
 	void reloadBrushes();
 
+	void resizeByStepUp() {
+		gcn::KeyEvent keyEvent{
+			nullptr, nullptr, false, false, false, false, 0, false, gcn::Key::Right};
+		sizeSlider->keyPressed(keyEvent);
+	};
+	void resizeByStepDown() {
+		gcn::KeyEvent keyEvent{
+			nullptr, nullptr, false, false, false, false, 0, false, gcn::Key::Left};
+		sizeSlider->keyPressed(keyEvent);
+	};
+
 private:
 
 	void Init();
@@ -96,18 +107,6 @@ private:
 
 	std::map<ECtrlSets, CSetOfCtrls> controlSets;
 
-/*
-	std::list<gcn::Widget *> controls; // List of all controls (both enabled and disabled for
-		// current brush). In order to improve readability, instead
-		// of disabling controls, we just hide them.
-
-	std::list<gcn::Widget *> hiddenControls; // List of temporarily hidden controls that are
-											 // _enabled_ for current brush. If we need to hide
-											 // the entire BrushControlsUI we save all currently 
-											 // enabled controls into this list and then hide them.
-											 // We use this list to avoid unhiding the disabled
-											 // ones later.
-*/
 	std::unique_ptr<gcn::DropDown> brushSelect;
 	std::unique_ptr<StringListModel> brushesList;
 	std::unique_ptr<LambdaActionListener> brushesDropdownListener;

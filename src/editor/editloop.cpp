@@ -1459,15 +1459,27 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.SelectedElevationLevel--;
 			}
 			break;
-		case ']': /// Increase highlighted elevation level
+		case ']': /// Increace brush size
+			if (Editor.State == EditorStateType::EditTile) {
+				brushesCtrlUI->resizeByStepUp();
+			}
+			break;
+		case '[': /// Decreace brush size
+			if (Editor.State == EditorStateType::EditTile) {
+				brushesCtrlUI->resizeByStepDown();
+			}
+			break;
+		case '.': /// Increace highlighted elevation level
+		case '>':
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
-			    && Editor.HighlightElevationLevel < 255) {
+				&& Editor.HighlightElevationLevel < 255) {
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case '[': /// Decrease highlighted elevation level
+		case ',':	/// Decreace highlighted elevation level 
+		case '<':
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
-			    && Editor.HighlightElevationLevel > 0) {
+				&& Editor.HighlightElevationLevel > 0) {
 				Editor.HighlightElevationLevel--;
 			}
 			break;
