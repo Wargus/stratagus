@@ -748,22 +748,36 @@ static void DrawCursorBorder(TilePos tilePos, PixelPos screenPos)
 	const auto &brush = Editor.brushes.getCurrentBrush();
 
 	if (Editor.State == EditorStateType::EditTile) {
+		const PixelPos offset = {tileSize.x * brush.getAllignOffset().x,
+								 tileSize.y * brush.getAllignOffset().y};
+
 		if (brush.isRound() && brush.getWidth() > 1) {
 			Video.DrawCircleClip(ColorWhite, 
-				screenPos.x + tileSize.x / 2,
-				screenPos.y + tileSize.y / 2,
-				tileSize.x * brush.getWidth() / 2 - 1);
+								 screenPos.x + tileSize.x / 2,
+								 screenPos.y + tileSize.y / 2,
+								 tileSize.x * brush.getWidth() / 2 - 1);
 		} else {
-			const PixelPos offset{tileSize.x * brush.getAllignOffset().x,
-								  tileSize.y * brush.getAllignOffset().y};
 			Video.DrawRectangleClip(ColorWhite,
 									screenPos.x + offset.x,
 									screenPos.y + offset.y,
 									tileSize.x * brush.getWidth(),
 									tileSize.y * brush.getHeight());
-		}	
+		}
+		if (Map.Info.IsHighgroundsEnabled()) {
+			auto xPos = screenPos.x + offset.x;
+			xPos += ((brush.isRound() && brush.getWidth() > 2) ? 4 : 2);
+			auto yPos = screenPos.y + 1;
+			yPos += (brush.isRound() ? 0 : offset.y);
+			
+			CLabel(GetGameFont()).DrawClip(xPos, yPos, Editor.SelectedElevationLevel);
+		}
 	} else {
 		Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, tileSize.x, tileSize.y);
+	}
+	if (Map.Info.IsHighgroundsEnabled() && Editor.State == EditorStateType::ElevationLevel) {
+		CLabel(GetGameFont()).DrawClip(screenPos.x + 2,
+									   screenPos.y + 1,
+									   Editor.SelectedElevationLevel);		
 	}
 }
 
@@ -1450,12 +1464,20 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '+': /// Increase brush's elevation level
 		case '=':
-			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel < 255) {
+			if (Editor.SelectedElevationLevel < 255 
+				&& (Editor.State == EditorStateType::ElevationLevel
+					|| (Map.Info.IsHighgroundsEnabled()
+						&& Editor.State == EditorStateType::EditTile))) {
+
 				Editor.SelectedElevationLevel++;
 			}
 			break;
-		case '-': /// Decrease brush's elevation level
-			if (Editor.State == EditorStateType::ElevationLevel && Editor.SelectedElevationLevel > 0) {
+		case '-': /// Decreace brush's elevation level
+			if (Editor.SelectedElevationLevel > 0
+				&& (Editor.State == EditorStateType::ElevationLevel
+					|| (Map.Info.IsHighgroundsEnabled()
+						&& Editor.State == EditorStateType::EditTile))) {
+
 				Editor.SelectedElevationLevel--;
 			}
 			break;

@@ -174,7 +174,9 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 			return;
 		}
 		SetTile(tilePos, tileIdx);
-
+		if (Map.Info.IsHighgroundsEnabled()) {
+			Map.Field(tilePos)->setElevation(SelectedElevationLevel);
+		}
 		CMapField &mapField = *Map.Field(tilePos);
 		if (decorative) {
 			mapField.setFlag(MapFieldNonMixing);
@@ -233,7 +235,9 @@ void CEditor::ChangeTile(const Vec2i &pos,
 	const tile_index tileIdx = randomizeTile ? Map.Tileset.getRandomTileOfTheSameKindAs(tileIndex)
 											 : tileIndex;
 	SetTile(pos, tileIdx);
-
+	if (Map.Info.IsHighgroundsEnabled()) {
+		Map.Field(pos)->setElevation(SelectedElevationLevel);
+	}
 	// Change the flags
 	if (changeSurroundings
 		&& !Map.Field(pos)->isFlag(MapFieldDecorative | MapFieldNonMixing)) {
