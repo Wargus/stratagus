@@ -60,7 +60,6 @@ enum class EditorStateType {
 	Selecting,         /// Select
 	EditTile,          /// Edit tiles
 	ElevationLevel,    /// Edit elevation levels
-	EditRamps,         /// Place and edit ramps
 	SetStartLocation,  /// Set the start location
 	EditUnit           /// Edit units
 };

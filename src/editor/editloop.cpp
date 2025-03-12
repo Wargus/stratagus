@@ -1970,7 +1970,7 @@ void EditorMainLoop()
 	std::vector<std::string> toolListStrings = { "Select", "Tiles", "Start Locations", "Units" };
 
 	if (Map.Info.IsHighgroundsEnabled()) {
-		std::vector<std::string> highgroundsTools = { "Elevation", "Ramps" };
+		std::vector<std::string> highgroundsTools = { "Elevation" };
 
 		toolListStrings.insert(ranges::find(toolListStrings, "Start Locations"),
 							   highgroundsTools.begin(),
@@ -2012,11 +2012,6 @@ void EditorMainLoop()
 
 		} else if (selectedItem == "Elevation") {
 			Editor.State = EditorStateType::ElevationLevel;
-			editorSlider->setVisible(false);
-			Editor.SelectedElevationLevel = 0;
-
-		} else if (selectedItem == "Ramps") {
-			Editor.State = EditorStateType::EditRamps;
 			editorSlider->setVisible(false);
 			Editor.SelectedElevationLevel = 0;
 
