@@ -205,9 +205,9 @@ static int CclEditorAddBrush(lua_State *l)
 		} else if (key == "TileIconsPaletteRequired") {
 			properties.tileIconsPaletteRequired = LuaToBoolean(l, -1);
 		} else if (key == "ExtendedTilesetRequired") {
-			const bool extendedReq = LuaToBoolean(l, -1);
-			if (extendedReq && !Map.Tileset.isExtended()) {
-				ErrorPrint("This brush requires extended tileset, but basic is loaded. Unable to load brush.\n");
+			properties.extendedTilesetRequired = LuaToBoolean(l, -1);
+			if(properties.extendedTilesetRequired && !Map.Info.IsHighgroundsEnabled()) {
+				ErrorPrint("Unable to load brush: extended tileset required, but loaded base.\n");
 				return 0;
 			}
 		} else if (key == "Generator") {

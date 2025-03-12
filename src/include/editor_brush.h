@@ -79,7 +79,8 @@ public:
 		bool randomizeAllowed = true;
 		bool fixNeighborsAllowed = true;
 		bool tileIconsPaletteRequired = true;
-		
+		bool extendedTilesetRequired = false;
+
 		struct
 		{
 			std::string source;
@@ -183,6 +184,7 @@ public:
 	}
 	bool isFixNeighborsEnabled() const { return fixNeighborsEnabled; }
 	bool isTileIconsPaletteRequired() const { return properties.tileIconsPaletteRequired; };
+	bool isExtendedTilesetRequired() const { return properties.extendedTilesetRequired; }
 
 	const auto& getGeneratorOptions() const { return properties.decorationGenerator.options; }
 
