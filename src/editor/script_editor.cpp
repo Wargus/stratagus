@@ -108,7 +108,7 @@ static int CclEditorResizeMap(lua_State *l)
   ExtendedTilesetRequired = true,
   Generator = { -- decoration generator options
     ["source"] = "scripts/editor/brushes/_generator_.lua", -- path to generator file
-    ["option"] = "value" -- option : values pairs, both as a string
+    ["option"] = {"value1", "value2" ...} -- option : {possible values} pairs, tvalues type is string
   }
 */
 
