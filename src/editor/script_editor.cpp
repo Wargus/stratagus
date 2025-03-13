@@ -94,16 +94,22 @@ static int CclEditorResizeMap(lua_State *l)
 
 /*
   Name = "Default",
-  Type = "SingleTile", -- MultiTile, Ramp 
-  Shape = "Rectangular", -- Round
+  Type = "SingleTile", -- or Decoration
+  Shape = "Rectangular", -- or Round
   Symmetric = false,
-  Allign = "UpperLeft",  -- Center
+  Allign = "UpperLeft",  -- or Center
   Resizable = true,
   ResizeSteps = {1, 1},
   MinSize = {1, 1},
   MaxSize = {20, 20},
   RandomizeAllowed = true,
-  FixNeighborsAllowed = true
+  FixNeighborsAllowed = true,
+  TileIconsPaletteRequired = true,
+  ExtendedTilesetRequired = true,
+  Generator = { -- decoration generator options
+    ["source"] = "scripts/editor/brushes/_generator_.lua", -- path to generator file
+    ["option"] = "value" -- option : values pairs, both as a string
+  }
 */
 
 static int CclEditorAddBrush(lua_State *l)
@@ -160,12 +166,14 @@ static int CclEditorAddBrush(lua_State *l)
 
 		} else if (key == "ResizeSteps") {
 			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
-				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			properties.resizeSteps.width = LuaToUnsignedNumber(l, -1, 1);
@@ -173,12 +181,14 @@ static int CclEditorAddBrush(lua_State *l)
 
 		} else if (key == "MinSize") {
 			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
-				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			properties.minSize.width = LuaToUnsignedNumber(l, -1, 1);
@@ -186,12 +196,14 @@ static int CclEditorAddBrush(lua_State *l)
 
 		} else if (key == "MaxSize") {
 			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			const int args = lua_rawlen(l, -1);
 			if (args != 2) {
-				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			properties.maxSize.width = LuaToUnsignedNumber(l, -1, 1);
@@ -212,7 +224,8 @@ static int CclEditorAddBrush(lua_State *l)
 			}
 		} else if (key == "Generator") {
 			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
+							LuaToString(l, -1).data());
 				return 0;
 			}
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
@@ -253,7 +266,7 @@ int CclEditorBrush_GetGeneratorOption(lua_State *l)
 
 int CclEditorBrush_LoadDecorationTiles(lua_State *l)
 {
-	auto parseTiles = [&l]() { // at (l, -1) should be a table 
+	auto parseTiles = [&l]() { // at (l, -1) should be a table
 		std::vector<tile_index> result;
 
 		const int rows = lua_rawlen(l, -1);
@@ -336,7 +349,9 @@ static int CclEditorRandomizeProperties(lua_State *l)
 				if (lua_rawlen(l, -1) != 3) {
 					LuaError(l, "incorrect RandomTiles entry length, need 3 integers");
 				}
-				Editor.RandomTiles.push_back(std::make_tuple(LuaToNumber(l, -1, 1), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3)));
+				Editor.RandomTiles.push_back(std::make_tuple(LuaToNumber(l, -1, 1),
+															 LuaToNumber(l, -1, 2),
+															 LuaToNumber(l, -1, 3)));
 				lua_pop(l, 1);
 			}
 		} else if (value == "RandomUnits") {
@@ -352,7 +367,10 @@ static int CclEditorRandomizeProperties(lua_State *l)
 				if (lua_rawlen(l, -1) != 4) {
 					LuaError(l, "incorrect RandomUnits entry length, need 1 string followed by 3 integers");
 				}
-				Editor.RandomUnits.push_back(std::make_tuple(std::string(LuaToString(l, -1, 1)), LuaToNumber(l, -1, 2), LuaToNumber(l, -1, 3), LuaToNumber(l, -1, 4)));
+				Editor.RandomUnits.push_back(std::make_tuple(std::string(LuaToString(l, -1, 1)),
+																		 LuaToNumber(l, -1, 2),
+																		 LuaToNumber(l, -1, 3),
+																		 LuaToNumber(l, -1, 4)));
 				lua_pop(l, 1);
 			}
 		}

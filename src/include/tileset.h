@@ -85,9 +85,9 @@ constexpr tile_flags MapFieldCost5			{0x0000'0000'0004'0000 | MapFieldForest};	/
 constexpr tile_flags MapFieldCost6			{0x0000'0000'0008'0000 | MapFieldForest};	/// This field is terrain harvestable, but gives Cost6 instead of wood
 
 constexpr tile_flags MapFieldFromUnseparatedSlot
-											{0x0000'0000'1000'0000};	/// If non-interchangeable tiles are located in the same subslot with 
+											{0x0000'0000'1000'0000};	/// If non-interchangeable tiles are located in the same subslot with
 																		/// no separators (0) between them, such tiles must be flagged with this flag.
-																		/// Otherwise, some of the editor's algorithms will be broken (e.g. the randomization 
+																		/// Otherwise, some of the editor's algorithms will be broken (e.g. the randomization
 																		/// will pick any tile from a given subslot).
 constexpr tile_flags MapFieldNonMixing		{0x0000'0000'8000'0000};	/// special flag - this isn't it's own name, but it doesn't mix
 
@@ -203,11 +203,11 @@ public:
 
 	const std::string &getTerrainName(terrain_typeIdx solidTerrainIndex) const;
 
-	graphic_index getGraphicTileFor(tile_index idx) const 
+	graphic_index getGraphicTileFor(tile_index idx) const
 	{
-		return idx < tiles.size() ? tiles[idx].tile : 0; 
+		return idx < tiles.size() ? tiles[idx].tile : 0;
 	};
-	
+
 	int32_t findTileIndexByTile(graphic_index tile) const;
 
 	std::vector<tile_index> getAllTiles() const;
@@ -221,7 +221,7 @@ public:
 	tile_index tileFromQuad(uint32_t fixed, uint32_t quad) const;
 	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
 	std::vector<tile_index> getAllTilesOfTheSameKindAs(tile_index tileIndex) const;
-	
+
 	bool isTileRandomizable(tile_index tileIndex) const;
 	tile_index getRandomTileOfTheSameKindAs(tile_index tileIndex) const;
 
@@ -363,11 +363,11 @@ class CTilesetGraphicGenerator
 {
 public:
 	CTilesetGraphicGenerator(lua_State *luaStack,
-	                         int tablePos,
-	                         int argPos,
-	                         const CTileset *srcTileset,
-	                         const CGraphic *srcGraphic,
-	                         const CGraphic *srcImgGraphic) :
+							int tablePos,
+							int argPos,
+							const CTileset *srcTileset,
+							const CGraphic *srcGraphic,
+							const CGraphic *srcImgGraphic) :
 		SrcTileset(srcTileset),
 		SrcTilesetGraphic(srcGraphic),
 		SrcImgGraphic(srcImgGraphic)

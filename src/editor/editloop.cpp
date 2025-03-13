@@ -463,7 +463,7 @@ static std::string getTileInfo(const tile_index index)
 			 buffSize,
 			 "[0x%04X] %s%s%s",
 			 index,
-			 baseTerrain, 
+			 baseTerrain,
 			 mixTerrainIdx ? " <> " : "",
 			 mixTerrain);
 	return std::string(buf);
@@ -516,10 +516,10 @@ static void DrawPlayers()
 		// if player exists, draw player color 2px inside highlight
 		if (Map.Info.PlayerType[i] != PlayerTypes::PlayerNobody) {
 			Video.FillRectangle(PlayerColorsRGB[GameSettings.Presets[i].PlayerColor][0],
-			                    x + 2,
-			                    y + 2,
-			                    getPlayerButtonSize() - 2,
-			                    getPlayerButtonSize() - 2);
+								x + 2,
+								y + 2,
+								getPlayerButtonSize() - 2,
+								getPlayerButtonSize() - 2);
 		}
 
 		// Draw green rectangle around selected player
@@ -675,7 +675,7 @@ static void DrawTileIcons()
 		return;
 	}
 	forEachTileIconArea([](int i, int x, int y, int w, int h) {
-		
+
 		if (const auto tile = Editor.tileIcons.getTile(i)) {
 
 			const auto iconWidth = Map.Tileset.getPixelTileSize().x;
@@ -727,8 +727,8 @@ static void DrawInfoHighlightedOverlay()
 	if (overlaysDropdown->getSelected() == EditorOverlays::Elevation) {
 		CLabel(GetGameFont())
 			.Draw(overlaysDropdown->getX() + overlaysDropdown->getWidth() + 5,
-		          2,
-		          Editor.HighlightElevationLevel);
+				  2,
+				  Editor.HighlightElevationLevel);
 	}
 }
 
@@ -752,7 +752,7 @@ static void DrawCursorBorder(TilePos tilePos, PixelPos screenPos)
 								 tileSize.y * brush.getAllignOffset().y};
 
 		if (brush.isRound() && brush.getWidth() > 1) {
-			Video.DrawCircleClip(ColorWhite, 
+			Video.DrawCircleClip(ColorWhite,
 								 screenPos.x + tileSize.x / 2,
 								 screenPos.y + tileSize.y / 2,
 								 tileSize.x * brush.getWidth() / 2 - 1);
@@ -768,16 +768,16 @@ static void DrawCursorBorder(TilePos tilePos, PixelPos screenPos)
 			xPos += ((brush.isRound() && brush.getWidth() > 2) ? 4 : 2);
 			auto yPos = screenPos.y + 1;
 			yPos += (brush.isRound() ? 0 : offset.y);
-			
+
 			CLabel(GetGameFont()).DrawClip(xPos, yPos, Editor.SelectedElevationLevel);
 		}
-	} else {
-		Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, tileSize.x, tileSize.y);
-	}
-	if (Map.Info.IsHighgroundsEnabled() && Editor.State == EditorStateType::ElevationLevel) {
+	} else if (Map.Info.IsHighgroundsEnabled() && Editor.State == EditorStateType::ElevationLevel) {
+
 		CLabel(GetGameFont()).DrawClip(screenPos.x + 2,
 									   screenPos.y + 1,
-									   Editor.SelectedElevationLevel);		
+									   Editor.SelectedElevationLevel);
+	} else {
+		Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, tileSize.x, tileSize.y);
 	}
 }
 
@@ -787,17 +787,17 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 	PushClipping();
 	UI.MouseViewport->SetClipping();
 	const PixelSize tileSize(Map.Tileset.getPixelTileSize().x,
-	                         Map.Tileset.getPixelTileSize().y);
+							 Map.Tileset.getPixelTileSize().y);
 
 	auto drawBrushTile = [&screenPos, &tileSize](const TilePos &tileOffset,
-	                                             tile_index tileIdx,
+												 tile_index tileIdx,
 												 bool,
 												 bool) -> void
 	{
 		const PixelPos screenPosIt(screenPos.x + tileOffset.x * tileSize.x,
-		                           screenPos.y + tileOffset.y * tileSize.y);
+								   screenPos.y + tileOffset.y * tileSize.y);
 
-		if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x 
+		if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x
 			|| screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y
 			|| screenPosIt.x + tileSize.x <  UI.MouseViewport->GetTopLeftPos().x
 			|| screenPosIt.y + tileSize.y <  UI.MouseViewport->GetTopLeftPos().y) {
@@ -852,7 +852,7 @@ static void UpdateMapCursor()
 						  screenPos,
 						  Editor.brushes.getCurrentBrush());
 
-		} else if (Editor.State == EditorStateType::EditTile 
+		} else if (Editor.State == EditorStateType::EditTile
 					&& Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::Decoration) {
 			DrawMapCursor(tilePos,
 						  screenPos,
@@ -934,32 +934,32 @@ static void DrawEditorInfo()
 	//
 	const unsigned flag = mf.getFlags();
 	snprintf(buf,
-	         sizeof(buf),
-	         "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
-	         mf.getElevation(),
-	         mf.Value,
-	         flag,
-	         flag & MapFieldOpaque ? 'o' : '-',
-	         flag & MapFieldUnpassable ? 'u' : '-',
-	         flag & MapFieldNoBuilding ? 'n' : '-',
-	         flag & MapFieldHuman ? 'h' : '-',
-	         flag & MapFieldWall ? 'w' : '-',
-	         flag & MapFieldRocks ? 'r' : '-',
-	         flag & MapFieldForest ? 'f' : '-',
-	         flag & MapFieldLandAllowed ? 'L' : '-',
-	         flag & MapFieldCoastAllowed ? 'C' : '-',
-	         flag & MapFieldWaterAllowed ? 'W' : '-',
-	         flag & MapFieldLandUnit ? 'l' : '-',
-	         flag & MapFieldAirUnit ? 'a' : '-',
-	         flag & MapFieldSeaUnit ? 's' : '-',
-	         flag & MapFieldBuilding ? 'b' : '-',
-	         flag & MapFieldDecorative ? 'd' : '-',
-	         flag & MapFieldNonMixing  ? 'X' : '-');
+			 sizeof(buf),
+			 "elev:(%u) value:(0x%02X) | flags:(0x%04X)>[%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c]",
+			 mf.getElevation(),
+			 mf.Value,
+			 flag,
+			 flag & MapFieldOpaque ? 'o' : '-',
+			 flag & MapFieldUnpassable ? 'u' : '-',
+			 flag & MapFieldNoBuilding ? 'n' : '-',
+			 flag & MapFieldHuman ? 'h' : '-',
+			 flag & MapFieldWall ? 'w' : '-',
+			 flag & MapFieldRocks ? 'r' : '-',
+			 flag & MapFieldForest ? 'f' : '-',
+			 flag & MapFieldLandAllowed ? 'L' : '-',
+			 flag & MapFieldCoastAllowed ? 'C' : '-',
+			 flag & MapFieldWaterAllowed ? 'W' : '-',
+			 flag & MapFieldLandUnit ? 'l' : '-',
+			 flag & MapFieldAirUnit ? 'a' : '-',
+			 flag & MapFieldSeaUnit ? 's' : '-',
+			 flag & MapFieldBuilding ? 'b' : '-',
+			 flag & MapFieldDecorative ? 'd' : '-',
+			 flag & MapFieldNonMixing  ? 'X' : '-');
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
 							   UI.StatusLine.TextY - GetGameFont().getHeight() * 2,
 							   buf);
 
-	// Display tile info 
+	// Display tile info
 	const tile_index index = mf.getTileIndex();
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX,
 							   UI.StatusLine.TextY - GetGameFont().getHeight(),
@@ -977,12 +977,12 @@ static void ShowUnitInfo(const CUnit &unit)
 	char buf[256];
 
 	int n = snprintf(buf,
-	                 sizeof(buf),
-	                 _("#%d '%s' Player:#%d %s"),
-	                 UnitNumber(unit),
-	                 unit.Type->Name.c_str(),
-	                 unit.Player->Index + 1,
-	                 unit.Active ? "active" : "passive");
+					 sizeof(buf),
+					 _("#%d '%s' Player:#%d %s"),
+					 UnitNumber(unit),
+					 unit.Type->Name.c_str(),
+					 unit.Player->Index + 1,
+					 unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
 		snprintf(buf + n, sizeof(buf) - n, _(" Amount %d"), unit.ResourcesHeld);
 	}
@@ -1024,7 +1024,7 @@ void EditorUpdateDisplay()
 		UI.Minimap.Draw();
 		for (std::size_t i = 0; i != UI.NumViewports; ++i) {
 			UI.Minimap.DrawViewportArea(UI.Viewports[i],
-			                            UI.SelectedViewport == &UI.Viewports[i] ? 255 : 128);
+										UI.SelectedViewport == &UI.Viewports[i] ? 255 : 128);
 		}
 	}
 	// Info panel
@@ -1244,7 +1244,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				Editor.SelectedUnitIndex = -1;
 				CursorBuilding = nullptr;
 				return;
-			} else if (Editor.State == EditorStateType::EditTile 
+			} else if (Editor.State == EditorStateType::EditTile
 					   && Editor.tileIcons.isSelected()) {
 
 				Editor.tileIcons.resetSelected();
@@ -1262,7 +1262,7 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorStateType::EditTile 
+			if (Editor.State == EditorStateType::EditTile
 				&& (Editor.tileIcons.isSelected()
 					|| Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::Decoration)) {
 
@@ -1464,7 +1464,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 			break;
 		case '+': /// Increase brush's elevation level
 		case '=':
-			if (Editor.SelectedElevationLevel < 255 
+			if (Editor.SelectedElevationLevel < 255
 				&& (Editor.State == EditorStateType::ElevationLevel
 					|| (Map.Info.IsHighgroundsEnabled()
 						&& Editor.State == EditorStateType::EditTile))) {
@@ -1498,7 +1498,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case ',':	/// Decreace highlighted elevation level 
+		case ',':	/// Decreace highlighted elevation level
 		case '<':
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 				&& Editor.HighlightElevationLevel > 0) {
@@ -1710,7 +1710,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorStateType::EditTile 
+		if (Editor.State == EditorStateType::EditTile
 			&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
 
 			Editor.applyCurentBrush(tilePos);
@@ -1786,7 +1786,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		if (UI.MouseViewport != vp) { // viewport changed
 			UI.MouseViewport = vp;
 			DebugPrint("active viewport changed to %ld.\n",
-			           static_cast<long int>(UI.Viewports - vp));
+					   static_cast<long int>(UI.Viewports - vp));
 		}
 		CursorOn = ECursorOn::Map;
 
@@ -1821,8 +1821,8 @@ void CEditor::Init()
 	const fs::path filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.string());
 	if (!fs::exists(filename)) {
 		ErrorPrint("Editor configuration file '%s' was not found\n"
-		           "Specify another with '-E file.lua'\n",
-		           Parameters::Instance.luaEditorStartFilename.u8string().c_str());
+				   "Specify another with '-E file.lua'\n",
+				   Parameters::Instance.luaEditorStartFilename.u8string().c_str());
 		ExitFatal(-1);
 	}
 
@@ -2015,8 +2015,8 @@ void EditorMainLoop()
 	});
 	editorSlider->addActionListener(editorSliderListener.get());
 	editorContainer->add(editorSlider.get(),
-	                     getSelectionArea()[cUpperLeftX],
-	                     getSelectionArea()[cBottomRightY] - editorSlider->getHeight());
+						 getSelectionArea()[cUpperLeftX],
+						 getSelectionArea()[cBottomRightY] - editorSlider->getHeight());
 	Editor.tileIcons.attachSliderCtrl(editorSlider.get());
 
 	// Mode selection is put into the status line

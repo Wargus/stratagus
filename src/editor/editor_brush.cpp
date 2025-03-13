@@ -10,7 +10,7 @@
 //
 /**@name editor_brush.h - Assistant for brushes in the editor. */
 //
-//      (c) Copyright 2023-2024 by Alyokhin
+//      (c) Copyright 2023-2025 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,6 +51,47 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CBrush::CBrush(std::string name, CBrush::Properties properties)
+	: name(std::move(name)), properties(std::move(properties))
+{
+	rndEnabled = this->properties.randomizeAllowed;
+	fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
+
+	// init generator's options
+	if (!this->properties.decorationGenerator.options.empty()) {
+		for (auto &[option, values] : this->properties.decorationGenerator.options) {
+			if (values.empty()) {
+				continue;
+			}
+			decorationOptions[option] = values[0];
+		}
+	} else {
+		setSize(this->properties.minSize.width, this->properties.minSize.height);
+	}
+}
+
+CBrush::CBrush(std::string name,
+				CBrush::Properties properties,
+				const std::vector<tile_index> &tilesSrc)
+	: name(std::move(name)), properties(std::move(properties))
+{
+	rndEnabled = this->properties.randomizeAllowed;
+	fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
+
+	// init generator's options
+	if (!this->properties.decorationGenerator.options.empty()) {
+		for (auto &[option, values] : this->properties.decorationGenerator.options) {
+			if (values.empty()) {
+				continue;
+			}
+			decorationOptions[option] = values[0];
+		}
+	} else {
+		setSize(this->properties.minSize.width, this->properties.minSize.height);
+		fillWith(tilesSrc);
+	}
+}
+
 void CBrush::applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization /* = false*/) const
 {
 	TilePos brushOffset{};
@@ -64,7 +105,7 @@ void CBrush::applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandom
 			if (tileIdx) {
 				const TilePos tileOffset(col - brushOffset.x, row - brushOffset.y);
 				const tile_index applyTile = forbidRandomization || !this->rndEnabled
-											 ? tileIdx 
+											 ? tileIdx
 											 : randomizeTile(tileIdx);
 				applyFn(tileOffset, applyTile, isFixNeighborsEnabled(), isDecorative());
 			}
@@ -187,7 +228,7 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 	}
 
 	const auto currentTile = properties.type == EBrushTypes::SingleTile ? getCurrentTile() : 0;
-	
+
 	tiles.clear();
 	width = newWidth;
 	height = newHeight;
@@ -199,7 +240,7 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 		height = width;
 	}
 	tiles.resize(width * height, 0);
-	
+
 	if (properties.type == EBrushTypes::SingleTile) {
 		fillWith(currentTile, true);
 	}
@@ -222,7 +263,7 @@ const CBrush::TDecorationOptionValue& CBrush::getDecorationOption(const TDecorat
 	if (!decorationOptions.count(option)) {
 		return emptyValue;
 	}
-	return decorationOptions[option];	
+	return decorationOptions[option];
 }
 
 auto& CBrush::getDecoration(const TDecorationOptions &options) {
@@ -255,7 +296,7 @@ void CBrush::loadDecoration()
 void CBrush::generateDecoration()
 {
 	const fs::path filename = LibraryFileName(properties.decorationGenerator.source);
-	
+
 	if (LuaLoadFile(filename) == -1) {
 		ErrorPrint("%s's brush generator file '%s' not found\n",
 					name.c_str(),
@@ -273,8 +314,12 @@ tile_index CBrush::getCurrentTile() const
 	return 0;
 }
 
-// Bresenham algorithm 
-void CBrush::drawCircle(int16_t xCenter, int16_t yCenter, int16_t diameter, tile_index tile, std::vector<tile_index> &canvas)
+// Bresenham algorithm
+void CBrush::drawCircle(int16_t xCenter,
+						int16_t yCenter,
+						int16_t diameter,
+						tile_index tile,
+						std::vector<tile_index> &canvas)
 {
 	// Because of the symmetry with respect to the cursor position, the diameter must be odd
 	if (canvas.size() < diameter * diameter || diameter % 2 == 0) {
@@ -290,7 +335,7 @@ void CBrush::drawCircle(int16_t xCenter, int16_t yCenter, int16_t diameter, tile
 	int x = diameter / 2;
 	int y = 0;
 	int delta = 1 - x;
- 
+
 	while (x >= y)
 	{
 		drawHLine(xCenter - x, xCenter + x, yCenter + y);

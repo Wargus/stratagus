@@ -128,7 +128,7 @@ void CTileIconsSet::recalcDisplayed()
 };
 
 void CTileIconsSet::setDisplayedNum(const uint16_t number)
-{ 
+{
 	displayedNum = number;
 	updateSliderCtrl();
 	recalcDisplayed();
@@ -164,7 +164,7 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 {
 	auto editTile = [this, &pos](const TilePos &tileOffset,
 								 tile_index tileIdx,
-								 bool fixNeighbors, 
+								 bool fixNeighbors,
 								 bool decorative) -> void {
 		const TilePos tilePos(pos + tileOffset);
 		if (tilePos.x < 0
@@ -187,7 +187,7 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 			if (fixNeighbors) {
 				ChangeSurrounding(tilePos, tilePos);
 			}
-		}	
+		}
 	};
 
 	const auto &brush = brushes.getCurrentBrush();
@@ -381,7 +381,7 @@ void CEditor::TileFill(const Vec2i &pos, int tile, int size)
 
 	// change surroundings unless the fill covers the entire map
 	bool changeSurroundings = (ipos.x > 0 || ipos.y > 0 || Map.Info.MapWidth - 1 > apos.x
-	                           || Map.Info.MapHeight - 1 > apos.y);
+							   || Map.Info.MapHeight - 1 > apos.y);
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {

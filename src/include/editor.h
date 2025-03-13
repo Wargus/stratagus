@@ -71,7 +71,7 @@ public:
 	~CTileIconsSet() = default;
 
 	void enable(bool value = true)
-	{ 
+	{
 		enabled = value;
 		if (!enabled) {
 			resetSelected();
@@ -118,7 +118,7 @@ private:
 	bool enabled = true;
 	int selected = -1; /// Selected tile icon
 	int iconUnderCursor = -1;
-	
+
 	gcn::Slider* sliderCtrl = nullptr;
 	uint16_t shiftToFirstDisplayed = 0;	/// Shift to the first icon displayed
 	uint16_t displayedNum = 0;	/// The number of icons that can be displayed in the area
@@ -133,9 +133,9 @@ public:
 	~CEditor() {}
 
 	void Init();
-	
-	void applyCurentBrush(const Vec2i &pos); 
-	
+
+	void applyCurentBrush(const Vec2i &pos);
+
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false);
 

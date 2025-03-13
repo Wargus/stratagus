@@ -10,7 +10,7 @@
 //
 /**@name editor_brush.h - Assistant for brushes in the editor. */
 //
-//      (c) Copyright 2023-2024 by Alyokhin
+//      (c) Copyright 2023-2025 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public:
 	using TDecorationOptionName = std::string;
 	using TDecorationOptionValue = std::string;
 	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue>;
-	
+
 	struct Properties { // with default settings
 		EBrushTypes type = EBrushTypes::SingleTile;
 		EBrushShapes shape = EBrushShapes::Rectangular;
@@ -92,49 +92,16 @@ public:
 	};
 
 public:
-	explicit CBrush(std::string name, CBrush::Properties properties)
-		: name(std::move(name)), properties(std::move(properties))
-	{
-		rndEnabled = this->properties.randomizeAllowed;
-		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
+	explicit CBrush(std::string name, CBrush::Properties properties);
 
-		// init generator's options
-		if (!this->properties.decorationGenerator.options.empty()) {
-			for (auto &[option, values] : this->properties.decorationGenerator.options) {
-				if (values.empty()) {
-					continue;
-				}
-				decorationOptions[option] = values[0];
-			}
-		} else {
-			setSize(this->properties.minSize.width, this->properties.minSize.height);
-		}
-	}
 	explicit CBrush(std::string name,
 					CBrush::Properties properties,
-					const std::vector<tile_index> &tilesSrc)
-					: name(std::move(name)), properties(std::move(properties))
-	{
-		rndEnabled = this->properties.randomizeAllowed;
-		fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
+					const std::vector<tile_index> &tilesSrc);
 
-		// init generator's options
-		if (!this->properties.decorationGenerator.options.empty()) {
-			for (auto &[option, values] : this->properties.decorationGenerator.options) {
-				if (values.empty()) {
-					continue;
-				}
-				decorationOptions[option] = values[0];
-			}
-		} else {
-			setSize(this->properties.minSize.width, this->properties.minSize.height);
-			fillWith(tilesSrc);
-		}
-	}
 	~CBrush() = default;
 
 	void applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
-	
+
 	uint8_t getWidth() const { return width; }
 	uint8_t getHeight() const { return height; }
 
@@ -165,7 +132,8 @@ public:
 	uint8_t getWidth() { return width; }
 	uint8_t getHeight() { return height; }
 
-	Vec2i getResizeSteps() const { return { properties.resizeSteps.width, properties.resizeSteps.height}; }
+	Vec2i getResizeSteps() const { return { properties.resizeSteps.width,
+											properties.resizeSteps.height}; }
 	Vec2i getMaxSize() const { return { properties.maxSize.width, properties.maxSize.height}; }
 	Vec2i getMinSize() const { return { properties.minSize.width, properties.minSize.height}; }
 
@@ -180,19 +148,21 @@ public:
 	}
 	bool isRandomizationEnabled() const { return rndEnabled; }
 	void enableFixNeighbors(bool enable = true)
-	{ 
+	{
 		fixNeighborsEnabled = properties.fixNeighborsAllowed ? enable : false;
 	}
 	bool isFixNeighborsEnabled() const { return fixNeighborsEnabled; }
 	bool isTileIconsPaletteRequired() const { return properties.tileIconsPaletteRequired; };
 	bool isExtendedTilesetRequired() const { return properties.extendedTilesetRequired; }
 
-	const auto& getGeneratorOptions() const { return properties.decorationGenerator.options; }
+	const auto &getGeneratorOptions() const { return properties.decorationGenerator.options; }
 
-	void updateDecorationOption(const TDecorationOptionName &option, const TDecorationOptionValue &value);
+	void updateDecorationOption(const TDecorationOptionName &option, 
+								const TDecorationOptionValue &value);
 	const TDecorationOptionValue& getDecorationOption(const TDecorationOptionName &option);
 
-	void pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles);
+	void pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, 
+							 const std::vector<tile_index> &srcTiles);
 	void loadDecoration();
 
 	bool isDecorative() const { return decorative || getType() == EBrushTypes::Decoration; }
@@ -207,10 +177,10 @@ protected:
 	bool withinBounds(uint8_t col, uint8_t row) const { return col < width && row < height; }
 
 	void drawCircle(int16_t xCenter,
-	                int16_t yCenter,
-	                int16_t diameter,
-	                tile_index tile,
-	                std::vector<tile_index> &canvas);
+					int16_t yCenter,
+					int16_t diameter,
+					tile_index tile,
+					std::vector<tile_index> &canvas);
 
 	tile_index randomizeTile(tile_index tileIdx) const;
 	tile_index getCurrentTile() const;
@@ -218,7 +188,7 @@ protected:
 	/// Move to protected
 	auto& getDecoration(const TDecorationOptions &options);
 	void generateDecoration();
-	
+
 protected:
 	Properties properties;
 
@@ -236,7 +206,7 @@ protected:
 
 	/// for EBrushTypes::Decoration type
 	TDecorationOptions decorationOptions;
-	
+
 	struct SDecoration
 	{
 		uint8_t width = 0;
@@ -255,7 +225,7 @@ public:
 	}
 
 	CBrushesSet(std::string_view brushesSrc)
-	{ 
+	{
 		loadBrushes(brushesSrc);
 	}
 	~CBrushesSet() { brushes.clear(); }
@@ -265,7 +235,7 @@ public:
 	bool isLoaded() const { return !brushes.empty(); }
 
 	CBrush &getCurrentBrush() { return currentBrush; }
-	
+
 	bool setCurrentBrush(std::string_view name);
 	void addBrush(CBrush brush) { brushes.push_back(std::move(brush)); }
 

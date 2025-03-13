@@ -10,7 +10,7 @@
 //
 /**@name editor_brush.h - Assistant for brushes in the editor. */
 //
-//      (c) Copyright 2023-2024 by Alyokhin
+//      (c) Copyright 2023-2025 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -56,11 +56,11 @@ private:
 
 	std::list<gcn::Widget *> hiddenControls; 	// List of temporarily hidden controls that are
 												// _enabled_ for current brush. If we need to hide
-												// the entire BrushControlsUI we save all currently 
+												// the entire BrushControlsUI we save all currently
 												// enabled controls into this list and then hide them.
 												// We use this list to avoid unhiding the disabled
 												// ones later.
-	
+
 };
 
 class CBrushControlsUI
@@ -68,7 +68,7 @@ class CBrushControlsUI
 public:
 	explicit CBrushControlsUI(gcn::Container* parrent, const gcn::Rectangle &rectangle)
 	: parrent(parrent), UIRectangle(rectangle)
-	{ 
+	{
 		Init();
 	}
 	~CBrushControlsUI() = default;
@@ -126,8 +126,8 @@ private:
 	std::unique_ptr<LambdaActionListener> enableRndListener;
 	std::unique_ptr<gcn::CheckBox> decorative;
 	std::unique_ptr<LambdaActionListener> decorativeListener;
-	
-	/// Generator options controls
+
+	/// Decoration generator options controls
 	struct GeneratorOptionCtrl
 	{
 		std::unique_ptr<StringListModel> valuesList;

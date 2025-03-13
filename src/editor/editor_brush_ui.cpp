@@ -10,7 +10,7 @@
 //
 /**@name editor_brush.h - Assistant for brushes in the editor. */
 //
-//      (c) Copyright 2023-2024 by Alyokhin
+//      (c) Copyright 2023-2025 by Alyokhin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -109,12 +109,12 @@ void CBrushControlsUI::Init()
 	brushSelect->setBaseColor(baseColor);
 	brushSelect->setForegroundColor(foregroundColor);
 	brushSelect->setBackgroundColor(backgroundColor);
-	parrent->add(brushSelect.get());	
+	parrent->add(brushSelect.get());
 	brushSelect->setPosition(UIRectangle.x + 5, UIRectangle.y + 5);
 
 	controlSets[ECtrlSets::cSelectBrush].add(dynamic_cast<gcn::Widget *>(brushSelect.get()));
 
-	brushesDropdownListener = 
+	brushesDropdownListener =
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
 		const int selected = brushSelect->getSelected();
 		if (Editor.brushes.setCurrentBrush(brushesList->getElementAt(selected))) {
@@ -231,9 +231,9 @@ void CBrushControlsUI::Init()
 				 			controlSets[ECtrlSets::cSingleTile].bottomRight().y + verticalGap);
 	controlSets[ECtrlSets::cSingleTile].add(dynamic_cast<gcn::Widget*>(enableRnd.get()));
 
-	enableRndListener = 
+	enableRndListener =
 	std::make_unique<LambdaActionListener>([this](const std::string&) {
-		
+
 		auto &brush = Editor.brushes.getCurrentBrush();
 		brush.enableRandomization(enableRnd->isSelected());
 		Editor.tileIcons.rebuild(brush.isFixNeighborsEnabled() == false,
@@ -279,16 +279,16 @@ void CBrushControlsUI::updateSingleTileCtrls()
 	if (brush.getType() == CBrush::EBrushTypes::SingleTile) {
 		manualEditMode->setVisible(brush.isNeighborsFixAllowed());
 		manualEditMode->setSelected(!brush.isFixNeighborsEnabled());
-	
+
 		enableRnd->setVisible(brush.isRandomizeAllowed() && manualEditMode->isSelected());
 		enableRnd->setSelected(brush.isRandomizationEnabled());
-	
+
 		decorative->setVisible(!brush.isFixNeighborsEnabled());
 		decorative->setSelected(brush.isDecorative());
 
 		Editor.tileIcons.enable();
 		Editor.tileIcons.rebuild(brush.isFixNeighborsEnabled() == false,
-		                         brush.isRandomizationEnabled());
+								 brush.isRandomizationEnabled());
 	} else {
 		controlSets[ECtrlSets::cSingleTile].hide();
 	}
@@ -325,7 +325,7 @@ void CBrushControlsUI::updateSizeCtrls()
 																   : "HeightOnly";
 		allowResize[selected]->setSelected(true);
 	}
-	
+
 	sizeSlider->setVisible(true);
 
 	if (allowed == ResizeAllowed::cBoth || allowed == ResizeAllowed::cWidthOnly) {
@@ -380,13 +380,13 @@ void CBrushControlsUI::updateGeneratorOptionsCtrls()
 
 			parrent->add(dropDown.get());
 			const int y = controlSets.count(ECtrlSets::cGenerator)
-			                ? controlSets[ECtrlSets::cGenerator].bottomRight().y
-			                : controlSets[ECtrlSets::cSelectBrush].bottomRight().y + verticalGap;
+							? controlSets[ECtrlSets::cGenerator].bottomRight().y
+							: controlSets[ECtrlSets::cSelectBrush].bottomRight().y + verticalGap;
 			dropDown->setPosition(UIRectangle.x + 5, y + verticalGap / 2);
 
 			controlSets[ECtrlSets::cGenerator].add(dynamic_cast<gcn::Widget *>(dropDown.get()));
-		
-			ctrls.actionListener = 
+
+			ctrls.actionListener =
 			std::make_unique<LambdaActionListener>([this, option](const std::string&) {
 				auto &brush = Editor.brushes.getCurrentBrush();
 				const auto &optionCtrl = generatorOptionsCtrls[option];
