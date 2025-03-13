@@ -146,7 +146,7 @@ static std::unique_ptr<CBrushControlsUI> brushesCtrlUI;
 --  Functions
 ----------------------------------------------------------------------------*/
 /**
-**  Release the memory allocated to the editor's controls
+**  Release the memory allocated for the editor's controls
 **  in the correct order
 */
 static void EditorClearControls()
@@ -748,8 +748,8 @@ static void DrawCursorBorder(TilePos tilePos, PixelPos screenPos)
 	const auto &brush = Editor.brushes.getCurrentBrush();
 
 	if (Editor.State == EditorStateType::EditTile) {
-		const PixelPos offset = {tileSize.x * brush.getAllignOffset().x,
-								 tileSize.y * brush.getAllignOffset().y};
+		const PixelPos offset = {tileSize.x * brush.getAlignOffset().x,
+								 tileSize.y * brush.getAlignOffset().y};
 
 		if (brush.isRound() && brush.getWidth() > 1) {
 			Video.DrawCircleClip(ColorWhite,

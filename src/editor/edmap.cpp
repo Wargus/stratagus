@@ -93,8 +93,8 @@ void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly 
 		icons = firstOfKindOnly ? Map.Tileset.getFirstOfItsKindTiles()
 								: Map.Tileset.getAllTiles();
 	} else {
-		/// FIXME: The extended tailset can be edited only in manual mode _yet_,
-		/// so only the icons of the basic tailset should be left in the icon palette.
+		/// FIXME: The extended tileset can be edited only in manual mode _yet_,
+		/// so only the icons of the basic tileset should be left in the icon palette.
 		icons.clear();
 		for (auto icon : Map.Tileset.getSolidTiles()) {
 			if (icon < ExtendedTilesetBeginIdx) {
@@ -199,7 +199,7 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 
 	TilePos maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
 
-	if (brush.getAllign() == CBrush::EBrushAllign::UpperLeft) {
+	if (brush.getAlign() == CBrush::EBrushAlign::UpperLeft) {
 		maxPos.x -= brush.getWidth() - 1;
 		maxPos.y -= brush.getHeight() - 1;
 	}

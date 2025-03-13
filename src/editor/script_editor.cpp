@@ -97,7 +97,7 @@ static int CclEditorResizeMap(lua_State *l)
   Type = "SingleTile", -- or Decoration
   Shape = "Rectangular", -- or Round
   Symmetric = false,
-  Allign = "UpperLeft",  -- or Center
+  Align = "UpperLeft",  -- or Center
   Resizable = true,
   ResizeSteps = {1, 1},
   MinSize = {1, 1},
@@ -108,7 +108,7 @@ static int CclEditorResizeMap(lua_State *l)
   ExtendedTilesetRequired = true,
   Generator = { -- decoration generator options
     ["source"] = "scripts/editor/brushes/_generator_.lua", -- path to generator file
-    ["option"] = {"value1", "value2" ...} -- option : {possible values} pairs, tvalues type is string
+    ["option"] = {"value1", "value2" ...} -- option : {possible values} pairs, values type is string
   }
 */
 
@@ -151,14 +151,14 @@ static int CclEditorAddBrush(lua_State *l)
 		} else if (key == "Symmetric") {
 					properties.symmetric = LuaToBoolean(l, -1);
 
-		} else if (key == "Allign") {
-			const std::string_view allign = LuaToString(l, -1);
-			if (allign == "UpperLeft") {
-				properties.allign = CBrush::EBrushAllign::UpperLeft;
-			} else if (allign == "Center") {
-				properties.allign = CBrush::EBrushAllign::Center;
+		} else if (key == "Align") {
+			const std::string_view align = LuaToString(l, -1);
+			if (align == "UpperLeft") {
+				properties.align = CBrush::EBrushAlign::UpperLeft;
+			} else if (align == "Center") {
+				properties.align = CBrush::EBrushAlign::Center;
 			} else {
-				ErrorPrint("Incorrect brush allign '%s'\n", LuaToString(l, -1).data());
+				ErrorPrint("Incorrect brush align '%s'\n", LuaToString(l, -1).data());
 				return 0;
 			}
 		} else if (key == "Resizable") {

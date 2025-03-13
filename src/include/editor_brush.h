@@ -53,7 +53,7 @@ public:
 		Rectangular
 	};
 
-	enum class EBrushAllign
+	enum class EBrushAlign
 	{
 		UpperLeft,
 		Center
@@ -67,7 +67,7 @@ public:
 	struct Properties { // with default settings
 		EBrushTypes type = EBrushTypes::SingleTile;
 		EBrushShapes shape = EBrushShapes::Rectangular;
-		EBrushAllign allign = EBrushAllign::Center;
+		EBrushAlign align = EBrushAlign::Center;
 		bool symmetric = false;
 		bool resizable = true;
 		struct
@@ -119,11 +119,11 @@ public:
 	void fillWith(const std::vector<tile_index> &tilesSrc);
 	void randomize();
 
-	void setAllign(EBrushAllign allignTo) { properties.allign = allignTo; }
-	TilePos getAllignOffset() const;
-	EBrushAllign getAllign() const { return properties.allign; }
+	void setAlign(EBrushAlign alignTo) { properties.align = alignTo; }
+	TilePos getAlignOffset() const;
+	EBrushAlign getAlign() const { return properties.align; }
 
-	bool isCentered() const { return properties.allign == EBrushAllign::Center; }
+	bool isCentered() const { return properties.align == EBrushAlign::Center; }
 
 	void resizeW(uint8_t newWidth);
 	void resizeH(uint8_t newHeight);

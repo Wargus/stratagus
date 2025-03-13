@@ -188,14 +188,14 @@ void CBrush::randomize()
 	}
 }
 
-TilePos CBrush::getAllignOffset() const
+TilePos CBrush::getAlignOffset() const
 {
-	TilePos allignOffset{};
+	TilePos alignOffset{};
 	if (isCentered()) {
-		allignOffset.x = -getWidth() / 2;
-		allignOffset.y = -getHeight() / 2;
+		alignOffset.x = -getWidth() / 2;
+		alignOffset.y = -getHeight() / 2;
 	}
-	return allignOffset;
+	return alignOffset;
 }
 
 void CBrush::setSize(uint8_t newWidth, uint8_t newHeight)

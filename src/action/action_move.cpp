@@ -251,7 +251,7 @@ int DoActionMove(CUnit &unit)
 		d = unit.pathFinderData->output.Length;
 	}
 
-	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
+	unit.pathFinderData->output.Cycles++;// reset have to be manually controlled by caller.
 	int move = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, Map.Field(unit.Offset)->getMoveCost());
 
 	bool reached_next_tile = false;
