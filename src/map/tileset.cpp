@@ -725,7 +725,7 @@ std::vector<tile_index> CTileset::queryAllTiles() const
 	tile_index tileIdx = 0;
 	for (auto &tile : tiles) {
 		if (tileIdx >= 0x10) { /// First 16 tiles for fog of war.
-			if (tile.tile != 0) { /// Ccheck for separator between tiles
+			if (tile.tile != 0) { /// Check for separator between tiles
 				result.push_back(static_cast<tile_index>(tileIdx));
 			}
 		}
@@ -762,7 +762,7 @@ std::vector<tile_index> CTileset::queryFirstOfItsKindTiles() const
 	bool foundFirstOfAKind = false;
 	tile_index tileIdx = 0;
 	for (auto &tile : tiles) {
-		if (tileIdx > 0xF) { // First 16 tiles for fog of war
+		if (tileIdx >= 0x10) { // First 16 tiles for fog of war
 			if (tile.tile == 0 
 				|| tileIdx % 0x10 == 0) { // the begining of a new subslot
 
