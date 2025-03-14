@@ -77,7 +77,7 @@ public:
 			resetSelected();
 		}
 	}
-	bool isEnabled() { return enabled; }
+	bool isEnabled() const { return enabled; }
 
 	bool isSelected() const { return selected != -1; }
 
