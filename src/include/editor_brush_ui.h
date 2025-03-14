@@ -66,14 +66,14 @@ private:
 class CBrushControlsUI
 {
 public:
-	explicit CBrushControlsUI(gcn::Container* parrent, const gcn::Rectangle &rectangle)
-	: parrent(parrent), UIRectangle(rectangle)
+	explicit CBrushControlsUI(gcn::Container* parent, const gcn::Rectangle &rectangle)
+	: parent(parent), UIRectangle(rectangle)
 	{
 		Init();
 	}
 	~CBrushControlsUI() = default;
 
-	enum class ECtrlSets {cSelectBrush, cSize, cSingleTile, cGenerator};
+	enum class ECtrlSets {SelectBrush, Size, SingleTile, Generator};
 
 	void show();
 	void hide();
@@ -102,7 +102,7 @@ private:
 private:
 	using CtrlName = std::string;
 
-	gcn::Container *parrent = nullptr;
+	gcn::Container *parent = nullptr;
 	gcn::Rectangle UIRectangle;
 
 	std::map<ECtrlSets, CSetOfCtrls> controlSets;
