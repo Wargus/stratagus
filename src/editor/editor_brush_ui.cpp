@@ -91,7 +91,7 @@ void CBrushControlsUI::reloadBrushes()
 	brushSelect->setListModel(brushesList.get());
 
 	const std::string currentBrush = Editor.brushes.getCurrentBrush().getName();
-	if (const auto idx = brushesList->getIdxOfElement(currentBrush) != -1) {
+	if (const auto idx = brushesList->getIdxOfElement(currentBrush); idx != -1) {
 		brushSelect->setSelected(idx);
 	} else {
 		brushSelect->setSelected(0);
