@@ -164,54 +164,26 @@ static int CclEditorAddBrush(lua_State *l)
 		} else if (key == "Resizable") {
 			properties.resizable = LuaToBoolean(l, -1);
 
-		} else if (key == "ResizeSteps") {
+		} else if (key == "ResizeSteps" || key == "MinSize" || key == "MaxSize") {
 			if (!lua_istable(l, -1)) {
 				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
 							LuaToString(l, -1).data());
 				return 0;
 			}
-			const int args = lua_rawlen(l, -1);
-			if (args != 2) {
+			if (const int args = lua_rawlen(l, -1); args != 2) {
 				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
 							LuaToString(l, -1).data());
 				return 0;
 			}
-			properties.resizeSteps.width = LuaToUnsignedNumber(l, -1, 1);
-			properties.resizeSteps.height = LuaToUnsignedNumber(l, -1, 2);
+			auto &property = key == "ResizeSteps" ? properties.resizeSteps
+						   : key == "MinSize"	  ? properties.minSize
+												  : properties.maxSize;
 
-		} else if (key == "MinSize") {
-			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
-							LuaToString(l, -1).data());
-				return 0;
-			}
-			const int args = lua_rawlen(l, -1);
-			if (args != 2) {
-				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
-							LuaToString(l, -1).data());
-				return 0;
-			}
-			properties.minSize.width = LuaToUnsignedNumber(l, -1, 1);
-			properties.minSize.height = LuaToUnsignedNumber(l, -1, 2);
-
-		} else if (key == "MaxSize") {
-			if (!lua_istable(l, -1)) {
-				ErrorPrint("Incorrect argument type: table expected. ['%s']\n",
-							LuaToString(l, -1).data());
-				return 0;
-			}
-			const int args = lua_rawlen(l, -1);
-			if (args != 2) {
-				ErrorPrint("Incorrect table size: {width, height} expected. ['%s']\n",
-							LuaToString(l, -1).data());
-				return 0;
-			}
-			properties.maxSize.width = LuaToUnsignedNumber(l, -1, 1);
-			properties.maxSize.height = LuaToUnsignedNumber(l, -1, 2);
+			property = {uint8_t(LuaToUnsignedNumber(l, -1, 1)),
+						uint8_t(LuaToUnsignedNumber(l, -1, 2))};
 
 		} else if (key == "RandomizeAllowed") {
 			properties.randomizeAllowed = LuaToBoolean(l, -1);
-
 		} else if (key == "FixNeighborsAllowed") {
 			properties.fixNeighborsAllowed = LuaToBoolean(l, -1);
 		} else if (key == "TileIconsPaletteRequired") {
