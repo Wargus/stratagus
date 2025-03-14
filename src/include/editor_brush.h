@@ -58,8 +58,13 @@ public:
 		UpperLeft,
 		Center
 	};
+ 	
+	// type alias
+	using brushApplyFn = std::function<void(const TilePos&,
+											tile_index,
+											bool /*fixNeighbors*/,
+											bool /*isDecorative*/)>;
 
-	using brushApplyFn = std::function<void(const TilePos&, tile_index, bool, bool)>; // type alias
 	using TDecorationOptionName = std::string;
 	using TDecorationOptionValue = std::string;
 	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue>;
