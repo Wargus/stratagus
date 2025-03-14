@@ -73,21 +73,9 @@ CBrush::CBrush(std::string name, CBrush::Properties properties)
 CBrush::CBrush(std::string name,
 				CBrush::Properties properties,
 				const std::vector<tile_index> &tilesSrc)
-	: name(std::move(name)), properties(std::move(properties))
+	: CBrush(std::move(name), std::move(properties))
 {
-	rndEnabled = this->properties.randomizeAllowed;
-	fixNeighborsEnabled = this->properties.fixNeighborsAllowed;
-
-	// init generator's options
-	if (!this->properties.decorationGenerator.options.empty()) {
-		for (auto &[option, values] : this->properties.decorationGenerator.options) {
-			if (values.empty()) {
-				continue;
-			}
-			decorationOptions[option] = values[0];
-		}
-	} else {
-		setSize(this->properties.minSize.width, this->properties.minSize.height);
+	if (this->properties.decorationGenerator.options.empty()) {
 		fillWith(tilesSrc);
 	}
 }
