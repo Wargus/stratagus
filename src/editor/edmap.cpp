@@ -167,10 +167,7 @@ void CEditor::applyCurentBrush(const Vec2i &pos)
 								 bool fixNeighbors,
 								 bool decorative) -> void {
 		const TilePos tilePos(pos + tileOffset);
-		if (tilePos.x < 0
-			|| tilePos.x >= Map.Info.MapWidth
-			|| tilePos.y < 0
-			|| tilePos.y >= Map.Info.MapHeight) {
+		if (!Map.Info.IsPointOnMap(tilePos)) {
 			return;
 		}
 		SetTile(tilePos, tileIdx);
