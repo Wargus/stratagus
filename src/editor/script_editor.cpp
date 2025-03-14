@@ -129,22 +129,16 @@ static int CclEditorAddBrush(lua_State *l)
 			name = std::string(LuaToString(l, -1));
 
 		} else if (key == "Type") {
-			const std::string_view type = LuaToString(l, -1);
-			if (type == "SingleTile") {
-				properties.type = CBrush::EBrushTypes::SingleTile;
-			} else if (type == "Decoration") {
-				properties.type = CBrush::EBrushTypes::Decoration;
-			} else {
+			properties.type = CBrush::convertToEnumTypes(LuaToString(l, -1));
+
+			if (properties.type == CBrush::EBrushTypes::NotSet) {
 				ErrorPrint("Incorrect brush type '%s'\n", LuaToString(l, -1).data());
 				return 0;
 			}
 		} else if (key == "Shape") {
-			const std::string_view shape = LuaToString(l, -1);
-			if (shape == "Rectangular") {
-				properties.shape = CBrush::EBrushShapes::Rectangular;
-			} else if (shape == "Round") {
-				properties.shape = CBrush::EBrushShapes::Round;
-			} else {
+			properties.shape = CBrush::convertToEnumShapes(LuaToString(l, -1));
+
+			if (properties.shape == CBrush::EBrushShapes::NotSet) {
 				ErrorPrint("Incorrect brush shape '%s'\n", LuaToString(l, -1).data());
 				return 0;
 			}
@@ -152,12 +146,9 @@ static int CclEditorAddBrush(lua_State *l)
 					properties.symmetric = LuaToBoolean(l, -1);
 
 		} else if (key == "Align") {
-			const std::string_view align = LuaToString(l, -1);
-			if (align == "UpperLeft") {
-				properties.align = CBrush::EBrushAlign::UpperLeft;
-			} else if (align == "Center") {
-				properties.align = CBrush::EBrushAlign::Center;
-			} else {
+			properties.align = CBrush::convertToEnumAlign(LuaToString(l, -1));
+
+			if (properties.align == CBrush::EBrushAlign::NotSet) {
 				ErrorPrint("Incorrect brush align '%s'\n", LuaToString(l, -1).data());
 				return 0;
 			}

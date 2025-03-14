@@ -282,6 +282,37 @@ void CBrush::loadDecoration()
 	setTiles(srcWidth, srcHeight, srcTiles);
 }
 
+CBrush::EBrushTypes CBrush::convertToEnumTypes(std::string_view type)
+{
+	if (type == "SingleTile") {
+		return EBrushTypes::SingleTile;
+	} else if(type == "Decoration") {
+		return EBrushTypes::Decoration;
+	}
+	return EBrushTypes::NotSet;
+}
+
+CBrush::EBrushShapes CBrush::convertToEnumShapes(std::string_view shape)
+{
+	if (shape == "Round") {
+		return EBrushShapes::Round;
+	} else if(shape == "Rectangular") {
+		return EBrushShapes::Rectangular;
+	}
+	return EBrushShapes::NotSet;
+
+}
+
+CBrush::EBrushAlign CBrush::convertToEnumAlign(std::string_view align)
+{
+	if (align == "UpperLeft") {
+		return EBrushAlign::UpperLeft;
+	} else if(align == "Center") {
+		return EBrushAlign::Center;
+	}
+	return EBrushAlign::NotSet;
+}
+
 void CBrush::generateDecoration()
 {
 	const fs::path filename = LibraryFileName(properties.decorationGenerator.source);

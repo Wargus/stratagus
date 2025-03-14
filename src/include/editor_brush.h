@@ -43,18 +43,21 @@ class CBrush
 public:
 	enum class EBrushTypes
 	{
+		NotSet,
 		SingleTile,
 		Decoration
 	};
 
 	enum class EBrushShapes
 	{
+		NotSet,
 		Round,
 		Rectangular
 	};
 
 	enum class EBrushAlign
 	{
+		NotSet,
 		UpperLeft,
 		Center
 	};
@@ -67,7 +70,7 @@ public:
 
 	using TDecorationOptionName = std::string;
 	using TDecorationOptionValue = std::string;
-	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue>;
+	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue, std::less<>>;
 
 	struct Properties { // with default settings
 		EBrushTypes type = EBrushTypes::SingleTile;
@@ -173,6 +176,10 @@ public:
 	}
 	const std::string &getName() const { return name; }
 	void setName(const std::string &name) { this->name = name; }
+
+	static CBrush::EBrushTypes convertToEnumTypes(std::string_view type);
+	static CBrush::EBrushShapes convertToEnumShapes(std::string_view shape);
+	static CBrush::EBrushAlign convertToEnumAlign(std::string_view align);
 
 protected:
 	void setSize(uint8_t newWidth, uint8_t newHeight);
