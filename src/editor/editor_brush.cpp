@@ -260,10 +260,11 @@ void CBrush::updateDecorationOption(const TDecorationOptionName &option, const T
 const CBrush::TDecorationOptionValue& CBrush::getDecorationOption(const TDecorationOptionName &option)
 {
 	static const TDecorationOptionValue emptyValue{"no value"};
-	if (!decorationOptions.count(option)) {
-		return emptyValue;
+
+	if (auto it = decorationOptions.find(option); it != decorationOptions.end()) {
+		return it->second;
 	}
-	return decorationOptions[option];
+	return emptyValue;
 }
 
 auto& CBrush::getDecoration(const TDecorationOptions &options) {

@@ -665,12 +665,10 @@ tile_index CTileset::getRandomTileOfTheSameKindAs(tile_index tileIndex) const
 
 int32_t CTileset::findTileIndexByTile(graphic_index tile) const
 {
-	tile_index index = 0;
-	for (const auto &checkTile : tiles) {
-		if (tile == checkTile.tile) {
-			return index;
-		}
-		index++;
+	if (auto it = ranges::find_if(tiles,
+								 [&](const auto &checkTile) { return tile == checkTile.tile; });
+		it != tiles.end()) {
+		return std::distance(tiles.begin(), it);
 	}
 	return -1;
 }
