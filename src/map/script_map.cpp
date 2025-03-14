@@ -940,6 +940,7 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 	return 0;
 }
 
+#ifdef DEBUG
 /**
 **  Save tileset graphics into png-file. Debug purposes only.
 **
@@ -951,6 +952,7 @@ static int CClSaveTilesetGraphics(lua_State *l)
 	IMG_SavePNG(Map.TileGraphic->getSurface(), filename.string().c_str());
 	return 0;
 }
+#endif
 
 /**
 ** Build tileset tables like humanWallTable or mixedLookupTable
@@ -1214,7 +1216,10 @@ void MapCclRegister()
 
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 	lua_register(Lua, "GenerateExtendedTileset", CclGenerateExtendedTileset);
+
+#ifdef DEBUG	
 	lua_register(Lua, "SaveTilesetGraphics", CClSaveTilesetGraphics);
+#endif
 
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
