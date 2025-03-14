@@ -136,7 +136,7 @@ void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 
 	switch (properties.type)
 	{
 		case EBrushTypes::SingleTile:
-			fillWith(tile, isInit ? false : true);
+			fillWith(tile, !isInit);
 			break;
 		default:
 			if (withinBounds(col, row)) {

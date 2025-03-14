@@ -1640,7 +1640,6 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	HandleCursorMove(&restrictPos.x, &restrictPos.y); // Reduce to screen
 	const PixelPos screenPos = pos;
 
-	// Clean status line
 	UI.StatusLine.Clear();
 
 	// Move map.
