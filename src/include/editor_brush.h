@@ -169,7 +169,7 @@ public:
 	void setDecorative(bool value) {
 		decorative = properties.fixNeighborsAllowed ? value : true;
 	}
-	std::string getName() const { return name; }
+	const std::string &getName() const { return name; }
 	void setName(const std::string &name) { this->name = name; }
 
 protected:
@@ -194,7 +194,7 @@ protected:
 
 	std::string name; /// brush name
 
-	bool rndEnabled = false; /// Edit mode: place an the selected tile or a random tile of the same type
+	bool rndEnabled = false; /// Edit mode: place the selected tile or a random tile of the same type
 	bool fixNeighborsEnabled = false; /// Edit mode: enabled fix up for neighbors with tile to be placed
 	bool decorative = false;
 

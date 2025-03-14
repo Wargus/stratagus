@@ -127,7 +127,7 @@ void CTileIconsSet::recalcDisplayed()
 	displayFrom(sliderCtrl->getValue());
 };
 
-void CTileIconsSet::setDisplayedNum(const uint16_t number)
+void CTileIconsSet::setDisplayedNum(uint16_t number)
 {
 	displayedNum = number;
 	updateSliderCtrl();

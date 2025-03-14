@@ -155,7 +155,7 @@ public:
 	void clear();
 
 	void setExtended(bool value) { extended = value; }
-	bool isExtended() { return extended; }
+	bool isExtended() const { return extended; }
 
 	const CTile &getTile(tile_index tileIndex) const;
 

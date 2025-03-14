@@ -89,7 +89,7 @@ public:
 
 	std::optional<tile_index> getSelectedTile() const;
 	int getSelectedIcon() const { return selected; }
-	void select(const uint16_t iconNo)
+	void select(uint16_t iconNo)
 	{
 		selected = iconNo < icons.size() ? iconNo : selected;
 	}
@@ -103,12 +103,12 @@ public:
 
 	void updateSliderCtrl();
 	void recalcDisplayed();
-	void displayFrom(const uint16_t shift)
+	void displayFrom(uint16_t shift)
 	{
 		shiftToFirstDisplayed = shift < icons.size() ? shift : shiftToFirstDisplayed;
 	}
-	int getDisplayedFirst() { return shiftToFirstDisplayed; }
-	void setDisplayedNum(const uint16_t number);
+	int getDisplayedFirst() const { return shiftToFirstDisplayed; }
+	void setDisplayedNum(uint16_t number);
 	uint16_t getDisplayedNum() const { return displayedNum; }
 
 	void attachSliderCtrl(gcn::Slider *slider) { sliderCtrl = slider; }
