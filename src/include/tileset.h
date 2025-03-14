@@ -210,9 +210,9 @@ public:
 
 	int32_t findTileIndexByTile(graphic_index tile) const;
 
-	std::vector<tile_index> getAllTiles() const;
-	std::vector<tile_index> getSolidTiles() const;
-	std::vector<tile_index> getFirstOfItsKindTiles() const;
+	std::vector<tile_index> queryAllTiles() const;
+	std::vector<tile_index> querySolidTiles() const;
+	std::vector<tile_index> queryFirstOfItsKindTiles() const;
 
 	uint32_t getQuadFromTile(tile_index tileIndex) const;
 	int getTileBySurrounding(tile_flags type,
@@ -220,7 +220,7 @@ public:
 							 int bottom, int left) const;
 	tile_index tileFromQuad(uint32_t fixed, uint32_t quad) const;
 	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
-	std::vector<tile_index> getAllTilesOfTheSameKindAs(tile_index tileIndex) const;
+	std::vector<tile_index> queryAllTilesOfTheSameKindAs(tile_index tileIndex) const;
 
 	bool isTileRandomizable(tile_index tileIndex) const;
 	tile_index getRandomTileOfTheSameKindAs(tile_index tileIndex) const;

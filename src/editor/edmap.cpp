@@ -90,13 +90,13 @@ void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly 
 {
 	resetSelected();
 	if (manualMode) {
-		icons = firstOfKindOnly ? Map.Tileset.getFirstOfItsKindTiles()
-								: Map.Tileset.getAllTiles();
+		icons = firstOfKindOnly ? Map.Tileset.queryFirstOfItsKindTiles()
+								: Map.Tileset.queryAllTiles();
 	} else {
 		/// FIXME: The extended tileset can be edited only in manual mode _yet_,
 		/// so only the icons of the basic tileset should be left in the icon palette.
 		icons.clear();
-		for (auto icon : Map.Tileset.getSolidTiles()) {
+		for (auto icon : Map.Tileset.querySolidTiles()) {
 			if (icon < ExtendedTilesetBeginIdx) {
 				icons.push_back(icon);
 			}

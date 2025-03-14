@@ -619,7 +619,7 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 **  @return				vector of tile indices of tiles in the same subslot
 **
 */
-std::vector<tile_index> CTileset::getAllTilesOfTheSameKindAs(tile_index tileIndex) const
+std::vector<tile_index> CTileset::queryAllTilesOfTheSameKindAs(tile_index tileIndex) const
 {
 	auto calcRangeBoundary = [tileIndex, this](int dir) -> tile_index 
 	{
@@ -656,7 +656,7 @@ tile_index CTileset::getRandomTileOfTheSameKindAs(tile_index tileIndex) const
 	if (!isTileRandomizable(tileIndex)) {
 		return tileIndex;
 	}
-	auto tiles = getAllTilesOfTheSameKindAs(tileIndex);
+	auto tiles = queryAllTilesOfTheSameKindAs(tileIndex);
 	if (tiles.empty()) {
 		return tileIndex;
 	}
@@ -720,7 +720,7 @@ uint32_t CTileset::getQuadFromTile(tile_index tileIndex) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-std::vector<tile_index> CTileset::getAllTiles() const
+std::vector<tile_index> CTileset::queryAllTiles() const
 {
 	std::vector<tile_index> result;
 
@@ -736,7 +736,7 @@ std::vector<tile_index> CTileset::getAllTiles() const
 	return result;
 }
 
-std::vector<tile_index> CTileset::getSolidTiles() const
+std::vector<tile_index> CTileset::querySolidTiles() const
 {
 	std::vector<tile_index> result;
 
@@ -757,7 +757,7 @@ std::vector<tile_index> CTileset::getSolidTiles() const
 	return result;
 }
 
-std::vector<tile_index> CTileset::getFirstOfItsKindTiles() const
+std::vector<tile_index> CTileset::queryFirstOfItsKindTiles() const
 {
 	std::vector<tile_index> result;
 
