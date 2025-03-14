@@ -129,9 +129,6 @@ public:
 	void resizeH(uint8_t newHeight);
 	void resize(uint8_t newWidth, uint8_t newHeight);
 
-	uint8_t getWidth() { return width; }
-	uint8_t getHeight() { return height; }
-
 	Vec2i getResizeSteps() const { return { properties.resizeSteps.width,
 											properties.resizeSteps.height}; }
 	Vec2i getMaxSize() const { return { properties.maxSize.width, properties.maxSize.height}; }
@@ -228,7 +225,7 @@ public:
 	{
 		loadBrushes(brushesSrc);
 	}
-	~CBrushesSet() { brushes.clear(); }
+	~CBrushesSet() = default;
 
 public:
 	void loadBrushes(std::string_view brushesSrc = {});
