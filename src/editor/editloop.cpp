@@ -797,11 +797,7 @@ static void DrawMapCursor(TilePos tilePos, PixelPos screenPos, const CBrush &bru
 		const PixelPos screenPosIt(screenPos.x + tileOffset.x * tileSize.x,
 								   screenPos.y + tileOffset.y * tileSize.y);
 
-		if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x
-			|| screenPosIt.y >= UI.MouseViewport->GetBottomRightPos().y
-			|| screenPosIt.x + tileSize.x <  UI.MouseViewport->GetTopLeftPos().x
-			|| screenPosIt.y + tileSize.y <  UI.MouseViewport->GetTopLeftPos().y) {
-
+		if (!UI.MouseViewport->IsAreaVisibleInViewport(screenPosIt, tileSize)) {
 			return;
 		}
 		Map.TileGraphic->DrawFrameClip(Map.Tileset.getGraphicTileFor(tileIdx),

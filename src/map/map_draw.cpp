@@ -101,6 +101,18 @@ bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &bo
 	return true;
 }
 
+bool CViewport::IsAreaVisibleInViewport(const PixelPos &areaScreenPos, 
+										const PixelSize &areaSize) const
+{
+	if (areaScreenPos.x >= this->GetBottomRightPos().x
+		|| areaScreenPos.y >= this->GetBottomRightPos().y
+		|| areaScreenPos.x + areaSize.x < this->GetTopLeftPos().x
+		|| areaScreenPos.y + areaSize.y < this->GetTopLeftPos().y) {
+		return false;
+	}
+	return true;
+}
+
 bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);

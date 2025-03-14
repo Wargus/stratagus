@@ -101,6 +101,7 @@ public:
 	void DrawBorder() const;
 	/// Check if any part of an area is visible in viewport
 	bool AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &boxmax) const;
+	bool IsAreaVisibleInViewport(const PixelPos &areaScreenPos, const PixelSize &areaSize) const;
 
 	bool Contains(const PixelPos &screenPos) const;
 
