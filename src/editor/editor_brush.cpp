@@ -379,19 +379,20 @@ bool CBrushesSet::setCurrentBrush(std::string_view name)
 	Assert(!brushes.empty());
 
 	const auto prev = currentBrush.getName();
-	for (auto &brush : brushes) {
-		if (brush.getName() == name) {
-			currentBrush = brush;
-			const auto selectedTile = Editor.tileIcons.getSelectedTile();
-			if (selectedTile && currentBrush.getType() == CBrush::EBrushTypes::SingleTile) {
-				currentBrush.setTile(*selectedTile);
-			} else if (currentBrush.getType() == CBrush::EBrushTypes::Decoration) {
-				currentBrush.loadDecoration();
-			}
-			break;
+
+	if (auto it =
+	        ranges::find_if(brushes, [&](const auto &brush) { return name == brush.getName(); });
+	    it != brushes.end()) {
+			
+		currentBrush = *it;
+		const auto selectedTile = Editor.tileIcons.getSelectedTile();
+
+		if (selectedTile && currentBrush.getType() == CBrush::EBrushTypes::SingleTile) {
+			currentBrush.setTile(*selectedTile);
+		} else if (currentBrush.getType() == CBrush::EBrushTypes::Decoration) {
+			currentBrush.loadDecoration();
 		}
 	}
-
 	if (prev == currentBrush.getName()) {
 		return false;
 	}
