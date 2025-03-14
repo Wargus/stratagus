@@ -165,7 +165,7 @@ void CBrushControlsUI::Init()
 	updateSizeCtrls();
 
 	allowResizeRadioListener = std::make_unique<LambdaActionListener>([this](const std::string &) {
-		const auto brush = Editor.brushes.getCurrentBrush();
+		const auto &brush = Editor.brushes.getCurrentBrush();
 
 		if (allowResize["Both"]->isSelected() || allowResize["WidthOnly"]->isSelected()) {
 			sizeSlider->setScale(brush.getMinSize().x, brush.getMaxSize().x);
@@ -264,7 +264,7 @@ void CBrushControlsUI::reloadCtrlSettings()
 	for (auto &[key, ctrl] : controlSets) {
 		ctrl.resetHidden();
 	}
-	const auto brush = Editor.brushes.getCurrentBrush();
+	const auto &brush = Editor.brushes.getCurrentBrush();
 	Editor.tileIcons.enable(brush.isTileIconsPaletteRequired());
 	updateSingleTileCtrls();
 	updateSizeCtrls();
@@ -273,8 +273,7 @@ void CBrushControlsUI::reloadCtrlSettings()
 
 void CBrushControlsUI::updateSingleTileCtrls()
 {
-	const auto brush = Editor.brushes.getCurrentBrush();
-	CBrush &_brush = Editor.brushes.getCurrentBrush();
+	const auto &brush = Editor.brushes.getCurrentBrush();
 
 	if (brush.getType() == CBrush::EBrushTypes::SingleTile) {
 		manualEditMode->setVisible(brush.isNeighborsFixAllowed());
