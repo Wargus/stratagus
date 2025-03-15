@@ -72,17 +72,18 @@ public:
 	using TDecorationOptionValue = std::string;
 	using TDecorationOptions = std::map<TDecorationOptionName, TDecorationOptionValue, std::less<>>;
 
+	using BrushSize = Vec2T<uint8_t>;
+
 	struct Properties { // with default settings
 		EBrushTypes type = EBrushTypes::SingleTile;
 		EBrushShapes shape = EBrushShapes::Rectangular;
 		EBrushAlign align = EBrushAlign::Center;
 		bool symmetric = false;
 		bool resizable = true;
-		struct
-		{
-			uint8_t width;
-			uint8_t height;
-		} resizeSteps{1, 1}, minSize{1, 1}, maxSize{20, 20};
+
+		BrushSize resizeSteps{1, 1};
+		BrushSize minSize{1, 1};
+		BrushSize maxSize{20, 20};
 
 		bool randomizeAllowed = true;
 		bool fixNeighborsAllowed = true;
@@ -110,8 +111,8 @@ public:
 
 	void applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization = false) const;
 
-	uint8_t getWidth() const { return width; }
-	uint8_t getHeight() const { return height; }
+	uint8_t getWidth() const { return size.x; }
+	uint8_t getHeight() const { return size.y; }
 
 	EBrushTypes getType() const { return properties.type; }
 	bool isRound() const { return properties.shape == EBrushShapes::Round; }
@@ -121,7 +122,7 @@ public:
 	tile_index getTile(uint8_t col, uint8_t row) const;
 
 	void setTile(tile_index tile, uint8_t col = 0, uint8_t row = 0);
-	void setTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles);
+	void setTiles(BrushSize srcSize, const std::vector<tile_index> &srcTiles);
 
 	void fillWith(tile_index tile, bool init = false);
 	void fillWith(const std::vector<tile_index> &tilesSrc);
@@ -137,10 +138,9 @@ public:
 	void resizeH(uint8_t newHeight);
 	void resize(uint8_t newWidth, uint8_t newHeight);
 
-	Vec2i getResizeSteps() const { return { properties.resizeSteps.width,
-											properties.resizeSteps.height}; }
-	Vec2i getMaxSize() const { return { properties.maxSize.width, properties.maxSize.height}; }
-	Vec2i getMinSize() const { return { properties.minSize.width, properties.minSize.height}; }
+	BrushSize getResizeSteps() const { return properties.resizeSteps; }
+	BrushSize getMaxSize() const { return properties.maxSize; }
+	BrushSize getMinSize() const { return properties.minSize; }
 
 	bool isSymmetric() const { return properties.symmetric; }
 	bool isResizable() const { return properties.resizable; }
@@ -182,8 +182,8 @@ public:
 	static CBrush::EBrushAlign convertToEnumAlign(std::string_view align);
 
 protected:
-	void setSize(uint8_t newWidth, uint8_t newHeight);
-	bool withinBounds(uint8_t col, uint8_t row) const { return col < width && row < height; }
+	void setSize(BrushSize newSize);
+	bool withinBounds(uint8_t col, uint8_t row) const { return col < size.x && row < size.y; }
 
 	void drawCircle(int16_t xCenter,
 					int16_t yCenter,
@@ -209,8 +209,7 @@ protected:
 
 	bool isInit = false;
 
-	uint8_t width = 1;
-	uint8_t height = 1;
+	BrushSize size = {1, 1};
 	std::vector<tile_index> tiles;
 
 	/// for EBrushTypes::Decoration type
@@ -218,8 +217,7 @@ protected:
 
 	struct SDecoration
 	{
-		uint8_t width = 0;
-		uint8_t height = 0;
+		BrushSize size = {0, 0};
 		std::vector<tile_index> tiles;
 	};
 	std::map<TDecorationOptions, SDecoration> decorationsPalette;

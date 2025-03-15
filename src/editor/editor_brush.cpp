@@ -66,7 +66,7 @@ CBrush::CBrush(std::string name, CBrush::Properties properties)
 			decorationOptions[option] = values[0];
 		}
 	} else {
-		setSize(this->properties.minSize.width, this->properties.minSize.height);
+		setSize(this->properties.minSize);
 	}
 }
 
@@ -82,13 +82,13 @@ CBrush::CBrush(std::string name,
 
 void CBrush::applyAt(const TilePos &pos, brushApplyFn applyFn, bool forbidRandomization /* = false*/) const
 {
-	TilePos brushOffset{};
+	TilePos brushOffset;
 	if (isCentered()) {
-		brushOffset.x = int16_t(width) / 2;
-		brushOffset.y = int16_t(height) / 2;
+		brushOffset.x = int16_t(size.x) / 2;
+		brushOffset.y = int16_t(size.y) / 2;
 	}
-	for (int16_t row = 0; row < height; ++row) {
-		for (int16_t col = 0; col < width; ++col) {
+	for (int16_t row = 0; row < size.y; ++row) {
+		for (int16_t col = 0; col < size.x; ++col) {
 			const tile_index tileIdx = getTile(col, row);
 			if (tileIdx) {
 				const TilePos tileOffset(col - brushOffset.x, row - brushOffset.y);
@@ -116,7 +116,7 @@ tile_index CBrush::getTile(uint8_t col, uint8_t row) const
 	if (tiles.size() == 0 || !withinBounds(col, row)) {
 		return 0;
 	}
-	return tiles[col + row * width];
+	return tiles[col + row * size.x];
 }
 
 void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 */)
@@ -128,13 +128,13 @@ void CBrush::setTile(tile_index tile, uint8_t col /* = 0 */, uint8_t row /* = 0 
 			break;
 		default:
 			if (withinBounds(col, row)) {
-				tiles[col + row * width] = tile;
+				tiles[col + row * size.x] = tile;
 			}
 	}
 }
-void  CBrush::setTiles(uint8_t srcWidth, uint8_t srcHeight, const std::vector<tile_index> &srcTiles)
+void  CBrush::setTiles(BrushSize srcSize, const std::vector<tile_index> &srcTiles)
 {
-	setSize(srcWidth, srcHeight);
+	setSize(srcSize);
 	fillWith(srcTiles);
 }
 
@@ -142,8 +142,8 @@ void CBrush::fillWith(tile_index tile, bool init /* = false */)
 {
 	if (init && properties.shape == EBrushShapes::Round) {
 		ranges::fill(tiles, 0);
-		if (width == height) {
-			drawCircle(width / 2, height / 2, width, tile, this->tiles);
+		if (size.x == size.y) {
+			drawCircle(size.x / 2, size.y / 2, size.x, tile, this->tiles);
 		}
 	} else {
 		for (auto &brushTile : tiles) {
@@ -186,21 +186,20 @@ TilePos CBrush::getAlignOffset() const
 	return alignOffset;
 }
 
-void CBrush::setSize(uint8_t newWidth, uint8_t newHeight)
+void CBrush::setSize(BrushSize newSize)
 {
-	width = newWidth;
-	height = newHeight;
-	tiles.resize(width * height, 0);
+	size = newSize;
+	tiles.resize(size.x * size.y, 0);
 }
 
 void CBrush::resizeW(uint8_t newWidth)
 {
-	resize(newWidth, this->height);
+	resize(newWidth, this->size.y);
 }
 
 void CBrush::resizeH(uint8_t newHeight)
 {
-	resize(this->width, newHeight);
+	resize(this->size.x, newHeight);
 }
 
 void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
@@ -208,26 +207,26 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 	if (!properties.resizable) {
 		return;
 	}
-	if (newWidth != this->width && properties.resizeSteps.width == 0) {
+	if (newWidth != this->size.x && properties.resizeSteps.x == 0) {
 		return;
 	}
-	if (newHeight != this->height && properties.resizeSteps.height == 0) {
+	if (newHeight != this->size.y && properties.resizeSteps.y == 0) {
 		return;
 	}
 
 	const auto currentTile = properties.type == EBrushTypes::SingleTile ? getCurrentTile() : 0;
 
 	tiles.clear();
-	width = newWidth;
-	height = newHeight;
+	size.x = newWidth;
+	size.y = newHeight;
 
 	if(properties.shape == EBrushShapes::Round) {
 		if (newWidth && newWidth % 2 == 0) {
-			width = newWidth - 1;
+			size.x = newWidth - 1;
 		}
-		height = width;
+		size.y = size.x;
 	}
-	tiles.resize(width * height, 0);
+	tiles.resize(size.x * size.y, 0);
 
 	if (properties.type == EBrushTypes::SingleTile && currentTile) {
 		fillWith(currentTile, true);
@@ -274,13 +273,13 @@ void CBrush::pushDecorationTiles(uint8_t srcWidth, uint8_t srcHeight, const std:
 	if (srcWidth * srcHeight != srcTiles.size()) {
 		return;
 	}
-	decorationsPalette[decorationOptions] = {srcWidth, srcHeight, srcTiles};
+	decorationsPalette[decorationOptions] = {{srcWidth, srcHeight}, srcTiles};
 }
 
 void CBrush::loadDecoration()
 {
-	const auto &[srcWidth, srcHeight, srcTiles] = getDecoration(decorationOptions);
-	setTiles(srcWidth, srcHeight, srcTiles);
+	const auto &[srcSize, srcTiles] = getDecoration(decorationOptions);
+	setTiles(srcSize, srcTiles);
 }
 
 CBrush::EBrushTypes CBrush::convertToEnumTypes(std::string_view type)
