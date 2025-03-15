@@ -344,9 +344,9 @@ terrain_typeIdx CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 
 const std::string &CTileset::getTerrainName(terrain_typeIdx solidTerrainIndex) const
 {
-	static const std::string emptyValue = "";
 	if (solidTerrainIndex >= solidTerrainTypes.size()) {
-		return emptyValue;
+		ErrorPrint("Requested terrain name for invalid terrain_typeIdx: %d\n", solidTerrainIndex);
+		Exit(1);
 	}
 	return solidTerrainTypes[solidTerrainIndex].TerrainName;
 }
