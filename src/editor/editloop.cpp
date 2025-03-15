@@ -109,7 +109,7 @@ enum EditorOverlays {
 	Opaque
 };
 
-enum Positions {
+enum CornerPosition {
 	cUpperLeftX = 0,
 	cUpperLeftY,
 	cBottomRightX,
