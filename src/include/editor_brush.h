@@ -89,7 +89,7 @@ public:
 		bool tileIconsPaletteRequired = true;
 		bool extendedTilesetRequired = false;
 
-		struct
+		struct Generator
 		{
 			std::string source;
 

@@ -198,18 +198,21 @@ static int CclEditorAddBrush(lua_State *l)
 				if (option == "source") {
 					properties.decorationGenerator.source = LuaToString(l, -1);
 				} else {
-					auto &values = properties.decorationGenerator.options[std::string(option)];
-
+					std::vector <CBrush::TDecorationOptionValue> values;
 					if (lua_istable(l, -1)) {
 						const int valuesCount = lua_rawlen(l, -1);
 						for (int i = 1; i <= valuesCount; i++) {
-							const std::string_view val = LuaToString(l, -1, i);
-							values.emplace_back(val);
+							values.emplace_back(LuaToString(l, -1, i));
 						}
 					} else {
-						const std::string_view val = LuaToString(l, -1);
-						values.emplace_back(val);
+						values.emplace_back(LuaToString(l, -1));
 					}
+					if (values.size() == 0) {
+						ErrorPrint("Unable to parse possible values for generator option \"%s\".\n",
+						           option);
+						return 0;
+					}
+					properties.decorationGenerator.options.emplace(option, values);
 				}
 			}
 		}
