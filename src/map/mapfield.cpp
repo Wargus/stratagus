@@ -71,26 +71,31 @@ bool CMapField::IsTerrainResourceOnMap() const
 	return false;
 }
 
-void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile /* = -1 */)
+void CMapField::setTileIndex(const CTileset &tileset, 
+							 tile_index tileIndex, 
+							 int value, 
+							 uint8_t elevation, 
+							 int subtile /* = -1 */)
 {
-	uint8_t compShift = 0; // [0..F] in case that current tileset slot length is shorter than map's original
-
-	if (tileIndex >= ExtendedTilesetBeginIdx) { // tile from extended tileset
-		while(tileset.tiles[tileIndex - compShift].tile == 0 && ((tileIndex & 0xF) - compShift) > 0) {
-			compShift++;
-		}
+	uint8_t compShift = 0; // [0..F] in case then current tileset slot length is shorter 
+						   // than map's original tileset. *To prevent display of black tiles.
+	while (tileset.tiles[tileIndex - compShift].tile == 0 && ((tileIndex & 0xF) - compShift) > 0) {
+		compShift++;
 	}
+
 	const CTile &tile = tileset.tiles[tileIndex - compShift];
 	this->tile = tile.tile;
 	this->Value = value;
 	this->ElevationLevel = elevation;
-#if 0
-	this->Flags = tile.flag;
-#else
-	this->Flags &= ~(MapFieldOpaque | MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
-					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-					 MapFieldWall | MapFieldRocks | MapFieldForest);
-	this->Flags |= tile.flag;
+
+	const tile_flags preserved = this->Flags & (MapFieldLandUnit
+												| MapFieldAirUnit
+												| MapFieldSeaUnit
+												| MapFieldBuilding
+												| MapFieldNonMixing);
+
+	this->Flags = tile.flag | preserved;
+
 	if (subtile >= 0) {
 		uint32_t subtileUnpassabilityFlags = tile.flag >> MapFieldSubtilesUnpassableShift;
 		bool subtileUnpassable = (subtileUnpassabilityFlags >> subtile) & 1;
@@ -109,16 +114,15 @@ void CMapField::setTileIndex(const CTileset &tileset, const tile_index tileIndex
 			this->Value = 100; // TODO: should be DefaultResourceAmounts[WoodCost] once all games are migrated
 		}
 	}
-#endif
-	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
-#ifdef DEBUG
+
+	this->moveCost = 1 << (tile.flag & MapFieldSpeedMask);
+	
 	this->tilesetTile = tileIndex - compShift;
-#endif
 }
 
 void CMapField::Save(CFile &file) const
 {
-	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
+	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, moveCost);
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
@@ -197,7 +201,7 @@ void CMapField::parse(lua_State *l)
 	this->tile = LuaToNumber(l, -1, 1);
 	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
 	this->Value = LuaToNumber(l, -1, 3);
-	this->cost = LuaToNumber(l, -1, 4);
+	this->moveCost = LuaToNumber(l, -1, 4);
 
 	for (int j = 4; j < len; ++j) {
 		const std::string_view value = LuaToString(l, -1, j + 1);
@@ -257,7 +261,7 @@ bool CMapField::isOpaque() const
 }
 
 /// Check if a field flags.
-bool CMapField::CheckMask(int mask) const
+bool CMapField::CheckMask(tile_flags mask) const
 {
 	return (this->Flags & mask) != 0;
 }

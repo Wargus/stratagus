@@ -252,7 +252,7 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manually controlled by caller.
-	int move = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+	int move = UnitShowAnimationScaled(unit, &unit.Type->Animations->Move, Map.Field(unit.Offset)->getMoveCost());
 
 	bool reached_next_tile = false;
 	if (posd.x) {

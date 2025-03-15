@@ -935,9 +935,24 @@ static int CclGenerateExtendedTileset(lua_State *luaStack)
 	}
 	/// Add new graphic
 	Map.TileGraphic->AppendFrames(parser.getGraphic());
+	Map.Tileset.setExtended(true);
 
 	return 0;
 }
+
+#ifdef DEBUG
+/**
+**  Save tileset graphics into png-file. Debug purposes only.
+**
+**  @param luaStack  Lua state.
+*/
+static int CClSaveTilesetGraphics(lua_State *l)
+{
+	const fs::path filename = Map.Tileset.Name + "TilesetGraphics.png";
+	IMG_SavePNG(Map.TileGraphic->getSurface(), filename.string().c_str());
+	return 0;
+}
+#endif
 
 /**
 ** Build tileset tables like humanWallTable or mixedLookupTable
@@ -993,8 +1008,8 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = Map.Tileset;
-	const int32_t index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	Assert(index != -1);
+	const tile_index index = mf.getTileIndex();
+	
 	const terrain_typeIdx baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
@@ -1043,7 +1058,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 
-	if (mf.getFlag() & flag) {
+	if (mf.isFlag(flag)) {
 		lua_pushboolean(l, 1);
 	} else {
 		lua_pushboolean(l, 0);
@@ -1201,6 +1216,11 @@ void MapCclRegister()
 
 	lua_register(Lua, "DefineTileset", CclDefineTileset);
 	lua_register(Lua, "GenerateExtendedTileset", CclGenerateExtendedTileset);
+
+#ifdef DEBUG	
+	lua_register(Lua, "SaveTilesetGraphics", CClSaveTilesetGraphics);
+#endif
+
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 

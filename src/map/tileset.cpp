@@ -225,6 +225,15 @@ void CTileset::clear()
 	ranges::fill(orcWallTable, 0);
 }
 
+const CTile& CTileset::getTile(tile_index tileIndex) const
+{
+	if (tileIndex >= getTileCount()) {
+		ErrorPrint("Invalid tile index %d\n", tileIndex);
+		Exit(1);
+	}
+	return tiles[tileIndex];
+}
+
 bool CTileset::setTileCount(const size_t newCount)
 {
 	if (newCount < tiles.size() || newCount >= (1 << (sizeof(tile_index) * 8))) {
@@ -335,6 +344,10 @@ terrain_typeIdx CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 
 const std::string &CTileset::getTerrainName(terrain_typeIdx solidTerrainIndex) const
 {
+	if (solidTerrainIndex >= solidTerrainTypes.size()) {
+		ErrorPrint("Requested terrain name for invalid terrain_typeIdx: %d\n", solidTerrainIndex);
+		Exit(1);
+	}
 	return solidTerrainTypes[solidTerrainIndex].TerrainName;
 }
 
@@ -361,6 +374,11 @@ int32_t CTileset::findTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mix
 		}
 	}
 	return -1;
+}
+
+bool CTileset::CheckForUnseparatedSlot(const CTile &tile) const 
+{ 
+	return tile.flag & MapFieldFromUnseparatedSlot;
 }
 
 int32_t CTileset::getTileIndex(terrain_typeIdx baseTerrain, terrain_typeIdx mixTerrain, uint32_t quad) const
@@ -592,64 +610,67 @@ bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
 	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
 }
 
-int32_t CTileset::findTileIndexByTile(graphic_index tile) const
+/**
+**  Get the indices of all tiles that belong to the same subslot as the tile with the given index.
+**  Each subslot contains tiles with identical type.
+**
+**  @param tileIndex	tile to find subslot neighbors for
+**
+**  @return				vector of tile indices of tiles in the same subslot
+**
+*/
+std::vector<tile_index> CTileset::queryAllTilesOfTheSameKindAs(tile_index tileIndex) const
 {
-	tile_index index = 0;
-	for (const auto &checkTile : tiles) {
-		if (tile == checkTile.tile) {
-			return index;
+	auto calcRangeBoundary = [tileIndex, this](int dir) -> tile_index 
+	{
+		dir = dir < 0 ? -1 : 1;  // if dir < 0 then left boundary, right otherwise 
+		tile_index result = tileIndex;
+		if (getGraphicTileFor(tileIndex)) {
+			const int scopeWidth = dir < 0 ? tileIndex & 0xF
+										   : 0xF - (tileIndex & 0xF);
+			tile_index scope = 1;
+			while(scope <= scopeWidth) {
+				if (getGraphicTileFor(tileIndex + scope * dir)) result += dir;
+				else break;
+				scope++;
+			}
 		}
-		index++;
-	}
-	return -1;
+		return result;
+	};
+	const tile_index rangeFrom = calcRangeBoundary(-1);
+	const tile_index rangeTo = calcRangeBoundary(1);
+
+	std::vector<tile_index> result(rangeTo - rangeFrom + 1);
+	ranges::iota(result, rangeFrom);
+
+	return result;
 }
 
-/**
-**  Get tile number.
-**
-**  @param basic   Basic tile number
-**  @param random  Return random tile
-**  @param filler  Get a decorated tile.
-**
-**  @return        Tile index number.
-**
-**  @todo  FIXME: Solid tiles are here still hardcoded.
-*/
-tile_index CTileset::getTileNumber(tile_index basic, bool random, bool filler) const
+bool CTileset::isTileRandomizable(tile_index tileIndex) const
 {
-	tile_index tile = basic;
-	if (random) {
-		int n = 0;
-		for (int i = 0; i < 16; ++i) {
-			if (!tiles[tile + i].tile) {
-				if (!filler) {
-					break;
-				}
-			} else {
-				++n;
-			}
-		}
-		n = MyRand() % n;
-		int i = -1;
-		do {
-			while (++i < 16 && !tiles[tile + i].tile) {
-			}
-		} while (i < 16 && n--);
-		if (i != 16) {
-			return tile + i;
-		}
+	return CheckForUnseparatedSlot(getTile(tileIndex)) == false;
+}
+
+tile_index CTileset::getRandomTileOfTheSameKindAs(tile_index tileIndex) const
+{
+	if (!isTileRandomizable(tileIndex)) {
+		return tileIndex;
 	}
-	if (filler) {
-		int i = 0;
-		for (; i < 16 && tiles[tile + i].tile; ++i) {
-		}
-		for (; i < 16 && !tiles[tile + i].tile; ++i) {
-		}
-		if (i != 16) {
-			return tile + i;
-		}
+	auto tiles = queryAllTilesOfTheSameKindAs(tileIndex);
+	if (tiles.empty()) {
+		return tileIndex;
 	}
-	return tile;
+	return tiles[MyRand() % tiles.size()];	
+}
+
+int32_t CTileset::findTileIndexByTile(graphic_index tile) const
+{
+	if (auto it = ranges::find_if(tiles,
+								 [&](const auto &checkTile) { return tile == checkTile.tile; });
+		it != tiles.end()) {
+		return std::distance(tiles.begin(), it);
+	}
+	return -1;
 }
 
 /**
@@ -667,10 +688,8 @@ tile_index CTileset::getTileNumber(tile_index basic, bool random, bool filler) c
 **  If the tile is 3/4 light grass and dark grass(0x06) in upper left corner
 **    the value is 0x06050505.
 */
-uint32_t CTileset::getQuadFromTile(graphic_index tile) const
+uint32_t CTileset::getQuadFromTile(tile_index tileIndex) const
 {
-	const int32_t tileIndex = findTileIndexByTile(tile);
-	Assert(tileIndex != -1);
 
 	const uint32_t base = tiles[tileIndex].tileinfo.BaseTerrain;
 	const uint32_t mix = tiles[tileIndex].tileinfo.MixTerrain;
@@ -699,20 +718,66 @@ uint32_t CTileset::getQuadFromTile(graphic_index tile) const
 	return base | (base << 8) | (base << 16) | (base << 24);
 }
 
-void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
+std::vector<tile_index> CTileset::queryAllTiles() const
 {
-	std::vector<int> seen_types;
-	seen_types.resize(solidTerrainTypes.size(), 0);
-	const size_t tilesCount = getTileCount();
-	for (size_t i = 16; i < tilesCount; i++) {
-		const CTileInfo &info = tiles[i].tileinfo;
-		if (info.BaseTerrain && info.MixTerrain == 0) {
-			if (seen_types[info.BaseTerrain] == 0) {
-				seen_types[info.BaseTerrain] = 1;
-				solidTiles->push_back(tiles[i].tile);
+	std::vector<tile_index> result;
+
+	tile_index tileIdx = 0;
+	for (auto &tile : tiles) {
+		if (tileIdx >= 0x10) { /// First 16 tiles for fog of war.
+			if (tile.tile != 0) { /// Check for separator between tiles
+				result.push_back(tileIdx);
 			}
 		}
+		tileIdx++;
 	}
+	return result;
+}
+
+std::vector<tile_index> CTileset::querySolidTiles() const
+{
+	std::vector<tile_index> result;
+
+	std::set<terrain_typeIdx> addedTerrains;
+	tile_index tileIdx = 0;
+	for (const auto &tile : tiles) {
+		if (tileIdx >= 0x10) { // First 16 tiles for fog of war
+			const CTileInfo &info = tile.tileinfo;
+			if (info.BaseTerrain && info.MixTerrain == 0
+				&& addedTerrains.count(info.BaseTerrain) == 0) {
+
+				addedTerrains.insert(info.BaseTerrain);
+				result.push_back(tileIdx);
+			}
+		}
+		tileIdx++;
+	}
+	return result;
+}
+
+std::vector<tile_index> CTileset::queryFirstOfItsKindTiles() const
+{
+	std::vector<tile_index> result;
+
+	bool foundFirstOfAKind = false;
+	tile_index tileIdx = 0;
+	for (auto &tile : tiles) {
+		if (tileIdx >= 0x10) { // First 16 tiles for fog of war
+			if (tile.tile == 0 
+				|| tileIdx % 0x10 == 0) { // the begining of a new subslot
+
+				foundFirstOfAKind = false;
+			}
+			if (!foundFirstOfAKind && tile.tile != 0) {
+				if (CheckForUnseparatedSlot(tile) == false) {
+					foundFirstOfAKind = true;
+				}
+				result.push_back(tileIdx);
+			}
+		}
+		tileIdx++;
+	}
+	return result;
 }
 
 unsigned CTileset::getWallDirection(tile_index tileIndex, bool human) const

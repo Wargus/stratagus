@@ -185,7 +185,13 @@ public:
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
-	void setTileIndex(const CTileset &tileset, const tile_index tileIndex, const int value, const uint8_t elevation, const int subtile = -1);
+	void setTileIndex(const CTileset &tileset,
+					  tile_index tileIndex,
+					  int value,
+					  uint8_t elevation,
+					  int subtile = -1);
+
+	tile_index getTileIndex() const { return tilesetTile; }
 
 	graphic_index getGraphicTile() const { return tile; }
 
@@ -193,7 +199,7 @@ public:
 	bool isOpaque() const;
 
 	/// Check if a field flags.
-	bool CheckMask(int mask) const;
+	bool CheckMask(tile_flags mask) const;
 
 	/// Returns true, if water on the map tile field
 	bool WaterOnMap() const;
@@ -227,9 +233,13 @@ public:
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
 
-	unsigned char getCost() const { return cost; }
-	unsigned int getFlag() const { return Flags; }
-	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+	unsigned char getMoveCost() const { return moveCost; }
+	tile_flags getFlags() const { return Flags; }
+	bool isFlag(tile_flags checkFlags) const { return CheckMask(checkFlags); }
+	void setFlag(tile_flags flag) { Flags |= flag; }
+	void resetFlag(tile_flags flag) { Flags &= ~flag; }
+
+	void setGraphicTile(graphic_index tile) { this->tile = tile; }
 #ifdef DEBUG
 	int64_t lastAStarCost = 0;    /// debugging pathfinder
 #endif
@@ -237,15 +247,9 @@ public:
 	uint8_t getElevation() const { return this->ElevationLevel; }
 	void setElevation(const uint8_t newLevel) { this->ElevationLevel = newLevel; }
 
-private:
-#ifdef DEBUG
-	tile_index tilesetTile = 0;  /// tileset tile number
-#endif
-	graphic_index tile = 0;      /// graphic tile number
 public:
 	tile_flags Flags = 0;        /// field flags
-private:
-	unsigned char cost = 0;      /// unit cost to move in this tile
+
 public:
 	unsigned int Value = 0;         /// HP for walls/Wood Regeneration, value of stored resource for forest or harvestable terrain
 	std::vector<CUnit *> UnitCache; /// A unit on the map field.
@@ -253,7 +257,11 @@ public:
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player
 
 private:
-	uint8_t ElevationLevel {0}; /// highground elevation level
+	tile_index tilesetTile = 0;	/// tileset tile number
+	graphic_index tile = 0;		/// graphic tile number
+	uint8_t ElevationLevel = 0;	/// highground elevation level
+	unsigned char moveCost = 0;	/// unit cost to move in this tile
+
 };
 
 extern PixelSize PixelTileSize; /// Size of a tile in pixels

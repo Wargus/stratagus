@@ -596,7 +596,7 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				cost += AStarUnknownTerrainCost;
 			}
 			// Add tile movement cost
-			cost += mf->getCost();
+			cost += mf->getMoveCost();
 #ifdef DEBUG
 			const_cast<CMapField *>(mf)->lastAStarCost = cost;
 #endif

@@ -30,6 +30,7 @@
 #ifndef VEC2I_H
 #define VEC2I_H
 
+#include <cstdint>
 #include <tuple>
 
 //@{
@@ -168,6 +169,7 @@ using PixelPos = Vec2T<int>;
 using PixelDiff = Vec2T<int>;
 using PixelSize = Vec2T<int>;
 using PixelPrecise = Vec2T<double>;
+using TilePos = Vec2T<int16_t>;
 
 //@}
 

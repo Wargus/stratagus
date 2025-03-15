@@ -62,12 +62,18 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 	if (ranges::contains(mf.UnitCache, &exceptionUnit)) {
 		return true;
 	}
-	const unsigned int blockedFlag = (MapFieldUnpassable | MapFieldWall | MapFieldRocks | MapFieldForest | MapFieldBuilding);
-	if (mf.Flags & blockedFlag) {
+	const tile_flags blockedFlag = (MapFieldUnpassable
+									| MapFieldWall
+									| MapFieldRocks
+									| MapFieldForest
+									| MapFieldBuilding);
+	if (mf.isFlag(blockedFlag)) {
 		return false;
 	}
-	const unsigned int passableFlag = (MapFieldWaterAllowed | MapFieldCoastAllowed | MapFieldLandAllowed);
-	return ((mf.Flags & passableFlag) != 0);
+	const tile_flags passableFlag = (MapFieldWaterAllowed
+									 | MapFieldCoastAllowed
+									 | MapFieldLandAllowed);
+	return (mf.isFlag(passableFlag) != 0);
 }
 
 /**
