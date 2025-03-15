@@ -726,7 +726,7 @@ std::vector<tile_index> CTileset::queryAllTiles() const
 	for (auto &tile : tiles) {
 		if (tileIdx >= 0x10) { /// First 16 tiles for fog of war.
 			if (tile.tile != 0) { /// Check for separator between tiles
-				result.push_back(static_cast<tile_index>(tileIdx));
+				result.push_back(tileIdx);
 			}
 		}
 		tileIdx++;
@@ -747,7 +747,7 @@ std::vector<tile_index> CTileset::querySolidTiles() const
 				&& addedTerrains.count(info.BaseTerrain) == 0) {
 
 				addedTerrains.insert(info.BaseTerrain);
-				result.push_back(static_cast<tile_index>(tileIdx));
+				result.push_back(tileIdx);
 			}
 		}
 		tileIdx++;
@@ -772,7 +772,7 @@ std::vector<tile_index> CTileset::queryFirstOfItsKindTiles() const
 				if (CheckForUnseparatedSlot(tile) == false) {
 					foundFirstOfAKind = true;
 				}
-				result.push_back(static_cast<tile_index>(tileIdx));
+				result.push_back(tileIdx);
 			}
 		}
 		tileIdx++;

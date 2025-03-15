@@ -143,7 +143,7 @@ static int CclEditorAddBrush(lua_State *l)
 				return 0;
 			}
 		} else if (key == "Symmetric") {
-					properties.symmetric = LuaToBoolean(l, -1);
+			properties.symmetric = LuaToBoolean(l, -1);
 
 		} else if (key == "Align") {
 			properties.align = CBrush::convertToEnumAlign(LuaToString(l, -1));
