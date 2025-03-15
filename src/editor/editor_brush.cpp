@@ -229,7 +229,7 @@ void CBrush::resize(uint8_t newWidth, uint8_t newHeight)
 	}
 	tiles.resize(width * height, 0);
 
-	if (properties.type == EBrushTypes::SingleTile) {
+	if (properties.type == EBrushTypes::SingleTile && currentTile) {
 		fillWith(currentTile, true);
 	}
 	/// FIXME: Init|fill
