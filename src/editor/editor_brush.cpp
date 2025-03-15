@@ -250,7 +250,8 @@ const CBrush::TDecorationOptionValue& CBrush::getDecorationOption(const TDecorat
 	static const TDecorationOptionValue emptyValue{"no value"};
 
 	if (auto it = decorationOptions.find(option); it != decorationOptions.end()) {
-		return it->second;
+		const auto &[option, value] = *it;
+		return value;
 	}
 	return emptyValue;
 }
@@ -326,12 +327,8 @@ void CBrush::generateDecoration()
 
 tile_index CBrush::getCurrentTile() const
 {
-	for (const auto &tile : tiles) {
-		if (tile) {
-			return tile;
-		}
-	}
-	return 0;
+	auto it = ranges::find_if(tiles, [](const auto &index) { return index != 0; });
+	return it != tiles.end() ? *it : 0;
 }
 
 // Bresenham algorithm
