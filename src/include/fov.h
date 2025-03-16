@@ -117,7 +117,7 @@ private:
 	uint8_t		currOctant		{0};	/// Current octant
 	Vec2i		Origin			{0, 0};	/// Position of the spectator in the global (Map) coordinate system
 	uint8_t		Elevation		{0};	/// highground elevation level of origin
-	uint16_t	OpaqueFields	{0};	/// Flags for opaque MapTiles for current calculation
+	tile_flags	OpaqueFields	{0};	/// Flags for opaque MapTiles for current calculation
 
 	const CPlayer   *Player 	  {nullptr}; /// Pointer to player to set FoV for
 	const CUnit     *Unit 		  {nullptr}; /// Pointer to unit to calculate FoV for
@@ -156,7 +156,7 @@ inline bool CFieldOfView::IsTileOpaque() const
 		return false;
 	} else if (this->Elevation < mf.getElevation()) {
 		return true;
-	} else return (mf.Flags & OpaqueFields);
+	} else return (mf.getFlags() & OpaqueFields);
 }
 
 inline void CFieldOfView::MarkTile()

@@ -101,6 +101,18 @@ bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &bo
 	return true;
 }
 
+bool CViewport::IsAreaVisibleInViewport(const PixelPos &areaScreenPos, 
+										const PixelSize &areaSize) const
+{
+	if (areaScreenPos.x >= this->GetBottomRightPos().x
+		|| areaScreenPos.y >= this->GetBottomRightPos().y
+		|| areaScreenPos.x + areaSize.x < this->GetTopLeftPos().x
+		|| areaScreenPos.y + areaSize.y < this->GetTopLeftPos().y) {
+		return false;
+	}
+	return true;
+}
+
 bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
@@ -325,13 +337,13 @@ void CViewport::DrawMapBackgroundInViewport(const fieldHighlightChecker highligh
 			if (CViewport::isPassabilityHighlighted() && Editor.Running == EditorNotRunning) {
 				for (int i = 0; i < graphicTileOffset; i++) {
 					for (int j = 0; j < graphicTileOffset; j++) {
-						if (Map.Fields[sx + j + (mapW * i)].getFlag() & MapFieldUnpassable) {
+						if (Map.Fields[sx + j + (mapW * i)].isFlag(MapFieldUnpassable)) {
 							Video.FillTransRectangleClip(ColorRed, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						} else {
 							Video.FillTransRectangleClip(ColorGreen, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						}
 
-						if (Map.Fields[sx + j + (mapW * i)].getFlag() & (MapFieldLandUnit | MapFieldBuilding | MapFieldSeaUnit)) {
+						if (Map.Fields[sx + j + (mapW * i)].isFlag(MapFieldLandUnit | MapFieldBuilding | MapFieldSeaUnit)) {
 							Video.FillTransRectangleClip(ColorOrange, dx + j * PixelTileSize.x, dy + i * PixelTileSize.y, PixelTileSize.x, PixelTileSize.y, 32);
 						}
 					}

@@ -112,6 +112,7 @@
 #include "vec2i.h"
 
 #include <SDL.h>
+#include <string>
 #include <vector>
 
 /*----------------------------------------------------------------------------

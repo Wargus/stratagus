@@ -430,13 +430,13 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 			return;
 		}
 	}
-	if (!seen && !(mf.getFlag() & type)) {
+	if (!seen && !(mf.isFlag(type))) {
 		return;
 	}
 
 	// Select Table to lookup
-	int removedtile;
-	int flags;
+	graphic_index removedtile;
+	tile_flags flags;
 	if (type == MapFieldForest) {
 		removedtile = this->Tileset.getRemovedTreeTile();
 		flags = (MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
@@ -483,7 +483,7 @@ void CMap::FixTile(tile_flags type, int seen, const Vec2i &pos)
 			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf.setGraphicTile(removedtile);
-			mf.Flags &= ~flags;
+			mf.resetFlag(flags);
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
@@ -545,7 +545,7 @@ void CMap::ClearTile(const Vec2i &tilePos)
 	const bool isOpaque = Map.Field(tilePos)->isOpaque();
 	if (isOpaque) {
 		MapRefreshUnitsSight(tilePos, true);
-		mapField.Flags &= ~MapFieldOpaque;
+		mapField.resetFlag(MapFieldOpaque);
 	}
 	if (mapField.ForestOnMap()) {
 		ClearWoodTile(tilePos);
@@ -564,7 +564,11 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	CMapField &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset.getRemovedTreeTile());
-	mf.Flags &= ~(MapFieldCost4 | MapFieldCost5 | MapFieldCost6 | MapFieldForest | MapFieldUnpassable);
+	mf.resetFlag(MapFieldCost4
+				 | MapFieldCost5
+				 | MapFieldCost6
+				 | MapFieldForest
+				 | MapFieldUnpassable);
 	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
@@ -583,7 +587,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	CMapField &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset.getRemovedRockTile());
-	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+	mf.resetFlag(MapFieldRocks | MapFieldUnpassable);
 	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
@@ -615,26 +619,29 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
 
-	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
+	const tile_flags occupedFlag = (MapFieldWall
+									| MapFieldUnpassable
+									| MapFieldLandUnit
+									| MapFieldBuilding);
 	++mf.Value;
 	if (mf.Value < ForestRegeneration) {
 		return;
 	}
 	mf.Value = ForestRegeneration;
-	if ((mf.Flags & occupedFlag) || pos.y == 0) {
+	if (mf.isFlag(occupedFlag) || pos.y == 0) {
 		return;
 	}
 	const Vec2i offset(0, -1);
 	CMapField &topMf = *(&mf - this->Info.MapWidth);
 	if (topMf.getGraphicTile() == this->Tileset.getRemovedTreeTile()
 		&& topMf.Value >= ForestRegeneration
-		&& !(topMf.Flags & occupedFlag)) {
+		&& !topMf.isFlag(occupedFlag)) {
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(Map.Tileset, Map.Tileset.getDefaultWoodTileIndex(), 0, mf.getElevation());
 		topMf.setGraphicTile(Map.Tileset.getTopOneTreeTile());
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
-		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
+		topMf.setFlag(MapFieldForest | MapFieldUnpassable);
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 
@@ -643,7 +650,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.setGraphicTile(Map.Tileset.getBottomOneTreeTile());
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 100; // TODO: Should be DefaultResourceAmounts[WoodCost] once all games are migrated
-		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		mf.setFlag(MapFieldForest | MapFieldUnpassable);
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
