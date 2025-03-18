@@ -386,13 +386,13 @@ void CBrushControlsUI::updateGeneratorOptionsCtrls()
 			controlSets[ECtrlSets::Generator].add(dynamic_cast<gcn::Widget *>(dropDown.get()));
 
 			ctrls.actionListener =
-			std::make_unique<LambdaActionListener>([this, option](const std::string&) {
-				auto &brush = Editor.brushes.getCurrentBrush();
-				const auto &optionCtrl = generatorOptionsCtrls[option];
-				const int selectedIdx = optionCtrl.dropDown->getSelected();
-				brush.updateDecorationOption(option,
-										 optionCtrl.valuesList->getElementAt(selectedIdx));
-			});
+				std::make_unique<LambdaActionListener>([this, thisOption = option](const std::string &) {
+					auto &brush = Editor.brushes.getCurrentBrush();
+					const auto &optionCtrl = generatorOptionsCtrls[thisOption];
+					const int selectedIdx = optionCtrl.dropDown->getSelected();
+					brush.updateDecorationOption(thisOption,
+				                                 optionCtrl.valuesList->getElementAt(selectedIdx));
+				});
 			dropDown->addActionListener(generatorOptionsCtrls[option].actionListener.get());
 			dropDown->setSelected(0);
 		}
