@@ -822,18 +822,18 @@ static void UpdateMapCursor()
 	//  (Menu reset CursorBuilding)
 	if (!CursorBuilding) {
 		switch (Editor.State) {
-			case EditorStateType::Selecting:
-			case EditorStateType::EditTile:
-				break;
 			case EditorStateType::EditUnit:
 				if (Editor.SelectedUnitIndex != -1) {
-					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
+					CursorBuilding =
+						const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.SelectedUnitIndex]);
 				}
 				break;
 			case EditorStateType::SetStartLocation:
 				if (Editor.StartUnit) {
 					CursorBuilding = const_cast<CUnitType *>(Editor.StartUnit);
 				}
+				break;
+			default:
 				break;
 		}
 	}
