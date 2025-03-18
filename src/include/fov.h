@@ -121,7 +121,7 @@ private:
 
 	const CPlayer   *Player 	  {nullptr}; /// Pointer to player to set FoV for
 	const CUnit     *Unit 		  {nullptr}; /// Pointer to unit to calculate FoV for
-	MapMarkerFunc	*map_setFoV   {nullptr}; /// Pointer to external function for setting tiles visibilty
+	MapMarkerFunc	*map_setFoV   {nullptr}; /// Pointer to external function for setting tiles visibility
 
 	std::vector<uint8_t> MarkedTilesCache;	/// To prevent multiple calls of map_setFoV for single tile
 											/// (for tiles on the vertical, horizontal and diagonal lines it calls twice)

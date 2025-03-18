@@ -146,7 +146,7 @@ Vec2i CViewport::ScreenToTilePos(const PixelPos &screenPixelPos) const
 	return tilePos;
 }
 
-/// convert tilepos coordonates into screen (take the top left of the tile)
+/// convert tilepos coordinates into screen (take the top left of the tile)
 PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 {
 	const PixelPos mapPos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
@@ -154,7 +154,7 @@ PixelPos CViewport::TilePosToScreen_TopLeft(const Vec2i &tilePos) const
 	return MapToScreenPixelPos(mapPos);
 }
 
-/// convert tilepos coordonates into screen (take the center of the tile)
+/// convert tilepos coordinates into screen (take the center of the tile)
 PixelPos CViewport::TilePosToScreen_Center(const Vec2i &tilePos) const
 {
 	const PixelPos topLeft = TilePosToScreen_TopLeft(tilePos);
@@ -248,7 +248,7 @@ void CViewport::Center(const PixelPos &mapPixelPos)
 ** (in pixels)
 ** </PRE>
 */
-/// Draw the map grid for dubug purposes
+/// Draw the map grid for debug purposes
 void CViewport::DrawMapGridInViewport() const
 {
 	int x0 = this->TopLeftPos.x - this->Offset.x;
@@ -552,12 +552,12 @@ void CViewport::Draw(const fieldHighlightChecker highlightChecker /* = nullptr *
 	//
 	if (CursorOn == ECursorOn::Map && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
-		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
+		const bool isMapFieldVisible = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
-			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
+			&& ((isMapFieldVisible && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-		} else if (!isMapFieldVisile) {
+		} else if (!isMapFieldVisible) {
 			ShowUnitName(*this, CursorScreenPos, nullptr, true);
 		}
 	}

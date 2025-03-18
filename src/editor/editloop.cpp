@@ -1468,7 +1468,7 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.SelectedElevationLevel++;
 			}
 			break;
-		case '-': /// Decreace brush's elevation level
+		case '-': /// Decrease brush's elevation level
 			if (Editor.SelectedElevationLevel > 0
 				&& (Editor.State == EditorStateType::ElevationLevel
 					|| (Map.Info.IsHighgroundsEnabled()
@@ -1477,24 +1477,24 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 				Editor.SelectedElevationLevel--;
 			}
 			break;
-		case ']': /// Increace brush size
+		case ']': /// Increase brush size
 			if (Editor.State == EditorStateType::EditTile) {
 				brushesCtrlUI->resizeByStepUp();
 			}
 			break;
-		case '[': /// Decreace brush size
+		case '[': /// Decrease brush size
 			if (Editor.State == EditorStateType::EditTile) {
 				brushesCtrlUI->resizeByStepDown();
 			}
 			break;
-		case '.': /// Increace highlighted elevation level
+		case '.': /// Increase highlighted elevation level
 		case '>':
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 				&& Editor.HighlightElevationLevel < 255) {
 				Editor.HighlightElevationLevel++;
 			}
 			break;
-		case ',':	/// Decreace highlighted elevation level
+		case ',':	/// Decrease highlighted elevation level
 		case '<':
 			if (overlaysDropdown->getSelected() == EditorOverlays::Elevation
 				&& Editor.HighlightElevationLevel > 0) {

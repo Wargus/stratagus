@@ -513,7 +513,7 @@ void CEditor::RandomizeTransition(int x, int y)
 /**
 **  Create a random map
 */
-void CEditor::CreateRandomMap(bool shuffleTranslitions)
+void CEditor::CreateRandomMap(bool shuffleTransitions)
 {
 	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
 
@@ -533,7 +533,7 @@ void CEditor::CreateRandomMap(bool shuffleTranslitions)
 		EditorUpdateDisplay();
 	}
 
-	if (shuffleTranslitions) {
+	if (shuffleTransitions) {
 		// shuffle transitions in all directions
 		// from top left to bottom right
 		for (int x = 0; x < Map.Info.MapWidth; x++) {

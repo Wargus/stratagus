@@ -153,7 +153,7 @@ void CFieldOfView::Refresh(const CPlayer &player, const CUnit &unit, const Vec2i
 }
 
 /**
-**  Refresh the whole sight of unit by SimleRadial algorithm. (Explore and make visible.)
+**  Refresh the whole sight of unit by SimpleRadial algorithm. (Explore and make visible.)
 **
 **  @param player  player to mark the sight for (not unit owner)
 **  @param pos     location to mark
@@ -166,7 +166,7 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos,
 									   const int16_t w, const int16_t h, const int16_t range,
 									   MapMarkerFunc *marker) const
 {
-	// Up hemi-cyle
+	// Up hemi-cycle
 	const int16_t miny = std::max(-range, 0 - pos.y);
 	for (int16_t offsety = miny; offsety != 0; offsety++) {
 		const int16_t offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
@@ -207,10 +207,10 @@ void CFieldOfView::ProceedSimpleRadial(const CPlayer &player, const Vec2i &pos,
 /**
 ** Mark the sight of unit by ShadowCaster algorithm. (Explore and make visible.)
 **
-**  @param spectratorPos	Tile position of the spectrator unit - upper left corner for unit larger than 1x1
-**  @param width			Spectrator's width in tiles
-**  @param height			Spectrator's height in tiles
-**  @param range			Spectrator's sight range in tiles
+**  @param spectatorPos		Tile position of the spectator unit - upper left corner for unit larger than 1x1
+**  @param width			Spectator's width in tiles
+**  @param height			Spectator's height in tiles
+**  @param range			Spectator's sight range in tiles
 */
 inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const uint16_t width, const uint16_t height, const uint16_t range)
 {
@@ -283,7 +283,7 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 		/// Second half-quadrant
 		RefreshOctant(octant + 1, origin, sightRange);
 
-		/// calv FoV for asymmetric spectrator
+		/// call FoV for asymmetric spectator
 		if (rayWidth) {
 			ProceedRaysCast(octant, origin, rayWidth, sightRange);
 		}
@@ -292,13 +292,13 @@ inline void CFieldOfView::ProceedShadowCasting(const Vec2i &spectatorPos, const 
 
 /**
 **  Calc field of view for set of lines along x or y.
-**	Used for calc part of FoV for assymetric (width != height) spectators.
+**	Used for calc part of FoV for asymmetric (width != height) spectators.
 **
 **  @param octant	Current work octant
-**	@param origin	Tile position of the spectrator
-**  @param width	Spectrator's width in tiles
-**  @param height	Spectrator's height in tiles
-**  @param range	Spectrator's sight range in tiles
+**	@param origin	Tile position of the spectator
+**  @param width	Spectator's width in tiles
+**  @param height	Spectator's height in tiles
+**  @param range	Spectator's sight range in tiles
 */
 void CFieldOfView::ProceedRaysCast(const uint8_t octant, const Vec2i &origin, const uint16_t width, const uint16_t range)
 {
@@ -319,8 +319,8 @@ void CFieldOfView::ProceedRaysCast(const uint8_t octant, const Vec2i &origin, co
 **  Calc shadow casting field of view for single octant
 **
 **  @param octant	Octant to calc for
-**	@param origin	Tile position of the spectrator
-**  @param range	Spectrator's sight range in tiles
+**	@param origin	Tile position of the spectator
+**  @param range	Spectator's sight range in tiles
 */
 void CFieldOfView::RefreshOctant(const uint8_t octant, const Vec2i &origin, const uint16_t range)
 {
@@ -344,7 +344,7 @@ void CFieldOfView::RefreshOctant(const uint8_t octant, const Vec2i &origin, cons
 **  @param col  		Column in current octant
 **	@param topVector  	Top direction vector
 **	@param bottomVector Top direction vector
-**  @param range		Spectrator's sight range in tiles
+**  @param range		Spectator's sight range in tiles
 **	@param wrkQueue		Queue with all column pieces
 */
 void  CFieldOfView::CalcFoVForColumnPiece(const int16_t col, Vec2i &topVector, Vec2i &bottomVector,
@@ -461,7 +461,7 @@ void CFieldOfView::PrepareCache(const Vec2i pos, const uint16_t width, const uin
 **  Update values of Octant and Origin for current working set
 **
 **  @param octant	Octant to calc for
-**	@param origin	Tile position of the spectrator
+**	@param origin	Tile position of the spectator
 */
 void CFieldOfView::SetEnvironment(const uint8_t octant, const Vec2i &origin)
 {

@@ -339,7 +339,7 @@ static int CclSetHighlightPassability(lua_State *l)
 }
 
 /**
-**  Check if tiles passability higlighted
+**  Check if tiles passability highlighted
 */
 static int CclGetIsPassabilityHighlighted(lua_State *l)
 {
@@ -584,7 +584,7 @@ static int CclSetFogOfWarOpacityLevels(lua_State *l)
 }
 
 /**
-**  Set parameters for FOW blurer (radiuses and number of iterations)
+**  Set parameters for FOW blurrer (radiuses and number of iterations)
 **
 **  @param l  Lua state.
 **
@@ -608,7 +608,7 @@ static int CclSetFogOfWarBlur(lua_State *l)
 	if (iterations <= 0 ) {
 		LuaError(l, "Number of box blur iterations should be greater than 0. Blur is disabled.\n");
 	}
-	FogOfWar->InitBlurer(radiusSimple, radiusBilinear, iterations);
+	FogOfWar->InitBlurrer(radiusSimple, radiusBilinear, iterations);
 	return 0;
 }
 
@@ -705,7 +705,7 @@ static int CclSetFogOfWarColor(lua_State *l)
 }
 
 /**
-**  Set nember of steps for Fog textures easing
+**  Set number of steps for Fog textures easing
 **
 **  @param l  Lua state.
 */
@@ -1104,7 +1104,7 @@ static int CclGetIsGameHoster(lua_State *l)
 /**
 ** <b>Description</b>
 **
-** Set basic map caracteristics.
+** Set basic map characteristics.
 **
 **  @param l  Lua state.
 **

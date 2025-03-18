@@ -143,7 +143,7 @@ public:
 		} else {
 			/*
 			 * HACK: UGLY !!!
-			 * There is bug in Seen code conneded with
+			 * There is bug in Seen code connected with
 			 * UnitAction::Die and Cloaked units.
 			 */
 			if (!unit->VisCount[p] && unit->CurrentAction() == UnitAction::Die) {
@@ -256,7 +256,7 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
 **  Unmark a tile's sight. (Explore and make visible.)
 **
 **  @param player  Player to mark sight.
-**  @param indexx  tile to mark.
+**  @param index   tile to mark.
 */
 void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 {
