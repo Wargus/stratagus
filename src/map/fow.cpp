@@ -170,7 +170,7 @@ void CFogOfWar::InitEnhanced()
     RenderedFog.resize(Map.Info.MapWidth * Map.Info.MapHeight * 16);
     ranges::fill(RenderedFog, 0xFF);
 
-    Blurer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
+    Blurrer.Init(fogTextureWidth, fogTextureHeight, Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
 
     SetFogColor(Settings.FogColor);
 }
@@ -215,7 +215,7 @@ void CFogOfWar::Clean(const bool isHardClean /*= false*/)
             }
             FogTexture.Clean();
             RenderedFog.clear();
-            Blurer.Clean();
+            Blurrer.Clean();
             break;
 
         default:
@@ -274,21 +274,21 @@ void CFogOfWar::EnableBilinearUpscale(const bool enable)
     const uint8_t prev = Settings.UpscaleType;
     Settings.UpscaleType = enable ? UpscaleTypes::cBilinear : UpscaleTypes::cSimple;
     if (prev != Settings.UpscaleType) {
-        Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
+        Blurrer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], Settings.BlurIterations);
     }
 }
 
-void CFogOfWar::InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations)
+void CFogOfWar::InitBlurrer(const float radius1, const float radius2, const uint16_t numOfIterations)
 {
     Settings.BlurRadius[cSimple]   = radius1;
     Settings.BlurRadius[cBilinear] = radius2;
     Settings.BlurIterations        = numOfIterations;
-    Blurer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
+    Blurrer.PrecalcParameters(Settings.BlurRadius[Settings.UpscaleType], numOfIterations);
 }
 
 /**
 ** Generate fog of war:
-** fill map-sized table with values of visiblty for current player/players
+** fill map-sized table with values of visibility for current player/players
 **
 */
 void CFogOfWar::GenerateFog()
@@ -337,7 +337,7 @@ void CFogOfWar::GenerateFog()
 /**
 **  Proceed fog of war state update
 **
-**  @param doAtOnce     command to calculate fog of war in single sycle
+**  @param doAtOnce     command to calculate fog of war in single cycle
 **
 */
 void CFogOfWar::Update(bool doAtOnce /*= false*/)
@@ -371,7 +371,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
     if (doAtOnce || this->State == States::cFirstEntry) {
         GenerateFog();
         FogUpscale4x4();
-        Blurer.Blur(FogTexture.GetNext());
+        Blurrer.Blur(FogTexture.GetNext());
         FogTexture.PushNext(doAtOnce);
         this->State = States::cGenerateFog;
     } else {
@@ -387,7 +387,7 @@ void CFogOfWar::Update(bool doAtOnce /*= false*/)
                 break;
 
             case States::cBlurTexture:
-                Blurer.Blur(FogTexture.GetNext());
+                Blurrer.Blur(FogTexture.GetNext());
                 this->State++;
                 break;
 
@@ -474,7 +474,7 @@ void CFogOfWar::DrawEnhanced(CViewport &viewport)
 void CFogOfWar::FogUpscale4x4()
 {
     /*
-    **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Exlored.
+    **  For all fields from VisTable in the given rectangle to calculate two patterns - Visible and Explored.
     **
     **  [1][2] checks neighbours (#2,#3,#4) for tile #1 to calculate upscale patterns.
     **  [3][4]
@@ -484,9 +484,9 @@ void CFogOfWar::FogUpscale4x4()
     **  with sum of UpscaleTable values (one for Visible and another for Explored)
     **
     **  VisTable     FogTexture
-    **              [x][*][0][0]   where X - 2 or 1 - Visible or Exlored
+    **              [x][*][0][0]   where X - 2 or 1 - Visible or Explored
     **   [X][0] --\ [*][0][0][0]         x - 1/2 transparency
-    **   [0][0] --/ [0][0][0][0]         * - 1/4 transperency
+    **   [0][0] --/ [0][0][0][0]         * - 1/4 transparency
     **              [0][0][0][0]         0 - full opacity
     */
 

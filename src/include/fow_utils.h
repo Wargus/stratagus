@@ -82,7 +82,7 @@ private:
 };
 
 /// Class for box blur algorithm. Used to blur 4x4 upscaled FOW texture.
-class CBlurer
+class CBlurrer
 {
 public:
     void Init(const uint16_t textureWidth, const uint16_t textureHeight, const float radius, const int numOfIterations);
@@ -96,7 +96,7 @@ private:
 private:
     float   Radius          {2}; /// From 1 to 3 is optimal. With 3 result is very smooth,
                                  /// but it opens about 1/2 extra tiles around SightRange circle
-    uint8_t NumOfIterations {3}; /// 2-3 is optimal, with higher values result enhancing not so radicaly
+    uint8_t NumOfIterations {3}; /// 2-3 is optimal, with higher values result enhancing not so radically
 
     std::vector<uint8_t> HalfBoxes; /// Radiuses (box sizes) for box blur iterations
     std::vector<uint8_t> WorkingTexture;  /// Back buffer

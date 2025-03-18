@@ -174,7 +174,7 @@ public:
 
 	bool isInitialized() const { return this->isMapInitialized; }
 
-	/// Alocate and initialise map table.
+	/// Allocate and initialise map table.
 	void Create();
 	/// Build tables for map
 	void Init();

@@ -27,8 +27,8 @@
 //      02111-1307, USA.
 //
 
-#ifndef PARAMATERS_H
-#define PARAMATERS_H
+#ifndef PARAMETERS_H
+#define PARAMETERS_H
 
 #include "filesystem.h"
 
@@ -65,4 +65,4 @@ public:
 	static Parameters Instance;
 };
 
-#endif /* PARAMATERS_H */
+#endif /* PARAMETERS_H */

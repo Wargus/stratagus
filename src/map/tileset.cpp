@@ -113,7 +113,7 @@
 **      The tile number of the tile placed where trees are removed.
 **      Is created on the map by lumber chopping.
 **
-**  CTilset::woodTable[20]
+**  CTileset::woodTable[20]
 **
 **      Table for wood removable. This table contains the tile which
 **      is placed after a tree removement, depending on the surrounding.
@@ -145,7 +145,7 @@
 **
 **  CTileset::rockTable[20]
 **
-**      Table for rock removable. Depending on the surrinding this
+**      Table for rock removable. Depending on the surroundings this
 **      table contains the new tile to be placed.
 **
 **      @todo Johns: I don't think this table or routines look correct.

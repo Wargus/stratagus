@@ -321,7 +321,7 @@ void CMapInfo::Clear()
 }
 
 /**
-**  Alocate and initialise map table
+**  Allocate and initialise map table
 */
 void CMap::Create()
 {
@@ -619,7 +619,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
 
-	const tile_flags occupedFlag = (MapFieldWall
+	const tile_flags occupiedFlag = (MapFieldWall
 									| MapFieldUnpassable
 									| MapFieldLandUnit
 									| MapFieldBuilding);
@@ -628,14 +628,14 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		return;
 	}
 	mf.Value = ForestRegeneration;
-	if (mf.isFlag(occupedFlag) || pos.y == 0) {
+	if (mf.isFlag(occupiedFlag) || pos.y == 0) {
 		return;
 	}
 	const Vec2i offset(0, -1);
 	CMapField &topMf = *(&mf - this->Info.MapWidth);
 	if (topMf.getGraphicTile() == this->Tileset.getRemovedTreeTile()
 		&& topMf.Value >= ForestRegeneration
-		&& !topMf.isFlag(occupedFlag)) {
+		&& !topMf.isFlag(occupiedFlag)) {
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(Map.Tileset, Map.Tileset.getDefaultWoodTileIndex(), 0, mf.getElevation());
 		topMf.setGraphicTile(Map.Tileset.getTopOneTreeTile());

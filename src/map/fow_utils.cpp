@@ -187,7 +187,7 @@ void CEasedTexture::CalcDeltas()
 }
 
 /**
-**  Init box blurer
+**  Init box blurrer
 **
 **  @param textureWidth width of the working texture (input/output texture also)
 **  @param textureHeight height of the working texture (input/output texture also)
@@ -195,7 +195,7 @@ void CEasedTexture::CalcDeltas()
 **  @param numOfIterations c
 **
 */
-void CBlurer::Init(const uint16_t textureWidth, const uint16_t textureHeight, const float radius, const int numOfIterations)
+void CBlurrer::Init(const uint16_t textureWidth, const uint16_t textureHeight, const float radius, const int numOfIterations)
 {
     PrecalcParameters(radius, numOfIterations);
 
@@ -206,13 +206,13 @@ void CBlurer::Init(const uint16_t textureWidth, const uint16_t textureHeight, co
 }
 
 /**
-**  Init box blurer parameters (determine radiuses (box sizes) for box blur iterations)
+**  Init box blurrer parameters (determine radiuses (box sizes) for box blur iterations)
 **  This used to set new parameters for blur algorithm
 **
 **  @param radius Radius or standard deviation
 **  @param numOfIterations Number of boxes
 */
-void CBlurer::PrecalcParameters(const float radius, const int numOfIterations)
+void CBlurrer::PrecalcParameters(const float radius, const int numOfIterations)
 {
     Radius          = radius;
     NumOfIterations = numOfIterations;
@@ -237,10 +237,10 @@ void CBlurer::PrecalcParameters(const float radius, const int numOfIterations)
 }
 
 /**
-**  Clean blurer
+**  Clean blurrer
 **
 */
-void CBlurer::Clean()
+void CBlurrer::Clean()
 {
     HalfBoxes.clear();
     WorkingTexture.clear();
@@ -255,7 +255,7 @@ void CBlurer::Clean()
 ** @param  texture texture to blur (uint8_t)
 **
 */
-void CBlurer::Blur(uint8_t *const texture)
+void CBlurrer::Blur(uint8_t *const texture)
 {
     if (Radius * NumOfIterations == 0) { return; }
 
@@ -276,14 +276,14 @@ void CBlurer::Blur(uint8_t *const texture)
 }
 
 /**
-**  Proceed one iteration of box bluring
+**  Proceed one iteration of box blurring
 **
-**  @param  source  source texture (which has to be blured)
+**  @param  source  source texture (which has to be blurred)
 **  @param  target  target texture (where result will be)
 **  @param  radius  blur radius (box size) for current iteration
 **
 */
-void CBlurer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
+void CBlurrer::ProceedIteration(uint8_t *source, uint8_t *target, const uint8_t radius)
 {
     constexpr uint32_t fixedOneHalf = 32768; // 0.5
 

@@ -83,7 +83,7 @@ public:
 
     void EnableBilinearUpscale(const bool enable);
     bool IsBilinearUpscaleEnabled() const { return Settings.UpscaleType == UpscaleTypes::cBilinear; }
-    void InitBlurer(const float radius1, const float radius2, const uint16_t numOfIterations);
+    void InitBlurrer(const float radius1, const float radius2, const uint16_t numOfIterations);
 
     void Update(bool doAtOnce = false);
     void Draw(CViewport &viewport);
@@ -161,7 +161,7 @@ private:
     CEasedTexture        FogTexture;          /// Upscaled fog texture (alpha-channel values only) for whole map
                                               /// + 1 tile to the left and up (for simplification of upscale algorithm purposes).
     std::vector<uint8_t> RenderedFog;         /// Back buffer for bilinear upscaling in to viewports
-    CBlurer              Blurer;              /// Blurer for fog of war texture
+    CBlurrer             Blurrer;             /// Blurrer for fog of war texture
 
     /// Tables with patterns to generate fog of war texture from vision table
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
