@@ -780,6 +780,24 @@ std::vector<tile_index> CTileset::queryFirstOfItsKindTiles() const
 	return result;
 }
 
+tile_index CTileset::getFirstOfItsKindTile(tile_index tileIndex) const
+{
+	if (getGraphicTileFor(tileIndex) == 0) {
+		ErrorPrint("Requested first tile in the subslot for empty tile: %d\n", tileIndex);
+		return tileIndex;
+	}
+	tile_index result = tileIndex;
+	constexpr tile_index subSlotLen = 0xF;
+	while ((result & subSlotLen) != 0) {
+		if (getGraphicTileFor(result) == 0) {
+			result += 1;
+			break;
+		}
+		result--;
+	}
+	return result;
+}
+
 unsigned CTileset::getWallDirection(tile_index tileIndex, bool human) const
 {
 	int i;

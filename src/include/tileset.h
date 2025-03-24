@@ -213,6 +213,7 @@ public:
 	std::vector<tile_index> queryAllTiles() const;
 	std::vector<tile_index> querySolidTiles() const;
 	std::vector<tile_index> queryFirstOfItsKindTiles() const;
+	tile_index getFirstOfItsKindTile(tile_index tileIndex) const;
 
 	uint32_t getQuadFromTile(tile_index tileIndex) const;
 	int getTileBySurrounding(tile_flags type,

@@ -95,6 +95,8 @@ public:
 	}
 	void resetSelected() { selected = -1; }
 
+	bool selectByTile(tile_index tileIdx);
+
 	size_t numberOf() const { return icons.size(); }
 
 	void rebuild(bool manualMode = false, bool firstOfKindOnly = true);
