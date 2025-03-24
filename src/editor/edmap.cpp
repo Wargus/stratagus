@@ -86,6 +86,34 @@ std::optional<tile_index> CTileIconsSet::getSelectedTile() const
 	return std::nullopt;
 }
 
+bool CTileIconsSet::selectByTile(tile_index tileIdx)
+{
+	const auto prevSelected = selected;
+
+	auto tryToSelect = [this](tile_index idx) {
+		if (const auto it = ranges::find(icons, idx); it != icons.end()) {
+			select(std::distance(icons.begin(), it));
+			return true;
+		}
+		return false;
+	};
+	if (!tryToSelect(tileIdx)) {
+		tryToSelect(Map.Tileset.getFirstOfItsKindTile(tileIdx));
+	}
+	if (isSelected() && selected != prevSelected) {
+		if (displayedNum == 0) {
+			displayFrom(0);
+			ErrorPrint("Trying to set first displayed tile icon, "
+						"but the number of possible displayed icons is 0.\n");
+		} else {
+			const uint16_t k = selected / displayedNum;
+			displayFrom(displayedNum * k);
+		}
+		return true;
+	}
+	return false;
+}
+
 void CTileIconsSet::rebuild(bool manualMode /* = false */, bool firstOfKindOnly /* = true */)
 {
 	resetSelected();

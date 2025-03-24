@@ -96,6 +96,8 @@ static int ButtonPanelHeight;
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static int VisibleUnitIcons = 0;              /// Number of icons that are visible at a time
 
+static bool waitForReleaseLeftButton = false;
+
 enum class EditorActionType {
 	PlaceUnit,
 	RemoveUnit
@@ -1081,6 +1083,10 @@ static bool OverlayOpaque(const CMapField &mapField)
 */
 static void EditorCallbackButtonUp(unsigned button)
 {
+	if (waitForReleaseLeftButton && !(MouseButtons & LeftButton)) {
+		waitForReleaseLeftButton = false;
+	}
+
 	if (GameCursor == UI.Scroll.Cursor) {
 		// Move map.
 		GameCursor = UI.Point.Cursor; // Reset
@@ -1258,12 +1264,27 @@ static void EditorCallbackButtonDown(unsigned button)
 		if (MouseButtons & LeftButton) {
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (Editor.State == EditorStateType::EditTile
-				&& (Editor.tileIcons.isSelected()
-					|| Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::Decoration)) {
-
-				Editor.applyCurentBrush(tilePos);
-
+			if (Editor.State == EditorStateType::EditTile) {
+				if (!Editor.tileIcons.isSelected()
+					&& (KeyModifiers & ModifierControl)
+					&& !waitForReleaseLeftButton
+					&& Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::SingleTile) {
+	
+					const CMapField &mf = *Map.Field(tilePos);
+					if (Editor.tileIcons.selectByTile(mf.getTileIndex())) {
+						if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
+							Editor.brushes.getCurrentBrush().setTile(*selectedTile);
+						}
+						waitForReleaseLeftButton = true;
+					}
+				} else if (Editor.State == EditorStateType::EditTile
+							&& !waitForReleaseLeftButton
+							&& (Editor.tileIcons.isSelected()
+								|| Editor.brushes.getCurrentBrush().getType()
+									== CBrush::EBrushTypes::Decoration)) {
+	
+					Editor.applyCurentBrush(tilePos);
+				}
 			} else if (Editor.State == EditorStateType::EditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
@@ -1706,6 +1727,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorStateType::EditTile
+			&& !waitForReleaseLeftButton
 			&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
 
 			Editor.applyCurentBrush(tilePos);
