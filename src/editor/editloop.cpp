@@ -96,8 +96,6 @@ static int ButtonPanelHeight;
 static bool ActionDoneThisPress = false;	/// Only allow single action per press
 static int VisibleUnitIcons = 0;			/// Number of icons that are visible at a time
 
-static bool waitForReleaseLeftButton = false;
-
 enum class EditorActionType {
 	PlaceUnit,
 	RemoveUnit
