@@ -188,17 +188,19 @@ void CEditor::SetTile(const Vec2i &pos, tile_index tileIdx)
 **
 **  @param pos   map tile coordinate.
 */
-void CEditor::applyCurentBrush(const Vec2i &pos)
+void CEditor::applyCurentBrush(const Vec2i &pos, bool doNotChangeGraphics /* = false */)
 {
-	auto editTile = [this, &pos](const TilePos &tileOffset,
-								 tile_index tileIdx,
-								 bool fixNeighbors,
-								 bool decorative) -> void {
+	auto editTile = [this, &pos, doNotChangeGraphics](const TilePos &tileOffset,
+													  tile_index tileIdx,
+													  bool fixNeighbors,
+													  bool decorative) -> void {
 		const TilePos tilePos(pos + tileOffset);
 		if (!Map.Info.IsPointOnMap(tilePos)) {
 			return;
 		}
-		SetTile(tilePos, tileIdx);
+		if (!doNotChangeGraphics) {
+			SetTile(tilePos, tileIdx);
+		}
 		if (Map.Info.IsHighgroundsEnabled()) {
 			Map.Field(tilePos)->setElevation(SelectedElevationLevel);
 		}

@@ -93,8 +93,8 @@ static int IconHeight;                      /// Icon height in panels
 static int ButtonPanelWidth;
 static int ButtonPanelHeight;
 
-static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
-static int VisibleUnitIcons = 0;              /// Number of icons that are visible at a time
+static bool ActionDoneThisPress = false;	/// Only allow single action per press
+static int VisibleUnitIcons = 0;			/// Number of icons that are visible at a time
 
 static bool waitForReleaseLeftButton = false;
 
@@ -1083,10 +1083,6 @@ static bool OverlayOpaque(const CMapField &mapField)
 */
 static void EditorCallbackButtonUp(unsigned button)
 {
-	if (waitForReleaseLeftButton && !(MouseButtons & LeftButton)) {
-		waitForReleaseLeftButton = false;
-	}
-
 	if (GameCursor == UI.Scroll.Cursor) {
 		// Move map.
 		GameCursor = UI.Point.Cursor; // Reset
@@ -1102,7 +1098,7 @@ static void EditorCallbackButtonUp(unsigned button)
 		}
 	}
 	if ((1 << button) == LeftButton) {
-		UnitPlacedThisPress = false;
+		ActionDoneThisPress = false;
 	}
 
 	if (CursorState == CursorStates::Rectangle && !(MouseButtons & LeftButton)) { // leave select mode
@@ -1265,33 +1261,38 @@ static void EditorCallbackButtonDown(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (Editor.State == EditorStateType::EditTile) {
-				if (!Editor.tileIcons.isSelected()
-					&& (KeyModifiers & ModifierControl)
-					&& !waitForReleaseLeftButton
-					&& Editor.brushes.getCurrentBrush().getType() == CBrush::EBrushTypes::SingleTile) {
-	
-					const CMapField &mf = *Map.Field(tilePos);
-					if (Editor.tileIcons.selectByTile(mf.getTileIndex())) {
-						if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
-							Editor.brushes.getCurrentBrush().setTile(*selectedTile);
+				if (!ActionDoneThisPress) {
+					const auto &brushType = Editor.brushes.getCurrentBrush().getType();
+					
+					if (brushType == CBrush::EBrushTypes::SingleTile) {
+						if (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt)) {
+
+							const bool suppressGraphicsChange = !Editor.tileIcons.isSelected();
+							Editor.applyCurentBrush(tilePos, suppressGraphicsChange);
+							ActionDoneThisPress = true;
+
+						} else if (KeyModifiers & ModifierControl) {
+
+							if (Editor.tileIcons.selectByTile(Map.Field(tilePos)->getTileIndex())) {
+								if (const auto selectedTile = Editor.tileIcons.getSelectedTile()) {
+									Editor.brushes.getCurrentBrush().setTile(*selectedTile);
+								}
+								ActionDoneThisPress = true;
+							}
 						}
-						waitForReleaseLeftButton = true;
+					} else if (brushType == CBrush::EBrushTypes::Decoration) {
+		
+						Editor.applyCurentBrush(tilePos);
+						ActionDoneThisPress = true;
 					}
-				} else if (Editor.State == EditorStateType::EditTile
-							&& !waitForReleaseLeftButton
-							&& (Editor.tileIcons.isSelected()
-								|| Editor.brushes.getCurrentBrush().getType()
-									== CBrush::EBrushTypes::Decoration)) {
-	
-					Editor.applyCurentBrush(tilePos);
 				}
 			} else if (Editor.State == EditorStateType::EditUnit) {
-				if (!UnitPlacedThisPress && CursorBuilding) {
+				if (!ActionDoneThisPress && CursorBuilding) {
 					if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound.get(),
 									  MaxSampleVolume);
 						EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
-						UnitPlacedThisPress = true;
+						ActionDoneThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
@@ -1699,7 +1700,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	if (LastMapX != cursorTilePos.x || LastMapY != cursorTilePos.y) {
 		LastMapX = cursorTilePos.x;
 		LastMapY = cursorTilePos.y;
-		UnitPlacedThisPress = false;
+		ActionDoneThisPress = false;
 	}
 	// Drawing tiles on map.
 	if (CursorOn == ECursorOn::Map && (MouseButtons & LeftButton)
@@ -1726,17 +1727,28 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		RestrictCursorToViewport();
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
-		if (Editor.State == EditorStateType::EditTile
-			&& !waitForReleaseLeftButton
-			&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
+		if (Editor.State == EditorStateType::EditTile) {
+			if (!ActionDoneThisPress) {
 
-			Editor.applyCurentBrush(tilePos);
+				const auto &brushType = Editor.brushes.getCurrentBrush().getType();
 
+				if (brushType == CBrush::EBrushTypes::SingleTile
+					&& (Editor.tileIcons.isSelected() || (KeyModifiers & ModifierAlt))) {
+
+					const bool suppressGraphicsChange = !Editor.tileIcons.isSelected();
+					Editor.applyCurentBrush(tilePos, suppressGraphicsChange);
+					ActionDoneThisPress = true;
+
+				} else if (brushType == CBrush::EBrushTypes::Decoration) {
+					Editor.applyCurentBrush(tilePos);
+					ActionDoneThisPress = true;
+				}
+			}
 		} else if (Editor.State == EditorStateType::EditUnit && CursorBuilding) {
-			if (!UnitPlacedThisPress) {
+			if (!ActionDoneThisPress) {
 				if (CanBuildUnitType(nullptr, *CursorBuilding, tilePos, 1)) {
 					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
-					UnitPlacedThisPress = true;
+					ActionDoneThisPress = true;
 					UI.StatusLine.Clear();
 				}
 			}
