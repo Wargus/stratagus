@@ -136,7 +136,7 @@ public:
 
 	void Init();
 
-	void applyCurentBrush(const Vec2i &pos);
+	void applyCurentBrush(const Vec2i &pos, bool doNotChangeGraphics = false);
 
 	/// Make random map
 	void CreateRandomMap(bool shuffleTransitions = false);
