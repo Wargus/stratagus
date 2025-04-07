@@ -11,7 +11,6 @@ on:
       - '!**.md'
       - '!.vscode/**'
       - '!doc/**'
-      - '!doc/**'
 
   pull_request:
     paths:
@@ -21,7 +20,6 @@ on:
       - '.github/workflows/ubuntu.yml'
       - '!**.md'
       - '!.vscode/**'
-      - '!doc/**'
       - '!doc/**'
 
 jobs:
@@ -43,7 +41,7 @@ jobs:
     - name: build stratagus
       run: |
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DBUILD_TESTING=1
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=ON -DBUILD_VENDORED_MEDIA_LIBS=ON -DBUILD_TESTING=1 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         cmake --build . --config Release
         
     - name: run tests
