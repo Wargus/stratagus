@@ -41,7 +41,7 @@ jobs:
     - name: Build stratagus
       run: |
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=OFF -DBUILD_VENDORED_MEDIA_LIBS=OFF -DBUILD_TESTING=1
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_VENDORED_LUA=ON -DBUILD_VENDORED_SDL=OFF -DBUILD_VENDORED_MEDIA_LIBS=OFF -DBUILD_TESTING=1 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
         cmake --build . --config Release
 
     - name: run tests
