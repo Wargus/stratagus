@@ -649,7 +649,7 @@ else()
 	find_package(Tolua++ REQUIRED)
 endif()
 
-set(SOL2_INCLUDE_DIR sol2/include/)
+set(SOL2_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third-party/sol2/include)
 
 if(BUILD_VENDORED_MEDIA_LIBS)
 	vendored_zlib()
