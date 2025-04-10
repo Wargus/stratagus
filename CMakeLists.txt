@@ -647,7 +647,7 @@ endif()
 if(BUILD_VENDORED_LUA)
 	vendored_lua()
 else()
-	find_package(Lua51 REQUIRED)
+	find_package(Lua 5.1 EXACT REQUIRED)
 	find_package(Tolua++ REQUIRED)
 endif()
 
