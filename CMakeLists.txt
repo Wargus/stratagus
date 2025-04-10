@@ -87,8 +87,6 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-include_directories(SYSTEM src/third_party/)
-
 set(action_SRCS
 	src/action/action_attack.cpp
 	src/action/action_board.cpp
@@ -647,9 +645,11 @@ endif()
 if(BUILD_VENDORED_LUA)
 	vendored_lua()
 else()
-	find_package(Lua51 REQUIRED)
+	find_package(Lua 5.1 EXACT REQUIRED)
 	find_package(Tolua++ REQUIRED)
 endif()
+
+set(SOL2_INCLUDE_DIR sol2/include/)
 
 if(BUILD_VENDORED_MEDIA_LIBS)
 	vendored_zlib()
@@ -766,7 +766,7 @@ endif()
 # Stratagus definitions
 
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
-include_directories(SYSTEM ${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
+include_directories(SYSTEM ${LUA_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SOL2_INCLUDE_DIR} ${TOLUA++_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${PNG_INCLUDE_DIR})
 set(stratagus_LIBS ${stratagus_LIBS} ${LUA_LIBRARIES} ${SDL2_LIBRARY} ${SDL2_MIXER_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${TOLUA++_LIBRARY} ${ZLIB_LIBRARIES} ${PNG_LIBRARY})
 
 if(WIN32 AND NOT ENABLE_STDIO_REDIRECT)
