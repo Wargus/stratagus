@@ -52,6 +52,11 @@ extern "C" {
 #include "stratagus.h"
 #include "vec2i.h"
 
+#define SOL_ALL_SAFETIES_ON 1
+#define SOL_LUA_VERSION 501
+#define SOL_ENABLE_INTEROP 1 // MUST be defined to use interop features
+#include <sol/sol.hpp>
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -122,12 +127,12 @@ inline int LuaGetArgsNum(lua_State *l)
 }
 
 #if LUA_VERSION_NUM <= 501
-
+/*
 inline size_t lua_rawlen(lua_State *l, int index)
 {
 	return luaL_getn(l, index);
 }
-
+*/
 #endif
 
 /// All possible value for a number.
