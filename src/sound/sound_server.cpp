@@ -176,8 +176,8 @@ static bool External_Play(const std::string &file) {
 		auto volumeStr = std::to_string(std::min(MusicVolume, 127));
 		auto full_filenameStr = full_filename.string();
 #endif
-		auto args = QuoteArguments({L("stratagus-midiplayer.exe"), volumeStr, full_filenameStr});
-		auto cmd = std::accumulate(std::next(args.begin()), args.end(), args[0], [](const auto& lhs, const auto& rhs) { return lhs + L(" ") + rhs; });
+		auto args = QuoteArguments({LL("stratagus-midiplayer.exe"), volumeStr, full_filenameStr});
+		auto cmd = std::accumulate(std::next(args.begin()), args.end(), args[0], [](const auto& lhs, const auto& rhs) { return lhs + LL(" ") + rhs; });
 		DebugPrint("Using external command to play midi on windows: %s\n", cmd.c_str());
 		STARTUPINFO si;
 		ZeroMemory(&si, sizeof(si));

@@ -107,9 +107,9 @@ extern errno_t strcat_s(char *dst, size_t dstsize, const char *src);
 #endif
 
 #if defined(WIN32) && defined(UNICODE)
-#define L(LITERAL) L"" LITERAL
+#define LL(LITERAL) L"" LITERAL
 #else
-#define L(LITERAL) "" LITERAL
+#define LL(LITERAL) "" LITERAL
 #endif
 
 int to_number(std::string_view s, int base = 10);

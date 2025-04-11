@@ -669,7 +669,7 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 #ifdef USE_WIN32
 static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 {
-	HANDLE hFile = CreateFile(L("crash.dmp"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+	HANDLE hFile = CreateFile(LL("crash.dmp"), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
 		nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	MINIDUMP_EXCEPTION_INFORMATION mei;
 	mei.ThreadId = GetCurrentThreadId();
