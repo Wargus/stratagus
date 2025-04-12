@@ -239,7 +239,7 @@ public:
 
 private:
 	std::vector<AiForce> forces;
-	char script[AI_MAX_FORCES];
+	unsigned int script[AI_MAX_FORCES];
 };
 
 /**
