@@ -471,8 +471,8 @@ void InitVideoSdl()
 	// fullscreen. So we don't hide the cursor, but instead set a transparent
 	// 1px cursor
 	Uint8 emptyCursor[] = {'\0'};
-	Video.blankCursor = SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0);
-	SDL_SetCursor(Video.blankCursor);
+	Video.blankCursor.reset(SDL_CreateCursor(emptyCursor, emptyCursor, 1, 1, 0, 0));
+	SDL_SetCursor(Video.blankCursor.get());
 
 	InitKey2Str();
 

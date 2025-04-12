@@ -390,7 +390,7 @@ public:
 	int WindowWidth = 0;
 	int WindowHeight = 0;
 	double VerticalPixelSize = 1.;
-	SDL_Cursor *blankCursor = nullptr;
+	sdl2::CursorPtr blankCursor;
 	int Depth = 0;
 	bool FullScreen = false;
 };
